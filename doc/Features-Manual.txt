@@ -1,0 +1,173 @@
+Alarian-MFH Mod 2.9xx Features List
+
+-------------------
+IMPORTANT - Note on the memory leak and how to handle it:
+Python version 2.4 (which Frets on Fire is built on) has an inherent memory leak problem.  As you play more songs, this leak will eat more and more of your physical and virtual memory until the game runs unplayably slow.
+Every so often, it is recommended that you quit the game completely and restart it.  This clears all memory used and restarts the game fresh.
+-------------------
+
+Notes: 
+-When I refer to the Game Settings menu, it means the top option under Options. MFH-Alarian renames it to "MFH-Alarian Mod vX.XXX" to reflect the current version number.
+-A few options have the selection "RB" that means that ONLY the Rock Band theme will have this option
+
+
+* Completely Customizable Graphics
+	Using different themes, the Alarian-MFH mod can change nearly every visual aspect of the game, as well as some of the sounds. Themes included in Alarian-MFH are; Rock Band, Guitar Hero 3, Guitar Hero 2, Guitar Hero 1 and 8-bit. These themes can be changed in the Game Settings menu.
+
+* Unlimited Themes
+	Alarian-MFH mod supports an unlimited amount of themes, so feel free to add as many as you want without having to replace any existing ones. The themes you add will be changeable in the Game Settings menu.
+
+* Multiplayer Support
+	Alarian-MFH mod supports up to two players on the same computer. Each player can play any instrument they would like, including guitar, bass and drums. There are 3 different modes of multiplayer play;
+Face-off: Each player can choose any instrument they would like, and just play. It takes both players to reach the bottom of their meter to fail the song.
+Pro Face-off!: Similar to Face-Off, each player can choose any instrument they would like, but this time your fail meter depends on your opponent's meter. As your opponent does better, you do worse and vice-versa.
+Party Mode: Only one player plays at a time. At a set interval, control of the frets is switched between player 1 and player 2. The interval can be changed in the Game Settings menu.
+Face-off and Pro Face-off! can be selected in the Game Settings menu. Party mode is selected when 2nd player is selecting his instrument.
+
+* Random Stages and Stage Rotate
+	An unlimited number of stages can be placed into any theme and randomly chosen each time you begin a song. Stages can also be rotated through either randomly, in order, back and forth, or not at all, while playing the song. The stages will rotate at a set interval. Stage properties can be changed in the Game Settings menu. The interval at which the stages rotate can also be changed during a song, in Settings in the pause menu.
+
+Extra: Stages can actually be 'animated' through a small enough time interval and frame-by-frame pictures. 
+
+* Starpower/Overdrive
+	Starpower is a feature that allows a player to double their multiplier while playing a song. It can be achieved through hitting a number of notes (starnotes) in order without missing. At least 2 of these combos is needed to activate starpower. In the Rock Band theme, starpower is called Overdrive. It is displayed as a bar under the keys and has the same properties as starpower. 
+	Through the option "SP Refill" in the Game Settings menu, more starpower can be gained while starpower is already activated.
+	Alarian-MFH mod also supports animated starnotes (exclusive to the Guitar Hero 3 theme). This will make the starnotes actually spin in place on the fretboard. This can also be changed in the Game Settings menu.
+
+* Bass Groove
+	When you hit enough notes in order while playing the bass guitar of a song, your multiplier will exceed 4x and continue to 5x and even 6x. A neck will either overlay or replace your current neck to indicate that bass groove is active. The bass groove neck options can be changed in the Game Settings menu.
+
+* Killswitch
+	In place of whammy, killswitch allows a player to modify the sound of hold notes by pressing a set key. Killswitch will cut the sound for that note. In hold notes that are also starnotes, the killswitch can be used to gain more starpower, by activating killswitch while holding the note. The necks will glow white to show that killswitch is active. Themes with custom tails, like the Guitar Hero 3 theme, will not glow white (though killswitch works the same).
+
+* Jurgen
+	Jurgen is a bot that will 100% any song you would like. You can also play against Jurgen by allowing him to play as second player. Jurgen can play guitar, bass and drums. His options can be changed in the Game Settings menu, and also in the in-game pause menu (under Settings). To have him play as second player, make sure 2 player is turned on.
+
+* Rock Band Events
+	Alarian-MFH includes some of the Rock Band features found only in that game. These features include;
+Solos: During a song solo, the neck will change to indicate that a solo is happening, and on the side a note counter will appear, showing how many notes are in the solo and how many notes you have hit. When the solo ends, you will be given a bonus on how well you did during the solo.
+Star Counter: As you play the song, stars in the top right corner will light up, showing how well you are doing in the song.
+These events are toggleable in the Game Settings menu.
+
+* Customizable Ho/pos and Note Hit Window
+	Alarian-MFH offers a wide variety of different settings for ho/pos and note hit window. Options include;
+HO/PO System: The qualities that the ho/pos will have. 
+Ho/PO Timing: The amount of ho/pos there will be. 
+HO/PO After Chord: Just what it says, if you want ho/pos to be hittable able chords, turn it On, if you want to have to strum the ho/pos after chords, turn it Off.
+Note Hit-Window: The amount of leniency before and after a note that you are still allowed to hit the note. 
+	Board Speed can also be changed. It is measured on Difficulty & BPM. The higher the percent, the faster it goes and vice-versa. It has no effect on the amount of ho/pos or the hit window. These options can be changed in Fretboard Settings. 
+
+* In game Status Display
+	There are a number of different displays the player can watch as he plays a song on top of the failing meter and star display.
+-Accuracy: Can be measured in Numeric(milliseconds) or Friendly(in words such as Perfect or Late). The position of the Accuracy words can also be changed in Visual Settings.
+-In-Game Stats: A counter of the notes you have hit to the amount of notes in the song. It also displays your multiplier average. This option can be changed in the Game Settings menu. 
+	In multiplayer, each player gets their own fail meter and status display.
+
+* Customizable Fretboard POV
+	The point of view of the fretboard while playing a song can be changed in the Fretboard Settings menu. Choices are Rock Band, ROck Rev(olution), GH2, GH3, FoF and custom. Each one makes the neck look like the one from a certain game.
+	The drum neck POV can also be changed from large to regular sized, in the same menu.
+
+* Support for seperate song, guitar, bass, and drum audio tracks
+	When playing a song with a seperate track for, lets say, guitar, when you miss a note, only the guitar part of the track will go silent, while the rest of the song will continue to play on. The same goes for bass and drum tracks.
+
+* Optional scrolling MIDI / Rock Band lyrics (where available)
+	Reading from the midi itself, song lyrics can be displayed and will scroll on the top of the screen. Songs recognized to have these lyrics will automatically display the lyricsheet at the top of the screen and move the scores and in-game display accordingly. 
+This option can be toggled in the Game Settings menu under MIDI/RB Lyrics.
+
+* Neck Selection
+	After choosing Quickplay to begin playing, you will be given a choice of what neck you want to play with. The necks that you can choose from are found in the FoF/data/necks folder. An unlimited number of necks can be placed in the folder, as long as they are numbered in order from Neck_1. A random neck selection is also available. Neck selection can be toggled in the Performance Settings menu.
+
+* Debug Options
+	If you ever feel the need to see exactly how all the notes are working and you wish to see exactly how, you can turn on HOPO Debug and Killsw Debug in the Game Settings Menu.
+
+*******************************************************
+
+Miscellaneous Options
+
+*******************************************************
+
+Here is a brief overview of the options not described
+in the feature list above.
+
+
+*******************************************************
+Game Settings
+*******************************************************
+
+--Language - Select the language of the game
+--Upload Highscores - by default, Alarian-MFH sends 
+scores to http://fofchart.exofire.net/index.php?sp=true
+--Starpower Clap SFX: In Guitar Hero 3, during starpower
+the crowd will clap along with the song. 
+--Star Scoring: The way the stars are calculated. For
+GH/RB it is based on your average multiplier, for FoF
+it is based on your hit percentage
+--Score SFX: After the song is finished, a sound will
+play depending on how you did.
+--Rock Band MIDI Events: This will display the events
+named in a midi, like guitar_solo.
+--Show Unused Events: No; only events that trigger solos
+or end solos will be shown. Yes; all events listed in 
+a midi will be shown. These events scroll across the
+screen at the top.
+--Rock Band Version: The way the Rock Band theme will 
+look.
+
+*******************************************************
+Key Settings
+*******************************************************
+
+--Key Conflicts: How the game will monitor your key 
+settings.
+--Keyset: Switches between Normal keys or alternate
+keys.
+
+The rest should be self-explanatory. 
+
+*******************************************************
+Visual Settings
+*******************************************************
+
+--Enable Glow-FX: The glow under notes as you press or
+hold them.
+--Glow-FX Color: The color the glow will be. Actual
+color makes it white.
+
+*******************************************************
+Fretboard Settings
+*******************************************************
+
+--Phrases: Words that will pop up during gameplay when
+you reach a certain goal, like 100 note streak, or
+starpower ready.
+--Bass Groove Neck: How the bass groove will look when
+it is activated. Overlay will put a neck over your 
+current one, and replace will replace it. You can
+also turn this feature off.
+--Guitar Solo Neck: Same feature as Bass Groove, 
+except this neck displays when a solo is active.
+
+*******************************************************
+Audio Settings
+*******************************************************
+
+--A/V Delay: The delay of the song for the notes. If the 
+notes seem to come too early or too late, change this 
+value. It can also be changed at the pause menu.
+--Bass Kick sound: when playing drums; On: the bass
+kick sound will play whenever you hit the bass, even 
+if there is a note there. Off: the sound will never play.
+
+*******************************************************
+Performance Settings
+*******************************************************
+
+--Disable Library Count: On: when a folder is selected,
+then the game will tell you how many songs are in the
+folder.
+
+*******************************************************
+
+Thats about all of it. If you have any questions please
+go to the official topic of the Alarian-MFH mod at the
+fretsonfire fan forums. http://fretsonfire.net

@@ -1,0 +1,1664 @@
+New in 3.0:-----------------------------------------------------------------------------------------------------
+
+
+New since 2.995:
+==Replaced RbMFH theme's editor.png with >Slash666<'s fixed image
+==Replaced RbMFH theme's Preview.png with BlackJack's fixed image
+++Added Blazingamer's font shadowing to songlist (only applies to GH2 & GH3 themes, RB themes unaffected)
+++Added Blazingamer's font shadowing to gameplay (this also results in the Rock Band theme using the songlist font in-game, looks OK so I'm gonna leave it)
+++++New option under "Fretboard Settings" -> "In-Game Font Shadow" (default Off) - will double-render text objects during gameplay for a shadowing effect (Off to minimize lag)
+++Added "mfhlogo.png" to credits and data\ folder
+++Added blank lines to end of credits so they scroll off the screen before the credit sequence ends
+++Added version numbers to Python and Pygame entries in credits since I know them
+++Partial translation code changes from evilynux's [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4970#entry311217].diff patch[/url] (any of the bool or int options can have translated dictionary values; the game never refers to those strings, only to the bool or int -- so most of these changes are unnecessary)
+++Prevented Neck_0.png from being included in the new neck randomization logic
+++Updated to V2 of Figure's Fakir font for Rock Band theme from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=25341]this post[/url]
+++Added new logic (for Rock Band scoring style only) to calculate and use mrhoievo's partial grey stars from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4860#entry309884]this post[/url] -- [url=http://i36.tinypic.com/ka1r41.jpg]SS[/url]
+++Added support for separate / optional "drum_overdrive_side_bars.png" - if not present it won't be used
+++Moved note accuracy display slightly left when using 2 decimal places to prevent >1000 note counts from overlapping with streak counter box
+++Added translatable string "% Complete" from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=5030#entry312617]BlackJack's post[/url]
+++Added separate setting to allow in-game star scoring without the text stats - [url=http://i36.tinypic.com/2mop76g.jpg]SS with partial grey star[/url]
+++++"In-Game Stats" setting now only controls the display of Average Multiplier and Total Accuracy - default now Off
+++++New option, under "Theme Settings" -> "In-Game Stars": (default "RB Only") "Off", "RB Only", "On"
+++++New option, under "Theme Settings" -> "Partial Stars": (default "Auto") "Auto", "Off"   (enables Partial Grey Star system, if available)
+++Added log entry to startup routine that displays internal pygame version
+++Ensured lyric font does not get shadowed (shadowed lyrics are quite jumpy)
+++Added Blazingamer's new GH3-style 3D keys with hit and hold models to both Guitar and Drum objects (no hold models for Drum objects, of course) - 3D notes and keys currently display white
+++Relocated script / static lyric display determination logic to initialization routine, so it doesn't happen repeatedly during render
+++Fixed loading screen's incorrect font size estimation (was always off-center)
+++Added logic to recognize current method of sorting tier songs by name (1. 2. 3.) and filter these numbers out of the songlist display 
+++Added logic to add indents to tier songs (when sorting by tier)
+++Added evilynux's [url=http://rafb.net/p/M1LU7n80.html].diff patch[/url] to skip blank songlist / cd list lines, and to skip tier lines in songlist mode
+++Added logic to catch entering of a completely empty song folder - and kick back out to the parent folder
+++Added logic to remove any double blank lines in songlist (resulting from having no "bonus" songs while in career mode, for example)
+++Added logic to allow Left and Right to stop on the CareerResetter as well as the Tiers
+++Updated Left and Right songlist behavior to not get confused with evilynux's blank line & tier line skipper code
+++++Rewrote Dialogs.wrapCenteredText() function to truly provide a line-by-line centering / wrapping capability (x parameter = centerline)
+++Fixed GH3 loading screen to always wrap text around the right area (single-line phrases were not positioned correctly)
+++Ensured lyric sheet doesn't show up on a song with lyrics when they are disabled
+++Added support for Figure's [url=http://i199.photobucket.com/albums/aa248/Figure_02/Rock%20Band%20Stuff/overdriveready.png]overdrive_string_flash.png[/url] for Rock Band themes (glowing strings for a second or so whenever overdrive is gained or activated) - for Guitar objects
+++Added support for a drum_overdrive_string_flash.png (does not yet exist) - for Drum objects
+++Added missing fallback logic to Guitar objects for optional loading of overdrive side_bars and overdrive center_lines
+++New user setting under Game Settings -> "MIDI/RB Sections" (default Auto): "Off", "Auto" - enables scrolling section names across the top of the screen (where available) - Guitar solos will still work with this Off (with no warning)
+++evilynux renamed all neck filenames to Neck_001,002,003, etc. so they display in order again (since arbitrary neck filenames may now be used)
+++Normalized all Rock Band main menu songs (they were at VASTLY different volume levels)
+++Ensured that bass drum notes are always rendered before other drum notes, so the bass drum notes don't obscure them - [url=http://i38.tinypic.com/w8x9jb.jpg]SS[/url]
+++Fixed use of translated "Standard" animated stage option in guitarscene (changed to "Normal" as well for clarity) - [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=4900#entry310261]detail post[/url]
+++When hit accuracy is set to display in the center and guitar solo is also set to display in the center, bump solo accuracy and review texts up above it to avoid overlap - [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4550#entry305541]detail post[/url]
+++New option under "Audio Settings" -> "Mute last second" (default Off): Off, On (will mute all audio tracks at the last second for those who have songs with clicks at the end) -- [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4970#entry311323]detail post[/url]
+++Renamed "Gh2" theme folder to "Guitar Hero II", updated to Project Clone's latest version
+++Duplicated loading phrases from GH3 theme into GH2's theme.ini (instead of "Loading phrases coming soon!")
+++Added [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=23970;r=1]Blazingamer's Megalight theme V2[/url] and making it the default / fallback theme
+++Duplicated loading phrases from Rock Band theme into MegaLight's theme.ini
+++Fixed MegaLight's songlist display color to show song names in white (song_name_text_color = #FFFFFF)
+++Added partial stars capability to MegaLight theme (can be disabled in options, and only adds 80kB to MegaLight)
+++Renamed "Gh1" theme folder to "Guitar Hero I"
+++Added theme.ini entries to adjust Guitar Hero I theme (menu position, loading phrase position, song name color, etc)
+++Renamed Gh3 folder to Guitar Hero III (worldrave's GH3 theme v2.09)
+++Added Project Clone's Guitar Hero: Rock the 80's theme to full release as "Guitar Hero 80s" folder
+++Duplicated GH3 theme.ini loading phrases to GH80's theme.ini (instead of "loading phrases coming soon!")
+==IMPORTANT: Renamed all files and folders and code references to lowercase (except FretsOnFire.exe, MSVCR71.dll, doc\*.*, SDL.dll, SDL_image.dll, SDL_mixer.dll, SDL_ttf.dll, _GL__init__.pyd, and _GLU__init__.pyd)
+====THEME CREATORS - please download the newest version of your theme from the 3.000 posted links, or make sure all your folder and file names are lowercase for cross-platform compatibility!
+++Renamed "RbMFH" theme folder to "Rock Band"
+++Added ugo's Rock Band 2 theme to full release with folder name "Rock Band 2"
+++Added partial grey star capability to ugo's Rock Band 2 theme
+--Removed 8-bit theme from full release (this will be an optional download, it does not fit in as a GH/RB theme)
+++Added a Guitar Hero: Aerosmith theme to the "Guitar Hero Aerosmith" folder, from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24995]this thread[/url]
+++Duplicated theme.ini settings for GHA songlist colors and loading phrases from GH3 theme.ini
+++Removed "Cassette Tapes" mod (since we have individual control over cassettes and guitar cases in the other mods)
+==Renamed "Cassettes Only" mod to "Cassettes"
+==Renamed "Guitar Cases Only" mod to "Guitar Cases"
+++Added [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=25648&st=#entry251966]Blazingamer's low-poly CDs & cases mod[/url] as "Low Poly CD List"
+++Added treckzy's [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=29804&st=160#entry313422]glowing bass groove multiplier[/url] for Rock Band 2 theme
+++New selection for "Animated Stage" - "Random" (translatable, only available if 2 or more animated subfolders are found) - will randomly select one of the animated stage subfolders in <themename>\stages\ (it will ignore the base stages\ folder)
+++Added TypusMensch's "Beavis and Butthead" and "Schizo Tunnel" animated stage subfolders to Rock Band 1 theme as small demonstrations (needed at least 2 to demonstrate Random)
+++Replaced Schizo Tunnel stage with animated stage from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=29265&st=#entry295800]this post[/url] by SneakHouse
+++Replaced "99pct1.ogg" with a sound clip from Wayne's World - "Okay.  Party.  Bonus."
+++Replaced "99pct2.ogg" with a sound clip from Bill and Ted's Excellent Adventure - "Excellent! <air guitar>"
+++Replaced "99pct3.ogg" with a clip from riff 33 from [url=http://guitar-wav.com/riffs4.html]this page[/url]
+++Replaced "100pct1.ogg" with a sound clip from Bill and Ted's Excellent Adventure - "Whoa..."
+++Replaced "100pct2.ogg" with "endsong.wav" from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=4480#entry304428]p_025's RB ripped SFX[/url]
+==Renamed all Guitar screw up sounds from fibaX.wav to guitscwX.wav
+==Renamed all Bass screw up sounds from bfibaX.wav to bassscwX.wav
+++Updated to worldrave's GH3 theme hotfix 10
+++Fixed tutorial "Unsubscriptable Object" crash - [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=5130#entry314051]detail post[/url]
+++Ensured tutorial has failing disabled
+++Ensured partial grey star status resets along with song restarts
+++Fixed [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=5100#entry313616]HOPO before chord strum issue[/url] involving Tribe - Outside
+++Wrote some new pre-emptive same-note HOPO strum patten detection to help determine HOPO strumming intentions
+++Wrote new logic to allow tracking of multiple HOPO problem notes (for strumming a HOPO while your fingers match the next chord) -- test this with 3.000 beta4, requires 2.995 and windows (or renaming all data & theme files to lowercase as detailed above): [url=http://www.usaupload.net/d/zmohqbybuca]download beta4[/url]
+++++Enhanced HOPO debug log output and added this new multiple problem note tracking to the HOPO on-screen debug
+++Replaced RB overdrive center lines & overdrive side bars with [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=5130#entry314291]Dillusional's[/url]
+++Added support for [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=4480#entry304428]p_025's RB ripped SFX[/url]
+++++Normalized audio levels for all of these SFX to -10db by perceived loudness (could barely hear them before)
+++++Added optional support for theme-based Guitar screw-up sounds (guitscwX.wav)
+++++Added optional support for theme-based Bass screw-up sounds (bassscwX.wav)
+++++Added optional support for theme-based Drum miss sounds (drumscwX.wav)
+++++Added optional support for theme-based rocksound.ogg
+++++Created rocksound.ogg for Rock Band 1 theme from "endsong.wav" from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=4480#entry304428]p_025's RB ripped SFX[/url]
+++++Renamed starpower.wav to optional crowdcheers.wav, added logic to play crowd cheer when starpower is activated and when a great (or better) solo is finished
+++++Created starpower.wav for Rock Band 1 theme from "energy gain.wav" from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=4480#entry304428]p_025's RB ripped SFX[/url]
+++++Added optional support for a separate "Starpower / overdrive gained & ready to use" sound ("starpowerready.wav" from "energy gain, OD Ready.wav" in [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=4480#entry304428]p_025's RB ripped SFX[/url])
+++++Added optional support for a separate "Starpower / overdrive activation" sound ("staractivate.wav" from "OD Activate.wav" in [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=4480#entry304428]p_025's RB ripped SFX[/url])
+++++Added optional support for a "Starpower / overdrive depleted" sound ("stardeactivate.wav" from "back.wav" in [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=4480#entry304428]p_025's RB ripped SFX[/url] - plays nothing if absent)
+++++Added optional support for a random selection of 10 "Accept / action" SFX ("accept1.wav" - "accept10.wav" from "rb conf01.wav" - "rb conf10.wav" in [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=4480#entry304428]p_025's RB ripped SFX[/url] - either all required or none) instead of just the one "action.wav" (or "in.wav")
+++Renamed "crunchX.wav" to "selectX.wav" for clarity (these 3 SFX are randomly played as you change the highlighted item in a menu) <===IMPORTANT, ATTENTION THEMERS
+++Added new mod to mods folder, "MegaLight RB Notes": uses Rock Band 1 notes.png for the MegaLight theme
+++New option under "Theme Settings" -> "Animation Delay": (default 3) delay to use for animated stages (subfolders) - separate from Rotation Delay, which is only for the stages\ folder slideshow
+++Added logic to automatically select the first animated stage by default if at least one is found, when you restart with a new theme; otherwise falllback on Normal (rotation / slideshow)
+++Added logic to default to the Rock Band 1 theme if it exists with MegaLight still as a fallback
+++Added new function to Options menu, untranslatable: "Reset to English" - will reset language to English and restart, just in case you get trapped in a language you can't understand (unless already using English)
+++Added partial grey star scoring calculations & support to GH-style star scoring.
+++Added partial grey star scoring calculations & support to FoF-style star scoring.
+++Translation update to Alexfighter's Spanish v1.5 from 25th September 2008
+++Translation update to BlackJack's French (Reform 1990) v0.85, Pig Latin v0.85, English Reversed 1.0
+++Translation update to x-driver's German v0.41 from 2008-09-18
+++Added background auto-scaling logic to Game Results screen (neck select background already scales automatically)
+++Compressed all .wav files to .ogg, changed appropriate loading code - test the final (hopefully) beta (windows only, Rock Band 1 theme only, others must rename all files as above to lowercase and compress all .wav files to .ogg): [url=http://www.mediafire.com/?iwwmnz9xznn]3.000.beta5[/url]
+++Re-built FretsOnFire.exe & library.zip from sources - releases will contain a full windows src folder, complete with batch files
+++++Updated setup.py script to properly compile & build FretsOnFire.exe & library.zip
+
+New in 2.9:-----------------------------------------------------------------------------------------------------
+
+--------------------------------
+[b]Version 2.995 (9/16/2008, 9:45pm PST) -- ugo's full installer [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=1750#entry263934]post[/url], [url=http://rapidshare.com/files/146112954/Frets_on_Fire_MFH-Alarian_Mod_v2.995.exe]Rapidshare download[/url] -- [url=http://mfh-alarian-mod.com/Releases/MfhModV2_995-AnimatedStageSelect.rar]Patch direct download[/url] -- [url=http://www.mediafire.com/?bgyn11icee0]Patch mediafire download[/url]
+[i]New since 2.990:[/i]
+++Simplified Dialogs.songListLoaded log entry (no longer spits out IDs of all song and title objects)
+++Fixed logic that handles [i]the unsupported capitalized .PNG stage files[/i] during scale factor precalculation routine
+++++Completely filtered out .PNG files now, with log warnings.  If every single stage is .PNG, this situation is now caught and blank stage mode is forced instead of a crash
+++++++This means no more blank frames will be displayed in-game; extreme cases, such as every single stage being .PNG, cause a stack overflow.
+==Changed ugo's credits entry to "ugo247548 (Biskit)"
+++New setting under "Theme Settings" -> "Animated Stage" allows user to select from animated stage folders under <themename>\Stages\  --- [url=http://i35.tinypic.com/213ewyx.jpg]SS[/url]
+++Moved "stage_mode", "song_stage", "rotate_stages", "stage_rotate_delay" settings to Theme settings menu
+++Code changes from evilynux's .diff posts [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4670#entry307188]here[/url], and [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=4680#entry307517]here[/url]
+++Wrote new solo detection logic that can recognize the correct solos in GH2 - Rush - YYZ (filter for "bass solo" section markers)
+++Wrote new solo detection logic that can correctly count solo notes in RBDLC - Staind - This is It, RB - Ballroom Blitz, GH80's - .38 Special - Hold On Loosely, Dio - Holy Diver, Twisted Sister - I Wanna Rock (solos until end counted wrong)
+++Added treckzy's [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=29804&st=90#entry307345]yellow overdrive centerlines / outline[/url] to RbMFH theme
+++Added optional support for "drum_overdrive_center_lines.png"
+++Added fallback logic to allow "overdrive center_lines.png" and "overdrive side_bars.png" to be optional
+++Added worldrave's new GH3 starpower bulb rendering code from [url=http://pastebin.com/f4a1646fd]here[/url] and [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4770#entry308952]here[/url]
+++New logic inserts blank lines after each career tier, an "End of Career" marker sandwiched by blank lines after the last career song (shows where "bonus" songs start), and a blank line before "Reset Career"
+++Wrote new random neck logic that can support arbitrary neck filenames, applied to both Guitar and Drum objects
+--Removed "chosen neck doesn't exist" fallback logic from Neck Chooser (handled upon startup in Main Menu)
+++Added support for 2 possible "random neck" selection filenames: "Neck_0.png" and "randomneck.png"
+++Added [url=http://i37.tinypic.com/eg73p5.png]evil-doer's fixed GH3 strings image[/url], with no hard edges - [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=4780#entry308973]detail post[/url]
+++Added evilynux's .diff patch to tidy up GuitarScene.py / failed screen
+++Replaced necks 46 - 49 with [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=4790#entry309133]BlackJack's fixed necks[/url]
+++New option under "Fretboard Settings" -> "HOPO Indicator" (default Off) - shows "HOPO" at lower right-hand corner, greyed out = strums required, white = no strums required [url=http://i33.tinypic.com/30t6wzp.jpg]SS[/url]
+++Added a simple confirmation menu to "Reset Career" function ("Are you sure you want to reset this entire career?") ("No") ("Yes") -- [url=http://i35.tinypic.com/wbqnub.jpg]SS[/url]
+++Adding logic to display year in CD song list mode
+==Renamed "Drum highscore nav" to "Drum navigation" - this setting now enables / disables drum menu navigation (for those using keyboard for drums, this allows songlist search and highscore name input)
+++Updated to Alexfighter's v1.2f Spanish translation file
+++Updated to BlackJack's v0.74 French (Reform 1990) translation file
+++Updated to x-driver's v0.39 German translation file
+++Fixed "Animated Stage" "Standard" Spanish translation problem (constructed dictionary of options manually, with a non-translated internal label) -- [url=http://i38.tinypic.com/2r2b39k.jpg]SS[/url]
+++New option under "Song List Settings" -> "Quickplay Tiers" (default On): When Off, Quickplay mode ignores career tiers and sorts songs as if they were not in a career
+++Updated GH3 theme patch files to worldrave's hotfix 8
+[/b]
+
+
+--------------------------------
+Version 2.990 (9/12/2008, 11:15pm PST) -- [url=http://rapidshare.com/files/144880654/Frets_on_Fire_MFH-Alarian_Mod_v2.990_Full_Installer.exe]ugo's full installer[/url] -- [url=http://mfh-alarian-mod.com/Releases/MfhModV2_990-InternalCareerReset.rar]Patch direct download[/url] -- [url=http://www.mediafire.com/?ylys1j3oxgj]Patch mediafire download[/url]
+[i]New since 2.986:[/i]
+++Added "Reset Career" selection only to the bottom of career song lists - resets unlock status of all songs in current career folder -- [url=http://i38.tinypic.com/do9soy.jpg]SS[/url]
+++Allowed songlist SFX to play even during / after a preview has started
+++Changed translation call as in [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4520#entry304927]this post[/url]
+++Changed Dialogs.py code for worldrave's GH3 theme: Line 2965 - "             wrapCenteredText (font, (x,y), self.text, scale = 0.0016, rightmargin = 0.82)"
+++Added GH3-theme Fail screen .diff patch from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4560#entry305995]this post[/url]
+++Added Dialogs.WrapText .diff patch / fix from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=4530#entry305292]this post[/url]
+++Un-translated more problematic strings -- [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4510#entry304769]detail post[/url]
+++Added [url=http://fretsonfire.svn.sourceforge.net/viewvc/fretsonfire/trunk/data/key.dae]original FoF 3D fret file "key.dae"[/url] to data\ folder, for 3D key support
+++Fixed fallback logic for 3D notes & keys for guitar & drum objects
+++Added missing logic to drum objects to handle static strings
+++Corrected drum score multiplier variable name capitalization
+++Fixed HOPO problem, as reported [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4410#entry303676]here[/url] and [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4580#entry306314]here[/url]
+++++Further enhanced HOPO Debug log entries to assist in location of reported HOPO bugs (added "Time left=" to end of each debug entry to provide an easy method to match log entries with video positions)
+++Fixed 3D drum note mode (using Blazingamer's code from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4600#entry306441]this post[/url])
+++Fixed GH2 score display code as detailed in [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=4610#entry306536]this post[/url]
+++Line 698, Song.py - made "Reset Career" translatable
+++Added logic to search for missed notes before any notes have been played (first note of song will mute now - they won't turn grey but at least they'll mute now)
+++Enforced a minimum allowed sustain release window, tighter hitwindows result in a negative sustain release window -- [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=4620#entry306684]detail post[/url]
+++The "Theme Settings" -> "In-Game Stats" user option now completely disables all in-game star scoring / accuracy display / etc - and also disables the extra calculations during gameplay
+++Changed RbMFH theme's Loading font to Fakir Regular TTF provided by acrox999 in [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4560#entry306015]this post[/url] (and created by Figure)
+++Changed RbMFH theme's Menu font to worldrave's Rock Band font
+++Added optional support for a SongList.ttf font with fallback on Menu.ttf
+++Added [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4400#entry303595]Blackjack's international fonts[/url] to 8bit & GH1 themes (GH2orig theme unsupported at this point)
+++Updated to Blackjack's French (Reform 1990) translation file v0.65
+++Updated to fablaculp's French translation file for 2.986+
+++Updated to x-driver's German translation file posted 9/12/2008
+++Updated to Alexfighter's Spanish translation file v1.2
+++Updated in-game credits
+++Added support for Rock Band separate "Back / Cancel" sound (out.wav) from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=4480#entry304428]p_025's RB ripped SFX[/url]
+++Replaced RbMFH "action.wav" with "conf07.wav" sound from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=4480#entry304428]p_025's RB ripped SFX[/url]
+
+
+--------------------------------
+Version 2.986 (9/10/2008, 9:15am PST) -- [url=http://mfh-alarian-mod.com/Releases/MfhModV2_986-MuteAndBkgFixes.rar]Patch direct download[/url] -- [url=http://www.mediafire.com/?mtzf11k0xti]Patch mediafire download[/url]
+[i]New since 2.985:[/i]
+--Removed second "Blackfriday" from in-game credits
+++Fixed logic that was incorrectly muting after every note release; now should only try to mute early sustain releases
+++Caught up with .diff patches from evilynux [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4480#entry304302]here[/url]
+++Added user option under "Audio Settings" -> "Mute sustain releases" (default No) to enable / disable track muting on early sustained note release
+++Fixed practice background and song background precalculated scale factor logic
+++Added Alexfighter's Spanish translation file for 2.985+, v1.1d
+++Added BlackJack's French (Reform 1990) translation file for 2.985+, v0.541
+++Added fablaculp's French translation file for 2.985+
+
+
+-------------------------------
+Version 2.985 (9/8/2008, 11:15pm PST) -- [url=http://mfh-alarian-mod.com/Releases/MfhModV2_985-Optimizations.rar]Patch direct download[/url] -- [url=http://www.mediafire.com/?dmtjijssex8]Patch mediafire download[/url]
+[i]New since 2.981:[/i]
+++Added Blazingamer's tail render order fix, and updated 3D note rendering logic
+++Updated in-game credits
+++Duplicated MainText.png from GH2 theme to GH1 theme to add patch support for menu
+++RbMFH overdriveneck.png now smaller and more transparent (please speak up if this is your neck, I'm not sure who made it)
+++RbMFH theme now using kawaii's overdrive bar & glow from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=3720#entry294435]this post[/url]
+++Added neck fallback logic to "defaultneck.png" if chosen neck invalid and "Neck_1.png" not found 
+++Added [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=4310#entry302471]death_au's RB mult.png, multB.png, and bassgroovemult.png[/url] to the RbMFH theme
+++Added logic to catch strums without frets held and ignore them (used to act like overstrum)
+++++Added user option to enable / disable this logic: "Fretboard Options" -> "Ignore open strums" ("Yes" = default)
+++Added fablaculp's 2.981.2 French translation file and support code
+++Added BlackJack's French (Reform 1990) translation file (v0.51)
+++Added Alexfigher's 2.980+ Spanish translation file (v1.1b)
+++Added TypusMensch's updated German translation file
+++Added logic to support more translatable phrases as Alexfighter demonstrates in [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4310#entry302468]this post[/url]
+++Added logic to precalculate static background and lyric sheet scale factors instead of recalculating every frame (should help lag)
+++Rewrote a more efficient algorithm to determine note streaks of 100 and up (for displaying "xxx Note Streak!!", should help lag)
+++Added logic to catch and filter out all unnecessary neckspeed re-calculations (only during actual BPM changes now; should help lag)
+++Removed several unnecessary layers of VBPM logic; now only one algorithm controls VBPM & neckspeed instead of three fighting for control (should help lag)
+++Added translation fix for "fretted by" string (newline now included in translation call)
+++Added user option under "Fretboard Options" -> "Static strings" (default On) (should help lag when on)
+++Prevented starpower from raising above 100% from killswitch action
+++Added initialization for Dialogs.py: SongChooser's render() function's local variables notesTotal, notesHit, and noteStreak to prevent "undefined" crashes
+++Added black background layer behind background of FileChooser ("Song List Settings -> Select Song Library", for example) to hide the "Options" background still being rendered underneath
+++Added precalculated full-screen scale constants to stage rotation array instead of calculating on the fly (should help lag)
+++Added user option to "MFH-Alarian Mod V2.9xx" -> "Whammy saves SP" (default No) -- to enable/disable slowdown of starpower / overdrive depletion rate with killswitch
+++Fixed logic to apply the "miss volume" when releasing a sustained note early:
+++++Ensured killswitch volume logic doesn't even get attempted unless there are currently "playedNotes" (should help lag)
+
+
+----------------------------
+Version 2.981 (9/6/2008) -- [url=http://mfh-alarian-mod.com/Releases/MfhModV2_981-TailFix.rar]Patch direct download[/url] -- [url=http://www.mediafire.com/?czgboytnxnr]Patch mediafire download[/url]
+[i]New since 2.980:[/i]
+++Fixed the note tail problem (tails always "missed"):
+++++Undid fix from 2.980 that reversed note render order (for guitar only), this requires much more attention to successfully fix
+++++++Note that drum notes are still rendered in reverse order, since there are no sustains this doesn't matter to drum parts
+++++Relocated sustain detection logic to the Guitar.run() function (instead of juggling back and forth between render functions)
+
+
+----------------------------
+Version 2.980 (9/6/2008) -- [url=http://mfh-alarian-mod.com/Releases/MfhModV2_980-RenderOrderFixes1.rar]Patch direct download[/url] -- [url=http://www.mediafire.com/?rsytwbdt2b2]Patch mediafire download[/url]
+[i]New since 2.963:[/i]
+[i]Please note - the majority of these items were taken care of by EVILYNUX and BLAZINGAMER![/i]
++ If tutorial doesn't exist, display message and return to training menu instead of crashing
++ Fixed bug in font rendering routine
+++ Scaling was applied twice when calling getSizeFont
+++ Scaling now quasi-linear (as expected)
++ Improved font rendering a great deal
+++ Smallest font source is now 30 instead of 15
++ Added support for a Song.ttf for the song info during the song start countdown, falls back on Menu.ttf for themes which do not have this font
++ Fixed Quickplay mode default song comment, was Career comment "play to advance"
++ Fixed song comment for practice mode, now shows "practice"
++ Improved stage loading logic and added log entries
+++ Fallback to no background when none can be found
+++ Fixed crash when stages folder exists but only contains practice.png
++Neck rotates and zooms in instead of just appearing when a song starts, during the countdown
++ Added songlist Score color to theme.ini (songlist_score_color)
++ Added practice to Career Mode pause menu
++ Added display of the longest note streak in parentheses, in the songlist
++ Added ability to have the paper in the song list screen scroll.
+++ If you run out of the background, make sure you have a SongChooseBack.png just in case.
+++ You turn the function on by putting songback = True in the theme.ini for that theme
++ Changed phrases to look more like the real games
++ New bass drum sound (the original was off-sync by a few ms)
++ Repositioned the GH3 POV (the current one was too low.
++ You can now turn off the the file path text in the song choose screen, from the Song List Options
++Versiontag can now be forced through the theme.ini
+++This can be useful if you're using the versiontag.png as a top layer for the main menu
+++You can turn this on by setting versiontag = true in the theme.ini
++ Added cmdline options
+++ mode to select 1 player or 2 player mode
+++ nbrplayers to specify the number of players
++ Added Credits to Options menu
+++ Used credits mentioned in second post of his very thread
++ Added hit percentage and note streak to Song List
+++ Used layout proposed by slantyr
++open note color can now be defined with opencolor = (#hex) in the theme.ini
++score and note streak in songchooser no longer have an outline.
++Notes change color in star power for GH themes
++Hit windows in drums have been fixed
++ CD List now uses songlist_extra_stats too (more intuitive)
++ Note streak between parentheses in CD List lie elsewhere
++Code has been cleared of all code that was commented out
++ Fixed more text to be translatable (thanks to Alexfighter and Fablaculp)
++ Added kawaii's bassgroovemult.png and mult.png for the 8bit theme (switched the color of the x2 and x3 of mult.png, so as to be consistent with the dots)
++ Repositioned the solo percent position for Rock Band.
++ Can use new drumfrets.png to render frets
+++ This will draw separate bass drum fret buttons over normal frets
+++ If drumfrets.png not present, it falls back to drumfretshacked.png, or alternately just fretbuttons.png as it worked previously
+## Note: The other fret buttons still "light up" when a bass drum note is hit. I don't know how to fix this yet
++ Changed the way drumnotes.png works slightly
+++ Image now has 6 rows rather than 5
+++ Last two rows contain notes when star power is active
+++ Modified images included for RbMFH, Gh3, Gh2, Gh1 and 8-bit themes
+## Note: Keeping your old dumnotes.png will most likely result in distorted images for drums... Sorry for no backwards-compatibility there...
++Changed RbMFH theme DrumNotes.png to [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4230#entry301456]kawaii's[/url]
++ Make the overdrive bar glow ONLY when OD is inactive but ready
++ Added support for necks with arbitrary filenames (works in Choose Neck as well as manually entering into fretsonfire.ini)
++ Display the name of the song on the highscore board (finished song)
++ Fixed crash in Key Settings Tester when Analog Killswitch is enabled and no joystick is connected
++Moved Rock Band theme "Bass Groove" text up higher when Jurgen is playing so the text doesn't overlap
++ Uses multB.png instead of mult.png for bass if available (with fall-back logic) 
+++GuitarScene.py: line 3276, adding the blank missing in "fretted by", it should be " fretted by" to be displayed ingame correctly
+++Dialogs.py: Lines 1536, 1538, 1534, and 1545 (using 2.979+font_smallfix), changed "scale = scale * 2.8" at the end of the lines to "scale = scale * 1.8"
+==Renamed Theme Settings -> "RB Mult FX" setting to "RB Mult Grow" for clarity
+++Changed loading screen rightMargin TO 0.65 for GH3 themes
+++Dialogs.py, NeckChooser: moved the check for "NeckImage is None" to the "else"
++You can now have 3d star power notes
+++Added [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=16498]Blazingamer's note.dae, star.dae, open.dae GH-themed 3D note files[/url] to GH3 theme folder and data folder so those who want to experiment with 3D notes can do so
+++enable 3D notes with theme.ini entry: twoDnote = false 
+++If there is no star.dae in your theme's folder it will use the star.dae in the data folder
+++If there is no star.dae in your data folder it will use the note.dae in your theme's folder
+++If there is no note.dae in your theme's folder it will use the note.dae in your data folder
++star.dae now rotates!!
+++Rotates by default
+++Can turn off rotation by adding threeDspin = False to the theme's theme.ini
++3d drum open note:
+++Uses open.dae if one exists in the theme's folder
+++If one doesn't exist it will just place a regular note in the middle
+++Updated latest theme.ini and other GH3 files (that are currently included in official patches) from worldrave's GH3 hotfix3
++Reversed note rendering order, so that overlapping notes will appear correctly -- [url=http://img291.imageshack.us/my.php?image=coveriv5.jpg]problem screenshot[/url] -- [url=http://i35.tinypic.com/izlz43.jpg]Fixed screenshot[/url]
++Added user option under "Fretboard Options" -> "Frets under notes" for notes to pass over or under the frets (On by default) -- [url=http://i35.tinypic.com/2rzazwl.jpg]SS[/url]
++Fixed drum navigation when entering a highscore name (currently requires an Enter - green pad doesn't accept)
++Added new option to "Key Settings" -> "Drum highscore nav":
++++"On" allows the green drum pad to accept your highscore name
++++"Off" disables this (for those who play drums on the keyboard, this allows that letter to be used to enter a highscore name)
++Fixed fallback logic to allow main menus without any background music without a crash [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=3930#entry298100]detail post[/url]
+
+
+<span style="color: brown;"><br />
+---------===========-------------=============------------=============<br />
+Unofficial Updates (may or may not contain features from other unofficial updates, check the posts for details on this):<br />
+---------===========-------------=============------------=============</p>
+
+<p>blazingamer's 2.979 update / minor fix (source-only, requires 2.979) <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4210#entry301321">post</a>, <a href="http://www.mediafire.com/?md1qlqr5mrf">download</a></p>
+
+<p>fablaculp's 2.979 French translation patch <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=4190#entry301159">post</a>, <a href="http://www.mediafire.com/download.php?3o31nhsomoz">download</a></p>
+
+<p>blazingamer's 2.979 code cleanup patch <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4190#entry301139">post</a>, <a href="http://www.mediafire.com/?ccz0ek1r7ng">download</a></p>
+
+<p>fablaculp's 2.9782 French translation patch <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4180#entry301051">post</a>, <a href="http://www.mediafire.com/download.php?7gwt2nrtvwm">download</a></p>
+
+<p>fablaculp's 2.9781 French translation patch <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4160#entry300845">post</a>, <a href="http://www.mediafire.com/download.php?bxzcyfn5gbx">download</a></p>
+
+<p>kawaii_kumiko69's 2.9781 patch <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4160#entry300831">post</a>, <a href="http://www.mediafire.com/?wzjajkcbdiz">download</a></p>
+
+<p>fablaculp's 2.978 translation patch <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4110#entry300204">post</a>, <a href="http://www.mediafire.com/download.php?muw9wrmgpcu">download</a></p>
+
+<p>evilynux's 2.978 patch (windows version converted by MistTribe) <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4110#entry300175">post</a>, <a href="http://www.mediafire.com/download.php?wojsjnz3bi4">download</a></p>
+
+<p>fablaculp's 2.977 translation patch <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4090#entry299915">post</a>, <a href="http://www.mediafire.com/download.php?f8xvgpfdz52">download</a></p>
+
+<p>evilynux / death_au 2.974 patch <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=3940#entry298176">post</a>, <a href="http://www.mediafire.com/?1mjtnuwmy1m">download</a></p>
+
+<p>evilynux / blazingamer 2.972 patch <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=3900#entry297701">post</a>, <a href="http://www.mediafire.com/?atdkygqaim9">download</a></p>
+
+<p>blazingamer's 2.969 patch <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=3830#entry296759">post</a>, <a href="http://www.mediafire.com/?ke02gruhvdg">download</a></p>
+
+<p>evilynux / blazingamer 2.968 patch <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=3810#entry296398">post</a>, <a href="http://www.mediafire.com/?xgygrcbmkys">download</a></p>
+
+<p>blazingamer's 2.9665 patch <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=3800#entry296350">post</a>, <a href="http://www.mediafire.com/?oatizxmbayt">download</a></p>
+
+<p>evilynux / blazingamer 2.966 patch <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=3800#entry296260">post</a>, <a href="http://www.mediafire.com/?dwmqqdacndr">download</a></p>
+
+<p>kawaii_kumiko69's 2.964 patch <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=3720#entry294435">post</a>, <a href="http://www.mediafire.com/?833nsb49mbn">download</a> (alternate graphics files also available in his post)</p>
+
+<p>blazingamer's 2.964 patch <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=3740#entry294755">post</a>, <a href="http://www.mediafire.com/?xozdizyjuvv">download</a></p>
+
+<p>---------===========-------------=============------------=============<br />
+</span><br />
+<span style="color: white;"></p>
+
+<p>--------------------------------<br />
+Version 2.963 -- ugo's full installer <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=1750#entry263934">post</a>, <a href="http://rapidshare.com/files/140050336/Frets_on_Fire_MFH-Alarian_Mod_v2.963_Full_Installer.exe">rapidshare download</a> -- <a href="http://mfh-alarian-mod.com/Releases/MfhModV2_963-DrumAndNeckFix.rar">Patch direct download</a> -- <a href="http://www.mediafire.com/?npfze0tyms2">Patch mediafire download</a><br />
+<em>New since 2.962:</em><br />
+++Fixed "list index out of range" error caused by not selecting songs folder from options menu first time run (caused by iteration over self.items when it's empty)<br />
+++Fixed default neck crash; if you've never selected Choose Neck, or have Random Neck selected from a previous version, Neck_1 will be forced.<br />
+++Swapped Neck_1.png (default) with Neck_28.png (blank / transparent neck)<br />
+++Fixed drum mode crashes (getrequirednotesMFH and other optimized functions needed to be added to drum.py)</p>
+
+<p>--------------------------------<br />
+Version 2.962 -- ugo's full installer <a href="http://rapidshare.com/files/139349382/Frets_on_Fire_MFH-Alarian_Mod_v2.962_Full_Installer.exe">download</a> -- <a href="http://mfh-alarian-mod.com/Releases/MfhModV2_962-NeckIterationFix.rar">Patch direct download</a> -- <a href="http://www.mediafire.com/?lczjvmdg4jn">Patch mediafire download</a><br />
+<em>IMPORTANT: Please "Choose Neck" before attempting gameplay with a fresh install / fretsonfire.ini to avoid a crash!  (This will be fixed next patch)</em><br />
+<em>New since 2.960:</em><br />
+++Added evilynux's code to force uppercase display for Career titles<br />
+++Added evilynux's code to force uppercase display for Artists<br />
+++Added bad animated background image / frame catching logic, will make log entry to point to problem file and display blank stage for bad frames<br />
+++++UPPERCASE .PNG file extensions cause this problem!  While my code can now recognize and load these .PNGs, FoF's internal functions do not process these files correctly!  Renaming any .PNG to .png will fix this problem; if it does not, that particular image needs to be opened and re-saved in the correct png format (noninterlaced, optimized palette).<br />
+++++Please note, this logic is in place to help you create animated background sets with all working frames; be</span> have known the PNG files were not loading.<br />
+++Completely relocated neck filename checks / neck counting to on-demand Neck Chooser menu (you will need to "Choose Neck" at least once after adding a new neck in order for "Random" to recognize the new count)<br />
+++Changed "Yellow / Blue to change:" to "Yellow (#3) / Blue (#4) to change:" (for clarity in the neck selection menu)<br />
+++Fixed Difficulty select screen's Cancel (for songs with only 1 instrument, hitting cancel did nothing until you hit select)</p>
+
+<p>--------------------------------<br />
+Version 2.960 -- ugo's full installer <a href="http://rapidshare.com/files/139221565/Frets_on_Fire_MFH-Alarian_Mod_v2.960_Full_Installer.exe">download</a> -- <a href="http://mfh-alarian-mod.com/Releases/MfhModV2_960-HopoFixes.rar">Patch direct download</a> -- <a href="http://www.mediafire.com/?xmdyjrbytgd">Patch mediafire download</a><br />
+<em>New since 2.956:</em><br />
+++Added Gh2 theme.ini entry to display songlist name text in black<br />
+++Added user option for multiple Jurgen "play" logic styles (improving Jurgen gives me a test player to help isolate HOPO bugs while I observe):<br />
+++++"Original" = Original style Jurgen play logic (from previous versions, 2.956 and below) - Jurgen has a lot of trouble with fast strums; may not recover in time and fail song<br />
+++++"MFH-Early" = Optimized / rewritten Jurgen play logic - Jurgen can hit most fast strum patterns and CAN recover after missing some - still hits notes as early as possible<br />
+++++"MFH-OnTime1" = Has logic to attempt to strum notes on time instead of as early as possible (by only showing Jurgen the notes that are on time or late)<br />
+++++"MFH-OnTime2" = Also attempts to strum notes on-time, but this method exposes all notes in the hitwindow to Jurgen and he has to determine which to play (to emulate the behavior of a real player as much as possible, and to help flush out problems)<br />
++++Also added Jurgen "play" logic setting to pause settings menu<br />
+++Optimized internal function call to retrieve the next note pattern to match (should help lag)<br />
+++Optimized internal function call to retrieve missed notes outside the late margin (should help lag)<br />
+++Enhanced optional Hopo Debug log output to include more helpful information on why each specific streak / multiplier reset occured<br />
+++Added <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=3420#entry289551">evil-doer's new Rock Band main menu</a><br />
+++Added Blazingamer's animated killswitch tail fix (will not draw / animate tails past end of board; very long notes no longer cause excessive lag)<br />
+++Fixed GH2 Strict HOPO problem as demonstrated by <a href="http://www.youtube.com/watch?v=zPxWRbpYz10">Inkk's video</a>:<br />
+++++Added logic to catch invalid pull-offs and ignore them (separately from invalid hammer-ons)<br />
+++Disabled "early pick" logic (for strums before frets held down, if correct frets pressed quickly enough after strum) - was never working correctly anyway.  Should reduce lag.<br />
+++Fixed complex tail loading logic<br />
+++Added Blazingamer's fix for the theme.ini CD X position, which can now take on values from 0 to 5 to position the stack of CDs<br />
+++Changed default for "Upload Scores" to "False" (causes delays, will be fixed when a starpower chart is up elsewhere)<br />
+++Updated Gh3 theme patch files theme.ini, MainText.png, star3.png, star4.png from <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=28649">worldrave's Guitar Hero 3 theme</a> beta 3<br />
+++Added support for EOF's "Test in FoF" function (as far as I can tell, it only directly tests Guitar Expert this way.)<br />
+++Increased analog killswitch's starpower reward "chunk" size<br />
+++Created a new HOPO system, "GH2" with no tag, that just forces a re-strum but does not break streak when tapping incorrect notes<br />
+++Added logic to completely ignore manipulation of lower frets while a higher HOPO is held for GH2 and GH2 Strict systems (prepare however you'd like for your next pull-off!)<br />
+++Rewrote & optimized the core HOPO strum / intention determination logic</p>
+
+
+<p>-----------------<br />
+Version 2.956 -- ugo's full installer <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=1750#entry263934">post</a>,<a href="http://rapidshare.com/files/138435922/Frets_on_Fire_MFH-Alarian_Mod_v2.956_Full_Installer.exe"> rapidshare download</a>, <a href="http://www.megaupload.com/?d=BWHH183N"> megaupload download</a> -- <a href="http://mfh-alarian-mod.com/Releases/MfhModV2_956-IntMainMenuFix.rar">Patch direct download</a> -- <a href="http://www.mediafire.com/?jrax0zx21op">Patch mediafire download</a><br />
+<em>New since 2.955:</em><br />
+++Fixed international / non-english translation Main Menu bug<br />
+++Added line in Gh3 theme.ini to display song names in black</p>
+
+<p>-----------------<br />
+Version 2.955 -- ugo's Full Installer: <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=1750#entry263934">post</a>, <a href="http://rapidshare.com/files/138069162/Frets_on_Fire_MFH-Alarian_Mod_v2.955_Full_Installer.exe">download</a> -- <a href="http://mfh-alarian-mod.com/Releases/MfhModV2_955-CareerFixes.rar">Patch direct download</a> -- <a href="http://www.mediafire.com/?sdsz2m4etcj">Patch mediafire download</a><br />
+<em>New since 2.951:</em><br />
+++Fixed crash caused by setting neck speed to Percentage mode with a 400% speed percent <br />
+++++(although excessive neck speeds require a VERY high frame rate to display correctly...)<br />
+++Fixed error caused by attempting to type / search for a song with career titles<br />
+++Added logic to display "bonus" songs (non-tiered songs in a career folder) at the end of the list instead of first<br />
+++Fixed non-career song sorting<br />
+++Filtered out "practice.png" from stage rotation modes and random stage mode<br />
+++Added logic to force lowercase to file name extension checks (some .PNG backgrounds may have never been loaded while .png backgrounds were)<br />
+++Added <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=2970#entry283871">Death Legion's separated Cassette / Guitar Cases mods</a><br />
+++++Note: Since patches only overwrite, I had to put these mods into new folders (leaving the original "Cassette Tapes" mod intact)<br />
+++Renamed "Song Previews: Yellow Fret" to "Song Previews: Yellow Fret (#3)" for clarity<br />
+++Renamed "Song Choosing Highscores: Blue Fret" to "Song Choosing Highscores: Blue Fret (#4)" for clarity<br />
+++Fixed crash caused by songlist: CDs mode (actually crashes when a title is encountered - undefined situation)<br />
+++Added a method to represent Career tiers (as CD cases) in CD list (they used to just show up as blank spaces in the CD stack)<br />
+++Added logic to allow Career Tiers to be highlighted but not selected (to allow tier name display in CD songlist - later, will also allow tier labels and tier detail)<br />
+++Added logic to display Career tier names when <a href="http://i34.tinypic.com/69ouj7.jpg">they are highlighted in a CD songlist</a><br />
+++Added Blazingamer's updated GH2 score code - now held notes will keep the score meter updated as they build points<br />
+++Disabled auto and yellow-fret previews for locked songs in Career mode<br />
+++Added <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=3270#entry287605">kawaii_kumiko69's latest RB tails</a><br />
+++Moved "Jurgen Is Here" text a bit higher when in 2-player mode<br />
+++Forced sort by name (instead of artist or tag if selected) for Career songs (within tiers)<br />
+++Completely disabled Jurgen for Career mode<br />
+++Reversed neck selection render order to render BG on top of necks<br />
+++Changed GH3 pause menu text to match <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=2930#entry283555">worldrave's list</a> and re-aligned pause menu text<br />
+++Added new "script.txt" lyric display position setting, can display on bottom (under fretboard) or on top (where scrolling lyrics go)<br />
+++Fixed GH3 loading text position in theme.ini<br />
+++Added <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=3260#entry287519">EdisLeado's GH3 killswitch tails v2</a><br />
+++Added <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=3260#entry287427">death_au's 8-bit theme killswitch tails (non-filled)</a><br />
+++Added Main Menu (MainText.png) scale factor adjustment to theme.ini<br />
+++Added Main Menu item vertical spacing adjustment to theme.ini<br />
+++Added theme.ini positioning options for all main menu - text submenus<br />
+++Added evilynux's fix for the GH3 tail Linux problem<br />
+++Added separate theme.ini text color options for:<br />
+++++Options menu text / selected text (only affects the main Options / Settings screen; <em>all other submenus use the base_color and selected_color</em>)<br />
+++++Pause menu text / selected text (only affects the main Pause menu; <em>all other submenus use the base_color and selected_color</em>)<br />
+++++Fail menu text / selected text<br />
+++++Career titles / venues text<br />
+++++Songlist songname text / selected text<br />
+++++Songlist artist & year text / selected text<br />
+++++Songlist folder text / selected text</p>
+
+<p>-----------------</p>
+
+
+<br>&nbsp;
+<br>&nbsp;
+<p>Version 2.951 - <a href="http://mfh-alarian-mod.com/Releases/Frets_on_Fire_MFH-Alarian_Mod_v2.951_Full_Installer.exe">ugo's full installer direct download</a> -- <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=1750#entry263934">ugo's full installer post</a> -- <a href="http://rapidshare.com/files/136806254/Frets_on_Fire_MFH-Alarian_Mod_v2.951_Full_Installer.exe">ugo's full installer rapidshare download</a> -- <a href="http://mfh-alarian-mod.com/Releases/MfhModV2_951-SongfolderFix.rar">Patch direct download</a> -- <a href="http://www.mediafire.com/?roi9gm2nu91">Patch mediafire download</a><br />
+<em>New since 2.950:</em><br />
+++Fixed logic to NOT ignore seemingly "empty" folders (with only other folders inside them - Tier folders) when listing songs<br />
+</p>
+
+<p>-----------------<br />
+Version 2.950 - <a href="http://mfh-alarian-mod.com/Releases/MfhModV2_950-CareerMode.rar">Patch direct download</a> -- <a href="http://www.mediafire.com/?71ef4zlzcy2">Patch mediafire download</a><br />
+<em>New since 2.940:</em><br />
+++Changed RbMFH Loading font to worldrave's Rock Band Font<br />
+++Added italiansta1ion's 8-bit main menu text / support for 8-bit theme<br />
+++Added correct dots and score font to match Blazingamer's GH2 rockmeter<br />
+++Fixed errors / typos in RbMFH theme.ini loading phrases<br />
+++Removed unnecessary spaces in all theme.ini loading phrases<br />
+++Added evil-doer's latest / beveled RbMFH main menu<br />
+++Fixed "starding" SFX Volume setting code to use internal variable instead of reading from INI file during gameplay<br />
+++Updated Help-Manual.txt to explain "Encoding = UTF-8" and "Encoding = Latin" accent / tilde handling modes<br />
+++Added "Party Mode" to the Multiplayer sub-menu<br />
+--Removed "Party Mode" and "No Player 2" from 2p part select menu<br />
+++Changed Solo Review text from greenish-blue to white for visibility<br />
+++Fixed stage rotation logic when Stage is set to Default<br />
+++Merged features from <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=27734&st=0#entry276957">Hero FOF 3.0</a><br />
+<em>For Career Mode careers, go to the <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=27734&st=0#entry276957">Hero FOF 3.0</a> thread <br />
+and download from the first post.  Instructions for using Career Mode can all be found here.  I will slowly update my documentation to cover Career Mode later.</em></p>
+<br>&nbsp;
+
+<br>
+<p>Version 2.940 - <a href="http://mfh-alarian-mod.com/Releases/Frets_on_Fire_MFH-Alarian_Mod_v2.940_Full_Installer.exe">ugo's full installer direct download</a> -- <a href="http://rapidshare.com/files/136452722/Frets_on_Fire_MFH-Alarian_Mod_v2.940_Full_Installer.exe">ugo's full installer rapidshare</a> -- <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=1750#entry263934">ugo's full installer post</a> -- <a href="http://mfh-alarian-mod.com/Releases/MfhModV2_940-MenuRestructure.rar">Patch direct download</a> -- <a href="http://www.mediafire.com/?yr3wyydigwx">Patch mediafire download</a> -- <a href="http://rapidshare.com/files/136520029/MfhModV2_940-MenuRestructure.rar.html">TypusMensch's patch rapidshare download</a><br />
+<em>New since 2.935:</em><br />
+<em>Note: 2.936 (unofficial patch) included separate Versiontag.png images for each theme (in RbMFH\Menu\ and Gh3\Menu\) - Please delete these; my patches do not include new version tag graphics for each theme, this would be confusing to keep up with.</em><br />
+++Added worldrave's GH3 theme.ini customization settings to the patch<br />
+++Replaced GH3 theme Preview.png and star4.png with latest versions from worldrave<br />
+++Integrated changes from <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=2570#entry280563">wolferacing's 2.936 hotfix</a><br />
+-Added to Help-Manual.txt: For the French translation (and others with accents), add this line in your fretsonfire.ini, under the [game] section:<br />
+encoding = utf-8<br />
+++Moved wolferacing's name to Main Coders list - just noticed it was not there<br />
+++Moved rchiav's name to Main Coders list (memory leakage)<br />
+++Added Maze2234's name to Main Coders list (Python client/server communications)<br />
+++Added entire Hero FOF team to credits under a new heading, "Career Mode / Hero FOF Team"<br />
+++Fixed <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=2500#entry278111">typos in theme.ini loading phrases</a><br />
+++Updated ThemeINI Instructions.txt documentation to reflect new loading_phrase and results_phrase separator (underscore instead of comma)<br />
+++Added option under Game menu ("MFH Version 2.940") -> "P2 Menu Navigate":<br />
+++++"Off" disables Player 2's menu navigation abilities<br />
+++++"On" (default) enables Player 2's menu navigation abilities<br />
+++Added fail menu background & text positioning documentation to ThemeINI Instructions.txt<br />
+--Removed 2-player mode from Options menu<br />
+++Made sure that you can back out to the songlist after picking a song<br />
+++Ensured SFX volume gets applied to Select, Accept, and Cancel sounds as well<br />
+++Renamed "HOPO Timing" option to "HOPO Frequency" for clarity<br />
+++Fixed neck speed calculations for BPM mode and Diff&BPM modes to match Help-Manual.txt documentation<br />
+++Renamed "Constant Speed" numerical setting back to "Speed Percent" for clarity<br />
+++Renamed "Set Constant" board speed option to "Percentage" for clarity<br />
+++++Inverted the scale for "Percentage" mode: higher values = faster neck speeds<br />
+++++Changed default "Speed Percent" to 100<br />
+++Added death_au's "Oldschool 3D Songlist" mod to the patch<br />
+++++If your "Settings > Song List Settings > Song Display >" is set to "CDs",<br />
+++++you can switch to cassette tapes: "Settings > Mods > Cassette Tapes > On"<br />
+++Relocated Neck Select menu to a sub-menu in "Settings" -> "Choose Neck >"<br />
+++++Created new Dialog class "NeckChooser", to be loaded only on-demand<br />
+++++Added loading screen while neck menu is being prepared<br />
+--Removed Neck Menu enable setting<br />
+++Added Neck Menu prompt "Yellow / Blue to change:" for clarity<br />
+++Added drawing of a black background (neckBackBlack.png) behind Neck menu (in front of Options BG) so that transparent necks show the black<br />
+++Added Slantyr's GH2 MainText.png to support the 2.900 GH2 theme (Project Clone is a separate theme until next major release)<br />
++++Updated GH2 theme.ini with typo-corrected loading phrases, and MenuText.png positioning<br />
+++Added Blazingamer's song-specific stage background code ("background.png" in song folder used when song is played)<br />
+++++Added separate user setting to enable or disable song-specific stage backgrounds "MFH Version 2.940" -> "Song Stage"<br />
+++++++"On" (default) will display <songfolder>\background.png as the stage background if it exists, unless in Practice mode (or stage mode is Blank)<br />
+++++++"Off" will ignore <songfolder>\background.png and use the normal stage rotation or display logic<br />
++++Wrote new stage background logic to handle all the new background situations:<br />
++++++"Blank" stage mode takes precedence over everything else; no practice background or song-specific background will be shown<br />
++++++Practice mode will attempt to use "practice.png" in <themename>\Stages --- if this is not found, it will use "Blank" stage mode<br />
++++++If not in practice mode, if enabled, if a song-specific "background.png" is found in the song folder, that background will be used<br />
++++++Otherwise, the normal stage mode option will be used (default stage, random stage, rotating stages)<br />
+++Fixed Practice Mode's operation when "Rotate Stages" is enabled<br />
+++Applied SFX volume also to the "Start" sound (plays when song starts and is quite loud)<br />
+++Rewrote main menu logic:<br />
++++GH themes: 6 selections<br />
++++++Career<br />
++++++Quickplay<br />
++++++Multiplayer    (submenu: Face-Off, Pro Face-Off)<br />
++++++Training   (submenu: Tutorial, Practice)<br />
++++++Settings<br />
++++++Exit<br />
++++RB themes: 5 selections<br />
++++++Solo  (submenu: Career, Quickplay)<br />
++++++Multiplayer   (submenu: Face-Off, Pro Face-Off)<br />
++++++Training  (submenu: Tutorial, Practice)<br />
++++++Options<br />
++++++Quit<br />
+++Added Blazingamer's Project Clone GH2 score meter support / code (rockmeter position is not perfect but close enough for now)</p></p>
+
+
+<br>&nbsp;
+<p>Wolferacing's 2.936 hotfix - <a href="http://mfh-alarian-mod.com/Releases/Frets_on_Fire_MFH-Alarian_Mod_v2.936_Full_Installer.exe">ugo's
+Full Installer Direct Download</a> -- <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=2600#entry281176">ugo's
+Full Installer Post</a> -- <a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=2570#entry280563">Patch
+Post</a> - <a href="http://www.mediafire.com/?70608xb67am">Patch Download</a>
+<br>&nbsp;
+<p>Version 2.935 - <a href="http://mfh-alarian-mod.com/Releases/Frets_on_Fire_MFH-Alarian_Mod_v2.935_Full_Installer.exe">Direct
+Download ugo's Full Installer</a> -- <a href="http://mfh-alarian-mod.com/Releases/MfhModV2_935-NeckSpeedFixes.rar">Patch
+direct download</a> -- <a href="http://www.mediafire.com/?nydk0gzwmz0">Patch
+mediafire download</a>
+<br><i>New since 2.930:</i>
+<br>++Rewrote XBOX analog whammy mode to handle negative axis values correctly;
+now XBOX analog readings should look the same as PS2 to the analog kill
+logic
+<br>++Added another XBOX analog whammy mode, "XBOX Inverted" with negative
+/ opposite axis handling
+<br>++Changed "PS2" analog whammy mode to "PS2 / PS3 / Wii" analog whammy
+mode for clarity
+<br>++Changed result_phrases separator to "_"
+<br>++Added new volume setting (also in pause menu) for crowd / starpower
+/ SFX sound level (now I can hear Hotel California!)
+<br>++Made Solo Accuracy text in pure white, so it can be seen better
+<br>++Fixed board speed mode confusion for both guitar and drum necks
+<br>++Increased allowable neck speed constant range from (50-150) to (10-400)
+<br>++Fixed script.txt picture event (.SVG or .PNG) display
+<br>++Allowed listing of the tutorial song without requiring removal of
+the "tutorial=1" flag in song.ini (this way the game still knows it's the
+tutorial)
+<br>++Added support for an optional "Loading.ttf" loading screen phrase
+text font
+<br>++Added positioning options in theme.ini for settings &amp; pause menu
+text
+<br>++Added text color options in theme.ini for song selection / highlight,
+pause menu, options menu
+<br>++Added year display to songlist, will display after artist and fretter,
+if it exists (just like in GH3: artist, year)
+<br>++Discovered a large source of lag - VBPM neck speed calculations
+<br>+++Optimized neck speed calculations as much as possible without losing
+the modes
+<br>+++Added some "MFH Lag Reduction Tips / Recommended Settings" to the
+Help-Readme.txt file in the doc\ folder
+<br>+++Set new defaults to optimize fresh game lag:
+<br>++++Constant Speed neck mode, set to 200 (higher numbers = slower neck
+for Constant Speed mode)
+<br>++++Killswitch FX set to STATIC
+<br>++Added 6 new song review sounds in data\Sounds\
+<br>++++When you get 100% accuracy on a song, it will randomly play one
+of three files: "100pct1.ogg" "100pct2.ogg" "100pct3.ogg"
+<br>++++When you get 99.0 - 99.9% accuracy on a song, it will randomly
+play one of three files: "99pct1.ogg" "99pct2.ogg" "99pct3.ogg"
+<br><i>++++Please note, these files are all currently the same (the old
+"myhero.ogg") - replace with other sound files as you see fit.</i>
+<br><i>+++++++Please share with the rest of us if you find some good sounds!</i>
+<p><i>Ugo's full installer for 2.931 beta (with XBOX analog whammy mode
+fix and some other extras he added):</i>
+<br><i><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=2380#entry276699">Post
+link</a></i>
+<br><i><a href="http://rapidshare.com/files/135011070/Frets_on_Fire_MFH-Alarian_Mod_v2.931_Full_Installer.exe">Download
+link</a></i>
+<br><i><a href="http://mfh-alarian-mod.com/Releases/Frets_on_Fire_MFH-Alarian_Mod_v2.931_Full_Installer.exe">Direct
+Download link</a></i>
+<br>&nbsp;
+<p>Version 2.930 - <a href="http://mfh-alarian-mod.com/Releases/MFH-Alarian2_930-FullRelease-6Themes.rar">Full
+version direct download</a> -- <a href="http://www.mediafire.com/?xgsiymukuz4">Patch
+download</a>
+<br><i>New since 2.925:</i>
+<br>++Killswitch volume is now in the xx/10 display format, and sorted
+correctly (100% is now AFTER 90%)
+<br>++Added auto-scaling to screen resolution for the following background
+images:
+<br>++++Songlist background &amp; paper (for list &amp; CD modes)
+<br>++++Loading screen
+<br>++++(one background)Practice mode / section select, Instrument select,
+Difficulty select, P2 selects
+<br>++++Song folder selection background
+<br>++++Main Menu background
+<br>++++Main Settings background
+<br>++++Neck Select background
+<br>++Added support for star3.png and star4.png for use on songlist star
+display (with fallback to star1.png and star2.png)
+<br>++Fixed digital killswitch detection &amp; activation
+<br>++++Ensured digital killswitch disables when released on a long note
+<br>++Added [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&amp;f=11&amp;t=24664&amp;st=2260#entry274687]worldrave's
+new custom GH3 Streak font[/url]
+<br>++Added new optional settings to theme.ini to allow horizontal positioning
+of songlist elements (see ThemeINI Instructions.txt in doc folder):
+<br>++++song_cd_x
+<br>++++song_cdscore_x
+<br>++++song_list_x
+<br>++++song_listscore_x
+<br>++Added lots of new theme.ini song loading phrases to GH and RB themes
+[url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&amp;f=11&amp;t=24664&amp;st=2270#entry274752]as
+posted by italianstal1ion[/url]
+<br>++++Changed logic to use "_" (underscore) to separate theme.ini loading
+phrases - so commas can be displayed
+<br>++++Corrected and added general after-show loading phrases
+<br>++++Added word wrapping function to loading screen phrase display as
+demonstrated by death_au
+<br>+++++Wrote new word wrapping logic to keep long phrases completely
+on the screen and centered, and separately center single-liners
+<br>&nbsp;
+<p>-----
+<br>Version 2.925 - <a href="http://www.mediafire.com/?li7olognxfg">Patch
+download</a>
+<br><i>New since 2.920:</i>
+<br>++Lefty modes for P1 &amp; P2 are now available in pause setting menu
+<br>++Wrote separate logic to determine killswitch "engaged" status correctly
+in analog killswitch mode
+<br>+++Also added analog threshold requirement for killswitch "engaged"
+status (for untouched whammy registering changes)
+<br>++Rewrote Main Menu music playing logic to utilize actual music stream
+channel instead of sound effect channel, which allowed the following:
+<br>++++Ensured Main Menu will re-randomize and play music when re-displayed
+<br>++++Added auto-re-randomize logic that will play a new song when one
+ends
+<br>++Added option under "Visual Settings" - "GfxVersionTag":
+<br>++++"On" - Display the graphical version tag on the Main Menu
+<br>++++"Off" - Do not display the graphical version tag on the Main Menu
+<br>++Added separate killswitch volume setting to both main settings and
+pause settings menus
+<br>===Please note, this volume setting does not sort correctly since 100%
+is included...
+<br>++++Ensured killswitch volume setting gets reloaded after unpausing
+<br>++++Added logic to scale analog killswitch volume to max out at killswitch
+volume setting
+<br>++Moved "Starpower Clap SFX" to Audio Settings
+<br>--Removed "Practice Beat Clap" setting (since it is nonfunctional)
+<br>++Added logic to check for an appropriately-held long note before applying
+digital or analog killswitch effects
+<br>+++Also ensured that killswitch effect will be turned off after a note
+ends
+<br>++Added Volume Settings back to main Settings menu (no idea how long
+this was gone)
+<br>++Fixed / removed "Spinal Tap"-style volume settings (they all go 0-10
+now like they are supposed to... this was changed incorrectly in an unofficial
+hotfix)
+<br>++Ensured restart of faaa's drum sound logic when restarting a song
+<p>-----
+<br>Version 2.920 - <a href="http://www.mediafire.com/?qgbdmzjxxwz">Patch
+download</a>
+<br><i>New since 2.914:</i>
+<br>++Implemented rchiav's Main Menu memory leak fix (prevented re-instantiation
+of MainMenu object)
+<br>++Added fallback logic to use Versiontag.png in data\ if not found
+in Themes\(themename)\Menu\
+<br>++++(more convenient to update, separate themed version tags are now
+optional and user-made)
+<br>++Moved Rock Band loading screen phrase display up a bit (via theme.ini
+-- so it doesn't overlap the little "rock band")
+<br>++Added user option "Game Time" under "Visual Settings":
+<br>++++"Countdown" (default) - will display amount of time remaining during
+gameplay
+<br>++++"Off" - will not display amount of time remaining during gameplay
+<br><i>By the way, if you have 2.914, you have separate Versiontag.png
+images in each theme's Menu folder. Please delete these files, or your
+FoF will still display the old "Version 2.9" graphic.</i>
+<br>&nbsp;
+<p>---------===========-------------=============------------=============
+<br>Unofficial updates - latest on top (please let me know if I've missed
+an unofficial update - link me to the post and tell me where it should
+be listed here based on when it was released):
+<br><i>(please note, I have not tested nor will I support these updates;
+I have no idea what features are included from other unofficial patches.</i>
+<br><i>When I feel like coding again I will integrate what works into the
+next patch. So all you coders out there, have at it!)</i>
+<p><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=2130#entry273010">Blazingamer's
+2.914 hotfix</a>
+<p><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=2080#entry272280">Blazingamer's
+fixed data.py for 2.913</a>
+<br><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=2070#entry272217">Blazingamer's
+2.913 hotfix</a>
+<p><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=1970#entry268829">arfn24's
+2.912 MAC version installer</a>
+<br><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=1840#entry265663">ugo247548's
+2.912 full installer</a>
+<br><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=1830#entry265583">Blazingamer's
+2.912 hotfix</a>
+<p><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=1810#entry265212">ugo247548's
+2.911 full installer rev 2 (with new GH3 theme &amp; sounds)</a>
+<br><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=1760#entry263934">ugo247548's
+2.911 full installer</a>
+<br><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=1580#entry259404">Blazingamer's
+2.911 hotfix</a>
+<p><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=1760#entry264015">ugo247548's
+2.910 full installer</a>
+<br><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=1560#entry259193">wolferacing's
+2.910 hotfix</a>
+<p><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=1480#entry258401">Blazingamer's
+2.909 fixed guitarscene.py</a>
+<br><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=1480#entry258384">Blazingamer's
+2.909 patch</a>
+<p><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=1450#entry258289">Blazingamer's
+2.908 patch</a>
+<p><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=1440#entry257999">Blazingamer's
+2.907 patch</a>
+<p><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=1410#entry257341">death
+au's patch</a>
+<p><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=1380#entry256892">faaa's
+newer Drum Sounds patch</a>
+<p><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=1200#entry254200">Blazingamer's
+2.905 patch</a>
+<p><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=1190#entry254116">faaa's
+2.900 Drum Sounds patch</a>
+<p><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=1160#entry253743">D4rkGraphicFix
+#1</a>
+<p><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=1130#entry253504">jrdnxxhero's
+2.903 update</a>
+<p><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=1010#entry250749">Blazingamer's
+2.902 update</a>
+<p><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=980#entry250280">wolferacing's
+hotfix update</a>
+<p><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=970#entry250154">wolferacing's
+hotfix</a>
+<p><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=940#entry249694">Blazingamer's
+second update</a>
+<p><a href="http://www.mediafire.com/?mm0kmd0tpea">Blazingamer's 2.901
+update</a>
+<p>---------===========-------------=============------------=============
+<br>---------===========-------------=============------------=============
+<p><i>New in 2.900 since 2.830:</i>
+<br>++Added <a href="http://www.mediafire.com/download.php?j3yg2gxq95j">Blazingamer's
+neck select fix</a>
+<br>++Added navigatable <a href="http://i28.tinypic.com/168wojn.jpg">new
+song play choice dialog</a> before selecting instrument - "Play Mode:"
+- "Gig",Practice"
+<br>++Wrote logic to calculate generic practice sections for songs without
+any markers
+<br>++Added "Start" position to all practice section lists (for those that
+want to practice the whole song single-track)
+<br>++Added navigatable <a href="http://i28.tinypic.com/5loz11.jpg">new
+generic song practice section choice dialog </a>(without actual section
+names, for songs without them) before selecting instrument, if "Practice"
+mode is selected.
+<br>+++Rewrote new section retrieval and organization logic for the song
+initialization to find practicable sections
+<br>+++Wrote <a href="http://i31.tinypic.com/35kspkl.jpg">practice section
+display</a> &amp; selection logic to replace generic song practice section
+choices, when available
+<br>+++Converted raw practice section locations to <a href="http://i30.tinypic.com/11uua8j.jpg">more
+user-friendly mm:ss std time format</a>
+<br>++Wrote logic to pass the necessary practice mode information between
+files, classes, and functions used to prepare and play the song
+<br>+++Wrote logic to take the practice information and use it to decide
+which track(s) to load, and where to start playing them from
+<br>++Wrote logic to disable failing when in practice mode
+<br>++Practice mode will now start you 4 measures before the section you
+picked
+<br>++Wrote logic to prevent practice mode scores from being stored / uploaded
+<br>++Created separate song-listing quick MIDI reader function to speed
+up song listing (so it doesn't have to retrieve practice sections in the
+song list)
+<br>++Added support for all GH1-style simple text event markers to be practice
+sections (messy but effective)
+<br>++If only one text event / practice marker, the automatically-generated
+section splits will be used instead
+<br>--------------------------------
+<br><i>If you want to practice a multi-track song with all instruments
+playing...</i>
+<br><i>make a copy of that song's folder, edit the title in the song.ini
+so you</i>
+<br><i>can tell the difference, merge all the .ogg tracks into the song.ogg,
+and</i>
+<br><i>delete all .ogg files except song.ogg.</i>
+<p><i>To add practice sections to a song with NO text / section events
+at all (no solo markers),</i>
+<br><i>just add text events or section markers wherever you'd like a practice
+marker. (GH1-style)</i>
+<p><i>If you would like to add practice sections to a song that already
+has guitar solo markings,</i>
+<br><i>and those solo markings are actual section markers (like in Rock
+Band), you must add</i>
+<br><i>more section markers to designate practice sections.</i>
+<p>--------------------------------
+<p>Old 2.8 base downloads in case you'd like to downgrade:
+<br><a href="http://www.mediafire.com/?ed2ly332wbo">Old V2.800 Rock Band
+Only release</a> for those who need a full release before 2.900's are uploaded
+<br><a href="http://www.megaupload.com/?d=ZOUEDYER">Download lsapg's 2.805
+installer package</a>: 10 necks, 10 GH3 stages, GH3 &amp; RbMFH themes,
+~76 MB, MegaUpload host
+<br><a href="http://www.megaupload.com/?d=DQNXUYQ8">Download lsapg's 2.801
+Full Version installer package</a>: all 5 themes, ~150 MB, MegaUpload host
+<p>=====================================================================
+<br>&nbsp;
+<br>&nbsp;
+<p>Here is a link to the old "Alarian Mod V2.0 Hotfixes" thread, for those
+of you that want a really old version:
+<br><a href="http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=21552">http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=21552</a>
+<p>
+<hr WIDTH="100%"></center>
+
+
+
+
+
+New in 2.8:-----------------------------------------------------------------------------------------------------
+================================2.830:
+[url=http://www.mediafire.com/?gtm44gvcmkm]Download old patch[/url] [i]New in 2.830 (from 2.825):[/i]
+[url=http://ifile.it/rjvi9tx]ifile.it alternative 2.830 patch download host[/url]
+++Added [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=600#entry245814]wolferacing's gold star results mod for Rock Band themes[/url]
+++Changed default theme background color to black
+++Fixed starperfect.png reference with incorrect case (caused Linux issues; file "starperfect.png" was NOT renamed)
+++Applied gold star display mod to Rock Band songlist as well
+--Changed sustained note scoring back to old FoF to avoid high score problems
++++Increased requirement for Rock Band guitar gold stars from 5.00x to 5.30x to compensate for FoF's higher sustain scoring
++++Increased requirement for Rock Band bass and rhythm guitar parts from 4.65x to 4.80x to compensate for FoF's higher sustain scoring
++++Created separate logic for Drum parts to maintain the 4.65x requirement for gold stars
+++Added GH1-style (non-section) solo off marker "gtr_off" - fixes GH1 solos until end such as Cowboys From Hell and Bark at the Moon
+++When Jurgen is playing, moved Guitar Solo "Rock Band" accuracy and review displays to above "Jurgen Is Here"
+++Added blank "artist" property to folder items so searching by artist name no longer causes an error with subfolders present
+
+
+
+================================2.825:
+[url=http://www.mediafire.com/?mjvedwqmkde]Download old patch[/url] [i]New in 2.825 (from 2.821):[/i]
+++Added logic to catch when an old fretsonfire.ini points to an invalid theme folder and force the default theme instead of crashing
+++Adapted and added Blazingamer's features:
++++New POV setting "Theme" will display the appropriate POV for your selected theme type (GH2, GH3, or RB)
++++Now optional basic main menu positioning is available with a custom theme.ini file in a custom theme (explained in doc\ThemeINI Instructions.txt)
++++Basic theme.ini settings can now be theme-specific (base_color, selected_color, etc)
++++Fixed default text color (was set to yellow, now is back to white)
+++Only using score font for guitar solo reviews in Rock Band themes; otherwise normal font will be used (GH3 score font does not include all characters)
+++Only using score font for guitar solo accuracies in Rock Band themes; otherwise normal font will be used (GH3 score font does not include all characters)
+++Added valid solo section markers for Foreplay / Long Time ("Guitar Lead") and Pleasure ("Guitar Ostinato") 
+++Changed options for "Killsw Debug" to "Off" and "On" (used to be Off and P1, now works for both players)
+++Adjusted new GH2 theme score text position to more closely match the new rockmeter
+====However, the rockmeter's digit separator spacing is less than the font's spacing between digits, so large scores overlap the lines
+
+
+================================2.821:
+[url=http://www.mediafire.com/?y21faltmc1z]Download old patch[/url] [i]New in 2.821 (from 2.820):[/i]
+++Rewrote theme folder detection and default theme determination:
+++++Theme folders with an extension (like "RbMFH.old") are now recognized as valid
+++++Theme folders without a Notes.png file are not even added to the potential theme list
+++++If the default theme (RbMFH) does not exist, it will default to the first VALID theme folder found
+--Bass groove multiplier images for all themes are now in a [url=http://www.mediafire.com/?oijknjnbs91]separate file[/url]
+
+
+================================2.820:
+[url=http://www.mediafire.com/?yn0dxpowmcz]Download old patch[/url] [i]New in 2.820 (from 2.816):[/i]
+++Added crash-catching logic for case when analog whammy is set but joystick is not present
+++Added [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=470#entry244351]death_au's graphical bass groove multiplier[/url]
+++Added [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=510#entry244797]wolferacing's solo accuracy "Rock Band" position[/url] up above fretboard
++++Moved this accuracy text slightly upward so that it can be clearly seen even when Jurgen is playing
++++Also moved the solo review text to the same vertical offset
+++Changed Guitar Solo accuracy display font to score font
+++Changed Guitar Solo accuracy display color to white
+++Changed default Guitar Solo accuracy display position to Rock Band
+++Changed Guitar Solo solo review font to score font
+++Reordered solo review text, added center-based text wrapping logic
+++Added 2 player simultaneous solo review support (before, only the most recent guitar solo review would be displayed no matter which player)
+++Added new analog killswitch mode: "XBOX" mode is for XBOX guitar controllers, "PS2" is for PS2 guitar controllers, and "Off" = digital killswitch
++++Added separate analog killswitch mode settings for P1 and P2 so two different types of guitar controller can be used together
+++Moved analog whammy killswitch P1/P2 settings to Key Settings menu
+++Ensured if a note is missed / streak is reset that the Guitar Solo isn't counted as a Perfect Solo (forced to 99%)
+++Added new options for Rock-Band specific feature Bass Groove (all other MIDI event-based features can already be configured this way)
++++++"Off" feature off in all themes
++++++"RB" feature on in Rock Band themes only
++++++"On" feature on in all themes
+===
+[i]Patch 2.820 includes bassgroovemult.png image files for each theme.  If you don't have all themes installed, and you install all the bassgroovemult.png files, then the game might try to use the RbMFH default theme even though you don't have a full one installed.
+The next patch will not include the theme files, they will be in a separate download.
+SUMMARY:  if you do NOT have the RbMFH theme installed, then delete the Themes\RbMFH folder!  Also delete any other theme folders that are not complete...[/i]
+===
+
+
+================================2.816:
+[url=http://www.mediafire.com/?lnid4ilyfmw]Download old patch[/url][i]New in 2.816 (from 2.815):[/i]
+++Updated Blazingamer's GH2 Complete Rockmeter to the latest patch version and added
+      [url=http://www.mediafire.com/?dxh1dxyjddc]Blazingamer's updated GH2 theme for v2.816+[/url]
+++Added "synth" to list of solo section label filters (synth solo was incorrectly triggering a guitar solo)
+
+
+================================2.815:
+[url=http://www.mediafire.com/?dnnufhmmgwb]Download old patch[/url][i]New in 2.815 (from 2.812):[/i]
+++Added .liquid.'s solo crowd responses (rocksound.ogg plays when solo start, and solo finish at 100%.. messy solo gets failsound.ogg)
+++Changed neck select default back to ON for the noobs that can't find the setting to enable it
+++Cut score for held notes in half to more closely match [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=350#entry243268]GH3's sustain scoring[/url]
+++Raised RB scoring gold star required average multiplier up to 5.00x for guitar parts, left at 4.65x for drum and bass parts
+++Added new option under "Visual Settings" - "GtrSolo Pos" for guitar solo accuracy display position:
++++++"Right" (default) displays guitar solo accuracy to the right of the fretboard
++++++"Center" displays guitar solo accuracy centered on the fretboard (works best with 0 decimal places)
++++++"Left" displays guitar solo accuracy to the left of the fretboard
+
+
+================================2.812:
+[url=http://www.mediafire.com/?vymiw3dnrxv]Download old patch[/url][i]New in 2.812 (from 2.811):[/i]
+++Fixed quite a few incorrect variable names in GH and FoF style star scoring
+
+
+
+================================2.811:
+[url=http://www.mediafire.com/?ymntm0vvjxg]Download old patch[/url][i]New in 2.811 (from 2.810):[/i]
+++Fixed "global variable player" in-game bug
+++Added processor priority and affinity support back in as Death Au pointed out was missing
+
+
+================================2.810:
+[url=http://www.mediafire.com/?mpmgudts2cg]Download old patch[/url][i]New in 2.810 (from 2.805):[/i]
+++Added new option under "Visual Settings" - "Decimal Places":
+++++You may now select the number of decimal places to display (0 - 2), used for the following numerical displays:
++++++++Overall accuracy, average multiplier, guitar solo accuracy, note hit timing, and now analog killswitch debug as well
+++Added new scoring option to "Star Scoring" under Game Settings (version)
++++Modeled after [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=220#entry242351]data gathered by italiansta1lion[/url]
+++++"RB" (default) style scoring uses the following ranges to determine stars: 
+(tweaked slightly to not be so much easier than GH scoring on lower stars, and so it wasn't so easy to get gold stars on many RB songs)
+1 star: 0.25x average multiplier
+2 star: 0.50x average multiplier
+3 star: 1.00x average multiplier
+4 star: 2.00x average multiplier
+5 star: 3.00x average multiplier
+Gold:   4.65x average multiplier
+++Further refined HOPO strum intention logic to properly handle picking before-and-after-chord HOPOs (try In Bloom now)
+++Added optional log debug output on streak resets if HOPO Debug is enabled
+++Added support for a second type of Rock Band solo, as in REM - Orange Crush:  "[section gtr_line]" can begin a Guitar Solo
+++Added "fade" logic to the analog killswitch... 
+++++whammy position is the volume target and it changes in small steps towards the target...
+++Moved Killswitch / whammy debug display down slightly to not interfere with gutiar solo accuracy
+
+
+===============================2.805:
+[url=http://www.mediafire.com/?mtmybwntbjw]Download old patch[/url][i] - New in 2.805 (from 2.801):[/i]
+[url=http://www.megaupload.com/?d=ZOUEDYER]Download lsapg's 2.805 installer package[/url]: 10 necks, 10 GH3 stages, GH3 & RbMFH themes, ~76 MB, MegaUpload host
+++Increased Guitar Solo section detection slop
+++Added logic to double-check if the player reset streak at any time during a solo (backup Perfect Solo detection)
+++Added logic to ignore GH-style solo markers once a Section marker has been found (the two styles interfere and are mixed in GH2 songs)
+++Added "[" open bracket to GH-style solo marker filter (gets mixed up with other GH2 text events)
+++Added logic to catch Guitar Solos that last until the very end of the song (GH2 - Search and Destroy)
+++Added user option for Guitar Solo accuracy display:
+++++"Off" will not display your Guitar Solo accuracy as you play, just the review when you finish a solo
+++++"Percent" (default) will display your Guitar Solo accuracy as a percentage only
+++++"Detail" will display your Guitar Solo accuracy as a percentage and show you notes hit / total notes
+++Centered Guitar Solo results text, and shortened display time
+---Removed repeated Guitar Solo results in scaling text
+++Added required logic to display Player 2's solo review in the correct viewport
+++Added logic to prevent total accuracy display when paused or failed (unless HOPO Debug option is on, because I find it useful when debugging)
+++Added logic to prevent Guitar Solo accuracy or review information from displaying when paused or failed
+++Added logic to prevent Killswitch Debug from displaying when paused or failed
+++Added some missing image object cleanup after each song (probably part of memory leak)
+++Added support for in-game star scoring system & SFX in GH themes:
+++++This requires ghthemename\Sounds\starding.wav and of course the starwhite stargrey starperfect imagefiles
+++Added logic for separate overall accuracy and average multiplier display location in GH theme (on top of stars)
+
+
+
+
+[url=http://www.mediafire.com/?aiiyxyergry]Download old patch[/url][i] - New in 2.801 (from 2.800):[/i]
+[url=http://www.megaupload.com/?d=DQNXUYQ8]Download lsapg's 2.801 Full Version installer package[/url]: all 5 themes, ~150 MB, MegaUpload host
+++Fixed guitar solo restart bug
+++Changed a couple of the default setting selections to provide a much quicker-loading / better-performing game with a blank fretsonfire.ini file and no settings changes:
++++++Rock Band themes overdrive neck glow defaults to OFF
++++++Library count, rotation, and neck selection all default to OFF initially
++++++The default theme, if none is selected, will be "RbMFH" instead of "Gh3" since I consider it to be the main theme of this mod
++++++Stage rotation defaults to OFF now to shorten default song loading time
++++++Guitar Solo neck style defaults to Overlay
++++++Players defaults to 2 (since you can easily enable / disable player 2 when selecting song difficulty and part)
++++++Point Of View defaults to Rock Band instead of FoF
++++++Fullscreen now defaults to OFF
++++++Large Drum Neck defaults to OFF
+++Rearranged "Key Settings" menu to be more convenient
+++Added version string to windowed mode window title
+
+
+============================================================================================================2.800:
+[i]New features since [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=3440#entry237784]Alarian mod v2.7.hotfix25[/URL]:[/i]
+++Added "organ" to the solo section filter list so it won't trigger the Guitar Solo neck.
+++Added user option for Guitar Solo neck mode under "Fretboard Settings":
+++++"Off" will not show any neck changes for Guitar Solos
+++++"Replace" (default) will replace neck with "guitarsoloneck.png" - Overdrive neck will replace this neck.
+++++"Overlay" will create a static neck overlay with "guitarsoloneckovr.png" - this will show on top of overdrive
+++Fixed after-chord HOPO marking / playing issue
+++Added "play" to list of words to not allow with "solo" to detect a Guitar Solo section
+++Added Rock Band-like real-time in-game 5-star scoring display (if starwhite.png and stargrey.png are found)
++++Added numerical total accuracy display
+++Added starperfect.png support to display 100% in-game
++++Used Death Au's white / grey star images
++++Used Daevid's gold star image
++++Used anthman's perfectly ripped Rock Band star "ding" sound from gameplay
+++Relocated a large portion of the in-game text and lyric event string manipulation to song preprocessing / loading
+++Added Rock Band-like solo note counting, review, and bonus score:
+++++Perfect Solo: 100%, 100n points
+++++Awesome Solo: 95%-99%, 50n points 
+++++Great Solo: 90% - 94%, 30n points
+++++Good Solo: 80% - 89%, 20n points
+++++Solid Solo: 70% - 79%, 10n points
+++++Okay Solo: 60% - 69%, 5n points
+++++Messy Solo: 0% - 59%, 0 points 
+++Added numerical average multiplier display
+++Fixed average multiplier calculations during gameplay and afterwards (at results):
+----Before, one could get above 4x average multiplier in a song with chords without using starpower.
+++++Now, the only way to get above a 4x average multiplier (besides long notes) is to use starpower and get above 4x long enough
+++Added Blazingamer's option for the vertical POV, like in ddr and rock revolution (under "Fretboard Settings" - "POV" - "Rock Rev")
+++Added new option under "Game Options" - "In Game Stats":
+++++"Off" will not display average multiplier and overall note hit accuracy during gameplay
+++++"RB" (default) will only display average multiplier and overall note hit accuracy during gameplay in Rock Band themes
+++++"On" will always display average multiplier and overall note hit accuracy during gameplay
+++Fixing Guitar Solo accuracy note counting with some slop logic - was including / missing notes just at the edge of the solo events
++++Added some solo marker timing slop to allow for late activation of Guitar Solo events (game lag)
++++Will also ensure a maximum of 100% guitar solo accuracy
+++Added logic to not go to score results screen if Jurgen is playing solo and finishes the song
++++Or, if Jurgen is playing both players, it will also bypass the score screen
+++Fixed many 2-player issues
++++Duplicated many of the newer features to be compatible with two players
+++++Each player has their own guitar solo processing and display
+++++Each player has their own in-game star score 
+++++Each player has a total note hit accuracy and average multiplier display
+++++Each player has an early/late hit accuracy display
+++Added basic internal version identification and display (replaced "Game Settings" text with version string)
+++Made score and streak counters appear in the same place always (not shifted when lyric sheet is absent)
+++Fixed another problem with certain before-chord HOPOs preventing the chord from being stummed
++++Added logic to ensure that a potential problem strum doesn't interrupt any held notes if the game determines no penalty should apply
+++Allowing GH1-style guitar solo ending marker "verse" (they don't always include a "solo off" event, like in Thunderkiss)
+++Added option under "Game Settings" (version) - "HOPO Debug":
+++++"Off" will not display any detailed HOPO or solo debug info
+++++"On" will display the current HopoActive, PotentialProblemFlag, note tappable markings, and guitar solo note counts
+
+
+=====================================================================================2.7xxx:
+
+Hotfix #25 - [url=http://www.mediafire.com/?ytmm9htcndk]Hotfix Link[/URL] -- [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=3440#entry237784]Post[/URL]
+++Updated logic to allow the very first note in a song to start a HOPO (had become outdated with new HOPO system)
+++Fixed [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2890#entry232178]fail before countdown complete bug[/url]:
+++++You may now fail during the song start countdown (should you be that ambitious), and the fail screen will now prevent the song from playing
+++Added option to "Rotate Stages" - "BackNForth" 
+++++This mode will display stages in order from first to last, and then from last to first, and repeat.
+
+Hotfix #24 -- [url=http://www.mediafire.com/?gwdz0ijnm3c]Hotfix Link[/URL] -- [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=3430#entry237579]Post[/URL]
+++Gave Jurgen the ability to hammer-on and pull-off, and updated his algorithm to the latest GH2 requirements.
++++Jurgen will now officially kick your ass with any instrument (unless you can tie his 100%)
+++Refined HOPO strum intention logic - seems really solid now
+--Removed killswitch debug display when playing Drums
+++Added some color coding to better bring out the killswitch debug display:
++++++When an analog killswitch is in use, and the value is 0.0, it will be grey.  Otherwise it will be yellow.
++++++When a digital killswitch is in use, and it is off, it will be grey.  If it is on, it will be yellow.
+++Moved unused MIDI text events, if they are enabled, to scroll across the screen a bit lower than the section names
+++When the lyricsheet.png is drawn, the song title and info are repositioned (the title should appear in the lyric bar)
+++When the lyricsheet.png is drawn, the song play coundown time left display is slightly moved to better accomodate the unused text event scrolling
+
+Hotfix #23 - [url=http://www.mediafire.com/?1mnswwmmeej]Hotfix Link[/URL] -- [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=3420#entry237383]Post[/URL]
+++Fixed occasional crash caused by hotfix 22's new logic (global variable 'num' no longer should be a problem)
+--Removed previous hotfix's HOPO intention determination logic unnecessary debug code:
+----Removed fretsonfire.log file entry each time a "miss" was detected
+----Removed "Flag: False/True" in-game debug display for the flag used to activate the new HOPO logic
+++Converted and added [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=3410#entry237210]oesick's redone lyricsheet.png[/url] 
+
+Hotfix #22 - [url=http://www.mediafire.com/?nx2xnmnmrnj]Hotfix Link[/URL] -- [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=3390#entry237007]Post[/URL]
+===[i]I accidentally left an on-screen debug for the new HOPO logic.. the "Flag:" display shows when this problematic situation has been detected and the game is watching for a possible correction.[/i]
++++Added option under "Key Settings" - "Key Conflicts":
++++++"No check" will not check for conflicting keys at all (WARNING: assign conflicting keys and you will have problems in-game)
++++++"Notify" will check for conflicting keys and warn you, but will not reset your new key (default)
++++++"Enforce" (old logic) will check for conflicting keys and prevent you from setting a conflicting key
+++++This now allows you to set your keys the way you'd like.  The old mode made it difficult to set your keys, as you had to hunt for the conflicting key and change it to something else unused before you could assign it to the control you wanted.
++++Added "outro" to the solo section filter to prevent "outro solo" sections from triggering Guitar Solos.
+++Rewrote after-chord HOPO marking logic to not allow chord pull-offs if the HOPO is the same as the top note in the chord.
+++Rewrote same-note HOPO strum logic checks to include a little more intelligence in how the game determines when to reject a strum:
++++When a string of the same note comes up, and the first is a HOPO, the game will keep track of your strums and attempt to determine your intentions
+++++Instead of cutting the strum hit window in half when these HOPO-samenote sequences come up like before, now you should be able to strum these sections your way
+++++If the user strums the first HOPO, and the game thinks the strum is for the next note - 
++++++++then if the user strums the note one more time at the end of the sequence, the game will realize that strum was meant for the last note and not apply a penalty.
+++++If the user HOPOs the first note, and intends to strum the next note but the hitwindows overlap -
++++++++then if the user doesn't strum the last note in the sequence, the game will realize the first strum was meant for the note after it, and not apply a penalty.
+
+Hotfix #21 - [url=http://www.mediafire.com/?n37jotbjxtz]Hotfix Link[/URL] -- [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=3330#entry236553]Post[/URL]
+++Added [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=3290#entry235788]wolferacing's RB beta gfx & switch[/url] with some fallback logic to prevent crashes in RB themes without "beta" graphics files
+++Added [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=3290#entry235783]worldrave's new GH3 menu BG[/url]
+++Added [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=3290#entry235718]worldrave's GH3 theme pixel-perfect updates[/url]
+++Repositioned lyricsheet, score and streak counter displays so they look right in all resolutions
+++Section names containing "gtr" in them are displayed as "Guitar"
+
+Hotfix #20 - [url=http://i31.tinypic.com/11qh375.jpg]Screenshot[/url] -- [URL=http://www.mediafire.com/?tj3e0eta1lf]Hotfix Link[/URL] -- [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=3280#entry235715]Post[/URL]
+++Altered lyrical pitch change event display from the actual "+" to "~"
+++Increased relative speed of lyrics (decreased lyric retrieval window) so words appear further apart, prevents more overlapping
+++Adjusted vertical position of lyrics to separate them better from the lyricsheet.png bottom line
+++If lyrics are present in the song, show lyric sheet and rearrange score / streak displays / accuracy's upper right display position
+++++Score and streak boxes and text positions now relative to lyrics sheet and top of screen
+++++Accuracy display when set to upper right position is now low enough to not overlap the counters.
++++If lyrics are not present in a song, the lyricsheet graphic will not load and the Rock Band screen rearrangement will not occur.
++++If the lyricsheet graphic is not present in a theme, that theme will not be rearranged
+++Updated glorandwarf's key conflict checker with trinidude's patches and reactivated to prevent assigning conflicting controls
+++Added extra logic for bass pedal sound playing so that other drum keys don't accidentally get recognized as the bass drum
+++++Please note, the random drum samples still contain a bass drum sound.  If you don't ever want the other drums to play a bass drum sound, find this file and replace it.
+++Added fallback logic for when data\Sounds\bassdrum.wav is not present, so this does not cause a crash.
+
+Hotfix #19 - [URL=http://www.mediafire.com/?sn1mnsengt0]Hotfix Link[/URL] -- [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=3220#entry235051]Post[/URL]
+++Added fallback logic if a nonexistant neck filename is selected; in this case, it will set neck 0 (random necks)
+++Changed "Rock Band text events" option to "Rock Band events" with new settings:
++++++"Off" will not process any Rock Band / MIDI text events (lyrics, sections, solos, etc) or attempt to load a lyricsheet.png
++++++"On" will process all Rock Band / MIDI text events (lyrics, sections, solos, etc) and attempt to load a lyricsheet.png
++++++"RB Only" will process all Rock Band / MIDI text events (lyrics, sections, solos, etc) and attempt to load a lyricsheet.png -- only in Rock Band themes. 
+
+Hotfix #18 - [URL=http://www.mediafire.com/?ume0i1mmmrz]Hotfix Link[/URL] -- [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=3200#entry235014]Post[/URL]
+++Fixed drum tester logic to match new drum key enumeration order
+++Added lyricSheet.png optional loading logic to GH-based themes (fixed GH theme song load crash)
+++Added worldrave's [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=3180#entry234718]GH3 Menu.ttf font[/url]
+
+Hotfix #17 - [url=http://i31.tinypic.com/2rqg1et.jpg]Screenshot[/url] -- [URL=http://www.mediafire.com/?ourlxs1yrjs]Hotfix Link[/URL] -- [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=3170#entry234698]Post[/URL]
+++Added very beta Rock Band MIDI lyric scrolling and timing / highlighting logic
+++++Rock Band MIDI lyrics will scroll from right to left, a syllable at a time.
+------Some syllables too close together currently overlap...
+++Added support for optional "lyricsheet.png" in the theme folder:
+++++This will display a Rock Band-ish lyric background graphic (originally provided by wolferacing) at the top of the screen.
++++++This also shows the timing line with a fake voice arrow 1/4 of the way across the screen.  Lyrics are centered around this timing line.
+++++Lyrics just at the timing line are being sung right now (current lyric).  These will be colored green-blue.
+++++Lyrics to the right of the line (future lyrics) are colored white
+++++Lyrics to the left of the line (past lyrics) are colored grey
+++++Long lyrics that change pitch at certain times have these pitch changes marked in the text with a "+" symbol
+++++This symbol has been shifted up to the top of the screen to prevent unnecessary overlapping
++++Added user option under "Game Settings" - "MIDI/RB Lyrics":
+++++"Off" will not display any MIDI / Rock Band lyric events
+++++"Auto" will display scrolling MIDI / Rock Band lyric events
+++Added check for the word "drum" before recognizing a "solo" text event as a Guitar Solo
+++Added check for the word "map" before recognizing a "solo" text event as a Guitar Solo
+++Applied scrolling and coloring logic to section labels, which will scroll on the top of the screen.
++++The game will also now give you advance notice of recognized Guitar Solo sections with timed scrolling section text above the lyrics.
+
+Hotfix #16 - [URL=http://www.mediafire.com/?ozwe1jzy3mf]Hotfix Link[/URL] -- [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=3140#entry234518]Post[/URL]
+++Added Guitar Hero 1 style solo markers (regular text events, NOT sections, "solo_on" and "solo_off") to the Guitar Solo recognition logic
++++Yes, Guitar Hero 1,2, and 3 songs should now have recognized Guitar Solo sections.
++++You may now designate a guitar solo section Rock Band style, with "section" markers 
++++++++example: "[section_gtr_solo_a]" begins, "[section_verse_a]" ends  (end marker can NOT have "solo" in it)
++++Or, you can use Guitar Hero 1 style simple text events
++++++++example: "solo_on" begins, "solo_off" ends
+++Added support for section labels and solo markers with capital letters in them (all lowercase is no longer required)
+++Added "bassdrum.wav" a bass drum sample sound, which will play whenever the bass drum is hit, note or not - [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=3050#entry233781]HolystoneH's sample[/url]
+[i]+++This file is required for operation.  No fallthrough logic to stop crashes if it isn't there.[/i]
++++Added user option under "Audio Settings" - "Bass kick sound" to enable or disable this bass drum sound
+++++"On" will play the bass drum sound whether there was a note there or not, whether you hit or missed.
+++++"Off" will play normal random drum screwup sounds when the bass pedal is hit at the wrong time, and no additional sound will play when bass drum notes are hit.
+++Reordered drum keys to match note numbers, which caused the following:
++++Jurgen now has drumming skills.
+
+Hotfix #15 - [URL=http://www.mediafire.com/?uwmjs7blez1]Hotfix Link[/URL] -- [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=3140#entry234467]Post[/URL]
+++Fixed bug that was causing a hang at the song loading screen for songs without a rhythm.ogg bass track
+
+Hotfix #14 - [URL=http://www.mediafire.com/?njwtjj0fcz1]Hotfix Link[/URL] -- [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=3110#entry234309]Post[/URL]
+++Fixed problem caused by support for separate drums.ogg track - you can now play songs that do NOT have a separate drums.ogg 
+++Removed support for alternate bass track filename [i]"bass.ogg"[/i] -- [b]bass tracks MUST be named "rhythm.ogg" to work.[/b]
+++Finished debugging drum track muting, all tracks are muting properly now
+
+Hotfix #13 - [URL=http://www.mediafire.com/?wl2mnzmzgod]Hotfix Link[/URL] -- [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=3080#entry234096]Post[/URL]
+++Added Gamexprt's [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=3040#entry233717]redone Rock Band graphics files[/url]
+++Added worldrave's updated custom [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=3040#entry233729]GH3 Score truetype font[/url]
+++Added logic needed to correctly process successive guitar solo sections (such as: section_gtr_solo_a, section_gtr_solo_b, section_chorus_a)
++++When a Guitar Solo section is started, and no Guitar Solo is already in progress, the "Guitar Solo!" text will show and scale
++++If a new Guitar Solo section comes up, the last section was also a Guitar Solo, the "Guitar Solo!" text sill not be shown again
++++When a Guitar Solo section ends (with a non-solo section), the text "Solo Finished!" will show and scale (this will eventually be your solo performance review)
+++Ensured resources are freed after finishing a song (this was accidentally removed while debugging another problem in an earlier hotfix)fs
+++Fixed logic for separate drum track muting, and for "bass.ogg" alternate rhythm file support
+
+Hotfix #12 - [URL=http://www.mediafire.com/?wxtq9xwmnix]Hotfix Link[/URL] -- [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=3050#entry233763]Post[/URL]
+++Fixed bug caused by hotfix #11 that broke score results and upload
+
+Hotfix #11 - [URL=http://www.mediafire.com/?j2a90cootmn]Hotfix Link[/URL] -- [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=3050#entry233731]Post[/URL]
+---[i]Drum track muting is not behaving correctly yet :(
+---and also, WARNING! --this version breaks the score results screen and score uploading.[/i]
+++Added option under "Game Settings" - "Show Unused Events"
++++Now you can turn off all the unused text events (only show lyrics and section names without the mess on the left)
+++Fixed issue caused by hotfix #10 breaking drums
+++Added support for separate "drums.ogg" audio track, if present.
++++Linked drum parts to this audio track's volume control
++++++Test songs with separated drums.ogg track: [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=17;t=23920]SlowDrag's[/url], and [url=http://rapidshare.com/files/121259502/Iron_Maiden_-_Run_to_the_Hills.rar]v4vendetta's rerip of Run to the Hills[/url]
+++Also mapped alternate "bass.ogg" audio track name to "rhythm" track if no "rhythm.ogg" is found
+++Added another audio channel for sound effects (was interfering with drum track)
+
+Hotfix #10 - [url=http://i32.tinypic.com/2crow21.jpg]Screenshot[/url] -- [URL=http://www.mediafire.com/?ni3x099nizn]Hotfix Link[/URL] -- [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=3030#entry233692]Post[/URL]
+[b]WARNING!  This mod is known to break drums![/b]
+++Added worldrave's new painstakingly-crafted GH3 Score truetype font
++[b]IMPORTANT: For any of the following features to work, you must have "Rock Band text events" set to "On"![/b]
+++Added basic detection and display of UNstripped Rock Band song sections
++++Stripped unnecessary characters and labels from section text
++++Changed all underscores "_" to spaces " " for better section name readability (this was done just after the screenshot)
++++Added basic detection and display of guitar solos (no accuracy meter, solo review, or upcoming solo indications are implemented yet)
++++++Wrote logic to only allow "Guitar" and "Lead Guitar" parts to obtain Guitar Solos
++++++When Guitar Solo begins, the appropriate player's neck will use "guitarsoloneck.png" (if it exists in the theme)
++++++When Guitar Solo begins, "Guitar Solo!" will show in the large scaling text used for other notifications such as "Starpower Ready!"
++++++When Guitar Solo ends, the neck will go back to normal.
++++++Starpower neck overrides Guitar Solo neck (only one will display)
+
+Hotfix #9 - [URL=http://www.mediafire.com/?m4qw0v1mwxm]Hotfix Link[/URL] -- [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=3030#entry233654]Post[/URL]
+[i]This is the "OK, so I care a little about certain graphics" hotfix...[/i]
+++Replaced [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2930#entry232877]bassgrooveneck.png, DrumNotes.png[/url], and [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2960#entry233183]bassgrooveneckovr.png[/url] with Figure's
+==Moved Death AU's bassgrooveneckovr.png (simple blue fade) to Gh3 theme
+==Moved my original tiny blue bassgrooveneck.png to Gh3 theme
+++Replaced Rock Band score and streak font with ITC Avant Garde Std Book, with the number "0" and letter "O" swapped.
+++Added new "locale" module to library, and used it to format Rock Band score with commas appropriate to your region
+++Re-created Rock Band theme rockmeter instrument icon arrows
+++Stretched Rock Band score background / label / instrument icon images to accomodate larger scores
++++Also finally mirrored the Bass score icon, which was displaying backwards
+++Added code to read optional drumfretshacked.png as altered by [url=http://img73.imageshack.us/img73/9307/drumfretbuttonsfixedrb9.png]slantyr[/url] (to correct RB drum fret angles)
+++Added functions to pull effects / sections / commands text and lyrics text from Rock Band rips and display them in two locations on the screen -- THIS IS INCREDIBLY BETA
++++Added user option to enable / disable handling these Rock Band text/lyric events under "Game Settings" - "Rock Band text events"
+
+Hotfix #8 -- [URL=http://www.mediafire.com/?vnii5mwnvmx]Hotfix Link[/URL] -- [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2950#entry233031]Post[/URL]
+==Double-checked, Wolferacing's latest POV code is indeed included already.
+==Checked raw whammy volume, sounded worse than old rounding, abandoned
+++Added new user setting under "Fretboard Settings" - "Bass Groove Neck:"
++++++"Off" - This will not alter the neck appearance at all when Bass Groove is active.
++++++"Replace" - This is the original mode; "bassgrooveneck.png" will be used in place of your regular neck during Bass Groove.
++++++"Overlay" - Death AU's new static overlay mode; "bassgrooveneckovr.png" will be overlaid on top of your neck during Bass Groove
++++++++"Overlay" mode still shows on top of starpower necks.
+
+Hotfix #7 -- [url=http://i30.tinypic.com/317hbvt.jpg]Screenshot[/url] -- [URL=http://www.mediafire.com/?333wwm1hblz]Hotfix Link[/URL] -- [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2900#entry232316]Post[/URL]
+++Fixed player 2's Bass Groove feature
+++Created logic to replace GH theme multiplier with text for Bass Groove multipliers
+
+Hotfix #6 -- [url=http://i28.tinypic.com/5xjx41.jpg]Screenshot[/url] -- [URL=http://www.mediafire.com/?x3vh2yd0ndj]Hotfix Link[/URL] -- [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2880#entry232109]Post[/URL]
+++Implemented a basic "Bass Groove" feature: 
+++++++++[i]PLEASE NOTE the Bass Groove multiplier text will currently only show in Rock Band themes![/i]
+++++++++[i]Bass players in GH themes will have "4x" still displayed incorrectly for now![/i]
+++++Bass Guitar parts will have the capability to reach 5x and 6x multipliers for hit streaks of 40 and 50.
++++++These new multipliers also scale 2x with starpower / overdrive (Bass players can reach 10x and 12x multipliers)
++++++These new multiplier values currently are only shown in bluish text in place of the graphical multiplier
+++++If a theme has "bassgrooveneck.png" then that neck will be used whenever Bass Groove is active (and starpower is not)
+++Implemented Worldrave's latest perfect GH3 hitflame sizing
+
+Hotfix #5 -- [URL=http://www.mediafire.com/?n3xmmyatdg2]Hotfix Link[/URL] -- [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2880#entry232086]Post[/URL]
+++Added new user option under "Fretboard Settings" for "Large Drum Neck"
+++++"Yes" will set the drum neck to the original large size in the Rock Band theme
+++++"No" will set the drum neck to the same size as the guitar neck
+++When starting the game with a fresh INI file, the user will only be prompted to find the "songs" folder once.
+
+Hotfix #4 -- [url=http://i26.tinypic.com/akecn5.jpg]Screenshot[/url] -- [URL=http://www.mediafire.com/?mmyxoizctz3]Hotfix Link[/URL] -- [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2860#entry231998]Post[/URL]
+++Wrote new logic to separately display Rock Band instrument icons for Player 1 and Player 2
+
+Hotfix #3 -- [URL=http://www.mediafire.com/?1m2cmnjwz20]Hotfix Link[/URL] -- [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2850#entry231908]Post[/URL]
+++Fixed neck selection menu problem caused by Hotfix #2
+++Redefined Stage Rotate Delay option to include 3 ranges of step sizes:
+++++Delays 1  - 10 can be adjusted in single steps
+++++Delays 10 - 50 can be adjusted in steps of 10
+++++Delays 50 - 2000 can be adjusted in steps of 50
+++Added Stage Rotate Delay option to in-game pause menu and ensured it gets refreshed when unpausing
+
+Hotfix #2 -- [URL=http://www.mediafire.com/?jbtyzolzwn1]Hotfix Link[/URL] -- [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2820#entry231491]Post[/URL]
+[i]**Warning!  Hotfix 2 breaks the neck selection menu!![/i]
+++Fixed unnecessary repeated hard drive INI access "(D) Config.get: coffee.neck_choose" during neck select menu init / runtime
+++Added [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2810#entry231411]Spikehead's Jurgen player mods [/URL]
+++Fixed [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2810#entry231416]R4nd0m's HOPO re-strum issue[/URL]
+++Rewrote drum / guitar object key assignments and drum track detection logic
++++which has fixed the bug italiansta1ion reported in detail [URL=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2800#entry231301]here[/URL]
++++Added log output for each guitar scene's keylist initialization to help debug this
+
+Hotfix #1 -- [url=http://www.mediafire.com/?m9jbm9etsmu]Hotfix Link[/url] -- [url=http://www.mediafire.com/?nbbmkxxtngm]Mini .RAR Release Link[/url] -- [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2780#entry231196]Post[/url]
+++Re-implemented [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2700#entry230528]2.63b hotfix #9[/url]
+++Applied animated hitglow scaling change from Guitar.py also to Drum.py
+
+
+
+New in 2.7:-----------------------------------------------------------------------------------------------------
++Changed the neckspeed calculation to better reflect BPM-changes.
++New yourock, youfailed and random neck images by EdisLeado
+
+Hotfix #8 -- [url=http://www.mediafire.com/?tejam4uvj15]Link[/url] - [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2610#entry229773]Post[/url]
+++Fixed the drums hitflame and hitglow positioning
++++For now, the bass drum shows a normal hitflame appears in the center of the fretboard and slightly above the other hitflames
+++Added Wolferacing's drum graphics (drumcenterlines.png, DrumNotes.png) for 8bit, Gh1, Gh2, and Gh3 (lines corrected)
+
+Hotfix #7 -- [url=http://www.mediafire.com/?4t1zw13mwad]Link[/url] - [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2590#entry229537]Post[/url]
+++Added new option under Key Settings > Drum Keys > Auto Drum SP (Auto Drum Starpower Activation)
++++Now you can choose to have the game automatically activate your starpower for you
++++Handy for those with drumsets that don't want to reach or search for the starpower button, or for the lazy (like me)
+
+Hotfix #6 - [url=http://i26.tinypic.com/15f6he0.jpg]Screenshot[/url] -- [url=http://www.mediafire.com/?lbr3vdneqzq]Link[/url] - [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2580#entry229522]Post[/url]
+++Re-enumerated all player0/player1 guitar/drum keycodes to ensure no interference
++++Player 0's drum starpower will now no longer automatically activate whenever the red drum is hit.
++++Increased allowed thickness of bass drum note rendered from DrumNotes.png
++++Created 2 new Rock Band "rock meter" arrows, one for Bass and one for Drums
+++++Three new files used with new rock meter arrow code: rockarr_guitar.png, rockarr_bass.png, rockarr_drums.png
+++++If one of these images is not present, it will attempt to load the regular rock_arr.png as a fallback
+++++New code has been written to represent your selected instrument on the Rock Band rock meter.
++++++This new code currently will only determine Player 0's part and use that rock meter arrow
++++++I still have to adapt this to 2 players so that each player can have a different rock meter arrow
+
+Hotfix #5 - [url=http://i28.tinypic.com/2h6btqg.jpg]Screenshot GH3 (too many lines)[/url] -- [url=http://i28.tinypic.com/bi10cw.jpg]Screenshot RB[/url] -- [url=http://www.mediafire.com/?aamz4d4ysfw]Link[/url] - [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2580#entry229490]Post[/url]
+++++Added support for an optional drumcenterlines.png in a theme folder.
++++++If this file is not found, no drum center lines will be drawn
+++++++Included Wolferacing's GH3 and RB drumcenterlines.png files -- RB looks good once again but GH3 has one too many strings still... see screenshots.
+
+Hotfix #4 - [url=http://www.mediafire.com/?z4mrzm2bg3j]Link[/url] - [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2570#entry229474]Post[/url]
+++++Added function to play Drum screw up sounds
++++++Created a set of 8 drum screw up sounds (data\Sounds\drumscw1.wav - drumscw8.wav) from random drum samples that Happ E Nose provided
+++++Replaced Gh3 theme's DrumNotes.png with wolferacing's fixed file
+
+Hotfix #3 - [url=http://i27.tinypic.com/dgs010.jpg]Screenshot GH3 (notes too close)[/url] -- [url=http://i25.tinypic.com/jb0l51.jpg]Screenshot RB[/url] -- [url=http://www.mediafire.com/?yzwi2lxz4mz]Link[/url] - [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2560#entry229321]Post[/url]
+++++Added capability for separate Drum Notes image files (use [url=http://i26.tinypic.com/2ahfl8o.jpg]this note format[/url] as a template for spacing and placement to make your own drum notes.)
++++++Included Wolferacing's GH3 and straight RB drum note files.
+++++++The GH3 drum note image file's notes are too close together and need to be fixed (needs to be evenly spaced for the math to work!)
++++++++DO NOT USE THE INCLUDED Gh3\DrumNotes.png - they are included so that someone else might fix them.
++++++You may now add a "DrumNotes.png" file to any theme, in [url=http://i26.tinypic.com/2ahfl8o.jpg]this note format[/url], and the game will automatically detect and use it for drum tracks.
+++++++If you do not have a "DrumNotes.png" file in a theme, the game will still automatically generate usable drum notes by hacking up Notes.png
+
+Hotfix #2 - [url=http://www.mediafire.com/?vvtrk1gw1eh]Link[/url] - [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2540#entry229116]Post[/url]
++++Fixed drum track scoring bug - total notes are now calculated correctly when drum "chords" are involved
+
+Hotfix #1 - [url=http://www.mediafire.com/?frltmzxd3ho]Link[/url] - [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2510#entry228890]Post[/url]
++Drums, as in [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2500#entry228863]2.63.hotfix5[/url]
+++Forced drum neck / board to normal guitar size in GH-based themes so rockmeter doesn't interfere
+++Ported drums to 2.63b - animated hitglow code has been added to both Guitar and Drum objects
+
+
+--------Myfingershurt takes over from here on up...
+New in 2.62
++Actual GH3-tails in GH3-theme
++Actual Streak Lights in GH3-theme
++Hotfix #1-17 by [b]Myfingershurt[/b], QQStarS, Blazingamer -->http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=1900#entry223462
++Neckspeed is now always depending on Difficulty & BPM
++New Hitwindow calculation.
++New Hitflames (actual Blowtorch-graphics! in GH3-theme made by me :))
++Improved logics related to strumming, by Myfingershurt.
++2.6c hotfix #1 is included as well, with the nicely-trimmed 2 decimal point hit accuracies with the "ms" label.
+
+New in 2.6:
++Spinning Starnotes in GH3-theme, with option to turn off in Visual Settings (This code was initially made by QQStarS. Spinning starnotes frames provided by Worldrave. Notesheet made by Alarian. Fixed QQStarS code so that the stars spin in the right direction and at the right speed)
++Made the hitwindows a little easier on all 3 settings
++Prevented the option to manipulate hitwindows in fretsonfire.ini
++New graphics in GH3-theme by Worldrave (fret-guide on backgrounds and high quality selection line in song list)
++New Overdrive neck again (Edited one neck provided by Ds~)
+Hotfixes since 2.5c By Myfingershurt:
++Hotfix#7 - Fixed problem caused by hotfix 6, where certain chords after a tapped HOPO could not be strummed. Restructured the HOPO strum logic to accomodate the special checks necessary for the after-chord HOPO system.
++Hotfix#6 - Fixed case where a strummed chord pull-off before another chord would sometimes cause a streak reset.
++Hotfix#5 - Built on new logic from hotfix #4 and re-fixed the problem caused by the user pausing during the "You Rock" message.
++Hotfix#4 - Fixed issue where songs would not end (caused by the check for pause, new logic written).
++Hotfix#3 - Added new option to completely disable the Rock Band Starpower / Overdrive Neck Glow (under Fretboard options).
++Hotfix#2 - Fixed case where a chord pull-off before a long pause would result in that chord-pulloff requiring a strum. Fixed case where a chord pull-off too close to the end of a song would result in a funky half-HOPO half-chord merged strum. Fixed crash that happened when user pauses during "You Rock" message. Fixed problem where user managed to restart during "You Rock" message before the crash, and the game would try to restart and then immediately go to the results screen.
++Hotfix#1 - Ensured that special strummed HOPO logic does not get applied to tapped or pulled-off notes.  This has fixed speedpicked chord / pulloff / chord / pulloff / etc  issues. This is the so-called "Lefty Mode" fix.
+
+New in 2.5c:
++Fixed Song list items overlapping info at bottom (Fixed the overlapping issue in RB theme that this caused in 2.5b )
++Fixed tight and wide note hit windows being swapped 
++Neck selection positioning tweaked to fit in squares
++Hit window option added, default hit window is wider than 2.36c
++Reorganized Settings
++Fixed GH3 Strings (were upside down)
++GH3 Streak Lights updated (provided by Worldrave)
++GH3 SPLights are more detailed (provided by Worldrave)
++New graphics for Main menu, Setlist, Pause and FailMsg in GH3 (provided by Worldrave)
++Updated Rockband backgrounds (provided by Ds~)
++Very nice RB Scene backgrounds (provided by Ds~)
++New RB Menu items graphics (provided by Ds~)
++New RB Multiplier graphics (provided by Ds~)
++New Overdrive neck
++Themes fix by ShiekOdaSandz (first theme in themes folder wasn't selectable)
+
+New in 2.36c:
++Quick fix to the Guitar Track unsync (that was in 2.36b)
++Note window is alot tighter on faster songs now since... (Less tight in 2.36c vs 2.36b)
++Note hitting margin are now based on Neckspeed instead of 100 BPM, this fixes some issues with overlapping hitmargins of notes. (vs Based on BPM in 2.36) which results in...
++vBPM fix by Glorandwarf (Finished in 2.36b vs unfinished in 2.36)
++Glorandwarf Fixed the issue with the notes hit number counting the chords as separate notes, while 
+the streak number does not. This means that before, accuracy% was ALWAYS wrong if a song had chords in it. Same with notes hit/total
++Repositioned the Selected Neck image in GH3-theme slightly
++Added modified Gameresults screen (originally by Seraph_88), to match the Notes Hit / Total Notes 
+info) and tweaked some positioning.
++Fixed the case sensitive issues with GH2-theme filenames
++12 Necks replaced by High Resolution necks (By Bluzer) these are Necks 11-22
++Edited the Rockband Notes image so that they have a gold rim in overdrive phrase and in overdrive
++Changed strings in GH3-mod to be the exact rip from GH3 (provided by Worldrave)
++New Spanish translation by Meteorito
+
+New in 2.34c:
++No white tails in Overdrive
++Unlimited themes
++New yourock for GH1+2 by Daevid
++New Hitflames in RB by Daevid
++Random Necks option (choose the ? neck)
++pov option activated
++hitglow color option ("same as fret" or the actual color of the image(svg)-file
++fixed an issue with the necks being restricted to 256x512 pixels to render correctly in neck selection screen, also added 8 necks that are 512x1024 pixels, that's 4 times the detail. Necks provided by Worldrave These are: Neck_2, 3, 4, 5, 6, 7, 29 and 30
++Added Notes hit / Total notes in Game Results, provided by Divra, ported and positioned by Lnkk
+
+New in 2.3:
++Codescrubbing
++Codecleaning
++Menu Texts fixed - Before this, text looked different when you changed resolution.
++New Rockband Notes - Please note that the tails colors haven't been adapted to these notes!
++GH3 Gameresults background changed
++Stage backgrounds no longer need to be called "Stage1.png, Stage2.png" etc. All stages need to be put in <themefolder>\Stages\(Submitted by Glorandwarf)
++You Rock/Failed! messages are shown for a shorter time (perhaps too short ???)
++Daevid's GH1- and GH2-themes added.
++Custom themes feature - You can now have 11 themes called whatever you want, so there's 5 themes currently in the game so you can either add 1-6 more or replace the current ones... You get the picture. Just put them in the Themes folder, but make sure they follow the filename convention of the GH3-theme. This feature is still under development and there will be unlimited themes in the future with better customization-options.
++Scores are no longer uploaded with "RF-Mod" version-tag.
+
+
+New in 2.0 Hotfix 1-28.5:
+
+1) (thanks to khornerz for this solution) Multi-OS-friendly file-fetching code (Max / Linux / Win) 
+2) 8-bit mod repaired
+3) Guitar and bass track confusions fixed!
+4) HO/PO system selection or diasble (fixed!)
+5) Random stage backgrounds enable / disable setting
+6) GH2 HOPO system no longer allows HOPO hits while holding a higher fret
+7) GH2 "sloppy" HOPO system option added - allows tapping while holding a higher fret for sloppy players like myself
+8) Fixed bugs related to "End Song" - which also will store partial song scores.  "Change Song" has been made the default option after scoring.  If a song is ended with 0 score, the results screen is bypassed - avoiding the looping bug that situation causes.  Also clarified "HOPO Timing" option names: "Close" "GH2" and "Far" - indicating the required spacing between notes for HOPOs to be possible
+9) Fixed bug where "restart song" would render additional sets of BPM lines, showing up as ever-thickening BPM lines in-game and causing lag
+9.5) (Blazingamer) - code cleanup, and CD-list background images have been fixed
+10) Fixed bug "invalid literal for int" at score screen.  Also moved where the "loading" screen is displayed while preparing to play a song - it appears briefly and then disappears after some later code removes it again - at least it shows up now.  Also  reverted "HOPO Timing" setting labels to pre-Alarian values of "Less" "Normal" and "More"
+11)   Full Release Automatic lyrics!  Settings available:
+Lyrics Off
+Lyrics only if song.ini says so
+Lyrics On if script.txt available  auto mode
+12) GH2 Strict / Sloppy system - Lefty mode fret / key enumeration fix - this affects how the game determines which frets are "higher" than others, and was screwed up by Lefty mode users in previous hotfixes.
+13) CD label fix from Blazingamer 12.5
+and updated to GH-like star scoring calculations from ShiekODaSandz as follows, and is based on average multiplier: THIS FIX IS BUGGED, GET 14
+14) Fixed GH-like star scoring calculations where almost
+FC'd songs give 4 stars -original solution by ShiekODaSandz- based on average multiplier:
+5*=2.8x AND > 90% accuracy (this was the bugged part)
+4*=2.0x
+3*=1.2x
+2*=0.4x
+1*=0.0x
+15) -solution provided by Alarian from across the pond-
+Automatic main menu background scaling - 8bit mod main menu stretches to fullscreen now.
+16) -Screenshot of new 8-bit background Stage2.png
+"Random Stages" setting changed to "Stage Mode" setting, with options:
+-Random  automatically selects a random stage1-stagexx.png
+-Stage1  just uses Stage1.png
+-Blank  uses BlankStage.png (REQUIRED NEW FILE)
+ALSO - 8-bit mod supports random backgrounds, included are Stage1 original and Stage2 C64 forgot from who (REQUIRED AT LEAST STAGE1.PNG)
+-Additional setup steps:-
+-Place the BlankStage.png file in your data folder.
+-Place the 8-bit Stage1 and Stage2.png files in the data\8bit folder.
+17) (thanks to glorandwarf) Background randomization counting has been optimized.  Loading / preparation time to play a song has been reduced noticeably. 
+18) GH2 Strict and GH2 Sloppy systems now ignore incorrectly-tapped frets between HOPO notes.  Also ensured that the special-case HOPO strum logic does not get applied to non-HOPO note checks. 
+19) When holding a note with a lower fret, releasing the lower fret does not break the held note.  
+20) (incorrect taps in between HOPOs ignored) is now only applied to the GH2 Sloppy system.    
+21) Maze's Installer Capo's starpower clap SFX now available as an option.  HOPO System = "None" mode will now work with starpower and killswitch.    
+22) Big GH2 HOPO sytem update!  HOPOs allowed after chords.  Chord pull-offs if you'd like.  All additional logic required to track the notes and mark them for this has been debugged.
+Old HOPO system fix - sometimes, a note before a chord was just not tappable.  This will no longer happen.
+Also - the Rock Band greyscale starpower notes have been redrawn by Maze, they are now glowing white.  These new notes are included in the hotfix, under data\Rockband Mod.
+22.5)Interim update from Blazingamer: Hotfix 22.5:
+Blazingamer has fixed some of the CD list display code.  If you already use Hotfix #22, just download this and add the Dialogs.py to your library.zip
+23) CD List Bug Fixes:
+-(Blazingamer22.5) CD / song rotation corrected
+-(Blazingamer22.5) Auto song preview enabled
+-(Blazingamer22.5) First CD shows label
+However, hotfix 22.5 was not debugged... the yellow fret preview was not implemented, and no-CD list view was buggy.  Also, the CD cases for folders were still being rendered backwards.  So, from 22.5 I have:
+-Added user setting for "Song Previews" - can be set to "Auto" or "Yellow Fret"
+-Added yellow fret preview functionality again
+-Added two additional CD case "select" rotations to properly face the front towards the user when browsing song library
+Interim hotfix from glorandwarf: 23.5) Changed Code - Maze's Installer - Song "Loading" screen is now handled asynchronously from the actual song loading - so the "Loading" screen stays up until the song is ready to play now.
+Test hotfix: 23.6) Added Glorandwarf's hotfix 23.5 code for asynchronous loading screen.  Also removed the one change from hotfix 17 to 18 that somehow might have caused GH2 Strict pull-off issues (please test, I cannot confirm).
+24) GH2 Strict pull-off issues seem to have been fixed in test hotfix 23.6, so that change is included here. DO NOT GET 24, GET 24.1 INSTEAD.
+The Divra starpower-friendly score chart has been added as the new default Starpower score upload chart.  Just enable "Upload Highscores" in the Game Settings.
+(glorandwarf) The board speed during the song countdown now matches the song speed exactly.  A side effect of this is that the countdown's speed depends on the song's speed (slower songs will have a longer countdown).  
+24.1) The Divra starpower-friendly score chart automatically-added address has been corrected (hotfix 24 used the viewing address as the upload address by mistake).  
+25) Blazingamer's two new options for star scoring method (avg multiplier or raw percentage) and congratulations phrases (when you receive your star rating, the sound effects that play) have been implemented and debugged.  
+26) Blessedmain's "You Rock!" graphic and EdisLeado's crowd cheer SFX played when you finish a song, before scoring.  Thanks to Alarian for the original code suggestion to achieve this.  Separate GFX for each theme - feel free to submit alternate images and sounds.  
+Interim hotfix 26.5 from glorandwarf: The countdown length before a song will now be constant no matter the speed of the song.
+27) Glorandwarf's countdown board speed timing fix #2 has been applied (all song countdowns will be the same now).
+- Also, an option has been added that enables / disables HOPOs after chords (so everyone that has issues with it can disable it while I debug it, which may take a while) 
+28) Full Release -GH2 Strict after-chord HOPOs have been fixed.  You may now remove fingers from a chord in order to tap a lower (or higher) note than was included in the chord without breaking your streak.  Also changed setting names:
+"Starpower claps" is now "Starpower clap SFX"
+"Congrat Phrases" is now "Score SFX"
+Interim hotfix 28.5 from glorandwarf) Fixed player 2's default key settings, and player 2 key processing in solo mode.  Add to an installation that already has hotfix #28.
+
+New in 2.0
+
++Blazingamer's CD/List added and tweaked both by him and me [b]mostly by him[/b] (Please tell me if this f*cks things up this time again, I've only tested it in GH3-theme...)
++Changed "Battle/Normal" to "Pro Face-Off / Face-Off" (just the texts)
++Fixed so you can have as many Stage*number*.png in your theme folder as you would prefer (except in 8-bit, didn't fix that one yet) So you can have just 1 or you can have 9999 (Sorry 10000 doesn't work) just name them Stage1.png, Stage2.png, Stage3.png etc etc and make them scaled 1.5:1 in imagesize (like 640x480 or 1024x768 etc)
++Added New Main menu Background by Worldrave (higher resolution, nicer detail, Worldrave [b]rules[/b])
++Changed GH3 game results background (	blessedmain911 provided)
+
+New in 1.9
+
++QQStarS made Battle-mode
++trinidude4 fixed bugs (fixed the freeze when ending song and score is now set to 0 when you end song)
++Worldrave edited graphics: Songlist, Pause-menu, fail-menu (Direct rip from game!!!)
+So what did I do for 1.9??? NOTHING :)
+Thank them they are the heroes
+
+New in 1.8b
+
++Added option (Missed notes: Disappear / Keep on going)
++fixed the crash this caused in 1.8b....
++Added skor's 8bit-mod updates
+
+New in 1.8
+
++Fixed ALOT of bugs... Thanks Capo, Lnkk, Myfingershurt, ShiekOdaSandz AND whoever I forgot to thank here....
++Capo took time to debug the implementation I did of his fix, thanks once again!
++Added Myfingershurts changes (except for main menu music in Rockband theme)
+
+New in 1.7-1.7c
+
++Fixed failure sound BOOOOOOing crowd AGAIN (sound by EdisLeado)
++Fixed some bugs that came with QQStarS player2-edit like P2 Two chords only said "P1 ..." and some other minor stuff like that. Also some more serious bugs related to the adding of the 2player patch like Gamecrashes and such.
++Added more resources to be freed when ending song, added the function for Rockband- and 8bit theme (stuff was for the most part only released in GH3-theme except for the)... This should ease some of the memory leak I hope!
++Tweaked positioning of part and difficulty choosing in GH3-theme so it doesn't get outside the square in the background. This was an quick and ugly fix because I moved the options panel in the options menu. A more thorough fix has to distinct between these two, now they are in the same function....
++Added ShiekOdaSandz fix to the stars in Setlist so they're not backwards ;)
+
+New in 1.6
+
++COMPLETE 2-player mode (by QQStarS, BIG Kudos)
++Beginning of song pause bugfix (by QQStarS)
++Starting volume 0 bugfix (by QQStarS)
++First starnote bugfix (by QQStarS. Don't think he got this one right, but it's added so it can be tweaked)
+
+New in 1.5b
+Programmed some failure-stuff with files I got from Edis
++Failure sound BOOOOOOing crowd (sound by EdisLeado)
++You Failed! message is way cooler (img by EdisLeado), [i]only in GH3, need images for other mods![/i]
++Updated editor.png in GH3-theme (thx Meteorito????)
++Some code-cleaning
+
+New in 1.5
++[b][color=orange]8-bit Theme by Skor (THIS IS EXCELLENT!!! REALLY NICE!)[/color][/b]
++Stars above the score in the setlist (by QQStarS) - When I look at the code I think the position of the stars might differ between resolutions, haven't had time to test this though!
++random stage background in GH3 and RB themes
++additional minor fixes
+
+New in 1.4c:
++removed Blazingamer's CDs/List-switch
++changed text "no data" back to "nil" in song list when there's no difficulty for a song
++updated lyrics positioning in both mods (By Myfingershurt)
++fixed "Invalid Literal for Int(): None" at gameresults again...
++Myfingershurt's Ho/Po-system [b][u]ACTUALLY[/u][/b] implemented.
+[color=orange]Everyone give your best to him because he's worked really hard on it and it's REALLY GREAT.[/color]
++New Rockmeter-graphics from Worldrave
+
+New in 1.4:
++fixed font visibility
++implemented the kickass HOPO-fix (by Myfingershurt)
++lyrics positioning in Rockband mod (By Myfingershurt)
+
+New in 1.3b:
++List/CD-switch fixed...
++QQStarS Hopo "fix" removed
++Removed "Party Mode Timer" from settings
+
+New in 1.3:
++Lightning on Starpower-charge in GH3-theme
++Rockband menu graphics
++Main menu bug (Menu items were wider apart at lower res, overlapping at higher res)
++new overdrive notes
++phrases toggle (by blazingamer)
++cassette/list  toggle (by blazingamer)
++2 new necks (EdisLeado)
++proper GH3 gameresult stars (EdisLeado)
++Really nice Rockband Options background (EdisLeado)
++Might have missed something else I implemented from EdisLeado
+
+New in 1.2b:
++"Invalid Literal for Int(): None" at gameresults fixed
+
+New in 1.2:
++"Select song folder"-crash fixed
++Sorted options menu in logical categories
++Fixed optionmenu font so the text is no longer outside th panel.
++Added Key Glow FX toggle in settings
++New Rockband notes (overdrive-notes curve more defined)
++Added Miss-volume option in settings (pause menu while playing)
++Implemented [b]GREAT[/b] GH3-graphics provided by Worldrave
+
+New in 1.1:
++Replaced the Svg-data system.
+[i]Before, .svg-files were loaded and then checked if there was a .png-file to use instead. Now it just loads the .png directly if that's what you want to do and an .svg directly if that's what you want. This resulted in me stripping the game of over 100 trash .svg-files[/i]
++Fixed angled overdrive-notes (before they were all straight and din't follow the curve of the fretboard)
++Removed 3D-keys/notes. I don't know why anyone would want to use them... Sorry!
++Removed Hopo Type option (This was related to 3D-notes)
++Removed Font Scale changeable option (The game looks best in 100%)
++Fixed the song-folder dialogs.
++Fixed the "editor.png" and "gameresults.png" so you can use whatever image you want without putting it upside down or matching it at the exact place in a HUGE image-file.
++Changed editor.png in GH3
+
+New in 1.0:
++Hit note gloweffect
++Curved BPM Lines in Rockband mod
++Gameresultsbackground fixed (Was same in both mods)
++removed "GH3 Backgroundfix" mod-dependency (It's implemented now)
++updated Graphics (Thanks Worldrave, v4vendetta <and seraph88?>, any others? Gimme names and I'll put in credits, sorry for missing you out!!!!!!)
++[b]Fixed alot of performance-related issues, the game [i]should[/i] run smoother now, especially in GH3-mod!![/b]
++Fixed Overdrive-meter bug (now it's resolution-independent and shows correctly in all resolutions)
+
+New in Beta:
++Latest BPM Lines (By Capo)
++8th note Ho/Po (By Capo)
++fixed stupid tails bug (By Capo)
++Removed Tutorial, Song Editor and Credits screen (There's a credits.txt, credits are going up on main menu screen when the mod is finished)
++Removed FoF-theme
++Removed unused .pyo-files (There are .py-files that replace these, the mod will be released compiled, this is a beta and is still released with the .py's)
++Implemented GH3 Background fix so you don't have to run it as a separate mod
++Optimized Codes
+[i]All of the above resulted in a 7 MB smaller folder (decompressed)[/i]
++fixed starpower/overdrive-bug (was the same after a restart)
++fixed rockband main menu display bug (on other resolutions than 1024x768 the menu wasn't displayed correctly)
++fixed flamecolors (before, they were the same in Rockband- and GH3 mod either white or orange, now it's white in RB and orange in GH3)
++fixed those annoyingly high volume sounds (like when you do selections in menu or activate starpower the volume of these sounds are ALOT louder than everything else)
++edited that ugly Optionspanel in GH3-theme

@@ -1,0 +1,67 @@
+---------===========-------------=============------------=============
+---------===========-------------=============------------=============
+[color=yellow]---------===========-------------=============------------=============
+[size=4][b]===NOTICES: PLEASE READ BEFORE CONTACTING ME!!!===[/b][/size][/color]
+[size=2]=[i]If anyone finds problematic note patterns with either GH2 HOPO system, with or without after-chord HOPOs enabled (like, you can't hit a certain note in a certain song no matter what): please confirm by performing multiple tests with the various HOPO options, and then create a blank / silent song containing just the problematic pattern and send it to me to use for debugging.  Please ensure that your test song exhibits the same problem, if not you need to include more surrounding notes.
+
+=Here's the deal -- I'm a coder.  I care about gameplay, major features, bug fixes, etc.  I do NOT care about graphics.  If someone wants to upgrade something I've done with better graphics and effects, please feel free.  Then show me what you've done and I will be sure to include the changes.
+...Basically - I'll make it work.  You guys make it look better.
+
+=I would love to implement an online multiplayer mod / microphone mod / vocals / 3 player / note bending whammy -- but these are seriously HUGE major changes that may or may not even be possible with the current game engine version.  Please don't suggest these types of game-rewriting changes - they are all quite obvious to anyone who's ever played any of the console games.  I have no plans to attempt any of these things; and even if I did, it would not be something I would announce beforehand.  I would wait until I had it working, and then would show it off.  I like to have the option to give up on a feature and turn my attention elsewhere.  
+
+=BTW, if I had any idea how to ensure that FoF always sets a single processor affinity or whatever is required to work properly, I would make it automatic... unfortunatly, I have only 1 processor in my system.  
+
+=[b]PLEASE don't PM me with requests, that goes for everybody.[/b]  If you think you have a new idea that hasn't been discussed or thought of yet, post it in this thread.  I'm not the only one involved in this project, you know.  Everyone should have a chance to respond to the ideas, I like to see how popular certain features are before attempting to do something that I think I can finish.
+
+=[b]PLEASE don't ask me when a certain feature is going to be done.[/b]  This really starts to make my coding seem like work, as if I have to answer to somebody who might not give me my next paycheck.  This is not a job; it is a hobby.  I share what I do with everybody because, well, I'd be a real douche if I didn't :)
+
+=I've made a decision that I won't help anyone with Python.  It's just easier this way.  It's such a confusing language... I can waste a long time walking someone through what would seem like the simplest change.  I barely have enough time to make my own code work.  Do you want me to stop making progress and spend my time teaching Python?  That doesn't make sense.... I'm a terrible teacher, I'm a much better coder.
+==In short, [b]PLEASE don't ask me any questions about Python or where certain code is or that sort of thing[/b].  
+====If you're determined to figure something out, do what I did.  Google search.  Study the code.  Study Python articles.  Study example code. 
+
+
+
+[/i][/size]
+[color=yellow][size=4]To summarize: Please just let me do my thing and code what I feel like.[/size][/color]
+
+---------===========-------------=============------------=============
+---------===========-------------=============------------=============
+
+
+---------===========-------------=============------------=============
+[size=4][b]IF you want help, use this template for your bugreports. In most other cases you'll simply be ignored, ridiculed, insulted or met with extreme sarcasm and irritation:[/size][/b]
+[i]
+0. Create an empty fretsonfire.ini in your gamefolder, restart the game, and try playing WITHOUT CHANGING ANY OF THE DEFAULT SETTINGS.  If the problem persists, continue with the bugreport below.  If it works, find the setting that causes a problem and report it in detail.
+    ---also, if you are not using a fresh install from one of my full releases (RB only, GH3 only, or 5-theme releases).  Chances are, if you tried the manual patch and are having problems, you did something wrong.
+1. In which version did the bug start?
+2. Do you get any information in FretsOnFire.exe.log? (Delete the file, restart game and recreate the bug)
+3. Describe what you're experiencing is happening.
+4. Describe what you're expecting to happen.
+5. If possible, provide describing Screenshot(s) and/or a Video of your problem.
+6. If you have a "FretsOnFire.exe.log" file in your game directory, you may want to post the contents of that (or upload and share the file)
+7. You may want to post the "fretsonfire.ini" file from the game directory so we can see your settings
+8. You may also want to post the "%appdata%\fretsonfire\fretsonfire.log" file if you experienced a crash or hang, as this can contain valuable debug information
+[/i]
+
+---------===========-------------=============------------=============
+---------===========-------------=============------------=============
+[b]ANYONE WHO HAS ISSUES WITH UNOFFICIAL UPDATES -- PLEASE SEND PERSONAL MESSAGES TO THE RESPECTIVE CODER, DON'T LITTER THIS THREAD PLEASE[/b]
+
+---------===========-------------=============------------=============
+---------===========-------------=============------------=============
+
+[b]About Double-pick problem on guitar controllers![/b]
+- When strumming down, up, down, up, ... the game doesn't always register all the picks. 
+Alarian has the Xbox Xplorer guitar controller and it's safe to say that the problem he's experiencing is caused by the controller!
+The "strum-button" on the controller is registered by the computer as "Point of View Hat" and this causes problems since it's not a button that you can release. FoF won't register when you release the button. What I did was to download Xpadder: [url]http://xpadder.com/[/url].
+You can link the "strum-button" to 2 keys on the keyboard instead, this solved my problem.
+
+---------===========-------------=============------------=============
+---------===========-------------=============------------=============
+
+[b]About Variable/Speed-dependent Hitwindow!  Exact values [url=http://www.primavikt.se/fof/hitwindows.htm]here[/url][/b]
+Set the hitwindow to tight and tweak the A/V-Delay so it's right when you hit the notes when listening to the music. This is now easy with the new Accuracy indicator.
+Remember that the correct A/V-Delay is different on every computer depending on system, prestanda and audio-settings.
+
+---------===========-------------=============------------=============
+---------===========-------------=============------------=============
