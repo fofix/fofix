@@ -152,7 +152,7 @@ if __name__ == "__main__":
           if os.name == "nt":
             bin = "c:/python24/python"
           else:
-            bin = "/usr/bin/python"
+            bin = "/usr/bin/python2.4"
           os.execl(bin, bin, "FretsOnFire.py", *sys.argv[1:])
       except:
         Log.warn("Restart failed.")
