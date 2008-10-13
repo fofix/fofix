@@ -59,14 +59,7 @@ class Data(object):
 
 
     #myfingershurt: check for existance of theme path
-
-    # evilynux - Fixed themes when running from src/ folder
-    #if not hasattr(sys,"frozen"):
-    #  themepath = self.resource.fileName("themes")
-    #else:
-    #  themepath = os.path.join("data","themes")
-
-    #MFH - fixed themes when running from src folder (above did not work for mine)
+    #evilynux/MFH - fixed themes when running from src folder
     themepath = os.path.join("data","themes")
     if not hasattr(sys,"frozen"):
       themepath = os.path.join("..",themepath)
