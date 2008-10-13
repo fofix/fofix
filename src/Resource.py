@@ -140,6 +140,13 @@ class Resource(Task):
     #myfingershurt: the following should be global, and only done at startup.  Not every damn time a file is loaded.
     self.songPath = []
     self.baseLibrary = Config.get("game", "base_library")
+    #evilynux - Support for songs in ~/.fretsonfire/songs (GNU/Linux and MacOS X)
+    if self.baseLibrary == "None" and os.name == "posix":
+      path = os.path.expanduser("~/." + Version.appName())
+      if os.path.isdir(path):
+        self.baseLibrary = path
+        Config.set("game", "base_library", path)
+
     if self.baseLibrary and os.path.isdir(self.baseLibrary):
       self.songPath = [self.baseLibrary]
 
