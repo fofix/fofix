@@ -3,6 +3,7 @@
 #####################################################################
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
+#               2008 evilynux <evilynux@gmail.com>                  #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
