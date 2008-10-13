@@ -424,6 +424,9 @@ class Data(object):
     font.setCustomGlyph(RIGHT, self.right.texture)
     font.setCustomGlyph(BALL1, self.ball1.texture)
     font.setCustomGlyph(BALL2, self.ball2.texture)
+    # evilynux - Load cache to speedup rendering
+    if Config.get("performance", "preload_glyph_cache"):
+      font.loadCache()
 
 #MFH - acceptSound and selectSound will now be merged into either 10 random sounds or just the acceptSound as a fallback:
   def getAcceptSound(self):

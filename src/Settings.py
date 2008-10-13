@@ -345,7 +345,6 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "game", "frets_under_notes", autoApply = True), #MFH
       ConfigChoice(engine.config, "game", "pov", autoApply = True),
       ConfigChoice(engine.config, "game", "ignore_open_strums", autoApply = True),      #myfingershurt
-      ConfigChoice(engine.config, "game", "static_strings", autoApply = True),      #myfingershurt
       ConfigChoice(engine.config, "game", "hopo_indicator", autoApply = True),      #myfingershurt
       ConfigChoice(engine.config, "game", "hopo_style", autoApply = True),      #myfingershurt
       ConfigChoice(engine.config, "coffee", "moreHopo", autoApply = True),
@@ -387,13 +386,15 @@ class SettingsMenu(Menu.Menu):
     audioSettingsMenu = Menu.Menu(engine, audioSettings + applyItem)
 
     perfSettings = [
-      ConfigChoice(engine.config, "engine",  "game_priority", autoApply = True),
-      ConfigChoice(engine.config, "game", "disable_libcount", autoApply = True),
-      ConfigChoice(engine.config, "game", "disable_librotation", autoApply = True),
-      ConfigChoice(engine.config, "video", "Starspin"),
-      ConfigChoice(engine.config, "game", "killfx", autoApply = True),   #blazingamer
+      ConfigChoice(engine.config, "performance", "game_priority", autoApply = True),
+      ConfigChoice(engine.config, "performance", "disable_libcount", autoApply = True),
+      ConfigChoice(engine.config, "performance", "disable_librotation", autoApply = True),
+      ConfigChoice(engine.config, "performance", "starspin"),
+      ConfigChoice(engine.config, "performance", "static_strings", autoApply = True),      #myfingershurt
+      ConfigChoice(engine.config, "performance", "killfx", autoApply = True),   #blazingamer
       ConfigChoice(engine.config, "game", "star_score_updates", autoApply = True),   #MFH
       ConfigChoice(engine.config, "game", "in_game_stats", autoApply = True),#myfingershurt
+      ConfigChoice(engine.config, "performance", "preload_glyph_cache", autoApply = True)#evilynux
     ]
     perfSettingsMenu = Menu.Menu(engine, perfSettings + applyItem)
 

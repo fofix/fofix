@@ -132,7 +132,7 @@ class Drum:
     #myfingershurt: this should be retrieved once at init, not repeatedly in-game whenever tails are rendered.
     self.notedisappear = self.engine.config.get("game", "notedisappear")
     self.fretsUnderNotes  = self.engine.config.get("game", "frets_under_notes")
-    self.staticStrings  = self.engine.config.get("game", "static_strings")
+    self.staticStrings  = self.engine.config.get("performance", "static_strings")
 
 
     self.indexFps       = self.engine.config.get("video", "fps")

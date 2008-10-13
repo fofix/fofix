@@ -127,7 +127,7 @@ class Guitar:
     #myfingershurt: this should be retrieved once at init, not repeatedly in-game whenever tails are rendered.
     self.notedisappear = self.engine.config.get("game", "notedisappear")
     self.fretsUnderNotes  = self.engine.config.get("game", "frets_under_notes")
-    self.staticStrings  = self.engine.config.get("game", "static_strings")
+    self.staticStrings  = self.engine.config.get("performance", "static_strings")
     
 
 
@@ -172,7 +172,7 @@ class Guitar:
     self.twoDnote = Theme.twoDnote
     self.twoDkeys = Theme.twoDkeys 
     self.threeDspin = Theme.threeDspin 
-    self.killfx = self.engine.config.get("game", "killfx")
+    self.killfx = self.engine.config.get("performance", "killfx")
     self.killCount         = 0
     self.ocount = 0
     self.noterotate = self.engine.config.get("coffee", "noterotate")
@@ -248,7 +248,7 @@ class Guitar:
 
     if self.twoDnote == True:
       #Spinning starnotes or not?
-      self.starspin = self.engine.config.get("video", "Starspin")
+      self.starspin = self.engine.config.get("performance", "starspin")
       #myfingershurt: allowing any non-Rock Band theme to have spinning starnotes if the SpinNotes.png is available in that theme's folder
       if self.starspin == True and self.theme < 2:
         #myfingershurt: check for SpinNotes, if not there then no animation

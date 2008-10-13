@@ -614,7 +614,7 @@ class SongChooser(Layer, KeyListener):
     #RF-mod
     self.previewDisabled  = self.engine.config.get("audio", "disable_preview")
     self.sortOrder        = self.engine.config.get("game", "sort_order")
-    self.rotationDisabled = self.engine.config.get("game", "disable_librotation")
+    self.rotationDisabled = self.engine.config.get("performance", "disable_librotation")
     self.spinnyDisabled   = self.engine.config.get("game", "disable_spinny")
 
     self.sfxVolume    = self.engine.config.get("audio", "SFX_volume")

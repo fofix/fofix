@@ -60,7 +60,7 @@ Config.define("video",  "resolution",   str,   "640x480")
 Config.define("video",  "fps",          int,   80,    text = _("Frames per Second"), options = dict([(n, n) for n in range(1, 120)]))
 Config.define("video",  "hitglow_color", int,  0,     text = _("Glow-FX Color"), options = {0: _("Same as Fret"), 1: _("Actual Color")})
 Config.define("video",  "hitflame_color", int, 0,     text = _("Hitflames Color"), options = {0: _("Theme Specific"), 1: _("Same as Fret"), 2: _("Actual Color")})
-Config.define("video",  "Starspin", bool,     True,  text = _("Starnotes"), options = {True: _("Animated"), False: _("Static")})
+Config.define("performance",  "starspin", bool,     True,  text = _("Starnotes"), options = {True: _("Animated"), False: _("Static")})
 Config.define("opengl", "svgquality",   int,   NORMAL_QUALITY,  text = _("SVG Quality"), options = {LOW_QUALITY: _("Low"), NORMAL_QUALITY: _("Normal"), HIGH_QUALITY: _("High")})
 Config.define("audio",  "frequency",    int,   44100, text = _("Sample Frequency"), options = [8000, 11025, 22050, 32000, 44100, 48000])
 Config.define("audio",  "bits",         int,   16,    text = _("Sample Bits"), options = [16, 8])
@@ -89,7 +89,7 @@ Config.define("audio",  "guitarvol",  float,    1.0,  text = _("Guitar Volume"),
 Config.define("audio",  "songvol",    float,    1.0,  text = _("Song Volume"),     options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(0, 110, 10)]))
 Config.define("audio",  "rhythmvol",  float,    1.0,  text = _("Rhythm Volume"),   options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(0, 110, 10)]))
 
-Config.define("engine", "game_priority",       int,   2,      text = _("Priority"), options = {0: _("0 Idle"), 1: _("1 Low"), 2: _("2 Normal"), 3:_("3 Above Normal"), 4:_("4 High"), 5:_("5 Realtime")})
+Config.define("performance", "game_priority",       int,   2,      text = _("Priority"), options = {0: _("0 Idle"), 1: _("1 Low"), 2: _("2 Normal"), 3:_("3 Above Normal"), 4:_("4 High"), 5:_("5 Realtime")})
 Config.define("game",   "alt_keys",            bool,  False,  text = _("Keyset"), options = {False: _("Normal"), True: _("Alternate")})
 Config.define("game",   "margin",              int,   0,      text = _("Hit Margin"), options = {0: _("FoF"), 1: _("Capo")})
 Config.define("game",   "notedisappear",      bool,   False,  text = _("Missed Notes"), options = {False: _("Disappear"), True: _("Keep on going")})
@@ -121,7 +121,7 @@ Config.define("game",   "frets_under_notes",          bool, True,  text = _("Fre
 Config.define("game",   "drum_navigation",          bool, False,  text = _("Drum navigation"), options = {False: _("Off"), True: _("On")})
 
 Config.define("game",   "ignore_open_strums",          bool, True,  text = _("Ignore open strums"), options = {False: _("No"), True: _("Yes")})
-Config.define("game",   "static_strings",          bool, True,  text = _("Static strings"), options = {False: _("No"), True: _("Yes")})
+Config.define("performance",   "static_strings",          bool, True,  text = _("Static strings"), options = {False: _("No"), True: _("Yes")})
 Config.define("game",   "whammy_saves_starpower",          bool, False,  text = _("Whammy saves SP"), options = {False: _("No"), True: _("Yes")})
 Config.define("game",   "mute_sustain_releases",          bool, False,  text = _("Mute sustain releases"), options = {False: _("No"), True: _("Yes")})
 Config.define("game",   "hopo_indicator",          bool, False,  text = _("HOPO Indicator"), options = {False: _("Off"), True: _("On")})
@@ -184,7 +184,7 @@ Config.define("game", "starfx",       bool, True,     text = _("GH SP Lights"), 
 Config.define("game", "rbmfx",       bool, True,     text = _("RB Mult Grow"),             options = {True: _("On"), False: _("Off")})#blazingamer
 Config.define("game", "nstype",       int, 2,     text = _("Board Speed"),             options = {0: _("BPM"), 1: _("Difficulty"), 2: _("BPM & Diff"), 3: _("Percentage")})
 Config.define("game", "lphrases",       bool, True,     text = _("Loading Phrases"),             options = {True: _("On"), False: _("Off")})
-Config.define("game", "killfx",       int, 0,     text = _("Killswitch FX"),             options = {0: _("Static"), 1: _("Animated"), 2: _("Off")})
+Config.define("performance", "killfx",       int, 0,     text = _("Killswitch FX"),             options = {0: _("Static"), 1: _("Animated"), 2: _("Off")})
 Config.define("coffee", "songfilepath",       bool, True,     text = _("Library Filepath"),             options = {True: _("Show"), False: _("Hide")})
 Config.define("coffee", "noterotate",       bool, False,     text = _("Rotate 3D Notes"),             options = {True: _("1.1"), False: _("1.2")})
 Config.define("coffee", "phrases",       bool, True,     text = _("Phrases"),             options = {True: _("On"), False: _("Off")})
@@ -196,8 +196,8 @@ Config.define("game",   "disable_vbpm",        bool,  False,  text = _("Disable 
 Config.define("game",   "sort_order",          int,   0,      text = _("Sort Order"), options = {0: _("Title"), 1: _("Artist"), 2: _("Times played")})
 Config.define("game",   "pov",                 int,   3,      text = _("Point Of View"), options = {0: _("FoF"), 1: _("GH3"), 2: _("Custom"), 3: _("Rock Band"), 4: _("GH2"), 5: _("Rock Rev"), 6: _("Theme")}) #Racer, Blazingamer
 Config.define("game",   "party_time",          int,   30,     text = _("Party Mode Timer"), options = dict([(n, n) for n in range(1, 99)]))
-Config.define("game",   "disable_libcount",    bool,  True,  text = _("Disable Library Count"),    options = {False: _("No"), True: _("Yes")})
-Config.define("game",   "disable_librotation", bool,  True,  text = _("Disable Library Rotation"),    options = {False: _("No"), True: _("Yes")})
+Config.define("performance",   "disable_libcount",    bool,  True,  text = _("Disable Library Count"),    options = {False: _("No"), True: _("Yes")})
+Config.define("performance",   "disable_librotation", bool,  True,  text = _("Disable Library Rotation"),    options = {False: _("No"), True: _("Yes")})
 
 #Spikehead777
 Config.define("game",   "jurgdef",             bool,  False,  text = _("Enable Jurgen"),    options = {False: _("No"), True: _("Yes")})
@@ -217,6 +217,8 @@ Config.define("player0","leftymode",           bool,  False,  text = _("P1 Lefty
 Config.define("player1","two_chord_max",       bool,  False,  text = _("P2 Two Key Chords Only"),  options = {False: _("No"), True: _("Yes")}) #QQstarS
 Config.define("player1","leftymode",           bool,  False,  text = _("P2 Lefty mode"),           options = {False: _("No"), True: _("Yes")}) #QQstarS
 
+# evilynux - Preload glyph cache may require more VRAM. Disable it if you're low on VRAM e.g. less than 64MB
+Config.define("performance","preload_glyph_cache", bool,  True,  text = _("Preload Glyph Cache"), options = {False: _("No"), True: _("Yes")})
 
 ##Alarian: Get unlimited themes by foldername
 themepath = os.path.join("data","themes")

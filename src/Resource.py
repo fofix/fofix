@@ -47,7 +47,7 @@ class Loader(Thread):
     self.canceled    = False
 
     #myfingershurt: the following should be global and done ONCE:
-    #self.game_priority = Config.get("engine", "game_priority")
+    #self.game_priority = Config.get("performance", "game_priority")
 
 
     if target and name:
@@ -63,7 +63,7 @@ class Loader(Thread):
       #self.setPriority(priority = self.game_priority)
 
       #...or maybe not at all...
-      game_priority = Config.get("engine", "game_priority")
+      game_priority = Config.get("performance", "game_priority")
       self.setPriority(priority = game_priority)
       
       #wont work without ctypes

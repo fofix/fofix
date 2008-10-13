@@ -638,7 +638,7 @@ class LibraryInfo(object):
     # Set a default name
     if not self.name:
       self.name = os.path.basename(os.path.dirname(self.fileName))
-    if Config.get("game", "disable_libcount") == True:
+    if Config.get("performance", "disable_libcount") == True:
       return
     # Count the available songs
     libraryRoot = os.path.dirname(self.fileName)
