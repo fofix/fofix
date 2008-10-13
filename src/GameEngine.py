@@ -126,7 +126,7 @@ Config.define("game",   "whammy_saves_starpower",          bool, False,  text = 
 Config.define("game",   "mute_sustain_releases",          bool, False,  text = _("Mute sustain releases"), options = {False: _("No"), True: _("Yes")})
 Config.define("game",   "hopo_indicator",          bool, False,  text = _("HOPO Indicator"), options = {False: _("Off"), True: _("On")})
 Config.define("game",   "quickplay_career_tiers",          bool, True,  text = _("Quickplay Tiers"), options = {False: _("Off"), True: _("On")})
-Config.define("game",   "star_score_updates",          int, 1,  text = _("Star Updates"), options = {0: _("On Hit"), 1: _("Score Change")})
+Config.define("performance",   "star_score_updates",          int, 1,  text = _("Star Updates"), options = {0: _("On Hit"), 1: _("Score Change")})
 
 Config.define("game", "script_lyric_pos",      int,   0,   text = _("Script Lyric Pos"),    options = {0: _("Bottom"), 1: _("Top")}) #MFH - script.txt lyric display position
 
@@ -152,7 +152,7 @@ Config.define("game", "bass_kick_sound",      bool, False,  text = _("Bass kick 
 Config.define("game", "midi_lyrics",           bool,  True,   text = _("MIDI/RB Lyrics"), options = {False: _("Off"), True: _("Auto")})
 Config.define("game", "midi_sections",           int,  1,   text = _("MIDI/RB Sections"), options = {0: _("Off"), 1: _("Auto")})
 Config.define("game", "key_checker_mode",      int, 1,  text = _("Key Conflicts"), options = {0: _("No check"), 1: _("Notify"), 2: _("Enforce")})
-Config.define("game", "in_game_stats",      int, 0,  text = _("In-Game Stats"), options = {0: _("Off"), 1: _("RB Only"), 2: _("On")})
+Config.define("performance", "in_game_stats",      int, 0,  text = _("In-Game Stats"), options = {0: _("Off"), 1: _("RB Only"), 2: _("On")})
 Config.define("game", "in_game_stars",      int, 1,  text = _("In-Game Stars"), options = {0: _("Off"), 1: _("RB Only"), 2: _("On")})
 Config.define("game", "partial_stars",      int, 1,  text = _("Partial Stars"), options = {0: _("Off"), 1: _("Auto")})
 Config.define("game", "hopo_debug_disp",      int, 0,  text = _("HOPO Debug"), options = {0: _("Off"), 1: _("On")})

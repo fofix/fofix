@@ -302,7 +302,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.fontShadowing = self.engine.config.get("game", "in_game_font_shadowing") #MFH
     self.muteLastSecond = self.engine.config.get("audio", "mute_last_second") #MFH
     self.mutedLastSecondYet = False
-    self.starScoreUpdates = self.engine.config.get("game", "star_score_updates") #MFH
+    self.starScoreUpdates = self.engine.config.get("performance", "star_score_updates") #MFH
 
     #racer: practice beat claps:
     self.beatClaps = self.engine.config.get("game", "beat_claps")
@@ -372,7 +372,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
 
     #myfingershurt: also want to go through song and search for guitar solo parts, and count notes in them in each diff.
-    self.inGameStats = self.engine.config.get("game","in_game_stats")
+    self.inGameStats = self.engine.config.get("performance","in_game_stats")
     self.inGameStars = self.engine.config.get("game","in_game_stars")
     self.partialStars = self.engine.config.get("game","partial_stars")
 

@@ -392,9 +392,9 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "performance", "starspin"),
       ConfigChoice(engine.config, "performance", "static_strings", autoApply = True),      #myfingershurt
       ConfigChoice(engine.config, "performance", "killfx", autoApply = True),   #blazingamer
-      ConfigChoice(engine.config, "game", "star_score_updates", autoApply = True),   #MFH
-      ConfigChoice(engine.config, "game", "in_game_stats", autoApply = True),#myfingershurt
-      ConfigChoice(engine.config, "performance", "preload_glyph_cache", autoApply = True)#evilynux
+      ConfigChoice(engine.config, "performance", "star_score_updates", autoApply = True),   #MFH
+      ConfigChoice(engine.config, "performance", "in_game_stats", autoApply = True),#myfingershurt
+      ConfigChoice(engine.config, "performance", "preload_glyph_cache", autoApply = True),#evilynux
     ]
     perfSettingsMenu = Menu.Menu(engine, perfSettings + applyItem)
 
