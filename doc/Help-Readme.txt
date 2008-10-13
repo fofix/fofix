@@ -23,6 +23,19 @@ Every so often, it is recommended that you quit the game completely and restart 
 
 
 ======================================================================
+========================PNG Formatting Help===========================
+======================================================================
+Blazingamer sez:
+
+PNG Formatting Troubleshooting
+
+When saving an image for FOF in a .png format there are several things you must follow.
+1)It has the file extension of .png, exception is with stages where they can also be .PNG
+2)Color mode of the image must be RGB.  Grayscale, Indexed, or B&W will cause the image to load incorrectly if at all and result in the game crashing.
+3)PNG must be saved as non-interlaced.  If you set the image to interlaced while saving this will cause the game to hang or crash
+
+
+======================================================================
 =====================Animated Stage Selection=========================
 ======================================================================
 

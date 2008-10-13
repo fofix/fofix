@@ -1,0 +1,161 @@
+---------===========-------------=============------------=============
+---------===========-------------=============------------=============
+Please note, I'm not looking for suggestions.  However, just in case you feel the need to suggest or report something, please review the following first:
+---------===========-------------=============------------=============
+---------===========-------------=============------------=============
+[b]Known issues / problems / quirks:[/b]
+...not all of these have been confirmed by me.  And some have existed long before this mod was created.
+
+[i]Known issues with drums:[/i]
+-some drum "chords" at the end of starpower phrases result in a double starpower reward
+-hitglow for drum "chords" only show for the last note hit
+
+[i]Other unresolved / reported issues:[/i]
+-Practice mode's "time" (mm:ss)-style markers are NOT calculated accurately at all
+-Random, inexplicable, unrepeatable hangs occur sometimes when loading the song list or loading a song for gameplay.  Above-normal priority handling code is suspected.  [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4670#entry307313]detail post[/url]
+-Pausing may interrupt your streak and multiplier if there are notes close enough to the current position
+-Songs with a corrupted or problematic .OGG file will cause [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=2570#entry280280]a tough-to-read in-game error[/url]
+-Solos in RB - Green Grass & High Tides aren't parsed exactly as they are in the real game [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=3590#entry291538] detail post[/url]
+-All "sub-menus" share an x and y position; this is due to the way FoF's menu object works.
+-Options are sorted alphabetically; sometimes this is not desirable but this is the way it is.
+-Starpower phrases sometimes will re-activate after missing a note, allowing undeserved starpower gains
+-Guitar solos require an unbroken streak to get a 100% - even if you overstrum and hit all the notes, your guitar solo will be forced down to 99.0%.  I do not plan to change this; it's like this for a reason, and was tough enough to get working.
+-Browsing a folder with only 4 entries in song "list" mode results in the list jumping up and down - it has been this way for a long time - [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4660#entry307107]detail post[/url]
+-Sometimes, the game will start with fonts displayed all incorrectly.  It has been this way for a long time.  Just exit and restart.
+-Any image files (stages, backgrounds, etc) MUST  have a lowercase ".png" extension - THE GAME CAN NOT HANDLE CAPITALIZED ".PNG" EXTENSIONS!
+
+[i]Unconfirmed bug reports [b](I have not been able to reproduce any of these, so to me, these bugs do not exist)[/b]:[/i]
+-GH3 complex tail system does not work under Linux
+-Font size and positioning has some discrepancies between platforms / OS's
+-[url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=450#entry244078]Pro Face-Off mode causes drumming issues for Jurgen[/url]
+-[url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=20933;st=2830#entry231627]2-player fail / rock bug[/url] -- [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2920#entry232494]Detail post 2[/url]
+-[url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=20933;st=2900#entry232308]Track volume bug[/url]
+-Second player timing bug?  [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4590#entry306332]detail post[/url]
+-Selecting a language other than English, then quitting the game & deleting that translation file, then restarting the game will incorrectly show the selected language.  [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4390#entry303584]detail post[/url]
+-After pressing ESC to exit from a sub-menu, Up and Down no longer repeat for some reason.
+-HOPO strum problem (TTFAF medium, intro) reported [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4700#entry307784]here[/url], [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4730#entry308100]here[/url], and [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4730#entry308109]here[/url].
+-Note tails (GH3 complex tails) under strings bug -- [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4810#entry309661]detail post[/url]
+-Another GH3 complex tail bug - only one held note appears to be held - [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4970#entry311323]detail post[/url]
+-songs folder on a different drive than Frets on Fire navigation problem [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=4900#entry310268]detail post[/url]
+-When exiting the songlist back to the main menu, the OptionsBG image can be seen.
+-Every once in a while, [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=5120#entry313889]this[/url] will happen (multiple game screens mixed together) - FoF isn't perfect (far from it), and it gets confused.  Restart the game, you'll be fine.
+-Pressing the "Home" button while playing the game can result in this [url=http://img337.imageshack.us/img337/7711/mfhhomebuttonerrorue5.th.gif]screenshot[/url]
+-Drum overdrive sometimes will dissappear without a miss, and reappear - [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=30757;st=250#entry318723]detail post[/url]
+-In-game credits logo scrolls at a different speed than the text
+-Sometimes Career songs in Career mode will still say "Play to Advance" instead of showing the number of times played
+---------===========-------------=============------------=============
+---------===========-------------=============------------=============
+
+[b]To do (besides the obvious, please don't suggest the obvious...):[/b]
+
+[i]Short-term:[/i]
+++Investigate invisible tails bug and potential fix -- [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=31005&st=#entry320251]detail post[/url]
+++Add optional song.ini setting to force HOPO Frequency setting, so songs can be played as they are in the actual games
+++Check out [url=http://www.mediafire.com/?sharekey=e3c55d9fd5ad51cfab1eab3e9fa335ca9a3675f7013ea352]sherranjjj001's You Rock sound for the GH1, 2, and 80's themes[/url]
+++Check out .liquid.'s RB2-style [url=http://www.mediafire.com/?tltypwxm1l0]partial grey star files[/url]
+++Check out >Slash666<'s [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=31067&st=0#entry320985]new GFX[/url]
+++Check out MeteOritO's RB hitflames [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=30757&st=410#entry322361]here in post #420[/url] - [url=http://www.mediafire.com/download.php?qrzh0z0ehwm]download[/url]
+++Investigate reported bug: "Attribute: 'NoneType' object has no attribute 'lower' " when songlist sort is set to Artist? - [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=30757&st=140#entry317788]detail post[/url]
+++Check out [url=http://www.mediafire.com/download.php?yhrjmmzjxyy]worldrave's GH3 back and failed sounds[/url], and add support for them:
+++++Add optional support for theme-based failsound.ogg
+++++Add optional support for random choice between theme-based back1.ogg and back2.ogg instead of just out.ogg
+++Use Spikehead's guitscw2.ogg with removed leading silence from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=30757&st=140#entry317733]this post[/url]
+++Add logic to flash the overdrive strings just before You Rock
+++Add option to pause the animated background when you've messed up, and resume when you resume your streak (will be amusing with the Beavis and Butthead animation)
+++Organize and clarify stage rotation & animation settings in the Options menu as detailed in [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=5120#entry313966]this post[/url]
+++Add logic to play crowd cheer when rock meter reaches top 1/3rd (also precalculate rockMed, rockHi thresholds instead of every time in the render)
+++Add song.ttf scale factor to theme.ini (for song info display during gameplay countdown)
+++Add support for Career Title / Tier labels (title1.png, title2.png, etc)
+++Add Difficulty select as a Career submenu, and remove from Career song selection
+++Add Difficulty-based careers (separate "unlock_completed" entry for Easy, Medium, Hard, Expert) so you must unlock a song on each difficulty (4 careers in 1)
+++Add theme.ini settings to allow re-organizing of the various screen elements from the Game Results screen
+++Add theme.ini setting for Neck Select screen's text -- [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4930#entry310665]detail post[/url]
+++Add option for in-game text shadows (as rendering 2x the text will result in 2x the lag from rendering text objects) -- [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4930#entry310665]detail post[/url]
+++Add support for a transparent loading overlay and a song-specific loading background  -- [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4930#entry310665]detail post[/url]
+++Add user option to display "Jurgen Is Here" and "Jurgen Was Here" much smaller and out of the way
+++Add theme.ini option to allow a full-width image to be used for the Rock Band overdrive bar and fill, so custom length and position overdrive bars can be used - [url=http://i35.tinypic.com/24uxojq.jpg]example[/url]
+++Add auto font scaling, like the GH3 failed screen, to the songlist - so long song names won't overlap the score & stars
+++Attempt to fix the game's mishandling of capital .PNG files - Svg.py, "if ImgData.endswith(".png"):" line...
+++Add new option to disable track miss muting for single-track songs
+++Add new option for "theme-based" songlist, will default to songlist unless theme.ini contains "list=CD" - then it will force CD list mode
+++Add new options to sort, ascending or descending, by: score, streak, star count, and hit accuracy / percentage
+++Attempt to fix failing with > 100% shown in Fail screen - [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=31247&st=#entry323565]detail post[/url]
+++Add "Album" entry to song.ini, to be displayed before Year (or put the Year tag on a new line so Album text could be part of it, as Puppetz sometimes does)
+++Pick from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=28649]worldrave's GH3 coding requests[/url] (found near bottom of that first post)
+++Pick from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=30757&st=140#entry317751]BlackJack's list[/url]
+
+[i]Long-term:[/i]
+-Add optional flashing sidebars on neck when SP is ready
+-Check out [url=http://www.mediafire.com/?sharekey=3b3779e0aeba7433d2db6fb9a8902bda]11111's proposed FoF intro video[/url] and look into adding an optional intro video (default On) to the FoF startup sequence
+-Rewrite all sound loading logic to support optional random choices with single sound fallback (example: starpower.ogg = fallback, starpower1.ogg starpower2.ogg = random choices) with any number of random choices for each sound
+-Add support for each stage folder to have an .ini file containing intended rotation order and delay settings
+-Add new control key to allow real-time selection (via cycling) of available Killswitch effects
+--...(during gameplay, without pausing) - i.e., start with analog killswitch, press "select", BAM you're using digital killswitch.  Press "select" again and... analog killswitch
+-Add functions to career songlist "Career Backup" and "Career Restore" to support basic juggling of multiple careers (each "career" will include an unlock code for each difficulty)
+-Add "Reset Scores" function to the bottom of Quickplay mode songlists, which will reset scores of all songs in the current folder (NOT recursively)
+--Add submenu to Reset Scores function, just a simple confirmation dialog ("Are you sure you want to reset all scores for songs in this list?")
+-Add submenu / confirmation to Reset Career function, allow user to choose: (1)reset scores + unlock status, (2)reset unlock status only (keep scores), or (3)cancel / reset nothing
+-Locate a copy (or a better clone) of [url=http://www.fontshop.com/fonts/singles/underware/fakir_regular_ot/]this font[/url] for use in the Rock Band theme
+-Rewrite guitar/bass note rendering logic so that the notes can be rendered in reverse order for correct close note overlaps (like drums) without breaking tail logic
+-Add support for animated stages that are not theme-specific (data\Stages\)
+-Either add width scaling or more static killswitch tail states for analog killswitch mode [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=5210#entry316091]one suggestion[/url]
+-Create a separate pause submenu for Career mode that does not include Jurgen options
+-Figure out how to force logfile creation in the FretsOnFire base folder instead of %appdata%\fretsonfire to avoid the inevitable new player being unable to find the log.
+-Figure out how to force compile error logfile to save to "FoF-CompileErrors.log" instead of the confusing "FretsOnFire.exe.log" name
+-Add optional support for a separated "crowd.ogg" audio track; with settings "Disabled", "On all the time", and "On during SP only"
+-Fix Jurgen logic so Pro-Face-Off mode fails him just like a human player (disables his controls, etc): [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=3640#entry292306]detail post[/url]
+-Create a persistant songlist object, to prevent re-instantiation and memory leak
+-Add secondary / duplicate guitar fret buttons with navigation for Rock Band guitars
+-Add option to show graphical selections (like main menu buttons) for instrument
+-Add option to show graphical selections (like main menu buttons) for difficulty
+-[i]Changes that will affect scoring will have to be handled differently, for details see [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=690#entry246608]this post[/url][/i]
+--Enhance score uploading logic [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=280#entry242813]as in these 2 posts[/url] so score charts can correctly track gold stars separately from Full Combos, and separate GH2 Sloppy & GH2 Strict scores
+--Try to make scoring as accurate as possible according to [url=http://www.scorehero.com/forum/viewtopic.php?t=378]this post[/url]
+-Write logic to recalculate total number of notes to not include notes before start position - for practice mode's accuracy & note counts
+-Figure out how to cram [url=http://i33.tinypic.com/28w0848.jpg]this graphic[/url] into a TTF so I can use it for Rock Band lyrics...
+-Rewrite neck image detection logic to allow for any neck filenames, and store neck filename instead of neck number
+-Display the longest note streak in parentheses in-game
+-Force 2-decimal place average multiplier rounding to match the full accuracy display [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=420#entry243857]problem discussed here[/url]
+-In rockband theme, do not make 2 rock meter bars, only one and have both arrows on it (2 player CO-OP mode, combined score like RB)
+-Add user option to completely disable graphical multipliers and just use text as in Bass Groove
+-Add user option to use a starpowerneckovr.png (or overdriveneckovr.png) for a starpower / overdrive neck overlay
+-Write separate logic to handle individual player's "You Rock" status; right now, if one player makes it to the end of the song, both players "Rock."
+-Add code to use separate DrumKeys.png if present, so we can use Wolferacing's drum keys
+-Attempt to add another audio track for rhythm guitar (separate from bass guitar)
+-Add wide bassdrumhitflames1.png and bassdrumhitflames2.png support for bass drum hits, properly scaled and positioned
+-Port Hering's song queue / merged difficulty & part selection screen
+-Create a phantom difficulty filter so that the game will not show you difficulties with 5 or less notes in them.
+-Add [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2420#entry227856]hit accuracy average, total error score, etc. review at end of song[/url]
+-Add drum fill sections, with required green fret / cymbal hit at end to continue streak (or maybe to activate starpower instead) - [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2850#entry231947]detail post[/url]
+---Add option to use the separate drum fill drum sounds as miss sounds, instead of the random sounds
+-Allow theme-based necks; if there is a "necks" folder in a theme, then those necks will be used.  If not, data\necks will be used.
+-Move all text and graphic positioning elements into the theme.ini so it is easier to code custom themes - [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2920#entry232509]detail post[/url]
+-Give Jurgen the (in)ability to play worse... allow user to select Jurgen's "skill" level to compete against
+--Also add a small Jurgen score display to the game results so you can compare your score and streak against his
+----And have Jurgen talk trash to you or praise you depending on the score gap
+-Add function to read in manual starpower section markings from MIDI file instead of automatic calculation, and do something with big rock ending parts: 
+----[url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2820#entry231590]detail post 1[/url] -- [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2850#entry231911]detail post 2[/url] -- [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2780#entry231218]detail post 3[/url] -- [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=3470#entry290074]detail post 4[/url]
+-Add support for Loading, You Rock, and You Fail animations - just a couple frames of PNG files
+-Add capability for main menu submenu's "last" settings to be retained and selected by default the next time they are navigated
+- Add the ability to have different menus for Difficulty (Default), Instrument, Selection select, with a fallback on default.
+- Add the ability to have a different set of menus for Career, Quick Play (Default), Multiplayer, and Practice, with a fallback on default.
+- Separate the results screen and the high score, with a fallback on the Results.
+- Add the ability to have a different results screen for Multiplayer, with a fallback on the default one.
+- Change the Pause and Fail screen to make them so they stretch to the full size of the screen (Make it easier to see how it would look in-game when editing).
+- Add the ability to have a different Training screen, with a fallback on the Options.
+- Add a neck folder to each theme, and add an option to have either Custom necks, or Theme necks.
+- Add a practice neck to the neck folder that only gets used during Practice & Tutorial mode, that gets filtered out during regular play.
+- Add a neck angle option to theme.ini and a option called Theme.
+- Add a neck width option to theme.ini and add a option for Thene, and other pre-set ones.
+- Make the high score scroll appear above the Contine, Replay, and Quit options, instead of starting at the bottom and going behind it.
+- Add support for graphical Game Mode select screens  -- [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4930#entry310665]detail post[/url]
+- Change the dots in the GH2 mod so 1-10 are yellow, 10 making it x2, 11-20 are green, 20 being x3, 21-30 being purple, 30 being x4, and stop the dots from adding up anymore, leaving all the dots colored purple.
+-Add a 3rd option to "Song List", along with "List and "CD" : "List with CD" (basically, it'd be like "List", but CD cases would appear in the place of the skull from "selected.png")
+-Add songlist display mode "All" to ignore folder and career structures and just list / sort all songs in one list
+-Add logic to pause the game when it loses focus (when another application demands attention with a pop-up and switches out of FoF) -- [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4800#entry309254]detail post[/url]
+-Remove Career Tier objects from CD list mode, display tier name on each song included in them instead -- [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4820#entry309685]detail post[/url]
+-Add a special position below all other necks for the "random" neck, so at any point browsing through other necks the user can just press down for random - [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4830#entry309728]detail post[/url]
+-Add Boss Battles to Career mode (with Jurgen at a certain skill level playing the other part, displaying the guitarist name "is here" instead of Jurgen, and you must defeat him to continue)
+
+---------===========-------------=============------------=============
+---------===========-------------=============------------=============

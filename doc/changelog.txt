@@ -1,5 +1,37 @@
 New in 3.0:-----------------------------------------------------------------------------------------------------
 
+------------------------3.000:
+[size=4][b]Base v3.000 Releases (9/27/2008, 12:45am)(required for any later patches):[/b][/size] 
+  [url=http://www.mediafire.com/?sharekey=187e8200c0c403b6ab1eab3e9fa335cadc638398220da2ce]3.000 Mediafire files[/url] 
+
+
+  [url=http://www.megaupload.com/?d=ERHBA763]MFH Mod V3.000 Full Release[/url]:  (~307MB, RAR archive, MegaUpload host)
+    +All 9 themes - 8bit / MegaLight / Guitar Hero 80s / Guitar Hero Aerosmith / Guitar Hero I / Guitar Hero II / Guitar Hero III / Rock Band 1 / Rock Band 2
+    +Big-Ass Neck Pack (137 concurrently-named necks)
+
+  [url=http://www.mediafire.com/file/wztd21yikzj/FoF-MFH3_00_RB1andMegaLight.rar]MFH Mod V3.000 Rock Band 1 & MegaLight only release[/url]:  (~63MB, RAR archive, Mediafire host)
+    +MegaLight / Rock Band 1 themes
+    +First 10 necks only
+
+  [url=http://www.mediafire.com/file/wazmywzkdll/FoF-MFH3_00_MegaLight_minimal.rar]MFH Mod V3.000 MegaLight only release[/url]:  (~11MB, RAR archive, Mediafire host)
+    +MegaLight theme only
+    +First 10 necks only
+
+------
+  3.000 Individual Theme Releases (theme creators please download your updated themes here before modifying):
+------
+  [url=http://www.mediafire.com/file/z2yjzweyn3x/THEME3_000-8bit.rar]THEME3_000-8bit.rar [/url]:  (~5MB, RAR archive, Mediafire host)
+  [url=http://www.mediafire.com/file/mmjykmdiktl/THEME3_000-Guitar%20Hero%2080s.rar]THEME3_000-Guitar Hero 80s.rar [/url]:  (~21MB, RAR archive, Mediafire host)
+  [url=http://www.mediafire.com/file/2wgqljmcugd/THEME3_000-Guitar%20Hero%20Aerosmith.rar]THEME3_000-Guitar Hero Aerosmith.rar [/url]:  (~24MB, RAR archive, Mediafire host)
+  [url=http://www.mediafire.com/file/dtjmwmyzyig/THEME3_000-Guitar%20Hero%20I.rar]THEME3_000-Guitar Hero I.rar [/url]:  (~9MB, RAR archive, Mediafire host)
+  [url=http://www.mediafire.com/file/ltxyh1eqmdt/THEME3_000-Guitar%20Hero%20II.rar]THEME3_000-Guitar Hero II.rar [/url]:  (~20MB, RAR archive, Mediafire host)
+  [url=http://www.mediafire.com/file/y24m2mnodxy/THEME3_000-Guitar%20Hero%20III.rar]THEME3_000-Guitar Hero III.rar [/url]:  (~31MB, RAR archive, Mediafire host)
+  [url=http://www.mediafire.com/file/fnr2ygzokcm/THEME3_000-MegaLight.rar]THEME3_000-MegaLight.rar [/url]:  (~2MB, RAR archive, Mediafire host)
+  [url=http://www.mediafire.com/file/zxjiz4niwti/THEME3_000-Rock%20Band%201.rar]THEME3_000-Rock Band 1.rar [/url]:  (~52MB, RAR archive, Mediafire host)
+  [url=http://rapidshare.com/files/148681891/THEME3_000-Rock_Band_2.rar.html]THEME3_000-Rock Band 2.rar [/url]:  (~114MB, RAR archive, Rapidshare host)
+------
+
+  [url=http://www.mediafire.com/file/jyf35n3zx1d/BigAssNeckPackForMfh3_000.rar]BigAssNeckPackForMfh3_000.rar[/url]:  (~23MB, RAR archive, Mediafire host)
 
 New since 2.995:
 ==Replaced RbMFH theme's editor.png with >Slash666<'s fixed image

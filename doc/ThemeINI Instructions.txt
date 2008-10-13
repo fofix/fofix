@@ -35,7 +35,7 @@ menu_y = .8
 
 
 --------------------------------------------------------------------------------------------------------------------------------------
--=Notes and Keys=-
+-=In Game Items=-
 (Decimal # between 0 and 1, IE- .34)
 
 twoDkeys = False      (Use 3d keys  = False)
@@ -46,6 +46,9 @@ spot_color = #EEEEEE  (Enter Hex color here. IE- #EEEEEE)
 hopo_color = #EEEEEE  (Enter Hex color here. IE- #EEEEEE)
 mesh_color = #000000  (Enter Hex color here. Default - #000000)
 open_color = #FF9933  (Enter Hex color here. Default - #FF9933)
+rockmeter_score_color = #93c351  (Enter Hex color here. Default for GH3 is )
+ingame_stats_color = #000000  (Enter Hex color here.)
+
 
 
 
