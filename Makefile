@@ -57,7 +57,7 @@ endif
            /usr/lib/libmikmod.so.2 \
            dist
 	mv dist/FretsOnFire dist/FretsOnFire.bin
-	-cp data/launcher.sh dist/FretsOnFire
+	-cp src/launcher.sh dist/FretsOnFire
 	-chmod +x dist/FretsOnFire
 
 doc:
