@@ -2023,6 +2023,32 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.handleWhammy(playerNum)
         self.handlePhrases(playerNum, thePlayer.streak)
 
+      #stage rotation
+      if self.stageAnimation:
+        whichDelay = self.stageAnimateDelay
+      else:
+        whichDelay = self.stageRotateDelay
+      self.indexCount = self.indexCount + 1
+      if self.indexCount > whichDelay:   #myfingershurt - adding user setting for stage rotate delay
+        self.indexCount = 0
+        if self.isRotation == 1: #QQstarS:random
+          self.arrNum = random.randint(0,len(self.imgArr)-1)
+        elif self.isRotation == 2: #myfingershurt: in order display mode
+          self.arrNum += 1
+          if self.arrNum > (len(self.imgArr)-1):
+            self.arrNum = 0
+        elif self.isRotation == 3: #myfingershurt: in order, back and forth display mode
+          if self.arrDir == 1:  #forwards
+            self.arrNum += 1
+            if self.arrNum > (len(self.imgArr)-1):
+              self.arrNum -= 2
+              self.arrDir = 0
+          else:
+            self.arrNum -= 1
+            if self.arrNum < 0:
+              self.arrNum += 2
+              self.arrDir = 1
+
     
       if self.timeLeft == "0:01" and not self.mutedLastSecondYet and self.muteLastSecond == 1:
         self.song.setAllTrackVolumes(0.0)
@@ -4427,13 +4453,27 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     h = self.hFull
     wBak = w
     hBak = h
-    
+
+    if self.fontShadowing:
+      font    = self.engine.data.shadowfont
+    else:
+      font    = self.engine.data.font
+    lyricFont = self.engine.data.font
+    bigFont = self.engine.data.bigFont
+
+    scoreFont = self.engine.data.scoreFont
+    streakFont = self.engine.data.streakFont
+
+    pos = self.getSongPosition()
 
     if self.boardY <= 1:
       self.boardY == 1
     elif self.boardY > 1:
       self.boardY -= 0.01
     self.setCamera()
+
+    #Theme.setBaseColor()
+
 
     #myfingershurt: multiple rotation modes
     if self.stageMode != 2 and self.song:
@@ -4445,33 +4485,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
       #myfingershurt:
       else:
-        #MFH conditional, are we animating or rotating?
-        if self.stageAnimation:
-          whichDelay = self.stageAnimateDelay
-        else:
-          whichDelay = self.stageRotateDelay
-        self.indexCount = self.indexCount + 1
-        if self.indexCount > whichDelay:   #myfingershurt - adding user setting for stage rotate delay
-          self.indexCount = 0
-          if self.isRotation == 1: #QQstarS:random
-            self.arrNum = random.randint(0,len(self.imgArr)-1)
-          elif self.isRotation == 2: #myfingershurt: in order display mode
-            self.arrNum += 1
-            if self.arrNum > (len(self.imgArr)-1):
-              self.arrNum = 0
-          elif self.isRotation == 3: #myfingershurt: in order, back and forth display mode
-            if self.arrDir == 1:  #forwards
-              self.arrNum += 1
-              if self.arrNum > (len(self.imgArr)-1):
-                self.arrNum -= 2
-                self.arrDir = 0
-            else:
-              self.arrNum -= 1
-              if self.arrNum < 0:
-                self.arrNum += 2
-                self.arrDir = 1
-            
-
         #MFH - use precalculated scale factors instead
         self.imgArr[self.arrNum].transform.reset()
         self.imgArr[self.arrNum].transform.translate(w/2,h/2)
@@ -4486,22 +4499,121 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.lyricSheet.draw()  
       #the timing line on this lyric sheet image is approx. 1/4 over from the left
 
-    
-    SceneClient.render(self, visibility, topMost)
-    
-    if self.fontShadowing:
-      font    = self.engine.data.shadowfont
-    else:
-      font    = self.engine.data.font
-    lyricFont = self.engine.data.font
-    bigFont = self.engine.data.bigFont
 
-    scoreFont = self.engine.data.scoreFont
-    streakFont = self.engine.data.streakFont
+    SceneClient.render(self, visibility, topMost) #MFH - I believe this eventually calls the renderGuitar function, which also involves two viewports... may not be easy to move this one...
       
     self.visibility = v = 1.0 - ((1 - visibility) ** 2)
 
     self.engine.view.setOrthogonalProjection(normalize = True)
+
+    #MFH - also render the scrolling lyrics & sections before changing viewports:
+    if (self.readTextAndLyricEvents == 2 or (self.readTextAndLyricEvents == 1 and self.theme == 2)) and (not self.pause and not self.failed and not self.ending):
+      minPos = pos - ((self.guitars[0].currentPeriod * self.guitars[0].beatsPerBoard) / 2)
+      maxPos = pos + ((self.guitars[0].currentPeriod * self.guitars[0].beatsPerBoard) * 1.5)
+      eventWindow = (maxPos - minPos)
+      #lyricSlop = ( self.guitars[0].currentPeriod / (maxPos - minPos) ) / 4
+      lyricSlop = ( self.guitars[0].currentPeriod / ((maxPos - minPos)/2) ) / 2
+
+      #handle the sections track
+      if self.midiSectionsEnabled == 1: 
+        for time, event in self.song.eventTracks[Song.TK_SECTIONS].getEvents(minPos, maxPos):
+          if self.theme == 2:
+            #xOffset = 0.5
+            yOffset = 0.715
+            txtSize = 0.00170
+          else:
+            #gh3 or other standard mod
+            #xOffset = 0.5
+            yOffset = 0.69
+            txtSize = 0.00175
+          #is event happening now?
+          #this version will turn events green right as they hit the line and then grey shortly afterwards
+          #instead of an equal margin on both sides.
+          xOffset = (time - pos) / eventWindow
+          EventHappeningNow = False
+          if xOffset < (0.0 - lyricSlop * 2.0):   #past
+            glColor3f(0.5, 0.5, 0.5)    #I'm hoping this is some sort of grey.
+          elif xOffset < lyricSlop / 16.0:   #present
+            EventHappeningNow = True
+            glColor3f(0, 1, 0.6)    #green-blue
+          else:   #future, and all other text
+            glColor3f(1, 1, 1)    #cracker white
+          xOffset += 0.250
+
+          text = event.text
+          yOffset = 0.00005     #last change -.00035
+          txtSize = 0.00150
+          lyricFont.render(text, (xOffset, yOffset),(1, 0, 0),txtSize)
+
+
+      #handle the lyrics track
+      if self.midiLyricsEnabled:
+        for time, event in self.song.eventTracks[Song.TK_LYRICS].getEvents(minPos, maxPos):
+          if self.theme == 2:
+            #xOffset = 0.5
+            yOffset = 0.715
+            txtSize = 0.00170
+          else:
+            #gh3 or other standard mod
+            #xOffset = 0.5
+            yOffset = 0.69
+            txtSize = 0.00175
+          #is event happening now?
+          #this version will turn events green right as they hit the line and then grey shortly afterwards
+          #instead of an equal margin on both sides.
+          xOffset = (time - pos) / eventWindow
+          EventHappeningNow = False
+          if xOffset < (0.0 - lyricSlop * 2.0):   #past
+            glColor3f(0.5, 0.5, 0.5)    #I'm hoping this is some sort of grey.
+          elif xOffset < lyricSlop / 16.0:   #present
+            EventHappeningNow = True
+            glColor3f(0, 1, 0.6)    #green-blue
+          else:   #future, and all other text
+            glColor3f(1, 1, 1)    #cracker white
+          xOffset += 0.250
+
+          yOffset = 0.0696    #last change +0.0000
+          txtSize = 0.00160
+          text = event.text
+          if text.find("+") >= 0:   #shift the pitch adjustment markers down one line
+            text = text.replace("+","~")
+            txtSize = 0.00145   #last change +.0000
+            yOffset -= 0.0115   #last change -.0005
+          lyricFont.render(text, (xOffset, yOffset),(1, 0, 0),txtSize)
+
+
+
+
+      #finally, handle the unused text events track
+      if self.showUnusedTextEvents:
+        for time, event in self.song.eventTracks[Song.TK_LYRICS].getEvents(minPos, maxPos):
+          if self.theme == 2:
+            #xOffset = 0.5
+            yOffset = 0.715
+            txtSize = 0.00170
+          else:
+            #gh3 or other standard mod
+            #xOffset = 0.5
+            yOffset = 0.69
+            txtSize = 0.00175
+          #is event happening now?
+          #this version will turn events green right as they hit the line and then grey shortly afterwards
+          #instead of an equal margin on both sides.
+          xOffset = (time - pos) / eventWindow
+          EventHappeningNow = False
+          if xOffset < (0.0 - lyricSlop * 2.0):   #past
+            glColor3f(0.5, 0.5, 0.5)    #I'm hoping this is some sort of grey.
+          elif xOffset < lyricSlop / 16.0:   #present
+            EventHappeningNow = True
+            glColor3f(0, 1, 0.6)    #green-blue
+          else:   #future, and all other text
+            glColor3f(1, 1, 1)    #cracker white
+          xOffset += 0.250
+      
+          yOffset = 0.0190      #last change -.0020
+          txtSize = 0.00124
+          lyricFont.render(event.text, (xOffset, yOffset),(1, 0, 0),txtSize)
+
     try:
       now = self.getSongPosition()
       pos = self.lastEvent - now
@@ -5933,20 +6045,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               Log.warn("Unable to render score/streak text: %s" % e)
   
 
-
-
-
-
-  
-
-
             if self.displayText!= None and self.streakFlag == "%d" % (i):  #QQstarS:Set [0] to [i] #if set the flag, then show the words
               glColor3f(.8,.75,.01)
               size = font.getStringSize(self.displayText, scale = self.dislayTextScale)
               font.render(self.displayText, (.5-size[0]/2,self.textY-size[1]), scale = self.dislayTextScale)
-  
-
-
   
             if self.rock[0] <= 0 and self.rock[1] <= 0 and self.numOfPlayers>1 and self.failingEnabled: #QQstarS: all two are "die" that failing
               self.failed = True
@@ -6327,6 +6429,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 
   
           glColor3f(1, 1, 1)
+
           pos = self.getSongPosition()
   
           if self.showScriptLyrics and not self.pause and not self.failed:
@@ -6392,23 +6495,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
           #-------------after "if showlyrics"
           
-          self.engine.view.setViewport(1,0) 
-          
-          if (self.readTextAndLyricEvents == 2 or (self.readTextAndLyricEvents == 1 and self.theme == 2)) and (not self.pause and not self.failed and not self.ending):
-            minPos = pos - ((self.guitars[0].currentPeriod * self.guitars[0].beatsPerBoard) / 2)
-            maxPos = pos + ((self.guitars[0].currentPeriod * self.guitars[0].beatsPerBoard) * 1.5)
-            eventWindow = (maxPos - minPos)
-            #lyricSlop = ( self.guitars[0].currentPeriod / (maxPos - minPos) ) / 4
-            lyricSlop = ( self.guitars[0].currentPeriod / ((maxPos - minPos)/2) ) / 2
-            #for time, event in self.song.track[i].getEvents(minPos, maxPos):
+          #self.engine.view.setViewport(1,0) 
+          #scrolling lyrics & sections: moved to before player viewport split
 
-            #MFH - TODO - convert this single track parsing to multiple track retrieval
-              #self.song.eventTracks[Song.TK_SCRIPT]
-              #self.song.eventTracks[Song.TK_SECTIONS]
-              #self.song.eventTracks[Song.TK_GUITAR_SOLOS]
-              #self.song.eventTracks[Song.TK_LYRICS]
-              #self.song.eventTracks[Song.TK_UNUSED_TEXT]
-            #First, handle the guitar solo track
+          #handle the guitar solo track
+          if (self.readTextAndLyricEvents == 2 or (self.readTextAndLyricEvents == 1 and self.theme == 2)) and (not self.pause and not self.failed and not self.ending):
+  
             for time, event in self.song.eventTracks[Song.TK_GUITAR_SOLOS].getEvents(minPos, maxPos):
               #is event happening now?
               xOffset = (time - pos) / eventWindow
@@ -6475,164 +6567,64 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                       #reset for next solo
                       self.guitars[i].currentGuitarSoloHitNotes = 0
                       self.currentGuitarSolo[i] += 1
-            
-
-            #next, handle the sections track
-            if self.midiSectionsEnabled == 1: 
-              for time, event in self.song.eventTracks[Song.TK_SECTIONS].getEvents(minPos, maxPos):
-                if self.theme == 2:
-                  #xOffset = 0.5
-                  yOffset = 0.715
-                  txtSize = 0.00170
-                else:
-                  #gh3 or other standard mod
-                  #xOffset = 0.5
-                  yOffset = 0.69
-                  txtSize = 0.00175
-                #is event happening now?
-                #this version will turn events green right as they hit the line and then grey shortly afterwards
-                #instead of an equal margin on both sides.
-                xOffset = (time - pos) / eventWindow
-                EventHappeningNow = False
-                if xOffset < (0.0 - lyricSlop * 2.0):   #past
-                  glColor3f(0.5, 0.5, 0.5)    #I'm hoping this is some sort of grey.
-                elif xOffset < lyricSlop / 16.0:   #present
-                  EventHappeningNow = True
-                  glColor3f(0, 1, 0.6)    #green-blue
-                else:   #future, and all other text
-                  glColor3f(1, 1, 1)    #cracker white
-                xOffset += 0.250
   
-                text = event.text
-                yOffset = 0.00005     #last change -.00035
-                txtSize = 0.00150
-                lyricFont.render(text, (xOffset, yOffset),(1, 0, 0),txtSize)
-
-
-            #next, handle the lyrics track
-            if self.midiLyricsEnabled:
-              for time, event in self.song.eventTracks[Song.TK_LYRICS].getEvents(minPos, maxPos):
-                if self.theme == 2:
-                  #xOffset = 0.5
-                  yOffset = 0.715
-                  txtSize = 0.00170
-                else:
-                  #gh3 or other standard mod
-                  #xOffset = 0.5
-                  yOffset = 0.69
-                  txtSize = 0.00175
-                #is event happening now?
-                #this version will turn events green right as they hit the line and then grey shortly afterwards
-                #instead of an equal margin on both sides.
-                xOffset = (time - pos) / eventWindow
-                EventHappeningNow = False
-                if xOffset < (0.0 - lyricSlop * 2.0):   #past
-                  glColor3f(0.5, 0.5, 0.5)    #I'm hoping this is some sort of grey.
-                elif xOffset < lyricSlop / 16.0:   #present
-                  EventHappeningNow = True
-                  glColor3f(0, 1, 0.6)    #green-blue
-                else:   #future, and all other text
-                  glColor3f(1, 1, 1)    #cracker white
-                xOffset += 0.250
-
-                yOffset = 0.0696    #last change +0.0000
-                txtSize = 0.00160
-                text = event.text
-                if text.find("+") >= 0:   #shift the pitch adjustment markers down one line
-                  text = text.replace("+","~")
-                  txtSize = 0.00145   #last change +.0000
-                  yOffset -= 0.0115   #last change -.0005
-                lyricFont.render(text, (xOffset, yOffset),(1, 0, 0),txtSize)
-
-
-
-
-            #finally, handle the unused text events track
-            if self.showUnusedTextEvents:
-              for time, event in self.song.eventTracks[Song.TK_LYRICS].getEvents(minPos, maxPos):
-                if self.theme == 2:
-                  #xOffset = 0.5
-                  yOffset = 0.715
-                  txtSize = 0.00170
-                else:
-                  #gh3 or other standard mod
-                  #xOffset = 0.5
-                  yOffset = 0.69
-                  txtSize = 0.00175
-                #is event happening now?
-                #this version will turn events green right as they hit the line and then grey shortly afterwards
-                #instead of an equal margin on both sides.
-                xOffset = (time - pos) / eventWindow
-                EventHappeningNow = False
-                if xOffset < (0.0 - lyricSlop * 2.0):   #past
-                  glColor3f(0.5, 0.5, 0.5)    #I'm hoping this is some sort of grey.
-                elif xOffset < lyricSlop / 16.0:   #present
-                  EventHappeningNow = True
-                  glColor3f(0, 1, 0.6)    #green-blue
-                else:   #future, and all other text
-                  glColor3f(1, 1, 1)    #cracker white
-                xOffset += 0.250
-            
-                yOffset = 0.0190      #last change -.0020
-                txtSize = 0.00124
-                lyricFont.render(event.text, (xOffset, yOffset),(1, 0, 0),txtSize)
-
-
+  
             #MFH - render guitar solo in progress - stats
-            try:
-              if self.guitars[i].canGuitarSolo:
-                if self.guitars[i].guitarSolo:
-                  self.engine.view.setViewportHalf(self.numOfPlayers,i)
-                  if self.guitarSoloAccuracyDisplayPos == 0:    #right
-                    xOffset = 0.950
-                  else:
-                    xOffset = 0.150
-                  yOffset = 0.320   #last change -.040
-                  txtSize = 0.00250
-                  #if we hit more notes in the solo than were counted, update the solo count (for the slop)
-                  if self.guitars[i].currentGuitarSoloHitNotes > self.currentGuitarSoloTotalNotes[i]:
-                    self.currentGuitarSoloTotalNotes[i] = self.guitars[i].currentGuitarSoloHitNotes
-                  if not self.pause and not self.failed:
-                    tempSoloAccuracy = (float(self.guitars[i].currentGuitarSoloHitNotes)/float(self.currentGuitarSoloTotalNotes[i]) * 100.0)
-                    trimmedIntSoloNoteAcc = self.decimal(str(tempSoloAccuracy)).quantize(self.decPlaceOffset)
-                    if self.guitarSoloAccuracyDisplayMode == 1:   #percentage only
-                      soloText = str(trimmedIntSoloNoteAcc) + "%"
-                      if self.guitarSoloAccuracyDisplayPos == 0:    #right
-                        xOffset = 0.890
-                    elif self.guitarSoloAccuracyDisplayMode == 2:   #detailed
-                      soloText = str(self.guitars[i].currentGuitarSoloHitNotes) + "/" + str(self.currentGuitarSoloTotalNotes[i]) + ": " + str(trimmedIntSoloNoteAcc) + "%"
-                    if self.guitarSoloAccuracyDisplayMode > 0:    #if not off:
-                      soloText = soloText.replace("0","O")
-                      glColor3f(1.0, 1.0, 1.0)  #cracker white
-
-                      if self.theme == 2:
-                        soloFont = scoreFont
-                      else:
-                        soloFont = font
-
-                      Tw, Th = soloFont.getStringSize(soloText,txtSize)
-                      if self.guitarSoloAccuracyDisplayPos == 0:  #right
-                        soloFont.render(soloText, (xOffset - Tw, yOffset),(1, 0, 0),txtSize)   #right-justified
-                      elif self.guitarSoloAccuracyDisplayPos == 1:  #centered
-                        soloFont.render(soloText, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #centered
-                      elif self.guitarSoloAccuracyDisplayPos == 3:  #racer: rock band 
-                        if self.hitAccuracyPos == 0: #Center - need to move solo text above this!
-                          yOffset = 0.100    #above Jurgen Is Here
-                        elif i == 0 and self.jurg1 and self.autoPlay:
-                          yOffset = 0.140    #above Jurgen Is Here
-                        elif i == 1 and self.jurg2 and self.autoPlay:
-                          yOffset = 0.140    #above Jurgen Is Here
-                        else:   #no jurgens here:
-                          yOffset = 0.210 #kk69: lower
-                        soloFont.render(soloText, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #rock band
-                      else:   #left
-                        soloFont.render(soloText, (xOffset, yOffset),(1, 0, 0),txtSize)   #left-justified
-                  self.engine.view.setViewport(1,0)
-            except Exception, e:
-              Log.warn("Unable to render guitar solo accuracy text: %s" % e)
+            #try:
+            if self.guitars[i].canGuitarSolo:
+              if self.guitars[i].guitarSolo:
+                #self.engine.view.setViewportHalf(self.numOfPlayers,i)
+                if self.guitarSoloAccuracyDisplayPos == 0:    #right
+                  xOffset = 0.950
+                else:
+                  xOffset = 0.150
+                yOffset = 0.320   #last change -.040
+                txtSize = 0.00250
+                #if we hit more notes in the solo than were counted, update the solo count (for the slop)
+                if self.guitars[i].currentGuitarSoloHitNotes > self.currentGuitarSoloTotalNotes[i]:
+                  self.currentGuitarSoloTotalNotes[i] = self.guitars[i].currentGuitarSoloHitNotes
+                if not self.pause and not self.failed:
+                  tempSoloAccuracy = (float(self.guitars[i].currentGuitarSoloHitNotes)/float(self.currentGuitarSoloTotalNotes[i]) * 100.0)
+                  trimmedIntSoloNoteAcc = self.decimal(str(tempSoloAccuracy)).quantize(self.decPlaceOffset)
+                  if self.guitarSoloAccuracyDisplayMode == 1:   #percentage only
+                    soloText = str(trimmedIntSoloNoteAcc) + "%"
+                    if self.guitarSoloAccuracyDisplayPos == 0:    #right
+                      xOffset = 0.890
+                  elif self.guitarSoloAccuracyDisplayMode == 2:   #detailed
+                    soloText = str(self.guitars[i].currentGuitarSoloHitNotes) + "/" + str(self.currentGuitarSoloTotalNotes[i]) + ": " + str(trimmedIntSoloNoteAcc) + "%"
+                  if self.guitarSoloAccuracyDisplayMode > 0:    #if not off:
+                    soloText = soloText.replace("0","O")
+                    glColor3f(1.0, 1.0, 1.0)  #cracker white
+  
+                    if self.theme == 2:
+                      soloFont = scoreFont
+                    else:
+                      soloFont = font
+  
+                    Tw, Th = soloFont.getStringSize(soloText,txtSize)
+                    if self.guitarSoloAccuracyDisplayPos == 0:  #right
+                      soloFont.render(soloText, (xOffset - Tw, yOffset),(1, 0, 0),txtSize)   #right-justified
+                    elif self.guitarSoloAccuracyDisplayPos == 1:  #centered
+                      soloFont.render(soloText, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #centered
+                    elif self.guitarSoloAccuracyDisplayPos == 3:  #racer: rock band 
+                      if self.hitAccuracyPos == 0: #Center - need to move solo text above this!
+                        yOffset = 0.100    #above Jurgen Is Here
+                      elif i == 0 and self.jurg1 and self.autoPlay:
+                        yOffset = 0.140    #above Jurgen Is Here
+                      elif i == 1 and self.jurg2 and self.autoPlay:
+                        yOffset = 0.140    #above Jurgen Is Here
+                      else:   #no jurgens here:
+                        yOffset = 0.210 #kk69: lower
+                      soloFont.render(soloText, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #rock band
+                    else:   #left
+                      soloFont.render(soloText, (xOffset, yOffset),(1, 0, 0),txtSize)   #left-justified
+                #self.engine.view.setViewport(1,0)
+            #except Exception, e:
+            #  Log.warn("Unable to render guitar solo accuracy text: %s" % e)
   
 
-                
+      #self.engine.view.setViewport(1,0)
     finally:
+      self.engine.view.setViewport(1,0)
       self.engine.view.resetProjection()
 

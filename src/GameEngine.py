@@ -407,6 +407,8 @@ class GameEngine(Engine):
     #if not hasattr(sys,"frozen"):
     #  themepath = os.path.join("..",themepath)
     stagespath = os.path.join("data","themes",currentTheme,"stages")
+    if not hasattr(sys,"frozen"):   #MFH - so animated stages work with sources
+      stagespath = os.path.join("..",stagespath)
     if os.path.exists(stagespath):
       self.stageFolders = []
       allFolders = os.listdir(stagespath)   #this also includes all the stage files - so check to see if there is at least one .png file inside each folder to be sure it's an animated stage folder
