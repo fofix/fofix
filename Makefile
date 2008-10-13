@@ -84,7 +84,7 @@ sdist:	doc
 	tar cvzf FretsOnFire-src-$(VERSION).tar.gz FretsOnFire-src-$(VERSION)
 
 translations:
-	xgettext -k_ -kN_ -o $(MESSAGESPOT) src/*.py
+	xgettext --from-code iso-8859-1 -k_ -kN_ -o $(MESSAGESPOT) src/*.py
 	
 clean:
 	@rm -rf dist build doc/html
