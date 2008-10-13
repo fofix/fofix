@@ -1,0 +1,143 @@
+msgid "Ah yes, I know. I'm amazing."
+msgstr ""
+
+msgid "Ah, that was cool."
+msgstr ""
+
+msgid "Und hello everyone."
+msgstr ""
+
+msgid "My name is Jurgen"
+msgstr ""
+
+msgid "Guntherswarchzhaffenstrassen."
+msgstr ""
+
+msgid "Und today I will show you"
+msgstr ""
+
+msgid "how to play this game."
+msgstr ""
+
+msgid "Check this sh*t!"
+msgstr ""
+
+msgid "And now, pick up your keyboard"
+msgstr ""
+
+msgid "like this."
+msgstr ""
+
+msgid "When I shred,"
+msgstr ""
+
+msgid "I use the whole keyboard."
+msgstr ""
+
+msgid "But since you SUCK,"
+msgstr ""
+
+msgid "You will only need"
+msgstr ""
+
+msgid "These five frets,"
+msgstr ""
+
+msgid "Und zie Pick button."
+msgstr ""
+
+msgid "However, zie most important"
+msgstr ""
+
+msgid "is the Escape button."
+msgstr ""
+
+msgid "You will need it,"
+msgstr ""
+
+msgid "when you finally realize"
+msgstr ""
+
+msgid "that you SUCK."
+msgstr ""
+
+msgid "Bigtime."
+msgstr ""
+
+msgid "To me, that is already obvious."
+msgstr ""
+
+msgid "Ok, there comes your first note."
+msgstr ""
+
+msgid "You can already hold down the 1st fret"
+msgstr ""
+
+msgid "BUT DON'T PICK IT YET!"
+msgstr ""
+
+msgid "You missed it."
+msgstr ""
+
+msgid "Ok, let's try it again."
+msgstr ""
+
+msgid "Ok, wait for it."
+msgstr ""
+
+msgid "Wait for it."
+msgstr ""
+
+msgid "No!"
+msgstr ""
+
+msgid "*Sigh*"
+msgstr ""
+
+msgid "Now, hold down two frets."
+msgstr ""
+
+msgid "Ah, you missed it!"
+msgstr ""
+
+msgid "And now, try this super easy lick."
+msgstr ""
+
+msgid "Und up to my tempo."
+msgstr ""
+
+msgid "Don't try this,"
+msgstr ""
+
+msgid "or you'll just hurt yourself."
+msgstr ""
+
+msgid "Ok, that was about"
+msgstr ""
+
+msgid "four billion notes per second."
+msgstr ""
+
+msgid "If I play that any faster,"
+msgstr ""
+
+msgid "your minds would just blow up."
+msgstr ""
+
+msgid "Ok, that is it for now."
+msgstr ""
+
+msgid "You can now go and sell"
+msgstr ""
+
+msgid "your keyboards on Ebay."
+msgstr ""
+
+msgid "Because you SUCK."
+msgstr ""
+
+msgid "And remember one thing."
+msgstr ""
+
+msgid "I am your new god, little girls."
+msgstr ""
