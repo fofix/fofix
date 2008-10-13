@@ -1531,7 +1531,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     self.lastEvent = lastTime + 1000
     self.lastEvent = round(self.lastEvent / 1000) * 1000
-    self.notesCum = 0
+    #self.notesCum = 0
     self.noteLastTime = 0
 
 
@@ -1648,7 +1648,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     self.lastEvent = lastTime + 1000
     self.lastEvent = round(self.lastEvent / 1000) * 1000
-    self.notesCum = 0
+    #self.notesCum = 0
     self.noteLastTime = 0
 
 
@@ -1669,6 +1669,135 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           if (event.barType == 1 or event.barType == 2):
             self.beatTime.append(time)
         
+
+  def handleWhammy(self, playerNum):
+    i = playerNum
+    try:    #since analog axis might be set but joystick not present = crash
+      #MFH - adding another nest of logic filtration; don't even want to run these checks unless there are playedNotes present!
+      if self.guitars[i].playedNotes:
+        #Player i kill / whammy check:
+        if self.isKillAnalog[i]:
+          if self.CheckForValidKillswitchNote(i):    #if a note has length and is being held enough to get score
+          
+            #rounding to integers, setting volumes 0-10 and only when changed from last time:
+            #want a whammy reading of 0.0 to = full volume, as that's what it reads at idle
+            if self.analogKillMode[i] == 2:  #XBOX mode: (1.0 at rest, -1.0 fully depressed)
+              self.whammyVol[i] = 1.0 - (round(10* ((self.engine.input.joysticks[self.whichJoy[i]].get_axis(self.whichAxis[i])+1.0) / 2.0 ))/10.0)
+            elif self.analogKillMode[i] == 3:  #XBOX Inverted mode: (-1.0 at rest, 1.0 fully depressed)
+              self.whammyVol[i] = (round(10* ((self.engine.input.joysticks[self.whichJoy[i]].get_axis(self.whichAxis[i])+1.0) / 2.0 ))/10.0)
+            else: #PS2 mode: (0.0 at rest, fluctuates between 1.0 and -1.0 when pressed)
+              self.whammyVol[i] = (round(10*(abs(self.engine.input.joysticks[self.whichJoy[i]].get_axis(self.whichAxis[i]))))/10.0)
+            if self.whammyVol[i] > 0.0 and self.whammyVol[i] < 0.1:
+              self.whammyVol[i] = 0.1
+            
+            #MFH - simple whammy tail determination:
+            if self.whammyVol[i] > 0.1:
+              self.killswitchEngaged[i] = True
+            else:
+              self.killswitchEngaged[i] = False
+            
+            if self.whammyVol[i] != self.lastWhammyVol[i] and self.whammyVol[i] > 0.1:
+              if self.guitars[i].killPoints or (self.guitars[i].starPowerActive and self.whammySavesSP):
+                self.guitars[i].starPower += self.analogKillswitchStarpowerChunkSize
+                if self.guitars[i].starPower > 100:
+                  self.guitars[i].starPower = 100
+  
+            self.lastWhammyVol[i] = self.whammyVol[i]
+            
+            #here, scale whammyVol to match kill volume setting:
+            self.targetWhammyVol[i] = self.whammyVol[i] * (1.0 - self.killVolume)
+  
+            if self.actualWhammyVol[i] < self.targetWhammyVol[i]:
+              self.actualWhammyVol[i] += self.whammyVolAdjStep
+              whammyVolSet = 1.0 - self.actualWhammyVol[i]
+              self.song.setInstrumentVolume(whammyVolSet, self.players[i].part)
+            elif self.actualWhammyVol[i] > self.targetWhammyVol[i]:
+              self.actualWhammyVol[i] -= self.whammyVolAdjStep
+              whammyVolSet = 1.0 - self.actualWhammyVol[i]
+              self.song.setInstrumentVolume(whammyVolSet, self.players[i].part)
+            
+          elif self.playerList[i].streak > 0:
+            self.song.setInstrumentVolume(1.0, self.players[i].part)
+            self.actualWhammyVol[i] = self.defaultWhammyVol[i]
+  
+        else:   #digital killswitch:
+          if self.CheckForValidKillswitchNote(i):    #if a note has length and is being held enough to get score
+            if self.killswitchEngaged[i] == True: #QQstarS:new Fix the killswitch
+              if self.guitars[i].isKillswitchPossible() == True:
+                self.killswitchEngaged[i] = True
+                #self.song.setInstrumentVolume(0.0, self.players[i].part)
+                self.song.setInstrumentVolume(self.killVolume, self.players[i].part)  #MFH
+                if self.guitars[i].killPoints or (self.guitars[i].starPowerActive and self.whammySavesSP):
+                  self.guitars[i].starPower += self.digitalKillswitchStarpowerChunkSize
+                  if self.guitars[i].starPower > 100:
+                    self.guitars[i].starPower = 100
+                  
+              else:
+                self.killswitchEngaged[i] = None
+            elif self.playerList[i].streak > 0:
+              self.song.setInstrumentVolume(1.0, self.players[i].part)
+              self.killswitchEngaged[i] = False
+          elif self.playerList[i].streak > 0:
+            self.song.setInstrumentVolume(1.0, self.players[i].part)
+            self.killswitchEngaged[i] = False
+          else:
+            self.killswitchEngaged[i] = False
+          
+    except Exception, e:
+      self.whammyVol[i] = self.defaultWhammyVol[i] 
+
+
+
+  def handlePhrases(self, playerNum, playerStreak):
+    if self.phrases == True:
+  
+      i = playerNum
+      
+      if self.lastStreak < playerStreak:
+        self.textChanged = True
+      else:
+        self.textChanged = False
+      self.lastStreak = playerStreak
+  
+      if playerStreak == 50 and self.textChanged:
+        self.displayText = _("50 Note Streak!!!") #kk69: more GH3-like
+        self.streakFlag = "%d" % (i)   #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1. 
+      #MFH - I think a simple integer modulo would be more efficient here: 
+      if (playerStreak % 100 == 0) and playerStreak > 50 and self.textChanged:
+        self.displayText = _("%d Note Streak!!!") % playerStreak #kk69: more GH3-like
+        self.streakFlag = "%d" % (i)  #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1.
+  
+      if self.scaleText >= 0.0024:
+        self.dislayTextScale = self.scaleText + self.scaleText2
+        if self.scaleText2 <= -0.0005:
+          self.goingUP = True
+        elif self.scaleText2 >= 0.0005:
+          self.goingUP = False
+        if self.goingUP == True:
+          self.scaleText2 += 0.00008
+        else:
+          self.scaleText2 -= 0.00008
+      else:
+        self.dislayTextScale = self.scaleText
+  
+      if not self.displayText == None and not self.scaleText >= 0.0024:
+        self.scaleText += 0.0001
+      if self.scaleText > 0.0024:
+        self.scaleText = 0.0024
+      if not self.displayText == None:
+        self.textTimer += 1
+      if self.textTimer > 100:
+        self.textY -= 0.02
+      if self.textY < 0:
+        self.scaleText = 0
+        self.textTimer = 0
+        self.displayText = None
+        self.textChanged = False
+        self.textY = .3
+        self.scaleText2 = 0.0
+        self.goingUP = False
+
+
   def run(self, ticks): #QQstarS: Fix this funcion
     SceneClient.run(self, ticks)
     pos = self.getSongPosition()
@@ -1880,6 +2009,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       
       
       #MFH - new refugees from the render() function:
+      for playerNum, thePlayer in enumerate(self.playerList):
+        self.handleWhammy(playerNum)
+        self.handlePhrases(playerNum, thePlayer.streak)
+
+    
+      if self.timeLeft == "0:01" and not self.mutedLastSecondYet and self.muteLastSecond == 1:
+        self.song.setAllTrackVolumes(0.0)
+        self.mutedLastSecondYet = True
+      
       if self.guitars[0].starPowerActive == True: #QQstarS: Change the logical ways
         self.multi[0] = 2
       if self.numOfPlayers>1 and self.guitars[1].starPowerActive == True:
@@ -4450,9 +4588,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if self.gameTimeMode == 1 or self.muteLastSecond == 1 or self.hopoDebugDisp == 1:
           #MFH: making this a global variable so it may be easily accessed for log entries where appropriate
           self.timeLeft = "%d:%02d" % (pos / 60000, (pos % 60000) / 1000)
-          if self.timeLeft == "0:01" and not self.mutedLastSecondYet and self.muteLastSecond == 1:
-            self.song.setAllTrackVolumes(0.0)
-            self.mutedLastSecondYet = True
           if self.gameTimeMode == 1 or self.hopoDebugDisp == 1:
             w, h = font.getStringSize(self.timeLeft)
             if self.lyricSheet != None:   #shift this stuff down so it don't look so bad over top the lyricsheet:
@@ -4464,12 +4599,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
 
         #Not ready for 2player yet
-        if self.notesCum:
-          f = int(100 * (float(self.playerList[0].notesHit) / self.notesCum))
-
-          font.render("%d%%" % f, (.5 - w / 2, y + h))
+        #if self.notesCum:
+        #  f = int(100 * (float(self.playerList[0].notesHit) / self.notesCum))
+        #  font.render("%d%%" % f, (.5 - w / 2, y + h))
 			
 
+        #battle failing
         if self.rock[0]<=0 and self.battle and self.numOfPlayers>1: #QQstarS:new2 Bettle failing
           self.displayText = "You Failed!!!!"
           self.streakFlag = "0"   #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1. 
@@ -4510,92 +4645,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             font.render(t,  (.5 - w / 2, y + h))
 
       for i,player in enumerate(self.playerList): #QQstarS: This part has big fix. I add the code into it,So he can shown corect
-
-
-        try:    #since analog axis might be set but joystick not present = crash
-        
-          #MFH - adding another nest of logic filtration; don't even want to run these checks unless there are playedNotes present!
-          if self.guitars[i].playedNotes:
-        
-            #Player i kill / whammy check:
-            if self.isKillAnalog[i]:
-              if self.CheckForValidKillswitchNote(i):    #if a note has length and is being held enough to get score
-              
-                #rounding to integers, setting volumes 0-10 and only when changed from last time:
-                #want a whammy reading of 0.0 to = full volume, as that's what it reads at idle
-               
-                if self.analogKillMode[i] == 2:  #XBOX mode: (1.0 at rest, -1.0 fully depressed)
-                  self.whammyVol[i] = 1.0 - (round(10* ((self.engine.input.joysticks[self.whichJoy[i]].get_axis(self.whichAxis[i])+1.0) / 2.0 ))/10.0)
-  
-                elif self.analogKillMode[i] == 3:  #XBOX Inverted mode: (-1.0 at rest, 1.0 fully depressed)
-                  self.whammyVol[i] = (round(10* ((self.engine.input.joysticks[self.whichJoy[i]].get_axis(self.whichAxis[i])+1.0) / 2.0 ))/10.0)
-                
-                  
-                else: #PS2 mode: (0.0 at rest, fluctuates between 1.0 and -1.0 when pressed)
-                  self.whammyVol[i] = (round(10*(abs(self.engine.input.joysticks[self.whichJoy[i]].get_axis(self.whichAxis[i]))))/10.0)
-    
-                if self.whammyVol[i] > 0.0 and self.whammyVol[i] < 0.1:
-                  self.whammyVol[i] = 0.1
-                
-                #MFH - simple whammy tail determination:
-                if self.whammyVol[i] > 0.1:
-                  self.killswitchEngaged[i] = True
-                else:
-                  self.killswitchEngaged[i] = False
-                
-                if self.whammyVol[i] != self.lastWhammyVol[i] and self.whammyVol[i] > 0.1:
-                  if self.guitars[i].killPoints or (self.guitars[i].starPowerActive and self.whammySavesSP):
-                    self.guitars[i].starPower += self.analogKillswitchStarpowerChunkSize
-                    if self.guitars[i].starPower > 100:
-                      self.guitars[i].starPower = 100
-      
-                self.lastWhammyVol[i] = self.whammyVol[i]
-                
-                #here, scale whammyVol to match kill volume setting:
-                self.targetWhammyVol[i] = self.whammyVol[i] * (1.0 - self.killVolume)
-  
-    
-    
-                if self.actualWhammyVol[i] < self.targetWhammyVol[i]:
-                  self.actualWhammyVol[i] += self.whammyVolAdjStep
-                  whammyVolSet = 1.0 - self.actualWhammyVol[i]
-                  self.song.setInstrumentVolume(whammyVolSet, self.players[i].part)
-                elif self.actualWhammyVol[i] > self.targetWhammyVol[i]:
-                  self.actualWhammyVol[i] -= self.whammyVolAdjStep
-                  whammyVolSet = 1.0 - self.actualWhammyVol[i]
-                  self.song.setInstrumentVolume(whammyVolSet, self.players[i].part)
-                
-              elif self.playerList[i].streak > 0:
-                self.song.setInstrumentVolume(1.0, self.players[i].part)
-                self.actualWhammyVol[i] = self.defaultWhammyVol[i]
-      
-            else:   #digital killswitch:
-              if self.CheckForValidKillswitchNote(i):    #if a note has length and is being held enough to get score
-                if self.killswitchEngaged[i] == True: #QQstarS:new Fix the killswitch
-                  if self.guitars[i].isKillswitchPossible() == True:
-                    self.killswitchEngaged[i] = True
-                    #self.song.setInstrumentVolume(0.0, self.players[i].part)
-                    self.song.setInstrumentVolume(self.killVolume, self.players[i].part)  #MFH
-                    if self.guitars[i].killPoints or (self.guitars[i].starPowerActive and self.whammySavesSP):
-                      self.guitars[i].starPower += self.digitalKillswitchStarpowerChunkSize
-                      if self.guitars[i].starPower > 100:
-                        self.guitars[i].starPower = 100
-                      
-                  else:
-                    self.killswitchEngaged[i] = None
-                elif self.playerList[i].streak > 0:
-                  self.song.setInstrumentVolume(1.0, self.players[i].part)
-                  self.killswitchEngaged[i] = False
-              elif self.playerList[i].streak > 0:
-                self.song.setInstrumentVolume(1.0, self.players[i].part)
-                self.killswitchEngaged[i] = False
-              else:
-                self.killswitchEngaged[i] = False
-              
-        except Exception, e:
-          self.whammyVol[i] = self.defaultWhammyVol[i] 
-
-
 
         streakFlag = 0  #set the flag to 0
         self.engine.view.setViewportHalf(self.numOfPlayers,i)
@@ -4860,65 +4909,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               size = streakFont.getStringSize(text)
               streakFont.render(text, (.132-size[0]/2, 0.667-size[1]/2+self.hFontOffset[i]))
   
-            if self.lastStreak < player.streak:
-              self.textChanged = True
-            else:
-              self.textChanged = False
-  
-            self.lastStreak = player.streak
-            if self.phrases == True:
-              if player.streak == 50 and self.textChanged:
-                self.displayText = _("50 Note Streak!!!") #kk69: more GH3-like
-                self.streakFlag = "%d" % (i)   #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1. 
-              
-              #MFH - I think a simple integer modulo would be more efficient here: divmod(x,y)
-              #if divmod(player.streak,100) == 0 and player.streak > 50 and self.textChanged:
-              if (player.streak % 100 == 0) and player.streak > 50 and self.textChanged:
-                self.displayText = _("%d Note Streak!!!") % player.streak #kk69: more GH3-like
-                self.streakFlag = "%d" % (i)  #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1.
-              #for st in range(100,10000,100):
-              #  if player.streak == st and self.textChanged:
-              #    self.displayText = _("%d Note Streak!!!") % st #kk69: more GH3-like
-              #    self.streakFlag = "%d" % (i)  #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1.
-  
-            if self.scaleText >= 0.0024:
-              textScale = self.scaleText + self.scaleText2
-              if self.scaleText2 <= -0.0005:
-                self.goingUP = True
-              elif self.scaleText2 >= 0.0005:
-                self.goingUP = False
-  
-              if self.goingUP == True:
-                self.scaleText2 += 0.00008
-              else:
-                self.scaleText2 -= 0.00008
-            else:
-              textScale = self.scaleText
-  
-  
-            if not self.displayText == None and not self.scaleText >= 0.0024:
-              self.scaleText += 0.0001
-            if self.scaleText > 0.0024:
-              self.scaleText = 0.0024
+
             if self.displayText!= None and self.streakFlag == "%d" % (i):  #QQstarS:Set [0] to [i] #if set the flag, then show the words
               glColor3f(.8,.75,.01)
-              size = font.getStringSize(self.displayText, scale = textScale)
-              font.render(self.displayText, (.5-size[0]/2,self.textY-size[1]), scale = textScale)
-  
-            if not self.displayText == None:
-              self.textTimer += 1
-  
-            if self.textTimer > 100:
-              self.textY -= 0.02
-  
-            if self.textY < 0:
-              self.scaleText = 0
-              self.textTimer = 0
-              self.displayText = None
-              self.textChanged = False
-              self.textY = .3
-              self.scaleText2 = 0.0
-              self.goingUP = False
+              size = font.getStringSize(self.displayText, scale = self.dislayTextScale)
+              font.render(self.displayText, (.5-size[0]/2,self.textY-size[1]), scale = self.dislayTextScale)
+
   
             if self.rock[0] <= 0 and self.rock[1] <= 0 and self.numOfPlayers>1 and self.failingEnabled: #QQstarS: all two are "die" that failing
               self.failed = True
@@ -5461,66 +5457,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               size = streakFont.getStringSize(text)
               streakFont.render(text, (.132-size[0]/2, 0.667-size[1]/2+self.hFontOffset[i]))
   
-            if self.lastStreak < player.streak:
-              self.textChanged = True
-            else:
-              self.textChanged = False
-  
-            self.lastStreak = player.streak
-            if self.phrases == True:
-              if player.streak == 50 and self.textChanged:
-                self.displayText = _("50 Note Streak!!!") #kk69: more GH3-like
-                self.streakFlag = "%d" % (i)   #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1. 
 
-
-              #MFH - I think a simple integer modulo would be more efficient here: divmod(x,y)
-              #if divmod(player.streak,100) == 0 and player.streak > 50 and self.textChanged:
-              if (player.streak % 100 == 0) and player.streak > 50 and self.textChanged:
-                self.displayText = _("%d Note Streak!!!") % player.streak #kk69: more GH3-like
-                self.streakFlag = "%d" % (i)  #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1.
-              #for st in range(100,10000,100):
-              #  if player.streak == st and self.textChanged:
-              #    self.displayText = _("%d Note Streak!!!") % st #kk69: more GH3-like
-              #    self.streakFlag = "%d" % (i)  #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1.
-  
-            if self.scaleText >= 0.0024:
-              textScale = self.scaleText + self.scaleText2
-              if self.scaleText2 <= -0.0005:
-                self.goingUP = True
-              elif self.scaleText2 >= 0.0005:
-                self.goingUP = False
-  
-              if self.goingUP == True:
-                self.scaleText2 += 0.00008
-              else:
-                self.scaleText2 -= 0.00008
-            else:
-              textScale = self.scaleText
-  
-  
-            if not self.displayText == None and not self.scaleText >= 0.0024:
-              self.scaleText += 0.0001
-            if self.scaleText > 0.0024:
-              self.scaleText = 0.0024
             if self.displayText!= None and self.streakFlag == "%d" % (i):  #QQstarS:Set [0] to [i] #if set the flag, then show the words
               glColor3f(.8,.75,.01)
-              size = font.getStringSize(self.displayText, scale = textScale)
-              font.render(self.displayText, (.5-size[0]/2,self.textY-size[1]), scale = textScale)
+              size = font.getStringSize(self.displayText, scale = self.dislayTextScale)
+              font.render(self.displayText, (.5-size[0]/2,self.textY-size[1]), scale = self.dislayTextScale)
   
-            if not self.displayText == None:
-              self.textTimer += 1
-  
-            if self.textTimer > 100:
-              self.textY -= 0.02
-  
-            if self.textY < 0:
-              self.scaleText = 0
-              self.textTimer = 0
-              self.displayText = None
-              self.textChanged = False
-              self.textY = .3
-              self.scaleText2 = 0.0
-              self.goingUP = False
   
             if self.rock[0] <= 0 and self.rock[1] <= 0 and self.numOfPlayers>1 and self.failingEnabled: #QQstarS: all two are "die" that failing
               self.failed = True
@@ -5986,67 +5928,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
 
   
-            if self.lastStreak < player.streak:
-              self.textChanged = True
-            else:
-              self.textChanged = False
-  
-            self.lastStreak = player.streak
-  
-            if self.phrases == True:
-              if player.streak == 50 and self.textChanged:
-                self.displayText = _("50 Note Streak!!!") #kk69: more GH3-like
-                self.streakFlag = "%d" % (i)   #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1. 
 
-              #MFH - I think a simple integer modulo would be more efficient here: divmod(x,y)
-              #if divmod(player.streak,100) == 0 and player.streak > 50 and self.textChanged:
-              if (player.streak % 100 == 0) and player.streak > 50 and self.textChanged:
-                self.displayText = _("%d Note Streak!!!") % player.streak #kk69: more GH3-like
-                self.streakFlag = "%d" % (i)  #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1.
-              #for st in range(100,10000,100):
-              #  if player.streak == st and self.textChanged:
-              #    self.displayText = _("%d Note Streak!!!") % st #kk69: more GH3-like
-              #    self.streakFlag = "%d" % (i)  #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1.
-  
-            if self.scaleText >= 0.0024:
-              textScale = self.scaleText + self.scaleText2
-              if self.scaleText2 <= -0.0005:
-                self.goingUP = True
-              elif self.scaleText2 >= 0.0005:
-                self.goingUP = False
-  
-              if self.goingUP == True:
-                self.scaleText2 += 0.00008
-              else:
-                self.scaleText2 -= 0.00008
-            else:
-              textScale = self.scaleText
-  
-  
-            if not self.displayText == None and not self.scaleText >= 0.0024:
-              self.scaleText += 0.0001
-            if self.scaleText > 0.0024:
-              self.scaleText = 0.0024
 
             if self.displayText!= None and self.streakFlag == "%d" % (i):  #QQstarS:Set [0] to [i] #if set the flag, then show the words
               glColor3f(.8,.75,.01)
-              size = font.getStringSize(self.displayText, scale = textScale)
-              font.render(self.displayText, (.5-size[0]/2,self.textY-size[1]), scale = textScale)
+              size = font.getStringSize(self.displayText, scale = self.dislayTextScale)
+              font.render(self.displayText, (.5-size[0]/2,self.textY-size[1]), scale = self.dislayTextScale)
   
-            if not self.displayText == None:
-              self.textTimer += 1
-  
-            if self.textTimer > 100:
-              self.textY -= 0.02
-  
-            if self.textY < 0:
-              self.scaleText = 0
-              self.textTimer = 0
-              self.displayText = None
-              self.textChanged = False
-              self.textY = .3
-              self.scaleText2 = 0.0
-              self.goingUP = False
+
+
   
             if self.rock[0] <= 0 and self.rock[1] <= 0 and self.numOfPlayers>1 and self.failingEnabled: #QQstarS: all two are "die" that failing
               self.failed = True
