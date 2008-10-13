@@ -275,6 +275,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.starClaps = self.engine.config.get("game", "star_claps")
     self.rb_sp_neck_glow = self.engine.config.get("game", "rb_sp_neck_glow")
     self.accuracy = [0,0]
+    self.countdownSeconds = 5
     self.dispAccuracy = [False,False]
     self.showAccuracy = self.engine.config.get("game", "accuracy_mode")
     self.hitAccuracyPos = self.engine.config.get("game", "accuracy_pos")
@@ -1877,6 +1878,281 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   self.controls.toggle(k, False)
 
       
+      
+      #MFH - new refugees from the render() function:
+      if self.guitars[0].starPowerActive == True: #QQstarS: Change the logical ways
+        self.multi[0] = 2
+      if self.numOfPlayers>1 and self.guitars[1].starPowerActive == True:
+        self.multi[1] = 2
+      if self.guitars[0].starPowerActive != True:
+        self.multi[0] = 1
+      if  self.numOfPlayers>1 and self.guitars[1].starPowerActive != True:
+        self.multi[1] = 1
+  
+        #Faaa Drum sound
+      self.countdownSeconds = self.countdown / self.songBPS + 1
+  
+      if self.TSoundEnabled < 2: #rockmeter decrease after countdown
+        #if not self.pause and not self.failed and (self.battle==False or self.numOfPlayers==1) and self.playerList[0].part.text == "Drums" and self.countdownSeconds <=1:
+        if not self.pause and not self.failed and (self.battle==False or self.numOfPlayers==1) and self.guitars[0].isDrum and self.countdownSeconds <=1:
+          if self.notesMissed[0]: 
+            self.guitars[0].spEnabled = False
+            self.guitars[0].spNote = False 
+            self.minusRock[0] += self.minGain/self.multi[0]
+            self.rock[0] -= self.minusRock[0]/self.multi[0]
+            if self.plusRock[0] > self.pluBase:
+              self.plusRock[0] -= self.pluGain*2.0/self.multi[0]
+            if self.plusRock[0] <= self.pluBase:
+              self.plusRock[0] = self.pluBase/self.multi[0]
+          #if self.numOfPlayers>1 and self.notesMissed[1] and self.Drumstart == True and self.playerList[1].part.text == "Drums" and self.countdownSeconds <=1: #QQstarS:Set [0] to [i]
+          if self.numOfPlayers>1 and self.notesMissed[1] and self.Drumstart == True and self.guitars[1].isDrum and self.countdownSeconds <=1:
+            self.guitars[1].spEnabled = False
+            self.guitars[1].spNote = False #QQstarS:new1
+            self.minusRock[1] += self.minGain/self.multi[1]
+            self.rock[1] -= self.minusRock[1]/self.multi[1]
+            if self.plusRock[1] > self.pluBase:
+              self.plusRock[1] -= self.pluGain*2.0/self.multi[1]
+            if self.plusRock[1] <= self.pluBase:
+              self.plusRock[1] = self.pluBase/self.multi[1]
+          if self.notesHit[0]:
+            if self.rock[0] < self.rockMax:
+              self.plusRock[0] += self.pluGain*self.multi[0]
+              self.rock[0] += self.plusRock[0]*self.multi[0]
+            if self.rock[0] >= self.rockMax:
+              self.rock[0] = self.rockMax
+            if self.minusRock[0] > self.minBase:
+              self.minusRock[0] -= self.minGain/2.0*self.multi[0]
+          if self.notesHit[1]:
+            if self.rock[1] < self.rockMax:
+              self.plusRock[1] += self.pluGain*self.multi[1]
+              self.rock[1] += self.plusRock[1]*self.multi[1]
+            if self.rock[1] >= self.rockMax:
+              self.rock[1] = self.rockMax
+            if self.minusRock[1] > self.minBase:
+              self.minusRock[1] -= self.minGain/2.0*self.multi[1]
+          if self.lessMissed[0]: #QQstarS:Set [0] to [i]
+            self.guitars[0].spEnabled = False
+            self.guitars[0].spNote = False #QQstarS:new1
+            self.minusRock[0] += self.minGain/5.0/self.multi[0]
+            self.rock[0] -= self.minusRock[0]/5.0/self.multi[0]
+            if self.plusRock[0] > self.pluBase:
+              self.plusRock[0] -= self.pluGain/2.5/self.multi[0]
+          if  self.numOfPlayers>1 and self.lessMissed[1]: #QQstarS:Set [0] to [i]
+            self.guitars[1].spEnabled = False
+            self.guitars[1].spNote = False #QQstarS:new1
+            self.minusRock[1] += self.minGain/5.0/self.multi[1]
+            self.rock[1] -= self.minusRock[1]/5.0/self.multi[1]
+            if self.plusRock[1] > self.pluBase:
+              self.plusRock[1] -= self.pluGain/2.5/self.multi[1]
+  
+          if self.minusRock[1] <= self.minBase:
+            self.minusRock[1] = self.minBase
+          if self.plusRock[1] <= self.pluBase:
+            self.plusRock[1] = self.pluBase
+          if self.minusRock[0] <= self.minBase:
+            self.minusRock[0] = self.minBase
+          if self.plusRock[0] <= self.pluBase:
+            self.plusRock[0] = self.pluBase
+  
+  
+      if self.TSoundEnabled == 2: #rockmeter decrease after the first note
+        #if (self.lessMissed[0] == True or self.notesHit[0] == True) and self.playerList[0].part.text == "Drums":
+        if (self.lessMissed[0] == True or self.notesHit[0] == True) and self.guitars[0].isDrum:
+          self.Drumstart = True
+  
+  
+  
+      #if not self.pause and not self.failed and (self.battle==False or self.numOfPlayers==1) and self.playerList[0].part.text == "Drums" and self.Drumstart == True: #QQstarS:new2 not bettle mode
+      if not self.pause and not self.failed and (self.battle==False or self.numOfPlayers==1) and self.guitars[0].isDrum and self.Drumstart == True: #QQstarS:new2 not bettle mode
+        if self.notesMissed[0]: #QQstarS:Set [0] to [i]
+          self.guitars[0].spEnabled = False
+          self.guitars[0].spNote = False #QQstarS:new1
+          self.minusRock[0] += self.minGain/self.multi[0]
+          self.rock[0] -= self.minusRock[0]/self.multi[0]
+          if self.plusRock[0] > self.pluBase:
+            self.plusRock[0] -= self.pluGain*2.0/self.multi[0]
+          if self.plusRock[0] <= self.pluBase:
+            self.plusRock[0] = self.pluBase/self.multi[0]
+        #if self.numOfPlayers>1 and self.notesMissed[1] and self.Drumstart == True and self.playerList[1].part.text == "Drums": #QQstarS:Set [0] to [i]
+        if self.numOfPlayers>1 and self.notesMissed[1] and self.Drumstart == True and self.guitars[1].isDrum: #QQstarS:Set [0] to [i]
+          self.guitars[1].spEnabled = False
+          self.guitars[1].spNote = False #QQstarS:new1
+          self.minusRock[1] += self.minGain/self.multi[1]
+          self.rock[1] -= self.minusRock[1]/self.multi[1]
+          if self.plusRock[1] > self.pluBase:
+            self.plusRock[1] -= self.pluGain*2.0/self.multi[1]
+          if self.plusRock[1] <= self.pluBase:
+            self.plusRock[1] = self.pluBase/self.multi[1]
+        if self.notesHit[0]:
+          if self.rock[0] < self.rockMax:
+            self.plusRock[0] += self.pluGain*self.multi[0]
+            self.rock[0] += self.plusRock[0]*self.multi[0]
+          if self.rock[0] >= self.rockMax:
+            self.rock[0] = self.rockMax
+          if self.minusRock[0] > self.minBase:
+            self.minusRock[0] -= self.minGain/2.0*self.multi[0]
+        if self.notesHit[1]:
+          if self.rock[1] < self.rockMax:
+            self.plusRock[1] += self.pluGain*self.multi[1]
+            self.rock[1] += self.plusRock[1]*self.multi[1]
+          if self.rock[1] >= self.rockMax:
+            self.rock[1] = self.rockMax
+          if self.minusRock[1] > self.minBase:
+            self.minusRock[1] -= self.minGain/2.0*self.multi[1]
+        if self.lessMissed[0]: #QQstarS:Set [0] to [i]
+          self.guitars[0].spEnabled = False
+          self.guitars[0].spNote = False #QQstarS:new1
+          self.minusRock[0] += self.minGain/5.0/self.multi[0]
+          self.rock[0] -= self.minusRock[0]/5.0/self.multi[0]
+          if self.plusRock[0] > self.pluBase:
+            self.plusRock[0] -= self.pluGain/2.5/self.multi[0]
+        if  self.numOfPlayers>1 and self.lessMissed[1]: #QQstarS:Set [0] to [i]
+          self.guitars[1].spEnabled = False
+          self.guitars[1].spNote = False #QQstarS:new1
+          self.minusRock[1] += self.minGain/5.0/self.multi[1]
+          self.rock[1] -= self.minusRock[1]/5.0/self.multi[1]
+          if self.plusRock[1] > self.pluBase:
+            self.plusRock[1] -= self.pluGain/2.5/self.multi[1]
+  
+        if self.minusRock[1] <= self.minBase:
+          self.minusRock[1] = self.minBase
+        if self.plusRock[1] <= self.pluBase:
+          self.plusRock[1] = self.pluBase
+        if self.minusRock[0] <= self.minBase:
+          self.minusRock[0] = self.minBase
+        if self.plusRock[0] <= self.pluBase:
+          self.plusRock[0] = self.pluBase
+  
+      #if not self.pause and not self.failed and (self.battle==False or self.numOfPlayers==1) and not self.playerList[0].part.text == "Drums": #QQstarS:new2 not bettle mode
+      if not self.pause and not self.failed and (self.battle==False or self.numOfPlayers==1) and not self.guitars[0].isDrum: #QQstarS:new2 not bettle mode
+        if self.notesMissed[0]: #QQstarS:Set [0] to [i]
+          self.guitars[0].spEnabled = False
+          self.guitars[0].spNote = False #QQstarS:new1
+          self.minusRock[0] += self.minGain/self.multi[0]
+          self.rock[0] -= self.minusRock[0]/self.multi[0]
+          if self.plusRock[0] > self.pluBase:
+            self.plusRock[0] -= self.pluGain*2.0/self.multi[0]
+          if self.plusRock[0] <= self.pluBase:
+            self.plusRock[0] = self.pluBase/self.multi[0]
+        #if self.numOfPlayers>1 and self.notesMissed[1] and not self.playerList[1].part.text == "Drums": #QQstarS:Set [0] to [i]
+        if self.numOfPlayers>1 and self.notesMissed[1] and not self.guitars[1].isDrum: #QQstarS:Set [0] to [i]
+          self.guitars[1].spEnabled = False
+          self.guitars[1].spNote = False #QQstarS:new1
+          self.minusRock[1] += self.minGain/self.multi[1]
+          self.rock[1] -= self.minusRock[1]/self.multi[1]
+          if self.plusRock[1] > self.pluBase:
+            self.plusRock[1] -= self.pluGain*2.0/self.multi[1]
+          if self.plusRock[1] <= self.pluBase:
+            self.plusRock[1] = self.pluBase/self.multi[1]
+        if self.notesHit[0]:
+          if self.rock[0] < self.rockMax:
+            self.plusRock[0] += self.pluGain*self.multi[0]
+            self.rock[0] += self.plusRock[0]*self.multi[0]
+          if self.rock[0] >= self.rockMax:
+            self.rock[0] = self.rockMax
+          if self.minusRock[0] > self.minBase:
+            self.minusRock[0] -= self.minGain/2.0*self.multi[0]
+        if self.notesHit[1]:
+          if self.rock[1] < self.rockMax:
+            self.plusRock[1] += self.pluGain*self.multi[1]
+            self.rock[1] += self.plusRock[1]*self.multi[1]
+          if self.rock[1] >= self.rockMax:
+            self.rock[1] = self.rockMax
+          if self.minusRock[1] > self.minBase:
+            self.minusRock[1] -= self.minGain/2.0*self.multi[1]
+        if self.lessMissed[0]: #QQstarS:Set [0] to [i]
+          self.guitars[0].spEnabled = False
+          self.guitars[0].spNote = False #QQstarS:new1
+          self.minusRock[0] += self.minGain/5.0/self.multi[0]
+          self.rock[0] -= self.minusRock[0]/5.0/self.multi[0]
+          if self.plusRock[0] > self.pluBase:
+            self.plusRock[0] -= self.pluGain/2.5/self.multi[0]
+        if  self.numOfPlayers>1 and self.lessMissed[1]: #QQstarS:Set [0] to [i]
+          self.guitars[1].spEnabled = False
+          self.guitars[1].spNote = False #QQstarS:new1
+          self.minusRock[1] += self.minGain/5.0/self.multi[1]
+          self.rock[1] -= self.minusRock[1]/5.0/self.multi[1]
+          if self.plusRock[1] > self.pluBase:
+            self.plusRock[1] -= self.pluGain/2.5/self.multi[1]
+  
+        if self.minusRock[1] <= self.minBase:
+          self.minusRock[1] = self.minBase
+        if self.plusRock[1] <= self.pluBase:
+          self.plusRock[1] = self.pluBase
+        if self.minusRock[0] <= self.minBase:
+          self.minusRock[0] = self.minBase
+        if self.plusRock[0] <= self.pluBase:
+          self.plusRock[0] = self.pluBase
+      elif not self.pause and not self.failed and self.battle and self.numOfPlayers>1: #QQstarS:new2 Bettle mode
+        if self.notesMissed[0]: #QQstarS:Set [0] to [i]
+          self.guitars[0].spEnabled = False
+          self.guitars[0].spNote = False #QQstarS:new1
+          self.minusRock[0] += self.minGain/self.multi[0]
+          #self.rock[0] -= self.minusRock[0]/self.multi[0]
+          if self.plusRock[0] > self.pluBase:
+            self.plusRock[0] -= self.pluGain*2.0/self.multi[0]
+          if self.plusRock[0] <= self.pluBase:
+            self.plusRock[0] = self.pluBase/self.multi[0]
+        if  self.numOfPlayers>1 and self.notesMissed[1]: #QQstarS:Set [0] to [i]
+          self.guitars[1].spEnabled = False
+          self.guitars[1].spNote = False #QQstarS:new1
+          self.minusRock[1] += self.minGain/self.multi[1]
+          #self.rock[1] -= self.minusRock[1]/self.multi[1]
+          if self.plusRock[1] > self.pluBase:
+            self.plusRock[1] -= self.pluGain*2.0/self.multi[1]
+          if self.plusRock[1] <= self.pluBase:
+            self.plusRock[1] = self.pluBase/self.multi[1]
+  	
+        if self.notesHit[0]:
+          if self.rock[0] < self.rockMax:
+            self.plusRock[0] += self.pluGain*self.multi[0]
+            if self.plusRock[0] >self.battleMax:
+              self.plusRock[0] = self.battleMax
+            self.rock[0] += self.plusRock[0]*self.multi[0]
+            self.rock[1] -= self.plusRock[0]*self.multi[0]
+          if self.rock[1] <0:
+            self.rock[1]=0
+          if self.rock[0] >= self.rockMax:
+            self.rock[0] = self.rockMax
+          if self.minusRock[0] > self.minBase:
+            self.minusRock[0] -= self.minGain/2.0*self.multi[0]
+  
+        if self.notesHit[1]:
+          if self.rock[1] < self.rockMax:
+            self.plusRock[1] += self.pluGain*self.multi[1]
+            if self.plusRock[1] > self.battleMax:
+              self.plusRock[1] = self.battleMax
+            self.rock[1] += self.plusRock[1]*self.multi[1]
+            self.rock[0] -= self.plusRock[1]*self.multi[1]
+          if self.rock[0] <0:
+            self.rock[0]=0
+          if self.rock[1] >= self.rockMax:
+            self.rock[1] = self.rockMax
+          if self.minusRock[1] > self.minBase:
+            self.minusRock[1] -= self.minGain/2.0*self.multi[1]
+  
+        if self.lessMissed[0]: #QQstarS:Set [0] to [i]
+          self.guitars[0].spEnabled = False
+          self.guitars[0].spNote = False #QQstarS:new1
+          self.minusRock[0] += self.minGain/5.0/self.multi[0]
+          #self.rock[0] -= self.minusRock[0]/5.0/self.multi[0]
+          if self.plusRock[0] > self.pluBase:
+            self.plusRock[0] -= self.pluGain/2.5/self.multi[0]
+        if  self.numOfPlayers>1 and self.lessMissed[1]: #QQstarS:Set [0] to [i]
+          self.guitars[1].spEnabled = False
+          self.guitars[1].spNote = False #QQstarS:new1
+          self.minusRock[1] += self.minGain/5.0/self.multi[1]
+          #self.rock[1] -= self.minusRock[1]/5.0/self.multi[1]
+          if self.plusRock[1] > self.pluBase:
+            self.plusRock[1] -= self.pluGain/2.5/self.multi[1]
+      self.notesMissed[0] = False #QQstarS:Set [0] to [i]
+      self.notesMissed[1] = False #QQstarS:Set [0] to [i]
+      self.notesHit[0] = False #QQstarS:Set [0] to [i]
+      self.notesHit[1] = False #QQstarS:Set [0] to [i]
+      self.lessMissed[0] = False #QQstarS:Set [0] to [i]
+      self.lessMissed[1] = False #QQstarS:Set [0] to [i]
+
+      
       self.song.update(ticks)
       if self.countdown > 0 and not self.pause and not self.failed: #MFH won't start song playing if you failed or pause
         #for guitar in self.guitars:
@@ -1907,39 +2183,31 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.endPick(i)
 
       # missed some notes?
-      if guitar.getMissedNotesMFH(self.song, pos):
+      missedNotes = guitar.getMissedNotesMFH(self.song, pos)
+      if missedNotes:
         self.lessMissed[i] = True  #QQstarS:Set [0] to [i]
       
       if self.song:
-        #if self.playerList[i].streak != 0 and not guitar.playedNotes:
-        #if not guitar.playedNotes:    #MFH: we want to check even if streak == 0, so it'll catch the first missed note...
-        if (self.playerList[i].streak != 0 or not self.processedFirstNoteYet) and not guitar.playedNotes:
-          missedNotes = guitar.getMissedNotesMFH(self.song, pos)
-          if len(missedNotes) > 0:
-            if not self.processedFirstNoteYet:
-              self.stage.triggerMiss(pos)
-              self.notesMissed[i] = True
-            self.processedFirstNoteYet = True
-            self.playerList[i].streak = 0
-            guitar.setMultiplier(1)
-            guitar.hopoLast = -1
-            self.song.setInstrumentVolume(0.0, self.players[i].part)
-            self.guitarSoloBroken[i] = True
-
-            if self.hopoDebugDisp == 1:
-              missedNoteNums = [noat.number for time, noat in missedNotes]
-              Log.debug("Miss: run(), found missed note(s)... %s" % str(missedNoteNums) + ", Time left=" + str(self.timeLeft))
-
-            guitar.hopoActive = 0
-            guitar.wasLastNoteHopod = False
-            guitar.sameNoteHopoString = False
-            guitar.hopoProblemNoteNum = -1
-            #self.problemNotesP1 = []
-            #self.problemNotesP2 = []
-            
-        
-        
-        notes = self.guitars[i].getRequiredNotesMFH(self.song, pos)
+        if (self.playerList[i].streak != 0 or not self.processedFirstNoteYet) and not guitar.playedNotes and len(missedNotes) > 0:
+          if not self.processedFirstNoteYet:
+            self.stage.triggerMiss(pos)
+            self.notesMissed[i] = True
+          self.processedFirstNoteYet = True
+          self.playerList[i].streak = 0
+          guitar.setMultiplier(1)
+          guitar.hopoLast = -1
+          self.song.setInstrumentVolume(0.0, self.players[i].part)
+          self.guitarSoloBroken[i] = True
+          if self.hopoDebugDisp == 1:
+            missedNoteNums = [noat.number for time, noat in missedNotes]
+            Log.debug("Miss: run(), found missed note(s)... %s" % str(missedNoteNums) + ", Time left=" + str(self.timeLeft))
+          guitar.hopoActive = 0
+          guitar.wasLastNoteHopod = False
+          guitar.sameNoteHopoString = False
+          guitar.hopoProblemNoteNum = -1
+          #self.problemNotesP1 = []
+          #self.problemNotesP2 = []
+        #notes = self.guitars[i].getRequiredNotesMFH(self.song, pos)    #MFH - wtf was this doing here?  I must have left it by accident o.o
 
 
 
@@ -4070,277 +4338,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.lyricSheet.draw()  
       #the timing line on this lyric sheet image is approx. 1/4 over from the left
 
-    if self.guitars[0].starPowerActive == True: #QQstarS: Change the logical ways
-      self.multi[0] = 2
-    if self.numOfPlayers>1 and self.guitars[1].starPowerActive == True:
-      self.multi[1] = 2
-    if self.guitars[0].starPowerActive != True:
-      self.multi[0] = 1
-    if  self.numOfPlayers>1 and self.guitars[1].starPowerActive != True:
-      self.multi[1] = 1
-
-      #Faaa Drum sound
-    countdownSeconds = self.countdown / self.songBPS + 1
-
-    if self.TSoundEnabled < 2: #rockmeter decrease after countdown
-      #if not self.pause and not self.failed and (self.battle==False or self.numOfPlayers==1) and self.playerList[0].part.text == "Drums" and countdownSeconds <=1: 
-      if not self.pause and not self.failed and (self.battle==False or self.numOfPlayers==1) and self.guitars[0].isDrum and countdownSeconds <=1: 
-        if self.notesMissed[0]: 
-          self.guitars[0].spEnabled = False
-          self.guitars[0].spNote = False 
-          self.minusRock[0] += self.minGain/self.multi[0]
-          self.rock[0] -= self.minusRock[0]/self.multi[0]
-          if self.plusRock[0] > self.pluBase:
-            self.plusRock[0] -= self.pluGain*2.0/self.multi[0]
-          if self.plusRock[0] <= self.pluBase:
-            self.plusRock[0] = self.pluBase/self.multi[0]
-        #if self.numOfPlayers>1 and self.notesMissed[1] and self.Drumstart == True and self.playerList[1].part.text == "Drums" and countdownSeconds <=1: #QQstarS:Set [0] to [i]
-        if self.numOfPlayers>1 and self.notesMissed[1] and self.Drumstart == True and self.guitars[1].isDrum and countdownSeconds <=1:
-          self.guitars[1].spEnabled = False
-          self.guitars[1].spNote = False #QQstarS:new1
-          self.minusRock[1] += self.minGain/self.multi[1]
-          self.rock[1] -= self.minusRock[1]/self.multi[1]
-          if self.plusRock[1] > self.pluBase:
-            self.plusRock[1] -= self.pluGain*2.0/self.multi[1]
-          if self.plusRock[1] <= self.pluBase:
-            self.plusRock[1] = self.pluBase/self.multi[1]
-        if self.notesHit[0]:
-          if self.rock[0] < self.rockMax:
-            self.plusRock[0] += self.pluGain*self.multi[0]
-            self.rock[0] += self.plusRock[0]*self.multi[0]
-          if self.rock[0] >= self.rockMax:
-            self.rock[0] = self.rockMax
-          if self.minusRock[0] > self.minBase:
-            self.minusRock[0] -= self.minGain/2.0*self.multi[0]
-        if self.notesHit[1]:
-          if self.rock[1] < self.rockMax:
-            self.plusRock[1] += self.pluGain*self.multi[1]
-            self.rock[1] += self.plusRock[1]*self.multi[1]
-          if self.rock[1] >= self.rockMax:
-            self.rock[1] = self.rockMax
-          if self.minusRock[1] > self.minBase:
-            self.minusRock[1] -= self.minGain/2.0*self.multi[1]
-        if self.lessMissed[0]: #QQstarS:Set [0] to [i]
-          self.guitars[0].spEnabled = False
-          self.guitars[0].spNote = False #QQstarS:new1
-          self.minusRock[0] += self.minGain/5.0/self.multi[0]
-          self.rock[0] -= self.minusRock[0]/5.0/self.multi[0]
-          if self.plusRock[0] > self.pluBase:
-            self.plusRock[0] -= self.pluGain/2.5/self.multi[0]
-        if  self.numOfPlayers>1 and self.lessMissed[1]: #QQstarS:Set [0] to [i]
-          self.guitars[1].spEnabled = False
-          self.guitars[1].spNote = False #QQstarS:new1
-          self.minusRock[1] += self.minGain/5.0/self.multi[1]
-          self.rock[1] -= self.minusRock[1]/5.0/self.multi[1]
-          if self.plusRock[1] > self.pluBase:
-            self.plusRock[1] -= self.pluGain/2.5/self.multi[1]
-
-        if self.minusRock[1] <= self.minBase:
-          self.minusRock[1] = self.minBase
-        if self.plusRock[1] <= self.pluBase:
-          self.plusRock[1] = self.pluBase
-        if self.minusRock[0] <= self.minBase:
-          self.minusRock[0] = self.minBase
-        if self.plusRock[0] <= self.pluBase:
-          self.plusRock[0] = self.pluBase
-
-
-    if self.TSoundEnabled == 2: #rockmeter decrease after the first note
-      #if (self.lessMissed[0] == True or self.notesHit[0] == True) and self.playerList[0].part.text == "Drums":
-      if (self.lessMissed[0] == True or self.notesHit[0] == True) and self.guitars[0].isDrum:
-        self.Drumstart = True
-
-
-
-    #if not self.pause and not self.failed and (self.battle==False or self.numOfPlayers==1) and self.playerList[0].part.text == "Drums" and self.Drumstart == True: #QQstarS:new2 not bettle mode
-    if not self.pause and not self.failed and (self.battle==False or self.numOfPlayers==1) and self.guitars[0].isDrum and self.Drumstart == True: #QQstarS:new2 not bettle mode
-      if self.notesMissed[0]: #QQstarS:Set [0] to [i]
-        self.guitars[0].spEnabled = False
-        self.guitars[0].spNote = False #QQstarS:new1
-        self.minusRock[0] += self.minGain/self.multi[0]
-        self.rock[0] -= self.minusRock[0]/self.multi[0]
-        if self.plusRock[0] > self.pluBase:
-          self.plusRock[0] -= self.pluGain*2.0/self.multi[0]
-        if self.plusRock[0] <= self.pluBase:
-          self.plusRock[0] = self.pluBase/self.multi[0]
-      #if self.numOfPlayers>1 and self.notesMissed[1] and self.Drumstart == True and self.playerList[1].part.text == "Drums": #QQstarS:Set [0] to [i]
-      if self.numOfPlayers>1 and self.notesMissed[1] and self.Drumstart == True and self.guitars[1].isDrum: #QQstarS:Set [0] to [i]
-        self.guitars[1].spEnabled = False
-        self.guitars[1].spNote = False #QQstarS:new1
-        self.minusRock[1] += self.minGain/self.multi[1]
-        self.rock[1] -= self.minusRock[1]/self.multi[1]
-        if self.plusRock[1] > self.pluBase:
-          self.plusRock[1] -= self.pluGain*2.0/self.multi[1]
-        if self.plusRock[1] <= self.pluBase:
-          self.plusRock[1] = self.pluBase/self.multi[1]
-      if self.notesHit[0]:
-        if self.rock[0] < self.rockMax:
-          self.plusRock[0] += self.pluGain*self.multi[0]
-          self.rock[0] += self.plusRock[0]*self.multi[0]
-        if self.rock[0] >= self.rockMax:
-          self.rock[0] = self.rockMax
-        if self.minusRock[0] > self.minBase:
-          self.minusRock[0] -= self.minGain/2.0*self.multi[0]
-      if self.notesHit[1]:
-        if self.rock[1] < self.rockMax:
-          self.plusRock[1] += self.pluGain*self.multi[1]
-          self.rock[1] += self.plusRock[1]*self.multi[1]
-        if self.rock[1] >= self.rockMax:
-          self.rock[1] = self.rockMax
-        if self.minusRock[1] > self.minBase:
-          self.minusRock[1] -= self.minGain/2.0*self.multi[1]
-      if self.lessMissed[0]: #QQstarS:Set [0] to [i]
-        self.guitars[0].spEnabled = False
-        self.guitars[0].spNote = False #QQstarS:new1
-        self.minusRock[0] += self.minGain/5.0/self.multi[0]
-        self.rock[0] -= self.minusRock[0]/5.0/self.multi[0]
-        if self.plusRock[0] > self.pluBase:
-          self.plusRock[0] -= self.pluGain/2.5/self.multi[0]
-      if  self.numOfPlayers>1 and self.lessMissed[1]: #QQstarS:Set [0] to [i]
-        self.guitars[1].spEnabled = False
-        self.guitars[1].spNote = False #QQstarS:new1
-        self.minusRock[1] += self.minGain/5.0/self.multi[1]
-        self.rock[1] -= self.minusRock[1]/5.0/self.multi[1]
-        if self.plusRock[1] > self.pluBase:
-          self.plusRock[1] -= self.pluGain/2.5/self.multi[1]
-
-      if self.minusRock[1] <= self.minBase:
-        self.minusRock[1] = self.minBase
-      if self.plusRock[1] <= self.pluBase:
-        self.plusRock[1] = self.pluBase
-      if self.minusRock[0] <= self.minBase:
-        self.minusRock[0] = self.minBase
-      if self.plusRock[0] <= self.pluBase:
-        self.plusRock[0] = self.pluBase
-
-    #if not self.pause and not self.failed and (self.battle==False or self.numOfPlayers==1) and not self.playerList[0].part.text == "Drums": #QQstarS:new2 not bettle mode
-    if not self.pause and not self.failed and (self.battle==False or self.numOfPlayers==1) and not self.guitars[0].isDrum: #QQstarS:new2 not bettle mode
-      if self.notesMissed[0]: #QQstarS:Set [0] to [i]
-        self.guitars[0].spEnabled = False
-        self.guitars[0].spNote = False #QQstarS:new1
-        self.minusRock[0] += self.minGain/self.multi[0]
-        self.rock[0] -= self.minusRock[0]/self.multi[0]
-        if self.plusRock[0] > self.pluBase:
-          self.plusRock[0] -= self.pluGain*2.0/self.multi[0]
-        if self.plusRock[0] <= self.pluBase:
-          self.plusRock[0] = self.pluBase/self.multi[0]
-      #if self.numOfPlayers>1 and self.notesMissed[1] and not self.playerList[1].part.text == "Drums": #QQstarS:Set [0] to [i]
-      if self.numOfPlayers>1 and self.notesMissed[1] and not self.guitars[1].isDrum: #QQstarS:Set [0] to [i]
-        self.guitars[1].spEnabled = False
-        self.guitars[1].spNote = False #QQstarS:new1
-        self.minusRock[1] += self.minGain/self.multi[1]
-        self.rock[1] -= self.minusRock[1]/self.multi[1]
-        if self.plusRock[1] > self.pluBase:
-          self.plusRock[1] -= self.pluGain*2.0/self.multi[1]
-        if self.plusRock[1] <= self.pluBase:
-          self.plusRock[1] = self.pluBase/self.multi[1]
-      if self.notesHit[0]:
-        if self.rock[0] < self.rockMax:
-          self.plusRock[0] += self.pluGain*self.multi[0]
-          self.rock[0] += self.plusRock[0]*self.multi[0]
-        if self.rock[0] >= self.rockMax:
-          self.rock[0] = self.rockMax
-        if self.minusRock[0] > self.minBase:
-          self.minusRock[0] -= self.minGain/2.0*self.multi[0]
-      if self.notesHit[1]:
-        if self.rock[1] < self.rockMax:
-          self.plusRock[1] += self.pluGain*self.multi[1]
-          self.rock[1] += self.plusRock[1]*self.multi[1]
-        if self.rock[1] >= self.rockMax:
-          self.rock[1] = self.rockMax
-        if self.minusRock[1] > self.minBase:
-          self.minusRock[1] -= self.minGain/2.0*self.multi[1]
-      if self.lessMissed[0]: #QQstarS:Set [0] to [i]
-        self.guitars[0].spEnabled = False
-        self.guitars[0].spNote = False #QQstarS:new1
-        self.minusRock[0] += self.minGain/5.0/self.multi[0]
-        self.rock[0] -= self.minusRock[0]/5.0/self.multi[0]
-        if self.plusRock[0] > self.pluBase:
-          self.plusRock[0] -= self.pluGain/2.5/self.multi[0]
-      if  self.numOfPlayers>1 and self.lessMissed[1]: #QQstarS:Set [0] to [i]
-        self.guitars[1].spEnabled = False
-        self.guitars[1].spNote = False #QQstarS:new1
-        self.minusRock[1] += self.minGain/5.0/self.multi[1]
-        self.rock[1] -= self.minusRock[1]/5.0/self.multi[1]
-        if self.plusRock[1] > self.pluBase:
-          self.plusRock[1] -= self.pluGain/2.5/self.multi[1]
-
-      if self.minusRock[1] <= self.minBase:
-        self.minusRock[1] = self.minBase
-      if self.plusRock[1] <= self.pluBase:
-        self.plusRock[1] = self.pluBase
-      if self.minusRock[0] <= self.minBase:
-        self.minusRock[0] = self.minBase
-      if self.plusRock[0] <= self.pluBase:
-        self.plusRock[0] = self.pluBase
-    elif not self.pause and not self.failed and self.battle and self.numOfPlayers>1: #QQstarS:new2 Bettle mode
-      if self.notesMissed[0]: #QQstarS:Set [0] to [i]
-        self.guitars[0].spEnabled = False
-        self.guitars[0].spNote = False #QQstarS:new1
-        self.minusRock[0] += self.minGain/self.multi[0]
-        #self.rock[0] -= self.minusRock[0]/self.multi[0]
-        if self.plusRock[0] > self.pluBase:
-          self.plusRock[0] -= self.pluGain*2.0/self.multi[0]
-        if self.plusRock[0] <= self.pluBase:
-          self.plusRock[0] = self.pluBase/self.multi[0]
-      if  self.numOfPlayers>1 and self.notesMissed[1]: #QQstarS:Set [0] to [i]
-        self.guitars[1].spEnabled = False
-        self.guitars[1].spNote = False #QQstarS:new1
-        self.minusRock[1] += self.minGain/self.multi[1]
-        #self.rock[1] -= self.minusRock[1]/self.multi[1]
-        if self.plusRock[1] > self.pluBase:
-          self.plusRock[1] -= self.pluGain*2.0/self.multi[1]
-        if self.plusRock[1] <= self.pluBase:
-          self.plusRock[1] = self.pluBase/self.multi[1]
-	
-      if self.notesHit[0]:
-        if self.rock[0] < self.rockMax:
-          self.plusRock[0] += self.pluGain*self.multi[0]
-          if self.plusRock[0] >self.battleMax:
-            self.plusRock[0] = self.battleMax
-          self.rock[0] += self.plusRock[0]*self.multi[0]
-          self.rock[1] -= self.plusRock[0]*self.multi[0]
-        if self.rock[1] <0:
-          self.rock[1]=0
-        if self.rock[0] >= self.rockMax:
-          self.rock[0] = self.rockMax
-        if self.minusRock[0] > self.minBase:
-          self.minusRock[0] -= self.minGain/2.0*self.multi[0]
-
-      if self.notesHit[1]:
-        if self.rock[1] < self.rockMax:
-          self.plusRock[1] += self.pluGain*self.multi[1]
-          if self.plusRock[1] > self.battleMax:
-            self.plusRock[1] = self.battleMax
-          self.rock[1] += self.plusRock[1]*self.multi[1]
-          self.rock[0] -= self.plusRock[1]*self.multi[1]
-        if self.rock[0] <0:
-          self.rock[0]=0
-        if self.rock[1] >= self.rockMax:
-          self.rock[1] = self.rockMax
-        if self.minusRock[1] > self.minBase:
-          self.minusRock[1] -= self.minGain/2.0*self.multi[1]
-
-      if self.lessMissed[0]: #QQstarS:Set [0] to [i]
-        self.guitars[0].spEnabled = False
-        self.guitars[0].spNote = False #QQstarS:new1
-        self.minusRock[0] += self.minGain/5.0/self.multi[0]
-        #self.rock[0] -= self.minusRock[0]/5.0/self.multi[0]
-        if self.plusRock[0] > self.pluBase:
-          self.plusRock[0] -= self.pluGain/2.5/self.multi[0]
-      if  self.numOfPlayers>1 and self.lessMissed[1]: #QQstarS:Set [0] to [i]
-        self.guitars[1].spEnabled = False
-        self.guitars[1].spNote = False #QQstarS:new1
-        self.minusRock[1] += self.minGain/5.0/self.multi[1]
-        #self.rock[1] -= self.minusRock[1]/5.0/self.multi[1]
-        if self.plusRock[1] > self.pluBase:
-          self.plusRock[1] -= self.pluGain/2.5/self.multi[1]
-    self.notesMissed[0] = False #QQstarS:Set [0] to [i]
-    self.notesMissed[1] = False #QQstarS:Set [0] to [i]
-    self.notesHit[0] = False #QQstarS:Set [0] to [i]
-    self.notesHit[1] = False #QQstarS:Set [0] to [i]
-    self.lessMissed[0] = False #QQstarS:Set [0] to [i]
-    self.lessMissed[1] = False #QQstarS:Set [0] to [i]
     
     SceneClient.render(self, visibility, topMost)
     
@@ -4401,14 +4398,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
       # show countdown
       # glorandwarf: fixed the countdown timer
-      if countdownSeconds > 1:
-        Theme.setBaseColor(min(1.0, 3.0 - abs(4.0 - countdownSeconds)))
+      if self.countdownSeconds > 1:
+        Theme.setBaseColor(min(1.0, 3.0 - abs(4.0 - self.countdownSeconds)))
         text = _("Get Ready to Rock")
         w, h = font.getStringSize(text)
         font.render(text,  (.5 - w / 2, .3))
-        if countdownSeconds < 6:
-          scale = 0.002 + 0.0005 * (countdownSeconds % 1) ** 3
-          text = "%d" % (countdownSeconds)
+        if self.countdownSeconds < 6:
+          scale = 0.002 + 0.0005 * (self.countdownSeconds % 1) ** 3
+          text = "%d" % (self.countdownSeconds)
           w, h = bigFont.getStringSize(text, scale = scale)
           Theme.setBaseColor()
           bigFont.render(text,  (.5 - w / 2, .45 - h / 2), scale = scale)
