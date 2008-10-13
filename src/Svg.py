@@ -535,7 +535,7 @@ class ImgDrawing:
     # Detect the type of data passed in
     if type(ImgData) == str:
       # Check whether we have a cached bitmap version
-      if ImgData.endswith(".png") or ImgData.endswith(".PNG"):
+      if ImgData.lower().endswith(".png"): # evilynux - Support mixed-cased extensions
         self.texture = Texture(ImgData)
       else:
         self.ImgData = open(ImgData).read()
