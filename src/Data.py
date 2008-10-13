@@ -148,8 +148,8 @@ class Data(object):
     font8     = lambda: Font(songListFont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False) #MFH
     font9     = lambda: Font(shadowfont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False, shadow = True) #MFH
 
-    resource.load(self, "font",         font1, onLoad = self.customizeFont)
-    resource.load(self, "bigFont",      font2, onLoad = self.customizeFont)
+    resource.load(self, "font",         font1, onLoad = self.customizeFont, synch = True)
+    resource.load(self, "bigFont",      font2, onLoad = self.customizeFont, synch = True)
 
 
     #MFH - seems like these should be up here...
@@ -183,32 +183,32 @@ class Data(object):
     if self.theme == 0:
       font1     = lambda: Font(menuFont,  fontSize[2], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly)
       font2     = lambda: Font(menuFont,  fontSize[2], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, outline = False)
-      resource.load(self, "lfont",         font2, onLoad = self.customizeFont)
-      resource.load(self, "font",          font1, onLoad = self.customizeFont)
-      resource.load(self, "pauseFont",     font3, onLoad = self.customizeFont)
-      resource.load(self, "scoreFont",     font4, onLoad = self.customizeFont)
-      resource.load(self, "streakFont",    font5, onLoad = self.customizeFont)
-      resource.load(self, "songFont",      font7, onLoad = self.customizeFont)
+      resource.load(self, "lfont",         font2, onLoad = self.customizeFont, synch = True)
+      resource.load(self, "font",          font1, onLoad = self.customizeFont, synch = True)
+      resource.load(self, "pauseFont",     font3, onLoad = self.customizeFont, synch = True)
+      resource.load(self, "scoreFont",     font4, onLoad = self.customizeFont, synch = True)
+      resource.load(self, "streakFont",    font5, onLoad = self.customizeFont, synch = True)
+      resource.load(self, "songFont",      font7, onLoad = self.customizeFont, synch = True)
     elif self.theme == 1:
       font1     = lambda: Font(menuFont,  fontSize[3], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly)
       font2     = lambda: Font(menuFont,  fontSize[3], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, outline = False)
-      resource.load(self, "lfont",         font2, onLoad = self.customizeFont)
-      resource.load(self, "font",          font1, onLoad = self.customizeFont)
-      resource.load(self, "pauseFont",     font3, onLoad = self.customizeFont)
-      resource.load(self, "scoreFont",     font4, onLoad = self.customizeFont)
-      resource.load(self, "streakFont",    font5, onLoad = self.customizeFont)
-      resource.load(self, "songFont",      font7, onLoad = self.customizeFont)
+      resource.load(self, "lfont",         font2, onLoad = self.customizeFont, synch = True)
+      resource.load(self, "font",          font1, onLoad = self.customizeFont, synch = True)
+      resource.load(self, "pauseFont",     font3, onLoad = self.customizeFont, synch = True)
+      resource.load(self, "scoreFont",     font4, onLoad = self.customizeFont, synch = True)
+      resource.load(self, "streakFont",    font5, onLoad = self.customizeFont, synch = True)
+      resource.load(self, "songFont",      font7, onLoad = self.customizeFont, synch = True)
     elif self.theme == 2:
       font1     = lambda: Font(menuFont,  fontSize[4], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, outline = False)
-      resource.load(self, "font",          font1, onLoad = self.customizeFont)
-      resource.load(self, "pauseFont",     font3, onLoad = self.customizeFont)
-      resource.load(self, "scoreFont",     font4, onLoad = self.customizeFont)
-      resource.load(self, "streakFont",    font5, onLoad = self.customizeFont)
-      resource.load(self, "songFont",      font7, onLoad = self.customizeFont)
+      resource.load(self, "font",          font1, onLoad = self.customizeFont, synch = True)
+      resource.load(self, "pauseFont",     font3, onLoad = self.customizeFont, synch = True)
+      resource.load(self, "scoreFont",     font4, onLoad = self.customizeFont, synch = True)
+      resource.load(self, "streakFont",    font5, onLoad = self.customizeFont, synch = True)
+      resource.load(self, "songFont",      font7, onLoad = self.customizeFont, synch = True)
 
-    resource.load(self, "songListFont",      font8, onLoad = self.customizeFont)
-    resource.load(self, "shadowfont",      font9, onLoad = self.customizeFont)
-    resource.load(self, "loadingFont",    font6, onLoad = self.customizeFont)
+    resource.load(self, "songListFont",      font8, onLoad = self.customizeFont, synch = True)
+    resource.load(self, "shadowfont",      font9, onLoad = self.customizeFont, synch = True)
+    resource.load(self, "loadingFont",    font6, onLoad = self.customizeFont, synch = True)
 
 
     if self.fileExists(os.path.join("themes",themename,"sounds","starding.ogg")):
