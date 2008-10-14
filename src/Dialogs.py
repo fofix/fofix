@@ -690,9 +690,12 @@ class SongChooser(Layer, KeyListener):
   def loadCollection(self):
     Log.debug("Dialogs.loadCollection() function call...")
     self.loaded = False
+    #showLoadingScreen(self.engine, lambda: self.loaded, text = _("Browsing Collection..."))
+    self.splash = showLoadingSplashScreen(self.engine, _("Browsing Collection..."))
+    
     self.engine.resource.load(self, "libraries", lambda: Song.getAvailableLibraries(self.engine, self.library), onLoad = self.libraryListLoaded, synch = True) # evilynux - Less BlackSOD[?]
 
-    showLoadingScreen(self.engine, lambda: self.loaded, text = _("Browsing Collection..."))
+    #showLoadingScreen(self.engine, lambda: self.loaded, text = _("Browsing Collection..."))
 
     
 
@@ -834,6 +837,10 @@ class SongChooser(Layer, KeyListener):
     # Load labels for libraries right away
     #if self.items != []:
       self.updateSelection()
+
+    hideLoadingSplashScreen(self.engine, self.splash)
+    self.splash = None
+
     
   def shown(self):
     self.engine.input.addKeyListener(self, priority = True)
@@ -926,7 +933,6 @@ class SongChooser(Layer, KeyListener):
             else:
               break  
           self.engine.view.pushLayer(self)
-        
         
     elif c in Player.CANCELS + Player.KEY2S or (c in Player.DRUM1S and self.drumNav):
       #if not self.song:

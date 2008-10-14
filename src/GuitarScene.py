@@ -77,6 +77,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     Log.debug("GuitarSceneClient init...")
     
+    splash = Dialogs.showLoadingSplashScreen(self.engine, _("Preparing...") ) 
+    
     #MFH - retrieve game parameters:
     self.gamePlayers = self.engine.config.get("game", "players")
     self.gameMode1p = self.engine.config.get("player0","mode_1p")
@@ -365,6 +367,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         KillKeyCode[1] = self.controls.getReverseMapping(Player.PLAYER_2_KILL)
         self.isKillAnalog[1], self.whichJoy[1], self.whichAxis[1] = self.engine.input.getWhammyAxis(KillKeyCode[1])
 
+    #MFH - this is where song loading originally took place, and the loading screen was spawned.
     self.engine.resource.load(self, "song", lambda: loadSong(self.engine, songName, library = libraryName, part = [player.part for player in self.playerList], practiceMode = self.playerList[0].practiceMode), synch = True, onLoad = self.songLoaded)
 
     #myfingershurt: new loading place for "loading" screen for song preparation:
@@ -385,6 +388,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         else:
           phrase = "Jurgen is watching"
     # glorandwarf: show the loading splash screen and load the song synchronously
+    Dialogs.hideLoadingSplashScreen(self.engine, splash)
     splash = Dialogs.showLoadingSplashScreen(self.engine, phrase)
 
 
@@ -4553,9 +4557,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     if self.boardY <= 1:
       self.boardY == 1
+      self.setCamera()
     elif self.boardY > 1:
       self.boardY -= 0.01
-    self.setCamera()
+      self.setCamera()
+    #self.setCamera()
 
     #Theme.setBaseColor()
 
