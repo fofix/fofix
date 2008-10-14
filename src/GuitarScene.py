@@ -276,15 +276,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.drumMisses == 0
 
 
-    #myfingershurt
+    #MFH - constant definitions, ini value retrievals
     self.digitalKillswitchStarpowerChunkSize = 0.05
     self.analogKillswitchStarpowerChunkSize = 0.10
     self.rbOverdriveBarGlowFadeInChunk = .07     #this amount added to visibility every run() cycle when fading in - original .2
     self.rbOverdriveBarGlowFadeOutChunk = .03   #this amount subtracted from visibility every run() cycle when fading out - original .07
     self.maxDisplayTextScale = 0.0024       #orig 0.0024
-    self.displayTextScaleStep2 = 0.00004    #orig 0.00008
-    self.displayTextScaleStep1 = 0.00005     #orig 0.0001
-    self.textTimeToDisplay = 175
+    self.displayTextScaleStep2 = 0.00008    #orig 0.00008
+    self.displayTextScaleStep1 = 0.0001     #orig 0.0001
+    self.textTimeToDisplay = 100
     self.lyricMode = self.engine.config.get("game", "lyric_mode")
     self.scriptLyricPos = self.engine.config.get("game", "script_lyric_pos")
     self.starClaps = self.engine.config.get("game", "star_claps")
@@ -297,8 +297,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.showUnusedTextEvents = self.engine.config.get("game", "show_unused_text_events")
     self.bassKickSoundEnabled = self.engine.config.get("game", "bass_kick_sound")
     self.gameTimeMode = self.engine.config.get("game", "game_time")
-    self.midiLyricsEnabled = self.engine.config.get("game", "midi_lyrics")
-    self.midiSectionsEnabled = self.engine.config.get("game", "midi_sections") #MFH
+    self.midiLyricsEnabled = self.engine.config.get("game", "rb_midi_lyrics")
+    self.midiSectionsEnabled = self.engine.config.get("game", "rb_midi_sections") #MFH
+    if self.numOfPlayers > 1 and self.midiLyricsEnabled == 1:
+      self.midiLyricsEnabled = 0
+    if self.numOfPlayers > 1 and self.midiSectionsEnabled == 1:
+      self.midiSectionsEnabled = 0
     self.readTextAndLyricEvents = self.engine.config.get("game","rock_band_events")
     self.hopoDebugDisp = self.engine.config.get("game","hopo_debug_disp")
     if self.hopoDebugDisp == 1:
@@ -653,7 +657,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     #lyric sheet!
     if self.readTextAndLyricEvents == 2 or (self.readTextAndLyricEvents == 1 and self.theme == 2):
-      if self.song.hasMidiLyrics and self.midiLyricsEnabled:
+      if self.song.hasMidiLyrics and self.midiLyricsEnabled > 0:
         try:
           self.engine.loadImgDrawing(self, "lyricSheet", os.path.join("themes",themename,"lyricsheet.png"))
         except IOError:
@@ -1728,11 +1732,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.lastStreak[i] = playerStreak
   
       if playerStreak == 50 and textChanged:
-        self.displayText[i] = _("50 Note Streak!!!") #kk69: more GH3-like
+        #self.displayText[i] = _("50 Note Streak!!!") #kk69: more GH3-like
+        self.newScalingText(i, _("50 Note Streak!!!") )
         #self.streakFlag = "%d" % (i)   #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1. 
       #MFH - I think a simple integer modulo would be more efficient here: 
       if (playerStreak % 100 == 0) and playerStreak > 50 and textChanged:
-        self.displayText[i] = _("%d Note Streak!!!") % playerStreak #kk69: more GH3-like
+        #self.displayText[i] = _("%d Note Streak!!!") % playerStreak #kk69: more GH3-like
+        self.newScalingText(i, _("%d Note Streak!!!") % playerStreak )
         #self.streakFlag = "%d" % (i)  #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1.
   
       if self.scaleText[i] >= self.maxDisplayTextScale:
@@ -1764,6 +1770,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.textY[i] = .3
         self.scaleText2[i] = 0.0
         self.goingUP[i] = False
+
+
+  def newScalingText(self, playerNum, text):
+    i = playerNum
+    self.scaleText[i] = 0
+    self.textTimer[i] = 0
+    self.textY[i] = .3
+    self.scaleText2[i] = 0.0
+    self.goingUP[i] = False
+    self.displayText[i] = text
 
 
   def handleJurgen(self, pos):
@@ -2036,10 +2052,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.guitars[i].starPowerGained = False  #QQstarS:Set [0] to [i]
           if self.phrases == True and self.guitars[i].starPower >= 50:  #QQstarS:Set [0] to [i]
             if self.theme == 0 or self.theme == 1:
-              self.displayText[i] = _("Star Power Ready") #kk69: more GH3-like
+              #self.displayText[i] = _("Star Power Ready") #kk69: more GH3-like
+              self.newScalingText(i, _("Star Power Ready") )
               #self.streakFlag = "%d" % (i)  #QQstarS:Set  the flag
             elif self.theme == 2:
-              self.displayText[i] = _("Overdrive Ready") #kk69: more GH3-like, even though it's RB (just for people who use phrases on RB theme)
+              #self.displayText[i] = _("Overdrive Ready") #kk69: more GH3-like, even though it's RB (just for people who use phrases on RB theme)
+              self.newScalingText(i, _("Overdrive Ready") )
               #self.streakFlag = "%d" % (i) #QQstarS:Set the flag
 
       # update board
@@ -2173,7 +2191,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         #battle failing
         if self.battle and self.numOfPlayers>1:
           if self.rock[i] <= 0:
-            self.displayText[i] = "You Failed!!!!"
+            #self.displayText[i] = "You Failed!!!!"
+            self.newScalingText(i, _("You Failed!!!!") )
             #self.streakFlag = str(i)   #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1. 
           self.guitars[i].actions = [0,0,0]
 
@@ -4583,7 +4602,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         lyricSlop = ( self.guitars[0].currentPeriod / ((maxPos - minPos)/2) ) / 2
   
         #handle the sections track
-        if self.midiSectionsEnabled == 1: 
+        if self.midiSectionsEnabled > 0: 
           for time, event in self.song.eventTracks[Song.TK_SECTIONS].getEvents(minPos, maxPos):
             if self.theme == 2:
               #xOffset = 0.5
@@ -4615,7 +4634,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
   
         #handle the lyrics track
-        if self.midiLyricsEnabled:
+        if self.midiLyricsEnabled > 0:
           for time, event in self.song.eventTracks[Song.TK_LYRICS].getEvents(minPos, maxPos):
             if self.theme == 2:
               #xOffset = 0.5
@@ -6475,7 +6494,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                         self.currentGuitarSoloTotalNotes[i] = self.guitarSolos[i][self.currentGuitarSolo[i]]
                         self.guitarSoloBroken[i] = False
                         self.guitars[i].guitarSolo = True
-                        self.displayText[i] = _("Guitar Solo!")
+                        #self.displayText[i] = _("Guitar Solo!")
+                        self.newScalingText(i, _("Guitar Solo!") )
                         #self.sfxChannel.setVolume(self.sfxVolume)
                         self.engine.data.crowdSound.play()
                   else:

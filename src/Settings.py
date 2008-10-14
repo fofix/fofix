@@ -191,8 +191,8 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "game", "party_time", autoApply = True),
       ConfigChoice(engine.config, "game", "lyric_mode", autoApply = True),      #myfingershurt
       ConfigChoice(engine.config, "game", "script_lyric_pos", autoApply = True),      #myfingershurt
-      ConfigChoice(engine.config, "game", "midi_lyrics", autoApply = True),      #myfingershurt
-      ConfigChoice(engine.config, "game", "midi_sections", autoApply = True),      #myfingershurt
+      ConfigChoice(engine.config, "game", "rb_midi_lyrics", autoApply = True),      #myfingershurt
+      ConfigChoice(engine.config, "game", "rb_midi_sections", autoApply = True),      #myfingershurt
       ConfigChoice(engine.config, "coffee", "failingEnabled", autoApply = True),
       ConfigChoice(engine.config, "game", "star_scoring", autoApply = True),#myfingershurt
       ConfigChoice(engine.config, "game", "congrats", autoApply = True),#blazingamer
