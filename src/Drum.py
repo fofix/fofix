@@ -74,6 +74,8 @@ class Drum:
     self.sameNoteHopoString = False
     self.hopoProblemNoteNum = -1
 
+    self.cappedScoreMult = 0
+
     self.tempoBpm = 120   #MFH - default is NEEDED here...
     
     self.beatsPerBoard  = 5.0

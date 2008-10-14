@@ -65,6 +65,8 @@ class Guitar:
     self.guitarSolo = False
     self.currentGuitarSoloHitNotes = 0
 
+    self.cappedScoreMult = 0
+
     self.tempoBpm = 120   #MFH - default is NEEDED here...
     
     Log.debug("Guitar class init...")
@@ -1802,7 +1804,8 @@ class Guitar:
           
           #myfingershurt: need to cap flameSizes use of scoreMultiplier to 4x, the 5x and 6x bass groove mults cause crash:
           if self.scoreMultiplier > 4:
-            cappedScoreMult = 4
+            #cappedScoreMult = 4
+            self.cappedScoreMult = 4
           else:
             self.cappedScoreMult = self.scoreMultiplier
           

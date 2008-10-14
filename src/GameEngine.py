@@ -168,8 +168,8 @@ Config.define("game", "decimal_places",      int, 1,  text = _("Decimal Places")
 Config.define("game", "star_scoring",       int, 3,     text = _("Star Scoring"), options = {0: _("FoF"), 1: _("GH"), 2: _("RB"), 3: _("RB+GH")})#MFH
 Config.define("game", "gsolo_acc_pos",       int, 3,     text = _("GtrSolo Pos."), options = {0: _("Right"), 1: _("Center"), 2: _("Left"), 3: _("Rock Band")})#MFH,(racer: added RB)
 Config.define("game", "bass_groove_enable",       int, 1,     text = _("Bass Groove"), options = {0: _("Off"), 1: _("RB Only"), 2: _("On")}) #MFH
-Config.define("game", "T_sound",      int, 0,  text = _("Drums sound"), options = {0: _("Off"), 1: _("On Countdown"), 2: _("On First note")} ) #Faaa Drum sound
-Config.define("game", "game_time",       int, 1,     text = _("Game Time"), options = {0: _("Off"), 1: _("Countdown")}) #MFH
+Config.define("game", "T_sound",      int, 2,  text = _("Drum Misses"), options = {0: _("Always"), 1: _("Song Start"), 2: _("First Note")} ) #Faaa Drum sound
+Config.define("game", "game_time",       int, 1,     text = _("Game Time"), options = {0: _("Off"), 1: _("Countdown"), 2: _("Elapsed")}) #MFH
 Config.define("game", "gfx_version_tag",       int, 1,     text = _("GfxVersionTag"), options = {0: _("Off"), 1: _("On")}) #MFH
 Config.define("game", "p2_menu_nav",       int, 1,     text = _("P2 Menu Navigate"), options = {0: _("Off"), 1: _("On")}) #MFH
 Config.define("game", "in_game_font_shadowing",      bool, False,  text = _("In-Game Font Shadow"), options = {False: _("Off"), True: _("On")})
