@@ -196,15 +196,11 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "coffee", "failingEnabled", autoApply = True),
       ConfigChoice(engine.config, "game", "star_scoring", autoApply = True),#myfingershurt
       ConfigChoice(engine.config, "game", "congrats", autoApply = True),#blazingamer
-      ConfigChoice(engine.config, "game", "kill_debug", autoApply = True),#myfingershurt
       ConfigChoice(engine.config, "game", "jurgdef", autoApply = True),#Spikehead777
       ConfigChoice(engine.config, "game", "jurgtype", autoApply = True),#Spikehead777
       ConfigChoice(engine.config, "game", "jurglogic", autoApply = True),#MFH
       ConfigChoice(engine.config, "game", "bass_groove_enable", autoApply = True),#myfingershurt
-      ConfigChoice(engine.config, "game", "show_unused_text_events", autoApply = True),#myfingershurt
-      ConfigChoice(engine.config, "game", "hopo_debug_disp", autoApply = True),#myfingershurt
       ConfigChoice(engine.config, "game", "lphrases", autoApply = True),#blazingamer
-      ConfigChoice(engine.config, "game", "p2_menu_nav", autoApply = True),#myfingershurt
       ConfigChoice(engine.config, "game", "whammy_saves_starpower", autoApply = True),#myfingershurt
     ]
     gameSettingsMenu = Menu.Menu(engine, gameSettings + applyItem)
@@ -322,6 +318,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "player1",  "two_chord_max", autoApply = True), #QQstarS
       ConfigChoice(engine.config, "player1",  "leftymode", autoApply = True), #QQstarS
       ConfigChoice(engine.config, "game", "drum_navigation", autoApply = True),#myfingershurt
+      ConfigChoice(engine.config, "game", "p2_menu_nav", autoApply = True),#myfingershurt
     ]
     keySettingsMenu = Menu.Menu(engine, keySettings + applyItem)
     
@@ -433,10 +430,19 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "game", "rbnote", autoApply = True), #racer
       ConfigChoice(engine.config, "game", "in_game_stars", autoApply = True),#myfingershurt
       ConfigChoice(engine.config, "game", "partial_stars", autoApply = True),#myfingershurt
-      ConfigChoice(engine.config, "game", "rock_band_events", autoApply = True),#myfingershurt
       ConfigChoice(engine.config, "game", "sp_notes_while_active", autoApply = True),   #myfingershurt - setting for gaining more SP while active
     ]
     themeSettingsMenu = Menu.Menu(engine, themeSettings + applyItem)
+
+
+    #MFH - new menu
+    debugSettings = [
+      ConfigChoice(engine.config, "game", "kill_debug", autoApply = True),#myfingershurt
+      ConfigChoice(engine.config, "game", "hopo_debug_disp", autoApply = True),#myfingershurt
+      ConfigChoice(engine.config, "game", "rock_band_events", autoApply = True),#myfingershurt
+      ConfigChoice(engine.config, "game", "show_unused_text_events", autoApply = True),#myfingershurt
+    ]
+    debugSettingsMenu = Menu.Menu(engine, debugSettings)
 
 
     settings = [
@@ -449,6 +455,7 @@ class SettingsMenu(Menu.Menu):
       (_("Performance Settings"), perfSettingsMenu),
       (_("Song List Settings"),   listSettingsMenu),
       (_("Mod settings"), modSettings),
+      (_("Debug Settings"),   debugSettingsMenu),
       (_("Choose Neck >"), lambda: Dialogs.chooseNeck(engine,prompt=_("Yellow (#3) / Blue (#4) to change:"))),
       (_("Credits"), lambda: Dialogs.showCredits(engine)) # evilynux - Show Credits!
     ]
