@@ -66,6 +66,7 @@ class Guitar:
     self.currentGuitarSoloHitNotes = 0
 
     self.cappedScoreMult = 0
+    self.starSpinFrameIndex = 0
 
     self.tempoBpm = 120   #MFH - default is NEEDED here...
     
@@ -1099,19 +1100,10 @@ class Guitar:
           size = (self.boardWidth/self.strings/2, self.boardWidth/self.strings/2)
           texSize = (fret/5.0,fret/5.0+0.2)
           if spNote == True:
-            spIndex = 0
-            self.indexCount = self.indexCount + 1
-
-            if self.indexCount > self.Animspeed-1:
-              self.indexCount = 0
-            spIndex = (self.indexCount * 16 - (self.indexCount * 16) % self.Animspeed) / self.Animspeed
-
-            if spIndex > 15:
-              spIndex = 0
             if isTappable:
-              texY = (0.9-spIndex*0.05, 0.925-spIndex*0.05)
+              texY = (0.9-self.starSpinFrameIndex*0.05, 0.925-self.starSpinFrameIndex*0.05)
             else:
-              texY = (0.875-spIndex*0.05, 0.9-spIndex*0.05)
+              texY = (0.875-self.starSpinFrameIndex*0.05, 0.9-self.starSpinFrameIndex*0.05)
           else:
             if isTappable:
               texY = (0.025,0.05)
@@ -2801,6 +2793,16 @@ class Guitar:
 
   def run(self, ticks, pos, controls):
     self.time += ticks
+    
+    #MFH - Determine which frame to display for starpower notes
+    if self.starspin:
+      self.indexCount = self.indexCount + 1
+      if self.indexCount > self.Animspeed-1:
+        self.indexCount = 0
+      self.starSpinFrameIndex = (self.indexCount * 16 - (self.indexCount * 16) % self.Animspeed) / self.Animspeed
+      if self.starSpinFrameIndex > 15:
+        self.starSpinFrameIndex = 0
+    
     #myfingershurt: must not decrease SP if paused.
     if self.starPowerActive == True and self.paused == False:
       self.starPower -= ticks/200.0
@@ -2809,7 +2811,7 @@ class Guitar:
         self.starPowerActive = False
         #MFH - TODO - add call to play star power deactivation sound, if it exists (if not play nothing)
         if self.engine.data.starDeActivateSoundFound:
-          self.engine.data.starDeActivateSound.setVolume(self.sfxVolume)
+          #self.engine.data.starDeActivateSound.setVolume(self.sfxVolume)
           self.engine.data.starDeActivateSound.play()
 
     

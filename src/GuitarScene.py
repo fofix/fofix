@@ -1438,6 +1438,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.avMult = [0.0 for i in self.playerList]
     self.lastStars = [0 for i in self.playerList]
     #self.stars = [0,0]
+    self.dispAccuracy = [False for i in self.playerList]
     for thePlayer in self.playerList:   
       thePlayer.stars = 0
     self.partialStar = [0 for i in self.playerList]
@@ -1465,6 +1466,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.rockTimer = 0  #myfingershurt
     self.youRock = False    #myfingershurt
     self.rockFinished = False    #myfingershurt
+    ###Capo###
+    if self.song:
+      self.beatTime = []
+      if (self.starClaps or self.beatClaps):
+        for time, event in self.song.track[0].getAllEvents():
+          if isinstance(event, Bars):
+            if (event.barType == 1 or event.barType == 2):
+              self.beatTime.append(time)
+    ###endCapo###
   
 
   def restartSong(self, firstTime = False):  #QQstarS: Fix this function
@@ -1541,24 +1551,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.lastEvent = round(self.lastEvent / 1000) * 1000
     #self.notesCum = 0
     self.noteLastTime = 0
-
-
-    ###Capo###
-    self.beatTime = []
-    if self.starClaps:
-      for time, event in self.song.track[0].getAllEvents():
-        if isinstance(event, Bars):
-          if (event.barType == 1 or event.barType == 2):
-            self.beatTime.append(time)
-    ###endCapo###
-
-#racer
-    self.beatTime = []
-    if self.beatClaps:
-      for time, event in self.song.track[0].getAllEvents():
-        if isinstance(event, Bars):
-          if (event.barType == 1 or event.barType == 2):
-            self.beatTime.append(time)
             
   def restartAfterFail(self):  #QQstarS: Fix this function
     self.resetVariablesToDefaults()
@@ -1626,25 +1618,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.lastEvent = round(self.lastEvent / 1000) * 1000
     #self.notesCum = 0
     self.noteLastTime = 0
-
-
-    ###Capo###
-    self.beatTime = []
-    if self.starClaps:
-      for time, event in self.song.track[0].getAllEvents():
-        if isinstance(event, Bars):
-          if (event.barType == 1 or event.barType == 2):
-            self.beatTime.append(time)
-    ###endCapo###
-
- #racer
-    self.beatTime = []
-    if self.beatClaps:
-      for time, event in self.song.track[0].getAllEvents():
-        if isinstance(event, Bars):
-          if (event.barType == 1 or event.barType == 2):
-            self.beatTime.append(time)
-        
 
   def handleWhammy(self, playerNum):
     i = playerNum
@@ -1735,15 +1708,18 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         textChanged = False
       self.lastStreak[i] = playerStreak
   
-      if playerStreak == 50 and textChanged:
+      if (playerStreak == 50 or (self.lastStreak[i] < 50 and playerStreak > 50) ) and textChanged:
         #self.displayText[i] = _("50 Note Streak!!!") #kk69: more GH3-like
         self.newScalingText(i, _("50 Note Streak!!!") )
         #self.streakFlag = "%d" % (i)   #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1. 
       #MFH - I think a simple integer modulo would be more efficient here: 
-      if (playerStreak % 100 == 0) and playerStreak > 50 and textChanged:
-        #self.displayText[i] = _("%d Note Streak!!!") % playerStreak #kk69: more GH3-like
-        self.newScalingText(i, _("%d Note Streak!!!") % playerStreak )
-        #self.streakFlag = "%d" % (i)  #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1.
+      else:
+        streakModulo = playerStreak % 100
+        if ( (streakModulo == 0) or (self.lastStreak[i] % 100 > streakModulo) ) and playerStreak > 50 and textChanged:
+          #self.displayText[i] = _("%d Note Streak!!!") % playerStreak #kk69: more GH3-like
+          #self.newScalingText(i, _("%d Note Streak!!!") % playerStreak )
+          self.newScalingText(i, _("%d Note Streak!!!") % (playerStreak - streakModulo) )
+          #self.streakFlag = "%d" % (i)  #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1.
   
       if self.scaleText[i] >= self.maxDisplayTextScale:
         self.dislayTextScale[i] = self.scaleText[i] + self.scaleText2[i]
@@ -2097,18 +2073,19 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
       #if not self.pause and not self.failed:
       #myfingershurt: Capo's starpower claps on a user setting:
-      if self.starClaps and self.song and len(self.beatTime) > 0 or (self.beatClaps and self.song and len(self.beatTime) > 0):
+      #if self.starClaps and self.song and len(self.beatTime) > 0 or (self.beatClaps and self.song and len(self.beatTime) > 0):
+      if (self.starClaps or self.beatClaps) and len(self.beatTime) > 0:
         ###Capo###
         #Play a sound on each beat on starpower
         clap = False
-        for i,player in enumerate(self.playerList):
-          if self.guitars[i].starPowerActive == True or self.playerList[0].practiceMode: #racer: practice beat claps
-            clap = True
-            break
-  
-        pos = self.getSongPosition()
-  
-  
+        if self.playerList[0].practiceMode and self.beatClaps:
+          clap = True
+        else:
+          for i,player in enumerate(self.playerList):
+            if self.guitars[i].starPowerActive == True:
+              clap = True
+              break
+        #pos = self.getSongPosition()
         if pos >= (self.beatTime[0] - 100):
           self.beatTime.pop(0)
           if clap == True:
@@ -6041,6 +6018,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 if self.rockTimer == 1:
                   #self.sfxChannel.setVolume(self.sfxVolume)
                   self.engine.data.rockSound.play()
+                  for num, thePlayer in enumerate(self.playerList):   #MFH - flash overdrive strings in RB theme
+                    self.guitars[num].overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
+                    self.guitars[num].ocount = 0  #MFH - this triggers the oFlash strings & timer
                 if self.rockTimer < self.rockCountdown:
                   self.rockTimer += 1
                   self.rockMsg.transform.reset()
@@ -6511,7 +6491,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                         #self.sfxChannel.setVolume(self.sfxVolume)    #liquid
                         self.guitarSoloAccuracy[i] = (float(self.guitars[i].currentGuitarSoloHitNotes) / float(self.currentGuitarSoloTotalNotes[i]) ) * 100.0
                         if not self.guitarSoloBroken[i]:    #backup perfect solo detection
-                          self.guitarSoloAccuracy[i] = 100.0
+                          if self.guitars[i].currentGuitarSoloHitNotes > 0: #MFH - need to make sure someone didn't just not play a guitar solo at all - and still wind up with 100%
+                            self.guitarSoloAccuracy[i] = 100.0
                         if self.guitarSoloAccuracy[i] > 100.0:
                           self.guitarSoloAccuracy[i] = 100.0
                         if self.guitarSoloBroken[i] and self.guitarSoloAccuracy[i] == 100.0:   #streak was broken, not perfect solo, force 99%
@@ -6609,121 +6590,123 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
         #MFH - Get Ready to Rock & countdown, song info during countdown, and song time left display on top of everything else
         self.engine.view.setViewport(1,0)
-        # show countdown
-        # glorandwarf: fixed the countdown timer
-        if self.countdownSeconds > 1:
-          Theme.setBaseColor(min(1.0, 3.0 - abs(4.0 - self.countdownSeconds)))
-          text = _("Get Ready to Rock")
-          w, h = font.getStringSize(text)
-          font.render(text,  (.5 - w / 2, .3))
-          if self.countdownSeconds < 6:
-            scale = 0.002 + 0.0005 * (self.countdownSeconds % 1) ** 3
-            text = "%d" % (self.countdownSeconds)
-            w, h = bigFont.getStringSize(text, scale = scale)
-            Theme.setBaseColor()
-            bigFont.render(text,  (.5 - w / 2, .45 - h / 2), scale = scale)
-  
-        w, h = font.getStringSize(" ")
-        y = .05 - h / 2 - (1.0 - v) * .2
-  
-        songFont = self.engine.data.songFont
-  
-        # show song name
-        if self.countdown and self.song:
-          cover = ""
-          if self.song.info.findTag("cover") == True: #kk69: misc changes to make it more GH/RB
-            cover = _("as made famous by")+ "  \n "     #kk69: no more ugly colon! ^_^
-          else:
-            if self.theme == 2:
-              cover = "" #kk69: for RB
-            else:
-              cover = _("by ") #kk69: for GH
-          Theme.setBaseColor(min(1.0, 4.0 - abs(4.0 - self.countdown)))
-          comma = ""
-          extra = ""
-          if self.song.info.year: #add comma between year and artist
-            comma = ", "
-          if self.song.info.frets:
-            extra += " \n " + _(" fretted by ") + self.song.info.frets
-          if self.song.info.version:
-            extra += " \n v" + self.song.info.version
-  
-          if self.theme != 1:   #shift this stuff down so it don't look so bad over top the lyricsheet:
-            Dialogs.wrapText(songFont, (.05, .0895 - h / 2), self.song.info.name + " \n " + cover + self.song.info.artist + comma + self.song.info.year + extra, rightMargin = .6)#kk69: incorporates song.ttf, evilynux - increased scale by 1/3 by worldrave's request    
-          else:
-            Dialogs.wrapText(songFont, (.05, .05 - h / 2), self.song.info.name + " \n " + cover + self.song.info.artist + comma + self.song.info.year + extra, rightMargin = .6, scale = 0.0030) #evilynux - increased scale by 1/3 by worldrave's request
-        else:
-          
-          #mfh: this is where the song countdown display is generated:
-          if pos < 0:
-            pos = 0
-          Theme.setBaseColor()
-  
 
-          
-          
-          if (self.gameTimeMode > 0 or self.muteLastSecond == 1 or self.hopoDebugDisp == 1) and (not self.pause and not self.failed and not self.ending and not self.youRock):
-            #MFH: making this a global variable so it may be easily accessed for log entries where appropriate
-            if self.gameTimeMode == 1:    #countdown
-              self.timeLeft = "%d:%02d" % (countdownPos / 60000, (countdownPos % 60000) / 1000)
-            elif self.gameTimeMode == 2:  #elapsed
-              self.timeLeft = "%d:%02d" % (pos / 60000, (pos % 60000) / 1000)
-            if self.gameTimeMode > 0 or self.hopoDebugDisp == 1:
-              w, h = font.getStringSize(self.timeLeft)
-              if self.lyricSheet != None:   #shift this stuff down so it don't look so bad over top the lyricsheet:
-                font.render(self.timeLeft,  (.5 - w / 2, .055 - h / 2 - (1.0 - v) * .2))
+        if (not self.pause and not self.failed and not self.ending):
+          # show countdown
+          # glorandwarf: fixed the countdown timer
+          if self.countdownSeconds > 1:
+            Theme.setBaseColor(min(1.0, 3.0 - abs(4.0 - self.countdownSeconds)))
+            text = _("Get Ready to Rock")
+            w, h = font.getStringSize(text)
+            font.render(text,  (.5 - w / 2, .3))
+            if self.countdownSeconds < 6:
+              scale = 0.002 + 0.0005 * (self.countdownSeconds % 1) ** 3
+              text = "%d" % (self.countdownSeconds)
+              w, h = bigFont.getStringSize(text, scale = scale)
+              Theme.setBaseColor()
+              bigFont.render(text,  (.5 - w / 2, .45 - h / 2), scale = scale)
+    
+          w, h = font.getStringSize(" ")
+          y = .05 - h / 2 - (1.0 - v) * .2
+    
+          songFont = self.engine.data.songFont
+    
+          # show song name
+          if self.countdown and self.song:
+            cover = ""
+            if self.song.info.findTag("cover") == True: #kk69: misc changes to make it more GH/RB
+              cover = _("as made famous by")+ "  \n "     #kk69: no more ugly colon! ^_^
+            else:
+              if self.theme == 2:
+                cover = "" #kk69: for RB
               else:
-                font.render(self.timeLeft,  (.5 - w / 2, y))
+                cover = _("by ") #kk69: for GH
+            Theme.setBaseColor(min(1.0, 4.0 - abs(4.0 - self.countdown)))
+            comma = ""
+            extra = ""
+            if self.song.info.year: #add comma between year and artist
+              comma = ", "
+            if self.song.info.frets:
+              extra += " \n " + _(" fretted by ") + self.song.info.frets
+            if self.song.info.version:
+              extra += " \n v" + self.song.info.version
+    
+            if self.theme != 1:   #shift this stuff down so it don't look so bad over top the lyricsheet:
+              Dialogs.wrapText(songFont, (.05, .0895 - h / 2), self.song.info.name + " \n " + cover + self.song.info.artist + comma + self.song.info.year + extra, rightMargin = .6)#kk69: incorporates song.ttf, evilynux - increased scale by 1/3 by worldrave's request    
+            else:
+              Dialogs.wrapText(songFont, (.05, .05 - h / 2), self.song.info.name + " \n " + cover + self.song.info.artist + comma + self.song.info.year + extra, rightMargin = .6, scale = 0.0030) #evilynux - increased scale by 1/3 by worldrave's request
+          else:
+            
+            #mfh: this is where the song countdown display is generated:
+            if pos < 0:
+              pos = 0
+            Theme.setBaseColor()
+    
   
-  
-  
-  
-          #Not ready for 2player yet
-          #if self.notesCum:
-          #  f = int(100 * (float(self.playerList[0].notesHit) / self.notesCum))
-          #  font.render("%d%%" % f, (.5 - w / 2, y + h))
-  			
-  
-        
-  
-  #-        if self.rock[0]<=0 and self.battle and self.numOfPlayers>1: #QQstarS:new2 Bettle failing
-  #-          self.displayText = "You Failed!!!!"
-  #-          self.streakFlag = "0"   #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1. 
-  #-          self.guitars[0].actions = [0,0,0]
-  #-          #self.keysList   = [PLAYER2KEYS]
-  #-        elif self.rock[1]<=0 and self.battle and self.numOfPlayers>1: #QQstarS:new2 Bettle failing
-  #-          self.displayText = "You Failed!!!!"
-  #-          self.streakFlag = "1"   #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1. 
-  #-          self.guitars[1].actions = [0,0,0]
-  
-          #Party mode
-          if self.partyMode == True:
-            timeleft = (now - self.partySwitch) / 1000
-            if timeleft > self.partyTime:
-              self.partySwitch = now
-              if self.partyPlayer == 0:
-                self.guitars[0].keys = PLAYER2KEYS
-                self.guitars[0].actions = PLAYER2ACTIONS
-                self.keysList   = [PLAYER2KEYS]
-                self.partyPlayer = 1
-              else:
-                self.guitars[0].keys = PLAYER1KEYS
-                self.guitars[0].actions = PLAYER1ACTIONS
-                self.keysList   = [PLAYER1KEYS]
-                self.partyPlayer = 0
-            t = "%d" % (self.partyTime - timeleft + 1)
-            if self.partyTime - timeleft < 5:
-              glColor3f(1, 0, 0)
-              w, h = font.getStringSize(t)#QQstarS:party
-              font.render(t,  (.5 - w / 2, 0.4))  #QQstarS:party
-            elif self.partySwitch != 0 and timeleft < 1:
-              t = "Switch"
-              glColor3f(0, 1, 0)
-              w, h = font.getStringSize(t)#QQstarS:party
-              font.render(t,  (.5 - w / 2, 0.4))#QQstarS:party
-            else:#QQstarS:party
-              w, h = font.getStringSize(t)
-              font.render(t,  (.5 - w / 2, y + h))
+            
+            
+            if (self.gameTimeMode > 0 or self.muteLastSecond == 1 or self.hopoDebugDisp == 1) and (not self.pause and not self.failed and not self.ending and not self.youRock):
+              #MFH: making this a global variable so it may be easily accessed for log entries where appropriate
+              if self.gameTimeMode == 1:    #countdown
+                self.timeLeft = "%d:%02d" % (countdownPos / 60000, (countdownPos % 60000) / 1000)
+              elif self.gameTimeMode == 2:  #elapsed
+                self.timeLeft = "%d:%02d" % (pos / 60000, (pos % 60000) / 1000)
+              if self.gameTimeMode > 0 or self.hopoDebugDisp == 1:
+                w, h = font.getStringSize(self.timeLeft)
+                if self.lyricSheet != None:   #shift this stuff down so it don't look so bad over top the lyricsheet:
+                  font.render(self.timeLeft,  (.5 - w / 2, .055 - h / 2 - (1.0 - v) * .2))
+                else:
+                  font.render(self.timeLeft,  (.5 - w / 2, y))
+    
+    
+    
+    
+            #Not ready for 2player yet
+            #if self.notesCum:
+            #  f = int(100 * (float(self.playerList[0].notesHit) / self.notesCum))
+            #  font.render("%d%%" % f, (.5 - w / 2, y + h))
+    			
+    
+          
+    
+    #-        if self.rock[0]<=0 and self.battle and self.numOfPlayers>1: #QQstarS:new2 Bettle failing
+    #-          self.displayText = "You Failed!!!!"
+    #-          self.streakFlag = "0"   #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1. 
+    #-          self.guitars[0].actions = [0,0,0]
+    #-          #self.keysList   = [PLAYER2KEYS]
+    #-        elif self.rock[1]<=0 and self.battle and self.numOfPlayers>1: #QQstarS:new2 Bettle failing
+    #-          self.displayText = "You Failed!!!!"
+    #-          self.streakFlag = "1"   #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1. 
+    #-          self.guitars[1].actions = [0,0,0]
+    
+            #Party mode
+            if self.partyMode == True:
+              timeleft = (now - self.partySwitch) / 1000
+              if timeleft > self.partyTime:
+                self.partySwitch = now
+                if self.partyPlayer == 0:
+                  self.guitars[0].keys = PLAYER2KEYS
+                  self.guitars[0].actions = PLAYER2ACTIONS
+                  self.keysList   = [PLAYER2KEYS]
+                  self.partyPlayer = 1
+                else:
+                  self.guitars[0].keys = PLAYER1KEYS
+                  self.guitars[0].actions = PLAYER1ACTIONS
+                  self.keysList   = [PLAYER1KEYS]
+                  self.partyPlayer = 0
+              t = "%d" % (self.partyTime - timeleft + 1)
+              if self.partyTime - timeleft < 5:
+                glColor3f(1, 0, 0)
+                w, h = font.getStringSize(t)#QQstarS:party
+                font.render(t,  (.5 - w / 2, 0.4))  #QQstarS:party
+              elif self.partySwitch != 0 and timeleft < 1:
+                t = "Switch"
+                glColor3f(0, 1, 0)
+                w, h = font.getStringSize(t)#QQstarS:party
+                font.render(t,  (.5 - w / 2, 0.4))#QQstarS:party
+              else:#QQstarS:party
+                w, h = font.getStringSize(t)
+                font.render(t,  (.5 - w / 2, y + h))
   
       finally:
         #self.engine.view.setViewport(1,0)
