@@ -5567,8 +5567,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 size = font.getStringSize(self.displayText[i], scale = self.dislayTextScale[i])
                 font.render(self.displayText[i], (.5-size[0]/2,self.textY[i]-size[1]), scale = self.dislayTextScale[i])
     
-    
-              if self.rock[0] <= 0 and self.rock[1] <= 0 and self.numOfPlayers>1 and self.failingEnabled: #QQstarS: all two are "die" that failing
+              if self.rock[0] <= 0 and self.numOfPlayers>1 and self.rock[1] <= 0 and self.failingEnabled: #QQstarS: all two are "die" that failing
                 self.failed = True
               elif self.rock[0] <= 0 and self.numOfPlayers<=1 and self.failingEnabled: #QQstarS: one player, die,failed
                 self.failed = True
