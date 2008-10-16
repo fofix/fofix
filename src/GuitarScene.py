@@ -2026,6 +2026,23 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       pos = self.getSongPosition()
       self.song.update(ticks)
       # update stage
+
+      #MFH - new failing detection logic
+      if self.failingEnabled:
+        #if self.numOfPlayers > 1:
+        somebodyStillAlive = False
+        for i, player in enumerate(self.playerList):
+          if self.rock[i] > 0:
+            somebodyStillAlive = True
+        if not somebodyStillAlive:    #only if everybody has failed
+          self.failed = True
+      
+      #if self.rock[0] <= 0 and self.numOfPlayers>1 and self.rock[1] <= 0 and self.failingEnabled: #QQstarS: all two are "die" that failing
+      #  self.failed = True
+      #elif self.rock[0] <= 0 and self.numOfPlayers<=1 and self.failingEnabled: #QQstarS: one player, die,failed
+      #  self.failed = True
+      
+      
       for i,guitar in enumerate(self.guitars):  #QQstarS:add the for loop to let it do with both player
         self.stage.run(pos, self.guitars[i].currentPeriod)  #QQstarS:Set [0] to [i]
 
@@ -5004,12 +5021,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 glColor3f(.8,.75,.01)
                 size = font.getStringSize(self.displayText[i], scale = self.dislayTextScale[i])
                 font.render(self.displayText[i], (.5-size[0]/2,self.textY[i]-size[1]), scale = self.dislayTextScale[i])
-  
-    
-              if self.rock[0] <= 0 and self.rock[1] <= 0 and self.numOfPlayers>1 and self.failingEnabled: #QQstarS: all two are "die" that failing
-                self.failed = True
-              elif self.rock[0] <= 0 and self.numOfPlayers<=1 and self.failingEnabled: #QQstarS: one player, die,failed
-                self.failed = True
     
               if self.youRock == True:
                 if self.rockTimer == 1:
@@ -5553,11 +5564,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 size = font.getStringSize(self.displayText[i], scale = self.dislayTextScale[i])
                 font.render(self.displayText[i], (.5-size[0]/2,self.textY[i]-size[1]), scale = self.dislayTextScale[i])
     
-              if self.rock[0] <= 0 and self.numOfPlayers>1 and self.rock[1] <= 0 and self.failingEnabled: #QQstarS: all two are "die" that failing
-                self.failed = True
-              elif self.rock[0] <= 0 and self.numOfPlayers<=1 and self.failingEnabled: #QQstarS: one player, die,failed
-                self.failed = True
-    
               if self.youRock == True:
                 if self.rockTimer == 1:
                   #self.sfxChannel.setVolume(self.sfxVolume)
@@ -6018,11 +6024,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 size = font.getStringSize(self.displayText[i], scale = self.dislayTextScale[i])
                 font.render(self.displayText[i], (.5-size[0]/2,self.textY[i]-size[1]), scale = self.dislayTextScale[i])
     
-              if self.rock[0] <= 0 and self.rock[1] <= 0 and self.numOfPlayers>1 and self.failingEnabled: #QQstarS: all two are "die" that failing
-                self.failed = True
-              elif self.rock[0] <= 0 and self.numOfPlayers<=1 and self.failingEnabled: #QQstarS: one player, die,failed
-                self.failed = True
-  
               if self.youRock == True:
                 if self.rockTimer == 1:
                   #self.sfxChannel.setVolume(self.sfxVolume)
