@@ -55,6 +55,10 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
     self.libraryName   = libraryName
     self.songName      = songName
 
+    #MFH - testing new traceback logging:
+    #raise TypeError
+
+
     self.songSettings  = []
     self.gameStarted   = False
     if songQueue == None:

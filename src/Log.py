@@ -25,7 +25,8 @@ import os
 import Resource
 
 quiet = True
-logFile = open(os.path.join(Resource.getWritableResourcePath(), "fretsonfire.log"), "w")
+#logFile = open(os.path.join(Resource.getWritableResourcePath(), "fretsonfire.log"), "w")
+logFile = open("fretsonfire.log", "w")  #MFH - local logfile!
 encoding = "iso-8859-1"
 
 if "-v" in sys.argv:
@@ -50,7 +51,14 @@ def log(cls, msg):
   msg = unicode(msg).encode(encoding, "ignore")
   if not quiet:
     print labels[cls] + " " + msg
-  print >>logFile, labels[cls] + " " + msg
+  tempTrace = None
+  if cls == "error":
+    import traceback
+    tempTrace = traceback.format_exc()
+  if tempTrace:
+    print >>logFile, labels[cls] + " " + msg + tempTrace
+  else:
+    print >>logFile, labels[cls] + " " + msg
 
 warn   = lambda msg: log("warn", msg)
 debug  = lambda msg: log("debug", msg)

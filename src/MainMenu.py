@@ -308,6 +308,7 @@ class MainMenu(BackgroundLayer):
           function(self, *args, **kwargs)
         except:
           import traceback
+          Log.error("Traceback:" + traceback.format_exc() )
           traceback.print_exc()
           raise
       except socket.error, e:
@@ -324,6 +325,7 @@ class MainMenu(BackgroundLayer):
     if not self.nextLayer:
       self.nextLayer = layerFunc
       self.engine.view.popAllLayers()
+  #launchLayer = catchErrors(launchLayer)    #MFH - trying to catch errors
 
   def showTutorial(self):
     # evilynux - Make sure tutorial exists before launching
@@ -357,6 +359,10 @@ class MainMenu(BackgroundLayer):
     Config.set("game", "players", players)
     Config.set("player0","mode_1p", mode1p)
     Config.set("player1","mode_2p", mode2p)
+
+    #MFH - testing new traceback logging:
+    #raise TypeError
+
 
     if self.engine.isServerRunning():
       return

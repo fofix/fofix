@@ -76,6 +76,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.battle = False #QQstarS:new2 Bettle
 
     Log.debug("GuitarSceneClient init...")
+
+
+    #MFH - testing new traceback logging:
+    #raise TypeError
     
     splash = Dialogs.showLoadingSplashScreen(self.engine, _("Preparing...") ) 
     
@@ -2011,6 +2015,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
   def run(self, ticks): #QQstarS: Fix this funcion
     SceneClient.run(self, ticks)
+    
+    #MFH - testing new traceback logging:
+    #raise TypeError
+    
+    
     # update song
     #if self.song:
     if self.song and not self.pause and not self.failed:

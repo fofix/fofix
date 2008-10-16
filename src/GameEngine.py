@@ -613,20 +613,22 @@ class GameEngine(Engine):
 
   def main(self):
     """Main state loop."""
-
-    # Tune the scheduler priority so that transitions are as smooth as possible
-    if self.view.isTransitionInProgress():
-      self.boostBackgroundThreads(False)
-    else:
-      self.boostBackgroundThreads(True)
-    
-    done = Engine.run(self)
-    self.clearScreen()
-    self.view.render()
-    if self.debugLayer:
-      self.debugLayer.render(1.0, True)
-    self.video.flip()
-    return done
+    try:
+      # Tune the scheduler priority so that transitions are as smooth as possible
+      if self.view.isTransitionInProgress():
+        self.boostBackgroundThreads(False)
+      else:
+        self.boostBackgroundThreads(True)
+      
+      done = Engine.run(self)
+      self.clearScreen()
+      self.view.render()
+      if self.debugLayer:
+        self.debugLayer.render(1.0, True)
+      self.video.flip()
+      return done
+    except:
+      Log.error("Loading error:")
 
   def run(self):
     try:
@@ -646,6 +648,7 @@ class GameEngine(Engine):
 
       if self.handlingException:
         # A recursive exception is fatal as we can't reliably reset the GL state
+        Log.error("Recursive exception:")
         sys.exit(1)
 
       self.handlingException = True

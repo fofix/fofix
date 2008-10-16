@@ -59,7 +59,13 @@ Options:
   --nbrplayers=,-N [1 or 2]         Number of players         
 """ % {"prog": sys.argv[0] }
 
-if __name__ == "__main__":
+debuglevel = 1
+
+
+#if __name__ == "__main__":
+def main():
+  """Main thread"""
+
   try:
     opts, args = getopt.getopt(sys.argv[1:], "vdc:p:D:P:m:N:", ["verbose", "debug", "config=", "play=", "diff=", "part=", "mode=", "nbrplayers="])
   except getopt.GetoptError:
@@ -162,3 +168,76 @@ if __name__ == "__main__":
     else:
       break
   engine.quit()
+
+class Trace:
+    """Class for tracing script
+    
+    This class is developed by cyke64.
+    Lisenced under GNU GPL.
+    """
+    def __init__(self, runfile, f_all=u'traceit.txt',
+                 f_main=u'traceitmain.txt'):
+        self.out_all=open(f_all, 'w')
+        self.out_main=open(f_main, 'w')
+        self.runfile = runfile
+      
+    def go(self):
+        sys.settrace(self.traceit)
+    
+    def stop(self):    
+        sys.settrace(None)
+        self.out_all.close()
+        self.out_main.close()
+ 
+    def traceit(self, frame, event, arg):
+        lineno = frame.f_lineno
+        name = frame.f_globals['__name__']
+        if (frame.f_globals).has_key('__file__'):
+            file_trace=frame.f_globals['__file__']
+            line = linecache.getline(file_trace, lineno)
+        else:
+            file_trace = self.runfile
+            line = linecache.getline(file_trace, lineno)
+            self.out_main.write('%s*%s*\n*%s*\n' \
+              % (event, lineno, line.rstrip()))
+            self.out_all.write('%s*%s*of %s(%s)\n*%s*\n' \
+              %(event, lineno, name, file_trace, line.rstrip()))
+            e32.ao_sleep(0)
+        return self.traceit
+ 
+def call_callback(func):
+    """Catch exception
+    
+    This function is developed by jethro.fn.
+    """
+    def call_func(*args, **kwds):
+        import traceback
+        #global exceptions
+        #global script_lock
+        try:
+            return func(*args, **kwds)
+        except:
+            # Collect Exceptions
+            #exception = ''.join(traceback.format_exception(*sys.exc_info()))
+            #exceptions.append(exception)
+            
+            Log.error("Exception traceback: " + str(traceback.format_exception(*sys.exc_info())) )
+            
+            # Signal lock in main thread (immediate termination)
+            #if debuglevel == 2: script_lock.signal()
+    return call_func
+ 
+
+if __name__ == '__main__':
+    try:
+        if debuglevel == 2:
+            trace = Trace('E:\\Python\\RaiseErrorTest.py')
+            trace.go()
+            call_callback(main())
+            trace.stop()
+        elif debuglevel == 1:
+            call_callback(main())
+        else:
+            main()
+    except:
+        raise
