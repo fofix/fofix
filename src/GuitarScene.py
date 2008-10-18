@@ -296,7 +296,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.starClaps = self.engine.config.get("game", "star_claps")
     self.rb_sp_neck_glow = self.engine.config.get("game", "rb_sp_neck_glow")
     self.accuracy = [0 for i in self.playerList]
-    self.countdownSeconds = 5
+    self.countdownSeconds = 5   #MFH - don't change this initialization value unless you alter the other related variables to match
     self.dispAccuracy = [False for i in self.playerList]
     self.showAccuracy = self.engine.config.get("game", "accuracy_mode")
     self.hitAccuracyPos = self.engine.config.get("game", "accuracy_pos")
@@ -6373,8 +6373,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 posY = .305 + h
                 if self.showAccuracy == 3:    #for displaying numerical below descriptive
                   posY = .305
-                if self.pov != 1: #not GH POV
-                  posY = y + 4 * h
+                #if self.pov != 1: #not GH POV
+                #  posY = y + 4 * h   -- MFH: this line causes a bad hang.
               elif self.hitAccuracyPos == 2:#Left-bottom
                 posX = .193
                 posY = .700		#(.193-size[0]/2, 0.667-size[1]/2+self.hFontOffset[i]))

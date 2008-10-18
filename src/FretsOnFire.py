@@ -33,7 +33,6 @@ codecs.register(lambda encoding: encodings.iso8859_1.getregentry())
 codecs.register(lambda encoding: encodings.utf_8.getregentry())
 assert codecs.lookup("iso-8859-1")
 assert codecs.lookup("utf-8")
-
 from GameEngine import GameEngine
 from MainMenu import MainMenu
 import Log
@@ -59,8 +58,8 @@ Options:
   --nbrplayers=,-N [1 or 2]         Number of players         
 """ % {"prog": sys.argv[0] }
 
-debuglevel = 1
-
+debuglevel = 0    #MFH - experimental, leave at 0
+import linecache
 
 #if __name__ == "__main__":
 def main():
@@ -231,7 +230,7 @@ def call_callback(func):
 if __name__ == '__main__':
     try:
         if debuglevel == 2:
-            trace = Trace('E:\\Python\\RaiseErrorTest.py')
+            trace = Trace('FretsOnFire.py')
             trace.go()
             call_callback(main())
             trace.stop()
