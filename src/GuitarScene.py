@@ -6650,6 +6650,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             #mfh: this is where the song countdown display is generated:
             if pos < 0:
               pos = 0
+            if countdownPos < 0:
+              countdownPos = 0
             Theme.setBaseColor()
     
   
