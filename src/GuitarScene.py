@@ -3600,11 +3600,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #myfingershurt: removing check for hopolast for GH2 system after-chord HOPOs
       #myfingershurt: also added self.hopoAfterChord conditional to ensure this logic doesn't apply without HOPOs after chord
       if self.hopoAfterChord and (self.hopoStyle == 2 or self.hopoStyle == 3 or self.hopoStyle == 4):   #for GH2 systems: so user can release lower fret from chord to "tap" held HOPO
-        if len(activeList) != 0 and guitar.wasLastNoteHopod and control in self.keysList[i]:
+        #if len(activeList) != 0 and guitar.wasLastNoteHopod and control in self.keysList[i]:
+        if len(activeList) != 0 and guitar.hopoActive > 0 and control in self.keysList[i]:
           self.keyPressed3(None, 0, activeList[0], pullOff = True)
       
       else:
-        if len(activeList) != 0 and guitar.wasLastNoteHopod and activeList[0] != self.keysList[i][guitar.hopoLast] and control in self.keysList[i]:
+        #if len(activeList) != 0 and guitar.wasLastNoteHopod and activeList[0] != self.keysList[i][guitar.hopoLast] and control in self.keysList[i]:
+        if len(activeList) != 0 and guitar.hopoActive > 0 and activeList[0] != self.keysList[i][guitar.hopoLast] and control in self.keysList[i]:
           self.keyPressed3(None, 0, activeList[0], pullOff = True)
         
   def getPlayerNum(self, control):
