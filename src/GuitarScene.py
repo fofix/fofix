@@ -284,7 +284,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     #MFH - constant definitions, ini value retrievals
     self.digitalKillswitchStarpowerChunkSize = 0.05
-    self.analogKillswitchStarpowerChunkSize = 0.10
+    # evilynux: was 0.10, now much closer to actual GH3
+    self.analogKillswitchStarpowerChunkSize = 0.15
     self.rbOverdriveBarGlowFadeInChunk = .07     #this amount added to visibility every run() cycle when fading in - original .2
     self.rbOverdriveBarGlowFadeOutChunk = .03   #this amount subtracted from visibility every run() cycle when fading out - original .07
     self.maxDisplayTextScale = 0.0024       #orig 0.0024
