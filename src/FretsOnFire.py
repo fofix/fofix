@@ -152,6 +152,12 @@ def main():
         if hasattr(sys, "frozen"):
           if os.name == "nt":
             os.execl("FretsOnFire.exe", "FretsOnFire.exe", *sys.argv[1:])
+          elif sys.frozen == "macosx_app":
+            import string
+            import subprocess
+            appname = string.join(string.split(sys.executable, '/')[:-1], '/')
+            appname = appname+"/Frets on Fire"
+            subprocess.Popen(`appname`, shell=True)
           else:
             os.execl("./FretsOnFire", "./FretsOnFire", *sys.argv[1:])
         else:
