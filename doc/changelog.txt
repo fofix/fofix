@@ -1,4 +1,150 @@
-New in 3.0:-----------------------------------------------------------------------------------------------------
+New in 3.0xx:-----------------------------------------------------------------------------------------------------
+
+--------------------------------
+[u]Version 3.016 "Logging & Debugging Enhancements" - (10/16/2008, 10:30am PST) - [i](SVN rev 37 / tag 3.016a)[/i][/u] -- 
+[url=http://www.mediafire.com/?nn2yzkjmqyf]Patch mediafire download[/url]
+[i]New since 3.015:[/i]
+++Enhanced "error" logfile entries to produce a helpful trace output like that created when running from sources and using an immediate / debug window (no code shown, just classes / functions / line numbers)
+++fretsonfire.log file will now be created in the game folder you are running from (will appear in the same place fretsonfire.ini is created)
+++Recompiled library.zip and FretsOnFire.exe from sources
+
+--------------------------------
+[u]Version 3.015 "Optimizations" - (10/15/2008, 8:00am PST) - [i](SVN rev 33 / tag 3.015)[/i][/u] -- 
+[url=http://www.mediafire.com/?wmjlyfjnonj]Patch mediafire download[/url] -- [url=http://www.mediafire.com/?czjmimmjddm]Source mediafire download[/url]
+[i]New since 3.005:[/i]
+++Updated to Blazingamer's unofficial 3.011 w/revised Dialogs.py
+++Changed default neck speed mode to "BPM & Diff" instead of "Percentage" as it more closely matches the console game behavior (and should keep speeds above the threshold where close notes overlap for the most part)
+++Replaced countless player count array length function calls during gameplay with a predetermined variable
+++Wrote logic to precalculate the viewport geometries and remember them instead of recalculating multiple times per frame
+++Fixed themes when running from sources (the existing solution did not work for me, I changed evilynux's code src folder code to that found in GameEngine.py)
+++Completely rewrote an equivalent, much simpler problematic HOPO determination logic - doesn't even need pre-marking of problematic note patterns or ANY note hunting -- beta testers: [url=http://www.mediafire.com/?2msr9fdmzn1]v3.015 beta1[/url] (packaged as a standard patch from 3.0xx)
+++Replaced all gameplay text comparisons for part == "Drums" or part != "Drums" with a quicker boolean comparison using isDrum instead
+++Cleaned up / rewrote faaa's drum sound code  (which contained many redundant conditionals and prevented normal random drum screwup sounds if disabled)
+++Added a boolean variable to check for Bass Guitar part without string comparisons
+++++Replaced all gameplay text comparisons for part == "Bass Guitar" or part != "Bass Guitar" with a quicker boolean comparison using isBassGuitar instead
+++Created new function to replace multiple doPick screw-up code sections, "screwUp(playerNum)"
+++Added code to precalculate rockMed and rockHi thresholds instead of the unnecessary floating-point divisions every time in the render
+++Rewrote code that handles star scoring to precalculate all thresholds and use fast comparisons during gameplay -- beta testers: [url=http://www.mediafire.com/?moz53dmmmk2]3.015 beta2[/url]
+++++(moved option to "Performance Settings") -- "In-Game Stats" option now is an independant lag setting: disabling stats (avg mult & overall percentage) stops calculations that are otherwise unneeded (In-Game Stars used to force enabling of the calculations)
+++New option under "Performance Settings" -> "Star Updates": (default "Score Change") 
+++++"On Hit" only updates star scoring when a note is hit
+++++"Score Change" updates star scoring every time the score has changed (this will allow star updates during sustains)
+++Added "harmonica" to solo filter for RB2: Bob Dylan - Tangled Up in Blue
+++Rewrote parsing, retrieval, and handling of events from script.txt, MIDI sections, MIDI lyrics, guitar solos, and other MIDI text events, which are now organized in special event tracks, all separate from the note tracks (overall, much smaller tracks to filter and sort through during gameplay) -- beta testers: [url=http://www.mediafire.com/?duemtjyjmon]3.015 beta3[/url]
+++++Fixed guitar solo note counting for solos until the end of a song, no longer will cause a divide by zero error - beta testers: 3.015 beta4 - [url=http://www.mediafire.com/?tt0qzwytmgm]Mediafire[/url], [url=http://www.usaupload.net/d/xzeuwzimmm5]USAupload[/url], [url=http://anonym.to/?http://rapidshare.com/files/152805772/MfhModV3_015beta4-FixedEndingGuitarSolos.rar]Rapidshare[/url]
+++Moved star count to the Player object, and removed all redundant (and outdated) star scoring logic from the GameResults object (star score now determined only once, in GuitarScene)
+++++Added code to run the final star calculation just before spawning a Game Results scene, just in case the player has in-game stars disabled
+++Added new hybrid star scoring system, "RB+GH" (default now "RB+GH") - scores just like RB (with avg multiplier), but will also force gold stars if you hit every note 100%
+++Rewrote all gameplay soundFX play logic to create a new sound channel and mix with currently-playing SFX instead of a single channel with only one sound at a time playing
+++Wrote function to set all SFX object volumes to the set SfxVol, that can be called when un-pausing - instead of setting SFX volume before every SFX play request
+++Prevented songlist Left / Right controls from entering an endless loop hunting for tier labels when there are none
+++Added Blazingamer's cleaned-up neck chooser render code
+++Added [url=http://paste.ideaslabs.com/show/ANRnUmEtgH]evilynux's patch[/url] containing some merging mistake fixes
+++Added [url=http://paste.ideaslabs.com/show/Oe0yhMBh53]evilynux's patch[/url] that fixes two stage-related crashes
+++Added [url=http://paste.ideaslabs.com/show/XhGWnX6ma1]evilynux's patch[/url] to slightly optimize a couple theme.ini color options during gameplay
+++Relocated Decimal.py initialization to the actual GuitarScene initialization with global variables instead of local variables reinitialized each render()
+++Moved total notes and total streak variables to the Player object (instead of the GuitarScene object) so the Game Results object doesn't have to re-calculate them
+++Added [url=http://paste.ideaslabs.com/show/pPfTmgN17]evilynux's patch[/url] containing some font caching optimization
+++Added evilynux's fix to the Font.getLineSpacing function
+++Fixed guitar solo issue with GH1 - Anarchy Club - Behind The Mask (guitar solo start & end at same exact position) -- Added "chorus" to list of GH1-style solo end markers, and added logic to ensure guitar solo start and stop cannot be recognized at the exact same position in the song
+++++Added logic to prevent multiple consecutive section events to be added to the exact same time
+++Added [url=http://paste.ideaslabs.com/show/0lvX4GyoGT]evilynux's patch[/url] that fixes song previews
+++Added evilynux's View.py geometry integer warning fixes
+++Added [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=30757;st=650#entry329343]evilynux's changes[/url] which organize the fretsonfire.ini file
+++Removed TWO unnecessary note object list retrieval operations (sorting & filtration) from the run() function
+++Added code to support animated stages when running from sources
+++Organized the render() function to minimize switching between setViewport and setViewportHalf each frame (several switches back and forth are currently taking place)
+++Relocated several inappropriate sections of code from the GuitarScene render() function to the run() function - so they are no longer dependant on video framerate:
+++++Moved missed starpower note detection
+++++Moved rockmeter tracking logic
+++++Moved scaling phrase handling logic
+++++Moved killswitch processing logic
+++++Moved animated / rotating stage frame change logic 
+++Prevented reservation of a special "sound FX" channel, which wastes a channel with the new system of playing each sound on an unused channel for mixing
+++Rewrote player-indexed list initializations that must remain in GuitarScene, to be more compatible with a future 3-player mode (i.e. not hardcoded for 2-players)
+++++Rewrote and reorganized the majority of the GuitarScene.run() function
+++++Rewrote rockmeter calculations and starpower note miss detection algorithms to NOT: use a hard-coded 2 players and force all related variables to represent 2 players even in a solo game
+++++Rewrote Faaa's drum sound playing and hit-ignoring logic
+++++Changed Faaa's "Drums sound" setting to "Drum Misses", (default "First Note"):
+++++++"Always" is the old default - this will always register drum misses
+++++++"Song Start" will allow you to bang away freestyle on the drums until the song countdown is complete (when the song actually starts)
+++++++"First Note" will allow you to bang away freestyle on the drums until the first drum note in the song appears (default)
+++Rewrote phrase-handling code to truly support two players (currently, only one scaling phrase can be displayed on one of the players fretboards at a time)
+++Moved RB overdrive ready glow fadein / fadeout calculation from GuitarScene.render() to GuitarScene.run()
+++++Rewrote RB overdrive ready glow display logic in GuitarScene.render()
+++Moved Get Ready to Rock, start countdown, song info during countdown, and song time left code to display on top of everything else (some were hidden by various parts of the 2-player screen)
+++Added new option to "Game Time" setting: "Elapsed" will display song time as an increasing value, starting at 0:00 and ending at the length of the song
+++Ensured reset of scaling text's display timer whenever new text is set (now setting the displayText involves calling a function instead of just changing the text)
+++++New translatable string, for Pro Face-Off mode, "You Failed!!!!" (was not translatable before)
+++Added new options to the settings for "MIDI/RB Lyrics" and "MIDI/RB Sections": "1p Only" (new defaults = "1p Only")(will only enable lyrics or sections when in a single-player game; multiplayer games will disable these features to improve performance)
+++Added a "Preparing..." (new translatable string) loading screen to display as soon as the song starts initializing for gameplay - so that the loading screen comes up quicker and stays up for more of the actual loading time
+++Added a new responsive loading screen to the songlist loads - now compatible with the new synchronous loading
+++Ensured GuitarScene.setCamera is called only once after the board rotation / song countdown is complete, instead of every time in the render() during actual gameplay
+++Added a new option category "Debug Settings" for all debug settings (such as HOPO debug, analog killswitch debug, in-game stats, unused text events, etc) so they don't confuse players
+++Moved "P2 Menu Navigate" option from "Game Settings" to "Key Settings"
+++Created a new 99pct1.ogg from the ending crowd cheers from Gugered's [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=5;t=31342]live Eagles - Hotel California song (from the Hell Freezes Over tour)[/url] (and add Gugered to credits)
+++Added gamexprt1's improved RB1 [url=http://i21.photobucket.com/albums/b252/gamexprt1/mult2.png]mult2.png[/url] from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=30757&st=540#entry326235]this post[/url]
+++Added [url=http://www.mediafire.com/?sharekey=e3c55d9fd5ad51cfab1eab3e9fa335ca9a3675f7013ea352]sherranjjj001's You Rock sound for the GH1, 2, and 80's themes[/url] as the default / fallback rocksound.ogg
+++Added .liquid.'s RB2-style [url=http://www.mediafire.com/?w5lkf4ghyoq]partial grey star files V2[/url] to the Rock Band 1 theme
+++Added >Slash666<'s [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=31067]gameresults, pause, and editor GFX[/url]
+++Added MeteOritO's RB hitflames [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=30757&st=410#entry322361]here in post #420[/url] - [url=http://www.mediafire.com/download.php?qrzh0z0ehwm]download[/url]
+++Used Spikehead's guitscw2.ogg with removed leading silence from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=30757&st=140#entry317733]this post[/url]
+++Edited clapsound.ogg: normalized to -16db by perceived loudness, cut beginning so clap SFX starts right away, cut silent ending, ensured both waveform endpoints at center
+++Fixed pause layering during song countdown
+++Ensured the accuracy indicator from the last note hit is not still displayed after a restart
+++Ensured that just letting an entire guitar solo go by without attempting to hit any notes does not result in a 100% perfect solo
+++Moved spinning star rotation angle calculation / update from Guitar render() function to run() function
+++Added logic to catch when a drum chord (which counts individual notes for streak) skips a "note streak" threshold (like, from 99 to 101) and display the appropriate streak notification
+++Added logic to flash the overdrive strings just before You Rock for Rock Band based themes
+++Recompiled library.zip and FretsOnFire.exe from sources
+
+---------------------------------
+[/color]
+[color=grey]
+Unofficial patches, newest on top: (will be examined and tested and integrated into my next patch when I decide to start coding again)
+
+Blazingamer's Dialogs.py for 3.011 to add proper neck sorting = [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=30757&st=450#entry322935]post[/url], [url=http://www.mediafire.com/?4ilyyvggjwh]download[/url]
+
+Blazingamer's v3.011: [url=http://www.megaupload.com/?d=GT1W83IK]ugo's full installer[/url] -- [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=30757&st=450#entry322920]post[/url], [url=http://www.mediafire.com/?imc2yo2byjl]download[/url]
++Added all of evilynux's fixes
++FIXED Rb themes now say solo tour instead of career
++Label now says 3.011
+
+Blazingamer's v3.010: [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=30757;st=410#entry322275]post[/url], [url=http://www.mediafire.com/?zdmyzdjnkmm]download[/url]
+++Added overdrive bar glow fading
+++Added MeteOritO's RB partial grey star brighter fills to Rock Band 1 theme
+++Added >Slash666<'s RB editor and game results screen to Rock Band 1 theme
+++Added support for stages with a .PNG ending
++++Things like .pNG or Png are still not supported for stages, only .png and .PNG
+++In RB themes instead of saying career it says Solo Tour
+++No longer attempts to upload scores if Jurgen was playing, or at least shouldn't.
+
+Blazingamer's GuitarScene.py for 3.005 for overdrive bar glow fading - [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=30757&st=130#entry317714]post[/url], [url=http://www.mediafire.com/?lzjor0t4yoy]download[/url]
+
+-------------------------------
+[/color]
+[color=white]
+.
+.
+.
+.
+.
+.
+
+
+--------------------------------
+[b]Version 3.005 (9/27/2008, 2:45pm PST) -- [url=http://www.megaupload.com/?d=FD747ZHV]ugo's full installer[/url], [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=30757&st=470#entry323431]rolliwood's rapidshare mirror[/url] --[url=http://www.mediafire.com/?yw2ibzmkxy2]Patch mediafire download[/url] -- [url=http://rapidshare.com/files/148993945/MfhModPatch3_005-FixedPeriodSongNames.rar.html]TypusMensch's Rapidshare patch mirror[/url] -- ugo's full installer [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=30757&st=60#entry317362]post[/url], [url=http://www.megaupload.com/?d=FD747ZHV]download[/url]
+[i]New since 3.000:[/i]
+++Fixed bug caused by song names beginning with a period (...And Justice For All)
+++Updated to Alexfighter's Spanish translation v1.5c from 26th September 2008
+++Updated to fablaculp's French translation for 3.000
+++Added fixes / changes from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=30757&st=100#entry317593]Blazingamer's patch[/url] (RB string flash fading, 3D note rotation option, etc)
+++Added wide version of [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=30757;st=90#entry317512]Dillusional's overdrive_string_flash.png gfx[/url]
+++Fixed starGrey1 reported issue when partial stars disabled -- [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=30757&st=50#entry317316]detail post[/url]
+++Ensured muting of last second is disabled when the option is turned off, and that its status resets when the song restarts
+++Recompiled library.zip from sources
+[/b]
+
 
 ------------------------3.000:
 [size=4][b]Base v3.000 Releases (9/27/2008, 12:45am)(required for any later patches):[/b][/size] 
@@ -33,7 +179,18 @@ New in 3.0:---------------------------------------------------------------------
 
   [url=http://www.mediafire.com/file/jyf35n3zx1d/BigAssNeckPackForMfh3_000.rar]BigAssNeckPackForMfh3_000.rar[/url]:  (~23MB, RAR archive, Mediafire host)
 
-New since 2.995:
+--------------------------
+Changelog from 2.995 to 3.000:
+[b]IMPORTANT differences between 2.9xx and 3.0xx that MUST be followed:
+=====Filenames and folders are, for the most part, all lowercase now.  We needed a common naming convention, it was chaos before with capital letters tossed in wherever.
+=======(These files do not change case: FretsOnFire.exe, MSVCR71.dll, doc\*.*, SDL.dll, SDL_image.dll, SDL_mixer.dll, SDL_ttf.dll, _GL__init__.pyd, and _GLU__init__.pyd)
+=======Theme foldernames and song foldernames and neck filenames and stage filenames don't have to be lowercase (but .png extensions do, as always).
+=====Renamed "crunchX.wav" to "selectX.wav" for clarity (these 3 SFX are randomly played as you change the highlighted item in a menu)
+=====Renamed all Guitar screw up sounds from fibaX.wav to guitscwX.wav
+=====Renamed all Bass screw up sounds from bfibaX.wav to bassscwX.wav
+=====All .wav files have been compressed to .ogg files.  We needed a common sound file format, and this reduces space taken (they all load into memory at startup anyway).
+[/b]
+--------------------------
 ==Replaced RbMFH theme's editor.png with >Slash666<'s fixed image
 ==Replaced RbMFH theme's Preview.png with BlackJack's fixed image
 ++Added Blazingamer's font shadowing to songlist (only applies to GH2 & GH3 themes, RB themes unaffected)
@@ -150,7 +307,8 @@ New since 2.995:
 ++Re-built FretsOnFire.exe & library.zip from sources - releases will contain a full windows src folder, complete with batch files
 ++++Updated setup.py script to properly compile & build FretsOnFire.exe & library.zip
 
-New in 2.9:-----------------------------------------------------------------------------------------------------
+
+New in 2.9xx:-----------------------------------------------------------------------------------------------------
 
 --------------------------------
 [b]Version 2.995 (9/16/2008, 9:45pm PST) -- ugo's full installer [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=1750#entry263934]post[/url], [url=http://rapidshare.com/files/146112954/Frets_on_Fire_MFH-Alarian_Mod_v2.995.exe]Rapidshare download[/url] -- [url=http://mfh-alarian-mod.com/Releases/MfhModV2_995-AnimatedStageSelect.rar]Patch direct download[/url] -- [url=http://www.mediafire.com/?bgyn11icee0]Patch mediafire download[/url]

@@ -22,6 +22,7 @@ Every so often, it is recommended that you quit the game completely and restart 
 -------------------
 
 
+
 ======================================================================
 ========================PNG Formatting Help===========================
 ======================================================================
@@ -228,12 +229,14 @@ They could be in one setting, I'm just limited in how long the setting names can
 =======================================================================
 
 
-Rock Band scoring = 
+"RB" (Rock Band style) scoring = 
 5.3x average multiplier for gold stars (guitar)
 4.8x average multiplier for gold stars (bass)
 4.65x average multiplier for gold stars (drums).  
 
-GH scoring = 100% for gold stars.
+"GH" (Guitar Hero style) scoring = 100% notes hit for gold stars.
+
+"RB+GH" hybrid scoring = either of the above conditions result in gold stars (high enough avg multiplier OR 100% notes hit)
 
 I know the 5.3 avg multiplier is actually unreachable with some songs 
 (with very little or no sustains) but that's the way it's supposed to be,

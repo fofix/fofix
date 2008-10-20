@@ -56,6 +56,11 @@ fret4_color = #FF9933 (Manually set 5th fret tail color)
 
 
 
+fret0_color = #22FF22
+fret1_color = #FF2222
+fret2_color = #FFFF22
+fret3_color = #3333FF
+fret4_color = #FF9933
 
 
 

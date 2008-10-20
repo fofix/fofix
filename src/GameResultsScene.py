@@ -387,10 +387,15 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
             self.nextHighScore()
             endScroll = -0.14
           
-        if self.uploadingScores and self.uploadResult is None:
+        if self.uploadingScores:
           Theme.setBaseColor(1 - v)
-          font.render(_("Uploading Scores..."), (.05, .7 + v), scale = 0.001)
+          if self.uploadResult is None:
+            font.render(_("Uploading Scores..."), (.05, .7 + v), scale = 0.001)
+          else:
+            font.render(_("Scores uploaded! ..." + str(self.uploadResult) ), (.05, .7 + v), scale = 0.001)
+        
         return
+        
 
 
 
