@@ -47,7 +47,9 @@ class Timer(object):
       if diff >= self.timestep:
         break
       if not self.highPriority:
-        pygame.time.wait(0)
+        # evilynux : Give the CPU a break...
+        # FIXME: video tasks and other tasks should have their own wait.
+        pygame.time.wait(int(self.timestep/2))
 
     self.ticks = ticks
     self.frame += 1
