@@ -488,7 +488,7 @@ class SongInfo(object):
       Log.debug("Score upload result: %s" % data)
       return data == "True"
     except Exception, e:
-      Log.error(e)
+      Log.error("Score upload error: %s" % e)
       return False
     return True
   
