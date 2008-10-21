@@ -486,7 +486,8 @@ class SongInfo(object):
       }
       data = urllib.urlopen(url + "?" + urllib.urlencode(d)).read()
       Log.debug("Score upload result: %s" % data)
-      return data == "True"
+      #return data == "True"
+      return data   #MFH - want to return the actual result data.
     except Exception, e:
       Log.error("Score upload error: %s" % e)
       return False
@@ -901,6 +902,8 @@ class Track:
 
     Log.debug("Track class init (song.py)...")
 
+    self.chordFudge = 1
+
     self.hopoTick = engine.config.get("coffee", "moreHopo")
 
   def __getitem__(self, index):
@@ -1027,7 +1030,7 @@ class Track:
         hopoDelta = 250
     else:
         hopoDelta = 170
-    chordFudge = 10
+    self.chordFudge = 10
 
     if self.hopoTick == 0:
       ticksPerBeat = 960
@@ -1105,7 +1108,7 @@ class Track:
         event.tappable = -2
             
       #This is a chord
-      elif tickDelta < chordFudge:
+      elif tickDelta < self.chordFudge:
         #Add both notes to bad list even if duplicate.  Will come out in processing
         if len(chordNotes) != 0 and chordNotes[-1] != lastEvent:
           chordNotes.append(lastEvent)
@@ -1247,7 +1250,9 @@ class Track:
         hopoDelta = 250
     else:
         hopoDelta = 170
-    chordFudge = 10
+
+    #chordFudge = 10
+    self.chordFudge = 1   #MFH - there should be no chord fudge.
 
     if self.hopoTick == 0:    #HOPO frequency
       ticksPerBeat = 960
@@ -1385,7 +1390,7 @@ class Track:
       #myfingershurt: both this note and the last note are listed at the same time
       #to allow after-chord HOPOs, we need a separate identification for "chord" notes
       #and also might need to track the "last" chord notes in a separate array
-      elif tickDelta < chordFudge:
+      elif tickDelta < self.chordFudge:
         #Add both notes to bad list even if duplicate.  Will come out in processing
         #myfingershurt:
         if HoposAfterChords:
@@ -1417,7 +1422,7 @@ class Track:
     else:
       #Add last note to HOPO list if applicable
       #myfingershurt:
-      if noteDelta != 0 and tickDelta > chordFudge and tickDelta < hopoDelta and isinstance(event, Note):
+      if noteDelta != 0 and tickDelta > self.chordFudge and tickDelta < hopoDelta and isinstance(event, Note):
         hopoNotes.append([time, bpmEvent])
         hopoNotes.append([time, event])
 
@@ -1526,11 +1531,11 @@ class Track:
             topChordNote = eventBeforeLast.number
           numChordNotes = 2
           #now to determine how many notes were in that chord:
-          if tickDeltaBeforeLast < chordFudge:  #is there a 3rd note in the same chord?
+          if tickDeltaBeforeLast < self.chordFudge:  #is there a 3rd note in the same chord?
             if eventBeforeEventBeforeLast.number > topChordNote:
               topChordNote = eventBeforeEventBeforeLast.number
             numChordNotes = 3
-            if tickDeltaBeforeTickDeltaBeforeLast < chordFudge:  #is there a 4th note in the same chord?
+            if tickDeltaBeforeTickDeltaBeforeLast < self.chordFudge:  #is there a 4th note in the same chord?
               if eventBeforeEventBeforeEventBeforeLast.number > topChordNote:
                 topChordNote = eventBeforeEventBeforeEventBeforeLast.number
               numChordNotes = 4
@@ -1566,11 +1571,11 @@ class Track:
               topChordNote = eventBeforeLast.number
             numChordNotes = 2
             #now to determine how many notes were in that chord:
-            if tickDeltaBeforeLast < chordFudge:  #is there a 3rd note in the same chord?
+            if tickDeltaBeforeLast < self.chordFudge:  #is there a 3rd note in the same chord?
               if eventBeforeEventBeforeLast.number > topChordNote:
                 topChordNote = eventBeforeEventBeforeLast.number
               numChordNotes = 3
-              if tickDeltaBeforeTickDeltaBeforeLast < chordFudge:  #is there a 4th note in the same chord?
+              if tickDeltaBeforeTickDeltaBeforeLast < self.chordFudge:  #is there a 4th note in the same chord?
                 if eventBeforeEventBeforeEventBeforeLast.number > topChordNote:
                   topChordNote = eventBeforeEventBeforeEventBeforeLast.number
                 numChordNotes = 4
@@ -1641,11 +1646,11 @@ class Track:
               topChordNote = eventBeforeLast.number
             numChordNotes = 2
             #now to determine how many notes were in that chord:
-            if tickDeltaBeforeLast < chordFudge:  #is there a 3rd note in the same chord?
+            if tickDeltaBeforeLast < self.chordFudge:  #is there a 3rd note in the same chord?
               if eventBeforeEventBeforeLast.number > topChordNote:
                 topChordNote = eventBeforeEventBeforeLast.number
               numChordNotes = 3
-              if tickDeltaBeforeTickDeltaBeforeLast < chordFudge:  #is there a 4th note in the same chord?
+              if tickDeltaBeforeTickDeltaBeforeLast < self.chordFudge:  #is there a 4th note in the same chord?
                 if eventBeforeEventBeforeEventBeforeLast.number > topChordNote:
                   topChordNote = eventBeforeEventBeforeEventBeforeLast.number
                 numChordNotes = 4
@@ -1692,7 +1697,7 @@ class Track:
         #If it is the middle of a HOPO, it's really the end of a HOPO
         elif note.tappable == 2:
           #myfingershurt: here, need to check if the last note is a HOPO after chord and is being merged into the chord (which happens if too close to end of song)
-          if tickDelta < chordFudge:
+          if tickDelta < self.chordFudge:
             note.tappable = -4
           else:
             note.tappable = 3      

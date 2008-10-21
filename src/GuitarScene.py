@@ -1768,6 +1768,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
 
   def handleJurgen(self, pos):
+    #chordFudge = 1   #MFH - was 10 - #myfingershurt - needed to detect chords
+    chordFudge = self.song.track[0].chordFudge
+    
     if self.autoPlay:
       for i,guitar in enumerate(self.guitars):
   
@@ -1811,7 +1814,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         
         elif self.jurgenLogic == 1:   #Jurgen logic style MFH-Early -- will separate notes out by time index, with chord slop detection, and strum every note
           #MFH - Jurgen needs some logic that can handle notes that may be coming too fast to retrieve one set at a time
-          chordFudge = 10   #myfingershurt - needed to detect chords
           notes = guitar.getRequiredNotesMFH(self.song, pos)  #mfh - needed updatin' 
           
           #now, want to isolate the first note or set of notes to strum - then do it, and then release the controls
@@ -1848,7 +1850,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         elif self.jurgenLogic == 2:   #Jurgen logic style MFH-OnTime1 -- Have Jurgen attempt to strum on time instead of as early as possible
           #This method simply shrinks the note retrieval window to only notes that are on time and late.  No early notes are even considered.
           #MFH - Jurgen needs some logic that can handle notes that may be coming too fast to retrieve one set at a time
-          chordFudge = 10   #myfingershurt - needed to detect chords
           notes = guitar.getRequiredNotesForJurgenOnTime(self.song, pos)  #mfh - needed updatin' 
           
           #now, want to isolate the first note or set of notes to strum - then do it, and then release the controls
@@ -1884,7 +1885,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
         elif self.jurgenLogic == 3:   #Jurgen logic style MFH-OnTime2 -- Have Jurgen attempt to strum on time instead of as early as possible
           #This method retrieves all notes in the window and only attempts to play them as they pass the current position, like a real player
-          chordFudge = 10   #myfingershurt - needed to detect chords
           notes = guitar.getRequiredNotesMFH(self.song, pos)  #mfh - needed updatin' 
           
           
@@ -2775,7 +2775,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if not self.song:
       return
   
-    chordFudge = 10   #myfingershurt - needed to detect chords
+    chordFudge = 1  #MFH - was 10  #myfingershurt - needed to detect chords
     
     pos = self.getSongPosition()
 

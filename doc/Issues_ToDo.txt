@@ -1,7 +1,5 @@
+[anchor]known_issues[/anchor]
 [color=white]
-[size=160]
-TO DO
-[/size]
 [size=150]
 ---------===========-------------=============------------=============
 ---------===========-------------=============------------=============
@@ -66,6 +64,10 @@ Please note, I'm not looking for suggestions.  However, just in case you feel th
 
 ---------===========-------------=============------------=============
 [/color]
+[anchor]to_do_short[/anchor]
+[size=160]
+TO DO
+[/size]
 [color=white]
 ---------===========-------------=============------------=============
 
@@ -107,10 +109,12 @@ Please note, I'm not looking for suggestions.  However, just in case you feel th
 ++Pick from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=28649]worldrave's GH3 coding requests[/url] (found near bottom of that first post)
 ++Pick from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=30757&st=140#entry317751]BlackJack's list[/url]
 
+
+[anchor]to_do_long[/anchor]
 [color=white]
 [i]Long-term:[/i]
 [/color]
-[color=light grey]
+[color=grey]
 -Create a 3-player mode
 --Create a third set of player keys / alternate keys
 -Add optional flashing sidebars on neck when SP is ready

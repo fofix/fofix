@@ -67,6 +67,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.highscoreIndex  = [-1 for i in players]
     self.taunt           = None
     self.uploadingScores = False
+    self.uploadResult    = None
     self.nextScene       = None
     self.offset          = None
     self.pauseScroll     = None
@@ -392,7 +393,16 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           if self.uploadResult is None:
             font.render(_("Uploading Scores..."), (.05, .7 + v), scale = 0.001)
           else:
-            font.render(_("Scores uploaded! ..." + str(self.uploadResult) ), (.05, .7 + v), scale = 0.001)
+            result = str(self.uploadResult).split(";")
+            if len(result) > 0:
+              if result[0] == "True":
+                #MFH - display rank if it was successful
+                if len(result) > 1:
+                  font.render(_("Scores uploaded! ...your highscore ranks #" + result[1] + " on the world starpower chart!" ), (.05, .7 + v), scale = 0.001)
+                else:
+                  font.render(_("Scores uploaded! ...unknown rank."), (.05, .7 + v), scale = 0.001)
+              else:
+                font.render(_("Score upload failed!  World charts may be down."), (.05, .7 + v), scale = 0.001)
         
         return
         
