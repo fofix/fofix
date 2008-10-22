@@ -298,7 +298,6 @@ Expert:
 Constant/speedpercent -> 220/0.9 = 244,4...
 Hard/Medium/Easy: 277,7.../311,1.../333,3...
 
-
 Naturally the Neckspeed and hitwindows will be the slowest (and widest) for Boardspeed by Difficulty.
 
 ----
@@ -325,7 +324,7 @@ Here's the procedure:
     * This adds titles to the tiers.
     * Place it in the root of the folder with the songs in it (alongside library.ini if there is one).
     * The format is as follows (example for GH2):
-
+{{{
 [titles]
 sections = tier1 tier2 tier3 tier4 tier5 tier6 tier7 tier8 bonus
 
@@ -340,7 +339,7 @@ unlock_id = gh2_2
 [bonus]
 name = Bonus Songs
 unlock_id = gh2_bonus
-
+}}}
   * The "sections" setting under [titles] just identifies the names of the rest of the ini sections (sections beginning with lines with square brackets).
   * Each ini section refers to a single title.
   * The "name" setting is the text that will be placed on the title.
@@ -389,12 +388,13 @@ The very next "Section" marker that does not say "gtr_solo" marks the end of the
 Add another regular MIDI text event "solo_off" to mark ending.
 
 Please note, if your solo markers contain any of the following words they might be filtered:
+{{{
 "Drum"
 "Hand"
 "Map"
 "Organ"
 "Verse"
-
+}}}
 -----
 
 ==Translators==
@@ -406,15 +406,15 @@ Accent marks and tildes cause FoF some confusion if you don't tell it ahead of t
 Right now, we only have two options (and neither completely handles both)...
 
   # To have the game remove accent marks and display those characters as plain letters
-add this line in your fretsonfire.ini, under the [game] section (however, tildes will cause errors - "�" is correctly displayed, "�" displays an error ("codec can't decode byte (...) invalid data"), and there's a risk it will crash or hang at the loading screen):
+add this line in your `fretsonfire.ini`, under the [game] section (however, tildes will cause errors - "é" is correctly displayed, "õ" displays an error ("codec can't decode byte (...) invalid data"), and there's a risk it will crash or hang at the loading screen):
 
-Encoding = UTF-8
+`Encoding = UTF-8`
 
 -or-
   # To have the game remove tildes and display those characters as plain letters,
-add this line in your fretsonfire.ini, under the [game] section (accent marks are not displayed correctly - "õ" is correctly displayed, "é" is displayed "A©"):
+add this line in your `fretsonfire.ini`, under the [game] section (accent marks are not displayed correctly - "õ" is correctly displayed, "é" is displayed "A©"):
 
-Encoding = Latin
+`Encoding = Latin`
 
 -----
 
