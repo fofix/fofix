@@ -266,6 +266,7 @@ class Data(object):
     resource.load(self, "screwUpsoundsDrums", self.loadScrewUpsoundsDrums)    #myfingershurt: drum screw up sounds
     
     resource.load(self, "acceptSounds", self.loadAcceptSounds)    #myfingershurt
+    resource.load(self, "cancelSounds", self.loadBackSounds)    #myfingershurt
     
     resource.load(self, "symcsounds", self.loadScrewUpsounds)
     self.loadSoundEffect(self, "selectSound1", os.path.join("themes",themename,"sounds","select1.ogg"))
@@ -273,7 +274,14 @@ class Data(object):
     self.loadSoundEffect(self, "selectSound3", os.path.join("themes",themename,"sounds","select3.ogg"))
     self.loadSoundEffect(self, "startSound",   os.path.join("themes",themename,"sounds","start.ogg"))
     self.loadSoundEffect(self, "starSound", os.path.join("themes",themename,"sounds","starpower.ogg"))
-    self.loadSoundEffect(self, "failSound", os.path.join("sounds","failsound.ogg"))
+
+    if self.fileExists(os.path.join("themes",themename,"sounds","failsound.ogg")):
+      self.loadSoundEffect(self, "failSound", os.path.join("themes",themename,"sounds","failsound.ogg"))
+    else: #MFH: Fallback on general failsound.ogg
+      self.loadSoundEffect(self, "failSound", os.path.join("sounds","failsound.ogg"))
+      Log.warn(themename + "\sounds\failSound.ogg not found -- using general failSound.ogg instead.")
+
+
     #myfingershurt: integrating Capo's starpower clap sounds
     self.loadSoundEffect(self, "clapSound", os.path.join("sounds","clapsound.ogg"))
 
@@ -285,8 +293,10 @@ class Data(object):
 
     if self.fileExists(os.path.join("themes",themename,"sounds","crowdcheers.ogg")):
       self.loadSoundEffect(self, "crowdSound", os.path.join("themes",themename,"sounds","crowdcheers.ogg"))
+      self.cheerSoundFound = True
     else: #MFH: Fallback on starpower.ogg
       self.loadSoundEffect(self, "crowdSound", os.path.join("themes",themename,"sounds","starpower.ogg"))
+      self.cheerSoundFound = False
       Log.warn(themename + "\sounds\crowdcheers.ogg not found -- using starpower.ogg instead.")
 
     if self.fileExists(os.path.join("themes",themename,"sounds","staractivate.ogg")):
@@ -311,12 +321,12 @@ class Data(object):
     else:
       self.loadSoundEffect(self, "rockSound", os.path.join("sounds","rocksound.ogg"))
     
-    if self.theme == 0 or self.theme == 1:#GH2 or GH3
-      #self.loadSoundEffect(self, "acceptSound",  os.path.join("themes",themename,"sounds","in.ogg"))
-      self.loadSoundEffect(self, "cancelSound",  os.path.join("themes",themename,"sounds","out.ogg"))
-    elif self.theme == 2:
-      #self.loadSoundEffect(self, "acceptSound",  os.path.join("themes",themename,"sounds","action.ogg"))
-      self.loadSoundEffect(self, "cancelSound",  os.path.join("themes",themename,"sounds","out.ogg"))
+    #if self.theme == 0 or self.theme == 1:#GH2 or GH3
+    #  #self.loadSoundEffect(self, "acceptSound",  os.path.join("themes",themename,"sounds","in.ogg"))
+    #  self.loadSoundEffect(self, "cancelSounds",  os.path.join("themes",themename,"sounds","out.ogg"))
+    #elif self.theme == 2:
+    #  #self.loadSoundEffect(self, "acceptSound",  os.path.join("themes",themename,"sounds","action.ogg"))
+    #  self.loadSoundEffect(self, "cancelSounds",  os.path.join("themes",themename,"sounds","out.ogg"))
       
 
 
@@ -338,7 +348,9 @@ class Data(object):
     self.CDrumSound.setVolume(volume)
     for s in self.acceptSounds:
       s.setVolume(volume)
-    self.cancelSound.setVolume(volume)
+    for s in self.cancelSounds:
+      s.setVolume(volume)
+    #self.cancelSounds.setVolume(volume)
     self.rockSound.setVolume(volume)
     self.starDeActivateSound.setVolume(volume)
     self.starActivateSound.setVolume(volume)
@@ -357,6 +369,13 @@ class Data(object):
     volume   = self.sfxVolume
     fileName = self.resource.fileName(fileName)
     self.resource.load(target, name, lambda: Sound(fileName), onLoad = lambda s: s.setVolume(volume))
+
+
+  def loadBackSounds(self):   #MFH - adding optional support for random choice between two back sounds
+    if self.fileExists(os.path.join("themes",self.themeLabel,"sounds","back1.ogg")):
+      return [Sound(self.resource.fileName(os.path.join("themes",self.themeLabel,"sounds","back%d.ogg") % i)) for i in range(1, 3)]
+    else:
+      return [Sound(self.resource.fileName(os.path.join("themes",self.themeLabel,"sounds","out.ogg")))]
 
 
   def loadAcceptSounds(self):
@@ -437,6 +456,12 @@ class Data(object):
     return random.choice(self.acceptSounds)
 
   acceptSound = property(getAcceptSound)
+
+  def getBackSound(self):
+    """@return: A randomly chosen selection sound."""
+    return random.choice(self.cancelSounds)
+
+  cancelSound = property(getBackSound)
 
 
   def getSelectSound(self):

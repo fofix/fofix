@@ -118,12 +118,9 @@ class Guitar:
     self.starPower = 0
     self.starPowerActive = False
     self.starPowerGained = False
-    self.starNotesSet = False
 
     self.killPoints = False
 
-    self.maxStars = []
-    self.starNotes = []
     #get difficulty
     self.difficulty = self.engine.config.get("player%d" %(player), "difficulty")
 
@@ -210,6 +207,14 @@ class Guitar:
 
     
     self.setBPM(self.currentBpm)
+
+    self.starNotesSet = False
+    self.maxStars = []
+    self.starNotes = []
+    self.totalNotes = 0
+    
+
+
 
     engine.loadImgDrawing(self, "glowDrawing", "glow.svg",  textureSize = (128, 128))
 
@@ -1258,14 +1263,14 @@ class Guitar:
       if (event.noteBpm == 0.0):
         event.noteBpm = self.tempoBpm
 
-      for q in self.starNotes:
-        if time == q:
-          event.star = True
-          enable = False
-      for q in self.maxStars:
-        if time == q:
-          event.finalStar = True
-          enable = False
+      #for q in self.starNotes:
+      #  if time == q:
+      #    event.star = True
+      #    enable = False
+      #for q in self.maxStars:
+      #  if time == q:
+      #    event.finalStar = True
+      #    enable = False
       
       c = self.fretColors[event.number]
 
@@ -1415,14 +1420,14 @@ class Guitar:
       if (event.noteBpm == 0.0):
         event.noteBpm = self.tempoBpm
 
-      for q in self.starNotes:
-        if time == q:
-          event.star = True
-          enable = False
-      for q in self.maxStars:
-        if time == q:
-          event.finalStar = True
-          enable = False
+      #for q in self.starNotes:
+      #  if time == q:
+      #    event.star = True
+      #    enable = False
+      #for q in self.maxStars:
+      #  if time == q:
+      #    event.finalStar = True
+      #    enable = False
       
       c = self.fretColors[event.number]
 
@@ -2201,23 +2206,18 @@ class Guitar:
   def render(self, visibility, song, pos, controls, killswitch):
 
     if not self.starNotesSet == True:
-      totalNotes = 0
+      self.totalNotes = 0
       for time, event in song.track[self.player].getAllEvents():
         if not isinstance(event, Note):
           continue
-        totalNotes += 1
-
+        self.totalNotes += 1
       stars = []
       maxStars = []
-
-      maxPhrase = totalNotes/120
-
+      maxPhrase = self.totalNotes/120
       for q in range(0,maxPhrase):
         for n in range(0,10):
-          stars.append(totalNotes/maxPhrase*(q)+n+maxPhrase/4)
-        maxStars.append(totalNotes/maxPhrase*(q)+10+maxPhrase/4)
-      
-      self.starNotesSet = True
+          stars.append(self.totalNotes/maxPhrase*(q)+n+maxPhrase/4)
+        maxStars.append(self.totalNotes/maxPhrase*(q)+10+maxPhrase/4)
       i = 0
       for time, event in song.track[self.player].getAllEvents():
         if not isinstance(event, Note):
@@ -2225,10 +2225,23 @@ class Guitar:
         for a in stars:
           if i == a:
             self.starNotes.append(time)
+            event.star = True
         for a in maxStars:
           if i == a:
             self.maxStars.append(time)
+            event.finalStar = True
         i += 1
+      for time, event in song.track[self.player].getAllEvents():
+        if not isinstance(event, Note):
+          continue
+        for q in self.starNotes:
+          if time == q:
+            event.star = True
+        for q in self.maxStars:
+          if time == q and not event.finalStar:
+            event.star = True
+      self.starNotesSet = True
+
         
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)

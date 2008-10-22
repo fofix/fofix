@@ -7,20 +7,12 @@ Please note, I'm not looking for suggestions.  However, just in case you feel th
 ---------===========-------------=============------------=============
 ---------===========-------------=============------------=============
 [/size]
-[b]Known issues / problems / quirks:[/b]
 ...not all of these have been confirmed by me.  And some have existed long before this mod was created.
 
-[i]Known issues with drums:[/i]
+[i]Known issues:[/i]
 [/color]
 [color=grey]
--some drum "chords" at the end of starpower phrases result in a double starpower reward, when the notes are not all hit simultaneously
 -hitglow for drum "chords" only show for the last note hit
-[/color]
-
-[color=white]
-[i]Other unresolved / reported issues:[/i]
-[/color]
-[color=grey]
 -Practice mode's "time" (mm:ss)-style markers are NOT calculated accurately at all
 -Random, inexplicable, unrepeatable hangs occur sometimes when loading the song list or loading a song for gameplay.  Above-normal priority handling code is suspected.  [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4670#entry307313]detail post[/url]
 -Pausing may interrupt your streak and multiplier if there are notes close enough to the current position
@@ -34,6 +26,9 @@ Please note, I'm not looking for suggestions.  However, just in case you feel th
 -Sometimes, the game will start with fonts displayed all incorrectly.  It has been this way for a long time.  Just exit and restart.
 -Any image files (stages, backgrounds, etc) MUST  have a lowercase ".png" extension - THE GAME CAN NOT HANDLE CAPITALIZED ".PNG" EXTENSIONS!
 -While in the songlist, the game ignores keypresses while loading a song preview either via the yellow fret or auto preview (of course... just like the game ignores inputs while it's loading anything else)
+-on the setlist (CD mode), when using F3 to load a preview, "Loading Preview..." doesn't disappear anymore after the preview has been loaded; you can even press Escape to go to another folder : "Loading Preview..." stays on the screen.
+--and in songlist mode, "Loading Preview..." does not show up at all.
+
 [/color]
 
 [color=white]
@@ -75,16 +70,11 @@ TO DO
 
 [i]Short-term:[/i]
 [/color]
-++Add score uploading feedback - have the game tell the player if the score was uploaded or the connection timed out.
-++++Also notify user of this score's rank on the charts, or if it was too low to rank
-++Write logic to stagger-mix two different crowd cheering sound files in a loop to create an endless cheering effect for the GameResults screen (a la GH2)
 ++Add theme.ini options for HOPO indicator inactive and active colors, as well as x,y position on screen
 ++Add a new higher tier of star score, above gold (6) stars --- this new "7" star score will denote an actual, verifiable FC (Full Combo).  This means the player hit 100% of the notes from start to finish, and did not break the streak (no overstrums).
 ++++Add logic to ensure a star score of 7 uploads to Divra's charts as a star score of 6 for compatibility reasons -- until I am notified that the chart code has changed and will handle a star score of 7, then I will re-enable uploading of a 7 star score
-++Add logic to filter out career sorting prefixes (1. 2. 3.) for difficulty / instrument select screens, as well as the game results screen and failed screen
 ++Investigate invisible tails bug and potential fix -- [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=31005&st=#entry320251]detail post[/url]
 ++Add optional song.ini setting to force HOPO Frequency setting, so songs can be played as they are in the actual games
-++Add option to pause the animated background when you've messed up, and resume when you resume your streak (will be amusing with the Beavis and Butthead animation)
 ++Organize and clarify stage rotation & animation settings in the Options menu as detailed in [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=5120#entry313966]this post[/url]
 ++Add logic to play crowd cheer when rock meter reaches top 1/3rd
 ++Add song.ttf scale factor to theme.ini (for song info display during gameplay countdown)
@@ -103,11 +93,10 @@ TO DO
 ++Add new options to sort, ascending or descending, by: score, streak, star count, and hit accuracy / percentage
 ++Attempt to fix failing with > 100% shown in Fail screen - [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=31247&st=#entry323565]detail post[/url]
 ++Add "Album" entry to song.ini, to be displayed before Year (or put the Year tag on a new line so Album text could be part of it, as Puppetz sometimes does)
-++Investigate why, if you fail to play the first starnotes of a song, then use "Restart", you no more get the starnotes from the start
 ++Investigate why you can still gain starpower on a starpower sustain after losing a starpower streak
 ++Investigate why starpower clap SFX and practice beat claps don't seem to work
 ++Pick from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=28649]worldrave's GH3 coding requests[/url] (found near bottom of that first post)
-++Pick from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=30757&st=140#entry317751]BlackJack's list[/url]
+++Pick from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=30757&st=140#entry317751]BlackJack's list 1[/url] or [url=http://www.fretsonfire.net/forums/viewtopic.php?f=11&t=25040&p=295934#p296095]list 2[/url]
 
 
 [anchor]to_do_long[/anchor]
@@ -121,6 +110,8 @@ TO DO
 -Look into the feasibility of creating a font rendering queueing function, so all the font.render() functions will queue up and then at the end of the guitarscene.render() it will give the command to render all queued text as efficiently as possible
 -Add a setting to the main game options to enable / disable "Advanced Settings" - create an new set of a couple user-friendly settings (such as Volume, Theme, Animated Stage, Choose Neck, Advanced Mode, and Credits) for when this is disabled
 -Enhance the concept of "Alternate" keysets, instead of just "Normal" and "Alternate" - make this an integer, and allow up to 4 key sets (which will be easily expandable).
+-Replace all Decimal object quantization with modulo formatting, which can specify the number of decimal places to display (without rounding, which will work better to show thresholds)
+--which also needs to involve an update to the "Decimal Places" setting and how it is handled
 -Add support for a new star graphic for a star score of 7 in-game (gold stars with an aura?  3D-looking extruded gold stars?  whatever - just something different...)
 -Add support for a new star graphic for a star score of 7 in the songlist score & game results score (something different...)
 -Check out [url=http://www.mediafire.com/?sharekey=3b3779e0aeba7433d2db6fb9a8902bda]11111's proposed FoF intro video #1[/url] and [url=http://www.mediafire.com/?descsg1yht9]video #2[/url], and look into adding an optional intro video (default On) to the FoF startup sequence.

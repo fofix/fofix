@@ -93,6 +93,10 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       
     self.starScoring = self.engine.config.get("game", "star_scoring")#MFH
     self.Congratphrase = self.engine.config.get("game", "congrats")#blazingamer
+
+    self.resultCheerLoop = self.engine.config.get("game", "result_cheer_loop")#MFH
+    self.cheerLoopDelay = self.engine.config.get("game", "cheer_loop_delay")#MFH
+    self.cheerLoopCounter = self.cheerLoopDelay   #MFH - starts out ready to cheer
       
     self.engine.loadImgDrawing(self, "background", os.path.join("themes",themename,"gameresults.png"))
 
@@ -269,12 +273,18 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     if self.pauseScroll != None:
       self.pauseScroll += ticks / 20000.0
       
-
     if self.counter > 5000 and self.taunt:
       #self.taunt.setVolume(self.engine.config.get("audio", "guitarvol"))
       self.taunt.setVolume(self.engine.config.get("audio", "SFX_volume"))  #MFH - sound effect level
       self.taunt.play()
       self.taunt = None
+
+    #MFH - add counter here to play another crowd cheer before the one playing ends for an endless cheering loop
+    if self.resultCheerLoop == 1 and self.engine.data.cheerSoundFound:
+      self.cheerLoopCounter += 1
+      if self.cheerLoopCounter >= self.cheerLoopDelay:
+        self.cheerLoopCounter = 0
+        self.engine.data.crowdSound.play()
     
   def anim(self, start, ticks):
     return min(1.0, float(max(start, self.counter)) / ticks)
@@ -398,11 +408,15 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
               if result[0] == "True":
                 #MFH - display rank if it was successful
                 if len(result) > 1:
-                  font.render(_("Scores uploaded! ...your highscore ranks #" + result[1] + " on the world starpower chart!" ), (.05, .7 + v), scale = 0.001)
+                  #font.render(_("Scores uploaded! ...your highscore ranks #" + result[1] + " on the world starpower chart!" ), (.05, .7 + v), scale = 0.001)
+                  font.render(_("Scores uploaded!") + "  ..." + _("your highscore ranks") + " #" + result[1] + " " + _("on the world starpower chart!"), (.05, .7 + v), scale = 0.001)
                 else:
-                  font.render(_("Scores uploaded! ...unknown rank."), (.05, .7 + v), scale = 0.001)
+                  font.render(_("Scores uploaded!") + "  ..." + _("unknown rank."), (.05, .7 + v), scale = 0.001)
               else:
-                font.render(_("Score upload failed!  World charts may be down."), (.05, .7 + v), scale = 0.001)
+                #font.render(_("Score upload failed!  World charts may be down."), (.05, .7 + v), scale = 0.001)
+                font.render(_("Scores uploaded!") + "  ..." + _("no new highscore."), (.05, .7 + v), scale = 0.001)
+            else:
+              font.render(_("Score upload failed!  World charts may be down."), (.05, .7 + v), scale = 0.001)
         
         return
         

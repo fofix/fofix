@@ -385,6 +385,8 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "game", "bass_kick_sound", autoApply = True),   #myfingershurt
       ConfigChoice(engine.config, "game", "T_sound", autoApply = True), #Faaa Drum sound
       ConfigChoice(engine.config, "audio", "mute_last_second", autoApply = True), #MFH
+      ConfigChoice(engine.config, "game", "result_cheer_loop", autoApply = True), #MFH
+      ConfigChoice(engine.config, "game", "cheer_loop_delay", autoApply = True), #MFH
       ConfigChoice(engine.config, "game", "star_claps", autoApply = True),      #myfingershurt
       ConfigChoice(engine.config, "game", "beat_claps", autoApply = True), #racer
     ]

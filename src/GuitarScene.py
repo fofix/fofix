@@ -137,14 +137,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       else:
         self.keysList = self.keysList + [PLAYER2KEYS]
     
-    Log.debug("GuitarScene keysList: " + str(self.keysList))
-
-    #self.problemNote = [0,0]
-    #MFH - problemNote must now be a multi-dimensional list, to support problem chords (strumming chords and HOPOs that don't involve any fret changes)
-    #self.problemNote = [ self.problemNoteDefault, self.problemNoteDefault ]
-    #self.problemNoteDefault = [[-1],[-1],[-1],[-1]]
-    #self.problemNotesP1 = []
-    #self.problemNotesP2 = []
+    #Log.debug("GuitarScene keysList: " + str(self.keysList))
+    Log.debug("GuitarScene keysList: %s" % str(self.keysList))
 
     #for number formatting with commas for Rock Band:
     locale.setlocale(locale.LC_ALL, '')   #more compatible
@@ -1210,7 +1204,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.engine.view.popLayer(self.menu)
     self.resumeGame()
   
-  #MFH - TODO - determine if this can be called only once after the board rotation during countdown, instead of every time in the render()
   def setCamera(self):
     #x=0 middle
     #x=1 rotate left
@@ -2089,7 +2082,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.guitarSoloBroken[i] = True
           if self.hopoDebugDisp == 1:
             missedNoteNums = [noat.number for time, noat in missedNotes]
-            Log.debug("Miss: run(), found missed note(s)... %s" % str(missedNoteNums) + ", Time left=" + str(self.timeLeft))
+            #Log.debug("Miss: run(), found missed note(s)... %s" % str(missedNoteNums) + ", Time left=" + str(self.timeLeft))
+            Log.debug("Miss: run(), found missed note(s)... %(missedNotes)s, Song time=%(songTime)s" % \
+              {'missedNotes': str(missedNoteNums), 'songTime': str(self.timeLeft)})
+
           guitar.hopoActive = 0
           guitar.wasLastNoteHopod = False
           guitar.sameNoteHopoString = False
@@ -2204,272 +2200,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             #self.streakFlag = str(i)   #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1. 
           self.guitars[i].actions = [0,0,0]
 
-#-      #Faaa Drum sound -- OLD
-#-      #MFH - this is a separate rockmeter / starpower miss algorithm for drum parts, that includes Faaa's new drum hit ignore logic before the song starts
-#-      if self.drumMisses < 2: #rockmeter decrease after countdown
-#-        #if not self.pause and not self.failed and (self.battle==False or self.numOfPlayers==1) and self.playerList[0].part.text == "Drums" and self.countdownSeconds <=1:
-#-        if not self.pause and not self.failed and (self.battle==False or self.numOfPlayers==1) and self.guitars[0].isDrum and self.countdownSeconds <=1:
-#-          if self.notesMissed[0]: 
-#-            self.guitars[0].spEnabled = False
-#-            self.guitars[0].spNote = False 
-#-            self.minusRock[0] += self.minGain/self.multi[0]
-#-            self.rock[0] -= self.minusRock[0]/self.multi[0]
-#-            if self.plusRock[0] > self.pluBase:
-#-              self.plusRock[0] -= self.pluGain*2.0/self.multi[0]
-#-            if self.plusRock[0] <= self.pluBase:
-#-              self.plusRock[0] = self.pluBase/self.multi[0]
-#-          #if self.numOfPlayers>1 and self.notesMissed[1] and self.drumStart == True and self.playerList[1].part.text == "Drums" and self.countdownSeconds <=1: #QQstarS:Set [0] to [i]
-#-          if self.numOfPlayers>1 and self.notesMissed[1] and self.drumStart == True and self.guitars[1].isDrum and self.countdownSeconds <=1:
-#-            self.guitars[1].spEnabled = False
-#-            self.guitars[1].spNote = False #QQstarS:new1
-#-            self.minusRock[1] += self.minGain/self.multi[1]
-#-            self.rock[1] -= self.minusRock[1]/self.multi[1]
-#-            if self.plusRock[1] > self.pluBase:
-#-              self.plusRock[1] -= self.pluGain*2.0/self.multi[1]
-#-            if self.plusRock[1] <= self.pluBase:
-#-              self.plusRock[1] = self.pluBase/self.multi[1]
-#-          if self.notesHit[0]:
-#-            if self.rock[0] < self.rockMax:
-#-              self.plusRock[0] += self.pluGain*self.multi[0]
-#-              self.rock[0] += self.plusRock[0]*self.multi[0]
-#-            if self.rock[0] >= self.rockMax:
-#-              self.rock[0] = self.rockMax
-#-            if self.minusRock[0] > self.minBase:
-#-              self.minusRock[0] -= self.minGain/2.0*self.multi[0]
-#-          if self.notesHit[1]:
-#-            if self.rock[1] < self.rockMax:
-#-              self.plusRock[1] += self.pluGain*self.multi[1]
-#-              self.rock[1] += self.plusRock[1]*self.multi[1]
-#-            if self.rock[1] >= self.rockMax:
-#-              self.rock[1] = self.rockMax
-#-            if self.minusRock[1] > self.minBase:
-#-              self.minusRock[1] -= self.minGain/2.0*self.multi[1]
-#-          if self.lessMissed[0]: #QQstarS:Set [0] to [i]
-#-            self.guitars[0].spEnabled = False
-#-            self.guitars[0].spNote = False #QQstarS:new1
-#-            self.minusRock[0] += self.minGain/5.0/self.multi[0]
-#-            self.rock[0] -= self.minusRock[0]/5.0/self.multi[0]
-#-            if self.plusRock[0] > self.pluBase:
-#-              self.plusRock[0] -= self.pluGain/2.5/self.multi[0]
-#-          if  self.numOfPlayers>1 and self.lessMissed[1]: #QQstarS:Set [0] to [i]
-#-            self.guitars[1].spEnabled = False
-#-            self.guitars[1].spNote = False #QQstarS:new1
-#-            self.minusRock[1] += self.minGain/5.0/self.multi[1]
-#-            self.rock[1] -= self.minusRock[1]/5.0/self.multi[1]
-#-            if self.plusRock[1] > self.pluBase:
-#-              self.plusRock[1] -= self.pluGain/2.5/self.multi[1]
-#-  
-#-          if self.minusRock[1] <= self.minBase:
-#-            self.minusRock[1] = self.minBase
-#-          if self.plusRock[1] <= self.pluBase:
-#-            self.plusRock[1] = self.pluBase
-#-          if self.minusRock[0] <= self.minBase:
-#-            self.minusRock[0] = self.minBase
-#-          if self.plusRock[0] <= self.pluBase:
-#-            self.plusRock[0] = self.pluBase
-#-  
-#-  
-#-      if self.drumMisses == 2: #rockmeter decrease after the first note
-#-        #if (self.lessMissed[0] == True or self.notesHit[0] == True) and self.playerList[0].part.text == "Drums":
-#-        if (self.lessMissed[0] == True or self.notesHit[0] == True) and self.guitars[0].isDrum:
-#-          self.drumStart = True
-#-  
-#-  
-#-  
-#-      #if not self.pause and not self.failed and (self.battle==False or self.numOfPlayers==1) and self.playerList[0].part.text == "Drums" and self.drumStart == True: #QQstarS:new2 not bettle mode
-#-      if not self.pause and not self.failed and (self.battle==False or self.numOfPlayers==1) and self.guitars[0].isDrum and self.drumStart == True: #QQstarS:new2 not bettle mode
-#-        if self.notesMissed[0]: #QQstarS:Set [0] to [i]
-#-          self.guitars[0].spEnabled = False
-#-          self.guitars[0].spNote = False #QQstarS:new1
-#-          self.minusRock[0] += self.minGain/self.multi[0]
-#-          self.rock[0] -= self.minusRock[0]/self.multi[0]
-#-          if self.plusRock[0] > self.pluBase:
-#-            self.plusRock[0] -= self.pluGain*2.0/self.multi[0]
-#-          if self.plusRock[0] <= self.pluBase:
-#-            self.plusRock[0] = self.pluBase/self.multi[0]
-#-        #if self.numOfPlayers>1 and self.notesMissed[1] and self.drumStart == True and self.playerList[1].part.text == "Drums": #QQstarS:Set [0] to [i]
-#-        if self.numOfPlayers>1 and self.notesMissed[1] and self.drumStart == True and self.guitars[1].isDrum: #QQstarS:Set [0] to [i]
-#-          self.guitars[1].spEnabled = False
-#-          self.guitars[1].spNote = False #QQstarS:new1
-#-          self.minusRock[1] += self.minGain/self.multi[1]
-#-          self.rock[1] -= self.minusRock[1]/self.multi[1]
-#-          if self.plusRock[1] > self.pluBase:
-#-            self.plusRock[1] -= self.pluGain*2.0/self.multi[1]
-#-          if self.plusRock[1] <= self.pluBase:
-#-            self.plusRock[1] = self.pluBase/self.multi[1]
-#-        if self.notesHit[0]:
-#-          if self.rock[0] < self.rockMax:
-#-            self.plusRock[0] += self.pluGain*self.multi[0]
-#-            self.rock[0] += self.plusRock[0]*self.multi[0]
-#-          if self.rock[0] >= self.rockMax:
-#-            self.rock[0] = self.rockMax
-#-          if self.minusRock[0] > self.minBase:
-#-            self.minusRock[0] -= self.minGain/2.0*self.multi[0]
-#-        if self.notesHit[1]:
-#-          if self.rock[1] < self.rockMax:
-#-            self.plusRock[1] += self.pluGain*self.multi[1]
-#-            self.rock[1] += self.plusRock[1]*self.multi[1]
-#-          if self.rock[1] >= self.rockMax:
-#-            self.rock[1] = self.rockMax
-#-          if self.minusRock[1] > self.minBase:
-#-            self.minusRock[1] -= self.minGain/2.0*self.multi[1]
-#-        if self.lessMissed[0]: #QQstarS:Set [0] to [i]
-#-          self.guitars[0].spEnabled = False
-#-          self.guitars[0].spNote = False #QQstarS:new1
-#-          self.minusRock[0] += self.minGain/5.0/self.multi[0]
-#-          self.rock[0] -= self.minusRock[0]/5.0/self.multi[0]
-#-          if self.plusRock[0] > self.pluBase:
-#-            self.plusRock[0] -= self.pluGain/2.5/self.multi[0]
-#-        if  self.numOfPlayers>1 and self.lessMissed[1]: #QQstarS:Set [0] to [i]
-#-          self.guitars[1].spEnabled = False
-#-          self.guitars[1].spNote = False #QQstarS:new1
-#-          self.minusRock[1] += self.minGain/5.0/self.multi[1]
-#-          self.rock[1] -= self.minusRock[1]/5.0/self.multi[1]
-#-          if self.plusRock[1] > self.pluBase:
-#-            self.plusRock[1] -= self.pluGain/2.5/self.multi[1]
-#-  
-#-        if self.minusRock[1] <= self.minBase:
-#-          self.minusRock[1] = self.minBase
-#-        if self.plusRock[1] <= self.pluBase:
-#-          self.plusRock[1] = self.pluBase
-#-        if self.minusRock[0] <= self.minBase:
-#-          self.minusRock[0] = self.minBase
-#-        if self.plusRock[0] <= self.pluBase:
-#-          self.plusRock[0] = self.pluBase
-#-  
-#-      #if not self.pause and not self.failed and (self.battle==False or self.numOfPlayers==1) and not self.playerList[0].part.text == "Drums": #QQstarS:new2 not bettle mode
-#-      if not self.pause and not self.failed and (self.battle==False or self.numOfPlayers==1) and not self.guitars[0].isDrum: #QQstarS:new2 not bettle mode
-#-        if self.notesMissed[0]: #QQstarS:Set [0] to [i]
-#-          self.guitars[0].spEnabled = False
-#-          self.guitars[0].spNote = False #QQstarS:new1
-#-          self.minusRock[0] += self.minGain/self.multi[0]
-#-          self.rock[0] -= self.minusRock[0]/self.multi[0]
-#-          if self.plusRock[0] > self.pluBase:
-#-            self.plusRock[0] -= self.pluGain*2.0/self.multi[0]
-#-          if self.plusRock[0] <= self.pluBase:
-#-            self.plusRock[0] = self.pluBase/self.multi[0]
-#-        #if self.numOfPlayers>1 and self.notesMissed[1] and not self.playerList[1].part.text == "Drums": #QQstarS:Set [0] to [i]
-#-        if self.numOfPlayers>1 and self.notesMissed[1] and not self.guitars[1].isDrum: #QQstarS:Set [0] to [i]
-#-          self.guitars[1].spEnabled = False
-#-          self.guitars[1].spNote = False #QQstarS:new1
-#-          self.minusRock[1] += self.minGain/self.multi[1]
-#-          self.rock[1] -= self.minusRock[1]/self.multi[1]
-#-          if self.plusRock[1] > self.pluBase:
-#-            self.plusRock[1] -= self.pluGain*2.0/self.multi[1]
-#-          if self.plusRock[1] <= self.pluBase:
-#-            self.plusRock[1] = self.pluBase/self.multi[1]
-#-        if self.notesHit[0]:
-#-          if self.rock[0] < self.rockMax:
-#-            self.plusRock[0] += self.pluGain*self.multi[0]
-#-            self.rock[0] += self.plusRock[0]*self.multi[0]
-#-          if self.rock[0] >= self.rockMax:
-#-            self.rock[0] = self.rockMax
-#-          if self.minusRock[0] > self.minBase:
-#-            self.minusRock[0] -= self.minGain/2.0*self.multi[0]
-#-        if self.notesHit[1]:
-#-          if self.rock[1] < self.rockMax:
-#-            self.plusRock[1] += self.pluGain*self.multi[1]
-#-            self.rock[1] += self.plusRock[1]*self.multi[1]
-#-          if self.rock[1] >= self.rockMax:
-#-            self.rock[1] = self.rockMax
-#-          if self.minusRock[1] > self.minBase:
-#-            self.minusRock[1] -= self.minGain/2.0*self.multi[1]
-#-        if self.lessMissed[0]: #QQstarS:Set [0] to [i]
-#-          self.guitars[0].spEnabled = False
-#-          self.guitars[0].spNote = False #QQstarS:new1
-#-          self.minusRock[0] += self.minGain/5.0/self.multi[0]
-#-          self.rock[0] -= self.minusRock[0]/5.0/self.multi[0]
-#-          if self.plusRock[0] > self.pluBase:
-#-            self.plusRock[0] -= self.pluGain/2.5/self.multi[0]
-#-        if  self.numOfPlayers>1 and self.lessMissed[1]: #QQstarS:Set [0] to [i]
-#-          self.guitars[1].spEnabled = False
-#-          self.guitars[1].spNote = False #QQstarS:new1
-#-          self.minusRock[1] += self.minGain/5.0/self.multi[1]
-#-          self.rock[1] -= self.minusRock[1]/5.0/self.multi[1]
-#-          if self.plusRock[1] > self.pluBase:
-#-            self.plusRock[1] -= self.pluGain/2.5/self.multi[1]
-#-  
-#-        if self.minusRock[1] <= self.minBase:
-#-          self.minusRock[1] = self.minBase
-#-        if self.plusRock[1] <= self.pluBase:
-#-          self.plusRock[1] = self.pluBase
-#-        if self.minusRock[0] <= self.minBase:
-#-          self.minusRock[0] = self.minBase
-#-        if self.plusRock[0] <= self.pluBase:
-#-          self.plusRock[0] = self.pluBase
-#-      
-#-      
-#-      elif not self.pause and not self.failed and self.battle and self.numOfPlayers>1: #QQstarS:new2 Bettle mode
-#-        if self.notesMissed[0]: #QQstarS:Set [0] to [i]
-#-          self.guitars[0].spEnabled = False
-#-          self.guitars[0].spNote = False #QQstarS:new1
-#-          self.minusRock[0] += self.minGain/self.multi[0]
-#-          #self.rock[0] -= self.minusRock[0]/self.multi[0]
-#-          if self.plusRock[0] > self.pluBase:
-#-            self.plusRock[0] -= self.pluGain*2.0/self.multi[0]
-#-          if self.plusRock[0] <= self.pluBase:
-#-            self.plusRock[0] = self.pluBase/self.multi[0]
-#-        if  self.numOfPlayers>1 and self.notesMissed[1]: #QQstarS:Set [0] to [i]
-#-          self.guitars[1].spEnabled = False
-#-          self.guitars[1].spNote = False #QQstarS:new1
-#-          self.minusRock[1] += self.minGain/self.multi[1]
-#-          #self.rock[1] -= self.minusRock[1]/self.multi[1]
-#-          if self.plusRock[1] > self.pluBase:
-#-            self.plusRock[1] -= self.pluGain*2.0/self.multi[1]
-#-          if self.plusRock[1] <= self.pluBase:
-#-            self.plusRock[1] = self.pluBase/self.multi[1]
-#-  	
-#-        if self.notesHit[0]:
-#-          if self.rock[0] < self.rockMax:
-#-            self.plusRock[0] += self.pluGain*self.multi[0]
-#-            if self.plusRock[0] >self.battleMax:
-#-              self.plusRock[0] = self.battleMax
-#-            self.rock[0] += self.plusRock[0]*self.multi[0]
-#-            self.rock[1] -= self.plusRock[0]*self.multi[0]
-#-          if self.rock[1] <0:
-#-            self.rock[1]=0
-#-          if self.rock[0] >= self.rockMax:
-#-            self.rock[0] = self.rockMax
-#-          if self.minusRock[0] > self.minBase:
-#-            self.minusRock[0] -= self.minGain/2.0*self.multi[0]
-#-  
-#-        if self.notesHit[1]:
-#-          if self.rock[1] < self.rockMax:
-#-            self.plusRock[1] += self.pluGain*self.multi[1]
-#-            if self.plusRock[1] > self.battleMax:
-#-              self.plusRock[1] = self.battleMax
-#-            self.rock[1] += self.plusRock[1]*self.multi[1]
-#-            self.rock[0] -= self.plusRock[1]*self.multi[1]
-#-          if self.rock[0] <0:
-#-            self.rock[0]=0
-#-          if self.rock[1] >= self.rockMax:
-#-            self.rock[1] = self.rockMax
-#-          if self.minusRock[1] > self.minBase:
-#-            self.minusRock[1] -= self.minGain/2.0*self.multi[1]
-#-  
-#-        if self.lessMissed[0]: #QQstarS:Set [0] to [i]
-#-          self.guitars[0].spEnabled = False
-#-          self.guitars[0].spNote = False #QQstarS:new1
-#-          self.minusRock[0] += self.minGain/5.0/self.multi[0]
-#-          #self.rock[0] -= self.minusRock[0]/5.0/self.multi[0]
-#-          if self.plusRock[0] > self.pluBase:
-#-            self.plusRock[0] -= self.pluGain/2.5/self.multi[0]
-#-        if  self.numOfPlayers>1 and self.lessMissed[1]: #QQstarS:Set [0] to [i]
-#-          self.guitars[1].spEnabled = False
-#-          self.guitars[1].spNote = False #QQstarS:new1
-#-          self.minusRock[1] += self.minGain/5.0/self.multi[1]
-#-          #self.rock[1] -= self.minusRock[1]/5.0/self.multi[1]
-#-          if self.plusRock[1] > self.pluBase:
-#-            self.plusRock[1] -= self.pluGain/2.5/self.multi[1]
-#-      
-#-      self.notesMissed[0] = False #QQstarS:Set [0] to [i]
-#-      self.notesMissed[1] = False #QQstarS:Set [0] to [i]
-#-      self.notesHit[0] = False #QQstarS:Set [0] to [i]
-#-      self.notesHit[1] = False #QQstarS:Set [0] to [i]
-#-      self.lessMissed[0] = False #QQstarS:Set [0] to [i]
-#-      self.lessMissed[1] = False #QQstarS:Set [0] to [i]
-
-    
 
       if self.countdown > 0: #MFH won't start song playing if you failed or pause
         self.countdown = max(self.countdown - ticks / self.song.period, 0)
@@ -2795,7 +2525,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.notesMissed[num] = True #QQstarS:Set [0] to [i]
       if self.hopoDebugDisp == 1:
         missedNoteNums = [noat.number for time, noat in missedNotes]
-        Log.debug("Miss: dopick3gh2(), found missed note(s).... %s" % str(missedNoteNums) + ", Time left=" + str(self.timeLeft))
+        #Log.debug("Miss: dopick3gh2(), found missed note(s).... %s" % str(missedNoteNums) + ", Time left=" + str(self.timeLeft))
+        Log.debug("Miss: dopick3gh2(), found missed note(s)... %(missedNotes)s, Song time=%(songTime)s" % \
+          {'missedNotes': str(missedNoteNums), 'songTime': str(self.timeLeft)})
+
 
       if hopo == True:
         return
@@ -2942,7 +2675,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if self.hopoDebugDisp == 1  and not self.guitars[num].isDrum:
           #Log.debug("Skipped note(s) detected in startpick3: " + str(self.guitars[num].missedNoteNums))
           problemNoteMatchingList = [(int(tym), noat.number, noat.played) for tym, noat in self.guitars[num].matchingNotes]
-          Log.debug("Skipped note(s) detected in startpick3: " + str(self.guitars[num].missedNoteNums) + ", problemMatchingNotes: " + str(problemNoteMatchingList) + ", activeKeys= " + str(activeKeyList) + ", Time left=" + str(self.timeLeft))
+          #Log.debug("Skipped note(s) detected in startpick3: " + str(self.guitars[num].missedNoteNums) + ", problemMatchingNotes: " + str(problemNoteMatchingList) + ", activeKeys= " + str(activeKeyList) + ", Time left=" + str(self.timeLeft))
+          Log.debug("Skipped note(s) detected in startpick3: %(missedNotes)s, notesToMatch: %(matchNotes)s, activeFrets: %(activeFrets)s, Song time=%(songTime)s" % \
+            {'missedNotes': str(self.guitars[num].missedNoteNums), 'matchNotes': str(problemNoteMatchingList), 'activeFrets': str(activeKeyList), 'songTime': str(self.timeLeft)})
+
       
         self.playerList[num].streak = 0
         self.guitarSoloBroken[num] = True
@@ -3113,7 +2849,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         #if self.hopoDebugDisp == 1 and `self.playerList[num].part` != "Drums":
         if self.hopoDebugDisp == 1 and not self.guitars[num].isDrum:
           problemNoteMatchingList = [(int(tym), noat.number, noat.played) for tym, noat in self.guitars[num].matchingNotes]  
-          Log.debug("Miss: dopick3gh2(), fail-startpick3()...HigherFretsHeld: " + str(HigherFretsHeld) + ", LastHopoFretHeld: " + str(LastHopoFretStillHeld) + ", lastStrumWasChord: " + str(lastStrumWasChordWas) + ", sameNoteHopoStringFlag: " + str(sameNoteHopoFlagWas) + ", problemNoteMatchingList: " + str(problemNoteMatchingList) + ", activeKeys= " + str(activeKeyList) + ", Time left=" + str(self.timeLeft))
+          #Log.debug("Miss: dopick3gh2(), fail-startpick3()...HigherFretsHeld: " + str(HigherFretsHeld) + ", LastHopoFretHeld: " + str(LastHopoFretStillHeld) + ", lastStrumWasChord: " + str(lastStrumWasChordWas) + ", sameNoteHopoStringFlag: " + str(sameNoteHopoFlagWas) + ", problemNoteMatchingList: " + str(problemNoteMatchingList) + ", activeKeys= " + str(activeKeyList) + ", Time left=" + str(self.timeLeft))
+          Log.debug("Miss: dopick3gh2(), fail-startpick3()...HigherFretsHeld: %(higherFrets)s, LastHopoFretHeld: %(lastHopoFret)s, lastStrumWasChord: %(lastStrumChord)s, sameNoteHopoStringFlag: %(sameNoteHopoFlag)s, notesToMatch: %(matchNotes)s, activeFrets: %(activeFrets)s, Song time=%(songTime)s" % \
+            {'higherFrets': str(HigherFretsHeld), 'lastHopoFret': str(LastHopoFretStillHeld), 'lastStrumChord': str(lastStrumWasChordWas), 'sameNoteHopoFlag': str(sameNoteHopoFlagWas), 'matchNotes': str(problemNoteMatchingList), 'activeFrets': str(activeKeyList), 'songTime': str(self.timeLeft)})
           
   
         self.notesMissed[num] = True #QQstarS:Set [0] to [i]
@@ -3131,8 +2869,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   def activateSP(self, num): #QQstarS: Fix this function, add a element "num"
     if self.guitars[num].starPower >= 50 and self.guitars[num].starPowerActive == False: #QQstarS:Set [0] to [i]
       #self.sfxChannel.setVolume(self.sfxVolume)
-      #MFH - TODO - may need a second SFX channel to mix crowd and star sounds
-      self.engine.data.crowdSound.play()
+      if self.engine.data.cheerSoundFound:
+        self.engine.data.crowdSound.play()
       self.engine.data.starActivateSound.play()
       self.guitars[num].starPowerActive = True #QQstarS:Set [0] to [i]
       self.guitars[num].overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
@@ -4027,512 +3765,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
       self.hitAccuracy[playerNum] = (float(self.playerList[playerNum].notesHit) / float(self.playerList[playerNum].totalStreakNotes) ) * 100.0
       self.avMult[playerNum] = self.playerList[playerNum].score/(self.playerList[playerNum].totalNotes*50.0)
-
-#-      self.lastStars[playerNum] = self.playerList[playerNum].stars
-#-      #MFH - 3 star scoring styles  
-#-      if self.starScoring == 1:     #GH style scoring
-#-        if self.avMult[playerNum] >= 2.8:#ShiekOdaSandz: might add "must get 90%" if people don't like this; "and self.hitAccuracy[playerNum] = 90.0"
-#-          #myfingershurt: yes, this is needed to ensure a proper 5* score.  If the accuracy isn't there, it's still a 4*:
-#-          if self.hitAccuracy[playerNum] >= 90.0:
-#-            self.playerList[playerNum].stars = 5
-#-          else:
-#-            self.playerList[playerNum].stars = 4
-#-        elif self.avMult[playerNum] >= 2.0:#ShiekOdaSandz: changed so that you have higher threshold for 4 stars
-#-          self.playerList[playerNum].stars = 4
-#-          if self.starGrey1:  #if more complex star system is enabled
-#-            if self.avMult[playerNum] < 2.1:
-#-              self.partialStar[playerNum] = 0
-#-            elif self.avMult[playerNum] < 2.2:
-#-              self.partialStar[playerNum] = 1
-#-            elif self.avMult[playerNum] < 2.3:
-#-              self.partialStar[playerNum] = 2
-#-            elif self.avMult[playerNum] < 2.4:
-#-              self.partialStar[playerNum] = 3
-#-            elif self.avMult[playerNum] < 2.5:
-#-              self.partialStar[playerNum] = 4
-#-            elif self.avMult[playerNum] < 2.6:
-#-              self.partialStar[playerNum] = 5
-#-            elif self.avMult[playerNum] < 2.7:
-#-              self.partialStar[playerNum] = 6
-#-            else:
-#-              self.partialStar[playerNum] = 7
-#-
-#-        elif self.avMult[playerNum] >= 1.2:#ShiekOdaSandz: scorehero for 3 stars
-#-          self.playerList[playerNum].stars = 3
-#-          if self.starGrey1:  #if more complex star system is enabled
-#-            if self.avMult[playerNum] < 1.3:
-#-              self.partialStar[playerNum] = 0
-#-            elif self.avMult[playerNum] < 1.4:
-#-              self.partialStar[playerNum] = 1
-#-            elif self.avMult[playerNum] < 1.5:
-#-              self.partialStar[playerNum] = 2
-#-            elif self.avMult[playerNum] < 1.6:
-#-              self.partialStar[playerNum] = 3
-#-            elif self.avMult[playerNum] < 1.7:
-#-              self.partialStar[playerNum] = 4
-#-            elif self.avMult[playerNum] < 1.8:
-#-              self.partialStar[playerNum] = 5
-#-            elif self.avMult[playerNum] < 1.9:
-#-              self.partialStar[playerNum] = 6
-#-            else:
-#-              self.partialStar[playerNum] = 7
-#-
-#-        elif self.avMult[playerNum] >= .4:#ShiekOdaSandz: scorehero version
-#-          self.playerList[playerNum].stars = 2
-#-          if self.starGrey1:  #if more complex star system is enabled
-#-            if self.avMult[playerNum] < 0.5:
-#-              self.partialStar[playerNum] = 0
-#-            elif self.avMult[playerNum] < 0.6:
-#-              self.partialStar[playerNum] = 1
-#-            elif self.avMult[playerNum] < 0.7:
-#-              self.partialStar[playerNum] = 2
-#-            elif self.avMult[playerNum] < 0.8:
-#-              self.partialStar[playerNum] = 3
-#-            elif self.avMult[playerNum] < 0.9:
-#-              self.partialStar[playerNum] = 4
-#-            elif self.avMult[playerNum] < 1.0:
-#-              self.partialStar[playerNum] = 5
-#-            elif self.avMult[playerNum] < 1.1:
-#-              self.partialStar[playerNum] = 6
-#-            else:
-#-              self.partialStar[playerNum] = 7
-#-
-#-        elif self.avMult[playerNum] > 0:#ShiekOdaSandz: scorehero version
-#-          self.playerList[playerNum].stars = 1
-#-          if self.starGrey1:  #if more complex star system is enabled
-#-            if self.avMult[playerNum] < 0.05:
-#-              self.partialStar[playerNum] = 0
-#-            elif self.avMult[playerNum] < 0.1:
-#-              self.partialStar[playerNum] = 1
-#-            elif self.avMult[playerNum] < 0.15:
-#-              self.partialStar[playerNum] = 2
-#-            elif self.avMult[playerNum] < 0.2:
-#-              self.partialStar[playerNum] = 3
-#-            elif self.avMult[playerNum] < 0.25:
-#-              self.partialStar[playerNum] = 4
-#-            elif self.avMult[playerNum] < 0.3:
-#-              self.partialStar[playerNum] = 5
-#-            elif self.avMult[playerNum] < 0.35:
-#-              self.partialStar[playerNum] = 6
-#-            else:
-#-              self.partialStar[playerNum] = 7
-#-
-#-        elif self.avMult[playerNum] == 0:#ShiekOdaSandz: changed so that you cannot get 3 stars with a score = 0
-#-          self.playerList[playerNum].stars = 0
-#-          self.partialStar[playerNum] = 0
-#-        if self.hitAccuracy[playerNum] == 100.0 and self.playerList[playerNum].notesHit == self.playerList[playerNum].totalStreakNotes:
-#-          self.playerList[playerNum].stars = 6
-#-        
-#-          
-#-      elif self.starScoring == 2:   #RB style scoring
-#-        #if self.playerList[playerNum].part.text == "Bass Guitar":
-#-        if self.guitars[playerNum].isBassGuitar:
-#-          if self.avMult[playerNum] >= 4.80:
-#-            self.playerList[playerNum].stars = 6
-#-          elif self.avMult[playerNum] >= 3.0:
-#-            self.playerList[playerNum].stars = 5
-#-          elif self.avMult[playerNum] >= 2.0:
-#-            self.playerList[playerNum].stars = 4
-#-            if self.starGrey1:  #if more complex star system is enabled, and we're using Rock Band style scoring
-#-              if self.avMult[playerNum] < 2.125:
-#-                self.partialStar[playerNum] = 0
-#-              elif self.avMult[playerNum] < 2.25:
-#-                self.partialStar[playerNum] = 1
-#-              elif self.avMult[playerNum] < 2.375:
-#-                self.partialStar[playerNum] = 2
-#-              elif self.avMult[playerNum] < 2.5:
-#-                self.partialStar[playerNum] = 3
-#-              elif self.avMult[playerNum] < 2.625:
-#-                self.partialStar[playerNum] = 4
-#-              elif self.avMult[playerNum] < 2.75:
-#-                self.partialStar[playerNum] = 5
-#-              elif self.avMult[playerNum] < 2.875:
-#-                self.partialStar[playerNum] = 6
-#-              else:
-#-                self.partialStar[playerNum] = 7
-#-
-#-          elif self.avMult[playerNum] >= 1.0:
-#-            self.playerList[playerNum].stars = 3
-#-            if self.starGrey1:  #if more complex star system is enabled, and we're using Rock Band style scoring
-#-              if self.avMult[playerNum] < 1.125:
-#-                self.partialStar[playerNum] = 0
-#-              elif self.avMult[playerNum] < 1.25:
-#-                self.partialStar[playerNum] = 1
-#-              elif self.avMult[playerNum] < 1.375:
-#-                self.partialStar[playerNum] = 2
-#-              elif self.avMult[playerNum] < 1.5:
-#-                self.partialStar[playerNum] = 3
-#-              elif self.avMult[playerNum] < 1.625:
-#-                self.partialStar[playerNum] = 4
-#-              elif self.avMult[playerNum] < 1.75:
-#-                self.partialStar[playerNum] = 5
-#-              elif self.avMult[playerNum] < 1.875:
-#-                self.partialStar[playerNum] = 6
-#-              else:
-#-                self.partialStar[playerNum] = 7
-#-
-#-          elif self.avMult[playerNum] >= 0.5:
-#-            self.playerList[playerNum].stars = 2
-#-            if self.starGrey1:  #if more complex star system is enabled, and we're using Rock Band style scoring
-#-              if self.avMult[playerNum] < 0.5625:
-#-                self.partialStar[playerNum] = 0
-#-              elif self.avMult[playerNum] < 0.625:
-#-                self.partialStar[playerNum] = 1
-#-              elif self.avMult[playerNum] < 0.6875:
-#-                self.partialStar[playerNum] = 2
-#-              elif self.avMult[playerNum] < 0.75:
-#-                self.partialStar[playerNum] = 3
-#-              elif self.avMult[playerNum] < 0.8125:
-#-                self.partialStar[playerNum] = 4
-#-              elif self.avMult[playerNum] < 0.875:
-#-                self.partialStar[playerNum] = 5
-#-              elif self.avMult[playerNum] < 0.9375:
-#-                self.partialStar[playerNum] = 6
-#-              else:
-#-                self.partialStar[playerNum] = 7
-#-          elif self.avMult[playerNum] > 0.25:
-#-            self.playerList[playerNum].stars = 1
-#-            if self.starGrey1:  #if more complex star system is enabled, and we're using Rock Band style scoring
-#-              if self.avMult[playerNum] < 0.28125:
-#-                self.partialStar[playerNum] = 0
-#-              elif self.avMult[playerNum] < 0.3125:
-#-                self.partialStar[playerNum] = 1
-#-              elif self.avMult[playerNum] < 0.34375:
-#-                self.partialStar[playerNum] = 2
-#-              elif self.avMult[playerNum] < 0.375:
-#-                self.partialStar[playerNum] = 3
-#-              elif self.avMult[playerNum] < 0.40625:
-#-                self.partialStar[playerNum] = 4
-#-              elif self.avMult[playerNum] < 0.4375:
-#-                self.partialStar[playerNum] = 5
-#-              elif self.avMult[playerNum] < 0.46875:
-#-                self.partialStar[playerNum] = 6
-#-              else:
-#-                self.partialStar[playerNum] = 7
-#-
-#-          else: 
-#-            self.playerList[playerNum].stars = 0
-#-            if self.starGrey1:  #if more complex star system is enabled, and we're using Rock Band style scoring
-#-              if self.avMult[playerNum] < 0.03125:
-#-                self.partialStar[playerNum] = 0
-#-              elif self.avMult[playerNum] < 0.0625:
-#-                self.partialStar[playerNum] = 1
-#-              elif self.avMult[playerNum] < 0.09375:
-#-                self.partialStar[playerNum] = 2
-#-              elif self.avMult[playerNum] < 0.125:
-#-                self.partialStar[playerNum] = 3
-#-              elif self.avMult[playerNum] < 0.15625:
-#-                self.partialStar[playerNum] = 4
-#-              elif self.avMult[playerNum] < 0.1875:
-#-                self.partialStar[playerNum] = 5
-#-              elif self.avMult[playerNum] < 0.21875:
-#-                self.partialStar[playerNum] = 6
-#-              else:
-#-                self.partialStar[playerNum] = 7
-#-
-#-        #elif self.playerList[playerNum].part.text == "Drums":
-#-        elif self.guitars[playerNum].isDrum:
-#-          if self.avMult[playerNum] >= 4.65:
-#-            self.playerList[playerNum].stars = 6
-#-          elif self.avMult[playerNum] >= 3.0:
-#-            self.playerList[playerNum].stars = 5
-#-          elif self.avMult[playerNum] >= 2.0:
-#-            self.playerList[playerNum].stars = 4
-#-            if self.starGrey1:  #if more complex star system is enabled, and we're using Rock Band style scoring
-#-              if self.avMult[playerNum] < 2.125:
-#-                self.partialStar[playerNum] = 0
-#-              elif self.avMult[playerNum] < 2.25:
-#-                self.partialStar[playerNum] = 1
-#-              elif self.avMult[playerNum] < 2.375:
-#-                self.partialStar[playerNum] = 2
-#-              elif self.avMult[playerNum] < 2.5:
-#-                self.partialStar[playerNum] = 3
-#-              elif self.avMult[playerNum] < 2.625:
-#-                self.partialStar[playerNum] = 4
-#-              elif self.avMult[playerNum] < 2.75:
-#-                self.partialStar[playerNum] = 5
-#-              elif self.avMult[playerNum] < 2.875:
-#-                self.partialStar[playerNum] = 6
-#-              else:
-#-                self.partialStar[playerNum] = 7
-#-
-#-          elif self.avMult[playerNum] >= 1.0:
-#-            self.playerList[playerNum].stars = 3
-#-            if self.starGrey1:  #if more complex star system is enabled, and we're using Rock Band style scoring
-#-              if self.avMult[playerNum] < 1.125:
-#-                self.partialStar[playerNum] = 0
-#-              elif self.avMult[playerNum] < 1.25:
-#-                self.partialStar[playerNum] = 1
-#-              elif self.avMult[playerNum] < 1.375:
-#-                self.partialStar[playerNum] = 2
-#-              elif self.avMult[playerNum] < 1.5:
-#-                self.partialStar[playerNum] = 3
-#-              elif self.avMult[playerNum] < 1.625:
-#-                self.partialStar[playerNum] = 4
-#-              elif self.avMult[playerNum] < 1.75:
-#-                self.partialStar[playerNum] = 5
-#-              elif self.avMult[playerNum] < 1.875:
-#-                self.partialStar[playerNum] = 6
-#-              else:
-#-                self.partialStar[playerNum] = 7
-#-
-#-          elif self.avMult[playerNum] >= 0.5:
-#-            self.playerList[playerNum].stars = 2
-#-            if self.starGrey1:  #if more complex star system is enabled, and we're using Rock Band style scoring
-#-              if self.avMult[playerNum] < 0.5625:
-#-                self.partialStar[playerNum] = 0
-#-              elif self.avMult[playerNum] < 0.625:
-#-                self.partialStar[playerNum] = 1
-#-              elif self.avMult[playerNum] < 0.6875:
-#-                self.partialStar[playerNum] = 2
-#-              elif self.avMult[playerNum] < 0.75:
-#-                self.partialStar[playerNum] = 3
-#-              elif self.avMult[playerNum] < 0.8125:
-#-                self.partialStar[playerNum] = 4
-#-              elif self.avMult[playerNum] < 0.875:
-#-                self.partialStar[playerNum] = 5
-#-              elif self.avMult[playerNum] < 0.9375:
-#-                self.partialStar[playerNum] = 6
-#-              else:
-#-                self.partialStar[playerNum] = 7
-#-          elif self.avMult[playerNum] > 0.25:
-#-            self.playerList[playerNum].stars = 1
-#-            if self.starGrey1:  #if more complex star system is enabled, and we're using Rock Band style scoring
-#-              if self.avMult[playerNum] < 0.28125:
-#-                self.partialStar[playerNum] = 0
-#-              elif self.avMult[playerNum] < 0.3125:
-#-                self.partialStar[playerNum] = 1
-#-              elif self.avMult[playerNum] < 0.34375:
-#-                self.partialStar[playerNum] = 2
-#-              elif self.avMult[playerNum] < 0.375:
-#-                self.partialStar[playerNum] = 3
-#-              elif self.avMult[playerNum] < 0.40625:
-#-                self.partialStar[playerNum] = 4
-#-              elif self.avMult[playerNum] < 0.4375:
-#-                self.partialStar[playerNum] = 5
-#-              elif self.avMult[playerNum] < 0.46875:
-#-                self.partialStar[playerNum] = 6
-#-              else:
-#-                self.partialStar[playerNum] = 7
-#-
-#-          else: 
-#-            self.playerList[playerNum].stars = 0
-#-            if self.starGrey1:  #if more complex star system is enabled, and we're using Rock Band style scoring
-#-              if self.avMult[playerNum] < 0.03125:
-#-                self.partialStar[playerNum] = 0
-#-              elif self.avMult[playerNum] < 0.0625:
-#-                self.partialStar[playerNum] = 1
-#-              elif self.avMult[playerNum] < 0.09375:
-#-                self.partialStar[playerNum] = 2
-#-              elif self.avMult[playerNum] < 0.125:
-#-                self.partialStar[playerNum] = 3
-#-              elif self.avMult[playerNum] < 0.15625:
-#-                self.partialStar[playerNum] = 4
-#-              elif self.avMult[playerNum] < 0.1875:
-#-                self.partialStar[playerNum] = 5
-#-              elif self.avMult[playerNum] < 0.21875:
-#-                self.partialStar[playerNum] = 6
-#-              else:
-#-                self.partialStar[playerNum] = 7
-#-
-#-        else:   #guitar parts
-#-          if self.avMult[playerNum] >= 5.30:
-#-            self.playerList[playerNum].stars = 6
-#-          elif self.avMult[playerNum] >= 3.0:
-#-            self.playerList[playerNum].stars = 5
-#-          elif self.avMult[playerNum] >= 2.0:
-#-            self.playerList[playerNum].stars = 4
-#-            if self.starGrey1:  #if more complex star system is enabled, and we're using Rock Band style scoring
-#-              if self.avMult[playerNum] < 2.125:
-#-                self.partialStar[playerNum] = 0
-#-              elif self.avMult[playerNum] < 2.25:
-#-                self.partialStar[playerNum] = 1
-#-              elif self.avMult[playerNum] < 2.375:
-#-                self.partialStar[playerNum] = 2
-#-              elif self.avMult[playerNum] < 2.5:
-#-                self.partialStar[playerNum] = 3
-#-              elif self.avMult[playerNum] < 2.625:
-#-                self.partialStar[playerNum] = 4
-#-              elif self.avMult[playerNum] < 2.75:
-#-                self.partialStar[playerNum] = 5
-#-              elif self.avMult[playerNum] < 2.875:
-#-                self.partialStar[playerNum] = 6
-#-              else:
-#-                self.partialStar[playerNum] = 7
-#-
-#-          elif self.avMult[playerNum] >= 1.0:
-#-            self.playerList[playerNum].stars = 3
-#-            if self.starGrey1:  #if more complex star system is enabled, and we're using Rock Band style scoring
-#-              if self.avMult[playerNum] < 1.125:
-#-                self.partialStar[playerNum] = 0
-#-              elif self.avMult[playerNum] < 1.25:
-#-                self.partialStar[playerNum] = 1
-#-              elif self.avMult[playerNum] < 1.375:
-#-                self.partialStar[playerNum] = 2
-#-              elif self.avMult[playerNum] < 1.5:
-#-                self.partialStar[playerNum] = 3
-#-              elif self.avMult[playerNum] < 1.625:
-#-                self.partialStar[playerNum] = 4
-#-              elif self.avMult[playerNum] < 1.75:
-#-                self.partialStar[playerNum] = 5
-#-              elif self.avMult[playerNum] < 1.875:
-#-                self.partialStar[playerNum] = 6
-#-              else:
-#-                self.partialStar[playerNum] = 7
-#-
-#-          elif self.avMult[playerNum] >= 0.5:
-#-            self.playerList[playerNum].stars = 2
-#-            if self.starGrey1:  #if more complex star system is enabled, and we're using Rock Band style scoring
-#-              if self.avMult[playerNum] < 0.5625:
-#-                self.partialStar[playerNum] = 0
-#-              elif self.avMult[playerNum] < 0.625:
-#-                self.partialStar[playerNum] = 1
-#-              elif self.avMult[playerNum] < 0.6875:
-#-                self.partialStar[playerNum] = 2
-#-              elif self.avMult[playerNum] < 0.75:
-#-                self.partialStar[playerNum] = 3
-#-              elif self.avMult[playerNum] < 0.8125:
-#-                self.partialStar[playerNum] = 4
-#-              elif self.avMult[playerNum] < 0.875:
-#-                self.partialStar[playerNum] = 5
-#-              elif self.avMult[playerNum] < 0.9375:
-#-                self.partialStar[playerNum] = 6
-#-              else:
-#-                self.partialStar[playerNum] = 7
-#-
-#-          elif self.avMult[playerNum] > 0.25:
-#-            self.playerList[playerNum].stars = 1
-#-            if self.starGrey1:  #if more complex star system is enabled, and we're using Rock Band style scoring
-#-              if self.avMult[playerNum] < 0.28125:
-#-                self.partialStar[playerNum] = 0
-#-              elif self.avMult[playerNum] < 0.3125:
-#-                self.partialStar[playerNum] = 1
-#-              elif self.avMult[playerNum] < 0.34375:
-#-                self.partialStar[playerNum] = 2
-#-              elif self.avMult[playerNum] < 0.375:
-#-                self.partialStar[playerNum] = 3
-#-              elif self.avMult[playerNum] < 0.40625:
-#-                self.partialStar[playerNum] = 4
-#-              elif self.avMult[playerNum] < 0.4375:
-#-                self.partialStar[playerNum] = 5
-#-              elif self.avMult[playerNum] < 0.46875:
-#-                self.partialStar[playerNum] = 6
-#-              else:
-#-                self.partialStar[playerNum] = 7
-#-
-#-          else: 
-#-            self.playerList[playerNum].stars = 0
-#-            if self.starGrey1:  #if more complex star system is enabled, and we're using Rock Band style scoring
-#-              if self.avMult[playerNum] < 0.03125:
-#-                self.partialStar[playerNum] = 0
-#-              elif self.avMult[playerNum] < 0.0625:
-#-                self.partialStar[playerNum] = 1
-#-              elif self.avMult[playerNum] < 0.09375:
-#-                self.partialStar[playerNum] = 2
-#-              elif self.avMult[playerNum] < 0.125:
-#-                self.partialStar[playerNum] = 3
-#-              elif self.avMult[playerNum] < 0.15625:
-#-                self.partialStar[playerNum] = 4
-#-              elif self.avMult[playerNum] < 0.1875:
-#-                self.partialStar[playerNum] = 5
-#-              elif self.avMult[playerNum] < 0.21875:
-#-                self.partialStar[playerNum] = 6
-#-              else:
-#-                self.partialStar[playerNum] = 7
-#-
-#-  
-#-      else:   #0 = FoF scoring
-#-        if self.hitAccuracy[playerNum] >= 95.0:#Blazingamer: 95% or more accuracy for 5 stars
-#-          self.playerList[playerNum].stars = 5
-#-        elif self.hitAccuracy[playerNum] >= 75.0:#Blazingamer: 75% or more accuracy for 4 stars
-#-          self.playerList[playerNum].stars = 4
-#-          if self.starGrey1:  #if more complex star system is enabled
-#-            if self.hitAccuracy[playerNum] < 77.5:
-#-              self.partialStar[playerNum] = 0
-#-            elif self.hitAccuracy[playerNum] < 80.0:
-#-              self.partialStar[playerNum] = 1
-#-            elif self.hitAccuracy[playerNum] < 82.5:
-#-              self.partialStar[playerNum] = 2
-#-            elif self.hitAccuracy[playerNum] < 85.0:
-#-              self.partialStar[playerNum] = 3
-#-            elif self.hitAccuracy[playerNum] < 87.5:
-#-              self.partialStar[playerNum] = 4
-#-            elif self.hitAccuracy[playerNum] < 90.0:
-#-              self.partialStar[playerNum] = 5
-#-            elif self.hitAccuracy[playerNum] < 92.5:
-#-              self.partialStar[playerNum] = 6
-#-            else:
-#-              self.partialStar[playerNum] = 7
-#-
-#-        elif self.hitAccuracy[playerNum] >= 50.0:#Blazingamer: 50% or more accuracy for 3 stars
-#-          self.playerList[playerNum].stars = 3
-#-          if self.starGrey1:  #if more complex star system is enabled
-#-            if self.hitAccuracy[playerNum] < 53.125:
-#-              self.partialStar[playerNum] = 0
-#-            elif self.hitAccuracy[playerNum] < 56.25:
-#-              self.partialStar[playerNum] = 1
-#-            elif self.hitAccuracy[playerNum] < 59.375:
-#-              self.partialStar[playerNum] = 2
-#-            elif self.hitAccuracy[playerNum] < 62.5:
-#-              self.partialStar[playerNum] = 3
-#-            elif self.hitAccuracy[playerNum] < 65.625:
-#-              self.partialStar[playerNum] = 4
-#-            elif self.hitAccuracy[playerNum] < 68.75:
-#-              self.partialStar[playerNum] = 5
-#-            elif self.hitAccuracy[playerNum] < 71.875:
-#-              self.partialStar[playerNum] = 6
-#-            else:
-#-              self.partialStar[playerNum] = 7
-#-
-#-        elif self.hitAccuracy[playerNum] >= 25.0:#Blazingamer: 25% or more accuracy for 2 stars
-#-          self.playerList[playerNum].stars = 2
-#-          if self.starGrey1:  #if more complex star system is enabled
-#-            if self.hitAccuracy[playerNum] < 28.125:
-#-              self.partialStar[playerNum] = 0
-#-            elif self.hitAccuracy[playerNum] < 31.25:
-#-              self.partialStar[playerNum] = 1
-#-            elif self.hitAccuracy[playerNum] < 34.375:
-#-              self.partialStar[playerNum] = 2
-#-            elif self.hitAccuracy[playerNum] < 37.5:
-#-              self.partialStar[playerNum] = 3
-#-            elif self.hitAccuracy[playerNum] < 40.625:
-#-              self.partialStar[playerNum] = 4
-#-            elif self.hitAccuracy[playerNum] < 43.75:
-#-              self.partialStar[playerNum] = 5
-#-            elif self.hitAccuracy[playerNum] < 46.875:
-#-              self.partialStar[playerNum] = 6
-#-            else:
-#-              self.partialStar[playerNum] = 7
-#-
-#-        elif self.hitAccuracy[playerNum] > 0:#Blazingamer: More than 0% accuracy for 1 stars
-#-          self.playerList[playerNum].stars = 1
-#-          if self.starGrey1:  #if more complex star system is enabled
-#-            if self.hitAccuracy[playerNum] < 3.125:
-#-              self.partialStar[playerNum] = 0
-#-            elif self.hitAccuracy[playerNum] < 6.25:
-#-              self.partialStar[playerNum] = 1
-#-            elif self.hitAccuracy[playerNum] < 9.375:
-#-              self.partialStar[playerNum] = 2
-#-            elif self.hitAccuracy[playerNum] < 12.5:
-#-              self.partialStar[playerNum] = 3
-#-            elif self.hitAccuracy[playerNum] < 15.625:
-#-              self.partialStar[playerNum] = 4
-#-            elif self.hitAccuracy[playerNum] < 18.75:
-#-              self.partialStar[playerNum] = 5
-#-            elif self.hitAccuracy[playerNum] < 21.875:
-#-              self.partialStar[playerNum] = 6
-#-            else:
-#-              self.partialStar[playerNum] = 7
-#-
-#-        elif self.hitAccuracy[playerNum] == 0:#Blazingamer: 0% accuracy for 0 stars
-#-          self.playerList[playerNum].stars = 0
-#-          self.partialStar[playerNum] = 0
-#-        if self.hitAccuracy[playerNum] == 100.0 and self.playerList[playerNum].notesHit == self.playerList[playerNum].totalStreakNotes:
-#-          self.playerList[playerNum].stars = 6
-#-  
-#-      if self.playerList[playerNum].stars != self.lastStars[playerNum] and self.engine.data.starDingSoundFound:  #new star gained!
-#-        self.engine.data.starDingSound.setVolume(self.sfxVolume) #MFH - no need to retrieve from INI file every star ding...
-#-        self.engine.data.starDingSound.play()
 
 
         
@@ -6203,26 +5435,39 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               else:
                 self.dispSoloReview[i] = False 
             
-            if self.hopoDebugDisp == 1 and not self.pause and not self.failed:
+            if self.hopoDebugDisp == 1 and not self.pause and not self.failed and not self.guitars[i].isDrum:
               #MFH: PlayedNote HOPO tappable marking
               if self.guitars[i].playedNotes:
-               self.lastTapText = "tapp: " + str(self.guitars[i].playedNotes[0][1].tappable)
-               if len(self.guitars[i].playedNotes) > 1:
-                 self.lastTapText += ", " + str(self.guitars[i].playedNotes[1][1].tappable)
+                
+               
+                if len(self.guitars[i].playedNotes) > 1:
+                  self.lastTapText = "tapp: %d, %d" % (self.guitars[i].playedNotes[0][1].tappable, self.guitars[i].playedNotes[1][1].tappable)
+                else:
+                  self.lastTapText = "tapp: %d" % (self.guitars[i].playedNotes[0][1].tappable)
+
+                #self.lastTapText = "tapp: " + str(self.guitars[i].playedNotes[0][1].tappable)
+                #if len(self.guitars[i].playedNotes) > 1:
+                # self.lastTapText += ", " + str(self.guitars[i].playedNotes[1][1].tappable)
+                 
+                 
               w, h = font.getStringSize(self.lastTapText,0.00170)
               font.render(self.lastTapText, (.750 - w / 2, .440),(1, 0, 0),0.00170)     #off to the right slightly above fretboard
               
               #MFH: HOPO active debug
-              text = "HOact: "
+              #text = "HOact: "
               if self.guitars[i].hopoActive > 0:
-               glColor3f(1, 1, 0)  #yel
-               text += "+"
+                glColor3f(1, 1, 0)  #yel
+                #text += "+"
+                hoActDisp = "+"
               elif self.guitars[i].hopoActive < 0:
-               glColor3f(0, 1, 1)  #blu-grn
-               text += "-"
+                glColor3f(0, 1, 1)  #blu-grn
+                #text += "-"
+                hoActDisp = "-"
               else:
-               glColor3f(0.5, 0.5, 0.5)  #gry
-               text += "0"
+                glColor3f(0.5, 0.5, 0.5)  #gry
+                #text += "0"
+                hoActDisp = "0"
+              text = "HOact: %s" % hoActDisp              
               w, h = font.getStringSize(text,0.00175)
               font.render(text, (.750 - w / 2, .410),(1, 0, 0),0.00170)     #off to the right slightly above fretboard
               glColor3f(1, 1, 1)  #whitey
@@ -6230,10 +5475,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               
               #MFH: HOPO intention determination flag debug
               if self.guitars[i].sameNoteHopoString:
-               glColor3f(1, 1, 0)  #yel
+                glColor3f(1, 1, 0)  #yel
               else:
-               glColor3f(0.5, 0.5, 0.5)  #gry
-              text = "HOflag: " + str(self.guitars[i].sameNoteHopoString)
+                glColor3f(0.5, 0.5, 0.5)  #gry
+            
+              #text = "HOflag: " + str(self.guitars[i].sameNoteHopoString)
+              text = "HOflag: %s" % str(self.guitars[i].sameNoteHopoString)
+            
               w, h = font.getStringSize(text,0.00175)
               font.render(text, (.750 - w / 2, .385),(1, 0, 0),0.00170)     #off to the right slightly above fretboard
               glColor3f(1, 1, 1)  #whitey
@@ -6260,7 +5508,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             if ((self.inGameStats == 2 or (self.inGameStats == 1 and self.theme == 2) or self.hopoDebugDisp == 1 ) and (not self.pause and not self.failed)):
               #will not show on pause screen, unless HOPO debug is on (for debugging)
               trimmedTotalNoteAcc = self.decimal(str(self.hitAccuracy[i])).quantize(self.decPlaceOffset)
-              text = str(self.playerList[i].notesHit) + "/" + str(self.playerList[i].totalStreakNotes) + ": " + str(trimmedTotalNoteAcc) + "%"
+              #text = str(self.playerList[i].notesHit) + "/" + str(self.playerList[i].totalStreakNotes) + ": " + str(trimmedTotalNoteAcc) + "%"
+              text = "%(notesHit)s/%(totalNotes)s: %(hitAcc)s%%" % \
+                {'notesHit': str(self.playerList[i].notesHit), 'totalNotes': str(self.playerList[i].totalStreakNotes), 'hitAcc': str(trimmedTotalNoteAcc)}
               c1,c2,c3 = self.ingame_stats_color
               glColor3f(c1, c2, c3)  #wht
               w, h = font.getStringSize(text,0.00160)
@@ -6276,9 +5526,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 accDispYac = 0.140
                 accDispYam = 0.164
               font.render(text, (accDispX - w/2, accDispYac),(1, 0, 0),0.00140)     #top-centered by streak under score
-    
               trimmedAvMult = self.decimal(str(self.avMult[i])).quantize(self.decPlaceOffset)
-              text = _("Avg: ") + str(trimmedAvMult) + "x"
+              #text = _("Avg: ") + str(trimmedAvMult) + "x"
+              avgLabel = _("Avg")
+              text = "%(avLab)s: %(avMult)sx" % \
+                {'avLab': avgLabel, 'avMult': str(trimmedAvMult)}
               glColor3f(c1, c2, c3)
               w, h = font.getStringSize(text,0.00160)
               font.render(text, (accDispX - w/2, accDispYam),(1, 0, 0),0.00140)     #top-centered by streak under score
@@ -6363,7 +5615,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   glColor3f(1, 0, 0)
                 else:
                   #bug catch - show the problematic number:            
-                  text = str(trimmedAccuracy) + _(" ms")
+                  #text = str(trimmedAccuracy) + _(" ms")
+                  msText = _("ms")
+                  text = "%(acc)s %(ms)s" % \
+                    {'acc': str(trimmedAccuracy), 'ms': msText}
                   glColor3f(1, 0, 0)
     
               w, h = font.getStringSize(text,0.00175)
@@ -6395,7 +5650,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
               if self.showAccuracy == 3:    #for displaying numerical below descriptive
                 #text = str(self.accuracy)
-                text = str(trimmedAccuracy) + " ms"
+                #text = str(trimmedAccuracy) + " ms"
+                msText = _("ms")
+                text = "%(acc)s %(ms)s" % \
+                  {'acc': str(trimmedAccuracy), 'ms': msText}
                 w, h = font.getStringSize(text,0.00140)
                 if self.theme == 2:   #RB mod
                   font.render(text, (posX - w / 2, posY - h / 2 + .030),(1, 0, 0),0.00140) 
@@ -6538,7 +5796,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                         soloBonusScore = soloScoreMult * self.guitars[i].currentGuitarSoloHitNotes
                         player.score += soloBonusScore
                         trimmedSoloNoteAcc = self.decimal(str(self.guitarSoloAccuracy[i])).quantize(self.decPlaceOffset)
-                        self.soloReviewText[i] = [soloDesc,str(trimmedSoloNoteAcc) + "% = " + str(soloBonusScore) + _(" pts")]
+                        #self.soloReviewText[i] = [soloDesc,str(trimmedSoloNoteAcc) + "% = " + str(soloBonusScore) + _(" pts")]
+                        ptsText = _("pts")
+                        self.soloReviewText[i] = [soloDesc, 
+                          "%(soloNoteAcc)s%% = %(soloBonus)d %(pts)s" % \
+                          {'soloNoteAcc': str(trimmedSoloNoteAcc), 'soloBonus': soloBonusScore, 'pts': ptsText} ]
                         self.dispSoloReview[i] = True
                         self.soloReviewCountdown[i] = 0
                         #reset for next solo
@@ -6564,11 +5826,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     tempSoloAccuracy = (float(self.guitars[i].currentGuitarSoloHitNotes)/float(self.currentGuitarSoloTotalNotes[i]) * 100.0)
                     trimmedIntSoloNoteAcc = self.decimal(str(tempSoloAccuracy)).quantize(self.decPlaceOffset)
                     if self.guitarSoloAccuracyDisplayMode == 1:   #percentage only
-                      soloText = str(trimmedIntSoloNoteAcc) + "%"
+                      #soloText = str(trimmedIntSoloNoteAcc) + "%"
+                      soloText = "%s%%" % str(trimmedIntSoloNoteAcc)
                       if self.guitarSoloAccuracyDisplayPos == 0:    #right
                         xOffset = 0.890
                     elif self.guitarSoloAccuracyDisplayMode == 2:   #detailed
-                      soloText = str(self.guitars[i].currentGuitarSoloHitNotes) + "/" + str(self.currentGuitarSoloTotalNotes[i]) + ": " + str(trimmedIntSoloNoteAcc) + "%"
+                      #soloText = str(self.guitars[i].currentGuitarSoloHitNotes) + "/" + str(self.currentGuitarSoloTotalNotes[i]) + ": " + str(trimmedIntSoloNoteAcc) + "%"
+                      soloText = "%(hitSoloNotes)d/ %(totalSoloNotes)d: %(soloAcc)s%%" % \
+                        {'hitSoloNotes': self.guitars[i].currentGuitarSoloHitNotes, 'totalSoloNotes': self.currentGuitarSoloTotalNotes[i], 'soloAcc': str(trimmedIntSoloNoteAcc)}
                     if self.guitarSoloAccuracyDisplayMode > 0:    #if not off:
                       soloText = soloText.replace("0","O")
                       glColor3f(1.0, 1.0, 1.0)  #cracker white
@@ -6626,6 +5891,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
           # show song name
           if self.countdown and self.song:
+            #MFH - TODO - all this string concatenation really should be replaced by modulo (%) formatting, as it is faster.  
+            #  However, this is not high priority, since this concatenation only occurs during the Get Ready To Rock countdown.
             cover = ""
             if self.song.info.findTag("cover") == True: #kk69: misc changes to make it more GH/RB
               cover = _("as made famous by")+ "  \n "     #kk69: no more ugly colon! ^_^
