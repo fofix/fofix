@@ -1,0 +1,6 @@
+#summary Frequently asked questions
+#labels Phase-Support
+
+=Frequently Asked Questions=
+==Where can I find discussions about this game?==
+On the [http://fretsonfire.net FretsOnFire Fan Forum].
