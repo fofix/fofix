@@ -2,5 +2,22 @@
 #labels Phase-Support
 
 =Frequently Asked Questions=
-==Where can I find discussions about this game?==
+==General==
+===Where can I find discussions about this game?===
 On the [http://fretsonfire.net FretsOnFire Fan Forum].
+
+----
+
+==Playing the Game==
+===LAG - Recommended Settings===
+We recommend the following important settings to minimize lag:
+  * Performance -> Killswitch FX -> STATIC (Animated takes a bit more procesing time)
+  * Fretboard -> Board Speed -> PERCENTAGE (all other settings involve at least 2 more floating-point calculations during BPM changes)
+  * Fretboard -> Speed Percent -> 100 (this can be any number without affecting lag in Percentage mode, other than trying to draw too many notes at once for extremely slow settings)
+  * Performance -> Set Priority -> ABOVE NORMAL (this helps a great deal as well with lag, especially if you have other applications running)
+  * Theme -> MegaLight (very low-overhead theme)
+
+===Memory Leaks===
+IMPORTANT - Note on the memory leak and how to handle it:
+Python version 2.4 (which Frets on Fire 1.2.451 is built on) has an inherent memory leak problem. As you play more songs, this leak will eat more and more of your physical and virtual memory until the game runs unplayably slow.
+Every so often, it is recommended that you quit the game completely and restart it. This clears all memory used and restarts the game fresh.
