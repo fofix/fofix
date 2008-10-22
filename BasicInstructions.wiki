@@ -4,12 +4,12 @@
 = Basic Instructions =
 
 ==Instructions==
-Download the 3.000 release of your choice (below the latest patch). Decompress into a NEW folder of your choice. Do NOT attempt to merge this version with ANY OTHER version of Frets on Fire, including previous MFH-Alarian mods. Run FretsOnFire.exe, set your settings. The first time you attempt to play you will be prompted to find your "songs" folder. It must be named "songs" but it may be outside the game folder structure. Enjoy!
+Download the 3.000 release of your choice (below the latest patch). Decompress into a *NEW* folder of your choice. Do *NOT* attempt to merge this version with ANY OTHER version of Frets on Fire, including previous MFH-Alarian mods. Run !FretsOnFire.exe, set your settings. The first time you attempt to play you will be prompted to find your "songs" folder. It must be named "songs" but it may be outside the game folder structure. Enjoy!
 
 ==Patch install instructions==
-First, be sure you have one of the 3.000 releases (I recommend the Rock Band release). Download the latest patch and extract it to the game folder (where FretsOnFire.exe and the data folder are). This should mainly copy a new data\library.zip over your original, as well as any additional support files required over the last major release. Then you are ready to play!
+First, be sure you have one of the 3.000 releases (I recommend the Rock Band release). Download the latest patch and extract it to the game folder (where !FretsOnFire.exe and the data folder are). This should mainly copy a new data\library.zip over your original, as well as any additional support files required over the last major release. Then you are ready to play!
 
-Each patch comes with a blank fretsonfire.ini for MAXIMUM COMPATIBILITY. You may choose to keep your old fretsonfire.ini so you do not have to re-set all your settings. However, if you encounter problems or bugs then the FIRST THING you have to try is a BLANK fretsonfire.ini file!
+Each patch comes with a blank fretsonfire.ini for *MAXIMUM COMPATIBILITY*. You may choose to keep your old fretsonfire.ini so you do not have to re-set all your settings. However, if you encounter problems or bugs then the *FIRST THING* you have to try is a *BLANK* fretsonfire.ini file!
 
 *IMPORTANT* Use [http://www.rarlab.com/ WinRar 3.70+] or equivalent to read the .RAR compressed archives properly.
 
