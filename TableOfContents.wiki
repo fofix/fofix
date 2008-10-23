@@ -1,5 +1,5 @@
 ==Table of Contents==
-  # [BasicInstructions]
-  # [FAQ]
-  # [KnownIssues]
-  # [ReportingBugs]
+  * [BasicInstructions]
+  * [FAQ]
+  * [KnownIssues]
+  * [ReportingBugs]
