@@ -5,7 +5,9 @@
 Please note, we are not currently looking for suggestions. However, just in case you feel the need to suggest or report something, please review the following first.
 
 = Known Issues =
-*NOTE* Some of these have not been confirmed and some have existed long before this fork was created.
+*NOTE* Some of the known issues have existed long before this fork was created.
+
+*NOTE* Our Issues Tracker contains both [http://code.google.com/p/fofix/issues/list?can=2&q=type:Defect enhancement requests, bugs and known issues]. Have a look!
 
   * hitglow for drum "chords" only show for the last note hit
   * Practice mode's "time" (mm:ss)-style markers are NOT calculated accurately at all
@@ -36,6 +38,7 @@ Remember that the correct A/V-Delay is different on every computer depending on 
 
 = Unconfirmed Bug Reports =
 *NOTE* We have not been able to reproduce any of these, so to us, these bugs do not exist.
+
 
   * GH3 complex tail system does not work under Linux
   * Font size and positioning has some discrepancies between platforms / OS's
