@@ -250,20 +250,8 @@ Basic premise: Ho/Po note after a chord
   * You CAN pull a finger off a higher fret from the chord to "tap" a Ho/Po.
   * You CAN NOT pull a finger off a lower fret from the chord to "tap" a Ho/Po (these notes will NOT be marked as HOPOs).
 
-===What to do if you have isolated a note pattern that cannot be Ho/Po'd or strummed correctly===
-If you have found a certain note pattern that you can't play a certain valid way
-in a certain Ho/Po system (or in all of them), here is how to fully report the
-situation to me in a way that I can use to actually attempt to solve the issue:
-
-  # Go to your top Settings menu (the one with the version number - "MFH-Alarian Mod VX.XXX >"), and set "HOPO Debug" to "On" --- this will enable some real-time visual debugging details while you play, as well as log entries when certain important events happen in the HOPO logic.
-  # Set up some method of recording your gameplay to a video file. FRAPS is one such program that can record FoF gameplay. (Google search for FRAPS, you'll find it.)
-  # Run FoF, go straight to your problem / demonstration song, and play it for me. Record at least at 15 frames per second, at 320x240 pixel resolution. Sound is not required; I just need to be able to read the video display as you demonstrate your issue. As soon as the section containing your issue has been demonstrated, please pause the game and Quit, Exit from the game immediately.
-  # From your Start menu, click Run and type in "%appdata%\fretsonfire\" and then click OK. In the folder that should pop up, locate the "fretsonfire.log" file. Please copy this file to the same place you saved your video, as these two files belong together; I need them both. Please don't play FoF again before copying this log file, or your demonstration log will be overwritten!
-  # Upload your demonstration logfile to a filesharing website, such as mediafire.com or megaupload.com, and send me the link.
-  # Upload your video to somewhere you can share it with me; youtube or Google Video -- or if you'd rather just upload the video file to a filesharing site such as mediafire or megaupload and give me the link. Describe your issue in as much detail as you can when you post or PM the link to me; how exactly you are trying to play the notes, and what you think the problem is from your play experience.
-  # Then, just be patient as I hunt the issue down. This can really take some time - but if there is really an issue and you have reported it with all the detail I've requested above, chances are I will solve it eventually.
-
-Thank you for isolating a bug!
+===How to report bugs or issues ===
+Please refer to ReportingBugs.
 
 === Neckspeed Details ===
 Neck speed is calculated like this:

@@ -1,0 +1,28 @@
+==Foreword==
+*PLEASE* don't contact us with requests, that goes for everybody. If you think you have a new idea that is not in the Issues tracker and hasn't been discussed or thought of yet, post it in the appropriate Frets On Fire Fan Forum thread. We (coders) are not the only ones involved in this project. Everyone should have a chance to respond to the ideas, we like to see how popular certain features are before attempting to do something that we think we can finish.
+
+*PLEASE* don't ask us when a certain feature is going to be done. This really starts to make our coding seem like work, as if we had to answer to somebody who might not give us our next paycheck. This is not a job; it is a hobby. We share what we do with everybody because, well, we'd be a real douches if we didn't :)
+
+*NOTE* We *won't help anyone with Python*. It's just easier this way. We can't waste a long time walking someone through what would seem like the simplest change. We barely have enough time to make our own code work. Do you want us to stop making progress and spend our time teaching Python? That doesn't make sense....
+
+In short, *PLEASE* don't ask us any question about Python or where certain code is or that sort of thing.
+If you're determined to figure something out, do what we did:
+  * Google search.
+  * Study the code.
+  * Study Python articles.
+  * Study example code. 
+
+==Isolating a note pattern that cannot be Ho/Po'd or strummed correctly==
+If you have found a certain note pattern that you can't play a certain valid way
+in a certain Ho/Po system (or in all of them), here is how to fully report the
+situation to me in a way that I can use to actually attempt to solve the issue:
+
+  # Go to your top Settings menu (the one with the version number - "MFH-Alarian Mod VX.XXX >"), and set "HOPO Debug" to "On" --- this will enable some real-time visual debugging details while you play, as well as log entries when certain important events happen in the HOPO logic.
+  # Set up some method of recording your gameplay to a video file. FRAPS is one such program that can record FoF gameplay. (Google search for FRAPS, you'll find it.)
+  # Run FoF, go straight to your problem / demonstration song, and play it for me. Record at least at 15 frames per second, at 320x240 pixel resolution. Sound is not required; I just need to be able to read the video display as you demonstrate your issue. As soon as the section containing your issue has been demonstrated, please pause the game and Quit, Exit from the game immediately.
+  # From your Start menu, click Run and type in "%appdata%\fretsonfire\" and then click OK. In the folder that should pop up, locate the "fretsonfire.log" file. Please copy this file to the same place you saved your video, as these two files belong together; I need them both. Please don't play FoF again before copying this log file, or your demonstration log will be overwritten!
+  # Upload your demonstration logfile to a filesharing website, such as mediafire.com or megaupload.com, and send me the link.
+  # Upload your video to somewhere you can share it with me; youtube or Google Video -- or if you'd rather just upload the video file to a filesharing site such as mediafire or megaupload and give me the link. Describe your issue in as much detail as you can when you post or PM the link to me; how exactly you are trying to play the notes, and what you think the problem is from your play experience.
+  # Then, just be patient as I hunt the issue down. This can really take some time - but if there is really an issue and you have reported it with all the detail I've requested above, chances are I will solve it eventually.
+
+Thank you for isolating a bug!
