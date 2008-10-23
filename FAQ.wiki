@@ -1,5 +1,6 @@
 #summary Frequently asked questions
 #labels Phase-Support
+#sidebar TableOfContents
 
 =Frequently Asked Questions=
 ==General==
@@ -289,6 +290,8 @@ Hard/Medium/Easy: 277,7.../311,1.../333,3...
 Naturally the Neckspeed and hitwindows will be the slowest (and widest) for Boardspeed by Difficulty.
 
 ----
+
+
 
 ==Content Creators==
 ===Creating Careers===
