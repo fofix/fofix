@@ -5,20 +5,19 @@ You first need to create a theme.ini in your theme's folder.  Once you create th
 
 
 ....then any of the settings below may be added underneath the [theme] header:
---------------------------------------------------------------------------------------------------------------------------------------
--=Main Menu=-
+=======================================-----------------------------------------------------------------------------------------------
+-=Main Menu=-                         |
+=======================================
 (Decimal # between 0 and 1, IE- .34)
 
-menu_x = .665
-menu_y = .842
-main_menu_scale = .5
-main_menu_vspacing = 0.09
-main_menu_scale = .5
-main_menu_vspacing = 0.09
+menu_x = .665              (X Position of main menu image.)
+menu_y = .842              (Y Position of main menu image.)
+main_menu_scale = .5       (Scaling size of main menu image)
+main_menu_vspacing = 0.09  (Spacing in between each line of separated main menu image)
 
 
 Default Theme #'s
-----------------
+-----------------
 GHII Themes
 menu_x = .5
 menu_y = .45
@@ -34,38 +33,33 @@ menu_y = .8
 
 
 
---------------------------------------------------------------------------------------------------------------------------------------
--=In Game Items=-
+=======================================-----------------------------------------------------------------------------------------------
+-=In Game Items=-                     |
+=======================================
 (Decimal # between 0 and 1, IE- .34)
 
-twoDkeys = False      (Use 3d keys  = False)
-twoDnote = False      (Use 3d notes = Fales)
-Rotating 3d Starnotes (Default is on)
-threeDspin = False    (Turns 3d Starnote spinning off.)
-spot_color = #EEEEEE  (Enter Hex color here. IE- #EEEEEE)
-hopo_color = #EEEEEE  (Enter Hex color here. IE- #EEEEEE)
-mesh_color = #000000  (Enter Hex color here. Default - #000000)
-open_color = #FF9933  (Enter Hex color here. Default - #FF9933)
+twoDkeys = False                 (Use 3d keys  = False)
+twoDnote = False                 (Use 3d notes = Fales)
+Rotating 3d Starnotes            (Default is on)
+threeDspin = False               (Turns 3d Starnote spinning off.)
+spot_color = #EEEEEE             (Enter Hex color here. IE- #EEEEEE)
+hopo_color = #EEEEEE             (Enter Hex color here. IE- #EEEEEE)
+mesh_color = #000000             (Enter Hex color here. Default - #000000)
+open_color = #FF9933             (Enter Hex color here. Default - #FF9933)
 rockmeter_score_color = #93c351  (Enter Hex color here. Default for GH3 is )
-ingame_stats_color = #000000  (Enter Hex color here.)
-fret0_color = #22FF22 (Manually set 1st fret tail color)
-fret1_color = #FF2222 (Manually set 2nd fret tail color)
-fret2_color = #FFFF22 (Manually set 3rd fret tail color)
-fret3_color = #3333FF (Manually set 4tg fret tail color)
-fret4_color = #FF9933 (Manually set 5th fret tail color)
+ingame_stats_color = #000000     (Enter Hex color here.)
+fret0_color = #22FF22            (Manually set 1st fret tail color)
+fret1_color = #FF2222            (Manually set 2nd fret tail color)
+fret2_color = #FFFF22            (Manually set 3rd fret tail color)
+fret3_color = #3333FF            (Manually set 4tg fret tail color)
+fret4_color = #FF9933            (Manually set 5th fret tail color)
 
 
 
-fret0_color = #22FF22
-fret1_color = #FF2222
-fret2_color = #FFFF22
-fret3_color = #3333FF
-fret4_color = #FF9933
 
-
-
---------------------------------------------------------------------------------------------------------------------------------------
--=Loading Phrases and Coordinates=-
+=======================================-----------------------------------------------------------------------------------------------
+-=Loading Phrases and Coordinates=-   |
+=======================================
 (Decimal # between 0 and 1, IE- .34)
 
 loading_X = .5
@@ -78,13 +72,14 @@ Notice - If you just want the default phrases to show do not put these in your t
 
 
 
---------------------------------------------------------------------------------------------------------------------------------------
--=Song Selection List / CD list (defaults shown below)=-
+===========================================================----------------------------------------------------------------------------
+-=Song Selection List / CD list (defaults shown below)=-  |
+===========================================================
 
 song_cd_x = 0                        (Can be 0 through 5, values outside this range will be clipped to 0 or 5 to prevent CDs from going off-screen)
-song_cdscore_x = .6                  (Decimal # between 0 and 1, IE- .34)
-song_list_x = .15                    (Decimal # between 0 and 1, IE- .34)
-song_listscore_x = .8                (Decimal # between 0 and 1, IE- .34)
+song_cdscore_x = .6                  (Decimal # between 0 - 1, IE- .34)
+song_list_x = .15                    (Decimal # between 0 - 1, IE- .34)
+song_listscore_x = .8                (Decimal # between 0 - 1, IE- .34)
 songback = True                      (Scrolls the Song Selection Background image. If your image isn't long enough, Use SongChooseBack.png just in case, this image is static)
 career_title_color = #000000         (Hex color code)
 opt_text_color = #FFFFFF             (Hex color code)
@@ -100,8 +95,9 @@ songlist_score_color = #FFFFFF       (GH3 theme default = #3f5a75)
 
 
 
---------------------------------------------------------------------------------------------------------------------------------------
--=Background, text, selected text colors=- 
+=============================================------------------------------------------------------------------------------------------
+-=Background, text, selected text colors=-  |
+=============================================
 
 background_color = #000000     (Color of the background screen. Should be black)
 base_color = #FFFFFF           (Unselected text color)
@@ -111,13 +107,14 @@ versiontag = true              (Forces showing the Versiontag onscreen)
 
 
 
---------------------------------------------------------------------------------------------------------------------------------------
--=Pause & options menus, backgrounds & text positions=-
+==========================================================----------------------------------------------------------------------------
+-=Pause & options menus, backgrounds & text positions=-  |
+==========================================================
 
 pause_bkg_x = 0                      (from center)
 pause_bkg_y = 0                      (from center)
-pause_text_x = .3                    (Decimal # between 0 and 1, IE- .34)
-pause_text_y = .31                   (Decimal # between 0 and 1, IE- .34)
+pause_text_x = .3                    (Decimal # between 0 - 1, IE- .34)
+pause_text_y = .31                   (Decimal # between 0 - 1, IE- .34)
 opt_bkg_x = 0                        (from center)
 opt_bkg_y = 0                        (from center)
 opt_text_x = .38                     (8bit theme default = .44, RB theme default = .25)
@@ -140,4 +137,4 @@ fail_selected_color = #FFBF00        (Hex color code)
 
 Good luck with making a custom theme to all!!!
 ==============================================
-Originally written by ~Blazingamer~, Redone and maintained by WorldRave
+Done and Maintained by Worldrave
