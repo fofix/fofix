@@ -1,9 +1,24 @@
+#summary How to properly report bugs
+#labels Phase-Support
+
 ==Foreword==
+We are glad to receive useful bug reports. It's not always possible for us to test everything. However, more often than not we receive incomplete or useless bug reports that don't help us help you. So please take the time to read the following and oh...
+
+*Thank you for taking the time to isolate a bug!*
+
+=== Feature Requests ===
 *PLEASE* don't contact us with requests, that goes for everybody. If you think you have a new idea that is not in the Issues tracker and hasn't been discussed or thought of yet, post it in the appropriate Frets On Fire Fan Forum thread. We (coders) are not the only ones involved in this project. Everyone should have a chance to respond to the ideas, we like to see how popular certain features are before attempting to do something that we think we can finish.
 
+=== Feature Completion ===
 *PLEASE* don't ask us when a certain feature is going to be done. This really starts to make our coding seem like work, as if we had to answer to somebody who might not give us our next paycheck. This is not a job; it is a hobby. We share what we do with everybody because, well, we'd be a real douches if we didn't :)
 
-*NOTE* We *won't help anyone with Python*. It's just easier this way. We can't waste a long time walking someone through what would seem like the simplest change. We barely have enough time to make our own code work. Do you want us to stop making progress and spend our time teaching Python? That doesn't make sense....
+Have a look at our Issues tracker, it might give you an idea of what is being worked on or what is planned.
+
+=== Unofficial Updates ===
+*NOTE* If you have issues with unofficial updates, please send personal messages to the respective coder not us.
+
+=== Learning Python ===
+*We won't help anyone with Python*. It's just easier this way. We can't waste a long time walking someone through what would seem like the simplest change. We barely have enough time to make our own code work. Do you want us to stop making progress and spend our time teaching Python? That doesn't make sense....
 
 In short, *PLEASE* don't ask us any question about Python or where certain code is or that sort of thing.
 If you're determined to figure something out, do what we did:
@@ -25,4 +40,17 @@ situation to me in a way that I can use to actually attempt to solve the issue:
   # Upload your video to somewhere you can share it with me; youtube or Google Video -- or if you'd rather just upload the video file to a filesharing site such as mediafire or megaupload and give me the link. Describe your issue in as much detail as you can when you post or PM the link to me; how exactly you are trying to play the notes, and what you think the problem is from your play experience.
   # Then, just be patient as I hunt the issue down. This can really take some time - but if there is really an issue and you have reported it with all the detail I've requested above, chances are I will solve it eventually.
 
-Thank you for isolating a bug!
+== Steps to report a bug or issue ==
+If you want help, use this procedure for your bugreports. If you don't, in most cases you'll simply be ignored, ridiculed, insulted or met with extreme sarcasm and irritation.
+
+  # Create an empty `fretsonfire.ini` in your gamefolder, restart the game, and try playing *WITHOUT CHANGING ANY OF THE DEFAULT SETTINGS*. If the problem persists, continue with the bugreport below. If it works, find the setting that causes a problem and report it in detail. *Also note*, if you are not using a fresh install from one of my full releases (RB only, GH3 only, or 5-theme releases). Chances are, if you tried the manual patch and are having problems, you did something wrong.
+  # In which version did the bug start?
+  # Do you get any information in FretsOnFire.exe.log? (Delete the file, restart game and recreate the bug)
+  # Describe what you're experiencing is happening.
+  # Describe what you're expecting to happen.
+  # If possible, provide describing Screenshot(s) and/or a Video of your problem.
+  # You may want to post the `fretsonfire.ini` file from the game directory so we can see your settings.
+  # You may want to post the `fretsonfire.log` file if you experienced a crash or hang, as this can contain valuable debug information. That file can be found in your game directory.
+  # You may also want to post the `FretsOnFire.exe.log` file. When available, it's in your game directory.
+
+  
