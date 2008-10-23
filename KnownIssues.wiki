@@ -29,10 +29,6 @@ Please note, we are not currently looking for suggestions. However, just in case
 
   * GH3 complex tail system does not work under Linux
   * Font size and positioning has some discrepancies between platforms / OS's
-  * [http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=450#entry244078 Pro Face-Off mode causes drumming issues for Jurgen]
-  * [http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=20933;st=2830#entry231627 2-player fail / rock bug] -- [http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=20933&st=2920#entry232494 Detail post 2]
-  * [http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=20933;st=2900#entry232308 Track volume bug]
-  * Second player timing bug? [http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4590#entry306332 detail post]
   * Selecting a language other than English, then quitting the game & deleting that translation file, then restarting the game will incorrectly show the selected language. [http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4390#entry303584 detail post]
   * After pressing ESC to exit from a sub-menu, Up and Down no longer repeat for some reason.
   * Note tails (GH3 complex tails) under strings bug -- [http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4810#entry309661 detail post]
