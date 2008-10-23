@@ -1,4 +1,4 @@
-==Table of Contents==
+==Other Pages==
   * [BasicInstructions]
   * [FAQ]
   * [KnownIssues]
