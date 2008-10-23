@@ -189,6 +189,8 @@ class Texture:
       func(*args)
     except Empty:
       pass
+    except Exception, e:    #MFH - to catch "did you call glewInit?" crashes
+      Log.error("Texture.py texture deletion exception: %s" % e)
     
     self.texture = glGenTextures(1)
     self.texEnv = GL_MODULATE
