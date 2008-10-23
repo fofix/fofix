@@ -1,4 +1,4 @@
-#summary Problems we are aware of.
+#summary Problems we are aware of
 #labels Phase-Support
 
 = Introduction =
@@ -23,6 +23,16 @@ Please note, we are not currently looking for suggestions. However, just in case
   * While in the songlist, the game ignores keypresses while loading a song preview either via the yellow fret or auto preview (of course... just like the game ignores inputs while it's loading anything else)
   * on the setlist (CD mode), when using F3 to load a preview, "Loading Preview..." doesn't disappear anymore after the preview has been loaded; you can even press Escape to go to another folder : "Loading Preview..." stays on the screen.
   * -and in songlist mode, "Loading Preview..." does not show up at all.
+
+==About Double-pick problem on guitar controllers!==
+When strumming down, up, down, up, ... the game doesn't always register all the picks.
+Alarian has the Xbox Xplorer guitar controller and it's safe to say that the problem he's experiencing is caused by the controller!
+The "strum-button" on the controller is registered by the computer as "Point of View Hat" and this causes problems since it's not a button that you can release. FoF won't register when you release the button. What I did was to download Xpadder: http://xpadder.com/.
+You can link the "strum-button" to 2 keys on the keyboard instead, this solved my problem. 
+
+==About Variable/Speed-dependent Hitwindow==
+Set the hitwindow to tight and tweak the A/V-Delay so it's right when you hit the notes when listening to the music. This is now easy with the new Accuracy indicator.
+Remember that the correct A/V-Delay is different on every computer depending on system, prestanda and audio-settings. 
 
 = Unconfirmed Bug Reports =
 *NOTE* We have not been able to reproduce any of these, so to us, these bugs do not exist.
