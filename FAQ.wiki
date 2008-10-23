@@ -418,7 +418,7 @@ add this line in your `fretsonfire.ini`, under the [game] section (accent marks 
 
 -----
 
-==Developpers==
+==Developers==
 ===Compiling the Source===
 To set up source files for this mod and compile from scratch:
 Get the latest and greatest source code from the Source tab. 
