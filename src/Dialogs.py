@@ -1599,7 +1599,7 @@ class SongChooser(Layer, KeyListener):
             for p in item.parts:    #MFH - look at selected instrument!
               if str(p) == self.instrument:
                 for d in item.difficulties:
-                  scores = item.getHighscores(d)
+                  scores = item.getHighscores(d, part = p)
                   if scores:
                     score, stars, name, scoreExt = scores[0]
                     notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 = scoreExt
@@ -1905,7 +1905,7 @@ class SongChooser(Layer, KeyListener):
                   if str(p) == self.instrument:
                     for d in item.difficulties:
                       if str(d) == self.diff:
-                        scores = item.getHighscores(d)
+                        scores = item.getHighscores(d, part = p)
                         if scores:
                           score, stars, name, scoreExt = scores[0]
                           notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 = scoreExt
@@ -2178,7 +2178,7 @@ class SongChooser(Layer, KeyListener):
                   if str(p) == self.instrument:
                     for d in item.difficulties:
                       if str(d) == self.diff:
-                        scores = item.getHighscores(d)
+                        scores = item.getHighscores(d, part = p)
                         if scores:
                           score, stars, name, scoreExt = scores[0]
                           notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 = scoreExt
