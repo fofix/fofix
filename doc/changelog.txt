@@ -1,6 +1,13 @@
 New in 3.0xx:-----------------------------------------------------------------------------------------------------
 
 --------------------------------
+[u]Version 3.017 "Fail Detection Fix" - (10/16/2008, 4:00pm PST) - [i](SVN rev 39 / tag 3.017)[/i][/u] -- 
+url=http://www.mediafire.com/?t45zmkdmyoy]Patch mediafire download[/url] -- [url=http://www.megaupload.com/?d=EUOEIS1X]ugo's full installer megaupload[/url] -- [url=http://thepiratebay.org/torrent/4455617/Frets_on_Fire_MFH_Mod_v3.017_Full_Installer]wuxingwarrior3's full installer mirror torrent[/url]
+[i]New since 3.016:[/i]
+++Rewrote fail detection logic in GuitarScene.run() function to not be hardcoded for 2 players, to be compatible with future expansion
+++Recompiled library.zip and FretsOnFire.exe from sources
+
+--------------------------------
 [u]Version 3.016 "Logging & Debugging Enhancements" - (10/16/2008, 10:30am PST) - [i](SVN rev 37 / tag 3.016a)[/i][/u] -- 
 [url=http://www.mediafire.com/?nn2yzkjmqyf]Patch mediafire download[/url]
 [i]New since 3.015:[/i]

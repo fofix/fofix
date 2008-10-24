@@ -1,0 +1,11 @@
+"*."//get all extentionless files
+"*.exe"//all exes
+"fretsonfire.ini"//inis
+"*.htm"//htms
+"*.dll"//dlls
+"src\*.*"//all src files
+"src\midi\*.*"//all src/midi files
+"doc\*.*"//all other doc files
+"data\library.zip"//all
+"data\versiontag.png"//all
+"..\FoFiX-wiki\*.*"//all wiki pages
