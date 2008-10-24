@@ -1,5 +1,5 @@
 #summary Frequently asked questions
-#labels Phase-Support
+#labels Phase-Support,Featured
 #sidebar TableOfContents
 
 =Frequently Asked Questions=
