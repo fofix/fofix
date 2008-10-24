@@ -9,22 +9,13 @@ Please note, we are not currently looking for suggestions. However, just in case
 
 *NOTE* Our Issues Tracker contains both [http://code.google.com/p/fofix/issues/list?can=2&q=type:Defect enhancement requests, bugs and known issues]. Have a look!
 
-  * hitglow for drum "chords" only show for the last note hit
-  * Practice mode's "time" (mm:ss)-style markers are NOT calculated accurately at all
-  * Random, inexplicable, unrepeatable hangs occur sometimes when loading the song list or loading a song for gameplay. Above-normal priority handling code is suspected. [http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4670#entry307313 detail post] *Maybe Fixed*
-  * Pausing may interrupt your streak and multiplier if there are notes close enough to the current position
-  * Songs with a corrupted or problematic .OGG file will cause a [http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=2570#entry280280 tough-to-read in-game error]
   * Solos in RB - Green Grass & High Tides aren't parsed exactly as they are in the real game [http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=3590#entry291538 detail post]
-  * All "sub-menus" share an x and y position; this is due to the way FoF's menu object works.
   * Options are sorted alphabetically; sometimes this is not desirable but this is the way it is.
-  * Starpower phrases sometimes will re-activate after missing a note, allowing undeserved starpower gains
   * Guitar solos require an unbroken streak to get a 100% - even if you overstrum and hit all the notes, your guitar solo will be forced down to 99.0%. I do not plan to change this; it's like this for a reason, and was tough enough to get working.
   * Browsing a folder with only 4 entries in song "list" mode results in the list jumping up and down - it has been this way for a long time - [http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4660#entry307107 detail post]
-  * Sometimes, the game will start with fonts displayed all incorrectly. It has been this way for a long time. Just exit and restart.
+  * Sometimes, the game will start with fonts displayed all incorrectly. It has been this way for a long time. Just exit and restart. *Fixed[?]*
   * Any image files (stages, backgrounds, etc) MUST have a lowercase ".png" extension - THE GAME CAN NOT HANDLE CAPITALIZED ".PNG" EXTENSIONS! *Likely Fixed*
   * While in the songlist, the game ignores keypresses while loading a song preview either via the yellow fret or auto preview (of course... just like the game ignores inputs while it's loading anything else)
-  * on the setlist (CD mode), when using F3 to load a preview, "Loading Preview..." doesn't disappear anymore after the preview has been loaded; you can even press Escape to go to another folder : "Loading Preview..." stays on the screen.
-  * -and in songlist mode, "Loading Preview..." does not show up at all.
 
 ==About Double-pick problem on guitar controllers!==
 When strumming down, up, down, up, ... the game doesn't always register all the picks.
