@@ -1,5 +1,5 @@
 #summary How to properly report bugs
-#labels Phase-Support
+#labels Phase-Support,Featured
 
 ==Foreword==
 We are glad to receive useful bug reports. It's not always possible for us to test everything. However, more often than not we receive incomplete or useless bug reports that don't help us help you. So please take the time to read the following and oh...
