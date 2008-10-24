@@ -4300,7 +4300,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 self.failScreen.transform.translate(w/2+self.fail_bkg_x,h/2+self.fail_bkg_y)
                 self.failScreen.draw()
     
-                text = self.song.info.name
+                text = Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
                 size = font.getStringSize(text)
                 font.render(text, (.5-size[0]/2.0,.35-size[1]))
                 #now = self.getSongPosition()
@@ -4844,7 +4844,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
                 # evilynux - Closer to actual GH3
                 font = self.engine.data.pauseFont
-                text = self.song.info.name.upper()
+                text = Dialogs.removeSongOrderPrefixFromName(self.song.info.name).upper()
                 scale = 0.0038
                 size = font.getStringSize(text, scale = scale)
                 while size[0] > 0.3983:
@@ -5305,7 +5305,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 self.failScreen.transform.translate(w/2+self.fail_bkg_x,h/2+self.fail_bkg_y)
                 self.failScreen.draw()
     
-                text = self.song.info.name
+                text = Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
                 size = font.getStringSize(text)
                 font.render(text, (.5-size[0]/2.0,.3-size[1]))
                 #now = self.getSongPosition()
@@ -5912,9 +5912,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               extra += " \n v" + self.song.info.version
     
             if self.theme != 1:   #shift this stuff down so it don't look so bad over top the lyricsheet:
-              Dialogs.wrapText(songFont, (.05, .0895 - h / 2), self.song.info.name + " \n " + cover + self.song.info.artist + comma + self.song.info.year + extra, rightMargin = .6)#kk69: incorporates song.ttf, evilynux - increased scale by 1/3 by worldrave's request    
+              Dialogs.wrapText(songFont, (.05, .0895 - h / 2), Dialogs.removeSongOrderPrefixFromName(self.song.info.name) + " \n " + cover + self.song.info.artist + comma + self.song.info.year + extra, rightMargin = .6)#kk69: incorporates song.ttf, evilynux - increased scale by 1/3 by worldrave's request
             else:
-              Dialogs.wrapText(songFont, (.05, .05 - h / 2), self.song.info.name + " \n " + cover + self.song.info.artist + comma + self.song.info.year + extra, rightMargin = .6, scale = 0.0030) #evilynux - increased scale by 1/3 by worldrave's request
+              Dialogs.wrapText(songFont, (.05, .05 - h / 2), Dialogs.removeSongOrderPrefixFromName(self.song.info.name) + " \n " + cover + self.song.info.artist + comma + self.song.info.year + extra, rightMargin = .6, scale = 0.0030) #evilynux - increased scale by 1/3 by worldrave's request
           else:
             
             #mfh: this is where the song countdown display is generated:

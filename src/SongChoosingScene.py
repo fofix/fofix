@@ -215,7 +215,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
               #startTime = Dialogs.chooseItem(self.engine, info.sections, "%s \n %s" % (info.name, _("Start Section:")))
               
               sectionLabels = [sLabel for sLabel,sPos in info.sections]
-              startLabel = Dialogs.chooseItem(self.engine, sectionLabels, "%s \n %s" % (info.name, _("Start Section:")))
+              startLabel = Dialogs.chooseItem(self.engine, sectionLabels, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Start Section:")))
               if startLabel:
                 Log.debug("Practice start section selected: " + startLabel)
             else:
@@ -242,7 +242,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
             while True: #new nesting for Practice Mode selection
             
               if len(info.parts) > 1:
-                p = Dialogs.chooseItem(self.engine, info.parts, "%s \n %s" % (info.name, _("Player 1 Choose a part:")), selected = self.player.part)
+                p = Dialogs.chooseItem(self.engine, info.parts, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Player 1 Choose a part:")), selected = self.player.part)
               else:
                 p = info.parts[0]
               if p:
@@ -254,7 +254,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
               while True:
                 if len(info.difficulties) > 1:
                   d = Dialogs.chooseItem(self.engine, info.difficulties,
-                                       "%s \n %s" % (info.name, _("Player 1 Choose a difficulty:")), selected = self.player.difficulty)
+                                       "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Player 1 Choose a difficulty:")), selected = self.player.difficulty)
                 else:
                   d = info.difficulties[0]
                 if d:
@@ -267,7 +267,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
                 while True:
                   if self.engine.config.get("game", "players") > 1:               
                     #p = Dialogs.chooseItem(self.engine, info.parts + ["Party Mode"] + ["No Player 2"], "%s \n %s" % (info.name, _("Player 2 Choose a part:")), selected = self.player2.part)
-                    p = Dialogs.chooseItem(self.engine, info.parts, "%s \n %s" % (info.name, _("Player 2 Choose a part:")), selected = self.player2.part)
+                    p = Dialogs.chooseItem(self.engine, info.parts, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Player 2 Choose a part:")), selected = self.player2.part)
                     #if p and p == "No Player 2":
                     #  players = 1
                     #  selected = True
@@ -291,7 +291,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
                       break
                     while True:                    
                       if len(info.difficulties) > 1:
-                        d = Dialogs.chooseItem(self.engine, info.difficulties, "%s \n %s" % (info.name, _("Player 2 Choose a difficulty:")), selected = self.player2.difficulty)
+                        d = Dialogs.chooseItem(self.engine, info.difficulties, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Player 2 Choose a difficulty:")), selected = self.player2.difficulty)
                       else:
                         d = info.difficulties[0]
                       if d:

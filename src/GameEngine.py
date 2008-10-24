@@ -317,7 +317,7 @@ class GameEngine(Engine):
 
     self.mainMenu = None    #placeholder for main menu object - to prevent reinstantiation
 
-    self.versionString = "MFH Mod v3.020"
+    self.versionString = "FoFiX v3.020"
     
     Log.debug(self.versionString + " starting up...")
     

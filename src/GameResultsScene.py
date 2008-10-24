@@ -335,7 +335,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           
           # evilynux - highscore
           if self.song is not None:
-            text = _("%s High Scores for %s") % (self.scorePart, self.song.info.name)
+            text = _("%s High Scores for %s") % (self.scorePart, Dialogs.removeSongOrderPrefixFromName(self.song.info.name))
           else:
             text = _("%s High Scores") % self.scorePart
           w, h = font.getStringSize(text)
@@ -426,9 +426,9 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
    
       Theme.setBaseColor(1 - v)
       if self.playerList[0].cheating:
-        text = _("%s Cheated!") % self.song.info.name
+        text = _("%s Cheated!") % Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
       else:
-        text = _("%s Finished!") % self.song.info.name
+        text = _("%s Finished!") % Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
         w, h = font.getStringSize(text)
         Dialogs.wrapText(font, (.05, .045 - v), text)
         text = "%d/" % self.hits

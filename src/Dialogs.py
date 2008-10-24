@@ -714,15 +714,34 @@ class SongChooser(Layer, KeyListener):
           if splitName[0] == "":
             possibleInt = splitName[1]
       if str(int(possibleInt)) == str(possibleInt):
-        Log.debug("Dialogs.isInt: " + str(possibleInt) + " = TRUE")
+        #Log.debug("Dialogs.isInt: " + str(possibleInt) + " = TRUE")
         return True
       else:
-        Log.debug("Dialogs.isInt: " + str(possibleInt) + " = FALSE")
+        #Log.debug("Dialogs.isInt: " + str(possibleInt) + " = FALSE")
         return False
     except Exception, e:
       return False
-      Log.debug("Dialogs.isInt: " + str(possibleInt) + " = FALSE, exception: " + str(e) )
+      #Log.debug("Dialogs.isInt: " + str(possibleInt) + " = FALSE, exception: " + str(e) )
       
+  def removeSongOrderPrefixFromItem(self, item):
+    if not item.name.startswith("."):
+      splitName = item.name.split(".",1)
+      #Log.debug("Dialogs.songListLoaded: Separating song name from prefix: " + str(splitName) )
+      if self.isInt(splitName[0]) and len(splitName) > 1:
+        item.name = splitName[1]
+        #while len(splitName) > 1: #now remove any remaining leading spaces
+        splitName[0] = ""
+        while splitName[0] == "":
+          splitName = item.name.split(" ",1)
+          if len(splitName) > 1:
+            if splitName[0] == "":
+              item.name = splitName[1]
+              #Log.debug("Dialogs.songListLoaded: Removing song name prefix, new name = " + splitName[1])
+    else:
+      Log.debug("Song name starting with a period filtered from prefix removal logic: " + item.name)
+
+
+
   def songListLoaded(self, songs):
     if self.songLoader:
       self.songLoader.stop() # evilynux - cancel() became stop()
@@ -803,21 +822,25 @@ class SongChooser(Layer, KeyListener):
     #   but -- also must NOT get stuck here on ellipsises (such as RBDLC - Metallica - ...And Justice For All)
     for i, item in enumerate(self.items):
       if isinstance(item, Song.SongInfo):
-        if not item.name.startswith("."):
-          splitName = item.name.split(".",1)
-          #Log.debug("Dialogs.songListLoaded: Separating song name from prefix: " + str(splitName) )
-          if self.isInt(splitName[0]) and len(splitName) > 1:
-            item.name = splitName[1]
-            #while len(splitName) > 1: #now remove any remaining leading spaces
-            splitName[0] = ""
-            while splitName[0] == "":
-              splitName = item.name.split(" ",1)
-              if len(splitName) > 1:
-                if splitName[0] == "":
-                  item.name = splitName[1]
-                  #Log.debug("Dialogs.songListLoaded: Removing song name prefix, new name = " + splitName[1])
-        else:
-          Log.debug("Song name starting with a period filtered from prefix removal logic: " + item.name)
+
+
+        self.removeSongOrderPrefixFromItem(item)
+#-        if not item.name.startswith("."):
+#-          splitName = item.name.split(".",1)
+#-          #Log.debug("Dialogs.songListLoaded: Separating song name from prefix: " + str(splitName) )
+#-          if self.isInt(splitName[0]) and len(splitName) > 1:
+#-            item.name = splitName[1]
+#-            #while len(splitName) > 1: #now remove any remaining leading spaces
+#-            splitName[0] = ""
+#-            while splitName[0] == "":
+#-              splitName = item.name.split(" ",1)
+#-              if len(splitName) > 1:
+#-                if splitName[0] == "":
+#-                  item.name = splitName[1]
+#-                  #Log.debug("Dialogs.songListLoaded: Removing song name prefix, new name = " + splitName[1])
+#-        else:
+#-          Log.debug("Song name starting with a period filtered from prefix removal logic: " + item.name)
+
       elif isinstance(item, Song.TitleInfo):
         self.tiersArePresent = True 
 
@@ -3236,3 +3259,42 @@ def showLoadingSplashScreen(engine, text = _("Loading...")):
 
 def hideLoadingSplashScreen(engine, splash):
   engine.view.popLayer(splash)
+
+
+def isInt(possibleInt):
+  try:
+    #MFH - remove any leading zeros (for songs with 01. or 02. for example)        
+    splitName = possibleInt.split("0",1)
+    while splitName[0] == "":
+      splitName = possibleInt.split("0",1)
+      if len(splitName) > 1:
+        if splitName[0] == "":
+          possibleInt = splitName[1]
+    if str(int(possibleInt)) == str(possibleInt):
+      #Log.debug("Dialogs.isInt: " + str(possibleInt) + " = TRUE")
+      return True
+    else:
+      #Log.debug("Dialogs.isInt: " + str(possibleInt) + " = FALSE")
+      return False
+  except Exception, e:
+    return False
+    #Log.debug("Dialogs.isInt: " + str(possibleInt) + " = FALSE, exception: " + str(e) )
+
+
+def removeSongOrderPrefixFromName(name):
+  if not name.startswith("."):
+    splitName = name.split(".",1)
+    #Log.debug("Dialogs.songListLoaded: Separating song name from prefix: " + str(splitName) )
+    if isInt(splitName[0]) and len(splitName) > 1:
+      name = splitName[1]
+      #while len(splitName) > 1: #now remove any remaining leading spaces
+      splitName[0] = ""
+      while splitName[0] == "":
+        splitName = name.split(" ",1)
+        if len(splitName) > 1:
+          if splitName[0] == "":
+            name = splitName[1]
+            #Log.debug("Dialogs.songListLoaded: Removing song name prefix, new name = " + splitName[1])
+  else:
+    Log.debug("Song name starting with a period filtered from prefix removal logic: " + item.name)
+  return name
