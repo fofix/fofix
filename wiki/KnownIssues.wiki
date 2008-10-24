@@ -1,0 +1,47 @@
+#summary Problems we are aware of
+#labels Phase-Support
+
+= Introduction =
+Please note, we are not currently looking for suggestions. However, just in case you feel the need to suggest or report something, please review the following first.
+
+= Known Issues =
+*NOTE* Some of the known issues have existed long before this fork was created.
+
+*NOTE* Our Issues Tracker contains both [http://code.google.com/p/fofix/issues/list?can=2&q=type:Defect enhancement requests, bugs and known issues]. Have a look!
+
+  * Solos in RB - Green Grass & High Tides aren't parsed exactly as they are in the real game [http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=3590#entry291538 detail post]
+  * Options are sorted alphabetically; sometimes this is not desirable but this is the way it is.
+  * Guitar solos require an unbroken streak to get a 100% - even if you overstrum and hit all the notes, your guitar solo will be forced down to 99.0%. I do not plan to change this; it's like this for a reason, and was tough enough to get working.
+  * Browsing a folder with only 4 entries in song "list" mode results in the list jumping up and down - it has been this way for a long time - [http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4660#entry307107 detail post]
+  * Sometimes, the game will start with fonts displayed all incorrectly. It has been this way for a long time. Just exit and restart. *Fixed[?]*
+  * Any image files (stages, backgrounds, etc) MUST have a lowercase ".png" extension - THE GAME CAN NOT HANDLE CAPITALIZED ".PNG" EXTENSIONS! *Likely Fixed*
+  * While in the songlist, the game ignores keypresses while loading a song preview either via the yellow fret or auto preview (of course... just like the game ignores inputs while it's loading anything else)
+  * PH3 career songs always say "Play to advance"? - [http://www.fretsonfire.net/forums/viewtopic.php?f=11&t=25040&st=0&sk=t&sd=a&start=705#p295165 post], [http://www.mediafire.com/?ygyynwyq22z log]
+  * Sometimes Career songs in Career mode will still say "Play to Advance" instead of showing the number of times played. Only occurs with PH3 so same of above?
+
+==About Double-pick problem on guitar controllers!==
+When strumming down, up, down, up, ... the game doesn't always register all the picks.
+Alarian has the Xbox Xplorer guitar controller and it's safe to say that the problem he's experiencing is caused by the controller!
+The "strum-button" on the controller is registered by the computer as "Point of View Hat" and this causes problems since it's not a button that you can release. FoF won't register when you release the button. What I did was to download Xpadder: http://xpadder.com/.
+You can link the "strum-button" to 2 keys on the keyboard instead, this solved my problem. 
+
+==About Variable/Speed-dependent Hitwindow==
+Set the hitwindow to tight and tweak the A/V-Delay so it's right when you hit the notes when listening to the music. This is now easy with the new Accuracy indicator.
+Remember that the correct A/V-Delay is different on every computer depending on system, prestanda and audio-settings. 
+
+= Unconfirmed Bug Reports =
+*NOTE* We have not been able to reproduce any of these, so to us, these bugs do not exist.
+
+  * Selecting a language other than English, then quitting the game & deleting that translation file, then restarting the game will incorrectly show the selected language. [http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4390#entry303584 detail post]
+  * After pressing ESC to exit from a sub-menu, Up and Down no longer repeat for some reason.
+  * Note tails (GH3 complex tails) under strings bug -- [http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4810#entry309661 detail post]
+  * Another GH3 complex tail bug - only one held note appears to be held - [http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4970#entry311323 detail post]
+  * songs folder on a different drive than Frets on Fire navigation problem [http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=4900#entry310268 detail post]
+  * When exiting the songlist back to the main menu, the OptionsBG image can be seen.
+  * Every once in a while, [http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=5120#entry313889 this] will happen (multiple game screens mixed together) - FoF isn't perfect (far from it), and it gets confused. Restart the game, you'll be fine.
+  * Pressing the "Home" button while playing the game can result in this [http://img337.imageshack.us/img337/7711/mfhhomebuttonerrorue5.th.gif screenshot]
+  * Drum overdrive sometimes will disappear without a miss, and reappear - [http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=30757;st=250#entry318723 detail post]
+  * In-game credits logo scrolls at a different speed than the text
+  * Animated Killswitch tails change to white when the end of the tail is in view -- [http://www.mediafire.com/?xzyt2trnyza demo video]
+  * Error: "iteration over non-sequence" for custom songs? [http://www.fretsonfire.net/forums/viewtopic.php?f=11&t=25040&st=0&sk=t&sd=a&start=705#p294920 report post], [http://www.mediafire.com/download.php?2myhhznmgty log]
+  * CD-mode songlist does not display stars [http://www.fretsonfire.net/forums/viewtopic.php?f=11&t=25040&st=0&sk=t&sd=a&start=705#p295031 post], [http://rapidshare.com/files/155252111/fretsonfire.log log] 
