@@ -29,6 +29,9 @@ import math
 #evilynux: needed for multi-OS file fetching
 import os
 
+#MFH - needed to check if running from compiled app or sources
+import sys
+
 from View import Layer
 from Input import KeyListener
 from Language import _
@@ -121,8 +124,11 @@ class Credits(Layer, KeyListener):
       Text(nf, ns, c1, "center", "%s" % self.engine.versionString) ]
 
     # evilynux: Use CREDITS file as source.
-    if os.path.exists(os.path.join("..","CREDITS")):
-      file = open(os.path.join("..","CREDITS"))
+    creditsPath = "CREDITS"
+    if not hasattr(sys,"frozen"): #MFH - add ".." to path only if running from sources - not if running from EXE
+      creditsPath = os.path.join("..",creditsPath)
+    if os.path.exists(creditsPath):
+      file = open(creditsPath)
       for line in file:
         line = line.strip("\n")
         if line.startswith("=====") or line.startswith("-----"):
