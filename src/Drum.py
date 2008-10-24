@@ -992,6 +992,8 @@ class Drum:
 
     num = 0
     enable = True
+
+    starEventsInView = False
     #for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard):
     for time, event in reversed(track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)):    #MFH - reverse order of note rendering
       if isinstance(event, Tempo):
@@ -1061,6 +1063,9 @@ class Drum:
         elif self.spRefillMode == 1 and self.theme != 2:  #mode 1 = overdrive refill notes in RB themes only
           self.spEnabled = False
 
+      if event.star or event.finalStar:
+        starEventsInView = True
+
 
       if event.star and self.spEnabled:
         spNote = True
@@ -1075,8 +1080,8 @@ class Drum:
             self.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
             self.starPowerGained = True
 
-      if enable:
-        self.spEnabled = True
+      #if enable:
+      #  self.spEnabled = True
 
       isTappable = False
 
@@ -1113,6 +1118,8 @@ class Drum:
       glPopMatrix()
 
     #myfingershurt: end FOR loop / note rendering loop       
+    if not starEventsInView:
+      self.spEnabled = True
 
 
 

@@ -1244,6 +1244,8 @@ class Guitar:
 
     num = 0
     enable = True
+    starEventsInView = False
+    
     for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard):
     #for time, event in reversed(track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)):    #MFH - reverse order of note rendering
       if isinstance(event, Tempo):
@@ -1304,6 +1306,9 @@ class Guitar:
           self.spEnabled = False
 
 
+      if event.star or event.finalStar:
+        starEventsInView = True
+
       if event.star and self.spEnabled:
         spNote = True
       if event.finalStar and self.spEnabled:
@@ -1317,8 +1322,8 @@ class Guitar:
             self.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
             self.starPowerGained = True
 
-      if enable:
-        self.spEnabled = True
+      #if enable:
+      #  self.spEnabled = True
 
       if event.tappable < 2:
         isTappable = False
@@ -1384,6 +1389,9 @@ class Guitar:
       else:
         self.renderNote(length, sustain = sustain, kill = killswitch, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote)
       glPopMatrix()
+
+    if not starEventsInView:
+      self.spEnabled = True
 
   def renderTails(self, visibility, song, pos, killswitch):
     if not song:
@@ -1476,8 +1484,8 @@ class Guitar:
             if self.theme == 2 and self.oFlash != None:
               self.ocount = 0
 
-      if enable:
-        self.spEnabled = True
+      #if enable:
+      #  self.spEnabled = True
 
       if event.tappable < 2:
         isTappable = False
