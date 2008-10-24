@@ -647,6 +647,20 @@ class SongChooser(Layer, KeyListener):
 
     self.loadCollection()
 
+
+    #MFH configurable default instrument display with 5th / orange fret
+    self.instrument = self.engine.config.get("game", "songlist_instrument")
+    if self.instrument == 4:
+      self.instrument = "Drums"
+    elif self.instrument == 3:
+      self.instrument = "Lead Guitar"
+    elif self.instrument == 2:
+      self.instrument = "Bass Guitar"
+    elif self.instrument == 1:
+      self.instrument = "Rhythm Guitar"
+    else: 
+      self.instrument = "Guitar"
+
     if self.display:
       self.engine.resource.load(self, "cassette",     lambda: Mesh(self.engine.resource.fileName("cassette.dae")), synch = True)
       self.engine.resource.load(self, "label",        lambda: Mesh(self.engine.resource.fileName("label.dae")), synch = True)
@@ -662,18 +676,6 @@ class SongChooser(Layer, KeyListener):
       self.engine.loadImgDrawing(self, "selected",    os.path.join("themes",themename,"menu","selected.png"))
       self.scoreTimer = 0
 
-      #MFH configurable default instrument display with 5th / orange fret
-      self.instrument = self.engine.config.get("game", "songlist_instrument")
-      if self.instrument == 4:
-        self.instrument = "Drums"
-      elif self.instrument == 3:
-        self.instrument = "Lead Guitar"
-      elif self.instrument == 2:
-        self.instrument = "Bass Guitar"
-      elif self.instrument == 1:
-        self.instrument = "Rhythm Guitar"
-      else: 
-        self.instrument = "Guitar"
 
       # evilynux - configurable default highscores difficulty display
       self.diff = self.engine.config.get("game", "songlist_difficulty")
@@ -1366,7 +1368,24 @@ class SongChooser(Layer, KeyListener):
     notesHit = 0
     noteStreak = 0
 
-      
+    if self.instrumentChange:
+      self.instrumentChange = False
+      if self.instrument == "Lead Guitar":
+        self.instrument = "Drums"
+        self.engine.config.set("game", "songlist_instrument", 4)
+      elif self.instrument == "Bass Guitar":
+        self.instrument = "Lead Guitar"
+        self.engine.config.set("game", "songlist_instrument", 3)
+      elif self.instrument == "Rhythm Guitar":
+        self.instrument = "Bass Guitar"
+        self.engine.config.set("game", "songlist_instrument", 2)
+      elif self.instrument == "Guitar":
+        self.instrument = "Rhythm Guitar"
+        self.engine.config.set("game", "songlist_instrument", 1)
+      else: # self.diff == 0:
+        self.instrument = "Guitar"
+        self.engine.config.set("game", "songlist_instrument", 0)
+
     if self.display:
     # render the item list
       try:
@@ -1577,7 +1596,6 @@ class SongChooser(Layer, KeyListener):
             if len(item.difficulties) > 3:
               y = .42 + f / 2.0
             
-            #MFH - TODO - add nesting to go through and find the right instrument before retrieving difficulties
             for p in item.parts:    #MFH - look at selected instrument!
               if str(p) == self.instrument:
                 for d in item.difficulties:
@@ -1632,9 +1650,20 @@ class SongChooser(Layer, KeyListener):
             wrapText(font, (x, pos[1] + 3 * font.getHeight() * 0.0016), careerResetText, visibility = f, scale = 0.0016)
 
 
+        #MFH CD list
+        text = self.instrument
+        scale = 0.00250
+        #glColor3f(1, 1, 1)
+        c1,c2,c3 = self.song_name_selected_color
+        glColor3f(c1,c2,c3)
+        w, h = font.getStringSize(text, scale=scale)
+        font.render(text, (0.95-w, 0.000), scale=scale)
+
+
+
 
       finally:
-      #  self.engine.view.resetProjection()
+        self.engine.view.resetProjection()
         nuttin = True
     
     else:   #MFH - song List display
@@ -2196,38 +2225,21 @@ class SongChooser(Layer, KeyListener):
                   self.scoreTimer += 1
                 else:
                   self.scoreTimer = 0
+      
+      
             
         finally:
         #  self.engine.view.resetProjection()
           nuttin = True
-    
-    #MFH - after songlist / CD and theme conditionals - common executions
+      
+      #MFH - after songlist / CD and theme conditionals - common executions
+      text = self.instrument
+      scale = 0.00250
+      glColor3f(1, 1, 1)
+      w, h = font.getStringSize(text, scale=scale)
+      font.render(text, (0.85-w, 0.10), scale=scale)
 
-    if self.instrumentChange:
-      self.instrumentChange = False
-      if self.instrument == "Lead Guitar":
-        self.instrument = "Drums"
-        self.engine.config.set("game", "songlist_instrument", 4)
-      elif self.instrument == "Bass Guitar":
-        self.instrument = "Lead Guitar"
-        self.engine.config.set("game", "songlist_instrument", 3)
-      elif self.instrument == "Rhythm Guitar":
-        self.instrument = "Bass Guitar"
-        self.engine.config.set("game", "songlist_instrument", 2)
-      elif self.instrument == "Guitar":
-        self.instrument = "Rhythm Guitar"
-        self.engine.config.set("game", "songlist_instrument", 1)
-      else: # self.diff == 0:
-        self.instrument = "Guitar"
-        self.engine.config.set("game", "songlist_instrument", 0)
-
-    text = self.instrument
-    scale = 0.00145
-    w, h = font.getStringSize(text, scale=scale)
-    font.render(text, (0.9-w, 0.05), scale=scale)
-
-    
-    self.engine.view.resetProjection()
+      self.engine.view.resetProjection()
           
 class FileChooser(BackgroundLayer, KeyListener):
   """File choosing layer."""
