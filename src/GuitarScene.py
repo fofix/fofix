@@ -323,6 +323,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.muteLastSecond = self.engine.config.get("audio", "mute_last_second") #MFH
     self.mutedLastSecondYet = False
     self.starScoreUpdates = self.engine.config.get("performance", "star_score_updates") #MFH
+    self.currentlyAnimating = True
+    self.missPausesAnim = self.engine.config.get("game", "miss_pauses_anim") #MFH
 
     #racer: practice beat claps:
     self.beatClaps = self.engine.config.get("game", "beat_claps")
@@ -2076,6 +2078,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             self.notesMissed[i] = True
           self.processedFirstNoteYet = True
           self.playerList[i].streak = 0
+          self.currentlyAnimating = False
           guitar.setMultiplier(1)
           guitar.hopoLast = -1
           self.song.setInstrumentVolume(0.0, self.players[i].part)
@@ -2140,30 +2143,32 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.handleJurgen(pos)
 
       #stage rotation
-      if self.stageAnimation:
-        whichDelay = self.stageAnimateDelay
-      else:
-        whichDelay = self.stageRotateDelay
-      self.indexCount = self.indexCount + 1
-      if self.indexCount > whichDelay:   #myfingershurt - adding user setting for stage rotate delay
-        self.indexCount = 0
-        if self.isRotation == 1: #QQstarS:random
-          self.arrNum = random.randint(0,len(self.imgArr)-1)
-        elif self.isRotation == 2: #myfingershurt: in order display mode
-          self.arrNum += 1
-          if self.arrNum > (len(self.imgArr)-1):
-            self.arrNum = 0
-        elif self.isRotation == 3: #myfingershurt: in order, back and forth display mode
-          if self.arrDir == 1:  #forwards
+      #MFH - TODO - add logic to prevent advancing rotation frames if you have screwed up, until you resume a streak
+      if (self.currentlyAnimating and self.missPausesAnim == 1) or self.missPausesAnim == 0:
+        if self.stageAnimation:
+          whichDelay = self.stageAnimateDelay
+        else:
+          whichDelay = self.stageRotateDelay
+        self.indexCount = self.indexCount + 1
+        if self.indexCount > whichDelay:   #myfingershurt - adding user setting for stage rotate delay
+          self.indexCount = 0
+          if self.isRotation == 1: #QQstarS:random
+            self.arrNum = random.randint(0,len(self.imgArr)-1)
+          elif self.isRotation == 2: #myfingershurt: in order display mode
             self.arrNum += 1
             if self.arrNum > (len(self.imgArr)-1):
-              self.arrNum -= 2
-              self.arrDir = 0
-          else:
-            self.arrNum -= 1
-            if self.arrNum < 0:
-              self.arrNum += 2
-              self.arrDir = 1
+              self.arrNum = 0
+          elif self.isRotation == 3: #myfingershurt: in order, back and forth display mode
+            if self.arrDir == 1:  #forwards
+              self.arrNum += 1
+              if self.arrNum > (len(self.imgArr)-1):
+                self.arrNum -= 2
+                self.arrDir = 0
+            else:
+              self.arrNum -= 1
+              if self.arrNum < 0:
+                self.arrNum += 2
+                self.arrDir = 1
        
       #MFH - new logic to update the starpower pre-multiplier
       for i, thePlayer in enumerate(self.playerList):
@@ -2317,6 +2322,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.killswitchEngaged[num] = False   #always reset killswitch status when picking / tapping
     if self.guitars[num].startPick(self.song, pos, self.controls):
       self.song.setInstrumentVolume(self.guitarVolume, self.playerList[num].part)
+      self.currentlyAnimating = True
       self.playerList[num].streak += 1
 
       self.notesHit[num] = True #QQstarS:Set [0] to [i]
@@ -2340,6 +2346,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.song.setInstrumentVolume(0.0, self.playerList[num].part)
       self.playerList[num].streak = 0
       self.guitars[num].setMultiplier(1)
+      self.currentlyAnimating = False
       self.stage.triggerMiss(pos)
       self.guitarSoloBroken[num] = True
       
@@ -2394,6 +2401,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.song.setInstrumentVolume(self.guitarVolume, self.playerList[num].part)
       if self.guitars[num].playedNotes:
         self.playerList[num].streak += 1
+        self.currentlyAnimating = True
 
         self.notesHit[num] = True #QQstarS:Set [0] to [i]
         
@@ -2408,6 +2416,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     else:
       self.guitars[num].hopoActive = 0
       self.guitars[num].wasLastNoteHopod = False
+      self.currentlyAnimating = False
       self.guitars[num].hopoLast = -1
       self.song.setInstrumentVolume(0.0, self.playerList[num].part)
       self.playerList[num].streak = 0
@@ -2466,7 +2475,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.playerList[num].streak += 1
 
         self.notesHit[num] = True #qqstars
-        
+
+      self.currentlyAnimating = True        
       self.playerList[num].notesHit += 1  # glorandwarf: was len(self.guitars[num].playedNotes)
       self.updateStars(num)
       self.updateAvMult(num)
@@ -2482,6 +2492,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.dispAccuracy[num] = True
 
     else:
+      self.currentlyAnimating = False
       self.guitars[num].hopoActive = 0
       self.guitars[num].wasLastNoteHopod = False
       self.guitars[num].hopoLast = 0
@@ -2771,7 +2782,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         #  #self.guitars[num].wasLastNoteHopod = False
 
         self.notesHit[num] = True #QQstarS:Set [0] to [i]
-        
+
+      self.currentlyAnimating = True        
       self.playerList[num].notesHit += 1  # glorandwarf: was len(self.guitars[num].playedNotes)
       self.updateStars(num)
       self.updateAvMult(num)
@@ -2834,6 +2846,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       
       if ApplyPenalty == True:
 
+        self.currentlyAnimating = False
         self.guitars[num].hopoActive = 0
         self.guitars[num].wasLastNoteHopod = False
         self.guitars[num].sameNoteHopoString = False

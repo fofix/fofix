@@ -425,6 +425,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "game", "song_stage", autoApply = True),   #myfingershurt
       ConfigChoice(engine.config, "game", "rotate_stages", autoApply = True),   #myfingershurt
       ConfigChoice(engine.config, "game", "animated_stage_folder", autoApply = True),   #myfingershurt
+      ConfigChoice(engine.config, "game", "miss_pauses_anim", autoApply = True),   #myfingershurt
       ConfigChoice(engine.config, "game", "stage_rotate_delay", autoApply = True),   #myfingershurt - user defined stage rotate delay
       ConfigChoice(engine.config, "game", "stage_animate_delay", autoApply = True),   #myfingershurt - user defined stage rotate delay
       ConfigChoice(engine.config, "game", "rb_sp_neck_glow", autoApply = True),
