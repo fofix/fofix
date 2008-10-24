@@ -1,0 +1,3 @@
+#summary Project statistics by Ohloh
+#labels Featured
+<wiki:gadget url="http://www.ohloh.net/projects/fofix/widgets/project_basic_stats.xml" height="220" border="1" />
