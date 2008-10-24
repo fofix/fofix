@@ -319,7 +319,7 @@ class GameEngine(Engine):
 
     self.mainMenu = None    #placeholder for main menu object - to prevent reinstantiation
 
-    self.versionString = "FoFiX v3.020"
+    self.versionString = "FoFiX v3.021"
     
     Log.debug(self.versionString + " starting up...")
     
