@@ -10,38 +10,14 @@ TO DO
 
 [i]Short-term:[/i]
 [/color]
-++Add theme.ini options for HOPO indicator inactive and active colors, as well as x,y position on screen
-++Add a new higher tier of star score, above gold (6) stars --- this new "7" star score will denote an actual, verifiable FC (Full Combo).  This means the player hit 100% of the notes from start to finish, and did not break the streak (no overstrums).
-++++Add logic to ensure a star score of 7 uploads to Divra's charts as a star score of 6 for compatibility reasons -- until I am notified that the chart code has changed and will handle a star score of 7, then I will re-enable uploading of a 7 star score
-++Investigate invisible tails bug and potential fix -- [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=31005&st=#entry320251]detail post[/url]
-++Add optional song.ini setting to force HOPO Frequency setting, so songs can be played as they are in the actual games
-++Organize and clarify stage rotation & animation settings in the Options menu as detailed in [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=24664;st=5120#entry313966]this post[/url]
-++Add logic to play crowd cheer when rock meter reaches top 1/3rd
-++Add song.ttf scale factor to theme.ini (for song info display during gameplay countdown)
-++Add support for Career Title / Tier labels (title1.png, title2.png, etc)
-++Add Difficulty select as a Career submenu, and remove from Career song selection
-++Add Difficulty-based careers (separate "unlock_completed" entry for Easy, Medium, Hard, Expert) so you must unlock a song on each difficulty (4 careers in 1)
-++Add theme.ini settings to allow re-organizing of the various screen elements from the Game Results screen - [url=http://www.flickr.com/photos/31202878@N03/2923641175/]example 1[/url], [url=http://www.flickr.com/photos/31202878@N03/2923641179/]example 2[/url]
-++Attempt to write new code that allows separate positioning of callback submenus (so options text and difficulty select, for example, can have separate positions) - [url=http://www.flickr.com/photos/31202878@N03/2923641173/]example[/url]
-++Add theme.ini setting for Neck Select screen's text -- [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4930#entry310665]detail post[/url]
-++Add support for a transparent loading overlay and a song-specific loading background  -- [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4930#entry310665]detail post[/url]
-++Add user option to display "Jurgen Is Here" and "Jurgen Was Here" much smaller and out of the way
-++Add theme.ini option to allow a full-width image to be used for the Rock Band overdrive bar and fill, so custom length and position overdrive bars can be used - [url=http://i35.tinypic.com/24uxojq.jpg]example[/url] -- [url=http://www.fretsonfire.net/forums/viewtopic.php?f=11&t=25040&p=295573#p295618]detail post 2[/url]
-++Add auto font scaling, like the GH3 failed screen, to the songlist - so long song names won't overlap the score & stars
-++Add new option to disable track miss muting for single-track songs
-++Add new option for "theme-based" songlist, will default to songlist unless theme.ini contains "list=CD" - then it will force CD list mode
-++Add new options to sort, ascending or descending, by: score, streak, star count, and hit accuracy / percentage
-++Attempt to fix failing with > 100% shown in Fail screen - [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=31247&st=#entry323565]detail post[/url]
-++Add "Album" entry to song.ini, to be displayed before Year (or put the Year tag on a new line so Album text could be part of it, as Puppetz sometimes does)
-++Investigate why you can still gain starpower on a starpower sustain after losing a starpower streak
-++Investigate why starpower clap SFX and practice beat claps don't seem to work
+[url=http://code.google.com/p/fofix/issues/list?can=2&q=&sort=priority]FoFiX prioritized issues / to do list[/url]
 ++Pick from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST;f=11;t=28649]worldrave's GH3 coding requests[/url] (found near bottom of that first post)
 ++Pick from [url=http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=30757&st=140#entry317751]BlackJack's list 1[/url] or [url=http://www.fretsonfire.net/forums/viewtopic.php?f=11&t=25040&p=295934#p296095]list 2[/url]
 
 
 [anchor]to_do_long[/anchor]
 [color=white]
-[i]Long-term:[/i]
+[i]Long-term: (low priority / background progress)[/i]
 [/color]
 [color=grey]
 -Create a 3-player mode

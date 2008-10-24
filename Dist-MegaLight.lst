@@ -1,0 +1,20 @@
+"*."//get all extentionless files
+"*.exe"//all exes
+"fretsonfire.ini"//inis
+"*.htm"//htms
+"*.dll"//dlls
+"src\*.*"//all src files
+"src\midi\*.*"//all src/midi files
+"doc\*.*"//all other doc files
+"data\*.*"//all data files
+"data\mods\*.*"//all
+"data\mods\Low Poly CD List\*.*"//all
+"data\mods\MegaLight RB Notes\*.*"//all
+"data\necks\defaultneck.png"//all
+"data\necks\randomneck.png"//all
+"data\necks\Neck_00?.*"//all
+"data\translations\*.*"//all
+"data\themes\MegaLight\*.*"//all
+"data\themes\MegaLight\menu\*.*"//all
+"data\themes\MegaLight\sounds\*.*"//all
+"data\themes\MegaLight\stages\*.*"//all
