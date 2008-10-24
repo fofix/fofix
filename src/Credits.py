@@ -117,84 +117,31 @@ class Credits(Layer, KeyListener):
 
     space = Text(nf, hs, c1, "center", " ")
     self.credits = [
-      #Picture(self.engine, os.path.join("themes",themename,"star2.png"), .25), # evilynux - We need a logo!
       Picture(self.engine, "mfhlogo.png", .10), 
-      Text(nf, ns, c1, "center", "%s" % self.engine.versionString),
+      Text(nf, ns, c1, "center", "%s" % self.engine.versionString) ]
 
-      space,
-      Text(nf, ns, c2, "center", _("This mod is built on Alarian's Mod,")),
-      Text(nf, ns, c2, "center", _("which was built on Ultimate Coffee's Ultimate Mod,")),
-      Text(nf, ns, c2, "center", _("which was built on Rogue_F's RF_Mod 4.15,")),
-      Text(nf, ns, c2, "center", _("which was, of course, built on Frets on Fire 1.2.451,")),
-      Text(nf, ns, c2, "center", _("which was created by Unreal Voodoo")),
-      
-      space,
-      Text(nf, ns, c1, "left",   _("Coders:")),
-      Text(nf, bs, c1, "left",   _("No particular order")),
-      Text(nf, ns, c2, "right",  "Alarian"),
-      Text(nf, ns, c2, "right",  "Blazingamer"),
-      Text(nf, ns, c2, "right",  "Capo"),
-      Text(nf, ns, c2, "right",  "Glorandwarf"),
-      Text(nf, ns, c2, "right",  "Myfingershurt"),
-      Text(nf, ns, c2, "right",  "ShiekOdaSandz"),
-      Text(nf, ns, c2, "right",  "Trinidude"),
-      Text(nf, ns, c2, "right",  "QQStarS"),
-      Text(nf, ns, c2, "right",  "wolferacing"),
-      Text(nf, ns, c2, "right",  "rchiav"),
-      Text(nf, ns, c2, "right",  "Maze2234"),
-      Text(nf, ns, c2, "right",  ".liquid."),
-      Text(nf, ns, c2, "right",  "evilynux"),
-      space,
-      Text(nf, ns, c1, "left",   _("Main graphic contributors:")),
-      Text(nf, bs, c1, "left",   _("No particular order")),
-      Text(nf, ns, c2, "right",  "Alarian"),
-      Text(nf, ns, c2, "right",  "Ds~"),
-      Text(nf, ns, c2, "right",  "Dævid"),
-      Text(nf, ns, c2, "right",  "EdisLeado"),
-      Text(nf, ns, c2, "right",  "Skor"),
-      Text(nf, ns, c2, "right",  "Worldrave"),
-      space,
-      Text(nf, ns, c1, "left",   _("Team Hero:")),
-      Text(nf, bs, c1, "left",   _("Creators of the Career Mode")),
-      Text(nf, ns, c2, "right",  "Lsapg09"),
-      Text(nf, ns, c2, "right",  "Jrdnxxhero"),
-      Text(nf, ns, c2, "right",  "Blackfriday"),
-      Text(nf, ns, c2, "right",  "blessedmain911"),
-      Text(nf, ns, c2, "right",  "ADH"),
-      Text(nf, ns, c2, "right",  "razlo7"),
-      Text(nf, ns, c2, "right",  "coolguy5678"),
-      Text(nf, ns, c2, "right",  "arfn24"),
-      Text(nf, ns, c2, "right",  "Qwedgeonline"),
-      Text(nf, ns, c1, "left",   _("Tutorial inspired by:")),
-      Text(nf, ns, c2, "right",  "adam02"),
-      space,
-      Text(nf, ns, c1, "left",   _("Resource donators:")),
-      Text(nf, ns, c2, "right",  "Leixner"),
-      Text(nf, bs, c2, "right",  "mfh-alarian-mod.com webspace / domain"),
-      space,
-      Text(nf, ns, c1, "left",   _("Honorary credits to:")),
-      Text(nf, ns, c2, "right",  "Rogue_F"),
-      Text(nf, ns, c2, "right",  "h3r1n6"),
-      Text(nf, ns, c2, "right",  "Ultimate Coffee"),
-      Text(nf, ns, c2, "right",  "Unreal Voodoo"),
-      space,
-      Text(nf, ns, c1, "left",   _("Other credits:")),
-      Text(nf, bs, c1, "left",   _("No particular order")),
-      Text(nf, ns, c2, "right",  "Aduro, blessedmain911, Chadman, Divra,"),
-      Text(nf, ns, c2, "right",  "Evil Ken, FoZZ, Kookoz, Inkk, Meteorito,"),
-      Text(nf, ns, c2, "right",  "Pudding, Racer 13, Raph666, RavenSourcious,"),
-      Text(nf, ns, c2, "right",  "Seraph88, TXF, v4vendetta, YMS, Figure,"),
-      Text(nf, ns, c2, "right",  "anthman852, Happ E Nose, Death Au, jnuz,"),
-      Text(nf, ns, c2, "right",  "italiansta1ion, lsapg09, fuzion, rubjonny,"),
-      Text(nf, ns, c2, "right",  "slantyr, Tpyn, cama, kingleonidas, MoonFlow43,"),
-      Text(nf, ns, c2, "right",  "evil-doer, D4rksh4d0w, bluzer, MistTribe,"),
-      Text(nf, ns, c2, "right",  "faaa, ugo247548 (Biskit), jacobo123, mrhoeivo,"),
-      Text(nf, ns, c2, "right",  "Death Legion, sherranjjj001, JcFerggy, iamnoob,"),
-      Text(nf, ns, c2, "right",  "BlackJack, kawaii_kumiko69, Alexfighter,"),
-      Text(nf, ns, c2, "right",  "fablaculp, gamexprt1, acrox999, p_025, x-driver,"),
-      Text(nf, ns, c2, "right",  "TypusMensch, treckzy, >Slash666<, mrhoievo,"),
-      Text(nf, ns, c2, "right",  "Dillusional, SneakHouse, Borisdsp, Don Tonberry,"),
-      Text(nf, ns, c2, "right",  "Gugered."),
+    # evilynux: Use CREDITS file as source.
+    if os.path.exists(os.path.join("..","CREDITS")):
+      file = open(os.path.join("..","CREDITS"))
+      for line in file:
+        line = line.strip("\n")
+        if line.startswith("=====") or line.startswith("-----"):
+          continue
+        if line == "":
+          self.credits.append(space)
+        elif line.startswith("`") and line.endswith("`"):
+          line = line.strip("`")
+          self.credits.append( Text(nf, bs, c1, "left", "%s" % line) )
+        elif line.startswith("_") and line.endswith("_"):
+          line = line.strip("_")
+          self.credits.append( Text(nf, ns, c2, "center", "%s" % line) )
+        elif line.startswith("=") and line.endswith("="):
+          line = line.strip("=")
+          self.credits.append( Text(nf, ns, c1, "left", "%s" % line) )
+        else:
+          self.credits.append( Text(nf, ns, c2, "right", "%s" % line) )
+  
+    self.credits.extend( [
       space,
       Text(nf, ns, c1, "left",   _("Made with:")),
       Text(nf, ns, c2, "right",  "Python 2.4"),
@@ -220,13 +167,13 @@ class Credits(Layer, KeyListener):
       space,
       space,
       Text(nf, bs, c1, "center", _("Source Code available under the GNU General Public License")),
-      Text(nf, bs, c2, "center", "http://mfh-alarian-mod.com"),
+      Text(nf, bs, c2, "center", "http://code.google.com/p/fofix"),
       space,
       space,
       space,
       space,
       Text(nf, bs, c1, "center", _("Copyright 2006, 2007 by Unreal Voodoo")),
-      Text(nf, bs, c1, "center", _("Copyright 2008 by MFH-Alarian Team")),
+      Text(nf, bs, c1, "center", _("Copyright 2008 by FoFiX Team")),
       space,
       space,
       space,
@@ -236,8 +183,8 @@ class Credits(Layer, KeyListener):
       space,
       space,
       space,
-      space,
-    ]
+      space
+    ])
 
   def shown(self):
     self.engine.input.addKeyListener(self)
