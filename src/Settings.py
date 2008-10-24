@@ -414,6 +414,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "audio", "disable_preview", autoApply = True),  #myfingershurt
       ConfigChoice(engine.config, "game", "songlist_difficulty", autoApply = True), #evilynux
       ConfigChoice(engine.config, "game", "songlist_extra_stats", autoApply = True), #evilynux
+      ConfigChoice(engine.config, "game", "songlist_instrument", autoApply = True), #MFH
       ConfigChoice(engine.config, "game", "HSMovement", autoApply = True), #racer
     ]
     listSettingsMenu = Menu.Menu(engine, listSettings + applyItem)

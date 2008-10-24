@@ -261,9 +261,10 @@ Config.define("coffee", "failingEnabled",       bool, True,     text = _("Failin
 
 # evilynux - configurable default highscores difficulty display.
 # Index assigned following same standard as command line argument.
-Config.define("game", "songlist_difficulty", int, 0, text = _("Song Default Highscores"), options = {0: "Expert", 1: "Hard", 2: "Medium", 3: "Easy"}  )
+Config.define("game", "songlist_difficulty", int, 0, text = _("Show Difficulty"), options = {0: "Expert", 1: "Hard", 2: "Medium", 3: "Easy"}  )
 Config.define("game", "songlist_extra_stats", bool, True, text = _("Display hit% and note streak"), options = {True: _("Yes"), False: _("No")} )
 
+Config.define("game", "songlist_instrument", int, 0, text = _("Show Instrument"), options = {0: "Guitar", 1: "Rhythm Guitar", 2: "Bass Guitar", 3: "Lead Guitar", 4: "Drums"}  )  #MFH
 
 
 class FullScreenSwitcher(KeyListener):

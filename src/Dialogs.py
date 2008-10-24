@@ -661,6 +661,20 @@ class SongChooser(Layer, KeyListener):
       self.engine.loadImgDrawing(self, "paper",       os.path.join("themes",themename,"menu","songchoosepaper.png"))
       self.engine.loadImgDrawing(self, "selected",    os.path.join("themes",themename,"menu","selected.png"))
       self.scoreTimer = 0
+
+      #MFH configurable default instrument display with 5th / orange fret
+      self.instrument = self.engine.config.get("game", "songlist_instrument")
+      if self.instrument == 4:
+        self.instrument = "Drums"
+      elif self.instrument == 3:
+        self.instrument = "Lead Guitar"
+      elif self.instrument == 2:
+        self.instrument = "Bass Guitar"
+      elif self.instrument == 1:
+        self.instrument = "Rhythm Guitar"
+      else: 
+        self.instrument = "Guitar"
+
       # evilynux - configurable default highscores difficulty display
       self.diff = self.engine.config.get("game", "songlist_difficulty")
       if self.diff == 3:
@@ -686,6 +700,8 @@ class SongChooser(Layer, KeyListener):
 #racer: highscores are changed by fret
     self.highScoreChange = False
     self.highScoreType = self.engine.config.get("game", "HSMovement")
+
+    self.instrumentChange = False   #MFH
 
   def loadCollection(self):
     Log.debug("Dialogs.loadCollection() function call...")
@@ -1013,6 +1029,11 @@ class SongChooser(Layer, KeyListener):
   #racer: highscores change on fret hit
     elif c in Player.KEY4S or (c in Player.BASEDRUMS and self.drumNav):
      self.highScoreChange = True
+
+    #MFH - instrument change on 5th fret
+    elif c in Player.KEY5S or (c in Player.DRUM3S and self.drumNav):
+     self.instrumentChange = True
+
 
     elif c in Player.UPS + Player.ACTION1S or (c in Player.DRUM2S and self.drumNav):
       #if not self.song:
@@ -1556,36 +1577,38 @@ class SongChooser(Layer, KeyListener):
             if len(item.difficulties) > 3:
               y = .42 + f / 2.0
             
-            #new
-            for d in item.difficulties:
-              scores = item.getHighscores(d)
-              if scores:
-                score, stars, name, scoreExt = scores[0]
-                notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 = scoreExt
-              else:
-                score, stars, name = "---", 0, "---"
-              Theme.setBaseColor(1 - v)
-              font.render(unicode(d),     (x, y),           scale = scale)
-              # evilynux - Fixed star size following Font render bugfix
-              if stars == 6 and self.theme == 2:    #gold stars in RB songlist
-                glColor3f(1, 1, 0)  
-                font.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
-              elif stars == 6:
-                glColor3f(0, 1, 0)  
-                font.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
-              else:
-                font.render(unicode(Data.STAR2 * stars + Data.STAR1 * (5 - stars)), (x, y + h), scale = scale * 1.8)
-              Theme.setSelectedColor(1 - v)
-              # evilynux - Also use hit%/noteStreak SongList option
-              if scores:
-                if self.extraStats:
-                  if notesTotal != 0:
-                    score = "%s %.1f%%" % (score, (float(notesHit) / notesTotal) * 100.0)
-                  if noteStreak != 0:
-                    score = "%s (%d)" % (score, noteStreak)
-              font.render(unicode(score), (x + .15, y),     scale = scale)
-              font.render(name,       (x + .15, y + h),     scale = scale)
-              y += 2 * h + f / 4.0
+            #MFH - TODO - add nesting to go through and find the right instrument before retrieving difficulties
+            for p in item.parts:    #MFH - look at selected instrument!
+              if str(p) == self.instrument:
+                for d in item.difficulties:
+                  scores = item.getHighscores(d)
+                  if scores:
+                    score, stars, name, scoreExt = scores[0]
+                    notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 = scoreExt
+                  else:
+                    score, stars, name = "---", 0, "---"
+                  Theme.setBaseColor(1 - v)
+                  font.render(unicode(d),     (x, y),           scale = scale)
+                  # evilynux - Fixed star size following Font render bugfix
+                  if stars == 6 and self.theme == 2:    #gold stars in RB songlist
+                    glColor3f(1, 1, 0)  
+                    font.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
+                  elif stars == 6:
+                    glColor3f(0, 1, 0)  
+                    font.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
+                  else:
+                    font.render(unicode(Data.STAR2 * stars + Data.STAR1 * (5 - stars)), (x, y + h), scale = scale * 1.8)
+                  Theme.setSelectedColor(1 - v)
+                  # evilynux - Also use hit%/noteStreak SongList option
+                  if scores:
+                    if self.extraStats:
+                      if notesTotal != 0:
+                        score = "%s %.1f%%" % (score, (float(notesHit) / notesTotal) * 100.0)
+                      if noteStreak != 0:
+                        score = "%s (%d)" % (score, noteStreak)
+                  font.render(unicode(score), (x + .15, y),     scale = scale)
+                  font.render(name,       (x + .15, y + h),     scale = scale)
+                  y += 2 * h + f / 4.0
           elif isinstance(item, Song.LibraryInfo):
             Theme.setBaseColor(1 - v)
 
@@ -1611,7 +1634,8 @@ class SongChooser(Layer, KeyListener):
 
 
       finally:
-        self.engine.view.resetProjection()
+      #  self.engine.view.resetProjection()
+        nuttin = True
     
     else:   #MFH - song List display
       if self.theme == 0 or self.theme == 1:
@@ -1825,31 +1849,39 @@ class SongChooser(Layer, KeyListener):
                     self.diff = "Easy"
 
                 #racer: score can be changed by fret button:
+                #MFH - and now they will be remembered as well
                 if self.highScoreChange == True and self.highScoreType == 1:
                   if self.diff == "Easy":
                     self.diff = "Medium"
+                    self.engine.config.set("game", "songlist_difficulty", 2)
                     self.highScoreChange = False
                   elif self.diff == "Medium":
                     self.diff = "Hard"
+                    self.engine.config.set("game", "songlist_difficulty", 1)
                     self.highScoreChange = False
                   elif self.diff == "Hard":
                     self.diff = "Expert"
+                    self.engine.config.set("game", "songlist_difficulty", 0)
                     self.highScoreChange = False
                   elif self.diff == "Expert":
                     self.diff = "Easy"
+                    self.engine.config.set("game", "songlist_difficulty", 3)
                     self.highScoreChange = False
 
                 score = _("Nil")
                 stars = 0
                 name = ""
-                for d in item.difficulties:
-                  if str(d) == self.diff:
-                    scores = item.getHighscores(d)
-                    if scores:
-                      score, stars, name, scoreExt = scores[0]
-                      notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 = scoreExt
-                    else:
-                      score, stars, name = 0, 0, "---"
+                
+                for p in item.parts:    #MFH - look at selected instrument!
+                  if str(p) == self.instrument:
+                    for d in item.difficulties:
+                      if str(d) == self.diff:
+                        scores = item.getHighscores(d)
+                        if scores:
+                          score, stars, name, scoreExt = scores[0]
+                          notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 = scoreExt
+                        else:
+                          score, stars, name = 0, 0, "---"
 
                 #QQstarS:add  to show stars
                 if stars == 6:
@@ -1892,7 +1924,9 @@ class SongChooser(Layer, KeyListener):
                   self.scoreTimer = 0
             
         finally:
-          self.engine.view.resetProjection()
+        #  self.engine.view.resetProjection()
+          nuttin = True
+      
       elif self.theme == 2: # RbMFH
         # render the song info
         self.engine.view.setOrthogonalProjection(normalize = True)
@@ -2088,31 +2122,39 @@ class SongChooser(Layer, KeyListener):
                     self.diff = "Easy"
 
                 #racer: score can be changed by fret button:
+                #MFH - and now they will be remembered as well
                 if self.highScoreChange == True and self.highScoreType == 1:
                   if self.diff == "Easy":
                     self.diff = "Medium"
+                    self.engine.config.set("game", "songlist_difficulty", 2)
                     self.highScoreChange = False
                   elif self.diff == "Medium":
                     self.diff = "Hard"
+                    self.engine.config.set("game", "songlist_difficulty", 1)
                     self.highScoreChange = False
                   elif self.diff == "Hard":
                     self.diff = "Expert"
+                    self.engine.config.set("game", "songlist_difficulty", 0)
                     self.highScoreChange = False
                   elif self.diff == "Expert":
                     self.diff = "Easy"
+                    self.engine.config.set("game", "songlist_difficulty", 3)
                     self.highScoreChange = False
 
                 score = _("Nil")
                 stars = 0
                 name = ""
-                for d in item.difficulties:
-                  if str(d) == self.diff:
-                    scores = item.getHighscores(d)
-                    if scores:
-                      score, stars, name, scoreExt = scores[0]
-                      notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 = scoreExt
-                    else:
-                      score, stars, name = 0, 0, "---"
+                
+                for p in item.parts:    #MFH - look at selected instrument!
+                  if str(p) == self.instrument:
+                    for d in item.difficulties:
+                      if str(d) == self.diff:
+                        scores = item.getHighscores(d)
+                        if scores:
+                          score, stars, name, scoreExt = scores[0]
+                          notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 = scoreExt
+                        else:
+                          score, stars, name = 0, 0, "---"
 
                 #QQstarS:add  to show stars
                 # evilynux - Tweaked position to fit hit% and note streak
@@ -2156,7 +2198,36 @@ class SongChooser(Layer, KeyListener):
                   self.scoreTimer = 0
             
         finally:
-          self.engine.view.resetProjection()
+        #  self.engine.view.resetProjection()
+          nuttin = True
+    
+    #MFH - after songlist / CD and theme conditionals - common executions
+
+    if self.instrumentChange:
+      self.instrumentChange = False
+      if self.instrument == "Lead Guitar":
+        self.instrument = "Drums"
+        self.engine.config.set("game", "songlist_instrument", 4)
+      elif self.instrument == "Bass Guitar":
+        self.instrument = "Lead Guitar"
+        self.engine.config.set("game", "songlist_instrument", 3)
+      elif self.instrument == "Rhythm Guitar":
+        self.instrument = "Bass Guitar"
+        self.engine.config.set("game", "songlist_instrument", 2)
+      elif self.instrument == "Guitar":
+        self.instrument = "Rhythm Guitar"
+        self.engine.config.set("game", "songlist_instrument", 1)
+      else: # self.diff == 0:
+        self.instrument = "Guitar"
+        self.engine.config.set("game", "songlist_instrument", 0)
+
+    text = self.instrument
+    scale = 0.00145
+    w, h = font.getStringSize(text, scale=scale)
+    font.render(text, (0.9-w, 0.05), scale=scale)
+
+    
+    self.engine.view.resetProjection()
           
 class FileChooser(BackgroundLayer, KeyListener):
   """File choosing layer."""
