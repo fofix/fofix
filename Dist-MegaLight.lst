@@ -1,15 +1,16 @@
 "*."//get all extentionless files
 "*.exe"//all exes
-"fretsonfire.ini"//inis
-"*.htm"//htms
+"fretsonfire.ini"//ini
 "*.dll"//dlls
 "src\*.*"//all src files
 "src\midi\*.*"//all src/midi files
+"po\*.*"//all translation .po source files
+"..\FoFiX-wiki\*.*"//all wiki pages
 "doc\*.*"//all other doc files
 "data\*.*"//all data files
 "data\mods\*.*"//all
 "data\mods\Low Poly CD List\*.*"//all
-"data\mods\MegaLight RB Notes\*.*"//all
+"data\mods\MegaLight RB Notes\themes\MegaLight\*.*"//all
 "data\necks\defaultneck.png"//all
 "data\necks\randomneck.png"//all
 "data\necks\Neck_00?.*"//all
@@ -18,3 +19,7 @@
 "data\themes\MegaLight\menu\*.*"//all
 "data\themes\MegaLight\sounds\*.*"//all
 "data\themes\MegaLight\stages\*.*"//all
+"data\sounds\*.*"//all base sounds
+"data\tutorials\bangbang\*.*"//all of Bang Bang Mystery Man
+"data\tutorials\jurgenfof\*.*"//all of the original Jurgen FoF tutorial
+

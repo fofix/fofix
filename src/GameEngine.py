@@ -174,7 +174,7 @@ Config.define("game", "gfx_version_tag",       int, 1,     text = _("GfxVersionT
 Config.define("game", "p2_menu_nav",       int, 1,     text = _("P2 Menu Navigate"), options = {0: _("Off"), 1: _("On")}) #MFH
 Config.define("game", "in_game_font_shadowing",      bool, False,  text = _("In-Game Font Shadow"), options = {False: _("Off"), True: _("On")})
 Config.define("audio", "mute_last_second",       int, 0,     text = _("Mute last second"), options = {0: _("No"), 1: _("Yes")}) #MFH
-Config.define("game", "result_cheer_loop",       int, 1,     text = _("Results Cheer Loop"), options = {0: _("Off"), 1: _("On")}) #MFH
+Config.define("game", "result_cheer_loop",       int, 1,     text = _("Results Cheer Loop"), options = {0: _("Off"), 1: _("Theme"), 2: _("Auto")}) #MFH
 Config.define("game",  "cheer_loop_delay",        int,   550,   text = _("Cheer Loop Delay"), options = dict([(n, n) for n in range(0, 10, 1)] + [(n, n) for n in range(10, 50, 10)] + [(n, n) for n in range(50, 2001, 50)]))
 Config.define("game", "miss_pauses_anim",       int, 1,     text = _("Miss Pauses Anim"), options = {0: _("Off"), 1: _("On")}) #MFH
 
@@ -199,6 +199,7 @@ Config.define("coffee", "songfilepath",       bool, True,     text = _("Library 
 Config.define("coffee", "noterotate",       bool, False,     text = _("Rotate 3D Notes"),             options = {True: _("1.1"), False: _("1.2")})
 Config.define("coffee", "phrases",       bool, True,     text = _("Phrases"),             options = {True: _("On"), False: _("Off")})
 Config.define("coffee", "songdisplay",       bool, False,     text = _("Song Display"),             options = {True: _("CDs"), False: _("List")})
+Config.define("game", "tut",       bool, False,     text = _("tut"),             options = {True: _("yes"), False: _("no")})
 
 
 Config.define("game",   "hit_window",          int, 1,    text = _("Note Hit-window"), options = {0: _("Wide"), 1: _("Standard"), 2: _("Tight"), 3: _("Hot Pants Tight"), 4: _("Tight Like a Tiger")})#racer blazingamer
@@ -319,7 +320,7 @@ class GameEngine(Engine):
 
     self.mainMenu = None    #placeholder for main menu object - to prevent reinstantiation
 
-    self.versionString = "FoFiX v3.020"
+    self.versionString = "FoFiX v3.021"
     
     Log.debug(self.versionString + " starting up...")
     
@@ -330,6 +331,9 @@ class GameEngine(Engine):
 
     @param config:  L{Config} instance for settings
     """
+
+
+    self.tutorialFolder = "tutorials"
 
     if not config:
       config = Config.load()

@@ -183,67 +183,147 @@ class SongInfo(object):
     self.highScoresRhythm = {}
     
     scores = self._get("scores_rhythm", str, "")
+    scores_ext = self._get("scores_rhythm_ext", str, "")
     if scores:
       scores = Cerealizer.loads(binascii.unhexlify(scores))
+      if scores_ext:
+        scores_ext = Cerealizer.loads(binascii.unhexlify(scores_ext))
       for difficulty in scores.keys():
         try:
           difficulty = difficulties[difficulty]
         except KeyError:
           continue
-        for score, stars, name, hash in scores[difficulty.id]:
+        #for score, stars, name, hash in scores[difficulty.id]:
+        #  if self.getScoreHash(difficulty, score, stars, name) == hash:
+        #    self.addHighscore(difficulty, score, stars, name, part = parts[RHYTHM_PART])
+        #  else:
+        #    Log.warn("Weak hack attempt detected. Better luck next time.")
+        for i, base_scores in enumerate(scores[difficulty.id]):
+          score, stars, name, hash = base_scores
+          if scores_ext != "":
+            #Someone may have mixed extended and non extended
+            try:
+              hash_ext, stars2, notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 =  scores_ext[difficulty.id][i]
+              scoreExt = (notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2)
+            except:
+              hash_ext = 0
+              scoreExt = (0, 0, 0 , "RF-mod", "Default", "Default")
           if self.getScoreHash(difficulty, score, stars, name) == hash:
-            self.addHighscore(difficulty, score, stars, name, part = parts[RHYTHM_PART])
+            if scores_ext != "" and hash == hash_ext:
+              self.addHighscore(difficulty, score, stars, name, part = parts[RHYTHM_PART], scoreExt = scoreExt)
+            else:
+              self.addHighscore(difficulty, score, stars, name, part = parts[RHYTHM_PART])
           else:
             Log.warn("Weak hack attempt detected. Better luck next time.")
 
     self.highScoresBass = {}
     
     scores = self._get("scores_bass", str, "")
+    scores_ext = self._get("scores_bass_ext", str, "")
     if scores:
       scores = Cerealizer.loads(binascii.unhexlify(scores))
+      if scores_ext:
+        scores_ext = Cerealizer.loads(binascii.unhexlify(scores_ext))
       for difficulty in scores.keys():
         try:
           difficulty = difficulties[difficulty]
         except KeyError:
           continue
-        for score, stars, name, hash in scores[difficulty.id]:
+        #for score, stars, name, hash in scores[difficulty.id]:
+        #  if self.getScoreHash(difficulty, score, stars, name) == hash:
+        #    self.addHighscore(difficulty, score, stars, name, part = parts[BASS_PART])
+        #  else:
+        #    Log.warn("Weak hack attempt detected. Better luck next time.")
+        for i, base_scores in enumerate(scores[difficulty.id]):
+          score, stars, name, hash = base_scores
+          if scores_ext != "":
+            #Someone may have mixed extended and non extended
+            try:
+              hash_ext, stars2, notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 =  scores_ext[difficulty.id][i]
+              scoreExt = (notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2)
+            except:
+              hash_ext = 0
+              scoreExt = (0, 0, 0 , "RF-mod", "Default", "Default")
           if self.getScoreHash(difficulty, score, stars, name) == hash:
-            self.addHighscore(difficulty, score, stars, name, part = parts[BASS_PART])
+            if scores_ext != "" and hash == hash_ext:
+              self.addHighscore(difficulty, score, stars, name, part = parts[BASS_PART], scoreExt = scoreExt)
+            else:
+              self.addHighscore(difficulty, score, stars, name, part = parts[BASS_PART])
           else:
             Log.warn("Weak hack attempt detected. Better luck next time.")
 
     self.highScoresLead = {}
     
     scores = self._get("scores_lead", str, "")
+    scores_ext = self._get("scores_lead_ext", str, "")
     if scores:
       scores = Cerealizer.loads(binascii.unhexlify(scores))
+      if scores_ext:
+        scores_ext = Cerealizer.loads(binascii.unhexlify(scores_ext))
       for difficulty in scores.keys():
         try:
           difficulty = difficulties[difficulty]
         except KeyError:
           continue
-        for score, stars, name, hash in scores[difficulty.id]:
+        #for score, stars, name, hash in scores[difficulty.id]:
+        #  if self.getScoreHash(difficulty, score, stars, name) == hash:
+        #    self.addHighscore(difficulty, score, stars, name, part = parts[LEAD_PART])
+        #  else:
+        #    Log.warn("Weak hack attempt detected. Better luck next time.")            
+        for i, base_scores in enumerate(scores[difficulty.id]):
+          score, stars, name, hash = base_scores
+          if scores_ext != "":
+            #Someone may have mixed extended and non extended
+            try:
+              hash_ext, stars2, notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 =  scores_ext[difficulty.id][i]
+              scoreExt = (notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2)
+            except:
+              hash_ext = 0
+              scoreExt = (0, 0, 0 , "RF-mod", "Default", "Default")
           if self.getScoreHash(difficulty, score, stars, name) == hash:
-            self.addHighscore(difficulty, score, stars, name, part = parts[LEAD_PART])
+            if scores_ext != "" and hash == hash_ext:
+              self.addHighscore(difficulty, score, stars, name, part = parts[LEAD_PART], scoreExt = scoreExt)
+            else:
+              self.addHighscore(difficulty, score, stars, name, part = parts[LEAD_PART])
           else:
-            Log.warn("Weak hack attempt detected. Better luck next time.")            
+            Log.warn("Weak hack attempt detected. Better luck next time.")
 
     #myfingershurt: drums :)
     self.highScoresDrum = {}
     
     scores = self._get("scores_drum", str, "")
+    scores_ext = self._get("scores_drum_ext", str, "")
     if scores:
       scores = Cerealizer.loads(binascii.unhexlify(scores))
+      if scores_ext:
+        scores_ext = Cerealizer.loads(binascii.unhexlify(scores_ext))
       for difficulty in scores.keys():
         try:
           difficulty = difficulties[difficulty]
         except KeyError:
           continue
-        for score, stars, name, hash in scores[difficulty.id]:
+        #for score, stars, name, hash in scores[difficulty.id]:
+        #  if self.getScoreHash(difficulty, score, stars, name) == hash:
+        #    self.addHighscore(difficulty, score, stars, name, part = parts[DRUM_PART])
+        #  else:
+        #    Log.warn("Weak hack attempt detected. Better luck next time.")         
+        for i, base_scores in enumerate(scores[difficulty.id]):
+          score, stars, name, hash = base_scores
+          if scores_ext != "":
+            #Someone may have mixed extended and non extended
+            try:
+              hash_ext, stars2, notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 =  scores_ext[difficulty.id][i]
+              scoreExt = (notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2)
+            except:
+              hash_ext = 0
+              scoreExt = (0, 0, 0 , "RF-mod", "Default", "Default")
           if self.getScoreHash(difficulty, score, stars, name) == hash:
-            self.addHighscore(difficulty, score, stars, name, part = parts[DRUM_PART])
+            if scores_ext != "" and hash == hash_ext:
+              self.addHighscore(difficulty, score, stars, name, part = parts[DRUM_PART], scoreExt = scoreExt)
+            else:
+              self.addHighscore(difficulty, score, stars, name, part = parts[DRUM_PART])
           else:
-            Log.warn("Weak hack attempt detected. Better luck next time.")         
+            Log.warn("Weak hack attempt detected. Better luck next time.")
             
   def _set(self, attr, value):
     if not self.info.has_section("song"):
@@ -454,6 +534,28 @@ class SongInfo(object):
   def setLyrics(self, value):
     self._set("lyrics", value)    
         
+
+  def getHighscoresWithPartString(self, difficulty, part = str(parts[GUITAR_PART]) ):
+    if part == str(parts[GUITAR_PART]):
+      highScores = self.highScores
+    elif part == str(parts[RHYTHM_PART]):
+      highScores = self.highScoresRhythm
+    elif part == str(parts[BASS_PART]):
+      highScores = self.highScoresBass
+    elif part == str(parts[LEAD_PART]):
+      highScores = self.highScoresLead
+    #myfingershurt: drums :)
+    elif part == str(parts[DRUM_PART]):
+      highScores = self.highScoresDrum
+    else:
+      highScores = self.highScores
+      
+    try:
+      return highScores[difficulty]
+    except KeyError:
+      return []
+
+
   def getHighscores(self, difficulty, part = parts[GUITAR_PART]):
     if part == parts[GUITAR_PART]:
       highScores = self.highScores
@@ -2748,6 +2850,10 @@ def getAvailableLibraries(engine, library = DEFAULT_LIBRARY):
 
 def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = False):
   order = engine.config.get("game", "sort_order")
+  tut = engine.config.get("game", "tut")
+  
+  if tut:
+    includeTutorials = True
 
   #MFH - Career Mode determination:
   gameMode1p = engine.config.get("player0","mode_1p")

@@ -68,6 +68,7 @@ class MainMenu(BackgroundLayer):
     self.gfxVersionTag = Config.get("game", "gfx_version_tag")
 
     self.chosenNeck = Config.get("coffee", "neck_choose")
+    self.tut = Config.get("game", "tut")
 
     Config.define("coffee",   "max_neck", int, 1)      
 
@@ -218,7 +219,7 @@ class MainMenu(BackgroundLayer):
     ])
 
     trainingMenu = [
-      (_("Tutorial"), self.showTutorial),
+      (_("Tutorials"), self.showTutorial),
       (_("Practice"), lambda: self.newLocalGame(mode1p = 1)),
     ]
 
@@ -329,9 +330,11 @@ class MainMenu(BackgroundLayer):
 
   def showTutorial(self):
     # evilynux - Make sure tutorial exists before launching
-    tutorialpath = self.engine.getPath(os.path.join("songs","tutorial"))
-    if not os.path.exists(tutorialpath):
-      Dialogs.showMessage(self.engine, _("No tutorial found in your song library!"))
+    #tutorialpath = self.engine.getPath(os.path.join("songs","tutorial"))
+    tutorialpath = self.engine.tutorialFolder
+    if not os.path.isdir(self.engine.resource.fileName(tutorialpath)):
+      Log.debug("No folder found: %s" % tutorialpath)
+      Dialogs.showMessage(self.engine, _("No tutorials found!"))
       return
 
     if self.engine.isServerRunning():
@@ -340,16 +343,14 @@ class MainMenu(BackgroundLayer):
     Config.set("player0","mode_1p", 0)    #MFH - ensure tutorial can work with new logic that depends on this mode variable
     Config.set("player0","mode_2p", 0)    #MFH - ensure tutorial can work with new logic that depends on this mode variable
     Config.set("game", "players", 1)
-
+    Config.set("game", "tut", True)
 
     self.engine.startServer()
     self.engine.resource.load(self, "session", lambda: self.engine.connect("127.0.0.1"), synch = True)
 
     if Dialogs.showLoadingScreen(self.engine, lambda: self.session and self.session.isConnected):
-      self.launchLayer(lambda: Lobby(self.engine, self.session, singlePlayer = True, tutorial = True))
+      self.launchLayer(lambda: Lobby(self.engine, self.session, singlePlayer = True))
   showTutorial = catchErrors(showTutorial)
-
-
 
   #MFH: adding deprecated support for EOF's method of quickstarting a song to test it
   def newSinglePlayerGame(self):
@@ -359,6 +360,10 @@ class MainMenu(BackgroundLayer):
     Config.set("game", "players", players)
     Config.set("player0","mode_1p", mode1p)
     Config.set("player1","mode_2p", mode2p)
+    if self.tut == True:
+      Config.set("game", "tut", False)
+      Config.set("game", "selected_library", "")
+      Config.set("game", "selected_song", "")
 
     #MFH - testing new traceback logging:
     #raise TypeError
