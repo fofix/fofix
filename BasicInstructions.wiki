@@ -24,4 +24,10 @@ Each patch comes with a blank fretsonfire.ini for *MAXIMUM COMPATIBILITY*. You m
 
 *IMPORTANT* Use [http://www.rarlab.com/ WinRar 3.70+] or equivalent to read the .RAR compressed archives properly.
 
+
+==Additional themes==
+You can find a list of additional, up-to-date themes for FoFiX [http://www.fretsonfire.net/forums/viewtopic.php?f=11&t=25040#themes here].  You can find even more themes by searching around the linked forum.
+
+After downloading and extracting a new theme, move the theme's folder (should be named after the theme you downloaded - such as "Rock Band 1" or "Guitar Hero 3") into your FoFiX\data\themes\ folder.  It should appear underneath your "MegaLight" theme folder, and should be selectable under "Theme Settings" for use in-game.  Be sure to "Apply New Settings" to load the new theme!
+
 *PLEASE NOTE* if you cannot even get a basic version of Frets on Fire working, this mod will not fix your problem. Furthermore, I will not help you get the game working. There are plenty of other support threads on this forum that can help you troubleshoot. Once you have a basic version of FoF working, then you are ready to try this mod.
