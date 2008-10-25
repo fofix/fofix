@@ -1713,6 +1713,15 @@ class SongChooser(Layer, KeyListener):
           text = self.library
           w, h = font.getStringSize(text)
 
+          if self.searchText:
+            text = _("Filter: %s") % (self.searchText) + "|"
+            if not self.matchesSearch(self.items[self.selectedIndex]):
+              text += " (%s)" % _("Not found")
+            font.render(text, (.05, .7 + v), scale = 0.001)
+          elif self.songLoader:
+            font.render(_("Loading Preview..."), (.05, .7 + v), scale = 0.001)
+
+
           if self.filepathenable:
             font.render(text, (self.song_list_xpos, .19))
 
@@ -1998,6 +2007,14 @@ class SongChooser(Layer, KeyListener):
           if self.filepathenable:
             font.render(text, (self.song_list_xpos, .19))
           
+          if self.searchText:
+            text = _("Filter: %s") % (self.searchText) + "|"
+            if not self.matchesSearch(self.items[self.selectedIndex]):
+              text += " (%s)" % _("Not found")
+            font.render(text, (.05, .7 + v), scale = 0.001)
+          elif self.songLoader:
+            font.render(_("Loading Preview..."), (.05, .7 + v), scale = 0.001)
+
           for i, item in enumerate(self.items):
             if i >= pos[0] and i <= pos[1]:
 
