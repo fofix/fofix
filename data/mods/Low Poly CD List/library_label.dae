@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA version="1.4.0" xmlns="http://www.collada.org/2005/11/COLLADASchema">
+	<asset>
+		<contributor>
+			<author>Illusoft Collada 1.4.0 plugin for Blender - http://colladablender.illusoft.com</author>
+			<authoring_tool>Blender v:246 - Illusoft Collada Exporter v:0.3.159</authoring_tool>
+			<comments></comments>
+			<copyright></copyright>
+			<source_data>file://C:/</source_data>
+		</contributor>
+		<created>2008-07-06T09:35:34.258000</created>
+		<modified>2008-07-06T09:35:34.258000</modified>
+		<unit meter="0.01" name="centimeter"/>
+		<up_axis>Z_UP</up_axis>
+	</asset>
+	<library_effects>
+		<effect id="WHITE_GLASS-fx" name="WHITE_GLASS-fx">
+			<profile_COMMON>
+				<technique sid="blender">
+					<phong>
+						<emission>
+							<color>0.00000 0.00000 0.00000 1</color>
+						</emission>
+						<ambient>
+							<color>0.38824 0.38432 0.38824 1</color>
+						</ambient>
+						<diffuse>
+							<color>0.77647 0.76863 0.77647 1</color>
+						</diffuse>
+						<specular>
+							<color>0.50000 0.50000 0.50000 1</color>
+						</specular>
+						<shininess>
+							<float>12.0</float>
+						</shininess>
+						<reflective>
+							<color>1.00000 1.00000 1.00000 1</color>
+						</reflective>
+						<reflectivity>
+							<float>0.8</float>
+						</reflectivity>
+						<transparent>
+							<color>1 1 1 1</color>
+						</transparent>
+						<transparency>
+							<float>0.0</float>
+						</transparency>
+					</phong>
+				</technique>
+			</profile_COMMON>
+		</effect>
+	</library_effects>
+	<library_materials>
+		<material id="WHITE_GLASS" name="WHITE_GLASS">
+			<instance_effect url="#WHITE_GLASS-fx"/>
+		</material>
+	</library_materials>
+	<library_geometries>
+		<geometry id="Mesh_001-lib" name="Mesh_001-lib">
+			<mesh>
+				<source id="Mesh_001-lib-Position">
+					<float_array count="12" id="Mesh_001-lib-Position-array">2.06390 2.06802 -0.21815 2.06390 -2.09356 -0.37358 -2.07613 -2.09356 -0.37358 -2.07613 2.06802 -0.21815</float_array>
+					<technique_common>
+						<accessor count="4" source="#Mesh_001-lib-Position-array" stride="3">
+							<param type="float" name="X"></param>
+							<param type="float" name="Y"></param>
+							<param type="float" name="Z"></param>
+						</accessor>
+					</technique_common>
+				</source>
+				<source id="Mesh_001-lib-Normals">
+					<float_array count="3" id="Mesh_001-lib-Normals-array">0.00000 0.03732 -0.99930</float_array>
+					<technique_common>
+						<accessor count="1" source="#Mesh_001-lib-Normals-array" stride="3">
+							<param type="float" name="X"></param>
+							<param type="float" name="Y"></param>
+							<param type="float" name="Z"></param>
+						</accessor>
+					</technique_common>
+				</source>
+				<source id="Mesh_001-lib-UV">
+					<float_array count="8" id="Mesh_001-lib-UV-array">0.00000 0.00000 1.00000 0.00000 1.00000 0.99413 0.00000 0.99413</float_array>
+					<technique_common>
+						<accessor count="4" source="#Mesh_001-lib-UV-array" stride="2">
+							<param type="float" name="S"></param>
+							<param type="float" name="T"></param>
+						</accessor>
+					</technique_common>
+				</source>
+				<vertices id="Mesh_001-lib-Vertex">
+					<input semantic="POSITION" source="#Mesh_001-lib-Position"/>
+				</vertices>
+				<polygons count="1" material="WHITE_GLASS">
+					<input offset="0" semantic="VERTEX" source="#Mesh_001-lib-Vertex"/>
+					<input offset="1" semantic="NORMAL" source="#Mesh_001-lib-Normals"/>
+					<input offset="2" semantic="TEXCOORD" source="#Mesh_001-lib-UV"/>
+					<p>0 0 0 1 0 1 2 0 2 3 0 3</p>
+				</polygons>
+			</mesh>
+		</geometry>
+	</library_geometries>
+	<library_visual_scenes>
+		<visual_scene id="Scene002" name="Scene002">
+			<node layer="L1" id="Mesh_001" name="Mesh_001">
+				<translate sid="translate">-0.00000 -0.02615 -0.01758</translate>
+				<rotate sid="rotateZ">0 0 1 0.00000</rotate>
+				<rotate sid="rotateY">0 1 0 -0.00000</rotate>
+				<rotate sid="rotateX">1 0 0 87.77132</rotate>
+				<scale sid="scale">1.03387 1.00000 1.00000</scale>
+				<instance_geometry url="#Mesh_001-lib">
+					<bind_material>
+						<technique_common>
+							<instance_material symbol="WHITE_GLASS" target="#WHITE_GLASS">
+								<bind_vertex_input input_semantic="TEXCOORD" input_set="1" semantic="CHANNEL1"/>
+							</instance_material>
+						</technique_common>
+					</bind_material>
+				</instance_geometry>
+			</node>
+		</visual_scene>
+	</library_visual_scenes>
+	<library_physics_materials>
+		<physics_material id="Mesh_001-PhysicsMaterial" name="Mesh_001-PhysicsMaterial">
+			<technique_common>
+				<dynamic_friction>0.5</dynamic_friction>
+				<restitution>0.0</restitution>
+				<static_friction>0.5</static_friction>
+			</technique_common>
+		</physics_material>
+	</library_physics_materials>
+	<library_physics_models>
+		<physics_model id="Scene002-PhysicsModel" name="Scene002-PhysicsModel">
+			<rigid_body name="Mesh_001-RigidBody" sid="Mesh_001-RigidBody">
+				<technique_common>
+					<dynamic>false</dynamic>
+					<mass>0</mass>
+					<instance_physics_material url="#Mesh_001-PhysicsMaterial"/>
+					<shape>
+						<instance_geometry url="#Mesh_001-lib"/>
+					</shape>
+				</technique_common>
+			</rigid_body>
+		</physics_model>
+	</library_physics_models>
+	<library_physics_scenes>
+		<physics_scene id="Scene002-Physics" name="Scene002-Physics">
+			<instance_physics_model url="#Scene002-PhysicsModel">
+				<instance_rigid_body body="Mesh_001-RigidBody" target="#Mesh_001"/>
+			</instance_physics_model>
+		</physics_scene>
+	</library_physics_scenes>
+	<scene>
+		<instance_physics_scene url="#Scene002-Physics"/>
+		<instance_visual_scene url="#Scene002"/>
+	</scene>
+</COLLADA>
