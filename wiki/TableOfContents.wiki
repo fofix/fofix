@@ -2,4 +2,5 @@
   * [BasicInstructions]
   * [FAQ]
   * [KnownIssues]
+  * [ProjectStatistics]
   * [ReportingBugs]

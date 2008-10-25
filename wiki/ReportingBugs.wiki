@@ -1,5 +1,5 @@
 #summary How to properly report bugs
-#labels Phase-Support
+#labels Phase-Support,Featured
 
 ==Foreword==
 We are glad to receive useful bug reports. It's not always possible for us to test everything. However, more often than not we receive incomplete or useless bug reports that don't help us help you. So please take the time to read the following and oh...
@@ -10,7 +10,7 @@ We are glad to receive useful bug reports. It's not always possible for us to te
 *PLEASE* don't contact us with requests, that goes for everybody. If you think you have a new idea that is not in the Issues tracker and hasn't been discussed or thought of yet, post it in the appropriate Frets On Fire Fan Forum thread. We (coders) are not the only ones involved in this project. Everyone should have a chance to respond to the ideas, we like to see how popular certain features are before attempting to do something that we think we can finish.
 
 === Feature Completion ===
-*PLEASE* don't ask us when a certain feature is going to be done. This really starts to make our coding seem like work, as if we had to answer to somebody who might not give us our next paycheck. This is not a job; it is a hobby. We share what we do with everybody because, well, we'd be a real douches if we didn't :)
+*PLEASE* don't ask us when a certain feature is going to be done. This really starts to make our coding seem like work, as if we had to answer to somebody who might not give us our next paycheck. This is not a job; it is a hobby. We share what we do with everybody because, well, we'd be real douches if we didn't :)
 
 Have a look at our Issues tracker, it might give you an idea of what is being worked on or what is planned.
 
@@ -34,7 +34,7 @@ If you have found a certain note pattern that you can't play a certain valid way
 in a certain Ho/Po system (or in all of them), here is how to fully report the
 situation to me in a way that I can use to actually attempt to solve the issue:
 
-  # Go to your top Settings menu (the one with the version number - "MFH-Alarian Mod VX.XXX >"), and set "HOPO Debug" to "On" --- this will enable some real-time visual debugging details while you play, as well as log entries when certain important events happen in the HOPO logic.
+  # Go to your top Settings menu (the one with the version number - "FoFiX VX.XXX >"), and set "HOPO Debug" to "On" --- this will enable some real-time visual debugging details while you play, as well as log entries when certain important events happen in the HOPO logic.
   # Set up some method of recording your gameplay to a video file. FRAPS is one such program that can record FoF gameplay. (Google search for FRAPS, you'll find it.)
   # Run FoF, go straight to your problem / demonstration song, and play it for me. Record at least at 15 frames per second, at 320x240 pixel resolution. Sound is not required; I just need to be able to read the video display as you demonstrate your issue. As soon as the section containing your issue has been demonstrated, please pause the game and Quit, Exit from the game immediately.
   # Locate the `fretsonfire.log` file which is in your game directory. Please copy this file to the same place you saved your video, as these two files belong together; we need them both. Please don't play FoF again before copying this log file, or your demonstration log will be overwritten!

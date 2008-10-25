@@ -1,5 +1,5 @@
 #summary Problems we are aware of
-#labels Phase-Support
+#labels Phase-Support,Featured
 
 = Introduction =
 Please note, we are not currently looking for suggestions. However, just in case you feel the need to suggest or report something, please review the following first.
