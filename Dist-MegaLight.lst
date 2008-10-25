@@ -1,10 +1,10 @@
 "*."//get all extentionless files
 "*.exe"//all exes
 "fretsonfire.ini"//ini
-"*.htm"//htms
 "*.dll"//dlls
 "src\*.*"//all src files
 "src\midi\*.*"//all src/midi files
+"po\*.*"//all translation .po source files
 "..\FoFiX-wiki\*.*"//all wiki pages
 "doc\*.*"//all other doc files
 "data\*.*"//all data files
@@ -19,3 +19,4 @@
 "data\themes\MegaLight\menu\*.*"//all
 "data\themes\MegaLight\sounds\*.*"//all
 "data\themes\MegaLight\stages\*.*"//all
+"data\sounds\*.*"//all base sounds
