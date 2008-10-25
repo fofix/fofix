@@ -4,7 +4,7 @@
 = Basic Instructions =
 
 ==Instructions for a first time installation ==
-  # Download the [http://code.google.com/p/fofix/downloads/list?can=2&q=&sort=-uploaded&colspec=Filename+Summary+Uploaded+Size+DownloadCount+Opsys full release of your choice].
+  # Download the [http://code.google.com/p/fofix/downloads/list?can=2&q=&sort=-uploaded full release of your choice].
   # Decompress the archive in a *NEW* folder of your choice.
     * Do *NOT* attempt to merge this version with ANY OTHER version of Frets on Fire, including previous MFH-Alarian mods.
   # Start the game.
