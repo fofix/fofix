@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-10-25 00:57-0700\n"
+"POT-Creation-Date: 2008-10-25 10:58-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -693,9 +693,9 @@ msgstr ""
 #: GameEngine.py:135 GameEngine.py:141 GameEngine.py:144 GameEngine.py:151
 #: GameEngine.py:156 GameEngine.py:158 GameEngine.py:162 GameEngine.py:163
 #: GameEngine.py:165 GameEngine.py:170 GameEngine.py:173 GameEngine.py:174
-#: GameEngine.py:175 GameEngine.py:177 GameEngine.py:179 GameEngine.py:185
-#: GameEngine.py:192 GameEngine.py:193 GameEngine.py:194 GameEngine.py:196
-#: GameEngine.py:200 Mod.py:34
+#: GameEngine.py:175 GameEngine.py:179 GameEngine.py:185 GameEngine.py:192
+#: GameEngine.py:193 GameEngine.py:194 GameEngine.py:196 GameEngine.py:200
+#: Mod.py:34
 msgid "On"
 msgstr ""
 
@@ -784,7 +784,7 @@ msgid "song.ini"
 msgstr ""
 
 #: GameEngine.py:125 GameEngine.py:142 GameEngine.py:159 GameEngine.py:160
-#: GameEngine.py:164 GameEngine.py:188
+#: GameEngine.py:164 GameEngine.py:177 GameEngine.py:188
 msgid "Auto"
 msgstr ""
 
@@ -1076,6 +1076,10 @@ msgstr ""
 msgid "Results Cheer Loop"
 msgstr ""
 
+#: GameEngine.py:177 GameEngine.py:207 GameEngine.py:254
+msgid "Theme"
+msgstr ""
+
 #: GameEngine.py:178
 msgid "Cheer Loop Delay"
 msgstr ""
@@ -1248,10 +1252,6 @@ msgstr ""
 msgid "Rock Rev"
 msgstr ""
 
-#: GameEngine.py:207 GameEngine.py:254
-msgid "Theme"
-msgstr ""
-
 #: GameEngine.py:208
 msgid "Party Mode Timer"
 msgstr ""
@@ -1409,80 +1409,80 @@ msgstr ""
 msgid "%d points is a new high score! Enter your name"
 msgstr ""
 
-#: GameResultsScene.py:338
+#: GameResultsScene.py:339
 #, python-format
 msgid "%s High Scores for %s"
 msgstr ""
 
-#: GameResultsScene.py:340
+#: GameResultsScene.py:341
 #, python-format
 msgid "%s High Scores"
 msgstr ""
 
-#: GameResultsScene.py:346
+#: GameResultsScene.py:347
 #, python-format
 msgid "Difficulty: %s"
 msgstr ""
 
-#: GameResultsScene.py:404
+#: GameResultsScene.py:405
 msgid "Uploading Scores..."
 msgstr ""
 
-#: GameResultsScene.py:412 GameResultsScene.py:414 GameResultsScene.py:417
+#: GameResultsScene.py:413 GameResultsScene.py:415 GameResultsScene.py:418
 msgid "Scores uploaded!"
 msgstr ""
 
-#: GameResultsScene.py:412
+#: GameResultsScene.py:413
 msgid "your highscore ranks"
 msgstr ""
 
-#: GameResultsScene.py:412
+#: GameResultsScene.py:413
 msgid "on the world starpower chart!"
 msgstr ""
 
-#: GameResultsScene.py:414
+#: GameResultsScene.py:415
 msgid "unknown rank."
 msgstr ""
 
-#: GameResultsScene.py:417
+#: GameResultsScene.py:418
 msgid "no new highscore."
 msgstr ""
 
-#: GameResultsScene.py:419
+#: GameResultsScene.py:420
 msgid "Score upload failed!  World charts may be down."
 msgstr ""
 
-#: GameResultsScene.py:429
+#: GameResultsScene.py:430
 #, python-format
 msgid "%s Cheated!"
 msgstr ""
 
-#: GameResultsScene.py:431
+#: GameResultsScene.py:432
 #, python-format
 msgid "%s Finished!"
 msgstr ""
 
-#: GameResultsScene.py:435
+#: GameResultsScene.py:436
 #, python-format
 msgid "%d notes hit"
 msgstr ""
 
-#: GameResultsScene.py:469
+#: GameResultsScene.py:470
 #, python-format
 msgid "Accuracy: %.1f%%"
 msgstr ""
 
-#: GameResultsScene.py:472
+#: GameResultsScene.py:473
 #, python-format
 msgid "Longest note streak: %d"
 msgstr ""
 
-#: GameResultsScene.py:476
+#: GameResultsScene.py:477
 #, python-format
 msgid "Part: %s on %s (2 chord)"
 msgstr ""
 
-#: GameResultsScene.py:478
+#: GameResultsScene.py:479
 #, python-format
 msgid "Part: %s on %s"
 msgstr ""
