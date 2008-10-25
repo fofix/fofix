@@ -2850,6 +2850,10 @@ def getAvailableLibraries(engine, library = DEFAULT_LIBRARY):
 
 def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = False):
   order = engine.config.get("game", "sort_order")
+  tut = engine.config.get("game", "tut")
+  
+  if tut:
+    includeTutorials = True
 
   #MFH - Career Mode determination:
   gameMode1p = engine.config.get("player0","mode_1p")

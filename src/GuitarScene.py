@@ -3800,6 +3800,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       font    = self.engine.data.font
     lyricFont = self.engine.data.font
     bigFont = self.engine.data.bigFont
+    sphraseFont = self.engine.data.streakFont2
 
     scoreFont = self.engine.data.scoreFont
     streakFont = self.engine.data.streakFont
@@ -4267,8 +4268,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
               if self.displayText[i] != None:
                 glColor3f(.8,.75,.01)
-                size = font.getStringSize(self.displayText[i], scale = self.dislayTextScale[i])
-                font.render(self.displayText[i], (.5-size[0]/2,self.textY[i]-size[1]), scale = self.dislayTextScale[i])
+                size = sphraseFont.getStringSize(self.displayText[i], scale = self.dislayTextScale[i])
+                sphraseFont.render(self.displayText[i], (.5-size[0]/2,self.textY[i]-size[1]), scale = self.dislayTextScale[i])
     
               if self.youRock == True:
                 if self.rockTimer == 1:
@@ -4809,8 +4810,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
               if self.displayText[i] != None:
                 glColor3f(.8,.75,.01)
-                size = font.getStringSize(self.displayText[i], scale = self.dislayTextScale[i])
-                font.render(self.displayText[i], (.5-size[0]/2,self.textY[i]-size[1]), scale = self.dislayTextScale[i])
+                size = sphraseFont.getStringSize(self.displayText[i], scale = self.dislayTextScale[i])
+                sphraseFont.render(self.displayText[i], (.5-size[0]/2,self.textY[i]-size[1]), scale = self.dislayTextScale[i])
     
               if self.youRock == True:
                 if self.rockTimer == 1:
@@ -5245,7 +5246,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 streaktext = locale.format("%d", player.streak, grouping=True)
                 #myfingershurt: swapping the number "0" and the letter "O" in the score font for accurate Rock Band score type!
                 streaktext = streaktext.replace("0","O")
-                stW, stH = scoreFont.getStringSize(streaktext)
+                stW, stH = streakfont.getStringSize(streaktext)
   
   
                 #streak counter box:
@@ -5269,8 +5270,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
               if self.displayText[i] != None:
                 glColor3f(.8,.75,.01)
-                size = font.getStringSize(self.displayText[i], scale = self.dislayTextScale[i])
-                font.render(self.displayText[i], (.5-size[0]/2,self.textY[i]-size[1]), scale = self.dislayTextScale[i])
+                size = sphraseFont.getStringSize(self.displayText[i], scale = self.dislayTextScale[i])
+                sphraseFont.render(self.displayText[i], (.5-size[0]/2,self.textY[i]-size[1]), scale = self.dislayTextScale[i])
     
               if self.youRock == True:
                 if self.rockTimer == 1:

@@ -199,6 +199,7 @@ Config.define("coffee", "songfilepath",       bool, True,     text = _("Library 
 Config.define("coffee", "noterotate",       bool, False,     text = _("Rotate 3D Notes"),             options = {True: _("1.1"), False: _("1.2")})
 Config.define("coffee", "phrases",       bool, True,     text = _("Phrases"),             options = {True: _("On"), False: _("Off")})
 Config.define("coffee", "songdisplay",       bool, False,     text = _("Song Display"),             options = {True: _("CDs"), False: _("List")})
+Config.define("game", "tut",       bool, False,     text = _("tut"),             options = {True: _("yes"), False: _("no")})
 
 
 Config.define("game",   "hit_window",          int, 1,    text = _("Note Hit-window"), options = {0: _("Wide"), 1: _("Standard"), 2: _("Tight"), 3: _("Hot Pants Tight"), 4: _("Tight Like a Tiger")})#racer blazingamer
@@ -330,6 +331,9 @@ class GameEngine(Engine):
 
     @param config:  L{Config} instance for settings
     """
+
+
+    self.tutorialFolder = "tutorials"
 
     if not config:
       config = Config.load()

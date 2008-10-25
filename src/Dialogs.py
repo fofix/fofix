@@ -630,6 +630,7 @@ class SongChooser(Layer, KeyListener):
     self.theme = self.engine.data.theme
 
     self.display = self.engine.config.get("coffee", "songdisplay")
+    self.tut = self.engine.config.get("game", "tut")
 
     self.songback = Theme.songback
     self.filepathenable = self.engine.config.get("coffee", "songfilepath")
@@ -644,6 +645,8 @@ class SongChooser(Layer, KeyListener):
     # Use the default library if this one doesn't exist
     if not self.library or not os.path.isdir(self.engine.resource.fileName(self.library)):
       self.library = Song.DEFAULT_LIBRARY
+    if self.tut == True:
+      self.library = self.engine.tutorialFolder
 
     self.loadCollection()
 
@@ -980,7 +983,7 @@ class SongChooser(Layer, KeyListener):
       #if not self.song:
       self.engine.data.cancelSound.setVolume(self.sfxVolume)  #MFH
       self.engine.data.cancelSound.play()
-      if self.library != Song.DEFAULT_LIBRARY:
+      if self.library != Song.DEFAULT_LIBRARY and self.tut == False:
         self.initialItem = self.library
         self.library     = os.path.dirname(self.library)
         if self.song:
@@ -1369,9 +1372,6 @@ class SongChooser(Layer, KeyListener):
     notesTotal = 0    
     notesHit = 0
     noteStreak = 0
-
-
-
 
     if self.instrumentChange:
       self.instrumentChange = False
