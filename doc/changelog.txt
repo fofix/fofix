@@ -1,6 +1,33 @@
 New in 3.0xx:-----------------------------------------------------------------------------------------------------
 
 --------------------------------
+[u]Version 3.020 - "FoFiX: Frets on Fire X" - (10/24/2008, 12:30am PST) - [i](SVN rev 86 / [url=http://code.google.com/p/fofix/source/browse/MFH-Mod#MFH-Mod/tags/Release_3.020]tag 3.020[/url])[/i][/u] -- 
+[url=http://www.mediafire.com/?eget3zl4t12]Patch mediafire download[/url] -- [url=http://fofix.googlecode.com/files/FoFiX-3.020-Patch-Windows.rar]Direct patch GoogleCode download[/url]
+[url=http://fofix.googlecode.com/files/FoFiX-3.020-Full-Windows.rar]Direct FoFiX GoogleCode release (complete game, MegaLight theme)[/url] -- [url=http://www.megaupload.com/?d=KF7KLJZM]ugo's full installer[/url]
+[i]New since 3.017:[/i]
+++Fixed game freeze / hang caused by "Accuracy Words Pos" = "Center" (SVN rev 41's GuitarScene.py)
+++Used [url=http://vwtech.no-ip.info/fof/foficon.zip]rubjonny's FoF icon[/url] instead of the old style icon
+++Fixed issue where the song time countdown, once it reaches zero, starts counting back from 60 while the music track finishes (if it finishes after the midi, as a lot of songs do) (SVN r42)
+++Fixed Bug: Strumming a HOPO before pulling off to another doesn't work correctly - [url=http://www.fretsonfire.net/forums/viewtopic.php?f=11&t=25040&st=0&sk=t&sd=a&start=705#p295204]post[/url] -- (SVN r43) beta testers: [url=http://www.mediafire.com/?m1id2mudmg4]3.020 beta1[/url]
+++Added evilynux's Timer.py patch that greatly reduces CPU usage in menus and in game
+++Added basic score uploading feedback - the game will now tell you if the upload succeeded or failed
+++++Added logic to display resulting rank for your uploaded top score in the world chart [url=http://i36.tinypic.com/2cxzqyv.jpg]SS[/url]
+++Fixed HOPO markings on notes extremely close together, examples are found all over the Hell Freezes Over version of Hotel California (SVN rev 50) - beta testers: [url=http://www.mediafire.com/?nl2mom0zntq]3.020 beta 2[/url] - [url=http://rapidshare.com/files/156170256/MfhModV3_020beta2-HopoMarkingFix.rar]SmashD's rapidshare mirror[/url]
+++Replaced all GuitarScene realtime string concatenation (slow) with % formatting (fast) -- only during gameplay (initialization concatenation is still present)
+++Rewrote both Guitar and Drum starpower marking logic to occur only at initialization, not every time through the renderNotes() functions
+++Rewrote starpower marking logic to only mark the actual last note as the starpower "final" instead of the entire last chord (this fixes the double drum starpower rewards)
+++Prevented HOPO debug text from being rendered for drum players
+++++Added optional support for theme-based failsound.ogg from [url=http://www.mediafire.com/download.php?yhrjmmzjxyy]worldrave's GH3 back and failed sounds[/url]
+++++Added optional support for random choice between theme-based [url=http://www.zshare.net/download/50165784f1788532/]back1.ogg[/url] and [url=http://www.zshare.net/download/50165806b0683e84/]back2.ogg[/url] instead of just out.ogg
+++Wrote logic to stagger-mix crowd cheering sound files in a loop to create an endless cheering effect for the GameResults screen (a la GH2) if [url=http://www.zshare.net/download/50167245e96a9c32/]crowdcheers.ogg[/url] exists in the current theme
+++++New setting under "Audio Options" -> "Results Cheer Loop" (default On) - will mix and endless loop of cheers during game results scoring
+++++New setting under "Audio Options" -> "Cheer Loop Delay" (default 550) - this is the adjustable delay between mixing of a fresh crowd cheer into the loop (careful!)
+++Ensured that if crowdcheers.ogg is not found, that starpower.ogg is not mixed twice whenever activating starpower (SVN rev 53)
+++Added [url=http://www.mediafire.com/?sharekey=03cb874335296e22ab1eab3e9fa335cafabbec8ce69f9b50]slashy666's updated pause.png and editor.png[/url] to Rock Band 1 theme
+++Added logic to catch a crash/hang when the game attempts to improperly delete a texture (SVN rev 65)
+Also completed: [url=http://code.google.com/p/fofix/issues/list?can=1&q=status%3Afixed%2Cverified+milestone%3Arelease-3.020]FoFiX completed items for 3.020[/url]
+
+--------------------------------
 [u]Version 3.017 "Fail Detection Fix" - (10/16/2008, 4:00pm PST) - [i](SVN rev 39 / tag 3.017)[/i][/u] -- 
 url=http://www.mediafire.com/?t45zmkdmyoy]Patch mediafire download[/url] -- [url=http://www.megaupload.com/?d=EUOEIS1X]ugo's full installer megaupload[/url] -- [url=http://thepiratebay.org/torrent/4455617/Frets_on_Fire_MFH_Mod_v3.017_Full_Installer]wuxingwarrior3's full installer mirror torrent[/url]
 [i]New since 3.016:[/i]
