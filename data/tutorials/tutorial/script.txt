@@ -1,0 +1,54 @@
+# Tutorial script
+6000    1500  text  Ah yes, I know. I'm amazing.
+10000   1000  text  Ah, that was cool.
+11500   1200  text  Und hello everyone.
+13000   1000  text  My name is Jurgen
+14000   1700  text  Guntherswarchzhaffenstrassen.
+18000   1500  text  Und today I will show you
+19600   1400  text  how to play this game.
+21100   1500  text  Check this sh*t!
+26000   1500  text  And now, pick up your keyboard
+27500   1500  text  like this.
+26000   5000  pic   pose.svg
+29800   1300  text  When I shred,
+31800   1500  text  I use the whole keyboard.
+34000   1500  text  But since you SUCK,
+37000   1000  text  You will only need
+38000   1000  text  These five frets,
+37000   5500  pic   keyboard.svg
+39000   2000  text  Und zie Pick button.
+42000   2000  text  However, zie most important
+44000   2000  text  is the Escape button.
+46000   5000  pic   esc.svg
+48000   1000  text  You will need it,
+49000   1500  text  when you finally realize
+50500   1500  text  that you SUCK.
+52500   500   text  Bigtime.
+54000   1500  text  To me, that is already obvious.
+58000   2000  text  Ok, there comes your first note.
+60500   2000  text  You can already hold down the 1st fret
+62500   1000  text  BUT DON'T PICK IT YET!
+63500   1500  text  You missed it.
+66000   2000  text  Ok, let's try it again.
+69000   2000  text  Ok, wait for it.
+71000   800   text  Wait for it.
+71800   1000  text  No!
+73500   1000  text  Wait for it.
+75500   1000  text  Wait for it.
+77500   1000  text  *Sigh*
+79000   2000  text  Now, hold down two frets.
+85000   2000  text  Ah, you missed it!
+87500   3500  text  And now, try this super easy lick.
+106500  2000  text  Und up to my tempo.
+108500  1000  text  Don't try this,
+109500  1500  text  or you'll just hurt yourself.
+114000  1500  text  Ok, that was about
+115500  1500  text  four billion notes per second.
+117500  1500  text  If I play that any faster,
+119500  1500  text  your minds would just blow up.
+122500  2000  text  Ok, that is it for now.
+124500  1000  text  You can now go and sell
+125500  1500  text  your keyboards on Ebay.
+127500  1500  text  Because you SUCK.
+130000  1500  text  And remember one thing.
+132000  2000  text  I am your new god, little girls.
