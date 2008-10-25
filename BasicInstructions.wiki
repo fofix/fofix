@@ -3,8 +3,19 @@
 
 = Basic Instructions =
 
-==Instructions==
-Download the 3.000 release of your choice (below the latest patch). Decompress into a *NEW* folder of your choice. Do *NOT* attempt to merge this version with ANY OTHER version of Frets on Fire, including previous MFH-Alarian mods. Run !FretsOnFire.exe, set your settings. The first time you attempt to play you will be prompted to find your "songs" folder. It must be named "songs" but it may be outside the game folder structure. Enjoy!
+==Instructions for a first time installation ==
+  # Download the [http://code.google.com/p/fofix/downloads/list?can=2&q=&sort=-uploaded&colspec=Filename+Summary+Uploaded+Size+DownloadCount+Opsys full release of your choice].
+  # Decompress the archive in a *NEW* folder of your choice.
+    * Do *NOT* attempt to merge this version with ANY OTHER version of Frets on Fire, including previous MFH-Alarian mods.
+  # Start the game.
+    * Windows: run `FretsOnFire.exe`
+    * GNU/Linux or MacOS X: run `FretsOnFire`
+  # Set your settings.
+  # Set your song folder.
+    * The first time you attempt to play you will be prompted to find your `songs` folder.
+    * It must be named `songs` but it may be outside the game folder structure.
+
+Enjoy!
 
 ==Patch install instructions==
 First, be sure you have one of the 3.000 releases (I recommend the Rock Band release). Download the latest patch and extract it to the game folder (where !FretsOnFire.exe and the data folder are). This should mainly copy a new data\library.zip over your original, as well as any additional support files required over the last major release. Then you are ready to play!
