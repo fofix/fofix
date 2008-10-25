@@ -4,7 +4,7 @@
 = Basic Instructions =
 
 ==Instructions for a first time installation ==
-  # Download the [http://code.google.com/p/fofix/downloads/list?can=2&q=&sort=-uploaded full release of your choice].
+  # Download the [http://code.google.com/p/fofix/downloads/list?can=2&q=release:Full full release of your choice].
   # Decompress the archive in a *NEW* folder of your choice.
     * Do *NOT* attempt to merge this version with ANY OTHER version of Frets on Fire, including previous MFH-Alarian mods.
   # Start the game.
@@ -18,7 +18,7 @@
 Enjoy!
 
 ==Patch install instructions==
-First, be sure you have one of the 3.000 releases (I recommend the Rock Band release). Download the latest patch and extract it to the game folder (where !FretsOnFire.exe and the data folder are). This should mainly copy a new data\library.zip over your original, as well as any additional support files required over the last major release. Then you are ready to play!
+First, be sure you have one of the 3.0xx full releases.  Download the latest patch [http://code.google.com/p/fofix/downloads/list?can=2&q=release:Patch from here] and extract it to the game folder (where !FretsOnFire.exe and the data folder are). This should mainly copy a new data\library.zip over your original, as well as any additional support files required over the last major release. Then you are ready to play!
 
 Each patch comes with a blank fretsonfire.ini for *MAXIMUM COMPATIBILITY*. You may choose to keep your old fretsonfire.ini so you do not have to re-set all your settings. However, if you encounter problems or bugs then the *FIRST THING* you have to try is a *BLANK* fretsonfire.ini file!
 
