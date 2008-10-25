@@ -291,12 +291,17 @@ class Data(object):
       self.loadSoundEffect(self, "starReadySound", os.path.join("themes",themename,"sounds","starpower.ogg"))
       Log.warn(themename + "\sounds\starpowerready.ogg not found -- using starpower.ogg instead.")
 
+    #MFH - fallback on sounds\crowdcheers.ogg, and then starpower.ogg.  Note if the fallback crowdcheers was used or not.
     if self.fileExists(os.path.join("themes",themename,"sounds","crowdcheers.ogg")):
       self.loadSoundEffect(self, "crowdSound", os.path.join("themes",themename,"sounds","crowdcheers.ogg"))
-      self.cheerSoundFound = True
+      self.cheerSoundFound = 2
+    elif self.fileExists(os.path.join("sounds","crowdcheers.ogg")):
+      self.loadSoundEffect(self, "crowdSound", os.path.join("sounds","crowdcheers.ogg"))
+      self.cheerSoundFound = 1
+      Log.warn(themename + "\sounds\crowdcheers.ogg not found -- using data\sounds\crowdcheers.ogg instead.")
     else: #MFH: Fallback on starpower.ogg
       self.loadSoundEffect(self, "crowdSound", os.path.join("themes",themename,"sounds","starpower.ogg"))
-      self.cheerSoundFound = False
+      self.cheerSoundFound = 0
       Log.warn(themename + "\sounds\crowdcheers.ogg not found -- using starpower.ogg instead.")
 
     if self.fileExists(os.path.join("themes",themename,"sounds","staractivate.ogg")):

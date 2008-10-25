@@ -280,11 +280,12 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       self.taunt = None
 
     #MFH - add counter here to play another crowd cheer before the one playing ends for an endless cheering loop
-    if self.resultCheerLoop == 1 and self.engine.data.cheerSoundFound:
-      self.cheerLoopCounter += 1
-      if self.cheerLoopCounter >= self.cheerLoopDelay:
-        self.cheerLoopCounter = 0
-        self.engine.data.crowdSound.play()
+    if self.engine.data.cheerSoundFound > 0 and self.resultCheerLoop > 0:
+      if self.resultCheerLoop == 2 or (self.resultCheerLoop == 1 and self.engine.data.cheerSoundFound == 2):
+        self.cheerLoopCounter += 1
+        if self.cheerLoopCounter >= self.cheerLoopDelay:
+          self.cheerLoopCounter = 0
+          self.engine.data.crowdSound.play()
     
   def anim(self, start, ticks):
     return min(1.0, float(max(start, self.counter)) / ticks)
