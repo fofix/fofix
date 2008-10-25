@@ -1167,7 +1167,8 @@ class SongChooser(Layer, KeyListener):
     if self.songLoader:
       self.songLoader.stop()
 
-    self.songLoader = self.engine.resource.load(self, None, lambda: Song.loadSong(self.engine, song, playbackOnly = True, library = self.library), synch = True, onLoad = self.songLoaded) # evilynux - Less BlackSOD[?]    
+    #self.songLoader = self.engine.resource.load(self, None, lambda: Song.loadSong(self.engine, song, playbackOnly = True, library = self.library), synch = True, onLoad = self.songLoaded) # evilynux - Less BlackSOD[?]    
+    self.songLoader = self.engine.resource.load(self, None, lambda: Song.loadSong(self.engine, song, playbackOnly = True, library = self.library), synch = False, onLoad = self.songLoaded) #Blazingamer - asynchronous preview loading allows "Loading Preview..." to correctly disappear.
 
   def run(self, ticks):
     self.time += ticks / 50.0
