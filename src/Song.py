@@ -454,6 +454,28 @@ class SongInfo(object):
   def setLyrics(self, value):
     self._set("lyrics", value)    
         
+
+  def getHighscoresWithPartString(self, difficulty, part = str(parts[GUITAR_PART]) ):
+    if part == str(parts[GUITAR_PART]):
+      highScores = self.highScores
+    elif part == str(parts[RHYTHM_PART]):
+      highScores = self.highScoresRhythm
+    elif part == str(parts[BASS_PART]):
+      highScores = self.highScoresBass
+    elif part == str(parts[LEAD_PART]):
+      highScores = self.highScoresLead
+    #myfingershurt: drums :)
+    elif part == str(parts[DRUM_PART]):
+      highScores = self.highScoresDrum
+    else:
+      highScores = self.highScores
+      
+    try:
+      return highScores[difficulty]
+    except KeyError:
+      return []
+
+
   def getHighscores(self, difficulty, part = parts[GUITAR_PART]):
     if part == parts[GUITAR_PART]:
       highScores = self.highScores
