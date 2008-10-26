@@ -344,6 +344,7 @@ class MainMenu(BackgroundLayer):
     Config.set("player0","mode_2p", 0)    #MFH - ensure tutorial can work with new logic that depends on this mode variable
     Config.set("game", "players", 1)
     Config.set("game", "tut", True)
+    Config.set("player0","mode_1p", 1)
 
     self.engine.startServer()
     self.engine.resource.load(self, "session", lambda: self.engine.connect("127.0.0.1"), synch = True)
