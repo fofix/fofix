@@ -6,49 +6,50 @@ We are glad to receive useful bug reports. It's not always possible for us to te
 
 *Thank you for taking the time to isolate a bug!*
 
-
+----
 
 === Has this bug (or suggestion) already been submitted? ===
 *Please*, before you submit an issue or suggestion, review the [http://code.google.com/p/fofix/issues/list?can=2&q=&sort=priority existing To Do list] carefully (there may be multiple pages to look through) - be sure you are not reporting or suggesting something we already have in the list!
 
-"The To Do list is too long" is not an acceptable excuse for breaking these rules.  You only have to search for your issue; We have to actually fix and implement these issues.  So, no matter how much work you _think_ you are being stuck with, compare it to the level of effort the developers put into FoFiX first.  Thank you.
+*"The To Do list is too long"* is not an acceptable excuse for breaking these rules.  Think about it -- you only have to search for your issue.  We have to actually fix and implement these issues without causing new problems.  
 
+So, no matter how much work you _think_ you are being stuck with, compare it to the level of effort the developers put into FoFiX first.  Thank you.
 
+----
 
 === Is this really a bug?? ===
 *Please*, before you submit an issue that you THINK is a bug - review this [http://code.google.com/p/fofix/issues/list?can=1&q=status:Invalid list of "Invalid" issues] that have been reported and then removed because the game is working as intended.  Please realize that there are other users out there that play the game in different ways, and your "bug" is probably a feature you just don't understand...
 
-
+----
 
 === Feature Requests ===
 *PLEASE* don't contact us with requests, that goes for everybody. If you think you have a new idea that is not in the Issues tracker and hasn't been discussed or thought of yet, post it in the appropriate Frets On Fire Fan Forum thread. We (coders) are not the only ones involved in this project. Everyone should have a chance to respond to the ideas, we like to see how popular certain features are before attempting to do something that we think we can finish.
 
-
+----
 
 === Feature Completion ===
 *PLEASE* don't ask us when a certain feature is going to be done. This really starts to make our coding seem like work, as if we had to answer to somebody who might not give us our next paycheck. This is not a job; it is a hobby. We share what we do with everybody because, well, we'd be real douches if we didn't :)
 
-Have a look at our Issues tracker, it might give you an idea of what is being worked on or what is planned.
+Have a look at our [http://code.google.com/p/fofix/issues/list?can=2&q=&sort=priority Issues tracker], it might give you an idea of what is being worked on or what is planned.
 
-
+----
 
 === Unofficial Updates ===
-*NOTE* If you have issues with unofficial updates, please send personal messages to the respective coder not us.
+*NOTE* If you have issues with unofficial updates, please send personal messages to the respective coder -- not us.
 
-
+----
 
 === Learning Python ===
-*We won't help anyone with Python*. It's just easier this way. We can't waste a long time walking someone through what would seem like the simplest change. We barely have enough time to make our own code work. Do you want us to stop making progress and spend our time teaching Python? That doesn't make sense....
+*We won't help anyone with Python*. It's just easier this way.  We can't waste a long time walking someone through what would seem like the simplest change.  We barely have enough time to make our own code work.  Do you want us to stop making progress and spend our time teaching Python?  That doesn't make sense....
 
 In short, *PLEASE* don't ask us any question about Python or where certain code is or that sort of thing.
 If you're determined to figure something out, do what we did:
-  * Google search.
+  * _Google search._
   * Study the code.
   * Study Python articles.
   * Study example code. 
 
 ----
-
 
 
 ==Isolating a note pattern that cannot be Ho/Po'd or strummed correctly==
