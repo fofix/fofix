@@ -34,30 +34,6 @@ menu_y = .8
 
 
 =======================================-----------------------------------------------------------------------------------------------
--=In Game Items=-                     |
-=======================================
-(Decimal # between 0 and 1, IE- .34)
-
-twoDkeys = False                 (Use 3d keys  = False)
-twoDnote = False                 (Use 3d notes = Fales)
-Rotating 3d Starnotes            (Default is on)
-threeDspin = False               (Turns 3d Starnote spinning off.)
-spot_color = #EEEEEE             (Enter Hex color here. IE- #EEEEEE)
-hopo_color = #EEEEEE             (Enter Hex color here. IE- #EEEEEE)
-mesh_color = #000000             (Enter Hex color here. Default - #000000)
-open_color = #FF9933             (Enter Hex color here. Default - #FF9933)
-rockmeter_score_color = #93c351  (Enter Hex color here. Default for GH3 is )
-ingame_stats_color = #000000     (Enter Hex color here.)
-fret0_color = #22FF22            (Manually set 1st fret tail color)
-fret1_color = #FF2222            (Manually set 2nd fret tail color)
-fret2_color = #FFFF22            (Manually set 3rd fret tail color)
-fret3_color = #3333FF            (Manually set 4tg fret tail color)
-fret4_color = #FF9933            (Manually set 5th fret tail color)
-
-
-
-
-=======================================-----------------------------------------------------------------------------------------------
 -=Loading Phrases and Coordinates=-   |
 =======================================
 (Decimal # between 0 and 1, IE- .34)
@@ -91,6 +67,31 @@ artist_selected_color = #4080FF      (Hex color code)
 library_text_color = #FFFFFF         (Hex color code)
 library_selected_color = #FFBF00     (Hex color code)
 songlist_score_color = #FFFFFF       (GH3 theme default = #3f5a75)
+
+
+
+
+=======================================-----------------------------------------------------------------------------------------------
+-=In Game Items=-                     |
+=======================================
+(Decimal # between 0 and 1, IE- .34)
+
+twoDkeys = False                 (Use 3d keys  = False)
+twoDnote = False                 (Use 3d notes = Fales)
+Rotating 3d Starnotes            (Default is on)
+threeDspin = False               (Turns 3d Starnote spinning off.)
+spot_color = #EEEEEE             (Enter Hex color here. IE- #EEEEEE)
+hopo_color = #EEEEEE             (Enter Hex color here. IE- #EEEEEE)
+mesh_color = #000000             (Enter Hex color here. Default - #000000)
+open_color = #FF9933             (Enter Hex color here. Default - #FF9933)
+rockmeter_score_color = #93c351  (Enter Hex color here. Default for GH3 is )
+ingame_stats_color = #000000     (Enter Hex color here.)
+fret0_color = #22FF22            (Manually set 1st fret tail color)
+fret1_color = #FF2222            (Manually set 2nd fret tail color)
+fret2_color = #FFFF22            (Manually set 3rd fret tail color)
+fret3_color = #3333FF            (Manually set 4tg fret tail color)
+fret4_color = #FF9933            (Manually set 5th fret tail color)
+
 
 
 
