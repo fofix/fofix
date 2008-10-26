@@ -6,8 +6,11 @@ We are glad to receive useful bug reports. It's not always possible for us to te
 
 *Thank you for taking the time to isolate a bug!*
 
+=== Has this bug (or suggestion) already been submitted? ===
+*Please*, before you submit an issue or suggestion, review the [http://code.google.com/p/fofix/issues/list?can=2&q=&sort=priority existing To Do list] carefully - be sure you are not reporting or suggesting something we already have in the list!
+
 === Is this really a bug?? ===
-Please, before you submit an issue that you THINK is a bug - review this [http://code.google.com/p/fofix/issues/list?can=1&q=status:Invalid list of "Invalid" issues] that have been reported and then removed because the game is working as intended.  Please realize that there are other users out there that play the game in different ways, and your "bug" is probably a feature you just don't understand...
+*Please*, before you submit an issue that you THINK is a bug - review this [http://code.google.com/p/fofix/issues/list?can=1&q=status:Invalid list of "Invalid" issues] that have been reported and then removed because the game is working as intended.  Please realize that there are other users out there that play the game in different ways, and your "bug" is probably a feature you just don't understand...
 
 === Feature Requests ===
 *PLEASE* don't contact us with requests, that goes for everybody. If you think you have a new idea that is not in the Issues tracker and hasn't been discussed or thought of yet, post it in the appropriate Frets On Fire Fan Forum thread. We (coders) are not the only ones involved in this project. Everyone should have a chance to respond to the ideas, we like to see how popular certain features are before attempting to do something that we think we can finish.
