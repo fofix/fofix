@@ -8,3 +8,10 @@
 "data\library.zip"//all
 "data\versiontag.png"//all
 "..\FoFiX-wiki\*.*"//all wiki pages
+//-------Additional files required over 3.000--------
+"data\sounds\99pct1.ogg"//new sound
+"data\sounds\clapsound.ogg"//new sound
+"data\sounds\crowdcheers.ogg"//new sound
+"data\sounds\guitscw2.ogg"//new sound
+"data\sounds\rocksound.ogg"//new sound
+"data\themes\MegaLight\drumnotes.png"//new image

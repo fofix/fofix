@@ -5246,7 +5246,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 streaktext = locale.format("%d", player.streak, grouping=True)
                 #myfingershurt: swapping the number "0" and the letter "O" in the score font for accurate Rock Band score type!
                 streaktext = streaktext.replace("0","O")
-                stW, stH = streakfont.getStringSize(streaktext)
+                stW, stH = streakFont.getStringSize(streaktext)
   
   
                 #streak counter box:
