@@ -261,9 +261,9 @@ class Guitar:
     self.bassGrooveNeckMode = self.engine.config.get("game", "bass_groove_neck")
     self.guitarSoloNeckMode = self.engine.config.get("game", "guitar_solo_neck")
 
+    self.starspin = self.engine.config.get("performance", "starspin")
     if self.twoDnote == True:
       #Spinning starnotes or not?
-      self.starspin = self.engine.config.get("performance", "starspin")
       #myfingershurt: allowing any non-Rock Band theme to have spinning starnotes if the SpinNotes.png is available in that theme's folder
       if self.starspin == True and self.theme < 2:
         #myfingershurt: check for SpinNotes, if not there then no animation
