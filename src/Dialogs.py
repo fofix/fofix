@@ -1037,7 +1037,8 @@ class SongChooser(Layer, KeyListener):
      self.highScoreChange = True
 
     #MFH - instrument change on 5th fret
-    elif c in Player.KEY5S or (c in Player.DRUM3S and self.drumNav):
+    #elif c in Player.KEY5S or (c in Player.DRUM3S and self.drumNav):
+    elif c in Player.KEY5S:   #MFH can't use drum3, that's for down
      self.instrumentChange = True
 
 
