@@ -23,7 +23,7 @@ So, no matter how much work you _think_ you are being stuck with, compare it to 
 ----
 
 === Feature Requests ===
-*PLEASE* don't contact us with requests, that goes for everybody. If you think you have a new idea that is not in the Issues tracker and hasn't been discussed or thought of yet, post it in the appropriate Frets On Fire Fan Forum thread. We (coders) are not the only ones involved in this project. Everyone should have a chance to respond to the ideas, we like to see how popular certain features are before attempting to do something that we think we can finish.
+*PLEASE* don't contact us with requests, that goes for everybody. If you think you have a new idea that is not in the Issues tracker and hasn't been discussed or thought of yet, post it in the [http://www.fretsonfire.net/forums/viewtopic.php?f=11&t=25040 Frets On Fire Fan Forum FoFiX Development Thread]. We (coders) are not the only ones involved in this project. Everyone should have a chance to respond to the ideas, we like to see how popular certain features are before attempting to do something that we think we can finish.
 
 ----
 
