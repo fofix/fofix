@@ -100,6 +100,31 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.cheerLoopDelay = self.engine.config.get("game", "cheer_loop_delay")#MFH
     self.cheerLoopCounter = self.cheerLoopDelay   #MFH - starts out ready to cheer
       
+    #MFH
+    self.hopoStyle        = self.engine.config.get("game", "hopo_style")
+    if self.hopoStyle == 0:
+      self.hopoStyle = _("None")
+    elif self.hopoStyle == 1:
+      self.hopoStyle = _("RF-Mod")
+    elif self.hopoStyle == 2:
+      self.hopoStyle = _("GH2 Strict")
+    elif self.hopoStyle == 3:
+      self.hopoStyle = _("GH2 Sloppy")
+    elif self.hopoStyle == 4:
+      self.hopoStyle = _("GH2")
+    self.hitWindow = self.engine.config.get("game", "hit_window")  #this should be global, not retrieved every BPM change.
+    if self.hitWindow == 0:
+      self.hitWindow = _("Wide")
+    elif self.hitWindow == 1:
+      self.hitWindow = _("Standard")
+    elif self.hitWindow == 2:
+      self.hitWindow = _("Tight")
+    elif self.hitWindow == 3:
+      self.hitWindow = _("Hot Pants Tight")
+    elif self.hitWindow == 4:
+      self.hitWindow = _("Tight Like a Tiger")
+
+
     self.engine.loadImgDrawing(self, "background", os.path.join("themes",themename,"gameresults.png"))
 
     phrase = random.choice(Theme.resultsPhrase.split("_"))
@@ -120,9 +145,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     Dialogs.showLoadingScreen(self.engine, lambda: self.song, text = phrase)
     
   
-  #def handleWorldChartRanking(self, playerNum):   #MFH - TODO
-  #  self.highScoreResult[playerNum] = self.uploadResult
-  def handleWorldChartRanking(self, resultTemp):   #MFH - TODO
+  def handleWorldChartRanking(self, resultTemp):   #MFH
     self.highScoreResult[self.resultNum] = self.uploadResult
     self.resultNum += 1
   
@@ -432,7 +455,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
 
 
 
-   
+      #initial scoring - skipped after names entered
       Theme.setBaseColor(1 - v)
       if self.playerList[0].cheating:
         text = _("%s Cheated!") % Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
@@ -445,6 +468,12 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         text = text + text2
         w, h = font.getStringSize(text)
         Dialogs.wrapText(font, (.5 - w / 2, .54 - v - h), text)
+
+      #MFH - TODO - add HOPO system & hit window display to this screen
+      settingsScale = 0.0012
+      settingsText = "HOPOs: %s, Hit Window: %s" % (self.hopoStyle, self.hitWindow)
+      w, h = font.getStringSize(settingsText, settingsScale)
+      font.render(settingsText, (.5 - w/2, 0.0), scale = settingsScale)
         
       for j,player in enumerate(self.playerList):
         if self.playerList[j].cheating:
