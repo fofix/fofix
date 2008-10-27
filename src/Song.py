@@ -2522,7 +2522,7 @@ class MidiInfoReader(midi.MidiOutStream):
     
 
   def note_on(self, channel, note, velocity):
-    pos = midi.MidiOutStream.abs_time(self)
+    pos = float(midi.MidiOutStream.abs_time(self))
     if (pos / 60000) >= self.nextSectionMinute:
       text = "%d:%02d -> " % (pos / 60000, (pos % 60000) / 1000) + "Section " + str(round(self.nextSectionMinute,2))
       self.nextSectionMinute += 0.25
