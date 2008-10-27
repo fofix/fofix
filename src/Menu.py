@@ -36,13 +36,14 @@ import Player
 import Log
 
 class Choice:
-  def __init__(self, text, callback, values = None, valueIndex = 0):
+  def __init__(self, text, callback, values = None, valueIndex = 0, append_submenu_char = True):
     #Log.debug("Choice class init (Menu.py)...")
     self.text       = unicode(text)
     self.callback   = callback
     self.values     = values
     self.valueIndex = valueIndex
-  
+    self.append_submenu_char = append_submenu_char
+
     if self.text.endswith(" >"):
       self.text = text[:-2]
       self.isSubMenu = True
@@ -73,7 +74,7 @@ class Choice:
       
   def getText(self, selected):
     if not self.values:
-      if self.isSubMenu:
+      if self.isSubMenu and self.append_submenu_char:
         return "%s >" % self.text
       return self.text
     if selected:
@@ -82,7 +83,7 @@ class Choice:
       return "%s: %s" % (self.text, self.values[self.valueIndex])
           
 class Menu(Layer, KeyListener):
-  def __init__(self, engine, choices, onClose = None, onCancel = None, pos = (.2, .66 - .35), viewSize = 6, fadeScreen = False, font = "font", mainMenu = None, textColor = None, selectedColor = None):
+  def __init__(self, engine, choices, onClose = None, onCancel = None, pos = (.2, .66 - .35), viewSize = 6, fadeScreen = False, font = "font", mainMenu = None, textColor = None, selectedColor = None, append_submenu_char = True):
     self.engine       = engine
     Log.debug("Menu class init (Menu.py)...")
 
@@ -140,9 +141,9 @@ class Menu(Layer, KeyListener):
       try:
         text, callback = c
         if isinstance(text, tuple):
-          c = Choice(text[0], callback, values = text[2], valueIndex = text[1])
+          c = Choice(text[0], callback, values = text[2], valueIndex = text[1], append_submenu_char = append_submenu_char)
         else:
-          c = Choice(text, callback)
+          c = Choice(text, callback, append_submenu_char = append_submenu_char)
       except TypeError:
         pass
       self.choices.append(c)

@@ -1078,18 +1078,18 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           (_("       RESTART"), self.restartSong),
           (_("        GIVE UP"), self.changeSong),
           (_("       PRACTICE"), self.practiceSong), #evilynux
-          (_("      OPTIONS"), settingsMenu),
+          (_("       OPTIONS"), settingsMenu),
           (_("           QUIT"), self.quit),
-        ], fadeScreen = False, onClose = self.resumeGame, font = "pauseFont", pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color)
+        ], fadeScreen = False, onClose = self.resumeGame, font = "pauseFont", pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color, append_submenu_char = False)
       else:
         self.menu = Menu(self.engine, [
           (_("        RESUME"), self.resumeSong),
           (_("       RESTART"), self.restartSong),
           (_("        GIVE UP"), self.changeSong),
           (_("      END SONG"), self.endSong),
-          (_("      OPTIONS"), settingsMenu),
+          (_("       OPTIONS"), settingsMenu),
           (_("           QUIT"), self.quit),
-        ], fadeScreen = False, onClose = self.resumeGame, font = "pauseFont", pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color)
+        ], fadeScreen = False, onClose = self.resumeGame, font = "pauseFont", pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color, append_submenu_char = False)
       size = self.engine.data.pauseFont.getStringSize("Quit to Main")
       if self.careerMode:
         self.failMenu = Menu(self.engine, [
