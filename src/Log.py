@@ -25,8 +25,11 @@ import os
 import Resource
 
 quiet = True
-#logFile = open(os.path.join(Resource.getWritableResourcePath(), "fretsonfire.log"), "w")
-logFile = open("fretsonfire.log", "w")  #MFH - local logfile!
+if os.name == "posix": # evilynux - logfile in ~/.fretsonfire/ for GNU/Linux and MacOS X
+  logFile = open(os.path.join(Resource.getWritableResourcePath(), "fretsonfire.log"), "w")
+else:
+  logFile = open("fretsonfire.log", "w")  #MFH - local logfile!
+  
 encoding = "iso-8859-1"
 
 if "-v" in sys.argv:
