@@ -199,6 +199,7 @@ class SettingsMenu(Menu.Menu):
        ConfigChoice(engine.config, "game", "hopo_indicator", autoApply = True),      #myfingershurt
        ConfigChoice(engine.config, "game", "hopo_style", autoApply = True),      #myfingershurt
        ConfigChoice(engine.config, "coffee", "moreHopo", autoApply = True),
+       ConfigChoice(engine.config, "game", "song_hopo_freq", autoApply = True),      #myfingershurt
        ConfigChoice(engine.config, "game", "hopo_after_chord", autoApply = True),      #myfingershurt
     ]
     HOPOSettingsMenu = Menu.Menu(engine, HOPOSettings)
