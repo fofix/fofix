@@ -447,20 +447,27 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "game", "show_unused_text_events", autoApply = True),#myfingershurt
     ]
     debugSettingsMenu = Menu.Menu(engine, debugSettings)
-
+    
+    ManualPerfSettings = [
+       ConfigChoice(engine.config, "performance", "game_priority", autoApply = True),
+       ConfigChoice(engine.config, "performance", "disable_libcount", autoApply = True),
+       ConfigChoice(engine.config, "performance", "disable_librotation", autoApply = True),
+       ConfigChoice(engine.config, "performance", "starspin"),
+       ConfigChoice(engine.config, "performance", "static_strings", autoApply = True),      #myfingershurt
+       ConfigChoice(engine.config, "performance", "killfx", autoApply = True),   #blazingamer
+       ConfigChoice(engine.config, "performance", "star_score_updates", autoApply = True),   #MFH
+       ConfigChoice(engine.config, "performance", "in_game_stats", autoApply = True),#myfingershurt
+       ConfigChoice(engine.config, "performance", "preload_glyph_cache", autoApply = True),#evilynux
+    ]
+    ManualPerfSettingsMenu = Menu.Menu(engine, ManualPerfSettings)
+    
     perfSettings = [
-      ConfigChoice(engine.config, "performance", "game_priority", autoApply = True),
-      ConfigChoice(engine.config, "performance", "disable_libcount", autoApply = True),
-      ConfigChoice(engine.config, "performance", "disable_librotation", autoApply = True),
-      ConfigChoice(engine.config, "performance", "starspin"),
-      ConfigChoice(engine.config, "performance", "static_strings", autoApply = True),      #myfingershurt
-      ConfigChoice(engine.config, "performance", "killfx", autoApply = True),   #blazingamer
-      ConfigChoice(engine.config, "performance", "star_score_updates", autoApply = True),   #MFH
-      ConfigChoice(engine.config, "performance", "in_game_stats", autoApply = True),#myfingershurt
-      ConfigChoice(engine.config, "performance", "preload_glyph_cache", autoApply = True),#evilynux
+      ConfigChoice(engine.config, "performance", "autoset"),
+      (_("Manual Settings (Autoset must be off)"), ManualPerfSettingsMenu),
       (_("Debug Settings"), debugSettingsMenu),
     ]
     perfSettingsMenu = Menu.Menu(engine, perfSettings)
+    
     
     AdvancedLibrarySettings = [
        ConfigChoice(engine.config, "coffee", "songfilepath", autoApply = True),
