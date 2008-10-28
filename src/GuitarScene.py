@@ -967,6 +967,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.rockHiThreshold = self.rockMax/3.0*2   #MFH
     self.rock = [self.rockMax/2 for i in self.playerList]
     self.arrowRotation    = [.5 for i in self.playerList]
+    self.starNotesMissed = [False for i in self.playerList]  #MFH
     self.notesMissed = [False for i in self.playerList]
     self.lessMissed = [False for i in self.playerList]
     self.notesHit = [False for i in self.playerList]
@@ -1928,9 +1929,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if self.guitars[i].isDrum: 
       self.drumStart = True
     if self.battle and self.numPlayers > 1: #battle mode
-      if self.notesMissed[i]: #QQstarS:Set [i] to [i]
+      if self.starNotesMissed[i]:
         self.guitars[i].spEnabled = False
-        self.guitars[i].spNote = False #QQstarS:new1
+        self.guitars[i].spNote = False 
+      if self.notesMissed[i]: #QQstarS:Set [i] to [i]
         self.minusRock[i] += self.minGain/self.multi[i]
         #self.rock[i] -= self.minusRock[i]/self.multi[i]
         if self.plusRock[i] > self.pluBase:
@@ -1938,17 +1940,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if self.plusRock[i] <= self.pluBase:
           self.plusRock[i] = self.pluBase/self.multi[i]
       if self.lessMissed[i]: #QQstarS:Set [i] to [i]
-        self.guitars[i].spEnabled = False
-        self.guitars[i].spNote = False #QQstarS:new1
         self.minusRock[i] += self.minGain/5.0/self.multi[i]
         #self.rock[i] -= self.minusRock[i]/5.0/self.multi[i]
         if self.plusRock[i] > self.pluBase:
           self.plusRock[i] -= self.pluGain/2.5/self.multi[i]
     
     else:   #normal mode
-      if self.notesMissed[i]:
+      if self.starNotesMissed[i]:
         self.guitars[i].spEnabled = False
         self.guitars[i].spNote = False 
+      if self.notesMissed[i]:
         self.minusRock[i] += self.minGain/self.multi[i]
         self.rock[i] -= self.minusRock[i]/self.multi[i]
         if self.plusRock[i] > self.pluBase:
@@ -1956,8 +1957,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if self.plusRock[i] <= self.pluBase:
           self.plusRock[i] = self.pluBase/self.multi[i]
       if self.lessMissed[i]:
-        self.guitars[i].spEnabled = False
-        self.guitars[i].spNote = False #QQstarS:new1
         self.minusRock[i] += self.minGain/5.0/self.multi[i]
         self.rock[i] -= self.minusRock[i]/5.0/self.multi[i]
         if self.plusRock[i] > self.pluBase:
@@ -2070,6 +2069,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         missedNotes = guitar.getMissedNotesMFH(self.song, pos)
         if missedNotes:
           self.lessMissed[i] = True  #QQstarS:Set [0] to [i]
+          for tym, theNote in missedNotes:  #MFH
+            if theNote.star or theNote.finalStar:
+              self.starNotesMissed[i] = True
         
         if (self.playerList[i].streak != 0 or not self.processedFirstNoteYet) and not guitar.playedNotes and len(missedNotes) > 0:
           if not self.processedFirstNoteYet:
@@ -2193,6 +2195,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.rockmeterIncrease(i)
 
         self.notesMissed[i] = False 
+        self.starNotesMissed[i] = False
         self.notesHit[i] = False 
         self.lessMissed[i] = False 
 
@@ -2351,6 +2354,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       
 
       self.notesMissed[num] = True #QQstarS:Set [0] to [i]
+      for tym, theNote in self.guitars[num].matchingNotes:  #MFH
+        if theNote.star or theNote.finalStar:
+          self.starNotesMissed[num] = True
+      
       
 
       self.screwUp(num) #MFH - call screw-up sound handling function
@@ -2383,6 +2390,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.guitarSoloBroken[num] = True
 
       self.notesMissed[num] = True #QQstarS:Set [0] to [i]
+      for tym, theNote in missedNotes:  #MFH
+        if theNote.star or theNote.finalStar:
+          self.starNotesMissed[num] = True
       
       if hopo == True:
         return
@@ -2424,6 +2434,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.guitarSoloBroken[num] = True
 
       self.notesMissed[num] = True #QQstarS:Set [0] to [i]
+      for tym, theNote in self.guitars[num].matchingNotes:  #MFH
+        if theNote.star or theNote.finalStar:
+          self.starNotesMissed[num] = True
       
 
       self.screwUp(num)
@@ -2447,6 +2460,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.guitarSoloBroken[num] = True
 
       self.notesMissed[num] = True  #qqstars 
+      for tym, theNote in missedNotes:  #MFH
+        if theNote.star or theNote.finalStar:
+          self.starNotesMissed[num] = True
         
       if hopo == True:
         return
@@ -2469,6 +2485,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.guitarSoloBroken[num] = True
 
         self.notesMissed[num] = True  #qqstars
+        for tym, theNote in self.guitars[num].matchingNotes:  #MFH
+          if theNote.star or theNote.finalStar:
+            self.starNotesMissed[num] = True
         
       if self.guitars[num].playedNotes:
         self.playerList[num].streak += 1
@@ -2502,6 +2521,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.stage.triggerMiss(pos)
 
       self.notesMissed[num] = True  #qqstars
+      for tym, theNote in self.guitars[num].matchingNotes:  #MFH
+        if theNote.star or theNote.finalStar:
+          self.starNotesMissed[num] = True
 
 
       self.screwUp(num)
@@ -2533,6 +2555,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.guitars[num].wasLastNoteHopod = False
       self.guitars[num].hopoLast = -1
       self.notesMissed[num] = True #QQstarS:Set [0] to [i]
+      for tym, theNote in missedNotes:  #MFH
+        if theNote.star or theNote.finalStar:
+          self.starNotesMissed[num] = True
+      
       if self.hopoDebugDisp == 1:
         missedNoteNums = [noat.number for time, noat in missedNotes]
         #Log.debug("Miss: dopick3gh2(), found missed note(s).... %s" % str(missedNoteNums) + ", Time left=" + str(self.timeLeft))
@@ -2694,6 +2720,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.guitarSoloBroken[num] = True
 
         self.notesMissed[num] = True #QQstarS:Set [0] to [i]
+        for tym, theNote in self.guitars[num].matchingNotes:  #MFH
+          if theNote.star or theNote.finalStar:
+            self.starNotesMissed[num] = True
         
       if self.guitars[num].playedNotes:
         self.playerList[num].streak += 1
@@ -2867,6 +2896,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           
   
         self.notesMissed[num] = True #QQstarS:Set [0] to [i]
+        for tym, theNote in self.guitars[num].matchingNotes:  #MFH
+          if theNote.star or theNote.finalStar:
+            self.starNotesMissed[num] = True
   
         self.screwUp(num)
 

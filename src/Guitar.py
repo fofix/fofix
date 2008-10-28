@@ -2682,11 +2682,11 @@ class Guitar:
     
     self.playedNotes = []
     
-    notes = self.getRequiredNotes(song, pos)
+    self.matchingNotes = self.getRequiredNotes(song, pos)
 
-    if self.controlsMatchNotes(controls, notes):
+    if self.controlsMatchNotes(controls, self.matchingNotes):
       self.pickStartPos = pos
-      for time, note in notes:
+      for time, note in self.matchingNotes:
         if note.skipped == True:
           continue
         self.pickStartPos = max(self.pickStartPos, time)
@@ -2703,11 +2703,11 @@ class Guitar:
     
     self.playedNotes = []
     
-    notes = self.getRequiredNotes2(song, pos, hopo)
+    self.matchingNotes = self.getRequiredNotes2(song, pos, hopo)
 
-    if self.controlsMatchNotes2(controls, notes, hopo):
+    if self.controlsMatchNotes2(controls, self.matchingNotes, hopo):
       self.pickStartPos = pos
-      for time, note in notes:
+      for time, note in self.matchingNotes:
         if note.skipped == True:
           continue
         self.pickStartPos = max(self.pickStartPos, time)
