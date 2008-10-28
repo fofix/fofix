@@ -698,6 +698,13 @@ class SongInfo(object):
   def getLocked(self):
     return self.locked
 
+
+  def getHopoFreq(self):  #MFH
+    return self._get("hopofreq")
+
+  def setHopoFreq(self, value):   #MFH
+    self._set("hopofreq", value)
+
     
   name          = property(getName, setName)
   artist        = property(getArtist, setArtist)
@@ -716,6 +723,7 @@ class SongInfo(object):
   count         = property(getCount, setCount)
   lyrics        = property(getLyrics, setLyrics)
   EighthNoteHopo = property(getEighthNoteHopo, setEighthNoteHopo)
+  hopofreq = property(getHopoFreq, setHopoFreq)   #MFH
   #May no longer be necessary
   folder        = False
   
@@ -1007,6 +1015,7 @@ class Track:
     self.chordFudge = 1
 
     self.hopoTick = engine.config.get("coffee", "moreHopo")
+    self.songHopoFreq = engine.config.get("game", "song_hopo_freq")
 
   def __getitem__(self, index):
     #if isinstance(index, slice):
@@ -1118,13 +1127,17 @@ class Track:
         #currentTicks = ticks
 #---------------------
 
-  def markHopoRF(self, EighthNH):
+  def markHopoRF(self, EighthNH, songHopoFreq):
     lastTick = 0
     lastTime  = 0
     lastEvent = Note
     
     tickDelta = 0
     noteDelta = 0
+
+    if self.songHopoFreq == 1 and (str(songHopoFreq) == "0" or str(songHopoFreq) == "1" or str(songHopoFreq) == "2"):
+      Log.debug("markHopoRF: song-specific HOPO frequency %s forced" % str(songHopoFreq))
+      self.hopoTick = songHopoFreq
 
     #dtb file says 170 ticks
     hopoDelta = 170
@@ -1338,13 +1351,17 @@ class Track:
 
 
 #---------------------
-  def markHopoGH2(self, EighthNH, HoposAfterChords):
+  def markHopoGH2(self, EighthNH, HoposAfterChords, songHopoFreq):
     lastTick = 0
     lastTime  = 0
     lastEvent = Note
     
     tickDelta = 0
     noteDelta = 0
+
+    if self.songHopoFreq == 1 and (str(songHopoFreq) == "0" or str(songHopoFreq) == "1" or str(songHopoFreq) == "2"):
+      Log.debug("markHopoGH2: song-specific HOPO frequency %s forced" % str(songHopoFreq))
+      self.hopoTick = songHopoFreq
 
     #dtb file says 170 ticks
     hopoDelta = 170

@@ -1530,12 +1530,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       if self.hopoStyle > 0 or self.song.info.hopo == "on":
         
         #myfingershurt: drums :)
-        #if not self.playerList[guitar.player].part == "Drums":
         if not guitar.isDrum:
           if self.hopoStyle == 2 or self.hopoStyle == 3 or self.hopoStyle == 4:  #GH2 style HOPO system
-            self.song.track[i].markHopoGH2(self.song.info.EighthNoteHopo, self.hopoAfterChord)
+            self.song.track[i].markHopoGH2(self.song.info.EighthNoteHopo, self.hopoAfterChord, self.song.info.hopofreq)
           elif self.hopoStyle == 1:   #RF-Mod style HOPO system
-            self.song.track[i].markHopoRF(self.song.info.EighthNoteHopo)
+            self.song.track[i].markHopoRF(self.song.info.EighthNoteHopo, self.song.info.hopofreq)
     
     #myfingershurt: removing buggy disable stats option
     lastTime = 0
@@ -1602,9 +1601,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #myfingershurt: next line commented to prevent everthickening BPM lines
       if self.hopoStyle > 0 or self.song.info.hopo == "on":
         if self.hopoStyle == 2 or self.hopoStyle == 3 or self.hopoStyle == 4:  #GH2 style HOPO system
-          self.song.track[i].markHopoGH2(self.song.info.EighthNoteHopo, self.hopoAfterChord)
+          self.song.track[i].markHopoGH2(self.song.info.EighthNoteHopo, self.hopoAfterChord, self.song.info.hopofreq)
         elif self.hopoStyle == 1:   #RF-Mod style HOPO system
-          self.song.track[i].markHopoRF(self.song.info.EighthNoteHopo)
+          self.song.track[i].markHopoRF(self.song.info.EighthNoteHopo, self.song.info.hopofreq)
     
     lastTime = 0
     for i,guitar in enumerate(self.guitars):      
