@@ -11,6 +11,7 @@
 #               2008 QQStarS                                        #
 #               2008 Blazingamer                                    #
 #               2008 evilynux <evilynux@gmail.com>                  #
+#               2008 fablaculp                                            #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
