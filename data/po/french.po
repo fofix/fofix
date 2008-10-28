@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Traduction FR FoFiX\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-10-28 15:35+0100\n"
-"PO-Revision-Date: 2008-10-28 15:40+0100\n"
+"PO-Revision-Date: 2008-10-29 00:01+0100\n"
 "Last-Translator: fablaculp <fablaculp@hotmail.com>\n"
 "Language-Team: Français <fablaculp@hotmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -12,11 +12,27 @@ msgstr ""
 "Generated-By: pygettext.py 1.5\n"
 "X-Generator: KBabel 1.11.4\n"
 "X-Generator: KBabel 1.11.4\n"
-"X-Poedit-Basepath: C:\\Users\\Binou\\Desktop\\FoFiX_SVN\\svn (NE PAS MODIFIER SAUF FINAL)\n"
+"X-Poedit-Basepath: C:\\Users\\Binou\\Desktop\\FoFiX_SVN\\Tests\n"
 "X-Poedit-Bookmarks: -1,-1,-1,330,-1,-1,-1,-1,-1,-1\n"
 "X-Poedit-Language: French\n"
 "X-Poedit-Country: FRANCE\n"
 "X-Poedit-SearchPath-0: src\n"
+
+# PERFORMANCE AUTOSET
+msgid "Autoset"
+msgstr "Auto configuration"
+
+msgid "My Pc Sucks !"
+msgstr "Mon PC rame !"
+
+msgid "My PC is good !"
+msgstr "Mon PC est puissant !"
+
+msgid "I've paid for all of this ! Gimme more !"
+msgstr "Je veux la totale !"
+
+msgid "Manual Settings (Autoset must be off)"
+msgstr "Réglages manuels (l'auto config doit être désactivée)"
 
 # LANGUAGES
 msgid "English"
