@@ -1,0 +1,2676 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Traduction FR FoFiX\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2008-10-28 15:35+0100\n"
+"PO-Revision-Date: 2008-10-28 15:40+0100\n"
+"Last-Translator: fablaculp <fablaculp@hotmail.com>\n"
+"Language-Team: Français <fablaculp@hotmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+"X-Generator: KBabel 1.11.4\n"
+"X-Generator: KBabel 1.11.4\n"
+"X-Poedit-Basepath: C:\\Users\\Binou\\Desktop\\FoFiX_SVN\\svn (NE PAS MODIFIER SAUF FINAL)\n"
+"X-Poedit-Bookmarks: -1,-1,-1,330,-1,-1,-1,-1,-1,-1\n"
+"X-Poedit-Language: French\n"
+"X-Poedit-Country: FRANCE\n"
+"X-Poedit-SearchPath-0: src\n"
+
+# LANGUAGES
+msgid "English"
+msgstr "Anglais"
+
+msgid "Spanish"
+msgstr "Espagnol"
+
+msgid "French"
+msgstr "Français"
+
+msgid "French (reform 1990)"
+msgstr "Français (réforme 90)"
+
+msgid "German"
+msgstr "Alemand"
+
+msgid "Hebrew"
+msgstr "Hébreu"
+
+msgid "Portuguese"
+msgstr "Portuguais"
+
+msgid "Polish"
+msgstr "Polonais"
+
+msgid "Russian"
+msgstr "Russe"
+
+msgid "Swedish"
+msgstr "Suédois"
+
+msgid "Brazilian portuguese"
+msgstr "Portugais (Brésil)"
+
+# JURGEN TUTORIAL
+msgid "Ah yes, I know. I'm amazing."
+msgstr "Oui, je sais, je suis trop fort."
+
+msgid "Ah, that was cool."
+msgstr "Ah, ça c'est cool."
+
+msgid "Und hello everyone."
+msgstr "Und salut tout le monde."
+
+msgid "My name is Jurgen"
+msgstr "Je m'appelle Jurgen"
+
+msgid "Guntherswarchzhaffenstrassen."
+msgstr "Guntherswarchzhaffenstrassen."
+
+msgid "Und today I will show you"
+msgstr "Et aujourd'hui je vais te montrer"
+
+msgid "how to play this game."
+msgstr "comment on joue à ce jeu."
+
+msgid "Check this sh*t!"
+msgstr "Ecoute ça !"
+
+msgid "And now, pick up your keyboard"
+msgstr "Et maintenant, prend ton clavier"
+
+msgid "like this."
+msgstr "comme ça."
+
+msgid "When I shred,"
+msgstr "Quand je joue,"
+
+msgid "I use the whole keyboard."
+msgstr "j'utilise tout le clavier."
+
+msgid "But since you SUCK,"
+msgstr "Mais comme t'es une MERDE,"
+
+msgid "You will only need"
+msgstr "t'auras seulement besoin de"
+
+msgid "These five frets,"
+msgstr "ces cinq touches,"
+
+msgid "Und zie Pick button."
+msgstr "et de la touche Médiator."
+
+msgid "However, zie most important"
+msgstr "Cependant, le plus important"
+
+msgid "is the Escape button."
+msgstr "reste la touche Échap."
+
+msgid "You will need it,"
+msgstr "T'en auras besoin,"
+
+msgid "when you finally realize"
+msgstr "quand tu réaliseras"
+
+msgid "that you SUCK."
+msgstr "que t'es vraiment une MERDE."
+
+msgid "Bigtime."
+msgstr "Show time."
+
+msgid "To me, that is already obvious."
+msgstr "Pour moi, ça c'est un jeu d'enfant."
+
+msgid "Ok, there comes your first note."
+msgstr "Ok, voilà ta première note."
+
+msgid "You can already hold down the 1st fret"
+msgstr "Tu peux déjà appuyer sur la première touche"
+
+msgid "BUT DON'T PICK IT YET!"
+msgstr "MAIS NE GRATTE PAS TOUT DE SUITE !"
+
+msgid "You missed it."
+msgstr "Tu l'as raté."
+
+msgid "Ok, let's try it again."
+msgstr "Ok, on réessaye."
+
+msgid "Ok, wait for it."
+msgstr "Ok, attend que ca arrive."
+
+msgid "Wait for it."
+msgstr "Attends."
+
+msgid "No!"
+msgstr "Non !"
+
+msgid "Now, hold down two frets."
+msgstr "Maintenant, maintiens enfoncées deux frettes."
+
+msgid "Ah, you missed it!"
+msgstr "Ah, ratée !"
+
+msgid "And now, try this super easy lick."
+msgstr "Et maintenant, essaye ce lick super facile."
+
+msgid "Und up to my tempo."
+msgstr "Und maintenant on passe à mon rythme."
+
+msgid "Don't try this,"
+msgstr "N'essaye même pas ça,"
+
+msgid "or you'll just hurt yourself."
+msgstr "ou tu vas te blesser."
+
+msgid "Ok, that was about"
+msgstr "Ok, ça faisait à peu près"
+
+msgid "four billion notes per second."
+msgstr "quatre milliards de notes par seconde."
+
+msgid "If I play that any faster,"
+msgstr "Si je jouais plus vite,"
+
+msgid "your minds would just blow up."
+msgstr "ta tête exploserait."
+
+msgid "Ok, that is it for now."
+msgstr "Ok, c'est bon pour l'instant."
+
+msgid "You can now go and sell"
+msgstr "Tu peux maintenant aller vendre"
+
+msgid "your keyboards on Ebay."
+msgstr "ton clavier sur eBay."
+
+msgid "Because you SUCK."
+msgstr "Parce que t'es une MERDE."
+
+msgid "And remember one thing."
+msgstr "Et souviens-toi d'une chose."
+
+msgid "I am your new god, little girls."
+msgstr "Je suis votre nouveau dieu, les filles."
+
+#: src/Credits.py:152
+msgid "Made with:"
+msgstr "Fait avec :"
+
+#: src/Credits.py:175
+msgid "Source Code available under the GNU General Public License"
+msgstr "Code source disponible selon les termes de la License Publique Generale GNU (GPL)"
+
+#: src/Credits.py:181
+msgid "Copyright 2006, 2007 by Unreal Voodoo"
+msgstr "Copyright 2006, 2007 par Unreal Voodoo"
+
+#: src/Credits.py:182
+msgid "Copyright 2008 by FoFiX Team"
+msgstr "Copyright 2008 par l'équipe FoFiX"
+
+#: src/Data.py:123
+msgid "__lefttoright__"
+msgstr "__lefttoright__"
+
+# DIALOGS
+#: src/Dialogs.py:460
+msgid "<OK>"
+msgstr "<OK>"
+
+#: src/Dialogs.py:716
+msgid "Browsing Collection..."
+msgstr "Fouille dans la bibliothèque..."
+
+#: src/Dialogs.py:787
+msgid "End of Career"
+msgstr "Fin de la carrière"
+
+#: src/Dialogs.py:966
+msgid "No"
+msgstr "Non"
+
+#: src/Dialogs.py:966
+#: src/Dialogs.py:968
+msgid "Yes"
+msgstr "Oui"
+
+#: src/Dialogs.py:966
+msgid "Are you sure you want to reset this entire career?"
+msgstr "Etes-vous sûr de vouloir remettre à zéro la carrière ?"
+
+#: src/Dialogs.py:969
+msgid "Resetting career..."
+msgstr "Remise à zéro de la carrière..."
+
+#: src/Dialogs.py:1532
+#: src/Dialogs.py:1740
+#: src/Dialogs.py:2035
+#, python-format
+msgid "Filter: %s"
+msgstr "Filtrer : %s"
+
+#: src/Dialogs.py:1534
+#: src/Dialogs.py:1742
+#: src/Dialogs.py:2037
+msgid "Not found"
+msgstr "Non trouvé"
+
+#: src/Dialogs.py:1537
+#: src/Dialogs.py:1745
+#: src/Dialogs.py:2040
+msgid "Loading Preview..."
+msgstr "Chargement de l'aperçu..."
+
+#: src/Dialogs.py:1557
+#: src/Dialogs.py:1838
+#: src/Dialogs.py:2123
+msgid "-- Locked --"
+msgstr "-- Verrouillée --"
+
+#: src/Dialogs.py:1588
+#, python-format
+msgid "Played %d time"
+msgstr "Jouée %d fois"
+
+#: src/Dialogs.py:1590
+#, python-format
+msgid "Played %d times"
+msgstr "Jouée %d fois"
+
+#: src/Dialogs.py:1595
+#: src/Dialogs.py:1602
+#: src/Dialogs.py:1764
+msgid "Play To Advance."
+msgstr "Jouer cette chanson pour avancer"
+
+#: src/Dialogs.py:1660
+msgid "One Song In This Setlist"
+msgstr "Une chanson dans cette liste"
+
+#: src/Dialogs.py:1662
+#, python-format
+msgid "%d Songs In This Setlist"
+msgstr "%d chansons dans cette liste"
+
+#: src/Dialogs.py:1672
+#: src/Dialogs.py:1792
+#: src/Dialogs.py:2078
+msgid "Reset this entire career"
+msgstr "Remettre à zéro la carrière"
+
+#: src/Dialogs.py:1766
+#: src/Dialogs.py:2054
+msgid "Practice"
+msgstr "Entraînement"
+
+#: src/Dialogs.py:1770
+#: src/Dialogs.py:2058
+msgid "Played Once"
+msgstr "Jouée une fois"
+
+#: src/Dialogs.py:1772
+#: src/Dialogs.py:2060
+#, python-format
+msgid "Played %d times."
+msgstr "Jouée %d fois"
+
+#: src/Dialogs.py:1774
+#: src/Dialogs.py:2062
+msgid "Quickplay"
+msgstr "Partie rapide"
+
+#: src/Dialogs.py:1780
+msgid "There Is 1 Song In This Setlist"
+msgstr "Il y a une chanson dans cette liste"
+
+#: src/Dialogs.py:1782
+#, python-format
+msgid "There are %d songs in this folder"
+msgstr "Il y a %d chansons dans ce dossier"
+
+# SONG SELECT MENUS
+#: src/Dialogs.py:1787
+#: src/Dialogs.py:2074
+msgid "Tier"
+msgstr "Palier"
+
+#: src/Dialogs.py:1932
+#: src/Dialogs.py:1970
+#: src/Dialogs.py:1977
+#: src/Dialogs.py:2214
+#: src/Dialogs.py:2254
+msgid "Nil"
+msgstr "Néant"
+
+#: src/Dialogs.py:2052
+msgid "Play To Advance"
+msgstr "Jouer cette chanson pour avancer"
+
+#: src/Dialogs.py:2068
+msgid "There Is 1 Song In This Setlist."
+msgstr "Il y a une chanson dans cette liste."
+
+#: src/Dialogs.py:2070
+#, python-format
+msgid "There Are %d Songs In This Setlist."
+msgstr "Il y a %d chansons dans cette liste."
+
+#: src/Dialogs.py:2324
+msgid "[Parent Folder]"
+msgstr "[Dossier parent]"
+
+#: src/Dialogs.py:2328
+msgid "[Accept Folder]"
+msgstr "[Choisir ce dossier]"
+
+#: src/Dialogs.py:2330
+#, python-format
+msgid "%s [Folder]"
+msgstr "%s [Dossier]"
+
+#: src/Dialogs.py:2475
+msgid "Loading necks..."
+msgstr "Chargement des pistes..."
+
+#: src/Dialogs.py:2512
+msgid "Neck"
+msgstr "Piste"
+
+#: src/Dialogs.py:2882
+#, python-format
+msgid "%.2f beats per minute"
+msgstr "tempo : %.2f"
+
+#: src/Dialogs.py:2958
+#: src/Dialogs.py:3022
+msgid "StarPower"
+msgstr "StarPower"
+
+#: src/Dialogs.py:3009
+#: src/Dialogs.py:3027
+#, python-format
+msgid "Killswitch %d%%"
+msgstr "Vibrato %d%%"
+
+#: src/Dialogs.py:3015
+#: src/Dialogs.py:3033
+msgid "Killswitch"
+msgstr "Vibrato"
+
+#: src/Dialogs.py:3039
+#: src/Dialogs.py:3045
+msgid "Pick!"
+msgstr "Gratte !"
+
+#: src/Dialogs.py:3157
+msgid "Choose a Song"
+msgstr "Choisissez une chanson :"
+
+#: src/Dialogs.py:3176
+msgid "Choose a File"
+msgstr "Choisissez un fichier"
+
+#: src/Dialogs.py:3221
+#: src/Dialogs.py:3232
+msgid "Play with the keys and press Escape when you're done."
+msgstr "Jouez avec les touches (Echap pour sortir)."
+
+#: src/Dialogs.py:3243
+#: src/Dialogs.py:3379
+msgid "Loading..."
+msgstr "Chargement..."
+
+#: src/Editor.py:71
+msgid "Save Song"
+msgstr "Sauvegarder la chanson"
+
+#: src/Editor.py:72
+msgid "Set Song Name"
+msgstr "Définir le nom de la chanson"
+
+#: src/Editor.py:73
+msgid "Set Artist Name"
+msgstr "Définir le nom de l'artiste"
+
+#: src/Editor.py:74
+msgid "Set Beats per Minute"
+msgstr "Définir le tempo"
+
+#: src/Editor.py:75
+msgid "Estimate Beats per Minute"
+msgstr "Estimer le tempo"
+
+#: src/Editor.py:76
+msgid "Set A/V delay"
+msgstr "Définir le décalage A/V"
+
+#: src/Editor.py:77
+msgid "Set Cassette Color"
+msgstr "Définir la couleur de la cassette"
+
+#: src/Editor.py:78
+msgid "Set Cassette Label"
+msgstr "Définir la pochette du CD"
+
+#: src/Editor.py:79
+msgid "Editing Help"
+msgstr "Aide de l'éditeur"
+
+#: src/Editor.py:80
+msgid "Quit to Main Menu"
+msgstr "Retour au menu principal"
+
+#: src/Editor.py:86
+msgid "There are no changes to save."
+msgstr "Il n'y a aucun changement à sauvegarder."
+
+#: src/Editor.py:94
+msgid "Saving..."
+msgstr "Sauvegarde..."
+
+#: src/Editor.py:95
+#, python-format
+msgid "'%s' saved."
+msgstr "'%s' sauvegardé."
+
+#: src/Editor.py:98
+msgid "Editing keys: "
+msgstr "Édition des touches : "
+
+#: src/Editor.py:99
+msgid "Arrows - Move cursor, "
+msgstr "Flèches - Déplacer le curseur, "
+
+#: src/Editor.py:100
+msgid "Space - Play/pause song, "
+msgstr "Espace - Jouer/mettre en pause la chanson, "
+
+#: src/Editor.py:101
+msgid "Enter - Make note (hold and move for long notes), "
+msgstr "Entrée - Créer une note (maintenir appuyé et déplacer pour de longues notes), "
+
+#: src/Editor.py:102
+msgid "Delete - Delete note, "
+msgstr "Suppr - Supprimer la note, "
+
+#: src/Editor.py:103
+msgid "Page Up/Down - Change difficulty"
+msgstr "Page Précédente/Suivante - Changer la difficulté"
+
+#: src/Editor.py:107
+msgid "Enter Song Name"
+msgstr "Entrez le nom de la chanson"
+
+#: src/Editor.py:113
+msgid "Enter Artist Name"
+msgstr "Entrez le nom de l'artiste"
+
+#: src/Editor.py:119
+msgid "Enter A/V delay in milliseconds"
+msgstr "Entrez le décalage A/V en millisecondes"
+
+#: src/Editor.py:125
+#: src/Editor.py:134
+msgid "That isn't a number."
+msgstr "Ça n'est pas un nombre."
+
+#: src/Editor.py:128
+msgid "Enter Beats per Minute Value"
+msgstr "Entrez le tempo"
+
+#: src/Editor.py:137
+msgid "Tap the Space bar to the beat of the song. Press Enter when done or Escape to cancel."
+msgstr "Tapez sur la barre d'espace au rythme de la chanson. Appuyez sur Entrée quand vous avez fini ou Échap pour annuler."
+
+#: src/Editor.py:147
+msgid "Enter cassette color in HTML (#RRGGBB) format."
+msgstr "Entrez la couleur de la cassette au format HTML (#RRGGBB)."
+
+#: src/Editor.py:153
+msgid "That isn't a color."
+msgstr "Ça n'est pas une couleur."
+
+#: src/Editor.py:156
+msgid "Choose a 256x128 PNG format label image."
+msgstr "Choisissez une pochette en 256x128 au format PNG."
+
+#: src/Editor.py:173
+msgid "Loading song..."
+msgstr "Chargement de la chanson..."
+
+#: src/Editor.py:342
+msgid "Playing"
+msgstr "Lecture"
+
+#: src/Editor.py:344
+msgid "Stopped"
+msgstr "Arrêtée"
+
+#: src/Editor.py:385
+msgid "Enter a name for the song."
+msgstr "Donnez un nom à la chanson."
+
+#: src/Editor.py:393
+msgid "That song already exists."
+msgstr "Cette chanson existe déjà."
+
+#: src/Editor.py:397
+msgid "Choose the Instrument Track (OGG format)."
+msgstr "Choisissez la piste instrumentale (au format OGG)."
+
+#: src/Editor.py:403
+msgid "Choose the Background Track (OGG format) or press Escape to skip."
+msgstr "Choisissez la piste de fond (au format OGG) (Échap pour passer)"
+
+#: src/Editor.py:407
+msgid "Importing..."
+msgstr "Import..."
+
+#: src/Editor.py:599
+msgid "Stage 1/8: Splitting VGS file"
+msgstr "Étape 1/8: Division du fichier VGS"
+
+#: src/Editor.py:634
+msgid "Stage 6/8: Joining song stereo tracks"
+msgstr "Étape 6/8: Assemblage des pistes stéréo de la chanson"
+
+#: src/Editor.py:638
+msgid "Stage 7/8: Joining guitar stereo tracks"
+msgstr "Étape 7/8: Assemblage des pistes stéréo de guitare"
+
+#: src/Editor.py:653
+msgid "Stage 8/8: Compressing tracks"
+msgstr "Étape 8/8: Compression des pistes"
+
+#: src/Editor.py:688
+msgid "Reading the song list."
+msgstr "Lecture de la liste des chansons."
+
+#: src/Editor.py:695
+msgid "Reading the archive index."
+msgstr "Lecture de l'index de l'archive."
+
+#: src/Editor.py:719
+#, python-format
+msgid "Extracting %s by %s. %d of %d songs imported. Yeah, this is going to take forever."
+msgstr "Extraction de %s par %s. %d chansons sur %d importées. Ouais, ça va prendre une éternité."
+
+#: src/Editor.py:764
+msgid "Ready"
+msgstr "Prêt"
+
+#: src/Editor.py:779
+#, python-format
+msgid "All done! %d songs imported. Have fun!"
+msgstr "Terminé ! %d chansons importées. Amusez-vous!"
+
+#: src/Editor.py:781
+msgid "No songs could be imported, sorry. Check the log files for more information."
+msgstr "Aucune chanson n'a pu être importée, désolé. Vérifier les fichiers logs pour plus d'information."
+
+#: src/Editor.py:790
+msgid "Ogg Vorbis encoder (oggenc.exe) not found. Please install it to the game directory and try again."
+msgstr "Encodeur Ogg Vorbis (oggenc) introuvable. Veuillez l'installer dans le répertoire du jeu et essayez à nouveau."
+
+#: src/Editor.py:792
+msgid "Ogg Vorbis encoder (oggenc) not found. Please install it and try again."
+msgstr "Encodeur Ogg Vorbis (oggenc) introuvable. Veuillez l'installer et essayez à nouveau."
+
+#: src/Editor.py:796
+msgid "Make sure you have at least 500 megabytes of free disk space before using this importer."
+msgstr "Assurez-vous d'avoir au moins 500 mégaoctets d'espace libre sur le disque avant d'utiliser l'importateur."
+
+#: src/Editor.py:800
+msgid "Enter the path to the mounted Guitar Hero (tm) DVD"
+msgstr "Entrez le point de montage du DVD de Guitar Hero (tm)"
+
+#: src/Editor.py:809
+msgid "That's not it. Try again."
+msgstr "Ça n'est pas ça. Essayez encore."
+
+#: src/Editor.py:827
+msgid "Importing Songs"
+msgstr "Import des Chansons"
+
+#: src/GameEngine.py:61
+msgid "Upload Highscores"
+msgstr "Envoyer les scores"
+
+#: src/GameEngine.py:62
+msgid "Lefty mode"
+msgstr "Mode gaucher"
+
+#: src/GameEngine.py:63
+msgid "Fullscreen Mode"
+msgstr "Plein écran"
+
+#: src/GameEngine.py:64
+msgid "Antialiasing Quality"
+msgstr "Qualité de l'antialiasing"
+
+#: src/GameEngine.py:64
+#: src/GameEngine.py:111
+#: src/GameEngine.py:145
+#: src/GameEngine.py:464
+#: src/GameResultsScene.py:106
+#: src/GuitarScene.py:509
+msgid "None"
+msgstr "Aucun"
+
+#: src/GameEngine.py:65
+msgid "Enable Glow-FX"
+msgstr "Activer le halo"
+
+#: src/GameEngine.py:67
+msgid "Frames per Second"
+msgstr "Images par seconde"
+
+#: src/GameEngine.py:68
+msgid "Glow-FX Color"
+msgstr "Couleur du halo"
+
+#: src/GameEngine.py:68
+#: src/GameEngine.py:69
+msgid "Same as Fret"
+msgstr "Frette"
+
+#: src/GameEngine.py:68
+#: src/GameEngine.py:69
+msgid "Actual Color"
+msgstr "Couleur actuelle"
+
+#: src/GameEngine.py:69
+msgid "Hitflames Color"
+msgstr "Couleur des flammes"
+
+#: src/GameEngine.py:69
+msgid "Theme Specific"
+msgstr "Spécifique au thème"
+
+#: src/GameEngine.py:70
+msgid "Starnotes"
+msgstr "Notes StarPower"
+
+#: src/GameEngine.py:70
+#: src/GameEngine.py:198
+msgid "Animated"
+msgstr "Animées"
+
+#: src/GameEngine.py:70
+#: src/GameEngine.py:198
+msgid "Static"
+msgstr "Statiques"
+
+#: src/GameEngine.py:71
+msgid "SVG Quality"
+msgstr "Qualité des graphismes"
+
+#: src/GameEngine.py:71
+msgid "Low"
+msgstr "Bas"
+
+#: src/GameEngine.py:71
+#: src/GameEngine.py:100
+#: src/GameEngine.py:112
+#: src/GameEngine.py:447
+msgid "Normal"
+msgstr "Normale"
+
+#: src/GameEngine.py:71
+msgid "High"
+msgstr "Haut"
+
+#: src/GameEngine.py:72
+msgid "Sample Frequency"
+msgstr "Fréquence d'échantillonnage"
+
+#: src/GameEngine.py:73
+msgid "Sample Bits"
+msgstr "Bits d'échantillonnage"
+
+#: src/GameEngine.py:90
+msgid "Buffer Size"
+msgstr "Taille du tampon"
+
+#: src/GameEngine.py:91
+msgid "A/V delay"
+msgstr "Décalage Audio/Video"
+
+#: src/GameEngine.py:92
+msgid "Screw Up sounds"
+msgstr "Sons des ratés"
+
+#: src/GameEngine.py:92
+#: src/GameEngine.py:113
+#: src/GameEngine.py:114
+#: src/GameEngine.py:120
+#: src/GameEngine.py:125
+#: src/GameEngine.py:128
+#: src/GameEngine.py:134
+#: src/GameEngine.py:135
+#: src/GameEngine.py:141
+#: src/GameEngine.py:144
+#: src/GameEngine.py:147
+#: src/GameEngine.py:148
+#: src/GameEngine.py:151
+#: src/GameEngine.py:154
+#: src/GameEngine.py:155
+#: src/GameEngine.py:156
+#: src/GameEngine.py:158
+#: src/GameEngine.py:159
+#: src/GameEngine.py:160
+#: src/GameEngine.py:162
+#: src/GameEngine.py:163
+#: src/GameEngine.py:164
+#: src/GameEngine.py:165
+#: src/GameEngine.py:166
+#: src/GameEngine.py:170
+#: src/GameEngine.py:172
+#: src/GameEngine.py:173
+#: src/GameEngine.py:174
+#: src/GameEngine.py:175
+#: src/GameEngine.py:177
+#: src/GameEngine.py:179
+#: src/GameEngine.py:180
+#: src/GameEngine.py:186
+#: src/GameEngine.py:193
+#: src/GameEngine.py:194
+#: src/GameEngine.py:195
+#: src/GameEngine.py:197
+#: src/GameEngine.py:198
+#: src/GameEngine.py:201
+msgid "Off"
+msgstr "Aucun"
+
+#: src/GameEngine.py:92
+msgid "Quiet"
+msgstr "Calmes"
+
+#: src/GameEngine.py:92
+msgid "Loud"
+msgstr "Fort"
+
+#: src/GameEngine.py:92
+msgid "Painful"
+msgstr "Assourdissants"
+
+#: src/GameEngine.py:95
+msgid "Guitar Volume"
+msgstr "Volume de la guitare"
+
+#: src/GameEngine.py:96
+msgid "Song Volume"
+msgstr "Volume de la chanson"
+
+#: src/GameEngine.py:97
+msgid "Rhythm Volume"
+msgstr "Volume de la basse"
+
+#: src/GameEngine.py:99
+msgid "Priority"
+msgstr "Priorité"
+
+#: src/GameEngine.py:99
+msgid "0 Idle"
+msgstr "0 Basse"
+
+#: src/GameEngine.py:99
+msgid "1 Low"
+msgstr "1 Inférieure à la normale"
+
+#: src/GameEngine.py:99
+msgid "2 Normal"
+msgstr "2 Normale"
+
+#: src/GameEngine.py:99
+msgid "3 Above Normal"
+msgstr "3 Supérieure à la normale"
+
+#: src/GameEngine.py:99
+msgid "4 High"
+msgstr "4 Haute"
+
+#: src/GameEngine.py:99
+msgid "5 Realtime"
+msgstr "5 Temps Réel"
+
+#: src/GameEngine.py:100
+msgid "Keyset"
+msgstr "Configuration"
+
+#: src/GameEngine.py:100
+msgid "Alternate"
+msgstr "Alternative"
+
+#: src/GameEngine.py:101
+msgid "Hit Margin"
+msgstr "Marge de grattage"
+
+#: src/GameEngine.py:101
+#: src/GameEngine.py:109
+#: src/GameEngine.py:168
+#: src/GameEngine.py:209
+msgid "FoF"
+msgstr "FoF"
+
+#: src/GameEngine.py:101
+msgid "Capo"
+msgstr "Capo"
+
+#: src/GameEngine.py:102
+msgid "Missed Notes"
+msgstr "Notes manquées"
+
+#: src/GameEngine.py:102
+msgid "Disappear"
+msgstr "Effacer"
+
+#: src/GameEngine.py:102
+msgid "Keep on going"
+msgstr "Continuer"
+
+#: src/GameEngine.py:108
+msgid "HO/PO"
+msgstr "HO/PO"
+
+#: src/GameEngine.py:109
+msgid "HO/PO Note Marks"
+msgstr "Repérage des HO/PO"
+
+#: src/GameEngine.py:109
+msgid "RFmod"
+msgstr "RFmod"
+
+#: src/GameEngine.py:111
+msgid "HO/PO System"
+msgstr "Système HO/PO"
+
+#: src/GameEngine.py:111
+#: src/GameResultsScene.py:108
+msgid "RF-Mod"
+msgstr "RF-Mod"
+
+#: src/GameEngine.py:111
+#: src/GameResultsScene.py:110
+msgid "GH2 Strict"
+msgstr "GH2 Strict"
+
+#: src/GameEngine.py:111
+#: src/GameResultsScene.py:112
+msgid "GH2 Sloppy"
+msgstr "GH2 Souple"
+
+#: src/GameEngine.py:111
+#: src/GameEngine.py:209
+#: src/GameResultsScene.py:114
+msgid "GH2"
+msgstr "GH2"
+
+#: src/GameEngine.py:112
+msgid "HO/PO Frequency"
+msgstr "Fréquence des HO/PO"
+
+#: src/GameEngine.py:112
+msgid "Less"
+msgstr "Peu"
+
+#: src/GameEngine.py:112
+msgid "More"
+msgstr "Beaucoup"
+
+#: src/GameEngine.py:113
+msgid "HO/PO After Chord"
+msgstr "HO/PO après accord"
+
+#: src/GameEngine.py:113
+#: src/GameEngine.py:120
+#: src/GameEngine.py:128
+#: src/GameEngine.py:134
+#: src/GameEngine.py:135
+#: src/GameEngine.py:141
+#: src/GameEngine.py:144
+#: src/GameEngine.py:151
+#: src/GameEngine.py:156
+#: src/GameEngine.py:158
+#: src/GameEngine.py:162
+#: src/GameEngine.py:163
+#: src/GameEngine.py:165
+#: src/GameEngine.py:170
+#: src/GameEngine.py:173
+#: src/GameEngine.py:174
+#: src/GameEngine.py:175
+#: src/GameEngine.py:179
+#: src/GameEngine.py:186
+#: src/GameEngine.py:193
+#: src/GameEngine.py:194
+#: src/GameEngine.py:195
+#: src/GameEngine.py:197
+#: src/GameEngine.py:201
+msgid "On"
+msgstr "Oui"
+
+#: src/GameEngine.py:114
+msgid "Accuracy"
+msgstr "Précision"
+
+#: src/GameEngine.py:114
+msgid "Numeric"
+msgstr "Numérique"
+
+#: src/GameEngine.py:114
+msgid "Friendly"
+msgstr "Texte"
+
+#: src/GameEngine.py:114
+#: src/GameEngine.py:216
+msgid "Both"
+msgstr "Les deux"
+
+#: src/GameEngine.py:115
+msgid "Accuracy Words Pos"
+msgstr "Affichage précision"
+
+#: src/GameEngine.py:115
+#: src/GameEngine.py:169
+msgid "Center"
+msgstr "Centre"
+
+#: src/GameEngine.py:115
+msgid "Right-top Corner"
+msgstr "En haut à droite"
+
+#: src/GameEngine.py:115
+msgid "Left-Bottom Corner"
+msgstr "En bas à gauche"
+
+#: src/GameEngine.py:115
+msgid "Center-Bottom"
+msgstr "Centré en bas"
+
+#: src/GameEngine.py:116
+msgid "Rotate Delay"
+msgstr "Délai de rotation"
+
+#: src/GameEngine.py:117
+msgid "Animation Delay"
+msgstr "Délai d'animation"
+
+#: src/GameEngine.py:119
+msgid "Stages"
+msgstr "Scènes"
+
+#: src/GameEngine.py:119
+#: src/GameEngine.py:124
+#: src/GameEngine.py:449
+msgid "Random"
+msgstr "Aléatoire"
+
+#: src/GameEngine.py:119
+msgid "Default"
+msgstr "Défaut"
+
+#: src/GameEngine.py:119
+msgid "Blank"
+msgstr "Vide"
+
+#: src/GameEngine.py:120
+msgid "Song Stage"
+msgstr "Scène spécifique à la chanson"
+
+#: src/GameEngine.py:124
+msgid "Rotate Stages"
+msgstr "Rotation des scènes"
+
+#: src/GameEngine.py:124
+msgid "In Order"
+msgstr "Dans l'ordre"
+
+#: src/GameEngine.py:124
+msgid "BackNForth"
+msgstr "Aller-retours"
+
+#: src/GameEngine.py:125
+msgid "Lyrics"
+msgstr "Paroles"
+
+#: src/GameEngine.py:125
+msgid "song.ini"
+msgstr "song.ini"
+
+#: src/GameEngine.py:125
+#: src/GameEngine.py:142
+#: src/GameEngine.py:159
+#: src/GameEngine.py:160
+#: src/GameEngine.py:164
+#: src/GameEngine.py:177
+#: src/GameEngine.py:180
+#: src/GameEngine.py:189
+msgid "Auto"
+msgstr "Auto"
+
+#: src/GameEngine.py:125
+msgid "Dual Lyric Prevention"
+msgstr "Prévention des doubles paroles"
+
+#: src/GameEngine.py:126
+msgid "Frets under notes"
+msgstr "Notes au-dessus des frettes"
+
+#: src/GameEngine.py:128
+msgid "Drum navigation"
+msgstr "Navigation batterie"
+
+#: src/GameEngine.py:130
+msgid "Ignore open strums"
+msgstr "Ignorer le grattage à vide"
+
+#: src/GameEngine.py:131
+msgid "Static strings"
+msgstr "Cordes statiques"
+
+#: src/GameEngine.py:132
+msgid "Whammy saves SP"
+msgstr "Vibrato économise SP"
+
+#: src/GameEngine.py:133
+msgid "Mute sustain releases"
+msgstr "Baisse de volume quand relaché trop tôt"
+
+#: src/GameEngine.py:134
+msgid "HOPO Indicator"
+msgstr "Indicateur HOPO"
+
+#: src/GameEngine.py:135
+msgid "Quickplay Tiers"
+msgstr "Paliers partie rapide"
+
+#: src/GameEngine.py:136
+msgid "Star Updates"
+msgstr "Mise à jour des étoiles"
+
+#: src/GameEngine.py:136
+msgid "On Hit"
+msgstr "A chaque grattage"
+
+#: src/GameEngine.py:136
+msgid "Score Change"
+msgstr "Changement du score"
+
+#: src/GameEngine.py:138
+msgid "Script Lyric Pos"
+msgstr "Position des paroles"
+
+#: src/GameEngine.py:138
+msgid "Bottom"
+msgstr "Bas"
+
+#: src/GameEngine.py:138
+msgid "Top"
+msgstr "Haut"
+
+#: src/GameEngine.py:141
+msgid "Starpower Clap SFX"
+msgstr "Applaudissements StarPower"
+
+#: src/GameEngine.py:142
+msgid "Song Previews"
+msgstr "Aperçus des chansons"
+
+#: src/GameEngine.py:142
+msgid "Yellow Fret (#3)"
+msgstr "Frette jaune (#3)"
+
+#: src/GameEngine.py:144
+msgid "RB SP Neck Glow"
+msgstr "RB SP Halo"
+
+#: src/GameEngine.py:145
+msgid "SP Refill"
+msgstr "Renouvèlement SP"
+
+#: src/GameEngine.py:145
+#: src/GameEngine.py:169
+#: src/GameEngine.py:209
+msgid "Rock Band"
+msgstr "Rock Band"
+
+#: src/GameEngine.py:147
+msgid "Analog Killswitch P1"
+msgstr "J1: Vibrato analogique"
+
+#: src/GameEngine.py:147
+#: src/GameEngine.py:148
+msgid "PS2/PS3/Wii"
+msgstr "PS2/PS3/Wii"
+
+#: src/GameEngine.py:147
+#: src/GameEngine.py:148
+msgid "XBOX"
+msgstr "XBOX"
+
+#: src/GameEngine.py:147
+#: src/GameEngine.py:148
+msgid "XBOX Inv"
+msgstr "XBOX Inv"
+
+#: src/GameEngine.py:148
+msgid "Analog Killswitch P2"
+msgstr "J2 : Vibrato analogique"
+
+#: src/GameEngine.py:151
+msgid "Killsw Debug"
+msgstr "Débugage du vibrato"
+
+# DRUM KEY SETTINGS
+#: src/GameEngine.py:152
+msgid "Auto Drum SP"
+msgstr "Batterie > SP auto"
+
+#: src/GameEngine.py:153
+msgid "Large Drum Neck"
+msgstr "Batterie > Piste large"
+
+#: src/GameEngine.py:154
+msgid "Bass Groove Neck"
+msgstr "Piste Bass Groove"
+
+#: src/GameEngine.py:154
+#: src/GameEngine.py:155
+msgid "Replace"
+msgstr "Remplacer"
+
+#: src/GameEngine.py:154
+#: src/GameEngine.py:155
+msgid "Overlay"
+msgstr "Superposer"
+
+#: src/GameEngine.py:155
+msgid "Guitar Solo Neck"
+msgstr "Piste Solo de guitare"
+
+#: src/GameEngine.py:156
+msgid "Rock Band MIDI events"
+msgstr "Evènements MIDI RB"
+
+#: src/GameEngine.py:156
+#: src/GameEngine.py:162
+#: src/GameEngine.py:163
+#: src/GameEngine.py:170
+msgid "RB Only"
+msgstr "RB seulement"
+
+#: src/GameEngine.py:157
+msgid "Show unused events"
+msgstr "Montrer évènements inutilisés"
+
+#: src/GameEngine.py:158
+msgid "Bass kick sound"
+msgstr "Son du kick basse"
+
+#: src/GameEngine.py:159
+msgid "MIDI/RB Lyrics"
+msgstr "Paroles MIDI/RB"
+
+#: src/GameEngine.py:159
+#: src/GameEngine.py:160
+msgid "1p Only"
+msgstr "1 joueur seulement"
+
+#: src/GameEngine.py:160
+msgid "MIDI/RB Sections"
+msgstr "Sections MIDI/RB"
+
+#: src/GameEngine.py:161
+msgid "Key Conflicts"
+msgstr "Conflits de touches"
+
+#: src/GameEngine.py:161
+msgid "No check"
+msgstr "Pas de vérification"
+
+#: src/GameEngine.py:161
+msgid "Notify"
+msgstr "Notifier"
+
+#: src/GameEngine.py:161
+msgid "Enforce"
+msgstr "Forcer"
+
+#: src/GameEngine.py:162
+msgid "In-Game Stats"
+msgstr "Stats en jeu"
+
+#: src/GameEngine.py:163
+msgid "In-Game Stars"
+msgstr "Etoiles en jeu"
+
+#: src/GameEngine.py:164
+msgid "Partial Stars"
+msgstr "Etoiles partielles"
+
+#: src/GameEngine.py:165
+msgid "HOPO Debug"
+msgstr "Débugage HO/PO"
+
+#: src/GameEngine.py:166
+msgid "Solo Accuracy"
+msgstr "Précision du solo"
+
+#: src/GameEngine.py:166
+msgid "Percent"
+msgstr "Pourcentage"
+
+#: src/GameEngine.py:166
+msgid "Detail"
+msgstr "Détail"
+
+#: src/GameEngine.py:167
+msgid "Decimal Places"
+msgstr "Nombre de décimales"
+
+#: src/GameEngine.py:168
+msgid "Star Scoring"
+msgstr "Comptage des points"
+
+#: src/GameEngine.py:168
+msgid "GH"
+msgstr "GH"
+
+#: src/GameEngine.py:168
+msgid "RB"
+msgstr "RB"
+
+#: src/GameEngine.py:168
+msgid "RB+GH"
+msgstr "RB+GH"
+
+#: src/GameEngine.py:169
+msgid "GtrSolo Pos."
+msgstr "Affichage de \"Solo\""
+
+#: src/GameEngine.py:169
+msgid "Right"
+msgstr "Droite"
+
+#: src/GameEngine.py:169
+msgid "Left"
+msgstr "Gauche"
+
+#: src/GameEngine.py:170
+msgid "Bass Groove"
+msgstr "Bass Groove"
+
+#: src/GameEngine.py:171
+msgid "Drum Misses"
+msgstr "Batterie libre"
+
+#: src/GameEngine.py:171
+msgid "Always"
+msgstr "Jamais"
+
+#: src/GameEngine.py:171
+msgid "Song Start"
+msgstr "Début de la chanson"
+
+#: src/GameEngine.py:171
+msgid "First Note"
+msgstr "Jusqu'à la première note"
+
+#: src/GameEngine.py:172
+msgid "Game Time"
+msgstr "Affichage du temps"
+
+#: src/GameEngine.py:172
+msgid "Countdown"
+msgstr "Décompte"
+
+#: src/GameEngine.py:172
+msgid "Elapsed"
+msgstr "Ecoulée"
+
+#: src/GameEngine.py:173
+msgid "GfxVersionTag"
+msgstr "Afficher version"
+
+#: src/GameEngine.py:174
+msgid "P2 Menu Navigate"
+msgstr "J2 : Navigation dans les menus"
+
+#: src/GameEngine.py:175
+msgid "In-Game Font Shadow"
+msgstr "Ombres sur textes en jeu"
+
+#: src/GameEngine.py:176
+msgid "Mute last second"
+msgstr "Couper la dernière seconde"
+
+#: src/GameEngine.py:177
+msgid "Results Cheer Loop"
+msgstr "Boucler applaudissements"
+
+#: src/GameEngine.py:177
+#: src/GameEngine.py:209
+#: src/GameEngine.py:256
+msgid "Theme"
+msgstr "Thème"
+
+#: src/GameEngine.py:178
+msgid "Cheer Loop Delay"
+msgstr "Délai de la boucle"
+
+#: src/GameEngine.py:179
+msgid "Miss Pauses Anim"
+msgstr "Stopper anim en pause"
+
+#: src/GameEngine.py:180
+msgid "Song HOPO Freq"
+msgstr "Fréquence des HO/PO (Song.ini)"
+
+#: src/GameEngine.py:185
+msgid "Rock Band Version"
+msgstr "Version de Rock Band"
+
+#: src/GameEngine.py:185
+msgid "Regular"
+msgstr "Normal"
+
+#: src/GameEngine.py:185
+msgid "Beta"
+msgstr "Beta"
+
+#: src/GameEngine.py:186
+msgid "Practice Beat Claps"
+msgstr "Métronome à l'entraînement"
+
+#: src/GameEngine.py:189
+msgid "Song Choosing Highscores"
+msgstr "Changer scores"
+
+#: src/GameEngine.py:189
+msgid "Blue Fret (#4)"
+msgstr "Frette bleue (#4)"
+
+#: src/GameEngine.py:193
+msgid "Score SFX"
+msgstr "SFX sur le score"
+
+#: src/GameEngine.py:194
+msgid "GH SP Lights"
+msgstr "Lumières GH RB"
+
+#: src/GameEngine.py:195
+msgid "RB Mult Grow"
+msgstr "Effets Rock Band"
+
+#: src/GameEngine.py:196
+msgid "Board Speed"
+msgstr "Vitesse de la piste"
+
+#: src/GameEngine.py:196
+msgid "BPM"
+msgstr "BPM"
+
+#: src/GameEngine.py:196
+msgid "Difficulty"
+msgstr "Difficulté"
+
+#: src/GameEngine.py:196
+msgid "BPM & Diff"
+msgstr "BPM & Difficulté"
+
+#: src/GameEngine.py:196
+msgid "Percentage"
+msgstr "Pourcentage"
+
+#: src/GameEngine.py:197
+msgid "Loading Phrases"
+msgstr "Textes au chargement"
+
+#: src/GameEngine.py:198
+msgid "Killswitch FX"
+msgstr "Effets du vibrato"
+
+#: src/GameEngine.py:199
+msgid "Library Filepath"
+msgstr "Chemin de la bibliothèque"
+
+#: src/GameEngine.py:199
+msgid "Show"
+msgstr "Afficher"
+
+#: src/GameEngine.py:199
+msgid "Hide"
+msgstr "Cacher"
+
+# BlazingGamer 3D Notes
+#: src/GameEngine.py:200
+msgid "Rotate 3D Notes"
+msgstr "Rotation des notes 3D"
+
+#: src/GameEngine.py:200
+msgid "1.1"
+msgstr "1.1"
+
+#: src/GameEngine.py:200
+msgid "1.2"
+msgstr "1.2"
+
+#: src/GameEngine.py:201
+msgid "Phrases"
+msgstr "Phrases"
+
+#: src/GameEngine.py:202
+msgid "Song Display"
+msgstr "Affichage des chansons"
+
+#: src/GameEngine.py:202
+msgid "CDs"
+msgstr "CDs"
+
+#: src/GameEngine.py:202
+msgid "List"
+msgstr "Liste"
+
+#: src/GameEngine.py:203
+msgid "tut"
+msgstr "tut"
+
+#: src/GameEngine.py:203
+msgid "yes"
+msgstr "oui"
+
+#: src/GameEngine.py:203
+msgid "no"
+msgstr "non"
+
+#: src/GameEngine.py:206
+msgid "Note Hit-window"
+msgstr "Timing de grattage"
+
+#: src/GameEngine.py:206
+#: src/GameResultsScene.py:117
+msgid "Wide"
+msgstr "Large"
+
+#: src/GameEngine.py:206
+#: src/GameResultsScene.py:119
+msgid "Standard"
+msgstr "Standard"
+
+#: src/GameEngine.py:206
+#: src/GameResultsScene.py:121
+msgid "Tight"
+msgstr "Assez restreint"
+
+#: src/GameEngine.py:206
+#: src/GameResultsScene.py:123
+msgid "Hot Pants Tight"
+msgstr "Restreint"
+
+#: src/GameEngine.py:206
+#: src/GameResultsScene.py:125
+msgid "Tight Like a Tiger"
+msgstr "Très restreint"
+
+#: src/GameEngine.py:207
+msgid "Disable Variable BPM"
+msgstr "Désactiver la variation du tempo"
+
+#: src/GameEngine.py:208
+msgid "Sort Order"
+msgstr "Trier par"
+
+#: src/GameEngine.py:208
+msgid "Title"
+msgstr "Titre"
+
+#: src/GameEngine.py:208
+msgid "Artist"
+msgstr "Artiste"
+
+#: src/GameEngine.py:208
+msgid "Times played"
+msgstr "Nombre de fois jouées"
+
+#: src/GameEngine.py:209
+msgid "Point Of View"
+msgstr "Point de vue"
+
+#: src/GameEngine.py:209
+msgid "GH3"
+msgstr "GH3"
+
+#: src/GameEngine.py:209
+msgid "Custom"
+msgstr "Personnalisé"
+
+#: src/GameEngine.py:209
+msgid "Rock Rev"
+msgstr "Rock Rev"
+
+# SETTING MENUS
+# MFH-ALARIAN SETTINGS
+#: src/GameEngine.py:210
+msgid "Party Mode Timer"
+msgstr "Chronomètre en mode Party"
+
+#: src/GameEngine.py:211
+msgid "Disable Library Count"
+msgstr "Désactiver comptage des listes"
+
+#: src/GameEngine.py:212
+msgid "Disable Library Rotation"
+msgstr "Désactiver rotation bibliothèque"
+
+#: src/GameEngine.py:215
+msgid "Enable Jurgen"
+msgstr "Activer Jurgen"
+
+#: src/GameEngine.py:216
+msgid "Jurgen Player"
+msgstr "Joueur Jurgen"
+
+#: src/GameEngine.py:216
+msgid "1"
+msgstr "1"
+
+#: src/GameEngine.py:216
+msgid "2"
+msgstr "2"
+
+#: src/GameEngine.py:218
+msgid "Jurgen Logic"
+msgstr "Intelligence de Jurgen"
+
+#: src/GameEngine.py:218
+msgid "Original"
+msgstr "Originale"
+
+#: src/GameEngine.py:218
+msgid "MFH-Early"
+msgstr "MFH-Early"
+
+#: src/GameEngine.py:218
+msgid "MFH-OnTime1"
+msgstr "MFH-OnTime1"
+
+#: src/GameEngine.py:218
+msgid "MFH-OnTime2"
+msgstr "MFH-OnTime2"
+
+#: src/GameEngine.py:222
+msgid "Miss Volume"
+msgstr "Baisse de volume sur un raté"
+
+#: src/GameEngine.py:223
+msgid "Kill Volume"
+msgstr "Baisse de volume du vibrato"
+
+#: src/GameEngine.py:224
+msgid "SFX Volume"
+msgstr "Effets sur le volume"
+
+#: src/GameEngine.py:227
+msgid "P1 Two Key Chords Only"
+msgstr "J1: 2 notes max par accord"
+
+#: src/GameEngine.py:228
+msgid "P1 Lefty mode"
+msgstr "J1 : Mode gaucher"
+
+#: src/GameEngine.py:229
+msgid "P2 Two Key Chords Only"
+msgstr "J2: 2 notes max par accord"
+
+#: src/GameEngine.py:230
+msgid "P2 Lefty mode"
+msgstr "J2 : Mode gaucher"
+
+#: src/GameEngine.py:233
+msgid "Preload Glyph Cache"
+msgstr "Précharger cache"
+
+#: src/GameEngine.py:262
+msgid "Speed Percent"
+msgstr "Pourcentage de vitesse"
+
+#: src/GameEngine.py:263
+msgid "Failing"
+msgstr "Activer le Rockmètre"
+
+#: src/GameEngine.py:267
+msgid "Show Difficulty"
+msgstr "Afficher Difficulté"
+
+#: src/GameEngine.py:268
+msgid "Display hit% and note streak"
+msgstr "Afficher les détails du score"
+
+#: src/GameEngine.py:270
+msgid "Show Instrument"
+msgstr "Afficher instrument"
+
+#: src/GameEngine.py:348
+msgid "Frets on Fire "
+msgstr "Frets on Fire"
+
+#: src/GameEngine.py:450
+#: src/GameEngine.py:464
+msgid "Animated Stage"
+msgstr "Scène animée"
+
+#: src/GameResultsScene.py:83
+msgid "Continue"
+msgstr "Continuer"
+
+#: src/GameResultsScene.py:84
+msgid "Replay"
+msgstr "Rejouer"
+
+#: src/GameResultsScene.py:85
+msgid "Quit"
+msgstr "Quitter"
+
+# RESULTS
+#: src/GameResultsScene.py:134
+msgid "Relax, it was an excellent show."
+msgstr "Relax, c'était super."
+
+#: src/GameResultsScene.py:136
+msgid "Truly Amazing!"
+msgstr "Carrément dément !"
+
+#: src/GameResultsScene.py:138
+msgid "Thanks for playing!"
+msgstr "Merci d'avoir joué !"
+
+#: src/GameResultsScene.py:140
+msgid "One more song can't hurt, can it?"
+msgstr "Une chanson de plus ne peut pas faire de mal, n'est-ce pas ?"
+
+#: src/GameResultsScene.py:142
+msgid "What an amazing performance!"
+msgstr "Quel show !"
+
+#: src/GameResultsScene.py:144
+msgid "That's how it's done!"
+msgstr "Voilà comment on fait !"
+
+#: src/GameResultsScene.py:162
+msgid "No highscores for cheaters!"
+msgstr "Pas de records pour les tricheurs !"
+
+#: src/GameResultsScene.py:164
+msgid "No highscore"
+msgstr "Pas de records"
+
+#: src/GameResultsScene.py:167
+#, python-format
+msgid "%d points is a new high score! Enter your name"
+msgstr "%d points ! Nouveau record ! Entrez votre nom :"
+
+#: src/GameResultsScene.py:359
+#, python-format
+msgid "%s High Scores for %s"
+msgstr "%s Records pour %s"
+
+#: src/GameResultsScene.py:361
+#, python-format
+msgid "%s High Scores"
+msgstr "%s Records"
+
+#: src/GameResultsScene.py:367
+#, python-format
+msgid "Difficulty: %s"
+msgstr "Difficulté : %s"
+
+#: src/GameResultsScene.py:429
+msgid "Uploading Scores..."
+msgstr "Envoi des scores..."
+
+#: src/GameResultsScene.py:434
+msgid "Scores uploaded!"
+msgstr "Scores envoyés !"
+
+#: src/GameResultsScene.py:439
+msgid "your highscore ranks"
+msgstr "classement :"
+
+#: src/GameResultsScene.py:440
+msgid "on the world starpower chart!"
+msgstr "mondial pour cette chanson et difficulté !"
+
+#: src/GameResultsScene.py:443
+msgid "unknown rank."
+msgstr "classement inconnu"
+
+#: src/GameResultsScene.py:446
+msgid "no new highscore."
+msgstr "Pas de nouveau record"
+
+#: src/GameResultsScene.py:450
+msgid "Score upload failed!  World charts may be down."
+msgstr "L'envoi des scores a échoué. Le serveur est peut-être indisponible."
+
+#: src/GameResultsScene.py:461
+#, python-format
+msgid "%s Cheated!"
+msgstr "%s Triché !"
+
+#: src/GameResultsScene.py:463
+#, python-format
+msgid "%s Finished!"
+msgstr "%s Terminée !"
+
+#: src/GameResultsScene.py:467
+#, python-format
+msgid "%d notes hit"
+msgstr "%d notes réussies"
+
+#: src/GameResultsScene.py:507
+#, python-format
+msgid "Accuracy: %.1f%%"
+msgstr "Précision: %.1f%%"
+
+#: src/GameResultsScene.py:510
+#, python-format
+msgid "Longest note streak: %d"
+msgstr "Plus long enchaînement : %d"
+
+#: src/GameResultsScene.py:514
+#, python-format
+msgid "Part: %s on %s (2 chord)"
+msgstr "Partie : %s en %s (2 notes/accord)"
+
+#: src/GameResultsScene.py:516
+#, python-format
+msgid "Part: %s on %s"
+msgstr "Partie : %s en %s"
+
+#: src/GameTask.py:74
+msgid "Connection lost."
+msgstr "Connexion perdue."
+
+#: src/GuitarScene.py:84
+msgid "Preparing..."
+msgstr "Chargement..."
+
+# PAUSE MENUS
+#: src/GuitarScene.py:1077
+#: src/GuitarScene.py:1086
+msgid "        RESUME"
+msgstr "        REPRENDRE"
+
+#: src/GuitarScene.py:1078
+#: src/GuitarScene.py:1087
+msgid "       RESTART"
+msgstr "       RECOMMENCER"
+
+#: src/GuitarScene.py:1079
+#: src/GuitarScene.py:1088
+msgid "        GIVE UP"
+msgstr "        ARRETER"
+
+#: src/GuitarScene.py:1080
+msgid "       PRACTICE"
+msgstr "       ENTRAINEMENT"
+
+#: src/GuitarScene.py:1081
+#: src/GuitarScene.py:1090
+msgid "       OPTIONS"
+msgstr "      OPTIONS"
+
+#: src/GuitarScene.py:1082
+#: src/GuitarScene.py:1091
+msgid "           QUIT"
+msgstr "           QUITTER"
+
+#: src/GuitarScene.py:1089
+msgid "      END SONG"
+msgstr "      TERMINER"
+
+#: src/GuitarScene.py:1096
+#: src/GuitarScene.py:1103
+msgid "RETRY SONG"
+msgstr " REESSAYER"
+
+#: src/GuitarScene.py:1097
+msgid "  PRACTICE"
+msgstr "ENTRAINEMENT"
+
+#: src/GuitarScene.py:1098
+#: src/GuitarScene.py:1104
+msgid " NEW SONG"
+msgstr "NOUVELLE CHANSON"
+
+#: src/GuitarScene.py:1099
+#: src/GuitarScene.py:1105
+msgid "     QUIT"
+msgstr "   QUITTER"
+
+#: src/GuitarScene.py:1112
+#: src/GuitarScene.py:1121
+msgid "  Resume"
+msgstr "Reprendre"
+
+#: src/GuitarScene.py:1113
+#: src/GuitarScene.py:1122
+msgid "  Start Over"
+msgstr "Recommencer"
+
+#: src/GuitarScene.py:1114
+#: src/GuitarScene.py:1123
+msgid "  Change Song"
+msgstr "Changer de chanson"
+
+#: src/GuitarScene.py:1115
+msgid "  Practice"
+msgstr "Entraînement"
+
+#: src/GuitarScene.py:1116
+#: src/GuitarScene.py:1125
+msgid "  Settings"
+msgstr "Options"
+
+#: src/GuitarScene.py:1117
+#: src/GuitarScene.py:1126
+msgid "  Quit to Main Menu"
+msgstr "Retour au menu principal"
+
+#: src/GuitarScene.py:1124
+msgid "  End Song"
+msgstr "Terminer la chanson"
+
+#: src/GuitarScene.py:1131
+#: src/GuitarScene.py:1138
+msgid " Try Again?"
+msgstr "Réessayer"
+
+#: src/GuitarScene.py:1132
+#: src/GuitarScene.py:1139
+msgid "  Give Up?"
+msgstr "Arrêter"
+
+#: src/GuitarScene.py:1133
+msgid "  Practice?"
+msgstr "Entrainement"
+
+#: src/GuitarScene.py:1134
+#: src/GuitarScene.py:1140
+msgid "Quit to Main"
+msgstr "Menu principal"
+
+# PAUSE MENUS
+#: src/GuitarScene.py:1148
+#: src/GuitarScene.py:1157
+msgid "   RESUME"
+msgstr "   REPRENDRE"
+
+#: src/GuitarScene.py:1149
+#: src/GuitarScene.py:1158
+msgid "   RESTART"
+msgstr "   RECOMMENCER"
+
+#: src/GuitarScene.py:1150
+#: src/GuitarScene.py:1159
+msgid "   CHANGE SONG"
+msgstr "   CHANGER DE CHANSON"
+
+#: src/GuitarScene.py:1151
+msgid "   PRACTICE"
+msgstr "   ENTRAINEMENT"
+
+#: src/GuitarScene.py:1152
+#: src/GuitarScene.py:1161
+msgid "   SETTINGS"
+msgstr "   OPTIONS"
+
+#: src/GuitarScene.py:1153
+#: src/GuitarScene.py:1162
+msgid "   QUIT"
+msgstr "   QUITTER"
+
+#: src/GuitarScene.py:1160
+msgid "   END SONG"
+msgstr "   TERMINER"
+
+# FAIL MENUS
+#: src/GuitarScene.py:1167
+#: src/GuitarScene.py:1174
+msgid " TRY AGAIN?"
+msgstr " REESSAYER"
+
+#: src/GuitarScene.py:1168
+#: src/GuitarScene.py:1175
+msgid " GIVE UP?"
+msgstr " ARRETER"
+
+#: src/GuitarScene.py:1169
+msgid " PRACTICE?"
+msgstr " ENTRAINEMENT"
+
+#: src/GuitarScene.py:1170
+#: src/GuitarScene.py:1176
+msgid " QUIT"
+msgstr " QUITTER"
+
+#: src/GuitarScene.py:1712
+msgid "50 Note Streak!!!"
+msgstr "50 notes d'affilée"
+
+#: src/GuitarScene.py:1720
+#, python-format
+msgid "%d Note Streak!!!"
+msgstr "%d notes d'affilée"
+
+#: src/GuitarScene.py:2057
+msgid "Star Power Ready"
+msgstr "Utilise ton StarPower !"
+
+#: src/GuitarScene.py:2061
+msgid "Overdrive Ready"
+msgstr "Utilise ton Overdrive !"
+
+#: src/GuitarScene.py:2203
+msgid "You Failed!!!!"
+msgstr "Echec !"
+
+#: src/GuitarScene.py:3970
+#: src/GuitarScene.py:3981
+#: src/GuitarScene.py:3993
+msgid "Jurgen is here"
+msgstr "Jurgen est dans la salle"
+
+#: src/GuitarScene.py:3972
+#: src/GuitarScene.py:3974
+#: src/GuitarScene.py:3983
+#: src/GuitarScene.py:3985
+#: src/GuitarScene.py:3995
+#: src/GuitarScene.py:3997
+msgid "Jurgen was here"
+msgstr "Jurgen est parti"
+
+#: src/GuitarScene.py:4320
+#: src/GuitarScene.py:5323
+msgid "% Complete"
+msgstr "% réussis"
+
+#: src/GuitarScene.py:4327
+#: src/GuitarScene.py:4902
+#: src/GuitarScene.py:5332
+msgid "HOPO"
+msgstr "HOPO"
+
+#: src/GuitarScene.py:4872
+#: src/GuitarScene.py:4881
+msgid "COMPLETED"
+msgstr "TERMINEE"
+
+#: src/GuitarScene.py:4874
+#: src/GuitarScene.py:4890
+msgid " % ON "
+msgstr " % EN "
+
+#: src/GuitarScene.py:5161
+msgid "BASS GROOVE"
+msgstr "BASS GROOVE"
+
+#: src/GuitarScene.py:5190
+msgid "Bass Groove:"
+msgstr "Bass Groove:"
+
+#: src/GuitarScene.py:5542
+msgid "Avg"
+msgstr "Moyenne"
+
+#: src/GuitarScene.py:5600
+msgid "Very Late"
+msgstr "Trop tard"
+
+#: src/GuitarScene.py:5603
+msgid "Late"
+msgstr "Tard"
+
+#: src/GuitarScene.py:5606
+msgid "Slightly Late"
+msgstr "Un peu tard"
+
+#: src/GuitarScene.py:5609
+msgid "-Excellent!"
+msgstr "-Excellent !"
+
+#: src/GuitarScene.py:5613
+msgid "Perfect!!"
+msgstr "Parfait !"
+
+#: src/GuitarScene.py:5616
+msgid "+Excellent!"
+msgstr "+Excellent !"
+
+#: src/GuitarScene.py:5619
+msgid "Slightly Early"
+msgstr "Un peu tôt"
+
+#: src/GuitarScene.py:5622
+msgid "Early"
+msgstr "Tôt"
+
+#: src/GuitarScene.py:5625
+msgid "Very Early"
+msgstr "Trop tôt"
+
+#: src/GuitarScene.py:5630
+#: src/GuitarScene.py:5665
+msgid "ms"
+msgstr "ms"
+
+#: src/GuitarScene.py:5765
+msgid "Guitar Solo!"
+msgstr "Solo de guitare !"
+
+#: src/GuitarScene.py:5783
+msgid "Perfect Solo!"
+msgstr "Solo parfait !"
+
+#: src/GuitarScene.py:5787
+msgid "Awesome Solo!"
+msgstr "Super solo !"
+
+#: src/GuitarScene.py:5791
+msgid "Great Solo!"
+msgstr "Solo fantastique !"
+
+#: src/GuitarScene.py:5795
+msgid "Good Solo!"
+msgstr "Bon solo !"
+
+#: src/GuitarScene.py:5798
+msgid "Solid Solo!"
+msgstr "Solo moyen !"
+
+#: src/GuitarScene.py:5801
+msgid "Okay Solo!"
+msgstr "Solo acceptable !"
+
+#: src/GuitarScene.py:5804
+msgid "Messy Solo!"
+msgstr "Mauvais solo !"
+
+#: src/GuitarScene.py:5811
+msgid "pts"
+msgstr "pts"
+
+# IN-GAME
+#: src/GuitarScene.py:5888
+msgid "Get Ready to Rock"
+msgstr "Prépare toi à rocker !"
+
+#: src/GuitarScene.py:5909
+msgid "as made famous by"
+msgstr "interprétée par :"
+
+#: src/GuitarScene.py:5914
+msgid "by "
+msgstr "par "
+
+#: src/GuitarScene.py:5921
+msgid " fretted by "
+msgstr " frettée par "
+
+#: src/Language.py:60
+msgid "Language"
+msgstr "Langue"
+
+#: src/Lobby.py:54
+msgid "Player"
+msgstr "Joueur"
+
+#: src/Lobby.py:55
+msgid "Player2"
+msgstr "Joueur 2"
+
+#: src/Lobby.py:63
+msgid "Enter your name:"
+msgstr "Entrez votre nom :"
+
+#: src/Lobby.py:63
+#, python-format
+msgid "Player #%d"
+msgstr "Joueur #%d"
+
+#: src/Lobby.py:114
+#, python-format
+msgid "Lobby (%d players)"
+msgstr "Salle (%d joueurs)"
+
+#: src/Lobby.py:143
+msgid "Press Enter to Start Game"
+msgstr "Appuyez sur Entrée pour démarrer le jeu"
+
+#: src/MainMenu.py:211
+msgid "Host Multiplayer Game"
+msgstr "Héberger une partie multijoueur"
+
+#: src/MainMenu.py:212
+msgid "Join Multiplayer Game"
+msgstr "Rejoindre une partie multijoueur"
+
+# EDITOR
+#: src/MainMenu.py:216
+msgid "Edit Existing Song"
+msgstr "Éditer une chanson existante"
+
+#: src/MainMenu.py:217
+msgid "Import New Song"
+msgstr "Importer une nouvelle chanson"
+
+#: src/MainMenu.py:218
+msgid "Import GH(tm) Songs"
+msgstr "Importer des chansons de Guitar Hero (tm)"
+
+#: src/MainMenu.py:222
+msgid "Tutorials"
+msgstr "Tutoriels"
+
+#: src/MainMenu.py:227
+msgid "Face-Off"
+msgstr "Duel"
+
+#: src/MainMenu.py:228
+msgid "Pro Face-Off"
+msgstr "Duel Pro"
+
+#: src/MainMenu.py:229
+msgid "Party Mode"
+msgstr "Mode Party"
+
+#: src/MainMenu.py:268
+msgid "Solo Tour"
+msgstr "Solo Tour"
+
+#: src/MainMenu.py:337
+msgid "No tutorials found!"
+msgstr "Tutoriels introuvables !"
+
+# MULTIPLAYER
+#: src/MainMenu.py:392
+msgid "Enter the server address:"
+msgstr "Entrez l'adresse du serveur :"
+
+#: src/MainMenu.py:399
+msgid "Connecting..."
+msgstr "Connection ..."
+
+# P1 KEY SETTINGS
+#: src/Player.py:112
+msgid "P1 Move left"
+msgstr "J1 : Se déplacer à gauche"
+
+#: src/Player.py:113
+msgid "P1 Move right"
+msgstr "J1 : Se déplacer à droite"
+
+#: src/Player.py:114
+msgid "P1 Move up"
+msgstr "J1 : Se déplacer en haut"
+
+#: src/Player.py:115
+msgid "P1 Move down"
+msgstr "J1 : Se déplacer en bas"
+
+#: src/Player.py:116
+msgid "P1 Pick"
+msgstr "J1 : Gratter (bas)"
+
+#: src/Player.py:117
+msgid "P1 Secondary Pick"
+msgstr "J1 : Gratter (haut)"
+
+#: src/Player.py:118
+msgid "P1 Fret #1"
+msgstr "J1 : Frette verte #1"
+
+#: src/Player.py:119
+msgid "P1 Fret #2"
+msgstr "J1 : Frette rouge #2"
+
+#: src/Player.py:120
+msgid "P1 Fret #3"
+msgstr "J1 : Frette jaune (#3)"
+
+#: src/Player.py:121
+msgid "P1 Fret #4"
+msgstr "J1 : Frette bleue (#4)"
+
+#: src/Player.py:122
+msgid "P1 Fret #5"
+msgstr "J1 : Frette orange #5"
+
+#: src/Player.py:123
+msgid "P1 Cancel"
+msgstr "J1 : Annuler"
+
+#: src/Player.py:124
+msgid "P1 StarPower"
+msgstr "J1: StarPower"
+
+#: src/Player.py:125
+msgid "P1 Killswitch"
+msgstr "J1 : Vibrato"
+
+#: src/Player.py:126
+msgid "Alt P1 Move left"
+msgstr "J1 : Se déplacer à gauche (alternatif)"
+
+#: src/Player.py:127
+msgid "Alt P1 Move right"
+msgstr "J1 : Se déplacer à droite (alternatif)"
+
+#: src/Player.py:128
+msgid "Alt P1 Move up"
+msgstr "J1 : Se déplacer en haut (alternatif)"
+
+#: src/Player.py:129
+msgid "Alt P1 Move down"
+msgstr "J1 : Se déplacer en bas (alternatif)"
+
+#: src/Player.py:130
+msgid "Alt P1 Pick"
+msgstr "J1 : Médiator (haut)"
+
+#: src/Player.py:131
+msgid "Alt P1 Secondary Pick"
+msgstr "J1 : Gratter (haut)  (alternatif)"
+
+#: src/Player.py:132
+msgid "Alt P1 Fret #1"
+msgstr "J1 : Frette verte #1 (alternatif)"
+
+#: src/Player.py:133
+msgid "Alt P1 Fret #2"
+msgstr "J1 : Frette rouge #2 (alternatif)"
+
+#: src/Player.py:134
+msgid "Alt P1 Fret #3"
+msgstr "J1 : Frette jaune #3 (alternatif)"
+
+#: src/Player.py:135
+msgid "Alt P1 Fret #4"
+msgstr "J1 : Frette bleue (#4) (alternatif)"
+
+#: src/Player.py:136
+msgid "Alt P1 Fret #5"
+msgstr "J1 : Frette orange #5 (alternatif)"
+
+#: src/Player.py:137
+msgid "Alt P1 Cancel"
+msgstr "J1 : Annuler (alternatif)"
+
+#: src/Player.py:138
+msgid "Alt P1 StarPower"
+msgstr "J1 : StarPower (alternatif)"
+
+#: src/Player.py:139
+msgid "Alt P1 Killswitch"
+msgstr "J1 : Vibrato (alternatif)"
+
+# P2 KEY SETTINGS
+#: src/Player.py:146
+msgid "P2 Move left"
+msgstr "J2 : Se déplacer à gauche"
+
+#: src/Player.py:147
+msgid "P2 Move right"
+msgstr "J2 : Se déplacer à droite"
+
+#: src/Player.py:148
+msgid "P2 Move up"
+msgstr "J2 : Se déplacer en haut"
+
+#: src/Player.py:149
+msgid "P2 Move down"
+msgstr "J2 : Se déplacer en bas"
+
+#: src/Player.py:150
+msgid "P2 Pick"
+msgstr "J2 : Gratter (bas)"
+
+#: src/Player.py:151
+msgid "P2 Secondary Pick"
+msgstr "J2 : Gratter (haut)"
+
+#: src/Player.py:152
+msgid "P2 Fret #1"
+msgstr "J2 : Frette verte #1"
+
+#: src/Player.py:153
+msgid "P2 Fret #2"
+msgstr "J2 : Frette rouge #2"
+
+#: src/Player.py:154
+msgid "P2 Fret #3"
+msgstr "J2 : Frette jaune (#3)"
+
+#: src/Player.py:155
+msgid "P2 Fret #4"
+msgstr "J2 : Frette bleue (#4)"
+
+#: src/Player.py:156
+msgid "P2 Fret #5"
+msgstr "J2 : Frette orange #5"
+
+#: src/Player.py:157
+msgid "P2 Cancel"
+msgstr "J2 : Annuler"
+
+#: src/Player.py:158
+msgid "P2 StarPower"
+msgstr "J2 : StarPower"
+
+#: src/Player.py:159
+msgid "P2 Killswitch"
+msgstr "J2 : Vibrato"
+
+#: src/Player.py:161
+msgid "Alt P2 Move left"
+msgstr "J2 : Se déplacer à gauche (alternatif)"
+
+#: src/Player.py:162
+msgid "Alt P2 Move right"
+msgstr "J2 : Se déplacer à droite (alternatif)"
+
+#: src/Player.py:163
+msgid "Alt P2 Move up"
+msgstr "J2: Se déplacer en haut (alternatif)"
+
+#: src/Player.py:164
+msgid "Alt P2 Move down"
+msgstr "J2 : Se déplacer en bas (alternatif)"
+
+#: src/Player.py:165
+msgid "Alt P2 Pick"
+msgstr "J2 : Médiator (haut)"
+
+#: src/Player.py:166
+msgid "Alt P2 Secondary Pick"
+msgstr "J2 : Gratter (haut) (alternatif)"
+
+#: src/Player.py:167
+msgid "Alt P2 Fret #1"
+msgstr "J2 : Frette verte #1 (alternatif)"
+
+#: src/Player.py:168
+msgid "Alt P2 Fret #2"
+msgstr "J2 : Frette rouge #2 (alternatif)"
+
+#: src/Player.py:169
+msgid "Alt P2 Fret #3"
+msgstr "J2 : Frette jaune #3 (alternatif)"
+
+#: src/Player.py:170
+msgid "Alt P2 Fret #4"
+msgstr "J2 : Frette bleue #4 (alternatif)"
+
+#: src/Player.py:171
+msgid "Alt P2 Fret #5"
+msgstr "J2 : Frette orange #5 (alternatif)"
+
+#: src/Player.py:172
+msgid "Alt P2 Cancel"
+msgstr "J2 : Annuler (alternatif)"
+
+#: src/Player.py:173
+msgid "Alt P2 StarPower"
+msgstr "J2 : StarPower (alternatif)"
+
+#: src/Player.py:174
+msgid "Alt P2 Killswitch"
+msgstr "J2 : Vibrato (alternatif)"
+
+#: src/Player.py:177
+msgid "Bass drum"
+msgstr "Grosse caisse"
+
+#: src/Player.py:178
+#: src/Player.py:182
+msgid "Drum #1"
+msgstr "Tom #1"
+
+#: src/Player.py:179
+#: src/Player.py:183
+msgid "Drum #2"
+msgstr "Tom #2"
+
+#: src/Player.py:180
+#: src/Player.py:184
+msgid "Drum #3"
+msgstr "Tom #3"
+
+#: src/Player.py:181
+#: src/Player.py:185
+msgid "Drum #4"
+msgstr "Tom #4"
+
+#: src/Player.py:186
+msgid "Player 2 Bass drum"
+msgstr "J2 : Grosse caisse"
+
+#: src/Player.py:187
+#: src/Player.py:191
+msgid "Player 2 Drum #1"
+msgstr "J2 : Tom #1"
+
+#: src/Player.py:188
+#: src/Player.py:192
+msgid "Player 2 Drum #2"
+msgstr "J2 : Tom #2"
+
+#: src/Player.py:189
+#: src/Player.py:193
+msgid "Player 2 Drum #3"
+msgstr "J2 : Tom #3"
+
+#: src/Player.py:190
+#: src/Player.py:194
+msgid "Player 2 Drum #4"
+msgstr "J2 : Tom #4"
+
+#: src/Settings.py:142
+#, python-format
+msgid "Press a key for '%s' or Escape to cancel."
+msgstr "Appuyez sur une touche pour '%s' ou Echap pour annuler."
+
+#: src/Settings.py:152
+msgid "That key is already in use. Please choose another."
+msgstr "Cette touche est déjà utilisée. Veuillez en choisir une autre."
+
+#: src/Settings.py:159
+msgid "A key conflict exists somewhere. You should fix it."
+msgstr "Il y a un conflit entre deux touches. Vous devriez le régler."
+
+#: src/Settings.py:181
+#: src/Settings.py:513
+msgid "Apply New Settings"
+msgstr "Appliquer les nouveaux réglages"
+
+#: src/Settings.py:221
+msgid "Stages Options"
+msgstr "Options des scènes"
+
+#: src/Settings.py:222
+msgid "HO/PO Settings"
+msgstr "Options HO/PO"
+
+# KEY SETTINGS
+#: src/Settings.py:223
+msgid "Lyrics Settings"
+msgstr "Paroles"
+
+#: src/Settings.py:224
+msgid "Jurgen Settings"
+msgstr "Jurgen"
+
+#: src/Settings.py:243
+#: src/Settings.py:359
+msgid "Test Keys"
+msgstr "Essayer les touches"
+
+#: src/Settings.py:354
+msgid "Player 1 Keys"
+msgstr "Joueur 1: Touches"
+
+#: src/Settings.py:355
+msgid "Player 1 Alt. Keys"
+msgstr "Joueur 1: Touches alternatives"
+
+#: src/Settings.py:356
+msgid "Player 2 Keys"
+msgstr "Joueur 2: Touches"
+
+#: src/Settings.py:357
+msgid "Player 2 Alt. Keys"
+msgstr "Joueur 2: Touches alternatives"
+
+#: src/Settings.py:358
+msgid "Drum keys"
+msgstr "Touches de batterie"
+
+#: src/Settings.py:360
+msgid "Advanced controls"
+msgstr "Contrôles avancés"
+
+#: src/Settings.py:379
+msgid "Video Resolution"
+msgstr "Résolution vidéo"
+
+# CHOOSE NECK MENU
+#: src/Settings.py:388
+msgid "Choose Neck >"
+msgstr "Choisir une piste >"
+
+#: src/Settings.py:388
+msgid "Yellow (#3) / Blue (#4) to change:"
+msgstr "Jaune (#3) / Bleu (#4) pour changer :"
+
+# AUDIO SETTINGS
+#: src/Settings.py:389
+msgid "Advanced Video Settings"
+msgstr "Options vidéo avancées"
+
+#: src/Settings.py:435
+msgid "Volume Settings"
+msgstr "Options du volume"
+
+# AUDIO SETTINGS
+#: src/Settings.py:436
+msgid "Advanced Audio Settings"
+msgstr "Options audio avancées"
+
+#: src/Settings.py:459
+msgid "Debug Settings"
+msgstr "Options de débug"
+
+#: src/Settings.py:472
+msgid "Select Song Library >"
+msgstr "Choix de la bibliothèque >"
+
+# AUDIO SETTINGS
+#: src/Settings.py:479
+msgid "Advanced Libary Settings"
+msgstr "Options avancées de la bibliothèque"
+
+# PERFORMANCE SETTINGS
+#: src/Settings.py:497
+msgid "FoFix Advanced Settings"
+msgstr "Options avancées de FoFiX"
+
+# THEME SETTINGS
+#: src/Settings.py:498
+msgid "Theme Settings"
+msgstr "Options du thème"
+
+# FRETBOARD SETTINGS
+#: src/Settings.py:499
+msgid "Fretboard Settings"
+msgstr "Options de la piste"
+
+#: src/Settings.py:504
+msgid " Basics Settings"
+msgstr " options de base"
+
+#: src/Settings.py:505
+msgid "Controls"
+msgstr "Contrôles"
+
+#: src/Settings.py:506
+msgid "Library"
+msgstr "Bibliothèque"
+
+#: src/Settings.py:507
+msgid "Audio"
+msgstr "Audio"
+
+#: src/Settings.py:508
+msgid "Video"
+msgstr "Vidéo"
+
+# PERFORMANCE SETTINGS
+#: src/Settings.py:509
+msgid "Performances/Debug"
+msgstr "Performances/Debug"
+
+# AUDIO SETTINGS
+#: src/Settings.py:510
+msgid "Advanced Settings"
+msgstr "Options avancées"
+
+# MOD SETTINGS
+#: src/Settings.py:511
+msgid "Mod settings"
+msgstr "Options des mods"
+
+# CREDITS
+#: src/Settings.py:512
+msgid "Credits"
+msgstr "Crédits"
+
+#: src/Settings.py:579
+#: src/SongChoosingScene.py:171
+msgid "Choose a new songs directory."
+msgstr "Choisissez un nouveau répertoire pour les chansons."
+
+#: src/Song.py:140
+msgid "NoName"
+msgstr "Aucun"
+
+#: src/Song.py:676
+msgid "This song is locked."
+msgstr "Cette chanson est verrouillée"
+
+#: src/Song.py:886
+msgid "Reset Career"
+msgstr "Remettre à zéro la carrière"
+
+# DETAILED SELECTION
+#: src/SongChoosingScene.py:218
+msgid "Start Section:"
+msgstr "Choix de la section :"
+
+#: src/SongChoosingScene.py:245
+msgid "Player 1 Choose a part:"
+msgstr "Joueur 1, choisissez un instrument :"
+
+#: src/SongChoosingScene.py:257
+msgid "Player 1 Choose a difficulty:"
+msgstr "Joueur 1, choisissez une difficulté :"
+
+#: src/SongChoosingScene.py:270
+msgid "Player 2 Choose a part:"
+msgstr "Joueur 2, choisissez un instrument :"
+
+#: src/SongChoosingScene.py:294
+msgid "Player 2 Choose a difficulty:"
+msgstr "Joueur 2, choisissez une difficulté :"
+
