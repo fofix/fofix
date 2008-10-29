@@ -2068,6 +2068,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
         missedNotes = guitar.getMissedNotesMFH(self.song, pos)
         if missedNotes:
+          if guitar.isDrum:
+            self.drumStart = True
           self.lessMissed[i] = True  #QQstarS:Set [0] to [i]
           for tym, theNote in missedNotes:  #MFH
             if theNote.star or theNote.finalStar:
@@ -2323,6 +2325,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     self.killswitchEngaged[num] = False   #always reset killswitch status when picking / tapping
     if self.guitars[num].startPick(self.song, pos, self.controls):
+      if self.guitars[num].isDrum:
+        self.drumStart = True
       self.song.setInstrumentVolume(self.guitarVolume, self.playerList[num].part)
       self.currentlyAnimating = True
       self.playerList[num].streak += 1
@@ -2351,7 +2355,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.currentlyAnimating = False
       self.stage.triggerMiss(pos)
       self.guitarSoloBroken[num] = True
-      
 
       self.notesMissed[num] = True #QQstarS:Set [0] to [i]
       for tym, theNote in self.guitars[num].matchingNotes:  #MFH
