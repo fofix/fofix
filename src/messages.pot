@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-10-28 23:58-0700\n"
+"POT-Creation-Date: 2008-10-29 09:09-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -464,7 +464,7 @@ msgid "Antialiasing Quality"
 msgstr ""
 
 #: GameEngine.py:65 GameEngine.py:117 GameEngine.py:151 GameEngine.py:470
-#: GameResultsScene.py:106 GuitarScene.py:510
+#: GameResultsScene.py:112 GuitarScene.py:510
 msgid "None"
 msgstr ""
 
@@ -675,19 +675,19 @@ msgstr ""
 msgid "HO/PO System"
 msgstr ""
 
-#: GameEngine.py:117 GameResultsScene.py:108
+#: GameEngine.py:117 GameResultsScene.py:114
 msgid "RF-Mod"
 msgstr ""
 
-#: GameEngine.py:117 GameResultsScene.py:110
+#: GameEngine.py:117 GameResultsScene.py:116
 msgid "GH2 Strict"
 msgstr ""
 
-#: GameEngine.py:117 GameResultsScene.py:112
+#: GameEngine.py:117 GameResultsScene.py:118
 msgid "GH2 Sloppy"
 msgstr ""
 
-#: GameEngine.py:117 GameEngine.py:215 GameResultsScene.py:114
+#: GameEngine.py:117 GameEngine.py:215 GameResultsScene.py:120
 msgid "GH2"
 msgstr ""
 
@@ -1230,23 +1230,23 @@ msgstr ""
 msgid "Note Hit-window"
 msgstr ""
 
-#: GameEngine.py:212 GameResultsScene.py:117
+#: GameEngine.py:212 GameResultsScene.py:123
 msgid "Wide"
 msgstr ""
 
-#: GameEngine.py:212 GameResultsScene.py:119
+#: GameEngine.py:212 GameResultsScene.py:125
 msgid "Standard"
 msgstr ""
 
-#: GameEngine.py:212 GameResultsScene.py:121
+#: GameEngine.py:212 GameResultsScene.py:127
 msgid "Tight"
 msgstr ""
 
-#: GameEngine.py:212 GameResultsScene.py:123
+#: GameEngine.py:212 GameResultsScene.py:129
 msgid "Hot Pants Tight"
 msgstr ""
 
-#: GameEngine.py:212 GameResultsScene.py:125
+#: GameEngine.py:212 GameResultsScene.py:131
 msgid "Tight Like a Tiger"
 msgstr ""
 
@@ -1406,117 +1406,117 @@ msgstr ""
 msgid "Quit"
 msgstr ""
 
-#: GameResultsScene.py:134
+#: GameResultsScene.py:140
 msgid "Relax, it was an excellent show."
 msgstr ""
 
-#: GameResultsScene.py:136
+#: GameResultsScene.py:142
 msgid "Truly Amazing!"
 msgstr ""
 
-#: GameResultsScene.py:138
+#: GameResultsScene.py:144
 msgid "Thanks for playing!"
 msgstr ""
 
-#: GameResultsScene.py:140
+#: GameResultsScene.py:146
 msgid "One more song can't hurt, can it?"
 msgstr ""
 
-#: GameResultsScene.py:142
+#: GameResultsScene.py:148
 msgid "What an amazing performance!"
 msgstr ""
 
-#: GameResultsScene.py:144
+#: GameResultsScene.py:150
 msgid "That's how it's done!"
 msgstr ""
 
-#: GameResultsScene.py:162
+#: GameResultsScene.py:168
 msgid "No highscores for cheaters!"
 msgstr ""
 
-#: GameResultsScene.py:164
+#: GameResultsScene.py:170
 msgid "No highscore"
 msgstr ""
 
-#: GameResultsScene.py:167
+#: GameResultsScene.py:173
 #, python-format
 msgid "%d points is a new high score! Enter your name"
 msgstr ""
 
-#: GameResultsScene.py:359
+#: GameResultsScene.py:365
 #, python-format
 msgid "%s High Scores for %s"
 msgstr ""
 
-#: GameResultsScene.py:361
+#: GameResultsScene.py:367
 #, python-format
 msgid "%s High Scores"
 msgstr ""
 
-#: GameResultsScene.py:367
+#: GameResultsScene.py:373
 #, python-format
 msgid "Difficulty: %s"
 msgstr ""
 
-#: GameResultsScene.py:429
+#: GameResultsScene.py:435
 msgid "Uploading Scores..."
 msgstr ""
 
-#: GameResultsScene.py:434
+#: GameResultsScene.py:440
 msgid "Scores uploaded!"
 msgstr ""
 
-#: GameResultsScene.py:439
+#: GameResultsScene.py:445
 msgid "your highscore ranks"
 msgstr ""
 
-#: GameResultsScene.py:440
+#: GameResultsScene.py:446
 msgid "on the world starpower chart!"
 msgstr ""
 
-#: GameResultsScene.py:443
+#: GameResultsScene.py:449
 msgid "unknown rank."
 msgstr ""
 
-#: GameResultsScene.py:446
+#: GameResultsScene.py:452
 msgid "no new highscore."
 msgstr ""
 
-#: GameResultsScene.py:450
+#: GameResultsScene.py:456
 msgid "Score upload failed!  World charts may be down."
-msgstr ""
-
-#: GameResultsScene.py:461
-#, python-format
-msgid "%s Cheated!"
-msgstr ""
-
-#: GameResultsScene.py:463
-#, python-format
-msgid "%s Finished!"
 msgstr ""
 
 #: GameResultsScene.py:467
 #, python-format
+msgid "%s Cheated!"
+msgstr ""
+
+#: GameResultsScene.py:469
+#, python-format
+msgid "%s Finished!"
+msgstr ""
+
+#: GameResultsScene.py:473
+#, python-format
 msgid "%d notes hit"
 msgstr ""
 
-#: GameResultsScene.py:507
+#: GameResultsScene.py:513
 #, python-format
 msgid "Accuracy: %.1f%%"
 msgstr ""
 
-#: GameResultsScene.py:510
+#: GameResultsScene.py:516
 #, python-format
 msgid "Longest note streak: %d"
 msgstr ""
 
-#: GameResultsScene.py:514
+#: GameResultsScene.py:520
 #, python-format
 msgid "Part: %s on %s (2 chord)"
 msgstr ""
 
-#: GameResultsScene.py:516
+#: GameResultsScene.py:522
 #, python-format
 msgid "Part: %s on %s"
 msgstr ""
@@ -1691,123 +1691,123 @@ msgstr ""
 msgid "Jurgen was here"
 msgstr ""
 
-#: GuitarScene.py:4341 GuitarScene.py:5344
+#: GuitarScene.py:4342 GuitarScene.py:5349
 msgid "% Complete"
 msgstr ""
 
-#: GuitarScene.py:4348 GuitarScene.py:4923 GuitarScene.py:5353
+#: GuitarScene.py:4349 GuitarScene.py:4926 GuitarScene.py:5358
 msgid "HOPO"
 msgstr ""
 
-#: GuitarScene.py:4893 GuitarScene.py:4902
+#: GuitarScene.py:4896 GuitarScene.py:4905
 msgid "COMPLETED"
 msgstr ""
 
-#: GuitarScene.py:4895 GuitarScene.py:4911
+#: GuitarScene.py:4898 GuitarScene.py:4914
 msgid " % ON "
 msgstr ""
 
-#: GuitarScene.py:5182
+#: GuitarScene.py:5185
 msgid "BASS GROOVE"
 msgstr ""
 
-#: GuitarScene.py:5211
+#: GuitarScene.py:5214
 msgid "Bass Groove:"
 msgstr ""
 
-#: GuitarScene.py:5563
+#: GuitarScene.py:5568
 msgid "Avg"
 msgstr ""
 
-#: GuitarScene.py:5621
+#: GuitarScene.py:5626
 msgid "Very Late"
 msgstr ""
 
-#: GuitarScene.py:5624
+#: GuitarScene.py:5629
 msgid "Late"
 msgstr ""
 
-#: GuitarScene.py:5627
+#: GuitarScene.py:5632
 msgid "Slightly Late"
 msgstr ""
 
-#: GuitarScene.py:5630
+#: GuitarScene.py:5635
 msgid "-Excellent!"
 msgstr ""
 
-#: GuitarScene.py:5634
+#: GuitarScene.py:5639
 msgid "Perfect!!"
 msgstr ""
 
-#: GuitarScene.py:5637
+#: GuitarScene.py:5642
 msgid "+Excellent!"
 msgstr ""
 
-#: GuitarScene.py:5640
+#: GuitarScene.py:5645
 msgid "Slightly Early"
 msgstr ""
 
-#: GuitarScene.py:5643
+#: GuitarScene.py:5648
 msgid "Early"
 msgstr ""
 
-#: GuitarScene.py:5646
+#: GuitarScene.py:5651
 msgid "Very Early"
 msgstr ""
 
-#: GuitarScene.py:5651 GuitarScene.py:5686
+#: GuitarScene.py:5656 GuitarScene.py:5691
 msgid "ms"
 msgstr ""
 
-#: GuitarScene.py:5786
+#: GuitarScene.py:5791
 msgid "Guitar Solo!"
 msgstr ""
 
-#: GuitarScene.py:5804
+#: GuitarScene.py:5809
 msgid "Perfect Solo!"
 msgstr ""
 
-#: GuitarScene.py:5808
+#: GuitarScene.py:5813
 msgid "Awesome Solo!"
 msgstr ""
 
-#: GuitarScene.py:5812
+#: GuitarScene.py:5817
 msgid "Great Solo!"
 msgstr ""
 
-#: GuitarScene.py:5816
+#: GuitarScene.py:5821
 msgid "Good Solo!"
 msgstr ""
 
-#: GuitarScene.py:5819
+#: GuitarScene.py:5824
 msgid "Solid Solo!"
 msgstr ""
 
-#: GuitarScene.py:5822
+#: GuitarScene.py:5827
 msgid "Okay Solo!"
 msgstr ""
 
-#: GuitarScene.py:5825
+#: GuitarScene.py:5830
 msgid "Messy Solo!"
 msgstr ""
 
-#: GuitarScene.py:5832
+#: GuitarScene.py:5837
 msgid "pts"
 msgstr ""
 
-#: GuitarScene.py:5909
+#: GuitarScene.py:5914
 msgid "Get Ready to Rock"
 msgstr ""
 
-#: GuitarScene.py:5930
+#: GuitarScene.py:5935
 msgid "as made famous by"
 msgstr ""
 
-#: GuitarScene.py:5935
+#: GuitarScene.py:5940
 msgid "by "
 msgstr ""
 
-#: GuitarScene.py:5942
+#: GuitarScene.py:5947
 msgid " fretted by "
 msgstr ""
 
