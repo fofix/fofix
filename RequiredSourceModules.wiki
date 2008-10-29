@@ -78,7 +78,7 @@ with
 }}}
 
 
- 19. Save this file
+19. Save this file
 
  20. Delete '--init--.pyc' and '--init--.pyo' in the same directory
 *VERY IMPORTANT*
