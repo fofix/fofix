@@ -2841,11 +2841,14 @@ def getAvailableLibraries(engine, library = DEFAULT_LIBRARY):
     if (os.path.exists(songRoot) == False):
       return libraries
     for libraryRoot in os.listdir(songRoot):
+      if libraryRoot == ".svn":   #MFH - filter out the hidden SVN control folder!
+        continue
       libraryRoot = os.path.join(songRoot, libraryRoot)
       if not os.path.isdir(libraryRoot):
         continue
       if os.path.isfile(os.path.join(libraryRoot, "notes.mid")):
         continue
+
       libName = library + os.path.join(libraryRoot.replace(songRoot, ""))
       
       libraries.append(LibraryInfo(libName, os.path.join(libraryRoot, "library.ini")))

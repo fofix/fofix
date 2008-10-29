@@ -1708,6 +1708,7 @@ class SongChooser(Layer, KeyListener):
           for i, item in enumerate(self.items):
             maxIndex = i
 
+          #MFH - TODO - add logic for special 4-item songlist to prevent jumping up and down
           if self.selectedIndex == 0:#Selection is first item in list
             pos = (self.selectedIndex, self.selectedIndex +5)
             y = h*0.63
