@@ -3420,6 +3420,6 @@ def removeSongOrderPrefixFromName(name):
           if splitName[0] == "":
             name = splitName[1]
             #Log.debug("Dialogs.songListLoaded: Removing song name prefix, new name = " + splitName[1])
-  else:
-    Log.debug("Song name starting with a period filtered from prefix removal logic: " + item.name)
+  #else:
+  #  Log.debug("Song name starting with a period filtered from prefix removal logic: " + name)
   return name
