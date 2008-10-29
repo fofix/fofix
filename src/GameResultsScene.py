@@ -98,7 +98,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
 
     self.resultCheerLoop = self.engine.config.get("game", "result_cheer_loop")#MFH
 
-    #MFH TODO - adding theme.ini override:
+    #MFH theme.ini override:
     self.cheerLoopDelay = Theme.crowdLoopDelay
     if self.cheerLoopDelay == None:
       self.cheerLoopDelay = self.engine.config.get("game", "cheer_loop_delay")#MFH
