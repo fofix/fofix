@@ -2743,7 +2743,7 @@ class ItemChooser(BackgroundLayer, KeyListener):
     self.accepted       = False
     self.selectedItem   = None
     self.time           = 0.0
-    self.menu = Menu(self.engine, choices = [(c, self._callbackForItem(c)) for c in items], onClose = self.close, onCancel = self.cancel)
+    self.menu = Menu(self.engine, choices = [(c, self._callbackForItem(c)) for c in items], onClose = self.close, onCancel = self.cancel, font = self.engine.data.streakFont2)
     self.spinnyDisabled = self.engine.config.get("game", "disable_spinny")
     
     if selected and selected in items:
@@ -2790,8 +2790,6 @@ class ItemChooser(BackgroundLayer, KeyListener):
     self.engine.view.setViewport(1,0)
     w, h, = self.engine.view.geometry[2:4]
     r = .5
-    
-
 
     #MFH - auto background scaling 
     imgwidth = self.background.width1()
@@ -2804,7 +2802,7 @@ class ItemChooser(BackgroundLayer, KeyListener):
 
       
     self.engine.view.setOrthogonalProjection(normalize = True)
-    font = self.engine.data.font
+    font = self.engine.data.streakFont2
     
     try:
       glEnable(GL_BLEND)

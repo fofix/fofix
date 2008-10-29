@@ -1082,7 +1082,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           (_("       PRACTICE"), self.practiceSong), #evilynux
           (_("       OPTIONS"), settingsMenu),
           (_("           QUIT"), self.quit),
-        ], fadeScreen = False, onClose = self.resumeGame, font = "pauseFont", pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color, append_submenu_char = False)
+        ], fadeScreen = False, onClose = self.resumeGame, font = self.engine.data.pauseFont, pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color, append_submenu_char = False)
       else:
         self.menu = Menu(self.engine, [
           (_("        RESUME"), self.resumeSong),
@@ -1091,7 +1091,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           (_("      END SONG"), self.endSong),
           (_("       OPTIONS"), settingsMenu),
           (_("           QUIT"), self.quit),
-        ], fadeScreen = False, onClose = self.resumeGame, font = "pauseFont", pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color, append_submenu_char = False)
+        ], fadeScreen = False, onClose = self.resumeGame, font = self.engine.data.pauseFont, pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color, append_submenu_char = False)
       size = self.engine.data.pauseFont.getStringSize("Quit to Main")
       if self.careerMode:
         self.failMenu = Menu(self.engine, [
@@ -1099,13 +1099,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           (_("  PRACTICE"), self.practiceSong), #evilynux
           (_(" NEW SONG"), self.changeAfterFail),
           (_("     QUIT"), self.quit),
-        ], fadeScreen = False, onCancel = self.changeAfterFail, font = "pauseFont", pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
+        ], fadeScreen = False, onCancel = self.changeAfterFail, font = self.engine.data.pauseFont, pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
       else:
         self.failMenu = Menu(self.engine, [
           (_("RETRY SONG"), self.restartAfterFail),
           (_(" NEW SONG"), self.changeAfterFail),
           (_("     QUIT"), self.quit),
-        ], fadeScreen = False, onCancel = self.changeAfterFail, font = "pauseFont", pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
+        ], fadeScreen = False, onCancel = self.changeAfterFail, font = self.engine.data.pauseFont, pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
       FirstTime = True
       self.restartSong(FirstTime)
     elif self.theme == 0:   #GH2-like theme
@@ -1117,7 +1117,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           (_("  Practice"),       self.practiceSong), #evilynux
           (_("  Settings"),          settingsMenu),
           (_("  Quit to Main Menu"), self.quit),
-        ], fadeScreen = False, onClose = self.resumeGame, font = "pauseFont", pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color)
+        ], fadeScreen = False, onClose = self.resumeGame, font = self.engine.data.pauseFont, pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color)
       else:
         self.menu = Menu(self.engine, [
           (_("  Resume"),       self.resumeSong),
@@ -1126,7 +1126,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           (_("  End Song"),          self.endSong),
           (_("  Settings"),          settingsMenu),
           (_("  Quit to Main Menu"), self.quit),
-        ], fadeScreen = False, onClose = self.resumeGame, font = "pauseFont", pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color)
+        ], fadeScreen = False, onClose = self.resumeGame, font = self.engine.data.pauseFont, pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color)
       size = self.engine.data.pauseFont.getStringSize("Quit to Main")
       if self.careerMode:
         self.failMenu = Menu(self.engine, [
@@ -1134,13 +1134,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           (_("  Give Up?"), self.changeAfterFail),
           (_("  Practice?"), self.practiceSong), #evilynux
           (_("Quit to Main"), self.quit),
-        ], fadeScreen = False, onCancel = self.changeAfterFail, font = "pauseFont", pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
+        ], fadeScreen = False, onCancel = self.changeAfterFail, font = self.engine.data.pauseFont, pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
       else:
         self.failMenu = Menu(self.engine, [
           (_(" Try Again?"), self.restartAfterFail),
           (_("  Give Up?"), self.changeAfterFail),
           (_("Quit to Main"), self.quit),
-        ], fadeScreen = False, onCancel = self.changeAfterFail, font = "pauseFont", pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
+        ], fadeScreen = False, onCancel = self.changeAfterFail, font = self.engine.data.pauseFont, pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
       FirstTime = True
       self.restartSong(FirstTime)
     elif self.theme == 2:   #RB-like theme
@@ -1153,7 +1153,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           (_("   PRACTICE"),       self.practiceSong), #evilynux
           (_("   SETTINGS"),          settingsMenu),
           (_("   QUIT"), self.quit),
-        ], fadeScreen = False, onClose = self.resumeGame, font = "pauseFont", pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color)
+        ], fadeScreen = False, onClose = self.resumeGame, font = self.engine.data.pauseFont, pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color)
       else:      
         self.menu = Menu(self.engine, [
           (_("   RESUME"),       self.resumeSong),
@@ -1162,7 +1162,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           (_("   END SONG"),          self.endSong),
           (_("   SETTINGS"),          settingsMenu),
           (_("   QUIT"), self.quit),
-        ], fadeScreen = False, onClose = self.resumeGame, font = "pauseFont", pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color)
+        ], fadeScreen = False, onClose = self.resumeGame, font = self.engine.data.pauseFont, pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color)
       size = self.engine.data.pauseFont.getStringSize("Quit to Main")
       if self.careerMode:
         self.failMenu = Menu(self.engine, [
@@ -1170,13 +1170,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           (_(" GIVE UP?"), self.changeAfterFail),
           (_(" PRACTICE?"), self.practiceSong), #evilynux
           (_(" QUIT"), self.quit),
-        ], fadeScreen = False, onCancel = self.changeAfterFail, font = "pauseFont", pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
+        ], fadeScreen = False, onCancel = self.changeAfterFail, font = self.engine.data.pauseFont, pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
       else:
         self.failMenu = Menu(self.engine, [
           (_(" TRY AGAIN?"), self.restartAfterFail),
           (_(" GIVE UP?"), self.changeAfterFail),
           (_(" QUIT"), self.quit),
-        ], fadeScreen = False, onCancel = self.changeAfterFail, font = "pauseFont", pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
+        ], fadeScreen = False, onCancel = self.changeAfterFail, font = self.engine.data.pauseFont, pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
       FirstTime = True
       self.restartSong(FirstTime)
 

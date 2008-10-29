@@ -221,10 +221,11 @@ class Menu(Layer, KeyListener):
     self.engine.view.setOrthogonalProjection(normalize = True)
     try:
       v = (1 - visibility) ** 2
-      if self.font == "pauseFont":
-        font = self.engine.data.pauseFont
-      else:
+      # Default to this font if none was specified
+      if self.font == "font":
         font = self.engine.data.font
+      else:
+        font = self.font
 
       if self.fadeScreen:
         Dialogs.fadeScreen(v)
@@ -254,10 +255,7 @@ class Menu(Layer, KeyListener):
             scale = 0.0016
 
         else:
-          if self.theme == 1 and font == "pauseFont": # evilynux - Close to GH3
-            scale = 0.0035
-          else:
-            scale = 0.002
+          scale = 0.002
 
         w, h = font.getStringSize(" ", scale = scale)
 
@@ -299,7 +297,7 @@ class Menu(Layer, KeyListener):
         
         
         v *= 2
-        if self.theme == 1 and self.font == "pauseFont": # evilynux - Ugly workaround for Gh3
+        if self.theme == 1 and self.font == self.engine.data.pauseFont: # evilynux - Ugly workaround for Gh3
           y += h*.75
         else:
           y += h
