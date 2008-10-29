@@ -1930,7 +1930,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     i = playerNum
     if self.guitars[i].isDrum: 
       self.drumStart = True
-    if self.battle and self.numPlayers > 1: #battle mode
+    if self.battle and self.numOfPlayers > 1: #battle mode
       if self.starNotesMissed[i]:
         self.guitars[i].spEnabled = False
         self.guitars[i].spNote = False 
