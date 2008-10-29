@@ -364,15 +364,15 @@ class SettingsMenu(Menu.Menu):
     keySettingsMenu = Menu.Menu(engine, keySettings)
     
     AdvancedVideoSettings = [
-       ConfigChoice(engine.config, "video", "hitglow_color"),
+       ConfigChoice(engine.config, "video",  "fps"),
        ConfigChoice(engine.config, "game", "game_time", autoApply = True),      
        ConfigChoice(engine.config, "game", "accuracy_mode", autoApply = True),
        ConfigChoice(engine.config, "game", "accuracy_pos", autoApply = True),
+       ConfigChoice(engine.config, "game", "decimal_places", autoApply = True), #MFH
        ConfigChoice(engine.config, "game", "gsolo_accuracy_disp", autoApply = True), #MFH
        ConfigChoice(engine.config, "game", "gsolo_acc_pos", autoApply = True), #MFH
-       ConfigChoice(engine.config, "game", "decimal_places", autoApply = True), #MFH
-       ConfigChoice(engine.config, "game", "gfx_version_tag", autoApply = True), #MFH
        ConfigChoice(engine.config, "coffee", "noterotate", autoApply = True), #blazingamer
+       ConfigChoice(engine.config, "game", "gfx_version_tag", autoApply = True), #MFH
     ]
     AdvancedVideoSettingsMenu = Menu.Menu(engine, AdvancedVideoSettings)
       
@@ -383,8 +383,8 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "video",  "resolution"),
       ConfigChoice(engine.config, "video",  "fullscreen"),
       ConfigChoice(engine.config, "video",  "multisamples"),
-      ConfigChoice(engine.config, "video",  "fps"),
       ConfigChoice(engine.config, "video", "disable_fretsfx"),
+      ConfigChoice(engine.config, "video", "hitglow_color"),
       ConfigChoice(engine.config, "opengl", "svgquality"),
       ConfigChoice(engine.config, "game", "pov", autoApply = True),
       (_("Choose Neck >"), lambda: Dialogs.chooseNeck(engine,prompt=_("Yellow (#3) / Blue (#4) to change:"))),
@@ -467,25 +467,18 @@ class SettingsMenu(Menu.Menu):
       (_("Debug Settings"), debugSettingsMenu),
     ]
     perfSettingsMenu = Menu.Menu(engine, perfSettings)
-    
-    
-    AdvancedLibrarySettings = [
-       ConfigChoice(engine.config, "coffee", "songfilepath", autoApply = True),
-       ConfigChoice(engine.config, "game", "quickplay_career_tiers", autoApply = True),  #myfingershurt
-       ConfigChoice(engine.config, "game", "songlist_instrument", autoApply = True), #MFH
-    ]
-    AdvancedLibrarySettingsMenu = Menu.Menu(engine, AdvancedLibrarySettings)
-      
 
     listSettings = [
       (_("Select Song Library >"), self.baseLibrarySelect),
+      ConfigChoice(engine.config, "coffee", "songfilepath", autoApply = True),
       ConfigChoice(engine.config, "game",  "sort_order", autoApply = True),
       ConfigChoice(engine.config, "coffee", "songdisplay", autoApply = True),
       ConfigChoice(engine.config, "audio", "disable_preview", autoApply = True),  #myfingershurt
+      ConfigChoice(engine.config, "game", "songlist_instrument", autoApply = True), #MFH
       ConfigChoice(engine.config, "game", "songlist_difficulty", autoApply = True), #evilynux
       ConfigChoice(engine.config, "game", "songlist_extra_stats", autoApply = True), #evilynux
       ConfigChoice(engine.config, "game", "HSMovement", autoApply = True), #racer
-      (_("Advanced Libary Settings"), AdvancedLibrarySettingsMenu),
+      ConfigChoice(engine.config, "game", "quickplay_career_tiers", autoApply = True),  #myfingershurt
     ]
     listSettingsMenu = Menu.Menu(engine, listSettings)
 
