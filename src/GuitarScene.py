@@ -3033,15 +3033,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             break
       else:
         self.enteredCode = []
-    
+
     #myfingershurt: Adding starpower and killswitch for "no HOPOs" mode
     if control == Player.STAR:
       self.activateSP(0)
-    elif control == Player.PLAYER_2_STAR: #QQstarS:Add the 2nd palyers active SP key
+    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_STAR: #QQstarS:Add the 2nd palyers active SP key
       self.activateSP(1) #QQstarS:ADD
     if control == Player.KILL and not self.isKillAnalog[0]:  #MFH - only use this logic if digital killswitch
       self.killswitchEngaged[0] = True
-    elif control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
+    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
       self.killswitchEngaged[1] = True
 
 
@@ -3106,6 +3106,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             break
       else:
         self.enteredCode = []
+
+    if control == Player.STAR:
+      self.activateSP(0)
+    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_STAR: #QQstarS:Add the 2nd palyers active SP key
+      self.activateSP(1) #QQstarS:ADD
+    if control == Player.KILL and not self.isKillAnalog[0]:  #MFH - only use this logic if digital killswitch
+      self.killswitchEngaged[0] = True
+    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
+      self.killswitchEngaged[1] = True
+
  
   def keyPressed3(self, key, unicode, control = None, pullOff = False):  #MFH - gonna pass whether this was called from a pull-off or not
     hopo = False
@@ -3218,13 +3228,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             break
       else:
         self.enteredCode = []
+
     if control == Player.STAR:
       self.activateSP(0)
-    elif control == Player.PLAYER_2_STAR: #QQstarS:Add the 2nd palyers active SP key
+    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_STAR: #QQstarS:Add the 2nd palyers active SP key
       self.activateSP(1) #QQstarS:ADD
     if control == Player.KILL and not self.isKillAnalog[0]:  #MFH - only use this logic if digital killswitch
       self.killswitchEngaged[0] = True
-    elif control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
+    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
       self.killswitchEngaged[1] = True
 
 
@@ -3280,38 +3291,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.guitars[num].lastFretWasC = False
       return True    	  
 
-#    if self.guitars[0].isDrum and control in (self.guitars[0].keys):
-#      if not self.controls.getState(self.guitars[0].keys[0]):
-#        self.guitars[0].lastFretWasBassDrum = False
-#      return True
-#      if not self.controls.getState(self.guitars[0].keys[1]):
-#        self.guitars[0].lastFretWasT1 = False
-#      return True
-#      if not self.controls.getState(self.guitars[0].keys[2]):
-#        self.guitars[0].lastFretWasT2 = False
-#      return True  
-#      if not self.controls.getState(self.guitars[0].keys[3]):
-#        self.guitars[0].lastFretWasT3 = False
-#      return True    	  
-#      if not self.controls.getState(self.guitars[0].keys[4]):
-#        self.guitars[0].lastFretWasC = False
-#      return True    	  
-#    elif self.numOfPlayers > 1 and self.guitars[1].isDrum and control in (self.guitars[1].keys):
-#      if not self.controls.getState(self.guitars[1].keys[0]):
-#        self.guitars[1].lastFretWasBassDrum = False
-#      return True  
-#      if not self.controls.getState(self.guitars[1].keys[1]):
-#        self.guitars[1].lastFretWasT1 = False
-#      return True
-#      if not self.controls.getState(self.guitars[1].keys[2]):
-#        self.guitars[1].lastFretWasT2 = False
-#      return True  
-#      if not self.controls.getState(self.guitars[1].keys[3]):
-#        self.guitars[1].lastFretWasT3 = False
-#      return True
-#      if not self.controls.getState(self.guitars[1].keys[4]):
-#        self.guitars[1].lastFretWasC = False
-#      return True  	    	  
 
     #myfingershurt:
   
@@ -3336,7 +3315,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #Digital killswitch disengage:
     if control == Player.KILL and not self.isKillAnalog[0]:  #MFH - only use this logic if digital killswitch
       self.killswitchEngaged[0] = False
-    elif control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
+    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
       self.killswitchEngaged[1] = False
 
 
@@ -3351,7 +3330,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #Digital killswitch disengage:
     if control == Player.KILL and not self.isKillAnalog[0]:  #MFH - only use this logic if digital killswitch
       self.killswitchEngaged[0] = False
-    elif control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
+    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
       self.killswitchEngaged[1] = False
 
     
@@ -3378,7 +3357,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #Digital killswitch disengage:
     if control == Player.KILL and not self.isKillAnalog[0]:  #MFH - only use this logic if digital killswitch
       self.killswitchEngaged[0] = False
-    elif control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
+    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
       self.killswitchEngaged[1] = False
     
     for i, guitar in enumerate(self.guitars):
