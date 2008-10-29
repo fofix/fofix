@@ -141,18 +141,6 @@ DEFAULT_OPT_TEXT_X    = None
 DEFAULT_OPT_TEXT_Y    = None
 
 #MFH:
-#++Adding Main Menu (maintext.png) scale factor adjustment to theme.ini
-#++Add Main Menu item vertical spacing adjustment to theme.ini
-#++Add theme.ini positioning options for all main menu - text submenus
-#++Add separate theme.ini text color options for:
-#++++Career titles / venues text
-#++++Options menu text / selected text
-#++++Songlist songname text / selected text
-#++++Songlist artist & year text / selected text
-#++++Songlist folder text / selected text
-#++++Pause menu text / selected text
-#++++Fail menu text / selected text
-
 DEFAULT_MAIN_MENU_SCALE = None
 DEFAULT_MAIN_MENU_VSPACING = None
 
@@ -173,11 +161,16 @@ DEFAULT_PAUSE_SELECTED_COLOR = "#FFBF00"
 DEFAULT_FAIL_TEXT_COLOR = "#FFFFFF"
 DEFAULT_FAIL_SELECTED_COLOR = "#FFBF00"
 
+#MFH - crowd cheer loop delay in theme.ini: if not exist, use value from settings. Otherwise, use theme.ini value.
+DEFAULT_CROWD_LOOP_DELAY = None
+
+
 #racer:
 DEFAULT_FAIL_BKG_X     = None
 DEFAULT_FAIL_BKG_Y     = None
 DEFAULT_FAIL_TEXT_X    = None
 DEFAULT_FAIL_TEXT_Y    = None
+
 
 
 
@@ -319,6 +312,8 @@ Config.define("theme", "pause_selected_color",  str, DEFAULT_PAUSE_SELECTED_COLO
 Config.define("theme", "fail_text_color",  str, DEFAULT_FAIL_TEXT_COLOR)
 Config.define("theme", "fail_selected_color",  str, DEFAULT_FAIL_SELECTED_COLOR)
 
+#MFH - crowd cheer loop delay in theme.ini: if not exist, use value from settings. Otherwise, use theme.ini value.
+Config.define("theme", "crowd_loop_delay",  int, DEFAULT_CROWD_LOOP_DELAY)
 
 #RACER:
 Config.define("theme", "fail_bkg_x",       float, DEFAULT_FAIL_BKG_X)
@@ -415,6 +410,8 @@ pause_selected_colorVar = None
 fail_text_colorVar = None
 fail_selected_colorVar = None
 
+#MFH - crowd cheer loop delay in theme.ini: if not exist, use value from settings. Otherwise, use theme.ini value.
+crowdLoopDelay = None
 
 #Racer:
 fail_bkg_xPos = None
@@ -771,6 +768,7 @@ def setupPOV(config):
 def setupMisc(config):
   global loadingPhrase, resultsPhrase
   global creditSong
+  global crowdLoopDelay
 
   temp = config.get("theme", "loading_phrase")
   #Log.debug("Loading phrases found: " + temp)
@@ -784,6 +782,12 @@ def setupMisc(config):
   temp = config.get("theme", "credit_song")
   if creditSong == None or temp != DEFAULT_SONG_CREDIT:
     creditSong = temp
+
+  #MFH - crowd cheer loop delay in theme.ini: if not exist, use value from settings. Otherwise, use theme.ini value.
+  temp = config.get("theme", "crowd_loop_delay")
+  if crowdLoopDelay == None or temp != DEFAULT_CROWD_LOOP_DELAY:
+    crowdLoopDelay = temp
+
 
 
 #MFH:
@@ -1123,11 +1127,14 @@ def writePOV(f, config):
 def writeMisc(f, config):
   global loadingPhrase, resultsPhrase
   global creditSong
+  global crowdLoopDelay
 
   f.write("%s = %s\n" % ("loading_phrase", loadingPhrase))
   f.write("%s = %s\n" % ("results_phrase", resultsPhrase))
   f.write("%s = %s\n" % ("credit_song", creditSong))
  
+  #MFH - crowd cheer loop delay in theme.ini: if not exist, use value from settings. Otherwise, use theme.ini value.
+  f.write("%s = %s\n" % ("crowd_loop_delay", crowdLoopDelay))
 
 #MFH:  
 def writeSonglist(f, config):

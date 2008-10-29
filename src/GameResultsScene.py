@@ -97,7 +97,13 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.Congratphrase = self.engine.config.get("game", "congrats")#blazingamer
 
     self.resultCheerLoop = self.engine.config.get("game", "result_cheer_loop")#MFH
-    self.cheerLoopDelay = self.engine.config.get("game", "cheer_loop_delay")#MFH
+
+    #MFH TODO - adding theme.ini override:
+    self.cheerLoopDelay = Theme.crowdLoopDelay
+    if self.cheerLoopDelay == None:
+      self.cheerLoopDelay = self.engine.config.get("game", "cheer_loop_delay")#MFH
+    Log.debug("Cheer loop delay value used: %d" % self.cheerLoopDelay)
+
     self.cheerLoopCounter = self.cheerLoopDelay   #MFH - starts out ready to cheer
       
     #MFH
