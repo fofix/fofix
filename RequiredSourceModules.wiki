@@ -8,7 +8,7 @@
 ==For Windows==
 
 ===Download===
-(equivalent to / copied from "Setting Up FoF v1.2.451 Sources," found [http://www.fretsonfire.net/forums/viewtopic.php?f=11&t=25044 here].
+(equivalent to / copied from "Setting Up FoF v1.2.451 Sources," found [http://www.fretsonfire.net/forums/viewtopic.php?f=11&t=25044 here].)
 
 Versions are likely important. Don't substitute one for the other without trying the original versions first. These versions were tested, yours were not. I will not answer questions unless you have done the things in this document.
 
