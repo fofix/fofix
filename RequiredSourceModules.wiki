@@ -1,4 +1,6 @@
+#summary How to set up required source modules to compile FoFiX
 #labels Featured,Phase-Implementation
+
 =Setting Up FoFiX Sources=
 
 ----
