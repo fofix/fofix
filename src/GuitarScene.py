@@ -1443,6 +1443,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     for thePlayer in self.playerList:   
       thePlayer.stars = 0
     self.partialStar = [0 for i in self.playerList]
+    self.resetStarThresholds()
     self.mutedLastSecondYet = False
     self.dispSoloReview = [False for i in self.playerList]
     self.soloReviewCountdown = [0 for i in self.playerList]
@@ -3722,7 +3723,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.getNextStarThresholds(playerNum)   #start it at the first threshold pair to surpass
       tempFS, tempPS, self.finalScoreThreshold[playerNum], self.finalHitNotesThreshold[playerNum] = self.starThresholdsP2[-1]
     
-  
+
+  def resetStarThresholds(self):
+    for i, player in enumerate(self.playerList):
+      self.starThresholdIndex[i] = 0
+      self.getNextStarThresholds(i)
+
   def getNextStarThresholds(self, playerNum):
     #ready for a new tuple o' data
     self.starThresholdIndex[playerNum] = self.starThresholdIndex[playerNum] + 1
@@ -3730,7 +3736,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.nextStar[playerNum], self.nextPartialStar[playerNum], self.nextScoreThreshold[playerNum], self.nextHitNotesThreshold[playerNum] = self.starThresholdsP1[self.starThresholdIndex[playerNum]]
     elif playerNum == 1:
       self.nextStar[playerNum], self.nextPartialStar[playerNum], self.nextScoreThreshold[playerNum], self.nextHitNotesThreshold[playerNum] = self.starThresholdsP2[self.starThresholdIndex[playerNum]]
-  
+
 
   def updateStarsWithSustain(self, playerNum, tempExtraScore):
     if (self.inGameStars == 2 or (self.inGameStars == 1 and self.theme == 2) ) and self.playerList[playerNum].stars < 6:
