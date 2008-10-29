@@ -4338,7 +4338,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 size = font.getStringSize(text)
                 font.render(text, (.5-size[0]/2.0,.35-size[1]))
                 #now = self.getSongPosition()
-                text = str(int(now/self.lastEvent*100))+_("% Complete")
+                pctComplete = min(100, int(now/self.lastEvent*100))
+                text = str(pctComplete) + _("% Complete")
                 size = font.getStringSize(text)
                 font.render(text, (.5-size[0]/2.0, .35))
                 if not self.failEnd:
@@ -4890,8 +4891,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
                 diff = str(self.playerList[0].difficulty)
                 # compute initial position
+                pctComplete = min(100, int(now/self.lastEvent*100))
+                
                 curxpos = font.getStringSize(_("COMPLETED")+" ", scale = 0.0015)[0]
-                curxpos += font.getStringSize(str(int(now/self.lastEvent*100)), scale = 0.003)[0]
+                curxpos += font.getStringSize(str(pctComplete), scale = 0.003)[0]
                 curxpos += font.getStringSize( _(" % ON "), scale = 0.0015)[0]
                 curxpos += font.getStringSize(diff, scale = 0.003)[0]
                 curxpos = .5-curxpos/2.0
@@ -4903,7 +4906,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 size = font.getStringSize(text, scale = 0.0015)
                 # evilynux - Again, for this very font, the "real" height value is 75% of returned value
                 font.render(text, (curxpos, .37+(font.getStringSize(text, scale = 0.003)[1]-size[1])*.75), scale = 0.0015)
-                text = str(int(now/self.lastEvent*100))
+                text = str(pctComplete)
                 curxpos += size[0]
   
                 size = font.getStringSize(text, scale = 0.003)
@@ -5341,7 +5344,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 size = font.getStringSize(text)
                 font.render(text, (.5-size[0]/2.0,.3-size[1]))
                 #now = self.getSongPosition()
-                text = str(int(now/self.lastEvent*100))+_("% Complete")
+
+                pctComplete = min(100, int(now/self.lastEvent*100))
+                text = str(pctComplete) + _("% Complete")
                 size = font.getStringSize(text)
                 font.render(text, (.5-size[0]/2.0, .3))
                 if not self.failEnd:
