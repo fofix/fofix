@@ -13,31 +13,18 @@
 Versions are likely important. Don't substitute one for the other without trying the original versions first. These versions were tested, yours were not. I will not answer questions unless you have done the things in this document.
 
   # Download Active Python 2.4.3.12 (not the standard python distro) - [http://downloads.activestate.com/ActivePython/windows/2.4/ActivePython-2.4.3.12-win32-x86.msi]
-
   # Download Psyco optimizing compiler 1.5.2 - [http://downloads.sourceforge.net/psyco/psyco-1.5.2.win32-py2.4.exe]
-
   # Download GLEW 1.4.0 - [http://downloads.sourceforge.net/glew/glew-1.4.0-win32.zip]
-
   # Download PyOpenGL 2.0.2.01 - [http://downloads.sourceforge.net/pyopengl/PyOpenGL-2.0.2.01.py2.4-numpy23.exe]
-
   # Download GLEWpy 0.7.4 - [http://downloads.sourceforge.net/glewpy/glewpy-0.7.4.win32-py2.4.exe]
-
   # Download PyGame 1.7.1 - [http://www.pygame.org/ftp/pygame-1.7.1release.win32-py2.4.exe]
-
   # Download PIL 1.1.6 - [http://effbot.org/downloads/PIL-1.1.6.win32-py2.4.exe]
-
   # Download Numeric 2.4.2 - [http://downloads.sourceforge.net/numpy/Numeric-24.2.win32-py2.4.exe]
-
   # Download Amanith 0.3 - [http://fretsonfire.phonotheque.ca/setup_amanith_03.rar]
-
   # Download PyAmanith 0.3.34 - [http://muksuluuri.ath.cx/~skyostil/projects/pyamanith/dist/PyAmanith-0.3.34.win32-py2.4.exe]
-
   # Download PyOgg 1.3 (this url is important, other versions dont work) - [http://thomas.paviot.free.fr/soya/pyogg-1.3.win32-py2.4.exe]
-
   # Download PyVorbis 1.4 (this URL is important, other versions don't work) - [http://thomas.paviot.free.fr/soya/pyvorbis-1.4.win32-py2.4.exe]
-
   # Download py2exe 0.6.6 - [http://downloads.sourceforge.net/py2exe/py2exe-0.6.6.win32-py2.4.exe]
-
   # Download the FoFiX source files from the trunk, or SVN revision / tag of your choice - [http://code.google.com/p/fofix/source/browse/MFH-Mod]
 
 ===Install===
@@ -57,49 +44,38 @@ Versions are likely important. Don't substitute one for the other without trying
   # Install Pyogg by double clicking the .exe
   # Install Pyvorbis by double clicking the .exe
   # Install py2exe by double clicking the .exe
-
-
 _This next part fixes a opengl/py2exe bug so it may not be necessary in the future. Only if you get an error when running the FretsOnFire.exe that says:_
-
+{{{
 IOError: [Errno 2] No such file or directory: 'D:\\Games\\Frets on Fire\\dist\\data\\library.zip\\OpenGL\\version'
-
+}}}
   # Go to your Python directory and go into the 'Lib' and then 'site-packages' directory
-
 *VERY IMPORTANT*
 _In steps 15-18 you must replace the --'s with two underscores. The Wiki does not display underscores directly since they are formatting characters._
-
   # Go into the 'OpenGL' directory and edit the file called '--init--.py'
   # replace the line that reads:
-
+{{{
 --version-- = string.strip(open(filename).read())
-
+}}}
 with
-
+{{{
 --version-- = '2.0.2.01'
-
+}}}
   # Save this file
   # Delete '--init--.pyc' and '--init--.pyo' in the same directory
-
 *VERY IMPORTANT*
 _In previous 15-18 you must replace the --'s with two underscores. The Wiki does not display underscores directly since they are formatting characters._
-
-
-
   # Locate the downloaded or checked-out FoFiX sources
   # Move the 'src' directory into your FoFiX directory (same place as the 'data' directory) if it is not already located there.
   # *REBOOT* _(required)_
   # Open a command prompt
   # cd to the new 'src' directory in your FoFiX directory
   # type 'python FretsOnFire.py'
-
 At this point you should be able to play frets on fire directly from the source
 To create the executable we need a few more steps
-
   # in your command prompt type 'python setup.py py2exe'
   # a bunch of stuff will happen and you should end up with a 'dist' directory above.
   # Go into the dist directory and retrieve FretsOnFire.exe, place in your FoFiX trunk / root.
   # Go into the dist\data directory and retrieve library.zip, place in your FoFiX's data directory.
-
   # You may need the Windows support files for FoFiX (mostly .DLLs), which can be found inside any full Windows FoFiX distribution in the appropriate directory structure.
 
 ----
