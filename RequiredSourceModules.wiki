@@ -52,61 +52,49 @@ IOError: [Errno 2] No such file or directory: 'D:\\Games\\Frets on Fire\\dist\\d
 }}}
 
 
-16. Go to your Python directory and go into the 'Lib' and then 'site-packages' directory
-*VERY IMPORTANT*
+16. Go to your Python directory and go into the `Lib` and then `site-packages` directory
 
-
-_In steps 17-20 you must replace the --'s with two underscores. The Wiki does not display underscores directly since they are formatting characters._
-
-
-17. Go into the 'OpenGL' directory and edit the file called '--init--.py'
-
+17. Go into the `OpenGL` directory and edit the file called `__init__.py`
 
 18. replace the line that reads:
 
-
 {{{
---version-- = string.strip(open(filename).read())
+__version__ = string.strip(open(filename).read())
 }}}
-
 
 with
 
-
 {{{
---version-- = '2.0.2.01'
+__version__ = '2.0.2.01'
 }}}
 
 
 19. Save this file
 
- 20. Delete '--init--.pyc' and '--init--.pyo' in the same directory
-*VERY IMPORTANT*
-
-_In previous 17-20 you must replace the --'s with two underscores. The Wiki does not display underscores directly since they are formatting characters._
+ 20. Delete `__init__.pyc` and `__init__.pyo` in the same directory
 
  21. Locate the downloaded or checked-out FoFiX sources
 
- 22. Move the 'src' directory into your FoFiX directory (same place as the 'data' directory) if it is not already located there.
+ 22. Move the `src` directory into your FoFiX directory (same place as the `data` directory) if it is not already located there.
 
  23. *REBOOT* _(required)_
 
  24. Open a command prompt
 
- 25. cd to the new 'src' directory in your FoFiX directory
+ 25. cd to the new `src` directory in your FoFiX directory
 
- 26. type 'python FretsOnFire.py'
+ 26. type `python FretsOnFire.py`
 
 At this point you should be able to play frets on fire directly from the source
 To create the executable we need a few more steps
 
- 27. in your command prompt type 'python setup.py py2exe'
+ 27. in your command prompt type `python setup.py py2exe`
 
- 28. a bunch of stuff will happen and you should end up with a 'dist' directory above.
+ 28. a bunch of stuff will happen and you should end up with a `dist` directory above.
 
- 29. Go into the dist directory and retrieve FretsOnFire.exe, place in your FoFiX trunk / root.
+ 29. Go into the dist directory and retrieve `FretsOnFire.exe`, place in your FoFiX trunk / root.
 
- 30. Go into the dist\data directory and retrieve library.zip, place in your FoFiX's data directory.
+ 30. Go into the `dist\data` directory and retrieve `library.zip`, place in your FoFiX's data directory.
 
  31. You may need the Windows support files for FoFiX (mostly .DLLs), which can be found inside any full Windows FoFiX distribution in the appropriate directory structure.
 
