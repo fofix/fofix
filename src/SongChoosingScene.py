@@ -66,6 +66,8 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
     else:
         self.songQueue     = songQueue
     self.dialog    = None
+
+    self.tut = Config.get("game", "tut")
     
   def addToQueue(self, value = None, selectedSong = None):
       players = Config.get("game", "selected_players")
@@ -179,8 +181,9 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
             self.session.world.finishGame()
             return
 
-          Config.set("game", "selected_library", self.libraryName)
-          Config.set("game", "selected_song",    self.songName)
+          if not self.tut:
+            Config.set("game", "selected_library", self.libraryName)
+            Config.set("game", "selected_song",    self.songName)
           
           info = Song.loadSongInfo(self.engine, self.songName, library = self.libraryName)
 

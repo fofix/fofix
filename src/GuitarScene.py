@@ -170,11 +170,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.timeLeft = None
     self.processedFirstNoteYet = False
     
-    #MFH - no Jurgen in Career mode:
-    if self.careerMode:
-      self.autoPlay = False
-    else:
-      self.autoPlay         = self.engine.config.get("game", "jurgdef")
+    self.autoPlay         = self.engine.config.get("game", "jurgdef")
     
     self.jurg1            = False
     self.jurg2            = False
@@ -480,9 +476,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.failingEnabled = True
 
 
+    self.tut = self.engine.config.get("game", "tut")
     
-    if self.playerList[0].practiceMode or self.song.info.tutorial:
+    if self.playerList[0].practiceMode or self.song.info.tutorial or self.tut:
       self.failingEnabled = False
+
+    #MFH - no Jurgen in Career mode or tutorial mode or practice mode:
+    if self.careerMode or self.tut or self.playerList[0].practiceMode:
+      self.autoPlay = False
 
     
     self.phrases = self.engine.config.get("coffee", "phrases")#blazingamer
