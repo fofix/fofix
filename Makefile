@@ -1,13 +1,25 @@
 CXFREEZE=/usr/src/experimental/cx_Freeze-3.0.3/FreezePython
 PYTHON=python2.4
 PYTHON_LIBS=/usr/lib/python2.4
-VERSION=test
 USE_AMANITH=1
 MESSAGESPOT=src/messages.pot
 
+# evilynux - Dynamically update the version number, this is "clever" but hard to understand... :-(
+VERSION=`grep "versionString =" src/GameEngine.py | sed -e "s/.\+\(\([0-9]\+\.\)\+[0-9]\+\).\+/\1/g"`
+
 all:	dist
 
+patch: dist
+	@echo --- Creating patch
+	[ -e FoFiX-${VERSION}-Patch-GNULinux-64bit ] && \
+	rm -rf FoFiX-${VERSION}-Patch-GNULinux-64bit*
+	mkdir FoFiX-${VERSION}-Patch-GNULinux-64bit
+	cp dist/FretsOnFire.bin FoFiX-${VERSION}-Patch-GNULinux-64bit/
+	cp -a doc  FoFiX-${VERSION}-Patch-GNULinux-64bit/
+	tar -cjvf FoFiX-${VERSION}-Patch-GNULinux-64bit.tar.gz FoFiX-${VERSION}-Patch-GNULinux-64bit/
+
 dist:
+	@echo --- Detected version: ${VERSION}
 	@echo --- Building binary
 	$(CXFREEZE) --target-dir dist \
 --include-modules \
