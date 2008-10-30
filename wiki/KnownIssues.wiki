@@ -21,9 +21,7 @@ Please note, we are not currently looking for suggestions. However, just in case
 
 ==About Double-pick problem on guitar controllers!==
 When strumming down, up, down, up, ... the game doesn't always register all the picks.
-Alarian has the Xbox Xplorer guitar controller and it's safe to say that the problem he's experiencing is caused by the controller!
-The "strum-button" on the controller is registered by the computer as "Point of View Hat" and this causes problems since it's not a button that you can release. FoF won't register when you release the button. What I did was to download Xpadder: http://xpadder.com/.
-You can link the "strum-button" to 2 keys on the keyboard instead, this solved my problem. 
+Workaround (and brief explanation) for this double-pick problem exists in issue 165.
 
 ==About Variable/Speed-dependent Hitwindow==
 Set the hitwindow to tight and tweak the A/V-Delay so it's right when you hit the notes when listening to the music. This is now easy with the new Accuracy indicator.
