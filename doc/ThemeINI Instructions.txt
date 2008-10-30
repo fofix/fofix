@@ -91,6 +91,7 @@ fret1_color = #FF2222            (Manually set 2nd fret tail color)
 fret2_color = #FFFF22            (Manually set 3rd fret tail color)
 fret3_color = #3333FF            (Manually set 4tg fret tail color)
 fret4_color = #FF9933            (Manually set 5th fret tail color)
+crowd_loop_delay = x             (x = integer.  Default user setting = 550 for sounds\crowdcheers.ogg)
 
 
 
