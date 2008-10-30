@@ -11,11 +11,10 @@ then any of the settings below may be added underneath the [theme] header:
 ---------------------------------------
 (Decimal # between 0 and 1, IE- .34)
 
-{{{menu_x = .665              (X Position of main menu image)
-menu_y = .842              (Y Position of main menu image)
-main_menu_scale = .5       (Scaling size of main menu image)
-main_menu_vspacing = 0.09  (Spacing in between each line of separated main menu image)
-}}}
+{{{menu_x = .665              (X Position of main menu image)}}}
+{{{menu_y = .842              (Y Position of main menu image)}}}
+{{{main_menu_scale = .5       (Scaling size of main menu image)}}}
+{{{main_menu_vspacing = 0.09  (Spacing in between each line of separated main menu image)}}}
 
 Default Theme #'s
 -----------------
