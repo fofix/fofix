@@ -261,9 +261,9 @@ class Guitar:
     self.bassGrooveNeckMode = self.engine.config.get("game", "bass_groove_neck")
     self.guitarSoloNeckMode = self.engine.config.get("game", "guitar_solo_neck")
 
+    self.starspin = self.engine.config.get("performance", "starspin")
     if self.twoDnote == True:
       #Spinning starnotes or not?
-      self.starspin = self.engine.config.get("performance", "starspin")
       #myfingershurt: allowing any non-Rock Band theme to have spinning starnotes if the SpinNotes.png is available in that theme's folder
       if self.starspin == True and self.theme < 2:
         #myfingershurt: check for SpinNotes, if not there then no animation
@@ -1367,6 +1367,7 @@ class Guitar:
         if big == True and tailOnly == True:
           self.killPoints = True
 
+      #MFH - TODO - filter out this tail whitening when starpower notes have been disbled from a screwup
       if not killswitch == False:
         if event.star or event.finalStar:
           if big == True and tailOnly == True:
@@ -2682,11 +2683,11 @@ class Guitar:
     
     self.playedNotes = []
     
-    notes = self.getRequiredNotes(song, pos)
+    self.matchingNotes = self.getRequiredNotes(song, pos)
 
-    if self.controlsMatchNotes(controls, notes):
+    if self.controlsMatchNotes(controls, self.matchingNotes):
       self.pickStartPos = pos
-      for time, note in notes:
+      for time, note in self.matchingNotes:
         if note.skipped == True:
           continue
         self.pickStartPos = max(self.pickStartPos, time)
@@ -2703,11 +2704,11 @@ class Guitar:
     
     self.playedNotes = []
     
-    notes = self.getRequiredNotes2(song, pos, hopo)
+    self.matchingNotes = self.getRequiredNotes2(song, pos, hopo)
 
-    if self.controlsMatchNotes2(controls, notes, hopo):
+    if self.controlsMatchNotes2(controls, self.matchingNotes, hopo):
       self.pickStartPos = pos
-      for time, note in notes:
+      for time, note in self.matchingNotes:
         if note.skipped == True:
           continue
         self.pickStartPos = max(self.pickStartPos, time)

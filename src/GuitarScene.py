@@ -170,11 +170,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.timeLeft = None
     self.processedFirstNoteYet = False
     
-    #MFH - no Jurgen in Career mode:
-    if self.careerMode:
-      self.autoPlay = False
-    else:
-      self.autoPlay         = self.engine.config.get("game", "jurgdef")
+    self.autoPlay         = self.engine.config.get("game", "jurgdef")
     
     self.jurg1            = False
     self.jurg2            = False
@@ -480,9 +476,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.failingEnabled = True
 
 
+    self.tut = self.engine.config.get("game", "tut")
     
-    if self.playerList[0].practiceMode or self.song.info.tutorial:
+    if self.playerList[0].practiceMode or self.song.info.tutorial or self.tut:
       self.failingEnabled = False
+
+    #MFH - no Jurgen in Career mode or tutorial mode or practice mode:
+    if self.careerMode or self.tut or self.playerList[0].practiceMode:
+      self.autoPlay = False
 
     
     self.phrases = self.engine.config.get("coffee", "phrases")#blazingamer
@@ -967,6 +968,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.rockHiThreshold = self.rockMax/3.0*2   #MFH
     self.rock = [self.rockMax/2 for i in self.playerList]
     self.arrowRotation    = [.5 for i in self.playerList]
+    self.starNotesMissed = [False for i in self.playerList]  #MFH
     self.notesMissed = [False for i in self.playerList]
     self.lessMissed = [False for i in self.playerList]
     self.notesHit = [False for i in self.playerList]
@@ -1031,7 +1033,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     # evilynux - More themeable options
     self.rockmeter_score_color = Theme.hexToColor(Theme.rockmeter_score_colorVar)
-    self.fail_text_color = Theme.hexToColor(Theme.song_name_selected_colorVar) # text same color as selected song
+    self.fail_completed_color = Theme.hexToColor(Theme.song_name_selected_colorVar) # text same color as selected song
     self.ingame_stats_color = Theme.hexToColor(Theme.ingame_stats_colorVar)
 
     Log.debug("Pause text / selected hex colors: " + Theme.pause_text_colorVar + " / " + Theme.pause_selected_colorVar)
@@ -1078,18 +1080,18 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           (_("       RESTART"), self.restartSong),
           (_("        GIVE UP"), self.changeSong),
           (_("       PRACTICE"), self.practiceSong), #evilynux
-          (_("      OPTIONS"), settingsMenu),
+          (_("       OPTIONS"), settingsMenu),
           (_("           QUIT"), self.quit),
-        ], fadeScreen = False, onClose = self.resumeGame, font = "pauseFont", pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color)
+        ], fadeScreen = False, onClose = self.resumeGame, font = self.engine.data.pauseFont, pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color, append_submenu_char = False)
       else:
         self.menu = Menu(self.engine, [
           (_("        RESUME"), self.resumeSong),
           (_("       RESTART"), self.restartSong),
           (_("        GIVE UP"), self.changeSong),
           (_("      END SONG"), self.endSong),
-          (_("      OPTIONS"), settingsMenu),
+          (_("       OPTIONS"), settingsMenu),
           (_("           QUIT"), self.quit),
-        ], fadeScreen = False, onClose = self.resumeGame, font = "pauseFont", pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color)
+        ], fadeScreen = False, onClose = self.resumeGame, font = self.engine.data.pauseFont, pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color, append_submenu_char = False)
       size = self.engine.data.pauseFont.getStringSize("Quit to Main")
       if self.careerMode:
         self.failMenu = Menu(self.engine, [
@@ -1097,13 +1099,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           (_("  PRACTICE"), self.practiceSong), #evilynux
           (_(" NEW SONG"), self.changeAfterFail),
           (_("     QUIT"), self.quit),
-        ], fadeScreen = False, onCancel = self.changeAfterFail, font = "pauseFont", pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
+        ], fadeScreen = False, onCancel = self.changeAfterFail, font = self.engine.data.pauseFont, pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
       else:
         self.failMenu = Menu(self.engine, [
           (_("RETRY SONG"), self.restartAfterFail),
           (_(" NEW SONG"), self.changeAfterFail),
           (_("     QUIT"), self.quit),
-        ], fadeScreen = False, onCancel = self.changeAfterFail, font = "pauseFont", pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
+        ], fadeScreen = False, onCancel = self.changeAfterFail, font = self.engine.data.pauseFont, pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
       FirstTime = True
       self.restartSong(FirstTime)
     elif self.theme == 0:   #GH2-like theme
@@ -1115,7 +1117,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           (_("  Practice"),       self.practiceSong), #evilynux
           (_("  Settings"),          settingsMenu),
           (_("  Quit to Main Menu"), self.quit),
-        ], fadeScreen = False, onClose = self.resumeGame, font = "pauseFont", pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color)
+        ], fadeScreen = False, onClose = self.resumeGame, font = self.engine.data.pauseFont, pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color)
       else:
         self.menu = Menu(self.engine, [
           (_("  Resume"),       self.resumeSong),
@@ -1124,7 +1126,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           (_("  End Song"),          self.endSong),
           (_("  Settings"),          settingsMenu),
           (_("  Quit to Main Menu"), self.quit),
-        ], fadeScreen = False, onClose = self.resumeGame, font = "pauseFont", pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color)
+        ], fadeScreen = False, onClose = self.resumeGame, font = self.engine.data.pauseFont, pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color)
       size = self.engine.data.pauseFont.getStringSize("Quit to Main")
       if self.careerMode:
         self.failMenu = Menu(self.engine, [
@@ -1132,13 +1134,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           (_("  Give Up?"), self.changeAfterFail),
           (_("  Practice?"), self.practiceSong), #evilynux
           (_("Quit to Main"), self.quit),
-        ], fadeScreen = False, onCancel = self.changeAfterFail, font = "pauseFont", pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
+        ], fadeScreen = False, onCancel = self.changeAfterFail, font = self.engine.data.pauseFont, pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
       else:
         self.failMenu = Menu(self.engine, [
           (_(" Try Again?"), self.restartAfterFail),
           (_("  Give Up?"), self.changeAfterFail),
           (_("Quit to Main"), self.quit),
-        ], fadeScreen = False, onCancel = self.changeAfterFail, font = "pauseFont", pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
+        ], fadeScreen = False, onCancel = self.changeAfterFail, font = self.engine.data.pauseFont, pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
       FirstTime = True
       self.restartSong(FirstTime)
     elif self.theme == 2:   #RB-like theme
@@ -1151,7 +1153,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           (_("   PRACTICE"),       self.practiceSong), #evilynux
           (_("   SETTINGS"),          settingsMenu),
           (_("   QUIT"), self.quit),
-        ], fadeScreen = False, onClose = self.resumeGame, font = "pauseFont", pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color)
+        ], fadeScreen = False, onClose = self.resumeGame, font = self.engine.data.pauseFont, pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color)
       else:      
         self.menu = Menu(self.engine, [
           (_("   RESUME"),       self.resumeSong),
@@ -1160,7 +1162,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           (_("   END SONG"),          self.endSong),
           (_("   SETTINGS"),          settingsMenu),
           (_("   QUIT"), self.quit),
-        ], fadeScreen = False, onClose = self.resumeGame, font = "pauseFont", pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color)
+        ], fadeScreen = False, onClose = self.resumeGame, font = self.engine.data.pauseFont, pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color)
       size = self.engine.data.pauseFont.getStringSize("Quit to Main")
       if self.careerMode:
         self.failMenu = Menu(self.engine, [
@@ -1168,13 +1170,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           (_(" GIVE UP?"), self.changeAfterFail),
           (_(" PRACTICE?"), self.practiceSong), #evilynux
           (_(" QUIT"), self.quit),
-        ], fadeScreen = False, onCancel = self.changeAfterFail, font = "pauseFont", pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
+        ], fadeScreen = False, onCancel = self.changeAfterFail, font = self.engine.data.pauseFont, pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
       else:
         self.failMenu = Menu(self.engine, [
           (_(" TRY AGAIN?"), self.restartAfterFail),
           (_(" GIVE UP?"), self.changeAfterFail),
           (_(" QUIT"), self.quit),
-        ], fadeScreen = False, onCancel = self.changeAfterFail, font = "pauseFont", pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
+        ], fadeScreen = False, onCancel = self.changeAfterFail, font = self.engine.data.pauseFont, pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
       FirstTime = True
       self.restartSong(FirstTime)
 
@@ -1442,6 +1444,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     for thePlayer in self.playerList:   
       thePlayer.stars = 0
     self.partialStar = [0 for i in self.playerList]
+    self.resetStarThresholds()
     self.mutedLastSecondYet = False
     self.dispSoloReview = [False for i in self.playerList]
     self.soloReviewCountdown = [0 for i in self.playerList]
@@ -1530,12 +1533,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       if self.hopoStyle > 0 or self.song.info.hopo == "on":
         
         #myfingershurt: drums :)
-        #if not self.playerList[guitar.player].part == "Drums":
         if not guitar.isDrum:
           if self.hopoStyle == 2 or self.hopoStyle == 3 or self.hopoStyle == 4:  #GH2 style HOPO system
-            self.song.track[i].markHopoGH2(self.song.info.EighthNoteHopo, self.hopoAfterChord)
+            self.song.track[i].markHopoGH2(self.song.info.EighthNoteHopo, self.hopoAfterChord, self.song.info.hopofreq)
           elif self.hopoStyle == 1:   #RF-Mod style HOPO system
-            self.song.track[i].markHopoRF(self.song.info.EighthNoteHopo)
+            self.song.track[i].markHopoRF(self.song.info.EighthNoteHopo, self.song.info.hopofreq)
     
     #myfingershurt: removing buggy disable stats option
     lastTime = 0
@@ -1602,9 +1604,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #myfingershurt: next line commented to prevent everthickening BPM lines
       if self.hopoStyle > 0 or self.song.info.hopo == "on":
         if self.hopoStyle == 2 or self.hopoStyle == 3 or self.hopoStyle == 4:  #GH2 style HOPO system
-          self.song.track[i].markHopoGH2(self.song.info.EighthNoteHopo, self.hopoAfterChord)
+          self.song.track[i].markHopoGH2(self.song.info.EighthNoteHopo, self.hopoAfterChord, self.song.info.hopofreq)
         elif self.hopoStyle == 1:   #RF-Mod style HOPO system
-          self.song.track[i].markHopoRF(self.song.info.EighthNoteHopo)
+          self.song.track[i].markHopoRF(self.song.info.EighthNoteHopo, self.song.info.hopofreq)
     
     lastTime = 0
     for i,guitar in enumerate(self.guitars):      
@@ -1928,10 +1930,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     i = playerNum
     if self.guitars[i].isDrum: 
       self.drumStart = True
-    if self.battle and self.numPlayers > 1: #battle mode
-      if self.notesMissed[i]: #QQstarS:Set [i] to [i]
+    if self.battle and self.numOfPlayers > 1: #battle mode
+      if self.starNotesMissed[i]:
         self.guitars[i].spEnabled = False
-        self.guitars[i].spNote = False #QQstarS:new1
+        self.guitars[i].spNote = False 
+      if self.notesMissed[i]: #QQstarS:Set [i] to [i]
         self.minusRock[i] += self.minGain/self.multi[i]
         #self.rock[i] -= self.minusRock[i]/self.multi[i]
         if self.plusRock[i] > self.pluBase:
@@ -1939,17 +1942,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if self.plusRock[i] <= self.pluBase:
           self.plusRock[i] = self.pluBase/self.multi[i]
       if self.lessMissed[i]: #QQstarS:Set [i] to [i]
-        self.guitars[i].spEnabled = False
-        self.guitars[i].spNote = False #QQstarS:new1
         self.minusRock[i] += self.minGain/5.0/self.multi[i]
         #self.rock[i] -= self.minusRock[i]/5.0/self.multi[i]
         if self.plusRock[i] > self.pluBase:
           self.plusRock[i] -= self.pluGain/2.5/self.multi[i]
     
     else:   #normal mode
-      if self.notesMissed[i]:
+      if self.starNotesMissed[i]:
         self.guitars[i].spEnabled = False
         self.guitars[i].spNote = False 
+      if self.notesMissed[i]:
         self.minusRock[i] += self.minGain/self.multi[i]
         self.rock[i] -= self.minusRock[i]/self.multi[i]
         if self.plusRock[i] > self.pluBase:
@@ -1957,8 +1959,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if self.plusRock[i] <= self.pluBase:
           self.plusRock[i] = self.pluBase/self.multi[i]
       if self.lessMissed[i]:
-        self.guitars[i].spEnabled = False
-        self.guitars[i].spNote = False #QQstarS:new1
         self.minusRock[i] += self.minGain/5.0/self.multi[i]
         self.rock[i] -= self.minusRock[i]/5.0/self.multi[i]
         if self.plusRock[i] > self.pluBase:
@@ -2070,7 +2070,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
         missedNotes = guitar.getMissedNotesMFH(self.song, pos)
         if missedNotes:
+          if guitar.isDrum:
+            self.drumStart = True
           self.lessMissed[i] = True  #QQstarS:Set [0] to [i]
+          for tym, theNote in missedNotes:  #MFH
+            if theNote.star or theNote.finalStar:
+              self.starNotesMissed[i] = True
         
         if (self.playerList[i].streak != 0 or not self.processedFirstNoteYet) and not guitar.playedNotes and len(missedNotes) > 0:
           if not self.processedFirstNoteYet:
@@ -2194,6 +2199,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.rockmeterIncrease(i)
 
         self.notesMissed[i] = False 
+        self.starNotesMissed[i] = False
         self.notesHit[i] = False 
         self.lessMissed[i] = False 
 
@@ -2321,6 +2327,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     self.killswitchEngaged[num] = False   #always reset killswitch status when picking / tapping
     if self.guitars[num].startPick(self.song, pos, self.controls):
+      if self.guitars[num].isDrum:
+        self.drumStart = True
       self.song.setInstrumentVolume(self.guitarVolume, self.playerList[num].part)
       self.currentlyAnimating = True
       self.playerList[num].streak += 1
@@ -2349,9 +2357,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.currentlyAnimating = False
       self.stage.triggerMiss(pos)
       self.guitarSoloBroken[num] = True
-      
 
       self.notesMissed[num] = True #QQstarS:Set [0] to [i]
+      for tym, theNote in self.guitars[num].matchingNotes:  #MFH
+        if theNote.star or theNote.finalStar:
+          self.starNotesMissed[num] = True
+      
       
 
       self.screwUp(num) #MFH - call screw-up sound handling function
@@ -2384,6 +2395,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.guitarSoloBroken[num] = True
 
       self.notesMissed[num] = True #QQstarS:Set [0] to [i]
+      for tym, theNote in missedNotes:  #MFH
+        if theNote.star or theNote.finalStar:
+          self.starNotesMissed[num] = True
       
       if hopo == True:
         return
@@ -2425,6 +2439,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.guitarSoloBroken[num] = True
 
       self.notesMissed[num] = True #QQstarS:Set [0] to [i]
+      for tym, theNote in self.guitars[num].matchingNotes:  #MFH
+        if theNote.star or theNote.finalStar:
+          self.starNotesMissed[num] = True
       
 
       self.screwUp(num)
@@ -2448,6 +2465,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.guitarSoloBroken[num] = True
 
       self.notesMissed[num] = True  #qqstars 
+      for tym, theNote in missedNotes:  #MFH
+        if theNote.star or theNote.finalStar:
+          self.starNotesMissed[num] = True
         
       if hopo == True:
         return
@@ -2470,6 +2490,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.guitarSoloBroken[num] = True
 
         self.notesMissed[num] = True  #qqstars
+        for tym, theNote in self.guitars[num].matchingNotes:  #MFH
+          if theNote.star or theNote.finalStar:
+            self.starNotesMissed[num] = True
         
       if self.guitars[num].playedNotes:
         self.playerList[num].streak += 1
@@ -2503,6 +2526,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.stage.triggerMiss(pos)
 
       self.notesMissed[num] = True  #qqstars
+      for tym, theNote in self.guitars[num].matchingNotes:  #MFH
+        if theNote.star or theNote.finalStar:
+          self.starNotesMissed[num] = True
 
 
       self.screwUp(num)
@@ -2534,6 +2560,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.guitars[num].wasLastNoteHopod = False
       self.guitars[num].hopoLast = -1
       self.notesMissed[num] = True #QQstarS:Set [0] to [i]
+      for tym, theNote in missedNotes:  #MFH
+        if theNote.star or theNote.finalStar:
+          self.starNotesMissed[num] = True
+      
       if self.hopoDebugDisp == 1:
         missedNoteNums = [noat.number for time, noat in missedNotes]
         #Log.debug("Miss: dopick3gh2(), found missed note(s).... %s" % str(missedNoteNums) + ", Time left=" + str(self.timeLeft))
@@ -2695,6 +2725,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.guitarSoloBroken[num] = True
 
         self.notesMissed[num] = True #QQstarS:Set [0] to [i]
+        for tym, theNote in self.guitars[num].matchingNotes:  #MFH
+          if theNote.star or theNote.finalStar:
+            self.starNotesMissed[num] = True
         
       if self.guitars[num].playedNotes:
         self.playerList[num].streak += 1
@@ -2868,6 +2901,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           
   
         self.notesMissed[num] = True #QQstarS:Set [0] to [i]
+        for tym, theNote in self.guitars[num].matchingNotes:  #MFH
+          if theNote.star or theNote.finalStar:
+            self.starNotesMissed[num] = True
   
         self.screwUp(num)
 
@@ -2999,15 +3035,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             break
       else:
         self.enteredCode = []
-    
+
     #myfingershurt: Adding starpower and killswitch for "no HOPOs" mode
     if control == Player.STAR:
       self.activateSP(0)
-    elif control == Player.PLAYER_2_STAR: #QQstarS:Add the 2nd palyers active SP key
+    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_STAR: #QQstarS:Add the 2nd palyers active SP key
       self.activateSP(1) #QQstarS:ADD
     if control == Player.KILL and not self.isKillAnalog[0]:  #MFH - only use this logic if digital killswitch
       self.killswitchEngaged[0] = True
-    elif control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
+    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
       self.killswitchEngaged[1] = True
 
 
@@ -3072,6 +3108,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             break
       else:
         self.enteredCode = []
+
+    if control == Player.STAR:
+      self.activateSP(0)
+    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_STAR: #QQstarS:Add the 2nd palyers active SP key
+      self.activateSP(1) #QQstarS:ADD
+    if control == Player.KILL and not self.isKillAnalog[0]:  #MFH - only use this logic if digital killswitch
+      self.killswitchEngaged[0] = True
+    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
+      self.killswitchEngaged[1] = True
+
  
   def keyPressed3(self, key, unicode, control = None, pullOff = False):  #MFH - gonna pass whether this was called from a pull-off or not
     hopo = False
@@ -3184,13 +3230,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             break
       else:
         self.enteredCode = []
+
     if control == Player.STAR:
       self.activateSP(0)
-    elif control == Player.PLAYER_2_STAR: #QQstarS:Add the 2nd palyers active SP key
+    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_STAR: #QQstarS:Add the 2nd palyers active SP key
       self.activateSP(1) #QQstarS:ADD
     if control == Player.KILL and not self.isKillAnalog[0]:  #MFH - only use this logic if digital killswitch
       self.killswitchEngaged[0] = True
-    elif control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
+    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
       self.killswitchEngaged[1] = True
 
 
@@ -3246,38 +3293,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.guitars[num].lastFretWasC = False
       return True    	  
 
-#    if self.guitars[0].isDrum and control in (self.guitars[0].keys):
-#      if not self.controls.getState(self.guitars[0].keys[0]):
-#        self.guitars[0].lastFretWasBassDrum = False
-#      return True
-#      if not self.controls.getState(self.guitars[0].keys[1]):
-#        self.guitars[0].lastFretWasT1 = False
-#      return True
-#      if not self.controls.getState(self.guitars[0].keys[2]):
-#        self.guitars[0].lastFretWasT2 = False
-#      return True  
-#      if not self.controls.getState(self.guitars[0].keys[3]):
-#        self.guitars[0].lastFretWasT3 = False
-#      return True    	  
-#      if not self.controls.getState(self.guitars[0].keys[4]):
-#        self.guitars[0].lastFretWasC = False
-#      return True    	  
-#    elif self.numOfPlayers > 1 and self.guitars[1].isDrum and control in (self.guitars[1].keys):
-#      if not self.controls.getState(self.guitars[1].keys[0]):
-#        self.guitars[1].lastFretWasBassDrum = False
-#      return True  
-#      if not self.controls.getState(self.guitars[1].keys[1]):
-#        self.guitars[1].lastFretWasT1 = False
-#      return True
-#      if not self.controls.getState(self.guitars[1].keys[2]):
-#        self.guitars[1].lastFretWasT2 = False
-#      return True  
-#      if not self.controls.getState(self.guitars[1].keys[3]):
-#        self.guitars[1].lastFretWasT3 = False
-#      return True
-#      if not self.controls.getState(self.guitars[1].keys[4]):
-#        self.guitars[1].lastFretWasC = False
-#      return True  	    	  
 
     #myfingershurt:
   
@@ -3302,7 +3317,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #Digital killswitch disengage:
     if control == Player.KILL and not self.isKillAnalog[0]:  #MFH - only use this logic if digital killswitch
       self.killswitchEngaged[0] = False
-    elif control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
+    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
       self.killswitchEngaged[1] = False
 
 
@@ -3317,7 +3332,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #Digital killswitch disengage:
     if control == Player.KILL and not self.isKillAnalog[0]:  #MFH - only use this logic if digital killswitch
       self.killswitchEngaged[0] = False
-    elif control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
+    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
       self.killswitchEngaged[1] = False
 
     
@@ -3344,7 +3359,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #Digital killswitch disengage:
     if control == Player.KILL and not self.isKillAnalog[0]:  #MFH - only use this logic if digital killswitch
       self.killswitchEngaged[0] = False
-    elif control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
+    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
       self.killswitchEngaged[1] = False
     
     for i, guitar in enumerate(self.guitars):
@@ -3709,7 +3724,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.getNextStarThresholds(playerNum)   #start it at the first threshold pair to surpass
       tempFS, tempPS, self.finalScoreThreshold[playerNum], self.finalHitNotesThreshold[playerNum] = self.starThresholdsP2[-1]
     
-  
+
+  def resetStarThresholds(self):
+    for i, player in enumerate(self.playerList):
+      self.starThresholdIndex[i] = 0
+      self.getNextStarThresholds(i)
+
   def getNextStarThresholds(self, playerNum):
     #ready for a new tuple o' data
     self.starThresholdIndex[playerNum] = self.starThresholdIndex[playerNum] + 1
@@ -3717,7 +3737,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.nextStar[playerNum], self.nextPartialStar[playerNum], self.nextScoreThreshold[playerNum], self.nextHitNotesThreshold[playerNum] = self.starThresholdsP1[self.starThresholdIndex[playerNum]]
     elif playerNum == 1:
       self.nextStar[playerNum], self.nextPartialStar[playerNum], self.nextScoreThreshold[playerNum], self.nextHitNotesThreshold[playerNum] = self.starThresholdsP2[self.starThresholdIndex[playerNum]]
-  
+
 
   def updateStarsWithSustain(self, playerNum, tempExtraScore):
     if (self.inGameStars == 2 or (self.inGameStars == 1 and self.theme == 2) ) and self.playerList[playerNum].stars < 6:
@@ -4318,7 +4338,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 size = font.getStringSize(text)
                 font.render(text, (.5-size[0]/2.0,.35-size[1]))
                 #now = self.getSongPosition()
-                text = str(int(now/self.lastEvent*100))+_("% Complete")
+                pctComplete = min(100, int(now/self.lastEvent*100))
+                text = str(pctComplete) + _("% Complete")
                 size = font.getStringSize(text)
                 font.render(text, (.5-size[0]/2.0, .35))
                 if not self.failEnd:
@@ -4870,14 +4891,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
                 diff = str(self.playerList[0].difficulty)
                 # compute initial position
+                pctComplete = min(100, int(now/self.lastEvent*100))
+                
                 curxpos = font.getStringSize(_("COMPLETED")+" ", scale = 0.0015)[0]
-                curxpos += font.getStringSize(str(int(now/self.lastEvent*100)), scale = 0.003)[0]
+                curxpos += font.getStringSize(str(pctComplete), scale = 0.003)[0]
                 curxpos += font.getStringSize( _(" % ON "), scale = 0.0015)[0]
                 curxpos += font.getStringSize(diff, scale = 0.003)[0]
                 curxpos = .5-curxpos/2.0
-                #glColor3f(0.68627451,0.4117647060,0.003921569)
-                #c1,c2,c3 = Theme.hexToColor(Theme.song_name_selected_colorVar)
-                c1,c2,c3 = self.fail_text_color
+                c1,c2,c3 = self.fail_completed_color
                 glColor3f(c1,c2,c3)              
   
                 # now render
@@ -4885,7 +4906,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 size = font.getStringSize(text, scale = 0.0015)
                 # evilynux - Again, for this very font, the "real" height value is 75% of returned value
                 font.render(text, (curxpos, .37+(font.getStringSize(text, scale = 0.003)[1]-size[1])*.75), scale = 0.0015)
-                text = str(int(now/self.lastEvent*100))
+                text = str(pctComplete)
                 curxpos += size[0]
   
                 size = font.getStringSize(text, scale = 0.003)
@@ -5246,7 +5267,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 streaktext = locale.format("%d", player.streak, grouping=True)
                 #myfingershurt: swapping the number "0" and the letter "O" in the score font for accurate Rock Band score type!
                 streaktext = streaktext.replace("0","O")
-                stW, stH = streakfont.getStringSize(streaktext)
+                stW, stH = streakFont.getStringSize(streaktext)
   
   
                 #streak counter box:
@@ -5323,7 +5344,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 size = font.getStringSize(text)
                 font.render(text, (.5-size[0]/2.0,.3-size[1]))
                 #now = self.getSongPosition()
-                text = str(int(now/self.lastEvent*100))+_("% Complete")
+
+                pctComplete = min(100, int(now/self.lastEvent*100))
+                text = str(pctComplete) + _("% Complete")
                 size = font.getStringSize(text)
                 font.render(text, (.5-size[0]/2.0, .3))
                 if not self.failEnd:

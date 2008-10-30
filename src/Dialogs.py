@@ -1037,7 +1037,8 @@ class SongChooser(Layer, KeyListener):
      self.highScoreChange = True
 
     #MFH - instrument change on 5th fret
-    elif c in Player.KEY5S or (c in Player.DRUM3S and self.drumNav):
+    #elif c in Player.KEY5S or (c in Player.DRUM3S and self.drumNav):
+    elif c in Player.KEY5S:   #MFH can't use drum3, that's for down
      self.instrumentChange = True
 
 
@@ -1707,6 +1708,7 @@ class SongChooser(Layer, KeyListener):
           for i, item in enumerate(self.items):
             maxIndex = i
 
+          #MFH - TODO - add logic for special 4-item songlist to prevent jumping up and down
           if self.selectedIndex == 0:#Selection is first item in list
             pos = (self.selectedIndex, self.selectedIndex +5)
             y = h*0.63
@@ -2741,7 +2743,7 @@ class ItemChooser(BackgroundLayer, KeyListener):
     self.accepted       = False
     self.selectedItem   = None
     self.time           = 0.0
-    self.menu = Menu(self.engine, choices = [(c, self._callbackForItem(c)) for c in items], onClose = self.close, onCancel = self.cancel)
+    self.menu = Menu(self.engine, choices = [(c, self._callbackForItem(c)) for c in items], onClose = self.close, onCancel = self.cancel, font = self.engine.data.streakFont2)
     self.spinnyDisabled = self.engine.config.get("game", "disable_spinny")
     
     if selected and selected in items:
@@ -2788,8 +2790,6 @@ class ItemChooser(BackgroundLayer, KeyListener):
     self.engine.view.setViewport(1,0)
     w, h, = self.engine.view.geometry[2:4]
     r = .5
-    
-
 
     #MFH - auto background scaling 
     imgwidth = self.background.width1()
@@ -2802,7 +2802,7 @@ class ItemChooser(BackgroundLayer, KeyListener):
 
       
     self.engine.view.setOrthogonalProjection(normalize = True)
-    font = self.engine.data.font
+    font = self.engine.data.streakFont2
     
     try:
       glEnable(GL_BLEND)
@@ -3419,6 +3419,6 @@ def removeSongOrderPrefixFromName(name):
           if splitName[0] == "":
             name = splitName[1]
             #Log.debug("Dialogs.songListLoaded: Removing song name prefix, new name = " + splitName[1])
-  else:
-    Log.debug("Song name starting with a period filtered from prefix removal logic: " + item.name)
+  #else:
+  #  Log.debug("Song name starting with a period filtered from prefix removal logic: " + name)
   return name

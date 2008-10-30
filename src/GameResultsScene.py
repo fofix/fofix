@@ -66,7 +66,9 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.showHighscores  = False
     self.highscoreIndex  = [-1 for i in players]
     self.taunt           = None
-    self.uploadingScores = False
+    self.uploadingScores = [False for p in players]
+    self.highScoreResult = [None for p in players]
+    self.resultNum       = 0
     self.uploadResult    = None
     self.nextScene       = None
     self.offset          = None
@@ -95,9 +97,40 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.Congratphrase = self.engine.config.get("game", "congrats")#blazingamer
 
     self.resultCheerLoop = self.engine.config.get("game", "result_cheer_loop")#MFH
-    self.cheerLoopDelay = self.engine.config.get("game", "cheer_loop_delay")#MFH
+
+    #MFH theme.ini override:
+    self.cheerLoopDelay = Theme.crowdLoopDelay
+    if self.cheerLoopDelay == None:
+      self.cheerLoopDelay = self.engine.config.get("game", "cheer_loop_delay")#MFH
+    Log.debug("Cheer loop delay value used: %d" % self.cheerLoopDelay)
+
     self.cheerLoopCounter = self.cheerLoopDelay   #MFH - starts out ready to cheer
       
+    #MFH
+    self.hopoStyle        = self.engine.config.get("game", "hopo_style")
+    if self.hopoStyle == 0:
+      self.hopoStyle = _("None")
+    elif self.hopoStyle == 1:
+      self.hopoStyle = _("RF-Mod")
+    elif self.hopoStyle == 2:
+      self.hopoStyle = _("GH2 Strict")
+    elif self.hopoStyle == 3:
+      self.hopoStyle = _("GH2 Sloppy")
+    elif self.hopoStyle == 4:
+      self.hopoStyle = _("GH2")
+    self.hitWindow = self.engine.config.get("game", "hit_window")  #this should be global, not retrieved every BPM change.
+    if self.hitWindow == 0:
+      self.hitWindow = _("Wide")
+    elif self.hitWindow == 1:
+      self.hitWindow = _("Standard")
+    elif self.hitWindow == 2:
+      self.hitWindow = _("Tight")
+    elif self.hitWindow == 3:
+      self.hitWindow = _("Hot Pants Tight")
+    elif self.hitWindow == 4:
+      self.hitWindow = _("Tight Like a Tiger")
+
+
     self.engine.loadImgDrawing(self, "background", os.path.join("themes",themename,"gameresults.png"))
 
     phrase = random.choice(Theme.resultsPhrase.split("_"))
@@ -117,6 +150,11 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         phrase = _("That's how it's done!")
     Dialogs.showLoadingScreen(self.engine, lambda: self.song, text = phrase)
     
+  
+  def handleWorldChartRanking(self, resultTemp):   #MFH
+    self.highScoreResult[self.resultNum] = self.uploadResult
+    self.resultNum += 1
+  
   def keyPressed(self, key, unicode):
     ret = SceneClient.keyPressed(self, key, unicode)
 
@@ -149,12 +187,12 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
             self.song.info.save()
           
             if self.engine.config.get("game", "uploadscores") and not player.cheating:
-              self.uploadingScores = True
-              #myfingershurt: ensuring new SP highscore upload URL is used from Divra (set to default in gameengine.py)
+              self.uploadingScores[i] = True
               # evilynux - New url starting 20080902
               fn = lambda: self.song.info.uploadHighscores(self.engine.config.get("game", "uploadurl_w67_starpower"), self.song.getHash(), part = player.part)
               
-              self.engine.resource.load(self, "uploadResult", fn)
+              #self.engine.resource.load(self, "uploadResult", fn)
+              self.engine.resource.load(self, "uploadResult", fn, onLoad = self.handleWorldChartRanking)  #MFH
 
       if len(self.playerList) > 1 and self.playerList[0].part == self.playerList[1].part and self.playerList[0].difficulty == self.playerList[1].difficulty and self.highscoreIndex[0] != -1 and self.highscoreIndex[1] != -1 and self.highscoreIndex[1] <= self.highscoreIndex[0]:
         self.highscoreIndex[0] += 1
@@ -200,19 +238,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     for i,player in enumerate(self.playerList):
       song.difficulty[i] = player.difficulty
 
-      ##myfingershurt: drum notes need to be counted individually!
-      #if player.part.text == "Drums":
-      #  notes = len([1 for time, event in song.track[i].getAllEvents() if isinstance(event, Song.Note)])
-      #else:
-      #  # glorandwarf: changed to count chords as one note (should match streak)
-      #  notes = len(set(time for time, event in song.track[i].getAllEvents() if isinstance(event, Song.Note)))
-
-      ##MFH - so chords aren't counted as single notes when average multiplier / score is concerned:
-      #singleNotes = len([1 for time, event in song.track[i].getAllEvents() if isinstance(event, Song.Note)])
-      
       notes = player.totalStreakNotes
-      #singleNotes = player.totalNotes
-      
       if notes:# ShiekOdaSandz: Determines the number of stars received at the end of the song; I modified Coffee's settings
         f = float(player.notesHit) / notes
         #self.stars[i]    = int(5.0   * (f + .05))
@@ -399,32 +425,43 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
             self.nextHighScore()
             endScroll = -0.14
           
-        if self.uploadingScores:
-          Theme.setBaseColor(1 - v)
-          if self.uploadResult is None:
-            font.render(_("Uploading Scores..."), (.05, .7 + v), scale = 0.001)
-          else:
-            result = str(self.uploadResult).split(";")
-            if len(result) > 0:
-              if result[0] == "True":
-                #MFH - display rank if it was successful
-                if len(result) > 1:
-                  #font.render(_("Scores uploaded! ...your highscore ranks #" + result[1] + " on the world starpower chart!" ), (.05, .7 + v), scale = 0.001)
-                  font.render(_("Scores uploaded!") + "  ..." + _("your highscore ranks") + " #" + result[1] + " " + _("on the world starpower chart!"), (.05, .7 + v), scale = 0.001)
-                else:
-                  font.render(_("Scores uploaded!") + "  ..." + _("unknown rank."), (.05, .7 + v), scale = 0.001)
-              else:
-                #font.render(_("Score upload failed!  World charts may be down."), (.05, .7 + v), scale = 0.001)
-                font.render(_("Scores uploaded!") + "  ..." + _("no new highscore."), (.05, .7 + v), scale = 0.001)
+        for j,player in enumerate(self.playerList): #MFH 
+          if self.uploadingScores[j]:
+            sScale = 0.001
+            sW, sH = font.getStringSize("A", scale = sScale)
+            sYPos = .7 - ( (sH * 1.25) * j)
+            Theme.setBaseColor(1 - v)
+            if self.highScoreResult[j] is None:
+              upScoreText = _("Uploading Scores...")
+              font.render("P%d (%s) %s" % (j+1, player.name, upScoreText), (.05, sYPos + v), scale = sScale)
             else:
-              font.render(_("Score upload failed!  World charts may be down."), (.05, .7 + v), scale = 0.001)
+              result = str(self.highScoreResult[j]).split(";")
+              if len(result) > 0:
+                upScoreText1 = _("Scores uploaded!")
+                if result[0] == "True":
+                  #MFH - display rank if it was successful
+                  if len(result) > 1:
+                    #font.render(_("Scores uploaded! ...your highscore ranks #" + result[1] + " on the world starpower chart!" ), (.05, .7 + v), scale = 0.001)
+                    upScoreText2 = _("your highscore ranks")
+                    upScoreText3 = _("on the world starpower chart!")
+                    font.render("P%d (%s) %s %s  ...%s #%d %s" % (j+1, player.name, player.part.text, upScoreText1, upScoreText2, int(result[1]), upScoreText3), (.05, sYPos + v), scale = sScale)
+                  else:
+                    upScoreText2 = _("unknown rank.")
+                    font.render("P%d (%s) %s %s  ... %s" % (j+1, player.name, player.part.text, upScoreText1, upScoreText2), (.05, sYPos + v), scale = sScale)
+                else:
+                  upScoreText2 = _("no new highscore.")
+                  #font.render(_("Score upload failed!  World charts may be down."), (.05, .7 + v), scale = 0.001)
+                  font.render("P%d (%s) %s %s  ...%s" % (j+1, player.name, player.part.text, upScoreText1, upScoreText2), (.05, sYPos + v), scale = sScale)
+              else:
+                upScoreText1 = _("Score upload failed!  World charts may be down.")
+                font.render("P%d (%s) %s %s" % (j+1, player.name, player.part.text, upScoreText1), (.05, sYPos + v), scale = sScale)
         
         return
         
 
 
 
-   
+      #initial scoring - skipped after names entered
       Theme.setBaseColor(1 - v)
       if self.playerList[0].cheating:
         text = _("%s Cheated!") % Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
@@ -437,6 +474,12 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         text = text + text2
         w, h = font.getStringSize(text)
         Dialogs.wrapText(font, (.5 - w / 2, .54 - v - h), text)
+
+      #MFH - TODO - add HOPO system & hit window display to this screen
+      settingsScale = 0.0012
+      settingsText = "HOPOs: %s, Hit Window: %s" % (self.hopoStyle, self.hitWindow)
+      w, h = font.getStringSize(settingsText, settingsScale)
+      font.render(settingsText, (.5 - w/2, 0.0), scale = settingsScale)
         
       for j,player in enumerate(self.playerList):
         if self.playerList[j].cheating:

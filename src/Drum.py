@@ -74,6 +74,11 @@ class Drum:
     self.sameNoteHopoString = False
     self.hopoProblemNoteNum = -1
 
+    self.matchingNotes = None
+
+    self.starNotesInView = False
+    self.openStarNotesInView = False
+
     self.cappedScoreMult = 0
 
     self.tempoBpm = 120   #MFH - default is NEEDED here...
@@ -993,7 +998,7 @@ class Drum:
     num = 0
     enable = True
 
-    starEventsInView = False
+    self.openStarNotesInView = False
     #for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard):
     for time, event in reversed(track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)):    #MFH - reverse order of note rendering
       if isinstance(event, Tempo):
@@ -1064,7 +1069,7 @@ class Drum:
           self.spEnabled = False
 
       if event.star or event.finalStar:
-        starEventsInView = True
+        self.openStarNotesInView = True
 
 
       if event.star and self.spEnabled:
@@ -1118,9 +1123,8 @@ class Drum:
       glPopMatrix()
 
     #myfingershurt: end FOR loop / note rendering loop       
-    if not starEventsInView:
+    if (not self.openStarNotesInView) and (not self.starNotesInView):
       self.spEnabled = True
-
 
 
   def renderNotes(self, visibility, song, pos):
@@ -1140,6 +1144,7 @@ class Drum:
 
     num = 0
     enable = True
+    self.starNotesInView = False
     #for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard):
     for time, event in reversed(track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)):    #MFH - reverse order of note rendering
       if isinstance(event, Tempo):
@@ -1174,6 +1179,8 @@ class Drum:
 
       c = self.fretColors[event.number]
       
+      if event.star or event.finalStar:
+        self.starNotesInView = True
       
       
       isOpen = False
@@ -1226,8 +1233,8 @@ class Drum:
             if self.theme == 2 and self.oFlash != None:
               self.ocount = 0
 
-      if enable:
-        self.spEnabled = True
+      #if enable:
+      #  self.spEnabled = True
 
       isTappable = False
 
@@ -1264,6 +1271,8 @@ class Drum:
       glPopMatrix()
 
     #myfingershurt: end FOR loop / note rendering loop       
+    if (not self.openStarNotesInView) and (not self.starNotesInView):
+      self.spEnabled = True
 
   def renderFrets(self, visibility, song, controls):
     w = self.boardWidth / self.strings
@@ -2195,17 +2204,17 @@ class Drum:
     else:
       self.lastFretWasC = False
   
-    notes = self.getRequiredNotes(song, pos)
+    self.matchingNotes = self.getRequiredNotes(song, pos)
 
-    # no notes?
-    if not notes:
+    # no self.matchingNotes?
+    if not self.matchingNotes:
       return False
     self.playedNotes = []
     self.pickStartPos = pos
     
     #adding bass drum hit every bass fret:
     
-    for time, note in notes:
+    for time, note in self.matchingNotes:
       if ((note.number == 0 and controls.getState(self.keys[0]))
        or (note.number == 1 and (controls.getState(self.keys[1]) or controls.getState(self.keys[5])))
        or (note.number == 2 and (controls.getState(self.keys[2]) or controls.getState(self.keys[6]))) 

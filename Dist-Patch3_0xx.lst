@@ -8,3 +8,28 @@
 "data\library.zip"//all
 "data\versiontag.png"//all
 "..\FoFiX-wiki\*.*"//all wiki pages
+//-------Additional files required over 3.000--------
+"data\sounds\99pct1.ogg"//new sound
+"data\sounds\clapsound.ogg"//new sound
+"data\sounds\crowdcheers.ogg"//new sound
+"data\sounds\guitscw2.ogg"//new sound
+"data\sounds\rocksound.ogg"//new sound
+"data\themes\MegaLight\drumnotes.png"//new image
+"data\mods\MegaLight RB Notes\themes\MegaLight\drumnotes.png"//new image
+"data\themes\MegaLight\tail1.png"//new theme files
+"data\themes\MegaLight\side_bars.png"//new theme files
+"data\themes\MegaLight\rock_arr.png"//new theme files
+"data\themes\MegaLight\overdriveneck.png"//new theme files
+"data\themes\MegaLight\overdrive side_bars.png"//new theme files
+"data\themes\MegaLight\overdrive center_lines.png"//new theme files
+"data\themes\MegaLight\notes.png"//new theme files
+"data\themes\MegaLight\guitarsoloneckovr.png"//new theme files
+"data\themes\MegaLight\guitarsoloneck.png"//new theme files
+"data\themes\MegaLight\fretbuttons.png"//new theme files
+"data\themes\MegaLight\drumnotes.png"//new theme files
+"data\themes\MegaLight\drumcenterlines.png"//new theme files
+"data\themes\MegaLight\center_lines.png"//new theme files
+"data\themes\MegaLight\bigtail1.png"//new theme files
+"data\themes\MegaLight\bassgrooveneckovr.png"//new theme files
+"data\themes\MegaLight\bassgrooveneck.png"//new theme files
+

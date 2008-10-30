@@ -68,7 +68,7 @@ class MainMenu(BackgroundLayer):
     self.gfxVersionTag = Config.get("game", "gfx_version_tag")
 
     self.chosenNeck = Config.get("coffee", "neck_choose")
-    self.tut = Config.get("game", "tut")
+    #self.tut = Config.get("game", "tut")
 
     Config.define("coffee",   "max_neck", int, 1)      
 
@@ -344,6 +344,8 @@ class MainMenu(BackgroundLayer):
     Config.set("player0","mode_2p", 0)    #MFH - ensure tutorial can work with new logic that depends on this mode variable
     Config.set("game", "players", 1)
     Config.set("game", "tut", True)
+    
+    #Config.set("player0","mode_1p", 1) #MFH - don't force practice mode.... this is problematic.
 
     self.engine.startServer()
     self.engine.resource.load(self, "session", lambda: self.engine.connect("127.0.0.1"), synch = True)
@@ -360,10 +362,10 @@ class MainMenu(BackgroundLayer):
     Config.set("game", "players", players)
     Config.set("player0","mode_1p", mode1p)
     Config.set("player1","mode_2p", mode2p)
-    if self.tut == True:
+    if Config.get("game", "tut") == True:
       Config.set("game", "tut", False)
-      Config.set("game", "selected_library", "")
-      Config.set("game", "selected_song", "")
+      #Config.set("game", "selected_library", "")
+      #Config.set("game", "selected_song", "")
 
     #MFH - testing new traceback logging:
     #raise TypeError

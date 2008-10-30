@@ -10,6 +10,7 @@
 #               2008 QQStarS                                        #
 #               2008 Blazingamer                                    #
 #               2008 evilynux <evilynux@gmail.com>                  #
+#               2008 fablaculp                                #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -101,6 +102,11 @@ Config.define("game",   "alt_keys",            bool,  False,  text = _("Keyset")
 Config.define("game",   "margin",              int,   0,      text = _("Hit Margin"), options = {0: _("FoF"), 1: _("Capo")})
 Config.define("game",   "notedisappear",      bool,   False,  text = _("Missed Notes"), options = {False: _("Disappear"), True: _("Keep on going")})
 
+
+#Fablaculp's Performance Autoset
+Config.define("performance","autoset",int,0,text = _("Autoset"),options = {0:_("Off"), 1:_("My Pc Sucks !"), 2:_("Normal"), 3:_("My PC is good !"), 4:_("I've paid for all of this ! Gimme more !")})
+
+
 #myfingershurt: the following two lines are not used in gameplay,
 # but are still used in the encrypted score system.  Therefore, the simplest
 # way to prevent users from having issues is to leave these two lines uncommented
@@ -174,9 +180,10 @@ Config.define("game", "gfx_version_tag",       int, 1,     text = _("GfxVersionT
 Config.define("game", "p2_menu_nav",       int, 1,     text = _("P2 Menu Navigate"), options = {0: _("Off"), 1: _("On")}) #MFH
 Config.define("game", "in_game_font_shadowing",      bool, False,  text = _("In-Game Font Shadow"), options = {False: _("Off"), True: _("On")})
 Config.define("audio", "mute_last_second",       int, 0,     text = _("Mute last second"), options = {0: _("No"), 1: _("Yes")}) #MFH
-Config.define("game", "result_cheer_loop",       int, 1,     text = _("Results Cheer Loop"), options = {0: _("Off"), 1: _("Theme"), 2: _("Auto")}) #MFH
+Config.define("game", "result_cheer_loop",       int, 2,     text = _("Results Cheer Loop"), options = {0: _("Off"), 1: _("Theme"), 2: _("Auto")}) #MFH
 Config.define("game",  "cheer_loop_delay",        int,   550,   text = _("Cheer Loop Delay"), options = dict([(n, n) for n in range(0, 10, 1)] + [(n, n) for n in range(10, 50, 10)] + [(n, n) for n in range(50, 2001, 50)]))
 Config.define("game", "miss_pauses_anim",       int, 1,     text = _("Miss Pauses Anim"), options = {0: _("Off"), 1: _("On")}) #MFH
+Config.define("game", "song_hopo_freq",       int, 1,     text = _("Song HOPO Freq"), options = {0: _("Off"), 1: _("Auto")}) #MFH
 
 
 
@@ -320,7 +327,7 @@ class GameEngine(Engine):
 
     self.mainMenu = None    #placeholder for main menu object - to prevent reinstantiation
 
-    self.versionString = "FoFiX v3.021"
+    self.versionString = "FoFiX v3.025"
     
     Log.debug(self.versionString + " starting up...")
     
@@ -481,6 +488,63 @@ class GameEngine(Engine):
     self.startupLayer       = None
     self.loadingScreenShown = False
     
+    #Fablaculp: Performance Autoset configures the options
+    autosetnum = self.config.get("performance","autoset")
+    
+    if autosetnum == 1:
+	    self.config.set("performance", "game_priority", 3)
+	    self.config.set("performance", "disable_libcount", True)
+	    self.config.set("performance", "disable_librotation", True)
+	    self.config.set("performance", "starspin", False)
+	    self.config.set("performance", "static_strings", True)
+	    self.config.set("performance", "killfx", 2)
+	    self.config.set("performance", "star_score_updates", 0)
+	    self.config.set("performance", "in_game_stats", 0)
+	    self.config.set("performance", "preload_glyph_cache", False)
+	    Log.debug("Performance Autoset is 1 (under normal).")
+	    
+    elif autosetnum == 2:
+	    self.config.set("performance", "game_priority", 3)
+	    self.config.set("performance", "disable_libcount", True)
+	    self.config.set("performance", "disable_librotation", True)
+	    self.config.set("performance", "starspin", False)
+	    self.config.set("performance", "static_strings", True)
+	    self.config.set("performance", "killfx", 2)
+	    self.config.set("performance", "star_score_updates", 0)
+	    self.config.set("performance", "in_game_stats", 0)
+	    self.config.set("performance", "preload_glyph_cache", True)
+	    Log.debug("Performance Autoset is 2 (Normal).")
+	    
+    elif autosetnum == 3:
+	    self.config.set("performance", "game_priority", 3)
+	    self.config.set("performance", "disable_libcount", False)
+	    self.config.set("performance", "disable_librotation", True)
+	    self.config.set("performance", "starspin", True)
+	    self.config.set("performance", "static_strings", True)
+	    self.config.set("performance", "killfx", 0)
+	    self.config.set("performance", "star_score_updates", 0)
+	    self.config.set("performance", "in_game_stats", 2)
+	    self.config.set("performance", "preload_glyph_cache", True)
+	    Log.debug("Performance Autoset is 3 (Above Normal).")
+	    
+    elif autosetnum == 4:
+	    self.config.set("performance", "game_priority", 3)
+	    self.config.set("performance", "disable_libcount", False)
+	    self.config.set("performance", "disable_librotation", False)
+	    self.config.set("performance", "starspin", True)
+	    self.config.set("performance", "static_strings", False)
+	    self.config.set("performance", "killfx", 1)
+	    self.config.set("performance", "star_score_updates", 1)
+	    self.config.set("performance", "in_game_stats", 2)
+	    self.config.set("performance", "preload_glyph_cache", True)
+	    Log.debug("Performance Autoset is 4 (Max).")
+	    
+    else:
+	    Log.debug("Performance Autoset is off.")
+	    
+	    
+#Fablaculp: End of Performance Autoset
+
     Log.debug("Ready.")
 
   def setStartupLayer(self, startupLayer):
