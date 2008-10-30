@@ -1,7 +1,7 @@
 #labels theme
 {{{You first need to create a theme.ini in your theme's folder.  Once you create the file you need to type this header line in at the very top:
 
-[theme]
+"[theme]"  <--(Without the quotes)
 
 
 
