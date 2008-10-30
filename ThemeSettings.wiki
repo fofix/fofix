@@ -1,0 +1,9 @@
+#labels theme
+#ThemeInstructions.txt settings
+= Introduction =
+
+Add your content here.
+
+
+= Details =
+-=In Progress=-
