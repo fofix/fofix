@@ -462,7 +462,7 @@ class SettingsMenu(Menu.Menu):
     ManualPerfSettingsMenu = Menu.Menu(engine, ManualPerfSettings)
     
     perfSettings = [
-      ConfigChoice(engine.config, "performance", "autoset"),
+      ConfigChoice(engine.config, "performance", "autoset", autoApply = True),
       (_("Manual Settings (Autoset must be off)"), ManualPerfSettingsMenu),
       (_("Debug Settings"), debugSettingsMenu),
     ]
@@ -503,7 +503,7 @@ class SettingsMenu(Menu.Menu):
     AdvancedSettingsMenu = Menu.Menu(engine, AdvancedSettings)
     
     settings = [
-      (_(engine.versionString+_(" Basics Settings")),   FoFiXBasicSettingsMenu),
+      (_(engine.versionString+_(" Basic Settings")),   FoFiXBasicSettingsMenu),
       (_("Controls"),          keySettingsMenu),
       (_("Library"),   listSettingsMenu),
       (_("Audio"),      audioSettingsMenu),

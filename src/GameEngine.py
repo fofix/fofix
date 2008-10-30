@@ -104,7 +104,7 @@ Config.define("game",   "notedisappear",      bool,   False,  text = _("Missed N
 
 
 #Fablaculp's Performance Autoset
-Config.define("performance","autoset",int,2,text = _("Autoset"),options = {0:_("Off"), 1:_("My Pc Sucks !"), 2:_("Normal"), 3:_("My PC is good !"), 4:_("I've paid for all of this ! Gimme more !")})
+Config.define("performance","autoset",int,0,text = _("Autoset"),options = {0:_("Off"), 1:_("My Pc Sucks !"), 2:_("Normal"), 3:_("My PC is good !"), 4:_("I've paid for all of this ! Gimme more !")})
 
 
 #myfingershurt: the following two lines are not used in gameplay,

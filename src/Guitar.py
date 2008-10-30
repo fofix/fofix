@@ -1367,6 +1367,7 @@ class Guitar:
         if big == True and tailOnly == True:
           self.killPoints = True
 
+      #MFH - TODO - filter out this tail whitening when starpower notes have been disbled from a screwup
       if not killswitch == False:
         if event.star or event.finalStar:
           if big == True and tailOnly == True:
