@@ -5315,7 +5315,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   self.song.pause()
                 if self.failTimer == 1:
                   #self.sfxChannel.setVolume(self.sfxVolume)
-                  self.engine.data.failSound.play
+                  self.engine.data.failSound.play()
                 if self.failTimer < 100:
                   self.failTimer += 1
                   self.failMsg.transform.reset()

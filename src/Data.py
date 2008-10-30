@@ -283,7 +283,7 @@ class Data(object):
       self.loadSoundEffect(self, "failSound", os.path.join("themes",themename,"sounds","failsound.ogg"))
     else: #MFH: Fallback on general failsound.ogg
       self.loadSoundEffect(self, "failSound", os.path.join("sounds","failsound.ogg"))
-      Log.warn(themename + "\sounds\failSound.ogg not found -- using general failSound.ogg instead.")
+      Log.warn(themename + "\sounds\ failsound.ogg not found -- using general failsound.ogg instead.")
 
 
     #myfingershurt: integrating Capo's starpower clap sounds
