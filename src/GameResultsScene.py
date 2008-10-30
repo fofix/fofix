@@ -486,7 +486,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
 
       #MFH - TODO - add HOPO system & hit window display to this screen
       settingsScale = 0.0012
-      settingsText = "HOPOs: %s / %s, Hit Window: %s" % (self.hopoStyle, self.hopoFreq, self.hitWindow)
+      settingsText = "%s settings - HOPOs: %s / %s, Hit Window: %s" % (self.engine.versionString, self.hopoStyle, self.hopoFreq, self.hitWindow)
       w, h = font.getStringSize(settingsText, settingsScale)
       font.render(settingsText, (.5 - w/2, 0.0), scale = settingsScale)
         
