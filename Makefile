@@ -13,9 +13,7 @@ patch: dist
 	@echo --- Creating patch
 	[ -e FoFiX-${VERSION}-Patch-GNULinux-64bit ] && \
 	rm -rf FoFiX-${VERSION}-Patch-GNULinux-64bit*
-	mkdir FoFiX-${VERSION}-Patch-GNULinux-64bit
-	cp dist/FretsOnFire.bin FoFiX-${VERSION}-Patch-GNULinux-64bit/
-	cp -a doc  FoFiX-${VERSION}-Patch-GNULinux-64bit/
+	perl Dist-Patch3_0xx-GNULinux.pl FoFiX-${VERSION}-Patch-GNULinux-64bit
 	tar -cjvf FoFiX-${VERSION}-Patch-GNULinux-64bit.tar.gz FoFiX-${VERSION}-Patch-GNULinux-64bit/
 
 dist:
