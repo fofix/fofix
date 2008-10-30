@@ -1,31 +1,24 @@
 #labels theme
-#ThemeInstructions.txt settings
-#= Introduction =
-#This is documentation of the different settings that can be used to customize a theme, or
-#to be used to help make your own if you want to. 
-#
-#
-#= Details =
-#You first need to create a theme.ini in your theme's folder.  Once you create the file #you need to type this header line in at the very top:
-#
-#[theme]
-#
-#
-#
-#....then any of the settings below may be added underneath the [theme] header:
-#=======================================
-#-=Main Menu=-                         |
-#=======================================
-#(Decimal # between 0 and 1, IE- .34)
-#
-#menu_x = .665              (X Position of main menu image.)
-#menu_y = .842              (Y Position of main menu image.)
-#main_menu_scale = .5       (Scaling size of main menu image)
-#main_menu_vspacing = 0.09  (Spacing in between each line of separated main menu image)
-#
-#
-#Default Theme #'s
-#-----------------
+{{{You first need to create a theme.ini in your theme's folder.  Once you create the file you need to type this header line in at the very top:
+
+[theme]
+
+
+
+....then any of the settings below may be added underneath the [theme] header:
+=======================================-----------------------------------------------------------------------------------------------
+-=Main Menu=-                         |
+=======================================
+(Decimal # between 0 and 1, IE- .34)
+
+menu_x = .665              (X Position of main menu image.)
+menu_y = .842              (Y Position of main menu image.)
+main_menu_scale = .5       (Scaling size of main menu image)
+main_menu_vspacing = 0.09  (Spacing in between each line of separated main menu image)
+
+
+Default Theme #'s
+-----------------
 GHII Themes
 menu_x = .5
 menu_y = .45
@@ -41,7 +34,7 @@ menu_y = .8
 
 
 
-=======================================
+=======================================-----------------------------------------------------------------------------------------------
 -=Loading Phrases and Coordinates=-   |
 =======================================
 (Decimal # between 0 and 1, IE- .34)
@@ -56,7 +49,7 @@ Notice - If you just want the default phrases to show do not put these in your t
 
 
 
-===========================================================
+===========================================================----------------------------------------------------------------------------
 -=Song Selection List / CD list (defaults shown below)=-  |
 ===========================================================
 
@@ -79,7 +72,7 @@ songlist_score_color = #FFFFFF       (GH3 theme default = #3f5a75)
 
 
 
-=======================================
+=======================================-----------------------------------------------------------------------------------------------
 -=In Game Items=-                     |
 =======================================
 (Decimal # between 0 and 1, IE- .34)
@@ -104,7 +97,7 @@ fret4_color = #FF9933            (Manually set 5th fret tail color)
 
 
 
-=============================================
+=============================================------------------------------------------------------------------------------------------
 -=Background, text, selected text colors=-  |
 =============================================
 
@@ -116,7 +109,7 @@ versiontag = true              (Forces showing the Versiontag onscreen)
 
 
 
-==========================================================
+==========================================================----------------------------------------------------------------------------
 -=Pause & options menus, backgrounds & text positions=-  |
 ==========================================================
 
@@ -146,4 +139,4 @@ fail_selected_color = #FFBF00        (Hex color code)
 
 Good luck with making a custom theme to all!!!
 ==============================================
-Done and Maintained by Worldrave
+Done and Maintained by Worldrave}}}
