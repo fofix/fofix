@@ -1,12 +1,12 @@
 #labels theme
 You first need to create a theme.ini in your theme's folder.  Once you create the file you need to type this header line in at the very top:
 
-"[theme]"  <--(Without the quotes)
+{{{[theme]}}}
 
 
 
 then any of the settings below may be added underneath the [theme] header:
-=======================================-----------------------------------------------------------------------------------------------
+=======================================
 -=Main Menu=-                         |
 =======================================
 (Decimal # between 0 and 1, IE- .34)
