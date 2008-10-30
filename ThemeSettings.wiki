@@ -6,9 +6,9 @@ You first need to create a theme.ini in your theme's folder.  Once you create th
 
 
 then any of the settings below may be added underneath the [theme] header:
-=======================================
--=Main Menu=-                         |
-=======================================
+---------------------------------------
+-Main Menu                            |
+---------------------------------------
 (Decimal # between 0 and 1, IE- .34)
 
 {{{menu_x = .665              (X Position of main menu image)
