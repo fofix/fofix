@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-10-29 09:09-0700\n"
+"POT-Creation-Date: 2008-10-29 19:44-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -189,41 +189,41 @@ msgstr ""
 msgid "Neck"
 msgstr ""
 
-#: Dialogs.py:2883
+#: Dialogs.py:2881
 #, python-format
 msgid "%.2f beats per minute"
 msgstr ""
 
-#: Dialogs.py:2959 Dialogs.py:3023
+#: Dialogs.py:2957 Dialogs.py:3021
 msgid "StarPower"
 msgstr ""
 
-#: Dialogs.py:3010 Dialogs.py:3028
+#: Dialogs.py:3008 Dialogs.py:3026
 #, python-format
 msgid "Killswitch %d%%"
 msgstr ""
 
-#: Dialogs.py:3016 Dialogs.py:3034
+#: Dialogs.py:3014 Dialogs.py:3032
 msgid "Killswitch"
 msgstr ""
 
-#: Dialogs.py:3040 Dialogs.py:3046
+#: Dialogs.py:3038 Dialogs.py:3044
 msgid "Pick!"
 msgstr ""
 
-#: Dialogs.py:3158
+#: Dialogs.py:3156
 msgid "Choose a Song"
 msgstr ""
 
-#: Dialogs.py:3177
+#: Dialogs.py:3175
 msgid "Choose a File"
 msgstr ""
 
-#: Dialogs.py:3222 Dialogs.py:3233
+#: Dialogs.py:3220 Dialogs.py:3231
 msgid "Play with the keys and press Escape when you're done."
 msgstr ""
 
-#: Dialogs.py:3244 Dialogs.py:3380
+#: Dialogs.py:3242 Dialogs.py:3378
 msgid "Loading..."
 msgstr ""
 
@@ -2170,7 +2170,7 @@ msgstr ""
 msgid "A key conflict exists somewhere. You should fix it."
 msgstr ""
 
-#: Settings.py:182 Settings.py:522
+#: Settings.py:182 Settings.py:515
 msgid "Apply New Settings"
 msgstr ""
 
@@ -2250,63 +2250,59 @@ msgstr ""
 msgid "Debug Settings"
 msgstr ""
 
-#: Settings.py:481
+#: Settings.py:472
 msgid "Select Song Library >"
 msgstr ""
 
-#: Settings.py:488
-msgid "Advanced Libary Settings"
-msgstr ""
-
-#: Settings.py:506
+#: Settings.py:499
 msgid "FoFix Advanced Settings"
 msgstr ""
 
-#: Settings.py:507
+#: Settings.py:500
 msgid "Theme Settings"
 msgstr ""
 
-#: Settings.py:508
+#: Settings.py:501
 msgid "Fretboard Settings"
 msgstr ""
 
-#: Settings.py:513
+#: Settings.py:506
 msgid " Basics Settings"
 msgstr ""
 
-#: Settings.py:514
+#: Settings.py:507
 msgid "Controls"
 msgstr ""
 
-#: Settings.py:515
+#: Settings.py:508
 msgid "Library"
 msgstr ""
 
-#: Settings.py:516
+#: Settings.py:509
 msgid "Audio"
 msgstr ""
 
-#: Settings.py:517
+#: Settings.py:510
 msgid "Video"
 msgstr ""
 
-#: Settings.py:518
+#: Settings.py:511
 msgid "Performances/Debug"
 msgstr ""
 
-#: Settings.py:519
+#: Settings.py:512
 msgid "Advanced Settings"
 msgstr ""
 
-#: Settings.py:520
+#: Settings.py:513
 msgid "Mod settings"
 msgstr ""
 
-#: Settings.py:521
+#: Settings.py:514
 msgid "Credits"
 msgstr ""
 
-#: Settings.py:588 SongChoosingScene.py:173
+#: Settings.py:581 SongChoosingScene.py:173
 msgid "Choose a new songs directory."
 msgstr ""
 
