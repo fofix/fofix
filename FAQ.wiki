@@ -223,7 +223,7 @@ Ho/Po is short for Hammer On / Pull-off
 A Note which is marked differently than usual is a Ho/Po-note.
 This means that the note is tappable and doesn't require a strum/pick.
 
-Thanks to Myfingershurt, Alarian mod has several options for the Ho/Po-
+Thanks to Myfingershurt, FoFiX has several options for the Ho/Po-
 system:
 
   *"None" = No tappable notes at all.
@@ -235,7 +235,7 @@ system:
     * You can NOT strum a tappable note while holding a lower fret.
     * You can NOT tap an incorrect fret in between Ho/Pos
     * You CAN hold a higher fret and tap a lower fret
-    * You can NOT tap a note after a chord.
+    * You can NOT perform a chord pull-off
 
   * "GH2 Strict" = Guitar Hero 2-like Ho/Po system with strict rules.
     * The first note in a string of the same notes CAN be tapped.
@@ -244,7 +244,7 @@ system:
     * You can NOT tap an incorrect fret (hammer-on) in between Ho/Pos.
     * The penalties for this are: a streak & multiplier reset, and you will have to strum to resume Ho/Po'ing.
     * You can NOT hold a higher fret and tap a lower fret.
-    * You CAN tap a note after a chord (if the option is enabled).
+    * You CAN perform a chord pull-off (if the option is enabled).
 
   * "GH2" = Guitar Hero 2 replica Ho/Po system, rules match GH2 console game rules as closely as possible.
     * The first note in a string of the same notes CAN be tapped.
@@ -253,7 +253,7 @@ system:
     * You can NOT tap an incorrect fret (hammer-on) in between Ho/Pos.
     * The penalty for this is: you will have to strum to resume Ho/Po'ing.
     * You can NOT hold a higher fret and tap a lower fret.
-    * You CAN tap a note after a chord (if the option is enabled).
+    * You CAN perform a chord pull-off (if the option is enabled).
 
   *"GH2 Sloppy" = Guitar Hero 2-like Ho/Po system with sloppy rules.
     * The first note in a string of the same notes CAN be tapped.
@@ -261,9 +261,9 @@ system:
     * You CAN strum a tappable note while holding a lower fret.
     * You CAN tap an incorrect fret in between Ho/Pos.
     * You CAN hold a higher fret and tap a lower fret.
-    * You CAN tap a note after a chord (if the option is enabled).
+    * You CAN perform a chord pull-off (if the option is enabled).
 
-Basic premise: Ho/Po note after a chord
+"Chord Pull-Off" - Basic premise: Ho/Po note after a chord
   * You CAN pull off any other fingers from a 3-or-4-note chord to "tap" a Ho/Po.
   * You CAN pull a finger off a higher fret from the chord to "tap" a Ho/Po.
   * You CAN NOT pull a finger off a lower fret from the chord to "tap" a Ho/Po (these notes will NOT be marked as HOPOs).
