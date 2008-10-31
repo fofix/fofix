@@ -115,22 +115,16 @@ I know the 5.3 avg multiplier is actually unreachable with some songs
 (with very little or no sustains) but that's the way it's supposed to be,
 if the real game is any indication.
 
-==== FoF scoring ====
-...is based on accuracy alone.
+==== "FoF" scoring ====
+Based on accuracy alone.
 i.e., 95%+ is 5 stars, no matter if you have a 1x avg multiplier.
 
 ===Tutorial Song===
-In order for the Training -> Tutorial menu option to work,
-you have to have the tutorial song itself in your main songs folder.
+In order for the Training -> Tutorials menu option to work,
+you have to have at least one tutorial song in the game's {{{data\tutorials}}} folder.
 
-songs\tutorial
-(this means that all the files, such as `song.ogg` / `notes.mid` / `script.txt` / etc.
-should be in the `songs\tutorial\` folder.... *NO SUBFOLDERS*)
-
-would be the recommended location to place it.
-
-Tutorial may be downloaded from mediafire at this URL:
-http://www.mediafire.com/?zm1jjlwxnyr
+The original FoF Jurgen Tutorial may be downloaded from mediafire at this URL (included with full release 3.021 or later):
+[http://www.mediafire.com/?zm1jjlwxnyr]
 
 === Multiplayer ===
 Multiplayer > Party Mode:
@@ -140,7 +134,11 @@ the game switches between 1st and 2nd player controls every 30 seconds
 (or however long you set) to play a single track in a song.
 It is the original 2-player mode from a way earlier version.
 
-Face-Off is probably the mode you're looking for.
+Face-Off is probably the mode you're looking for (separate rock meters and scores)
+
+Pro-Face Off is a bit strange, and is tough to keep fair unless both players are playing the same instrument and difficulty.  Each note player 1 hits decreases player 2's rock meter, and vice versa (along with the normal increasing / decreasing of each player's rock meter based on notes hit / missed).  Eventually one player will "make" the other player fail.
+
+You can face Jurgen by enabling him and setting him to player 2 only.
 
 === Practice Mode ===
 If you want to practice a multi-track song with all instruments playing...
