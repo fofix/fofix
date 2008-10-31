@@ -10,6 +10,7 @@ On the [http://fretsonfire.net FretsOnFire Fan Forum].
 More specifically, in the [http://www.fretsonfire.net/forums/viewtopic.php?f=11&t=25040 FoFiX Development & Discussion Thread]
 
 ----
+----
 
 ==Playing the Game==
 ===LAG - Recommended Settings===
@@ -20,10 +21,14 @@ We recommend the following important settings to minimize lag:
   * Performance -> Set Priority -> ABOVE NORMAL (this helps a great deal as well with lag, especially if you have other applications running)
   * Theme -> MegaLight (very low-overhead theme)
 
+----
+
 ===Memory Leaks===
 IMPORTANT - Note on the memory leak and how to handle it:
 Python version 2.4 (which Frets on Fire 1.2.451 is built on) has an inherent memory leak problem. As you play more songs, this leak will eat more and more of your physical and virtual memory until the game runs unplayably slow.
 Every so often, it is recommended that you quit the game completely and restart it. This clears all memory used and restarts the game fresh.
+
+----
 
 ===Animated Stage Selection===
 Under "Theme Settings" there is a setting for "Animated Stage"
@@ -41,6 +46,8 @@ Animation Delay is the delay between stage frames in an animsated stage subfolde
 
 To summarize:
 The stages folder is for the standard slideshow stage rotation with a long delay. The animated subfolders are for frames, meant for display with a short delay. You wouldn't want the standard slideshow animating fast, and you wouldn't want a random static background frame from one of the animated subfolders...
+
+----
 
 ===Backing up / Restoring Careers===
 ====Backup====
@@ -63,11 +70,7 @@ The following is a manual procedure for restoring up a Frets on Fire career in W
   # Select the drive where your career was originally located (yes, just the root folder, such as C:\). Click "OK"
   # A box will pop up, notifying you of a file replacement. Click "Yes to All". Your backed-up career has been restored (as well as a snapshot of your scores from the time of backup).
 
-===Board Speeds===
-"Percentage" mode directly uses the "Speed Percent" number you set as the board speed with no calculations during gameplay.....
-
-In all other cases, the "Speed Percent" number is used as a percentage scaler for the board speed
-(all other board speed modes involve calculations during gameplay)
+----
 
 ===Stage Backgrounds / Stage Modes / Stage Rotation===
 Stage determination logic / psuedocode: ("End" means, stage background policy has been determined.)
@@ -98,6 +101,8 @@ When Rotation is off, Stages: Default shows the default stage. Stages: Random sh
 
 They could be in one setting, I'm just limited in how long the setting names can be. "Stages: Rotate Random" and "Stages: Rotate BackNForth" would probably be well off the screen, for example.
 
+----
+
 ===Star Scoring===
 
 ===="RB" (Rock Band style) scoring ====
@@ -119,12 +124,16 @@ if the real game is any indication.
 Based on accuracy alone.
 i.e., 95%+ is 5 stars, no matter if you have a 1x avg multiplier.
 
+----
+
 ===Tutorial Song===
 In order for the Training -> Tutorials menu option to work,
 you have to have at least one tutorial song in the game's {{{data\tutorials}}} folder.
 
 The original FoF Jurgen Tutorial may be downloaded from mediafire at this URL (included with full release 3.021 or later):
 [http://www.mediafire.com/?zm1jjlwxnyr]
+
+----
 
 === Multiplayer ===
 Multiplayer > Party Mode:
@@ -140,6 +149,8 @@ Pro-Face Off is a bit strange, and is tough to keep fair unless both players are
 
 You can face Jurgen by enabling him and setting him to player 2 only.
 
+----
+
 === Practice Mode ===
 If you want to practice a multi-track song with all instruments playing...
 make a copy of that song's folder, edit the title in the `song.ini` so you
@@ -151,6 +162,8 @@ just add text events or section markers wherever you'd like a practice marker. (
 
 If you would like to add practice sections to a song that already has guitar solo markings, and those solo markings are actual section markers (like in Rock Band), you must add
 more section markers to designate practice sections.
+
+----
 
 === Analog Killswitch Notes ===
 Analog killswitch fades volume to the whammy position, scaled to the kill volume.
@@ -168,6 +181,8 @@ the whammy can be used as the killswitch control.
 
 If your guitar is in digital mode, the whammy bar will most likely register as strums.
 Look in your PS2 - USB adapter manual for instructions how to change to analog.
+
+----
 
 === Note Hit Accuracy Display ===
 Under "Visual Settings," you can enable a note hit accuracy display by setting the "Accuracy" option as follows:
@@ -195,12 +210,13 @@ Under "Visual Settings," you can enable a note hit accuracy display by setting t
 
   * "Both" will display the friendly text and the numerical representation below it
 
-=== Browsing Uploaded Scores ===
-*NOTE*: Divra's webserver decided we were using too much bandwidth with our highscores!
-*THIS DOES NOT CURRENTLY WORK, THE SITE IS DOWN*
+----
 
+=== Browsing Uploaded Scores ===
 To check Divra's world charts (for us, with starpower), you need to go to this URL:
-http://fofchart.exofire.net/index.php?sp=true
+[http://www.wembley1967.com/chart/]
+
+----
 
 === HO/PO System Details ===
 Ho/Po is short for Hammer On / Pull-off
@@ -252,8 +268,19 @@ Basic premise: Ho/Po note after a chord
   * You CAN pull a finger off a higher fret from the chord to "tap" a Ho/Po.
   * You CAN NOT pull a finger off a lower fret from the chord to "tap" a Ho/Po (these notes will NOT be marked as HOPOs).
 
+----
+
 ===How to report bugs or issues ===
 Please refer to ReportingBugs.
+
+
+----
+
+===Board Speeds===
+"Percentage" mode directly uses the "Speed Percent" number you set as the board speed with no calculations during gameplay.....
+
+In all other cases, the "Speed Percent" number is used as a percentage scaler for the board speed
+(all other board speed modes involve calculations during gameplay)
 
 === Neckspeed Details ===
 Neck speed is calculated like this:
@@ -291,8 +318,7 @@ Hard/Medium/Easy: 277,7.../311,1.../333,3...
 Naturally the Neckspeed and hitwindows will be the slowest (and widest) for Boardspeed by Difficulty.
 
 ----
-
-
+----
 
 ==Content Creators==
 ===Creating Careers===
@@ -354,6 +380,8 @@ unlock_id = gh2_bonus
 *NOTE*: the highscores no longer affect the carrer unlocking, so quickplaying
 an unlocked song won't cause issues.
 
+----
+
 ====Ordering Songs Within Careers====
 V3.000 allows sorting within tiers based on song name (as before). Now, prefixes used for tier song sorting (1. 2. 3. etc.) will be filtered out. Songs will be indented forward slightly from their tiers.
 This is now the accepted / standard method that should be used for all career packs (song.ini - add 1. 2. 3. 4. 5. etc. to order songs any way you'd like)
@@ -388,6 +416,7 @@ Please note, if your solo markers contain any of the following words they might 
 "Verse"
 }}}
 -----
+-----
 
 ==Translators==
 === Translations with Accent Marks (') or Tildes (~)===
@@ -409,8 +438,10 @@ add this line in your `fretsonfire.ini`, under the [game] section (accent marks 
 `Encoding = Latin`
 
 -----
+-----
 
 ==Developers==
 ===Compiling the Source===
 To set up source files for this mod and compile from scratch:
 Get the latest and greatest source code from the Source tab. 
+For instructions on where to retrieve and how to install the required source modules so you can compile & build FoFiX yourself, see the RequiredSourceModules wiki.
