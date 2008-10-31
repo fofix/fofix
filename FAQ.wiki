@@ -115,8 +115,9 @@ I know the 5.3 avg multiplier is actually unreachable with some songs
 (with very little or no sustains) but that's the way it's supposed to be,
 if the real game is any indication.
 
-FoF scoring is based on accuracy alone...
-95%+ is 5 stars, no matter if you have a 1x avg multiplier.
+==== FoF scoring ====
+...is based on accuracy alone.
+i.e., 95%+ is 5 stars, no matter if you have a 1x avg multiplier.
 
 ===Tutorial Song===
 In order for the Training -> Tutorial menu option to work,
