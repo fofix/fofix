@@ -4,3 +4,4 @@
   * [KnownIssues]
   * [ProjectStatistics]
   * [ReportingBugs]
+  * [RequiredSourceModules]
