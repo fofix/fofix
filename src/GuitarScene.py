@@ -82,6 +82,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #raise TypeError
     
     splash = Dialogs.showLoadingSplashScreen(self.engine, _("Preparing...") ) 
+
     
     #MFH - retrieve game parameters:
     self.gamePlayers = self.engine.config.get("game", "players")
@@ -226,6 +227,47 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #Get theme
     themename = self.engine.data.themeLabel
     self.theme = self.engine.data.theme
+
+
+    #MFH pre-translate text strings:
+    self.tsNoteStreak = _("Note Streak!!!")
+    if self.theme == 2:
+      self.tsStarPowerReady = _("Overdrive Ready")
+    else:
+      self.tsStarPowerReady = _("Star Power Ready")
+    self.tsYouFailedBattle = _("You Failed!!!!")
+    self.tsJurgenIsHere = _("Jurgen is here")
+    self.tsJurgenWasHere = _("Jurgen was here")
+    self.tsPercentComplete = _("% Complete")
+    self.tsHopoIndicator = _("HOPO")
+    self.tsCompleted = _("COMPLETED")
+    self.tsPercentOn = _(" % ON ")
+    self.tsBassGroove = _("BASS GROOVE")
+    self.tsBassGrooveLabel = _("Bass Groove:")
+    self.tsAvgLabel = _("Avg")
+    self.tsAccVeryLate = _("Very Late")
+    self.tsAccLate = _("Late")
+    self.tsAccSlightlyLate = _("Slightly Late")
+    self.tsAccExcellentLate = _("-Excellent!")
+    self.tsAccPerfect = _("Perfect!!")
+    self.tsAccExcellentEarly = _("+Excellent!")
+    self.tsAccSlightlyEarly = _("Slightly Early")
+    self.tsAccEarly = _("Early")
+    self.tsAccVeryEarly = _("Very Early")
+    self.msLabel = _("ms")
+    self.tsGuitarSolo = _("Guitar Solo!")
+    self.tsPerfectSolo = _("Perfect Solo!")
+    self.tsAwesomeSolo = _("Awesome Solo!")
+    self.tsGreatSolo = _("Great Solo!")
+    self.tsGoodSolo = _("Good Solo!")
+    self.tsSolidSolo = _("Solid Solo!")
+    self.tsOkaySolo = _("Okay Solo!")
+    self.tsMessySolo = _("Messy Solo!")
+    self.tsPtsLabel = _("pts")
+    self.tsGetReady = _("Get Ready to Rock")
+    self.tsAsMadeFamousBy = _("as made famous by")
+    self.tsBy = _("by ")
+    self.tsFrettedBy = _(" fretted by ")
 
 
     self.playerList[0].currentTheme = self.theme
@@ -1712,7 +1754,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
       if (playerStreak == 50 or (self.lastStreak[i] < 50 and playerStreak > 50) ) and textChanged:
         #self.displayText[i] = _("50 Note Streak!!!") #kk69: more GH3-like
-        self.newScalingText(i, _("50 Note Streak!!!") )
+        #self.newScalingText(i, _("50 Note Streak!!!") )
+        self.newScalingText(i, "50 %s" % self.tsNoteStreak)
         #self.streakFlag = "%d" % (i)   #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1. 
       #MFH - I think a simple integer modulo would be more efficient here: 
       else:
@@ -1720,7 +1763,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if ( (streakModulo == 0) or (self.lastStreak[i] % 100 > streakModulo) ) and playerStreak > 50 and textChanged:
           #self.displayText[i] = _("%d Note Streak!!!") % playerStreak #kk69: more GH3-like
           #self.newScalingText(i, _("%d Note Streak!!!") % playerStreak )
-          self.newScalingText(i, _("%d Note Streak!!!") % (playerStreak - streakModulo) )
+          #self.newScalingText(i, _("%d Note Streak!!!") % (playerStreak - streakModulo) )
+          self.newScalingText(i, "%d %s" % (playerStreak - streakModulo, self.tsNoteStreak) )
           #self.streakFlag = "%d" % (i)  #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1.
   
       if self.scaleText[i] >= self.maxDisplayTextScale:
@@ -2051,16 +2095,20 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           else:
             self.engine.data.starSound.play()
             
+
+
           self.guitars[i].starPowerGained = False  #QQstarS:Set [0] to [i]
           if self.phrases == True and self.guitars[i].starPower >= 50:  #QQstarS:Set [0] to [i]
-            if self.theme == 0 or self.theme == 1:
-              #self.displayText[i] = _("Star Power Ready") #kk69: more GH3-like
-              self.newScalingText(i, _("Star Power Ready") )
-              #self.streakFlag = "%d" % (i)  #QQstarS:Set  the flag
-            elif self.theme == 2:
-              #self.displayText[i] = _("Overdrive Ready") #kk69: more GH3-like, even though it's RB (just for people who use phrases on RB theme)
-              self.newScalingText(i, _("Overdrive Ready") )
-              #self.streakFlag = "%d" % (i) #QQstarS:Set the flag
+            self.newScalingText(i, self.tsStarPowerReady )
+
+#-            if self.theme == 0 or self.theme == 1:
+#-              #self.displayText[i] = _("Star Power Ready") #kk69: more GH3-like
+#-              self.newScalingText(i, _("Star Power Ready") )
+#-              #self.streakFlag = "%d" % (i)  #QQstarS:Set  the flag
+#-            elif self.theme == 2:
+#-              #self.displayText[i] = _("Overdrive Ready") #kk69: more GH3-like, even though it's RB (just for people who use phrases on RB theme)
+#-              self.newScalingText(i, _("Overdrive Ready") )
+#-              #self.streakFlag = "%d" % (i) #QQstarS:Set the flag
 
       # update board
       #for i,guitar in enumerate(self.guitars):
@@ -2203,11 +2251,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.notesHit[i] = False 
         self.lessMissed[i] = False 
 
+
+
         #battle failing
         if self.battle and self.numOfPlayers>1:
           if self.rock[i] <= 0:
             #self.displayText[i] = "You Failed!!!!"
-            self.newScalingText(i, _("You Failed!!!!") )
+            #self.newScalingText(i, _("You Failed!!!!") )
+            self.newScalingText(i, self.tsYouFailedBattle )
             #self.streakFlag = str(i)   #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1. 
           self.guitars[i].actions = [0,0,0]
 
@@ -3982,28 +4033,29 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       try:
         now = self.getSongPosition()
         countdownPos = self.lastEvent - now
-  
+
+        #MFH TODO - rewrite this Jurgen block and rename variables to be multiplayer-friendly (for >2 players)
         #Show Jurgen played Spikehead777
         #Player 1
         if self.jurg1 == True and self.splayers == 2:
           if self.autoPlay:
             if self.jurg == 0 or self.jurg == 2:
-              text = _("Jurgen is here")
+              text = self.tsJurgenIsHere
             else:
-              text = _("Jurgen was here")
+              text = self.tsJurgenWasHere
           else:
-            text = _("Jurgen was here")
+            text = self.tsJurgenWasHere
           w, h = bigFont.getStringSize(text, scale = 0.0005)
           Theme.setBaseColor()
           bigFont.render(text,  (0.25-(w/2), 0.34), scale = 0.0005)  #MFH - y was 0.4
         elif self.jurg1 == True and self.splayers == 1:
           if self.autoPlay:
             if self.jurg == 0 or self.jurg == 2:
-              text = _("Jurgen is here")
+              text = self.tsJurgenIsHere
             else:
-              text = _("Jurgen was here")
+              text = self.tsJurgenWasHere
           else:
-            text = _("Jurgen was here")
+            text = self.tsJurgenWasHere
           w, h = bigFont.getStringSize(text, scale = 0.001)
           Theme.setBaseColor()
           bigFont.render(text,  (0.5-(w/2), 0.2), scale = 0.001)
@@ -4011,11 +4063,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if self.jurg2 == True and self.splayers == 2:
           if self.autoPlay:
             if self.jurg == 1 or self.jurg == 2:
-              text = _("Jurgen is here")
+              text = self.tsJurgenIsHere
             else:
-              text = _("Jurgen was here")
+              text = self.tsJurgenWasHere
           else:
-            text = _("Jurgen was here")
+            text = self.tsJurgenWasHere
           w, h = bigFont.getStringSize(text, scale = 0.0005)
           Theme.setBaseColor()
           bigFont.render(text,  (0.75-(w/2), 0.34), scale = 0.0005)
@@ -4334,19 +4386,22 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 self.failScreen.transform.translate(w/2+self.fail_bkg_x,h/2+self.fail_bkg_y)
                 self.failScreen.draw()
     
+
                 text = Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
                 size = font.getStringSize(text)
                 font.render(text, (.5-size[0]/2.0,.35-size[1]))
                 #now = self.getSongPosition()
                 pctComplete = min(100, int(now/self.lastEvent*100))
-                text = str(pctComplete) + _("% Complete")
+                #text = str(pctComplete) + _("% Complete")
+                text = "%s%s" % ( str(pctComplete), self.tsPercentComplete )
                 size = font.getStringSize(text)
                 font.render(text, (.5-size[0]/2.0, .35))
                 if not self.failEnd:
                   self.failGame()
   
+
               if self.hopoIndicatorEnabled and not self.guitars[i].isDrum and not self.pause and not self.failed: #MFH - HOPO indicator (grey = strums required, white = strums not required)
-                text = _("HOPO")
+                text = self.tsHopoIndicator
                 if self.guitars[i].hopoActive > 0:
                   glColor3f(1.0, 1.0, 1.0)  #white
                 else:
@@ -4892,17 +4947,18 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 diff = str(self.playerList[0].difficulty)
                 # compute initial position
                 pctComplete = min(100, int(now/self.lastEvent*100))
+
                 
-                curxpos = font.getStringSize(_("COMPLETED")+" ", scale = 0.0015)[0]
+                curxpos = font.getStringSize("%s " % self.tsCompleted, scale = 0.0015)[0]
                 curxpos += font.getStringSize(str(pctComplete), scale = 0.003)[0]
-                curxpos += font.getStringSize( _(" % ON "), scale = 0.0015)[0]
+                curxpos += font.getStringSize(self.tsPercentOn, scale = 0.0015)[0]
                 curxpos += font.getStringSize(diff, scale = 0.003)[0]
                 curxpos = .5-curxpos/2.0
                 c1,c2,c3 = self.fail_completed_color
                 glColor3f(c1,c2,c3)              
   
                 # now render
-                text = _("COMPLETED") + " "
+                text = "%s " % self.tsCompleted
                 size = font.getStringSize(text, scale = 0.0015)
                 # evilynux - Again, for this very font, the "real" height value is 75% of returned value
                 font.render(text, (curxpos, .37+(font.getStringSize(text, scale = 0.003)[1]-size[1])*.75), scale = 0.0015)
@@ -4911,7 +4967,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
                 size = font.getStringSize(text, scale = 0.003)
                 font.render(text, (curxpos, .37), scale = 0.003)
-                text = _(" % ON ")
+                text = self.tsPercentOn
                 curxpos += size[0]
                 size = font.getStringSize(text, scale = 0.0015)
                 font.render(text, (curxpos, .37+(font.getStringSize(text, scale = 0.003)[1]-size[1])*.75), scale = 0.0015)
@@ -4921,9 +4977,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
                 if not self.failEnd:
                   self.failGame()
+
   
               if self.hopoIndicatorEnabled and not self.guitars[i].isDrum and not self.pause and not self.failed: #MFH - HOPO indicator (grey = strums required, white = strums not required)
-                text = _("HOPO")
+                text = self.tsHopoIndicator
                 if self.guitars[i].hopoActive > 0:
                   glColor3f(1.0, 1.0, 1.0)  #white
                 else:
@@ -5176,13 +5233,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   #-                self.oTop.transform.translate(w/2,h/12)
   #-                self.oTop.draw()
   
+
                 
                 #must duplicate to other theme 
                 #if self.playerList[i].part.text == "Bass Guitar" and player.streak >= 40 and self.bassGrooveEnableMode > 0:   #bass groove!
                 if self.guitars[i].isBassGuitar and player.streak >= 40 and self.bassGrooveEnableMode > 0:   #bass groove!
                   #death_au: bassgroove multiplier image
                   if self.bassgroovemult != None:
-                    text = _("BASS GROOVE") #kk69: displays "Bass Groove" whenever active, like Rock Band (only for RB theme)
+                    text = self.tsBassGroove   #kk69: displays "Bass Groove" whenever active, like Rock Band (only for RB theme)
                     wid, hig = font.getStringSize(text,0.00150)
                     
                     #MFH - if Jurgen is active on the current player, raise "Bass Groove" up above "Jurgen Is Here":
@@ -5211,7 +5269,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   else:
                     #myfingershurt: Temp text bass groove multiplier:
                     glColor3f(0,0.75,1)
-                    text = _("Bass Groove:") + str(self.playerList[i].getScoreMultiplier() * self.multi[i]) + "x"
+
+
+                    #text = self.tsBassGrooveLabel + str(self.playerList[i].getScoreMultiplier() * self.multi[i]) + "x"
+                    text = "%s%d%s" % (self.tsBassGrooveLabel, self.playerList[i].getScoreMultiplier() * self.multi[i], "x")
                     wid, hig = font.getStringSize(text,0.00150)
                     font.render(text, (.500 - wid / 2, .690),(1, 0, 0),0.00150)     #replacing normal rock band multiplier text
                 
@@ -5345,8 +5406,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 font.render(text, (.5-size[0]/2.0,.3-size[1]))
                 #now = self.getSongPosition()
 
+
                 pctComplete = min(100, int(now/self.lastEvent*100))
-                text = str(pctComplete) + _("% Complete")
+                text = str(pctComplete) + self.tsPercentComplete
                 size = font.getStringSize(text)
                 font.render(text, (.5-size[0]/2.0, .3))
                 if not self.failEnd:
@@ -5355,7 +5417,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                #QQstarS:add the code in for loop end of here		
   
               if self.hopoIndicatorEnabled and not self.guitars[i].isDrum and not self.pause and not self.failed: #MFH - HOPO indicator (grey = strums required, white = strums not required)
-                text = _("HOPO")
+                text = self.tsHopoIndicator
                 if self.guitars[i].hopoActive > 0:
                   glColor3f(1.0, 1.0, 1.0)  #white
                 else:
@@ -5565,9 +5627,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               font.render(text, (accDispX - w/2, accDispYac),(1, 0, 0),0.00140)     #top-centered by streak under score
               trimmedAvMult = self.decimal(str(self.avMult[i])).quantize(self.decPlaceOffset)
               #text = _("Avg: ") + str(trimmedAvMult) + "x"
-              avgLabel = _("Avg")
+
+              #avgLabel = _("Avg")
               text = "%(avLab)s: %(avMult)sx" % \
-                {'avLab': avgLabel, 'avMult': str(trimmedAvMult)}
+                {'avLab': self.tsAvgLabel, 'avMult': str(trimmedAvMult)}
               glColor3f(c1, c2, c3)
               w, h = font.getStringSize(text,0.00160)
               font.render(text, (accDispX - w/2, accDispYam),(1, 0, 0),0.00140)     #top-centered by streak under score
@@ -5622,40 +5685,40 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 
                 worstAccuracy = self.guitars[i].lateMargin      
     
+                #MFH TODO - Precalculate these hit accuracy thresholds instead of every frame
                 if (self.accuracy[i] >= (0-worstAccuracy)) and (self.accuracy[i] < (0-(3*worstAccuracy/4))):
-                  text = _("Very Late")
+                  text = self.tsAccVeryLate
                   glColor3f(1, 0, 0)
                 elif (self.accuracy[i] >= (0-(3*worstAccuracy/4))) and (self.accuracy[i] < (0-(2*worstAccuracy/4))):
-                  text = _("Late")
+                  text = self.tsAccLate
                   glColor3f(1, 1, 0)
                 elif (self.accuracy[i] >= (0-(2*worstAccuracy/4))) and (self.accuracy[i] < (0-(1*worstAccuracy/4))):
-                  text = _("Slightly Late")
+                  text = self.tsAccSlightlyLate
                   glColor3f(1, 1, 0)
                 elif (self.accuracy[i] >= (0-(1*worstAccuracy/4))) and (self.accuracy[i] < -1.0):
-                  text = _("-Excellent!")
+                  text = self.tsAccExcellentLate
                   glColor3f(0, 1, 0)
                 elif (self.accuracy[i] >= -1.0) and (self.accuracy[i] < 1.0):
                   #give the "perfect" reading some slack, -1.0 to 1.0
-                  text = _("Perfect!!")
+                  text = self.tsAccPerfect
                   glColor3f(0, 1, 1) #changed color
                 elif (self.accuracy[i] >= 1.0) and (self.accuracy[i] < (1*worstAccuracy/4)):
-                  text = _("+Excellent!")
+                  text = self.tsAccExcellentEarly
                   glColor3f(0, 1, 0)
                 elif (self.accuracy[i] >= (1*worstAccuracy/4)) and (self.accuracy[i] < (2*worstAccuracy/4)):
-                  text = _("Slightly Early")
+                  text = self.tsAccSlightlyEarly
                   glColor3f(1, 1, 0)
                 elif (self.accuracy[i] >= (2*worstAccuracy/4)) and (self.accuracy[i] < (3*worstAccuracy/4)):
-                  text = _("Early")
+                  text = self.tsAccEarly
                   glColor3f(1, 1, 0)
                 elif (self.accuracy[i] >= (3*worstAccuracy/4)) and (self.accuracy[i] < (4*worstAccuracy/4)):
-                  text = _("Very Early")
+                  text = self.tsAccVeryEarly
                   glColor3f(1, 0, 0)
                 else:
                   #bug catch - show the problematic number:            
                   #text = str(trimmedAccuracy) + _(" ms")
-                  msText = _("ms")
                   text = "%(acc)s %(ms)s" % \
-                    {'acc': str(trimmedAccuracy), 'ms': msText}
+                    {'acc': str(trimmedAccuracy), 'ms': self.msLabel}
                   glColor3f(1, 0, 0)
     
               w, h = font.getStringSize(text,0.00175)
@@ -5684,13 +5747,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               else:
                 #gh3 or other standard mod
                 font.render(text, (posX - w / 2, posY - h / 2),(1, 0, 0),0.00170)    
+
     
               if self.showAccuracy == 3:    #for displaying numerical below descriptive
                 #text = str(self.accuracy)
                 #text = str(trimmedAccuracy) + " ms"
-                msText = _("ms")
+                #msText = _("ms")
                 text = "%(acc)s %(ms)s" % \
-                  {'acc': str(trimmedAccuracy), 'ms': msText}
+                  {'acc': str(trimmedAccuracy), 'ms': self.msLabel}
                 w, h = font.getStringSize(text,0.00140)
                 if self.theme == 2:   #RB mod
                   font.render(text, (posX - w / 2, posY - h / 2 + .030),(1, 0, 0),0.00140) 
@@ -5749,7 +5813,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                       txtSize = 0.00160
                     
     
-    
+                    #MFH TODO - pre-retrieve and translate all current tutorial script.txt events, if applicable.
                     if self.song.info.tutorial:
                       text = _(event.text)
                       w, h = lyricFont.getStringSize(text,txtSize)
@@ -5770,7 +5834,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
             #handle the guitar solo track
             if (self.readTextAndLyricEvents == 2 or (self.readTextAndLyricEvents == 1 and self.theme == 2)) and (not self.pause and not self.failed and not self.ending):
-    
+
               for time, event in self.song.eventTracks[Song.TK_GUITAR_SOLOS].getEvents(minPos, maxPos):
                 #is event happening now?
                 xOffset = (time - pos) / eventWindow
@@ -5788,7 +5852,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                         self.guitarSoloBroken[i] = False
                         self.guitars[i].guitarSolo = True
                         #self.displayText[i] = _("Guitar Solo!")
-                        self.newScalingText(i, _("Guitar Solo!") )
+                        self.newScalingText(i, self.tsGuitarSolo )
                         #self.sfxChannel.setVolume(self.sfxVolume)
                         self.engine.data.crowdSound.play()
                   else:
@@ -5805,39 +5869,40 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                           self.guitarSoloAccuracy[i] = 100.0
                         if self.guitarSoloBroken[i] and self.guitarSoloAccuracy[i] == 100.0:   #streak was broken, not perfect solo, force 99%
                           self.guitarSoloAccuracy[i] = 99.0
+
                         if self.guitarSoloAccuracy[i] == 100.0: #fablaculp: soloDescs changed
-                          soloDesc = _("Perfect Solo!")
+                          soloDesc = self.tsPerfectSolo
                           soloScoreMult = 100
                           self.engine.data.crowdSound.play()    #liquid
                         elif self.guitarSoloAccuracy[i] >= 95.0:
-                          soloDesc = _("Awesome Solo!")
+                          soloDesc = self.tsAwesomeSolo
                           soloScoreMult = 50
                           self.engine.data.crowdSound.play()    #liquid
                         elif self.guitarSoloAccuracy[i] >= 90.0:
-                          soloDesc = _("Great Solo!")
+                          soloDesc = self.tsGreatSolo
                           soloScoreMult = 30
                           self.engine.data.crowdSound.play()    #liquid
                         elif self.guitarSoloAccuracy[i] >= 80.0:
-                          soloDesc = _("Good Solo!")
+                          soloDesc = self.tsGoodSolo
                           soloScoreMult = 20
                         elif self.guitarSoloAccuracy[i] >= 70.0:
-                          soloDesc = _("Solid Solo!")
+                          soloDesc = self.tsSolidSolo
                           soloScoreMult = 10
                         elif self.guitarSoloAccuracy[i] >= 60.0:
-                          soloDesc = _("Okay Solo!")
+                          soloDesc = self.tsOkaySolo
                           soloScoreMult = 5
                         else:   #0% - 59.9%
-                          soloDesc = _("Messy Solo!")
+                          soloDesc = self.tsMessySolo
                           soloScoreMult = 0
                           self.engine.data.failSound.play()    #liquid
                         soloBonusScore = soloScoreMult * self.guitars[i].currentGuitarSoloHitNotes
                         player.score += soloBonusScore
                         trimmedSoloNoteAcc = self.decimal(str(self.guitarSoloAccuracy[i])).quantize(self.decPlaceOffset)
                         #self.soloReviewText[i] = [soloDesc,str(trimmedSoloNoteAcc) + "% = " + str(soloBonusScore) + _(" pts")]
-                        ptsText = _("pts")
+                        #ptsText = _("pts")
                         self.soloReviewText[i] = [soloDesc, 
                           "%(soloNoteAcc)s%% = %(soloBonus)d %(pts)s" % \
-                          {'soloNoteAcc': str(trimmedSoloNoteAcc), 'soloBonus': soloBonusScore, 'pts': ptsText} ]
+                          {'soloNoteAcc': str(trimmedSoloNoteAcc), 'soloBonus': soloBonusScore, 'pts': self.tsPtsLabel} ]
                         self.dispSoloReview[i] = True
                         self.soloReviewCountdown[i] = 0
                         #reset for next solo
@@ -5906,12 +5971,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         #MFH - Get Ready to Rock & countdown, song info during countdown, and song time left display on top of everything else
         self.engine.view.setViewport(1,0)
 
+
         if (not self.pause and not self.failed and not self.ending):
           # show countdown
           # glorandwarf: fixed the countdown timer
           if self.countdownSeconds > 1:
             Theme.setBaseColor(min(1.0, 3.0 - abs(4.0 - self.countdownSeconds)))
-            text = _("Get Ready to Rock")
+            text = self.tsGetReady
             w, h = font.getStringSize(text)
             font.render(text,  (.5 - w / 2, .3))
             if self.countdownSeconds < 6:
@@ -5932,19 +5998,19 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             #  However, this is not high priority, since this concatenation only occurs during the Get Ready To Rock countdown.
             cover = ""
             if self.song.info.findTag("cover") == True: #kk69: misc changes to make it more GH/RB
-              cover = _("as made famous by")+ "  \n "     #kk69: no more ugly colon! ^_^
+              cover = self.tsAsMadeFamousBy + "  \n "     #kk69: no more ugly colon! ^_^
             else:
               if self.theme == 2:
                 cover = "" #kk69: for RB
               else:
-                cover = _("by ") #kk69: for GH
+                cover = self.tsBy   #kk69: for GH
             Theme.setBaseColor(min(1.0, 4.0 - abs(4.0 - self.countdown)))
             comma = ""
             extra = ""
             if self.song.info.year: #add comma between year and artist
               comma = ", "
             if self.song.info.frets:
-              extra += " \n " + _(" fretted by ") + self.song.info.frets
+              extra += " \n " + self.tsFrettedBy + self.song.info.frets
             if self.song.info.version:
               extra += " \n v" + self.song.info.version
     
