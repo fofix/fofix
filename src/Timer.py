@@ -34,6 +34,7 @@ class Timer(object):
     self.fpsEstimate           = 0
     self.fpsEstimateStartTick  = self.ticks
     self.fpsEstimateStartFrame = self.frame
+    self.highPriority          = False
     self.startTime             = 0
 
   # Store current time as start time, used in method below
@@ -44,7 +45,7 @@ class Timer(object):
   # Note: int(val+.5) is a simple round up.
   def waitFromStart(self):
     waitTime = int(self.timestep+.5) - (pygame.time.get_ticks() - self.startTime)
-    if waitTime > 0 :
+    if waitTime > 0 and not self.highPriority:
       pygame.time.wait(waitTime)
     
   def getTime(self):
