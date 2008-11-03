@@ -37,8 +37,10 @@ class TimerTest(unittest.TestCase):
 
     fps = []
     while t.frame < 100:
+      t.startTimer()
       ticks = list(t.advanceFrame())
       fps.append(t.fpsEstimate)
+      t.waitFromStart()
 
     fps = fps[30:]
     avgFps = sum(fps) / len(fps)

@@ -3,6 +3,7 @@
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
+#               2008 evilynux (evilynux@gmail.com)                  #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -33,24 +34,27 @@ class Timer(object):
     self.fpsEstimate           = 0
     self.fpsEstimateStartTick  = self.ticks
     self.fpsEstimateStartFrame = self.frame
-    self.highPriority          = False
+    self.startTime             = 0
 
+  # Store current time as start time, used in method below
+  def startTimer(self):
+    self.startTime = pygame.time.get_ticks()
+
+  # Wait for timestep milliseconds from start
+  # Note: int(val+.5) is a simple round up.
+  def waitFromStart(self):
+    waitTime = int(self.timestep+.5) - (pygame.time.get_ticks() - self.startTime)
+    if waitTime > 0 :
+      pygame.time.wait(waitTime)
+    
   def getTime(self):
     return int(pygame.time.get_ticks() * self.tickrate)
 
   time = property(getTime)
 
   def advanceFrame(self):
-    while True:
-      ticks = self.getTime()
-      diff = ticks - self.ticks
-      if diff >= self.timestep:
-        break
-      if not self.highPriority:
-        # evilynux : Give the CPU a break...
-        # FIXME: video tasks and other tasks should have their own wait.
-        pygame.time.wait(int(self.timestep/2))
-
+    ticks = self.getTime()
+    diff = ticks - self.ticks
     self.ticks = ticks
     self.frame += 1
 
@@ -61,6 +65,3 @@ class Timer(object):
       self.fpsEstimateStartFrame = self.frame
 
     return [min(diff, self.timestep * 16)]
-    #timeslice = max(self.timestep, min(diff, self.timestep * 16))
-    #timeslice = max(self.timestep, timeslice - self.timestep)
-    #return [self.timestep] * int(self.timestep / timeslice)
