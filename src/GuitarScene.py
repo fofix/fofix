@@ -2196,7 +2196,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.handleJurgen(pos)
 
       #stage rotation
-      #MFH - TODO - add logic to prevent advancing rotation frames if you have screwed up, until you resume a streak
+      #MFH - logic to prevent advancing rotation frames if you have screwed up, until you resume a streak
       if (self.currentlyAnimating and self.missPausesAnim == 1) or self.missPausesAnim == 0:
         if self.stageAnimation:
           whichDelay = self.stageAnimateDelay
@@ -5683,35 +5683,35 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 text = str(trimmedAccuracy) + " ms"
               elif self.showAccuracy >= 2:    #friendly / descriptive mode
                 
-                worstAccuracy = self.guitars[i].lateMargin      
+
     
                 #MFH TODO - Precalculate these hit accuracy thresholds instead of every frame
-                if (self.accuracy[i] >= (0-worstAccuracy)) and (self.accuracy[i] < (0-(3*worstAccuracy/4))):
+                if (self.accuracy[i] >= self.guitars[i].accThresholdWorstLate) and (self.accuracy[i] < self.guitars[i].accThresholdVeryLate):
                   text = self.tsAccVeryLate
                   glColor3f(1, 0, 0)
-                elif (self.accuracy[i] >= (0-(3*worstAccuracy/4))) and (self.accuracy[i] < (0-(2*worstAccuracy/4))):
+                elif (self.accuracy[i] >= self.guitars[i].accThresholdVeryLate) and (self.accuracy[i] < self.guitars[i].accThresholdLate):
                   text = self.tsAccLate
                   glColor3f(1, 1, 0)
-                elif (self.accuracy[i] >= (0-(2*worstAccuracy/4))) and (self.accuracy[i] < (0-(1*worstAccuracy/4))):
+                elif (self.accuracy[i] >= self.guitars[i].accThresholdLate) and (self.accuracy[i] < self.guitars[i].accThresholdSlightlyLate):
                   text = self.tsAccSlightlyLate
                   glColor3f(1, 1, 0)
-                elif (self.accuracy[i] >= (0-(1*worstAccuracy/4))) and (self.accuracy[i] < -1.0):
+                elif (self.accuracy[i] >= self.guitars[i].accThresholdSlightlyLate) and (self.accuracy[i] < self.guitars[i].accThresholdExcellentLate):
                   text = self.tsAccExcellentLate
                   glColor3f(0, 1, 0)
-                elif (self.accuracy[i] >= -1.0) and (self.accuracy[i] < 1.0):
+                elif (self.accuracy[i] >= self.guitars[i].accThresholdExcellentLate) and (self.accuracy[i] < self.guitars[i].accThresholdPerfect):
                   #give the "perfect" reading some slack, -1.0 to 1.0
                   text = self.tsAccPerfect
                   glColor3f(0, 1, 1) #changed color
-                elif (self.accuracy[i] >= 1.0) and (self.accuracy[i] < (1*worstAccuracy/4)):
+                elif (self.accuracy[i] >= self.guitars[i].accThresholdPerfect) and (self.accuracy[i] < self.guitars[i].accThresholdExcellentEarly):
                   text = self.tsAccExcellentEarly
                   glColor3f(0, 1, 0)
-                elif (self.accuracy[i] >= (1*worstAccuracy/4)) and (self.accuracy[i] < (2*worstAccuracy/4)):
+                elif (self.accuracy[i] >= self.guitars[i].accThresholdExcellentEarly) and (self.accuracy[i] < self.guitars[i].accThresholdSlightlyEarly):
                   text = self.tsAccSlightlyEarly
                   glColor3f(1, 1, 0)
-                elif (self.accuracy[i] >= (2*worstAccuracy/4)) and (self.accuracy[i] < (3*worstAccuracy/4)):
+                elif (self.accuracy[i] >= self.guitars[i].accThresholdSlightlyEarly) and (self.accuracy[i] < self.guitars[i].accThresholdEarly):
                   text = self.tsAccEarly
                   glColor3f(1, 1, 0)
-                elif (self.accuracy[i] >= (3*worstAccuracy/4)) and (self.accuracy[i] < (4*worstAccuracy/4)):
+                elif (self.accuracy[i] >= self.guitars[i].accThresholdEarly) and (self.accuracy[i] < self.guitars[i].accThresholdVeryEarly):
                   text = self.tsAccVeryEarly
                   glColor3f(1, 0, 0)
                 else:

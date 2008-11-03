@@ -81,6 +81,18 @@ class Drum:
 
     self.cappedScoreMult = 0
 
+    self.accThresholdWorstLate = 0
+    self.accThresholdVeryLate = 0
+    self.accThresholdLate = 0
+    self.accThresholdSlightlyLate = 0
+    self.accThresholdExcellentLate = 0
+    self.accThresholdPerfect = 0
+    self.accThresholdExcellentEarly = 0
+    self.accThresholdSlightlyEarly = 0
+    self.accThresholdEarly = 0
+    self.accThresholdVeryEarly = 0
+
+
     self.tempoBpm = 120   #MFH - default is NEEDED here...
     
     self.beatsPerBoard  = 5.0
@@ -450,6 +462,17 @@ class Drum:
       self.earlyMargin       = 250 - bpm/5 - 70*self.hitw
       self.lateMargin        = 250 - bpm/5 - 70*self.hitw
       self.noteReleaseMargin = 200 - bpm/5 - 70*self.hitw
+
+      self.accThresholdWorstLate = (0-self.lateMargin)
+      self.accThresholdVeryLate = (0-(3*self.lateMargin/4))
+      self.accThresholdLate = (0-(2*self.lateMargin/4))
+      self.accThresholdSlightlyLate = (0-(1*self.lateMargin/4))
+      self.accThresholdExcellentLate = -1.0
+      self.accThresholdPerfect = 1.0
+      self.accThresholdExcellentEarly = (1*self.lateMargin/4)
+      self.accThresholdSlightlyEarly = (2*self.lateMargin/4)
+      self.accThresholdEarly = (3*self.lateMargin/4)
+      self.accThresholdVeryEarly = (4*self.lateMargin/4)
 
 
   def setMultiplier(self, multiplier):
