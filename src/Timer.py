@@ -54,8 +54,16 @@ class Timer(object):
   time = property(getTime)
 
   def advanceFrame(self):
-    ticks = self.getTime()
-    diff = ticks - self.ticks
+    if not self.highPriority:
+      ticks = self.getTime()
+      diff = ticks - self.ticks
+    else: # evilynux - Preserve old behavior in case some have issues.
+      while True:
+        ticks = self.getTime()
+        diff = ticks - self.ticks
+        if diff >= self.timestep:
+          break
+
     self.ticks = ticks
     self.frame += 1
 
