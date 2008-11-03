@@ -3,6 +3,7 @@
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
+#               2008 evilynux <evilynux@gmail.com>                  #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -128,7 +129,10 @@ class Engine:
     
     for task in self.frameTasks:
       self._runTask(task)
-    for ticks in self.timer.advanceFrame():
+    self.timer.startTimer()
+    ticks = self.timer.advanceFrame()
+    for tick in ticks:
       for task in self.tasks:
-        self._runTask(task, ticks)
+        self._runTask(task, tick)
+    self.timer.waitFromStart()
     return True
