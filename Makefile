@@ -11,10 +11,10 @@ all:	dist
 
 patch: dist
 	@echo --- Creating patch
-	[ -e FoFiX-${VERSION}-Patch-GNULinux-64bit ] && \
-	rm -rf FoFiX-${VERSION}-Patch-GNULinux-64bit*
+	[ -d FoFiX-${VERSION}-Patch-GNULinux-64bit ] && \
+	rm -rf FoFiX-${VERSION}-Patch-GNULinux-64bit* || echo
 	perl Dist-Patch3_0xx-GNULinux.pl FoFiX-${VERSION}-Patch-GNULinux-64bit
-	tar -cjvf FoFiX-${VERSION}-Patch-GNULinux-64bit.tar.gz FoFiX-${VERSION}-Patch-GNULinux-64bit/
+	tar -cjvf FoFiX-${VERSION}-Patch-GNULinux-64bit.tar.bz2 FoFiX-${VERSION}-Patch-GNULinux-64bit/
 
 dist:
 	@echo --- Detected version: ${VERSION}
