@@ -106,9 +106,6 @@ class Credits(Layer, KeyListener):
     
     Config.set("game", "selected_library", "songs")
 
-    # evilynux - We need artifacts/items to make this look nice..
-    self.engine.boostBackgroundThreads(True)
-
     nf = self.engine.data.font
     bf = self.engine.data.bigFont
     ns = 0.002

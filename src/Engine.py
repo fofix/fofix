@@ -115,15 +115,6 @@ class Engine:
     """
     gc.collect()
 
-  def boostBackgroundThreads(self, boost):
-    """
-    Increase priority of background threads.
-
-    @param boost True of the scheduling of the main UI thread should  be
-                 made fairer to background threads, False otherwise.
-    """
-    self.timer.highPriority = not bool(boost)
-
   def _runTask(self, task, ticks = 0):
     if not task in self.paused:
       self.currentTask = task

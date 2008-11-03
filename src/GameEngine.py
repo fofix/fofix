@@ -686,12 +686,6 @@ class GameEngine(Engine):
   def main(self):
     """Main state loop."""
     try:
-      # Tune the scheduler priority so that transitions are as smooth as possible
-      if self.view.isTransitionInProgress():
-        self.boostBackgroundThreads(False)
-      else:
-        self.boostBackgroundThreads(True)
-      
       done = Engine.run(self)
       self.clearScreen()
       self.view.render()
