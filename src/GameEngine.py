@@ -119,15 +119,16 @@ Config.define("coffee", "moreHopo",            int,   1,   text = _("HO/PO Frequ
 Config.define("game", "hopo_after_chord",      int,   1,   text = _("HO/PO After Chord"),    options = {0: _("Off"), 1: _("On")})
 Config.define("game", "accuracy_mode",      int,   2,   text = _("Accuracy"),    options = {0: _("Off"), 1: _("Numeric"), 2: _("Friendly"), 3: _("Both")})
 Config.define("game", "accuracy_pos",      int,   1,   text = _("Accuracy Words Pos"),    options = {0: _("Center"), 1: _("Right-top Corner"), 2: _("Left-Bottom Corner"), 3: _("Center-Bottom")}) #QQstarS:acc show
-Config.define("game",  "stage_rotate_delay",        int,   800,   text = _("Rotate Delay"), options = dict([(n, n) for n in range(0, 10, 1)] + [(n, n) for n in range(10, 50, 10)] + [(n, n) for n in range(50, 2001, 50)]))
-Config.define("game",  "stage_animate_delay",        int,   3,   text = _("Animation Delay"), options = dict([(n, n) for n in range(0, 10, 1)] + [(n, n) for n in range(10, 50, 10)] + [(n, n) for n in range(50, 2001, 50)]))
 
-Config.define("game",   "stage_mode",           int,  0,  text = _("Stages"),  options = {0: _("Random"), 1: _("Default"), 2: _("Blank") } )
-Config.define("game",   "song_stage",           int,  1,  text = _("Song Stage"),  options = {0: _("Off"), 1: _("On") } ) #MFH
 
 
 #myfingershurt:
-Config.define("game",   "rotate_stages",           int,  0,  text = _("Rotate Stages"),  options = {0: _("No"), 1: _("Random"), 2: _("In Order"), 3: _("BackNForth")} ) 
+Config.define("game",  "stage_rotate_delay",        int,   800,   text = _("Slideshow Delay"), options = dict([(n, n) for n in range(0, 10, 1)] + [(n, n) for n in range(10, 50, 10)] + [(n, n) for n in range(50, 2001, 50)]))
+Config.define("game",  "stage_animate_delay",        int,   3,   text = _("Animation Delay"), options = dict([(n, n) for n in range(0, 10, 1)] + [(n, n) for n in range(10, 50, 10)] + [(n, n) for n in range(50, 2001, 50)]))
+Config.define("game",   "rotate_stages",           int,  0,  text = _("Stage Slideshow"),  options = {0: _("Off"), 1: _("Random"), 2: _("In Order"), 3: _("BackNForth")} ) 
+Config.define("game",   "stage_animate",           int,  0,  text = _("Stage Animation"),  options = {0: _("Off"), 1: _("Random"), 2: _("In Order"), 3: _("BackNForth")} ) 
+Config.define("game",   "stage_mode",           int,  0,  text = _("Static Stages"),  options = {0: _("Random"), 1: _("Default"), 2: _("Blank") } )
+Config.define("game",   "song_stage",           int,  1,  text = _("Song Stage"),  options = {0: _("Off"), 1: _("On") } ) #MFH
 Config.define("game",   "lyric_mode",           int,   2,   text = _("Lyrics"), options = {0: _("Off"), 1: _("song.ini"), 2: _("Auto"), 3: _("Dual Lyric Prevention")})#racer
 Config.define("game",   "frets_under_notes",          bool, True,  text = _("Frets under notes"), options = {False: _("No"), True: _("Yes")})
 #Config.define("game",   "drum_highscore_nav",          bool, False,  text = _("Drum highscore nav"), options = {False: _("Off"), True: _("On")})
@@ -450,7 +451,7 @@ class GameEngine(Engine):
         defaultAniStage = "Normal"
       Log.debug("Default animated stage for " + currentTheme + " theme = " + defaultAniStage)
       aniStageOptions = dict([(str(self.stageFolders[n]),self.stageFolders[n]) for n in range(0, i)])
-      aniStageOptions.update({"Normal":_("Normal")})
+      aniStageOptions.update({"Normal":_("Slideshow")})
       if i > 1:   #only add Random setting if more than one animated stage exists
         aniStageOptions.update({"Random":_("Random")})
       Config.define("game", "animated_stage_folder", str, defaultAniStage, text = _("Animated Stage"), options = aniStageOptions )

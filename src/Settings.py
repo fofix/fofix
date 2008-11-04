@@ -187,10 +187,11 @@ class SettingsMenu(Menu.Menu):
     
     StagesOptions = [
       ConfigChoice(engine.config, "game", "stage_mode", autoApply = True),   #myfingershurt
+      ConfigChoice(engine.config, "game", "animated_stage_folder", autoApply = True),   #myfingershurt
       ConfigChoice(engine.config, "game", "song_stage", autoApply = True),   #myfingershurt
       ConfigChoice(engine.config, "game", "rotate_stages", autoApply = True),   #myfingershurt
       ConfigChoice(engine.config, "game", "stage_rotate_delay", autoApply = True),   #myfingershurt - user defined stage rotate delay
-      ConfigChoice(engine.config, "game", "animated_stage_folder", autoApply = True),   #myfingershurt
+      ConfigChoice(engine.config, "game", "stage_animate", autoApply = True),   #myfingershurt - user defined stage rotate delay
       ConfigChoice(engine.config, "game", "stage_animate_delay", autoApply = True),   #myfingershurt - user defined stage rotate delay
     ]
     StagesOptionsMenu = Menu.Menu(engine, StagesOptions)

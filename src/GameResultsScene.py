@@ -78,6 +78,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.playerList      = players
     self.spinnyDisabled   = True#NO SPINNY!!!    
 
+    self.scoreScrollStartOffset = .8    #MFH - where highscore scrolling starts
+
     #myfingershurt: reordering so default is Change Song.
     items = [
       (_("Continue"),       self.changeSong),
@@ -430,7 +432,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
             endScroll -= .07
             
           if self.offset < endScroll or i == -1:
-            self.offset = .8
+            #self.offset = .8
+            self.offset = self.scoreScrollStartOffset
             self.nextHighScore()
             endScroll = -0.14
           

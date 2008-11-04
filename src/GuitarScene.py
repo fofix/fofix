@@ -543,14 +543,19 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.songStageEnabled = self.engine.config.get("game", "song_stage")
     self.animatedStageFolder = self.engine.config.get("game", "animated_stage_folder")
 
+
 #===================================================================
 # glorandwarf: modified the code to use directory "<theme>/Stages"
 
-
-    #myfingershurt: adding new rotation mode "sequential" to display stage files in order
-    self.isRotation = self.engine.config.get("game", "rotate_stages") #QQstarS:random
+    #MFH TODO - alter logic to accomodate separated animation and slideshow settings based on seleted animated stage folder
+    self.animationMode = self.engine.config.get("game", "stage_animate")
+    self.slideShowMode = self.engine.config.get("game", "rotate_stages")
     if self.animatedStageFolder == _("None"):
-      self.isRotation = 0   #MFH: if no animated stage folders are available, disable rotation.
+      self.stageRotationMode = 0   #MFH: if no animated stage folders are available, disable rotation.
+    elif self.animatedStageFolder == "Normal":
+      self.stageRotationMode = self.slideShowMode
+    else:
+      self.stageRotationMode = self.animationMode
     
     self.imgArr = [] #QQstarS:random
     self.imgArrScaleFactors = []  #MFH - for precalculated scale factors
@@ -576,10 +581,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if self.stageMode == 2:   #blank / no stage
       #self.background = None
       self.songStageEnabled = 0
-      self.isRotation = 0
+      self.stageRotationMode = 0
     elif self.playerList[0].practiceMode:   #check for existing practice stage; always disable stage rotation here
       self.songStageEnabled = 0
-      self.isRotation = 0
+      self.stageRotationMode = 0
       self.stageMode = 1
       try:
         self.engine.loadImgDrawing(self, "background", os.path.join("themes",themename,"stages", "practice.png"))
@@ -594,7 +599,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         Log.warn("No song-specific stage found") # evilynux
         test = False
       if test:  #does a song-specific background exist?
-        self.isRotation = 0
+        self.stageRotationMode = 0
         self.stageMode = 1
       else:
         self.songStageEnabled = 0
@@ -613,7 +618,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
 
       ##This checks how many Stage-background we have to select from
-      if self.stageMode == 0 and self.isRotation == 0:  #MFH: just display a random stage
+      if self.stageMode == 0 and self.stageRotationMode == 0:  #MFH: just display a random stage
         files = []
         fileIndex = 0
         allfiles = os.listdir(stagepathfull)
@@ -639,7 +644,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.engine.loadImgDrawing(self, "background", os.path.join(stagepath, filename))
 
 
-      elif self.isRotation > 0 and self.stageMode != 2:
+      elif self.stageRotationMode > 0 and self.stageMode != 2:
         files = []
         fileIndex = 0
         
@@ -670,7 +675,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               Log.debug("Practice background filtered: " + name)
           files.sort()
 
-      if self.isRotation > 0 and self.stageMode != 2:   #alarian: blank stage option is not selected
+      if self.stageRotationMode > 0 and self.stageMode != 2:   #alarian: blank stage option is not selected
       #myfingershurt: just populate the image array in order, they are pulled in whatever order requested:
         for j in range(len(files)):
           self.engine.loadImgDrawing(self, "backgroundA", os.path.join(stagepath, files[j]))
@@ -2206,13 +2211,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.indexCount = self.indexCount + 1
         if self.indexCount > whichDelay:   #myfingershurt - adding user setting for stage rotate delay
           self.indexCount = 0
-          if self.isRotation == 1: #QQstarS:random
+          if self.stageRotationMode == 1: #QQstarS:random
             self.arrNum = random.randint(0,len(self.imgArr)-1)
-          elif self.isRotation == 2: #myfingershurt: in order display mode
+          elif self.stageRotationMode == 2: #myfingershurt: in order display mode
             self.arrNum += 1
             if self.arrNum > (len(self.imgArr)-1):
               self.arrNum = 0
-          elif self.isRotation == 3: #myfingershurt: in order, back and forth display mode
+          elif self.stageRotationMode == 3: #myfingershurt: in order, back and forth display mode
             if self.arrDir == 1:  #forwards
               self.arrNum += 1
               if self.arrNum > (len(self.imgArr)-1):
@@ -3894,7 +3899,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
       #myfingershurt: multiple rotation modes
       if self.stageMode != 2:
-        if self.isRotation == 0:
+        if self.stageRotationMode == 0:
           self.background.transform.reset()
           self.background.transform.translate(w/2,h/2)
           self.background.transform.scale(self.backgroundScaleFactor,-self.backgroundScaleFactor)
