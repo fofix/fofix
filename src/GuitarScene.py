@@ -668,6 +668,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               fileIndex += 1
             else:
               Log.debug("Practice background filtered: " + name)
+          files.sort()
 
       if self.isRotation > 0 and self.stageMode != 2:   #alarian: blank stage option is not selected
       #myfingershurt: just populate the image array in order, they are pulled in whatever order requested:
