@@ -423,7 +423,8 @@ class SettingsMenu(Menu.Menu):
        ConfigChoice(engine.config, "audio",  "frequency"),
        ConfigChoice(engine.config, "audio",  "bits"),
        ConfigChoice(engine.config, "audio",  "buffersize"),
-       ConfigChoice(engine.config, "game", "mute_sustain_releases", autoApply = True),   #myfingershurt
+       #ConfigChoice(engine.config, "game", "mute_sustain_releases", autoApply = True),   #myfingershurt
+       ConfigChoice(engine.config, "game", "sustain_muting", autoApply = True),   #myfingershurt
        ConfigChoice(engine.config, "audio", "mute_last_second", autoApply = True), #MFH
        ConfigChoice(engine.config, "game", "bass_kick_sound", autoApply = True),   #myfingershurt
        ConfigChoice(engine.config, "game", "T_sound", autoApply = True), #Faaa Drum sound

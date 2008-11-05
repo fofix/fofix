@@ -149,12 +149,14 @@ class Guitar:
     
 
 
+    self.muteSustainReleases = self.engine.config.get("game", "sustain_muting") #MFH
+
     self.hitw = self.engine.config.get("game", "hit_window")  #this should be global, not retrieved every BPM change.
-    if self.hitw == 0:
+    if self.hitw == 0:   #wide
       self.hitw = 0.70
-    elif self.hitw == 1:
+    elif self.hitw == 1: #normal
       self.hitw = 1.0
-    elif self.hitw == 2:
+    elif self.hitw == 2: #tight
       self.hitw = 1.2
     elif self.hitw == 3: #blazingamer new tighter hit window
       self.hitw = 1.9
@@ -541,11 +543,19 @@ class Guitar:
       # Alarian: Hitwindows/-margins
       self.earlyMargin       = 250 - bpm/5 - 70*self.hitw
       self.lateMargin        = 250 - bpm/5 - 70*self.hitw
-      self.noteReleaseMargin = 200 - bpm/5 - 70*self.hitw
-      
-      
-      if (self.noteReleaseMargin < (200 - bpm/5 - 70*1.2)):   #MFH - enforce "tight" hitwindow minimum note release margin
+
+      #self.noteReleaseMargin = 200 - bpm/5 - 70*self.hitw
+      #if (self.noteReleaseMargin < (200 - bpm/5 - 70*1.2)):   #MFH - enforce "tight" hitwindow minimum note release margin
+      #  self.noteReleaseMargin = (200 - bpm/5 - 70*1.2)
+      if self.muteSustainReleases == 4:   #tight
         self.noteReleaseMargin = (200 - bpm/5 - 70*1.2)
+      elif self.muteSustainReleases == 3: #standard
+        self.noteReleaseMargin = (200 - bpm/5 - 70*1.0)
+      elif self.muteSustainReleases == 2: #wide
+        self.noteReleaseMargin = (200 - bpm/5 - 70*0.7)
+      else:  #ultra-wide 
+        self.noteReleaseMargin = (200 - bpm/5 - 70*0.5)
+
 
       self.accThresholdWorstLate = (0-self.lateMargin)
       self.accThresholdVeryLate = (0-(3*self.lateMargin/4))

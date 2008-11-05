@@ -360,7 +360,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.starScoring = self.engine.config.get("game", "star_scoring")#MFH
     self.ignoreOpenStrums = self.engine.config.get("game", "ignore_open_strums") #MFH
     self.whammySavesSP = self.engine.config.get("game", "whammy_saves_starpower") #MFH
-    self.muteSustainReleases = self.engine.config.get("game", "mute_sustain_releases") #MFH
+    self.muteSustainReleases = self.engine.config.get("game", "sustain_muting") #MFH
     self.hopoIndicatorEnabled = self.engine.config.get("game", "hopo_indicator") #MFH
     self.fontShadowing = self.engine.config.get("game", "in_game_font_shadowing") #MFH
     self.muteLastSecond = self.engine.config.get("audio", "mute_last_second") #MFH
@@ -2131,7 +2131,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if not self.guitars[num].endPick(self.song.getPosition()):
       #if self.hopoDebugDisp == 1:
       #  Log.debug("MFH: An early sustain release was detected, and it was deemed too early, and muting was attempted.")
-      if self.muteSustainReleases:
+      if self.muteSustainReleases > 0:
         self.song.setInstrumentVolume(0.0, self.players[num].part)
     #elif self.hopoDebugDisp == 1:
     #  Log.debug("MFH: An early sustain release was detected, and it was not deemed too early, so muting was not attempted.")

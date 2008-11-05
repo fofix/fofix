@@ -137,7 +137,6 @@ Config.define("game",   "drum_navigation",          bool, False,  text = _("Drum
 Config.define("game",   "ignore_open_strums",          bool, True,  text = _("Ignore open strums"), options = {False: _("No"), True: _("Yes")})
 Config.define("performance",   "static_strings",          bool, True,  text = _("Static strings"), options = {False: _("No"), True: _("Yes")})
 Config.define("game",   "whammy_saves_starpower",          bool, False,  text = _("Whammy saves SP"), options = {False: _("No"), True: _("Yes")})
-Config.define("game",   "mute_sustain_releases",          bool, False,  text = _("Mute sustain releases"), options = {False: _("No"), True: _("Yes")})
 Config.define("game",   "hopo_indicator",          bool, False,  text = _("HOPO Indicator"), options = {False: _("Off"), True: _("On")})
 Config.define("game",   "quickplay_career_tiers",          bool, True,  text = _("Quickplay Tiers"), options = {False: _("Off"), True: _("On")})
 Config.define("performance",   "star_score_updates",          int, 1,  text = _("Star Updates"), options = {0: _("On Hit"), 1: _("Score Change")})
@@ -185,6 +184,8 @@ Config.define("game", "result_cheer_loop",       int, 2,     text = _("Results C
 Config.define("game",  "cheer_loop_delay",        int,   550,   text = _("Cheer Loop Delay"), options = dict([(n, n) for n in range(0, 10, 1)] + [(n, n) for n in range(10, 50, 10)] + [(n, n) for n in range(50, 2001, 50)]))
 Config.define("game", "miss_pauses_anim",       int, 1,     text = _("Miss Pauses Anim"), options = {0: _("Off"), 1: _("On")}) #MFH
 Config.define("game", "song_hopo_freq",       int, 1,     text = _("Song HOPO Freq"), options = {0: _("Off"), 1: _("Auto")}) #MFH
+#Config.define("game",   "mute_sustain_releases",          bool, False,  text = _("Mute sustain releases"), options = {False: _("No"), True: _("Yes")})
+Config.define("game",   "sustain_muting",          int, 1,    text = _("Sustain Muting"), options = {0: _("Off"), 1: _("Ultra Wide"), 2: _("Wide"), 3: _("Standard"), 4: _("Tight")})
 
 
 
