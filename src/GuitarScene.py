@@ -3991,6 +3991,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               self.rockmeter.draw()
               
               #===============blazingamer GH2 scoremeter
+              
+              
               scoretext = locale.format("%d", player.score + self.getExtraScoreForCurrentlyPlayedNotes(i), grouping=True)
               scoretext = scoretext.replace(",","   ")
               scW, scH = scoreFont.getStringSize(scoretext)
@@ -5132,6 +5134,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
   
                 #myfingershurt: locale.format call adds commas to separate numbers just like Rock Band
+
                 scoretext = locale.format("%d", player.score + self.getExtraScoreForCurrentlyPlayedNotes(i), grouping=True)
                 #myfingershurt: swapping the number "0" and the letter "O" in the score font for accurate Rock Band score type!
                 scoretext = scoretext.replace("0","O")
@@ -5219,9 +5222,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 font.render(text, (.5-size[0]/2.0,.3-size[1]))
                 #now = self.getSongPosition()
 
-
                 pctComplete = min(100, int(now/self.lastEvent*100))
-                text = str(pctComplete) + self.tsPercentComplete
+                #MFH string concatenation -> modulo formatting
+                #text = str(pctComplete) + self.tsPercentComplete
+                text = "%s%s" % (str(pctComplete), self.tsPercentComplete)
                 size = font.getStringSize(text)
                 font.render(text, (.5-size[0]/2.0, .3))
                 if not self.failEnd:
@@ -5493,12 +5497,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
             
               if self.showAccuracy == 1:    #numeric mode
-                text = str(trimmedAccuracy) + " ms"
-              elif self.showAccuracy >= 2:    #friendly / descriptive mode
                 
+                #MFH string concatenation -> modulo formatting
+                #text = str(trimmedAccuracy) + " ms"
+                text = "%s %s" % (str(trimmedAccuracy), self.msLabel)
 
+              elif self.showAccuracy >= 2:    #friendly / descriptive mode
     
-                #MFH TODO - Precalculate these hit accuracy thresholds instead of every frame
+                #MFH Precalculated these hit accuracy thresholds instead of every frame
                 if (self.accuracy[i] >= self.guitars[i].accThresholdWorstLate) and (self.accuracy[i] < self.guitars[i].accThresholdVeryLate):
                   text = self.tsAccVeryLate
                   glColor3f(1, 0, 0)
