@@ -283,6 +283,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.hPlayer = []
     self.hOffset = []
     self.hFontOffset = []
+    self.stage.wFull = self.wFull   #MFH - needed for new stage background handling
+    self.stage.hFull = self.hFull
+    
     
     for i, thePlayer in enumerate(self.playerList):
       self.engine.view.setViewportHalf(self.numOfPlayers,i)
