@@ -222,12 +222,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #MFH - precalculation variable definition
     self.numOfPlayers = len(self.playerList)    #MFH - MUST be in front of loadSettings call!
 
-    self.loadSettings()
-
     #Get theme
     themename = self.engine.data.themeLabel
     self.theme = self.engine.data.theme
 
+    stage = os.path.join("themes",themename,"stage.ini")
+    self.stage = Stage.Stage(self, self.engine.resource.fileName(stage))
+
+    self.loadSettings()
 
     #MFH pre-translate text strings:
     self.tsNoteStreak = _("Note Streak!!!")
@@ -535,163 +537,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.rbOverdriveBarGlowVisibility = 0
     self.rbOverdriveBarGlowFadeOut = False
 
-    stage = os.path.join("themes",themename,"stage.ini")
-      
-    self.stage            = Stage.Stage(self, self.engine.resource.fileName(stage))
-    #myfingershurt:
-    self.stageMode = self.engine.config.get("game", "stage_mode")
-    self.songStageEnabled = self.engine.config.get("game", "song_stage")
-    self.animatedStageFolder = self.engine.config.get("game", "animated_stage_folder")
+    # evilynux - Load stage background(s)
+    self.stage.load(self.libraryName, self.songName, self.playerList[0].practiceMode)
 
-
-#===================================================================
-# glorandwarf: modified the code to use directory "<theme>/Stages"
-
-    #MFH TODO - alter logic to accomodate separated animation and slideshow settings based on seleted animated stage folder
-    self.animationMode = self.engine.config.get("game", "stage_animate")
-    self.slideShowMode = self.engine.config.get("game", "rotate_stages")
-    if self.animatedStageFolder == _("None"):
-      self.stageRotationMode = 0   #MFH: if no animated stage folders are available, disable rotation.
-    elif self.animatedStageFolder == "Normal":
-      self.stageRotationMode = self.slideShowMode
-    else:
-      self.stageRotationMode = self.animationMode
-    
-    self.imgArr = [] #QQstarS:random
-    self.imgArrScaleFactors = []  #MFH - for precalculated scale factors
-    self.stageRotateDelay = self.engine.config.get("game",  "stage_rotate_delay") #myfingershurt - user defined stage rotate delay
-    self.stageAnimateDelay = self.engine.config.get("game",  "stage_animate_delay") #myfingershurt - user defined stage rotate delay
-    self.stageAnimation = False
-
-    self.indexCount = 0 #QQstarS:random time counter
-    self.arrNum = 0 #QQstarS:random the array num
-    self.arrDir = 1 #forwards
-
-    # evilynux - Improved stage error handling
-    stagepath = os.path.join("themes",themename,"stages")
-    stagepathfull = self.engine.getPath(stagepath)
-    if not os.path.exists(stagepathfull): # evilynux
-      Log.warn("Stage folder does not exist: %s" % stagepathfull)
-      self.stageMode = 1 # Fallback to song-specific stage
-
-    # evilynux - Fixes a self.background not defined crash
-    self.background = None
-
-    #MFH - new background stage logic:
-    if self.stageMode == 2:   #blank / no stage
-      #self.background = None
-      self.songStageEnabled = 0
-      self.stageRotationMode = 0
-    elif self.playerList[0].practiceMode:   #check for existing practice stage; always disable stage rotation here
-      self.songStageEnabled = 0
-      self.stageRotationMode = 0
-      self.stageMode = 1
-      try:
-        self.engine.loadImgDrawing(self, "background", os.path.join("themes",themename,"stages", "practice.png"))
-      except IOError:
-        Log.warn("No practice stage, fallbacking on a forced Blank stage mode") # evilynux
-        self.stageMode = 2    #if no practice stage, just fall back on a forced Blank stage mode
-    elif self.songStageEnabled == 1:    #check for song-specific background
-      test = True
-      try:
-        self.engine.loadImgDrawing(self, "background", os.path.join(self.libraryName, self.songName, "background.png"))
-      except IOError:
-        Log.warn("No song-specific stage found") # evilynux
-        test = False
-      if test:  #does a song-specific background exist?
-        self.stageRotationMode = 0
-        self.stageMode = 1
-      else:
-        self.songStageEnabled = 0
-
-    #MFH - now, after the above logic, we can run the normal stage mode logic - only worrying about checking for Blank, 
-    #song-specific, and practice stage modes
-
-    if self.stageMode != 2 and self.songStageEnabled == 0 and not self.playerList[0].practiceMode: #still need to load stage(s)
-      #myfingershurt: assign this first
-      if self.stageMode == 1:   #just use Default.png
-        try:
-          self.engine.loadImgDrawing(self, "background", os.path.join(stagepath, "default.png"))
-        except IOError:
-          Log.warn("Default stage not found") # evilynux
-          self.stageMode = 2    #if no practice stage, just fall back on a forced Blank stage mode
-
-
-      ##This checks how many Stage-background we have to select from
-      if self.stageMode == 0 and self.stageRotationMode == 0:  #MFH: just display a random stage
-        files = []
-        fileIndex = 0
-        allfiles = os.listdir(stagepathfull)
-        for name in allfiles:
-
-          if os.path.splitext(name)[1].lower() == ".png":
-            if os.path.splitext(name)[0].lower() != "practice":
-              Log.debug("Valid background found, index (" + str(fileIndex) + "): " + name)
-              files.append(name)
-              fileIndex += 1
-            else:
-              Log.debug("Practice background filtered: " + name)
-  
-
-        # evilynux - improved error handling, fallback to blank background if no background are found
-        if fileIndex == 0:
-          Log.warn("No valid stage found!")
-          self.stageMode = 2;
-        else:
-          i = random.randint(0,len(files)-1)
-          filename = files[i]
-      ##End check number of Stage-backgrounds
-          self.engine.loadImgDrawing(self, "background", os.path.join(stagepath, filename))
-
-
-      elif self.stageRotationMode > 0 and self.stageMode != 2:
-        files = []
-        fileIndex = 0
-        
-        if self.animatedStageFolder == "Random": #Select one of the subfolders under stages\ to animate randomly
-          numAniStageFolders = len(self.engine.stageFolders)
-          if numAniStageFolders > 0:
-            self.animatedStageFolder = random.choice(self.engine.stageFolders)
-          else:
-            self.animatedStageFolder = "Normal"
-          
-        elif self.animatedStageFolder == "None":
-          self.stageMode = 2
-        
-        if self.animatedStageFolder != "Normal" and self.stageMode != 2: #just use the base Stages folder for rotation
-          stagepath = os.path.join("themes",themename,"stages",self.animatedStageFolder)
-          stagepathfull = self.engine.getPath(stagepath)
-          self.stageAnimation = True
-
-        allfiles = os.listdir(stagepathfull)
-        for name in allfiles:
-
-          if os.path.splitext(name)[1].lower() == ".png":
-            if os.path.splitext(name)[0].lower() != "practice":
-              Log.debug("Valid background found, index (" + str(fileIndex) + "): " + name)
-              files.append(name)
-              fileIndex += 1
-            else:
-              Log.debug("Practice background filtered: " + name)
-          files.sort()
-
-      if self.stageRotationMode > 0 and self.stageMode != 2:   #alarian: blank stage option is not selected
-      #myfingershurt: just populate the image array in order, they are pulled in whatever order requested:
-        for j in range(len(files)):
-          self.engine.loadImgDrawing(self, "backgroundA", os.path.join(stagepath, files[j]))
-          #MFH: also precalculate each image's scale factor and store in the array
-          imgwidth = self.backgroundA.width1()
-          wfactor = 640.000/imgwidth
-          self.imgArr.append(getattr(self, "backgroundA", os.path.join(stagepath, files[j])))
-          #self.imgArr.append([getattr(self, "backgroundA", os.path.join(stagepath, files[j])),wfactor])
-          self.imgArrScaleFactors.append(wfactor)
-
-    if self.stageMode != 2 and self.background:   #MFH - precalculating scale factor
-      imgwidth = self.background.width1()
-      self.backgroundScaleFactor = 640.000/imgwidth
-
-#===================================================================
-   
     #MFH - this determination logic should happen once, globally -- not repeatedly.
     self.showScriptLyrics = False
     if self.song.hasMidiLyrics and self.lyricMode == 3: #racer: new option for double lyrics
@@ -1348,8 +1196,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.arrowP2 = None
       self.mult2 = None
     #MFH - additional cleanup!
-    self.background = None
-    self.backgroundA = None
     self.lyricSheet = None
     self.starWhite = None
     self.starGrey = None
@@ -1364,9 +1210,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     
   def loadSettings(self):
-
-    self.stageRotateDelay = self.engine.config.get("game",  "stage_rotate_delay") #myfingershurt - user defined stage rotate delay
-    self.stageAnimateDelay = self.engine.config.get("game",  "stage_animate_delay") #myfingershurt - user defined stage rotate delay
+    self.stage.updateDelays()
 
     self.guitarVolume     = self.engine.config.get("audio", "guitarvol")
     self.songVolume       = self.engine.config.get("audio", "songvol")
@@ -2204,30 +2048,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #stage rotation
       #MFH - logic to prevent advancing rotation frames if you have screwed up, until you resume a streak
       if (self.currentlyAnimating and self.missPausesAnim == 1) or self.missPausesAnim == 0:
-        if self.stageAnimation:
-          whichDelay = self.stageAnimateDelay
-        else:
-          whichDelay = self.stageRotateDelay
-        self.indexCount = self.indexCount + 1
-        if self.indexCount > whichDelay:   #myfingershurt - adding user setting for stage rotate delay
-          self.indexCount = 0
-          if self.stageRotationMode == 1: #QQstarS:random
-            self.arrNum = random.randint(0,len(self.imgArr)-1)
-          elif self.stageRotationMode == 2: #myfingershurt: in order display mode
-            self.arrNum += 1
-            if self.arrNum > (len(self.imgArr)-1):
-              self.arrNum = 0
-          elif self.stageRotationMode == 3: #myfingershurt: in order, back and forth display mode
-            if self.arrDir == 1:  #forwards
-              self.arrNum += 1
-              if self.arrNum > (len(self.imgArr)-1):
-                self.arrNum -= 2
-                self.arrDir = 0
-            else:
-              self.arrNum -= 1
-              if self.arrNum < 0:
-                self.arrNum += 2
-                self.arrDir = 1
+        self.stage.rotate()
        
       #MFH - new logic to update the starpower pre-multiplier
       for i, thePlayer in enumerate(self.playerList):
@@ -3894,33 +3715,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     #Theme.setBaseColor()
 
-
     if self.song:
-    
-      #myfingershurt: multiple rotation modes
-      if self.stageMode != 2:
-        if self.stageRotationMode == 0:
-          self.background.transform.reset()
-          self.background.transform.translate(w/2,h/2)
-          self.background.transform.scale(self.backgroundScaleFactor,-self.backgroundScaleFactor)
-          self.background.draw()  
-  
-        #myfingershurt:
-        else:
-          #MFH - use precalculated scale factors instead
-          self.imgArr[self.arrNum].transform.reset()
-          self.imgArr[self.arrNum].transform.translate(w/2,h/2)
-          self.imgArr[self.arrNum].transform.scale(self.imgArrScaleFactors[self.arrNum],-self.imgArrScaleFactors[self.arrNum])
-          self.imgArr[self.arrNum].draw()
-  
-      #render the note sheet just on top of the background:
+      self.stage.renderBackground()
+
+      #MFH: render the note sheet just on top of the background:
       if self.lyricSheet != None:
         self.lyricSheet.transform.reset()
         self.lyricSheet.transform.translate(w/2, h*0.935)   #last change: -0.015
         self.lyricSheet.transform.scale(self.lyricSheetScaleFactor,-self.lyricSheetScaleFactor)
         self.lyricSheet.draw()  
         #the timing line on this lyric sheet image is approx. 1/4 over from the left
-  
   
       SceneClient.render(self, visibility, topMost) #MFH - I believe this eventually calls the renderGuitar function, which also involves two viewports... may not be easy to move this one...
         
