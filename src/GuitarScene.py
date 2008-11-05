@@ -6000,11 +6000,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
           # show song name
           if self.countdown and self.song:
-            #MFH - TODO - all this string concatenation really should be replaced by modulo (%) formatting, as it is faster.  
-            #  However, this is not high priority, since this concatenation only occurs during the Get Ready To Rock countdown.
             cover = ""
             if self.song.info.findTag("cover") == True: #kk69: misc changes to make it more GH/RB
-              cover = self.tsAsMadeFamousBy + "  \n "     #kk69: no more ugly colon! ^_^
+              cover = "%s  \n " % self.tsAsMadeFamousBy #kk69: no more ugly colon! ^_^
             else:
               if self.theme == 2:
                 cover = "" #kk69: for RB
@@ -6016,16 +6014,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             if self.song.info.year: #add comma between year and artist
               comma = ", "
             if self.song.info.frets:
-              extra += " \n " + self.tsFrettedBy + self.song.info.frets
+              extra = "%s \n %s%s" % (extra, self.tsFrettedBy, self.song.info.frets)
             if self.song.info.version:
-              extra += " \n v" + self.song.info.version
+              extra = "%s \n v%s" % (extra, self.song.info.version)
     
             if self.theme != 1:   #shift this stuff down so it don't look so bad over top the lyricsheet:
-              Dialogs.wrapText(songFont, (.05, .0895 - h / 2), Dialogs.removeSongOrderPrefixFromName(self.song.info.name) + " \n " + cover + self.song.info.artist + comma + self.song.info.year + extra, rightMargin = .6)#kk69: incorporates song.ttf, evilynux - increased scale by 1/3 by worldrave's request
+              Dialogs.wrapText(songFont, (.05, .0895 - h / 2), "%s \n %s%s%s%s%s" % (Dialogs.removeSongOrderPrefixFromName(self.song.info.name), cover, self.song.info.artist, comma, self.song.info.year, extra), rightMargin = .6)#kk69: incorporates song.ttf
             else:
-              Dialogs.wrapText(songFont, (.05, .05 - h / 2), Dialogs.removeSongOrderPrefixFromName(self.song.info.name) + " \n " + cover + self.song.info.artist + comma + self.song.info.year + extra, rightMargin = .6, scale = 0.0030) #evilynux - increased scale by 1/3 by worldrave's request
+              Dialogs.wrapText(songFont, (.05, .05 - h / 2), "%s \n %s%s%s%s%s" % (Dialogs.removeSongOrderPrefixFromName(self.song.info.name), cover, self.song.info.artist, comma, self.song.info.year, extra), rightMargin = .6, scale = 0.0030)
           else:
-            
             #mfh: this is where the song countdown display is generated:
             if pos < 0:
               pos = 0
