@@ -170,8 +170,8 @@ class View(Task):
     geometry[2] = int(geometry[2] / screens)
     geometry = tuple(geometry)
     self.savedGeometry, self.geometry = viewport, geometry
-    glViewport(*geometry)
-    glScissor(*geometry)
+    glViewport(int(geometry[0]), int(geometry[1]), int(geometry[2]), int(geometry[3]))
+    glScissor(int(geometry[0]), int(geometry[1]), int(geometry[2]), int(geometry[3]))
 
   def setViewport(self, screens=1, screen=0):
     geometry = list(self.savedGeometry)
@@ -183,8 +183,8 @@ class View(Task):
     geometry = tuple(geometry)
     self.geometry = geometry
 
-    glViewport(*geometry)
-    glScissor(*geometry)
+    glViewport(int(geometry[0]), int(geometry[1]), int(geometry[2]), int(geometry[3]))
+    glScissor(int(geometry[0]), int(geometry[1]), int(geometry[2]), int(geometry[3]))
 
   def setViewportHalf(self, screens=1, screen=0):
     geometry = list(self.savedGeometry)
@@ -196,16 +196,16 @@ class View(Task):
     geometry = tuple(geometry)
     self.geometry = geometry
 
-    glViewport(*geometry)
-    glScissor(*geometry)    
+    glViewport(int(geometry[0]), int(geometry[1]), int(geometry[2]), int(geometry[3]))
+    glScissor(int(geometry[0]), int(geometry[1]), int(geometry[2]), int(geometry[3]))    
 
   def resetGeometry(self):
     assert self.savedGeometry
     
     self.savedGeometry, geometry = None, self.savedGeometry
     self.geometry = geometry
-    glViewport(*geometry)
-    glScissor(*geometry)
+    glViewport(int(geometry[0]), int(geometry[1]), int(geometry[2]), int(geometry[3]))
+    glScissor(int(geometry[0]), int(geometry[1]), int(geometry[2]), int(geometry[3]))
 
   def render(self):
     #print [(str(m.__class__), v) for m, v in self.visibility.items()]

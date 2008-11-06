@@ -388,7 +388,7 @@ class GameEngine(Engine):
     w = viewport[2] - viewport[0]
     geometry = (0, 0, w, h)
     self.svg = SvgContext(geometry)
-    glViewport(*viewport)
+    glViewport(int(viewport[0]), int(viewport[1]), int(viewport[2]), int(viewport[3]))
 
     self.input     = Input()
     self.view      = View(self, geometry)
