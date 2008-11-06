@@ -9,6 +9,10 @@
 "data\versiontag.png"//all
 "..\FoFiX-wiki\*.*"//all wiki pages
 //-------Additional files required over 3.000--------
+"data\glow.png"//new PNG from SVG
+"data\cassette.png"//new PNG from SVG
+"data\left.png"//new PNG from SVG
+"data\right.png"//new PNG from SVG
 "data\sounds\99pct1.ogg"//new sound
 "data\sounds\clapsound.ogg"//new sound
 "data\sounds\crowdcheers.ogg"//new sound
