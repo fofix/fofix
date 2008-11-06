@@ -386,7 +386,6 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "video",  "multisamples"),
       ConfigChoice(engine.config, "video", "disable_fretsfx"),
       ConfigChoice(engine.config, "video", "hitglow_color"),
-      ConfigChoice(engine.config, "opengl", "svgquality"),
       ConfigChoice(engine.config, "game", "pov", autoApply = True),
       (_("Choose Neck >"), lambda: Dialogs.chooseNeck(engine,prompt=_("Yellow (#3) / Blue (#4) to change:"))),
       (_("Advanced Video Settings"), AdvancedVideoSettingsMenu),

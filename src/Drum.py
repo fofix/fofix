@@ -245,7 +245,7 @@ class Drum:
       
     self.setBPM(self.currentBpm)
 
-    engine.loadImgDrawing(self, "glowDrawing", "glow.svg",  textureSize = (128, 128))
+    engine.loadImgDrawing(self, "glowDrawing", "glow.png")
 
     # evilynux - Fixed random neck -- MFH: further fixing random neck
     if self.neck == "0" or self.neck == "Neck_0" or self.neck == "randomneck":

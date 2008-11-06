@@ -43,8 +43,6 @@ STAR1 = unicode('\x10')
 STAR2 = unicode('\x11')
 LEFT  = unicode('\x12')
 RIGHT = unicode('\x13')
-BALL1 = unicode('\x14')
-BALL2 = unicode('\x15')
 
 class Data(object):
   """A collection of globally used data resources such as fonts and sound effects."""
@@ -110,10 +108,8 @@ class Data(object):
       self.loadImgDrawing(self, "star2",   os.path.join("themes",themename,"star2.png"), textureSize = (128, 128))
 
  
-    self.loadImgDrawing(self, "left",    "left.svg",  textureSize = (128, 128))
-    self.loadImgDrawing(self, "right",   "right.svg", textureSize = (128, 128))
-    self.loadImgDrawing(self, "ball1",   "ball1.svg", textureSize = (128, 128))
-    self.loadImgDrawing(self, "ball2",   "ball2.svg", textureSize = (128, 128))
+    self.loadImgDrawing(self, "left",    "left.png",  textureSize = (128, 128))
+    self.loadImgDrawing(self, "right",   "right.png", textureSize = (128, 128))
 
     # load misc images
     self.loadImgDrawing(self, "loadingImage", os.path.join("themes",themename,"loadingbg.png"), textureSize = (256,256))
@@ -453,8 +449,6 @@ class Data(object):
     font.setCustomGlyph(STAR2, self.star2.texture)
     font.setCustomGlyph(LEFT,  self.left.texture)
     font.setCustomGlyph(RIGHT, self.right.texture)
-    font.setCustomGlyph(BALL1, self.ball1.texture)
-    font.setCustomGlyph(BALL2, self.ball2.texture)
     # evilynux - Load cache to speedup rendering
     if Config.get("performance", "preload_glyph_cache"):
       font.loadCache()

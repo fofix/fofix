@@ -42,7 +42,7 @@ from Resource import Resource
 from Data import Data
 from Server import Server
 from Session import ClientSession
-from Svg import SvgContext, ImgDrawing, LOW_QUALITY, NORMAL_QUALITY, HIGH_QUALITY
+from Svg import SvgContext, ImgDrawing
 #alarian
 #from Song import EAS_DIF, MED_DIF, HAR_DIF, EXP_DIF
 from Debug import DebugLayer
@@ -69,7 +69,6 @@ Config.define("video",  "fps",          int,   80,    text = _("Frames per Secon
 Config.define("video",  "hitglow_color", int,  0,     text = _("Glow-FX Color"), options = {0: _("Same as Fret"), 1: _("Actual Color")})
 Config.define("video",  "hitflame_color", int, 0,     text = _("Hitflames Color"), options = {0: _("Theme Specific"), 1: _("Same as Fret"), 2: _("Actual Color")})
 Config.define("performance",  "starspin", bool,     True,  text = _("Starnotes"), options = {True: _("Animated"), False: _("Static")})
-Config.define("opengl", "svgquality",   int,   NORMAL_QUALITY,  text = _("SVG Quality"), options = {LOW_QUALITY: _("Low"), NORMAL_QUALITY: _("Normal"), HIGH_QUALITY: _("High")})
 Config.define("audio",  "frequency",    int,   44100, text = _("Sample Frequency"), options = [8000, 11025, 22050, 32000, 44100, 48000])
 Config.define("audio",  "bits",         int,   16,    text = _("Sample Bits"), options = [16, 8])
 Config.define("audio",  "stereo",       bool,  True)
@@ -389,7 +388,6 @@ class GameEngine(Engine):
     w = viewport[2] - viewport[0]
     geometry = (0, 0, w, h)
     self.svg = SvgContext(geometry)
-    self.svg.setRenderingQuality(self.config.get("opengl", "svgquality"))
     glViewport(*viewport)
 
     self.input     = Input()
