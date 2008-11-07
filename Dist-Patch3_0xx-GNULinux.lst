@@ -1,6 +1,10 @@
 src:src
 doc:doc
 data/versiontag.png:data/
+data/glow.png:data/
+data/cassette.png:data/
+data/left.png:data/
+data/right.png:data/
 data/translations:data/translations
 data/sounds/99pct1.ogg:data/sounds/
 data/sounds/clapsound.ogg:data/sounds/

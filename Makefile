@@ -42,18 +42,8 @@ GameResultsScene src/FretsOnFire.py
 #	@echo --- Fixing PyOpenGL-ctypes
 #	cp -Lr $(PYTHON_LIBS)/site-packages/PyOpenGL*egg-info dist
 
-ifneq ($(USE_AMANITH), 1)
 	@echo --- Rendering SVG files to PNG images
 	cd dist; $(PYTHON) ../src/svg2png.py; cd ..
-endif
-
-	@echo --- Fixing stuff
-ifeq ($(USE_AMANITH), 1)
-	strip dist/_amanith.so
-	cp /home/evilynux/FoF-pkg/libamanith.so.1.64bit dist/libamanith.so.1
-else
-	rm dist/_amanith.so
-endif
 
 	-cp /usr/lib/libpython2.4.so.1.0 \
            /usr/lib/libSDL_ttf-2.0.so.0 \
