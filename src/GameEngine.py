@@ -58,7 +58,7 @@ import Mod
 
 # define configuration keys
 Config.define("engine", "tickrate",     float, 1.0)
-Config.define("engine", "highpriority", bool,  False) # evilynux - Default to false should be safe
+Config.define("engine", "highpriority", bool,  True)
 Config.define("game",   "uploadscores", bool,  False, text = _("Upload Highscores"),    options = {False: _("No"), True: _("Yes")})
 Config.define("game",   "leftymode",    bool,  False, text = _("Lefty mode"),           options = {False: _("No"), True: _("Yes")})
 Config.define("video",  "fullscreen",   bool,  False,  text = _("Fullscreen Mode"),      options = {False: _("No"), True: _("Yes")})
