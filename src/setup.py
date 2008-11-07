@@ -87,10 +87,7 @@ dataFiles = [
   "label.dae",
   "library.dae",
   "library_label.dae",
-  "glow.svg",
-  "ball1.svg",
-  "ball2.svg",
-  "ghmidimap.txt",
+  "glow.png",
 ]
 
 

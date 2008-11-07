@@ -1,5 +1,6 @@
 call GetTranslatableText.bat
 python setup.py py2exe
+rem pause
 call ClearCompiledPycs.bat
 cd ..
 copy dist\FretsOnFire.exe FretsOnFire.exe
