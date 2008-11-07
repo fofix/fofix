@@ -165,10 +165,10 @@ class View(Task):
     h = viewport[3] - viewport[1]
     s = (w, h, w, h)
 
-    geometry = tuple([(type(coord) == float) and int(s[i] * coord) or int(coord) for i, coord in enumerate(geometry)])
-#    geometry[0] = int(geometry[0] / screens)
-#    geometry[2] = int(geometry[2] / screens)
-#    geometry = tuple(geometry)
+    geometry = [(type(coord) == float) and int(s[i] * coord) or int(coord) for i, coord in enumerate(geometry)]
+    geometry[0] = int(geometry[0] / screens)
+    geometry[2] = int(geometry[2] / screens)
+    geometry = tuple(geometry)
     self.savedGeometry, self.geometry = viewport, geometry
     glViewport(int(geometry[0]), int(geometry[1]), int(geometry[2]), int(geometry[3]))
     glScissor(int(geometry[0]), int(geometry[1]), int(geometry[2]), int(geometry[3]))
