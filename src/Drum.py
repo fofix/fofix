@@ -1323,7 +1323,11 @@ class Drum:
     
     for n in range(self.strings):
       f = self.fretWeight[n]
-      c = self.fretColors[n + 1]
+
+      if n == 3:
+        c = self.fretColors[0]
+      else:
+        c = self.fretColors[n + 1]
 
       if f and (controls.getState(self.keys[0])):
         f += 0.25
