@@ -17,6 +17,6 @@ rem Below stores line execution counts (only written after close - not good for 
 rem python -m trace -c -C traced FretsOnFire.py
 
 
-
+cd scripts
 call ClearCompiledPycs
 pause

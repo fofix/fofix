@@ -1,3 +1,4 @@
+cd ..
 del *.pyc
 del *.pyo
 del *.bak
