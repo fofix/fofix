@@ -21,18 +21,18 @@
 #####################################################################
 
 import os
+import sys
 
 if os.name == "nt":
   import setup_exe
   setup_exe.setupWindows()
 
-#MFH - other OS users please fill out the following as you adapt this convention for your build scripts, using the below skeleton
-#elif os.name == "posix":
+#elif sys.platform == "darwin":    #(mac)
 
+#elif os.name == "posix":   #(linux)
+
+#other potentially-useful conditionals for the future:
 #elif os.name == "mac":
-
 #elif os.name == "dos":
-  
 #elif os.name == "os2":
-
 #elif os.name == "ce":
