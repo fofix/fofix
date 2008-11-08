@@ -129,10 +129,7 @@ class Engine:
     
     for task in self.frameTasks:
       self._runTask(task)
-    self.timer.startTimer()
-    ticks = self.timer.advanceFrame()
-    for tick in ticks:
+    for tick in self.timer.advanceFrame():
       for task in self.tasks:
         self._runTask(task, tick)
-    self.timer.waitFromStart()
     return True
