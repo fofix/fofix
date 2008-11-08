@@ -438,6 +438,16 @@ add this line in your `fretsonfire.ini`, under the [game] section (accent marks 
 `Encoding = Latin`
 
 -----
+
+==To read the included .CHM (Compiled HtMl) help file==
+
+[http://www.fileheap.com/software-help-explorer-viewer-download-28269.html Download Software Help Explorer Viewer] (includes windows version)
+
+or
+
+[http://xchm.sourceforge.net/ Download xchm]
+
+-----
 -----
 
 ==Developers==
