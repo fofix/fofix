@@ -8,7 +8,6 @@ Usage:
 from setuptools import setup
 
 import sys, SceneFactory, Version
-import amanith
 import glob
 
 APP = ['FretsOnFire.py']
@@ -27,9 +26,8 @@ OPTIONS = {
  'argv_emulation': True,
  'dist_dir': '../dist',
  'dylib_excludes': 'OpenGL,AGL',
- 'frameworks' : '../../amanith/lib/libamanith.dylib, ../../glew/lib/libGLEW.dylib', 
  'iconfile': '../icon_mac_composed.icns',
- 'includes': SceneFactory.scenes + ['amanith'],
+ 'includes': SceneFactory.scenes,
  'excludes': ['glew.gl.apple'
       "glew.gl.ati",
       "glew.gl.atix",
