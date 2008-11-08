@@ -13,7 +13,7 @@ patch: dist
 	@echo --- Creating patch
 	[ -d FoFiX-${VERSION}-Patch-GNULinux-64bit ] && \
 	rm -rf FoFiX-${VERSION}-Patch-GNULinux-64bit* || echo
-	perl Dist-Patch3_0xx-GNULinux.pl FoFiX-${VERSION}-Patch-GNULinux-64bit
+	perl pkg/Dist-Patch3_0xx-GNULinux.pl FoFiX-${VERSION}-Patch-GNULinux-64bit
 	tar -cjvf FoFiX-${VERSION}-Patch-GNULinux-64bit.tar.bz2 FoFiX-${VERSION}-Patch-GNULinux-64bit/
 
 dist:

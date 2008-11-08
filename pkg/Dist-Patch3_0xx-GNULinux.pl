@@ -3,16 +3,17 @@
 # Copyright 2008 Pascal Giard <evilynux@gmail.com>
 #
 # Create patch for FoFiX from a list of source:destination
-#
+# Look at ../Makefile for a usage example.
 use strict;
 use File::Copy::Recursive qw(rcopy);
 use File::Remove qw(remove);
 
-my $list = "Dist-Patch3_0xx-GNULinux.lst";
 my (@src, @dest, @tuple);
 my $dir = $ARGV[0] or die "Need destination directory!";
+my $list = "Dist-Patch3_0xx-GNULinux.lst";
+my $cwd = ( $0 =~ /(^.*\/)[^\/]+$/ ) ? $1 : "./";
 
-open(FH, $list) or die $!;
+open(FH, "$cwd$list") or die $!;
 while( <FH> ) {
   chop();
   next if( /^$/ );
