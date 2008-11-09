@@ -1,10 +1,10 @@
-These Are All the Documented Theme.ini Settings Usable. This list will be updated as new ones are added.
+These are all the documented Theme.ini Settings usable. This will be updated as new ones are added.
 
-You first need to create a theme.ini in your theme's folder. Once you create the file you need to type this header line in at the very top:
+First, you need to create a theme.ini in your theme's folder. Once you create the file you need to type this header line in at the very top:
 
 _{{{[theme]}}}_
 
-....then any of the settings below may be added underneath the [theme] header:
+Use any of the settings below the {{{[theme]}}} header:
 -----------------------------------------------------------------------------------------
 ==Main Menu==
 
@@ -37,7 +37,7 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||song_cdscore_x = .6||Use a decimal # between 0 - 1. IE- .34||
 ||song_list_x = .15||Use a decimal # between 0 - 1. IE- .34||
 ||song_listscore_x = .8||Use a decimal # between 0 - 1. IE- .34||
-||songback = True||Scrolls the Song Selection Background image. If your image isn't long enough, Use SongChooseBack.png just in case, this image is static||
+||songback = True||Scrolls the Song Selection Background image. If your image isn't long enough, Use 'SongChooseBack.png' just in case, this image is static||
 ||career_title_color = #000000||Use a Hex color code||
 ||opt_text_color = #FFFFFF||Use a Hex color code||
 ||opt_selected_color = #FFBF00||Use a Hex color code||
