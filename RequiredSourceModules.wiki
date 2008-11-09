@@ -75,5 +75,38 @@ To create the executable we need a few more steps
   # You may need the Windows support files for FoFiX (mostly {{{.DLL}}}s), which can be found inside any full Windows FoFiX distribution in the appropriate directory structure.
 
 ----
+==For GNU/Linux==
+=== Get latest FoFiX ===
+  # Open a terminal
+  # Change to the directory in which you want to have FoFiX
+  # Execute `svn checkout http://fofix.googlecode.com/svn/MFH-Mod/trunk/ FoFiX-SVN`
+=== Install dependencies ===
+You need to install those packages:
+  * python2.4
+  * python-pygame
+  * python-opengl (= 2.x)
+  * python-numpy
+  * python-numeric
+  * python-pil
+  * python-vorbis
 
-_Instructions for other platforms coming soon!_
+Optionally, if you are in 32bit you can also install python-psyco.
+
+=== Running from sources ===
+  # Change directory to `FoFiX-SVN/src`
+  # Execute `python2.4 FretsOnFire.py`
+
+=== Creating binaries ===
+You first need to...
+  # Install cxFreeze
+  # Substitue line 16 of `/usr/lib/python2.4/site-packages/OpenGL/__init__.py` with `__version__ = "2.0.1.09"`.
+
+Then either create a patch or a full package.
+
+==== Patch ====
+  * Execute `make patch`.
+==== Full package ====
+  # Execute `make dist`.
+  # Execute `perl pkg/Dist-Patch3_0xx-GNULinux.pl -d FoFiX-Full-GNULinux`
+----
+_Instructions for MacOS X coming soon!_
