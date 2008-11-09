@@ -1,5 +1,4 @@
-#These Are All the Documented Theme.ini Settings Usable
-This will be updated as new ones are added.
+These Are All the Documented Theme.ini Settings Usable. This list will be updated as new ones are added.
 
 You first need to create a theme.ini in your theme's folder. Once you create the file you need to type this header line in at the very top:
 
@@ -10,8 +9,6 @@ _{{{[theme]}}}_
 *Main Menu*
                      
 _(Decimal number between 0 and 1, IE- .34)_
-
-
 {{{
 'menu_x = .665 (X Position of main menu image)'
 'menu_y = .842 (Y Position of main menu image)'
