@@ -18,14 +18,14 @@ def songFiles(song, extra = []):
 dataFiles = [
   (".", ["../AUTHORS", "../COPYING", "../CREDITS", "../ChangeLog", "../Makefile", "../NEWS", "../README", "../fretsonfire.ini"]),
   ("doc", glob.glob("../doc/*")),
-  ("data", glob.glob("../data/*")),
-  ("FoFiX-wiki", glob.glob("../FoFiX-wiki/*"))
+  ("data", glob.glob("../data/*"))
 ]
 
 OPTIONS = {
  'argv_emulation': True,
  'dist_dir': '../dist',
  'dylib_excludes': 'OpenGL,AGL',
+ 'frameworks' : '../../glew/lib/libGLEW.dylib',
  'iconfile': '../icon_mac_composed.icns',
  'includes': SceneFactory.scenes,
  'excludes': ['glew.gl.apple'
