@@ -376,16 +376,30 @@ class Data(object):
     self.resource.load(target, name, lambda: Sound(fileName), onLoad = lambda s: s.setVolume(volume))
 
 
+  def determineNumSounds(self, soundPath, soundPrefix, soundExtension = ".ogg"):   #MFH - auto random sound enumeration
+    soundNum = 1
+    while self.fileExists(os.path.join(soundPath,"%s%d%s" % (soundPrefix, soundNum, soundExtension) ) ):
+      soundNum += 1
+    return soundNum-1
+
+  def getSoundObjectList(self, soundPath, soundPrefix, numSounds, soundExtension = ".ogg"):   #MFH
+    Log.debug( str(numSounds) + " " + soundPrefix + " sounds found in " + soundPath + ": " + soundPrefix + "1" + soundExtension + " - " + soundPrefix + str(numSounds) + soundExtension )
+    return [Sound(self.resource.fileName(os.path.join(soundPath,"%s%d%s" % (soundPrefix, i, soundExtension) ))) for i in range(1, numSounds+1)]
+
   def loadBackSounds(self):   #MFH - adding optional support for random choice between two back sounds
     if self.fileExists(os.path.join("themes",self.themeLabel,"sounds","back1.ogg")):
       return [Sound(self.resource.fileName(os.path.join("themes",self.themeLabel,"sounds","back%d.ogg") % i)) for i in range(1, 3)]
     else:
       return [Sound(self.resource.fileName(os.path.join("themes",self.themeLabel,"sounds","out.ogg")))]
 
-
   def loadAcceptSounds(self):
-    if self.fileExists(os.path.join("themes",self.themeLabel,"sounds","accept1.ogg")):
-      return [Sound(self.resource.fileName(os.path.join("themes",self.themeLabel,"sounds","accept%d.ogg") % i)) for i in range(1, 11)]
+    soundPathTheme = os.path.join("themes",self.themeLabel,"sounds")
+    soundPathData = "sounds"
+    soundPath = soundPathTheme
+    soundPrefix = "accept"
+    numSounds = self.determineNumSounds(soundPath, soundPrefix)
+    if numSounds > 0:
+      return self.getSoundObjectList(soundPath, soundPrefix, numSounds)
     else:
       if self.theme == 0 or self.theme == 1:#GH2 or GH3
         return [Sound(self.resource.fileName(os.path.join("themes",self.themeLabel,"sounds","in.ogg")))]
@@ -393,25 +407,37 @@ class Data(object):
         return [Sound(self.resource.fileName(os.path.join("themes",self.themeLabel,"sounds","action.ogg")))]
 
   def loadScrewUpsounds(self):
-    #MFH - adding support for optional theme-specific screwup sounds:
-    if self.fileExists(os.path.join("themes",self.themeLabel,"sounds","guitscw1.ogg")):
-      return [Sound(self.resource.fileName(os.path.join("themes",self.themeLabel,"sounds","guitscw%d.ogg") % i)) for i in range(1, 7)]
-    else:
-      return [Sound(self.resource.fileName(os.path.join("sounds","guitscw%d.ogg") % i)) for i in range(1, 7)]
+    soundPathTheme = os.path.join("themes",self.themeLabel,"sounds")
+    soundPathData = "sounds"
+    soundPath = soundPathTheme
+    soundPrefix = "guitscw"
+    numSounds = self.determineNumSounds(soundPath, soundPrefix)
+    if numSounds == 0:
+      soundPath = soundPathData
+      numSounds = self.determineNumSounds(soundPath, soundPrefix)
+    return self.getSoundObjectList(soundPath, soundPrefix, numSounds)
 
   def loadScrewUpsoundsBass(self):
-    #MFH - adding support for optional theme-specific screwup sounds:
-    if self.fileExists(os.path.join("themes",self.themeLabel,"sounds","bassscw1.ogg")):
-      return [Sound(self.resource.fileName(os.path.join("themes",self.themeLabel,"sounds","bassscw%d.ogg") % i)) for i in range(1, 7)]
-    else:
-      return [Sound(self.resource.fileName(os.path.join("sounds","bassscw%d.ogg") % i)) for i in range(1, 7)]
+    soundPathTheme = os.path.join("themes",self.themeLabel,"sounds")
+    soundPathData = "sounds"
+    soundPath = soundPathTheme
+    soundPrefix = "bassscw"
+    numSounds = self.determineNumSounds(soundPath, soundPrefix)
+    if numSounds == 0:
+      soundPath = soundPathData
+      numSounds = self.determineNumSounds(soundPath, soundPrefix)
+    return self.getSoundObjectList(soundPath, soundPrefix, numSounds)
 
   def loadScrewUpsoundsDrums(self):
-    #MFH - adding support for optional theme-specific screwup sounds:
-    if self.fileExists(os.path.join("themes",self.themeLabel,"sounds","drumscw1.ogg")):
-      return [Sound(self.resource.fileName(os.path.join("themes",self.themeLabel,"sounds","drumscw%d.ogg") % i)) for i in range(1, 8)]
-    else:
-      return [Sound(self.resource.fileName(os.path.join("sounds","drumscw%d.ogg") % i)) for i in range(1, 8)]
+    soundPathTheme = os.path.join("themes",self.themeLabel,"sounds")
+    soundPathData = "sounds"
+    soundPath = soundPathTheme
+    soundPrefix = "drumscw"
+    numSounds = self.determineNumSounds(soundPath, soundPrefix)
+    if numSounds == 0:
+      soundPath = soundPathData
+      numSounds = self.determineNumSounds(soundPath, soundPrefix)
+    return self.getSoundObjectList(soundPath, soundPrefix, numSounds)
   
   def loadSyncsounds(self):
     return [Sound(self.resource.fileName("sync%d.ogg" % i)) for i in range(1, 2)]
