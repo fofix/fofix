@@ -387,8 +387,13 @@ class Data(object):
     return [Sound(self.resource.fileName(os.path.join(soundPath,"%s%d%s" % (soundPrefix, i, soundExtension) ))) for i in range(1, numSounds+1)]
 
   def loadBackSounds(self):   #MFH - adding optional support for random choice between two back sounds
-    if self.fileExists(os.path.join("themes",self.themeLabel,"sounds","back1.ogg")):
-      return [Sound(self.resource.fileName(os.path.join("themes",self.themeLabel,"sounds","back%d.ogg") % i)) for i in range(1, 3)]
+    soundPathTheme = os.path.join("themes",self.themeLabel,"sounds")
+    soundPathData = "sounds"
+    soundPath = soundPathTheme
+    soundPrefix = "back"
+    numSounds = self.determineNumSounds(soundPath, soundPrefix)
+    if numSounds > 0:
+      return self.getSoundObjectList(soundPath, soundPrefix, numSounds)
     else:
       return [Sound(self.resource.fileName(os.path.join("themes",self.themeLabel,"sounds","out.ogg")))]
 
