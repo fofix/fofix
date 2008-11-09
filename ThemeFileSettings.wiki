@@ -7,21 +7,20 @@ _{{{[theme]}}}_
 ....then any of the settings below may be added underneath the [theme] header:
 -----------------------------------------------------------------------------------------
 ==Main Menu==
-_(Decimal number between 0 and 1, IE- .34)_
 
-||_*Item Name*_||*What it does*||
-||menu_x = .665||X Position of main menu image||
-||menu_y = .842||Y Position of main menu image||
-||main_menu_scale = .5||Controls the size of main menu text|| 
-||main_menu_vspacing = 0.09||Controls the spacing between the menu text items||
+||_*Item Name*_||_*What it Does/How to use it*_||
+||menu_x = .665||X Position of main menu image. Use a decimal # between 0-1||
+||menu_y = .842||Y Position of main menu image. Use a decimal # between 0-1||
+||main_menu_scale = .5||Controls the size of main menu text. Use a decimal # between 0-1|| 
+||main_menu_vspacing = 0.09||Controls the spacing between the menu text items. Use a decimal # between 0-1||
 
 
 ------------------------------------------------------------------------------------------
 ==Loading Phrases and Coordinates==   
-_(Decimal # between 0 and 1, IE- .34)_
+
 ||_*Item Name*_||_*What it Does/How to use it*_||
-||loading_X = .5||X Position of Phrase positioning on screen||
-||loading_Y = .595||Y Position of Phrase positioning on screen||
+||loading_X = .5||X Position of Phrase positioning on screen. Use a decimal # between 0-1||
+||loading_Y = .595||Y Position of Phrase positioning on screen. Use a decimal # between 0-1||
 ||loading_phrase = How good are You?||Put an underscore between each phrase for multiple phrases||   
 ||results_phrase = Jurgen is watching||Put an underscore between each phrase for multiple phrases||
 
@@ -32,40 +31,40 @@ Notice - If you just want the default phrases to show do not put these in your t
 
 ----------------------------------------------------------------------------
 ==Song Selection List / CD list== 
-_(defaults shown below)_
+
 ||_*Item Name*_||_*What it Does/How to use it*_||
 ||song_cd_x = 0||Can be 0 through 5, values outside this range will be clipped to 0 or 5 to prevent CDs from going off-screen||
-||song_cdscore_x = .6||Decimal # between 0 - 1. IE- .34||
-||song_list_x = .15||Decimal # between 0 - 1. IE- .34||
-||song_listscore_x = .8||Decimal # between 0 - 1. IE- .34||
+||song_cdscore_x = .6||Use a decimal # between 0 - 1. IE- .34||
+||song_list_x = .15||Use a decimal # between 0 - 1. IE- .34||
+||song_listscore_x = .8||Use a decimal # between 0 - 1. IE- .34||
 ||songback = True||Scrolls the Song Selection Background image. If your image isn't long enough, Use SongChooseBack.png just in case, this image is static||
-||career_title_color = #000000||Use Hex color code||
-||opt_text_color = #FFFFFF||Use Hex color code||
-||opt_selected_color = #FFBF00||Use Hex color code||
-||song_name_text_color = #FFFFFF||Use Hex color code||
-||song_name_selected_color = #FFBF00||Use Hex color code||
-||artist_text_color = #4080FF||Use Hex color code||
-||artist_selected_color = #4080FF||Use Hex color code||
-||library_text_color = #FFFFFF||Use Hex color code||
-||library_selected_color = #FFBF00||Use Hex color code||
-||songlist_score_color = #FFFFFF||Use Hex color code||
+||career_title_color = #000000||Use a Hex color code||
+||opt_text_color = #FFFFFF||Use a Hex color code||
+||opt_selected_color = #FFBF00||Use a Hex color code||
+||song_name_text_color = #FFFFFF||Use a Hex color code||
+||song_name_selected_color = #FFBF00||Use a Hex color code||
+||artist_text_color = #4080FF||Use a Hex color code||
+||artist_selected_color = #4080FF||Use a Hex color code||
+||library_text_color = #FFFFFF||Use a Hex color code||
+||library_selected_color = #FFBF00||Use a Hex color code||
+||songlist_score_color = #FFFFFF||Use a Hex color code||
 
 
 
 ------------------------------------------------------------------------------------------
 ==In Game Items==                     
-_(Decimal # between 0 and 1, IE- .34)_
+
 ||_*Item Name*_||_*What it Does/How to use it*_||
 ||twoDkeys = False||Use 3d keys  = False||
 ||twoDnote = False||Use 3d notes = False||
 ||Rotating 3d Starnotes||Default is on||
 ||threeDspin = False||Turns 3d Starnote spinning off.||
-||spot_color = #EEEEEE||Enter Hex color here.||
-||hopo_color = #EEEEEE||Enter Hex color here.||
-||mesh_color = #000000||Enter Hex color here.||
-||open_color = #FF9933||Enter Hex color here.||
-||rockmeter_score_color = #93c351||Enter Hex color here.||
-||ingame_stats_color = #000000||Enter Hex color here.||
+||spot_color = #EEEEEE||Enter a Hex color here.||
+||hopo_color = #EEEEEE||Enter a Hex color here.||
+||mesh_color = #000000||Enter a Hex color here.||
+||open_color = #FF9933||Enter a Hex color here.||
+||rockmeter_score_color = #93c351||Enter a Hex color here.||
+||ingame_stats_color = #000000||Enter a Hex color here.||
 ||fret0_color = #22FF22||Manually sets 1st fret tail color||
 ||fret1_color = #FF2222||Manually sets 2nd fret tail color||
 ||fret2_color = #FFFF22||Manually sets 3rd fret tail color||
@@ -78,35 +77,36 @@ _(Decimal # between 0 and 1, IE- .34)_
 
 ------------------------------------------------------------------------------------------
 ==Background, text, selected text colors==
+
 ||_*Item Name*_||_*What it Does/How to use it*_||
-background_color = #000000     Color of the background screen. Should be black)
-base_color = #FFFFFF           (Unselected text color)
-selected_color = #FFBF00       (Highlighted text color)
-versiontag = true              (Forces showing the Versiontag onscreen) 
+||background_color = #000000||Controls the color of the background screen. Should be black||
+||base_color = #FFFFFF||Controls the Unselected text color||
+||selected_color = #FFBF00||Controls the Highlighted text color||
+||versiontag = true||Forces showing the Versiontag.png on-screen|| 
 
 
 
 ----------------------------------------------------------------------------
 ==Pause & options menus, backgrounds & text positions==
 ||_*Item Name*_||_*What it Does/How to use it*_||
-pause_bkg_x = 0                      (from center)
-pause_bkg_y = 0                      (from center)
-pause_text_x = .3                    (Decimal # between 0 - 1, IE- .34)
-pause_text_y = .31                   (Decimal # between 0 - 1, IE- .34)
-opt_bkg_x = 0                        (from center)
-opt_bkg_y = 0                        (from center)
-opt_text_x = .38                     (8bit theme default = .44, RB theme default = .25)
-opt_text_y = .15                     (8bit theme default = .14, RB theme default = .14)
-fail_bkg_x = 0                       (fail menu background and text)
-fail_bkg_y = 0                       (fail menu background and text)
-fail_text_x =                        (default is calculated, not constant)
-fail_text_y = .47                    (fail menu background and text)
-pause_text_color = #FFFFFF           (Hex color code)
-pause_selected_color = #FFBF00       (Hex color code)
-sub_menu_x = .38                     (Difficult Select Screen & Instrument Select. 8bit theme default = .44, RB theme default = .25)
-sub_menu_y = .15                     (Difficult Select Screen & Instrument Select. 8bit theme default = .14, RB theme default = .14)
-fail_text_color = #FFFFFF            (Hex color code)
-fail_selected_color = #FFBF00        (Hex color code)
+||pause_bkg_x = 0||0 starts from the center of the screen||
+||pause_bkg_y = 0||0 starts from the center of the screen||
+||pause_text_x = .3||Controls the Pause Menu text position. Use a Decimal # between 0 - 1, IE- .34||
+||pause_text_y = .31||Use a decimal # between 0 - 1, IE- .34||
+||opt_bkg_x = 0||0 starts from the center||
+||opt_bkg_y = 0||0 starts from the center||
+||opt_text_x = .38||Controls the Option Menu X text position||
+||opt_text_y = .15||Controls the Option Menu Y text position||
+||fail_bkg_x = 0||Controls the fail menu background and text positions||
+||fail_bkg_y = 0||Controls the fail menu background and text positions||
+||fail_text_x =   ||Default is calculated, not constant||
+||fail_text_y = .47||Controls the fail menu background and text positions||
+||pause_text_color = #FFFFFF||Use a Hex color code||
+||pause_selected_color = #FFBF00||Use a Hex color code||
+||sub_menu_x = .38||Controls the Difficult Select Screen & Instrument Select X Position||
+||sub_menu_y = .15||Controls the Difficult Select Screen & Instrument Select Y Position||
+||fail_text_color = #FFFFFF||Use a Hex color code||
+||fail_selected_color = #FFBF00||Use a Hex color code||
 
 
 
@@ -114,4 +114,4 @@ fail_selected_color = #FFBF00        (Hex color code)
 
 Good luck with making a custom theme to all!!!
 -----------------------------------------------
-Done and Maintained by Worldrave
+This was made and maintained by Worldrave
