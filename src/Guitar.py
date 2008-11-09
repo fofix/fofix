@@ -2277,8 +2277,11 @@ class Guitar:
           if time == q:
             event.star = True
         for q in self.maxStars:
-          if time == q and not event.finalStar:
-            event.star = True
+          #if time == q and not event.finalStar:
+          #  event.star = True
+          if time == q:   #MFH - no need to mark only the final SP phrase note as the finalStar as in drums, they will be hit simultaneously here.
+            event.finalStar = True
+
       self.starNotesSet = True
 
         
