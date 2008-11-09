@@ -7,14 +7,14 @@ _{{{[theme]}}}_
 ....then any of the settings below may be added underneath the [theme] header:
 -----------------------------------------------------------------------------------------
 *Main Menu*
-                     
 _(Decimal number between 0 and 1, IE- .34)_
-{{{
-'menu_x = .665 (X Position of main menu image)'
-'menu_y = .842 (Y Position of main menu image)'
-'main_menu_scale = .5'
-'main_menu_vspacing = 0.09'
-}}}
+
+||*Item Name*||*What it does*||
+||menu_x = .665||X Position of main menu image||
+||menu_y = .842||Y Position of main menu image||
+||main_menu_scale = .5||Controls the size of main menu text|| 
+||main_menu_vspacing = 0.09||Controls the spacing between the menu text items||
+
 
 ------------------------------------------------------------------------------------------
 *Loading Phrases and Coordinates*   
