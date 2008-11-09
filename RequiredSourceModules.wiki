@@ -35,7 +35,7 @@ Versions are likely important. Don't substitute one for the other without trying
   #  Install active python by double clicking the .msi
   #  Install psyco by double clicking the .exe
   #  Unzip GLEW (no easy install)
-  #  Install glew by copying the 'glew32.dll' file in 'bin' to your 'system32' dir under C:\Windows (or equivalent) (64bit OS users - copy into 'C:\Windows' instead of '\system32')
+  #  Install glew by copying the 'glew32.dll' file in 'bin' to your 'system32' dir under C:\Windows (or equivalent)   _*64bit OS users - Copy to 'C:\Windows' instead of '\system32'*_
   #  Install PyOpenGL by double clicking the .exe
   #  Install GLEWpy by double clicking the .exe
   #  Install PyGame by double clicking the .exe
