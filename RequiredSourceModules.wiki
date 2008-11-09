@@ -103,6 +103,8 @@ Optionally, if you are in 32bit you can also install python-psyco.
 You first need to...
   # Install cxFreeze
   # Substitue line 16 of `/usr/lib/python2.4/site-packages/OpenGL/__init__.py` with `__version__ = "2.0.1.09"`.
+  # Get the wiki pages by executing the following in the folder that contains `FoFiX-SVN`:
+    * `svn checkout http://fofix.googlecode.com/svn/wiki FoFiX-wiki`
 
 Then either create a patch or a full package.
 
