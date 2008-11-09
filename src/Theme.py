@@ -118,6 +118,7 @@ DEFAULT_COLOR_OPEN      = "#FF9933"
 
 DEFAULT_SONGBACK         = False
 DEFAULT_VERSIONTAG       = False
+DEFAULT_RMTYPE           = None
 
 #evilynux
 DEFAULT_ROCKMETER_SCORE_COLOR = "#93C351"
@@ -269,6 +270,7 @@ Config.define("theme", "opencolor",       str, DEFAULT_COLOR_OPEN)
 
 Config.define("theme", "songback",       bool, DEFAULT_SONGBACK)
 Config.define("theme", "versiontag",       bool, DEFAULT_VERSIONTAG)
+Config.define("theme", "rmtype",       int, DEFAULT_RMTYPE)
 
 #evilynux
 Config.define("theme", "songlist_score_color",  str, DEFAULT_SONGLIST_SCORE_COLOR)
@@ -368,6 +370,7 @@ opencolor = None
 meshColor = None
 songback = None
 versiontag = None
+rmtype = None
 
 #evilynux
 songlist_score_colorVar = None
@@ -460,6 +463,7 @@ def open(config):
   setupTWOD(config)
   setupFail(config) #racer
   setupEvilynux(config)
+  setupRockmeter(config)
 
 def setupColors(config):
   global backgroundColor, baseColor, selectedColor
@@ -992,7 +996,12 @@ def setupFail(config):
   if fail_text_yPos == None or temp != DEFAULT_FAIL_TEXT_Y:
     fail_text_yPos = temp 
 
+def setupRockmeter(config):
+  global rmtype
 
+  temp = config.get("theme", "rmtype")
+  if rmtype == None or temp != DEFAULT_RMTYPE:
+    rmtype = temp  
 
 def setupEvilynux(config):
   global songlist_score_colorVar, rockmeter_score_colorVar, ingame_stats_colorVar
@@ -1008,6 +1017,7 @@ def setupEvilynux(config):
   temp = config.get("theme", "ingame_stats_color")
   if ingame_stats_colorVar == None or temp != DEFAULT_INGAME_STATS_COLOR:
     ingame_stats_colorVar = temp  
+
 
 def write(f, config):
   # Write read in theme.ini specific variables
@@ -1028,6 +1038,7 @@ def write(f, config):
   writeTWOD(f, config)
   writeFail(f, config) #racer
   writeEvilynux(f, config)
+  writeRockmeter(f, config)
 
 def writeColors(f, config):
   global backgroundColor, baseColor, selectedColor
@@ -1220,9 +1231,14 @@ def writeFail(f, config): #racer
   f.write("%s = %s\n" % ("fail_text_y", fail_text_yPos))
 
 def writeEvilynux(f, config):
+
   global songlist_score_colorVar, rockmeter_score_colorVar, ingame_stats_colorVar
 
   f.write("%s = %s\n" % ("songlist_score_color", songlist_score_colorVar))
   f.write("%s = %s\n" % ("rockmeter_score_color", rockmeter_score_colorVar))
   f.write("%s = %s\n" % ("ingame_stats_color", ingame_stats_colorVar))
 
+def writeRockmeter(f, config):
+  global rmtype
+
+  f.write("%s = %s\n" % ("rmtype", rmtype))

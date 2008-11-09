@@ -226,6 +226,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     themename = self.engine.data.themeLabel
     self.theme = self.engine.data.theme
 
+    if Theme.rmtype != None:
+      self.rmtype = Theme.rmtype
+    else:
+      self.rmtype = self.theme
+
     stage = os.path.join("themes",themename,"stage.ini")
     self.stage = Stage.Stage(self, self.engine.resource.fileName(stage))
 
@@ -580,7 +585,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
 
 
-    if self.theme == 0:
+    if self.rmtype == 0:
 
       #starpower
       self.engine.loadImgDrawing(self, "oTop", os.path.join("themes",themename,"sptop.png"))
@@ -646,7 +651,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.engine.loadImgDrawing(self, "rockMsg", os.path.join("themes",themename,"yourock.png"))
 
 
-    elif self.theme == 1:
+    elif self.rmtype == 1 or self.rmtype == 3:
       #Pause Screen
       self.engine.loadImgDrawing(self, "pauseScreen", os.path.join("themes",themename,"pause.png"))
       self.engine.loadImgDrawing(self, "failScreen", os.path.join("themes",themename,"fail.png"))
@@ -704,7 +709,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.engine.loadImgDrawing(self, "rockMsg", os.path.join("themes",themename,"yourock.png"))
 
 
-    elif self.theme == 2:
+    elif self.rmtype == 2:
 
       
       #Pause Screen
@@ -856,7 +861,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     try:
       self.engine.loadImgDrawing(self, "rockOff", os.path.join("themes",themename,"rock_off.png"))
     except IOError:
-      if self.theme == 2:
+      if self.rmtype == 2:
         self.engine.loadImgDrawing(self, "rockOff", os.path.join("themes",themename,"rock_fill.png"))
       else:
         self.engine.loadImgDrawing(self, "rockOff", os.path.join("themes",themename,"rock_med.png"))
@@ -1132,18 +1137,22 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.camera.target    = (0.0, -6.0, 2.6666666666)
       self.camera.origin    = (0.0, 6.0, 2.6666666665)  
     elif self.pov == 6: #Blazingamer theme-dependant 
-      if self.theme == 0:
+      if self.rmtype == 0:
         self.camera.target    = (0.0, 1.6, 2.0)
         self.camera.origin    = (0.0, 2.6*self.boardY, -3.6)
-      elif self.theme == 1:
+      elif self.rmtype == 1:
         self.camera.target    = (0.0, 1.4, 1.8) #kk69:More like GH3
         self.camera.origin    = (0.0, 2.8*self.boardY, -3.6)
-      elif self.theme == 2:
+      elif self.rmtype == 2:
         self.camera.target    = (0.0, 0.0, 3.7)
         self.camera.origin    = (0.0, 2.9*self.boardY, -2.9)
     else:
       self.camera.target    = (0.0, 0.0, 4.0)
       self.camera.origin    = (0.0, 3.0*self.boardY, -3.0)
+
+    if self.rmtype == 3:
+      self.camera.target    = (0.0, 1.4, 1.8) #kk69:More like GH3
+      self.camera.origin    = (0.0, 2.8*self.boardY, -3.6)
            
   def freeResources(self):
     self.engine.view.setViewport(1,0)
@@ -1158,7 +1167,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.rockMsg = None
     self.song = None
     self.rockOff = None
-    if self.theme == 0:
+    if self.rmtype == 0:
       self.rockmeter = None
       self.basedots = None
       self.dt1 = None
@@ -1178,7 +1187,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.oBottom = None
       self.oFill = None
       self.oFull = None
-    elif self.theme == 1:
+    elif self.rmtype == 1 or self.rmtype == 3:
       self.rockmeter = None
       self.dots = None
       self.basedots = None
@@ -1186,7 +1195,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.rockLo = None
       self.rockMed = None
       self.SP = None
-    elif self.theme == 2:
+    elif self.rmtype == 2:
       self.oTop = None
       self.oBottom = None
       self.oFill = None
@@ -3895,7 +3904,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           # show the streak counter and miss message
           #============Blazingamer's GHII Rock Meter=============#
   
-          if self.theme == 0:   #GH2 theme
+          if self.rmtype == 0:   #GH2 theme
            if not self.pauseScreen == None:
               w = self.wPlayer[i]
               h = self.hPlayer[i]
@@ -4228,7 +4237,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
           #===================================================#
   
-          elif self.theme == 1:
+          elif self.rmtype == 1:
             if not self.pauseScreen == None:
               w = self.wPlayer[i]
               h = self.hPlayer[i]
@@ -4805,7 +4814,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 glColor3f(1, 1, 1)  #cracker white
     
                   
-          elif (self.theme == 2):# and self.countdown<=4) or (self.theme == 1 and self.numOfPlayers==1):
+          elif (self.rmtype == 2):# and self.countdown<=4) or (self.theme == 1 and self.numOfPlayers==1):
             if not self.pauseScreen == None:
               w = self.wPlayer[i]
               h = self.hPlayer[i]
@@ -5243,6 +5252,557 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 font.render(text, (.950 - w / 2, .725),(1, 0, 0),0.00150)     #off to the right slightly above fretboard
                 glColor3f(1, 1, 1)  #cracker white
   
+          elif self.rmtype == 3:
+            if not self.pauseScreen == None:
+              w = self.wPlayer[i]
+              h = self.hPlayer[i]
+              wBak = w
+              hBak = h
+              if self.guitars[i].starPowerActive: #QQstarS:Set [0] to [i]
+                
+                #myfingershurt: so that any GH theme can use dotshalf.png:
+                if self.theme < 2:
+                  if self.halfDots:
+                    #death_au: check for bass groove
+                    #if self.playerList[i].part.text == "Bass Guitar" and self.bassgroovemult != None and player.streak >= 40 and self.bassGrooveEnableMode == 2:
+                    if self.guitars[i].isBassGuitar and self.bassgroovemult != None and player.streak >= 40 and self.bassGrooveEnableMode == 2:
+                      if player.streak >= 50:
+                        multiplier = 6
+                        multRange = (0.75,1.00) #MFH division->constant: was (3.0/4.0,4.0/4.0)
+                        color = (1,0,0.75,1)
+                      else:
+                        multiplier = 5
+                        multRange = (0.5,0.75) #MFH division->constant: was (2.0/4.0,3.0/4.0)
+                        color = (1,0,0.75,1)
+                      xs = (0.75,1)
+                    #death_au: end check for bass groove
+                    elif player.streak >= 30:
+                      multiplier = 4
+                      multRange = (0.875,1.0) #MFH division->constant: was (7.0/8.0,8.0/8.0)
+                      color = (.3,.7,.9,1)
+                      xs = (0.75,1)
+                    elif player.streak >= 20:
+                      multiplier = 3
+                      multRange = (0.75,0.875) #MFH division->constant: was (6.0/8.0,7.0/8.0)
+                      color = (.3,.7,.9,1)
+                      xs = (0.75,1)
+                    elif player.streak >= 10:
+                      multiplier = 2
+                      multRange = (0.625,0.75) #MFH division->constant: was (5.0/8.0,6.0/8.0)
+                      color = (.3,.7,.9,1)
+                      xs = (0.75,1)
+                    else:
+                      multiplier = 1
+                      multRange = (0.5,0.625) #MFH division->constant: was (4.0/8.0,5.0/8.0)
+                      color = (.3,.7,.9,1)
+                      xs = (0.75,1)
+                  else:
+                    #death_au: check for bass groove
+                    #if self.playerList[i].part.text == "Bass Guitar" and self.bassgroovemult != None and player.streak >= 40 and self.bassGrooveEnableMode == 2:
+                    if self.guitars[i].isBassGuitar and self.bassgroovemult != None and player.streak >= 40 and self.bassGrooveEnableMode == 2:
+                      if player.streak >= 50:
+                        multiplier = 6
+                        multRange = (0.75,1.0) #MFH division->constant: was (3.0/4.0,4.0/4.0)
+                        color = (1,0,0.75,1)
+                      else:
+                        multiplier = 5
+                        multRange = (0.5,0.75) #MFH division->constant: was (2.0/4.0,3.0/4.0)
+                        color = (1,0,0.75,1)
+                    #death_au: end check for bass groove
+                    elif player.streak >= 30:
+                      multiplier = 4
+                      multRange = (0.875,1.0) #MFH division->constant: was (7.0/8.0,8.0/8.0)
+                      color = (.3,.7,.9,1)
+                    elif player.streak >= 20:
+                      multiplier = 3
+                      multRange = (0.75,0.875) #MFH division->constant: was (6.0/8.0,7.0/8.0)
+                      color = (.3,.7,.9,1)
+                    elif player.streak >= 10:
+                      multiplier = 2
+                      multRange = (0.625,0.75) #MFH division->constant: was (5.0/8.0,6.0/8.0)
+                      color = (.3,.7,.9,1)
+                    else:
+                      multiplier = 1
+                      multRange = (0.5,0.625) #MFH division->constant: was (4.0/8.0,5.0/8.0)
+                      color = (.3,.7,.9,1)
+              else:
+                #myfingershurt: so that any GH theme can use dotshalf.png:
+                if self.theme < 2:
+                  if self.halfDots:
+                    #death_au: check for bass groove
+                    #if self.playerList[i].part.text == "Bass Guitar" and self.bassgroovemult != None and player.streak >= 40 and self.bassGrooveEnableMode == 2:
+                    if self.guitars[i].isBassGuitar and self.bassgroovemult != None and player.streak >= 40 and self.bassGrooveEnableMode == 2:
+                      if player.streak >= 50:
+                        multiplier = 6
+                        multRange = (0.25,0.5) #MFH division->constant: was (1.0/4.0,2.0/4.0)
+                        color = (1,0,0.75,1)
+                      else:
+                        multiplier = 5
+                        multRange = (0.0,0.25) #MFH division->constant: was (0.0/4.0,1.0/4.0)
+                        color = (1,0,0.75,1)
+                      xs = (0.75,1)
+                    #death_au: end check for bass groove
+                    elif player.streak >= 30:
+                      multiplier = 4
+                      multRange = (0.375,0.5) #MFH division->constant: was (3.0/8.0,4.0/8.0)
+                      color = (1,-1,1,1)
+                      xs = (0.5,0.75)
+                    elif player.streak >= 20:
+                      multiplier = 3
+                      multRange = (0.25,0.375) #MFH division->constant: was (2.0/8.0,3.0/8.0)
+                      color = (-1,1,-.75,1)
+                      xs = (0.25,0.5)
+                    elif player.streak >= 10:
+                      multiplier = 2
+                      multRange = (0.125,0.25) #MFH division->constant: was (1.0/8.0,2.0/8.0)
+                      color = (1,1,-1,1)
+                      xs = (0,0.25)
+                    else:
+                      multiplier = 1
+                      multRange = (0.0,0.125) #MFH division->constant: was (0.0/8.0,1.0/8.0)
+                      color = (1,1,-1,1)
+                      xs = (0,0.25)
+                  else:
+                     #death_au: check for bass groove
+                    #if self.playerList[i].part.text == "Bass Guitar" and self.bassgroovemult != None and player.streak >= 40 and self.bassGrooveEnableMode == 2:
+                    if self.guitars[i].isBassGuitar and self.bassgroovemult != None and player.streak >= 40 and self.bassGrooveEnableMode == 2:
+                      if player.streak >= 50:
+                        multiplier = 6
+                        multRange = (0.25,0.5) #MFH division->constant: was (1.0/4.0,2.0/4.0)
+                        color = (1,0,0.75,1)
+                      else:
+                        multiplier = 5
+                        multRange = (0.0,0.25) #MFH division->constant: was (0.0/4.0,1.0/4.0)
+                        color = (1,0,0.75,1)
+                      xs = (0.75,1)
+                    #death_au: end check for bass groove
+                    elif player.streak >= 30:
+                      multiplier = 4
+                      multRange = (0.375,0.5) #MFH division->constant: was (3.0/8.0,4.0/8.0)
+                      color = (1,-1,1,1)
+                    elif player.streak >= 20:
+                      multiplier = 3
+                      multRange = (0.25,0.375) #MFH division->constant: was (2.0/8.0,3.0/8.0)
+                      color = (-1,1,-.75,1)
+                    elif player.streak >= 10:
+                      multiplier = 2
+                      multRange = (0.125,0.25) #MFH division->constant: was (1.0/8.0,2.0/8.0)
+                      color = (1,1,-1,1)
+                    else:
+                      multiplier = 1
+                      multRange = (0.0,0.125) #MFH division->constant: was (0.0/8.0,1.0/8.0)
+                      color = (1,1,-1,1)
+            
+              
+              #myfingershurt: GH bass groove multiplier: 
+              # death_au: added drawing of bassgroovemult image             
+              #if self.playerList[i].part.text == "Bass Guitar" and player.streak >= 40 and self.bassGrooveEnableMode == 2:   #bass groove!
+              if self.guitars[i].isBassGuitar and player.streak >= 40 and self.bassGrooveEnableMode == 2:   #bass groove!
+                if self.bassgroovemult != None: #death_au : bassgroovemult image found, draw image
+                      
+                  self.bassgroovemult.transform.reset()
+                  self.bassgroovemult.transform.scale(.5,-.125) #MFH division->constant: was (.5,-.5/4.0)
+                  self.bassgroovemult.transform.translate(w*0.134,h*0.19 + self.hOffset[i]) #QQstarS:Set  new postion. I only shown it once.
+                  self.bassgroovemult.draw(rect = (0,1,multRange[0],multRange[1]))
+                
+                else: #death_au: bassgroovemult not found
+                  #myfingershurt: Temp text bass groove multiplier:
+                  glColor3f(0,0.75,1)
+                  text = str(self.playerList[i].getScoreMultiplier() * self.multi[i])
+                  wid, hig = font.getStringSize(text,0.00325)
+                  font.render(text, (.133 - wid / 2, .566),(1, 0, 0),0.00325)     #replacing GH multiplier large text
+  
+  
+              else:
+                self.mult.transform.reset()
+                self.mult.transform.scale(.5,-.0625) #MFH division->constant: was (.5,-.5/8.0)
+                self.mult.transform.translate(w*0.674,h*0.397 + self.hOffset[i]) #QQstarS:Set  new postion. I only shown it once.
+                self.mult.draw(rect = (0,1,multRange[0],multRange[1]))
+  
+              if player.streak == 0:
+                streak = 0
+                hstreak = 0
+              elif player.streak - ((multiplier-1)*10) == 1:
+                streak = 0
+                hstreak = 1  
+              elif player.streak - ((multiplier-1)*10) == 2:
+                streak = 1
+                hstreak = 0
+              elif player.streak - ((multiplier-1)*10) == 3:
+                streak = 1
+                hstreak = 1
+              elif player.streak - ((multiplier-1)*10) == 4:
+                streak = 2
+                hstreak = 0
+              elif player.streak - ((multiplier-1)*10) == 5:
+                streak = 2
+                hstreak = 1
+              elif player.streak - ((multiplier-1)*10) == 6:
+                streak = 3
+                hstreak = 0
+              elif player.streak - ((multiplier-1)*10) == 7:
+                streak = 3
+                hstreak = 1
+              elif player.streak - ((multiplier-1)*10) == 8:
+                streak = 4
+                hstreak = 0
+              elif player.streak - ((multiplier-1)*10) == 9:
+                streak = 4
+                hstreak = 1
+              else:
+                streak = 5
+                hstreak = 0
+    
+              r = self.dots
+    
+              s = 0
+              hs = 0
+              for t in range(0,5):
+                if s < streak:
+                  ys = (0.66666667,1.0)  #MFH division->constant: was (2.0/3.0,1.0)
+                  s += 1
+                elif hs < hstreak:
+                  ys = (0.33333333,0.66666667)  #MFH division->constant: was (1.0/3.0,2.0/3.0)
+                  hs += 1
+                else:
+                  ys = (0.0,0.33333333)  #MFH division->constant: was (0.0,1.0/3.0)
+                  
+
+                if self.halfDots:
+                  r.transform.reset()
+                  r.transform.scale(0.125,-.166666667) #MFH division->constant: was (.5*(1.0/4.0),-.5*(1.0/3.0))
+                  r.transform.translate(w*.701+t*(w*-.0106),h*.256+t*(h*.026) + self.hOffset[i])
+                  r.draw(rect = (xs[0],xs[1],ys[0],ys[1]))
+                else:
+                  r.transform.reset()
+                  r.transform.scale(.5,-.166666667) #MFH division->constant: was (.5,-.5*(1.0/3.0))
+                  r.transform.translate(w*.044,h*.12+t*(h*.034) + self.hOffset[i])
+                  r.draw(color = color, rect = (0.0,1.0,ys[0],ys[1]))
+  
+    
+              if self.x1[i] == 0: #QQstarS:Set [0] to [i]
+                self.x1[i] = .14
+                self.y1[i] = .4
+                self.x2[i] = .14
+                self.y2[i] = .4
+                self.x3[i] = .14
+                self.y3[i] = .4
+  
+  
+              if self.starfx: #blazingamer, corrected by myfingershurt, adjusted by worldrave
+                if self.guitars[i].starPower >= 50 or self.guitars[i].starPowerActive:
+                  if self.x1[i] < 0.141:
+                    self.x1[i] += 0.01
+                    if self.x1[i] > 0.141:
+                      self.x1[i] = 0.141
+                  if self.y1[i] < 0.544:
+                    self.y1[i] += 0.01
+                    if self.y1[i] > 0.544:
+                      self.y1[i] = 0.544
+                  if self.x2[i] < 0.176:
+                    self.x2[i] += 0.01
+                    if self.x2[i] > 0.176:
+                      self.x2[i] = 0.176
+                  if self.y2[i] < 0.527:
+                    self.y2[i] += 0.01
+                    if self.y2[i] > 0.527:
+                      self.y2[i] = 0.527
+                  if self.x3[i] < 0.202:
+                    self.x3[i] += 0.01
+                    if self.x3[i] > 0.202:
+                      self.x3[i] = 0.202
+                  if self.y3[i] < 0.491:
+                    self.y3[i] += 0.01
+                    if self.y3[i] > 0.491:
+                      self.y3[i] = 0.491
+                else:
+                  if self.x1[i] > 0.14:
+                    self.x1[i] -= 0.01
+                  if self.y1[i] > 0.4:
+                    self.y1[i] -= 0.01
+                  if self.x2[i] > 0.14:
+                    self.x2[i] -= 0.01
+                  if self.y2[i] > 0.4:
+                    self.y2[i] -= 0.01
+                  if self.x3[i] > 0.14:
+                    self.x3[i] -= 0.01
+                  if self.y3[i] > 0.4:
+                    self.y3[i] -= 0.01
+      
+                if self.guitars[i].starPower >= 50 or self.guitars[i].starPowerActive: #QQstarS:Set [0] to [i]
+                  lightPos = (0.689655172,1)  #MFH division->constant: was (2.0/2.9,1)
+                else:
+                  lightPos = (1.0/2.9,2.0/3.1)  #MFH division->constant: ok any preprocessor worth it's salt would take care of this before runtime... this is pointless.
+      
+                if self.guitars[i].starPower >= 16.6: #QQstarS:Set [0] to [i]
+                  lightVis = 1
+                else:
+                  lightVis = self.guitars[i].starPower/16.6
+    
+                wfactor = self.SP.widthf(pixelw = 23.000) #Worldrave Change - Bulb 1
+                self.SP.transform.reset()
+                self.SP.transform.rotate(.87)  #Worldrave Change
+                self.SP.transform.scale(wfactor,-wfactor*3)
+                self.SP.transform.translate(w*.036,h*.487 + self.hOffset[i]) #Worldrave Width and Height was h*0.310
+                self.SP.draw(rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
+                self.SP.transform.reset()
+                self.SP.transform.rotate(.87) #Worldrave Change
+                self.SP.transform.scale(wfactor,-wfactor*3)
+                self.SP.transform.translate(w*.036, h*.487 + self.hOffset[i]) #Worldrave Change
+                self.SP.draw(rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
+      
+                if self.guitars[i].starPower >= 33.2: #QQstarS:Set [0] to [i]
+                  lightVis = 1
+                else:
+                  lightVis = (self.guitars[i].starPower-16.6)/16.6
+                wfactor = self.SP.widthf(pixelw = 23.000) #Worldrave Change - Bulb 2
+                self.SP.transform.reset()
+                self.SP.transform.rotate(.58)  #Worldrave Change
+                self.SP.transform.scale(wfactor,-wfactor*3)
+                self.SP.transform.translate(w*.059,h*.515 + self.hOffset[i])  #Worldrave Change
+                self.SP.draw(rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
+                self.SP.transform.reset()
+                self.SP.transform.rotate(.58)  #evilynux - should be the same
+                self.SP.transform.scale(wfactor,-wfactor*3)
+                self.SP.transform.translate(w*.059,h*.515 + self.hOffset[i])  #Worldrave Change
+                self.SP.draw(rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
+      
+                if self.guitars[i].starPower >= 49.8:
+                  lightVis = 1
+                else:
+                  lightVis = (self.guitars[i].starPower-32.2)/16.6
+    
+                wfactor = self.SP.widthf(pixelw = 23.000)  #Worldrave Change - Bulb 3
+                self.SP.transform.reset()
+                self.SP.transform.rotate(.37)  #Worldrave Change
+                self.SP.transform.scale(wfactor,-wfactor*3)
+                self.SP.transform.translate(w*.086,h*.532 + self.hOffset[i]) #Worldrave Width and Height was h*0.338
+                self.SP.draw(rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
+                self.SP.transform.reset()
+                self.SP.transform.rotate(.37)  #evilynux - should be the same
+                self.SP.transform.scale(wfactor,-wfactor*3)
+                self.SP.transform.translate(w*.086,h*.532 + self.hOffset[i])  #Worldrave Change
+                self.SP.draw(rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
+      
+                if self.guitars[i].starPower >= 66.4:
+                  lightVis = 1
+                else:
+                  lightVis = (self.guitars[i].starPower-49.8)/16.6
+    
+                wfactor = self.SP.widthf(pixelw = 32.000) #Worldrave Change - Bulb 4
+                self.SP.transform.reset()
+                self.SP.transform.rotate(.0)  #Worldrave Change
+                self.SP.transform.scale(wfactor,-wfactor*3)
+                self.SP.transform.translate(w*self.x1[i]*0.96652469,h*self.y1[i]*1.011455279 + self.hOffset[i])  #evilynux - fixed for all resolutions
+                self.SP.draw(rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
+                self.SP.transform.reset()
+                self.SP.transform.rotate(.0)  #Worldrave Change
+                self.SP.transform.scale(wfactor,-wfactor*3)
+                self.SP.transform.translate(w*self.x1[i]*0.96652469,h*self.y1[i]*1.011455279 + self.hOffset[i])  #evilynux - fixed for all resolutions
+                self.SP.draw(rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
+      
+                if self.guitars[i].starPower >= 83:
+                  lightVis = 1
+                else:
+                  lightVis = (self.guitars[i].starPower-66.4)/16.6
+    
+                wfactor = self.SP.widthf(pixelw = 32.000)  #Worldrave Change - Bulb 5  
+                self.SP.transform.reset()
+                self.SP.transform.rotate(-.40)  #Worldrave Change
+                self.SP.transform.scale(wfactor,-wfactor*3)
+                self.SP.transform.translate(w*self.x2[i]*0.976698075,h*self.y2[i]*1.02813143 + self.hOffset[i])  #evilynux - fixed for all resolutions
+                self.SP.draw(rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
+                self.SP.transform.reset()
+                self.SP.transform.rotate(-.40)  #Worldrave Change
+                self.SP.transform.scale(wfactor,-wfactor*3)
+                self.SP.transform.translate(w*self.x2[i]*0.976698075,h*self.y2[i]*1.02813143 + self.hOffset[i])  #evilynux - fixed for all resolutions
+                self.SP.draw(rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
+      
+                if self.guitars[i].starPower >= 100:
+                  lightVis = 1
+                else:
+                  lightVis = (self.guitars[i].starPower-83)/16.6
+    
+                wfactor = self.SP.widthf(pixelw = 32.000) #Worldrave Change - Bulb 6
+                self.SP.transform.reset()
+                self.SP.transform.rotate(-.75)  #Worldrave Change
+                self.SP.transform.scale(wfactor,-wfactor*3)
+                self.SP.transform.translate(w*self.x3[i]*0.986664588,h*self.y3[i]*1.04973235 + self.hOffset[i])  #evilynux - fixed for all resolutions
+                self.SP.draw(rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
+                self.SP.transform.reset()
+                self.SP.transform.rotate(-.75)  #Worldrave Change
+                self.SP.transform.scale(wfactor,-wfactor*3)
+                self.SP.transform.translate(w*self.x3[i]*0.986664588,h*self.y3[i]*1.04973235 + self.hOffset[i])  #evilynux - fixed for all resolutions
+                self.SP.draw(rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
+
+                        
+              self.rockmeter.transform.reset()
+              self.rockmeter.transform.scale(.5,-.5)
+              self.rockmeter.transform.translate(w*.134, h*.23 + self.hOffset[i])
+              self.rockmeter.draw()
+              size      = scoreFont.getStringSize(str(player.score + self.getExtraScoreForCurrentlyPlayedNotes(i)))
+              x = 0.19-size[0]
+              # evilynux - Changed upon worldrave's request
+              c1,c2,c3 = self.rockmeter_score_color
+              glColor3f(c1,c2,c3)
+              if self.numOfPlayers > 1 and i == 0:
+                scoreFont.render("%d" % (player.score + self.getExtraScoreForCurrentlyPlayedNotes(i)), (x, 0.507+self.hFontOffset[i]))
+              else:
+                scoreFont.render("%d" % (player.score + self.getExtraScoreForCurrentlyPlayedNotes(i)),  (x, 0.507+self.hFontOffset[i]))
+    
+              #MFH - rock measurement tristate
+              #if self.rock[i] > self.rockMax/3.0*2:
+              if self.rock[i] > self.rockHiThreshold:
+                rock = self.rockHi
+              #elif self.rock[i] > self.rockMax/3.0:
+              elif self.rock[i] > self.rockMedThreshold:
+                rock = self.rockMed
+              else:
+                rock = self.rockLo
+    
+              rockx = .13
+              rocky = .426
+              if self.failingEnabled:
+                rock.transform.reset()
+                rock.transform.scale(.5,-.5)
+                rock.transform.translate(w*rockx,h*rocky + self.hOffset[i])
+                rock.draw()
+              else:
+                self.rockOff.transform.reset()
+                self.rockOff.transform.scale(.5,-.5)
+                self.rockOff.transform.translate(w*rockx,h*rocky + self.hOffset[i])
+                self.rockOff.draw()
+    
+              currentRock = (0.0 + self.rock[i]) / (self.rockMax)
+              if self.rock[i] >= 0:
+                self.arrowRotation[i] += ( 0.0 + currentRock - self.arrowRotation[i]) / 5.0
+              else:  #QQstarS: Fix the arrow let him never rotation to bottom
+                self.arrowRotation[i] = self.arrowRotation[i]
+              angle = -(.460 / 2) * math.pi + .460 * math.pi * self.arrowRotation[i]
+              wfactor = self.arrow.widthf(pixelw = 60.000)
+  
+              if self.failingEnabled:
+                self.arrow.transform.reset()
+                self.arrow.transform.scale(wfactor,-wfactor)
+                self.arrow.transform.rotate(angle) 
+                self.arrow.transform.translate(w*rockx,h*(rocky-.056 + self.hOffset[i]))
+                self.arrow.draw()
+    
+              self.rockTop.transform.reset()
+              self.rockTop.transform.scale(.5,-.5)
+              self.rockTop.transform.translate(w*rockx,h*rocky + self.hOffset[i])
+              self.rockTop.draw()
+    
+
+              glColor4f(.85,.47,0,1)
+              streak = player.streak
+              text = str(streak)
+              size = streakFont.getStringSize(text)
+              streakFont.render(text, (.193-size[0], 0.548+self.hFontOffset[i]))
+    
+  
+              if self.displayText[i] != None:
+                glColor3f(.8,.75,.01)
+                size = sphraseFont.getStringSize(self.displayText[i], scale = self.dislayTextScale[i])
+                sphraseFont.render(self.displayText[i], (.5-size[0]/2,self.textY[i]-size[1]), scale = self.dislayTextScale[i])
+    
+              if self.youRock == True:
+                if self.rockTimer == 1:
+                  #self.sfxChannel.setVolume(self.sfxVolume)
+                  self.engine.data.rockSound.play()
+                if self.rockTimer < self.rockCountdown:
+                  self.rockTimer += 1
+                  self.rockMsg.transform.reset()
+                  self.rockMsg.transform.scale(0.5, -0.5)
+                  self.rockMsg.transform.translate(w/2,h/2)
+                  self.rockMsg.draw()
+                if self.rockTimer >= self.rockCountdown:
+                  self.rockFinished = True
+    
+              if self.failed:
+                if self.failTimer == 0:
+                  self.song.pause()
+                if self.failTimer == 1:
+                  #self.sfxChannel.setVolume(self.sfxVolume)
+                  self.engine.data.failSound.play()
+                if self.failTimer < 100:
+                  self.failTimer += 1
+                  self.failMsg.transform.reset()
+                  self.failMsg.transform.scale(0.5, -0.5)
+                  self.failMsg.transform.translate(w/2,h/2)
+                  self.failMsg.draw()
+                else:
+                  self.finalFailed = True
+                
+            
+              if self.pause:
+                self.engine.view.setViewport(1,0)
+                self.pauseScreen.transform.reset()
+                self.pauseScreen.transform.scale(0.75, -0.75)
+                self.pauseScreen.transform.translate(w/2+self.pause_bkg_x,h/2+self.pause_bkg_y)
+                self.pauseScreen.draw()
+                
+              if self.finalFailed and self.song:
+                self.engine.view.setViewport(1,0)
+                self.failScreen.transform.reset()
+                self.failScreen.transform.scale(0.75, -0.75)
+                self.failScreen.transform.translate(w/2+self.fail_bkg_x,h/2+self.fail_bkg_y)
+                self.failScreen.draw()
+    
+                # evilynux - Closer to actual GH3
+                font = self.engine.data.pauseFont
+                text = Dialogs.removeSongOrderPrefixFromName(self.song.info.name).upper()
+                scale = 0.0038
+                size = font.getStringSize(text, scale = scale)
+                while size[0] > 0.3983:
+                  scale = scale * .95
+                  size = font.getStringSize(text, scale = scale)
+                font.render(text, (.5-size[0]/2.0,.37-size[1]), scale = scale)
+  
+                #now = self.getSongPosition()
+  
+                diff = str(self.playerList[0].difficulty)
+                # compute initial position
+                pctComplete = min(100, int(now/self.lastEvent*100))
+                
+                curxpos = font.getStringSize(_("COMPLETED")+" ", scale = 0.0015)[0]
+                curxpos += font.getStringSize(str(pctComplete), scale = 0.003)[0]
+                curxpos += font.getStringSize( _(" % ON "), scale = 0.0015)[0]
+                curxpos += font.getStringSize(diff, scale = 0.003)[0]
+                curxpos = .5-curxpos/2.0
+                c1,c2,c3 = self.fail_completed_color
+                glColor3f(c1,c2,c3)              
+  
+                # now render
+                text = _("COMPLETED") + " "
+                size = font.getStringSize(text, scale = 0.0015)
+                # evilynux - Again, for this very font, the "real" height value is 75% of returned value
+                font.render(text, (curxpos, .37+(font.getStringSize(text, scale = 0.003)[1]-size[1])*.75), scale = 0.0015)
+                text = str(pctComplete)
+                curxpos += size[0]
+  
+                size = font.getStringSize(text, scale = 0.003)
+                font.render(text, (curxpos, .37), scale = 0.003)
+                text = _(" % ON ")
+                curxpos += size[0]
+                size = font.getStringSize(text, scale = 0.0015)
+                font.render(text, (curxpos, .37+(font.getStringSize(text, scale = 0.003)[1]-size[1])*.75), scale = 0.0015)
+                text = diff
+                curxpos += size[0]
+                font.render(text, (curxpos, .37), scale = 0.003)
+  
+                if not self.failEnd:
+                  self.failGame()
+  
+              if self.hopoIndicatorEnabled and not self.guitars[i].isDrum and not self.pause and not self.failed: #MFH - HOPO indicator (grey = strums required, white = strums not required)
+                text = _("HOPO")
+                if self.guitars[i].hopoActive > 0:
+                  glColor3f(1.0, 1.0, 1.0)  #white
+                else:
+                  glColor3f(0.4, 0.4, 0.4)  #grey
+                w, h = font.getStringSize(text,0.00150)
+                font.render(text, (.950 - w / 2, .710),(1, 0, 0),0.00150)     #off to the right slightly above fretboard
+                glColor3f(1, 1, 1)  #cracker white
   
           #MFH - new location for star system support - outside theme-specific logic:
           w = wBak

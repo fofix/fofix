@@ -261,6 +261,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         
         taunt = None
 
+        #MFH TODO - utilize new functions in self.engine.data to automatically enumerate any number of the following soundfiles automatically, for issue 73
         if self.Congratphrase:
           if player.score == 0 or player.cheating == True:
             taunt = os.path.join("sounds","jurgen1.ogg")
