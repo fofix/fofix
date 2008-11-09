@@ -18,7 +18,11 @@
 "data\themes\MegaLight\*.*"//all
 "data\themes\MegaLight\menu\*.*"//all
 "data\themes\MegaLight\sounds\*.*"//all
-"data\themes\MegaLight\stages\*.*"//all
+"data\themes\MegaLight\stages\*.png"//all
+"data\themes\MegaLight GH3\*.*"//all
+"data\themes\MegaLight GH3\menu\*.*"//all
+"data\themes\MegaLight GH3\sounds\*.*"//all
+"data\themes\MegaLight GH3\stages\*.png"//all
 "data\sounds\*.*"//all base sounds
 "data\tutorials\bangbang\*.*"//all of Bang Bang Mystery Man
 "data\tutorials\jurgenfof\*.*"//all of the original Jurgen FoF tutorial
