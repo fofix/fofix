@@ -1,4 +1,4 @@
-#summary These are all the documented _Theme.ini_ Settings usable.
+#summary These are all the Theme.ini settings usable.
 
 First, you need to create a theme.ini in your theme's folder. Once you create the file you need to type this header line in at the very top:
 
