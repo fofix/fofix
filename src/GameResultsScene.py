@@ -129,17 +129,18 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     elif self.hopoFreq == 2:
       self.hopoFreq = _("More")
 
+
     self.hitWindow = self.engine.config.get("game", "hit_window")  #this should be global, not retrieved every BPM change.
     if self.hitWindow == 0:
-      self.hitWindow = _("Wide")
+      self.hitWindow = _("1. Widest")
     elif self.hitWindow == 1:
-      self.hitWindow = _("Standard")
+      self.hitWindow = _("2. Wide")
     elif self.hitWindow == 2:
-      self.hitWindow = _("Tight")
+      self.hitWindow = _("3. Standard")
     elif self.hitWindow == 3:
-      self.hitWindow = _("Hot Pants Tight")
+      self.hitWindow = _("4. Tight")
     elif self.hitWindow == 4:
-      self.hitWindow = _("Tight Like a Tiger")
+      self.hitWindow = _("5. Tightest")
 
 
     self.engine.loadImgDrawing(self, "background", os.path.join("themes",themename,"gameresults.png"))

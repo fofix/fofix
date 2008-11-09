@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-11-08 21:57-0800\n"
+"POT-Creation-Date: 2008-11-08 22:27-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1106,15 +1106,15 @@ msgstr ""
 msgid "Ultra Wide"
 msgstr ""
 
-#: GameEngine.py:187 GameEngine.py:213 GameResultsScene.py:134
+#: GameEngine.py:187
 msgid "Wide"
 msgstr ""
 
-#: GameEngine.py:187 GameEngine.py:213 GameResultsScene.py:136
+#: GameEngine.py:187
 msgid "Standard"
 msgstr ""
 
-#: GameEngine.py:187 GameEngine.py:213 GameResultsScene.py:138
+#: GameEngine.py:187
 msgid "Tight"
 msgstr ""
 
@@ -1238,12 +1238,24 @@ msgstr ""
 msgid "Note Hit-window"
 msgstr ""
 
-#: GameEngine.py:213 GameResultsScene.py:140
-msgid "Hot Pants Tight"
+#: GameEngine.py:213 GameResultsScene.py:135
+msgid "1. Widest"
 msgstr ""
 
-#: GameEngine.py:213 GameResultsScene.py:142
-msgid "Tight Like a Tiger"
+#: GameEngine.py:213 GameResultsScene.py:137
+msgid "2. Wide"
+msgstr ""
+
+#: GameEngine.py:213 GameResultsScene.py:139
+msgid "3. Standard"
+msgstr ""
+
+#: GameEngine.py:213 GameResultsScene.py:141
+msgid "4. Tight"
+msgstr ""
+
+#: GameEngine.py:213 GameResultsScene.py:143
+msgid "5. Tightest"
 msgstr ""
 
 #: GameEngine.py:214
@@ -1406,117 +1418,117 @@ msgstr ""
 msgid "Quit"
 msgstr ""
 
-#: GameResultsScene.py:151
+#: GameResultsScene.py:152
 msgid "Relax, it was an excellent show."
 msgstr ""
 
-#: GameResultsScene.py:153
+#: GameResultsScene.py:154
 msgid "Truly Amazing!"
 msgstr ""
 
-#: GameResultsScene.py:155
+#: GameResultsScene.py:156
 msgid "Thanks for playing!"
 msgstr ""
 
-#: GameResultsScene.py:157
+#: GameResultsScene.py:158
 msgid "One more song can't hurt, can it?"
 msgstr ""
 
-#: GameResultsScene.py:159
+#: GameResultsScene.py:160
 msgid "What an amazing performance!"
 msgstr ""
 
-#: GameResultsScene.py:161
+#: GameResultsScene.py:162
 msgid "That's how it's done!"
 msgstr ""
 
-#: GameResultsScene.py:179
+#: GameResultsScene.py:180
 msgid "No highscores for cheaters!"
 msgstr ""
 
-#: GameResultsScene.py:181
+#: GameResultsScene.py:182
 msgid "No highscore"
 msgstr ""
 
-#: GameResultsScene.py:184
+#: GameResultsScene.py:185
 #, python-format
 msgid "%d points is a new high score! Enter your name"
 msgstr ""
 
-#: GameResultsScene.py:376
+#: GameResultsScene.py:377
 #, python-format
 msgid "%s High Scores for %s"
 msgstr ""
 
-#: GameResultsScene.py:378
+#: GameResultsScene.py:379
 #, python-format
 msgid "%s High Scores"
 msgstr ""
 
-#: GameResultsScene.py:384
+#: GameResultsScene.py:385
 #, python-format
 msgid "Difficulty: %s"
 msgstr ""
 
-#: GameResultsScene.py:447
+#: GameResultsScene.py:448
 msgid "Uploading Scores..."
 msgstr ""
 
-#: GameResultsScene.py:452
+#: GameResultsScene.py:453
 msgid "Scores uploaded!"
 msgstr ""
 
-#: GameResultsScene.py:457
+#: GameResultsScene.py:458
 msgid "your highscore ranks"
 msgstr ""
 
-#: GameResultsScene.py:458
+#: GameResultsScene.py:459
 msgid "on the world starpower chart!"
 msgstr ""
 
-#: GameResultsScene.py:461
+#: GameResultsScene.py:462
 msgid "unknown rank."
 msgstr ""
 
-#: GameResultsScene.py:464
+#: GameResultsScene.py:465
 msgid "no new highscore."
 msgstr ""
 
-#: GameResultsScene.py:468
+#: GameResultsScene.py:469
 msgid "Score upload failed!  World charts may be down."
 msgstr ""
 
-#: GameResultsScene.py:479
+#: GameResultsScene.py:480
 #, python-format
 msgid "%s Cheated!"
 msgstr ""
 
-#: GameResultsScene.py:481
+#: GameResultsScene.py:482
 #, python-format
 msgid "%s Finished!"
 msgstr ""
 
-#: GameResultsScene.py:485
+#: GameResultsScene.py:486
 #, python-format
 msgid "%d notes hit"
 msgstr ""
 
-#: GameResultsScene.py:525
+#: GameResultsScene.py:526
 #, python-format
 msgid "Accuracy: %.1f%%"
 msgstr ""
 
-#: GameResultsScene.py:528
+#: GameResultsScene.py:529
 #, python-format
 msgid "Longest note streak: %d"
 msgstr ""
 
-#: GameResultsScene.py:532
+#: GameResultsScene.py:533
 #, python-format
 msgid "Part: %s on %s (2 chord)"
 msgstr ""
 
-#: GameResultsScene.py:534
+#: GameResultsScene.py:535
 #, python-format
 msgid "Part: %s on %s"
 msgstr ""
