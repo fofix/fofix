@@ -29,21 +29,21 @@ Versions are likely important. Don't substitute one for the other without trying
 
 ===Install In This Order===
 
-  1.  Install active python by double clicking the .msi
-  2.  Install psyco by double clicking the .exe
-  3.  Unzip GLEW (no easy install)
-  4.  Install glew by copying the 'glew32.dll' file in 'bin' to your 'system32' dir under C:\Windows (or equivalent) *[64bit OS users - copy into 'C:\Windows' instead of '\system32']
-  5.  Install PyOpenGL by double clicking the .exe
-  6.  Install GLEWpy by double clicking the .exe
-  7.  Install PyGame by double clicking the .exe
-  8.  Install PIL by double clicking the .exe
-  9.  Install Numeric by double clicking the .exe
-  10. Install Amanith by double clicking the .exe
-  11. Select reboot later
-  12. Install PyAmanith by double clicking the .exe
-  13. Install Pyogg by double clicking the .exe
-  14. Install Pyvorbis by double clicking the .exe
-  15. Install py2exe by double clicking the .exe
+  #  Install active python by double clicking the .msi
+  #  Install psyco by double clicking the .exe
+  #  Unzip GLEW (no easy install)
+  #  Install glew by copying the 'glew32.dll' file in 'bin' to your 'system32' dir under C:\Windows (or equivalent) (64bit OS users - copy into 'C:\Windows' instead of '\system32')
+  #  Install PyOpenGL by double clicking the .exe
+  #  Install GLEWpy by double clicking the .exe
+  #  Install PyGame by double clicking the .exe
+  #  Install PIL by double clicking the .exe
+  #  Install Numeric by double clicking the .exe
+  # Install Amanith by double clicking the .exe
+  # Select reboot later
+  # Install PyAmanith by double clicking the .exe
+  # Install Pyogg by double clicking the .exe
+  # Install Pyvorbis by double clicking the .exe
+  # Install py2exe by double clicking the .exe
 
 _This next part fixes a opengl/py2exe bug so it may not be necessary in the future. Only if you get an error when running the FretsOnFire.exe that says:_
 
@@ -70,10 +70,10 @@ At this point you should be able to play frets on fire directly from the source.
 
 To create the executable we need a few more steps
 
-  # In your command prompt type `python setup.py py2exe`
-  # A bunch of stuff will happen and you should end up with a `dist` directory above.
-  # Go into the dist directory and retrieve `FretsOnFire.exe`, place in your FoFiX trunk / root.
-  # Go into the `dist\data` directory and retrieve `library.zip`, place in your FoFiX's data directory.
+  # Go to your 'src\scripts' directory where you have your SVN directory setup (IE- C:\FoFiX SVN\src\scripts)
+  # Double-click on the 'RebuildWin.bat' script.
+  # Go into the main SVN folder and retrieve `FretsOnFire.exe`, place it in your FoFiX main directory.
+  # Go into the `data` directory in your SVN folder and retrieve `library.zip`, place in your FoFiX's data directory.
   # You may need the Windows support files for FoFiX (mostly .DLLs), which can be found inside any full Windows FoFiX distribution in the appropriate directory structure.
 
 ----
