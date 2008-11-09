@@ -60,19 +60,19 @@ IOError: [Errno 2] No such file or directory: 'D:\\Games\\Frets on Fire\\dist\\d
 
 Back to what we were initially trying:
   # Locate the downloaded or checked-out FoFiX sources
-  # Move the `src` directory into your FoFiX directory (same place as the `data` directory) if it is not already located there.
+  # Move the {{{src}}} directory into your FoFiX directory (same place as the {{{data}}} directory) if it is not already located there.
   # *REBOOT* _(required)_
   # Open a command prompt
-  # cd to the new `src` directory in your FoFiX directory
-  # type `python FretsOnFire.py`
+  # cd to the new {{{src}}} directory in your FoFiX directory
+  # type {{{python FretsOnFire.py}}} (or run the {{{src\scripts\RunFofFromSources.bat}}} script)
 
 At this point you should be able to play frets on fire directly from the source.
 
 To create the executable we need a few more steps
 
-  # Go to your 'src\scripts' directory where you have your SVN directory setup (IE- C:\FoFiX SVN\src\scripts)
-  # Double-click on the {{{RebuildWin.bat}}} script.  This will recompile and rebuild the game .EXE file, library.zip, and required Python support modules (.PYD files).  This script will also retrieve these files and replace the old files in your FoFiX and data folders, as well as copy over any .DLL files that the build process decided to include.  Then the intermediate files (in src\build and dist\) will automatically be cleaned up.
-  # You may need the Windows support files for FoFiX (mostly .DLLs), which can be found inside any full Windows FoFiX distribution in the appropriate directory structure.
+  # Go to your {{{src\scripts}}} directory where you have your SVN directory setup (IE- {{{C:\FoFiX SVN\src\scripts}}})
+  # Double-click on the {{{RebuildWin.bat}}} script.  This will recompile and rebuild the game {{{.EXE}}} file, {{{library.zip}}}, and required Python support modules ({{{.PYD}}} files).  This script will also retrieve these files and replace the old files in your FoFiX and data folders, as well as copy over any {{{.DLL}}} files that the build process decided to include.  Then the intermediate files (in {{{src\build}}} and {{{dist\}}}) will automatically be cleaned up.
+  # You may need the Windows support files for FoFiX (mostly {{{.DLL}}}s), which can be found inside any full Windows FoFiX distribution in the appropriate directory structure.
 
 ----
 
