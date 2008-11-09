@@ -2,7 +2,10 @@
 #labels Featured,Phase-Implementation
 
 =Setting Up FoFiX Sources=
+  * [http://code.google.com/p/fofix/wiki/RequiredSourceModules#For_GNU/Linux GNU/Linux]
+  * [http://code.google.com/p/fofix/wiki/RequiredSourceModules#For_Windows Windows]
 
+_Instructions for MacOS X welcome!_
 ----
 
 ==For Windows==
@@ -109,4 +112,3 @@ Then either create a patch or a full package.
   # Execute `make dist`.
   # Execute `perl pkg/Dist-Patch3_0xx-GNULinux.pl -d FoFiX-Full-GNULinux`
 ----
-_Instructions for MacOS X coming soon!_
