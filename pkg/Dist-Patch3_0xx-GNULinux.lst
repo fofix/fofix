@@ -1,40 +1,18 @@
-src:src
-doc:doc
+src:.
+doc:.
 data/versiontag.png:data/
 data/glow.png:data/
 data/cassette.png:data/
 data/left.png:data/
 data/right.png:data/
-data/translations:data/translations
-data/sounds/99pct1.ogg:data/sounds/
-data/sounds/clapsound.ogg:data/sounds/
-data/sounds/crowdcheers.ogg:data/sounds/
-data/sounds/guitscw2.ogg:data/sounds/
-data/sounds/rocksound.ogg:data/sounds/
-data/themes/MegaLight/drumnotes.png:data/themes/MegaLight/
-data/mods/MegaLight RB Notes/themes/MegaLight/drumnotes.png:data/mods/MegaLight RB Notes/themes/MegaLight/
-data/themes/MegaLight/tail1.png:data/themes/MegaLight/
-data/themes/MegaLight/side_bars.png:data/themes/MegaLight/
-data/themes/MegaLight/rock_arr.png:data/themes/MegaLight/
-data/themes/MegaLight/overdriveneck.png:data/themes/MegaLight/
-data/themes/MegaLight/overdrive side_bars.png:data/themes/MegaLight/
-data/themes/MegaLight/overdrive center_lines.png:data/themes/MegaLight/
-data/themes/MegaLight/notes.png:data/themes/MegaLight/
-data/themes/MegaLight/guitarsoloneckovr.png:data/themes/MegaLight/
-data/themes/MegaLight/guitarsoloneck.png:data/themes/MegaLight/
-data/themes/MegaLight/fretbuttons.png:data/themes/MegaLight/
-data/themes/MegaLight/drumnotes.png:data/themes/MegaLight/
-data/themes/MegaLight/drumcenterlines.png:data/themes/MegaLight/
-data/themes/MegaLight/center_lines.png:data/themes/MegaLight/
-data/themes/MegaLight/bigtail1.png:data/themes/MegaLight/
-data/themes/MegaLight/bassgrooveneckovr.png:data/themes/MegaLight/
-data/themes/MegaLight/bassgrooveneck.png:data/themes/MegaLight/
-data/themes/MegaLight/lyricsheet.png:data/themes/MegaLight/
-data/themes/MegaLight/star1.png:data/themes/MegaLight/
+data/translations:data/
+data/sounds/*.ogg:data/sounds/
+data/mods:data/
+data/themes/MegaLight/*.png:data/themes/MegaLight/
 dist/FretsOnFire.bin:.
 AUTHORS:.
 COPYING:.
 CREDITS:.
 NEWS:.
 README:.
-../FoFiX-wiki:FoFiX-wiki/
+../FoFiX-wiki:.

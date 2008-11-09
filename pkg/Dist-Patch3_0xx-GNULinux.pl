@@ -6,23 +6,27 @@
 # Look at ../Makefile for a usage example.
 use strict;
 use warnings;
+use Getopt::Long;
 use File::Path;
 use File::Remove qw(remove);
 use File::NCopy;
 use File::Find;
 
-my (@src, @dest, @tuple, @svndirs);
-my $dir = $ARGV[0] or die "Need destination directory!";
-my $list = "Dist-MegaLight-GNULinux.lst";
-#Dist-Patch3_0xx-GNULinux.lst";
+use vars qw(%opt @src @dest @tuple @svndirs);
 my $cwd = ( $0 =~ /(^.*\/)[^\/]+$/ ) ? $1 : "./";
+
+GetOptions( "dest=s"   => \$opt{'dir'},
+	    "list=s"    => \$opt{'list'} );
+
+die "Need destination directory!" unless( defined $opt{'dir'} );
+$opt{'list'} = "Dist-MegaLight-GNULinux.lst" unless( defined $opt{'list'} );
 
 sub delsvn {
   return unless ( $File::Find::name =~ /\.svn$/ );
   push @svndirs, $File::Find::name;
 }
 
-open(FH, "$cwd$list") or die $!;
+open(FH, "$opt{'list'}") or die $!;
 while( <FH> ) {
   chop();
   next if( /^$/ );
@@ -36,13 +40,14 @@ my $cp = File::NCopy->new(recursive => 1,
                           force_write => 1,
                           follow_links => 1);
 
+mkpath("$opt{'dir'}");
 for(my $i = 0; $i < scalar(@src); $i++ ) {
-  mkpath("$dir/$dest[$i]") unless ( -e "$dir/$dest[$i]" );
-  $cp->copy("$src[$i]", "$dir/$dest[$i]")
-    or die "Copy of $src[$i] to $dir/$dest[$i] failed: $!";
+  mkpath("$opt{'dir'}/$dest[$i]") unless ( -e "$opt{'dir'}/$dest[$i]" );
+  $cp->copy("$src[$i]", "$opt{'dir'}/$dest[$i]")
+    or die "Copy of $src[$i] to $opt{'dir'}/$dest[$i] failed: $!";
 }
 
-chdir $dir;
+chdir $opt{'dir'};
 remove( \1, qw{
                src/*.pyc src/*.pyo src/*.bat
                src/midi/*.pyc src/midi/*.pyo } ) or die $!;
