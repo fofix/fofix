@@ -27,23 +27,23 @@ Versions are likely important. Don't substitute one for the other without trying
   # Download py2exe 0.6.6 - [http://downloads.sourceforge.net/py2exe/py2exe-0.6.6.win32-py2.4.exe]
   # Download the FoFiX source files from the trunk, or SVN revision / tag of your choice - [http://code.google.com/p/fofix/source/browse/MFH-Mod]
 
-===Install===
+===Install In This Order===
 
-  # Install active python by double clicking the .msi
-  # Install psyco by double clicking the .exe
-  # Unzip GLEW (no easy install)
-  # Install glew by copying the 'glew.dll' file in 'bin' to your 'system32' dir under C:\Windows (or equivalent)
-  # Install PyOpenGL by double clicking the .exe
-  # Install GLEWpy by double clicking the .exe
-  # Install PyGame by double clicking the .exe
-  # Install PIL by double clicking the .exe
-  # Install Numeric by double clicking the .exe
-  # Install Amanith by double clicking the .exe
-  # Select reboot later
-  # Install PyAmanith by double clicking the .exe
-  # Install Pyogg by double clicking the .exe
-  # Install Pyvorbis by double clicking the .exe
-  # Install py2exe by double clicking the .exe
+  1.  Install active python by double clicking the .msi
+  2.  Install psyco by double clicking the .exe
+  3.  Unzip GLEW (no easy install)
+  4.  Install glew by copying the 'glew32.dll' file in 'bin' to your 'system32' dir under C:\Windows (or equivalent) *[64bit OS users - copy into 'C:\Windows' instead of '\system32']
+  5.  Install PyOpenGL by double clicking the .exe
+  6.  Install GLEWpy by double clicking the .exe
+  7.  Install PyGame by double clicking the .exe
+  8.  Install PIL by double clicking the .exe
+  9.  Install Numeric by double clicking the .exe
+  10. Install Amanith by double clicking the .exe
+  11. Select reboot later
+  12. Install PyAmanith by double clicking the .exe
+  13. Install Pyogg by double clicking the .exe
+  14. Install Pyvorbis by double clicking the .exe
+  15. Install py2exe by double clicking the .exe
 
 _This next part fixes a opengl/py2exe bug so it may not be necessary in the future. Only if you get an error when running the FretsOnFire.exe that says:_
 
