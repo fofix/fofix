@@ -57,15 +57,16 @@ class Loader(Thread):
 
   def run(self):
     self.semaphore.acquire()
+    game_priority = Config.get("performance", "game_priority")
     # Reduce priority on posix
     if os.name == "posix":
-      os.nice(5)
+      # evilynux - Beware, os.nice _decreases_ priority, hence the reverse logic
+      os.nice(5 - game_priority)
     elif os.name == "nt":
       #myfingershurt: the following should be global and done ONCE:
       #self.setPriority(priority = self.game_priority)
 
       #...or maybe not at all...
-      game_priority = Config.get("performance", "game_priority")
       self.setPriority(priority = game_priority)
       
       #wont work without ctypes
