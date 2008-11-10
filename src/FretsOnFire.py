@@ -140,11 +140,7 @@ def main():
       Log.warn("Unable to enable psyco.")
 
     try:
-      engineRuns = True
-      while engineRuns:
-        engine.timer.startTimer()
-        engineRuns = engine.run()
-        engine.timer.waitFromStart()
+      while engine.run():
         pass
     except KeyboardInterrupt:
         pass

@@ -26,18 +26,19 @@ import gc
 import Network
 import Object
 from World import World
-from Timer import Timer
 from Task import Task
+import pygame
 
 class Engine:
   """Main task scheduler."""
-  def __init__(self, fps = 60, tickrate = 1.0):
+  def __init__(self, fps = 60):
     self.tasks = []
     self.frameTasks = []
-    self.timer = Timer(fps = fps, tickrate = tickrate)
+    self.fps = fps
     self.currentTask = None
     self.paused = []
     self.running = True
+    self.clock = pygame.time.Clock()
 
   def quit(self):
     for t in list(self.tasks + self.frameTasks):
@@ -129,7 +130,8 @@ class Engine:
     
     for task in self.frameTasks:
       self._runTask(task)
-    for tick in self.timer.advanceFrame():
-      for task in self.tasks:
-        self._runTask(task, tick)
+    tick = self.clock.get_time()
+    for task in self.tasks:
+      self._runTask(task, tick)
+    self.clock.tick(self.fps)
     return True
