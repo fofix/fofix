@@ -2059,7 +2059,7 @@ class Drum:
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     glEnable(GL_COLOR_MATERIAL)
     if self.leftyMode:
-      glScale(-1, 1, 1)
+      glScalef(-1, 1, 1)
 
     if self.ocount <= 1:
       self.ocount = self.ocount + .1
@@ -2088,7 +2088,7 @@ class Drum:
     self.renderFlames(visibility, song, pos, controls)
     
     if self.leftyMode:
-      glScale(-1, 1, 1)
+      glScalef(-1, 1, 1)
 
   def getMissedNotes(self, song, pos, catchup = False):
     if not song:
