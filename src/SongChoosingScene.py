@@ -36,6 +36,8 @@ from Input import KeyListener
 
 import Log    #MFH
 
+import Theme  #MFH
+
 # save chosen song into config file
 Config.define("game", "selected_library",  str, "")
 Config.define("game", "selected_song",     str, "")
@@ -68,6 +70,15 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
     self.dialog    = None
 
     self.tut = Config.get("game", "tut")
+
+    self.songSelectSubmenuX = Theme.songSelectSubmenuX
+    self.songSelectSubmenuY = Theme.songSelectSubmenuY
+    
+    self.subMenuPosTuple = None
+    if self.songSelectSubmenuX != None and self.songSelectSubmenuY != None:
+      self.subMenuPosTuple = (self.songSelectSubmenuX, self.songSelectSubmenuY)
+
+    Log.debug("Song select submenu position tuple: " + str(self.subMenuPosTuple))    
     
   def addToQueue(self, value = None, selectedSong = None):
       players = Config.get("game", "selected_players")
@@ -218,7 +229,12 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
               #startTime = Dialogs.chooseItem(self.engine, info.sections, "%s \n %s" % (info.name, _("Start Section:")))
               
               sectionLabels = [sLabel for sLabel,sPos in info.sections]
-              startLabel = Dialogs.chooseItem(self.engine, sectionLabels, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Start Section:")))
+
+              if self.subMenuPosTuple:
+                startLabel = Dialogs.chooseItem(self.engine, sectionLabels, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Start Section:")), pos = self.subMenuPosTuple)
+              else:
+                startLabel = Dialogs.chooseItem(self.engine, sectionLabels, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Start Section:")))
+
               if startLabel:
                 Log.debug("Practice start section selected: " + startLabel)
             else:
@@ -245,7 +261,12 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
             while True: #new nesting for Practice Mode selection
             
               if len(info.parts) > 1:
-                p = Dialogs.chooseItem(self.engine, info.parts, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Player 1 Choose a part:")), selected = self.player.part)
+
+                if self.subMenuPosTuple:
+                  p = Dialogs.chooseItem(self.engine, info.parts, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Player 1 Choose a part:")), selected = self.player.part, pos = self.subMenuPosTuple)
+                else:
+                  p = Dialogs.chooseItem(self.engine, info.parts, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Player 1 Choose a part:")), selected = self.player.part)
+
               else:
                 p = info.parts[0]
               if p:
@@ -256,8 +277,14 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
                 break;
               while True:
                 if len(info.difficulties) > 1:
-                  d = Dialogs.chooseItem(self.engine, info.difficulties,
+
+                  if self.subMenuPosTuple:
+                    d = Dialogs.chooseItem(self.engine, info.difficulties,
+                                       "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Player 1 Choose a difficulty:")), selected = self.player.difficulty, pos = self.subMenuPosTuple)
+                  else:
+                    d = Dialogs.chooseItem(self.engine, info.difficulties,
                                        "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Player 1 Choose a difficulty:")), selected = self.player.difficulty)
+
                 else:
                   d = info.difficulties[0]
                 if d:
@@ -270,7 +297,12 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
                 while True:
                   if self.engine.config.get("game", "players") > 1:               
                     #p = Dialogs.chooseItem(self.engine, info.parts + ["Party Mode"] + ["No Player 2"], "%s \n %s" % (info.name, _("Player 2 Choose a part:")), selected = self.player2.part)
-                    p = Dialogs.chooseItem(self.engine, info.parts, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Player 2 Choose a part:")), selected = self.player2.part)
+
+                    if self.subMenuPosTuple:
+                      p = Dialogs.chooseItem(self.engine, info.parts, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Player 2 Choose a part:")), selected = self.player2.part, pos = self.subMenuPosTuple)
+                    else:
+                      p = Dialogs.chooseItem(self.engine, info.parts, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Player 2 Choose a part:")), selected = self.player2.part)
+
                     #if p and p == "No Player 2":
                     #  players = 1
                     #  selected = True
@@ -294,7 +326,12 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
                       break
                     while True:                    
                       if len(info.difficulties) > 1:
-                        d = Dialogs.chooseItem(self.engine, info.difficulties, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Player 2 Choose a difficulty:")), selected = self.player2.difficulty)
+
+                        if self.subMenuPosTuple:
+                          d = Dialogs.chooseItem(self.engine, info.difficulties, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Player 2 Choose a difficulty:")), selected = self.player2.difficulty, pos = self.subMenuPosTuple)
+                        else:
+                          d = Dialogs.chooseItem(self.engine, info.difficulties, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Player 2 Choose a difficulty:")), selected = self.player2.difficulty)
+
                       else:
                         d = info.difficulties[0]
                       if d:

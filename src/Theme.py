@@ -165,6 +165,10 @@ DEFAULT_FAIL_SELECTED_COLOR = "#FFBF00"
 #MFH - crowd cheer loop delay in theme.ini: if not exist, use value from settings. Otherwise, use theme.ini value.
 DEFAULT_CROWD_LOOP_DELAY = None
 
+#MFH - for instrument / difficulty / practice section submenu positioning
+DEFAULT_SONG_SELECT_SUBMENU_X = None
+DEFAULT_SONG_SELECT_SUBMENU_Y = None
+
 
 #racer:
 DEFAULT_FAIL_BKG_X     = None
@@ -317,6 +321,10 @@ Config.define("theme", "fail_selected_color",  str, DEFAULT_FAIL_SELECTED_COLOR)
 #MFH - crowd cheer loop delay in theme.ini: if not exist, use value from settings. Otherwise, use theme.ini value.
 Config.define("theme", "crowd_loop_delay",  int, DEFAULT_CROWD_LOOP_DELAY)
 
+#MFH - for instrument / difficulty / practice section submenu positioning
+Config.define("theme", "song_select_submenu_x",  int, DEFAULT_SONG_SELECT_SUBMENU_X)
+Config.define("theme", "song_select_submenu_y",  int, DEFAULT_SONG_SELECT_SUBMENU_Y)
+
 #RACER:
 Config.define("theme", "fail_bkg_x",       float, DEFAULT_FAIL_BKG_X)
 Config.define("theme", "fail_bkg_y",       float, DEFAULT_FAIL_BKG_Y)
@@ -415,6 +423,10 @@ fail_selected_colorVar = None
 
 #MFH - crowd cheer loop delay in theme.ini: if not exist, use value from settings. Otherwise, use theme.ini value.
 crowdLoopDelay = None
+
+#MFH - for instrument / difficulty / practice section submenu positioning
+songSelectSubmenuX = None
+songSelectSubmenuY = None
 
 #Racer:
 fail_bkg_xPos = None
@@ -805,6 +817,16 @@ def setupSonglist(config):
   global library_text_colorVar, library_selected_colorVar
   global pause_text_colorVar, pause_selected_colorVar
   global fail_text_colorVar, fail_selected_colorVar
+  global songSelectSubmenuX, songSelectSubmenuY
+
+#MFH - for instrument / difficulty / practice section submenu positioning
+  temp = config.get("theme", "song_select_submenu_x")
+  if songSelectSubmenuX == None or temp != DEFAULT_SONG_SELECT_SUBMENU_X:
+    songSelectSubmenuX = temp  
+
+  temp = config.get("theme", "song_select_submenu_y")
+  if songSelectSubmenuY == None or temp != DEFAULT_SONG_SELECT_SUBMENU_Y:
+    songSelectSubmenuY = temp  
 
   temp = config.get("theme", "song_cd_x")
   if song_cd_Xpos == None or temp != DEFAULT_SONGCDX:
@@ -1160,6 +1182,12 @@ def writeSonglist(f, config):
   global pause_text_colorVar, pause_selected_colorVar
   global fail_text_colorVar, fail_selected_colorVar
   global songlist_score_colorVar # evilynux - score color
+
+  global songSelectSubmenuX, songSelectSubmenuY
+
+  #MFH - for instrument / difficulty / practice section submenu positioning
+  f.write("%s = %s\n" % ("song_select_submenu_x", songSelectSubmenuX))
+  f.write("%s = %s\n" % ("song_select_submenu_y", songSelectSubmenuY))
 
   f.write("%s = %s\n" % ("song_cd_x", song_cd_Xpos))
   f.write("%s = %s\n" % ("song_cdscore_x", song_cdscore_Xpos))

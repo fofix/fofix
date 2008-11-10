@@ -2727,17 +2727,20 @@ class NeckChooser(BackgroundLayer, KeyListener):
 
 class ItemChooser(BackgroundLayer, KeyListener):
   """Item menu layer."""
-  def __init__(self, engine, items, selected = None, prompt = ""):
+  def __init__(self, engine, items, selected = None, prompt = "", pos = None):    #MFH
     self.prompt         = prompt
     self.engine         = engine
     
     Log.debug("ItemChooser class init (Dialogs.py)...")
     
-    
     self.accepted       = False
     self.selectedItem   = None
     self.time           = 0.0
-    self.menu = Menu(self.engine, choices = [(c, self._callbackForItem(c)) for c in items], onClose = self.close, onCancel = self.cancel, font = self.engine.data.streakFont2)
+
+    if pos: #MFH
+      self.menu = Menu(self.engine, choices = [(c, self._callbackForItem(c)) for c in items], onClose = self.close, onCancel = self.cancel, font = self.engine.data.streakFont2, pos = pos)
+    else:
+      self.menu = Menu(self.engine, choices = [(c, self._callbackForItem(c)) for c in items], onClose = self.close, onCancel = self.cancel, font = self.engine.data.streakFont2)
     self.spinnyDisabled = self.engine.config.get("game", "disable_spinny")
     
     if selected and selected in items:
@@ -3179,7 +3182,7 @@ def chooseFile(engine, masks = ["*.*"], path = ".", prompt = _("Choose a File"),
   _runDialog(engine, d)
   return d.getSelectedFile()
   
-def chooseItem(engine, items, prompt, selected = None):
+def chooseItem(engine, items, prompt, selected = None, pos = None):   #MFH
   """
   Ask the user to one item from a list.
   
@@ -3187,8 +3190,9 @@ def chooseItem(engine, items, prompt, selected = None):
   @param items:     List of items
   @param prompt:    Prompt shown to the user
   @param selected:  Item selected by default
+  @param pos:       Position tuple (x,y) for placing the menu
   """
-  d = ItemChooser(engine, items, prompt = prompt, selected = selected)
+  d = ItemChooser(engine, items, prompt = prompt, selected = selected, pos = pos)
   _runDialog(engine, d)
   return d.getSelectedItem()
 
