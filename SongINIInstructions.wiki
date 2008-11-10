@@ -1,0 +1,23 @@
+#summary Usable functions in the song.ini file.
+
+------------------------------------------------------------------------------
+==Usable functions in the song.ini file.==
+
+||_*SongINI Feature*_||_*Proper Usage*_||
+||artist = .38 Special||Indicates that the artist is ".38 Special"||
+||name = Hold On Loosely||Indicates that the song name is "Hold On Loosely"||
+||tags = cover||Indicates that is not an original master. So it will show "As Made famous by" instead of "As performed by" at the beginning of the song.||
+||unlock_id = gh80_3||For career mode, indicates the Tier it belongs to.||
+||unlock_require = gh80_2enc||For career mode, indicates the unlock_id of the songs you have to complete to be able to play this song.||
+||unlock_text = Finish Tier 2 Encore To Unlock||This is a text that is displayed when the song is locked and you try to select it.||
+||cassettecolor = #000000||Chooses the color of the cassette/CD||
+||count = 1||How many times played||
+||scores =||Encoded HighScores||
+||scores_ext =||Also Encoded, contains other score info (longest note streak, etc)||
+||tutorial =||Boolean value -- not checked, but chances are it tells the game not to display the song in the Set list if set to 1.||
+||delay =||Not sure; IINM makes the notes appear earlier/later (depending on the value -- that could be set in ms but that's a random guess).||
+||frets =||Name of the maker/converter of the song.||
+||version = ||Show the version of the song.||
+||year =||Year in which the song has been published/made. Place at the end of the list.||
+||loading_phrase =||Should be put at the end of the file; displays a custom phrase (maybe more than 1, if separated by "_", but I haven't tested) on the loading screen, instead of the selected theme's default ones.||
+
