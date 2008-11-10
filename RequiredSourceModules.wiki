@@ -90,8 +90,9 @@ You need to install those packages:
   * python-opengl (= 2.x)
   * python-numpy
   * python-numeric
-  * python-pil
+  * python-imaging
   * python-vorbis
+  * python-xml
 
 Optionally, if you are in 32bit you can also install python-psyco.
 
