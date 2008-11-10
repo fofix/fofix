@@ -322,8 +322,8 @@ Config.define("theme", "fail_selected_color",  str, DEFAULT_FAIL_SELECTED_COLOR)
 Config.define("theme", "crowd_loop_delay",  int, DEFAULT_CROWD_LOOP_DELAY)
 
 #MFH - for instrument / difficulty / practice section submenu positioning
-Config.define("theme", "song_select_submenu_x",  int, DEFAULT_SONG_SELECT_SUBMENU_X)
-Config.define("theme", "song_select_submenu_y",  int, DEFAULT_SONG_SELECT_SUBMENU_Y)
+Config.define("theme", "song_select_submenu_x",  float, DEFAULT_SONG_SELECT_SUBMENU_X)
+Config.define("theme", "song_select_submenu_y",  float, DEFAULT_SONG_SELECT_SUBMENU_Y)
 
 #RACER:
 Config.define("theme", "fail_bkg_x",       float, DEFAULT_FAIL_BKG_X)
