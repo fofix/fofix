@@ -71,6 +71,15 @@ songlist_score_color = #FFFFFF       (GH3 theme default = #3f5a75)
 
 
 
+=====================================================---------------------------------------------------------------------------------
+-=Difficulty/Instruments/Practice Select Screens=-  |
+=====================================================
+
+song_select_submenu_x = 0            (Controls the submenu text positions. Use a decimal # between 0 - 1, IE- .012)
+song_select_submenu_y = 0            (Controls the submenu text positions. Use a decimal # between 0 - 1, IE- .030)
+
+
+
 =======================================-----------------------------------------------------------------------------------------------
 -=In Game Items=-                     |
 =======================================
