@@ -53,10 +53,9 @@ class Choice:
   #MFH TODO - add support for passing position values to the callback "next menu"
   def trigger(self, engine = None):
     if engine and isinstance(self.callback, list):
-      
       #MFH 
       if self.values:
-        nextMenu = Menu(engine, self.callback, pos = self.values )
+        nextMenu = Menu(engine, self.callback, pos = self.values, selectedIndex = self.valueIndex )
       else:
         nextMenu = Menu(engine, self.callback)
     elif engine and isinstance(self.callback, Menu):
@@ -89,7 +88,7 @@ class Choice:
       return "%s: %s" % (self.text, self.values[self.valueIndex])
           
 class Menu(Layer, KeyListener):
-  def __init__(self, engine, choices, onClose = None, onCancel = None, pos = (.2, .66 - .35), viewSize = 6, fadeScreen = False, font = "font", mainMenu = None, textColor = None, selectedColor = None, append_submenu_char = True):
+  def __init__(self, engine, choices, onClose = None, onCancel = None, pos = (.2, .66 - .35), viewSize = 6, fadeScreen = False, font = "font", mainMenu = None, textColor = None, selectedColor = None, append_submenu_char = True, selectedIndex = None):
     self.engine       = engine
     Log.debug("Menu class init (Menu.py)...")
 
@@ -99,6 +98,9 @@ class Menu(Layer, KeyListener):
     
     self.choices      = []
     self.currentIndex = 0
+    #MFH
+    if selectedIndex:
+      self.currentIndex = selectedIndex
     self.time         = 0
     self.onClose      = onClose
     self.onCancel     = onCancel
