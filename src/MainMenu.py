@@ -270,6 +270,7 @@ class MainMenu(BackgroundLayer):
       ]
 
       mainMenu = [
+        #( ( _(strSolo), 0, (0,0) ), soloMenu),
         (_(strSolo), soloMenu),
         (_(strMultiplayer), multPlayerMenu),
         (_(strTraining),    trainingMenu),
