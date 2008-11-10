@@ -52,11 +52,11 @@ Notice - If you just want the default phrases to show do not put these in your t
 
 
 ------------------------------------------------------------------------------------------
-==Difficulty/Instruments Select Screen==
+==Difficulty/Instruments/Practice Select Screen==
 
 ||_*Item Name*_||_*What it Does/How to use it*_||
-||song_select_submenu_x = 0||Use a decimal # between 0 - 1, IE- .012||
-||song_select_submenu_y = 0||Use a decimal # between 0 - 1, IE- .030||
+||song_select_submenu_x = 0||Controls the submenu text positions. Use a decimal # between 0 - 1, IE- .012||
+||song_select_submenu_y = 0||Controls the submenu text positions. Use a decimal # between 0 - 1, IE- .030||
 
 
 
