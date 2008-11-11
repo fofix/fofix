@@ -2737,9 +2737,20 @@ class ItemChooser(BackgroundLayer, KeyListener):
     self.selectedItem   = None
     self.time           = 0.0
 
+    self.font = self.engine.data.streakFont2
+    self.promptScale = 0.002
+    self.promptWidth, self.promptHeight = self.font.getStringSize(self.prompt, scale=self.promptScale)
+    widthOfSpace, heightOfSpace = self.font.getStringSize(" ", scale=self.promptScale)
+
     if pos: #MFH
-      self.menu = Menu(self.engine, choices = [(c, self._callbackForItem(c)) for c in items], onClose = self.close, onCancel = self.cancel, font = self.engine.data.streakFont2, pos = pos)
+      self.posX, self.posY = pos
+      wrapX, wrapY = wrapText(self.font, (self.posX, self.posY), self.prompt, scale = self.promptScale)
+      #self.posY += self.promptHeight*2
+      #self.posX -= self.promptWidth/2
+      self.menu = Menu(self.engine, choices = [(c, self._callbackForItem(c)) for c in items], onClose = self.close, onCancel = self.cancel, font = self.engine.data.streakFont2, pos = (self.posX + widthOfSpace*2, wrapY + self.promptHeight*2) )
     else:
+      self.posX = .1    #MFH - default
+      self.posY = .05   #MFH - default
       self.menu = Menu(self.engine, choices = [(c, self._callbackForItem(c)) for c in items], onClose = self.close, onCancel = self.cancel, font = self.engine.data.streakFont2)
     self.spinnyDisabled = self.engine.config.get("game", "disable_spinny")
     
@@ -2799,14 +2810,15 @@ class ItemChooser(BackgroundLayer, KeyListener):
 
       
     self.engine.view.setOrthogonalProjection(normalize = True)
-    font = self.engine.data.streakFont2
+    
     
     try:
       glEnable(GL_BLEND)
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
       glEnable(GL_COLOR_MATERIAL)
       Theme.setBaseColor(1 - v)
-      wrapText(font, (.1, .05 - v), self.prompt)
+      #wrapText(self.font, (.1, .05 - v), self.prompt)
+      wrapText(self.font, (self.posX, self.posY - v), self.prompt, scale = self.promptScale)
     finally:
       self.engine.view.resetProjection()
       
