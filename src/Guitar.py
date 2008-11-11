@@ -600,7 +600,9 @@ class Guitar:
       self.bassGrooveNeck.texture.bind()
     else:
       self.neckDrawing.texture.bind()
-    
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+
     glBegin(GL_TRIANGLE_STRIP)
     glColor4f(color[0],color[1],color[2], 0)
     glTexCoord2f(0.0, project(offset - 2 * beatsPerUnit))
@@ -1836,7 +1838,7 @@ class Guitar:
           ff = f
           ff += 1.2
           
-          glBlendFunc(GL_ONE, GL_ONE)
+          glBlendFunc(GL_SRC_ALPHA, GL_ONE)
           
           #myfingershurt: need to cap flameSizes use of scoreMultiplier to 4x, the 5x and 6x bass groove mults cause crash:
           if self.scoreMultiplier > 4:
