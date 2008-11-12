@@ -412,9 +412,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if self.analogKillMode[0] > 0:
       KillKeyCode[0] = self.controls.getReverseMapping(Player.KILL)
       self.isKillAnalog[0], self.whichJoy[0], self.whichAxis[0] = self.engine.input.getWhammyAxis(KillKeyCode[0])
-      if self.numOfPlayers > 1 and self.analogKillMode[1] > 0:
-        KillKeyCode[1] = self.controls.getReverseMapping(Player.PLAYER_2_KILL)
-        self.isKillAnalog[1], self.whichJoy[1], self.whichAxis[1] = self.engine.input.getWhammyAxis(KillKeyCode[1])
+    if self.numOfPlayers > 1 and self.analogKillMode[1] > 0:
+      KillKeyCode[1] = self.controls.getReverseMapping(Player.PLAYER_2_KILL)
+      self.isKillAnalog[1], self.whichJoy[1], self.whichAxis[1] = self.engine.input.getWhammyAxis(KillKeyCode[1])
 
     #MFH - this is where song loading originally took place, and the loading screen was spawned.
     self.engine.resource.load(self, "song", lambda: loadSong(self.engine, songName, library = libraryName, part = [player.part for player in self.playerList], practiceMode = self.playerList[0].practiceMode), synch = True, onLoad = self.songLoaded)
