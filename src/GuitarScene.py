@@ -4584,12 +4584,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 self.SP.transform.reset()
                 self.SP.transform.rotate(.0)  #Worldrave Change
                 self.SP.transform.scale(wfactor,-wfactor*3)
-                self.SP.transform.translate(w*self.x1[i]*0.96652469,h*self.y1[i]*1.011455279 + self.hOffset[i])  #evilynux - fixed for all resolutions
+                self.SP.transform.translate(w*self.x1[i]*0.96852469,h*self.y1[i]*1.011455279 + self.hOffset[i])  #evilynux - fixed for all resolutions
                 self.SP.draw(rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
                 self.SP.transform.reset()
                 self.SP.transform.rotate(.0)  #Worldrave Change
                 self.SP.transform.scale(wfactor,-wfactor*3)
-                self.SP.transform.translate(w*self.x1[i]*0.96652469,h*self.y1[i]*1.011455279 + self.hOffset[i])  #evilynux - fixed for all resolutions
+                self.SP.transform.translate(w*self.x1[i]*0.96852469,h*self.y1[i]*1.011455279 + self.hOffset[i])  #evilynux - fixed for all resolutions
                 self.SP.draw(rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
       
                 if self.guitars[i].starPower >= 83:
@@ -4599,14 +4599,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
                 wfactor = self.SP.widthf(pixelw = 32.000)  #Worldrave Change - Bulb 5  
                 self.SP.transform.reset()
-                self.SP.transform.rotate(-.40)  #Worldrave Change
+                self.SP.transform.rotate(-.34)  #Worldrave Change
                 self.SP.transform.scale(wfactor,-wfactor*3)
-                self.SP.transform.translate(w*self.x2[i]*0.976698075,h*self.y2[i]*1.02813143 + self.hOffset[i])  #evilynux - fixed for all resolutions
+                self.SP.transform.translate(w*self.x2[i]*0.978698075,h*self.y2[i]*1.02813143 + self.hOffset[i])  #evilynux - fixed for all resolutions
                 self.SP.draw(rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
                 self.SP.transform.reset()
-                self.SP.transform.rotate(-.40)  #Worldrave Change
+                self.SP.transform.rotate(-.34)  #Worldrave Change
                 self.SP.transform.scale(wfactor,-wfactor*3)
-                self.SP.transform.translate(w*self.x2[i]*0.976698075,h*self.y2[i]*1.02813143 + self.hOffset[i])  #evilynux - fixed for all resolutions
+                self.SP.transform.translate(w*self.x2[i]*0.978698075,h*self.y2[i]*1.02813143 + self.hOffset[i])  #evilynux - fixed for all resolutions
                 self.SP.draw(rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
       
                 if self.guitars[i].starPower >= 100:
@@ -4616,14 +4616,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
                 wfactor = self.SP.widthf(pixelw = 32.000) #Worldrave Change - Bulb 6
                 self.SP.transform.reset()
-                self.SP.transform.rotate(-.75)  #Worldrave Change
+                self.SP.transform.rotate(-.70)  #Worldrave Change
                 self.SP.transform.scale(wfactor,-wfactor*3)
-                self.SP.transform.translate(w*self.x3[i]*0.986664588,h*self.y3[i]*1.04973235 + self.hOffset[i])  #evilynux - fixed for all resolutions
+                self.SP.transform.translate(w*self.x3[i]*0.990664588,h*self.y3[i]*1.04973235 + self.hOffset[i])  #evilynux - fixed for all resolutions
                 self.SP.draw(rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
                 self.SP.transform.reset()
-                self.SP.transform.rotate(-.75)  #Worldrave Change
+                self.SP.transform.rotate(-.70)  #Worldrave Change
                 self.SP.transform.scale(wfactor,-wfactor*3)
-                self.SP.transform.translate(w*self.x3[i]*0.986664588,h*self.y3[i]*1.04973235 + self.hOffset[i])  #evilynux - fixed for all resolutions
+                self.SP.transform.translate(w*self.x3[i]*0.990664588,h*self.y3[i]*1.04973235 + self.hOffset[i])  #evilynux - fixed for all resolutions
                 self.SP.draw(rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
                         
               self.rockmeter.transform.reset()
