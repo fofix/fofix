@@ -64,6 +64,7 @@ Notice - If you just want the default phrases to show do not put these in your t
 ==In Game Items==                     
 
 ||_*Item Name*_||_*What it Does/How to use it*_||
+||song_info_display_scale = 0.0020||Controls the size of the song info shown at gameplay countdown||
 ||twoDkeys = False||Use 3d keys  = False||
 ||twoDnote = False||Use 3d notes = False||
 ||Rotating 3d Starnotes||Default is on||
