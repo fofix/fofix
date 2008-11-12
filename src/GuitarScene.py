@@ -2099,7 +2099,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             #self.newScalingText(i, _("You Failed!!!!") )
             self.newScalingText(i, self.tsYouFailedBattle )
             #self.streakFlag = str(i)   #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1. 
-          self.guitars[i].actions = [0,0,0]
+            self.guitars[i].actions = [0,0,0]
 
 
       if self.countdown > 0: #MFH won't start song playing if you failed or pause
