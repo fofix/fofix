@@ -402,11 +402,10 @@ class GameEngine(Engine):
     # Load game modifications
     Mod.init(self)
     
+    self.addTask(self.audio, synchronized = False)
     self.addTask(self.input, synchronized = False)
     self.addTask(self.view)
     self.addTask(self.resource, synchronized = False)
-    
-    
 
     self.data = Data(self.resource, self.svg)
     themename = self.data.themeLabel
@@ -591,6 +590,10 @@ class GameEngine(Engine):
     else:
       self.quit()
     
+  def quit(self):
+    self.audio.close()
+    Engine.quit(self)
+
   def resizeScreen(self, width, height):
     """
     Resize the game screen.
