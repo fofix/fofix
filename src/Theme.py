@@ -169,6 +169,8 @@ DEFAULT_CROWD_LOOP_DELAY = None
 DEFAULT_SONG_SELECT_SUBMENU_X = None
 DEFAULT_SONG_SELECT_SUBMENU_Y = None
 
+#MFH - for scaling song info during countdown
+DEFAULT_SONG_INFO_DISPLAY_SCALE = 0.0020
 
 #racer:
 DEFAULT_FAIL_BKG_X     = None
@@ -325,6 +327,9 @@ Config.define("theme", "crowd_loop_delay",  int, DEFAULT_CROWD_LOOP_DELAY)
 Config.define("theme", "song_select_submenu_x",  float, DEFAULT_SONG_SELECT_SUBMENU_X)
 Config.define("theme", "song_select_submenu_y",  float, DEFAULT_SONG_SELECT_SUBMENU_Y)
 
+#MFH - for scaling song info during countdown
+Config.define("theme", "song_info_display_scale",  float, DEFAULT_SONG_INFO_DISPLAY_SCALE)
+
 #RACER:
 Config.define("theme", "fail_bkg_x",       float, DEFAULT_FAIL_BKG_X)
 Config.define("theme", "fail_bkg_y",       float, DEFAULT_FAIL_BKG_Y)
@@ -427,6 +432,9 @@ crowdLoopDelay = None
 #MFH - for instrument / difficulty / practice section submenu positioning
 songSelectSubmenuX = None
 songSelectSubmenuY = None
+
+#MFH - for scaling song info during countdown
+songInfoDisplayScale = None
 
 #Racer:
 fail_bkg_xPos = None
@@ -785,6 +793,7 @@ def setupMisc(config):
   global loadingPhrase, resultsPhrase
   global creditSong
   global crowdLoopDelay
+  global songInfoDisplayScale
 
   temp = config.get("theme", "loading_phrase")
   #Log.debug("Loading phrases found: " + temp)
@@ -804,7 +813,10 @@ def setupMisc(config):
   if crowdLoopDelay == None or temp != DEFAULT_CROWD_LOOP_DELAY:
     crowdLoopDelay = temp
 
-
+  #MFH - for scaling song info during countdown
+  temp = config.get("theme", "song_info_display_scale")
+  if songInfoDisplayScale == None or temp != DEFAULT_SONG_INFO_DISPLAY_SCALE:
+    songInfoDisplayScale = temp
 
 #MFH:
 def setupSonglist(config):
@@ -1168,6 +1180,9 @@ def writeMisc(f, config):
  
   #MFH - crowd cheer loop delay in theme.ini: if not exist, use value from settings. Otherwise, use theme.ini value.
   f.write("%s = %s\n" % ("crowd_loop_delay", crowdLoopDelay))
+
+  #MFH - for scaling song info during countdown
+  f.write("%s = %s\n" % ("song_info_display_scale", songInfoDisplayScale))
 
 #MFH:  
 def writeSonglist(f, config):
