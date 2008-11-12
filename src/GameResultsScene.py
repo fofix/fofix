@@ -80,6 +80,12 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
 
     self.scoreScrollStartOffset = .8    #MFH - where highscore scrolling starts
 
+    #MFH - pretranslation
+    self.tsSettings = _("settings")
+    self.tsHopos = _("HOPOs")
+    self.tsHitWindow = _("Hit Window")
+
+
     #myfingershurt: reordering so default is Change Song.
     items = [
       (_("Continue"),       self.changeSong),
@@ -489,9 +495,10 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         w, h = font.getStringSize(text)
         Dialogs.wrapText(font, (.5 - w / 2, .54 - v - h), text)
 
-      #MFH - TODO - add HOPO system & hit window display to this screen
+      #MFH - HOPO system & hit window display
       settingsScale = 0.0012
-      settingsText = "%s settings - HOPOs: %s / %s, Hit Window: %s" % (self.engine.versionString, self.hopoStyle, self.hopoFreq, self.hitWindow)
+      #settingsText = "%s settings - HOPOs: %s / %s, Hit Window: %s" % (self.engine.versionString, self.hopoStyle, self.hopoFreq, self.hitWindow)
+      settingsText = "%s %s - %s: %s / %s, %s: %s" % (self.engine.versionString, self.tsSettings, self.tsHopos, self.hopoStyle, self.hopoFreq, self.tsHitWindow, self.hitWindow)
       w, h = font.getStringSize(settingsText, settingsScale)
       font.render(settingsText, (.5 - w/2, 0.0), scale = settingsScale)
         
