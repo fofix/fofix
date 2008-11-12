@@ -412,6 +412,7 @@ class SettingsMenu(Menu.Menu):
       VolumeConfigChoice(engine, engine.config, "audio",  "rhythmvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "screwupvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "miss_volume", autoApply = True),
+      VolumeConfigChoice(engine, engine.config, "audio",  "single_track_miss_volume", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "kill_volume", autoApply = True), #MFH
       VolumeConfigChoice(engine, engine.config, "audio",  "SFX_volume", autoApply = True), #MFH
     ]
@@ -596,6 +597,7 @@ class GameSettingsMenu(Menu.Menu):
       VolumeConfigChoice(engine, engine.config, "audio",  "rhythmvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "screwupvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "miss_volume", autoApply = True),
+      VolumeConfigChoice(engine, engine.config, "audio",  "single_track_miss_volume", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "kill_volume", autoApply = True), #MFH
       VolumeConfigChoice(engine, engine.config, "audio",  "SFX_volume", autoApply = True), #MFH
       ConfigChoice(engine.config, "audio",  "delay", autoApply = True),   #myfingershurt: so the a/v delay can be adjusted in-game

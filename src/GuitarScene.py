@@ -442,6 +442,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     splash = Dialogs.showLoadingSplashScreen(self.engine, phrase)
 
 
+    #MFH - single audio track song detection
+    self.isSingleAudioTrack = self.song.isSingleAudioTrack
+
+
     #myfingershurt: also want to go through song and search for guitar solo parts, and count notes in them in each diff.
     self.inGameStats = self.engine.config.get("performance","in_game_stats")
     self.inGameStars = self.engine.config.get("game","in_game_stars")

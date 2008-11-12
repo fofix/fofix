@@ -1925,6 +1925,8 @@ class Song(object):
     #TK_UNUSED_TEXT = 4    #Unused / other text events
     self.eventTracks       = [Track(self.engine) for t in range(0,5)]    #MFH - should result in eventTracks[0] through [4]
 
+    self.music = None
+
     # load the tracks
     if songTrackName:
       self.music       = Audio.Music(songTrackName)
@@ -1956,6 +1958,12 @@ class Song(object):
     except Exception, e:
       Log.warn("Unable to load drum track: %s" % e)
 
+    #MFH - single audio track song detection
+    self.singleTrackSong = False
+    if (self.music == None) or (self.guitarTrack == None and self.rhythmTrack == None and self.drumTrack == None):
+      self.singleTrackSong = True
+      self.missVolume = self.engine.config.get("audio", "single_track_miss_volume")   #MFH - force single-track miss volume setting instead
+      Log.debug("Song with only a single audio track identified - single-track miss volume applied: " + str(self.missVolume))
 
 
     # load the notes   
@@ -1976,7 +1984,10 @@ class Song(object):
 
   #myfingershurt: new function to refresh the miss volume after a pause
   def refreshMissVolume(self):  
-    self.missVolume   = self.engine.config.get("audio", "miss_volume")
+    if self.singleTrackSong:
+      self.missVolume = self.engine.config.get("audio", "single_track_miss_volume")   #MFH - force single-track miss volume setting instead
+    else:
+      self.missVolume   = self.engine.config.get("audio", "miss_volume")
 
   
 
@@ -2127,7 +2138,11 @@ class Song(object):
   def getTrack(self):
     return [self.tracks[i][self.difficulty[i].id] for i in range(len(self.difficulty))]
 
+  def getIsSingleAudioTrack(self):
+    return self.singleTrackSong
+
   track = property(getTrack)
+  isSingleAudioTrack = property(getIsSingleAudioTrack)
 
 noteMap = {     # difficulty, note
   0x60: (EXP_DIF, 0),
