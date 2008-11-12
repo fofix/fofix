@@ -594,10 +594,6 @@ class GameEngine(Engine):
     else:
       self.quit()
     
-  def quit(self):
-    self.audio.close()
-    Engine.quit(self)
-
   def resizeScreen(self, width, height):
     """
     Resize the game screen.
