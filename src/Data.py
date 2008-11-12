@@ -146,7 +146,7 @@ class Data(object):
       font7     = lambda: Font(songFont, fontSize[0], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False)#kk69: loads font specific for song name in Guitar Scene =)
     font8     = lambda: Font(songListFont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False) #MFH
     font9     = lambda: Font(shadowfont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False, shadow = True) #blazingamer
-    font10    = lambda: Font(streakFont2, fontSize[2], scale = scale2*.64, reversed = reversed, systemFont = not asciiOnly, outline = False, shadow = True) #blazingamer - Worldrave Modified (- .18)
+    font10    = lambda: Font(streakFont2, fontSize[2], scale = scale2*.65, reversed = reversed, systemFont = not asciiOnly, outline = False, shadow = True) #blazingamer - Worldrave Modified (- .18)
 
 
     resource.load(self, "font",         font1, onLoad = self.customizeFont, synch = True)
