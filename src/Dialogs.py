@@ -1208,8 +1208,6 @@ class SongChooser(Layer, KeyListener):
     if label is not None:
       glEnable(GL_TEXTURE_2D)
       label.bind()
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
       glColor3f(1, 1, 1)
       glMatrixMode(GL_TEXTURE)
       glScalef(1, -1, 1)

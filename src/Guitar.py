@@ -600,8 +600,6 @@ class Guitar:
       self.bassGrooveNeck.texture.bind()
     else:
       self.neckDrawing.texture.bind()
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
 
     glBegin(GL_TRIANGLE_STRIP)
     glColor4f(color[0],color[1],color[2], 0)
