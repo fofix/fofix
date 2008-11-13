@@ -105,7 +105,10 @@ class View(Task):
       return
 
     topLayer = self.topLayer()
-    t = ticks / self.transitionTime
+    
+    #t = ticks / self.transitionTime
+    t = self.engine.clock.get_time() / self.transitionTime
+    
     for layer in list(self.layers):
       if not layer in self.visibility:
         continue

@@ -408,7 +408,10 @@ class GameEngine(Engine):
     
     self.addTask(self.audio, synchronized = False)
     self.addTask(self.input, synchronized = False)
-    self.addTask(self.view)
+    
+    #self.addTask(self.view)
+    self.addTask(self.view, synchronized = False)
+    
     self.addTask(self.resource, synchronized = False)
 
     self.data = Data(self.resource, self.svg)

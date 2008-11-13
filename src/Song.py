@@ -2553,6 +2553,32 @@ class MidiInfoReader(midi.MidiOutStream):
     self.nextSectionMinute = 0.25
     
 
+  def header(self, format=0, nTracks=1, division=96):
+    self.ticksPerBeat = division
+  
+  def abs_time(self):
+    def ticksToBeats(ticks, bpm):
+      return (60000.0 * ticks) / (bpm * self.ticksPerBeat)
+      
+    if self.bpm:
+      currentTime = midi.MidiOutStream.abs_time(self)
+
+      scaledTime      = 0.0
+      tempoMarkerTime = 0.0
+      currentBpm      = self.bpm
+      for i, marker in enumerate(self.tempoMarkers):
+        time, bpm = marker
+        if time > currentTime:
+          break
+        scaledTime += ticksToBeats(time - tempoMarkerTime, currentBpm)
+        tempoMarkerTime, currentBpm = time, bpm
+      return scaledTime + ticksToBeats(currentTime - tempoMarkerTime, currentBpm)
+    return 0.0
+    
+  def tempo(self, value):
+    self.bpm = 60.0 * 10.0**6 / value
+    self.tempoMarkers.append((midi.MidiOutStream.abs_time(self), self.bpm))
+    
   def note_on(self, channel, note, velocity):
     pos = float(midi.MidiOutStream.abs_time(self))
     if (pos / 60000) >= self.nextSectionMinute:
@@ -2578,7 +2604,7 @@ class MidiInfoReader(midi.MidiOutStream):
   #also must prevent "Done" flag setting so can read whole MIDI file, all text events
   def text(self, text):
     if text.find("GNMIDI") < 0:   #to filter out the midi class illegal usage / trial timeout messages
-      pos = midi.MidiOutStream.abs_time(self)
+      pos = self.abs_time()
       #Log.debug("Found MidiInfoReader text event: " + text)
       #if self.readTextAndLyricEvents > 0:
       text = text.replace("_"," ")
