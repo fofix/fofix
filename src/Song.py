@@ -1162,8 +1162,13 @@ class Track:
     tickDelta = 0
     noteDelta = 0
 
-    if self.songHopoFreq == 1 and (str(songHopoFreq) == "0" or str(songHopoFreq) == "1" or str(songHopoFreq) == "2"):
-      Log.debug("markHopoRF: song-specific HOPO frequency %s forced" % str(songHopoFreq))
+    try:
+      songHopoFreq = int(songHopoFreq)
+    except Exception, e:
+      songHopoFreq = 1
+      Log.warn("Song.ini HOPO Frequency setting is invalid -- forcing Normal (value 1)")
+    if self.songHopoFreq == 1 and (songHopoFreq == 0 or songHopoFreq == 1 or songHopoFreq == 2):
+      Log.debug("markHopoRF: song-specific HOPO frequency %d forced" % songHopoFreq)
       self.hopoTick = songHopoFreq
 
     #dtb file says 170 ticks
@@ -1386,9 +1391,15 @@ class Track:
     tickDelta = 0
     noteDelta = 0
 
-    if self.songHopoFreq == 1 and (str(songHopoFreq) == "0" or str(songHopoFreq) == "1" or str(songHopoFreq) == "2"):
-      Log.debug("markHopoGH2: song-specific HOPO frequency %s forced" % str(songHopoFreq))
+    try:
+      songHopoFreq = int(songHopoFreq)
+    except Exception, e:
+      songHopoFreq = 1
+      Log.warn("Song.ini HOPO Frequency setting is invalid -- forcing Normal (value 1)")
+    if self.songHopoFreq == 1 and (songHopoFreq == 0 or songHopoFreq == 1 or songHopoFreq == 2):
+      Log.debug("markHopoRF: song-specific HOPO frequency %d forced" % songHopoFreq)
       self.hopoTick = songHopoFreq
+
 
     #dtb file says 170 ticks
     hopoDelta = 170
@@ -1990,9 +2001,10 @@ class Song(object):
     #MFH - single audio track song detection
     self.singleTrackSong = False
     if (self.music == None) or (self.guitarTrack == None and self.rhythmTrack == None and self.drumTrack == None):
-      self.singleTrackSong = True
-      self.missVolume = self.engine.config.get("audio", "single_track_miss_volume")   #MFH - force single-track miss volume setting instead
-      Log.debug("Song with only a single audio track identified - single-track miss volume applied: " + str(self.missVolume))
+      if not (self.music == None and self.guitarTrack == None and self.rhythmTrack == None and self.drumTrack == None):
+        self.singleTrackSong = True
+        self.missVolume = self.engine.config.get("audio", "single_track_miss_volume")   #MFH - force single-track miss volume setting instead
+        Log.debug("Song with only a single audio track identified - single-track miss volume applied: " + str(self.missVolume))
 
 
     # load the notes   
