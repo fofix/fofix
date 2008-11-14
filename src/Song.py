@@ -1397,7 +1397,7 @@ class Track:
       songHopoFreq = 1
       Log.warn("Song.ini HOPO Frequency setting is invalid -- forcing Normal (value 1)")
     if self.songHopoFreq == 1 and (songHopoFreq == 0 or songHopoFreq == 1 or songHopoFreq == 2):
-      Log.debug("markHopoRF: song-specific HOPO frequency %d forced" % songHopoFreq)
+      Log.debug("markHopoGH2: song-specific HOPO frequency %d forced" % songHopoFreq)
       self.hopoTick = songHopoFreq
 
 
