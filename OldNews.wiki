@@ -1,0 +1,6 @@
+#summary Archived old news items from the summary page
+#labels Deprecated
+
+= Old News =
+
+_coming soon - as soon as there is some obsolete news, it will be archived here._
