@@ -47,7 +47,10 @@ RIGHT = unicode('\x13')
 class Data(object):
   """A collection of globally used data resources such as fonts and sound effects."""
   def __init__(self, resource, svg):
-    Log.debug("Data class init (Data.py)...")
+
+    self.logClassInits = Config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("Data class init (Data.py)...")
     
     self.resource = resource
     self.svg      = svg

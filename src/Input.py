@@ -29,6 +29,8 @@ import Audio
 from Task import Task
 from Player import Controls
 
+import Config   #MFH
+
 class KeyListener:
   def keyPressed(self, key, unicode):
     pass
@@ -71,7 +73,10 @@ except:
 
 class Input(Task):
   def __init__(self):
-    Log.debug("Input class init (Input.py)...")
+
+    self.logClassInits = Config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("Input class init (Input.py)...")
   
     Task.__init__(self)
     self.mouse                = pygame.mouse
@@ -256,7 +261,16 @@ class Input(Task):
           state     = self.joystickHats[event.joy][event.hat]
           keyEvent  = None
 
-          if event.value != (0, 0) and state == (0, 0):
+          #if event.value != (0, 0) and state == (0, 0):
+
+          # Stump's PS3 GH3 up-and-down-strumming patch
+          if event.value != (0, 0) and state != (0, 0):
+            keyEvent = "keyReleased"
+            args     = (self.encodeJoystickHat(event.joy, event.hat, state), )
+            state    = (0, 0)
+            pygame.event.post(event)
+          elif event.value != (0, 0) and state == (0, 0):
+
             self.joystickHats[event.joy][event.hat] = event.value
             keyEvent = "keyPressed"
             args     = (self.encodeJoystickHat(event.joy, event.hat, event.value), u'\x00')

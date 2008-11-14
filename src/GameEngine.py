@@ -185,6 +185,12 @@ Config.define("game", "song_hopo_freq",       int, 1,     text = _("Song HOPO Fr
 #Config.define("game",   "mute_sustain_releases",          bool, False,  text = _("Mute sustain releases"), options = {False: _("No"), True: _("Yes")})
 Config.define("game",   "sustain_muting",          int, 1,    text = _("Sustain Muting"), options = {0: _("Off"), 1: _("Ultra Wide"), 2: _("Wide"), 3: _("Standard"), 4: _("Tight")})
 
+#MFH - log settings
+Config.define("game",   "log_ini_reads",          int, 0,    text = _("Log INI Reads"), options = {0: _("No"), 1: _("Yes")})
+Config.define("game",   "log_class_inits",          int, 0,    text = _("Log Class Inits"), options = {0: _("No"), 1: _("Yes")})
+Config.define("game",   "log_loadings",          int, 0,    text = _("Log Loadings"), options = {0: _("No"), 1: _("Yes")})
+Config.define("game",   "log_sections",          int, 0,    text = _("Log MIDI Sections"), options = {0: _("No"), 1: _("Yes")})
+Config.define("game",   "log_undefined_gets",          int, 0,    text = _("Log Undefined GETs"), options = {0: _("No"), 1: _("Yes")})
 
 
 #racer
@@ -327,6 +333,10 @@ class SystemEventHandler(SystemEventListener):
 class GameEngine(Engine):
   """The main game engine."""
   def __init__(self, config = None):
+
+    #self.logClassInits = Config.get("game", "log_class_inits")
+    #if self.logClassInits == 1:
+    #  Log.debug("GameEngine class init (GameEngine.py)...")
     Log.debug("GameEngine class init (GameEngine.py)...")
 
     self.mainMenu = None    #placeholder for main menu object - to prevent reinstantiation

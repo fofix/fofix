@@ -32,6 +32,9 @@ encoding  = "iso-8859-1"
 config    = None
 prototype = {}
 
+logIniReads = 0   #MFH - INI reads disabled by default during the startup period
+logUndefinedGets = 0 
+
 class MyConfigParser(ConfigParser):
   def write(self, fp):
       if self._defaults:
@@ -98,15 +101,17 @@ def define(section, option, type, default = None, text = None, options = None, p
 
 def load(fileName = None, setAsDefault = False):
   """Load a configuration with the default prototype"""
-  global config
+  global config, logIniReads, logUndefinedGets
   c = Config(prototype, fileName)
   if setAsDefault and not config:
     config = c
+  logIniReads = c.get("game", "log_ini_reads")
+  logUndefinedGets = c.get("game", "log_undefined_gets")
   return c
 
-def unLoad():   #MFH - to unload the global config object for later reload
-  global config
-  config = None
+#def unLoad():   #MFH - to unload the global config object for later reload
+#  global config
+#  config = None
 
 class Config:
   """A configuration registry."""
@@ -146,11 +151,15 @@ class Config:
     @param option:    Option name
     @return:          Key value
     """
+    
+    global logIniReads, logUndefinedGets
+
     try:
       type    = self.prototype[section][option].type
       default = self.prototype[section][option].default
     except KeyError:
-      Log.warn("Config key %s.%s not defined while reading." % (section, option))
+      if logUndefinedGets == 1:
+        Log.warn("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
       type, default = str, None
   
     value = self.config.has_option(section, option) and self.config.get(section, option) or default
@@ -167,7 +176,8 @@ class Config:
         value = None
       
     #myfingershurt: verbose log output
-    Log.debug("Config.get: %s.%s = %s" % (section, option, value))
+    if logIniReads == 1:
+      Log.debug("Config.get: %s.%s = %s" % (section, option, value))
     return value
 
 #-------------------------
@@ -180,11 +190,15 @@ class Config:
     @param option:    Option name
     @return:          Key value
     """
+    global logIniReads, logUndefinedGets
+
+
     try:
       type    = self.prototype[section][option].type
       default = self.prototype[section][option].default
     except KeyError:
-      Log.warn("Config key %s.%s not defined while reading." % (section, option))
+      if logUndefinedGets == 1:
+        Log.warn("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
       type, default = str, None
   
     value = default
@@ -201,7 +215,8 @@ class Config:
         value = None
       
     #myfingershurt: verbose log output
-    Log.debug("Config.getDefault: %s.%s = %s" % (section, option, value))
+    if logIniReads == 1:
+      Log.debug("Config.getDefault: %s.%s = %s" % (section, option, value))
     return value
 #-------------------------
 
@@ -213,10 +228,14 @@ class Config:
     @param option:    Option name
     @param value:     Value name
     """
+
+    global logUndefinedGets
+
     try:
       prototype[section][option]
     except KeyError:
-      Log.warn("Config key %s.%s not defined while writing." % (section, option))
+      if logUndefinedGets == 1:
+        Log.warn("Config key %s.%s not defined while writing %s." % (section, option, self.fileName))
     
     if not self.config.has_section(section):
       self.config.add_section(section)
@@ -334,6 +353,11 @@ def get(section, option):
   @return:          Key value
   """
   global config
+  
+  #MFH - for init config.gets
+  #if config == None:
+  #  load()
+
   return config.get(section, option)
   
 def set(section, option, value):

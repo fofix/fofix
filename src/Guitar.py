@@ -81,7 +81,9 @@ class Guitar:
 
     self.tempoBpm = 120   #MFH - default is NEEDED here...
     
-    Log.debug("Guitar class init...")
+    self.logClassInits = self.engine.config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("Guitar class init...")
     
     self.boardWidth     = 3.0
     self.boardLength    = 9.0
@@ -180,7 +182,8 @@ class Guitar:
 
     self.hit = [False, False, False, False, False]
 
-    self.neck = self.engine.config.get("coffee", "neck_choose")
+    neckSettingName = "neck_choose_p%d" % (self.player)
+    self.neck = self.engine.config.get("coffee", neckSettingName)
 
     #Get theme
     themename = self.engine.data.themeLabel

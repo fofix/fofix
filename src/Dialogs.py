@@ -190,7 +190,10 @@ class GetText(Layer, KeyListener):
     self.engine = engine
     self.time = 0
     self.accepted = False
-    Log.debug("GetText class init (Dialogs.py)...")
+
+    self.logClassInits = self.engine.config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("GetText class init (Dialogs.py)...")
     
     self.sfxVolume    = self.engine.config.get("audio", "SFX_volume")
 
@@ -322,7 +325,10 @@ class GetKey(Layer, KeyListener):
     self.engine = engine
     self.time = 0
     self.accepted = False
-    Log.debug("GetKey class init (Dialogs.py)...")
+
+    self.logClassInits = self.engine.config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("GetKey class init (Dialogs.py)...")
     
   def shown(self):
     self.engine.input.addKeyListener(self, priority = True)
@@ -376,7 +382,11 @@ class LoadingScreen(Layer, KeyListener):
     self.ready        = False
     self.allowCancel  = allowCancel
     self.time         = 0.0
-    Log.debug("LoadingScreen class init (Dialogs.py)...")
+
+    self.logClassInits = self.engine.config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("LoadingScreen class init (Dialogs.py)...")
+
     self.loadingx = Theme.loadingX
     self.loadingy = Theme.loadingY
     self.allowtext = self.engine.config.get("game", "lphrases")    
@@ -456,7 +466,10 @@ class MessageScreen(Layer, KeyListener):
     self.text = text
     self.time = 0.0
     self.prompt = prompt
-    Log.debug("MessageScreen class init (Dialogs.py)...")
+
+    self.logClassInits = self.engine.config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("MessageScreen class init (Dialogs.py)...")
     
 
   def shown(self):
@@ -506,7 +519,9 @@ class SongChooser(Layer, KeyListener):
     self.prompt         = prompt
     self.engine         = engine
     
-    Log.debug("SongChooser class init (Dialogs.py)...")
+    self.logClassInits = self.engine.config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("SongChooser class init (Dialogs.py)...")
 
     #MFH - retrieve game parameters:
     self.gamePlayers = self.engine.config.get("game", "players")
@@ -2305,7 +2320,9 @@ class FileChooser(BackgroundLayer, KeyListener):
     self.time           = 0.0
     self.menu           = None
 
-    Log.debug("FileChooser class init (Dialogs.py)...")
+    self.logClassInits = self.engine.config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("FileChooser class init (Dialogs.py)...")
     
 
     self.dirSelect      = dirSelect
@@ -2476,18 +2493,23 @@ class FileChooser(BackgroundLayer, KeyListener):
 #MFH - on-demand Neck Select menu
 class NeckChooser(BackgroundLayer, KeyListener):
   """Item menu layer."""
-  def __init__(self, engine, selected = None, prompt = ""):
+  def __init__(self, engine, selected = None, prompt = "", player = 0):
     self.prompt         = prompt
     self.engine         = engine
+    self.player         = player
     
-    Log.debug("NeckChooser class init (Dialogs.py)...")
+    self.logClassInits = self.engine.config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("Player %d NeckChooser class init (Dialogs.py)..." % (self.player))
     
     splash = showLoadingSplashScreen(self.engine, _("Loading necks..."))
 
     self.neck = []
     self.necks = ["2none", "none"]
     self.maxNeck = 0
-    self.selectedNeck = Config.get("coffee", "neck_choose")
+
+    self.neckSettingName = "neck_choose_p%d" % (self.player)
+    self.selectedNeck = Config.get("coffee", self.neckSettingName)
 
     # evilynux - improved loading logic to support arbitrary filenames
     #          - os.listdir is not garanteed to return a sorted list, so sort it!
@@ -2519,7 +2541,7 @@ class NeckChooser(BackgroundLayer, KeyListener):
         self.necks.append(neckImage)
         self.maxNeck += 1
     self.maxNeck -= 1 # evilynux - confusing, but there's an offset of -1
-    Config.define("coffee",   "neck_choose",         str,   0,  text = _("Neck"), options = self.neck)
+    Config.define("coffee",   self.neckSettingName,  str,  0,  text = _("Neck"), options = self.neck)
     Config.set("coffee",   "max_neck", self.maxNeck)
 
     self.necks.append("none")
@@ -2545,7 +2567,7 @@ class NeckChooser(BackgroundLayer, KeyListener):
     self.engine.loadImgDrawing(self, "neckSelect", os.path.join("themes",self.themename,"menu","neckchooseselect.png"))
 
     neckChooseSettings = [
-      Settings.ConfigChoice(engine.config, "coffee",   "neck_choose", autoApply = True)
+      Settings.ConfigChoice(engine.config, "coffee",   self.neckSettingName, autoApply = True)
     ]
     self.menu = Menu(self.engine, neckChooseSettings, pos = (12,12), onClose = self.close, onCancel = self.cancel)
 
@@ -2584,6 +2606,7 @@ class NeckChooser(BackgroundLayer, KeyListener):
   
   def run(self, ticks):
     self.time += ticks / 50.0
+    self.selectedNeck = Config.get("coffee", self.neckSettingName)    #MFH - update this in the run not render
     
   def render(self, visibility, topMost):
    v = (1 - visibility) ** 2
@@ -2606,7 +2629,7 @@ class NeckChooser(BackgroundLayer, KeyListener):
 
 
 
-   self.selectedNeck = Config.get("coffee", "neck_choose")
+   #self.selectedNeck = Config.get("coffee", self.neckSettingName)
    # evilynux - search for index number of selected neck
    found = False
    for i in range(len(self.neck)):
@@ -2746,7 +2769,9 @@ class ItemChooser(BackgroundLayer, KeyListener):
     self.prompt         = prompt
     self.engine         = engine
     
-    Log.debug("ItemChooser class init (Dialogs.py)...")
+    self.logClassInits = self.engine.config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("ItemChooser class init (Dialogs.py)...")
     
     self.accepted       = False
     self.selectedItem   = None
@@ -2843,7 +2868,10 @@ class BpmEstimator(Layer, KeyListener):
   def __init__(self, engine, song, prompt = ""):
     self.prompt         = prompt
     self.engine         = engine
-    Log.debug("BpmEstimator class init (Dialogs.py)...")
+
+    self.logClassInits = self.engine.config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("BpmEstimator class init (Dialogs.py)...")
 
     self.song           = song
     self.accepted       = False
@@ -2912,7 +2940,9 @@ class KeyTester(Layer, KeyListener):
     self.prompt         = prompt
     self.engine         = engine
     
-    Log.debug("KeyTester class init (Dialogs.py)...")
+    self.logClassInits = self.engine.config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("KeyTester class init (Dialogs.py)...")
     
     
     self.accepted       = False
@@ -3083,7 +3113,10 @@ class DrumTester(KeyTester):
     self.prompt         = prompt
     self.engine         = engine
    
-    Log.debug("DrumTester class init (Dialogs.py)...")
+
+    self.logClassInits = self.engine.config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("DrumTester class init (Dialogs.py)...")
     
     
     self.accepted       = False
@@ -3224,7 +3257,7 @@ def chooseItem(engine, items, prompt, selected = None, pos = None):   #MFH
   return d.getSelectedItem()
 
 #MFH - on-demand Neck Chooser
-def chooseNeck(engine, prompt = "", selected = None):
+def chooseNeck(engine, prompt = "", selected = None, player = 0):
   """
   Ask the user to one item from a list.
   
@@ -3233,7 +3266,7 @@ def chooseNeck(engine, prompt = "", selected = None):
   @param prompt:    Prompt shown to the user
   @param selected:  Item selected by default
   """
-  d = NeckChooser(engine, prompt = prompt, selected = selected)
+  d = NeckChooser(engine, prompt = prompt, selected = selected, player = player)
   _runDialog(engine, d)
   return d.getSelectedNeck()
 
@@ -3324,7 +3357,9 @@ class LoadingSplashScreen(Layer, KeyListener):
     self.loadingy = Theme.loadingY  
     self.allowtext = self.engine.config.get("game", "lphrases")  
 
-    Log.debug("LoadingSplashScreen class init (Dialogs.py)...")
+    self.logClassInits = self.engine.config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("LoadingSplashScreen class init (Dialogs.py)...")
 
     #Get theme
     themename = self.engine.data.themeLabel

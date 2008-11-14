@@ -53,7 +53,11 @@ import Log
 class MainMenu(BackgroundLayer):
   def __init__(self, engine):
     self.engine              = engine
-    Log.debug("MainMenu class init (MainMenu.py)...")
+
+    self.logClassInits = Config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("MainMenu class init (MainMenu.py)...")
+
     self.time                = 0.0
     self.nextLayer           = None
     self.visibility          = 0.0
@@ -67,61 +71,52 @@ class MainMenu(BackgroundLayer):
 
     self.gfxVersionTag = Config.get("game", "gfx_version_tag")
 
-    self.chosenNeck = Config.get("coffee", "neck_choose")
     #self.tut = Config.get("game", "tut")
 
     Config.define("coffee",   "max_neck", int, 1)      
 
-    #neck fallback to random if doesn't exist.
-    try:
-      # evilynux - first assume the chosenNeck contains the full filename
-      engine.loadImgDrawing(self, "ok", os.path.join("necks",self.chosenNeck+".png"))
-    except IOError:
+    for playerNum in range(0,2):    #MFH - verify chosen necks and, if necessary, force appropriate defaults / fallbacks
+      neckSettingName = "neck_choose_p%d" % (playerNum)
+      self.chosenNeck = Config.get("coffee", neckSettingName )
+      #neck fallback to random if doesn't exist.
       try:
-        engine.loadImgDrawing(self, "ok", os.path.join("necks","Neck_"+self.chosenNeck+".png"))
+        # evilynux - first assume the chosenNeck contains the full filename
+        engine.loadImgDrawing(self, "ok", os.path.join("necks",self.chosenNeck+".png"))
       except IOError:
-        exists = 0
-      else:
-        exists = 1
-    else:
-      exists = 1
-    if exists == 0: #MFH - fallback logic now supports a couple valid default neck filenames
-
-      #MFH - check for Neck_1
-      try:
-        engine.loadImgDrawing(self, "ok", os.path.join("necks","Neck_1.png"))
-        exists = 1
-      except IOError:
-        exists = 0
-      if exists == 1:
-        Config.set("coffee", "neck_choose", "1")
-        Log.warn("Chosen neck not valid, fallback Neck_1.png forced.")
-      else:
-
-        #MFH - check for defaultneck
         try:
-          engine.loadImgDrawing(self, "ok", os.path.join("necks","defaultneck.png"))
+          engine.loadImgDrawing(self, "ok", os.path.join("necks","Neck_"+self.chosenNeck+".png"))
+        except IOError:
+          exists = 0
+        else:
+          exists = 1
+      else:
+        exists = 1
+      if exists == 0: #MFH - fallback logic now supports a couple valid default neck filenames
+        #MFH - check for Neck_1
+        try:
+          engine.loadImgDrawing(self, "ok", os.path.join("necks","Neck_1.png"))
           exists = 1
         except IOError:
           exists = 0
         if exists == 1:
-          Log.warn("Chosen neck not valid, fallback defaultneck.png forced.")
-          Config.set("coffee", "neck_choose", "defaultneck")
+          Config.set("coffee", neckSettingName, "1")
+          Log.warn("P%d Chosen neck not valid, fallback Neck_1.png forced." % (playerNum) )
         else:
-          Log.warn("Warning!  Chosen neck not valid, fallbacks Neck_1.png and defaultneck.png also not valid!  Crash imminent!")
-        
-      
-
-
-        
-
-        
+          #MFH - check for defaultneck
+          try:
+            engine.loadImgDrawing(self, "ok", os.path.join("necks","defaultneck.png"))
+            exists = 1
+          except IOError:
+            exists = 0
+          if exists == 1:
+            Log.warn("P%d Chosen neck not valid, fallback defaultneck.png forced." % (playerNum) )
+            Config.set("coffee", neckSettingName, "defaultneck")
+          else:
+            Log.warn("P%d Warning!  Chosen neck not valid, fallbacks Neck_1.png and defaultneck.png also not valid!  Crash imminent!" % (playerNum) )
 
     #Get theme
     self.theme = self.engine.data.theme
     self.themename = self.engine.data.themeLabel
-
-    
 
     try:
       #blazingamer

@@ -57,7 +57,11 @@ class GameResultsSceneServer(GameResultsScene, SceneServer):
 
 class GameResultsSceneClient(GameResultsScene, SceneClient):
   def createClient(self, libraryName, songName, players = 1): #players = None
-    Log.debug("GameResultsSceneClient class init...")
+
+    self.logClassInits = self.engine.config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("GameResultsSceneClient class init...")
+
     self.libraryName     = libraryName
     self.songName        = songName
     self.stars           = [0 for i in players]

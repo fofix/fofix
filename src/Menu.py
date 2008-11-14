@@ -90,7 +90,10 @@ class Choice:
 class Menu(Layer, KeyListener):
   def __init__(self, engine, choices, onClose = None, onCancel = None, pos = (.2, .66 - .35), viewSize = 6, fadeScreen = False, font = "font", mainMenu = None, textColor = None, selectedColor = None, append_submenu_char = True, selectedIndex = None):
     self.engine       = engine
-    Log.debug("Menu class init (Menu.py)...")
+
+    self.logClassInits = self.engine.config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("Menu class init (Menu.py)...")
 
     #Get theme
     themename = self.engine.data.themeLabel

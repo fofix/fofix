@@ -109,8 +109,9 @@ class Drum:
     self.leftyMode      = False
     #self.player         = player
 
-
-    Log.debug("Drum class initialization!")
+    self.logClassInits = self.engine.config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("Drum class initialization!")
     
     self.actualBpm = 0.0
 
@@ -177,7 +178,8 @@ class Drum:
 
     self.hit = [False, False, False, False, False]
 
-    self.neck = self.engine.config.get("coffee", "neck_choose")
+    neckSettingName = "neck_choose_p%d" % (self.player)
+    self.neck = self.engine.config.get("coffee", neckSettingName)
 
     #Get theme
     themename = self.engine.data.themeLabel

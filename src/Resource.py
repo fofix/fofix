@@ -50,7 +50,7 @@ class Loader(Thread):
 
     #myfingershurt: the following should be global and done ONCE:
     #self.game_priority = Config.get("performance", "game_priority")
-
+    self.logLoadings = Config.get("game", "log_loadings")
 
     if target and name:
       setattr(target, name, None)
@@ -119,7 +119,8 @@ class Loader(Thread):
     if self.canceled:
       return
     
-    Log.notice("Loaded %s.%s in %.3f seconds" % (self.target.__class__.__name__, self.name, self.time))
+    if self.logLoadings == 1:
+      Log.notice("Loaded %s.%s in %.3f seconds" % (self.target.__class__.__name__, self.name, self.time))
     
     if self.exception:
       raise self.exception[0], self.exception[1], self.exception[2]
@@ -153,6 +154,7 @@ class Resource(Task):
     if self.baseLibrary and os.path.isdir(self.baseLibrary):
       self.songPath = [self.baseLibrary]
 
+    self.logLoadings = Config.get("game", "log_loadings")
 
   #myfingershurt: Need a function to refresh the base library after a new one is selected:
   def refreshBaseLib(self):
@@ -231,7 +233,10 @@ class Resource(Task):
     os.chmod(path, stat.S_IWRITE | stat.S_IREAD | stat.S_IEXEC)
   
   def load(self, target = None, name = None, function = lambda: None, synch = False, onLoad = None):
-    Log.notice("Loading %s.%s %s" % (target.__class__.__name__, name, synch and "synchronously" or "asynchronously"))
+
+    if self.logLoadings == 1:
+      Log.notice("Loading %s.%s %s" % (target.__class__.__name__, name, synch and "synchronously" or "asynchronously"))
+
     l = Loader(target, name, function, self.resultQueue, self.loaderSemaphore, onLoad = onLoad)
     if synch:
       l.load()
