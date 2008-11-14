@@ -1926,7 +1926,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #MFH - testing new traceback logging:
     #raise TypeError
     
-    
     # update song
     #if self.song:
     if self.song and not self.pause and not self.failed:
@@ -4764,11 +4763,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 # evilynux - Closer to actual GH3
                 font = self.engine.data.pauseFont
                 text = Dialogs.removeSongOrderPrefixFromName(self.song.info.name).upper()
-                scale = 0.0038
+                scale = font.scaleText(text, maxwidth = 0.398, scale = 0.0038)
                 size = font.getStringSize(text, scale = scale)
-                while size[0] > 0.3983:
-                  scale = scale * .95
-                  size = font.getStringSize(text, scale = scale)
                 font.render(text, (.5-size[0]/2.0,.37-size[1]), scale = scale)
   
                 #now = self.getSongPosition()
@@ -5757,11 +5753,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 # evilynux - Closer to actual GH3
                 font = self.engine.data.pauseFont
                 text = Dialogs.removeSongOrderPrefixFromName(self.song.info.name).upper()
-                scale = 0.0038
+                scale = font.scaleText(text, maxwidth = 0.398, scale = 0.0038)
                 size = font.getStringSize(text, scale = scale)
-                while size[0] > 0.3983:
-                  scale = scale * .95
-                  size = font.getStringSize(text, scale = scale)
                 font.render(text, (.5-size[0]/2.0,.37-size[1]), scale = scale)
   
                 #now = self.getSongPosition()

@@ -1853,14 +1853,16 @@ class SongChooser(Layer, KeyListener):
                 if isinstance(item, Song.BlankSpaceInfo):   #for the End of Career marker
                   text = string.upper(text)
   
-  
-                w, h = font.getStringSize(text)
+                # evilynux - automatically scale song name
+                scale = font.scaleText(text, maxwidth = 0.440)
+                w, h = font.getStringSize(text, scale = scale)
+
                 if i == self.selectedIndex:
-                  sfont.render(text, (self.song_list_xpos, .0935*(i+1)-pos[0]*.0935+.15))
+                  sfont.render(text, (self.song_list_xpos, .0935*(i+1)-pos[0]*.0935+.15), scale = scale)
                 else:
-                  lfont.render(text, (self.song_list_xpos, .0935*(i+1)-pos[0]*.0935+.15))
-  
-        
+                  lfont.render(text, (self.song_list_xpos, .0935*(i+1)-pos[0]*.0935+.15), scale = scale)
+
+
                 #MFH - Song list score / info display:
                 if isinstance(item, Song.SongInfo) and not item.getLocked():
                   scale = 0.0009
@@ -1897,7 +1899,10 @@ class SongChooser(Layer, KeyListener):
                   # evilynux - Force uppercase display for artist name
                   text = string.upper(item.artist)+suffix+yeartag
                   
-                  w, h = font.getStringSize(text, scale=scale)
+                  # evilynux - automatically scale artist name and year
+                  scale = font.scaleText(text, maxwidth = 0.440, scale = scale)
+                  w, h = font.getStringSize(text, scale = scale)
+
                   lfont.render(text, (self.song_list_xpos+.05, .0935*(i+1)-pos[0]*.0935+.2), scale=scale)
   
                   if self.scoreTimer == 0 and self.highScoreType == 0: #racer: regular-style highscore movement
@@ -2138,9 +2143,11 @@ class SongChooser(Layer, KeyListener):
                 if isinstance(item, Song.BlankSpaceInfo):
                   text = string.upper(text)
   
-                
-                w, h = font.getStringSize(text)
-                font.render(text, (self.song_list_xpos, .0935*(i+1)-pos[0]*.0935+.15))
+                # evilynux - automatically scale song name
+                scale = font.scaleText(text, maxwidth = 0.64)
+                w, h = font.getStringSize(text, scale = scale)
+
+                font.render(text, (self.song_list_xpos, .0935*(i+1)-pos[0]*.0935+.15), scale = scale)
   
                 if isinstance(item, Song.SongInfo) and not item.getLocked():
                   scale = 0.0009
@@ -2178,8 +2185,10 @@ class SongChooser(Layer, KeyListener):
                   # evilynux - Force uppercase display for artist name
                   text = string.upper(item.artist)+suffix+yeartag
   
-  
-                  w, h = font.getStringSize(text, scale=scale)
+                  # evilynux - automatically scale artist name and year
+                  scale = font.scaleText(text, maxwidth = 0.554, scale = scale)
+                  w, h = font.getStringSize(text, scale = scale)
+
                   font.render(text, (self.song_list_xpos+.05, .0935*(i+1)-pos[0]*.0935+.2), scale=scale)
   
                   if self.scoreTimer == 0 and self.highScoreType == 0: #racer: regular-style highscore movement

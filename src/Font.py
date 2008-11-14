@@ -77,6 +77,14 @@ class Font:
       h = max(s[1], h)
     return (w * scale, h * scale)
 
+  # evilynux - Return scaling factor needed to fit text within maxwidth
+  def scaleText(self, text, maxwidth, scale = 0.002):
+    w, h = self.getStringSize(text, scale = scale)
+    while w > maxwidth:
+      scale = scale * 0.95
+      w, h = self.getStringSize(text, scale = scale)
+    return scale
+
   def getHeight(self):
     """@return: The height of this font"""
     return self.font.get_height() * self.scale
