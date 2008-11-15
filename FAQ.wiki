@@ -28,6 +28,8 @@ IMPORTANT - Note on the memory leak and how to handle it:
 Python version 2.4 (which Frets on Fire 1.2.451 is built on) has an inherent memory leak problem. As you play more songs, this leak will eat more and more of your physical and virtual memory until the game runs unplayably slow.
 Every so often, it is recommended that you quit the game completely and restart it. This clears all memory used and restarts the game fresh.
 
+Update: Windows users have a workaround option to handle the memory leak -- [http://www.snapfiles.com/get/minimem.html MiniMem] can be set to automatically "optimize" memory usage and free leaked memory for "FretsOnFire.exe" 
+
 ----
 
 ===Animated Stage Selection===
