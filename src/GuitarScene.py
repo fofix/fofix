@@ -74,6 +74,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     self.partyMode = False
     self.battle = False #QQstarS:new2 Bettle
+    self.coOp = False
 
     Log.debug("GuitarSceneClient init...")
 
@@ -111,8 +112,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #MFH - check for battle mode
       if self.gameMode2p == 1:
         self.battle = True
+        self.coOp = False
+      elif self.gameMode2p == 3:
+        self.battle = False
+        self.coOp = True
       else:
         self.battle = False
+        self.coOp = False
         
     self.splayers = Players #Spikehead777
 
@@ -1857,6 +1863,22 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         #self.rock[i] -= self.minusRock[i]/5.0/self.multi[i]
         if self.plusRock[i] > self.pluBase:
           self.plusRock[i] -= self.pluGain/2.5/self.multi[i]
+    elif self.coOp and self.numOfPlayers > 1: #battle mode
+      if self.starNotesMissed[i]:
+        self.guitars[i].spEnabled = False
+        self.guitars[i].spNote = False 
+      if self.notesMissed[i]:
+        self.minusRock[0] += self.minGain/self.multi[i]
+        self.rock[0] -= self.minusRock[0]/self.multi[i]
+        if self.plusRock[0] > self.pluBase:
+          self.plusRock[0] -= self.pluGain*2.0/self.multi[i]
+        if self.plusRock[0] <= self.pluBase:
+          self.plusRock[0] = self.pluBase/self.multi[i]
+      if self.lessMissed[i]:
+        self.minusRock[0] += self.minGain/5.0/self.multi[i]
+        self.rock[0] -= self.minusRock[0]/5.0/self.multi[i]
+        if self.plusRock[0] > self.pluBase:
+          self.plusRock[0] -= self.pluGain/2.5/self.multi[i]
     
     else:   #normal mode
       if self.starNotesMissed[i]:
@@ -1904,6 +1926,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.rock[i] = self.rockMax
         if self.minusRock[i] > self.minBase:
           self.minusRock[i] -= self.minGain/2.0*self.multi[i]
+    elif self.coOp and self.numOfPlayers > 1: #battle mode
+      if self.rock[0] < self.rockMax:
+        self.plusRock[0] += self.pluGain*self.multi[i]
+        self.rock[0] += self.plusRock[0]*self.multi[i]
+      if self.rock[0] >= self.rockMax:
+        self.rock[0] = self.rockMax
+      if self.minusRock[0] > self.minBase:
+        self.minusRock[0] -= self.minGain/2.0*self.multi[i]
     
     else:   #normal mode
       if self.rock[i] < self.rockMax:
@@ -1936,12 +1966,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #MFH - new failing detection logic
       if self.failingEnabled:
         #if self.numOfPlayers > 1:
-        somebodyStillAlive = False
-        for i, player in enumerate(self.playerList):
-          if self.rock[i] > 0:
-            somebodyStillAlive = True
-        if not somebodyStillAlive:    #only if everybody has failed
-          self.failed = True
+        if self.numOfPlayers > 1 and self.coOp:
+          if self.rock[0] <= 0:
+            self.failed = True
+        else:
+          somebodyStillAlive = False
+          for i, player in enumerate(self.playerList):
+            if self.rock[i] > 0:
+              somebodyStillAlive = True
+          if not somebodyStillAlive:    #only if everybody has failed
+            self.failed = True
       
       #if self.rock[0] <= 0 and self.numOfPlayers>1 and self.rock[1] <= 0 and self.failingEnabled: #QQstarS: all two are "die" that failing
       #  self.failed = True
@@ -4958,10 +4992,17 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               heightIncrease = h*0.6234375*currentRock*0.65
     
               if currentRock == 1 and self.failingEnabled:
-                self.rockFull.transform.reset()
-                self.rockFull.transform.translate(w*0.07,h*0.5)
-                self.rockFull.transform.scale(.5,.5)
-                self.rockFull.draw()
+                if self.numOfPlayers > 1 and self.coOp:
+                  if i == 0:
+                    self.rockFull.transform.reset()
+                    self.rockFull.transform.translate(w*0.07,h*0.5)
+                    self.rockFull.transform.scale(.5,.5)
+                    self.rockFull.draw()
+                else:
+                  self.rockFull.transform.reset()
+                  self.rockFull.transform.translate(w*0.07,h*0.5)
+                  self.rockFull.transform.scale(.5,.5)
+                  self.rockFull.draw()
               else:
                 if currentRock < 0.333:
                   fillColor = (1,0,0,1)
@@ -4970,44 +5011,83 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 else:
                   fillColor = (0,1,0,1)
     
-                self.rockBottom.transform.reset()
-                self.rockBottom.transform.scale(.5,.5)
-                self.rockBottom.transform.translate(w*0.07, h*0.5)
-                self.rockBottom.draw()
+
+                if self.numOfPlayers > 1 and self.coOp:
+                  if i == 0:
+                    self.rockBottom.transform.reset()
+                    self.rockBottom.transform.scale(.5,.5)
+                    self.rockBottom.transform.translate(w*0.07, h*0.5)
+                    self.rockBottom.draw()
+                else:
+                  self.rockBottom.transform.reset()
+                  self.rockBottom.transform.scale(.5,.5)
+                  self.rockBottom.transform.translate(w*0.07, h*0.5)
+                  self.rockBottom.draw()
   
                 if self.failingEnabled == False:
-                  self.rockOff.transform.reset()
-                  self.rockOff.transform.translate(w*0.07,h*0.5)
-                  self.rockOff.transform.scale(.5,.5)
-                  self.rockOff.draw()
-                else:  
-                  self.rockFill.transform.reset()
-                  self.rockFill.transform.scale(.5,.5*currentRock)
-                  self.rockFill.transform.translate(w*0.07, h*0.3-heightIncrease/2+heightIncrease)
-                  self.rockFill.draw(color = fillColor)
+                  if self.numOfPlayers > 1 and self.coOp:
+                    if i == 0:
+                      self.rockOff.transform.reset()
+                      self.rockOff.transform.translate(w*0.07,h*0.5)
+                      self.rockOff.transform.scale(.5,.5)
+                      self.rockOff.draw()
+                  else:
+                    self.rockOff.transform.reset()
+                    self.rockOff.transform.translate(w*0.07,h*0.5)
+                    self.rockOff.transform.scale(.5,.5)
+                    self.rockOff.draw()
+                else:
+                  if self.numOfPlayers > 1 and self.coOp:
+                    if i == 0:
+                      self.rockFill.transform.reset()
+                      self.rockFill.transform.scale(.5,.5*currentRock)
+                      self.rockFill.transform.translate(w*0.07, h*0.3-heightIncrease/2+heightIncrease)
+                      self.rockFill.draw(color = fillColor)
+                  else:
+                    self.rockFill.transform.reset()
+                    self.rockFill.transform.scale(.5,.5*currentRock)
+                    self.rockFill.transform.translate(w*0.07, h*0.3-heightIncrease/2+heightIncrease)
+                    self.rockFill.draw(color = fillColor)
               
-                self.rockTop.transform.reset()
-                self.rockTop.transform.scale(.5,.5)
-                self.rockTop.transform.translate(w*0.07, h*0.5)
-                self.rockTop.draw()
+                if self.numOfPlayers > 1 and self.coOp:
+                  if i == 0:
+                    self.rockTop.transform.reset()
+                    self.rockTop.transform.scale(.5,.5)
+                    self.rockTop.transform.translate(w*0.07, h*0.5)
+                    self.rockTop.draw()
+                else:
+                  self.rockTop.transform.reset()
+                  self.rockTop.transform.scale(.5,.5)
+                  self.rockTop.transform.translate(w*0.07, h*0.5)
+                  self.rockTop.draw()
   
               wfactor = self.arrow.widthf(pixelw = 60.000)
   
             
               #myfingershurt: separate 2 player instrument icons
               if i == 0:
-                self.arrow.transform.reset()
-                self.arrow.transform.scale(wfactor,-wfactor)
-                self.arrow.transform.translate(w*.1,h*.3+heightIncrease)
-                if self.failingEnabled:  
-                  self.arrow.draw()
+                if self.numOfPlayers > 1 and self.coOp:
+                  self.arrow.transform.reset()
+                  self.arrow.transform.scale(wfactor,-wfactor)
+                  self.arrow.transform.translate(w*.1,h*.3+heightIncrease)
+                  if self.failingEnabled:  
+                    self.arrow.draw()
+                else:
+                  self.arrow.transform.reset()
+                  self.arrow.transform.scale(wfactor,-wfactor)
+                  self.arrow.transform.translate(w*.1,h*.3+heightIncrease)
+                  if self.failingEnabled:  
+                    self.arrow.draw()
                 whichScorePic = self.scorePic
               elif i == 1:
-                self.arrowP2.transform.reset()
-                self.arrowP2.transform.scale(wfactor,-wfactor)
-                self.arrowP2.transform.translate(w*.1,h*.3+heightIncrease)
-                if self.failingEnabled:  
-                  self.arrowP2.draw()
+                if self.numOfPlayers > 1 and self.coOp:
+                  self.arrowP2.transform.reset()
+                else:
+                  self.arrowP2.transform.reset()
+                  self.arrowP2.transform.scale(wfactor,-wfactor)
+                  self.arrowP2.transform.translate(w*.1,h*.3+heightIncrease)
+                  if self.failingEnabled:  
+                    self.arrowP2.draw()
                 whichScorePic = self.scorePicP2
     
               if not self.pause and not self.failed:
