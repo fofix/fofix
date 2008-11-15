@@ -76,7 +76,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
 
   def handleGameStarted(self, sender):
     self.gameStarted = True
-    self.engine.addTask(GameTask(self.engine, self.session))
+    self.engine.addTask(GameTask(self.engine, self.session), synchronized = False)
     self.engine.view.popLayer(self)
 
   def keyPressed(self, key, unicode):
