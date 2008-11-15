@@ -31,7 +31,6 @@ from Input import KeyListener
 from GameTask import GameTask
 from Session import MessageHandler
 from Language import _
-import MainMenu
 import Dialogs
 import Player
 import Song
@@ -71,7 +70,6 @@ class Lobby(Layer, KeyListener, MessageHandler):
     self.session.broker.removeMessageHandler(self)
     if not self.gameStarted:
       self.session.close()
-      #self.engine.view.pushLayer(MainMenu.MainMenu(self.engine))
       self.engine.view.pushLayer(self.engine.mainMenu)    #rchiav: use already-existing MainMenu instance
 
   def handleGameStarted(self, sender):
