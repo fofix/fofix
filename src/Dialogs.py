@@ -724,7 +724,8 @@ class SongChooser(Layer, KeyListener):
     #showLoadingScreen(self.engine, lambda: self.loaded, text = _("Browsing Collection..."))
     self.splash = showLoadingSplashScreen(self.engine, _("Browsing Collection..."))
     
-    self.engine.resource.load(self, "libraries", lambda: Song.getAvailableLibraries(self.engine, self.library), onLoad = self.libraryListLoaded, synch = True) # evilynux - Less BlackSOD[?]
+    # evilynux - Has to be synchronous so we don't return with an empty library list!
+    self.engine.resource.load(self, "libraries", lambda: Song.getAvailableLibraries(self.engine, self.library), onLoad = self.libraryListLoaded, synch = True)
 
     #showLoadingScreen(self.engine, lambda: self.loaded, text = _("Browsing Collection..."))
 
@@ -994,6 +995,10 @@ class SongChooser(Layer, KeyListener):
           self.engine.view.pushLayer(self)
         
     elif c in Player.CANCELS + Player.KEY2S or (c in Player.DRUM1S and self.drumNav):
+      # evilynux - "song" might be in the process of being created,
+      #            stopping the songLoader is safer.
+      if self.songLoader:
+        self.songLoader.stop()
       #if not self.song:
       self.engine.data.cancelSound.setVolume(self.sfxVolume)  #MFH
       self.engine.data.cancelSound.play()
@@ -1186,7 +1191,6 @@ class SongChooser(Layer, KeyListener):
     if self.songLoader:
       self.songLoader.stop()
 
-    #self.songLoader = self.engine.resource.load(self, None, lambda: Song.loadSong(self.engine, song, playbackOnly = True, library = self.library), synch = True, onLoad = self.songLoaded) # evilynux - Less BlackSOD[?]    
     self.songLoader = self.engine.resource.load(self, None, lambda: Song.loadSong(self.engine, song, playbackOnly = True, library = self.library), synch = False, onLoad = self.songLoaded) #Blazingamer - asynchronous preview loading allows "Loading Preview..." to correctly disappear.
 
   def run(self, ticks):
@@ -2305,9 +2309,8 @@ class SongChooser(Layer, KeyListener):
         glColor3f(1, 1, 1)
         w, h = font.getStringSize(text, scale=scale)
         font.render(text, (0.85-w, 0.10), scale=scale)
-  
         self.engine.view.resetProjection()
-          
+
 class FileChooser(BackgroundLayer, KeyListener):
   """File choosing layer."""
   def __init__(self, engine, masks, path, prompt = "", dirSelect = False):
