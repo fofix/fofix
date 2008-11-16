@@ -24,9 +24,9 @@ dataFiles = [
 OPTIONS = {
  'argv_emulation': True,
  'dist_dir': '../dist',
- 'dylib_excludes': 'OpenGL,AGL',
  'frameworks' : '../../glew/lib/libGLEW.dylib',
  'iconfile': '../icon_mac_composed.icns',
+ 'plist': dict(CFBundleIdentifier='org.pythonmac.FoFiX.FretsonFire'),
  'includes': SceneFactory.scenes,
  'excludes': ['glew.gl.apple'
       "glew.gl.ati",
