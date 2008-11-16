@@ -1396,14 +1396,16 @@ class Guitar:
           big = True
           self.bigMax += 1
 
-      if event.star or event.finalStar:
-        if big == True and tailOnly == True:
-          self.killPoints = True
+      #if event.star or event.finalStar:
+      #  if big == True and tailOnly == True:
+      #    self.killPoints = True
 
-      #MFH - TODO - filter out this tail whitening when starpower notes have been disbled from a screwup
-      if not killswitch == False:
+      #MFH - filter out this tail whitening when starpower notes have been disbled from a screwup
+      if self.spEnabled and killswitch:
+      #if not killswitch == False:
         if event.star or event.finalStar:
           if big == True and tailOnly == True:
+            self.killPoints = True
             color = (1,1,1,1)
 
       if z + length < -1.0:
@@ -1559,13 +1561,15 @@ class Guitar:
           big = True
           self.bigMax += 1
 
-      if event.star or event.finalStar:
-        if big == True and tailOnly == True:
-          self.killPoints = True
+      #if event.star or event.finalStar:
+      #  if big == True and tailOnly == True:
+      #    self.killPoints = True
 
-      if not killswitch == False:
+      #if not killswitch == False:
+      if self.spEnabled and killswitch:
         if event.star or event.finalStar:
           if big == True and tailOnly == True:
+            self.killPoints = True
             color = (1,1,1,1)
 
       if z + length < -1.0:
