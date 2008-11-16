@@ -948,7 +948,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     # evilynux - More themeable options
     self.rockmeter_score_color = Theme.hexToColor(Theme.rockmeter_score_colorVar)
-    self.fail_completed_color = Theme.hexToColor(Theme.song_name_selected_colorVar) # text same color as selected song
+    
+    #self.fail_completed_color = Theme.hexToColor(Theme.song_name_selected_colorVar) # text same color as selected song
+    self.fail_completed_color = Theme.hexToColor(Theme.fail_text_colorVar)  #No, now same as fail_text color.
+    
     self.ingame_stats_color = Theme.hexToColor(Theme.ingame_stats_colorVar)
 
     Log.debug("Pause text / selected hex colors: " + Theme.pause_text_colorVar + " / " + Theme.pause_selected_colorVar)
