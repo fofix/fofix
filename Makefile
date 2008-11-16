@@ -2,7 +2,7 @@ CXFREEZE=/usr/src/experimental/cx_Freeze-3.0.3/FreezePython
 PYTHON=python2.4
 PYTHON_LIBS=/usr/lib/python2.4
 USE_AMANITH=1
-MESSAGESPOT=src/messages.pot
+MESSAGESPOT=messages.pot
 
 # evilynux - Dynamically update the version number, this is "clever" but hard to understand... :-(
 VERSION=`grep "versionString =" src/GameEngine.py | sed -e "s/.\+\(\([0-9]\+\.\)\+[0-9]\+\).\+/\1/g"`
@@ -84,7 +84,9 @@ sdist:	doc
 	tar cvzf FretsOnFire-src-$(VERSION).tar.gz FretsOnFire-src-$(VERSION)
 
 translations:
-	xgettext --from-code iso-8859-1 -k_ -kN_ -o $(MESSAGESPOT) src/*.py
+	cd src && \
+	xgettext --from-code iso-8859-1 -k_ -kN_ -o $(MESSAGESPOT) *.py && \
+	cd ..
 	
 clean:
 	@rm -rf dist build doc/html
