@@ -364,7 +364,7 @@ class GameEngine(Engine):
     fps          = self.config.get("video", "fps")
     Engine.__init__(self, fps = fps)
     
-    self.title             = _("Frets on Fire " + self.versionString)
+    self.title             = self.versionString
     self.restartRequested  = False
     self.handlingException = False
     self.video             = Video(self.title)
