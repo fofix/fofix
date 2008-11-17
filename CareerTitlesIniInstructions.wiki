@@ -1,0 +1,5 @@
+#summary Career Mode's titles.ini Instructions
+
+= How to work with Career Mode's {{{titles.ini}}} =
+
+_coming soon!_
