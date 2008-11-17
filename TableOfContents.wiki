@@ -1,7 +1,12 @@
 ==Other Pages==
   * [BasicInstructions]
   * [FAQ]
+  * [ThemeFileSettings]
+  * [SongINIInstructions]
+  * [CareerTitlesIniInstructions]
   * [KnownIssues]
-  * [ProjectStatistics]
   * [ReportingBugs]
   * [RequiredSourceModules]
+  * [ProjectStatistics]
+
+  * [OldNews]
