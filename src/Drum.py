@@ -81,6 +81,9 @@ class Drum:
 
     self.cappedScoreMult = 0
 
+    self.isStarPhrase = False
+    self.finalStarSeen = False
+    
     self.accThresholdWorstLate = 0
     self.accThresholdVeryLate = 0
     self.accThresholdLate = 0
@@ -1060,18 +1063,7 @@ class Drum:
       if event.number != 0:   #skip all regular notes
         continue
 
-      #for q in self.starNotes:
-      #  if time == q:
-      #    event.star = True
-      #    enable = False
-      #for q in self.maxStars:
-      #  if time == q:
-      #    event.finalStar = True
-      #    enable = False
-
       c = self.fretColors[event.number]
-      
-      
       
       isOpen = False
       if event.number == 0: #treat open string note differently
@@ -1107,9 +1099,12 @@ class Drum:
         elif self.spRefillMode == 1 and self.theme != 2:  #mode 1 = overdrive refill notes in RB themes only
           self.spEnabled = False
 
-      if event.star or event.finalStar:
+      if event.star:
+        self.isStarPhrase = True
         self.openStarNotesInView = True
-
+      if event.finalStar:
+        self.finalStarSeen = True
+        self.openStarNotesInView = True
 
       if event.star and self.spEnabled:
         spNote = True
@@ -1162,9 +1157,10 @@ class Drum:
       glPopMatrix()
 
     #myfingershurt: end FOR loop / note rendering loop       
-    if (not self.openStarNotesInView) and (not self.starNotesInView):
+    if (not self.openStarNotesInView) and (not self.starNotesInView) and self.finalStarSeen:
       self.spEnabled = True
-
+      self.finalStarSeen = False
+      self.isStarPhrase = False
 
   def renderNotes(self, visibility, song, pos):
     if not song:
@@ -1184,6 +1180,7 @@ class Drum:
     num = 0
     enable = True
     self.starNotesInView = False
+    
     #for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard):
     for time, event in reversed(track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)):    #MFH - reverse order of note rendering
       if isinstance(event, Tempo):
@@ -1206,21 +1203,14 @@ class Drum:
       if event.number == 0: #MFH - skip all open notes
         continue
 
-
-      #for q in self.starNotes:
-      #  if time == q:
-      #    event.star = True
-      #    enable = False
-      #for q in self.maxStars:
-      #  if time == q:
-      #    event.finalStar = True
-      #    enable = False
-
       c = self.fretColors[event.number]
       
-      if event.star or event.finalStar:
+      if event.star:
+        self.isStarPhrase = True
         self.starNotesInView = True
-      
+      if event.finalStar:
+        self.finalStarSeen = True
+        self.starNotesInView = True
       
       isOpen = False
       if event.number == 0: #treat open string note differently
@@ -1310,8 +1300,10 @@ class Drum:
       glPopMatrix()
 
     #myfingershurt: end FOR loop / note rendering loop       
-    if (not self.openStarNotesInView) and (not self.starNotesInView):
+    if (not self.openStarNotesInView) and (not self.starNotesInView) and self.finalStarSeen:
       self.spEnabled = True
+      self.isStarPhrase = False
+      self.finalStarSeen = False
 
   def renderFrets(self, visibility, song, controls):
     w = self.boardWidth / self.strings

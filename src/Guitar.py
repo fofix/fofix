@@ -68,6 +68,9 @@ class Guitar:
     self.cappedScoreMult = 0
     self.starSpinFrameIndex = 0
 
+    self.isStarPhrase = False
+    self.finalStarSeen = False
+
     self.accThresholdWorstLate = 0
     self.accThresholdVeryLate = 0
     self.accThresholdLate = 0
@@ -1278,7 +1281,7 @@ class Guitar:
     num = 0
     enable = True
     starEventsInView = False
-    
+
     for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard):
     #for time, event in reversed(track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)):    #MFH - reverse order of note rendering
       if isinstance(event, Tempo):
@@ -1339,8 +1342,13 @@ class Guitar:
           self.spEnabled = False
 
 
-      if event.star or event.finalStar:
+      if event.star:
+        self.isStarPhrase = True
         starEventsInView = True
+      if event.finalStar:
+        self.finalStarSeen = True
+        starEventsInView = True
+
 
       if event.star and self.spEnabled:
         spNote = True
@@ -1426,8 +1434,10 @@ class Guitar:
         self.renderNote(length, sustain = sustain, kill = killswitch, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote)
       glPopMatrix()
 
-    if not starEventsInView:
+    if (not starEventsInView and self.finalStarSeen):
       self.spEnabled = True
+      self.finalStarSeen = False
+      self.isStarPhrase = False
 
   def renderTails(self, visibility, song, pos, killswitch):
     if not song:
@@ -1498,11 +1508,11 @@ class Guitar:
       spNote = False
 
       #myfingershurt: user setting for starpower refill / replenish notes
-      if self.starPowerActive:
-        if self.spRefillMode == 0:    #mode 0 = no starpower / overdrive refill notes
-          self.spEnabled = False
-        elif self.spRefillMode == 1 and self.theme != 2:  #mode 1 = overdrive refill notes in RB themes only
-          self.spEnabled = False
+      #if self.starPowerActive:
+      #  if self.spRefillMode == 0:    #mode 0 = no starpower / overdrive refill notes
+      #    self.spEnabled = False
+      #  elif self.spRefillMode == 1 and self.theme != 2:  #mode 1 = overdrive refill notes in RB themes only
+      #    self.spEnabled = False
 
 
       if event.star and self.spEnabled:
