@@ -75,7 +75,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.partyMode = False
     self.battle = False #QQstarS:new2 Bettle
     self.coOp = False
-
     Log.debug("GuitarSceneClient init...")
 
 
@@ -119,7 +118,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       else:
         self.battle = False
         self.coOp = False
-        
+
     self.splayers = Players #Spikehead777
 
     #myfingershurt: drums :)
@@ -1366,6 +1365,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       thePlayer.stars = 0
     self.partialStar = [0 for i in self.playerList]
     self.resetStarThresholds()
+    self.coOpScore = 0
+    self.coOpStars = 0
+    self.lastCoOpStars = 0
+    self.coOpPartialStars = 0
+    self.coOpNotesHit = 0
     self.mutedLastSecondYet = False
     self.dispSoloReview = [False for i in self.playerList]
     self.soloReviewCountdown = [0 for i in self.playerList]
@@ -1869,6 +1873,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         #self.rock[i] -= self.minusRock[i]/5.0/self.multi[i]
         if self.plusRock[i] > self.pluBase:
           self.plusRock[i] -= self.pluGain/2.5/self.multi[i]
+    
+    #MFH TODO - maintain separate rock status for each player in co-op mode
     elif self.coOp and self.numOfPlayers > 1: #battle mode
       if self.starNotesMissed[i] or self.guitars[i].isStarPhrase:
         self.guitars[i].spEnabled = False
@@ -1932,7 +1938,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.rock[i] = self.rockMax
         if self.minusRock[i] > self.minBase:
           self.minusRock[i] -= self.minGain/2.0*self.multi[i]
-    elif self.coOp and self.numOfPlayers > 1: #battle mode
+    
+    #MFH TODO maintain separate rock status for each player
+    elif self.coOp and self.numOfPlayers > 1: 
       if self.rock[0] < self.rockMax:
         self.plusRock[0] += self.pluGain*self.multi[i]
         self.rock[0] += self.plusRock[0]*self.multi[i]
@@ -1972,6 +1980,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #MFH - new failing detection logic
       if self.failingEnabled:
         #if self.numOfPlayers > 1:
+        #MFH TODO - maintain separate rock status, just combine into single rockmeter (2 arrows) for RB theme
+        # this will also allow separate failing, and saving with starpower
         if self.numOfPlayers > 1 and self.coOp:
           if self.rock[0] <= 0:
             self.failed = True
@@ -2270,9 +2280,19 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.notesHit[num] = True #QQstarS:Set [0] to [i]
       
       self.playerList[num].notesHit += 1  # glorandwarf: was len(self.guitars[num].playedNotes)
-      self.updateStars(num)
+      tempScoreValue = len(self.guitars[num].playedNotes) * 50 * self.multi[num]
+      self.playerList[num].addScore(tempScoreValue) 
+      
+      if self.coOp:
+        self.coOpScore += tempScoreValue 
+        self.coOpNotesHit += 1
+        self.updateStars(self.coOpPlayerIndex)
+      else:
+        self.updateStars(num)
+      
       self.updateAvMult(num)
-      self.playerList[num].addScore(len(self.guitars[num].playedNotes) * 50 * self.multi[num]) #QQstarS
+      
+      
       self.stage.triggerPick(pos, [n[1].number for n in self.guitars[num].playedNotes])
       if self.playerList[num].streak % 10 == 0:
         self.lastMultTime[num] = pos
@@ -2354,10 +2374,18 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.notesHit[num] = True #QQstarS:Set [0] to [i]
         
       self.playerList[num].notesHit += 1  # glorandwarf: was len(self.guitars[num].playedNotes)
-      self.updateStars(num)
+      tempScoreValue = len(self.guitars[num].playedNotes) * 50 * self.multi[num]
+      self.playerList[num].addScore(tempScoreValue)
+      
+      if self.coOp:
+        self.coOpScore += tempScoreValue 
+        self.coOpNotesHit += 1
+        self.updateStars(self.coOpPlayerIndex)
+      else:
+        self.updateStars(num)
+      
       self.updateAvMult(num)
       self.stage.triggerPick(pos, [n[1].number for n in self.guitars[num].playedNotes])    
-      self.players[num].addScore(len(self.guitars[num].playedNotes) * 50 * self.multi[num]) #QQstarS
       if self.players[num].streak % 10 == 0:
         self.lastMultTime[num] = self.getSongPosition()
         self.guitars[num].setMultiplier(self.playerList[num].getScoreMultiplier())
@@ -2435,10 +2463,19 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
       self.currentlyAnimating = True        
       self.playerList[num].notesHit += 1  # glorandwarf: was len(self.guitars[num].playedNotes)
-      self.updateStars(num)
+      tempScoreValue = len(self.guitars[num].playedNotes) * 50 * self.multi[num]
+      self.playerList[num].addScore(tempScoreValue)
+      
+      if self.coOp:
+        self.coOpScore += tempScoreValue 
+        self.coOpNotesHit += 1
+        self.updateStars(self.coOpPlayerIndex)
+      else:
+        self.updateStars(num)
+      
       self.updateAvMult(num)
+
       self.stage.triggerPick(pos, [n[1].number for n in self.guitars[num].playedNotes])    
-      self.players[num].addScore(len(self.guitars[num].playedNotes) * 50)
       if self.players[num].streak % 10 == 0:
         self.lastMultTime[num] = self.getSongPosition()
         self.guitars[num].setMultiplier(self.playerList[num].getScoreMultiplier())
@@ -2751,11 +2788,20 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.notesHit[num] = True #QQstarS:Set [0] to [i]
 
       self.currentlyAnimating = True        
+
       self.playerList[num].notesHit += 1  # glorandwarf: was len(self.guitars[num].playedNotes)
-      self.updateStars(num)
+      tempScoreValue = len(self.guitars[num].playedNotes) * 50 * self.multi[num]
+      self.playerList[num].addScore(tempScoreValue)
+      
+      if self.coOp:
+        self.coOpScore += tempScoreValue 
+        self.coOpNotesHit += 1
+        self.updateStars(self.coOpPlayerIndex)
+      else:
+        self.updateStars(num)
+      
       self.updateAvMult(num)
       self.stage.triggerPick(pos, [n[1].number for n in self.guitars[num].playedNotes])    
-      self.players[num].addScore(len(self.guitars[num].playedNotes) * 50 * self.multi[num]) #QQstarS
       if self.players[num].streak % 10 == 0:
         self.lastMultTime[num] = self.getSongPosition()
         self.guitars[num].setMultiplier(self.playerList[num].getScoreMultiplier())
@@ -3198,7 +3244,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if pickLength > 1.1 * self.song.period / 4:
       tempExtraScore = .1 * pickLength * noteCount
       if self.starScoreUpdates == 1:
-        self.updateStarsWithSustain(num, tempExtraScore)
+        if self.coOp:
+          self.updateStars(self.coOpPlayerIndex, tempExtraScore = tempExtraScore)
+        else:
+          self.updateStars(num, tempExtraScore = tempExtraScore)
       return int(tempExtraScore)   #original FoF sustain scoring
     return 0
 
@@ -3354,6 +3403,22 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.avg1xScore = []
     self.finalScoreThreshold = []
     self.finalHitNotesThreshold = []
+
+    #MFH - TODO - add separate co-op star scoring structure
+    #  must maintain separate scores and star scores for uploading and highscore saving
+    #  and a setting to not play star ding sounds when catching up at end of song 
+    #    (co op mode will catch up and calculate individual star scores here at the end of a song)
+    #  Only display co-op score and star score for co-op mode; hide individual scores & stars
+    self.coOpScore = 0
+    self.coOpStars = 0
+    self.lastCoOpStars = 0
+    self.coOpPartialStars = 0
+    self.coOpNotesHit = 0
+    self.starThresholdsCoOp = []
+    self.coOpTotalStreakNotes = 0
+    self.coOpPlayerIndex = len(self.playerList)
+    #if self.coOp:
+
     
     #player1:
     playerNum = 0
@@ -3654,15 +3719,175 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.starThresholdsP2.append( (5, 0, int(0.00*baseScore), int(0.95*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
         self.starThresholdsP2.append( (6, 0, int(0.00*baseScore), int(1.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
   
+      
       self.maxStarThresholdIndex[playerNum]=len(self.starThresholdsP2) - 1
       self.getNextStarThresholds(playerNum)   #start it at the first threshold pair to surpass
       tempFS, tempPS, self.finalScoreThreshold[playerNum], self.finalHitNotesThreshold[playerNum] = self.starThresholdsP2[-1]
     
+      #MFH - still numOfPlayers > 1:
+      if self.coOp:   #now create array of tuples for co-op mode star score thresholds
+        self.coOpTotalStreakNotes = 0
+        baseScore = 0
+        for playerNum, playa in enumerate(self.playerList):   #accumulate base scoring values for co-op
+          self.coOpTotalStreakNotes += self.playerList[playerNum].totalStreakNotes
+          baseScore += self.avg1xScore[playerNum]
+        self.avg1xScore.append(baseScore)
+        self.starThresholdIndex.append(0)   #to index self.coOpPlayerIndex
+        self.nextScoreThreshold.append(0)
+        self.nextHitNotesThreshold.append(0)
+        self.nextStar.append(0)
+        self.nextPartialStar.append(0)
+        self.maxStarThresholdIndex.append(0)
+        self.finalScoreThreshold.append(0)
+        self.finalHitNotesThreshold.append(0)
+
+        if self.starScoring == 1:     #GH style scoring
+          #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (0, 0, int(0.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - first always all 0's
+          self.starThresholdsCoOp.append( (1, 0, int(0.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - first threshold(s) to surpass
+          self.starThresholdsCoOp.append( (1, 1, int(0.05*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (1, 2, int(0.10*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (1, 3, int(0.15*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (1, 4, int(0.20*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (1, 5, int(0.25*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (1, 6, int(0.30*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (1, 7, int(0.35*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (2, 0, int(0.40*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (2, 1, int(0.50*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (2, 2, int(0.60*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (2, 3, int(0.70*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (2, 4, int(0.80*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (2, 5, int(0.90*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (2, 6, int(1.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (2, 7, int(1.10*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (3, 0, int(1.20*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (3, 1, int(1.30*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (3, 2, int(1.40*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (3, 3, int(1.50*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (3, 4, int(1.60*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (3, 5, int(1.70*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (3, 6, int(1.80*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (3, 7, int(1.90*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (4, 0, int(2.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (4, 1, int(2.10*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (4, 2, int(2.20*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (4, 3, int(2.30*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (4, 4, int(2.40*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (4, 5, int(2.50*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (4, 6, int(2.60*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (4, 7, int(2.70*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (5, 0, int(2.80*baseScore), int(0.90*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (6, 0, int(0.00*baseScore), int(1.00*self.coOpTotalStreakNotes) ) )
+      
+            
+        elif self.starScoring == 2 or self.starScoring == 3:   #RB style scoring
+          #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (0, 0, int(0.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - first always all 0's
+          self.starThresholdsCoOp.append( (0, 1, int(0.03125*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (0, 2, int(0.0625*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (0, 3, int(0.09375*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (0, 4, int(0.125*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (0, 5, int(0.15625*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (0, 6, int(0.1875*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (0, 7, int(0.21875*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (1, 0, int(0.25*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (1, 1, int(0.28125*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (1, 2, int(0.3125*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (1, 3, int(0.34375*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (1, 4, int(0.375*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (1, 5, int(0.40625*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (1, 6, int(0.4375*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (1, 7, int(0.46875*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (2, 0, int(0.5*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (2, 1, int(0.5625*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (2, 2, int(0.625*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (2, 3, int(0.6875*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (2, 4, int(0.75*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (2, 5, int(0.8125*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (2, 6, int(0.875*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (2, 7, int(0.9375*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (3, 0, int(1.0*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (3, 1, int(1.125*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (3, 2, int(1.25*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (3, 3, int(1.375*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (3, 4, int(1.5*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (3, 5, int(1.625*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (3, 6, int(1.75*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (3, 7, int(1.875*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (4, 0, int(2.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (4, 1, int(2.125*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (4, 2, int(2.25*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (4, 3, int(2.375*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (4, 4, int(2.5*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (4, 5, int(2.625*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (4, 6, int(2.75*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (4, 7, int(2.875*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          self.starThresholdsCoOp.append( (5, 0, int(3.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          if self.guitars[playerNum].isBassGuitar:
+            #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+            self.starThresholdsCoOp.append( (6, 0, int(4.80*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          elif self.guitars[playerNum].isDrum:
+            #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+            self.starThresholdsCoOp.append( (6, 0, int(4.65*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+          else:   #guitar parts
+            #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+            self.starThresholdsCoOp.append( (6, 0, int(5.30*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+    
+          if self.starScoring == 3:   #if RB+GH scoring, 100% automatically skips you to 6 stars
+            self.starThresholdsCoOp.append( (6, 0, int(0.00*baseScore), int(1.00*self.coOpTotalStreakNotes) ) )
+    
+        
+        else:   #0 = FoF scoring
+          #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (0, 0, int(0.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - first always all 0's
+          self.starThresholdsCoOp.append( (1, 0, int(0.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (1, 1, int(0.00*baseScore), int(0.03125*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (1, 2, int(0.00*baseScore), int(0.0625*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (1, 3, int(0.00*baseScore), int(0.09375*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (1, 4, int(0.00*baseScore), int(0.125*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (1, 5, int(0.00*baseScore), int(0.15625*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (1, 6, int(0.00*baseScore), int(0.1875*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (1, 7, int(0.00*baseScore), int(0.21875*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (2, 0, int(0.00*baseScore), int(0.25*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (2, 1, int(0.00*baseScore), int(0.28125*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (2, 2, int(0.00*baseScore), int(0.3125*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (2, 3, int(0.00*baseScore), int(0.34375*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (2, 4, int(0.00*baseScore), int(0.375*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (2, 5, int(0.00*baseScore), int(0.40625*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (2, 6, int(0.00*baseScore), int(0.4375*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (2, 7, int(0.00*baseScore), int(0.46875*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (3, 0, int(0.00*baseScore), int(0.50*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (3, 1, int(0.00*baseScore), int(0.53125*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (3, 2, int(0.00*baseScore), int(0.5625*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (3, 3, int(0.00*baseScore), int(0.59375*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (3, 4, int(0.00*baseScore), int(0.625*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (3, 5, int(0.00*baseScore), int(0.65625*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (3, 6, int(0.00*baseScore), int(0.6875*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (3, 7, int(0.00*baseScore), int(0.71875*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (4, 0, int(0.00*baseScore), int(0.75*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (4, 1, int(0.00*baseScore), int(0.775*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (4, 2, int(0.00*baseScore), int(0.80*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (4, 3, int(0.00*baseScore), int(0.825*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (4, 4, int(0.00*baseScore), int(0.85*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (4, 5, int(0.00*baseScore), int(0.875*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (4, 6, int(0.00*baseScore), int(0.90*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (4, 7, int(0.00*baseScore), int(0.925*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (5, 0, int(0.00*baseScore), int(0.95*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+          self.starThresholdsCoOp.append( (6, 0, int(0.00*baseScore), int(1.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+    
+        
+        self.maxStarThresholdIndex[self.coOpPlayerIndex]=len(self.starThresholdsP2) - 1
+        self.getNextStarThresholds(self.coOpPlayerIndex)   #start it at the first threshold pair to surpass
+        tempFS, tempPS, self.finalScoreThreshold[self.coOpPlayerIndex], self.finalHitNotesThreshold[self.coOpPlayerIndex] = self.starThresholdsCoOp[-1]
+      
 
   def resetStarThresholds(self):
     for i, player in enumerate(self.playerList):
       self.starThresholdIndex[i] = 0
       self.getNextStarThresholds(i)
+    if self.coOp:
+      self.starThresholdIndex[self.coOpPlayerIndex] = 0
+      self.getNextStarThresholds(self.coOpPlayerIndex)
 
   def getNextStarThresholds(self, playerNum):
     #ready for a new tuple o' data
@@ -3671,10 +3896,34 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.nextStar[playerNum], self.nextPartialStar[playerNum], self.nextScoreThreshold[playerNum], self.nextHitNotesThreshold[playerNum] = self.starThresholdsP1[self.starThresholdIndex[playerNum]]
     elif playerNum == 1:
       self.nextStar[playerNum], self.nextPartialStar[playerNum], self.nextScoreThreshold[playerNum], self.nextHitNotesThreshold[playerNum] = self.starThresholdsP2[self.starThresholdIndex[playerNum]]
+    elif playerNum == self.coOpPlayerIndex:
+      self.nextStar[playerNum], self.nextPartialStar[playerNum], self.nextScoreThreshold[playerNum], self.nextHitNotesThreshold[playerNum] = self.starThresholdsCoOp[self.starThresholdIndex[playerNum]]    
 
 
-  def updateStarsWithSustain(self, playerNum, tempExtraScore):
-    if (self.inGameStars == 2 or (self.inGameStars == 1 and self.theme == 2) ) and self.playerList[playerNum].stars < 6:
+  def updateStars(self, playerNum, forceUpdate = False, tempExtraScore = 0):    #MFH - merging the two star update functions
+    if playerNum == self.coOpPlayerIndex:
+      if forceUpdate or ( (self.inGameStars == 2 or (self.inGameStars == 1 and self.theme == 2) ) and self.coOpStars < 6 ):
+        self.lastCoOpStars = self.coOpStars
+  
+        if (self.coOpScore + tempExtraScore) >= self.finalScoreThreshold[playerNum] and self.coOpNotesHit >= self.finalHitNotesThreshold[playerNum]:
+          #force last index, max stars
+          self.coOpStars = 6
+          self.coOpPartialStars = 0
+          self.starThresholdIndex[playerNum] = self.maxStarThresholdIndex[playerNum]
+  
+        #make sure we're not at the last threshold tuple, or the following might cause an infinite loop!
+        while (self.starThresholdIndex[playerNum] < self.maxStarThresholdIndex[playerNum]) and ( (self.coOpScore + tempExtraScore) >= self.nextScoreThreshold[playerNum]) and (self.coOpNotesHit >= self.nextHitNotesThreshold[playerNum]):
+          #may be ready for a new tuple, check to see if stars and partialstars already match or not:
+          #if (self.playerList[playerNum].stars < self.nextStar[playerNum]) or (self.partialStar[playerNum] < self.nextPartialStar[playerNum]):
+          self.coOpStars = self.nextStar[playerNum]
+          self.coOpPartialStars = self.nextPartialStar[playerNum]
+          self.getNextStarThresholds(playerNum)
+    
+        if self.coOpStars != self.lastCoOpStars and self.engine.data.starDingSoundFound:  #new star gained!
+          #self.engine.data.starDingSound.setVolume(self.sfxVolume) #MFH - no need to retrieve from INI file every star ding...
+          self.engine.data.starDingSound.play()
+    
+    elif forceUpdate or ( (self.inGameStars == 2 or (self.inGameStars == 1 and self.theme == 2) ) and self.playerList[playerNum].stars < 6 ):
       self.lastStars[playerNum] = self.playerList[playerNum].stars
 
       #if self.nextStar[playerNum] == 0 and self.nextPartialStar[playerNum] == 0:    #need to get first threshold to surpass
@@ -3688,32 +3937,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
       #make sure we're not at the last threshold tuple, or the following might cause an infinite loop!
       while (self.starThresholdIndex[playerNum] < self.maxStarThresholdIndex[playerNum]) and ( (self.playerList[playerNum].score + tempExtraScore) >= self.nextScoreThreshold[playerNum]) and (self.playerList[playerNum].notesHit >= self.nextHitNotesThreshold[playerNum]):
-        #may be ready for a new tuple, check to see if stars and partialstars already match or not:
-        #if (self.playerList[playerNum].stars < self.nextStar[playerNum]) or (self.partialStar[playerNum] < self.nextPartialStar[playerNum]):
-        self.playerList[playerNum].stars = self.nextStar[playerNum]
-        self.partialStar[playerNum] = self.nextPartialStar[playerNum]
-        self.getNextStarThresholds(playerNum)
-  
-      if self.playerList[playerNum].stars != self.lastStars[playerNum] and self.engine.data.starDingSoundFound:  #new star gained!
-        #self.engine.data.starDingSound.setVolume(self.sfxVolume) #MFH - no need to retrieve from INI file every star ding...
-        self.engine.data.starDingSound.play()
-
-
-  def updateStars(self, playerNum, forceUpdate = False):
-    if forceUpdate or ( (self.inGameStars == 2 or (self.inGameStars == 1 and self.theme == 2) ) and self.playerList[playerNum].stars < 6 ):
-      self.lastStars[playerNum] = self.playerList[playerNum].stars
-
-      #if self.nextStar[playerNum] == 0 and self.nextPartialStar[playerNum] == 0:    #need to get first threshold to surpass
-      #  self.getNextStarThresholds(playerNum)
-
-      if self.playerList[playerNum].score >= self.finalScoreThreshold[playerNum] and self.playerList[playerNum].notesHit >= self.finalHitNotesThreshold[playerNum]:
-        #force last index, max stars
-        self.playerList[playerNum].stars = 6
-        self.partialStar[playerNum] = 0
-        self.starThresholdIndex[playerNum] = self.maxStarThresholdIndex[playerNum]
-
-      #make sure we're not at the last threshold tuple, or the following might cause an infinite loop!
-      while (self.starThresholdIndex[playerNum] < self.maxStarThresholdIndex[playerNum]) and (self.playerList[playerNum].score >= self.nextScoreThreshold[playerNum]) and (self.playerList[playerNum].notesHit >= self.nextHitNotesThreshold[playerNum]):
         #may be ready for a new tuple, check to see if stars and partialstars already match or not:
         #if (self.playerList[playerNum].stars < self.nextStar[playerNum]) or (self.partialStar[playerNum] < self.nextPartialStar[playerNum]):
         self.playerList[playerNum].stars = self.nextStar[playerNum]
@@ -4046,43 +4269,50 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               #===============blazingamer GH2 scoremeter
               
               
-              scoretext = locale.format("%d", player.score + self.getExtraScoreForCurrentlyPlayedNotes(i), grouping=True)
-              scoretext = scoretext.replace(",","   ")
-              scW, scH = scoreFont.getStringSize(scoretext)
-  
-              score = player.score + self.getExtraScoreForCurrentlyPlayedNotes(i)
-              score6 = score/1000000
-              score5 = (score-score6*1000000)/100000
-              score4 = (score-score6*1000000-score5*100000)/10000
-              score3 = (score-score6*1000000-score5*100000 - score4*10000)/1000
-              score2 = (score-score6*1000000-score5*100000 - score4*10000-score3*1000)/100
-              score1 = (score-score6*1000000-score5*100000 - score4*10000-score3*1000-score2*100)/10
-              score0 = (score-score6*1000000-score5*100000 - score4*10000-score3*1000-score2*100-score1*10)
-             
-              glColor4f(0,0,0,1)
-              text = str(score0)
-              size = scoreFont.getStringSize(text)
-              scoreFont.render(text, (.189, 0.519))
-              if player.score >= 10:
-                text = str(score1)
-                size = streakFont.getStringSize(text)
-                scoreFont.render(text, (.168, 0.522))
-              if player.score >= 100:
-                text = str(score2)
-                size = streakFont.getStringSize(text)
-                scoreFont.render(text, (.148, 0.524))
-              if player.score >= 1000:
-                text = str(score3)
-                size = streakFont.getStringSize(text)
-                scoreFont.render(text, (.118, 0.527))
-              if player.score >= 10000:
-                text = str(score4)
-                size = streakFont.getStringSize(text)
-                scoreFont.render(text, (.095, 0.530))
-              if player.score >= 100000:
-                text = str(score5)
-                size = streakFont.getStringSize(text)
-                scoreFont.render(text, (.074, 0.532))
+              if (self.coOp and i == 0) or not self.coOp:  #MFH only render for player 0 if co-op mode
+
+                if self.coOp:
+                  score=self.coOpScore
+                else:
+                  score=player.score
+                score += self.getExtraScoreForCurrentlyPlayedNotes(i)
+
+                scoretext = locale.format("%d", score, grouping=True)
+                scoretext = scoretext.replace(",","   ")
+                scW, scH = scoreFont.getStringSize(scoretext)
+    
+                score6 = score/1000000
+                score5 = (score-score6*1000000)/100000
+                score4 = (score-score6*1000000-score5*100000)/10000
+                score3 = (score-score6*1000000-score5*100000 - score4*10000)/1000
+                score2 = (score-score6*1000000-score5*100000 - score4*10000-score3*1000)/100
+                score1 = (score-score6*1000000-score5*100000 - score4*10000-score3*1000-score2*100)/10
+                score0 = (score-score6*1000000-score5*100000 - score4*10000-score3*1000-score2*100-score1*10)
+               
+                glColor4f(0,0,0,1)
+                text = str(score0)
+                size = scoreFont.getStringSize(text)
+                scoreFont.render(text, (.189, 0.519))
+                if player.score >= 10:
+                  text = str(score1)
+                  size = streakFont.getStringSize(text)
+                  scoreFont.render(text, (.168, 0.522))
+                if player.score >= 100:
+                  text = str(score2)
+                  size = streakFont.getStringSize(text)
+                  scoreFont.render(text, (.148, 0.524))
+                if player.score >= 1000:
+                  text = str(score3)
+                  size = streakFont.getStringSize(text)
+                  scoreFont.render(text, (.118, 0.527))
+                if player.score >= 10000:
+                  text = str(score4)
+                  size = streakFont.getStringSize(text)
+                  scoreFont.render(text, (.095, 0.530))
+                if player.score >= 100000:
+                  text = str(score5)
+                  size = streakFont.getStringSize(text)
+                  scoreFont.render(text, (.074, 0.532))
               #============end blazingamer gh2 scoremeter
   
               #MFH - rock measurement tristate
@@ -4669,15 +4899,24 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               self.rockmeter.transform.scale(.5,-.5)
               self.rockmeter.transform.translate(w*.134, h*.22 + self.hOffset[i])
               self.rockmeter.draw()
-              size      = scoreFont.getStringSize(str(player.score + self.getExtraScoreForCurrentlyPlayedNotes(i)))
-              x = 0.19-size[0]
-              # evilynux - Changed upon worldrave's request
-              c1,c2,c3 = self.rockmeter_score_color
-              glColor3f(c1,c2,c3)
-              if self.numOfPlayers > 1 and i == 0:
-                scoreFont.render("%d" % (player.score + self.getExtraScoreForCurrentlyPlayedNotes(i)), (x, 0.518+self.hFontOffset[i]))
-              else:
-                scoreFont.render("%d" % (player.score + self.getExtraScoreForCurrentlyPlayedNotes(i)),  (x, 0.518+self.hFontOffset[i]))
+
+              if (self.coOp and i == 0) or not self.coOp:  #MFH only render for player 0 if co-op mode
+
+                if self.coOp:
+                  score=self.coOpScore
+                else:
+                  score=player.score
+                score += self.getExtraScoreForCurrentlyPlayedNotes(i)
+
+                size      = scoreFont.getStringSize(str(score))
+                x = 0.19-size[0]
+                # evilynux - Changed upon worldrave's request
+                c1,c2,c3 = self.rockmeter_score_color
+                glColor3f(c1,c2,c3)
+                #if self.numOfPlayers > 1 and i == 0:
+                #  scoreFont.render("%d" % (score), (x, 0.518+self.hFontOffset[i]))
+                #else:
+                scoreFont.render("%d" % (score),  (x, 0.518+self.hFontOffset[i]))
     
               #MFH - rock measurement tristate
               #if self.rock[i] > self.rockMax/3.0*2:
@@ -5231,11 +5470,27 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
                 #myfingershurt: locale.format call adds commas to separate numbers just like Rock Band
 
-                scoretext = locale.format("%d", player.score + self.getExtraScoreForCurrentlyPlayedNotes(i), grouping=True)
-                #myfingershurt: swapping the number "0" and the letter "O" in the score font for accurate Rock Band score type!
-                scoretext = scoretext.replace("0","O")
-                scW, scH = scoreFont.getStringSize(scoretext)
+                if (self.coOp and i == 0) or not self.coOp:  #MFH only render for player 0 if co-op mode
   
+                  if self.coOp:
+                    score=self.coOpScore
+                  else:
+                    score=player.score
+                  score += self.getExtraScoreForCurrentlyPlayedNotes(i)
+
+                  scoretext = locale.format("%d", score, grouping=True)
+                  #myfingershurt: swapping the number "0" and the letter "O" in the score font for accurate Rock Band score type!
+                  scoretext = scoretext.replace("0","O")
+                  scW, scH = scoreFont.getStringSize(scoretext)
+  
+                  scorepicheight = whichScorePic.height1()
+                  whichScorePic.transform.reset()
+                  whichScorePic.transform.scale(.5,.5)
+                  whichScorePic.transform.translate(w*0.9, h*0.8304)    #just below lyric sheet, last change -.0000
+                  whichScorePic.draw()
+
+                  scoreFont.render(scoretext, (0.97-scW, 0.1050 ))    #last change +0.0015
+
                 #myfingershurt: locale.format call adds commas to separate numbers just like Rock Band
                 streaktext = locale.format("%d", player.streak, grouping=True)
                 #myfingershurt: swapping the number "0" and the letter "O" in the score font for accurate Rock Band score type!
@@ -5245,21 +5500,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
                 #streak counter box:
   
-                scorepicheight = whichScorePic.height1()
-                whichScorePic.transform.reset()
-                whichScorePic.transform.scale(.5,.5)
-                whichScorePic.transform.translate(w*0.9, h*0.8304)    #just below lyric sheet, last change -.0000
-                whichScorePic.draw()
                 counterimgheight = self.counter.height1()
                 self.counter.transform.reset()
                 self.counter.transform.translate(w*.915, h*0.7720)    #just below score box, last change -.0000
                 self.counter.transform.scale(.5,-.5)
                 self.counter.draw()
-                scoreFont.render(scoretext, (0.97-scW, 0.1050 ))    #last change +0.0015
                 streakFont.render(streaktext, (0.97-stW,0.1500 ))    #last change +0.0015
   
               except Exception, e:
-                Log.warn("Unable to render score/streak text: %s" % e)
+                #Log.warn("Unable to render score/streak text: %s" % e)
+                scorepicheight = 0  #exception placeholder
     
   
               if self.displayText[i] != None:
@@ -5727,15 +5977,24 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               self.rockmeter.transform.scale(.5,-.5)
               self.rockmeter.transform.translate(w*.134, h*.23 + self.hOffset[i])
               self.rockmeter.draw()
-              size      = scoreFont.getStringSize(str(player.score + self.getExtraScoreForCurrentlyPlayedNotes(i)))
-              x = 0.19-size[0]
-              # evilynux - Changed upon worldrave's request
-              c1,c2,c3 = self.rockmeter_score_color
-              glColor3f(c1,c2,c3)
-              if self.numOfPlayers > 1 and i == 0:
-                scoreFont.render("%d" % (player.score + self.getExtraScoreForCurrentlyPlayedNotes(i)), (x, 0.507+self.hFontOffset[i]))
-              else:
-                scoreFont.render("%d" % (player.score + self.getExtraScoreForCurrentlyPlayedNotes(i)),  (x, 0.507+self.hFontOffset[i]))
+
+              if (self.coOp and i == 0) or not self.coOp:  #MFH only render for player 0 if co-op mode
+
+                if self.coOp:
+                  score=self.coOpScore
+                else:
+                  score=player.score
+                score += self.getExtraScoreForCurrentlyPlayedNotes(i)
+
+                size      = scoreFont.getStringSize(str(score))
+                x = 0.19-size[0]
+                # evilynux - Changed upon worldrave's request
+                c1,c2,c3 = self.rockmeter_score_color
+                glColor3f(c1,c2,c3)
+                #if self.numOfPlayers > 1 and i == 0:
+                #  scoreFont.render("%d" % (player.score + self.getExtraScoreForCurrentlyPlayedNotes(i)), (x, 0.507+self.hFontOffset[i]))
+                #else:
+                scoreFont.render("%d" % (score),  (x, 0.507+self.hFontOffset[i]))
     
               #MFH - rock measurement tristate
               #if self.rock[i] > self.rockMax/3.0*2:
@@ -5889,77 +6148,87 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 glColor3f(1, 1, 1)  #cracker white
   
           #MFH - new location for star system support - outside theme-specific logic:
-          w = wBak
-          h = hBak
-          if (self.inGameStars == 2 or (self.inGameStars == 1 and self.theme == 2) )  and not self.pause and not self.failed: #MFH - only show stars if in-game stars enabled
-            if self.starGrey != None:
-              for starNum in range(0, 5):
-                if self.playerList[i].stars == 6:    #perfect!
-                  self.starPerfect.transform.reset()
-                  self.starPerfect.transform.scale(.080,-.080)
-                  self.starPerfect.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
-                  self.starPerfect.draw()
-                elif starNum == self.playerList[i].stars:
-                  #if self.starGrey1 and self.starScoring == 2:  #if more complex star system is enabled, and we're using Rock Band style scoring
-                  if self.starGrey1:
-                    if self.partialStar[i] == 0:
+
+          if (self.coOp and i == 0) or not self.coOp:  #MFH only render for player 0 if co-op mode
+
+            if self.coOp:
+              stars=self.coOpStars
+              partialStars=self.coOpPartialStars
+            else:
+              stars=player.stars
+              partialStars=self.partialStar[i]
+
+            w = wBak
+            h = hBak
+            if (self.inGameStars == 2 or (self.inGameStars == 1 and self.theme == 2) )  and not self.pause and not self.failed: #MFH - only show stars if in-game stars enabled
+              if self.starGrey != None:
+                for starNum in range(0, 5):
+                  if stars == 6:    #perfect!
+                    self.starPerfect.transform.reset()
+                    self.starPerfect.transform.scale(.080,-.080)
+                    self.starPerfect.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
+                    self.starPerfect.draw()
+                  elif starNum == stars:
+                    #if self.starGrey1 and self.starScoring == 2:  #if more complex star system is enabled, and we're using Rock Band style scoring
+                    if self.starGrey1:
+                      if partialStars == 0:
+                        self.starGrey.transform.reset()
+                        self.starGrey.transform.scale(.080,-.080)
+                        self.starGrey.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
+                        self.starGrey.draw()
+                      elif partialStars == 1:
+                        self.starGrey1.transform.reset()
+                        self.starGrey1.transform.scale(.080,-.080)
+                        self.starGrey1.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
+                        self.starGrey1.draw()
+                      elif partialStars == 2:
+                        self.starGrey2.transform.reset()
+                        self.starGrey2.transform.scale(.080,-.080)
+                        self.starGrey2.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
+                        self.starGrey2.draw()
+                      elif partialStars == 3:
+                        self.starGrey3.transform.reset()
+                        self.starGrey3.transform.scale(.080,-.080)
+                        self.starGrey3.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
+                        self.starGrey3.draw()
+                      elif partialStars == 4:
+                        self.starGrey4.transform.reset()
+                        self.starGrey4.transform.scale(.080,-.080)
+                        self.starGrey4.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
+                        self.starGrey4.draw()
+                      elif partialStars == 5:
+                        self.starGrey5.transform.reset()
+                        self.starGrey5.transform.scale(.080,-.080)
+                        self.starGrey5.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
+                        self.starGrey5.draw()
+                      elif partialStars == 6:
+                        self.starGrey6.transform.reset()
+                        self.starGrey6.transform.scale(.080,-.080)
+                        self.starGrey6.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
+                        self.starGrey6.draw()
+                      elif partialStars == 7:
+                        self.starGrey7.transform.reset()
+                        self.starGrey7.transform.scale(.080,-.080)
+                        self.starGrey7.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
+                        self.starGrey7.draw()
+                      
+                    else:
                       self.starGrey.transform.reset()
                       self.starGrey.transform.scale(.080,-.080)
                       self.starGrey.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
                       self.starGrey.draw()
-                    elif self.partialStar[i] == 1:
-                      self.starGrey1.transform.reset()
-                      self.starGrey1.transform.scale(.080,-.080)
-                      self.starGrey1.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
-                      self.starGrey1.draw()
-                    elif self.partialStar[i] == 2:
-                      self.starGrey2.transform.reset()
-                      self.starGrey2.transform.scale(.080,-.080)
-                      self.starGrey2.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
-                      self.starGrey2.draw()
-                    elif self.partialStar[i] == 3:
-                      self.starGrey3.transform.reset()
-                      self.starGrey3.transform.scale(.080,-.080)
-                      self.starGrey3.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
-                      self.starGrey3.draw()
-                    elif self.partialStar[i] == 4:
-                      self.starGrey4.transform.reset()
-                      self.starGrey4.transform.scale(.080,-.080)
-                      self.starGrey4.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
-                      self.starGrey4.draw()
-                    elif self.partialStar[i] == 5:
-                      self.starGrey5.transform.reset()
-                      self.starGrey5.transform.scale(.080,-.080)
-                      self.starGrey5.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
-                      self.starGrey5.draw()
-                    elif self.partialStar[i] == 6:
-                      self.starGrey6.transform.reset()
-                      self.starGrey6.transform.scale(.080,-.080)
-                      self.starGrey6.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
-                      self.starGrey6.draw()
-                    elif self.partialStar[i] == 7:
-                      self.starGrey7.transform.reset()
-                      self.starGrey7.transform.scale(.080,-.080)
-                      self.starGrey7.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
-                      self.starGrey7.draw()
-                    
-                  else:
+    
+                  elif starNum > stars:
                     self.starGrey.transform.reset()
                     self.starGrey.transform.scale(.080,-.080)
                     self.starGrey.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
                     self.starGrey.draw()
-  
-                elif starNum > self.playerList[i].stars:
-                  self.starGrey.transform.reset()
-                  self.starGrey.transform.scale(.080,-.080)
-                  self.starGrey.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
-                  self.starGrey.draw()
-  
-                else:   #white star
-                  self.starWhite.transform.reset()
-                  self.starWhite.transform.scale(.080,-.080)
-                  self.starWhite.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
-                  self.starWhite.draw()
+    
+                  else:   #white star
+                    self.starWhite.transform.reset()
+                    self.starWhite.transform.scale(.080,-.080)
+                    self.starWhite.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
+                    self.starWhite.draw()
   
           if self.song:
     

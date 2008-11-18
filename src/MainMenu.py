@@ -219,10 +219,10 @@ class MainMenu(BackgroundLayer):
     ]
 
     multPlayerMenu = [
+      (_("Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),
       (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
       (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
       (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
-      (_("Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),
     ]
     
     settingsMenu = Settings.SettingsMenu(self.engine)
