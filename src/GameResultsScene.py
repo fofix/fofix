@@ -132,13 +132,23 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       self.hopoStyle = _("GH2")
 
     self.hopoFreq        = self.engine.config.get("coffee", "moreHopo")
+    #MFH if song.ini HOPO frequency exists and is enabled, display that instead...
+    self.songHopoFreq = self.engine.config.get("game", "song_hopo_freq")
+    songHopoFreq = self.playerList[0].hopoFreq
+    try:
+      songHopoFreq = int(songHopoFreq)
+    except Exception, e:
+      songHopoFreq = None
+    #  Log.warn("Song.ini HOPO Frequency setting is invalid -- forcing Normal (value 1)")
+    if self.songHopoFreq == 1 and (songHopoFreq == 0 or songHopoFreq == 1 or songHopoFreq == 2):
+      #Log.debug("song-specific HOPO frequency %d forced" % songHopoFreq)
+      self.hopoFreq = songHopoFreq
     if self.hopoFreq == 0:
       self.hopoFreq = _("Less")
     elif self.hopoFreq == 1:
       self.hopoFreq = _("Normal")
     elif self.hopoFreq == 2:
       self.hopoFreq = _("More")
-
 
     self.hitWindow = self.engine.config.get("game", "hit_window")  #this should be global, not retrieved every BPM change.
     if self.hitWindow == 0:

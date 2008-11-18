@@ -462,6 +462,9 @@ class Player(object):
     self.practiceSection = None
     self.startPos = 0.0
     
+    self.hopoFreq = None
+    
+    
     self.stars = 0
     self.totalStreakNotes = 0
     self.totalNotes = 0

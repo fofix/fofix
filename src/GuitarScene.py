@@ -447,6 +447,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     Dialogs.hideLoadingSplashScreen(self.engine, splash)
     splash = Dialogs.showLoadingSplashScreen(self.engine, phrase)
 
+    self.playerList[0].hopoFreq = self.song.info.hopofreq
+
+
 
     #MFH - single audio track song detection
     self.isSingleAudioTrack = self.song.isSingleAudioTrack

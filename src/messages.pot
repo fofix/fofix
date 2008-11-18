@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-11-17 21:33-0800\n"
+"POT-Creation-Date: 2008-11-17 22:44-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -601,7 +601,7 @@ msgid "Keyset"
 msgstr ""
 
 #: GameEngine.py:99 GameEngine.py:105 GameEngine.py:116
-#: GameResultsScene.py:138
+#: GameResultsScene.py:149
 msgid "Normal"
 msgstr ""
 
@@ -685,11 +685,11 @@ msgstr ""
 msgid "HO/PO Frequency"
 msgstr ""
 
-#: GameEngine.py:116 GameResultsScene.py:136
+#: GameEngine.py:116 GameResultsScene.py:147
 msgid "Less"
 msgstr ""
 
-#: GameEngine.py:116 GameResultsScene.py:140
+#: GameEngine.py:116 GameResultsScene.py:151
 msgid "More"
 msgstr ""
 
@@ -1260,23 +1260,23 @@ msgstr ""
 msgid "Note Hit-window"
 msgstr ""
 
-#: GameEngine.py:218 GameResultsScene.py:145
+#: GameEngine.py:218 GameResultsScene.py:155
 msgid "1. Widest"
 msgstr ""
 
-#: GameEngine.py:218 GameResultsScene.py:147
+#: GameEngine.py:218 GameResultsScene.py:157
 msgid "2. Wide"
 msgstr ""
 
-#: GameEngine.py:218 GameResultsScene.py:149
+#: GameEngine.py:218 GameResultsScene.py:159
 msgid "3. Standard"
 msgstr ""
 
-#: GameEngine.py:218 GameResultsScene.py:151
+#: GameEngine.py:218 GameResultsScene.py:161
 msgid "4. Tight"
 msgstr ""
 
-#: GameEngine.py:218 GameResultsScene.py:153
+#: GameEngine.py:218 GameResultsScene.py:163
 msgid "5. Tightest"
 msgstr ""
 
@@ -1452,117 +1452,117 @@ msgstr ""
 msgid "Quit"
 msgstr ""
 
-#: GameResultsScene.py:162
+#: GameResultsScene.py:172
 msgid "Relax, it was an excellent show."
 msgstr ""
 
-#: GameResultsScene.py:164
+#: GameResultsScene.py:174
 msgid "Truly Amazing!"
 msgstr ""
 
-#: GameResultsScene.py:166
+#: GameResultsScene.py:176
 msgid "Thanks for playing!"
 msgstr ""
 
-#: GameResultsScene.py:168
+#: GameResultsScene.py:178
 msgid "One more song can't hurt, can it?"
 msgstr ""
 
-#: GameResultsScene.py:170
+#: GameResultsScene.py:180
 msgid "What an amazing performance!"
 msgstr ""
 
-#: GameResultsScene.py:172
+#: GameResultsScene.py:182
 msgid "That's how it's done!"
 msgstr ""
 
-#: GameResultsScene.py:190
+#: GameResultsScene.py:200
 msgid "No highscores for cheaters!"
 msgstr ""
 
-#: GameResultsScene.py:192
+#: GameResultsScene.py:202
 msgid "No highscore"
 msgstr ""
 
-#: GameResultsScene.py:195
+#: GameResultsScene.py:205
 #, python-format
 msgid "%d points is a new high score! Enter your name"
 msgstr ""
 
-#: GameResultsScene.py:388
+#: GameResultsScene.py:398
 #, python-format
 msgid "%s High Scores for %s"
 msgstr ""
 
-#: GameResultsScene.py:390
+#: GameResultsScene.py:400
 #, python-format
 msgid "%s High Scores"
 msgstr ""
 
-#: GameResultsScene.py:396
+#: GameResultsScene.py:406
 #, python-format
 msgid "Difficulty: %s"
 msgstr ""
 
-#: GameResultsScene.py:459
+#: GameResultsScene.py:469
 msgid "Uploading Scores..."
 msgstr ""
 
-#: GameResultsScene.py:464
+#: GameResultsScene.py:474
 msgid "Scores uploaded!"
 msgstr ""
 
-#: GameResultsScene.py:469
+#: GameResultsScene.py:479
 msgid "your highscore ranks"
 msgstr ""
 
-#: GameResultsScene.py:470
+#: GameResultsScene.py:480
 msgid "on the world starpower chart!"
 msgstr ""
 
-#: GameResultsScene.py:473
+#: GameResultsScene.py:483
 msgid "unknown rank."
 msgstr ""
 
-#: GameResultsScene.py:476
+#: GameResultsScene.py:486
 msgid "no new highscore."
 msgstr ""
 
-#: GameResultsScene.py:480
+#: GameResultsScene.py:490
 msgid "Score upload failed!  World charts may be down."
 msgstr ""
 
-#: GameResultsScene.py:491
+#: GameResultsScene.py:501
 #, python-format
 msgid "%s Cheated!"
 msgstr ""
 
-#: GameResultsScene.py:493
+#: GameResultsScene.py:503
 #, python-format
 msgid "%s Finished!"
 msgstr ""
 
-#: GameResultsScene.py:497
+#: GameResultsScene.py:507
 #, python-format
 msgid "%d notes hit"
 msgstr ""
 
-#: GameResultsScene.py:538
+#: GameResultsScene.py:548
 #, python-format
 msgid "Accuracy: %.1f%%"
 msgstr ""
 
-#: GameResultsScene.py:541
+#: GameResultsScene.py:551
 #, python-format
 msgid "Longest note streak: %d"
 msgstr ""
 
-#: GameResultsScene.py:545
+#: GameResultsScene.py:555
 #, python-format
 msgid "Part: %s on %s (2 chord)"
 msgstr ""
 
-#: GameResultsScene.py:547
+#: GameResultsScene.py:557
 #, python-format
 msgid "Part: %s on %s"
 msgstr ""
@@ -1603,15 +1603,15 @@ msgstr ""
 msgid "% Complete"
 msgstr ""
 
-#: GuitarScene.py:255 GuitarScene.py:5879
+#: GuitarScene.py:255 GuitarScene.py:5882
 msgid "HOPO"
 msgstr ""
 
-#: GuitarScene.py:256 GuitarScene.py:5849 GuitarScene.py:5858
+#: GuitarScene.py:256 GuitarScene.py:5852 GuitarScene.py:5861
 msgid "COMPLETED"
 msgstr ""
 
-#: GuitarScene.py:257 GuitarScene.py:5851 GuitarScene.py:5867
+#: GuitarScene.py:257 GuitarScene.py:5854 GuitarScene.py:5870
 msgid " % ON "
 msgstr ""
 
@@ -1719,135 +1719,135 @@ msgstr ""
 msgid " fretted by "
 msgstr ""
 
-#: GuitarScene.py:997 GuitarScene.py:1006
+#: GuitarScene.py:1000 GuitarScene.py:1009
 msgid "        RESUME"
 msgstr ""
 
-#: GuitarScene.py:998 GuitarScene.py:1007
+#: GuitarScene.py:1001 GuitarScene.py:1010
 msgid "       RESTART"
 msgstr ""
 
-#: GuitarScene.py:999 GuitarScene.py:1008
+#: GuitarScene.py:1002 GuitarScene.py:1011
 msgid "        GIVE UP"
 msgstr ""
 
-#: GuitarScene.py:1000
+#: GuitarScene.py:1003
 msgid "       PRACTICE"
 msgstr ""
 
-#: GuitarScene.py:1001 GuitarScene.py:1010
+#: GuitarScene.py:1004 GuitarScene.py:1013
 msgid "       OPTIONS"
 msgstr ""
 
-#: GuitarScene.py:1002 GuitarScene.py:1011
+#: GuitarScene.py:1005 GuitarScene.py:1014
 msgid "           QUIT"
 msgstr ""
 
-#: GuitarScene.py:1009
+#: GuitarScene.py:1012
 msgid "      END SONG"
 msgstr ""
 
-#: GuitarScene.py:1016 GuitarScene.py:1023
+#: GuitarScene.py:1019 GuitarScene.py:1026
 msgid "RETRY SONG"
 msgstr ""
 
-#: GuitarScene.py:1017
+#: GuitarScene.py:1020
 msgid "  PRACTICE"
 msgstr ""
 
-#: GuitarScene.py:1018 GuitarScene.py:1024
+#: GuitarScene.py:1021 GuitarScene.py:1027
 msgid " NEW SONG"
 msgstr ""
 
-#: GuitarScene.py:1019 GuitarScene.py:1025
+#: GuitarScene.py:1022 GuitarScene.py:1028
 msgid "     QUIT"
 msgstr ""
 
-#: GuitarScene.py:1032 GuitarScene.py:1041
+#: GuitarScene.py:1035 GuitarScene.py:1044
 msgid "  Resume"
 msgstr ""
 
-#: GuitarScene.py:1033 GuitarScene.py:1042
+#: GuitarScene.py:1036 GuitarScene.py:1045
 msgid "  Start Over"
 msgstr ""
 
-#: GuitarScene.py:1034 GuitarScene.py:1043
+#: GuitarScene.py:1037 GuitarScene.py:1046
 msgid "  Change Song"
 msgstr ""
 
-#: GuitarScene.py:1035
+#: GuitarScene.py:1038
 msgid "  Practice"
 msgstr ""
 
-#: GuitarScene.py:1036 GuitarScene.py:1045
+#: GuitarScene.py:1039 GuitarScene.py:1048
 msgid "  Settings"
 msgstr ""
 
-#: GuitarScene.py:1037 GuitarScene.py:1046
+#: GuitarScene.py:1040 GuitarScene.py:1049
 msgid "  Quit to Main Menu"
 msgstr ""
 
-#: GuitarScene.py:1044
+#: GuitarScene.py:1047
 msgid "  End Song"
 msgstr ""
 
-#: GuitarScene.py:1051 GuitarScene.py:1058
+#: GuitarScene.py:1054 GuitarScene.py:1061
 msgid " Try Again?"
 msgstr ""
 
-#: GuitarScene.py:1052 GuitarScene.py:1059
+#: GuitarScene.py:1055 GuitarScene.py:1062
 msgid "  Give Up?"
 msgstr ""
 
-#: GuitarScene.py:1053
+#: GuitarScene.py:1056
 msgid "  Practice?"
 msgstr ""
 
-#: GuitarScene.py:1054 GuitarScene.py:1060
+#: GuitarScene.py:1057 GuitarScene.py:1063
 msgid "Quit to Main"
 msgstr ""
 
-#: GuitarScene.py:1068 GuitarScene.py:1077
+#: GuitarScene.py:1071 GuitarScene.py:1080
 msgid "   RESUME"
 msgstr ""
 
-#: GuitarScene.py:1069 GuitarScene.py:1078
+#: GuitarScene.py:1072 GuitarScene.py:1081
 msgid "   RESTART"
 msgstr ""
 
-#: GuitarScene.py:1070 GuitarScene.py:1079
+#: GuitarScene.py:1073 GuitarScene.py:1082
 msgid "   CHANGE SONG"
 msgstr ""
 
-#: GuitarScene.py:1071
+#: GuitarScene.py:1074
 msgid "   PRACTICE"
 msgstr ""
 
-#: GuitarScene.py:1072 GuitarScene.py:1081
+#: GuitarScene.py:1075 GuitarScene.py:1084
 msgid "   SETTINGS"
 msgstr ""
 
-#: GuitarScene.py:1073 GuitarScene.py:1082
+#: GuitarScene.py:1076 GuitarScene.py:1085
 msgid "   QUIT"
 msgstr ""
 
-#: GuitarScene.py:1080
+#: GuitarScene.py:1083
 msgid "   END SONG"
 msgstr ""
 
-#: GuitarScene.py:1087 GuitarScene.py:1094
+#: GuitarScene.py:1090 GuitarScene.py:1097
 msgid " TRY AGAIN?"
 msgstr ""
 
-#: GuitarScene.py:1088 GuitarScene.py:1095
+#: GuitarScene.py:1091 GuitarScene.py:1098
 msgid " GIVE UP?"
 msgstr ""
 
-#: GuitarScene.py:1089
+#: GuitarScene.py:1092
 msgid " PRACTICE?"
 msgstr ""
 
-#: GuitarScene.py:1090 GuitarScene.py:1096
+#: GuitarScene.py:1093 GuitarScene.py:1099
 msgid " QUIT"
 msgstr ""
 
