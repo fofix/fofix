@@ -120,6 +120,10 @@ DEFAULT_SONGBACK         = False
 DEFAULT_VERSIONTAG       = False
 DEFAULT_RMTYPE           = None
 
+#TWD
+DEFAULT_MENU_NECK_CHOOSE_X = 0.1
+DEFAULT_MENU_NECK_CHOOSE_Y = 0.05
+
 #evilynux
 DEFAULT_ROCKMETER_SCORE_COLOR = "#93C351"
 DEFAULT_INGAME_STATS_COLOR = "#FFFFFF"
@@ -278,6 +282,10 @@ Config.define("theme", "songback",       bool, DEFAULT_SONGBACK)
 Config.define("theme", "versiontag",       bool, DEFAULT_VERSIONTAG)
 Config.define("theme", "rmtype",       int, DEFAULT_RMTYPE)
 
+#TWD
+Config.define("theme", "menu_neck_choose_x", float, DEFAULT_MENU_NECK_CHOOSE_X)
+Config.define("theme", "menu_neck_choose_y", float, DEFAULT_MENU_NECK_CHOOSE_Y)
+
 #evilynux
 Config.define("theme", "songlist_score_color",  str, DEFAULT_SONGLIST_SCORE_COLOR)
 Config.define("theme", "rockmeter_score_color",  str, DEFAULT_ROCKMETER_SCORE_COLOR)
@@ -433,6 +441,10 @@ crowdLoopDelay = None
 songSelectSubmenuX = None
 songSelectSubmenuY = None
 
+#TWD - for neck chooser text positionning
+neck_prompt_x = None
+neck_prompt_y = None
+
 #MFH - for scaling song info during countdown
 songInfoDisplayScale = None
 
@@ -484,6 +496,16 @@ def open(config):
   setupFail(config) #racer
   setupEvilynux(config)
   setupRockmeter(config)
+  setupNeckChooser(config)
+
+def setupNeckChooser(config):
+  global neck_prompt_x, neck_prompt_y
+  temp = config.get("theme", "menu_neck_choose_x")
+  if neck_prompt_x == None or temp != DEFAULT_MENU_NECK_CHOOSE_X:
+    neck_prompt_x = temp  
+  temp = config.get("theme", "menu_neck_choose_y")
+  if neck_prompt_y == None or temp != DEFAULT_MENU_NECK_CHOOSE_Y:
+    neck_prompt_y = temp  
 
 def setupColors(config):
   global backgroundColor, baseColor, selectedColor
@@ -1274,12 +1296,14 @@ def writeFail(f, config): #racer
   f.write("%s = %s\n" % ("fail_text_y", fail_text_yPos))
 
 def writeEvilynux(f, config):
-
   global songlist_score_colorVar, rockmeter_score_colorVar, ingame_stats_colorVar
+  global neck_prompt_x, neck_prompt_y
 
   f.write("%s = %s\n" % ("songlist_score_color", songlist_score_colorVar))
   f.write("%s = %s\n" % ("rockmeter_score_color", rockmeter_score_colorVar))
   f.write("%s = %s\n" % ("ingame_stats_color", ingame_stats_colorVar))
+  f.write("%s = %s\n" % ("menu_neck_choose_x", neck_prompt_x))
+  f.write("%s = %s\n" % ("menu_neck_choose_y", neck_prompt_y))
 
 def writeRockmeter(f, config):
   global rmtype

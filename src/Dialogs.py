@@ -2498,9 +2498,11 @@ class NeckChooser(BackgroundLayer, KeyListener):
   """Item menu layer."""
   def __init__(self, engine, selected = None, prompt = "", player = 0):
     self.prompt         = prompt
+    self.prompt_x       = Theme.neck_prompt_x
+    self.prompt_y       = Theme.neck_prompt_y
     self.engine         = engine
     self.player         = player
-    
+
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("Player %d NeckChooser class init (Dialogs.py)..." % (self.player))
@@ -2757,7 +2759,7 @@ class NeckChooser(BackgroundLayer, KeyListener):
      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
      glEnable(GL_COLOR_MATERIAL)
      Theme.setBaseColor(1 - v)
-     wrapText(font, (.1, .05 - v), self.prompt)
+     wrapText(font, (self.prompt_x, self.prompt_y - v), self.prompt)
    finally:
      self.engine.view.resetProjection()
    #==============================================================
