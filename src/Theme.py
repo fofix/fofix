@@ -176,6 +176,9 @@ DEFAULT_SONG_SELECT_SUBMENU_Y = None
 #MFH - for scaling song info during countdown
 DEFAULT_SONG_INFO_DISPLAY_SCALE = 0.0020
 
+#MFH - option for Rock Band 2 theme.ini - only show # of stars you are working on
+DEFAULT_DISPLAY_ALL_GREY_STARS = True
+
 #racer:
 DEFAULT_FAIL_BKG_X     = None
 DEFAULT_FAIL_BKG_Y     = None
@@ -338,6 +341,10 @@ Config.define("theme", "song_select_submenu_y",  float, DEFAULT_SONG_SELECT_SUBM
 #MFH - for scaling song info during countdown
 Config.define("theme", "song_info_display_scale",  float, DEFAULT_SONG_INFO_DISPLAY_SCALE)
 
+#MFH - option for Rock Band 2 theme.ini - only show # of stars you are working on
+Config.define("theme", "display_all_grey_stars",  bool, DEFAULT_DISPLAY_ALL_GREY_STARS)
+
+
 #RACER:
 Config.define("theme", "fail_bkg_x",       float, DEFAULT_FAIL_BKG_X)
 Config.define("theme", "fail_bkg_y",       float, DEFAULT_FAIL_BKG_Y)
@@ -447,6 +454,9 @@ neck_prompt_y = None
 
 #MFH - for scaling song info during countdown
 songInfoDisplayScale = None
+
+#MFH - option for Rock Band 2 theme.ini - only show # of stars you are working on
+displayAllGreyStars = None
 
 #Racer:
 fail_bkg_xPos = None
@@ -816,6 +826,7 @@ def setupMisc(config):
   global creditSong
   global crowdLoopDelay
   global songInfoDisplayScale
+  global displayAllGreyStars
 
   temp = config.get("theme", "loading_phrase")
   #Log.debug("Loading phrases found: " + temp)
@@ -839,6 +850,12 @@ def setupMisc(config):
   temp = config.get("theme", "song_info_display_scale")
   if songInfoDisplayScale == None or temp != DEFAULT_SONG_INFO_DISPLAY_SCALE:
     songInfoDisplayScale = temp
+
+  #MFH - option for Rock Band 2 theme.ini - only show # of stars you are working on
+  temp = config.get("theme", "display_all_grey_stars")
+  #Log.debug("Loading phrases found: " + temp)
+  if displayAllGreyStars == None or temp != DEFAULT_DISPLAY_ALL_GREY_STARS:
+    displayAllGreyStars = temp
 
 #MFH:
 def setupSonglist(config):
@@ -1205,6 +1222,9 @@ def writeMisc(f, config):
 
   #MFH - for scaling song info during countdown
   f.write("%s = %s\n" % ("song_info_display_scale", songInfoDisplayScale))
+
+  #MFH - option for Rock Band 2 theme.ini - only show # of stars you are working on
+  f.write("%s = %s\n" % ("display_all_grey_stars", displayAllGreyStars))
 
 #MFH:  
 def writeSonglist(f, config):

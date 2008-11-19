@@ -379,6 +379,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.starScoreUpdates = self.engine.config.get("performance", "star_score_updates") #MFH
     self.currentlyAnimating = True
     self.missPausesAnim = self.engine.config.get("game", "miss_pauses_anim") #MFH
+    self.displayAllGreyStars = Theme.displayAllGreyStars
 
     #racer: practice beat claps:
     self.beatClaps = self.engine.config.get("game", "beat_claps")
@@ -6219,10 +6220,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                       self.starGrey.draw()
     
                   elif starNum > stars:
-                    self.starGrey.transform.reset()
-                    self.starGrey.transform.scale(.080,-.080)
-                    self.starGrey.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
-                    self.starGrey.draw()
+                    if self.displayAllGreyStars:
+                      self.starGrey.transform.reset()
+                      self.starGrey.transform.scale(.080,-.080)
+                      self.starGrey.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
+                      self.starGrey.draw()
     
                   else:   #white star
                     self.starWhite.transform.reset()
