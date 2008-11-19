@@ -597,6 +597,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.lyricSheetScaleFactor = 640.000/imgwidth
       
     
+    try:
+      self.engine.loadImgDrawing(self, "soloFrame", os.path.join("themes",themename,"soloframe.png"))
+    except IOError:
+      self.soloFrame = None
 
 
     if self.rmtype == 0:
@@ -3405,7 +3409,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.finalScoreThreshold = []
     self.finalHitNotesThreshold = []
 
-    #MFH - TODO - add separate co-op star scoring structure
+    #MFH - add separate co-op star scoring structure
     #  must maintain separate scores and star scores for uploading and highscore saving
     #  and a setting to not play star ding sounds when catching up at end of song 
     #    (co op mode will catch up and calculate individual star scores here at the end of a song)
@@ -6680,10 +6684,17 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                         soloFont = font
     
                       Tw, Th = soloFont.getStringSize(soloText,txtSize)
+                      
+                      boxXOffset = xOffset
+                      
                       if self.guitarSoloAccuracyDisplayPos == 0:  #right
-                        soloFont.render(soloText, (xOffset - Tw, yOffset),(1, 0, 0),txtSize)   #right-justified
+                        xOffset -= Tw
+                        boxXOffset -= Tw/2
+                        #soloFont.render(soloText, (xOffset - Tw, yOffset),(1, 0, 0),txtSize)   #right-justified
                       elif self.guitarSoloAccuracyDisplayPos == 1:  #centered
-                        soloFont.render(soloText, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #centered
+                        xOffset = 0.5 - Tw/2
+                        boxXOffset = 0.5
+                        #soloFont.render(soloText, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #centered
                       elif self.guitarSoloAccuracyDisplayPos == 3:  #racer: rock band 
                         if self.hitAccuracyPos == 0: #Center - need to move solo text above this!
                           yOffset = 0.100    #above Jurgen Is Here
@@ -6693,9 +6704,26 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                           yOffset = 0.140    #above Jurgen Is Here
                         else:   #no jurgens here:
                           yOffset = 0.210 #kk69: lower
-                        soloFont.render(soloText, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #rock band
+                        xOffset = 0.5 - Tw/2
+                        boxXOffset = 0.5
+                        #soloFont.render(soloText, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #rock band
                       else:   #left
-                        soloFont.render(soloText, (xOffset, yOffset),(1, 0, 0),txtSize)   #left-justified
+                        boxXOffset += Tw/2
+                        #soloFont.render(soloText, (xOffset, yOffset),(1, 0, 0),txtSize)   #left-justified
+
+                      #MFH TODO - scale and display self.soloFrame behind / around the solo accuracy text display
+                      if self.soloFrame:
+                        self.soloFrame.transform.reset()
+                        tempWFactor = self.soloFrame.widthf(wBak)
+                        tempWScale = Tw*(tempWFactor/1.75)
+                        tempHScale = -Th*(tempWFactor/2.25)
+                        self.soloFrame.transform.scale(tempWScale,tempHScale)
+                        #self.soloFrame.transform.scale(1,1)
+                        self.soloFrame.transform.translate(wBak*boxXOffset,hBak*(1-yOffset-Th*2.1))
+                        self.soloFrame.draw()
+                        
+                      soloFont.render(soloText, (xOffset, yOffset),(1, 0, 0),txtSize)
+                      
                   #self.engine.view.setViewport(1,0)
               #except Exception, e:
               #  Log.warn("Unable to render guitar solo accuracy text: %s" % e)
