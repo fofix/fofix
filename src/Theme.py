@@ -118,6 +118,11 @@ DEFAULT_COLOR_OPEN      = "#FF9933"
 
 DEFAULT_SONGBACK         = False
 DEFAULT_VERSIONTAG       = False
+DEFAULT_RMTYPE           = None
+
+#TWD
+DEFAULT_MENU_NECK_CHOOSE_X = 0.1
+DEFAULT_MENU_NECK_CHOOSE_Y = 0.05
 
 #evilynux
 DEFAULT_ROCKMETER_SCORE_COLOR = "#93C351"
@@ -164,6 +169,19 @@ DEFAULT_FAIL_SELECTED_COLOR = "#FFBF00"
 #MFH - crowd cheer loop delay in theme.ini: if not exist, use value from settings. Otherwise, use theme.ini value.
 DEFAULT_CROWD_LOOP_DELAY = None
 
+#MFH - for instrument / difficulty / practice section submenu positioning
+DEFAULT_SONG_SELECT_SUBMENU_X = None
+DEFAULT_SONG_SELECT_SUBMENU_Y = None
+
+#MFH - for scaling song info during countdown
+DEFAULT_SONG_INFO_DISPLAY_SCALE = 0.0020
+
+#MFH - y offset = lines, x offset = spaces
+DEFAULT_SONG_SELECT_SUBMENU_OFFSET_LINES = 2
+DEFAULT_SONG_SELECT_SUBMENU_OFFSET_SPACES = 2
+
+#MFH - option for Rock Band 2 theme.ini - only show # of stars you are working on
+DEFAULT_DISPLAY_ALL_GREY_STARS = True
 
 #racer:
 DEFAULT_FAIL_BKG_X     = None
@@ -269,6 +287,11 @@ Config.define("theme", "opencolor",       str, DEFAULT_COLOR_OPEN)
 
 Config.define("theme", "songback",       bool, DEFAULT_SONGBACK)
 Config.define("theme", "versiontag",       bool, DEFAULT_VERSIONTAG)
+Config.define("theme", "rmtype",       int, DEFAULT_RMTYPE)
+
+#TWD
+Config.define("theme", "menu_neck_choose_x", float, DEFAULT_MENU_NECK_CHOOSE_X)
+Config.define("theme", "menu_neck_choose_y", float, DEFAULT_MENU_NECK_CHOOSE_Y)
 
 #evilynux
 Config.define("theme", "songlist_score_color",  str, DEFAULT_SONGLIST_SCORE_COLOR)
@@ -314,6 +337,20 @@ Config.define("theme", "fail_selected_color",  str, DEFAULT_FAIL_SELECTED_COLOR)
 
 #MFH - crowd cheer loop delay in theme.ini: if not exist, use value from settings. Otherwise, use theme.ini value.
 Config.define("theme", "crowd_loop_delay",  int, DEFAULT_CROWD_LOOP_DELAY)
+
+#MFH - for instrument / difficulty / practice section submenu positioning
+Config.define("theme", "song_select_submenu_x",  float, DEFAULT_SONG_SELECT_SUBMENU_X)
+Config.define("theme", "song_select_submenu_y",  float, DEFAULT_SONG_SELECT_SUBMENU_Y)
+
+#MFH - for scaling song info during countdown
+Config.define("theme", "song_info_display_scale",  float, DEFAULT_SONG_INFO_DISPLAY_SCALE)
+
+#MFH - option for Rock Band 2 theme.ini - only show # of stars you are working on
+Config.define("theme", "display_all_grey_stars",  bool, DEFAULT_DISPLAY_ALL_GREY_STARS)
+
+#MFH - y offset = lines, x offset = spaces
+Config.define("theme", "song_select_submenu_offset_lines",  int, DEFAULT_SONG_SELECT_SUBMENU_OFFSET_LINES)
+Config.define("theme", "song_select_submenu_offset_spaces",  int, DEFAULT_SONG_SELECT_SUBMENU_OFFSET_SPACES)
 
 #RACER:
 Config.define("theme", "fail_bkg_x",       float, DEFAULT_FAIL_BKG_X)
@@ -368,6 +405,7 @@ opencolor = None
 meshColor = None
 songback = None
 versiontag = None
+rmtype = None
 
 #evilynux
 songlist_score_colorVar = None
@@ -412,6 +450,24 @@ fail_selected_colorVar = None
 
 #MFH - crowd cheer loop delay in theme.ini: if not exist, use value from settings. Otherwise, use theme.ini value.
 crowdLoopDelay = None
+
+#MFH - for instrument / difficulty / practice section submenu positioning
+songSelectSubmenuX = None
+songSelectSubmenuY = None
+
+#TWD - for neck chooser text positionning
+neck_prompt_x = None
+neck_prompt_y = None
+
+#MFH - for scaling song info during countdown
+songInfoDisplayScale = None
+
+#MFH - y offset = lines, x offset = spaces
+songSelectSubmenuOffsetLines = None
+songSelectSubmenuOffsetSpaces = None
+
+#MFH - option for Rock Band 2 theme.ini - only show # of stars you are working on
+displayAllGreyStars = None
 
 #Racer:
 fail_bkg_xPos = None
@@ -460,6 +516,17 @@ def open(config):
   setupTWOD(config)
   setupFail(config) #racer
   setupEvilynux(config)
+  setupRockmeter(config)
+  setupNeckChooser(config)
+
+def setupNeckChooser(config):
+  global neck_prompt_x, neck_prompt_y
+  temp = config.get("theme", "menu_neck_choose_x")
+  if neck_prompt_x == None or temp != DEFAULT_MENU_NECK_CHOOSE_X:
+    neck_prompt_x = temp  
+  temp = config.get("theme", "menu_neck_choose_y")
+  if neck_prompt_y == None or temp != DEFAULT_MENU_NECK_CHOOSE_Y:
+    neck_prompt_y = temp  
 
 def setupColors(config):
   global backgroundColor, baseColor, selectedColor
@@ -769,6 +836,8 @@ def setupMisc(config):
   global loadingPhrase, resultsPhrase
   global creditSong
   global crowdLoopDelay
+  global songInfoDisplayScale
+  global displayAllGreyStars
 
   temp = config.get("theme", "loading_phrase")
   #Log.debug("Loading phrases found: " + temp)
@@ -788,7 +857,16 @@ def setupMisc(config):
   if crowdLoopDelay == None or temp != DEFAULT_CROWD_LOOP_DELAY:
     crowdLoopDelay = temp
 
+  #MFH - for scaling song info during countdown
+  temp = config.get("theme", "song_info_display_scale")
+  if songInfoDisplayScale == None or temp != DEFAULT_SONG_INFO_DISPLAY_SCALE:
+    songInfoDisplayScale = temp
 
+  #MFH - option for Rock Band 2 theme.ini - only show # of stars you are working on
+  temp = config.get("theme", "display_all_grey_stars")
+  #Log.debug("Loading phrases found: " + temp)
+  if displayAllGreyStars == None or temp != DEFAULT_DISPLAY_ALL_GREY_STARS:
+    displayAllGreyStars = temp
 
 #MFH:
 def setupSonglist(config):
@@ -801,6 +879,27 @@ def setupSonglist(config):
   global library_text_colorVar, library_selected_colorVar
   global pause_text_colorVar, pause_selected_colorVar
   global fail_text_colorVar, fail_selected_colorVar
+  global songSelectSubmenuX, songSelectSubmenuY
+  global songSelectSubmenuOffsetLines, songSelectSubmenuOffsetSpaces
+
+  #MFH - for instrument / difficulty / practice section submenu positioning
+  temp = config.get("theme", "song_select_submenu_offset_lines")
+  if songSelectSubmenuOffsetLines == None or temp != DEFAULT_SONG_SELECT_SUBMENU_OFFSET_LINES:
+    songSelectSubmenuOffsetLines = temp  
+
+  #MFH - for instrument / difficulty / practice section submenu positioning
+  temp = config.get("theme", "song_select_submenu_offset_spaces")
+  if songSelectSubmenuOffsetSpaces == None or temp != DEFAULT_SONG_SELECT_SUBMENU_OFFSET_SPACES:
+    songSelectSubmenuOffsetSpaces = temp  
+
+  #MFH - for instrument / difficulty / practice section submenu positioning
+  temp = config.get("theme", "song_select_submenu_x")
+  if songSelectSubmenuX == None or temp != DEFAULT_SONG_SELECT_SUBMENU_X:
+    songSelectSubmenuX = temp  
+
+  temp = config.get("theme", "song_select_submenu_y")
+  if songSelectSubmenuY == None or temp != DEFAULT_SONG_SELECT_SUBMENU_Y:
+    songSelectSubmenuY = temp  
 
   temp = config.get("theme", "song_cd_x")
   if song_cd_Xpos == None or temp != DEFAULT_SONGCDX:
@@ -992,7 +1091,12 @@ def setupFail(config):
   if fail_text_yPos == None or temp != DEFAULT_FAIL_TEXT_Y:
     fail_text_yPos = temp 
 
+def setupRockmeter(config):
+  global rmtype
 
+  temp = config.get("theme", "rmtype")
+  if rmtype == None or temp != DEFAULT_RMTYPE:
+    rmtype = temp  
 
 def setupEvilynux(config):
   global songlist_score_colorVar, rockmeter_score_colorVar, ingame_stats_colorVar
@@ -1008,6 +1112,7 @@ def setupEvilynux(config):
   temp = config.get("theme", "ingame_stats_color")
   if ingame_stats_colorVar == None or temp != DEFAULT_INGAME_STATS_COLOR:
     ingame_stats_colorVar = temp  
+
 
 def write(f, config):
   # Write read in theme.ini specific variables
@@ -1028,6 +1133,7 @@ def write(f, config):
   writeTWOD(f, config)
   writeFail(f, config) #racer
   writeEvilynux(f, config)
+  writeRockmeter(f, config)
 
 def writeColors(f, config):
   global backgroundColor, baseColor, selectedColor
@@ -1128,6 +1234,7 @@ def writeMisc(f, config):
   global loadingPhrase, resultsPhrase
   global creditSong
   global crowdLoopDelay
+  global song_info_display_scale, display_all_grey_stars
 
   f.write("%s = %s\n" % ("loading_phrase", loadingPhrase))
   f.write("%s = %s\n" % ("results_phrase", resultsPhrase))
@@ -1135,6 +1242,12 @@ def writeMisc(f, config):
  
   #MFH - crowd cheer loop delay in theme.ini: if not exist, use value from settings. Otherwise, use theme.ini value.
   f.write("%s = %s\n" % ("crowd_loop_delay", crowdLoopDelay))
+
+  #MFH - for scaling song info during countdown
+  f.write("%s = %s\n" % ("song_info_display_scale", songInfoDisplayScale))
+
+  #MFH - option for Rock Band 2 theme.ini - only show # of stars you are working on
+  f.write("%s = %s\n" % ("display_all_grey_stars", displayAllGreyStars))
 
 #MFH:  
 def writeSonglist(f, config):
@@ -1149,6 +1262,17 @@ def writeSonglist(f, config):
   global pause_text_colorVar, pause_selected_colorVar
   global fail_text_colorVar, fail_selected_colorVar
   global songlist_score_colorVar # evilynux - score color
+
+  global songSelectSubmenuX, songSelectSubmenuY
+  global songSelectSubmenuOffsetLines, songSelectSubmenuOffsetSpaces
+
+  #MFH - y offset = lines, x offset = spaces
+  f.write("%s = %s\n" % ("song_select_submenu_offset_lines", songSelectSubmenuOffsetLines))
+  f.write("%s = %s\n" % ("song_select_submenu_offset_spaces", songSelectSubmenuOffsetSpaces))
+
+  #MFH - for instrument / difficulty / practice section submenu positioning
+  f.write("%s = %s\n" % ("song_select_submenu_x", songSelectSubmenuX))
+  f.write("%s = %s\n" % ("song_select_submenu_y", songSelectSubmenuY))
 
   f.write("%s = %s\n" % ("song_cd_x", song_cd_Xpos))
   f.write("%s = %s\n" % ("song_cdscore_x", song_cdscore_Xpos))
@@ -1221,8 +1345,15 @@ def writeFail(f, config): #racer
 
 def writeEvilynux(f, config):
   global songlist_score_colorVar, rockmeter_score_colorVar, ingame_stats_colorVar
+  global neck_prompt_x, neck_prompt_y
 
   f.write("%s = %s\n" % ("songlist_score_color", songlist_score_colorVar))
   f.write("%s = %s\n" % ("rockmeter_score_color", rockmeter_score_colorVar))
   f.write("%s = %s\n" % ("ingame_stats_color", ingame_stats_colorVar))
+  f.write("%s = %s\n" % ("menu_neck_choose_x", neck_prompt_x))
+  f.write("%s = %s\n" % ("menu_neck_choose_y", neck_prompt_y))
 
+def writeRockmeter(f, config):
+  global rmtype
+
+  f.write("%s = %s\n" % ("rmtype", rmtype))

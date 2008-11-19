@@ -50,9 +50,14 @@ class Choice:
     else:
       self.isSubMenu = isinstance(self.callback, Menu) or isinstance(self.callback, list)
     
+  #MFH TODO - add support for passing position values to the callback "next menu"
   def trigger(self, engine = None):
     if engine and isinstance(self.callback, list):
-      nextMenu = Menu(engine, self.callback)
+      #MFH 
+      if self.values:
+        nextMenu = Menu(engine, self.callback, pos = self.values, selectedIndex = self.valueIndex )
+      else:
+        nextMenu = Menu(engine, self.callback)
     elif engine and isinstance(self.callback, Menu):
       nextMenu = self.callback
     elif self.values:
@@ -83,9 +88,12 @@ class Choice:
       return "%s: %s" % (self.text, self.values[self.valueIndex])
           
 class Menu(Layer, KeyListener):
-  def __init__(self, engine, choices, onClose = None, onCancel = None, pos = (.2, .66 - .35), viewSize = 6, fadeScreen = False, font = "font", mainMenu = None, textColor = None, selectedColor = None, append_submenu_char = True):
+  def __init__(self, engine, choices, onClose = None, onCancel = None, pos = (.2, .66 - .35), viewSize = 6, fadeScreen = False, font = "font", mainMenu = None, textColor = None, selectedColor = None, append_submenu_char = True, selectedIndex = None):
     self.engine       = engine
-    Log.debug("Menu class init (Menu.py)...")
+
+    self.logClassInits = self.engine.config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("Menu class init (Menu.py)...")
 
     #Get theme
     themename = self.engine.data.themeLabel
@@ -93,6 +101,9 @@ class Menu(Layer, KeyListener):
     
     self.choices      = []
     self.currentIndex = 0
+    #MFH
+    if selectedIndex:
+      self.currentIndex = selectedIndex
     self.time         = 0
     self.onClose      = onClose
     self.onCancel     = onCancel
@@ -102,7 +113,9 @@ class Menu(Layer, KeyListener):
     self.textColor = textColor
     self.selectedColor = selectedColor
 
-    self.sfxVolume    = self.engine.config.get("audio", "SFX_volume")
+    #self.sfxVolume    = self.engine.config.get("audio", "SFX_volume")
+    self.drumNav = self.engine.config.get("game", "drum_navigation")  #MFH
+
 
     if pos == (.2, .66 - .35):  #MFH - default position, not called with a special one - this is a submenu:
       self.sub_menu_x = Theme.sub_menu_xVar
@@ -167,30 +180,32 @@ class Menu(Layer, KeyListener):
     if self.currentIndex < self.viewOffset:
       self.viewOffset = self.currentIndex
     
+  #MFH added drum navigation conditional here to prevent drum nav if disabled
+  #MFH updated SFX play logic to just play the new sound instead of setting volume
   def keyPressed(self, key, unicode): #racer: drum nav.
     self.time = 0
     choice = self.choices[self.currentIndex]
     c = self.engine.input.controls.getMapping(key)
-    if c in Player.KEY1S or key == pygame.K_RETURN or c in Player.DRUM4S:
+    if c in Player.KEY1S or key == pygame.K_RETURN or (c in Player.DRUM4S and self.drumNav):
       choice.trigger(self.engine)
-      self.engine.data.acceptSound.setVolume(self.sfxVolume)  #MFH
+      #self.engine.data.acceptSound.setVolume(self.sfxVolume)  #MFH
       self.engine.data.acceptSound.play()
-    elif c in Player.CANCELS + Player.KEY2S or c in Player.DRUM1S:
+    elif c in Player.CANCELS + Player.KEY2S or (c in Player.DRUM1S and self.drumNav):
       if self.onCancel:
         self.onCancel()
       self.engine.view.popLayer(self)
       self.engine.input.removeKeyListener(self)
-      self.engine.data.cancelSound.setVolume(self.sfxVolume)  #MFH
+      #self.engine.data.cancelSound.setVolume(self.sfxVolume)  #MFH
       self.engine.data.cancelSound.play()
-    elif c in Player.DOWNS + Player.ACTION2S or c in Player.DRUM3S:
+    elif c in Player.DOWNS + Player.ACTION2S or (c in Player.DRUM3S and self.drumNav):
       self.currentIndex = (self.currentIndex + 1) % len(self.choices)
       self.updateSelection()
-      self.engine.data.selectSound.setVolume(self.sfxVolume)  #MFH
+      #self.engine.data.selectSound.setVolume(self.sfxVolume)  #MFH
       self.engine.data.selectSound.play()
-    elif c in Player.UPS + Player.ACTION1S or c in Player.DRUM2S:
+    elif c in Player.UPS + Player.ACTION1S or (c in Player.DRUM2S and self.drumNav):
       self.currentIndex = (self.currentIndex - 1) % len(self.choices)
       self.updateSelection()
-      self.engine.data.selectSound.setVolume(self.sfxVolume)  #MFH
+      #self.engine.data.selectSound.setVolume(self.sfxVolume)  #MFH
       self.engine.data.selectSound.play()
     elif c in Player.RIGHTS + Player.KEY4S:
       choice.selectNextValue()

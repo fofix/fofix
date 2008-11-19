@@ -31,6 +31,9 @@ G_HIGH_RENDERING_QUALITY   = 2
 class GKernel:
   pass
 
+class GMatrix33:
+  pass
+
 class GOpenGLBoard:
   def __init__(*a, **b):
     pass
@@ -39,7 +42,7 @@ class GOpenGLBoard:
     pass
 
   def SetViewport(self, x, y, w, h):
-    glViewport(x, y, w, h)
+    glViewport(int(x), int(y), int(w), int(h))
 
   def SetProjection(self, left, right, bottom, top):
     glMatrixMode(GL_PROJECTION)

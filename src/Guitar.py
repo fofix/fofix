@@ -68,9 +68,25 @@ class Guitar:
     self.cappedScoreMult = 0
     self.starSpinFrameIndex = 0
 
+    self.isStarPhrase = False
+    self.finalStarSeen = False
+
+    self.accThresholdWorstLate = 0
+    self.accThresholdVeryLate = 0
+    self.accThresholdLate = 0
+    self.accThresholdSlightlyLate = 0
+    self.accThresholdExcellentLate = 0
+    self.accThresholdPerfect = 0
+    self.accThresholdExcellentEarly = 0
+    self.accThresholdSlightlyEarly = 0
+    self.accThresholdEarly = 0
+    self.accThresholdVeryEarly = 0
+
     self.tempoBpm = 120   #MFH - default is NEEDED here...
     
-    Log.debug("Guitar class init...")
+    self.logClassInits = self.engine.config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("Guitar class init...")
     
     self.boardWidth     = 3.0
     self.boardLength    = 9.0
@@ -138,12 +154,14 @@ class Guitar:
     
 
 
+    self.muteSustainReleases = self.engine.config.get("game", "sustain_muting") #MFH
+
     self.hitw = self.engine.config.get("game", "hit_window")  #this should be global, not retrieved every BPM change.
-    if self.hitw == 0:
+    if self.hitw == 0:   #wide
       self.hitw = 0.70
-    elif self.hitw == 1:
+    elif self.hitw == 1: #normal
       self.hitw = 1.0
-    elif self.hitw == 2:
+    elif self.hitw == 2: #tight
       self.hitw = 1.2
     elif self.hitw == 3: #blazingamer new tighter hit window
       self.hitw = 1.9
@@ -167,7 +185,8 @@ class Guitar:
 
     self.hit = [False, False, False, False, False]
 
-    self.neck = self.engine.config.get("coffee", "neck_choose")
+    neckSettingName = "neck_choose_p%d" % (self.player)
+    self.neck = self.engine.config.get("coffee", neckSettingName)
 
     #Get theme
     themename = self.engine.data.themeLabel
@@ -212,12 +231,8 @@ class Guitar:
     self.maxStars = []
     self.starNotes = []
     self.totalNotes = 0
-    
 
-
-
-    engine.loadImgDrawing(self, "glowDrawing", "glow.svg",  textureSize = (128, 128))
-
+    engine.loadImgDrawing(self, "glowDrawing", "glow.png")
 
     # evilynux - Fixed random neck -- MFH: further fixing random neck
     if self.neck == "0" or self.neck == "Neck_0" or self.neck == "randomneck":
@@ -530,11 +545,32 @@ class Guitar:
       # Alarian: Hitwindows/-margins
       self.earlyMargin       = 250 - bpm/5 - 70*self.hitw
       self.lateMargin        = 250 - bpm/5 - 70*self.hitw
-      self.noteReleaseMargin = 200 - bpm/5 - 70*self.hitw
-      
-      
-      if (self.noteReleaseMargin < (200 - bpm/5 - 70*1.2)):   #MFH - enforce "tight" hitwindow minimum note release margin
+
+      #self.noteReleaseMargin = 200 - bpm/5 - 70*self.hitw
+      #if (self.noteReleaseMargin < (200 - bpm/5 - 70*1.2)):   #MFH - enforce "tight" hitwindow minimum note release margin
+      #  self.noteReleaseMargin = (200 - bpm/5 - 70*1.2)
+      if self.muteSustainReleases == 4:   #tight
         self.noteReleaseMargin = (200 - bpm/5 - 70*1.2)
+      elif self.muteSustainReleases == 3: #standard
+        self.noteReleaseMargin = (200 - bpm/5 - 70*1.0)
+      elif self.muteSustainReleases == 2: #wide
+        self.noteReleaseMargin = (200 - bpm/5 - 70*0.7)
+      else:  #ultra-wide 
+        self.noteReleaseMargin = (200 - bpm/5 - 70*0.5)
+
+
+      self.accThresholdWorstLate = (0-self.lateMargin)
+      self.accThresholdVeryLate = (0-(3*self.lateMargin/4))
+      self.accThresholdLate = (0-(2*self.lateMargin/4))
+      self.accThresholdSlightlyLate = (0-(1*self.lateMargin/4))
+      self.accThresholdExcellentLate = -1.0
+      self.accThresholdPerfect = 1.0
+      self.accThresholdExcellentEarly = (1*self.lateMargin/4)
+      self.accThresholdSlightlyEarly = (2*self.lateMargin/4)
+      self.accThresholdEarly = (3*self.lateMargin/4)
+      self.accThresholdVeryEarly = (4*self.lateMargin/4)
+
+
     
   def setMultiplier(self, multiplier):
     self.scoreMultiplier = multiplier
@@ -570,7 +606,7 @@ class Guitar:
       self.bassGrooveNeck.texture.bind()
     else:
       self.neckDrawing.texture.bind()
-    
+
     glBegin(GL_TRIANGLE_STRIP)
     glColor4f(color[0],color[1],color[2], 0)
     glTexCoord2f(0.0, project(offset - 2 * beatsPerUnit))
@@ -1245,7 +1281,7 @@ class Guitar:
     num = 0
     enable = True
     starEventsInView = False
-    
+
     for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard):
     #for time, event in reversed(track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)):    #MFH - reverse order of note rendering
       if isinstance(event, Tempo):
@@ -1306,8 +1342,13 @@ class Guitar:
           self.spEnabled = False
 
 
-      if event.star or event.finalStar:
+      if event.star:
+        self.isStarPhrase = True
         starEventsInView = True
+      if event.finalStar:
+        self.finalStarSeen = True
+        starEventsInView = True
+
 
       if event.star and self.spEnabled:
         spNote = True
@@ -1363,14 +1404,16 @@ class Guitar:
           big = True
           self.bigMax += 1
 
-      if event.star or event.finalStar:
-        if big == True and tailOnly == True:
-          self.killPoints = True
+      #if event.star or event.finalStar:
+      #  if big == True and tailOnly == True:
+      #    self.killPoints = True
 
-      #MFH - TODO - filter out this tail whitening when starpower notes have been disbled from a screwup
-      if not killswitch == False:
+      #MFH - filter out this tail whitening when starpower notes have been disbled from a screwup
+      if self.spEnabled and killswitch:
+      #if not killswitch == False:
         if event.star or event.finalStar:
           if big == True and tailOnly == True:
+            self.killPoints = True
             color = (1,1,1,1)
 
       if z + length < -1.0:
@@ -1391,8 +1434,10 @@ class Guitar:
         self.renderNote(length, sustain = sustain, kill = killswitch, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote)
       glPopMatrix()
 
-    if not starEventsInView:
+    if (not starEventsInView and self.finalStarSeen):
       self.spEnabled = True
+      self.finalStarSeen = False
+      self.isStarPhrase = False
 
   def renderTails(self, visibility, song, pos, killswitch):
     if not song:
@@ -1463,11 +1508,11 @@ class Guitar:
       spNote = False
 
       #myfingershurt: user setting for starpower refill / replenish notes
-      if self.starPowerActive:
-        if self.spRefillMode == 0:    #mode 0 = no starpower / overdrive refill notes
-          self.spEnabled = False
-        elif self.spRefillMode == 1 and self.theme != 2:  #mode 1 = overdrive refill notes in RB themes only
-          self.spEnabled = False
+      #if self.starPowerActive:
+      #  if self.spRefillMode == 0:    #mode 0 = no starpower / overdrive refill notes
+      #    self.spEnabled = False
+      #  elif self.spRefillMode == 1 and self.theme != 2:  #mode 1 = overdrive refill notes in RB themes only
+      #    self.spEnabled = False
 
 
       if event.star and self.spEnabled:
@@ -1526,13 +1571,15 @@ class Guitar:
           big = True
           self.bigMax += 1
 
-      if event.star or event.finalStar:
-        if big == True and tailOnly == True:
-          self.killPoints = True
+      #if event.star or event.finalStar:
+      #  if big == True and tailOnly == True:
+      #    self.killPoints = True
 
-      if not killswitch == False:
+      #if not killswitch == False:
+      if self.spEnabled and killswitch:
         if event.star or event.finalStar:
           if big == True and tailOnly == True:
+            self.killPoints = True
             color = (1,1,1,1)
 
       if z + length < -1.0:
@@ -1806,7 +1853,7 @@ class Guitar:
           ff = f
           ff += 1.2
           
-          glBlendFunc(GL_ONE, GL_ONE)
+          glBlendFunc(GL_SRC_ALPHA, GL_ONE)
           
           #myfingershurt: need to cap flameSizes use of scoreMultiplier to 4x, the 5x and 6x bass groove mults cause crash:
           if self.scoreMultiplier > 4:
@@ -2247,8 +2294,11 @@ class Guitar:
           if time == q:
             event.star = True
         for q in self.maxStars:
-          if time == q and not event.finalStar:
-            event.star = True
+          #if time == q and not event.finalStar:
+          #  event.star = True
+          if time == q:   #MFH - no need to mark only the final SP phrase note as the finalStar as in drums, they will be hit simultaneously here.
+            event.finalStar = True
+
       self.starNotesSet = True
 
         
@@ -2256,7 +2306,7 @@ class Guitar:
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     glEnable(GL_COLOR_MATERIAL)
     if self.leftyMode:
-      glScale(-1, 1, 1)
+      glScalef(-1, 1, 1)
 
     if self.ocount <= 1:
       self.ocount = self.ocount + .1
@@ -2290,7 +2340,7 @@ class Guitar:
     self.renderFlames(visibility, song, pos, controls)
     
     if self.leftyMode:
-      glScale(-1, 1, 1)
+      glScalef(-1, 1, 1)
 
   def getMissedNotes(self, song, pos, catchup = False):
     if not song:

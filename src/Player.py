@@ -200,7 +200,10 @@ Config.define("player1", "part",         int, Song.GUITAR_PART)
 
 class Controls:
   def __init__(self):
-    Log.debug("Controls class init (Player.py)...")
+
+    self.logClassInits = Config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("Controls class init (Player.py)...")
     
     def keycode(name, player):
       playerstring = "player" + str(player)
@@ -440,7 +443,11 @@ class Controls:
 
 class Player(object):
   def __init__(self, owner, name, number):
-    Log.debug("Player class init (Player.py)...")
+
+    self.logClassInits = Config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("Player class init (Player.py)...")
+
     self.owner    = owner
     self.controls = Controls()
     self.reset()
@@ -454,6 +461,9 @@ class Player(object):
     self.practiceMode = False
     self.practiceSection = None
     self.startPos = 0.0
+    
+    self.hopoFreq = None
+    
     
     self.stars = 0
     self.totalStreakNotes = 0

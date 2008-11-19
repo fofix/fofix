@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Traduction FR FoFiX\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2008-10-28 15:35+0100\n"
-"PO-Revision-Date: 2008-10-29 00:01+0100\n"
+"PO-Revision-Date: 2008-10-30 10:07+0100\n"
 "Last-Translator: fablaculp <fablaculp@hotmail.com>\n"
 "Language-Team: Français <fablaculp@hotmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -17,6 +17,9 @@ msgstr ""
 "X-Poedit-Language: French\n"
 "X-Poedit-Country: FRANCE\n"
 "X-Poedit-SearchPath-0: src\n"
+
+msgid " Basic Settings"
+msgstr " (options de base)"
 
 # PERFORMANCE AUTOSET
 msgid "Autoset"

@@ -25,7 +25,6 @@ from Input import KeyListener
 from Session import MessageHandler
 from Task import Task
 from Language import _
-import MainMenu
 import Svg
 import Dialogs
 
@@ -43,7 +42,6 @@ class GameTask(Task, KeyListener, MessageHandler):
     self.session.broker.removeMessageHandler(self)
     self.engine.view.popAllLayers()
     self.session.close()
-    #self.engine.view.pushLayer(MainMenu.MainMenu(self.engine))
     self.engine.view.pushLayer(self.engine.mainMenu)    #rchiav: use already-existing MainMenu instance
     self.engine.removeTask(self)
 

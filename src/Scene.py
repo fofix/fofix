@@ -126,7 +126,7 @@ class BoxActor(Actor):
     glPushMatrix()
     glMultMatrixd(T.tolist())
     sx, sy, sz = self.size
-    glScale(sx, sy, sz)
+    glScalef(sx, sy, sz)
 
     glDisable(GL_LIGHTING)
     glEnable(GL_BLEND)
@@ -140,7 +140,7 @@ class BoxActor(Actor):
     glEnable(GL_LIGHTING)
     glFrontFace(GL_CCW)
     glColor4f(*[abs(x) + .3 for x in self.body.getLinearVel() + (.5,)])
-    glScale(.97, .97, .97)
+    glScalef(.97, .97, .97)
     #glutSolidCube(1)
     glDisable(GL_LIGHTING)
     glPopMatrix()

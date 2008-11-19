@@ -24,20 +24,25 @@
 import pygame
 from OpenGL.GL import *
 import sys
+if not sys.version.startswith("2.4"):
+  import numpy
 
-from Texture import Texture
+from Texture import Texture, TextureAtlas, TextureAtlasFullException
 
 class Font:
   """A texture-mapped font."""
   def __init__(self, fileName, size, bold = False, italic = False, underline = False, outline = True,
                scale = 1.0, reversed = False, systemFont = False, shadow = False):
     pygame.font.init()
-    self.size           = size
-    self.scale          = scale
-    self.glyphCache     = {}
-    self.glyphSizeCache = {}
-    self.outline        = outline
-    self.reversed       = reversed
+    self.size             = size
+    self.scale            = scale
+    self.glyphCache       = {}
+    self.glyphSizeCache   = {}
+    self.outline          = outline
+    self.glyphTextures    = []
+    self.reversed         = reversed
+    self.stringCache      = {}
+    self.stringCacheLimit = 256
     self.shadow         = shadow
     # Try loading a system font first if one was requested
     self.font           = None
@@ -72,6 +77,14 @@ class Font:
       h = max(s[1], h)
     return (w * scale, h * scale)
 
+  # evilynux - Return scaling factor needed to fit text within maxwidth
+  def scaleText(self, text, maxwidth, scale = 0.002):
+    w, h = self.getStringSize(text, scale = scale)
+    while w > maxwidth:
+      scale = scale * 0.95
+      w, h = self.getStringSize(text, scale = scale)
+    return scale
+
   def getHeight(self):
     """@return: The height of this font"""
     return self.font.get_height() * self.scale
@@ -89,11 +102,75 @@ class Font:
     """
     texture.setFilter(GL_LINEAR, GL_LINEAR)
     texture.setRepeat(GL_CLAMP, GL_CLAMP)
-    self.glyphCache[character]     = texture
+    if sys.version.startswith("2.4"):
+      self.glyphCache[character]     = texture
+    else:
+      self.glyphCache[character]     = (texture, (0.0, 0.0, texture.size[0], texture.size[1]))
     s = .75 * self.getHeight() / float(texture.pixelSize[0])
     self.glyphSizeCache[character] = (texture.pixelSize[0] * s, texture.pixelSize[1] * s)
 
-  def render(self, text, pos = (0, 0), direction = (1, 0, 0), scale = 0.002):
+  def _renderString(self, text, pos, direction, scale):
+    if not text:
+      return
+
+    if not (text, scale) in self.stringCache:
+      currentTexture = None
+      #x, y           = pos[0], pos[1]
+      x, y           = 0.0, 0.0
+      vertices       = numpy.empty((4 * len(text), 2), numpy.float32)
+      texCoords      = numpy.empty((4 * len(text), 2), numpy.float32)
+      vertexCount    = 0
+      cacheEntry     = []
+
+      for i, ch in enumerate(text):
+        g, coordinates     = self.getGlyph(ch)
+        w, h               = self.getStringSize(ch, scale = scale)
+        tx1, ty1, tx2, ty2 = coordinates
+
+        # Set the initial texture
+        if currentTexture is None:
+          currentTexture = g
+
+        # If the texture changed, flush the geometry
+        if currentTexture != g:
+          cacheEntry.append((currentTexture, vertexCount, numpy.array(vertices[:vertexCount]), numpy.array(texCoords[:vertexCount])))
+          currentTexture = g
+          vertexCount = 0
+
+        vertices[vertexCount + 0]  = (x,     y)
+        vertices[vertexCount + 1]  = (x + w, y)
+        vertices[vertexCount + 2]  = (x + w, y + h)
+        vertices[vertexCount + 3]  = (x,     y + h)
+        texCoords[vertexCount + 0] = (tx1, ty2)
+        texCoords[vertexCount + 1] = (tx2, ty2)
+        texCoords[vertexCount + 2] = (tx2, ty1)
+        texCoords[vertexCount + 3] = (tx1, ty1)
+        vertexCount += 4
+
+        x += w * direction[0]
+        y += w * direction[1]
+      cacheEntry.append((currentTexture, vertexCount, vertices[:vertexCount], texCoords[:vertexCount]))
+
+      # Don't store very short strings
+      if len(text) > 5:
+        # Limit the cache size
+        if len(self.stringCache) > self.stringCacheLimit:
+          del self.stringCache[self.stringCache.keys()[0]]
+        self.stringCache[(text, scale)] = cacheEntry
+    else:
+      cacheEntry = self.stringCache[(text, scale)]
+
+    glPushMatrix()
+    glTranslatef(pos[0], pos[1], 0)
+    for texture, vertexCount, vertices, texCoords in cacheEntry:
+      texture.bind()
+      glVertexPointer(2, GL_FLOAT, 0, vertices)
+      glTexCoordPointer(2, GL_FLOAT, 0, texCoords)
+      glDrawArrays(GL_QUADS, 0, vertexCount)
+    glPopMatrix()
+
+  # evilynux - Rendering method for Python 2.4
+  def render24(self, text, pos = (0, 0), direction = (1, 0, 0), scale = 0.002):
     """
     Draw some text.
 
@@ -190,11 +267,45 @@ class Font:
     glDisableClientState(GL_TEXTURE_COORD_ARRAY)
     glDisable(GL_TEXTURE_2D)
 
+  def render(self, text, pos = (0, 0), direction = (1, 0), scale = 0.002):
+    """
+    Draw some text.
+
+    @param text:      Text to draw
+    @param pos:       Text coordinate tuple (x, y)
+    @param direction: Text direction vector (x, y, z)
+    @param scale:     Scale factor
+    """
+    if sys.version.startswith("2.4"):
+      self.render24(text, pos, (1,0,0), scale)
+      return
+
+    glEnable(GL_TEXTURE_2D)
+    glEnableClientState(GL_VERTEX_ARRAY)
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY)
+
+    if self.reversed:
+      text = "".join(reversed(text))
+
+    if self.outline:
+      glPushAttrib(GL_CURRENT_BIT)
+      glColor4f(0, 0, 0, glGetFloatv(GL_CURRENT_COLOR)[3])
+      self._renderString(text, (pos[0] + 0.003, pos[1] + 0.003), direction, scale)
+      glPopAttrib()
+
+    self._renderString(text, pos, direction, scale)
+    
+    glDisableClientState(GL_VERTEX_ARRAY)
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY)
+    glDisable(GL_TEXTURE_2D)
+
   # evilynux
   def loadCache(self):
     """
     Fill in the caches to speedup rendering.
     """
+    if not sys.version.startswith("2.4"):
+      return
     for ch in "abcdefghijklmnopqrstuvwxyz0123456789":
       try:
         self.glyphCache[ch]
@@ -209,6 +320,8 @@ class Font:
     @param ch: Character
     @return:   Glyph instance
     """
+    if not sys.version.startswith("2.4"):
+      return
     # Font size
     self.glyphSizeCache[ch] = self.font.size(ch)
     # Font texture
@@ -221,6 +334,13 @@ class Font:
     self.glyphCache[ch] = t
     return t
 
+  def _allocateGlyphTexture(self):
+    t = TextureAtlas(size = glGetInteger(GL_MAX_TEXTURE_SIZE))
+    t.texture.setFilter(GL_LINEAR, GL_LINEAR)
+    t.texture.setRepeat(GL_CLAMP, GL_CLAMP)
+    self.glyphTextures.append(t)
+    return t
+
   def getGlyph(self, ch):
     """
     Get the L{Texture} for a given character.
@@ -231,5 +351,25 @@ class Font:
     try:
       return self.glyphCache[ch]
     except KeyError:
-      return self.cacheGlyph(ch)
+      if sys.version.startswith("2.4"):
+        return self.cacheGlyph(ch)
+
+      s = self.font.render(ch, True, (255, 255, 255))
+
+      # Draw outlines
+      if not self.glyphTextures:
+        texture = self._allocateGlyphTexture()
+      else:
+        texture = self.glyphTextures[-1]
+
+      # Insert the texture into the glyph cache
+      try:
+        coordinates = texture.add(s)
+      except TextureAtlasFullException:
+        # Try again with a fresh atlas
+        texture = self._allocateGlyphTexture()
+        return self.getGlyph(ch)
+
+      self.glyphCache[ch] = (texture, coordinates)
+      return (texture, coordinates)
 

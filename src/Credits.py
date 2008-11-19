@@ -35,7 +35,6 @@ import sys
 from View import Layer
 from Input import KeyListener
 from Language import _
-import MainMenu
 import Song
 import Version
 import Player
@@ -105,9 +104,6 @@ class Credits(Layer, KeyListener):
     self.themename = Config.get("coffee", "themename")
     
     Config.set("game", "selected_library", "songs")
-
-    # evilynux - We need artifacts/items to make this look nice..
-    self.engine.boostBackgroundThreads(True)
 
     nf = self.engine.data.font
     bf = self.engine.data.bigFont
@@ -197,7 +193,6 @@ class Credits(Layer, KeyListener):
 
   def hidden(self):
     self.engine.input.removeKeyListener(self)
-    #self.engine.view.pushLayer(MainMenu.MainMenu(self.engine))
     self.engine.view.pushLayer(self.engine.mainMenu)    #rchiav: use already-existing MainMenu instance
 
   def quit(self):

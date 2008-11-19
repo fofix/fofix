@@ -2,7 +2,7 @@ CXFREEZE=/usr/src/experimental/cx_Freeze-3.0.3/FreezePython
 PYTHON=python2.4
 PYTHON_LIBS=/usr/lib/python2.4
 USE_AMANITH=1
-MESSAGESPOT=src/messages.pot
+MESSAGESPOT=messages.pot
 
 # evilynux - Dynamically update the version number, this is "clever" but hard to understand... :-(
 VERSION=`grep "versionString =" src/GameEngine.py | sed -e "s/.\+\(\([0-9]\+\.\)\+[0-9]\+\).\+/\1/g"`
@@ -11,12 +11,10 @@ all:	dist
 
 patch: dist
 	@echo --- Creating patch
-	[ -e FoFiX-${VERSION}-Patch-GNULinux-64bit ] && \
-	rm -rf FoFiX-${VERSION}-Patch-GNULinux-64bit*
-	mkdir FoFiX-${VERSION}-Patch-GNULinux-64bit
-	cp dist/FretsOnFire.bin FoFiX-${VERSION}-Patch-GNULinux-64bit/
-	cp -a doc  FoFiX-${VERSION}-Patch-GNULinux-64bit/
-	tar -cjvf FoFiX-${VERSION}-Patch-GNULinux-64bit.tar.gz FoFiX-${VERSION}-Patch-GNULinux-64bit/
+	[ -d FoFiX-${VERSION}-Patch-GNULinux-64bit ] && \
+	rm -rf FoFiX-${VERSION}-Patch-GNULinux-64bit* || echo
+	perl pkg/Package-GNULinux.pl -d FoFiX-${VERSION}-Patch-GNULinux-64bit -l pkg/Dist-Patch3_0xx-GNULinux.lst
+	tar -cjvf FoFiX-${VERSION}-Patch-GNULinux-64bit.tar.bz2 FoFiX-${VERSION}-Patch-GNULinux-64bit/
 
 dist:
 	@echo --- Detected version: ${VERSION}
@@ -44,18 +42,8 @@ GameResultsScene src/FretsOnFire.py
 #	@echo --- Fixing PyOpenGL-ctypes
 #	cp -Lr $(PYTHON_LIBS)/site-packages/PyOpenGL*egg-info dist
 
-ifneq ($(USE_AMANITH), 1)
 	@echo --- Rendering SVG files to PNG images
 	cd dist; $(PYTHON) ../src/svg2png.py; cd ..
-endif
-
-	@echo --- Fixing stuff
-ifeq ($(USE_AMANITH), 1)
-	strip dist/_amanith.so
-	cp /home/evilynux/FoF-pkg/libamanith.so.1.64bit dist/libamanith.so.1
-else
-	rm dist/_amanith.so
-endif
 
 	-cp /usr/lib/libpython2.4.so.1.0 \
            /usr/lib/libSDL_ttf-2.0.so.0 \
@@ -96,7 +84,9 @@ sdist:	doc
 	tar cvzf FretsOnFire-src-$(VERSION).tar.gz FretsOnFire-src-$(VERSION)
 
 translations:
-	xgettext --from-code iso-8859-1 -k_ -kN_ -o $(MESSAGESPOT) src/*.py
+	cd src && \
+	xgettext --from-code iso-8859-1 -k_ -kN_ -o $(MESSAGESPOT) *.py && \
+	cd ..
 	
 clean:
 	@rm -rf dist build doc/html

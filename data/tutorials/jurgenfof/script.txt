@@ -9,17 +9,17 @@
 21100   1500  text  Check this sh*t!
 26000   1500  text  And now, pick up your keyboard
 27500   1500  text  like this.
-26000   5000  pic   pose.svg
+26000   5000  pic   pose.png
 29800   1300  text  When I shred,
 31800   1500  text  I use the whole keyboard.
 34000   1500  text  But since you SUCK,
 37000   1000  text  You will only need
 38000   1000  text  These five frets,
-37000   5500  pic   keyboard.svg
+37000   5500  pic   keyboard.png
 39000   2000  text  Und zie Pick button.
 42000   2000  text  However, zie most important
 44000   2000  text  is the Escape button.
-46000   5000  pic   esc.svg
+46000   5000  pic   esc.png
 48000   1000  text  You will need it,
 49000   1500  text  when you finally realize
 50500   1500  text  that you SUCK.

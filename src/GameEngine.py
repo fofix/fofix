@@ -42,7 +42,7 @@ from Resource import Resource
 from Data import Data
 from Server import Server
 from Session import ClientSession
-from Svg import SvgContext, ImgDrawing, LOW_QUALITY, NORMAL_QUALITY, HIGH_QUALITY
+from Svg import SvgContext, ImgDrawing
 #alarian
 #from Song import EAS_DIF, MED_DIF, HAR_DIF, EXP_DIF
 from Debug import DebugLayer
@@ -57,7 +57,6 @@ import Mod
 
 
 # define configuration keys
-Config.define("engine", "tickrate",     float, 1.0)
 Config.define("engine", "highpriority", bool,  True)
 Config.define("game",   "uploadscores", bool,  False, text = _("Upload Highscores"),    options = {False: _("No"), True: _("Yes")})
 Config.define("game",   "leftymode",    bool,  False, text = _("Lefty mode"),           options = {False: _("No"), True: _("Yes")})
@@ -69,7 +68,6 @@ Config.define("video",  "fps",          int,   80,    text = _("Frames per Secon
 Config.define("video",  "hitglow_color", int,  0,     text = _("Glow-FX Color"), options = {0: _("Same as Fret"), 1: _("Actual Color")})
 Config.define("video",  "hitflame_color", int, 0,     text = _("Hitflames Color"), options = {0: _("Theme Specific"), 1: _("Same as Fret"), 2: _("Actual Color")})
 Config.define("performance",  "starspin", bool,     True,  text = _("Starnotes"), options = {True: _("Animated"), False: _("Static")})
-Config.define("opengl", "svgquality",   int,   NORMAL_QUALITY,  text = _("SVG Quality"), options = {LOW_QUALITY: _("Low"), NORMAL_QUALITY: _("Normal"), HIGH_QUALITY: _("High")})
 Config.define("audio",  "frequency",    int,   44100, text = _("Sample Frequency"), options = [8000, 11025, 22050, 32000, 44100, 48000])
 Config.define("audio",  "bits",         int,   16,    text = _("Sample Bits"), options = [16, 8])
 Config.define("audio",  "stereo",       bool,  True)
@@ -119,15 +117,16 @@ Config.define("coffee", "moreHopo",            int,   1,   text = _("HO/PO Frequ
 Config.define("game", "hopo_after_chord",      int,   1,   text = _("HO/PO After Chord"),    options = {0: _("Off"), 1: _("On")})
 Config.define("game", "accuracy_mode",      int,   2,   text = _("Accuracy"),    options = {0: _("Off"), 1: _("Numeric"), 2: _("Friendly"), 3: _("Both")})
 Config.define("game", "accuracy_pos",      int,   1,   text = _("Accuracy Words Pos"),    options = {0: _("Center"), 1: _("Right-top Corner"), 2: _("Left-Bottom Corner"), 3: _("Center-Bottom")}) #QQstarS:acc show
-Config.define("game",  "stage_rotate_delay",        int,   800,   text = _("Rotate Delay"), options = dict([(n, n) for n in range(0, 10, 1)] + [(n, n) for n in range(10, 50, 10)] + [(n, n) for n in range(50, 2001, 50)]))
-Config.define("game",  "stage_animate_delay",        int,   3,   text = _("Animation Delay"), options = dict([(n, n) for n in range(0, 10, 1)] + [(n, n) for n in range(10, 50, 10)] + [(n, n) for n in range(50, 2001, 50)]))
 
-Config.define("game",   "stage_mode",           int,  0,  text = _("Stages"),  options = {0: _("Random"), 1: _("Default"), 2: _("Blank") } )
-Config.define("game",   "song_stage",           int,  1,  text = _("Song Stage"),  options = {0: _("Off"), 1: _("On") } ) #MFH
 
 
 #myfingershurt:
-Config.define("game",   "rotate_stages",           int,  0,  text = _("Rotate Stages"),  options = {0: _("No"), 1: _("Random"), 2: _("In Order"), 3: _("BackNForth")} ) 
+Config.define("game",  "stage_rotate_delay",        int,   800,   text = _("Slideshow Delay"), options = dict([(n, n) for n in range(0, 10, 1)] + [(n, n) for n in range(10, 50, 10)] + [(n, n) for n in range(50, 2001, 50)]))
+Config.define("game",  "stage_animate_delay",        int,   3,   text = _("Animation Delay"), options = dict([(n, n) for n in range(0, 10, 1)] + [(n, n) for n in range(10, 50, 10)] + [(n, n) for n in range(50, 2001, 50)]))
+Config.define("game",   "rotate_stages",           int,  0,  text = _("Stage Slideshow"),  options = {0: _("Off"), 1: _("Random"), 2: _("In Order"), 3: _("BackNForth")} ) 
+Config.define("game",   "stage_animate",           int,  0,  text = _("Stage Animation"),  options = {0: _("Off"), 1: _("Random"), 2: _("In Order"), 3: _("BackNForth")} ) 
+Config.define("game",   "stage_mode",           int,  0,  text = _("Static Stages"),  options = {0: _("Random"), 1: _("Default"), 2: _("Blank") } )
+Config.define("game",   "song_stage",           int,  1,  text = _("Song Stage"),  options = {0: _("Off"), 1: _("On") } ) #MFH
 Config.define("game",   "lyric_mode",           int,   2,   text = _("Lyrics"), options = {0: _("Off"), 1: _("song.ini"), 2: _("Auto"), 3: _("Dual Lyric Prevention")})#racer
 Config.define("game",   "frets_under_notes",          bool, True,  text = _("Frets under notes"), options = {False: _("No"), True: _("Yes")})
 #Config.define("game",   "drum_highscore_nav",          bool, False,  text = _("Drum highscore nav"), options = {False: _("Off"), True: _("On")})
@@ -136,7 +135,6 @@ Config.define("game",   "drum_navigation",          bool, False,  text = _("Drum
 Config.define("game",   "ignore_open_strums",          bool, True,  text = _("Ignore open strums"), options = {False: _("No"), True: _("Yes")})
 Config.define("performance",   "static_strings",          bool, True,  text = _("Static strings"), options = {False: _("No"), True: _("Yes")})
 Config.define("game",   "whammy_saves_starpower",          bool, False,  text = _("Whammy saves SP"), options = {False: _("No"), True: _("Yes")})
-Config.define("game",   "mute_sustain_releases",          bool, False,  text = _("Mute sustain releases"), options = {False: _("No"), True: _("Yes")})
 Config.define("game",   "hopo_indicator",          bool, False,  text = _("HOPO Indicator"), options = {False: _("Off"), True: _("On")})
 Config.define("game",   "quickplay_career_tiers",          bool, True,  text = _("Quickplay Tiers"), options = {False: _("Off"), True: _("On")})
 Config.define("performance",   "star_score_updates",          int, 1,  text = _("Star Updates"), options = {0: _("On Hit"), 1: _("Score Change")})
@@ -184,7 +182,15 @@ Config.define("game", "result_cheer_loop",       int, 2,     text = _("Results C
 Config.define("game",  "cheer_loop_delay",        int,   550,   text = _("Cheer Loop Delay"), options = dict([(n, n) for n in range(0, 10, 1)] + [(n, n) for n in range(10, 50, 10)] + [(n, n) for n in range(50, 2001, 50)]))
 Config.define("game", "miss_pauses_anim",       int, 1,     text = _("Miss Pauses Anim"), options = {0: _("Off"), 1: _("On")}) #MFH
 Config.define("game", "song_hopo_freq",       int, 1,     text = _("Song HOPO Freq"), options = {0: _("Off"), 1: _("Auto")}) #MFH
+#Config.define("game",   "mute_sustain_releases",          bool, False,  text = _("Mute sustain releases"), options = {False: _("No"), True: _("Yes")})
+Config.define("game",   "sustain_muting",          int, 1,    text = _("Sustain Muting"), options = {0: _("Off"), 1: _("Ultra Wide"), 2: _("Wide"), 3: _("Standard"), 4: _("Tight")})
 
+#MFH - log settings
+Config.define("game",   "log_ini_reads",          int, 0,    text = _("Log INI Reads"), options = {0: _("No"), 1: _("Yes")})
+Config.define("game",   "log_class_inits",          int, 0,    text = _("Log Class Inits"), options = {0: _("No"), 1: _("Yes")})
+Config.define("game",   "log_loadings",          int, 0,    text = _("Log Loadings"), options = {0: _("No"), 1: _("Yes")})
+Config.define("game",   "log_sections",          int, 0,    text = _("Log MIDI Sections"), options = {0: _("No"), 1: _("Yes")})
+Config.define("game",   "log_undefined_gets",          int, 0,    text = _("Log Undefined GETs"), options = {0: _("No"), 1: _("Yes")})
 
 
 #racer
@@ -209,7 +215,7 @@ Config.define("coffee", "songdisplay",       bool, False,     text = _("Song Dis
 Config.define("game", "tut",       bool, False,     text = _("tut"),             options = {True: _("yes"), False: _("no")})
 
 
-Config.define("game",   "hit_window",          int, 1,    text = _("Note Hit-window"), options = {0: _("Wide"), 1: _("Standard"), 2: _("Tight"), 3: _("Hot Pants Tight"), 4: _("Tight Like a Tiger")})#racer blazingamer
+Config.define("game",   "hit_window",          int, 1,    text = _("Note Hit-window"), options = {0: _("1. Widest"), 1: _("2. Wide"), 2: _("3. Standard"), 3: _("4. Tight"), 4: _("5. Tightest")})#racer blazingamer
 Config.define("game",   "disable_vbpm",        bool,  False,  text = _("Disable Variable BPM"),  options = {False: _("No"), True: _("Yes")})
 Config.define("game",   "sort_order",          int,   0,      text = _("Sort Order"), options = {0: _("Title"), 1: _("Artist"), 2: _("Times played")})
 Config.define("game",   "pov",                 int,   3,      text = _("Point Of View"), options = {0: _("FoF"), 1: _("GH3"), 2: _("Custom"), 3: _("Rock Band"), 4: _("GH2"), 5: _("Rock Rev"), 6: _("Theme")}) #Racer, Blazingamer
@@ -225,7 +231,11 @@ Config.define("game",   "jurglogic",            int,   1,      text = _("Jurgen 
 
 
 
-Config.define("audio",  "miss_volume",         float, 0.2,    text = _("Miss Volume"), options = dict([(n / 100.0, "%d%%" % n) for n in range(0, 100, 10)]))
+#Config.define("audio",  "miss_volume",         float, 0.2,    text = _("Miss Volume"), options = dict([(n / 100.0, "%d%%" % n) for n in range(0, 100, 10)]))
+#Config.define("audio",  "single_track_miss_volume",         float, 0.9,    text = _("Single Track Miss"), options = dict([(n / 100.0, "%d%%" % n) for n in range(0, 100, 10)]))
+Config.define("audio",  "miss_volume",         float, 0.2,    text = _("Miss Volume"), options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(0, 110, 10)]))  #MFH
+Config.define("audio",  "single_track_miss_volume",         float, 0.9,    text = _("Single Track Miss"), options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(0, 110, 10)]))  #MFH
+
 Config.define("audio",  "kill_volume",         float, 0.0,    text = _("Kill Volume"), options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(0, 110, 10)]))  #MFH
 Config.define("audio",  "SFX_volume",         float, 0.7,    text = _("SFX Volume"), options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(0, 110, 10)]))  #MFH
 
@@ -323,11 +333,15 @@ class SystemEventHandler(SystemEventListener):
 class GameEngine(Engine):
   """The main game engine."""
   def __init__(self, config = None):
+
+    #self.logClassInits = Config.get("game", "log_class_inits")
+    #if self.logClassInits == 1:
+    #  Log.debug("GameEngine class init (GameEngine.py)...")
     Log.debug("GameEngine class init (GameEngine.py)...")
 
     self.mainMenu = None    #placeholder for main menu object - to prevent reinstantiation
 
-    self.versionString = "FoFiX v3.025"
+    self.versionString = "FoFiX v3.030"
     
     Log.debug(self.versionString + " starting up...")
     
@@ -348,10 +362,9 @@ class GameEngine(Engine):
     self.config  = config
     
     fps          = self.config.get("video", "fps")
-    tickrate     = self.config.get("engine", "tickrate")
-    Engine.__init__(self, fps = fps, tickrate = tickrate)
+    Engine.__init__(self, fps = fps)
     
-    self.title             = _("Frets on Fire " + self.versionString)
+    self.title             = self.versionString
     self.restartRequested  = False
     self.handlingException = False
     self.video             = Video(self.title)
@@ -380,15 +393,15 @@ class GameEngine(Engine):
     # Enable the high priority timer if configured
     if self.config.get("engine", "highpriority"):
       Log.debug("Enabling high priority timer.")
-      self.timer.highPriority = True
+      #self.timer.highPriority = True
+      self.fps = 0 # High priority
 
     viewport = glGetIntegerv(GL_VIEWPORT)
     h = viewport[3] - viewport[1]
     w = viewport[2] - viewport[0]
     geometry = (0, 0, w, h)
     self.svg = SvgContext(geometry)
-    self.svg.setRenderingQuality(self.config.get("opengl", "svgquality"))
-    glViewport(*viewport)
+    glViewport(int(viewport[0]), int(viewport[1]), int(viewport[2]), int(viewport[3]))
 
     self.input     = Input()
     self.view      = View(self, geometry)
@@ -403,11 +416,13 @@ class GameEngine(Engine):
     # Load game modifications
     Mod.init(self)
     
+    self.addTask(self.audio, synchronized = False)
     self.addTask(self.input, synchronized = False)
-    self.addTask(self.view)
+    
+    #self.addTask(self.view)
+    self.addTask(self.view, synchronized = False)
+    
     self.addTask(self.resource, synchronized = False)
-    
-    
 
     self.data = Data(self.resource, self.svg)
     themename = self.data.themeLabel
@@ -450,7 +465,7 @@ class GameEngine(Engine):
         defaultAniStage = "Normal"
       Log.debug("Default animated stage for " + currentTheme + " theme = " + defaultAniStage)
       aniStageOptions = dict([(str(self.stageFolders[n]),self.stageFolders[n]) for n in range(0, i)])
-      aniStageOptions.update({"Normal":_("Normal")})
+      aniStageOptions.update({"Normal":_("Slideshow")})
       if i > 1:   #only add Random setting if more than one animated stage exists
         aniStageOptions.update({"Random":_("Random")})
       Config.define("game", "animated_stage_folder", str, defaultAniStage, text = _("Animated Stage"), options = aniStageOptions )
@@ -686,12 +701,6 @@ class GameEngine(Engine):
   def main(self):
     """Main state loop."""
     try:
-      # Tune the scheduler priority so that transitions are as smooth as possible
-      if self.view.isTransitionInProgress():
-        self.boostBackgroundThreads(False)
-      else:
-        self.boostBackgroundThreads(True)
-      
       done = Engine.run(self)
       self.clearScreen()
       self.view.render()

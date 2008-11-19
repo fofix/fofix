@@ -47,7 +47,9 @@ class ConfigChoice(Menu.Choice):
   def __init__(self, config, section, option, autoApply = False):
     self.config    = config
     
-    Log.debug("ConfigChoice class init (Settings.py)...")
+    self.logClassInits = Config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("ConfigChoice class init (Settings.py)...")
     
     self.section   = section
     self.option    = option
@@ -96,7 +98,10 @@ class VolumeConfigChoice(ConfigChoice):
   def __init__(self, engine, config, section, option, autoApply = False):
     ConfigChoice.__init__(self, config, section, option, autoApply)
     self.engine = engine
-    Log.debug("VolumeConfigChoice class init (Settings.py)...")
+
+    self.logClassInits = self.engine.config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("VolumeConfigChoice class init (Settings.py)...")
     
 
   def change(self, value):
@@ -108,7 +113,11 @@ class VolumeConfigChoice(ConfigChoice):
 class KeyConfigChoice(Menu.Choice):
   def __init__(self, engine, config, section, option):
     self.engine  = engine
-    Log.debug("KeyConfigChoice class init (Settings.py)...")
+
+    self.logClassInits = self.engine.config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("KeyConfigChoice class init (Settings.py)...")
+
     self.config  = config
     self.section = section
     self.option  = option
@@ -175,9 +184,13 @@ class KeyConfigChoice(Menu.Choice):
 
 class SettingsMenu(Menu.Menu):
   def __init__(self, engine):
-    Log.debug("SettingsMenu class init (Settings.py)...")
-    
+
     self.engine = engine
+
+    self.logClassInits = self.engine.config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("SettingsMenu class init (Settings.py)...")
+
     
     applyItem = [(_("Apply New Settings"), self.applySettings)]
 
@@ -187,10 +200,11 @@ class SettingsMenu(Menu.Menu):
     
     StagesOptions = [
       ConfigChoice(engine.config, "game", "stage_mode", autoApply = True),   #myfingershurt
+      ConfigChoice(engine.config, "game", "animated_stage_folder", autoApply = True),   #myfingershurt
       ConfigChoice(engine.config, "game", "song_stage", autoApply = True),   #myfingershurt
       ConfigChoice(engine.config, "game", "rotate_stages", autoApply = True),   #myfingershurt
       ConfigChoice(engine.config, "game", "stage_rotate_delay", autoApply = True),   #myfingershurt - user defined stage rotate delay
-      ConfigChoice(engine.config, "game", "animated_stage_folder", autoApply = True),   #myfingershurt
+      ConfigChoice(engine.config, "game", "stage_animate", autoApply = True),   #myfingershurt - user defined stage rotate delay
       ConfigChoice(engine.config, "game", "stage_animate_delay", autoApply = True),   #myfingershurt - user defined stage rotate delay
     ]
     StagesOptionsMenu = Menu.Menu(engine, StagesOptions)
@@ -224,6 +238,8 @@ class SettingsMenu(Menu.Menu):
       (_("HO/PO Settings"), HOPOSettingsMenu),
       (_("Lyrics Settings"), LyricsSettingsMenu),
       (_("Jurgen Settings"), JurgenSettingsMenu),
+      (_("Choose P1 Neck >"), lambda: Dialogs.chooseNeck(engine,player=0,prompt=_("Yellow (#3) / Blue (#4) to change:"))),
+      (_("Choose P2 Neck >"), lambda: Dialogs.chooseNeck(engine,player=1,prompt=_("Yellow (#3) / Blue (#4) to change:"))),
       ConfigChoice(engine.config, "game", "ignore_open_strums", autoApply = True),      #myfingershurt
       ConfigChoice(engine.config, "game", "star_scoring", autoApply = True),#myfingershurt
       ConfigChoice(engine.config, "coffee", "failingEnabled", autoApply = True),
@@ -385,9 +401,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "video",  "multisamples"),
       ConfigChoice(engine.config, "video", "disable_fretsfx"),
       ConfigChoice(engine.config, "video", "hitglow_color"),
-      ConfigChoice(engine.config, "opengl", "svgquality"),
       ConfigChoice(engine.config, "game", "pov", autoApply = True),
-      (_("Choose Neck >"), lambda: Dialogs.chooseNeck(engine,prompt=_("Yellow (#3) / Blue (#4) to change:"))),
       (_("Advanced Video Settings"), AdvancedVideoSettingsMenu),
     ]
     videoSettingsMenu = Menu.Menu(engine, videoSettings)
@@ -412,6 +426,7 @@ class SettingsMenu(Menu.Menu):
       VolumeConfigChoice(engine, engine.config, "audio",  "rhythmvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "screwupvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "miss_volume", autoApply = True),
+      VolumeConfigChoice(engine, engine.config, "audio",  "single_track_miss_volume", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "kill_volume", autoApply = True), #MFH
       VolumeConfigChoice(engine, engine.config, "audio",  "SFX_volume", autoApply = True), #MFH
     ]
@@ -422,7 +437,8 @@ class SettingsMenu(Menu.Menu):
        ConfigChoice(engine.config, "audio",  "frequency"),
        ConfigChoice(engine.config, "audio",  "bits"),
        ConfigChoice(engine.config, "audio",  "buffersize"),
-       ConfigChoice(engine.config, "game", "mute_sustain_releases", autoApply = True),   #myfingershurt
+       #ConfigChoice(engine.config, "game", "mute_sustain_releases", autoApply = True),   #myfingershurt
+       ConfigChoice(engine.config, "game", "sustain_muting", autoApply = True),   #myfingershurt
        ConfigChoice(engine.config, "audio", "mute_last_second", autoApply = True), #MFH
        ConfigChoice(engine.config, "game", "bass_kick_sound", autoApply = True),   #myfingershurt
        ConfigChoice(engine.config, "game", "T_sound", autoApply = True), #Faaa Drum sound
@@ -440,11 +456,21 @@ class SettingsMenu(Menu.Menu):
     audioSettingsMenu = Menu.Menu(engine, audioSettings)
     
     #MFH - new menu
+    logfileSettings = [
+      ConfigChoice(engine.config, "game", "log_ini_reads", autoApply = True),#myfingershurt
+      ConfigChoice(engine.config, "game", "log_class_inits", autoApply = True),#myfingershurt
+      ConfigChoice(engine.config, "game", "log_loadings", autoApply = True),#myfingershurt
+      ConfigChoice(engine.config, "game", "log_sections", autoApply = True),#myfingershurt
+      ConfigChoice(engine.config, "game", "log_undefined_gets", autoApply = True),#myfingershurt
+    ]
+    logfileSettingsMenu = Menu.Menu(engine, logfileSettings)
+
     debugSettings = [
       ConfigChoice(engine.config, "game", "kill_debug", autoApply = True),#myfingershurt
       ConfigChoice(engine.config, "game", "hopo_debug_disp", autoApply = True),#myfingershurt
       ConfigChoice(engine.config, "game", "rock_band_events", autoApply = True),#myfingershurt
       ConfigChoice(engine.config, "game", "show_unused_text_events", autoApply = True),#myfingershurt
+      (_("Log Settings"),    logfileSettingsMenu),
     ]
     debugSettingsMenu = Menu.Menu(engine, debugSettings)
     
@@ -587,7 +613,10 @@ class SettingsMenu(Menu.Menu):
     
 class GameSettingsMenu(Menu.Menu):
   def __init__(self, engine):
-    Log.debug("GameSettingsMenu class init (Settings.py)...")
+
+    self.logClassInits = Config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("GameSettingsMenu class init (Settings.py)...")
 
     settings = [
       VolumeConfigChoice(engine, engine.config, "audio",  "guitarvol", autoApply = True),
@@ -595,6 +624,7 @@ class GameSettingsMenu(Menu.Menu):
       VolumeConfigChoice(engine, engine.config, "audio",  "rhythmvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "screwupvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "miss_volume", autoApply = True),
+      VolumeConfigChoice(engine, engine.config, "audio",  "single_track_miss_volume", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "kill_volume", autoApply = True), #MFH
       VolumeConfigChoice(engine, engine.config, "audio",  "SFX_volume", autoApply = True), #MFH
       ConfigChoice(engine.config, "audio",  "delay", autoApply = True),   #myfingershurt: so the a/v delay can be adjusted in-game

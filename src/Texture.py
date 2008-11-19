@@ -73,7 +73,7 @@ class Framebuffer:
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
     # PyOpenGL does not support NULL textures, so we must make a temporary buffer here
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
-                 GL_RGBA, GL_UNSIGNED_BYTE, " " * (width * height * 4))
+                 GL_RGBA, GL_UNSIGNED_BYTE, "\x00" * (width * height * 4))
     self._checkError()
     
     if self.emulated:
@@ -269,6 +269,24 @@ class Texture:
         self.loadRaw(surface.get_size(), string, GL_RGB, 3)
     self.size = (w / w2, h / h2)
 
+  def loadSubsurface(self, surface, position = (0, 0), monochrome = False, alphaChannel = False):
+    """Load the texture from a pygame surface"""
+
+    if monochrome:
+      # pygame doesn't support monochrome, so the fastest way
+      # appears to be using PIL to do the conversion.
+      string = pygame.image.tostring(surface, "RGB")
+      image = Image.fromstring("RGB", surface.get_size(), string).convert("L")
+      string = image.tostring('raw', 'L', 0, -1)
+      self.loadSubRaw(surface.get_size(), position, string, GL_INTENSITY8)
+    else:
+      if alphaChannel:
+        string = pygame.image.tostring(surface, "RGBA", True)
+        self.loadSubRaw(surface.get_size(), position, string, GL_RGBA)
+      else:
+        string = pygame.image.tostring(surface, "RGB", True)
+        self.loadSubRaw(surface.get_size(), position, string, GL_RGB)
+
   def loadRaw(self, size, string, format, components):
     """Load a raw image from the given string. 'format' is a constant such as
        GL_RGB or GL_RGBA that can be passed to gluBuild2DMipmaps.
@@ -281,6 +299,19 @@ class Texture:
     Texture.bind(self)
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
     gluBuild2DMipmaps(self.glTarget, components, w, h, format, GL_UNSIGNED_BYTE, string)
+
+  def loadSubRaw(self, size, position, string, format):
+    Texture.bind(self)
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
+    glTexSubImage2D(self.glTarget, 0, position[0], position[1], size[0], size[1], format, GL_UNSIGNED_BYTE, string)
+
+  def loadEmpty(self, size, format):
+    self.pixelSize = size
+    self.size = (1.0, 1.0)
+    self.format = format
+    Texture.bind(self)
+    glTexImage2D(GL_TEXTURE_2D, 0, format, size[0], size[1], 0,
+                 format, GL_UNSIGNED_BYTE, "\x00" * (size[0] * size[1] * 4))
 
   def setDefaults(self):
     """Set the default OpenGL options for this texture"""
@@ -311,3 +342,52 @@ class Texture:
         glTarget = self.glTarget
     glBindTexture(glTarget, self.texture)
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, self.texEnv)
+#
+# Texture atlas
+#
+TEXTURE_ATLAS_SIZE = 1024
+
+class TextureAtlasFullException(Exception):
+  pass
+
+class TextureAtlas(object):
+  def __init__(self, size = TEXTURE_ATLAS_SIZE):
+    self.texture      = Texture()
+    self.cursor       = (0, 0)
+    self.rowHeight    = 0
+    self.surfaceCount = 0
+    self.texture.loadEmpty((size, size), GL_RGBA)
+
+  def add(self, surface, margin = 0):
+    w, h = surface.get_size()
+    x, y = self.cursor
+
+    w += margin
+    h += margin
+
+    if w > self.texture.pixelSize[0] or h > self.texture.pixelSize[1]:
+      raise ValueError("Surface is too big to fit into atlas.")
+
+    if x + w >= self.texture.pixelSize[0]:
+      x = 0
+      y += self.rowHeight
+      self.rowHeight = 0
+
+    if y + h >= self.texture.pixelSize[1]:
+      Log.debug("Texture atlas %s full after %d surfaces." % (self.texture.pixelSize, self.surfaceCount))
+      raise TextureAtlasFullException()
+
+    self.texture.loadSubsurface(surface, position = (x, y), alphaChannel = True)
+
+    self.surfaceCount += 1
+    self.rowHeight = max(self.rowHeight, h)
+    self.cursor = (x + w, y + h)
+
+    # Return the coordinates for the uploaded texture patch
+    w -= margin
+    h -= margin
+    return  x      / float(self.texture.pixelSize[0]),  y      / float(self.texture.pixelSize[1]), \
+           (x + w) / float(self.texture.pixelSize[0]), (y + h) / float(self.texture.pixelSize[1])
+
+  def bind(self):
+    self.texture.bind()

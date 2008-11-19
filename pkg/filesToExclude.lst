@@ -1,0 +1,1 @@
+"*.db"//exclude those pesky Thumbs.db files that don't seem to exist yet get archived!

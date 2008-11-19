@@ -496,7 +496,6 @@ class GHImporter(Layer):
     self.stageProgress = 0.0
 
   def hidden(self):
-    self.engine.boostBackgroundThreads(False)
     self.engine.view.pushLayer(MainMenu.MainMenu(self.engine))
 
   def decodeVgsStreams(self, vgsFile, length):
@@ -811,7 +810,6 @@ class GHImporter(Layer):
        break
 
     workPath = tempfile.mkdtemp("fretsonfire")
-    self.engine.boostBackgroundThreads(True)
     self.engine.resource.load(self, "songs", lambda: self.importSongs(headerPath, archivePath, workPath))
 
   def render(self, visibility, topMost):

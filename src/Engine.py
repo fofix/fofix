@@ -3,6 +3,7 @@
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
+#               2008 evilynux <evilynux@gmail.com>                  #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -25,18 +26,19 @@ import gc
 import Network
 import Object
 from World import World
-from Timer import Timer
 from Task import Task
+import pygame
 
 class Engine:
   """Main task scheduler."""
-  def __init__(self, fps = 60, tickrate = 1.0):
+  def __init__(self, fps = 60):
     self.tasks = []
     self.frameTasks = []
-    self.timer = Timer(fps = fps, tickrate = tickrate)
+    self.fps = fps
     self.currentTask = None
     self.paused = []
     self.running = True
+    self.clock = pygame.time.Clock()
 
   def quit(self):
     for t in list(self.tasks + self.frameTasks):
@@ -115,15 +117,6 @@ class Engine:
     """
     gc.collect()
 
-  def boostBackgroundThreads(self, boost):
-    """
-    Increase priority of background threads.
-
-    @param boost True of the scheduling of the main UI thread should  be
-                 made fairer to background threads, False otherwise.
-    """
-    self.timer.highPriority = not bool(boost)
-
   def _runTask(self, task, ticks = 0):
     if not task in self.paused:
       self.currentTask = task
@@ -137,7 +130,8 @@ class Engine:
     
     for task in self.frameTasks:
       self._runTask(task)
-    for ticks in self.timer.advanceFrame():
-      for task in self.tasks:
-        self._runTask(task, ticks)
+    tick = self.clock.get_time()
+    for task in self.tasks:
+      self._runTask(task, tick)
+    self.clock.tick(self.fps)
     return True

@@ -33,14 +33,8 @@ import Log
 import Config
 from Texture import Texture, TextureException
 
-try:
-  import amanith
-  import SvgColors
-  haveAmanith    = True
-except ImportError:
-  Log.warn("PyAmanith not found, SVG support disabled.")
-  import DummyAmanith as amanith
-  haveAmanith    = False
+import DummyAmanith as amanith
+haveAmanith = True
 
 # Add support for 'foo in attributes' syntax
 if not hasattr(sax.xmlreader.AttributesImpl, '__contains__'):
@@ -55,10 +49,6 @@ if not hasattr(sax.xmlreader.AttributesImpl, '__contains__'):
 #
 
 Config.define("opengl",  "svgshaders",   bool,  False, text = "Use OpenGL SVG shaders",   options = {False: "No", True: "Yes"})
-
-LOW_QUALITY    = amanith.G_LOW_RENDERING_QUALITY
-NORMAL_QUALITY = amanith.G_NORMAL_RENDERING_QUALITY
-HIGH_QUALITY   = amanith.G_HIGH_RENDERING_QUALITY
 
 class SvgGradient:
   def __init__(self, gradientDesc, transform):
@@ -99,25 +89,6 @@ class SvgContext:
     self.drawBoard.SetProjection(geometry[0], geometry[0] + geometry[2],
                                  geometry[1], geometry[1] + geometry[3])
     self.geometry = geometry
-
-  def setRenderingQuality(self, quality):
-    if quality == LOW_QUALITY:
-      q = amanith.G_LOW_RENDERING_QUALITY
-    elif quality == NORMAL_QUALITY:
-      q = amanith.G_NORMAL_RENDERING_QUALITY
-    elif quality == HIGH_QUALITY:
-      q = amanith.G_HIGH_RENDERING_QUALITY
-    else:
-      raise RaiseValueError("Bad rendering quality.")
-    self.drawBoard.SetRenderingQuality(q)
-
-  def getRenderingQuality(self):
-    q = self.drawBoard.RenderingQuality()
-    if q == amanith.G_LOW_RENDERING_QUALITY:
-      return LOW_QUALITY
-    elif q == amanith.G_NORMAL_RENDERING_QUALITY:
-      return NORMAL_QUALITY
-    return HIGH_QUALITY
 
   def clear(self, r = 0, g = 0, b = 0, a = 0):
     self.drawBoard.Clear(r, g, b, a)
@@ -535,15 +506,34 @@ class ImgDrawing:
     self.transform = SvgTransform()
 
     # Detect the type of data passed in
-    if type(ImgData) == str:
-      # Check whether we have a cached bitmap version
-      if ImgData.lower().endswith(".png"): # evilynux - Support mixed-cased extensions
-        self.texture = Texture(ImgData)
-      else:
-        self.ImgData = open(ImgData).read()
-    elif type(ImgData) == file:
+    if type(ImgData) == file:
       self.ImgData = ImgData.read()
-      
+    elif type(ImgData) == str:
+      bitmapFile = ImgData.replace(".svg", ".png")
+      # Load PNG files directly
+      if ImgData.endswith(".png"):
+        self.texture = Texture(ImgData)
+      # Check whether we have a prerendered bitmap version of the SVG file
+      elif ImgData.endswith(".svg") and os.path.exists(bitmapFile):
+        Log.debug("Loading cached bitmap '%s' instead of '%s'." % (bitmapFile, ImgData))
+        self.texture = Texture(bitmapFile)
+      else:
+        if not haveAmanith:
+          e = "PyAmanith support is deprecated and you are trying to load an SVG file."
+          Log.error(e)
+          raise RuntimeError(e)
+        Log.debug("Loading SVG file '%s'." % (ImgData))
+        self.ImgData = open(ImgData).read()
+
+    # Make sure we have a valid texture
+    if not self.texture:
+      if type(ImgData) == str:
+        e = "Unable to load texture for %s." % ImgData
+      else:
+        e = "Unable to load texture for SVG file."
+      Log.error(e)
+      raise RuntimeError(e)
+
   def _cacheDrawing(self, drawBoard):
     self.cache.beginCaching()
     parser = sax.make_parser()
@@ -555,26 +545,9 @@ class ImgDrawing:
     if self.texture:
       return
 
-    try:
-      self.texture = Texture()
-      self.texture.bind()
-      self.texture.prepareRenderTarget(width, height)
-      self.texture.setAsRenderTarget()
-      quality = self.context.getRenderingQuality()
-      self.context.setRenderingQuality(HIGH_QUALITY)
-      geometry = self.context.geometry
-      self.context.setProjection((0, 0, width, height))
-      glViewport(0, 0, width, height)
-      self.context.clear()
-      transform = SvgTransform()
-      transform.translate(width / 2, height / 2)
-      self._render(transform)
-      self.texture.resetDefaultRenderTarget()
-      self.context.setProjection(geometry)
-      glViewport(*geometry)
-      self.context.setRenderingQuality(quality)
-    except TextureException, e:
-      Log.warn("Unable to convert SVG drawing to texture: %s" % str(e))
+    e = "SVG drawing does not have a valid texture image."
+    Log.error(e)
+    raise RuntimeError(e)
 
   def _getEffectiveTransform(self):
     transform = SvgTransform(self.transform)

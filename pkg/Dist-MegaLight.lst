@@ -1,0 +1,29 @@
+"*."//get all extentionless files
+"*.exe"//all exes
+"fretsonfire.ini"//ini
+"*.dll"//dlls
+"src\*.*"//all src files
+"src\midi\*.*"//all src/midi files
+"po\*.*"//all translation .po source files
+"..\FoFiX-wiki\*.*"//all wiki pages
+"doc\*.*"//all other doc files
+"data\*.*"//all data files
+"data\mods\*.*"//all
+"data\mods\Low Poly CD List\*.*"//all
+"data\mods\MegaLight RB Notes\themes\MegaLight\*.*"//all
+"data\necks\defaultneck.png"//all
+"data\necks\randomneck.png"//all
+"data\necks\Neck_00?.*"//all
+"data\translations\*.*"//all
+"data\themes\MegaLight\*.*"//all
+"data\themes\MegaLight\menu\*.*"//all
+"data\themes\MegaLight\sounds\*.*"//all
+"data\themes\MegaLight\stages\*.png"//all
+"data\themes\MegaLight GH3\*.*"//all
+"data\themes\MegaLight GH3\menu\*.*"//all
+"data\themes\MegaLight GH3\sounds\*.*"//all
+"data\themes\MegaLight GH3\stages\*.png"//all
+"data\sounds\*.*"//all base sounds
+"data\tutorials\jurgenfof\*.*"//all of the original Jurgen FoF tutorial
+"data\tutorials\drumtest\*.*"//all of the Drum Test Song
+

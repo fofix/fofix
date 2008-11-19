@@ -43,13 +43,14 @@ STAR1 = unicode('\x10')
 STAR2 = unicode('\x11')
 LEFT  = unicode('\x12')
 RIGHT = unicode('\x13')
-BALL1 = unicode('\x14')
-BALL2 = unicode('\x15')
 
 class Data(object):
   """A collection of globally used data resources such as fonts and sound effects."""
   def __init__(self, resource, svg):
-    Log.debug("Data class init (Data.py)...")
+
+    self.logClassInits = Config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("Data class init (Data.py)...")
     
     self.resource = resource
     self.svg      = svg
@@ -110,10 +111,8 @@ class Data(object):
       self.loadImgDrawing(self, "star2",   os.path.join("themes",themename,"star2.png"), textureSize = (128, 128))
 
  
-    self.loadImgDrawing(self, "left",    "left.svg",  textureSize = (128, 128))
-    self.loadImgDrawing(self, "right",   "right.svg", textureSize = (128, 128))
-    self.loadImgDrawing(self, "ball1",   "ball1.svg", textureSize = (128, 128))
-    self.loadImgDrawing(self, "ball2",   "ball2.svg", textureSize = (128, 128))
+    self.loadImgDrawing(self, "left",    "left.png",  textureSize = (128, 128))
+    self.loadImgDrawing(self, "right",   "right.png", textureSize = (128, 128))
 
     # load misc images
     self.loadImgDrawing(self, "loadingImage", os.path.join("themes",themename,"loadingbg.png"), textureSize = (256,256))
@@ -150,7 +149,7 @@ class Data(object):
       font7     = lambda: Font(songFont, fontSize[0], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False)#kk69: loads font specific for song name in Guitar Scene =)
     font8     = lambda: Font(songListFont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False) #MFH
     font9     = lambda: Font(shadowfont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False, shadow = True) #blazingamer
-    font10    = lambda: Font(streakFont2, fontSize[2], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False, shadow = True) #blazingamer
+    font10    = lambda: Font(streakFont2, fontSize[2], scale = scale2*.65, reversed = reversed, systemFont = not asciiOnly, outline = False, shadow = True) #blazingamer - Worldrave Modified (- .18)
 
 
     resource.load(self, "font",         font1, onLoad = self.customizeFont, synch = True)
@@ -283,7 +282,7 @@ class Data(object):
       self.loadSoundEffect(self, "failSound", os.path.join("themes",themename,"sounds","failsound.ogg"))
     else: #MFH: Fallback on general failsound.ogg
       self.loadSoundEffect(self, "failSound", os.path.join("sounds","failsound.ogg"))
-      Log.warn(themename + "\sounds\failSound.ogg not found -- using general failSound.ogg instead.")
+      Log.warn(themename + "\sounds\ failsound.ogg not found -- using general failsound.ogg instead.")
 
 
     #myfingershurt: integrating Capo's starpower clap sounds
@@ -380,16 +379,35 @@ class Data(object):
     self.resource.load(target, name, lambda: Sound(fileName), onLoad = lambda s: s.setVolume(volume))
 
 
+  def determineNumSounds(self, soundPath, soundPrefix, soundExtension = ".ogg"):   #MFH - auto random sound enumeration
+    soundNum = 1
+    while self.fileExists(os.path.join(soundPath,"%s%d%s" % (soundPrefix, soundNum, soundExtension) ) ):
+      soundNum += 1
+    return soundNum-1
+
+  def getSoundObjectList(self, soundPath, soundPrefix, numSounds, soundExtension = ".ogg"):   #MFH
+    Log.debug( str(numSounds) + " " + soundPrefix + " sounds found in " + soundPath + ": " + soundPrefix + "1" + soundExtension + " - " + soundPrefix + str(numSounds) + soundExtension )
+    return [Sound(self.resource.fileName(os.path.join(soundPath,"%s%d%s" % (soundPrefix, i, soundExtension) ))) for i in range(1, numSounds+1)]
+
   def loadBackSounds(self):   #MFH - adding optional support for random choice between two back sounds
-    if self.fileExists(os.path.join("themes",self.themeLabel,"sounds","back1.ogg")):
-      return [Sound(self.resource.fileName(os.path.join("themes",self.themeLabel,"sounds","back%d.ogg") % i)) for i in range(1, 3)]
+    soundPathTheme = os.path.join("themes",self.themeLabel,"sounds")
+    soundPathData = "sounds"
+    soundPath = soundPathTheme
+    soundPrefix = "back"
+    numSounds = self.determineNumSounds(soundPath, soundPrefix)
+    if numSounds > 0:
+      return self.getSoundObjectList(soundPath, soundPrefix, numSounds)
     else:
       return [Sound(self.resource.fileName(os.path.join("themes",self.themeLabel,"sounds","out.ogg")))]
 
-
   def loadAcceptSounds(self):
-    if self.fileExists(os.path.join("themes",self.themeLabel,"sounds","accept1.ogg")):
-      return [Sound(self.resource.fileName(os.path.join("themes",self.themeLabel,"sounds","accept%d.ogg") % i)) for i in range(1, 11)]
+    soundPathTheme = os.path.join("themes",self.themeLabel,"sounds")
+    soundPathData = "sounds"
+    soundPath = soundPathTheme
+    soundPrefix = "accept"
+    numSounds = self.determineNumSounds(soundPath, soundPrefix)
+    if numSounds > 0:
+      return self.getSoundObjectList(soundPath, soundPrefix, numSounds)
     else:
       if self.theme == 0 or self.theme == 1:#GH2 or GH3
         return [Sound(self.resource.fileName(os.path.join("themes",self.themeLabel,"sounds","in.ogg")))]
@@ -397,25 +415,37 @@ class Data(object):
         return [Sound(self.resource.fileName(os.path.join("themes",self.themeLabel,"sounds","action.ogg")))]
 
   def loadScrewUpsounds(self):
-    #MFH - adding support for optional theme-specific screwup sounds:
-    if self.fileExists(os.path.join("themes",self.themeLabel,"sounds","guitscw1.ogg")):
-      return [Sound(self.resource.fileName(os.path.join("themes",self.themeLabel,"sounds","guitscw%d.ogg") % i)) for i in range(1, 7)]
-    else:
-      return [Sound(self.resource.fileName(os.path.join("sounds","guitscw%d.ogg") % i)) for i in range(1, 7)]
+    soundPathTheme = os.path.join("themes",self.themeLabel,"sounds")
+    soundPathData = "sounds"
+    soundPath = soundPathTheme
+    soundPrefix = "guitscw"
+    numSounds = self.determineNumSounds(soundPath, soundPrefix)
+    if numSounds == 0:
+      soundPath = soundPathData
+      numSounds = self.determineNumSounds(soundPath, soundPrefix)
+    return self.getSoundObjectList(soundPath, soundPrefix, numSounds)
 
   def loadScrewUpsoundsBass(self):
-    #MFH - adding support for optional theme-specific screwup sounds:
-    if self.fileExists(os.path.join("themes",self.themeLabel,"sounds","bassscw1.ogg")):
-      return [Sound(self.resource.fileName(os.path.join("themes",self.themeLabel,"sounds","bassscw%d.ogg") % i)) for i in range(1, 7)]
-    else:
-      return [Sound(self.resource.fileName(os.path.join("sounds","bassscw%d.ogg") % i)) for i in range(1, 7)]
+    soundPathTheme = os.path.join("themes",self.themeLabel,"sounds")
+    soundPathData = "sounds"
+    soundPath = soundPathTheme
+    soundPrefix = "bassscw"
+    numSounds = self.determineNumSounds(soundPath, soundPrefix)
+    if numSounds == 0:
+      soundPath = soundPathData
+      numSounds = self.determineNumSounds(soundPath, soundPrefix)
+    return self.getSoundObjectList(soundPath, soundPrefix, numSounds)
 
   def loadScrewUpsoundsDrums(self):
-    #MFH - adding support for optional theme-specific screwup sounds:
-    if self.fileExists(os.path.join("themes",self.themeLabel,"sounds","drumscw1.ogg")):
-      return [Sound(self.resource.fileName(os.path.join("themes",self.themeLabel,"sounds","drumscw%d.ogg") % i)) for i in range(1, 8)]
-    else:
-      return [Sound(self.resource.fileName(os.path.join("sounds","drumscw%d.ogg") % i)) for i in range(1, 8)]
+    soundPathTheme = os.path.join("themes",self.themeLabel,"sounds")
+    soundPathData = "sounds"
+    soundPath = soundPathTheme
+    soundPrefix = "drumscw"
+    numSounds = self.determineNumSounds(soundPath, soundPrefix)
+    if numSounds == 0:
+      soundPath = soundPathData
+      numSounds = self.determineNumSounds(soundPath, soundPrefix)
+    return self.getSoundObjectList(soundPath, soundPrefix, numSounds)
   
   def loadSyncsounds(self):
     return [Sound(self.resource.fileName("sync%d.ogg" % i)) for i in range(1, 2)]
@@ -453,8 +483,6 @@ class Data(object):
     font.setCustomGlyph(STAR2, self.star2.texture)
     font.setCustomGlyph(LEFT,  self.left.texture)
     font.setCustomGlyph(RIGHT, self.right.texture)
-    font.setCustomGlyph(BALL1, self.ball1.texture)
-    font.setCustomGlyph(BALL2, self.ball2.texture)
     # evilynux - Load cache to speedup rendering
     if Config.get("performance", "preload_glyph_cache"):
       font.loadCache()
