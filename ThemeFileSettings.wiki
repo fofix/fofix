@@ -57,6 +57,8 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||_*Item Name*_||_*What it Does/How to use it*_||
 ||song_select_submenu_x = 0||Controls the submenu text positions. Use a decimal # between 0 - 1, IE- .012||
 ||song_select_submenu_y = 0||Controls the submenu text positions. Use a decimal # between 0 - 1, IE- .030||
+||song_select_submenu_offset_lines = 2||Adds offset lines. Has *NO* effect if {{{song_select_submenu_x_ AND _song_select_submenu_y}}} *aren't* used.||
+||song_select_submenu_offset_spaces = 2||Adds offset spaces. Has *NO* effect if {{{song_select_submenu_x AND song_select_submenu_y}}} *aren't* used.||
 
 
 
@@ -81,7 +83,7 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||fret3_color = #3333FF||Manually sets 4tg fret tail color||
 ||fret4_color = #FF9933||Manually sets 5th fret tail color||
 ||crowd_loop_delay = x||x = integer.  Default user setting = 550 for sounds\crowdcheers.ogg)||
-
+||display_all_grey_stars = True||True - All 5 stars shown at all times. False - Only shows the grey star your currently working on||
 
 
 
