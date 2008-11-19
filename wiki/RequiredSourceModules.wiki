@@ -2,7 +2,10 @@
 #labels Featured,Phase-Implementation
 
 =Setting Up FoFiX Sources=
+  * [http://code.google.com/p/fofix/wiki/RequiredSourceModules#For_GNU/Linux GNU/Linux]
+  * [http://code.google.com/p/fofix/wiki/RequiredSourceModules#For_Windows Windows]
 
+_Instructions for MacOS X welcome!_
 ----
 
 ==For Windows==
@@ -20,27 +23,27 @@ Versions are likely important. Don't substitute one for the other without trying
   # Download PyGame 1.7.1 - [http://www.pygame.org/ftp/pygame-1.7.1release.win32-py2.4.exe]
   # Download PIL 1.1.6 - [http://effbot.org/downloads/PIL-1.1.6.win32-py2.4.exe]
   # Download Numeric 2.4.2 - [http://downloads.sourceforge.net/numpy/Numeric-24.2.win32-py2.4.exe]
-  # Download Amanith 0.3 - [http://fretsonfire.phonotheque.ca/setup_amanith_03.rar]
-  # Download PyAmanith 0.3.34 - [http://muksuluuri.ath.cx/~skyostil/projects/pyamanith/dist/PyAmanith-0.3.34.win32-py2.4.exe]
+  # *ONLY for FoFiX 3.025 or earlier* -- Download Amanith 0.3 - [http://fretsonfire.phonotheque.ca/setup_amanith_03.rar]
+  # *ONLY for FoFiX 3.025 or earlier* -- Download PyAmanith 0.3.34 - [http://muksuluuri.ath.cx/~skyostil/projects/pyamanith/dist/PyAmanith-0.3.34.win32-py2.4.exe]
   # Download PyOgg 1.3 (this url is important, other versions dont work) - [http://thomas.paviot.free.fr/soya/pyogg-1.3.win32-py2.4.exe]
   # Download PyVorbis 1.4 (this URL is important, other versions don't work) - [http://thomas.paviot.free.fr/soya/pyvorbis-1.4.win32-py2.4.exe]
   # Download py2exe 0.6.6 - [http://downloads.sourceforge.net/py2exe/py2exe-0.6.6.win32-py2.4.exe]
   # Download the FoFiX source files from the trunk, or SVN revision / tag of your choice - [http://code.google.com/p/fofix/source/browse/MFH-Mod]
 
-===Install===
+===Install In This Order===
 
-  # Install active python by double clicking the .msi
-  # Install psyco by double clicking the .exe
-  # Unzip GLEW (no easy install)
-  # Install glew by copying the 'glew.dll' file in 'bin' to your 'system32' dir under C:\Windows (or equivalent)
-  # Install PyOpenGL by double clicking the .exe
-  # Install GLEWpy by double clicking the .exe
-  # Install PyGame by double clicking the .exe
-  # Install PIL by double clicking the .exe
-  # Install Numeric by double clicking the .exe
-  # Install Amanith by double clicking the .exe
-  # Select reboot later
-  # Install PyAmanith by double clicking the .exe
+  #  Install active python by double clicking the .msi
+  #  Install psyco by double clicking the .exe
+  #  Unzip GLEW (no easy install)
+  #  Install glew by copying the 'glew32.dll' file in 'bin' to your 'system32' dir under C:\Windows (or equivalent)   _*64bit OS users - Copy to 'C:\Windows' instead of '\system32'*_
+  #  Install PyOpenGL by double clicking the .exe
+  #  Install GLEWpy by double clicking the .exe
+  #  Install PyGame by double clicking the .exe
+  #  Install PIL by double clicking the .exe
+  #  Install Numeric by double clicking the .exe
+  # *ONLY for FoFiX 3.025 or earlier* -- Install Amanith by double clicking the .exe
+  # *ONLY for FoFiX 3.025 or earlier* -- Select reboot later
+  # *ONLY for FoFiX 3.025 or earlier* -- Install PyAmanith by double clicking the .exe
   # Install Pyogg by double clicking the .exe
   # Install Pyvorbis by double clicking the .exe
   # Install py2exe by double clicking the .exe
@@ -60,22 +63,55 @@ IOError: [Errno 2] No such file or directory: 'D:\\Games\\Frets on Fire\\dist\\d
 
 Back to what we were initially trying:
   # Locate the downloaded or checked-out FoFiX sources
-  # Move the `src` directory into your FoFiX directory (same place as the `data` directory) if it is not already located there.
-  # *REBOOT* _(required)_
+  # Move the {{{src}}} directory into your FoFiX directory (same place as the {{{data}}} directory) if it is not already located there.
+  # *ONLY for FoFiX 3.025 or earlier* -- *REBOOT* _(required)_
   # Open a command prompt
-  # cd to the new `src` directory in your FoFiX directory
-  # type `python FretsOnFire.py`
+  # cd to the new {{{src}}} directory in your FoFiX directory
+  # type {{{python FretsOnFire.py}}} (or run the {{{src\scripts\RunFofFromSources.bat}}} script)
 
 At this point you should be able to play frets on fire directly from the source.
 
 To create the executable we need a few more steps
 
-  # In your command prompt type `python setup.py py2exe`
-  # A bunch of stuff will happen and you should end up with a `dist` directory above.
-  # Go into the dist directory and retrieve `FretsOnFire.exe`, place in your FoFiX trunk / root.
-  # Go into the `dist\data` directory and retrieve `library.zip`, place in your FoFiX's data directory.
-  # You may need the Windows support files for FoFiX (mostly .DLLs), which can be found inside any full Windows FoFiX distribution in the appropriate directory structure.
+  # Go to your {{{src\scripts}}} directory where you have your SVN directory setup (IE- {{{C:\FoFiX SVN\src\scripts}}})
+  # Double-click on the {{{RebuildWin.bat}}} script.  This will recompile and rebuild the game {{{.EXE}}} file, {{{library.zip}}}, and required Python support modules ({{{.PYD}}} files).  This script will also retrieve these files and replace the old files in your FoFiX and data folders, as well as copy over any {{{.DLL}}} files that the build process decided to include.  Then the intermediate files (in {{{src\build}}} and {{{dist\}}}) will automatically be cleaned up.
+  # You may need the Windows support files for FoFiX (mostly {{{.DLL}}}s), which can be found inside any full Windows FoFiX distribution in the appropriate directory structure.
 
 ----
+==For GNU/Linux==
+=== Get latest FoFiX ===
+  # Open a terminal
+  # Change to the directory in which you want to have FoFiX
+  # Execute `svn checkout http://fofix.googlecode.com/svn/MFH-Mod/trunk/ FoFiX-SVN`
+=== Install dependencies ===
+You need to install those packages:
+  * python2.4
+  * python-pygame
+  * python-opengl (= 2.x)
+  * python-numpy
+  * python-numeric
+  * python-imaging
+  * python-vorbis
+  * python-xml
 
-_Instructions for other platforms coming soon!_
+Optionally, if you are in 32bit you can also install python-psyco.
+
+=== Running from sources ===
+  # Change directory to `FoFiX-SVN/src`
+  # Execute `python2.4 FretsOnFire.py`
+
+=== Creating binaries ===
+You first need to...
+  # Install cxFreeze
+  # Substitue line 16 of `/usr/lib/python2.4/site-packages/OpenGL/__init__.py` with `__version__ = "2.0.1.09"`.
+  # Get the wiki pages by executing the following in the folder that contains `FoFiX-SVN`:
+    * `svn checkout http://fofix.googlecode.com/svn/wiki FoFiX-wiki`
+
+Then either create a patch or a full package.
+
+==== Patch ====
+  * Execute `make patch`.
+==== Full package ====
+  # Execute `make dist`.
+  # Execute `perl pkg/Package-GNULinux.pl -d FoFiX-Full-GNULinux -l pkg/Dist-MegaLight-GNULinux.lst`
+----

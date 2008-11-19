@@ -18,7 +18,7 @@ So, no matter how much work you _think_ you are being stuck with, compare it to 
 ----
 
 === Is this really a bug?? ===
-*Please*, before you submit an issue that you THINK is a bug - review this [http://code.google.com/p/fofix/issues/list?can=1&q=status%3AInvalid%2CDuplicate list of "Invalid" and "Duplicate" issues] that have been reported and then removed because the game is working as intended.  Please realize that there are other users out there that play the game in different ways, and your "bug" is probably a feature you just don't understand...
+*Please*, before you submit an issue that you THINK is a bug - review this [http://code.google.com/p/fofix/issues/list?can=1&q=status%3AInvalid%2CDuplicate%2CCantReproduce list of "Invalid", "Duplicate", and "CantReproduce" issues] that have been reported and then removed because the game is working as intended.  Please realize that there are other users out there that play the game in different ways, and your "bug" is probably a feature you just don't understand...
 
 ----
 
