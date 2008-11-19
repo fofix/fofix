@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-11-18 20:50-0800\n"
+"POT-Creation-Date: 2008-11-18 21:13-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -191,41 +191,41 @@ msgstr ""
 msgid "Neck"
 msgstr ""
 
-#: Dialogs.py:2938
+#: Dialogs.py:2941
 #, python-format
 msgid "%.2f beats per minute"
 msgstr ""
 
-#: Dialogs.py:3016 Dialogs.py:3080
+#: Dialogs.py:3019 Dialogs.py:3083
 msgid "StarPower"
 msgstr ""
 
-#: Dialogs.py:3067 Dialogs.py:3085
+#: Dialogs.py:3070 Dialogs.py:3088
 #, python-format
 msgid "Killswitch %d%%"
 msgstr ""
 
-#: Dialogs.py:3073 Dialogs.py:3091
+#: Dialogs.py:3076 Dialogs.py:3094
 msgid "Killswitch"
 msgstr ""
 
-#: Dialogs.py:3097 Dialogs.py:3103
+#: Dialogs.py:3100 Dialogs.py:3106
 msgid "Pick!"
 msgstr ""
 
-#: Dialogs.py:3218
+#: Dialogs.py:3221
 msgid "Choose a Song"
 msgstr ""
 
-#: Dialogs.py:3237
+#: Dialogs.py:3240
 msgid "Choose a File"
 msgstr ""
 
-#: Dialogs.py:3283 Dialogs.py:3294
+#: Dialogs.py:3286 Dialogs.py:3297
 msgid "Play with the keys and press Escape when you're done."
 msgstr ""
 
-#: Dialogs.py:3305 Dialogs.py:3437
+#: Dialogs.py:3308 Dialogs.py:3440
 msgid "Loading..."
 msgstr ""
 

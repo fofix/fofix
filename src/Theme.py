@@ -176,6 +176,10 @@ DEFAULT_SONG_SELECT_SUBMENU_Y = None
 #MFH - for scaling song info during countdown
 DEFAULT_SONG_INFO_DISPLAY_SCALE = 0.0020
 
+#MFH - y offset = lines, x offset = spaces
+DEFAULT_SONG_SELECT_SUBMENU_OFFSET_LINES = 2
+DEFAULT_SONG_SELECT_SUBMENU_OFFSET_SPACES = 2
+
 #MFH - option for Rock Band 2 theme.ini - only show # of stars you are working on
 DEFAULT_DISPLAY_ALL_GREY_STARS = True
 
@@ -344,6 +348,9 @@ Config.define("theme", "song_info_display_scale",  float, DEFAULT_SONG_INFO_DISP
 #MFH - option for Rock Band 2 theme.ini - only show # of stars you are working on
 Config.define("theme", "display_all_grey_stars",  bool, DEFAULT_DISPLAY_ALL_GREY_STARS)
 
+#MFH - y offset = lines, x offset = spaces
+Config.define("theme", "song_select_submenu_offset_lines",  int, DEFAULT_SONG_SELECT_SUBMENU_OFFSET_LINES)
+Config.define("theme", "song_select_submenu_offset_spaces",  int, DEFAULT_SONG_SELECT_SUBMENU_OFFSET_SPACES)
 
 #RACER:
 Config.define("theme", "fail_bkg_x",       float, DEFAULT_FAIL_BKG_X)
@@ -454,6 +461,10 @@ neck_prompt_y = None
 
 #MFH - for scaling song info during countdown
 songInfoDisplayScale = None
+
+#MFH - y offset = lines, x offset = spaces
+songSelectSubmenuOffsetLines = None
+songSelectSubmenuOffsetSpaces = None
 
 #MFH - option for Rock Band 2 theme.ini - only show # of stars you are working on
 displayAllGreyStars = None
@@ -869,8 +880,19 @@ def setupSonglist(config):
   global pause_text_colorVar, pause_selected_colorVar
   global fail_text_colorVar, fail_selected_colorVar
   global songSelectSubmenuX, songSelectSubmenuY
+  global songSelectSubmenuOffsetLines, songSelectSubmenuOffsetSpaces
 
-#MFH - for instrument / difficulty / practice section submenu positioning
+  #MFH - for instrument / difficulty / practice section submenu positioning
+  temp = config.get("theme", "song_select_submenu_offset_lines")
+  if songSelectSubmenuOffsetLines == None or temp != DEFAULT_SONG_SELECT_SUBMENU_OFFSET_LINES:
+    songSelectSubmenuOffsetLines = temp  
+
+  #MFH - for instrument / difficulty / practice section submenu positioning
+  temp = config.get("theme", "song_select_submenu_offset_spaces")
+  if songSelectSubmenuOffsetSpaces == None or temp != DEFAULT_SONG_SELECT_SUBMENU_OFFSET_SPACES:
+    songSelectSubmenuOffsetSpaces = temp  
+
+  #MFH - for instrument / difficulty / practice section submenu positioning
   temp = config.get("theme", "song_select_submenu_x")
   if songSelectSubmenuX == None or temp != DEFAULT_SONG_SELECT_SUBMENU_X:
     songSelectSubmenuX = temp  
@@ -1212,6 +1234,7 @@ def writeMisc(f, config):
   global loadingPhrase, resultsPhrase
   global creditSong
   global crowdLoopDelay
+  global song_info_display_scale, display_all_grey_stars
 
   f.write("%s = %s\n" % ("loading_phrase", loadingPhrase))
   f.write("%s = %s\n" % ("results_phrase", resultsPhrase))
@@ -1241,6 +1264,11 @@ def writeSonglist(f, config):
   global songlist_score_colorVar # evilynux - score color
 
   global songSelectSubmenuX, songSelectSubmenuY
+  global songSelectSubmenuOffsetLines, songSelectSubmenuOffsetSpaces
+
+  #MFH - y offset = lines, x offset = spaces
+  f.write("%s = %s\n" % ("song_select_submenu_offset_lines", songSelectSubmenuOffsetLines))
+  f.write("%s = %s\n" % ("song_select_submenu_offset_spaces", songSelectSubmenuOffsetSpaces))
 
   #MFH - for instrument / difficulty / practice section submenu positioning
   f.write("%s = %s\n" % ("song_select_submenu_x", songSelectSubmenuX))

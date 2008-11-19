@@ -2788,11 +2788,14 @@ class ItemChooser(BackgroundLayer, KeyListener):
     widthOfSpace, heightOfSpace = self.font.getStringSize(" ", scale=self.promptScale)
 
     if pos: #MFH
+      self.songSelectSubmenuOffsetLines = Theme.songSelectSubmenuOffsetLines
+      self.songSelectSubmenuOffsetSpaces = Theme.songSelectSubmenuOffsetSpaces
       self.posX, self.posY = pos
       wrapX, wrapY = wrapText(self.font, (self.posX, self.posY), self.prompt, scale = self.promptScale)
       #self.posY += self.promptHeight*2
       #self.posX -= self.promptWidth/2
-      self.menu = Menu(self.engine, choices = [(c, self._callbackForItem(c)) for c in items], onClose = self.close, onCancel = self.cancel, font = self.engine.data.streakFont2, pos = (self.posX + widthOfSpace*2, wrapY + self.promptHeight*2) )
+      #self.menu = Menu(self.engine, choices = [(c, self._callbackForItem(c)) for c in items], onClose = self.close, onCancel = self.cancel, font = self.engine.data.streakFont2, pos = (self.posX + widthOfSpace*2, wrapY + self.promptHeight*2) )
+      self.menu = Menu(self.engine, choices = [(c, self._callbackForItem(c)) for c in items], onClose = self.close, onCancel = self.cancel, font = self.engine.data.streakFont2, pos = (self.posX + widthOfSpace*(self.songSelectSubmenuOffsetSpaces+1), wrapY + self.promptHeight*(self.songSelectSubmenuOffsetLines+1)) )
     else:
       self.posX = .1    #MFH - default
       self.posY = .05   #MFH - default
