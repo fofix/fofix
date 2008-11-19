@@ -11,6 +11,7 @@ data/tutorials/jurgenfof:data/tutorials/
 data/tutorials/drumtest:data/tutorials/
 data/mods:data/
 data/themes/MegaLight:data/themes/
+data/themes/MegaLight\ GH3:data/themes/
 dist/FretsOnFire:.
 dist/FretsOnFire.bin:.
 AUTHORS:.
