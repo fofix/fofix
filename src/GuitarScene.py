@@ -6714,12 +6714,17 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                       #MFH TODO - scale and display self.soloFrame behind / around the solo accuracy text display
                       if self.soloFrame:
                         self.soloFrame.transform.reset()
-                        tempWFactor = self.soloFrame.widthf(wBak)
-                        tempWScale = Tw*(tempWFactor/1.75)
-                        tempHScale = -Th*(tempWFactor/2.25)
+                        soloImgwidth = self.soloFrame.width1()
+                        #tempWFactor = self.soloFrame.widthf(32.000)
+                        tempWFactor = 640.000/soloImgwidth
+                        #tempWScale = Tw*(tempWFactor/1.75)
+                        #tempHScale = -Th*(tempWFactor/2.25)
+                        tempWScale = Tw*1.15*(tempWFactor)
+                        tempHScale = -Th*(tempWFactor)
+                        
                         self.soloFrame.transform.scale(tempWScale,tempHScale)
                         #self.soloFrame.transform.scale(1,1)
-                        self.soloFrame.transform.translate(wBak*boxXOffset,hBak*(1-yOffset-Th*2.1))
+                        self.soloFrame.transform.translate(wBak*boxXOffset,hBak*(1.0-yOffset-Th*2.05))
                         self.soloFrame.draw()
                         
                       soloFont.render(soloText, (xOffset, yOffset),(1, 0, 0),txtSize)
