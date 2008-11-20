@@ -5,7 +5,7 @@
 (requires a Subversion client, such as [http://tortoisesvn.net/ TortoiseSVN], to check out and receive easy updates of the latest FoFiX source code)
 
 Perform an "SVN Checkout" on the following URL to a local folder of your choosing: 
-{{{http://fofix.googlecode.com/svn/trunk}}}
+{{{http://fofix.googlecode.com/svn/MFH-Mod/trunk}}}
 
 Then, to check for and update to the very latest FoFiX alpha source code, perform an "SVN Update" on the folder where you checked out the source files.  
 
