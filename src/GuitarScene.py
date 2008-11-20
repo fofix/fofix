@@ -2205,7 +2205,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #  Log.debug("MFH: An early sustain release was detected, and it was not deemed too early, so muting was not attempted.")
 
     if score != 0:
-      self.players[num].addScore(score*self.multi[num])
+      scoreTemp = score*self.multi[num]
+      self.players[num].addScore(scoreTemp)
+      self.coOpScore += (scoreTemp)
+      
 
   def render3D(self):
     self.stage.render(self.visibility)
