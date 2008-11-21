@@ -4,6 +4,8 @@
 =Checking out the latest code anonymously=
 (requires a Subversion client, such as [http://tortoisesvn.net/ TortoiseSVN], to check out and receive easy updates of the latest FoFiX source code)
 
+_(Note - it is recommended that you download the latest "full" release of FoFiX for your operating system, extract it where you want, and test it first.  This folder now has all the required dependencies for you to rebuild and recompile the source into FretsOnFire.exe and library.zip -- this should also be the folder you perform the "SVN Checkout" and "SVN Update" on!)_
+
 Perform an "SVN Checkout" on the following URL to a local folder of your choosing: 
 {{{http://fofix.googlecode.com/svn/MFH-Mod/trunk}}}
 
