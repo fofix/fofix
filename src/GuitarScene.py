@@ -312,6 +312,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.hOffset[i] = self.hPlayer[i]*.4*(self.numOfPlayers-1) #QQstarS: Hight Offset when there are 2 players
       self.hFontOffset[i] = -self.hOffset[i]/self.hPlayer[i]*0.752 #QQstarS: font Hight Offset when there are 2 players
 
+
     self.engine.view.setViewport(1,0)
 
     
@@ -599,8 +600,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     try:
       self.engine.loadImgDrawing(self, "soloFrame", os.path.join("themes",themename,"soloframe.png"))
+      soloImgwidth = self.soloFrame.width1()
+      self.soloFrameWFactor = 640.000/soloImgwidth
     except IOError:
       self.soloFrame = None
+      self.soloFrameWFactor = None
+
 
 
     if self.rmtype == 0:
@@ -6300,8 +6305,27 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 else:
                   soloFont = font
                 
+
+
                 Tw, Th = soloFont.getStringSize(text1,txtSize)
                 Tw2, Th2 = soloFont.getStringSize(text2,txtSize)
+
+                
+
+                #MFH - scale and display self.soloFrame behind / around the text
+                if self.soloFrame:
+                  frameWidth = (max(Tw,Tw2))*1.15
+                  frameHeight = (Th+Th2)*1.05
+                  boxXOffset = 0.5
+                  #MFH - font Y position = top of text to be written
+                  boxYOffset = self.hPlayer[i]-(self.wFull* (yOffset+(frameHeight/1.97)) )
+                  self.soloFrame.transform.reset()
+                  tempWScale = frameWidth*self.soloFrameWFactor
+                  tempHScale = -(frameHeight)*self.soloFrameWFactor
+                  self.soloFrame.transform.scale(tempWScale,tempHScale)
+                  self.soloFrame.transform.translate(self.wPlayer[i]*boxXOffset,boxYOffset)
+                  self.soloFrame.draw()
+
                 soloFont.render(text1, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #centered
                 soloFont.render(text2, (0.5 - Tw2/2, yOffset+Th+txtSize),(1, 0, 0),txtSize)   #centered
               else:
@@ -6748,22 +6772,19 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                         boxXOffset += Tw/2
                         #soloFont.render(soloText, (xOffset, yOffset),(1, 0, 0),txtSize)   #left-justified
 
-                      #MFH TODO - scale and display self.soloFrame behind / around the solo accuracy text display
+                      #MFH - scale and display self.soloFrame behind / around the solo accuracy text display
                       if self.soloFrame:
+                        frameWidth = Tw*1.15
+                        frameHeight = Th*1.05
+                        #MFH - font Y position = top of text to be written
+                        boxYOffset = self.hPlayer[i]-(self.wFull* (yOffset+(frameHeight/1.97)) )
                         self.soloFrame.transform.reset()
-                        soloImgwidth = self.soloFrame.width1()
-                        #tempWFactor = self.soloFrame.widthf(32.000)
-                        tempWFactor = 640.000/soloImgwidth
-                        #tempWScale = Tw*(tempWFactor/1.75)
-                        #tempHScale = -Th*(tempWFactor/2.25)
-                        tempWScale = Tw*1.15*(tempWFactor)
-                        tempHScale = -Th*(tempWFactor)
-                        
+                        tempWScale = frameWidth*self.soloFrameWFactor
+                        tempHScale = -(frameHeight)*self.soloFrameWFactor
                         self.soloFrame.transform.scale(tempWScale,tempHScale)
-                        #self.soloFrame.transform.scale(1,1)
-                        self.soloFrame.transform.translate(wBak*boxXOffset,hBak*(1.0-yOffset-Th*2.05))
+                        self.soloFrame.transform.translate(self.wPlayer[i]*boxXOffset,boxYOffset)
                         self.soloFrame.draw()
-                        
+
                       soloFont.render(soloText, (xOffset, yOffset),(1, 0, 0),txtSize)
                       
                   #self.engine.view.setViewport(1,0)
