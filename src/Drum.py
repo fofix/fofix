@@ -1100,7 +1100,7 @@ class Drum:
           self.spEnabled = False
 
       if event.star:
-        self.isStarPhrase = True
+        #self.isStarPhrase = True
         self.openStarNotesInView = True
       if event.finalStar:
         self.finalStarSeen = True
@@ -1206,7 +1206,7 @@ class Drum:
       c = self.fretColors[event.number]
       
       if event.star:
-        self.isStarPhrase = True
+        #self.isStarPhrase = True
         self.starNotesInView = True
       if event.finalStar:
         self.finalStarSeen = True

@@ -1343,7 +1343,7 @@ class Guitar:
 
 
       if event.star:
-        self.isStarPhrase = True
+        #self.isStarPhrase = True
         starEventsInView = True
       if event.finalStar:
         self.finalStarSeen = True
