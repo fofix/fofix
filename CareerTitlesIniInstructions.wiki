@@ -3,3 +3,5 @@
 = How to work with Career Mode's {{{titles.ini}}} =
 
 _coming soon!_
+
+Basic guide has been posted [http://www.fretsonfire.net/forums/viewtopic.php?f=11&t=30269&start=0&st=0&sk=t&sd=a here] - use this for now until we get an organized Wiki together.
