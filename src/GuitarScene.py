@@ -1366,8 +1366,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.lastStars = [0 for i in self.playerList]
     #self.stars = [0,0]
     self.dispAccuracy = [False for i in self.playerList]
-    for thePlayer in self.playerList:   
+    for playaNum, thePlayer in enumerate(self.playerList): 
       thePlayer.stars = 0
+      self.guitars[playaNum].spEnabled = True
     self.partialStar = [0 for i in self.playerList]
     self.resetStarThresholds()
     self.coOpScore = 0
@@ -2314,6 +2315,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.accuracy[num] = self.guitars[num].playedNotes[0][0] - pos
         self.dispAccuracy[num] = True
 
+      if self.guitars[num].playedNotes[0][1].star:
+        self.guitars[num].isStarPhrase = True
 
     else:
       self.song.setInstrumentVolume(0.0, self.playerList[num].part)
@@ -2400,6 +2403,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       if self.players[num].streak % 10 == 0:
         self.lastMultTime[num] = self.getSongPosition()
         self.guitars[num].setMultiplier(self.playerList[num].getScoreMultiplier())
+        
+      if self.guitars[num].playedNotes[0][1].star:
+        self.guitars[num].isStarPhrase = True
+      
     else:
       self.guitars[num].hopoActive = 0
       self.guitars[num].wasLastNoteHopod = False
@@ -2468,6 +2475,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             self.starNotesMissed[num] = True
         
       if self.guitars[num].playedNotes:
+        if self.guitars[num].playedNotes[0][1].star:
+          self.guitars[num].isStarPhrase = True
         self.playerList[num].streak += 1
 
         self.notesHit[num] = True #qqstars
@@ -2712,6 +2721,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             self.starNotesMissed[num] = True
         
       if self.guitars[num].playedNotes:
+        if self.guitars[num].playedNotes[0][1].star:
+          self.guitars[num].isStarPhrase = True
+      
         self.playerList[num].streak += 1
 
         #if self.guitars[num].sameNoteHopoString:
