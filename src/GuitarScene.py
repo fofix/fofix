@@ -1883,6 +1883,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #MFH TODO - maintain separate rock status for each player in co-op mode
     elif self.coOp and self.numOfPlayers > 1: #battle mode
       if self.starNotesMissed[i] or self.guitars[i].isStarPhrase:
+        self.guitars[i].isStarPhrase = True
         self.guitars[i].spEnabled = False
         #self.guitars[i].spNote = False 
       if self.notesMissed[i]:
@@ -1900,6 +1901,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     else:   #normal mode
       if self.starNotesMissed[i] or self.guitars[i].isStarPhrase:
+        self.guitars[i].isStarPhrase = True
         self.guitars[i].spEnabled = False
         #self.guitars[i].spNote = False 
       if self.notesMissed[i]:
