@@ -2332,10 +2332,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.guitarSoloBroken[num] = True
 
       self.notesMissed[num] = True #QQstarS:Set [0] to [i]
-      for tym, theNote in self.guitars[num].matchingNotes:  #MFH
-        if theNote.star or theNote.finalStar:
-          self.starNotesMissed[num] = True
-      
+      #for tym, theNote in self.guitars[num].matchingNotes:  #MFH
+      #  if theNote.star or theNote.finalStar:
+      #    self.starNotesMissed[num] = True
+      theNote = self.guitars[num].matchingNotes[0][1]
+      if theNote.star or theNote.finalStar:
+        self.starNotesMissed[num] = True
       
 
       self.screwUp(num) #MFH - call screw-up sound handling function
@@ -2424,9 +2426,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.guitarSoloBroken[num] = True
 
       self.notesMissed[num] = True #QQstarS:Set [0] to [i]
-      for tym, theNote in self.guitars[num].matchingNotes:  #MFH
-        if theNote.star or theNote.finalStar:
-          self.starNotesMissed[num] = True
+      #for tym, theNote in self.guitars[num].matchingNotes:  #MFH
+      #  if theNote.star or theNote.finalStar:
+      #    self.starNotesMissed[num] = True
+      theNote = self.guitars[num].matchingNotes[0][1]
+      if theNote.star or theNote.finalStar:
+        self.starNotesMissed[num] = True
       
 
       self.screwUp(num)
@@ -2475,7 +2480,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.guitarSoloBroken[num] = True
 
         self.notesMissed[num] = True  #qqstars
-        for tym, theNote in self.guitars[num].matchingNotes:  #MFH
+        for tym, theNote in self.guitars[num].missedNotes:  #MFH
           if theNote.star or theNote.finalStar:
             self.starNotesMissed[num] = True
         
@@ -2522,9 +2527,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.stage.triggerMiss(pos)
 
       self.notesMissed[num] = True  #qqstars
-      for tym, theNote in self.guitars[num].matchingNotes:  #MFH
-        if theNote.star or theNote.finalStar:
-          self.starNotesMissed[num] = True
+      #for tym, theNote in self.guitars[num].matchingNotes:  #MFH
+      #  if theNote.star or theNote.finalStar:
+      #    self.starNotesMissed[num] = True
+      theNote = self.guitars[num].matchingNotes[0][1]
+      if theNote.star or theNote.finalStar:
+        self.starNotesMissed[num] = True
 
 
       self.screwUp(num)
@@ -2721,7 +2729,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.guitarSoloBroken[num] = True
 
         self.notesMissed[num] = True #QQstarS:Set [0] to [i]
-        for tym, theNote in self.guitars[num].matchingNotes:  #MFH
+        for tym, theNote in self.guitars[num].missedNotes:  #MFH
           if theNote.star or theNote.finalStar:
             self.starNotesMissed[num] = True
         
@@ -2909,9 +2917,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           
   
         self.notesMissed[num] = True #QQstarS:Set [0] to [i]
-        for tym, theNote in self.guitars[num].matchingNotes:  #MFH
-          if theNote.star or theNote.finalStar:
-            self.starNotesMissed[num] = True
+        #for tym, theNote in self.guitars[num].matchingNotes:  #MFH
+        #  if theNote.star or theNote.finalStar:
+        #    self.starNotesMissed[num] = True
+        theNote = self.guitars[num].matchingNotes[0][1]
+        if theNote.star or theNote.finalStar:
+          self.starNotesMissed[num] = True
   
         self.screwUp(num)
 
