@@ -67,9 +67,13 @@ TK_UNUSED_TEXT = 4    #Unused / other text events
 #self.song.eventTracks[Song.TK_UNUSED_TEXT]
 
 
-FOF_TYPE                = 0
-GH1_TYPE                = 1
-GH2_TYPE                = 2
+#FOF_TYPE                = 0
+#GH1_TYPE                = 1
+#GH2_TYPE                = 2
+
+#MFH
+MIDI_TYPE_GH            = 0       #GH type MIDIs have starpower phrases marked with a long G8 note on that instrument's track
+MIDI_TYPE_RB            = 1       #RB type MIDIs have overdrive phrases marked with a long G#9 note on that instrument's track
 
 GUITAR_PART             = 0
 RHYTHM_PART             = 1
@@ -977,6 +981,16 @@ class TitleInfo(object):
 class Event:
   def __init__(self, length):
     self.length = length
+
+
+class MarkerNote(Event): #MFH
+  def __init__(self, number, length):
+    Event.__init__(self, length)
+    self.number   = number
+    
+  def __repr__(self):
+    return "<#%d>" % self.number
+
 
 class Note(Event):
   def __init__(self, number, length, special = False, tappable = 0, star = False, finalStar = False):
@@ -1955,6 +1969,7 @@ class Song(object):
     self.missVolume   = self.engine.config.get("audio", "miss_volume")
 
     self.hasMidiLyrics = False
+    self.midiStyle = MIDI_TYPE_GH
 
     #MFH - add a separate variable to house the special text event tracks:
     #MFH - special text-event tracks for the separated text-event list variable
@@ -2185,28 +2200,35 @@ class Song(object):
   track = property(getTrack)
   isSingleAudioTrack = property(getIsSingleAudioTrack)
 
+#MFH - translating / marking the common MIDI notes:
 noteMap = {     # difficulty, note
-  0x60: (EXP_DIF, 0),
-  0x61: (EXP_DIF, 1),
-  0x62: (EXP_DIF, 2),
-  0x63: (EXP_DIF, 3),
-  0x64: (EXP_DIF, 4),
-  0x54: (HAR_DIF, 0),
-  0x55: (HAR_DIF, 1),
-  0x56: (HAR_DIF, 2),
-  0x57: (HAR_DIF, 3),
-  0x58: (HAR_DIF, 4),
-  0x48: (MED_DIF, 0),
-  0x49: (MED_DIF, 1),
-  0x4a: (MED_DIF, 2),
-  0x4b: (MED_DIF, 3),
-  0x4c: (MED_DIF, 4),
-  0x3c: (EAS_DIF, 0),
-  0x3d: (EAS_DIF, 1),
-  0x3e: (EAS_DIF, 2),
-  0x3f: (EAS_DIF, 3),
-  0x40: (EAS_DIF, 4),
+  0x60: (EXP_DIF, 0), #=========#0x60 = 96 = C 8
+  0x61: (EXP_DIF, 1),           #0x61 = 97 = Db8
+  0x62: (EXP_DIF, 2),           #0x62 = 98 = D 8
+  0x63: (EXP_DIF, 3),           #0x63 = 99 = Eb8
+  0x64: (EXP_DIF, 4),           #0x64 = 100= E 8
+  0x54: (HAR_DIF, 0), #=========#0x54 = 84 = C 7
+  0x55: (HAR_DIF, 1),           #0x55 = 85 = Db7
+  0x56: (HAR_DIF, 2),           #0x56 = 86 = D 7
+  0x57: (HAR_DIF, 3),           #0x57 = 87 = Eb7
+  0x58: (HAR_DIF, 4),           #0x58 = 88 = E 7
+  0x48: (MED_DIF, 0), #=========#0x48 = 72 = C 6
+  0x49: (MED_DIF, 1),           #0x49 = 73 = Db6
+  0x4a: (MED_DIF, 2),           #0x4a = 74 = D 6
+  0x4b: (MED_DIF, 3),           #0x4b = 75 = Eb6
+  0x4c: (MED_DIF, 4),           #0x4c = 76 = E 6
+  0x3c: (EAS_DIF, 0), #=========#0x3c = 60 = C 5
+  0x3d: (EAS_DIF, 1),           #0x3d = 61 = Db5
+  0x3e: (EAS_DIF, 2),           #0x3e = 62 = D 5
+  0x3f: (EAS_DIF, 3),           #0x3f = 63 = Eb5
+  0x40: (EAS_DIF, 4),           #0x40 = 64 = E 5
 }
+
+#MFH - special note numbers
+starPowerMarkingNote = 103     #note 103 = G 8
+overDriveMarkingNote = 116     #note 116 = G#9
+
+
 
 reverseNoteMap = dict([(v, k) for k, v in noteMap.items()])
 
@@ -2415,6 +2437,24 @@ class MidiReader(midi.MidiOutStream):
       if note in noteMap:
         track, number = noteMap[note]
         self.addEvent(track, Note(number, endTime - startTime, special = self.velocity[note] == 127), time = startTime)
+
+      #MFH TODO:
+      elif note == overDriveMarkingNote:    #MFH
+        if self.song.midiStyle != MIDI_TYPE_RB:
+          Log.debug("RB-style Overdrive marking note found!  Using RB-style MIDI special notes.")
+          self.song.midiStyle = MIDI_TYPE_RB
+
+        for diff in self.song.difficulty:
+          self.addEvent(diff.id, MarkerNote(note, endTime - startTime), time = startTime)
+          Log.debug("Overdrive MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, diff ) )
+
+      elif note == starPowerMarkingNote:    #MFH
+
+        for diff in self.song.difficulty:
+          self.addEvent(diff.id, MarkerNote(note, endTime - startTime), time = startTime)
+          Log.debug("Starpower MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, diff ) )
+
+
       else:
         #Log.warn("MIDI note 0x%x at %d does not map to any game note." % (note, self.abs_time()))
         pass
@@ -2551,7 +2591,7 @@ class MidiReader(midi.MidiOutStream):
         #    t.addEvent(self.abs_time(), event)
 
   
-  
+
 class MidiInfoReaderNoSections(midi.MidiOutStream):
   # We exit via this exception so that we don't need to read the whole file in
   class Done: pass
