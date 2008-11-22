@@ -2320,8 +2320,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.accuracy[num] = self.guitars[num].playedNotes[0][0] - pos
         self.dispAccuracy[num] = True
 
-      if self.guitars[num].playedNotes[0][1].star:
-        self.guitars[num].isStarPhrase = True
+      if len(self.guitars[num].playedNotes) > 0:
+        if self.guitars[num].playedNotes[0][1].star:
+          self.guitars[num].isStarPhrase = True
 
     else:
       self.song.setInstrumentVolume(0.0, self.playerList[num].part)
@@ -2412,8 +2413,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.lastMultTime[num] = self.getSongPosition()
         self.guitars[num].setMultiplier(self.playerList[num].getScoreMultiplier())
         
-      if self.guitars[num].playedNotes[0][1].star:
-        self.guitars[num].isStarPhrase = True
+      if len(self.guitars[num].playedNotes) > 0:
+        if self.guitars[num].playedNotes[0][1].star:
+          self.guitars[num].isStarPhrase = True
       
     else:
       self.guitars[num].hopoActive = 0
