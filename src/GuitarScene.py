@@ -381,6 +381,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.currentlyAnimating = True
     self.missPausesAnim = self.engine.config.get("game", "miss_pauses_anim") #MFH
     self.displayAllGreyStars = Theme.displayAllGreyStars
+    self.starpowerMode = self.engine.config.get("game", "starpower_mode") #MFH
+    self.logMarkerNotes = self.engine.config.get("game", "log_marker_notes")
+
+
 
     #racer: practice beat claps:
     self.beatClaps = self.engine.config.get("game", "beat_claps")
@@ -527,6 +531,34 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         #self.song.eventTracks[Song.TK_GUITAR_SOLOS].addEvent(time - soloSlop,newEvent) #adding the missing GSOLO OFF event
         self.song.eventTracks[Song.TK_GUITAR_SOLOS].addEvent(Ntime, newEvent) #adding the missing GSOLO OFF event
         Log.debug("GuitarScene: Guitar Solo until end of song found - (guitarSoloStartTime - Ntime = guitarSoloNoteCount): " + str(guitarSoloStartTime) + "-" + str(Ntime) + " = " + str(guitarSoloNoteCount) )
+
+
+    #MFH - now, handle MIDI starpower / overdrive / other special marker notes:
+    if self.starpowerMode == 2:     #auto-MIDI mode only
+      for i,guitar in enumerate(self.guitars):
+        for time, event in self.song.track[i].getAllEvents():
+          if isinstance(event, Song.MarkerNote):
+            markStarpower = False
+            if event.number == Song.overDriveMarkingNote:
+              markStarpower = True
+            if event.number == Song.starPowerMarkingNote:
+              if self.song.midiStyle == Song.MIDI_TYPE_GH:
+                markStarpower = True
+              #else:  #RB solo marking!
+            
+            if markStarpower:
+              tempStarpowerNoteList = self.song.track[i].getEvents(time, time+event.length) 
+              for spTime, spEvent in tempStarpowerNoteList:
+                if isinstance(spEvent, Note):
+                  spEvent.star = True
+              #now, go back and mark all of the last chord as finalStar
+              lastChordTime = spTime
+              for spTime, spEvent in tempStarpowerNoteList:
+                if isinstance(spEvent, Note):
+                  if spTime == lastChordTime:
+                    spEvent.finalStar = True
+              if self.logMarkerNotes == 1:
+                Log.debug("GuitarScene: Starpower phrase marked between %f and %f" % ( time, time+event.length ) )
 
 
     self.initializeStarScoringThresholds()    #MFH

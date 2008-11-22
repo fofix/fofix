@@ -137,6 +137,8 @@ class Guitar:
 
     self.killPoints = False
 
+    self.starpowerMode = self.engine.config.get("game", "starpower_mode") #MFH
+
     #get difficulty
     self.difficulty = self.engine.config.get("player%d" %(player), "difficulty")
 
@@ -227,10 +229,15 @@ class Guitar:
     
     self.setBPM(self.currentBpm)
 
-    self.starNotesSet = False
+    if self.starpowerMode == 1:
+      self.starNotesSet = False
+    else:
+      self.starNotesSet = True
+
     self.maxStars = []
     self.starNotes = []
     self.totalNotes = 0
+
 
     engine.loadImgDrawing(self, "glowDrawing", "glow.png")
 
@@ -2298,10 +2305,8 @@ class Guitar:
           #  event.star = True
           if time == q:   #MFH - no need to mark only the final SP phrase note as the finalStar as in drums, they will be hit simultaneously here.
             event.finalStar = True
-
       self.starNotesSet = True
 
-        
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     glEnable(GL_COLOR_MATERIAL)

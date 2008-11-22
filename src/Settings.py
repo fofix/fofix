@@ -254,6 +254,7 @@ class SettingsMenu(Menu.Menu):
        ConfigChoice(engine.config, "game", "bass_groove_enable", autoApply = True),#myfingershurt
        ConfigChoice(engine.config, "game", "lphrases", autoApply = True),#blazingamer
        ConfigChoice(engine.config, "game", "whammy_saves_starpower", autoApply = True),#myfingershurt
+       ConfigChoice(engine.config, "game", "starpower_mode", autoApply = True),#myfingershurt
     ]
     FoFiXAdvancedSettingsMenu = Menu.Menu(engine, FoFiXAdvancedSettings)
     

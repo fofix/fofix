@@ -141,12 +141,20 @@ class Drum:
     self.starPower = 0
     self.starPowerActive = False
     self.starPowerGained = False
-    self.starNotesSet = False
+
+    self.starpowerMode = self.engine.config.get("game", "starpower_mode") #MFH
+
     self.killPoints = False
+    
+    if self.starpowerMode == 1:
+      self.starNotesSet = False
+    else:
+      self.starNotesSet = True
+
     self.maxStars = []
     self.starNotes = []
     self.totalNotes = 0
-    
+
     #get difficulty
     self.difficulty = self.engine.config.get("player%d" %(player), "difficulty")
 
@@ -2010,7 +2018,6 @@ class Drum:
 
 
   def render(self, visibility, song, pos, controls, killswitch):
-  
 
     if not self.starNotesSet == True:
       self.totalNotes = 0
