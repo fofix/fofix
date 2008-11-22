@@ -462,6 +462,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "game", "log_loadings", autoApply = True),#myfingershurt
       ConfigChoice(engine.config, "game", "log_sections", autoApply = True),#myfingershurt
       ConfigChoice(engine.config, "game", "log_undefined_gets", autoApply = True),#myfingershurt
+      ConfigChoice(engine.config, "game", "log_marker_notes", autoApply = True),#myfingershurt
     ]
     logfileSettingsMenu = Menu.Menu(engine, logfileSettings)
 

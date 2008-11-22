@@ -2334,6 +2334,8 @@ class MidiReader(midi.MidiOutStream):
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("MidiReader class init (song.py)...")
+
+    self.logMarkerNotes = Config.get("game", "log_marker_notes")
     
     self.readTextAndLyricEvents = Config.get("game","rock_band_events")
     self.guitarSoloIndex = 0
@@ -2446,13 +2448,15 @@ class MidiReader(midi.MidiOutStream):
 
         for diff in self.song.difficulty:
           self.addEvent(diff.id, MarkerNote(note, endTime - startTime), time = startTime)
-          Log.debug("Overdrive MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, diff ) )
+          if self.logMarkerNotes == 1:
+            Log.debug("Overdrive MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, diff ) )
 
       elif note == starPowerMarkingNote:    #MFH
 
         for diff in self.song.difficulty:
           self.addEvent(diff.id, MarkerNote(note, endTime - startTime), time = startTime)
-          Log.debug("Starpower MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, diff ) )
+          if self.logMarkerNotes == 1:
+            Log.debug("Starpower MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, diff ) )
 
 
       else:
