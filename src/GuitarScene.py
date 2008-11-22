@@ -2335,9 +2335,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #for tym, theNote in self.guitars[num].matchingNotes:  #MFH
       #  if theNote.star or theNote.finalStar:
       #    self.starNotesMissed[num] = True
-      theNote = self.guitars[num].matchingNotes[0][1]
-      if theNote.star or theNote.finalStar:
-        self.starNotesMissed[num] = True
+      if len(self.guitars[num].matchingNotes) > 0:
+        theNote = self.guitars[num].matchingNotes[0][1]
+        if theNote.star or theNote.finalStar:
+          self.starNotesMissed[num] = True
       
 
       self.screwUp(num) #MFH - call screw-up sound handling function
@@ -2429,9 +2430,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #for tym, theNote in self.guitars[num].matchingNotes:  #MFH
       #  if theNote.star or theNote.finalStar:
       #    self.starNotesMissed[num] = True
-      theNote = self.guitars[num].matchingNotes[0][1]
-      if theNote.star or theNote.finalStar:
-        self.starNotesMissed[num] = True
+      if len(self.guitars[num].matchingNotes) > 0:
+        theNote = self.guitars[num].matchingNotes[0][1]
+        if theNote.star or theNote.finalStar:
+          self.starNotesMissed[num] = True
       
 
       self.screwUp(num)
@@ -2530,9 +2532,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #for tym, theNote in self.guitars[num].matchingNotes:  #MFH
       #  if theNote.star or theNote.finalStar:
       #    self.starNotesMissed[num] = True
-      theNote = self.guitars[num].matchingNotes[0][1]
-      if theNote.star or theNote.finalStar:
-        self.starNotesMissed[num] = True
+      if len(self.guitars[num].matchingNotes) > 0:
+        theNote = self.guitars[num].matchingNotes[0][1]
+        if theNote.star or theNote.finalStar:
+          self.starNotesMissed[num] = True
 
 
       self.screwUp(num)
@@ -2920,9 +2923,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         #for tym, theNote in self.guitars[num].matchingNotes:  #MFH
         #  if theNote.star or theNote.finalStar:
         #    self.starNotesMissed[num] = True
-        theNote = self.guitars[num].matchingNotes[0][1]
-        if theNote.star or theNote.finalStar:
-          self.starNotesMissed[num] = True
+        if len(self.guitars[num].matchingNotes) > 0:
+          theNote = self.guitars[num].matchingNotes[0][1]
+          if theNote.star or theNote.finalStar:
+            self.starNotesMissed[num] = True
   
         self.screwUp(num)
 
