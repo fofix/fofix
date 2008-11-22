@@ -2448,17 +2448,19 @@ class MidiReader(midi.MidiOutStream):
           Log.debug("RB-style Overdrive marking note found!  Using RB-style MIDI special notes.")
           self.song.midiStyle = MIDI_TYPE_RB
 
-        for diff in self.song.difficulty:
-          self.addEvent(diff.id, MarkerNote(note, endTime - startTime), time = startTime)
+        #for diff in self.song.difficulty:
+        for diff in difficulties:
+          self.addEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
           if self.logMarkerNotes == 1:
-            Log.debug("Overdrive MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, diff ) )
+            Log.debug("Overdrive MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, difficulties[diff] ) )
 
       elif note == starPowerMarkingNote:    #MFH
         self.song.hasStarpowerPaths = True
-        for diff in self.song.difficulty:
-          self.addEvent(diff.id, MarkerNote(note, endTime - startTime), time = startTime)
+        #for diff in self.song.difficulty:
+        for diff in difficulties:
+          self.addEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
           if self.logMarkerNotes == 1:
-            Log.debug("Starpower MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, diff ) )
+            Log.debug("Starpower MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, difficulties[diff] ) )
 
 
       else:

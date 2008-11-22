@@ -559,7 +559,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     if spTime == lastChordTime:
                       spEvent.finalStar = True
                 if self.logMarkerNotes == 1:
-                  Log.debug("GuitarScene: Starpower phrase marked between %f and %f" % ( time, time+event.length ) )
+                  Log.debug("GuitarScene: P%d starpower phrase marked between %f and %f" % ( i+1, time, time+event.length ) )
       
       else:
         for guitar in self.guitars:
