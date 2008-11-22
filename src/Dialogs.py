@@ -3020,23 +3020,23 @@ class KeyTester(Layer, KeyListener):
 
       #evilynux - Get killswitch mode (analog or digital?)
       # If analog, get and show attenuation. Most code taken from GuitarScene.
+      self.playerList = [0,1] # evilynux - Static for now, should be eventually made dynamic to support more players
       self.analogKillMode = [self.engine.config.get("game", "analog_killsw_mode"),self.engine.config.get("game", "analog_killsw_mode_p2")]
-      self.isKillAnalog = [False,False]
-      self.whichJoy = [0,0]
-      self.whichAxis = [0,0]
-      self.whammyVol = [0.0,0.0]
-      self.targetWhammyVol = [0.0,0.0]
-      self.defaultWhammyVol = [self.analogKillMode[0]-1.0,self.analogKillMode[1]-1.0]   #makes xbox defaults 1.0, PS2 defaults 0.0
-
-      if self.analogKillMode[0] == 3:   #XBOX inverted mode
-        self.defaultWhammyVol[0] = -1.0
-      if self.analogKillMode[1] == 3:   #XBOX inverted mode
-        self.defaultWhammyVol[1] = -1.0
-
-      self.actualWhammyVol = [self.defaultWhammyVol[0],self.defaultWhammyVol[1]]
       self.whammyVolAdjStep = 0.1
-      self.lastWhammyVol = [self.defaultWhammyVol[0],self.defaultWhammyVol[1]]
-      KillKeyCode = [0,0]
+      self.isKillAnalog = [False for i in self.playerList]
+      self.whichJoy = [0 for i in self.playerList]
+      self.whichAxis = [0 for i in self.playerList]
+      self.whammyVol = [0.0 for i in self.playerList]
+      self.targetWhammyVol = [0.0 for i in self.playerList]
+      self.defaultWhammyVol = [self.analogKillMode[i]-1.0 for i, thePlayer in enumerate(self.playerList)]   #makes xbox defaults 1.0, PS2 defaults 0.0
+
+      for i, thePlayer in enumerate(self.playerList):
+        if self.analogKillMode[i] == 3:   #XBOX inverted mode
+          self.defaultWhammyVol[i] = -1.0
+
+      self.actualWhammyVol = [self.defaultWhammyVol[i] for i, thePlayer in enumerate(self.playerList)]
+      self.lastWhammyVol = [self.defaultWhammyVol[i] for i, thePlayer in enumerate(self.playerList)]
+      KillKeyCode = [0 for i in self.playerList]
 
       if len(self.engine.input.joysticks) != 0:
         if self.analogKillMode[0] > 0:
@@ -3047,11 +3047,11 @@ class KeyTester(Layer, KeyListener):
           self.isKillAnalog[1], self.whichJoy[1], self.whichAxis[1] = self.engine.input.getWhammyAxis(KillKeyCode[1])
   
         #evilynux - Compute analog killswitch value
-        for i in range(0,1):
+        for i, thePlayer in enumerate(self.playerList):
           if self.isKillAnalog[i]:
             if self.analogKillMode[i] == 2:  #XBOX mode: (1.0 at rest, -1.0 fully depressed)
               self.whammyVol[i] = 1.0 - (round(10* ((self.engine.input.joysticks[self.whichJoy[i]].get_axis(self.whichAxis[i])+1.0) / 2.0 ))/10.0)
-  
+
             elif self.analogKillMode[i] == 3:  #XBOX Inverted mode: (-1.0 at rest, 1.0 fully depressed)
               self.whammyVol[i] = (round(10* ((self.engine.input.joysticks[self.whichJoy[i]].get_axis(self.whichAxis[i])+1.0) / 2.0 ))/10.0)
                 
@@ -3060,7 +3060,9 @@ class KeyTester(Layer, KeyListener):
     
             if self.whammyVol[i] > 0.0 and self.whammyVol[i] < 0.1:
               self.whammyVol[i] = 0.1
-  
+
+            self.lastWhammyVol[i] = self.whammyVol[i]
+
           if self.whammyVol[i] > 0.0 and self.whammyVol[i] < 0.1:
             self.whammyVol[i] = 0.1
 
