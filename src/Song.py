@@ -1970,6 +1970,7 @@ class Song(object):
 
     self.hasMidiLyrics = False
     self.midiStyle = MIDI_TYPE_GH
+    self.hasStarpowerPaths = False
 
     #MFH - add a separate variable to house the special text event tracks:
     #MFH - special text-event tracks for the separated text-event list variable
@@ -2442,6 +2443,7 @@ class MidiReader(midi.MidiOutStream):
 
       #MFH TODO:
       elif note == overDriveMarkingNote:    #MFH
+        self.song.hasStarpowerPaths = True
         if self.song.midiStyle != MIDI_TYPE_RB:
           Log.debug("RB-style Overdrive marking note found!  Using RB-style MIDI special notes.")
           self.song.midiStyle = MIDI_TYPE_RB
@@ -2452,7 +2454,7 @@ class MidiReader(midi.MidiOutStream):
             Log.debug("Overdrive MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, diff ) )
 
       elif note == starPowerMarkingNote:    #MFH
-
+        self.song.hasStarpowerPaths = True
         for diff in self.song.difficulty:
           self.addEvent(diff.id, MarkerNote(note, endTime - startTime), time = startTime)
           if self.logMarkerNotes == 1:
