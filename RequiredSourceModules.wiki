@@ -18,6 +18,9 @@ Then, to check for and update to the very latest FoFiX alpha source code, perfor
 _Instructions for MacOS X welcome!_
 ----
 
+_It is highly recommended that when you become an Alpha tester, you keep a separate FoFiX folder containing a full install of the latest stable release - as the Alpha versions' new features and bugfixes might cause other issues affecting playability._
+
+
 ==For Windows==
 
 ===Download===
@@ -39,7 +42,7 @@ Versions are likely important. Don't substitute one for the other without trying
   # Download py2exe 0.6.6 - [http://downloads.sourceforge.net/py2exe/py2exe-0.6.6.win32-py2.4.exe]
   # Download the FoFiX source files from the trunk, or SVN revision / tag of your choice - [http://code.google.com/p/fofix/source/browse/MFH-Mod]
 
-Or here's a complete package with all the files above, courtesy of Worldrave.
+*Or here's a complete package with all the files above, courtesy of Worldrave*:
 [http://www.mediafire.com/download.php?vgnwumi4yzn]
 
 ===Install In This Order===
