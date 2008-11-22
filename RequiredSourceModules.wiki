@@ -25,7 +25,7 @@ _Instructions for MacOS X welcome!_
 
 Versions are likely important. Don't substitute one for the other without trying the original versions first. These versions were tested, yours were not. I will not answer questions unless you have done the things in this document.
 
-  # Download Active Python 2.4.3.12 (not the standard python distro) - [http://downloads.activestate.com/ActivePython/windows/2.4/ActivePython-2.4.3.12-win32-x86.msi]
+  # Download Active Python 2.4.3.12 (not the standard python distro) - [http://downloads.activestate.com/ActivePython/windows/2.4/ActivePython-2.4.3.12-win32-x86.msi] or [http://www.mediafire.com/?2zz5mzoybuw]
   # Download Psyco optimizing compiler 1.5.2 - [http://downloads.sourceforge.net/psyco/psyco-1.5.2.win32-py2.4.exe]
   # Download GLEW 1.4.0 - [http://downloads.sourceforge.net/glew/glew-1.4.0-win32.zip]
   # Download PyOpenGL 2.0.2.01 - [http://downloads.sourceforge.net/pyopengl/PyOpenGL-2.0.2.01.py2.4-numpy23.exe]
