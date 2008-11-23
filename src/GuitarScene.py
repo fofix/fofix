@@ -1911,11 +1911,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     i = playerNum
     if self.guitars[i].isDrum: 
       self.drumStart = True
+
+    if self.starNotesMissed[i] or self.guitars[i].isStarPhrase:
+      self.guitars[i].isStarPhrase = True
+      self.guitars[i].spEnabled = False
+      #self.guitars[i].spNote = False 
+
     if self.battle and self.numOfPlayers > 1: #battle mode
-      if self.starNotesMissed[i] or self.guitars[i].isStarPhrase:
-        self.guitars[i].isStarPhrase = True
-        self.guitars[i].spEnabled = False
-        #self.guitars[i].spNote = False 
       if self.notesMissed[i]: #QQstarS:Set [i] to [i]
         self.minusRock[i] += self.minGain/self.multi[i]
         #self.rock[i] -= self.minusRock[i]/self.multi[i]
@@ -1931,10 +1933,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     #MFH TODO - maintain separate rock status for each player in co-op mode
     elif self.coOp and self.numOfPlayers > 1: #battle mode
-      if self.starNotesMissed[i] or self.guitars[i].isStarPhrase:
-        self.guitars[i].isStarPhrase = True
-        self.guitars[i].spEnabled = False
-        #self.guitars[i].spNote = False 
       if self.notesMissed[i]:
         self.minusRock[0] += self.minGain/self.multi[i]
         self.rock[0] -= self.minusRock[0]/self.multi[i]
@@ -1949,10 +1947,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.plusRock[0] -= self.pluGain/2.5/self.multi[i]
     
     else:   #normal mode
-      if self.starNotesMissed[i] or self.guitars[i].isStarPhrase:
-        self.guitars[i].isStarPhrase = True
-        self.guitars[i].spEnabled = False
-        #self.guitars[i].spNote = False 
       if self.notesMissed[i]:
         self.minusRock[i] += self.minGain/self.multi[i]
         self.rock[i] -= self.minusRock[i]/self.multi[i]
@@ -2537,7 +2531,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
         for chord in self.guitars[num].missedNotes:
           for tym, theNote in chord:  #MFH
-            if theNote.star or theNote.finalStar:
+            if theNote.skipped and (theNote.star or theNote.finalStar):
               self.starNotesMissed[num] = True
         
       isFirst = True
@@ -2708,7 +2702,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
         for chord in self.guitars[num].missedNotes:
           for tym, theNote in chord:  #MFH
-            if theNote.star or theNote.finalStar:
+            if theNote.skipped and (theNote.star or theNote.finalStar):
               self.starNotesMissed[num] = True
         
       isFirst = True
