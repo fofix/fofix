@@ -383,7 +383,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.displayAllGreyStars = Theme.displayAllGreyStars
     self.starpowerMode = self.engine.config.get("game", "starpower_mode") #MFH
     self.logMarkerNotes = self.engine.config.get("game", "log_marker_notes")
-
+    self.logStarpowerMisses = self.engine.config.get("game", "log_starpower_misses")
 
 
     #racer: practice beat claps:
@@ -2090,6 +2090,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.lessMissed[i] = True  #QQstarS:Set [0] to [i]
           for tym, theNote in missedNotes:  #MFH
             if theNote.star or theNote.finalStar:
+              if self.logStarpowerMisses == 1:
+                Log.debug("SP Miss: run(), note: %d, gameTime: %s" % (theNote.number, self.timeLeft) )
               self.starNotesMissed[i] = True
         
         if (self.playerList[i].streak != 0 or not self.processedFirstNoteYet) and not guitar.playedNotes and len(missedNotes) > 0:
@@ -2619,6 +2621,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.notesMissed[num] = True #QQstarS:Set [0] to [i]
       for tym, theNote in missedNotes:  #MFH
         if theNote.star or theNote.finalStar:
+          if self.logStarpowerMisses == 1:
+            Log.debug("SP Miss: doPick3GH2(), foundMissedCatchupNote: %d, gameTime: %s" % (theNote.number, self.timeLeft) )
           self.starNotesMissed[num] = True
       
       if self.hopoDebugDisp == 1:
@@ -2703,6 +2707,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         for chord in self.guitars[num].missedNotes:
           for tym, theNote in chord:  #MFH
             if theNote.skipped and (theNote.star or theNote.finalStar):
+              if self.logStarpowerMisses == 1:
+                Log.debug("SP Miss: doPick3GH2(), afterStartPick3Ok-foundMissedCatchupNote: %d, gameTime: %s" % (theNote.number, self.timeLeft) )
               self.starNotesMissed[num] = True
         
       isFirst = True
@@ -2803,6 +2809,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         noteList = self.guitars[num].matchingNotes
         for tym, noat in noteList:
           if (noat.star or noat.finalStar) and isFirst:
+            if self.logStarpowerMisses == 1:
+              Log.debug("SP Miss: doPick3GH2(), afterStartPick3Fail, matchingNote: %d, gameTime: %s" % (noat.number, self.timeLeft) )
             self.starNotesMissed[num] = True
           isFirst = False
 
