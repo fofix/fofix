@@ -549,17 +549,22 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               
               if markStarpower:
                 tempStarpowerNoteList = self.song.track[i].getEvents(time, time+event.length) 
+                lastSpNoteTime = 0
                 for spTime, spEvent in tempStarpowerNoteList:
                   if isinstance(spEvent, Note):
+                    if spTime > lastSpNoteTime:
+                      lastSpNoteTime = spTime
                     spEvent.star = True
                 #now, go back and mark all of the last chord as finalStar
-                lastChordTime = spTime
+                #lastChordTime = spTime
                 for spTime, spEvent in tempStarpowerNoteList:
                   if isinstance(spEvent, Note):
-                    if spTime == lastChordTime:
+                    if spTime == lastSpNoteTime:
                       spEvent.finalStar = True
                 if self.logMarkerNotes == 1:
                   Log.debug("GuitarScene: P%d starpower phrase marked between %f and %f" % ( i+1, time, time+event.length ) )
+                  if lastSpNoteTime == 0:
+                    Log.warn("This starpower phrase doesn't appear to have any finalStar notes marked... probably will not reward starpower!")
       
       else:
         for guitar in self.guitars:
