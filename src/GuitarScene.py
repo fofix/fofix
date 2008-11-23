@@ -2544,7 +2544,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
         for chord in self.guitars[num].missedNotes:
           for tym, theNote in chord:  #MFH
-            if theNote.skipped and (theNote.star or theNote.finalStar):
+            if not theNote.played and (theNote.star or theNote.finalStar):
               self.starNotesMissed[num] = True
         
       isFirst = True
@@ -2717,7 +2717,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
         for chord in self.guitars[num].missedNotes:
           for tym, theNote in chord:  #MFH
-            if theNote.skipped and (theNote.star or theNote.finalStar):
+            if not theNote.played and (theNote.star or theNote.finalStar):
               if self.logStarpowerMisses == 1:
                 Log.debug("SP Miss: doPick3GH2(), afterStartPick3Ok-foundMissedCatchupNote: %d, gameTime: %s" % (theNote.number, self.timeLeft) )
               self.starNotesMissed[num] = True
