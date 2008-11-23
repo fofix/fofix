@@ -6276,12 +6276,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 
 
                 #MFH - scale and display self.soloFrame behind / around the text
+                lineSpacing = txtSize
                 if self.soloFrame:
                   frameWidth = (max(Tw,Tw2))*1.15
                   frameHeight = (Th+Th2)*1.07
                   boxXOffset = 0.5
                   #lineSpacing = soloFont.getLineSpacing(scale = txtSize)
-                  lineSpacing = txtSize
                   #MFH - font Y position = top of text to be written
                   #boxYOffset = self.hPlayer[i]-(self.wFull* (yOffset+Th+(lineSpacing/2.00)+(frameHeight/2.00)) )
                   boxYOffset = self.hPlayer[i]-(self.wFull* (yOffset+Th+(lineSpacing/2.00)) )
