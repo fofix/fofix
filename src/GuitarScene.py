@@ -312,7 +312,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.hOffset[i] = self.hPlayer[i]*.4*(self.numOfPlayers-1) #QQstarS: Hight Offset when there are 2 players
       self.hFontOffset[i] = -self.hOffset[i]/self.hPlayer[i]*0.752 #QQstarS: font Hight Offset when there are 2 players
 
-
     self.engine.view.setViewport(1,0)
 
     
@@ -386,6 +385,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.starpowerMode = self.engine.config.get("game", "starpower_mode") #MFH
     self.logMarkerNotes = self.engine.config.get("game", "log_marker_notes")
     self.logStarpowerMisses = self.engine.config.get("game", "log_starpower_misses")
+    self.soloFrameMode = self.engine.config.get("game", "solo_frame")
 
 
     #racer: practice beat claps:
@@ -604,6 +604,39 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.boardY = 2
     self.rbOverdriveBarGlowVisibility = 0
     self.rbOverdriveBarGlowFadeOut = False
+    self.counting = self.engine.config.get("video", "counting")
+    if self.counting:
+      try:
+        if self.guitars[0].isDrum:
+          self.engine.loadImgDrawing(self, "part", os.path.join("themes",themename,"drum.png"))
+        if self.guitars[0].isBassGuitar:
+          self.engine.loadImgDrawing(self, "part", os.path.join("themes",themename,"bass.png"))
+        else:
+          self.engine.loadImgDrawing(self, "part", os.path.join("themes",themename,"guitar.png"))
+      except IOError:
+        if self.guitars[0].isDrum:
+          self.engine.loadImgDrawing(self, "part", os.path.join("drum.png"))
+        if self.guitars[0].isBassGuitar:
+          self.engine.loadImgDrawing(self, "part", os.path.join("bass.png"))
+        else:
+          self.engine.loadImgDrawing(self, "part", os.path.join("guitar.png"))
+          
+      if self.numOfPlayers > 1:
+        try:
+          if self.guitars[1].isDrum:
+            self.engine.loadImgDrawing(self, "part2", os.path.join("themes",themename,"drum.png"))
+          if self.guitars[1].isBassGuitar:
+            self.engine.loadImgDrawing(self, "part2", os.path.join("themes",themename,"bass.png"))
+          else:
+            self.engine.loadImgDrawing(self, "part2", os.path.join("themes",themename,"guitar.png"))
+        except IOError:
+          if self.guitars[1].isDrum:
+            self.engine.loadImgDrawing(self, "part2", os.path.join("drum.png"))
+          if self.guitars[1].isBassGuitar:
+            self.engine.loadImgDrawing(self, "part2", os.path.join("bass.png"))
+          else:
+            self.engine.loadImgDrawing(self, "part2", os.path.join("guitar.png"))
+
 
     # evilynux - Load stage background(s)
     self.stage.load(self.libraryName, self.songName, self.playerList[0].practiceMode)
@@ -647,9 +680,19 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.engine.loadImgDrawing(self, "soloFrame", os.path.join("themes",themename,"soloframe.png"))
       soloImgwidth = self.soloFrame.width1()
       self.soloFrameWFactor = 640.000/soloImgwidth
+      #soloImgheight = self.soloFrame.height1()
+      #soloHeightYFactor = (640.000*self.hFull)/self.wFull
+      #self.soloFrameHFactor = soloHeightYFactor/soloImgheight
     except IOError:
       self.soloFrame = None
       self.soloFrameWFactor = None
+      #self.soloFrameHFactor = None
+
+    if self.soloFrameMode == 0:
+      self.soloFrame = None
+      #self.soloFrameHFactor = None
+      self.soloFrameWFactor = None
+      
 
 
 
@@ -1223,7 +1266,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     if self.rmtype == 3:
       self.camera.target    = (0.0, 1.4, 1.8) #kk69:More like GH3
-      self.camera.origin    = (0.0, 2.8*self.boardY, -3.6)
+      self.camera.origin    = (0.0, 2.8, -3.6)
            
   def freeResources(self):
     self.engine.view.setViewport(1,0)
@@ -1290,6 +1333,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.starGrey5 = None
     self.starGrey6 = None
     self.starGrey7 = None
+    if self.counting:
+      self.part = None
+      self.part2 = None
 
     
   def loadSettings(self):
@@ -5707,7 +5753,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               else:
                 self.mult.transform.reset()
                 self.mult.transform.scale(.5,-.0625) #MFH division->constant: was (.5,-.5/8.0)
-                self.mult.transform.translate(w*0.674,h*0.397 + self.hOffset[i]) #QQstarS:Set  new postion. I only shown it once.
+                if self.numOfPlayers > 1:
+                  self.mult.transform.translate(w*0.752,h*0.397)
+                else:
+                  self.mult.transform.translate(w*0.674,h*0.397 + self.hOffset[i])
                 self.mult.draw(rect = (0,1,multRange[0],multRange[1]))
   
               if player.streak == 0:
@@ -5762,7 +5811,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 if self.halfDots:
                   r.transform.reset()
                   r.transform.scale(0.125,-.166666667) #MFH division->constant: was (.5*(1.0/4.0),-.5*(1.0/3.0))
-                  r.transform.translate(w*.701+t*(w*-.0106),h*.256+t*(h*.026) + self.hOffset[i])
+                  if self.numOfPlayers > 1:
+                    r.transform.translate(w*.777+t*(w*-.0129),h*.256+t*(h*.026))
+                  else:
+                    r.transform.translate(w*.701+t*(w*-.0106),h*.256+t*(h*.026))
                   r.draw(rect = (xs[0],xs[1],ys[0],ys[1]))
                 else:
                   r.transform.reset()
@@ -6208,7 +6260,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 elif i == 1 and self.jurg2 and self.autoPlay:
                   yOffset = 0.115    #above Jurgen Is Here
                 else:   #no jurgens here:
-                  yOffset = 0.190
+                  yOffset = 0.180
                 txtSize = 0.00185
                 
                 if self.theme == 2:
@@ -6226,10 +6278,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 #MFH - scale and display self.soloFrame behind / around the text
                 if self.soloFrame:
                   frameWidth = (max(Tw,Tw2))*1.15
-                  frameHeight = (Th+Th2)*1.05
+                  frameHeight = (Th+Th2)*1.07
                   boxXOffset = 0.5
+                  #lineSpacing = soloFont.getLineSpacing(scale = txtSize)
+                  lineSpacing = txtSize
                   #MFH - font Y position = top of text to be written
-                  boxYOffset = self.hPlayer[i]-(self.wFull* (yOffset+(frameHeight/1.97)) )
+                  #boxYOffset = self.hPlayer[i]-(self.wFull* (yOffset+Th+(lineSpacing/2.00)+(frameHeight/2.00)) )
+                  boxYOffset = self.hPlayer[i]-(self.wFull* (yOffset+Th+(lineSpacing/2.00)) )
                   self.soloFrame.transform.reset()
                   tempWScale = frameWidth*self.soloFrameWFactor
                   tempHScale = -(frameHeight)*self.soloFrameWFactor
@@ -6238,7 +6293,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   self.soloFrame.draw()
 
                 soloFont.render(text1, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #centered
-                soloFont.render(text2, (0.5 - Tw2/2, yOffset+Th+txtSize),(1, 0, 0),txtSize)   #centered
+                soloFont.render(text2, (0.5 - Tw2/2, yOffset+Th+lineSpacing),(1, 0, 0),txtSize)   #centered
               else:
                 self.dispSoloReview[i] = False 
             
@@ -6686,9 +6741,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                       #MFH - scale and display self.soloFrame behind / around the solo accuracy text display
                       if self.soloFrame:
                         frameWidth = Tw*1.15
-                        frameHeight = Th*1.05
+                        frameHeight = Th*1.07
                         #MFH - font Y position = top of text to be written
-                        boxYOffset = self.hPlayer[i]-(self.wFull* (yOffset+(frameHeight/1.97)) )
+                        boxYOffset = self.hPlayer[i]-(self.wFull* (yOffset+(Th/2.0)) )
                         self.soloFrame.transform.reset()
                         tempWScale = frameWidth*self.soloFrameWFactor
                         tempHScale = -(frameHeight)*self.soloFrameWFactor
@@ -6715,13 +6770,47 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             Theme.setBaseColor(min(1.0, 3.0 - abs(4.0 - self.countdownSeconds)))
             text = self.tsGetReady
             w, h = font.getStringSize(text)
-            font.render(text,  (.5 - w / 2, .3))
+            font.render(text,  (.5 - w / 2, .3))              
             if self.countdownSeconds < 6:
-              scale = 0.002 + 0.0005 * (self.countdownSeconds % 1) ** 3
-              text = "%d" % (self.countdownSeconds)
-              w, h = bigFont.getStringSize(text, scale = scale)
-              Theme.setBaseColor()
-              bigFont.render(text,  (.5 - w / 2, .45 - h / 2), scale = scale)
+              if self.counting:
+                for i,player in enumerate(self.playerList):
+
+
+                  w = self.wPlayer[i]
+                  h = self.hPlayer[i]  
+                  if self.numOfPlayers > 1:
+                    if i == 0:                    
+                      self.part.transform.reset()
+                      self.part.transform.scale(0.25,-0.25)
+                      self.part.transform.translate(w*.25,h*.4)
+                      self.part.draw(color = (1,1,1, 3.0 - abs(4.0 - self.countdownSeconds)))
+                      Theme.setBaseColor(min(1.0, 3.0 - abs(4.0 - self.countdownSeconds)))
+                      text = player.part.text
+                      w, h = font.getStringSize(text)
+                      font.render(text,  (.25 - w*.5, .5))
+                    elif i == 1:
+                      self.part2.transform.reset()
+                      self.part2.transform.scale(0.25,-0.25)
+                      self.part2.transform.translate(w*.75,h*.4)
+                      self.part2.draw(color = (1,1,1, 3.0 - abs(4.0 - self.countdownSeconds)))
+                      Theme.setBaseColor(min(1.0, 3.0 - abs(4.0 - self.countdownSeconds)))
+                      text = player.part.text
+                      w, h = font.getStringSize(text)
+                      font.render(text,  (.75 - w*.5, .5))
+                  else:
+                    self.part.transform.reset()
+                    self.part.transform.scale(0.5,-0.5)
+                    self.part.transform.translate(w*.5,h*.4)
+                    self.part.draw(color = (1,1,1, 3.0 - abs(4.0 - self.countdownSeconds)))
+                    text = player.part.text
+                    w, h = font.getStringSize(text)
+                    font.render(text,  (.5 - w*.5, .55))
+              else:
+                scale = 0.002 + 0.0005 * (self.countdownSeconds % 1) ** 3
+                text = "%d" % (self.countdownSeconds)
+                w, h = bigFont.getStringSize(text, scale = scale)
+                Theme.setBaseColor()
+                bigFont.render(text,  (.5 - w / 2, .45 - h / 2), scale = scale)
     
           w, h = font.getStringSize(" ")
           y = .05 - h / 2 - (1.0 - v) * .2

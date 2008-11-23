@@ -184,6 +184,7 @@ Config.define("game", "miss_pauses_anim",       int, 1,     text = _("Miss Pause
 Config.define("game", "song_hopo_freq",       int, 1,     text = _("Song HOPO Freq"), options = {0: _("Off"), 1: _("Auto")}) #MFH
 #Config.define("game",   "mute_sustain_releases",          bool, False,  text = _("Mute sustain releases"), options = {False: _("No"), True: _("Yes")})
 Config.define("game",   "sustain_muting",          int, 1,    text = _("Sustain Muting"), options = {0: _("Off"), 1: _("Ultra Wide"), 2: _("Wide"), 3: _("Standard"), 4: _("Tight")})
+Config.define("game",   "solo_frame",          int, 1,    text = _("Solo Frame"), options = {0: _("Off"), 1: _("Auto")})
 Config.define("game",   "starpower_mode",          int, 2,    text = _("Starpower Mode"), options = {0: _("Off"), 1: _("FoF"), 2: _("Auto MIDI")})
 
 
@@ -217,6 +218,7 @@ Config.define("coffee", "noterotate",       bool, False,     text = _("Rotate 3D
 Config.define("coffee", "phrases",       bool, True,     text = _("Phrases"),             options = {True: _("On"), False: _("Off")})
 Config.define("coffee", "songdisplay",       bool, False,     text = _("Song Display"),             options = {True: _("CDs"), False: _("List")})
 Config.define("game", "tut",       bool, False,     text = _("tut"),             options = {True: _("yes"), False: _("no")})
+Config.define("video", "counting",       bool, False,     text = _("Song Countdown"),             options = {True: _("Show Part"), False: _("Show Numbers")})
 
 
 Config.define("game",   "hit_window",          int, 1,    text = _("Note Hit-window"), options = {0: _("1. Widest"), 1: _("2. Wide"), 2: _("3. Standard"), 3: _("4. Tight"), 4: _("5. Tightest")})#racer blazingamer

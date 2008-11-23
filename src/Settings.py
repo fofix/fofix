@@ -11,7 +11,7 @@
 #               2008 QQStarS                                        #
 #               2008 Blazingamer                                    #
 #               2008 evilynux <evilynux@gmail.com>                  #
-#               2008 fablaculp                                            #
+#               2008 fablaculp                                      #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -403,6 +403,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "video", "disable_fretsfx"),
       ConfigChoice(engine.config, "video", "hitglow_color"),
       ConfigChoice(engine.config, "game", "pov", autoApply = True),
+      ConfigChoice(engine.config, "video", "counting", autoApply = True),
       (_("Advanced Video Settings"), AdvancedVideoSettingsMenu),
     ]
     videoSettingsMenu = Menu.Menu(engine, videoSettings)
@@ -417,6 +418,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "game", "large_drum_neck", autoApply = True),      #myfingershurt
       ConfigChoice(engine.config, "game", "bass_groove_neck", autoApply = True),      #myfingershurt
       ConfigChoice(engine.config, "game", "guitar_solo_neck", autoApply = True),      #myfingershurt
+      ConfigChoice(engine.config, "game", "solo_frame", autoApply = True),      #myfingershurt
       ConfigChoice(engine.config, "game", "in_game_font_shadowing", autoApply = True),      #myfingershurt
     ]
     fretSettingsMenu = Menu.Menu(engine, fretSettings)
