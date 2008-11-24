@@ -92,6 +92,19 @@ class Font:
   def getLineSpacing(self, scale = 0.002):
     """@return: Recommanded line spacing of this font"""
     return self.font.get_linesize() * self.scale * scale
+
+  #MFH - needed to find the centerline of text
+  def getFontAscent(self, scale = 0.002):
+    """@return: Return the height in pixels for the font ascent. 
+    The ascent is the number of pixels from the font baseline to the top of the font. """
+    return self.font.get_ascent() * self.scale * scale
+
+  #MFH - needed to find the centerline of text
+  def getFontDescent(self, scale = 0.002):
+    """@return: Return the height in pixels for the font descent. The descent 
+    is the number of pixels from the font baseline to the bottom of the font.  """
+    return self.font.get_descent() * self.scale * scale
+
     
   def setCustomGlyph(self, character, texture):
     """

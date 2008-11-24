@@ -6276,15 +6276,26 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 
 
                 #MFH - scale and display self.soloFrame behind / around the text
-                lineSpacing = txtSize
+                lineSpacing = soloFont.getLineSpacing(txtSize)
                 if self.soloFrame:
                   frameWidth = (max(Tw,Tw2))*1.15
-                  frameHeight = (Th+Th2)*1.07
+                  #frameHeight = (Th+Th2)*1.10
+                  frameHeight = lineSpacing*2.05
                   boxXOffset = 0.5
+                  fontAscent = soloFont.getFontAscent(txtSize)
+                  fontDescent = soloFont.getFontDescent(txtSize)
                   #lineSpacing = soloFont.getLineSpacing(scale = txtSize)
                   #MFH - font Y position = top of text to be written
                   #boxYOffset = self.hPlayer[i]-(self.wFull* (yOffset+Th+(lineSpacing/2.00)+(frameHeight/2.00)) )
-                  boxYOffset = self.hPlayer[i]-(self.wFull* (yOffset+Th+(lineSpacing/2.00)) )
+                  #boxYOffset = self.hPlayer[i]-(self.wFull* (yOffset+Th+(lineSpacing/2.00)) )
+                  #boxYOffset = self.hFull-(self.wFull* (yOffset+(fontAscent*2.00)+(lineSpacing/2.00)) )
+                  centerLine1 = yOffset+fontAscent
+                  centerLine2 = yOffset+lineSpacing+fontAscent
+                  centerLineAvg = (centerLine1 + centerLine2)/2.00
+                  
+                  boxYOffset = self.hFull-(self.wFull* (centerLineAvg) )
+                  
+                  
                   self.soloFrame.transform.reset()
                   tempWScale = frameWidth*self.soloFrameWFactor
                   tempHScale = -(frameHeight)*self.soloFrameWFactor
@@ -6293,7 +6304,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   self.soloFrame.draw()
 
                 soloFont.render(text1, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #centered
-                soloFont.render(text2, (0.5 - Tw2/2, yOffset+Th+lineSpacing),(1, 0, 0),txtSize)   #centered
+                #soloFont.render(text2, (0.5 - Tw2/2, yOffset+Th+lineSpacing),(1, 0, 0),txtSize)   #centered
+                soloFont.render(text2, (0.5 - Tw2/2, yOffset+lineSpacing),(1, 0, 0),txtSize)   #centered
               else:
                 self.dispSoloReview[i] = False 
             
@@ -6742,8 +6754,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                       if self.soloFrame:
                         frameWidth = Tw*1.15
                         frameHeight = Th*1.07
+                        fontAscent = soloFont.getFontAscent(txtSize)
                         #MFH - font Y position = top of text to be written
-                        boxYOffset = self.hPlayer[i]-(self.wFull* (yOffset+(Th/2.0)) )
+                        #boxYOffset = self.hPlayer[i]-(self.wFull* (yOffset+(Th/2.0)) )
+                        #boxYOffset = self.hFull-(self.wFull* (yOffset+(Th/2.0)) )
+                        boxYOffset = self.hFull-(self.wFull* (yOffset+(fontAscent) ) )
                         self.soloFrame.transform.reset()
                         tempWScale = frameWidth*self.soloFrameWFactor
                         tempHScale = -(frameHeight)*self.soloFrameWFactor
