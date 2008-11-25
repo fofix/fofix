@@ -108,7 +108,7 @@ class Font:
   #MFH - why the hell aren't we using the pygame.font.render function?  We seem to be re-inventing the wheel here, and not correctly!
   #all the example PyGame apps I see that use pygame.font.render also use "screen.blit" or "background.blit".  
   #not to mention that the pygame.font.render function allows setting of a font background color, which would fully solve the solo frame issue...
-  def pygameFontRender(self, text, antialias = False, color, background=None):
+  def pygameFontRender(self, text, antialias, color, background=None):
     """
     @return: This creates a new Surface with the specified text rendered on it.
     Pygame provides no way to directly draw text on an existing Surface: instead you must use Font.render - 
