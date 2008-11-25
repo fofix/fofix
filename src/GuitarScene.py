@@ -6766,6 +6766,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                         self.soloFrame.transform.translate(self.wPlayer[i]*boxXOffset,boxYOffset)
                         self.soloFrame.draw()
 
+                        #trying new rendering method...
+                        #tempSurface = soloFont.pygameFontRender(soloText, antialias=False, color=(0,0,255), background=(0,0,0)  )
+                        
+    
+                      #else:
                       soloFont.render(soloText, (xOffset, yOffset),(1, 0, 0),txtSize)
                       
                   #self.engine.view.setViewport(1,0)
