@@ -80,7 +80,7 @@ IOError: [Errno 2] No such file or directory: 'D:\\Games\\Frets on Fire\\dist\\d
 
 Back to what we were initially trying:
   # Locate the downloaded or checked-out FoFiX sources
-  # Move the {{{src}}} directory into your FoFiX directory (same place as the {{{data}}} directory) if it is not already located there.
+  # Move the {{{src}}} directory into your FoFiX directory (same place as the {{{data}}} directory) if it is not already located there. *NOT _inside_ the {{{data}}} directory!!*
   # *ONLY for FoFiX 3.025 or earlier* -- *REBOOT* _(required)_
   # Open a command prompt
   # cd to the new {{{src}}} directory in your FoFiX directory
@@ -88,8 +88,14 @@ Back to what we were initially trying:
 
 At this point you should be able to play frets on fire directly from the source.
 
-To create the executable we need a few more steps
+*New Method of Rebuilding The Executable*
+Assuming you have TortoiseSVN installed in {{{C:\Program Files\TortoiseSVN\}}}, and assuming you have your Python 2.4's path included in the environment PATH variable, you should be able to use the following one-step Auto SVN Update / Rebuild / Play script:
+{{{src\scripts\Win_Alpha_UpdateRebuildPlay.bat}}}
 
+Note that you might not see any errors using this method; if things aren't working correctly, or if the game is not starting, try the below old method.
+
+*Old Method of Rebuilding The Executable*
+To create the executable we need a few more steps:
   # Go to your {{{src\scripts}}} directory where you have your SVN directory setup (IE- {{{C:\FoFiX SVN\src\scripts}}})
   # Double-click on the {{{RebuildWin.bat}}} script.  This will recompile and rebuild the game {{{.EXE}}} file, {{{library.zip}}}, and required Python support modules ({{{.PYD}}} files).  This script will also retrieve these files and replace the old files in your FoFiX and data folders, as well as copy over any {{{.DLL}}} files that the build process decided to include.  Then the intermediate files (in {{{src\build}}} and {{{dist\}}}) will automatically be cleaned up.
   # You may need the Windows support files for FoFiX (mostly {{{.DLL}}}s), which can be found inside any full Windows FoFiX distribution in the appropriate directory structure.
