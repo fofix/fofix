@@ -9,3 +9,5 @@ I would highly recommend you create any Starpower sections as Overdrive sections
 This means that if you mark starpower on G8, you will ONLY be able to designate GUITAR SOLOS using the old TEXT EVENT (GH1 style) or SECTION EVENT (original FoFiX RB1 style) methods.
 
 That is why I recommend marking starpower or overdrive on G#9.  Then, should you decide later that you want to mark out some DRUM SOLOS or BASS SOLOS -- you will be able to add those on G8.  (will be supported in FoFiX soon!)
+
+Note, it would be entirely possible to choose an unused GH MIDI note to use for marking solo sections while still using G8 for starpower.  However, if the game detects any G#9 in the MIDI file on an instrument track, it will NOT let you use any G8 starpower markings.
