@@ -344,21 +344,14 @@ class GameEngine(Engine):
     #if self.logClassInits == 1:
     #  Log.debug("GameEngine class init (GameEngine.py)...")
     Log.debug("GameEngine class init (GameEngine.py)...")
-
     self.mainMenu = None    #placeholder for main menu object - to prevent reinstantiation
-
     self.versionString = "FoFiX v3.035 alpha"
-    
     Log.debug(self.versionString + " starting up...")
-    
     Log.debug("pygame version: " + str(pygame.version.ver) )
-
     """
     Constructor.
-
     @param config:  L{Config} instance for settings
     """
-
 
     self.tutorialFolder = "tutorials"
 
@@ -562,11 +555,14 @@ class GameEngine(Engine):
 	    
     else:
 	    Log.debug("Performance Autoset is off.")
-	    
-	    
-#Fablaculp: End of Performance Autoset
 
+#Fablaculp: End of Performance Autoset
     Log.debug("Ready.")
+
+  # evilynux - This stops the crowd cheers if they're still playing (issue 317).
+  def quit(self):
+    self.audio.close()
+    Engine.quit(self)
 
   def setStartupLayer(self, startupLayer):
     """

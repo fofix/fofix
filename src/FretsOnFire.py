@@ -173,6 +173,7 @@ def main():
       break
     else:
       break
+  # evilynux - MainMenu class already calls this - useless?
   engine.quit()
 
 class Trace:
