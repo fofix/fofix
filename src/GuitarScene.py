@@ -397,6 +397,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.laminaScreen.refresh()
       self.laminaScreen.refreshPosition()
 
+    elif self.fontMode == 2:    #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
+      #self.laminaScreen = lamina.LaminaScreenSurface(0.985)
+      self.laminaFrame_soloAcc = lamina.LaminaPanelSurface(quadDims=(1,1,200,200))
+      self.laminaFrame_soloAcc.refresh()
+
+
     self.screenCenterX = self.engine.video.screen.get_rect().centerx
     self.screenCenterY = self.engine.video.screen.get_rect().centery
   
@@ -512,6 +518,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     else:
       self.solo_soloFont = self.engine.data.font
 
+    self.guitarSoloShown = [False for i in self.playerList]
     self.currentGuitarSoloLastHitNotes = [1 for i in self.playerList]
     self.solo_xOffset = [0.0 for i in self.playerList]
     self.solo_yOffset = [0.0 for i in self.playerList]
@@ -1764,6 +1771,30 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               #self.laminaScreen.refreshPosition()   #needs to be called whenever camera position changes                        
               #self.laminaScreen.display()
 
+            elif self.fontMode==2:  #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
+              #trying new rendering method...
+              tempSurface = self.solo_soloFont.pygameFontRender(self.solo_soloText[i], antialias=False, color=(0,0,255), background=(0,0,0)  )
+              # Create a rectangle
+              tempRect = tempSurface.get_rect()
+              # Center the rectangle
+              #tempRect.centerx = self.screenCenterX
+              #tempRect.centery = self.screenCenterY
+              # Blit the text
+              #self.engine.video.screen.blit(tempSurface, tempRect)
+              self.laminaFrame_soloAcc.surf.blit(tempSurface, tempRect)
+              self.laminaFrame_soloAcc.refresh()
+
+            self.guitarSoloShown[i] = True
+
+      else:   #not currently a guitar solo - clear Lamina solo accuracy surface (but only once!)
+        if self.guitarSoloShown[i]:
+          self.guitarSoloShown[i] = False
+          self.currentGuitarSoloLastHitNotes[i] = 1
+          if self.fontMode==1:
+            self.laminaScreen.clear()
+            self.laminaScreen.refresh()
+          
+        
 
   def handleWhammy(self, playerNum):
     i = playerNum
@@ -7080,6 +7111,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if self.fontMode==1:      #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
           self.laminaScreen.refreshPosition() 
           self.laminaScreen.display()
+        elif self.fontMode==2:  #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
+          self.laminaFrame_soloAcc.display()
         #self.engine.view.setViewport(1,0)
         self.engine.view.resetProjection()
 
