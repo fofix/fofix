@@ -114,7 +114,7 @@ class Font:
     Pygame provides no way to directly draw text on an existing Surface: instead you must use Font.render - 
     draw text on a new Surface to create an image (Surface) of the text, then blit this image onto another Surface. 
     """
-    return self.font.render(text=text, antialias=antialias, color=color, background=background)
+    return self.font.render(text, antialias, color, background)
 
     
   def setCustomGlyph(self, character, texture):

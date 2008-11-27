@@ -475,6 +475,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "game", "hopo_debug_disp", autoApply = True),#myfingershurt
       ConfigChoice(engine.config, "game", "rock_band_events", autoApply = True),#myfingershurt
       ConfigChoice(engine.config, "game", "show_unused_text_events", autoApply = True),#myfingershurt
+      ConfigChoice(engine.config, "game", "font_rendering_mode", autoApply = True),#myfingershurt
       (_("Log Settings"),    logfileSettingsMenu),
     ]
     debugSettingsMenu = Menu.Menu(engine, debugSettings)

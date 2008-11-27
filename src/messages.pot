@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-11-23 10:46-0800\n"
+"POT-Creation-Date: 2008-11-25 21:08-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -466,7 +466,7 @@ msgstr ""
 msgid "Antialiasing Quality"
 msgstr ""
 
-#: GameEngine.py:64 GameEngine.py:115 GameEngine.py:149 GameEngine.py:491
+#: GameEngine.py:64 GameEngine.py:115 GameEngine.py:149 GameEngine.py:484
 #: GameResultsScene.py:124 Stage.py:251
 msgid "None"
 msgstr ""
@@ -758,7 +758,7 @@ msgstr ""
 msgid "Stage Slideshow"
 msgstr ""
 
-#: GameEngine.py:126 GameEngine.py:127 GameEngine.py:128 GameEngine.py:476
+#: GameEngine.py:126 GameEngine.py:127 GameEngine.py:128 GameEngine.py:469
 msgid "Random"
 msgstr ""
 
@@ -1456,11 +1456,11 @@ msgstr ""
 msgid "Show Instrument"
 msgstr ""
 
-#: GameEngine.py:474
+#: GameEngine.py:467
 msgid "Slideshow"
 msgstr ""
 
-#: GameEngine.py:477 GameEngine.py:491
+#: GameEngine.py:470 GameEngine.py:484
 msgid "Animated Stage"
 msgstr ""
 

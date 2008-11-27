@@ -59,8 +59,9 @@ import decimal
 import Log
 import locale
 
-
 from OpenGL.GL import *
+
+import lamina
 
 class GuitarScene:
   pass
@@ -386,7 +387,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.logMarkerNotes = self.engine.config.get("game", "log_marker_notes")
     self.logStarpowerMisses = self.engine.config.get("game", "log_starpower_misses")
     self.soloFrameMode = self.engine.config.get("game", "solo_frame")
+    self.fontMode = self.engine.config.get("game", "font_rendering_mode")   #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
 
+    self.laminaScreen = None
+    if self.fontMode == 1:    #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
+      #self.laminaScreen = lamina.LaminaScreenSurface(0.985)
+      self.laminaScreen = lamina.LaminaScreenSurface(1.0)
+      self.laminaScreen.clear()
+      self.laminaScreen.refresh()
+      self.laminaScreen.refreshPosition()
+  
 
     #racer: practice beat claps:
     self.beatClaps = self.engine.config.get("game", "beat_claps")
@@ -1267,6 +1277,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if self.rmtype == 3:
       self.camera.target    = (0.0, 1.4, 1.8) #kk69:More like GH3
       self.camera.origin    = (0.0, 2.8, -3.6)
+
+    #if self.fontMode == 1:    #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
+    #  self.laminaScreen.refreshPosition()   #needs to be called whenever camera position changes
+
            
   def freeResources(self):
     self.engine.view.setViewport(1,0)
@@ -6751,27 +6765,46 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                         #soloFont.render(soloText, (xOffset, yOffset),(1, 0, 0),txtSize)   #left-justified
 
                       #MFH - scale and display self.soloFrame behind / around the solo accuracy text display
-                      if self.soloFrame:
-                        frameWidth = Tw*1.15
-                        frameHeight = Th*1.07
-                        fontAscent = soloFont.getFontAscent(txtSize)
-                        #MFH - font Y position = top of text to be written
-                        #boxYOffset = self.hPlayer[i]-(self.wFull* (yOffset+(Th/2.0)) )
-                        #boxYOffset = self.hFull-(self.wFull* (yOffset+(Th/2.0)) )
-                        boxYOffset = self.hFull-(self.wFull* (yOffset+(fontAscent) ) )
-                        self.soloFrame.transform.reset()
-                        tempWScale = frameWidth*self.soloFrameWFactor
-                        tempHScale = -(frameHeight)*self.soloFrameWFactor
-                        self.soloFrame.transform.scale(tempWScale,tempHScale)
-                        self.soloFrame.transform.translate(self.wPlayer[i]*boxXOffset,boxYOffset)
-                        self.soloFrame.draw()
 
+                      if self.fontMode==0:      #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
+                        if self.soloFrame:
+                          frameWidth = Tw*1.15
+                          frameHeight = Th*1.07
+                          fontAscent = soloFont.getFontAscent(txtSize)
+                          #MFH - font Y position = top of text to be written
+                          #boxYOffset = self.hPlayer[i]-(self.wFull* (yOffset+(Th/2.0)) )
+                          #boxYOffset = self.hFull-(self.wFull* (yOffset+(Th/2.0)) )
+                          boxYOffset = self.hFull-(self.wFull* (yOffset+(fontAscent) ) )
+                          self.soloFrame.transform.reset()
+                          tempWScale = frameWidth*self.soloFrameWFactor
+                          tempHScale = -(frameHeight)*self.soloFrameWFactor
+                          self.soloFrame.transform.scale(tempWScale,tempHScale)
+                          self.soloFrame.transform.translate(self.wPlayer[i]*boxXOffset,boxYOffset)
+                          self.soloFrame.draw()
+                        soloFont.render(soloText, (xOffset, yOffset),(1, 0, 0),txtSize)
+
+                      elif self.fontMode==1:      #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
                         #trying new rendering method...
-                        #tempSurface = soloFont.pygameFontRender(soloText, antialias=False, color=(0,0,255), background=(0,0,0)  )
+                        tempSurface = soloFont.pygameFontRender(soloText, antialias=False, color=(0,0,255), background=(0,0,0)  )
                         
-    
-                      #else:
-                      soloFont.render(soloText, (xOffset, yOffset),(1, 0, 0),txtSize)
+                        # Create a rectangle
+                        tempRect = tempSurface.get_rect()
+
+                        self.screenCenterX = self.engine.video.screen.get_rect().centerx
+                        self.screenCenterY = self.engine.video.screen.get_rect().centery
+
+
+                        # Center the rectangle
+                        tempRect.centerx = self.screenCenterX
+                        tempRect.centery = self.screenCenterY
+                        
+                        # Blit the text
+                        #self.engine.video.screen.blit(tempSurface, tempRect)
+                        self.laminaScreen.surf.blit(tempSurface, tempRect)
+                        self.laminaScreen.refresh()         #needs to be called whenever text contents change
+                        self.laminaScreen.refreshPosition()   #needs to be called whenever camera position changes                        
+                        
+                        #self.laminaScreen.display()
                       
                   #self.engine.view.setViewport(1,0)
               #except Exception, e:
@@ -6934,8 +6967,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               else:#QQstarS:party
                 w, h = font.getStringSize(t)
                 font.render(t,  (.5 - w / 2, y + h))
+
+
   
       finally:
+        if self.fontMode==1:      #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
+          self.laminaScreen.display()
+
         #self.engine.view.setViewport(1,0)
         self.engine.view.resetProjection()
 

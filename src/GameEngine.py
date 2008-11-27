@@ -186,6 +186,7 @@ Config.define("game", "song_hopo_freq",       int, 1,     text = _("Song HOPO Fr
 Config.define("game",   "sustain_muting",          int, 1,    text = _("Sustain Muting"), options = {0: _("Off"), 1: _("Ultra Wide"), 2: _("Wide"), 3: _("Standard"), 4: _("Tight")})
 Config.define("game",   "solo_frame",          int, 1,    text = _("Solo Frame"), options = {0: _("Off"), 1: _("Auto")})
 Config.define("game",   "starpower_mode",          int, 2,    text = _("Starpower Mode"), options = {0: _("Off"), 1: _("FoF"), 2: _("Auto MIDI")})
+Config.define("game",   "font_rendering_mode",          int, 0,    text = _("Font Mode"), options = {0: _("oGL Hack"), 1: _("Lamina Screen"), 2: _("Lamina Frames")})
 
 
 #MFH - log settings
