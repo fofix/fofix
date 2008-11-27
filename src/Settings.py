@@ -547,16 +547,24 @@ class SettingsMenu(Menu.Menu):
       (_("Apply New Settings"), self.applySettings)
     ]
   
-    self.settingsToApply = settings + \
-                           videoSettings + \
+    self.settingsToApply = videoSettings + \
                            AdvancedAudioSettings + \
-                           volumeSettings + \
                            keySettings + \
-			   AdvancedVideoSettings + \
+			                     AdvancedVideoSettings + \
                            FoFiXBasicSettings + \
                            perfSettings + \
-                           listSettings + \
                            modSettings
+
+#-    self.settingsToApply = settings + \
+#-                           videoSettings + \
+#-                           AdvancedAudioSettings + \
+#-                           volumeSettings + \
+#-                           keySettings + \
+#-			                     AdvancedVideoSettings + \
+#-                           FoFiXBasicSettings + \11/26/2008 11:10:30 PM
+#-                           perfSettings + \
+#-                           listSettings + \
+#-                           modSettings
 
     self.opt_text_x = Theme.opt_text_xPos
     self.opt_text_y = Theme.opt_text_yPos
