@@ -45,5 +45,3 @@ soloFont.render(text1, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #centered
 soloFont.render(text2, (0.5 - Tw2/2, yOffset+Th+txtSize),(1, 0, 0),txtSize)   #centered
 
 }}}
-
-*NOTE* - With the impending implementation of the Lamina library in 3.035, rendering text will make a LOT more sense!
