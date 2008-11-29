@@ -368,6 +368,9 @@ class GameEngine(Engine):
     self.restartRequested  = False
     self.handlingException = False
     self.video             = Video(self.title)
+
+    self.config.set("game",   "font_rendering_mode", 0) #force oGL mode
+
     self.audio             = Audio()
 
     Log.debug("Initializing audio.")
