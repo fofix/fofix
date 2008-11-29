@@ -6,7 +6,16 @@
 This Wiki is probably only going to be of use to developers... 
 
 
+== Toggling the Debug Layer ==
+_In FoFiX's main menu_, pressing *ALT + D* will toggle the Debug Layer on and off.  This layer provides real-time information on the inner workings of FoFiX, and could be of use to some advanced developers.
+
+This should be togglable anywhere; except that further layers of menus and UIs have their own keyListeners and the ALT-D doesn't seem to make it all the way out to the FretsOnFire.py code.  
+
+Although this is probably simple to fix (passing ALT-Ds back to the main keyListener, for example), it is not necessary... toggle it on in the Main Menu and then go play and watch it.  Restart the game or exit out to the main menu if you've seen enough.
+
+
 == Image and Text Positioning ==
+*Warning - this section is under development and the information is not entirely accurate yet!*
 
 In the FoFiX game engine, images are positioned by their exact center. Text is positioned by it's upper left corner, with a small margin.  
 
