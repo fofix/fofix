@@ -11,7 +11,7 @@ _(Note - it is recommended that you download the latest "full" release of FoFiX 
 [http://www.fretsonfire.net/forums/viewtopic.php?f=11&t=30709&p=315847#p315846 http://i374.photobucket.com/albums/oo189/ze_raph/svn-win.png]
 
 Perform an "SVN Checkout" on the following URL to a local folder of your choosing: 
-{{{http://fofix.googlecode.com/svn/MFH-Mod/trunk}}}
+{{{http://fofix.googlecode.com/svn/MFH-Mod/trunk/}}}
 
 Then, to check for and update to the very latest FoFiX alpha source code, perform an "SVN Update" on the folder where you checked out the source files.  
 
