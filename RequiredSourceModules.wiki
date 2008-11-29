@@ -6,6 +6,8 @@
 
 _(Note - it is recommended that you download the latest "full" release of FoFiX for your operating system, extract it where you want, and test it first.  This folder now has all the required dependencies for you to rebuild and recompile the source into FretsOnFire.exe and library.zip -- this should also be the folder you perform the "SVN Checkout" and "SVN Update" on!)_
 
+*More detailed instructions can be found [http://www.fretsonfire.net/forums/viewtopic.php?f=11&t=30709&p=315847#p315846 here] if this Wiki does not make sense.*
+
 Perform an "SVN Checkout" on the following URL to a local folder of your choosing: 
 {{{http://fofix.googlecode.com/svn/MFH-Mod/trunk}}}
 
