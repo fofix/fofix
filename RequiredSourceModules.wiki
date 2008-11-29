@@ -8,6 +8,8 @@ _(Note - it is recommended that you download the latest "full" release of FoFiX 
 
 *More detailed instructions can be found [http://www.fretsonfire.net/forums/viewtopic.php?f=11&t=30709&p=315847#p315846 here] if this Wiki does not make sense.*
 
+[http://www.fretsonfire.net/forums/viewtopic.php?f=11&t=30709&p=315847#p315846 http://i374.photobucket.com/albums/oo189/ze_raph/svn-win.png]
+
 Perform an "SVN Checkout" on the following URL to a local folder of your choosing: 
 {{{http://fofix.googlecode.com/svn/MFH-Mod/trunk}}}
 
