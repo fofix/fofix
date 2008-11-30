@@ -576,7 +576,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       if isGuitarSoloNow:   #open solo until end - needs end event!
         isGuitarSoloNow = False
         #guitarSoloNoteCount = len([1 for Gtime, Gevent in self.song.track[i].getEvents(guitarSoloStartTime, time) if isinstance(Gevent, Note)])
-        Ntime = Ntime - soloSlop
+        #MFH - must find the real "last note" time, requires another iteration...
+        for lnTime, lnEvent in self.song.track[i].getAllEvents():
+          if isinstance(lnEvent, Note):
+            if lnTime > Ntime:
+              Ntime = lnTime
+        #Ntime = Ntime + soloSlop
         guitarSoloNoteCount = len([1 for Gtime, Gevent in self.song.track[i].getEvents(guitarSoloStartTime, Ntime) if isinstance(Gevent, Note)])
         self.guitarSolos[i].append(guitarSoloNoteCount - 1)
         newEvent = TextEvent("GSOLO OFF", 100.0)
