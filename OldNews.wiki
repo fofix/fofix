@@ -2,6 +2,12 @@
 
 = Old News =
 
+====Nov. 19th 2008 ====
+Final 3.030 is finally out with [http://code.google.com/p/fofix/issues/list?can=1&q=status%3Afixed%2Cverified%2Cdone+milestone%3Arelease-3.030 tons of changes since 3.025]!
+Thanks to all the players who provided valuable feedback during the beta phase.
+
+Now head to the [http://code.google.com/p/fofix/downloads/list download section]! ;-)
+
 ====Nov. 14th 2008 ====
 3.030 beta 2 (SVN r355) has been released for testing.  
 The main reasons for this beta release is to let users test:
