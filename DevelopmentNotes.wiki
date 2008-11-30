@@ -31,4 +31,4 @@ _Please keep in mind that this does not directly apply to all theme.ini position
 == How the neck is drawn ==
 _The following are my scribblings that allowed me to figure out how to scroll incoming guitar solo necks towards you:_
 
-http://i34.tinypic.com/jimexs.jpg
+[http://i34.tinypic.com/jimexs.jpg http://i36.tinypic.com/10dw2hj.jpg]
