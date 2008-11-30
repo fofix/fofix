@@ -41,6 +41,8 @@ import os
 
 import Log
 
+import Song   #need the base song defines as well
+
 #KEYS = [Player.KEY1, Player.KEY2, Player.KEY3, Player.KEY4, Player.KEY5]
 PLAYER1KEYS    = [Player.KEY1, Player.KEY2, Player.KEY3, Player.KEY4, Player.KEY5]
 PLAYER1ACTIONS = [Player.ACTION1, Player.ACTION2]
@@ -581,6 +583,67 @@ class Guitar:
     
   def setMultiplier(self, multiplier):
     self.scoreMultiplier = multiplier
+
+  def renderIncomingNeck(self, visibility, song, pos, time, neckTexture):   #MFH - attempt to "scroll" an incoming guitar solo neck towards the player
+    if not song:
+      return
+    
+    def project(beat):
+      return 0.125 * beat / beatsPerUnit    # glorandwarf: was 0.12
+
+    v            = visibility
+    w            = self.boardWidth
+    l            = self.boardLength
+
+    beatsPerUnit = self.beatsPerBoard / self.boardLength
+
+    offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
+
+    z  = ((time - pos) / self.currentPeriod) / beatsPerUnit
+
+    color = (1,1,1)
+
+    glEnable(GL_TEXTURE_2D)
+    if neckTexture:
+      neckTexture.texture.bind()
+
+
+    glBegin(GL_TRIANGLE_STRIP)
+    glColor4f(color[0],color[1],color[2], 0)
+    glTexCoord2f(0.0, project(offset - 2 * beatsPerUnit))
+    #glVertex3f(-w / 2, 0, -2)
+    glVertex3f(-w / 2, 0, z)   #point A
+    glTexCoord2f(1.0, project(offset - 2 * beatsPerUnit))
+    #glVertex3f( w / 2, 0, -2)
+    glVertex3f( w / 2, 0, z)   #point B
+
+    
+    glColor4f(color[0],color[1],color[2], v)
+    glTexCoord2f(0.0, project(offset - 1 * beatsPerUnit))
+    #glVertex3f(-w / 2, 0, -1)
+    glVertex3f(-w / 2, 0, z+1)   #point C
+    glTexCoord2f(1.0, project(offset - 1 * beatsPerUnit))
+    #glVertex3f( w / 2, 0, -1)
+    glVertex3f( w / 2, 0, z+1)   #point D
+    
+    glTexCoord2f(0.0, project(offset + l * beatsPerUnit * .7))
+    #glVertex3f(-w / 2, 0, l * .7)
+    glVertex3f(-w / 2, 0, z+2+l * .7) #point E
+    glTexCoord2f(1.0, project(offset + l * beatsPerUnit * .7))
+    #glVertex3f( w / 2, 0, l * .7)
+    glVertex3f( w / 2, 0, z+2+l * .7) #point F
+    
+    glColor4f(color[0],color[1],color[2], 0)
+    glTexCoord2f(0.0, project(offset + l * beatsPerUnit))
+    #glVertex3f(-w / 2, 0, l)
+    glVertex3f(-w / 2, 0, z+2+l)    #point G
+    glTexCoord2f(1.0, project(offset + l * beatsPerUnit))
+    #glVertex3f( w / 2, 0, l)
+    glVertex3f( w / 2, 0, z+2+l)    #point H
+    glEnd()
+    
+    glDisable(GL_TEXTURE_2D)
+
     
   def renderNeck(self, visibility, song, pos):
     if not song:
@@ -1270,6 +1333,16 @@ class Guitar:
 
       glDepthMask(0)
       glPopMatrix()
+
+  def renderIncomingNecks(self, visibility, song, pos):
+    if not song:
+      return
+
+    for time, event in song.eventTracks[Song.TK_GUITAR_SOLOS].getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard):
+      if self.canGuitarSolo and self.guitarSoloNeck:
+        self.renderIncomingNeck(visibility, song, pos, time, self.guitarSoloNeck)
+              
+
 
   def renderNotes(self, visibility, song, pos, killswitch):
     if not song:
@@ -2319,6 +2392,7 @@ class Guitar:
       self.ocount = 1
 
     self.renderNeck(visibility, song, pos)
+    self.renderIncomingNecks(visibility, song, pos) #MFH
     if self.theme == 0 or self.theme == 1 or self.theme == 2:
       self.drawTrack(self.ocount, song, pos)
       self.drawBPM(visibility, song, pos)
