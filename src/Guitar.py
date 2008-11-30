@@ -89,6 +89,8 @@ class Guitar:
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("Guitar class init...")
+
+    self.incomingNeckMode = self.engine.config.get("game", "incoming_neck_mode")
     
     self.boardWidth     = 3.0
     self.boardLength    = 9.0
@@ -1339,18 +1341,21 @@ class Guitar:
     if not song:
       return
 
-    for time, event in song.eventTracks[Song.TK_GUITAR_SOLOS].getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard):
-      if self.canGuitarSolo and self.guitarSoloNeck:
-        if event.text.find("ON") >= 0:
-          neckImg = self.guitarSoloNeck
-        else: #event.text.find("OFF"):
-          if self.starPowerActive and self.oNeck:
-            neckImg = self.oNeck
-          elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
-            neckImg = self.bassGrooveNeck
-          else:
-            neckImg = self.neckDrawing
-        self.renderIncomingNeck(visibility, song, pos, time, neckImg)
+    if self.incomingNeckMode > 0:   #if enabled
+      for time, event in song.eventTracks[Song.TK_GUITAR_SOLOS].getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard):
+        if self.canGuitarSolo and self.guitarSoloNeck:
+          if event.text.find("ON") >= 0:
+            neckImg = self.guitarSoloNeck
+            self.renderIncomingNeck(visibility, song, pos, time, neckImg)
+          #else: #event.text.find("OFF"):
+          elif self.incomingNeckMode == 2:    #render both start and end incoming necks
+            if self.starPowerActive and self.oNeck:
+              neckImg = self.oNeck
+            elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
+              neckImg = self.bassGrooveNeck
+            else:
+              neckImg = self.neckDrawing
+            self.renderIncomingNeck(visibility, song, pos, time, neckImg)
               
 
 

@@ -418,6 +418,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "game", "large_drum_neck", autoApply = True),      #myfingershurt
       ConfigChoice(engine.config, "game", "bass_groove_neck", autoApply = True),      #myfingershurt
       ConfigChoice(engine.config, "game", "guitar_solo_neck", autoApply = True),      #myfingershurt
+      ConfigChoice(engine.config, "game", "incoming_neck_mode", autoApply = True),      #myfingershurt
       ConfigChoice(engine.config, "game", "solo_frame", autoApply = True),      #myfingershurt
       ConfigChoice(engine.config, "game", "in_game_font_shadowing", autoApply = True),      #myfingershurt
     ]
