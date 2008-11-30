@@ -85,6 +85,13 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||fret4_color = #FF9933||Manually sets 5th fret tail color||
 ||crowd_loop_delay = x||x = integer.  Default user setting = 550 for sounds\crowdcheers.ogg)||
 ||display_all_grey_stars = True||True - All 5 stars shown at all times. False - Only shows the grey star your currently working on||
+||pov_target_x = 0.0||Controls Custom POV. -Wiki WIP||
+||pov_target_y = 0.0||Controls Custom POV. -Wiki WIP||
+||pov_target_z = 3.7||Controls Custom POV. -Wiki WIP||
+||pov_origin_x = 0.0||Controls Custom POV. -Wiki WIP||
+||pov_origin_y = 2.9||Controls Custom POV. -Wiki WIP||
+||pov_origin_z = -2.9||Controls Custom POV. -Wiki WIP||
+
 
 
 
