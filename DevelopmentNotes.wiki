@@ -15,8 +15,6 @@ Although this is probably simple to fix (passing ALT-Ds back to the main keyList
 
 
 == Image and Text Positioning ==
-*Warning - this section is under development and may not be entirely accurate yet!*
-
 In the FoFiX game engine, images are positioned (anchored) by their exact center, by exact pixel coordinates.  These are typically scaled using relative values between 0.0 and 1.0.  Width and height have separate scales; an image positioned at (0.5, 0.5) will be _exactly_ centered in the viewport.
 
 Text is positioned (anchored) by it's upper left corner, with a small margin.  
