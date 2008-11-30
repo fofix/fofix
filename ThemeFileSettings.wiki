@@ -87,7 +87,7 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||pov_target_x = 0.0||Controls Custom POV. -Wiki WIP||
 ||pov_target_y = 0.0||Controls Custom POV. -Wiki WIP||
 ||pov_target_z = 3.7||Controls Custom POV. -Wiki WIP||
-||pov_origin_x = 0.0||Controls Custom POV. -Wiki WIP||
+||pov_origin_x = 0.0||Controls Custom POV. -Wiki WIP.   {{{http://img73.imageshack.us/my.php?image=exampleef7.gif}}}||
 ||pov_origin_y = 2.9||Controls Custom POV. -Wiki WIP||
 ||pov_origin_z = -2.9||Controls Custom POV. -Wiki WIP||
 
