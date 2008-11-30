@@ -19,8 +19,8 @@ Although this is probably simple to fix (passing ALT-Ds back to the main keyList
 
 In the FoFiX game engine, images are positioned (anchored) by their exact center. Text is positioned (anchored) by it's upper left corner, with a small margin.  
 
-One quirk of this; fonts are positioned by relative coordinates between 0.0 and 1.0.  However, the scale is EQUAL for both width and height of the screen.  
-Examples:
+One quirk of this; fonts are positioned by relative coordinates between 0.0 and 1.0.  However, the scale is EQUAL for both width and height of the screen, and depends only on the aspect ratio.  
+Examples using our current 4:3 aspect ratio viewport:
  * Font position (x, y) = (0.0, 0.0) will write text starting in the upper left corner of the screen.
  * Font position (x, y) = (1.0, 0.0) will attempt to write text starting in the upper *RIGHT* corner of the screen, and no text will be visible as it starts at the right edge and continues right.
  * Font position (x, y) = (0.0, 0.75) will attempt to write text starting at the *LOWER* left corner of the screen, which will not be visible due to the text displaying down and to the right of it's given position.
