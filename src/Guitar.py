@@ -597,7 +597,8 @@ class Guitar:
 
     beatsPerUnit = self.beatsPerBoard / self.boardLength
 
-    offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
+    #offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
+    offset = 0
 
     z  = ((time - pos) / self.currentPeriod) / beatsPerUnit
 
