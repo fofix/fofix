@@ -290,12 +290,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #MFH - precalculate full and player viewports
     self.engine.view.setViewport(1,0)
     self.wFull, self.hFull = self.engine.view.geometry[2:4]
+    #Log.debug("GuitarScene wFull = %d, hFull = %d" % (self.wFull, self.hFull) )
     self.wPlayer = []
     self.hPlayer = []
     self.hOffset = []
     self.hFontOffset = []
     self.stage.wFull = self.wFull   #MFH - needed for new stage background handling
     self.stage.hFull = self.hFull
+    self.fontScreenBottom = 0.75      #from our current viewport's constant 3:4 aspect ratio (which is always stretched to fill the video resolution)
     
     
     for i, thePlayer in enumerate(self.playerList):
@@ -1748,7 +1750,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 elif i == 1 and self.jurg2 and self.autoPlay:
                   self.solo_yOffset[i] = 0.140    #above Jurgen Is Here
                 else:   #no jurgens here:
-                  self.solo_yOffset[i] = 0.210 #kk69: lower
+                  self.solo_yOffset[i] = 0.175    #was 0.210, occluded notes
                 self.solo_xOffset[i] = 0.5 - self.solo_Tw[i]/2
                 self.solo_boxXOffset[i] = 0.5
                 #soloFont.render(soloText, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #rock band
@@ -6411,7 +6413,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 elif i == 1 and self.jurg2 and self.autoPlay:
                   yOffset = 0.115    #above Jurgen Is Here
                 else:   #no jurgens here:
-                  yOffset = 0.180
+                  yOffset = 0.155   #was 0.180, occluded notes
                 txtSize = 0.00185
                 
 #-                if self.theme == 2:
@@ -6433,20 +6435,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   #frameHeight = (Th+Th2)*1.10
                   frameHeight = lineSpacing*2.05
                   boxXOffset = 0.5
-                  fontAscent = self.solo_soloFont.getFontAscent(txtSize)
-                  fontDescent = self.solo_soloFont.getFontDescent(txtSize)
-                  #lineSpacing = soloFont.getLineSpacing(scale = txtSize)
-                  #MFH - font Y position = top of text to be written
-                  #boxYOffset = self.hPlayer[i]-(self.wFull* (yOffset+Th+(lineSpacing/2.00)+(frameHeight/2.00)) )
-                  #boxYOffset = self.hPlayer[i]-(self.wFull* (yOffset+Th+(lineSpacing/2.00)) )
-                  #boxYOffset = self.hFull-(self.wFull* (yOffset+(fontAscent*2.00)+(lineSpacing/2.00)) )
-                  centerLine1 = yOffset+fontAscent
-                  centerLine2 = yOffset+lineSpacing+fontAscent
-                  centerLineAvg = (centerLine1 + centerLine2)/2.00
-                  
-                  boxYOffset = self.hFull-(self.wFull* (centerLineAvg) )
-                  
-                  
+                  boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + lineSpacing) / self.fontScreenBottom) )
                   self.soloFrame.transform.reset()
                   tempWScale = frameWidth*self.soloFrameWFactor
                   tempHScale = -(frameHeight)*self.soloFrameWFactor
@@ -6455,7 +6444,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   self.soloFrame.draw()
 
                 self.solo_soloFont.render(text1, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #centered
-                #soloFont.render(text2, (0.5 - Tw2/2, yOffset+Th+lineSpacing),(1, 0, 0),txtSize)   #centered
                 self.solo_soloFont.render(text2, (0.5 - Tw2/2, yOffset+lineSpacing),(1, 0, 0),txtSize)   #centered
               else:
                 self.dispSoloReview[i] = False 
@@ -6843,76 +6831,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               if self.guitars[i].canGuitarSolo:
                 if self.guitars[i].guitarSolo:
 
-#-                  #self.engine.view.setViewportHalf(self.numOfPlayers,i)
-#-                  if self.guitarSoloAccuracyDisplayPos == 0:    #right
-#-                    xOffset = 0.950
-#-                  else:
-#-                    xOffset = 0.150
-#-                  yOffset = 0.320   #last change -.040
-#-                  txtSize = 0.00250
-#-                  #if we hit more notes in the solo than were counted, update the solo count (for the slop)
-#-                  if self.guitars[i].currentGuitarSoloHitNotes > self.currentGuitarSoloTotalNotes[i]:
-#-                    self.currentGuitarSoloTotalNotes[i] = self.guitars[i].currentGuitarSoloHitNotes
-#-                  if not self.pause and not self.failed:
-#-                    tempSoloAccuracy = (float(self.guitars[i].currentGuitarSoloHitNotes)/float(self.currentGuitarSoloTotalNotes[i]) * 100.0)
-#-                    trimmedIntSoloNoteAcc = self.decimal(str(tempSoloAccuracy)).quantize(self.decPlaceOffset)
-#-                    if self.guitarSoloAccuracyDisplayMode == 1:   #percentage only
-#-                      #soloText = str(trimmedIntSoloNoteAcc) + "%"
-#-                      soloText = "%s%%" % str(trimmedIntSoloNoteAcc)
-#-                      if self.guitarSoloAccuracyDisplayPos == 0:    #right
-#-                        xOffset = 0.890
-#-                    elif self.guitarSoloAccuracyDisplayMode == 2:   #detailed
-#-                      #soloText = str(self.guitars[i].currentGuitarSoloHitNotes) + "/" + str(self.currentGuitarSoloTotalNotes[i]) + ": " + str(trimmedIntSoloNoteAcc) + "%"
-#-                      soloText = "%(hitSoloNotes)d/ %(totalSoloNotes)d: %(soloAcc)s%%" % \
-#-                        {'hitSoloNotes': self.guitars[i].currentGuitarSoloHitNotes, 'totalSoloNotes': self.currentGuitarSoloTotalNotes[i], 'soloAcc': str(trimmedIntSoloNoteAcc)}
-#-                    if self.guitarSoloAccuracyDisplayMode > 0:    #if not off:
-#-                      soloText = soloText.replace("0","O")
-#-                      glColor3f(1.0, 1.0, 1.0)  #cracker white
-#-    
-#-                      if self.theme == 2:
-#-                        soloFont = scoreFont
-#-                      else:
-#-                        soloFont = font
-#-    
-#-                      Tw, Th = soloFont.getStringSize(soloText,txtSize)
-#-                      
-#-                      boxXOffset = xOffset
-#-                      
-#-                      if self.guitarSoloAccuracyDisplayPos == 0:  #right
-#-                        xOffset -= Tw
-#-                        boxXOffset -= Tw/2
-#-                        #soloFont.render(soloText, (xOffset - Tw, yOffset),(1, 0, 0),txtSize)   #right-justified
-#-                      elif self.guitarSoloAccuracyDisplayPos == 1:  #centered
-#-                        xOffset = 0.5 - Tw/2
-#-                        boxXOffset = 0.5
-#-                        #soloFont.render(soloText, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #centered
-#-                      elif self.guitarSoloAccuracyDisplayPos == 3:  #racer: rock band 
-#-                        if self.hitAccuracyPos == 0: #Center - need to move solo text above this!
-#-                          yOffset = 0.100    #above Jurgen Is Here
-#-                        elif i == 0 and self.jurg1 and self.autoPlay:
-#-                          yOffset = 0.140    #above Jurgen Is Here
-#-                        elif i == 1 and self.jurg2 and self.autoPlay:
-#-                          yOffset = 0.140    #above Jurgen Is Here
-#-                        else:   #no jurgens here:
-#-                          yOffset = 0.210 #kk69: lower
-#-                        xOffset = 0.5 - Tw/2
-#-                        boxXOffset = 0.5
-#-                        #soloFont.render(soloText, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #rock band
-#-                      else:   #left
-#-                        boxXOffset += Tw/2
-#-                        #soloFont.render(soloText, (xOffset, yOffset),(1, 0, 0),txtSize)   #left-justified
-
                       #MFH - scale and display self.soloFrame behind / around the solo accuracy text display
 
                       if self.fontMode==0:      #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
                         if self.soloFrame:
                           frameWidth = self.solo_Tw[i]*1.15
                           frameHeight = self.solo_Th[i]*1.07
-                          fontAscent = self.solo_soloFont.getFontAscent(self.solo_txtSize)
-                          #MFH - font Y position = top of text to be written
-                          #boxYOffset = self.hPlayer[i]-(self.wFull* (yOffset+(Th/2.0)) )
-                          #boxYOffset = self.hFull-(self.wFull* (yOffset+(Th/2.0)) )
-                          self.solo_boxYOffset[i] = self.hFull-(self.wFull* (self.solo_yOffset[i]+(fontAscent) ) )
+                          self.solo_boxYOffset[i] = self.hPlayer[i]-(self.hPlayer[i]* ((self.solo_yOffset[i] + self.solo_Th[i]/2.0 ) / self.fontScreenBottom) )   
                           self.soloFrame.transform.reset()
                           tempWScale = frameWidth*self.soloFrameWFactor
                           tempHScale = -(frameHeight)*self.soloFrameWFactor
@@ -6921,29 +6846,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                           self.soloFrame.draw()
                         self.solo_soloFont.render(self.solo_soloText[i], (self.solo_xOffset[i], self.solo_yOffset[i]),(1, 0, 0),self.solo_txtSize)
 
-#-                      elif self.fontMode==1:      #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
-#-                        
-#-                        #only update if the text will have changed!
-#-                        
-#-                        
-#-                        #trying new rendering method...
-#-                        tempSurface = soloFont.pygameFontRender(soloText, antialias=False, color=(0,0,255), background=(0,0,0)  )
-#-                        
-#-                        # Create a rectangle
-#-                        tempRect = tempSurface.get_rect()
-#-
-#-                        # Center the rectangle
-#-                        tempRect.centerx = self.screenCenterX
-#-                        tempRect.centery = self.screenCenterY
-#-                        
-#-                        # Blit the text
-#-                        #self.engine.video.screen.blit(tempSurface, tempRect)
-#-                        self.laminaScreen.surf.blit(tempSurface, tempRect)
-#-                        self.laminaScreen.refresh()         #needs to be called whenever text contents change
-#-                        self.laminaScreen.refreshPosition()   #needs to be called whenever camera position changes                        
-#-                        
-#-                        #self.laminaScreen.display()
-#-                      
+                        #self.solo_soloFont.render("test", (0.5,0.0) )     #appears to render text from given position, down / right...
+                        #self.solo_soloFont.render("test", (0.5,0.5) )     #this test confirms that the Y scale is in units relative to the X pixel width - 1280x960 yes but 1280x1024 NO
+
+                        #this test locates the constant that the font rendering routine always considers the "bottom" of the screen   
+                        #self.solo_soloFont.render("test", (0.5,0.75-self.solo_Th[i]), scale=self.solo_txtSize )    #ah-ha!  4:3 AR viewport = 0.75 max!
+
 
                   #self.engine.view.setViewport(1,0)
               #except Exception, e:

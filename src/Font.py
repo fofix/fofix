@@ -275,6 +275,25 @@ class Font:
       w, h = self.getStringSize(ch, scale = scale)
       tw, th = g.size
 
+      #MFH
+      # Rectangle with numbered corners for notation reference: 
+      #   3_______4   (height = h)
+      #   |       |  
+      #   |       |h  
+      #   1-------2   (width = w)
+      #       w 
+      #
+      #The VertexPointer traces around (designates) a rectangle of dimensions w * h in the following order (two triangles, or TRIANGLE_STRIPs):
+      #   1,2,3,4   (which is traced as two triangles 1-2-3 and 2-3-4)
+      #The TexCoordPointer traces around (designates) this rectangle in the following order (two triangles, or TRIANGLE_STRIPs):
+      #   3,4,1,2   (which is traced as two triangles 3-4-1 and 4-1-2)
+      #               ...which, I assume, is why normal textures show up upside-down if they are not corrected with a negative Y axis scale?
+
+      #This leads me to believe that fonts are actually rendered with their given "position" anchoring their lower left corner, as a font
+      # should be.  I must re-examine how the solo frame is generated and try some new experiments.
+      
+      #Nope - writing a "test" string at pos (0.5, 0.0) clearly shows that the position is the anchor for the TOP-LEFT corner of the text.
+
       glVertexPointerf([(0.0, 0.0, 0.0), (w, 0.0, 0.0), (0.0, h, 0.0), (w, h, 0.0)])
       glTexCoordPointerf([(0.0, th), (tw, th), (0.0, 0.0), (tw, 0.0)])
 

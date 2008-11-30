@@ -1880,6 +1880,8 @@ class Track:
     tempoBpm = []
 
     #get all the bpm changes and their times
+    endBpm = None
+    endTime = None
     for time, event in self.allEvents:
       if isinstance(event, Tempo):
         tempoTime.append(time)
@@ -1889,8 +1891,11 @@ class Track:
       if isinstance(event, Note):
         endTime = time + event.length + 30000
         continue
-    tempoTime.append(endTime)
-    tempoBpm.append(endBpm)
+    
+    if endTime:
+      tempoTime.append(endTime)
+    if endBpm:
+      tempoBpm.append(endBpm)
 
     #calculate and add the measures/beats/half-beats
     passes = 0  
