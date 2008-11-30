@@ -161,7 +161,7 @@ Config.define("game", "rock_band_events",      int, 1,  text = _("Rock Band MIDI
 Config.define("game", "show_unused_text_events",      bool, False,  text = _("Show unused events"), options = {False: _("No"), True: _("Yes")})
 Config.define("game", "bass_kick_sound",      bool, False,  text = _("Bass kick sound"), options = {False: _("Off"), True: _("On")})
 Config.define("game", "rb_midi_lyrics",           int,  1,   text = _("MIDI/RB Lyrics"), options = {0: _("Off"), 1: _("1p Only"), 2: _("Auto")})
-Config.define("game", "rb_midi_sections",           int,  1,   text = _("MIDI/RB Sections"), options = {0: _("Off"), 1: _("1p Only"), 2: _("Auto")})
+Config.define("game", "rb_midi_sections",           int,  0,   text = _("MIDI/RB Sections"), options = {0: _("Off"), 1: _("1p Only"), 2: _("Auto")})
 Config.define("game", "key_checker_mode",      int, 1,  text = _("Key Conflicts"), options = {0: _("No check"), 1: _("Notify"), 2: _("Enforce")})
 Config.define("performance", "in_game_stats",      int, 0,  text = _("In-Game Stats"), options = {0: _("Off"), 1: _("RB Only"), 2: _("On")})
 Config.define("game", "in_game_stars",      int, 1,  text = _("In-Game Stars"), options = {0: _("Off"), 1: _("RB Only"), 2: _("On")})
