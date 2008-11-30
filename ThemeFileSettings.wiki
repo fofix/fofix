@@ -74,7 +74,6 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||spot_color = #EEEEEE||Enter a Hex color here.||
 ||hopo_color = #EEEEEE||Enter a Hex color here.||
 ||mesh_color = #000000||Enter a Hex color here.||
-||open_color = #FF9933||Enter a Hex color here.||
 ||opencolor = #FF8000 ||Enter a Hec color here. Sets the Bass drum note color for 3d notes||
 ||rockmeter_score_color = #93c351||Enter a Hex color here.||
 ||ingame_stats_color = #000000||Enter a Hex color here.||
