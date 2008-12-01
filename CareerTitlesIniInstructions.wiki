@@ -112,6 +112,7 @@ unlock_id = gha_7
 
 *NOTE*- If you are going to have more than 10 tiers, you *MUST* put a zero in front of single digits for the IDs!!
 
+To order songs within a tier, use a decimal in the unlock_id. So for example, the first song in the 2nd tier for Guitar Hero III (gh3_2) would be unlock_id=gh3_2.1 . The 2nd would be gh3_2.2, and so on. But make sure all the songs are done this way.
 Also, you can make part of the songs in the tier unlocked, then another part, then the
 encore by adding changing those parts into "unlock_id = gh3_1a" or whatever would
 correspond to your career. BUT, You will also have to change the "unlock_require = "
