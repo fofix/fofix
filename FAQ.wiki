@@ -148,9 +148,9 @@ It is the original multi-player mode from a way earlier version.
 
 Party mode actually was designed to be for as many players as could switch guitars during a given song.  See, the way Party Mode is supposed to work is (if you have more than two players):
 
-  # The first player is holding Guitar 1, and the second player is holding Guitar 2 - ready to take over after the countdown.
-  # Then, while player 2 is playing guitar 2, player 1 hands off guitar 1 to player 3, who gets ready to take over after the countdown.
-  # Then, while player 3 is playing guitar 1, player 2 hands off guitar 2 to player 4, who gets ready to take over after the countdown.
+  * The first player is holding Guitar 1, and the second player is holding Guitar 2 - ready to take over after the countdown.
+  * Then, while player 2 is playing guitar 2, player 1 hands off guitar 1 to player 3, who gets ready to take over after the countdown.
+  * Then, while player 3 is playing guitar 1, player 2 hands off guitar 2 to player 4, who gets ready to take over after the countdown.
 ...
 ...
 until all players have played (if the song is still going at this point), then player 1 just gets in the rotation again and it starts over.
