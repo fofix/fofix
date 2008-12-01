@@ -92,13 +92,22 @@ DEFAULT_SIZE_FLAME4_4X   = 0.075
 
 DEFAULT_SPINNY           = False
 
-DEFAULT_X_TARGET_POV     = 0.0
-DEFAULT_Y_TARGET_POV     = 0.0
-DEFAULT_Z_TARGET_POV     = 4.0
+#DEFAULT_X_TARGET_POV     = 0.0
+#DEFAULT_Y_TARGET_POV     = 0.0
+#DEFAULT_Z_TARGET_POV     = 4.0
 
-DEFAULT_X_ORIGIN_POV     = 0.0
-DEFAULT_Y_ORIGIN_POV     = 3.0
-DEFAULT_Z_ORIGIN_POV     = -3.0
+#DEFAULT_X_ORIGIN_POV     = 0.0
+#DEFAULT_Y_ORIGIN_POV     = 3.0
+#DEFAULT_Z_ORIGIN_POV     = -3.0
+
+DEFAULT_X_TARGET_POV     = None
+DEFAULT_Y_TARGET_POV     = None
+DEFAULT_Z_TARGET_POV     = None
+
+DEFAULT_X_ORIGIN_POV     = None
+DEFAULT_Y_ORIGIN_POV     = None
+DEFAULT_Z_ORIGIN_POV     = None
+
 
 DEFAULT_PHRASE_LOADING   = None
 DEFAULT_PHRASE_RESULTS   = None
@@ -107,6 +116,7 @@ DEFAULT_SONG_CREDIT      = "Unknown"
 #blazingamer
 DEFAULT_X_MENU           = None
 DEFAULT_Y_MENU           = None
+DEFAULT_RBMENU           = False
 
 DEFAULT_X_loading        = None
 DEFAULT_Y_loading        = None
@@ -119,6 +129,8 @@ DEFAULT_COLOR_OPEN      = "#FF9933"
 DEFAULT_SONGBACK         = False
 DEFAULT_VERSIONTAG       = False
 DEFAULT_RMTYPE           = None
+
+
 
 #TWD
 DEFAULT_MENU_NECK_CHOOSE_X = 0.1
@@ -276,6 +288,8 @@ Config.define("theme", "pov_origin_z",       float, DEFAULT_Z_ORIGIN_POV)
 #blazingamer
 Config.define("theme", "menu_x",       float, DEFAULT_X_MENU)
 Config.define("theme", "menu_y",       float, DEFAULT_Y_MENU)
+Config.define("theme", "rbmenu",       bool, DEFAULT_RBMENU)
+
 
 Config.define("theme", "loading_x",       float, DEFAULT_X_loading)
 Config.define("theme", "loading_y",       float, DEFAULT_Y_loading)
@@ -396,6 +410,7 @@ povOriginZ = None
 #Blazingamer
 menuX = None
 menuY = None
+menuRB = None
 loadingX = None
 loadingY = None
 twoDnote = None
@@ -1024,7 +1039,7 @@ def setupPauseNOpt(config):
 
 
 def setupMenu(config):
-  global menuX, menuY
+  global menuX, menuY, menuRB
   global loadingX, loadingY
   global songback, versiontag
   
@@ -1035,6 +1050,11 @@ def setupMenu(config):
   temp = config.get("theme", "menu_y")
   if menuY == None or temp != DEFAULT_Y_MENU:
     menuY = temp
+
+  temp = config.get("theme", "rbmenu")
+  if menuRB == None or temp != DEFAULT_RBMENU:
+    menuRB = temp
+
 
   temp = config.get("theme", "loading_x")
   if loadingX == None or temp != DEFAULT_X_loading:
@@ -1316,12 +1336,13 @@ def writePauseNOpt(f, config):
 
 
 def writeMenu(f, config):
-  global menuX, menuY
+  global menuX, menuY, menuRB
   global loadingX, loadingY
   global songback
 
   f.write("%s = %s\n" % ("menu_x", menuX))
   f.write("%s = %s\n" % ("menu_y", menuY))
+  f.write("%s = %s\n" % ("rbmenu", menuRB))
   f.write("%s = %s\n" % ("loading_x", loadingX))
   f.write("%s = %s\n" % ("loading_y", loadingY))
   f.write("%s = %s\n" % ("songback", songback))

@@ -127,7 +127,8 @@ class MainMenu(BackgroundLayer):
       self.menux = None
       self.menuy = None
 
-
+    self.rbmenu = Theme.menuRB
+ 
     #MFH
     self.main_menu_scale = Theme.main_menu_scaleVar
     self.main_menu_vspacing = Theme.main_menu_vspacingVar
@@ -439,9 +440,12 @@ class MainMenu(BackgroundLayer):
   def render(self, visibility, topMost):
     self.engine.view.setViewport(1,0)
     self.visibility = visibility
-    v = 1.0 - ((1 - visibility) ** 2)
-
-    self.engine.view.transitionTime = 1
+    if self.rbmenu:
+      v = 1.0 - ((1 - visibility) ** 2)
+    else:
+      v = 1
+    if v == 1:
+      self.engine.view.transitionTime = 1 
 
     if self.menu.active and not self.active:
       self.active = True
@@ -553,17 +557,17 @@ class MainMenu(BackgroundLayer):
           ypos = 1/5.0*i
           self.BGText.transform.reset()
           #self.BGText.transform.scale(.5*.5,-1/5.0*.5)
-          self.BGText.transform.scale(.5*self.main_menu_scale,-1/5.0*self.main_menu_scale)
+          self.BGText.transform.scale(.5*self.main_menu_scale,(-1/5.0*self.main_menu_scale))
           
 
 #============blazingamer============
 #if menux and/or menuy are not set it will use the default positions for the main text
           if self.menux == None or self.menuy == None:
-            self.BGText.transform.translate(w*0.2,h*0.8-(h*self.main_menu_vspacing)*i)
+            self.BGText.transform.translate(w*0.2,(h*0.8-(h*self.main_menu_vspacing)*i)*v)
 #if menux and menuy are set it will use those
           else:
             try:
-              self.BGText.transform.translate(w*self.menux,h*self.menuy-(h*self.main_menu_vspacing)*i)
+              self.BGText.transform.translate(w*self.menux,(h*self.menuy-(h*self.main_menu_vspacing)*i)*v)
             except Exception, e:
               Log.warn("Unable to translate BGText: %s" % e) 
         
