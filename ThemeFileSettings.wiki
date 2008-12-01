@@ -90,6 +90,7 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||pov_origin_x = 0.0||Controls Custom POV. -Wiki WIP.   {{{Animated image Example - http://img73.imageshack.us/my.php?image=exampleef7.gif}}}||
 ||pov_origin_y = 2.9||Controls Custom POV. -Wiki WIP. {{{Animated image Example - http://img88.imageshack.us/img88/4791/examplepy6.gif}}}||
 ||pov_origin_z = -2.9||Controls Custom POV. -Wiki WIP. {{{Animated image Example - http://img140.imageshack.us/img140/4686/examplezv4.gif}}}||
+||rbmenu = true||Turns on replicating the Buttons scrolling up from the bottom for Rock Band theme's.||
 
 
 
