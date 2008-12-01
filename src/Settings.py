@@ -472,6 +472,7 @@ class SettingsMenu(Menu.Menu):
     logfileSettingsMenu = Menu.Menu(engine, logfileSettings)
 
     debugSettings = [
+      ConfigChoice(engine.config, "video", "show_fps", autoApply = True),#evilynux
       ConfigChoice(engine.config, "game", "kill_debug", autoApply = True),#myfingershurt
       ConfigChoice(engine.config, "game", "hopo_debug_disp", autoApply = True),#myfingershurt
       ConfigChoice(engine.config, "game", "rock_band_events", autoApply = True),#myfingershurt

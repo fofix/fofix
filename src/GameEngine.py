@@ -65,6 +65,7 @@ Config.define("video",  "multisamples", int,   4,     text = _("Antialiasing Qua
 Config.define("video",  "disable_fretsfx", bool, False, text = _("Enable Glow-FX"), options = {False: _("Yes"), True: _("No")})
 Config.define("video",  "resolution",   str,   "640x480")
 Config.define("video",  "fps",          int,   80,    text = _("Frames per Second"), options = dict([(n, n) for n in range(1, 120)]))
+Config.define("video",  "show_fps",     bool,   False,  text = _("Print Frames per Second"), options = {False: _("No"), True: _("Yes")})
 Config.define("video",  "hitglow_color", int,  0,     text = _("Glow-FX Color"), options = {0: _("Same as Fret"), 1: _("Actual Color")})
 Config.define("video",  "hitflame_color", int, 0,     text = _("Hitflames Color"), options = {0: _("Theme Specific"), 1: _("Same as Fret"), 2: _("Actual Color")})
 Config.define("performance",  "starspin", bool,     True,  text = _("Starnotes"), options = {True: _("Animated"), False: _("Static")})
@@ -373,6 +374,12 @@ class GameEngine(Engine):
     self.config.set("game",   "font_rendering_mode", 0) #force oGL mode
 
     self.audio             = Audio()
+    self.frames            = 0
+    self.fpsEstimate       = 0
+    self.lastTime          = 0
+    self.elapsedTime       = 0
+    self.priority          = self.config.get("engine", "highpriority")
+    self.show_fps          = self.config.get("video", "show_fps")
 
     Log.debug("Initializing audio.")
     frequency    = self.config.get("audio", "frequency")
@@ -395,7 +402,7 @@ class GameEngine(Engine):
     self.video.setMode((width, height), fullscreen = fullscreen, multisamples = multisamples)
 
     # Enable the high priority timer if configured
-    if self.config.get("engine", "highpriority"):
+    if self.priority:
       Log.debug("Enabling high priority timer.")
       #self.timer.highPriority = True
       self.fps = 0 # High priority
@@ -716,6 +723,18 @@ class GameEngine(Engine):
       if self.debugLayer:
         self.debugLayer.render(1.0, True)
       self.video.flip()
+      # evilynux - Estimate the rendered frames per second.
+      if not self.priority and self.show_fps:
+        self.frames = self.frames+1
+        # Estimate every 2*config.fps .
+        # If you are on target, that should be every 2 seconds.
+        if self.frames == (self.fps << 1):
+          currentTime = pygame.time.get_ticks()
+          self.elapsedTime = currentTime-self.lastTime
+          self.lastTime = currentTime
+          self.fpsEstimate = self.frames*(1000.0/self.elapsedTime)
+          print("fps:  %f" % self.fpsEstimate)
+          self.frames = 0 
       return done
     except:
       Log.error("Loading error:")

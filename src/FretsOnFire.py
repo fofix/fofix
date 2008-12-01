@@ -45,6 +45,7 @@ import sys
 import os
 import codecs
 import Resource
+import pygame
 
 usage = """%(prog)s [options]
 Options:
@@ -141,6 +142,7 @@ def main():
       Log.warn("Unable to enable psyco.")
 
     try:
+      engine.ticksAtStart = pygame.time.get_ticks()
       while engine.run():
         pass
     except KeyboardInterrupt:
