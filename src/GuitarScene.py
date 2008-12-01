@@ -78,6 +78,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.coOp = False
     Log.debug("GuitarSceneClient init...")
 
+    self.coOpPlayerMeter = 1    #we're using Player 1's rock meter and score to display the CoOp stats
 
     #MFH - testing new traceback logging:
     #raise TypeError
@@ -2149,17 +2150,17 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #MFH TODO - maintain separate rock status for each player in co-op mode
     elif self.coOp and self.numOfPlayers > 1: #battle mode
       if self.notesMissed[i]:
-        self.minusRock[0] += self.minGain/self.multi[i]
-        self.rock[0] -= self.minusRock[0]/self.multi[i]
-        if self.plusRock[0] > self.pluBase:
-          self.plusRock[0] -= self.pluGain*2.0/self.multi[i]
-        if self.plusRock[0] <= self.pluBase:
-          self.plusRock[0] = self.pluBase/self.multi[i]
+        self.minusRock[self.coOpPlayerMeter] += self.minGain/self.multi[i]
+        self.rock[self.coOpPlayerMeter] -= self.minusRock[self.coOpPlayerMeter]/self.multi[i]
+        if self.plusRock[self.coOpPlayerMeter] > self.pluBase:
+          self.plusRock[self.coOpPlayerMeter] -= self.pluGain*2.0/self.multi[i]
+        if self.plusRock[self.coOpPlayerMeter] <= self.pluBase:
+          self.plusRock[self.coOpPlayerMeter] = self.pluBase/self.multi[i]
       if self.lessMissed[i]:
-        self.minusRock[0] += self.minGain/5.0/self.multi[i]
-        self.rock[0] -= self.minusRock[0]/5.0/self.multi[i]
-        if self.plusRock[0] > self.pluBase:
-          self.plusRock[0] -= self.pluGain/2.5/self.multi[i]
+        self.minusRock[self.coOpPlayerMeter] += self.minGain/5.0/self.multi[i]
+        self.rock[self.coOpPlayerMeter] -= self.minusRock[0]/5.0/self.multi[i]
+        if self.plusRock[self.coOpPlayerMeter] > self.pluBase:
+          self.plusRock[self.coOpPlayerMeter] -= self.pluGain/2.5/self.multi[i]
     
     else:   #normal mode
       if self.notesMissed[i]:
@@ -2207,13 +2208,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     #MFH TODO maintain separate rock status for each player
     elif self.coOp and self.numOfPlayers > 1: 
-      if self.rock[0] < self.rockMax:
-        self.plusRock[0] += self.pluGain*self.multi[i]
-        self.rock[0] += self.plusRock[0]*self.multi[i]
-      if self.rock[0] >= self.rockMax:
-        self.rock[0] = self.rockMax
-      if self.minusRock[0] > self.minBase:
-        self.minusRock[0] -= self.minGain/2.0*self.multi[i]
+      if self.rock[self.coOpPlayerMeter] < self.rockMax:
+        self.plusRock[self.coOpPlayerMeter] += self.pluGain*self.multi[i]
+        self.rock[self.coOpPlayerMeter] += self.plusRock[self.coOpPlayerMeter]*self.multi[i]
+      if self.rock[self.coOpPlayerMeter] >= self.rockMax:
+        self.rock[self.coOpPlayerMeter] = self.rockMax
+      if self.minusRock[self.coOpPlayerMeter] > self.minBase:
+        self.minusRock[self.coOpPlayerMeter] -= self.minGain/2.0*self.multi[i]
     
     else:   #normal mode
       if self.rock[i] < self.rockMax:
@@ -2249,7 +2250,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         #MFH TODO - maintain separate rock status, just combine into single rockmeter (2 arrows) for RB theme
         # this will also allow separate failing, and saving with starpower
         if self.numOfPlayers > 1 and self.coOp:
-          if self.rock[0] <= 0:
+          if self.rock[self.coOpPlayerMeter] <= 0:
             self.failed = True
         else:
           somebodyStillAlive = False
@@ -4414,7 +4415,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               
               
               #if (self.coOp and i == 0) or not self.coOp:  #MFH only render for player 0 if co-op mode
-              if (self.coOp and i == 1) or not self.coOp:  #MFH only render for player 1 if co-op mode
+              if (self.coOp and i == self.coOpPlayerMeter) or not self.coOp:  #MFH only render for player 1 if co-op mode
 
                 if self.coOp:
                   score=self.coOpScore
@@ -5048,7 +5049,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               self.rockmeter.draw()
 
               #if (self.coOp and i == 0) or not self.coOp:  #MFH only render for player 0 if co-op mode
-              if (self.coOp and i == 1) or not self.coOp:  #MFH only render for player 1 if co-op mode
+              if (self.coOp and i == self.coOpPlayerMeter) or not self.coOp:  #MFH only render for player 1 if co-op mode
 
                 if self.coOp:
                   score=self.coOpScore
@@ -5387,7 +5388,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               heightIncrease = h*0.6234375*currentRock*0.65
     
               if currentRock == 1 and self.failingEnabled:
-                if (self.coOp and i == 1) or not self.coOp:  #MFH only render for player 1 if co-op mode
+                if (self.coOp and i == self.coOpPlayerMeter) or not self.coOp:  #MFH only render for player 1 if co-op mode
                 #if self.numOfPlayers > 1 and self.coOp:
                 #  if i == 0:
                 #    self.rockFull.transform.reset()
@@ -5408,7 +5409,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   fillColor = (0,1,0,1)
     
 
-                if (self.coOp and i == 1) or not self.coOp:  #MFH only render for player 1 if co-op mode
+                if (self.coOp and i == self.coOpPlayerMeter) or not self.coOp:  #MFH only render for player 1 if co-op mode
                 #if self.numOfPlayers > 1 and self.coOp:
                 #  if i == 0:
                 #    self.rockBottom.transform.reset()
@@ -5422,7 +5423,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   self.rockBottom.draw()
   
                 if self.failingEnabled == False:
-                  if (self.coOp and i == 1) or not self.coOp:  #MFH only render for player 1 if co-op mode
+                  if (self.coOp and i == self.coOpPlayerMeter) or not self.coOp:  #MFH only render for player 1 if co-op mode
                   #if self.numOfPlayers > 1 and self.coOp:
                   #  if i == 0:
                   #    self.rockOff.transform.reset()
@@ -5435,7 +5436,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     self.rockOff.transform.scale(.5,.5)
                     self.rockOff.draw()
                 else:
-                  if (self.coOp and i == 1) or not self.coOp:  #MFH only render for player 1 if co-op mode
+                  if (self.coOp and i == self.coOpPlayerMeter) or not self.coOp:  #MFH only render for player 1 if co-op mode
                   #if self.numOfPlayers > 1 and self.coOp:
                   #  if i == 0:
                   #    self.rockFill.transform.reset()
@@ -5448,7 +5449,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     self.rockFill.transform.translate(w*0.07, h*0.3-heightIncrease/2+heightIncrease)
                     self.rockFill.draw(color = fillColor)
               
-                if (self.coOp and i == 1) or not self.coOp:  #MFH only render for player 1 if co-op mode
+                if (self.coOp and i == self.coOpPlayerMeter) or not self.coOp:  #MFH only render for player 1 if co-op mode
                 #if self.numOfPlayers > 1 and self.coOp:
                 #  if i == 0:
                 #    self.rockTop.transform.reset()
@@ -5480,7 +5481,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   if self.failingEnabled:  
                     self.arrow.draw()
                 whichScorePic = self.scorePic
-              elif i == 1:
+              elif i == self.coOpPlayerMeter:
                 #if self.numOfPlayers > 1 and self.coOp:
                 #  self.arrowP2.transform.reset()
                 #else:
@@ -5627,7 +5628,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 #myfingershurt: locale.format call adds commas to separate numbers just like Rock Band
 
                 #if (self.coOp and i == 0) or not self.coOp:  #MFH only render for player 0 if co-op mode
-                if (self.coOp and i == 1) or not self.coOp:  #MFH only render for player 1 if co-op mode
+                if (self.coOp and i == self.coOpPlayerMeter) or not self.coOp:  #MFH only render for player 1 if co-op mode
   
                   if self.coOp:
                     score=self.coOpScore
@@ -6144,7 +6145,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               self.rockmeter.draw()
 
               #if (self.coOp and i == 0) or not self.coOp:  #MFH only render for player 0 if co-op mode
-              if (self.coOp and i == 1) or not self.coOp:  #MFH only render for player 1 if co-op mode
+              if (self.coOp and i == self.coOpPlayerMeter) or not self.coOp:  #MFH only render for player 1 if co-op mode
 
                 if self.coOp:
                   score=self.coOpScore
@@ -6318,7 +6319,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           #MFH - new location for star system support - outside theme-specific logic:
 
           #if (self.coOp and i == 0) or not self.coOp:  #MFH only render for player 0 if co-op mode
-          if (self.coOp and i == 1) or not self.coOp:  #MFH only render for player 1 if co-op mode
+          if (self.coOp and i == self.coOpPlayerMeter) or not self.coOp:  #MFH only render for player 1 if co-op mode
 
             if self.coOp:
               stars=self.coOpStars
