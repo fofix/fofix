@@ -724,16 +724,17 @@ class GameEngine(Engine):
         self.debugLayer.render(1.0, True)
       self.video.flip()
       # evilynux - Estimate the rendered frames per second.
-      if not self.priority and self.show_fps:
+      if self.show_fps:
         self.frames = self.frames+1
-        # Estimate every 2*config.fps .
-        # If you are on target, that should be every 2 seconds.
-        if self.frames == (self.fps << 1):
+        # Estimate every 120 frames when highpriority is True.
+        # Estimate every 2*config.fps when highpriority is False,
+        # if you are on target, that should be every 2 seconds.
+        if( not self.priority and self.frames == (self.fps << 1) ) or ( self.priority and self.frames == 120 ):
           currentTime = pygame.time.get_ticks()
           self.elapsedTime = currentTime-self.lastTime
           self.lastTime = currentTime
           self.fpsEstimate = self.frames*(1000.0/self.elapsedTime)
-          print("fps:  %f" % self.fpsEstimate)
+          print("%.2f fps" % self.fpsEstimate)
           self.frames = 0 
       return done
     except:
