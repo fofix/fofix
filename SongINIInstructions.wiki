@@ -20,4 +20,4 @@
 ||version = ||Show the version of the song.||
 ||year =||Year in which the song has been published/made. Place at the end of the list.||
 ||loading_phrase =||Should be put at the end of the file; displays a custom phrase (maybe more than 1, if separated by "_", but I haven't tested) on the loading screen, instead of the selected theme's default ones.||
-||hopofreq = ||HOPO Frequency setting, since r487 this has 6 settings (0="Least", 1="Less", 2="Normal", 3="More", 4="Even More", 5="Most").  Detail on how old HOPO Frequency settings translate into this new list can be found in issue 170.||
+||hopofreq = ||HOPO Frequency setting, since r487 this has 6 settings (0="Least", 1="Less", 2="Normal", 3="More", 4="Even More", 5="Most").  Detail on how old HOPO Frequency settings translate into this new list can be found in issue 170.  Requires the user setting "Song HOPO Freq" be set to "Auto."||
