@@ -1436,7 +1436,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.hopoStyle        = self.engine.config.get("game", "hopo_style")
     self.hopoAfterChord = self.engine.config.get("game", "hopo_after_chord")
 
-    self.pov              = self.engine.config.get("game", "pov")
+    self.pov              = self.engine.config.get("fretboard", "point_of_view")
     #CoffeeMod
 
     if self.numOfPlayers == 1:
