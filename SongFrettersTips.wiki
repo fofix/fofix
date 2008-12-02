@@ -11,3 +11,7 @@ This means that if you mark starpower on G8, you will ONLY be able to designate 
 That is why I recommend marking starpower or overdrive on G#9.  Then, should you decide later that you want to mark out some DRUM SOLOS or BASS SOLOS -- you will be able to add those on G8.  (will be supported in FoFiX soon!)
 
 Note, it would be entirely possible to choose an unused GH MIDI note to use for marking solo sections while still using G8 for starpower.  However, if the game detects any G#9 in the MIDI file on an instrument track, it will NOT let you use any G8 starpower markings.  Not to mention the fact that any such custom song might not be compatible with the real GH engine (which matters to some).
+
+===What NOT to do===
+
+Please see Puppetz Hero 3, Tier 1 (at least) for examples of how to NOT use MIDI marker notes.  Inexplicably, these songs have solo sections marked as note G8... and they have NO OTHER MARKER NOTES.  Meaning, no G#9 starpower / overdrive markings -- which means, his G8 markers are interpreted as STARPOWER / OVERDRIVE PATHS.  There is nothing I can do about this.  These MIDIs must be corrected, either removing the G8 solo marking or adding starpower / overdrive paths on G#9.
