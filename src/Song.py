@@ -1196,9 +1196,17 @@ class Track:
     if self.hopoTick == 0:
       ticksPerBeat = 960
     elif self.hopoTick == 1:
+      ticksPerBeat = 720
+    elif self.hopoTick == 2:
       ticksPerBeat = 480
+    elif self.hopoTick == 3:
+      ticksPerBeat = 360
+    elif self.hopoTick == 4:
+      ticksPerBeat = 240
     else:
       ticksPerBeat = 240
+      hopoDelta = 250
+      
     hopoNotes = []
     chordNotes = []
     sameNotes = []
@@ -1425,12 +1433,19 @@ class Track:
     #chordFudge = 10
     self.chordFudge = 1   #MFH - there should be no chord fudge.
 
-    if self.hopoTick == 0:    #HOPO frequency
+    if self.hopoTick == 0:
       ticksPerBeat = 960
     elif self.hopoTick == 1:
+      ticksPerBeat = 720
+    elif self.hopoTick == 2:
       ticksPerBeat = 480
+    elif self.hopoTick == 3:
+      ticksPerBeat = 360
+    elif self.hopoTick == 4:
+      ticksPerBeat = 240
     else:
       ticksPerBeat = 240
+      hopoDelta = 250
     hopoNotes = []
 
     #myfingershurt:

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-01 09:14-0800\n"
+"POT-Creation-Date: 2008-12-02 08:16-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -44,7 +44,7 @@ msgstr ""
 msgid "Browsing Collection..."
 msgstr ""
 
-#: Dialogs.py:797 Song.py:3127
+#: Dialogs.py:797 Song.py:3142
 msgid "End of Career"
 msgstr ""
 
@@ -693,12 +693,12 @@ msgstr ""
 msgid "HO/PO Frequency"
 msgstr ""
 
-#: GameEngine.py:117 GameResultsScene.py:147
-msgid "Less"
+#: GameEngine.py:117
+msgid "Least"
 msgstr ""
 
-#: GameEngine.py:117 GameResultsScene.py:151
-msgid "More"
+#: GameEngine.py:117 GameResultsScene.py:147
+msgid "Less"
 msgstr ""
 
 #: GameEngine.py:118
@@ -1515,6 +1515,10 @@ msgstr ""
 
 #: GameResultsScene.py:97
 msgid "Quit"
+msgstr ""
+
+#: GameResultsScene.py:151
+msgid "More"
 msgstr ""
 
 #: GameResultsScene.py:172

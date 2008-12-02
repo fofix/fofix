@@ -114,7 +114,7 @@ Config.define("game",   "tapping",      int,   0,  text = _("HO/PO"),       opti
 Config.define("game",   "hopo_mark",           int,   1,      text = _("HO/PO Note Marks"), options = {0: _("FoF"), 1: _("RFmod")})
 #myfingershurt: HOPO settings
 Config.define("game",   "hopo_style",          int,   4,      text = _("HO/PO System"), options = {0: _("None"), 1: _("RF-Mod"), 2: _("GH2 Strict"), 3: _("GH2 Sloppy"), 4: _("GH2")})
-Config.define("coffee", "moreHopo",            int,   1,   text = _("HO/PO Frequency"),    options = {0: _("Less"), 1: _("Normal"), 2: _("More")})
+Config.define("coffee", "moreHopo",            int,   2,   text = _("HO/PO Frequency"),    options = {0: _("Least"), 1: _("Less"), 2: _("Normal"), 3:("More"), 4:("Even More"), 5:("Most")})
 Config.define("game", "hopo_after_chord",      int,   1,   text = _("HO/PO After Chord"),    options = {0: _("Off"), 1: _("On")})
 Config.define("game", "accuracy_mode",      int,   2,   text = _("Accuracy"),    options = {0: _("Off"), 1: _("Numeric"), 2: _("Friendly"), 3: _("Both")})
 Config.define("game", "accuracy_pos",      int,   1,   text = _("Accuracy Words Pos"),    options = {0: _("Center"), 1: _("Right-top Corner"), 2: _("Left-Bottom Corner"), 3: _("Center-Bottom")}) #QQstarS:acc show
