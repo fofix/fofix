@@ -227,7 +227,8 @@ Config.define("video", "counting",       bool, False,     text = _("Song Countdo
 Config.define("game",   "hit_window",          int, 1,    text = _("Note Hit-window"), options = {0: _("1. Widest"), 1: _("2. Wide"), 2: _("3. Standard"), 3: _("4. Tight"), 4: _("5. Tightest")})#racer blazingamer
 Config.define("game",   "disable_vbpm",        bool,  False,  text = _("Disable Variable BPM"),  options = {False: _("No"), True: _("Yes")})
 Config.define("game",   "sort_order",          int,   0,      text = _("Sort Order"), options = {0: _("Title"), 1: _("Artist"), 2: _("Times played")})
-Config.define("fretboard",   "point_of_view",                 int,   5,      text = _("Point Of View"), options = {0: _("FoF"), 1: _("GH3"), 2: _("Rock Band"), 3: _("GH2"), 4: _("Rock Rev"), 5: _("Theme")}) #Racer, Blazingamer
+#Config.define("game",   "pov",                 int,   3,      text = _("Point Of View"), options = {0: _("FoF"), 1: _("GH3"), 2: _("Custom"), 3: _("Rock Band"), 4: _("GH2"), 5: _("Rock Rev"), 6: _("Theme")}) #Racer, Blazingamer
+Config.define("game",   "pov",                 int,   3,      text = _("Point Of View"), options = {0: _("FoF"), 1: _("GH3"), 2: _("Rock Band"), 3: _("GH2"), 4: _("Rock Rev"), 5: _("Theme")}) #Racer, Blazingamer
 Config.define("game",   "party_time",          int,   30,     text = _("Party Mode Timer"), options = dict([(n, n) for n in range(1, 99)]))
 Config.define("performance",   "disable_libcount",    bool,  True,  text = _("Disable Library Count"),    options = {False: _("No"), True: _("Yes")})
 Config.define("performance",   "disable_librotation", bool,  True,  text = _("Disable Library Rotation"),    options = {False: _("No"), True: _("Yes")})
@@ -237,6 +238,7 @@ Config.define("game",   "jurgdef",             bool,  False,  text = _("Enable J
 Config.define("game",   "jurgtype",            int,   2,      text = _("Jurgen Player"), options = {0: _("1"), 1: _("2"), 2: _("Both")}  )
 #MFH
 Config.define("game",   "jurglogic",            int,   1,      text = _("Jurgen Logic"), options = {0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}  )
+Config.define("game",   "jurgtext",            int,   1,      text = _("Jurgen Text Size"), options = {0: _("Big"), 1: _("Small")})
 
 
 

@@ -175,6 +175,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     #MFH
     self.jurgenLogic = self.engine.config.get("game", "jurglogic")    #logic 0 = original, logic 1 = MFH-1
+    self.jurgenText = self.engine.config.get("game", "jurgtext")
     self.timeLeft = None
     self.processedFirstNoteYet = False
     
@@ -1435,7 +1436,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.hopoStyle        = self.engine.config.get("game", "hopo_style")
     self.hopoAfterChord = self.engine.config.get("game", "hopo_after_chord")
 
-    self.pov              = self.engine.config.get("fretboard", "point_of_view")
+    self.pov              = self.engine.config.get("game", "pov")
     #CoffeeMod
 
     if self.numOfPlayers == 1:
@@ -4289,7 +4290,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             text = self.tsJurgenWasHere
           w, h = bigFont.getStringSize(text, scale = 0.0005)
           Theme.setBaseColor()
-          bigFont.render(text,  (0.25-(w/2), 0.34), scale = 0.0005)  #MFH - y was 0.4
+          if self.jurgenText == 0:
+            bigFont.render(text,  (0.25-(w/2), 0.34), scale = 0.0005)#MFH - y was 0.4
+          else:
+            bigFont.render(text,  (0.35-(w/2), 0.08), scale = 0.0005)
         elif self.jurg1 == True and self.splayers == 1:
           if self.autoPlay:
             if self.jurg == 0 or self.jurg == 2:
@@ -4300,7 +4304,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             text = self.tsJurgenWasHere
           w, h = bigFont.getStringSize(text, scale = 0.001)
           Theme.setBaseColor()
-          bigFont.render(text,  (0.5-(w/2), 0.2), scale = 0.001)
+          if self.jurgenText == 0:
+            bigFont.render(text,  (0.5-(w/2), 0.2), scale = 0.001)
+          else:
+            bigFont.render(text,  (0.61-(w/2), 0.08), scale = 0.0005)
         #Player 2
         if self.jurg2 == True and self.splayers == 2:
           if self.autoPlay:
@@ -4312,7 +4319,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             text = self.tsJurgenWasHere
           w, h = bigFont.getStringSize(text, scale = 0.0005)
           Theme.setBaseColor()
-          bigFont.render(text,  (0.75-(w/2), 0.34), scale = 0.0005)
+          if self.jurgenText == 0:
+            bigFont.render(text,  (0.75-(w/2), 0.34), scale = 0.0005)#MFH - y was 0.4
+          else:
+            bigFont.render(text,  (0.65-(w/2), 0.08), scale = 0.0005)
         #End Jurgen Code
   
         for i,player in enumerate(self.playerList): #QQstarS: This part has big fix. I add the code into it,So he can shown corect

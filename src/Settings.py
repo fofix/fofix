@@ -228,6 +228,7 @@ class SettingsMenu(Menu.Menu):
        ConfigChoice(engine.config, "game", "jurgdef", autoApply = True),#Spikehead777
        ConfigChoice(engine.config, "game", "jurgtype", autoApply = True),#Spikehead777
        ConfigChoice(engine.config, "game", "jurglogic", autoApply = True),#MFH
+       ConfigChoice(engine.config, "game", "jurgtext", autoApply = True),#hman
     ]
     JurgenSettingsMenu = Menu.Menu(engine, JurgenSettings)
            
@@ -402,13 +403,13 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "video",  "multisamples"),
       ConfigChoice(engine.config, "video", "disable_fretsfx"),
       ConfigChoice(engine.config, "video", "hitglow_color"),
+      ConfigChoice(engine.config, "game", "pov", autoApply = True),
       ConfigChoice(engine.config, "video", "counting", autoApply = True),
       (_("Advanced Video Settings"), AdvancedVideoSettingsMenu),
     ]
     videoSettingsMenu = Menu.Menu(engine, videoSettings)
 
     fretSettings = [
-      ConfigChoice(engine.config, "fretboard", "point_of_view", autoApply = True),
       ConfigChoice(engine.config, "coffee", "phrases", autoApply = True),
       ConfigChoice(engine.config, "game", "notedisappear", autoApply = True),
       ConfigChoice(engine.config, "game", "frets_under_notes", autoApply = True), #MFH
