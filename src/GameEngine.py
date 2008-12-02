@@ -228,7 +228,7 @@ Config.define("game",   "hit_window",          int, 1,    text = _("Note Hit-win
 Config.define("game",   "disable_vbpm",        bool,  False,  text = _("Disable Variable BPM"),  options = {False: _("No"), True: _("Yes")})
 Config.define("game",   "sort_order",          int,   0,      text = _("Sort Order"), options = {0: _("Title"), 1: _("Artist"), 2: _("Times played")})
 #Config.define("game",   "pov",                 int,   3,      text = _("Point Of View"), options = {0: _("FoF"), 1: _("GH3"), 2: _("Custom"), 3: _("Rock Band"), 4: _("GH2"), 5: _("Rock Rev"), 6: _("Theme")}) #Racer, Blazingamer
-Config.define("game",   "pov",                 int,   3,      text = _("Point Of View"), options = {0: _("FoF"), 1: _("GH3"), 2: _("Rock Band"), 3: _("GH2"), 4: _("Rock Rev"), 5: _("Theme")}) #Racer, Blazingamer
+Config.define("game",   "pov",                 int,   5,      text = _("Point Of View"), options = {0: _("FoF"), 1: _("GH3"), 2: _("Rock Band"), 3: _("GH2"), 4: _("Rock Rev"), 5: _("Theme")}) #Racer, Blazingamer
 Config.define("game",   "party_time",          int,   30,     text = _("Party Mode Timer"), options = dict([(n, n) for n in range(1, 99)]))
 Config.define("performance",   "disable_libcount",    bool,  True,  text = _("Disable Library Count"),    options = {False: _("No"), True: _("Yes")})
 Config.define("performance",   "disable_librotation", bool,  True,  text = _("Disable Library Rotation"),    options = {False: _("No"), True: _("Yes")})
