@@ -2221,6 +2221,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.minusRock[self.coOpPlayerMeter] -= self.minGain/2.0*self.multi[i]
     
     else:   #normal mode
+  
       if self.rock[i] < self.rockMax:
         self.plusRock[i] += self.pluGain*self.multi[i]
         self.rock[i] += self.plusRock[i]*self.multi[i]
@@ -2228,7 +2229,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.rock[i] = self.rockMax
       if self.minusRock[i] > self.minBase:
         self.minusRock[i] -= self.minGain/2.0*self.multi[i]
-
+      #Log.debug(str((self.rock[i]-(self.plusRock[i]*self.multi[i]))/self.rockMax) % "AND" % str(self.rock[i]/self.rockMax))
+      if (self.rock[i]/self.rockMax > 0.667) and ((self.rock[i]-(self.plusRock[i]*self.multi[i]))/self.rockMax < 0.667):
+        self.engine.data.crowdSound.play()
+          
     if self.minusRock[i] <= self.minBase:
       self.minusRock[i] = self.minBase
     if self.plusRock[i] <= self.pluBase:
