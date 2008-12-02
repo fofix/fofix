@@ -614,11 +614,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                       lastSpNoteTime = spTime
                     spEvent.star = True
                 #now, go back and mark all of the last chord as finalStar
+                #   BUT only if not drums!  If drums, mark only ONE of the last notes!
                 #lastChordTime = spTime
+                oneLastSpNoteMarked = False
                 for spTime, spEvent in tempStarpowerNoteList:
                   if isinstance(spEvent, Note):
                     if spTime == lastSpNoteTime:
-                      spEvent.finalStar = True
+                      if (guitar.isDrum and not oneLastSpNoteMarked) or (not guitar.isDrum):
+                        spEvent.finalStar = True
+                        oneLastSpNoteMarked = True
                 if self.logMarkerNotes == 1:
                   Log.debug("GuitarScene: P%d starpower phrase marked between %f and %f" % ( i+1, time, time+event.length ) )
                   if lastSpNoteTime == 0:
