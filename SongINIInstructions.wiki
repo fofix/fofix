@@ -14,8 +14,8 @@
 ||count = 1||How many times played||
 ||scores =||Encoded HighScores||
 ||scores_ext =||Also Encoded, contains other score info (longest note streak, etc)||
-||tutorial =||Boolean value -- not checked, but chances are it tells the game not to display the song in the Set list if set to 1.||
-||delay =||Not sure; IINM makes the notes appear earlier/later (depending on the value -- that could be set in ms but that's a random guess).||
+||tutorial =||0 or 1 -- it tells the game not to display the song in the Set list if set to 1.  Also enables translation of the script.txt phrases (really, this is only for the Jurgen FoF tutorial -- and possibly other tutorials if they are made with script.txt)||
+||delay =||This setting adds some delay (in milliseconds, just like your A/V delay) so that the notes appear later.||
 ||frets =||Name of the maker/converter of the song.||
 ||version = ||Show the version of the song.||
 ||year =||Year in which the song has been published/made. Place at the end of the list.||
