@@ -85,6 +85,10 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||crowd_loop_delay = x||x = integer.  Default user setting = 550 for sounds\crowdcheers.ogg)||
 ||display_all_grey_stars = True||True - All 5 stars shown at all times. False - Only shows the grey star your currently working on||
 ||rbmenu = true||Turns on replicating the Buttons scrolling up from the bottom at the game intro for Rock Band theme's.||
+||hopo_indicator_x = .950||Manually sets x position of hopo indicator||
+||hopo_indicator_y = .950||Manually sets y position of hopo indicator||
+||hopo_indicator_active_color = #0000FF||Manually sets active color of hopo indicator||
+||hopo_indicator_inactive_color = #FF0000||Manually sets inactive color of hopo indicator||
 ||_*Note for 6 POV items below*_||_*If you have ALL 6 of these settings in your 'theme.ini', AND you are not specifying "rmtype = 3" (for GH:WT rockmeter, which requires special positioning), then "Custom" POV will be forced.*_||
 ||pov_target_x = 0.0||Controls Custom POV. -Wiki WIP. {{{Animated image Example - http://img98.imageshack.us/img98/5323/exampledx9.gif}}}||
 ||pov_target_y = 0.0||Controls Custom POV. -Wiki WIP. {{{Animated image Example - http://img98.imageshack.us/img98/2541/examplecb3.gif}}}||
@@ -92,10 +96,7 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||pov_origin_x = 0.0||Controls Custom POV. -Wiki WIP.   {{{Animated image Example - http://img73.imageshack.us/my.php?image=exampleef7.gif}}}||
 ||pov_origin_y = 2.9||Controls Custom POV. -Wiki WIP. {{{Animated image Example - http://img88.imageshack.us/img88/4791/examplepy6.gif}}}||
 ||pov_origin_z = -2.9||Controls Custom POV. -Wiki WIP. {{{Animated image Example - http://img140.imageshack.us/img140/4686/examplezv4.gif}}}||
-||hopo_indicator_x = .950||Manually sets x position of hopo indicator||
-||hopo_indicator_y = .950||Manually sets y position of hopo indicator||
-||hopo_indicator_active_color = #0000FF||Manually sets active color of hopo indicator||
-||hopo_indicator_inactive_color = #FF0000||Manually sets inactive color of hopo indicator||
+
 
 
 
