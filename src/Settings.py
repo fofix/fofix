@@ -506,6 +506,7 @@ class SettingsMenu(Menu.Menu):
     listSettings = [
       (_("Select Song Library >"), self.baseLibrarySelect),
       ConfigChoice(engine.config, "coffee", "songfilepath", autoApply = True),
+      ConfigChoice(engine.config, "game", "sort_direction", autoApply = True),
       ConfigChoice(engine.config, "game",  "sort_order", autoApply = True),
       ConfigChoice(engine.config, "coffee", "songdisplay", autoApply = True),
       ConfigChoice(engine.config, "audio", "disable_preview", autoApply = True),  #myfingershurt

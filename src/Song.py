@@ -3060,14 +3060,15 @@ def getAvailableLibraries(engine, library = DEFAULT_LIBRARY):
             libraries.append(LibraryInfo(libName, os.path.join(libraryRoot, "library.ini")))
             #Log.debug("Library added: " + str(libraries) )
             libraryRoots.append(libraryRoot)
-
+   
   libraries.sort(lambda a, b: cmp(a.name.lower(), b.name.lower()))
+  
   return libraries
 
 def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = False):
   order = engine.config.get("game", "sort_order")
   tut = engine.config.get("game", "tut")
-  
+  direction = engine.config.get("game", "sort_direction")
   if tut:
     includeTutorials = True
 
@@ -3090,17 +3091,15 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
       if not os.path.isfile(os.path.join(songRoot, name, "notes.mid")):
         continue
       if not os.path.isfile(os.path.join(songRoot, name, "song.ini")) or name.startswith("."):
-      #if not os.path.isfile(os.path.join(songRoot, name, "song.ini")):
+       #if not os.path.isfile(os.path.join(songRoot, name, "song.ini")):
         continue
       if not name in names:
         names.append(name)
-
   songs = [SongInfo(engine.resource.fileName(library, name, "song.ini", writable = True)) for name in names]
   if not includeTutorials:
     songs = [song for song in songs if not song.tutorial]
   songs = [song for song in songs if not song.artist == '=FOLDER=']
-
-  #coolguy567's unlock system
+    #coolguy567's unlock system
   if careerMode:
     for song in songs:
       if song.getUnlockRequire() != "":
@@ -3110,14 +3109,20 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
             song.setLocked(True)
       else:
         song.setLocked(False)
-
-
-  if order == 1:
-    songs.sort(lambda a, b: cmp(a.artist.lower(), b.artist.lower()))
-  elif order == 2:
-    songs.sort(lambda a, b: cmp(int(b.count+str(0)), int(a.count+str(0))))
+  if direction == 0:
+    if order == 1:
+      songs.sort(lambda a, b: cmp(a.artist.lower(), b.artist.lower()))
+    elif order == 2:
+      songs.sort(lambda a, b: cmp(int(b.count+str(0)), int(a.count+str(0))))
+    else:
+      songs.sort(lambda a, b: cmp(a.name.lower(), b.name.lower()))
   else:
-    songs.sort(lambda a, b: cmp(a.name.lower(), b.name.lower()))
+    if order == 1:
+      songs.sort(lambda a, b: cmp(b.artist.lower(), a.artist.lower()))
+    elif order == 2:
+      songs.sort(lambda a, b: cmp(int(a.count+str(0)), int(b.count+str(0))))
+    else:
+      songs.sort(lambda a, b: cmp(b.name.lower(), a.name.lower()))
   return songs
 
 
@@ -3207,12 +3212,22 @@ def compareSongsAndTitles(engine, a, b):
   quickPlayCareerTiers = engine.config.get("game", "quickplay_career_tiers")
   if quickPlayMode and not quickPlayCareerTiers:
     order = engine.config.get("game", "sort_order")
-    if order == 1:
-      return cmp(a.artist.lower(), b.artist.lower())
-    elif order == 2:
-      return cmp(int(b.count+str(0)), int(a.count+str(0)))
+    direction = engine.config.get("game", "sort_direction")
+    Log.debug(direction)
+    if direction == 0:
+      if order == 1:
+        return cmp(a.artist.lower(), b.artist.lower())
+      elif order == 2:
+        return cmp(int(b.count+str(0)), int(a.count+str(0)))
+      else:
+        return cmp(a.name.lower(), b.name.lower())
     else:
-      return cmp(a.name.lower(), b.name.lower())
+      if order == 1:
+        return cmp(b.artist.lower(), a.artist.lower())
+      elif order == 2:
+        return cmp(int(a.count+str(0)), int(b.count+str(0)))
+      else:
+        return cmp(b.name.lower(), a.name.lower())
   else:
     #Log.debug("Unlock IDs found, a=" + str(a.getUnlockID()) + ", b=" + str(b.getUnlockID()) )
     if a.getUnlockID() == "" and b.getUnlockID() != "":   #MFH - a is a bonus song, b is involved in career mode
@@ -3227,12 +3242,21 @@ def compareSongsAndTitles(engine, a, b):
         return -1
       else: #both bonus songs, apply sort order:
         order = engine.config.get("game", "sort_order")
-        if order == 1:
-          return cmp(a.artist.lower(), b.artist.lower())
-        elif order == 2:
-          return cmp(int(b.count+str(0)), int(a.count+str(0)))
+        direction = engine.config.get("game", "sort_direction")
+        if direction == 0:
+          if order == 1:
+            return cmp(a.artist.lower(), b.artist.lower())
+          elif order == 2:
+            return cmp(int(b.count+str(0)), int(a.count+str(0)))
+          else:
+            return cmp(a.name.lower(), b.name.lower())
         else:
-          return cmp(a.name.lower(), b.name.lower())
+          if order == 1:
+            return cmp(b.artist.lower(), a.artist.lower())
+          elif order == 2:
+            return cmp(int(a.count+str(0)), int(b.count+str(0)))
+          else:
+            return cmp(b.name.lower(), a.name.lower())
     #original career sorting logic:
     elif a.getUnlockID() != b.getUnlockID():    #MFH - if returned unlock IDs are different, sort by unlock ID (this roughly sorts the tiers and shoves "bonus" songs to the top)
       return cmp(a.getUnlockID(), b.getUnlockID())
