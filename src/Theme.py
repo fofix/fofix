@@ -25,6 +25,7 @@
 
 from OpenGL.GL import *
 import Config
+import Log
 
 #DEFAULT_COLOR_BACKGROUND = "#330000"
 DEFAULT_COLOR_BACKGROUND = "#000000"
@@ -194,6 +195,12 @@ DEFAULT_SONG_SELECT_SUBMENU_OFFSET_SPACES = 2
 
 #MFH - option for Rock Band 2 theme.ini - only show # of stars you are working on
 DEFAULT_DISPLAY_ALL_GREY_STARS = True
+
+#Qstick - hopo indicator position and color
+DEFAULT_HOPO_INDICATOR_X = None
+DEFAULT_HOPO_INDICATOR_Y = None
+DEFAULT_HOPO_INDICATOR_ACTIVE_COLOR  = None
+DEFAULT_HOPO_INDICATOR_INACTIVE_COLOR  = None
 
 #racer:
 DEFAULT_FAIL_BKG_X     = None
@@ -366,6 +373,12 @@ Config.define("theme", "display_all_grey_stars",  bool, DEFAULT_DISPLAY_ALL_GREY
 Config.define("theme", "song_select_submenu_offset_lines",  int, DEFAULT_SONG_SELECT_SUBMENU_OFFSET_LINES)
 Config.define("theme", "song_select_submenu_offset_spaces",  int, DEFAULT_SONG_SELECT_SUBMENU_OFFSET_SPACES)
 
+#Qstick - hopo indicator position and color
+Config.define("theme", "hopo_indicator_x",       float, DEFAULT_HOPO_INDICATOR_X)
+Config.define("theme", "hopo_indicator_y",       float, DEFAULT_HOPO_INDICATOR_Y)
+Config.define("theme", "hopo_indicator_active_color",   str, DEFAULT_HOPO_INDICATOR_ACTIVE_COLOR)
+Config.define("theme", "hopo_indicator_inactive_color",   str, DEFAULT_HOPO_INDICATOR_INACTIVE_COLOR)
+
 #RACER:
 Config.define("theme", "fail_bkg_x",       float, DEFAULT_FAIL_BKG_X)
 Config.define("theme", "fail_bkg_y",       float, DEFAULT_FAIL_BKG_Y)
@@ -484,6 +497,12 @@ songSelectSubmenuOffsetSpaces = None
 #MFH - option for Rock Band 2 theme.ini - only show # of stars you are working on
 displayAllGreyStars = None
 
+#Qstick - hopo indicator position and color
+hopoIndicatorX = None
+hopoIndicatorY = None
+hopoIndicatorActiveColor = None
+hopoIndicatorInactiveColor = None
+
 #Racer:
 fail_bkg_xPos = None
 fail_bkg_yPos = None
@@ -533,6 +552,8 @@ def open(config):
   setupEvilynux(config)
   setupRockmeter(config)
   setupNeckChooser(config)
+  setupHopoIndicator(config)
+  
 
 def setupNeckChooser(config):
   global neck_prompt_x, neck_prompt_y
@@ -1131,7 +1152,28 @@ def setupEvilynux(config):
 
   temp = config.get("theme", "ingame_stats_color")
   if ingame_stats_colorVar == None or temp != DEFAULT_INGAME_STATS_COLOR:
-    ingame_stats_colorVar = temp  
+    ingame_stats_colorVar = temp
+    
+def setupHopoIndicator(config):
+  global hopoIndicatorX, hopoIndicatorY
+  global hopoIndicatorActiveColor, hopoIndicatorInactiveColor
+  
+  temp = config.get("theme", "hopo_indicator_x")
+  if hopoIndicatorX == None or temp != DEFAULT_HOPO_INDICATOR_X:
+    hopoIndicatorX = temp
+    
+  temp = config.get("theme", "hopo_indicator_y")
+  if hopoIndicatorY == None or temp != DEFAULT_HOPO_INDICATOR_Y:
+    hopoIndicatorY = temp
+    
+  temp = config.get("theme", "hopo_indicator_active_color")
+  if hopoIndicatorActiveColor == None or temp != DEFAULT_HOPO_INDICATOR_ACTIVE_COLOR:
+    hopoIndicatorActiveColor = hexToColor(temp)
+
+    
+  temp = config.get("theme", "hopo_indicator_inactive_color")
+  if hopoIndicatorInactiveColor == None or temp != DEFAULT_HOPO_INDICATOR_INACTIVE_COLOR:
+    hopoIndicatorInactiveColor = hexToColor(temp) 
 
 
 def write(f, config):
@@ -1154,6 +1196,7 @@ def write(f, config):
   writeFail(f, config) #racer
   writeEvilynux(f, config)
   writeRockmeter(f, config)
+  writeHopoIndicator(f, config)
 
 def writeColors(f, config):
   global backgroundColor, baseColor, selectedColor
@@ -1378,3 +1421,12 @@ def writeRockmeter(f, config):
   global rmtype
 
   f.write("%s = %s\n" % ("rmtype", rmtype))
+  
+def writeHopoIndicator(f, config):
+  global hopoIndicatorX, hopoIndicatorY
+  global hopoIndicatorActiveColor, hopoIndicatorInactiveColor
+
+  f.write("%s = %s\n" % ("hopo_indicator_x", hopoIndicatorX))
+  f.write("%s = %s\n" % ("hopo_indicator_y", hopoIndicatorY))
+  f.write("%s = %s\n" % ("hopo_indicator_active_color", hopoIndicatorActiveColor))
+  f.write("%s = %s\n" % ("hopo_indicator_inactive_color", hopoIndicatorInactiveColor))

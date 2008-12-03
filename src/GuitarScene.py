@@ -201,6 +201,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.originZ          = Theme.povOriginZ
     self.ending           = False
 
+
+
     self.pause = False
     self.failed = False
     self.finalFailed = False
@@ -238,6 +240,27 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.rmtype = Theme.rmtype
     else:
       self.rmtype = self.theme
+
+    if Theme.hopoIndicatorX != None:
+      self.hopoIndicatorX   = Theme.hopoIndicatorX
+    else:
+      self.hopoIndicatorX = .950
+      
+    if Theme.hopoIndicatorY != None:
+      self.hopoIndicatorY   = Theme.hopoIndicatorY
+    else:
+      self.hopoIndicatorY = .710
+     
+    if Theme.hopoIndicatorActiveColor != None:
+      self.hopoIndicatorActiveColor   = Theme.hopoIndicatorActiveColor
+    else:
+      self.hopoIndicatorActiveColor = (1.0,1.0,1.0)
+ 
+    if Theme.hopoIndicatorInactiveColor != None:
+      self.hopoIndicatorInactiveColor   = Theme.hopoIndicatorInactiveColor
+    else:
+      self.hopoIndicatorInactiveColor = (0.4,0.4,0.4)
+
 
     stage = os.path.join("themes",themename,"stage.ini")
     self.stage = Stage.Stage(self, self.engine.resource.fileName(stage))
@@ -4667,11 +4690,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               if self.hopoIndicatorEnabled and not self.guitars[i].isDrum and not self.pause and not self.failed: #MFH - HOPO indicator (grey = strums required, white = strums not required)
                 text = self.tsHopoIndicator
                 if self.guitars[i].hopoActive > 0:
-                  glColor3f(1.0, 1.0, 1.0)  #white
+                  c1,c2,c3 = self.hopoIndicatorActiveColor
+                  glColor3f(c1,c2,c3)  #white
                 else:
-                  glColor3f(0.4, 0.4, 0.4)  #grey
+                  c1,c2,c3 = self.hopoIndicatorInactiveColor
+                  glColor3f(c1,c2,c3)  #grey
                 w, h = font.getStringSize(text,0.00150)
-                font.render(text, (.950 - w / 2, .710),(1, 0, 0),0.00150)     #off to the right slightly above fretboard
+                font.render(text, (self.hopoIndicatorX - w / 2, self.hopoIndicatorY),(1, 0, 0),0.00150)     #off to the right slightly above fretboard
                 glColor3f(1, 1, 1)  #cracker white
   
     
@@ -5255,11 +5280,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               if self.hopoIndicatorEnabled and not self.guitars[i].isDrum and not self.pause and not self.failed: #MFH - HOPO indicator (grey = strums required, white = strums not required)
                 text = self.tsHopoIndicator
                 if self.guitars[i].hopoActive > 0:
-                  glColor3f(1.0, 1.0, 1.0)  #white
+                  c1,c2,c3 = self.hopoIndicatorActiveColor
+                  glColor3f(c1,c2,c3)  #white
                 else:
-                  glColor3f(0.4, 0.4, 0.4)  #grey
+                  c1,c2,c3 = self.hopoIndicatorInactiveColor
+                  glColor3f(c1,c2,c3)  #grey
                 w, h = font.getStringSize(text,0.00150)
-                font.render(text, (.950 - w / 2, .710),(1, 0, 0),0.00150)     #off to the right slightly above fretboard
+                font.render(text, (self.hopoIndicatorX - w / 2, self.hopoIndicatorY),(1, 0, 0),0.00150)     #off to the right slightly above fretboard
                 glColor3f(1, 1, 1)  #cracker white
     
                   
@@ -5760,11 +5787,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               if self.hopoIndicatorEnabled and not self.guitars[i].isDrum and not self.pause and not self.failed: #MFH - HOPO indicator (grey = strums required, white = strums not required)
                 text = self.tsHopoIndicator
                 if self.guitars[i].hopoActive > 0:
-                  glColor3f(1.0, 1.0, 1.0)  #white
+                  c1,c2,c3 = self.hopoIndicatorActiveColor
+                  glColor3f(c1,c2,c3)  #white
                 else:
-                  glColor3f(0.4, 0.4, 0.4)  #grey
+                  c1,c2,c3 = self.hopoIndicatorInactiveColor
+                  glColor3f(c1,c2,c3)  #grey
                 w, h = font.getStringSize(text,0.00150)
-                font.render(text, (.950 - w / 2, .725),(1, 0, 0),0.00150)     #off to the right slightly above fretboard
+                font.render(text, (self.hopoIndicatorX - w / 2, self.hopoIndicatorY),(1, 0, 0),0.00150)     #off to the right slightly above fretboard
                 glColor3f(1, 1, 1)  #cracker white
   
           elif self.rmtype == 3:
