@@ -15,3 +15,5 @@ Note, it would be entirely possible to choose an unused GH MIDI note to use for 
 ===What NOT to do===
 
 Please see Puppetz Hero 3, Tier 1 (at least) for examples of how to NOT use MIDI marker notes.  Inexplicably, these songs have solo sections marked as note G8... and they have NO OTHER MARKER NOTES.  Meaning, no G#9 starpower / overdrive markings -- which means, his G8 markers are interpreted as STARPOWER / OVERDRIVE PATHS.  There is nothing I can do about this.  These MIDIs must be corrected, either removing the G8 solo marking or adding starpower / overdrive paths on G#9.
+
+These particular songs will require a special song.ini entry to tell FoFiX to not use the G8 notes as starpower markers.  (coming soon)
