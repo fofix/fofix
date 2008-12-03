@@ -251,15 +251,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     else:
       self.hopoIndicatorY = .710
      
-    if Theme.hopoIndicatorActiveColor != None:
-      self.hopoIndicatorActiveColor   = Theme.hopoIndicatorActiveColor
-    else:
-      self.hopoIndicatorActiveColor = (1.0,1.0,1.0)
- 
-    if Theme.hopoIndicatorInactiveColor != None:
-      self.hopoIndicatorInactiveColor   = Theme.hopoIndicatorInactiveColor
-    else:
-      self.hopoIndicatorInactiveColor = (0.4,0.4,0.4)
+    self.hopoIndicatorActiveColor   = Theme.hopoIndicatorActiveColor
+    self.hopoIndicatorInactiveColor   = Theme.hopoIndicatorInactiveColor
+
 
 
     stage = os.path.join("themes",themename,"stage.ini")
