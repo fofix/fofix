@@ -140,15 +140,21 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     except Exception, e:
       songHopoFreq = None
     #  Log.warn("Song.ini HOPO Frequency setting is invalid -- forcing Normal (value 1)")
-    if self.songHopoFreq == 1 and (songHopoFreq == 0 or songHopoFreq == 1 or songHopoFreq == 2):
+    if self.songHopoFreq == 2 and (songHopoFreq == 0 or songHopoFreq == 1 or songHopoFreq == 2 or songHopoFreq == 3 or songHopoFreq == 4 or songHopoFreq == 5):
       #Log.debug("song-specific HOPO frequency %d forced" % songHopoFreq)
       self.hopoFreq = songHopoFreq
     if self.hopoFreq == 0:
-      self.hopoFreq = _("Less")
+      self.hopoFreq = _("Least")
     elif self.hopoFreq == 1:
-      self.hopoFreq = _("Normal")
+      self.hopoFreq = _("Less")
     elif self.hopoFreq == 2:
+      self.hopoFreq = _("Normal")
+    elif self.hopoFreq == 3:
       self.hopoFreq = _("More")
+    elif self.hopoFreq == 4:
+      self.hopoFreq = _("Even More")
+    elif self.hopoFreq == 5:
+      self.hopoFreq = _("Most")
 
     self.hitWindow = self.engine.config.get("game", "hit_window")  #this should be global, not retrieved every BPM change.
     if self.hitWindow == 0:
