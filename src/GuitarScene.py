@@ -2420,13 +2420,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.multi[i] = 1
 
         #MFH - rewritten rockmeter / starpower miss logic, and Faaa's drum sounds:
-        #the old logic was ridiculously complicated (see below commented block).  
+        #the old logic was ridiculously complicated  
       # For each existing player (already in this loop)
         if self.notesMissed[i] or self.lessMissed[i]:   #(detects missed note or overstrum)
           if self.guitars[i].isDrum:
             if self.drumMisses == 0:    #mode: always
               self.rockmeterDecrease(i)
-            elif self.drumMisses == 1 and self.countdownSeconds < 1:    #mode: song start
+            #elif self.drumMisses == 1 and self.countdownSeconds < 1:    #mode: song start
+            elif self.drumMisses == 1 and self.countdown < 1:    #mode: song start
               self.rockmeterDecrease(i)
             elif self.drumMisses == 2 and self.drumStart:    #mode: song start
               self.rockmeterDecrease(i)
