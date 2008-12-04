@@ -1181,7 +1181,7 @@ class Track:
     except Exception, e:
       songHopoFreq = None
     #  Log.warn("Song.ini HOPO Frequency setting is invalid -- forcing Normal (value 1)")
-      if self.songHopoFreq == 1 and (songHopoFreq == 0 or songHopoFreq == 1 or songHopoFreq == 2):
+      if self.songHopoFreq == 1 and (songHopoFreq == 0 or songHopoFreq == 1 or songHopoFreq == 2 or songHopoFreq == 3 or songHopoFreq == 4 or songHopoFreq == 5):
         Log.debug("markHopoRF: song-specific HOPO frequency %d forced" % songHopoFreq)
         self.hopoTick = songHopoFreq
 
@@ -1418,7 +1418,7 @@ class Track:
     except Exception, e:
       songHopoFreq = None
     #  Log.warn("Song.ini HOPO Frequency setting is invalid -- forcing Normal (value 1)")
-    if self.songHopoFreq == 1 and (songHopoFreq == 0 or songHopoFreq == 1 or songHopoFreq == 2):
+    if self.songHopoFreq == 1 and (songHopoFreq == 0 or songHopoFreq == 1 or songHopoFreq == 2 or songHopoFreq == 3 or songHopoFreq == 4 or songHopoFreq == 5):
       Log.debug("markHopoGH2: song-specific HOPO frequency %d forced" % songHopoFreq)
       self.hopoTick = songHopoFreq
 
