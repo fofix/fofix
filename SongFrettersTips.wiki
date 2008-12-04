@@ -2,7 +2,7 @@
 
 == Special MIDI Marker Notes ==
 
-When I refer to a MIDI marker note, I am referring to a "NOTE ON" event and a "NOTE OFF" event that collectively mark out a song section for some special purpose (starpower, solo, etc.)
+When I refer to a MIDI marker note, I am referring to a "NOTE ON" event and a "NOTE OFF" event that collectively mark out a song section for some special purpose (starpower, solo, etc.) on a certain note pitch (such as G8 or G#9).
 
 == Star Power _(GH)_ / Overdrive _(RB)_ ==
 
