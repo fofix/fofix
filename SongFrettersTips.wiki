@@ -1,5 +1,9 @@
 #summary Tips, information, and recommendations for song fretters.
 
+== Special MIDI Marker Notes ==
+
+When I refer to a MIDI marker note, I am referring to a "NOTE ON" event and a "NOTE OFF" event that collectively mark out a song section for some special purpose (starpower, solo, etc.)
+
 == Star Power _(GH)_ / Overdrive _(RB)_ ==
 
 *Fretters' note on marking Overdrive and Starpower sections, with future Solo Section marking in mind*
