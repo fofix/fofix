@@ -610,43 +610,57 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
 
     #MFH - now, handle MIDI starpower / overdrive / other special marker notes:
+    
+    #MFH - first, count the markers for each instrument.  If a particular instrument does not have at least two starpower phrases 
+    #  marked, ignore them and force auto-generation of SP paths.
+    
     if self.starpowerMode == 2:     #auto-MIDI mode only
       if self.song.hasStarpowerPaths:
         for i,guitar in enumerate(self.guitars):
-          for time, event in self.song.track[i].getAllEvents():
-            if isinstance(event, Song.MarkerNote):
-              markStarpower = False
-              if event.number == Song.overDriveMarkingNote:
-                markStarpower = True
-              if event.number == Song.starPowerMarkingNote:
-                if self.song.midiStyle == Song.MIDI_TYPE_GH:
+
+          #MFH - first, count the SP marker notes!
+          numOfSpMarkerNotes = len([1 for time, event in self.song.track[i].getAllEvents() if (isinstance(event, Song.MarkerNote) and (event.number == Song.overDriveMarkingNote or (event.number == Song.starPowerMarkingNote and self.song.midiStyle == Song.MIDI_TYPE_GH) ) ) ])
+          if numOfSpMarkerNotes > 1:
+          
+            for time, event in self.song.track[i].getAllEvents():
+              if isinstance(event, Song.MarkerNote):
+                markStarpower = False
+                if event.number == Song.overDriveMarkingNote:
                   markStarpower = True
-                #else:  #RB solo marking!
-              
-              if markStarpower:
-                tempStarpowerNoteList = self.song.track[i].getEvents(time, time+event.length) 
-                lastSpNoteTime = 0
-                for spTime, spEvent in tempStarpowerNoteList:
-                  if isinstance(spEvent, Note):
-                    if spTime > lastSpNoteTime:
-                      lastSpNoteTime = spTime
-                    spEvent.star = True
-                #now, go back and mark all of the last chord as finalStar
-                #   BUT only if not drums!  If drums, mark only ONE of the last notes!
-                #lastChordTime = spTime
-                oneLastSpNoteMarked = False
-                for spTime, spEvent in tempStarpowerNoteList:
-                  if isinstance(spEvent, Note):
-                    if spTime == lastSpNoteTime:
-                      if (guitar.isDrum and not oneLastSpNoteMarked) or (not guitar.isDrum):
-                        spEvent.finalStar = True
-                        oneLastSpNoteMarked = True
-                if self.logMarkerNotes == 1:
-                  Log.debug("GuitarScene: P%d starpower phrase marked between %f and %f" % ( i+1, time, time+event.length ) )
-                  if lastSpNoteTime == 0:
-                    Log.warn("This starpower phrase doesn't appear to have any finalStar notes marked... probably will not reward starpower!")
+                if event.number == Song.starPowerMarkingNote:
+                  if self.song.midiStyle == Song.MIDI_TYPE_GH:
+                    markStarpower = True
+                  #else:  #RB solo marking!
+                
+                if markStarpower:
+                  tempStarpowerNoteList = self.song.track[i].getEvents(time, time+event.length) 
+                  lastSpNoteTime = 0
+                  for spTime, spEvent in tempStarpowerNoteList:
+                    if isinstance(spEvent, Note):
+                      if spTime > lastSpNoteTime:
+                        lastSpNoteTime = spTime
+                      spEvent.star = True
+                  #now, go back and mark all of the last chord as finalStar
+                  #   BUT only if not drums!  If drums, mark only ONE of the last notes!
+                  #lastChordTime = spTime
+                  oneLastSpNoteMarked = False
+                  for spTime, spEvent in tempStarpowerNoteList:
+                    if isinstance(spEvent, Note):
+                      if spTime == lastSpNoteTime:
+                        if (guitar.isDrum and not oneLastSpNoteMarked) or (not guitar.isDrum):
+                          spEvent.finalStar = True
+                          oneLastSpNoteMarked = True
+                  if self.logMarkerNotes == 1:
+                    Log.debug("GuitarScene: P%d starpower phrase marked between %f and %f" % ( i+1, time, time+event.length ) )
+                    if lastSpNoteTime == 0:
+                      Log.warn("This starpower phrase doesn't appear to have any finalStar notes marked... probably will not reward starpower!")
+          
+          else: #this particular instrument only has one starpower path marked!  Force auto-generation of SP paths.            
+            Log.warn("Instrument %s only has one starpower path marked!  ...falling back on auto-generated paths for this instrument." % self.playerList[i].part.text)
+            guitar.starNotesSet = False     #fallback on auto generation.
       
       else:
+        Log.warn("This song does not appear to have any starpower or overdrive paths marked, falling back on auto-generated paths.")
         for guitar in self.guitars:
           guitar.starNotesSet = False     #fallback on auto generation.
     
