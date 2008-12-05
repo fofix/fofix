@@ -202,6 +202,9 @@ DEFAULT_HOPO_INDICATOR_Y = None
 DEFAULT_HOPO_INDICATOR_ACTIVE_COLOR  = "#FFFFFF"
 DEFAULT_HOPO_INDICATOR_INACTIVE_COLOR  = "#666666"
 
+#Qstick - Misc
+DEFAULT_SONG_LIST_DISPLAY = None
+
 #racer:
 DEFAULT_FAIL_BKG_X     = None
 DEFAULT_FAIL_BKG_Y     = None
@@ -351,6 +354,7 @@ Config.define("theme", "artist_selected_color",  str, DEFAULT_ARTIST_SELECTED_CO
 Config.define("theme", "library_text_color",  str, DEFAULT_LIBRARY_TEXT_COLOR)
 Config.define("theme", "library_selected_color",  str, DEFAULT_LIBRARY_SELECTED_COLOR)
 
+
 Config.define("theme", "pause_text_color",  str, DEFAULT_PAUSE_TEXT_COLOR)
 Config.define("theme", "pause_selected_color",  str, DEFAULT_PAUSE_SELECTED_COLOR)
 Config.define("theme", "fail_text_color",  str, DEFAULT_FAIL_TEXT_COLOR)
@@ -378,6 +382,9 @@ Config.define("theme", "hopo_indicator_x",       float, DEFAULT_HOPO_INDICATOR_X
 Config.define("theme", "hopo_indicator_y",       float, DEFAULT_HOPO_INDICATOR_Y)
 Config.define("theme", "hopo_indicator_active_color",   str, DEFAULT_HOPO_INDICATOR_ACTIVE_COLOR)
 Config.define("theme", "hopo_indicator_inactive_color",   str, DEFAULT_HOPO_INDICATOR_INACTIVE_COLOR)
+
+#Qstick - Misc
+Config.define("theme", "song_list_display",       int, DEFAULT_SONG_LIST_DISPLAY)
 
 #RACER:
 Config.define("theme", "fail_bkg_x",       float, DEFAULT_FAIL_BKG_X)
@@ -502,6 +509,9 @@ hopoIndicatorX = None
 hopoIndicatorY = None
 hopoIndicatorActiveColor = None
 hopoIndicatorInactiveColor = None
+
+#Qstick - misc
+songListDisplay = None
 
 #Racer:
 fail_bkg_xPos = None
@@ -874,6 +884,7 @@ def setupMisc(config):
   global crowdLoopDelay
   global songInfoDisplayScale
   global displayAllGreyStars
+  global songListDisplay
 
   temp = config.get("theme", "loading_phrase")
   #Log.debug("Loading phrases found: " + temp)
@@ -903,6 +914,10 @@ def setupMisc(config):
   #Log.debug("Loading phrases found: " + temp)
   if displayAllGreyStars == None or temp != DEFAULT_DISPLAY_ALL_GREY_STARS:
     displayAllGreyStars = temp
+
+  temp = config.get("theme", "song_list_display")
+  if songListDisplay == None or temp != DEFAULT_SONG_LIST_DISPLAY:
+    songListDisplay = temp
 
 #MFH:
 def setupSonglist(config):
@@ -1298,6 +1313,7 @@ def writeMisc(f, config):
   global creditSong
   global crowdLoopDelay
   global song_info_display_scale, display_all_grey_stars
+  global songListDisplay
 
   f.write("%s = %s\n" % ("loading_phrase", loadingPhrase))
   f.write("%s = %s\n" % ("results_phrase", resultsPhrase))
@@ -1311,6 +1327,8 @@ def writeMisc(f, config):
 
   #MFH - option for Rock Band 2 theme.ini - only show # of stars you are working on
   f.write("%s = %s\n" % ("display_all_grey_stars", displayAllGreyStars))
+
+  f.write("%s = %s\n" % ("song_list_display", songListDisplay))  
 
 #MFH:  
 def writeSonglist(f, config):
