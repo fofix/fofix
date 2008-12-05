@@ -640,7 +640,7 @@ class SongChooser(Layer, KeyListener):
     themename = self.engine.data.themeLabel
     self.theme = self.engine.data.theme
 
-    self.display = self.engine.config.get("coffee", "songdisplay")
+    self.display = self.engine.config.get("coffee", "song_display_mode")
     Log.debug("List Mode is set to %d" % self.display)
     #Log.debug(Theme.songListDisplay)
     if self.display == 3:

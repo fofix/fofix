@@ -208,6 +208,9 @@ class Guitar:
     self.killCount         = 0
     self.ocount = 0
     self.noterotate = self.engine.config.get("coffee", "noterotate")
+    self.isFailing = False
+    self.failcount = 0
+    self.failcount2 = False
 
     #MFH- fixing neck speed
     if self.nstype < 3:   #not constant mode: 
@@ -443,7 +446,11 @@ class Guitar:
     else:
       self.guitarSoloNeck = None
 
-
+    try:
+      engine.loadImgDrawing(self, "failNeck", os.path.join("themes",themename,"failneck.png"))
+    except IOError:
+      engine.loadImgDrawing(self, "failNeck", os.path.join("failneck.png"))
+                                                           
     #inkk: loading theme-dependant tail images
     #myfingershurt: must ensure the new tails don't affect the Rock Band mod...
     self.simpleTails = False
@@ -667,7 +674,7 @@ class Guitar:
     elif self.starPowerActive and self.theme == 1:
       color = (.3,.7,.9)
     else:
-      color = (1,1,1)
+      color = (1,1,1)   
 
     glEnable(GL_TEXTURE_2D)
     #myfingershurt: every theme can have oNeck:
@@ -761,7 +768,36 @@ class Guitar:
       glVertex3f( w / 2, 0, l)
       glEnd()
 
-    
+
+    if self.isFailing:   #static overlay
+      self.failNeck.texture.bind()
+      
+      color = (1,1,1) 
+      glBegin(GL_TRIANGLE_STRIP)
+      glColor4f(color[0],color[1],color[2], 0)
+      glTexCoord2f(0.0, project(-2 * beatsPerUnit))
+      glVertex3f(-w / 2, 0, -2)
+      glTexCoord2f(1.0, project(-2 * beatsPerUnit))
+      glVertex3f( w / 2, 0, -2)
+      
+      glColor4f(color[0],color[1],color[2], self.failcount)
+      glTexCoord2f(0.0, project(-1 * beatsPerUnit))
+      glVertex3f(-w / 2, 0, -1)
+      glTexCoord2f(1.0, project(-1 * beatsPerUnit))
+      glVertex3f( w / 2, 0, -1)
+      
+      glTexCoord2f(0.0, 0)
+      glVertex3f(-w / 2, 0, 0)
+      glTexCoord2f(1.0, 0)
+      glVertex3f( w / 2, 0, 0)
+      
+      glColor4f(color[0],color[1],color[2], 0)
+      glTexCoord2f(0.0, project(l * beatsPerUnit))
+      glVertex3f(-w / 2, 0, l)
+      glTexCoord2f(1.0, project(l * beatsPerUnit))
+      glVertex3f( w / 2, 0, l)
+      glEnd()
+      
     glDisable(GL_TEXTURE_2D)
 
   def drawTrack(self, visibility, song, pos):
@@ -2408,6 +2444,19 @@ class Guitar:
     else:
       self.ocount = 1
 
+    if self.isFailing == True:
+      if self.failcount <= 1 and self.failcount2 == False:
+        self.failcount += .05
+      elif self.failcount >= 1 and self.failcount2 == False:
+        self.failcount = 1
+        self.failcount2 = True
+        
+      if self.failcount >= 0 and self.failcount2 == True:
+        self.failcount -= .05
+      elif self.failcount <= 0 and self.failcount2 == True:
+        self.failcount = 0
+        self.failcount2 = False
+        
     self.renderNeck(visibility, song, pos)
     self.renderIncomingNecks(visibility, song, pos) #MFH
     if self.theme == 0 or self.theme == 1 or self.theme == 2:

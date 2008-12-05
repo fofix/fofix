@@ -508,7 +508,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "coffee", "songfilepath", autoApply = True),
       ConfigChoice(engine.config, "game", "sort_direction", autoApply = True),
       ConfigChoice(engine.config, "game",  "sort_order", autoApply = True),
-      ConfigChoice(engine.config, "coffee", "songdisplay", autoApply = True),
+      ConfigChoice(engine.config, "coffee", "song_display_mode", autoApply = True),
       ConfigChoice(engine.config, "game", "songlistrotation", autoApply = True),
       ConfigChoice(engine.config, "audio", "disable_preview", autoApply = True),  #myfingershurt
       ConfigChoice(engine.config, "game", "songlist_instrument", autoApply = True), #MFH

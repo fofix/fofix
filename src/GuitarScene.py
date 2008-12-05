@@ -2522,6 +2522,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   def renderGuitar(self):
     for i in range(self.numOfPlayers):
       self.engine.view.setViewport(self.numOfPlayers,i)
+      if self.rock[i]< self.rockMax/3.0:
+        self.guitars[i].isFailing = True
+      else:
+        self.guitars[i].isFailing = False
       if self.theme == 0 or self.theme == 1 or self.theme == 2:
         if not self.pause and not self.failed:
           self.guitars[i].render(self.visibility, self.song, self.getSongPosition(), self.controls, self.killswitchEngaged[i])  #QQstarS: new
