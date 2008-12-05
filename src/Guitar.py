@@ -1345,17 +1345,19 @@ class Guitar:
       for time, event in song.eventTracks[Song.TK_GUITAR_SOLOS].getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard):
         if self.canGuitarSolo and self.guitarSoloNeck:
           if event.text.find("ON") >= 0:
-            neckImg = self.guitarSoloNeck
-            self.renderIncomingNeck(visibility, song, pos, time, neckImg)
+            if not self.guitarSolo:   #only until guitar solo starts!
+              neckImg = self.guitarSoloNeck
+              self.renderIncomingNeck(visibility, song, pos, time, neckImg)
           #else: #event.text.find("OFF"):
           elif self.incomingNeckMode == 2:    #render both start and end incoming necks
-            if self.starPowerActive and self.oNeck:
-              neckImg = self.oNeck
-            elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
-              neckImg = self.bassGrooveNeck
-            else:
-              neckImg = self.neckDrawing
-            self.renderIncomingNeck(visibility, song, pos, time, neckImg)
+            if self.guitarSolo:   #only until the end of the guitar solo!
+              if self.starPowerActive and self.oNeck:
+                neckImg = self.oNeck
+              elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
+                neckImg = self.bassGrooveNeck
+              else:
+                neckImg = self.neckDrawing
+              self.renderIncomingNeck(visibility, song, pos, time, neckImg)
               
 
 
