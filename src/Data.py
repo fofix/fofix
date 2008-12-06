@@ -200,7 +200,7 @@ class Data(object):
       resource.load(self, "lfont",         font2, onLoad = self.customizeFont, synch = True)
       resource.load(self, "font",          font1, onLoad = self.customizeFont, synch = True)
     elif self.theme == 1:
-      font1     = lambda: Font(menuFont,  fontSize[3], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly)
+      font1     = lambda: Font(menuFont,  fontSize[3], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, outline = False) #Worldrave - Removed outline from options text on GH-Based theme's. No other drawbacks noticed.
       font2     = lambda: Font(menuFont,  fontSize[3], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, outline = False)
       resource.load(self, "lfont",         font2, onLoad = self.customizeFont, synch = True)
       resource.load(self, "font",          font1, onLoad = self.customizeFont, synch = True)
