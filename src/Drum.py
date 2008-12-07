@@ -2518,20 +2518,20 @@ class Drum:
 
   def endPick(self, pos):
     self.playedNotes = []
-    for time, note in self.playedNotes:
-      if time + note.length > pos + self.noteReleaseMargin:
-        return False
+    #for time, note in self.playedNotes:
+    #  if time + note.length > pos + self.noteReleaseMargin:
+    #    return False
     return True
     
   def getPickLength(self, pos):
-    if not self.playedNotes:
-      return 0.0
+    #if not self.playedNotes:
+    return 0.0
     
-    # The pick length is limited by the played notes
-    pickLength = pos - self.pickStartPos
-    for time, note in self.playedNotes:
-      pickLength = min(pickLength, note.length)
-    return pickLength
+    ## The pick length is limited by the played notes
+    #pickLength = pos - self.pickStartPos
+    #for time, note in self.playedNotes:
+    #  pickLength = min(pickLength, note.length)
+    #return pickLength
 
   def run(self, ticks, pos, controls):
     self.time += ticks

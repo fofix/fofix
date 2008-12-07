@@ -3517,8 +3517,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       return False
 
   def getExtraScoreForCurrentlyPlayedNotes(self, num):
-    if not self.song:
+    if not self.song or self.guitars[num].isDrum:
       return 0
+
  
     noteCount  = len(self.guitars[num].playedNotes)
     pickLength = self.guitars[num].getPickLength(self.getSongPosition())
