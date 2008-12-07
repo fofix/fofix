@@ -772,7 +772,7 @@ class Guitar:
       glEnd()
 
 
-    if self.spcount2 != 0 and self.spcount < 1.2:   #static overlay
+    if self.spcount2 != 0 and self.spcount < 1.2 and self.oNeck:   #static overlay
       self.oNeck.texture.bind()
       
       glBegin(GL_TRIANGLE_STRIP)
