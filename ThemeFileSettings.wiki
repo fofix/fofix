@@ -54,6 +54,7 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||song_listcd_score_x||Controls location of 'SCORE' X position in listcd songlist view. Use a decimal # between 0 - 1||
 ||song_listcd_score_y||Controls location of 'SCORE' Y position in listcd songlist view. Use a decimal # between 0 - 1||
 ||song_listcd_list_x||Controls location of 'LIST' X position in listcd songlist view. Use a decimal # between 0 - 1||
+||songlistcd_score_color||Controls the scores color for both CD and List/CD mode||
 
 
 
