@@ -311,7 +311,7 @@ class Drum:
       try:
         engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"drumfretshacked.png"))    
       except IOError:
-        engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"FretButtons.png"))
+        engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"fretbuttons.png"))
       #death_au: adding drumfrets.png (with bass drum frets seperate)
       try:
         engine.loadImgDrawing(self, "drumFretButtons", os.path.join("themes",themename,"drumfrets.png"))
