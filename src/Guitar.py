@@ -63,6 +63,7 @@ class Guitar:
     self.sameNoteHopoString = False
     self.hopoProblemNoteNum = -1
     
+    self.useMidiSoloMarkers = False
     self.canGuitarSolo = False
     self.guitarSolo = False
     self.currentGuitarSoloHitNotes = 0
@@ -211,7 +212,9 @@ class Guitar:
     self.isFailing = False
     self.failcount = 0
     self.failcount2 = False
-
+    self.spcount = 0
+    self.spcount2 = 0
+    
     #MFH- fixing neck speed
     if self.nstype < 3:   #not constant mode: 
       self.speed = self.engine.config.get("coffee", "neckSpeed")*0.01
@@ -678,9 +681,9 @@ class Guitar:
 
     glEnable(GL_TEXTURE_2D)
     #myfingershurt: every theme can have oNeck:
-    if self.starPowerActive and self.oNeck:
+    if self.starPowerActive and self.oNeck and self.spcount == 1.2:
       self.oNeck.texture.bind()
-    elif self.canGuitarSolo and self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 1:
+    elif self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 1:
       self.guitarSoloNeck.texture.bind()
     elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
       self.bassGrooveNeck.texture.bind()
@@ -740,7 +743,7 @@ class Guitar:
       glVertex3f( w / 2, 0, l)
       glEnd()
 
-    elif self.canGuitarSolo and self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 2:   #static overlay
+    elif self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 2:   #static overlay
       self.guitarSoloNeck.texture.bind()
 
       glBegin(GL_TRIANGLE_STRIP)
@@ -768,6 +771,34 @@ class Guitar:
       glVertex3f( w / 2, 0, l)
       glEnd()
 
+
+    if self.spcount2 != 0 and self.spcount < 1.2:   #static overlay
+      self.oNeck.texture.bind()
+      
+      glBegin(GL_TRIANGLE_STRIP)
+      glColor4f(color[0],color[1],color[2], 0)
+      glTexCoord2f(0.0, project(offset - 2 * beatsPerUnit))
+      glVertex3f(-w / 2, 0, -2)
+      glTexCoord2f(1.0, project(offset - 2 * beatsPerUnit))
+      glVertex3f( w / 2, 0, -2)
+      
+      glColor4f(color[0],color[1],color[2], self.spcount)
+      glTexCoord2f(0.0, project(offset - 1 * beatsPerUnit))
+      glVertex3f(-w / 2, 0, -1)
+      glTexCoord2f(1.0, project(offset - 1 * beatsPerUnit))
+      glVertex3f( w / 2, 0, -1)
+      
+      glTexCoord2f(0.0, project(offset + l * beatsPerUnit * .7))
+      glVertex3f(-w / 2, 0, l * .7)
+      glTexCoord2f(1.0, project(offset + l * beatsPerUnit * .7))
+      glVertex3f( w / 2, 0, l * .7)
+      
+      glColor4f(color[0],color[1],color[2], 0)
+      glTexCoord2f(0.0, project(offset + l * beatsPerUnit))
+      glVertex3f(-w / 2, 0, l)
+      glTexCoord2f(1.0, project(offset + l * beatsPerUnit))
+      glVertex3f( w / 2, 0, l)
+      glEnd()
 
     if self.isFailing:   #static overlay
       self.failNeck.texture.bind()
@@ -1378,22 +1409,50 @@ class Guitar:
       return
 
     if self.incomingNeckMode > 0:   #if enabled
-      for time, event in song.eventTracks[Song.TK_GUITAR_SOLOS].getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard):
-        if self.canGuitarSolo and self.guitarSoloNeck:
-          if event.text.find("ON") >= 0:
-            if not self.guitarSolo:   #only until guitar solo starts!
-              neckImg = self.guitarSoloNeck
-              self.renderIncomingNeck(visibility, song, pos, time, neckImg)
-          #else: #event.text.find("OFF"):
-          elif self.incomingNeckMode == 2:    #render both start and end incoming necks
-            if self.guitarSolo:   #only until the end of the guitar solo!
-              if self.starPowerActive and self.oNeck:
-                neckImg = self.oNeck
-              elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
-                neckImg = self.bassGrooveNeck
-              else:
-                neckImg = self.neckDrawing
-              self.renderIncomingNeck(visibility, song, pos, time, neckImg)
+      boardWindowMin = pos - self.currentPeriod * 2
+      boardWindowMax = pos + self.currentPeriod * self.beatsPerBoard
+
+
+      #if self.song.hasStarpowerPaths and self.song.midiStyle == Song.MIDI_TYPE_RB:  
+      if self.useMidiSoloMarkers:
+        track = song.midiEventTrack[self.player]
+        for time, event in track.getEvents(boardWindowMin, boardWindowMax):
+          if isinstance(event, Song.MarkerNote):
+            if event.number == Song.starPowerMarkingNote:
+              if self.guitarSoloNeck:
+                if event.endMarker:   #solo end
+                  if self.incomingNeckMode == 2:    #render both start and end incoming necks
+                    if self.guitarSolo:   #only until the end of the guitar solo!
+                      if self.starPowerActive and self.oNeck:
+                        neckImg = self.oNeck
+                      elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
+                        neckImg = self.bassGrooveNeck
+                      else:
+                        neckImg = self.neckDrawing
+                      self.renderIncomingNeck(visibility, song, pos, time, neckImg)
+                else:   #solo start
+                  if not self.guitarSolo:   #only until guitar solo starts!
+                    neckImg = self.guitarSoloNeck
+                    self.renderIncomingNeck(visibility, song, pos, time, neckImg)
+              
+
+      else:   #fall back on text-based guitar solo marking track
+        for time, event in song.eventTracks[Song.TK_GUITAR_SOLOS].getEvents(boardWindowMin, boardWindowMax):
+          if self.canGuitarSolo and self.guitarSoloNeck:
+            if event.text.find("ON") >= 0:
+              if not self.guitarSolo:   #only until guitar solo starts!
+                neckImg = self.guitarSoloNeck
+                self.renderIncomingNeck(visibility, song, pos, time, neckImg)
+            #else: #event.text.find("OFF"):
+            elif self.incomingNeckMode == 2:    #render both start and end incoming necks
+              if self.guitarSolo:   #only until the end of the guitar solo!
+                if self.starPowerActive and self.oNeck:
+                  neckImg = self.oNeck
+                elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
+                  neckImg = self.bassGrooveNeck
+                else:
+                  neckImg = self.neckDrawing
+                self.renderIncomingNeck(visibility, song, pos, time, neckImg)
               
 
 
@@ -2456,7 +2515,27 @@ class Guitar:
       elif self.failcount <= 0 and self.failcount2 == True:
         self.failcount = 0
         self.failcount2 = False
-        
+
+    if self.isFailing == False and self.failcount > 0:
+      self.failcount -= .05
+      sefl.failcount2 = False
+
+    if self.starPowerActive:
+
+      if self.spcount < 1.2:
+        self.spcount += .05
+        self.spcount2 = 1
+      elif self.spcount >=1.2:
+        self.spcount = 1.2
+        self.spcount2 = 0
+    else:
+      if self.spcount > 0:
+        self.spcount -= .05
+        self.spcount2 = 2
+      elif self.spcount <=0:
+        self.spcount = 0
+        self.spcount2 = 0
+      
     self.renderNeck(visibility, song, pos)
     self.renderIncomingNecks(visibility, song, pos) #MFH
     if self.theme == 0 or self.theme == 1 or self.theme == 2:

@@ -287,14 +287,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.tsAccEarly = _("Early")
     self.tsAccVeryEarly = _("Very Early")
     self.msLabel = _("ms")
-    self.tsGuitarSolo = _("Guitar Solo!")
-    self.tsPerfectSolo = _("Perfect Solo!")
-    self.tsAwesomeSolo = _("Awesome Solo!")
-    self.tsGreatSolo = _("Great Solo!")
-    self.tsGoodSolo = _("Good Solo!")
-    self.tsSolidSolo = _("Solid Solo!")
-    self.tsOkaySolo = _("Okay Solo!")
-    self.tsMessySolo = _("Messy Solo!")
+    #self.tsSolo = _("Guitar Solo!")
+    self.tsSolo = _("Solo!")
+    self.tsPerfectSolo = _("Perfect")
+    self.tsAwesomeSolo = _("Awesome")
+    self.tsGreatSolo = _("Great")
+    self.tsGoodSolo = _("Good")
+    self.tsSolidSolo = _("Solid")
+    self.tsOkaySolo = _("Okay")
+    self.tsMessySolo = _("Messy")
     self.tsPtsLabel = _("pts")
     self.tsGetReady = _("Get Ready to Rock")
     self.tsAsMadeFamousBy = _("as made famous by")
@@ -573,96 +574,120 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     lastSoloNoteTime = 0
     self.drumStart = False
     soloSlop = 100.0
-    for i,guitar in enumerate(self.guitars):
-      if guitar.isDrum:
-        self.playerList[i].totalStreakNotes = len([1 for time, event in self.song.track[i].getAllEvents() if isinstance(event, Note)])
-      else:
-        self.playerList[i].totalStreakNotes = len(set(time for time, event in self.song.track[i].getAllEvents() if isinstance(event, Note)))
-      self.playerList[i].totalNotes = len([1 for Ntime, event in self.song.track[i].getAllEvents() if isinstance(event, Note)])
-      #Ntime now should contain the last note time - this can be used for guitar solo finishing
-      #MFH - use new self.song.eventTracks[Song.TK_GUITAR_SOLOS] -- retrieve a gsolo on / off combo, then use it to count notes
-      # just like before, detect if end reached with an open solo - and add a GSOLO OFF event just before the end of the song.
-      for time, event in self.song.eventTracks[Song.TK_GUITAR_SOLOS].getAllEvents():
-        if event.text.find("GSOLO") >= 0:
-          if event.text.find("ON") >= 0:
-            isGuitarSoloNow = True
-            guitarSoloStartTime = time
-          else:
-            isGuitarSoloNow = False
-            guitarSoloNoteCount = len([1 for Gtime, Gevent in self.song.track[i].getEvents(guitarSoloStartTime, time) if isinstance(Gevent, Note)])
-            self.guitarSolos[i].append(guitarSoloNoteCount - 1)
-            Log.debug("GuitarScene: Guitar Solo found: " + str(guitarSoloStartTime) + "-" + str(time) + " = " + str(guitarSoloNoteCount) )
-      if isGuitarSoloNow:   #open solo until end - needs end event!
-        isGuitarSoloNow = False
-        #guitarSoloNoteCount = len([1 for Gtime, Gevent in self.song.track[i].getEvents(guitarSoloStartTime, time) if isinstance(Gevent, Note)])
-        #MFH - must find the real "last note" time, requires another iteration...
-        for lnTime, lnEvent in self.song.track[i].getAllEvents():
-          if isinstance(lnEvent, Note):
-            if lnTime > Ntime:
-              Ntime = lnTime
-        #Ntime = Ntime + soloSlop
-        guitarSoloNoteCount = len([1 for Gtime, Gevent in self.song.track[i].getEvents(guitarSoloStartTime, Ntime) if isinstance(Gevent, Note)])
-        self.guitarSolos[i].append(guitarSoloNoteCount - 1)
-        newEvent = TextEvent("GSOLO OFF", 100.0)
-        #self.song.eventTracks[Song.TK_GUITAR_SOLOS].addEvent(time - soloSlop,newEvent) #adding the missing GSOLO OFF event
-        self.song.eventTracks[Song.TK_GUITAR_SOLOS].addEvent(Ntime, newEvent) #adding the missing GSOLO OFF event
-        Log.debug("GuitarScene: Guitar Solo until end of song found - (guitarSoloStartTime - Ntime = guitarSoloNoteCount): " + str(guitarSoloStartTime) + "-" + str(Ntime) + " = " + str(guitarSoloNoteCount) )
-
+    
 
     #MFH - now, handle MIDI starpower / overdrive / other special marker notes:
     
     #MFH - first, count the markers for each instrument.  If a particular instrument does not have at least two starpower phrases 
     #  marked, ignore them and force auto-generation of SP paths.
     
-    if self.starpowerMode == 2:     #auto-MIDI mode only
-      if self.song.hasStarpowerPaths:
-        for i,guitar in enumerate(self.guitars):
+    #if self.starpowerMode == 2:     #auto-MIDI mode only
+    if self.song.hasStarpowerPaths:
+      for i,guitar in enumerate(self.guitars):
 
-          #MFH - first, count the SP marker notes!
-          numOfSpMarkerNotes = len([1 for time, event in self.song.track[i].getAllEvents() if (isinstance(event, Song.MarkerNote) and (event.number == Song.overDriveMarkingNote or (event.number == Song.starPowerMarkingNote and self.song.midiStyle == Song.MIDI_TYPE_GH) ) ) ])
-          if numOfSpMarkerNotes > 1:
-          
-            for time, event in self.song.track[i].getAllEvents():
-              if isinstance(event, Song.MarkerNote):
-                markStarpower = False
-                if event.number == Song.overDriveMarkingNote:
+        #MFH - first, count the SP marker notes!
+        numOfSpMarkerNotes = len([1 for time, event in self.song.midiEventTrack[i].getAllEvents() if (isinstance(event, Song.MarkerNote) and not event.endMarker and (event.number == Song.overDriveMarkingNote or (event.number == Song.starPowerMarkingNote and self.song.midiStyle == Song.MIDI_TYPE_GH) ) ) ])
+
+        #also want to count RB solo sections in this track, if the MIDI type is RB.  Then we'll know to activate MIDI guitar solo markers or not 
+        # for this instrument
+        if self.song.midiStyle == Song.MIDI_TYPE_RB:
+          numMidiSoloMarkerNotes = len([1 for time, event in self.song.midiEventTrack[i].getAllEvents() if (isinstance(event, Song.MarkerNote) and not event.endMarker and event.number == Song.starPowerMarkingNote ) ])          
+          if numMidiSoloMarkerNotes > 0:  #if at least 1 solo marked in this fashion, tell that guitar to ignore text solo events
+            guitar.useMidiSoloMarkers = True
+            
+        if numOfSpMarkerNotes > 1:
+        
+          for time, event in self.song.midiEventTrack[i].getAllEvents():
+            if isinstance(event, Song.MarkerNote) and not event.endMarker:
+              markStarpower = False
+              if event.number == Song.overDriveMarkingNote:
+                markStarpower = True
+              if event.number == Song.starPowerMarkingNote:
+                if self.song.midiStyle == Song.MIDI_TYPE_GH:
                   markStarpower = True
-                if event.number == Song.starPowerMarkingNote:
-                  if self.song.midiStyle == Song.MIDI_TYPE_GH:
-                    markStarpower = True
-                  #else:  #RB solo marking!
-                
-                if markStarpower:
-                  tempStarpowerNoteList = self.song.track[i].getEvents(time, time+event.length) 
-                  lastSpNoteTime = 0
-                  for spTime, spEvent in tempStarpowerNoteList:
-                    if isinstance(spEvent, Note):
-                      if spTime > lastSpNoteTime:
-                        lastSpNoteTime = spTime
-                      spEvent.star = True
-                  #now, go back and mark all of the last chord as finalStar
-                  #   BUT only if not drums!  If drums, mark only ONE of the last notes!
-                  #lastChordTime = spTime
-                  oneLastSpNoteMarked = False
-                  for spTime, spEvent in tempStarpowerNoteList:
-                    if isinstance(spEvent, Note):
-                      if spTime == lastSpNoteTime:
-                        if (guitar.isDrum and not oneLastSpNoteMarked) or (not guitar.isDrum):
-                          spEvent.finalStar = True
-                          oneLastSpNoteMarked = True
-                  if self.logMarkerNotes == 1:
-                    Log.debug("GuitarScene: P%d starpower phrase marked between %f and %f" % ( i+1, time, time+event.length ) )
-                    if lastSpNoteTime == 0:
-                      Log.warn("This starpower phrase doesn't appear to have any finalStar notes marked... probably will not reward starpower!")
-          
-          else: #this particular instrument only has one starpower path marked!  Force auto-generation of SP paths.            
-            Log.warn("Instrument %s only has one starpower path marked!  ...falling back on auto-generated paths for this instrument." % self.playerList[i].part.text)
-            guitar.starNotesSet = False     #fallback on auto generation.
-      
-      else:
-        Log.warn("This song does not appear to have any starpower or overdrive paths marked, falling back on auto-generated paths.")
-        for guitar in self.guitars:
+                #else:  #RB solo marking!
+              
+              if markStarpower and self.starpowerMode == 2:     #auto-MIDI mode only:
+                tempStarpowerNoteList = self.song.track[i].getEvents(time, time+event.length) 
+                lastSpNoteTime = 0
+                for spTime, spEvent in tempStarpowerNoteList:
+                  if isinstance(spEvent, Note):
+                    if spTime > lastSpNoteTime:
+                      lastSpNoteTime = spTime
+                    spEvent.star = True
+                #now, go back and mark all of the last chord as finalStar
+                #   BUT only if not drums!  If drums, mark only ONE of the last notes!
+                #lastChordTime = spTime
+                oneLastSpNoteMarked = False
+                for spTime, spEvent in tempStarpowerNoteList:
+                  if isinstance(spEvent, Note):
+                    if spTime == lastSpNoteTime:
+                      if (guitar.isDrum and not oneLastSpNoteMarked) or (not guitar.isDrum):
+                        spEvent.finalStar = True
+                        oneLastSpNoteMarked = True
+                if self.logMarkerNotes == 1:
+                  Log.debug("GuitarScene: P%d overdrive / starpower phrase marked between %f and %f" % ( i+1, time, time+event.length ) )
+                  if lastSpNoteTime == 0:
+                    Log.warn("This starpower phrase doesn't appear to have any finalStar notes marked... probably will not reward starpower!")
+        
+        elif self.starpowerMode == 2: #this particular instrument only has one starpower path marked!  Force auto-generation of SP paths.            
+          Log.warn("Instrument %s only has one starpower path marked!  ...falling back on auto-generated paths for this instrument." % self.playerList[i].part.text)
           guitar.starNotesSet = False     #fallback on auto generation.
+    
+    elif self.starpowerMode == 2:
+      Log.warn("This song does not appear to have any starpower or overdrive paths marked, falling back on auto-generated paths.")
+      for guitar in self.guitars:
+        guitar.starNotesSet = False     #fallback on auto generation.
+
+    
+    #count / init solos
+    for i,guitar in enumerate(self.guitars):
+      if guitar.isDrum:
+        self.playerList[i].totalStreakNotes = len([1 for time, event in self.song.track[i].getAllEvents() if isinstance(event, Note)])
+      else:
+        self.playerList[i].totalStreakNotes = len(set(time for time, event in self.song.track[i].getAllEvents() if isinstance(event, Note)))
+      self.playerList[i].totalNotes = len([1 for Ntime, event in self.song.track[i].getAllEvents() if isinstance(event, Note)])
+      
+      if guitar.useMidiSoloMarkers:   #mark using the new MIDI solo marking system
+        for time, event in self.song.midiEventTrack[i].getAllEvents():
+          if isinstance(event, Song.MarkerNote) and not event.endMarker:
+            if (event.number == Song.starPowerMarkingNote) and (self.song.midiStyle == Song.MIDI_TYPE_RB):    #solo marker note.
+              startTime = time
+              endTime = time + event.length
+              guitarSoloNoteCount = len([1 for Gtime, Gevent in self.song.track[i].getEvents(startTime, endTime) if isinstance(Gevent, Note)])
+              self.guitarSolos[i].append(guitarSoloNoteCount - 1)
+              Log.debug("P" + str(i+1) + " MIDI " + self.playerList[i].part.text + " Solo found from: " + str(startTime) + " to: " + str(endTime) + ", containing " + str(guitarSoloNoteCount) + " notes." )
+        
+      else:   #mark using the old text-based system
+      
+        #Ntime now should contain the last note time - this can be used for guitar solo finishing
+        #MFH - use new self.song.eventTracks[Song.TK_GUITAR_SOLOS] -- retrieve a gsolo on / off combo, then use it to count notes
+        # just like before, detect if end reached with an open solo - and add a GSOLO OFF event just before the end of the song.
+        for time, event in self.song.eventTracks[Song.TK_GUITAR_SOLOS].getAllEvents():
+          if event.text.find("GSOLO") >= 0:
+            if event.text.find("ON") >= 0:
+              isGuitarSoloNow = True
+              guitarSoloStartTime = time
+            else:
+              isGuitarSoloNow = False
+              guitarSoloNoteCount = len([1 for Gtime, Gevent in self.song.track[i].getEvents(guitarSoloStartTime, time) if isinstance(Gevent, Note)])
+              self.guitarSolos[i].append(guitarSoloNoteCount - 1)
+              Log.debug("GuitarScene: Guitar Solo found: " + str(guitarSoloStartTime) + "-" + str(time) + " = " + str(guitarSoloNoteCount) )
+        if isGuitarSoloNow:   #open solo until end - needs end event!
+          isGuitarSoloNow = False
+          #guitarSoloNoteCount = len([1 for Gtime, Gevent in self.song.track[i].getEvents(guitarSoloStartTime, time) if isinstance(Gevent, Note)])
+          #MFH - must find the real "last note" time, requires another iteration...
+          for lnTime, lnEvent in self.song.track[i].getAllEvents():
+            if isinstance(lnEvent, Note):
+              if lnTime > Ntime:
+                Ntime = lnTime
+          #Ntime = Ntime + soloSlop
+          guitarSoloNoteCount = len([1 for Gtime, Gevent in self.song.track[i].getEvents(guitarSoloStartTime, Ntime) if isinstance(Gevent, Note)])
+          self.guitarSolos[i].append(guitarSoloNoteCount - 1)
+          newEvent = TextEvent("GSOLO OFF", 100.0)
+          #self.song.eventTracks[Song.TK_GUITAR_SOLOS].addEvent(time - soloSlop,newEvent) #adding the missing GSOLO OFF event
+          self.song.eventTracks[Song.TK_GUITAR_SOLOS].addEvent(Ntime, newEvent) #adding the missing GSOLO OFF event
+          Log.debug("GuitarScene: Guitar Solo until end of song found - (guitarSoloStartTime - Ntime = guitarSoloNoteCount): " + str(guitarSoloStartTime) + "-" + str(Ntime) + " = " + str(guitarSoloNoteCount) )
     
 
 
@@ -1746,101 +1771,166 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #self.notesCum = 0
     self.noteLastTime = 0
 
+  def startSolo(self, playerNum):   #MFH - more modular and general handling of solos
+    i = playerNum
+     #Guitar Solo Start
+    self.currentGuitarSoloTotalNotes[i] = self.guitarSolos[i][self.currentGuitarSolo[i]]
+    self.guitarSoloBroken[i] = False
+    self.guitars[i].guitarSolo = True
+    #self.displayText[i] = _("Guitar Solo!")
+    instrumentSoloString = "%s %s" % (self.playerList[i].part.text, self.tsSolo)
+    self.newScalingText(i, instrumentSoloString )
+    #self.sfxChannel.setVolume(self.sfxVolume)
+    self.engine.data.crowdSound.play()
+  
+  def endSolo(self, playerNum):     #MFH - more modular and general handling of solos
+    i = playerNum
+    #Guitar Solo End
+    self.guitars[i].guitarSolo = False
+    #self.sfxChannel.setVolume(self.sfxVolume)    #liquid
+    self.guitarSoloAccuracy[i] = (float(self.guitars[i].currentGuitarSoloHitNotes) / float(self.currentGuitarSoloTotalNotes[i]) ) * 100.0
+    if not self.guitarSoloBroken[i]:    #backup perfect solo detection
+      if self.guitars[i].currentGuitarSoloHitNotes > 0: #MFH - need to make sure someone didn't just not play a guitar solo at all - and still wind up with 100%
+        self.guitarSoloAccuracy[i] = 100.0
+    if self.guitarSoloAccuracy[i] > 100.0:
+      self.guitarSoloAccuracy[i] = 100.0
+    if self.guitarSoloBroken[i] and self.guitarSoloAccuracy[i] == 100.0:   #streak was broken, not perfect solo, force 99%
+      self.guitarSoloAccuracy[i] = 99.0
+
+    if self.guitarSoloAccuracy[i] == 100.0: #fablaculp: soloDescs changed
+      soloDesc = "%s %s" % (self.tsPerfectSolo, self.tsSolo)
+      soloScoreMult = 100
+      self.engine.data.crowdSound.play()    #liquid
+    elif self.guitarSoloAccuracy[i] >= 95.0:
+      soloDesc = "%s %s" % (self.tsAwesomeSolo, self.tsSolo)
+      soloScoreMult = 50
+      self.engine.data.crowdSound.play()    #liquid
+    elif self.guitarSoloAccuracy[i] >= 90.0:
+      soloDesc = "%s %s" % (self.tsGreatSolo, self.tsSolo)
+      soloScoreMult = 30
+      self.engine.data.crowdSound.play()    #liquid
+    elif self.guitarSoloAccuracy[i] >= 80.0:
+      soloDesc = "%s %s" % (self.tsGoodSolo, self.tsSolo)
+      soloScoreMult = 20
+    elif self.guitarSoloAccuracy[i] >= 70.0:
+      soloDesc = "%s %s" % (self.tsSolidSolo, self.tsSolo)
+      soloScoreMult = 10
+    elif self.guitarSoloAccuracy[i] >= 60.0:
+      soloDesc = "%s %s" % (self.tsOkaySolo, self.tsSolo)
+      soloScoreMult = 5
+    else:   #0% - 59.9%
+      soloDesc = "%s %s" % (self.tsMessySolo, self.tsSolo)
+      soloScoreMult = 0
+      self.engine.data.failSound.play()    #liquid
+    soloBonusScore = soloScoreMult * self.guitars[i].currentGuitarSoloHitNotes
+    self.playerList[i].score += soloBonusScore
+    trimmedSoloNoteAcc = self.decimal(str(self.guitarSoloAccuracy[i])).quantize(self.decPlaceOffset)
+    #self.soloReviewText[i] = [soloDesc,str(trimmedSoloNoteAcc) + "% = " + str(soloBonusScore) + _(" pts")]
+    #ptsText = _("pts")
+    self.soloReviewText[i] = [soloDesc, 
+      "%(soloNoteAcc)s%% = %(soloBonus)d %(pts)s" % \
+      {'soloNoteAcc': str(trimmedSoloNoteAcc), 'soloBonus': soloBonusScore, 'pts': self.tsPtsLabel} ]
+    self.dispSoloReview[i] = True
+    self.soloReviewCountdown[i] = 0
+    #reset for next solo
+    self.guitars[i].currentGuitarSoloHitNotes = 0
+    self.currentGuitarSolo[i] += 1
+
 
   def updateGuitarSolo(self, playerNum):
     i = playerNum
-    if self.guitars[i].canGuitarSolo:
-      if self.guitars[i].guitarSolo:
+    #if self.guitars[i].canGuitarSolo:
+    if self.guitars[i].guitarSolo:
 
-        #update guitar solo for player i
+      #update guitar solo for player i
 
-        #if we hit more notes in the solo than were counted, update the solo count (for the slop)
-        if self.guitars[i].currentGuitarSoloHitNotes > self.currentGuitarSoloTotalNotes[i]:
-          self.currentGuitarSoloTotalNotes[i] = self.guitars[i].currentGuitarSoloHitNotes
+      #if we hit more notes in the solo than were counted, update the solo count (for the slop)
+      if self.guitars[i].currentGuitarSoloHitNotes > self.currentGuitarSoloTotalNotes[i]:
+        self.currentGuitarSoloTotalNotes[i] = self.guitars[i].currentGuitarSoloHitNotes
 
-        if self.guitars[i].currentGuitarSoloHitNotes != self.currentGuitarSoloLastHitNotes[i]:    #changed!
-          self.currentGuitarSoloLastHitNotes[i] = self.guitars[i].currentGuitarSoloHitNotes   #update.
-          if self.guitarSoloAccuracyDisplayMode > 0:    #if not off:
-            tempSoloAccuracy = (float(self.guitars[i].currentGuitarSoloHitNotes)/float(self.currentGuitarSoloTotalNotes[i]) * 100.0)
-            trimmedIntSoloNoteAcc = self.decimal(str(tempSoloAccuracy)).quantize(self.decPlaceOffset)
-            if self.guitarSoloAccuracyDisplayMode == 1:   #percentage only
-              #soloText = str(trimmedIntSoloNoteAcc) + "%"
-              self.solo_soloText[i] = "%s%%" % str(trimmedIntSoloNoteAcc)
-            elif self.guitarSoloAccuracyDisplayMode == 2:   #detailed
-              #soloText = str(self.guitars[i].currentGuitarSoloHitNotes) + "/" + str(self.currentGuitarSoloTotalNotes[i]) + ": " + str(trimmedIntSoloNoteAcc) + "%"
-              self.solo_soloText[i] = "%(hitSoloNotes)d/ %(totalSoloNotes)d: %(soloAcc)s%%" % \
-                {'hitSoloNotes': self.guitars[i].currentGuitarSoloHitNotes, 'totalSoloNotes': self.currentGuitarSoloTotalNotes[i], 'soloAcc': str(trimmedIntSoloNoteAcc)}
-            self.solo_soloText[i] = self.solo_soloText[i].replace("0","O")
-    
+      if self.guitars[i].currentGuitarSoloHitNotes != self.currentGuitarSoloLastHitNotes[i]:    #changed!
+        self.currentGuitarSoloLastHitNotes[i] = self.guitars[i].currentGuitarSoloHitNotes   #update.
+        if self.guitarSoloAccuracyDisplayMode > 0:    #if not off:
+          tempSoloAccuracy = (float(self.guitars[i].currentGuitarSoloHitNotes)/float(self.currentGuitarSoloTotalNotes[i]) * 100.0)
+          trimmedIntSoloNoteAcc = self.decimal(str(tempSoloAccuracy)).quantize(self.decPlaceOffset)
+          if self.guitarSoloAccuracyDisplayMode == 1:   #percentage only
+            #soloText = str(trimmedIntSoloNoteAcc) + "%"
+            self.solo_soloText[i] = "%s%%" % str(trimmedIntSoloNoteAcc)
+          elif self.guitarSoloAccuracyDisplayMode == 2:   #detailed
+            #soloText = str(self.guitars[i].currentGuitarSoloHitNotes) + "/" + str(self.currentGuitarSoloTotalNotes[i]) + ": " + str(trimmedIntSoloNoteAcc) + "%"
+            self.solo_soloText[i] = "%(hitSoloNotes)d/ %(totalSoloNotes)d: %(soloAcc)s%%" % \
+              {'hitSoloNotes': self.guitars[i].currentGuitarSoloHitNotes, 'totalSoloNotes': self.currentGuitarSoloTotalNotes[i], 'soloAcc': str(trimmedIntSoloNoteAcc)}
+          self.solo_soloText[i] = self.solo_soloText[i].replace("0","O")
   
-            if self.fontMode==0:      #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
-              self.solo_Tw[i], self.solo_Th[i] = self.solo_soloFont.getStringSize(self.solo_soloText[i],self.solo_txtSize)
-              self.solo_boxXOffset[i] = self.solo_xOffset[i]
-              
-              if self.guitarSoloAccuracyDisplayPos == 0:  #right
-                self.solo_xOffset[i] -= self.solo_Tw[i]
-                self.solo_boxXOffset[i] -= self.solo_Tw[i]/2
-                #soloFont.render(soloText, (xOffset - Tw, yOffset),(1, 0, 0),txtSize)   #right-justified
-              elif self.guitarSoloAccuracyDisplayPos == 1:  #centered
-                self.solo_xOffset[i] = 0.5 - self.solo_Tw[i]/2
-                self.solo_boxXOffset[i] = 0.5
-                #soloFont.render(soloText, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #centered
-              elif self.guitarSoloAccuracyDisplayPos == 3:  #racer: rock band 
-                if self.hitAccuracyPos == 0: #Center - need to move solo text above this!
-                  self.solo_yOffset[i] = 0.100    #above Jurgen Is Here
-                elif i == 0 and self.jurg1 and self.autoPlay:
-                  self.solo_yOffset[i] = 0.140    #above Jurgen Is Here
-                elif i == 1 and self.jurg2 and self.autoPlay:
-                  self.solo_yOffset[i] = 0.140    #above Jurgen Is Here
-                else:   #no jurgens here:
-                  self.solo_yOffset[i] = 0.175    #was 0.210, occluded notes
-                self.solo_xOffset[i] = 0.5 - self.solo_Tw[i]/2
-                self.solo_boxXOffset[i] = 0.5
-                #soloFont.render(soloText, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #rock band
-              else:   #left
-                self.solo_boxXOffset[i] += self.solo_Tw[i]/2
-                #soloFont.render(soloText, (xOffset, yOffset),(1, 0, 0),txtSize)   #left-justified
-  
-            elif self.fontMode==1:      #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
-              #only update if the text will have changed!
-              #trying new rendering method...
-              tempSurface = self.solo_soloFont.pygameFontRender(self.solo_soloText[i], antialias=False, color=(0,0,255), background=(0,0,0)  )
-              # Create a rectangle
-              self.soloAcc_Rect[i] = tempSurface.get_rect()
-              # Center the rectangle
-              self.soloAcc_Rect[i].centerx = self.screenCenterX
-              self.soloAcc_Rect[i].centery = self.screenCenterY
-              # Blit the text
-              #self.engine.video.screen.blit(tempSurface, tempRect)
-              self.laminaScreen.surf.blit(tempSurface, self.soloAcc_Rect[i])
-              #self.laminaScreen.refresh()         #needs to be called whenever text contents change
-              self.laminaScreen.refresh([self.soloAcc_Rect[i]])         #needs to be called whenever text contents change
-              #self.laminaScreen.refreshPosition()   #needs to be called whenever camera position changes                        
-              #self.laminaScreen.display()
 
-            elif self.fontMode==2:  #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
-              #trying new rendering method...
-              tempSurface = self.solo_soloFont.pygameFontRender(self.solo_soloText[i], antialias=False, color=(0,0,255), background=(0,0,0)  )
-              # Create a rectangle
-              tempRect = tempSurface.get_rect()
-              # Center the rectangle
-              #tempRect.centerx = self.screenCenterX
-              #tempRect.centery = self.screenCenterY
-              # Blit the text
-              #self.engine.video.screen.blit(tempSurface, tempRect)
-              self.laminaFrame_soloAcc.surf.blit(tempSurface, tempRect)
-              self.laminaFrame_soloAcc.refresh()
+          if self.fontMode==0:      #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
+            self.solo_Tw[i], self.solo_Th[i] = self.solo_soloFont.getStringSize(self.solo_soloText[i],self.solo_txtSize)
+            self.solo_boxXOffset[i] = self.solo_xOffset[i]
+            
+            if self.guitarSoloAccuracyDisplayPos == 0:  #right
+              self.solo_xOffset[i] -= self.solo_Tw[i]
+              self.solo_boxXOffset[i] -= self.solo_Tw[i]/2
+              #soloFont.render(soloText, (xOffset - Tw, yOffset),(1, 0, 0),txtSize)   #right-justified
+            elif self.guitarSoloAccuracyDisplayPos == 1:  #centered
+              self.solo_xOffset[i] = 0.5 - self.solo_Tw[i]/2
+              self.solo_boxXOffset[i] = 0.5
+              #soloFont.render(soloText, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #centered
+            elif self.guitarSoloAccuracyDisplayPos == 3:  #racer: rock band 
+              if self.hitAccuracyPos == 0: #Center - need to move solo text above this!
+                self.solo_yOffset[i] = 0.100    #above Jurgen Is Here
+              elif i == 0 and self.jurg1 and self.autoPlay:
+                self.solo_yOffset[i] = 0.140    #above Jurgen Is Here
+              elif i == 1 and self.jurg2 and self.autoPlay:
+                self.solo_yOffset[i] = 0.140    #above Jurgen Is Here
+              else:   #no jurgens here:
+                self.solo_yOffset[i] = 0.175    #was 0.210, occluded notes
+              self.solo_xOffset[i] = 0.5 - self.solo_Tw[i]/2
+              self.solo_boxXOffset[i] = 0.5
+              #soloFont.render(soloText, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #rock band
+            else:   #left
+              self.solo_boxXOffset[i] += self.solo_Tw[i]/2
+              #soloFont.render(soloText, (xOffset, yOffset),(1, 0, 0),txtSize)   #left-justified
 
-            self.guitarSoloShown[i] = True
+          elif self.fontMode==1:      #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
+            #only update if the text will have changed!
+            #trying new rendering method...
+            tempSurface = self.solo_soloFont.pygameFontRender(self.solo_soloText[i], antialias=False, color=(0,0,255), background=(0,0,0)  )
+            # Create a rectangle
+            self.soloAcc_Rect[i] = tempSurface.get_rect()
+            # Center the rectangle
+            self.soloAcc_Rect[i].centerx = self.screenCenterX
+            self.soloAcc_Rect[i].centery = self.screenCenterY
+            # Blit the text
+            #self.engine.video.screen.blit(tempSurface, tempRect)
+            self.laminaScreen.surf.blit(tempSurface, self.soloAcc_Rect[i])
+            #self.laminaScreen.refresh()         #needs to be called whenever text contents change
+            self.laminaScreen.refresh([self.soloAcc_Rect[i]])         #needs to be called whenever text contents change
+            #self.laminaScreen.refreshPosition()   #needs to be called whenever camera position changes                        
+            #self.laminaScreen.display()
 
-      else:   #not currently a guitar solo - clear Lamina solo accuracy surface (but only once!)
-        if self.guitarSoloShown[i]:
-          self.guitarSoloShown[i] = False
-          self.currentGuitarSoloLastHitNotes[i] = 1
-          if self.fontMode==1 and self.soloAcc_Rect[i]:
-            self.laminaScreen.clear()
-            self.laminaScreen.refresh(self.soloAcc_Rect[i])
-          
+          elif self.fontMode==2:  #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
+            #trying new rendering method...
+            tempSurface = self.solo_soloFont.pygameFontRender(self.solo_soloText[i], antialias=False, color=(0,0,255), background=(0,0,0)  )
+            # Create a rectangle
+            tempRect = tempSurface.get_rect()
+            # Center the rectangle
+            #tempRect.centerx = self.screenCenterX
+            #tempRect.centery = self.screenCenterY
+            # Blit the text
+            #self.engine.video.screen.blit(tempSurface, tempRect)
+            self.laminaFrame_soloAcc.surf.blit(tempSurface, tempRect)
+            self.laminaFrame_soloAcc.refresh()
+
+          self.guitarSoloShown[i] = True
+
+    else:   #not currently a guitar solo - clear Lamina solo accuracy surface (but only once!)
+      if self.guitarSoloShown[i]:
+        self.guitarSoloShown[i] = False
+        self.currentGuitarSoloLastHitNotes[i] = 1
+        if self.fontMode==1 and self.soloAcc_Rect[i]:
+          self.laminaScreen.clear()
+          self.laminaScreen.refresh(self.soloAcc_Rect[i])
+        
         
 
   def handleWhammy(self, playerNum):
@@ -2522,7 +2612,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   def renderGuitar(self):
     for i in range(self.numOfPlayers):
       self.engine.view.setViewport(self.numOfPlayers,i)
-      if self.rock[i]< self.rockMax/3.0:
+      #if self.rock[i]< self.rockMax/3.0:
+      if self.rock[i]< self.rockMax/3.0 and not self.playerList[i].practiceMode:
         self.guitars[i].isFailing = True
       else:
         self.guitars[i].isFailing = False
@@ -6816,108 +6907,74 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             #scrolling lyrics & sections: moved to before player viewport split
   
             #handle the guitar solo track
-            if (self.readTextAndLyricEvents == 2 or (self.readTextAndLyricEvents == 1 and self.theme == 2)) and (not self.pause and not self.failed and not self.ending):
+            #if (self.readTextAndLyricEvents == 2 or (self.readTextAndLyricEvents == 1 and self.theme == 2)) and (not self.pause and not self.failed and not self.ending):
+            if (not self.pause and not self.failed and not self.ending):
 
-              for time, event in self.song.eventTracks[Song.TK_GUITAR_SOLOS].getEvents(minPos, maxPos):
-                #is event happening now?
-                xOffset = (time - pos) / eventWindow
-                EventHappeningNow = False
-                if xOffset < (0.0 - lyricSlop * 2.0):   #past
+              #MFH - only use the TK_GUITAR_SOLOS track if at least one player has no MIDI solos marked:
+              if self.guitars[i].useMidiSoloMarkers:   #mark using the new MIDI solo marking system
+                for time, event in self.song.midiEventTrack[i].getEvents(minPos, maxPos):
+                  if isinstance(event, Song.MarkerNote):
+                    if (event.number == Song.starPowerMarkingNote) and (self.song.midiStyle == Song.MIDI_TYPE_RB):    #solo marker note.
+                      soloChangeNow = False
+                      xOffset = (time - pos) / eventWindow
+                      if xOffset < lyricSlop / 16.0:   #present
+                        soloChangeNow = True
+                      if soloChangeNow:
+                        if event.endMarker:   #solo ending
+                          if self.guitars[i].guitarSolo and not event.happened:
+                            self.endSolo(i)
+                            event.happened = True
+                        else:   #solo beginning
+                          if not self.guitars[i].guitarSolo and not event.happened:
+                            self.startSolo(i)
+                            event.happened = True
+
+
+              else:   #fall back on old guitar solo marking system
+                for time, event in self.song.eventTracks[Song.TK_GUITAR_SOLOS].getEvents(minPos, maxPos):
+                  #is event happening now?
+                  xOffset = (time - pos) / eventWindow
                   EventHappeningNow = False
-                elif xOffset < lyricSlop / 16.0:   #present
-                  EventHappeningNow = True
-                if EventHappeningNow:   #process the guitar solo event
-                  if event.text.find("ON") >= 0:
-                    if self.guitars[i].canGuitarSolo:
-                      if not self.guitars[i].guitarSolo:
-                        #Guitar Solo Start
-                        self.currentGuitarSoloTotalNotes[i] = self.guitarSolos[i][self.currentGuitarSolo[i]]
-                        self.guitarSoloBroken[i] = False
-                        self.guitars[i].guitarSolo = True
-                        #self.displayText[i] = _("Guitar Solo!")
-                        self.newScalingText(i, self.tsGuitarSolo )
-                        #self.sfxChannel.setVolume(self.sfxVolume)
-                        self.engine.data.crowdSound.play()
-                  else:
-                    if self.guitars[i].canGuitarSolo:
+                  if xOffset < (0.0 - lyricSlop * 2.0):   #past
+                    EventHappeningNow = False
+                  elif xOffset < lyricSlop / 16.0:   #present
+                    EventHappeningNow = True
+                  if EventHappeningNow:   #process the guitar solo event
+                    if event.text.find("ON") >= 0:
+                      if self.guitars[i].canGuitarSolo:
+                        if not self.guitars[i].guitarSolo:
+                          self.startSolo(i)
+                    else:
+                      #if self.guitars[i].canGuitarSolo:
                       if self.guitars[i].guitarSolo:
-                        #Guitar Solo End
-                        self.guitars[i].guitarSolo = False
-                        #self.sfxChannel.setVolume(self.sfxVolume)    #liquid
-                        self.guitarSoloAccuracy[i] = (float(self.guitars[i].currentGuitarSoloHitNotes) / float(self.currentGuitarSoloTotalNotes[i]) ) * 100.0
-                        if not self.guitarSoloBroken[i]:    #backup perfect solo detection
-                          if self.guitars[i].currentGuitarSoloHitNotes > 0: #MFH - need to make sure someone didn't just not play a guitar solo at all - and still wind up with 100%
-                            self.guitarSoloAccuracy[i] = 100.0
-                        if self.guitarSoloAccuracy[i] > 100.0:
-                          self.guitarSoloAccuracy[i] = 100.0
-                        if self.guitarSoloBroken[i] and self.guitarSoloAccuracy[i] == 100.0:   #streak was broken, not perfect solo, force 99%
-                          self.guitarSoloAccuracy[i] = 99.0
-
-                        if self.guitarSoloAccuracy[i] == 100.0: #fablaculp: soloDescs changed
-                          soloDesc = self.tsPerfectSolo
-                          soloScoreMult = 100
-                          self.engine.data.crowdSound.play()    #liquid
-                        elif self.guitarSoloAccuracy[i] >= 95.0:
-                          soloDesc = self.tsAwesomeSolo
-                          soloScoreMult = 50
-                          self.engine.data.crowdSound.play()    #liquid
-                        elif self.guitarSoloAccuracy[i] >= 90.0:
-                          soloDesc = self.tsGreatSolo
-                          soloScoreMult = 30
-                          self.engine.data.crowdSound.play()    #liquid
-                        elif self.guitarSoloAccuracy[i] >= 80.0:
-                          soloDesc = self.tsGoodSolo
-                          soloScoreMult = 20
-                        elif self.guitarSoloAccuracy[i] >= 70.0:
-                          soloDesc = self.tsSolidSolo
-                          soloScoreMult = 10
-                        elif self.guitarSoloAccuracy[i] >= 60.0:
-                          soloDesc = self.tsOkaySolo
-                          soloScoreMult = 5
-                        else:   #0% - 59.9%
-                          soloDesc = self.tsMessySolo
-                          soloScoreMult = 0
-                          self.engine.data.failSound.play()    #liquid
-                        soloBonusScore = soloScoreMult * self.guitars[i].currentGuitarSoloHitNotes
-                        player.score += soloBonusScore
-                        trimmedSoloNoteAcc = self.decimal(str(self.guitarSoloAccuracy[i])).quantize(self.decPlaceOffset)
-                        #self.soloReviewText[i] = [soloDesc,str(trimmedSoloNoteAcc) + "% = " + str(soloBonusScore) + _(" pts")]
-                        #ptsText = _("pts")
-                        self.soloReviewText[i] = [soloDesc, 
-                          "%(soloNoteAcc)s%% = %(soloBonus)d %(pts)s" % \
-                          {'soloNoteAcc': str(trimmedSoloNoteAcc), 'soloBonus': soloBonusScore, 'pts': self.tsPtsLabel} ]
-                        self.dispSoloReview[i] = True
-                        self.soloReviewCountdown[i] = 0
-                        #reset for next solo
-                        self.guitars[i].currentGuitarSoloHitNotes = 0
-                        self.currentGuitarSolo[i] += 1
+                        self.endSolo(i)
     
     
               #MFH - render guitar solo in progress - stats
               #try:
-              if self.guitars[i].canGuitarSolo:
-                if self.guitars[i].guitarSolo:
+              #if self.guitars[i].canGuitarSolo:
+              if self.guitars[i].guitarSolo:
 
-                      #MFH - scale and display self.soloFrame behind / around the solo accuracy text display
+                    #MFH - scale and display self.soloFrame behind / around the solo accuracy text display
 
-                      if self.fontMode==0:      #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
-                        if self.soloFrame:
-                          frameWidth = self.solo_Tw[i]*1.15
-                          frameHeight = self.solo_Th[i]*1.07
-                          self.solo_boxYOffset[i] = self.hPlayer[i]-(self.hPlayer[i]* ((self.solo_yOffset[i] + self.solo_Th[i]/2.0 ) / self.fontScreenBottom) )   
-                          self.soloFrame.transform.reset()
-                          tempWScale = frameWidth*self.soloFrameWFactor
-                          tempHScale = -(frameHeight)*self.soloFrameWFactor
-                          self.soloFrame.transform.scale(tempWScale,tempHScale)
-                          self.soloFrame.transform.translate(self.wPlayer[i]*self.solo_boxXOffset[i],self.solo_boxYOffset[i])
-                          self.soloFrame.draw()
-                        self.solo_soloFont.render(self.solo_soloText[i], (self.solo_xOffset[i], self.solo_yOffset[i]),(1, 0, 0),self.solo_txtSize)
+                    if self.fontMode==0:      #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
+                      if self.soloFrame:
+                        frameWidth = self.solo_Tw[i]*1.15
+                        frameHeight = self.solo_Th[i]*1.07
+                        self.solo_boxYOffset[i] = self.hPlayer[i]-(self.hPlayer[i]* ((self.solo_yOffset[i] + self.solo_Th[i]/2.0 ) / self.fontScreenBottom) )   
+                        self.soloFrame.transform.reset()
+                        tempWScale = frameWidth*self.soloFrameWFactor
+                        tempHScale = -(frameHeight)*self.soloFrameWFactor
+                        self.soloFrame.transform.scale(tempWScale,tempHScale)
+                        self.soloFrame.transform.translate(self.wPlayer[i]*self.solo_boxXOffset[i],self.solo_boxYOffset[i])
+                        self.soloFrame.draw()
+                      self.solo_soloFont.render(self.solo_soloText[i], (self.solo_xOffset[i], self.solo_yOffset[i]),(1, 0, 0),self.solo_txtSize)
 
-                        #self.solo_soloFont.render("test", (0.5,0.0) )     #appears to render text from given position, down / right...
-                        #self.solo_soloFont.render("test", (0.5,0.5) )     #this test confirms that the Y scale is in units relative to the X pixel width - 1280x960 yes but 1280x1024 NO
+                      #self.solo_soloFont.render("test", (0.5,0.0) )     #appears to render text from given position, down / right...
+                      #self.solo_soloFont.render("test", (0.5,0.5) )     #this test confirms that the Y scale is in units relative to the X pixel width - 1280x960 yes but 1280x1024 NO
 
-                        #this test locates the constant that the font rendering routine always considers the "bottom" of the screen   
-                        #self.solo_soloFont.render("test", (0.5,0.75-self.solo_Th[i]), scale=self.solo_txtSize )    #ah-ha!  4:3 AR viewport = 0.75 max!
+                      #this test locates the constant that the font rendering routine always considers the "bottom" of the screen   
+                      #self.solo_soloFont.render("test", (0.5,0.75-self.solo_Th[i]), scale=self.solo_txtSize )    #ah-ha!  4:3 AR viewport = 0.75 max!
 
 
                   #self.engine.view.setViewport(1,0)

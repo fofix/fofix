@@ -45,7 +45,7 @@ HAR_DIF     = 1
 MED_DIF     = 2
 EAS_DIF     = 3
 
-#MFH - special text-event tracks for the separated text-event list variable
+#MFH - special / global text-event tracks for the separated text-event list variable
 TK_SCRIPT = 0         #script.txt events
 TK_SECTIONS = 1       #Section events
 TK_GUITAR_SOLOS = 2   #Guitar Solo start/stop events
@@ -984,9 +984,11 @@ class Event:
 
 
 class MarkerNote(Event): #MFH
-  def __init__(self, number, length):
+  def __init__(self, number, length, endMarker = False):
     Event.__init__(self, length)
     self.number   = number
+    self.endMarker = endMarker
+    self.happened = False
     
   def __repr__(self):
     return "<#%d>" % self.number
@@ -1110,6 +1112,8 @@ class Track:
           event.hopod = False
           event.skipped = False
           event.flameCount = 0
+        if isinstance(event, MarkerNote):
+          event.happened = False
 
   #myfingershurt: this function may be commented out, but is left in for
   #old INI file compatibility reasons
@@ -2001,6 +2005,9 @@ class Song(object):
     #TK_UNUSED_TEXT = 4    #Unused / other text events
     self.eventTracks       = [Track(self.engine) for t in range(0,5)]    #MFH - should result in eventTracks[0] through [4]
 
+    self.midiEventTracks   = [[Track(self.engine) for t in range(len(difficulties))] for i in range(len(partlist))]
+
+
     self.music = None
 
     # load the tracks
@@ -2169,6 +2176,11 @@ class Song(object):
     for tracks in self.tracks:
       for track in tracks:
         track.reset()
+
+    for tracks in self.midiEventTracks:
+      for track in tracks:
+        track.reset()
+
       
     self.music.stop()
     self.music.rewind()
@@ -2220,6 +2232,11 @@ class Song(object):
 
   track = property(getTrack)
   isSingleAudioTrack = property(getIsSingleAudioTrack)
+
+  def getMidiEventTrack(self):   #MFH - for new special MIDI marker note track
+    return [self.midiEventTracks[i][self.difficulty[i].id] for i in range(len(self.difficulty))]
+  midiEventTrack = property(getMidiEventTrack)  
+
 
 #MFH - translating / marking the common MIDI notes:
 noteMap = {     # difficulty, note
@@ -2388,6 +2405,32 @@ class MidiReader(midi.MidiOutStream):
         if track < len(self.song.tracks[i]):
           self.song.tracks[i][track].addEvent(time, eventcopy)
 
+  def addSpecialMidiEvent(self, track, event, time = None):    #MFH
+    if self.partnumber == -1:
+      #Looks like notes have started appearing before any part information. Lets assume its part0
+      self.partnumber = self.song.parts[0]
+    
+    if (self.partnumber == None) and isinstance(event, MarkerNote):
+      return True
+
+    if time is None:
+      time = self.abs_time()
+    assert time >= 0
+    
+    if track is None:
+      for t in self.song.midiEventTracks:
+        for s in t:
+          s.addEvent(time, event)
+    else:
+      
+      tracklist = [i for i,j in enumerate(self.song.parts) if self.partnumber == j]
+      for i in tracklist:
+        #Each track needs it's own copy of the event, otherwise they'll interfere
+        eventcopy = copy.deepcopy(event)
+        if track < len(self.song.midiEventTracks[i]):
+          self.song.midiEventTracks[i][track].addEvent(time, eventcopy)
+
+
   def abs_time(self):
     def ticksToBeats(ticks, bpm):
       return (60000.0 * ticks) / (bpm * self.ticksPerBeat)
@@ -2461,7 +2504,13 @@ class MidiReader(midi.MidiOutStream):
         track, number = noteMap[note]
         self.addEvent(track, Note(number, endTime - startTime, special = self.velocity[note] == 127), time = startTime)
 
-      #MFH TODO:
+      #MFH TODO: use self.midiEventTracks to store all the special MIDI marker notes, keep the clutter out of the main notes lists
+      #  also -- to make use of marker notes in real-time, must add a new attribute to MarkerNote class "endMarker"
+      #     if this is == True, then the note is just an event to mark the end of the previous note (which has length and is used in other ways)
+
+
+
+      
       elif note == overDriveMarkingNote:    #MFH
         self.song.hasStarpowerPaths = True
         if self.song.midiStyle != MIDI_TYPE_RB:
@@ -2470,17 +2519,21 @@ class MidiReader(midi.MidiOutStream):
 
         #for diff in self.song.difficulty:
         for diff in difficulties:
-          self.addEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
+          #self.addEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
+          self.addSpecialMidiEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
+          self.addSpecialMidiEvent(diff, MarkerNote(note, 1, endMarker = True), time = endTime+1)   #ending marker note
           if self.logMarkerNotes == 1:
-            Log.debug("Overdrive MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, difficulties[diff] ) )
+            Log.debug("RB Overdrive MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, difficulties[diff] ) )
 
       elif note == starPowerMarkingNote:    #MFH
         self.song.hasStarpowerPaths = True
         #for diff in self.song.difficulty:
         for diff in difficulties:
-          self.addEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
+          #self.addEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
+          self.addSpecialMidiEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
+          self.addSpecialMidiEvent(diff, MarkerNote(note, 1, endMarker = True), time = endTime+1)   #ending marker note
           if self.logMarkerNotes == 1:
-            Log.debug("Starpower MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, difficulties[diff] ) )
+            Log.debug("GH Starpower (or RB Solo) MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, difficulties[diff] ) )
 
 
       else:
@@ -2563,18 +2616,11 @@ class MidiReader(midi.MidiOutStream):
           if gSolo:
             if not self.guitarSoloActive:
               self.guitarSoloActive = True
-              #soloEvent = TextEvent("GSOLO" + str(self.guitarSoloIndex) + " ON", 250.0)
               soloEvent = TextEvent("GSOLO ON", 250.0)
               Log.debug("GSOLO ON event " + event.text + " found at time " + str(self.abs_time()) )
               self.song.eventTracks[TK_GUITAR_SOLOS].addEvent(self.abs_time(), soloEvent)  #MFH - add an event to the guitar solos track
-              #for track in self.song.tracks:
-              #  for t in track:
-              #    t.addEvent(self.abs_time()-soloSlop, soloEvent)
-              #self.guitarSoloNoteCount = [0,0,0,0]
-              #self.guitarSoloStartTime = self.abs_time()
           else: #this is the cue to end solos...
             if self.guitarSoloActive:
-              #soloEvent = TextEvent("GSOLO" + str(self.guitarSoloIndex) + " OFF", 250.0)
               #MFH - here, check to make sure we're not ending a guitar solo that has just started!!
               curTime = self.abs_time()
               if self.song.eventTracks[TK_GUITAR_SOLOS][-1][0] < curTime:
@@ -2583,10 +2629,6 @@ class MidiReader(midi.MidiOutStream):
                 Log.debug("GSOLO OFF event " + event.text + " found at time " + str(curTime) )
                 self.guitarSoloIndex += 1
                 self.song.eventTracks[TK_GUITAR_SOLOS].addEvent(curTime, soloEvent)  #MFH - add an event to the guitar solos track
-                #for track in self.song.tracks:
-                #  for t in track:
-                #    t.addEvent(self.abs_time()+soloSlop, soloEvent)
-
     
         if event:
           curTime = self.abs_time()
