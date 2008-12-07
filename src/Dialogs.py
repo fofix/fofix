@@ -2680,8 +2680,7 @@ class SongChooser(Layer, KeyListener):
                   item  = self.items[self.selectedIndex]
                   angle = self.itemAngles[self.selectedIndex]
                   f = ((90.0 - angle) / 90.0) ** 2
-      
-                  Theme.setSelectedColor(1 - v)
+
                   
                   c1,c2,c3 = self.songlistcd_score_color
                   glColor3f(c1,c2,c3)
@@ -2701,7 +2700,7 @@ class SongChooser(Layer, KeyListener):
                       notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 = scoreExt
                     else:
                       score, stars, name = "---", 0, "---"
-                    Theme.setBaseColor(1 - v)
+                    #Theme.setBaseColor(1 - v)
                     lfont.render(unicode(d),     (x, y),           scale = scale)
                     if stars == 6 and self.theme == 2:
                       glColor3f(1, 1, 0)  
@@ -2711,10 +2710,10 @@ class SongChooser(Layer, KeyListener):
                       lfont.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
                     else:
                       lfont.render(unicode(Data.STAR2 * stars + Data.STAR1 * (5 - stars)), (x, y + h), scale = scale * 1.8)
-                    Theme.setSelectedColor(1 - v)
+                    #Theme.setSelectedColor(1 - v)
                     
                                     
-                    c1,c2,c3 = self.songlist_score_color
+                    c1,c2,c3 = self.songlistcd_score_color
                     glColor3f(c1,c2,c3)
                     if scores:
                       if self.extraStats:
@@ -2917,8 +2916,9 @@ class SongChooser(Layer, KeyListener):
                       notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 = scoreExt
                     else:
                       score, stars, name = "---", 0, "---"
-                    Theme.setBaseColor(1 - v)
+                    
                     font.render(unicode(d),     (x, y),           scale = scale)
+                    
                     if stars == 6 and self.theme == 2:
                       glColor3f(1, 1, 0)  
                       font.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
@@ -2927,10 +2927,10 @@ class SongChooser(Layer, KeyListener):
                       font.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
                     else:
                       font.render(unicode(Data.STAR2 * stars + Data.STAR1 * (5 - stars)), (x, y + h), scale = scale * 1.8)
-                    Theme.setSelectedColor(1 - v)
+                    #Theme.setSelectedColor(1 - v)
                     
                                     
-                    c1,c2,c3 = self.songlist_score_color
+                    c1,c2,c3 = self.songlistcd_score_color
                     glColor3f(c1,c2,c3)
                     if scores:
                       if self.extraStats:
