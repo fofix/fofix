@@ -543,6 +543,7 @@ class SongChooser(Layer, KeyListener):
     self.library_text_color = Theme.hexToColor(Theme.library_text_colorVar)
     self.library_selected_color = Theme.hexToColor(Theme.library_selected_colorVar)
     self.songlist_score_color = Theme.hexToColor(Theme.songlist_score_colorVar)
+    self.songlistcd_score_color = Theme.hexToColor(Theme.songlistcd_score_colorVar)
 
     self.listRotation = self.engine.config.get("game", "songlistrotation")    
 
@@ -637,16 +638,16 @@ class SongChooser(Layer, KeyListener):
       
     #Qstick - List/CD mode element positions
     if self.song_listcd_cd_xpos == None:
-      self.song_listcd_cd_xpos = 6.5
+      self.song_listcd_cd_xpos = 6
   
     if self.song_listcd_cd_ypos == None:
-      self.song_listcd_cd_ypos = 1.75
+      self.song_listcd_cd_ypos = 1
       
     if self.song_listcd_score_xpos == None:
       self.song_listcd_score_xpos = 0.6
 
     if self.song_listcd_score_ypos == None:
-      self.song_listcd_score_ypos = 0.4
+      self.song_listcd_score_ypos = 0.5
       
     if self.song_listcd_list_xpos == None:
       self.song_listcd_list_xpos = .1
@@ -769,7 +770,12 @@ class SongChooser(Layer, KeyListener):
         self.engine.loadImgDrawing(self, "background",       os.path.join("themes",themename,"menu","songchooselistcd.png"))
       except IOError:
         self.engine.loadImgDrawing(self, "background",       os.path.join("themes",themename,"menu","songchoosepaper.png"))
-      self.engine.loadImgDrawing(self, "selected",    os.path.join("themes",themename,"menu","selected.png"))
+      try:
+        self.engine.loadImgDrawing(self, "selectedlistcd",    os.path.join("themes",themename,"menu","selectedlistcd.png"))
+      except IOError:
+        self.engine.loadImgDrawing(self, "selected",    os.path.join("themes",themename,"menu","selected.png"))
+        self.selectedrb = None
+        
       #if self.rotationDisabled:
       #  item = self.items[self.selectedIndex]
       #  Log.debug(os.path.join(self.library, item.songName,    "label.png"))
@@ -1719,7 +1725,7 @@ class SongChooser(Layer, KeyListener):
   
               Theme.setSelectedColor(1 - v)
   
-              c1,c2,c3 = self.song_name_selected_color
+              c1,c2,c3 = self.songlistcd_score_color
               glColor3f(c1,c2,c3)
   
               scale = 0.0011
@@ -2511,7 +2517,10 @@ class SongChooser(Layer, KeyListener):
             else:
               pos = (self.selectedIndex-3, self.selectedIndex+4)#Any other item than above
               y = h*0.57
-        
+          
+
+
+
           if self.theme == 0 or self.theme == 1:
             lfont = self.engine.data.songListFont
             sfont = self.engine.data.shadowfont
@@ -2674,7 +2683,7 @@ class SongChooser(Layer, KeyListener):
       
                   Theme.setSelectedColor(1 - v)
                   
-                  c1,c2,c3 = self.song_name_selected_color
+                  c1,c2,c3 = self.songlistcd_score_color
                   glColor3f(c1,c2,c3)
     
                   scale = 0.0013
@@ -2718,11 +2727,17 @@ class SongChooser(Layer, KeyListener):
                     y += 2 * h + f / 4.0
             
           elif self.theme == 2:
-            imgwidth = self.selected.width1()
-            self.selected.transform.reset()
-            self.selected.transform.scale(.64, -1.05)
-            self.selected.transform.translate(self.song_listcd_list_xpos * w + (imgwidth*.64/2), y*1.2-h*.215)  #change depending on list Xpos
-            self.selected.draw()
+            if self.selectedlistcd == None:
+              imgwidth = self.selected.width1()
+              self.selected.transform.reset()
+              self.selected.transform.scale(.64, -1.05)
+              self.selected.transform.translate(self.song_listcd_list_xpos * w + (imgwidth*.64/2), y*1.2-h*.215)  #change depending on list Xpos
+              self.selected.draw()
+            else:
+              self.selectedlistcd.reset()
+              self.selectedlistcd.scale(1,-1)
+              self.selectedlistcd.translate(self.song_listcd_list_xpos * w + (imgwidth/2), y*1.2-h*.215)
+              self.selectedlistcd.draw()
             
 
 
@@ -2884,7 +2899,7 @@ class SongChooser(Layer, KeyListener):
       
                   Theme.setSelectedColor(1 - v)
                   
-                  c1,c2,c3 = self.song_name_selected_color
+                  c1,c2,c3 = self.songlistcd_score_color
                   glColor3f(c1,c2,c3)
     
                   scale = 0.0013

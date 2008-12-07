@@ -141,6 +141,7 @@ DEFAULT_MENU_NECK_CHOOSE_Y = 0.05
 DEFAULT_ROCKMETER_SCORE_COLOR = "#93C351"
 DEFAULT_INGAME_STATS_COLOR = "#FFFFFF"
 DEFAULT_SONGLIST_SCORE_COLOR = "#FFFFFF" # evilynux - score color
+DEFAULT_SONGLISTCD_SCORE_COLOR = "#FFFFFF" 
 
 #MFH:
 DEFAULT_SONGCDX         = None
@@ -325,6 +326,7 @@ Config.define("theme", "menu_neck_choose_y", float, DEFAULT_MENU_NECK_CHOOSE_Y)
 
 #evilynux
 Config.define("theme", "songlist_score_color",  str, DEFAULT_SONGLIST_SCORE_COLOR)
+Config.define("theme", "songlistcd_score_color",  str, DEFAULT_SONGLISTCD_SCORE_COLOR)
 Config.define("theme", "rockmeter_score_color",  str, DEFAULT_ROCKMETER_SCORE_COLOR)
 Config.define("theme", "ingame_stats_color",  str, DEFAULT_INGAME_STATS_COLOR)
 
@@ -456,6 +458,7 @@ rmtype = None
 
 #evilynux
 songlist_score_colorVar = None
+songlistcd_score_colorVar = None
 rockmeter_score_colorVar = None
 ingame_stats_colorVar = None
 
@@ -1194,11 +1197,15 @@ def setupRockmeter(config):
     rmtype = temp  
 
 def setupEvilynux(config):
-  global songlist_score_colorVar, rockmeter_score_colorVar, ingame_stats_colorVar
+  global songlist_score_colorVar, songlistcd_score_colorVar, rockmeter_score_colorVar, ingame_stats_colorVar
 
   temp = config.get("theme", "songlist_score_color")
   if songlist_score_colorVar == None or temp != DEFAULT_SONGLIST_SCORE_COLOR:
-    songlist_score_colorVar = temp  
+    songlist_score_colorVar = temp
+    
+  temp = config.get("theme", "songlistcd_score_color")
+  if songlistcd_score_colorVar == None or temp != DEFAULT_SONGLISTCD_SCORE_COLOR:
+    songlistcd_score_colorVar = temp  
 
   temp = config.get("theme", "rockmeter_score_color")
   if rockmeter_score_colorVar == None or temp != DEFAULT_ROCKMETER_SCORE_COLOR:
@@ -1472,10 +1479,11 @@ def writeFail(f, config): #racer
   f.write("%s = %s\n" % ("fail_text_y", fail_text_yPos))
 
 def writeEvilynux(f, config):
-  global songlist_score_colorVar, rockmeter_score_colorVar, ingame_stats_colorVar
+  global songlist_score_colorVar, rockmeter_score_colorVar, ingame_stats_colorVar, songlistcd_score_colorVar
   global neck_prompt_x, neck_prompt_y
 
   f.write("%s = %s\n" % ("songlist_score_color", songlist_score_colorVar))
+  f.write("%s = %s\n" % ("songlistcd_score_color", songlistcd_score_colorVar))
   f.write("%s = %s\n" % ("rockmeter_score_color", rockmeter_score_colorVar))
   f.write("%s = %s\n" % ("ingame_stats_color", ingame_stats_colorVar))
   f.write("%s = %s\n" % ("menu_neck_choose_x", neck_prompt_x))
