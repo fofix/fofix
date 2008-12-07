@@ -1,5 +1,7 @@
 #summary Love FoFiX?  Want to make a difference?  Support your freeware developers today!
 
+http://i37.tinypic.com/n6c2gh.jpg
+
 = Introduction =
 
 Do you like how this mod has evolved since MFH-Alarian? 
@@ -10,6 +12,8 @@ You too can make a difference!
 ==Donating to Myfingershurt (chris.paiano)==
 
 Currently, Chris needs some kind of RB or GH drumset to continue development on complex features such as drum fills and big rock endings. Depending on how much donation fundage is accumulated, Chris can buy better and more featured drumsets to integrate into FoFiX.
+
+[http://i36.tinypic.com/1497gk5.jpg http://www.cpeproto.com/FofixDonate.html]
 
   * For example - basic drum features and probably all kinds of cool drum-related features will be implemented with just an old RB1 drum set. Chris promises to protect the plastic bass drum pedal with a steel plate and not hit them too hard :)
 
