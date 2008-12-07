@@ -2518,7 +2518,7 @@ class Guitar:
 
     if self.isFailing == False and self.failcount > 0:
       self.failcount -= .05
-      sefl.failcount2 = False
+      self.failcount2 = False
 
     if self.starPowerActive:
 
