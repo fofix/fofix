@@ -148,6 +148,12 @@ DEFAULT_SONGCDSCOREX    = None
 DEFAULT_SONGLISTX       = None
 DEFAULT_SONGLISTSCOREX  = None
 
+DEFAULT_SONGLISTCD_CD_X = None
+DEFAULT_SONGLISTCD_CD_Y = None
+DEFAULT_SONGLISTCD_SCORE_X = None
+DEFAULT_SONGLISTCD_SCORE_Y = None
+DEFAULT_SONGLISTCD_LIST_X = None
+
 DEFAULT_PAUSE_BKG_X     = None
 DEFAULT_PAUSE_BKG_Y     = None
 DEFAULT_PAUSE_TEXT_X    = None
@@ -328,6 +334,12 @@ Config.define("theme", "song_cdscore_x",       float, DEFAULT_SONGCDSCOREX)
 Config.define("theme", "song_list_x",       float, DEFAULT_SONGLISTX)
 Config.define("theme", "song_listscore_x",       float, DEFAULT_SONGLISTSCOREX)
 
+Config.define("theme", "song_listcd_cd_x",       float, DEFAULT_SONGLISTCD_CD_X)
+Config.define("theme", "song_listcd_cd_y",       float, DEFAULT_SONGLISTCD_CD_Y)
+Config.define("theme", "song_listcd_score_x",       float, DEFAULT_SONGLISTCD_SCORE_X)
+Config.define("theme", "song_listcd_score_y",       float, DEFAULT_SONGLISTCD_SCORE_Y)
+Config.define("theme", "song_listcd_list_x",       float, DEFAULT_SONGLISTCD_LIST_X)
+
 Config.define("theme", "pause_bkg_x",       float, DEFAULT_PAUSE_BKG_X)
 Config.define("theme", "pause_bkg_y",       float, DEFAULT_PAUSE_BKG_Y)
 Config.define("theme", "pause_text_x",       float, DEFAULT_PAUSE_TEXT_X)
@@ -452,6 +464,12 @@ song_cd_Xpos = None         #Songlist in CD mode: horizontal position of CDs/cas
 song_cdscore_Xpos = None    #Songlist in CD mode: horizontal position of score info
 song_list_Xpos = None       #Songlist in List mode: horizontal position of song names/artists
 song_listscore_Xpos = None  #Songlist in List mode: horizontal position of score info
+
+song_listcd_cd_Xpos = None
+song_listcd_cd_Ypos = None
+song_listcd_score_Xpos = None
+song_listcd_score_Ypos = None
+song_listcd_list_Xpos = None
 
 pause_bkg_xPos = None
 pause_bkg_yPos = None
@@ -922,6 +940,7 @@ def setupMisc(config):
 #MFH:
 def setupSonglist(config):
   global song_cd_Xpos, song_cdscore_Xpos, song_list_Xpos, song_listscore_Xpos
+  global song_listcd_cd_Xpos, song_listcd_cd_Ypos, song_listcd_score_Xpos, song_listcd_score_Ypos, song_listcd_list_Xpos
 
   global main_menu_scaleVar, main_menu_vspacingVar, sub_menu_xVar, sub_menu_yVar
   global career_title_colorVar, opt_text_colorVar, opt_selected_colorVar
@@ -954,8 +973,28 @@ def setupSonglist(config):
 
   temp = config.get("theme", "song_cd_x")
   if song_cd_Xpos == None or temp != DEFAULT_SONGCDX:
-    song_cd_Xpos = temp  
-
+    song_cd_Xpos = temp
+    
+  temp = config.get("theme", "song_listcd_cd_x")
+  if song_listcd_cd_Xpos == None or temp != DEFAULT_SONGLISTCD_CD_X:
+    song_listcd_cd_Xpos = temp
+    
+  temp = config.get("theme", "song_listcd_cd_y")
+  if song_listcd_cd_Ypos == None or temp != DEFAULT_SONGLISTCD_CD_Y:
+    song_listcd_cd_Ypos = temp
+    
+  temp = config.get("theme", "song_listcd_score_x")
+  if song_listcd_score_Xpos == None or temp != DEFAULT_SONGLISTCD_SCORE_X:
+    song_listcd_score_Xpos = temp
+    
+  temp = config.get("theme", "song_listcd_score_y")
+  if song_listcd_score_Ypos == None or temp != DEFAULT_SONGLISTCD_SCORE_Y:
+    song_listcd_score_Ypos = temp
+    
+  temp = config.get("theme", "song_listcd_list_x")
+  if song_listcd_list_Xpos == None or temp != DEFAULT_SONGLISTCD_LIST_X:
+    song_listcd_list_Xpos = temp
+    
   temp = config.get("theme", "song_cdscore_x")
   if song_cdscore_Xpos == None or temp != DEFAULT_SONGCDSCOREX:
     song_cdscore_Xpos = temp  
@@ -1334,6 +1373,7 @@ def writeMisc(f, config):
 def writeSonglist(f, config):
   global song_cd_Xpos, song_cdscore_Xpos
   global song_list_Xpos, song_listscore_Xpos
+  global song_listcd_cd_Xpos, song_listcd_cd_Ypos, song_listcd_score_Xpos, song_listcd_score_Ypos, song_listcd_list_Xpos
 
   global main_menu_scaleVar, main_menu_vspacingVar, sub_menu_xVar, sub_menu_yVar
   global career_title_colorVar, opt_text_colorVar, opt_selected_colorVar
@@ -1359,6 +1399,12 @@ def writeSonglist(f, config):
   f.write("%s = %s\n" % ("song_cdscore_x", song_cdscore_Xpos))
   f.write("%s = %s\n" % ("song_list_x", song_list_Xpos))
   f.write("%s = %s\n" % ("song_listscore_x", song_listscore_Xpos))
+  
+  f.write("%s = %s\n" % ("song_listcd_cd_x", song_listcd_cd_Xpos))
+  f.write("%s = %s\n" % ("song_listcd_cd_y", song_listcd_cd_Ypos))
+  f.write("%s = %s\n" % ("song_listcd_score_x", song_listcd_score_Xpos))
+  f.write("%s = %s\n" % ("song_listcd_score_y", song_listcd_score_Ypos))
+  f.write("%s = %s\n" % ("song_listcd_list_x", song_listcd_list_Xpos))
 
 
   #MFH - adding new options here
