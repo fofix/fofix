@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-06 21:09-0800\n"
+"POT-Creation-Date: 2008-12-07 08:19-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1720,15 +1720,15 @@ msgstr ""
 msgid "% Complete"
 msgstr ""
 
-#: GuitarScene.py:274 GuitarScene.py:6461
+#: GuitarScene.py:274 GuitarScene.py:6462
 msgid "HOPO"
 msgstr ""
 
-#: GuitarScene.py:275 GuitarScene.py:6431 GuitarScene.py:6440
+#: GuitarScene.py:275 GuitarScene.py:6432 GuitarScene.py:6441
 msgid "COMPLETED"
 msgstr ""
 
-#: GuitarScene.py:276 GuitarScene.py:6433 GuitarScene.py:6449
+#: GuitarScene.py:276 GuitarScene.py:6434 GuitarScene.py:6450
 msgid " % ON "
 msgstr ""
 

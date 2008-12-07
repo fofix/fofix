@@ -4293,12 +4293,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.engine.view.setOrthogonalProjection(normalize = True)
   
       #MFH - also render the scrolling lyrics & sections before changing viewports:
+      minPos = pos - ((self.guitars[0].currentPeriod * self.guitars[0].beatsPerBoard) / 2)
+      maxPos = pos + ((self.guitars[0].currentPeriod * self.guitars[0].beatsPerBoard) * 1.5)
+      eventWindow = (maxPos - minPos)
+      #lyricSlop = ( self.guitars[0].currentPeriod / (maxPos - minPos) ) / 4
+      lyricSlop = ( self.guitars[0].currentPeriod / ((maxPos - minPos)/2) ) / 2
+
       if (self.readTextAndLyricEvents == 2 or (self.readTextAndLyricEvents == 1 and self.theme == 2)) and (not self.pause and not self.failed and not self.ending):
-        minPos = pos - ((self.guitars[0].currentPeriod * self.guitars[0].beatsPerBoard) / 2)
-        maxPos = pos + ((self.guitars[0].currentPeriod * self.guitars[0].beatsPerBoard) * 1.5)
-        eventWindow = (maxPos - minPos)
-        #lyricSlop = ( self.guitars[0].currentPeriod / (maxPos - minPos) ) / 4
-        lyricSlop = ( self.guitars[0].currentPeriod / ((maxPos - minPos)/2) ) / 2
   
         #handle the sections track
         if self.midiSectionsEnabled > 0: 
