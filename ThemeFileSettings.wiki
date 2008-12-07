@@ -49,6 +49,11 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||library_selected_color = #FFBF00||Use a Hex color code||
 ||songlist_score_color = #FFFFFF||Use a Hex color code||
 ||song_list_display = 1||Choices are - 0=CD's / 1=LIST Mode / 2=BOTH||
+||song_listcd_cd_x||Controls location of 'CDs' X position in listcd songlist view. Use a decimal # between 0 - 1||
+||song_listcd_cd_y||Controls location of 'CDs' Y position in listcd songlist view. Use a decimal # between 0 - 1||
+||song_listcd_score_x||Controls location of 'SCORE' X position in listcd songlist view. Use a decimal # between 0 - 1||
+||song_listcd_score_y||Controls location of 'SCORE' Y position in listcd songlist view. Use a decimal # between 0 - 1||
+||song_listcd_list_x||Controls location of 'LIST' X position in listcd songlist view. Use a decimal # between 0 - 1||
 
 
 
