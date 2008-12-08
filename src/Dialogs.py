@@ -84,7 +84,7 @@ def wrapCenteredText(font, pos, text, rightMargin = 0.9, scale = 0.002, visibili
   sentence = ""
   for n, word in enumerate(text.split(" ")):
     w, h = font.getStringSize(sentence + " " + word, scale = scale)
-    if x + (w/2) > rightMargin or word == "\n":
+    if x + (w/2) > rightMargin*1.11 or word == "\n":
       w, h = font.getStringSize(sentence, scale = scale)
       #x = startXpos
       glPushMatrix()
@@ -116,7 +116,7 @@ def wrapCenteredText(font, pos, text, rightMargin = 0.9, scale = 0.002, visibili
   #x = startXpos
   #for n, word in enumerate(text.split(" ")):
   #  w, h = font.getStringSize(word, scale = scale)
-  #  if x + w > rightMargin or word == "\n":
+  #  if x + w > rightMargin*1.11 or word == "\n":
   #    x = startXpos
   #    y += h*.5 # Worldrave - Modified spacing between lines
   #  if word == "\n":
