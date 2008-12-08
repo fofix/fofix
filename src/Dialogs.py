@@ -59,6 +59,8 @@ from Credits import Credits
 import Config
 import Settings
 
+#MFH - for cd/song list
+from Svg import ImgDrawing, SvgContext
 
 #MFH - for loading phrases
 def wrapCenteredText(font, pos, text, rightMargin = 0.9, scale = 0.002, visibility = 0.0):
@@ -544,7 +546,8 @@ class SongChooser(Layer, KeyListener):
     self.songlist_score_color = Theme.hexToColor(Theme.songlist_score_colorVar)
     self.songlistcd_score_color = Theme.hexToColor(Theme.songlistcd_score_colorVar)
 
-    self.listRotation = self.engine.config.get("game", "songlistrotation")    
+    self.listRotation = self.engine.config.get("game", "songlistrotation")
+    self.songCoverType = self.engine.config.get("game", "songcovertype")
 
     Log.debug("Songlist artist colors: " + str(self.artist_text_color) + " / " + str(self.artist_selected_color))
 
@@ -1024,13 +1027,21 @@ class SongChooser(Layer, KeyListener):
     item = self.items[i]
     if self.itemLabels[i] is None:
       if isinstance(item, Song.SongInfo):
-        label = self.engine.resource.fileName(self.library, item.songName,    "label.png")
+        if self.songCoverType:
+          label = self.engine.resource.fileName(self.library, item.songName,    "label.png")
+        else:
+          label = self.engine.resource.fileName(self.library, item.songName,    "album.png")
       elif isinstance(item, Song.LibraryInfo):
         label = self.engine.resource.fileName(item.libraryName, "label.png")
       else:
         return
       if os.path.exists(label):
-        self.itemLabels[i] = Texture(label)
+        #MFH - load as 2D drawing and not a texture when in CD/List mode:
+        if self.display == 2 and not self.listRotation:
+          #self.engine.loadImgDrawing(self, "itemLabels[i]",  label)
+          self.itemLabels[i] = ImgDrawing(self.engine.data.svg, label)
+        else:
+          self.itemLabels[i] = Texture(label)
 
   def updateSelection(self):
   
@@ -2415,50 +2426,62 @@ class SongChooser(Layer, KeyListener):
         self.engine.view.resetProjection()
 
       elif self.display == 2:   #Qstick/BlazinGamer - Combo CD/List
-        try:
-          glMatrixMode(GL_PROJECTION)
-          glPushMatrix()
-          
-          #myfingershurt: indentation was screwy here
-          glLoadIdentity()
-          gluPerspective(60, self.engine.view.aspectRatio, 0.1, 1000)
-          glMatrixMode(GL_MODELVIEW)
-          glLoadIdentity()
-              
-          glEnable(GL_DEPTH_TEST)
-          glDisable(GL_CULL_FACE)
-          glDepthMask(1)
-              
-          offset = 10 * (v ** 2)
-          self.camera.origin = (-9, -self.cameraOffset - self.song_listcd_cd_ypos, 4  - self.song_listcd_cd_xpos + offset)
-          self.camera.target = (  0, -self.cameraOffset - self.song_listcd_cd_ypos, 2.5 - self.song_listcd_cd_xpos + offset)
-          self.camera.apply()
-              
-          y = 0.0
+        item  = self.items[self.selectedIndex]
+        i = self.selectedIndex
+        if not self.listRotation:
+          if self.itemLabels[i]:
+            imgwidth = self.itemLabels[i].width1()
+            wfactor = 640.000/imgwidth
+            self.itemLabels[i].transform.reset()
+            self.itemLabels[i].transform.translate(self.song_listcd_cd_xpos*45+250,(self.song_listcd_cd_ypos*35)+320)
+            self.itemLabels[i].transform.scale(wfactor/3,-wfactor/3)
+            self.itemLabels[i].draw() 
+        else:
+          try:
+            glMatrixMode(GL_PROJECTION)
+            glPushMatrix()
+            
+            #myfingershurt: indentation was screwy here
+            glLoadIdentity()
+            gluPerspective(60, self.engine.view.aspectRatio, 0.1, 1000)
+            glMatrixMode(GL_MODELVIEW)
+            glLoadIdentity()
+                
+            glEnable(GL_DEPTH_TEST)
+            glDisable(GL_CULL_FACE)
+            glDepthMask(1)
+                
+            offset = 10 * (v ** 2)
+            self.camera.origin = (-9, -self.cameraOffset - self.song_listcd_cd_ypos, 4  - self.song_listcd_cd_xpos + offset)
+            self.camera.target = (  0, -self.cameraOffset - self.song_listcd_cd_ypos, 2.5 - self.song_listcd_cd_xpos + offset)
+            self.camera.apply()
+                
+            y = 0.0
 
-          item  = self.items[self.selectedIndex]
-          
-          i = self.selectedIndex
+            
 
-          glPushMatrix()
-          if isinstance(item, Song.SongInfo):
-            self.renderCassette(item.cassetteColor, self.itemLabels[i])
-          elif isinstance(item, Song.LibraryInfo):
-            self.renderLibrary(item.color, self.itemLabels[i])
-          glPopMatrix()
-          
-          glTranslatef(0, -h / 2, 0)
-          y += h
+            glPushMatrix()
+            if isinstance(item, Song.SongInfo):
+              if self.songCoverType:
+                self.renderCassette(item.cassetteColor, self.itemLabels[i])
+              else:
+                self.renderLibrary(item.cassetteColor, self.itemLabels[i])
+            elif isinstance(item, Song.LibraryInfo):
+              self.renderLibrary(item.color, self.itemLabels[i])
+            glPopMatrix()
+            
+            glTranslatef(0, -h / 2, 0)
+            y += h
 
-          glDisable(GL_DEPTH_TEST)
-          glDisable(GL_CULL_FACE)
-          glDepthMask(0)
-        
-        finally:
-          glMatrixMode(GL_PROJECTION)
-          glPopMatrix()
-          glMatrixMode(GL_MODELVIEW)
-        # render the song info
+            glDisable(GL_DEPTH_TEST)
+            glDisable(GL_CULL_FACE)
+            glDepthMask(0)
+          
+          finally:
+            glMatrixMode(GL_PROJECTION)
+            glPopMatrix()
+            glMatrixMode(GL_MODELVIEW)
+          # render the song info
         self.engine.view.setOrthogonalProjection(normalize = True)
         font = self.engine.data.songListFont
         
@@ -2738,11 +2761,6 @@ class SongChooser(Layer, KeyListener):
               self.selectedlistcd.scale(1,-1)
               self.selectedlistcd.translate(self.song_listcd_list_xpos * w + (imgwidth/2), y*1.2-h*.215)
               self.selectedlistcd.draw()
-            
-            #currentlabel.reset()
-            #currentlabel.scale(1,-1)
-            #currentlabel.translate(self.song_listcd_list_xpos * w + (imgwidth/2), y*1.2-h*.215)
-            #currentlabel.draw()
             
             glColor4f(1,1,1,1)
             text = self.library

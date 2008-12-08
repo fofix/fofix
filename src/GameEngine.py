@@ -220,6 +220,7 @@ Config.define("coffee", "songfilepath",       bool, True,     text = _("Library 
 Config.define("coffee", "noterotate",       bool, False,     text = _("Rotate 3D Notes"),             options = {True: _("1.1"), False: _("1.2")})
 Config.define("coffee", "phrases",       bool, True,     text = _("Phrases"),             options = {True: _("On"), False: _("Off")})
 Config.define("coffee", "song_display_mode",       int, 1,     text = _("Song List Display"),             options = {0: _("CDs"), 1: _("List"), 2: _("Both"), 3: _("Auto")})
+Config.define("game", "songcovertype",        bool, True,     text = _("Song Cover Type"),      options = {True: _("Cd Labels"), False: _("Album Covers")})
 Config.define("game", "songlistrotation",     bool, True,     text = _("Rotating Cds"),           options = {True: _("On"), False: _("Off")})
 Config.define("game", "tut",       bool, False,     text = _("tut"),             options = {True: _("yes"), False: _("no")})
 Config.define("video", "counting",       bool, False,     text = _("Song Countdown"),             options = {True: _("Show Part"), False: _("Show Numbers")})
