@@ -49,7 +49,6 @@ import Song
 import Data
 import Player
 import Guitar
-import Svg
 
 #myfingershurt: drums :)
 import Drum
@@ -2677,7 +2676,6 @@ class SongChooser(Layer, KeyListener):
                   lfont.render(text, (self.song_listcd_list_xpos + .05, .09*(i+1)-pos[0]*.09+.05), scale=scale)
             
                 if isinstance(item, Song.SongInfo):
-                  item  = self.items[self.selectedIndex]
                   angle = self.itemAngles[self.selectedIndex]
                   f = ((90.0 - angle) / 90.0) ** 2
 
@@ -2738,8 +2736,11 @@ class SongChooser(Layer, KeyListener):
               self.selectedlistcd.translate(self.song_listcd_list_xpos * w + (imgwidth/2), y*1.2-h*.215)
               self.selectedlistcd.draw()
             
-
-
+            #currentlabel.reset()
+            #currentlabel.scale(1,-1)
+            #currentlabel.translate(self.song_listcd_list_xpos * w + (imgwidth/2), y*1.2-h*.215)
+            #currentlabel.draw()
+            
             glColor4f(1,1,1,1)
             text = self.library
             w, h = font.getStringSize(text)
@@ -2859,9 +2860,6 @@ class SongChooser(Layer, KeyListener):
 
                 font.render(text, (self.song_listcd_list_xpos, .09*(i+1)-pos[0]*.09), scale = scale) #add theme option for song_listCD_xpos
                 
-                angle = self.itemAngles[self.selectedIndex]
-                f = ((90.0 - angle) / 90.0) ** 2
-                
                 if isinstance(item, Song.SongInfo) and not item.getLocked():
                   if not item.frets == "":
                     suffix = ", ("+item.frets+")"
@@ -2892,7 +2890,6 @@ class SongChooser(Layer, KeyListener):
                   font.render(text, (self.song_listcd_list_xpos + .05, .09*(i+1)-pos[0]*.09+.05), scale=scale) #add theme song_listCD_Xpos
             
                 if isinstance(item, Song.SongInfo):
-                  item  = self.items[self.selectedIndex]
                   angle = self.itemAngles[self.selectedIndex]
                   f = ((90.0 - angle) / 90.0) ** 2
       
