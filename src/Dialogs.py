@@ -2675,53 +2675,56 @@ class SongChooser(Layer, KeyListener):
 
                   lfont.render(text, (self.song_listcd_list_xpos + .05, .09*(i+1)-pos[0]*.09+.05), scale=scale)
             
-                if isinstance(item, Song.SongInfo):
-                  angle = self.itemAngles[self.selectedIndex]
-                  f = ((90.0 - angle) / 90.0) ** 2
+                
+                item  = self.items[self.selectedIndex]
+                if self.matchesSearch(item):
+                  if isinstance(item, Song.SongInfo):
+                    angle = self.itemAngles[self.selectedIndex]
+                    f = ((90.0 - angle) / 90.0) ** 2
 
-                  
-                  c1,c2,c3 = self.songlistcd_score_color
-                  glColor3f(c1,c2,c3)
-    
-                  scale = 0.0013
-                  w, h = font.getStringSize(self.prompt, scale = scale)
-                  x = self.song_listcd_score_xpos
-                  y = self.song_listcd_score_ypos + f / 2.0
-                  if len(item.difficulties) > 3:
-                    y = self.song_listcd_score_ypos + f / 2.0
-                  
-                  #new
-                  for d in item.difficulties:
-                    scores =  item.getHighscoresWithPartString(d, part = self.instrument)
-                    if scores:
-                      score, stars, name, scoreExt = scores[0]
-                      notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 = scoreExt
-                    else:
-                      score, stars, name = "---", 0, "---"
-                    #Theme.setBaseColor(1 - v)
-                    lfont.render(unicode(d),     (x, y),           scale = scale)
-                    if stars == 6 and self.theme == 2:
-                      glColor3f(1, 1, 0)  
-                      lfont.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
-                    elif stars == 6:
-                      glColor3f(0, 1, 0)  
-                      lfont.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
-                    else:
-                      lfont.render(unicode(Data.STAR2 * stars + Data.STAR1 * (5 - stars)), (x, y + h), scale = scale * 1.8)
-                    #Theme.setSelectedColor(1 - v)
                     
-                                    
                     c1,c2,c3 = self.songlistcd_score_color
                     glColor3f(c1,c2,c3)
-                    if scores:
-                      if self.extraStats:
-                        if notesTotal != 0:
-                          score = "%s %.1f%%" % (score, (float(notesHit) / notesTotal) * 100.0)
-                        if noteStreak != 0:
-                          score = "%s (%d)" % (score, noteStreak)
-                    lfont.render(unicode(score), (x + .15, y),     scale = scale)
-                    lfont.render(name,       (x + .15, y + h),     scale = scale)
-                    y += 2 * h + f / 4.0
+      
+                    scale = 0.0013
+                    w, h = font.getStringSize(self.prompt, scale = scale)
+                    x = self.song_listcd_score_xpos
+                    y = self.song_listcd_score_ypos + f / 2.0
+                    if len(item.difficulties) > 3:
+                      y = self.song_listcd_score_ypos + f / 2.0
+                    
+                    #new
+                    for d in item.difficulties:
+                      scores =  item.getHighscoresWithPartString(d, part = self.instrument)
+                      if scores:
+                        score, stars, name, scoreExt = scores[0]
+                        notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 = scoreExt
+                      else:
+                        score, stars, name = "---", 0, "---"
+                      #Theme.setBaseColor(1 - v)
+                      lfont.render(unicode(d),     (x, y),           scale = scale)
+                      if stars == 6 and self.theme == 2:
+                        glColor3f(1, 1, 0)  
+                        lfont.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
+                      elif stars == 6:
+                        glColor3f(0, 1, 0)  
+                        lfont.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
+                      else:
+                        lfont.render(unicode(Data.STAR2 * stars + Data.STAR1 * (5 - stars)), (x, y + h), scale = scale * 1.8)
+                      #Theme.setSelectedColor(1 - v)
+                      
+                                      
+                      c1,c2,c3 = self.songlistcd_score_color
+                      glColor3f(c1,c2,c3)
+                      if scores:
+                        if self.extraStats:
+                          if notesTotal != 0:
+                            score = "%s %.1f%%" % (score, (float(notesHit) / notesTotal) * 100.0)
+                          if noteStreak != 0:
+                            score = "%s (%d)" % (score, noteStreak)
+                      lfont.render(unicode(score), (x + .15, y),     scale = scale)
+                      lfont.render(name,       (x + .15, y + h),     scale = scale)
+                      y += 2 * h + f / 4.0
             
           elif self.theme == 2:
             if self.selectedlistcd == None:
@@ -2889,55 +2892,58 @@ class SongChooser(Layer, KeyListener):
 
                   font.render(text, (self.song_listcd_list_xpos + .05, .09*(i+1)-pos[0]*.09+.05), scale=scale) #add theme song_listCD_Xpos
             
-                if isinstance(item, Song.SongInfo):
-                  angle = self.itemAngles[self.selectedIndex]
-                  f = ((90.0 - angle) / 90.0) ** 2
-      
-                  Theme.setSelectedColor(1 - v)
-                  
-                  c1,c2,c3 = self.songlistcd_score_color
-                  glColor3f(c1,c2,c3)
-    
-                  scale = 0.0013
-                  w, h = font.getStringSize(self.prompt, scale = scale)
-                  x = self.song_listcd_score_xpos
-                  y = self.song_listcd_score_ypos + f / 2.0
-                  if len(item.difficulties) > 3:
-                    y = self.song_listcd_score_ypos + f / 2.0
-                  
-                  #new
-                  for d in item.difficulties:
-                    scores =  item.getHighscoresWithPartString(d, part = self.instrument)
-                    if scores:
-                      score, stars, name, scoreExt = scores[0]
-                      notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 = scoreExt
-                    else:
-                      score, stars, name = "---", 0, "---"
+                
+                item  = self.items[self.selectedIndex]
+                if self.matchesSearch(item):
+                  if isinstance(item, Song.SongInfo):
+                    angle = self.itemAngles[self.selectedIndex]
+                    f = ((90.0 - angle) / 90.0) ** 2
+        
+                    Theme.setSelectedColor(1 - v)
                     
-                    font.render(unicode(d),     (x, y),           scale = scale)
-                    
-                    if stars == 6 and self.theme == 2:
-                      glColor3f(1, 1, 0)  
-                      font.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
-                    elif stars == 6:
-                      glColor3f(0, 1, 0)  
-                      font.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
-                    else:
-                      font.render(unicode(Data.STAR2 * stars + Data.STAR1 * (5 - stars)), (x, y + h), scale = scale * 1.8)
-                    #Theme.setSelectedColor(1 - v)
-                    
-                                    
                     c1,c2,c3 = self.songlistcd_score_color
                     glColor3f(c1,c2,c3)
-                    if scores:
-                      if self.extraStats:
-                        if notesTotal != 0:
-                          score = "%s %.1f%%" % (score, (float(notesHit) / notesTotal) * 100.0)
-                        if noteStreak != 0:
-                          score = "%s (%d)" % (score, noteStreak)
-                    font.render(unicode(score), (x + .15, y),     scale = scale)
-                    font.render(name,       (x + .15, y + h),     scale = scale)
-                    y += 2 * h + f / 4.0
+      
+                    scale = 0.0013
+                    w, h = font.getStringSize(self.prompt, scale = scale)
+                    x = self.song_listcd_score_xpos
+                    y = self.song_listcd_score_ypos + f / 2.0
+                    if len(item.difficulties) > 3:
+                      y = self.song_listcd_score_ypos + f / 2.0
+                    
+                    #new
+                    for d in item.difficulties:
+                      scores =  item.getHighscoresWithPartString(d, part = self.instrument)
+                      if scores:
+                        score, stars, name, scoreExt = scores[0]
+                        notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 = scoreExt
+                      else:
+                        score, stars, name = "---", 0, "---"
+                      
+                      font.render(unicode(d),     (x, y),           scale = scale)
+                      
+                      if stars == 6 and self.theme == 2:
+                        glColor3f(1, 1, 0)  
+                        font.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
+                      elif stars == 6:
+                        glColor3f(0, 1, 0)  
+                        font.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
+                      else:
+                        font.render(unicode(Data.STAR2 * stars + Data.STAR1 * (5 - stars)), (x, y + h), scale = scale * 1.8)
+                      #Theme.setSelectedColor(1 - v)
+                      
+                                      
+                      c1,c2,c3 = self.songlistcd_score_color
+                      glColor3f(c1,c2,c3)
+                      if scores:
+                        if self.extraStats:
+                          if notesTotal != 0:
+                            score = "%s %.1f%%" % (score, (float(notesHit) / notesTotal) * 100.0)
+                          if noteStreak != 0:
+                            score = "%s (%d)" % (score, noteStreak)
+                      font.render(unicode(score), (x + .15, y),     scale = scale)
+                      font.render(name,       (x + .15, y + h),     scale = scale)
+                      y += 2 * h + f / 4.0
               
         finally:
           text = self.instrument
