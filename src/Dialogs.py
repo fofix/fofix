@@ -92,7 +92,7 @@ def wrapCenteredText(font, pos, text, rightMargin = 0.9, scale = 0.002, visibili
       font.render(sentence, (x - (w/2), y + visibility * n), scale = scale)
       glPopMatrix()
       sentence = word
-      y += h*.8 # evilynux - Reduced spacing between lines (worldrave request)
+      y += h*.5 # Worldrave - Modified spacing between lines
     else:
       if sentence == "" or sentence == "\n":
         sentence = word
@@ -104,7 +104,7 @@ def wrapCenteredText(font, pos, text, rightMargin = 0.9, scale = 0.002, visibili
     glRotate(visibility * (n + 1) * -45, 0, 0, 1)
     font.render(sentence, (x - (w/2), y + visibility * n), scale = scale)
     glPopMatrix()
-    y += h*.8 # evilynux - Reduced spacing between lines (worldrave request)
+    y += h*.5 # Worldrave - Modified spacing between lines
   
     #if word == "\n":
     #  continue
@@ -118,7 +118,7 @@ def wrapCenteredText(font, pos, text, rightMargin = 0.9, scale = 0.002, visibili
   #  w, h = font.getStringSize(word, scale = scale)
   #  if x + w > rightMargin or word == "\n":
   #    x = startXpos
-  #    y += h*.8 # evilynux - Reduced spacing between lines (worldrave request)
+  #    y += h*.5 # Worldrave - Modified spacing between lines
   #  if word == "\n":
   #    continue
   #  glPushMatrix()
