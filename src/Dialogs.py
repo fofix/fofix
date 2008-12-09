@@ -2433,7 +2433,7 @@ class SongChooser(Layer, KeyListener):
             imgwidth = self.itemLabels[i].width1()
             wfactor = 640.000/imgwidth
             self.itemLabels[i].transform.reset()
-            self.itemLabels[i].transform.translate(self.song_listcd_cd_xpos*45+250,(self.song_listcd_cd_ypos*35)+320)
+            self.itemLabels[i].transform.translate(self.song_listcd_cd_xpos * w,self.song_listcd_cd_ypos*h)
             self.itemLabels[i].transform.scale(wfactor/3,-wfactor/3)
             self.itemLabels[i].draw() 
         else:
@@ -2452,8 +2452,8 @@ class SongChooser(Layer, KeyListener):
             glDepthMask(1)
                 
             offset = 10 * (v ** 2)
-            self.camera.origin = (-9, -self.cameraOffset - self.song_listcd_cd_ypos, 4  - self.song_listcd_cd_xpos + offset)
-            self.camera.target = (  0, -self.cameraOffset - self.song_listcd_cd_ypos, 2.5 - self.song_listcd_cd_xpos + offset)
+            self.camera.origin = (-9,(5.196/self.engine.view.aspectRatio) - (5.196*2/self.engine.view.aspectRatio)*self.song_listcd_cd_ypos,(5.196*self.engine.view.aspectRatio)-(5.196*2*self.engine.view.aspectRatio)*self.song_listcd_cd_xpos)
+            self.camera.target = ( 0,(5.196/self.engine.view.aspectRatio) - (5.196*2/self.engine.view.aspectRatio)*self.song_listcd_cd_ypos,(5.196*self.engine.view.aspectRatio)-(5.196*2*self.engine.view.aspectRatio)*self.song_listcd_cd_xpos)
             self.camera.apply()
                 
             y = 0.0
