@@ -57,4 +57,5 @@ midi: 120-124 - drum fills
 http://img166.imageshack.us/img166/1467/gasfdgasfur2.th.jpg
 
 -----------------------------------------------------
-Written by *kristijan_mkd*, Wiki made and arranged by Worldrave
+Written by *kristijan_mkd*
+Wiki Page made and organized by Worldrave
