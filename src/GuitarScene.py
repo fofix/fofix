@@ -6674,6 +6674,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               w, h = font.getStringSize(text,0.00110)
               font.render(text, (.900 - w / 2, .540),(1, 0, 0),0.00110)     #off to the right slightly above fretboard
     
+            # evilynux - Display framerate
+            if self.engine.show_fps:
+              c1,c2,c3 = self.ingame_stats_color
+              glColor3f(c1, c2, c3)
+              text = _("FPS: %.2f" % self.engine.fpsEstimate)
+              w, h = font.getStringSize(text, scale = 0.00140)
+              font.render(text, (.85, .055 - h/2), (1,0,0), 0.00140)
       
             #MFH: Realtime hit accuracy display:
             
