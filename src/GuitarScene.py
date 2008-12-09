@@ -2612,19 +2612,30 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   def renderGuitar(self):
     for i in range(self.numOfPlayers):
       self.engine.view.setViewport(self.numOfPlayers,i)
-      #if self.rock[i]< self.rockMax/3.0:
-      if self.rock[i]< self.rockMax/3.0 and not self.playerList[i].practiceMode:
-        self.guitars[i].isFailing = True
-      else:
-        self.guitars[i].isFailing = False
       if self.theme == 0 or self.theme == 1 or self.theme == 2:
         if not self.pause and not self.failed:
           self.guitars[i].render(self.visibility, self.song, self.getSongPosition(), self.controls, self.killswitchEngaged[i])  #QQstarS: new
       else:
         self.guitars[i].render(self.visibility, self.song, self.getSongPosition(), self.controls, self.killswitchEngaged[i]) #QQstarS: new
-      
-    self.engine.view.setViewport(1,0)
 
+    for i, player in enumerate(self.playerList):
+      if not self.coOp:
+        #if self.rock[i]< self.rockMax/3.0:
+        if self.rock[i]< self.rockMax/3.0 and self.failingEnabled:
+          self.guitars[i].isFailing = True
+        else:
+          self.guitars[i].isFailing = False
+      else:
+        if self.rock[self.coOpPlayerMeter]< self.rockMax/3.0 and self.failingEnabled:
+          self.guitars[0].isFailing = True
+          self.guitars[1].isFailing = True
+        else:
+          self.guitars[0].isFailing = False
+          self.guitars[1].isFailing = False
+         
+    self.engine.view.setViewport(1,0)
+    
+    
   def getSongPosition(self):
     if self.song:
       if not self.done:
