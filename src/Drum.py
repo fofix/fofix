@@ -2305,6 +2305,39 @@ class Drum:
     else:
       self.ocount = 1
 
+    if self.isFailing == True:
+      if self.failcount <= 1 and self.failcount2 == False:
+        self.failcount += .05
+      elif self.failcount >= 1 and self.failcount2 == False:
+        self.failcount = 1
+        self.failcount2 = True
+        
+      if self.failcount >= 0 and self.failcount2 == True:
+        self.failcount -= .05
+      elif self.failcount <= 0 and self.failcount2 == True:
+        self.failcount = 0
+        self.failcount2 = False
+
+    if self.isFailing == False and self.failcount > 0:
+      self.failcount -= .05
+      self.failcount2 = False
+
+    if self.starPowerActive:
+
+      if self.spcount < 1.2:
+        self.spcount += .05
+        self.spcount2 = 1
+      elif self.spcount >=1.2:
+        self.spcount = 1.2
+        self.spcount2 = 0
+    else:
+      if self.spcount > 0:
+        self.spcount -= .05
+        self.spcount2 = 2
+      elif self.spcount <=0:
+        self.spcount = 0
+        self.spcount2 = 0
+
     self.renderNeck(visibility, song, pos)
     self.renderIncomingNecks(visibility, song, pos) #MFH
     if self.theme == 0 or self.theme == 1 or self.theme == 2:
