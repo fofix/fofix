@@ -2431,7 +2431,7 @@ class SongChooser(Layer, KeyListener):
         if not self.listRotation:
           if self.itemLabels[i]:
             imgwidth = self.itemLabels[i].width1()
-            wfactor = 214/imgwidth
+            wfactor = 214.000/imgwidth
             self.itemLabels[i].transform.reset()
             self.itemLabels[i].transform.translate(self.song_listcd_cd_xpos * w,self.song_listcd_cd_ypos*h)
             self.itemLabels[i].transform.scale(wfactor,-wfactor)
@@ -2757,9 +2757,9 @@ class SongChooser(Layer, KeyListener):
               self.selected.transform.translate(self.song_listcd_list_xpos * w + (imgwidth*.64/2), y*1.2-h*.215)  #change depending on list Xpos
               self.selected.draw()
             else:
-              self.selectedlistcd.reset()
-              self.selectedlistcd.scale(1,-1)
-              self.selectedlistcd.translate(self.song_listcd_list_xpos * w + (imgwidth/2), y*1.2-h*.215)
+              self.selectedlistcd.transform.reset()
+              self.selectedlistcd.transform.scale(1,-1)
+              self.selectedlistcd.transform.translate(self.song_listcd_list_xpos * w + (imgwidth/2), y*1.2-h*.215)
               self.selectedlistcd.draw()
             
             glColor4f(1,1,1,1)
