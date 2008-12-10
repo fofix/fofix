@@ -640,10 +640,10 @@ class SongChooser(Layer, KeyListener):
       
     #Qstick - List/CD mode element positions
     if self.song_listcd_cd_xpos == None:
-      self.song_listcd_cd_xpos = 6
+      self.song_listcd_cd_xpos = .75
   
     if self.song_listcd_cd_ypos == None:
-      self.song_listcd_cd_ypos = 1
+      self.song_listcd_cd_ypos = .6
       
     if self.song_listcd_score_xpos == None:
       self.song_listcd_score_xpos = 0.6
@@ -2431,10 +2431,10 @@ class SongChooser(Layer, KeyListener):
         if not self.listRotation:
           if self.itemLabels[i]:
             imgwidth = self.itemLabels[i].width1()
-            wfactor = 640.000/imgwidth
+            wfactor = 214/imgwidth
             self.itemLabels[i].transform.reset()
             self.itemLabels[i].transform.translate(self.song_listcd_cd_xpos * w,self.song_listcd_cd_ypos*h)
-            self.itemLabels[i].transform.scale(wfactor/3,-wfactor/3)
+            self.itemLabels[i].transform.scale(wfactor,-wfactor)
             self.itemLabels[i].draw() 
         else:
           try:
@@ -2511,7 +2511,7 @@ class SongChooser(Layer, KeyListener):
             elif self.selectedIndex == 4:#Second to last item in list
               pos = (self.selectedIndex-4, self.selectedIndex+3)
               y = h*0.47
-            elif self.selectedIndex == 5 and not self.selectedIndex == 1:#Third to Last in list and not third item
+            elif self.selectedIndex == 5:#Third to Last in list and not third item
               pos = (self.selectedIndex-5, self.selectedIndex+2)
               y = h*0.37
             else:
