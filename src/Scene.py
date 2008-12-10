@@ -248,6 +248,9 @@ class SceneClient(Scene, KeyListener):
       return True
     return False
 
+  def lostFocus(self):
+    pass
+
   def handleControlData(self, sender, owner, flags):
     # TODO: player mapping
     for player in self.session.world.players:

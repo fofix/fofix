@@ -1349,6 +1349,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   def resumeSong(self):
     self.engine.view.popLayer(self.menu)
     self.resumeGame()
+
+  def lostFocus(self): #akedrou - catch to pause on lostFocus
+    if self.song:
+      if not self.failed and not self.pause:
+        self.engine.view.pushLayer(self.menu)
+        self.pauseGame()
   
   def setCamera(self):
     #x=0 middle

@@ -220,6 +220,9 @@ class Input(Task):
         self.broadcastEvent(self.systemListeners, "screenResized", event.size)
       elif event.type == pygame.QUIT:
         self.broadcastEvent(self.systemListeners, "quit")
+      elif event.type == pygame.ACTIVEEVENT: # akedrou - catch for pause onLoseFocus
+        if (event.state == 2 or event.state == 6) and event.gain == 0:
+          self.broadcastEvent(self.keyListeners, "lostFocus") # as a key event, since Scene clients don't handle system events
       elif event.type == MusicFinished:
         self.broadcastEvent(self.systemListeners, "musicFinished")
       elif event.type == pygame.JOYBUTTONDOWN: # joystick buttons masquerade as keyboard events
