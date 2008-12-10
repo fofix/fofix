@@ -5549,6 +5549,118 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 currentRock = (0.0 + 0) / (self.rockMax)
               heightIncrease = h*0.6234375*currentRock*0.65
     
+
+    
+              if not self.pause and not self.failed:
+                currentSP = self.guitars[i].starPower/100.0
+                widthChange = w*0.25
+
+                self.engine.view.setViewportHalf(self.numOfPlayers,i)
+    
+                self.oBottom.transform.reset()
+                self.oBottom.transform.scale(.5,.5)
+                self.oBottom.transform.translate(w/2,h/12)
+                self.oBottom.draw()
+                
+                self.oFill.transform.reset()
+                self.oFill.transform.scale(.5*currentSP,.5)
+                self.oFill.transform.translate(w*0.5-widthChange+widthChange*currentSP,h/12)
+                self.oFill.draw(rect = (0,currentSP,0,1))
+    
+  
+                self.oTop.transform.reset()
+                self.oTop.transform.scale(.5,.5)
+                self.oTop.transform.translate(w/2,h/12)
+                self.oTop.draw()
+                if self.rb_sp_neck_glow and self.guitars[i].starPower >= 50 and not self.guitars[i].starPowerActive:
+                  self.oFull.transform.reset()
+                  self.oFull.transform.scale(.5,.5)
+                  self.oFull.transform.translate(w/2,h/12)
+                  self.oFull.draw(color = (1,1,1,self.rbOverdriveBarGlowVisibility))
+                
+                #must duplicate to other theme 
+                #if self.playerList[i].part.text == "Bass Guitar" and player.streak >= 40 and self.bassGrooveEnableMode > 0:   #bass groove!
+                if self.guitars[i].isBassGuitar and player.streak >= 40 and self.bassGrooveEnableMode > 0:   #bass groove!
+                  #death_au: bassgroove multiplier image
+                  if self.bassgroovemult != None:
+                    text = self.tsBassGroove   #kk69: displays "Bass Groove" whenever active, like Rock Band (only for RB theme)
+                    wid, hig = font.getStringSize(text,0.00150)
+                    
+                    #MFH - if Jurgen is active on the current player, raise "Bass Groove" up above "Jurgen Is Here":
+                    if (i == 0 and self.jurg1) or (i == 1 and self.jurg2):
+                      font.render(text, (0.47 - wid / 2, 0.165),(1, 0, 0),0.00210)#end kk69
+                    else:
+                      font.render(text, (0.47 - wid / 2, 0.190),(1, 0, 0),0.00210)#end kk69
+  
+                    #UC's mult
+                    if self.multRbFill and player.streak > 0:
+                      self.mult2.transform.reset()
+                      self.mult2.transform.scale(.95,-.82/8.0)
+                      self.mult2.transform.translate(w*0.5023,h*0.0585)         
+                      self.mult2.draw(rect = (0,1,(streak/10.0),(streak+1)/10.0))
+                      
+                    self.bassgroovemult.transform.reset()
+                    if self.multRbFill:
+                      self.bassgroovemult.transform.scale(.8,-.8/4.0)
+                      self.bassgroovemult.transform.translate(w*0.5,h*0.05)                  
+                    else:
+                      self.bassgroovemult.transform.scale(.5,-.5/4.0)
+                      self.bassgroovemult.transform.translate(w*0.5,h*0.05)
+                    self.bassgroovemult.draw(rect = (0,1,multRange[0],multRange[1]))
+  
+  
+                  else:
+                    #myfingershurt: Temp text bass groove multiplier:
+                    glColor3f(0,0.75,1)
+
+
+                    #text = self.tsBassGrooveLabel + str(self.playerList[i].getScoreMultiplier() * self.multi[i]) + "x"
+                    text = "%s%d%s" % (self.tsBassGrooveLabel, self.playerList[i].getScoreMultiplier() * self.multi[i], "x")
+                    wid, hig = font.getStringSize(text,0.00150)
+                    font.render(text, (.500 - wid / 2, .690),(1, 0, 0),0.00150)     #replacing normal rock band multiplier text
+                
+                else:              
+    
+                  #myfingershurt: UC's mult
+                  if self.multRbFill and player.streak > 0:
+                    self.mult2.transform.reset()
+                    if self.rbmfx: #blazingamer
+                      if player.streak > 9:   #draw bigger!
+                        self.mult2.transform.scale(.95,-.82/8.0)
+                        self.mult2.transform.translate(w*0.5023,h*0.0585)
+                      else:
+                        #myfingershurt: overlay streak perfectly:
+                        self.mult2.transform.scale(.6,-.5/8.0)
+                        self.mult2.transform.translate(w*0.501,h*0.055)
+                    else:
+                      self.mult2.transform.scale(.95,-.82/8.0)
+                      self.mult2.transform.translate(w*0.5023,h*0.0585)         
+                    self.mult2.draw(rect = (0,1,(streak/10.0),(streak+1)/10.0))
+  
+                  self.mult.transform.reset()
+                  if self.multRbFill:
+                    if self.rbmfx:  #blazingamer
+                      if player.streak > 9:   #draw bigger!
+                        self.mult.transform.scale(.8,-.8/8.0)
+                        self.mult.transform.translate(w*0.5,h*0.05)
+                      else:
+                        self.mult.transform.scale(.5,-.5/8.0)
+                        self.mult.transform.translate(w*0.5,h*0.05)
+                    else:
+                      self.mult.transform.scale(.8,-.8/8.0)
+                      self.mult.transform.translate(w*0.5,h*0.05)                  
+                  else:
+                    self.mult.transform.scale(.5,-.5/8.0)
+                    self.mult.transform.translate(w*0.5,h*0.05)
+                  self.mult.draw(rect = (0,1,multRange[0],multRange[1]))
+  
+              glColor4f(1,1,1,1)
+ 
+              if not self.coOp:
+                self.engine.view.setViewportHalf(self.numOfPlayers,i)
+              else:
+                self.engine.view.setViewportHalf(1,i)  
+
               if currentRock == 1 and self.failingEnabled:
                 if (self.coOp and i == self.coOpPlayerMeter) or not self.coOp:  #MFH only render for player 1 if co-op mode
                 #if self.numOfPlayers > 1 and self.coOp:
@@ -5653,137 +5765,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 if self.failingEnabled:  
                   self.arrowP2.draw()
                 whichScorePic = self.scorePicP2
-    
-              if not self.pause and not self.failed:
-                currentSP = self.guitars[i].starPower/100.0
-                widthChange = w*0.25
-    
-                self.oBottom.transform.reset()
-                self.oBottom.transform.scale(.5,.5)
-                self.oBottom.transform.translate(w/2,h/12)
-                self.oBottom.draw()
-                
-                self.oFill.transform.reset()
-                self.oFill.transform.scale(.5*currentSP,.5)
-                self.oFill.transform.translate(w*0.5-widthChange+widthChange*currentSP,h/12)
-                self.oFill.draw(rect = (0,currentSP,0,1))
-    
-  
-                self.oTop.transform.reset()
-                self.oTop.transform.scale(.5,.5)
-                self.oTop.transform.translate(w/2,h/12)
-                self.oTop.draw()
-                if self.rb_sp_neck_glow and self.guitars[i].starPower >= 50 and not self.guitars[i].starPowerActive:
-                  self.oFull.transform.reset()
-                  self.oFull.transform.scale(.5,.5)
-                  self.oFull.transform.translate(w/2,h/12)
-                  self.oFull.draw(color = (1,1,1,self.rbOverdriveBarGlowVisibility))
-                  
-  
-  #-              if self.rb_sp_neck_glow and self.guitars[i].starPower >= 50: #kk69: glow when star power is ready instead of when active
-  #-                if self.guitars[i].starPowerActive:
-  #-                  self.oTop.transform.reset()
-  #-                  self.oTop.transform.scale(.5,.5)
-  #-                  self.oTop.transform.translate(w/2,h/12)
-  #-                  self.oTop.draw()
-  #-                else:
-  #-                  self.oTop.transform.reset()
-  #-                  self.oTop.transform.scale(.5,.5)
-  #-                  self.oTop.transform.translate(w/2,h/12)
-  #-                  self.oTop.draw()
-  #-
-  #-                  self.oFull.transform.reset()
-  #-                  self.oFull.transform.scale(.5,.5)
-  #-                  self.oFull.transform.translate(w/2,h/12)
-  #-                  self.oFull.draw(color = (1,1,1,self.rbOverdriveBarGlowVisibility))
-  #-              else:
-  #-                self.oTop.transform.reset()
-  #-                self.oTop.transform.scale(.5,.5)
-  #-                self.oTop.transform.translate(w/2,h/12)
-  #-                self.oTop.draw()
-  
 
                 
-                #must duplicate to other theme 
-                #if self.playerList[i].part.text == "Bass Guitar" and player.streak >= 40 and self.bassGrooveEnableMode > 0:   #bass groove!
-                if self.guitars[i].isBassGuitar and player.streak >= 40 and self.bassGrooveEnableMode > 0:   #bass groove!
-                  #death_au: bassgroove multiplier image
-                  if self.bassgroovemult != None:
-                    text = self.tsBassGroove   #kk69: displays "Bass Groove" whenever active, like Rock Band (only for RB theme)
-                    wid, hig = font.getStringSize(text,0.00150)
-                    
-                    #MFH - if Jurgen is active on the current player, raise "Bass Groove" up above "Jurgen Is Here":
-                    if (i == 0 and self.jurg1) or (i == 1 and self.jurg2):
-                      font.render(text, (0.47 - wid / 2, 0.165),(1, 0, 0),0.00210)#end kk69
-                    else:
-                      font.render(text, (0.47 - wid / 2, 0.190),(1, 0, 0),0.00210)#end kk69
-  
-                    #UC's mult
-                    if self.multRbFill and player.streak > 0:
-                      self.mult2.transform.reset()
-                      self.mult2.transform.scale(.95,-.82/8.0)
-                      self.mult2.transform.translate(w*0.5023,h*0.0585)         
-                      self.mult2.draw(rect = (0,1,(streak/10.0),(streak+1)/10.0))
-                      
-                    self.bassgroovemult.transform.reset()
-                    if self.multRbFill:
-                      self.bassgroovemult.transform.scale(.8,-.8/4.0)
-                      self.bassgroovemult.transform.translate(w*0.5,h*0.05)                  
-                    else:
-                      self.bassgroovemult.transform.scale(.5,-.5/4.0)
-                      self.bassgroovemult.transform.translate(w*0.5,h*0.05)
-                    self.bassgroovemult.draw(rect = (0,1,multRange[0],multRange[1]))
-  
-  
-                  else:
-                    #myfingershurt: Temp text bass groove multiplier:
-                    glColor3f(0,0.75,1)
-
-
-                    #text = self.tsBassGrooveLabel + str(self.playerList[i].getScoreMultiplier() * self.multi[i]) + "x"
-                    text = "%s%d%s" % (self.tsBassGrooveLabel, self.playerList[i].getScoreMultiplier() * self.multi[i], "x")
-                    wid, hig = font.getStringSize(text,0.00150)
-                    font.render(text, (.500 - wid / 2, .690),(1, 0, 0),0.00150)     #replacing normal rock band multiplier text
-                
-                else:              
-    
-                  #myfingershurt: UC's mult
-                  if self.multRbFill and player.streak > 0:
-                    self.mult2.transform.reset()
-                    if self.rbmfx: #blazingamer
-                      if player.streak > 9:   #draw bigger!
-                        self.mult2.transform.scale(.95,-.82/8.0)
-                        self.mult2.transform.translate(w*0.5023,h*0.0585)
-                      else:
-                        #myfingershurt: overlay streak perfectly:
-                        self.mult2.transform.scale(.6,-.5/8.0)
-                        self.mult2.transform.translate(w*0.501,h*0.055)
-                    else:
-                      self.mult2.transform.scale(.95,-.82/8.0)
-                      self.mult2.transform.translate(w*0.5023,h*0.0585)         
-                    self.mult2.draw(rect = (0,1,(streak/10.0),(streak+1)/10.0))
-  
-                  self.mult.transform.reset()
-                  if self.multRbFill:
-                    if self.rbmfx:  #blazingamer
-                      if player.streak > 9:   #draw bigger!
-                        self.mult.transform.scale(.8,-.8/8.0)
-                        self.mult.transform.translate(w*0.5,h*0.05)
-                      else:
-                        self.mult.transform.scale(.5,-.5/8.0)
-                        self.mult.transform.translate(w*0.5,h*0.05)
-                    else:
-                      self.mult.transform.scale(.8,-.8/8.0)
-                      self.mult.transform.translate(w*0.5,h*0.05)                  
-                  else:
-                    self.mult.transform.scale(.5,-.5/8.0)
-                    self.mult.transform.translate(w*0.5,h*0.05)
-                  self.mult.draw(rect = (0,1,multRange[0],multRange[1]))
-  
-                
-              glColor4f(1,1,1,1)
-   
-              
               try:
   
   
@@ -5812,28 +5795,48 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   whichScorePic.draw()
 
                   scoreFont.render(scoretext, (0.97-scW, 0.1050 ))    #last change +0.0015
+  
+              except Exception, e:
+                #Log.warn("Unable to render score/streak text: %s" % e)
+                scorepicheight = 0  #exception placeholder
 
-                #myfingershurt: locale.format call adds commas to separate numbers just like Rock Band
-                streaktext = locale.format("%d", player.streak, grouping=True)
-                #myfingershurt: swapping the number "0" and the letter "O" in the score font for accurate Rock Band score type!
-                streaktext = streaktext.replace("0","O")
-                stW, stH = streakFont.getStringSize(streaktext)
-  
-  
-                #streak counter box:
-  
+
+
+              #myfingershurt: locale.format call adds commas to separate numbers just like Rock Band
+              streaktext = locale.format("%d", player.streak, grouping=True)
+              #myfingershurt: swapping the number "0" and the letter "O" in the score font for accurate Rock Band score type!
+              streaktext = streaktext.replace("0","O")
+              stW, stH = streakFont.getStringSize(streaktext)
+              
+              #streak counter box:
+              if self.coOp:
+                if i == 1:
+                  counterimgheight = self.counter.height1()
+                  self.counter.transform.reset()
+                  self.counter.transform.translate(w*.915, h*0.7720)    #just below score box, last change -.0000
+                  self.counter.transform.scale(.5,-.5)
+                  self.counter.draw()
+                  streakFont.render(streaktext, (0.97-stW,0.1500 ))    #last change +0.0015
+                if i == 0:
+                  counterimgheight = self.counter.height1()
+                  self.counter.transform.reset()
+                  self.counter.transform.translate(w*.415, h*0.7720)    #just below score box, last change -.0000
+                  self.counter.transform.scale(.5,-.5)
+                  self.counter.draw()
+                  streakFont.render(streaktext, (0.47-stW,0.1500 ))    #last change +0.0015
+
+              self.engine.view.setViewportHalf(self.numOfPlayers,i)
+
+              if not self.coOp:
                 counterimgheight = self.counter.height1()
                 self.counter.transform.reset()
                 self.counter.transform.translate(w*.915, h*0.7720)    #just below score box, last change -.0000
                 self.counter.transform.scale(.5,-.5)
                 self.counter.draw()
                 streakFont.render(streaktext, (0.97-stW,0.1500 ))    #last change +0.0015
-  
-              except Exception, e:
-                #Log.warn("Unable to render score/streak text: %s" % e)
-                scorepicheight = 0  #exception placeholder
-    
-  
+                
+
+                
               if self.displayText[i] != None:
                 glColor3f(.8,.75,.01)
                 size = sphraseFont.getStringSize(self.displayText[i], scale = self.dislayTextScale[i])
@@ -6488,6 +6491,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             if self.coOp:
               stars=self.coOpStars
               partialStars=self.coOpPartialStars
+              self.engine.view.setViewport(1,0)
             else:
               stars=player.stars
               partialStars=self.partialStar[i]
