@@ -1327,13 +1327,20 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
   def failGame(self):
     self.engine.view.pushLayer(self.failMenu)
+    if self.song and self.pause: #akedrou - don't let the pause menu overlap the fail menu.
+      self.engine.view.popLayer(self.menu)
+      self.pause = False
+      self.guitars[0].paused = False
+      if self.numOfPlayers == 2:
+        self.guitars[1].paused = False
     self.failEnd = True
 
   def resumeGame(self):
     self.loadSettings()
     self.setCamera()
     if self.song:
-      self.song.unpause()
+      if not self.failed: #akedrou - don't resume the song if you have already failed.
+        self.song.unpause()
       self.pause = False
       self.guitars[0].paused = False
       if self.numOfPlayers == 2:
