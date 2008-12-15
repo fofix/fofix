@@ -36,6 +36,7 @@ import urllib
 import Version
 import Theme
 import copy
+import string
 from Language import _
 
 DEFAULT_LIBRARY         = "songs"
@@ -474,6 +475,24 @@ class SongInfo(object):
   def getArtist(self):
     return self._get("artist")
 
+  def getAlbum(self):
+    return self._get("album")
+
+  def getGenre(self):
+    return self._get("genre")
+
+  def getDiffSong(self):
+    return self._get("diff_band", int, -1)
+
+  def getDiffGuitar(self):
+    return self._get("diff_guitar", int, -1)
+
+  def getDiffDrums(self):
+    return self._get("diff_drums", int, -1)
+
+  def getDiffBass(self):
+    return self._get("diff_bass", int, -1)     
+
   def getYear(self):
     return self._get("year")
 
@@ -490,6 +509,24 @@ class SongInfo(object):
   
   def setArtist(self, value):
     self._set("artist", value)
+
+  def setAlbum(self, value):
+    self._set("album", value)
+
+  def setGenre(self, value):
+    self._set("genre", value)
+
+  def setDiffSong(self, value):
+    self._set("diff_band", value)
+
+  def setDiffGuitar(self, value):
+    self._set("diff_guitar", value)
+
+  def setDiffDrums(self, value):
+    self._set("diff_drums", value)
+
+  def setDiffBass(self, value):
+    self._set("diff_bass", value)       
 
   def setYear(self, value):
     self._set("year", value)
@@ -745,6 +782,13 @@ class SongInfo(object):
   lyrics        = property(getLyrics, setLyrics)
   EighthNoteHopo = property(getEighthNoteHopo, setEighthNoteHopo)
   hopofreq = property(getHopoFreq, setHopoFreq)   #MFH
+  #New rb2 setlist
+  album         = property(getAlbum, setAlbum)
+  genre         = property(getGenre, setGenre)
+  diffSong     = property(getDiffSong, setDiffSong)
+  diffGuitar   = property(getDiffGuitar, setDiffGuitar)
+  diffBass     = property(getDiffBass, setDiffBass)
+  diffDrums    = property(getDiffDrums, setDiffDrums)
   #May no longer be necessary
   folder        = False
   
@@ -925,6 +969,53 @@ class CareerResetterInfo(object): #MFH
          
   name          = property(getName, setName)
   color         = property(getColor, setColor)
+
+
+class RandomSongInfo(object): #MFH
+  #def __init__(self, config, section):
+  def __init__(self):
+    #self.info    = config
+    #self.section = section
+
+    self.logClassInits = Config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("RandomSongInfo class init (song.py)...")
+
+    self.artist = None    #MFH - prevents search errors
+
+  def _set(self, attr, value):
+    if type(value) == unicode:
+      value = value.encode(Config.encoding)
+    else:
+      value = str(value)
+    self.info.set(self.section, attr, value)
+    
+  def _get(self, attr, type = None, default = ""):
+    try:
+      v = self.info.get(self.section, attr)
+    except:
+      v = default
+    if v is not None and type:
+      v = type(v)
+    return v
+
+  def getName(self):
+    #return self._get("name")
+    return _("   (Random Song)")
+
+  def setName(self, value):
+    self._set("name", value)
+
+  def getColor(self):
+    c = self._get("color")
+    if c:
+      return Theme.hexToColor(c)
+  
+  def setColor(self, color):
+    self._set("color", Theme.colorToHex(color))
+         
+  name          = property(getName, setName)
+  color         = property(getColor, setColor)  
 
 
 #coolguy567's unlock system
@@ -3156,15 +3247,27 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
       songs.sort(lambda a, b: cmp(a.artist.lower(), b.artist.lower()))
     elif order == 2:
       songs.sort(lambda a, b: cmp(int(b.count+str(0)), int(a.count+str(0))))
-    else:
+    elif order == 0:
       songs.sort(lambda a, b: cmp(a.name.lower(), b.name.lower()))
+    elif order == 3:
+      songs.sort(lambda a, b: cmp(a.album.lower(), b.album.lower()))
+    elif order == 4:
+      songs.sort(lambda a, b: cmp(a.genre.lower(), b.genre.lower()))
+    elif order == 5:
+      songs.sort(lambda a, b: cmp(a.year.lower(), b.year.lower()))
   else:
     if order == 1:
       songs.sort(lambda a, b: cmp(b.artist.lower(), a.artist.lower()))
     elif order == 2:
       songs.sort(lambda a, b: cmp(int(a.count+str(0)), int(b.count+str(0))))
-    else:
+    elif order == 0:
       songs.sort(lambda a, b: cmp(b.name.lower(), a.name.lower()))
+    elif order == 3:
+      songs.sort(lambda a, b: cmp(b.album.lower(), a.album.lower()))
+    elif order == 4:
+      songs.sort(lambda a, b: cmp(b.genre.lower(), a.genre.lower()))
+    elif order == 5:
+      songs.sort(lambda a, b: cmp(b.year.lower(), a.year.lower()))
   return songs
 
 
@@ -3218,10 +3321,15 @@ def getAvailableSongsAndTitles(engine, library = DEFAULT_LIBRARY, includeTutoria
 
   items = getAvailableSongs(engine, library, includeTutorials) + titles
   items.sort(lambda a, b: compareSongsAndTitles(engine, a, b))
+  
+  
+  if quickPlayMode and len(items) != 0:
+    items.insert(0, RandomSongInfo())
 
   if careerMode and titles != []:
     items.append(BlankSpaceInfo())
     items.append(CareerResetterInfo())
+  
   return items
   
 def compareSongsAndTitles(engine, a, b):
@@ -3255,21 +3363,32 @@ def compareSongsAndTitles(engine, a, b):
   if quickPlayMode and not quickPlayCareerTiers:
     order = engine.config.get("game", "sort_order")
     direction = engine.config.get("game", "sort_direction")
-    Log.debug(direction)
     if direction == 0:
       if order == 1:
         return cmp(a.artist.lower(), b.artist.lower())
       elif order == 2:
         return cmp(int(b.count+str(0)), int(a.count+str(0)))
-      else:
+      elif order == 0:
         return cmp(a.name.lower(), b.name.lower())
+      elif order == 3:
+        return cmp(a.album.lower(), b.album.lower())
+      elif order == 4:
+        return cmp(a.genre.lower(), b.genre.lower())
+      elif order == 5:
+        return cmp(a.year.lower(), b.year.lower())
     else:
       if order == 1:
         return cmp(b.artist.lower(), a.artist.lower())
       elif order == 2:
         return cmp(int(a.count+str(0)), int(b.count+str(0)))
-      else:
+      elif order == 0:
         return cmp(b.name.lower(), a.name.lower())
+      elif order == 3:
+        return cmp(b.album.lower(), a.album.lower())
+      elif order == 4:
+        return cmp(b.genre.lower(), a.genre.lower())
+      elif order == 5:
+        return cmp(b.year.lower(), a.year.lower())
   else:
     #Log.debug("Unlock IDs found, a=" + str(a.getUnlockID()) + ", b=" + str(b.getUnlockID()) )
     if a.getUnlockID() == "" and b.getUnlockID() != "":   #MFH - a is a bonus song, b is involved in career mode
@@ -3290,15 +3409,27 @@ def compareSongsAndTitles(engine, a, b):
             return cmp(a.artist.lower(), b.artist.lower())
           elif order == 2:
             return cmp(int(b.count+str(0)), int(a.count+str(0)))
-          else:
+          elif order == 0:
             return cmp(a.name.lower(), b.name.lower())
+          elif order == 3:
+            return cmp(a.album.lower(), b.album.lower())
+          elif order == 4:
+            return cmp(a.genre.lower(), b.genre.lower())
+          elif order == 5:
+            return cmp(a.year.lower(), b.year.lower())
         else:
           if order == 1:
             return cmp(b.artist.lower(), a.artist.lower())
           elif order == 2:
             return cmp(int(a.count+str(0)), int(b.count+str(0)))
-          else:
+          elif order == 0:
             return cmp(b.name.lower(), a.name.lower())
+          elif order == 3:
+            return cmp(b.album.lower(), a.album.lower())
+          elif order == 4:
+            return cmp(b.genre.lower(), a.genre.lower())
+          elif order == 5:
+            return cmp(b.year.lower(), a.year.lower())
     #original career sorting logic:
     elif a.getUnlockID() != b.getUnlockID():    #MFH - if returned unlock IDs are different, sort by unlock ID (this roughly sorts the tiers and shoves "bonus" songs to the top)
       return cmp(a.getUnlockID(), b.getUnlockID())
