@@ -698,37 +698,38 @@ class Guitar:
       self.guitarSoloNeck.texture.bind()
     elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
       self.bassGrooveNeck.texture.bind()
-    elif self.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and self.scoreMultiplier < 4 and not self.guitarSolo:
+    elif self.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and self.scoreMultiplier <= 4:
       self.oNeck.texture.bind()
     else:
       self.neckDrawing.texture.bind()
 
-    glBegin(GL_TRIANGLE_STRIP)
-    glColor4f(color[0],color[1],color[2], 0)
-    glTexCoord2f(0.0, project(offset - 2 * beatsPerUnit))
-    glVertex3f(-w / 2, 0, -2)
-    glTexCoord2f(1.0, project(offset - 2 * beatsPerUnit))
-    glVertex3f( w / 2, 0, -2)
-    
-    glColor4f(color[0],color[1],color[2], v)
-    glTexCoord2f(0.0, project(offset - 1 * beatsPerUnit))
-    glVertex3f(-w / 2, 0, -1)
-    glTexCoord2f(1.0, project(offset - 1 * beatsPerUnit))
-    glVertex3f( w / 2, 0, -1)
-    
-    glTexCoord2f(0.0, project(offset + l * beatsPerUnit * .7))
-    glVertex3f(-w / 2, 0, l * .7)
-    glTexCoord2f(1.0, project(offset + l * beatsPerUnit * .7))
-    glVertex3f( w / 2, 0, l * .7)
-    
-    glColor4f(color[0],color[1],color[2], 0)
-    glTexCoord2f(0.0, project(offset + l * beatsPerUnit))
-    glVertex3f(-w / 2, 0, l)
-    glTexCoord2f(1.0, project(offset + l * beatsPerUnit))
-    glVertex3f( w / 2, 0, l)
-    glEnd()
+    if not (self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 2):
+      glBegin(GL_TRIANGLE_STRIP)
+      glColor4f(color[0],color[1],color[2], 0)
+      glTexCoord2f(0.0, project(offset - 2 * beatsPerUnit))
+      glVertex3f(-w / 2, 0, -2)
+      glTexCoord2f(1.0, project(offset - 2 * beatsPerUnit))
+      glVertex3f( w / 2, 0, -2)
+      
+      glColor4f(color[0],color[1],color[2], v)
+      glTexCoord2f(0.0, project(offset - 1 * beatsPerUnit))
+      glVertex3f(-w / 2, 0, -1)
+      glTexCoord2f(1.0, project(offset - 1 * beatsPerUnit))
+      glVertex3f( w / 2, 0, -1)
+      
+      glTexCoord2f(0.0, project(offset + l * beatsPerUnit * .7))
+      glVertex3f(-w / 2, 0, l * .7)
+      glTexCoord2f(1.0, project(offset + l * beatsPerUnit * .7))
+      glVertex3f( w / 2, 0, l * .7)
+      
+      glColor4f(color[0],color[1],color[2], 0)
+      glTexCoord2f(0.0, project(offset + l * beatsPerUnit))
+      glVertex3f(-w / 2, 0, l)
+      glTexCoord2f(1.0, project(offset + l * beatsPerUnit))
+      glVertex3f( w / 2, 0, l)
+      glEnd()
 
-    if self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 2:   #static bass groove overlay
+    if self.bgcount > 0 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 2:   #static bass groove overlay
       self.bassGrooveNeck.texture.bind()
      
       glBegin(GL_TRIANGLE_STRIP)
