@@ -157,7 +157,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.done             = False
     
     #try:
-    #  self.sfxChannel = self.engine.audio.getChannel(4)
+    #  self.sfxChannel = self.engine.audio.getChannel(5)
     #except Exception, e:
     #  Log.warn("GuitarScene.py: Unable to procure sound effect track: %s" % e)
     #  self.sfxChannel = None
@@ -207,6 +207,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.failed = False
     self.finalFailed = False
     self.failEnd = False
+    self.crowdsCheering = False #akedrou
+    self.starPowersActive = 0
+    self.playersInGreen = 0
     self.failTimer = 0
     self.rockTimer = 0  #myfingershurt
     self.youRock = False    #myfingershurt
@@ -1481,9 +1484,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.songVolume       = self.engine.config.get("audio", "songvol")
     self.rhythmVolume     = self.engine.config.get("audio", "rhythmvol")
     self.screwUpVolume    = self.engine.config.get("audio", "screwupvol")
-    self.killVolume    = self.engine.config.get("audio", "kill_volume")
-    self.sfxVolume    = self.engine.config.get("audio", "SFX_volume")
+    self.killVolume       = self.engine.config.get("audio", "kill_volume")
+    self.sfxVolume        = self.engine.config.get("audio", "SFX_volume")
+    self.crowdVolume      = self.engine.config.get("audio", "crowd_volume") #akedrou
+    self.crowdsEnabled    = self.engine.config.get("audio", "enable_crowd_tracks")
     self.engine.data.sfxVolume = self.sfxVolume   #MFH - keep Data updated
+    self.engine.data.crowdVolume = self.crowdVolume
 
     #MFH - now update volume of all screwup sounds and other SFX:
     self.engine.data.SetAllScrewUpSoundFxObjectVolumes(self.screwUpVolume)
@@ -1521,6 +1527,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.song.refreshAudioDelay()
       #myfingershurt: ensuring the miss volume gets refreshed:
       self.song.refreshMissVolume()
+      if self.crowdsCheering == True:
+        self.song.setCrowdVolume(self.crowdVolume)
+      else:
+        self.song.setCrowdVolume(0.0)
       self.song.setBackgroundVolume(self.songVolume)
       self.song.setRhythmVolume(self.rhythmVolume)
       self.song.setDrumVolume(self.rhythmVolume)
@@ -1603,6 +1613,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.guitars[playaNum].spEnabled = True
     self.partialStar = [0 for i in self.playerList]
     self.resetStarThresholds()
+    self.crowdsCheering = False #akedrou
     self.coOpScore = 0
     self.coOpStars = 0
     self.lastCoOpStars = 0
@@ -2264,6 +2275,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
   def rockmeterDecrease(self, playerNum):
     i = playerNum
+    rockMinusAmount = 0 #akedrou - purely local to simplify the various incarnations of minusRock.
     if self.guitars[i].isDrum: 
       self.drumStart = True
 
@@ -2287,33 +2299,42 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.plusRock[i] -= self.pluGain/2.5/self.multi[i]
     
     #MFH TODO - maintain separate rock status for each player in co-op mode
+    #akedrou - only update the minus var for the "band" rockMeter if that is being kept separate from individual coOps.
     elif self.coOp and self.numOfPlayers > 1: #battle mode
       if self.notesMissed[i]:
         self.minusRock[self.coOpPlayerMeter] += self.minGain/self.multi[i]
-        self.rock[self.coOpPlayerMeter] -= self.minusRock[self.coOpPlayerMeter]/self.multi[i]
+        rockMinusAmount = self.minusRock[self.coOpPlayerMeter]/self.multi[i]
+        self.rock[self.coOpPlayerMeter] -= rockMinusAmount
         if self.plusRock[self.coOpPlayerMeter] > self.pluBase:
           self.plusRock[self.coOpPlayerMeter] -= self.pluGain*2.0/self.multi[i]
         if self.plusRock[self.coOpPlayerMeter] <= self.pluBase:
           self.plusRock[self.coOpPlayerMeter] = self.pluBase/self.multi[i]
       if self.lessMissed[i]:
         self.minusRock[self.coOpPlayerMeter] += self.minGain/5.0/self.multi[i]
-        self.rock[self.coOpPlayerMeter] -= self.minusRock[0]/5.0/self.multi[i]
+        rockMinusAmount = self.minusRock[0]/5.0/self.multi[i]
+        self.rock[self.coOpPlayerMeter] -= rockMinusAmount
         if self.plusRock[self.coOpPlayerMeter] > self.pluBase:
           self.plusRock[self.coOpPlayerMeter] -= self.pluGain/2.5/self.multi[i]
+      if (self.rock[self.coOpPlayerMeter]/self.rockMax <= 0.667) and ((self.rock[self.coOpPlayerMeter]+rockMinusAmount)/self.rockMax > 0.667): #akedrou
+        self.playersInGreen -= 1
     
     else:   #normal mode
       if self.notesMissed[i]:
         self.minusRock[i] += self.minGain/self.multi[i]
-        self.rock[i] -= self.minusRock[i]/self.multi[i]
+        rockMinusAmount = self.minusRock[i]/self.multi[i]
+        self.rock[i] -= rockMinusAmount
         if self.plusRock[i] > self.pluBase:
           self.plusRock[i] -= self.pluGain*2.0/self.multi[i]
         if self.plusRock[i] <= self.pluBase:
           self.plusRock[i] = self.pluBase/self.multi[i]
       if self.lessMissed[i]:
         self.minusRock[i] += self.minGain/5.0/self.multi[i]
-        self.rock[i] -= self.minusRock[i]/5.0/self.multi[i]
+        rockMinusAmount = self.minusRock[i]/5.0/self.multi[i]
+        self.rock[i] -= rockMinusAmount
         if self.plusRock[i] > self.pluBase:
           self.plusRock[i] -= self.pluGain/2.5/self.multi[i]
+      if (self.rock[i]/self.rockMax <= 0.667) and ((self.rock[i]+rockMinusAmount)/self.rockMax > 0.667): #akedrou
+        self.playersInGreen -= 1
 
     if self.minusRock[i] <= self.minBase:
       self.minusRock[i] = self.minBase
@@ -2346,6 +2367,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.minusRock[i] -= self.minGain/2.0*self.multi[i]
     
     #MFH TODO maintain separate rock status for each player
+    #akedrou - only update playersInGreen for the "band" rockMeter if that is being maintained separate from individual coOps.
     elif self.coOp and self.numOfPlayers > 1: 
       if self.rock[self.coOpPlayerMeter] < self.rockMax:
         self.plusRock[self.coOpPlayerMeter] += self.pluGain*self.multi[i]
@@ -2354,6 +2376,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.rock[self.coOpPlayerMeter] = self.rockMax
       if self.minusRock[self.coOpPlayerMeter] > self.minBase:
         self.minusRock[self.coOpPlayerMeter] -= self.minGain/2.0*self.multi[i]
+      if (self.rock[self.coOpPlayerMeter]/self.rockMax > 0.667) and ((self.rock[self.coOpPlayerMeter]-(self.plusRock[self.coOpPlayerMeter]*self.multi[i]))/self.rockMax <= 0.667):
+          self.playersInGreen += 1
     
     else:   #normal mode
   
@@ -2365,8 +2389,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       if self.minusRock[i] > self.minBase:
         self.minusRock[i] -= self.minGain/2.0*self.multi[i]
       #Log.debug(str((self.rock[i]-(self.plusRock[i]*self.multi[i]))/self.rockMax) % "AND" % str(self.rock[i]/self.rockMax))
-      if (self.rock[i]/self.rockMax > 0.667) and ((self.rock[i]-(self.plusRock[i]*self.multi[i]))/self.rockMax < 0.667):
-        self.engine.data.crowdSound.play()
+      if (self.rock[i]/self.rockMax > 0.667) and ((self.rock[i]-(self.plusRock[i]*self.multi[i]))/self.rockMax <= 0.667):
+        self.playersInGreen += 1
+        if self.crowdsEnabled == 0: #haven't decided whether or not to cut crowdSound with crowdsEnabled = 0, but would have to do it at solos too...
+          self.engine.data.crowdSound.play()
           
     if self.minusRock[i] <= self.minBase:
       self.minusRock[i] = self.minBase
@@ -2528,14 +2554,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #MFH - logic to prevent advancing rotation frames if you have screwed up, until you resume a streak
       if (self.currentlyAnimating and self.missPausesAnim == 1) or self.missPausesAnim == 0:
         self.stage.rotate()
-       
+      self.starPowersActive = 0 #would like to make this only run on activate/deactivate...
       #MFH - new logic to update the starpower pre-multiplier
       for i, thePlayer in enumerate(self.playerList):
         if self.guitars[i].starPowerActive: 
           self.multi[i] = 2
+          self.starPowersActive += 1
         else:
           self.multi[i] = 1
-
         #MFH - rewritten rockmeter / starpower miss logic, and Faaa's drum sounds:
         #the old logic was ridiculously complicated  
       # For each existing player (already in this loop)
@@ -2558,8 +2584,32 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.notesHit[i] = False 
         self.lessMissed[i] = False 
 
-
-
+        #akedrou Song/Crowd logic
+        if self.crowdsEnabled == 3 and self.crowdsCheering == False and not self.countdown: #prevents cheer-cut-cheer
+          self.song.setCrowdVolume(self.crowdVolume)
+          self.crowdsCheering = True
+        elif self.crowdsEnabled == 0 and self.crowdsCheering == True: #setting change
+          self.song.setCrowdVolume(0.0)
+          self.crowdsCheering = False
+        elif self.crowdsEnabled == 1:
+          if self.starPowersActive > 0:
+            if self.crowdsCheering == False:
+              self.song.setCrowdVolume(self.crowdVolume)
+              self.crowdsCheering = True
+          else:
+            if self.crowdsCheering == True:
+              self.song.setCrowdVolume(0.0)
+              self.crowdsCheering = False
+        elif self.crowdsEnabled == 2:
+          if self.starPowersActive > 0 or self.playersInGreen > 0:
+            if self.crowdsCheering == False:
+              self.song.setCrowdVolume(self.crowdVolume)
+              self.crowdsCheering = True
+          else:
+            if self.crowdsCheering == True:
+              self.song.setCrowdVolume(0.0)
+              self.crowdsCheering = False
+              
         #battle failing
         if self.battle and self.numOfPlayers>1:
           if self.rock[i] <= 0:
@@ -2568,8 +2618,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             self.newScalingText(i, self.tsYouFailedBattle )
             #self.streakFlag = str(i)   #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1. 
             self.guitars[i].actions = [0,0,0]
-
-
+  
       if self.countdown > 0: #MFH won't start song playing if you failed or pause
         self.countdown = max(self.countdown - ticks / self.song.period, 0)
         self.countdownSeconds = self.countdown / self.songBPS + 1
@@ -2578,8 +2627,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           #RF-mod should we collect garbage when we start?
           self.engine.collectGarbage()
           self.song.setGuitarVolume(self.guitarVolume)
-          self.song.setBackgroundVolume(self.songVolume)
           self.song.setRhythmVolume(self.rhythmVolume)
+          self.song.setBackgroundVolume(self.songVolume)
+          self.song.setCrowdVolume(0.0)
+          self.crowdsCheering = False #catches crowdsEnabled != 3, pause before countdown, set to 3
+          self.starPowersActive = 0
+          self.playersInGreen = 0
           if self.playerList[0].practiceMode:
             self.playerList[0].startPos[0] -= self.song.period*4
             if self.playerList[0].startPos[0] < 0.0:
@@ -3203,8 +3256,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   def activateSP(self, num): #QQstarS: Fix this function, add a element "num"
     if self.guitars[num].starPower >= 50 and self.guitars[num].starPowerActive == False: #QQstarS:Set [0] to [i]
       #self.sfxChannel.setVolume(self.sfxVolume)
-      if self.engine.data.cheerSoundFound:
-        self.engine.data.crowdSound.play()
+      #if self.engine.data.cheerSoundFound:
+        #self.engine.data.crowdSound.play()
       self.engine.data.starActivateSound.play()
       self.guitars[num].starPowerActive = True #QQstarS:Set [0] to [i]
       self.guitars[num].overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer

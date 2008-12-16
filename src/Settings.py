@@ -243,6 +243,7 @@ class SettingsMenu(Menu.Menu):
       (_("Choose P2 Neck >"), lambda: Dialogs.chooseNeck(engine,player=1,prompt=_("Yellow (#3) / Blue (#4) to change:"))),
       ConfigChoice(engine.config, "game", "ignore_open_strums", autoApply = True),      #myfingershurt
       ConfigChoice(engine.config, "game", "star_scoring", autoApply = True),#myfingershurt
+      ConfigChoice(engine.config, "audio", "enable_crowd_tracks", autoApply = True), #akedrou: I don't like this here, but "audio" menu is empty of choices.
       ConfigChoice(engine.config, "coffee", "failingEnabled", autoApply = True),
       ConfigChoice(engine.config, "game",  "uploadscores", autoApply = True),
     ]
@@ -432,6 +433,7 @@ class SettingsMenu(Menu.Menu):
       VolumeConfigChoice(engine, engine.config, "audio",  "screwupvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "miss_volume", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "single_track_miss_volume", autoApply = True),
+      VolumeConfigChoice(engine, engine.config, "audio",  "crowd_volume", autoApply = True), #akedrou
       VolumeConfigChoice(engine, engine.config, "audio",  "kill_volume", autoApply = True), #MFH
       VolumeConfigChoice(engine, engine.config, "audio",  "SFX_volume", autoApply = True), #MFH
     ]
@@ -645,8 +647,10 @@ class GameSettingsMenu(Menu.Menu):
       VolumeConfigChoice(engine, engine.config, "audio",  "screwupvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "miss_volume", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "single_track_miss_volume", autoApply = True),
+      VolumeConfigChoice(engine, engine.config, "audio",  "crowd_volume", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "kill_volume", autoApply = True), #MFH
       VolumeConfigChoice(engine, engine.config, "audio",  "SFX_volume", autoApply = True), #MFH
+      ConfigChoice(engine.config, "audio", "enable_crowd_tracks", autoApply = True), #akedrou
       ConfigChoice(engine.config, "audio",  "delay", autoApply = True),   #myfingershurt: so the a/v delay can be adjusted in-game
       ConfigChoice(engine.config, "game", "jurgdef", autoApply = True),#Jurgen config -- Spikehead777
       ConfigChoice(engine.config, "game", "jurgtype", autoApply = True),#Jurgen controls -- Spikehead777

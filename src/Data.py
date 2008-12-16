@@ -56,6 +56,7 @@ class Data(object):
     self.svg      = svg
 
     self.sfxVolume    = Config.get("audio", "SFX_volume")
+    self.crowdVolume  = Config.get("audio", "crowd_volume")
 
     #Get theme
     themename = Config.get("coffee", "themename")
@@ -286,8 +287,7 @@ class Data(object):
     else: #MFH: Fallback on general failsound.ogg
       self.loadSoundEffect(self, "failSound", os.path.join("sounds","failsound.ogg"))
       Log.warn(themename + "\sounds\ failsound.ogg not found -- using general failsound.ogg instead.")
-
-
+      
     #myfingershurt: integrating Capo's starpower clap sounds
     self.loadSoundEffect(self, "clapSound", os.path.join("sounds","clapsound.ogg"))
 
@@ -297,7 +297,7 @@ class Data(object):
       self.loadSoundEffect(self, "starReadySound", os.path.join("themes",themename,"sounds","starpower.ogg"))
       Log.warn(themename + "\sounds\starpowerready.ogg not found -- using starpower.ogg instead.")
 
-    #MFH - fallback on sounds\crowdcheers.ogg, and then starpower.ogg.  Note if the fallback crowdcheers was used or not.
+    #MFH - fallback on sounds\crowdcheers.ogg, and then starpower.ogg.  Note if the fallback crowdcheers was used or not.    
     if self.fileExists(os.path.join("themes",themename,"sounds","crowdcheers.ogg")):
       self.loadSoundEffect(self, "crowdSound", os.path.join("themes",themename,"sounds","crowdcheers.ogg"))
       self.cheerSoundFound = 2
@@ -323,6 +323,8 @@ class Data(object):
       self.loadSoundEffect(self, "starDeActivateSound", os.path.join("themes",themename,"sounds","starpower.ogg"))
       self.starDeActivateSoundFound = False
       Log.warn(themename + "\sounds\stardeactivate.ogg not found -- sound disabled.")
+    
+    
 
 
 
@@ -338,9 +340,7 @@ class Data(object):
     #elif self.theme == 2:
     #  #self.loadSoundEffect(self, "acceptSound",  os.path.join("themes",themename,"sounds","action.ogg"))
     #  self.loadSoundEffect(self, "cancelSounds",  os.path.join("themes",themename,"sounds","out.ogg"))
-      
-
-
+  
   def SetAllScrewUpSoundFxObjectVolumes(self, volume):   #MFH - single function to go through all screwup sound objects and set object volume to the given volume
     for s in self.screwUpsounds:
       s.setVolume(volume)
@@ -348,7 +348,7 @@ class Data(object):
       s.setVolume(volume)
     for s in self.screwUpsoundsDrums:
       s.setVolume(volume)
-
+  
   def SetAllSoundFxObjectVolumes(self, volume):   #MFH - single function to go through all sound objects (and iterate through all sound lists) and set object volume to the given volume
     #MFH TODO - set every sound object's volume here...
     self.starDingSound.setVolume(volume)
@@ -416,7 +416,7 @@ class Data(object):
         return [Sound(self.resource.fileName(os.path.join("themes",self.themeLabel,"sounds","in.ogg")))]
       elif self.theme == 2:
         return [Sound(self.resource.fileName(os.path.join("themes",self.themeLabel,"sounds","action.ogg")))]
-
+    
   def loadScrewUpsounds(self):
     soundPathTheme = os.path.join("themes",self.themeLabel,"sounds")
     soundPathData = "sounds"

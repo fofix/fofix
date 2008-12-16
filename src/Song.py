@@ -2061,7 +2061,7 @@ class Track:
 
 
 class Song(object):
-  def __init__(self, engine, infoFileName, songTrackName, guitarTrackName, rhythmTrackName, noteFileName, scriptFileName = None, partlist = [parts[GUITAR_PART]], drumTrackName = None):
+  def __init__(self, engine, infoFileName, songTrackName, guitarTrackName, rhythmTrackName, noteFileName, scriptFileName = None, partlist = [parts[GUITAR_PART]], drumTrackName = None, crowdTrackName = None):
     self.engine        = engine
     
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
@@ -2082,6 +2082,7 @@ class Song(object):
     self.delay        = self.engine.config.get("audio", "delay")
     self.delay        += self.info.delay
     self.missVolume   = self.engine.config.get("audio", "miss_volume")
+    #self.songVolume   = self.engine.config.get("audio", "songvol") #akedrou
 
     self.hasMidiLyrics = False
     self.midiStyle = MIDI_TYPE_GH
@@ -2110,6 +2111,8 @@ class Song(object):
     
     #myfingershurt:
     self.drumTrack = None
+    #akedrou
+    self.crowdTrack = None
     #if songTrackName:
     #  drumTrackName = songTrackName.replace("song.ogg","drums.ogg")
 
@@ -2131,6 +2134,12 @@ class Song(object):
         self.drumTrack = Audio.StreamingSound(self.engine, self.engine.audio.getChannel(3), drumTrackName)
     except Exception, e:
       Log.warn("Unable to load drum track: %s" % e)
+      
+    try:
+      if crowdTrackName:
+        self.crowdTrack = Audio.StreamingSound(self.engine, self.engine.audio.getChannel(4), crowdTrackName)
+    except Exception, e:
+      Log.warn("Unable to load crowd track: %s" % e)
 
     #MFH - single audio track song detection
     self.singleTrackSong = False
@@ -2205,6 +2214,9 @@ class Song(object):
     if self.drumTrack:
       assert start == 0.0
       self.drumTrack.play()
+    if self.crowdTrack:
+      assert start == 0.0
+      self.crowdTrack.play()
     self._playing = True
 
   def pause(self):
@@ -2257,12 +2269,17 @@ class Song(object):
   def setBackgroundVolume(self, volume):
     self.music.setVolume(volume)
   
+  def setCrowdVolume(self, volume):
+    if self.crowdTrack:
+      self.crowdTrack.setVolume(volume)
+  
   def setAllTrackVolumes(self, volume):
     self.setBackgroundVolume(volume)
     self.setDrumVolume(volume)
     self.setRhythmVolume(volume)
     self.setGuitarVolume(volume)
-  
+    self.setCrowdVolume(volume)
+    
   def stop(self):
     for tracks in self.tracks:
       for track in tracks:
@@ -2281,6 +2298,8 @@ class Song(object):
       self.rhythmTrack.stop()
     if self.drumTrack:
       self.drumTrack.stop()
+    if self.crowdTrack:
+      self.crowdTrack.stop()
     self._playing = False
 
   def fadeout(self, time):
@@ -2295,6 +2314,8 @@ class Song(object):
       self.rhythmTrack.fadeout(time)
     if self.drumTrack:
       self.drumTrack.fadeout(time)
+    if self.crowdTrack:
+      self.crowdTrack.fadeout(time)
     self._playing = False
 
   def getPosition(self):
@@ -3031,12 +3052,13 @@ class MidiPartsReader(midi.MidiOutStream):
 def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playbackOnly = False, notesOnly = False, part = [parts[GUITAR_PART]], practiceMode = False):
 
   Log.debug("loadSong function call (song.py)...")
-
+  crowdsEnabled = engine.config.get("audio", "crowd_tracks_enabled")
 
   #RF-mod (not needed?)
   guitarFile = engine.resource.fileName(library, name, "guitar.ogg")
   songFile   = engine.resource.fileName(library, name, "song.ogg")
   rhythmFile = engine.resource.fileName(library, name, "rhythm.ogg")
+  crowdFile  = engine.resource.fileName(library, name, "crowd.ogg")
   noteFile   = engine.resource.fileName(library, name, "notes.mid", writable = True)
   infoFile   = engine.resource.fileName(library, name, "song.ini", writable = True)
   scriptFile = engine.resource.fileName(library, name, "script.txt")
@@ -3067,7 +3089,15 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
 
   if not os.path.isfile(drumFile):
     drumFile = None
- 
+  
+  if not os.path.isfile(crowdFile):
+    crowdFile = None
+    #if os.path.isfile(songCrowdFile) and useSongCrowdTrack:   #supports song+crowd... may be (re)implemented later.
+      #crowdFile = songCrowdFile
+      #Log.warn("crowd.ogg file not found. Using song+crowd.ogg instead! Volumes may be off.")
+
+  if crowdsEnabled == 0:
+    crowdFile = None      
 
   if practiceMode:    #single track practice mode only!
     if part[0] == parts[GUITAR_PART] and guitarFile != None:
@@ -3078,7 +3108,8 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
       songFile = drumFile
     guitarFile = None
     rhythmFile = None
-    drumFile = None      
+    drumFile = None
+    crowdFile = None
     
       
 
@@ -3086,6 +3117,7 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
 
   if playbackOnly:
     noteFile = None
+    crowdFile = None
     if os.path.isfile(previewFile):
       songFile = previewFile
       guitarFile = None
@@ -3094,11 +3126,12 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
       
   if notesOnly:
     songFile = None
+    crowdFile = None
     guitarFile = None
     rhythmFile = None
     previewFile = None
     drumFile = None
-
+    
   if songFile != None and guitarFile != None:
     #check for the same file
     songStat = os.stat(songFile)
@@ -3107,7 +3140,7 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
     if songStat.st_size == guitarStat.st_size:
       guitarFile = None
   
-  song       = Song(engine, infoFile, songFile, guitarFile, rhythmFile, noteFile, scriptFile, part, drumFile)
+  song       = Song(engine, infoFile, songFile, guitarFile, rhythmFile, noteFile, scriptFile, part, drumFile, crowdFile)
   return song
 
 def loadSongInfo(engine, name, library = DEFAULT_LIBRARY):
