@@ -210,6 +210,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.crowdsCheering = False #akedrou
     self.starPowersActive = 0
     self.playersInGreen = 0
+    self.crowdFaderVolume = 0.0
     self.failTimer = 0
     self.rockTimer = 0  #myfingershurt
     self.youRock = False    #myfingershurt
@@ -363,6 +364,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.analogKillswitchActiveStarpowerChunkSize = self.analogKillswitchStarpowerChunkSize / 3.0
     self.rbOverdriveBarGlowFadeInChunk = .07     #this amount added to visibility every run() cycle when fading in - original .2
     self.rbOverdriveBarGlowFadeOutChunk = .03   #this amount subtracted from visibility every run() cycle when fading out - original .07
+    self.crowdCheerFadeInChunk =  .02           #added to crowdVolume every run() when fading in
+    self.crowdCheerFadeOutChunk = .07           #subtracted from crowdVolume every run() on fade out.
     self.maxDisplayTextScale = 0.0024       #orig 0.0024
     self.displayTextScaleStep2 = 0.00008    #orig 0.00008
     self.displayTextScaleStep1 = 0.0001     #orig 0.0001
@@ -2586,29 +2589,42 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
         #akedrou Song/Crowd logic
         if self.crowdsEnabled == 3 and self.crowdsCheering == False and not self.countdown: #prevents cheer-cut-cheer
-          self.song.setCrowdVolume(self.crowdVolume)
+          #self.song.setCrowdVolume(self.crowdVolume)
           self.crowdsCheering = True
         elif self.crowdsEnabled == 0 and self.crowdsCheering == True: #setting change
-          self.song.setCrowdVolume(0.0)
+          #self.song.setCrowdVolume(0.0)
           self.crowdsCheering = False
         elif self.crowdsEnabled == 1:
           if self.starPowersActive > 0:
             if self.crowdsCheering == False:
-              self.song.setCrowdVolume(self.crowdVolume)
+              #self.song.setCrowdVolume(self.crowdVolume)
               self.crowdsCheering = True
           else:
             if self.crowdsCheering == True:
-              self.song.setCrowdVolume(0.0)
+              #self.song.setCrowdVolume(0.0)
               self.crowdsCheering = False
         elif self.crowdsEnabled == 2:
           if self.starPowersActive > 0 or self.playersInGreen > 0:
             if self.crowdsCheering == False:
-              self.song.setCrowdVolume(self.crowdVolume)
+              #self.song.setCrowdVolume(self.crowdVolume)
               self.crowdsCheering = True
           else:
             if self.crowdsCheering == True:
-              self.song.setCrowdVolume(0.0)
+              #self.song.setCrowdVolume(0.0)
               self.crowdsCheering = False
+        
+        #Crowd fade-in/out
+        if self.crowdsCheering == True and self.crowdFaderVolume < self.crowdVolume:
+          self.crowdFaderVolume += self.crowdCheerFadeInChunk
+          if self.crowdFaderVolume > self.crowdVolume:
+            self.crowdFaderVolume = self.crowdVolume
+          self.song.setCrowdVolume(self.crowdFaderVolume)
+        
+        if self.crowdsCheering == False and self.crowdFaderVolume > 0.0:
+          self.crowdFaderVolume -= self.crowdCheerFadeOutChunk
+          if self.crowdFaderVolume < 0.0:
+            self.crowdFaderVolume = 0.0
+          self.song.setCrowdVolume(self.crowdFaderVolume)
               
         #battle failing
         if self.battle and self.numOfPlayers>1:
