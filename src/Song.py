@@ -3062,6 +3062,8 @@ class MidiPartsReader(midi.MidiOutStream):
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("MidiPartsReader class init (song.py)...")
+
+    self.logSections = Config.get("game", "log_sections")
     
   def sequence_name(self, text):
 
@@ -3073,38 +3075,42 @@ class MidiPartsReader(midi.MidiOutStream):
       if not parts[GUITAR_PART] in self.parts:
         part = parts[GUITAR_PART]
         self.parts.append(part)
-      if self.logSections == 1:
-        tempText2 = "GUITAR_PART"
+        if self.logSections == 1:
+          tempText2 = "GUITAR_PART"
+          Log.debug(tempText + tempText2)
 
     if text == "PART RHYTHM":
       if not parts[RHYTHM_PART] in self.parts:
         part = parts[RHYTHM_PART]
         self.parts.append(part)        
-      if self.logSections == 1:
-        tempText2 = "RHYTHM_PART"
+        if self.logSections == 1:
+          tempText2 = "RHYTHM_PART"
+          Log.debug(tempText + tempText2)
      
     if text == "PART BASS":
       if not parts[BASS_PART] in self.parts:
         part = parts[BASS_PART]
         self.parts.append(part)
-      if self.logSections == 1:
-        tempText2 = "BASS_PART"
+        if self.logSections == 1:
+          tempText2 = "BASS_PART"
+          Log.debug(tempText + tempText2)
 
     if text == "PART GUITAR COOP":
       if not parts[LEAD_PART] in self.parts:
         part = parts[LEAD_PART]
         self.parts.append(part)
-      if self.logSections == 1:
-        tempText2 = "LEAD_PART"
+        if self.logSections == 1:
+          tempText2 = "LEAD_PART"
+          Log.debug(tempText + tempText2)
 
     #myfingershurt: drums, rock band rip compatible :)
     if text == "PART DRUM" or text == "PART DRUMS":
       if not parts[DRUM_PART] in self.parts:
         part = parts[DRUM_PART]
         self.parts.append(part)
-      if self.logSections == 1:
-        tempText2 = "DRUM_PART"
-
+        if self.logSections == 1:
+          tempText2 = "DRUM_PART"
+          Log.debug(tempText + tempText2)
 
 def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playbackOnly = False, notesOnly = False, part = [parts[GUITAR_PART]], practiceMode = False):
 
