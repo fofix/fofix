@@ -1878,7 +1878,7 @@ class SongChooser(Layer, KeyListener):
               c1,c2,c3 = self.song_name_selected_color
               glColor3f(c1,c2,c3)
   
-              careerResetText = _("")
+              careerResetText = ""
               wrapText(font, (x, pos[1] + 3 * font.getHeight() * 0.0016), careerResetText, visibility = f, scale = 0.0016)
   
           #MFH CD list

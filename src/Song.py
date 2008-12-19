@@ -162,6 +162,26 @@ class SongInfo(object):
 
     self.logSections = Config.get("game", "log_sections")
 
+    self.logUneditedMidis = Config.get("log",   "log_unedited_midis")
+
+    self.useUneditedMidis = Config.get("debug",   "use_unedited_midis")
+    if self.useUneditedMidis == 1:    #auto
+      #if os.path.exists(os.path.join(os.path.dirname(self.fileName), "notes-unedited.mid"))
+      if os.path.isfile(os.path.join(os.path.dirname(self.fileName), "notes-unedited.mid")):
+        notefile = "notes-unedited.mid"
+        if self.logUneditedMidis == 1:
+          Log.debug("notes-unedited.mid found, using instead of notes.mid! - " + self.name)
+      else:
+        notefile = "notes.mid"
+        if self.logUneditedMidis == 1:
+          Log.debug("notes-unedited.mid not found, using notes.mid - " + self.name)
+    else:
+      notefile = "notes.mid"
+      if self.logUneditedMidis == 1:
+        Log.debug("notes-unedited.mid not found, using notes.mid - " + self.name)
+    self.noteFileName = os.path.join(os.path.dirname(self.fileName), notefile)
+    
+
     # Read highscores and verify their hashes.
     # There ain't no security like security throught obscurity :)
     self.highScores = {}
@@ -428,7 +448,9 @@ class SongInfo(object):
 
     # See which difficulties are available
     try:
-      noteFileName = os.path.join(os.path.dirname(self.fileName), "notes.mid")
+
+      noteFileName = self.noteFileName
+      
       Log.debug("Retrieving difficulties from: " + noteFileName)
       info = MidiInfoReaderNoSections()
       midiIn = midi.MidiInFile(info, noteFileName)
@@ -448,7 +470,7 @@ class SongInfo(object):
 
     # See which parts are available
     try:
-      noteFileName = os.path.join(os.path.dirname(self.fileName), "notes.mid")
+      noteFileName = self.noteFileName
       Log.debug("Retrieving parts from: " + noteFileName)
       info = MidiPartsReader()
 
@@ -692,7 +714,7 @@ class SongInfo(object):
       return self._sections
     # See which sections are available
     try:
-      noteFileName = os.path.join(os.path.dirname(self.fileName), "notes.mid")
+      noteFileName = self.noteFileName
       Log.debug("Retrieving sections from: " + noteFileName)
       info = MidiInfoReader()
       midiIn = midi.MidiInFile(info, noteFileName)
@@ -827,6 +849,9 @@ class LibraryInfo(object):
         continue
       if os.path.isfile(os.path.join(libraryRoot, name, "notes.mid")):
         self.songCount += 1
+      elif os.path.isfile(os.path.join(libraryRoot, name, "notes-unedited.mid")):
+        self.songCount += 1
+
 
   def _set(self, attr, value):
     if not self.info.has_section("library"):
@@ -3091,7 +3116,28 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
   songFile   = engine.resource.fileName(library, name, "song.ogg")
   rhythmFile = engine.resource.fileName(library, name, "rhythm.ogg")
   crowdFile  = engine.resource.fileName(library, name, "crowd.ogg")
-  noteFile   = engine.resource.fileName(library, name, "notes.mid", writable = True)
+
+  logUneditedMidis = engine.config.get("log",   "log_unedited_midis")
+
+  useUneditedMidis = engine.config.get("debug",   "use_unedited_midis")
+  if useUneditedMidis == 1:    #auto
+    noteFile   = engine.resource.fileName(library, name, "notes-unedited.mid", writable = True)
+    #if os.path.exists(os.path.join(os.path.dirname(self.fileName), "notes-unedited.mid"))
+    if os.path.isfile(noteFile):
+      if logUneditedMidis == 1:
+        Log.debug("notes-unedited.mid found, using instead of notes.mid! - " + name)
+    else:
+      noteFile   = engine.resource.fileName(library, name, "notes.mid", writable = True)
+      if logUneditedMidis == 1:
+        Log.debug("notes-unedited.mid not found, using notes.mid - " + name)
+  else:
+    noteFile   = engine.resource.fileName(library, name, "notes.mid", writable = True)
+    if logUneditedMidis == 1:
+      Log.debug("notes-unedited.mid not found, using notes.mid - " + name)
+
+
+  #noteFile   = engine.resource.fileName(library, name, "notes.mid", writable = True)
+  
   infoFile   = engine.resource.fileName(library, name, "song.ini", writable = True)
   scriptFile = engine.resource.fileName(library, name, "script.txt")
   previewFile = engine.resource.fileName(library, name, "preview.ogg")
@@ -3242,6 +3288,8 @@ def getAvailableLibraries(engine, library = DEFAULT_LIBRARY):
         continue
       if os.path.isfile(os.path.join(libraryRoot, "notes.mid")):
         continue
+      if os.path.isfile(os.path.join(libraryRoot, "notes-unedited.mid")):
+        continue
 
       libName = library + os.path.join(libraryRoot.replace(songRoot, ""))
       
@@ -3286,7 +3334,8 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
     if (os.path.exists(songRoot) == False):
       return []
     for name in os.listdir(songRoot):
-      if not os.path.isfile(os.path.join(songRoot, name, "notes.mid")):
+      #if not os.path.isfile(os.path.join(songRoot, name, "notes.mid")):
+      if ( not os.path.isfile(os.path.join(songRoot, name, "notes.mid")) ) and ( not os.path.isfile(os.path.join(songRoot, name, "notes-unedited.mid")) ):
         continue
       if not os.path.isfile(os.path.join(songRoot, name, "song.ini")) or name.startswith("."):
        #if not os.path.isfile(os.path.join(songRoot, name, "song.ini")):

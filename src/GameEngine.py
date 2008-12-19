@@ -191,6 +191,11 @@ Config.define("game",   "font_rendering_mode",          int, 0,    text = _("Fon
 Config.define("game",   "incoming_neck_mode",          int, 2,    text = _("Inc. Neck Mode"), options = {0: _("Off"), 1: _("Start Only"), 2: _("Start & End")})
 
 
+
+#MFH - debug settings
+Config.define("debug",   "use_unedited_midis",          int, 1,    text = _("notes-unedited.mid"), options = {0: _("Off"), 1: _("Auto")})
+
+
 #MFH - log settings
 Config.define("game",   "log_ini_reads",          int, 0,    text = _("Log INI Reads"), options = {0: _("No"), 1: _("Yes")})
 Config.define("game",   "log_class_inits",          int, 0,    text = _("Log Class Inits"), options = {0: _("No"), 1: _("Yes")})
@@ -199,6 +204,7 @@ Config.define("game",   "log_sections",          int, 0,    text = _("Log MIDI S
 Config.define("game",   "log_undefined_gets",          int, 0,    text = _("Log Undefined GETs"), options = {0: _("No"), 1: _("Yes")})
 Config.define("game",   "log_marker_notes",          int, 0,    text = _("Log Marker Notes"), options = {0: _("No"), 1: _("Yes")})
 Config.define("game",   "log_starpower_misses",          int, 0,    text = _("Log SP Misses"), options = {0: _("No"), 1: _("Yes")})
+Config.define("log",   "log_unedited_midis",          int, 0,    text = _("Log Unedited MIDIs"), options = {0: _("No"), 1: _("Yes")})
 
 
 #racer
