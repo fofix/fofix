@@ -2486,6 +2486,8 @@ class MidiReader(midi.MidiOutStream):
       Log.debug("MidiReader class init (song.py)...")
 
     self.logMarkerNotes = Config.get("game", "log_marker_notes")
+
+    self.logSections = Config.get("game", "log_sections")
     
     self.readTextAndLyricEvents = Config.get("game","rock_band_events")
     self.guitarSoloIndex = 0
@@ -2577,23 +2579,39 @@ class MidiReader(midi.MidiOutStream):
   def sequence_name(self, text):
     #if self.get_current_track() == 0:
     self.partnumber = None
-      
+
+    tempText = "Found sequence_name in MIDI: " + text + ", recognized as "
+    tempText2 = ""
+    
     if (text == "PART GUITAR" or text == "T1 GEMS" or text == "Click" or text == "MIDI out") and parts[GUITAR_PART] in self.song.parts:
       self.partnumber = parts[GUITAR_PART]
+      if self.logSections == 1:
+        tempText2 = "GUITAR_PART"
     elif text == "PART RHYTHM" and parts[RHYTHM_PART] in self.song.parts:
       self.partnumber = parts[RHYTHM_PART]
+      if self.logSections == 1:
+        tempText2 = "RHYTHM_PART"
     elif text == "PART BASS" and parts[BASS_PART] in self.song.parts:
       self.partnumber = parts[BASS_PART]
+      if self.logSections == 1:
+        tempText2 = "BASS_PART"
     elif text == "PART GUITAR COOP" and parts[LEAD_PART] in self.song.parts:
       self.partnumber = parts[LEAD_PART]
-    elif text == "PART DRUM" and parts[DRUM_PART] in self.song.parts:
+      if self.logSections == 1:
+        tempText2 = "LEAD_PART"
+    elif (text == "PART DRUM" or text == "PART DRUMS") and parts[DRUM_PART] in self.song.parts:
       self.partnumber = parts[DRUM_PART]
+      if self.logSections == 1:
+        tempText2 = "DRUM_PART"
     #for rock band unaltered rip compatibility
-    elif text == "PART DRUMS" and parts[DRUM_PART] in self.song.parts:
-      self.partnumber = parts[DRUM_PART]
-    elif self.get_current_track() <= 1 and parts [GUITAR_PART] in self.song.parts:
-      #Oh dear, the track wasn't recognised, lets just assume it was the guitar part
-      self.partnumber = parts[GUITAR_PART]
+    #-elif text == "PART DRUMS" and parts[DRUM_PART] in self.song.parts:
+      #-self.partnumber = parts[DRUM_PART]
+    #-elif self.get_current_track() <= 1 and parts [GUITAR_PART] in self.song.parts:
+      #-#Oh dear, the track wasn't recognised, lets just assume it was the guitar part
+      #-self.partnumber = parts[GUITAR_PART]
+
+    if self.logSections == 1:
+      Log.debug(tempText + tempText2)
 
     self.guitarSoloIndex = 0
     self.guitarSoloActive = False
@@ -3022,31 +3040,45 @@ class MidiPartsReader(midi.MidiOutStream):
     
   def sequence_name(self, text):
 
+    if self.logSections == 1:
+      tempText = "MIDI sequence_name found: " + text + ", recognized and added to list as "
+      tempText2 = ""
+
     if text == "PART GUITAR" or text == "T1 GEMS" or text == "Click":
       if not parts[GUITAR_PART] in self.parts:
         part = parts[GUITAR_PART]
         self.parts.append(part)
+      if self.logSections == 1:
+        tempText2 = "GUITAR_PART"
 
     if text == "PART RHYTHM":
       if not parts[RHYTHM_PART] in self.parts:
         part = parts[RHYTHM_PART]
         self.parts.append(part)        
+      if self.logSections == 1:
+        tempText2 = "RHYTHM_PART"
      
     if text == "PART BASS":
       if not parts[BASS_PART] in self.parts:
         part = parts[BASS_PART]
         self.parts.append(part)
+      if self.logSections == 1:
+        tempText2 = "BASS_PART"
 
     if text == "PART GUITAR COOP":
       if not parts[LEAD_PART] in self.parts:
         part = parts[LEAD_PART]
         self.parts.append(part)
+      if self.logSections == 1:
+        tempText2 = "LEAD_PART"
 
     #myfingershurt: drums, rock band rip compatible :)
     if text == "PART DRUM" or text == "PART DRUMS":
       if not parts[DRUM_PART] in self.parts:
         part = parts[DRUM_PART]
         self.parts.append(part)
+      if self.logSections == 1:
+        tempText2 = "DRUM_PART"
 
 
 def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playbackOnly = False, notesOnly = False, part = [parts[GUITAR_PART]], practiceMode = False):
