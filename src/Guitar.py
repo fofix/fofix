@@ -219,6 +219,12 @@ class Guitar:
     self.spcount2 = 0
     self.bgcount = 0
     
+    #akedrou
+    self.coOpFailed = False
+    self.coOpRestart = False
+    self.coOpRescueTime = 0.0
+    self.oNeckovr = None #I don't think this was my doing...
+    
     #MFH- fixing neck speed
     if self.nstype < 3:   #not constant mode: 
       self.speed = self.engine.config.get("coffee", "neckSpeed")*0.01
@@ -1557,7 +1563,17 @@ class Guitar:
       #  if time == q:
       #    event.finalStar = True
       #    enable = False
-      
+      if self.coOpFailed:
+        if self.coOpRestart:
+          if time - self.coOpRescueTime < (self.currentPeriod * self.beatsPerBoard * 2):
+            continue
+          elif self.coOpRescueTime + (self.currentPeriod * self.beatsPerBoard * 2) < pos:
+            self.coOpFailed = False
+            self.coOpRestart = False
+            Log.debug("Turning off coOpFailed. Rescue successful.")
+        else:
+          continue #can't break. Tempo.
+        
       c = self.fretColors[event.number]
 
       x  = (self.strings / 2 - event.number) * w
@@ -1730,7 +1746,18 @@ class Guitar:
       #  if time == q:
       #    event.finalStar = True
       #    enable = False
-      
+
+      if self.coOpFailed:
+        if self.coOpRestart:
+          if time - self.coOpRescueTime < (self.currentPeriod * self.beatsPerBoard * 2):
+            continue
+          elif self.coOpRescueTime + (self.currentPeriod * self.beatsPerBoard * 2) < pos:
+            self.coOpFailed = False
+            self.coOpRestart = False
+            Log.debug("Turning off coOpFailed. Rescue successful.")
+        else:
+          continue
+
       c = self.fretColors[event.number]
 
       x  = (self.strings / 2 - event.number) * w
@@ -2645,7 +2672,7 @@ class Guitar:
       self.renderTracks(visibility)
       self.renderBars(visibility, song, pos)
     
-
+    
     if self.fretsUnderNotes:  #MFH
       if self.twoDnote == True:
         self.renderTails(visibility, song, pos, killswitch)
@@ -3186,6 +3213,13 @@ class Guitar:
       pickLength = min(pickLength, note.length)
     return pickLength
 
+
+  def coOpRescue(self, pos):
+    self.coOpRestart = True #initializes Restart Timer
+    self.coOpRescueTime  = pos
+    self.starPower  = 0
+    Log.debug("Rescued at " + str(pos))
+  
   def run(self, ticks, pos, controls):
     self.time += ticks
     

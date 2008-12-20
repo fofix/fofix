@@ -222,6 +222,12 @@ class Drum:
     self.failcount2 = False
     self.spcount = 0
     self.spcount2 = 0
+    
+    #akedrou
+    self.coOpFailed = False
+    self.coOpRestart = False
+    self.coOpRescueTime = 0.0
+    self.oNeckovr = None #I don't think this was my doing...
 
 
     #MFH- fixing neck speed
@@ -1305,6 +1311,17 @@ class Drum:
 
       if (event.noteBpm == 0.0):
         event.noteBpm = self.tempoBpm
+      
+      if self.coOpFailed:
+        if self.coOpRestart:
+          if time - self.coOpRescueTime < (self.currentPeriod * self.beatsPerBoard * 2):
+            continue
+          elif self.coOpRescueTime + (self.currentPeriod * self.beatsPerBoard * 2) < pos:
+            self.coOpFailed = False
+            self.coOpRestart = False
+            Log.debug("Turning off coOpFailed. Rescue successful.")
+        else:
+          continue #can't break. Tempo.
 
       if event.number != 0:   #skip all regular notes
         continue
@@ -1448,6 +1465,17 @@ class Drum:
 
       if event.number == 0: #MFH - skip all open notes
         continue
+      
+      if self.coOpFailed:
+        if self.coOpRestart:
+          if time - self.coOpRescueTime < (self.currentPeriod * self.beatsPerBoard * 2):
+            continue
+          elif self.coOpRescueTime + (self.currentPeriod * self.beatsPerBoard * 2) < pos:
+            self.coOpFailed = False
+            self.coOpRestart = False
+            Log.debug("Turning off coOpFailed. Rescue successful.")
+        else:
+          continue #can't break. Tempo.
 
       c = self.fretColors[event.number]
       
@@ -2358,7 +2386,7 @@ class Drum:
       self.renderNotes(visibility, song, pos)
       self.renderFrets(visibility, song, controls)
 
-    self.renderFlames(visibility, song, pos, controls)
+      self.renderFlames(visibility, song, pos, controls)
     
     if self.leftyMode:
       glScalef(-1, 1, 1)
@@ -2566,6 +2594,12 @@ class Drum:
     #  pickLength = min(pickLength, note.length)
     #return pickLength
 
+  def coOpRescue(self, pos):
+    self.coOpRestart = True #initializes Restart Timer
+    self.coOpRescueTime  = pos
+    self.starPower  = 0
+    Log.debug("Rescued at " + str(pos))
+  
   def run(self, ticks, pos, controls):
     self.time += ticks
     #myfingershurt: must not decrease SP if paused.

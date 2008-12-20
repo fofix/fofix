@@ -324,7 +324,23 @@ class Data(object):
       self.starDeActivateSoundFound = False
       Log.warn(themename + "\sounds\stardeactivate.ogg not found -- sound disabled.")
     
+    if self.fileExists(os.path.join("themes",themename,"sounds","rescue.ogg")):
+      self.loadSoundEffect(self, "rescueSound", os.path.join("themes",themename,"sounds","rescue.ogg"))
+    elif self.fileExists(os.path.join("themes",themename,"sounds","staractivate.ogg")):
+      self.loadSoundEffect(self, "rescueSound", os.path.join("themes",themename,"sounds","staractivate.ogg"))
+      Log.warn(themename + "\sounds\rescue.ogg not found -- using staractivate.ogg instead.")
+    else:
+      self.loadSoundEffect(self, "rescueSound", os.path.join("themes",themename,"sounds","starpower.ogg"))
+      Log.warn(themename + "\sounds\rescue.ogg not found -- using starpower.ogg instead.")
     
+    if self.fileExists(os.path.join("themes",themename,"sounds","coopfail.ogg")):
+      self.loadSoundEffect(self, "coOpFailSound",os.path.join("themes",themename,"sounds","coopfail.ogg"))
+    elif self.fileExists(os.path.join("themes",themename,"sounds","stardeactivate.ogg")):
+      self.loadSoundEffect(self, "coOpFailSound",os.path.join("themes",themename,"sounds","stardeactivate.ogg"))
+      Log.warn(themename + "\sounds\coopfail.ogg not found -- using stardeactivate.ogg instead")
+    else:
+      self.loadSoundEffect(self, "coOpFailSound",os.path.join("themes",themename,"sounds","out.ogg"))
+      Log.warn(themename + "\sounds\coopfail.ogg not found -- using out.ogg instead")
 
 
 
@@ -365,6 +381,8 @@ class Data(object):
     self.rockSound.setVolume(volume)
     self.starDeActivateSound.setVolume(volume)
     self.starActivateSound.setVolume(volume)
+    self.rescueSound.setVolume(volume)
+    self.coOpFailSound.setVolume(volume)
     self.crowdSound.setVolume(volume)
     self.starReadySound.setVolume(volume)
     self.clapSound.setVolume(volume)

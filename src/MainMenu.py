@@ -218,13 +218,6 @@ class MainMenu(BackgroundLayer):
       (_("Tutorials"), self.showTutorial),
       (_("Practice"), lambda: self.newLocalGame(mode1p = 1)),
     ]
-
-    multPlayerMenu = [
-      (_("Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),
-      (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
-      (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
-      (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
-    ]
     
     settingsMenu = Settings.SettingsMenu(self.engine)
 
@@ -248,6 +241,13 @@ class MainMenu(BackgroundLayer):
 
 
     if self.theme == 0 or self.theme == 1:    #GH themes = 6 main menu selections
+    
+      multPlayerMenu = [
+        (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),
+        (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
+        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
+        (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
+      ]
 
       mainMenu = [
         (_(strCareer), lambda:   self.newLocalGame(mode1p = 2)),
@@ -264,6 +264,14 @@ class MainMenu(BackgroundLayer):
       soloMenu = [
         (_("Solo Tour"), lambda: self.newLocalGame(mode1p = 2)),
         (_("Quickplay"), lambda: self.newLocalGame()),
+      ]
+
+      multPlayerMenu = [
+        (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),
+        (_("RB Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 4)),
+        (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
+        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
+        (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
       ]
 
       mainMenu = [
