@@ -399,10 +399,15 @@ class GameEngine(Engine):
     stereo       = self.config.get("audio", "stereo")
     bufferSize   = self.config.get("audio", "buffersize")
     
-    self.audio.pre_open(frequency = frequency, bits = bits, stereo = stereo, bufferSize = bufferSize)
-    self.audio.open(frequency = frequency, bits = bits, stereo = stereo, bufferSize = bufferSize)
+    self.frequency = frequency    #MFH - store this for later reference!
+    self.bits = bits
+    self.stereo = stereo
+    self.bufferSize = bufferSize
     
-    pygame.init()
+    #self.audio.pre_open(frequency = frequency, bits = bits, stereo = stereo, bufferSize = bufferSize)
+    #self.audio.open(frequency = frequency, bits = bits, stereo = stereo, bufferSize = bufferSize)
+    #pygame.init()
+    self.setSpeedDivisor(1)   #MFH - handles initialization at full speed    
     
     Log.debug("Initializing video.")
     #myfingershurt: ensuring windowed mode starts up in center of the screen instead of cascading positions:
@@ -449,6 +454,10 @@ class GameEngine(Engine):
 
     self.data = Data(self.resource, self.svg)
     themename = self.data.themeLabel
+
+
+    #self.setSpeedDivisor(2)    #MFH - this is just a hack - try if you'd like, doesn't work right yet...
+
 
     ##MFH: Animated stage folder selection option
     #<themename>\Stages still contains the backgrounds for when stage rotation is off, and practice.png
@@ -582,6 +591,20 @@ class GameEngine(Engine):
 
 #Fablaculp: End of Performance Autoset
     Log.debug("Ready.")
+
+
+  def setSpeedDivisor(self, divisor):     #MFH - allows for slowing down streaming audio tracks
+    #MFH - test to see if re-initializing the mixer here at 22050 Hz after loading the sounds at 44100 Hz results in half speed playback
+    #try:
+    #  self.audio.close()
+    #except:
+    #  pass
+      
+    self.audio.pre_open(frequency = self.frequency/divisor, bits = self.bits, stereo = self.stereo, bufferSize = self.bufferSize)
+    self.audio.open(frequency = self.frequency/divisor, bits = self.bits, stereo = self.stereo, bufferSize = self.bufferSize)
+    self.audioSpeedDivisor = divisor
+    pygame.init()
+
 
   # evilynux - This stops the crowd cheers if they're still playing (issue 317).
   def quit(self):

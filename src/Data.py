@@ -338,9 +338,12 @@ class Data(object):
     elif self.fileExists(os.path.join("themes",themename,"sounds","stardeactivate.ogg")):
       self.loadSoundEffect(self, "coOpFailSound",os.path.join("themes",themename,"sounds","stardeactivate.ogg"))
       Log.warn(themename + "\sounds\coopfail.ogg not found -- using stardeactivate.ogg instead")
-    else:
+    elif self.fileExists(os.path.join("themes",themename,"sounds","out.ogg")):  #MFH - not all themes have out.ogg!
       self.loadSoundEffect(self, "coOpFailSound",os.path.join("themes",themename,"sounds","out.ogg"))
       Log.warn(themename + "\sounds\coopfail.ogg not found -- using out.ogg instead")
+    else:
+      self.loadSoundEffect(self, "coOpFailSound",os.path.join("themes",themename,"sounds","back1.ogg"))
+      Log.warn(themename + "\sounds\coopfail.ogg not found -- using back1.ogg instead")
 
 
 
@@ -356,6 +359,7 @@ class Data(object):
     #elif self.theme == 2:
     #  #self.loadSoundEffect(self, "acceptSound",  os.path.join("themes",themename,"sounds","action.ogg"))
     #  self.loadSoundEffect(self, "cancelSounds",  os.path.join("themes",themename,"sounds","out.ogg"))
+
   
   def SetAllScrewUpSoundFxObjectVolumes(self, volume):   #MFH - single function to go through all screwup sound objects and set object volume to the given volume
     for s in self.screwUpsounds:

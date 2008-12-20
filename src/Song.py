@@ -2348,6 +2348,10 @@ class Song(object):
       pos = 0.0
     else:
       pos = self.music.getPosition()
+
+      if self.engine.audioSpeedDivisor > 1:   #MFH - to correct for slowdown's positioning
+        pos /= self.engine.audioSpeedDivisor    
+        
     if pos < 0.0:
       pos = 0.0
     return pos + self.start - self.delay

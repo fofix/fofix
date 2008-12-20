@@ -305,11 +305,14 @@ class StreamingSound(Sound, Task):
   def __new__(cls, engine, channel, fileName):
     frequency, format, stereo = pygame.mixer.get_init()
     if fileName.lower().endswith(".ogg"):
-      if frequency == 44100 and format == -16 and stereo:
-        return StreamingOggSound(engine, channel, fileName)
-      else:
-        Log.warn("Audio settings must match stereo 16 bits at 44100 Hz in order to stream OGG files.")
-    return super(StreamingSound, cls).__new__(cls, engine, channel, fileName)
+      
+      return StreamingOggSound(engine, channel, fileName)   #MFH - forced allow of non-matching sample rates
+
+#-      if frequency == 44100 and format == -16 and stereo:
+#-        return StreamingOggSound(engine, channel, fileName)
+#-      else:
+#-        Log.warn("Audio settings must match stereo 16 bits at 44100 Hz in order to stream OGG files.")
+#-    return super(StreamingSound, cls).__new__(cls, engine, channel, fileName)
 
   def play(self):
     self.channel.play(self)
