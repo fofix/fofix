@@ -2386,7 +2386,7 @@ class Drum:
       self.renderNotes(visibility, song, pos)
       self.renderFrets(visibility, song, controls)
 
-      self.renderFlames(visibility, song, pos, controls)
+    self.renderFlames(visibility, song, pos, controls)
     
     if self.leftyMode:
       glScalef(-1, 1, 1)
