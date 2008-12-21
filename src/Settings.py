@@ -514,6 +514,8 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "game", "sort_direction", autoApply = True),
       ConfigChoice(engine.config, "game",  "sort_order", autoApply = True),
       ConfigChoice(engine.config, "coffee", "song_display_mode", autoApply = True),
+      ConfigChoice(engine.config, "game", "song_listing_mode", autoApply = True),
+      #(_("Select List All Folder >"), self.listAllFolderSelect), #- Not Working Yet - Qstick
       ConfigChoice(engine.config, "game", "songcovertype", autoApply = True),
       ConfigChoice(engine.config, "game", "songlistrotation", autoApply = True),
       ConfigChoice(engine.config, "audio", "disable_preview", autoApply = True),  #myfingershurt
@@ -521,7 +523,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "game", "songlist_difficulty", autoApply = True), #evilynux
       ConfigChoice(engine.config, "game", "songlist_extra_stats", autoApply = True), #evilynux
       ConfigChoice(engine.config, "game", "HSMovement", autoApply = True), #racer
-      ConfigChoice(engine.config, "game", "quickplay_career_tiers", autoApply = True),  #myfingershurt
+      ConfigChoice(engine.config, "game", "quickplay_tiers", autoApply = True),  #myfingershurt
     ]
     listSettingsMenu = Menu.Menu(engine, listSettings)
 
@@ -627,6 +629,15 @@ class SettingsMenu(Menu.Menu):
       self.engine.restart()
 
 
+  #def listAllFolderSelect(self):
+  #  Log.debug("settings.baseLibrarySelect function call...")
+  #  newPath = Dialogs.chooseFile(self.engine, masks = ["*/*"], prompt = _("Choose a New List All directory."), dirSelect = True)
+  #  if newPath != None:
+  #    Config.set("game", "listall_folder", os.path.dirname(newPath))
+  #    Log.debug(newPath)
+  #    Log.debug(os.path.dirname(newPath))
+  #    self.engine.resource.refreshBaseLib()   #myfingershurt - to let user continue with new songpath without restart
+      
   def baseLibrarySelect(self):
     Log.debug("settings.baseLibrarySelect function call...")
     newPath = Dialogs.chooseFile(self.engine, masks = ["*/songs"], prompt = _("Choose a new songs directory."), dirSelect = True)

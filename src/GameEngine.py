@@ -137,6 +137,7 @@ Config.define("game",   "ignore_open_strums",          bool, True,  text = _("Ig
 Config.define("performance",   "static_strings",          bool, True,  text = _("Static strings"), options = {False: _("No"), True: _("Yes")})
 Config.define("game",   "whammy_saves_starpower",          bool, False,  text = _("Whammy saves SP"), options = {False: _("No"), True: _("Yes")})
 Config.define("game",   "hopo_indicator",          bool, False,  text = _("HOPO Indicator"), options = {False: _("Off"), True: _("On")})
+Config.define("game",   "quickplay_tiers",          int, 1,  text = _("Quickplay Tiers"), options = {0: _("Off"), 1: _("Normal"), 2: _("Sorting")})
 Config.define("game",   "quickplay_career_tiers",          bool, True,  text = _("Quickplay Tiers"), options = {False: _("Off"), True: _("On")})
 Config.define("performance",   "star_score_updates",          int, 1,  text = _("Star Updates"), options = {0: _("On Hit"), 1: _("Score Change")})
 
@@ -228,6 +229,7 @@ Config.define("coffee", "songfilepath",       bool, True,     text = _("Library 
 Config.define("coffee", "noterotate",       bool, False,     text = _("Rotate 3D Notes"),             options = {True: _("1.1"), False: _("1.2")})
 Config.define("coffee", "phrases",       bool, True,     text = _("Phrases"),             options = {True: _("On"), False: _("Off")})
 Config.define("coffee", "song_display_mode",       int, 1,     text = _("Song List Display"),             options = {0: _("CDs"), 1: _("List"), 2: _("List/CD"), 3: _("Auto"), 4: _("RB2")})
+Config.define("game", "song_listing_mode",        int, 0,     text = _("Song Listing Mode"),            options = {0: _("Normal"), 1: _("List All")})
 Config.define("game", "songcovertype",        bool, True,     text = _("Song Cover Type"),      options = {True: _("Cd Labels"), False: _("Album Covers")})
 Config.define("game", "songlistrotation",     bool, True,     text = _("Rotating Cds"),           options = {True: _("On"), False: _("Off")})
 Config.define("game", "tut",       bool, False,     text = _("tut"),             options = {True: _("yes"), False: _("no")})
@@ -237,7 +239,7 @@ Config.define("video", "counting",       bool, False,     text = _("Song Countdo
 Config.define("game",   "hit_window",          int, 1,    text = _("Note Hit-window"), options = {0: _("1. Widest"), 1: _("2. Wide"), 2: _("3. Standard"), 3: _("4. Tight"), 4: _("5. Tightest")})#racer blazingamer
 Config.define("game",   "disable_vbpm",        bool,  False,  text = _("Disable Variable BPM"),  options = {False: _("No"), True: _("Yes")})
 Config.define("game",   "sort_direction",      int, 0,    text = _("Sort Direction"), options = {0: _("Ascending"), 1: _("Descending")})
-Config.define("game",   "sort_order",          int,   0,      text = _("Sort Order"), options = {0: _("Title"), 1: _("Artist"), 2: _("Times played"), 3: _("Album"), 4: _("Genre"), 5: _("Year")})
+Config.define("game",   "sort_order",          int,   0,      text = _("Sort Order"), options = {0: _("Title"), 1: _("Artist"), 2: _("Times played"), 3: _("Album"), 4: _("Genre"), 5: _("Year"), 6: _("Band Difficulty")})
 Config.define("fretboard",   "point_of_view",                 int,   5,      text = _("Point Of View"), options = {0: _("FoF"), 1: _("GH3"), 2: _("Rock Band"), 3: _("GH2"), 4: _("Rock Rev"), 5: _("Theme")}) #Racer, Blazingamer
 Config.define("game",   "party_time",          int,   30,     text = _("Party Mode Timer"), options = dict([(n, n) for n in range(1, 99)]))
 Config.define("performance",   "disable_libcount",    bool,  True,  text = _("Disable Library Count"),    options = {False: _("No"), True: _("Yes")})
@@ -406,6 +408,7 @@ class GameEngine(Engine):
     self.stereo = stereo
     self.bufferSize = bufferSize
     
+
     #self.audio.pre_open(frequency = frequency, bits = bits, stereo = stereo, bufferSize = bufferSize)
     #self.audio.open(frequency = frequency, bits = bits, stereo = stereo, bufferSize = bufferSize)
     #pygame.init()
@@ -459,6 +462,7 @@ class GameEngine(Engine):
 
 
     #self.setSpeedDivisor(2)    #MFH - this is just a hack - try if you'd like, doesn't work right yet...
+
 
 
     ##MFH: Animated stage folder selection option
@@ -593,7 +597,7 @@ class GameEngine(Engine):
 
 #Fablaculp: End of Performance Autoset
     Log.debug("Ready.")
-
+    
 
   def setSpeedDivisor(self, divisor):     #MFH - allows for slowing down streaming audio tracks
     #MFH - test to see if re-initializing the mixer here at 22050 Hz after loading the sounds at 44100 Hz results in half speed playback
@@ -607,7 +611,6 @@ class GameEngine(Engine):
     self.audioSpeedDivisor = divisor
     pygame.init()
     Log.debug("Initializing pygame.mixer & audio system at " + str(self.frequency/divisor) + " Hz." )
-
 
   # evilynux - This stops the crowd cheers if they're still playing (issue 317).
   def quit(self):

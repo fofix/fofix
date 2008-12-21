@@ -148,6 +148,11 @@ Config.define("theme", "song_listcd_score_x",       float, None)
 Config.define("theme", "song_listcd_score_y",       float, None)
 Config.define("theme", "song_listcd_list_x",       float, None)
 
+Config.define("theme", "song_rb2_name_color",       str, "#FFFFFF")
+Config.define("theme", "song_rb2_name_selected_color",       str, "#FFBF00")
+Config.define("theme", "song_rb2_diff_color",       str, "#FFBF00")
+Config.define("theme", "song_rb2_artist_color",       str, "#4080FF")
+
 Config.define("theme", "pause_bkg_x",       float, None)
 Config.define("theme", "pause_bkg_y",       float, None)
 Config.define("theme", "pause_text_x",       float, None)
@@ -304,6 +309,11 @@ artist_text_colorVar = None
 artist_selected_colorVar = None
 library_text_colorVar = None
 library_selected_colorVar = None
+
+song_rb2_name_colorVar = None
+song_rb2_name_selected_colorVar = None
+song_rb2_diff_colorVar = None
+song_rb2_artist_colorVar = None
 
 pause_text_colorVar = None
 pause_selected_colorVar = None
@@ -542,6 +552,9 @@ def setupSonglist(config):
   global fail_text_colorVar, fail_selected_colorVar
   global songSelectSubmenuX, songSelectSubmenuY
   global songSelectSubmenuOffsetLines, songSelectSubmenuOffsetSpaces
+  
+  global song_rb2_name_colorVar, song_rb2_name_selected_colorVar, song_rb2_diff_colorVar, song_rb2_artist_colorVar
+
 
   songSelectSubmenuOffsetLines = config.get("theme", "song_select_submenu_offset_lines")
   songSelectSubmenuOffsetSpaces = config.get("theme", "song_select_submenu_offset_spaces")
@@ -573,6 +586,12 @@ def setupSonglist(config):
   pause_selected_colorVar = config.get("theme", "pause_selected_color")
   fail_text_colorVar = config.get("theme", "fail_text_color")
   fail_selected_colorVar = config.get("theme", "fail_selected_color")
+  
+  song_rb2_name_colorVar = config.get("theme", "song_rb2_name_color")
+  song_rb2_name_selected_colorVar = config.get("theme", "song_rb2_name_selected_color")
+  song_rb2_diff_colorVar = config.get("theme", "song_rb2_diff_color")
+  song_rb2_artist_colorVar = config.get("theme", "song_rb2_artist_color")
+
   
 def setupPauseNOpt(config):
   global pause_bkg_xPos, pause_bkg_yPos, pause_text_xPos, pause_text_yPos

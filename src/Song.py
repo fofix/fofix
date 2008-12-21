@@ -135,9 +135,10 @@ defaultSections = ["Start","1/4","1/2","3/4"]
 
 
 class SongInfo(object):
-  def __init__(self, infoFileName):
+  def __init__(self, infoFileName, songLibrary = DEFAULT_LIBRARY):
     self.songName      = os.path.basename(os.path.dirname(infoFileName))
     self.fileName      = infoFileName
+    self.libraryNam       = songLibrary[songLibrary.find(DEFAULT_LIBRARY):]
     self.info          = Config.MyConfigParser()
     self._difficulties = None
     self._parts        = None
@@ -1092,6 +1093,52 @@ class TitleInfo(object):
   color         = property(getColor, setColor)
 
 
+class SortTitleInfo(object):
+  def __init__(self, nameToDisplay):
+    
+    self.nameToDisplay = nameToDisplay
+
+    self.logClassInits = Config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("TitleInfo class init (song.py)...")
+
+    self.artist = None    #MFH - prevents search errors
+
+  def _set(self, attr, value):
+    if type(value) == unicode:
+      value = value.encode(Config.encoding)
+    else:
+      value = str(value)
+    self.info.set(self.section, attr, value)
+    
+  def _get(self, attr, type = None, default = ""):
+    try:
+      v = self.info.get(self.section, attr)
+    except:
+      v = default
+    if v is not None and type:
+      v = type(v)
+    return v
+
+  def getName(self):
+    return self.nameToDisplay
+
+  def setName(self, value):
+    self._set("name", value)
+
+  def getColor(self):
+    c = self._get("color")
+    if c:
+      return Theme.hexToColor(c)
+  
+  def setColor(self, color):
+    self._set("color", Theme.colorToHex(color))
+        
+  def getUnlockID(self):
+    return self.nameToDisplay
+        
+  name          = property(getName, setName)
+  color         = property(getColor, setColor)
 
 
 class Event:
@@ -2362,6 +2409,7 @@ class Song(object):
     else:
       pos = self.music.getPosition()
 
+
       if self.engine.audioSpeedDivisor > 1:   #MFH - to correct for slowdown's positioning
         pos /= self.engine.audioSpeedDivisor    
         
@@ -3247,7 +3295,7 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
 def loadSongInfo(engine, name, library = DEFAULT_LIBRARY):
   #RF-mod (not needed?)
   infoFile   = engine.resource.fileName(library, name, "song.ini", writable = True)
-  return SongInfo(infoFile)
+  return SongInfo(infoFile, library)
   
 def createSong(engine, name, guitarTrackName, backgroundTrackName, rhythmTrackName = None, library = DEFAULT_LIBRARY):
   #RF-mod (not needed?)
@@ -3365,7 +3413,7 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
         continue
       if not name in names:
         names.append(name)
-  songs = [SongInfo(engine.resource.fileName(library, name, "song.ini", writable = True)) for name in names]
+  songs = [SongInfo(engine.resource.fileName(library, name, "song.ini", writable = True), library) for name in names]
   if not includeTutorials:
     songs = [song for song in songs if not song.tutorial]
   songs = [song for song in songs if not song.artist == '=FOLDER=']
@@ -3392,6 +3440,8 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
       songs.sort(lambda a, b: cmp(a.genre.lower(), b.genre.lower()))
     elif order == 5:
       songs.sort(lambda a, b: cmp(a.year.lower(), b.year.lower()))
+    elif order == 6:
+      songs.sort(lambda a, b: cmp(a.diffSong, b.diffSong))
   else:
     if order == 1:
       songs.sort(lambda a, b: cmp(b.artist.lower(), a.artist.lower()))
@@ -3405,10 +3455,72 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
       songs.sort(lambda a, b: cmp(b.genre.lower(), a.genre.lower()))
     elif order == 5:
       songs.sort(lambda a, b: cmp(b.year.lower(), a.year.lower()))
+    elif order == 6:
+      songs.sort(lambda a, b: cmp(b.diffSong, a.diffSong))
   return songs
 
 
   #coolguy567's unlock system
+def getSortingTitles(engine, songList = []):
+  sortOrder = engine.config.get("game","sort_order")
+  titles = []
+  sortTitles = []
+  
+  #if sortOrder == 0:
+  #  for i in range (65,90):
+  #    sortTitles.append(SortTitleInfo(chr(i)))
+  #elif sortOrder == 1:
+  for songItem in songList:
+    if sortOrder == 1:
+      try:
+        titles.index(songItem.artist.lower())
+      except ValueError:
+        titles.append(songItem.artist.lower())
+        sortTitles.append(SortTitleInfo(songItem.artist))
+    elif sortOrder == 0:
+      try:
+        titles.index(songItem.name[0].upper())
+      except ValueError:
+        titles.append(songItem.name[0].upper())
+        sortTitles.append(SortTitleInfo(songItem.name[0].upper()))
+    elif sortOrder == 2:
+      try:
+        titles.index(songItem.count)
+      except ValueError:
+        titles.append(songItem.count)
+        if songItem.count == "":
+          sortTitles.append(SortTitleInfo("0"))
+          titles.append("0")
+        else:
+          sortTitles.append(SortTitleInfo(songItem.count))
+    elif sortOrder == 3:
+      try:
+        titles.index(songItem.album.lower())
+      except ValueError:
+        titles.append(songItem.album.lower())
+        sortTitles.append(SortTitleInfo(songItem.album))
+    elif sortOrder == 4:
+      try:
+        titles.index(songItem.genre.lower())
+      except ValueError:
+        titles.append(songItem.genre.lower())
+        sortTitles.append(SortTitleInfo(songItem.genre))
+    elif sortOrder == 5:
+      try:
+        titles.index(songItem.year)
+      except ValueError:
+        titles.append(songItem.year)
+        sortTitles.append(SortTitleInfo(songItem.year))
+    elif sortOrder == 6:
+      try:
+        titles.index(songItem.diffSong)
+      except ValueError:
+        titles.append(songItem.diffSong)
+        sortTitles.append(SortTitleInfo(str(songItem.diffSong)))
+        
+  return sortTitles
+  
+  
 def getAvailableTitles(engine, library = DEFAULT_LIBRARY):
   if library == None:
     return []
@@ -3435,6 +3547,7 @@ def getAvailableTitles(engine, library = DEFAULT_LIBRARY):
   return titles
   
 def getAvailableSongsAndTitles(engine, library = DEFAULT_LIBRARY, includeTutorials = False):
+  listingMode = engine.config.get("game","song_listing_mode")
   if library == None:
     return []
 
@@ -3450,13 +3563,36 @@ def getAvailableSongsAndTitles(engine, library = DEFAULT_LIBRARY, includeTutoria
     else:
       quickPlayMode = False
       
-  quickPlayCareerTiers = engine.config.get("game", "quickplay_career_tiers")
-  if quickPlayMode and not quickPlayCareerTiers:
-    titles = []
-  else:
-    titles = getAvailableTitles(engine, library)
+  quickPlayCareerTiers = engine.config.get("game", "quickplay_tiers")
 
-  items = getAvailableSongs(engine, library, includeTutorials) + titles
+
+  if listingMode == 0 or careerMode:
+    items = getAvailableSongs(engine, library, includeTutorials)
+    if quickPlayMode and quickPlayCareerTiers == 0:
+      titles = []
+    else:
+      if quickPlayCareerTiers == 1:
+        titles = getAvailableTitles(engine, library)
+      else:
+        titles = getSortingTitles(engine, items)
+    items = items + titles
+  else:
+    items = []
+    titles = []
+    rootDir = engine.resource.fileName(DEFAULT_LIBRARY)
+    for root, subFolders, files in os.walk(rootDir):
+      for folder in subFolders:
+        libName = os.path.join(root,folder)
+        items = items + getAvailableSongs(engine, libName, includeTutorials)
+        if quickPlayMode and quickPlayCareerTiers == 0:
+          titles = []
+        else:
+          if quickPlayCareerTiers == 1:
+            titles = titles + getAvailableTitles(engine, libName)
+    if quickPlayCareerTiers == 2:
+      titles = getSortingTitles(engine, items)
+    items = items + titles
+        
   items.sort(lambda a, b: compareSongsAndTitles(engine, a, b))
   
   
@@ -3486,6 +3622,8 @@ def compareSongsAndTitles(engine, a, b):
 
   #MFH - Career Mode determination:
   gameMode1p = engine.config.get("player0","mode_1p")
+  order = engine.config.get("game", "sort_order")
+  direction = engine.config.get("game", "sort_direction")
   if gameMode1p == 2:
     careerMode = True
     quickPlayMode = False
@@ -3496,10 +3634,8 @@ def compareSongsAndTitles(engine, a, b):
     else:
       quickPlayMode = False
       
-  quickPlayCareerTiers = engine.config.get("game", "quickplay_career_tiers")
-  if quickPlayMode and not quickPlayCareerTiers:
-    order = engine.config.get("game", "sort_order")
-    direction = engine.config.get("game", "sort_direction")
+  quickPlayCareerTiers = engine.config.get("game", "quickplay_tiers")
+  if quickPlayMode and quickPlayCareerTiers == 0:
     if direction == 0:
       if order == 1:
         return cmp(a.artist.lower(), b.artist.lower())
@@ -3513,6 +3649,8 @@ def compareSongsAndTitles(engine, a, b):
         return cmp(a.genre.lower(), b.genre.lower())
       elif order == 5:
         return cmp(a.year.lower(), b.year.lower())
+      elif order == 6:
+        return cmp(a.diffSong, b.diffSong)
     else:
       if order == 1:
         return cmp(b.artist.lower(), a.artist.lower())
@@ -3526,6 +3664,65 @@ def compareSongsAndTitles(engine, a, b):
         return cmp(b.genre.lower(), a.genre.lower())
       elif order == 5:
         return cmp(b.year.lower(), a.year.lower())
+      elif order == 6:
+        return cmp(b.diffSong, a.diffSong)
+  elif quickPlayMode and quickPlayCareerTiers == 2:
+    Aval = ""
+    Bval = ""
+    if isinstance(a, SongInfo):
+      if order == 0:
+        Aval = a.name[0].lower()
+      if order == 1:
+        Aval = a.artist.lower()
+      if order == 2:
+        Aval = a.count
+        if Aval == "":
+          Aval = "0"
+      if order == 3:
+        Aval = a.album.lower()
+      if order == 4:
+        Aval = a.genre.lower()
+      if order == 5:
+        Aval = a.year.lower()
+      if order == 6:
+        Aval = a.diffSong
+    elif isinstance(a, SortTitleInfo):
+      Aval = a.name.lower()
+      
+    if isinstance(b, SongInfo):
+      if order == 0:
+        Bval = b.name[0].lower()
+      if order == 1:
+        Bval = b.artist.lower()
+      if order == 2:
+        Bval = b.count
+        if Bval == "":
+          Bval = "0"
+      if order == 3:
+        Bval = b.album.lower()
+      if order == 4:
+        Bval = b.genre.lower()
+      if order == 5:
+        Bval = b.year.lower()
+      if order == 6:
+        Bval = b.diffSong
+    elif isinstance(b, SortTitleInfo):
+      Bval = b.name.lower()
+
+    if Aval != Bval:    #MFH - if returned unlock IDs are different, sort by unlock ID (this roughly sorts the tiers and shoves "bonus" songs to the top)
+      if direction == 0:
+        return cmp(Aval, Bval)
+      else:
+        return cmp(Bval, Aval)
+    elif isinstance(a, SortTitleInfo) and isinstance(b, SortTitleInfo):
+      return 0
+    elif isinstance(a, SortTitleInfo) and isinstance(b, SongInfo):
+      return -1
+    elif isinstance(a, SongInfo) and isinstance(b, SortTitleInfo):
+      return 1
+    else:
+      return cmp(a.name, b.name)
+
   else:
     #Log.debug("Unlock IDs found, a=" + str(a.getUnlockID()) + ", b=" + str(b.getUnlockID()) )
     if a.getUnlockID() == "" and b.getUnlockID() != "":   #MFH - a is a bonus song, b is involved in career mode
@@ -3539,8 +3736,6 @@ def compareSongsAndTitles(engine, a, b):
       elif isinstance(a, BlankSpaceInfo) and isinstance(b, SongInfo):   #a is a blank space, b is a bonus song (end of career marker) - this is fine.
         return -1
       else: #both bonus songs, apply sort order:
-        order = engine.config.get("game", "sort_order")
-        direction = engine.config.get("game", "sort_direction")
         if direction == 0:
           if order == 1:
             return cmp(a.artist.lower(), b.artist.lower())
@@ -3554,6 +3749,8 @@ def compareSongsAndTitles(engine, a, b):
             return cmp(a.genre.lower(), b.genre.lower())
           elif order == 5:
             return cmp(a.year.lower(), b.year.lower())
+          elif order == 6:
+            return cmp(a.diffSong, b.diffSong)
         else:
           if order == 1:
             return cmp(b.artist.lower(), a.artist.lower())
@@ -3567,6 +3764,8 @@ def compareSongsAndTitles(engine, a, b):
             return cmp(b.genre.lower(), a.genre.lower())
           elif order == 5:
             return cmp(b.year.lower(), a.year.lower())
+          elif order == 6:
+            return cmp(b.diffSong, a.diffSong)
     #original career sorting logic:
     elif a.getUnlockID() != b.getUnlockID():    #MFH - if returned unlock IDs are different, sort by unlock ID (this roughly sorts the tiers and shoves "bonus" songs to the top)
       return cmp(a.getUnlockID(), b.getUnlockID())
@@ -3576,5 +3775,6 @@ def compareSongsAndTitles(engine, a, b):
       return -1
     elif isinstance(a, SongInfo) and isinstance(b, TitleInfo):
       return 1
+    
     else:   #MFH - This is where career songs are sorted within tiers -- we want to force sorting by "name" only:
       return cmp(a.name.lower(), b.name.lower())    #MFH - force sort by name for career songs
