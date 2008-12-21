@@ -3571,7 +3571,7 @@ def getAvailableSongsAndTitles(engine, library = DEFAULT_LIBRARY, includeTutoria
     if quickPlayMode and quickPlayCareerTiers == 0:
       titles = []
     else:
-      if quickPlayCareerTiers == 1:
+      if quickPlayCareerTiers == 1 or careerMode:
         titles = getAvailableTitles(engine, library)
       else:
         titles = getSortingTitles(engine, items)
