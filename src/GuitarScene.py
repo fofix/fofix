@@ -4726,7 +4726,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           if self.jurgenText == 0:
             bigFont.render(text,  (0.25-(w/2), 0.34), scale = 0.0005)#MFH - y was 0.4
           else:
-            bigFont.render(text,  (0.35-(w/2), 0.05), scale = 0.0005)
+            bigFont.render(text,  (0.40-(w/2), 0.11), scale = 0.0004)
         elif self.jurg1 == True and self.splayers == 1:
           if self.autoPlay:
             if self.jurg == 0 or self.jurg == 2:
@@ -4755,7 +4755,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           if self.jurgenText == 0:
             bigFont.render(text,  (0.75-(w/2), 0.34), scale = 0.0005)#MFH - y was 0.4
           else:
-            bigFont.render(text,  (0.65-(w/2), 0.05), scale = 0.0005)
+            bigFont.render(text,  (0.64-(w/2), 0.11), scale = 0.0004)
         #End Jurgen Code
   
         for i,player in enumerate(self.playerList): #QQstarS: This part has big fix. I add the code into it,So he can shown corect
