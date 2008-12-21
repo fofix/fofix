@@ -55,6 +55,10 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||song_listcd_score_y||Controls location of 'SCORE' Y position in listcd songlist view. Use a decimal # between 0 - 1||
 ||song_listcd_list_x||Controls location of 'LIST' X position in listcd songlist view. Use a decimal # between 0 - 1||
 ||songlistcd_score_color||Controls the scores color for both CD and List/CD mode||
+||song_rb2_name_color||Controls color of the Rock Band name's color. Use a Hex color code||
+||song_rb2_name_selected_color||Controls color of the Rock Band 2 name selected color. Use a Hex color code||
+||song_rb2_diff_color||Controls color of the Rock Band 2 Difficulty level name's color. Use a Hex color code||
+||song_rb2_artist_color||Controls color of the Rock Band 2 artist name's color. Use a Hex color code||
 
 
 
