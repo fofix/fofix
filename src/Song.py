@@ -3688,7 +3688,7 @@ def compareSongsAndTitles(engine, a, b):
         Aval = a.diffSong
     elif isinstance(a, SortTitleInfo):
       if order == 2 or order == 6:
-          Aval = int(a.name)
+        Aval = int(a.name+str(0))
       else:
         Aval = a.name.lower()
       
@@ -3711,7 +3711,7 @@ def compareSongsAndTitles(engine, a, b):
         Bval = b.diffSong
     elif isinstance(b, SortTitleInfo):
       if order == 2 or order == 6:
-        Bval = int(b.name)
+        Bval = int(b.name+str(0))
       else:
         Bval = b.name.lower()
 
