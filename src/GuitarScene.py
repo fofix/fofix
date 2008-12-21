@@ -425,8 +425,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.logMarkerNotes = self.engine.config.get("game", "log_marker_notes")
     self.logStarpowerMisses = self.engine.config.get("game", "log_starpower_misses")
     self.soloFrameMode = self.engine.config.get("game", "solo_frame")
-    self.fontMode = self.engine.config.get("game", "font_rendering_mode")   #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
 
+    #MFH - TODO - switch to midi lyric mode option
+    #self.midiLyricMode = self.engine.config.get("game", "midi_lyric_mode")
+    self.midiLyricMode = 0
+
+    self.fontMode = self.engine.config.get("game", "font_rendering_mode")   #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
     self.laminaScreen = None
     if self.fontMode == 1:    #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
       #self.laminaScreen = lamina.LaminaScreenSurface(0.985)
@@ -434,7 +438,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.laminaScreen.clear()
       self.laminaScreen.refresh()
       self.laminaScreen.refreshPosition()
-
     elif self.fontMode == 2:    #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
       #self.laminaScreen = lamina.LaminaScreenSurface(0.985)
       self.laminaFrame_soloAcc = lamina.LaminaPanelSurface(quadDims=(-1,-1,500,500))
@@ -716,6 +719,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           Log.debug("GuitarScene: Guitar Solo until end of song found - (guitarSoloStartTime - Ntime = guitarSoloNoteCount): " + str(guitarSoloStartTime) + "-" + str(Ntime) + " = " + str(guitarSoloNoteCount) )
     
 
+    #MFH - TODO - handle gathering / sizing / grouping line-by-line lyric display here, during initialization:
+#    if self.midiLyricsEnabled == 1 and self.midiLyricMode == 1:   #line-by-line lyrics mode is selected and enabled:
+      #MFH - now we need an appropriate array to store and organize the lyric events into "lines"
+      #  -- the first attempt at coding this will probably butcher the measures and timing horribly, but at least
+      #     those of us with older systems can read the lyrics without them jumping all over the place.
+#      for time, event in self.song.eventTracks[Song.TK_LYRICS].getAllEvents():
+        
 
     self.initializeStarScoringThresholds()    #MFH
       
@@ -3483,7 +3493,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
       noScore = False
 
-      if self.engine.audioSpeedDivisor == 1:  #MFH - only allow score uploads and unlocking when songs are played at full speed.
+      if not self.engine.audioSpeedDivisor == 1:  #MFH - only allow score uploads and unlocking when songs are played at full speed.
         noScore = True
         self.changeSong()
 
@@ -4626,38 +4636,42 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
         #handle the lyrics track
         if self.midiLyricsEnabled > 0:
-          for time, event in self.song.eventTracks[Song.TK_LYRICS].getEvents(minPos, maxPos):
-            if self.theme == 2:
-              #xOffset = 0.5
-              yOffset = 0.715
-              txtSize = 0.00170
-            else:
-              #gh3 or other standard mod
-              #xOffset = 0.5
-              yOffset = 0.69
-              txtSize = 0.00175
-            #is event happening now?
-            #this version will turn events green right as they hit the line and then grey shortly afterwards
-            #instead of an equal margin on both sides.
-            xOffset = (time - pos) / eventWindow
-            EventHappeningNow = False
-            if xOffset < (0.0 - lyricSlop * 2.0):   #past
-              glColor3f(0.5, 0.5, 0.5)    #I'm hoping this is some sort of grey.
-            elif xOffset < lyricSlop / 16.0:   #present
-              EventHappeningNow = True
-              glColor3f(0, 1, 0.6)    #green-blue
-            else:   #future, and all other text
-              glColor3f(1, 1, 1)    #cracker white
-            xOffset += 0.250
-  
-            yOffset = 0.0696    #last change +0.0000
-            txtSize = 0.00160
-            text = event.text
-            if text.find("+") >= 0:   #shift the pitch adjustment markers down one line
-              text = text.replace("+","~")
-              txtSize = 0.00145   #last change +.0000
-              yOffset -= 0.0115   #last change -.0005
-            lyricFont.render(text, (xOffset, yOffset),(1, 0, 0),txtSize)
+          if self.midiLyricMode == 0:   #scrolling lyrics mode:
+            for time, event in self.song.eventTracks[Song.TK_LYRICS].getEvents(minPos, maxPos):
+              if self.theme == 2:
+                #xOffset = 0.5
+                yOffset = 0.715
+                txtSize = 0.00170
+              else:
+                #gh3 or other standard mod
+                #xOffset = 0.5
+                yOffset = 0.69
+                txtSize = 0.00175
+              #is event happening now?
+              #this version will turn events green right as they hit the line and then grey shortly afterwards
+              #instead of an equal margin on both sides.
+              xOffset = (time - pos) / eventWindow
+              EventHappeningNow = False
+              if xOffset < (0.0 - lyricSlop * 2.0):   #past
+                glColor3f(0.5, 0.5, 0.5)    #I'm hoping this is some sort of grey.
+              elif xOffset < lyricSlop / 16.0:   #present
+                EventHappeningNow = True
+                glColor3f(0, 1, 0.6)    #green-blue
+              else:   #future, and all other text
+                glColor3f(1, 1, 1)    #cracker white
+              xOffset += 0.250
+    
+              yOffset = 0.0696    #last change +0.0000
+              txtSize = 0.00160
+              text = event.text
+              if text.find("+") >= 0:   #shift the pitch adjustment markers down one line
+                text = text.replace("+","~")
+                txtSize = 0.00145   #last change +.0000
+                yOffset -= 0.0115   #last change -.0005
+              lyricFont.render(text, (xOffset, yOffset),(1, 0, 0),txtSize)
+
+          #MFH - TODO - handle line-by-line lyric display and coloring here:
+          #elif self.midiLyricMode == 1:   #line-by-line lyrics mode:
   
   
   

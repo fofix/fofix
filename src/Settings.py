@@ -252,6 +252,7 @@ class SettingsMenu(Menu.Menu):
     FoFiXAdvancedSettings = [
        ConfigChoice(engine.config, "game", "party_time", autoApply = True),
        ConfigChoice(engine.config, "game", "rb_midi_lyrics", autoApply = True),      #myfingershurt
+       ConfigChoice(engine.config, "game", "midi_lyric_mode", autoApply = True),      #myfingershurt
        ConfigChoice(engine.config, "game", "rb_midi_sections", autoApply = True),      #myfingershurt
        ConfigChoice(engine.config, "game", "bass_groove_enable", autoApply = True),#myfingershurt
        ConfigChoice(engine.config, "game", "lphrases", autoApply = True),#blazingamer
