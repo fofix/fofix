@@ -2313,8 +2313,8 @@ class Guitar:
             glPopMatrix()
             glDisable(GL_TEXTURE_2D)
           else:
-            HCount2 = 13
-            HCountAni = True
+            self.HCount2 = 13
+            self.HCountAni = True
             if event.flameCount < flameLimitHalf:
               glColor3f(flameColor[0], flameColor[1], flameColor[2])
               if self.starPowerActive:

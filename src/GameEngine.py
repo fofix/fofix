@@ -195,6 +195,8 @@ Config.define("game",   "incoming_neck_mode",          int, 2,    text = _("Inc.
 #MFH - debug settings
 Config.define("debug",   "use_unedited_midis",          int, 1,    text = _("notes-unedited.mid"), options = {0: _("Off"), 1: _("Auto")})
 
+Config.define("audio",  "slow_down_divisor",  int,    1,  text = _("Slowdown"),   options = {1: _("Full Speed"), 2: _("1/2 Speed"), 4: _("1/4 Speed")})  #MFH
+
 
 #MFH - log settings
 Config.define("game",   "log_ini_reads",          int, 0,    text = _("Log INI Reads"), options = {0: _("No"), 1: _("Yes")})
@@ -604,6 +606,7 @@ class GameEngine(Engine):
     self.audio.open(frequency = self.frequency/divisor, bits = self.bits, stereo = self.stereo, bufferSize = self.bufferSize)
     self.audioSpeedDivisor = divisor
     pygame.init()
+    Log.debug("Initializing pygame.mixer & audio system at " + str(self.frequency/divisor) + " Hz." )
 
 
   # evilynux - This stops the crowd cheers if they're still playing (issue 317).

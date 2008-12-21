@@ -2127,7 +2127,13 @@ class Song(object):
 
     self.music = None
 
+
+    
+    self.slowDownDivisor = self.engine.config.get("audio", "slow_down_divisor")
+    self.engine.setSpeedDivisor(self.slowDownDivisor)    #MFH 
+
     # load the tracks
+    #if self.engine.audioSpeedDivisor == 1:    #MFH - only use the music track   
     if songTrackName:
       self.music       = Audio.Music(songTrackName)
 
@@ -2228,7 +2234,12 @@ class Song(object):
     self.start = start
     self.music.play(0, start / 1000.0)
     #RF-mod No longer needed?
-    self.music.setVolume(1.0)
+    
+    if self.engine.audioSpeedDivisor == 1:  #MFH - shut this track up if slowing audio down!    
+      self.music.setVolume(1.0)
+    else:
+      self.music.setVolume(0.0)   
+    
     if self.guitarTrack:
       assert start == 0.0
       self.guitarTrack.play()
@@ -2315,8 +2326,10 @@ class Song(object):
         track.reset()
 
       
-    self.music.stop()
-    self.music.rewind()
+    if self.music:  #MFH
+      self.music.stop()
+      self.music.rewind()
+
     if self.guitarTrack:
       self.guitarTrack.stop()
     if self.rhythmTrack:

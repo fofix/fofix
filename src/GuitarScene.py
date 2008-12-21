@@ -3483,6 +3483,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
       noScore = False
 
+      if self.engine.audioSpeedDivisor == 1:  #MFH - only allow score uploads and unlocking when songs are played at full speed.
+        noScore = True
+        self.changeSong()
+
       if self.playerList[0].score == 0:
         if self.numOfPlayers == 1:
           noScore = True
