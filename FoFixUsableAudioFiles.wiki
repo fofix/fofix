@@ -1,0 +1,21 @@
+#summary List of Usable Audio Files it's Functions.
+
+=Usable Audio Files for FoFiX=
+This is a WIP list of the audio file's usable in FoFiX (IE-Clap's, Boo's,Ending Sounds,etc.) It will be in alphabetical order for now to simplify finding things. 
+
+||*Filename*||*Function* _(#)Denote's Multiple file numbers can be used._||
+||accept(#).ogg||Can use multiple files, used randomly in FoFiX. Used for player SELECT sound.||
+||back(#).ogg||Can use multiple files, used randomly in FoFiX. Used for player BACK sound.||
+||crowdcheers.ogg||Plays crowd cheer in game||
+||guitscw(#).ogg||Can use multiple files, used randomly in FoFiX. Used for player guitar screw up sounds.||
+||failsoung.ogg||This is the sound played when failing a song.||
+||in.ogg||Used by default in place of player SELECT sound is back(#).ogg's aren't found||
+||jurgen(#).ogg||Can use multiple files, used randomly in FoFiX. Used for Jurgen's Sarcasm lines.||
+||menu(name's).ogg||Can use multiple files, used randomly in FoFiX. Used for the theme's main menu background songs.(IE-menuTomSawyer.ogg,menuTheTrees.ogg,or menu1.ogg-menu4.ogg||
+||rocksound.ogg||This is the sound that is played after a song is finished successfully.||
+||starpower.ogg||Used to play the starpower sound in game.||
+||start.ogg||This is the sound played at the beginning of the song in game.||
+
+
+------------------------
+_WIP Wiki Page_
