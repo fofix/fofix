@@ -1308,12 +1308,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if self.theme == 1: #GH3-like theme
       if self.careerMode:
         self.menu = Menu(self.engine, [
-          (_("        RESUME"), self.resumeSong),
-          (_("       RESTART"), self.restartSong),
+          (_("         RESUME"), self.resumeSong), #Worldrave adjusted proper spacing.
+          (_("        RESTART"), self.restartSong),
           (_("        GIVE UP"), self.changeSong),
-          (_("       PRACTICE"), self.practiceSong), #evilynux
-          (_("       OPTIONS"), settingsMenu),
-          (_("           QUIT"), self.quit),
+          (_("      PRACTICE"), self.practiceSong), #evilynux
+          (_("      OPTIONS"), settingsMenu),
+          (_("        QUIT"), self.quit),
         ], fadeScreen = False, onClose = self.resumeGame, font = self.engine.data.pauseFont, pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color, append_submenu_char = False)
       else:
         self.menu = Menu(self.engine, [
