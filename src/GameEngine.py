@@ -365,7 +365,7 @@ class GameEngine(Engine):
     #  Log.debug("GameEngine class init (GameEngine.py)...")
     Log.debug("GameEngine class init (GameEngine.py)...")
     self.mainMenu = None    #placeholder for main menu object - to prevent reinstantiation
-    self.versionString = "FoFiX v3.035 alpha"
+    self.versionString = "FoFiX v3.035 beta 2"
     Log.debug(self.versionString + " starting up...")
     Log.debug("pygame version: " + str(pygame.version.ver) )
     """

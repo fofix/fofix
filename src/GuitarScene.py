@@ -367,6 +367,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
 
     #MFH - constant definitions, ini value retrievals
+    self.lineByLineLyricMaxLineWidth = 0.8
     self.digitalKillswitchStarpowerChunkSize = 0.05
     self.digitalKillswitchActiveStarpowerChunkSize = self.digitalKillswitchStarpowerChunkSize / 3.0
     # evilynux: was 0.10, now much closer to actual GH3
@@ -720,12 +721,45 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
 
     #MFH - TODO - handle gathering / sizing / grouping line-by-line lyric display here, during initialization:
-#    if self.midiLyricsEnabled == 1 and self.midiLyricMode == 1:   #line-by-line lyrics mode is selected and enabled:
+    self.midiLyricLineEvents = []    #MFH - this is a list of sublists of tuples.
+                                # The tuples will contain (time, event)  
+                                # The sublists will contain:
+                                #   references to Lyric text events that will be treated as lines
+                                #    such that the game can still use song position to determine each text event's color 
+    self.midiLyricLines = []        #MFH - this is a list of text strings
+                                    #  it will contain a list of the concactenated midi lines for a simpler lyric display mode
+    self.midiLyricLineIndex = 0
+    if self.midiLyricsEnabled == 1 and self.midiLyricMode == 1:   #line-by-line lyrics mode is selected and enabled:
+      lyricFont = self.engine.data.font        
+      if self.theme == 2:
+        txtSize = 0.00170
+      else:
+        txtSize = 0.00175
       #MFH - now we need an appropriate array to store and organize the lyric events into "lines"
       #  -- the first attempt at coding this will probably butcher the measures and timing horribly, but at least
       #     those of us with older systems can read the lyrics without them jumping all over the place.
-#      for time, event in self.song.eventTracks[Song.TK_LYRICS].getAllEvents():
-        
+      tempLyricLine = ""
+      tempLyricLineEvents = []
+      for time, event in self.song.eventTracks[Song.TK_LYRICS].getAllEvents():
+        lastLyricLineContents = tempLyricLine
+        tempLyricLine = tempLyricLine + " " + event.text
+        if lyricFont.getStringSize(tempLyricLine, scale = txtSize) > self.lineByLineLyricMaxLineWidth: 
+          self.midiLyricLineEvents.append(tempLyricLineEvents)
+          self.midiLyricLines.append(lastLyricLineContents)
+          tempLyricLine = event.text
+          tempLyricLineEvents = []
+        tempLyricLineEvents.append( (time, event) )
+
+      
+      #MFH - test unpacking / decoding the lyrical lines:
+      for midiLyricSubList in self.midiLyricLineEvents:
+        Log.debug("...New MIDI lyric line:")
+        for lyricTuple in midiLyricSubList:
+          time, event = lyricTuple
+          Log.debug("MIDI Line-by-line lyric unpack test - time, event = " + str(time) + ", " + event.text )
+              
+      for midiLyricSimpleLine in self.midiLyricLines:
+        Log.debug("MIDI Line-by-line simple lyric line unpack test: " + midiLyricSimpleLine)
 
     self.initializeStarScoringThresholds()    #MFH
       
@@ -3469,6 +3503,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.engine.data.starActivateSound.play()
           self.guitars[num].starPowerActive = True #QQstarS:Set [0] to [i]
       else:
+        self.engine.data.starActivateSound.play()
         self.guitars[num].starPowerActive = True #QQstarS:Set [0] to [i]
       self.guitars[num].overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
       self.guitars[num].ocount = 0  #MFH - this triggers the oFlash strings & timer
@@ -4678,7 +4713,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
         #finally, handle the unused text events track
         if self.showUnusedTextEvents:
-          for time, event in self.song.eventTracks[Song.TK_LYRICS].getEvents(minPos, maxPos):
+          for time, event in self.song.eventTracks[Song.TK_UNUSED_TEXT].getEvents(minPos, maxPos):
             if self.theme == 2:
               #xOffset = 0.5
               yOffset = 0.715
