@@ -3675,7 +3675,7 @@ def compareSongsAndTitles(engine, a, b):
       if order == 1:
         Aval = a.artist.lower()
       if order == 2:
-        Aval = a.count
+        Aval = int(a.count+str(0))
         if Aval == "":
           Aval = "0"
       if order == 3:
@@ -3687,7 +3687,10 @@ def compareSongsAndTitles(engine, a, b):
       if order == 6:
         Aval = a.diffSong
     elif isinstance(a, SortTitleInfo):
-      Aval = a.name.lower()
+      if order == 2 or order == 6:
+          Aval = int(a.name)
+      else:
+        Aval = a.name.lower()
       
     if isinstance(b, SongInfo):
       if order == 0:
@@ -3695,7 +3698,7 @@ def compareSongsAndTitles(engine, a, b):
       if order == 1:
         Bval = b.artist.lower()
       if order == 2:
-        Bval = b.count
+        Bval = int(b.count+str(0))
         if Bval == "":
           Bval = "0"
       if order == 3:
@@ -3707,7 +3710,10 @@ def compareSongsAndTitles(engine, a, b):
       if order == 6:
         Bval = b.diffSong
     elif isinstance(b, SortTitleInfo):
-      Bval = b.name.lower()
+      if order == 2 or order == 6:
+        Bval = int(b.name)
+      else:
+        Bval = b.name.lower()
 
     if Aval != Bval:    #MFH - if returned unlock IDs are different, sort by unlock ID (this roughly sorts the tiers and shoves "bonus" songs to the top)
       if direction == 0:
