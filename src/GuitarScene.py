@@ -785,6 +785,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.autoPlay = False
 
     
+    self.rockFailUp  = True #akedrou - fading mech
+    self.rockFailViz = 0.0
+    self.failViz = [0.0 for i in self.playerList]
+    
     self.phrases = self.engine.config.get("coffee", "phrases")#blazingamer
     self.starfx = self.engine.config.get("game", "starfx")#blazingamer
     self.rbmfx = self.engine.config.get("game", "rbmfx")#blazingamer
@@ -1015,34 +1019,33 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.engine.loadImgDrawing(self, "counter", os.path.join("themes",themename,"counter.png"))
 
 
-
-      #MFH - TODO - rewrite scorePic code to be more expandable, create a list of scorePic objects so each player can have one without special initializations
-      #kuzux: instrument-dependant score meter for Rock Band theme
-      try:
-        #if self.playerList[0].part.text == "Drums":
-        if self.guitars[0].isDrum:
-          self.engine.loadImgDrawing(self, "scorePic", os.path.join("themes",themename,"score_drums.png"))
-        #elif self.playerList[0].part.text == "Bass Guitar":
-        elif self.guitars[0].isBassGuitar:
-          self.engine.loadImgDrawing(self, "scorePic", os.path.join("themes",themename,"score_bass.png"))
-        else:
-          self.engine.loadImgDrawing(self, "scorePic", os.path.join("themes",themename,"score_guitar.png"))
-      except IOError:
-        self.engine.loadImgDrawing(self, "scorePic", os.path.join("themes",themename,"score.png"))      
-
-      if self.numOfPlayers > 1:
-        #Log.debug("P2 RB Score Icon for: " + self.playerList[1].part.text)
+      self.rockArr  = [None for i in self.playerList]
+      self.scorePic = [None for i in self.playerList]
+      for i,thePlayer in enumerate(self.playerList):
         try:
-          #if self.playerList[1].part.text == "Drums":
-          if self.guitars[1].isDrum:
-            self.engine.loadImgDrawing(self, "scorePicP2", os.path.join("themes",themename,"score_drums.png"))
-          #elif self.playerList[1].part.text == "Bass Guitar":
-          elif self.guitars[1].isBassGuitar:
-            self.engine.loadImgDrawing(self, "scorePicP2", os.path.join("themes",themename,"score_bass.png"))
+          if self.guitars[i].isDrum:
+            self.engine.loadImgDrawing(self, "scorePicLoad", os.path.join("themes",themename,"score_drums.png"))
+          elif self.guitars[i].isBassGuitar:
+            self.engine.loadImgDrawing(self, "scorePicLoad", os.path.join("themes",themename,"score_bass.png"))
           else:
-            self.engine.loadImgDrawing(self, "scorePicP2", os.path.join("themes",themename,"score_guitar.png"))
+            self.engine.loadImgDrawing(self, "scorePicLoad", os.path.join("themes",themename,"score_guitar.png"))
         except IOError:
-          self.engine.loadImgDrawing(self, "scorePicP2", os.path.join("themes",themename,"score.png"))      
+          self.engine.loadImgDrawing(self, "scorePicLoad", os.path.join("themes",themename,"score.png"))
+        self.scorePic[i] = self.scorePicLoad
+        try:
+          if self.guitars[i].isDrum:
+            self.engine.loadImgDrawing(self, "rockArrLoad", os.path.join("themes",themename,"rockarr_drums.png"))
+          elif self.guitars[i].isBassGuitar:
+            self.engine.loadImgDrawing(self, "rockArrLoad", os.path.join("themes",themename,"rockarr_bass.png"))
+          else:
+            self.engine.loadImgDrawing(self, "rockArrLoad", os.path.join("themes",themename,"rockarr_guitar.png"))
+        except IOError:
+          self.engine.loadImgDrawing(self, "rockArrLoad", os.path.join("themes",themename,"rock_arr.png"))
+        self.rockArr[i] = self.rockArrLoad
+      
+      self.scorePicLoad = None
+      self.rockArrLoad = None
+      self.engine.loadImgDrawing(self, "scorePicBand", os.path.join("themes",themename,"score.png"))
 
 
 
@@ -1106,30 +1109,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.engine.loadImgDrawing(self, "coOpFailImg", os.path.join("themes",themename,"youfailed.png"))
          
       #myfingershurt: Rock Band theme gets instrument-dependant rock meter arrows:
-      try:
-        #if self.playerList[0].part.text == "Drums":
-        if self.guitars[0].isDrum:
-          self.engine.loadImgDrawing(self, "arrow", os.path.join("themes",themename,"rockarr_drums.png"))
-        #elif self.playerList[0].part.text == "Bass Guitar":
-        elif self.guitars[0].isBassGuitar:
-          self.engine.loadImgDrawing(self, "arrow", os.path.join("themes",themename,"rockarr_bass.png"))
-        else:
-          self.engine.loadImgDrawing(self, "arrow", os.path.join("themes",themename,"rockarr_guitar.png"))
-      except IOError:
-        self.engine.loadImgDrawing(self, "arrow", os.path.join("themes",themename,"rock_arr.png"))
-        
-      if self.numOfPlayers > 1:
-        try:
-          #if self.playerList[1].part.text == "Drums":
-          if self.guitars[1].isDrum:
-            self.engine.loadImgDrawing(self, "arrowP2", os.path.join("themes",themename,"rockarr_drums.png"))
-          #elif self.playerList[1].part.text == "Bass Guitar":
-          elif self.guitars[1].isBassGuitar:
-            self.engine.loadImgDrawing(self, "arrowP2", os.path.join("themes",themename,"rockarr_bass.png"))
-          else:
-            self.engine.loadImgDrawing(self, "arrowP2", os.path.join("themes",themename,"rockarr_guitar.png"))
-        except IOError:
-          self.engine.loadImgDrawing(self, "arrowP2", os.path.join("themes",themename,"rock_arr.png"))
+
 
 
 
@@ -1503,7 +1483,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
            
   def freeResources(self):
     self.engine.view.setViewport(1,0)
-    self.arrow = None
     self.counter = None
     self.failScreen = None
     self.failMsg = None
@@ -1515,6 +1494,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.song = None
     self.rockOff = None
     if self.rmtype == 0:
+      self.arrow = None
       self.rockmeter = None
       self.basedots = None
       self.dt1 = None
@@ -1535,6 +1515,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.oFill = None
       self.oFull = None
     elif self.rmtype == 1 or self.rmtype == 3:
+      self.arrow = None
       self.rockmeter = None
       self.dots = None
       self.basedots = None
@@ -1550,9 +1531,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.rockBottom = None
       self.rockFull = None
       self.rockFill = None
-      self.scorePic = None
-      self.scorePicP2 = None
-      self.arrowP2 = None
+      self.scorePic = [None for i in self.playerList]
+      self.scorePicBand = None
+      self.rockArr = [None for i in self.playerList]
       self.mult2 = None
     if self.coOpRB:
       self.coOpFailImg = None
@@ -1740,6 +1721,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.deadPlayerList = []
     self.numDeadPlayers  = 0
     self.coOpFailDone = [False for i in self.playerList]
+    self.rockFailUp = True
+    self.rockFailViz  = 0.0
+    self.failViz = [0.0 for i in self.playerList]
     if self.coOpRB:
       self.rock.append(self.rockMax/2)
       self.minusRock.append(0.0)
@@ -2567,8 +2551,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #MFH - new failing detection logic
       if self.failingEnabled:
         #if self.numOfPlayers > 1:
-        #MFH TODO - maintain separate rock status, just combine into single rockmeter (2 arrows) for RB theme
-        # this will also allow separate failing, and saving with starpower
         if self.numOfPlayers > 1 and self.coOp:
           if self.rock[self.coOpPlayerMeter] <= 0:
             self.failed = True
@@ -6010,13 +5992,28 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               else:
                 if self.coOpRB:
                   fillColor = (0,0,0,0)
+                  if currentRock < 0.333:
+                    failUse = True
+                    self.failViz[i] += .03
+                    if self.failViz[i] > 1.0:
+                      self.failViz[i] = 0.0
+                  else:
+                    failUse = False
+                    self.failViz[i] = 0.0
                 else:
                   if currentRock < 0.333:
                     fillColor = (1,0,0,1)
+                    failUse = True
+                    self.failViz[i] += .03
+                    if self.failViz[i] > 1.0:
+                      self.failViz[i] = 0.0
                   elif currentRock < 0.666:
                     fillColor = (1,1,0,1)
+                    failUse = False
+                    self.failViz[i] = 0.0
                   else:
                     fillColor = (0,1,0,1)
+                    failUse = False
                 if self.coOpRB and i == 0:
                   if self.numDeadPlayers > 0:
                     fillColorCoOp = (.67, 0, 0, 1)
@@ -6027,10 +6024,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                       fillColorCoOp = (1,1,0,1)
                     else:
                       fillColorCoOp = (0,1,0,1)
-
-    
-
-                if (self.coOp and i == self.coOpPlayerMeter) or (self.coOpRB and i == 0) or not self.coOp:  #MFH only render for player 1 if co-op mode
+                      
+                if (self.coOp and i == self.coOpPlayerMeter) or (self.coOpRB and i == 0) or (not self.coOp and not self.coOpRB):  #MFH only render for player 1 if co-op mode
                 #if self.numOfPlayers > 1 and self.coOp:
                 #  if i == 0:
                 #    self.rockBottom.transform.reset()
@@ -6069,13 +6064,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     self.rockFill.transform.scale(.5,.5*currentRock)
                     self.rockFill.transform.translate(w*0.07, h*0.3-heightIncrease/2+heightIncrease)
                     self.rockFill.draw(color = fillColor)
-                  if self.coOpRB:
+                  if self.coOpRB and i == 0:
                     self.rockFill.transform.reset()
                     self.rockFill.transform.scale(.5,.5*currentRockCoOp)
                     self.rockFill.transform.translate(w*0.07, h*0.3-heightIncreaseCoOp/2+heightIncreaseCoOp)
                     self.rockFill.draw(color = fillColorCoOp)
               
-                if (self.coOp and i == self.coOpPlayerMeter) or (self.coOpRB and i == 0) or not self.coOp:  #MFH only render for player 1 if co-op mode
+                if (self.coOp and i == self.coOpPlayerMeter) or (self.coOpRB and i == 0) or (not self.coOp and not self.coOpRB):  #MFH only render for player 1 if co-op mode
                 #if self.numOfPlayers > 1 and self.coOp:
                 #  if i == 0:
                 #    self.rockTop.transform.reset()
@@ -6083,22 +6078,27 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 #    self.rockTop.transform.translate(w*0.07, h*0.5)
                 #    self.rockTop.draw()
                 #else:
-                  if self.coOpRB and self.numDeadPlayers > 0 and self.rockFailFound:
-                    self.rockTopFail.transform.reset()
-                    self.rockTopFail.transform.scale(.5,.5)
-                    self.rockTopFail.transform.translate(w*0.07, h*0.5)
-                    self.rockTopFail.draw()
-                  else:
-                    self.rockTop.transform.reset()
-                    self.rockTop.transform.scale(.5,.5)
-                    self.rockTop.transform.translate(w*0.07, h*0.5)
-                    self.rockTop.draw()
+                  self.rockTop.transform.reset()
+                  self.rockTop.transform.scale(.5,.5)
+                  self.rockTop.transform.translate(w*0.07, h*0.5)
+                  self.rockTop.draw()
+                  if self.coOpRB and self.numDeadPlayers > 0:
+                    self.rockFailViz += .03
+                    if self.rockFailViz > 1.0:
+                      self.rockFailViz = 0.0
+                    if not (self.guitars[i].coOpFailed and not self.guitars[i].coOpRestart):
+                      failUse = True
+                      self.failViz[i] = self.rockFailViz
+                    if self.rockFailFound:
+                      self.rockTopFail.transform.reset()
+                      self.rockTopFail.transform.scale(.5,.5)
+                      self.rockTopFail.transform.translate(w*0.07, h*0.5)
+                      self.rockTopFail.draw(color = (1,1,1,self.rockFailViz))
   
-              wfactor = self.arrow.widthf(pixelw = 60.000)
+              wfactor = self.rockArr[i].widthf(pixelw = 60.000)
   
             
               #myfingershurt: separate 2 player instrument icons
-              if i == 0:
                 #if self.numOfPlayers > 1 and self.coOp:
                 #  self.arrow.transform.reset()
                 #  self.arrow.transform.scale(wfactor,-wfactor)
@@ -6106,35 +6106,61 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 #  if self.failingEnabled:  
                 #    self.arrow.draw()
                 #else:
-                if not self.coOp:  #MFH only render for player 1 if co-op mode
-                  self.arrow.transform.reset()
-                  self.arrow.transform.scale(wfactor,-wfactor)
-                  self.arrow.transform.translate(w*.1,h*.3+heightIncrease)
-                  if self.failingEnabled:  
-                    self.arrow.draw()
-                whichScorePic = self.scorePic
-              elif i == 1 and self.coOpRB:
-                self.arrowP2.transform.reset()
-                self.arrowP2.transform.scale(wfactor,-wfactor)
-                if abs(self.rock[1]-self.rock[0]) < 60.0:
+              if failUse:
+                if (self.guitars[i].coOpFailed and not self.guitars[i].coOpRestart) or self.failed:
+                  failUse = True
+                  redBlink = 0.4
+                  self.failViz[i] = 1
+                else:
+                  redBlink = 0.7
+                failColor = (redBlink,0,0,self.failViz[i])
+              
+              if self.coOpRB:
+                if self.numDeadPlayers > 0 and not (self.guitars[i].coOpFailed and not self.guitars[i].coOpRestart) and not self.failed:
+                  failUse = True
+                  failColor = (.7,0,0,self.rockFailViz)
+              
+              if not self.coOp:  #MFH only render for player 1 if co-op mode
+                self.rockArr[i].transform.reset()
+                self.rockArr[i].transform.scale(wfactor,-wfactor)
+                self.rockArr[i].transform.translate(w*.1,h*.3+heightIncrease)
+                if self.failingEnabled:  
+                  if failUse:
+                    self.rockArr[i].draw()
+                    self.rockArr[i].draw(color = failColor)
+                  else:
+                    self.rockArr[i].draw()
+                if not self.coOpRB:
+                  whichScorePic = self.scorePic[i]
+              if i > 0 and self.coOpRB:
+                self.rockArr[i].transform.reset()
+                self.rockArr[i].transform.scale(wfactor,-wfactor)
+                if abs(self.rock[1]-self.rock[0]) < 80.0: # fix for more players...
                   spreadOut = .04
                 else:
                   spreadOut = 0.0
-                self.arrowP2.transform.translate(w*(.1+spreadOut),h*.3+heightIncrease)
+                self.rockArr[i].transform.translate(w*(.1+spreadOut),h*.3+heightIncrease)
                 if self.failingEnabled:  
-                  self.arrowP2.draw()
-                whichScorePic = self.scorePicP2
+                  if failUse:
+                    self.rockArr[i].draw()
+                    self.rockArr[i].draw(color = failColor)
+                  else:
+                    self.rockArr[i].draw()
+                whichScorePic = self.scorePicBand
               
-              elif i == self.coOpPlayerMeter:
+              elif self.coOp and i == self.coOpPlayerMeter:
                 #if self.numOfPlayers > 1 and self.coOp:
                   #self.arrowP2.transform.reset()
                 #else:
-                self.arrowP2.transform.reset()
-                self.arrowP2.transform.scale(wfactor,-wfactor)
-                self.arrowP2.transform.translate(w*.1,h*.3+heightIncrease)
+                self.rockArr[i].transform.reset()
+                self.rockArr[i].transform.scale(wfactor,-wfactor)
+                self.rockArr[i].transform.translate(w*.1,h*.3+heightIncrease)
                 if self.failingEnabled:  
-                  self.arrowP2.draw()
-                whichScorePic = self.scorePicP2
+                  self.rockArr[i].draw()
+                if self.coOp:
+                  whichScorePic = self.scorePicBand
+                else:
+                  whichScorePic = self.scorePic[i]
 
                 
               try:
@@ -6143,7 +6169,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 #myfingershurt: locale.format call adds commas to separate numbers just like Rock Band
 
                 #if (self.coOp and i == 0) or not self.coOp:  #MFH only render for player 0 if co-op mode
-                if (self.coOp and i == self.coOpPlayerMeter) or (self.coOpRB and i == 0) or not self.coOp:  #MFH only render for player 1 if co-op mode
+                if (self.coOp and i == self.coOpPlayerMeter) or (self.coOpRB and i == 0) or (not self.coOp and not self.coOpRB):  #MFH only render for player 1 if co-op mode
   
                   if self.coOp or self.coOpRB:
                     score=self.coOpScore
