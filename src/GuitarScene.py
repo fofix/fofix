@@ -1771,6 +1771,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       guitar.hopoLast = -1
       guitar.guitarSolo = False
       guitar.currentGuitarSoloHitNotes = 0
+      guitar.scoreMultiplier = 1
       
     if self.partyMode == True:
       self.guitars[0].keys = PLAYER1KEYS
