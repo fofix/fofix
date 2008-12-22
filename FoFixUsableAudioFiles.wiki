@@ -1,13 +1,14 @@
 #summary List of Audio Files and their Functions.
 
 =Usable Audio Files for FoFiX=
-This is a list of the audio files usable in FoFiX (ie, claps, boos, ending sounds).
+This is a list of the audio files usable in FoFiX (IE- Claps, Boo's, Ending sounds).
 It is sorted into Menu Sounds, Game SFX, and Instrument SFX. Files are not required unless indicated.
 
   * file(#).ogg represents a sequential number (_file1.ogg_, _file2.ogg_)
   * *file.ogg* represents a sound required for FoFiX to function properly.
   * file(XXX).ogg represents any set of letters or numbers, or none. (_file.ogg_, _file12.ogg_, _fileYourMom.ogg_)
 
+--------------------------------------------------
 ==Menu Sounds==
 || *Filename* || *Function* ||
 || *accept(#).ogg* ||Random sound used for player SELECT - either _accept1.ogg_ OR _action.ogg_/_in.ogg_ required (depending on theme type)||
@@ -20,6 +21,7 @@ It is sorted into Menu Sounds, Game SFX, and Instrument SFX. Files are not requi
 || *select2.ogg* ||Changing a menu selection||
 || *select3.ogg* ||Changing a menu selection||
 
+--------------------------------------------------
 ==Game SFX==
 || *Filename* || *Function* ||
 ||coopfail.ogg||Player fails in RB Co-Op Mode||
@@ -35,6 +37,7 @@ It is sorted into Menu Sounds, Game SFX, and Instrument SFX. Files are not requi
 ||starpowerready.ogg||Star Power/Overdrive is ready||
 || *start.ogg* ||At the beginning of a song (in-game)||
 
+--------------------------------------------------
 ==Instrument SFX==
 || *Filename* || *Function* ||
 ||bassscw(#).ogg||Random sound played when bass misses||
