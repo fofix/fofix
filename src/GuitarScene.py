@@ -1463,7 +1463,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #z=-3
 
     if self.pov == 1:
-      self.camera.target    = (0.0, 1.4, 1.8) #kk69:More like GH3
+      self.camera.target    = (0.0, 3.4, 2.8) #kk69:More like GH3
       self.camera.origin    = (0.0, 2.8*self.boardY, -3.6)
     elif self.pov == 2: #Racer
       self.camera.target    = (0.0, 0.0, 3.7)
@@ -1479,8 +1479,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.camera.target    = (0.0, 1.6, 2.0)
         self.camera.origin    = (0.0, 2.6*self.boardY, -3.6)
       elif self.rmtype == 1:
-        self.camera.target    = (0.0, 1.4, 1.8) #kk69:More like GH3
-        self.camera.origin    = (0.0, 2.8*self.boardY, -3.6)
+        self.camera.target    = (0.0, 0.6, 4.4) #Worldrave - Perfected the proper GH3 POV
+        self.camera.origin    = (0.0, 3.5*self.boardY, -3.8)
       elif self.rmtype == 2:
         self.camera.target    = (0.0, 0.0, 3.7)
         self.camera.origin    = (0.0, 2.9*self.boardY, -2.9)
