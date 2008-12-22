@@ -5989,6 +5989,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   self.rockFull.transform.translate(w*0.07,h*0.5)
                   self.rockFull.transform.scale(.5,.5)
                   self.rockFull.draw()
+                  failUse = False
               else:
                 if self.coOpRB:
                   fillColor = (0,0,0,0)
@@ -6106,6 +6107,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 #  if self.failingEnabled:  
                 #    self.arrow.draw()
                 #else:
+              
+              if self.coOpRB:
+                if self.numDeadPlayers > 0 and not (self.guitars[i].coOpFailed and not self.guitars[i].coOpRestart) and not self.failed:
+                  failUse = True
+                  self.failViz[i] = self.rockFailViz
+
               if failUse:
                 if (self.guitars[i].coOpFailed and not self.guitars[i].coOpRestart) or self.failed:
                   failUse = True
@@ -6114,13 +6121,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 else:
                   redBlink = 0.7
                 failColor = (redBlink,0,0,self.failViz[i])
-              
-              if self.coOpRB:
-                if self.numDeadPlayers > 0 and not (self.guitars[i].coOpFailed and not self.guitars[i].coOpRestart) and not self.failed:
-                  failUse = True
-                  failColor = (.7,0,0,self.rockFailViz)
-              
-              if not self.coOp:  #MFH only render for player 1 if co-op mode
+                
+              if not self.coOp and not (self.coOpRB and i==0):  #MFH only render for player 1 if co-op mode
                 self.rockArr[i].transform.reset()
                 self.rockArr[i].transform.scale(wfactor,-wfactor)
                 self.rockArr[i].transform.translate(w*.1,h*.3+heightIncrease)
@@ -6132,7 +6134,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     self.rockArr[i].draw()
                 if not self.coOpRB:
                   whichScorePic = self.scorePic[i]
-              if i > 0 and self.coOpRB:
+              elif i == 0 and self.coOpRB:
                 self.rockArr[i].transform.reset()
                 self.rockArr[i].transform.scale(wfactor,-wfactor)
                 if abs(self.rock[1]-self.rock[0]) < 80.0: # fix for more players...
@@ -7000,9 +7002,58 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
           if self.song:
     
-  
-            if self.dispSoloReview[i] and not self.pause and not self.failed:
+            if not self.coOpRB:
               self.engine.view.setViewportHalf(self.numOfPlayers,i)
+
+            #MFH: Realtime hit accuracy display:
+            
+            #if ((self.inGameStats == 2 or (self.inGameStats == 1 and self.theme == 2)) and (not self.pause and not self.failed)) and ( (not self.pause and not self.failed) or self.hopoDebugDisp == 1 ):
+            if ((self.inGameStats == 2 or (self.inGameStats == 1 and self.theme == 2) or self.hopoDebugDisp == 1 ) and (not self.pause and not self.failed) and not (self.coOpRB and not i==0)):
+              #will not show on pause screen, unless HOPO debug is on (for debugging)
+              if self.coOpRB:
+                sNotesHit   = self.coOpNotesHit
+                sTotalNotes = self.coOpTotalStreakNotes
+                sHitAcc = self.hitAccuracy[self.coOpPlayerMeter]
+                sAvMult = self.avMult[self.coOpPlayerMeter]
+              else:
+                sNotesHit   = self.playerList[i].notesHit
+                sTotalNotes = self.playerList[i].totalStreakNotes
+                sHitAcc = self.hitAccuracy[i]
+                sAvMult = self.avMult[i]
+              trimmedTotalNoteAcc = self.decimal(str(sHitAcc)).quantize(self.decPlaceOffset)
+              #text = str(self.playerList[i].notesHit) + "/" + str(self.playerList[i].totalStreakNotes) + ": " + str(trimmedTotalNoteAcc) + "%"
+              text = "%(notesHit)s/%(totalNotes)s: %(hitAcc)s%%" % \
+                {'notesHit': str(sNotesHit), 'totalNotes': str(sTotalNotes), 'hitAcc': str(trimmedTotalNoteAcc)}
+              c1,c2,c3 = self.ingame_stats_color
+              glColor3f(c1, c2, c3)  #wht
+              w, h = font.getStringSize(text,0.00160)
+              if self.theme == 2:
+                if self.numDecimalPlaces < 2:
+                  accDispX = 0.755
+                else:
+                  accDispX = 0.740  #last change -0.015
+                accDispYac = 0.147
+                accDispYam = 0.170
+              else:
+                accDispX = 0.890      #last change -0.010
+                accDispYac = 0.140
+                accDispYam = 0.164
+              font.render(text, (accDispX - w/2, accDispYac),(1, 0, 0),0.00140)     #top-centered by streak under score
+              trimmedAvMult = self.decimal(str(sAvMult)).quantize(self.decPlaceOffset)
+              #text = _("Avg: ") + str(trimmedAvMult) + "x"
+
+              #avgLabel = _("Avg")
+              text = "%(avLab)s: %(avMult)sx" % \
+                {'avLab': self.tsAvgLabel, 'avMult': str(trimmedAvMult)}
+              glColor3f(c1, c2, c3)
+              w, h = font.getStringSize(text,0.00160)
+              font.render(text, (accDispX - w/2, accDispYam),(1, 0, 0),0.00140)     #top-centered by streak under score
+            
+
+            if self.coOpRB:
+              self.engine.view.setViewportHalf(self.numOfPlayers,i)
+            
+            if self.dispSoloReview[i] and not self.pause and not self.failed:
               if self.soloReviewCountdown[i] < self.soloReviewDispDelay:
                 self.soloReviewCountdown[i] += 1
                 #glColor3f(0, 0.85, 1)  #grn-blu
@@ -7118,60 +7169,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               w, h = font.getStringSize(text,0.00110)
               font.render(text, (.900 - w / 2, .540),(1, 0, 0),0.00110)     #off to the right slightly above fretboard
     
-            # evilynux - Display framerate
-            if self.engine.show_fps:
-              c1,c2,c3 = self.ingame_stats_color
-              glColor3f(c1, c2, c3)
-              text = _("FPS: %.2f" % self.engine.fpsEstimate)
-              w, h = font.getStringSize(text, scale = 0.00140)
-              font.render(text, (.85, .055 - h/2), (1,0,0), 0.00140)
       
-            #MFH: Realtime hit accuracy display:
-            
-            #if ((self.inGameStats == 2 or (self.inGameStats == 1 and self.theme == 2)) and (not self.pause and not self.failed)) and ( (not self.pause and not self.failed) or self.hopoDebugDisp == 1 ):
-            if ((self.inGameStats == 2 or (self.inGameStats == 1 and self.theme == 2) or self.hopoDebugDisp == 1 ) and (not self.pause and not self.failed) and not (self.coOpRB and not i==0)):
-              #will not show on pause screen, unless HOPO debug is on (for debugging)
-              if self.coOpRB:
-                sNotesHit   = self.coOpNotesHit
-                sTotalNotes = self.coOpTotalStreakNotes
-                sHitAcc = self.hitAccuracy[self.coOpPlayerMeter]
-                sAvMult = self.avMult[self.coOpPlayerMeter]
-              else:
-                sNotesHit   = self.playerList[i].notesHit
-                sTotalNotes = self.playerList[i].totalStreakNotes
-                sHitAcc = self.hitAccuracy[i]
-                sAvMult = self.avMult[i]
-              trimmedTotalNoteAcc = self.decimal(str(sHitAcc)).quantize(self.decPlaceOffset)
-              #text = str(self.playerList[i].notesHit) + "/" + str(self.playerList[i].totalStreakNotes) + ": " + str(trimmedTotalNoteAcc) + "%"
-              text = "%(notesHit)s/%(totalNotes)s: %(hitAcc)s%%" % \
-                {'notesHit': str(sNotesHit), 'totalNotes': str(sTotalNotes), 'hitAcc': str(trimmedTotalNoteAcc)}
-              c1,c2,c3 = self.ingame_stats_color
-              glColor3f(c1, c2, c3)  #wht
-              w, h = font.getStringSize(text,0.00160)
-              if self.theme == 2:
-                if self.numDecimalPlaces < 2:
-                  accDispX = 0.755
-                else:
-                  accDispX = 0.740  #last change -0.015
-                accDispYac = 0.147
-                accDispYam = 0.170
-              else:
-                accDispX = 0.890      #last change -0.010
-                accDispYac = 0.140
-                accDispYam = 0.164
-              font.render(text, (accDispX - w/2, accDispYac),(1, 0, 0),0.00140)     #top-centered by streak under score
-              trimmedAvMult = self.decimal(str(sAvMult)).quantize(self.decPlaceOffset)
-              #text = _("Avg: ") + str(trimmedAvMult) + "x"
-
-              #avgLabel = _("Avg")
-              text = "%(avLab)s: %(avMult)sx" % \
-                {'avLab': self.tsAvgLabel, 'avMult': str(trimmedAvMult)}
-              glColor3f(c1, c2, c3)
-              w, h = font.getStringSize(text,0.00160)
-              font.render(text, (accDispX - w/2, accDispYam),(1, 0, 0),0.00140)     #top-centered by streak under score
-            
-            
-            
             if self.killDebugEnabled and not self.pause and not self.failed:
               killXpos = 0.760    #last change: +0.010
               killYpos = 0.365    #last change: -0.010
@@ -7300,75 +7298,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   
     
             glColor3f(1, 1, 1)
-  
-            pos = self.getSongPosition()
-    
-            if self.showScriptLyrics and not self.pause and not self.failed:
-              #for time, event in self.song.track[i].getEvents(pos - self.song.period * 2, pos + self.song.period * 4):
-              for time, event in self.song.eventTracks[Song.TK_SCRIPT].getEvents(pos - self.song.period * 2, pos + self.song.period * 4): #MFH - script track
-              
-                if isinstance(event, PictureEvent):
-                  if pos < time or pos > time + event.length:
-                    continue
-                  
-                  try:
-                    picture = event.picture
-                  except:
-                    self.engine.loadImgDrawing(event, "picture", os.path.join(self.libraryName, self.songName, event.fileName))
-                    picture = event.picture
-                    
-                  w = self.wFull
-                  h = self.hFull
-  
-                  if self.theme == 2:
-                    yOffset = 0.715
-                  else:
-                    #gh3 or other standard mod
-                    yOffset = 0.69
-  
-                  fadePeriod = 500.0
-                  f = (1.0 - min(1.0, abs(pos - time) / fadePeriod) * min(1.0, abs(pos - time - event.length) / fadePeriod)) ** 2
-                  picture.transform.reset()
-                  picture.transform.translate(w / 2, (f * -2 + 1) * h/2+yOffset)
-                  
-                  picture.transform.scale(1, -1)
-                  picture.draw()
-                elif isinstance(event, TextEvent):
-                  if pos >= time and pos <= time + event.length and not self.ending:    #myfingershurt: to not display events after ending!
-                    
-                    xOffset = 0.5
-                    if self.scriptLyricPos == 0:
-                      if self.theme == 2:
-                        yOffset = 0.715
-                        txtSize = 0.00170
-                      else:
-                        #gh3 or other standard mod
-                        yOffset = 0.69
-                        txtSize = 0.00175
-                    else:   #display in lyric bar position
-                      yOffset = 0.0696    #last change +0.0000
-                      txtSize = 0.00160
-                    
-    
-                    #MFH TODO - pre-retrieve and translate all current tutorial script.txt events, if applicable.
-                    if self.song.info.tutorial:
-                      text = _(event.text)
-                      w, h = lyricFont.getStringSize(text,txtSize)
-                      lyricFont.render(text, (xOffset - w / 2, yOffset),(1, 0, 0),txtSize) 
-    
-                    #elif event.text.find("TXT:") < 0 and event.text.find("LYR:") < 0 and event.text.find("SEC:") < 0 and event.text.find("GSOLO") < 0:   #filter out MIDI text events, only show from script here.
-                    else:
-                      text = event.text
-                      w, h = lyricFont.getStringSize(text,txtSize)
-                      lyricFont.render(text, (xOffset - w / 2, yOffset),(1, 0, 0),txtSize) 
-    
-    
-    
-            #-------------after "if showlyrics"
             
-            #self.engine.view.setViewport(1,0) 
-            #scrolling lyrics & sections: moved to before player viewport split
-  
+
             #handle the guitar solo track
             #if (self.readTextAndLyricEvents == 2 or (self.readTextAndLyricEvents == 1 and self.theme == 2)) and (not self.pause and not self.failed and not self.ending):
             if (not self.pause and not self.failed and not self.ending):
@@ -7443,6 +7374,85 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   #self.engine.view.setViewport(1,0)
               #except Exception, e:
               #  Log.warn("Unable to render guitar solo accuracy text: %s" % e)
+            
+            self.engine.view.setViewportHalf(1,0)
+            # evilynux - Display framerate
+            if self.engine.show_fps: #probably only need to once through.
+              c1,c2,c3 = self.ingame_stats_color
+              glColor3f(c1, c2, c3)
+              text = _("FPS: %.2f" % self.engine.fpsEstimate)
+              w, h = font.getStringSize(text, scale = 0.00140)
+              font.render(text, (.85, .055 - h/2), (1,0,0), 0.00140)
+ 
+            pos = self.getSongPosition()
+    
+            if self.showScriptLyrics and not self.pause and not self.failed:
+              #for time, event in self.song.track[i].getEvents(pos - self.song.period * 2, pos + self.song.period * 4):
+              for time, event in self.song.eventTracks[Song.TK_SCRIPT].getEvents(pos - self.song.period * 2, pos + self.song.period * 4): #MFH - script track
+              
+                if isinstance(event, PictureEvent):
+                  if pos < time or pos > time + event.length:
+                    continue
+                  
+                  try:
+                    picture = event.picture
+                  except:
+                    self.engine.loadImgDrawing(event, "picture", os.path.join(self.libraryName, self.songName, event.fileName))
+                    picture = event.picture
+                    
+                  w = self.wFull
+                  h = self.hFull
+  
+                  if self.theme == 2:
+                    yOffset = 0.715
+                  else:
+                    #gh3 or other standard mod
+                    yOffset = 0.69
+  
+                  fadePeriod = 500.0
+                  f = (1.0 - min(1.0, abs(pos - time) / fadePeriod) * min(1.0, abs(pos - time - event.length) / fadePeriod)) ** 2
+                  picture.transform.reset()
+                  picture.transform.translate(w / 2, (f * -2 + 1) * h/2+yOffset)
+                  
+                  picture.transform.scale(1, -1)
+                  picture.draw()
+                elif isinstance(event, TextEvent):
+                  if pos >= time and pos <= time + event.length and not self.ending:    #myfingershurt: to not display events after ending!
+                    
+                    xOffset = 0.5
+                    if self.scriptLyricPos == 0:
+                      if self.theme == 2:
+                        yOffset = 0.715
+                        txtSize = 0.00170
+                      else:
+                        #gh3 or other standard mod
+                        yOffset = 0.69
+                        txtSize = 0.00175
+                    else:   #display in lyric bar position
+                      yOffset = 0.0696    #last change +0.0000
+                      txtSize = 0.00160
+                    
+    
+                    #MFH TODO - pre-retrieve and translate all current tutorial script.txt events, if applicable.
+                    if self.song.info.tutorial:
+                      text = _(event.text)
+                      w, h = lyricFont.getStringSize(text,txtSize)
+                      lyricFont.render(text, (xOffset - w / 2, yOffset),(1, 0, 0),txtSize) 
+    
+                    #elif event.text.find("TXT:") < 0 and event.text.find("LYR:") < 0 and event.text.find("SEC:") < 0 and event.text.find("GSOLO") < 0:   #filter out MIDI text events, only show from script here.
+                    else:
+                      text = event.text
+                      w, h = lyricFont.getStringSize(text,txtSize)
+                      lyricFont.render(text, (xOffset - w / 2, yOffset),(1, 0, 0),txtSize) 
+    
+    
+    
+            #-------------after "if showlyrics"
+            
+            #self.engine.view.setViewport(1,0) 
+            #scrolling lyrics & sections: moved to before player viewport split
+  
+
   
   
   
