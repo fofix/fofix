@@ -1,21 +1,46 @@
-#summary List of Usable Audio Files it's Functions.
+#summary List of Audio Files and their Functions.
 
 =Usable Audio Files for FoFiX=
-This is a WIP list of the audio file's usable in FoFiX (IE-Clap's, Boo's,Ending Sounds,etc.) It will be in alphabetical order for now to simplify finding things. 
+This is a list of the audio files usable in FoFiX (ie, claps, boos, ending sounds).
+It is sorted into Menu Sounds, Game SFX, and Instrument SFX. Files are not required unless indicated.
 
-||*Filename*||*Function* _(#)Denote's Multiple file numbers can be used._||
-||accept(#).ogg||Can use multiple files, used randomly in FoFiX. Used for player SELECT sound.||
-||back(#).ogg||Can use multiple files, used randomly in FoFiX. Used for player BACK sound.||
-||crowdcheers.ogg||Plays crowd cheer in game||
-||guitscw(#).ogg||Can use multiple files, used randomly in FoFiX. Used for player guitar screw up sounds.||
-||failsoung.ogg||This is the sound played when failing a song.||
-||in.ogg||Used by default in place of player SELECT sound is back(#).ogg's aren't found||
-||jurgen(#).ogg||Can use multiple files, used randomly in FoFiX. Used for Jurgen's Sarcasm lines.||
-||menu(name's).ogg||Can use multiple files, used randomly in FoFiX. Used for the theme's main menu background songs.(IE-menuTomSawyer.ogg,menuTheTrees.ogg,or menu1.ogg-menu4.ogg||
-||rocksound.ogg||This is the sound that is played after a song is finished successfully.||
-||starpower.ogg||Used to play the starpower sound in game.||
-||start.ogg||This is the sound played at the beginning of the song in game.||
+  * file(#).ogg represents a sequential number (_file1.ogg_, _file2.ogg_)
+  * *file.ogg* represents a sound required for FoFiX to function properly.
+  * file(XXX).ogg represents any set of letters or numbers, or none. (_file.ogg_, _file12.ogg_, _fileYourMom.ogg_)
 
+==Menu Sounds==
+|| *Filename* || *Function* ||
+|| *accept(#).ogg* ||Random sound used for player SELECT - either _accept1.ogg_ OR _action.ogg_/_in.ogg_ required (depending on theme type)||
+|| *action.ogg* ||Played on SELECT in RB-style themes with no accept(#).ogg - either _accept1.ogg_ OR _action.ogg_ required (if RB theme)||
+|| *back(#).ogg* ||Random sound used for player BACK - either _back1.ogg_ OR _out.ogg_ required||
+|| *in.ogg* ||Played on SELECT in GH-style themes with no accept(#).ogg - either _accept1.ogg_ OR _in.ogg_ required (if GH theme)||
+|| *menu(XXX).ogg* ||Menu music - at least one is required (_menu.ogg_)||
+|| *out.ogg* ||Played on BACK with no back(#).ogg - either _back1.ogg_ OR _out.ogg_ required||
+|| *select1.ogg* ||Changing a menu selection||
+|| *select2.ogg* ||Changing a menu selection||
+|| *select3.ogg* ||Changing a menu selection||
 
-------------------------
-_WIP Wiki Page_
+==Game SFX==
+|| *Filename* || *Function* ||
+||coopfail.ogg||Player fails in RB Co-Op Mode||
+||crowdcheers.ogg||Plays crowd cheer in-game||
+||failsound.ogg||Played when failing a song||
+||jurgen(#).ogg||Jurgen's Sarcasm lines||
+||rescue.ogg||Rescuing a player in RB Co-Op Mode||
+||rocksound.ogg||Song is finished successfully||
+||staractivate.ogg||Activating star power/overdrive||
+||stardeactivate.ogg||Star power/overdrive runs out||
+||starding.ogg||Passing a star score threshold (ie, getting 4 stars) in-game||
+|| *starpower.ogg* ||Completing a starpower phrase||
+||starpowerready.ogg||Star Power/Overdrive is ready||
+|| *start.ogg* ||At the beginning of a song (in-game)||
+
+==Instrument SFX==
+|| *Filename* || *Function* ||
+||bassscw(#).ogg||Random sound played when bass misses||
+||guitscw(#).ogg||Random sound played when guitar misses||
+||bassdrum.ogg||The kick bass sound for fills and before the first drum note||
+||tom01.ogg||The left (red) drum sound for fills and before the first drum note||
+||tom02.ogg||The second left (yellow) drum sound for fills and before the first drum note||
+||tom03.ogg||The second right (blue) drum sound for fills and before the first drum note||
+||crash.ogg||The right (green) drum sound for fills and before the first drum note||
