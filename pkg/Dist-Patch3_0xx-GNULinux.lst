@@ -1,13 +1,6 @@
 src:.
 doc:.
-data/versiontag.png:data/
-data/glow.png:data/
-data/cassette.png:data/
-data/left.png:data/
-data/right.png:data/
-data/drum.png:data/
-data/bass.png:data/
-data/guitar.png:data/
+data/*.png:data/
 data/translations:data/
 data/sounds/*.ogg:data/sounds/
 data/mods:data/
