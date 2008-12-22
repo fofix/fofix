@@ -5,16 +5,19 @@ USE_AMANITH=1
 MESSAGESPOT=messages.pot
 
 # evilynux - Dynamically update the version number, this is "clever" but hard to understand... :-(
-VERSION=`grep "versionString =" src/GameEngine.py | sed -e "s/.\+\(\([0-9]\+\.\)\+[0-9]\+\).\+/\1/g"`
+VERSION=$(shell grep "versionString =" src/GameEngine.py | sed -e "s/.\+\(\([0-9]\+\.\)\+[0-9]\+\).\+/\1/g")
+# evilynux - Dynamically get the architecture; only supports 32bit/64bit
+UNAME = $(shell uname -m)
+ARCH = $(shell test $(UNAME) = "i686" && echo 32bit || echo 64bit)
 
 all:	dist
 
 patch: dist
 	@echo --- Creating patch
-	[ -d FoFiX-${VERSION}-Patch-GNULinux-64bit ] && \
-	rm -rf FoFiX-${VERSION}-Patch-GNULinux-64bit* || echo
-	perl pkg/Package-GNULinux.pl -d FoFiX-${VERSION}-Patch-GNULinux-64bit -l pkg/Dist-Patch3_0xx-GNULinux.lst
-	tar -cjvf FoFiX-${VERSION}-Patch-GNULinux-64bit.tar.bz2 FoFiX-${VERSION}-Patch-GNULinux-64bit/
+	[ -d FoFiX-${VERSION}-Patch-GNULinux-${ARCH} ] && \
+	rm -rf FoFiX-${VERSION}-Patch-GNULinux-${ARCH}* || echo 
+	perl pkg/Package-GNULinux.pl -d FoFiX-${VERSION}-Patch-GNULinux-${ARCH} -l pkg/Dist-Patch3_0xx-GNULinux.lst &&\
+	tar -cjvf FoFiX-${VERSION}-Patch-GNULinux-${ARCH}.tar.bz2 FoFiX-${VERSION}-Patch-GNULinux-${ARCH}/
 
 dist:
 	@echo --- Detected version: ${VERSION}
