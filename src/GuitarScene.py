@@ -1310,7 +1310,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.menu = Menu(self.engine, [
           (_("         RESUME"), self.resumeSong), #Worldrave adjusted proper spacing.
           (_("        RESTART"), self.restartSong),
-          (_("        GIVE UP"), self.changeSong),
+          #(_("        GIVE UP"), self.changeSong), *Worldrave-commented out just to match GH3. Since this is a GH3 specific instruction.
           (_("      PRACTICE"), self.practiceSong), #evilynux
           (_("      OPTIONS"), settingsMenu),
           (_("        QUIT"), self.quit),
