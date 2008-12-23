@@ -1,7 +1,6 @@
 CXFREEZE=/usr/src/experimental/cx_Freeze-3.0.3/FreezePython
 PYTHON=python2.4
 PYTHON_LIBS=/usr/lib/python2.4
-USE_AMANITH=1
 MESSAGESPOT=messages.pot
 
 # evilynux - Dynamically update the version number, this is "clever" but hard to understand... :-(
@@ -9,15 +8,25 @@ VERSION = $(shell grep "versionString =" src/GameEngine.py | sed -e "s/\s/_/g" |
 # evilynux - Dynamically get the architecture; only supports 32bit/64bit
 UNAME = $(shell uname -m)
 ARCH = $(shell test $(UNAME) = "i686" && echo 32bit || echo 64bit)
+# evilynux - Folder names for both patches and full releases
+DIRFULL=FoFiX-${VERSION}-Full-GNULinux-${ARCH}
+DIRPATCH=FoFiX-${VERSION}-Patch-GNULinux-${ARCH}
 
 all:	dist
 
 patch: dist
 	@echo --- Creating patch
-	[ -d FoFiX-${VERSION}-Patch-GNULinux-${ARCH} ] && \
-	rm -rf FoFiX-${VERSION}-Patch-GNULinux-${ARCH}* || echo 
-	perl pkg/Package-GNULinux.pl -d FoFiX-${VERSION}-Patch-GNULinux-${ARCH} -l pkg/Dist-Patch3_0xx-GNULinux.lst &&\
-	tar -cjvf FoFiX-${VERSION}-Patch-GNULinux-${ARCH}.tar.bz2 FoFiX-${VERSION}-Patch-GNULinux-${ARCH}/
+	[ -d ${DIRPATCH} ] && \
+	rm -rf ${DIRPATCH}* || echo 
+	perl pkg/Package-GNULinux.pl -d ${DIRPATCH} -l pkg/Dist-Patch3_0xx-GNULinux.lst &&\
+	tar -cjvf ${DIRPATCH}.tar.bz2 ${DIRPATCH}/
+
+bindist: dist
+	@echo --- Creating full release
+	[ -d ${DIRFULL} ] && \
+	rm -rf ${DIRFULL}* || echo 
+	perl pkg/Package-GNULinux.pl -d ${DIRFULL} -l pkg/Dist-MegaLight-GNULinux.lst &&\
+	tar -cjvf ${DIRFULL}.tar.bz2 ${DIRFULL}/
 
 dist:
 	@echo --- Detected version: ${VERSION}
@@ -90,7 +99,7 @@ translations:
 	cd src && \
 	xgettext --from-code iso-8859-1 -k_ -kN_ -o $(MESSAGESPOT) *.py && \
 	cd ..
-	
+
 clean:
 	@rm -rf dist build doc/html
 
