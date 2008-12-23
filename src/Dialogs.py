@@ -1123,6 +1123,10 @@ class SongChooser(Layer, KeyListener):
     c = self.engine.input.controls.getMapping(key)
     if c in Player.KEY1S or key == pygame.K_RETURN or (c in Player.DRUM4S and self.drumNav):
       if self.matchesSearch(self.selectedItem):
+        # evilynux - "song" might be in the process of being created by a song preview,
+        #            stopping the songLoader is safer.
+        if self.songLoader:
+          self.songLoader.stop()
         #if not self.song: #MFH - play the sound immediately, THEN process.
         self.engine.data.acceptSound.setVolume(self.sfxVolume)  #MFH
         self.engine.data.acceptSound.play()
