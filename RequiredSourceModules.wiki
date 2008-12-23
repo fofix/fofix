@@ -131,6 +131,8 @@ Optionally, if you are in 32bit you can also install python-psyco.
   # Execute `python2.4 FretsOnFire.py`
 
 === Creating binaries ===
+*Unless you want to distribute binaries of FoFiX this is really _not_ required.*
+
 You first need to...
   # Install cxFreeze 3.0.3
   # Substitue line 16 of `/usr/lib/python2.4/site-packages/OpenGL/__init__.py` with `__version__ = "2.0.1.09"`.
@@ -142,6 +144,5 @@ Then either create a patch or a full package.
 ==== Patch ====
   * Execute `make patch`.
 ==== Full package ====
-  # Execute `make dist`.
-  # Execute `perl pkg/Package-GNULinux.pl -d FoFiX-Full-GNULinux -l pkg/Dist-MegaLight-GNULinux.lst`
+  * Execute `make bindist`.
 ----
