@@ -5,7 +5,7 @@ USE_AMANITH=1
 MESSAGESPOT=messages.pot
 
 # evilynux - Dynamically update the version number, this is "clever" but hard to understand... :-(
-VERSION=$(shell grep "versionString =" src/GameEngine.py | sed -e "s/.\+\(\([0-9]\+\.\)\+[0-9]\+\).\+/\1/g")
+VERSION = $(shell grep "versionString =" src/GameEngine.py | sed -e "s/\s/_/g" | sed -e "s/^.\+\(\([0-9]\.\)\+[^\"]\+\).\+/\1/")
 # evilynux - Dynamically get the architecture; only supports 32bit/64bit
 UNAME = $(shell uname -m)
 ARCH = $(shell test $(UNAME) = "i686" && echo 32bit || echo 64bit)
