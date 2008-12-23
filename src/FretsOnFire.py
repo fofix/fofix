@@ -167,7 +167,7 @@ def main():
           if os.name == "nt":
             bin = "c:/python24/python"
           else:
-            bin = "/usr/bin/python2.4"
+            bin = os.environ['_'] # evilynux - Generic solution (non-Windows only)
           os.execl(bin, bin, "FretsOnFire.py", *sys.argv[1:])
       except:
         Log.warn("Restart failed.")
