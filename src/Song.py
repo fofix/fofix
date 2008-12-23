@@ -3580,6 +3580,8 @@ def getAvailableSongsAndTitles(engine, library = DEFAULT_LIBRARY, includeTutoria
     items = []
     titles = []
     rootDir = engine.resource.fileName(DEFAULT_LIBRARY)
+
+    items = getAvailableSongs(engine, rootDir, includeTutorials)
     for root, subFolders, files in os.walk(rootDir):
       for folder in subFolders:
         libName = os.path.join(root,folder)
