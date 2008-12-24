@@ -5996,23 +5996,23 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   fillColor = (0,0,0,0)
                   if currentRock < 0.333:
                     failUse = True
-                    self.failViz[i] += .03
-                    if self.failViz[i] > 1.0:
-                      self.failViz[i] = 0.0
+                    self.failViz[i] -= .025
+                    if self.failViz[i] < 0.0:
+                      self.failViz[i] = 1.0
                   else:
                     failUse = False
-                    self.failViz[i] = 0.0
+                    self.failViz[i] = 1.0
                 else:
                   if currentRock < 0.333:
                     fillColor = (1,0,0,1)
                     failUse = True
-                    self.failViz[i] += .03
-                    if self.failViz[i] > 1.0:
-                      self.failViz[i] = 0.0
+                    self.failViz[i] -= .025
+                    if self.failViz[i] < 0.0:
+                      self.failViz[i] = 1.0
                   elif currentRock < 0.666:
                     fillColor = (1,1,0,1)
                     failUse = False
-                    self.failViz[i] = 0.0
+                    self.failViz[i] = 1.0
                   else:
                     fillColor = (0,1,0,1)
                     failUse = False
@@ -6085,7 +6085,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   self.rockTop.transform.translate(w*0.07, h*0.5)
                   self.rockTop.draw()
                   if self.coOpRB and self.numDeadPlayers > 0:
-                    self.rockFailViz += .03
+                    self.rockFailViz += .025
                     if self.rockFailViz > 1.0:
                       self.rockFailViz = 0.0
                     if not (self.guitars[i].coOpFailed and not self.guitars[i].coOpRestart):
@@ -6112,16 +6112,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               if self.coOpRB:
                 if self.numDeadPlayers > 0 and not (self.guitars[i].coOpFailed and not self.guitars[i].coOpRestart) and not self.failed:
                   failUse = True
-                  self.failViz[i] = self.rockFailViz
+                  self.failViz[i] = 1.0 - self.rockFailViz
 
               if failUse:
                 if (self.guitars[i].coOpFailed and not self.guitars[i].coOpRestart) or self.failed:
                   failUse = True
                   redBlink = 0.4
-                  self.failViz[i] = 1
+                  self.failViz[i] = 0
                 else:
-                  redBlink = 0.7
-                failColor = (redBlink,0,0,self.failViz[i])
+                  redBlink = .7 + (.3 * self.failViz[i])
+                failColor = (redBlink,self.failViz[i],self.failViz[i],1)
                 
               if not self.coOp and not (self.coOpRB and i==0):  #MFH only render for player 1 if co-op mode
                 self.rockArr[i].transform.reset()
@@ -6129,7 +6129,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 self.rockArr[i].transform.translate(w*.1,h*.3+heightIncrease)
                 if self.failingEnabled:  
                   if failUse:
-                    self.rockArr[i].draw()
                     self.rockArr[i].draw(color = failColor)
                   else:
                     self.rockArr[i].draw()
@@ -6145,7 +6144,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 self.rockArr[i].transform.translate(w*(.1+spreadOut),h*.3+heightIncrease)
                 if self.failingEnabled:  
                   if failUse:
-                    self.rockArr[i].draw()
                     self.rockArr[i].draw(color = failColor)
                   else:
                     self.rockArr[i].draw()
@@ -6159,7 +6157,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 self.rockArr[i].transform.scale(wfactor,-wfactor)
                 self.rockArr[i].transform.translate(w*.1,h*.3+heightIncrease)
                 if self.failingEnabled:  
-                  self.rockArr[i].draw()
+                  if failUse:
+                    self.rockArr[i].draw(color = failColor)
+                  else:
+                    self.rockArr[i].draw()
                 if self.coOp:
                   whichScorePic = self.scorePicBand
                 else:

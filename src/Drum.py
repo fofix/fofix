@@ -227,7 +227,6 @@ class Drum:
     self.coOpFailed = False
     self.coOpRestart = False
     self.coOpRescueTime = 0.0
-    self.oNeckovr = None #I don't think this was my doing...
 
 
     #MFH- fixing neck speed
@@ -376,15 +375,19 @@ class Drum:
     engine.loadImgDrawing(self, "bpm_halfbeat", os.path.join("themes",themename,"bpm_halfbeat.png"))
     engine.loadImgDrawing(self, "bpm_beat", os.path.join("themes",themename,"bpm_beat.png"))
     engine.loadImgDrawing(self, "bpm_measure", os.path.join("themes",themename,"bpm_measure.png"))
+    self.oNeckovr = None
 
     if self.theme == 0 or self.theme == 1:
       engine.loadImgDrawing(self, "hitlightning", os.path.join("themes",themename,"lightning.png"),  textureSize = (128, 128))
 
       #myfingershurt: the starpower neck file should be in the theme folder... and also not required:
       try:
-        engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"starpowerneck.png"),  textureSize = (256, 256))
+        engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"starpowerneck_drum.png"),  textureSize = (256, 256))
       except IOError:
-        self.oNeck = None
+        try:
+          engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"starpowerneck.png"),  textureSize = (256, 256))
+        except IOError:
+          self.oNeck = None
 
     elif self.theme == 2:
       try:
@@ -401,9 +404,12 @@ class Drum:
       
       #myfingershurt: the overdrive neck file should be in the theme folder... and also not required:
       try:
-        engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"), textureSize = (256, 256))
+        engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck_drum.png"),  textureSize = (256, 256))
       except IOError:
-        self.oNeck = None
+        try:
+          engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
+        except IOError:
+          self.oNeck = None
 
       #MFH: support for optional drum_overdrive_string_flash.png
       self.overdriveFlashCounts = self.indexFps/4   #how many cycles to display the oFlash: self.indexFps/2 = 1/2 second

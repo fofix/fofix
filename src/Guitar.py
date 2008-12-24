@@ -223,7 +223,6 @@ class Guitar:
     self.coOpFailed = False
     self.coOpRestart = False
     self.coOpRescueTime = 0.0
-    self.oNeckovr = None #I don't think this was my doing...
     
     #MFH- fixing neck speed
     if self.nstype < 3:   #not constant mode: 
@@ -391,6 +390,13 @@ class Guitar:
             engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
           except IOError:
             self.oNeck = None
+          try:
+            engine.loadImgDrawing(self, "oNeckBass", os.path.join("themes",themename,"overdriveneck_bass.png"),  textureSize = (256, 256))
+          except IOError:
+            try:
+              engine.loadImgDrawing(self, "oNeckBass", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
+            except IOError:
+              self.oNeckBass = None
           self.rbnote = 0
       else:
         try:
@@ -401,6 +407,13 @@ class Guitar:
           engine.loadImgDrawing(self, "oCenterLines", os.path.join("themes",themename,"overdrive center_lines.png"),  textureSize = (256, 256))
         except IOError:
           self.oCenterLines = None
+        try:
+          engine.loadImgDrawing(self, "oNeckBass", os.path.join("themes",themename,"overdriveneck_bass.png"),  textureSize = (256, 256))
+        except IOError:
+          try:
+            engine.loadImgDrawing(self, "oNeckBass", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
+          except IOError:
+            self.oNeckBass = None
         try:
           engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
         except IOError:
@@ -429,11 +442,19 @@ class Guitar:
     if self.theme == 0 or self.theme == 1:
       engine.loadImgDrawing(self, "hitlightning", os.path.join("themes",themename,"lightning.png"),  textureSize = (128, 128))
 
+      self.oNeckovr = None #fixes GH theme crash
       #myfingershurt: the starpower neck file should be in the theme folder... and also not required:
       try:
         engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"starpowerneck.png"),  textureSize = (256, 256))
       except IOError:
         self.oNeck = None
+      try:
+        engine.loadImgDrawing(self, "oNeckBass", os.path.join("themes",themename,"starpowerneck_bass.png"),  textureSize = (256, 256))
+      except IOError:
+        try:
+          engine.loadImgDrawing(self, "oNeckBass", os.path.join("themes",themename,"starpowerneck.png"),  textureSize = (256, 256))
+        except IOError:
+          self.oNeckBass = None
 
     #myfingershurt: Bass Groove neck:
     if self.bassGrooveNeckMode > 0:
@@ -705,7 +726,10 @@ class Guitar:
     elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
       self.bassGrooveNeck.texture.bind()
     elif self.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and self.scoreMultiplier <= 4:
-      self.oNeck.texture.bind()
+      if self.isBassGuitar and self.oNeckBass:
+        self.oNeckBass.texture.bind()
+      else:
+        self.oNeck.texture.bind()
     else:
       self.neckDrawing.texture.bind()
 
@@ -798,7 +822,10 @@ class Guitar:
       if self.oNeckovr != None and (self.scoreMultiplier > 4 or self.guitarSolo):
         self.oNeckovr.texture.bind()
       else:
-        self.oNeck.texture.bind()
+        if self.isBassGuitar and self.oNeckBass:
+          self.oNeckBass.texture.bind()
+        else:
+          self.oNeck.texture.bind()
 
       glBegin(GL_TRIANGLE_STRIP)
       glColor4f(color[0],color[1],color[2], 0)
@@ -832,7 +859,10 @@ class Guitar:
         self.oNeckovr.texture.bind()
       else:
         glBlendFunc(GL_ONE, GL_ONE)
-        self.oNeck.texture.bind()
+        if self.isBassGuitar and self.oNeckBass:
+          self.oNeckBass.texture.bind()
+        else:
+          self.oNeck.texture.bind()
         
       glBegin(GL_TRIANGLE_STRIP)
       glColor4f(color[0],color[1],color[2], 0)
