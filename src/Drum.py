@@ -2327,75 +2327,75 @@ class Drum:
           if time == q and not event.finalStar:
             event.star = True
       self.starNotesSet = True
+    if not (self.coOpFailed and not self.coOpRestart):
+      glEnable(GL_BLEND)
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+      glEnable(GL_COLOR_MATERIAL)
+      if self.leftyMode:
+        glScalef(-1, 1, 1)
 
-    glEnable(GL_BLEND)
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-    glEnable(GL_COLOR_MATERIAL)
-    if self.leftyMode:
-      glScalef(-1, 1, 1)
+      if self.ocount <= 1:
+        self.ocount = self.ocount + .1
+      else:
+        self.ocount = 1
 
-    if self.ocount <= 1:
-      self.ocount = self.ocount + .1
-    else:
-      self.ocount = 1
-
-    if self.isFailing == True:
-      if self.failcount <= 1 and self.failcount2 == False:
-        self.failcount += .05
-      elif self.failcount >= 1 and self.failcount2 == False:
-        self.failcount = 1
-        self.failcount2 = True
+      if self.isFailing == True:
+        if self.failcount <= 1 and self.failcount2 == False:
+          self.failcount += .05
+        elif self.failcount >= 1 and self.failcount2 == False:
+          self.failcount = 1
+          self.failcount2 = True
         
-      if self.failcount >= 0 and self.failcount2 == True:
+        if self.failcount >= 0 and self.failcount2 == True:
+          self.failcount -= .05
+        elif self.failcount <= 0 and self.failcount2 == True:
+          self.failcount = 0
+          self.failcount2 = False
+
+      if self.isFailing == False and self.failcount > 0:
         self.failcount -= .05
-      elif self.failcount <= 0 and self.failcount2 == True:
-        self.failcount = 0
         self.failcount2 = False
 
-    if self.isFailing == False and self.failcount > 0:
-      self.failcount -= .05
-      self.failcount2 = False
+      if self.starPowerActive:
 
-    if self.starPowerActive:
+        if self.spcount < 1.2:
+          self.spcount += .05
+          self.spcount2 = 1
+        elif self.spcount >=1.2:
+          self.spcount = 1.2
+          self.spcount2 = 0
+      else:
+        if self.spcount > 0:
+          self.spcount -= .05
+          self.spcount2 = 2
+        elif self.spcount <=0:
+          self.spcount = 0
+          self.spcount2 = 0
 
-      if self.spcount < 1.2:
-        self.spcount += .05
-        self.spcount2 = 1
-      elif self.spcount >=1.2:
-        self.spcount = 1.2
-        self.spcount2 = 0
-    else:
-      if self.spcount > 0:
-        self.spcount -= .05
-        self.spcount2 = 2
-      elif self.spcount <=0:
-        self.spcount = 0
-        self.spcount2 = 0
-
-    self.renderNeck(visibility, song, pos)
-    self.renderIncomingNecks(visibility, song, pos) #MFH
-    if self.theme == 0 or self.theme == 1 or self.theme == 2:
-      self.drawTrack(self.ocount, song, pos)
-      self.drawBPM(visibility, song, pos)
-      self.drawSideBars(visibility, song, pos)
-    else:
-      self.renderTracks(visibility)
-      self.renderBars(visibility, song, pos)
+      self.renderNeck(visibility, song, pos)
+      self.renderIncomingNecks(visibility, song, pos) #MFH
+      if self.theme == 0 or self.theme == 1 or self.theme == 2:
+        self.drawTrack(self.ocount, song, pos)
+        self.drawBPM(visibility, song, pos)
+        self.drawSideBars(visibility, song, pos)
+      else:
+        self.renderTracks(visibility)
+        self.renderBars(visibility, song, pos)
 
     #if self.fretsUnderNotes:    #MFH
-    if self.fretsUnderNotes and self.twoDnote != False:    #MFH
-      self.renderFrets(visibility, song, controls)
-      self.renderOpenNotes(visibility, song, pos)
-      self.renderNotes(visibility, song, pos)
-    else:
-      self.renderOpenNotes(visibility, song, pos)
-      self.renderNotes(visibility, song, pos)
-      self.renderFrets(visibility, song, controls)
+      if self.fretsUnderNotes and self.twoDnote != False:    #MFH
+        self.renderFrets(visibility, song, controls)
+        self.renderOpenNotes(visibility, song, pos)
+        self.renderNotes(visibility, song, pos)
+      else:
+        self.renderOpenNotes(visibility, song, pos)
+        self.renderNotes(visibility, song, pos)
+        self.renderFrets(visibility, song, controls)
 
-    self.renderFlames(visibility, song, pos, controls)
+      self.renderFlames(visibility, song, pos, controls)
     
-    if self.leftyMode:
-      glScalef(-1, 1, 1)
+      if self.leftyMode:
+        glScalef(-1, 1, 1)
 
   def getMissedNotes(self, song, pos, catchup = False):
     if not song:

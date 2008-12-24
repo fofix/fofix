@@ -2591,7 +2591,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           #myfingershurt: auto drum starpower activation option:
           if guitar.isDrum and self.autoDrumStarpowerActivate:
             self.activateSP(i)
-          if self.guitars[i].starPower >= 50:
+          if self.guitars[i].starPower >= 50 and not self.guitars[i].starPowerActive:
             self.engine.data.starReadySound.play()
           else:
             self.engine.data.starSound.play()
@@ -2599,7 +2599,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
 
           self.guitars[i].starPowerGained = False  #QQstarS:Set [0] to [i]
-          if self.phrases == True and self.guitars[i].starPower >= 50:  #QQstarS:Set [0] to [i]
+          if self.phrases == True and self.guitars[i].starPower >= 50 and not self.guitars[i].starPowerActive:  #QQstarS:Set [0] to [i]
             self.newScalingText(i, self.tsStarPowerReady )
 
 #-            if self.theme == 0 or self.theme == 1:
@@ -5867,7 +5867,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
 
     
-              if not self.pause and not self.failed:
+              if not self.pause and not self.failed and not (self.guitars[i].coOpFailed and not self.guitars[i].coOpRestart):
                 currentSP = self.guitars[i].starPower/100.0
                 widthChange = w*0.25
 
