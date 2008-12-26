@@ -204,6 +204,10 @@ if ogg:
     def __del__(self):
       self.engine.removeTask(self)
 
+    def streamIsPlaying(self):  #MFH - adding function to check if sound is playing
+      return self.playing
+
+
     def play(self):
       if self.playing:
         return
@@ -327,6 +331,10 @@ class StreamingSound(Sound, Task):
   def setVolume(self, volume):
     Sound.setVolume(self, volume)
     self.channel.setVolume(volume)
+
+  def streamIsPlaying(self):  #MFH - adding function to check if sound is playing
+    return Sound.get_num_channels()
+
 
   def fadeout(self, time):
     Sound.fadeout(self, time)

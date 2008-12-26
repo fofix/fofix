@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-26 10:16-0800\n"
+"POT-Creation-Date: 2008-12-26 13:17-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,7 +29,7 @@ msgid "Copyright 2006, 2007 by Unreal Voodoo"
 msgstr ""
 
 #: Credits.py:178
-msgid "Copyright 2008 by FoFiX Team"
+msgid "Copyright 2008 by Team FoFiX"
 msgstr ""
 
 #: Data.py:123
@@ -44,7 +44,7 @@ msgstr ""
 msgid "Browsing Collection..."
 msgstr ""
 
-#: Dialogs.py:936 Song.py:3543
+#: Dialogs.py:936 Song.py:3548
 msgid "End of Career"
 msgstr ""
 

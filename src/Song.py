@@ -2420,7 +2420,12 @@ class Song(object):
     return pos + self.start - self.delay
 
   def isPlaying(self):
-    return self._playing and self.music.isPlaying()
+    #MFH - check here to see if any audio tracks are still playing first!
+    #return self._playing and self.music.isPlaying()
+    if self.guitarTrack.streamIsPlaying() > 0 or self.rhythmTrack.streamIsPlaying() > 0 or self.drumTrack.streamIsPlaying() > 0:
+      return True
+    else:
+      return self._playing and self.music.isPlaying() 
 
   def getBeat(self):
     return self.getPosition() / self.period

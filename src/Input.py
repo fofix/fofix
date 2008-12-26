@@ -100,8 +100,8 @@ class Input(Task):
     Log.debug("%d joysticks found." % (len(self.joysticks)))
 
     # Enable music events
-    #Audio.Music.setEndEvent(MusicFinished)
-    Audio.Music.setEndEvent()   #MFH - no event required
+    Audio.Music.setEndEvent(MusicFinished)
+    #Audio.Music.setEndEvent()   #MFH - no event required?
 
     # Custom key names
     self.getSystemKeyName = pygame.key.name
