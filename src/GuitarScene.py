@@ -519,6 +519,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.playerList[0].hopoFreq = self.song.info.hopofreq
 
 
+    self.initBeatAndSpClaps()   #MFH - need to init this before starting!
+
 
     #MFH - single audio track song detection
     self.isSingleAudioTrack = self.song.isSingleAudioTrack
@@ -1682,6 +1684,17 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.session.world.deleteScene(self)
     self.session.world.createScene("SongChoosingScene")
 
+  def initBeatAndSpClaps(self):
+    ###Capo###
+    if self.song:
+      self.beatTime = []
+      if (self.starClaps or self.beatClaps):
+        for time, event in self.song.track[0].getAllEvents():
+          if isinstance(event, Bars):
+            if (event.barType == 1 or event.barType == 2):
+              self.beatTime.append(time)
+    ###endCapo###
+
 
   def resetVariablesToDefaults(self):
     self.drumStart = False  #faaa's drum sound mod restart
@@ -1741,17 +1754,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.rockTimer = 0  #myfingershurt
     self.youRock = False    #myfingershurt
     self.rockFinished = False    #myfingershurt
-    ###Capo###
-    if self.song:
-      self.beatTime = []
-      if (self.starClaps or self.beatClaps):
-        for time, event in self.song.track[0].getAllEvents():
-          if isinstance(event, Bars):
-            if (event.barType == 1 or event.barType == 2):
-              self.beatTime.append(time)
-    ###endCapo###
-  
-
+    self.initBeatAndSpClaps()
+    
   def restartSong(self, firstTime = False):  #QQstarS: Fix this function
     self.resetVariablesToDefaults()
     self.engine.data.startSound.play()
