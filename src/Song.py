@@ -2279,12 +2279,14 @@ class Song(object):
 
   def play(self, start = 0.0):
     self.start = start
-    self.music.play(0, start / 1000.0)
+    
     #RF-mod No longer needed?
     
     if self.engine.audioSpeedDivisor == 1:  #MFH - shut this track up if slowing audio down!    
+      self.music.play(0, start / 1000.0)
       self.music.setVolume(1.0)
     else:
+      self.music.play(self.engine.audioSpeedDivisor, start / 1000.0)  #tell music to loop 2 times for 1/2 speed, 4 times for 1/4 speed (so it doesn't end early)
       self.music.setVolume(0.0)   
     
     if self.guitarTrack:

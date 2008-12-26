@@ -413,6 +413,7 @@ class GameEngine(Engine):
     #self.audio.pre_open(frequency = frequency, bits = bits, stereo = stereo, bufferSize = bufferSize)
     #self.audio.open(frequency = frequency, bits = bits, stereo = stereo, bufferSize = bufferSize)
     #pygame.init()
+    self.audioSpeedDivisor = 0
     self.setSpeedDivisor(1)   #MFH - handles initialization at full speed    
     
     Log.debug("Initializing video.")
@@ -606,12 +607,13 @@ class GameEngine(Engine):
     #  self.audio.close()
     #except:
     #  pass
-      
-    self.audio.pre_open(frequency = self.frequency/divisor, bits = self.bits, stereo = self.stereo, bufferSize = self.bufferSize)
-    self.audio.open(frequency = self.frequency/divisor, bits = self.bits, stereo = self.stereo, bufferSize = self.bufferSize)
-    self.audioSpeedDivisor = divisor
-    pygame.init()
-    Log.debug("Initializing pygame.mixer & audio system at " + str(self.frequency/divisor) + " Hz." )
+    
+    if self.audioSpeedDivisor != divisor:   #MFH - don't re-init to the same divisor.
+      self.audio.pre_open(frequency = self.frequency/divisor, bits = self.bits, stereo = self.stereo, bufferSize = self.bufferSize)
+      self.audio.open(frequency = self.frequency/divisor, bits = self.bits, stereo = self.stereo, bufferSize = self.bufferSize)
+      self.audioSpeedDivisor = divisor
+      pygame.init()
+      Log.debug("Initializing pygame.mixer & audio system at " + str(self.frequency/divisor) + " Hz." )
 
   # evilynux - This stops the crowd cheers if they're still playing (issue 317).
   def quit(self):

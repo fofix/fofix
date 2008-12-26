@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-21 11:57-0800\n"
+"POT-Creation-Date: 2008-12-26 08:56-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -44,11 +44,11 @@ msgstr ""
 msgid "Browsing Collection..."
 msgstr ""
 
-#: Dialogs.py:936 Song.py:3541
+#: Dialogs.py:936 Song.py:3543
 msgid "End of Career"
 msgstr ""
 
-#: Dialogs.py:1156 GameEngine.py:61 GameEngine.py:62 GameEngine.py:63
+#: Dialogs.py:1160 GameEngine.py:61 GameEngine.py:62 GameEngine.py:63
 #: GameEngine.py:65 GameEngine.py:68 GameEngine.py:113 GameEngine.py:132
 #: GameEngine.py:136 GameEngine.py:137 GameEngine.py:138 GameEngine.py:158
 #: GameEngine.py:159 GameEngine.py:163 GameEngine.py:182 GameEngine.py:204
@@ -60,7 +60,7 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: Dialogs.py:1156 Dialogs.py:1158 GameEngine.py:61 GameEngine.py:62
+#: Dialogs.py:1160 Dialogs.py:1162 GameEngine.py:61 GameEngine.py:62
 #: GameEngine.py:63 GameEngine.py:65 GameEngine.py:68 GameEngine.py:113
 #: GameEngine.py:132 GameEngine.py:136 GameEngine.py:137 GameEngine.py:138
 #: GameEngine.py:151 GameEngine.py:158 GameEngine.py:159 GameEngine.py:163
@@ -72,177 +72,177 @@ msgstr ""
 msgid "Yes"
 msgstr ""
 
-#: Dialogs.py:1156
+#: Dialogs.py:1160
 msgid "Are you sure you want to reset this entire career?"
 msgstr ""
 
-#: Dialogs.py:1159
+#: Dialogs.py:1163
 msgid "Resetting career..."
 msgstr ""
 
-#: Dialogs.py:1759 Dialogs.py:1981 Dialogs.py:2293 Dialogs.py:2667
-#: Dialogs.py:2892 Dialogs.py:3256
+#: Dialogs.py:1763 Dialogs.py:1985 Dialogs.py:2297 Dialogs.py:2671
+#: Dialogs.py:2896 Dialogs.py:3260
 #, python-format
 msgid "Filter: %s"
 msgstr ""
 
-#: Dialogs.py:1761 Dialogs.py:1983 Dialogs.py:2295 Dialogs.py:2669
-#: Dialogs.py:2894 Dialogs.py:3258
+#: Dialogs.py:1765 Dialogs.py:1987 Dialogs.py:2299 Dialogs.py:2673
+#: Dialogs.py:2898 Dialogs.py:3262
 msgid "Not found"
 msgstr ""
 
-#: Dialogs.py:1764 Dialogs.py:1986 Dialogs.py:2298 Dialogs.py:2672
-#: Dialogs.py:2897 Dialogs.py:3261
+#: Dialogs.py:1768 Dialogs.py:1990 Dialogs.py:2302 Dialogs.py:2676
+#: Dialogs.py:2901 Dialogs.py:3265
 msgid "Loading Preview..."
 msgstr ""
 
-#: Dialogs.py:1784 Dialogs.py:2089 Dialogs.py:2392 Dialogs.py:2765
-#: Dialogs.py:2993 Dialogs.py:3362
+#: Dialogs.py:1788 Dialogs.py:2093 Dialogs.py:2396 Dialogs.py:2769
+#: Dialogs.py:2997 Dialogs.py:3366
 msgid "-- Locked --"
 msgstr ""
 
-#: Dialogs.py:1815
+#: Dialogs.py:1819
 #, python-format
 msgid "Played %d time"
 msgstr ""
 
-#: Dialogs.py:1817
+#: Dialogs.py:1821
 #, python-format
 msgid "Played %d times"
 msgstr ""
 
-#: Dialogs.py:1822 Dialogs.py:1829 Dialogs.py:2005
+#: Dialogs.py:1826 Dialogs.py:1833 Dialogs.py:2009
 msgid "Play To Advance."
 msgstr ""
 
-#: Dialogs.py:1887
+#: Dialogs.py:1891
 msgid "One Song In This Setlist"
 msgstr ""
 
-#: Dialogs.py:1889
+#: Dialogs.py:1893
 #, python-format
 msgid "%d Songs In This Setlist"
 msgstr ""
 
-#: Dialogs.py:1899 Dialogs.py:2033 Dialogs.py:2337 Dialogs.py:2710
-#: Dialogs.py:2938 Dialogs.py:3304
+#: Dialogs.py:1903 Dialogs.py:2037 Dialogs.py:2341 Dialogs.py:2714
+#: Dialogs.py:2942 Dialogs.py:3308
 msgid "Reset this entire career"
 msgstr ""
 
-#: Dialogs.py:2007 Dialogs.py:2313 Dialogs.py:2686 Dialogs.py:2914
-#: Dialogs.py:3278 MainMenu.py:219
+#: Dialogs.py:2011 Dialogs.py:2317 Dialogs.py:2690 Dialogs.py:2918
+#: Dialogs.py:3282 MainMenu.py:219
 msgid "Practice"
 msgstr ""
 
-#: Dialogs.py:2011 Dialogs.py:2317 Dialogs.py:2690 Dialogs.py:2918
-#: Dialogs.py:3282
+#: Dialogs.py:2015 Dialogs.py:2321 Dialogs.py:2694 Dialogs.py:2922
+#: Dialogs.py:3286
 msgid "Played Once"
 msgstr ""
 
-#: Dialogs.py:2013 Dialogs.py:2319 Dialogs.py:2692 Dialogs.py:2920
-#: Dialogs.py:3284
+#: Dialogs.py:2017 Dialogs.py:2323 Dialogs.py:2696 Dialogs.py:2924
+#: Dialogs.py:3288
 #, python-format
 msgid "Played %d times."
 msgstr ""
 
-#: Dialogs.py:2015 Dialogs.py:2321 Dialogs.py:2694 Dialogs.py:2922
-#: Dialogs.py:3286 MainMenu.py:266
+#: Dialogs.py:2019 Dialogs.py:2325 Dialogs.py:2698 Dialogs.py:2926
+#: Dialogs.py:3290 MainMenu.py:266
 msgid "Quickplay"
 msgstr ""
 
-#: Dialogs.py:2021
+#: Dialogs.py:2025
 msgid "There Is 1 Song In This Setlist"
 msgstr ""
 
-#: Dialogs.py:2023
+#: Dialogs.py:2027
 #, python-format
 msgid "There are %d songs in this folder"
 msgstr ""
 
-#: Dialogs.py:2028 Dialogs.py:2333 Dialogs.py:2706 Dialogs.py:2934
-#: Dialogs.py:3298
+#: Dialogs.py:2032 Dialogs.py:2337 Dialogs.py:2710 Dialogs.py:2938
+#: Dialogs.py:3302
 msgid "Tier"
 msgstr ""
 
-#: Dialogs.py:2037 Dialogs.py:2341 Dialogs.py:2714 Dialogs.py:2942
-#: Dialogs.py:3309
+#: Dialogs.py:2041 Dialogs.py:2345 Dialogs.py:2718 Dialogs.py:2946
+#: Dialogs.py:3313
 msgid "Random Song"
 msgstr ""
 
-#: Dialogs.py:2188 Dialogs.py:2226 Dialogs.py:2233 Dialogs.py:2487
-#: Dialogs.py:2527 Dialogs.py:3425
+#: Dialogs.py:2192 Dialogs.py:2230 Dialogs.py:2237 Dialogs.py:2491
+#: Dialogs.py:2531 Dialogs.py:3429
 msgid "Nil"
 msgstr ""
 
-#: Dialogs.py:2311 Dialogs.py:2684 Dialogs.py:2912 Dialogs.py:3276
+#: Dialogs.py:2315 Dialogs.py:2688 Dialogs.py:2916 Dialogs.py:3280
 msgid "Play To Advance"
 msgstr ""
 
-#: Dialogs.py:2327 Dialogs.py:2700 Dialogs.py:2928 Dialogs.py:3292
+#: Dialogs.py:2331 Dialogs.py:2704 Dialogs.py:2932 Dialogs.py:3296
 msgid "There Is 1 Song In This Setlist."
 msgstr ""
 
-#: Dialogs.py:2329 Dialogs.py:2702 Dialogs.py:2930 Dialogs.py:3294
+#: Dialogs.py:2333 Dialogs.py:2706 Dialogs.py:2934 Dialogs.py:3298
 #, python-format
 msgid "There Are %d Songs In This Setlist."
 msgstr ""
 
-#: Dialogs.py:3602
+#: Dialogs.py:3606
 msgid "[Parent Folder]"
 msgstr ""
 
-#: Dialogs.py:3606
+#: Dialogs.py:3610
 msgid "[Accept Folder]"
 msgstr ""
 
-#: Dialogs.py:3608
+#: Dialogs.py:3612
 #, python-format
 msgid "%s [Folder]"
 msgstr ""
 
-#: Dialogs.py:3758
+#: Dialogs.py:3762
 msgid "Loading necks..."
 msgstr ""
 
-#: Dialogs.py:3797
+#: Dialogs.py:3801
 msgid "Neck"
 msgstr ""
 
-#: Dialogs.py:4189
+#: Dialogs.py:4193
 #, python-format
 msgid "%.2f beats per minute"
 msgstr ""
 
-#: Dialogs.py:4267 Dialogs.py:4333
+#: Dialogs.py:4271 Dialogs.py:4337
 msgid "StarPower"
 msgstr ""
 
-#: Dialogs.py:4320 Dialogs.py:4338
+#: Dialogs.py:4324 Dialogs.py:4342
 #, python-format
 msgid "Killswitch %d%%"
 msgstr ""
 
-#: Dialogs.py:4326 Dialogs.py:4344
+#: Dialogs.py:4330 Dialogs.py:4348
 msgid "Killswitch"
 msgstr ""
 
-#: Dialogs.py:4350 Dialogs.py:4356
+#: Dialogs.py:4354 Dialogs.py:4360
 msgid "Pick!"
 msgstr ""
 
-#: Dialogs.py:4471
+#: Dialogs.py:4475
 msgid "Choose a Song"
 msgstr ""
 
-#: Dialogs.py:4490
+#: Dialogs.py:4494
 msgid "Choose a File"
 msgstr ""
 
-#: Dialogs.py:4536 Dialogs.py:4547
+#: Dialogs.py:4540 Dialogs.py:4551
 msgid "Play with the keys and press Escape when you're done."
 msgstr ""
 
-#: Dialogs.py:4558 Dialogs.py:4690
+#: Dialogs.py:4562 Dialogs.py:4694
 msgid "Loading..."
 msgstr ""
 
@@ -482,7 +482,7 @@ msgstr ""
 msgid "Antialiasing Quality"
 msgstr ""
 
-#: GameEngine.py:64 GameEngine.py:116 GameEngine.py:151 GameEngine.py:524
+#: GameEngine.py:64 GameEngine.py:116 GameEngine.py:151 GameEngine.py:525
 #: GameResultsScene.py:124 Stage.py:251
 msgid "None"
 msgstr ""
@@ -783,7 +783,7 @@ msgstr ""
 msgid "Stage Slideshow"
 msgstr ""
 
-#: GameEngine.py:127 GameEngine.py:128 GameEngine.py:129 GameEngine.py:509
+#: GameEngine.py:127 GameEngine.py:128 GameEngine.py:129 GameEngine.py:510
 msgid "Random"
 msgstr ""
 
@@ -1641,11 +1641,11 @@ msgstr ""
 msgid "Show Instrument"
 msgstr ""
 
-#: GameEngine.py:507
+#: GameEngine.py:508
 msgid "Slideshow"
 msgstr ""
 
-#: GameEngine.py:510 GameEngine.py:524
+#: GameEngine.py:511 GameEngine.py:525
 msgid "Animated Stage"
 msgstr ""
 
@@ -1844,15 +1844,15 @@ msgstr ""
 msgid "% Complete"
 msgstr ""
 
-#: GuitarScene.py:288 GuitarScene.py:6880
+#: GuitarScene.py:288 GuitarScene.py:6910
 msgid "HOPO"
 msgstr ""
 
-#: GuitarScene.py:289 GuitarScene.py:6850 GuitarScene.py:6859
+#: GuitarScene.py:289 GuitarScene.py:6880 GuitarScene.py:6889
 msgid "COMPLETED"
 msgstr ""
 
-#: GuitarScene.py:290 GuitarScene.py:6852 GuitarScene.py:6868
+#: GuitarScene.py:290 GuitarScene.py:6882 GuitarScene.py:6898
 msgid " % ON "
 msgstr ""
 
@@ -1960,139 +1960,155 @@ msgstr ""
 msgid " fretted by "
 msgstr ""
 
-#: GuitarScene.py:1311 GuitarScene.py:1320
+#: GuitarScene.py:1291
+msgid "         RESUME"
+msgstr ""
+
+#: GuitarScene.py:1292
+msgid "        RESTART"
+msgstr ""
+
+#: GuitarScene.py:1294
+msgid "      PRACTICE"
+msgstr ""
+
+#: GuitarScene.py:1295
+msgid "      OPTIONS"
+msgstr ""
+
+#: GuitarScene.py:1296
+msgid "        QUIT"
+msgstr ""
+
+#: GuitarScene.py:1300
 msgid "        RESUME"
 msgstr ""
 
-#: GuitarScene.py:1312 GuitarScene.py:1321
+#: GuitarScene.py:1301
 msgid "       RESTART"
 msgstr ""
 
-#: GuitarScene.py:1313 GuitarScene.py:1322
+#: GuitarScene.py:1302
 msgid "        GIVE UP"
 msgstr ""
 
-#: GuitarScene.py:1314
-msgid "       PRACTICE"
-msgstr ""
-
-#: GuitarScene.py:1315 GuitarScene.py:1324
-msgid "       OPTIONS"
-msgstr ""
-
-#: GuitarScene.py:1316 GuitarScene.py:1325
-msgid "           QUIT"
-msgstr ""
-
-#: GuitarScene.py:1323
+#: GuitarScene.py:1303
 msgid "      END SONG"
 msgstr ""
 
-#: GuitarScene.py:1330 GuitarScene.py:1337
+#: GuitarScene.py:1304
+msgid "       OPTIONS"
+msgstr ""
+
+#: GuitarScene.py:1305
+msgid "           QUIT"
+msgstr ""
+
+#: GuitarScene.py:1310 GuitarScene.py:1317
 msgid "RETRY SONG"
 msgstr ""
 
-#: GuitarScene.py:1331
+#: GuitarScene.py:1311
 msgid "  PRACTICE"
 msgstr ""
 
-#: GuitarScene.py:1332 GuitarScene.py:1338
+#: GuitarScene.py:1312 GuitarScene.py:1318
 msgid " NEW SONG"
 msgstr ""
 
-#: GuitarScene.py:1333 GuitarScene.py:1339
+#: GuitarScene.py:1313 GuitarScene.py:1319
 msgid "     QUIT"
 msgstr ""
 
-#: GuitarScene.py:1346 GuitarScene.py:1355
+#: GuitarScene.py:1326 GuitarScene.py:1335
 msgid "  Resume"
 msgstr ""
 
-#: GuitarScene.py:1347 GuitarScene.py:1356
+#: GuitarScene.py:1327 GuitarScene.py:1336
 msgid "  Start Over"
 msgstr ""
 
-#: GuitarScene.py:1348 GuitarScene.py:1357
+#: GuitarScene.py:1328 GuitarScene.py:1337
 msgid "  Change Song"
 msgstr ""
 
-#: GuitarScene.py:1349
+#: GuitarScene.py:1329
 msgid "  Practice"
 msgstr ""
 
-#: GuitarScene.py:1350 GuitarScene.py:1359
+#: GuitarScene.py:1330 GuitarScene.py:1339
 msgid "  Settings"
 msgstr ""
 
-#: GuitarScene.py:1351 GuitarScene.py:1360
+#: GuitarScene.py:1331 GuitarScene.py:1340
 msgid "  Quit to Main Menu"
 msgstr ""
 
-#: GuitarScene.py:1358
+#: GuitarScene.py:1338
 msgid "  End Song"
 msgstr ""
 
-#: GuitarScene.py:1365 GuitarScene.py:1372
+#: GuitarScene.py:1345 GuitarScene.py:1352
 msgid " Try Again?"
 msgstr ""
 
-#: GuitarScene.py:1366 GuitarScene.py:1373
+#: GuitarScene.py:1346 GuitarScene.py:1353
 msgid "  Give Up?"
 msgstr ""
 
-#: GuitarScene.py:1367
+#: GuitarScene.py:1347
 msgid "  Practice?"
 msgstr ""
 
-#: GuitarScene.py:1368 GuitarScene.py:1374
+#: GuitarScene.py:1348 GuitarScene.py:1354
 msgid "Quit to Main"
 msgstr ""
 
-#: GuitarScene.py:1382 GuitarScene.py:1391
+#: GuitarScene.py:1362 GuitarScene.py:1371
 msgid "   RESUME"
 msgstr ""
 
-#: GuitarScene.py:1383 GuitarScene.py:1392
+#: GuitarScene.py:1363 GuitarScene.py:1372
 msgid "   RESTART"
 msgstr ""
 
-#: GuitarScene.py:1384 GuitarScene.py:1393
+#: GuitarScene.py:1364 GuitarScene.py:1373
 msgid "   CHANGE SONG"
 msgstr ""
 
-#: GuitarScene.py:1385
+#: GuitarScene.py:1365
 msgid "   PRACTICE"
 msgstr ""
 
-#: GuitarScene.py:1386 GuitarScene.py:1395
+#: GuitarScene.py:1366 GuitarScene.py:1375
 msgid "   SETTINGS"
 msgstr ""
 
-#: GuitarScene.py:1387 GuitarScene.py:1396
+#: GuitarScene.py:1367 GuitarScene.py:1376
 msgid "   QUIT"
 msgstr ""
 
-#: GuitarScene.py:1394
+#: GuitarScene.py:1374
 msgid "   END SONG"
 msgstr ""
 
-#: GuitarScene.py:1401 GuitarScene.py:1408
+#: GuitarScene.py:1381 GuitarScene.py:1388
 msgid " TRY AGAIN?"
 msgstr ""
 
-#: GuitarScene.py:1402 GuitarScene.py:1409
+#: GuitarScene.py:1382 GuitarScene.py:1389
 msgid " GIVE UP?"
 msgstr ""
 
-#: GuitarScene.py:1403
+#: GuitarScene.py:1383
 msgid " PRACTICE?"
 msgstr ""
 
-#: GuitarScene.py:1404 GuitarScene.py:1410
+#: GuitarScene.py:1384 GuitarScene.py:1390
 msgid " QUIT"
 msgstr ""
 
-#: GuitarScene.py:7099
+#: GuitarScene.py:7385
 #, python-format
 msgid "FPS: %.2f"
 msgstr ""
