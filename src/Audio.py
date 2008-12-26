@@ -84,8 +84,11 @@ class Music(object):
     pygame.mixer.music.load(fileName)
 
   @staticmethod
-  def setEndEvent(event):
-    pygame.mixer.music.set_endevent(event)
+  def setEndEvent(event = None):
+    if event:
+      pygame.mixer.music.set_endevent(event)
+    else:
+      pygame.mixer.music.set_endevent()   #MFH - to set NO event.
 
   def play(self, loops = -1, pos = 0.0):
     pygame.mixer.music.play(loops, pos)
