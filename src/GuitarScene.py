@@ -519,7 +519,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.playerList[0].hopoFreq = self.song.info.hopofreq
 
 
-    self.initBeatAndSpClaps()   #MFH - need to init this before starting!
 
 
     #MFH - single audio track song detection
@@ -1824,6 +1823,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           continue
         if time + event.length > lastTime:
           lastTime = time + event.length
+
+    self.initBeatAndSpClaps()
+
 
     
     self.lastEvent = lastTime + 1000
