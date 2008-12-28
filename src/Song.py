@@ -2176,8 +2176,8 @@ class Song(object):
 
 
     
-    self.slowDownDivisor = self.engine.config.get("audio", "slow_down_divisor")
-    self.engine.setSpeedDivisor(self.slowDownDivisor)    #MFH 
+    #self.slowDownDivisor = self.engine.config.get("audio", "slow_down_divisor")
+    #self.engine.setSpeedDivisor(self.slowDownDivisor)    #MFH 
 
     # load the tracks
     #if self.engine.audioSpeedDivisor == 1:    #MFH - only use the music track   
@@ -2422,7 +2422,11 @@ class Song(object):
   def isPlaying(self):
     #MFH - check here to see if any audio tracks are still playing first!
     #return self._playing and self.music.isPlaying()
-    if self.guitarTrack.streamIsPlaying() > 0 or self.rhythmTrack.streamIsPlaying() > 0 or self.drumTrack.streamIsPlaying() > 0:
+    if self.guitarTrack and self.guitarTrack.streamIsPlaying() > 0: 
+      return True
+    if self.rhythmTrack and self.rhythmTrack.streamIsPlaying() > 0:
+      return True
+    if self.drumTrack and self.drumTrack.streamIsPlaying() > 0:
       return True
     else:
       return self._playing and self.music.isPlaying() 
@@ -3255,6 +3259,17 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
   if crowdsEnabled == 0:
     crowdFile = None      
 
+
+  if songFile != None and guitarFile != None:
+    #check for the same file
+    songStat = os.stat(songFile)
+    guitarStat = os.stat(guitarFile)
+    #Simply checking file size, no md5
+    if songStat.st_size == guitarStat.st_size:
+      guitarFile = None
+
+
+    
   if practiceMode:    #single track practice mode only!
     if part[0] == parts[GUITAR_PART] and guitarFile != None:
       songFile = guitarFile
@@ -3266,7 +3281,32 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
     rhythmFile = None
     drumFile = None
     crowdFile = None
+
+  slowDownDivisor = engine.config.get("audio", "slow_down_divisor")
+  engine.setSpeedDivisor(slowDownDivisor)    #MFH 
     
+
+  #MFH - check for slowdown mode here.  If slowdown, and single track song (or practice mode), 
+  #  duplicate single track to a streamingAudio track so the slowed down version can be heard.
+  if engine.audioSpeedDivisor > 1:
+    crowdFile = None
+    #count tracks:
+    audioTrackCount = 0
+    if guitarFile:
+      audioTrackCount += 1
+    if rhythmFile:
+      audioTrackCount += 1
+    if drumFile:
+      audioTrackCount += 1
+    if audioTrackCount < 1:
+      if part[0] == parts[GUITAR_PART]:
+        guitarFile = songFile
+      elif part[0] == parts[BASS_PART]:
+        rhythmFile = songFile
+      elif part[0] == parts[DRUM_PART]:
+        drumFile = songFile
+      else:
+        guitarFile = songFile
       
 
 
@@ -3287,15 +3327,7 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
     rhythmFile = None
     previewFile = None
     drumFile = None
-    
-  if songFile != None and guitarFile != None:
-    #check for the same file
-    songStat = os.stat(songFile)
-    guitarStat = os.stat(guitarFile)
-    #Simply checking file size, no md5
-    if songStat.st_size == guitarStat.st_size:
-      guitarFile = None
-  
+      
   song       = Song(engine, infoFile, songFile, guitarFile, rhythmFile, noteFile, scriptFile, part, drumFile, crowdFile)
   return song
 

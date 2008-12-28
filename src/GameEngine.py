@@ -190,7 +190,7 @@ Config.define("game",   "solo_frame",          int, 1,    text = _("Solo Frame")
 Config.define("game",   "starpower_mode",          int, 2,    text = _("Starpower Mode"), options = {0: _("Off"), 1: _("FoF"), 2: _("Auto MIDI")})
 Config.define("game",   "font_rendering_mode",          int, 0,    text = _("Font Mode"), options = {0: _("oGL Hack"), 1: _("Lamina Screen"), 2: _("Lamina Frames")})
 Config.define("game",   "incoming_neck_mode",          int, 2,    text = _("Inc. Neck Mode"), options = {0: _("Off"), 1: _("Start Only"), 2: _("Start & End")})
-Config.define("game", "midi_lyric_mode",           int,  1,   text = _("MIDI Lyric Mode"), options = {0: _("Scrolling"), 1: _("Line-by-line")})
+Config.define("game", "midi_lyric_mode",           int,  1,   text = _("MIDI Lyric Mode"), options = {0: _("Scrolling"), 1: _("Simple Lines")})
 
 
 
@@ -609,12 +609,16 @@ class GameEngine(Engine):
     #  pass
     
     if self.audioSpeedDivisor != divisor:   #MFH - don't re-init to the same divisor.
-      self.audio.pre_open(frequency = self.frequency/divisor, bits = self.bits, stereo = self.stereo, bufferSize = self.bufferSize)
-      self.audio.open(frequency = self.frequency/divisor, bits = self.bits, stereo = self.stereo, bufferSize = self.bufferSize)
-      self.audioSpeedDivisor = divisor
-      pygame.init()
-      Log.debug("Initializing pygame.mixer & audio system at " + str(self.frequency/divisor) + " Hz." )
-
+      try:
+        self.audio.close()    #MFH - ensure no audio is playing during the switch!
+        self.audio.pre_open(frequency = self.frequency/divisor, bits = self.bits, stereo = self.stereo, bufferSize = self.bufferSize)
+        self.audio.open(frequency = self.frequency/divisor, bits = self.bits, stereo = self.stereo, bufferSize = self.bufferSize)
+        self.audioSpeedDivisor = divisor
+        pygame.init()
+        Log.debug("Initializing pygame.mixer & audio system at " + str(self.frequency/divisor) + " Hz." )
+      except Exception, e:
+        Log.error("Failed to initialize or re-initialize pygame.mixer & audio system - crash imminent!")
+  
   # evilynux - This stops the crowd cheers if they're still playing (issue 317).
   def quit(self):
     self.audio.close()

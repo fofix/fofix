@@ -71,7 +71,11 @@ class Audio(Task):
     return Channel(n)
 
   def close(self):
-    pygame.mixer.quit()
+    try:
+      pygame.mixer.quit()
+    except:
+      pass
+    #pygame.mixer.quit()
 
   def pause(self):
     pygame.mixer.pause()

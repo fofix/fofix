@@ -367,7 +367,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
 
     #MFH - constant definitions, ini value retrievals
-    self.lineByLineLyricMaxLineWidth = 0.8
+    self.lineByLineLyricMaxLineWidth = 0.5
+    self.lineByLineStartSlopMs = 750
     self.digitalKillswitchStarpowerChunkSize = 0.05
     self.digitalKillswitchActiveStarpowerChunkSize = self.digitalKillswitchStarpowerChunkSize / 3.0
     # evilynux: was 0.10, now much closer to actual GH3
@@ -428,9 +429,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.soloFrameMode = self.engine.config.get("game", "solo_frame")
 
     #MFH - TODO - switch to midi lyric mode option
-    #self.midiLyricMode = self.engine.config.get("game", "midi_lyric_mode")
-    self.midiLyricMode = 0
+    self.midiLyricMode = self.engine.config.get("game", "midi_lyric_mode")
+    #self.midiLyricMode = 0
+    self.currentSimpleMidiLyricLine = ""
+    self.noMoreMidiLineLyrics = False
 
+    
     self.fontMode = self.engine.config.get("game", "font_rendering_mode")   #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
     self.laminaScreen = None
     if self.fontMode == 1:    #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
@@ -741,15 +745,23 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #     those of us with older systems can read the lyrics without them jumping all over the place.
       tempLyricLine = ""
       tempLyricLineEvents = []
+      firstTime = None
       for time, event in self.song.eventTracks[Song.TK_LYRICS].getAllEvents():
+        if not firstTime:
+          firstTime = time
         lastLyricLineContents = tempLyricLine
         tempLyricLine = tempLyricLine + " " + event.text
-        if lyricFont.getStringSize(tempLyricLine, scale = txtSize) > self.lineByLineLyricMaxLineWidth: 
+        if lyricFont.getStringSize(tempLyricLine, scale = txtSize)[0] > self.lineByLineLyricMaxLineWidth: 
           self.midiLyricLineEvents.append(tempLyricLineEvents)
-          self.midiLyricLines.append(lastLyricLineContents)
+          self.midiLyricLines.append( (firstTime, lastLyricLineContents) )
+          firstTime = None
           tempLyricLine = event.text
           tempLyricLineEvents = []
         tempLyricLineEvents.append( (time, event) )
+      else:   #after last line is accumulated
+        self.midiLyricLineEvents.append(tempLyricLineEvents)
+        self.midiLyricLines.append( (firstTime, tempLyricLine) )
+      
 
       
       #MFH - test unpacking / decoding the lyrical lines:
@@ -759,9 +771,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           time, event = lyricTuple
           Log.debug("MIDI Line-by-line lyric unpack test - time, event = " + str(time) + ", " + event.text )
               
-      for midiLyricSimpleLine in self.midiLyricLines:
-        Log.debug("MIDI Line-by-line simple lyric line unpack test: " + midiLyricSimpleLine)
+      for lineStartTime, midiLyricSimpleLineText in self.midiLyricLines:
+        Log.debug("MIDI Line-by-line simple lyric line starting at time: " + str(lineStartTime) + ", " + midiLyricSimpleLineText)
 
+    self.numMidiLyricLines = len(self.midiLyricLines)
+    #MFH - init vars for the next time & lyric line to display
+    if ( self.numMidiLyricLines > 0 ):
+      self.nextMidiLyricStartTime, self.nextMidiLyricLine = self.midiLyricLines[self.midiLyricLineIndex]
+    
+    
+    
     self.initializeStarScoringThresholds()    #MFH
       
 
@@ -1696,6 +1715,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
 
   def resetVariablesToDefaults(self):
+    self.midiLyricLineIndex = 0
     self.drumStart = False  #faaa's drum sound mod restart
     self.avMult = [0.0 for i in self.playerList]
     self.lastStars = [0 for i in self.playerList]
@@ -2835,7 +2855,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.crowdsCheering = False #catches crowdsEnabled != 3, pause before countdown, set to 3
           self.starPowersActive = 0
           self.playersInGreen = 0
-          if self.playerList[0].practiceMode:
+          if self.playerList[0].practiceMode and self.engine.audioSpeedDivisor == 1:
             self.playerList[0].startPos[0] -= self.song.period*4
             if self.playerList[0].startPos[0] < 0.0:
               self.playerList[0].startPos[0] = 0.0
@@ -2857,6 +2877,28 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       if self.rockFinished and not self.pause:
         self.goToResults()
         return
+
+      #MFH
+      if self.midiLyricMode == 1 and (not self.noMoreMidiLineLyrics):   #line-by-line lyrics mode:
+
+#-        latestGoodStartTime = 0
+#-        latestGoodLyricLine = ""
+#-        for lineStartTime, midiLyricSimpleLineText in self.midiLyricLines:
+#-          if pos >= (lineStartTime-lineByLineStartSlopMs) and lineStartTime > latestGoodStartTime: 
+#-            latestGoodLyricLine = midiLyricSimpleLineText
+#-            latestGoodStartTime = lineStartTime
+        #self.currentSimpleMidiLyricLine = latestGoodLyricLine
+
+        if pos >= (self.nextMidiLyricStartTime-self.lineByLineStartSlopMs): 
+          self.currentSimpleMidiLyricLine = self.nextMidiLyricLine
+
+          if ( self.numMidiLyricLines > self.midiLyricLineIndex+1 ):
+            self.midiLyricLineIndex += 1
+            self.nextMidiLyricStartTime, self.nextMidiLyricLine = self.midiLyricLines[self.midiLyricLineIndex]
+          else:
+            self.noMoreMidiLineLyrics = True
+
+
 
   def endPick(self, num):
     score = self.getExtraScoreForCurrentlyPlayedNotes(num)
@@ -4695,7 +4737,19 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               lyricFont.render(text, (xOffset, yOffset),(1, 0, 0),txtSize)
 
           #MFH - TODO - handle line-by-line lyric display and coloring here:
-          #elif self.midiLyricMode == 1:   #line-by-line lyrics mode:
+          elif self.midiLyricMode == 1:   #line-by-line lyrics mode:
+
+            if self.theme == 2:
+              txtSize = 0.00170
+            else:
+              #gh3 or other standard mod
+              txtSize = 0.00175
+            yOffset = 0.0696  
+            xOffset = 0.5 - (lyricFont.getStringSize(self.currentSimpleMidiLyricLine, scale = txtSize)[0] / 2.0)
+            glColor3f(1, 1, 1)
+            lyricFont.render(self.currentSimpleMidiLyricLine, (xOffset, yOffset),(1, 0, 0),txtSize)                
+              
+
   
   
   
