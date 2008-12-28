@@ -12,16 +12,6 @@ You too can make a difference!
 
 ==Donating to Myfingershurt (chris.paiano)==
 
-Currently, Chris needs some kind of RB or GH drumset to continue development on complex features such as drum fills and big rock endings. Depending on how much donation fundage is accumulated, Chris can buy better and more featured drumsets to integrate into FoFiX.
-
-[http://www.cpeproto.com/FofixDonate.html http://i36.tinypic.com/1497gk5.jpg]
-
-  * For example - basic drum features and probably all kinds of cool drum-related features will be implemented with just an old RB1 drum set. Chris promises to protect the plastic bass drum pedal with a steel plate and not hit them too hard :)
-
-  * However, if Chris gets a RB2 drumset - he can also then add support for the velocity-sensing function (analog drum pads), which will directly control drum track loudness (just like the game).
-
-  * With a GH:WT drumset and that extra cymbal, it probably wouldn't be too long before we had full support for a 5-drum fretboard. 
-
-Please *[http://www.cpeproto.com/FofixDonate.html donate to the "MFH Needs a Drumset To Develop Remaining Drum Features" fund]* today!  :)  
+[http://www.cpeproto.com/FofixDonate.html MFH's donation page]
 
 With your donation, you can leave a comment to direct MFH to work on the feature you'd like to see done most!
