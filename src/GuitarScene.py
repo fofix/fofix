@@ -734,6 +734,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.midiLyricLines = []        #MFH - this is a list of text strings
                                     #  it will contain a list of the concactenated midi lines for a simpler lyric display mode
     self.midiLyricLineIndex = 0
+    self.nextMidiLyricStartTime = 0
+    self.nextMidiLyricLine = ""
     if self.midiLyricsEnabled == 1 and self.midiLyricMode == 1:   #line-by-line lyrics mode is selected and enabled:
       lyricFont = self.engine.data.font        
       if self.theme == 2:
@@ -759,8 +761,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           tempLyricLineEvents = []
         tempLyricLineEvents.append( (time, event) )
       else:   #after last line is accumulated
-        self.midiLyricLineEvents.append(tempLyricLineEvents)
-        self.midiLyricLines.append( (firstTime, tempLyricLine) )
+        if len(self.midiLyricLines) > 0:
+          self.midiLyricLineEvents.append(tempLyricLineEvents)
+          self.midiLyricLines.append( (firstTime, tempLyricLine) )
       
 
       
@@ -2879,7 +2882,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         return
 
       #MFH
-      if self.midiLyricMode == 1 and (not self.noMoreMidiLineLyrics):   #line-by-line lyrics mode:
+      if self.midiLyricMode == 1 and self.numMidiLyricLines > 0 and (not self.noMoreMidiLineLyrics):   #line-by-line lyrics mode:
 
 #-        latestGoodStartTime = 0
 #-        latestGoodLyricLine = ""
