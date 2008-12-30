@@ -148,7 +148,7 @@ Config.define("game",   "star_claps",          bool, False,  text = _("Starpower
 Config.define("audio", "disable_preview",      bool, True,  text = _("Song Previews"), options = {False: _("Auto"), True: _("Yellow Fret (#3)")})
 Config.define("game", "uploadurl_w67_starpower",    str,   "http://www.wembley1967.com/chart/uploadsp.php") # evilynux - new one starting 20080902
 Config.define("game", "rb_sp_neck_glow",      bool, False,  text = _("RB SP Neck Glow"), options = {False: _("Off"), True: _("On")})
-Config.define("game",   "sp_notes_while_active",  int,  1,  text = _("SP Refill"),  options = {0: _("None"), 1: _("Rock Band"), 2: _("Yes")} ) 
+Config.define("game",   "sp_notes_while_active",  int,  2,  text = _("SP Refill"),  options = {0: _("None"), 1: _("By Theme"), 2: _("By MIDI Type"), 3: _("Always")} ) 
 
 Config.define("game", "analog_killsw_mode",      int, 0,  text = _("Analog Killswitch P1"), options = {0: _("Off"), 1: _("PS2/PS3/Wii"), 2: _("XBOX"), 3: _("XBOX Inv")})
 Config.define("game", "analog_killsw_mode_p2",      int, 0,  text = _("Analog Killswitch P2"), options = {0: _("Off"), 1: _("PS2/PS3/Wii"), 2: _("XBOX"), 3: _("XBOX Inv")})

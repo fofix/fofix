@@ -1367,6 +1367,8 @@ class Drum:
           self.spEnabled = False
         elif self.spRefillMode == 1 and self.theme != 2:  #mode 1 = overdrive refill notes in RB themes only
           self.spEnabled = False
+        elif self.spRefillMode == 2 and song.midiStyle != 1: #mode 2 = refill based on MIDI type
+          self.spEnabled = False
 
       if event.star:
         #self.isStarPhrase = True
@@ -1524,6 +1526,8 @@ class Drum:
         if self.spRefillMode == 0:    #mode 0 = no starpower / overdrive refill notes
           self.spEnabled = False
         elif self.spRefillMode == 1 and self.theme != 2:  #mode 1 = overdrive refill notes in RB themes only
+          self.spEnabled = False
+        elif self.spRefillMode == 2 and song.midiStyle != 1: #mode 2 = refill based on MIDI type
           self.spEnabled = False
 
 
