@@ -126,24 +126,27 @@ Notice - If you just want the default phrases to show do not put these in your t
 ----------------------------------------------------------------------------
 ==Pause & options menus, backgrounds & text positions==
 ||_*Item Name*_||_*What it Does/How to use it*_||
-||pause_bkg_x = 0||0 starts from the center of the screen||
-||pause_bkg_y = 0||0 starts from the center of the screen||
-||pause_text_x = .3||Controls the Pause Menu text position. Use a Decimal # between 0 - 1, IE- .34||
-||pause_text_y = .31||Use a decimal # between 0 - 1, IE- .34||
+||fail_bkg_x = 0||Controls the fail menu background and text positions||
+||fail_bkg_y = 0||Controls the fail menu background and text positions||
+||fail_completed_color = #FFFFFF ||Controls the Fail/Completed text line color.Use a hex color||
+||fail_selected_color = #FFBF00||Use a Hex color code||
+||fail_text_x =   ||Default is calculated, not constant||
+||fail_text_y = .47||Controls the fail menu background and text positions||
+||fail_text_color = #FFFFFF||Use a Hex color code||
+||loading_text_color = #FFFFFF||Controls the Loading phrase color. Use a hex color||
 ||opt_bkg_x = 0||0 starts from the center||
 ||opt_bkg_y = 0||0 starts from the center||
 ||opt_text_x = .38||Controls the Option Menu X text position||
 ||opt_text_y = .15||Controls the Option Menu Y text position||
-||fail_bkg_x = 0||Controls the fail menu background and text positions||
-||fail_bkg_y = 0||Controls the fail menu background and text positions||
-||fail_text_x =   ||Default is calculated, not constant||
-||fail_text_y = .47||Controls the fail menu background and text positions||
-||pause_text_color = #FFFFFF||Use a Hex color code||
+||pause_bkg_x = 0||0 starts from the center of the screen||
+||pause_bkg_y = 0||0 starts from the center of the screen||
 ||pause_selected_color = #FFBF00||Use a Hex color code||
+||pause_text_color = #FFFFFF||Use a Hex color code||
+||pause_text_x = .3||Controls the Pause Menu text position. Use a Decimal # between 0 - 1, IE- .34||
+||pause_text_y = .31||Use a decimal # between 0 - 1, IE- .34||
 ||sub_menu_x = .38||Controls the Difficult Select Screen & Instrument Select X Position||
 ||sub_menu_y = .15||Controls the Difficult Select Screen & Instrument Select Y Position||
-||fail_text_color = #FFFFFF||Use a Hex color code||
-||fail_selected_color = #FFBF00||Use a Hex color code||
+
 
 
 
