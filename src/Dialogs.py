@@ -4617,6 +4617,7 @@ class LoadingSplashScreen(Layer, KeyListener):
     self.time         = 0.0
     self.loadingx = Theme.loadingX
     self.loadingy = Theme.loadingY  
+    self.textColor = Theme.loadingColor
     self.allowtext = self.engine.config.get("game", "lphrases")  
 
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
@@ -4679,6 +4680,10 @@ class LoadingSplashScreen(Layer, KeyListener):
         x = .5
         y = .6 - h / 2 + v * .5
 
+      #akedrou - support for Loading Text Color
+      c1,c2,c3 = self.textColor
+      glColor3f(c1,c2,c3)
+      
       # evilynux - Made text about 2 times smaller (as requested by worldrave)
       if self.allowtext:
         if self.theme == 1:   #GH3 themes get different right margin, and always call wrap function

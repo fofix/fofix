@@ -84,7 +84,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #MFH - testing new traceback logging:
     #raise TypeError
     
-    splash = Dialogs.showLoadingSplashScreen(self.engine, _("Preparing...") ) 
+    splash = Dialogs.showLoadingSplashScreen(self.engine, _("Preparing...")) 
 
     
     #MFH - retrieve game parameters:
@@ -1233,10 +1233,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     Dialogs.hideLoadingSplashScreen(self.engine, splash)
     splash = None
 
-    settingsMenu = Settings.GameSettingsMenu(self.engine)
-    settingsMenu.fadeScreen = True
-
-
     #MFH - retrieve theme.ini pause background & text positions 
     self.pause_bkg_x = Theme.pause_bkg_xPos
     self.pause_bkg_y = Theme.pause_bkg_yPos
@@ -1262,12 +1258,17 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.pause_selected_color = Theme.hexToColor(Theme.pause_selected_colorVar)
     self.fail_text_color = Theme.hexToColor(Theme.fail_text_colorVar)
     self.fail_selected_color = Theme.hexToColor(Theme.fail_selected_colorVar)
+    self.fail_completed_color = Theme.hexToColor(Theme.fail_completed_colorVar)
 
+    settingsMenu = Settings.GameSettingsMenu(self.engine, self.pause_text_color, self.pause_selected_color)
+    settingsMenu.fadeScreen = True
+
+    
     # evilynux - More themeable options
     self.rockmeter_score_color = Theme.hexToColor(Theme.rockmeter_score_colorVar)
     
     #self.fail_completed_color = Theme.hexToColor(Theme.song_name_selected_colorVar) # text same color as selected song
-    self.fail_completed_color = Theme.hexToColor(Theme.fail_text_colorVar)  #No, now same as fail_text color.
+    #self.fail_completed_color = Theme.hexToColor(Theme.fail_text_colorVar)  #No, now same as fail_text color.
     
     self.ingame_stats_color = Theme.hexToColor(Theme.ingame_stats_colorVar)
 
@@ -1282,6 +1283,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.fail_text_color = (1,1,1)
     if self.fail_selected_color == None:
       self.fail_selected_color = (1,0.75,0)
+    if self.fail_completed_color == None:
+      self.fail_completed_color = self.fail_text_color
 
     Log.debug("Pause text / selected colors: " + str(self.pause_text_color) + " / " + str(self.pause_selected_color))
 

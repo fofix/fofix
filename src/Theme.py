@@ -116,6 +116,7 @@ Config.define("theme", "rbmenu",       bool, False)
 
 Config.define("theme", "loading_x",       float, None)
 Config.define("theme", "loading_y",       float, None)
+Config.define("theme", "loading_text_color", str, "#FFFFFF")
 
 Config.define("theme", "twoDnote",       bool, True)
 Config.define("theme", "twoDkeys",       bool, True)
@@ -155,8 +156,12 @@ Config.define("theme", "song_rb2_artist_color",       str, "#4080FF")
 
 Config.define("theme", "pause_bkg_x",       float, None)
 Config.define("theme", "pause_bkg_y",       float, None)
+Config.define("theme", "pause_bkg_w",       float, None)
+Config.define("theme", "pause_bkg_h",       float, None)
 Config.define("theme", "pause_text_x",       float, None)
 Config.define("theme", "pause_text_y",       float, None)
+Config.define("theme", "pause_text_color",  str, "#FFFFFF")
+Config.define("theme", "pause_selected_color",  str, "#FFBF00")
 
 Config.define("theme", "opt_bkg_x",       float, None)
 Config.define("theme", "opt_bkg_y",       float, None)
@@ -180,10 +185,10 @@ Config.define("theme", "library_text_color",  str, "#FFFFFF")
 Config.define("theme", "library_selected_color",  str, "#FFBF00")
 
 
-Config.define("theme", "pause_text_color",  str, "#FFFFFF")
-Config.define("theme", "pause_selected_color",  str, "#FFBF00")
 Config.define("theme", "fail_text_color",  str, "#FFFFFF")
+Config.define("theme", "fail_completed_color",  str, "#FFFFFF")
 Config.define("theme", "fail_selected_color",  str, "#FFBF00")
+
 
 #MFH - crowd cheer loop delay in theme.ini: if not exist, use value from settings. Otherwise, use theme.ini value.
 Config.define("theme", "crowd_loop_delay",  int, None)
@@ -258,6 +263,7 @@ menuY = None
 menuRB = None
 loadingX = None
 loadingY = None
+loadingColor = None
 twoDnote = None
 twoDkeys = None
 threeDspin = None
@@ -317,6 +323,7 @@ song_rb2_artist_colorVar = None
 
 pause_text_colorVar = None
 pause_selected_colorVar = None
+fail_completed_colorVar = None
 fail_text_colorVar = None
 fail_selected_colorVar = None
 
@@ -455,7 +462,7 @@ def setupFlameColors(config):
     flameColors[0][1] = hexToColor(config.get("theme", "flame1_1X_color"))
     flameColors[0][2] = hexToColor(config.get("theme", "flame2_1X_color"))
     flameColors[0][3] = hexToColor(config.get("theme", "flame3_1X_color"))
-    flameColors[0][5] = hexToColor(config.get("theme", "flame4_1X_color"))
+    flameColors[0][4] = hexToColor(config.get("theme", "flame4_1X_color"))
     flameColors[1][0] = hexToColor(config.get("theme", "flame0_2X_color"))
     flameColors[1][1] = hexToColor(config.get("theme", "flame1_2X_color"))
     flameColors[1][2] = hexToColor(config.get("theme", "flame2_2X_color"))
@@ -486,7 +493,7 @@ def setupFlameSizes(config):
     flameSizes[0][1] = config.get("theme", "flame1_1X_size")
     flameSizes[0][2] = config.get("theme", "flame2_1X_size")
     flameSizes[0][3] = config.get("theme", "flame3_1X_size")
-    flameSizes[0][5] = config.get("theme", "flame4_1X_size")
+    flameSizes[0][4] = config.get("theme", "flame4_1X_size")
     flameSizes[1][0] = config.get("theme", "flame0_2X_size")
     flameSizes[1][1] = config.get("theme", "flame1_2X_size")
     flameSizes[1][2] = config.get("theme", "flame2_2X_size")
@@ -549,7 +556,7 @@ def setupSonglist(config):
   global artist_text_colorVar, artist_selected_colorVar
   global library_text_colorVar, library_selected_colorVar
   global pause_text_colorVar, pause_selected_colorVar
-  global fail_text_colorVar, fail_selected_colorVar
+  global fail_text_colorVar, fail_selected_colorVar, fail_completed_colorVar
   global songSelectSubmenuX, songSelectSubmenuY
   global songSelectSubmenuOffsetLines, songSelectSubmenuOffsetSpaces
   
@@ -584,6 +591,7 @@ def setupSonglist(config):
   library_selected_colorVar = config.get("theme", "library_selected_color")
   pause_text_colorVar = config.get("theme", "pause_text_color")
   pause_selected_colorVar = config.get("theme", "pause_selected_color")
+  fail_completed_colorVar = config.get("theme", "fail_completed_color")
   fail_text_colorVar = config.get("theme", "fail_text_color")
   fail_selected_colorVar = config.get("theme", "fail_selected_color")
   
@@ -608,7 +616,7 @@ def setupPauseNOpt(config):
   
 def setupMenu(config):
   global menuX, menuY, menuRB
-  global loadingX, loadingY
+  global loadingX, loadingY, loadingColor
   global songback, versiontag
   
   menuX = config.get("theme", "menu_x")
@@ -616,6 +624,7 @@ def setupMenu(config):
   menuRB = config.get("theme", "rbmenu")
   loadingX = config.get("theme", "loading_x")
   loadingY = config.get("theme", "loading_y")
+  loadingColor = hexToColor(config.get("theme", "loading_text_color"))
   songback = config.get("theme", "songback")
   versiontag = config.get("theme", "versiontag")
 

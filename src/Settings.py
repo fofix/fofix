@@ -649,7 +649,7 @@ class SettingsMenu(Menu.Menu):
       self.engine.resource.refreshBaseLib()   #myfingershurt - to let user continue with new songpath without restart
     
 class GameSettingsMenu(Menu.Menu):
-  def __init__(self, engine):
+  def __init__(self, engine, gTextColor, gSelectedColor):
 
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:
@@ -675,5 +675,5 @@ class GameSettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "player0",  "leftymode", autoApply = True),
       ConfigChoice(engine.config, "player1",  "leftymode", autoApply = True), #QQstarS
     ]
-    Menu.Menu.__init__(self, engine, settings, pos = (.3, .31), viewSize = 5)
+    Menu.Menu.__init__(self, engine, settings, pos = (.3, .31), viewSize = 5, textColor = gTextColor, selectedColor = gSelectedColor)
 
