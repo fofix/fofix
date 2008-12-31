@@ -696,6 +696,58 @@ class Guitar:
     
     glDisable(GL_TEXTURE_2D)
 
+  def renderNeckMethod(self, visibility, offset, beatsPerUnit, neck, alpha = False): #blazingamer: New neck rendering method
+
+    def project(beat):
+      return 0.125 * beat / beatsPerUnit    # glorandwarf: was 0.12
+    
+    if self.starPowerActive and self.theme == 0:#8bit
+      color = (.3,.7,.9)
+    elif self.starPowerActive and self.theme == 1:
+      color = (.3,.7,.9)
+    else:
+      color = (1,1,1)
+
+    v            = visibility
+    w            = self.boardWidth
+    l            = self.boardLength
+
+    beatsPerUnit = beatsPerUnit
+    offset       = offset
+    
+    glEnable(GL_TEXTURE_2D)
+
+    if alpha == True:
+      glBlendFunc(GL_ONE, GL_ONE)
+    neck.texture.bind()
+    glBegin(GL_TRIANGLE_STRIP)
+    glColor4f(color[0],color[1],color[2], 0)
+    glTexCoord2f(0.0, project(offset - 2 * beatsPerUnit))
+    glVertex3f(-w / 2, 0, -2)
+    glTexCoord2f(1.0, project(offset - 2 * beatsPerUnit))
+    glVertex3f( w / 2, 0, -2)
+    
+    glColor4f(color[0],color[1],color[2], v)
+    glTexCoord2f(0.0, project(offset - 1 * beatsPerUnit))
+    glVertex3f(-w / 2, 0, -1)
+    glTexCoord2f(1.0, project(offset - 1 * beatsPerUnit))
+    glVertex3f( w / 2, 0, -1)
+    
+    glTexCoord2f(0.0, project(offset + l * beatsPerUnit * .7))
+    glVertex3f(-w / 2, 0, l * .7)
+    glTexCoord2f(1.0, project(offset + l * beatsPerUnit * .7))
+    glVertex3f( w / 2, 0, l * .7)
+    
+    glColor4f(color[0],color[1],color[2], 0)
+    glTexCoord2f(0.0, project(offset + l * beatsPerUnit))
+    glVertex3f(-w / 2, 0, l)
+    glTexCoord2f(1.0, project(offset + l * beatsPerUnit))
+    glVertex3f( w / 2, 0, l)
+    glEnd()
+    if alpha == True:
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+      
+    glDisable(GL_TEXTURE_2D)
     
   def renderNeck(self, visibility, song, pos):
     if not song:
@@ -711,217 +763,55 @@ class Guitar:
     beatsPerUnit = self.beatsPerBoard / self.boardLength
     offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
 
-    if self.starPowerActive and self.theme == 0:#8bit
-      color = (.3,.7,.9)
-    elif self.starPowerActive and self.theme == 1:
-      color = (.3,.7,.9)
-    else:
-      color = (1,1,1)   
-
-    glEnable(GL_TEXTURE_2D)
     #myfingershurt: every theme can have oNeck:
 
     if self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 1:
-      self.guitarSoloNeck.texture.bind()
+      neck = self.guitarSoloNeck
     elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
-      self.bassGrooveNeck.texture.bind()
+      neck = self.bassGrooveNeck
     elif self.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and self.scoreMultiplier <= 4:
       if self.isBassGuitar and self.oNeckBass:
-        self.oNeckBass.texture.bind()
+        neck = self.oNeckBass
       else:
-        self.oNeck.texture.bind()
+        neck = self.oNeck
     else:
-      self.neckDrawing.texture.bind()
+      neck = self.neckDrawing
 
     if not (self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 2):
-      glBegin(GL_TRIANGLE_STRIP)
-      glColor4f(color[0],color[1],color[2], 0)
-      glTexCoord2f(0.0, project(offset - 2 * beatsPerUnit))
-      glVertex3f(-w / 2, 0, -2)
-      glTexCoord2f(1.0, project(offset - 2 * beatsPerUnit))
-      glVertex3f( w / 2, 0, -2)
-      
-      glColor4f(color[0],color[1],color[2], v)
-      glTexCoord2f(0.0, project(offset - 1 * beatsPerUnit))
-      glVertex3f(-w / 2, 0, -1)
-      glTexCoord2f(1.0, project(offset - 1 * beatsPerUnit))
-      glVertex3f( w / 2, 0, -1)
-      
-      glTexCoord2f(0.0, project(offset + l * beatsPerUnit * .7))
-      glVertex3f(-w / 2, 0, l * .7)
-      glTexCoord2f(1.0, project(offset + l * beatsPerUnit * .7))
-      glVertex3f( w / 2, 0, l * .7)
-      
-      glColor4f(color[0],color[1],color[2], 0)
-      glTexCoord2f(0.0, project(offset + l * beatsPerUnit))
-      glVertex3f(-w / 2, 0, l)
-      glTexCoord2f(1.0, project(offset + l * beatsPerUnit))
-      glVertex3f( w / 2, 0, l)
-      glEnd()
+      self.renderNeckMethod(v, offset, beatsPerUnit, neck)
 
     if self.bgcount > 0 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 2:   #static bass groove overlay
-      self.bassGrooveNeck.texture.bind()
-     
-      glBegin(GL_TRIANGLE_STRIP)
-      glColor4f(color[0],color[1],color[2], 0)
-      glTexCoord2f(0.0, project(-2 * beatsPerUnit))
-      glVertex3f(-w / 2, 0, -2)
-      glTexCoord2f(1.0, project(-2 * beatsPerUnit))
-      glVertex3f( w / 2, 0, -2)
+      self.renderNeckMethod(v*self.bgcount, 0, beatsPerUnit, self.bassGrooveNeck)
       
-      glColor4f(color[0],color[1],color[2], v*self.bgcount)
-      glTexCoord2f(0.0, project(-1 * beatsPerUnit))
-      glVertex3f(-w / 2, 0, -1)
-      glTexCoord2f(1.0, project(-1 * beatsPerUnit))
-      glVertex3f( w / 2, 0, -1)
-      
-      glTexCoord2f(0.0, 0)
-      glVertex3f(-w / 2, 0, 0)
-      glTexCoord2f(1.0, 0)
-      glVertex3f( w / 2, 0, 0)
-      
-      glColor4f(color[0],color[1],color[2], 0)
-      glTexCoord2f(0.0, project(l * beatsPerUnit))
-      glVertex3f(-w / 2, 0, l)
-      glTexCoord2f(1.0, project(l * beatsPerUnit))
-      glVertex3f( w / 2, 0, l)
-      glEnd()
-
     elif self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 2:   #static overlay
-      self.guitarSoloNeck.texture.bind()
-
-      glBegin(GL_TRIANGLE_STRIP)
-      glColor4f(color[0],color[1],color[2], 0)
-      glTexCoord2f(0.0, project(-2 * beatsPerUnit))
-      glVertex3f(-w / 2, 0, -2)
-      glTexCoord2f(1.0, project(-2 * beatsPerUnit))
-      glVertex3f( w / 2, 0, -2)
-      
-      glColor4f(color[0],color[1],color[2], v)
-      glTexCoord2f(0.0, project(-1 * beatsPerUnit))
-      glVertex3f(-w / 2, 0, -1)
-      glTexCoord2f(1.0, project(-1 * beatsPerUnit))
-      glVertex3f( w / 2, 0, -1)
-      
-      glTexCoord2f(0.0, 0)
-      glVertex3f(-w / 2, 0, 0)
-      glTexCoord2f(1.0, 0)
-      glVertex3f( w / 2, 0, 0)
-      
-      glColor4f(color[0],color[1],color[2], 0)
-      glTexCoord2f(0.0, project(l * beatsPerUnit))
-      glVertex3f(-w / 2, 0, l)
-      glTexCoord2f(1.0, project(l * beatsPerUnit))
-      glVertex3f( w / 2, 0, l)
-      glEnd()
-
-
+      self.renderNeckMethod(v, 0, beatsPerUnit, self.guitarSoloNeck)
       
     if self.spcount2 != 0 and self.spcount < 1.2 and self.oNeck:   #static overlay
-
       if self.oNeckovr != None and (self.scoreMultiplier > 4 or self.guitarSolo):
-        self.oNeckovr.texture.bind()
+        neck = self.oNeckovr
       else:
         if self.isBassGuitar and self.oNeckBass:
-          self.oNeckBass.texture.bind()
+          neck = self.oNeckBass
         else:
-          self.oNeck.texture.bind()
-
-      glBegin(GL_TRIANGLE_STRIP)
-      glColor4f(color[0],color[1],color[2], 0)
-      glTexCoord2f(0.0, project(offset - 2 * beatsPerUnit))
-      glVertex3f(-w / 2, 0, -2)
-      glTexCoord2f(1.0, project(offset - 2 * beatsPerUnit))
-      glVertex3f( w / 2, 0, -2)
+          neck = self.oNeck
+          
+      self.renderNeckMethod(self.spcount, offset, beatsPerUnit, neck)
       
-      glColor4f(color[0],color[1],color[2], self.spcount)
-      glTexCoord2f(0.0, project(offset - 1 * beatsPerUnit))
-      glVertex3f(-w / 2, 0, -1)
-      glTexCoord2f(1.0, project(offset - 1 * beatsPerUnit))
-      glVertex3f( w / 2, 0, -1)
-      
-      glTexCoord2f(0.0, project(offset + l * beatsPerUnit * .7))
-      glVertex3f(-w / 2, 0, l * .7)
-      glTexCoord2f(1.0, project(offset + l * beatsPerUnit * .7))
-      glVertex3f( w / 2, 0, l * .7)
-      
-      glColor4f(color[0],color[1],color[2], 0)
-      glTexCoord2f(0.0, project(offset + l * beatsPerUnit))
-      glVertex3f(-w / 2, 0, l)
-      glTexCoord2f(1.0, project(offset + l * beatsPerUnit))
-      glVertex3f( w / 2, 0, l)
-      glEnd()
-
-
     if self.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and (self.scoreMultiplier > 4 or self.guitarSolo):   #static overlay
 
       if self.oNeckovr != None:
-        self.oNeckovr.texture.bind()
+        neck = self.oNeckovr
       else:
-        glBlendFunc(GL_ONE, GL_ONE)
         if self.isBassGuitar and self.oNeckBass:
-          self.oNeckBass.texture.bind()
+          neck = self.oNeckBass
         else:
-          self.oNeck.texture.bind()
-        
-      glBegin(GL_TRIANGLE_STRIP)
-      glColor4f(color[0],color[1],color[2], 0)
-      glTexCoord2f(0.0, project(offset - 2 * beatsPerUnit))
-      glVertex3f(-w / 2, 0, -2)
-      glTexCoord2f(1.0, project(offset - 2 * beatsPerUnit))
-      glVertex3f( w / 2, 0, -2)
-      
-      glColor4f(color[0],color[1],color[2], v)
-      glTexCoord2f(0.0, project(offset - 1 * beatsPerUnit))
-      glVertex3f(-w / 2, 0, -1)
-      glTexCoord2f(1.0, project(offset - 1 * beatsPerUnit))
-      glVertex3f( w / 2, 0, -1)
-      
-      glTexCoord2f(0.0, project(offset + l * beatsPerUnit * .7))
-      glVertex3f(-w / 2, 0, l * .7)
-      glTexCoord2f(1.0, project(offset + l * beatsPerUnit * .7))
-      glVertex3f( w / 2, 0, l * .7)
-      
-      glColor4f(color[0],color[1],color[2], 0)
-      glTexCoord2f(0.0, project(offset + l * beatsPerUnit))
-      glVertex3f(-w / 2, 0, l)
-      glTexCoord2f(1.0, project(offset + l * beatsPerUnit))
-      glVertex3f( w / 2, 0, l)
-      glEnd()
+          neck = self.oNeck
+        alpha = True
 
-      if self.oNeckovr == None:
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+      self.renderNeckMethod(v, offset, beatsPerUnit, neck, alpha)
       
-    if self.isFailing:   #static overlay
-      self.failNeck.texture.bind()
-      
-      color = (1,1,1) 
-      glBegin(GL_TRIANGLE_STRIP)
-      glColor4f(color[0],color[1],color[2], 0)
-      glTexCoord2f(0.0, project(-2 * beatsPerUnit))
-      glVertex3f(-w / 2, 0, -2)
-      glTexCoord2f(1.0, project(-2 * beatsPerUnit))
-      glVertex3f( w / 2, 0, -2)
-      
-      glColor4f(color[0],color[1],color[2], self.failcount)
-      glTexCoord2f(0.0, project(-1 * beatsPerUnit))
-      glVertex3f(-w / 2, 0, -1)
-      glTexCoord2f(1.0, project(-1 * beatsPerUnit))
-      glVertex3f( w / 2, 0, -1)
-      
-      glTexCoord2f(0.0, 0)
-      glVertex3f(-w / 2, 0, 0)
-      glTexCoord2f(1.0, 0)
-      glVertex3f( w / 2, 0, 0)
-      
-      glColor4f(color[0],color[1],color[2], 0)
-      glTexCoord2f(0.0, project(l * beatsPerUnit))
-      glVertex3f(-w / 2, 0, l)
-      glTexCoord2f(1.0, project(l * beatsPerUnit))
-      glVertex3f( w / 2, 0, l)
-      glEnd()
-      
-    glDisable(GL_TEXTURE_2D)
+    if self.isFailing:
+      self.renderNeckMethod(self.failcount, 0, beatsPerUnit, self.failNeck)
 
   def drawTrack(self, visibility, song, pos):
     if not song:

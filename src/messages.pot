@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-12-28 13:15-0800\n"
+"POT-Creation-Date: 2008-12-30 17:29-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -63,12 +63,12 @@ msgstr ""
 #: Dialogs.py:1160 Dialogs.py:1162 GameEngine.py:61 GameEngine.py:62
 #: GameEngine.py:63 GameEngine.py:65 GameEngine.py:68 GameEngine.py:113
 #: GameEngine.py:132 GameEngine.py:136 GameEngine.py:137 GameEngine.py:138
-#: GameEngine.py:151 GameEngine.py:158 GameEngine.py:159 GameEngine.py:163
-#: GameEngine.py:182 GameEngine.py:204 GameEngine.py:205 GameEngine.py:206
-#: GameEngine.py:207 GameEngine.py:208 GameEngine.py:209 GameEngine.py:210
-#: GameEngine.py:211 GameEngine.py:241 GameEngine.py:246 GameEngine.py:247
-#: GameEngine.py:250 GameEngine.py:269 GameEngine.py:270 GameEngine.py:271
-#: GameEngine.py:272 GameEngine.py:275 GameEngine.py:305 GameEngine.py:310
+#: GameEngine.py:158 GameEngine.py:159 GameEngine.py:163 GameEngine.py:182
+#: GameEngine.py:204 GameEngine.py:205 GameEngine.py:206 GameEngine.py:207
+#: GameEngine.py:208 GameEngine.py:209 GameEngine.py:210 GameEngine.py:211
+#: GameEngine.py:241 GameEngine.py:246 GameEngine.py:247 GameEngine.py:250
+#: GameEngine.py:269 GameEngine.py:270 GameEngine.py:271 GameEngine.py:272
+#: GameEngine.py:275 GameEngine.py:305 GameEngine.py:310
 msgid "Yes"
 msgstr ""
 
@@ -909,8 +909,16 @@ msgstr ""
 msgid "SP Refill"
 msgstr ""
 
-#: GameEngine.py:151 GameEngine.py:175 GameEngine.py:244
-msgid "Rock Band"
+#: GameEngine.py:151
+msgid "By Theme"
+msgstr ""
+
+#: GameEngine.py:151
+msgid "By MIDI Type"
+msgstr ""
+
+#: GameEngine.py:151 GameEngine.py:177
+msgid "Always"
 msgstr ""
 
 #: GameEngine.py:153
@@ -1065,16 +1073,16 @@ msgstr ""
 msgid "Left"
 msgstr ""
 
+#: GameEngine.py:175 GameEngine.py:244
+msgid "Rock Band"
+msgstr ""
+
 #: GameEngine.py:176
 msgid "Bass Groove"
 msgstr ""
 
 #: GameEngine.py:177
 msgid "Drum Misses"
-msgstr ""
-
-#: GameEngine.py:177
-msgid "Always"
 msgstr ""
 
 #: GameEngine.py:177
