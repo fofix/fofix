@@ -229,7 +229,7 @@ Config.define("performance", "killfx",       int, 0,     text = _("Killswitch FX
 Config.define("coffee", "songfilepath",       bool, True,     text = _("Library Filepath"),             options = {True: _("Show"), False: _("Hide")})
 Config.define("coffee", "noterotate",       bool, False,     text = _("Rotate 3D Notes"),             options = {True: _("1.1"), False: _("1.2")})
 Config.define("coffee", "phrases",       bool, True,     text = _("Phrases"),             options = {True: _("On"), False: _("Off")})
-Config.define("coffee", "song_display_mode",       int, 1,     text = _("Song List Display"),             options = {0: _("CDs"), 1: _("List"), 2: _("List/CD"), 3: _("RB2")})
+Config.define("coffee", "song_display_mode",       int, 1,     text = _("Song List Display"),             options = {0: _("CDs"), 1: _("List"), 2: _("List/CD"), 3: _("RB2"), 4: _("Theme.ini")})
 Config.define("game", "song_listing_mode",        int, 0,     text = _("Song Listing Mode"),            options = {0: _("Normal"), 1: _("List All")})
 Config.define("game", "songcovertype",        bool, True,     text = _("Song Cover Type"),      options = {True: _("Cd Labels"), False: _("Album Covers")})
 Config.define("game", "songlistrotation",     bool, True,     text = _("Rotating Cds"),           options = {True: _("On"), False: _("Off")})

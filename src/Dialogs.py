@@ -707,9 +707,12 @@ class SongChooser(Layer, KeyListener):
     self.theme = self.engine.data.theme
 
     
-    self.display = Theme.songListDisplay
-    if self.display == None:
-      self.display = self.engine.config.get("coffee", "song_display_mode")
+    self.display = self.engine.config.get("coffee", "song_display_mode")
+    if self.display == 4:
+      if Theme.songListDisplay != None:
+        self.display = Theme.songListDisplay
+      else:
+        self.display = 1
 
     self.tut = self.engine.config.get("game", "tut")
 
