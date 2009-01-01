@@ -706,13 +706,10 @@ class SongChooser(Layer, KeyListener):
     themename = self.engine.data.themeLabel
     self.theme = self.engine.data.theme
 
-    self.display = self.engine.config.get("coffee", "song_display_mode")
-    if self.display == 3:
-      if Theme.songListDisplay != None:
-        self.display = Theme.songListDisplay
-        Log.debug("Theme Forced List mode is %d" % self.display)
-      else:
-        self.display = 1
+    
+    self.display = Theme.songListDisplay
+    if self.display == None:
+      self.display = self.engine.config.get("coffee", "song_display_mode")
 
     self.tut = self.engine.config.get("game", "tut")
 
@@ -789,7 +786,7 @@ class SongChooser(Layer, KeyListener):
       except IOError:
         self.engine.loadImgDrawing(self, "selected",    os.path.join("themes",themename,"menu","selected.png"))
         self.selectedlistcd = None
-    elif self.display == 4:
+    elif self.display == 3:
       try:
         self.engine.loadImgDrawing(self, "background",  os.path.join("themes",themename,"menu","songchooserb2.png"))
       except IOError:
@@ -1092,12 +1089,12 @@ class SongChooser(Layer, KeyListener):
         if self.display == 2 and not self.listRotation:
           #self.engine.loadImgDrawing(self, "itemLabels[i]",  label)
           self.itemLabels[i] = ImgDrawing(self.engine.data.svg, label)
-        elif self.display == 4:
+        elif self.display == 3:
           self.itemLabels[i] = ImgDrawing(self.engine.data.svg, label)
         else:
           self.itemLabels[i] = Texture(label)
       else:
-        if self.display == 4:
+        if self.display == 3:
           label = self.engine.resource.fileName("themes",themename,"menu","emptylabel.png")
           if os.path.exists(label):
             self.itemLabels[i] = ImgDrawing(self.engine.data.svg, label)
@@ -3107,7 +3104,7 @@ class SongChooser(Layer, KeyListener):
           nuttin = True
 
           
-      elif self.display == 4:   #Qstick - rb2 Mode
+      elif self.display == 3:   #Qstick - rb2 Mode
         item  = self.items[self.selectedIndex]
         i = self.selectedIndex
         if self.itemLabels[i]:

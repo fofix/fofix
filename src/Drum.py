@@ -613,22 +613,11 @@ class Drum:
     
     glDisable(GL_TEXTURE_2D)
 
-
-      
-  def renderNeck(self, visibility, song, pos):
-    if not song:
-      return
+  def renderNeckMethod(self, visibility, offset, beatsPerUnit, neck, alpha = False): #blazingamer: New neck rendering method
 
     def project(beat):
       return 0.125 * beat / beatsPerUnit    # glorandwarf: was 0.12
-
-    v            = visibility
-    w            = self.boardWidth
-    l            = self.boardLength
-
-    beatsPerUnit = self.beatsPerBoard / self.boardLength
-    offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
-
+    
     if self.starPowerActive and self.theme == 0:#8bit
       color = (.3,.7,.9)
     elif self.starPowerActive and self.theme == 1:
@@ -636,16 +625,18 @@ class Drum:
     else:
       color = (1,1,1)
 
+    v            = visibility
+    w            = self.boardWidth
+    l            = self.boardLength
+
+    beatsPerUnit = beatsPerUnit
+    offset       = offset
+    
     glEnable(GL_TEXTURE_2D)
-    #myfingershurt: every theme can have oNeck:
 
-    if self.starPowerActive and self.oNeck and self.spcount == 1.2:
-      self.oNeck.texture.bind()
-    elif self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 1:
-      self.guitarSoloNeck.texture.bind()
-    else:
-      self.neckDrawing.texture.bind()
-
+    if alpha == True:
+      glBlendFunc(GL_ONE, GL_ONE)
+    neck.texture.bind()
     glBegin(GL_TRIANGLE_STRIP)
     glColor4f(color[0],color[1],color[2], 0)
     glTexCoord2f(0.0, project(offset - 2 * beatsPerUnit))
@@ -670,96 +661,60 @@ class Drum:
     glTexCoord2f(1.0, project(offset + l * beatsPerUnit))
     glVertex3f( w / 2, 0, l)
     glEnd()
-
-    if self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 2:   #static overlay
-      self.guitarSoloNeck.texture.bind()
-
-      glBegin(GL_TRIANGLE_STRIP)
-      glColor4f(color[0],color[1],color[2], 0)
-      glTexCoord2f(0.0, project(-2 * beatsPerUnit))
-      glVertex3f(-w / 2, 0, -2)
-      glTexCoord2f(1.0, project(-2 * beatsPerUnit))
-      glVertex3f( w / 2, 0, -2)
+    if alpha == True:
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
       
-      glColor4f(color[0],color[1],color[2], v)
-      glTexCoord2f(0.0, project(-1 * beatsPerUnit))
-      glVertex3f(-w / 2, 0, -1)
-      glTexCoord2f(1.0, project(-1 * beatsPerUnit))
-      glVertex3f( w / 2, 0, -1)
-      
-      glTexCoord2f(0.0, 0)
-      glVertex3f(-w / 2, 0, 0)
-      glTexCoord2f(1.0, 0)
-      glVertex3f( w / 2, 0, 0)
-      
-      glColor4f(color[0],color[1],color[2], 0)
-      glTexCoord2f(0.0, project(l * beatsPerUnit))
-      glVertex3f(-w / 2, 0, l)
-      glTexCoord2f(1.0, project(l * beatsPerUnit))
-      glVertex3f( w / 2, 0, l)
-      glEnd()
-
-
-    if self.spcount2 != 0 and self.spcount < 1.2 and self.oNeck:   #static overlay
-      self.oNeck.texture.bind()
-      
-      glBegin(GL_TRIANGLE_STRIP)
-      glColor4f(color[0],color[1],color[2], 0)
-      glTexCoord2f(0.0, project(offset - 2 * beatsPerUnit))
-      glVertex3f(-w / 2, 0, -2)
-      glTexCoord2f(1.0, project(offset - 2 * beatsPerUnit))
-      glVertex3f( w / 2, 0, -2)
-      
-      glColor4f(color[0],color[1],color[2], self.spcount)
-      glTexCoord2f(0.0, project(offset - 1 * beatsPerUnit))
-      glVertex3f(-w / 2, 0, -1)
-      glTexCoord2f(1.0, project(offset - 1 * beatsPerUnit))
-      glVertex3f( w / 2, 0, -1)
-      
-      glTexCoord2f(0.0, project(offset + l * beatsPerUnit * .7))
-      glVertex3f(-w / 2, 0, l * .7)
-      glTexCoord2f(1.0, project(offset + l * beatsPerUnit * .7))
-      glVertex3f( w / 2, 0, l * .7)
-      
-      glColor4f(color[0],color[1],color[2], 0)
-      glTexCoord2f(0.0, project(offset + l * beatsPerUnit))
-      glVertex3f(-w / 2, 0, l)
-      glTexCoord2f(1.0, project(offset + l * beatsPerUnit))
-      glVertex3f( w / 2, 0, l)
-      glEnd()
-    
-
-    if self.isFailing:   #static overlay
-      self.failNeck.texture.bind()
-      
-      color = (1,1,1) 
-      glBegin(GL_TRIANGLE_STRIP)
-      glColor4f(color[0],color[1],color[2], 0)
-      glTexCoord2f(0.0, project(-2 * beatsPerUnit))
-      glVertex3f(-w / 2, 0, -2)
-      glTexCoord2f(1.0, project(-2 * beatsPerUnit))
-      glVertex3f( w / 2, 0, -2)
-      
-      glColor4f(color[0],color[1],color[2], self.failcount)
-      glTexCoord2f(0.0, project(-1 * beatsPerUnit))
-      glVertex3f(-w / 2, 0, -1)
-      glTexCoord2f(1.0, project(-1 * beatsPerUnit))
-      glVertex3f( w / 2, 0, -1)
-      
-      glTexCoord2f(0.0, 0)
-      glVertex3f(-w / 2, 0, 0)
-      glTexCoord2f(1.0, 0)
-      glVertex3f( w / 2, 0, 0)
-      
-      glColor4f(color[0],color[1],color[2], 0)
-      glTexCoord2f(0.0, project(l * beatsPerUnit))
-      glVertex3f(-w / 2, 0, l)
-      glTexCoord2f(1.0, project(l * beatsPerUnit))
-      glVertex3f( w / 2, 0, l)
-      glEnd()
-
-
     glDisable(GL_TEXTURE_2D)
+    
+  def renderNeck(self, visibility, song, pos):
+    if not song:
+      return
+    
+    def project(beat):
+      return 0.125 * beat / beatsPerUnit    # glorandwarf: was 0.12
+
+    v            = visibility
+    w            = self.boardWidth
+    l            = self.boardLength
+
+    beatsPerUnit = self.beatsPerBoard / self.boardLength
+    offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
+
+    #myfingershurt: every theme can have oNeck:
+
+    if self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 1:
+      neck = self.guitarSoloNeck
+    elif self.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck:
+      neck = self.oNeck
+    else:
+      neck = self.neckDrawing
+
+    if not (self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 2):
+      self.renderNeckMethod(v, offset, beatsPerUnit, neck)
+      
+    if self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 2:   #static overlay
+      self.renderNeckMethod(v, 0, beatsPerUnit, self.guitarSoloNeck)
+      
+    if self.spcount2 != 0 and self.spcount < 1.2 and self.oNeck:   #static overlay
+      if self.oNeckovr != None and (self.scoreMultiplier > 4 or self.guitarSolo):
+        neck = self.oNeckovr
+      else:
+        neck = self.oNeck
+          
+      self.renderNeckMethod(self.spcount, offset, beatsPerUnit, neck)
+      
+    if self.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and (self.scoreMultiplier > 4 or self.guitarSolo):   #static overlay
+
+      if self.oNeckovr != None:
+        neck = self.oNeckovr
+      else:
+        neck = self.oNeck
+        alpha = True
+
+      self.renderNeckMethod(v, offset, beatsPerUnit, neck, alpha)
+      
+    if self.isFailing:
+      self.renderNeckMethod(self.failcount, 0, beatsPerUnit, self.failNeck)
 
   def drawTrack(self, visibility, song, pos):
     if not song:
