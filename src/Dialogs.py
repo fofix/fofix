@@ -1013,9 +1013,10 @@ class SongChooser(Layer, KeyListener):
     self.searchText    = ""
     self.searching     = False
     
-    if self.preLoadSongLabels:
-      for i in range(0,len(self.items)):
-        self.loadItemLabel(i)
+    if self.display != 1:
+      if self.preLoadSongLabels:
+        for i in range(0,len(self.items)):
+          self.loadItemLabel(i)
     
     if self.initialItem is not None:
       for i, item in enumerate(self.items):
