@@ -443,6 +443,7 @@ class SettingsMenu(Menu.Menu):
     AdvancedAudioSettings = [
        ConfigChoice(engine.config, "audio",  "delay", autoApply = True),     #myfingershurt: so a/v delay can be set without restarting FoF
        ConfigChoice(engine.config, "audio",  "slow_down_divisor", autoApply = True),     #MFH
+       ConfigChoice(engine.config, "audio",  "whammy_effect", autoApply = True),     #MFH
        ConfigChoice(engine.config, "audio",  "frequency"),
        ConfigChoice(engine.config, "audio",  "bits"),
        ConfigChoice(engine.config, "audio",  "buffersize"),

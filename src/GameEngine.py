@@ -56,6 +56,27 @@ import Version
 import Mod
 
 
+#------------------
+#MFH - the following SVN revision retrieval code is copied from john.stumpo's pitchbend source - handy!
+import svntag
+
+#__version__ = '$Id: GameEngine.py 5 2009-01-01 05:00:35Z stump $'
+
+try:
+  #version = 'svn_rev%d' % \
+  #  int(svntag.get_svn_info(os.path.dirname(__file__))['revnum'])
+  version = int(svntag.get_svn_info(os.path.dirname(__file__))['revnum'])
+  
+  #open(os.path.join(os.path.dirname(__file__), 'VERSION'),
+  #  'w').write(version+'\n')
+except Exception, e:
+#  version = open(os.path.join(os.path.dirname(__file__),
+#    'VERSION')).read().strip()
+  version = str(e)
+#------------------
+
+
+
 # define configuration keys
 Config.define("engine", "highpriority", bool,  True)
 Config.define("game",   "uploadscores", bool,  False, text = _("Upload Highscores"),    options = {False: _("No"), True: _("Yes")})
@@ -198,6 +219,8 @@ Config.define("game", "midi_lyric_mode",           int,  1,   text = _("MIDI Lyr
 Config.define("debug",   "use_unedited_midis",          int, 1,    text = _("notes-unedited.mid"), options = {0: _("Off"), 1: _("Auto")})
 
 Config.define("audio",  "slow_down_divisor",  int,    1,  text = _("Slowdown"),   options = {1: _("Full Speed"), 2: _("1/2 Speed"), 4: _("1/4 Speed")})  #MFH
+
+Config.define("audio",  "whammy_effect",  int,    0,  text = _("Whammy FX"),   options = {0: _("Killswitch"), 1: _("Pitchbend")})  #MFH
 
 
 #MFH - log settings
@@ -365,7 +388,7 @@ class GameEngine(Engine):
     #  Log.debug("GameEngine class init (GameEngine.py)...")
     Log.debug("GameEngine class init (GameEngine.py)...")
     self.mainMenu = None    #placeholder for main menu object - to prevent reinstantiation
-    self.versionString = "FoFiX v3.035 alpha"
+    self.versionString = "FoFiX v3.035 alpha (r" + str(version) + ")"
     Log.debug(self.versionString + " starting up...")
     Log.debug("pygame version: " + str(pygame.version.ver) )
     """
