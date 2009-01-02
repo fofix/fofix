@@ -557,7 +557,9 @@ class SongChooser(Layer, KeyListener):
     self.listRotation = self.engine.config.get("game", "songlistrotation")
     self.songCoverType = self.engine.config.get("game", "songcovertype")
     self.listingMode = engine.config.get("game","song_listing_mode")
-
+    self.songIcons = engine.config.get("game", "song_icons")
+    self.preLoadSongLabels = engine.config.get("game", "preload_labels")
+    
     Log.debug("Songlist artist colors: " + str(self.artist_text_color) + " / " + str(self.artist_selected_color))
 
 
@@ -804,12 +806,33 @@ class SongChooser(Layer, KeyListener):
       except IOError:
         self.tierbg = None
       try:
+        self.engine.loadImgDrawing(self, "emptyLabel",    os.path.join("themes",themename,"menu","emptylabel.png"))
+      except IOError:
+        self.emptyLabel = None
+      
+      try:
         self.engine.loadImgDrawing(self, "diffimg1",    os.path.join("themes",themename,"menu","diff1.png"))
         self.engine.loadImgDrawing(self, "diffimg2",    os.path.join("themes",themename,"menu","diff2.png"))
         self.engine.loadImgDrawing(self, "diffimg3",    os.path.join("themes",themename,"menu","diff3.png"))
       except IOError:
         self.diffimg1 = None
-      
+        
+      #song icon loading
+      if self.songIcons:
+        self.itemIcons = []
+        self.itemIconNames = []
+        iconFolder = engine.resource.fileName(os.path.join("themes",themename,"menu","icon"))
+        
+        for filename in os.listdir(iconFolder):
+          if os.path.splitext(filename)[1].lower() == ".png":
+            
+            thisfile = self.engine.resource.fileName("themes",themename,"menu","icon",filename)
+            if os.path.exists(thisfile):
+              self.itemIcons.append(ImgDrawing(self.engine.data.svg, thisfile))
+              self.itemIconNames.append(os.path.splitext(filename)[0])
+             
+  
+        
       self.scoreTimer = 0
 
       # evilynux - configurable default highscores difficulty display
@@ -989,6 +1012,11 @@ class SongChooser(Layer, KeyListener):
     self.loaded        = True
     self.searchText    = ""
     self.searching     = False
+    
+    if self.preLoadSongLabels:
+      for i in range(0,len(self.items)):
+        self.loadItemLabel(i)
+    
     if self.initialItem is not None:
       for i, item in enumerate(self.items):
         if isinstance(item, Song.SongInfo) and self.initialItem == item.songName:
@@ -1098,9 +1126,7 @@ class SongChooser(Layer, KeyListener):
           self.itemLabels[i] = Texture(label)
       else:
         if self.display == 3:
-          label = self.engine.resource.fileName("themes",themename,"menu","emptylabel.png")
-          if os.path.exists(label):
-            self.itemLabels[i] = ImgDrawing(self.engine.data.svg, label)
+          self.itemLabels[i] = "Empty"
 
   def updateSelection(self):
   
@@ -3110,7 +3136,14 @@ class SongChooser(Layer, KeyListener):
       elif self.display == 3:   #Qstick - rb2 Mode
         item  = self.items[self.selectedIndex]
         i = self.selectedIndex
-        if self.itemLabels[i]:
+        if self.itemLabels[i] == "Empty":   #added so that emptylabel.png is only loaded once and not on every empty song
+          imgwidth = self.emptyLabel.width1()
+          wfactor = 155.000/imgwidth
+          self.emptyLabel.transform.reset()
+          self.emptyLabel.transform.translate(.21*w,.59*h)
+          self.emptyLabel.transform.scale(wfactor,-wfactor)
+          self.emptyLabel.draw()
+        elif self.itemLabels[i]:
           imgwidth = self.itemLabels[i].width1()
           wfactor = 155.000/imgwidth
           self.itemLabels[i].transform.reset()
@@ -3183,11 +3216,10 @@ class SongChooser(Layer, KeyListener):
                   self.tierbg.transform.reset()
                   self.tierbg.transform.scale(wfactor,-hfactor)
                   w, h, = self.engine.view.geometry[2:4]
-                  self.tierbg.transform.translate(w/1.587, h-((0.055*h)*(i+1)-pos[0]*(0.055*h))-(0.22*h))
+                  self.tierbg.transform.translate(w/1.587, h-((0.055*h)*(i+1)-pos[0]*(0.055*h))-(0.219*h))
                   self.tierbg.draw()
 
 
-          #kid
           imgwidth = self.selected.width1()
           imgheight = self.selected.height1()
           wfactor = 381.5/imgwidth
@@ -3196,18 +3228,13 @@ class SongChooser(Layer, KeyListener):
           self.selected.transform.reset()
           self.selected.transform.scale(wfactor,-hfactor)
           self.selected.transform.translate(w/1.587, y*1.2-h*.213)
-          self.selected.draw() 
+          self.selected.draw()
           
           
           if self.diffimg1 != None:
             imgwidth = self.diffimg3.width1()
             imgheight = self.diffimg3.height1()
             wfactor1 = 13.0/imgwidth
-
-            
-          #kid
-
-
 
           c1,c2,c3 = self.song_rb2_diff_color
           glColor3f(c1,c2,c3)
@@ -3271,6 +3298,21 @@ class SongChooser(Layer, KeyListener):
             if i >= pos[0] and i <= pos[1]:
 
               if isinstance(item, Song.SongInfo):
+                if self.songIcons:    
+                  if item.icon != "":
+                    iconNum = None
+                    try:
+                      iconNum = self.itemIconNames.index(item.icon)
+                      imgwidth = self.itemIcons[iconNum].width1()
+                      wfactor = 23.000/imgwidth
+                      self.itemIcons[iconNum].transform.reset()
+                      w, h, = self.engine.view.geometry[2:4]
+                      self.itemIcons[iconNum].transform.translate(w/2.86, h-((0.055*h)*(i+1)-pos[0]*(0.055*h))-(0.219*h))
+                      self.itemIcons[iconNum].transform.scale(wfactor,-wfactor)
+                      self.itemIcons[iconNum].draw()
+                    except ValueError:
+                      iconNum = -1
+                
                 c1,c2,c3 = self.song_name_selected_color
                 glColor3f(c1,c2,c3)
                 if i == self.selectedIndex:
@@ -3366,12 +3408,11 @@ class SongChooser(Layer, KeyListener):
                 text = _("-- Locked --")
                 
               if isinstance(item, Song.SongInfo): #MFH - add indentation when tier sorting
-                if self.tiersArePresent:
+                if self.tiersArePresent or self.songIcons:
                   text = self.indentString + text
                 
 
               # evilynux - Force uppercase display for Career titles
-              
               if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
                 text = string.upper(text)
                 maxwidth = .55
@@ -3405,7 +3446,7 @@ class SongChooser(Layer, KeyListener):
                     self.diff = "Expert"
                   elif self.diff == "Expert":
                     self.diff = "Easy"
-
+                
                 #racer: score can be changed by fret button:
                 #MFH - and now they will be remembered as well
                 if self.highScoreChange == True and self.highScoreType == 1:
@@ -3444,15 +3485,20 @@ class SongChooser(Layer, KeyListener):
 
 
                 scale = 0.0014
-                # evilynux - score color
                 #evilynux - hit% and note streak if enabled
-
+                if self.extraStats:
+                  scale = 0.0009
+                  if score is not _("Nil") and score > 0 and notesTotal != 0:
+                    text = "%.1f%% (%d)" % ((float(notesHit) / notesTotal) * 100.0, noteStreak)
+                    w, h = font.getStringSize(text, scale=scale)
+                    font.render(text, (.92-w, .0413*(i+1)-pos[0]*.0413+.163), scale=scale)
+                      
                 text = str(score)
                 w, h = font.getStringSize(text, scale=scale)
                 
-
-                # evilynux - changed positions a little for nice note streak integration
                 font.render(text, (.92-w, .0413*(i+1)-pos[0]*.0413+.15), scale=scale)
+         
+                  
 
                 if self.scoreTimer < 1000:
                   self.scoreTimer += 1
@@ -3461,57 +3507,54 @@ class SongChooser(Layer, KeyListener):
 
                   
                 if i == self.selectedIndex:
-                  text = item.artist
-                  if (item.getLocked()):
-                    text = "" # avoid giving away artist of locked song
-
-                  scale = 0.0015
-                  w, h = font.getStringSize(text, scale=scale)
-                  
-                  while w > .22:
-                    tlength = len(text) - 4
-                    text = text[:tlength] + "..."
-                    w, h = font.getStringSize(text, scale = scale)
-                    if w < .22:
-                      break
+                  if not (item.getLocked()):
+                    text = item.artist
+                    if (item.getLocked()):
+                      text = "" # avoid giving away artist of locked song
+  
+                    scale = 0.0015
+                    w, h = font.getStringSize(text, scale=scale)
                     
-                  c1,c2,c3 = self.song_rb2_artist_color
-                  glColor3f(c1,c2,c3)
-                  
-                  text = string.upper(text)
-                  font.render(text, (.095, .44), scale = scale)
-               
-
-                  if not item.album == "":
+                    while w > .21:
+                      tlength = len(text) - 4
+                      text = text[:tlength] + "..."
+                      w, h = font.getStringSize(text, scale = scale)
+                      if w < .22:
+                        break
+                      
+                    c1,c2,c3 = self.song_rb2_artist_color
+                    glColor3f(c1,c2,c3)
+                    
+                    text = string.upper(text)
+                    font.render(text, (.095, .44), scale = scale)
+                 
+  
+                    
                     albumtag = item.album
-                  else:
-                    albumtag = ""
+                      
+                    albumtag = string.upper(albumtag)
+                    w, h = font.getStringSize(albumtag, scale=scale)
                     
-                  albumtag = string.upper(albumtag)
-                  w, h = font.getStringSize(albumtag, scale=scale)
-                  
-                  while w > .22:
-                    tlength = len(albumtag) - 4
-                    albumtag = albumtag[:tlength] + "..."
-                    w, h = font.getStringSize(albumtag, scale = scale)
-                    if w < .22:
-                      break                    
-
-                  font.render(albumtag, (.095, .47), scale = 0.0015)
-                  
-                  if not item.genre == "":
+                    while w > .21:
+                      tlength = len(albumtag) - 4
+                      albumtag = albumtag[:tlength] + "..."
+                      w, h = font.getStringSize(albumtag, scale = scale)
+                      if w < .22:
+                        break                    
+  
+                    font.render(albumtag, (.095, .47), scale = 0.0015)
+                    
+  
                     genretag = item.genre
-                  else:
-                    genretag = ""
-
-                  font.render(genretag, (.095, .49), scale = 0.0015)                    
-                  
-                  if not item.year == "":
-                    yeartag = item.year
-                  else:
-                    yeartag = ""
+  
+  
+                    font.render(genretag, (.095, .49), scale = 0.0015)                    
                     
-                  font.render(yeartag, (.095, .51), scale = 0.0015)
+  
+                    yeartag = item.year
+  
+                      
+                    font.render(yeartag, (.095, .51), scale = 0.0015)
 
                  
                   for i in range(0,4):

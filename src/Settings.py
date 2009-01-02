@@ -520,6 +520,8 @@ class SettingsMenu(Menu.Menu):
       #(_("Select List All Folder >"), self.listAllFolderSelect), #- Not Working Yet - Qstick
       ConfigChoice(engine.config, "game", "songcovertype", autoApply = True),
       ConfigChoice(engine.config, "game", "songlistrotation", autoApply = True),
+      ConfigChoice(engine.config, "game", "song_icons", autoApply = True),
+      ConfigChoice(engine.config, "game", "preload_labels", autoApply = True),
       ConfigChoice(engine.config, "audio", "disable_preview", autoApply = True),  #myfingershurt
       ConfigChoice(engine.config, "game", "songlist_instrument", autoApply = True), #MFH
       ConfigChoice(engine.config, "game", "songlist_difficulty", autoApply = True), #evilynux

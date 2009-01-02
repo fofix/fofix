@@ -503,6 +503,9 @@ class SongInfo(object):
 
   def getGenre(self):
     return self._get("genre")
+    
+  def getIcon(self):
+    return self._get("icon")
 
   def getDiffSong(self):
     return self._get("diff_band", int, -1)
@@ -538,6 +541,9 @@ class SongInfo(object):
 
   def setGenre(self, value):
     self._set("genre", value)
+    
+  def setIcon(self, value):
+    self._set("icon", value)
 
   def setDiffSong(self, value):
     self._set("diff_band", value)
@@ -808,6 +814,7 @@ class SongInfo(object):
   #New rb2 setlist
   album         = property(getAlbum, setAlbum)
   genre         = property(getGenre, setGenre)
+  icon         = property(getIcon, setIcon)
   diffSong     = property(getDiffSong, setDiffSong)
   diffGuitar   = property(getDiffGuitar, setDiffGuitar)
   diffBass     = property(getDiffBass, setDiffBass)
@@ -3707,7 +3714,7 @@ def compareSongsAndTitles(engine, a, b):
         return cmp(b.year.lower(), a.year.lower())
       elif order == 6:
         return cmp(b.diffSong, a.diffSong)
-  elif quickPlayMode and quickPlayCareerTiers == 2:
+  elif gameMode1p != 2 and quickPlayCareerTiers == 2:
     Aval = ""
     Bval = ""
     if isinstance(a, SongInfo):
