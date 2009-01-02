@@ -164,11 +164,8 @@ def main():
           else:
             os.execl("./FretsOnFire", "./FretsOnFire", *sys.argv[1:])
         else:
-          if os.name == "nt":
-            bin = "c:/python24/python"
-          else:
-            bin = os.environ['_'] # evilynux - Generic solution (non-Windows only)
-          os.execl(bin, bin, "FretsOnFire.py", *sys.argv[1:])
+          # stump: sys.executable points to the active python interpreter
+          os.execl(sys.executable, sys.executable, "FretsOnFire.py", *sys.argv[1:])
       except:
         Log.warn("Restart failed.")
         raise
