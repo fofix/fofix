@@ -53,6 +53,9 @@ PLAYER2ACTIONS = [Player.PLAYER_2_ACTION1, Player.PLAYER_2_ACTION2]
 class Guitar:
   def __init__(self, engine, editorMode = False, player = 0):
     self.engine         = engine
+
+    self.starPowerDecreaseDivisor = 200.0*self.engine.audioSpeedDivisor
+
     self.isDrum = False
     self.isBassGuitar = False
     
@@ -3161,7 +3164,7 @@ class Guitar:
     
     #myfingershurt: must not decrease SP if paused.
     if self.starPowerActive == True and self.paused == False:
-      self.starPower -= ticks/200.0
+      self.starPower -= ticks/self.starPowerDecreaseDivisor 
       if self.starPower <= 0:
         self.starPower = 0
         self.starPowerActive = False

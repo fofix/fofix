@@ -379,10 +379,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.pitchBendLowestFactor = .96
     self.lineByLineLyricMaxLineWidth = 0.5
     self.lineByLineStartSlopMs = 750
-    self.digitalKillswitchStarpowerChunkSize = 0.05
+    self.digitalKillswitchStarpowerChunkSize = 0.05 / self.engine.audioSpeedDivisor
     self.digitalKillswitchActiveStarpowerChunkSize = self.digitalKillswitchStarpowerChunkSize / 3.0
     # evilynux: was 0.10, now much closer to actual GH3
-    self.analogKillswitchStarpowerChunkSize = 0.15
+    self.analogKillswitchStarpowerChunkSize = 0.15 / self.engine.audioSpeedDivisor
     self.analogKillswitchActiveStarpowerChunkSize = self.analogKillswitchStarpowerChunkSize / 3.0
     self.rbOverdriveBarGlowFadeInChunk = .07     #this amount added to visibility every run() cycle when fading in - original .2
     self.rbOverdriveBarGlowFadeOutChunk = .03   #this amount subtracted from visibility every run() cycle when fading out - original .07
@@ -438,7 +438,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.logStarpowerMisses = self.engine.config.get("game", "log_starpower_misses")
     self.soloFrameMode = self.engine.config.get("game", "solo_frame")
     self.whammyEffect = self.engine.config.get("audio",  "whammy_effect")
-
     if self.whammyEffect == 1 and not pitchBendModuleFound:    #pitchbend
       Dialogs.showMessage(self.engine, "Pitchbend module not found!  Forcing Killswitch effect.")
       self.whammyEffect = 0
@@ -3676,7 +3675,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.keyBurstTimeout[num] = None
           break
       else:
-        self.keyBurstTimeout[num] = self.engine.timer.time + self.keyBurstPeriod
+        #self.keyBurstTimeout[num] = self.engine.timer.time + self.keyBurstPeriod
         return True
 
     if control in (self.guitars[num].actions) and self.song:

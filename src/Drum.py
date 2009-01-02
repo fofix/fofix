@@ -62,6 +62,10 @@ PLAYER2DRUMS   = [Player.PLAYER_2_BASS, Player.PLAYER_2_DRUM1A,Player.PLAYER_2_D
 class Drum:
   def __init__(self, engine, editorMode = False, player = 0):
     self.engine         = engine
+    
+    self.starPowerDecreaseDivisor = 200.0*self.engine.audioSpeedDivisor
+
+    
     self.isDrum = True
     self.isBassGuitar = False
   
@@ -2569,7 +2573,7 @@ class Drum:
     self.time += ticks
     #myfingershurt: must not decrease SP if paused.
     if self.starPowerActive == True and self.paused == False:
-      self.starPower -= ticks/200.0
+      self.starPower -= ticks/self.starPowerDecreaseDivisor 
       if self.starPower <= 0:
         self.starPower = 0
         self.starPowerActive = False
