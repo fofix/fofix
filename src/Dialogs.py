@@ -1105,7 +1105,9 @@ class SongChooser(Layer, KeyListener):
     item = self.items[i]
     if self.itemLabels[i] is None:
       if isinstance(item, Song.SongInfo):
-        if self.songCoverType:
+        if (item.getLocked()):
+          label = ""
+        elif self.songCoverType:
           label = self.engine.resource.fileName(item.libraryNam, item.songName,    "label.png")
         else:
           label = self.engine.resource.fileName(item.libraryNam, item.songName,    "album.png")
@@ -3469,47 +3471,47 @@ class SongChooser(Layer, KeyListener):
                     self.engine.config.set("game", "songlist_difficulty", 3)
                     self.highScoreChange = False
 
-                score = _("Nil")
-                stars = 0
-                name = ""
-                
-                #for p in item.parts:    #MFH - look at selected instrument!
-                #  if str(p) == self.instrument:
-                for d in item.difficulties:
-                  if str(d) == self.diff:
-                    #scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
-                    scores = item.getHighscoresWithPartString(d, part = self.instrument)
-                    if scores:
-                      score, stars, name, scoreExt = scores[0]
-                      notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 = scoreExt
-                    else:
-                      score, stars, name = 0, 0, "---"
-
-
-                scale = 0.0014
-                #evilynux - hit% and note streak if enabled
-                if self.extraStats:
-                  scale = 0.0009
-                  if score is not _("Nil") and score > 0 and notesTotal != 0:
-                    text = "%.1f%% (%d)" % ((float(notesHit) / notesTotal) * 100.0, noteStreak)
-                    w, h = font.getStringSize(text, scale=scale)
-                    font.render(text, (.92-w, .0413*(i+1)-pos[0]*.0413+.163), scale=scale)
-                      
-                text = str(score)
-                w, h = font.getStringSize(text, scale=scale)
-                
-                font.render(text, (.92-w, .0413*(i+1)-pos[0]*.0413+.15), scale=scale)
-         
+                if not (item.getLocked()):
+                  score = _("Nil")
+                  stars = 0
+                  name = ""
                   
-
-                if self.scoreTimer < 1000:
-                  self.scoreTimer += 1
-                else:
-                  self.scoreTimer = 0
-
+                  #for p in item.parts:    #MFH - look at selected instrument!
+                  #  if str(p) == self.instrument:
+                  for d in item.difficulties:
+                    if str(d) == self.diff:
+                      #scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
+                      scores = item.getHighscoresWithPartString(d, part = self.instrument)
+                      if scores:
+                        score, stars, name, scoreExt = scores[0]
+                        notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 = scoreExt
+                      else:
+                        score, stars, name = 0, 0, "---"
+  
+  
+                  scale = 0.0014
+                  #evilynux - hit% and note streak if enabled
+                  if self.extraStats:
+                    scale = 0.0009
+                    if score is not _("Nil") and score > 0 and notesTotal != 0:
+                      text = "%.1f%% (%d)" % ((float(notesHit) / notesTotal) * 100.0, noteStreak)
+                      w, h = font.getStringSize(text, scale=scale)
+                      font.render(text, (.92-w, .0413*(i+1)-pos[0]*.0413+.163), scale=scale)
+                        
+                  text = str(score)
+                  w, h = font.getStringSize(text, scale=scale)
                   
-                if i == self.selectedIndex:
-                  if not (item.getLocked()):
+                  font.render(text, (.92-w, .0413*(i+1)-pos[0]*.0413+.15), scale=scale)
+           
+                    
+  
+                  if self.scoreTimer < 1000:
+                    self.scoreTimer += 1
+                  else:
+                    self.scoreTimer = 0
+  
+                    
+                  if i == self.selectedIndex:
                     text = item.artist
                     if (item.getLocked()):
                       text = "" # avoid giving away artist of locked song
@@ -3559,45 +3561,45 @@ class SongChooser(Layer, KeyListener):
                     font.render(yeartag, (.095, .51), scale = 0.0015)
 
                  
-                  for i in range(0,4):
-                    glColor3f(1, 1, 1) 
-                    if i == 0:
-                      diff = item.diffSong
-                    if i == 1:
-                      diff = item.diffGuitar
-                    if i == 2:
-                      diff = item.diffDrums
-                    if i == 3:
-                      diff = item.diffBass
-                    if self.diffimg1 == None:
-                      if diff == -1:
-                        font.render("N/A", (.18, .57 + i*.025), scale = 0.0014)
-                      elif diff == 6:
-                        glColor3f(1, 1, 0)  
-                        font.render(unicode(Data.STAR2 * (diff -1)), (.18, 0.575 + i*.025), scale = 0.003)
+                    for i in range(0,4):
+                      glColor3f(1, 1, 1) 
+                      if i == 0:
+                        diff = item.diffSong
+                      if i == 1:
+                        diff = item.diffGuitar
+                      if i == 2:
+                        diff = item.diffDrums
+                      if i == 3:
+                        diff = item.diffBass
+                      if self.diffimg1 == None:
+                        if diff == -1:
+                          font.render("N/A", (.18, .57 + i*.025), scale = 0.0014)
+                        elif diff == 6:
+                          glColor3f(1, 1, 0)  
+                          font.render(unicode(Data.STAR2 * (diff -1)), (.18, 0.575 + i*.025), scale = 0.003)
+                        else:
+                          font.render(unicode(Data.STAR2 * diff + Data.STAR1 * (5 - diff)), (.18, 0.575 + i*.025), scale = 0.003)
                       else:
-                        font.render(unicode(Data.STAR2 * diff + Data.STAR1 * (5 - diff)), (.18, 0.575 + i*.025), scale = 0.003)
-                    else:
-                      w, h, = self.engine.view.geometry[2:4]
-                      if diff == -1:
-                        font.render("N/A", (.18, .57 + i*.025), scale = 0.0014)
-                      elif diff == 6:
-                        for k in range(0,5):
-                          self.diffimg3.transform.reset()
-                          self.diffimg3.transform.scale(wfactor1,-wfactor1)
-                          self.diffimg3.transform.translate((.19+.03*k)*w, (0.22-.035*i)*h)
-                          self.diffimg3.draw()
-                      else:
-                        for k in range(0,diff):
-                          self.diffimg2.transform.reset()
-                          self.diffimg2.transform.scale(wfactor1,-wfactor1)
-                          self.diffimg2.transform.translate((.19+.03*k)*w, (0.22-.035*i)*h)
-                          self.diffimg2.draw()
-                        for k in range(0, 5-diff):
-                          self.diffimg1.transform.reset()
-                          self.diffimg1.transform.scale(wfactor1,-wfactor1)
-                          self.diffimg1.transform.translate((.31-.03*k)*w, (0.22-.035*i)*h)
-                          self.diffimg1.draw()
+                        w, h, = self.engine.view.geometry[2:4]
+                        if diff == -1:
+                          font.render("N/A", (.18, .57 + i*.025), scale = 0.0014)
+                        elif diff == 6:
+                          for k in range(0,5):
+                            self.diffimg3.transform.reset()
+                            self.diffimg3.transform.scale(wfactor1,-wfactor1)
+                            self.diffimg3.transform.translate((.19+.03*k)*w, (0.22-.035*i)*h)
+                            self.diffimg3.draw()
+                        else:
+                          for k in range(0,diff):
+                            self.diffimg2.transform.reset()
+                            self.diffimg2.transform.scale(wfactor1,-wfactor1)
+                            self.diffimg2.transform.translate((.19+.03*k)*w, (0.22-.035*i)*h)
+                            self.diffimg2.draw()
+                          for k in range(0, 5-diff):
+                            self.diffimg1.transform.reset()
+                            self.diffimg1.transform.scale(wfactor1,-wfactor1)
+                            self.diffimg1.transform.translate((.31-.03*k)*w, (0.22-.035*i)*h)
+                            self.diffimg1.draw()
            
         finally:
           text = self.instrument + " - " + self.diff
