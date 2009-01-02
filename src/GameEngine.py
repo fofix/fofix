@@ -65,14 +65,15 @@ import svntag
 try:
   #version = 'svn_rev%d' % \
   #  int(svntag.get_svn_info(os.path.dirname(__file__))['revnum'])
-  version = int(svntag.get_svn_info(os.path.dirname(__file__))['revnum'])
+  version = " (r" + str( int(svntag.get_svn_info(os.path.dirname(__file__))['revnum']) ) + ")"
   
   #open(os.path.join(os.path.dirname(__file__), 'VERSION'),
   #  'w').write(version+'\n')
 except Exception, e:
 #  version = open(os.path.join(os.path.dirname(__file__),
 #    'VERSION')).read().strip()
-  version = str(e)
+  #version = str(e)
+  version = ""
 #------------------
 
 
@@ -388,7 +389,7 @@ class GameEngine(Engine):
     #  Log.debug("GameEngine class init (GameEngine.py)...")
     Log.debug("GameEngine class init (GameEngine.py)...")
     self.mainMenu = None    #placeholder for main menu object - to prevent reinstantiation
-    self.versionString = "FoFiX v3.035 alpha (r" + str(version) + ")"
+    self.versionString = "FoFiX v3.035 alpha" + version
     Log.debug(self.versionString + " starting up...")
     Log.debug("pygame version: " + str(pygame.version.ver) )
     """

@@ -376,6 +376,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
 
     #MFH - constant definitions, ini value retrievals
+    self.pitchBendLowestFactor = .96
     self.lineByLineLyricMaxLineWidth = 0.5
     self.lineByLineStartSlopMs = 750
     self.digitalKillswitchStarpowerChunkSize = 0.05
@@ -2154,7 +2155,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 self.song.setInstrumentVolume(whammyVolSet, self.players[i].part)
               elif self.whammyEffect == 1:    #pitchbend
                 pitchbend.start()
-                pitchbend.setFactor(.96+(.04*self.whammyVol[i]))
+                pitchbend.setFactor(self.pitchBendLowestFactor+(.04*self.whammyVol[i]))
 
             elif self.actualWhammyVol[i] > self.targetWhammyVol[i]:
               self.actualWhammyVol[i] -= self.whammyVolAdjStep
@@ -2163,7 +2164,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 self.song.setInstrumentVolume(whammyVolSet, self.players[i].part)
               elif self.whammyEffect == 1:    #pitchbend
                 pitchbend.start()
-                pitchbend.setFactor(.96+(.04*self.whammyVol[i]))
+                pitchbend.setFactor(self.pitchBendLowestFactor+(.04*self.whammyVol[i]))
             
           elif self.playerList[i].streak > 0:
             self.song.setInstrumentVolume(1.0, self.players[i].part)
@@ -2180,7 +2181,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   self.song.setInstrumentVolume(self.killVolume, self.players[i].part)  #MFH
                 elif self.whammyEffect == 1:    #pitchbend
                   pitchbend.start()
-                  pitchbend.setFactor(.96)
+                  pitchbend.setFactor(self.pitchBendLowestFactor)
                 if self.guitars[i].killPoints:
                   self.guitars[i].starPower += self.digitalKillswitchStarpowerChunkSize
                   if self.guitars[i].starPower > 100:
