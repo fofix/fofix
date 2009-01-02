@@ -64,13 +64,6 @@ from OpenGL.GL import *
 #MFH: experimental 2D font rendering module
 import lamina
 
-#stump: experimental pitch-bending code
-try:
-  from pygame import pitchbend
-  pitchBendModuleFound = True
-except:
-  pitchBendModuleFound = False
-
 
 class GuitarScene:
   pass
@@ -376,7 +369,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
 
     #MFH - constant definitions, ini value retrievals
-    self.pitchBendLowestFactor = .96
+    self.pitchBendLowestFactor = .90 #stump: perhaps read this from song.ini and fall back on a specific value?
     self.lineByLineLyricMaxLineWidth = 0.5
     self.lineByLineStartSlopMs = 750
     self.digitalKillswitchStarpowerChunkSize = 0.05 / self.engine.audioSpeedDivisor
@@ -438,7 +431,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.logStarpowerMisses = self.engine.config.get("game", "log_starpower_misses")
     self.soloFrameMode = self.engine.config.get("game", "solo_frame")
     self.whammyEffect = self.engine.config.get("audio",  "whammy_effect")
-    if self.whammyEffect == 1 and not pitchBendModuleFound:    #pitchbend
+    if self.whammyEffect == 1 and not Audio.pitchBendSupported:    #pitchbend
       Dialogs.showMessage(self.engine, "Pitchbend module not found!  Forcing Killswitch effect.")
       self.whammyEffect = 0
 
@@ -2153,8 +2146,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               if self.whammyEffect == 0:    #killswitch
                 self.song.setInstrumentVolume(whammyVolSet, self.players[i].part)
               elif self.whammyEffect == 1:    #pitchbend
-                pitchbend.start()
-                pitchbend.setFactor(self.pitchBendLowestFactor+(.04*self.whammyVol[i]))
+                self.song.setInstrumentPitch(self.pitchBendLowestFactor+((1.0-self.pitchBendLowestFactor)*self.whammyVol[i]), self.players[i].part)
+
 
             elif self.actualWhammyVol[i] > self.targetWhammyVol[i]:
               self.actualWhammyVol[i] -= self.whammyVolAdjStep
@@ -2162,13 +2155,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               if self.whammyEffect == 0:    #killswitch
                 self.song.setInstrumentVolume(whammyVolSet, self.players[i].part)
               elif self.whammyEffect == 1:    #pitchbend
-                pitchbend.start()
-                pitchbend.setFactor(self.pitchBendLowestFactor+(.04*self.whammyVol[i]))
+                self.song.setInstrumentPitch(self.pitchBendLowestFactor+((1.0-self.pitchBendLowestFactor)*self.whammyVol[i]), self.players[i].part)
             
           elif self.playerList[i].streak > 0:
             self.song.setInstrumentVolume(1.0, self.players[i].part)
             if self.whammyEffect == 1:    #pitchbend
-              pitchbend.stop()
+              self.song.resetInstrumentPitch(self.players[i].part)
             self.actualWhammyVol[i] = self.defaultWhammyVol[i]
   
         else:   #digital killswitch:
@@ -2179,8 +2171,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 if self.whammyEffect == 0:    #killswitch
                   self.song.setInstrumentVolume(self.killVolume, self.players[i].part)  #MFH
                 elif self.whammyEffect == 1:    #pitchbend
-                  pitchbend.start()
-                  pitchbend.setFactor(self.pitchBendLowestFactor)
+                  self.song.setInstrumentPitch(self.pitchBendLowestFactor+((1.0-self.pitchBendLowestFactor)*self.whammyVol[i]), self.players[i].part)
                 if self.guitars[i].killPoints:
                   self.guitars[i].starPower += self.digitalKillswitchStarpowerChunkSize
                   if self.guitars[i].starPower > 100:
@@ -2195,12 +2186,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             elif self.playerList[i].streak > 0:
               self.song.setInstrumentVolume(1.0, self.players[i].part)
               if self.whammyEffect == 1:    #pitchbend
-                pitchbend.stop()
+                self.song.resetInstrumentPitch(self.players[i].part)
               self.killswitchEngaged[i] = False
           elif self.playerList[i].streak > 0:
             self.song.setInstrumentVolume(1.0, self.players[i].part)
             if self.whammyEffect == 1:    #pitchbend
-              pitchbend.stop()
+              self.song.resetInstrumentPitch(self.players[i].part)
             self.killswitchEngaged[i] = False
           else:
             self.killswitchEngaged[i] = False
@@ -2637,7 +2628,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 self.crowdsCheering = False
                 self.song.setInstrumentVolume(0.0, self.players[i].part)
                 if self.whammyEffect == 1:    #pitchbend
-                  pitchbend.stop()
+                  self.song.resetInstrumentPitch(self.players[i].part)
                 self.coOpFailDone[i] = True
         else:
           somebodyStillAlive = False
@@ -2708,7 +2699,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           guitar.hopoLast = -1
           self.song.setInstrumentVolume(0.0, self.players[i].part)
           if self.whammyEffect == 1:    #pitchbend
-            pitchbend.stop()
+            self.song.resetInstrumentPitch(self.players[i].part)
           self.guitarSoloBroken[i] = True
           if self.hopoDebugDisp == 1:
             missedNoteNums = [noat.number for time, noat in missedNotes]
@@ -3096,7 +3087,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     else:
       self.song.setInstrumentVolume(0.0, self.playerList[num].part)
       if self.whammyEffect == 1:    #pitchbend
-        pitchbend.stop()
+        self.song.resetInstrumentPitch(self.playerList[num].part)
       self.playerList[num].streak = 0
       self.coOpStreak = 0
       self.guitars[num].setMultiplier(1)
@@ -3201,7 +3192,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.guitars[num].hopoLast = -1
       self.song.setInstrumentVolume(0.0, self.playerList[num].part)
       if self.whammyEffect == 1:    #pitchbend
-        pitchbend.stop()
+        self.song.resetInstrumentPitch(self.playerList[num].part)
       self.playerList[num].streak = 0
       self.coOpStreak = 0
       self.guitars[num].setMultiplier(1)
@@ -3315,7 +3306,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.guitars[num].hopoLast = 0
       self.song.setInstrumentVolume(0.0, self.playerList[num].part)
       if self.whammyEffect == 1:    #pitchbend
-        pitchbend.stop()
+        self.song.resetInstrumentPitch(self.playerList[num].part)
       self.playerList[num].streak = 0
       self.guitarSoloBroken[num] = True
       self.guitars[num].setMultiplier(1)
@@ -3536,7 +3527,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.guitars[num].hopoLast = -1
         self.song.setInstrumentVolume(0.0, self.playerList[num].part)
         if self.whammyEffect == 1:    #pitchbend
-          pitchbend.stop()
+          self.song.resetInstrumentPitch(self.playerList[num].part)
         self.playerList[num].streak = 0
         self.guitarSoloBroken[num] = True
         self.guitars[num].setMultiplier(1)

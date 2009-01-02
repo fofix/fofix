@@ -2357,6 +2357,31 @@ class Song(object):
         self.drumTrack.setVolume(self.missVolume)
       else:
         self.drumTrack.setVolume(volume)
+        
+  #stump: pitch bending
+  def setInstrumentPitch(self, pitch, part):
+    if part == parts[GUITAR_PART]:
+      if self.guitarTrack:
+        self.guitarTrack.setPitchBend(pitch)
+      else:
+        self.music.setPitchBend(pitch)
+    elif part == parts[DRUM_PART]:
+      pass
+    else:
+      if self.rhythmTrack:
+        self.rhythmTrack.setPitchBend(pitch)
+
+  def resetInstrumentPitch(self, part):
+    if part == parts[GUITAR_PART]:
+      if self.guitarTrack:
+        self.guitarTrack.stopPitchBend()
+      else:
+        self.music.stopPitchBend()
+    elif part == parts[DRUM_PART]:
+      pass
+    else:
+      if self.rhythmTrack:
+        self.rhythmTrack.stopPitchBend()
 
   def setBackgroundVolume(self, volume):
     self.music.setVolume(volume)
