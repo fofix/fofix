@@ -822,14 +822,14 @@ class SongChooser(Layer, KeyListener):
         self.itemIcons = []
         self.itemIconNames = []
         iconFolder = engine.resource.fileName(os.path.join("themes",themename,"menu","icon"))
-        
-        for filename in os.listdir(iconFolder):
-          if os.path.splitext(filename)[1].lower() == ".png":
-            
-            thisfile = self.engine.resource.fileName("themes",themename,"menu","icon",filename)
-            if os.path.exists(thisfile):
-              self.itemIcons.append(ImgDrawing(self.engine.data.svg, thisfile))
-              self.itemIconNames.append(os.path.splitext(filename)[0])
+        if os.path.exists(iconFolder):
+          for filename in os.listdir(iconFolder):
+            if os.path.splitext(filename)[1].lower() == ".png":
+              
+              thisfile = self.engine.resource.fileName("themes",themename,"menu","icon",filename)
+              if os.path.exists(thisfile):
+                self.itemIcons.append(ImgDrawing(self.engine.data.svg, thisfile))
+                self.itemIconNames.append(os.path.splitext(filename)[0])
              
   
         
@@ -3137,12 +3137,13 @@ class SongChooser(Layer, KeyListener):
         item  = self.items[self.selectedIndex]
         i = self.selectedIndex
         if self.itemLabels[i] == "Empty":   #added so that emptylabel.png is only loaded once and not on every empty song
-          imgwidth = self.emptyLabel.width1()
-          wfactor = 155.000/imgwidth
-          self.emptyLabel.transform.reset()
-          self.emptyLabel.transform.translate(.21*w,.59*h)
-          self.emptyLabel.transform.scale(wfactor,-wfactor)
-          self.emptyLabel.draw()
+          if self.emptyLabel != None:
+            imgwidth = self.emptyLabel.width1()
+            wfactor = 155.000/imgwidth
+            self.emptyLabel.transform.reset()
+            self.emptyLabel.transform.translate(.21*w,.59*h)
+            self.emptyLabel.transform.scale(wfactor,-wfactor)
+            self.emptyLabel.draw()
         elif self.itemLabels[i]:
           imgwidth = self.itemLabels[i].width1()
           wfactor = 155.000/imgwidth
