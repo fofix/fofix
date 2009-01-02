@@ -50,7 +50,7 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||song_name_text_color = #FFFFFF||Use a Hex color code||
 ||song_name_selected_color = #FFBF00||Use a Hex color code||
 ||songlist_score_color = #FFFFFF||Use a Hex color code||
-||song_display_mode= 1||Sets the songlist view. Choices are - 0=CD's / 1=LIST Mode / 2=BOTH / 3=RB2 / 4=Auto||
+||song_list_display = 1||Sets the songlist view. Choices are - 0=CD's / 1=LIST Mode / 2=BOTH / 3=RB2 / 4=Auto||
 ||song_listcd_cd_x||Controls location of 'CDs' X position in listcd songlist view. Use a decimal # between 0 - 1||
 ||song_listcd_cd_y||Controls location of 'CDs' Y position in listcd songlist view. Use a decimal # between 0 - 1||
 ||song_listcd_score_x||Controls location of 'SCORE' X position in listcd songlist view. Use a decimal # between 0 - 1||
