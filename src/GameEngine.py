@@ -65,7 +65,7 @@ import svntag
 try:
   #version = 'svn_rev%d' % \
   #  int(svntag.get_svn_info(os.path.dirname(__file__))['revnum'])
-  version = " (r" + str( int(svntag.get_svn_info(os.path.dirname(__file__))['revnum']) ) + ")"
+  version = " alpha (r" + str( int(svntag.get_svn_info(os.path.dirname(__file__))['revnum']) ) + ")"
   
   #open(os.path.join(os.path.dirname(__file__), 'VERSION'),
   #  'w').write(version+'\n')
@@ -212,7 +212,7 @@ Config.define("game",   "solo_frame",          int, 1,    text = _("Solo Frame")
 Config.define("game",   "starpower_mode",          int, 2,    text = _("Starpower Mode"), options = {0: _("Off"), 1: _("FoF"), 2: _("Auto MIDI")})
 Config.define("game",   "font_rendering_mode",          int, 0,    text = _("Font Mode"), options = {0: _("oGL Hack"), 1: _("Lamina Screen"), 2: _("Lamina Frames")})
 Config.define("game",   "incoming_neck_mode",          int, 2,    text = _("Inc. Neck Mode"), options = {0: _("Off"), 1: _("Start Only"), 2: _("Start & End")})
-Config.define("game", "midi_lyric_mode",           int,  1,   text = _("MIDI Lyric Mode"), options = {0: _("Scrolling"), 1: _("Simple Lines")})
+Config.define("game", "midi_lyric_mode",           int,  1,   text = _("MIDI Lyric Mode"), options = {0: _("Scrolling"), 1: _("Simple Lines"), 2: _("2-Line")})
 
 
 
@@ -391,7 +391,11 @@ class GameEngine(Engine):
     #  Log.debug("GameEngine class init (GameEngine.py)...")
     Log.debug("GameEngine class init (GameEngine.py)...")
     self.mainMenu = None    #placeholder for main menu object - to prevent reinstantiation
-    self.versionString = "FoFiX v3.035 alpha" + version
+    
+    if version == "":   version = " beta 1"     #MFH - beta taggin'
+
+    self.versionString = "FoFiX v3.100" + version
+
     Log.debug(self.versionString + " starting up...")
     Log.debug("pygame version: " + str(pygame.version.ver) )
     """
