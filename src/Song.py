@@ -2166,6 +2166,7 @@ class Song(object):
     self.hasMidiLyrics = False
     self.midiStyle = MIDI_TYPE_GH
     self.hasStarpowerPaths = False
+    self.hasFreestyleMarkings = False
 
     #MFH - add a separate variable to house the special text event tracks:
     #MFH - special text-event tracks for the separated text-event list variable
@@ -2511,6 +2512,7 @@ noteMap = {     # difficulty, note
 starPowerMarkingNote = 103     #note 103 = G 8
 overDriveMarkingNote = 116     #note 116 = G#9
 
+freestyleMarkingNote = 124      #notes 120 - 124 = drum fills & BREs - always all 5 notes present
 
 
 reverseNoteMap = dict([(v, k) for k, v in noteMap.items()])
@@ -2797,6 +2799,17 @@ class MidiReader(midi.MidiOutStream):
           self.addSpecialMidiEvent(diff, MarkerNote(note, 1, endMarker = True), time = endTime+1)   #ending marker note
           if self.logMarkerNotes == 1:
             Log.debug("GH Starpower (or RB Solo) MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, difficulties[diff] ) )
+
+      elif note == freestyleMarkingNote:    #MFH - for drum fills and big rock endings
+        self.song.hasFreestyleMarkings = True
+        #for diff in self.song.difficulty:
+        for diff in difficulties:
+          #self.addEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
+          self.addSpecialMidiEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
+          #self.addSpecialMidiEvent(diff, MarkerNote(note, 1, endMarker = True), time = endTime+1)   #ending marker note
+          if self.logMarkerNotes == 1:
+            Log.debug("RB freestyle section (drum fill or BRE) at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, difficulties[diff] ) )
+
 
 
       else:

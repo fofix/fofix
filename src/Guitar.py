@@ -528,6 +528,14 @@ class Guitar:
       engine.loadImgDrawing(self, "kill1", "kill1.png",  textureSize = (128, 128))
       engine.loadImgDrawing(self, "kill2", "kill2.png",  textureSize = (128, 128))
 
+    #MFH - freestyle tails (for drum fills & BREs)
+    try:
+      engine.loadImgDrawing(self, "freestyle1", os.path.join("themes", themename, "freestyletail1.png"),  textureSize = (128, 128))
+      engine.loadImgDrawing(self, "freestyle2", os.path.join("themes", themename, "freestyletail2.png"),  textureSize = (128, 128))
+    except IOError:
+      engine.loadImgDrawing(self, "freestyle1", "freestyletail1.png",  textureSize = (128, 128))
+      engine.loadImgDrawing(self, "freestyle2", "freestyletail2.png",  textureSize = (128, 128))
+
 
 
     self.meshColor  = Theme.meshColor
@@ -1098,7 +1106,11 @@ class Guitar:
     glVertex3f(w / 2,  0, -sw)
     glEnd()
 
-  def renderTail(self, length, sustain, kill, color, flat = False, tailOnly = False, isTappable = False, big = False, fret = 0, spNote = False):
+  def renderTail(self, length, sustain, kill, color, flat = False, tailOnly = False, isTappable = False, big = False, fret = 0, spNote = False, freestyleTail = 0):
+
+    #MFH - if freestyleTail == 0, act normally.
+    #       if freestyleTail == 1, render an inactive freestyle tail  (self.freestyle1 & self.freestyle2)
+    #       if freestyleTail == 2, render an active / hit freestyle tail
 
     if not self.simpleTails:#Tail Colors
       glColor4f(1,1,1,1)
@@ -1124,80 +1136,95 @@ class Guitar:
         else:
           s = (length + 0.00001)
 
-        #myfingershurt: so any theme containing appropriate files can use new tails
-        if not self.simpleTails:
-            
-          if big == True and tailOnly == True:
-            if kill and self.killfx == 0:
-              zsize = .25
-              size = (.15, s - zsize)
-              tex1 = self.kill1
-              tex2 = self.kill2
-            else:
-              zsize = .25
-              size = (.17, s - zsize)
-              if self.starPowerActive and not color == (0,0,0,1):
-                tex1 = self.btail6
-                tex2 = self.btaile6
+    #       if freestyleTail == 1, render an inactive freestyle tail  (self.freestyle1 & self.freestyle2)
+    #       if freestyleTail == 2, render an active / hit freestyle tail
+
+        if freestyleTail == 0:    #normal tail rendering
+          #myfingershurt: so any theme containing appropriate files can use new tails
+          if not self.simpleTails:
+              
+            if big == True and tailOnly == True:
+              if kill and self.killfx == 0:
+                zsize = .25
+                size = (.15, s - zsize)
+                tex1 = self.kill1
+                tex2 = self.kill2
               else:
-                if fret == 0:
-                  tex1 = self.btail1
-                  tex2 = self.btaile1
-                elif fret == 1:
-                  tex1 = self.btail2
-                  tex2 = self.btaile2
-                elif fret == 2:
-                  tex1 = self.btail3
-                  tex2 = self.btaile3
-                elif fret == 3:
-                  tex1 = self.btail4
-                  tex2 = self.btaile4
-                elif fret == 4:
-                  tex1 = self.btail5
-                  tex2 = self.btaile5
-          else:
-            zsize = .15
-            size = (.1, s - zsize)
-            if tailOnly:#Note let go
-              tex1 = self.tail0
-              tex2 = self.taile0
+                zsize = .25
+                size = (.17, s - zsize)
+                if self.starPowerActive and not color == (0,0,0,1):
+                  tex1 = self.btail6
+                  tex2 = self.btaile6
+                else:
+                  if fret == 0:
+                    tex1 = self.btail1
+                    tex2 = self.btaile1
+                  elif fret == 1:
+                    tex1 = self.btail2
+                    tex2 = self.btaile2
+                  elif fret == 2:
+                    tex1 = self.btail3
+                    tex2 = self.btaile3
+                  elif fret == 3:
+                    tex1 = self.btail4
+                    tex2 = self.btaile4
+                  elif fret == 4:
+                    tex1 = self.btail5
+                    tex2 = self.btaile5
             else:
-              if self.starPowerActive and not color == (0,0,0,1):
-                tex1 = self.tail6
-                tex2 = self.taile6
+              zsize = .15
+              size = (.1, s - zsize)
+              if tailOnly:#Note let go
+                tex1 = self.tail0
+                tex2 = self.taile0
               else:
-                if fret == 0:
-                  tex1 = self.tail1
-                  tex2 = self.taile1
-                elif fret == 1:
-                  tex1 = self.tail2
-                  tex2 = self.taile2
-                elif fret == 2:
-                  tex1 = self.tail3
-                  tex2 = self.taile3
-                elif fret == 3:
-                  tex1 = self.tail4
-                  tex2 = self.taile4
-                elif fret == 4:
-                  tex1 = self.tail5
-                  tex2 = self.taile5
-        else:
-          if big == True and tailOnly == True:
-            if kill and self.killfx == 0:
-              zsize = .25
-              size = (.15, s - zsize)
-              tex1 = self.kill1
-              tex2 = self.kill2
-            else:
-              zsize = .25
-              size = (.11, s - zsize)
-              tex1 = self.bigTail1
-              tex2 = self.bigTail2
+                if self.starPowerActive and not color == (0,0,0,1):
+                  tex1 = self.tail6
+                  tex2 = self.taile6
+                else:
+                  if fret == 0:
+                    tex1 = self.tail1
+                    tex2 = self.taile1
+                  elif fret == 1:
+                    tex1 = self.tail2
+                    tex2 = self.taile2
+                  elif fret == 2:
+                    tex1 = self.tail3
+                    tex2 = self.taile3
+                  elif fret == 3:
+                    tex1 = self.tail4
+                    tex2 = self.taile4
+                  elif fret == 4:
+                    tex1 = self.tail5
+                    tex2 = self.taile5
           else:
-            zsize = .15
-            size = (.08, s - zsize)
-            tex1 = self.tail1
-            tex2 = self.tail2
+            if big == True and tailOnly == True:
+              if kill and self.killfx == 0:
+                zsize = .25
+                size = (.15, s - zsize)
+                tex1 = self.kill1
+                tex2 = self.kill2
+              else:
+                zsize = .25
+                size = (.11, s - zsize)
+                tex1 = self.bigTail1
+                tex2 = self.bigTail2
+            else:
+              zsize = .15
+              size = (.08, s - zsize)
+              tex1 = self.tail1
+              tex2 = self.tail2
+        
+        else:   #freestyleTail > 0
+          # render an inactive freestyle tail  (self.freestyle1 & self.freestyle2)
+          zsize = .50  
+          size = (.30, s - zsize)   #was .15,
+          tex1 = self.freestyle1
+          tex2 = self.freestyle2
+          if freestyleTail == 1:
+            glColor4f(*color)
+          else:   #if freestyleTail == 2
+            glColor4f(.3,.7,.9,1)
         
         glEnable(GL_TEXTURE_2D)
         tex1.texture.bind()
@@ -1217,21 +1244,44 @@ class Guitar:
 
         glDisable(GL_TEXTURE_2D)
 
+        #MFH - this block of code renders the tail "end" - after the note
         glEnable(GL_TEXTURE_2D)
         tex2.texture.bind()
 
         glBegin(GL_TRIANGLE_STRIP)
-        glTexCoord2f(0.0, 0.0)
-        glVertex3f(-size[0], 0, size[1] - (.01))
-        glTexCoord2f(1.0, 0.0)
-        glVertex3f( size[0], 0, size[1] - (.01))
-        glTexCoord2f(0.0, 1.0)
+        glTexCoord2f(0.0, 0.05)
+        glVertex3f(-size[0], 0, size[1] - (.05))
+        glTexCoord2f(1.0, 0.05)
+        glVertex3f( size[0], 0, size[1] - (.05))
+        glTexCoord2f(0.0, 0.95)
         glVertex3f(-size[0], 0, size[1] + (zsize))
-        glTexCoord2f(1.0, 1.0)
+        glTexCoord2f(1.0, 0.95)
         glVertex3f( size[0], 0, size[1] + (zsize))
         glEnd()
 
         glDisable(GL_TEXTURE_2D)
+
+
+
+        #MFH - TODO - this block of code renders the tail "beginning" - before the note, for freestyle "lanes" only
+        if freestyleTail > 0:   
+          glEnable(GL_TEXTURE_2D)
+          tex2.texture.bind()
+  
+          glBegin(GL_TRIANGLE_STRIP)
+          glTexCoord2f(0.0, 0.95)
+          glVertex3f(-size[0], 0, 0 - (zsize))
+          glTexCoord2f(1.0, 0.95)
+          glVertex3f( size[0], 0, 0 - (zsize))
+          glTexCoord2f(0.0, 0.05)
+          glVertex3f(-size[0], 0, 0 + (.05))
+          glTexCoord2f(1.0, 0.05)
+          glVertex3f( size[0], 0, 0 + (.05))
+          glEnd()
+  
+          glDisable(GL_TEXTURE_2D)
+
+
 
     if tailOnly:
       return
@@ -1393,14 +1443,20 @@ class Guitar:
     if not song:
       return
 
+    boardWindowMin = pos - self.currentPeriod * 2
+    boardWindowMax = pos + self.currentPeriod * self.beatsPerBoard
+    track = song.midiEventTrack[self.player]
+    #self.currentPeriod = self.neckSpeed
+    beatsPerUnit = self.beatsPerBoard / self.boardLength
+    
+
+
+
     if self.incomingNeckMode > 0:   #if enabled
-      boardWindowMin = pos - self.currentPeriod * 2
-      boardWindowMax = pos + self.currentPeriod * self.beatsPerBoard
 
 
       #if self.song.hasStarpowerPaths and self.song.midiStyle == Song.MIDI_TYPE_RB:  
       if self.useMidiSoloMarkers:
-        track = song.midiEventTrack[self.player]
         for time, event in track.getEvents(boardWindowMin, boardWindowMax):
           if isinstance(event, Song.MarkerNote):
             if event.number == Song.starPowerMarkingNote:
@@ -1439,6 +1495,25 @@ class Guitar:
                   neckImg = self.neckDrawing
                 self.renderIncomingNeck(visibility, song, pos, time, neckImg)
               
+
+    #MFH - TODO - render 5 freestyle tails when Song.freestyleMarkingNote comes up
+    for time, event in track.getEvents(boardWindowMin, boardWindowMax):
+      if isinstance(event, Song.MarkerNote):
+        if event.number == Song.freestyleMarkingNote:
+          #MFH - render 5 freestyle tails
+          for theFret in range(0,5):
+            c = self.fretColors[theFret]
+            #color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
+            color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1)
+            length     = (event.length - 50) / self.currentPeriod / beatsPerUnit
+            w = self.boardWidth / self.strings
+            x  = (self.strings / 2 - theFret) * w
+            z  = ((time - pos) / self.currentPeriod) / beatsPerUnit
+            glPushMatrix()
+            glTranslatef(x, (1.0 - visibility) ** (theFret + 1), z)
+            self.renderTail(length, sustain = True, kill = False, color = color, flat = False, tailOnly = True, isTappable = False, big = True, fret = theFret, spNote = False, freestyleTail = 1)
+            glPopMatrix()
+
 
 
   def renderNotes(self, visibility, song, pos, killswitch):
@@ -1639,7 +1714,9 @@ class Guitar:
     self.killPoints = False
 
     beatsPerUnit = self.beatsPerBoard / self.boardLength
+    
     w = self.boardWidth / self.strings
+    
     track = song.track[self.player]
 
     num = 0
