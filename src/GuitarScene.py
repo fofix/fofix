@@ -438,7 +438,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
 
 
-    #MFH - TODO - switch to midi lyric mode option
+    #MFH - switch to midi lyric mode option
     self.midiLyricMode = self.engine.config.get("game", "midi_lyric_mode")
     #self.midiLyricMode = 0
     self.currentSimpleMidiLyricLine = ""
@@ -735,7 +735,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           Log.debug("GuitarScene: Guitar Solo until end of song found - (guitarSoloStartTime - Ntime = guitarSoloNoteCount): " + str(guitarSoloStartTime) + "-" + str(Ntime) + " = " + str(guitarSoloNoteCount) )
     
 
-    #MFH - TODO - handle gathering / sizing / grouping line-by-line lyric display here, during initialization:
+    #MFH - handle gathering / sizing / grouping line-by-line lyric display here, during initialization:
     self.midiLyricLineEvents = []    #MFH - this is a list of sublists of tuples.
                                 # The tuples will contain (time, event)  
                                 # The sublists will contain:
@@ -746,12 +746,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.midiLyricLineIndex = 0
     self.nextMidiLyricStartTime = 0
     self.nextMidiLyricLine = ""
-    if self.midiLyricsEnabled == 1 and self.midiLyricMode == 1:   #line-by-line lyrics mode is selected and enabled:
-      lyricFont = self.engine.data.font        
+    self.lyricHeight = 0
+
+    if self.midiLyricsEnabled == 1 and (self.midiLyricMode == 1 or self.midiLyricMode == 2):   #line-by-line lyrics mode is selected and enabled:
+      lyricFont = self.engine.data.font
       if self.theme == 2:
         txtSize = 0.00170
       else:
         txtSize = 0.00175
+      self.lyricHeight = lyricFont.getStringSize("A", scale = txtSize)[1]
+
       #MFH - now we need an appropriate array to store and organize the lyric events into "lines"
       #  -- the first attempt at coding this will probably butcher the measures and timing horribly, but at least
       #     those of us with older systems can read the lyrics without them jumping all over the place.
@@ -776,6 +780,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.midiLyricLines.append( (firstTime, tempLyricLine) )
       
 
+
+
       
       #MFH - test unpacking / decoding the lyrical lines:
       for midiLyricSubList in self.midiLyricLineEvents:
@@ -788,9 +794,39 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         Log.debug("MIDI Line-by-line simple lyric line starting at time: " + str(lineStartTime) + ", " + midiLyricSimpleLineText)
 
     self.numMidiLyricLines = len(self.midiLyricLines)
+
     #MFH - init vars for the next time & lyric line to display
     if ( self.numMidiLyricLines > 0 ):
       self.nextMidiLyricStartTime, self.nextMidiLyricLine = self.midiLyricLines[self.midiLyricLineIndex]
+
+    #MFH - initialize word-by-word 2-line MIDI lyric display / highlighting system:
+    self.activeMidiLyricLine_GreyWords = ""
+    self.activeMidiLyricLine_GreenWords = ""
+    self.activeMidiLyricLine_WhiteWords = ""
+    self.activeMidiLyricLineIndex = 0
+    self.activeMidiLyricWordSubIndex = 0
+    self.numWordsInCurrentMidiLyricLine = 0
+    self.currentSimpleMidiLyricLine = ""
+    self.nextLyricWordTime = 0
+    self.nextLyricEvent = None
+    self.nextLyricIsOnNewLine = False
+    
+    if self.midiLyricMode == 2:
+    
+      self.numWordsInCurrentMidiLyricLine = 0
+      for nextLyricTime, nextLyricEvent in self.midiLyricLineEvents[self.activeMidiLyricLineIndex]:   #populate the first active line
+        self.numWordsInCurrentMidiLyricLine += 1
+    
+      if self.numWordsInCurrentMidiLyricLine > self.activeMidiLyricWordSubIndex+1:  #there is another word in this line
+        self.nextLyricWordTime, self.nextLyricEvent = self.midiLyricLineEvents[self.activeMidiLyricLineIndex][self.activeMidiLyricWordSubIndex]
+      else:
+        self.noMoreMidiLineLyrics = True    #t'aint no lyrics t'start wit!
+      #self.activeMidiLyricWordSubIndex += 1
+      for nextLyricTime, nextLyricEvent in self.midiLyricLineEvents[self.activeMidiLyricLineIndex]:   #populate the first active line
+        self.activeMidiLyricLine_WhiteWords = "%s %s" % (self.activeMidiLyricLine_WhiteWords, nextLyricEvent.text)
+      if self.numMidiLyricLines > self.activeMidiLyricLineIndex+2:  #is there a second line of lyrics?
+        tempTime, self.currentSimpleMidiLyricLine = self.midiLyricLines[self.activeMidiLyricLineIndex+1]
+
     
     
     
@@ -2913,17 +2949,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       if self.rockFinished and not self.pause:
         self.goToResults()
         return
-
+ 
       #MFH
       if self.midiLyricMode == 1 and self.numMidiLyricLines > 0 and (not self.noMoreMidiLineLyrics):   #line-by-line lyrics mode:
-
-#-        latestGoodStartTime = 0
-#-        latestGoodLyricLine = ""
-#-        for lineStartTime, midiLyricSimpleLineText in self.midiLyricLines:
-#-          if pos >= (lineStartTime-lineByLineStartSlopMs) and lineStartTime > latestGoodStartTime: 
-#-            latestGoodLyricLine = midiLyricSimpleLineText
-#-            latestGoodStartTime = lineStartTime
-        #self.currentSimpleMidiLyricLine = latestGoodLyricLine
 
         if pos >= (self.nextMidiLyricStartTime-self.lineByLineStartSlopMs): 
           self.currentSimpleMidiLyricLine = self.nextMidiLyricLine
@@ -2933,6 +2961,60 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             self.nextMidiLyricStartTime, self.nextMidiLyricLine = self.midiLyricLines[self.midiLyricLineIndex]
           else:
             self.noMoreMidiLineLyrics = True
+            
+      elif self.midiLyricMode == 2 and self.numMidiLyricLines > 0 and (not self.noMoreMidiLineLyrics):   #MFH - TODO - handle 2-line lyric mode with current-word highlighting advancement
+        #MFH - first, prepare / handle the active / top line (which will have highlighted words / syllables):
+        if pos >= self.nextLyricWordTime:      #time to switch to this word
+          if self.nextLyricIsOnNewLine:
+            self.activeMidiLyricLineIndex += 1
+            self.activeMidiLyricWordSubIndex = 0
+            self.nextLyricIsOnNewLine = False
+            self.activeMidiLyricLine_GreyWords = ""
+            self.activeMidiLyricLine_GreenWords = "%s " % self.nextLyricEvent.text
+            
+            self.numWordsInCurrentMidiLyricLine = 0
+            for nextLyricTime, nextLyricEvent in self.midiLyricLineEvents[self.activeMidiLyricLineIndex]:   #populate the first active line
+              self.numWordsInCurrentMidiLyricLine += 1
+            
+            if self.numWordsInCurrentMidiLyricLine > self.activeMidiLyricWordSubIndex+1:  #there is another word in this line
+              self.activeMidiLyricWordSubIndex += 1
+              self.nextLyricWordTime, self.nextLyricEvent = self.midiLyricLineEvents[self.activeMidiLyricLineIndex][self.activeMidiLyricWordSubIndex]
+              self.activeMidiLyricLine_WhiteWords = ""
+              for nextLyricTime, nextLyricEvent in self.midiLyricLineEvents[self.activeMidiLyricLineIndex]:
+                if nextLyricTime > pos:
+                  self.activeMidiLyricLine_WhiteWords = "%s %s" % (self.activeMidiLyricLine_WhiteWords, nextLyricEvent.text)
+          
+          else:   #next lyric is on the same line
+            if self.activeMidiLyricWordSubIndex > 0:  #set previous word as grey
+              lastLyricTime, lastLyricEvent = self.midiLyricLineEvents[self.activeMidiLyricLineIndex][self.activeMidiLyricWordSubIndex-1]
+              self.activeMidiLyricLine_GreyWords = "%s%s " % (self.activeMidiLyricLine_GreyWords, lastLyricEvent.text)
+            self.activeMidiLyricLine_GreenWords = "%s " % self.nextLyricEvent.text
+            if self.numWordsInCurrentMidiLyricLine > self.activeMidiLyricWordSubIndex+1:  #there is another word in this line
+              self.activeMidiLyricWordSubIndex += 1
+              self.nextLyricWordTime, self.nextLyricEvent = self.midiLyricLineEvents[self.activeMidiLyricLineIndex][self.activeMidiLyricWordSubIndex]
+              self.activeMidiLyricLine_WhiteWords = ""
+              for nextLyricTime, nextLyricEvent in self.midiLyricLineEvents[self.activeMidiLyricLineIndex]:
+                if nextLyricTime > pos:
+                  self.activeMidiLyricLine_WhiteWords = "%s %s" % (self.activeMidiLyricLine_WhiteWords, nextLyricEvent.text)
+        
+            else:   #no more words in this line
+              if self.numMidiLyricLines > self.activeMidiLyricLineIndex+1:  #there is another line
+                self.nextLyricIsOnNewLine = True
+                self.nextLyricWordTime, self.nextLyricEvent = self.midiLyricLineEvents[self.activeMidiLyricLineIndex+1][0]
+                self.activeMidiLyricLine_WhiteWords = ""
+
+
+              else:   #no more lines
+                self.noMoreMidiLineLyrics = True
+                self.activeMidiLyricLine_WhiteWords = ""
+                self.currentSimpleMidiLyricLine = ""
+                #Log.notice("No more MIDI lyric lines to handle!")
+
+          #MFH - then, prepare / handle the next / bottom line (which will just be a simple line with all white text):  
+          if self.numMidiLyricLines > self.activeMidiLyricLineIndex+1: 
+            tempTime, self.currentSimpleMidiLyricLine = self.midiLyricLines[self.activeMidiLyricLineIndex+1]
+          else:
+            self.currentSimpleMidiLyricLine = ""
 
 
 
@@ -4793,6 +4875,34 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             glColor3f(1, 1, 1)
             lyricFont.render(self.currentSimpleMidiLyricLine, (xOffset, yOffset),(1, 0, 0),txtSize)                
               
+          elif self.midiLyricMode == 2:   #line-by-line lyrics mode:
+
+            if self.theme == 2:
+              txtSize = 0.00170
+            else:
+              #gh3 or other standard mod
+              txtSize = 0.00175
+            yOffset = 0.0696  
+            #xOffset = 0.5 - (lyricFont.getStringSize(self.currentSimpleMidiLyricLine, scale = txtSize)[0] / 2.0)
+
+            tempTime, tempLyricLine = self.midiLyricLines[self.activeMidiLyricLineIndex]
+
+            xOffset = 0.5 - (lyricFont.getStringSize(tempLyricLine, scale = txtSize)[0] / 2.0)
+            glColor3f(0.75, 0.75, 0.75)
+            lyricFont.render(self.activeMidiLyricLine_GreyWords, (xOffset, yOffset),(1, 0, 0),txtSize)
+            
+            xOffset += lyricFont.getStringSize(self.activeMidiLyricLine_GreyWords, scale = txtSize)[0]
+            glColor3f(0, 1, 0)
+            lyricFont.render(self.activeMidiLyricLine_GreenWords, (xOffset, yOffset),(1, 0, 0),txtSize)
+            
+            xOffset += lyricFont.getStringSize(self.activeMidiLyricLine_GreenWords, scale = txtSize)[0]
+            glColor3f(1, 1, 1)
+            lyricFont.render(self.activeMidiLyricLine_WhiteWords, (xOffset, yOffset),(1, 0, 0),txtSize)
+                      
+            yOffset += self.lyricHeight
+            xOffset = 0.25
+            glColor3f(1, 1, 1)
+            lyricFont.render(self.currentSimpleMidiLyricLine, (xOffset, yOffset),(1, 0, 0),txtSize)                
 
   
   
