@@ -874,8 +874,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         else:
           self.engine.loadImgDrawing(self, "part", os.path.join("themes",themename,"guitar.png"))
       except IOError:
-        self.counting = False
-          
+        try:
+          if self.guitars[0].isDrum:
+            self.engine.loadImgDrawing(self, "part", os.path.join("drum.png"))
+          if self.guitars[0].isBassGuitar:
+            self.engine.loadImgDrawing(self, "part", os.path.join("bass.png"))
+          else:
+            self.engine.loadImgDrawing(self, "part", os.path.join("guitar.png"))
+        except IOError:
+          self.counting = False
+
       if self.numOfPlayers > 1:
         try:
           if self.guitars[1].isDrum:
@@ -885,8 +893,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           else:
             self.engine.loadImgDrawing(self, "part2", os.path.join("themes",themename,"guitar.png"))
         except IOError:
-          self.counting = False
-
+          try:
+            if self.guitars[1].isDrum:
+              self.engine.loadImgDrawing(self, "part2", os.path.join("drum.png"))
+            if self.guitars[1].isBassGuitar:
+              self.engine.loadImgDrawing(self, "part2", os.path.join("bass.png"))
+            else:
+              self.engine.loadImgDrawing(self, "part2", os.path.join("guitar.png"))
+          except IOError:
+            self.counting = False
 
     # evilynux - Load stage background(s)
     self.stage.load(self.libraryName, self.songName, self.playerList[0].practiceMode)
