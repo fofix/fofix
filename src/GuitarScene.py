@@ -812,20 +812,21 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.nextLyricIsOnNewLine = False
     
     if self.midiLyricMode == 2:
-    
-      self.numWordsInCurrentMidiLyricLine = 0
-      for nextLyricTime, nextLyricEvent in self.midiLyricLineEvents[self.activeMidiLyricLineIndex]:   #populate the first active line
-        self.numWordsInCurrentMidiLyricLine += 1
-    
-      if self.numWordsInCurrentMidiLyricLine > self.activeMidiLyricWordSubIndex+1:  #there is another word in this line
-        self.nextLyricWordTime, self.nextLyricEvent = self.midiLyricLineEvents[self.activeMidiLyricLineIndex][self.activeMidiLyricWordSubIndex]
-      else:
-        self.noMoreMidiLineLyrics = True    #t'aint no lyrics t'start wit!
-      #self.activeMidiLyricWordSubIndex += 1
-      for nextLyricTime, nextLyricEvent in self.midiLyricLineEvents[self.activeMidiLyricLineIndex]:   #populate the first active line
-        self.activeMidiLyricLine_WhiteWords = "%s %s" % (self.activeMidiLyricLine_WhiteWords, nextLyricEvent.text)
-      if self.numMidiLyricLines > self.activeMidiLyricLineIndex+2:  #is there a second line of lyrics?
-        tempTime, self.currentSimpleMidiLyricLine = self.midiLyricLines[self.activeMidiLyricLineIndex+1]
+      
+      if self.numMidiLyricLines > self.activeMidiLyricLineIndex:
+        self.numWordsInCurrentMidiLyricLine = 0
+        for nextLyricTime, nextLyricEvent in self.midiLyricLineEvents[self.activeMidiLyricLineIndex]:   #populate the first active line
+          self.numWordsInCurrentMidiLyricLine += 1
+      
+        if self.numWordsInCurrentMidiLyricLine > self.activeMidiLyricWordSubIndex+1:  #there is another word in this line
+          self.nextLyricWordTime, self.nextLyricEvent = self.midiLyricLineEvents[self.activeMidiLyricLineIndex][self.activeMidiLyricWordSubIndex]
+        else:
+          self.noMoreMidiLineLyrics = True    #t'aint no lyrics t'start wit!
+        #self.activeMidiLyricWordSubIndex += 1
+        for nextLyricTime, nextLyricEvent in self.midiLyricLineEvents[self.activeMidiLyricLineIndex]:   #populate the first active line
+          self.activeMidiLyricLine_WhiteWords = "%s %s" % (self.activeMidiLyricLine_WhiteWords, nextLyricEvent.text)
+        if self.numMidiLyricLines > self.activeMidiLyricLineIndex+2:  #is there a second line of lyrics?
+          tempTime, self.currentSimpleMidiLyricLine = self.midiLyricLines[self.activeMidiLyricLineIndex+1]
 
     
     
@@ -4880,7 +4881,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             glColor3f(1, 1, 1)
             lyricFont.render(self.currentSimpleMidiLyricLine, (xOffset, yOffset),(1, 0, 0),txtSize)                
               
-          elif self.midiLyricMode == 2:   #line-by-line lyrics mode:
+          elif self.midiLyricMode == 2 and (self.numMidiLyricLines > self.activeMidiLyricLineIndex):   #line-by-line lyrics mode:
 
             if self.theme == 2:
               txtSize = 0.00170
