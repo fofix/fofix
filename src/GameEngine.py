@@ -392,7 +392,9 @@ class GameEngine(Engine):
     Log.debug("GameEngine class init (GameEngine.py)...")
     self.mainMenu = None    #placeholder for main menu object - to prevent reinstantiation
     
-    if version == "":   version = " beta 1"     #MFH - beta taggin'
+    global version
+    if version == "":   
+      version = " beta 1"     #MFH - beta taggin'
 
     self.versionString = "FoFiX v3.100" + version
 
