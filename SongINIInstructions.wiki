@@ -5,6 +5,7 @@
 
 ||_*SongINI Feature*_||_*Proper Usage*_||
 ||artist = .38 Special||Indicates that the artist is ".38 Special"||
+||icon = rb2||Sets icon to use for song title. (Examples- rb1,rb2,rbdlc,rbtpk,gh1,gh2,gh2dlc,gh3,gh3dlc,gh80s,gha,ghm,ph1,ph2,ph3,ph4,phm)
 ||name = Hold On Loosely||Indicates that the song name is "Hold On Loosely"||
 ||tags = cover||Indicates that is not an original master. So it will show "As Made famous by" instead of "As performed by" at the beginning of the song.||
 ||unlock_id = gh80_3||For career mode, indicates the Tier it belongs to.||
