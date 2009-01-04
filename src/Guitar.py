@@ -2721,22 +2721,29 @@ class Guitar:
         self.renderTracks(visibility)
         self.renderBars(visibility, song, pos)
     
-    
-      if self.fretsUnderNotes:  #MFH
-        if self.twoDnote == True:
-          self.renderTails(visibility, song, pos, killswitch)
-          self.renderFrets(visibility, song, controls)
-          self.renderNotes(visibility, song, pos, killswitch)
+
+      if self.freestyleActive:
+        self.renderTails(visibility, song, pos, killswitch)
+        self.renderNotes(visibility, song, pos, killswitch)
+        self.renderFreestyleLanes(visibility, song, pos) #MFH - render the lanes on top of the notes.
+        self.renderFrets(visibility, song, controls)
+
+      else:    
+        if self.fretsUnderNotes:  #MFH
+          if self.twoDnote == True:
+            self.renderTails(visibility, song, pos, killswitch)
+            self.renderFrets(visibility, song, controls)
+            self.renderNotes(visibility, song, pos, killswitch)
+          else:
+            self.renderTails(visibility, song, pos, killswitch)
+            self.renderNotes(visibility, song, pos, killswitch)
+            self.renderFrets(visibility, song, controls)
         else:
           self.renderTails(visibility, song, pos, killswitch)
           self.renderNotes(visibility, song, pos, killswitch)
           self.renderFrets(visibility, song, controls)
-      else:
-        self.renderTails(visibility, song, pos, killswitch)
-        self.renderNotes(visibility, song, pos, killswitch)
-        self.renderFrets(visibility, song, controls)
 
-      self.renderFreestyleLanes(visibility, song, pos) #MFH - render the lanes on top of the notes.
+        self.renderFreestyleLanes(visibility, song, pos) #MFH - render the lanes on top of the notes.
 
 
       self.renderFlames(visibility, song, pos, controls)
