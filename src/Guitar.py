@@ -1503,12 +1503,28 @@ class Guitar:
           #MFH - render 5 freestyle tails
           for theFret in range(0,5):
             c = self.fretColors[theFret]
-            #color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
-            color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1)
             length     = (event.length - 50) / self.currentPeriod / beatsPerUnit
             w = self.boardWidth / self.strings
             x  = (self.strings / 2 - theFret) * w
             z  = ((time - pos) / self.currentPeriod) / beatsPerUnit
+
+            z2 = ((time + event.length - pos) / self.currentPeriod) / beatsPerUnit
+      
+            if z > self.boardLength * .8:
+              f = (self.boardLength - z) / (self.boardLength * .2)
+            elif z < 0:
+              f = min(1, max(0, 1 + z2))
+            else:
+              f = 1.0
+
+            color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
+            #color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1)
+
+            if time < pos:
+              length += z
+              z = 0
+
+
             glPushMatrix()
             glTranslatef(x, (1.0 - visibility) ** (theFret + 1), z)
             self.renderTail(length, sustain = True, kill = False, color = color, flat = False, tailOnly = True, isTappable = False, big = True, fret = theFret, spNote = False, freestyleTail = 1)
