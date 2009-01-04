@@ -1506,7 +1506,8 @@ class Guitar:
     #MFH - render 5 freestyle tails when Song.freestyleMarkingNote comes up
     if self.bigRockEndings == 2 or (self.theme == 2 and self.bigRockEndings == 1):
       freestyleActive = False
-      for time, event in track.getEvents(boardWindowMin, boardWindowMax):
+      #for time, event in track.getEvents(boardWindowMin, boardWindowMax):
+      for time, event in track.getEvents(pos, boardWindowMax):
         if isinstance(event, Song.MarkerNote):
           if event.number == Song.freestyleMarkingNote:
             length     = (event.length - 50) / self.currentPeriod / beatsPerUnit
