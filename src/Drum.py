@@ -203,6 +203,8 @@ class Drum:
 
     self.hit = [False, False, False, False, False]
 
+    self.freestyleHit = [False, False, False, False, False]
+
     neckSettingName = "neck_choose_p%d" % (self.player)
     self.neck = self.engine.config.get("coffee", neckSettingName)
 

@@ -200,6 +200,9 @@ class Guitar:
     self.scoreMultiplier = 1
 
     self.hit = [False, False, False, False, False]
+    
+    self.freestyleHit = [False, False, False, False, False]
+    
 
     neckSettingName = "neck_choose_p%d" % (self.player)
     self.neck = self.engine.config.get("coffee", neckSettingName)
@@ -1529,7 +1532,7 @@ class Guitar:
             glPushMatrix()
             glTranslatef(x, (1.0 - visibility) ** (theFret + 1), z)
             
-            if self.hit[theFret]:
+            if self.freestyleHit[theFret]:
               freestyleTailMode = 2
             else:
               freestyleTailMode = 1
@@ -3234,70 +3237,12 @@ class Guitar:
     #  return numHits
 
     for theFret in range(0,5):
-      self.hit[theFret] = controls.getState(self.keys[theFret])
-      if self.hit[theFret]:
+      self.freestyleHit[theFret] = controls.getState(self.keys[theFret])
+      if self.freestyleHit[theFret]:
         numHits += 1
     return numHits
 
 
-
-
-
-    self.lastPlayedNotes = self.playedNotes
-    self.playedNotes = []
-    
-    self.matchingNotes = self.getRequiredNotesMFH(song, pos)
-
-    self.controlsMatchNotes3(controls, self.matchingNotes, hopo)
-    
-    #myfingershurt
-    
-    for time, note in self.matchingNotes:
-      if note.played != True:
-        continue
-      
-      self.pickStartPos = pos
-      self.pickStartPos = max(self.pickStartPos, time)
-      if hopo:
-        note.hopod        = True
-      else:
-        note.played       = True
-        #self.wasLastNoteHopod = False
-      if note.tappable == 1 or note.tappable == 2:
-        self.hopoActive = time
-        self.wasLastNoteHopod = True
-      elif note.tappable == 3:
-        self.hopoActive = -time
-        self.wasLastNoteHopod = True
-        if hopo:  #MFH - you just tapped a 3 - make a note of it. (har har)
-          self.hopoProblemNoteNum = note.number
-          self.sameNoteHopoString = True
-      else:
-        self.hopoActive = 0
-        self.wasLastNoteHopod = False
-      self.hopoLast     = note.number
-      self.playedNotes.append([time, note])
-      if self.guitarSolo:
-        self.currentGuitarSoloHitNotes += 1
-     
-    #myfingershurt: be sure to catch when a chord is played
-    if len(self.playedNotes) > 1:
-      lastPlayedNote = None
-      for time, note in self.playedNotes:
-        if isinstance(lastPlayedNote, Note):
-          if note.tappable == 1 and lastPlayedNote.tappable == 1:
-            self.LastStrumWasChord = True
-            #self.sameNoteHopoString = False
-          else:
-            self.LastStrumWasChord = False
-        lastPlayedNote = note
-    
-    elif len(self.playedNotes) > 0: #ensure at least that a note was played here
-      self.LastStrumWasChord = False
-
-    if len(self.playedNotes) != 0:
-      return True
-    return False
 
 
   def endPick(self, pos):
