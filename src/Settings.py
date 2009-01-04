@@ -273,6 +273,11 @@ class SettingsMenu(Menu.Menu):
       KeyConfigChoice(engine, engine.config, "player0", "key_drum3b"),
       KeyConfigChoice(engine, engine.config, "player0", "key_drum4a"),
       KeyConfigChoice(engine, engine.config, "player0", "key_drum4b"),
+      KeyConfigChoice(engine, engine.config, "player0", "key_drum_up"), #shun - directionals
+      KeyConfigChoice(engine, engine.config, "player0", "key_drum_down"),
+      KeyConfigChoice(engine, engine.config, "player0", "key_drum_left"),
+      KeyConfigChoice(engine, engine.config, "player0", "key_drum_right"),
+      KeyConfigChoice(engine, engine.config, "player0", "key_drum_cancel"),
       KeyConfigChoice(engine, engine.config, "player1", "player_2_key_bass"),
       KeyConfigChoice(engine, engine.config, "player1", "player_2_key_drum1a"),
       KeyConfigChoice(engine, engine.config, "player1", "player_2_key_drum1b"),
@@ -282,9 +287,49 @@ class SettingsMenu(Menu.Menu):
       KeyConfigChoice(engine, engine.config, "player1", "player_2_key_drum3b"),
       KeyConfigChoice(engine, engine.config, "player1", "player_2_key_drum4a"),
       KeyConfigChoice(engine, engine.config, "player1", "player_2_key_drum4b"),
+      KeyConfigChoice(engine, engine.config, "player1", "player_2_key_drum_up"), #shun - directionals
+      KeyConfigChoice(engine, engine.config, "player1", "player_2_key_drum_down"),
+      KeyConfigChoice(engine, engine.config, "player1", "player_2_key_drum_left"),
+      KeyConfigChoice(engine, engine.config, "player1", "player_2_key_drum_right"),
+      KeyConfigChoice(engine, engine.config, "player1", "player_2_key_drum_cancel"),
+
     ]       
     drumKeySettingsMenu = Menu.Menu(engine, drumKeySettings)
 
+#shun - alternate drum keys
+    altDrumKeySettings = [
+      (_("Test Keys"), lambda: Dialogs.testDrums(engine)),
+      #ConfigChoice(engine.config, "game", "auto_drum_sp", autoApply = True),#myfingershurt #shun- probably not needed for alt(?)
+      KeyConfigChoice(engine, engine.config, "player0", "akey_bass"),
+      KeyConfigChoice(engine, engine.config, "player0", "akey_drum1a"),
+      KeyConfigChoice(engine, engine.config, "player0", "akey_drum1b"),
+      KeyConfigChoice(engine, engine.config, "player0", "akey_drum2a"),
+      KeyConfigChoice(engine, engine.config, "player0", "akey_drum2b"),
+      KeyConfigChoice(engine, engine.config, "player0", "akey_drum3a"),
+      KeyConfigChoice(engine, engine.config, "player0", "akey_drum3b"),
+      KeyConfigChoice(engine, engine.config, "player0", "akey_drum4a"),
+      KeyConfigChoice(engine, engine.config, "player0", "akey_drum4b"),
+      KeyConfigChoice(engine, engine.config, "player0", "akey_drum_up"),
+      KeyConfigChoice(engine, engine.config, "player0", "akey_drum_down"), #shun - directionals
+      KeyConfigChoice(engine, engine.config, "player0", "akey_drum_left"),
+      KeyConfigChoice(engine, engine.config, "player0", "akey_drum_right"),
+      KeyConfigChoice(engine, engine.config, "player0", "akey_drum_cancel"),
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_bass"),
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_drum1a"),
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_drum1b"),
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_drum2a"),
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_drum2b"),
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_drum3a"),
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_drum3b"),
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_drum4a"),
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_drum4b"),
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_drum_up"), # shun -directionals
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_drum_down"),
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_drum_left"),
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_drum_right"),
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_drum_cancel"),
+    ]       
+    altDrumKeySettingsMenu = Menu.Menu(engine, altDrumKeySettings)
 
     player0Keys = [
       KeyConfigChoice(engine, engine.config, "player0", "key_action1"),
@@ -377,9 +422,10 @@ class SettingsMenu(Menu.Menu):
       (_("Player 1 Alt. Keys"), player0AltKeyMenu),
       (_("Player 2 Keys"), player1KeyMenu),
       (_("Player 2 Alt. Keys"), player1AltKeyMenu),
-      (_("Drum keys" ), drumKeySettingsMenu),
+      (_("Drum Keys" ), drumKeySettingsMenu),
+      (_("Alt. Drum Keys" ), altDrumKeySettingsMenu),
       (_("Test Keys"), lambda: Dialogs.testKeys(engine)),
-      (_("Advanced controls"), AdvancedKeySettingsMenu),
+      (_("Advanced Controls"), AdvancedKeySettingsMenu),
     ]
     keySettingsMenu = Menu.Menu(engine, keySettings)
     

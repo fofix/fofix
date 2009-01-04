@@ -83,13 +83,25 @@ PLAYER_2_DRUM2B   = 0x100000000000
 PLAYER_2_DRUM3B   = 0x200000000000
 PLAYER_2_DRUM4B   = 0x400000000000
 
-LEFTS  = [LEFT,PLAYER_2_LEFT]
-RIGHTS = [RIGHT,PLAYER_2_RIGHT]
-UPS    = [UP,PLAYER_2_UP]
-DOWNS  = [DOWN,PLAYER_2_DOWN]
+#shun: adding drum directional/back keys
+DRUM_UP               = 0x800000000000 
+DRUM_DOWN             = 0x1000000000000
+DRUM_LEFT             = 0x2000000000000
+DRUM_RIGHT            = 0x4000000000000
+DRUM_CANCEL           = 0x8000000000000
+PLAYER_2_DRUM_UP      = 0x10000000000000 
+PLAYER_2_DRUM_DOWN    = 0x20000000000000
+PLAYER_2_DRUM_LEFT    = 0x40000000000000
+PLAYER_2_DRUM_RIGHT   = 0x80000000000000
+PLAYER_2_DRUM_CANCEL  = 0x100000000000000
+
+LEFTS  = [LEFT,PLAYER_2_LEFT,DRUM_LEFT,PLAYER_2_DRUM_LEFT]
+RIGHTS = [RIGHT,PLAYER_2_RIGHT,DRUM_RIGHT,PLAYER_2_DRUM_RIGHT]
+UPS    = [UP,PLAYER_2_UP,DRUM_UP,PLAYER_2_DRUM_UP]
+DOWNS  = [DOWN,PLAYER_2_DOWN,DRUM_DOWN,PLAYER_2_DRUM_DOWN]
 ACTION1S= [ACTION1,PLAYER_2_ACTION1]
 ACTION2S= [ACTION2,PLAYER_2_ACTION2]
-CANCELS= [CANCEL,PLAYER_2_CANCEL]
+CANCELS= [CANCEL,PLAYER_2_CANCEL,DRUM_CANCEL,PLAYER_2_DRUM_CANCEL]
 KEY1S  = [KEY1,PLAYER_2_KEY1]
 KEY2S  = [KEY2,PLAYER_2_KEY2]
 KEY3S  = [KEY3,PLAYER_2_KEY3]
@@ -183,6 +195,11 @@ Config.define("player0", "key_drum1b", str, "K_s", text = _("Drum #1"))
 Config.define("player0", "key_drum2b", str, "K_r", text = _("Drum #2"))
 Config.define("player0", "key_drum3b", str, "K_y", text = _("Drum #3"))
 Config.define("player0", "key_drum4b", str, "K_i", text = _("Drum #4"))
+Config.define("player0", "key_drum_up", str, "K_UP", text = _("Move up")) 
+Config.define("player0", "key_drum_down", str, "K_DOWN", text = _("Move down")) 
+Config.define("player0", "key_drum_left", str, "K_LEFT", text = _("Move left")) 
+Config.define("player0", "key_drum_right", str, "K_RIGHT", text = _("Move right")) 
+Config.define("player0", "key_drum_cancel", str, "K_ESCAPE", text = _("Cancel")) 
 Config.define("player1", "player_2_key_bass", str, "K_l", text = _("Player 2 Bass drum"))
 Config.define("player1", "player_2_key_drum1a", str, "K_z", text = _("Player 2 Drum #1"))
 Config.define("player1", "player_2_key_drum2a", str, "K_d", text = _("Player 2 Drum #2"))
@@ -192,6 +209,41 @@ Config.define("player1", "player_2_key_drum1b", str, "K_x", text = _("Player 2 D
 Config.define("player1", "player_2_key_drum2b", str, "K_f", text = _("Player 2 Drum #2"))
 Config.define("player1", "player_2_key_drum3b", str, "K_h", text = _("Player 2 Drum #3"))
 Config.define("player1", "player_2_key_drum4b", str, "K_k", text = _("Player 2 Drum #4"))
+Config.define("player1", "player_2_key_drum_up", str, "K_UP", text = _("Player 2 Move up")) 
+Config.define("player1", "player_2_key_drum_down", str, "K_DOWN", text = _("Player 2 Move down")) 
+Config.define("player1", "player_2_key_drum_left", str, "K_LEFT", text = _("Player 2 Move left")) 
+Config.define("player1", "player_2_key_drum_right", str, "K_RIGHT", text = _("Player 2 Move right"))
+Config.define("player1", "player_2_key_drum_cancel", str, "K_ESCAPE", text = _("Player 2 Cancel"))
+
+#shun - alternate drums
+Config.define("player0", "akey_bass", str, "K_SPACE", text = _("Bass drum"))
+Config.define("player0", "akey_drum1a", str, "K_a", text = _("Drum #1"))
+Config.define("player0", "akey_drum2a", str, "K_e", text = _("Drum #2"))
+Config.define("player0", "akey_drum3a", str, "K_t", text = _("Drum #3"))
+Config.define("player0", "akey_drum4a", str, "K_u", text = _("Drum #4"))
+Config.define("player0", "akey_drum1b", str, "K_s", text = _("Drum #1"))
+Config.define("player0", "akey_drum2b", str, "K_r", text = _("Drum #2"))
+Config.define("player0", "akey_drum3b", str, "K_y", text = _("Drum #3"))
+Config.define("player0", "akey_drum4b", str, "K_i", text = _("Drum #4"))
+Config.define("player0", "akey_drum_up", str, "K_UP", text = _("Move up")) 
+Config.define("player0", "akey_drum_down", str, "K_DOWN", text = _("Move down")) 
+Config.define("player0", "akey_drum_left", str, "K_LEFT", text = _("Move left")) 
+Config.define("player0", "akey_drum_right", str, "K_RIGHT", text = _("Move right")) 
+Config.define("player0", "akey_drum_cancel", str, "K_ESCAPE", text = _("Cancel")) 
+Config.define("player1", "aplayer_2_key_bass", str, "K_l", text = _("Player 2 Bass drum"))
+Config.define("player1", "aplayer_2_key_drum1a", str, "K_z", text = _("Player 2 Drum #1"))
+Config.define("player1", "aplayer_2_key_drum2a", str, "K_d", text = _("Player 2 Drum #2"))
+Config.define("player1", "aplayer_2_key_drum3a", str, "K_g", text = _("Player 2 Drum #3"))
+Config.define("player1", "aplayer_2_key_drum4a", str, "K_j", text = _("Player 2 Drum #4"))
+Config.define("player1", "aplayer_2_key_drum1b", str, "K_x", text = _("Player 2 Drum #1"))
+Config.define("player1", "aplayer_2_key_drum2b", str, "K_f", text = _("Player 2 Drum #2"))
+Config.define("player1", "aplayer_2_key_drum3b", str, "K_h", text = _("Player 2 Drum #3"))
+Config.define("player1", "aplayer_2_key_drum4b", str, "K_k", text = _("Player 2 Drum #4"))
+Config.define("player1", "aplayer_2_key_drum_up", str, "K_UP", text = _("Player 2 Move up")) 
+Config.define("player1", "aplayer_2_key_drum_down", str, "K_DOWN", text = _("Player 2 Move down")) 
+Config.define("player1", "aplayer_2_key_drum_left", str, "K_LEFT", text = _("Player 2 Move left")) 
+Config.define("player1", "aplayer_2_key_drum_right", str, "K_RIGHT", text = _("Player 2 Move right"))
+Config.define("player1", "aplayer_2_key_drum_cancel", str, "K_ESCAPE", text = _("Player 2 Cancel")) 
 
 
 Config.define("player1", "name",         str, "")
@@ -227,57 +279,67 @@ class Controls:
     #----------------------------------------------------------
     # glorandwarf: only map in player 2's keys if needed
     self.controlMapping = {
-      keycode("%skey_left" % (prefix), 0):      LEFT,
-      keycode("%skey_right" % (prefix), 0):     RIGHT,
-      keycode("%skey_up" % (prefix), 0):        UP,
-      keycode("%skey_down" % (prefix), 0):      DOWN,
-      keycode("%skey_action1" % (prefix), 0):   ACTION1,
-      keycode("%skey_action2" % (prefix), 0):   ACTION2,
-      keycode("%skey_1" % (prefix), 0):         KEY1,
-      keycode("%skey_2" % (prefix), 0):         KEY2,
-      keycode("%skey_3" % (prefix), 0):         KEY3,
-      keycode("%skey_4" % (prefix), 0):         KEY4,
-      keycode("%skey_5" % (prefix), 0):         KEY5,
-      keycode("%skey_cancel" % (prefix), 0):    CANCEL,
-      keycode("%skey_star" % (prefix), 0):      STAR,
-      keycode("%skey_kill" % (prefix), 0):      KILL,
-      keycode("key_bass", 0):      BASS,    #myfingershurt: drums
-      keycode("key_drum1a", 0):    DRUM1A,  
-      keycode("key_drum2a", 0):    DRUM2A,
-      keycode("key_drum3a", 0):    DRUM3A,
-      keycode("key_drum4a", 0):    DRUM4A,
-      keycode("key_drum1b", 0):    DRUM1B,
-      keycode("key_drum2b", 0):    DRUM2B,
-      keycode("key_drum3b", 0):    DRUM3B,
-      keycode("key_drum4b", 0):    DRUM4B,
+      keycode("%skey_left" % (prefix), 0):          LEFT,
+      keycode("%skey_right" % (prefix), 0):         RIGHT,
+      keycode("%skey_up" % (prefix), 0):            UP,
+      keycode("%skey_down" % (prefix), 0):          DOWN,
+      keycode("%skey_action1" % (prefix), 0):       ACTION1,
+      keycode("%skey_action2" % (prefix), 0):       ACTION2,
+      keycode("%skey_1" % (prefix), 0):             KEY1,
+      keycode("%skey_2" % (prefix), 0):             KEY2,
+      keycode("%skey_3" % (prefix), 0):             KEY3,
+      keycode("%skey_4" % (prefix), 0):             KEY4,
+      keycode("%skey_5" % (prefix), 0):             KEY5,
+      keycode("%skey_cancel" % (prefix), 0):        CANCEL,
+      keycode("%skey_star" % (prefix), 0):          STAR,
+      keycode("%skey_kill" % (prefix), 0):          KILL,
+      keycode("%skey_bass" % (prefix), 0):          BASS,    #myfingershurt: drums
+      keycode("%skey_drum1a" % (prefix), 0):        DRUM1A,  
+      keycode("%skey_drum2a" % (prefix), 0):        DRUM2A,
+      keycode("%skey_drum3a" % (prefix), 0):        DRUM3A,
+      keycode("%skey_drum4a" % (prefix), 0):        DRUM4A,
+      keycode("%skey_drum1b" % (prefix), 0):        DRUM1B,
+      keycode("%skey_drum2b" % (prefix), 0):        DRUM2B,
+      keycode("%skey_drum3b" % (prefix), 0):        DRUM3B,
+      keycode("%skey_drum4b" % (prefix), 0):        DRUM4B,
+      keycode("%skey_drum_up" % (prefix), 0):       DRUM_UP,
+      keycode("%skey_drum_down" % (prefix), 0):     DRUM_DOWN,
+      keycode("%skey_drum_left" % (prefix), 0):     DRUM_LEFT,
+      keycode("%skey_drum_right" % (prefix), 0):    DRUM_RIGHT,
+      keycode("%skey_drum_cancel" % (prefix), 0):   DRUM_CANCEL,
 
       
     }
     if self.Player2KeysEnabled == 1:    #MFH - menu option for this
       p2map = {
-        keycode("%splayer_2_key_action1" % (prefix), 1):   PLAYER_2_ACTION1, #QQstarS:add
-        keycode("%splayer_2_key_action2" % (prefix), 1):   PLAYER_2_ACTION2,
-        keycode("%splayer_2_key_1" % (prefix), 1):         PLAYER_2_KEY1,
-        keycode("%splayer_2_key_2" % (prefix), 1):         PLAYER_2_KEY2,
-        keycode("%splayer_2_key_3" % (prefix), 1):         PLAYER_2_KEY3,
-        keycode("%splayer_2_key_4" % (prefix), 1):         PLAYER_2_KEY4,
-        keycode("%splayer_2_key_5" % (prefix), 1):         PLAYER_2_KEY5,
-        keycode("%splayer_2_key_left" % (prefix), 1):      PLAYER_2_LEFT,
-        keycode("%splayer_2_key_right" % (prefix), 1):     PLAYER_2_RIGHT,
-        keycode("%splayer_2_key_up" % (prefix), 1):        PLAYER_2_UP,
-        keycode("%splayer_2_key_down" % (prefix), 1):      PLAYER_2_DOWN,
-        keycode("%splayer_2_key_cancel" % (prefix), 1):    PLAYER_2_CANCEL,
-        keycode("%splayer_2_key_star" % (prefix), 1):      PLAYER_2_STAR, #QQstarS:add
-        keycode("%splayer_2_key_kill" % (prefix), 1):      PLAYER_2_KILL, #QQstarS:add
-        keycode("player_2_key_bass", 1):      PLAYER_2_BASS,    #myfingershurt: drums
-        keycode("player_2_key_drum1a", 1):    PLAYER_2_DRUM1A,  
-        keycode("player_2_key_drum2a", 1):    PLAYER_2_DRUM2A,
-        keycode("player_2_key_drum3a", 1):    PLAYER_2_DRUM3A,
-        keycode("player_2_key_drum4a", 1):    PLAYER_2_DRUM4A,
-        keycode("player_2_key_drum1b", 1):    PLAYER_2_DRUM1B,
-        keycode("player_2_key_drum2b", 1):    PLAYER_2_DRUM2B,
-        keycode("player_2_key_drum3b", 1):    PLAYER_2_DRUM3B,
-        keycode("player_2_key_drum4b", 1):    PLAYER_2_DRUM4B,
+        keycode("%splayer_2_key_action1" % (prefix), 1):      PLAYER_2_ACTION1, #QQstarS:add
+        keycode("%splayer_2_key_action2" % (prefix), 1):      PLAYER_2_ACTION2,
+        keycode("%splayer_2_key_1" % (prefix), 1):            PLAYER_2_KEY1,
+        keycode("%splayer_2_key_2" % (prefix), 1):            PLAYER_2_KEY2,
+        keycode("%splayer_2_key_3" % (prefix), 1):            PLAYER_2_KEY3,
+        keycode("%splayer_2_key_4" % (prefix), 1):            PLAYER_2_KEY4,
+        keycode("%splayer_2_key_5" % (prefix), 1):            PLAYER_2_KEY5,
+        keycode("%splayer_2_key_left" % (prefix), 1):         PLAYER_2_LEFT,
+        keycode("%splayer_2_key_right" % (prefix), 1):        PLAYER_2_RIGHT,
+        keycode("%splayer_2_key_up" % (prefix), 1):           PLAYER_2_UP,
+        keycode("%splayer_2_key_down" % (prefix), 1):         PLAYER_2_DOWN,
+        keycode("%splayer_2_key_cancel" % (prefix), 1):       PLAYER_2_CANCEL,
+        keycode("%splayer_2_key_star" % (prefix), 1):         PLAYER_2_STAR, #QQstarS:add
+        keycode("%splayer_2_key_kill" % (prefix), 1):         PLAYER_2_KILL, #QQstarS:add
+        keycode("%splayer_2_key_bass" % (prefix), 1):         PLAYER_2_BASS,    #myfingershurt: drums
+        keycode("%splayer_2_key_drum1a" % (prefix), 1):       PLAYER_2_DRUM1A,  
+        keycode("%splayer_2_key_drum2a" % (prefix), 1):       PLAYER_2_DRUM2A,
+        keycode("%splayer_2_key_drum3a" % (prefix), 1):       PLAYER_2_DRUM3A,
+        keycode("%splayer_2_key_drum4a" % (prefix), 1):       PLAYER_2_DRUM4A,
+        keycode("%splayer_2_key_drum1b" % (prefix), 1):       PLAYER_2_DRUM1B,
+        keycode("%splayer_2_key_drum2b" % (prefix), 1):       PLAYER_2_DRUM2B,
+        keycode("%splayer_2_key_drum3b" % (prefix), 1):       PLAYER_2_DRUM3B,
+        keycode("%splayer_2_key_drum4b" % (prefix), 1):       PLAYER_2_DRUM4B,
+        keycode("%splayer_2_key_drum_up" % (prefix), 1):      PLAYER_2_DRUM_UP,
+        keycode("%splayer_2_key_drum_down" % (prefix), 1):    PLAYER_2_DRUM_DOWN,
+        keycode("%splayer_2_key_drum_left" % (prefix), 1):    PLAYER_2_DRUM_LEFT,
+        keycode("%splayer_2_key_drum_right" % (prefix), 1):   PLAYER_2_DRUM_RIGHT,
+        keycode("%splayer_2_key_drum_cancel" % (prefix), 1):  PLAYER_2_DRUM_CANCEL,
       }
       self.controlMapping.update(p2map)
     #----------------------------------------------------------
