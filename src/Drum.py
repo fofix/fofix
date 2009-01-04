@@ -91,7 +91,9 @@ class Drum:
 
     self.isStarPhrase = False
     self.finalStarSeen = False
-    
+
+    self.freestyleActive = False
+
     self.accThresholdWorstLate = 0
     self.accThresholdVeryLate = 0
     self.accThresholdLate = 0
@@ -2469,6 +2471,11 @@ class Drum:
         return True
     return False
 
+
+  #MFH - TODO - handle freestyle picks here
+  def freestylePick(self, song, pos, controls):
+    numHits = 0
+    return numHits
   
   def startPick(self, song, pos, controls, hopo = False):
     if not song:

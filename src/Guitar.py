@@ -77,6 +77,9 @@ class Guitar:
     self.isStarPhrase = False
     self.finalStarSeen = False
 
+    self.freestyleActive = False
+
+
     self.accThresholdWorstLate = 0
     self.accThresholdVeryLate = 0
     self.accThresholdLate = 0
@@ -1263,7 +1266,7 @@ class Guitar:
 
 
 
-        #MFH - TODO - this block of code renders the tail "beginning" - before the note, for freestyle "lanes" only
+        #MFH - this block of code renders the tail "beginning" - before the note, for freestyle "lanes" only
         if freestyleTail > 0:   
           glEnable(GL_TEXTURE_2D)
           tex2.texture.bind()
@@ -1496,39 +1499,45 @@ class Guitar:
                 self.renderIncomingNeck(visibility, song, pos, time, neckImg)
               
 
-    #MFH - TODO - render 5 freestyle tails when Song.freestyleMarkingNote comes up
+    #MFH - render 5 freestyle tails when Song.freestyleMarkingNote comes up
+    freestyleActive = False
     for time, event in track.getEvents(boardWindowMin, boardWindowMax):
       if isinstance(event, Song.MarkerNote):
         if event.number == Song.freestyleMarkingNote:
+          length     = (event.length - 50) / self.currentPeriod / beatsPerUnit
+          w = self.boardWidth / self.strings
+          z  = ((time - pos) / self.currentPeriod) / beatsPerUnit
+          z2 = ((time + event.length - pos) / self.currentPeriod) / beatsPerUnit
+    
+          if z > self.boardLength * .8:
+            f = (self.boardLength - z) / (self.boardLength * .2)
+          elif z < 0:
+            f = min(1, max(0, 1 + z2))
+          else:
+            f = 1.0
+
+          if time < pos:  #MFH - must extend the tail past the first fretboard section dynamically so we don't have to render the entire length at once
+            freestyleActive = True
+            length += z
+            z = 0
+
           #MFH - render 5 freestyle tails
           for theFret in range(0,5):
-            c = self.fretColors[theFret]
-            length     = (event.length - 50) / self.currentPeriod / beatsPerUnit
-            w = self.boardWidth / self.strings
             x  = (self.strings / 2 - theFret) * w
-            z  = ((time - pos) / self.currentPeriod) / beatsPerUnit
-
-            z2 = ((time + event.length - pos) / self.currentPeriod) / beatsPerUnit
-      
-            if z > self.boardLength * .8:
-              f = (self.boardLength - z) / (self.boardLength * .2)
-            elif z < 0:
-              f = min(1, max(0, 1 + z2))
-            else:
-              f = 1.0
-
+            c = self.fretColors[theFret]
             color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
-            #color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1)
-
-            if time < pos:
-              length += z
-              z = 0
-
-
             glPushMatrix()
             glTranslatef(x, (1.0 - visibility) ** (theFret + 1), z)
-            self.renderTail(length, sustain = True, kill = False, color = color, flat = False, tailOnly = True, isTappable = False, big = True, fret = theFret, spNote = False, freestyleTail = 1)
+            
+            if self.hit[theFret]:
+              freestyleTailMode = 2
+            else:
+              freestyleTailMode = 1
+            
+            self.renderTail(length, sustain = True, kill = False, color = color, flat = False, tailOnly = True, isTappable = False, big = True, fret = theFret, spNote = False, freestyleTail = freestyleTailMode)
             glPopMatrix()
+            
+    self.freestyleActive = freestyleActive
 
 
 
@@ -3216,6 +3225,80 @@ class Guitar:
     if len(self.playedNotes) != 0:
       return True
     return False
+
+
+  #MFH - TODO - handle freestyle picks here
+  def freestylePick(self, song, pos, controls):
+    numHits = 0
+    #if not song:
+    #  return numHits
+
+    for theFret in range(0,5):
+      self.hit[theFret] = controls.getState(self.keys[theFret])
+      if self.hit[theFret]:
+        numHits += 1
+    return numHits
+
+
+
+
+
+    self.lastPlayedNotes = self.playedNotes
+    self.playedNotes = []
+    
+    self.matchingNotes = self.getRequiredNotesMFH(song, pos)
+
+    self.controlsMatchNotes3(controls, self.matchingNotes, hopo)
+    
+    #myfingershurt
+    
+    for time, note in self.matchingNotes:
+      if note.played != True:
+        continue
+      
+      self.pickStartPos = pos
+      self.pickStartPos = max(self.pickStartPos, time)
+      if hopo:
+        note.hopod        = True
+      else:
+        note.played       = True
+        #self.wasLastNoteHopod = False
+      if note.tappable == 1 or note.tappable == 2:
+        self.hopoActive = time
+        self.wasLastNoteHopod = True
+      elif note.tappable == 3:
+        self.hopoActive = -time
+        self.wasLastNoteHopod = True
+        if hopo:  #MFH - you just tapped a 3 - make a note of it. (har har)
+          self.hopoProblemNoteNum = note.number
+          self.sameNoteHopoString = True
+      else:
+        self.hopoActive = 0
+        self.wasLastNoteHopod = False
+      self.hopoLast     = note.number
+      self.playedNotes.append([time, note])
+      if self.guitarSolo:
+        self.currentGuitarSoloHitNotes += 1
+     
+    #myfingershurt: be sure to catch when a chord is played
+    if len(self.playedNotes) > 1:
+      lastPlayedNote = None
+      for time, note in self.playedNotes:
+        if isinstance(lastPlayedNote, Note):
+          if note.tappable == 1 and lastPlayedNote.tappable == 1:
+            self.LastStrumWasChord = True
+            #self.sameNoteHopoString = False
+          else:
+            self.LastStrumWasChord = False
+        lastPlayedNote = note
+    
+    elif len(self.playedNotes) > 0: #ensure at least that a note was played here
+      self.LastStrumWasChord = False
+
+    if len(self.playedNotes) != 0:
+      return True
+    return False
+
 
   def endPick(self, pos):
     for time, note in self.playedNotes:
