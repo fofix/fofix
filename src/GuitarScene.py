@@ -434,6 +434,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if self.whammyEffect == 1 and not Audio.pitchBendSupported:    #pitchbend
       Dialogs.showMessage(self.engine, "Pitchbend module not found!  Forcing Killswitch effect.")
       self.whammyEffect = 0
+    self.bigRockEndings = self.engine.config.get("game", "big_rock_endings")
+    
 
 
 

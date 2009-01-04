@@ -213,6 +213,7 @@ Config.define("game",   "starpower_mode",          int, 2,    text = _("Starpowe
 Config.define("game",   "font_rendering_mode",          int, 0,    text = _("Font Mode"), options = {0: _("oGL Hack"), 1: _("Lamina Screen"), 2: _("Lamina Frames")})
 Config.define("game",   "incoming_neck_mode",          int, 2,    text = _("Inc. Neck Mode"), options = {0: _("Off"), 1: _("Start Only"), 2: _("Start & End")})
 Config.define("game", "midi_lyric_mode",           int,  2,   text = _("MIDI Lyric Mode"), options = {0: _("Scrolling"), 1: _("Simple Lines"), 2: _("2-Line")})
+Config.define("game", "big_rock_endings",           int,  2,   text = _("Big Rock Endings"), options = {0: _("Off"), 1: _("RB Only"), 2: _("On")})
 
 
 
