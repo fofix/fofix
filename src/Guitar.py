@@ -1224,8 +1224,13 @@ class Guitar:
         
         else:   #freestyleTail > 0
           # render an inactive freestyle tail  (self.freestyle1 & self.freestyle2)
-          zsize = .50  
-          size = (.30, s - zsize)   #was .15,
+          zsize = .25  
+          
+          if self.freestyleActive:
+            size = (.30, s - zsize)   #was .15
+          else:
+            size = (.15, s - zsize)   
+          
           tex1 = self.freestyle1
           tex2 = self.freestyle2
           if freestyleTail == 1:
