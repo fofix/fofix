@@ -1229,9 +1229,15 @@ class Guitar:
           tex1 = self.freestyle1
           tex2 = self.freestyle2
           if freestyleTail == 1:
-            glColor4f(*color)
-          else:   #if freestyleTail == 2
-            glColor4f(.3,.7,.9,1)
+            #glColor4f(*color)
+            c1, c2, c3, c4 = color
+            #color = (c1, c2, c3, c4*0.6)    #MFH - this fades inactive tails' opacity (can see notes through them)
+            color = (c1*0.6, c2*0.6, c3*0.6, c4)    #MFH - this fades inactive tails' color darker
+          #  glColor4f(*color)
+          #else:   #if freestyleTail == 2
+          #  #glColor4f(.3,.7,.9,1)
+          #  glColor4f(*color)
+          glColor4f(*color)
         
         glEnable(GL_TEXTURE_2D)
         tex1.texture.bind()
