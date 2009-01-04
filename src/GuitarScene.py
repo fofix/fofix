@@ -7716,11 +7716,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
 
                   w = self.wPlayer[i]
-                  h = self.hPlayer[i]  
+                  h = self.hPlayer[i]
+                  partImgwidth = self.part.width1()
+                  partwFactor = 250.000/partImgwidth
                   if self.numOfPlayers > 1:
                     if i == 0:                    
                       self.part.transform.reset()
-                      self.part.transform.scale(0.25,-0.25)
+                      self.part.transform.scale(partwFactor*0.25,partwFactor*-0.25)
                       self.part.transform.translate(w*.25,h*.4)
                       self.part.draw(color = (1,1,1, 3.0 - abs(4.0 - self.countdownSeconds)))
                       Theme.setBaseColor(min(1.0, 3.0 - abs(4.0 - self.countdownSeconds)))
@@ -7729,7 +7731,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                       font.render(text,  (.25 - w*.5, .5))
                     elif i == 1:
                       self.part2.transform.reset()
-                      self.part2.transform.scale(0.25,-0.25)
+                      self.part2.transform.scale(partwFactor*0.25,partwFactor*-0.25)
                       self.part2.transform.translate(w*.75,h*.4)
                       self.part2.draw(color = (1,1,1, 3.0 - abs(4.0 - self.countdownSeconds)))
                       Theme.setBaseColor(min(1.0, 3.0 - abs(4.0 - self.countdownSeconds)))
@@ -7738,7 +7740,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                       font.render(text,  (.75 - w*.5, .5))
                   else:
                     self.part.transform.reset()
-                    self.part.transform.scale(0.5,-0.5)
+                    self.part.transform.scale(partwFactor*0.5,partwFactor*-0.5)
                     self.part.transform.translate(w*.5,h*.4)
                     self.part.draw(color = (1,1,1, 3.0 - abs(4.0 - self.countdownSeconds)))
                     text = player.part.text
