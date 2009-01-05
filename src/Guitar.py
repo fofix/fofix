@@ -1223,7 +1223,7 @@ class Guitar:
               tex2 = self.tail2
         
         else:   #freestyleTail > 0
-          # render an inactive freestyle tail  (self.freestyle1 & self.freestyle2)
+          # render a freestyle tail  (self.freestyle1 & self.freestyle2)
           zsize = .25  
           
           if self.freestyleActive:
@@ -3273,8 +3273,10 @@ class Guitar:
 
     for theFret in range(0,5):
       self.freestyleHit[theFret] = controls.getState(self.keys[theFret])
+      self.hit[theFret] = self.freestyleHit[theFret]
       if self.freestyleHit[theFret]:
-        numHits += 1
+        #numHits += 1
+        numHits = 1
     return numHits
 
 
