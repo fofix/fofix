@@ -1204,7 +1204,7 @@ class SongChooser(Layer, KeyListener):
           
     elif c in Player.KILLS:
         self.sortOrder += 1
-        if self.sortOrder > 6:
+        if self.sortOrder > 7:
           self.sortOrder = 0
         self.engine.config.set("game", "sort_order", self.sortOrder)
         if self.songLoader:
@@ -3277,6 +3277,8 @@ class SongChooser(Layer, KeyListener):
             text = text + " BY YEAR"
           elif self.sortOrder == 6: #Band Difficulty
             text = text + " BY BAND DIFFICULTY"
+          else:
+            text = text + " BY SONG COLLECTION"
           #
           font.render(text, (.13, .152), scale = 0.0017)
 

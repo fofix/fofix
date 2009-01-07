@@ -3526,6 +3526,8 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
       songs.sort(lambda a, b: cmp(a.year.lower(), b.year.lower()))
     elif order == 6:
       songs.sort(lambda a, b: cmp(a.diffSong, b.diffSong))
+    elif order == 7:
+      songs.sort(lambda a, b: cmp(a.icon.lower(), b.icon.lower()))
   else:
     if order == 1:
       songs.sort(lambda a, b: cmp(b.artist.lower(), a.artist.lower()))
@@ -3541,6 +3543,8 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
       songs.sort(lambda a, b: cmp(b.year.lower(), a.year.lower()))
     elif order == 6:
       songs.sort(lambda a, b: cmp(b.diffSong, a.diffSong))
+    elif order == 7:
+      songs.sort(lambda a, b: cmp(b.icon.lower(), a.icon.lower()))
   return songs
 
 
@@ -3601,6 +3605,12 @@ def getSortingTitles(engine, songList = []):
       except ValueError:
         titles.append(songItem.diffSong)
         sortTitles.append(SortTitleInfo(str(songItem.diffSong)))
+    elif sortOrder == 7:
+      try:
+        titles.index(songItem.icon.lower())
+      except ValueError:
+        titles.append(songItem.icon.lower())
+        sortTitles.append(SortTitleInfo(songItem.icon))
         
   return sortTitles
   
@@ -3737,6 +3747,8 @@ def compareSongsAndTitles(engine, a, b):
         return cmp(a.year.lower(), b.year.lower())
       elif order == 6:
         return cmp(a.diffSong, b.diffSong)
+      elif order == 7:
+        return cmp(a.icon.lower(), b.icon.lower())
     else:
       if order == 1:
         return cmp(b.artist.lower(), a.artist.lower())
@@ -3752,26 +3764,30 @@ def compareSongsAndTitles(engine, a, b):
         return cmp(b.year.lower(), a.year.lower())
       elif order == 6:
         return cmp(b.diffSong, a.diffSong)
+      elif order == 7:
+        return cmp(b.icon.lower(), a.icon.lower())
   elif gameMode1p != 2 and quickPlayCareerTiers == 2:
     Aval = ""
     Bval = ""
     if isinstance(a, SongInfo):
       if order == 0:
         Aval = a.name[0].lower()
-      if order == 1:
+      elif order == 1:
         Aval = a.artist.lower()
-      if order == 2:
+      elif order == 2:
         Aval = int(a.count+str(0))
         if Aval == "":
           Aval = "0"
-      if order == 3:
+      elif order == 3:
         Aval = a.album.lower()
-      if order == 4:
+      elif order == 4:
         Aval = a.genre.lower()
-      if order == 5:
+      elif order == 5:
         Aval = a.year.lower()
-      if order == 6:
+      elif order == 6:
         Aval = a.diffSong
+      elif order == 7:
+        Aval = a.icon.lower()
     elif isinstance(a, SortTitleInfo):
       if order == 2:
         Aval = int(a.name+str(0))
@@ -3783,20 +3799,22 @@ def compareSongsAndTitles(engine, a, b):
     if isinstance(b, SongInfo):
       if order == 0:
         Bval = b.name[0].lower()
-      if order == 1:
+      elif order == 1:
         Bval = b.artist.lower()
-      if order == 2:
+      elif order == 2:
         Bval = int(b.count+str(0))
         if Bval == "":
           Bval = "0"
-      if order == 3:
+      elif order == 3:
         Bval = b.album.lower()
-      if order == 4:
+      elif order == 4:
         Bval = b.genre.lower()
-      if order == 5:
+      elif order == 5:
         Bval = b.year.lower()
-      if order == 6:
+      elif order == 6:
         Bval = b.diffSong
+      elif order == 7:
+        Bval = b.icon.lower()
     elif isinstance(b, SortTitleInfo):
       if order == 2:
         Bval = int(b.name+str(0))
@@ -3847,6 +3865,8 @@ def compareSongsAndTitles(engine, a, b):
             return cmp(a.year.lower(), b.year.lower())
           elif order == 6:
             return cmp(a.diffSong, b.diffSong)
+          elif order == 7:
+            return cmp(a.icon.lower(), b.icon.lower())
         else:
           if order == 1:
             return cmp(b.artist.lower(), a.artist.lower())
@@ -3862,6 +3882,8 @@ def compareSongsAndTitles(engine, a, b):
             return cmp(b.year.lower(), a.year.lower())
           elif order == 6:
             return cmp(b.diffSong, a.diffSong)
+          elif order == 7:
+            return cmp(b.icon.lower(), a.icon.lower())
     #original career sorting logic:
     elif a.getUnlockID() != b.getUnlockID():    #MFH - if returned unlock IDs are different, sort by unlock ID (this roughly sorts the tiers and shoves "bonus" songs to the top)
       return cmp(a.getUnlockID(), b.getUnlockID())
