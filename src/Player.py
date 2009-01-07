@@ -530,6 +530,7 @@ class Player(object):
     self.stars = 0
     self.totalStreakNotes = 0
     self.totalNotes = 0
+    self.freestyleSkippedNotes = 0 #volshebnyi
     
   def reset(self):
     self.score         = 0

@@ -435,6 +435,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       Dialogs.showMessage(self.engine, "Pitchbend module not found!  Forcing Killswitch effect.")
       self.whammyEffect = 0
     self.bigRockEndings = self.engine.config.get("game", "big_rock_endings")
+    self.bigRockLogic = self.engine.config.get("game", "big_rock_logic") #volshebnyi
     
 
 
@@ -689,10 +690,23 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     #count / init solos
     for i,guitar in enumerate(self.guitars):
-      if guitar.isDrum:
+      if guitar.isDrum:                
         self.playerList[i].totalStreakNotes = len([1 for time, event in self.song.track[i].getAllEvents() if isinstance(event, Note)])
       else:
         self.playerList[i].totalStreakNotes = len(set(time for time, event in self.song.track[i].getAllEvents() if isinstance(event, Note)))
+	
+      #volshebnyi - don't count notes in BRE zones if BRE active
+      if guitar.freestyleEnabled:
+	      self.playerList[i].freestyleSkippedNotes = 0
+	      for time, event in self.song.midiEventTrack[i].getAllEvents():
+	       	if isinstance(event, Song.MarkerNote) and not event.endMarker:
+	        	if (event.number == Song.freestyleMarkingNote):
+	        		for freestyleTime, event1 in self.song.track[i].getEvents(time, time + event.length):
+	        			if isinstance(event1, Note):
+	        				self.playerList[i].freestyleSkippedNotes += 1
+        	
+      self.playerList[i].totalStreakNotes -= self.playerList[i].freestyleSkippedNotes
+
       self.playerList[i].totalNotes = len([1 for Ntime, event in self.song.track[i].getAllEvents() if isinstance(event, Note)])
       
       if guitar.useMidiSoloMarkers:   #mark using the new MIDI solo marking system
@@ -1792,6 +1806,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     for i, thePlayer in enumerate(self.playerList):
       self.guitars[i].starPower = 0      
       self.guitars[i].coOpFailed = False
+      #volshebnyi - BRE variables reset
+      self.guitars[i].freestyleStart = 0 
+      self.guitars[i].freestyleFirstHit = 0 
+      self.guitars[i].freestyleLength = 0
+      self.guitars[i].freestyleBonusFret = 0
+      for i1 in range(0, 5):
+      	self.guitars[i].freestyleLastFretHitTime[i1] = 0
     self.failed = False
     self.finalFailed = False
     self.failEnd = False
@@ -2321,9 +2342,53 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     #MFH - check if freestyle is active or not before running the function... freestyle is much simpler :)
     if self.guitars[num].freestyleActive:
+    
+      # Volshebnyi - new BRE scoring
       pos = self.getSongPosition()
+      score = 0
       numFreestyleHits = self.guitars[num].freestylePick(self.song, pos, self.controls)
-      self.playerList[num].addScore(numFreestyleHits*5)   #MFH - for now just reward 5 points for each freestyle note played
+      if numFreestyleHits>0 or self.guitars[num].isDrum:
+	      
+	      if self.guitars[num].freestyleFirstHit + self.guitars[num].freestyleLength < pos :
+	        self.guitars[num].freestyleLastHit = pos - self.guitars[num].freestylePeriod
+	        self.guitars[num].freestyleFirstHit = pos
+	        for fret in range (0,5):
+	        	self.guitars[num].freestyleLastFretHitTime[fret] = pos - self.guitars[num].freestylePeriod
+	        if self.bigRockLogic == 1 :
+	        	self.guitars[num].freestylePeriod = 1500
+	        	score = 450
+	        	self.guitars[num].freestyleBaseScore = 300
+	        	self.guitars[num].freestyleBonusFret = random.randint(0,4)
+	        if self.bigRockLogic == 2 :
+	        	self.guitars[num].freestylePeriod = 1500
+	        	self.guitars[num].freestyleBaseScore = 150
+	        	score = 600 * numFreestyleHits
+	      
+	      if self.bigRockLogic == 0 or self.bigRockLogic == 1:
+	      	brzoneremain = ( self.guitars[num].freestyleLength - pos + self.guitars[num].freestyleFirstHit ) / self.guitars[num].freestyleLength
+	      	hitspeed = ( pos - self.guitars[num].freestyleLastHit ) / self.guitars[num].freestylePeriod
+	      	if hitspeed > 1:
+	      		hitspeed = 1.0	
+	      	if self.bigRockLogic == 1 and numFreestyleHits == 1 and self.controls.getState(self.guitars[num].keys[self.guitars[num].freestyleBonusFret]):
+	      		hitspeed = 1.0
+	      		self.guitars[num].freestyleBonusFret = random.randint(0,4)
+	      	score = int( score +  self.guitars[num].freestyleBaseScore * hitspeed * ( self.guitars[num].freestylePercent + ( 100 - self.guitars[num].freestylePercent )  * brzoneremain ) / 100 )
+	      	self.guitars[num].freestyleLastHit = pos
+	      	for fret in range (0,5):
+	      		if self.controls.getState(self.guitars[num].keys[fret]):
+	      			self.guitars[num].freestyleLastFretHitTime[fret] = pos
+	      		
+	      if self.bigRockLogic == 2:	
+	      	for fret in range (0,5):
+	      		if self.controls.getState(self.guitars[num].keys[fret]):
+	      			hitspeed = ( pos - self.guitars[num].freestyleLastFretHitTime[fret] ) / self.guitars[num].freestylePeriod
+	      			if hitspeed > 1:
+	      				hitspeed = 1.0
+	      			score += self.guitars[num].freestyleBaseScore * hitspeed
+	      			self.guitars[num].freestyleLastFretHitTime[fret] = pos
+	      	score = int ( score / numFreestyleHits ) 
+	      
+	      self.playerList[num].addScore( score )
     
       #MFH - also must ensure notes that pass during this time are marked as skipped without resetting the streak
       missedNotes = self.guitars[num].getMissedNotesMFH(self.song, pos, catchup = True)
@@ -3148,6 +3213,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     
     self.killswitchEngaged[num] = False   #always reset killswitch status when picking / tapping
+    
+    #volshebnyi - disable failing if BRE is active
     if self.guitars[num].startPick(self.song, pos, self.controls):
       if self.guitars[num].isDrum:
         self.drumStart = True

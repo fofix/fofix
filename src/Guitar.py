@@ -78,6 +78,18 @@ class Guitar:
     self.finalStarSeen = False
 
     self.freestyleActive = False
+    
+    # Volshebnyi - BRE scoring variables
+    self.freestyleEnabled = False
+    self.freestyleStart = 0
+    self.freestyleFirstHit = 0
+    self.freestyleLength = 0
+    self.freestyleLastHit = 0
+    self.freestyleBonusFret = -2
+    self.freestyleLastFretHitTime = range(5)
+    self.freestyleBaseScore = 750
+    self.freestylePeriod = 1000
+    self.freestylePercent = 50
 
 
     self.accThresholdWorstLate = 0
@@ -99,6 +111,7 @@ class Guitar:
 
     self.incomingNeckMode = self.engine.config.get("game", "incoming_neck_mode")
     self.bigRockEndings = self.engine.config.get("game", "big_rock_endings")    
+    self.bigRockLogic = self.engine.config.get("game", "big_rock_logic") #volshebnyi
     
     self.boardWidth     = 3.0
     self.boardLength    = 9.0
@@ -212,6 +225,10 @@ class Guitar:
     themename = self.engine.data.themeLabel
     #now theme determination logic is only in data.py:
     self.theme = self.engine.data.theme
+    
+    #check if BRE enabled
+    if self.bigRockEndings == 2 or (self.theme == 2 and self.bigRockEndings == 1):
+    	self.freestyleEnabled = True
 
     #blazingamer
     self.nstype = self.engine.config.get("game", "nstype")
@@ -1113,11 +1130,11 @@ class Guitar:
     glVertex3f(w / 2,  0, -sw)
     glEnd()
 
-  def renderTail(self, length, sustain, kill, color, flat = False, tailOnly = False, isTappable = False, big = False, fret = 0, spNote = False, freestyleTail = 0):
+  def renderTail(self, length, sustain, kill, color, flat = False, tailOnly = False, isTappable = False, big = False, fret = 0, spNote = False, freestyleTail = 0, pos = 0):
 
-    #MFH - if freestyleTail == 0, act normally.
-    #       if freestyleTail == 1, render an inactive freestyle tail  (self.freestyle1 & self.freestyle2)
-    #       if freestyleTail == 2, render an active / hit freestyle tail
+    #volshebnyi - if freestyleTail == 0, act normally.
+    #  if freestyleTail == 1, render an freestyle tail
+    #  if freestyleTail == 2, render highlighted freestyle tail
 
     if not self.simpleTails:#Tail Colors
       glColor4f(1,1,1,1)
@@ -1143,8 +1160,8 @@ class Guitar:
         else:
           s = (length + 0.00001)
 
-    #       if freestyleTail == 1, render an inactive freestyle tail  (self.freestyle1 & self.freestyle2)
-    #       if freestyleTail == 2, render an active / hit freestyle tail
+    #       if freestyleTail == 1, render freestyle tail
+    #       if freestyleTail == 2, render bonus fret freestyle tail
 
         if freestyleTail == 0:    #normal tail rendering
           #myfingershurt: so any theme containing appropriate files can use new tails
@@ -1223,7 +1240,7 @@ class Guitar:
               tex2 = self.tail2
         
         else:   #freestyleTail > 0
-          # render a freestyle tail  (self.freestyle1 & self.freestyle2)
+          # render an inactive freestyle tail  (self.freestyle1 & self.freestyle2)
           zsize = .25  
           
           if self.freestyleActive:
@@ -1236,16 +1253,20 @@ class Guitar:
           if freestyleTail == 1:
             #glColor4f(*color)
             c1, c2, c3, c4 = color
-            #color = (c1, c2, c3, c4*0.6)    #MFH - this fades inactive tails' opacity (can see notes through them)
-            color = (c1*0.6, c2*0.6, c3*0.6, c4)    #MFH - this fades inactive tails' color darker
-          #  glColor4f(*color)
-          #else:   #if freestyleTail == 2
-          #  #glColor4f(.3,.7,.9,1)
-          #  glColor4f(*color)
+            tailGlow = 1 - (pos - self.freestyleLastFretHitTime[fret] ) / self.freestylePeriod
+            if tailGlow < 0:
+            	tailGlow = 0
+            color = (c1 + c1*2.0*tailGlow, c2 + c2*2.0*tailGlow, c3 + c3*2.0*tailGlow, c4*0.6 + c4*0.4*tailGlow)    #MFH - this fades inactive tails' color darker       
+          if freestyleTail == 2:
+            #glColor4f(*color)
+            c1, c2, c3, c4 = color
+            color = (c1*3.0, c2*3.0, c3*3.0, c4)    #volshebnyi - bonus fret tail              
+            
           glColor4f(*color)
         
         glEnable(GL_TEXTURE_2D)
         tex1.texture.bind()
+        
 
 
         glBegin(GL_TRIANGLE_STRIP)
@@ -1282,7 +1303,8 @@ class Guitar:
 
 
         #MFH - this block of code renders the tail "beginning" - before the note, for freestyle "lanes" only
-        if freestyleTail > 0:   
+        #volshebnyi
+        if freestyleTail > 0 and pos < self.freestyleStart + self.freestyleLength:   
           glEnable(GL_TEXTURE_2D)
           tex2.texture.bind()
   
@@ -1468,7 +1490,7 @@ class Guitar:
     beatsPerUnit = self.beatsPerBoard / self.boardLength
 
     #MFH - render 5 freestyle tails when Song.freestyleMarkingNote comes up
-    if self.bigRockEndings == 2 or (self.theme == 2 and self.bigRockEndings == 1):
+    if self.freestyleEnabled:
       freestyleActive = False
       #for time, event in track.getEvents(boardWindowMin, boardWindowMax):
       for time, event in track.getEvents(pos, boardWindowMax):
@@ -1476,6 +1498,8 @@ class Guitar:
           if event.number == Song.freestyleMarkingNote:
             length     = (event.length - 50) / self.currentPeriod / beatsPerUnit
             w = self.boardWidth / self.strings
+            self.freestyleLength = event.length #volshebnyi
+            self.freestyleStart = time # volshebnyi
             z  = ((time - pos) / self.currentPeriod) / beatsPerUnit
             z2 = ((time + event.length - pos) / self.currentPeriod) / beatsPerUnit
       
@@ -1486,10 +1510,13 @@ class Guitar:
             else:
               f = 1.0
   
-            if time < pos:  #MFH - must extend the tail past the first fretboard section dynamically so we don't have to render the entire length at once
+            #MFH - must extend the tail past the first fretboard section dynamically so we don't have to render the entire length at once
+            #volshebnyi - allow tail to move under frets 
+            if time < pos:
               freestyleActive = True
-              length += z
-              z = 0
+              if z < -1.5:
+              	length += z +1.5
+              	z =  -1.5
   
             #MFH - render 5 freestyle tails
             for theFret in range(0,5):
@@ -1498,13 +1525,14 @@ class Guitar:
               color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
               glPushMatrix()
               glTranslatef(x, (1.0 - visibility) ** (theFret + 1), z)
-              
-              if self.freestyleHit[theFret]:
+                
+              # Volshebnyi - extra tail for bonus fret
+              if self.bigRockLogic == 1 and theFret == self.freestyleBonusFret:
                 freestyleTailMode = 2
               else:
                 freestyleTailMode = 1
               
-              self.renderTail(length, sustain = True, kill = False, color = color, flat = False, tailOnly = True, isTappable = False, big = True, fret = theFret, spNote = False, freestyleTail = freestyleTailMode)
+              self.renderTail(length, sustain = True, kill = False, color = color, flat = False, tailOnly = True, isTappable = False, big = True, fret = theFret, spNote = False, freestyleTail = freestyleTailMode, pos = pos)
               glPopMatrix()
               
       self.freestyleActive = freestyleActive
@@ -1638,6 +1666,11 @@ class Guitar:
         f = min(1, max(0, 1 + z2))
       else:
         f = 1.0
+      
+      #volshebnyi - hide notes in BRE zone if BRE enabled  
+      if self.freestyleEnabled:  
+      	if time >= self.freestyleStart and time < self.freestyleStart + self.freestyleLength:
+        	z = -2.0
 
       color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
       if event.length > 120:
@@ -2634,10 +2667,14 @@ class Guitar:
 
     if not self.starNotesSet == True:
       self.totalNotes = 0
+      
+      
       for time, event in song.track[self.player].getAllEvents():
         if not isinstance(event, Note):
           continue
         self.totalNotes += 1
+        
+        
       stars = []
       maxStars = []
       maxPhrase = self.totalNotes/120
@@ -3270,13 +3307,14 @@ class Guitar:
     numHits = 0
     #if not song:
     #  return numHits
+    
+    if not controls.getState(self.actions[0]) and not controls.getState(self.actions[1]):
+      return 0
 
     for theFret in range(0,5):
       self.freestyleHit[theFret] = controls.getState(self.keys[theFret])
-      self.hit[theFret] = self.freestyleHit[theFret]
       if self.freestyleHit[theFret]:
-        #numHits += 1
-        numHits = 1
+        numHits += 1
     return numHits
 
 
