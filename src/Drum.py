@@ -94,6 +94,19 @@ class Drum:
 
     self.freestyleActive = False
 
+    # Volshebnyi - BRE scoring variables
+    self.freestyleEnabled = False
+    self.freestyleStart = 0
+    self.freestyleFirstHit = 0
+    self.freestyleLength = 0
+    self.freestyleLastHit = 0
+    self.freestyleBonusFret = -2
+    self.freestyleLastFretHitTime = range(5)
+    self.freestyleBaseScore = 750
+    self.freestylePeriod = 1000
+    self.freestylePercent = 50
+
+
     self.accThresholdWorstLate = 0
     self.accThresholdVeryLate = 0
     self.accThresholdLate = 0
