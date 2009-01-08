@@ -809,7 +809,10 @@ class SongChooser(Layer, KeyListener):
         self.engine.loadImgDrawing(self, "emptyLabel",    os.path.join("themes",themename,"menu","emptylabel.png"))
       except IOError:
         self.emptyLabel = None
-      
+      try:
+        self.engine.loadImgDrawing(self, "lockedLabel",    os.path.join("themes",themename,"menu","lockedlabel.png"))
+      except IOError:
+        self.lockedLabel = self.emptyLabel
       try:
         self.engine.loadImgDrawing(self, "diffimg1",    os.path.join("themes",themename,"menu","diff1.png"))
         self.engine.loadImgDrawing(self, "diffimg2",    os.path.join("themes",themename,"menu","diff2.png"))
@@ -1106,7 +1109,8 @@ class SongChooser(Layer, KeyListener):
     if self.itemLabels[i] is None:
       if isinstance(item, Song.SongInfo):
         if (item.getLocked()):
-          label = ""
+          self.itemLabels[i] = "Locked"
+          return
         elif self.songCoverType:
           label = self.engine.resource.fileName(item.libraryNam, item.songName,    "label.png")
         else:
@@ -3147,6 +3151,14 @@ class SongChooser(Layer, KeyListener):
             self.emptyLabel.transform.translate(.21*w,.59*h)
             self.emptyLabel.transform.scale(wfactor,-wfactor)
             self.emptyLabel.draw()
+        elif self.itemLabels[i] == "Locked":   #added so that emptylabel.png is only loaded once and not on every empty song
+          if self.lockedLabel != None:
+            imgwidth = self.lockedLabel.width1()
+            wfactor = 155.000/imgwidth
+            self.lockedLabel.transform.reset()
+            self.lockedLabel.transform.translate(.21*w,.59*h)
+            self.lockedLabel.transform.scale(wfactor,-wfactor)
+            self.lockedLabel.draw()
         elif self.itemLabels[i]:
           imgwidth = self.itemLabels[i].width1()
           wfactor = 155.000/imgwidth
