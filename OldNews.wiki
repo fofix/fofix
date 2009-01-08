@@ -2,6 +2,14 @@
 
 = Old News =
 
+====Nov. 30th 2008 ====
+
+3.035 beta 1 (SVN r469) has been released for testing.  
+_Detail obliterated by chris.paiano - my bad!_
+
+  * [http://www.mediafire.com/download.php?1ntnwn2ueic Download 3.035beta1 Patch for Windows]
+  * _Other OS download links obliterated by chris.paiano - my bad!_
+
 ====Nov. 19th 2008 ====
 Final 3.030 is finally out with [http://code.google.com/p/fofix/issues/list?can=1&q=status%3Afixed%2Cverified%2Cdone+milestone%3Arelease-3.030 tons of changes since 3.025]!
 Thanks to all the players who provided valuable feedback during the beta phase.
