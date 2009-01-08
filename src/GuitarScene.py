@@ -435,7 +435,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       Dialogs.showMessage(self.engine, "Pitchbend module not found!  Forcing Killswitch effect.")
       self.whammyEffect = 0
     self.bigRockEndings = self.engine.config.get("game", "big_rock_endings")
-    self.bigRockLogic = self.engine.config.get("game", "big_rock_logic") #volshebnyi
     
 
 
@@ -2339,56 +2338,59 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   def handlePick(self, playerNum, hopo = False, pullOff = False):
     i = playerNum
     num = playerNum
+    guitar = self.guitars[num]
 
     #MFH - check if freestyle is active or not before running the function... freestyle is much simpler :)
-    if self.guitars[num].freestyleActive:
-    
+    if guitar.freestyleActive:
       # Volshebnyi - new BRE scoring
       pos = self.getSongPosition()
       score = 0
-      numFreestyleHits = self.guitars[num].freestylePick(self.song, pos, self.controls)
-      if numFreestyleHits>0 or self.guitars[num].isDrum:
+      numFreestyleHits = guitar.freestylePick(self.song, pos, self.controls)
+      if numFreestyleHits>0 or guitar.isDrum:
 	      
-	      if self.guitars[num].freestyleFirstHit + self.guitars[num].freestyleLength < pos :
-	        self.guitars[num].freestyleLastHit = pos - self.guitars[num].freestylePeriod
-	        self.guitars[num].freestyleFirstHit = pos
-	        for fret in range (0,5):
-	        	self.guitars[num].freestyleLastFretHitTime[fret] = pos - self.guitars[num].freestylePeriod
-	        if self.bigRockLogic == 1 :
+	      if guitar.freestyleFirstHit + guitar.freestyleLength < pos :
+	        guitar.freestyleFirstHit = pos
+	        if guitar.bigRockLogic == 1 :
 	        	self.guitars[num].freestylePeriod = 1500
 	        	score = 450
-	        	self.guitars[num].freestyleBaseScore = 300
-	        	self.guitars[num].freestyleBonusFret = random.randint(0,4)
-	        if self.bigRockLogic == 2 :
-	        	self.guitars[num].freestylePeriod = 1500
-	        	self.guitars[num].freestyleBaseScore = 150
+	        	guitar.freestyleBaseScore = 300
+	        	guitar.freestyleBonusFret = random.randint(0,4)
+	        if guitar.bigRockLogic == 2 :
+	        	guitar.freestylePeriod = 1500
+	        	guitar.freestyleBaseScore = 150
 	        	score = 600 * numFreestyleHits
+	        guitar.freestyleLastHit = pos - guitar.freestylePeriod
+	        for fret in range (0,5):
+	        	guitar.freestyleLastFretHitTime[fret] = pos - guitar.freestylePeriod
 	      
-	      if self.bigRockLogic == 0 or self.bigRockLogic == 1:
-	      	brzoneremain = ( self.guitars[num].freestyleLength - pos + self.guitars[num].freestyleFirstHit ) / self.guitars[num].freestyleLength
-	      	hitspeed = ( pos - self.guitars[num].freestyleLastHit ) / self.guitars[num].freestylePeriod
-	      	if hitspeed > 1:
-	      		hitspeed = 1.0	
-	      	if self.bigRockLogic == 1 and numFreestyleHits == 1 and self.controls.getState(self.guitars[num].keys[self.guitars[num].freestyleBonusFret]):
-	      		hitspeed = 1.0
-	      		self.guitars[num].freestyleBonusFret = random.randint(0,4)
-	      	score = int( score +  self.guitars[num].freestyleBaseScore * hitspeed * ( self.guitars[num].freestylePercent + ( 100 - self.guitars[num].freestylePercent )  * brzoneremain ) / 100 )
-	      	self.guitars[num].freestyleLastHit = pos
-	      	for fret in range (0,5):
-	      		if self.controls.getState(self.guitars[num].keys[fret]):
-	      			self.guitars[num].freestyleLastFretHitTime[fret] = pos
+	      if guitar.bigRockLogic == 0 or guitar.bigRockLogic == 1:
+	      	brzoneremain = ( guitar.freestyleLength - pos + guitar.freestyleFirstHit ) / guitar.freestyleLength
+	      	hitspeed = min(( pos - guitar.freestyleLastHit ) / guitar.freestylePeriod, 1.0)
+	      	if guitar.bigRockLogic == 1 and numFreestyleHits == 1:
+	      		if self.controls.getState(guitar.keys[guitar.freestyleBonusFret]) or ( guitar.isDrum and guitar.freestyleBonusFret>0 and self.controls.getState(guitar.keys[guitar.freestyleBonusFret+4]) ):
+	      			hitspeed = 1.0
+	      			guitar.freestyleBonusFret = random.randint(0,4)
+	      	score = int( score +  guitar.freestyleBaseScore * hitspeed * ( guitar.freestylePercent + ( 100 - guitar.freestylePercent )  * brzoneremain ) / 100 )
+	      	guitar.freestyleLastHit = pos
 	      		
-	      if self.bigRockLogic == 2:	
-	      	for fret in range (0,5):
-	      		if self.controls.getState(self.guitars[num].keys[fret]):
-	      			hitspeed = ( pos - self.guitars[num].freestyleLastFretHitTime[fret] ) / self.guitars[num].freestylePeriod
-	      			if hitspeed > 1:
-	      				hitspeed = 1.0
-	      			score += self.guitars[num].freestyleBaseScore * hitspeed
-	      			self.guitars[num].freestyleLastFretHitTime[fret] = pos
-	      	score = int ( score / numFreestyleHits ) 
+	      if guitar.bigRockLogic == 2:	
+	      	
+	      	if self.controls.getState(guitar.keys[0]):
+	      		hitspeed = min((pos - guitar.freestyleLastFretHitTime[0]) / guitar.freestylePeriod, 1.0)
+	      		score += guitar.freestyleBaseScore * hitspeed
+	      	for fret in range (1,5):
+	      		if self.controls.getState(guitar.keys[fret]) or ( guitar.isDrum and self.controls.getState(guitar.keys[fret+4])):
+	      			hitspeed = min((pos - guitar.freestyleLastFretHitTime[fret]) / guitar.freestylePeriod, 1.0)
+	      			score += guitar.freestyleBaseScore * hitspeed
+	      	score = int ( score / numFreestyleHits )
 	      
-	      self.playerList[num].addScore( score )
+	      if self.controls.getState(guitar.keys[0]):	
+	      	guitar.freestyleLastFretHitTime[0] = pos
+	      for fret in range (1,5):
+	      	if self.controls.getState(guitar.keys[fret]) or ( guitar.isDrum and self.controls.getState(guitar.keys[fret+4])):
+	      		guitar.freestyleLastFretHitTime[fret] = pos
+
+	      self.playerList[num].addScore( score )	      	
     
       #MFH - also must ensure notes that pass during this time are marked as skipped without resetting the streak
       missedNotes = self.guitars[num].getMissedNotesMFH(self.song, pos, catchup = True)
@@ -4822,7 +4824,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.hitAccuracy[self.coOpPlayerIndex] = (float(self.coOpNotesHit) / float(self.coOpTotalStreakNotes) ) * 100.0
         self.avMult[self.coOpPlayerIndex] = self.coOpScore/(self.coOpTotalNotes*50.0)
       else:
-        self.hitAccuracy[playerNum] = (float(self.playerList[playerNum].notesHit) / float(self.playerList[playerNum].totalStreakNotes) ) * 100.0
+        if self.playerList[playerNum].freestyleSkippedNotes > 0:
+        	self.hitAccuracy[playerNum] = ( float(self.playerList[playerNum].notesHit) / float(self.playerList[playerNum].totalStreakNotes) ) * 100.0
         self.avMult[playerNum] = self.playerList[playerNum].score/(self.playerList[playerNum].totalNotes*50.0)
 
 

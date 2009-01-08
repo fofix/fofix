@@ -282,8 +282,11 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         #self.stars[i]    = int(5.0   * (f + .05))
         self.stars[i] = player.stars
         self.accuracy[i] = 100.0 * f
-        self.hits=player.notesHit
-        self.totalnotes=notes
+        self.hits = player.notesHit + int( player.freestyleSkippedNotes * f )
+        self.totalnotes = notes + player.freestyleSkippedNotes
+        player.totalStreakNotes = self.totalnotes
+        player.notesHit = self.hits
+        self.accuracy[i] = 100.0 * self.hits / self.totalnotes
         
         taunt = None
 

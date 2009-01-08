@@ -93,7 +93,7 @@ class Drum:
     self.finalStarSeen = False
 
     self.freestyleActive = False
-
+    
     # Volshebnyi - BRE scoring variables
     self.freestyleEnabled = False
     self.freestyleStart = 0
@@ -105,7 +105,6 @@ class Drum:
     self.freestyleBaseScore = 750
     self.freestylePeriod = 1000
     self.freestylePercent = 50
-
 
     self.accThresholdWorstLate = 0
     self.accThresholdVeryLate = 0
@@ -141,6 +140,9 @@ class Drum:
 
     self.incomingNeckMode = self.engine.config.get("game", "incoming_neck_mode")
     self.guitarSoloNeckMode = self.engine.config.get("game", "guitar_solo_neck")
+    self.bigRockEndings = self.engine.config.get("game", "big_rock_endings")    
+    self.bigRockLogic = self.engine.config.get("game", "big_rock_logic") #volshebnyi
+
 
     
     self.actualBpm = 0.0
@@ -225,6 +227,10 @@ class Drum:
     themename = self.engine.data.themeLabel
     #now theme determination logic is only in data.py:
     self.theme = self.engine.data.theme
+    
+    #check if BRE enabled
+    if self.bigRockEndings == 2 or (self.theme == 2 and self.bigRockEndings == 1):
+    	self.freestyleEnabled = True   
 
     if self.theme < 2:    #make board same size as guitar board if GH based theme so it rockmeters dont interfere
       self.boardWidth     = 3.0
@@ -396,7 +402,12 @@ class Drum:
     engine.loadImgDrawing(self, "bpm_halfbeat", os.path.join("themes",themename,"bpm_halfbeat.png"))
     engine.loadImgDrawing(self, "bpm_beat", os.path.join("themes",themename,"bpm_beat.png"))
     engine.loadImgDrawing(self, "bpm_measure", os.path.join("themes",themename,"bpm_measure.png"))
-    self.oNeckovr = None
+    try:
+      engine.loadImgDrawing(self, "freestyle1", os.path.join("themes", themename, "freestyletail1.png"),  textureSize = (128, 128))
+      engine.loadImgDrawing(self, "freestyle2", os.path.join("themes", themename, "freestyletail2.png"),  textureSize = (128, 128))
+    except IOError:
+      engine.loadImgDrawing(self, "freestyle1", "freestyletail1.png",  textureSize = (128, 128))
+      engine.loadImgDrawing(self, "freestyle2", "freestyletail2.png",  textureSize = (128, 128))
 
     if self.theme == 0 or self.theme == 1:
       engine.loadImgDrawing(self, "hitlightning", os.path.join("themes",themename,"lightning.png"),  textureSize = (128, 128))
@@ -571,6 +582,65 @@ class Drum:
 
   def setMultiplier(self, multiplier):
     self.scoreMultiplier = multiplier
+    
+    
+  #volshebnyi - TODO - find a mistake in this function
+  def renderFreestyleLanes(self, visibility, song, pos):
+    if not song:
+      return
+
+    #boardWindowMin = pos - self.currentPeriod * 2
+    boardWindowMax = pos + self.currentPeriod * self.beatsPerBoard
+    track = song.midiEventTrack[self.player]
+    #self.currentPeriod = self.neckSpeed
+    beatsPerUnit = self.beatsPerBoard / self.boardLength
+    #MFH - render 5 freestyle tails when Song.freestyleMarkingNote comes up
+    if self.freestyleEnabled:
+      freestyleActive = False
+      #for time, event in track.getEvents(boardWindowMin, boardWindowMax):
+      for time, event in track.getEvents(pos, boardWindowMax):
+        if isinstance(event, Song.MarkerNote):
+          if event.number == Song.freestyleMarkingNote:
+            length     = (event.length - 50) / self.currentPeriod / beatsPerUnit
+            w = self.boardWidth / self.strings
+            self.freestyleLength = event.length #volshebnyi
+            self.freestyleStart = time # volshebnyi
+            z  = ((time - pos) / self.currentPeriod) / beatsPerUnit
+            z2 = ((time + event.length - pos) / self.currentPeriod) / beatsPerUnit
+      
+            if z > self.boardLength * .8:
+              f = (self.boardLength - z) / (self.boardLength * .2)
+            elif z < 0:
+              f = min(1, max(0, 1 + z2))
+            else:
+              f = 1.0
+              
+            #volshebnyi - allow tail to move under frets 
+            if time < pos:
+              freestyleActive = True
+              if z < -1.5:
+              	length += z +1.5
+              	z =  -1.5
+  
+            #volshebnyi - render 4 freestyle tails
+            #edited to prevent crashes
+            for theFret in range(2,0):
+              x  = (self.strings / 2 - theFret) * w
+              c = self.fretColors[theFret]
+              color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
+              glPushMatrix()
+              glTranslatef(x, (1.0 - visibility) ** (theFret + 1), z)
+                
+              # Volshebnyi - extra tail for bonus fret
+              if self.bigRockLogic == 1 and theFret == self.freestyleBonusFret:
+                freestyleTailMode = 2
+              else:
+                freestyleTailMode = 1
+              
+              self.renderTail(length, color = color, fret = theFret, freestyleTail = freestyleTailMode, pos = pos)
+              glPopMatrix()
+              
+      self.freestyleActive = freestyleActive
     
 
   def renderIncomingNeck(self, visibility, song, pos, time, neckTexture):   #MFH - attempt to "scroll" an incoming guitar solo neck towards the player
@@ -1019,7 +1089,98 @@ class Drum:
     glVertex3f(w / 2,  0,  sw)
     glVertex3f(w / 2,  0, -sw)
     glEnd()
+    
+  def renderTail(self, length, color, fret = 0, freestyleTail = 0, pos = 0):
 
+    #volshebnyi - if freestyleTail == 1, render an freestyle tail
+    #  if freestyleTail == 2, render highlighted freestyle tail
+
+    beatsPerUnit = self.beatsPerBoard / self.boardLength
+    
+    
+    if not length == None:
+      size = (.08, length + 0.00001)
+
+      if size[1] > self.boardLength:
+        s = self.boardLength
+      else:
+        s = (length + 0.00001)
+        
+        # render an inactive freestyle tail  (self.freestyle1 & self.freestyle2)
+        zsize = .25  
+        
+        if self.freestyleActive:
+          size = (.30, s - zsize)   #was .15
+        else:
+          size = (.15, s - zsize)   
+        
+        tex1 = self.freestyle1
+        tex2 = self.freestyle2
+        if freestyleTail == 1:
+          #glColor4f(*color)
+          c1, c2, c3, c4 = color
+          tailGlow = 1 - (pos - self.freestyleLastFretHitTime[fret] ) / self.freestylePeriod
+          if tailGlow < 0:
+          	tailGlow = 0
+          color = (c1 + c1*2.0*tailGlow, c2 + c2*2.0*tailGlow, c3 + c3*2.0*tailGlow, c4*0.6 + c4*0.4*tailGlow)    #MFH - this fades inactive tails' color darker       
+        if freestyleTail == 2:
+          #glColor4f(*color)
+          c1, c2, c3, c4 = color
+          color = (c1*3.0, c2*3.0, c3*3.0, c4)    #volshebnyi - bonus fret tail              
+          
+        glColor4f(*color)
+      
+      glEnable(GL_TEXTURE_2D)
+      tex1.texture.bind()
+      
+
+
+      glBegin(GL_TRIANGLE_STRIP)
+      glTexCoord2f(0.0, 0.0)
+      glVertex3f(-size[0], 0, 0)
+      glTexCoord2f(1.0, 0.0)
+      glVertex3f( size[0], 0, 0)
+      glTexCoord2f(0.0,1.0)
+      glVertex3f(-size[0], 0, size[1])
+      glTexCoord2f(1.0,1.0)
+      glVertex3f( size[0], 0, size[1])
+      glEnd()
+
+      glDisable(GL_TEXTURE_2D)
+
+      #MFH - this block of code renders the tail "end" - after the note
+      glEnable(GL_TEXTURE_2D)
+      tex2.texture.bind()
+
+      glBegin(GL_TRIANGLE_STRIP)
+      glTexCoord2f(0.0, 0.05)
+      glVertex3f(-size[0], 0, size[1] - (.05))
+      glTexCoord2f(1.0, 0.05)
+      glVertex3f( size[0], 0, size[1] - (.05))
+      glTexCoord2f(0.0, 0.95)
+      glVertex3f(-size[0], 0, size[1] + (zsize))
+      glTexCoord2f(1.0, 0.95)
+      glVertex3f( size[0], 0, size[1] + (zsize))
+      glEnd()
+
+      glDisable(GL_TEXTURE_2D)
+
+      #MFH - this block of code renders the tail "beginning" - before the note, for freestyle "lanes" only 
+      glEnable(GL_TEXTURE_2D)
+      tex2.texture.bind()
+
+      glBegin(GL_TRIANGLE_STRIP)
+      glTexCoord2f(0.0, 0.95)
+      glVertex3f(-size[0], 0, 0 - (zsize))
+      glTexCoord2f(1.0, 0.95)
+      glVertex3f( size[0], 0, 0 - (zsize))
+      glTexCoord2f(0.0, 0.05)
+      glVertex3f(-size[0], 0, 0 + (.05))
+      glTexCoord2f(1.0, 0.05)
+      glVertex3f( size[0], 0, 0 + (.05))
+      glEnd()
+
+      glDisable(GL_TEXTURE_2D)
 
   #myfingershurt:
   def renderNote(self, length, sustain, color, flat = False, tailOnly = False, isTappable = False, big = False, fret = 0, spNote = False, isOpen = False):    
@@ -1329,6 +1490,11 @@ class Drum:
         f = min(1, max(0, 1 + z2))
       else:
         f = 1.0
+        
+      #volshebnyi - hide open notes in BRE zone if BRE enabled  
+      if self.freestyleEnabled:  
+      	if time > self.freestyleStart and time < self.freestyleStart + self.freestyleLength:
+        	z = -2.0
 
       color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
       length = 0
@@ -1447,6 +1613,7 @@ class Drum:
       if (event.noteBpm == 0.0):
         event.noteBpm = self.tempoBpm
 
+      #volshebnyi - removed
       if event.number == 0: #MFH - skip all open notes
         continue
       
@@ -1489,6 +1656,11 @@ class Drum:
         f = min(1, max(0, 1 + z2))
       else:
         f = 1.0
+        
+      #volshebnyi - hide notes in BRE zone if BRE enabled  
+      if self.freestyleEnabled:  
+      	if time >= self.freestyleStart and time < self.freestyleStart + self.freestyleLength:
+        	z = -2.0
 
       color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
       length = 0
@@ -2361,16 +2533,26 @@ class Drum:
       else:
         self.renderTracks(visibility)
         self.renderBars(visibility, song, pos)
+        
+      if self.freestyleActive:
+        self.renderNotes(visibility, song, pos)
+        self.renderOpenNotes(visibility, song, pos)
+        self.renderFreestyleLanes(visibility, song, pos) #MFH - render the lanes on top of the notes.
+        self.renderFrets(visibility, song, controls)
+        
+      else:
 
     #if self.fretsUnderNotes:    #MFH
-      if self.fretsUnderNotes and self.twoDnote != False:    #MFH
-        self.renderFrets(visibility, song, controls)
-        self.renderOpenNotes(visibility, song, pos)
-        self.renderNotes(visibility, song, pos)
-      else:
-        self.renderOpenNotes(visibility, song, pos)
-        self.renderNotes(visibility, song, pos)
-        self.renderFrets(visibility, song, controls)
+        if self.fretsUnderNotes and self.twoDnote != False:    #MFH
+          self.renderFrets(visibility, song, controls)
+          self.renderOpenNotes(visibility, song, pos)
+          self.renderNotes(visibility, song, pos)
+        else:
+          self.renderOpenNotes(visibility, song, pos)
+          self.renderNotes(visibility, song, pos)
+          self.renderFrets(visibility, song, controls)
+          
+        self.renderFreestyleLanes(visibility, song, pos)
 
       self.renderFlames(visibility, song, pos, controls)
     
@@ -2487,9 +2669,14 @@ class Drum:
     return False
 
 
-  #MFH - TODO - handle freestyle picks here
+  #volshebnyi - handle freestyle picks here
   def freestylePick(self, song, pos, controls):
     numHits = 0
+    if controls.getState(self.keys[0]):
+    	numHits = 1
+    for i in range (1,4):
+  	if controls.getState(self.keys[i]) or controls.getState(self.keys[4+i]):
+    		numHits += 1
     return numHits
   
   def startPick(self, song, pos, controls, hopo = False):
