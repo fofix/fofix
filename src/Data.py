@@ -61,6 +61,7 @@ class Data(object):
     #Get theme
     themename = Config.get("coffee", "themename")
     self.themeLabel = themename
+    self.themeCoOp  = False
 
 
     #myfingershurt: check for existance of theme path
@@ -96,8 +97,11 @@ class Data(object):
       self.theme = 0
     elif self.fileExists(os.path.join("themes",themename,"overdrive fill.png")):
       self.theme = 2
+      self.themeCoOp = True
     else:
       self.theme = 1
+      if self.fileExists(os.path.join("themes",themename,"coop_rockmeter.png")):
+        self.themeCoOp = True
 
     #myfingershurt: multi-OS compatibility file access fixes using os.path.join()
     # load font customization images

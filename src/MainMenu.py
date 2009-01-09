@@ -116,6 +116,7 @@ class MainMenu(BackgroundLayer):
 
     #Get theme
     self.theme = self.engine.data.theme
+    self.themeCoOp = self.engine.data.themeCoOp
     self.themename = self.engine.data.themeLabel
 
     try:
@@ -242,12 +243,27 @@ class MainMenu(BackgroundLayer):
 
     if self.theme == 0 or self.theme == 1:    #GH themes = 6 main menu selections
     
-      multPlayerMenu = [
-        (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),
-        (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
-        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
-        (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
-      ]
+      if self.theme == 1 and self.themeCoOp:
+        multPlayerMenu = [
+          (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),
+          (_("GH Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 5)),
+          (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
+          (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
+          (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
+        ]
+      elif self.theme == 1 and not self.themeCoOp:
+        multPlayerMenu = [
+          (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
+          (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
+          (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
+        ]
+      else:
+        multPlayerMenu = [
+          (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),
+          (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
+          (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
+          (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
+        ]
 
       mainMenu = [
         (_(strCareer), lambda:   self.newLocalGame(mode1p = 2)),
@@ -269,6 +285,7 @@ class MainMenu(BackgroundLayer):
       multPlayerMenu = [
         (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),
         (_("RB Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 4)),
+        (_("GH Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 5)),
         (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
         (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
         (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
