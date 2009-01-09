@@ -3346,7 +3346,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       elif self.coOpRB:
         if self.rock[i]< self.rockMax/3.0 and self.failingEnabled:
           self.guitars[i].isFailing = True
-        elif self.rock[self.coOpPlayerMeter]< self.rockMax/3.0 and self.failingEnabled:
+        elif self.numDeadPlayers > 0 and self.rock[self.coOpPlayerMeter]< self.rockMax/6.0 and self.failingEnabled:
           self.guitars[i].isFailing = True
         else:
           self.guitars[i].isFailing = False
