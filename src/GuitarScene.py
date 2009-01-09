@@ -7108,7 +7108,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     self.rockArr[i].draw(color = failColor)
                   else:
                     self.rockArr[i].draw()
-                  if self.guitars[i].starPowerActive:
+                  if self.guitars[i].starPowerActive and self.rockArrGlow:
                     self.rockArrGlow.transform.reset()
                     self.rockArrGlow.transform.scale(wfactor,-wfactor)
                     self.rockArrGlow.transform.translate(w*.1,h*.3+heightIncrease)
@@ -7127,7 +7127,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     self.rockArr[i].draw(color = failColor)
                   else:
                     self.rockArr[i].draw()
-                  if self.guitars[i].starPowerActive:
+                  if self.guitars[i].starPowerActive and self.rockArrGlow:
                     self.rockArrGlow.transform.reset()
                     self.rockArrGlow.transform.scale(wfactor,-wfactor)
                     self.rockArrGlow.transform.translate(w*(.1+spreadOut),h*.3+heightIncrease)
@@ -7147,7 +7147,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     self.rockArr[i].draw(color = failColor)
                   else:
                     self.rockArr[i].draw()
-                  if not self.coOp and self.guitars[i].starPowerActive:
+                  if not self.coOp and self.guitars[i].starPowerActive and self.rockArrGlow:
                     self.rockArrGlow.transform.reset()
                     self.rockArrGlow.transform.scale(wfactor,-wfactor)
                     self.rockArrGlow.transform.translate(w*.1,h*.3+heightIncrease)
