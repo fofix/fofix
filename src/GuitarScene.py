@@ -1137,7 +1137,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.rockMed = None
           self.rockLo  = None
         try:
-          self.engine.loadImgDrawing(self, "scorePicBand", os.path.join("themes",themename,"score.png"))
+          self.engine.loadImgDrawing(self, "scorePicBand", os.path.join("themes",themename,"coop_score.png"))
         except IOError:
           self.scorePicBand = None
       else:
