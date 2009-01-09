@@ -967,17 +967,17 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if not self.partImage:
           break
         try:
-          if self.guitars[0].isDrum:
+          if self.guitars[i].isDrum:
             self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"drum.png"))
-          if self.guitars[0].isBassGuitar:
+          if self.guitars[i].isBassGuitar:
             self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"bass.png"))
           else:
             self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"guitar.png"))
         except IOError:
           try:
-            if self.guitars[0].isDrum:
+            if self.guitars[i].isDrum:
               self.engine.loadImgDrawing(self, "partLoad", os.path.join("drum.png"))
-            if self.guitars[0].isBassGuitar:
+            if self.guitars[i].isBassGuitar:
               self.engine.loadImgDrawing(self, "partLoad", os.path.join("bass.png"))
             else:
               self.engine.loadImgDrawing(self, "partLoad", os.path.join("guitar.png"))
@@ -1188,6 +1188,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         except IOError:
           self.engine.loadImgDrawing(self, "rockArrLoad", os.path.join("themes",themename,"rock_arr.png"))
         self.rockArr[i] = self.rockArrLoad
+      try:
+        self.engine.loadImgDrawing(self, "rockArrGlow", os.path.join("themes",themename,"rock_arr_glow.png"))
+      except IOError:
+        self.rockArrGlow = None
       
       self.scorePicLoad = None
       self.rockArrLoad = None
@@ -1703,6 +1707,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.scorePic = [None for i in self.playerList]
       self.scorePicBand = None
       self.rockArr = [None for i in self.playerList]
+      self.rockArrGlow = None
       self.mult2 = None
     if self.coOpRB:
       self.coOpFailImg = None
@@ -7094,7 +7099,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   redBlink = .7 + (.3 * self.failViz[i])
                 failColor = (redBlink,self.failViz[i],self.failViz[i],1)
                 
-              if not self.coOpType or (self.coOpRB and i!=0):  #MFH only render for player 1 if co-op mode
+              if not self.coOpType:  #MFH only render for player 1 if co-op mode
                 self.rockArr[i].transform.reset()
                 self.rockArr[i].transform.scale(wfactor,-wfactor)
                 self.rockArr[i].transform.translate(w*.1,h*.3+heightIncrease)
@@ -7103,22 +7108,32 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     self.rockArr[i].draw(color = failColor)
                   else:
                     self.rockArr[i].draw()
-                if not self.coOpRB:
-                  whichScorePic = self.scorePic[i]
-              elif i == 0 and self.coOpRB:
+                  if self.guitars[i].starPowerActive:
+                    self.rockArrGlow.transform.reset()
+                    self.rockArrGlow.transform.scale(wfactor,-wfactor)
+                    self.rockArrGlow.transform.translate(w*.1,h*.3+heightIncrease)
+                    self.rockArrGlow.draw()
+                whichScorePic = self.scorePic[i]
+              elif self.coOpRB:
                 self.rockArr[i].transform.reset()
                 self.rockArr[i].transform.scale(wfactor,-wfactor)
-                if abs(self.rock[1]-self.rock[0]) < 150.0: # fix for more players...
-                  spreadOut = .04
-                else:
-                  spreadOut = 0.0
+                spreadOut = 0.0
+                for j in range(i+1, self.numOfPlayers):
+                  if abs(self.rock[i]-self.rock[j]) < 250.0:
+                    spreadOut += .04
                 self.rockArr[i].transform.translate(w*(.1+spreadOut),h*.3+heightIncrease)
                 if self.failingEnabled:  
                   if failUse:
                     self.rockArr[i].draw(color = failColor)
                   else:
                     self.rockArr[i].draw()
-                whichScorePic = self.scorePicBand
+                  if self.guitars[i].starPowerActive:
+                    self.rockArrGlow.transform.reset()
+                    self.rockArrGlow.transform.scale(wfactor,-wfactor)
+                    self.rockArrGlow.transform.translate(w*(.1+spreadOut),h*.3+heightIncrease)
+                    self.rockArrGlow.draw()
+                if i == 0:
+                  whichScorePic = self.scorePicBand
               
               elif self.coOpType and i == self.coOpPlayerMeter:
                 #if self.numOfPlayers > 1 and self.coOp:
@@ -7132,6 +7147,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     self.rockArr[i].draw(color = failColor)
                   else:
                     self.rockArr[i].draw()
+                  if not self.coOp and self.guitars[i].starPowerActive:
+                    self.rockArrGlow.transform.reset()
+                    self.rockArrGlow.transform.scale(wfactor,-wfactor)
+                    self.rockArrGlow.transform.translate(w*.1,h*.3+heightIncrease)
+                    self.rockArrGlow.draw()
                 if self.coOp or self.coOpGH:
                   whichScorePic = self.scorePicBand
                 else:
@@ -7141,14 +7161,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 if self.unisonPic and i == 0:
                   self.unisonPic.transform.reset()
                   self.unisonPic.transform.scale(.5,-.5)
-                  self.unisonPic.transform.translate(w*.5,h*.5)
+                  self.unisonPic.transform.translate(w*.5,h*.65)
                   self.unisonPic.draw()
                 unisonX = .05*(self.unisonNum-1)
                 unisonI = .05*self.unisonNum
                 if self.haveUnison[i]:
                   self.part[i].transform.reset()
-                  self.part[i].transform.scale(.1,-.1)
-                  self.part[i].transform.translate(w*(.5-unisonX+unisonI*i),h*.45)
+                  self.part[i].transform.scale(.15,-.15)
+                  self.part[i].transform.translate(w*(.5-unisonX+unisonI*i),h*.58)
                   if self.inUnison[i]:
                     self.part[i].draw()
                   else:
