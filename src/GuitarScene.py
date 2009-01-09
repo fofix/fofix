@@ -743,9 +743,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 	      for time, event in self.song.midiEventTrack[i].getAllEvents():
 	       	if isinstance(event, Song.MarkerNote) and not event.endMarker:
 	        	if (event.number == Song.freestyleMarkingNote):
-	        		for freestyleTime, event1 in self.song.track[i].getEvents(time, time + event.length):
-	        			if isinstance(event1, Note):
-	        				self.playerList[i].freestyleSkippedNotes += 1
+	        		if guitar.isDrum:
+	        			guitar.drumFillsTotal += 1
+	        		else:
+                       		  for freestyleTime, event1 in self.song.track[i].getEvents(time, time + event.length):
+                       		    if isinstance(event1, Note):
+                       		      self.playerList[i].freestyleSkippedNotes += 1
         	
       self.playerList[i].totalStreakNotes -= self.playerList[i].freestyleSkippedNotes
 
@@ -1956,6 +1959,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.guitars[i].freestyleFirstHit = 0 
       self.guitars[i].freestyleLength = 0
       self.guitars[i].freestyleBonusFret = 0
+      if self.guitars[i].isDrum:
+      	self.guitars[i].drumFillsCount = 0
+      	self.guitars[i].drumFillsHits = 0
       for i1 in range(0, 5):
       	self.guitars[i].freestyleLastFretHitTime[i1] = 0
     self.failed = False
@@ -2483,9 +2489,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     num = playerNum
     guitar = self.guitars[num]
 
-    #MFH - check if freestyle is active or not before running the function... freestyle is much simpler :)
-    if guitar.freestyleActive:
-      # Volshebnyi - new BRE scoring
+    # Volshebnyi - new BRE and drum fills scoring
+    if guitar.freestyleActive or (guitar.isDrum and guitar.drumFillsActive):
       pos = self.getSongPosition()
       score = 0
       numFreestyleHits = guitar.freestylePick(self.song, pos, self.controls)
@@ -2502,9 +2507,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 	        	guitar.freestylePeriod = 1500
 	        	guitar.freestyleBaseScore = 150
 	        	score = 600 * numFreestyleHits
+	        if guitar.isDrum:
+	        	guitar.drumFillsHits = 0
 	        guitar.freestyleLastHit = pos - guitar.freestylePeriod
 	        for fret in range (0,5):
 	        	guitar.freestyleLastFretHitTime[fret] = pos - guitar.freestylePeriod
+	        	
+	      if guitar.isDrum:
+	        guitar.drumFillsHits += 1
 	      
 	      if guitar.bigRockLogic == 0 or guitar.bigRockLogic == 1:
 	      	brzoneremain = ( guitar.freestyleLength - pos + guitar.freestyleFirstHit ) / guitar.freestyleLength

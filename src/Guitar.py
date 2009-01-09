@@ -90,6 +90,7 @@ class Guitar:
     self.freestyleBaseScore = 750
     self.freestylePeriod = 1000
     self.freestylePercent = 50
+    self.freestyleOffset = 5
 
 
     self.accThresholdWorstLate = 0
@@ -1493,7 +1494,7 @@ class Guitar:
     if self.freestyleEnabled:
       freestyleActive = False
       #for time, event in track.getEvents(boardWindowMin, boardWindowMax):
-      for time, event in track.getEvents(pos, boardWindowMax):
+      for time, event in track.getEvents(pos - self.freestyleOffset , boardWindowMax + self.freestyleOffset):
         if isinstance(event, Song.MarkerNote):
           if event.number == Song.freestyleMarkingNote:
             length     = (event.length - 50) / self.currentPeriod / beatsPerUnit
@@ -1512,7 +1513,7 @@ class Guitar:
   
             #MFH - must extend the tail past the first fretboard section dynamically so we don't have to render the entire length at once
             #volshebnyi - allow tail to move under frets 
-            if time < pos:
+            if time - self.freestyleOffset < pos:
               freestyleActive = True
               if z < -1.5:
               	length += z +1.5
@@ -1669,7 +1670,7 @@ class Guitar:
       
       #volshebnyi - hide notes in BRE zone if BRE enabled  
       if self.freestyleEnabled:  
-      	if time >= self.freestyleStart and time < self.freestyleStart + self.freestyleLength:
+      	if time >= self.freestyleStart-self.freestyleOffset and time < self.freestyleStart + self.freestyleLength+self.freestyleOffset:
         	z = -2.0
 
       color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)

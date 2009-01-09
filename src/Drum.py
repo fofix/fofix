@@ -105,6 +105,13 @@ class Drum:
     self.freestyleBaseScore = 750
     self.freestylePeriod = 1000
     self.freestylePercent = 50
+    self.drumFillsCount = 0
+    self.drumFillsTotal = 0
+    self.drumFillsHits = 0
+    self.drumFillsActive = False
+    self.drumFillsReady = False
+    self.freestyleReady = False
+    self.freestyleOffset = 5
 
     self.accThresholdWorstLate = 0
     self.accThresholdVeryLate = 0
@@ -584,8 +591,8 @@ class Drum:
     self.scoreMultiplier = multiplier
     
     
-  #volshebnyi - TODO - find a mistake in this function
-  def renderFreestyleLanes(self, visibility, song, pos):
+  #volshebnyi - TODO - find a mistake with starpower activation
+  def renderFreestyleLanes(self, visibility, song, pos, controls):
     if not song:
       return
 
@@ -594,11 +601,11 @@ class Drum:
     track = song.midiEventTrack[self.player]
     #self.currentPeriod = self.neckSpeed
     beatsPerUnit = self.beatsPerBoard / self.boardLength
-    #MFH - render 5 freestyle tails when Song.freestyleMarkingNote comes up
     if self.freestyleEnabled:
       freestyleActive = False
+      self.drumFillsActive = False
       #for time, event in track.getEvents(boardWindowMin, boardWindowMax):
-      for time, event in track.getEvents(pos, boardWindowMax):
+      for time, event in track.getEvents(pos - self.freestyleOffset, boardWindowMax + self.freestyleOffset):
         if isinstance(event, Song.MarkerNote):
           if event.number == Song.freestyleMarkingNote:
             length     = (event.length - 50) / self.currentPeriod / beatsPerUnit
@@ -614,30 +621,62 @@ class Drum:
               f = min(1, max(0, 1 + z2))
             else:
               f = 1.0
-              
-            #volshebnyi - allow tail to move under frets 
-            if time < pos:
-              freestyleActive = True
+             
+            time -= self.freestyleOffset 
+            #volshebnyi - allow tail to move under frets
+            if time > pos:
+            	self.drumFillsHits = -1
+            if self.starPower>=50 and not self.starPowerActive:
+              self.drumFillsReady = True
+            else:
+              self.drumFillsReady = False
+            if (self.drumFillsCount == self.drumFillsTotal and time+event.length>pos) or (time > pos and self.drumFillsCount == self.drumFillsTotal-1):
+              self.freestyleReady = True
+            else:
+              self.freestyleReady = False
+            if time < pos: 
+              if self.drumFillsCount < self.drumFillsTotal and self.drumFillsReady:
+              	self.drumFillsActive = True
+              if self.drumFillsHits<0:
+              	self.drumFillsCount += 1
+              	self.drumFillsHits = 0
+              if self.drumFillsCount == self.drumFillsTotal:
+              	freestyleActive = True
               if z < -1.5:
               	length += z +1.5
               	z =  -1.5
-  
+              	
+            #if time+event.length>pos and time+event.length-0.5>pos:
+            #	if controls.getState(self.keys[4]) or controls.getState(self.keys[8]):
+            #		self.starPowerActive = True
+            	
             #volshebnyi - render 4 freestyle tails
-            #edited to prevent crashes
-            for theFret in range(2,0):
-              x  = (self.strings / 2 - theFret) * w
-              c = self.fretColors[theFret]
-              color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
-              glPushMatrix()
-              glTranslatef(x, (1.0 - visibility) ** (theFret + 1), z)
+            if self.freestyleReady or self.drumFillsReady:
+              for theFret in range(1,5):
+                x = (self.strings / 2 + .5 - theFret) * w
+                if theFret == 4:
+                  c = self.fretColors[0]
+                else:
+                  c = self.fretColors[theFret]
+                color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1.0 * visibility * f)
+                glPushMatrix()
+                glTranslatef(x, (1.0 - visibility) ** (theFret + 1), z)
+                  
+                # Volshebnyi - extra tail for bonus fret
+                if self.bigRockLogic == 1 and theFret == self.freestyleBonusFret:
+                  freestyleTailMode = 2
+                else:
+                  freestyleTailMode = 1
                 
-              # Volshebnyi - extra tail for bonus fret
-              if self.bigRockLogic == 1 and theFret == self.freestyleBonusFret:
-                freestyleTailMode = 2
-              else:
-                freestyleTailMode = 1
-              
-              self.renderTail(length, color = color, fret = theFret, freestyleTail = freestyleTailMode, pos = pos)
+                self.renderTail(length = length, color = color, fret = theFret, freestyleTail = freestyleTailMode, pos = pos)
+                glPopMatrix()
+                 
+            
+            if self.drumFillsActive and z + length<self.boardLength:
+              glPushMatrix()
+              color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1.0 * visibility * f)
+              glTranslatef(x, 0.0, z + length)
+              self.renderNote(length, sustain = False, color = color, flat = False, tailOnly = False, isTappable = False, fret = 4, spNote = False, isOpen = False)
               glPopMatrix()
               
       self.freestyleActive = freestyleActive
@@ -1096,91 +1135,88 @@ class Drum:
     #  if freestyleTail == 2, render highlighted freestyle tail
 
     beatsPerUnit = self.beatsPerBoard / self.boardLength
-    
-    
-    if not length == None:
-      size = (.08, length + 0.00001)
 
-      if size[1] > self.boardLength:
-        s = self.boardLength
-      else:
-        s = (length + 0.00001)
-        
-        # render an inactive freestyle tail  (self.freestyle1 & self.freestyle2)
-        zsize = .25  
-        
-        if self.freestyleActive:
-          size = (.30, s - zsize)   #was .15
-        else:
-          size = (.15, s - zsize)   
-        
-        tex1 = self.freestyle1
-        tex2 = self.freestyle2
-        if freestyleTail == 1:
-          #glColor4f(*color)
-          c1, c2, c3, c4 = color
-          tailGlow = 1 - (pos - self.freestyleLastFretHitTime[fret] ) / self.freestylePeriod
-          if tailGlow < 0:
-          	tailGlow = 0
-          color = (c1 + c1*2.0*tailGlow, c2 + c2*2.0*tailGlow, c3 + c3*2.0*tailGlow, c4*0.6 + c4*0.4*tailGlow)    #MFH - this fades inactive tails' color darker       
-        if freestyleTail == 2:
-          #glColor4f(*color)
-          c1, c2, c3, c4 = color
-          color = (c1*3.0, c2*3.0, c3*3.0, c4)    #volshebnyi - bonus fret tail              
-          
-        glColor4f(*color)
+    size = (.08, length + 0.00001)
+
+    if size[1] > self.boardLength:
+      s = self.boardLength
+    else:
+      s = (length + 0.00001)
       
-      glEnable(GL_TEXTURE_2D)
-      tex1.texture.bind()
+    # render an inactive freestyle tail  (self.freestyle1 & self.freestyle2)
+    zsize = .25  
+    size = (.15, s - zsize)
+    
+    if self.freestyleActive or (self.drumFillsActive and self.drumFillsHits >= 4):
+    	size = (.30, s - zsize)
+       
+    
+    tex1 = self.freestyle1
+    tex2 = self.freestyle2
+    if freestyleTail == 1:
+      #glColor4f(*color)
+      c1, c2, c3, c4 = color
+      tailGlow = 1 - (pos - self.freestyleLastFretHitTime[fret] ) / self.freestylePeriod
+      if tailGlow < 0:
+      	tailGlow = 0
+      color = (c1 + c1*2.0*tailGlow, c2 + c2*2.0*tailGlow, c3 + c3*2.0*tailGlow, c4*0.6 + c4*0.4*tailGlow)    #MFH - this fades inactive tails' color darker       
+    if freestyleTail == 2:
+      #glColor4f(*color)
+      c1, c2, c3, c4 = color
+      color = (c1*3.0, c2*3.0, c3*3.0, c4)    #volshebnyi - bonus fret tail              
       
+    glColor4f(*color)
+    
+    glEnable(GL_TEXTURE_2D)
+    tex1.texture.bind()	
+    
 
 
-      glBegin(GL_TRIANGLE_STRIP)
-      glTexCoord2f(0.0, 0.0)
-      glVertex3f(-size[0], 0, 0)
-      glTexCoord2f(1.0, 0.0)
-      glVertex3f( size[0], 0, 0)
-      glTexCoord2f(0.0,1.0)
-      glVertex3f(-size[0], 0, size[1])
-      glTexCoord2f(1.0,1.0)
-      glVertex3f( size[0], 0, size[1])
-      glEnd()
+    glBegin(GL_TRIANGLE_STRIP)
+    glTexCoord2f(0.0, 0.0)
+    glVertex3f(-size[0], 0, 0)
+    glTexCoord2f(1.0, 0.0)
+    glVertex3f( size[0], 0, 0)
+    glTexCoord2f(0.0,1.0)
+    glVertex3f(-size[0], 0, size[1])
+    glTexCoord2f(1.0,1.0)
+    glVertex3f( size[0], 0, size[1])
+    glEnd()
 
-      glDisable(GL_TEXTURE_2D)
+    glDisable(GL_TEXTURE_2D)
 
-      #MFH - this block of code renders the tail "end" - after the note
-      glEnable(GL_TEXTURE_2D)
-      tex2.texture.bind()
+    #MFH - this block of code renders the tail "end" - after the note
+    glEnable(GL_TEXTURE_2D)
+    tex2.texture.bind()
 
-      glBegin(GL_TRIANGLE_STRIP)
-      glTexCoord2f(0.0, 0.05)
-      glVertex3f(-size[0], 0, size[1] - (.05))
-      glTexCoord2f(1.0, 0.05)
-      glVertex3f( size[0], 0, size[1] - (.05))
-      glTexCoord2f(0.0, 0.95)
-      glVertex3f(-size[0], 0, size[1] + (zsize))
-      glTexCoord2f(1.0, 0.95)
-      glVertex3f( size[0], 0, size[1] + (zsize))
-      glEnd()
+    glBegin(GL_TRIANGLE_STRIP)
+    glTexCoord2f(0.0, 0.05)
+    glVertex3f(-size[0], 0, size[1] - (.05))
+    glTexCoord2f(1.0, 0.05)
+    glVertex3f( size[0], 0, size[1] - (.05))
+    glTexCoord2f(0.0, 0.95)
+    glVertex3f(-size[0], 0, size[1] + (zsize))
+    glTexCoord2f(1.0, 0.95)
+    glVertex3f( size[0], 0, size[1] + (zsize))
+    glEnd()
 
-      glDisable(GL_TEXTURE_2D)
+    glDisable(GL_TEXTURE_2D)
+      
+    glEnable(GL_TEXTURE_2D)
+    tex2.texture.bind()
 
-      #MFH - this block of code renders the tail "beginning" - before the note, for freestyle "lanes" only 
-      glEnable(GL_TEXTURE_2D)
-      tex2.texture.bind()
+    glBegin(GL_TRIANGLE_STRIP)
+    glTexCoord2f(0.0, 0.95)
+    glVertex3f(-size[0], 0, 0 - (zsize))
+    glTexCoord2f(1.0, 0.95)
+    glVertex3f( size[0], 0, 0 - (zsize))
+    glTexCoord2f(0.0, 0.05)
+    glVertex3f(-size[0], 0, 0 + (.05))
+    glTexCoord2f(1.0, 0.05)
+    glVertex3f( size[0], 0, 0 + (.05))
+    glEnd()
 
-      glBegin(GL_TRIANGLE_STRIP)
-      glTexCoord2f(0.0, 0.95)
-      glVertex3f(-size[0], 0, 0 - (zsize))
-      glTexCoord2f(1.0, 0.95)
-      glVertex3f( size[0], 0, 0 - (zsize))
-      glTexCoord2f(0.0, 0.05)
-      glVertex3f(-size[0], 0, 0 + (.05))
-      glTexCoord2f(1.0, 0.05)
-      glVertex3f( size[0], 0, 0 + (.05))
-      glEnd()
-
-      glDisable(GL_TEXTURE_2D)
+    glDisable(GL_TEXTURE_2D)
 
   #myfingershurt:
   def renderNote(self, length, sustain, color, flat = False, tailOnly = False, isTappable = False, big = False, fret = 0, spNote = False, isOpen = False):    
@@ -1493,8 +1529,9 @@ class Drum:
         
       #volshebnyi - hide open notes in BRE zone if BRE enabled  
       if self.freestyleEnabled:  
-      	if time > self.freestyleStart and time < self.freestyleStart + self.freestyleLength:
-        	z = -2.0
+        if self.drumFillsReady or self.freestyleReady:
+      		if time > self.freestyleStart - self.freestyleOffset and time < self.freestyleStart + self.freestyleOffset + self.freestyleLength:
+        		z = -2.0
 
       color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
       length = 0
@@ -1658,9 +1695,10 @@ class Drum:
         f = 1.0
         
       #volshebnyi - hide notes in BRE zone if BRE enabled  
-      if self.freestyleEnabled:  
-      	if time >= self.freestyleStart and time < self.freestyleStart + self.freestyleLength:
-        	z = -2.0
+      if self.freestyleEnabled:
+      	if self.drumFillsReady or self.freestyleReady:  
+      		if time > self.freestyleStart - self.freestyleOffset and time < self.freestyleStart + self.freestyleOffset + self.freestyleLength:
+        		z = -2.0
 
       color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
       length = 0
@@ -2534,13 +2572,15 @@ class Drum:
         self.renderTracks(visibility)
         self.renderBars(visibility, song, pos)
         
-      if self.freestyleActive:
-        self.renderNotes(visibility, song, pos)
+      if self.freestyleActive or self.drumFillsActive:
         self.renderOpenNotes(visibility, song, pos)
-        self.renderFreestyleLanes(visibility, song, pos) #MFH - render the lanes on top of the notes.
+        self.renderNotes(visibility, song, pos)
+        self.renderFreestyleLanes(visibility, song, pos, controls) #MFH - render the lanes on top of the notes.
         self.renderFrets(visibility, song, controls)
         
       else:
+      
+        self.renderFreestyleLanes(visibility, song, pos, controls)
 
     #if self.fretsUnderNotes:    #MFH
         if self.fretsUnderNotes and self.twoDnote != False:    #MFH
@@ -2551,8 +2591,6 @@ class Drum:
           self.renderOpenNotes(visibility, song, pos)
           self.renderNotes(visibility, song, pos)
           self.renderFrets(visibility, song, controls)
-          
-        self.renderFreestyleLanes(visibility, song, pos)
 
       self.renderFlames(visibility, song, pos, controls)
     
@@ -2674,7 +2712,7 @@ class Drum:
     numHits = 0
     if controls.getState(self.keys[0]):
     	numHits = 1
-    for i in range (1,4):
+    for i in range (1,5):
   	if controls.getState(self.keys[i]) or controls.getState(self.keys[4+i]):
     		numHits += 1
     return numHits
