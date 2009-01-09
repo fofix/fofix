@@ -238,6 +238,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.firstUnisonDone = False
     self.unisonActive = False
     self.unisonNum = 0
+    self.unisonEarn = [False for i in self.playerList]
     self.starPowersActive = 0
     self.playersInGreen = 0
     self.crowdFaderVolume = 0.0
@@ -795,6 +796,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     self.unisonConfirm = [] #akedrou
     self.unisonPlayers = []
+    self.unisonIndex = 0
     if self.coOpRB:
       for spNoted in unisonCheck:
         if unisonCheck.count(spNoted) > 1:
@@ -969,7 +971,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         try:
           if self.guitars[i].isDrum:
             self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"drum.png"))
-          if self.guitars[i].isBassGuitar:
+          elif self.guitars[i].isBassGuitar:
             self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"bass.png"))
           else:
             self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"guitar.png"))
@@ -977,7 +979,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           try:
             if self.guitars[i].isDrum:
               self.engine.loadImgDrawing(self, "partLoad", os.path.join("drum.png"))
-            if self.guitars[i].isBassGuitar:
+            elif self.guitars[i].isBassGuitar:
               self.engine.loadImgDrawing(self, "partLoad", os.path.join("bass.png"))
             else:
               self.engine.loadImgDrawing(self, "partLoad", os.path.join("guitar.png"))
@@ -1921,7 +1923,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.firstUnison = False
     self.firstUnisonDone = False
     self.unisonNum = 0
+    self.unisonIndex = 0
     self.unisonActive = False
+    self.unisonEarn   = [False for i in self.playerList]
     self.failTimer = 0  #myfingershurt
     self.rockTimer = 0  #myfingershurt
     self.youRock = False    #myfingershurt
@@ -2897,6 +2901,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.stage.run(pos, guitar.currentPeriod)
 
         if guitar.starPowerGained == True:
+          if self.unisonActive and self.inUnison[i]:
+            self.unisonEarn[i] = True
           if self.coOpGH:
             self.coOpStarPower += (25 * self.numOfPlayers) #lets 2 SP phrases give SP
             if self.coOpStarPower > (100 * self.numOfPlayers):
@@ -3062,16 +3068,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if self.coOpGH:
           self.coOpStarPower += guitar.starPower
       if self.coOpRB:
-        if len(self.unisonConfirm) > 0 and not self.unisonActive: #akedrou - unison bonuses
-          while self.unisonConfirm[0][0] < pos:
-            self.unisonPlayers.pop(0)
-            if len(self.unisonConfirm) == 0:
+        if self.unisonIndex < len(self.unisonConfirm) and not self.unisonActive: #akedrou - unison bonuses
+          while self.unisonConfirm[self.unisonIndex][0] < pos:
+            self.unisonIndex += 1
+            if len(self.unisonConfirm) == self.unisonIndex:
               break
-          if len(self.unisonConfirm) > 0:
-            if self.unisonConfirm[0][0] - pos < self.song.period * 2:
+          if len(self.unisonConfirm) > self.unisonIndex:
+            if self.unisonConfirm[self.unisonIndex][0] - pos < self.song.period * 2:
               self.unisonActive = True
               self.firstUnison = True
-              self.unisonNum = len(self.unisonPlayers[0])
+              self.unisonNum = len(self.unisonPlayers[self.unisonIndex])
         if self.starPowersActive > 0:
           self.coOpMulti = 2 * self.starPowersActive
         else:
@@ -3115,7 +3121,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.notesHit[i] = False 
         self.lessMissed[i] = False 
         if self.unisonActive:
-          if self.firstUnison and i in self.unisonPlayers[0]:
+          if self.firstUnison and i in self.unisonPlayers[self.unisonIndex]:
             self.inUnison[i] = True
             self.haveUnison[i] = True
           
@@ -3143,7 +3149,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if self.firstUnison:
           self.firstUnison = False
           self.firstUnisonDone = True
-        if pos - self.unisonConfirm[0][1] > 0 and self.firstUnisonDone:
+        if pos - self.unisonConfirm[self.unisonIndex][1] > 0 and self.firstUnisonDone:
           for i in range(len(self.inUnison)):
             if self.inUnison[i] != self.haveUnison[i]:
               break
@@ -3156,10 +3162,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 if guitar.starPower > 100:
                   guitar.starPower = 100
           self.firstUnisonDone = False
-        if pos - self.unisonConfirm[0][1] > self.song.period * 2:
-          self.unisonConfirm.pop(0)
-          self.unisonPlayers.pop(0)
+        if pos - self.unisonConfirm[self.unisonIndex][1] > self.song.period * 2:
+          self.unisonIndex+=1
           self.unisonActive = False
+          self.unisonEarn  = [False for i in self.playerList]
           self.haveUnison = [False for i in self.playerList]
           self.inUnison = [False for i in self.playerList]
       #akedrou Song/Crowd logic
@@ -7169,8 +7175,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   self.part[i].transform.reset()
                   self.part[i].transform.scale(.15,-.15)
                   self.part[i].transform.translate(w*(.5-unisonX+unisonI*i),h*.58)
-                  if self.inUnison[i]:
+                  if self.unisonEarn[i]:
                     self.part[i].draw()
+                  elif self.inUnison[i]:
+                    self.part[i].draw(color = (.8, .8, .8, 1))
                   else:
                     self.part[i].draw(color = (.6,.6,.6,1))
               try:
@@ -8481,7 +8489,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   h = self.hPlayer[i]
                   partImgwidth = self.part[i].width1()
                   partwFactor = 250.000/partImgwidth
-                  partX = (self.numOfPlayers*(i+1)) / 2.0            
+                  partX = ((i*2)+1) / (self.numOfPlayers*2.0)
                   self.part[i].transform.reset()
                   self.part[i].transform.scale(partwFactor*0.25,partwFactor*-0.25)
                   self.part[i].transform.translate(w*partX,h*.4)
