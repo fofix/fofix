@@ -37,7 +37,20 @@ import Version
 import Theme
 import copy
 import string
+import zlib
+import cPickle  #stump: Cerealizer and sqlite3 don't seem to like each other that much...
 from Language import _
+
+#stump: turns out the sqlite3 module didn't appear until Python 2.5...
+try:
+  import sqlite3
+  canCache = True
+except ImportError:
+  try:
+    import pysqlite2.dbapi2 as sqlite3  # close enough
+    canCache = True
+  except ImportError:
+    canCache = False
 
 DEFAULT_LIBRARY         = "songs"
 
@@ -132,6 +145,38 @@ defaultSections = ["Start","1/4","1/2","3/4"]
 
 
 
+# stump: manage cache files
+class CacheManager(object):
+  def __init__(self):
+    self.caches = {}
+  def getCache(self, infoFileName):
+    '''Given the path of a song.ini, return a SQLite connection to the
+    associated cache.'''
+    cachePath = os.path.dirname(os.path.dirname(infoFileName))
+    if self.caches.has_key(cachePath):
+      return self.caches[cachePath]
+    # The cache must be opened or created.
+    conn = sqlite3.Connection(os.path.join(cachePath, '.fofix-cache'))
+    # Check that the cache is completely initialized.
+    try:
+      v = conn.execute("SELECT `value` FROM `config` WHERE `key` = 'version'").fetchone()[0]
+      mustReinitialize = (int(v) != 1)  #stump: current cache format version number
+    except:
+      mustReinitialize = True
+    if mustReinitialize:
+      # Clean out the database, then make our tables.
+      for tbl in conn.execute("SELECT `name` FROM `sqlite_master` WHERE `type` = 'table'").fetchall():
+        conn.execute('DROP TABLE `%s`' % tbl)
+      conn.commit()
+      conn.execute('VACUUM')
+      conn.execute('CREATE TABLE `config` (`key` STRING UNIQUE, `value` STRING)')
+      conn.execute('CREATE TABLE `songinfo` (`hash` STRING UNIQUE, `info` STRING)')
+      conn.execute("INSERT INTO `config` (`key`, `value`) VALUES ('version', '1')")  #stump: current cache format version number
+      conn.commit()
+    self.caches[cachePath] = conn
+    return conn
+cacheManager = CacheManager()  # singleton instance
+del CacheManager
 
 
 class SongInfo(object):
@@ -182,6 +227,14 @@ class SongInfo(object):
         Log.debug("notes-unedited.mid not found, using notes.mid - " + self.name)
     self.noteFileName = os.path.join(os.path.dirname(self.fileName), notefile)
     
+    # stump: Check the cache for the presence of this song.
+    if canCache:
+      ckey = zlib.crc32(open(self.noteFileName, 'rb').read() + open(self.fileName, 'rb').read())
+      cache = cacheManager.getCache(self.fileName)
+      result = cache.execute('SELECT `info` FROM `songinfo` WHERE `hash` = ?', [ckey]).fetchone()
+      if result is not None:
+        self.__dict__.update(cPickle.loads(str(result[0])))
+        return
 
     # Read highscores and verify their hashes.
     # There ain't no security like security throught obscurity :)
@@ -361,6 +414,16 @@ class SongInfo(object):
           else:
             Log.warn("Weak hack attempt detected. Better luck next time.")
             
+  # stump: Write this song's info into the cache.
+  def writeCache(self):
+    if canCache:
+      ckey = zlib.crc32(open(self.noteFileName, 'rb').read() + open(self.fileName, 'rb').read())
+      cache = cacheManager.getCache(self.fileName)
+      pkl = cPickle.dumps(self.__dict__)
+      cache.execute('INSERT OR REPLACE INTO `songinfo` (`hash`, `info`) VALUES (?, ?)', [ckey, pkl])
+      cache.commit()
+
+
   def _set(self, attr, value):
     if not self.info.has_section("song"):
       self.info.add_section("song")
@@ -463,6 +526,7 @@ class SongInfo(object):
       self._difficulties = info.difficulties
     except:
       self._difficulties = difficulties.values()
+    self.writeCache()
     return self._difficulties
 
   def getParts(self):
@@ -487,6 +551,7 @@ class SongInfo(object):
       self._parts = info.parts
     except:
       self._parts = parts.values()
+    self.writeCache()
     return self._parts
 
   def getName(self):
