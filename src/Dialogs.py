@@ -3834,10 +3834,35 @@ class NeckChooser(BackgroundLayer, KeyListener):
     neckfiles = os.listdir(self.engine.resource.fileName("necks"))
     neckfiles.sort()
 
+    for i in neckfiles:   #MFH - first go through and find the random neck
+      if ( str(i) == "randomneck.png"  or str(i) == "Neck_0.png" ):    #MFH 
+        randomNeck = i
+        #exists = 1
+        
+        try:
+          neckImage = engine.loadImgDrawing(self, "neck"+str(i), os.path.join("necks",str(i)))
+          # evilynux - Warning, Thumbs.db won't fail at engine.loadImgDrawing
+  
+        except IOError:
+          exists = 0
+          break
+
+        if neckImage is None:
+          exists = 0
+        else:
+          exists = 1
+  
+        if exists == 1:
+          self.neck.append(str(i)[:-4]) # evilynux - filename w/o extension
+          self.necks.append(neckImage)
+
+
     for i in neckfiles:
       # evilynux - Special cases, ignore these...
       #if( str(i) == "overdriveneck.png" or str(i)[-4:] != ".png" ):
-      if( str(i) == "overdriveneck.png" or not i.endswith(".png") ):
+      #exists = 1
+      #if( str(i) == "overdriveneck.png" or not i.endswith(".png") ):
+      if( str(i) == "overdriveneck.png" or str(i) == "randomneck.png"  or str(i) == "Neck_0.png" or str(i)[-4:] != ".png" ):    #MFH 
         exists = 0
         continue
       try:
