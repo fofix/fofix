@@ -1416,7 +1416,10 @@ class SongChooser(Layer, KeyListener):
     
     # evilynux - Stop already playing song if any
     if self.songLoader:
-      self.songLoader.stop()
+      try:
+        self.songLoader.stop()
+      except:
+        self.songLoader = None
 
     self.songLoader = self.engine.resource.load(self, None, lambda: Song.loadSong(self.engine, song, playbackOnly = True, library = self.library), synch = False, onLoad = self.songLoaded) #Blazingamer - asynchronous preview loading allows "Loading Preview..." to correctly disappear.
 

@@ -231,7 +231,12 @@ class SongInfo(object):
     if canCache:
       ckey = zlib.crc32(open(self.noteFileName, 'rb').read() + open(self.fileName, 'rb').read())
       cache = cacheManager.getCache(self.fileName)
-      result = cache.execute('SELECT `info` FROM `songinfo` WHERE `hash` = ?', [ckey]).fetchone()
+
+      try:    #MFH - it crashes here on previews!
+        result = cache.execute('SELECT `info` FROM `songinfo` WHERE `hash` = ?', [ckey]).fetchone()
+      except:
+        result = None
+
       if result is not None:
         self.__dict__.update(cPickle.loads(str(result[0])))
         return
