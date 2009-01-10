@@ -56,7 +56,8 @@ Versions are likely important. Don't substitute one for the other without trying
 
 *Additional, optional modules currently in use with the latest Alpha version:*
   * [http://trac2.assembla.com/pkaudio/wiki/pyrtmidi pyRtMidi] - for MIDI instruments to be used as controller inputs
-  * [http://www.mediafire.com/stump jsPitchBend] - for a whammy pitchbend effect (source: [https://svn.stump.jstump.com/svnroot/pitchbend/trunk SVN Checkout], [https://svn.stump.jstump.com/websvn WebSVN])
+  * [http://www.mediafire.com/stump jsPitchBend] - for a whammy pitchbend effect (source: [https://svn.stump.jstump.com/svnroot/pitchbend/trunk SVN Checkout], [https://svn.stump.jstump.com/websvn WebSVN]).  At least revision 7 or release 0.1 is needed for the effect to work.  ([http://www.mediafire.com/?3mgtxhagijt direct download of latest release])
+  * [http://www.pysqlite.org/ PySQLite] is needed for metadata caching, which can speed up loading of large song folders.  ([http://oss.itsystementwicklung.de/download/pysqlite/2.5/2.5.1/pysqlite-2.5.1.win32-py2.4.exe direct download])
 
 
 ===Install In This Order===
@@ -76,6 +77,7 @@ Versions are likely important. Don't substitute one for the other without trying
   # Install Pyogg by double clicking the .exe
   # Install Pyvorbis by double clicking the .exe
   # Install py2exe by double clicking the .exe
+  # Install any optional modules by double clicking the .exe files in the order that you downloaded them.
 
 _This next part fixes a opengl/py2exe bug so it may not be necessary in the future. Only if you get an error when running the FretsOnFire.exe that says:_
 
