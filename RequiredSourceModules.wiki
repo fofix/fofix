@@ -54,6 +54,11 @@ Versions are likely important. Don't substitute one for the other without trying
 
 *Or w/o Amanith files (Not needed anymore after version 3.030+. Also 10Mb Less in size)* [http://www.mediafire.com/download.php?mmz3zjqkohm]
 
+*Additional, optional modules currently in use with the latest Alpha version:*
+  * [http://trac2.assembla.com/pkaudio/wiki/pyrtmidi pyRtMidi] - for MIDI instruments to be used as controller inputs
+  * [http://www.mediafire.com/stump jsPitchBend] - for a whammy pitchbend effect (source: [https://svn.stump.jstump.com/svnroot/pitchbend/trunk SVN Checkout], [https://svn.stump.jstump.com/websvn WebSVN])
+
+
 ===Install In This Order===
 
   #  Install active python by double clicking the .msi
