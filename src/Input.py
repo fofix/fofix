@@ -26,6 +26,19 @@ import pygame
 import Log
 import Audio
 
+try:
+  import rtmidi
+  midiin = rtmidi.RtMidiIn()
+  ports = range(midiin.getPortCount())
+  midi = []
+  for x in ports:
+    midi.append( rtmidi.RtMidiIn() )
+  haveMidi = True
+except ImportError:
+  ports = None
+  haveMidi = False
+
+
 from Task import Task
 from Player import Controls
 
@@ -107,6 +120,16 @@ class Input(Task):
     self.getSystemKeyName = pygame.key.name
     pygame.key.name       = self.getKeyName
 
+    global ports
+    if haveMidi == True:
+      if ports:
+        Log.debug("%d MIDI inputs found." % (len(ports)))
+        for i in ports:
+          midi[i].openPort(i, False)
+      else:
+        Log.warn("No MIDI input ports found.")
+
+
   def reloadControls(self):
     self.controls = Controls()
 
@@ -156,6 +179,9 @@ class Input(Task):
   def broadcastSystemEvent(self, name, *args):
     return self.broadcastEvent(self.systemListeners, name, *args)
 
+  def encodeMidiButton(self, midi, button):
+    return 0x40000 + (midi << 8 ) + button
+
   def encodeJoystickButton(self, joystick, button):
     return 0x10000 + (joystick << 8) + button
 
@@ -191,7 +217,10 @@ class Input(Task):
   
 
   def getKeyName(self, id):
-    if id >= 0x30000:
+    if id >= 0x40000:
+      midi, but = self.decodeMidiButton(id)
+      return "Midi #%d-%d" % (midi + 1, but)
+    elif id >= 0x30000:
       joy, axis, pos = self.decodeJoystickHat(id)
       return "Joy #%d, hat %d %s" % (joy + 1, axis, pos)
     elif id >= 0x20000:
@@ -203,6 +232,7 @@ class Input(Task):
     return self.getSystemKeyName(id)
 
   def run(self, ticks):
+    global ports
     pygame.event.pump()
     for event in pygame.event.get():
       if event.type == pygame.KEYDOWN:
@@ -290,6 +320,19 @@ class Input(Task):
               self.broadcastEvent(self.keyListeners, keyEvent, *args)
         except KeyError:
           pass
+
+    if ports:
+      for i in ports:
+        midimsg = midi[i].getMessage()
+        if len(midimsg) > 0:
+          id = self.encodeMidiButton(x, midimsg[1])
+          if midimsg[0] == 153:
+            if not self.broadcastEvent(self.priorityKeyListeners, "keyPressed", id, u'\x00'):
+              self.broadcastEvent(self.keyListeners, "keyPressed", id, u'\x00')
+          else:
+            if not self.broadcastEvent(self.priorityKeyListeners, "keyReleased", id):
+              self.broadcastEvent(self.keyListeners, "keyReleased", id)
+
 
   #-------------------------------------------
   # glorandwarf: check that there are no control conflicts
