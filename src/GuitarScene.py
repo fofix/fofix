@@ -5833,7 +5833,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 self.mult.transform.reset()
                 self.mult.transform.scale(.5,-.0625) #MFH division->constant: was (.5,-.5/8.0)
                 if self.coOpGH and self.numOfPlayers == 2:
-                  self.mult.transform.translate(w*0.5,h*0.3)
+                  self.mult.transform.translate(w*0.505,h*0.295) #Worldrave: was (w*0.5,h*0.3)
                 elif self.coOpGH:
                   self.mult.transform.translate(w*0.134,h*0.8)
                 else:
