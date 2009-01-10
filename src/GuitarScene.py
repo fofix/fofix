@@ -5938,22 +5938,22 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 if self.starfx: #blazingamer, corrected by myfingershurt, adjusted by worldrave
                   starPowerAmount = (self.coOpStarPower/self.numOfPlayers)
                   if starPowerAmount >= 50 or self.guitars[i].starPowerActive:
-                    if self.x1[self.coOpPhrase] < 0.516:   
+                    if self.x1[self.coOpPhrase] < 0.522:   
                       self.x1[self.coOpPhrase] += 0.01
-                      if self.x1[self.coOpPhrase] > 0.516:   
-                        self.x1[self.coOpPhrase] = 0.516     #Worldrave Notes - Controls 4th Bulbs X axis. Was .526
-                    if self.y1[self.coOpPhrase] < 0.461: 
+                      if self.x1[self.coOpPhrase] > 0.522:   
+                        self.x1[self.coOpPhrase] = 0.522     #Worldrave Notes - Controls 4th Bulbs X axis. Was .526
+                    if self.y1[self.coOpPhrase] < 0.464: 
                       self.y1[self.coOpPhrase] += 0.01
-                      if self.y1[self.coOpPhrase] > 0.461:
-                        self.y1[self.coOpPhrase] = 0.461     #Worldrave Notes - Controls 4th Bulbs Y axis. Was .471
-                    if self.x2[self.coOpPhrase] < 0.562:
+                      if self.y1[self.coOpPhrase] > 0.464:
+                        self.y1[self.coOpPhrase] = 0.464     #Worldrave Notes - Controls 4th Bulbs Y axis. Was .471
+                    if self.x2[self.coOpPhrase] < 0.563:
                       self.x2[self.coOpPhrase] += 0.01
-                      if self.x2[self.coOpPhrase] > 0.562:
-                        self.x2[self.coOpPhrase] = 0.562     #Worldrave Notes - Controls 5th Bulbs X axis. Was .562
-                    if self.y2[self.coOpPhrase] < 0.449:
+                      if self.x2[self.coOpPhrase] > 0.563:
+                        self.x2[self.coOpPhrase] = 0.563     #Worldrave Notes - Controls 5th Bulbs X axis. Was .562
+                    if self.y2[self.coOpPhrase] < 0.445:
                       self.y2[self.coOpPhrase] += 0.01
-                      if self.y2[self.coOpPhrase] > 0.449:
-                        self.y2[self.coOpPhrase] = 0.449     #Worldrave Notes - Controls 5th Bulbs Y axis. Was .449
+                      if self.y2[self.coOpPhrase] > 0.445:
+                        self.y2[self.coOpPhrase] = 0.445     #Worldrave Notes - Controls 5th Bulbs Y axis. Was .449
                     if self.x3[self.coOpPhrase] < 0.597:
                       self.x3[self.coOpPhrase] += 0.01
                       if self.x3[self.coOpPhrase] > 0.597:
