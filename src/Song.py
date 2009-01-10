@@ -180,13 +180,14 @@ del CacheManager
 
 
 class SongInfo(object):
-  def __init__(self, infoFileName, songLibrary = DEFAULT_LIBRARY):
+  def __init__(self, infoFileName, songLibrary = DEFAULT_LIBRARY, allowCacheUsage = False):
     self.songName      = os.path.basename(os.path.dirname(infoFileName))
     self.fileName      = infoFileName
     self.libraryNam       = songLibrary[songLibrary.find(DEFAULT_LIBRARY):]
     self.info          = Config.MyConfigParser()
     self._difficulties = None
     self._parts        = None
+    self.allowCacheUsage = allowCacheUsage  #stump
 
     self.locked = False
 
@@ -228,7 +229,7 @@ class SongInfo(object):
     self.noteFileName = os.path.join(os.path.dirname(self.fileName), notefile)
     
     # stump: Check the cache for the presence of this song.
-    if canCache:
+    if canCache and self.allowCacheUsage:
       ckey = zlib.crc32(open(self.noteFileName, 'rb').read() + open(self.fileName, 'rb').read())
       cache = cacheManager.getCache(self.fileName)
 
@@ -420,9 +421,11 @@ class SongInfo(object):
           else:
             Log.warn("Weak hack attempt detected. Better luck next time.")
             
+    self.writeCache()
+            
   # stump: Write this song's info into the cache.
   def writeCache(self):
-    if canCache:
+    if canCache and self.allowCacheUsage:
       ckey = zlib.crc32(open(self.noteFileName, 'rb').read() + open(self.fileName, 'rb').read())
       cache = cacheManager.getCache(self.fileName)
       pkl = cPickle.dumps(self.__dict__)
@@ -820,6 +823,7 @@ class SongInfo(object):
     except Exception, e:
       Log.warn("Song.py: Unable to retrieve section names for practice mode selection: %s" % e)
       self._sections = None
+    self.writeCache()
     return self._sections
 
 
@@ -3568,7 +3572,7 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
         continue
       if not name in names:
         names.append(name)
-  songs = [SongInfo(engine.resource.fileName(library, name, "song.ini", writable = True), library) for name in names]
+  songs = [SongInfo(engine.resource.fileName(library, name, "song.ini", writable = True), library, allowCacheUsage=True) for name in names]
   if not includeTutorials:
     songs = [song for song in songs if not song.tutorial]
   songs = [song for song in songs if not song.artist == '=FOLDER=']
