@@ -6422,8 +6422,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   if self.scorePicBand:
                     self.scorePicBand.transform.reset()
                     if self.coOpGH:
-                      self.scorePicBand.transform.scale(.41,-.5)           #Worldrave Notes - Controls Co-Op Score Meter X and Y sizing. Was (.41,-5)
-                      self.scorePicBand.transform.translate(w*.5,h*.79)    #Worldrave Notes - Controls Co-Op Score Meter X and Y positions.
+                      self.scorePicBand.transform.scale(.41,-.5)            #Worldrave Notes - Controls Co-Op Score Meter X and Y sizing. Was (.41,-5)
+                      self.scorePicBand.transform.translate(w*.5,h*.785)    #Worldrave Notes - Controls Co-Op Score Meter X and Y positions.
                     else:
                       self.scorePicBand.transform.scale(1, -1)
                       self.scorePicBand.transform.translate(0, h*1.44)
@@ -6467,14 +6467,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                       self.mult.draw(rect = (0,1,multRange[0],multRange[1])) #akedrou - mult goes after the rockmeter and arrow in coop.
                       if self.rockTop:
                         self.rockTop.transform.reset()
-                        self.rockTop.transform.scale(.5,-.5)     #Worldrave Notes - Controls the Co-op main meter X & Y size.
+                        self.rockTop.transform.scale(.5,-.5)             #Worldrave Notes - Controls the Co-op main meter X & Y size.
                         self.rockTop.transform.translate(w*.5,h*.3)
                         self.rockTop.draw()
                   
       
                   self.counter.transform.reset()
-                  self.counter.transform.translate(w*.5,h*.63)
-                  self.counter.transform.scale(.5,-.5)
+                  self.counter.transform.translate(w*.494,h*.63)    #Worldrave Notes - Controls the Co-op streak meter X and Y position.
+                  self.counter.transform.scale(.505,-.5)             #Worldrave Notes - Controls the Co-op streak meter X and Y Size.
                   self.counter.draw()
                   
                   glColor4f(0,0,0,1)
