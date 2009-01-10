@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-01-10 11:59-0800\n"
+"POT-Creation-Date: 2009-01-10 14:42-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -44,7 +44,7 @@ msgstr ""
 msgid "Browsing Collection..."
 msgstr ""
 
-#: Dialogs.py:962 Song.py:3706
+#: Dialogs.py:962 Song.py:3710
 msgid "End of Career"
 msgstr ""
 
@@ -2738,19 +2738,19 @@ msgstr ""
 msgid "Choose a new songs directory."
 msgstr ""
 
-#: Song.py:197
+#: Song.py:198
 msgid "NoName"
 msgstr ""
 
-#: Song.py:834
+#: Song.py:838
 msgid "This song is locked."
 msgstr ""
 
-#: Song.py:1061
+#: Song.py:1065
 msgid "Reset Career"
 msgstr ""
 
-#: Song.py:1108
+#: Song.py:1112
 msgid "   (Random Song)"
 msgstr ""
 

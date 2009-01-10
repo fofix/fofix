@@ -84,6 +84,9 @@ class Drum:
 
     self.matchingNotes = None
 
+
+    self.oNeckovr = None    #MFH - needs to be here to prevent crashes!    
+
     self.starNotesInView = False
     self.openStarNotesInView = False
 
@@ -1530,8 +1533,8 @@ class Drum:
       #volshebnyi - hide open notes in BRE zone if BRE enabled  
       if self.freestyleEnabled:  
         if self.drumFillsReady or self.freestyleReady:
-      		if time > self.freestyleStart - self.freestyleOffset and time < self.freestyleStart + self.freestyleOffset + self.freestyleLength:
-        		z = -2.0
+          if time > self.freestyleStart - self.freestyleOffset and time < self.freestyleStart + self.freestyleOffset + self.freestyleLength:
+            z = -2.0
 
       color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
       length = 0
@@ -1696,9 +1699,9 @@ class Drum:
         
       #volshebnyi - hide notes in BRE zone if BRE enabled  
       if self.freestyleEnabled:
-      	if self.drumFillsReady or self.freestyleReady:  
-      		if time > self.freestyleStart - self.freestyleOffset and time < self.freestyleStart + self.freestyleOffset + self.freestyleLength:
-        		z = -2.0
+        if self.drumFillsReady or self.freestyleReady:  
+          if time > self.freestyleStart - self.freestyleOffset and time < self.freestyleStart + self.freestyleOffset + self.freestyleLength:
+            z = -2.0
 
       color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
       length = 0
@@ -2711,11 +2714,21 @@ class Drum:
   def freestylePick(self, song, pos, controls):
     numHits = 0
     if controls.getState(self.keys[0]):
-    	numHits = 1
+      numHits = 1
     for i in range (1,5):
-  	if controls.getState(self.keys[i]) or controls.getState(self.keys[4+i]):
-    		numHits += 1
+      if controls.getState(self.keys[i]) or controls.getState(self.keys[4+i]):
+        numHits += 1
+        if i == 4 and self.drumFillsActive and not self.starPowerActive:   #MFH - must actually activate starpower!
+          drumFillCymbalPos = self.freestyleStart+self.freestyleLength
+          minDrumFillCymbalHitTime = drumFillCymbalPos - self.earlyMargin
+          maxDrumFillCymbalHitTime = drumFillCymbalPos + self.lateMargin
+          if (pos >= minDrumFillCymbalHitTime) and (pos <= maxDrumFillCymbalHitTime):
+            self.starPowerActive = True
+            self.engine.data.starActivateSound.play()
+            self.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
+            self.ocount = 0  #MFH - this triggers the oFlash strings & timer
     return numHits
+
   
   def startPick(self, song, pos, controls, hopo = False):
     if not song:
