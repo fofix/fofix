@@ -6422,15 +6422,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   if self.scorePicBand:
                     self.scorePicBand.transform.reset()
                     if self.coOpGH:
-                      self.scorePicBand.transform.scale(.5,-.5)
-                      self.scorePicBand.transform.translate(w*.5,h*.72)
+                      self.scorePicBand.transform.scale(.41,-.5)           #Worldrave Notes - Controls Co-Op Score Meter X and Y sizing. Was (.41,-5)
+                      self.scorePicBand.transform.translate(w*.5,h*.79)    #Worldrave Notes - Controls Co-Op Score Meter X and Y positions.
                     else:
                       self.scorePicBand.transform.scale(1, -1)
                       self.scorePicBand.transform.translate(0, h*1.44)
                     self.scorePicBand.draw()
                   if self.coOpGH:
-                    x = 0.5-(size[0]/2)
-                    y = 0.2
+                    x = 0.5-(size[0]/2)  #Worldrave Notes - Controls Co-Op Score X Pos.
+                    y = 0.152              #Worldrave Notes - Controls Co-Op Score Y Pos.
                   else:
                     x = 0-(size[0]/2)
                     y = -1.2
@@ -6451,7 +6451,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                       if self.failingEnabled:
                         if rock:
                           rock.transform.reset()
-                          rock.transform.scale(.5,-.5)
+                          rock.transform.scale(.5,-.5)     
                           if useRock == 0:
                             rock.transform.translate(w*.45,h*.335)
                           elif useRock == 2:
@@ -6467,7 +6467,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                       self.mult.draw(rect = (0,1,multRange[0],multRange[1])) #akedrou - mult goes after the rockmeter and arrow in coop.
                       if self.rockTop:
                         self.rockTop.transform.reset()
-                        self.rockTop.transform.scale(.5,-.5)
+                        self.rockTop.transform.scale(.5,-.5)     #Worldrave Notes - Controls the Co-op main meter X & Y size.
                         self.rockTop.transform.translate(w*.5,h*.3)
                         self.rockTop.draw()
                   
