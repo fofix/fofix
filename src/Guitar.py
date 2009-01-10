@@ -246,6 +246,7 @@ class Guitar:
     self.spcount = 0
     self.spcount2 = 0
     self.bgcount = 0
+    self.ovroverlay = self.engine.config.get("fretboard", "ovroverlay")
     
     #akedrou
     self.coOpFailed = False
@@ -359,6 +360,21 @@ class Guitar:
         engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "note.dae")))
       else:
         engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName("note.dae")))
+        
+      try:
+        engine.loadImgDrawing(self,  "notetexa",  os.path.join("themes", themename, "notetex_color.png"))
+        engine.loadImgDrawing(self,  "notetexb",  os.path.join("themes", themename, "notetex_main.png"))
+        engine.loadImgDrawing(self,  "notetexc",  os.path.join("themes", themename, "notetex_extra.png"))
+        engine.loadImgDrawing(self,  "notetexh",  os.path.join("themes", themename, "notetex_hopo.png"))
+        self.notetex = True
+
+      except IOError:
+        self.notetexa = False
+        self.notetexb = False
+        self.notetexc = False
+        self.notetexh = False
+        self.notetex = False
+        
       if self.engine.fileExists(os.path.join("themes", themename, "star.dae")):  
         engine.resource.load(self,  "starMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "star.dae")))
       else:  
@@ -848,6 +864,7 @@ class Guitar:
       
     if self.isFailing:
       self.renderNeckMethod(self.failcount, 0, beatsPerUnit, self.failNeck)
+
 
   def drawTrack(self, visibility, song, pos):
     if not song:
@@ -1449,7 +1466,7 @@ class Guitar:
       glEnable(GL_DEPTH_TEST)
       glDepthMask(1)
       glShadeModel(GL_SMOOTH)
-
+      
       if self.noterotate:
         glRotatef(90, 0, 1, 0)
         glRotatef(-90, 1, 0, 0)
@@ -1461,19 +1478,76 @@ class Guitar:
       if self.starPowerActive and self.theme != 2 and not color == (0,0,0,1):
         glColor4f(.3,.7,.9, 1)
 
-      note.render("Mesh_001")
-      glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
-      if isTappable:
-        if self.hopoColor[0] == -2:
-          glColor4f(*color)
+      if self.notetex == True and spNote == False:
+        
+        glEnable(GL_TEXTURE_2D)
+        self.notetexa.texture.bind()
+        glMatrixMode(GL_TEXTURE)
+        glScalef(1, -1, 1)
+        glMatrixMode(GL_MODELVIEW)
+        self.noteMesh.render("Mesh_001")
+        glMatrixMode(GL_TEXTURE)
+        glLoadIdentity()
+        glMatrixMode(GL_MODELVIEW)
+        glDisable(GL_TEXTURE_2D)
+        
+        glEnable(GL_TEXTURE_2D)
+        if isTappable:
+          self.notetexh.texture.bind()
         else:
-          glColor3f(self.hopoColor[0], self.hopoColor[1], self.hopoColor[2])
+          self.notetexb.texture.bind()
+        glColor3f(1, 1, 1)
+        glMatrixMode(GL_TEXTURE)
+        glScalef(1, -1, 1)
+        glMatrixMode(GL_MODELVIEW)
+        self.noteMesh.render("Mesh")
+        glMatrixMode(GL_TEXTURE)
+        glLoadIdentity()
+        glMatrixMode(GL_MODELVIEW)
+        glDisable(GL_TEXTURE_2D)
+
+        glEnable(GL_TEXTURE_2D)
+        self.notetexc.texture.bind()
+        glColor3f(1, 1, 1)
+        glMatrixMode(GL_TEXTURE)
+        glScalef(1, -1, 1)
+        glMatrixMode(GL_MODELVIEW)
+        self.noteMesh.render("Mesh_002")
+        glMatrixMode(GL_TEXTURE)
+        glLoadIdentity()
+        glMatrixMode(GL_MODELVIEW)
+        glDisable(GL_TEXTURE_2D)
+        
         if(note.find("Mesh_003")) == True:
-          note.render("Mesh_003")
-          glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
-      note.render("Mesh_002")
-      glColor3f(self.meshColor[0], self.meshColor[1], self.meshColor[2])
-      note.render("Mesh")
+          glEnable(GL_TEXTURE_2D)
+          if isTappable:
+            self.notetexh.texture.bind()
+          else:
+            self.notetexc.texture.bind()
+          glColor3f(1, 1, 1)
+          glMatrixMode(GL_TEXTURE)
+          glScalef(1, -1, 1)
+          glMatrixMode(GL_MODELVIEW)
+          self.noteMesh.render("Mesh_003")
+          glMatrixMode(GL_TEXTURE)
+          glLoadIdentity()
+          glMatrixMode(GL_MODELVIEW)
+          glDisable(GL_TEXTURE_2D)
+        
+      else:
+        note.render("Mesh_001")
+        glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
+        if isTappable:
+          if self.hopoColor[0] == -2:
+            glColor4f(*color)
+          else:
+            glColor3f(self.hopoColor[0], self.hopoColor[1], self.hopoColor[2])
+          if(note.find("Mesh_003")) == True:
+            note.render("Mesh_003")
+            glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
+        note.render("Mesh_002")
+        glColor3f(self.meshColor[0], self.meshColor[1], self.meshColor[2])
+        note.render("Mesh")
 
 
 
