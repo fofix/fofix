@@ -234,7 +234,8 @@ class SongInfo(object):
 
       try:    #MFH - it crashes here on previews!
         result = cache.execute('SELECT `info` FROM `songinfo` WHERE `hash` = ?', [ckey]).fetchone()
-      except:
+      except Exception, e:
+        Log.error(str(e))
         result = None
 
       if result is not None:
