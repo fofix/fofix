@@ -85,6 +85,8 @@ class Drum:
     self.matchingNotes = None
 
 
+
+
     self.oNeckovr = None    #MFH - needs to be here to prevent crashes!    
 
     self.starNotesInView = False
@@ -2715,10 +2717,23 @@ class Drum:
     numHits = 0
     if controls.getState(self.keys[0]):
       numHits = 1
+      if self.engine.data.bassDrumSoundFound:
+        self.engine.data.bassDrumSound.play()
     for i in range (1,5):
       if controls.getState(self.keys[i]) or controls.getState(self.keys[4+i]):
         numHits += 1
+        if i == 1:
+          if self.engine.data.T1DrumSoundFound:
+            self.engine.data.T1DrumSound.play()
+        if i == 2:
+          if self.engine.data.T2DrumSoundFound:
+            self.engine.data.T2DrumSound.play()
+        if i == 3:
+          if self.engine.data.T3DrumSoundFound:
+            self.engine.data.T3DrumSound.play()
         if i == 4 and self.drumFillsActive and not self.starPowerActive:   #MFH - must actually activate starpower!
+          if self.engine.data.CDrumSoundFound:
+            self.engine.data.CDrumSound.play()
           drumFillCymbalPos = self.freestyleStart+self.freestyleLength
           minDrumFillCymbalHitTime = drumFillCymbalPos - self.earlyMargin
           maxDrumFillCymbalHitTime = drumFillCymbalPos + self.lateMargin
