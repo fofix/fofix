@@ -20,8 +20,7 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-import asyncore
-import socket
+from FakeNetworking import socket, asyncore
 import struct
 import time
 import StringIO

@@ -25,7 +25,7 @@
 
 from OpenGL.GL import *
 import math
-import socket
+from FakeNetworking import socket
 
 from View import BackgroundLayer
 from Menu import Menu
