@@ -332,7 +332,7 @@ Config.define("coffee", "themename",           str,   defaultTheme,      text = 
 
 
 Config.define("coffee", "neckSpeed",            int,  100,      text = _("Speed Percent"),        options = dict([(n, n) for n in range(10, 410, 10)]))
-Config.define("coffee", "failingEnabled",       bool, True,     text = _("Failing"),             options = {True: _("Yes"), False: _("No")})
+Config.define("coffee", "failingEnabled",       bool, True,     text = _("No Fail"),             options = {True: _("Off"), False: _("On")})
 
 # evilynux - configurable default highscores difficulty display.
 # Index assigned following same standard as command line argument.

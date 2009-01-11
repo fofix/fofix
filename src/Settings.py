@@ -238,13 +238,12 @@ class SettingsMenu(Menu.Menu):
       (_("Stages Options"), StagesOptionsMenu),
       (_("HO/PO Settings"), HOPOSettingsMenu),
       (_("Lyrics Settings"), LyricsSettingsMenu),
-      (_("Jurgen Settings"), JurgenSettingsMenu),
       (_("Choose P1 Neck >"), lambda: Dialogs.chooseNeck(engine,player=0,prompt=_("Yellow (#3) / Blue (#4) to change:"))),
       (_("Choose P2 Neck >"), lambda: Dialogs.chooseNeck(engine,player=1,prompt=_("Yellow (#3) / Blue (#4) to change:"))),
       ConfigChoice(engine.config, "game", "ignore_open_strums", autoApply = True),      #myfingershurt
       ConfigChoice(engine.config, "game", "star_scoring", autoApply = True),#myfingershurt
       ConfigChoice(engine.config, "audio", "enable_crowd_tracks", autoApply = True), #akedrou: I don't like this here, but "audio" menu is empty of choices.
-      ConfigChoice(engine.config, "coffee", "failingEnabled", autoApply = True),
+      
       ConfigChoice(engine.config, "game",  "uploadscores", autoApply = True),
     ]
     FoFiXBasicSettingsMenu = Menu.Menu(engine, FoFiXBasicSettings)
@@ -490,7 +489,6 @@ class SettingsMenu(Menu.Menu):
     
     AdvancedAudioSettings = [
        ConfigChoice(engine.config, "audio",  "delay", autoApply = True),     #myfingershurt: so a/v delay can be set without restarting FoF
-       ConfigChoice(engine.config, "audio",  "slow_down_divisor", autoApply = True),     #MFH
        ConfigChoice(engine.config, "audio",  "whammy_effect", autoApply = True),     #MFH
        ConfigChoice(engine.config, "audio",  "frequency"),
        ConfigChoice(engine.config, "audio",  "bits"),
@@ -600,6 +598,13 @@ class SettingsMenu(Menu.Menu):
     ]
     AdvancedSettingsMenu = Menu.Menu(engine, AdvancedSettings)
     
+    Cheats = [
+      (_("Jurgen Settings"), JurgenSettingsMenu),
+      ConfigChoice(engine.config, "coffee", "failingEnabled", autoApply = True),
+      ConfigChoice(engine.config, "audio",  "slow_down_divisor", autoApply = True),     #MFH
+    ]
+    CheatMenu = Menu.Menu(engine, Cheats)
+    
     settings = [
       (_(engine.versionString+_(" Basic Settings")),   FoFiXBasicSettingsMenu),
       (_("Controls"),          keySettingsMenu),
@@ -609,6 +614,7 @@ class SettingsMenu(Menu.Menu):
       (_("Performances/Debug"), perfSettingsMenu),
       (_("Advanced Settings"), AdvancedSettingsMenu),
       (_("Mod settings"), modSettings),
+      (_("Cheats"), CheatMenu),
       (_("Credits"), lambda: Dialogs.showCredits(engine)), # evilynux - Show Credits!
       (_("Apply New Settings"), self.applySettings)
     ]
