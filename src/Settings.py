@@ -225,7 +225,7 @@ class SettingsMenu(Menu.Menu):
     LyricsSettingsMenu = Menu.Menu(engine, LyricsSettings)
     
     JurgenSettings = [
-       ConfigChoice(engine.config, "game", "jurgdef", autoApply = True),#Spikehead777
+       ConfigChoice(engine.config, "game", "jurgmode", autoApply = True),#Spikehead777
        ConfigChoice(engine.config, "game", "jurgtype", autoApply = True),#Spikehead777
        ConfigChoice(engine.config, "game", "jurglogic", autoApply = True),#MFH
        ConfigChoice(engine.config, "game", "jurgtext", autoApply = True),#hman
@@ -712,8 +712,18 @@ class GameSettingsMenu(Menu.Menu):
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("GameSettingsMenu class init (Settings.py)...")
-
+    
+    Cheats = [
+      ConfigChoice(engine.config, "game", "jurgmode", autoApply = True),#Jurgen config -- Spikehead777
+      ConfigChoice(engine.config, "game", "jurgtype", autoApply = True),#Jurgen controls -- Spikehead777
+      ConfigChoice(engine.config, "game", "jurglogic", autoApply = True),#MFH
+      ConfigChoice(engine.config, "coffee", "failingEnabled", autoApply = True),
+      ConfigChoice(engine.config, "audio",  "slow_down_divisor", autoApply = True),     #MFH
+    ]
+    CheatMenu = Menu.Menu(engine, Cheats, pos = (.3, .31), viewSize = 5, textColor = gTextColor, selectedColor = gSelectedColor)
+    
     settings = [
+      (_("Cheats"), CheatMenu),
       VolumeConfigChoice(engine, engine.config, "audio",  "guitarvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "songvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "rhythmvol", autoApply = True),
@@ -725,9 +735,6 @@ class GameSettingsMenu(Menu.Menu):
       VolumeConfigChoice(engine, engine.config, "audio",  "SFX_volume", autoApply = True), #MFH
       ConfigChoice(engine.config, "audio", "enable_crowd_tracks", autoApply = True), #akedrou
       ConfigChoice(engine.config, "audio",  "delay", autoApply = True),   #myfingershurt: so the a/v delay can be adjusted in-game
-      ConfigChoice(engine.config, "game", "jurgdef", autoApply = True),#Jurgen config -- Spikehead777
-      ConfigChoice(engine.config, "game", "jurgtype", autoApply = True),#Jurgen controls -- Spikehead777
-      ConfigChoice(engine.config, "game", "jurglogic", autoApply = True),#MFH
       ConfigChoice(engine.config, "game", "stage_rotate_delay", autoApply = True),   #myfingershurt - user defined stage rotate delay
       ConfigChoice(engine.config, "game", "stage_animate_delay", autoApply = True),   #myfingershurt - user defined stage rotate delay
       ConfigChoice(engine.config, "player0",  "leftymode", autoApply = True),

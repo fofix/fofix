@@ -205,7 +205,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.timeLeft = None
     self.processedFirstNoteYet = False
     
-    self.autoPlay         = self.engine.config.get("game", "jurgdef")
+    self.autoPlay         = self.engine.config.get("game", "jurgmode")
     
     self.jurgPlayer       = [False for i in self.playerList]
 
@@ -899,7 +899,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     #MFH - no Jurgen in Career mode or tutorial mode or practice mode:
     if self.careerMode or self.tut or self.playerList[0].practiceMode:
-      self.autoPlay = False
+      self.autoPlay = 1
 
     
     self.rockFailUp  = True #akedrou - fading mech
@@ -1764,9 +1764,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     #MFH - no Jurgen in Career mode.
     if self.careerMode:
-      self.autoPlay = False
+      self.autoPlay = 1
     else:
-      self.autoPlay         = self.engine.config.get("game", "jurgdef")
+      self.autoPlay         = self.engine.config.get("game", "jurgmode")
 
     self.hopoStyle        = self.engine.config.get("game", "hopo_style")
     self.hopoAfterChord = self.engine.config.get("game", "hopo_after_chord")
@@ -2262,7 +2262,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             elif self.guitarSoloAccuracyDisplayPos == 3:  #racer: rock band 
               if self.hitAccuracyPos == 0: #Center - need to move solo text above this!
                 self.solo_yOffset[i] = 0.100    #above Jurgen Is Here
-              elif self.jurgPlayer[i] and self.autoPlay:
+              elif self.jurgPlayer[i] and self.autoPlay != 1:
                 self.solo_yOffset[i] = 0.140    #above Jurgen Is Here
               else:   #no jurgens here:
                 self.solo_yOffset[i] = 0.175    #was 0.210, occluded notes
@@ -2565,7 +2565,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #chordFudge = 1   #MFH - was 10 - #myfingershurt - needed to detect chords
     chordFudge = self.song.track[0].chordFudge
     
-    if self.autoPlay:
+    if self.autoPlay != 1:
       for i,guitar in enumerate(self.guitars):
   
         #Allow Jurgen per player...Spikehead777
@@ -2582,16 +2582,19 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           changed = False
           held = 0
           for n, k in enumerate(self.keysList[i]):
-            if n in notes and not self.controls.getState(k):
-              changed = True
-              self.controls.toggle(k, True)
-              self.keyPressed3(None, 0, k)  #mfh
-            elif not n in notes and self.controls.getState(k):
-              changed = True
-              self.controls.toggle(k, False)
-              self.keyReleased3(k)    #mfh
-            if self.controls.getState(k):
-              held += 1
+            if self.autoPlay == 0 or (k == 1024 and self.autoPlay == 2) or ((k == 1024 or k == 512) and self.autoPlay == 3):
+              if n in notes and not self.controls.getState(k):
+                changed = True
+                self.controls.toggle(k, True)
+                Log.debug(k)
+                self.keyPressed3(None, 0, k)  #mfh
+              elif not n in notes and self.controls.getState(k):
+                changed = True
+                self.controls.toggle(k, False)
+                self.keyReleased3(k)    #mfh
+              if self.controls.getState(k):
+                held += 1
+            
           #if changed and held and not self.playerList[i].part.text == "Drums":  #dont need the extra pick for drums
           if changed and held and not guitar.isDrum:  #dont need the extra pick for drums
             #myfingershurt:
@@ -2612,16 +2615,17 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           held = 0
   
           for n, k in enumerate(self.keysList[i]):
-            if n in jurgStrumNotes and not self.controls.getState(k):
-              changed = True
-              self.controls.toggle(k, True)
-              self.keyPressed(None, 0, k)  #mfh
-            elif not n in jurgStrumNotes and self.controls.getState(k):
-              changed = True
-              self.controls.toggle(k, False)
-              self.keyReleased(k)    #mfh
-            if self.controls.getState(k):
-              held += 1
+            if self.autoPlay == 0 or (k == 1024 and self.autoPlay == 2) or ((k == 1024 or k == 512) and self.autoPlay == 3):
+              if n in jurgStrumNotes and not self.controls.getState(k):
+                changed = True
+                self.controls.toggle(k, True)
+                self.keyPressed(None, 0, k)  #mfh
+              elif not n in jurgStrumNotes and self.controls.getState(k):
+                changed = True
+                self.controls.toggle(k, False)
+                self.keyReleased(k)    #mfh
+              if self.controls.getState(k):
+                held += 1
           #if changed and held and not self.playerList[i].part.text == "Drums":  #dont need the extra pick for drums
           if changed and held and not guitar.isDrum:  #dont need the extra pick for drums
             #myfingershurt:
@@ -2643,16 +2647,17 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           held = 0
   
           for n, k in enumerate(self.keysList[i]):
-            if n in jurgStrumNotes and not self.controls.getState(k):
-              changed = True
-              self.controls.toggle(k, True)
-              self.keyPressed(None, 0, k)  #mfh
-            elif not n in jurgStrumNotes and self.controls.getState(k):
-              changed = True
-              self.controls.toggle(k, False)
-              self.keyReleased(k)    #mfh
-            if self.controls.getState(k):
-              held += 1
+            if self.autoPlay == 0 or (k == 1024 and self.autoPlay == 2) or ((k == 1024 or k == 512) and self.autoPlay == 3):
+              if n in jurgStrumNotes and not self.controls.getState(k):
+                changed = True
+                self.controls.toggle(k, True)
+                self.keyPressed(None, 0, k)  #mfh
+              elif not n in jurgStrumNotes and self.controls.getState(k):
+                changed = True
+                self.controls.toggle(k, False)
+                self.keyReleased(k)    #mfh
+              if self.controls.getState(k):
+                held += 1
           #if changed and held and not self.playerList[i].part.text == "Drums":  #dont need the extra pick for drums
           if changed and held and not guitar.isDrum:  #dont need the extra pick for drums
             #myfingershurt:
@@ -2679,24 +2684,26 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           if not notes or jurgStrumTime <= (pos + 30):
   
             for n, k in enumerate(self.keysList[i]):
-              if n in jurgStrumNotes and not self.controls.getState(k):
-                changed = True
-                self.controls.toggle(k, True)
-                self.keyPressed(None, 0, k)  #mfh
-              elif not n in jurgStrumNotes and self.controls.getState(k):
-                changed = True
-                self.controls.toggle(k, False)
-                self.keyReleased(k)    #mfh
-              if self.controls.getState(k):
-                held += 1
+              if self.autoPlay == 0 or (k == 1024 and self.autoPlay == 2) or ((k == 1024 or k == 512) and self.autoPlay == 3):
+                if n in jurgStrumNotes and not self.controls.getState(k):
+                  changed = True
+                  self.controls.toggle(k, True)
+                  self.keyPressed(None, 0, k)  #mfh
+                elif not n in jurgStrumNotes and self.controls.getState(k):
+                  changed = True
+                  self.controls.toggle(k, False)
+                  self.keyReleased(k)    #mfh
+                if self.controls.getState(k):
+                  held += 1
             #if changed and held and not self.playerList[i].part.text == "Drums":  #dont need the extra pick for drums
             if changed and held and not guitar.isDrum:  #dont need the extra pick for drums
               #myfingershurt:
               self.handlePick(i)
             #MFH - release all frets - who cares about held notes, I want a test player (actually if no keyReleased call, will hold notes fine)
             for n, k in enumerate(self.keysList[i]):
-              if self.controls.getState(k):
-                self.controls.toggle(k, False)
+              if self.autoPlay == 0 or (k == 1024 and self.autoPlay == 2) or ((k == 1024 or k == 512) and self.autoPlay == 3):
+                if self.controls.getState(k):
+                  self.controls.toggle(k, False)
   
 
   def rockmeterDecrease(self, playerNum):
@@ -5304,7 +5311,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         
           #Show Jurgen played Spikehead777
           if self.jurgPlayer[i] == True:
-            if self.autoPlay:
+            if self.autoPlay != 1:
               if self.jurg == i or self.jurg == 2: #or whatever the "all/both players" is
                 text = self.tsJurgenIsHere
               else:
@@ -8097,7 +8104,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 xOffset = 0.950
                 if self.hitAccuracyPos == 0: #Center - need to move solo review above this!
                   yOffset = 0.080
-                elif self.jurgPlayer[i] and self.autoPlay:
+                elif self.jurgPlayer[i] and self.autoPlay != 1:
                   yOffset = 0.115    #above Jurgen Is Here
                 else:   #no jurgens here:
                   yOffset = 0.155   #was 0.180, occluded notes

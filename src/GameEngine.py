@@ -277,7 +277,8 @@ Config.define("performance",   "disable_libcount",    bool,  True,  text = _("Di
 Config.define("performance",   "disable_librotation", bool,  True,  text = _("Disable Library Rotation"),    options = {False: _("No"), True: _("Yes")})
 
 #Spikehead777
-Config.define("game",   "jurgdef",             bool,  False,  text = _("Enable Jurgen"),    options = {False: _("No"), True: _("Yes")})
+#Config.define("game",   "jurgdef",             bool,  False,  text = _("Enable Jurgen"),    options = {False: _("No"), True: _("Yes")})
+Config.define("game",   "jurgmode",             int,   1,      text = _("Enable Jurgen"),    options = {0: _("Yes"), 1: _("No"), 2: _("Medium Assist"), 3: _("Easy Assist")})
 Config.define("game",   "jurgtype",            int,   2,      text = _("Jurgen Player"), options = {0: _("1"), 1: _("2"), 2: _("Both")}  )
 #MFH
 Config.define("game",   "jurglogic",            int,   1,      text = _("Jurgen Logic"), options = {0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}  )
@@ -340,6 +341,7 @@ Config.define("game", "songlist_difficulty", int, 0, text = _("Show Difficulty")
 Config.define("game", "songlist_extra_stats", bool, True, text = _("Display hit% and note streak"), options = {True: _("Yes"), False: _("No")} )
 
 Config.define("game", "songlist_instrument", int, 0, text = _("Show Instrument"), options = {0: "Guitar", 1: "Rhythm Guitar", 2: "Bass Guitar", 3: "Lead Guitar", 4: "Drums"}  )  #MFH
+
 
 
 class FullScreenSwitcher(KeyListener):
