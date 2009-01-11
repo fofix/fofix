@@ -2963,16 +2963,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           # done playing the current notes
           self.endPick(i)
 
-        missedNotes = guitar.getMissedNotesMFH(self.song, pos)
-
-        #MFH - TODO - ensure this missed notes check doesn't fail you during a freestyle section
+        #MFH - ensure this missed notes check doesn't fail you during a freestyle section
         if guitar.freestyleActive or guitar.drumFillsActive:  
-        
-          for tym, theNote in missedNotes:
-            theNote.skipped = True
-        
+          missedNotes = guitar.getMissedNotesMFH(self.song, pos + guitar.lateMargin)  #MFH - get all notes in the freestyle section.
+          if missedNotes:
+            for tym, theNote in missedNotes:
+              theNote.skipped = True
         else:
-
+          missedNotes = guitar.getMissedNotesMFH(self.song, pos)
           if missedNotes:
             if guitar.isDrum:
               self.drumStart = True
@@ -2984,6 +2982,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 self.starNotesMissed[i] = True
                 if self.unisonActive:
                   self.inUnison[i] = False
+
           
           if (self.playerList[i].streak != 0 or not self.processedFirstNoteYet) and not guitar.playedNotes and len(missedNotes) > 0:
             if not self.processedFirstNoteYet:

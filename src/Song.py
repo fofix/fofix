@@ -2926,7 +2926,7 @@ class MidiReader(midi.MidiOutStream):
           event = TextEvent(text, 250.0)
           if text.lower().find("big rock ending") >= 0:
             curTime = self.abs_time()
-            Log.debug("Big Rock Ending section event marker found at " + curTime)
+            Log.debug("Big Rock Ending section event marker found at " + str(curTime) )
             self.song.breMarkerTime = curTime
         
           if text.lower().find("solo") >= 0 and text.lower().find("drum") < 0 and text.lower().find("outro") < 0 and text.lower().find("organ") < 0 and text.lower().find("synth") < 0 and text.lower().find("bass") < 0 and text.lower().find("harmonica") < 0:

@@ -119,6 +119,9 @@ class Drum:
     self.freestyleReady = False
     self.freestyleOffset = 5
 
+    self.drumFillOnScreen = False   #MFH 
+    self.drumFillEvent = None
+
     self.accThresholdWorstLate = 0
     self.accThresholdVeryLate = 0
     self.accThresholdLate = 0
@@ -619,10 +622,14 @@ class Drum:
     if self.freestyleEnabled:
       freestyleActive = False
       self.drumFillsActive = False
+      drumFillOnScreen = False
+      drumFillEvent = None
       #for time, event in track.getEvents(boardWindowMin, boardWindowMax):
       for time, event in track.getEvents(pos - self.freestyleOffset, boardWindowMax + self.freestyleOffset):
         if isinstance(event, Song.MarkerNote):
-          if event.number == Song.freestyleMarkingNote:
+          if event.number == Song.freestyleMarkingNote and not event.happened:
+            drumFillOnScreen = True
+            drumFillEvent = event
             length     = (event.length - 50) / self.currentPeriod / beatsPerUnit
             w = self.boardWidth / self.strings
             self.freestyleLength = event.length #volshebnyi
@@ -643,9 +650,10 @@ class Drum:
             	self.drumFillsHits = -1
             if self.starPower>=50 and not self.starPowerActive:
               self.drumFillsReady = True
+                
             else:
               self.drumFillsReady = False
-            if (self.drumFillsCount == self.drumFillsTotal and time+event.length>pos) or (time > pos and self.drumFillsCount == self.drumFillsTotal-1):
+            if self.bigRockEndingMarkerSeen: # and ( (self.drumFillsCount == self.drumFillsTotal and time+event.length>pos) or (time > pos and self.drumFillsCount == self.drumFillsTotal-1) ):
               self.freestyleReady = True
             else:
               self.freestyleReady = False
@@ -698,6 +706,8 @@ class Drum:
               glPopMatrix()
               
       self.freestyleActive = freestyleActive
+      self.drumFillOnScreen = drumFillOnScreen
+      self.drumFillEvent = drumFillEvent
     
 
   def renderIncomingNeck(self, visibility, song, pos, time, neckTexture):   #MFH - attempt to "scroll" an incoming guitar solo neck towards the player
@@ -1596,6 +1606,8 @@ class Drum:
               self.starPower = 100
             self.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
             self.starPowerGained = True
+            if self.drumFillOnScreen:   #MFH - if there's a drum fill on the screen right now, skip it!
+              self.drumFillEvent.happened = True
 
       #if enable:
       #  self.spEnabled = True
