@@ -475,6 +475,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       Dialogs.showMessage(self.engine, "Pitchbend module not found!  Forcing Killswitch effect.")
       self.whammyEffect = 0
     self.bigRockEndings = self.engine.config.get("game", "big_rock_endings")
+    self.showFreestyleActive = self.engine.config.get("debug",   "show_freestyle_active")
     
 
 
@@ -736,20 +737,20 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.playerList[i].totalStreakNotes = len([1 for time, event in self.song.track[i].getAllEvents() if isinstance(event, Note)])
       else:
         self.playerList[i].totalStreakNotes = len(set(time for time, event in self.song.track[i].getAllEvents() if isinstance(event, Note)))
-	
+
       #volshebnyi - don't count notes in BRE zones if BRE active
       if guitar.freestyleEnabled:
-	      self.playerList[i].freestyleSkippedNotes = 0
-	      for time, event in self.song.midiEventTrack[i].getAllEvents():
-	       	if isinstance(event, Song.MarkerNote) and not event.endMarker:
-	        	if (event.number == Song.freestyleMarkingNote):
-	        		if guitar.isDrum:
-	        			guitar.drumFillsTotal += 1
-	        		else:
-                       		  for freestyleTime, event1 in self.song.track[i].getEvents(time, time + event.length):
-                       		    if isinstance(event1, Note):
-                       		      self.playerList[i].freestyleSkippedNotes += 1
-        	
+        self.playerList[i].freestyleSkippedNotes = 0
+        for time, event in self.song.midiEventTrack[i].getAllEvents():
+          if isinstance(event, Song.MarkerNote) and not event.endMarker:
+              if (event.number == Song.freestyleMarkingNote):
+                if guitar.isDrum:
+                    guitar.drumFillsTotal += 1
+                else:
+                  for freestyleTime, event1 in self.song.track[i].getEvents(time, time + event.length):
+                    if isinstance(event1, Note):
+                      self.playerList[i].freestyleSkippedNotes += 1
+
       self.playerList[i].totalStreakNotes -= self.playerList[i].freestyleSkippedNotes
 
       self.playerList[i].totalNotes = len([1 for Ntime, event in self.song.track[i].getAllEvents() if isinstance(event, Note)])
@@ -8219,7 +8220,17 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   w, h = font.getStringSize(text,killTsize)
                   font.render(text, (killXpos - w / 2, killYpos),(1, 0, 0),killTsize)     #off to the right slightly above fretboard
             glColor3f(1, 1, 1)  #whitey reset (cracka cracka)
-          
+
+            #MFH - TODO - freestyle active status debug display
+            if self.showFreestyleActive == 1 and not self.pause and not self.failed:    #MFH - shows when freestyle is active
+              if self.guitars[i].isDrum:    #also show the active status of drum fills
+                text = "BRE: %s, Fill: %s" % ( str(self.guitars[i].freestyleActive), str(self.guitars[i].drumFillsActive) )
+              else:
+                text = "BRE: %s" % str(self.guitars[i].freestyleActive)
+              freeX = .650
+              freeY = .510
+              freeTsize = 0.00150
+              font.render(text, (freeX, freeY),(1, 0, 0),freeTsize)
     
             #myfingershurt: lyrical display conditional logic:
             # show the comments (lyrics)

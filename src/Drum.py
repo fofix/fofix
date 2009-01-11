@@ -596,7 +596,7 @@ class Drum:
     self.scoreMultiplier = multiplier
     
     
-  #volshebnyi - TODO - find a mistake with starpower activation
+  #volshebnyi
   def renderFreestyleLanes(self, visibility, song, pos, controls):
     if not song:
       return
@@ -677,7 +677,7 @@ class Drum:
                 glPopMatrix()
                  
             
-            if self.drumFillsActive and z + length<self.boardLength:
+            if ( self.drumFillsActive and self.drumFillsHits >= 4 and z + length<self.boardLength ):
               glPushMatrix()
               color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1.0 * visibility * f)
               glTranslatef(x, 0.0, z + length)
@@ -1152,7 +1152,17 @@ class Drum:
     zsize = .25  
     size = (.15, s - zsize)
     
-    if self.freestyleActive or (self.drumFillsActive and self.drumFillsHits >= 4):
+    if self.drumFillsActive:
+      if self.drumFillsHits >= 4:
+        size = (.30, s - zsize)
+      if self.drumFillsHits >= 3:
+        size = (.25, s - zsize)
+      elif self.drumFillsHits >= 2:
+        size = (.21, s - zsize)
+      elif self.drumFillsHits >= 1:
+        size = (.17, s - zsize)
+    
+    if self.freestyleActive:
     	size = (.30, s - zsize)
        
     

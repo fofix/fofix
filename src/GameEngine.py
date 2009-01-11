@@ -220,6 +220,8 @@ Config.define("game", "big_rock_logic",           int,  2,   text = _("Big Rock 
 
 #MFH - debug settings
 Config.define("debug",   "use_unedited_midis",          int, 1,    text = _("notes-unedited.mid"), options = {0: _("Off"), 1: _("Auto")})
+Config.define("debug",   "show_freestyle_active",          int, 0,    text = _("Show fill status"), options = {0: _("Off"), 1: _("On")})
+
 
 Config.define("audio",  "slow_down_divisor",  int,    1,  text = _("Slowdown"),   options = {1: _("Full Speed"), 2: _("1/2 Speed"), 4: _("1/4 Speed")})  #MFH
 
