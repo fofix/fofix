@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-01-10 22:24-0800\n"
+"POT-Creation-Date: 2009-01-10 23:47-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,7 +56,7 @@ msgstr ""
 #: GameEngine.py:237 GameEngine.py:238 GameEngine.py:239 GameEngine.py:262
 #: GameEngine.py:263 GameEngine.py:271 GameEngine.py:276 GameEngine.py:277
 #: GameEngine.py:280 GameEngine.py:299 GameEngine.py:300 GameEngine.py:301
-#: GameEngine.py:302 GameEngine.py:305 GameEngine.py:335 GameEngine.py:340
+#: GameEngine.py:302 GameEngine.py:305 GameEngine.py:340
 msgid "No"
 msgstr ""
 
@@ -68,8 +68,7 @@ msgstr ""
 #: GameEngine.py:236 GameEngine.py:237 GameEngine.py:238 GameEngine.py:239
 #: GameEngine.py:262 GameEngine.py:263 GameEngine.py:271 GameEngine.py:276
 #: GameEngine.py:277 GameEngine.py:280 GameEngine.py:299 GameEngine.py:300
-#: GameEngine.py:301 GameEngine.py:302 GameEngine.py:305 GameEngine.py:335
-#: GameEngine.py:340
+#: GameEngine.py:301 GameEngine.py:302 GameEngine.py:305 GameEngine.py:340
 msgid "Yes"
 msgstr ""
 
@@ -564,7 +563,8 @@ msgstr ""
 #: GameEngine.py:210 GameEngine.py:211 GameEngine.py:212 GameEngine.py:214
 #: GameEngine.py:216 GameEngine.py:222 GameEngine.py:223 GameEngine.py:244
 #: GameEngine.py:251 GameEngine.py:252 GameEngine.py:253 GameEngine.py:255
-#: GameEngine.py:256 GameEngine.py:259 GameEngine.py:265 Mod.py:34
+#: GameEngine.py:256 GameEngine.py:259 GameEngine.py:265 GameEngine.py:335
+#: Mod.py:34
 msgid "Off"
 msgstr ""
 
@@ -732,7 +732,8 @@ msgstr ""
 #: GameEngine.py:193 GameEngine.py:198 GameEngine.py:201 GameEngine.py:202
 #: GameEngine.py:203 GameEngine.py:207 GameEngine.py:216 GameEngine.py:223
 #: GameEngine.py:244 GameEngine.py:251 GameEngine.py:252 GameEngine.py:253
-#: GameEngine.py:255 GameEngine.py:259 GameEngine.py:265 Mod.py:34
+#: GameEngine.py:255 GameEngine.py:259 GameEngine.py:265 GameEngine.py:335
+#: Mod.py:34
 msgid "On"
 msgstr ""
 
@@ -1688,7 +1689,7 @@ msgid "Speed Percent"
 msgstr ""
 
 #: GameEngine.py:335
-msgid "Failing"
+msgid "No Fail"
 msgstr ""
 
 #: GameEngine.py:339
@@ -1914,15 +1915,15 @@ msgstr ""
 msgid "% Complete"
 msgstr ""
 
-#: GuitarScene.py:330 GuitarScene.py:7928
+#: GuitarScene.py:330 GuitarScene.py:7941
 msgid "HOPO"
 msgstr ""
 
-#: GuitarScene.py:331 GuitarScene.py:7898 GuitarScene.py:7907
+#: GuitarScene.py:331 GuitarScene.py:7911 GuitarScene.py:7920
 msgid "COMPLETED"
 msgstr ""
 
-#: GuitarScene.py:332 GuitarScene.py:7900 GuitarScene.py:7916
+#: GuitarScene.py:332 GuitarScene.py:7913 GuitarScene.py:7929
 msgid " % ON "
 msgstr ""
 
@@ -2178,7 +2179,7 @@ msgstr ""
 msgid " QUIT"
 msgstr ""
 
-#: GuitarScene.py:8412
+#: GuitarScene.py:8425
 #, python-format
 msgid "FPS: %.2f"
 msgstr ""
@@ -2594,7 +2595,7 @@ msgstr ""
 msgid "A key conflict exists somewhere. You should fix it."
 msgstr ""
 
-#: Settings.py:195 Settings.py:613
+#: Settings.py:195 Settings.py:619
 msgid "Apply New Settings"
 msgstr ""
 
@@ -2611,134 +2612,138 @@ msgid "Lyrics Settings"
 msgstr ""
 
 #: Settings.py:241
-msgid "Jurgen Settings"
-msgstr ""
-
-#: Settings.py:242
 msgid "Choose P1 Neck >"
 msgstr ""
 
-#: Settings.py:242 Settings.py:243
+#: Settings.py:241 Settings.py:242
 msgid "Yellow (#3) / Blue (#4) to change:"
 msgstr ""
 
-#: Settings.py:243
+#: Settings.py:242
 msgid "Choose P2 Neck >"
 msgstr ""
 
-#: Settings.py:267 Settings.py:303 Settings.py:429
+#: Settings.py:266 Settings.py:302 Settings.py:428
 msgid "Test Keys"
 msgstr ""
 
-#: Settings.py:423
+#: Settings.py:422
 msgid "Player 1 Keys"
 msgstr ""
 
-#: Settings.py:424
+#: Settings.py:423
 msgid "Player 1 Alt. Keys"
 msgstr ""
 
-#: Settings.py:425
+#: Settings.py:424
 msgid "Player 2 Keys"
 msgstr ""
 
-#: Settings.py:426
+#: Settings.py:425
 msgid "Player 2 Alt. Keys"
 msgstr ""
 
-#: Settings.py:427
+#: Settings.py:426
 msgid "Drum Keys"
 msgstr ""
 
-#: Settings.py:428
+#: Settings.py:427
 msgid "Alt. Drum Keys"
 msgstr ""
 
-#: Settings.py:430
+#: Settings.py:429
 msgid "Advanced Controls"
 msgstr ""
 
-#: Settings.py:449
+#: Settings.py:448
 msgid "Video Resolution"
 msgstr ""
 
-#: Settings.py:457
+#: Settings.py:456
 msgid "Advanced Video Settings"
 msgstr ""
 
-#: Settings.py:511
+#: Settings.py:509
 msgid "Volume Settings"
 msgstr ""
 
-#: Settings.py:512
+#: Settings.py:510
 msgid "Advanced Audio Settings"
 msgstr ""
 
-#: Settings.py:538
+#: Settings.py:536
 msgid "Log Settings"
 msgstr ""
 
-#: Settings.py:557
+#: Settings.py:555
 msgid "Manual Settings (Autoset must be off)"
 msgstr ""
 
-#: Settings.py:558
+#: Settings.py:556
 msgid "Debug Settings"
 msgstr ""
 
-#: Settings.py:563
+#: Settings.py:561
 msgid "Select Song Library >"
 msgstr ""
 
-#: Settings.py:597
+#: Settings.py:595
 msgid "FoFix Advanced Settings"
 msgstr ""
 
-#: Settings.py:598
+#: Settings.py:596
 msgid "Theme Settings"
 msgstr ""
 
-#: Settings.py:599
+#: Settings.py:597
 msgid "Fretboard Settings"
 msgstr ""
 
-#: Settings.py:604
-msgid " Basic Settings"
-msgstr ""
-
-#: Settings.py:605
-msgid "Controls"
-msgstr ""
-
-#: Settings.py:606
-msgid "Library"
-msgstr ""
-
-#: Settings.py:607
-msgid "Audio"
-msgstr ""
-
-#: Settings.py:608
-msgid "Video"
+#: Settings.py:602
+msgid "Jurgen Settings"
 msgstr ""
 
 #: Settings.py:609
-msgid "Performances/Debug"
+msgid " Basic Settings"
 msgstr ""
 
 #: Settings.py:610
-msgid "Advanced Settings"
+msgid "Controls"
 msgstr ""
 
 #: Settings.py:611
-msgid "Mod settings"
+msgid "Library"
 msgstr ""
 
 #: Settings.py:612
+msgid "Audio"
+msgstr ""
+
+#: Settings.py:613
+msgid "Video"
+msgstr ""
+
+#: Settings.py:614
+msgid "Performances/Debug"
+msgstr ""
+
+#: Settings.py:615
+msgid "Advanced Settings"
+msgstr ""
+
+#: Settings.py:616
+msgid "Mod settings"
+msgstr ""
+
+#: Settings.py:617
+msgid "Cheats"
+msgstr ""
+
+#: Settings.py:618
 msgid "Credits"
 msgstr ""
 
-#: Settings.py:696 SongChoosingScene.py:184
+#: Settings.py:702 SongChoosingScene.py:184
 msgid "Choose a new songs directory."
 msgstr ""
 

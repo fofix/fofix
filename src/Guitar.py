@@ -2915,7 +2915,7 @@ class Guitar:
     
     notes   = [(time, event) for time, event in notes if not event.played and not event.hopod and not event.skipped]
 
-    if catchup == True:
+    if catchup:
       for time, event in notes:
         event.skipped = True
       

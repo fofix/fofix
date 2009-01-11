@@ -121,6 +121,7 @@ class Drum:
 
     self.drumFillOnScreen = False   #MFH 
     self.drumFillEvent = None
+    self.drumFillWasJustActive = False
 
     self.accThresholdWorstLate = 0
     self.accThresholdVeryLate = 0
@@ -664,6 +665,7 @@ class Drum:
                 #if self.drumFillsCount <= self.drumFillsTotal and self.drumFillsReady:
                 if self.drumFillsReady:
                 	self.drumFillsActive = True
+                	self.drumFillWasJustActive = True
                 if self.drumFillsHits<0:
                 	self.drumFillsCount += 1
                 	self.drumFillsHits = 0
@@ -2679,37 +2681,40 @@ class Drum:
     return sorted(notes, key=lambda x: x[0])    #MFH - what the hell, this should be sorted by TIME not note number....
 
   def getRequiredNotes(self, song, pos):
-    track   = song.track[self.player]
-    notes = [(time, event) for time, event in track.getEvents(pos - self.lateMargin, pos + self.earlyMargin) if isinstance(event, Note)]
-    notes = [(time, event) for time, event in notes if not event.played]
-    notes = [(time, event) for time, event in notes if (time >= (pos - self.lateMargin)) and (time <= (pos + self.earlyMargin))]
-    if notes:
-      t     = min([time for time, event in notes])
-      notes = [(time, event) for time, event in notes if time - t < 1e-3]
-    return sorted(notes, key=lambda x: x[1].number)
+    return self.getRequiredNotesMFH(song, pos)
+#-    track   = song.track[self.player]
+#-    notes = [(time, event) for time, event in track.getEvents(pos - self.lateMargin, pos + self.earlyMargin) if isinstance(event, Note)]
+#-    notes = [(time, event) for time, event in notes if not event.played]
+#-    notes = [(time, event) for time, event in notes if (time >= (pos - self.lateMargin)) and (time <= (pos + self.earlyMargin))]
+#-    if notes:
+#-      t     = min([time for time, event in notes])
+#-      notes = [(time, event) for time, event in notes if time - t < 1e-3]
+#-    return sorted(notes, key=lambda x: x[1].number)
 
   def getRequiredNotes2(self, song, pos, hopo = False):
+    return self.getRequiredNotesMFH(song, pos)
 
-    track   = song.track[self.player]
-    notes = [(time, event) for time, event in track.getEvents(pos - self.lateMargin, pos + self.earlyMargin) if isinstance(event, Note)]
-    notes = [(time, event) for time, event in notes if not (event.hopod or event.played)]
-    notes = [(time, event) for time, event in notes if (time >= (pos - self.lateMargin)) and (time <= (pos + self.earlyMargin))]
-    if notes:
-      t     = min([time for time, event in notes])
-      notes = [(time, event) for time, event in notes if time - t < 1e-3]
-      
-    return sorted(notes, key=lambda x: x[1].number)
+#-    track   = song.track[self.player]
+#-    notes = [(time, event) for time, event in track.getEvents(pos - self.lateMargin, pos + self.earlyMargin) if isinstance(event, Note)]
+#-    notes = [(time, event) for time, event in notes if not (event.hopod or event.played)]
+#-    notes = [(time, event) for time, event in notes if (time >= (pos - self.lateMargin)) and (time <= (pos + self.earlyMargin))]
+#-    if notes:
+#-      t     = min([time for time, event in notes])
+#-      notes = [(time, event) for time, event in notes if time - t < 1e-3]
+#-      
+#-    return sorted(notes, key=lambda x: x[1].number)
     
 
 
   def getRequiredNotes3(self, song, pos, hopo = False):
+    return self.getRequiredNotesMFH(song, pos)
 
-    track   = song.track[self.player]
-    notes = [(time, event) for time, event in track.getEvents(pos - self.lateMargin, pos + self.earlyMargin) if isinstance(event, Note)]
-    notes = [(time, event) for time, event in notes if not (event.hopod or event.played or event.skipped)]
-    notes = [(time, event) for time, event in notes if (time >= (pos - self.lateMargin)) and (time <= (pos + self.earlyMargin))]
-
-    return sorted(notes, key=lambda x: x[1].number)
+#-    track   = song.track[self.player]
+#-    notes = [(time, event) for time, event in track.getEvents(pos - self.lateMargin, pos + self.earlyMargin) if isinstance(event, Note)]
+#-    notes = [(time, event) for time, event in notes if not (event.hopod or event.played or event.skipped)]
+#-    notes = [(time, event) for time, event in notes if (time >= (pos - self.lateMargin)) and (time <= (pos + self.earlyMargin))]
+#-
+#-    return sorted(notes, key=lambda x: x[1].number)
 
   #MFH - corrected and optimized:
   def getRequiredNotesMFH(self, song, pos):
@@ -2741,9 +2746,9 @@ class Drum:
   def areNotesTappable(self, notes):
     if not notes:
       return
-    for time, note in notes:
-      if note.tappable > 1:
-        return True
+    #for time, note in notes:
+    #  if note.tappable > 1:
+    #    return True
     return False
 
 
@@ -2825,7 +2830,9 @@ class Drum:
     else:
       self.lastFretWasC = False
   
-    self.matchingNotes = self.getRequiredNotes(song, pos)
+    #self.matchingNotes = self.getRequiredNotes(song, pos)
+    self.matchingNotes = self.getRequiredNotesMFH(song, pos)    #MFH - ignore skipped notes please!
+    
 
     # no self.matchingNotes?
     if not self.matchingNotes:

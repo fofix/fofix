@@ -2546,17 +2546,20 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
       #MFH - also must ensure notes that pass during this time are marked as skipped without resetting the streak
       #missedNotes = self.guitars[num].getMissedNotesMFH(self.song, pos, catchup = True)
-      missedNotes = self.guitars[num].getMissedNotesMFH(self.song, pos + guitar.earlyMargin, catchup = True)  #MFh - check slightly ahead here.
-      for tym, theNote in missedNotes:
-        theNote.skipped = True
+      missedNotes = guitar.getMissedNotesMFH(self.song, pos + guitar.earlyMargin, catchup = True)  #MFh - check slightly ahead here.
+      #for tym, theNote in missedNotes:   #MFH - actually, passing catchup = True does this.
+      #  theNote.skipped = True
       
     else:
-      if self.hopoStyle ==  1:   #1 = rf-mod
-        self.doPick3RF(i, hopo)
-      elif self.hopoStyle == 2 or self.hopoStyle == 3 or self.hopoStyle == 4:  #GH2 style HOPO 
-        self.doPick3GH2(i, hopo, pullOff)
-      else:   #2 = no HOPOs
+      if guitar.isDrum:
         self.doPick(i)
+      else:
+        if self.hopoStyle ==  1:   #1 = rf-mod
+          self.doPick3RF(i, hopo)
+        elif self.hopoStyle == 2 or self.hopoStyle == 3 or self.hopoStyle == 4:  #GH2 style HOPO 
+          self.doPick3GH2(i, hopo, pullOff)
+        else:   #2 = no HOPOs
+          self.doPick(i)
 
   def handleJurgen(self, pos):
     #chordFudge = 1   #MFH - was 10 - #myfingershurt - needed to detect chords
@@ -2965,10 +2968,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
         #MFH - ensure this missed notes check doesn't fail you during a freestyle section
         if guitar.freestyleActive or guitar.drumFillsActive:  
-          missedNotes = guitar.getMissedNotesMFH(self.song, pos + guitar.lateMargin)  #MFH - get all notes in the freestyle section.
-          if missedNotes:
-            for tym, theNote in missedNotes:
-              theNote.skipped = True
+          missedNotes = guitar.getMissedNotesMFH(self.song, pos + guitar.lateMargin*2, catchup = True)  #MFH - get all notes in the freestyle section.
+          #if missedNotes:
+          #  for tym, theNote in missedNotes:
+          #    theNote.skipped = True
         else:
           missedNotes = guitar.getMissedNotesMFH(self.song, pos)
           if missedNotes:
@@ -3472,30 +3475,40 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.guitars[num].isStarPhrase = True
         isFirst = False
 
+      #if self.guitars[num].isDrum:
+      #  self.guitars[num].drumFillWasJustActive = False
+
     else:
-      self.song.setInstrumentVolume(0.0, self.playerList[num].part)
-      if self.whammyEffect == 1:    #pitchbend
-        self.song.resetInstrumentPitch(self.playerList[num].part)
-      self.playerList[num].streak = 0
-      self.coOpStreak = 0
-      self.guitars[num].setMultiplier(1)
-      self.currentlyAnimating = False
-      self.stage.triggerMiss(pos)
-      self.guitarSoloBroken[num] = True
+      ApplyPenalty = True
+      if self.guitars[num].isDrum:
+        if self.guitars[num].drumFillWasJustActive:
+          ApplyPenalty = False
+          self.guitars[num].drumFillWasJustActive = False
 
-      self.notesMissed[num] = True #QQstarS:Set [0] to [i]
-
-      isFirst = True
-      noteList = self.guitars[num].matchingNotes
-      for tym, noat in noteList:
-        if (noat.star or noat.finalStar) and isFirst:
-          self.starNotesMissed[num] = True
-        isFirst = False
-
-      self.screwUp(num) #MFH - call screw-up sound handling function
-
-      #myfingershurt: ensure accuracy display off when miss
-      self.dispAccuracy[num] = False
+      if ApplyPenalty:
+        self.song.setInstrumentVolume(0.0, self.playerList[num].part)
+        if self.whammyEffect == 1:    #pitchbend
+          self.song.resetInstrumentPitch(self.playerList[num].part)
+        self.playerList[num].streak = 0
+        self.coOpStreak = 0
+        self.guitars[num].setMultiplier(1)
+        self.currentlyAnimating = False
+        self.stage.triggerMiss(pos)
+        self.guitarSoloBroken[num] = True
+  
+        self.notesMissed[num] = True #QQstarS:Set [0] to [i]
+  
+        isFirst = True
+        noteList = self.guitars[num].matchingNotes
+        for tym, noat in noteList:
+          if (noat.star or noat.finalStar) and isFirst:
+            self.starNotesMissed[num] = True
+          isFirst = False
+  
+        self.screwUp(num) #MFH - call screw-up sound handling function
+  
+        #myfingershurt: ensure accuracy display off when miss
+        self.dispAccuracy[num] = False
 
     #myfingershurt: bass drum sound play
     if self.guitars[num].isDrum and self.bassKickSoundEnabled:
