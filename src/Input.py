@@ -38,13 +38,13 @@ except ImportError:
   haveMidi = False
 
 
-haveMidi = False  #this line disables the rtmidi module for computers with 0 midi ports...has to be this way for now to avoid crashes.
+#haveMidi = False  #this line disables the rtmidi module for computers with 0 midi ports...has to be this way for now to avoid crashes.
 
 if haveMidi:
   try:
     midiin = rtmidi.RtMidiIn()
     portCount = midiin.getPortCount()
-    Log.debug("MIDI port count = " + str(portCount) )
+    #Log.debug("MIDI port count = " + str(portCount) )
     if portCount > 0:
       ports = range(portCount)
       for x in ports:
