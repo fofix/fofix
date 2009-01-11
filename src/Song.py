@@ -2254,6 +2254,7 @@ class Song(object):
 
     self.midiEventTracks   = [[Track(self.engine) for t in range(len(difficulties))] for i in range(len(partlist))]
 
+    self.breMarkerTime = None
 
     self.music = None
 
@@ -2923,6 +2924,11 @@ class MidiReader(midi.MidiOutStream):
           text = text.replace("gtr","Guitar")
           #event = TextEvent("SEC: " + text, 250.0)
           event = TextEvent(text, 250.0)
+          if text.lower().find("big rock ending") >= 0:
+            curTime = self.abs_time()
+            Log.debug("Big Rock Ending section event marker found at " + curTime)
+            self.song.breMarkerTime = curTime
+        
           if text.lower().find("solo") >= 0 and text.lower().find("drum") < 0 and text.lower().find("outro") < 0 and text.lower().find("organ") < 0 and text.lower().find("synth") < 0 and text.lower().find("bass") < 0 and text.lower().find("harmonica") < 0:
             gSoloEvent = True
             gSolo = True

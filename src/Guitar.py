@@ -79,6 +79,10 @@ class Guitar:
 
     self.freestyleActive = False
     
+    self.drumFillsActive = False
+    
+    self.bigRockEndingMarkerSeen = False
+    
     # Volshebnyi - BRE scoring variables
     self.freestyleEnabled = False
     self.freestyleStart = 0

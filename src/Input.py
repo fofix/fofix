@@ -26,17 +26,32 @@ import pygame
 import Log
 import Audio
 
+
+ports = None
+midi = []
+midiin = None
+portCount = 0
 try:
   import rtmidi
-  midiin = rtmidi.RtMidiIn()
-  ports = range(midiin.getPortCount())
-  midi = []
-  for x in ports:
-    midi.append( rtmidi.RtMidiIn() )
   haveMidi = True
 except ImportError:
-  ports = None
   haveMidi = False
+
+
+haveMidi = False  #this line disables the rtmidi module for computers with 0 midi ports...has to be this way for now to avoid crashes.
+
+if haveMidi:
+  try:
+    midiin = rtmidi.RtMidiIn()
+    portCount = midiin.getPortCount()
+    Log.debug("MIDI port count = " + str(portCount) )
+    if portCount > 0:
+      ports = range(portCount)
+      for x in ports:
+        midi.append( rtmidi.RtMidiIn() )
+  except Exception, e:
+    Log.error(str(e))
+    ports = None
 
 
 from Task import Task
@@ -120,8 +135,7 @@ class Input(Task):
     self.getSystemKeyName = pygame.key.name
     pygame.key.name       = self.getKeyName
 
-    global ports
-    if haveMidi == True:
+    if haveMidi:
       if ports:
         Log.debug("%d MIDI inputs found." % (len(ports)))
         for i in ports:
@@ -232,7 +246,6 @@ class Input(Task):
     return self.getSystemKeyName(id)
 
   def run(self, ticks):
-    global ports
     pygame.event.pump()
     for event in pygame.event.get():
       if event.type == pygame.KEYDOWN:

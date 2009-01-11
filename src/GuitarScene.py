@@ -1901,6 +1901,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     for playaNum, thePlayer in enumerate(self.playerList): 
       thePlayer.stars = 0
       self.guitars[playaNum].spEnabled = True
+      self.guitars[playaNum].bigRockEndingMarkerSeen = False
     self.partialStar = [0 for i in self.playerList]
     self.resetStarThresholds()
     self.crowdsCheering = False #akedrou
@@ -2965,7 +2966,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         missedNotes = guitar.getMissedNotesMFH(self.song, pos)
 
         #MFH - TODO - ensure this missed notes check doesn't fail you during a freestyle section
-        if guitar.freestyleActive:
+        if guitar.freestyleActive or guitar.drumFillsActive:  
         
           for tym, theNote in missedNotes:
             theNote.skipped = True

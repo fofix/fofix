@@ -84,6 +84,7 @@ class Drum:
 
     self.matchingNotes = None
 
+    self.bigRockEndingMarkerSeen = False
 
 
 
@@ -601,6 +602,15 @@ class Drum:
     if not song:
       return
 
+    #MFH - check for [section big_rock_ending] to set a flag to determine how to treat the last drum fill marker note:
+    #for time, event in song.eventTracks[Song.TK_SECTIONS].getEvents(pos - self.lateMargin*2, pos):
+    #  if event.text.find("big rock ending") > 0:
+    if song.breMarkerTime and pos > song.breMarkerTime:
+      self.bigRockEndingMarkerSeen = True
+          
+          
+
+
     #boardWindowMin = pos - self.currentPeriod * 2
     boardWindowMax = pos + self.currentPeriod * self.beatsPerBoard
     track = song.midiEventTrack[self.player]
@@ -639,14 +649,17 @@ class Drum:
               self.freestyleReady = True
             else:
               self.freestyleReady = False
-            if time < pos: 
-              if self.drumFillsCount < self.drumFillsTotal and self.drumFillsReady:
-              	self.drumFillsActive = True
-              if self.drumFillsHits<0:
-              	self.drumFillsCount += 1
-              	self.drumFillsHits = 0
-              if self.drumFillsCount == self.drumFillsTotal:
+            if time < pos:
+              if self.bigRockEndingMarkerSeen:  # and self.drumFillsCount == self.drumFillsTotal:
               	freestyleActive = True
+              else:
+                #if self.drumFillsCount <= self.drumFillsTotal and self.drumFillsReady:
+                if self.drumFillsReady:
+                	self.drumFillsActive = True
+                if self.drumFillsHits<0:
+                	self.drumFillsCount += 1
+                	self.drumFillsHits = 0
+
               if z < -1.5:
               	length += z +1.5
               	z =  -1.5
