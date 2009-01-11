@@ -55,7 +55,7 @@ Versions are likely important. Don't substitute one for the other without trying
 *Or w/o Amanith files (Not needed anymore after version 3.030+. Also 10Mb Less in size)* [http://www.mediafire.com/download.php?mmz3zjqkohm]
 
 *Additional, optional modules currently in use with the latest Alpha version:*
-  * [http://trac2.assembla.com/pkaudio/wiki/pyrtmidi pyRtMidi] - for MIDI instruments to be used as controller inputs
+  * [http://trac2.assembla.com/pkaudio/wiki/pyrtmidi pyRtMidi] - for MIDI instruments to be used as controller inputs.  [http://www.mediafire.com/download.php?mhnaz1ncyly Here] is a direct download link to an installer that js put together for Python 2.4.
   * [http://www.mediafire.com/stump jsPitchBend] - for a whammy pitchbend effect (source: [https://svn.stump.jstump.com/svnroot/pitchbend/trunk SVN Checkout], [https://svn.stump.jstump.com/websvn WebSVN]).  At least revision 7 or release 0.1 is needed for the effect to work.  ([http://www.mediafire.com/?3mgtxhagijt direct download of latest release])
   * [http://www.pysqlite.org/ PySQLite] is needed for metadata caching, which can speed up loading of large song folders.  ([http://oss.itsystementwicklung.de/download/pysqlite/2.5/2.5.1/pysqlite-2.5.1.win32-py2.4.exe direct download])
 
