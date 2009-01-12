@@ -399,7 +399,7 @@ class GameEngine(Engine):
     self.mainMenu = None    #placeholder for main menu object - to prevent reinstantiation
     
     global version
-    if version == "":   version = " beta 1"     #MFH - beta taggin'
+    if version == "":   version = " beta 2"     #MFH - beta taggin'
 
     self.versionString = "FoFiX v3.100" + version
 
