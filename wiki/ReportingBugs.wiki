@@ -74,12 +74,15 @@ situation to me in a way that I can use to actually attempt to solve the issue:
 == Steps to report a bug or issue ==
 If you want help, use this procedure for your bugreports. If you don't, in most cases you'll simply be ignored, ridiculed, insulted or met with extreme sarcasm and irritation.
 
-  # Create an empty `fretsonfire.ini` in your gamefolder, restart the game, and try playing *WITHOUT CHANGING ANY OF THE DEFAULT SETTINGS*. If the problem persists, continue with the bugreport below. If it works, find the setting that causes a problem and report it in detail. *Also note*, if you are not using a fresh install from one of my full releases (RB only, GH3 only, or 5-theme releases). Chances are, if you tried the manual patch and are having problems, you did something wrong.
-  # In which version did the bug start?
-  # Do you get any information in `FretsOnFire.exe.log`? When available, it's in your game directory. As messages are appended to that file, please first delete that file, restart the game and recreate the bug.
-  # Describe what you're experiencing is happening.
+Create an empty `fretsonfire.ini` in your gamefolder, restart the game, and try playing *WITHOUT CHANGING ANY OF THE DEFAULT SETTINGS*. If the problem persists, continue with the bugreport below. If it works, find the setting that causes a problem and report it in detail. *Also note*, if you are not using a fresh install from one of my full releases (RB only, GH3 only, or 5-theme releases). Chances are, if you tried the manual patch and are having problems, you did something wrong.
+
+Create a new issue report by first clickling on the [http://code.google.com/p/fofix/issues/list Issues tab], then on [http://code.google.com/p/fofix/issues/entry New Issue].
+  # Specify the version in which the bug started.
+  # Verify if you have any information in `FretsOnFire.exe.log`? Messages are appended to that file. Thus, if you have one, please first delete it, restart the game and recreate the bug.
+  # Describe what you're experiencing, what is happening.
   # Describe what you're expecting to happen.
   # If possible, provide describing Screenshot(s) and/or a Video of your problem.
-  # You may want to post the `fretsonfire.ini` file from the game directory so we can see your settings.
-  # You may want to post the `fretsonfire.log` file if you experienced a crash or hang, as this can contain valuable debug information. That file can be found in your game directory.
-  # You may also want to post the `FretsOnFire.exe.log` file. When available, it's in your game directory.
+  # You may want to give a link to..
+   * the `fretsonfire.ini` file from the game directory so we can see your settings.
+   * the `fretsonfire.log` file if you experienced a crash or hang, as this can contain valuable debug information. That file can be found in your game directory.
+   * the `FretsOnFire.exe.log` file. When available, it's in your game directory.

@@ -1,5 +1,124 @@
 #summary Career Mode's titles.ini Instructions
 
-= How to work with Career Mode's {{{titles.ini}}} =
+= How to work with Career Mode's _"titles.ini"_ Files=
+_Credit to Razlo7 for writing these instructions. Wiki Page Done by Worldrave_
 
-_coming soon!_
+
+*HOW TO MAKE YOUR OWN CAREER!*
+
+Simply follow these steps in order-
+
+1. Add "unlock_id = " to each of the song.ini's in the career pack that you want to make.
+
+2. After "unlock_id = ", put an id for the song.(Example- "unlock_id = gh3_1" that would be the id for the songs of gh3's first tier)
+
+3. For the encore song of that tier you would put the id of the tier (gh3_1) then add "enc" to the end. (Example- "unlock_id = gh3_1enc")
+
+
+*NOW THE MOST IMPORTANT PART!!!*
+
+4. To make the encore unlockable, you have to put "unlock_require = " into the song.ini as well (NOTE- If the song doesn't need to be unlocked, then leave that out!) So to make that encore unlockable, you would put the id of the song that needs to be completed to unlock it. The "unlock_require" for the gh3 1st tier encore would be "unlock_require = gh3_1"
+
+5. For each tier, you must change the number in the "unlock_id" after the underscore (_) to the number that the tier will be. (Example::: 2nd tier: "unlock_id = gh3_2", 3rd tier: "unlock_id = gh3_3", etc.)
+
+
+After you've made the "unlock_id"'s and "unlock_require"'s for all of the songs you want in the career pack, you need to make a "titles.ini"
+
+6. BEFORE MAKING A TITLES.INI, make a folder named for the career pack, and put all the songs for the career pack into that folder. (leave the songs in thier own folders)
+
+7. Now you can make a titles.ini in the folder named for the career pack.
+
+
+*HERE'S HOW TO SETUP YOUR _"titles.ini"_*
+
+
+8. In the titles.ini you've created, copy and paste this
+------
+{{{[titles]}}}
+
+{{{[tier1]}}}
+
+{{{[tier2]}}}
+
+{{{[tier3]}}}
+
+{{{[tier4]}}}
+
+----------------
+
+Add as many more tiers as you need, just make sure to leave a blank line between each one, and *ALWAYS MAKE SURE TO LEAVE A WHOLE BLANK LINE AT THE BOTTOM OF THE TITLES.INI!*
+
+9. Under "[titles]" at the top of the titles.ini, put "sections = " after the equals, put the tier1 tier2 tier3 tier4, etc. and leave a space between each one. You only need to add as many tiers as you are going to have in the career pack.
+
+It should look something like this-
+-----------------
+{{{[titles]}}}
+sections = tier1 tier2 tier3 tier4 tier5 tier6 bonus
+
+
+-----------------
+
+10. Now you need to name the tiers of your career pack. Under the tier number ([tier1], [tier2], etc.) put "name = " and add ANYTHING after that. That will become the name of that tier.
+
+11. On the line under "name = ", put "unlock_id = " and put the id that you used for the songs of that tier (Example for tier2, the unlock id would be "unlock_id = gh3_2", just like the id of the song.ini's for tier2 songs.)
+
+
+Finally, you should have your titles.ini looking something like this (when done, also yours will have the id's of whatever your career is.)
+
+----------------------
+{{{
+[titles]
+'sections = tier1 tier2 tier3 tier4 tier5 tier6 bonus'
+}}}
+{{{
+[tier1]
+name = 1. Getting The Band Together (Nipmuc High School)
+unlock_id = gha_1
+}}}
+{{{
+[tier2]
+name = 2. First Taste Of Success (Max's Kansas City)
+unlock_id = gha_2
+}}}
+{{{
+[tier3]
+name = 3. The Triumphant Return (The Orpheum)
+unlock_id = gha_3
+}}}
+{{{
+[tier4]
+name = 4. International Superstars (Moscow)
+unlock_id = gha_4
+}}}
+{{{
+[tier5]
+name = 5. The Great American Band (Half-Time Show)
+unlock_id = gha_5
+}}}
+{{{
+[tier6]
+name = 6. Rock N' Roll Legends (Rock & Roll Hall of Fame)
+unlock_id = gha_6
+}}}
+
+{{{
+[bonus]
+name = Bonus (The Vault)
+unlock_id = gha_7
+
+}}}
+
+-----------------------------
+
+*NOTE*- If you are going to have more than 10 tiers, you *MUST* put a zero in front of single digits for the IDs!!
+
+To order songs within a tier, use a decimal in the unlock_id. So for example, the first song in the 2nd tier for Guitar Hero III (gh3_2) would be unlock_id=gh3_2.1 . The 2nd would be gh3_2.2, and so on. But make sure all the songs are done this way.
+Also, you can make part of the songs in the tier unlocked, then another part, then the
+encore by adding changing those parts into "unlock_id = gh3_1a" or whatever would
+correspond to your career. BUT, You will also have to change the "unlock_require = "
+to the part that needs to be completed.
+
+
+
+
+=GOOD LUCK!!! AND HAPPY CAREER MAKING!!!= 

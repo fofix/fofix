@@ -138,18 +138,42 @@ The original FoF Jurgen Tutorial may be downloaded from mediafire at this URL (i
 ----
 
 === Multiplayer ===
-Multiplayer > Party Mode:
+
+====Multiplayer > Party Mode====
 Looks like a single player mode, but if you'll notice there's
 a countdown (that you can set in the Options menu)...
 the game switches between 1st and 2nd player controls every 30 seconds
 (or however long you set) to play a single track in a song.
-It is the original 2-player mode from a way earlier version.
+It is the original multi-player mode from a way earlier version.
 
-Face-Off is probably the mode you're looking for (separate rock meters and scores)
+Party mode actually was designed to be for as many players as could switch guitars during a given song.  See, the way Party Mode is supposed to work is (if you have more than two players):
 
+  * The first player starts out playing Guitar 1, and the second player is holding Guitar 2 - ready to take over after the countdown.
+  * Then, while player 2 is playing guitar 2, player 1 hands off guitar 1 to player 3, who gets ready to take over after the countdown.
+  * Then, while player 3 is playing guitar 1, player 2 hands off guitar 2 to player 4, who gets ready to take over after the countdown.
+...
+...
+until all players have played (if the song is still going at this point), then player 1 just gets in the rotation again and it starts over.
+
+The Party Mode timer can be adjusted in the basic options, in case 30 seconds is too long or too short for your particular party.
+
+====Co-Op====
+This is probably the mode you're looking for.  Recently added to FoFiX, this is the newest and most popular 2-player mode.  This closely resembles the 2-player cooperative mode found in the original Guitar Hero console game.  
+
+Each player gets their own note streak counter and starpower / overdrive meter, but share a single rockmeter, a single rockmeter arrow, a single combined score, and a single combined star score.  When one player activates starpower / overdrive, only that player's "increases" to the rockmeter benefit from the starpower / overdrive.
+
+At the end of a song, both players' individual scores will be remembered and uploaded to highscore charts as usual (if enabled) - co-op scores currently have no mechanism to be stored or ranked or even categorized for all the different instrument / difficulty combinations.
+
+You can play co-op with Jurgen by enabling him and setting him to player 2 only.  However, only your individual score will be retained and uploaded (if enabled).
+
+====Face-Off====
+This was the first two-player mode, from the old Alarian mod.
+This mode completely duplicates the first player game window for the second player, complete with separate rock meters and scores.  This is considered to be the laggiest mode in the game, as it requires the most resources to operate.
+
+====Pro Face-Off====
 Pro-Face Off is a bit strange, and is tough to keep fair unless both players are playing the same instrument and difficulty.  Each note player 1 hits decreases player 2's rock meter, and vice versa (along with the normal increasing / decreasing of each player's rock meter based on notes hit / missed).  Eventually one player will "make" the other player fail.
 
-You can face Jurgen by enabling him and setting him to player 2 only.
+You can face Jurgen by enabling him and setting him to player 2 only.  Good luck!
 
 ----
 

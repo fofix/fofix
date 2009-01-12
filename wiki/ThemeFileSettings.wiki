@@ -16,13 +16,15 @@ Use any of the settings below the {{{[theme]}}} header:
 
 
 ------------------------------------------------------------------------------------------
-==Loading Phrases and Coordinates==   
+==Loading Phrase Screen==   
 
 ||_*Item Name*_||_*What it Does/How to use it*_||
 ||loading_X = .5||X Position of Phrase positioning on screen. Use a decimal # between 0-1||
 ||loading_Y = .595||Y Position of Phrase positioning on screen. Use a decimal # between 0-1||
 ||loading_phrase = How good are You?||Put an underscore between each phrase for multiple phrases||   
+||loading_text_color = #FFFFFF||Controls the Loading phrase color. Use a hex color||
 ||results_phrase = Jurgen is watching||Put an underscore between each phrase for multiple phrases||
+
 
 Notice - If you just want the default phrases to show do not put these in your theme.ini
 
@@ -33,21 +35,32 @@ Notice - If you just want the default phrases to show do not put these in your t
 ==Song Selection List / CD list== 
 
 ||_*Item Name*_||_*What it Does/How to use it*_||
+||artist_text_color = #4080FF||Use a Hex color code||
+||artist_selected_color = #4080FF||Use a Hex color code||
+||career_title_color = #000000||Use a Hex color code||
+||library_text_color = #FFFFFF||Use a Hex color code||
+||library_selected_color = #FFBF00||Use a Hex color code||
+||opt_text_color = #FFFFFF||Use a Hex color code||
+||opt_selected_color = #FFBF00||Use a Hex color code||
 ||song_cd_x = 0||Can be 0 through 5, values outside this range will be clipped to 0 or 5 to prevent CDs from going off-screen||
 ||song_cdscore_x = .6||Use a decimal # between 0 - 1. IE- .34||
 ||song_list_x = .15||Use a decimal # between 0 - 1. IE- .34||
 ||song_listscore_x = .8||Use a decimal # between 0 - 1. IE- .34||
 ||songback = True||Scrolls the Song Selection Background image. If your image isn't long enough, Use 'SongChooseBack.png' just in case, this image is static||
-||career_title_color = #000000||Use a Hex color code||
-||opt_text_color = #FFFFFF||Use a Hex color code||
-||opt_selected_color = #FFBF00||Use a Hex color code||
 ||song_name_text_color = #FFFFFF||Use a Hex color code||
 ||song_name_selected_color = #FFBF00||Use a Hex color code||
-||artist_text_color = #4080FF||Use a Hex color code||
-||artist_selected_color = #4080FF||Use a Hex color code||
-||library_text_color = #FFFFFF||Use a Hex color code||
-||library_selected_color = #FFBF00||Use a Hex color code||
 ||songlist_score_color = #FFFFFF||Use a Hex color code||
+||song_list_display = 1||Sets the songlist view. Choices are - 0=CD/Cassettes / 1=List / 2=List/CD / 3=RB2 / 4=Auto (_Should not use, you only need to use 0-3_)||
+||song_listcd_cd_x||Controls location of 'CDs' X position in listcd songlist view. Use a decimal # between 0 - 1||
+||song_listcd_cd_y||Controls location of 'CDs' Y position in listcd songlist view. Use a decimal # between 0 - 1||
+||song_listcd_score_x||Controls location of 'SCORE' X position in listcd songlist view. Use a decimal # between 0 - 1||
+||song_listcd_score_y||Controls location of 'SCORE' Y position in listcd songlist view. Use a decimal # between 0 - 1||
+||song_listcd_list_x||Controls location of 'LIST' X position in listcd songlist view. Use a decimal # between 0 - 1||
+||songlistcd_score_color||Controls the scores color for both CD and List/CD mode||
+||song_rb2_name_color||Controls color of the Rock Band name's color. Use a Hex color code||
+||song_rb2_name_selected_color||Controls color of the Rock Band 2 name selected color. Use a Hex color code||
+||song_rb2_diff_color||Controls color of the Rock Band 2 Difficulty level name's color. Use a Hex color code||
+||song_rb2_artist_color||Controls color of the Rock Band 2 artist name's color. Use a Hex color code||
 
 
 
@@ -66,24 +79,38 @@ Notice - If you just want the default phrases to show do not put these in your t
 ==In Game Items==                     
 
 ||_*Item Name*_||_*What it Does/How to use it*_||
-||song_info_display_scale = 0.0020||Controls the size of the song info shown at gameplay countdown||
-||twoDkeys = False||Use 3d keys  = False||
-||twoDnote = False||Use 3d notes = False||
-||Rotating 3d Starnotes||Default is on||
-||threeDspin = False||Turns 3d Starnote spinning off.||
-||spot_color = #EEEEEE||Enter a Hex color here.||
-||hopo_color = #EEEEEE||Enter a Hex color here.||
-||mesh_color = #000000||Enter a Hex color here.||
-||open_color = #FF9933||Enter a Hex color here.||
-||rockmeter_score_color = #93c351||Enter a Hex color here.||
-||ingame_stats_color = #000000||Enter a Hex color here.||
+||crowd_loop_delay = x||x = integer.  Default user setting = 550 for sounds\crowdcheers.ogg)||
+||display_all_grey_stars = True||True - All 5 stars shown at all times. False - Only shows the grey star your currently working on||
 ||fret0_color = #22FF22||Manually sets 1st fret tail color||
 ||fret1_color = #FF2222||Manually sets 2nd fret tail color||
 ||fret2_color = #FFFF22||Manually sets 3rd fret tail color||
 ||fret3_color = #3333FF||Manually sets 4tg fret tail color||
 ||fret4_color = #FF9933||Manually sets 5th fret tail color||
-||crowd_loop_delay = x||x = integer.  Default user setting = 550 for sounds\crowdcheers.ogg)||
-||display_all_grey_stars = True||True - All 5 stars shown at all times. False - Only shows the grey star your currently working on||
+||hopo_color = #EEEEEE||Enter a Hex color here.||
+||hopo_indicator_active_color = #0000FF||Manually sets active color of hopo indicator||
+||hopo_indicator_inactive_color = #FF0000||Manually sets inactive color of hopo indicator||
+||hopo_indicator_x = .950||Manually sets x position of hopo indicator||
+||hopo_indicator_y = .950||Manually sets y position of hopo indicator||
+||ingame_stats_color = #000000||Enter a Hex color here.||
+||mesh_color = #000000||Enter a Hex color here.||
+||opencolor = #FF8000 ||Enter a Hec color here. Sets the Bass drum note color for 3d notes||
+||_*Note for 6 POV items below*_||_*If you have ALL 6 of these settings in your 'theme.ini', AND you are not specifying "rmtype = 3" (for GH:WT rockmeter, which requires special positioning), then "Custom" POV will be forced.*_||
+||pov_target_x = 0.0||Controls Custom POV. -Wiki WIP. {{{Animated image Example - http://img98.imageshack.us/img98/5323/exampledx9.gif}}}||
+||pov_target_y = 0.0||Controls Custom POV. -Wiki WIP. {{{Animated image Example - http://img98.imageshack.us/img98/2541/examplecb3.gif}}}||
+||pov_target_z = 3.7||Controls Custom POV. -Wiki WIP. {{{Animated image Example - http://img140.imageshack.us/img140/323/examplezh4.gif}}}||
+||pov_origin_x = 0.0||Controls Custom POV. -Wiki WIP.   {{{Animated image Example - http://img73.imageshack.us/my.php?image=exampleef7.gif}}}||
+||pov_origin_y = 2.9||Controls Custom POV. -Wiki WIP. {{{Animated image Example - http://img88.imageshack.us/img88/4791/examplepy6.gif}}}||
+||pov_origin_z = -2.9||Controls Custom POV. -Wiki WIP. {{{Animated image Example - http://img140.imageshack.us/img140/4686/examplezv4.gif}}}||
+||rbmenu = true||Turns on replicating the Buttons scrolling up from the bottom at the game intro for Rock Band theme's.||
+||rockmeter_score_color = #93c351||Enter a Hex color here.||
+||Rotating 3d Starnotes||Default is on||
+||song_info_display_scale = 0.0020||Controls the size of the song info shown at gameplay countdown||
+||spot_color = #EEEEEE||Enter a Hex color here.||
+||threeDspin = False||Turns 3d Starnote spinning off.||
+||twoDkeys = False||Use 3d keys  = False||
+||twoDnote = False||Use 3d notes = False||
+
+
 
 
 
@@ -101,24 +128,26 @@ Notice - If you just want the default phrases to show do not put these in your t
 ----------------------------------------------------------------------------
 ==Pause & options menus, backgrounds & text positions==
 ||_*Item Name*_||_*What it Does/How to use it*_||
-||pause_bkg_x = 0||0 starts from the center of the screen||
-||pause_bkg_y = 0||0 starts from the center of the screen||
-||pause_text_x = .3||Controls the Pause Menu text position. Use a Decimal # between 0 - 1, IE- .34||
-||pause_text_y = .31||Use a decimal # between 0 - 1, IE- .34||
+||fail_bkg_x = 0||Controls the fail menu background and text positions||
+||fail_bkg_y = 0||Controls the fail menu background and text positions||
+||fail_completed_color = #FFFFFF ||Controls the Fail/Completed text line color.Use a hex color||
+||fail_selected_color = #FFBF00||Use a Hex color code||
+||fail_text_x =   ||Default is calculated, not constant||
+||fail_text_y = .47||Controls the fail menu background and text positions||
+||fail_text_color = #FFFFFF||Use a Hex color code||
 ||opt_bkg_x = 0||0 starts from the center||
 ||opt_bkg_y = 0||0 starts from the center||
 ||opt_text_x = .38||Controls the Option Menu X text position||
 ||opt_text_y = .15||Controls the Option Menu Y text position||
-||fail_bkg_x = 0||Controls the fail menu background and text positions||
-||fail_bkg_y = 0||Controls the fail menu background and text positions||
-||fail_text_x =   ||Default is calculated, not constant||
-||fail_text_y = .47||Controls the fail menu background and text positions||
-||pause_text_color = #FFFFFF||Use a Hex color code||
+||pause_bkg_x = 0||0 starts from the center of the screen||
+||pause_bkg_y = 0||0 starts from the center of the screen||
 ||pause_selected_color = #FFBF00||Use a Hex color code||
+||pause_text_color = #FFFFFF||Use a Hex color code||
+||pause_text_x = .3||Controls the Pause Menu text position. Use a Decimal # between 0 - 1, IE- .34||
+||pause_text_y = .31||Use a decimal # between 0 - 1, IE- .34||
 ||sub_menu_x = .38||Controls the Difficult Select Screen & Instrument Select X Position||
 ||sub_menu_y = .15||Controls the Difficult Select Screen & Instrument Select Y Position||
-||fail_text_color = #FFFFFF||Use a Hex color code||
-||fail_selected_color = #FFBF00||Use a Hex color code||
+
 
 
 
