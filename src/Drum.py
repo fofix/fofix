@@ -2773,7 +2773,7 @@ class Drum:
         if i == 3:
           if self.engine.data.T3DrumSoundFound:
             self.engine.data.T3DrumSound.play()
-        if i == 4 and self.drumFillsActive and not self.starPowerActive:   #MFH - must actually activate starpower!
+        if i == 4 and self.drumFillsActive and self.drumFillsHits >= 4 and not self.starPowerActive:   #MFH - must actually activate starpower!
           if self.engine.data.CDrumSoundFound:
             self.engine.data.CDrumSound.play()
           drumFillCymbalPos = self.freestyleStart+self.freestyleLength
