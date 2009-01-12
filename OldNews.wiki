@@ -2,6 +2,22 @@
 
 = Old News =
 
+====Dec. 21st 2008 ====
+3.035 Beta 2 (SVN r621) has been released for testing.  
+I would write more, but I have to go.  Someone else can edit this later :)
+(I also appear to have obliterated the beta 1 release news... I'll have to fix this later unless someone wants to take care of that for me - I forgot to paste into the oldnews, I'm a bit rushed as I have to leave in 5 minutes)
+
+  * [http://www.mediafire.com/?2mowhnyjklh Download 3.035 beta 2 Patch for Windows]
+  * [http://www.mediafire.com/?x0jgmyb4jtm Download 3.035 beta 2 Patch for GNU/Linux (32bit)]
+  * [http://www.mediafire.com/?ml3yym5vwmj Download 3.035 beta 2 Patch for GNU/Linux (64bit)]
+  * [http://www.mediafire.com/?v2zjdnoqdrl Download 3.035 beta 2 Patch for MacOS X]
+
+====Dec. 7th 2008 ====
+FoFiX has a new tutorial song, for a total of [http://fofix.googlecode.com/files/FoFiX-All4Tutorials.rar 4].  This new drum roll practice tutorial was created by venom426.
+
+Warning: playing this tutorial song in a FoFiX revision below 548 can result in incorrect scoring due to drums allowing sustained notes.  
+
+
 ====Nov. 30th 2008 ====
 
 3.035 beta 1 (SVN r469) has been released for testing.  
