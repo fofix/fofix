@@ -155,8 +155,8 @@ Then either create a patch or a full package.
 
 === Optional PitchBending ===
 ==== Requirements ====
-In order to build John Strumpo's pitchbend module you first need to install...
-  * libsdl-mixer1,2-dev
+In order to build John Stumpo's pitchbend module you first need to install...
+  * libsdl-mixer1.2-dev
   * libsndobj-dev
 
 ==== Compiling ====
