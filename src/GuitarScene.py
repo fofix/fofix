@@ -1142,11 +1142,25 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #dots
       #myfingershurt: determine which type of dots are included with this theme - dots.png = 10 small dots, dotshalf.png = 5 larger dots with half-dot increments
       self.halfDots = True
-      try:
-        self.engine.loadImgDrawing(self, "dots", os.path.join("themes",themename,"dotshalf.png"))
-      except IOError:
-        self.engine.loadImgDrawing(self, "dots", os.path.join("themes",themename,"dots.png"))
-        self.halfDots = False
+      if self.coOpType:
+        try:
+          try:
+            self.engine.loadImgDrawing(self, "dots", os.path.join("themes",themename,"coop_dotshalf.png"))
+          except IOError:
+            self.engine.loadImgDrawing(self, "dots", os.path.join("themes",themename,"coop_dots.png"))
+            self.halfDots = False
+        except IOError:
+          try:
+            self.engine.loadImgDrawing(self, "dots", os.path.join("themes",themename,"dotshalf.png"))
+          except IOError:
+            self.engine.loadImgDrawing(self, "dots", os.path.join("themes",themename,"dots.png"))
+            self.halfDots = False
+      else:
+        try:
+          self.engine.loadImgDrawing(self, "dots", os.path.join("themes",themename,"dotshalf.png"))
+        except IOError:
+          self.engine.loadImgDrawing(self, "dots", os.path.join("themes",themename,"dots.png"))
+          self.halfDots = False
       
       
       #rockmeter
