@@ -41,6 +41,8 @@ import os
 
 import Log
 
+import Song   #need the base song defines as well
+
 #KEYS = [Player.KEY1, Player.KEY2, Player.KEY3, Player.KEY4, Player.KEY5]
 PLAYER1KEYS    = [Player.KEY1, Player.KEY2, Player.KEY3, Player.KEY4, Player.KEY5]
 PLAYER1ACTIONS = [Player.ACTION1, Player.ACTION2]
@@ -51,6 +53,9 @@ PLAYER2ACTIONS = [Player.PLAYER_2_ACTION1, Player.PLAYER_2_ACTION2]
 class Guitar:
   def __init__(self, engine, editorMode = False, player = 0):
     self.engine         = engine
+
+    self.starPowerDecreaseDivisor = 200.0*self.engine.audioSpeedDivisor
+
     self.isDrum = False
     self.isBassGuitar = False
     
@@ -61,6 +66,7 @@ class Guitar:
     self.sameNoteHopoString = False
     self.hopoProblemNoteNum = -1
     
+    self.useMidiSoloMarkers = False
     self.canGuitarSolo = False
     self.guitarSolo = False
     self.currentGuitarSoloHitNotes = 0
@@ -70,6 +76,26 @@ class Guitar:
 
     self.isStarPhrase = False
     self.finalStarSeen = False
+
+    self.freestyleActive = False
+    
+    self.drumFillsActive = False
+    
+    self.bigRockEndingMarkerSeen = False
+    
+    # Volshebnyi - BRE scoring variables
+    self.freestyleEnabled = False
+    self.freestyleStart = 0
+    self.freestyleFirstHit = 0
+    self.freestyleLength = 0
+    self.freestyleLastHit = 0
+    self.freestyleBonusFret = -2
+    self.freestyleLastFretHitTime = range(5)
+    self.freestyleBaseScore = 750
+    self.freestylePeriod = 1000
+    self.freestylePercent = 50
+    self.freestyleOffset = 5
+
 
     self.accThresholdWorstLate = 0
     self.accThresholdVeryLate = 0
@@ -87,6 +113,10 @@ class Guitar:
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("Guitar class init...")
+
+    self.incomingNeckMode = self.engine.config.get("game", "incoming_neck_mode")
+    self.bigRockEndings = self.engine.config.get("game", "big_rock_endings")    
+    self.bigRockLogic = self.engine.config.get("game", "big_rock_logic") #volshebnyi
     
     self.boardWidth     = 3.0
     self.boardLength    = 9.0
@@ -125,7 +155,10 @@ class Guitar:
     self.indexCount     = 0
     #Alarian, For animated hitglow
     self.HCount         = 0
+    self.HCount2        = 0
+    self.HCountAni      = False
     self.Hitanim        = True
+    self.Hitanim2       = True
     
     #myfingershurt: to keep track of pause status here as well
     self.paused = False
@@ -136,6 +169,8 @@ class Guitar:
     self.starPowerGained = False
 
     self.killPoints = False
+
+    self.starpowerMode = self.engine.config.get("game", "starpower_mode") #MFH
 
     #get difficulty
     self.difficulty = self.engine.config.get("player%d" %(player), "difficulty")
@@ -184,6 +219,9 @@ class Guitar:
     self.scoreMultiplier = 1
 
     self.hit = [False, False, False, False, False]
+    
+    self.freestyleHit = [False, False, False, False, False]
+    
 
     neckSettingName = "neck_choose_p%d" % (self.player)
     self.neck = self.engine.config.get("coffee", neckSettingName)
@@ -192,6 +230,10 @@ class Guitar:
     themename = self.engine.data.themeLabel
     #now theme determination logic is only in data.py:
     self.theme = self.engine.data.theme
+    
+    #check if BRE enabled
+    if self.bigRockEndings == 2 or (self.theme == 2 and self.bigRockEndings == 1):
+    	self.freestyleEnabled = True
 
     #blazingamer
     self.nstype = self.engine.config.get("game", "nstype")
@@ -202,7 +244,19 @@ class Guitar:
     self.killCount         = 0
     self.ocount = 0
     self.noterotate = self.engine.config.get("coffee", "noterotate")
-
+    self.isFailing = False
+    self.failcount = 0
+    self.failcount2 = False
+    self.spcount = 0
+    self.spcount2 = 0
+    self.bgcount = 0
+    self.ovroverlay = self.engine.config.get("fretboard", "ovroverlay")
+    
+    #akedrou
+    self.coOpFailed = False
+    self.coOpRestart = False
+    self.coOpRescueTime = 0.0
+    
     #MFH- fixing neck speed
     if self.nstype < 3:   #not constant mode: 
       self.speed = self.engine.config.get("coffee", "neckSpeed")*0.01
@@ -227,10 +281,15 @@ class Guitar:
     
     self.setBPM(self.currentBpm)
 
-    self.starNotesSet = False
+    if self.starpowerMode == 1:
+      self.starNotesSet = False
+    else:
+      self.starNotesSet = True
+
     self.maxStars = []
     self.starNotes = []
     self.totalNotes = 0
+
 
     engine.loadImgDrawing(self, "glowDrawing", "glow.png")
 
@@ -258,10 +317,13 @@ class Guitar:
 
 
 
-
-    engine.loadImgDrawing(self, "hitflames1Drawing", os.path.join("themes",themename,"hitflames1.png"),  textureSize = (128, 128))
-    engine.loadImgDrawing(self, "hitflames2Drawing", os.path.join("themes",themename,"hitflames2.png"),  textureSize = (128, 128))
-
+    try:
+      engine.loadImgDrawing(self, "hitflamesAnim", os.path.join("themes",themename,"hitflamesanimation.png"),  textureSize = (128, 128))
+    except IOError:
+      engine.loadImgDrawing(self, "hitflames1Drawing", os.path.join("themes",themename,"hitflames1.png"),  textureSize = (128, 128))
+      engine.loadImgDrawing(self, "hitflames2Drawing", os.path.join("themes",themename,"hitflames2.png"),  textureSize = (128, 128))
+      self.Hitanim2 = False
+      
     try:
       engine.loadImgDrawing(self, "hitglowAnim", os.path.join("themes",themename,"hitglowanimation.png"),  textureSize = (128, 128))
     except IOError:
@@ -302,6 +364,21 @@ class Guitar:
         engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "note.dae")))
       else:
         engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName("note.dae")))
+        
+      try:
+        engine.loadImgDrawing(self,  "notetexa",  os.path.join("themes", themename, "notetex_color.png"))
+        engine.loadImgDrawing(self,  "notetexb",  os.path.join("themes", themename, "notetex_main.png"))
+        engine.loadImgDrawing(self,  "notetexc",  os.path.join("themes", themename, "notetex_extra.png"))
+        engine.loadImgDrawing(self,  "notetexh",  os.path.join("themes", themename, "notetex_hopo.png"))
+        self.notetex = True
+
+      except IOError:
+        self.notetexa = False
+        self.notetexb = False
+        self.notetexc = False
+        self.notetexh = False
+        self.notetex = False
+        
       if self.engine.fileExists(os.path.join("themes", themename, "star.dae")):  
         engine.resource.load(self,  "starMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "star.dae")))
       else:  
@@ -361,6 +438,13 @@ class Guitar:
             engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
           except IOError:
             self.oNeck = None
+          try:
+            engine.loadImgDrawing(self, "oNeckBass", os.path.join("themes",themename,"overdriveneck_bass.png"),  textureSize = (256, 256))
+          except IOError:
+            try:
+              engine.loadImgDrawing(self, "oNeckBass", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
+            except IOError:
+              self.oNeckBass = None
           self.rbnote = 0
       else:
         try:
@@ -372,9 +456,21 @@ class Guitar:
         except IOError:
           self.oCenterLines = None
         try:
+          engine.loadImgDrawing(self, "oNeckBass", os.path.join("themes",themename,"overdriveneck_bass.png"),  textureSize = (256, 256))
+        except IOError:
+          try:
+            engine.loadImgDrawing(self, "oNeckBass", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
+          except IOError:
+            self.oNeckBass = None
+        try:
           engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
         except IOError:
           self.oNeck = None
+          
+      try:
+        engine.loadImgDrawing(self, "oNeckovr", os.path.join("themes",themename,"overdriveneckovr.png"),  textureSize = (256, 256))
+      except IOError:
+        self.oNeckovr = None
 
       #MFH: support for optional overdrive_string_flash.png
       self.overdriveFlashCounts = self.indexFps/4   #how many cycles to display the oFlash: self.indexFps/2 = 1/2 second
@@ -394,11 +490,19 @@ class Guitar:
     if self.theme == 0 or self.theme == 1:
       engine.loadImgDrawing(self, "hitlightning", os.path.join("themes",themename,"lightning.png"),  textureSize = (128, 128))
 
+      self.oNeckovr = None #fixes GH theme crash
       #myfingershurt: the starpower neck file should be in the theme folder... and also not required:
       try:
         engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"starpowerneck.png"),  textureSize = (256, 256))
       except IOError:
         self.oNeck = None
+      try:
+        engine.loadImgDrawing(self, "oNeckBass", os.path.join("themes",themename,"starpowerneck_bass.png"),  textureSize = (256, 256))
+      except IOError:
+        try:
+          engine.loadImgDrawing(self, "oNeckBass", os.path.join("themes",themename,"starpowerneck.png"),  textureSize = (256, 256))
+        except IOError:
+          self.oNeckBass = None
 
     #myfingershurt: Bass Groove neck:
     if self.bassGrooveNeckMode > 0:
@@ -432,7 +536,11 @@ class Guitar:
     else:
       self.guitarSoloNeck = None
 
-
+    try:
+      engine.loadImgDrawing(self, "failNeck", os.path.join("themes",themename,"failneck.png"))
+    except IOError:
+      engine.loadImgDrawing(self, "failNeck", os.path.join("failneck.png"))
+                                                           
     #inkk: loading theme-dependant tail images
     #myfingershurt: must ensure the new tails don't affect the Rock Band mod...
     self.simpleTails = False
@@ -464,6 +572,14 @@ class Guitar:
     except IOError:
       engine.loadImgDrawing(self, "kill1", "kill1.png",  textureSize = (128, 128))
       engine.loadImgDrawing(self, "kill2", "kill2.png",  textureSize = (128, 128))
+
+    #MFH - freestyle tails (for drum fills & BREs)
+    try:
+      engine.loadImgDrawing(self, "freestyle1", os.path.join("themes", themename, "freestyletail1.png"),  textureSize = (128, 128))
+      engine.loadImgDrawing(self, "freestyle2", os.path.join("themes", themename, "freestyletail2.png"),  textureSize = (128, 128))
+    except IOError:
+      engine.loadImgDrawing(self, "freestyle1", "freestyletail1.png",  textureSize = (128, 128))
+      engine.loadImgDrawing(self, "freestyle2", "freestyletail2.png",  textureSize = (128, 128))
 
 
 
@@ -574,8 +690,8 @@ class Guitar:
     
   def setMultiplier(self, multiplier):
     self.scoreMultiplier = multiplier
-    
-  def renderNeck(self, visibility, song, pos):
+
+  def renderIncomingNeck(self, visibility, song, pos, time, neckTexture):   #MFH - attempt to "scroll" an incoming guitar solo neck towards the player
     if not song:
       return
     
@@ -587,8 +703,60 @@ class Guitar:
     l            = self.boardLength
 
     beatsPerUnit = self.beatsPerBoard / self.boardLength
-    offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
 
+    #offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
+    offset = 0
+
+    z  = ((time - pos) / self.currentPeriod) / beatsPerUnit
+
+    color = (1,1,1)
+
+    glEnable(GL_TEXTURE_2D)
+    if neckTexture:
+      neckTexture.texture.bind()
+
+
+    glBegin(GL_TRIANGLE_STRIP)
+    glColor4f(color[0],color[1],color[2], 0)
+    glTexCoord2f(0.0, project(offset - 2 * beatsPerUnit))
+    #glVertex3f(-w / 2, 0, -2)
+    glVertex3f(-w / 2, 0, z)   #point A
+    glTexCoord2f(1.0, project(offset - 2 * beatsPerUnit))
+    #glVertex3f( w / 2, 0, -2)
+    glVertex3f( w / 2, 0, z)   #point B
+
+    
+    glColor4f(color[0],color[1],color[2], v)
+    glTexCoord2f(0.0, project(offset - 1 * beatsPerUnit))
+    #glVertex3f(-w / 2, 0, -1)
+    glVertex3f(-w / 2, 0, z+1)   #point C
+    glTexCoord2f(1.0, project(offset - 1 * beatsPerUnit))
+    #glVertex3f( w / 2, 0, -1)
+    glVertex3f( w / 2, 0, z+1)   #point D
+    
+    glTexCoord2f(0.0, project(offset + l * beatsPerUnit * .7))
+    #glVertex3f(-w / 2, 0, l * .7)
+    glVertex3f(-w / 2, 0, z+2+l * .7) #point E
+    glTexCoord2f(1.0, project(offset + l * beatsPerUnit * .7))
+    #glVertex3f( w / 2, 0, l * .7)
+    glVertex3f( w / 2, 0, z+2+l * .7) #point F
+    
+    glColor4f(color[0],color[1],color[2], 0)
+    glTexCoord2f(0.0, project(offset + l * beatsPerUnit))
+    #glVertex3f(-w / 2, 0, l)
+    glVertex3f(-w / 2, 0, z+2+l)    #point G
+    glTexCoord2f(1.0, project(offset + l * beatsPerUnit))
+    #glVertex3f( w / 2, 0, l)
+    glVertex3f( w / 2, 0, z+2+l)    #point H
+    glEnd()
+    
+    glDisable(GL_TEXTURE_2D)
+
+  def renderNeckMethod(self, visibility, offset, beatsPerUnit, neck, alpha = False): #blazingamer: New neck rendering method
+
+    def project(beat):
+      return 0.125 * beat / beatsPerUnit    # glorandwarf: was 0.12
+    
     if self.starPowerActive and self.theme == 0:#8bit
       color = (.3,.7,.9)
     elif self.starPowerActive and self.theme == 1:
@@ -596,17 +764,18 @@ class Guitar:
     else:
       color = (1,1,1)
 
-    glEnable(GL_TEXTURE_2D)
-    #myfingershurt: every theme can have oNeck:
-    if self.starPowerActive and self.oNeck:
-      self.oNeck.texture.bind()
-    elif self.canGuitarSolo and self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 1:
-      self.guitarSoloNeck.texture.bind()
-    elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
-      self.bassGrooveNeck.texture.bind()
-    else:
-      self.neckDrawing.texture.bind()
+    v            = visibility
+    w            = self.boardWidth
+    l            = self.boardLength
 
+    beatsPerUnit = beatsPerUnit
+    offset       = offset
+    
+    glEnable(GL_TEXTURE_2D)
+
+    if alpha == True:
+      glBlendFunc(GL_ONE, GL_ONE)
+    neck.texture.bind()
     glBegin(GL_TRIANGLE_STRIP)
     glColor4f(color[0],color[1],color[2], 0)
     glTexCoord2f(0.0, project(offset - 2 * beatsPerUnit))
@@ -631,65 +800,75 @@ class Guitar:
     glTexCoord2f(1.0, project(offset + l * beatsPerUnit))
     glVertex3f( w / 2, 0, l)
     glEnd()
-
-    if self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 2:   #static bass groove overlay
-      self.bassGrooveNeck.texture.bind()
-     
-      glBegin(GL_TRIANGLE_STRIP)
-      glColor4f(color[0],color[1],color[2], 0)
-      glTexCoord2f(0.0, project(-2 * beatsPerUnit))
-      glVertex3f(-w / 2, 0, -2)
-      glTexCoord2f(1.0, project(-2 * beatsPerUnit))
-      glVertex3f( w / 2, 0, -2)
+    if alpha == True:
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
       
-      glColor4f(color[0],color[1],color[2], v)
-      glTexCoord2f(0.0, project(-1 * beatsPerUnit))
-      glVertex3f(-w / 2, 0, -1)
-      glTexCoord2f(1.0, project(-1 * beatsPerUnit))
-      glVertex3f( w / 2, 0, -1)
-      
-      glTexCoord2f(0.0, 0)
-      glVertex3f(-w / 2, 0, 0)
-      glTexCoord2f(1.0, 0)
-      glVertex3f( w / 2, 0, 0)
-      
-      glColor4f(color[0],color[1],color[2], 0)
-      glTexCoord2f(0.0, project(l * beatsPerUnit))
-      glVertex3f(-w / 2, 0, l)
-      glTexCoord2f(1.0, project(l * beatsPerUnit))
-      glVertex3f( w / 2, 0, l)
-      glEnd()
-
-    elif self.canGuitarSolo and self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 2:   #static overlay
-      self.guitarSoloNeck.texture.bind()
-
-      glBegin(GL_TRIANGLE_STRIP)
-      glColor4f(color[0],color[1],color[2], 0)
-      glTexCoord2f(0.0, project(-2 * beatsPerUnit))
-      glVertex3f(-w / 2, 0, -2)
-      glTexCoord2f(1.0, project(-2 * beatsPerUnit))
-      glVertex3f( w / 2, 0, -2)
-      
-      glColor4f(color[0],color[1],color[2], v)
-      glTexCoord2f(0.0, project(-1 * beatsPerUnit))
-      glVertex3f(-w / 2, 0, -1)
-      glTexCoord2f(1.0, project(-1 * beatsPerUnit))
-      glVertex3f( w / 2, 0, -1)
-      
-      glTexCoord2f(0.0, 0)
-      glVertex3f(-w / 2, 0, 0)
-      glTexCoord2f(1.0, 0)
-      glVertex3f( w / 2, 0, 0)
-      
-      glColor4f(color[0],color[1],color[2], 0)
-      glTexCoord2f(0.0, project(l * beatsPerUnit))
-      glVertex3f(-w / 2, 0, l)
-      glTexCoord2f(1.0, project(l * beatsPerUnit))
-      glVertex3f( w / 2, 0, l)
-      glEnd()
-
-    
     glDisable(GL_TEXTURE_2D)
+    
+  def renderNeck(self, visibility, song, pos):
+    if not song:
+      return
+    
+    def project(beat):
+      return 0.125 * beat / beatsPerUnit    # glorandwarf: was 0.12
+
+    v            = visibility
+    w            = self.boardWidth
+    l            = self.boardLength
+
+    beatsPerUnit = self.beatsPerBoard / self.boardLength
+    offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
+
+    #myfingershurt: every theme can have oNeck:
+
+    if self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 1:
+      neck = self.guitarSoloNeck
+    elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
+      neck = self.bassGrooveNeck
+    elif self.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and self.scoreMultiplier <= 4:
+      if self.isBassGuitar and self.oNeckBass:
+        neck = self.oNeckBass
+      else:
+        neck = self.oNeck
+    else:
+      neck = self.neckDrawing
+
+    if not (self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 2):
+      self.renderNeckMethod(v, offset, beatsPerUnit, neck)
+
+    if self.bgcount > 0 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 2:   #static bass groove overlay
+      self.renderNeckMethod(v*self.bgcount, 0, beatsPerUnit, self.bassGrooveNeck)
+      
+    elif self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 2:   #static overlay
+      self.renderNeckMethod(v, 0, beatsPerUnit, self.guitarSoloNeck)
+      
+    if self.spcount2 != 0 and self.spcount < 1.2 and self.oNeck:   #static overlay
+      if self.oNeckovr != None and (self.scoreMultiplier > 4 or self.guitarSolo):
+        neck = self.oNeckovr
+      else:
+        if self.isBassGuitar and self.oNeckBass:
+          neck = self.oNeckBass
+        else:
+          neck = self.oNeck
+          
+      self.renderNeckMethod(self.spcount, offset, beatsPerUnit, neck)
+      
+    if self.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and (self.scoreMultiplier > 4 or self.guitarSolo):   #static overlay
+
+      if self.oNeckovr != None:
+        neck = self.oNeckovr
+      else:
+        if self.isBassGuitar and self.oNeckBass:
+          neck = self.oNeckBass
+        else:
+          neck = self.oNeck
+        alpha = True
+
+      self.renderNeckMethod(v, offset, beatsPerUnit, neck, alpha)
+      
+    if self.isFailing:
+      self.renderNeckMethod(self.failcount, 0, beatsPerUnit, self.failNeck)
+
 
   def drawTrack(self, visibility, song, pos):
     if not song:
@@ -973,7 +1152,11 @@ class Guitar:
     glVertex3f(w / 2,  0, -sw)
     glEnd()
 
-  def renderTail(self, length, sustain, kill, color, flat = False, tailOnly = False, isTappable = False, big = False, fret = 0, spNote = False):
+  def renderTail(self, length, sustain, kill, color, flat = False, tailOnly = False, isTappable = False, big = False, fret = 0, spNote = False, freestyleTail = 0, pos = 0):
+
+    #volshebnyi - if freestyleTail == 0, act normally.
+    #  if freestyleTail == 1, render an freestyle tail
+    #  if freestyleTail == 2, render highlighted freestyle tail
 
     if not self.simpleTails:#Tail Colors
       glColor4f(1,1,1,1)
@@ -999,83 +1182,113 @@ class Guitar:
         else:
           s = (length + 0.00001)
 
-        #myfingershurt: so any theme containing appropriate files can use new tails
-        if not self.simpleTails:
+    #       if freestyleTail == 1, render freestyle tail
+    #       if freestyleTail == 2, render bonus fret freestyle tail
+
+        if freestyleTail == 0:    #normal tail rendering
+          #myfingershurt: so any theme containing appropriate files can use new tails
+          if not self.simpleTails:
+              
+            if big == True and tailOnly == True:
+              if kill and self.killfx == 0:
+                zsize = .25
+                size = (.15, s - zsize)
+                tex1 = self.kill1
+                tex2 = self.kill2
+              else:
+                zsize = .25
+                size = (.17, s - zsize)
+                if self.starPowerActive and not color == (0,0,0,1):
+                  tex1 = self.btail6
+                  tex2 = self.btaile6
+                else:
+                  if fret == 0:
+                    tex1 = self.btail1
+                    tex2 = self.btaile1
+                  elif fret == 1:
+                    tex1 = self.btail2
+                    tex2 = self.btaile2
+                  elif fret == 2:
+                    tex1 = self.btail3
+                    tex2 = self.btaile3
+                  elif fret == 3:
+                    tex1 = self.btail4
+                    tex2 = self.btaile4
+                  elif fret == 4:
+                    tex1 = self.btail5
+                    tex2 = self.btaile5
+            else:
+              zsize = .15
+              size = (.1, s - zsize)
+              if tailOnly:#Note let go
+                tex1 = self.tail0
+                tex2 = self.taile0
+              else:
+                if self.starPowerActive and not color == (0,0,0,1):
+                  tex1 = self.tail6
+                  tex2 = self.taile6
+                else:
+                  if fret == 0:
+                    tex1 = self.tail1
+                    tex2 = self.taile1
+                  elif fret == 1:
+                    tex1 = self.tail2
+                    tex2 = self.taile2
+                  elif fret == 2:
+                    tex1 = self.tail3
+                    tex2 = self.taile3
+                  elif fret == 3:
+                    tex1 = self.tail4
+                    tex2 = self.taile4
+                  elif fret == 4:
+                    tex1 = self.tail5
+                    tex2 = self.taile5
+          else:
+            if big == True and tailOnly == True:
+              if kill and self.killfx == 0:
+                zsize = .25
+                size = (.15, s - zsize)
+                tex1 = self.kill1
+                tex2 = self.kill2
+              else:
+                zsize = .25
+                size = (.11, s - zsize)
+                tex1 = self.bigTail1
+                tex2 = self.bigTail2
+            else:
+              zsize = .15
+              size = (.08, s - zsize)
+              tex1 = self.tail1
+              tex2 = self.tail2
+        
+        else:   #freestyleTail > 0
+          # render an inactive freestyle tail  (self.freestyle1 & self.freestyle2)
+          zsize = .25  
+          
+          if self.freestyleActive:
+            size = (.30, s - zsize)   #was .15
+          else:
+            size = (.15, s - zsize)   
+          
+          tex1 = self.freestyle1
+          tex2 = self.freestyle2
+          if freestyleTail == 1:
+            #glColor4f(*color)
+            c1, c2, c3, c4 = color
+            tailGlow = 1 - (pos - self.freestyleLastFretHitTime[fret] ) / self.freestylePeriod
+            if tailGlow < 0:
+            	tailGlow = 0
+            color = (c1 + c1*2.0*tailGlow, c2 + c2*2.0*tailGlow, c3 + c3*2.0*tailGlow, c4*0.6 + c4*0.4*tailGlow)    #MFH - this fades inactive tails' color darker       
+          if freestyleTail == 2:
+            #glColor4f(*color)
+            c1, c2, c3, c4 = color
+            color = (c1*3.0, c2*3.0, c3*3.0, c4)    #volshebnyi - bonus fret tail              
             
-          if big == True and tailOnly == True:
-            if kill and self.killfx == 0:
-              zsize = .25
-              size = (.15, s - zsize)
-              tex1 = self.kill1
-              tex2 = self.kill2
-            else:
-              zsize = .25
-              size = (.17, s - zsize)
-              if self.starPowerActive and not color == (0,0,0,1):
-                tex1 = self.btail6
-                tex2 = self.btaile6
-              else:
-                if fret == 0:
-                  tex1 = self.btail1
-                  tex2 = self.btaile1
-                elif fret == 1:
-                  tex1 = self.btail2
-                  tex2 = self.btaile2
-                elif fret == 2:
-                  tex1 = self.btail3
-                  tex2 = self.btaile3
-                elif fret == 3:
-                  tex1 = self.btail4
-                  tex2 = self.btaile4
-                elif fret == 4:
-                  tex1 = self.btail5
-                  tex2 = self.btaile5
-          else:
-            zsize = .15
-            size = (.1, s - zsize)
-            if tailOnly:#Note let go
-              tex1 = self.tail0
-              tex2 = self.taile0
-            else:
-              if self.starPowerActive and not color == (0,0,0,1):
-                tex1 = self.tail6
-                tex2 = self.taile6
-              else:
-                if fret == 0:
-                  tex1 = self.tail1
-                  tex2 = self.taile1
-                elif fret == 1:
-                  tex1 = self.tail2
-                  tex2 = self.taile2
-                elif fret == 2:
-                  tex1 = self.tail3
-                  tex2 = self.taile3
-                elif fret == 3:
-                  tex1 = self.tail4
-                  tex2 = self.taile4
-                elif fret == 4:
-                  tex1 = self.tail5
-                  tex2 = self.taile5
-        else:
-          if big == True and tailOnly == True:
-            if kill and self.killfx == 0:
-              zsize = .25
-              size = (.15, s - zsize)
-              tex1 = self.kill1
-              tex2 = self.kill2
-            else:
-              zsize = .25
-              size = (.11, s - zsize)
-              tex1 = self.bigTail1
-              tex2 = self.bigTail2
-          else:
-            zsize = .15
-            size = (.08, s - zsize)
-            tex1 = self.tail1
-            tex2 = self.tail2
+          glColor4f(*color)
         
         glEnable(GL_TEXTURE_2D)
         tex1.texture.bind()
+        
 
 
         glBegin(GL_TRIANGLE_STRIP)
@@ -1092,21 +1305,45 @@ class Guitar:
 
         glDisable(GL_TEXTURE_2D)
 
+        #MFH - this block of code renders the tail "end" - after the note
         glEnable(GL_TEXTURE_2D)
         tex2.texture.bind()
 
         glBegin(GL_TRIANGLE_STRIP)
-        glTexCoord2f(0.0, 0.0)
-        glVertex3f(-size[0], 0, size[1] - (.01))
-        glTexCoord2f(1.0, 0.0)
-        glVertex3f( size[0], 0, size[1] - (.01))
-        glTexCoord2f(0.0, 1.0)
+        glTexCoord2f(0.0, 0.05)
+        glVertex3f(-size[0], 0, size[1] - (.05))
+        glTexCoord2f(1.0, 0.05)
+        glVertex3f( size[0], 0, size[1] - (.05))
+        glTexCoord2f(0.0, 0.95)
         glVertex3f(-size[0], 0, size[1] + (zsize))
-        glTexCoord2f(1.0, 1.0)
+        glTexCoord2f(1.0, 0.95)
         glVertex3f( size[0], 0, size[1] + (zsize))
         glEnd()
 
         glDisable(GL_TEXTURE_2D)
+
+
+
+        #MFH - this block of code renders the tail "beginning" - before the note, for freestyle "lanes" only
+        #volshebnyi
+        if freestyleTail > 0 and pos < self.freestyleStart + self.freestyleLength:   
+          glEnable(GL_TEXTURE_2D)
+          tex2.texture.bind()
+  
+          glBegin(GL_TRIANGLE_STRIP)
+          glTexCoord2f(0.0, 0.95)
+          glVertex3f(-size[0], 0, 0 - (zsize))
+          glTexCoord2f(1.0, 0.95)
+          glVertex3f( size[0], 0, 0 - (zsize))
+          glTexCoord2f(0.0, 0.05)
+          glVertex3f(-size[0], 0, 0 + (.05))
+          glTexCoord2f(1.0, 0.05)
+          glVertex3f( size[0], 0, 0 + (.05))
+          glEnd()
+  
+          glDisable(GL_TEXTURE_2D)
+
+
 
     if tailOnly:
       return
@@ -1233,7 +1470,7 @@ class Guitar:
       glEnable(GL_DEPTH_TEST)
       glDepthMask(1)
       glShadeModel(GL_SMOOTH)
-
+      
       if self.noterotate:
         glRotatef(90, 0, 1, 0)
         glRotatef(-90, 1, 0, 0)
@@ -1245,24 +1482,199 @@ class Guitar:
       if self.starPowerActive and self.theme != 2 and not color == (0,0,0,1):
         glColor4f(.3,.7,.9, 1)
 
-      note.render("Mesh_001")
-      glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
-      if isTappable:
-        if self.hopoColor[0] == -2:
-          glColor4f(*color)
+      if self.notetex == True and spNote == False:
+        
+        glEnable(GL_TEXTURE_2D)
+        self.notetexa.texture.bind()
+        glMatrixMode(GL_TEXTURE)
+        glScalef(1, -1, 1)
+        glMatrixMode(GL_MODELVIEW)
+        self.noteMesh.render("Mesh_001")
+        glMatrixMode(GL_TEXTURE)
+        glLoadIdentity()
+        glMatrixMode(GL_MODELVIEW)
+        glDisable(GL_TEXTURE_2D)
+        
+        glEnable(GL_TEXTURE_2D)
+        if isTappable:
+          self.notetexh.texture.bind()
         else:
-          glColor3f(self.hopoColor[0], self.hopoColor[1], self.hopoColor[2])
+          self.notetexb.texture.bind()
+        glColor3f(1, 1, 1)
+        glMatrixMode(GL_TEXTURE)
+        glScalef(1, -1, 1)
+        glMatrixMode(GL_MODELVIEW)
+        self.noteMesh.render("Mesh")
+        glMatrixMode(GL_TEXTURE)
+        glLoadIdentity()
+        glMatrixMode(GL_MODELVIEW)
+        glDisable(GL_TEXTURE_2D)
+
+        glEnable(GL_TEXTURE_2D)
+        self.notetexc.texture.bind()
+        glColor3f(1, 1, 1)
+        glMatrixMode(GL_TEXTURE)
+        glScalef(1, -1, 1)
+        glMatrixMode(GL_MODELVIEW)
+        self.noteMesh.render("Mesh_002")
+        glMatrixMode(GL_TEXTURE)
+        glLoadIdentity()
+        glMatrixMode(GL_MODELVIEW)
+        glDisable(GL_TEXTURE_2D)
+        
         if(note.find("Mesh_003")) == True:
-          note.render("Mesh_003")
-          glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
-      note.render("Mesh_002")
-      glColor3f(self.meshColor[0], self.meshColor[1], self.meshColor[2])
-      note.render("Mesh")
+          glEnable(GL_TEXTURE_2D)
+          if isTappable:
+            self.notetexh.texture.bind()
+          else:
+            self.notetexc.texture.bind()
+          glColor3f(1, 1, 1)
+          glMatrixMode(GL_TEXTURE)
+          glScalef(1, -1, 1)
+          glMatrixMode(GL_MODELVIEW)
+          self.noteMesh.render("Mesh_003")
+          glMatrixMode(GL_TEXTURE)
+          glLoadIdentity()
+          glMatrixMode(GL_MODELVIEW)
+          glDisable(GL_TEXTURE_2D)
+        
+      else:
+        note.render("Mesh_001")
+        glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
+        if isTappable:
+          if self.hopoColor[0] == -2:
+            glColor4f(*color)
+          else:
+            glColor3f(self.hopoColor[0], self.hopoColor[1], self.hopoColor[2])
+          if(note.find("Mesh_003")) == True:
+            note.render("Mesh_003")
+            glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
+        note.render("Mesh_002")
+        glColor3f(self.meshColor[0], self.meshColor[1], self.meshColor[2])
+        note.render("Mesh")
 
 
 
       glDepthMask(0)
       glPopMatrix()
+
+  def renderFreestyleLanes(self, visibility, song, pos):
+    if not song:
+      return
+
+    #boardWindowMin = pos - self.currentPeriod * 2
+    boardWindowMax = pos + self.currentPeriod * self.beatsPerBoard
+    track = song.midiEventTrack[self.player]
+    #self.currentPeriod = self.neckSpeed
+    beatsPerUnit = self.beatsPerBoard / self.boardLength
+
+    #MFH - render 5 freestyle tails when Song.freestyleMarkingNote comes up
+    if self.freestyleEnabled:
+      freestyleActive = False
+      #for time, event in track.getEvents(boardWindowMin, boardWindowMax):
+      for time, event in track.getEvents(pos - self.freestyleOffset , boardWindowMax + self.freestyleOffset):
+        if isinstance(event, Song.MarkerNote):
+          if event.number == Song.freestyleMarkingNote:
+            length     = (event.length - 50) / self.currentPeriod / beatsPerUnit
+            w = self.boardWidth / self.strings
+            self.freestyleLength = event.length #volshebnyi
+            self.freestyleStart = time # volshebnyi
+            z  = ((time - pos) / self.currentPeriod) / beatsPerUnit
+            z2 = ((time + event.length - pos) / self.currentPeriod) / beatsPerUnit
+      
+            if z > self.boardLength * .8:
+              f = (self.boardLength - z) / (self.boardLength * .2)
+            elif z < 0:
+              f = min(1, max(0, 1 + z2))
+            else:
+              f = 1.0
+  
+            #MFH - must extend the tail past the first fretboard section dynamically so we don't have to render the entire length at once
+            #volshebnyi - allow tail to move under frets 
+            if time - self.freestyleOffset < pos:
+              freestyleActive = True
+              if z < -1.5:
+              	length += z +1.5
+              	z =  -1.5
+  
+            #MFH - render 5 freestyle tails
+            for theFret in range(0,5):
+              x  = (self.strings / 2 - theFret) * w
+              c = self.fretColors[theFret]
+              color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
+              glPushMatrix()
+              glTranslatef(x, (1.0 - visibility) ** (theFret + 1), z)
+                
+              # Volshebnyi - extra tail for bonus fret
+              if self.bigRockLogic == 1 and theFret == self.freestyleBonusFret:
+                freestyleTailMode = 2
+              else:
+                freestyleTailMode = 1
+              
+              self.renderTail(length, sustain = True, kill = False, color = color, flat = False, tailOnly = True, isTappable = False, big = True, fret = theFret, spNote = False, freestyleTail = freestyleTailMode, pos = pos)
+              glPopMatrix()
+              
+      self.freestyleActive = freestyleActive
+
+
+
+  def renderIncomingNecks(self, visibility, song, pos):
+    if not song:
+      return
+
+    boardWindowMin = pos - self.currentPeriod * 2
+    boardWindowMax = pos + self.currentPeriod * self.beatsPerBoard
+    track = song.midiEventTrack[self.player]
+    #self.currentPeriod = self.neckSpeed
+    beatsPerUnit = self.beatsPerBoard / self.boardLength
+    
+
+
+
+    if self.incomingNeckMode > 0:   #if enabled
+
+
+      #if self.song.hasStarpowerPaths and self.song.midiStyle == Song.MIDI_TYPE_RB:  
+      if self.useMidiSoloMarkers:
+        for time, event in track.getEvents(boardWindowMin, boardWindowMax):
+          if isinstance(event, Song.MarkerNote):
+            if event.number == Song.starPowerMarkingNote:
+              if self.guitarSoloNeck:
+                if event.endMarker:   #solo end
+                  if self.incomingNeckMode == 2:    #render both start and end incoming necks
+                    if self.guitarSolo:   #only until the end of the guitar solo!
+                      if self.starPowerActive and self.oNeck:
+                        neckImg = self.oNeck
+                      elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
+                        neckImg = self.bassGrooveNeck
+                      else:
+                        neckImg = self.neckDrawing
+                      self.renderIncomingNeck(visibility, song, pos, time, neckImg)
+                else:   #solo start
+                  if not self.guitarSolo:   #only until guitar solo starts!
+                    neckImg = self.guitarSoloNeck
+                    self.renderIncomingNeck(visibility, song, pos, time, neckImg)
+              
+
+      else:   #fall back on text-based guitar solo marking track
+        for time, event in song.eventTracks[Song.TK_GUITAR_SOLOS].getEvents(boardWindowMin, boardWindowMax):
+          if self.canGuitarSolo and self.guitarSoloNeck:
+            if event.text.find("ON") >= 0:
+              if not self.guitarSolo:   #only until guitar solo starts!
+                neckImg = self.guitarSoloNeck
+                self.renderIncomingNeck(visibility, song, pos, time, neckImg)
+            #else: #event.text.find("OFF"):
+            elif self.incomingNeckMode == 2:    #render both start and end incoming necks
+              if self.guitarSolo:   #only until the end of the guitar solo!
+                if self.starPowerActive and self.oNeck:
+                  neckImg = self.oNeck
+                elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
+                  neckImg = self.bassGrooveNeck
+                else:
+                  neckImg = self.neckDrawing
+                self.renderIncomingNeck(visibility, song, pos, time, neckImg)
+              
+
 
   def renderNotes(self, visibility, song, pos, killswitch):
     if not song:
@@ -1309,7 +1721,17 @@ class Guitar:
       #  if time == q:
       #    event.finalStar = True
       #    enable = False
-      
+      if self.coOpFailed:
+        if self.coOpRestart:
+          if time - self.coOpRescueTime < (self.currentPeriod * self.beatsPerBoard * 2):
+            continue
+          elif self.coOpRescueTime + (self.currentPeriod * self.beatsPerBoard * 2) < pos:
+            self.coOpFailed = False
+            self.coOpRestart = False
+            Log.debug("Turning off coOpFailed. Rescue successful.")
+        else:
+          continue #can't break. Tempo.
+        
       c = self.fretColors[event.number]
 
       x  = (self.strings / 2 - event.number) * w
@@ -1323,6 +1745,11 @@ class Guitar:
         f = min(1, max(0, 1 + z2))
       else:
         f = 1.0
+      
+      #volshebnyi - hide notes in BRE zone if BRE enabled  
+      if self.freestyleEnabled:  
+      	if time >= self.freestyleStart-self.freestyleOffset and time < self.freestyleStart + self.freestyleLength+self.freestyleOffset:
+        	z = -2.0
 
       color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
       if event.length > 120:
@@ -1340,10 +1767,12 @@ class Guitar:
           self.spEnabled = False
         elif self.spRefillMode == 1 and self.theme != 2:  #mode 1 = overdrive refill notes in RB themes only
           self.spEnabled = False
+        elif self.spRefillMode == 2 and song.midiStyle != 1: #mode 2 = refill based on MIDI type
+          self.spEnabled = False
 
 
       if event.star:
-        self.isStarPhrase = True
+        #self.isStarPhrase = True
         starEventsInView = True
       if event.finalStar:
         self.finalStarSeen = True
@@ -1450,7 +1879,9 @@ class Guitar:
     self.killPoints = False
 
     beatsPerUnit = self.beatsPerBoard / self.boardLength
+    
     w = self.boardWidth / self.strings
+    
     track = song.track[self.player]
 
     num = 0
@@ -1482,7 +1913,18 @@ class Guitar:
       #  if time == q:
       #    event.finalStar = True
       #    enable = False
-      
+
+      if self.coOpFailed:
+        if self.coOpRestart:
+          if time - self.coOpRescueTime < (self.currentPeriod * self.beatsPerBoard * 2):
+            continue
+          elif self.coOpRescueTime + (self.currentPeriod * self.beatsPerBoard * 2) < pos:
+            self.coOpFailed = False
+            self.coOpRestart = False
+            Log.debug("Turning off coOpFailed. Rescue successful.")
+        else:
+          continue
+
       c = self.fretColors[event.number]
 
       x  = (self.strings / 2 - event.number) * w
@@ -1512,6 +1954,8 @@ class Guitar:
       #  if self.spRefillMode == 0:    #mode 0 = no starpower / overdrive refill notes
       #    self.spEnabled = False
       #  elif self.spRefillMode == 1 and self.theme != 2:  #mode 1 = overdrive refill notes in RB themes only
+      #    self.spEnabled = False
+      #  elif self.spRefillMode == 2 and song.midiStyle != 1: #mode 2 = refill based on MIDI type
       #    self.spEnabled = False
 
 
@@ -1838,7 +2282,7 @@ class Guitar:
     size = (.22, .22)
     v = 1.0 - visibility
 
-    if self.disableFlameSFX != True:
+    if self.disableFlameSFX != True and self.HCountAni == True and self.HCount2 > 12:
       for n in range(self.strings):
         f = self.fretWeight[n]
         c = self.fretColors[n]
@@ -2001,160 +2445,58 @@ class Guitar:
           
           ff += 1.5 #ff first time is 2.75 after this
 
-          if event.flameCount < flameLimitHalf:
-            glColor3f(flameColor[0], flameColor[1], flameColor[2])
-            if self.starPowerActive:
-              if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                glColor3f(.0,.2,.4)
-              else: #Default starcolor (Rockband)
-                glColor3f(.1,.1,.1)
+          if self.Hitanim2:   
+            self.HCount2 = self.HCount2 + 1
+            self.HCountAni = False
+            if self.HCount2 > 12:
+              if event.length <= 130:
+                self.HCount2 = 0
+              else:
+                self.HCountAni = True
+
+              
+            HIndex = (self.HCount2 * 13 - (self.HCount2 * 13) % 13) / 13
+            if HIndex > 12:
+              HIndex = 0
+              
+            texX = (HIndex*(1/13.0), HIndex*(1/13.0)+(1/13.0))
+
+            glColor3f(1,1,1)
             glEnable(GL_TEXTURE_2D)
-            self.hitflames2Drawing.texture.bind()    
+            self.hitflamesAnim.texture.bind()    
             glPushMatrix()
-            glTranslate(x, y + .20, 0)
+            glTranslate(x, y + .225, 0)
             glRotate(90, 1, 0, 0)
-            glScalef(.25 + .6 * ms * ff, event.flameCount/6.0 + .6 * ms * ff, event.flameCount / 6.0 + .6 * ms * ff)
+            #glScalef(1.7, 1, 2.6)
+            glScalef(2, 2, 2.9)   #worldrave correct flame size
             glBegin(GL_TRIANGLE_STRIP)
-            glTexCoord2f(0.0, 0.0)
-            glVertex3f(-flameSize * ff, 0, -flameSize * ff)
-            glTexCoord2f(1.0, 0.0)
+            glTexCoord2f(texX[0], 0.0)#upper left corner of frame square in .png
+            glVertex3f(-flameSize * ff, 0, -flameSize * ff)#"upper left" corner of surface that texture is rendered on
+            glTexCoord2f(texX[1], 0.0)#upper right
             glVertex3f( flameSize * ff, 0, -flameSize * ff)
-            glTexCoord2f(0.0, 1.0)
+            glTexCoord2f(texX[0], 1.0)#lower left
             glVertex3f(-flameSize * ff, 0,  flameSize * ff)
-            glTexCoord2f(1.0, 1.0)
+            glTexCoord2f(texX[1], 1.0)#lower right
             glVertex3f( flameSize * ff, 0,  flameSize * ff)
             glEnd()
             glPopMatrix()
-            glDisable(GL_TEXTURE_2D) 
-
-            glColor3f(flameColor[0], flameColor[1], flameColor[2])
-            if self.starPowerActive:
-              if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                glColor3f(.1,.3,.5)
-              else: #Default starcolor (Rockband)
-                glColor3f(.1,.1,.1)
-            glEnable(GL_TEXTURE_2D)
-            self.hitflames2Drawing.texture.bind()    
-            glPushMatrix()
-            glTranslate(x - .005, y + .25 + .005, 0)
-            glRotate(90, 1, 0, 0)
-            glScalef(.30 + .6 * ms * ff, (event.flameCount + 1) / 5.5 + .6 * ms * ff, (event.flameCount + 1) / 5.5 + .6 * ms * ff)
-            glBegin(GL_TRIANGLE_STRIP)
-            glTexCoord2f(0.0, 0.0)
-            glVertex3f(-flameSize * ff, 0, -flameSize * ff)
-            glTexCoord2f(1.0, 0.0)
-            glVertex3f( flameSize * ff, 0, -flameSize * ff)
-            glTexCoord2f(0.0, 1.0)
-            glVertex3f(-flameSize * ff, 0,  flameSize * ff)
-            glTexCoord2f(1.0, 1.0)
-            glVertex3f( flameSize * ff, 0,  flameSize * ff)
-            glEnd()
-            glPopMatrix()	  
-            glDisable(GL_TEXTURE_2D)
-
-            glColor3f(flameColor[0], flameColor[1], flameColor[2])
-            if self.starPowerActive:
-              if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                glColor3f(.2,.4,.7)
-              else: #Default starcolor (Rockband)
-                glColor3f(.2,.2,.2)
-            glEnable(GL_TEXTURE_2D)
-            self.hitflames2Drawing.texture.bind()    
-            glPushMatrix()
-            glTranslate(x+.005, y +.25 +.005, 0)
-            glRotate(90, 1, 0, 0)
-            glScalef(.35 + .6 * ms * ff, (event.flameCount + 1) / 5.0 + .6 * ms * ff, (event.flameCount + 1) / 5.0 + .6 * ms * ff)
-            glBegin(GL_TRIANGLE_STRIP)
-            glTexCoord2f(0.0, 0.0)
-            glVertex3f(-flameSize * ff, 0, -flameSize * ff)
-            glTexCoord2f(1.0, 0.0)
-            glVertex3f( flameSize * ff, 0, -flameSize * ff)
-            glTexCoord2f(0.0, 1.0)
-            glVertex3f(-flameSize * ff, 0,  flameSize * ff)
-            glTexCoord2f(1.0, 1.0)
-            glVertex3f( flameSize * ff, 0,  flameSize * ff)
-            glEnd()
-            glPopMatrix()	  
-            glDisable(GL_TEXTURE_2D)
-
-            glColor3f(flameColor[0], flameColor[1], flameColor[2])
-            if self.starPowerActive:
-              if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                glColor3f(.2,.5,.7)
-              else: #Default starcolor (Rockband)
-                glColor3f(.3,.3,.3)
-            glEnable(GL_TEXTURE_2D)
-            self.hitflames2Drawing.texture.bind()    
-            glPushMatrix()
-            glTranslate(x, y +.25 +.005, 0)
-            glRotate(90, 1, 0, 0)
-            glScalef(.40 + .6 * ms * ff, (event.flameCount + 1)/ 4.7 + .6 * ms * ff, (event.flameCount + 1) / 4.7 + .6 * ms * ff)
-            glBegin(GL_TRIANGLE_STRIP)
-            glTexCoord2f(0.0, 0.0)
-            glVertex3f(-flameSize * ff, 0, -flameSize * ff)
-            glTexCoord2f(1.0, 0.0)
-            glVertex3f( flameSize * ff, 0, -flameSize * ff)
-            glTexCoord2f(0.0, 1.0)
-            glVertex3f(-flameSize * ff, 0,  flameSize * ff)
-            glTexCoord2f(1.0, 1.0)
-            glVertex3f( flameSize * ff, 0,  flameSize * ff)
-            glEnd()
-            glPopMatrix()	  
             glDisable(GL_TEXTURE_2D)
           else:
-            flameColorMod0 = 0.1 * (flameLimit - event.flameCount)
-            flameColorMod1 = 0.1 * (flameLimit - event.flameCount)
-            flameColorMod2 = 0.1 * (flameLimit - event.flameCount)
-            
-            glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
-            if self.theme == 0 and event.finalStar and self.spEnabled:
-              glColor3f(1,1,1)#lightning color
-            elif self.theme == 1 and event.finalStar and self.spEnabled:
-              glColor3f(1,1,1)#lightning color
-            if self.starPowerActive:
-              if self.theme == 0 or self.theme == 1: 
-                glColor3f(.3,.6,.7)#GH3 starcolor
-              else:
-                glColor3f(.4,.4,.4)#Default starcolor (Rockband)
-            glEnable(GL_TEXTURE_2D)
-            if self.theme == 0 and event.finalStar and self.spEnabled:
-              self.hitlightning.texture.bind()
-              wid, hei, = self.engine.view.geometry[2:4]
+            self.HCount2 = 13
+            self.HCountAni = True
+            if event.flameCount < flameLimitHalf:
+              glColor3f(flameColor[0], flameColor[1], flameColor[2])
+              if self.starPowerActive:
+                if self.theme == 0 or self.theme == 1: #GH3 starcolor
+                  glColor3f(.0,.2,.4)
+                else: #Default starcolor (Rockband)
+                  glColor3f(.1,.1,.1)
+              glEnable(GL_TEXTURE_2D)
+              self.hitflames2Drawing.texture.bind()    
               glPushMatrix()
-              glTranslate(xlightning, y, 3.3)
+              glTranslate(x, y + .20, 0)
               glRotate(90, 1, 0, 0)
-              glScalef(.15 + .5 * ms * ff, event.flameCount / 3.0 + .6 * ms * ff, 2)
-              glBegin(GL_TRIANGLE_STRIP)
-              glTexCoord2f(0.0, 0.0)
-              glVertex3f( .4, 0, -2)
-              glTexCoord2f(1.0, 0.0)
-              glVertex3f(-.4, 0, -2)
-              glTexCoord2f(0.0, 1.0)
-              glVertex3f( .4, 0,  2)
-              glTexCoord2f(1.0, 1.0)
-              glVertex3f(-.4, 0,  2)
-            elif self.theme == 1 and event.finalStar and self.spEnabled:
-              self.hitlightning.texture.bind()
-              wid, hei, = self.engine.view.geometry[2:4]
-              glPushMatrix()
-              glTranslate(xlightning, y, 3.3)
-              glRotate(90, 1, 0, 0)
-              glScalef(.15 + .5 * ms * ff, event.flameCount / 3.0 + .6 * ms * ff, 2)
-              glBegin(GL_TRIANGLE_STRIP)
-              glTexCoord2f(0.0, 0.0)
-              glVertex3f( .4, 0, -2)
-              glTexCoord2f(1.0, 0.0)
-              glVertex3f(-.4, 0, -2)
-              glTexCoord2f(0.0, 1.0)
-              glVertex3f( .4, 0,  2)
-              glTexCoord2f(1.0, 1.0)
-              glVertex3f(-.4, 0,  2)
-            else:
-              self.hitflames1Drawing.texture.bind()
-              glPushMatrix()
-              glTranslate(x, y + .35, 0)
-              glRotate(90, 1, 0, 0)
-              glScalef(.25 + .6 * ms * ff, event.flameCount / 3.0 + .6 * ms * ff, event.flameCount / 3.0 + .6 * ms * ff)
+              glScalef(.25 + .6 * ms * ff, event.flameCount/6.0 + .6 * ms * ff, event.flameCount / 6.0 + .6 * ms * ff)
               glBegin(GL_TRIANGLE_STRIP)
               glTexCoord2f(0.0, 0.0)
               glVertex3f(-flameSize * ff, 0, -flameSize * ff)
@@ -2164,96 +2506,237 @@ class Guitar:
               glVertex3f(-flameSize * ff, 0,  flameSize * ff)
               glTexCoord2f(1.0, 1.0)
               glVertex3f( flameSize * ff, 0,  flameSize * ff)
-            glEnd()
-            glPopMatrix()
-            glDisable(GL_TEXTURE_2D)
+              glEnd()
+              glPopMatrix()
+              glDisable(GL_TEXTURE_2D) 
 
-            flameColorMod0 = 0.1 * (flameLimit - event.flameCount)
-            flameColorMod1 = 0.1 * (flameLimit - event.flameCount)
-            flameColorMod2 = 0.1 * (flameLimit - event.flameCount)
-            
-            glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)      
-            if self.starPowerActive:
-              if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                glColor3f(.3,.6,.8)
-              else: #Default starcolor (Rockband)
-                glColor3f(.5,.5,.5)
-            glEnable(GL_TEXTURE_2D)
-            self.hitflames1Drawing.texture.bind()    
-            glPushMatrix()
-            glTranslate(x - .005, y + .40 + .005, 0)
-            glRotate(90, 1, 0, 0)
-            glScalef(.30 + .6 * ms * ff, (event.flameCount + 1)/ 2.5 + .6 * ms * ff, (event.flameCount + 1) / 2.5 + .6 * ms * ff)
-            glBegin(GL_TRIANGLE_STRIP)
-            glTexCoord2f(0.0, 0.0)
-            glVertex3f(-flameSize * ff, 0, -flameSize * ff)
-            glTexCoord2f(1.0, 0.0)
-            glVertex3f( flameSize * ff, 0, -flameSize * ff)
-            glTexCoord2f(0.0, 1.0)
-            glVertex3f(-flameSize * ff, 0,  flameSize * ff)
-            glTexCoord2f(1.0, 1.0)
-            glVertex3f( flameSize * ff, 0,  flameSize * ff)
-            glEnd()
-            glPopMatrix()  
-            glDisable(GL_TEXTURE_2D)
+              glColor3f(flameColor[0], flameColor[1], flameColor[2])
+              if self.starPowerActive:
+                if self.theme == 0 or self.theme == 1: #GH3 starcolor
+                  glColor3f(.1,.3,.5)
+                else: #Default starcolor (Rockband)
+                  glColor3f(.1,.1,.1)
+              glEnable(GL_TEXTURE_2D)
+              self.hitflames2Drawing.texture.bind()    
+              glPushMatrix()
+              glTranslate(x - .005, y + .25 + .005, 0)
+              glRotate(90, 1, 0, 0)
+              glScalef(.30 + .6 * ms * ff, (event.flameCount + 1) / 5.5 + .6 * ms * ff, (event.flameCount + 1) / 5.5 + .6 * ms * ff)
+              glBegin(GL_TRIANGLE_STRIP)
+              glTexCoord2f(0.0, 0.0)
+              glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(1.0, 0.0)
+              glVertex3f( flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(0.0, 1.0)
+              glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+              glTexCoord2f(1.0, 1.0)
+              glVertex3f( flameSize * ff, 0,  flameSize * ff)
+              glEnd()
+              glPopMatrix()	  
+              glDisable(GL_TEXTURE_2D)
 
-            flameColorMod0 = 0.1 * (flameLimit - event.flameCount)
-            flameColorMod1 = 0.1 * (flameLimit - event.flameCount)
-            flameColorMod2 = 0.1 * (flameLimit - event.flameCount)
-            
-            glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
-            if self.starPowerActive:
-              if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                glColor3f(.3,.7,.8)
-              else: #Default starcolor (Rockband)
-                glColor3f(.6,.6,.6)
-            glEnable(GL_TEXTURE_2D)
-            self.hitflames1Drawing.texture.bind()    
-            glPushMatrix()
-            glTranslate(x + .005, y + .35 + .005, 0)
-            glRotate(90, 1, 0, 0)
-            glScalef(.35 + .6 * ms * ff, (event.flameCount + 1) / 2.0 + .6 * ms * ff, (event.flameCount + 1) / 2.0 + .6 * ms * ff)
-            glBegin(GL_TRIANGLE_STRIP)
-            glTexCoord2f(0.0, 0.0)
-            glVertex3f(-flameSize * ff, 0, -flameSize * ff)
-            glTexCoord2f(1.0, 0.0)
-            glVertex3f( flameSize * ff, 0, -flameSize * ff)
-            glTexCoord2f(0.0, 1.0)
-            glVertex3f(-flameSize * ff, 0,  flameSize * ff)
-            glTexCoord2f(1.0, 1.0)
-            glVertex3f( flameSize * ff, 0,  flameSize * ff)
-            glEnd()
-            glPopMatrix()  
-            glDisable(GL_TEXTURE_2D)
+              glColor3f(flameColor[0], flameColor[1], flameColor[2])
+              if self.starPowerActive:
+                if self.theme == 0 or self.theme == 1: #GH3 starcolor
+                  glColor3f(.2,.4,.7)
+                else: #Default starcolor (Rockband)
+                  glColor3f(.2,.2,.2)
+              glEnable(GL_TEXTURE_2D)
+              self.hitflames2Drawing.texture.bind()    
+              glPushMatrix()
+              glTranslate(x+.005, y +.25 +.005, 0)
+              glRotate(90, 1, 0, 0)
+              glScalef(.35 + .6 * ms * ff, (event.flameCount + 1) / 5.0 + .6 * ms * ff, (event.flameCount + 1) / 5.0 + .6 * ms * ff)
+              glBegin(GL_TRIANGLE_STRIP)
+              glTexCoord2f(0.0, 0.0)
+              glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(1.0, 0.0)
+              glVertex3f( flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(0.0, 1.0)
+              glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+              glTexCoord2f(1.0, 1.0)
+              glVertex3f( flameSize * ff, 0,  flameSize * ff)
+              glEnd()
+              glPopMatrix()	  
+              glDisable(GL_TEXTURE_2D)
 
-            flameColorMod0 = 0.1 * (flameLimit - event.flameCount)
-            flameColorMod1 = 0.1 * (flameLimit - event.flameCount)
-            flameColorMod2 = 0.1 * (flameLimit - event.flameCount)
-            
-            glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
-            if self.starPowerActive:
-              if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                glColor3f(.3,.7,.9)
-              else: #Default starcolor (Rockband)
-                glColor3f(.7,.7,.7)
-            glEnable(GL_TEXTURE_2D)
-            self.hitflames1Drawing.texture.bind()    
-            glPushMatrix()
-            glTranslate(x+.005, y +.35 +.005, 0)
-            glRotate(90, 1, 0, 0)
-            glScalef(.40 + .6 * ms * ff, (event.flameCount + 1) / 1.7 + .6 * ms * ff, (event.flameCount + 1) / 1.7 + .6 * ms * ff)
-            glBegin(GL_TRIANGLE_STRIP)
-            glTexCoord2f(0.0, 0.0)
-            glVertex3f(-flameSize * ff, 0, -flameSize * ff)
-            glTexCoord2f(1.0, 0.0)
-            glVertex3f( flameSize * ff, 0, -flameSize * ff)
-            glTexCoord2f(0.0, 1.0)
-            glVertex3f(-flameSize * ff, 0,  flameSize * ff)
-            glTexCoord2f(1.0, 1.0)
-            glVertex3f( flameSize * ff, 0,  flameSize * ff)
-            glEnd()
-            glPopMatrix()  
-            glDisable(GL_TEXTURE_2D)
+              glColor3f(flameColor[0], flameColor[1], flameColor[2])
+              if self.starPowerActive:
+                if self.theme == 0 or self.theme == 1: #GH3 starcolor
+                  glColor3f(.2,.5,.7)
+                else: #Default starcolor (Rockband)
+                  glColor3f(.3,.3,.3)
+              glEnable(GL_TEXTURE_2D)
+              self.hitflames2Drawing.texture.bind()    
+              glPushMatrix()
+              glTranslate(x, y +.25 +.005, 0)
+              glRotate(90, 1, 0, 0)
+              glScalef(.40 + .6 * ms * ff, (event.flameCount + 1)/ 4.7 + .6 * ms * ff, (event.flameCount + 1) / 4.7 + .6 * ms * ff)
+              glBegin(GL_TRIANGLE_STRIP)
+              glTexCoord2f(0.0, 0.0)
+              glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(1.0, 0.0)
+              glVertex3f( flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(0.0, 1.0)
+              glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+              glTexCoord2f(1.0, 1.0)
+              glVertex3f( flameSize * ff, 0,  flameSize * ff)
+              glEnd()
+              glPopMatrix()	  
+              glDisable(GL_TEXTURE_2D)
+            else:
+              flameColorMod0 = 0.1 * (flameLimit - event.flameCount)
+              flameColorMod1 = 0.1 * (flameLimit - event.flameCount)
+              flameColorMod2 = 0.1 * (flameLimit - event.flameCount)
+              
+              glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
+              if self.theme == 0 and event.finalStar and self.spEnabled:
+                glColor3f(1,1,1)#lightning color
+              elif self.theme == 1 and event.finalStar and self.spEnabled:
+                glColor3f(1,1,1)#lightning color
+              if self.starPowerActive:
+                if self.theme == 0 or self.theme == 1: 
+                  glColor3f(.3,.6,.7)#GH3 starcolor
+                else:
+                  glColor3f(.4,.4,.4)#Default starcolor (Rockband)
+              glEnable(GL_TEXTURE_2D)
+              if self.theme == 0 and event.finalStar and self.spEnabled:
+                self.hitlightning.texture.bind()
+                wid, hei, = self.engine.view.geometry[2:4]
+                glPushMatrix()
+                glTranslate(xlightning, y, 3.3)
+                glRotate(90, 1, 0, 0)
+                glScalef(.15 + .5 * ms * ff, event.flameCount / 3.0 + .6 * ms * ff, 2)
+                glBegin(GL_TRIANGLE_STRIP)
+                glTexCoord2f(0.0, 0.0)
+                glVertex3f( .4, 0, -2)
+                glTexCoord2f(1.0, 0.0)
+                glVertex3f(-.4, 0, -2)
+                glTexCoord2f(0.0, 1.0)
+                glVertex3f( .4, 0,  2)
+                glTexCoord2f(1.0, 1.0)
+                glVertex3f(-.4, 0,  2)
+              elif self.theme == 1 and event.finalStar and self.spEnabled:
+                self.hitlightning.texture.bind()
+                wid, hei, = self.engine.view.geometry[2:4]
+                glPushMatrix()
+                glTranslate(xlightning, y, 3.3)
+                glRotate(90, 1, 0, 0)
+                glScalef(.15 + .5 * ms * ff, event.flameCount / 3.0 + .6 * ms * ff, 2)
+                glBegin(GL_TRIANGLE_STRIP)
+                glTexCoord2f(0.0, 0.0)
+                glVertex3f( .4, 0, -2)
+                glTexCoord2f(1.0, 0.0)
+                glVertex3f(-.4, 0, -2)
+                glTexCoord2f(0.0, 1.0)
+                glVertex3f( .4, 0,  2)
+                glTexCoord2f(1.0, 1.0)
+                glVertex3f(-.4, 0,  2)
+              else:
+                self.hitflames1Drawing.texture.bind()
+                glPushMatrix()
+                glTranslate(x, y + .35, 0)
+                glRotate(90, 1, 0, 0)
+                glScalef(.25 + .6 * ms * ff, event.flameCount / 3.0 + .6 * ms * ff, event.flameCount / 3.0 + .6 * ms * ff)
+                glBegin(GL_TRIANGLE_STRIP)
+                glTexCoord2f(0.0, 0.0)
+                glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+                glTexCoord2f(1.0, 0.0)
+                glVertex3f( flameSize * ff, 0, -flameSize * ff)
+                glTexCoord2f(0.0, 1.0)
+                glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+                glTexCoord2f(1.0, 1.0)
+                glVertex3f( flameSize * ff, 0,  flameSize * ff)
+              glEnd()
+              glPopMatrix()
+              glDisable(GL_TEXTURE_2D)
+
+              flameColorMod0 = 0.1 * (flameLimit - event.flameCount)
+              flameColorMod1 = 0.1 * (flameLimit - event.flameCount)
+              flameColorMod2 = 0.1 * (flameLimit - event.flameCount)
+              
+              glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)      
+              if self.starPowerActive:
+                if self.theme == 0 or self.theme == 1: #GH3 starcolor
+                  glColor3f(.3,.6,.8)
+                else: #Default starcolor (Rockband)
+                  glColor3f(.5,.5,.5)
+              glEnable(GL_TEXTURE_2D)
+              self.hitflames1Drawing.texture.bind()    
+              glPushMatrix()
+              glTranslate(x - .005, y + .40 + .005, 0)
+              glRotate(90, 1, 0, 0)
+              glScalef(.30 + .6 * ms * ff, (event.flameCount + 1)/ 2.5 + .6 * ms * ff, (event.flameCount + 1) / 2.5 + .6 * ms * ff)
+              glBegin(GL_TRIANGLE_STRIP)
+              glTexCoord2f(0.0, 0.0)
+              glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(1.0, 0.0)
+              glVertex3f( flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(0.0, 1.0)
+              glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+              glTexCoord2f(1.0, 1.0)
+              glVertex3f( flameSize * ff, 0,  flameSize * ff)
+              glEnd()
+              glPopMatrix()  
+              glDisable(GL_TEXTURE_2D)
+
+              flameColorMod0 = 0.1 * (flameLimit - event.flameCount)
+              flameColorMod1 = 0.1 * (flameLimit - event.flameCount)
+              flameColorMod2 = 0.1 * (flameLimit - event.flameCount)
+              
+              glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
+              if self.starPowerActive:
+                if self.theme == 0 or self.theme == 1: #GH3 starcolor
+                  glColor3f(.3,.7,.8)
+                else: #Default starcolor (Rockband)
+                  glColor3f(.6,.6,.6)
+              glEnable(GL_TEXTURE_2D)
+              self.hitflames1Drawing.texture.bind()    
+              glPushMatrix()
+              glTranslate(x + .005, y + .35 + .005, 0)
+              glRotate(90, 1, 0, 0)
+              glScalef(.35 + .6 * ms * ff, (event.flameCount + 1) / 2.0 + .6 * ms * ff, (event.flameCount + 1) / 2.0 + .6 * ms * ff)
+              glBegin(GL_TRIANGLE_STRIP)
+              glTexCoord2f(0.0, 0.0)
+              glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(1.0, 0.0)
+              glVertex3f( flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(0.0, 1.0)
+              glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+              glTexCoord2f(1.0, 1.0)
+              glVertex3f( flameSize * ff, 0,  flameSize * ff)
+              glEnd()
+              glPopMatrix()  
+              glDisable(GL_TEXTURE_2D)
+
+              flameColorMod0 = 0.1 * (flameLimit - event.flameCount)
+              flameColorMod1 = 0.1 * (flameLimit - event.flameCount)
+              flameColorMod2 = 0.1 * (flameLimit - event.flameCount)
+              
+              glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
+              if self.starPowerActive:
+                if self.theme == 0 or self.theme == 1: #GH3 starcolor
+                  glColor3f(.3,.7,.9)
+                else: #Default starcolor (Rockband)
+                  glColor3f(.7,.7,.7)
+              glEnable(GL_TEXTURE_2D)
+              self.hitflames1Drawing.texture.bind()    
+              glPushMatrix()
+              glTranslate(x+.005, y +.35 +.005, 0)
+              glRotate(90, 1, 0, 0)
+              glScalef(.40 + .6 * ms * ff, (event.flameCount + 1) / 1.7 + .6 * ms * ff, (event.flameCount + 1) / 1.7 + .6 * ms * ff)
+              glBegin(GL_TRIANGLE_STRIP)
+              glTexCoord2f(0.0, 0.0)
+              glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(1.0, 0.0)
+              glVertex3f( flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(0.0, 1.0)
+              glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+              glTexCoord2f(1.0, 1.0)
+              glVertex3f( flameSize * ff, 0,  flameSize * ff)
+              glEnd()
+              glPopMatrix()  
+              glDisable(GL_TEXTURE_2D)
          
 
           glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
@@ -2263,10 +2746,14 @@ class Guitar:
 
     if not self.starNotesSet == True:
       self.totalNotes = 0
+      
+      
       for time, event in song.track[self.player].getAllEvents():
         if not isinstance(event, Note):
           continue
         self.totalNotes += 1
+        
+        
       stars = []
       maxStars = []
       maxPhrase = self.totalNotes/120
@@ -2298,49 +2785,98 @@ class Guitar:
           #  event.star = True
           if time == q:   #MFH - no need to mark only the final SP phrase note as the finalStar as in drums, they will be hit simultaneously here.
             event.finalStar = True
-
       self.starNotesSet = True
 
-        
-    glEnable(GL_BLEND)
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-    glEnable(GL_COLOR_MATERIAL)
-    if self.leftyMode:
-      glScalef(-1, 1, 1)
+    if not (self.coOpFailed and not self.coOpRestart):
+      glEnable(GL_BLEND)
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+      glEnable(GL_COLOR_MATERIAL)
+      if self.leftyMode:
+        glScalef(-1, 1, 1)
 
-    if self.ocount <= 1:
-      self.ocount = self.ocount + .1
-    else:
-      self.ocount = 1
-
-    self.renderNeck(visibility, song, pos)
-    if self.theme == 0 or self.theme == 1 or self.theme == 2:
-      self.drawTrack(self.ocount, song, pos)
-      self.drawBPM(visibility, song, pos)
-      self.drawSideBars(visibility, song, pos)
-    else:
-      self.renderTracks(visibility)
-      self.renderBars(visibility, song, pos)
-    
-
-    if self.fretsUnderNotes:  #MFH
-      if self.twoDnote == True:
-        self.renderTails(visibility, song, pos, killswitch)
-        self.renderFrets(visibility, song, controls)
-        self.renderNotes(visibility, song, pos, killswitch)
+      if self.ocount <= 1:
+        self.ocount = self.ocount + .1
       else:
+        self.ocount = 1
+
+      if self.isFailing == True:
+        if self.failcount <= 1 and self.failcount2 == False:
+          self.failcount += .05
+        elif self.failcount >= 1 and self.failcount2 == False:
+          self.failcount = 1
+          self.failcount2 = True
+        
+        if self.failcount >= 0 and self.failcount2 == True:
+          self.failcount -= .05
+        elif self.failcount <= 0 and self.failcount2 == True:
+          self.failcount = 0
+          self.failcount2 = False
+
+      if self.isFailing == False and self.failcount > 0:
+        self.failcount -= .05
+        self.failcount2 = False
+
+      if self.starPowerActive:
+
+        if self.spcount < 1.2:
+          self.spcount += .05
+          self.spcount2 = 1
+        elif self.spcount >=1.2:
+          self.spcount = 1.2
+          self.spcount2 = 0
+      else:
+        if self.spcount > 0:
+          self.spcount -= .05
+          self.spcount2 = 2
+        elif self.spcount <=0:
+          self.spcount = 0
+          self.spcount2 = 0
+
+      if self.scoreMultiplier > 4 and self.bgcount < 1:
+        self.bgcount += .1
+      if self.scoreMultiplier < 4 and self.bgcount > 0:
+        self.bgcount -= .1
+      
+      
+      self.renderNeck(visibility, song, pos)
+      self.renderIncomingNecks(visibility, song, pos) #MFH
+      if self.theme == 0 or self.theme == 1 or self.theme == 2:
+        self.drawTrack(self.ocount, song, pos)
+        self.drawBPM(visibility, song, pos)
+        self.drawSideBars(visibility, song, pos)
+      else:
+        self.renderTracks(visibility)
+        self.renderBars(visibility, song, pos)
+    
+
+      if self.freestyleActive:
         self.renderTails(visibility, song, pos, killswitch)
         self.renderNotes(visibility, song, pos, killswitch)
+        self.renderFreestyleLanes(visibility, song, pos) #MFH - render the lanes on top of the notes.
         self.renderFrets(visibility, song, controls)
-    else:
-      self.renderTails(visibility, song, pos, killswitch)
-      self.renderNotes(visibility, song, pos, killswitch)
-      self.renderFrets(visibility, song, controls)
 
-    self.renderFlames(visibility, song, pos, controls)
+      else:    
+        if self.fretsUnderNotes:  #MFH
+          if self.twoDnote == True:
+            self.renderTails(visibility, song, pos, killswitch)
+            self.renderFrets(visibility, song, controls)
+            self.renderNotes(visibility, song, pos, killswitch)
+          else:
+            self.renderTails(visibility, song, pos, killswitch)
+            self.renderNotes(visibility, song, pos, killswitch)
+            self.renderFrets(visibility, song, controls)
+        else:
+          self.renderTails(visibility, song, pos, killswitch)
+          self.renderNotes(visibility, song, pos, killswitch)
+          self.renderFrets(visibility, song, controls)
+
+        self.renderFreestyleLanes(visibility, song, pos) #MFH - render the lanes on top of the notes.
+
+
+      self.renderFlames(visibility, song, pos, controls)
     
-    if self.leftyMode:
-      glScalef(-1, 1, 1)
+      if self.leftyMode:
+        glScalef(-1, 1, 1)
 
   def getMissedNotes(self, song, pos, catchup = False):
     if not song:
@@ -2379,7 +2915,7 @@ class Guitar:
     
     notes   = [(time, event) for time, event in notes if not event.played and not event.hopod and not event.skipped]
 
-    if catchup == True:
+    if catchup:
       for time, event in notes:
         event.skipped = True
       
@@ -2844,6 +3380,25 @@ class Guitar:
       return True
     return False
 
+
+  #MFH - TODO - handle freestyle picks here
+  def freestylePick(self, song, pos, controls):
+    numHits = 0
+    #if not song:
+    #  return numHits
+    
+    if not controls.getState(self.actions[0]) and not controls.getState(self.actions[1]):
+      return 0
+
+    for theFret in range(0,5):
+      self.freestyleHit[theFret] = controls.getState(self.keys[theFret])
+      if self.freestyleHit[theFret]:
+        numHits += 1
+    return numHits
+
+
+
+
   def endPick(self, pos):
     for time, note in self.playedNotes:
       if time + note.length > pos + self.noteReleaseMargin:
@@ -2863,6 +3418,13 @@ class Guitar:
       pickLength = min(pickLength, note.length)
     return pickLength
 
+
+  def coOpRescue(self, pos):
+    self.coOpRestart = True #initializes Restart Timer
+    self.coOpRescueTime  = pos
+    self.starPower  = 0
+    Log.debug("Rescued at " + str(pos))
+  
   def run(self, ticks, pos, controls):
     self.time += ticks
     
@@ -2877,7 +3439,7 @@ class Guitar:
     
     #myfingershurt: must not decrease SP if paused.
     if self.starPowerActive == True and self.paused == False:
-      self.starPower -= ticks/200.0
+      self.starPower -= ticks/self.starPowerDecreaseDivisor 
       if self.starPower <= 0:
         self.starPower = 0
         self.starPowerActive = False

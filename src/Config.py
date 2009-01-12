@@ -283,7 +283,7 @@ class Config:
 
     #5    
     #Value 0 FoF / 1 GH / 2 Custom
-    pov = int(self.get("game", "pov"))
+    pov = int(self.get("fretboard", "point_of_view"))
 
     #6    
     #Value 0 FoF / 1 Capo

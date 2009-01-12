@@ -90,7 +90,7 @@ class DebugLayer(Layer):
       font.render("System:", (x, y), scale = scale)
       font.render("%d threads" % threading.activeCount(), (x + .1, y), scale = scale)
       y += h
-      font.render("%.2f fps" % self.engine.timer.fpsEstimate, (x + .1, y), scale = scale)
+      font.render("%.2f fps" % self.engine.fpsEstimate, (x + .1, y), scale = scale)
       y += h
       font.render("%d sessions, server %s" % (len(self.engine.sessions), self.engine.server and "on" or "off"), (x + .1, y), scale = scale)
       #y += h

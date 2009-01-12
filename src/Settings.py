@@ -11,7 +11,7 @@
 #               2008 QQStarS                                        #
 #               2008 Blazingamer                                    #
 #               2008 evilynux <evilynux@gmail.com>                  #
-#               2008 fablaculp                                            #
+#               2008 fablaculp                                      #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -225,9 +225,10 @@ class SettingsMenu(Menu.Menu):
     LyricsSettingsMenu = Menu.Menu(engine, LyricsSettings)
     
     JurgenSettings = [
-       ConfigChoice(engine.config, "game", "jurgdef", autoApply = True),#Spikehead777
+       ConfigChoice(engine.config, "game", "jurgmode", autoApply = True),#Spikehead777
        ConfigChoice(engine.config, "game", "jurgtype", autoApply = True),#Spikehead777
        ConfigChoice(engine.config, "game", "jurglogic", autoApply = True),#MFH
+       ConfigChoice(engine.config, "game", "jurgtext", autoApply = True),#hman
     ]
     JurgenSettingsMenu = Menu.Menu(engine, JurgenSettings)
            
@@ -237,12 +238,12 @@ class SettingsMenu(Menu.Menu):
       (_("Stages Options"), StagesOptionsMenu),
       (_("HO/PO Settings"), HOPOSettingsMenu),
       (_("Lyrics Settings"), LyricsSettingsMenu),
-      (_("Jurgen Settings"), JurgenSettingsMenu),
       (_("Choose P1 Neck >"), lambda: Dialogs.chooseNeck(engine,player=0,prompt=_("Yellow (#3) / Blue (#4) to change:"))),
       (_("Choose P2 Neck >"), lambda: Dialogs.chooseNeck(engine,player=1,prompt=_("Yellow (#3) / Blue (#4) to change:"))),
       ConfigChoice(engine.config, "game", "ignore_open_strums", autoApply = True),      #myfingershurt
       ConfigChoice(engine.config, "game", "star_scoring", autoApply = True),#myfingershurt
-      ConfigChoice(engine.config, "coffee", "failingEnabled", autoApply = True),
+      ConfigChoice(engine.config, "audio", "enable_crowd_tracks", autoApply = True), #akedrou: I don't like this here, but "audio" menu is empty of choices.
+      
       ConfigChoice(engine.config, "game",  "uploadscores", autoApply = True),
     ]
     FoFiXBasicSettingsMenu = Menu.Menu(engine, FoFiXBasicSettings)
@@ -250,10 +251,14 @@ class SettingsMenu(Menu.Menu):
     FoFiXAdvancedSettings = [
        ConfigChoice(engine.config, "game", "party_time", autoApply = True),
        ConfigChoice(engine.config, "game", "rb_midi_lyrics", autoApply = True),      #myfingershurt
+       ConfigChoice(engine.config, "game", "midi_lyric_mode", autoApply = True),      #myfingershurt
        ConfigChoice(engine.config, "game", "rb_midi_sections", autoApply = True),      #myfingershurt
        ConfigChoice(engine.config, "game", "bass_groove_enable", autoApply = True),#myfingershurt
        ConfigChoice(engine.config, "game", "lphrases", autoApply = True),#blazingamer
        ConfigChoice(engine.config, "game", "whammy_saves_starpower", autoApply = True),#myfingershurt
+       ConfigChoice(engine.config, "game", "starpower_mode", autoApply = True),#myfingershurt
+       ConfigChoice(engine.config, "game", "big_rock_endings", autoApply = True),#myfingershurt
+       ConfigChoice(engine.config, "game", "big_rock_logic", autoApply = True),	#volshebnyi
     ]
     FoFiXAdvancedSettingsMenu = Menu.Menu(engine, FoFiXAdvancedSettings)
     
@@ -269,6 +274,11 @@ class SettingsMenu(Menu.Menu):
       KeyConfigChoice(engine, engine.config, "player0", "key_drum3b"),
       KeyConfigChoice(engine, engine.config, "player0", "key_drum4a"),
       KeyConfigChoice(engine, engine.config, "player0", "key_drum4b"),
+      KeyConfigChoice(engine, engine.config, "player0", "key_drum_up"), #shun - directionals
+      KeyConfigChoice(engine, engine.config, "player0", "key_drum_down"),
+      KeyConfigChoice(engine, engine.config, "player0", "key_drum_left"),
+      KeyConfigChoice(engine, engine.config, "player0", "key_drum_right"),
+      KeyConfigChoice(engine, engine.config, "player0", "key_drum_cancel"),
       KeyConfigChoice(engine, engine.config, "player1", "player_2_key_bass"),
       KeyConfigChoice(engine, engine.config, "player1", "player_2_key_drum1a"),
       KeyConfigChoice(engine, engine.config, "player1", "player_2_key_drum1b"),
@@ -278,9 +288,49 @@ class SettingsMenu(Menu.Menu):
       KeyConfigChoice(engine, engine.config, "player1", "player_2_key_drum3b"),
       KeyConfigChoice(engine, engine.config, "player1", "player_2_key_drum4a"),
       KeyConfigChoice(engine, engine.config, "player1", "player_2_key_drum4b"),
+      KeyConfigChoice(engine, engine.config, "player1", "player_2_key_drum_up"), #shun - directionals
+      KeyConfigChoice(engine, engine.config, "player1", "player_2_key_drum_down"),
+      KeyConfigChoice(engine, engine.config, "player1", "player_2_key_drum_left"),
+      KeyConfigChoice(engine, engine.config, "player1", "player_2_key_drum_right"),
+      KeyConfigChoice(engine, engine.config, "player1", "player_2_key_drum_cancel"),
+
     ]       
     drumKeySettingsMenu = Menu.Menu(engine, drumKeySettings)
 
+#shun - alternate drum keys
+    altDrumKeySettings = [
+      (_("Test Keys"), lambda: Dialogs.testDrums(engine)),
+      #ConfigChoice(engine.config, "game", "auto_drum_sp", autoApply = True),#myfingershurt #shun- probably not needed for alt(?)
+      KeyConfigChoice(engine, engine.config, "player0", "akey_bass"),
+      KeyConfigChoice(engine, engine.config, "player0", "akey_drum1a"),
+      KeyConfigChoice(engine, engine.config, "player0", "akey_drum1b"),
+      KeyConfigChoice(engine, engine.config, "player0", "akey_drum2a"),
+      KeyConfigChoice(engine, engine.config, "player0", "akey_drum2b"),
+      KeyConfigChoice(engine, engine.config, "player0", "akey_drum3a"),
+      KeyConfigChoice(engine, engine.config, "player0", "akey_drum3b"),
+      KeyConfigChoice(engine, engine.config, "player0", "akey_drum4a"),
+      KeyConfigChoice(engine, engine.config, "player0", "akey_drum4b"),
+      KeyConfigChoice(engine, engine.config, "player0", "akey_drum_up"),
+      KeyConfigChoice(engine, engine.config, "player0", "akey_drum_down"), #shun - directionals
+      KeyConfigChoice(engine, engine.config, "player0", "akey_drum_left"),
+      KeyConfigChoice(engine, engine.config, "player0", "akey_drum_right"),
+      KeyConfigChoice(engine, engine.config, "player0", "akey_drum_cancel"),
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_bass"),
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_drum1a"),
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_drum1b"),
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_drum2a"),
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_drum2b"),
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_drum3a"),
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_drum3b"),
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_drum4a"),
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_drum4b"),
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_drum_up"), # shun -directionals
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_drum_down"),
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_drum_left"),
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_drum_right"),
+      KeyConfigChoice(engine, engine.config, "player1", "aplayer_2_key_drum_cancel"),
+    ]       
+    altDrumKeySettingsMenu = Menu.Menu(engine, altDrumKeySettings)
 
     player0Keys = [
       KeyConfigChoice(engine, engine.config, "player0", "key_action1"),
@@ -373,9 +423,10 @@ class SettingsMenu(Menu.Menu):
       (_("Player 1 Alt. Keys"), player0AltKeyMenu),
       (_("Player 2 Keys"), player1KeyMenu),
       (_("Player 2 Alt. Keys"), player1AltKeyMenu),
-      (_("Drum keys" ), drumKeySettingsMenu),
+      (_("Drum Keys" ), drumKeySettingsMenu),
+      (_("Alt. Drum Keys" ), altDrumKeySettingsMenu),
       (_("Test Keys"), lambda: Dialogs.testKeys(engine)),
-      (_("Advanced controls"), AdvancedKeySettingsMenu),
+      (_("Advanced Controls"), AdvancedKeySettingsMenu),
     ]
     keySettingsMenu = Menu.Menu(engine, keySettings)
     
@@ -401,12 +452,13 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "video",  "multisamples"),
       ConfigChoice(engine.config, "video", "disable_fretsfx"),
       ConfigChoice(engine.config, "video", "hitglow_color"),
-      ConfigChoice(engine.config, "game", "pov", autoApply = True),
+      ConfigChoice(engine.config, "video", "counting", autoApply = True),
       (_("Advanced Video Settings"), AdvancedVideoSettingsMenu),
     ]
     videoSettingsMenu = Menu.Menu(engine, videoSettings)
 
     fretSettings = [
+      ConfigChoice(engine.config, "fretboard", "point_of_view", autoApply = True),
       ConfigChoice(engine.config, "coffee", "phrases", autoApply = True),
       ConfigChoice(engine.config, "game", "notedisappear", autoApply = True),
       ConfigChoice(engine.config, "game", "frets_under_notes", autoApply = True), #MFH
@@ -416,6 +468,8 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "game", "large_drum_neck", autoApply = True),      #myfingershurt
       ConfigChoice(engine.config, "game", "bass_groove_neck", autoApply = True),      #myfingershurt
       ConfigChoice(engine.config, "game", "guitar_solo_neck", autoApply = True),      #myfingershurt
+      ConfigChoice(engine.config, "game", "incoming_neck_mode", autoApply = True),      #myfingershurt
+      ConfigChoice(engine.config, "game", "solo_frame", autoApply = True),      #myfingershurt
       ConfigChoice(engine.config, "game", "in_game_font_shadowing", autoApply = True),      #myfingershurt
     ]
     fretSettingsMenu = Menu.Menu(engine, fretSettings)
@@ -427,6 +481,7 @@ class SettingsMenu(Menu.Menu):
       VolumeConfigChoice(engine, engine.config, "audio",  "screwupvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "miss_volume", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "single_track_miss_volume", autoApply = True),
+      VolumeConfigChoice(engine, engine.config, "audio",  "crowd_volume", autoApply = True), #akedrou
       VolumeConfigChoice(engine, engine.config, "audio",  "kill_volume", autoApply = True), #MFH
       VolumeConfigChoice(engine, engine.config, "audio",  "SFX_volume", autoApply = True), #MFH
     ]
@@ -434,6 +489,7 @@ class SettingsMenu(Menu.Menu):
     
     AdvancedAudioSettings = [
        ConfigChoice(engine.config, "audio",  "delay", autoApply = True),     #myfingershurt: so a/v delay can be set without restarting FoF
+       ConfigChoice(engine.config, "audio",  "whammy_effect", autoApply = True),     #MFH
        ConfigChoice(engine.config, "audio",  "frequency"),
        ConfigChoice(engine.config, "audio",  "bits"),
        ConfigChoice(engine.config, "audio",  "buffersize"),
@@ -462,14 +518,21 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "game", "log_loadings", autoApply = True),#myfingershurt
       ConfigChoice(engine.config, "game", "log_sections", autoApply = True),#myfingershurt
       ConfigChoice(engine.config, "game", "log_undefined_gets", autoApply = True),#myfingershurt
+      ConfigChoice(engine.config, "game", "log_marker_notes", autoApply = True),#myfingershurt
+      ConfigChoice(engine.config, "game", "log_starpower_misses", autoApply = True),#myfingershurt
+      ConfigChoice(engine.config, "log",   "log_unedited_midis", autoApply = True),#myfingershurt
     ]
     logfileSettingsMenu = Menu.Menu(engine, logfileSettings)
 
     debugSettings = [
+      ConfigChoice(engine.config, "video", "show_fps", autoApply = True),#evilynux
       ConfigChoice(engine.config, "game", "kill_debug", autoApply = True),#myfingershurt
       ConfigChoice(engine.config, "game", "hopo_debug_disp", autoApply = True),#myfingershurt
       ConfigChoice(engine.config, "game", "rock_band_events", autoApply = True),#myfingershurt
       ConfigChoice(engine.config, "game", "show_unused_text_events", autoApply = True),#myfingershurt
+      ConfigChoice(engine.config, "debug",   "use_unedited_midis", autoApply = True),#myfingershurt
+      #ConfigChoice(engine.config, "game", "font_rendering_mode", autoApply = True),#myfingershurt
+      ConfigChoice(engine.config, "debug",   "show_freestyle_active", autoApply = True),#myfingershurt
       (_("Log Settings"),    logfileSettingsMenu),
     ]
     debugSettingsMenu = Menu.Menu(engine, debugSettings)
@@ -497,14 +560,21 @@ class SettingsMenu(Menu.Menu):
     listSettings = [
       (_("Select Song Library >"), self.baseLibrarySelect),
       ConfigChoice(engine.config, "coffee", "songfilepath", autoApply = True),
+      ConfigChoice(engine.config, "game", "sort_direction", autoApply = True),
       ConfigChoice(engine.config, "game",  "sort_order", autoApply = True),
-      ConfigChoice(engine.config, "coffee", "songdisplay", autoApply = True),
+      ConfigChoice(engine.config, "coffee", "song_display_mode", autoApply = True),
+      ConfigChoice(engine.config, "game", "song_listing_mode", autoApply = True),
+      #(_("Select List All Folder >"), self.listAllFolderSelect), #- Not Working Yet - Qstick
+      ConfigChoice(engine.config, "game", "songcovertype", autoApply = True),
+      ConfigChoice(engine.config, "game", "songlistrotation", autoApply = True),
+      ConfigChoice(engine.config, "game", "song_icons", autoApply = True),
+      ConfigChoice(engine.config, "game", "preload_labels", autoApply = True),
       ConfigChoice(engine.config, "audio", "disable_preview", autoApply = True),  #myfingershurt
       ConfigChoice(engine.config, "game", "songlist_instrument", autoApply = True), #MFH
       ConfigChoice(engine.config, "game", "songlist_difficulty", autoApply = True), #evilynux
       ConfigChoice(engine.config, "game", "songlist_extra_stats", autoApply = True), #evilynux
       ConfigChoice(engine.config, "game", "HSMovement", autoApply = True), #racer
-      ConfigChoice(engine.config, "game", "quickplay_career_tiers", autoApply = True),  #myfingershurt
+      ConfigChoice(engine.config, "game", "quickplay_tiers", autoApply = True),  #myfingershurt
     ]
     listSettingsMenu = Menu.Menu(engine, listSettings)
 
@@ -528,6 +598,13 @@ class SettingsMenu(Menu.Menu):
     ]
     AdvancedSettingsMenu = Menu.Menu(engine, AdvancedSettings)
     
+    Cheats = [
+      (_("Jurgen Settings"), JurgenSettingsMenu),
+      ConfigChoice(engine.config, "coffee", "failingEnabled", autoApply = True),
+      ConfigChoice(engine.config, "audio",  "slow_down_divisor", autoApply = True),     #MFH
+    ]
+    CheatMenu = Menu.Menu(engine, Cheats)
+    
     settings = [
       (_(engine.versionString+_(" Basic Settings")),   FoFiXBasicSettingsMenu),
       (_("Controls"),          keySettingsMenu),
@@ -537,20 +614,29 @@ class SettingsMenu(Menu.Menu):
       (_("Performances/Debug"), perfSettingsMenu),
       (_("Advanced Settings"), AdvancedSettingsMenu),
       (_("Mod settings"), modSettings),
+      (_("Cheats"), CheatMenu),
       (_("Credits"), lambda: Dialogs.showCredits(engine)), # evilynux - Show Credits!
       (_("Apply New Settings"), self.applySettings)
     ]
   
-    self.settingsToApply = settings + \
-                           videoSettings + \
+    self.settingsToApply = videoSettings + \
                            AdvancedAudioSettings + \
-                           volumeSettings + \
                            keySettings + \
-			   AdvancedVideoSettings + \
+			                     AdvancedVideoSettings + \
                            FoFiXBasicSettings + \
                            perfSettings + \
-                           listSettings + \
                            modSettings
+
+#-    self.settingsToApply = settings + \
+#-                           videoSettings + \
+#-                           AdvancedAudioSettings + \
+#-                           volumeSettings + \
+#-                           keySettings + \
+#-			                     AdvancedVideoSettings + \
+#-                           FoFiXBasicSettings + \11/26/2008 11:10:30 PM
+#-                           perfSettings + \
+#-                           listSettings + \
+#-                           modSettings
 
     self.opt_text_x = Theme.opt_text_xPos
     self.opt_text_y = Theme.opt_text_yPos
@@ -602,6 +688,15 @@ class SettingsMenu(Menu.Menu):
       self.engine.restart()
 
 
+  #def listAllFolderSelect(self):
+  #  Log.debug("settings.baseLibrarySelect function call...")
+  #  newPath = Dialogs.chooseFile(self.engine, masks = ["*/*"], prompt = _("Choose a New List All directory."), dirSelect = True)
+  #  if newPath != None:
+  #    Config.set("game", "listall_folder", os.path.dirname(newPath))
+  #    Log.debug(newPath)
+  #    Log.debug(os.path.dirname(newPath))
+  #    self.engine.resource.refreshBaseLib()   #myfingershurt - to let user continue with new songpath without restart
+      
   def baseLibrarySelect(self):
     Log.debug("settings.baseLibrarySelect function call...")
     newPath = Dialogs.chooseFile(self.engine, masks = ["*/songs"], prompt = _("Choose a new songs directory."), dirSelect = True)
@@ -612,29 +707,37 @@ class SettingsMenu(Menu.Menu):
       self.engine.resource.refreshBaseLib()   #myfingershurt - to let user continue with new songpath without restart
     
 class GameSettingsMenu(Menu.Menu):
-  def __init__(self, engine):
+  def __init__(self, engine, gTextColor, gSelectedColor):
 
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("GameSettingsMenu class init (Settings.py)...")
-
+    
+    Cheats = [
+      ConfigChoice(engine.config, "game", "jurgmode", autoApply = True),#Jurgen config -- Spikehead777
+      ConfigChoice(engine.config, "game", "jurgtype", autoApply = True),#Jurgen controls -- Spikehead777
+      ConfigChoice(engine.config, "game", "jurglogic", autoApply = True),#MFH
+     #MFH
+    ]
+    CheatMenu = Menu.Menu(engine, Cheats, pos = (.3, .31), viewSize = 5, textColor = gTextColor, selectedColor = gSelectedColor)
+    
     settings = [
+      (_("Cheats"), CheatMenu),
       VolumeConfigChoice(engine, engine.config, "audio",  "guitarvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "songvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "rhythmvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "screwupvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "miss_volume", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "single_track_miss_volume", autoApply = True),
+      VolumeConfigChoice(engine, engine.config, "audio",  "crowd_volume", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "kill_volume", autoApply = True), #MFH
       VolumeConfigChoice(engine, engine.config, "audio",  "SFX_volume", autoApply = True), #MFH
+      ConfigChoice(engine.config, "audio", "enable_crowd_tracks", autoApply = True), #akedrou
       ConfigChoice(engine.config, "audio",  "delay", autoApply = True),   #myfingershurt: so the a/v delay can be adjusted in-game
-      ConfigChoice(engine.config, "game", "jurgdef", autoApply = True),#Jurgen config -- Spikehead777
-      ConfigChoice(engine.config, "game", "jurgtype", autoApply = True),#Jurgen controls -- Spikehead777
-      ConfigChoice(engine.config, "game", "jurglogic", autoApply = True),#MFH
       ConfigChoice(engine.config, "game", "stage_rotate_delay", autoApply = True),   #myfingershurt - user defined stage rotate delay
       ConfigChoice(engine.config, "game", "stage_animate_delay", autoApply = True),   #myfingershurt - user defined stage rotate delay
       ConfigChoice(engine.config, "player0",  "leftymode", autoApply = True),
       ConfigChoice(engine.config, "player1",  "leftymode", autoApply = True), #QQstarS
     ]
-    Menu.Menu.__init__(self, engine, settings, pos = (.3, .31), viewSize = 5)
+    Menu.Menu.__init__(self, engine, settings, pos = (.3, .31), viewSize = 5, textColor = gTextColor, selectedColor = gSelectedColor)
 

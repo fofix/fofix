@@ -41,6 +41,8 @@ import math
 import os
 import random
 
+import Song   #need the base song defines as well
+
 PLAYER1DRUMS   = [Player.BASS, Player.DRUM1A, Player.DRUM2A, Player.DRUM3A, Player.DRUM4A, Player.DRUM1B, Player.DRUM2B, Player.DRUM3B, Player.DRUM4B]
 PLAYER2DRUMS   = [Player.PLAYER_2_BASS, Player.PLAYER_2_DRUM1A,Player.PLAYER_2_DRUM2A, Player.PLAYER_2_DRUM3A, Player.PLAYER_2_DRUM4A,
                   Player.PLAYER_2_DRUM1B, Player.PLAYER_2_DRUM2B, Player.PLAYER_2_DRUM3B, Player.PLAYER_2_DRUM4B] 
@@ -60,6 +62,10 @@ PLAYER2DRUMS   = [Player.PLAYER_2_BASS, Player.PLAYER_2_DRUM1A,Player.PLAYER_2_D
 class Drum:
   def __init__(self, engine, editorMode = False, player = 0):
     self.engine         = engine
+    
+    self.starPowerDecreaseDivisor = 200.0*self.engine.audioSpeedDivisor
+
+    
     self.isDrum = True
     self.isBassGuitar = False
   
@@ -69,12 +75,20 @@ class Drum:
     self.lastFretWasT3 = False
     self.lastFretWasC = False
 
-
+    self.useMidiSoloMarkers = False
     self.canGuitarSolo = False
+    self.guitarSolo = False
     self.sameNoteHopoString = False
     self.hopoProblemNoteNum = -1
+    self.currentGuitarSoloHitNotes = 0
 
     self.matchingNotes = None
+
+    self.bigRockEndingMarkerSeen = False
+
+
+
+    self.oNeckovr = None    #MFH - needs to be here to prevent crashes!    
 
     self.starNotesInView = False
     self.openStarNotesInView = False
@@ -83,7 +97,32 @@ class Drum:
 
     self.isStarPhrase = False
     self.finalStarSeen = False
+
+    self.freestyleActive = False
     
+    # Volshebnyi - BRE scoring variables
+    self.freestyleEnabled = False
+    self.freestyleStart = 0
+    self.freestyleFirstHit = 0
+    self.freestyleLength = 0
+    self.freestyleLastHit = 0
+    self.freestyleBonusFret = -2
+    self.freestyleLastFretHitTime = range(5)
+    self.freestyleBaseScore = 750
+    self.freestylePeriod = 1000
+    self.freestylePercent = 50
+    self.drumFillsCount = 0
+    self.drumFillsTotal = 0
+    self.drumFillsHits = 0
+    self.drumFillsActive = False
+    self.drumFillsReady = False
+    self.freestyleReady = False
+    self.freestyleOffset = 5
+
+    #self.drumFillOnScreen = False   #MFH 
+    self.drumFillEvents = []
+    self.drumFillWasJustActive = False
+
     self.accThresholdWorstLate = 0
     self.accThresholdVeryLate = 0
     self.accThresholdLate = 0
@@ -115,6 +154,13 @@ class Drum:
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("Drum class initialization!")
+
+    self.incomingNeckMode = self.engine.config.get("game", "incoming_neck_mode")
+    self.guitarSoloNeckMode = self.engine.config.get("game", "guitar_solo_neck")
+    self.bigRockEndings = self.engine.config.get("game", "big_rock_endings")    
+    self.bigRockLogic = self.engine.config.get("game", "big_rock_logic") #volshebnyi
+
+
     
     self.actualBpm = 0.0
 
@@ -141,12 +187,20 @@ class Drum:
     self.starPower = 0
     self.starPowerActive = False
     self.starPowerGained = False
-    self.starNotesSet = False
+
+    self.starpowerMode = self.engine.config.get("game", "starpower_mode") #MFH
+
     self.killPoints = False
+    
+    if self.starpowerMode == 1:
+      self.starNotesSet = False
+    else:
+      self.starNotesSet = True
+
     self.maxStars = []
     self.starNotes = []
     self.totalNotes = 0
-    
+
     #get difficulty
     self.difficulty = self.engine.config.get("player%d" %(player), "difficulty")
 
@@ -181,6 +235,8 @@ class Drum:
 
     self.hit = [False, False, False, False, False]
 
+    self.freestyleHit = [False, False, False, False, False]
+
     neckSettingName = "neck_choose_p%d" % (self.player)
     self.neck = self.engine.config.get("coffee", neckSettingName)
 
@@ -188,6 +244,10 @@ class Drum:
     themename = self.engine.data.themeLabel
     #now theme determination logic is only in data.py:
     self.theme = self.engine.data.theme
+    
+    #check if BRE enabled
+    if self.bigRockEndings == 2 or (self.theme == 2 and self.bigRockEndings == 1):
+    	self.freestyleEnabled = True   
 
     if self.theme < 2:    #make board same size as guitar board if GH based theme so it rockmeters dont interfere
       self.boardWidth     = 3.0
@@ -201,6 +261,16 @@ class Drum:
     self.opencolor = Theme.opencolor 
     self.ocount = 0
     self.noterotate = self.engine.config.get("coffee", "noterotate")
+    self.isFailing = False
+    self.failcount = 0
+    self.failcount2 = False
+    self.spcount = 0
+    self.spcount2 = 0
+    
+    #akedrou
+    self.coOpFailed = False
+    self.coOpRestart = False
+    self.coOpRescueTime = 0.0
 
 
     #MFH- fixing neck speed
@@ -290,7 +360,7 @@ class Drum:
       try:
         engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"drumfretshacked.png"))    
       except IOError:
-        engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"FretButtons.png"))
+        engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"fretbuttons.png"))
       #death_au: adding drumfrets.png (with bass drum frets seperate)
       try:
         engine.loadImgDrawing(self, "drumFretButtons", os.path.join("themes",themename,"drumfrets.png"))
@@ -349,15 +419,24 @@ class Drum:
     engine.loadImgDrawing(self, "bpm_halfbeat", os.path.join("themes",themename,"bpm_halfbeat.png"))
     engine.loadImgDrawing(self, "bpm_beat", os.path.join("themes",themename,"bpm_beat.png"))
     engine.loadImgDrawing(self, "bpm_measure", os.path.join("themes",themename,"bpm_measure.png"))
+    try:
+      engine.loadImgDrawing(self, "freestyle1", os.path.join("themes", themename, "freestyletail1.png"),  textureSize = (128, 128))
+      engine.loadImgDrawing(self, "freestyle2", os.path.join("themes", themename, "freestyletail2.png"),  textureSize = (128, 128))
+    except IOError:
+      engine.loadImgDrawing(self, "freestyle1", "freestyletail1.png",  textureSize = (128, 128))
+      engine.loadImgDrawing(self, "freestyle2", "freestyletail2.png",  textureSize = (128, 128))
 
     if self.theme == 0 or self.theme == 1:
       engine.loadImgDrawing(self, "hitlightning", os.path.join("themes",themename,"lightning.png"),  textureSize = (128, 128))
 
       #myfingershurt: the starpower neck file should be in the theme folder... and also not required:
       try:
-        engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"starpowerneck.png"),  textureSize = (256, 256))
+        engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"starpowerneck_drum.png"),  textureSize = (256, 256))
       except IOError:
-        self.oNeck = None
+        try:
+          engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"starpowerneck.png"),  textureSize = (256, 256))
+        except IOError:
+          self.oNeck = None
 
     elif self.theme == 2:
       try:
@@ -374,9 +453,12 @@ class Drum:
       
       #myfingershurt: the overdrive neck file should be in the theme folder... and also not required:
       try:
-        engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"), textureSize = (256, 256))
+        engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck_drum.png"),  textureSize = (256, 256))
       except IOError:
-        self.oNeck = None
+        try:
+          engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
+        except IOError:
+          self.oNeck = None
 
       #MFH: support for optional drum_overdrive_string_flash.png
       self.overdriveFlashCounts = self.indexFps/4   #how many cycles to display the oFlash: self.indexFps/2 = 1/2 second
@@ -386,6 +468,27 @@ class Drum:
       except IOError:
         self.oFlash = None
 
+
+    #myfingershurt: Guitar Solo neck:
+    if self.guitarSoloNeckMode > 0:
+      if self.guitarSoloNeckMode == 1:  #replace neck
+        try:
+          engine.loadImgDrawing(self, "guitarSoloNeck", os.path.join("themes",themename,"guitarsoloneck.png"),  textureSize = (256, 256))
+        except IOError:
+          self.guitarSoloNeck = None
+      elif self.guitarSoloNeckMode == 2:  #overlay neck
+        try:
+          engine.loadImgDrawing(self, "guitarSoloNeck", os.path.join("themes",themename,"guitarsoloneckovr.png"),  textureSize = (256, 256))
+        except IOError:
+          self.guitarSoloNeck = None
+    else:
+      self.guitarSoloNeck = None
+
+    try:
+      engine.loadImgDrawing(self, "failNeck", os.path.join("themes",themename,"failneck.png"))
+    except IOError:
+      engine.loadImgDrawing(self, "failNeck", os.path.join("failneck.png"))
+                                                           
 
 
 
@@ -497,13 +600,123 @@ class Drum:
   def setMultiplier(self, multiplier):
     self.scoreMultiplier = multiplier
     
-
-
-      
-  def renderNeck(self, visibility, song, pos):
+    
+  #volshebnyi
+  def renderFreestyleLanes(self, visibility, song, pos, controls):
     if not song:
       return
 
+    #MFH - check for [section big_rock_ending] to set a flag to determine how to treat the last drum fill marker note:
+    #for time, event in song.eventTracks[Song.TK_SECTIONS].getEvents(pos - self.lateMargin*2, pos):
+    #  if event.text.find("big rock ending") > 0:
+    if song.breMarkerTime and pos > song.breMarkerTime:
+      self.bigRockEndingMarkerSeen = True
+          
+          
+
+
+    #boardWindowMin = pos - self.currentPeriod * 2
+    boardWindowMax = pos + self.currentPeriod * self.beatsPerBoard
+    track = song.midiEventTrack[self.player]
+    #self.currentPeriod = self.neckSpeed
+    beatsPerUnit = self.beatsPerBoard / self.boardLength
+    if self.freestyleEnabled:
+      freestyleActive = False
+      self.drumFillsActive = False
+      #drumFillOnScreen = False
+      drumFillEvents = []
+      #for time, event in track.getEvents(boardWindowMin, boardWindowMax):
+      for time, event in track.getEvents(pos - self.freestyleOffset, boardWindowMax + self.freestyleOffset):
+        if isinstance(event, Song.MarkerNote):
+          if event.number == Song.freestyleMarkingNote and not event.happened:
+            #drumFillOnScreen = True
+            drumFillEvents.append(event)
+            length     = (event.length - 50) / self.currentPeriod / beatsPerUnit
+            w = self.boardWidth / self.strings
+            self.freestyleLength = event.length #volshebnyi
+            self.freestyleStart = time # volshebnyi
+            z  = ((time - pos) / self.currentPeriod) / beatsPerUnit
+            z2 = ((time + event.length - pos) / self.currentPeriod) / beatsPerUnit
+      
+            if z > self.boardLength * .8:
+              f = (self.boardLength - z) / (self.boardLength * .2)
+            elif z < 0:
+              f = min(1, max(0, 1 + z2))
+            else:
+              f = 1.0
+             
+            time -= self.freestyleOffset 
+            #volshebnyi - allow tail to move under frets
+            if time > pos:
+            	self.drumFillsHits = -1
+            if self.starPower>=50 and not self.starPowerActive:
+              self.drumFillsReady = True
+                
+            else:
+              self.drumFillsReady = False
+            if self.bigRockEndingMarkerSeen: # and ( (self.drumFillsCount == self.drumFillsTotal and time+event.length>pos) or (time > pos and self.drumFillsCount == self.drumFillsTotal-1) ):
+              self.freestyleReady = True
+              self.drumFillsReady = False
+            else:
+              self.freestyleReady = False
+            if time < pos:
+              if self.bigRockEndingMarkerSeen:  # and self.drumFillsCount == self.drumFillsTotal:
+              	freestyleActive = True
+              else:
+                #if self.drumFillsCount <= self.drumFillsTotal and self.drumFillsReady:
+                if self.drumFillsReady:
+                	self.drumFillsActive = True
+                	self.drumFillWasJustActive = True
+                if self.drumFillsHits<0:
+                	self.drumFillsCount += 1
+                	self.drumFillsHits = 0
+
+              if z < -1.5:
+              	length += z +1.5
+              	z =  -1.5
+              	
+            #if time+event.length>pos and time+event.length-0.5>pos:
+            #	if controls.getState(self.keys[4]) or controls.getState(self.keys[8]):
+            #		self.starPowerActive = True
+            	
+            #volshebnyi - render 4 freestyle tails
+            if self.freestyleReady or self.drumFillsReady:
+              for theFret in range(1,5):
+                x = (self.strings / 2 + .5 - theFret) * w
+                if theFret == 4:
+                  c = self.fretColors[0]
+                else:
+                  c = self.fretColors[theFret]
+                color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1.0 * visibility * f)
+                glPushMatrix()
+                glTranslatef(x, (1.0 - visibility) ** (theFret + 1), z)
+                  
+                # Volshebnyi - extra tail for bonus fret
+                if self.bigRockLogic == 1 and theFret == self.freestyleBonusFret:
+                  freestyleTailMode = 2
+                else:
+                  freestyleTailMode = 1
+                
+                self.renderTail(length = length, color = color, fret = theFret, freestyleTail = freestyleTailMode, pos = pos)
+                glPopMatrix()
+                 
+            
+            if ( self.drumFillsActive and self.drumFillsHits >= 4 and z + length<self.boardLength ):
+              glPushMatrix()
+              color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1.0 * visibility * f)
+              glTranslatef(x, 0.0, z + length)
+              self.renderNote(length, sustain = False, color = color, flat = False, tailOnly = False, isTappable = False, fret = 4, spNote = False, isOpen = False)
+              glPopMatrix()
+              
+      self.freestyleActive = freestyleActive
+      #self.drumFillOnScreen = drumFillOnScreen
+      self.drumFillEvents = drumFillEvents
+    
+
+  def renderIncomingNeck(self, visibility, song, pos, time, neckTexture):   #MFH - attempt to "scroll" an incoming guitar solo neck towards the player
+    if not song:
+      return
+    
     def project(beat):
       return 0.125 * beat / beatsPerUnit    # glorandwarf: was 0.12
 
@@ -512,8 +725,60 @@ class Drum:
     l            = self.boardLength
 
     beatsPerUnit = self.beatsPerBoard / self.boardLength
-    offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
 
+    #offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
+    offset = 0
+
+    z  = ((time - pos) / self.currentPeriod) / beatsPerUnit
+
+    color = (1,1,1)
+
+    glEnable(GL_TEXTURE_2D)
+    if neckTexture:
+      neckTexture.texture.bind()
+
+
+    glBegin(GL_TRIANGLE_STRIP)
+    glColor4f(color[0],color[1],color[2], 0)
+    glTexCoord2f(0.0, project(offset - 2 * beatsPerUnit))
+    #glVertex3f(-w / 2, 0, -2)
+    glVertex3f(-w / 2, 0, z)   #point A
+    glTexCoord2f(1.0, project(offset - 2 * beatsPerUnit))
+    #glVertex3f( w / 2, 0, -2)
+    glVertex3f( w / 2, 0, z)   #point B
+
+    
+    glColor4f(color[0],color[1],color[2], v)
+    glTexCoord2f(0.0, project(offset - 1 * beatsPerUnit))
+    #glVertex3f(-w / 2, 0, -1)
+    glVertex3f(-w / 2, 0, z+1)   #point C
+    glTexCoord2f(1.0, project(offset - 1 * beatsPerUnit))
+    #glVertex3f( w / 2, 0, -1)
+    glVertex3f( w / 2, 0, z+1)   #point D
+    
+    glTexCoord2f(0.0, project(offset + l * beatsPerUnit * .7))
+    #glVertex3f(-w / 2, 0, l * .7)
+    glVertex3f(-w / 2, 0, z+2+l * .7) #point E
+    glTexCoord2f(1.0, project(offset + l * beatsPerUnit * .7))
+    #glVertex3f( w / 2, 0, l * .7)
+    glVertex3f( w / 2, 0, z+2+l * .7) #point F
+    
+    glColor4f(color[0],color[1],color[2], 0)
+    glTexCoord2f(0.0, project(offset + l * beatsPerUnit))
+    #glVertex3f(-w / 2, 0, l)
+    glVertex3f(-w / 2, 0, z+2+l)    #point G
+    glTexCoord2f(1.0, project(offset + l * beatsPerUnit))
+    #glVertex3f( w / 2, 0, l)
+    glVertex3f( w / 2, 0, z+2+l)    #point H
+    glEnd()
+    
+    glDisable(GL_TEXTURE_2D)
+
+  def renderNeckMethod(self, visibility, offset, beatsPerUnit, neck, alpha = False): #blazingamer: New neck rendering method
+
+    def project(beat):
+      return 0.125 * beat / beatsPerUnit    # glorandwarf: was 0.12
+    
     if self.starPowerActive and self.theme == 0:#8bit
       color = (.3,.7,.9)
     elif self.starPowerActive and self.theme == 1:
@@ -521,13 +786,18 @@ class Drum:
     else:
       color = (1,1,1)
 
-    glEnable(GL_TEXTURE_2D)
-    #myfingershurt: every theme can have oNeck:
-    if self.starPowerActive and self.oNeck:
-      self.oNeck.texture.bind()
-    else:
-      self.neckDrawing.texture.bind()
+    v            = visibility
+    w            = self.boardWidth
+    l            = self.boardLength
 
+    beatsPerUnit = beatsPerUnit
+    offset       = offset
+    
+    glEnable(GL_TEXTURE_2D)
+
+    if alpha == True:
+      glBlendFunc(GL_ONE, GL_ONE)
+    neck.texture.bind()
     glBegin(GL_TRIANGLE_STRIP)
     glColor4f(color[0],color[1],color[2], 0)
     glTexCoord2f(0.0, project(offset - 2 * beatsPerUnit))
@@ -552,8 +822,60 @@ class Drum:
     glTexCoord2f(1.0, project(offset + l * beatsPerUnit))
     glVertex3f( w / 2, 0, l)
     glEnd()
-    
+    if alpha == True:
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+      
     glDisable(GL_TEXTURE_2D)
+    
+  def renderNeck(self, visibility, song, pos):
+    if not song:
+      return
+    
+    def project(beat):
+      return 0.125 * beat / beatsPerUnit    # glorandwarf: was 0.12
+
+    v            = visibility
+    w            = self.boardWidth
+    l            = self.boardLength
+
+    beatsPerUnit = self.beatsPerBoard / self.boardLength
+    offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
+
+    #myfingershurt: every theme can have oNeck:
+
+    if self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 1:
+      neck = self.guitarSoloNeck
+    elif self.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck:
+      neck = self.oNeck
+    else:
+      neck = self.neckDrawing
+
+    if not (self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 2):
+      self.renderNeckMethod(v, offset, beatsPerUnit, neck)
+      
+    if self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 2:   #static overlay
+      self.renderNeckMethod(v, 0, beatsPerUnit, self.guitarSoloNeck)
+      
+    if self.spcount2 != 0 and self.spcount < 1.2 and self.oNeck:   #static overlay
+      if self.oNeckovr != None and (self.scoreMultiplier > 4 or self.guitarSolo):
+        neck = self.oNeckovr
+      else:
+        neck = self.oNeck
+          
+      self.renderNeckMethod(self.spcount, offset, beatsPerUnit, neck)
+      
+    if self.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and (self.scoreMultiplier > 4 or self.guitarSolo):   #static overlay
+
+      if self.oNeckovr != None:
+        neck = self.oNeckovr
+      else:
+        neck = self.oNeck
+        alpha = True
+
+      self.renderNeckMethod(v, offset, beatsPerUnit, neck, alpha)
+      
+    if self.isFailing:
+      self.renderNeckMethod(self.failcount, 0, beatsPerUnit, self.failNeck)
 
   def drawTrack(self, visibility, song, pos):
     if not song:
@@ -837,7 +1159,105 @@ class Drum:
     glVertex3f(w / 2,  0,  sw)
     glVertex3f(w / 2,  0, -sw)
     glEnd()
+    
+  def renderTail(self, length, color, fret = 0, freestyleTail = 0, pos = 0):
 
+    #volshebnyi - if freestyleTail == 1, render an freestyle tail
+    #  if freestyleTail == 2, render highlighted freestyle tail
+
+    beatsPerUnit = self.beatsPerBoard / self.boardLength
+
+    size = (.08, length + 0.00001)
+
+    if size[1] > self.boardLength:
+      s = self.boardLength
+    else:
+      s = (length + 0.00001)
+      
+    # render an inactive freestyle tail  (self.freestyle1 & self.freestyle2)
+    zsize = .25  
+    size = (.15, s - zsize)
+    
+    if self.drumFillsActive:
+      if self.drumFillsHits >= 4:
+        size = (.30, s - zsize)
+      if self.drumFillsHits >= 3:
+        size = (.25, s - zsize)
+      elif self.drumFillsHits >= 2:
+        size = (.21, s - zsize)
+      elif self.drumFillsHits >= 1:
+        size = (.17, s - zsize)
+    
+    if self.freestyleActive:
+    	size = (.30, s - zsize)
+       
+    
+    tex1 = self.freestyle1
+    tex2 = self.freestyle2
+    if freestyleTail == 1:
+      #glColor4f(*color)
+      c1, c2, c3, c4 = color
+      tailGlow = 1 - (pos - self.freestyleLastFretHitTime[fret] ) / self.freestylePeriod
+      if tailGlow < 0:
+      	tailGlow = 0
+      color = (c1 + c1*2.0*tailGlow, c2 + c2*2.0*tailGlow, c3 + c3*2.0*tailGlow, c4*0.6 + c4*0.4*tailGlow)    #MFH - this fades inactive tails' color darker       
+    if freestyleTail == 2:
+      #glColor4f(*color)
+      c1, c2, c3, c4 = color
+      color = (c1*3.0, c2*3.0, c3*3.0, c4)    #volshebnyi - bonus fret tail              
+      
+    glColor4f(*color)
+    
+    glEnable(GL_TEXTURE_2D)
+    tex1.texture.bind()	
+    
+
+
+    glBegin(GL_TRIANGLE_STRIP)
+    glTexCoord2f(0.0, 0.0)
+    glVertex3f(-size[0], 0, 0)
+    glTexCoord2f(1.0, 0.0)
+    glVertex3f( size[0], 0, 0)
+    glTexCoord2f(0.0,1.0)
+    glVertex3f(-size[0], 0, size[1])
+    glTexCoord2f(1.0,1.0)
+    glVertex3f( size[0], 0, size[1])
+    glEnd()
+
+    glDisable(GL_TEXTURE_2D)
+
+    #MFH - this block of code renders the tail "end" - after the note
+    glEnable(GL_TEXTURE_2D)
+    tex2.texture.bind()
+
+    glBegin(GL_TRIANGLE_STRIP)
+    glTexCoord2f(0.0, 0.05)
+    glVertex3f(-size[0], 0, size[1] - (.05))
+    glTexCoord2f(1.0, 0.05)
+    glVertex3f( size[0], 0, size[1] - (.05))
+    glTexCoord2f(0.0, 0.95)
+    glVertex3f(-size[0], 0, size[1] + (zsize))
+    glTexCoord2f(1.0, 0.95)
+    glVertex3f( size[0], 0, size[1] + (zsize))
+    glEnd()
+
+    glDisable(GL_TEXTURE_2D)
+      
+    glEnable(GL_TEXTURE_2D)
+    tex2.texture.bind()
+
+    glBegin(GL_TRIANGLE_STRIP)
+    glTexCoord2f(0.0, 0.95)
+    glVertex3f(-size[0], 0, 0 - (zsize))
+    glTexCoord2f(1.0, 0.95)
+    glVertex3f( size[0], 0, 0 - (zsize))
+    glTexCoord2f(0.0, 0.05)
+    glVertex3f(-size[0], 0, 0 + (.05))
+    glTexCoord2f(1.0, 0.05)
+    glVertex3f( size[0], 0, 0 + (.05))
+    glEnd()
+
+    glDisable(GL_TEXTURE_2D)
 
   #myfingershurt:
   def renderNote(self, length, sustain, color, flat = False, tailOnly = False, isTappable = False, big = False, fret = 0, spNote = False, isOpen = False):    
@@ -1022,6 +1442,58 @@ class Drum:
       glDepthMask(0)
       glPopMatrix()
 
+  def renderIncomingNecks(self, visibility, song, pos):
+    if not song:
+      return
+
+    if self.incomingNeckMode > 0:   #if enabled
+      boardWindowMin = pos - self.currentPeriod * 2
+      boardWindowMax = pos + self.currentPeriod * self.beatsPerBoard
+
+
+      #if self.song.hasStarpowerPaths and self.song.midiStyle == Song.MIDI_TYPE_RB:  
+      if self.useMidiSoloMarkers:
+        track = song.midiEventTrack[self.player]
+        for time, event in track.getEvents(boardWindowMin, boardWindowMax):
+          if isinstance(event, Song.MarkerNote):
+            if event.number == Song.starPowerMarkingNote:
+              if self.guitarSoloNeck:
+                if event.endMarker:   #solo end
+                  if self.incomingNeckMode == 2:    #render both start and end incoming necks
+                    if self.guitarSolo:   #only until the end of the guitar solo!
+                      if self.starPowerActive and self.oNeck:
+                        neckImg = self.oNeck
+                      elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
+                        neckImg = self.bassGrooveNeck
+                      else:
+                        neckImg = self.neckDrawing
+                      self.renderIncomingNeck(visibility, song, pos, time, neckImg)
+                else:   #solo start
+                  if not self.guitarSolo:   #only until guitar solo starts!
+                    neckImg = self.guitarSoloNeck
+                    self.renderIncomingNeck(visibility, song, pos, time, neckImg)
+              
+
+      else:   #fall back on text-based guitar solo marking track
+        for time, event in song.eventTracks[Song.TK_GUITAR_SOLOS].getEvents(boardWindowMin, boardWindowMax):
+          if self.canGuitarSolo and self.guitarSoloNeck:
+            if event.text.find("ON") >= 0:
+              if not self.guitarSolo:   #only until guitar solo starts!
+                neckImg = self.guitarSoloNeck
+                self.renderIncomingNeck(visibility, song, pos, time, neckImg)
+            #else: #event.text.find("OFF"):
+            elif self.incomingNeckMode == 2:    #render both start and end incoming necks
+              if self.guitarSolo:   #only until the end of the guitar solo!
+                if self.starPowerActive and self.oNeck:
+                  neckImg = self.oNeck
+                elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
+                  neckImg = self.bassGrooveNeck
+                else:
+                  neckImg = self.neckDrawing
+                self.renderIncomingNeck(visibility, song, pos, time, neckImg)
+              
+
+
   def renderOpenNotes(self, visibility, song, pos):
     if not song:
       return
@@ -1059,6 +1531,17 @@ class Drum:
 
       if (event.noteBpm == 0.0):
         event.noteBpm = self.tempoBpm
+      
+      if self.coOpFailed:
+        if self.coOpRestart:
+          if time - self.coOpRescueTime < (self.currentPeriod * self.beatsPerBoard * 2):
+            continue
+          elif self.coOpRescueTime + (self.currentPeriod * self.beatsPerBoard * 2) < pos:
+            self.coOpFailed = False
+            self.coOpRestart = False
+            Log.debug("Turning off coOpFailed. Rescue successful.")
+        else:
+          continue #can't break. Tempo.
 
       if event.number != 0:   #skip all regular notes
         continue
@@ -1084,6 +1567,12 @@ class Drum:
         f = min(1, max(0, 1 + z2))
       else:
         f = 1.0
+        
+      #volshebnyi - hide open notes in BRE zone if BRE enabled  
+      if self.freestyleEnabled:  
+        if self.drumFillsReady or self.freestyleReady:
+          if time > self.freestyleStart - self.freestyleOffset and time < self.freestyleStart + self.freestyleOffset + self.freestyleLength:
+            z = -2.0
 
       color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
       length = 0
@@ -1098,9 +1587,11 @@ class Drum:
           self.spEnabled = False
         elif self.spRefillMode == 1 and self.theme != 2:  #mode 1 = overdrive refill notes in RB themes only
           self.spEnabled = False
+        elif self.spRefillMode == 2 and song.midiStyle != 1: #mode 2 = refill based on MIDI type
+          self.spEnabled = False
 
       if event.star:
-        self.isStarPhrase = True
+        #self.isStarPhrase = True
         self.openStarNotesInView = True
       if event.finalStar:
         self.finalStarSeen = True
@@ -1118,6 +1609,9 @@ class Drum:
               self.starPower = 100
             self.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
             self.starPowerGained = True
+            #if self.drumFillOnScreen:   #MFH - if there's a drum fill on the screen right now, skip it!
+            for dfEvent in self.drumFillEvents:
+              dfEvent.happened = True
 
       #if enable:
       #  self.spEnabled = True
@@ -1200,13 +1694,25 @@ class Drum:
       if (event.noteBpm == 0.0):
         event.noteBpm = self.tempoBpm
 
+      #volshebnyi - removed
       if event.number == 0: #MFH - skip all open notes
         continue
+      
+      if self.coOpFailed:
+        if self.coOpRestart:
+          if time - self.coOpRescueTime < (self.currentPeriod * self.beatsPerBoard * 2):
+            continue
+          elif self.coOpRescueTime + (self.currentPeriod * self.beatsPerBoard * 2) < pos:
+            self.coOpFailed = False
+            self.coOpRestart = False
+            Log.debug("Turning off coOpFailed. Rescue successful.")
+        else:
+          continue #can't break. Tempo.
 
       c = self.fretColors[event.number]
       
       if event.star:
-        self.isStarPhrase = True
+        #self.isStarPhrase = True
         self.starNotesInView = True
       if event.finalStar:
         self.finalStarSeen = True
@@ -1231,6 +1737,12 @@ class Drum:
         f = min(1, max(0, 1 + z2))
       else:
         f = 1.0
+        
+      #volshebnyi - hide notes in BRE zone if BRE enabled  
+      if self.freestyleEnabled:
+        if self.drumFillsReady or self.freestyleReady:  
+          if time > self.freestyleStart - self.freestyleOffset and time < self.freestyleStart + self.freestyleOffset + self.freestyleLength:
+            z = -2.0
 
       color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
       length = 0
@@ -1244,6 +1756,8 @@ class Drum:
         if self.spRefillMode == 0:    #mode 0 = no starpower / overdrive refill notes
           self.spEnabled = False
         elif self.spRefillMode == 1 and self.theme != 2:  #mode 1 = overdrive refill notes in RB themes only
+          self.spEnabled = False
+        elif self.spRefillMode == 2 and song.midiStyle != 1: #mode 2 = refill based on MIDI type
           self.spEnabled = False
 
 
@@ -2010,7 +2524,6 @@ class Drum:
 
 
   def render(self, visibility, song, pos, controls, killswitch):
-  
 
     if not self.starNotesSet == True:
       self.totalNotes = 0
@@ -2048,41 +2561,85 @@ class Drum:
           if time == q and not event.finalStar:
             event.star = True
       self.starNotesSet = True
+    if not (self.coOpFailed and not self.coOpRestart):
+      glEnable(GL_BLEND)
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+      glEnable(GL_COLOR_MATERIAL)
+      if self.leftyMode:
+        glScalef(-1, 1, 1)
 
-    glEnable(GL_BLEND)
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-    glEnable(GL_COLOR_MATERIAL)
-    if self.leftyMode:
-      glScalef(-1, 1, 1)
+      if self.ocount <= 1:
+        self.ocount = self.ocount + .1
+      else:
+        self.ocount = 1
 
-    if self.ocount <= 1:
-      self.ocount = self.ocount + .1
-    else:
-      self.ocount = 1
+      if self.isFailing == True:
+        if self.failcount <= 1 and self.failcount2 == False:
+          self.failcount += .05
+        elif self.failcount >= 1 and self.failcount2 == False:
+          self.failcount = 1
+          self.failcount2 = True
+        
+        if self.failcount >= 0 and self.failcount2 == True:
+          self.failcount -= .05
+        elif self.failcount <= 0 and self.failcount2 == True:
+          self.failcount = 0
+          self.failcount2 = False
 
-    self.renderNeck(visibility, song, pos)
-    if self.theme == 0 or self.theme == 1 or self.theme == 2:
-      self.drawTrack(self.ocount, song, pos)
-      self.drawBPM(visibility, song, pos)
-      self.drawSideBars(visibility, song, pos)
-    else:
-      self.renderTracks(visibility)
-      self.renderBars(visibility, song, pos)
+      if self.isFailing == False and self.failcount > 0:
+        self.failcount -= .05
+        self.failcount2 = False
+
+      if self.starPowerActive:
+
+        if self.spcount < 1.2:
+          self.spcount += .05
+          self.spcount2 = 1
+        elif self.spcount >=1.2:
+          self.spcount = 1.2
+          self.spcount2 = 0
+      else:
+        if self.spcount > 0:
+          self.spcount -= .05
+          self.spcount2 = 2
+        elif self.spcount <=0:
+          self.spcount = 0
+          self.spcount2 = 0
+
+      self.renderNeck(visibility, song, pos)
+      self.renderIncomingNecks(visibility, song, pos) #MFH
+      if self.theme == 0 or self.theme == 1 or self.theme == 2:
+        self.drawTrack(self.ocount, song, pos)
+        self.drawBPM(visibility, song, pos)
+        self.drawSideBars(visibility, song, pos)
+      else:
+        self.renderTracks(visibility)
+        self.renderBars(visibility, song, pos)
+        
+      if self.freestyleActive or self.drumFillsActive:
+        self.renderOpenNotes(visibility, song, pos)
+        self.renderNotes(visibility, song, pos)
+        self.renderFreestyleLanes(visibility, song, pos, controls) #MFH - render the lanes on top of the notes.
+        self.renderFrets(visibility, song, controls)
+        
+      else:
+      
+        self.renderFreestyleLanes(visibility, song, pos, controls)
 
     #if self.fretsUnderNotes:    #MFH
-    if self.fretsUnderNotes and self.twoDnote != False:    #MFH
-      self.renderFrets(visibility, song, controls)
-      self.renderOpenNotes(visibility, song, pos)
-      self.renderNotes(visibility, song, pos)
-    else:
-      self.renderOpenNotes(visibility, song, pos)
-      self.renderNotes(visibility, song, pos)
-      self.renderFrets(visibility, song, controls)
+        if self.fretsUnderNotes and self.twoDnote != False:    #MFH
+          self.renderFrets(visibility, song, controls)
+          self.renderOpenNotes(visibility, song, pos)
+          self.renderNotes(visibility, song, pos)
+        else:
+          self.renderOpenNotes(visibility, song, pos)
+          self.renderNotes(visibility, song, pos)
+          self.renderFrets(visibility, song, controls)
 
-    self.renderFlames(visibility, song, pos, controls)
+      self.renderFlames(visibility, song, pos, controls)
     
-    if self.leftyMode:
-      glScalef(-1, 1, 1)
+      if self.leftyMode:
+        glScalef(-1, 1, 1)
 
   def getMissedNotes(self, song, pos, catchup = False):
     if not song:
@@ -2126,37 +2683,40 @@ class Drum:
     return sorted(notes, key=lambda x: x[0])    #MFH - what the hell, this should be sorted by TIME not note number....
 
   def getRequiredNotes(self, song, pos):
-    track   = song.track[self.player]
-    notes = [(time, event) for time, event in track.getEvents(pos - self.lateMargin, pos + self.earlyMargin) if isinstance(event, Note)]
-    notes = [(time, event) for time, event in notes if not event.played]
-    notes = [(time, event) for time, event in notes if (time >= (pos - self.lateMargin)) and (time <= (pos + self.earlyMargin))]
-    if notes:
-      t     = min([time for time, event in notes])
-      notes = [(time, event) for time, event in notes if time - t < 1e-3]
-    return sorted(notes, key=lambda x: x[1].number)
+    return self.getRequiredNotesMFH(song, pos)
+#-    track   = song.track[self.player]
+#-    notes = [(time, event) for time, event in track.getEvents(pos - self.lateMargin, pos + self.earlyMargin) if isinstance(event, Note)]
+#-    notes = [(time, event) for time, event in notes if not event.played]
+#-    notes = [(time, event) for time, event in notes if (time >= (pos - self.lateMargin)) and (time <= (pos + self.earlyMargin))]
+#-    if notes:
+#-      t     = min([time for time, event in notes])
+#-      notes = [(time, event) for time, event in notes if time - t < 1e-3]
+#-    return sorted(notes, key=lambda x: x[1].number)
 
   def getRequiredNotes2(self, song, pos, hopo = False):
+    return self.getRequiredNotesMFH(song, pos)
 
-    track   = song.track[self.player]
-    notes = [(time, event) for time, event in track.getEvents(pos - self.lateMargin, pos + self.earlyMargin) if isinstance(event, Note)]
-    notes = [(time, event) for time, event in notes if not (event.hopod or event.played)]
-    notes = [(time, event) for time, event in notes if (time >= (pos - self.lateMargin)) and (time <= (pos + self.earlyMargin))]
-    if notes:
-      t     = min([time for time, event in notes])
-      notes = [(time, event) for time, event in notes if time - t < 1e-3]
-      
-    return sorted(notes, key=lambda x: x[1].number)
+#-    track   = song.track[self.player]
+#-    notes = [(time, event) for time, event in track.getEvents(pos - self.lateMargin, pos + self.earlyMargin) if isinstance(event, Note)]
+#-    notes = [(time, event) for time, event in notes if not (event.hopod or event.played)]
+#-    notes = [(time, event) for time, event in notes if (time >= (pos - self.lateMargin)) and (time <= (pos + self.earlyMargin))]
+#-    if notes:
+#-      t     = min([time for time, event in notes])
+#-      notes = [(time, event) for time, event in notes if time - t < 1e-3]
+#-      
+#-    return sorted(notes, key=lambda x: x[1].number)
     
 
 
   def getRequiredNotes3(self, song, pos, hopo = False):
+    return self.getRequiredNotesMFH(song, pos)
 
-    track   = song.track[self.player]
-    notes = [(time, event) for time, event in track.getEvents(pos - self.lateMargin, pos + self.earlyMargin) if isinstance(event, Note)]
-    notes = [(time, event) for time, event in notes if not (event.hopod or event.played or event.skipped)]
-    notes = [(time, event) for time, event in notes if (time >= (pos - self.lateMargin)) and (time <= (pos + self.earlyMargin))]
-
-    return sorted(notes, key=lambda x: x[1].number)
+#-    track   = song.track[self.player]
+#-    notes = [(time, event) for time, event in track.getEvents(pos - self.lateMargin, pos + self.earlyMargin) if isinstance(event, Note)]
+#-    notes = [(time, event) for time, event in notes if not (event.hopod or event.played or event.skipped)]
+#-    notes = [(time, event) for time, event in notes if (time >= (pos - self.lateMargin)) and (time <= (pos + self.earlyMargin))]
+#-
+#-    return sorted(notes, key=lambda x: x[1].number)
 
   #MFH - corrected and optimized:
   def getRequiredNotesMFH(self, song, pos):
@@ -2188,10 +2748,43 @@ class Drum:
   def areNotesTappable(self, notes):
     if not notes:
       return
-    for time, note in notes:
-      if note.tappable > 1:
-        return True
+    #for time, note in notes:
+    #  if note.tappable > 1:
+    #    return True
     return False
+
+
+  #volshebnyi - handle freestyle picks here
+  def freestylePick(self, song, pos, controls):
+    numHits = 0
+    if controls.getState(self.keys[0]):
+      numHits = 1
+      if self.engine.data.bassDrumSoundFound:
+        self.engine.data.bassDrumSound.play()
+    for i in range (1,5):
+      if controls.getState(self.keys[i]) or controls.getState(self.keys[4+i]):
+        numHits += 1
+        if i == 1:
+          if self.engine.data.T1DrumSoundFound:
+            self.engine.data.T1DrumSound.play()
+        if i == 2:
+          if self.engine.data.T2DrumSoundFound:
+            self.engine.data.T2DrumSound.play()
+        if i == 3:
+          if self.engine.data.T3DrumSoundFound:
+            self.engine.data.T3DrumSound.play()
+        if i == 4 and self.drumFillsActive and self.drumFillsHits >= 4 and not self.starPowerActive:   #MFH - must actually activate starpower!
+          if self.engine.data.CDrumSoundFound:
+            self.engine.data.CDrumSound.play()
+          drumFillCymbalPos = self.freestyleStart+self.freestyleLength
+          minDrumFillCymbalHitTime = drumFillCymbalPos - self.earlyMargin
+          maxDrumFillCymbalHitTime = drumFillCymbalPos + self.lateMargin
+          if (pos >= minDrumFillCymbalHitTime) and (pos <= maxDrumFillCymbalHitTime):
+            self.starPowerActive = True
+            self.engine.data.starActivateSound.play()
+            self.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
+            self.ocount = 0  #MFH - this triggers the oFlash strings & timer
+    return numHits
 
   
   def startPick(self, song, pos, controls, hopo = False):
@@ -2239,7 +2832,9 @@ class Drum:
     else:
       self.lastFretWasC = False
   
-    self.matchingNotes = self.getRequiredNotes(song, pos)
+    #self.matchingNotes = self.getRequiredNotes(song, pos)
+    self.matchingNotes = self.getRequiredNotesMFH(song, pos)    #MFH - ignore skipped notes please!
+    
 
     # no self.matchingNotes?
     if not self.matchingNotes:
@@ -2255,6 +2850,8 @@ class Drum:
        or (note.number == 2 and (controls.getState(self.keys[2]) or controls.getState(self.keys[6]))) 
        or (note.number == 3 and (controls.getState(self.keys[3]) or controls.getState(self.keys[7]))) 
        or (note.number == 4 and (controls.getState(self.keys[4]) or controls.getState(self.keys[8])))):
+        if self.guitarSolo:
+          self.currentGuitarSoloHitNotes += 1
         return self.hitNote(time, note)         
 
     return False        
@@ -2270,26 +2867,32 @@ class Drum:
 
   def endPick(self, pos):
     self.playedNotes = []
-    for time, note in self.playedNotes:
-      if time + note.length > pos + self.noteReleaseMargin:
-        return False
+    #for time, note in self.playedNotes:
+    #  if time + note.length > pos + self.noteReleaseMargin:
+    #    return False
     return True
     
   def getPickLength(self, pos):
-    if not self.playedNotes:
-      return 0.0
+    #if not self.playedNotes:
+    return 0.0
     
-    # The pick length is limited by the played notes
-    pickLength = pos - self.pickStartPos
-    for time, note in self.playedNotes:
-      pickLength = min(pickLength, note.length)
-    return pickLength
+    ## The pick length is limited by the played notes
+    #pickLength = pos - self.pickStartPos
+    #for time, note in self.playedNotes:
+    #  pickLength = min(pickLength, note.length)
+    #return pickLength
 
+  def coOpRescue(self, pos):
+    self.coOpRestart = True #initializes Restart Timer
+    self.coOpRescueTime  = pos
+    self.starPower  = 0
+    Log.debug("Rescued at " + str(pos))
+  
   def run(self, ticks, pos, controls):
     self.time += ticks
     #myfingershurt: must not decrease SP if paused.
     if self.starPowerActive == True and self.paused == False:
-      self.starPower -= ticks/200.0
+      self.starPower -= ticks/self.starPowerDecreaseDivisor 
       if self.starPower <= 0:
         self.starPower = 0
         self.starPowerActive = False

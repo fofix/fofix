@@ -92,6 +92,30 @@ class Font:
   def getLineSpacing(self, scale = 0.002):
     """@return: Recommanded line spacing of this font"""
     return self.font.get_linesize() * self.scale * scale
+
+  #MFH - needed to find the centerline of text
+  def getFontAscent(self, scale = 0.002):
+    """@return: Return the height in pixels for the font ascent. 
+    The ascent is the number of pixels from the font baseline to the top of the font. """
+    return self.font.get_ascent() * self.scale * scale
+
+  #MFH - needed to find the centerline of text
+  def getFontDescent(self, scale = 0.002):
+    """@return: Return the height in pixels for the font descent. The descent 
+    is the number of pixels from the font baseline to the bottom of the font.  """
+    return self.font.get_descent() * self.scale * scale
+
+  #MFH - why the hell aren't we using the pygame.font.render function?  We seem to be re-inventing the wheel here, and not correctly!
+  #all the example PyGame apps I see that use pygame.font.render also use "screen.blit" or "background.blit".  
+  #not to mention that the pygame.font.render function allows setting of a font background color, which would fully solve the solo frame issue...
+  def pygameFontRender(self, text, antialias, color, background=None):
+    """
+    @return: This creates a new Surface with the specified text rendered on it.
+    Pygame provides no way to directly draw text on an existing Surface: instead you must use Font.render - 
+    draw text on a new Surface to create an image (Surface) of the text, then blit this image onto another Surface. 
+    """
+    return self.font.render(text, antialias, color, background)
+
     
   def setCustomGlyph(self, character, texture):
     """
@@ -250,6 +274,25 @@ class Font:
       # evilynux - Fixed bug, self.scaling must not be applied twice!
       w, h = self.getStringSize(ch, scale = scale)
       tw, th = g.size
+
+      #MFH
+      # Rectangle with numbered corners for notation reference: 
+      #   3_______4   (height = h)
+      #   |       |  
+      #   |       |h  
+      #   1-------2   (width = w)
+      #       w 
+      #
+      #The VertexPointer traces around (designates) a rectangle of dimensions w * h in the following order (two triangles, or TRIANGLE_STRIPs):
+      #   1,2,3,4   (which is traced as two triangles 1-2-3 and 2-3-4)
+      #The TexCoordPointer traces around (designates) this rectangle in the following order (two triangles, or TRIANGLE_STRIPs):
+      #   3,4,1,2   (which is traced as two triangles 3-4-1 and 4-1-2)
+      #               ...which, I assume, is why normal textures show up upside-down if they are not corrected with a negative Y axis scale?
+
+      #This leads me to believe that fonts are actually rendered with their given "position" anchoring their lower left corner, as a font
+      # should be.  I must re-examine how the solo frame is generated and try some new experiments.
+      
+      #Nope - writing a "test" string at pos (0.5, 0.0) clearly shows that the position is the anchor for the TOP-LEFT corner of the text.
 
       glVertexPointerf([(0.0, 0.0, 0.0), (w, 0.0, 0.0), (0.0, h, 0.0), (w, h, 0.0)])
       glTexCoordPointerf([(0.0, th), (tw, th), (0.0, 0.0), (tw, 0.0)])

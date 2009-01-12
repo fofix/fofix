@@ -220,9 +220,12 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
             self.player.practiceMode = True
           else:
             self.player.practiceMode = False
+            
+          slowDownDivisor = Config.get("audio",  "slow_down_divisor")
            
           while True: #new nesting for Practice Mode - section / start time selection
-            if self.player.practiceMode:
+            #if self.player.practiceMode:
+            if self.player.practiceMode and slowDownDivisor == 1:
               #self.engine.resource.load(self, "song", lambda: Song.loadSong(self.engine, songName, library = self.libraryName, notesOnly = True, part = [player.part for player in self.playerList]), onLoad = self.songLoaded)
 
               
@@ -247,6 +250,8 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
               Log.debug("Practice start position retrieved: " + str(self.player.startPos) )
               
             else:
+              
+              #self.player.startPos = [0]
               
               break;
             #if not self.player.practiceMode:

@@ -212,6 +212,9 @@ class Menu(Layer, KeyListener):
     elif c in Player.LEFTS + Player.KEY3S:
       choice.selectPreviousValue()
     return True
+
+  def lostFocus(self):
+    pass
     
   def run(self, ticks):
     self.time += ticks / 50.0

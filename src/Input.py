@@ -26,6 +26,34 @@ import pygame
 import Log
 import Audio
 
+
+ports = None
+midi = []
+midiin = None
+portCount = 0
+try:
+  import rtmidi
+  haveMidi = True
+except ImportError:
+  haveMidi = False
+
+
+#haveMidi = False  #this line disables the rtmidi module for computers with 0 midi ports...has to be this way for now to avoid crashes.
+
+if haveMidi:
+  try:
+    midiin = rtmidi.RtMidiIn()
+    portCount = midiin.getPortCount()
+    #Log.debug("MIDI port count = " + str(portCount) )
+    if portCount > 0:
+      ports = range(portCount)
+      for x in ports:
+        midi.append( rtmidi.RtMidiIn() )
+  except Exception, e:
+    Log.error(str(e))
+    ports = None
+
+
 from Task import Task
 from Player import Controls
 
@@ -101,10 +129,20 @@ class Input(Task):
 
     # Enable music events
     Audio.Music.setEndEvent(MusicFinished)
+    #Audio.Music.setEndEvent()   #MFH - no event required?
 
     # Custom key names
     self.getSystemKeyName = pygame.key.name
     pygame.key.name       = self.getKeyName
+
+    if haveMidi:
+      if ports:
+        Log.debug("%d MIDI inputs found." % (len(ports)))
+        for i in ports:
+          midi[i].openPort(i, False)
+      else:
+        Log.warn("No MIDI input ports found.")
+
 
   def reloadControls(self):
     self.controls = Controls()
@@ -155,6 +193,9 @@ class Input(Task):
   def broadcastSystemEvent(self, name, *args):
     return self.broadcastEvent(self.systemListeners, name, *args)
 
+  def encodeMidiButton(self, midi, button):
+    return 0x40000 + (midi << 8 ) + button
+
   def encodeJoystickButton(self, joystick, button):
     return 0x10000 + (joystick << 8) + button
 
@@ -190,7 +231,10 @@ class Input(Task):
   
 
   def getKeyName(self, id):
-    if id >= 0x30000:
+    if id >= 0x40000:
+      midi, but = self.decodeMidiButton(id)
+      return "Midi #%d-%d" % (midi + 1, but)
+    elif id >= 0x30000:
       joy, axis, pos = self.decodeJoystickHat(id)
       return "Joy #%d, hat %d %s" % (joy + 1, axis, pos)
     elif id >= 0x20000:
@@ -220,6 +264,9 @@ class Input(Task):
         self.broadcastEvent(self.systemListeners, "screenResized", event.size)
       elif event.type == pygame.QUIT:
         self.broadcastEvent(self.systemListeners, "quit")
+      elif event.type == pygame.ACTIVEEVENT: # akedrou - catch for pause onLoseFocus
+        if (event.state == 2 or event.state == 6) and event.gain == 0:
+          self.broadcastEvent(self.keyListeners, "lostFocus") # as a key event, since Scene clients don't handle system events
       elif event.type == MusicFinished:
         self.broadcastEvent(self.systemListeners, "musicFinished")
       elif event.type == pygame.JOYBUTTONDOWN: # joystick buttons masquerade as keyboard events
@@ -286,6 +333,19 @@ class Input(Task):
               self.broadcastEvent(self.keyListeners, keyEvent, *args)
         except KeyError:
           pass
+
+    if ports:
+      for i in ports:
+        midimsg = midi[i].getMessage()
+        if len(midimsg) > 0:
+          id = self.encodeMidiButton(x, midimsg[1])
+          if midimsg[0] == 153:
+            if not self.broadcastEvent(self.priorityKeyListeners, "keyPressed", id, u'\x00'):
+              self.broadcastEvent(self.keyListeners, "keyPressed", id, u'\x00')
+          else:
+            if not self.broadcastEvent(self.priorityKeyListeners, "keyReleased", id):
+              self.broadcastEvent(self.keyListeners, "keyReleased", id)
+
 
   #-------------------------------------------
   # glorandwarf: check that there are no control conflicts

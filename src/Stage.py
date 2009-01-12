@@ -342,11 +342,20 @@ class Stage(object):
       self.songStage = 0
       self.rotationMode = 0
       self.mode = 1
-      try:
-        self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages", "practice.png"))
+      try: #separated practice stages for the instruments by k.i.d
+        if self.scene.guitars[0].isDrum:
+          self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages","practicedrum.png"))
+        elif self.scene.guitars[0].isBassGuitar:
+          self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages","practicebass.png"))
+        else:
+          self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages","practice.png"))
       except IOError:
-        Log.warn("No practice stage, fallbacking on a forced Blank stage mode") # evilynux
-        self.mode = 2    #if no practice stage, just fall back on a forced Blank stage mode
+        #MFH - must first fall back on the old practice.png before forcing blank stage mode!
+        try:
+          self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages","practice.png"))
+        except IOError:
+          Log.warn("No practice stage, fallbacking on a forced Blank stage mode") # evilynux
+          self.mode = 2    #if no practice stage, just fall back on a forced Blank stage mode
     elif self.songStage == 1:    #check for song-specific background
       test = True
       try:
@@ -380,7 +389,7 @@ class Stage(object):
         for name in allfiles:
 
           if os.path.splitext(name)[1].lower() == ".png":
-            if os.path.splitext(name)[0].lower() != "practice":
+            if os.path.splitext(name)[0].lower() != "practice" and os.path.splitext(name)[0].lower() != "practicedrum" and os.path.splitext(name)[0].lower() != "practicebass":
               Log.debug("Valid background found, index (" + str(fileIndex) + "): " + name)
               files.append(name)
               fileIndex += 1
@@ -420,7 +429,7 @@ class Stage(object):
         for name in allfiles:
 
           if os.path.splitext(name)[1].lower() == ".png":
-            if os.path.splitext(name)[0].lower() != "practice":
+            if os.path.splitext(name)[0].lower() != "practice" and os.path.splitext(name)[0].lower() != "practicedrum" and os.path.splitext(name)[0].lower() != "practicebass":
               Log.debug("Valid background found, index (" + str(fileIndex) + "): " + name)
               files.append(name)
               fileIndex += 1

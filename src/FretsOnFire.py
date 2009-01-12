@@ -45,6 +45,7 @@ import sys
 import os
 import codecs
 import Resource
+import pygame
 
 usage = """%(prog)s [options]
 Options:
@@ -141,6 +142,7 @@ def main():
       Log.warn("Unable to enable psyco.")
 
     try:
+      engine.ticksAtStart = pygame.time.get_ticks()
       while engine.run():
         pass
     except KeyboardInterrupt:
@@ -162,17 +164,15 @@ def main():
           else:
             os.execl("./FretsOnFire", "./FretsOnFire", *sys.argv[1:])
         else:
-          if os.name == "nt":
-            bin = "c:/python24/python"
-          else:
-            bin = "/usr/bin/python2.4"
-          os.execl(bin, bin, "FretsOnFire.py", *sys.argv[1:])
+          # stump: sys.executable points to the active python interpreter
+          os.execl(sys.executable, sys.executable, "FretsOnFire.py", *sys.argv[1:])
       except:
         Log.warn("Restart failed.")
         raise
       break
     else:
       break
+  # evilynux - MainMenu class already calls this - useless?
   engine.quit()
 
 class Trace:

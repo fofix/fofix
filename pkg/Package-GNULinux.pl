@@ -50,7 +50,7 @@ for(my $i = 0; $i < scalar(@src); $i++ ) {
 chdir $opt{'dir'};
 remove( \1, qw{
                src/*.pyc src/*.pyo src/*.bat
-               src/midi/*.pyc src/midi/*.pyo } ) or die $!;
+               src/midi/*.pyc src/midi/*.pyo } );
 find({ wanted => \&delsvn, no_chdir => 1 }, ".");
 remove( \1, @svndirs ) or die $! if( scalar(@svndirs) > 0 );
 chdir "..";

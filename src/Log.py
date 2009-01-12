@@ -60,6 +60,7 @@ def log(cls, msg):
     tempTrace = traceback.format_exc()
   if tempTrace:
     print >>logFile, labels[cls] + " " + msg + tempTrace
+    logFile.flush()  #stump: truncated tracebacks be gone!
   else:
     print >>logFile, labels[cls] + " " + msg
 

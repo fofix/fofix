@@ -25,7 +25,7 @@
 
 from OpenGL.GL import *
 import math
-import socket
+from FakeNetworking import socket
 
 from View import BackgroundLayer
 from Menu import Menu
@@ -116,6 +116,7 @@ class MainMenu(BackgroundLayer):
 
     #Get theme
     self.theme = self.engine.data.theme
+    self.themeCoOp = self.engine.data.themeCoOp
     self.themename = self.engine.data.themeLabel
 
     try:
@@ -127,7 +128,8 @@ class MainMenu(BackgroundLayer):
       self.menux = None
       self.menuy = None
 
-
+    self.rbmenu = Theme.menuRB
+ 
     #MFH
     self.main_menu_scale = Theme.main_menu_scaleVar
     self.main_menu_vspacing = Theme.main_menu_vspacingVar
@@ -217,13 +219,6 @@ class MainMenu(BackgroundLayer):
       (_("Tutorials"), self.showTutorial),
       (_("Practice"), lambda: self.newLocalGame(mode1p = 1)),
     ]
-
-    multPlayerMenu = [
-      (_("Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),
-      (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
-      (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
-      (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
-    ]
     
     settingsMenu = Settings.SettingsMenu(self.engine)
 
@@ -247,6 +242,28 @@ class MainMenu(BackgroundLayer):
 
 
     if self.theme == 0 or self.theme == 1:    #GH themes = 6 main menu selections
+    
+      if self.theme == 1 and self.themeCoOp:
+        multPlayerMenu = [
+          (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),
+          (_("GH Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 5)),
+          (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
+          (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
+          (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
+        ]
+      elif self.theme == 1 and not self.themeCoOp:
+        multPlayerMenu = [
+          (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
+          (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
+          (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
+        ]
+      else:
+        multPlayerMenu = [
+          (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),
+          (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
+          (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
+          (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
+        ]
 
       mainMenu = [
         (_(strCareer), lambda:   self.newLocalGame(mode1p = 2)),
@@ -263,6 +280,15 @@ class MainMenu(BackgroundLayer):
       soloMenu = [
         (_("Solo Tour"), lambda: self.newLocalGame(mode1p = 2)),
         (_("Quickplay"), lambda: self.newLocalGame()),
+      ]
+
+      multPlayerMenu = [
+        (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),
+        (_("RB Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 4)),
+        (_("GH Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 5)),
+        (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
+        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
+        (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
       ]
 
       mainMenu = [
@@ -439,9 +465,12 @@ class MainMenu(BackgroundLayer):
   def render(self, visibility, topMost):
     self.engine.view.setViewport(1,0)
     self.visibility = visibility
-    v = 1.0 - ((1 - visibility) ** 2)
-
-    self.engine.view.transitionTime = 1
+    if self.rbmenu:
+      v = 1.0 - ((1 - visibility) ** 2)
+    else:
+      v = 1
+    if v == 1:
+      self.engine.view.transitionTime = 1 
 
     if self.menu.active and not self.active:
       self.active = True
@@ -553,17 +582,17 @@ class MainMenu(BackgroundLayer):
           ypos = 1/5.0*i
           self.BGText.transform.reset()
           #self.BGText.transform.scale(.5*.5,-1/5.0*.5)
-          self.BGText.transform.scale(.5*self.main_menu_scale,-1/5.0*self.main_menu_scale)
+          self.BGText.transform.scale(.5*self.main_menu_scale,(-1/5.0*self.main_menu_scale))
           
 
 #============blazingamer============
 #if menux and/or menuy are not set it will use the default positions for the main text
           if self.menux == None or self.menuy == None:
-            self.BGText.transform.translate(w*0.2,h*0.8-(h*self.main_menu_vspacing)*i)
+            self.BGText.transform.translate(w*0.2,(h*0.8-(h*self.main_menu_vspacing)*i)*v)
 #if menux and menuy are set it will use those
           else:
             try:
-              self.BGText.transform.translate(w*self.menux,h*self.menuy-(h*self.main_menu_vspacing)*i)
+              self.BGText.transform.translate(w*self.menux,(h*self.menuy-(h*self.main_menu_vspacing)*i)*v)
             except Exception, e:
               Log.warn("Unable to translate BGText: %s" % e) 
         

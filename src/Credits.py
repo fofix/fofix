@@ -155,9 +155,9 @@ class Credits(Layer, KeyListener):
       Text(nf, ns, c2, "right",  "PyOpenGL"),
       Text(nf, bs, c2, "right",  "http://pyopengl.sourceforge.net"),
       space,
-      Text(nf, ns, c2, "right",  "Amanith Framework"),
-      Text(nf, bs, c2, "right",  "http://www.amanith.org"),
-      space,
+      #Text(nf, ns, c2, "right",  "Amanith Framework"),
+      #Text(nf, bs, c2, "right",  "http://www.amanith.org"),
+      #space,
       Text(nf, ns, c2, "right",  "Illusoft Collada module 1.4"),
       Text(nf, bs, c2, "right",  "http://colladablender.illusoft.com"),
       space,
@@ -175,7 +175,7 @@ class Credits(Layer, KeyListener):
       space,
       space,
       Text(nf, bs, c1, "center", _("Copyright 2006, 2007 by Unreal Voodoo")),
-      Text(nf, bs, c1, "center", _("Copyright 2008 by FoFiX Team")),
+      Text(nf, bs, c1, "center", _("Copyright 2008 by Team FoFiX")),
       space,
       space,
       space,
@@ -205,10 +205,12 @@ class Credits(Layer, KeyListener):
   
   def run(self, ticks):
     self.time   += ticks / 50.0
-    self.offset -= ticks / 7500.0 # evilynux - corresponds to scroll speed
+    #self.offset -= ticks / 7500.0 # evilynux - corresponds to scroll speed
+    self.offset -= ticks / 15000.0 #MFH - slowin it down - # evilynux - corresponds to scroll speed
 
     # evilynux - approximating the end of the list from the (mostly used font size * lines)
-    if self.offset < -( self.text_size * len(self.credits) ):
+    #if self.offset < -( self.text_size * len(self.credits) ):
+    if self.offset < -( (self.text_size * 1.05) * len(self.credits) ):    #MFH - adding 5% to estimated font height
       self.quit()
   
   def render(self, visibility, topMost):

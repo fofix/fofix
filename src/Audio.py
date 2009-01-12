@@ -26,6 +26,18 @@ import Log
 import time
 from Task import Task
 
+#stump: check for pitch bending support
+try:
+  import pygame.pitchbend
+  pitchBendSupported = True
+  if not hasattr(pygame.pitchbend, 'ALL'):
+    Log.warn("Your pitchbend module is too old; upgrade it to r7 or higher for pitch bending to work.")
+    pitchBendSupported = False
+except ImportError:
+  Log.warn("Pitch bending is not supported; install john.stumpo's pitchbend module (r7 or higher) if you want it.")
+  pitchBendSupported = False
+
+
 try:
   import ogg.vorbis
 except ImportError:
@@ -71,7 +83,11 @@ class Audio(Task):
     return Channel(n)
 
   def close(self):
-    pygame.mixer.quit()
+    try:
+      pygame.mixer.quit()
+    except:
+      pass
+    #pygame.mixer.quit()
 
   def pause(self):
     pygame.mixer.pause()
@@ -84,8 +100,11 @@ class Music(object):
     pygame.mixer.music.load(fileName)
 
   @staticmethod
-  def setEndEvent(event):
-    pygame.mixer.music.set_endevent(event)
+  def setEndEvent(event = None):
+    if event:
+      pygame.mixer.music.set_endevent(event)
+    else:
+      pygame.mixer.music.set_endevent()   #MFH - to set NO event.
 
   def play(self, loops = -1, pos = 0.0):
     pygame.mixer.music.play(loops, pos)
@@ -104,6 +123,16 @@ class Music(object):
 
   def setVolume(self, volume):
     pygame.mixer.music.set_volume(volume)
+    
+  #stump: pitch bending
+  # SDL_mixer doesn't support callback processing of the music stream.
+  # Thus, as a workaround, we must bend the whole output.
+  def setPitchBend(self, factor):
+    pygame.pitchbend.start(pygame.pitchbend.ALL)
+    pygame.pitchbend.setFactor(pygame.pitchbend.ALL, factor)
+  
+  def stopPitchBend(self):
+    pygame.pitchbend.stop(pygame.pitchbend.ALL)
 
   def fadeout(self, time):
     pygame.mixer.music.fadeout(time)
@@ -117,18 +146,33 @@ class Music(object):
 class Channel(object):
   def __init__(self, id):
     self.channel = pygame.mixer.Channel(id)
+    self.id = id
+
+  def __del__(self):
+    if pitchBendSupported:
+      pygame.pitchbend.stop(self.id)
 
   def play(self, sound):
     self.channel.play(sound.sound)
 
   def stop(self):
     self.channel.stop()
+    if pitchBendSupported:
+      pygame.pitchbend.stop(self.id)
 
   def setVolume(self, volume):
     self.channel.set_volume(volume)
 
   def fadeout(self, time):
     self.channel.fadeout(time)
+
+  #stump: pitch bending
+  def setPitchBend(self, factor):
+    pygame.pitchbend.start(self.id)
+    pygame.pitchbend.setFactor(self.id, factor)
+
+  def stopPitchBend(self):
+    pygame.pitchbend.stop(self.id)
 
 class Sound(object):
   def __init__(self, fileName):
@@ -167,7 +211,7 @@ if ogg:
       Task.__init__(self)
       self.engine       = engine
       self.fileName     = fileName
-      self.channel      = channel.channel
+      self.channel      = channel
       self.playing      = False
       self.bufferSize   = 1024 * 64
       self.bufferCount  = 8
@@ -201,6 +245,10 @@ if ogg:
     def __del__(self):
       self.engine.removeTask(self)
 
+    def streamIsPlaying(self):  #MFH - adding function to check if sound is playing
+      return self.playing
+
+
     def play(self):
       if self.playing:
         return
@@ -215,7 +263,7 @@ if ogg:
 
       
       #once all 8 output buffers are filled, play the first one.
-      self.channel.play(self.buffersOut.pop())
+      self.channel.channel.play(self.buffersOut.pop())
 
     def stop(self):
       self.playing = False
@@ -226,7 +274,14 @@ if ogg:
     def setVolume(self, volume):
       self.volume = volume
       #myfingershurt: apply volume changes IMMEDIATELY:
-      self.channel.set_volume(self.volume)
+      self.channel.setVolume(self.volume)
+
+    #stump: pitch bending
+    def setPitchBend(self, factor):
+      self.channel.setPitchBend(factor)
+
+    def stopPitchBend(self):
+      self.channel.stopPitchBend()
 
     def fadeout(self, time):
       self.stop()
@@ -279,17 +334,17 @@ if ogg:
         return
 
       #myfingershurt: this is now done directly when called.
-      #self.channel.set_volume(self.volume)
+      #self.channel.setVolume(self.volume)
 
       if len(self.buffersOut) < self.bufferCount:
         self._produceSoundBuffers()
 
-      if not self.channel.get_queue() and self.buffersOut:
+      if not self.channel.channel.get_queue() and self.buffersOut:
         # Queue one decoded sound buffer and mark the previously played buffer as free
         soundBuffer = self.buffersOut.pop()
         self.buffersBusy.insert(0, soundBuffer)
         self.lastQueueTime = time.time()
-        self.channel.queue(soundBuffer)
+        self.channel.channel.queue(soundBuffer)
         if len(self.buffersBusy) > 2:
           self.buffersIn.insert(0, self.buffersBusy.pop())
       
@@ -305,11 +360,14 @@ class StreamingSound(Sound, Task):
   def __new__(cls, engine, channel, fileName):
     frequency, format, stereo = pygame.mixer.get_init()
     if fileName.lower().endswith(".ogg"):
-      if frequency == 44100 and format == -16 and stereo:
-        return StreamingOggSound(engine, channel, fileName)
-      else:
-        Log.warn("Audio settings must match stereo 16 bits at 44100 Hz in order to stream OGG files.")
-    return super(StreamingSound, cls).__new__(cls, engine, channel, fileName)
+      
+      return StreamingOggSound(engine, channel, fileName)   #MFH - forced allow of non-matching sample rates
+
+#-      if frequency == 44100 and format == -16 and stereo:
+#-        return StreamingOggSound(engine, channel, fileName)
+#-      else:
+#-        Log.warn("Audio settings must match stereo 16 bits at 44100 Hz in order to stream OGG files.")
+#-    return super(StreamingSound, cls).__new__(cls, engine, channel, fileName)
 
   def play(self):
     self.channel.play(self)
@@ -322,7 +380,17 @@ class StreamingSound(Sound, Task):
     Sound.setVolume(self, volume)
     self.channel.setVolume(volume)
 
+  def streamIsPlaying(self):  #MFH - adding function to check if sound is playing
+    return Sound.get_num_channels()
+
+
   def fadeout(self, time):
     Sound.fadeout(self, time)
     self.channel.fadeout(time)
 
+  #stump: pitch bending
+  def setPitchBend(self, factor):
+    self.channel.setPitchBend(factor)
+
+  def stopPitchBend(self):
+    self.channel.stopPitchBend()

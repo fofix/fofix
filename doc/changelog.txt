@@ -1,6 +1,6 @@
 New in 3.0xx:-----------------------------------------------------------------------------------------------------
 
---------------------------------
+-------------------------------- 
 [u]Version 3.021 - "Songlist Optimization" - (10/25/2008, 1:30pm PST) - [i](SVN rev 119 / [url=http://code.google.com/p/fofix/source/browse/MFH-Mod#MFH-Mod/tags/Release_3.021]tag 3.021[/url])[/i][/u] -- 
 [url=http://www.mediafire.com/?xnyjmjdryyz]Patch mediafire download[/url] -- [url=http://fofix.googlecode.com/files/FoFiX-3.021-Patch-Windows.rar]Direct patch GoogleCode download[/url] -- [url=http://rapidshare.com/files/157840656/FoFiX-3.021-Patch-Windows.rar___RB1_Theme_3.020.zip]SmashD's rapidshare mirror patch + RB1 patch[/url]
 [url=http://fofix.googlecode.com/files/FoFiX-3.021-Full-Windows.rar]Direct FoFiX GoogleCode release (complete game, MegaLight theme, 2 tutorial songs)[/url][/b]

@@ -56,10 +56,12 @@ class Data(object):
     self.svg      = svg
 
     self.sfxVolume    = Config.get("audio", "SFX_volume")
+    self.crowdVolume  = Config.get("audio", "crowd_volume")
 
     #Get theme
     themename = Config.get("coffee", "themename")
     self.themeLabel = themename
+    self.themeCoOp  = False
 
 
     #myfingershurt: check for existance of theme path
@@ -95,8 +97,11 @@ class Data(object):
       self.theme = 0
     elif self.fileExists(os.path.join("themes",themename,"overdrive fill.png")):
       self.theme = 2
+      self.themeCoOp = True
     else:
       self.theme = 1
+      if self.fileExists(os.path.join("themes",themename,"coop_rockmeter.png")):
+        self.themeCoOp = True
 
     #myfingershurt: multi-OS compatibility file access fixes using os.path.join()
     # load font customization images
@@ -142,14 +147,17 @@ class Data(object):
       font3     = lambda: Font(pauseFont, fontSize[2], scale = scale2, reversed = reversed, systemFont = not asciiOnly)
     font4     = lambda: Font(scoreFont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False)
     font5     = lambda: Font(streakFont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False)
-    font6     = lambda: Font(loadingFont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False)
+    if self.theme == 1:
+      font6     = lambda: Font(loadingFont, fontSize[3], scale = scale2*1.4, reversed = reversed, systemFont = not asciiOnly, outline = False, shadow = True) #Worldrave - Added shadow to Loading Phrases in GH-Based Theme's
+    else:
+      font6     = lambda: Font(loadingFont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False)
     if self.theme == 2:
       font7     = lambda: Font(songFont, fontSize[4], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False)#kk69: loads font specific for song name in Guitar Scene =)
     else:
       font7     = lambda: Font(songFont, fontSize[0], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False)#kk69: loads font specific for song name in Guitar Scene =)
     font8     = lambda: Font(songListFont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False) #MFH
     font9     = lambda: Font(shadowfont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False, shadow = True) #blazingamer
-    font10    = lambda: Font(streakFont2, fontSize[2], scale = scale2*.65, reversed = reversed, systemFont = not asciiOnly, outline = False, shadow = True) #blazingamer - Worldrave Modified (- .18)
+    font10    = lambda: Font(streakFont2, fontSize[2], scale = scale2*1.08, reversed = reversed, systemFont = not asciiOnly, outline = False, shadow = True) #blazingamer - Worldrave modified size to accuracy.
 
 
     resource.load(self, "font",         font1, onLoad = self.customizeFont, synch = True)
@@ -197,7 +205,7 @@ class Data(object):
       resource.load(self, "lfont",         font2, onLoad = self.customizeFont, synch = True)
       resource.load(self, "font",          font1, onLoad = self.customizeFont, synch = True)
     elif self.theme == 1:
-      font1     = lambda: Font(menuFont,  fontSize[3], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly)
+      font1     = lambda: Font(menuFont,  fontSize[3], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, outline = False) #Worldrave - Removed outline from options text on GH-Based theme's. No other drawbacks noticed.
       font2     = lambda: Font(menuFont,  fontSize[3], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, outline = False)
       resource.load(self, "lfont",         font2, onLoad = self.customizeFont, synch = True)
       resource.load(self, "font",          font1, onLoad = self.customizeFont, synch = True)
@@ -283,8 +291,7 @@ class Data(object):
     else: #MFH: Fallback on general failsound.ogg
       self.loadSoundEffect(self, "failSound", os.path.join("sounds","failsound.ogg"))
       Log.warn(themename + "\sounds\ failsound.ogg not found -- using general failsound.ogg instead.")
-
-
+      
     #myfingershurt: integrating Capo's starpower clap sounds
     self.loadSoundEffect(self, "clapSound", os.path.join("sounds","clapsound.ogg"))
 
@@ -294,7 +301,7 @@ class Data(object):
       self.loadSoundEffect(self, "starReadySound", os.path.join("themes",themename,"sounds","starpower.ogg"))
       Log.warn(themename + "\sounds\starpowerready.ogg not found -- using starpower.ogg instead.")
 
-    #MFH - fallback on sounds\crowdcheers.ogg, and then starpower.ogg.  Note if the fallback crowdcheers was used or not.
+    #MFH - fallback on sounds\crowdcheers.ogg, and then starpower.ogg.  Note if the fallback crowdcheers was used or not.    
     if self.fileExists(os.path.join("themes",themename,"sounds","crowdcheers.ogg")):
       self.loadSoundEffect(self, "crowdSound", os.path.join("themes",themename,"sounds","crowdcheers.ogg"))
       self.cheerSoundFound = 2
@@ -320,6 +327,27 @@ class Data(object):
       self.loadSoundEffect(self, "starDeActivateSound", os.path.join("themes",themename,"sounds","starpower.ogg"))
       self.starDeActivateSoundFound = False
       Log.warn(themename + "\sounds\stardeactivate.ogg not found -- sound disabled.")
+    
+    if self.fileExists(os.path.join("themes",themename,"sounds","rescue.ogg")):
+      self.loadSoundEffect(self, "rescueSound", os.path.join("themes",themename,"sounds","rescue.ogg"))
+    elif self.fileExists(os.path.join("themes",themename,"sounds","staractivate.ogg")):
+      self.loadSoundEffect(self, "rescueSound", os.path.join("themes",themename,"sounds","staractivate.ogg"))
+      Log.warn(themename + "\sounds\rescue.ogg not found -- using staractivate.ogg instead.")
+    else:
+      self.loadSoundEffect(self, "rescueSound", os.path.join("themes",themename,"sounds","starpower.ogg"))
+      Log.warn(themename + "\sounds\rescue.ogg not found -- using starpower.ogg instead.")
+    
+    if self.fileExists(os.path.join("themes",themename,"sounds","coopfail.ogg")):
+      self.loadSoundEffect(self, "coOpFailSound",os.path.join("themes",themename,"sounds","coopfail.ogg"))
+    elif self.fileExists(os.path.join("themes",themename,"sounds","stardeactivate.ogg")):
+      self.loadSoundEffect(self, "coOpFailSound",os.path.join("themes",themename,"sounds","stardeactivate.ogg"))
+      Log.warn(themename + "\sounds\coopfail.ogg not found -- using stardeactivate.ogg instead")
+    elif self.fileExists(os.path.join("themes",themename,"sounds","out.ogg")):  #MFH - not all themes have out.ogg!
+      self.loadSoundEffect(self, "coOpFailSound",os.path.join("themes",themename,"sounds","out.ogg"))
+      Log.warn(themename + "\sounds\coopfail.ogg not found -- using out.ogg instead")
+    else:
+      self.loadSoundEffect(self, "coOpFailSound",os.path.join("themes",themename,"sounds","back1.ogg"))
+      Log.warn(themename + "\sounds\coopfail.ogg not found -- using back1.ogg instead")
 
 
 
@@ -335,9 +363,8 @@ class Data(object):
     #elif self.theme == 2:
     #  #self.loadSoundEffect(self, "acceptSound",  os.path.join("themes",themename,"sounds","action.ogg"))
     #  self.loadSoundEffect(self, "cancelSounds",  os.path.join("themes",themename,"sounds","out.ogg"))
-      
 
-
+  
   def SetAllScrewUpSoundFxObjectVolumes(self, volume):   #MFH - single function to go through all screwup sound objects and set object volume to the given volume
     for s in self.screwUpsounds:
       s.setVolume(volume)
@@ -345,7 +372,7 @@ class Data(object):
       s.setVolume(volume)
     for s in self.screwUpsoundsDrums:
       s.setVolume(volume)
-
+  
   def SetAllSoundFxObjectVolumes(self, volume):   #MFH - single function to go through all sound objects (and iterate through all sound lists) and set object volume to the given volume
     #MFH TODO - set every sound object's volume here...
     self.starDingSound.setVolume(volume)
@@ -362,6 +389,8 @@ class Data(object):
     self.rockSound.setVolume(volume)
     self.starDeActivateSound.setVolume(volume)
     self.starActivateSound.setVolume(volume)
+    self.rescueSound.setVolume(volume)
+    self.coOpFailSound.setVolume(volume)
     self.crowdSound.setVolume(volume)
     self.starReadySound.setVolume(volume)
     self.clapSound.setVolume(volume)
@@ -413,7 +442,7 @@ class Data(object):
         return [Sound(self.resource.fileName(os.path.join("themes",self.themeLabel,"sounds","in.ogg")))]
       elif self.theme == 2:
         return [Sound(self.resource.fileName(os.path.join("themes",self.themeLabel,"sounds","action.ogg")))]
-
+    
   def loadScrewUpsounds(self):
     soundPathTheme = os.path.join("themes",self.themeLabel,"sounds")
     soundPathData = "sounds"

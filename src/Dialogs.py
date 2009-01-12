@@ -49,7 +49,7 @@ import Song
 import Data
 import Player
 import Guitar
-import Svg
+import random
 
 #myfingershurt: drums :)
 import Drum
@@ -60,6 +60,8 @@ from Credits import Credits
 import Config
 import Settings
 
+#MFH - for cd/song list
+from Svg import ImgDrawing, SvgContext
 
 #MFH - for loading phrases
 def wrapCenteredText(font, pos, text, rightMargin = 0.9, scale = 0.002, visibility = 0.0):
@@ -83,7 +85,7 @@ def wrapCenteredText(font, pos, text, rightMargin = 0.9, scale = 0.002, visibili
   sentence = ""
   for n, word in enumerate(text.split(" ")):
     w, h = font.getStringSize(sentence + " " + word, scale = scale)
-    if x + (w/2) > rightMargin or word == "\n":
+    if x + (w/2) > rightMargin*1.11 or word == "\n":
       w, h = font.getStringSize(sentence, scale = scale)
       #x = startXpos
       glPushMatrix()
@@ -91,7 +93,7 @@ def wrapCenteredText(font, pos, text, rightMargin = 0.9, scale = 0.002, visibili
       font.render(sentence, (x - (w/2), y + visibility * n), scale = scale)
       glPopMatrix()
       sentence = word
-      y += h*.8 # evilynux - Reduced spacing between lines (worldrave request)
+      y += h*.5 # Worldrave - Modified spacing between lines
     else:
       if sentence == "" or sentence == "\n":
         sentence = word
@@ -103,7 +105,7 @@ def wrapCenteredText(font, pos, text, rightMargin = 0.9, scale = 0.002, visibili
     glRotate(visibility * (n + 1) * -45, 0, 0, 1)
     font.render(sentence, (x - (w/2), y + visibility * n), scale = scale)
     glPopMatrix()
-    y += h*.8 # evilynux - Reduced spacing between lines (worldrave request)
+    y += h*.5 # Worldrave - Modified spacing between lines
   
     #if word == "\n":
     #  continue
@@ -115,9 +117,9 @@ def wrapCenteredText(font, pos, text, rightMargin = 0.9, scale = 0.002, visibili
   #x = startXpos
   #for n, word in enumerate(text.split(" ")):
   #  w, h = font.getStringSize(word, scale = scale)
-  #  if x + w > rightMargin or word == "\n":
+  #  if x + w > rightMargin*1.11 or word == "\n":
   #    x = startXpos
-  #    y += h*.8 # evilynux - Reduced spacing between lines (worldrave request)
+  #    y += h*.5 # Worldrave - Modified spacing between lines
   #  if word == "\n":
   #    continue
   #  glPushMatrix()
@@ -543,7 +545,21 @@ class SongChooser(Layer, KeyListener):
     self.library_text_color = Theme.hexToColor(Theme.library_text_colorVar)
     self.library_selected_color = Theme.hexToColor(Theme.library_selected_colorVar)
     self.songlist_score_color = Theme.hexToColor(Theme.songlist_score_colorVar)
+    self.songlistcd_score_color = Theme.hexToColor(Theme.songlistcd_score_colorVar)
+    
+    self.song_rb2_name_color = Theme.hexToColor(Theme.song_rb2_name_colorVar)
+    self.song_rb2_name_selected_color = Theme.hexToColor(Theme.song_rb2_name_selected_colorVar)
+    self.song_rb2_diff_color = Theme.hexToColor(Theme.song_rb2_diff_colorVar)
+    self.song_rb2_artist_color = Theme.hexToColor(Theme.song_rb2_artist_colorVar)
 
+    
+
+    self.listRotation = self.engine.config.get("game", "songlistrotation")
+    self.songCoverType = self.engine.config.get("game", "songcovertype")
+    self.listingMode = engine.config.get("game","song_listing_mode")
+    self.songIcons = engine.config.get("game", "song_icons")
+    self.preLoadSongLabels = engine.config.get("game", "preload_labels")
+    
     Log.debug("Songlist artist colors: " + str(self.artist_text_color) + " / " + str(self.artist_selected_color))
 
 
@@ -576,6 +592,41 @@ class SongChooser(Layer, KeyListener):
     except Exception, e:
       Log.warn("Unable to load Theme song_listscore_xpos: %s" % e) 
       self.song_listscore_xpos = None
+      
+    try:
+      self.song_listcd_cd_xpos = Theme.song_listcd_cd_Xpos
+      Log.debug("song_listcd_cd_xpos found: " + str(self.song_listcd_cd_xpos))
+    except Exception, e:
+      Log.warn("Unable to load Theme song_listcd_cd_xpos: %s" % e) 
+      self.song_listcd_cd_xpos = None
+
+    try:
+      self.song_listcd_cd_ypos = Theme.song_listcd_cd_Ypos
+      Log.debug("song_listcd_cd_ypos found: " + str(self.song_listcd_cd_ypos))
+    except Exception, e:
+      Log.warn("Unable to load Theme song_listcd_cd_ypos: %s" % e) 
+      self.song_listcd_cd_ypos = None
+
+    try:
+      self.song_listcd_score_xpos = Theme.song_listcd_score_Xpos
+      Log.debug("song_listcd_score_xpos found: " + str(self.song_listcd_score_xpos))
+    except Exception, e:
+      Log.warn("Unable to load Theme song_listcd_score_xpos: %s" % e) 
+      self.song_listcd_score_xpos = None
+
+    try:
+      self.song_listcd_score_ypos = Theme.song_listcd_score_Ypos
+      Log.debug("song_listcd_score_ypos found: " + str(self.song_listcd_score_ypos))
+    except Exception, e:
+      Log.warn("Unable to load Theme song_listcd_score_ypos: %s" % e) 
+      self.song_listcd_score_ypos = None
+
+    try:
+      self.song_listcd_list_xpos = Theme.song_listcd_list_Xpos
+      Log.debug("song_listcd_list_xpos found: " + str(self.song_listcd_list_xpos))
+    except Exception, e:
+      Log.warn("Unable to load Theme song_listcd_list_xpos: %s" % e) 
+      self.song_listcd_list_xpos = None
 
 
     #pre-determine these values and just replace them with these variables in the render function:
@@ -597,6 +648,22 @@ class SongChooser(Layer, KeyListener):
 
     if self.song_listscore_xpos == None:
       self.song_listscore_xpos = 0.8
+      
+    #Qstick - List/CD mode element positions
+    if self.song_listcd_cd_xpos == None:
+      self.song_listcd_cd_xpos = .75
+  
+    if self.song_listcd_cd_ypos == None:
+      self.song_listcd_cd_ypos = .6
+      
+    if self.song_listcd_score_xpos == None:
+      self.song_listcd_score_xpos = 0.6
+
+    if self.song_listcd_score_ypos == None:
+      self.song_listcd_score_ypos = 0.5
+      
+    if self.song_listcd_list_xpos == None:
+      self.song_listcd_list_xpos = .1
     
 
     
@@ -632,13 +699,23 @@ class SongChooser(Layer, KeyListener):
     self.rotationDisabled = self.engine.config.get("performance", "disable_librotation")
     self.spinnyDisabled   = self.engine.config.get("game", "disable_spinny")
 
+    self.sortorder = engine.config.get("game", "sort_order")
+    self.sortdirection = engine.config.get("game", "sort_direction")
+
     self.sfxVolume    = self.engine.config.get("audio", "SFX_volume")
 
     #Get Theme
     themename = self.engine.data.themeLabel
     self.theme = self.engine.data.theme
 
-    self.display = self.engine.config.get("coffee", "songdisplay")
+    
+    self.display = self.engine.config.get("coffee", "song_display_mode")
+    if self.display == 4:
+      if Theme.songListDisplay != None:
+        self.display = Theme.songListDisplay
+      else:
+        self.display = 1
+
     self.tut = self.engine.config.get("game", "tut")
 
     self.songback = Theme.songback
@@ -674,13 +751,14 @@ class SongChooser(Layer, KeyListener):
     else: 
       self.instrument = "Guitar"
 
-    if self.display:
+    if self.display == 0:
       self.engine.resource.load(self, "cassette",     lambda: Mesh(self.engine.resource.fileName("cassette.dae")), synch = True)
       self.engine.resource.load(self, "label",        lambda: Mesh(self.engine.resource.fileName("label.dae")), synch = True)
       self.engine.resource.load(self, "libraryMesh",  lambda: Mesh(self.engine.resource.fileName("library.dae")), synch = True)
       self.engine.resource.load(self, "libraryLabel", lambda: Mesh(self.engine.resource.fileName("library_label.dae")), synch = True)
       self.engine.loadImgDrawing(self, "background",  os.path.join("themes",themename,"menu","songchoosepaper.png"))
-    else:
+    elif self.display == 1:
+
       try:
         self.engine.loadImgDrawing(self, "background",  os.path.join("themes",themename,"menu","songchooseback.png"))
       except IOError:
@@ -688,7 +766,6 @@ class SongChooser(Layer, KeyListener):
       self.engine.loadImgDrawing(self, "paper",       os.path.join("themes",themename,"menu","songchoosepaper.png"))
       self.engine.loadImgDrawing(self, "selected",    os.path.join("themes",themename,"menu","selected.png"))
       self.scoreTimer = 0
-
 
       # evilynux - configurable default highscores difficulty display
       self.diff = self.engine.config.get("game", "songlist_difficulty")
@@ -700,7 +777,94 @@ class SongChooser(Layer, KeyListener):
         self.diff = "Hard"
       else: # self.diff == 0:
         self.diff = "Expert"
+    elif self.display == 2:
+      self.engine.resource.load(self, "cassette",     lambda: Mesh(self.engine.resource.fileName("cassette.dae")), synch = True)
+      self.engine.resource.load(self, "label",        lambda: Mesh(self.engine.resource.fileName("label.dae")), synch = True)
+      self.engine.resource.load(self, "libraryMesh",  lambda: Mesh(self.engine.resource.fileName("library.dae")), synch = True)
+      self.engine.resource.load(self, "libraryLabel", lambda: Mesh(self.engine.resource.fileName("library_label.dae")), synch = True)
+      try:
+        self.engine.loadImgDrawing(self, "background",       os.path.join("themes",themename,"menu","songchooselistcd.png"))
+      except IOError:
+        self.engine.loadImgDrawing(self, "background",       os.path.join("themes",themename,"menu","songchoosepaper.png"))
+      try:
+        self.engine.loadImgDrawing(self, "selectedlistcd",    os.path.join("themes",themename,"menu","selectedlistcd.png"))
+      except IOError:
+        self.engine.loadImgDrawing(self, "selected",    os.path.join("themes",themename,"menu","selected.png"))
+        self.selectedlistcd = None
+    elif self.display == 3:
+      try:
+        self.engine.loadImgDrawing(self, "background",  os.path.join("themes",themename,"menu","songchooserb2.png"))
+      except IOError:
+        self.background = None
+        self.engine.loadImgDrawing(self, "background",       os.path.join("themes",themename,"menu","songchoosepaper.png"))
+      try:
+        self.engine.loadImgDrawing(self, "selected",    os.path.join("themes",themename,"menu","selectedrb2.png"))
+      except IOError:
+        self.engine.loadImgDrawing(self, "selected",    os.path.join("themes",themename,"menu","selected.png"))
+      try:
+        self.engine.loadImgDrawing(self, "tierbg",    os.path.join("themes",themename,"menu","tier.png"))
+      except IOError:
+        self.tierbg = None
+      try:
+        self.engine.loadImgDrawing(self, "emptyLabel",    os.path.join("themes",themename,"menu","emptylabel.png"))
+      except IOError:
+        self.emptyLabel = None
+      try:
+        self.engine.loadImgDrawing(self, "lockedLabel",    os.path.join("themes",themename,"menu","lockedlabel.png"))
+      except IOError:
+        self.lockedLabel = self.emptyLabel
+      try:
+        self.engine.loadImgDrawing(self, "diffimg1",    os.path.join("themes",themename,"menu","diff1.png"))
+        self.engine.loadImgDrawing(self, "diffimg2",    os.path.join("themes",themename,"menu","diff2.png"))
+        self.engine.loadImgDrawing(self, "diffimg3",    os.path.join("themes",themename,"menu","diff3.png"))
+      except IOError:
+        self.diffimg1 = None
+        
+      #song icon loading
+      if self.songIcons:
+        self.itemIcons = []
+        self.itemIconNames = []
+        iconFolder = engine.resource.fileName(os.path.join("themes",themename,"menu","icon"))
+        if os.path.exists(iconFolder):
+          for filename in os.listdir(iconFolder):
+            if os.path.splitext(filename)[1].lower() == ".png":
+              
+              thisfile = self.engine.resource.fileName("themes",themename,"menu","icon",filename)
+              if os.path.exists(thisfile):
+                self.itemIcons.append(ImgDrawing(self.engine.data.svg, thisfile))
+                self.itemIconNames.append(os.path.splitext(filename)[0])
+             
+  
+        
+      self.scoreTimer = 0
 
+      # evilynux - configurable default highscores difficulty display
+      self.diff = self.engine.config.get("game", "songlist_difficulty")
+      if self.diff == 3:
+        self.diff = "Easy"
+      elif self.diff == 2:
+        self.diff = "Medium"
+      elif self.diff == 1:
+        self.diff = "Hard"
+      else: # self.diff == 0:
+        self.diff = "Expert"
+        
+      #if self.rotationDisabled:
+      #  item = self.items[self.selectedIndex]
+      #  Log.debug(os.path.join(self.library, item.songName,    "label.png"))
+      #  try:
+      #    if isinstance(item, Song.SongInfo):
+      #      
+      #      self.engine.loadImgDrawing(self, "currentlabel", os.path.join(self.library, item.songName,    "label.png"))
+      #    elif isinstance(item, Song.LibraryInfo):
+      #      self.engine.loadImgDrawing(self, "currentlabel", os.path.join(item.libraryName,    "label.png"))
+      #    else:
+      #      self.currentlabel = None
+      #  except IOError:
+      #    self.currentlabel = None
+
+
+      
     # evilynux - Shall we show hit% and note streak?
     self.extraStats = self.engine.config.get("game", "songlist_extra_stats")
     #myfingershurt: adding yellow fret preview again
@@ -717,6 +881,7 @@ class SongChooser(Layer, KeyListener):
     self.highScoreType = self.engine.config.get("game", "HSMovement")
 
     self.instrumentChange = False   #MFH
+
 
   def loadCollection(self):
     Log.debug("Dialogs.loadCollection() function call...")
@@ -778,56 +943,58 @@ class SongChooser(Layer, KeyListener):
     if self.songLoader:
       self.songLoader.stop() # evilynux - cancel() became stop()
     self.selectedIndex = 0
-    
-    #MFH: Here, scan self.songs for a SongInfo followed by a TitleInfo.  Insert a BlankSpaceInfo object in between them. (one will already be in front of a CareerResetterInfo)
-    addingBlankSpaces = True
-    foundEndOfCareerYet = False
-    while addingBlankSpaces:
-      lastObjectWasASong = False
-      for i, item in enumerate(self.songs):
-        if isinstance(item, Song.SongInfo):
-          lastObjectWasASong = True
-        elif isinstance(item, Song.TitleInfo):
-          if lastObjectWasASong:
-            self.songs.insert(i, Song.BlankSpaceInfo())
-            Log.debug("Dialogs.py: Inserted blank space in self.songs list before " + item.getName())
-            break   #now that the self.songs list has changed, we must re-enumerate and look for the next place to insert a space
-          lastObjectWasASong = False
-        elif isinstance(item, Song.BlankSpaceInfo):
-          if item.name == _("End of Career") and not foundEndOfCareerYet:   #also want to insert a blank space after the end of career marker
-            self.songs.insert(i, Song.BlankSpaceInfo())   #insert a blank space before End of Career
-            self.songs.insert(i+2, Song.BlankSpaceInfo())   #...and after End of Career (which is now shifted up one index)
-            foundEndOfCareerYet = True
-            Log.debug("Dialogs.py: Inserted blank space in self.songs list after " + item.getName())
-            break   #now that the self.songs list has changed, we must re-enumerate and look for the next place to insert a space
-          lastObjectWasASong = False
-        else:
-          lastObjectWasASong = False
-      else:   #executed after the for loop finishes
-        addingBlankSpaces = False   #finished adding blank spaces, exit while loop
-        Log.debug("Dialogs.py: Finished inserting blank spaces in self.songs.")
+    if self.display != 4:
+      #MFH: Here, scan self.songs for a SongInfo followed by a TitleInfo.  Insert a BlankSpaceInfo object in between them. (one will already be in front of a CareerResetterInfo)
+      addingBlankSpaces = True
+      foundEndOfCareerYet = False
+      while addingBlankSpaces:
+        lastObjectWasASong = False
+        for i, item in enumerate(self.songs):
+          if isinstance(item, Song.SongInfo):
+            lastObjectWasASong = True
+          elif isinstance(item, Song.TitleInfo):
+            if lastObjectWasASong:
+              self.songs.insert(i, Song.BlankSpaceInfo())
+              Log.debug("Dialogs.py: Inserted blank space in self.songs list before " + item.getName())
+              break   #now that the self.songs list has changed, we must re-enumerate and look for the next place to insert a space
+            lastObjectWasASong = False
+          elif isinstance(item, Song.BlankSpaceInfo):
+            if item.name == _("End of Career") and not foundEndOfCareerYet:   #also want to insert a blank space after the end of career marker
+              self.songs.insert(i, Song.BlankSpaceInfo())   #insert a blank space before End of Career
+              self.songs.insert(i+2, Song.BlankSpaceInfo())   #...and after End of Career (which is now shifted up one index)
+              foundEndOfCareerYet = True
+              Log.debug("Dialogs.py: Inserted blank space in self.songs list after " + item.getName())
+              break   #now that the self.songs list has changed, we must re-enumerate and look for the next place to insert a space
+            lastObjectWasASong = False
+          else:
+            lastObjectWasASong = False
+        else:   #executed after the for loop finishes
+          addingBlankSpaces = False   #finished adding blank spaces, exit while loop
+          Log.debug("Dialogs.py: Finished inserting blank spaces in self.songs.")
+  
+      #MFH: Second scan through songlist items to remove any resulting double blank spaces
+      removingBlankSpaces = True
+      foundEndOfCareerYet = False
+      while removingBlankSpaces:
+        lastObjectWasASpace = False
+        for i, item in enumerate(self.songs):
+          if isinstance(item, Song.BlankSpaceInfo) and item.name == "":
+            if lastObjectWasASpace:
+              #self.songs.remove(i)
+              del self.songs[i]
+              break
+            
+            lastObjectWasASpace = True
+          else:
+            lastObjectWasASpace = False
+        else:   #executed after the for loop finishes
+          removingBlankSpaces = False   #finished adding blank spaces, exit while loop
+          Log.debug("Dialogs.py: Finished filtering doubled blank spaces in self.songs.")
 
-    #MFH: Second scan through songlist items to remove any resulting double blank spaces
-    removingBlankSpaces = True
-    foundEndOfCareerYet = False
-    while removingBlankSpaces:
-      lastObjectWasASpace = False
-      for i, item in enumerate(self.songs):
-        if isinstance(item, Song.BlankSpaceInfo) and item.name == "":
-          if lastObjectWasASpace:
-            #self.songs.remove(i)
-            del self.songs[i]
-            break
-          
-          lastObjectWasASpace = True
-        else:
-          lastObjectWasASpace = False
-      else:   #executed after the for loop finishes
-        removingBlankSpaces = False   #finished adding blank spaces, exit while loop
-        Log.debug("Dialogs.py: Finished filtering doubled blank spaces in self.songs.")
-
-
-    self.items         = self.libraries + self.songs
+    if self.listingMode == 0:
+      self.items         = self.libraries + self.songs
+    else:
+      self.items         = self.songs
 
     if self.items == []:    #MFH: Catch when there ain't a damn thing in the current folder - back out!
       if self.library != Song.DEFAULT_LIBRARY:
@@ -848,6 +1015,12 @@ class SongChooser(Layer, KeyListener):
     self.loaded        = True
     self.searchText    = ""
     self.searching     = False
+    
+    if self.display != 1:
+      if self.preLoadSongLabels:
+        for i in range(0,len(self.items)):
+          self.loadItemLabel(i)
+    
     if self.initialItem is not None:
       for i, item in enumerate(self.items):
         if isinstance(item, Song.SongInfo) and self.initialItem == item.songName:
@@ -884,7 +1057,7 @@ class SongChooser(Layer, KeyListener):
 #-        else:
 #-          Log.debug("Song name starting with a period filtered from prefix removal logic: " + item.name)
 
-      elif isinstance(item, Song.TitleInfo):
+      elif isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
         self.tiersArePresent = True 
 
     # if the first item is a title, start on the second one
@@ -931,16 +1104,36 @@ class SongChooser(Layer, KeyListener):
   
   def loadItemLabel(self, i):
     # Load the item label if it isn't yet loaded
+    themename = self.engine.data.themeLabel
     item = self.items[i]
     if self.itemLabels[i] is None:
       if isinstance(item, Song.SongInfo):
-        label = self.engine.resource.fileName(self.library, item.songName,    "label.png")
+        if (item.getLocked()):
+          self.itemLabels[i] = "Locked"
+          return
+        elif self.songCoverType:
+          label = self.engine.resource.fileName(item.libraryNam, item.songName,    "label.png")
+        else:
+          label = self.engine.resource.fileName(item.libraryNam, item.songName,    "album.png")
+
       elif isinstance(item, Song.LibraryInfo):
         label = self.engine.resource.fileName(item.libraryName, "label.png")
+      elif isinstance(item, Song.RandomSongInfo):
+        label = self.engine.resource.fileName("themes",themename,"menu","random.png")
       else:
         return
       if os.path.exists(label):
-        self.itemLabels[i] = Texture(label)
+        #MFH - load as 2D drawing and not a texture when in CD/List mode:
+        if self.display == 2 and not self.listRotation:
+          #self.engine.loadImgDrawing(self, "itemLabels[i]",  label)
+          self.itemLabels[i] = ImgDrawing(self.engine.data.svg, label)
+        elif self.display == 3:
+          self.itemLabels[i] = ImgDrawing(self.engine.data.svg, label)
+        else:
+          self.itemLabels[i] = Texture(label)
+      else:
+        if self.display == 3:
+          self.itemLabels[i] = "Empty"
 
   def updateSelection(self):
   
@@ -948,7 +1141,7 @@ class SongChooser(Layer, KeyListener):
     self.songCountdown = 1024
 
     #myfingershurt: only if CD list
-    if self.display:
+    if self.display != 1:
       if self.selectedIndex > 1:
         self.loadItemLabel(self.selectedIndex - 1)
       self.loadItemLabel(self.selectedIndex)
@@ -963,16 +1156,35 @@ class SongChooser(Layer, KeyListener):
     c = self.engine.input.controls.getMapping(key)
     if c in Player.KEY1S or key == pygame.K_RETURN or (c in Player.DRUM4S and self.drumNav):
       if self.matchesSearch(self.selectedItem):
+        # evilynux - "song" might be in the process of being created by a song preview,
+        #            stopping the songLoader is safer.
+        if self.songLoader:
+          self.songLoader.stop()
         #if not self.song: #MFH - play the sound immediately, THEN process.
         self.engine.data.acceptSound.setVolume(self.sfxVolume)  #MFH
         self.engine.data.acceptSound.play()
         if isinstance(self.selectedItem, Song.LibraryInfo):
-          self.library     = self.selectedItem.libraryName
+          self.library = self.selectedItem.libraryName
           self.initialItem = None
           Log.debug("New library selected: " + str(self.library) )
           self.loadCollection()
         elif isinstance(self.selectedItem, Song.SongInfo) and not self.selectedItem.getLocked():
         #else:
+          
+          if self.listingMode == 1:
+            self.library = self.selectedItem.libraryNam
+            
+          self.engine.view.popLayer(self)
+          self.accepted = True
+        elif isinstance(self.selectedItem, Song.RandomSongInfo):
+          while True:
+            self.selectedItem = self.items[random.randint(0,len(self.items)-1)]
+            if isinstance(self.selectedItem, Song.SongInfo) and not self.selectedItem.getLocked():
+              break
+          
+          if self.listingMode == 1:
+            self.library = self.selectedItem.libraryNam
+            
           self.engine.view.popLayer(self)
           self.accepted = True
         elif isinstance(self.selectedItem, Song.CareerResetterInfo):  #MFH - here's where to actually reset careers
@@ -993,6 +1205,19 @@ class SongChooser(Layer, KeyListener):
             else:
               break  
           self.engine.view.pushLayer(self)
+          
+    elif c in Player.KILLS:
+        self.sortOrder += 1
+        if self.sortOrder > 7:
+          self.sortOrder = 0
+        self.engine.config.set("game", "sort_order", self.sortOrder)
+        if self.songLoader:
+          self.songLoader.stop()
+        if self.song:
+          self.song.fadeout(1000)
+        self.selectedItem = None
+        self.loadCollection()
+
         
     elif c in Player.CANCELS + Player.KEY2S or (c in Player.DRUM1S and self.drumNav):
       # evilynux - "song" might be in the process of being created,
@@ -1002,7 +1227,7 @@ class SongChooser(Layer, KeyListener):
       #if not self.song:
       self.engine.data.cancelSound.setVolume(self.sfxVolume)  #MFH
       self.engine.data.cancelSound.play()
-      if self.library != Song.DEFAULT_LIBRARY and self.tut == False:
+      if self.library != Song.DEFAULT_LIBRARY and self.tut == False and self.listingMode == 0:
         self.initialItem = self.library
         self.library     = os.path.dirname(self.library)
         if self.song:
@@ -1019,15 +1244,15 @@ class SongChooser(Layer, KeyListener):
       #if self.tiersArePresent or self.careerMode: # if there are no titles, we'll have an infinite loop = bad
       if self.tiersArePresent: # if there are no titles, we'll have an infinite loop = bad
         self.selectedIndex = (self.selectedIndex - 1) % len(self.items)   #MFH - nudge it up one count.
-        if isinstance(self.items[self.selectedIndex], Song.TitleInfo):  #MFH - if we just found a title, we need to go once more to ensure we're goin back a title:
+        if isinstance(self.items[self.selectedIndex], Song.TitleInfo) or isinstance(self.items[self.selectedIndex], Song.SortTitleInfo):  #MFH - if we just found a title, we need to go once more to ensure we're goin back a title:
           self.selectedIndex = (self.selectedIndex - 1) % len(self.items)
-        while not ( isinstance(self.items[self.selectedIndex], Song.TitleInfo) or isinstance(self.items[self.selectedIndex], Song.CareerResetterInfo) ):
+        while not ( isinstance(self.items[self.selectedIndex], Song.TitleInfo) or isinstance(self.items[self.selectedIndex], Song.CareerResetterInfo) or isinstance(self.items[self.selectedIndex], Song.SortTitleInfo) ):
           self.selectedIndex = (self.selectedIndex - 1) % len(self.items)
         while 1:
           if isinstance(self.items[self.selectedIndex], Song.CareerResetterInfo):
             break
           self.selectedIndex = (self.selectedIndex + 1) % len(self.items)
-          if self.matchesSearch(self.items[self.selectedIndex]) and not isinstance(self.items[self.selectedIndex], Song.TitleInfo):
+          if self.matchesSearch(self.items[self.selectedIndex]) and not isinstance(self.items[self.selectedIndex], Song.TitleInfo) and not isinstance(self.items[self.selectedIndex], Song.SortTitleInfo):
             break
         self.updateSelection()
     
@@ -1035,13 +1260,13 @@ class SongChooser(Layer, KeyListener):
       #if self.tiersArePresent or self.careerMode: # if there are no titles, we'll have an infinite loop = bad
       if self.tiersArePresent: # if there are no titles, we'll have an infinite loop = bad
         self.selectedIndex = (self.selectedIndex + 1) % len(self.items) #MFH - nudge it down one count to get things started.
-        while not ( isinstance(self.items[self.selectedIndex], Song.TitleInfo) or isinstance(self.items[self.selectedIndex], Song.CareerResetterInfo) ):
+        while not ( isinstance(self.items[self.selectedIndex], Song.TitleInfo) or isinstance(self.items[self.selectedIndex], Song.CareerResetterInfo) or isinstance(self.items[self.selectedIndex], Song.SortTitleInfo) ):
           self.selectedIndex = (self.selectedIndex + 1) % len(self.items)
         while 1:
           if isinstance(self.items[self.selectedIndex], Song.CareerResetterInfo):
             break
           self.selectedIndex = (self.selectedIndex + 1) % len(self.items)
-          if self.matchesSearch(self.items[self.selectedIndex]) and not isinstance(self.items[self.selectedIndex], Song.TitleInfo):
+          if self.matchesSearch(self.items[self.selectedIndex]) and not isinstance(self.items[self.selectedIndex], Song.TitleInfo) and not isinstance(self.items[self.selectedIndex], Song.SortTitleInfo):
             break
         self.updateSelection()
     
@@ -1075,7 +1300,8 @@ class SongChooser(Layer, KeyListener):
             if isinstance(self.items[currentIndex], Song.SongInfo) or \
                isinstance(self.items[currentIndex], Song.CareerResetterInfo) or \
                isinstance(self.items[currentIndex], Song.LibraryInfo) or \
-               (self.display and isinstance(self.items[currentIndex], Song.TitleInfo)):
+               isinstance(self.items[currentIndex], Song.RandomSongInfo) or \
+               (self.display == 0 and isinstance(self.items[currentIndex], Song.TitleInfo)):
               break
           self.selectedIndex = currentIndex
 
@@ -1097,7 +1323,8 @@ class SongChooser(Layer, KeyListener):
             if isinstance(self.items[currentIndex], Song.SongInfo) or \
                isinstance(self.items[currentIndex], Song.CareerResetterInfo) or \
                isinstance(self.items[currentIndex], Song.LibraryInfo) or \
-               (self.display and isinstance(self.items[currentIndex], Song.TitleInfo)):
+               isinstance(self.items[currentIndex], Song.RandomSongInfo) or \
+               (self.display == 0 and isinstance(self.items[currentIndex], Song.TitleInfo)):
               break
           self.selectedIndex = currentIndex
           
@@ -1189,7 +1416,10 @@ class SongChooser(Layer, KeyListener):
     
     # evilynux - Stop already playing song if any
     if self.songLoader:
-      self.songLoader.stop()
+      try:
+        self.songLoader.stop()
+      except:
+        self.songLoader = None
 
     self.songLoader = self.engine.resource.load(self, None, lambda: Song.loadSong(self.engine, song, playbackOnly = True, library = self.library), synch = False, onLoad = self.songLoaded) #Blazingamer - asynchronous preview loading allows "Loading Preview..." to correctly disappear.
 
@@ -1224,6 +1454,11 @@ class SongChooser(Layer, KeyListener):
       glColor3f(*color)
 
     glEnable(GL_COLOR_MATERIAL)
+
+    if self.display == 2:
+      glRotate(90, 0, 0, 1)
+      if self.listRotation:
+        glRotate(((self.time - self.lastTime) * 2 % 360) - 90, 1, 0, 0)
     self.cassette.render("Mesh_001")
     glColor3f(.1, .1, .1)
     self.cassette.render("Mesh")
@@ -1251,6 +1486,11 @@ class SongChooser(Layer, KeyListener):
 
     glEnable(GL_NORMALIZE)
     glEnable(GL_COLOR_MATERIAL)
+    if self.display == 2:
+      glRotate(-180, 0, 1, 0)
+      glRotate(-90, 0, 0, 1)
+      if self.listRotation:
+        glRotate(((self.time - self.lastTime) * 4 % 360) - 90, 1, 0, 0)
     self.libraryMesh.render("Mesh_001")
     glColor3f(.1, .1, .1)
     self.libraryMesh.render("Mesh")
@@ -1342,7 +1582,7 @@ class SongChooser(Layer, KeyListener):
       w, h, = self.engine.view.geometry[2:4]
       r = .5
   
-      if self.display:
+      if self.display != 1: #
         #MFH - auto background image scaling
         imgwidth = self.background.width1()
         wfactor = 640.000/imgwidth
@@ -1359,7 +1599,7 @@ class SongChooser(Layer, KeyListener):
           self.background.transform.scale(.5,-.5)
           self.background.draw()
         else:
-          self.background = None 
+          self.background = None
   
         self.paper.transform.reset()
         if self.songback:
@@ -1392,7 +1632,9 @@ class SongChooser(Layer, KeyListener):
       notesTotal = 0    
       notesHit = 0
       noteStreak = 0
-  
+
+
+
       if self.instrumentChange:
         self.instrumentChange = False
         self.instrumentNum += 1
@@ -1426,9 +1668,9 @@ class SongChooser(Layer, KeyListener):
   #-        self.instrument = "Guitar"
   #-        self.engine.config.set("game", "songlist_instrument", 0)
   
-      if self.display:
+      if self.display == 0: #CDs Mode
       # render the item list
-        try:
+        try:      
           glMatrixMode(GL_PROJECTION)
           glPushMatrix()
   
@@ -1469,6 +1711,8 @@ class SongChooser(Layer, KeyListener):
             elif isinstance(item, Song.TitleInfo):
               h = c * self.titleWidth + (1 - c) * self.titleHeight
             elif isinstance(item, Song.CareerResetterInfo):
+              h = c * self.titleWidth + (1 - c) * self.titleHeight
+            elif isinstance(item, Song.RandomSongInfo):
               h = c * self.titleWidth + (1 - c) * self.titleHeight
             elif isinstance(item, Song.BlankSpaceInfo):
               h = c * self.titleWidth + (1 - c) * self.titleHeight
@@ -1516,6 +1760,10 @@ class SongChooser(Layer, KeyListener):
                 glRotate(-self.itemAngles[i], 0, 0, 0.5)    #bring cd case up for viewing
                 if i == self.selectedIndex and self.rotationDisabled == False:
                   glRotate(((self.time - self.lastTime) * 4 % 360) - 90, 1, 0, 0)
+                self.renderCareerResetter(item.color, self.itemLabels[i])
+              elif isinstance(item, Song.RandomSongInfo):
+                #myfingershurt: cd cases are backwards
+                glRotate(self.itemAngles[i], 0, 0, 1)
                 self.renderCareerResetter(item.color, self.itemLabels[i])
   
   
@@ -1624,7 +1872,7 @@ class SongChooser(Layer, KeyListener):
   
               Theme.setSelectedColor(1 - v)
   
-              c1,c2,c3 = self.song_name_selected_color
+              c1,c2,c3 = self.songlistcd_score_color
               glColor3f(c1,c2,c3)
   
               scale = 0.0011
@@ -1691,6 +1939,14 @@ class SongChooser(Layer, KeyListener):
               careerResetText = _("Reset this entire career")
               wrapText(font, (x, pos[1] + 3 * font.getHeight() * 0.0016), careerResetText, visibility = f, scale = 0.0016)
   
+            elif isinstance(item, Song.RandomSongInfo):
+              Theme.setBaseColor(1 - v)
+  
+              c1,c2,c3 = self.song_name_selected_color
+              glColor3f(c1,c2,c3)
+  
+              careerResetText = ""
+              wrapText(font, (x, pos[1] + 3 * font.getHeight() * 0.0016), careerResetText, visibility = f, scale = 0.0016)
   
           #MFH CD list
           text = self.instrument
@@ -1708,7 +1964,9 @@ class SongChooser(Layer, KeyListener):
           self.engine.view.resetProjection()
           nuttin = True
       
-      else:   #MFH - song List display
+
+          
+      elif self.display == 1:   #MFH - song List display
         if self.theme == 0 or self.theme == 1:
           # render the song info
           self.engine.view.setOrthogonalProjection(normalize = True)
@@ -1728,7 +1986,10 @@ class SongChooser(Layer, KeyListener):
               maxIndex = i
   
             #MFH - TODO - add logic for special 4-item songlist to prevent jumping up and down
-            if self.selectedIndex == 0:#Selection is first item in list
+            if self.selectedIndex < 5 and maxIndex < 5:
+              pos = self.selectedIndex - self.selectedIndex, self.selectedIndex + (5-self.selectedIndex)
+              y = h*(.63-(.125*self.selectedIndex))
+            elif self.selectedIndex == 0:#Selection is first item in list
               pos = (self.selectedIndex, self.selectedIndex +5)
               y = h*0.63
             elif self.selectedIndex == 1:#Second item in list
@@ -1812,6 +2073,10 @@ class SongChooser(Layer, KeyListener):
                   text = _("Reset this entire career")
                   c1,c2,c3 = self.career_title_color
                   glColor3f(c1,c2,c3)
+                elif isinstance(item, Song.RandomSongInfo):
+                  text = _("Random Song")
+                  c1,c2,c3 = self.career_title_color
+                  glColor3f(c1,c2,c3)
   
   
                 if i == self.selectedIndex:
@@ -1821,6 +2086,9 @@ class SongChooser(Layer, KeyListener):
                 if i == self.selectedIndex:
                   glColor4f(.7,.5,.25,1)
                   if isinstance(item, Song.SongInfo):
+                    c1,c2,c3 = self.song_name_selected_color
+                    glColor3f(c1,c2,c3)
+                  if isinstance(item, Song.RandomSongInfo):
                     c1,c2,c3 = self.song_name_selected_color
                     glColor3f(c1,c2,c3)
                   if isinstance(item, Song.LibraryInfo):
@@ -1838,6 +2106,9 @@ class SongChooser(Layer, KeyListener):
                 else:
                   glColor4f(0,0,0,1)
                   if isinstance(item, Song.SongInfo):
+                    c1,c2,c3 = self.song_name_text_color
+                    glColor3f(c1,c2,c3)
+                  if isinstance(item, Song.RandomSongInfo):
                     c1,c2,c3 = self.song_name_text_color
                     glColor3f(c1,c2,c3)
                   if isinstance(item, Song.LibraryInfo):
@@ -2028,8 +2299,10 @@ class SongChooser(Layer, KeyListener):
   
             for i, item in enumerate(self.items):
               maxIndex = i
-  
-            if self.selectedIndex == 0:
+            if self.selectedIndex < 5 and maxIndex < 5:
+              pos = self.selectedIndex - self.selectedIndex, self.selectedIndex + (5-self.selectedIndex)
+              y = h*(.63-(.125*self.selectedIndex))
+            elif self.selectedIndex == 0:
               pos = (self.selectedIndex, self.selectedIndex +5)
               y = h*0.63
             elif self.selectedIndex == 1:
@@ -2063,7 +2336,8 @@ class SongChooser(Layer, KeyListener):
               font.render(text, (.05, .7 + v), scale = 0.001)
             elif self.songLoader:
               font.render(_("Loading Preview..."), (.05, .7 + v), scale = 0.001)
-  
+
+            #Render song list items  
             for i, item in enumerate(self.items):
               if i >= pos[0] and i <= pos[1]:
   
@@ -2103,6 +2377,10 @@ class SongChooser(Layer, KeyListener):
                   text = _("Reset this entire career")
                   c1,c2,c3 = self.career_title_color
                   glColor3f(c1,c2,c3)
+                elif isinstance(item, Song.RandomSongInfo):
+                  text = _("Random Song")
+                  c1,c2,c3 = self.career_title_color
+                  glColor3f(c1,c2,c3)
   
                 if i == self.selectedIndex:
                   w, h = font.getStringSize(text)
@@ -2111,6 +2389,9 @@ class SongChooser(Layer, KeyListener):
                 if i == self.selectedIndex:
                   glColor4f(.7,.5,.25,1)
                   if isinstance(item, Song.SongInfo):
+                    c1,c2,c3 = self.song_name_selected_color
+                    glColor3f(c1,c2,c3)
+                  if isinstance(item, Song.RandomSongInfo):
                     c1,c2,c3 = self.song_name_selected_color
                     glColor3f(c1,c2,c3)
                   if isinstance(item, Song.LibraryInfo):
@@ -2128,6 +2409,9 @@ class SongChooser(Layer, KeyListener):
                 else:
                   glColor4f(0,0,0,1)
                   if isinstance(item, Song.SongInfo):
+                    c1,c2,c3 = self.song_name_text_color
+                    glColor3f(c1,c2,c3)
+                  if isinstance(item, Song.RandomSongInfo):
                     c1,c2,c3 = self.song_name_text_color
                     glColor3f(c1,c2,c3)
                   if isinstance(item, Song.LibraryInfo):
@@ -2311,6 +2595,1038 @@ class SongChooser(Layer, KeyListener):
         font.render(text, (0.85-w, 0.10), scale=scale)
         self.engine.view.resetProjection()
 
+      elif self.display == 2:   #Qstick/BlazinGamer - Combo CD/List
+        item  = self.items[self.selectedIndex]
+        i = self.selectedIndex
+        if not self.listRotation:
+          if self.itemLabels[i]:
+            imgwidth = self.itemLabels[i].width1()
+            wfactor = 214.000/imgwidth
+            self.itemLabels[i].transform.reset()
+            self.itemLabels[i].transform.translate(self.song_listcd_cd_xpos * w,self.song_listcd_cd_ypos*h)
+            self.itemLabels[i].transform.scale(wfactor,-wfactor)
+            self.itemLabels[i].draw() 
+        else:
+          try:
+            glMatrixMode(GL_PROJECTION)
+            glPushMatrix()
+            
+            #myfingershurt: indentation was screwy here
+            glLoadIdentity()
+            gluPerspective(60, self.engine.view.aspectRatio, 0.1, 1000)
+            glMatrixMode(GL_MODELVIEW)
+            glLoadIdentity()
+                
+            glEnable(GL_DEPTH_TEST)
+            glDisable(GL_CULL_FACE)
+            glDepthMask(1)
+                
+            offset = 10 * (v ** 2)
+            self.camera.origin = (-9,(5.196/self.engine.view.aspectRatio) - (5.196*2/self.engine.view.aspectRatio)*self.song_listcd_cd_ypos,(5.196*self.engine.view.aspectRatio)-(5.196*2*self.engine.view.aspectRatio)*self.song_listcd_cd_xpos)
+            self.camera.target = ( 0,(5.196/self.engine.view.aspectRatio) - (5.196*2/self.engine.view.aspectRatio)*self.song_listcd_cd_ypos,(5.196*self.engine.view.aspectRatio)-(5.196*2*self.engine.view.aspectRatio)*self.song_listcd_cd_xpos)
+            self.camera.apply()
+                
+            y = 0.0
+
+            
+
+            glPushMatrix()
+            if isinstance(item, Song.SongInfo):
+              if self.songCoverType:
+                self.renderCassette(item.cassetteColor, self.itemLabels[i])
+              else:
+                self.renderLibrary(item.cassetteColor, self.itemLabels[i])
+            elif isinstance(item, Song.LibraryInfo):
+              self.renderLibrary(item.color, self.itemLabels[i])
+            glPopMatrix()
+            
+            glTranslatef(0, -h / 2, 0)
+            y += h
+
+            glDisable(GL_DEPTH_TEST)
+            glDisable(GL_CULL_FACE)
+            glDepthMask(0)
+          
+          finally:
+            glMatrixMode(GL_PROJECTION)
+            glPopMatrix()
+            glMatrixMode(GL_MODELVIEW)
+          # render the song info
+        self.engine.view.setOrthogonalProjection(normalize = True)
+        font = self.engine.data.songListFont
+        
+        try:
+          glEnable(GL_BLEND)
+          glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+          glEnable(GL_COLOR_MATERIAL)
+          Theme.setBaseColor(0)
+          
+          
+          
+          for i, item in enumerate(self.items):
+            maxIndex = i
+          if self.selectedIndex < 7 and maxIndex < 7:
+            pos = self.selectedIndex - self.selectedIndex, self.selectedIndex + (7-self.selectedIndex)
+            y = h*(.87-(.1*self.selectedIndex))
+          elif self.selectedIndex == 0:#Selection is first item in list
+            pos = (self.selectedIndex, self.selectedIndex +7)
+            y = h*0.87
+          elif self.selectedIndex == 1:#Second item in list
+            pos = (self.selectedIndex-1, self.selectedIndex+6)
+            y = h*0.77
+          elif self.selectedIndex == 2:#Second item in list
+            pos = (self.selectedIndex-2, self.selectedIndex+5)
+            y = h*0.67
+          elif self.selectedIndex == maxIndex-2:
+            pos = (self.selectedIndex-4, self.selectedIndex+3)
+            y = h*0.47
+          elif self.selectedIndex == maxIndex-1:#Second to last item in list
+            pos = (self.selectedIndex-5, self.selectedIndex+2)
+            y = h*0.37
+          elif self.selectedIndex == maxIndex and not self.selectedIndex == 1:#Third to Last in list and not third item
+            pos = (self.selectedIndex-6, self.selectedIndex+1)
+            y = h*0.27
+          else:
+            pos = (self.selectedIndex-3, self.selectedIndex+4)#Any other item than above
+            y = h*0.57
+          
+
+
+
+          if self.theme == 0 or self.theme == 1:
+            lfont = self.engine.data.songListFont
+            sfont = self.engine.data.shadowfont
+            
+            glColor4f(1,1,1,1)
+            text = self.library
+            w, h = font.getStringSize(text)
+            if self.filepathenable:
+              font.render(text, (.05, .01))
+            
+            if self.searchText:
+              text = _("Filter: %s") % (self.searchText) + "|"
+              if not self.matchesSearch(self.items[self.selectedIndex]):
+                text += " (%s)" % _("Not found")
+              font.render(text, (.05, .7 + v), scale = 0.001)
+            elif self.songLoader:
+              font.render(_("Loading Preview..."), (.05, .7 + v), scale = 0.001)
+              
+            for i, item in enumerate(self.items):
+              if i >= pos[0] and i <= pos[1]:
+  
+                if isinstance(item, Song.SongInfo):
+                  c1,c2,c3 = self.song_name_selected_color
+                  glColor3f(c1,c2,c3)
+                  if i == self.selectedIndex:
+                    if item.getLocked():
+                      text = item.getUnlockText()
+                    elif self.careerMode and not item.completed:
+                      text = _("Play To Advance")
+                    elif self.gameMode1p == 1: #evilynux - Practice mode
+                      text = _("Practice")
+                    elif item.count:
+                      count = int(item.count)
+                      if count == 1: 
+                        text = _("Played Once")
+                      else:
+                        text = _("Played %d times.") % count
+                    else:
+                      text = _("Quickplay")
+                elif isinstance(item, Song.LibraryInfo):
+                  c1,c2,c3 = self.library_selected_color
+                  glColor3f(c1,c2,c3)
+                  if i == self.selectedIndex:
+                    if item.songCount == 1:
+                      text = _("There Is 1 Song In This Setlist.")
+                    elif item.songCount > 1:
+                      text = _("There Are %d Songs In This Setlist." % (item.songCount))
+                    else:
+                      text = ""
+                elif isinstance(item, Song.TitleInfo):
+                  text = _("Tier")
+                  c1,c2,c3 = self.career_title_color
+                  glColor3f(c1,c2,c3)
+                elif isinstance(item, Song.CareerResetterInfo):
+                  text = _("Reset this entire career")
+                  c1,c2,c3 = self.career_title_color
+                  glColor3f(c1,c2,c3)
+                elif isinstance(item, Song.RandomSongInfo):
+                  text = _("Random Song")
+                  c1,c2,c3 = self.career_title_color
+                  glColor3f(c1,c2,c3)
+                
+                if i == self.selectedIndex:
+                  w, h = font.getStringSize(text)
+                  font.render(text, (self.song_listcd_score_xpos, .085), scale = 0.0012)
+                
+                if i == self.selectedIndex:
+                  glColor4f(.7,.5,.25,1)
+                  if isinstance(item, Song.SongInfo):
+                    c1,c2,c3 = self.song_name_selected_color
+                    glColor3f(c1,c2,c3)
+                  if isinstance(item, Song.LibraryInfo):
+                    c1,c2,c3 = self.library_selected_color
+                    glColor3f(c1,c2,c3)
+                  if isinstance(item, Song.RandomSongInfo):
+                    c1,c2,c3 = self.song_name_selected_color
+                    glColor3f(c1,c2,c3)
+                  if isinstance(item, Song.TitleInfo):
+                    c1,c2,c3 = self.career_title_color
+                    glColor3f(c1,c2,c3)
+                  if isinstance(item, Song.CareerResetterInfo):
+                    c1,c2,c3 = self.career_title_color
+                    glColor3f(c1,c2,c3)
+                  if isinstance(item, Song.BlankSpaceInfo):
+                    c1,c2,c3 = self.career_title_color
+                    glColor3f(c1,c2,c3)
+                else:
+                  glColor4f(0,0,0,1)
+                  if isinstance(item, Song.SongInfo):
+                    c1,c2,c3 = self.song_name_text_color
+                    glColor3f(c1,c2,c3)
+                  if isinstance(item, Song.RandomSongInfo):
+                    c1,c2,c3 = self.song_name_text_color
+                    glColor3f(c1,c2,c3)
+                  if isinstance(item, Song.LibraryInfo):
+                    c1,c2,c3 = self.library_text_color
+                    glColor3f(c1,c2,c3)
+                  if isinstance(item, Song.TitleInfo):
+                    c1,c2,c3 = self.career_title_color
+                    glColor3f(c1,c2,c3)
+                  if isinstance(item, Song.CareerResetterInfo):
+                    c1,c2,c3 = self.career_title_color
+                    glColor3f(c1,c2,c3)
+                  if isinstance(item, Song.BlankSpaceInfo):
+                    c1,c2,c3 = self.career_title_color
+                    glColor3f(c1,c2,c3)
+                text = item.name
+                
+                if isinstance(item, Song.SongInfo) and item.getLocked():
+                  text = _("-- Locked --")
+                  
+                if isinstance(item, Song.SongInfo): #MFH - add indentation when tier sorting
+                  if self.tiersArePresent:
+                    text = self.indentString + text
+  
+                # evilynux - Force uppercase display for Career titles
+                if isinstance(item, Song.TitleInfo):
+                  text = string.upper(text)
+                  
+                if isinstance(item, Song.CareerResetterInfo):
+                  text = string.upper(text)
+  
+                if isinstance(item, Song.BlankSpaceInfo):
+                  text = string.upper(text)
+                  
+                scale = font.scaleText(text, maxwidth = 0.45)
+                w, h = font.getStringSize(text, scale = scale)
+                
+                if i == self.selectedIndex:
+                  sfont.render(text, (self.song_listcd_list_xpos, .09*(i+1)-pos[0]*.09), scale = scale) #add theme option for song_listCD_xpos
+                else:
+                  lfont.render(text, (self.song_listcd_list_xpos, .09*(i+1)-pos[0]*.09), scale = scale) #add theme option for song_listCD_xpos
+                  
+                angle = self.itemAngles[self.selectedIndex]
+                f = ((90.0 - angle) / 90.0) ** 2
+                
+                if isinstance(item, Song.SongInfo) and not item.getLocked():
+                  if not item.frets == "":
+                    suffix = ", ("+item.frets+")"
+                  else:
+                    suffix = ""
+                  
+                  if not item.year == "":
+                    yeartag = ", "+item.year
+                  else:
+                    yeartag = ""
+                  
+                  scale = .0014
+                  glColor4f(.25,.5,1,1)
+  
+                  if i == self.selectedIndex:
+                    c1,c2,c3 = self.artist_selected_color
+                  else:
+                    c1,c2,c3 = self.artist_text_color
+                  glColor3f(c1,c2,c3)
+  
+                  # evilynux - Force uppercase display for artist name
+                  text = string.upper(item.artist)+suffix+yeartag
+  
+                  # evilynux - automatically scale artist name and year
+                  scale = font.scaleText(text, maxwidth = 0.4, scale = scale)
+                  w, h = font.getStringSize(text, scale = scale)
+
+                  lfont.render(text, (self.song_listcd_list_xpos + .05, .09*(i+1)-pos[0]*.09+.05), scale=scale)
+            
+                
+                item  = self.items[self.selectedIndex]
+                if self.matchesSearch(item):
+                  if isinstance(item, Song.SongInfo):
+                    angle = self.itemAngles[self.selectedIndex]
+                    f = ((90.0 - angle) / 90.0) ** 2
+
+                    
+                    c1,c2,c3 = self.songlistcd_score_color
+                    glColor3f(c1,c2,c3)
+      
+                    scale = 0.0013
+                    w, h = font.getStringSize(self.prompt, scale = scale)
+                    x = self.song_listcd_score_xpos
+                    y = self.song_listcd_score_ypos + f / 2.0
+                    if len(item.difficulties) > 3:
+                      y = self.song_listcd_score_ypos + f / 2.0
+                    
+                    #new
+                    for d in item.difficulties:
+                      scores =  item.getHighscoresWithPartString(d, part = self.instrument)
+                      if scores:
+                        score, stars, name, scoreExt = scores[0]
+                        notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 = scoreExt
+                      else:
+                        score, stars, name = "---", 0, "---"
+                      #Theme.setBaseColor(1 - v)
+                      lfont.render(unicode(d),     (x, y),           scale = scale)
+                      if stars == 6 and self.theme == 2:
+                        glColor3f(1, 1, 0)  
+                        lfont.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
+                      elif stars == 6:
+                        glColor3f(0, 1, 0)  
+                        lfont.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
+                      else:
+                        lfont.render(unicode(Data.STAR2 * stars + Data.STAR1 * (5 - stars)), (x, y + h), scale = scale * 1.8)
+                      #Theme.setSelectedColor(1 - v)
+                      
+                                      
+                      c1,c2,c3 = self.songlistcd_score_color
+                      glColor3f(c1,c2,c3)
+                      if scores:
+                        if self.extraStats:
+                          if notesTotal != 0:
+                            score = "%s %.1f%%" % (score, (float(notesHit) / notesTotal) * 100.0)
+                          if noteStreak != 0:
+                            score = "%s (%d)" % (score, noteStreak)
+                      lfont.render(unicode(score), (x + .15, y),     scale = scale)
+                      lfont.render(name,       (x + .15, y + h),     scale = scale)
+                      y += 2 * h + f / 4.0
+            
+          elif self.theme == 2:
+            if self.selectedlistcd == None:
+              imgwidth = self.selected.width1()
+              self.selected.transform.reset()
+              self.selected.transform.scale(.64, -1.05)
+              self.selected.transform.translate(self.song_listcd_list_xpos * w + (imgwidth*.64/2), y*1.2-h*.215)  #change depending on list Xpos
+              self.selected.draw()
+            else:
+              self.selectedlistcd.transform.reset()
+              self.selectedlistcd.transform.scale(1,-1)
+              self.selectedlistcd.transform.translate(self.song_listcd_list_xpos * w + (imgwidth/2), y*1.2-h*.215)
+              self.selectedlistcd.draw()
+            
+            glColor4f(1,1,1,1)
+            text = self.library
+            w, h = font.getStringSize(text)
+            if self.filepathenable:
+              font.render(text, (.05, .01))
+            
+            if self.searchText:
+              text = _("Filter: %s") % (self.searchText) + "|"
+              if not self.matchesSearch(self.items[self.selectedIndex]):
+                text += " (%s)" % _("Not found")
+              font.render(text, (.05, .7 + v), scale = 0.001)
+            elif self.songLoader:
+              font.render(_("Loading Preview..."), (.05, .7 + v), scale = 0.001)
+              
+            x = self.song_cdscore_xpos #Add theme.ini option for song_cdlistscore_xpos
+            font.render(self.prompt, (self.song_listcd_score_xpos, .05-v))
+            
+            for i, item in enumerate(self.items):
+              if i >= pos[0] and i <= pos[1]:
+  
+                if isinstance(item, Song.SongInfo):
+                  c1,c2,c3 = self.song_name_selected_color
+                  glColor3f(c1,c2,c3)
+                  if i == self.selectedIndex:
+                    if item.getLocked():
+                      text = item.getUnlockText()
+                    elif self.careerMode and not item.completed:
+                      text = _("Play To Advance")
+                    elif self.gameMode1p == 1: #evilynux - Practice mode
+                      text = _("Practice")
+                    elif item.count:
+                      count = int(item.count)
+                      if count == 1: 
+                        text = _("Played Once")
+                      else:
+                        text = _("Played %d times.") % count
+                    else:
+                      text = _("Quickplay")
+                elif isinstance(item, Song.LibraryInfo):
+                  c1,c2,c3 = self.library_selected_color
+                  glColor3f(c1,c2,c3)
+                  if i == self.selectedIndex:
+                    if item.songCount == 1:
+                      text = _("There Is 1 Song In This Setlist.")
+                    elif item.songCount > 1:
+                      text = _("There Are %d Songs In This Setlist." % (item.songCount))
+                    else:
+                      text = ""
+                elif isinstance(item, Song.TitleInfo):
+                  text = _("Tier")
+                  c1,c2,c3 = self.career_title_color
+                  glColor3f(c1,c2,c3)
+                elif isinstance(item, Song.CareerResetterInfo):
+                  text = _("Reset this entire career")
+                  c1,c2,c3 = self.career_title_color
+                  glColor3f(c1,c2,c3)
+                elif isinstance(item, Song.RandomSongInfo):
+                  text = _("Random Song")
+                  c1,c2,c3 = self.career_title_color
+                  glColor3f(c1,c2,c3)
+                
+                if i == self.selectedIndex:
+                  w, h = font.getStringSize(text)
+                  font.render(text, (self.song_listcd_score_xpos, .085), scale = 0.0012)
+                
+                if i == self.selectedIndex:
+                  glColor4f(.7,.5,.25,1)
+                  if isinstance(item, Song.SongInfo):
+                    c1,c2,c3 = self.song_name_selected_color
+                    glColor3f(c1,c2,c3)
+                  if isinstance(item, Song.LibraryInfo):
+                    c1,c2,c3 = self.library_selected_color
+                    glColor3f(c1,c2,c3)
+                  if isinstance(item, Song.TitleInfo):
+                    c1,c2,c3 = self.career_title_color
+                    glColor3f(c1,c2,c3)
+                  if isinstance(item, Song.CareerResetterInfo):
+                    c1,c2,c3 = self.career_title_color
+                    glColor3f(c1,c2,c3)
+                  if isinstance(item, Song.RandomSongInfo):
+                    c1,c2,c3 = self.song_name_selected_color
+                    glColor3f(c1,c2,c3)
+                  if isinstance(item, Song.BlankSpaceInfo):
+                    c1,c2,c3 = self.career_title_color
+                    glColor3f(c1,c2,c3)
+                else:
+                  glColor4f(0,0,0,1)
+                  if isinstance(item, Song.SongInfo):
+                    c1,c2,c3 = self.song_name_text_color
+                    glColor3f(c1,c2,c3)
+                  if isinstance(item, Song.LibraryInfo):
+                    c1,c2,c3 = self.library_text_color
+                    glColor3f(c1,c2,c3)
+                  if isinstance(item, Song.TitleInfo):
+                    c1,c2,c3 = self.career_title_color
+                    glColor3f(c1,c2,c3)
+                  if isinstance(item, Song.CareerResetterInfo):
+                    c1,c2,c3 = self.career_title_color
+                    glColor3f(c1,c2,c3)
+                  if isinstance(item, Song.RandomSongInfo):
+                    c1,c2,c3 = self.song_name_text_color
+                    glColor3f(c1,c2,c3)
+                  if isinstance(item, Song.BlankSpaceInfo):
+                    c1,c2,c3 = self.career_title_color
+                    glColor3f(c1,c2,c3)
+                text = item.name
+                
+                if isinstance(item, Song.SongInfo) and item.getLocked():
+                  text = _("-- Locked --")
+                  
+                if isinstance(item, Song.SongInfo): #MFH - add indentation when tier sorting
+                  if self.tiersArePresent:
+                    text = self.indentString + text
+  
+                # evilynux - Force uppercase display for Career titles
+                if isinstance(item, Song.TitleInfo):
+                  text = string.upper(text)
+                  
+                if isinstance(item, Song.CareerResetterInfo):
+                  text = string.upper(text)
+  
+                if isinstance(item, Song.BlankSpaceInfo):
+                  text = string.upper(text)
+                  
+                scale = font.scaleText(text, maxwidth = 0.45)
+                w, h = font.getStringSize(text, scale = scale)
+
+                font.render(text, (self.song_listcd_list_xpos, .09*(i+1)-pos[0]*.09), scale = scale) #add theme option for song_listCD_xpos
+                
+                if isinstance(item, Song.SongInfo) and not item.getLocked():
+                  if not item.frets == "":
+                    suffix = ", ("+item.frets+")"
+                  else:
+                    suffix = ""
+                  
+                  if not item.year == "":
+                    yeartag = ", "+item.year
+                  else:
+                    yeartag = ""
+                  
+                  scale = .0014
+                  glColor4f(.25,.5,1,1)
+  
+                  if i == self.selectedIndex:
+                    c1,c2,c3 = self.artist_selected_color
+                  else:
+                    c1,c2,c3 = self.artist_text_color
+                  glColor3f(c1,c2,c3)
+  
+                  # evilynux - Force uppercase display for artist name
+                  text = string.upper(item.artist)+suffix+yeartag
+  
+                  # evilynux - automatically scale artist name and year
+                  scale = font.scaleText(text, maxwidth = 0.4, scale = scale)
+                  w, h = font.getStringSize(text, scale = scale)
+
+                  font.render(text, (self.song_listcd_list_xpos + .05, .09*(i+1)-pos[0]*.09+.05), scale=scale) #add theme song_listCD_Xpos
+            
+                
+                item  = self.items[self.selectedIndex]
+                if self.matchesSearch(item):
+                  if isinstance(item, Song.SongInfo):
+                    angle = self.itemAngles[self.selectedIndex]
+                    f = ((90.0 - angle) / 90.0) ** 2
+        
+                    Theme.setSelectedColor(1 - v)
+                    
+                    c1,c2,c3 = self.songlistcd_score_color
+                    glColor3f(c1,c2,c3)
+      
+                    scale = 0.0013
+                    w, h = font.getStringSize(self.prompt, scale = scale)
+                    x = self.song_listcd_score_xpos
+                    y = self.song_listcd_score_ypos + f / 2.0
+                    if len(item.difficulties) > 3:
+                      y = self.song_listcd_score_ypos + f / 2.0
+                    
+                    #new
+                    for d in item.difficulties:
+                      scores =  item.getHighscoresWithPartString(d, part = self.instrument)
+                      if scores:
+                        score, stars, name, scoreExt = scores[0]
+                        notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 = scoreExt
+                      else:
+                        score, stars, name = "---", 0, "---"
+                      
+                      font.render(unicode(d),     (x, y),           scale = scale)
+                      
+                      if stars == 6 and self.theme == 2:
+                        glColor3f(1, 1, 0)  
+                        font.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
+                      elif stars == 6:
+                        glColor3f(0, 1, 0)  
+                        font.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
+                      else:
+                        font.render(unicode(Data.STAR2 * stars + Data.STAR1 * (5 - stars)), (x, y + h), scale = scale * 1.8)
+                      #Theme.setSelectedColor(1 - v)
+                      
+                                      
+                      c1,c2,c3 = self.songlistcd_score_color
+                      glColor3f(c1,c2,c3)
+                      if scores:
+                        if self.extraStats:
+                          if notesTotal != 0:
+                            score = "%s %.1f%%" % (score, (float(notesHit) / notesTotal) * 100.0)
+                          if noteStreak != 0:
+                            score = "%s (%d)" % (score, noteStreak)
+                      font.render(unicode(score), (x + .15, y),     scale = scale)
+                      font.render(name,       (x + .15, y + h),     scale = scale)
+                      y += 2 * h + f / 4.0
+              
+        finally:
+          text = self.instrument
+          scale = 0.00250
+          glColor3f(1, 1, 1)
+          w, h = font.getStringSize(text, scale=scale)
+          font.render(text, (0.95-w, 0.000), scale=scale)
+          self.engine.view.resetProjection()
+          nuttin = True
+
+          
+      elif self.display == 3:   #Qstick - rb2 Mode
+        item  = self.items[self.selectedIndex]
+        i = self.selectedIndex
+        if self.itemLabels[i] == "Empty":   #added so that emptylabel.png is only loaded once and not on every empty song
+          if self.emptyLabel != None:
+            imgwidth = self.emptyLabel.width1()
+            wfactor = 155.000/imgwidth
+            self.emptyLabel.transform.reset()
+            self.emptyLabel.transform.translate(.21*w,.59*h)
+            self.emptyLabel.transform.scale(wfactor,-wfactor)
+            self.emptyLabel.draw()
+        elif self.itemLabels[i] == "Locked":   #added so that emptylabel.png is only loaded once and not on every empty song
+          if self.lockedLabel != None:
+            imgwidth = self.lockedLabel.width1()
+            wfactor = 155.000/imgwidth
+            self.lockedLabel.transform.reset()
+            self.lockedLabel.transform.translate(.21*w,.59*h)
+            self.lockedLabel.transform.scale(wfactor,-wfactor)
+            self.lockedLabel.draw()
+        elif self.itemLabels[i]:
+          imgwidth = self.itemLabels[i].width1()
+          wfactor = 155.000/imgwidth
+          self.itemLabels[i].transform.reset()
+          self.itemLabels[i].transform.translate(.21*w,.59*h)
+          self.itemLabels[i].transform.scale(wfactor,-wfactor)
+          self.itemLabels[i].draw()
+
+        self.engine.view.setOrthogonalProjection(normalize = True)
+        font = self.engine.data.songListFont
+        
+        try:
+          glEnable(GL_BLEND)
+          glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+          glEnable(GL_COLOR_MATERIAL)
+          Theme.setBaseColor(0)
+          
+          
+          for i, item in enumerate(self.items):
+            maxIndex = i
+          if self.selectedIndex < 11 and maxIndex < 11:
+            pos = self.selectedIndex - self.selectedIndex, self.selectedIndex + (11-self.selectedIndex)
+            y = h*(.7825-(.0459*self.selectedIndex))
+          elif self.selectedIndex == 0:#Selection is first item in list
+            pos = (self.selectedIndex, self.selectedIndex +11)
+            y = h*0.7825
+          elif self.selectedIndex == 1:#Second item in list
+            pos = (self.selectedIndex-1, self.selectedIndex+10)
+            y = h*0.7365
+          elif self.selectedIndex == 2:#Second item in list
+            pos = (self.selectedIndex-2, self.selectedIndex+9)
+            y = h*0.6909
+          elif self.selectedIndex == 3:
+            pos = (self.selectedIndex-3, self.selectedIndex+8)
+            y = h*0.6447
+          elif self.selectedIndex == 4:
+            pos = (self.selectedIndex-4, self.selectedIndex+7)
+            y = h*0.5988
+          elif self.selectedIndex == 5:
+            pos = (self.selectedIndex-5, self.selectedIndex+6)
+            y = h*0.5529
+          elif self.selectedIndex == maxIndex-4:
+            pos = (self.selectedIndex-7, self.selectedIndex+4)
+            y = h*0.4611
+          elif self.selectedIndex == maxIndex-3:
+            pos = (self.selectedIndex-8, self.selectedIndex+3)
+            y = h*0.4152
+          elif self.selectedIndex == maxIndex-2:
+            pos = (self.selectedIndex-9, self.selectedIndex+2)
+            y = h*0.3693
+          elif self.selectedIndex == maxIndex-1:#Second to last item in list
+            pos = (self.selectedIndex-10, self.selectedIndex+1)
+            y = h*0.3234
+          elif self.selectedIndex == maxIndex and not self.selectedIndex == 2:#Third to Last in list and not third item
+            pos = (self.selectedIndex-11, self.selectedIndex)
+            y = h*0.2775
+          else:
+            pos = (self.selectedIndex-6, self.selectedIndex+5)#Any other item than above
+            y = h*0.507
+            
+            
+          if self.tierbg != None:
+            imgwidth = self.tierbg.width1()
+            imgheight = self.tierbg.height1()
+            wfactor = 381.1/imgwidth
+            hfactor = 24.000/imgheight
+          for i, item in enumerate(self.items):
+            if i >= pos[0] and i <= pos[1]:
+              if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
+                if self.tierbg != None:
+                  self.tierbg.transform.reset()
+                  self.tierbg.transform.scale(wfactor,-hfactor)
+                  w, h, = self.engine.view.geometry[2:4]
+                  self.tierbg.transform.translate(w/1.587, h-((0.055*h)*(i+1)-pos[0]*(0.055*h))-(0.219*h))
+                  self.tierbg.draw()
+
+
+          imgwidth = self.selected.width1()
+          imgheight = self.selected.height1()
+          wfactor = 381.5/imgwidth
+          hfactor = 36.000/imgheight
+
+          self.selected.transform.reset()
+          self.selected.transform.scale(wfactor,-hfactor)
+          self.selected.transform.translate(w/1.587, y*1.2-h*.213)
+          self.selected.draw()
+          
+          
+          if self.diffimg1 != None:
+            imgwidth = self.diffimg3.width1()
+            imgheight = self.diffimg3.height1()
+            wfactor1 = 13.0/imgwidth
+
+          c1,c2,c3 = self.song_rb2_diff_color
+          glColor3f(c1,c2,c3)
+          
+          font.render("DIFFICULTY", (.095, .54), scale = 0.0018)
+          scale = 0.0014
+          text = "BAND"
+          w, h = font.getStringSize(text, scale = scale)
+          font.render(text, (.17 - w, .57), scale = scale)
+          text = "GUITAR"
+          w, h = font.getStringSize(text, scale = scale)
+          font.render(text, (.17 - w, .595), scale = scale)
+          text = "DRUM"
+          w, h = font.getStringSize(text, scale = scale)
+          font.render(text, (.17 - w, .62), scale = scale)
+          text = "BASS"
+          w, h = font.getStringSize(text, scale = scale)
+          font.render(text, (.17 - w, .645), scale = scale)
+
+          #Add support for lead and rhythm diff          
+
+
+          #Qstick - Sorting Text
+          text = "SORTING:    "
+          if self.sortOrder == 0: #title
+            text = text + " ALPHABETICALLY BY TITLE"
+          elif self.sortOrder == 1: #artist
+            text = text + " ALPHABETICALLY BY ARTIST"
+          elif self.sortOrder == 2: #timesplayed
+            text = text + " BY PLAY COUNT"
+          elif self.sortOrder == 3: #album
+            text = text + " ALPHABETICALLY BY ALBUM"
+          elif self.sortOrder == 4: #genre
+            text = text + " ALPHABETICALLY BY GENRE"
+          elif self.sortOrder == 5: #year
+            text = text + " BY YEAR"
+          elif self.sortOrder == 6: #Band Difficulty
+            text = text + " BY BAND DIFFICULTY"
+          else:
+            text = text + " BY SONG COLLECTION"
+          #
+          font.render(text, (.13, .152), scale = 0.0017)
+
+          
+          #glColor4f(1,1,1,1)
+##          text = self.library
+##       w, h = font.getStringSize(text)
+##          if self.filepathenable:
+##            font.render(text, (.05, .01))
+          
+          if self.searchText:
+            text = _("Filter: %s") % (self.searchText) + "|"
+            if not self.matchesSearch(self.items[self.selectedIndex]):
+              text += " (%s)" % _("Not found")
+            font.render(text, (.05, .7 + v), scale = 0.001)
+          elif self.songLoader:
+            font.render(_("Loading Preview..."), (.05, .7 + v), scale = 0.001)
+            
+##          x = self.song_cdscore_xpos #Add theme.ini option for song_cdlistscore_xpos
+##          font.render(self.prompt, (self.song_listcd_score_xpos, .05-v))
+          
+          for i, item in enumerate(self.items):
+            if i >= pos[0] and i <= pos[1]:
+
+              if isinstance(item, Song.SongInfo):
+                if self.songIcons:    
+                  if item.icon != "":
+                    iconNum = None
+                    try:
+                      iconNum = self.itemIconNames.index(item.icon)
+                      imgwidth = self.itemIcons[iconNum].width1()
+                      wfactor = 23.000/imgwidth
+                      self.itemIcons[iconNum].transform.reset()
+                      w, h, = self.engine.view.geometry[2:4]
+                      self.itemIcons[iconNum].transform.translate(w/2.86, h-((0.055*h)*(i+1)-pos[0]*(0.055*h))-(0.219*h))
+                      self.itemIcons[iconNum].transform.scale(wfactor,-wfactor)
+                      self.itemIcons[iconNum].draw()
+                    except ValueError:
+                      iconNum = -1
+                
+                c1,c2,c3 = self.song_name_selected_color
+                glColor3f(c1,c2,c3)
+                if i == self.selectedIndex:
+                  if item.getLocked():
+                    text = item.getUnlockText()
+                  elif self.careerMode and not item.completed:
+                    text = _("Play To Advance")
+                  elif self.gameMode1p == 1: #evilynux - Practice mode
+                    text = _("Practice")
+                  elif item.count:
+                    count = int(item.count)
+                    if count == 1: 
+                      text = _("Played Once")
+                    else:
+                      text = _("Played %d times.") % count
+                  else:
+                    text = _("Quickplay")
+              elif isinstance(item, Song.LibraryInfo):
+                c1,c2,c3 = self.library_selected_color
+                glColor3f(c1,c2,c3)
+                if i == self.selectedIndex:
+                  if item.songCount == 1:
+                    text = _("There Is 1 Song In This Setlist.")
+                  elif item.songCount > 1:
+                    text = _("There Are %d Songs In This Setlist." % (item.songCount))
+                  else:
+                    text = ""
+              elif isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
+                text = _("Tier")
+                c1,c2,c3 = self.career_title_color
+                glColor3f(c1,c2,c3)
+                
+
+              elif isinstance(item, Song.CareerResetterInfo):
+                text = _("Reset this entire career")
+                c1,c2,c3 = self.career_title_color
+                glColor3f(c1,c2,c3)
+                
+              elif isinstance(item, Song.RandomSongInfo):
+                text = _("Random Song")
+                c1,c2,c3 = self.career_title_color
+                glColor3f(c1,c2,c3)
+              
+              if i == self.selectedIndex:
+                w, h = font.getStringSize(text, scale = 0.0012)
+                font.render(text, (0.92-w, .13), scale = 0.0012)
+              
+              maxwidth = .45
+              if i == self.selectedIndex:
+                glColor4f(.7,.5,.25,1)
+                if isinstance(item, Song.SongInfo):
+                  c1,c2,c3 = self.song_rb2_name_selected_color
+                  glColor3f(c1,c2,c3)
+                if isinstance(item, Song.LibraryInfo):
+                  c1,c2,c3 = self.song_rb2_name_selected_color
+                  glColor3f(c1,c2,c3)
+                if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
+                  c1,c2,c3 = self.career_title_color
+                  glColor3f(c1,c2,c3)
+                if isinstance(item, Song.CareerResetterInfo):
+                  c1,c2,c3 = self.career_title_color
+                  glColor3f(c1,c2,c3)
+                if isinstance(item, Song.RandomSongInfo):
+                  c1,c2,c3 = self.song_name_selected_color
+                  glColor3f(c1,c2,c3)
+                if isinstance(item, Song.BlankSpaceInfo):
+                  c1,c2,c3 = self.career_title_color
+                  glColor3f(c1,c2,c3)
+              else:
+                glColor4f(0,0,0,1)
+                if isinstance(item, Song.SongInfo):
+                  c1,c2,c3 = self.song_rb2_name_color
+                  glColor3f(c1,c2,c3)
+                if isinstance(item, Song.LibraryInfo):
+                  c1,c2,c3 = self.song_rb2_name_color
+                  glColor3f(c1,c2,c3)
+                if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
+                  c1,c2,c3 = self.career_title_color
+                  glColor3f(c1,c2,c3)
+                if isinstance(item, Song.CareerResetterInfo):
+                  c1,c2,c3 = self.career_title_color
+                  glColor3f(c1,c2,c3)
+                if isinstance(item, Song.RandomSongInfo):
+                  c1,c2,c3 = self.song_name_text_color
+                  glColor3f(c1,c2,c3)
+                if isinstance(item, Song.BlankSpaceInfo):
+                  c1,c2,c3 = self.career_title_color
+                  glColor3f(c1,c2,c3)
+              
+              text = item.name
+              
+              if isinstance(item, Song.SongInfo) and item.getLocked():
+                text = _("-- Locked --")
+                
+              if isinstance(item, Song.SongInfo): #MFH - add indentation when tier sorting
+                if self.tiersArePresent or self.songIcons:
+                  text = self.indentString + text
+                
+
+              # evilynux - Force uppercase display for Career titles
+              if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
+                text = string.upper(text)
+                maxwidth = .55
+                
+              if isinstance(item, Song.CareerResetterInfo):
+                text = string.upper(text)
+
+              if isinstance(item, Song.BlankSpaceInfo):
+                text = string.upper(text)
+                
+              scale = .0015
+              w, h = font.getStringSize(text, scale = scale)
+
+              while w > maxwidth:
+                tlength = len(text) - 4
+                text = text[:tlength] + "..."
+                w, h = font.getStringSize(text, scale = scale)
+                if w < .45:
+                  break
+                
+                
+              font.render(text, (.35, .0413*(i+1)-pos[0]*.0413+.15), scale = scale) #add theme option for song_listCD_xpos
+
+              if isinstance(item, Song.SongInfo):
+                if self.scoreTimer == 0 and self.highScoreType == 0: #racer: regular-style highscore movement
+                  if self.diff == "Easy":
+                    self.diff = "Medium"
+                  elif self.diff == "Medium":
+                    self.diff = "Hard"
+                  elif self.diff == "Hard":
+                    self.diff = "Expert"
+                  elif self.diff == "Expert":
+                    self.diff = "Easy"
+                
+                #racer: score can be changed by fret button:
+                #MFH - and now they will be remembered as well
+                if self.highScoreChange == True and self.highScoreType == 1:
+                  if self.diff == "Easy":
+                    self.diff = "Medium"
+                    self.engine.config.set("game", "songlist_difficulty", 2)
+                    self.highScoreChange = False
+                  elif self.diff == "Medium":
+                    self.diff = "Hard"
+                    self.engine.config.set("game", "songlist_difficulty", 1)
+                    self.highScoreChange = False
+                  elif self.diff == "Hard":
+                    self.diff = "Expert"
+                    self.engine.config.set("game", "songlist_difficulty", 0)
+                    self.highScoreChange = False
+                  elif self.diff == "Expert":
+                    self.diff = "Easy"
+                    self.engine.config.set("game", "songlist_difficulty", 3)
+                    self.highScoreChange = False
+
+                if not (item.getLocked()):
+                  score = _("Nil")
+                  stars = 0
+                  name = ""
+                  
+                  #for p in item.parts:    #MFH - look at selected instrument!
+                  #  if str(p) == self.instrument:
+                  for d in item.difficulties:
+                    if str(d) == self.diff:
+                      #scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
+                      scores = item.getHighscoresWithPartString(d, part = self.instrument)
+                      if scores:
+                        score, stars, name, scoreExt = scores[0]
+                        notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 = scoreExt
+                      else:
+                        score, stars, name = 0, 0, "---"
+  
+  
+                  scale = 0.0014
+                  #evilynux - hit% and note streak if enabled
+                  if self.extraStats:
+                    scale = 0.0009
+                    if score is not _("Nil") and score > 0 and notesTotal != 0:
+                      text = "%.1f%% (%d)" % ((float(notesHit) / notesTotal) * 100.0, noteStreak)
+                      w, h = font.getStringSize(text, scale=scale)
+                      font.render(text, (.92-w, .0413*(i+1)-pos[0]*.0413+.163), scale=scale)
+                        
+                  text = str(score)
+                  w, h = font.getStringSize(text, scale=scale)
+                  
+                  font.render(text, (.92-w, .0413*(i+1)-pos[0]*.0413+.15), scale=scale)
+           
+                    
+  
+                  if self.scoreTimer < 1000:
+                    self.scoreTimer += 1
+                  else:
+                    self.scoreTimer = 0
+  
+                    
+                  if i == self.selectedIndex:
+                    text = item.artist
+                    if (item.getLocked()):
+                      text = "" # avoid giving away artist of locked song
+  
+                    scale = 0.0015
+                    w, h = font.getStringSize(text, scale=scale)
+                    
+                    while w > .21:
+                      tlength = len(text) - 4
+                      text = text[:tlength] + "..."
+                      w, h = font.getStringSize(text, scale = scale)
+                      if w < .22:
+                        break
+                      
+                    c1,c2,c3 = self.song_rb2_artist_color
+                    glColor3f(c1,c2,c3)
+                    
+                    text = string.upper(text)
+                    font.render(text, (.095, .44), scale = scale)
+                 
+  
+                    
+                    albumtag = item.album
+                      
+                    albumtag = string.upper(albumtag)
+                    w, h = font.getStringSize(albumtag, scale=scale)
+                    
+                    while w > .21:
+                      tlength = len(albumtag) - 4
+                      albumtag = albumtag[:tlength] + "..."
+                      w, h = font.getStringSize(albumtag, scale = scale)
+                      if w < .22:
+                        break                    
+  
+                    font.render(albumtag, (.095, .47), scale = 0.0015)
+                    
+  
+                    genretag = item.genre
+  
+  
+                    font.render(genretag, (.095, .49), scale = 0.0015)                    
+                    
+  
+                    yeartag = item.year
+  
+                      
+                    font.render(yeartag, (.095, .51), scale = 0.0015)
+
+                 
+                    for i in range(0,4):
+                      glColor3f(1, 1, 1) 
+                      if i == 0:
+                        diff = item.diffSong
+                      if i == 1:
+                        diff = item.diffGuitar
+                      if i == 2:
+                        diff = item.diffDrums
+                      if i == 3:
+                        diff = item.diffBass
+                      if self.diffimg1 == None:
+                        if diff == -1:
+                          font.render("N/A", (.18, .57 + i*.025), scale = 0.0014)
+                        elif diff == 6:
+                          glColor3f(1, 1, 0)  
+                          font.render(unicode(Data.STAR2 * (diff -1)), (.18, 0.575 + i*.025), scale = 0.003)
+                        else:
+                          font.render(unicode(Data.STAR2 * diff + Data.STAR1 * (5 - diff)), (.18, 0.575 + i*.025), scale = 0.003)
+                      else:
+                        w, h, = self.engine.view.geometry[2:4]
+                        if diff == -1:
+                          font.render("N/A", (.18, .57 + i*.025), scale = 0.0014)
+                        elif diff == 6:
+                          for k in range(0,5):
+                            self.diffimg3.transform.reset()
+                            self.diffimg3.transform.scale(wfactor1,-wfactor1)
+                            self.diffimg3.transform.translate((.19+.03*k)*w, (0.22-.035*i)*h)
+                            self.diffimg3.draw()
+                        else:
+                          for k in range(0,diff):
+                            self.diffimg2.transform.reset()
+                            self.diffimg2.transform.scale(wfactor1,-wfactor1)
+                            self.diffimg2.transform.translate((.19+.03*k)*w, (0.22-.035*i)*h)
+                            self.diffimg2.draw()
+                          for k in range(0, 5-diff):
+                            self.diffimg1.transform.reset()
+                            self.diffimg1.transform.scale(wfactor1,-wfactor1)
+                            self.diffimg1.transform.translate((.31-.03*k)*w, (0.22-.035*i)*h)
+                            self.diffimg1.draw()
+           
+        finally:
+          text = self.instrument + " - " + self.diff
+          scale = 0.0017
+          glColor3f(1, 1, 1)
+          w, h = font.getStringSize(text, scale=scale)
+          font.render(text, (0.92-w, 0.152), scale=scale)
+          self.engine.view.resetProjection()
+          nuttin = True
+          
 class FileChooser(BackgroundLayer, KeyListener):
   """File choosing layer."""
   def __init__(self, engine, masks, path, prompt = "", dirSelect = False):
@@ -2521,10 +3837,35 @@ class NeckChooser(BackgroundLayer, KeyListener):
     neckfiles = os.listdir(self.engine.resource.fileName("necks"))
     neckfiles.sort()
 
+    for i in neckfiles:   #MFH - first go through and find the random neck
+      if ( str(i) == "randomneck.png"  or str(i) == "Neck_0.png" ):    #MFH 
+        randomNeck = i
+        #exists = 1
+        
+        try:
+          neckImage = engine.loadImgDrawing(self, "neck"+str(i), os.path.join("necks",str(i)))
+          # evilynux - Warning, Thumbs.db won't fail at engine.loadImgDrawing
+  
+        except IOError:
+          exists = 0
+          break
+
+        if neckImage is None:
+          exists = 0
+        else:
+          exists = 1
+  
+        if exists == 1:
+          self.neck.append(str(i)[:-4]) # evilynux - filename w/o extension
+          self.necks.append(neckImage)
+
+
     for i in neckfiles:
       # evilynux - Special cases, ignore these...
       #if( str(i) == "overdriveneck.png" or str(i)[-4:] != ".png" ):
-      if( str(i) == "overdriveneck.png" or not i.endswith(".png") ):
+      #exists = 1
+      #if( str(i) == "overdriveneck.png" or not i.endswith(".png") ):
+      if( str(i) == "overdriveneck.png" or str(i) == "randomneck.png"  or str(i) == "Neck_0.png" or str(i)[-4:] != ".png" ):    #MFH 
         exists = 0
         continue
       try:
@@ -3020,23 +4361,23 @@ class KeyTester(Layer, KeyListener):
 
       #evilynux - Get killswitch mode (analog or digital?)
       # If analog, get and show attenuation. Most code taken from GuitarScene.
+      self.playerList = [0,1] # evilynux - Static for now, should be eventually made dynamic to support more players
       self.analogKillMode = [self.engine.config.get("game", "analog_killsw_mode"),self.engine.config.get("game", "analog_killsw_mode_p2")]
-      self.isKillAnalog = [False,False]
-      self.whichJoy = [0,0]
-      self.whichAxis = [0,0]
-      self.whammyVol = [0.0,0.0]
-      self.targetWhammyVol = [0.0,0.0]
-      self.defaultWhammyVol = [self.analogKillMode[0]-1.0,self.analogKillMode[1]-1.0]   #makes xbox defaults 1.0, PS2 defaults 0.0
-
-      if self.analogKillMode[0] == 3:   #XBOX inverted mode
-        self.defaultWhammyVol[0] = -1.0
-      if self.analogKillMode[1] == 3:   #XBOX inverted mode
-        self.defaultWhammyVol[1] = -1.0
-
-      self.actualWhammyVol = [self.defaultWhammyVol[0],self.defaultWhammyVol[1]]
       self.whammyVolAdjStep = 0.1
-      self.lastWhammyVol = [self.defaultWhammyVol[0],self.defaultWhammyVol[1]]
-      KillKeyCode = [0,0]
+      self.isKillAnalog = [False for i in self.playerList]
+      self.whichJoy = [0 for i in self.playerList]
+      self.whichAxis = [0 for i in self.playerList]
+      self.whammyVol = [0.0 for i in self.playerList]
+      self.targetWhammyVol = [0.0 for i in self.playerList]
+      self.defaultWhammyVol = [self.analogKillMode[i]-1.0 for i, thePlayer in enumerate(self.playerList)]   #makes xbox defaults 1.0, PS2 defaults 0.0
+
+      for i, thePlayer in enumerate(self.playerList):
+        if self.analogKillMode[i] == 3:   #XBOX inverted mode
+          self.defaultWhammyVol[i] = -1.0
+
+      self.actualWhammyVol = [self.defaultWhammyVol[i] for i, thePlayer in enumerate(self.playerList)]
+      self.lastWhammyVol = [self.defaultWhammyVol[i] for i, thePlayer in enumerate(self.playerList)]
+      KillKeyCode = [0 for i in self.playerList]
 
       if len(self.engine.input.joysticks) != 0:
         if self.analogKillMode[0] > 0:
@@ -3047,11 +4388,11 @@ class KeyTester(Layer, KeyListener):
           self.isKillAnalog[1], self.whichJoy[1], self.whichAxis[1] = self.engine.input.getWhammyAxis(KillKeyCode[1])
   
         #evilynux - Compute analog killswitch value
-        for i in range(0,1):
+        for i, thePlayer in enumerate(self.playerList):
           if self.isKillAnalog[i]:
             if self.analogKillMode[i] == 2:  #XBOX mode: (1.0 at rest, -1.0 fully depressed)
               self.whammyVol[i] = 1.0 - (round(10* ((self.engine.input.joysticks[self.whichJoy[i]].get_axis(self.whichAxis[i])+1.0) / 2.0 ))/10.0)
-  
+
             elif self.analogKillMode[i] == 3:  #XBOX Inverted mode: (-1.0 at rest, 1.0 fully depressed)
               self.whammyVol[i] = (round(10* ((self.engine.input.joysticks[self.whichJoy[i]].get_axis(self.whichAxis[i])+1.0) / 2.0 ))/10.0)
                 
@@ -3060,7 +4401,9 @@ class KeyTester(Layer, KeyListener):
     
             if self.whammyVol[i] > 0.0 and self.whammyVol[i] < 0.1:
               self.whammyVol[i] = 0.1
-  
+
+            self.lastWhammyVol[i] = self.whammyVol[i]
+
           if self.whammyVol[i] > 0.0 and self.whammyVol[i] < 0.1:
             self.whammyVol[i] = 0.1
 
@@ -3363,6 +4706,7 @@ class LoadingSplashScreen(Layer, KeyListener):
     self.time         = 0.0
     self.loadingx = Theme.loadingX
     self.loadingy = Theme.loadingY  
+    self.textColor = Theme.loadingColor
     self.allowtext = self.engine.config.get("game", "lphrases")  
 
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
@@ -3425,6 +4769,10 @@ class LoadingSplashScreen(Layer, KeyListener):
         x = .5
         y = .6 - h / 2 + v * .5
 
+      #akedrou - support for Loading Text Color
+      c1,c2,c3 = self.textColor
+      glColor3f(c1,c2,c3)
+      
       # evilynux - Made text about 2 times smaller (as requested by worldrave)
       if self.allowtext:
         if self.theme == 1:   #GH3 themes get different right margin, and always call wrap function
