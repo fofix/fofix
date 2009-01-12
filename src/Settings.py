@@ -717,8 +717,7 @@ class GameSettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "game", "jurgmode", autoApply = True),#Jurgen config -- Spikehead777
       ConfigChoice(engine.config, "game", "jurgtype", autoApply = True),#Jurgen controls -- Spikehead777
       ConfigChoice(engine.config, "game", "jurglogic", autoApply = True),#MFH
-      ConfigChoice(engine.config, "coffee", "failingEnabled", autoApply = True),
-      ConfigChoice(engine.config, "audio",  "slow_down_divisor", autoApply = True),     #MFH
+     #MFH
     ]
     CheatMenu = Menu.Menu(engine, Cheats, pos = (.3, .31), viewSize = 5, textColor = gTextColor, selectedColor = gSelectedColor)
     
