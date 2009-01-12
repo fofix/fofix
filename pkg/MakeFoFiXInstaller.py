@@ -26,7 +26,7 @@ __version__ = '$Id$'
 # FOFIX_VERSION *must* be in the form [number].[number]!
 # FOFIX_VERSION_SUFFIX does not have this restriction.
 FOFIX_VERSION = '3.100'
-FOFIX_VERSION_SUFFIX = ' beta 1'
+FOFIX_VERSION_SUFFIX = ' beta 2'
 
 import ListToNSIS
 import _winreg
