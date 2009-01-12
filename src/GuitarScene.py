@@ -731,9 +731,30 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         guitar.starNotesSet = False     #fallback on auto generation.
 
     
+    
+    
+    
+    self.lastDrumNoteTime = 0
+    #self.lastDrumNoteEvent = None
+    self.drumScoringEnabled = True
+    
+    
     #count / init solos
     for i,guitar in enumerate(self.guitars):
       if guitar.isDrum:                
+        #MFH - go through, locate, and mark the last drum note.  When this is encountered, drum scoring should be turned off.
+        lastDrumNoteTime = 0
+        #lastDrumNoteEvent = None
+        for time, event in self.song.track[i].getAllEvents():
+          if isinstance(event, Note):
+            if time > lastDrumNoteTime:
+              lastDrumNoteTime = time
+              #lastDrumNoteEvent = event
+        self.lastDrumNoteTime = lastDrumNoteTime
+        Log.debug("Last drum note located at time = " + str(self.lastDrumNoteTime) )
+        #self.lastDrumNoteEvent = lastDrumNoteEvent
+        
+      
         self.playerList[i].totalStreakNotes = len([1 for time, event in self.song.track[i].getAllEvents() if isinstance(event, Note)])
       else:
         self.playerList[i].totalStreakNotes = len(set(time for time, event in self.song.track[i].getAllEvents() if isinstance(event, Note)))
@@ -1973,6 +1994,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.rockTimer = 0  #myfingershurt
     self.youRock = False    #myfingershurt
     self.rockFinished = False    #myfingershurt
+    self.drumScoringEnabled = True  #MFH
     self.initBeatAndSpClaps()
 
     #MFH - init vars for the next time & lyric line to display
@@ -2711,6 +2733,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     rockMinusAmount = 0 #akedrou - simplify the various incarnations of minusRock.
     if self.guitars[i].isDrum: 
       self.drumStart = True
+      if not self.drumScoringEnabled:   #MFH - ignore when drum scoring is disabled
+        return
 
     if self.starNotesMissed[i] or self.guitars[i].isStarPhrase:
       self.guitars[i].isStarPhrase = True
@@ -2879,6 +2903,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #if self.song:
     if self.song and not self.pause and not self.failed:
       pos = self.getSongPosition()
+
+      if pos > self.lastDrumNoteTime:   #MFH - disable drum scoring so that the drummer can get down with his bad self at the end of the song without penalty.
+        self.drumScoringEnabled = False
+
+
       self.song.update(ticks)
       # update stage
 
@@ -8583,7 +8612,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               countdownPos = 0
             Theme.setBaseColor()
     
-  
+    
+            #if countdownPos == 0:   #MFH - reset drumStart so that the drummer can get down with his bad self at the end of the song without penalty.
+            #  self.drumStart = False  #faaa's drum sound mod restart
+
+
             
             
             if (self.gameTimeMode > 0 or self.muteLastSecond == 1 or self.hopoDebugDisp == 1) and (not self.pause and not self.failed and not self.ending and not self.youRock):
