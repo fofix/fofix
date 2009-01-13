@@ -196,6 +196,10 @@ class Input(Task):
   def encodeMidiButton(self, midi, button):
     return 0x40000 + (midi << 8 ) + button
 
+  def decodeMidiButton(self, id):
+    id -= 0x40000
+    return (id >> 8, id & 0xff)
+
   def encodeJoystickButton(self, joystick, button):
     return 0x10000 + (joystick << 8) + button
 
