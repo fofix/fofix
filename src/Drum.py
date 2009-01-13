@@ -2757,6 +2757,7 @@ class Drum:
   #volshebnyi - handle freestyle picks here
   def freestylePick(self, song, pos, controls):
     numHits = 0
+    spHit = False
     if controls.getState(self.keys[0]):
       numHits = 1
       if self.engine.data.bassDrumSoundFound:
@@ -2780,11 +2781,8 @@ class Drum:
           minDrumFillCymbalHitTime = drumFillCymbalPos - self.earlyMargin
           maxDrumFillCymbalHitTime = drumFillCymbalPos + self.lateMargin
           if (pos >= minDrumFillCymbalHitTime) and (pos <= maxDrumFillCymbalHitTime):
-            self.starPowerActive = True
-            self.engine.data.starActivateSound.play()
-            self.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
-            self.ocount = 0  #MFH - this triggers the oFlash strings & timer
-    return numHits
+            spHit = True
+    return (numHits, spHit)
 
   
   def startPick(self, song, pos, controls, hopo = False):

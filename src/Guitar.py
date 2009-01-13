@@ -3394,7 +3394,7 @@ class Guitar:
       self.freestyleHit[theFret] = controls.getState(self.keys[theFret])
       if self.freestyleHit[theFret]:
         numHits += 1
-    return numHits
+    return (numHits, False) #akedrou - False for spHit
 
 
 
