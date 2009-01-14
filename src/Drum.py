@@ -118,6 +118,7 @@ class Drum:
     self.drumFillsReady = False
     self.freestyleReady = False
     self.freestyleOffset = 5
+    self.freestyleSP = False
 
     #self.drumFillOnScreen = False   #MFH 
     self.drumFillEvents = []
@@ -2757,7 +2758,6 @@ class Drum:
   #volshebnyi - handle freestyle picks here
   def freestylePick(self, song, pos, controls):
     numHits = 0
-    spHit = False
     if controls.getState(self.keys[0]):
       numHits = 1
       if self.engine.data.bassDrumSoundFound:
@@ -2774,15 +2774,16 @@ class Drum:
         if i == 3:
           if self.engine.data.T3DrumSoundFound:
             self.engine.data.T3DrumSound.play()
-        if i == 4 and self.drumFillsActive and self.drumFillsHits >= 4 and not self.starPowerActive:   #MFH - must actually activate starpower!
+        if i == 4:   #MFH - must actually activate starpower!
           if self.engine.data.CDrumSoundFound:
             self.engine.data.CDrumSound.play()
-          drumFillCymbalPos = self.freestyleStart+self.freestyleLength
-          minDrumFillCymbalHitTime = drumFillCymbalPos - self.earlyMargin
-          maxDrumFillCymbalHitTime = drumFillCymbalPos + self.lateMargin
-          if (pos >= minDrumFillCymbalHitTime) and (pos <= maxDrumFillCymbalHitTime):
-            spHit = True
-    return (numHits, spHit)
+          if self.drumFillsActive and self.drumFillsHits >= 4 and not self.starPowerActive:
+            drumFillCymbalPos = self.freestyleStart+self.freestyleLength
+            minDrumFillCymbalHitTime = drumFillCymbalPos - self.earlyMargin
+            maxDrumFillCymbalHitTime = drumFillCymbalPos + self.lateMargin
+            if (pos >= minDrumFillCymbalHitTime) and (pos <= maxDrumFillCymbalHitTime):
+              self.freestyleSP = True
+    return numHits
 
   
   def startPick(self, song, pos, controls, hopo = False):

@@ -95,6 +95,7 @@ class Guitar:
     self.freestylePeriod = 1000
     self.freestylePercent = 50
     self.freestyleOffset = 5
+    self.freestyleSP = False
 
 
     self.accThresholdWorstLate = 0
@@ -3394,7 +3395,7 @@ class Guitar:
       self.freestyleHit[theFret] = controls.getState(self.keys[theFret])
       if self.freestyleHit[theFret]:
         numHits += 1
-    return (numHits, False) #akedrou - False for spHit
+    return numHits
 
 
 

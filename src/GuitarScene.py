@@ -2531,8 +2531,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if guitar.freestyleActive or (guitar.isDrum and guitar.drumFillsActive):
       pos = self.getSongPosition()
       score = 0
-      freestyleHits = guitar.freestylePick(self.song, pos, self.controls)
-      if freestyleHits[0]>0 or guitar.isDrum:
+      numFreestyleHits = guitar.freestylePick(self.song, pos, self.controls)
+      if numFreestyleHits>0 or guitar.isDrum:
         if guitar.freestyleFirstHit + guitar.freestyleLength < pos :
           guitar.freestyleFirstHit = pos
           if guitar.bigRockLogic == 1 :
@@ -2543,7 +2543,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           if guitar.bigRockLogic == 2 :
               guitar.freestylePeriod = 1500
               guitar.freestyleBaseScore = 150
-              score = 600 * freestyleHits[0]
+              score = 600 * numFreestyleHits
           if guitar.isDrum:
               guitar.drumFillsHits = 0
           guitar.freestyleLastHit = pos - guitar.freestylePeriod
@@ -2552,13 +2552,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               
         if guitar.isDrum:
           guitar.drumFillsHits += 1
-          if freestyleHits[1]:
+          if guitar.freestyleSP:
             self.activateSP(num)
+            guitar.freestyleSP = False
 
         if guitar.bigRockLogic == 0 or guitar.bigRockLogic == 1:
           brzoneremain = ( guitar.freestyleLength - pos + guitar.freestyleFirstHit ) / guitar.freestyleLength
           hitspeed = min(( pos - guitar.freestyleLastHit ) / guitar.freestylePeriod, 1.0)
-          if guitar.bigRockLogic == 1 and freestyleHits[0] == 1:
+          if guitar.bigRockLogic == 1 and numFreestyleHits == 1:
             if self.controls.getState(guitar.keys[guitar.freestyleBonusFret]) or ( guitar.isDrum and guitar.freestyleBonusFret>0 and self.controls.getState(guitar.keys[guitar.freestyleBonusFret+4]) ):
               hitspeed = 1.0
               guitar.freestyleBonusFret = random.randint(0,4)
@@ -2573,7 +2574,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             if self.controls.getState(guitar.keys[fret]) or ( guitar.isDrum and self.controls.getState(guitar.keys[fret+4])):
               hitspeed = min((pos - guitar.freestyleLastFretHitTime[fret]) / guitar.freestylePeriod, 1.0)
               score += guitar.freestyleBaseScore * hitspeed
-          score = int ( score / freestyleHits[0] )
+          score = int ( score / numFreestyleHits )
         if self.controls.getState(guitar.keys[0]):	
           guitar.freestyleLastFretHitTime[0] = pos
         for fret in range (1,5):
