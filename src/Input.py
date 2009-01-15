@@ -343,10 +343,13 @@ class Input(Task):
         midimsg = midi[i].getMessage()
         if len(midimsg) > 0:
           id = self.encodeMidiButton(x, midimsg[1])
-          if midimsg[0] == 153:
+          #MFH - must check for 0x80 - 0x8F for Note Off events (keyReleased) and 0x90 - 0x9F for Note On events (keyPressed)
+          #if midimsg[0] == 153:
+          if (midimsg[0] >= 0x90) and (midimsg[0] <= 0x9F):
             if not self.broadcastEvent(self.priorityKeyListeners, "keyPressed", id, u'\x00'):
               self.broadcastEvent(self.keyListeners, "keyPressed", id, u'\x00')
-          else:
+          #else:
+          elif (midimsg[0] >= 0x80) and (midimsg[0] <= 0x8F):
             if not self.broadcastEvent(self.priorityKeyListeners, "keyReleased", id):
               self.broadcastEvent(self.keyListeners, "keyReleased", id)
 
