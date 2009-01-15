@@ -421,6 +421,10 @@ class SongInfo(object):
           else:
             Log.warn("Weak hack attempt detected. Better luck next time.")
             
+    if canCache and self.allowCacheUsage:  #stump: preload this stuff into the cache
+      self.getDifficulties()
+      self.getSections()
+      self.getParts()
     self.writeCache()
             
   # stump: Write this song's info into the cache.
@@ -535,7 +539,6 @@ class SongInfo(object):
       self._difficulties = info.difficulties
     except:
       self._difficulties = difficulties.values()
-    self.writeCache()
     return self._difficulties
 
   def getParts(self):
@@ -560,7 +563,6 @@ class SongInfo(object):
       self._parts = info.parts
     except:
       self._parts = parts.values()
-    self.writeCache()
     return self._parts
 
   def getName(self):
@@ -823,7 +825,6 @@ class SongInfo(object):
     except Exception, e:
       Log.warn("Song.py: Unable to retrieve section names for practice mode selection: %s" % e)
       self._sections = None
-    self.writeCache()
     return self._sections
 
 
