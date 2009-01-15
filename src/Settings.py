@@ -547,6 +547,7 @@ class SettingsMenu(Menu.Menu):
        ConfigChoice(engine.config, "performance", "star_score_updates", autoApply = True),   #MFH
        ConfigChoice(engine.config, "performance", "in_game_stats", autoApply = True),#myfingershurt
        ConfigChoice(engine.config, "performance", "preload_glyph_cache", autoApply = True),#evilynux
+       ConfigChoice(engine.config, "performance", "cache_song_metadata", autoApply = True), #stump
     ]
     ManualPerfSettingsMenu = Menu.Menu(engine, ManualPerfSettings)
     

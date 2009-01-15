@@ -305,6 +305,9 @@ Config.define("player1","leftymode",           bool,  False,  text = _("P2 Lefty
 # evilynux - Preload glyph cache may require more VRAM. Disable it if you're low on VRAM e.g. less than 64MB
 Config.define("performance","preload_glyph_cache", bool,  True,  text = _("Preload Glyph Cache"), options = {False: _("No"), True: _("Yes")})
 
+#stump: allow metadata caching to be turned off
+Config.define("performance", "cache_song_metadata", bool, True, text=_("Cache Song Metadata"), options={False: _("No"), True: _("Yes")})
+
 ##Alarian: Get unlimited themes by foldername
 themepath = os.path.join("data","themes")
 if not hasattr(sys,"frozen"):

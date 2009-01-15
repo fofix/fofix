@@ -156,7 +156,12 @@ class CacheManager(object):
     if self.caches.has_key(cachePath):
       return self.caches[cachePath]
     # The cache must be opened or created.
-    conn = sqlite3.Connection(os.path.join(cachePath, '.fofix-cache'))
+    oldcwd = os.getcwd()
+    try:
+      os.chdir(cachePath)  #stump: work around bug in SQLite unicode path name handling
+      conn = sqlite3.Connection('.fofix-cache')
+    finally:
+      os.chdir(oldcwd)
     # Check that the cache is completely initialized.
     try:
       v = conn.execute("SELECT `value` FROM `config` WHERE `key` = 'version'").fetchone()[0]
@@ -187,7 +192,10 @@ class SongInfo(object):
     self.info          = Config.MyConfigParser()
     self._difficulties = None
     self._parts        = None
-    self.allowCacheUsage = allowCacheUsage  #stump
+    if Config.get("performance", "cache_song_metadata"):
+      self.allowCacheUsage = allowCacheUsage  #stump
+    else:
+      self.allowCacheUsage = False
 
     self.locked = False
 
