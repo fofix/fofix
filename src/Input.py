@@ -345,11 +345,22 @@ class Input(Task):
           id = self.encodeMidiButton(x, midimsg[1])
           #MFH - must check for 0x80 - 0x8F for Note Off events (keyReleased) and 0x90 - 0x9F for Note On events (keyPressed)
           #if midimsg[0] == 153:
-          if (midimsg[0] >= 0x90) and (midimsg[0] <= 0x9F):
+          noteOn = False
+          noteOff = False
+          
+          if (midimsg[0] >= 0x90) and (midimsg[0] <= 0x9F):   #note ON range
+            if midimsg[2] > 0:  #velocity > 0, confirmed note on
+              noteOn = True
+            else:   #velocity is 0 - this is pretty much a note off.
+              noteOff = True
+          elif (midimsg[0] >= 0x80) and (midimsg[0] <= 0x8F):  #note OFF range
+            noteOff = True
+
+          if noteOn:
             if not self.broadcastEvent(self.priorityKeyListeners, "keyPressed", id, u'\x00'):
               self.broadcastEvent(self.keyListeners, "keyPressed", id, u'\x00')
-          #else:
-          elif (midimsg[0] >= 0x80) and (midimsg[0] <= 0x8F):
+          
+          elif noteOff:
             if not self.broadcastEvent(self.priorityKeyListeners, "keyReleased", id):
               self.broadcastEvent(self.keyListeners, "keyReleased", id)
 
