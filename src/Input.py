@@ -48,20 +48,7 @@ except ImportError:
 
 if haveMidi:
   
-  #MFH - first, check for MIDI input ports
-  try:
-    midiin = rtmidi.RtMidiIn()
-    portCount = midiin.getPortCount()
-    #Log.debug("MIDI port count = " + str(portCount) )
-    if portCount > 0:
-      ports = range(portCount)
-      for x in ports:
-        midi.append( rtmidi.RtMidiIn() )
-  except Exception, e:
-    Log.error(str(e))
-    ports = None
-
-  #MFH - then, check for and test MIDI output ports by playing a note
+  #MFH - check for and test MIDI output ports by playing a note
   try:
     Log.debug("Checking MIDI output ports for a wavetable or synth for sound generation...")
     midiout = rtmidi.RtMidiOut()
@@ -86,6 +73,21 @@ if haveMidi:
   except Exception, e:
     Log.error(str(e))
     midiOutPorts = None
+
+
+  #MFH - check for MIDI input ports
+  try:
+    midiin = rtmidi.RtMidiIn()
+    portCount = midiin.getPortCount()
+    #Log.debug("MIDI port count = " + str(portCount) )
+    if portCount > 0:
+      ports = range(portCount)
+      for x in ports:
+        midi.append( rtmidi.RtMidiIn() )
+  except Exception, e:
+    Log.error(str(e))
+    ports = None
+
 
 
 #-  // Program change: 192, 5
@@ -203,8 +205,11 @@ class Input(Task):
     if haveMidi:
       if ports:
         Log.debug("%d MIDI inputs found." % (len(ports)))
-        for i in ports:
-          midi[i].openPort(i, False)
+        try:
+          for i in ports:
+            midi[i].openPort(i, False)
+        except Exception, e:
+          Log.error("Error opening MIDI port %d: %s" % (i,str(e)) )
       else:
         Log.warn("No MIDI input ports found.")
 
