@@ -2153,6 +2153,8 @@ class Track:
     tempoBpm = []
 
     #get all the bpm changes and their times
+
+    #MFH - TODO - count tempo events.  If 0, realize and log that this is a song with no tempo events - and go mark all 120BPM bars.
     endBpm = None
     endTime = None
     for time, event in self.allEvents:
