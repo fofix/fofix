@@ -31,6 +31,12 @@ ports = None
 midi = []
 midiin = None
 portCount = 0
+
+midiOutPorts = None
+midiOutList = []
+midiout = None
+midiOutPortCount = 0
+
 try:
   import rtmidi
   haveMidi = True
@@ -41,6 +47,8 @@ except ImportError:
 #haveMidi = False  #this line disables the rtmidi module for computers with 0 midi ports...has to be this way for now to avoid crashes.
 
 if haveMidi:
+  
+  #MFH - first, check for MIDI input ports
   try:
     midiin = rtmidi.RtMidiIn()
     portCount = midiin.getPortCount()
@@ -52,6 +60,63 @@ if haveMidi:
   except Exception, e:
     Log.error(str(e))
     ports = None
+
+  #MFH - then, check for and test MIDI output ports by playing a note
+  try:
+    Log.debug("Checking MIDI output ports for a wavetable or synth for sound generation...")
+    midiout = rtmidi.RtMidiOut()
+    midiOutPortCount = midiout.getPortCount()
+    Log.debug("MIDI output port count = " + str(midiOutPortCount) )
+    if midiOutPortCount > 0:
+      midiOutPortNumber = 0
+      midiOutPorts = range(midiOutPortCount)
+      for x in midiOutPorts:
+        midiOutList.append( rtmidi.RtMidiOut() )
+        midiOutPortName = midiOutList[midiOutPortNumber].getPortName(midiOutPortNumber)
+        Log.debug("MIDI Output port %d found: %s" % (midiOutPortNumber,midiOutPortName) )
+        
+        #Log.debug("Testing MIDI Output port %d (%s)..." % (midiOutPortNumber,midiOutPortName) )
+        #midiOutList[midiOutPortNumber].openPort(midiOutPortNumber)
+        #midiOutList[midiOutPortNumber].sendMessage(144, 64, 90)
+        ##midiOutList[midiOutPortNumber].closePort(midiOutPortNumber)
+
+
+        
+        midiOutPortNumber += 1
+  except Exception, e:
+    Log.error(str(e))
+    midiOutPorts = None
+
+
+#-  // Program change: 192, 5
+#-  message.push_back( 192 );
+#-  message.push_back( 5 );
+#-  midiout->sendMessage( &message );
+#-
+#-  // Control Change: 176, 7, 100 (volume)
+#-  message[0] = 176;
+#-  message[1] = 7;
+#-  message.push_back( 100 );
+#-  midiout->sendMessage( &message );
+#-
+#-  // Note On: 144, 64, 90
+#-  message[0] = 144;
+#-  message[1] = 64;
+#-  message[2] = 90;
+#-  midiout->sendMessage( &message );
+#-
+#-  SLEEP( 500 ); // Platform-dependent ... see example in tests directory.
+#-
+#-  // Note Off: 128, 64, 40
+#-  message[0] = 128;
+#-  message[1] = 64;
+#-  message[2] = 40;
+#-  midiout->sendMessage( &message );
+#-
+#-  // Clean up
+#- cleanup:
+#-  delete midiout;
+
 
 
 from Task import Task

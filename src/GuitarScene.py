@@ -2583,6 +2583,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           for fret in range (1,5):
             if self.controls.getState(guitar.keys[fret]) or ( guitar.isDrum and self.controls.getState(guitar.keys[fret+4])):
               guitar.freestyleLastFretHitTime[fret] = pos
+          
+          #MFH - TODO - Add all BRE score to a temporary score accumulator with a separate display box
+          #   and only reward if all notes after the BRE are hit without breaking streak!
           if guitar.freestyleActive:   #MFH - only want to add the score if this is a BRE - drum fills get no scoring...
             self.playerList[num].addScore( score )
   
