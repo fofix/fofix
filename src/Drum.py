@@ -1604,15 +1604,19 @@ class Drum:
         spNote = True
         if event.played or event.hopod:
           if event.flameCount < 1 and not self.starPowerGained:
+
+            #if self.drumFillOnScreen:   #MFH - if there's a drum fill on the screen right now, skip it!
+            if self.starPower < 50:   #not enough starpower to activate yet, kill existing drumfills
+              for dfEvent in self.drumFillEvents:
+                dfEvent.happened = True
+            
             if self.starPower < 100:
               self.starPower += 25
             if self.starPower > 100:
               self.starPower = 100
             self.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
             self.starPowerGained = True
-            #if self.drumFillOnScreen:   #MFH - if there's a drum fill on the screen right now, skip it!
-            for dfEvent in self.drumFillEvents:
-              dfEvent.happened = True
+            
 
       #if enable:
       #  self.spEnabled = True
