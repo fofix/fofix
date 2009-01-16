@@ -165,7 +165,8 @@ class Drum:
     
     self.actualBpm = 0.0
 
-    self.currentBpm     = 50.0   #MFH - need currentBpm to be 0 to force first setBPM to work!
+    self.currentBpm     = 120.0   #MFH - need currentBpm to be 0 to force first setBPM to work!
+                                  #MFH - actually, need a default 120BPM to be set in case a custom song has no tempo events.
     self.currentPeriod  = 60000.0 / self.currentBpm
     
     self.targetBpm      = self.currentBpm

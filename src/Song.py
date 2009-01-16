@@ -2238,9 +2238,13 @@ class Song(object):
     self.start        = 0.0
     self.noteFileName = noteFileName
     
-    self.bpm          = None
+    #self.bpm          = None
+    self.bpm          = 120.0     #MFH - enforcing a default / fallback tempo of 120 BPM
+
+    #self.period       = 0
+    self.period = 60000.0 / self.bpm    #MFH - enforcing a default / fallback tempo of 120 BPM
+
     
-    self.period       = 0
     self.parts        = partlist
     self.delay        = self.engine.config.get("audio", "delay")
     self.delay        += self.info.delay

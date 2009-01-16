@@ -141,7 +141,7 @@ class Guitar:
 
     self.actualBpm = 0.0
 
-    self.currentBpm     = 50.0   
+    self.currentBpm     = 120.0
     self.currentPeriod  = 60000.0 / self.currentBpm
 
     self.targetBpm      = self.currentBpm
