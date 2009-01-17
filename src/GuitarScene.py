@@ -8447,7 +8447,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             if (not self.pause and not self.failed and not self.ending):
 
               #MFH - show BRE temp score frame
-              if self.guitars[i].freestyleActive or self.playerList[i].freestyleWasJustActive:
+              if not self.playerList[i].endingStreakBroken and (self.guitars[i].freestyleActive or self.playerList[i].freestyleWasJustActive):
 
                 text = "End Bonus"
                 yOffset = 0.210
