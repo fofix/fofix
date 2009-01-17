@@ -734,30 +734,36 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     
     
-    self.lastDrumNoteTime = 0
+    self.lastDrumNoteTime = 0.0
     #self.lastDrumNoteEvent = None
     self.drumScoringEnabled = True
     
     
     #count / init solos
     for i,guitar in enumerate(self.guitars):
-      if guitar.isDrum:                
-        #MFH - go through, locate, and mark the last drum note.  When this is encountered, drum scoring should be turned off.
-        lastDrumNoteTime = 0
-        #lastDrumNoteEvent = None
-        for time, event in self.song.track[i].getAllEvents():
-          if isinstance(event, Note):
-            if time > lastDrumNoteTime:
-              lastDrumNoteTime = time
-              #lastDrumNoteEvent = event
+      #MFH - go through, locate, and mark the last drum note.  When this is encountered, drum scoring should be turned off.
+      lastDrumNoteTime = 0.0
+      lastDrumNoteEvent = None
+      for time, event in self.song.track[i].getAllEvents():
+        if isinstance(event, Note):
+          if time >= lastDrumNoteTime:
+            lastDrumNoteTime = time
+            lastDrumNoteEvent = event
+      if guitar.isDrum:
         self.lastDrumNoteTime = lastDrumNoteTime
         Log.debug("Last drum note located at time = " + str(self.lastDrumNoteTime) )
         #self.lastDrumNoteEvent = lastDrumNoteEvent
-        
-      
+
         self.playerList[i].totalStreakNotes = len([1 for time, event in self.song.track[i].getAllEvents() if isinstance(event, Note)])
       else:
         self.playerList[i].totalStreakNotes = len(set(time for time, event in self.song.track[i].getAllEvents() if isinstance(event, Note)))
+
+      self.playerList[i].lastNoteEvent = lastDrumNoteEvent
+      if lastDrumNoteEvent:
+        Log.debug("Last note (number %d) found for player %d at time %f" % (lastDrumNoteEvent.number, i, lastDrumNoteTime) )
+      else:
+        Log.debug("Last note event not found and is None!")
+
 
       #volshebnyi - don't count notes in BRE zones if BRE active
       if guitar.freestyleEnabled:
@@ -2587,7 +2593,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           #MFH - TODO - Add all BRE score to a temporary score accumulator with a separate display box
           #   and only reward if all notes after the BRE are hit without breaking streak!
           if guitar.freestyleActive:   #MFH - only want to add the score if this is a BRE - drum fills get no scoring...
-            self.playerList[num].addScore( score )
+            #self.playerList[num].addScore( score )
+            self.playerList[num].endingScore += score
+            #also, when this happens, want to set a flag indicating that all of the remaining notes in the song must be hit without
+            # breaking streak, or this score will not be kept!
+            self.playerList[num].endingStreakBroken = False
+            self.playerList[num].freestyleWasJustActive = True
   
         #MFH - also must ensure notes that pass during this time are marked as skipped without resetting the streak
         #missedNotes = self.guitars[num].getMissedNotesMFH(self.song, pos, catchup = True)
@@ -2927,9 +2938,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if self.song and not self.pause and not self.failed:
       pos = self.getSongPosition()
 
-      if pos > self.lastDrumNoteTime:   #MFH - disable drum scoring so that the drummer can get down with his bad self at the end of the song without penalty.
-        self.drumScoringEnabled = False
-
 
       self.song.update(ticks)
       # update stage
@@ -2968,9 +2976,29 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #elif self.rock[0] <= 0 and self.numOfPlayers<=1 and self.failingEnabled: #QQstarS: one player, die,failed
       #  self.failed = True
       
+
+      if pos > self.lastDrumNoteTime:   #MFH - disable drum scoring so that the drummer can get down with his bad self at the end of the song without penalty.
+        self.drumScoringEnabled = False
+
       
-      for i,guitar in enumerate(self.guitars):  #QQstarS:add the for loop to let it do with both player
+      for i,guitar in enumerate(self.guitars):  
         self.stage.run(pos, guitar.currentPeriod)
+
+        #MFH - check for any unplayed notes and for an unbroken streak since the BRE, then award bonus scores
+        thePlayer = self.playerList[i]
+        if thePlayer.freestyleWasJustActive and not thePlayer.endingAwarded:   
+          if thePlayer.lastNoteEvent and not thePlayer.endingStreakBroken:
+            if thePlayer.lastNoteEvent.played or thePlayer.lastNoteEvent.hopod:
+              Log.debug("Big Rock Ending bonus awarded for player %d: %d points" % (i, thePlayer.endingScore) )
+              if thePlayer.endingScore > 0:
+                #thePlayer.score += thePlayer.endingScore
+                thePlayer.addEndingScore()
+                thePlayer.endingScore = 0
+                self.engine.data.starActivateSound.play()
+              thePlayer.endingAwarded = True
+              thePlayer.freestyleWasJustActive = False
+
+
 
         if guitar.starPowerGained == True:
           if self.unisonActive and self.inUnison[i]:
@@ -3059,6 +3087,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             if self.whammyEffect == 1:    #pitchbend
               self.song.resetInstrumentPitch(self.players[i].part)
             self.guitarSoloBroken[i] = True
+            self.playerList[i].endingStreakBroken = True   #MFH
             if self.hopoDebugDisp == 1:
               missedNoteNums = [noat.number for time, noat in missedNotes]
               #Log.debug("Miss: run(), found missed note(s)... %s" % str(missedNoteNums) + ", Time left=" + str(self.timeLeft))
@@ -3494,6 +3523,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     #volshebnyi - disable failing if BRE is active
     if self.guitars[num].startPick(self.song, pos, self.controls):
+    
       if self.guitars[num].isDrum:
         self.drumStart = True
       self.song.setInstrumentVolume(self.guitarVolume, self.playerList[num].part)
@@ -3554,7 +3584,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.currentlyAnimating = False
         self.stage.triggerMiss(pos)
         self.guitarSoloBroken[num] = True
-  
+        self.playerList[num].endingStreakBroken = True   #MFH
         self.notesMissed[num] = True #QQstarS:Set [0] to [i]
   
         isFirst = True
@@ -3593,6 +3623,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.guitars[num].wasLastNoteHopod = False
       self.guitars[num].hopoLast = -1
       self.guitarSoloBroken[num] = True
+      self.playerList[num].endingStreakBroken = True   #MFH
 
       self.notesMissed[num] = True #QQstarS:Set [0] to [i]
       for tym, theNote in missedNotes:  #MFH
@@ -3621,6 +3652,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         
       self.playerList[num].notesHit += 1  # glorandwarf: was len(self.guitars[num].playedNotes)
       tempScoreValue = len(self.guitars[num].playedNotes) * 50 * self.multi[num]
+      
       self.playerList[num].addScore(tempScoreValue)
       
       if self.coOpType:
@@ -3658,6 +3690,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.guitars[num].setMultiplier(1)
       self.stage.triggerMiss(pos)
       self.guitarSoloBroken[num] = True
+      self.playerList[num].endingStreakBroken = True   #MFH
 
       self.notesMissed[num] = True #QQstarS:Set [0] to [i]
 
@@ -3690,6 +3723,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.guitars[num].wasLastNoteHopod = False
       self.guitars[num].hopoLast = -1
       self.guitarSoloBroken[num] = True
+      self.playerList[num].endingStreakBroken = True   #MFH
 
       self.notesMissed[num] = True  #qqstars 
       for tym, theNote in missedNotes:  #MFH
@@ -3716,6 +3750,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.playerList[num].streak = 0
         self.coOpStreak = 0
         self.guitarSoloBroken[num] = True
+        self.playerList[num].endingStreakBroken = True   #MFH
 
         self.notesMissed[num] = True  #qqstars
 
@@ -3737,6 +3772,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.currentlyAnimating = True        
       self.playerList[num].notesHit += 1  # glorandwarf: was len(self.guitars[num].playedNotes)
       tempScoreValue = len(self.guitars[num].playedNotes) * 50 * self.multi[num]
+      
       self.playerList[num].addScore(tempScoreValue)
       
       if self.coOpType:
@@ -3769,6 +3805,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.song.resetInstrumentPitch(self.playerList[num].part)
       self.playerList[num].streak = 0
       self.guitarSoloBroken[num] = True
+      self.playerList[num].endingStreakBroken = True   #MFH
       self.guitars[num].setMultiplier(1)
       self.stage.triggerMiss(pos)
 
@@ -3804,6 +3841,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.playerList[num].streak = 0
       self.coOpStreak = 0
       self.guitarSoloBroken[num] = True
+      self.playerList[num].endingStreakBroken = True   #MFH
       self.guitars[num].setMultiplier(1)
       self.guitars[num].hopoActive = 0
       self.guitars[num].sameNoteHopoString = False
@@ -3898,6 +3936,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       
         self.playerList[num].streak = 0
         self.guitarSoloBroken[num] = True
+        self.playerList[num].endingStreakBroken = True   #MFH
         self.notesMissed[num] = True #QQstarS:Set [0] to [i]
 
         for chord in self.guitars[num].missedNotes:
@@ -3922,6 +3961,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
       self.playerList[num].notesHit += 1  # glorandwarf: was len(self.guitars[num].playedNotes)
       tempScoreValue = len(self.guitars[num].playedNotes) * 50 * self.multi[num]
+      
       self.playerList[num].addScore(tempScoreValue)
       
       if self.coOpType:
@@ -3996,6 +4036,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.song.resetInstrumentPitch(self.playerList[num].part)
         self.playerList[num].streak = 0
         self.guitarSoloBroken[num] = True
+        self.playerList[num].endingStreakBroken = True   #MFH
         self.guitars[num].setMultiplier(1)
         self.stage.triggerMiss(pos)
         if self.hopoDebugDisp == 1 and not self.guitars[num].isDrum:
@@ -8405,6 +8446,36 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             #if (self.readTextAndLyricEvents == 2 or (self.readTextAndLyricEvents == 1 and self.theme == 2)) and (not self.pause and not self.failed and not self.ending):
             if (not self.pause and not self.failed and not self.ending):
 
+              #MFH - show BRE temp score frame
+              if self.guitars[i].freestyleActive or self.playerList[i].freestyleWasJustActive:
+
+                text = "End Bonus"
+                yOffset = 0.210
+                xOffset = 0.500
+                tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
+                self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
+
+
+                text = "%s" % self.playerList[i].endingScore
+                if self.theme == 2:
+                  text = text.replace("0","O")
+                tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
+                yOffset = 0.250
+                xOffset = 0.500
+                
+                if self.soloFrame:
+                  frameWidth = tW*1.15
+                  frameHeight = tH*1.07
+                  boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
+                  self.soloFrame.transform.reset()
+                  tempWScale = frameWidth*self.soloFrameWFactor
+                  tempHScale = -(frameHeight)*self.soloFrameWFactor
+                  self.soloFrame.transform.scale(tempWScale,tempHScale)
+                  self.soloFrame.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
+                  self.soloFrame.draw()
+                self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
+              
+              
               #MFH - only use the TK_GUITAR_SOLOS track if at least one player has no MIDI solos marked:
               if self.guitars[i].useMidiSoloMarkers:   #mark using the new MIDI solo marking system
                 for time, event in self.song.midiEventTrack[i].getEvents(minPos, maxPos):

@@ -532,6 +532,12 @@ class Player(object):
     self.totalNotes = 0
     self.freestyleSkippedNotes = 0 #volshebnyi
     
+    self.endingScore = 0    #MFH
+    self.endingStreakBroken = False   #MFH
+    self.endingAwarded = False    #MFH
+    self.lastNoteEvent = None    #MFH
+    self.freestyleWasJustActive = False  #MFH
+    
   def reset(self):
     self.score         = 0
     self._streak       = 0
@@ -539,6 +545,12 @@ class Player(object):
     self.longestStreak = 0
     self.cheating      = False
     self.twoChord      = 0
+    self.endingScore = 0    #MFH
+
+    self.endingStreakBroken = False   #MFH
+    self.endingAwarded = False    #MFH
+    #self.lastNoteEvent = None    #MFH
+    self.freestyleWasJustActive = False  #MFH
     
   def getName(self):
     return Config.get(self.playerstring, "name")
@@ -589,7 +601,10 @@ class Player(object):
   
   def addScore(self, score):
     self.score += score * self.getScoreMultiplier()
-    
+
+  def addEndingScore(self):
+    self.score += self.endingScore
+
   def getScoreMultiplier(self):
     
     #if self.getPart() == "Bass Guitar":    #myfingershurt: bass groove
