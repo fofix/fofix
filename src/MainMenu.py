@@ -241,10 +241,10 @@ class MainMenu(BackgroundLayer):
 
     if self.theme == 0 or self.theme == 1:    #GH themes = 6 main menu selections
     
-      if self.theme == 1 and self.themeCoOp:
+      if self.theme == 1 and self.themeCoOp: #Worldrave - Put GH Co-op ahead of FoFix co-op for GH based theme's. Made more sense.
         multPlayerMenu = [
-          (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),
           (_("GH Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 5)),
+          (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),
           (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
           (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
           (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
