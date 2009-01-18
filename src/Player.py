@@ -516,7 +516,7 @@ class Player(object):
     self.playerstring = "player" + str(number)
     self.whichPart = Config.get(self.playerstring, "part")
     
-    self.bassGrooveEnableMode = Config.get("game", "bass_groove_enable")
+    self.bassGrooveEnabled = False
     self.currentTheme = 1
     
     #MFH - need to store selected practice mode and start position here
@@ -608,7 +608,7 @@ class Player(object):
   def getScoreMultiplier(self):
     
     #if self.getPart() == "Bass Guitar":    #myfingershurt: bass groove
-    if self.part.text == "Bass Guitar" and (self.bassGrooveEnableMode == 2 or (self.currentTheme == 2 and self.bassGrooveEnableMode == 1) ):    #myfingershurt: bass groove
+    if self.part.text == "Bass Guitar" and self.bassGrooveEnabled:    #myfingershurt: bass groove
       try:
         return BASS_GROOVE_SCORE_MULTIPLIER.index((self.streak / 10) * 10) + 1
       except ValueError:

@@ -220,8 +220,6 @@ class MainMenu(BackgroundLayer):
       (_("Practice"), lambda: self.newLocalGame(mode1p = 1)),
     ]
     
-    settingsMenu = Settings.SettingsMenu(self.engine)
-
     self.opt_bkg_x = Theme.opt_bkg_xPos
     self.opt_bkg_y = Theme.opt_bkg_yPos
 
@@ -270,7 +268,7 @@ class MainMenu(BackgroundLayer):
         (_(strQuickplay), lambda:        self.newLocalGame()),
         (_(strMultiplayer), multPlayerMenu),
         (_(strTraining),    trainingMenu),
-        (_(strSettings),  settingsMenu),
+        (_(strSettings),  self.settingsMenu),
         (_(strQuit),        self.quit),
       ]
 
@@ -296,7 +294,7 @@ class MainMenu(BackgroundLayer):
         (_(strSolo), soloMenu),
         (_(strMultiplayer), multPlayerMenu),
         (_(strTraining),    trainingMenu),
-        (_(strSettings),  settingsMenu),
+        (_(strSettings),  self.settingsMenu),
         (_(strQuit),        self.quit),
       ]
 
@@ -305,6 +303,12 @@ class MainMenu(BackgroundLayer):
     self.menu = Menu(self.engine, mainMenu, onClose = lambda: self.engine.view.popLayer(self), pos = (12,12), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
 
     engine.mainMenu = self    #Points engine.mainMenu to the one and only MainMenu object instance
+
+  def settingsMenu(self):
+    if self.engine.advSettings:
+      return Settings.SettingsMenu(self.engine)
+    else:
+      return Settings.BasicSettingsMenu(self.engine)
 
   def shown(self):
     self.engine.view.pushLayer(self.menu)

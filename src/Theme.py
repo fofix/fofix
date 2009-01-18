@@ -202,6 +202,7 @@ Config.define("theme", "song_info_display_scale",  float, 0.0020)
 
 #MFH - option for Rock Band 2 theme.ini - only show # of stars you are working on
 Config.define("theme", "display_all_grey_stars",  bool, True)
+Config.define("theme", "small_1x_mult", bool, True)
 
 #MFH - y offset = lines, x offset = spaces
 Config.define("theme", "song_select_submenu_offset_lines",  int, 2)
@@ -347,6 +348,7 @@ songSelectSubmenuOffsetSpaces = None
 
 #MFH - option for Rock Band 2 theme.ini - only show # of stars you are working on
 displayAllGreyStars = None
+smallMult = None
 
 #Qstick - hopo indicator position and color
 hopoIndicatorX = None
@@ -534,7 +536,7 @@ def setupMisc(config):
   global creditSong
   global crowdLoopDelay
   global songInfoDisplayScale
-  global displayAllGreyStars
+  global displayAllGreyStars, smallMult
   global songListDisplay
 
   loadingPhrase = config.get("theme", "loading_phrase")
@@ -543,6 +545,7 @@ def setupMisc(config):
   crowdLoopDelay = config.get("theme", "crowd_loop_delay")
   songInfoDisplayScale = config.get("theme", "song_info_display_scale")
   displayAllGreyStars = config.get("theme", "display_all_grey_stars")
+  smallMult = config.get("theme", "small_1x_mult")
   songListDisplay = config.get("theme", "song_list_display")
 
 #MFH:

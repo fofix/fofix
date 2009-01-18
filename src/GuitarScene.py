@@ -521,9 +521,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     self.killDebugEnabled = self.engine.config.get("game", "kill_debug")
 
-    self.bassGrooveEnableMode = self.engine.config.get("game", "bass_groove_enable")
-
-    
     #myfingershurt: for checking if killswitch key is analog for whammy
     self.whammyVolAdjStep = 0.1
     self.analogKillMode = [self.engine.config.get("game", "analog_killsw_mode"),self.engine.config.get("game", "analog_killsw_mode_p2")]
@@ -658,9 +655,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.rockFailViz = 0.0
     self.failViz = [0.0 for i in self.playerList]
     
-    self.phrases = self.engine.config.get("coffee", "phrases")#blazingamer
+    self.phrases = self.engine.config.get("coffee", "game_phrases")#blazingamer
     self.starfx = self.engine.config.get("game", "starfx")#blazingamer
-    self.rbmfx = self.engine.config.get("game", "rbmfx")#blazingamer
+    smallMult = self.engine.config.get("game","small_rb_mult")
+    self.rbmfx = False
+    if smallMult == 2 or (smallMult == 1 and Theme.smallMult):
+      self.rbmfx = True
     self.boardY = 2
     self.rbOverdriveBarGlowVisibility = 0
     self.rbOverdriveBarGlowFadeOut = False
@@ -703,9 +703,19 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
 
     self.playerList[0].hopoFreq = self.song.info.hopofreq
-
-
-
+    
+    bassGrooveEnableSet = self.engine.config.get("game", "bass_groove_enable")
+    if bassGrooveEnableSet == 1 and self.theme == 2:
+      self.bassGrooveEnabled = True
+    elif bassGrooveEnableSet == 2 and self.song.midiStyle == Song.MIDI_TYPE_RB:
+      self.bassGrooveEnabled = True
+    elif bassGrooveEnableSet == 3:
+      self.bassGrooveEnabled = True
+    else:
+      self.bassGrooveEnabled = False
+      
+    for player in self.playerList:
+      player.bassGrooveEnabled = self.bassGrooveEnabled
 
     #MFH - single audio track song detection
     self.isSingleAudioTrack = self.song.isSingleAudioTrack
@@ -2230,7 +2240,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.guitars[i].guitarSolo = True
     #self.displayText[i] = _("Guitar Solo!")
     instrumentSoloString = "%s %s" % (self.playerList[i].part.text, self.tsSolo)
-    self.newScalingText(i, instrumentSoloString )
+    if self.phrases > 1:
+      self.newScalingText(i, instrumentSoloString )
     #self.sfxChannel.setVolume(self.sfxVolume)
     self.engine.data.crowdSound.play()
   
@@ -2486,7 +2497,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
 
   def handlePhrases(self, playerNum, playerStreak):
-    if self.phrases == True:
+    if self.phrases > 0:
   
       i = playerNum
       
@@ -3048,7 +3059,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             
 
 
-          if self.phrases == True:
+          if self.phrases > 1:
             if self.coOpGH:
               if guitar.starPowerGained and self.coOpStarPower >= (50 * self.numOfPlayers) and not guitar.starPowerActive:
                 self.newScalingText(self.coOpPhrase, self.tsStarPowerReady )
@@ -4112,7 +4123,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               if self.autoDrumStarpowerActivate and guitar.isDrum:
                 self.activateSP(i)
                 break
-              self.newScalingText(i, self.tsCoOpStarPower )
+              if self.phrases > 1:
+                self.newScalingText(i, self.tsCoOpStarPower )
             self.coOpStarPowerTimer = time
         
     else:
@@ -5455,7 +5467,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             multStreak = self.coOpStreak
           else:
             multStreak = player.streak
-          if self.guitars[i].isBassGuitar and (self.bassGrooveEnableMode == 2 or (self.bassGrooveEnableMode == 1 and self.theme == 2)):
+          if self.guitars[i].isBassGuitar and self.bassGrooveEnabled:
             maxMult = 60
           else:
             maxMult = 40
@@ -5472,7 +5484,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               if self.guitars[i].starPowerActive: #QQstarS:Set [0] to [i]
                 #death_au: check for bass groove
                 #if self.playerList[i].part.text == "Bass Guitar" and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnableMode == 2:
-                if self.guitars[i].isBassGuitar and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnableMode == 2:
+                if self.guitars[i].isBassGuitar and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnabled:
                   if multStreak >= 50:
                     multiplier = 6
                     multRange = (0.75,1.00)  #MFH division->constant: [(3.0/4.0,4.0/4.0)]->[(0.75,1.00)]
@@ -5500,7 +5512,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   color = (.3,.7,.9,1)
               else:
                 #if self.playerList[i].part.text == "Bass Guitar" and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnableMode == 2:
-                if self.guitars[i].isBassGuitar and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnableMode == 2:
+                if self.guitars[i].isBassGuitar and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnabled:
                   if multStreak >= 50:
                     multiplier = 6
                     multRange = (0.25,0.5) #MFH division->constant: was [(1.0/4.0,2.0/4.0)]
@@ -5528,7 +5540,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                         
               #myfingershurt: GH bass groove multiplier:            
               #if self.playerList[i].part.text == "Bass Guitar" and multStreak >= 40 and self.bassGrooveEnableMode == 2:   #bass groove!
-              if self.guitars[i].isBassGuitar and multStreak >= 40 and self.bassGrooveEnableMode == 2:   #bass groove!
+              if self.guitars[i].isBassGuitar and multStreak >= 40 and self.bassGrooveEnabled:   #bass groove!
                 if self.bassgroovemult != None: #death_au : bassgroovemult image found, draw image
                       
                   self.bassgroovemult.transform.reset()
@@ -5821,7 +5833,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   if self.halfDots:
                     #death_au: check for bass groove
                     #if self.playerList[i].part.text == "Bass Guitar" and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnableMode == 2:
-                    if self.guitars[i].isBassGuitar and self.bassgroovemult != None and multStreak >= 40 and not self.coOpGH and self.bassGrooveEnableMode == 2:
+                    if self.guitars[i].isBassGuitar and self.bassgroovemult != None and multStreak >= 40 and not self.coOpGH and self.bassGrooveEnabled:
                       if multStreak >= 50:
                         multiplier = 6
                         multRange = (0.75,1.00) #MFH division->constant: was (3.0/4.0,4.0/4.0)
@@ -5855,7 +5867,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   else:
                     #death_au: check for bass groove
                     #if self.playerList[i].part.text == "Bass Guitar" and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnableMode == 2:
-                    if self.guitars[i].isBassGuitar and self.bassgroovemult != None and multStreak >= 40 and not self.coOpGH and self.bassGrooveEnableMode == 2:
+                    if self.guitars[i].isBassGuitar and self.bassgroovemult != None and multStreak >= 40 and not self.coOpGH and self.bassGrooveEnabled:
                       if multStreak >= 50:
                         multiplier = 6
                         multRange = (0.75,1.0) #MFH division->constant: was (3.0/4.0,4.0/4.0)
@@ -5887,7 +5899,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   if self.halfDots:
                     #death_au: check for bass groove
                     #if self.playerList[i].part.text == "Bass Guitar" and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnableMode == 2:
-                    if self.guitars[i].isBassGuitar and self.bassgroovemult != None and multStreak >= 40 and not self.coOpGH and self.bassGrooveEnableMode == 2:
+                    if self.guitars[i].isBassGuitar and self.bassgroovemult != None and multStreak >= 40 and not self.coOpGH and self.bassGrooveEnabled:
                       if multStreak >= 50:
                         multiplier = 6
                         multRange = (0.25,0.5) #MFH division->constant: was (1.0/4.0,2.0/4.0)
@@ -5921,7 +5933,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   else:
                      #death_au: check for bass groove
                     #if self.playerList[i].part.text == "Bass Guitar" and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnableMode == 2:
-                    if self.guitars[i].isBassGuitar and self.bassgroovemult != None and multStreak >= 40 and not self.coOpGH and self.bassGrooveEnableMode == 2:
+                    if self.guitars[i].isBassGuitar and self.bassgroovemult != None and multStreak >= 40 and not self.coOpGH and self.bassGrooveEnabled:
                       if multStreak >= 50:
                         multiplier = 6
                         multRange = (0.25,0.5) #MFH division->constant: was (1.0/4.0,2.0/4.0)
@@ -5953,7 +5965,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               #myfingershurt: GH bass groove multiplier: 
               # death_au: added drawing of bassgroovemult image             
               #if self.playerList[i].part.text == "Bass Guitar" and multStreak >= 40 and self.bassGrooveEnableMode == 2:   #bass groove!
-              if self.guitars[i].isBassGuitar and multStreak >= 40 and not self.coOpGH and self.bassGrooveEnableMode == 2:   #bass groove!
+              if self.guitars[i].isBassGuitar and multStreak >= 40 and not self.coOpGH and self.bassGrooveEnabled:   #bass groove!
                 if self.bassgroovemult != None: #death_au : bassgroovemult image found, draw image
                       
                   self.bassgroovemult.transform.reset()
@@ -6856,7 +6868,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               if self.guitars[i].starPowerActive and not self.coOpRB:
                 #death_au: added checks for bass groove here so multiplier is correct    
                 #if self.playerList[i].part.text == "Bass Guitar" and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnableMode > 0:
-                if self.guitars[i].isBassGuitar and not self.coOpGH and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnableMode > 0:
+                if self.guitars[i].isBassGuitar and not self.coOpGH and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnabled:
                   if multStreak >= 50:
                     multiplier = 6
                     multRange = (3.0/4.0,4.0/4.0)
@@ -6885,7 +6897,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               else:
                 #death_au: added checks for bass groove here so multiplier is correct    
                 #if self.playerList[i].part.text == "Bass Guitar" and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnableMode > 0:
-                if self.guitars[i].isBassGuitar and not self.coOpGH and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnableMode > 0:
+                if self.guitars[i].isBassGuitar and not self.coOpGH and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnabled:
                   if multStreak >= 50:
                     multiplier = 6
                     multRange = (1.0/4.0,2.0/4.0)
@@ -7028,7 +7040,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 
                 #must duplicate to other theme 
                 #if self.playerList[i].part.text == "Bass Guitar" and multStreak >= 40 and self.bassGrooveEnableMode > 0:   #bass groove!
-                if self.guitars[i].isBassGuitar and not self.coOpGH and multStreak >= 40 and self.bassGrooveEnableMode > 0:   #bass groove!
+                if self.guitars[i].isBassGuitar and not self.coOpGH and multStreak >= 40 and self.bassGrooveEnabled:   #bass groove!
                   #death_au: bassgroove multiplier image
                   if self.bassgroovemult != None:
                     text = self.tsBassGroove   #kk69: displays "Bass Groove" whenever active, like Rock Band (only for RB theme)
@@ -7519,7 +7531,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   if self.halfDots:
                     #death_au: check for bass groove
                     #if self.playerList[i].part.text == "Bass Guitar" and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnableMode == 2:
-                    if self.guitars[i].isBassGuitar and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnableMode == 2:
+                    if self.guitars[i].isBassGuitar and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnabled:
                       if multStreak >= 50:
                         multiplier = 6
                         multRange = (0.75,1.00) #MFH division->constant: was (3.0/4.0,4.0/4.0)
@@ -7553,7 +7565,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   else:
                     #death_au: check for bass groove
                     #if self.playerList[i].part.text == "Bass Guitar" and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnableMode == 2:
-                    if self.guitars[i].isBassGuitar and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnableMode == 2:
+                    if self.guitars[i].isBassGuitar and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnabled:
                       if multStreak >= 50:
                         multiplier = 6
                         multRange = (0.75,1.0) #MFH division->constant: was (3.0/4.0,4.0/4.0)
@@ -7585,7 +7597,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   if self.halfDots:
                     #death_au: check for bass groove
                     #if self.playerList[i].part.text == "Bass Guitar" and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnableMode == 2:
-                    if self.guitars[i].isBassGuitar and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnableMode == 2:
+                    if self.guitars[i].isBassGuitar and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnabled:
                       if multStreak >= 50:
                         multiplier = 6
                         multRange = (0.25,0.5) #MFH division->constant: was (1.0/4.0,2.0/4.0)
@@ -7619,7 +7631,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   else:
                      #death_au: check for bass groove
                     #if self.playerList[i].part.text == "Bass Guitar" and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnableMode == 2:
-                    if self.guitars[i].isBassGuitar and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnableMode == 2:
+                    if self.guitars[i].isBassGuitar and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnabled:
                       if multStreak >= 50:
                         multiplier = 6
                         multRange = (0.25,0.5) #MFH division->constant: was (1.0/4.0,2.0/4.0)
@@ -7651,7 +7663,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               #myfingershurt: GH bass groove multiplier: 
               # death_au: added drawing of bassgroovemult image             
               #if self.playerList[i].part.text == "Bass Guitar" and multStreak >= 40 and self.bassGrooveEnableMode == 2:   #bass groove!
-              if self.guitars[i].isBassGuitar and multStreak >= 40 and self.bassGrooveEnableMode == 2:   #bass groove!
+              if self.guitars[i].isBassGuitar and multStreak >= 40 and self.bassGrooveEnabled:   #bass groove!
                 if self.bassgroovemult != None: #death_au : bassgroovemult image found, draw image
                       
                   self.bassgroovemult.transform.reset()
@@ -8570,6 +8582,30 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   self.breScoreFrame.transform.scale(tempWScale,tempHScale)
                   self.breScoreFrame.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
                   self.breScoreFrame.draw()
+                self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
+
+
+                
+              
+              elif self.playerList[i].freestyleWasJustActive and not self.playerList[i].endingStreakBroken and self.playerList[i].endingAwarded:
+                #MFH - TODO - ending bonus was awarded - scale up obtained score & box to signify rockage
+                text = "%s" % self.playerList[i].endingScore
+                if self.theme == 2:
+                  text = text.replace("0","O")
+                tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
+                yOffset = 0.215
+                xOffset = 0.500
+                
+                if self.soloFrame:
+                  frameWidth = tW*1.15
+                  frameHeight = tH*1.07
+                  boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
+                  self.soloFrame.transform.reset()
+                  tempWScale = frameWidth*self.soloFrameWFactor
+                  tempHScale = -(frameHeight)*self.soloFrameWFactor
+                  self.soloFrame.transform.scale(tempWScale,tempHScale)
+                  self.soloFrame.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
+                  self.soloFrame.draw()
                 self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
 
 

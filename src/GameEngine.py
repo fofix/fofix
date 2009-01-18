@@ -80,17 +80,18 @@ except Exception, e:
 
 # define configuration keys
 Config.define("engine", "highpriority", bool,  True)
+Config.define("game",   "adv_settings", bool,  False)
 Config.define("game",   "uploadscores", bool,  False, text = _("Upload Highscores"),    options = {False: _("No"), True: _("Yes")})
-Config.define("game",   "leftymode",    bool,  False, text = _("Lefty mode"),           options = {False: _("No"), True: _("Yes")})
+Config.define("game",   "leftymode",    bool,  False, text = _("Lefty Mode"),           options = {False: _("No"), True: _("Yes")})
 Config.define("video",  "fullscreen",   bool,  False,  text = _("Fullscreen Mode"),      options = {False: _("No"), True: _("Yes")})
 Config.define("video",  "multisamples", int,   4,     text = _("Antialiasing Quality"), options = {0: _("None"), 2: "2x", 4: "4x", 6: "6x", 8: "8x"})
-Config.define("video",  "disable_fretsfx", bool, False, text = _("Enable Glow-FX"), options = {False: _("Yes"), True: _("No")})
+Config.define("video",  "disable_fretsfx", bool, False, text = _("Show Fret Glow Effect"), options = {False: _("Yes"), True: _("No")})
 Config.define("video",  "resolution",   str,   "640x480")
 Config.define("video",  "fps",          int,   80,    text = _("Frames per Second"), options = dict([(n, n) for n in range(1, 120)]))
 Config.define("video",  "show_fps",     bool,   False,  text = _("Print Frames per Second"), options = {False: _("No"), True: _("Yes")})
-Config.define("video",  "hitglow_color", int,  0,     text = _("Glow-FX Color"), options = {0: _("Same as Fret"), 1: _("Actual Color")})
+Config.define("video",  "hitglow_color", int,  0,     text = _("Fret Glow Color"), options = {0: _("Same as Fret"), 1: _("Actual Color")})
 Config.define("video",  "hitflame_color", int, 0,     text = _("Hitflames Color"), options = {0: _("Theme Specific"), 1: _("Same as Fret"), 2: _("Actual Color")})
-Config.define("performance",  "starspin", bool,     True,  text = _("Starnotes"), options = {True: _("Animated"), False: _("Static")})
+Config.define("performance",  "starspin", bool,     True,  text = _("Animated Star Notes"), options = {True: _("Yes"), False: _("No")})
 Config.define("audio",  "frequency",    int,   44100, text = _("Sample Frequency"), options = [8000, 11025, 22050, 32000, 44100, 48000])
 Config.define("audio",  "bits",         int,   16,    text = _("Sample Bits"), options = [16, 8])
 Config.define("audio",  "stereo",       bool,  True)
@@ -110,22 +111,22 @@ Config.define("game","last_theme",           str,  "")
 
 #myfingershurt: default buffersize changed from 4096 to 2048:
 Config.define("audio",  "buffersize",   int,   2048,  text = _("Buffer Size"), options = [256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536])
-Config.define("audio",  "delay",        int,   100,   text = _("A/V delay"), options = dict([(n, n) for n in range(0, 1001)]))
-Config.define("audio",  "screwupvol", float,   0.25,  text = _("Screw Up sounds"), options = {0.0: _("Off"), .25: _("Quiet"), .5: _("Loud"), 1.0: _("Painful")})
+Config.define("audio",  "delay",        int,   100,   text = _("A/V Delay"), options = dict([(n, n) for n in range(0, 1001)]))
+Config.define("audio",  "screwupvol", float,   0.25,  text = _("Screw-Up Sounds"), options = {0.0: _("Off"), .25: _("Quiet"), .5: _("Loud"), 1.0: _("Painful")})
 
 #MFH: below are normal 0-10 volume settings.
 Config.define("audio",  "guitarvol",  float,    1.0,  text = _("Guitar Volume"),   options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(0, 110, 10)]))
 Config.define("audio",  "songvol",    float,    1.0,  text = _("Song Volume"),     options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(0, 110, 10)]))
 Config.define("audio",  "rhythmvol",  float,    1.0,  text = _("Rhythm Volume"),   options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(0, 110, 10)]))
 
-Config.define("performance", "game_priority",       int,   2,      text = _("Priority"), options = {0: _("0 Idle"), 1: _("1 Low"), 2: _("2 Normal"), 3:_("3 Above Normal"), 4:_("4 High"), 5:_("5 Realtime")})
+Config.define("performance", "game_priority",       int,   2,      text = _("Process Priority"), options = {0: _("0 Idle"), 1: _("1 Low"), 2: _("2 Normal"), 3:_("3 Above Normal"), 4:_("4 High"), 5:_("5 Realtime")})
 Config.define("game",   "alt_keys",            bool,  False,  text = _("Keyset"), options = {False: _("Normal"), True: _("Alternate")})
 Config.define("game",   "margin",              int,   0,      text = _("Hit Margin"), options = {0: _("FoF"), 1: _("Capo")})
 Config.define("game",   "notedisappear",      bool,   False,  text = _("Missed Notes"), options = {False: _("Disappear"), True: _("Keep on going")})
 
-
-#Fablaculp's Performance Autoset
-Config.define("performance","autoset",int,0,text = _("Autoset"),options = {0:_("Off"), 1:_("My Pc Sucks !"), 2:_("Normal"), 3:_("My PC is good !"), 4:_("I've paid for all of this ! Gimme more !")})
+#akedrou - Quickset (based on Fablaculp's Performance Autoset)
+Config.define("quickset", "performance", int, 0, text = _("Performance"), options = {0: _("Manual"), 1: _("1 - Pure Speed"), 2: _("2 - Fast"), 3: _("3 - Effects (Recommended)"), 4: _("4 - Max Quality (Slow)")})
+Config.define("quickset", "gameplay",    int, 0, text = _("Gameplay"),    options = {0: _("Manual"), 1: _("Theme-Based"), 2: _("MIDI Based"), 3: _("RB Style"), 4: _("GH Style"), 5: _("WT Style")})
 
 
 #myfingershurt: the following two lines are not used in gameplay,
@@ -138,8 +139,8 @@ Config.define("game",   "hopo_mark",           int,   1,      text = _("HO/PO No
 Config.define("game",   "hopo_style",          int,   4,      text = _("HO/PO System"), options = {0: _("None"), 1: _("RF-Mod"), 2: _("GH2 Strict"), 3: _("GH2 Sloppy"), 4: _("GH2")})
 Config.define("coffee", "moreHopo",            int,   2,   text = _("HO/PO Frequency"),    options = {0: _("0. Least"), 1: _("1. Less"), 2: _("2. Normal"), 3:("3. More"), 4:("4. Even More"), 5:("5. Most")})
 Config.define("game", "hopo_after_chord",      int,   1,   text = _("HO/PO After Chord"),    options = {0: _("Off"), 1: _("On")})
-Config.define("game", "accuracy_mode",      int,   2,   text = _("Accuracy"),    options = {0: _("Off"), 1: _("Numeric"), 2: _("Friendly"), 3: _("Both")})
-Config.define("game", "accuracy_pos",      int,   1,   text = _("Accuracy Words Pos"),    options = {0: _("Center"), 1: _("Right-top Corner"), 2: _("Left-Bottom Corner"), 3: _("Center-Bottom")}) #QQstarS:acc show
+Config.define("game", "accuracy_mode",      int,   2,   text = _("Show Hit Accuracy"),    options = {0: _("Off"), 1: _("Numeric"), 2: _("Friendly"), 3: _("Both")})
+Config.define("game", "accuracy_pos",      int,   1,   text = _("Hit Accuracy Pos"),    options = {0: _("Center"), 1: _("Right-top Corner"), 2: _("Left-Bottom Corner"), 3: _("Center-Bottom")}) #QQstarS:acc show
 
 
 
@@ -148,84 +149,84 @@ Config.define("game",  "stage_rotate_delay",        int,   800,   text = _("Slid
 Config.define("game",  "stage_animate_delay",        int,   3,   text = _("Animation Delay"), options = dict([(n, n) for n in range(0, 10, 1)] + [(n, n) for n in range(10, 50, 10)] + [(n, n) for n in range(50, 2001, 50)]))
 Config.define("game",   "rotate_stages",           int,  0,  text = _("Stage Slideshow"),  options = {0: _("Off"), 1: _("Random"), 2: _("In Order"), 3: _("BackNForth")} ) 
 Config.define("game",   "stage_animate",           int,  0,  text = _("Stage Animation"),  options = {0: _("Off"), 1: _("Random"), 2: _("In Order"), 3: _("BackNForth")} ) 
-Config.define("game",   "stage_mode",           int,  0,  text = _("Static Stages"),  options = {0: _("Random"), 1: _("Default"), 2: _("Blank") } )
+Config.define("game",   "stage_mode",           int,  0,  text = _("Stage Selection"),  options = {0: _("Random"), 1: _("Default"), 2: _("Blank") } )
 Config.define("game",   "song_stage",           int,  1,  text = _("Song Stage"),  options = {0: _("Off"), 1: _("On") } ) #MFH
-Config.define("game",   "lyric_mode",           int,   2,   text = _("Lyrics"), options = {0: _("Off"), 1: _("song.ini"), 2: _("Auto"), 3: _("Dual Lyric Prevention")})#racer
-Config.define("game",   "frets_under_notes",          bool, True,  text = _("Frets under notes"), options = {False: _("No"), True: _("Yes")})
+Config.define("game",   "lyric_mode",           int,   2,   text = _("Script Lyric Display"), options = {0: _("Off"), 1: _("By Song"), 2: _("Auto"), 3: _("Dual Lyric Prevention")})#racer
+Config.define("game",   "frets_under_notes",          bool, True,  text = _("Frets Under Notes"), options = {False: _("No"), True: _("Yes")})
 #Config.define("game",   "drum_highscore_nav",          bool, False,  text = _("Drum highscore nav"), options = {False: _("Off"), True: _("On")})
-Config.define("game",   "drum_navigation",          bool, False,  text = _("Drum navigation"), options = {False: _("Off"), True: _("On")})
+Config.define("game",   "drum_navigation",          bool, False,  text = _("Drum Navigation"), options = {False: _("Off"), True: _("On")})
 
-Config.define("game",   "ignore_open_strums",          bool, True,  text = _("Ignore open strums"), options = {False: _("No"), True: _("Yes")})
-Config.define("performance",   "static_strings",          bool, True,  text = _("Static strings"), options = {False: _("No"), True: _("Yes")})
-Config.define("game",   "whammy_saves_starpower",          bool, False,  text = _("Whammy saves SP"), options = {False: _("No"), True: _("Yes")})
-Config.define("game",   "hopo_indicator",          bool, False,  text = _("HOPO Indicator"), options = {False: _("Off"), True: _("On")})
-Config.define("game",   "quickplay_tiers",          int, 1,  text = _("Quickplay Tiers"), options = {0: _("Off"), 1: _("Normal"), 2: _("Sorting")})
+Config.define("game",   "ignore_open_strums",          bool, True,  text = _("Ignore Open Strums"), options = {False: _("No"), True: _("Yes")})
+Config.define("performance",   "static_strings",          bool, True,  text = _("Static Strings"), options = {False: _("No"), True: _("Yes")})
+Config.define("game",   "whammy_saves_starpower",          bool, False,  text = _("Effects Save SP"), options = {False: _("No"), True: _("Yes")})
+Config.define("game",   "hopo_indicator",          bool, False,  text = _("Show HO/PO Indicator"), options = {False: _("No"), True: _("Yes")})
+Config.define("game",   "quickplay_tiers",          int, 1,  text = _("Use Tiers in Quickplay"), options = {0: _("Off"), 1: _("Normal"), 2: _("Sorting")})
 Config.define("game",   "quickplay_career_tiers",          bool, True,  text = _("Quickplay Tiers"), options = {False: _("Off"), True: _("On")})
 Config.define("performance",   "star_score_updates",          int, 1,  text = _("Star Updates"), options = {0: _("On Hit"), 1: _("Score Change")})
 
 Config.define("game", "script_lyric_pos",      int,   0,   text = _("Script Lyric Pos"),    options = {0: _("Bottom"), 1: _("Top")}) #MFH - script.txt lyric display position
 
 
-Config.define("game",   "star_claps",          bool, False,  text = _("Starpower Clap SFX"), options = {False: _("Off"), True: _("On")})
+Config.define("game",   "star_claps",          bool, False,  text = _("Starpower Claps"), options = {False: _("Off"), True: _("On")})
 Config.define("audio", "disable_preview",      bool, True,  text = _("Song Previews"), options = {False: _("Auto"), True: _("Yellow Fret (#3)")})
 Config.define("game", "uploadurl_w67_starpower",    str,   "http://www.wembley1967.com/chart/uploadsp.php") # evilynux - new one starting 20080902
 Config.define("game", "rb_sp_neck_glow",      bool, False,  text = _("RB SP Neck Glow"), options = {False: _("Off"), True: _("On")})
-Config.define("game",   "sp_notes_while_active",  int,  2,  text = _("SP Refill"),  options = {0: _("None"), 1: _("By Theme"), 2: _("By MIDI Type"), 3: _("Always")} ) 
+Config.define("game",   "sp_notes_while_active",  int,  2,  text = _("SP Refill Mode"),  options = {0: _("None"), 1: _("By Theme"), 2: _("By MIDI Type"), 3: _("Always")} ) 
 
-Config.define("game", "analog_killsw_mode",      int, 0,  text = _("Analog Killswitch P1"), options = {0: _("Off"), 1: _("PS2/PS3/Wii"), 2: _("XBOX"), 3: _("XBOX Inv")})
-Config.define("game", "analog_killsw_mode_p2",      int, 0,  text = _("Analog Killswitch P2"), options = {0: _("Off"), 1: _("PS2/PS3/Wii"), 2: _("XBOX"), 3: _("XBOX Inv")})
+Config.define("game", "analog_killsw_mode",      int, 0,  text = _("P1 Analog Effects"), options = {0: _("Off"), 1: _("PS2/PS3/Wii"), 2: _("XBOX"), 3: _("XBOX Inv")})
+Config.define("game", "analog_killsw_mode_p2",      int, 0,  text = _("P2 Analog Effects"), options = {0: _("Off"), 1: _("PS2/PS3/Wii"), 2: _("XBOX"), 3: _("XBOX Inv")})
 
 #MFH wuz here.  Yeah.
-Config.define("game", "kill_debug",      bool, False,  text = _("Killsw Debug"), options = {False: _("Off"), True: _("On")})
+Config.define("game", "kill_debug",      bool, False,  text = _("Effects Debug"), options = {False: _("Off"), True: _("On")})
 Config.define("game", "auto_drum_sp",      bool, False,  text = _("Auto Drum SP"), options = {False: _("No"), True: _("Yes")})
 Config.define("game", "large_drum_neck",      bool, False,  text = _("Large Drum Neck"), options = {False: _("No"), True: _("Yes")})
 Config.define("game", "bass_groove_neck",      int, 1,  text = _("Bass Groove Neck"), options = {0: _("Off"), 1: _("Replace"), 2: _("Overlay")})
 Config.define("game", "guitar_solo_neck",      int, 2,  text = _("Guitar Solo Neck"), options = {0: _("Off"), 1: _("Replace"), 2: _("Overlay")})
-Config.define("game", "rock_band_events",      int, 1,  text = _("Rock Band MIDI events"), options = {0: _("Off"), 1: _("RB Only"), 2: _("On")})
-Config.define("game", "show_unused_text_events",      bool, False,  text = _("Show unused events"), options = {False: _("No"), True: _("Yes")})
-Config.define("game", "bass_kick_sound",      bool, False,  text = _("Bass kick sound"), options = {False: _("Off"), True: _("On")})
-Config.define("game", "rb_midi_lyrics",           int,  1,   text = _("MIDI/RB Lyrics"), options = {0: _("Off"), 1: _("1p Only"), 2: _("Auto")})
-Config.define("game", "rb_midi_sections",           int,  0,   text = _("MIDI/RB Sections"), options = {0: _("Off"), 1: _("1p Only"), 2: _("Auto")})
+Config.define("game", "rock_band_events",      int, 1,  text = _("Rock Band MIDI Events"), options = {0: _("Off"), 1: _("By Theme"), 2: _("On")})
+Config.define("game", "show_unused_text_events",      bool, False,  text = _("Show Unused Events"), options = {False: _("No"), True: _("Yes")})
+Config.define("game", "bass_kick_sound",      bool, False,  text = _("Kick Bass Sound"), options = {False: _("Off"), True: _("On")})
+Config.define("game", "rb_midi_lyrics",           int,  1,   text = _("Show MIDI Lyrics"), options = {0: _("Off"), 1: _("1p Only"), 2: _("Auto")})
+Config.define("game", "rb_midi_sections",           int,  0,   text = _("Show MIDI Sections"), options = {0: _("Off"), 1: _("1p Only"), 2: _("Auto")})
 Config.define("game", "key_checker_mode",      int, 1,  text = _("Key Conflicts"), options = {0: _("No check"), 1: _("Notify"), 2: _("Enforce")})
-Config.define("performance", "in_game_stats",      int, 0,  text = _("In-Game Stats"), options = {0: _("Off"), 1: _("RB Only"), 2: _("On")})
-Config.define("game", "in_game_stars",      int, 1,  text = _("In-Game Stars"), options = {0: _("Off"), 1: _("RB Only"), 2: _("On")})
-Config.define("game", "partial_stars",      int, 1,  text = _("Partial Stars"), options = {0: _("Off"), 1: _("Auto")})
-Config.define("game", "hopo_debug_disp",      int, 0,  text = _("HOPO Debug"), options = {0: _("Off"), 1: _("On")})
-Config.define("game", "gsolo_accuracy_disp",      int, 1,  text = _("Solo Accuracy"), options = {0: _("Off"), 1: _("Percent"), 2: _("Detail")})
-Config.define("game", "decimal_places",      int, 1,  text = _("Decimal Places"), options = dict([(n, n) for n in range(0, 3)]))
-Config.define("game", "star_scoring",       int, 3,     text = _("Star Scoring"), options = {0: _("FoF"), 1: _("GH"), 2: _("RB"), 3: _("RB+GH")})#MFH
-Config.define("game", "gsolo_acc_pos",       int, 3,     text = _("GtrSolo Pos."), options = {0: _("Right"), 1: _("Center"), 2: _("Left"), 3: _("Rock Band")})#MFH,(racer: added RB)
-Config.define("game", "bass_groove_enable",       int, 1,     text = _("Bass Groove"), options = {0: _("Off"), 1: _("RB Only"), 2: _("On")}) #MFH
-Config.define("game", "T_sound",      int, 2,  text = _("Drum Misses"), options = {0: _("Always"), 1: _("Song Start"), 2: _("First Note")} ) #Faaa Drum sound
-Config.define("game", "game_time",       int, 1,     text = _("Game Time"), options = {0: _("Off"), 1: _("Countdown"), 2: _("Elapsed")}) #MFH
-Config.define("game", "gfx_version_tag",       int, 1,     text = _("GfxVersionTag"), options = {0: _("Off"), 1: _("On")}) #MFH
+Config.define("performance", "in_game_stats",      int, 0,  text = _("Show In-Game Stats"), options = {0: _("Off"), 1: _("By Theme"), 2: _("On")})
+Config.define("game", "in_game_stars",      int, 1,  text = _("Show Stars In-Game"), options = {0: _("Off"), 1: _("By Theme"), 2: _("On")})
+Config.define("game", "partial_stars",      int, 1,  text = _("Show Partial Stars"), options = {0: _("Off"), 1: _("Auto")})
+Config.define("game", "hopo_debug_disp",      int, 0,  text = _("HO/PO Debug"), options = {0: _("Off"), 1: _("On")})
+Config.define("game", "gsolo_accuracy_disp",      int, 1,  text = _("Show Solo Stats"), options = {0: _("Off"), 1: _("Percent"), 2: _("Detail")})
+Config.define("game", "decimal_places",      int, 1,  text = _("Stat Decimal Places"), options = dict([(n, n) for n in range(0, 3)]))
+Config.define("game", "star_scoring",       int, 3,     text = _("Star Scoring Style"), options = {0: _("FoF"), 1: _("GH"), 2: _("RB"), 3: _("RB+GH")})#MFH
+Config.define("game", "gsolo_acc_pos",       int, 3,     text = _("Solo Stat Positioning"), options = {0: _("Right"), 1: _("Center"), 2: _("Left"), 3: _("Rock Band")})#MFH,(racer: added RB)
+Config.define("game", "bass_groove_enable",       int, 1,     text = _("Bass Groove"), options = {0: _("Off"), 1: _("By Theme"), 2: _("By MIDI"), 3: _("On")}) #MFH
+Config.define("game", "T_sound",      int, 2,  text = _("Drum Miss Penalty"), options = {0: _("Always"), 1: _("Song Start"), 2: _("First Note")} ) #Faaa Drum sound
+Config.define("game", "game_time",       int, 1,     text = _("Time Display Format"), options = {0: _("Off"), 1: _("Countdown"), 2: _("Elapsed")}) #MFH
+Config.define("game", "gfx_version_tag",       int, 1,     text = _("Show Theme Version Tag"), options = {0: _("No"), 1: _("Yes")}) #MFH
 Config.define("game", "p2_menu_nav",       int, 1,     text = _("P2 Menu Navigate"), options = {0: _("Off"), 1: _("On")}) #MFH
 Config.define("game", "in_game_font_shadowing",      bool, False,  text = _("In-Game Font Shadow"), options = {False: _("Off"), True: _("On")})
-Config.define("audio", "mute_last_second",       int, 0,     text = _("Mute last second"), options = {0: _("No"), 1: _("Yes")}) #MFH
+Config.define("audio", "mute_last_second",       int, 0,     text = _("Mute Last Second"), options = {0: _("No"), 1: _("Yes")}) #MFH
 Config.define("game", "result_cheer_loop",       int, 2,     text = _("Results Cheer Loop"), options = {0: _("Off"), 1: _("Theme"), 2: _("Auto")}) #MFH
 Config.define("game",  "cheer_loop_delay",        int,   550,   text = _("Cheer Loop Delay"), options = dict([(n, n) for n in range(0, 10, 1)] + [(n, n) for n in range(10, 50, 10)] + [(n, n) for n in range(50, 2001, 50)]))
 Config.define("game", "miss_pauses_anim",       int, 1,     text = _("Miss Pauses Anim"), options = {0: _("Off"), 1: _("On")}) #MFH
-Config.define("game", "song_hopo_freq",       int, 1,     text = _("Song HOPO Freq"), options = {0: _("Off"), 1: _("Auto")}) #MFH
+Config.define("game", "song_hopo_freq",       int, 1,     text = _("Song HO/PO Freq"), options = {0: _("Off"), 1: _("Auto")}) #MFH
 #Config.define("game",   "mute_sustain_releases",          bool, False,  text = _("Mute sustain releases"), options = {False: _("No"), True: _("Yes")})
 Config.define("game",   "sustain_muting",          int, 1,    text = _("Sustain Muting"), options = {0: _("Off"), 1: _("Ultra Wide"), 2: _("Wide"), 3: _("Standard"), 4: _("Tight")})
-Config.define("game",   "solo_frame",          int, 1,    text = _("Solo Frame"), options = {0: _("Off"), 1: _("Auto")})
-Config.define("game",   "starpower_mode",          int, 2,    text = _("Starpower Mode"), options = {0: _("Off"), 1: _("FoF"), 2: _("Auto MIDI")})
+Config.define("game",   "solo_frame",          int, 1,    text = _("Show Solo Frame"), options = {0: _("Off"), 1: _("Auto")})
+Config.define("game",   "starpower_mode",          int, 2,    text = _("SP Mode"), options = {0: _("Off"), 1: _("FoF"), 2: _("Auto MIDI")})
 Config.define("game",   "font_rendering_mode",          int, 0,    text = _("Font Mode"), options = {0: _("oGL Hack"), 1: _("Lamina Screen"), 2: _("Lamina Frames")})
 Config.define("game",   "incoming_neck_mode",          int, 2,    text = _("Inc. Neck Mode"), options = {0: _("Off"), 1: _("Start Only"), 2: _("Start & End")})
-Config.define("game", "midi_lyric_mode",           int,  2,   text = _("MIDI Lyric Mode"), options = {0: _("Scrolling"), 1: _("Simple Lines"), 2: _("2-Line")})
-Config.define("game", "big_rock_endings",           int,  2,   text = _("Big Rock Endings"), options = {0: _("Off"), 1: _("RB Only"), 2: _("On")})
+Config.define("game", "midi_lyric_mode",           int,  2,   text = _("Lyric Display Mode"), options = {0: _("Scrolling"), 1: _("Simple Lines"), 2: _("2-Line")})
+Config.define("game", "big_rock_endings",           int,  2,   text = _("Big Rock Endings"), options = {0: _("Off"), 1: _("By Theme"), 2: _("On")})
 Config.define("game", "big_rock_logic",           int,  2,   text = _("Big Rock Logic"), options = {0: _("RB simplified"), 1: _("Alternative"), 2: _("RB original")}) #volshebnyi
 
 
 
 #MFH - debug settings
-Config.define("debug",   "use_unedited_midis",          int, 1,    text = _("notes-unedited.mid"), options = {0: _("Off"), 1: _("Auto")})
-Config.define("debug",   "show_freestyle_active",          int, 0,    text = _("Show fill status"), options = {0: _("Off"), 1: _("On")})
+Config.define("debug",   "use_unedited_midis",          int, 1,    text = _("Use (notes-unedited.mid)"), options = {0: _("Off"), 1: _("Auto")})
+Config.define("debug",   "show_freestyle_active",          int, 0,    text = _("Show Fill Status"), options = {0: _("Off"), 1: _("On")})
 
 
 Config.define("audio",  "slow_down_divisor",  int,    1,  text = _("Slowdown"),   options = {1: _("Full Speed"), 2: _("1/2 Speed"), 4: _("1/4 Speed")})  #MFH
 
-Config.define("audio",  "whammy_effect",  int,    0,  text = _("Whammy FX"),   options = {0: _("Killswitch"), 1: _("Pitchbend")})  #MFH
+Config.define("audio",  "whammy_effect",  int,    0,  text = _("Effects Mode"),   options = {0: _("Killswitch"), 1: _("Pitchbend")})  #MFH
 
 
 #MFH - log settings
@@ -240,42 +241,42 @@ Config.define("log",   "log_unedited_midis",          int, 0,    text = _("Log U
 
 
 #racer
-Config.define("game", "rbnote",      int,   0,   text = _("Rock Band Version"),    options = {0: _("Regular"), 1: _("Beta")}) #racer
+Config.define("game", "rbnote",      int,   0,   text = _("RB Graphic Mode"),    options = {0: _("Regular"), 1: _("Beta")}) #racer
 Config.define("game", "beat_claps",          bool, False,  text = _("Practice Beat Claps"), options = {False: _("Off"), True: _("On")}) #racer
 #Fixed invalid ini error finally!!!
 Config.define("game", "board_speed",      int,   0) #racer
-Config.define("game", "HSMovement",      int,   1,   text = _("Song Choosing Highscores"),    options = {0: _("Auto"), 1: _("Blue Fret (#4)")}) #racer
+Config.define("game", "HSMovement",      int,   1,   text = _("Change Score Display"),    options = {0: _("Auto"), 1: _("Blue Fret (#4)")}) #racer
 
 
 #blazingamer
 Config.define("game", "congrats",       bool, True,     text = _("Score SFX"),             options = {True: _("On"), False: _("Off")})#blazingamer
 Config.define("game", "starfx",       bool, True,     text = _("GH SP Lights"),             options = {True: _("On"), False: _("Off")})#blazingamer
-Config.define("game", "rbmfx",       bool, True,     text = _("RB Mult Grow"),             options = {True: _("On"), False: _("Off")})#blazingamer
-Config.define("game", "nstype",       int, 2,     text = _("Board Speed"),             options = {0: _("BPM"), 1: _("Difficulty"), 2: _("BPM & Diff"), 3: _("Percentage")})
+Config.define("game", "small_rb_mult",      int, 1,     text = _("RB Small 1x Multiplier"),             options = {0: _("Off"), 1: _("By Theme"), 2: _("On")})#blazingamer
+Config.define("game", "nstype",       int, 2,     text = _("Board Speed Mode"),             options = {0: _("BPM"), 1: _("Difficulty"), 2: _("BPM & Diff"), 3: _("Percentage")})
 Config.define("game", "lphrases",       bool, True,     text = _("Loading Phrases"),             options = {True: _("On"), False: _("Off")})
-Config.define("performance", "killfx",       int, 0,     text = _("Killswitch FX"),             options = {0: _("Static"), 1: _("Animated"), 2: _("Off")})
-Config.define("coffee", "songfilepath",       bool, True,     text = _("Library Filepath"),             options = {True: _("Show"), False: _("Hide")})
-Config.define("coffee", "noterotate",       bool, False,     text = _("Rotate 3D Notes"),             options = {True: _("1.1"), False: _("1.2")})
-Config.define("coffee", "phrases",       bool, True,     text = _("Phrases"),             options = {True: _("On"), False: _("Off")})
-Config.define("coffee", "song_display_mode",       int, 1,     text = _("Song List Display"),             options = {0: _("CDs"), 1: _("List"), 2: _("List/CD"), 3: _("RB2"), 4: _("Theme.ini")})
-Config.define("game", "song_listing_mode",        int, 0,     text = _("Song Listing Mode"),            options = {0: _("Normal"), 1: _("List All")})
-Config.define("game", "song_icons",          bool, True,     text = _("Display Song Type Icons"),     options = {True: _("Yes"), False: _("No")})
+Config.define("performance", "killfx",       int, 0,     text = _("Effects Display Mode"),             options = {0: _("Static"), 1: _("Animated"), 2: _("Off")})
+Config.define("coffee", "songfilepath",       bool, True,     text = _("Show Filepath"),             options = {True: _("Show"), False: _("Hide")})
+Config.define("coffee", "noterotate",       bool, False,     text = _("3D Note Rotation"),             options = {True: _("Old"), False: _("New")})
+Config.define("coffee", "game_phrases",       int, 2,     text = _("Show In-Game Text"),             options = {0: _("Never"), 1: _("Only Note Streaks"), 2: _("Always")})
+Config.define("coffee", "song_display_mode",       int, 1,     text = _("Setlist Display Mode"),             options = {0: _("CDs"), 1: _("List"), 2: _("List/CD"), 3: _("RB2"), 4: _("By Theme")})
+Config.define("game", "song_listing_mode",        int, 0,     text = _("Use Subfolders"),            options = {0: _("Normal"), 1: _("List All")})
+Config.define("game", "song_icons",          bool, True,     text = _("Show Song Type Icons"),     options = {True: _("Yes"), False: _("No")})
 Config.define("game", "preload_labels",          bool, False,     text = _("Preload Song Labels"),     options = {True: _("Yes"), False: _("No")})
-Config.define("game", "songcovertype",        bool, True,     text = _("Song Cover Type"),      options = {True: _("Cd Labels"), False: _("Album Covers")})
-Config.define("game", "songlistrotation",     bool, True,     text = _("Rotating Cds"),           options = {True: _("On"), False: _("Off")})
+Config.define("game", "songcovertype",        bool, True,     text = _("Label Type"),      options = {True: _("CD Labels"), False: _("Album Covers")})
+Config.define("game", "songlistrotation",     bool, True,     text = _("Rotating CDs"),           options = {True: _("On"), False: _("Off")})
 Config.define("game", "tut",       bool, False,     text = _("tut"),             options = {True: _("yes"), False: _("no")})
-Config.define("video", "counting",       bool, False,     text = _("Song Countdown"),             options = {True: _("Show Part"), False: _("Show Numbers")})
+Config.define("video", "counting",       bool, False,     text = _("Show at Song Start"),             options = {True: _("Part"), False: _("Countdown")})
 
 
 Config.define("game",   "hit_window",          int, 1,    text = _("Note Hit-window"), options = {0: _("1. Widest"), 1: _("2. Wide"), 2: _("3. Standard"), 3: _("4. Tight"), 4: _("5. Tightest")})#racer blazingamer
 Config.define("game",   "disable_vbpm",        bool,  False,  text = _("Disable Variable BPM"),  options = {False: _("No"), True: _("Yes")})
 Config.define("game",   "sort_direction",      int, 0,    text = _("Sort Direction"), options = {0: _("Ascending"), 1: _("Descending")})
-Config.define("game",   "sort_order",          int,   0,      text = _("Sort Order"), options = {0: _("Title"), 1: _("Artist"), 2: _("Times played"), 3: _("Album"), 4: _("Genre"), 5: _("Year"), 6: _("Band Difficulty"), 7: _("Song Collection")})
+Config.define("game",   "sort_order",          int,   0,      text = _("Sort Setlist By"), options = {0: _("Title"), 1: _("Artist"), 2: _("Times played"), 3: _("Album"), 4: _("Genre"), 5: _("Year"), 6: _("Band Difficulty"), 7: _("Song Collection")})
 Config.define("game",   "whammy_changes_sort_order", bool, True, text = _("Whammy Changes Sort Order"), options = {False: _("No"), True: _("Yes")})
 Config.define("fretboard",   "point_of_view",                 int,   5,      text = _("Point Of View"), options = {0: _("FoF"), 1: _("GH3"), 2: _("Rock Band"), 3: _("GH2"), 4: _("Rock Rev"), 5: _("Theme")}) #Racer, Blazingamer
 Config.define("game",   "party_time",          int,   30,     text = _("Party Mode Timer"), options = dict([(n, n) for n in range(1, 99)]))
-Config.define("performance",   "disable_libcount",    bool,  True,  text = _("Disable Library Count"),    options = {False: _("No"), True: _("Yes")})
-Config.define("performance",   "disable_librotation", bool,  True,  text = _("Disable Library Rotation"),    options = {False: _("No"), True: _("Yes")})
+Config.define("performance",   "disable_libcount",    bool,  True,  text = _("Keep Play Count"),    options = {False: _("Yes"), True: _("No")})
+Config.define("performance",   "disable_librotation", bool,  True,  text = _("CD Mode Y-Rotation"),    options = {False: _("Enabled"), True: _("Disabled")})
 
 #Spikehead777
 #Config.define("game",   "jurgdef",             bool,  False,  text = _("Enable Jurgen"),    options = {False: _("No"), True: _("Yes")})
@@ -336,15 +337,15 @@ Config.define("coffee", "themename",           str,   defaultTheme,      text = 
 
 
 
-Config.define("coffee", "neckSpeed",            int,  100,      text = _("Speed Percent"),        options = dict([(n, n) for n in range(10, 410, 10)]))
+Config.define("coffee", "neckSpeed",            int,  100,      text = _("Board Speed Percent"),        options = dict([(n, n) for n in range(10, 410, 10)]))
 Config.define("coffee", "failingEnabled",       bool, True,     text = _("No Fail"),             options = {True: _("Off"), False: _("On")})
 
 # evilynux - configurable default highscores difficulty display.
 # Index assigned following same standard as command line argument.
-Config.define("game", "songlist_difficulty", int, 0, text = _("Show Difficulty"), options = {0: "Expert", 1: "Hard", 2: "Medium", 3: "Easy"}  )
-Config.define("game", "songlist_extra_stats", bool, True, text = _("Display hit% and note streak"), options = {True: _("Yes"), False: _("No")} )
+Config.define("game", "songlist_difficulty", int, 0, text = _("Difficulty (Setlist Score)"), options = {0: "Expert", 1: "Hard", 2: "Medium", 3: "Easy"}  )
+Config.define("game", "songlist_extra_stats", bool, True, text = _("Show Additional Stats"), options = {True: _("Yes"), False: _("No")} )
 
-Config.define("game", "songlist_instrument", int, 0, text = _("Show Instrument"), options = {0: "Guitar", 1: "Rhythm Guitar", 2: "Bass Guitar", 3: "Lead Guitar", 4: "Drums"}  )  #MFH
+Config.define("game", "songlist_instrument", int, 0, text = _("Instrument (Setlist Score)"), options = {0: "Guitar", 1: "Rhythm Guitar", 2: "Bass Guitar", 3: "Lead Guitar", 4: "Drums"}  )  #MFH
 
 
 
@@ -440,6 +441,10 @@ class GameEngine(Engine):
     self.elapsedTime       = 0
     self.priority          = self.config.get("engine", "highpriority")
     self.show_fps          = self.config.get("video", "show_fps")
+    self.advSettings       = self.config.get("game", "adv_settings")
+    self.restartRequired   = False
+    self.quicksetRestart   = False
+    self.quicksetPerf      = self.config.get("quickset", "performance")
 
     Log.debug("Initializing audio.")
     frequency    = self.config.get("audio", "frequency")
@@ -586,61 +591,6 @@ class GameEngine(Engine):
     self.startupLayer       = None
     self.loadingScreenShown = False
     
-    #Fablaculp: Performance Autoset configures the options
-    autosetnum = self.config.get("performance","autoset")
-    
-    if autosetnum == 1:
-	    self.config.set("performance", "game_priority", 3)
-	    self.config.set("performance", "disable_libcount", True)
-	    self.config.set("performance", "disable_librotation", True)
-	    self.config.set("performance", "starspin", False)
-	    self.config.set("performance", "static_strings", True)
-	    self.config.set("performance", "killfx", 2)
-	    self.config.set("performance", "star_score_updates", 0)
-	    self.config.set("performance", "in_game_stats", 0)
-	    self.config.set("performance", "preload_glyph_cache", False)
-	    Log.debug("Performance Autoset is 1 (under normal).")
-	    
-    elif autosetnum == 2:
-	    self.config.set("performance", "game_priority", 3)
-	    self.config.set("performance", "disable_libcount", True)
-	    self.config.set("performance", "disable_librotation", True)
-	    self.config.set("performance", "starspin", False)
-	    self.config.set("performance", "static_strings", True)
-	    self.config.set("performance", "killfx", 2)
-	    self.config.set("performance", "star_score_updates", 0)
-	    self.config.set("performance", "in_game_stats", 0)
-	    self.config.set("performance", "preload_glyph_cache", True)
-	    Log.debug("Performance Autoset is 2 (Normal).")
-	    
-    elif autosetnum == 3:
-	    self.config.set("performance", "game_priority", 3)
-	    self.config.set("performance", "disable_libcount", False)
-	    self.config.set("performance", "disable_librotation", True)
-	    self.config.set("performance", "starspin", True)
-	    self.config.set("performance", "static_strings", True)
-	    self.config.set("performance", "killfx", 0)
-	    self.config.set("performance", "star_score_updates", 0)
-	    self.config.set("performance", "in_game_stats", 2)
-	    self.config.set("performance", "preload_glyph_cache", True)
-	    Log.debug("Performance Autoset is 3 (Above Normal).")
-	    
-    elif autosetnum == 4:
-	    self.config.set("performance", "game_priority", 3)
-	    self.config.set("performance", "disable_libcount", False)
-	    self.config.set("performance", "disable_librotation", False)
-	    self.config.set("performance", "starspin", True)
-	    self.config.set("performance", "static_strings", False)
-	    self.config.set("performance", "killfx", 1)
-	    self.config.set("performance", "star_score_updates", 1)
-	    self.config.set("performance", "in_game_stats", 2)
-	    self.config.set("performance", "preload_glyph_cache", True)
-	    Log.debug("Performance Autoset is 4 (Max).")
-	    
-    else:
-	    Log.debug("Performance Autoset is off.")
-
-#Fablaculp: End of Performance Autoset
     Log.debug("Ready.")
     
 

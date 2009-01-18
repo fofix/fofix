@@ -3913,7 +3913,7 @@ class NeckChooser(BackgroundLayer, KeyListener):
     self.engine.loadImgDrawing(self, "neckSelect", os.path.join("themes",self.themename,"menu","neckchooseselect.png"))
 
     neckChooseSettings = [
-      Settings.ConfigChoice(engine.config, "coffee",   self.neckSettingName, autoApply = True)
+      Settings.ConfigChoice(engine, engine.config, "coffee",   self.neckSettingName, autoApply = True)
     ]
     self.menu = Menu(self.engine, neckChooseSettings, pos = (12,12), onClose = self.close, onCancel = self.cancel)
 
