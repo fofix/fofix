@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-01-17 18:34-0800\n"
+"POT-Creation-Date: 2009-01-17 18:52-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1806,80 +1806,80 @@ msgstr ""
 msgid "%d points is a new high score! Enter your name"
 msgstr ""
 
-#: GameResultsScene.py:407
+#: GameResultsScene.py:413
 #, python-format
 msgid "%s High Scores for %s"
 msgstr ""
 
-#: GameResultsScene.py:409
+#: GameResultsScene.py:415
 #, python-format
 msgid "%s High Scores"
 msgstr ""
 
-#: GameResultsScene.py:415
+#: GameResultsScene.py:421
 #, python-format
 msgid "Difficulty: %s"
 msgstr ""
 
-#: GameResultsScene.py:478
+#: GameResultsScene.py:484
 msgid "Uploading Scores..."
 msgstr ""
 
-#: GameResultsScene.py:483
+#: GameResultsScene.py:489
 msgid "Scores uploaded!"
 msgstr ""
 
-#: GameResultsScene.py:488
+#: GameResultsScene.py:494
 msgid "your highscore ranks"
 msgstr ""
 
-#: GameResultsScene.py:489
+#: GameResultsScene.py:495
 msgid "on the world starpower chart!"
 msgstr ""
 
-#: GameResultsScene.py:492
+#: GameResultsScene.py:498
 msgid "unknown rank."
 msgstr ""
 
-#: GameResultsScene.py:495
+#: GameResultsScene.py:501
 msgid "no new highscore."
 msgstr ""
 
-#: GameResultsScene.py:499
+#: GameResultsScene.py:505
 msgid "Score upload failed!  World charts may be down."
-msgstr ""
-
-#: GameResultsScene.py:510
-#, python-format
-msgid "%s Cheated!"
-msgstr ""
-
-#: GameResultsScene.py:512
-#, python-format
-msgid "%s Finished!"
 msgstr ""
 
 #: GameResultsScene.py:516
 #, python-format
+msgid "%s Cheated!"
+msgstr ""
+
+#: GameResultsScene.py:518
+#, python-format
+msgid "%s Finished!"
+msgstr ""
+
+#: GameResultsScene.py:522
+#, python-format
 msgid "%d notes hit"
 msgstr ""
 
-#: GameResultsScene.py:557
+#: GameResultsScene.py:563
 #, python-format
 msgid "Accuracy: %.1f%%"
 msgstr ""
 
-#: GameResultsScene.py:560
+#: GameResultsScene.py:566
 #, python-format
 msgid "Longest note streak: %d"
 msgstr ""
 
-#: GameResultsScene.py:564
+#: GameResultsScene.py:570
 #, python-format
 msgid "Part: %s on %s (2 chord)"
 msgstr ""
 
-#: GameResultsScene.py:566
+#: GameResultsScene.py:572
 #, python-format
 msgid "Part: %s on %s"
 msgstr ""
@@ -1928,15 +1928,15 @@ msgstr ""
 msgid "% Complete"
 msgstr ""
 
-#: GuitarScene.py:338 GuitarScene.py:8044
+#: GuitarScene.py:338 GuitarScene.py:8046
 msgid "HOPO"
 msgstr ""
 
-#: GuitarScene.py:339 GuitarScene.py:8014 GuitarScene.py:8023
+#: GuitarScene.py:339 GuitarScene.py:8016 GuitarScene.py:8025
 msgid "COMPLETED"
 msgstr ""
 
-#: GuitarScene.py:340 GuitarScene.py:8016 GuitarScene.py:8032
+#: GuitarScene.py:340 GuitarScene.py:8018 GuitarScene.py:8034
 msgid " % ON "
 msgstr ""
 
@@ -2192,7 +2192,7 @@ msgstr ""
 msgid " QUIT"
 msgstr ""
 
-#: GuitarScene.py:8551
+#: GuitarScene.py:8577
 #, python-format
 msgid "FPS: %.2f"
 msgstr ""

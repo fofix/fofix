@@ -2610,6 +2610,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         for tym, theNote in missedNotes:   #MFH - also want to mark these notes as Played so they don't count against the note total!
           theNote.played = True
           self.playerList[num].totalStreakNotes -= 1
+          
         
       else:
         if guitar.isDrum:
@@ -2994,10 +2995,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               if thePlayer.endingScore > 0:
                 #thePlayer.score += thePlayer.endingScore
                 thePlayer.addEndingScore()
-                thePlayer.endingScore = 0
+                #thePlayer.endingScore = 0
                 self.engine.data.starActivateSound.play()
               thePlayer.endingAwarded = True
-              thePlayer.freestyleWasJustActive = False
+              #thePlayer.freestyleWasJustActive = False
+
 
 
 
@@ -8470,6 +8472,30 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   self.soloFrame.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
                   self.soloFrame.draw()
                 self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
+              
+              elif self.playerList[i].freestyleWasJustActive and not self.playerList[i].endingStreakBroken and self.playerList[i].endingAwarded:
+                #MFH - TODO - ending bonus was awarded - scale up obtained score & box to signify rockage
+                text = "%s" % self.playerList[i].endingScore
+                if self.theme == 2:
+                  text = text.replace("0","O")
+                tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
+                yOffset = 0.215
+                xOffset = 0.500
+                
+                if self.soloFrame:
+                  frameWidth = tW*1.15
+                  frameHeight = tH*1.07
+                  boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
+                  self.soloFrame.transform.reset()
+                  tempWScale = frameWidth*self.soloFrameWFactor
+                  tempHScale = -(frameHeight)*self.soloFrameWFactor
+                  self.soloFrame.transform.scale(tempWScale,tempHScale)
+                  self.soloFrame.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
+                  self.soloFrame.draw()
+                self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
+
+
+                
               
               
               #MFH - only use the TK_GUITAR_SOLOS track if at least one player has no MIDI solos marked:

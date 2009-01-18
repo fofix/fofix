@@ -213,10 +213,12 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
               player.name = name
 
             #myfingershurt: don't separate chords for drum part totals:
-            if player.part.text == "Drums":
-              notesTotal = len([1 for time, event in self.song.track[i].getAllEvents() if isinstance(event, Song.Note)])
-            else:
-              notesTotal = len(set(time for time, event in self.song.track[i].getAllEvents() if isinstance(event, Song.Note)))
+            #if player.part.text == "Drums":
+            #  notesTotal = len([1 for time, event in self.song.track[i].getAllEvents() if isinstance(event, Song.Note)])
+            #else:
+            #  notesTotal = len(set(time for time, event in self.song.track[i].getAllEvents() if isinstance(event, Song.Note)))
+            notesTotal = player.totalStreakNotes
+            
               
             modOptions1 = self.engine.config.getModOptions1(player.twoChord, 0)
             modOptions2 = self.engine.config.getModOptions2()
@@ -282,10 +284,14 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         #self.stars[i]    = int(5.0   * (f + .05))
         self.stars[i] = player.stars
         self.accuracy[i] = 100.0 * f
-        self.hits = player.notesHit + int( player.freestyleSkippedNotes * f )
-        self.totalnotes = notes + player.freestyleSkippedNotes
-        player.totalStreakNotes = self.totalnotes
-        player.notesHit = self.hits
+        #self.hits = player.notesHit + int( player.freestyleSkippedNotes * f )
+        #self.totalnotes = notes + player.freestyleSkippedNotes
+        
+        #player.totalStreakNotes = self.totalnotes
+        self.totalnotes = player.totalStreakNotes
+        #player.notesHit = self.hits
+        self.hits = player.notesHit
+        
         self.accuracy[i] = 100.0 * self.hits / self.totalnotes
         
         taunt = None
