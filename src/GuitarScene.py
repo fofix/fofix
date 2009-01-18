@@ -8472,7 +8472,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 text = "End Bonus"
                 yOffset = 0.110
                 xOffset = 0.500
-                tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
+                tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize/2.0)
 
                 if self.breScoreFrame:
                   frameWidth = tW*1.15
@@ -8484,14 +8484,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   self.breScoreFrame.transform.scale(tempWScale,tempHScale)
                   self.breScoreFrame.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
                   self.breScoreFrame.draw()
-                self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
+                self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize/2.0)
 
 
                 text = "%s" % self.playerList[i].endingScore
                 if self.theme == 2:
                   text = text.replace("0","O")
                 tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
-                yOffset = 0.185
+                yOffset = 0.175
                 xOffset = 0.500
                 
 
@@ -8525,7 +8525,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 text = "Success!"
                 yOffset = 0.110
                 xOffset = 0.500
-                tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
+                tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize/2.0)
 
                 if self.breScoreFrame:
                   frameWidth = tW*1.15
@@ -8537,14 +8537,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   self.breScoreFrame.transform.scale(tempWScale,tempHScale)
                   self.breScoreFrame.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
                   self.breScoreFrame.draw()
-                self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
+                self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize/2.0)
 
 
                 text = "%s" % self.playerList[i].endingScore
                 if self.theme == 2:
                   text = text.replace("0","O")
                 tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
-                yOffset = 0.185
+                yOffset = 0.175
                 xOffset = 0.500
                 
 
