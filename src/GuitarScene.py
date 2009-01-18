@@ -5208,8 +5208,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.hitAccuracy[self.coOpPlayerIndex] = (float(self.coOpNotesHit) / float(self.coOpTotalStreakNotes) ) * 100.0
         self.avMult[self.coOpPlayerIndex] = self.coOpScore/(self.coOpTotalNotes*50.0)
       else:
-        if self.playerList[playerNum].freestyleSkippedNotes > 0:
-        	self.hitAccuracy[playerNum] = ( float(self.playerList[playerNum].notesHit) / float(self.playerList[playerNum].totalStreakNotes) ) * 100.0
+        #if self.playerList[playerNum].freestyleSkippedNotes > 0:
+        self.hitAccuracy[playerNum] = ( float(self.playerList[playerNum].notesHit) / float(self.playerList[playerNum].totalStreakNotes) ) * 100.0
         self.avMult[playerNum] = self.playerList[playerNum].score/(self.playerList[playerNum].totalNotes*50.0)
 
 
