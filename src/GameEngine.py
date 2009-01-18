@@ -56,25 +56,36 @@ import Version
 import Mod
 
 
-#------------------
-#MFH - the following SVN revision retrieval code is copied from john.stumpo's pitchbend source - handy!
-import svntag
+# stump: if we've been py2exe'd, read our version string from the exe.
+if hasattr(sys, 'frozen') and sys.frozen == 'windows_exe':
+  import win32api
+  us = os.path.abspath(unicode(sys.executable, sys.getfilesystemencoding()))
+  version = "FoFiX v" + win32api.GetFileVersionInfo(us, r'\StringFileInfo\%04x%04x\ProductVersion' % win32api.GetFileVersionInfo(us, r'\VarFileInfo\Translation')[0])
+else:
+  #------------------
+  #MFH - the following SVN revision retrieval code is copied from john.stumpo's pitchbend source - handy!
+  import svntag
 
-#__version__ = '$Id: GameEngine.py 5 2009-01-01 05:00:35Z stump $'
+  #__version__ = '$Id: GameEngine.py 5 2009-01-01 05:00:35Z stump $'
 
-try:
-  #version = 'svn_rev%d' % \
-  #  int(svntag.get_svn_info(os.path.dirname(__file__))['revnum'])
-  version = " alpha (r" + str( int(svntag.get_svn_info(os.path.dirname(__file__))['revnum']) ) + ")"
-  
-  #open(os.path.join(os.path.dirname(__file__), 'VERSION'),
-  #  'w').write(version+'\n')
-except Exception, e:
-#  version = open(os.path.join(os.path.dirname(__file__),
-#    'VERSION')).read().strip()
-  #version = str(e)
-  version = ""
-#------------------
+  try:
+    #version = 'svn_rev%d' % \
+    #  int(svntag.get_svn_info(os.path.dirname(__file__))['revnum'])
+    version = " alpha (r" + str( int(svntag.get_svn_info(os.path.dirname(__file__))['revnum']) ) + ")"
+
+    #open(os.path.join(os.path.dirname(__file__), 'VERSION'),
+    #  'w').write(version+'\n')
+  except Exception, e:
+  #  version = open(os.path.join(os.path.dirname(__file__),
+  #    'VERSION')).read().strip()
+    #version = str(e)
+    version = " beta 2"     #MFH - beta taggin'
+  #------------------
+
+  #stump: move this here to let it be retrieved without instantiating a GameEngine.
+  # This is needed so it can be embedded into generated exes.
+  # If the format of the version string (except for suffixes) changes, be sure to edit setup_exe.py too.
+  version = "FoFiX v3.100" + version
 
 
 
@@ -405,10 +416,7 @@ class GameEngine(Engine):
     
     self.createdGuitarScene = False   #MFH - so we only create ONE guitarscene...!
     
-    global version
-    if version == "":   version = " beta 2"     #MFH - beta taggin'
-
-    self.versionString = "FoFiX v3.100" + version
+    self.versionString = version  #stump: other version stuff moved to allow full version string to be retrieved without instantiating GameEngine
 
     Log.debug(self.versionString + " starting up...")
     Log.debug("pygame version: " + str(pygame.version.ver) )

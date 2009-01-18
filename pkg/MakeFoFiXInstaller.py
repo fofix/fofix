@@ -23,15 +23,25 @@
 
 __version__ = '$Id$'
 
-# FOFIX_VERSION *must* be in the form [number].[number]!
-# FOFIX_VERSION_SUFFIX does not have this restriction.
-FOFIX_VERSION = '3.100'
-FOFIX_VERSION_SUFFIX = ' beta 2'
+import os
+if os.name != 'nt':
+  sys.stderr.write('This script only works on Windows.\n')
+  sys.exit(1)
 
 import ListToNSIS
 import _winreg
-import os
+import sys
 import shutil
+import win32api
+
+us = r'..\FretsOnFire.exe'
+if not os.path.isfile(us):
+  sys.stderr.write("There's no FretsOnFire.exe - did you compile yet?\n")
+  sys.exit(1)
+vdict = win32api.GetFileVersionInfo(us, '\\')
+# Unfortunately we need to do some bit-twiddling to retrieve the main version number.
+FOFIX_VERSION = '%d.%d.%d.%d' % (vdict['FileVersionMS'] >> 16, vdict['FileVersionMS'] & 0xffff, vdict['FileVersionLS'] >> 16, vdict['FileVersionLS'] & 0xffff)
+FOFIX_VERSION_FULL = str(win32api.GetFileVersionInfo(us, r'\StringFileInfo\%04x%04x\ProductVersion' % win32api.GetFileVersionInfo(us, r'\VarFileInfo\Translation')[0]))
 
 MLDist = ListToNSIS.NsisScriptGenerator('..')
 MLDist.readList('Dist-MegaLight-AllTutorials.lst')
@@ -40,20 +50,24 @@ MLDist.readExcludeList('filesToExclude.lst')
 os.chdir('..')
 
 # Find NSIS.
-key = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, r'Software\NSIS')
-nsisPath = _winreg.QueryValueEx(key, '')[0]
-_winreg.CloseKey(key)
+try:
+  key = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, r'Software\NSIS')
+  nsisPath = _winreg.QueryValueEx(key, '')[0]
+  _winreg.CloseKey(key)
+except WindowsError:
+  sys.stderr.write("Looks like you don't have NSIS - get it at http://nsis.sourceforge.net/\n")
+  sys.exit(1)
 makensis = os.path.join(nsisPath, 'makensis.exe')
 
 # Generate the script.
 builder = ListToNSIS.NsisScriptBuilder(r"""
 !define FOFIX_VERSION %s
-!define FOFIX_VERSION_SUFFIX "%s"
+!define FOFIX_VERSION_FULL "%s"
 !include "MUI2.nsh"
 
 # Installer title and filename.
-Name 'FoFiX ${FOFIX_VERSION}${FOFIX_VERSION_SUFFIX}'
-OutFile 'pkg\FoFiX ${FOFIX_VERSION}${FOFIX_VERSION_SUFFIX} Setup.exe'
+Name 'FoFiX v${FOFIX_VERSION_FULL}'
+OutFile 'pkg\FoFiX v${FOFIX_VERSION_FULL} Setup.exe'
 
 # Installer parameters.
 SetCompressor /SOLID lzma
@@ -72,6 +86,10 @@ InstallDirRegKey HKCU 'SOFTWARE\myfingershurt\FoFiX' InstallRoot
 !define MUI_FINISHPAGE_NOAUTOCLOSE
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
 !define MUI_LICENSEPAGE_RADIOBUTTONS
+!define MUI_HEADERIMAGE
+# gfx pending
+#!define MUI_HEADERIMAGE_BITMAP "pkg\installer_gfx\header.bmp"
+#!define MUI_HEADERIMAGE_UNBITMAP "pkg\installer_gfx\header.bmp"
 
 # The pages of the installer...
 !insertmacro MUI_PAGE_WELCOME
@@ -87,20 +105,33 @@ InstallDirRegKey HKCU 'SOFTWARE\myfingershurt\FoFiX' InstallRoot
 !insertmacro MUI_UNPAGE_INSTFILES
 !insertmacro MUI_UNPAGE_FINISH
 
+# Throw in a cool background image.
+# gfx pending
+#!define MUI_CUSTOMFUNCTION_GUIINIT startBackground
+#Function startBackground
+#  InitPluginsDir
+#  File /oname=$PLUGINSDIR\background.bmp pkg\installer_gfx\background.bmp
+#  BgImage::SetBG /NOUNLOAD /FILLSCREEN $PLUGINSDIR\background.bmp
+#  BgImage::Redraw /NOUNLOAD
+#FunctionEnd
+#Function .onGUIEnd
+#  BgImage::Destroy
+#FunctionEnd
+
 !insertmacro MUI_LANGUAGE "English"
 
 # Add version info to the resulting installers.
 # I know py2exe has some sort of options that can let FretsOnFire.exe have version info too...
-VIProductVersion "${FOFIX_VERSION}.0.0"
+VIProductVersion "${FOFIX_VERSION}"
 VIAddVersionKey /LANG=1033 "CompanyName" "FoFiX Team"
 VIAddVersionKey /LANG=1033 "FileDescription" "FoFiX Setup"
-VIAddVersionKey /LANG=1033 "FileVersion" "${FOFIX_VERSION}${FOFIX_VERSION_SUFFIX}"
-VIAddVersionKey /LANG=1033 "InternalName" "FoFiX ${FOFIX_VERSION}${FOFIX_VERSION_SUFFIX} Setup.exe"
+VIAddVersionKey /LANG=1033 "FileVersion" "${FOFIX_VERSION_FULL}"
+VIAddVersionKey /LANG=1033 "InternalName" "FoFiX v${FOFIX_VERSION_FULL} Setup.exe"
 VIAddVersionKey /LANG=1033 "LegalCopyright" "© 2008-2009 FoFiX Team.  GNU GPL v2 or later."
-VIAddVersionKey /LANG=1033 "OriginalFilename" "FoFiX ${FOFIX_VERSION}${FOFIX_VERSION_SUFFIX} Setup.exe"
+VIAddVersionKey /LANG=1033 "OriginalFilename" "FoFiX v${FOFIX_VERSION_FULL} Setup.exe"
 VIAddVersionKey /LANG=1033 "ProductName" "FoFiX"
-VIAddVersionKey /LANG=1033 "ProductVersion" "${FOFIX_VERSION}${FOFIX_VERSION_SUFFIX}"
-""" % (FOFIX_VERSION, FOFIX_VERSION_SUFFIX))
+VIAddVersionKey /LANG=1033 "ProductVersion" "${FOFIX_VERSION_FULL}"
+""" % (FOFIX_VERSION, FOFIX_VERSION_FULL))
 
 builder.addSection('FoFiX Core', r'''
 SectionIn RO
@@ -109,10 +140,12 @@ WriteRegStr HKCU "SOFTWARE\myfingershurt\FoFiX" InstallRoot $INSTDIR
 WriteUninstaller uninst.exe
 CreateDirectory "$SMPROGRAMS\FoFiX"
 CreateShortcut "$SMPROGRAMS\FoFiX\FoFiX.lnk" "$INSTDIR\FretsOnFire.exe"
+CreateShortcut "$SMPROGRAMS\FoFiX\FoFiX Installation Folder.lnk" "$INSTDIR"
 CreateShortcut "$SMPROGRAMS\FoFiX\Uninstall FoFiX.lnk" "$INSTDIR\uninst.exe"
 ''' % MLDist.getInstallScript(), r'''
 %s
 Delete "$SMPROGRAMS\FoFiX\FoFiX.lnk"
+Delete "$SMPROGRAMS\FoFiX\FoFiX Installation Folder.lnk"
 Delete "$SMPROGRAMS\FoFiX\Uninstall FoFiX.lnk"
 RmDir "$SMPROGRAMS\FoFiX"
 Delete "$INSTDIR\uninst.exe"
@@ -132,6 +165,13 @@ builder.filterSection('Stock Necks', r'data\necks\Neck_', 'Installs all stock gu
 builder.filterSection('Source Code', 'src', 'Installs the FoFiX source code.', secStart='Section /o')
 builder.filterSection('Wiki Pages', 'FoFiX-wiki', 'Installs the FoFiX wiki pages.', secStart='Section /o')
 
+# Unfortunately the installer graphics can only be BMPs, which are enormous.
+# Make them now out of PNGs that we'll do the real work with.
+# gfx pending
+#from PIL import Image
+#bkgd = Image.open(os.path.join('pkg', 'installer_gfx', 'background.png'))
+#bkgd.convert('RGB').save(os.path.join('pkg', 'installer_gfx', 'background.bmp'))
+
 # Generate and compile the NSIS script.
 open('Setup.nsi', 'w').write(builder.getScript())
 if os.path.isfile('fretsonfire.ini'):
@@ -142,3 +182,6 @@ os.unlink('fretsonfire.ini')
 if os.path.isfile('fretsonfire.bak'):
   os.rename('fretsonfire.bak', 'fretsonfire.ini')
 os.unlink('Setup.nsi')
+
+# gfx pending
+#os.unlink(os.path.join('pkg', 'installer_gfx', 'background.bmp'))
