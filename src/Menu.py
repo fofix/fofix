@@ -316,7 +316,7 @@ class Menu(Layer, KeyListener):
         
         v *= 2
         if self.theme == 1 and self.font == self.engine.data.pauseFont: # evilynux - Ugly workaround for Gh3
-          y += h*.75
+          y += h*.65
         else:
           y += h
         glPopMatrix()
