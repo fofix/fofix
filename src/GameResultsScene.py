@@ -219,7 +219,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
             #  notesTotal = len(set(time for time, event in self.song.track[i].getAllEvents() if isinstance(event, Song.Note)))
             notesTotal = player.totalStreakNotes
             
-              
+            
             modOptions1 = self.engine.config.getModOptions1(player.twoChord, 0)
             modOptions2 = self.engine.config.getModOptions2()
             scoreExt = (player.notesHit, notesTotal, player.longestStreak, Version.branchVersion(), modOptions1, modOptions2)

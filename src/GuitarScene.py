@@ -1002,6 +1002,27 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       imgwidth = self.lyricSheet.width1()
       self.lyricSheetScaleFactor = 640.000/imgwidth
       
+
+    #brescorebackground.png
+    try:
+      self.engine.loadImgDrawing(self, "breScoreBackground", os.path.join("themes",themename,"brescorebackground.png"))
+      breScoreBackgroundImgwidth = self.breScoreBackground.width1()
+      self.breScoreBackgroundWFactor = 640.000/breScoreBackgroundImgwidth
+    except IOError:
+      Log.debug("BRE score background image loading problem!")
+      self.breScoreBackground = None
+      self.breScoreBackgroundWFactor = None
+
+    #brescoreframe.png
+    try:
+      self.engine.loadImgDrawing(self, "breScoreFrame", os.path.join("themes",themename,"brescoreframe.png"))
+      breScoreFrameImgwidth = self.breScoreFrame.width1()
+      self.breScoreFrameWFactor = 640.000/breScoreFrameImgwidth
+    except IOError:
+      self.breScoreFrame = None
+      self.breScoreFrameWFactor = None
+
+
     
     try:
       self.engine.loadImgDrawing(self, "soloFrame", os.path.join("themes",themename,"soloframe.png"))
@@ -8445,12 +8466,24 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             if (not self.pause and not self.failed and not self.ending):
 
               #MFH - show BRE temp score frame
-              if self.guitars[i].freestyleActive or (self.playerList[i].freestyleWasJustActive and not self.playerList[i].endingStreakBroken):
+              if self.guitars[i].freestyleActive or (self.playerList[i].freestyleWasJustActive and not self.playerList[i].endingStreakBroken and not self.playerList[i].endingAwarded):
+                #to render BEFORE the bonus is awarded.
 
                 text = "End Bonus"
-                yOffset = 0.160
+                yOffset = 0.110
                 xOffset = 0.500
                 tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
+
+                if self.breScoreFrame:
+                  frameWidth = tW*1.15
+                  frameHeight = tH*1.07
+                  boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
+                  self.breScoreFrame.transform.reset()
+                  tempWScale = frameWidth*self.breScoreFrameWFactor
+                  tempHScale = -(frameHeight)*self.breScoreFrameWFactor
+                  self.breScoreFrame.transform.scale(tempWScale,tempHScale)
+                  self.breScoreFrame.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
+                  self.breScoreFrame.draw()
                 self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
 
 
@@ -8458,40 +8491,85 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 if self.theme == 2:
                   text = text.replace("0","O")
                 tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
-                yOffset = 0.215
+                yOffset = 0.185
                 xOffset = 0.500
                 
-                if self.soloFrame:
+
+                if self.breScoreBackground:
+                  #frameWidth = tW*3.0
+                  frameHeight = tH*4.0
+                  frameWidth = frameHeight
+                  boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
+                  self.breScoreBackground.transform.reset()
+                  tempWScale = frameWidth*self.breScoreBackgroundWFactor
+                  tempHScale = -(frameHeight)*self.breScoreBackgroundWFactor
+                  self.breScoreBackground.transform.scale(tempWScale,tempHScale)
+                  self.breScoreBackground.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
+                  self.breScoreBackground.draw()
+
+                if self.breScoreFrame:
                   frameWidth = tW*1.15
                   frameHeight = tH*1.07
                   boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
-                  self.soloFrame.transform.reset()
-                  tempWScale = frameWidth*self.soloFrameWFactor
-                  tempHScale = -(frameHeight)*self.soloFrameWFactor
-                  self.soloFrame.transform.scale(tempWScale,tempHScale)
-                  self.soloFrame.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
-                  self.soloFrame.draw()
+                  self.breScoreFrame.transform.reset()
+                  tempWScale = frameWidth*self.breScoreFrameWFactor
+                  tempHScale = -(frameHeight)*self.breScoreFrameWFactor
+                  self.breScoreFrame.transform.scale(tempWScale,tempHScale)
+                  self.breScoreFrame.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
+                  self.breScoreFrame.draw()
                 self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
               
               elif self.playerList[i].freestyleWasJustActive and not self.playerList[i].endingStreakBroken and self.playerList[i].endingAwarded:
                 #MFH - TODO - ending bonus was awarded - scale up obtained score & box to signify rockage
+
+                text = "Success!"
+                yOffset = 0.110
+                xOffset = 0.500
+                tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
+
+                if self.breScoreFrame:
+                  frameWidth = tW*1.15
+                  frameHeight = tH*1.07
+                  boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
+                  self.breScoreFrame.transform.reset()
+                  tempWScale = frameWidth*self.breScoreFrameWFactor
+                  tempHScale = -(frameHeight)*self.breScoreFrameWFactor
+                  self.breScoreFrame.transform.scale(tempWScale,tempHScale)
+                  self.breScoreFrame.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
+                  self.breScoreFrame.draw()
+                self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
+
+
                 text = "%s" % self.playerList[i].endingScore
                 if self.theme == 2:
                   text = text.replace("0","O")
                 tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
-                yOffset = 0.215
+                yOffset = 0.185
                 xOffset = 0.500
                 
-                if self.soloFrame:
+
+                if self.breScoreBackground:
+                  #frameWidth = tW*3.0
+                  frameHeight = tH*4.0
+                  frameWidth = frameHeight
+                  boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
+                  self.breScoreBackground.transform.reset()
+                  tempWScale = frameWidth*self.breScoreBackgroundWFactor
+                  tempHScale = -(frameHeight)*self.breScoreBackgroundWFactor
+                  self.breScoreBackground.transform.scale(tempWScale,tempHScale)
+                  self.breScoreBackground.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
+                  self.breScoreBackground.draw()
+
+                if self.breScoreFrame:
                   frameWidth = tW*1.15
                   frameHeight = tH*1.07
                   boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
-                  self.soloFrame.transform.reset()
-                  tempWScale = frameWidth*self.soloFrameWFactor
-                  tempHScale = -(frameHeight)*self.soloFrameWFactor
-                  self.soloFrame.transform.scale(tempWScale,tempHScale)
-                  self.soloFrame.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
-                  self.soloFrame.draw()
+                  self.breScoreFrame.transform.reset()
+                  tempWScale = frameWidth*self.breScoreFrameWFactor
+                  tempHScale = -(frameHeight)*self.breScoreFrameWFactor
+                  self.breScoreFrame.transform.scale(tempWScale,tempHScale)
+                  self.breScoreFrame.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
+                  self.breScoreFrame.draw()
                 self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
 
 

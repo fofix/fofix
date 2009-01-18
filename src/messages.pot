@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-01-17 18:52-0800\n"
+"POT-Creation-Date: 2009-01-17 19:35-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1928,15 +1928,15 @@ msgstr ""
 msgid "% Complete"
 msgstr ""
 
-#: GuitarScene.py:338 GuitarScene.py:8046
+#: GuitarScene.py:338 GuitarScene.py:8067
 msgid "HOPO"
 msgstr ""
 
-#: GuitarScene.py:339 GuitarScene.py:8016 GuitarScene.py:8025
+#: GuitarScene.py:339 GuitarScene.py:8037 GuitarScene.py:8046
 msgid "COMPLETED"
 msgstr ""
 
-#: GuitarScene.py:340 GuitarScene.py:8018 GuitarScene.py:8034
+#: GuitarScene.py:340 GuitarScene.py:8039 GuitarScene.py:8055
 msgid " % ON "
 msgstr ""
 
@@ -2044,155 +2044,155 @@ msgstr ""
 msgid " fretted by "
 msgstr ""
 
-#: GuitarScene.py:1526
+#: GuitarScene.py:1547
 msgid "         RESUME"
 msgstr ""
 
-#: GuitarScene.py:1527
+#: GuitarScene.py:1548
 msgid "        RESTART"
 msgstr ""
 
-#: GuitarScene.py:1529
+#: GuitarScene.py:1550
 msgid "      PRACTICE"
 msgstr ""
 
-#: GuitarScene.py:1530
+#: GuitarScene.py:1551
 msgid "      OPTIONS"
 msgstr ""
 
-#: GuitarScene.py:1531
+#: GuitarScene.py:1552
 msgid "        QUIT"
 msgstr ""
 
-#: GuitarScene.py:1535
+#: GuitarScene.py:1556
 msgid "        RESUME"
 msgstr ""
 
-#: GuitarScene.py:1536
+#: GuitarScene.py:1557
 msgid "       RESTART"
 msgstr ""
 
-#: GuitarScene.py:1537
+#: GuitarScene.py:1558
 msgid "        GIVE UP"
 msgstr ""
 
-#: GuitarScene.py:1538
+#: GuitarScene.py:1559
 msgid "      END SONG"
 msgstr ""
 
-#: GuitarScene.py:1539
+#: GuitarScene.py:1560
 msgid "       OPTIONS"
 msgstr ""
 
-#: GuitarScene.py:1540
+#: GuitarScene.py:1561
 msgid "           QUIT"
 msgstr ""
 
-#: GuitarScene.py:1545 GuitarScene.py:1552
+#: GuitarScene.py:1566 GuitarScene.py:1573
 msgid "RETRY SONG"
 msgstr ""
 
-#: GuitarScene.py:1546
+#: GuitarScene.py:1567
 msgid "  PRACTICE"
 msgstr ""
 
-#: GuitarScene.py:1547 GuitarScene.py:1553
+#: GuitarScene.py:1568 GuitarScene.py:1574
 msgid " NEW SONG"
 msgstr ""
 
-#: GuitarScene.py:1548 GuitarScene.py:1554
+#: GuitarScene.py:1569 GuitarScene.py:1575
 msgid "     QUIT"
 msgstr ""
 
-#: GuitarScene.py:1561 GuitarScene.py:1570
+#: GuitarScene.py:1582 GuitarScene.py:1591
 msgid "  Resume"
 msgstr ""
 
-#: GuitarScene.py:1562 GuitarScene.py:1571
+#: GuitarScene.py:1583 GuitarScene.py:1592
 msgid "  Start Over"
 msgstr ""
 
-#: GuitarScene.py:1563 GuitarScene.py:1572
+#: GuitarScene.py:1584 GuitarScene.py:1593
 msgid "  Change Song"
 msgstr ""
 
-#: GuitarScene.py:1564
+#: GuitarScene.py:1585
 msgid "  Practice"
 msgstr ""
 
-#: GuitarScene.py:1565 GuitarScene.py:1574
+#: GuitarScene.py:1586 GuitarScene.py:1595
 msgid "  Settings"
 msgstr ""
 
-#: GuitarScene.py:1566 GuitarScene.py:1575
+#: GuitarScene.py:1587 GuitarScene.py:1596
 msgid "  Quit to Main Menu"
 msgstr ""
 
-#: GuitarScene.py:1573
+#: GuitarScene.py:1594
 msgid "  End Song"
 msgstr ""
 
-#: GuitarScene.py:1580 GuitarScene.py:1587
+#: GuitarScene.py:1601 GuitarScene.py:1608
 msgid " Try Again?"
 msgstr ""
 
-#: GuitarScene.py:1581 GuitarScene.py:1588
+#: GuitarScene.py:1602 GuitarScene.py:1609
 msgid "  Give Up?"
 msgstr ""
 
-#: GuitarScene.py:1582
+#: GuitarScene.py:1603
 msgid "  Practice?"
 msgstr ""
 
-#: GuitarScene.py:1583 GuitarScene.py:1589
+#: GuitarScene.py:1604 GuitarScene.py:1610
 msgid "Quit to Main"
 msgstr ""
 
-#: GuitarScene.py:1597 GuitarScene.py:1606
+#: GuitarScene.py:1618 GuitarScene.py:1627
 msgid "   RESUME"
 msgstr ""
 
-#: GuitarScene.py:1598 GuitarScene.py:1607
+#: GuitarScene.py:1619 GuitarScene.py:1628
 msgid "   RESTART"
 msgstr ""
 
-#: GuitarScene.py:1599 GuitarScene.py:1608
+#: GuitarScene.py:1620 GuitarScene.py:1629
 msgid "   CHANGE SONG"
 msgstr ""
 
-#: GuitarScene.py:1600
+#: GuitarScene.py:1621
 msgid "   PRACTICE"
 msgstr ""
 
-#: GuitarScene.py:1601 GuitarScene.py:1610
+#: GuitarScene.py:1622 GuitarScene.py:1631
 msgid "   SETTINGS"
 msgstr ""
 
-#: GuitarScene.py:1602 GuitarScene.py:1611
+#: GuitarScene.py:1623 GuitarScene.py:1632
 msgid "   QUIT"
 msgstr ""
 
-#: GuitarScene.py:1609
+#: GuitarScene.py:1630
 msgid "   END SONG"
 msgstr ""
 
-#: GuitarScene.py:1616 GuitarScene.py:1623
+#: GuitarScene.py:1637 GuitarScene.py:1644
 msgid " TRY AGAIN?"
 msgstr ""
 
-#: GuitarScene.py:1617 GuitarScene.py:1624
+#: GuitarScene.py:1638 GuitarScene.py:1645
 msgid " GIVE UP?"
 msgstr ""
 
-#: GuitarScene.py:1618
+#: GuitarScene.py:1639
 msgid " PRACTICE?"
 msgstr ""
 
-#: GuitarScene.py:1619 GuitarScene.py:1625
+#: GuitarScene.py:1640 GuitarScene.py:1646
 msgid " QUIT"
 msgstr ""
 
-#: GuitarScene.py:8577
+#: GuitarScene.py:8655
 #, python-format
 msgid "FPS: %.2f"
 msgstr ""
