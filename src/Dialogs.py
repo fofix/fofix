@@ -1206,7 +1206,7 @@ class SongChooser(Layer, KeyListener):
               break  
           self.engine.view.pushLayer(self)
           
-    elif c in Player.KILLS:
+    elif c in Player.KILLS and self.engine.config.get("game", "whammy_changes_sort_order"):
         self.sortOrder += 1
         if self.sortOrder > 7:
           self.sortOrder = 0

@@ -563,6 +563,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine.config, "coffee", "songfilepath", autoApply = True),
       ConfigChoice(engine.config, "game", "sort_direction", autoApply = True),
       ConfigChoice(engine.config, "game",  "sort_order", autoApply = True),
+      ConfigChoice(engine.config, "game",  "whammy_changes_sort_order", autoApply = True), #stump
       ConfigChoice(engine.config, "coffee", "song_display_mode", autoApply = True),
       ConfigChoice(engine.config, "game", "song_listing_mode", autoApply = True),
       #(_("Select List All Folder >"), self.listAllFolderSelect), #- Not Working Yet - Qstick
