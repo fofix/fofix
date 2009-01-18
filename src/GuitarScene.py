@@ -202,7 +202,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.enteredCode      = []
     self.song             = None
 
-    self.finishedProcessingSong = False
+    #self.finishedProcessingSong = False
 
     #Spikehead777
     self.jurg             = self.engine.config.get("game", "jurgtype")
@@ -1624,19 +1624,19 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           (_(" QUIT"), self.quit),
         ], fadeScreen = False, onCancel = self.changeAfterFail, font = self.engine.data.pauseFont, pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
 
+    FirstTime = True
+    self.restartSong(FirstTime)
+
     # hide the splash screen
     Dialogs.hideLoadingSplashScreen(self.engine, splash)
     splash = None
-
-    FirstTime = True
-    self.restartSong(FirstTime)
     
     self.engine.createdGuitarScene = False
     #MFH - end of GuitarScene cleint initialization routine
 
 
   def pauseGame(self):
-    if self.song and self.finishedProcessingSong:
+    if self.song and self.song.readyToGo:
       self.song.pause()
       self.pause = True
       self.guitars[0].paused = True
@@ -1645,7 +1645,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
   def failGame(self):
     self.engine.view.pushLayer(self.failMenu)
-    if self.song and self.finishedProcessingSong and self.pause: #akedrou - don't let the pause menu overlap the fail menu.
+    if self.song and self.song.readyToGo and self.pause: #akedrou - don't let the pause menu overlap the fail menu.
       self.engine.view.popLayer(self.menu)
       self.pause = False
       self.guitars[0].paused = False
@@ -1656,7 +1656,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   def resumeGame(self):
     self.loadSettings()
     self.setCamera()
-    if self.song and self.finishedProcessingSong:
+    if self.song and self.song.readyToGo:
       if not self.failed: #akedrou - don't resume the song if you have already failed.
         self.song.unpause()
       self.pause = False
@@ -1669,7 +1669,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.resumeGame()
 
   def lostFocus(self): #akedrou - catch to pause on lostFocus
-    if self.song and self.finishedProcessingSong:
+    if self.song and self.song.readyToGo:
       if not self.failed and not self.pause:
         self.engine.view.pushLayer(self.menu)
         self.pauseGame()
@@ -1849,7 +1849,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       guitar.leftyMode = self.engine.config.get("player%d" % (i), "leftymode")
       guitar.twoChordMax  = self.engine.config.get("player%d" % (i), "two_chord_max")
 
-    if self.song and self.finishedProcessingSong:
+    if self.song and self.song.readyToGo:
       #myfingershurt: ensure that after a pause or restart, the a/v sync delay is refreshed:
       self.song.refreshAudioDelay()
       #myfingershurt: ensuring the miss volume gets refreshed:
@@ -1867,7 +1867,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     for i, player in enumerate(self.playerList):
       song.difficulty[i] = player.difficulty
       
-    self.finishedProcessingSong = False
+    self.song.readyToGo = False
 
   def endSong(self):
     self.engine.view.popLayer(self.menu)
@@ -1943,7 +1943,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
 
   def resetVariablesToDefaults(self):
-    self.finishedProcessingSong = False
+    if self.song:
+      self.song.readyToGo = False
+    #self.countdown = 4.0 * self.songBPS
+    self.countdown = float(self.countdownSeconds) * self.songBPS
     self.scaleText = [0.0 for i in self.playerList]
     self.displayText = [None for i in self.playerList]
     self.displayTextScale = [0.0 for i in self.playerList]
@@ -2111,7 +2114,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.setCamera()
 
 
-    self.finishedProcessingSong = True
+    if self.song:
+      self.song.readyToGo = True
 
     
   def restartSong(self, firstTime = False):  #QQstarS: Fix this function
@@ -2124,7 +2128,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     # glorandwarf: the countdown is now the number of beats to run
     # before the song begins
-    self.countdown = 4.0 * self.songBPS
+    
     
     self.partySwitch = 0
     for i,guitar in enumerate(self.guitars):
@@ -2170,10 +2174,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if not self.song:
       return
       
-    # glorandwarf: the countdown is now the number of beats to run
-    # before the song begins
-    self.countdown = 4.0 * self.songBPS
-
     self.partySwitch = 0
     for i,guitar in enumerate(self.guitars):
       guitar.endPick(i)
@@ -2932,7 +2932,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
   def run(self, ticks): #QQstarS: Fix this funcion
 
-    if self.song and self.finishedProcessingSong and not self.pause and not self.failed:
+    if self.song and self.song.readyToGo and not self.pause and not self.failed:
       SceneClient.run(self, ticks)
       
       pos = self.getSongPosition()
@@ -3466,7 +3466,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     
   def getSongPosition(self):
-    if self.song and self.finishedProcessingSong:
+    if self.song and self.song.readyToGo:
       if not self.done:
         self.lastSongPos = self.song.getPosition()
         return self.lastSongPos - self.countdown * self.song.period
@@ -5214,7 +5214,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     streakFont = self.engine.data.streakFont
 
 
-    if self.song and self.finishedProcessingSong:
+    if self.song and self.song.readyToGo:
       pos = self.getSongPosition()
   
       if self.boardY <= 1:
@@ -8135,7 +8135,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     self.starWhite.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
                     self.starWhite.draw()
   
-          if self.song and self.finishedProcessingSong:
+          if self.song and self.song.readyToGo:
     
             if not self.coOpRB and not self.coOpGH:
               self.engine.view.setViewportHalf(self.numOfPlayers,i)

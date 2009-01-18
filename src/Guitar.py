@@ -695,6 +695,8 @@ class Guitar:
   def renderIncomingNeck(self, visibility, song, pos, time, neckTexture):   #MFH - attempt to "scroll" an incoming guitar solo neck towards the player
     if not song:
       return
+    if not song.readyToGo:
+      return
     
     def project(beat):
       return 0.125 * beat / beatsPerUnit    # glorandwarf: was 0.12
@@ -809,6 +811,8 @@ class Guitar:
   def renderNeck(self, visibility, song, pos):
     if not song:
       return
+    if not song.readyToGo:
+      return
     
     def project(beat):
       return 0.125 * beat / beatsPerUnit    # glorandwarf: was 0.12
@@ -873,6 +877,8 @@ class Guitar:
 
   def drawTrack(self, visibility, song, pos):
     if not song:
+      return
+    if not song.readyToGo:
       return
 
     def project(beat):
@@ -960,6 +966,8 @@ class Guitar:
   def drawSideBars(self, visibility, song, pos):
     if not song:
       return
+    if not song.readyToGo:
+      return
 
     def project(beat):
       return 0.125 * beat / beatsPerUnit  # glorandwarf: was 0.12
@@ -1009,6 +1017,9 @@ class Guitar:
   def drawBPM(self, visibility, song, pos):
     if not song:
       return
+    if not song.readyToGo:
+      return
+
 
     v            = visibility
     w            = self.boardWidth
@@ -1562,6 +1573,9 @@ class Guitar:
   def renderFreestyleLanes(self, visibility, song, pos):
     if not song:
       return
+    if not song.readyToGo:
+      return
+
 
     #boardWindowMin = pos - self.currentPeriod * 2
     boardWindowMax = pos + self.currentPeriod * self.beatsPerBoard
@@ -1622,6 +1636,8 @@ class Guitar:
   def renderIncomingNecks(self, visibility, song, pos):
     if not song:
       return
+    if not song.readyToGo:
+      return
 
     boardWindowMin = pos - self.currentPeriod * 2
     boardWindowMax = pos + self.currentPeriod * self.beatsPerBoard
@@ -1679,6 +1695,8 @@ class Guitar:
 
   def renderNotes(self, visibility, song, pos, killswitch):
     if not song:
+      return
+    if not song.readyToGo:
       return
 
     # Update dynamic period
@@ -1871,6 +1889,8 @@ class Guitar:
 
   def renderTails(self, visibility, song, pos, killswitch):
     if not song:
+      return
+    if not song.readyToGo:
       return
 
     # Update dynamic period
@@ -2882,6 +2902,8 @@ class Guitar:
   def getMissedNotes(self, song, pos, catchup = False):
     if not song:
       return
+    if not song.readyToGo:
+      return
 
     m1      = self.lateMargin
     m2      = self.lateMargin * 2
@@ -2903,6 +2925,8 @@ class Guitar:
 
   def getMissedNotesMFH(self, song, pos, catchup = False):
     if not song:
+      return
+    if not song.readyToGo:
       return
 
     m1      = self.lateMargin
@@ -3267,6 +3291,8 @@ class Guitar:
       return res
     if not song:
       return False
+    if not song.readyToGo:
+      return False
     
     self.playedNotes = []
     
@@ -3287,6 +3313,8 @@ class Guitar:
 
   def startPick2(self, song, pos, controls, hopo = False):
     if not song:
+      return False
+    if not song.readyToGo:
       return False
     
     self.playedNotes = []
@@ -3322,6 +3350,8 @@ class Guitar:
 
   def startPick3(self, song, pos, controls, hopo = False):
     if not song:
+      return False
+    if not song.readyToGo:
       return False
     
     
@@ -3427,6 +3457,7 @@ class Guitar:
     Log.debug("Rescued at " + str(pos))
   
   def run(self, ticks, pos, controls):
+
     self.time += ticks
     
     #MFH - Determine which frame to display for starpower notes
@@ -3444,7 +3475,7 @@ class Guitar:
       if self.starPower <= 0:
         self.starPower = 0
         self.starPowerActive = False
-        #MFH - TODO - add call to play star power deactivation sound, if it exists (if not play nothing)
+        #MFH - call to play star power deactivation sound, if it exists (if not play nothing)
         if self.engine.data.starDeActivateSoundFound:
           #self.engine.data.starDeActivateSound.setVolume(self.sfxVolume)
           self.engine.data.starDeActivateSound.play()

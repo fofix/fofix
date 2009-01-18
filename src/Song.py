@@ -2246,6 +2246,8 @@ class Song(object):
     #self.period       = 0
     self.period = 60000.0 / self.bpm    #MFH - enforcing a default / fallback tempo of 120 BPM
 
+    self.readyToGo = False    #MFH - to prevent anything from happening until all prepration & initialization is complete!
+
     
     self.parts        = partlist
     self.delay        = self.engine.config.get("audio", "delay")

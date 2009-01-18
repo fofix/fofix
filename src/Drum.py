@@ -607,6 +607,9 @@ class Drum:
   def renderFreestyleLanes(self, visibility, song, pos, controls):
     if not song:
       return
+    if not song.readyToGo:
+      return
+
 
     #MFH - check for [section big_rock_ending] to set a flag to determine how to treat the last drum fill marker note:
     #for time, event in song.eventTracks[Song.TK_SECTIONS].getEvents(pos - self.lateMargin*2, pos):
@@ -717,6 +720,8 @@ class Drum:
 
   def renderIncomingNeck(self, visibility, song, pos, time, neckTexture):   #MFH - attempt to "scroll" an incoming guitar solo neck towards the player
     if not song:
+      return
+    if not song.readyToGo:
       return
     
     def project(beat):
@@ -832,6 +837,8 @@ class Drum:
   def renderNeck(self, visibility, song, pos):
     if not song:
       return
+    if not song.readyToGo:
+      return
     
     def project(beat):
       return 0.125 * beat / beatsPerUnit    # glorandwarf: was 0.12
@@ -881,6 +888,8 @@ class Drum:
 
   def drawTrack(self, visibility, song, pos):
     if not song:
+      return
+    if not song.readyToGo:
       return
 
     def project(beat):
@@ -968,6 +977,8 @@ class Drum:
   def drawSideBars(self, visibility, song, pos):
     if not song:
       return
+    if not song.readyToGo:
+      return
 
     def project(beat):
       return 0.125 * beat / beatsPerUnit  # glorandwarf: was 0.12
@@ -1016,6 +1027,8 @@ class Drum:
 
   def drawBPM(self, visibility, song, pos):
     if not song:
+      return
+    if not song.readyToGo:
       return
 
     v            = visibility
@@ -1447,6 +1460,8 @@ class Drum:
   def renderIncomingNecks(self, visibility, song, pos):
     if not song:
       return
+    if not song.readyToGo:
+      return
 
     if self.incomingNeckMode > 0:   #if enabled
       boardWindowMin = pos - self.currentPeriod * 2
@@ -1498,6 +1513,8 @@ class Drum:
 
   def renderOpenNotes(self, visibility, song, pos):
     if not song:
+      return
+    if not song.readyToGo:
       return
 
     self.bigMax = 0
@@ -1664,6 +1681,8 @@ class Drum:
 
   def renderNotes(self, visibility, song, pos):
     if not song:
+      return
+    if not song.readyToGo:
       return
 
     self.bigMax = 0
@@ -2650,6 +2669,8 @@ class Drum:
   def getMissedNotes(self, song, pos, catchup = False):
     if not song:
       return
+    if not song.readyToGo:
+      return
 
     m1      = self.lateMargin
     m2      = self.lateMargin * 2
@@ -2668,6 +2689,8 @@ class Drum:
 
   def getMissedNotesMFH(self, song, pos, catchup = False):
     if not song:
+      return
+    if not song.readyToGo:
       return
 
     m1      = self.lateMargin
@@ -2794,6 +2817,8 @@ class Drum:
   def startPick(self, song, pos, controls, hopo = False):
     if not song:
       return False
+    if not song.readyToGo:
+      return
 
     if self.lastFretWasBassDrum:
       if controls.getState(self.keys[1]) or controls.getState(self.keys[2]) or controls.getState(self.keys[3]) or controls.getState(self.keys[4]) or controls.getState(self.keys[5]) or controls.getState(self.keys[6]) or controls.getState(self.keys[7]) or controls.getState(self.keys[8]):
