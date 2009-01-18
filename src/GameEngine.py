@@ -401,6 +401,8 @@ class GameEngine(Engine):
     Log.debug("GameEngine class init (GameEngine.py)...")
     self.mainMenu = None    #placeholder for main menu object - to prevent reinstantiation
     
+    self.createdGuitarScene = False   #MFH - so we only create ONE guitarscene...!
+    
     global version
     if version == "":   version = " beta 2"     #MFH - beta taggin'
 

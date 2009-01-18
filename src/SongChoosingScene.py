@@ -57,9 +57,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
     self.libraryName   = libraryName
     self.songName      = songName
 
-    #MFH - testing new traceback logging:
-    #raise TypeError
-
+    
 
     self.songSettings  = []
     self.gameStarted   = False
@@ -391,5 +389,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
       if not self.player.part in info.parts:
         self.player.part = info.parts[0]   
         
-      self.session.world.deleteScene(self)
-      self.session.world.createScene("GuitarScene", libraryName = self.libraryName, songName = self.songName, Players = players)
+      if not self.engine.createdGuitarScene:
+        #self.engine.createdGuitarScene = True
+        self.session.world.deleteScene(self)
+        self.session.world.createScene("GuitarScene", libraryName = self.libraryName, songName = self.songName, Players = players)

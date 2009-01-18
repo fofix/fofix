@@ -73,6 +73,12 @@ class GuitarSceneServer(GuitarScene, SceneServer):
 
 class GuitarSceneClient(GuitarScene, SceneClient):
   def createClient(self, libraryName, songName, Players):
+  
+    if self.engine.createdGuitarScene:
+      return
+    else:
+      self.engine.createdGuitarScene = True
+
     self.playerList   = [self.player]
 
     self.partyMode = False
@@ -195,6 +201,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     ]
     self.enteredCode      = []
     self.song             = None
+
+    self.finishedProcessingSong = False
 
     #Spikehead777
     self.jurg             = self.engine.config.get("game", "jurgtype")
@@ -549,40 +557,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       KillKeyCode[1] = self.controls.getReverseMapping(Player.PLAYER_2_KILL)
       self.isKillAnalog[1], self.whichJoy[1], self.whichAxis[1] = self.engine.input.getWhammyAxis(KillKeyCode[1])
 
-    #MFH - this is where song loading originally took place, and the loading screen was spawned.
-    self.engine.resource.load(self, "song", lambda: loadSong(self.engine, songName, library = libraryName, part = [player.part for player in self.playerList], practiceMode = self.playerList[0].practiceMode), synch = True, onLoad = self.songLoaded)
 
-    #myfingershurt: new loading place for "loading" screen for song preparation:
-    #blazingamer new loading phrases
-    phrase = self.song.info.loading
-    if phrase == "":
-      phrase = random.choice(Theme.loadingPhrase.split("_"))
-      if phrase == "None":
-        i = random.randint(0,4)
-        if i == 0:
-          phrase = "Let's get this show on the Road"
-        elif i == 1:
-          phrase = "Impress the Crowd"
-        elif i == 2:
-          phrase = "Don't forget to strum!"
-        elif i == 3:
-          phrase = "Rock the house!"
-        else:
-          phrase = "Jurgen is watching"
-    # glorandwarf: show the loading splash screen and load the song synchronously
-    Dialogs.hideLoadingSplashScreen(self.engine, splash)
-    splash = Dialogs.showLoadingSplashScreen(self.engine, phrase)
-
-    self.playerList[0].hopoFreq = self.song.info.hopofreq
-
-
-
-
-    #MFH - single audio track song detection
-    self.isSingleAudioTrack = self.song.isSingleAudioTrack
-
-
-    #myfingershurt: also want to go through song and search for guitar solo parts, and count notes in them in each diff.
     self.inGameStats = self.engine.config.get("performance","in_game_stats")
     self.inGameStars = self.engine.config.get("game","in_game_stars")
     self.partialStars = self.engine.config.get("game","partial_stars")
@@ -591,7 +566,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.guitarSoloAccuracyDisplayMode = self.engine.config.get("game", "gsolo_accuracy_disp")
     self.guitarSoloAccuracyDisplayPos = self.engine.config.get("game", "gsolo_acc_pos")
     
-
     #need a new flag for each player, showing whether or not they've missed a note during a solo section.
     #this way we have a backup detection of Perfect Solo in case a note got left out, picks up the other side of the solo slop
     self.guitarSoloBroken = [False for i in self.playerList]
@@ -663,6 +637,82 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.drumStart = False
     soloSlop = 100.0
     unisonCheck = []
+
+
+
+    self.failingEnabled = self.engine.config.get("coffee", "failingEnabled")
+
+    if self.careerMode:
+      self.failingEnabled = True
+
+
+    self.tut = self.engine.config.get("game", "tut")
+    
+
+    #MFH - no Jurgen in Career mode or tutorial mode or practice mode:
+    if self.careerMode or self.tut or self.playerList[0].practiceMode:
+      self.autoPlay = 1
+
+    
+    self.rockFailUp  = True #akedrou - fading mech
+    self.rockFailViz = 0.0
+    self.failViz = [0.0 for i in self.playerList]
+    
+    self.phrases = self.engine.config.get("coffee", "phrases")#blazingamer
+    self.starfx = self.engine.config.get("game", "starfx")#blazingamer
+    self.rbmfx = self.engine.config.get("game", "rbmfx")#blazingamer
+    self.boardY = 2
+    self.rbOverdriveBarGlowVisibility = 0
+    self.rbOverdriveBarGlowFadeOut = False
+    self.counting = self.engine.config.get("video", "counting")
+
+
+
+
+
+    #MFH - this is where song loading originally took place, and the loading screen was spawned.
+    self.engine.resource.load(self, "song", lambda: loadSong(self.engine, songName, library = libraryName, part = [player.part for player in self.playerList], practiceMode = self.playerList[0].practiceMode), synch = True, onLoad = self.songLoaded)
+
+    #myfingershurt: new loading place for "loading" screen for song preparation:
+    #blazingamer new loading phrases
+    phrase = self.song.info.loading
+    if phrase == "":
+      phrase = random.choice(Theme.loadingPhrase.split("_"))
+      if phrase == "None":
+        i = random.randint(0,4)
+        if i == 0:
+          phrase = "Let's get this show on the Road"
+        elif i == 1:
+          phrase = "Impress the Crowd"
+        elif i == 2:
+          phrase = "Don't forget to strum!"
+        elif i == 3:
+          phrase = "Rock the house!"
+        else:
+          phrase = "Jurgen is watching"
+    # glorandwarf: show the loading splash screen and load the song synchronously
+    Dialogs.hideLoadingSplashScreen(self.engine, splash)
+    splash = None
+    splash = Dialogs.showLoadingSplashScreen(self.engine, phrase)
+
+
+
+    if self.playerList[0].practiceMode or self.song.info.tutorial or self.tut:
+      self.failingEnabled = False
+
+
+
+    self.playerList[0].hopoFreq = self.song.info.hopofreq
+
+
+
+
+    #MFH - single audio track song detection
+    self.isSingleAudioTrack = self.song.isSingleAudioTrack
+
+
+    #myfingershurt: also want to go through song and search for guitar solo parts, and count notes in them in each diff.
+
 
     #MFH - now, handle MIDI starpower / overdrive / other special marker notes:
     
@@ -913,33 +963,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.songBPS = self.song.bpm / 60.0
       
     
-    self.failingEnabled = self.engine.config.get("coffee", "failingEnabled")
-
-    if self.careerMode:
-      self.failingEnabled = True
-
-
-    self.tut = self.engine.config.get("game", "tut")
-    
-    if self.playerList[0].practiceMode or self.song.info.tutorial or self.tut:
-      self.failingEnabled = False
-
-    #MFH - no Jurgen in Career mode or tutorial mode or practice mode:
-    if self.careerMode or self.tut or self.playerList[0].practiceMode:
-      self.autoPlay = 1
-
-    
-    self.rockFailUp  = True #akedrou - fading mech
-    self.rockFailViz = 0.0
-    self.failViz = [0.0 for i in self.playerList]
-    
-    self.phrases = self.engine.config.get("coffee", "phrases")#blazingamer
-    self.starfx = self.engine.config.get("game", "starfx")#blazingamer
-    self.rbmfx = self.engine.config.get("game", "rbmfx")#blazingamer
-    self.boardY = 2
-    self.rbOverdriveBarGlowVisibility = 0
-    self.rbOverdriveBarGlowFadeOut = False
-    self.counting = self.engine.config.get("video", "counting")
 
     # evilynux - Load stage background(s)
     self.stage.load(self.libraryName, self.songName, self.playerList[0].practiceMode)
@@ -1420,10 +1443,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.killswitchEngaged = [None for i in self.playerList]
 
 
-    # glorandwarf: hide the splash screen
-    Dialogs.hideLoadingSplashScreen(self.engine, splash)
-    splash = None
-
     #MFH - retrieve theme.ini pause background & text positions 
     self.pause_bkg_x = Theme.pause_bkg_xPos
     self.pause_bkg_y = Theme.pause_bkg_yPos
@@ -1500,8 +1519,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if self.fail_text_y == None:
       self.fail_text_y = .47
 
-
-
     if self.theme == 1: #GH3-like theme
       if self.careerMode:
         self.menu = Menu(self.engine, [
@@ -1535,8 +1552,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           (_(" NEW SONG"), self.changeAfterFail),
           (_("     QUIT"), self.quit),
         ], fadeScreen = False, onCancel = self.changeAfterFail, font = self.engine.data.pauseFont, pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
-      FirstTime = True
-      self.restartSong(FirstTime)
+      #FirstTime = True
+      #self.restartSong(FirstTime)
     elif self.theme == 0:   #GH2-like theme
       if self.careerMode:
         self.menu = Menu(self.engine, [
@@ -1570,8 +1587,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           (_("  Give Up?"), self.changeAfterFail),
           (_("Quit to Main"), self.quit),
         ], fadeScreen = False, onCancel = self.changeAfterFail, font = self.engine.data.pauseFont, pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
-      FirstTime = True
-      self.restartSong(FirstTime)
+      #FirstTime = True
+      #self.restartSong(FirstTime)
     elif self.theme == 2:   #RB-like theme
       size = self.engine.data.pauseFont.getStringSize("Quit to Main Menu")
       if self.careerMode:
@@ -1606,13 +1623,20 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           (_(" GIVE UP?"), self.changeAfterFail),
           (_(" QUIT"), self.quit),
         ], fadeScreen = False, onCancel = self.changeAfterFail, font = self.engine.data.pauseFont, pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
-      FirstTime = True
-      self.restartSong(FirstTime)
 
+    # hide the splash screen
+    Dialogs.hideLoadingSplashScreen(self.engine, splash)
+    splash = None
+
+    FirstTime = True
+    self.restartSong(FirstTime)
+    
+    self.engine.createdGuitarScene = False
+    #MFH - end of GuitarScene cleint initialization routine
 
 
   def pauseGame(self):
-    if self.song:
+    if self.song and self.finishedProcessingSong:
       self.song.pause()
       self.pause = True
       self.guitars[0].paused = True
@@ -1621,7 +1645,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
   def failGame(self):
     self.engine.view.pushLayer(self.failMenu)
-    if self.song and self.pause: #akedrou - don't let the pause menu overlap the fail menu.
+    if self.song and self.finishedProcessingSong and self.pause: #akedrou - don't let the pause menu overlap the fail menu.
       self.engine.view.popLayer(self.menu)
       self.pause = False
       self.guitars[0].paused = False
@@ -1632,7 +1656,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   def resumeGame(self):
     self.loadSettings()
     self.setCamera()
-    if self.song:
+    if self.song and self.finishedProcessingSong:
       if not self.failed: #akedrou - don't resume the song if you have already failed.
         self.song.unpause()
       self.pause = False
@@ -1645,7 +1669,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.resumeGame()
 
   def lostFocus(self): #akedrou - catch to pause on lostFocus
-    if self.song:
+    if self.song and self.finishedProcessingSong:
       if not self.failed and not self.pause:
         self.engine.view.pushLayer(self.menu)
         self.pauseGame()
@@ -1776,6 +1800,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.starGrey6 = None
     self.starGrey7 = None
     self.part = [None for i in self.playerList]
+    for playa in self.playerList:
+      playa.lastNoteEvent = None
 
     
   def loadSettings(self):
@@ -1823,7 +1849,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       guitar.leftyMode = self.engine.config.get("player%d" % (i), "leftymode")
       guitar.twoChordMax  = self.engine.config.get("player%d" % (i), "two_chord_max")
 
-    if self.song:
+    if self.song and self.finishedProcessingSong:
       #myfingershurt: ensure that after a pause or restart, the a/v sync delay is refreshed:
       self.song.refreshAudioDelay()
       #myfingershurt: ensuring the miss volume gets refreshed:
@@ -1840,6 +1866,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     for i, player in enumerate(self.playerList):
       song.difficulty[i] = player.difficulty
+      
+    self.finishedProcessingSong = False
 
   def endSong(self):
     self.engine.view.popLayer(self.menu)
@@ -1915,6 +1943,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
 
   def resetVariablesToDefaults(self):
+    self.finishedProcessingSong = False
     self.scaleText = [0.0 for i in self.playerList]
     self.displayText = [None for i in self.playerList]
     self.displayTextScale = [0.0 for i in self.playerList]
@@ -2052,12 +2081,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if self.numMidiLyricLines > self.activeMidiLyricLineIndex+2:  #is there a second line of lyrics?
           tempTime, self.currentSimpleMidiLyricLine = self.midiLyricLines[self.activeMidiLyricLineIndex+1]
 
-
-    
-  def restartSong(self, firstTime = False):  #QQstarS: Fix this function
-    self.resetVariablesToDefaults()
-    self.engine.data.startSound.play()
-    self.engine.view.popLayer(self.menu)
     for player in self.playerList:
       player.reset()
     self.stage.reset()
@@ -2087,6 +2110,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.boardY = 2
     self.setCamera()
 
+
+    self.finishedProcessingSong = True
+
+    
+  def restartSong(self, firstTime = False):  #QQstarS: Fix this function
+    self.resetVariablesToDefaults()
+    self.engine.data.startSound.play()
+    self.engine.view.popLayer(self.menu)
+
     if not self.song:
       return
     
@@ -2103,15 +2135,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #myfingershurt: preventing ever-thickening BPM lines after restarts
       if firstTime:
         self.song.track[i].markBars()
-      #myfingershurt
-      if self.hopoStyle > 0 or self.song.info.hopo == "on":
-        
-        #myfingershurt: drums :)
-        if not guitar.isDrum:
-          if self.hopoStyle == 2 or self.hopoStyle == 3 or self.hopoStyle == 4:  #GH2 style HOPO system
-            self.song.track[i].markHopoGH2(self.song.info.EighthNoteHopo, self.hopoAfterChord, self.song.info.hopofreq)
-          elif self.hopoStyle == 1:   #RF-Mod style HOPO system
-            self.song.track[i].markHopoRF(self.song.info.EighthNoteHopo, self.song.info.hopofreq)
+
+        #MFH - should only be done the first time.
+        if self.hopoStyle > 0 or self.song.info.hopo == "on":
+          if not guitar.isDrum:
+            if self.hopoStyle == 2 or self.hopoStyle == 3 or self.hopoStyle == 4:  #GH2 style HOPO system
+              self.song.track[i].markHopoGH2(self.song.info.EighthNoteHopo, self.hopoAfterChord, self.song.info.hopofreq)
+            elif self.hopoStyle == 1:   #RF-Mod style HOPO system
+              self.song.track[i].markHopoRF(self.song.info.EighthNoteHopo, self.song.info.hopofreq)
     
     #myfingershurt: removing buggy disable stats option
     lastTime = 0
@@ -2135,35 +2166,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.resetVariablesToDefaults()
     self.engine.data.startSound.play()
     self.engine.view.popLayer(self.failMenu)
-    for player in self.playerList:
-      player.reset()
-    self.stage.reset()
-    self.enteredCode     = []
 
-    self.jurgPlayer       = [False for i in self.playerList] #Jurgen hasn't played the restarted song =P
-
-    for guitar in self.guitars:
-      guitar.twoChord = 0
-      guitar.hopoActive = 0
-      guitar.wasLastNoteHopod = False
-      guitar.sameNoteHopoString = False
-      guitar.hopoLast = -1
-      guitar.guitarSolo = False
-      guitar.currentGuitarSoloHitNotes = 0
-      
-    if self.partyMode == True:
-      self.guitars[0].keys = PLAYER1KEYS
-      self.guitars[0].actions = PLAYER1ACTIONS
-      self.keysList   = [PLAYER1KEYS]
-    if self.battle == True and self.numOfPlayers>1:
-      self.guitars[0].actions = PLAYER1ACTIONS
-      self.guitars[1].actions = PLAYER2ACTIONS
-
-    self.engine.collectGarbage()
-
-    self.boardY = 2
-    self.setCamera()
-    
     if not self.song:
       return
       
@@ -2928,14 +2931,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
 
   def run(self, ticks): #QQstarS: Fix this funcion
-    SceneClient.run(self, ticks)
-    
-    #MFH - testing new traceback logging:
-    #raise TypeError
-    
-    # update song
-    #if self.song:
-    if self.song and not self.pause and not self.failed:
+
+    if self.song and self.finishedProcessingSong and not self.pause and not self.failed:
+      SceneClient.run(self, ticks)
+      
       pos = self.getSongPosition()
 
 
@@ -3467,7 +3466,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     
   def getSongPosition(self):
-    if self.song:
+    if self.song and self.finishedProcessingSong:
       if not self.done:
         self.lastSongPos = self.song.getPosition()
         return self.lastSongPos - self.countdown * self.song.period
@@ -5214,19 +5213,21 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     scoreFont = self.engine.data.scoreFont
     streakFont = self.engine.data.streakFont
 
-    pos = self.getSongPosition()
 
-    if self.boardY <= 1:
-      self.boardY == 1
-      self.setCamera()
-    elif self.boardY > 1:
-      self.boardY -= 0.01
-      self.setCamera()
-    #self.setCamera()
+    if self.song and self.finishedProcessingSong:
+      pos = self.getSongPosition()
+  
+      if self.boardY <= 1:
+        self.boardY == 1
+        self.setCamera()
+      elif self.boardY > 1:
+        self.boardY -= 0.01
+        self.setCamera()
+      #self.setCamera()
+  
+      #Theme.setBaseColor()
 
-    #Theme.setBaseColor()
 
-    if self.song:
       self.stage.renderBackground()
 
       #MFH: render the note sheet just on top of the background:
@@ -8134,7 +8135,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     self.starWhite.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
                     self.starWhite.draw()
   
-          if self.song:
+          if self.song and self.finishedProcessingSong:
     
             if not self.coOpRB and not self.coOpGH:
               self.engine.view.setViewportHalf(self.numOfPlayers,i)
@@ -8190,51 +8191,44 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             if self.dispSoloReview[i] and not self.pause and not self.failed:
               if self.soloReviewCountdown[i] < self.soloReviewDispDelay:
                 self.soloReviewCountdown[i] += 1
-                #glColor3f(0, 0.85, 1)  #grn-blu
-                glColor3f(1, 1, 1)  #cracker white
-                text1 = self.soloReviewText[i][0]
-                text2 = self.soloReviewText[i][1]
-                xOffset = 0.950
-                if self.hitAccuracyPos == 0: #Center - need to move solo review above this!
-                  yOffset = 0.080
-                elif self.jurgPlayer[i] and self.autoPlay != 1:
-                  yOffset = 0.115    #above Jurgen Is Here
-                else:   #no jurgens here:
-                  yOffset = 0.155   #was 0.180, occluded notes
-                txtSize = 0.00185
-                
-#-                if self.theme == 2:
-#-                  soloFont = scoreFont
-#-                else:
-#-                  soloFont = font
-                
-
-
-                Tw, Th = self.solo_soloFont.getStringSize(text1,txtSize)
-                Tw2, Th2 = self.solo_soloFont.getStringSize(text2,txtSize)
-
-                
-
-                #MFH - scale and display self.soloFrame behind / around the text
-                lineSpacing = self.solo_soloFont.getLineSpacing(txtSize)
-                if self.soloFrame:
-                  frameWidth = (max(Tw,Tw2))*1.15
-                  #frameHeight = (Th+Th2)*1.10
-                  frameHeight = lineSpacing*2.05
-                  boxXOffset = 0.5
-                  boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + lineSpacing) / self.fontScreenBottom) )
-                  self.soloFrame.transform.reset()
-                  tempWScale = frameWidth*self.soloFrameWFactor
-                  tempHScale = -(frameHeight)*self.soloFrameWFactor
-                  self.soloFrame.transform.scale(tempWScale,tempHScale)
-                  self.soloFrame.transform.translate(self.wPlayer[i]*boxXOffset,boxYOffset)
-                  self.soloFrame.draw()
-
-                self.solo_soloFont.render(text1, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #centered
-                self.solo_soloFont.render(text2, (0.5 - Tw2/2, yOffset+lineSpacing),(1, 0, 0),txtSize)   #centered
+                if not (self.guitars[i].freestyleActive or (self.playerList[i].freestyleWasJustActive and not self.playerList[i].endingStreakBroken) ):
+                  #glColor3f(0, 0.85, 1)  #grn-blu
+                  glColor3f(1, 1, 1)  #cracker white
+                  text1 = self.soloReviewText[i][0]
+                  text2 = self.soloReviewText[i][1]
+                  xOffset = 0.950
+                  if self.hitAccuracyPos == 0: #Center - need to move solo review above this!
+                    yOffset = 0.080
+                  elif self.jurgPlayer[i] and self.autoPlay != 1:
+                    yOffset = 0.115    #above Jurgen Is Here
+                  else:   #no jurgens here:
+                    yOffset = 0.155   #was 0.180, occluded notes
+                  txtSize = 0.00185
+                  Tw, Th = self.solo_soloFont.getStringSize(text1,txtSize)
+                  Tw2, Th2 = self.solo_soloFont.getStringSize(text2,txtSize)
+  
+                  #MFH - scale and display self.soloFrame behind / around the text
+                  lineSpacing = self.solo_soloFont.getLineSpacing(txtSize)
+                  if self.soloFrame:
+                    frameWidth = (max(Tw,Tw2))*1.15
+                    #frameHeight = (Th+Th2)*1.10
+                    frameHeight = lineSpacing*2.05
+                    boxXOffset = 0.5
+                    boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + lineSpacing) / self.fontScreenBottom) )
+                    self.soloFrame.transform.reset()
+                    tempWScale = frameWidth*self.soloFrameWFactor
+                    tempHScale = -(frameHeight)*self.soloFrameWFactor
+                    self.soloFrame.transform.scale(tempWScale,tempHScale)
+                    self.soloFrame.transform.translate(self.wPlayer[i]*boxXOffset,boxYOffset)
+                    self.soloFrame.draw()
+  
+                  self.solo_soloFont.render(text1, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #centered
+                  self.solo_soloFont.render(text2, (0.5 - Tw2/2, yOffset+lineSpacing),(1, 0, 0),txtSize)   #centered
               else:
                 self.dispSoloReview[i] = False 
-            
+              
+              
+              
             if self.hopoDebugDisp == 1 and not self.pause and not self.failed and not self.guitars[i].isDrum:
               #MFH: PlayedNote HOPO tappable marking
               if self.guitars[i].playedNotes:
@@ -8447,10 +8441,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             if (not self.pause and not self.failed and not self.ending):
 
               #MFH - show BRE temp score frame
-              if not self.playerList[i].endingStreakBroken and (self.guitars[i].freestyleActive or self.playerList[i].freestyleWasJustActive):
+              if self.guitars[i].freestyleActive or (self.playerList[i].freestyleWasJustActive and not self.playerList[i].endingStreakBroken):
 
                 text = "End Bonus"
-                yOffset = 0.210
+                yOffset = 0.160
                 xOffset = 0.500
                 tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
                 self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
@@ -8460,7 +8454,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 if self.theme == 2:
                   text = text.replace("0","O")
                 tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
-                yOffset = 0.250
+                yOffset = 0.215
                 xOffset = 0.500
                 
                 if self.soloFrame:
