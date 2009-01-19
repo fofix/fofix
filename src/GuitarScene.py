@@ -5456,8 +5456,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         now = self.getSongPosition()
         countdownPos = self.lastEvent - now
 
-        for i,player in enumerate(self.playerList): #QQstarS: This part has big fix. I add the code into it,So he can shown corect
         
+
+        for i,player in enumerate(self.playerList): #QQstarS: This part has big fix. I add the code into it,So he can shown corect
+          self.engine.view.setViewportHalf(self.numOfPlayers,i)  
+          
           #Show Jurgen played Spikehead777
           if self.jurgPlayer[i] == True:
             if self.autoPlay != 1:
@@ -5467,19 +5470,26 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 text = self.tsJurgenWasHere
             else:
               text = self.tsJurgenWasHere
-            jurgScale = .001/self.numOfPlayers
-            w, h = bigFont.getStringSize(text, scale = jurgScale)
+            #jurgScale = .001/self.numOfPlayers
+            jurgScale = .00035
+            #w, h = bigFont.getStringSize(text, scale = jurgScale)
             Theme.setBaseColor()
-            jurgX = ((i*2.0)+1.0)/(2.0*self.numOfPlayers) #was different for each player and set of players - I tried to keep it close...
+            #jurgX = ((i*2.0)+1.0)/(2.0*self.numOfPlayers) #was different for each player and set of players - I tried to keep it close...
+            jurgX = 0.760
+            jurgY = 0.600
             if self.jurgenText == 0:
-              bigFont.render(text,  (jurgX-(w/2), 0.31), scale = jurgScale)#MFH - y was 0.4 - more positioning weirdness.
+              bigFont.render(text,  (jurgX, jurgY), scale = jurgScale)#MFH - y was 0.4 - more positioning weirdness.
             else:
-              bigFont.render(text,  (jurgX, 0.31), scale = jurgScale*.3*self.numOfPlayers) #weird, but keeps it from getting too small (I think)
+              #bigFont.render(text,  (jurgX, jurgY), scale = jurgScale*.3*self.numOfPlayers) #weird, but keeps it from getting too small (I think)
+              bigFont.render(text,  (jurgX, jurgY), scale = jurgScale)
           #End Jurgen Code
-            
+
+
           streakFlag = 0  #set the flag to 0
-          if not self.coOpGH or self.rmtype == 2:
-            self.engine.view.setViewportHalf(self.numOfPlayers,i)
+          #if not self.coOpGH or self.rmtype == 2:
+            #self.engine.view.setViewportHalf(self.numOfPlayers,i)
+          if self.coOpGH or self.rmtype != 2:
+            self.engine.view.setViewport(1,0)
           Theme.setBaseColor()
           if self.coOpGH:
             multStreak = self.coOpStreak
