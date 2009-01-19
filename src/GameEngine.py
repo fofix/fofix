@@ -566,7 +566,7 @@ class GameEngine(Engine):
         aniStageOptions.update({"Random":_("Random")})
       Config.define("game", "animated_stage_folder", str, defaultAniStage, text = _("Animated Stage"), options = aniStageOptions )
       
-      #MFH: TODO here, need to track and check a new ini entry for last theme - so when theme changes we can re-default animated stage to first found
+      #MFH: here, need to track and check a new ini entry for last theme - so when theme changes we can re-default animated stage to first found
       lastTheme = self.config.get("game","last_theme")
       if lastTheme == "" or lastTheme != currentTheme:   #MFH - no last theme, and theme just changed:
         self.config.set("game","animated_stage_folder",defaultAniStage)   #force defaultAniStage

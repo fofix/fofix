@@ -1029,8 +1029,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       breScoreFrameImgwidth = self.breScoreFrame.width1()
       self.breScoreFrameWFactor = 640.000/breScoreFrameImgwidth
     except IOError:
-      self.breScoreFrame = None
-      self.breScoreFrameWFactor = None
+
+      try:    #MFH - fallback on using soloframe.png if no brescoreframe.png is found
+        self.engine.loadImgDrawing(self, "breScoreFrame", os.path.join("themes",themename,"soloframe.png"))
+        breScoreFrameImgwidth = self.breScoreFrame.width1()
+        self.breScoreFrameWFactor = 640.000/breScoreFrameImgwidth
+      except IOError:
+        self.breScoreFrame = None
+        self.breScoreFrameWFactor = None
 
 
     
@@ -2619,14 +2625,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               if self.controls.getState(guitar.keys[fret]) or ( guitar.isDrum and self.controls.getState(guitar.keys[fret+4])):
                 hitspeed = min((pos - guitar.freestyleLastFretHitTime[fret]) / guitar.freestylePeriod, 1.0)
                 score += guitar.freestyleBaseScore * hitspeed
-            score = int ( score / numFreestyleHits )
+            if numFreestyleHits > 0:    #MFH - to prevent a float division!
+              score = int ( score / numFreestyleHits )
           if self.controls.getState(guitar.keys[0]):	
             guitar.freestyleLastFretHitTime[0] = pos
           for fret in range (1,5):
             if self.controls.getState(guitar.keys[fret]) or ( guitar.isDrum and self.controls.getState(guitar.keys[fret+4])):
               guitar.freestyleLastFretHitTime[fret] = pos
           
-          #MFH - TODO - Add all BRE score to a temporary score accumulator with a separate display box
+          #MFH - Add all BRE score to a temporary score accumulator with a separate display box
           #   and only reward if all notes after the BRE are hit without breaking streak!
           if guitar.freestyleActive:   #MFH - only want to add the score if this is a BRE - drum fills get no scoring...
             #self.playerList[num].addScore( score )
@@ -3512,7 +3519,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     return 0.0
 
 
-  def screwUp(self, num):
+  def screwUp(self, num, controls):
     if self.screwUpVolume > 0.0:
       #self.sfxChannel.setVolume(self.screwUpVolume)
       #if `self.playerList[num].part` == "Bass Guitar":
@@ -3520,17 +3527,22 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         #self.sfxChannel.play(self.engine.data.screwUpSoundBass)
         self.engine.data.screwUpSoundBass.play()
       elif self.guitars[num].isDrum:
+        
         if self.drumMisses > 0: #MFH's cleaned-up - Faaa Drum sound
-          if self.guitars[num].lastFretWasT1:
-            self.engine.data.T1DrumSound.play()
-          elif self.guitars[num].lastFretWasT2:
-            self.engine.data.T2DrumSound.play()
-          elif self.guitars[num].lastFretWasT3:
-            self.engine.data.T3DrumSound.play()
-          elif self.guitars[num].lastFretWasC:
-            self.engine.data.CDrumSound.play()
+
+          self.guitars[num].playDrumSounds(controls)
+
+#-          if self.guitars[num].lastFretWasT1:
+#-            self.engine.data.T1DrumSound.play()
+#-          elif self.guitars[num].lastFretWasT2:
+#-            self.engine.data.T2DrumSound.play()
+#-          elif self.guitars[num].lastFretWasT3:
+#-            self.engine.data.T3DrumSound.play()
+#-          elif self.guitars[num].lastFretWasC:
+#-            self.engine.data.CDrumSound.play()
+
         else:
-          self.engine.data.screwUpSoundDrums.play()
+          self.engine.data.screwUpSoundDrums.play()   #plays random drum sounds
       else:   #guitar
         self.engine.data.screwUpSound.play()
       
@@ -3629,16 +3641,17 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             self.starNotesMissed[num] = True
           isFirst = False
   
-        self.screwUp(num) #MFH - call screw-up sound handling function
+        self.screwUp(num, self.controls) #MFH - call screw-up sound handling function
   
         #myfingershurt: ensure accuracy display off when miss
         self.dispAccuracy[num] = False
 
     #myfingershurt: bass drum sound play
     if self.guitars[num].isDrum and self.bassKickSoundEnabled:
-      if self.guitars[num].lastFretWasBassDrum:
-        #self.sfxChannel.setVolume(self.screwUpVolume)
-        self.engine.data.bassDrumSound.play()
+      self.guitars[num].playDrumSounds(self.controls, playBassDrumOnly = True)
+      #if self.guitars[num].lastFretWasBassDrum:
+      #  #self.sfxChannel.setVolume(self.screwUpVolume)
+      #  self.engine.data.bassDrumSound.play()
 
 
   def doPick2(self, num, hopo = False):
@@ -3738,7 +3751,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.starNotesMissed[num] = True
         isFirst = False
       
-      self.screwUp(num)
+      self.screwUp(num, self.controls)
 
 #-----------------------
   def doPick3RF(self, num, hopo = False):
@@ -3853,7 +3866,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.starNotesMissed[num] = True
         isFirst = False
 
-      self.screwUp(num)
+      self.screwUp(num, self.controls)
       
       #myfingershurt: ensure accuracy display off when miss
       self.dispAccuracy[num] = False
@@ -4093,14 +4106,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               self.inUnison[num] = False
           isFirst = False
 
-        self.screwUp(num)
+        self.screwUp(num, self.controls)
 
         self.dispAccuracy[num] = False
 
     #myfingershurt: bass drum sound play
     if self.guitars[num].isDrum and self.bassKickSoundEnabled:
-      if self.guitars[num].lastFretWasBassDrum:
-        self.engine.data.bassDrumSound.play()
+      self.guitars[num].playDrumSounds(self.controls, playBassDrumOnly = True)
+      #if self.guitars[num].lastFretWasBassDrum:
+      #  #self.sfxChannel.setVolume(self.screwUpVolume)
+      #  self.engine.data.bassDrumSound.play()
   
   def activateSP(self, num): #QQstarS: Fix this function, add a element "num"
     if self.coOpGH:
@@ -4520,22 +4535,25 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     #myfingershurt: drums :)
     #MFH - cleaning up Faaa's drum tracking code: (which appears to determine which drum fret after key release?  TODO: why not before?)
-    if self.guitars[num].isDrum and control in (self.guitars[num].keys):
-      if not self.controls.getState(self.guitars[num].keys[0]):
-        self.guitars[num].lastFretWasBassDrum = False
+    if self.guitars[num].isDrum:
+      if control in (self.guitars[num].keys):
+        if not self.controls.getState(self.guitars[num].keys[0]):
+          self.guitars[num].bassDrumPedalDown = False    #MFH - this is all that's needed here...
+          #self.guitars[num].lastFretWasBassDrum = False
       return True
-      if not self.controls.getState(self.guitars[num].keys[1]):
-        self.guitars[num].lastFretWasT1 = False
-      return True
-      if not self.controls.getState(self.guitars[num].keys[2]):
-        self.guitars[num].lastFretWasT2 = False
-      return True  
-      if not self.controls.getState(self.guitars[num].keys[3]):
-        self.guitars[num].lastFretWasT3 = False
-      return True    	  
-      if not self.controls.getState(self.guitars[num].keys[4]):
-        self.guitars[num].lastFretWasC = False
-      return True    	  
+    
+#-      if not self.controls.getState(self.guitars[num].keys[1]):
+#-        self.guitars[num].lastFretWasT1 = False
+#-      return True
+#-      if not self.controls.getState(self.guitars[num].keys[2]):
+#-        self.guitars[num].lastFretWasT2 = False
+#-      return True  
+#-      if not self.controls.getState(self.guitars[num].keys[3]):
+#-        self.guitars[num].lastFretWasT3 = False
+#-      return True    	  
+#-      if not self.controls.getState(self.guitars[num].keys[4]):
+#-        self.guitars[num].lastFretWasC = False
+#-      return True    	  
 
 
     #myfingershurt:

@@ -68,6 +68,8 @@ class Drum:
     
     self.isDrum = True
     self.isBassGuitar = False
+
+    self.bassDrumPedalDown = False
   
     self.lastFretWasBassDrum = False
     self.lastFretWasT1 = False   #Faaa Drum sound
@@ -2783,34 +2785,88 @@ class Drum:
     return False
 
 
-  #volshebnyi - handle freestyle picks here
-  def freestylePick(self, song, pos, controls):
-    numHits = 0
-    if controls.getState(self.keys[0]):
-      numHits = 1
-      if self.engine.data.bassDrumSoundFound:
-        self.engine.data.bassDrumSound.play()
+  def playDrumSounds(self, controls, playBassDrumOnly = False):   #MFH - handles playing of drum sounds.  
+    #Returns list of drums that were just hit (including logic for detecting a held bass pedal)
+    #pass playBassDrumOnly = True (optional paramater) to only play the bass drum sound, but still
+    #  return a list of drums just hit (intelligently play the bass drum if it's held down during gameplay)
+    drumsJustHit = [False, False, False, False, False]
+
+    if controls.getState(self.keys[0]):   #Bass drum   
+      if not self.bassDrumPedalDown:  #MFH - gotta check if bass drum pedal is just held down!
+        if self.engine.data.bassDrumSoundFound:
+          self.engine.data.bassDrumSound.play()
+        self.bassDrumPedalDown = True
+        drumsJustHit[0] = True
+    else:
+      self.bassDrumPedalDown = False
+
     for i in range (1,5):
       if controls.getState(self.keys[i]) or controls.getState(self.keys[4+i]):
-        numHits += 1
         if i == 1:
-          if self.engine.data.T1DrumSoundFound:
+          if self.engine.data.T1DrumSoundFound and not playBassDrumOnly:
             self.engine.data.T1DrumSound.play()
+          drumsJustHit[i] = True
         if i == 2:
-          if self.engine.data.T2DrumSoundFound:
+          if self.engine.data.T2DrumSoundFound and not playBassDrumOnly:
             self.engine.data.T2DrumSound.play()
+          drumsJustHit[i] = True
         if i == 3:
-          if self.engine.data.T3DrumSoundFound:
+          if self.engine.data.T3DrumSoundFound and not playBassDrumOnly:
             self.engine.data.T3DrumSound.play()
+          drumsJustHit[i] = True
         if i == 4:   #MFH - must actually activate starpower!
-          if self.engine.data.CDrumSoundFound:
+          if self.engine.data.CDrumSoundFound and not playBassDrumOnly:
             self.engine.data.CDrumSound.play()
+          drumsJustHit[i] = True
+    
+    return drumsJustHit
+
+
+  #volshebnyi - handle freestyle picks here
+  def freestylePick(self, song, pos, controls):
+    drumsJustHit = self.playDrumSounds(controls)
+    numHits = 0
+    for i, drumHit in enumerate(drumsJustHit):
+      if drumHit:
+        numHits += 1
+        if i == 4:
           if self.drumFillsActive and self.drumFillsHits >= 4 and not self.starPowerActive:
             drumFillCymbalPos = self.freestyleStart+self.freestyleLength
             minDrumFillCymbalHitTime = drumFillCymbalPos - self.earlyMargin
             maxDrumFillCymbalHitTime = drumFillCymbalPos + self.lateMargin
             if (pos >= minDrumFillCymbalHitTime) and (pos <= maxDrumFillCymbalHitTime):
               self.freestyleSP = True
+        
+    
+    
+#-    if controls.getState(self.keys[0]):   
+#-      if not self.bassDrumPedalDown:  #MFH - gotta check if bass drum pedal is just held down!
+#-        numHits = 1
+#-        if self.engine.data.bassDrumSoundFound:
+#-          self.engine.data.bassDrumSound.play()
+#-        self.bassDrumPedalDown = True
+#-    for i in range (1,5):
+#-      if controls.getState(self.keys[i]) or controls.getState(self.keys[4+i]):
+#-        numHits += 1
+#-        if i == 1:
+#-          if self.engine.data.T1DrumSoundFound:
+#-            self.engine.data.T1DrumSound.play()
+#-        if i == 2:
+#-          if self.engine.data.T2DrumSoundFound:
+#-            self.engine.data.T2DrumSound.play()
+#-        if i == 3:
+#-          if self.engine.data.T3DrumSoundFound:
+#-            self.engine.data.T3DrumSound.play()
+#-        if i == 4:   #MFH - must actually activate starpower!
+#-          if self.engine.data.CDrumSoundFound:
+#-            self.engine.data.CDrumSound.play()
+#-          if self.drumFillsActive and self.drumFillsHits >= 4 and not self.starPowerActive:
+#-            drumFillCymbalPos = self.freestyleStart+self.freestyleLength
+#-            minDrumFillCymbalHitTime = drumFillCymbalPos - self.earlyMargin
+#-            maxDrumFillCymbalHitTime = drumFillCymbalPos + self.lateMargin
+#-            if (pos >= minDrumFillCymbalHitTime) and (pos <= maxDrumFillCymbalHitTime):
+#-              self.freestyleSP = True
+
     return numHits
 
   

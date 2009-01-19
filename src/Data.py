@@ -85,7 +85,7 @@ class Data(object):
       i = len(themes)
       if defaultTheme != "MegaLight":     #myfingershurt
         defaultTheme = themes[0]    #myfingershurt
-      #not a valid theme if Notes.png isn't there!  Force default theme:
+      #not a valid theme if notes.png isn't there!  Force default theme:
       Config.set("coffee", "themename",defaultTheme)
       #re-init Data with new default
       themename = defaultTheme
