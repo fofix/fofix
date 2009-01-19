@@ -266,6 +266,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "game",  "language"),
       ConfigChoice(engine, engine.config, "game", "T_sound", autoApply = True), #Faaa Drum sound
       ConfigChoice(engine, engine.config, "game", "star_scoring", autoApply = True),#myfingershurt
+      ConfigChoice(engine, engine.config, "game", "resume_countdown", autoApply = True), #akedrou
       ConfigChoice(engine, engine.config, "game", "whammy_saves_starpower", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "sp_notes_while_active", autoApply = True, isQuickset = 2),   #myfingershurt - setting for gaining more SP while active
       ConfigChoice(engine, engine.config, "game", "auto_drum_sp", autoApply = True),#myfingershurt
@@ -896,6 +897,7 @@ class BasicSettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "game",  "language"),
       ConfigChoice(engine, engine.config, "game", "T_sound", autoApply = True), #Faaa Drum sound
       ConfigChoice(engine, engine.config, "game", "star_scoring", autoApply = True),#myfingershurt
+      ConfigChoice(engine, engine.config, "game", "resume_countdown", autoApply = True), #akedrou
       ConfigChoice(engine, engine.config, "game", "whammy_saves_starpower", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "sp_notes_while_active", autoApply = True, isQuickset = 2),   #myfingershurt - setting for gaining more SP while active
       ConfigChoice(engine, engine.config, "game", "auto_drum_sp", autoApply = True),#myfingershurt

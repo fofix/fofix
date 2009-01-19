@@ -174,6 +174,7 @@ Config.define("game",   "hopo_indicator",          bool, False,  text = _("Show 
 Config.define("game",   "quickplay_tiers",          int, 1,  text = _("Use Tiers in Quickplay"), options = {0: _("Off"), 1: _("Normal"), 2: _("Sorting")})
 Config.define("game",   "quickplay_career_tiers",          bool, True,  text = _("Quickplay Tiers"), options = {False: _("Off"), True: _("On")})
 Config.define("performance",   "star_score_updates",          int, 1,  text = _("Star Updates"), options = {0: _("On Hit"), 1: _("Score Change")})
+Config.define("game", "resume_countdown", int, 1, text = _("Countdown on Resume"), options = {0: _("No"), 1: _("Yes")})
 
 Config.define("game", "script_lyric_pos",      int,   0,   text = _("Script Lyric Pos"),    options = {0: _("Bottom"), 1: _("Top")}) #MFH - script.txt lyric display position
 

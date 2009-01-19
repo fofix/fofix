@@ -440,6 +440,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.rb_sp_neck_glow = self.engine.config.get("game", "rb_sp_neck_glow")
     self.accuracy = [0 for i in self.playerList]
     self.countdownSeconds = 5   #MFH - don't change this initialization value unless you alter the other related variables to match
+    self.resumeCountdownEnabled = self.engine.config.get("game", "resume_countdown")
+    self.resumeCountdown = 0
+    self.resumeCountdownSeconds = 0
+    self.pausePos = 0
     self.dispAccuracy = [False for i in self.playerList]
     self.showAccuracy = self.engine.config.get("game", "accuracy_mode")
     self.hitAccuracyPos = self.engine.config.get("game", "accuracy_pos")
@@ -1676,31 +1680,34 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   def pauseGame(self):
     if self.song and self.song.readyToGo:
       self.song.pause()
+      self.pausePos = self.getSongPosition()
       self.pause = True
-      self.guitars[0].paused = True
-      if self.numOfPlayers == 2:
-        self.guitars[1].paused = True
+      for guitar in self.guitars:
+        guitar.paused = True
 
   def failGame(self):
     self.engine.view.pushLayer(self.failMenu)
     if self.song and self.song.readyToGo and self.pause: #akedrou - don't let the pause menu overlap the fail menu.
       self.engine.view.popLayer(self.menu)
       self.pause = False
-      self.guitars[0].paused = False
-      if self.numOfPlayers == 2:
-        self.guitars[1].paused = False
+      for guitar in self.guitars:
+        guitar.paused = False
     self.failEnd = True
 
   def resumeGame(self):
     self.loadSettings()
     self.setCamera()
-    if self.song and self.song.readyToGo:
-      if not self.failed: #akedrou - don't resume the song if you have already failed.
-        self.song.unpause()
+    if self.resumeCountdownEnabled and not self.failed and not self.countdown:
+      self.resumeCountdownSeconds = 3
+      self.resumeCountdown = float(self.resumeCountdownSeconds) * self.songBPS
       self.pause = False
-      self.guitars[0].paused = False
-      if self.numOfPlayers == 2:
-        self.guitars[1].paused = False
+    else:
+      if self.song and self.song.readyToGo:
+        if not self.failed: #akedrou - don't resume the song if you have already failed.
+          self.song.unpause()
+        self.pause = False
+        for guitar in self.guitars:
+          guitar.paused = False
 
   def resumeSong(self):
     self.engine.view.popLayer(self.menu)
@@ -2042,6 +2049,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.unisonIndex = 0
     self.unisonActive = False
     self.unisonEarn   = [False for i in self.playerList]
+    self.resumeCountdown = 0
+    self.resumeCountdownSeconds = 0
+    self.pausePos = 0
     self.failTimer = 0  #myfingershurt
     self.rockTimer = 0  #myfingershurt
     self.youRock = False    #myfingershurt
@@ -2977,11 +2987,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if self.song and self.song.readyToGo and not self.pause and not self.failed:
       SceneClient.run(self, ticks)
       
-      pos = self.getSongPosition()
+      if not self.resumeCountdown and not self.pause:
+        pos = self.getSongPosition()
 
-
-      self.song.update(ticks)
-      # update stage
+        self.song.update(ticks)
+        # update stage
+      else:
+        pos = self.pausePos
 
       #MFH - new failing detection logic
       if self.failingEnabled:
@@ -3103,6 +3115,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             self.playerList[i].totalStreakNotes -= 1
         else:
           missedNotes = guitar.getMissedNotesMFH(self.song, pos)
+          if guitar.paused:
+            missedNotes = []
           if missedNotes:
             if guitar.isDrum:
               self.drumStart = True
@@ -3115,7 +3129,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 if self.unisonActive:
                   self.inUnison[i] = False
 
-          
           if (self.playerList[i].streak != 0 or not self.processedFirstNoteYet) and not guitar.playedNotes and len(missedNotes) > 0:
             if not self.processedFirstNoteYet:
               self.stage.triggerMiss(pos)
@@ -3371,6 +3384,17 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             self.song.play(start = self.playerList[0].startPos[0])
           else:
             self.song.play()
+      
+      if self.resumeCountdown > 0: #unpause delay
+        self.resumeCountdown = max(self.resumeCountdown - ticks / self.song.period, 0)
+        self.resumeCountdownSeconds = self.resumeCountdown / self.songBPS + 1
+        
+        if not self.resumeCountdown:
+          self.song.unpause()
+          self.pause = False
+          missedNotes = []
+          for guitar in self.guitars:
+            guitar.paused = False
 
       if self.timeLeft == "0:01" and not self.mutedLastSecondYet and self.muteLastSecond == 1:
         self.song.setAllTrackVolumes(0.0)
@@ -8832,6 +8856,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 w, h = bigFont.getStringSize(text, scale = scale)
                 Theme.setBaseColor()
                 bigFont.render(text,  (.5 - w / 2, .45 - h / 2), scale = scale)
+          
+          if self.resumeCountdownSeconds > 1:
+            scale = 0.002 + 0.0005 * (self.resumeCountdownSeconds % 1) ** 3
+            text = "%d" % (self.resumeCountdownSeconds)
+            w, h = bigFont.getStringSize(text, scale = scale)
+            Theme.setBaseColor()
+            bigFont.render(text,  (.5 - w / 2, .45 - h / 2), scale = scale)
     
           w, h = font.getStringSize(" ")
           y = .05 - h / 2 - (1.0 - v) * .2

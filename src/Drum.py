@@ -2974,7 +2974,8 @@ class Drum:
     Log.debug("Rescued at " + str(pos))
   
   def run(self, ticks, pos, controls):
-    self.time += ticks
+    if not self.paused:
+      self.time += ticks
     #myfingershurt: must not decrease SP if paused.
     if self.starPowerActive == True and self.paused == False:
       self.starPower -= ticks/self.starPowerDecreaseDivisor 

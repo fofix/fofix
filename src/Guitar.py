@@ -3457,8 +3457,9 @@ class Guitar:
     Log.debug("Rescued at " + str(pos))
   
   def run(self, ticks, pos, controls):
-
-    self.time += ticks
+  
+    if not self.paused:
+      self.time += ticks
     
     #MFH - Determine which frame to display for starpower notes
     if self.starspin:
