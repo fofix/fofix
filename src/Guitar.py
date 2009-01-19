@@ -2486,10 +2486,10 @@ class Guitar:
             glEnable(GL_TEXTURE_2D)
             self.hitflamesAnim.texture.bind()    
             glPushMatrix()
-            glTranslate(x, y + .225, 0)
+            glTranslate(x, y + .665, 0) #Worldrave - Adjusted Animated Hit Flame position 
             glRotate(90, 1, 0, 0)
             #glScalef(1.7, 1, 2.6)
-            glScalef(2, 2, 2.9)   #worldrave correct flame size
+            glScalef(1.6, 1.6, 4.9)   #Worldrave - Adjusted Animated Hit Flame size
             glBegin(GL_TRIANGLE_STRIP)
             glTexCoord2f(texX[0], 0.0)#upper left corner of frame square in .png
             glVertex3f(-flameSize * ff, 0, -flameSize * ff)#"upper left" corner of surface that texture is rendered on
