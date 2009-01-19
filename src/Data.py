@@ -43,8 +43,8 @@ STAR1 = unicode('\x10')
 STAR2 = unicode('\x11')
 LEFT  = unicode('\x12')
 RIGHT = unicode('\x13')
-STAR3 = unicode('\x14')
-STAR4 = unicode('\x15')
+STAR3 = unicode('\x14')  #Worldrave - Added new Star3
+STAR4 = unicode('\x15')  #Worldrave - Added new Star4
 
 class Data(object):
   """A collection of globally used data resources such as fonts and sound effects."""
@@ -108,11 +108,11 @@ class Data(object):
     #myfingershurt: multi-OS compatibility file access fixes using os.path.join()
     # load font customization images
 
-    #MFH - if star3.png and star4.png exist, then use these for the glyphs instead.  If not, fallback on star1 and star2
+    #Worldrave - Use new defined Star3 and star4. Using star1 and star2 as a fallback.
 
-    try:
       self.loadImgDrawing(self, "star1",   os.path.join("themes",themename,"star1.png"), textureSize = (128, 128))
       self.loadImgDrawing(self, "star2",   os.path.join("themes",themename,"star2.png"), textureSize = (128, 128))
+    try:
       self.loadImgDrawing(self, "star3",   os.path.join("themes",themename,"star3.png"), textureSize = (128, 128))
       self.loadImgDrawing(self, "star4",   os.path.join("themes",themename,"star4.png"), textureSize = (128, 128))
     except IOError:
