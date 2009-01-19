@@ -2383,7 +2383,7 @@ class Guitar:
             glTranslate(x, y + .225, 0)
             glRotate(90, 1, 0, 0)
             #glScalef(1.7, 1, 2.6)
-            glScalef(2, 1, 2.9)   #worldrave correct flame size
+            glScalef(2.4, 1, 3.3)   #worldrave corrected hit glow size
             glBegin(GL_TRIANGLE_STRIP)
             glTexCoord2f(texX[0], 0.0)#upper left corner of frame square in .png
             glVertex3f(-flameSize * ff, 0, -flameSize * ff)#"upper left" corner of surface that texture is rendered on
