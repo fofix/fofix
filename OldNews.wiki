@@ -2,6 +2,21 @@
 
 = Old News =
 
+====Jan. 11th 2009 ====
+3.100 Beta 1 (SVN r762) has been released for testing.  Notable new features include very basic Big Rock Ending support, Drum Fills, MIDI instrument input support, whammy pitch-bending support, basic 3D note.dae texturing support, and songlist metadeta caching. 
+
+  * Download 3.100 beta 1 Patch for Windows [http://www.mediafire.com/?oyzm0zzjjy2 from Mediafire] / [http://rapidshare.com/files/183238330/FoFiX-v3.030_r762-Patch-Windows_3.100beta1_.rar from Rapidshare]
+  * [http://www.mediafire.com/download.php?kymz3ondmrn Download 3.100 beta 1 Full installer for Windows]
+  * [http://www.mediafire.com/?zaxtqiynlnk Download 3.100 beta 1 Full for Mac]
+  * [http://www.mediafire.com/?rgxfzcmd0nj Download 3.100 beta 1 Patch for GNU/Linux (32bit)]`*`
+  * [http://www.mediafire.com/?czndbnh2bjv Download 3.100 beta 1 Full for GNU/Linux (32bit)]`*`
+
+`*` *Note to GNU/Linux players:* MIDI instrument support and whammy pitch bending support are *not* included. Releasing a beta w/ SndObj (required for pitchbending) requires too much work for now. (--_evilynux_)
+
+====Jan. 7th 2009 ====
+
+_Coming soon - 3.100 beta 1 (that's right, we're skipping from 3.030 directly to 3.100.  There will be no 3.035... entirely too much progress has been made for such a minor version increment.  -Chris)_
+
 ====Dec. 21st 2008 ====
 3.035 Beta 2 (SVN r621) has been released for testing.  
 I would write more, but I have to go.  Someone else can edit this later :)
