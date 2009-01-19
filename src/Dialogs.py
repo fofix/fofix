@@ -2245,16 +2245,16 @@ class SongChooser(Layer, KeyListener):
                   if stars == 6:
                     glColor3f(1, 1, 1)  
                     if self.extraStats:
-                      lfont.render(unicode(Data.STAR2 * (stars -1)), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.1825-0.034), scale = scale * 2.0) #was scale 2.8
+                      lfont.render(unicode(Data.STAR4 * (stars -1)), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.1825-0.034), scale = scale * 2.0) #Worldrave - Uses STAR3 and STAR4 now w/ fallback
                     else:
-                      lfont.render(unicode(Data.STAR2 * (stars -1)), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.2-0.034), scale = scale * 2.0) #was scale 2.8
+                      lfont.render(unicode(Data.STAR4 * (stars -1)), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.2-0.034), scale = scale * 2.0) #Worldrave - Uses STAR3 and STAR4 now w/ fallback
                   elif score>0 and stars>=0 and name!="":
                     glColor3f(1, 1, 1)
                     #ShiekOdaSandz: Fixed stars so they display left to right, not right to left
                     if self.extraStats:
-                      lfont.render(unicode(Data.STAR2 * stars+Data.STAR1 * (5 - stars)), (self.song_listscore_xpos+.018*.03, .0935*(i+1)-pos[0]*.0935+.1825-0.034), scale = scale * 2.0) #was scale 2.8 #ShiekOdaSandz: Fixed stars so they display left to right, not right to left
+                      lfont.render(unicode(Data.STAR4 * stars+Data.STAR3 * (5 - stars)), (self.song_listscore_xpos+.018*.03, .0935*(i+1)-pos[0]*.0935+.1825-0.034), scale = scale * 2.0) #ShiekOdaSandz: Fixed stars so they display left to right, not right to left @Worldrave - Uses STAR3 and STAR4 now w/ fallback
                     else:
-                      lfont.render(unicode(Data.STAR2 * stars+Data.STAR1 * (5 - stars)), (self.song_listscore_xpos+.018*.03, .0935*(i+1)-pos[0]*.0935+.2-0.034), scale = scale * 2.0) #was scale 2.8 #ShiekOdaSandz: Fixed stars so they display left to right, not right to left
+                      lfont.render(unicode(Data.STAR4 * stars+Data.STAR3 * (5 - stars)), (self.song_listscore_xpos+.018*.03, .0935*(i+1)-pos[0]*.0935+.2-0.034), scale = scale * 2.0) #ShiekOdaSandz: Fixed stars so they display left to right, not right to left @Worldrave - Uses STAR3 and STAR4 now w/ fallback
                     #QQstarS: end of add
   
                   scale = 0.0014

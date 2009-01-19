@@ -43,6 +43,8 @@ STAR1 = unicode('\x10')
 STAR2 = unicode('\x11')
 LEFT  = unicode('\x12')
 RIGHT = unicode('\x13')
+STAR3 = unicode('\x14')
+STAR4 = unicode('\x15')
 
 class Data(object):
   """A collection of globally used data resources such as fonts and sound effects."""
@@ -109,11 +111,13 @@ class Data(object):
     #MFH - if star3.png and star4.png exist, then use these for the glyphs instead.  If not, fallback on star1 and star2
 
     try:
-      self.loadImgDrawing(self, "star1",   os.path.join("themes",themename,"star3.png"), textureSize = (128, 128))
-      self.loadImgDrawing(self, "star2",   os.path.join("themes",themename,"star4.png"), textureSize = (128, 128))
-    except IOError:
       self.loadImgDrawing(self, "star1",   os.path.join("themes",themename,"star1.png"), textureSize = (128, 128))
       self.loadImgDrawing(self, "star2",   os.path.join("themes",themename,"star2.png"), textureSize = (128, 128))
+      self.loadImgDrawing(self, "star3",   os.path.join("themes",themename,"star3.png"), textureSize = (128, 128))
+      self.loadImgDrawing(self, "star4",   os.path.join("themes",themename,"star4.png"), textureSize = (128, 128))
+    except IOError:
+      self.loadImgDrawing(self, "star3",   os.path.join("themes",themename,"star1.png"), textureSize = (128, 128))
+      self.loadImgDrawing(self, "star4",   os.path.join("themes",themename,"star2.png"), textureSize = (128, 128))
 
  
     self.loadImgDrawing(self, "left",    "left.png",  textureSize = (128, 128))
@@ -510,6 +514,8 @@ class Data(object):
     # change some predefined characters to custom images
     font.setCustomGlyph(STAR1, self.star1.texture)
     font.setCustomGlyph(STAR2, self.star2.texture)
+    font.setCustomGlyph(STAR3, self.star3.texture)
+    font.setCustomGlyph(STAR4, self.star4.texture)
     font.setCustomGlyph(LEFT,  self.left.texture)
     font.setCustomGlyph(RIGHT, self.right.texture)
     # evilynux - Load cache to speedup rendering
