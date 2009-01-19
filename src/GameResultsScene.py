@@ -214,11 +214,10 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
 
             #myfingershurt: don't separate chords for drum part totals:
             #if player.part.text == "Drums":
-            #  notesTotal = len([1 for time, event in self.song.track[i].getAllEvents() if isinstance(event, Song.Note)])
+              #notesTotal = len([1 for time, event in self.song.track[i].getAllEvents() if isinstance(event, Song.Note)])
             #else:
-            #  notesTotal = len(set(time for time, event in self.song.track[i].getAllEvents() if isinstance(event, Song.Note)))
+              #notesTotal = len(set(time for time, event in self.song.track[i].getAllEvents() if isinstance(event, Song.Note)))
             notesTotal = player.totalStreakNotes
-            
             
             modOptions1 = self.engine.config.getModOptions1(player.twoChord, 0)
             modOptions2 = self.engine.config.getModOptions2()
@@ -286,12 +285,10 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         self.accuracy[i] = 100.0 * f
         #self.hits = player.notesHit + int( player.freestyleSkippedNotes * f )
         #self.totalnotes = notes + player.freestyleSkippedNotes
-        
         #player.totalStreakNotes = self.totalnotes
         self.totalnotes = player.totalStreakNotes
         #player.notesHit = self.hits
         self.hits = player.notesHit
-        
         self.accuracy[i] = 100.0 * self.hits / self.totalnotes
         
         taunt = None
@@ -508,21 +505,20 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         return
         
 
-
-
       #initial scoring - skipped after names entered
       Theme.setBaseColor(1 - v)
       if self.playerList[0].cheating:
         text = _("%s Cheated!") % Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
       else:
-        text = _("%s Finished!") % Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
+        text = _(Theme.result_song[3]) % Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
         w, h = font.getStringSize(text)
-        Dialogs.wrapText(font, (.05, .045 - v), text)
+        Dialogs.wrapText(font, (float(Theme.result_song[0]), float(Theme.result_song[1]) - v), text, 0.9, float(Theme.result_song[2]))
         text = "%d/" % self.hits
-        text2 = _("%d notes hit") % self.totalnotes
+        text2 = _("%d") % self.totalnotes
         text = text + text2
+        text = _(Theme.result_stats_notes[3]) % text
         w, h = font.getStringSize(text)
-        Dialogs.wrapText(font, (.5 - w / 2, .54 - v - h), text)
+        Dialogs.wrapText(font, (float(Theme.result_stats_notes[0]) - w / 2, float(Theme.result_stats_notes[1]) + v), text, 0.9, float(Theme.result_stats_notes[2]))
 
       #MFH - HOPO system & hit window display
       settingsScale = 0.0012
@@ -539,10 +535,9 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         self.engine.view.setViewportHalf(len(self.playerList),j)
         text = "%d" % (player.score * self.anim(1000, 2000))
         w, h = bigFont.getStringSize(text)
-        bigFont.render(text, (.5 - w / 2, .11 + v + (1.0 - self.anim(0, 1000) ** 3)), scale = 0.0025)
+        bigFont.render(text, (float(Theme.result_score[0]) - w / 2, float(Theme.result_score[1]) + v + (1.0 - self.anim(0, 1000) ** 3)), scale = float(Theme.result_score[2]))
       
         if self.counter > 1000:
-          scale = 0.0017
           if self.stars[j] == 6 and self.theme == 2: #racer: gold perfect for RB
             glColor3f(1, 1, 0)  
             text = (Data.STAR2 * (self.stars[j] - 1))
@@ -552,26 +547,35 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           else:
             text = (Data.STAR2 * self.stars[j] + Data.STAR1 * (5 - self.stars[j]))
 
-          w, h = bigFont.getStringSize(Data.STAR1, scale = scale)
-          x = .5 - w * len(text) / 2
+          w, h = bigFont.getStringSize(Data.STAR1, scale = float(Theme.result_star[2]))
+          x = float(Theme.result_star[0]) - w * len(text) / 2
           for i, ch in enumerate(text):
-            bigFont.render(ch, (x + 100 * (1.0 - self.anim(1000 + i * 200, 1000 + (i + 1) * 200)) ** 2, .35 + v), scale = scale)
+            bigFont.render(ch, (x + 100 * (1.0 - self.anim(1000 + i * 200, 1000 + (i + 1) * 200)) ** 2, float(Theme.result_star[1]) + v), scale = float(Theme.result_star[2]))
             x += w
       
         if self.counter > 2500:
           Theme.setBaseColor(1 - v)
-          text = _("Accuracy: %.1f%%") % self.accuracy[j]
+          
+          text = _(Theme.result_stats_accuracy[3]) % self.accuracy[j]
           w, h = font.getStringSize(text)
-          font.render(text, (.5 - w / 2, .55 + v))
-          text = _("Longest note streak: %d") % player.longestStreak
+          font.render(text, (float(Theme.result_stats_accuracy[0]) - w / 2, float(Theme.result_stats_accuracy[1]) + v), scale = float(Theme.result_stats_accuracy[2]))
+          
+          text = _(Theme.result_stats_streak[3]) % player.longestStreak
           w, h = font.getStringSize(text)
-          font.render(text, (.5 - w / 2, .55 + h + v))
-          if player.twoChord > 0:
-            text = _("Part: %s on %s (2 chord)") % (player.part, player.difficulty)
-          else:
-            text = _("Part: %s on %s") % (player.part, player.difficulty)
+          font.render(text, (float(Theme.result_stats_streak[0]) - w / 2, float(Theme.result_stats_streak[1]) + v), scale = float(Theme.result_stats_streak[2]))
+          #if player.twoChord > 0:
+          #  text = _("Part: %s on %s (2 chord)") % (player.part, player.difficulty)
+          #else:
+          #  text = _("Part: %s on %s") % (player.part, player.difficulty)
+          
+          text = _(Theme.result_stats_diff[3]) % player.difficulty
           w, h = font.getStringSize(text)
-          font.render(text, (.5 - w / 2, .55 + (2 * h)+ v))
+          font.render(text, (float(Theme.result_stats_diff[0]) - w / 2, float(Theme.result_stats_diff[1]) + v), scale = float(Theme.result_stats_diff[2]))
+          
+          text = _(Theme.result_stats_part[3]) % player.part
+          w, h = font.getStringSize(text)
+          font.render(text, (float(Theme.result_stats_part[0]) - w / 2, float(Theme.result_stats_part[1]) + v), scale = float(Theme.result_stats_part[2]))
+      
       self.engine.view.setViewport(1,0)
     finally:
       self.engine.view.setViewport(1,0)

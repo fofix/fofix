@@ -189,6 +189,15 @@ Config.define("theme", "fail_text_color",  str, "#FFFFFF")
 Config.define("theme", "fail_completed_color",  str, "#FFFFFF")
 Config.define("theme", "fail_selected_color",  str, "#FFBF00")
 
+Config.define("theme", "result_score", str, ".5,.11,0.0025")
+Config.define("theme", "result_song", str, ".05,.045,.002,%s Finished!")
+Config.define("theme", "result_star", str, ".5,.35,0.0017")
+Config.define("theme", "result_stats_diff", str, ".5,.55,0.002,Difficulty: %s")
+Config.define("theme", "result_stats_part", str, ".5,.64,0.002,Part: %s")
+Config.define("theme", "result_stats_streak", str, ".5,.58,0.002,Long Streak: %s")
+Config.define("theme", "result_stats_accuracy", str, ".5,.61,0.002,Accuracy: %.1f%%")
+Config.define("theme", "result_stats_notes", str, ".5,.52,0.002,%s Notes Hit")
+
 
 #MFH - crowd cheer loop delay in theme.ini: if not exist, use value from settings. Otherwise, use theme.ini value.
 Config.define("theme", "crowd_loop_delay",  int, None)
@@ -216,6 +225,8 @@ Config.define("theme", "hopo_indicator_inactive_color",   str, "#666666")
 
 #Qstick - Misc
 Config.define("theme", "song_list_display",       int, None)
+
+#Qstick - Results Screen
 
 #RACER:
 Config.define("theme", "fail_bkg_x",       float, None)
@@ -359,6 +370,16 @@ hopoIndicatorInactiveColor = None
 #Qstick - misc
 songListDisplay = None
 
+result_score = [None] * 3
+result_star = [None] * 3
+result_song = [None] * 4
+result_stats_part = [None] * 4
+result_stats_diff = [None] * 4
+result_stats_accuracy = [None] * 4
+result_stats_streak = [None] * 4
+result_stats_notes = [None] * 4
+
+
 #Racer:
 fail_bkg_xPos = None
 fail_bkg_yPos = None
@@ -409,6 +430,7 @@ def open(config):
   setupRockmeter(config)
   setupNeckChooser(config)
   setupHopoIndicator(config)
+  setupResults(config)
   
 
 def setupNeckChooser(config):
@@ -672,5 +694,18 @@ def setupHopoIndicator(config):
   hopoIndicatorY = config.get("theme", "hopo_indicator_y")  
   hopoIndicatorActiveColor = hexToColor(config.get("theme", "hopo_indicator_active_color"))
   hopoIndicatorInactiveColor = hexToColor(config.get("theme", "hopo_indicator_inactive_color"))
+  
+def setupResults(config):
+  global result_score, result_star, result_song, result_stats_part, result_stats_diff
+  global result_stats_accuracy, result_stats_streak, result_stats_notes
+  
+  result_score = config.get("theme", "result_score").split(",")
+  result_star = config.get("theme", "result_star").split(",")
+  result_song = config.get("theme", "result_song").split(",")
+  result_stats_part = config.get("theme", "result_stats_part").split(",")
+  result_stats_diff = config.get("theme", "result_stats_diff").split(",")
+  result_stats_accuracy = config.get("theme", "result_stats_accuracy").split(",")
+  result_stats_streak = config.get("theme", "result_stats_streak").split(",")
+  result_stats_notes = config.get("theme", "result_stats_notes").split(",")
 
 
