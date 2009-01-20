@@ -63,6 +63,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       Log.debug("GameResultsSceneClient class init...")
 
     self.libraryName     = libraryName
+    self.cheats          = [None] * 6
+    self.cheating        = False
     self.songName        = songName
     self.stars           = [0 for i in players]
     self.accuracy        = [0 for i in players]
@@ -117,6 +119,16 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     Log.debug("Cheer loop delay value used: %d" % self.cheerLoopDelay)
 
     self.cheerLoopCounter = self.cheerLoopDelay   #MFH - starts out ready to cheer
+    self.jurgMode = self.engine.config.get("game", "jurgmode")
+    if self.jurgMode == 0:
+      self.cheating = True
+      self.cheats[0] = "Jurgen Enabled"
+    elif self.jurgMode == 2:
+      self.cheating = True
+      self.cheats[0] = "Medium Assist Enabled"
+    elif self.jurgMode == 3:
+      self.cheating = True
+      self.cheats[0] = "Easy Assist Enabled"
       
     #MFH
     self.hopoStyle        = self.engine.config.get("game", "hopo_system")
@@ -131,7 +143,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     
     self.gh2sloppy        = self.engine.config.get("game", "gh2_sloppy")
     if self.gh2sloppy == 1:
-      self.hopoStyle = _("GH2 SLOPPY")
+      self.cheating = True
+      self.cheats[1] = "GH2 Sloppy Cheat Enabled"
 
     self.hopoFreq        = self.engine.config.get("coffee", "hopo_frequency")
     #MFH if song.ini HOPO frequency exists and is enabled, display that instead...
@@ -153,6 +166,11 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       self.hopoFreq = _("Normal")
     elif self.hopoFreq == 3:
       self.hopoFreq = _("Most")
+    
+    self.hopoFreqCheat        = self.engine.config.get("coffee", "hopo_freq_cheat")
+    if self.hopoFreqCheat > 0:
+      self.cheating = True
+      self.cheats[3] = "HOPO Frequency Cheat Enabled"
 
     self.hitWindow = self.engine.config.get("game", "note_hit_window")  #this should be global, not retrieved every BPM change.
     if self.hitWindow == 0:
@@ -161,7 +179,22 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       self.hitWindow = _("2. Tight")
     elif self.hitWindow == 2:
       self.hitWindow = _("3. Tightest")
-
+    
+    self.hitWindowCheat = self.engine.config.get("game", "hit_window_cheat")
+    if self.hitWindowCheat > 0:
+      self.cheating = True
+      self.cheats[2] = "Hit Window Cheat Enabled"
+      
+    self.failCheat = self.engine.config.get("coffee", "failingEnabled")
+    if self.failCheat == False:
+      self.cheating = True
+      self.cheats[4] = "No Fail is Enabled"
+      
+    self.slowdowncheat = self.engine.config.get("audio",  "slow_down_divisor")
+    if self.slowdowncheat > 1:
+      self.cheating = True
+      self.cheats[5] = "Song Slowdown is Enabled"
+    
 
     self.engine.loadImgDrawing(self, "background", os.path.join("themes",themename,"gameresults.png"))
 
@@ -196,7 +229,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       
         scores = self.song.info.getHighscores(player.difficulty, part = player.part)
         if not scores or player.score > scores[-1][0] or len(scores) < 5:
-          if player.cheating:
+          if player.cheating or self.cheating:
             Dialogs.showMessage(self.engine, _("No highscores for cheaters!"))
           elif player.score == 0: #trinidude4
             Dialogs.showMessage(self.engine, _("No highscore")) #trinidude4
@@ -219,7 +252,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
             self.highscoreIndex[i] = self.song.info.addHighscore(player.difficulty, player.score, self.stars[i], player.name, part = player.part, scoreExt = scoreExt)
             self.song.info.save()
           
-            if self.engine.config.get("game", "uploadscores") and not player.cheating:
+            if self.engine.config.get("game", "uploadscores") and not player.cheating and not self.cheating:
               self.uploadingScores[i] = True
               # evilynux - New url starting 20080902
               fn = lambda: self.song.info.uploadHighscores(self.engine.config.get("game", "uploadurl_w67_starpower"), self.song.getHash(), part = player.part)
@@ -373,7 +406,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       t = self.time / 100
       w, h, = self.engine.view.geometry[2:4]
       r = .5
-      if self.background:
+      if self.background or self.cheating == False:
         imgwidth = self.background.width1()
         wfactor = 640.000/imgwidth
         self.background.transform.reset()
@@ -382,6 +415,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         self.background.transform.translate(w/2,h/2)
         self.background.draw()
       
+
       if self.showHighscores:
         for j,player in enumerate(self.playerList):
           #self.engine.view.setViewportHalf(len(self.playerList),j)
@@ -500,76 +534,94 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         
 
       #initial scoring - skipped after names entered
-      Theme.setBaseColor(1 - v)
-      if self.playerList[0].cheating:
-        text = _("%s Cheated!") % Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
+      if self.cheating:
+        Theme.setBaseColor(1 - v)
+        glColor3f(1, 1, 1)
+        y = .40
+        scale = 0.0014
+        text = "CHEATER"
+        w, h = bigFont.getStringSize(text, 0.002)
+        bigFont.render(text,(.5 - w/2,.15), scale = 0.002)
+        text = "Cheats Enabled:"
+        w, h = font.getStringSize(text, 0.0017)
+        font.render(text,(.5 - w/2,.35), scale = 0.0017)
+        for cheat in range(0,5):
+          if self.cheats[cheat] != None:
+            text = self.cheats[cheat]
+            w, h = font.getStringSize(text, scale)
+            font.render(text,(.5 - w/2,y), scale = scale)
+            y = y + .02
       else:
-        text = _(Theme.result_song[3]) % Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
-        w, h = font.getStringSize(text)
-        Dialogs.wrapText(font, (float(Theme.result_song[0]), float(Theme.result_song[1]) - v), text, 0.9, float(Theme.result_song[2]))
-        text = "%d/" % self.hits
-        text2 = _("%d") % self.totalnotes
-        text = text + text2
-        text = _(Theme.result_stats_notes[3]) % text
-        w, h = font.getStringSize(text)
-        Dialogs.wrapText(font, (float(Theme.result_stats_notes[0]) - w / 2, float(Theme.result_stats_notes[1]) + v), text, 0.9, float(Theme.result_stats_notes[2]))
-
-      #MFH - HOPO system & hit window display
-      settingsScale = 0.0012
-      #settingsText = "%s settings - HOPOs: %s / %s, Hit Window: %s" % (self.engine.versionString, self.hopoStyle, self.hopoFreq, self.hitWindow)
-      settingsText = "%s %s - %s: %s / %s, %s: %s" % (self.engine.versionString, self.tsSettings, self.tsHopos, self.hopoStyle, self.hopoFreq, self.tsHitWindow, self.hitWindow)
-      w, h = font.getStringSize(settingsText, settingsScale)
-      font.render(settingsText, (.5 - w/2, 0.0), scale = settingsScale)
+        Theme.setBaseColor(1 - v)
+        if self.playerList[0].cheating:
+          text = _("%s Cheated!") % Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
+        else:
+          text = _(Theme.result_song[3]) % Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
+          w, h = font.getStringSize(text)
+          Dialogs.wrapText(font, (float(Theme.result_song[0]), float(Theme.result_song[1]) - v), text, 0.9, float(Theme.result_song[2]))
+          text = "%d/" % self.hits
+          text2 = _("%d") % self.totalnotes
+          text = text + text2
+          text = _(Theme.result_stats_notes[3]) % text
+          w, h = font.getStringSize(text)
+          Dialogs.wrapText(font, (float(Theme.result_stats_notes[0]) - w / 2, float(Theme.result_stats_notes[1]) + v), text, 0.9, float(Theme.result_stats_notes[2]))
+  
+        #MFH - HOPO system & hit window display
+        settingsScale = 0.0012
+        #settingsText = "%s settings - HOPOs: %s / %s, Hit Window: %s" % (self.engine.versionString, self.hopoStyle, self.hopoFreq, self.hitWindow)
+        settingsText = "%s %s - %s: %s / %s, %s: %s" % (self.engine.versionString, self.tsSettings, self.tsHopos, self.hopoStyle, self.hopoFreq, self.tsHitWindow, self.hitWindow)
+        w, h = font.getStringSize(settingsText, settingsScale)
+        font.render(settingsText, (.5 - w/2, 0.0), scale = settingsScale)
+          
+        for j,player in enumerate(self.playerList):
+          if self.playerList[j].cheating:
+            self.stars[j] = 0
+            self.accuracy[j] = 0.0
+      
+          self.engine.view.setViewportHalf(len(self.playerList),j)
+          text = "%d" % (player.score * self.anim(1000, 2000))
+          w, h = bigFont.getStringSize(text)
+          bigFont.render(text, (float(Theme.result_score[0]) - w / 2, float(Theme.result_score[1]) + v + (1.0 - self.anim(0, 1000) ** 3)), scale = float(Theme.result_score[2]))
         
-      for j,player in enumerate(self.playerList):
-        if self.playerList[j].cheating:
-          self.stars[j] = 0
-          self.accuracy[j] = 0.0
-    
-        self.engine.view.setViewportHalf(len(self.playerList),j)
-        text = "%d" % (player.score * self.anim(1000, 2000))
-        w, h = bigFont.getStringSize(text)
-        bigFont.render(text, (float(Theme.result_score[0]) - w / 2, float(Theme.result_score[1]) + v + (1.0 - self.anim(0, 1000) ** 3)), scale = float(Theme.result_score[2]))
-      
-        if self.counter > 1000:
-          if self.stars[j] == 6 and self.theme == 2: #racer: gold perfect for RB
-            glColor3f(1, 1, 0)  
-            text = (Data.STAR2 * (self.stars[j] - 1))
-          elif self.stars[j] == 6 and self.theme < 2: #racer: green perfect for non-RB
-            glColor3f(0, 1, 0)  
-            text = (Data.STAR2 * (self.stars[j] - 1))
-          else:
-            text = (Data.STAR2 * self.stars[j] + Data.STAR1 * (5 - self.stars[j]))
-
-          w, h = bigFont.getStringSize(Data.STAR1, scale = float(Theme.result_star[2]))
-          x = float(Theme.result_star[0]) - w * len(text) / 2
-          for i, ch in enumerate(text):
-            bigFont.render(ch, (x + 100 * (1.0 - self.anim(1000 + i * 200, 1000 + (i + 1) * 200)) ** 2, float(Theme.result_star[1]) + v), scale = float(Theme.result_star[2]))
-            x += w
-      
-        if self.counter > 2500:
-          Theme.setBaseColor(1 - v)
-          
-          text = _(Theme.result_stats_accuracy[3]) % self.accuracy[j]
-          w, h = font.getStringSize(text)
-          font.render(text, (float(Theme.result_stats_accuracy[0]) - w / 2, float(Theme.result_stats_accuracy[1]) + v), scale = float(Theme.result_stats_accuracy[2]))
-          
-          text = _(Theme.result_stats_streak[3]) % player.longestStreak
-          w, h = font.getStringSize(text)
-          font.render(text, (float(Theme.result_stats_streak[0]) - w / 2, float(Theme.result_stats_streak[1]) + v), scale = float(Theme.result_stats_streak[2]))
-          #if player.twoChord > 0:
-          #  text = _("Part: %s on %s (2 chord)") % (player.part, player.difficulty)
-          #else:
-          #  text = _("Part: %s on %s") % (player.part, player.difficulty)
-          
-          text = _(Theme.result_stats_diff[3]) % player.difficulty
-          w, h = font.getStringSize(text)
-          font.render(text, (float(Theme.result_stats_diff[0]) - w / 2, float(Theme.result_stats_diff[1]) + v), scale = float(Theme.result_stats_diff[2]))
-          
-          text = _(Theme.result_stats_part[3]) % player.part
-          w, h = font.getStringSize(text)
-          font.render(text, (float(Theme.result_stats_part[0]) - w / 2, float(Theme.result_stats_part[1]) + v), scale = float(Theme.result_stats_part[2]))
-      
+          if self.counter > 1000:
+            if self.stars[j] == 6 and self.theme == 2: #racer: gold perfect for RB
+              glColor3f(1, 1, 0)  
+              text = (Data.STAR2 * (self.stars[j] - 1))
+            elif self.stars[j] == 6 and self.theme < 2: #racer: green perfect for non-RB
+              glColor3f(0, 1, 0)  
+              text = (Data.STAR2 * (self.stars[j] - 1))
+            else:
+              text = (Data.STAR2 * self.stars[j] + Data.STAR1 * (5 - self.stars[j]))
+  
+            w, h = bigFont.getStringSize(Data.STAR1, scale = float(Theme.result_star[2]))
+            x = float(Theme.result_star[0]) - w * len(text) / 2
+            for i, ch in enumerate(text):
+              bigFont.render(ch, (x + 100 * (1.0 - self.anim(1000 + i * 200, 1000 + (i + 1) * 200)) ** 2, float(Theme.result_star[1]) + v), scale = float(Theme.result_star[2]))
+              x += w
+        
+          if self.counter > 2500:
+            Theme.setBaseColor(1 - v)
+            
+            text = _(Theme.result_stats_accuracy[3]) % self.accuracy[j]
+            w, h = font.getStringSize(text)
+            font.render(text, (float(Theme.result_stats_accuracy[0]) - w / 2, float(Theme.result_stats_accuracy[1]) + v), scale = float(Theme.result_stats_accuracy[2]))
+            
+            text = _(Theme.result_stats_streak[3]) % player.longestStreak
+            w, h = font.getStringSize(text)
+            font.render(text, (float(Theme.result_stats_streak[0]) - w / 2, float(Theme.result_stats_streak[1]) + v), scale = float(Theme.result_stats_streak[2]))
+            #if player.twoChord > 0:
+            #  text = _("Part: %s on %s (2 chord)") % (player.part, player.difficulty)
+            #else:
+            #  text = _("Part: %s on %s") % (player.part, player.difficulty)
+            
+            text = _(Theme.result_stats_diff[3]) % player.difficulty
+            w, h = font.getStringSize(text)
+            font.render(text, (float(Theme.result_stats_diff[0]) - w / 2, float(Theme.result_stats_diff[1]) + v), scale = float(Theme.result_stats_diff[2]))
+            
+            text = _(Theme.result_stats_part[3]) % player.part
+            w, h = font.getStringSize(text)
+            font.render(text, (float(Theme.result_stats_part[0]) - w / 2, float(Theme.result_stats_part[1]) + v), scale = float(Theme.result_stats_part[2]))
+        
       self.engine.view.setViewport(1,0)
     finally:
       self.engine.view.setViewport(1,0)

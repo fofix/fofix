@@ -4218,19 +4218,19 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         noScore = True
         self.changeSong()
 
-      if self.playerList[0].score == 0:
-        if self.numOfPlayers == 1:
-          noScore = True
-          self.changeSong()
+      #if self.playerList[0].score == 0:
+        #if self.numOfPlayers == 1:
+          #noScore = True
+          #self.changeSong()
       
-      if self.numOfPlayers == 2:
-        if self.coOpType:
-          if self.coOpScore == 0:
-            noScore = True
-            self.changeSong()
-        if self.playerList[0].score == 0 and self.playerList[1].score == 0:
-          noScore = True
-          self.changeSong()
+      #if self.numOfPlayers == 2:
+      #  if self.coOpType:
+      #    if self.coOpScore == 0:
+      #      noScore = True
+      #      self.changeSong()
+      #  if self.playerList[0].score == 0 and self.playerList[1].score == 0:
+      #    noScore = True
+      #    self.changeSong()
       
       
       if not noScore:
