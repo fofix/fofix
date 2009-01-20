@@ -406,7 +406,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       t = self.time / 100
       w, h, = self.engine.view.geometry[2:4]
       r = .5
-      if self.background or self.cheating == False:
+      if self.background:
         imgwidth = self.background.width1()
         wfactor = 640.000/imgwidth
         self.background.transform.reset()
