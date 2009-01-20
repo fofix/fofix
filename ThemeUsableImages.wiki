@@ -2,5 +2,90 @@
 
 = Usable Images By FoFiX=
 
-This will be a complete list of usable images that FoFiX can use.
+This will be a complete list of usable images that FoFiX can use. What directory they
+belong in, and if they are Required or if they are just usable if they exist.
+This is WIP status until completed. Then it will just me maintained as things are added.
 
+
+==Main Theme Directory==
+||_Filename_||_What is file for in FoFiX?_||_Required - Yes/No_||
+||bassgroovemult.png|| WIP || Yes ||
+||bassgrooveneck.png|| WIP || Yes ||
+||bassgrooveneckovr.png|| WIP || Yes ||
+||bigtail1.png|| WIP || Yes ||
+||bigtail2.png|| WIP || Yes ||
+||bpm_beat.png|| WIP || Yes ||
+||bpm_halfbeat.png|| WIP || Yes ||
+||bpm_measure.png|| WIP || Yes ||
+||center_lines.png|| WIP || Yes ||
+||counter.png|| WIP || Yes ||
+||drumcenterlines.png|| WIP || Yes ||
+||drumnotes.png|| WIP || Yes ||
+||editor.png|| WIP || Yes ||
+||fretbuttons.png|| WIP || Yes ||
+||gameresults.png|| WIP || Yes ||
+||glow.png|| WIP || Yes ||
+||guitarsoloneck.png|| WIP || Yes ||
+||guitarsoloneckovr.png|| WIP || Yes ||
+||hitflames1.png|| WIP || Yes ||
+||hitflames2.png|| WIP || Yes ||
+||hitglow.png|| WIP || Yes ||
+||hitglow2.png|| WIP || Yes ||
+||kill1.png|| WIP || Yes ||
+||kill2.png|| WIP || Yes ||
+||loadingbg.png|| WIP || Yes ||
+||lyricsheet.png|| WIP || Yes ||
+||mult.png|| WIP || Yes ||
+||mult2.png|| WIP || Yes ||
+||notes.png|| WIP || Yes ||
+||overdrive bottom.png|| WIP || Yes ||
+||overdrive center_lines.png|| WIP || Yes ||
+||overdrive fill.png|| WIP || Yes ||
+||overdrive full.png|| WIP || Yes ||
+||overdrive side_bars.png|| WIP || Yes ||
+||overdrive top.png|| WIP || Yes ||
+||overdriveneck.png|| WIP || Yes ||
+||pause.png|| WIP || Yes ||
+||rock_arr.png|| WIP || Yes ||
+||rock_bottom.png|| WIP || Yes ||
+||rock_fill.png|| WIP || Yes ||
+||rock_max.png|| WIP || Yes ||
+||rock_top.png|| WIP || Yes ||
+||score.png|| WIP || Yes ||
+||side_bars.png|| WIP || Yes ||
+||soloframe.png|| WIP || Yes ||
+||star1.png|| WIP || Yes ||
+||star2.png|| WIP || Yes ||
+||stargrey.png|| WIP || Yes ||
+||stargrey1.png|| WIP || Yes ||
+||stargrey2.png|| WIP || Yes ||
+||stargrey3.png|| WIP || Yes ||
+||stargrey4.png|| WIP || Yes ||
+||stargrey5.png|| WIP || Yes ||
+||stargrey6.png|| WIP || Yes ||
+||stargrey7.png|| WIP || Yes ||
+||starperfect.png|| WIP || Yes ||
+||starwhite.png|| WIP || Yes ||
+||tail1.png|| WIP || Yes ||
+||tail2.png|| WIP || Yes ||
+||youfailed.png|| WIP || Yes ||
+||yourock.png|| WIP || Yes ||
+
+
+==\Menu\ Directory==
+||_Filename_||_What is file for in FoFiX?_||_Required - Yes/No_||
+||mainbg.png|| WIP || Yes ||
+||maintext.png|| WIP || Yes ||
+||neckchoosebg.png|| WIP || Yes ||
+||neckchooseselect.png|| WIP || Yes ||
+||neckchoosetext.png|| WIP || Yes ||
+||optionsbg.png|| WIP || Yes ||
+||optionspanel.png|| WIP || Yes ||
+||selected.png|| WIP || Yes ||
+||songchoosepaper.png|| WIP || Yes ||
+
+
+==\Stages\ Directory==
+||_Filename_||_What is file for in FoFiX?_||_Required - Yes/No_||
+||default.png|| WIP || Yes ||
+||pratice.png|| WIP || Yes ||
