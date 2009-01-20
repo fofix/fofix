@@ -227,7 +227,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
               if self.subMenuPosTuple:
                 slowdown = Dialogs.chooseItem(self.engine, options, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Speed Select:")), pos = self.subMenuPosTuple)
               else:
-                slowdown = Dialogs.chooseItem(self.engine, options, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Speed Select:")), pos = self.subMenuPosTuple)
+                slowdown = Dialogs.chooseItem(self.engine, options, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Speed Select:")))
               for i in range(len(values)):
                 if options[i] == slowdown:
                   Config.set("audio", "slow_down_divisor", values[i])
