@@ -5515,7 +5515,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           streakFlag = 0  #set the flag to 0
           #if not self.coOpGH or self.rmtype == 2:
             #self.engine.view.setViewportHalf(self.numOfPlayers,i)
-          if self.coOpGH or self.rmtype != 2:
+          if self.coOpGH and self.rmtype != 2:
             self.engine.view.setViewport(1,0)
           Theme.setBaseColor()
           if self.coOpGH:
