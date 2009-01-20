@@ -177,7 +177,7 @@ class Guitar:
     self.difficulty = self.engine.config.get("player%d" %(player), "difficulty")
 
     #myfingershurt:
-    self.hopoStyle        = self.engine.config.get("game", "hopo_style")
+    self.hopoStyle        = self.engine.config.get("game", "hopo_system")
     self.LastStrumWasChord = False
     self.spRefillMode = self.engine.config.get("game","sp_notes_while_active")
     self.hitglow_color = self.engine.config.get("video", "hitglow_color") #this should be global, not retrieved every fret render.
@@ -192,20 +192,21 @@ class Guitar:
 
     self.muteSustainReleases = self.engine.config.get("game", "sustain_muting") #MFH
 
-    self.hitw = self.engine.config.get("game", "hit_window")  #this should be global, not retrieved every BPM change.
-    if self.hitw == 0:   #wide
-      self.hitw = 0.70
-    elif self.hitw == 1: #normal
-      self.hitw = 1.0
-    elif self.hitw == 2: #tight
+    self.hitw = self.engine.config.get("game", "note_hit_window")  #this should be global, not retrieved every BPM change.
+    if self.hitw == 0: 
       self.hitw = 1.2
-    elif self.hitw == 3: #blazingamer new tighter hit window
+    elif self.hitw == 1: 
       self.hitw = 1.9
-    elif self.hitw == 4: #racer: new super tight hit window
+    elif self.hitw == 2: 
       self.hitw = 2.3
     else:
-      self.hitw = 1
-
+      self.hitw = 1.2
+    
+    self.hitwcheat = self.engine.config.get("game", "hit_window_cheat")
+    if self.hitwcheat == 1:   
+      self.hitw = 0.70
+    elif self.hitwcheat == 2: 
+      self.hitw = 1.0
     
     self.twoChord       = 0
     self.hopoActive     = 0
@@ -3267,7 +3268,7 @@ class Guitar:
 
 
       #myfingershurt: this is where to filter out higher frets held when HOPOing:
-      if hopo == False or self.hopoStyle == 2 or self.hopoStyle == 4:
+      if hopo == False or self.hopoStyle == 2 or self.hopoStyle == 3:
       #Check for higher numbered frets if not a HOPO or if GH2 strict mode
         for n, k in enumerate(self.keys):
           if n > requiredKey:

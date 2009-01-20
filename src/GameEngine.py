@@ -147,8 +147,10 @@ Config.define("quickset", "gameplay",    int, 0, text = _("Gameplay"),    option
 Config.define("game",   "tapping",      int,   0,  text = _("HO/PO"),       options = {0: _("Yes"), 1: _("No")})
 Config.define("game",   "hopo_mark",           int,   1,      text = _("HO/PO Note Marks"), options = {0: _("FoF"), 1: _("RFmod")})
 #myfingershurt: HOPO settings
-Config.define("game",   "hopo_style",          int,   4,      text = _("HO/PO System"), options = {0: _("None"), 1: _("RF-Mod"), 2: _("GH2 Strict"), 3: _("GH2 Sloppy"), 4: _("GH2")})
-Config.define("coffee", "moreHopo",            int,   2,   text = _("HO/PO Frequency"),    options = {0: _("0. Least"), 1: _("1. Less"), 2: _("2. Normal"), 3:("3. More"), 4:("4. Even More"), 5:("5. Most")})
+Config.define("game",   "hopo_system",          int,   3,      text = _("HO/PO System"), options = {0: _("None"), 1: _("RF-Mod"), 2: _("GH2 Strict"), 3: _("GH2")})
+Config.define("game",   "gh2_sloppy",          int,   0,      text = _("GH2 Sloppy Mode"), options = {0: _("Off"), 1: _("On")})
+Config.define("coffee", "hopo_frequency",            int,   2,   text = _("HO/PO Frequency"),    options = {0: _("0. Least"), 1: _("1. Less"), 2: _("2. Normal"), 3: _("3. Most")})
+Config.define("coffee", "hopo_freq_cheat",        int,   0,   text = _("HO/PO Frequency Cheats"),  options = {0: _("Off"), 1: _("More"), 2: _("Even More")}),
 Config.define("game", "hopo_after_chord",      int,   1,   text = _("HO/PO After Chord"),    options = {0: _("Off"), 1: _("On")})
 Config.define("game", "accuracy_mode",      int,   2,   text = _("Show Hit Accuracy"),    options = {0: _("Off"), 1: _("Numeric"), 2: _("Friendly"), 3: _("Both")})
 Config.define("game", "accuracy_pos",      int,   1,   text = _("Hit Accuracy Pos"),    options = {0: _("Center"), 1: _("Right-top Corner"), 2: _("Left-Bottom Corner"), 3: _("Center-Bottom")}) #QQstarS:acc show
@@ -280,7 +282,8 @@ Config.define("game", "tut",       bool, False,     text = _("tut"),            
 Config.define("video", "counting",       bool, False,     text = _("Show at Song Start"),             options = {True: _("Part"), False: _("Countdown")})
 
 
-Config.define("game",   "hit_window",          int, 1,    text = _("Note Hit-window"), options = {0: _("1. Widest"), 1: _("2. Wide"), 2: _("3. Standard"), 3: _("4. Tight"), 4: _("5. Tightest")})#racer blazingamer
+Config.define("game",   "note_hit_window",          int, 1,    text = _("Note Hit-window"), options = {0: _("1. Standard"), 1: _("2. Tight"), 2: _("3. Tightest")})#racer blazingamer
+Config.define("game",   "hit_window_cheat",    int, 0,    text = _("Hit-Window Cheat"), options = {0: _("Off"), 1: _("Widest"), 2: _("Wide")})
 Config.define("game",   "disable_vbpm",        bool,  False,  text = _("Disable Variable BPM"),  options = {False: _("No"), True: _("Yes")})
 Config.define("game",   "sort_direction",      int, 0,    text = _("Sort Direction"), options = {0: _("Ascending"), 1: _("Descending")})
 Config.define("game",   "sort_order",          int,   0,      text = _("Sort Setlist By"), options = {0: _("Title"), 1: _("Artist"), 2: _("Times played"), 3: _("Album"), 4: _("Genre"), 5: _("Year"), 6: _("Band Difficulty"), 7: _("Song Collection")})

@@ -224,8 +224,8 @@ class SettingsMenu(Menu.Menu):
     StagesOptionsMenu = Menu.Menu(engine, StagesOptions)
     
     HOPOSettings = [
-       ConfigChoice(engine, engine.config, "game", "hopo_style", autoApply = True),      #myfingershurt
-       ConfigChoice(engine, engine.config, "coffee", "moreHopo", autoApply = True),
+       ConfigChoice(engine, engine.config, "game", "hopo_system", autoApply = True),      #myfingershurt
+       ConfigChoice(engine, engine.config, "coffee", "hopo_frequency", autoApply = True),
        ConfigChoice(engine, engine.config, "game", "song_hopo_freq", autoApply = True),      #myfingershurt
        ConfigChoice(engine, engine.config, "game", "hopo_after_chord", autoApply = True),      #myfingershurt
     ]
@@ -249,7 +249,7 @@ class SettingsMenu(Menu.Menu):
     JurgenSettingsMenu = Menu.Menu(engine, JurgenSettings)
            
     FoFiXAdvancedSettings = [
-      ConfigChoice(engine, engine.config, "game",   "hit_window", autoApply = True), #alarian: defines hit window
+      ConfigChoice(engine, engine.config, "game",   "note_hit_window", autoApply = True), #alarian: defines hit window
       ConfigChoice(engine, engine.config, "performance", "star_score_updates", autoApply = True, isQuickset = 1),   #MFH
       ConfigChoice(engine, engine.config, "game", "bass_groove_enable", autoApply = True, isQuickset = 2),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "lphrases", autoApply = True),#blazingamer
@@ -614,9 +614,11 @@ class SettingsMenu(Menu.Menu):
     AdvancedSettingsMenu = Menu.Menu(engine, AdvancedSettings)
     
     Cheats = [
-      ConfigChoice(engine, engine.config, "game", "jurgmode", autoApply = True),#Spikehead777
-      ConfigChoice(engine, engine.config, "game", "jurgtype", autoApply = True),#Spikehead777
+      ConfigChoice(engine, engine.config, "game", "jurgmode", autoApply = True),
       (_("Jurgen Settings"), JurgenSettingsMenu),
+      ConfigChoice(engine, engine.config, "game", "gh2_sloppy", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "hit_window_cheat", autoApply = True),
+      ConfigChoice(engine, engine.config, "coffee", "hopo_freq_cheat", autoApply = True),
       ConfigChoice(engine, engine.config, "coffee", "failingEnabled", autoApply = True),
       ConfigChoice(engine, engine.config, "audio",  "slow_down_divisor", autoApply = True),     #MFH
       (_("Mod settings"), modSettings),
@@ -1138,8 +1140,11 @@ class BasicSettingsMenu(Menu.Menu):
     listSettingsMenu = Menu.Menu(engine, listSettings)
 
     Cheats = [
-      ConfigChoice(engine, engine.config, "game", "jurgmode", autoApply = True),#Spikehead777
-      ConfigChoice(engine, engine.config, "game", "jurgtype", autoApply = True),#Spikehead777
+      ConfigChoice(engine, engine.config, "game", "jurgmode", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "jurgtype", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "gh2_sloppy", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "hit_window_cheat", autoApply = True),
+      ConfigChoice(engine, engine.config, "coffee", "hopo_freq_cheat", autoApply = True),
       ConfigChoice(engine, engine.config, "coffee", "failingEnabled", autoApply = True),
       ConfigChoice(engine, engine.config, "audio",  "slow_down_divisor", autoApply = True),     #MFH
       (_("Mod settings"), modSettings),

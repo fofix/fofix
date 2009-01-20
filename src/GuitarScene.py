@@ -1880,7 +1880,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     else:
       self.autoPlay         = self.engine.config.get("game", "jurgmode")
 
-    self.hopoStyle        = self.engine.config.get("game", "hopo_style")
+    self.hopoStyle        = self.engine.config.get("game", "hopo_system")
+    self.gh2sloppy        = self.engine.config.get("game", "gh2_sloppy")
+    if self.gh2sloppy == 1:
+      self.hopoStyle == 4
     self.hopoAfterChord = self.engine.config.get("game", "hopo_after_chord")
 
     self.pov              = self.engine.config.get("fretboard", "point_of_view")
@@ -4070,10 +4073,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if (self.guitars[num].LastStrumWasChord or (self.guitars[num].wasLastNoteHopod and LastHopoFretStillHeld)):
           ApplyPenalty = False
 
-      if (self.hopoStyle == 3 and hopo == True):  #GH2 Sloppy
+      if (self.hopoStyle == 4 and hopo == True):  #GH2 Sloppy
         ApplyPenalty = False
 
-      if (self.hopoStyle == 4 and hopo == True):  #GH2
+      if (self.hopoStyle == 3 and hopo == True):  #GH2
         ApplyPenalty = False
         if not (self.guitars[num].LastStrumWasChord or (self.guitars[num].wasLastNoteHopod and LastHopoFretStillHeld)):
           self.guitars[num].hopoActive = 0
@@ -4424,7 +4427,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if control in (self.guitars[0].keys) and numpressed[0] >= 1:
       if self.guitars[0].hopoActive > 0 or (self.guitars[0].wasLastNoteHopod and self.guitars[0].hopoActive == 0):
 
-        if not pullOff and (self.hopoStyle == 2 or self.hopoStyle == 4): #GH2 or GH2 Strict, don't allow lower-fret tapping while holding a higher fret
+        if not pullOff and (self.hopoStyle == 2 or self.hopoStyle == 3): #GH2 or GH2 Strict, don't allow lower-fret tapping while holding a higher fret
 
           activeKeyList = []
           LastHopoFretStillHeld = False
@@ -4450,7 +4453,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     elif self.numOfPlayers > 1 and control in (self.guitars[1].keys) and numpressed[1] >= 1:
       if self.guitars[1].hopoActive > 0  or (self.guitars[1].wasLastNoteHopod and self.guitars[1].hopoActive == 0):
 
-        if not pullOff and (self.hopoStyle == 2 or self.hopoStyle == 4): #GH2 or GH2 Strict, don't allow lower-fret tapping while holding a higher fret
+        if not pullOff and (self.hopoStyle == 2 or self.hopoStyle == 3): #GH2 or GH2 Strict, don't allow lower-fret tapping while holding a higher fret
 
           activeKeyList = []
           LastHopoFretStillHeld = False

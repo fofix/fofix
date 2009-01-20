@@ -279,7 +279,7 @@ class Config:
 
     #4    
     #Value 0 FoF / 1 RFmod / 2 RFmod2
-    hopoStyle = int(self.get("game", "hopo_style"))
+    hopoStyle = int(self.get("game", "hopo_system"))
 
     #5    
     #Value 0 FoF / 1 GH / 2 Custom

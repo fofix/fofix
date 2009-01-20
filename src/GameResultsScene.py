@@ -119,7 +119,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.cheerLoopCounter = self.cheerLoopDelay   #MFH - starts out ready to cheer
       
     #MFH
-    self.hopoStyle        = self.engine.config.get("game", "hopo_style")
+    self.hopoStyle        = self.engine.config.get("game", "hopo_system")
     if self.hopoStyle == 0:
       self.hopoStyle = _("None")
     elif self.hopoStyle == 1:
@@ -127,11 +127,13 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     elif self.hopoStyle == 2:
       self.hopoStyle = _("GH2 Strict")
     elif self.hopoStyle == 3:
-      self.hopoStyle = _("GH2 Sloppy")
-    elif self.hopoStyle == 4:
       self.hopoStyle = _("GH2")
+    
+    self.gh2sloppy        = self.engine.config.get("game", "gh2_sloppy")
+    if self.gh2sloppy == 1:
+      self.hopoStyle = _("GH2 SLOPPY")
 
-    self.hopoFreq        = self.engine.config.get("coffee", "moreHopo")
+    self.hopoFreq        = self.engine.config.get("coffee", "hopo_frequency")
     #MFH if song.ini HOPO frequency exists and is enabled, display that instead...
     self.songHopoFreq = self.engine.config.get("game", "song_hopo_freq")
     songHopoFreq = self.playerList[0].hopoFreq
@@ -150,23 +152,15 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     elif self.hopoFreq == 2:
       self.hopoFreq = _("Normal")
     elif self.hopoFreq == 3:
-      self.hopoFreq = _("More")
-    elif self.hopoFreq == 4:
-      self.hopoFreq = _("Even More")
-    elif self.hopoFreq == 5:
       self.hopoFreq = _("Most")
 
-    self.hitWindow = self.engine.config.get("game", "hit_window")  #this should be global, not retrieved every BPM change.
+    self.hitWindow = self.engine.config.get("game", "note_hit_window")  #this should be global, not retrieved every BPM change.
     if self.hitWindow == 0:
-      self.hitWindow = _("1. Widest")
+      self.hitWindow = _("1. Standard")
     elif self.hitWindow == 1:
-      self.hitWindow = _("2. Wide")
+      self.hitWindow = _("2. Tight")
     elif self.hitWindow == 2:
-      self.hitWindow = _("3. Standard")
-    elif self.hitWindow == 3:
-      self.hitWindow = _("4. Tight")
-    elif self.hitWindow == 4:
-      self.hitWindow = _("5. Tightest")
+      self.hitWindow = _("3. Tightest")
 
 
     self.engine.loadImgDrawing(self, "background", os.path.join("themes",themename,"gameresults.png"))

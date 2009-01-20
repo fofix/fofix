@@ -1311,7 +1311,8 @@ class Track:
 
     self.chordFudge = 1
 
-    self.hopoTick = engine.config.get("coffee", "moreHopo")
+    self.hopoTick = engine.config.get("coffee", "hopo_frequency")
+    self.hopoTickCheat = engine.config.get("coffee", "hopo_freq_cheat")
     self.songHopoFreq = engine.config.get("game", "song_hopo_freq")
 
   def __getitem__(self, index):
@@ -1457,13 +1458,14 @@ class Track:
       ticksPerBeat = 720
     elif self.hopoTick == 2:
       ticksPerBeat = 480
-    elif self.hopoTick == 3:
-      ticksPerBeat = 360
-    elif self.hopoTick == 4:
-      ticksPerBeat = 240
     else:
       ticksPerBeat = 240
       hopoDelta = 250
+      
+    if self.hopoTickCheat == 1:
+      ticksPerBeat = 360
+    elif self.hopoTickCheat == 2:
+      ticksPerBeat = 240
       
     hopoNotes = []
     chordNotes = []
@@ -1697,13 +1699,15 @@ class Track:
       ticksPerBeat = 720
     elif self.hopoTick == 2:
       ticksPerBeat = 480
-    elif self.hopoTick == 3:
-      ticksPerBeat = 360
-    elif self.hopoTick == 4:
-      ticksPerBeat = 240
     else:
       ticksPerBeat = 240
       hopoDelta = 250
+      
+    if self.hopoTickCheat == 1:
+      ticksPerBeat = 360
+    elif self.hopoTickCheat == 2:
+      ticksPerBeat = 240
+      
     hopoNotes = []
 
     #myfingershurt:
