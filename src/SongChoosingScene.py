@@ -222,7 +222,18 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
           slowDownDivisor = Config.get("audio",  "slow_down_divisor")
            
           while True: #new nesting for Practice Mode - section / start time selection
-            #if self.player.practiceMode:
+            if self.player.practiceMode:
+              values, options = Config.getOptions("audio", "slow_down_divisor")
+              if self.subMenuPosTuple:
+                slowdown = Dialogs.chooseItem(self.engine, options, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Speed Select:")), pos = self.subMenuPosTuple)
+              else:
+                slowdown = Dialogs.chooseItem(self.engine, options, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Speed Select:")), pos = self.subMenuPosTuple)
+              for i in range(len(values)):
+                if options[i] == slowdown:
+                  Config.set("audio", "slow_down_divisor", values[i])
+                  slowDownDivisor = values[i]
+                  break
+              
             if self.player.practiceMode and slowDownDivisor == 1:
               #self.engine.resource.load(self, "song", lambda: Song.loadSong(self.engine, songName, library = self.libraryName, notesOnly = True, part = [player.part for player in self.playerList]), onLoad = self.songLoaded)
 

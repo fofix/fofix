@@ -179,6 +179,49 @@ class Config:
     if logIniReads == 1:
       Log.debug("Config.get: %s.%s = %s" % (section, option, value))
     return value
+  
+  def getOptions(self, section, option):
+    """
+    Read the preset options of a configuration key.
+    
+    @param section:   Section name
+    @param option:    Option name
+    @return:          Tuple of Key list and Values list
+    """
+    global logIniReads, logUndefinedGets
+
+
+    try:
+      options = self.prototype[section][option].options.values()
+      keys    = self.prototype[section][option].options.keys()
+      type    = self.prototype[section][option].type
+    except KeyError:
+      if logUndefinedGets == 1:
+        Log.warn("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
+      type = None
+      
+    optionList = []
+  
+    if type != None:
+      for i in range(len(options)):
+        value = keys[i]
+        if type == bool:
+          value = str(value).lower()
+          if value in ("1", "true", "yes", "on"):
+            value = True
+          else:
+            value = False
+        else:
+          try:
+            value = type(value)
+          except:
+            value = None
+        optionList.append(value)
+      
+    #myfingershurt: verbose log output
+    if logIniReads == 1:
+      Log.debug("Config.getOptions: %s.%s = %s" % (section, option, str(optionList)))
+    return optionList, options
 
 #-------------------------
 # glorandwarf: returns the default value of a configuration key
@@ -383,5 +426,17 @@ def getDefault(section, option):
   """
   global config
   return config.getDefault(section, option)
+
+#-------------------------
+def getOptions(section, option):
+  """
+  Read the default value of a global configuration key.
+  
+  @param section:   Section name
+  @param option:    Option name
+  @return:          Tuple of Key list and Values list
+  """
+  global config
+  return config.getOptions(section, option)
 
 #-------------------------
