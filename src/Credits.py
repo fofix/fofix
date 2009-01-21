@@ -39,7 +39,44 @@ import Song
 import Version
 import Player
 import Config
+import Dialogs
 import Theme
+
+#akedrou - Translatable Strings:
+bank = {}
+
+bank['intro']      = [_("This mod was built on Alarian's mod,"),
+                      _("which was built on UltimateCoffee's Ultimate mod,"),
+                      _("which was built on RogueF's RF_mod 4.15,"),\
+                      _("which was, of course, built on Frets on Fire 1.2.451,"),
+                      _("which was created by Unreal Voodoo")]
+bank['noOrder']    = [_("No Particular Order")]
+bank['coders']     = [_("Active Coders:")]
+bank['pastCoders'] = [_("Past Coders:")]
+bank['graphics']   = [_("Main Graphic Contributors:")]
+bank['Team Hero']  = [_("Team Hero:")]
+bank['careerMode'] = [_("Creators of Career Mode")]
+bank['honorary']   = [_("Honorary Credits to:")]
+bank['donations']  = [_("Donations to MFH")]
+bank['majorDonor'] = [_("Major Donations:")]
+bank['otherDonor'] = [_("Other Donations:")]
+bank['other']      = [_("Other Credits:")]
+bank['tutorial']   = [_("Jurgen FoF tutorial inspired by adam02"),
+                      _("Drum test song tutorial by Heka"),
+                      _("Bang Bang Mystery Man song tutorial is from the original FoF"),
+                      _("Drum Rolls practice tutorial by venom426")]
+bank['disclaimer'] = [_("If you see your work included in this game and you aren't"),
+                      _("in the credits, please leave a polite post stating what you"),
+                      _("did and when, as specific as possible."),
+                      _("If you can, please provide a link to your original posting"),
+                      _("of the work in question."),
+                      _("Then we can properly credit you.")]
+bank['thanks']     = [_("Thank you for your contribution.")]
+bank['oversight']  = [_("Please keep in mind that it is not easy to trace down and"),
+                      _("credit every single person who contributed; if your name is"),
+                      _("not included, it was not meant to slight you."),
+                      _("It was an oversight.")]
+
 
 class Element:
   """A basic element in the credits scroller."""
@@ -101,6 +138,8 @@ class Credits(Layer, KeyListener):
     self.engine      = engine
     self.time        = 0.0
     self.offset      = 1.0
+    self.speedDiv    = 15000.0
+    self.speedDir    = 1.0
     self.themename = Config.get("coffee", "themename")
     
     Config.set("game", "selected_library", "songs")
@@ -112,7 +151,7 @@ class Credits(Layer, KeyListener):
     hs = 0.003
     c1 = (1, 1, .5, 1)
     c2 = (1, .75, 0, 1)
-    self.text_size = nf.getLineSpacing(scale = ns)
+    self.text_size = nf.getLineSpacing(scale = hs)
 
     space = Text(nf, hs, c1, "center", " ")
     self.credits = [
@@ -133,15 +172,47 @@ class Credits(Layer, KeyListener):
           self.credits.append(space)
         elif line.startswith("`") and line.endswith("`"):
           line = line.strip("`")
-          self.credits.append( Text(nf, bs, c1, "left", "%s" % line) )
+          if line.startswith("%") and line.endswith("%"):
+            line = line.strip("%")
+            try:
+              for text in bank[line]:
+                self.credits.append( Text(nf, bs, c1, "left", "%s" % text) )
+            except KeyError:
+              self.credits.append( Text(nf, bs, c1, "left", "%s" % line) )
+          else:
+            self.credits.append( Text(nf, bs, c1, "left", "%s" % line) )
         elif line.startswith("_") and line.endswith("_"):
           line = line.strip("_")
-          self.credits.append( Text(nf, ns, c2, "center", "%s" % line) )
+          if line.startswith("%") and line.endswith("%"):
+            line = line.strip("%")
+            try:
+              for text in bank[line]:
+                self.credits.append( Text(nf, ns, c2, "center", "%s" % text) )
+            except KeyError:
+              self.credits.append( Text(nf, ns, c2, "center", "%s" % line) )
+          else:
+            self.credits.append( Text(nf, ns, c2, "center", "%s" % line) )
         elif line.startswith("=") and line.endswith("="):
           line = line.strip("=")
-          self.credits.append( Text(nf, ns, c1, "left", "%s" % line) )
+          if line.startswith("%") and line.endswith("%"):
+            line = line.strip("%")
+            try:
+              for text in bank[line]:
+                self.credits.append( Text(nf, ns, c1, "left", "%s" % text) )
+            except KeyError:
+              self.credits.append( Text(nf, ns, c1, "left", "%s" % line) )
+          else:
+            self.credits.append( Text(nf, ns, c1, "left", "%s" % line) )
         else:
-          self.credits.append( Text(nf, ns, c2, "right", "%s" % line) )
+          if line.startswith("%") and line.endswith("%"):
+            line = line.strip("%")
+            try:
+              for text in bank[line]:
+                self.credits.append( Text(nf, ns, c2, "right", "%s" % text) )
+            except KeyError:
+              self.credits.append( Text(nf, ns, c2, "right", "%s" % line) )
+          else:
+            self.credits.append( Text(nf, ns, c2, "right", "%s" % line) )
   
     self.credits.extend( [
       space,
@@ -172,18 +243,8 @@ class Credits(Layer, KeyListener):
       Text(nf, bs, c2, "center", "http://code.google.com/p/fofix"),
       space,
       space,
-      space,
-      space,
       Text(nf, bs, c1, "center", _("Copyright 2006, 2007 by Unreal Voodoo")),
       Text(nf, bs, c1, "center", _("Copyright 2008 by Team FoFiX")),
-      space,
-      space,
-      space,
-      space,
-      space,
-      space,
-      space,
-      space,
       space,
       space
     ])
@@ -199,18 +260,36 @@ class Credits(Layer, KeyListener):
     self.engine.view.popLayer(self)
 
   def keyPressed(self, key, unicode):
-    if self.engine.input.controls.getMapping(key) in [Player.CANCEL, Player.KEY1, Player.KEY2, Player.PLAYER_2_CANCEL, Player.PLAYER_2_KEY1, Player.PLAYER_2_KEY2] or key == pygame.K_RETURN:
+    if self.engine.input.controls.getMapping(key) in (Player.CANCELS + Player.KEY1S + Player.KEY2S + Player.DRUM1S + Player.DRUM4S) or key == pygame.K_RETURN or key == pygame.K_ESCAPE:
       self.quit()
+    elif self.engine.input.controls.getMapping(key) in (Player.ACTION2S + Player.DRUM3S): #akedrou: so I was bored.
+      if self.speedDiv > 1000.0:
+        self.speedDiv -= 1000.0
+        if self.speedDiv < 1000.0:
+          self.speedDiv = 1000.0
+    elif self.engine.input.controls.getMapping(key) in (Player.ACTION1S + Player.DRUM2S):
+      if self.speedDiv < 30000.0:
+        self.speedDiv += 1000.0
+        if self.speedDiv > 30000.0:
+          self.speedDiv = 30000.0
+    elif self.engine.input.controls.getMapping(key) in (Player.KEY3S):
+      self.speedDir *= -1
+    elif self.engine.input.controls.getMapping(key) in (Player.KEY4S):
+      if self.speedDir != 0:
+        self.speedDir = 0
+      else:
+        self.speedDir = 1.0
     return True
   
   def run(self, ticks):
     self.time   += ticks / 50.0
     #self.offset -= ticks / 7500.0 # evilynux - corresponds to scroll speed
-    self.offset -= ticks / 15000.0 #MFH - slowin it down - # evilynux - corresponds to scroll speed
+    #self.offset -= ticks / 15000.0 #MFH - slowin it down - # evilynux - corresponds to scroll speed
+    self.offset -= (ticks / self.speedDiv) * self.speedDir #akedrou - some credits fun.
 
     # evilynux - approximating the end of the list from the (mostly used font size * lines)
     #if self.offset < -( self.text_size * len(self.credits) ):
-    if self.offset < -( (self.text_size * 1.05) * len(self.credits) ):    #MFH - adding 5% to estimated font height
+    if self.offset < -( self.text_size * len(self.credits) ) or self.offset > 1.5:    #(MFH - adding 5% to estimated font height) undone: using larger scale for estimation.
       self.quit()
   
   def render(self, visibility, topMost):
@@ -221,6 +300,7 @@ class Credits(Layer, KeyListener):
     w, h, = self.engine.view.geometry[2:4]
     
     self.engine.view.setOrthogonalProjection(normalize = True)
+    Dialogs.fadeScreen(.4)
     font = self.engine.data.font
 
     # render the scroller elements

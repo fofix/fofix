@@ -1,14 +1,10 @@
 =======================CREDITS:========================
 =======================================================
-_This mod is built on Alarian's Mod,_
-_which was built on Ultimate Coffee's Ultimate Mod,_
-_which was built on Rogue_F's RF_Mod 4.15,_
-_which was, of course, built on Frets on Fire 1.2.451,_
-_which was created by Unreal Voodoo_
+_%intro%_
 -------------------------------------------------------
 
-=Active Coders:=
-`No particular order`
+=%coders%=
+`%noOrder%`
 Myfingershurt (chris.paiano)
 Pascal Giard (evilynux)
 Blazingamer
@@ -18,8 +14,8 @@ john.stumpo
 volshebnyi
 Worldrave
 
-=Past Coders=
-`No particular order`
+=%pastCoders%=
+`%noOrder%`
 Alarian
 Capo
 Glorandwarf
@@ -31,8 +27,8 @@ rchiav
 
 -------------------------------------------------------
 
-=Main graphic contributors:=
-`No particular order`
+=%graphics%=
+`%noOrder%`
 Alarian
 Ds~
 Dævid
@@ -43,25 +39,25 @@ kristijan_mkd
 
 -------------------------------------------------------
 
-=Team Hero:=
-`Creators of Career Mode`
+=%Team Hero%=
+`%careerMode%`
 Lsapg09, Jrdnxxhero, Blackfriday, blessedmain911, ADH, 
 razlo7, coolguy5678, arfn24, Qwedgeonline
 -------------------------------------------------------
 
-=Honorary credits to:=
+=%honorary%=
 Rogue_F, h3r1n6, Ultimate Coffee, Unreal Voodoo
 -------------------------------------------------------
 
-=Donations to MFH=
+=%donations%=
 
-`Major Donations:`
+`%majorDonor%`
 Slantyr ($50.00)
 fralacos ($42.00)
 Matt (KillerQ) ($35.00)
 Nickman ($23.23)
 
-`Other Donations:`
+`%otherDonor%`
 Bluto ($10.00)
 SmashD ($7.50)
 Simon Lemaire, Ryan Turcotte, 
@@ -74,8 +70,8 @@ Roland Willa ($1.00)
 
 -------------------------------------------------------
 
-=Other credits:=
-`No particular order`
+=%other%=
+`%noOrder%`
 Aduro, blessedmain911, Chadman, Divra, Evil Ken, FoZZ, 
 Kookoz, Inkk, Meteorito, Pudding, Racer 13, 
 Raph666, RavenSourcious, Seraph88, TXF, v4vendetta, YMS,
@@ -93,23 +89,12 @@ Leixner, Trinidude4, ver, pingflood
 
 -------------------------------------------------------
 
-_Jurgen FoF tutorial inspired by adam02_
-_Drum test song tutorial by Heka_
-_Bang Bang Mystery Man song tutorial is from the original FoF_
-_Drum Rolls practice tutorial by venom426_
+_%tutorial%_
 =======================================================
 
-_If you see your work included in this game and you aren't_
-_in the credits, please leave a polite post stating what you_
-_did and when, be as specific as possible._
-_If you can, please provide a link to your original posting_
-_of the work in question._
-_Then we can properly credit you._
+_%disclaimer%_
 
-_Thank you for your contribution._
+_%thanks%_
 
-_Please keep in mind that it is not easy to trace down and_
-_credit every single person who contributed; if your name is_
-_not included, it was not meant to slight you._
-_It was an oversight._
+_%oversight%_
 =================================================================================
