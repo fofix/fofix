@@ -4,7 +4,8 @@ First, you need to create a 'theme.ini' file in your theme's folder. Once you cr
 
 _{{{[theme]}}}_
 
-Then use any of the following settings below the {{{[theme]}}} header:
+Then use any of the following settings below the {{{[theme]}}} header in the theme.ini file. This list is mostly organized by which options belong mostly to which screen, but not necessarily to JUST that screen, since some items currently control things on multiple screens.
+
 -----------------------------------------------------------------------------------------
 ==Main Menu==
 
@@ -13,6 +14,19 @@ Then use any of the following settings below the {{{[theme]}}} header:
 ||menu_y = .842||Y Position of main menu image. Use a decimal # between 0-1||
 ||main_menu_scale = .5||Controls the size of main menu text. Use a decimal # between 0-1|| 
 ||main_menu_vspacing = 0.09||Controls the spacing between the menu text items. Use a decimal # between 0-1||
+
+
+
+------------------------------------------------------------------------------------------
+==Options Menu==
+
+||opt_bkg_x = 0||0 starts from the center||
+||opt_bkg_y = 0||0 starts from the center||
+||opt_text_x = .38||Controls the Option Menu X text position||
+||opt_text_y = .15||Controls the Option Menu Y text position||
+||opt_text_color = #FFFFFF||Use a Hex color code||
+||opt_selected_color = #FFBF00||Use a Hex color code||
+
 
 
 ------------------------------------------------------------------------------------------
@@ -40,8 +54,6 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||career_title_color = #000000||Use a Hex color code||
 ||library_text_color = #FFFFFF||Use a Hex color code||
 ||library_selected_color = #FFBF00||Use a Hex color code||
-||opt_text_color = #FFFFFF||Use a Hex color code||
-||opt_selected_color = #FFBF00||Use a Hex color code||
 ||song_cd_x = 0||Can be 0 through 5, values outside this range will be clipped to 0 or 5 to prevent CDs from going off-screen||
 ||song_cdscore_x = .6||Use a decimal # between 0 - 1. IE- .34||
 ||song_list_x = .15||Use a decimal # between 0 - 1. IE- .34||
@@ -126,7 +138,7 @@ Notice - If you just want the default phrases to show do not put these in your t
 
 
 ----------------------------------------------------------------------------
-==Pause & options menus==
+==Pause Menu's==
 ||_*Item Name*_||_*What it Does/How to use it*_||
 ||fail_bkg_x = 0||Controls the fail menu background and text positions||
 ||fail_bkg_y = 0||Controls the fail menu background and text positions||
@@ -135,10 +147,6 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||fail_text_x =   ||Default is calculated, not constant||
 ||fail_text_y = .47||Controls the fail menu background and text positions||
 ||fail_text_color = #FFFFFF||Use a Hex color code||
-||opt_bkg_x = 0||0 starts from the center||
-||opt_bkg_y = 0||0 starts from the center||
-||opt_text_x = .38||Controls the Option Menu X text position||
-||opt_text_y = .15||Controls the Option Menu Y text position||
 ||pause_bkg_x = 0||0 starts from the center of the screen||
 ||pause_bkg_y = 0||0 starts from the center of the screen||
 ||pause_selected_color = #FFBF00||Use a Hex color code||
