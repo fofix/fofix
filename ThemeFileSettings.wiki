@@ -22,10 +22,10 @@ Then use any of the following settings below the {{{[theme]}}} header in the the
 
 ||opt_bkg_x = 0||0 starts from the center||
 ||opt_bkg_y = 0||0 starts from the center||
-||opt_text_x = .38||Controls the Option Menu X text position||
-||opt_text_y = .15||Controls the Option Menu Y text position||
-||opt_text_color = #FFFFFF||Use a Hex color code||
-||opt_selected_color = #FFBF00||Use a Hex color code||
+||opt_selected_color = #FFBF00||Selects the color of the options menu selected text. Use a Hex color code||
+||opt_text_x = .38||Controls the Option Menu text X position||
+||opt_text_y = .15||Controls the Option Menu text Y position||
+||opt_text_color = #FFFFFF||Selects the color of the options menu items. Use a Hex color code||
 
 
 
