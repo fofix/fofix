@@ -585,7 +585,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "coffee", "song_display_mode", autoApply = True),
       ConfigChoice(engine, engine.config, "game",  "sort_order", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "sort_direction", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "song_listing_mode", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "song_listing_mode", autoApply = True, isQuickset = 2),
       ConfigChoice(engine, engine.config, "game", "quickplay_tiers", autoApply = True),  #myfingershurt
       ConfigChoice(engine, engine.config, "coffee", "songfilepath", autoApply = True),
       #(_("Select List All Folder >"), self.listAllFolderSelect), #- Not Working Yet - Qstick
@@ -702,46 +702,49 @@ class SettingsMenu(Menu.Menu):
     gameSetNum = self.config.get("quickset","gameplay")
     
     if gameSetNum == 1:
-	    self.config.set("game", "sp_notes_while_active", 1)
-	    self.config.set("game", "bass_groove_enable", 1)
-	    self.config.set("game", "big_rock_endings", 1)
-	    self.config.set("game", "in_game_stars", 1)
-	    Log.debug("Quickset Gameplay - Theme-Based")
-	    
+      self.config.set("game", "sp_notes_while_active", 1)
+      self.config.set("game", "bass_groove_enable", 1)
+      self.config.set("game", "big_rock_endings", 1)
+      self.config.set("game", "in_game_stars", 1)
+      self.config.set("coffee", "song_display_mode", 4)
+      Log.debug("Quickset Gameplay - Theme-Based")
+      
     elif gameSetNum == 2:
-	    self.config.set("game", "sp_notes_while_active", 2)
-	    self.config.set("game", "bass_groove_enable", 2)
-	    self.config.set("game", "big_rock_endings", 2)
-	    Log.debug("Quickset Gameplay - MIDI-Based")
-	    
+      self.config.set("game", "sp_notes_while_active", 2)
+      self.config.set("game", "bass_groove_enable", 2)
+      self.config.set("game", "big_rock_endings", 2)
+      Log.debug("Quickset Gameplay - MIDI-Based")
+      
     elif gameSetNum == 3:
-	    self.config.set("game", "sp_notes_while_active", 3)
-	    self.config.set("game", "bass_groove_enable", 3)
-	    self.config.set("game", "big_rock_endings", 2)
-	    self.config.set("game", "in_game_stars", 2)
-	    self.config.set("game", "counting", True)
-	    Log.debug("Quickset Gameplay - RB style")
-	    
+      self.config.set("game", "sp_notes_while_active", 3)
+      self.config.set("game", "bass_groove_enable", 3)
+      self.config.set("game", "big_rock_endings", 2)
+      self.config.set("game", "in_game_stars", 2)
+      self.config.set("game", "counting", True)
+      Log.debug("Quickset Gameplay - RB style")
+      
     elif gameSetNum == 4:
-	    self.config.set("game", "sp_notes_while_active", 0)
-	    self.config.set("game", "bass_groove_enable", 0)
-	    self.config.set("game", "big_rock_endings", 0)
-	    self.config.set("game", "in_game_stars", 0)
-	    self.config.set("game", "counting", False)
-	    Log.debug("Quickset Gameplay - GH style")
+      self.config.set("game", "sp_notes_while_active", 0)
+      self.config.set("game", "bass_groove_enable", 0)
+      self.config.set("game", "big_rock_endings", 0)
+      self.config.set("game", "in_game_stars", 0)
+      self.config.set("coffee", "song_display_mode", 1)
+      self.config.set("game", "counting", False)
+      Log.debug("Quickset Gameplay - GH style")
       
     elif gameSetNum == 5: # This needs work.
-	    self.config.set("game", "sp_notes_while_active", 0)
-	    self.config.set("game", "bass_groove_enable", 0)
-	    self.config.set("game", "big_rock_endings", 0)
-	    self.config.set("game", "in_game_stars", 0)
-	    self.config.set("game", "counting", True)
-	    Log.debug("Quickset Gameplay - WT style")
+      self.config.set("game", "sp_notes_while_active", 0)
+      self.config.set("game", "bass_groove_enable", 0)
+      self.config.set("game", "big_rock_endings", 0)
+      self.config.set("game", "in_game_stars", 0)
+      self.config.set("coffee", "song_display_mode", 1)
+      self.config.set("game", "counting", True)
+      Log.debug("Quickset Gameplay - WT style")
       
     # elif gameSetNum == 6: #FoFiX mode - perhaps soon.
       
     else:
-	    Log.debug("Quickset Gameplay - Manual")
+      Log.debug("Quickset Gameplay - Manual")
     
     if perfSetNum == 1:
       self.config.set("performance", "game_priority", 2)
@@ -756,6 +759,7 @@ class SettingsMenu(Menu.Menu):
       self.config.set("game", "partial_stars", 0)
       self.config.set("game", "songlistrotation", False)
       self.config.set("game", "song_listing_mode", 0)
+      self.config.set("game", "song_display_mode", 1)
       self.config.set("game", "stage_animate", 0)
       self.config.set("game", "lyric_mode", 0)
       self.config.set("audio", "enable_crowd_tracks", 0)
@@ -766,7 +770,7 @@ class SettingsMenu(Menu.Menu):
       self.config.set("performance", "preload_glyph_cache", False)
       self.config.set("performance", "cache_song_metadata", False)
       Log.debug("Quickset Performance - Fastest")
-	    
+      
     elif perfSetNum == 2:
       self.config.set("performance", "game_priority", 2)
       self.config.set("performance", "starspin", False)
@@ -790,7 +794,7 @@ class SettingsMenu(Menu.Menu):
       self.config.set("performance", "preload_glyph_cache", True)
       self.config.set("performance", "cache_song_metadata", True)
       Log.debug("Quickset Performance - Fast")
-	    
+      
     elif perfSetNum == 3:
       self.config.set("performance", "game_priority", 2)
       self.config.set("performance", "starspin", True)
@@ -812,7 +816,7 @@ class SettingsMenu(Menu.Menu):
       self.config.set("performance", "preload_glyph_cache", True)
       self.config.set("performance", "cache_song_metadata", True)
       Log.debug("Quickset Performance - Quality")
-	    
+      
     elif perfSetNum == 4:
       self.config.set("performance", "game_priority", 2)
       self.config.set("performance", "starspin", True)
@@ -1130,7 +1134,7 @@ class BasicSettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "coffee", "song_display_mode", autoApply = True),
       ConfigChoice(engine, engine.config, "game",  "sort_order", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "sort_direction", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "song_listing_mode", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "song_listing_mode", autoApply = True, isQuickset = 2),
       ConfigChoice(engine, engine.config, "game", "quickplay_tiers", autoApply = True),  #myfingershurt
       ConfigChoice(engine, engine.config, "game", "songcovertype", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "song_icons", autoApply = True),
@@ -1211,46 +1215,49 @@ class BasicSettingsMenu(Menu.Menu):
     gameSetNum = self.config.get("quickset","gameplay")
     
     if gameSetNum == 1:
-	    self.config.set("game", "sp_notes_while_active", 1)
-	    self.config.set("game", "bass_groove_enable", 1)
-	    self.config.set("game", "big_rock_endings", 1)
-	    self.config.set("game", "in_game_stars", 1)
-	    Log.debug("Quickset Gameplay - Theme-Based")
-	    
+      self.config.set("game", "sp_notes_while_active", 1)
+      self.config.set("game", "bass_groove_enable", 1)
+      self.config.set("game", "big_rock_endings", 1)
+      self.config.set("game", "in_game_stars", 1)
+      self.config.set("coffee", "song_display_mode", 4)
+      Log.debug("Quickset Gameplay - Theme-Based")
+      
     elif gameSetNum == 2:
-	    self.config.set("game", "sp_notes_while_active", 2)
-	    self.config.set("game", "bass_groove_enable", 2)
-	    self.config.set("game", "big_rock_endings", 2)
-	    Log.debug("Quickset Gameplay - MIDI-Based")
-	    
+      self.config.set("game", "sp_notes_while_active", 2)
+      self.config.set("game", "bass_groove_enable", 2)
+      self.config.set("game", "big_rock_endings", 2)
+      Log.debug("Quickset Gameplay - MIDI-Based")
+      
     elif gameSetNum == 3:
-	    self.config.set("game", "sp_notes_while_active", 3)
-	    self.config.set("game", "bass_groove_enable", 3)
-	    self.config.set("game", "big_rock_endings", 2)
-	    self.config.set("game", "in_game_stars", 2)
-	    self.config.set("game", "counting", True)
-	    Log.debug("Quickset Gameplay - RB style")
-	    
+      self.config.set("game", "sp_notes_while_active", 3)
+      self.config.set("game", "bass_groove_enable", 3)
+      self.config.set("game", "big_rock_endings", 2)
+      self.config.set("game", "in_game_stars", 2)
+      self.config.set("game", "counting", True)
+      Log.debug("Quickset Gameplay - RB style")
+      
     elif gameSetNum == 4:
-	    self.config.set("game", "sp_notes_while_active", 0)
-	    self.config.set("game", "bass_groove_enable", 0)
-	    self.config.set("game", "big_rock_endings", 0)
-	    self.config.set("game", "in_game_stars", 0)
-	    self.config.set("game", "counting", False)
-	    Log.debug("Quickset Gameplay - GH style")
+      self.config.set("game", "sp_notes_while_active", 0)
+      self.config.set("game", "bass_groove_enable", 0)
+      self.config.set("game", "big_rock_endings", 0)
+      self.config.set("game", "in_game_stars", 0)
+      self.config.set("coffee", "song_display_mode", 1)
+      self.config.set("game", "counting", False)
+      Log.debug("Quickset Gameplay - GH style")
       
     elif gameSetNum == 5: # This needs work.
-	    self.config.set("game", "sp_notes_while_active", 0)
-	    self.config.set("game", "bass_groove_enable", 0)
-	    self.config.set("game", "big_rock_endings", 0)
-	    self.config.set("game", "in_game_stars", 0)
-	    self.config.set("game", "counting", True)
-	    Log.debug("Quickset Gameplay - WT style")
+      self.config.set("game", "sp_notes_while_active", 0)
+      self.config.set("game", "bass_groove_enable", 0)
+      self.config.set("game", "big_rock_endings", 0)
+      self.config.set("game", "in_game_stars", 0)
+      self.config.set("coffee", "song_display_mode", 1)
+      self.config.set("game", "counting", True)
+      Log.debug("Quickset Gameplay - WT style")
       
     # elif gameSetNum == 6: #FoFiX mode - perhaps soon.
       
     else:
-	    Log.debug("Quickset Gameplay - Manual")
+      Log.debug("Quickset Gameplay - Manual")
     
     if perfSetNum == 1:
       self.config.set("performance", "game_priority", 2)
@@ -1265,6 +1272,7 @@ class BasicSettingsMenu(Menu.Menu):
       self.config.set("game", "partial_stars", 0)
       self.config.set("game", "songlistrotation", False)
       self.config.set("game", "song_listing_mode", 0)
+      self.config.set("game", "song_display_mode", 1)
       self.config.set("game", "stage_animate", 0)
       self.config.set("game", "lyric_mode", 0)
       self.config.set("audio", "enable_crowd_tracks", 0)
@@ -1275,7 +1283,7 @@ class BasicSettingsMenu(Menu.Menu):
       self.config.set("performance", "preload_glyph_cache", False)
       self.config.set("performance", "cache_song_metadata", False)
       Log.debug("Quickset Performance - Fastest")
-	    
+      
     elif perfSetNum == 2:
       self.config.set("performance", "game_priority", 2)
       self.config.set("performance", "starspin", False)
@@ -1299,7 +1307,7 @@ class BasicSettingsMenu(Menu.Menu):
       self.config.set("performance", "preload_glyph_cache", True)
       self.config.set("performance", "cache_song_metadata", True)
       Log.debug("Quickset Performance - Fast")
-	    
+      
     elif perfSetNum == 3:
       self.config.set("performance", "game_priority", 2)
       self.config.set("performance", "starspin", True)
@@ -1321,7 +1329,7 @@ class BasicSettingsMenu(Menu.Menu):
       self.config.set("performance", "preload_glyph_cache", True)
       self.config.set("performance", "cache_song_metadata", True)
       Log.debug("Quickset Performance - Quality")
-	    
+      
     elif perfSetNum == 4:
       self.config.set("performance", "game_priority", 2)
       self.config.set("performance", "starspin", True)

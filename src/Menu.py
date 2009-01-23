@@ -109,6 +109,11 @@ class Menu(Layer, KeyListener):
     self.onCancel     = onCancel
     self.viewOffset   = 0
     self.mainMenu = False
+    
+    self.click = False
+    self.scrollUp = False
+    self.scrollDown = False
+    self.halfTime = 0
 
     self.textColor = textColor
     self.selectedColor = selectedColor
@@ -198,19 +203,38 @@ class Menu(Layer, KeyListener):
       #self.engine.data.cancelSound.setVolume(self.sfxVolume)  #MFH
       self.engine.data.cancelSound.play()
     elif c in Player.DOWNS + Player.ACTION2S or (c in Player.DRUM3S and self.drumNav):
-      self.currentIndex = (self.currentIndex + 1) % len(self.choices)
-      self.updateSelection()
-      #self.engine.data.selectSound.setVolume(self.sfxVolume)  #MFH
-      self.engine.data.selectSound.play()
+      self.scrollDown = True
+      self.click = False
     elif c in Player.UPS + Player.ACTION1S or (c in Player.DRUM2S and self.drumNav):
-      self.currentIndex = (self.currentIndex - 1) % len(self.choices)
-      self.updateSelection()
-      #self.engine.data.selectSound.setVolume(self.sfxVolume)  #MFH
-      self.engine.data.selectSound.play()
+      self.scrollUp = True
+      self.click = False
     elif c in Player.RIGHTS + Player.KEY4S:
       choice.selectNextValue()
     elif c in Player.LEFTS + Player.KEY3S:
       choice.selectPreviousValue()
+    return True
+  
+  def scroll(self, dir):
+    if not self.click or (self.click and self.time > 10):
+      self.engine.data.selectSound.play()
+      if dir == 1:
+        self.currentIndex = (self.currentIndex + 1) % len(self.choices)
+        self.updateSelection()
+      elif dir == 0:
+        self.currentIndex = (self.currentIndex - 1) % len(self.choices)
+        self.updateSelection()
+      self.click = True
+  
+  def keyReleased(self, key):
+    c = self.engine.input.controls.getMapping(key)
+    if c in Player.UPS + Player.ACTION1S or (c in Player.DRUM2S and self.drumNav):
+      self.scrollUp = False
+      self.click = False
+    elif c in Player.DOWNS + Player.ACTION2S or (c in Player.DRUM3S and self.drumNav):
+      self.scrollDown = False
+      self.click = False
+    else:
+      self.click = False
     return True
 
   def lostFocus(self):
@@ -218,6 +242,12 @@ class Menu(Layer, KeyListener):
     
   def run(self, ticks):
     self.time += ticks / 50.0
+    self.halfTime = ~self.halfTime
+    if self.halfTime == 0:
+      if self.scrollUp:
+        self.scroll(0)
+      elif self.scrollDown:
+        self.scroll(1)
 
   def renderTriangle(self, up = (0, 1), s = .2):
     left = (-up[1], up[0])

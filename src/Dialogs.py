@@ -692,6 +692,11 @@ class SongChooser(Layer, KeyListener):
     self.library        = selectedLibrary
     self.searchText     = ""
     self.searching      = False
+    self.scrollUp       = False
+    self.scrollDown     = False
+    self.click          = False
+    
+    self.halfTime = 0
 
     #RF-mod
     self.previewDisabled  = self.engine.config.get("audio", "disable_preview")
@@ -703,6 +708,7 @@ class SongChooser(Layer, KeyListener):
     self.sortdirection = engine.config.get("game", "sort_direction")
 
     self.sfxVolume    = self.engine.config.get("audio", "SFX_volume")
+    self.engine.data.selectSound.setVolume(self.sfxVolume)
 
     #Get Theme
     themename = self.engine.data.themeLabel
@@ -741,15 +747,15 @@ class SongChooser(Layer, KeyListener):
     #   need to keep track of the instrument number and instrument name
     self.instrumentNum = self.engine.config.get("game", "songlist_instrument")
     if self.instrumentNum == 4:
-      self.instrument = "Drums"
+      self.instrument = _("Drums")
     elif self.instrumentNum == 3:
-      self.instrument = "Lead Guitar"
+      self.instrument = _("Lead")
     elif self.instrumentNum == 2:
-      self.instrument = "Bass Guitar"
+      self.instrument = _("Bass")
     elif self.instrumentNum == 1:
-      self.instrument = "Rhythm Guitar"
+      self.instrument = _("Rhythm")
     else: 
-      self.instrument = "Guitar"
+      self.instrument = _("Guitar")
 
     if self.display == 0:
       self.engine.resource.load(self, "cassette",     lambda: Mesh(self.engine.resource.fileName("cassette.dae")), synch = True)
@@ -770,13 +776,13 @@ class SongChooser(Layer, KeyListener):
       # evilynux - configurable default highscores difficulty display
       self.diff = self.engine.config.get("game", "songlist_difficulty")
       if self.diff == 3:
-        self.diff = "Easy"
+        self.diff = _("Easy")
       elif self.diff == 2:
-        self.diff = "Medium"
+        self.diff = _("Medium")
       elif self.diff == 1:
-        self.diff = "Hard"
+        self.diff = _("Hard")
       else: # self.diff == 0:
-        self.diff = "Expert"
+        self.diff = _("Expert")
     elif self.display == 2:
       self.engine.resource.load(self, "cassette",     lambda: Mesh(self.engine.resource.fileName("cassette.dae")), synch = True)
       self.engine.resource.load(self, "label",        lambda: Mesh(self.engine.resource.fileName("label.dae")), synch = True)
@@ -841,13 +847,13 @@ class SongChooser(Layer, KeyListener):
       # evilynux - configurable default highscores difficulty display
       self.diff = self.engine.config.get("game", "songlist_difficulty")
       if self.diff == 3:
-        self.diff = "Easy"
+        self.diff = _("Easy")
       elif self.diff == 2:
-        self.diff = "Medium"
+        self.diff = _("Medium")
       elif self.diff == 1:
-        self.diff = "Hard"
+        self.diff = _("Hard")
       else: # self.diff == 0:
-        self.diff = "Expert"
+        self.diff = _("Expert")
         
       #if self.rotationDisabled:
       #  item = self.items[self.selectedIndex]
@@ -1287,51 +1293,11 @@ class SongChooser(Layer, KeyListener):
 
 
     elif c in Player.UPS + Player.ACTION1S or (c in Player.DRUM2S and self.drumNav):
-      #if not self.song:
-      self.engine.data.selectSound.setVolume(self.sfxVolume)  #MFH
-      self.engine.data.selectSound.play()
-      if self.matchesSearch(self.items[self.selectedIndex]):
-        while 1:
-          #self.selectedIndex = (self.selectedIndex - 1) % len(self.items)
-          # evilynux - Skip blank lines and Tier names
-          currentIndex = self.selectedIndex
-          while 1:
-            currentIndex = (currentIndex - 1) % len(self.items)
-            if isinstance(self.items[currentIndex], Song.SongInfo) or \
-               isinstance(self.items[currentIndex], Song.CareerResetterInfo) or \
-               isinstance(self.items[currentIndex], Song.LibraryInfo) or \
-               isinstance(self.items[currentIndex], Song.RandomSongInfo) or \
-               (self.display == 0 and isinstance(self.items[currentIndex], Song.TitleInfo)):
-              break
-          self.selectedIndex = currentIndex
-
-          if self.matchesSearch(self.items[self.selectedIndex]):
-          #if self.matchesSearch(self.items[self.selectedIndex]) and not isinstance(self.items[self.selectedIndex], Song.TitleInfo):
-            break
-      self.updateSelection()
+      self.scrollUp = True
+      self.click = False
     elif c in Player.DOWNS + Player.ACTION2S or (c in Player.DRUM3S and self.drumNav):
-      #if not self.song:
-      self.engine.data.selectSound.setVolume(self.sfxVolume)  #MFH
-      self.engine.data.selectSound.play()
-      if self.matchesSearch(self.items[self.selectedIndex]):
-        while 1:
-          #self.selectedIndex = (self.selectedIndex + 1) % len(self.items)
-          # evilynux - Skip blank lines and Tier names
-          currentIndex = self.selectedIndex
-          while 1:
-            currentIndex = (currentIndex + 1) % len(self.items)
-            if isinstance(self.items[currentIndex], Song.SongInfo) or \
-               isinstance(self.items[currentIndex], Song.CareerResetterInfo) or \
-               isinstance(self.items[currentIndex], Song.LibraryInfo) or \
-               isinstance(self.items[currentIndex], Song.RandomSongInfo) or \
-               (self.display == 0 and isinstance(self.items[currentIndex], Song.TitleInfo)):
-              break
-          self.selectedIndex = currentIndex
-          
-          if self.matchesSearch(self.items[self.selectedIndex]):
-          #if self.matchesSearch(self.items[self.selectedIndex]) and not isinstance(self.items[self.selectedIndex], Song.TitleInfo):
-            break
-      self.updateSelection()
+      self.scrollDown = True
+      self.click = False
     elif key == pygame.K_BACKSPACE and not self.accepted:
       self.searchText = self.searchText[:-1]
       if self.searchText == "":
@@ -1366,6 +1332,67 @@ class SongChooser(Layer, KeyListener):
         self.selectedIndex = i
         self.updateSelection() 
     return True
+  
+  def keyReleased(self, key):
+    if not self.items or self.accepted:
+      return
+    c = self.engine.input.controls.getMapping(key)
+    if c in Player.UPS + Player.ACTION1S or (c in Player.DRUM2S and self.drumNav):
+      self.scrollUp = False
+      self.click = False
+    elif c in Player.DOWNS + Player.ACTION2S or (c in Player.DRUM3S and self.drumNav):
+      self.scrollDown = False
+      self.click = False
+    else:
+      self.click = False
+    return True
+  
+  def scroll(self, dir):
+    if not self.click or (self.click and (self.time - self.lastTime > 10)):
+      self.engine.data.selectSound.play()
+      if dir == 0:
+        #if not self.song:
+        # self.engine.data.selectSound.setVolume(self.sfxVolume)  #MFH
+        if self.matchesSearch(self.items[self.selectedIndex]):
+          while 1:
+            #self.selectedIndex = (self.selectedIndex - 1) % len(self.items)
+            # evilynux - Skip blank lines and Tier names
+            currentIndex = self.selectedIndex
+            while 1:
+              currentIndex = (currentIndex - 1) % len(self.items)
+              if isinstance(self.items[currentIndex], Song.SongInfo) or \
+                 isinstance(self.items[currentIndex], Song.CareerResetterInfo) or \
+                 isinstance(self.items[currentIndex], Song.LibraryInfo) or \
+                 isinstance(self.items[currentIndex], Song.RandomSongInfo) or \
+                 (self.display == 0 and isinstance(self.items[currentIndex], Song.TitleInfo)):
+                break
+            self.selectedIndex = currentIndex
+
+            if self.matchesSearch(self.items[self.selectedIndex]):
+            #if self.matchesSearch(self.items[self.selectedIndex]) and not isinstance(self.items[self.selectedIndex], Song.TitleInfo):
+              break
+        self.updateSelection()
+      elif dir == 1:
+        if self.matchesSearch(self.items[self.selectedIndex]):
+          while 1:
+            #self.selectedIndex = (self.selectedIndex + 1) % len(self.items)
+            # evilynux - Skip blank lines and Tier names
+            currentIndex = self.selectedIndex
+            while 1:
+              currentIndex = (currentIndex + 1) % len(self.items)
+              if isinstance(self.items[currentIndex], Song.SongInfo) or \
+                 isinstance(self.items[currentIndex], Song.CareerResetterInfo) or \
+                 isinstance(self.items[currentIndex], Song.LibraryInfo) or \
+                 isinstance(self.items[currentIndex], Song.RandomSongInfo) or \
+                 (self.display == 0 and isinstance(self.items[currentIndex], Song.TitleInfo)):
+                break
+            self.selectedIndex = currentIndex
+          
+            if self.matchesSearch(self.items[self.selectedIndex]):
+            #if self.matchesSearch(self.items[self.selectedIndex]) and not isinstance(self.items[self.selectedIndex], Song.TitleInfo):
+              break
+        self.updateSelection()
+      self.click = True
 
   def matchesSearch(self, item):
     if not self.searchText:
@@ -1436,6 +1463,13 @@ class SongChooser(Layer, KeyListener):
       self.songCountdown -= ticks
       if self.songCountdown <= 0:
         self.playSelectedSong()
+    
+    self.halfTime = ~self.halfTime
+    if self.halfTime == 0:
+      if self.scrollDown:
+        self.scroll(1)
+      elif self.scrollUp:
+        self.scroll(0)
 
     d = self.cameraOffset - self.selectedOffset
     self.cameraOffset -= d * ticks / 192.0
@@ -1641,15 +1675,15 @@ class SongChooser(Layer, KeyListener):
         if self.instrumentNum > 4:
           self.instrumentNum = 0
         if self.instrumentNum == 4:
-          self.instrument = "Drums"
+          self.instrument = _("Drums")
         elif self.instrumentNum == 3:
-          self.instrument = "Lead Guitar"
+          self.instrument = _("Lead")
         elif self.instrumentNum == 2:
-          self.instrument = "Bass Guitar"
+          self.instrument = _("Bass")
         elif self.instrumentNum == 1:
-          self.instrument = "Rhythm Guitar"
+          self.instrument = _("Rhythm")
         else: 
-          self.instrument = "Guitar"
+          self.instrument = _("Guitar")
         self.engine.config.set("game", "songlist_instrument", self.instrumentNum)
   
   #-      if self.instrument == "Lead Guitar":

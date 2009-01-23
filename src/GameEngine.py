@@ -272,7 +272,7 @@ Config.define("performance", "killfx",       int, 0,     text = _("Effects Displ
 Config.define("coffee", "songfilepath",       bool, True,     text = _("Show Filepath"),             options = {True: _("Show"), False: _("Hide")})
 Config.define("coffee", "noterotate",       bool, False,     text = _("3D Note Rotation"),             options = {True: _("Old"), False: _("New")})
 Config.define("coffee", "game_phrases",       int, 2,     text = _("Show In-Game Text"),             options = {0: _("Never"), 1: _("Only Note Streaks"), 2: _("Always")})
-Config.define("coffee", "song_display_mode",       int, 1,     text = _("Setlist Display Mode"),             options = {0: _("CDs"), 1: _("List"), 2: _("List/CD"), 3: _("RB2"), 4: _("By Theme")})
+Config.define("coffee", "song_display_mode",       int, 4,     text = _("Setlist Display Mode"),             options = {0: _("CDs"), 1: _("List"), 2: _("List/CD"), 3: _("RB2"), 4: _("By Theme")})
 Config.define("game", "song_listing_mode",        int, 0,     text = _("Use Subfolders"),            options = {0: _("Normal"), 1: _("List All")})
 Config.define("game", "song_icons",          bool, True,     text = _("Show Song Type Icons"),     options = {True: _("Yes"), False: _("No")})
 Config.define("game", "preload_labels",          bool, False,     text = _("Preload Song Labels"),     options = {True: _("Yes"), False: _("No")})
