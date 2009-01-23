@@ -633,7 +633,7 @@ class SettingsMenu(Menu.Menu):
       (_("Setlist Settings"),   listSettingsMenu),
       (_("Advanced Settings"), AdvancedSettingsMenu),
       (_("Mods, Cheats, AI"), CheatMenu),
-      (_(engine.versionString+_(" Credits")), lambda: Dialogs.showCredits(engine)), # evilynux - Show Credits!
+      (_("%s Credits") % (engine.versionString), lambda: Dialogs.showCredits(engine)), # evilynux - Show Credits!
       (_("Quickset"), quicksetMenu),
       (_("Hide Advanced Options"), self.advancedSettings)
     ]
@@ -1158,7 +1158,7 @@ class BasicSettingsMenu(Menu.Menu):
       (_("Audio Settings"),      audioSettingsMenu),
       (_("Setlist Settings"),   listSettingsMenu),
       (_("Mods, Cheats, AI"), CheatMenu),
-      (_(engine.versionString+_(" Credits")), lambda: Dialogs.showCredits(engine)), # evilynux - Show Credits!
+      (_("%s Credits") % (engine.versionString), lambda: Dialogs.showCredits(engine)), # evilynux - Show Credits!
       (_("Quickset"), quicksetMenu),
       (_("See Advanced Options"), self.advancedSettings)
     ]
