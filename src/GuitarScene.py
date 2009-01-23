@@ -1883,7 +1883,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.hopoStyle        = self.engine.config.get("game", "hopo_system")
     self.gh2sloppy        = self.engine.config.get("game", "gh2_sloppy")
     if self.gh2sloppy == 1:
-      self.hopoStyle == 4
+      self.hopoStyle = 4
     self.hopoAfterChord = self.engine.config.get("game", "hopo_after_chord")
 
     self.pov              = self.engine.config.get("fretboard", "point_of_view")
