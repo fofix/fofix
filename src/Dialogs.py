@@ -762,6 +762,12 @@ class SongChooser(Layer, KeyListener):
       self.instrument = "Guitar"
       self.instrumentNice = _("Guitar")
 
+    self.diffTrans = {}
+    self.diffTrans["Expert"] = _("Expert")
+    self.diffTrans["Hard"]   = _("Hard")
+    self.diffTrans["Medium"] = _("Medium")
+    self.diffTrans["Easy"]   = _("Easy")
+
     if self.display == 0:
       self.engine.resource.load(self, "cassette",     lambda: Mesh(self.engine.resource.fileName("cassette.dae")), synch = True)
       self.engine.resource.load(self, "label",        lambda: Mesh(self.engine.resource.fileName("label.dae")), synch = True)
@@ -780,11 +786,6 @@ class SongChooser(Layer, KeyListener):
 
       # evilynux - configurable default highscores difficulty display
       self.diff = self.engine.config.get("game", "songlist_difficulty")
-      self.diffTrans = {}
-      self.diffTrans["Expert"] = _("Expert")
-      self.diffTrans["Hard"]   = _("Hard")
-      self.diffTrans["Medium"] = _("Medium")
-      self.diffTrans["Easy"]   = _("Easy")
       if self.diff == 3:
         self.diff = "Easy"
         self.diffNice = self.diffTrans[self.diff]
