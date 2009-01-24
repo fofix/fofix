@@ -112,9 +112,9 @@ class Part:
 
 parts = {
   GUITAR_PART: Part(GUITAR_PART, "Guitar"),
-  RHYTHM_PART: Part(RHYTHM_PART, "Rhythm Guitar"),
-  BASS_PART:   Part(BASS_PART,   "Bass Guitar"),
-  LEAD_PART:   Part(LEAD_PART,   "Lead Guitar"),
+  RHYTHM_PART: Part(RHYTHM_PART, "Rhythm"),
+  BASS_PART:   Part(BASS_PART,   "Bass"),
+  LEAD_PART:   Part(LEAD_PART,   "Lead"),
   DRUM_PART:   Part(DRUM_PART,   "Drums"),
 }
 
