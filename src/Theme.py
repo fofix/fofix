@@ -209,6 +209,10 @@ Config.define("theme", "song_select_submenu_y",  float, None)
 #MFH - for scaling song info during countdown
 Config.define("theme", "song_info_display_scale",  float, 0.0020)
 
+#Worldrave - for song info display positioning
+Config.define("theme", "song_info_display_X",  float, 0.05)
+Config.define("theme", "song_info_display_Y",  float, 0.05)
+
 #MFH - option for Rock Band 2 theme.ini - only show # of stars you are working on
 Config.define("theme", "display_all_grey_stars",  bool, True)
 Config.define("theme", "small_1x_mult", bool, True)
@@ -352,6 +356,10 @@ neck_prompt_y = None
 
 #MFH - for scaling song info during countdown
 songInfoDisplayScale = None
+
+#Worldrave - for position of song info display during countdown
+songInfoDisplayX = None
+songInfoDisplayY = None
 
 #MFH - y offset = lines, x offset = spaces
 songSelectSubmenuOffsetLines = None
@@ -558,6 +566,8 @@ def setupMisc(config):
   global creditSong
   global crowdLoopDelay
   global songInfoDisplayScale
+  global songInfoDisplayX
+  global songInfoDisplayY
   global displayAllGreyStars, smallMult
   global songListDisplay
 
@@ -566,6 +576,8 @@ def setupMisc(config):
   creditSong = config.get("theme", "credit_song")
   crowdLoopDelay = config.get("theme", "crowd_loop_delay")
   songInfoDisplayScale = config.get("theme", "song_info_display_scale")
+  songInfoDisplayX = config.get("theme", "song_info_display_X")
+  songInfoDisplayY = config.get("theme", "song_info_display_Y")
   displayAllGreyStars = config.get("theme", "display_all_grey_stars")
   smallMult = config.get("theme", "small_1x_mult")
   songListDisplay = config.get("theme", "song_list_display")

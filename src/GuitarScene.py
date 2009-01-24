@@ -434,6 +434,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.displayTextScaleStep1 = 0.0001     #orig 0.0001
     self.textTimeToDisplay = 100
     self.songInfoDisplayScale = Theme.songInfoDisplayScale
+    self.songInfoDisplayX = Theme.songInfoDisplayX             #Worldrave - This controls the X position of song info display during countdown
+    self.songInfoDisplayY = Theme.songInfoDisplayY             #Worldrave - This controls the Y position of song info display during countdown
     self.lyricMode = self.engine.config.get("game", "lyric_mode")
     self.scriptLyricPos = self.engine.config.get("game", "script_lyric_pos")
     self.starClaps = self.engine.config.get("game", "star_claps")
@@ -8893,9 +8895,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               extra = "%s \n v%s" % (extra, self.song.info.version)
     
             if self.theme != 1:   #shift this stuff down so it don't look so bad over top the lyricsheet:
-              Dialogs.wrapText(songFont, (.05, .0895 - h / 2), "%s \n %s%s%s%s%s" % (Dialogs.removeSongOrderPrefixFromName(self.song.info.name), cover, self.song.info.artist, comma, self.song.info.year, extra), rightMargin = .6, scale = self.songInfoDisplayScale)#kk69: incorporates song.ttf
+              Dialogs.wrapText(songFont, (self.songInfoDisplayX, self.songInfoDisplayX - h / 2), "%s \n %s%s%s%s%s" % (Dialogs.removeSongOrderPrefixFromName(self.song.info.name), cover, self.song.info.artist, comma, self.song.info.year, extra), rightMargin = .6, scale = self.songInfoDisplayScale)#kk69: incorporates song.ttf
             else:
-              Dialogs.wrapText(songFont, (.05, .05 - h / 2), "%s \n %s%s%s%s%s" % (Dialogs.removeSongOrderPrefixFromName(self.song.info.name), cover, self.song.info.artist, comma, self.song.info.year, extra), rightMargin = .6, scale = self.songInfoDisplayScale)
+              Dialogs.wrapText(songFont, (self.songInfoDisplayX, self.songInfoDisplayY - h / 2), "%s \n %s%s%s%s%s" % (Dialogs.removeSongOrderPrefixFromName(self.song.info.name), cover, self.song.info.artist, comma, self.song.info.year, extra), rightMargin = .6, scale = self.songInfoDisplayScale)
           else:
             #mfh: this is where the song countdown display is generated:
             if pos < 0:
