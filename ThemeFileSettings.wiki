@@ -116,9 +116,9 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||rbmenu = true||Turns on replicating the Buttons scrolling up from the bottom at the game intro for Rock Band theme's.||
 ||rockmeter_score_color = #93c351||Enter a Hex color here.||
 ||Rotating 3d Starnotes||Default is on||
-||song_info_display_scale = 0.0020||Controls the size of the song info shown at gameplay countdown||
-||song_info_display_X = 0.05||Controls the X position of song info display during countdown||
-||song_info_display_Y = 0.05||Controls the Y position of song info display during countdown||
+||song_info_display_scale = 0.0020||Controls the size of the song info shown at gameplay countdown. Use a floating point number||
+||song_info_display_X = 0.05||Controls the X position of song info display during countdown. Use a floating point number||
+||song_info_display_Y = 0.05||Controls the Y position of song info display during countdown. Use a floating point number||
 ||spot_color = #EEEEEE||Enter a Hex color here.||
 ||threeDspin = False||Turns 3d Starnote spinning off.||
 ||twoDkeys = False||Use 3d keys  = False||
