@@ -87,6 +87,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.coOpRB = False #akedrou
     self.coOpGH = False
     self.coOpType = False
+    self.practiceMode = False
     Log.debug("GuitarSceneClient init...")
 
     self.coOpPlayerMeter = 1
@@ -167,6 +168,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.guitars[i].canGuitarSolo = True
         elif player.part.text == "Bass Guitar":
           self.guitars[i].isBassGuitar = True
+      if player.practiceMode:
+        self.practiceMode = True
     if self.guitars[0].isDrum: 
       self.keysList = [PLAYER1DRUMS]
     else:
@@ -2836,6 +2839,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.guitars[i].spEnabled = False
       #self.guitars[i].spNote = False 
 
+    if not self.failingEnabled or self.practiceMode:
+      return
+
     if self.battle and self.numOfPlayers > 1: #battle mode
       if self.notesMissed[i]: #QQstarS:Set [i] to [i]
         self.minusRock[i] += self.minGain/self.multi[i]
@@ -2919,6 +2925,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     i = playerNum
     if self.guitars[i].isDrum: 
       self.drumStart = True
+    if not self.failingEnabled or self.practiceMode:
+      return
     if self.battle and self.numOfPlayers > 1: #battle mode
       if i == 0:
         otherPlayer = 1
