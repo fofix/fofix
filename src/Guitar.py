@@ -2588,9 +2588,9 @@ class Guitar:
               flameColorMod2 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
               
               glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
-              if self.theme == 0 and event.finalStar and self.spEnabled:
+              if self.theme == 0 and self.spEnabled:
                 glColor3f(1,1,1)#lightning color
-              elif self.theme == 1 and event.finalStar and self.spEnabled:
+              elif self.theme == 1 and self.spEnabled:
                 glColor3f(1,1,1)#lightning color
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: 
@@ -2598,7 +2598,7 @@ class Guitar:
                 else:
                   glColor3f(.4,.4,.4)#Default starcolor (Rockband)
               glEnable(GL_TEXTURE_2D)
-              if self.theme == 0 and event.finalStar and self.spEnabled:
+              if self.theme == 0 and self.spEnabled:
                 self.hitlightning.texture.bind()
                 wid, hei, = self.engine.view.geometry[2:4]
                 glPushMatrix()
@@ -2614,7 +2614,7 @@ class Guitar:
                 glVertex3f( .4, 0,  2)
                 glTexCoord2f(1.0, 1.0)
                 glVertex3f(-.4, 0,  2)
-              elif self.theme == 1 and event.finalStar and self.spEnabled:
+              elif self.theme == 1 and self.spEnabled:
                 self.hitlightning.texture.bind()
                 wid, hei, = self.engine.view.geometry[2:4]
                 glPushMatrix()
