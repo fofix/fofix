@@ -163,13 +163,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.guitars = []
     self.keysList = []
     for i,player in enumerate(self.playerList):
-      if player.part.text == "Drums":
+      if player.part.id == Song.DRUM_PART:
         self.guitars.append(Drum(self.engine,False,i))
       else:
         self.guitars.append(Guitar(self.engine,False,i))
-        if player.part.text == "Lead Guitar" or player.part.text == "Guitar":    #both these selections should get guitar solos
+        if player.part.id == Song.LEAD_PART or player.part.id == Song.GUITAR_PART:    #both these selections should get guitar solos
           self.guitars[i].canGuitarSolo = True
-        elif player.part.text == "Bass Guitar":
+        elif player.part.id == Song.BASS_PART:
           self.guitars[i].isBassGuitar = True
       if player.practiceMode:
         self.practiceMode = True

@@ -111,11 +111,11 @@ class Part:
     return self.text
 
 parts = {
-  GUITAR_PART: Part(GUITAR_PART, "Guitar"),
-  RHYTHM_PART: Part(RHYTHM_PART, "Rhythm"),
-  BASS_PART:   Part(BASS_PART,   "Bass"),
-  LEAD_PART:   Part(LEAD_PART,   "Lead"),
-  DRUM_PART:   Part(DRUM_PART,   "Drums"),
+  GUITAR_PART: Part(GUITAR_PART, _("Guitar")),
+  RHYTHM_PART: Part(RHYTHM_PART, _("Rhythm")),
+  BASS_PART:   Part(BASS_PART,   _("Bass")),
+  LEAD_PART:   Part(LEAD_PART,   _("Lead")),
+  DRUM_PART:   Part(DRUM_PART,   _("Drums")),
 }
 
 class Difficulty:
@@ -135,10 +135,10 @@ class Difficulty:
     return self.text
 
 difficulties = {
-  EAS_DIF: Difficulty(EAS_DIF, "Easy"),
-  MED_DIF: Difficulty(MED_DIF, "Medium"),
-  HAR_DIF: Difficulty(HAR_DIF, "Hard"),
-  EXP_DIF: Difficulty(EXP_DIF, "Expert"),
+  EAS_DIF: Difficulty(EAS_DIF, _("Easy")),
+  MED_DIF: Difficulty(MED_DIF, _("Medium")),
+  HAR_DIF: Difficulty(HAR_DIF, _("Hard")),
+  EXP_DIF: Difficulty(EXP_DIF, _("Expert")),
 }
 
 defaultSections = ["Start","1/4","1/2","3/4"]

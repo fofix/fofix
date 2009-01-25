@@ -608,7 +608,7 @@ class Player(object):
   def getScoreMultiplier(self):
     
     #if self.getPart() == "Bass Guitar":    #myfingershurt: bass groove
-    if self.part.text == "Bass Guitar" and self.bassGrooveEnabled:    #myfingershurt: bass groove
+    if self.part.id == Song.BASS_PART and self.bassGrooveEnabled:    #myfingershurt: bass groove
       try:
         return BASS_GROOVE_SCORE_MULTIPLIER.index((self.streak / 10) * 10) + 1
       except ValueError:
