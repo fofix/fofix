@@ -79,7 +79,7 @@ else:
   #  version = open(os.path.join(os.path.dirname(__file__),
   #    'VERSION')).read().strip()
     #version = str(e)
-    version = " beta 2"     #MFH - beta taggin'
+    version = " beta 3"     #MFH - beta taggin'
   #------------------
 
   #stump: move this here to let it be retrieved without instantiating a GameEngine.
