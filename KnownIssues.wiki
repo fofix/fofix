@@ -4,6 +4,11 @@
 = Introduction =
 Please note, we are not currently looking for suggestions. However, just in case you feel the need to suggest or report something, please review the following first.
 
+= Excessive Framerates / FPS =
+
+To anyone who's having a problem with too many frames per second being rendered, change "highpriority = True" to "highpriority = False" in your fretsonfire.ini.  This will actually give you control over your framerate (Display Settings -> Advanced Video Options -> Frames Per Second) instead of just telling FoFiX to render as many frames as it can as fast as it can.
+
+
 = Known Issues =
 *NOTE* Some of the known issues have existed long before this fork was created.
 
@@ -21,7 +26,7 @@ Please note, we are not currently looking for suggestions. However, just in case
 
 ==About Double-pick problem on guitar controllers!==
 When strumming down, up, down, up, ... the game doesn't always register all the picks.
-Workaround (and brief explanation) for this double-pick problem exists in issue 165.
+Workaround (and brief explanation) for this double-pick problem exists in issue 165.  Actually this was solved several revisions ago, so it should no longer be a problem.
 
 ==About Variable/Speed-dependent Hitwindow==
 Set the hitwindow to tight and tweak the A/V-Delay so it's right when you hit the notes when listening to the music. This is now easy with the new Accuracy indicator.
