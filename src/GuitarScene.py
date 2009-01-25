@@ -74,7 +74,8 @@ class GuitarSceneServer(GuitarScene, SceneServer):
 class GuitarSceneClient(GuitarScene, SceneClient):
   def createClient(self, libraryName, songName, Players):
   
-    if self.engine.createdGuitarScene:
+    if self.engine.createdGuitarScene:  #MFH - dual / triple loading cycle fix
+      Log.warn("Extra GuitarSceneClient was instantiated, but detected and shut down.  Cause unknown.")
       return
     else:
       self.engine.createdGuitarScene = True
@@ -5349,42 +5350,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
       if (self.readTextAndLyricEvents == 2 or (self.readTextAndLyricEvents == 1 and self.theme == 2)) and (not self.pause and not self.failed and not self.ending):
   
-        #handle the sections track
-        if self.midiSectionsEnabled > 0: 
-          for time, event in self.song.eventTracks[Song.TK_SECTIONS].getEvents(minPos, maxPos):
-            if self.theme == 2:
-              #xOffset = 0.5
-              yOffset = 0.715
-              txtSize = 0.00170
-            else:
-              #gh3 or other standard mod
-              #xOffset = 0.5
-              yOffset = 0.69
-              txtSize = 0.00175
-            #is event happening now?
-            #this version will turn events green right as they hit the line and then grey shortly afterwards
-            #instead of an equal margin on both sides.
-            xOffset = (time - pos) / eventWindow
-            EventHappeningNow = False
-            if xOffset < (0.0 - lyricSlop * 2.0):   #past
-              glColor3f(0.5, 0.5, 0.5)    #I'm hoping this is some sort of grey.
-            elif xOffset < lyricSlop / 16.0:   #present
-              EventHappeningNow = True
-              glColor3f(0, 1, 0.6)    #green-blue
-            else:   #future, and all other text
-              glColor3f(1, 1, 1)    #cracker white
-            xOffset += 0.250
-  
-            text = event.text
-            yOffset = 0.00005     #last change -.00035
-            txtSize = 0.00150
-            lyricFont.render(text, (xOffset, yOffset),(1, 0, 0),txtSize)
-  
-  
-        #handle the lyrics track
-        if self.midiLyricsEnabled > 0:
-          if self.midiLyricMode == 0:   #scrolling lyrics mode:
-            for time, event in self.song.eventTracks[Song.TK_LYRICS].getEvents(minPos, maxPos):
+        if self.countdown <= 0: #MFH - only attempt to handle sections / lyrics / text events if the countdown is complete!
+
+          #handle the sections track
+          if self.midiSectionsEnabled > 0: 
+            for time, event in self.song.eventTracks[Song.TK_SECTIONS].getEvents(minPos, maxPos):
               if self.theme == 2:
                 #xOffset = 0.5
                 yOffset = 0.715
@@ -5408,90 +5378,123 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 glColor3f(1, 1, 1)    #cracker white
               xOffset += 0.250
     
-              yOffset = 0.0696    #last change +0.0000
-              txtSize = 0.00160
               text = event.text
-              if text.find("+") >= 0:   #shift the pitch adjustment markers down one line
-                text = text.replace("+","~")
-                txtSize = 0.00145   #last change +.0000
-                yOffset -= 0.0115   #last change -.0005
+              yOffset = 0.00005     #last change -.00035
+              txtSize = 0.00150
               lyricFont.render(text, (xOffset, yOffset),(1, 0, 0),txtSize)
-
-          #MFH - TODO - handle line-by-line lyric display and coloring here:
-          elif self.midiLyricMode == 1:   #line-by-line lyrics mode:
-
-            if self.theme == 2:
-              txtSize = 0.00170
-            else:
-              #gh3 or other standard mod
-              txtSize = 0.00175
-            yOffset = 0.0696  
-            xOffset = 0.5 - (lyricFont.getStringSize(self.currentSimpleMidiLyricLine, scale = txtSize)[0] / 2.0)
-            glColor3f(1, 1, 1)
-            lyricFont.render(self.currentSimpleMidiLyricLine, (xOffset, yOffset),(1, 0, 0),txtSize)                
+    
+  
+          #handle the lyrics track
+          if self.midiLyricsEnabled > 0:
+            if self.midiLyricMode == 0:   #scrolling lyrics mode:
+              for time, event in self.song.eventTracks[Song.TK_LYRICS].getEvents(minPos, maxPos):
+                if self.theme == 2:
+                  #xOffset = 0.5
+                  yOffset = 0.715
+                  txtSize = 0.00170
+                else:
+                  #gh3 or other standard mod
+                  #xOffset = 0.5
+                  yOffset = 0.69
+                  txtSize = 0.00175
+                #is event happening now?
+                #this version will turn events green right as they hit the line and then grey shortly afterwards
+                #instead of an equal margin on both sides.
+                xOffset = (time - pos) / eventWindow
+                EventHappeningNow = False
+                if xOffset < (0.0 - lyricSlop * 2.0):   #past
+                  glColor3f(0.5, 0.5, 0.5)    #I'm hoping this is some sort of grey.
+                elif xOffset < lyricSlop / 16.0:   #present
+                  EventHappeningNow = True
+                  glColor3f(0, 1, 0.6)    #green-blue
+                else:   #future, and all other text
+                  glColor3f(1, 1, 1)    #cracker white
+                xOffset += 0.250
+      
+                yOffset = 0.0696    #last change +0.0000
+                txtSize = 0.00160
+                text = event.text
+                if text.find("+") >= 0:   #shift the pitch adjustment markers down one line
+                  text = text.replace("+","~")
+                  txtSize = 0.00145   #last change +.0000
+                  yOffset -= 0.0115   #last change -.0005
+                lyricFont.render(text, (xOffset, yOffset),(1, 0, 0),txtSize)
+  
+            #MFH - TODO - handle line-by-line lyric display and coloring here:
+            elif self.midiLyricMode == 1:   #line-by-line lyrics mode:
+  
+              if self.theme == 2:
+                txtSize = 0.00170
+              else:
+                #gh3 or other standard mod
+                txtSize = 0.00175
+              yOffset = 0.0696  
+              xOffset = 0.5 - (lyricFont.getStringSize(self.currentSimpleMidiLyricLine, scale = txtSize)[0] / 2.0)
+              glColor3f(1, 1, 1)
+              lyricFont.render(self.currentSimpleMidiLyricLine, (xOffset, yOffset),(1, 0, 0),txtSize)                
+                
+            elif self.midiLyricMode == 2 and (self.numMidiLyricLines > self.activeMidiLyricLineIndex):   #line-by-line lyrics mode:
+  
+              if self.theme == 2:
+                txtSize = 0.00170
+              else:
+                #gh3 or other standard mod
+                txtSize = 0.00175
+              yOffset = 0.0696  
+              #xOffset = 0.5 - (lyricFont.getStringSize(self.currentSimpleMidiLyricLine, scale = txtSize)[0] / 2.0)
+  
+              tempTime, tempLyricLine = self.midiLyricLines[self.activeMidiLyricLineIndex]
+  
+              xOffset = 0.5 - (lyricFont.getStringSize(tempLyricLine, scale = txtSize)[0] / 2.0)
+              glColor3f(0.75, 0.75, 0.75)
+              lyricFont.render(self.activeMidiLyricLine_GreyWords, (xOffset, yOffset),(1, 0, 0),txtSize)
               
-          elif self.midiLyricMode == 2 and (self.numMidiLyricLines > self.activeMidiLyricLineIndex):   #line-by-line lyrics mode:
-
-            if self.theme == 2:
-              txtSize = 0.00170
-            else:
-              #gh3 or other standard mod
-              txtSize = 0.00175
-            yOffset = 0.0696  
-            #xOffset = 0.5 - (lyricFont.getStringSize(self.currentSimpleMidiLyricLine, scale = txtSize)[0] / 2.0)
-
-            tempTime, tempLyricLine = self.midiLyricLines[self.activeMidiLyricLineIndex]
-
-            xOffset = 0.5 - (lyricFont.getStringSize(tempLyricLine, scale = txtSize)[0] / 2.0)
-            glColor3f(0.75, 0.75, 0.75)
-            lyricFont.render(self.activeMidiLyricLine_GreyWords, (xOffset, yOffset),(1, 0, 0),txtSize)
-            
-            xOffset += lyricFont.getStringSize(self.activeMidiLyricLine_GreyWords, scale = txtSize)[0]
-            glColor3f(0, 1, 0)
-            lyricFont.render(self.activeMidiLyricLine_GreenWords, (xOffset, yOffset),(1, 0, 0),txtSize)
-            
-            xOffset += lyricFont.getStringSize(self.activeMidiLyricLine_GreenWords, scale = txtSize)[0]
-            glColor3f(1, 1, 1)
-            lyricFont.render(self.activeMidiLyricLine_WhiteWords, (xOffset, yOffset),(1, 0, 0),txtSize)
-                      
-            yOffset += self.lyricHeight
-            xOffset = 0.25
-            glColor3f(1, 1, 1)
-            lyricFont.render(self.currentSimpleMidiLyricLine, (xOffset, yOffset),(1, 0, 0),txtSize)                
-
+              xOffset += lyricFont.getStringSize(self.activeMidiLyricLine_GreyWords, scale = txtSize)[0]
+              glColor3f(0, 1, 0)
+              lyricFont.render(self.activeMidiLyricLine_GreenWords, (xOffset, yOffset),(1, 0, 0),txtSize)
+              
+              xOffset += lyricFont.getStringSize(self.activeMidiLyricLine_GreenWords, scale = txtSize)[0]
+              glColor3f(1, 1, 1)
+              lyricFont.render(self.activeMidiLyricLine_WhiteWords, (xOffset, yOffset),(1, 0, 0),txtSize)
+                        
+              yOffset += self.lyricHeight
+              xOffset = 0.25
+              glColor3f(1, 1, 1)
+              lyricFont.render(self.currentSimpleMidiLyricLine, (xOffset, yOffset),(1, 0, 0),txtSize)                
   
   
   
   
-        #finally, handle the unused text events track
-        if self.showUnusedTextEvents:
-          for time, event in self.song.eventTracks[Song.TK_UNUSED_TEXT].getEvents(minPos, maxPos):
-            if self.theme == 2:
-              #xOffset = 0.5
-              yOffset = 0.715
-              txtSize = 0.00170
-            else:
-              #gh3 or other standard mod
-              #xOffset = 0.5
-              yOffset = 0.69
-              txtSize = 0.00175
-            #is event happening now?
-            #this version will turn events green right as they hit the line and then grey shortly afterwards
-            #instead of an equal margin on both sides.
-            xOffset = (time - pos) / eventWindow
-            EventHappeningNow = False
-            if xOffset < (0.0 - lyricSlop * 2.0):   #past
-              glColor3f(0.5, 0.5, 0.5)    #I'm hoping this is some sort of grey.
-            elif xOffset < lyricSlop / 16.0:   #present
-              EventHappeningNow = True
-              glColor3f(0, 1, 0.6)    #green-blue
-            else:   #future, and all other text
-              glColor3f(1, 1, 1)    #cracker white
-            xOffset += 0.250
-        
-            yOffset = 0.0190      #last change -.0020
-            txtSize = 0.00124
-            lyricFont.render(event.text, (xOffset, yOffset),(1, 0, 0),txtSize)
+  
+          #finally, handle the unused text events track
+          if self.showUnusedTextEvents:
+            for time, event in self.song.eventTracks[Song.TK_UNUSED_TEXT].getEvents(minPos, maxPos):
+              if self.theme == 2:
+                #xOffset = 0.5
+                yOffset = 0.715
+                txtSize = 0.00170
+              else:
+                #gh3 or other standard mod
+                #xOffset = 0.5
+                yOffset = 0.69
+                txtSize = 0.00175
+              #is event happening now?
+              #this version will turn events green right as they hit the line and then grey shortly afterwards
+              #instead of an equal margin on both sides.
+              xOffset = (time - pos) / eventWindow
+              EventHappeningNow = False
+              if xOffset < (0.0 - lyricSlop * 2.0):   #past
+                glColor3f(0.5, 0.5, 0.5)    #I'm hoping this is some sort of grey.
+              elif xOffset < lyricSlop / 16.0:   #present
+                EventHappeningNow = True
+                glColor3f(0, 1, 0.6)    #green-blue
+              else:   #future, and all other text
+                glColor3f(1, 1, 1)    #cracker white
+              xOffset += 0.250
+          
+              yOffset = 0.0190      #last change -.0020
+              txtSize = 0.00124
+              lyricFont.render(event.text, (xOffset, yOffset),(1, 0, 0),txtSize)
   
       try:
         now = self.getSongPosition()
