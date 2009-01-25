@@ -97,6 +97,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     splash = Dialogs.showLoadingSplashScreen(self.engine, _("Preparing...")) 
 
+
+    self.countdownSeconds = 5   #MFH - don't change this initialization value unless you alter the other related variables to match
+    self.countdown = 10   #MFH - arbitrary value to prevent song from starting right away
     
     #MFH - retrieve game parameters:
     self.gamePlayers = self.engine.config.get("game", "players")
@@ -444,7 +447,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.starClaps = self.engine.config.get("game", "star_claps")
     self.rb_sp_neck_glow = self.engine.config.get("game", "rb_sp_neck_glow")
     self.accuracy = [0 for i in self.playerList]
-    self.countdownSeconds = 5   #MFH - don't change this initialization value unless you alter the other related variables to match
     self.resumeCountdownEnabled = self.engine.config.get("game", "resume_countdown")
     self.resumeCountdown = 0
     self.resumeCountdownSeconds = 0
