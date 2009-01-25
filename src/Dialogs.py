@@ -35,6 +35,7 @@ import math
 import os
 import fnmatch
 import string
+import time
 
 from View import Layer, BackgroundLayer
 from Input import KeyListener
@@ -913,6 +914,7 @@ class SongChooser(Layer, KeyListener):
     self.loaded = False
     #showLoadingScreen(self.engine, lambda: self.loaded, text = _("Browsing Collection..."))
     self.splash = showLoadingSplashScreen(self.engine, _("Browsing Collection..."))
+    self.loadStartTime = time.time()
     
     # evilynux - Has to be synchronous so we don't return with an empty library list!
     self.engine.resource.load(self, "libraries", lambda: Song.getAvailableLibraries(self.engine, self.library), onLoad = self.libraryListLoaded, synch = True)
@@ -924,7 +926,11 @@ class SongChooser(Layer, KeyListener):
   def libraryListLoaded(self, libraries):
     Log.debug("Dialogs.libraryListLoaded() function call...")
     #self.engine.resource.load(self, "songs",     lambda: Song.getAvailableSongs(self.engine, self.library), onLoad = self.songListLoaded)
-    self.engine.resource.load(self, "songs",     lambda: Song.getAvailableSongsAndTitles(self.engine, self.library), onLoad = self.songListLoaded, synch = True) # evilynux - Less BlackSOD[?]
+    self.engine.resource.load(self, "songs",     lambda: Song.getAvailableSongsAndTitles(self.engine, self.library, progressCallback=self.progressCallback), onLoad = self.songListLoaded, synch = True) # evilynux - Less BlackSOD[?]
+
+  def progressCallback(self, percent):
+    if time.time() - self.loadStartTime > 7:
+      changeLoadingSplashScreenText(self.engine, self.splash, _("Browsing Collection...") + ' (%d%%)' % (percent*100))
 
   def isInt(self, possibleInt):
     try:
@@ -4872,6 +4878,10 @@ def showLoadingSplashScreen(engine, text = _("Loading...")):
   engine.view.pushLayer(splash)
   engine.run()
   return splash
+
+def changeLoadingSplashScreenText(engine, splash, text=_("Loading...")):
+  splash.text = text
+  engine.run()
 
 def hideLoadingSplashScreen(engine, splash):
   engine.view.popLayer(splash)

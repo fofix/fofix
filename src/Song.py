@@ -3568,7 +3568,7 @@ def getAvailableLibraries(engine, library = DEFAULT_LIBRARY):
   
   return libraries
 
-def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = False):
+def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = False, progressCallback = lambda p: None):
   order = engine.config.get("game", "sort_order")
   tut = engine.config.get("game", "tut")
   direction = engine.config.get("game", "sort_direction")
@@ -3599,7 +3599,10 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
         continue
       if not name in names:
         names.append(name)
-  songs = [SongInfo(engine.resource.fileName(library, name, "song.ini", writable = True), library, allowCacheUsage=True) for name in names]
+  songs = []
+  for name in names:
+    progressCallback(len(songs)/float(len(names)))
+    songs.append(SongInfo(engine.resource.fileName(library, name, "song.ini", writable = True), library, allowCacheUsage=True))
   if not includeTutorials:
     songs = [song for song in songs if not song.tutorial]
   songs = [song for song in songs if not song.artist == '=FOLDER=']
@@ -3742,7 +3745,7 @@ def getAvailableTitles(engine, library = DEFAULT_LIBRARY):
   
   return titles
   
-def getAvailableSongsAndTitles(engine, library = DEFAULT_LIBRARY, includeTutorials = False):
+def getAvailableSongsAndTitles(engine, library = DEFAULT_LIBRARY, includeTutorials = False, progressCallback = lambda p: None):
   listingMode = engine.config.get("game","song_listing_mode")
   if library == None:
     return []
@@ -3763,7 +3766,7 @@ def getAvailableSongsAndTitles(engine, library = DEFAULT_LIBRARY, includeTutoria
 
 
   if listingMode == 0 or careerMode:
-    items = getAvailableSongs(engine, library, includeTutorials)
+    items = getAvailableSongs(engine, library, includeTutorials, progressCallback=progressCallback)
     if quickPlayMode and quickPlayCareerTiers == 0:
       titles = []
     else:
@@ -3777,11 +3780,11 @@ def getAvailableSongsAndTitles(engine, library = DEFAULT_LIBRARY, includeTutoria
     titles = []
     rootDir = engine.resource.fileName(DEFAULT_LIBRARY)
 
-    items = getAvailableSongs(engine, rootDir, includeTutorials)
+    items = getAvailableSongs(engine, rootDir, includeTutorials, progressCallback=progressCallback)
     for root, subFolders, files in os.walk(rootDir):
       for folder in subFolders:
         libName = os.path.join(root,folder)
-        items = items + getAvailableSongs(engine, libName, includeTutorials)
+        items = items + getAvailableSongs(engine, libName, includeTutorials, progressCallback=progressCallback)
         if quickPlayMode and quickPlayCareerTiers == 0:
           titles = []
         else:
