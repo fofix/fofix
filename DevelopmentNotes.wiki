@@ -26,7 +26,7 @@ Examples using our current 4:3 aspect ratio viewport:
  * Font position (x, y) = (0.0, 0.75) will attempt to write text starting at the *LOWER* left corner of the screen, which will not be visible due to the text displaying down and to the right of it's given position.
  * Font position (x, y) = (1.0, 0.75) will attempt to write text starting at the *LOWER RIGHT* corner of the screen, and no text will be visible as it starts at both the right AND bottom edges and continues down and right.
 
-Nickman has created a handy tool to help represent this quirk visually; run his program and move the mouse around the screen to see the FoFiX text coordinates of the cursor location: [http://www.mediafire.com/file/d1yn05inrjn/FoFiX_SH.zip]
+Nickman has created a handy tool to help represent this quirk visually; run his program and move the mouse around the screen to see the FoFiX text coordinates of the cursor location: [http://www.mediafire.com/file/d1yn05inrjn/FoFiX_SH.zip Download Skin Helper application], or [http://www.fretsonfire.net/forums/viewtopic.php?f=11&t=25040&p=345683#p345700 Take a look at the Skin Helper source].
 
 _Please keep in mind that this does not directly apply to all theme.ini positioning settings - several of these user-accessible font coordinates represent a more centered position of the text for a more user-friendly theming interface.  This section represents the inner workings of the FoFiX font / image rendering engine.  However, the whole thing about 0.75 being the max font vertical position still applies to theme creators._
 
