@@ -24,15 +24,20 @@
 __version__ = '$Id$'
 
 import os
+import sys
 if os.name != 'nt':
   sys.stderr.write('This script only works on Windows.\n')
   sys.exit(1)
 
 import ListToNSIS
 import _winreg
-import sys
 import shutil
 import win32api
+import sha
+try:
+  import sqlite3
+except ImportError:
+  import pysqlite2.dbapi2 as sqlite3
 
 us = r'..\FretsOnFire.exe'
 if not os.path.isfile(us):
@@ -43,10 +48,16 @@ vdict = win32api.GetFileVersionInfo(us, '\\')
 FOFIX_VERSION = '%d.%d.%d.%d' % (vdict['FileVersionMS'] >> 16, vdict['FileVersionMS'] & 0xffff, vdict['FileVersionLS'] >> 16, vdict['FileVersionLS'] & 0xffff)
 FOFIX_VERSION_FULL = str(win32api.GetFileVersionInfo(us, r'\StringFileInfo\%04x%04x\ProductVersion' % win32api.GetFileVersionInfo(us, r'\VarFileInfo\Translation')[0]))
 
-MLDist = ListToNSIS.NsisScriptGenerator('..')
+# Make the hashcache.
+hashcache = sqlite3.Connection('HashCache')
+hashcache.execute('CREATE TABLE IF NOT EXISTS `verlist` (`version` STRING UNIQUE)')
+hashcache.commit()
+MLDist = ListToNSIS.NsisScriptGenerator('..', hashcache, newTblName=FOFIX_VERSION_FULL)
 MLDist.readList('Dist-MegaLight-AllTutorials.lst')
 MLDist.readExcludeList('filesToExclude.lst')
+hashcache.commit()
 
+oldcwd = os.getcwd()
 os.chdir('..')
 
 # Find NSIS.
@@ -59,11 +70,12 @@ except WindowsError:
   sys.exit(1)
 makensis = os.path.join(nsisPath, 'makensis.exe')
 
-# Generate the script.
+# Generate the full installer script.
 builder = ListToNSIS.NsisScriptBuilder(r"""
 !define FOFIX_VERSION %s
 !define FOFIX_VERSION_FULL "%s"
 !include "MUI2.nsh"
+!include "FileFunc.nsh"
 
 # Installer title and filename.
 Name 'FoFiX v${FOFIX_VERSION_FULL}'
@@ -80,13 +92,29 @@ InstallDir '$DOCUMENTS\FoFiX'
 # Where we're stashing the install location.
 InstallDirRegKey HKCU 'SOFTWARE\myfingershurt\FoFiX' InstallRoot
 
+# Function to run FoFiX from the finish page.
+Function runFoFiX
+  SetOutPath $INSTDIR
+  Exec $INSTDIR\FretsOnFire.exe
+FunctionEnd
+
 # More installer parameters.
 !define MUI_ABORTWARNING
 !define MUI_UNABORTWARNING
 !define MUI_FINISHPAGE_NOAUTOCLOSE
+!define MUI_FINISHPAGE_NOREBOOTSUPPORT
+!define MUI_FINISHPAGE_RUN
+!define MUI_FINISHPAGE_RUN_TEXT "Run FoFiX v${FOFIX_VERSION_FULL}"
+!define MUI_FINISHPAGE_RUN_FUNCTION runFoFiX
+!define MUI_FINISHPAGE_LINK "FoFiX Development Home"
+!define MUI_FINISHPAGE_LINK_LOCATION "http://code.google.com/p/fofix/"
 !define MUI_UNFINISHPAGE_NOAUTOCLOSE
+!define MUI_UNFINISHPAGE_NOREBOOTSUPPORT
 !define MUI_LICENSEPAGE_RADIOBUTTONS
+!define MUI_COMPONENTSPAGE_SMALLDESC
 !define MUI_HEADERIMAGE
+!define MUI_FINISHPAGE_TEXT "FoFiX v${FOFIX_VERSION_FULL} has been installed on your computer.$\r$\n$\r$\nClick Finish to close this wizard.$\r$\n$\r$\nInstaller by John Stumpo."
+!define MUI_FINISHPAGE_TEXT_LARGE
 # gfx pending
 #!define MUI_HEADERIMAGE_BITMAP "pkg\installer_gfx\header.bmp"
 #!define MUI_HEADERIMAGE_UNBITMAP "pkg\installer_gfx\header.bmp"
@@ -118,10 +146,20 @@ InstallDirRegKey HKCU 'SOFTWARE\myfingershurt\FoFiX' InstallRoot
 #  BgImage::Destroy
 #FunctionEnd
 
+# Allow the patch build process to get at the uninstaller.
+Function .onInit
+  ${GetParameters} $R0
+  ${GetOptions} $R0 "/WriteUninstallerOnly" $R0
+  IfErrors continue
+  WriteUninstaller $EXEDIR\uninst.exe
+  Abort
+continue:
+  ClearErrors
+FunctionEnd
+
 !insertmacro MUI_LANGUAGE "English"
 
 # Add version info to the resulting installers.
-# I know py2exe has some sort of options that can let FretsOnFire.exe have version info too...
 VIProductVersion "${FOFIX_VERSION}"
 VIAddVersionKey /LANG=1033 "CompanyName" "FoFiX Team"
 VIAddVersionKey /LANG=1033 "FileDescription" "FoFiX Setup"
@@ -177,11 +215,153 @@ open('Setup.nsi', 'w').write(builder.getScript())
 if os.path.isfile('fretsonfire.ini'):
   os.rename('fretsonfire.ini', 'fretsonfire.bak')
 shutil.copy(os.path.join('pkg', 'fretsonfire.fresh.ini'), 'fretsonfire.ini')
-os.spawnl(os.P_WAIT, makensis, 'makensis.exe', 'Setup.nsi')
-os.unlink('fretsonfire.ini')
-if os.path.isfile('fretsonfire.bak'):
-  os.rename('fretsonfire.bak', 'fretsonfire.ini')
-os.unlink('Setup.nsi')
+try:
+  if os.spawnl(os.P_WAIT, makensis, 'makensis.exe', 'Setup.nsi') != 0:
+    raise RuntimeError, 'Installer generation failed.'
+  # Yank out the new uninstaller.
+  os.spawnl(os.P_WAIT, os.path.join(oldcwd, 'FoFiX v%s Setup.exe' % FOFIX_VERSION_FULL), 'FoFiX v%s Setup.exe' % FOFIX_VERSION_FULL, '/WriteUninstallerOnly')
+
+  # Now we can go back through the hashcache and make the patches.
+  versions = [row[0] for row in hashcache.execute('SELECT `version` FROM `verlist` WHERE `version` != ?', [FOFIX_VERSION_FULL])]
+  for v in versions:
+    os.chdir(oldcwd)
+    MLDist = ListToNSIS.NsisScriptGenerator('..', hashcache, oldTblName=v, newTblName=FOFIX_VERSION_FULL)
+    MLDist.readList('Dist-MegaLight-AllTutorials.lst')
+    MLDist.readExcludeList('filesToExclude.lst')
+    hashcache.commit()
+    os.chdir('..')
+    os.unlink('Setup.nsi')
+    oldExeSha1 = hashcache.execute("SELECT `hash` FROM `hashes_%s` WHERE `path` = 'FretsOnFire.exe'" % sha.sha(v).hexdigest()).fetchone()[0]
+    patcher = ListToNSIS.NsisScriptBuilder(r"""
+!define FOFIX_VERSION %s
+!define FOFIX_VERSION_FULL "%s"
+!define FOFIX_VERSION_OLD "%s"
+!define FOFIX_VERSION_OLD_EXE_SHA1 "%s"
+!include "MUI2.nsh"
+
+# Installer title and filename.
+Name 'FoFiX v${FOFIX_VERSION_OLD} to v${FOFIX_VERSION_FULL} Patch'
+Caption 'FoFiX v${FOFIX_VERSION_OLD} to v${FOFIX_VERSION_FULL} Patch'
+OutFile 'pkg\FoFiX v${FOFIX_VERSION_OLD} to v${FOFIX_VERSION_FULL} Patch.exe'
+
+# Installer parameters.
+SetCompressor /SOLID lzma
+RequestExecutionLevel user  # no UAC on Vista
+ShowInstDetails show
+InstallButtonText "&Upgrade"
+
+# Where we're going (by default at least)
+InstallDir '$DOCUMENTS\FoFiX'
+# Where we stashed the install location.
+InstallDirRegKey HKCU 'SOFTWARE\myfingershurt\FoFiX' InstallRoot
+
+# Function to run FoFiX from the finish page.
+Function runFoFiX
+  SetOutPath $INSTDIR
+  Exec $INSTDIR\FretsOnFire.exe
+FunctionEnd
+
+# More installer parameters.
+!define MUI_ABORTWARNING
+!define MUI_ABORTWARNING_TEXT "Are you sure you want to quit FoFiX v${FOFIX_VERSION_OLD} to v${FOFIX_VERSION_FULL} Patch?"
+!define MUI_FINISHPAGE_NOAUTOCLOSE
+!define MUI_FINISHPAGE_NOREBOOTSUPPORT
+!define MUI_FINISHPAGE_RUN
+!define MUI_FINISHPAGE_RUN_TEXT "Run FoFiX v${FOFIX_VERSION_FULL}"
+!define MUI_FINISHPAGE_RUN_FUNCTION runFoFiX
+!define MUI_FINISHPAGE_LINK "FoFiX Development Home"
+!define MUI_FINISHPAGE_LINK_LOCATION "http://code.google.com/p/fofix/"
+!define MUI_LICENSEPAGE_RADIOBUTTONS
+!define MUI_HEADERIMAGE
+!define MUI_WELCOMEPAGE_TITLE "Welcome to the FoFiX v${FOFIX_VERSION_OLD} to v${FOFIX_VERSION_FULL} Patch Wizard"
+!define MUI_WELCOMEPAGE_TEXT "This wizard will guide you through the upgrade of FoFiX v${FOFIX_VERSION_OLD} to version ${FOFIX_VERSION_FULL}.$\r$\n$\r$\nBefore upgrading, make sure FoFiX v${FOFIX_VERSION_OLD} is not running.$\r$\n$\r$\nClick Next to continue."
+!define MUI_DIRECTORYPAGE_TEXT_TOP "Setup will upgrade the installation of FoFiX v${FOFIX_VERSION_OLD} in the following folder to version ${FOFIX_VERSION_FULL}. To perform the upgrade in a different folder, click Browse and select another folder. Click Upgrade to start the upgrade."
+!define MUI_INSTFILESPAGE_FINISHHEADER_TEXT "Upgrade Complete"
+!define MUI_INSTFILESPAGE_FINISHHEADER_SUBTEXT "Upgrade was completed successfully."
+!define MUI_INSTFILESPAGE_ABORTHEADER_TEXT "Upgrade Aborted"
+!define MUI_INSTFILESPAGE_ABORTHEADER_SUBTEXT "Upgrade was aborted."
+!define MUI_FINISHPAGE_TITLE "Completing the FoFiX v${FOFIX_VERSION_OLD} to v${FOFIX_VERSION_FULL} Patch Wizard"
+!define MUI_FINISHPAGE_TEXT "FoFiX v${FOFIX_VERSION_OLD} has been upgraded to version ${FOFIX_VERSION_FULL}.$\r$\n$\r$\nClick Finish to close this wizard.$\r$\n$\r$\nInstaller by John Stumpo."
+!define MUI_FINISHPAGE_TEXT_LARGE
+# gfx pending
+#!define MUI_HEADERIMAGE_BITMAP "pkg\installer_gfx\header.bmp"
+
+# Function to verify the install path.
+Function verifyFoFiXInstDir
+  IfFileExists $INSTDIR haveDir
+  Abort
+haveDir:
+  IfFileExists $INSTDIR\FretsOnFire.exe haveFoFexe
+  MessageBox MB_YESNO|MB_ICONEXCLAMATION "This does not look like a valid FoFiX installation folder.$\r$\n$\r$\nIf you would like to merely unpack the altered files into this folder, you may continue anyway.$\r$\n$\r$\nContinue?" IDYES allow
+  Abort
+haveFoFexe:
+  Crypto::HashFile "SHA1" $INSTDIR\FretsOnFire.exe
+  Pop $0
+  StrCmp $0 ${FOFIX_VERSION_OLD_EXE_SHA1} allow
+  MessageBox MB_YESNO|MB_ICONEXCLAMATION "This looks like a valid FoFiX installation folder, but not version ${FOFIX_VERSION_OLD}.$\r$\n$\r$\nApplying this patch will more than likely break your installation!$\r$\n$\r$\nContinue anyway?" IDYES allow
+  Abort  
+allow:
+FunctionEnd
+
+# The pages of the installer...
+!insertmacro MUI_PAGE_WELCOME
+!insertmacro MUI_PAGE_LICENSE "COPYING"
+!define MUI_PAGE_HEADER_TEXT "Choose Upgrade Location"
+!define MUI_PAGE_HEADER_SUBTEXT "Choose the folder in which to upgrade FoFiX v${FOFIX_VERSION_OLD} to version ${FOFIX_VERSION_FULL}."
+!define MUI_PAGE_CUSTOMFUNCTION_LEAVE verifyFoFiXInstDir
+!insertmacro MUI_PAGE_DIRECTORY
+!define MUI_PAGE_HEADER_TEXT "Upgrading"
+!define MUI_PAGE_HEADER_SUBTEXT "Please wait while FoFiX v${FOFIX_VERSION_OLD} is upgraded to version ${FOFIX_VERSION_FULL}."
+!insertmacro MUI_PAGE_INSTFILES
+!insertmacro MUI_PAGE_FINISH
+
+# Throw in a cool background image.
+# gfx pending
+#!define MUI_CUSTOMFUNCTION_GUIINIT startBackground
+#Function startBackground
+#  InitPluginsDir
+#  File /oname=$PLUGINSDIR\background.bmp pkg\installer_gfx\background.bmp
+#  BgImage::SetBG /NOUNLOAD /FILLSCREEN $PLUGINSDIR\background.bmp
+#  BgImage::Redraw /NOUNLOAD
+#FunctionEnd
+#Function .onGUIEnd
+#  BgImage::Destroy
+#FunctionEnd
+
+!insertmacro MUI_LANGUAGE "English"
+
+# Add version info to the resulting installers.
+VIProductVersion "${FOFIX_VERSION}"
+VIAddVersionKey /LANG=1033 "CompanyName" "FoFiX Team"
+VIAddVersionKey /LANG=1033 "FileDescription" "FoFiX Patch Utility"
+VIAddVersionKey /LANG=1033 "FileVersion" "${FOFIX_VERSION_FULL}"
+VIAddVersionKey /LANG=1033 "InternalName" "FoFiX v${FOFIX_VERSION_OLD} to v${FOFIX_VERSION_FULL} Patch.exe"
+VIAddVersionKey /LANG=1033 "LegalCopyright" "© 2008-2009 FoFiX Team.  GNU GPL v2 or later."
+VIAddVersionKey /LANG=1033 "OriginalFilename" "FoFiX v${FOFIX_VERSION_OLD} to v${FOFIX_VERSION_FULL} Patch.exe"
+VIAddVersionKey /LANG=1033 "ProductName" "FoFiX"
+VIAddVersionKey /LANG=1033 "ProductVersion" "${FOFIX_VERSION_FULL}"
+""" % (FOFIX_VERSION, FOFIX_VERSION_FULL, str(v), str(oldExeSha1)))
+    patcher.addSection('Patch', r'''
+SectionIn RO
+%s
+SetOutPath $INSTDIR
+File "%s"
+''' % (MLDist.getInstallScript(), os.path.join(oldcwd, 'uninst.exe')), '', 'All altered files for this patch.')
+    open('Setup.nsi', 'w').write(patcher.getScript())
+    if os.spawnl(os.P_WAIT, makensis, 'makensis.exe', 'Setup.nsi') != 0:
+      raise RuntimeError, 'Installer generation failed.'
+
+finally:
+  if os.getcwd() == oldcwd:
+    os.chdir('..')
+  os.unlink('fretsonfire.ini')
+  if os.path.isfile('fretsonfire.bak'):
+    os.rename('fretsonfire.bak', 'fretsonfire.ini')
+  if os.path.isfile('Setup.nsi'):
+    os.unlink('Setup.nsi')
+  os.chdir(oldcwd)
+  if os.path.isfile('uninst.exe'):
+    os.unlink('uninst.exe')
 
 # gfx pending
 #os.unlink(os.path.join('pkg', 'installer_gfx', 'background.bmp'))
