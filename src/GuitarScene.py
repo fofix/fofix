@@ -1996,6 +1996,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if self.song:
       self.song.readyToGo = False
     #self.countdown = 4.0 * self.songBPS
+    self.countdownSeconds = 5   #MFH - This needs to be reset for song restarts, too!
     self.countdown = float(self.countdownSeconds) * self.songBPS
     self.scaleText = [0.0 for i in self.playerList]
     self.displayText = [None for i in self.playerList]
