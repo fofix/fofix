@@ -1800,8 +1800,10 @@ class Drum:
         if event.played or event.hopod:
           if event.flameCount < 1 and not self.starPowerGained:
 
-            for dfEvent in self.drumFillEvents:
-              dfEvent.happened = True
+            #if self.drumFillOnScreen:   #MFH - if there's a drum fill on the screen right now, skip it!
+            if self.starPower < 50:   #not enough starpower to activate yet, kill existing drumfills
+              for dfEvent in self.drumFillEvents:
+                dfEvent.happened = True
 
             if self.starPower < 100:
               self.starPower += 25

@@ -269,7 +269,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "game", "resume_countdown", autoApply = True), #akedrou
       ConfigChoice(engine, engine.config, "game", "whammy_saves_starpower", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "sp_notes_while_active", autoApply = True, isQuickset = 2),   #myfingershurt - setting for gaining more SP while active
-      ConfigChoice(engine, engine.config, "game", "auto_drum_sp", autoApply = True),#myfingershurt
+      ConfigChoice(engine, engine.config, "game", "drum_sp_mode", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game",  "uploadscores", autoApply = True),
       ConfigChoice(engine, engine.config, "audio",  "delay", autoApply = True),     #myfingershurt: so a/v delay can be set without restarting FoF
       (_("Advanced Gameplay Settings"), FoFiXAdvancedSettings),
@@ -906,7 +906,7 @@ class BasicSettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "game", "resume_countdown", autoApply = True), #akedrou
       ConfigChoice(engine, engine.config, "game", "whammy_saves_starpower", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "sp_notes_while_active", autoApply = True, isQuickset = 2),   #myfingershurt - setting for gaining more SP while active
-      ConfigChoice(engine, engine.config, "game", "auto_drum_sp", autoApply = True),#myfingershurt
+      ConfigChoice(engine, engine.config, "game", "drum_sp_mode", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game",  "uploadscores", autoApply = True),
       ConfigChoice(engine, engine.config, "audio",  "delay", autoApply = True),     #myfingershurt: so a/v delay can be set without restarting FoF
     ]

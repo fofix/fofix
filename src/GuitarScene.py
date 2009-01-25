@@ -555,8 +555,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.lastTapText = "tapp: -"
 
     #myfingershurt: auto drum starpower activation option
-    self.autoDrumStarpowerActivate = self.engine.config.get("game", "auto_drum_sp")
+    #self.autoDrumStarpowerActivate = self.engine.config.get("game", "auto_drum_sp")
+    self.autoDrumStarpowerActivate = self.engine.config.get("game", "drum_sp_mode")
 
+    self.numDrumFills = 0   #MFH - count drum fills to see whether or not we should use auto SP
 
     #MFH - TODO - rewrite in an expandable fashion; requires creation of some new Player object constants that will link to the appropriate player's control based on which player the object is set to
     if self.analogKillMode[0] > 0:
@@ -741,6 +743,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #MFH - first, count the markers for each instrument.  If a particular instrument does not have at least two starpower phrases 
     #  marked, ignore them and force auto-generation of SP paths.
     
+    for i, guitar in enumerate(self.guitars):   #MFH - count number of drum fills
+      if guitar.isDrum:   #MFH - count number of drum fill markers
+        self.numDrumFills = len([1 for time, event in self.song.midiEventTrack[i].getAllEvents() if (isinstance(event, Song.MarkerNote) and (event.number == Song.freestyleMarkingNote) ) ])
+        Log.debug("Drum part found, scanning for drum fills.... %d freestyle markings found (the last one may be a Big Rock Ending)." % self.numDrumFills)
+    
+
     #if self.starpowerMode == 2:     #auto-MIDI mode only
     if self.song.hasStarpowerPaths:
       for i,guitar in enumerate(self.guitars):
@@ -748,6 +756,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         #MFH - first, count the SP marker notes!
         numOfSpMarkerNotes = len([1 for time, event in self.song.midiEventTrack[i].getAllEvents() if (isinstance(event, Song.MarkerNote) and not event.endMarker and (event.number == Song.overDriveMarkingNote or (event.number == Song.starPowerMarkingNote and self.song.midiStyle == Song.MIDI_TYPE_GH) ) ) ])
 
+        
         #also want to count RB solo sections in this track, if the MIDI type is RB.  Then we'll know to activate MIDI guitar solo markers or not 
         # for this instrument
         if self.song.midiStyle == Song.MIDI_TYPE_RB:
@@ -3082,11 +3091,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               self.engine.data.starReadySound.play()
             else:
               self.engine.data.starSound.play()
-            if guitar.isDrum and self.autoDrumStarpowerActivate:
+            if guitar.isDrum and self.autoDrumStarpowerActivate == 0 and self.numDrumFills < 2:
               self.activateSP(i)
           else:
             #myfingershurt: auto drum starpower activation option:
-            if guitar.isDrum and self.autoDrumStarpowerActivate:
+            if guitar.isDrum and self.autoDrumStarpowerActivate == 0 and self.numDrumFills < 2:
               self.activateSP(i)
             if guitar.starPower >= 50 and not guitar.starPowerActive:
               self.engine.data.starReadySound.play()
@@ -4177,7 +4186,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               Log.debug(str(time - self.coOpStarPowerActive[i]))
               if time - self.coOpStarPowerActive[i] < 300.0:
                 continue
-              if self.autoDrumStarpowerActivate and guitar.isDrum:
+              if guitar.isDrum and self.autoDrumStarpowerActivate == 0 and self.numDrumFills < 2:
                 self.activateSP(i)
                 break
               if self.phrases > 1:
