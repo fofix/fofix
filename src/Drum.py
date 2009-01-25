@@ -3300,7 +3300,7 @@ class Drum:
       if drumHit:
         numHits += 1
         if i == 4:
-          if self.drumFillsActive and self.drumFillsHits >= 4 and not self.starPowerActive:
+          if not self.bigRockEndingMarkerSeen and (self.drumFillsActive or self.drumFillWasJustActive) and self.drumFillsHits >= 4 and not self.starPowerActive:
             drumFillCymbalPos = self.freestyleStart+self.freestyleLength
             minDrumFillCymbalHitTime = drumFillCymbalPos - self.earlyMargin
             maxDrumFillCymbalHitTime = drumFillCymbalPos + self.lateMargin

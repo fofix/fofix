@@ -3659,6 +3659,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       if self.guitars[num].isDrum:
         if self.guitars[num].drumFillWasJustActive:
           ApplyPenalty = False
+          self.guitars[num].freestylePick(self.song, pos, self.controls)    #MFH - to allow late drum fill SP activation
           self.guitars[num].drumFillWasJustActive = False
 
       if ApplyPenalty:

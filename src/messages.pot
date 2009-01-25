@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-01-24 19:02-0800\n"
+"POT-Creation-Date: 2009-01-24 23:52-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -164,39 +164,39 @@ msgstr ""
 msgid "<OK>"
 msgstr ""
 
-#: Dialogs.py:751 Dialogs.py:1698
+#: Dialogs.py:751 Dialogs.py:1698 Song.py:118
 msgid "Drums"
 msgstr ""
 
-#: Dialogs.py:754 Dialogs.py:1701
+#: Dialogs.py:754 Dialogs.py:1701 Song.py:117
 msgid "Lead"
 msgstr ""
 
-#: Dialogs.py:757 Dialogs.py:1704
+#: Dialogs.py:757 Dialogs.py:1704 Song.py:116
 msgid "Bass"
 msgstr ""
 
-#: Dialogs.py:760 Dialogs.py:1707
+#: Dialogs.py:760 Dialogs.py:1707 Song.py:115
 msgid "Rhythm"
 msgstr ""
 
-#: Dialogs.py:763 Dialogs.py:1710
+#: Dialogs.py:763 Dialogs.py:1710 Song.py:114
 msgid "Guitar"
 msgstr ""
 
-#: Dialogs.py:766
+#: Dialogs.py:766 Song.py:141
 msgid "Expert"
 msgstr ""
 
-#: Dialogs.py:767
+#: Dialogs.py:767 Song.py:140
 msgid "Hard"
 msgstr ""
 
-#: Dialogs.py:768
+#: Dialogs.py:768 Song.py:139
 msgid "Medium"
 msgstr ""
 
-#: Dialogs.py:769
+#: Dialogs.py:769 Song.py:138
 msgid "Easy"
 msgstr ""
 
@@ -2123,15 +2123,15 @@ msgstr ""
 msgid "% Complete"
 msgstr ""
 
-#: GuitarScene.py:344 GuitarScene.py:8147
+#: GuitarScene.py:344 GuitarScene.py:8148
 msgid "HOPO"
 msgstr ""
 
-#: GuitarScene.py:345 GuitarScene.py:8117 GuitarScene.py:8126
+#: GuitarScene.py:345 GuitarScene.py:8118 GuitarScene.py:8127
 msgid "COMPLETED"
 msgstr ""
 
-#: GuitarScene.py:346 GuitarScene.py:8119 GuitarScene.py:8135
+#: GuitarScene.py:346 GuitarScene.py:8120 GuitarScene.py:8136
 msgid " % ON "
 msgstr ""
 
@@ -2383,7 +2383,7 @@ msgstr ""
 msgid " QUIT"
 msgstr ""
 
-#: GuitarScene.py:8759
+#: GuitarScene.py:8760
 #, python-format
 msgid "FPS: %.2f"
 msgstr ""
