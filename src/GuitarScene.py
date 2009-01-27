@@ -2634,9 +2634,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 
           if guitar.isDrum:
             guitar.drumFillsHits += 1
-            if guitar.freestyleSP:
-              self.activateSP(num)
-              guitar.freestyleSP = False
+            #if guitar.freestyleSP:   #MFH - this logic should be in the run() function, not conditional here...
+            #  self.activateSP(num)
+            #  guitar.freestyleSP = False
   
           if guitar.bigRockLogic == 0 or guitar.bigRockLogic == 1:
             brzoneremain = ( guitar.freestyleLength - pos + guitar.freestyleFirstHit ) / guitar.freestyleLength
@@ -3021,6 +3021,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       else:
         pos = self.pausePos
 
+      
       #MFH - new failing detection logic
       if self.failingEnabled:
         #if self.numOfPlayers > 1:
@@ -3062,6 +3063,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       
       for i,guitar in enumerate(self.guitars):  
         self.stage.run(pos, guitar.currentPeriod)
+
+      
+        if guitar.isDrum and guitar.freestyleSP:    #MFH - this drum fill starpower activation logic should always be checked.
+          self.activateSP(num)
+          guitar.freestyleSP = False
+
 
         #MFH - check for any unplayed notes and for an unbroken streak since the BRE, then award bonus scores
         thePlayer = self.playerList[i]
