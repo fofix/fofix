@@ -120,6 +120,11 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||song_info_display_X = 0.05||Controls the X position of song info display during countdown. Use a floating point number||
 ||song_info_display_Y = 0.05||Controls the Y position of song info display during countdown. Use a floating point number||
 ||spot_color = #EEEEEE||Enter a Hex color here.||
+||star_fillup_center_x = 139||Controls the X Position of the Center of the Star Fillup||
+||star_fillup_center_y = 151||Controls the Y Position of the Center of the Star Fillup||
+||star_fillup_in_radius = 121||Controls the inner radius||
+||star_fillup_out_radius = 138||Controls the outer radius||
+||star_fillup_color = #FFF25E||Controls the color of the star fill up.||
 ||threeDspin = False||Turns 3d Starnote spinning off.||
 ||twoDkeys = False||Use 3d keys  = False||
 ||twoDnote = False||Use 3d notes = False||
