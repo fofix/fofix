@@ -483,6 +483,7 @@ class SettingsMenu(Menu.Menu):
       (_("Theme Display Settings"), ThemeDisplayMenu),
       ConfigChoice(engine, engine.config, "game", "in_game_stars", autoApply = True, isQuickset = 2),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "partial_stars", autoApply = True, isQuickset = 1),#myfingershurt
+      ConfigChoice(engine, engine.config, "performance", "star_continuous_fillup", autoApply = True, isQuickset = 1), #stump
       ConfigChoice(engine, engine.config, "coffee", "game_phrases", autoApply = True, isQuickset = 1),
       ConfigChoice(engine, engine.config, "game", "hopo_indicator", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "accuracy_mode", autoApply = True),

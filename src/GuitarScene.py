@@ -64,6 +64,11 @@ from OpenGL.GL import *
 #MFH: experimental 2D font rendering module
 import lamina
 
+#stump: needed for continuous star fillup
+import Image
+import ImageDraw
+from Svg import ImgDrawing
+
 
 class GuitarScene:
   pass
@@ -496,6 +501,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.whammyEffect = 0
     self.bigRockEndings = self.engine.config.get("game", "big_rock_endings")
     self.showFreestyleActive = self.engine.config.get("debug",   "show_freestyle_active")
+    #stump: continuous star fillup
+    self.starFillupCenterX = Theme.starFillupCenterX
+    self.starFillupCenterY = Theme.starFillupCenterY
+    self.starFillupInRadius = Theme.starFillupInRadius
+    self.starFillupOutRadius = Theme.starFillupOutRadius
+    self.starFillupColor = Theme.starFillupColor
+    self.starContinuousAvailable = self.engine.config.get("performance", "star_continuous_fillup") and \
+      None not in (self.starFillupCenterX, self.starFillupCenterY, self.starFillupInRadius, self.starFillupOutRadius, self.starFillupColor)
     
 
 
@@ -589,6 +602,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.lastStars.append(0.0)
       self.coOpStars = 0
       self.coOpPartialStars = 0
+      self.coOpStarRatio = 0.0
     self.deadPlayerList = [] #akedrou - keep the order failed.
     self.numDeadPlayers = 0
     #self.stars = [0,0]
@@ -597,6 +611,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     
     self.partialStar = [0 for i in self.playerList]
+    self.starRatio = [0.0 for i in self.playerList]
     self.dispSoloReview = [False for i in self.playerList]
     self.soloReviewText = [[] for i in self.playerList]
     self.soloReviewCountdown = [0 for i in self.playerList]
@@ -1419,8 +1434,29 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.starGrey = None
       self.starPerfect = None
 
+    #stump: continuous partial stars
+    # This is (compared to the other stuff) SLOOOOW!  Thus we generate the images now so we don't have to during gameplay...
+    if self.starContinuousAvailable:
+      try:
+        self.drawnOverlays = {}
+        baseStarGreyImageSize = Image.open(self.starGrey.texture.name).size
+        for degrees in range(0, 360, 5):
+          overlay = Image.new('RGBA', baseStarGreyImageSize)
+          draw = ImageDraw.Draw(overlay)
+          draw.pieslice((self.starFillupCenterX-self.starFillupOutRadius, self.starFillupCenterY-self.starFillupOutRadius,
+                         self.starFillupCenterX+self.starFillupOutRadius, self.starFillupCenterY+self.starFillupOutRadius),
+                        -90, degrees-90, outline=self.starFillupColor, fill=self.starFillupColor)
+          draw.ellipse((self.starFillupCenterX-self.starFillupInRadius, self.starFillupCenterY-self.starFillupInRadius,
+                        self.starFillupCenterX+self.starFillupInRadius, self.starFillupCenterY+self.starFillupInRadius),
+                       outline=(0, 0, 0, 0), fill=(0, 0, 0, 0))
+          dispOverlay = ImgDrawing(self.engine.data.svg, overlay)
+          self.drawnOverlays[degrees] = dispOverlay
+      except:
+        Log.error('Could not prebuild star overlay textures: ')
+        self.starContinuousAvailable = False
+
     self.starGrey1 = None
-    if self.starWhite and self.starGrey and self.starPerfect and self.partialStars == 1:   #MFH - even better in-game star display, stargrey1.png - stargrey7.png (stargrey8.png is useless - that's a white star.)
+    if self.starWhite and self.starGrey and self.starPerfect and self.partialStars == 1 and not self.starContinuousAvailable:   #MFH - even better in-game star display, stargrey1.png - stargrey7.png (stargrey8.png is useless - that's a white star.)
       try:
         self.engine.loadImgDrawing(self, "starGrey1", os.path.join("themes",themename,"stargrey1.png"))
         self.engine.loadImgDrawing(self, "starGrey2", os.path.join("themes",themename,"stargrey2.png"))
@@ -2042,6 +2078,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.guitars[playaNum].spEnabled = True
       self.guitars[playaNum].bigRockEndingMarkerSeen = False
     self.partialStar = [0 for i in self.playerList]
+    self.starRatio = [0.0 for i in self.playerList]
     self.resetStarThresholds()
     self.crowdsCheering = False #akedrou
     self.coOpScore = 0
@@ -2054,6 +2091,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.coOpStarPowerActive = [0 for i in self.playerList]
     self.lastCoOpStars = 0
     self.coOpPartialStars = 0
+    self.coOpStarRatio = 0.0
     self.mutedLastSecondYet = False
     self.dispSoloReview = [False for i in self.playerList]
     self.soloReviewCountdown = [0 for i in self.playerList]
@@ -4733,7 +4771,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.starThresholdsP2 = []  #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>)
     self.starThresholdIndex = []
     self.nextScoreThreshold = []
+    self.prevScoreThreshold = []
     self.nextHitNotesThreshold = []
+    self.prevHitNotesThreshold = []
     self.nextStar = []
     self.nextPartialStar = []
     self.maxStarThresholdIndex = []
@@ -4764,7 +4804,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     baseScore = self.avg1xScore[playerNum]
     self.starThresholdIndex.append(0)
     self.nextScoreThreshold.append(0)
+    self.prevScoreThreshold.append(0)
     self.nextHitNotesThreshold.append(0)
+    self.prevHitNotesThreshold.append(0)
     self.nextStar.append(0)
     self.nextPartialStar.append(0)
     self.maxStarThresholdIndex.append(0)
@@ -4916,7 +4958,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       baseScore = self.avg1xScore[playerNum]
       self.starThresholdIndex.append(0)
       self.nextScoreThreshold.append(0)
+      self.prevScoreThreshold.append(0)
       self.nextHitNotesThreshold.append(0)
+      self.prevHitNotesThreshold.append(0)
       self.nextStar.append(0)
       self.nextPartialStar.append(0)
       self.maxStarThresholdIndex.append(0)
@@ -5074,7 +5118,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.avg1xScore.append(baseScore)
         self.starThresholdIndex.append(0)   #to index self.coOpPlayerIndex
         self.nextScoreThreshold.append(0)
+        self.prevScoreThreshold.append(0)
         self.nextHitNotesThreshold.append(0)
+        self.prevHitNotesThreshold.append(0)
         self.nextStar.append(0)
         self.nextPartialStar.append(0)
         self.maxStarThresholdIndex.append(0)
@@ -5232,6 +5278,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   def getNextStarThresholds(self, playerNum):
     #ready for a new tuple o' data
     self.starThresholdIndex[playerNum] = self.starThresholdIndex[playerNum] + 1
+    self.prevScoreThreshold[playerNum], self.prevHitNotesThreshold[playerNum] = self.nextScoreThreshold[playerNum], self.nextHitNotesThreshold[playerNum]
     if playerNum == 0:
       self.nextStar[playerNum], self.nextPartialStar[playerNum], self.nextScoreThreshold[playerNum], self.nextHitNotesThreshold[playerNum] = self.starThresholdsP1[self.starThresholdIndex[playerNum]]
     elif playerNum == 1:
@@ -5258,6 +5305,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.coOpStars = self.nextStar[playerNum]
           self.coOpPartialStars = self.nextPartialStar[playerNum]
           self.getNextStarThresholds(playerNum)
+
+        try:
+          self.coOpStarRatio = float(self.coOpScore-self.prevScoreThreshold[playerNum])/(self.nextScoreThreshold[playerNum]-self.prevScoreThreshold[playerNum])
+        except ZeroDivisionError:
+          self.coOpStarRatio = 0.0
     
         if self.coOpStars != self.lastCoOpStars and self.engine.data.starDingSoundFound:  #new star gained!
           #self.engine.data.starDingSound.setVolume(self.sfxVolume) #MFH - no need to retrieve from INI file every star ding...
@@ -5283,6 +5335,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.partialStar[playerNum] = self.nextPartialStar[playerNum]
         self.getNextStarThresholds(playerNum)
   
+      try:
+        self.starRatio[playerNum] = float(self.playerList[playerNum].score-self.prevScoreThreshold[playerNum])/(self.nextScoreThreshold[playerNum]-self.prevScoreThreshold[playerNum])
+      except ZeroDivisionError:
+        self.starRatio[playerNum] = 0.0
+
       if self.playerList[playerNum].stars != self.lastStars[playerNum] and self.engine.data.starDingSoundFound:  #new star gained!
         #self.engine.data.starDingSound.setVolume(self.sfxVolume) #MFH - no need to retrieve from INI file every star ding...
         self.engine.data.starDingSound.play()
@@ -8182,10 +8239,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               stars=self.coOpStars
               partialStars=self.coOpPartialStars
               self.engine.view.setViewport(1,0)
+              ratio=self.coOpStarRatio
 
             else:
               stars=player.stars
               partialStars=self.partialStar[i]
+              ratio=self.starRatio[i]
 
             w = wBak
             h = hBak
@@ -8198,8 +8257,20 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     self.starPerfect.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
                     self.starPerfect.draw()
                   elif starNum == stars:
+                    if self.starContinuousAvailable:
+                      #stump: continuous fillup
+                      ratio = (partialStars/8.0) + (ratio/8.0)
+                      degrees = int(360*ratio) - (int(360*ratio) % 5)
+                      self.starGrey.transform.reset()
+                      self.starGrey.transform.scale(.080,-.080)
+                      self.starGrey.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
+                      self.starGrey.draw()
+                      self.drawnOverlays[degrees].transform.reset()
+                      self.drawnOverlays[degrees].transform.scale(.080,-.080)
+                      self.drawnOverlays[degrees].transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
+                      self.drawnOverlays[degrees].draw()
                     #if self.starGrey1 and self.starScoring == 2:  #if more complex star system is enabled, and we're using Rock Band style scoring
-                    if self.starGrey1:
+                    elif self.starGrey1:
                       if partialStars == 0:
                         self.starGrey.transform.reset()
                         self.starGrey.transform.scale(.080,-.080)

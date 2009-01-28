@@ -32,6 +32,7 @@ from math import sin, cos
 import Log
 import Config
 from Texture import Texture, TextureException
+import Image
 
 import DummyAmanith as amanith
 haveAmanith = True
@@ -524,6 +525,9 @@ class ImgDrawing:
           raise RuntimeError(e)
         Log.debug("Loading SVG file '%s'." % (ImgData))
         self.ImgData = open(ImgData).read()
+    elif isinstance(ImgData, Image.Image): #stump: let a PIL image be passed in
+      self.texture = Texture()
+      self.texture.loadImage(ImgData)
 
     # Make sure we have a valid texture
     if not self.texture:

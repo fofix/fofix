@@ -227,6 +227,13 @@ Config.define("theme", "hopo_indicator_y",       float, None)
 Config.define("theme", "hopo_indicator_active_color",   str, "#FFFFFF")
 Config.define("theme", "hopo_indicator_inactive_color",   str, "#666666")
 
+#stump - parameters for continuous fillup of stars
+Config.define("theme", "star_fillup_center_x", int, None)
+Config.define("theme", "star_fillup_center_y", int, None)
+Config.define("theme", "star_fillup_in_radius", int, None)
+Config.define("theme", "star_fillup_out_radius", int, None)
+Config.define("theme", "star_fillup_color", str, None)
+
 #Qstick - Misc
 Config.define("theme", "song_list_display",       int, None)
 
@@ -374,6 +381,13 @@ hopoIndicatorX = None
 hopoIndicatorY = None
 hopoIndicatorActiveColor = None
 hopoIndicatorInactiveColor = None
+
+#stump - parameters for continuous fillup of stars
+starFillupCenterX = None
+starFillupCenterY = None
+starFillupInRadius = None
+starFillupOutRadius = None
+starFillupColor = None
 
 #Qstick - misc
 songListDisplay = None
@@ -569,6 +583,11 @@ def setupMisc(config):
   global songInfoDisplayX
   global songInfoDisplayY
   global displayAllGreyStars, smallMult
+  global starFillupCenterX
+  global starFillupCenterY
+  global starFillupInRadius
+  global starFillupOutRadius
+  global starFillupColor
   global songListDisplay
 
   loadingPhrase = config.get("theme", "loading_phrase")
@@ -580,6 +599,11 @@ def setupMisc(config):
   songInfoDisplayY = config.get("theme", "song_info_display_Y")
   displayAllGreyStars = config.get("theme", "display_all_grey_stars")
   smallMult = config.get("theme", "small_1x_mult")
+  starFillupCenterX = config.get("theme", "star_fillup_center_x")
+  starFillupCenterY = config.get("theme", "star_fillup_center_y")
+  starFillupInRadius = config.get("theme", "star_fillup_in_radius")
+  starFillupOutRadius = config.get("theme", "star_fillup_out_radius")
+  starFillupColor = config.get("theme", "star_fillup_color")
   songListDisplay = config.get("theme", "song_list_display")
 
 #MFH:
