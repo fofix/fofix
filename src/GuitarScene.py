@@ -3104,7 +3104,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
       
         if guitar.isDrum and guitar.freestyleSP:    #MFH - this drum fill starpower activation logic should always be checked.
-          self.activateSP(num)
+          self.activateSP(i)
           guitar.freestyleSP = False
 
 
