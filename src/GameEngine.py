@@ -307,6 +307,8 @@ Config.define("game",   "jurgtype",            int,   2,      text = _("Jurgen P
 Config.define("game",   "jurglogic",            int,   1,      text = _("Jurgen Logic"), options = {0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}  )
 Config.define("game",   "jurgtext",            int,   1,      text = _("Jurgen Text Size"), options = {0: _("Big"), 1: _("Small")})
 
+Config.define("game", "use_graphical_submenu", int,   1,      text = _("Graphical Submenus"), options = {0: _("Disabled"), 1: _("Enabled")})
+
 
 Config.define("audio",  "enable_crowd_tracks", int,  1,      text = _("Crowd Cheers"), options = {0: _("Off (Disabled)"), 1: _("During SP Only"), 2: _("During SP & Green"), 3: _("Always On")}) #akedrou
 #Config.define("audio",  "miss_volume",         float, 0.2,    text = _("Miss Volume"), options = dict([(n / 100.0, "%d%%" % n) for n in range(0, 100, 10)]))
@@ -598,7 +600,7 @@ class GameEngine(Engine):
       theme = Config.load(self.resource.fileName("themes", themename, "theme.ini"))
     except IOError:
       theme = Config.load(self.resource.fileName("theme.ini"))
-    Theme.open(theme)
+    Theme.open(theme, self.getPath(os.path.join("themes",self.data.themeLabel,"menu")))
   
 
     

@@ -25,6 +25,7 @@
 import pygame
 from OpenGL.GL import *
 import math
+import os
 
 from View import Layer
 from Input import KeyListener
@@ -36,10 +37,11 @@ import Player
 import Log
 
 class Choice:
-  def __init__(self, text, callback, values = None, valueIndex = 0, append_submenu_char = True):
+  def __init__(self, text, callback, name = None, values = None, valueIndex = 0, append_submenu_char = True):
     #Log.debug("Choice class init (Menu.py)...")
     self.text       = unicode(text)
     self.callback   = callback
+    self.name       = name
     self.values     = values
     self.valueIndex = valueIndex
     self.append_submenu_char = append_submenu_char
@@ -55,9 +57,9 @@ class Choice:
     if engine and isinstance(self.callback, list):
       #MFH 
       if self.values:
-        nextMenu = Menu(engine, self.callback, pos = self.values, selectedIndex = self.valueIndex )
+        nextMenu = Menu(engine, self.callback, name = self.name, pos = self.values, selectedIndex = self.valueIndex )
       else:
-        nextMenu = Menu(engine, self.callback)
+        nextMenu = Menu(engine, self.callback, name = self.name)
     elif engine and isinstance(self.callback, Menu):
       nextMenu = self.callback
     elif self.values:
@@ -88,7 +90,7 @@ class Choice:
       return "%s: %s" % (self.text, self.values[self.valueIndex])
           
 class Menu(Layer, KeyListener):
-  def __init__(self, engine, choices, onClose = None, onCancel = None, pos = (.2, .66 - .35), viewSize = 6, fadeScreen = False, font = "font", mainMenu = None, textColor = None, selectedColor = None, append_submenu_char = True, selectedIndex = None):
+  def __init__(self, engine, choices, name = None, onClose = None, onCancel = None, pos = (.2, .66 - .35), viewSize = 6, fadeScreen = False, font = "font", mainMenu = None, textColor = None, selectedColor = None, append_submenu_char = True, selectedIndex = None):
     self.engine       = engine
 
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
@@ -96,7 +98,7 @@ class Menu(Layer, KeyListener):
       Log.debug("Menu class init (Menu.py)...")
 
     #Get theme
-    themename = self.engine.data.themeLabel
+    self.themename = self.engine.data.themeLabel
     self.theme = self.engine.data.theme
     
     self.choices      = []
@@ -108,7 +110,11 @@ class Menu(Layer, KeyListener):
     self.onClose      = onClose
     self.onCancel     = onCancel
     self.viewOffset   = 0
+    self.name     = name # akedrou - for graphical support
     self.mainMenu = False
+    self.graphicMenu = False
+    self.useGraphics = self.engine.config.get("game", "use_graphical_submenu")
+    self.gfxText = None
     
     self.click = False
     self.scrollUp = False
@@ -120,6 +126,35 @@ class Menu(Layer, KeyListener):
 
     #self.sfxVolume    = self.engine.config.get("audio", "SFX_volume")
     self.drumNav = self.engine.config.get("game", "drum_navigation")  #MFH
+    
+    if self.name and self.useGraphics > 0:
+      try:
+        self.engine.loadImgDrawing(self, "menuBackground", os.path.join("themes",self.themename,"menu","%s.png" % self.name))
+        self.gfxText = "%stext%d" % (self.name, len(choices))
+        self.engine.loadImgDrawing(self, "menuText", os.path.join("themes",self.themename,"menu","%s.png" % self.gfxText))
+        self.graphicMenu = True
+        self.menux = Theme.submenuX[self.gfxText]
+        self.menuy = Theme.submenuY[self.gfxText]
+        self.menuScale = Theme.submenuScale[self.gfxText]
+        self.vSpace = Theme.submenuVSpace[self.gfxText]
+        if str(self.menux) != "None" and str(self.menuy) != "None":
+          self.menux = float(self.menux)
+          self.menuy = float(self.menuy)
+        else:
+          self.menux = .4
+          self.menuy = .4
+        if str(self.menuScale) != "None":
+          self.menuScale = float(self.menuScale)
+        else:
+          self.menuScale = .5
+        if str(self.vSpace) != "None":
+          self.vSpace = float(self.vSpace)
+        else:
+          self.vSpace = .08
+        Log.debug("Graphic menu enabled for submenu: %s" % self.name)
+      except IOError:
+        self.menuBackground = None
+        self.menuText = None
 
 
     if pos == (.2, .66 - .35):  #MFH - default position, not called with a special one - this is a submenu:
@@ -159,7 +194,10 @@ class Menu(Layer, KeyListener):
       try:
         text, callback = c
         if isinstance(text, tuple):
-          c = Choice(text[0], callback, values = text[2], valueIndex = text[1], append_submenu_char = append_submenu_char)
+          if len(text) == 2: # a submenu's name
+            c = Choice(text[0], callback, name = text[1], append_submenu_char = append_submenu_char)
+          else: # Dialogs menus - FileChooser, NeckChooser, ItemChooser - this last to be changed soon
+            c = Choice(text[0], callback, values = text[2], valueIndex = text[1], append_submenu_char = append_submenu_char)
         else:
           c = Choice(text, callback, append_submenu_char = append_submenu_char)
       except TypeError:
@@ -277,79 +315,99 @@ class Menu(Layer, KeyListener):
 
       if self.fadeScreen:
         Dialogs.fadeScreen(v)
-      
-      glEnable(GL_BLEND)
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-      glEnable(GL_COLOR_MATERIAL)
+        
+      if self.graphicMenu and self.menuBackground:
+        w, h, = self.engine.view.geometry[2:4]
+        imgwidth = self.menuBackground.width1()
+        wfactor = 640.000/imgwidth
+        self.menuBackground.transform.reset()
+        self.menuBackground.transform.translate(w/2,h/2)
+        self.menuBackground.transform.scale(wfactor,-wfactor)
+        self.menuBackground.draw()
+      else:
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        glEnable(GL_COLOR_MATERIAL)
 
       n = len(self.choices)
       x, y = self.pos
 
       for i, choice in enumerate(self.choices[self.viewOffset:self.viewOffset + self.viewSize]):
-        text = choice.getText(i + self.viewOffset == self.currentIndex)
-        glPushMatrix()
-        glRotate(v * 45, 0, 0, 1)
-
-        if self.theme == 0 and self.mainMenu:#8bit
-          if not i % 2 == 1:
-            scale = 0.002
+        if self.graphicMenu:
+          if self.currentIndex == i:
+            xpos = (.5,1)
           else:
-            scale = 0.0016
+            xpos = (0,.5)
+          ypos = float(i+self.viewOffset)
+          self.menuText.transform.reset()
+          self.menuText.transform.scale(.5*self.menuScale,(-1.0/n*self.menuScale))
+          self.menuText.transform.translate(w*self.menux,h*self.menuy+(h*self.vSpace)*i)
+          self.menuText.draw(rect = (xpos[0],xpos[1],ypos/n,(ypos+1.0)/n))
+        else:
+          text = choice.getText(i + self.viewOffset == self.currentIndex)
+          glPushMatrix()
+          glRotate(v * 45, 0, 0, 1)
 
-        elif self.theme == 1 and self.mainMenu:
-          if not i % 2 == 1:
-            scale = 0.002
+          if self.theme == 0 and self.mainMenu:#8bit
+            if not i % 2 == 1:
+              scale = 0.002
+            else:
+              scale = 0.0016
+
+          elif self.theme == 1 and self.mainMenu:
+            if not i % 2 == 1:
+              scale = 0.002
+            else:
+              scale = 0.0016
+
           else:
-            scale = 0.0016
+            scale = 0.002
 
-        else:
-          scale = 0.002
+          w, h = font.getStringSize(" ", scale = scale)
 
-        w, h = font.getStringSize(" ", scale = scale)
+          # Draw arrows if scrolling is needed to see all items
+          if i == 0 and self.viewOffset > 0:
+            Theme.setBaseColor((1 - v) * max(.1, 1 - (1.0 / self.viewOffset) / 3))
+            glPushMatrix()
+            glTranslatef(x - v / 4 - w * 2, y + h / 2, 0)
+            self.renderTriangle(up = (0, -1), s = .015)
+            glPopMatrix()
+          elif i == self.viewSize - 1 and self.viewOffset + self.viewSize < n:
+            Theme.setBaseColor((1 - v) * max(.1, 1 - (1.0 / (n - self.viewOffset - self.viewSize)) / 3))
+            glPushMatrix()
+            glTranslatef(x - v / 4 - w * 2, y + h / 2, 0)
+            self.renderTriangle(up = (0, 1), s = .015)
+            glPopMatrix()
 
-        # Draw arrows if scrolling is needed to see all items
-        if i == 0 and self.viewOffset > 0:
-          Theme.setBaseColor((1 - v) * max(.1, 1 - (1.0 / self.viewOffset) / 3))
-          glPushMatrix()
-          glTranslatef(x - v / 4 - w * 2, y + h / 2, 0)
-          self.renderTriangle(up = (0, -1), s = .015)
+          if i + self.viewOffset == self.currentIndex:
+            a = (math.sin(self.time) * .15 + .75) * (1 - v * 2)
+            Theme.setSelectedColor(a)
+            a *= -.005
+            glTranslatef(a, a, a)
+          else:
+            Theme.setBaseColor(1 - v)      
+        
+          #MFH - settable color through Menu constructor
+          if i + self.viewOffset == self.currentIndex and self.selectedColor:
+            c1,c2,c3 = self.selectedColor
+            glColor3f(c1,c2,c3)
+          elif self.textColor:
+            c1,c2,c3 = self.textColor
+            glColor3f(c1,c2,c3)
+        
+          #MFH - now to catch " >" main menu options and blank them:
+          if text == " >":
+            text = ""
+        
+          font.render(text, (x - v / 4, y), scale = scale)
+        
+        
+          v *= 2
+          if self.theme == 1 and self.font == self.engine.data.pauseFont: # evilynux - Ugly workaround for Gh3
+            y += h*.65
+          else:
+            y += h
           glPopMatrix()
-        elif i == self.viewSize - 1 and self.viewOffset + self.viewSize < n:
-          Theme.setBaseColor((1 - v) * max(.1, 1 - (1.0 / (n - self.viewOffset - self.viewSize)) / 3))
-          glPushMatrix()
-          glTranslatef(x - v / 4 - w * 2, y + h / 2, 0)
-          self.renderTriangle(up = (0, 1), s = .015)
-          glPopMatrix()
-
-        if i + self.viewOffset == self.currentIndex:
-          a = (math.sin(self.time) * .15 + .75) * (1 - v * 2)
-          Theme.setSelectedColor(a)
-          a *= -.005
-          glTranslatef(a, a, a)
-        else:
-          Theme.setBaseColor(1 - v)      
-        
-        #MFH - settable color through Menu constructor
-        if i + self.viewOffset == self.currentIndex and self.selectedColor:
-          c1,c2,c3 = self.selectedColor
-          glColor3f(c1,c2,c3)
-        elif self.textColor:
-          c1,c2,c3 = self.textColor
-          glColor3f(c1,c2,c3)
-        
-        #MFH - now to catch " >" main menu options and blank them:
-        if text == " >":
-          text = ""
-        
-        font.render(text, (x - v / 4, y), scale = scale)
-        
-        
-        v *= 2
-        if self.theme == 1 and self.font == self.engine.data.pauseFont: # evilynux - Ugly workaround for Gh3
-          y += h*.65
-        else:
-          y += h
-        glPopMatrix()
     
     
     finally:

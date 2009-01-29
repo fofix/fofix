@@ -26,6 +26,7 @@
 from OpenGL.GL import *
 import Config
 import Log
+import os
 
 # read the color scheme from the config file
 Config.define("theme", "background_color",  str, "#000000")
@@ -245,7 +246,9 @@ Config.define("theme", "fail_bkg_y",       float, None)
 Config.define("theme", "fail_text_x",       float, None)
 Config.define("theme", "fail_text_y",       float, None)
 
-
+submenuX = {}
+submenuY = {}
+submenuV = {}
 
 backgroundColor = None
 baseColor       = None
@@ -433,7 +436,7 @@ def setBaseColor(alpha = 1.0):
   
 
 
-def open(config):
+def open(config, themepath = None):
   # Read in theme.ini specific variables
   
   setupColors(config)
@@ -453,6 +456,7 @@ def open(config):
   setupNeckChooser(config)
   setupHopoIndicator(config)
   setupResults(config)
+  setupSubmenus(config, themepath)
   
 
 def setupNeckChooser(config):
@@ -744,4 +748,45 @@ def setupResults(config):
   result_stats_streak = config.get("theme", "result_stats_streak").split(",")
   result_stats_notes = config.get("theme", "result_stats_notes").split(",")
 
-
+def setupSubmenus(config, themepath = None):
+  if not themepath:
+    return
+  global submenuScale, submenuX, submenuY, submenuVSpace
+  allfiles = os.listdir(themepath)
+  submenuScale = {}
+  submenuX = {}
+  submenuY = {}
+  submenuVSpace = {}
+  listmenu = []
+  for name in allfiles:
+    if os.path.splitext(name)[1] == ".png":
+      if name.find("text") > -1:
+        found = os.path.splitext(name)[0]
+        if found == "maintext":
+          continue
+        Config.define("theme", found, str, None)
+        submenuScale[found] = None
+        submenuX[found] = None
+        submenuY[found] = None
+        submenuVSpace[found] = None
+        listmenu.append(found)
+  for i in listmenu:
+    if i == "maintext":
+      continue
+    try:
+      submenuX[i] = config.get("theme", i).split(",")[0].strip()
+    except IndexError:
+      submenuX[i] = None
+    try:
+      submenuY[i] = config.get("theme", i).split(",")[1].strip()
+    except IndexError:
+      submenuY[i] = None
+    try:
+      submenuScale[i] = config.get("theme", i).split(",")[2].strip()
+    except IndexError:
+      submenuScale[i] = None
+    try:
+      submenuVSpace[i] = config.get("theme", i).split(",")[3].strip()
+    except IndexError:
+      submenuVSpace[i] = None
+  

@@ -266,9 +266,9 @@ class MainMenu(BackgroundLayer):
       mainMenu = [
         (_(strCareer), lambda:   self.newLocalGame(mode1p = 2)),
         (_(strQuickplay), lambda:        self.newLocalGame()),
-        (_(strMultiplayer), multPlayerMenu),
-        (_(strTraining),    trainingMenu),
-        (_(strSettings),  self.settingsMenu),
+        ((_(strMultiplayer),"multiplayer"), multPlayerMenu),
+        ((_(strTraining),"training"),    trainingMenu),
+        ((_(strSettings),"settings"),  self.settingsMenu),
         (_(strQuit),        self.quit),
       ]
 
@@ -291,10 +291,10 @@ class MainMenu(BackgroundLayer):
 
       mainMenu = [
         #( ( _(strSolo), 1, (0,0) ), soloMenu),
-        (_(strSolo), soloMenu),
-        (_(strMultiplayer), multPlayerMenu),
-        (_(strTraining),    trainingMenu),
-        (_(strSettings),  self.settingsMenu),
+        ((_(strSolo),"solo"), soloMenu),
+        ((_(strMultiplayer),"multiplayer"), multPlayerMenu),
+        ((_(strTraining),"training"),    trainingMenu),
+        ((_(strSettings),"settings"),  self.settingsMenu),
         (_(strQuit),        self.quit),
       ]
 

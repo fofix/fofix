@@ -105,6 +105,7 @@ class Text(Element):
     return self.size[1]
 
   def render(self, offset):
+    offset = (offset*4.0)/3.0 # akedrou - font rendering fix
     if self.alignment == "left":
       x = .1
     elif self.alignment == "right":
@@ -137,9 +138,10 @@ class Credits(Layer, KeyListener):
   def __init__(self, engine, songName = None):
     self.engine      = engine
     self.time        = 0.0
-    self.offset      = 1.0
-    self.speedDiv    = 15000.0
+    self.offset      = 0.5 # akedrou - this seems to fix the delay issue, but I'm not sure why. Return here!
+    self.speedDiv    = 20000.0
     self.speedDir    = 1.0
+    self.doneList    = []
     self.themename = Config.get("coffee", "themename")
     
     Config.set("game", "selected_library", "songs")
@@ -262,12 +264,12 @@ class Credits(Layer, KeyListener):
   def keyPressed(self, key, unicode):
     if self.engine.input.controls.getMapping(key) in (Player.CANCELS + Player.KEY1S + Player.KEY2S + Player.DRUM1S + Player.DRUM4S) or key == pygame.K_RETURN or key == pygame.K_ESCAPE:
       self.quit()
-    elif self.engine.input.controls.getMapping(key) in (Player.ACTION2S + Player.DRUM3S): #akedrou: so I was bored.
+    elif self.engine.input.controls.getMapping(key) in (Player.ACTION2S + Player.DRUM3S) or key == pygame.K_DOWN: #akedrou: so I was bored.
       if self.speedDiv > 1000.0:
         self.speedDiv -= 1000.0
         if self.speedDiv < 1000.0:
           self.speedDiv = 1000.0
-    elif self.engine.input.controls.getMapping(key) in (Player.ACTION1S + Player.DRUM2S):
+    elif self.engine.input.controls.getMapping(key) in (Player.ACTION1S + Player.DRUM2S) or key == pygame.K_UP:
       if self.speedDiv < 30000.0:
         self.speedDiv += 1000.0
         if self.speedDiv > 30000.0:
@@ -291,6 +293,8 @@ class Credits(Layer, KeyListener):
     #if self.offset < -( self.text_size * len(self.credits) ):
     if self.offset < -( self.text_size * len(self.credits) ) or self.offset > 1.5:    #(MFH - adding 5% to estimated font height) undone: using larger scale for estimation.
       self.quit()
+    if len(self.credits) == len(self.doneList): #akedrou - goofy workaround for string size glitch.
+      self.quit()
   
   def render(self, visibility, topMost):
     v = 1.0 - ((1 - visibility) ** 2)
@@ -302,6 +306,7 @@ class Credits(Layer, KeyListener):
     self.engine.view.setOrthogonalProjection(normalize = True)
     Dialogs.fadeScreen(.4)
     font = self.engine.data.font
+    self.doneList = []
 
     # render the scroller elements
     y = self.offset
@@ -311,6 +316,8 @@ class Credits(Layer, KeyListener):
         h = element.getHeight()
         if y + h > 0.0 and y < 1.0:
           element.render(y)
+        if y + h < 0.0:
+          self.doneList.append(element)
         y += h
         if y > 1.0:
           break
