@@ -1566,7 +1566,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.fail_completed_color = Theme.hexToColor(Theme.fail_completed_colorVar)
 
     settingsMenu = Settings.GameSettingsMenu(self.engine, self.pause_text_color, self.pause_selected_color)
-    settingsMenu.fadeScreen = True
+    settingsMenu.fadeScreen = False
 
     
     # evilynux - More themeable options
