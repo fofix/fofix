@@ -404,7 +404,7 @@ class Menu(Layer, KeyListener):
         
           v *= 2
           if self.theme == 1 and self.font == self.engine.data.pauseFont: # evilynux - Ugly workaround for Gh3
-            y += h*.65
+            y += h*.70      #Worldrave - Changed Pause menu spacing back to .70 from .65 for now.
           else:
             y += h
           glPopMatrix()
