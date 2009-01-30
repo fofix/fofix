@@ -120,6 +120,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
 
     self.cheerLoopCounter = self.cheerLoopDelay   #MFH - starts out ready to cheer
     self.jurgMode = self.engine.config.get("game", "jurgmode")
+    self.jurg = self.engine.config.get("game", "jurgtype")
     if self.jurgMode == 0:
       self.cheating = True
       self.cheats[0] = "Jurgen Enabled"
@@ -229,7 +230,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       
         scores = self.song.info.getHighscores(player.difficulty, part = player.part)
         if not scores or player.score > scores[-1][0] or len(scores) < 5:
-          if player.cheating or self.jurgMode != 1:
+          if player.cheating or self.jurg == i or self.jurg == 2:
             Dialogs.showMessage(self.engine, _("No highscores for cheaters!"))
           elif player.score == 0: #trinidude4
             Dialogs.showMessage(self.engine, _("No highscore")) #trinidude4
