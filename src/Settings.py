@@ -1402,7 +1402,7 @@ class GameSettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "game", "jurglogic", autoApply = True),#MFH
      #MFH
     ]
-    CheatMenu = Menu.Menu(engine, Cheats, pos = (.3, .31), viewSize = 5, textColor = gTextColor, selectedColor = gSelectedColor)
+    CheatMenu = Menu.Menu(engine, Cheats, pos = (.350, .310), viewSize = 5, textColor = gTextColor, selectedColor = gSelectedColor)
     
     settings = [
       (_("Cheats"), CheatMenu),
@@ -1422,5 +1422,5 @@ class GameSettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "player0",  "leftymode", autoApply = True),
       ConfigChoice(engine, engine.config, "player1",  "leftymode", autoApply = True), #QQstarS
     ]
-    Menu.Menu.__init__(self, engine, settings, pos = (.370, .250), viewSize = 5, textColor = gTextColor, selectedColor = gSelectedColor) #Worldrave- Changed Pause-Submenu Position more centered until i add a theme.ini setting.
+    Menu.Menu.__init__(self, engine, settings, pos = (.360, .250), viewSize = 5, textColor = gTextColor, selectedColor = gSelectedColor) #Worldrave- Changed Pause-Submenu Position more centered until i add a theme.ini setting.
 
