@@ -90,7 +90,7 @@ class Choice:
       return "%s: %s" % (self.text, self.values[self.valueIndex])
           
 class Menu(Layer, KeyListener):
-  def __init__(self, engine, choices, name = None, onClose = None, onCancel = None, pos = (.2, .66 - .35), viewSize = 6, fadeScreen = False, font = "font", mainMenu = None, textColor = None, selectedColor = None, append_submenu_char = True, selectedIndex = None):
+  def __init__(self, engine, choices, name = None, onClose = None, onCancel = None, pos = (.2, .66 - .35), viewSize = 6, fadeScreen = False, font = "font", mainMenu = None, textColor = None, selectedColor = None, append_submenu_char = True, selectedIndex = None, selectedBox = False):
     self.engine       = engine
 
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
@@ -113,6 +113,7 @@ class Menu(Layer, KeyListener):
     self.name     = name # akedrou - for graphical support
     self.mainMenu = False
     self.graphicMenu = False
+    self.useSelectedBox = selectedBox
     self.useGraphics = self.engine.config.get("game", "use_graphical_submenu")
     self.gfxText = None
     
@@ -316,12 +317,13 @@ class Menu(Layer, KeyListener):
       if self.fadeScreen:
         Dialogs.fadeScreen(v)
         
+      wS, hS = self.engine.view.geometry[2:4]
+        
       if self.graphicMenu and self.menuBackground:
-        w, h, = self.engine.view.geometry[2:4]
         imgwidth = self.menuBackground.width1()
         wfactor = 640.000/imgwidth
         self.menuBackground.transform.reset()
-        self.menuBackground.transform.translate(w/2,h/2)
+        self.menuBackground.transform.translate(wS/2,hS/2)
         self.menuBackground.transform.scale(wfactor,-wfactor)
         self.menuBackground.draw()
       else:
@@ -341,7 +343,7 @@ class Menu(Layer, KeyListener):
           ypos = float(i+self.viewOffset)
           self.menuText.transform.reset()
           self.menuText.transform.scale(.5*self.menuScale,(-1.0/n*self.menuScale))
-          self.menuText.transform.translate(w*self.menux,h*self.menuy+(h*self.vSpace)*i)
+          self.menuText.transform.translate(wS*self.menux,hS*self.menuy+(hS*self.vSpace)*i)
           self.menuText.draw(rect = (xpos[0],xpos[1],ypos/n,(ypos+1.0)/n))
         else:
           text = choice.getText(i + self.viewOffset == self.currentIndex)
@@ -398,6 +400,23 @@ class Menu(Layer, KeyListener):
           #MFH - now to catch " >" main menu options and blank them:
           if text == " >":
             text = ""
+            
+          if self.engine.data.submenuSelect and len(text) > 0 and not self.mainMenu and self.useSelectedBox:
+            Tw, Th = font.getStringSize(text,scale)
+            lineSpacing = font.getLineSpacing(scale)
+            frameWidth = Tw*1.10
+            #frameHeight = (Th+Th2)*1.10
+            frameHeight = Th + lineSpacing
+            boxXOffset = (x + (Tw/2))*wS
+            boxYOffset = (1.0 - (y*4.0/3.0) - (Th*1.2/2))*hS
+            subSelectHYFactor = 640.000/self.engine.view.aspectRatio
+            subSelectHFactor = subSelectHYFactor/self.engine.data.subSelectImgH
+            self.engine.data.submenuSelect.transform.reset()
+            tempWScale = frameWidth*self.engine.data.subSelectWFactor
+            tempHScale = -(frameHeight)*subSelectHFactor
+            self.engine.data.submenuSelect.transform.scale(tempWScale,tempHScale)
+            self.engine.data.submenuSelect.transform.translate(boxXOffset,boxYOffset)
+            self.engine.data.submenuSelect.draw()
         
           font.render(text, (x - v / 4, y), scale = scale)
         

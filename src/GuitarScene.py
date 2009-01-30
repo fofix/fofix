@@ -272,6 +272,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.youRock = False    #myfingershurt
     self.rockCountdown = 100
     self.soloReviewDispDelay = 300
+    self.baseScore = 50
     self.rockFinished = False
     self.spTimes = [[] for i in self.playerList]
     self.midiSP = False
@@ -999,11 +1000,65 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.numMidiLyricLines = len(self.midiLyricLines)
 
 
-    
-    
-    
-    self.initializeStarScoringThresholds()    #MFH
-      
+    #self.initializeStarScoringThresholds()    #MFH
+    self.coOpTotalStreakNotes = 0
+    self.coOpTotalNotes = 0
+    self.star = [{} for i in self.playerList]
+    for i, playa in enumerate(self.playerList):   #accumulate base scoring values for co-op
+      self.coOpTotalStreakNotes += playa.totalStreakNotes
+      self.coOpTotalNotes += playa.totalNotes
+      self.coOpPlayerIndex = len(self.playerList)
+      if self.starScoring == 1: #GH-style (mult thresholds, hit threshold for 5/6 stars)
+        self.star[i][5] = 2.8
+        self.star[i][4] = 2.0
+        self.star[i][3] = 1.2
+        self.star[i][2] = 0.4
+        self.star[i][1] = 0.0
+        self.star[i][0] = 0.0
+      elif self.starScoring > 1: #RB-style (mult thresholds, optional 100% gold star)
+        if self.starScoring == 4:
+          if self.guitars[i].isBassGuitar and not self.coOpType:
+            self.star[i][6] = 6.78
+            self.star[i][5] = 4.62
+            self.star[i][4] = 2.77
+            self.star[i][3] = 0.90
+            self.star[i][2] = 0.50
+            self.star[i][1] = 0.46
+            self.star[i][0] = 0.0
+          else:
+            if self.guitars[i].isDrum and not self.coOpType:
+              self.star[i][6] = 4.29
+            else:
+              self.star[i][6] = 4.52
+            self.star[i][5] = 3.08
+            self.star[i][4] = 1.85
+            self.star[i][3] = 0.77
+            self.star[i][2] = 0.46
+            self.star[i][1] = 0.21
+            self.star[i][0] = 0.0
+        else:
+          self.star[i][5] = 3.0
+          self.star[i][4] = 2.0
+          self.star[i][3] = 1.0
+          self.star[i][2] = 0.5
+          self.star[i][1] = 0.25
+          self.star[i][0] = 0.0
+          if self.coOpType:
+            self.star[i][6] = 4.8
+          elif self.guitars[i].isBassGuitar:
+            self.star[i][6] = 4.8
+          elif self.guitars[i].isDrum:
+            self.star[i][6] = 4.65
+          else:
+            self.star[i][6] = 5.3
+      else: #hit accuracy thresholds
+        self.star[i][6] = 1.0
+        self.star[i][5] = 0.95
+        self.star[i][4] = 0.75
+        self.star[i][3] = 0.5
+        self.star[i][2] = 0.25
+        self.star[i][1] = 0.0
+        self.star[i][0] = 0.0
 
 
     #glorandwarf: need to store the song's beats per second (bps) for later
@@ -2079,7 +2134,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.guitars[playaNum].bigRockEndingMarkerSeen = False
     self.partialStar = [0 for i in self.playerList]
     self.starRatio = [0.0 for i in self.playerList]
-    self.resetStarThresholds()
+    #self.resetStarThresholds()
     self.crowdsCheering = False #akedrou
     self.coOpScore = 0
     self.coOpStars = 0
@@ -3682,11 +3737,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.coOpScore += (tempScoreValue*self.players[num].getScoreMultiplier())
         self.coOpNotesHit += 1
         self.coOpStreak += 1
-        self.updateStars(self.coOpPlayerIndex)
-      else:
-        self.updateStars(num)
       
       self.updateAvMult(num)
+      
+      if self.coOpType:
+        #self.updateStars(self.coOpPlayerIndex)
+        self.coOpStars, self.coOpPartialStars, self.coOpStarRatio = self.getStarScores(num)
+      else:
+        #self.updateStars(num)
+        self.playerList[num].stars, self.partialStar[num], self.starRatio[num] = self.getStarScores(num)
       
       
       self.stage.triggerPick(pos, [n[1].number for n in self.guitars[num].playedNotes])
@@ -3803,11 +3862,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.coOpScore += (tempScoreValue*self.players[num].getScoreMultiplier())
         self.coOpNotesHit += 1
         self.coOpStreak += 1
-        self.updateStars(self.coOpPlayerIndex)
-      else:
-        self.updateStars(num)
       
       self.updateAvMult(num)
+      if self.coOpType:
+        #self.updateStars(self.coOpPlayerIndex)
+        self.coOpStars, self.coOpPartialStars, self.coOpStarRatio = self.getStarScores(num)
+      else:
+        #self.updateStars(num)
+        self.playerList[num].stars, self.partialStar[num], self.starRatio[num] = self.getStarScores(num)
       self.stage.triggerPick(pos, [n[1].number for n in self.guitars[num].playedNotes])    
       if self.players[num].streak % 10 == 0:
         self.lastMultTime[num] = self.getSongPosition()
@@ -3923,11 +3985,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.coOpScore += (tempScoreValue*self.players[num].getScoreMultiplier())
         self.coOpNotesHit += 1
         self.coOpStreak += 1
-        self.updateStars(self.coOpPlayerIndex)
-      else:
-        self.updateStars(num)
       
       self.updateAvMult(num)
+      
+      if self.coOpType:
+        #self.updateStars(self.coOpPlayerIndex)
+        self.coOpStars, self.coOpPartialStars, self.coOpStarRatio = self.getStarScores(num)
+      else:
+        #self.updateStars(num)
+        self.playerList[num].stars, self.partialStar[num], self.starRatio[num] = self.getStarScores(num)
 
       self.stage.triggerPick(pos, [n[1].number for n in self.guitars[num].playedNotes])    
       if self.players[num].streak % 10 == 0:
@@ -4112,11 +4178,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.coOpScore += (tempScoreValue*self.players[num].getScoreMultiplier())
         self.coOpNotesHit += 1
         self.coOpStreak += 1
-        self.updateStars(self.coOpPlayerIndex)
-      else:
-        self.updateStars(num)
       
       self.updateAvMult(num)
+      
+      if self.coOpType:
+        #self.updateStars(self.coOpPlayerIndex)
+        self.coOpStars, self.coOpPartialStars, self.coOpStarRatio = self.getStarScores(num)
+      else:
+        #self.updateStars(num)
+        self.playerList[num].stars, self.partialStar[num], self.starRatio[num] = self.getStarScores(num)
+      
       self.stage.triggerPick(pos, [n[1].number for n in self.guitars[num].playedNotes])    
       if self.players[num].streak % 10 == 0:
         self.lastMultTime[num] = self.getSongPosition()
@@ -4313,7 +4384,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         
         #MFH - force one star scoring update before gameresults just in case star scoring is disabled:
         for i, thePlayer in enumerate(self.playerList):
-          self.updateStars(i, forceUpdate = True)
+          if self.coOpType:
+            #self.updateStars(self.coOpPlayerIndex, forceUpdate = True)
+            self.coOpStars, self.coOpPartialStars, self.coOpStarRatio = self.getStarScores(i)
+          else:
+            #self.updateStars(i, forceUpdate = True)
+            self.playerList[i].stars, self.partialStar[i], self.starRatio[i] = self.getStarScores(i)
 
 
         self.engine.view.setViewport(1,0)
@@ -4617,9 +4693,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       tempExtraScore = .1 * pickLength * noteCount
       if self.starScoreUpdates == 1:
         if self.coOpType:
-          self.updateStars(self.coOpPlayerIndex, tempExtraScore = tempExtraScore)
+          #self.updateStars(self.coOpPlayerIndex, tempExtraScore = tempExtraScore)
+          self.coOpStars, self.coOpPartialStars, self.coOpStarRatio = self.getStarScores(num, tempExtraScore = tempExtraScore)
         else:
-          self.updateStars(num, tempExtraScore = tempExtraScore)
+          #self.updateStars(num, tempExtraScore = tempExtraScore)
+          self.playerList[num].stars, self.partialStar[num], self.starRatio[num] = self.getStarScores(num, tempExtraScore = tempExtraScore)
       return int(tempExtraScore)   #original FoF sustain scoring
     return 0
 
@@ -4760,591 +4838,503 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   #       if either threshold is set to 0 in the tuple, then it essentially does not matter.  
   #       The proposed unified star scoring system will step the user through the list of tuples as the progressively-ordered requirements are met
   #       Also must jump ahead and check if the last condition tuple in the list is met (which will always contain the 6* condition and, in GH scoring, might not be met sequentially)
-  def initializeStarScoringThresholds(self):
-    #so, a 1.0x multiplier's score would be self.playerList[playerNum].totalNotes*50.0
-    #a 2.0x multiplier's score would be (2.0)(self.playerList[playerNum].totalNotes*50.0)
-    #and so on...
-
-    #for playerNum, thePlayer in enumerate(self.playerList):
-    
-    self.starThresholdsP1 = []  #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>)
-    self.starThresholdsP2 = []  #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>)
-    self.starThresholdIndex = []
-    self.nextScoreThreshold = []
-    self.prevScoreThreshold = []
-    self.nextHitNotesThreshold = []
-    self.prevHitNotesThreshold = []
-    self.nextStar = []
-    self.nextPartialStar = []
-    self.maxStarThresholdIndex = []
-    self.avg1xScore = []
-    self.finalScoreThreshold = []
-    self.finalHitNotesThreshold = []
-
-    #MFH - add separate co-op star scoring structure
-    #  must maintain separate scores and star scores for uploading and highscore saving
-    #  and a setting to not play star ding sounds when catching up at end of song 
-    #    (co op mode will catch up and calculate individual star scores here at the end of a song)
-    #  Only display co-op score and star score for co-op mode; hide individual scores & stars
-    self.coOpScore = 0
-    self.coOpStars = 0
-    self.lastCoOpStars = 0
-    self.coOpPartialStars = 0
-    self.coOpNotesHit = 0
-    self.starThresholdsCoOp = []
-    self.coOpTotalStreakNotes = 0
-    self.coOpTotalNotes = 0
-    self.coOpPlayerIndex = len(self.playerList)
-    #if self.coOp:
-
-    
-    #player1:
-    playerNum = 0
-    self.avg1xScore.append(self.playerList[playerNum].totalNotes*50.0)
-    baseScore = self.avg1xScore[playerNum]
-    self.starThresholdIndex.append(0)
-    self.nextScoreThreshold.append(0)
-    self.prevScoreThreshold.append(0)
-    self.nextHitNotesThreshold.append(0)
-    self.prevHitNotesThreshold.append(0)
-    self.nextStar.append(0)
-    self.nextPartialStar.append(0)
-    self.maxStarThresholdIndex.append(0)
-    self.finalScoreThreshold.append(0)
-    self.finalHitNotesThreshold.append(0)
-
-    if self.starScoring == 1:     #GH style scoring
-      #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (0, 0, int(0.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - first always all 0's
-      self.starThresholdsP1.append( (1, 0, int(0.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - first threshold(s) to surpass
-      self.starThresholdsP1.append( (1, 1, int(0.05*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (1, 2, int(0.10*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (1, 3, int(0.15*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (1, 4, int(0.20*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (1, 5, int(0.25*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (1, 6, int(0.30*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (1, 7, int(0.35*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (2, 0, int(0.40*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (2, 1, int(0.50*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (2, 2, int(0.60*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (2, 3, int(0.70*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (2, 4, int(0.80*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (2, 5, int(0.90*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (2, 6, int(1.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (2, 7, int(1.10*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (3, 0, int(1.20*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (3, 1, int(1.30*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (3, 2, int(1.40*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (3, 3, int(1.50*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (3, 4, int(1.60*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (3, 5, int(1.70*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (3, 6, int(1.80*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (3, 7, int(1.90*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (4, 0, int(2.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (4, 1, int(2.10*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (4, 2, int(2.20*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (4, 3, int(2.30*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (4, 4, int(2.40*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (4, 5, int(2.50*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (4, 6, int(2.60*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (4, 7, int(2.70*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (5, 0, int(2.80*baseScore), int(0.90*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (6, 0, int(0.00*baseScore), int(1.00*self.playerList[playerNum].totalStreakNotes) ) )
-  
-        
-    elif self.starScoring == 2 or self.starScoring == 3:   #RB style scoring
-      #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (0, 0, int(0.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - first always all 0's
-      self.starThresholdsP1.append( (0, 1, int(0.03125*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (0, 2, int(0.0625*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (0, 3, int(0.09375*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (0, 4, int(0.125*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (0, 5, int(0.15625*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (0, 6, int(0.1875*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (0, 7, int(0.21875*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (1, 0, int(0.25*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (1, 1, int(0.28125*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (1, 2, int(0.3125*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (1, 3, int(0.34375*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (1, 4, int(0.375*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (1, 5, int(0.40625*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (1, 6, int(0.4375*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (1, 7, int(0.46875*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (2, 0, int(0.5*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (2, 1, int(0.5625*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (2, 2, int(0.625*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (2, 3, int(0.6875*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (2, 4, int(0.75*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (2, 5, int(0.8125*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (2, 6, int(0.875*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (2, 7, int(0.9375*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (3, 0, int(1.0*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (3, 1, int(1.125*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (3, 2, int(1.25*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (3, 3, int(1.375*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (3, 4, int(1.5*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (3, 5, int(1.625*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (3, 6, int(1.75*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (3, 7, int(1.875*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (4, 0, int(2.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (4, 1, int(2.125*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (4, 2, int(2.25*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (4, 3, int(2.375*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (4, 4, int(2.5*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (4, 5, int(2.625*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (4, 6, int(2.75*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (4, 7, int(2.875*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      self.starThresholdsP1.append( (5, 0, int(3.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      if self.guitars[playerNum].isBassGuitar:
-        #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP1.append( (6, 0, int(4.80*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      elif self.guitars[playerNum].isDrum:
-        #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP1.append( (6, 0, int(4.65*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-      else:   #guitar parts
-        #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP1.append( (6, 0, int(5.30*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-
-      if self.starScoring == 3:   #if RB+GH scoring, 100% automatically skips you to 6 stars
-        self.starThresholdsP1.append( (6, 0, int(0.00*baseScore), int(1.00*self.playerList[playerNum].totalStreakNotes) ) )
-  
-    else:   #0 = FoF scoring
-      #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (0, 0, int(0.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - first always all 0's
-      self.starThresholdsP1.append( (1, 0, int(0.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (1, 1, int(0.00*baseScore), int(0.03125*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (1, 2, int(0.00*baseScore), int(0.0625*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (1, 3, int(0.00*baseScore), int(0.09375*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (1, 4, int(0.00*baseScore), int(0.125*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (1, 5, int(0.00*baseScore), int(0.15625*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (1, 6, int(0.00*baseScore), int(0.1875*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (1, 7, int(0.00*baseScore), int(0.21875*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (2, 0, int(0.00*baseScore), int(0.25*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (2, 1, int(0.00*baseScore), int(0.28125*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (2, 2, int(0.00*baseScore), int(0.3125*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (2, 3, int(0.00*baseScore), int(0.34375*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (2, 4, int(0.00*baseScore), int(0.375*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (2, 5, int(0.00*baseScore), int(0.40625*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (2, 6, int(0.00*baseScore), int(0.4375*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (2, 7, int(0.00*baseScore), int(0.46875*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (3, 0, int(0.00*baseScore), int(0.50*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (3, 1, int(0.00*baseScore), int(0.53125*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (3, 2, int(0.00*baseScore), int(0.5625*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (3, 3, int(0.00*baseScore), int(0.59375*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (3, 4, int(0.00*baseScore), int(0.625*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (3, 5, int(0.00*baseScore), int(0.65625*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (3, 6, int(0.00*baseScore), int(0.6875*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (3, 7, int(0.00*baseScore), int(0.71875*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (4, 0, int(0.00*baseScore), int(0.75*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (4, 1, int(0.00*baseScore), int(0.775*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (4, 2, int(0.00*baseScore), int(0.80*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (4, 3, int(0.00*baseScore), int(0.825*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (4, 4, int(0.00*baseScore), int(0.85*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (4, 5, int(0.00*baseScore), int(0.875*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (4, 6, int(0.00*baseScore), int(0.90*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (4, 7, int(0.00*baseScore), int(0.925*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (5, 0, int(0.00*baseScore), int(0.95*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-      self.starThresholdsP1.append( (6, 0, int(0.00*baseScore), int(1.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-
-    self.maxStarThresholdIndex[playerNum]=len(self.starThresholdsP1) - 1
-    self.getNextStarThresholds(playerNum)   #start it at the first threshold pair to surpass
-    tempFS, tempPS, self.finalScoreThreshold[playerNum], self.finalHitNotesThreshold[playerNum] = self.starThresholdsP1[-1]
-
-    #--------
-    if self.numOfPlayers > 1:   #repeat above for second array of thresholds
-      #player2:
-      playerNum = 1
-      self.avg1xScore.append(self.playerList[playerNum].totalNotes*50.0)
-      baseScore = self.avg1xScore[playerNum]
-      self.starThresholdIndex.append(0)
-      self.nextScoreThreshold.append(0)
-      self.prevScoreThreshold.append(0)
-      self.nextHitNotesThreshold.append(0)
-      self.prevHitNotesThreshold.append(0)
-      self.nextStar.append(0)
-      self.nextPartialStar.append(0)
-      self.maxStarThresholdIndex.append(0)
-      self.finalScoreThreshold.append(0)
-      self.finalHitNotesThreshold.append(0)
-  
-      if self.starScoring == 1:     #GH style scoring
-        #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (0, 0, int(0.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - first always all 0's
-        self.starThresholdsP2.append( (1, 0, int(0.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - first threshold(s) to surpass
-        self.starThresholdsP2.append( (1, 1, int(0.05*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (1, 2, int(0.10*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (1, 3, int(0.15*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (1, 4, int(0.20*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (1, 5, int(0.25*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (1, 6, int(0.30*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (1, 7, int(0.35*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (2, 0, int(0.40*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (2, 1, int(0.50*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (2, 2, int(0.60*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (2, 3, int(0.70*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (2, 4, int(0.80*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (2, 5, int(0.90*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (2, 6, int(1.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (2, 7, int(1.10*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (3, 0, int(1.20*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (3, 1, int(1.30*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (3, 2, int(1.40*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (3, 3, int(1.50*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (3, 4, int(1.60*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (3, 5, int(1.70*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (3, 6, int(1.80*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (3, 7, int(1.90*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (4, 0, int(2.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (4, 1, int(2.10*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (4, 2, int(2.20*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (4, 3, int(2.30*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (4, 4, int(2.40*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (4, 5, int(2.50*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (4, 6, int(2.60*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (4, 7, int(2.70*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (5, 0, int(2.80*baseScore), int(0.90*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (6, 0, int(0.00*baseScore), int(1.00*self.playerList[playerNum].totalStreakNotes) ) )
-    
-          
-      elif self.starScoring == 2 or self.starScoring == 3:   #RB style scoring
-        #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (0, 0, int(0.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - first always all 0's
-        self.starThresholdsP2.append( (0, 1, int(0.03125*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (0, 2, int(0.0625*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (0, 3, int(0.09375*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (0, 4, int(0.125*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (0, 5, int(0.15625*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (0, 6, int(0.1875*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (0, 7, int(0.21875*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (1, 0, int(0.25*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (1, 1, int(0.28125*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (1, 2, int(0.3125*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (1, 3, int(0.34375*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (1, 4, int(0.375*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (1, 5, int(0.40625*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (1, 6, int(0.4375*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (1, 7, int(0.46875*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (2, 0, int(0.5*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (2, 1, int(0.5625*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (2, 2, int(0.625*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (2, 3, int(0.6875*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (2, 4, int(0.75*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (2, 5, int(0.8125*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (2, 6, int(0.875*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (2, 7, int(0.9375*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (3, 0, int(1.0*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (3, 1, int(1.125*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (3, 2, int(1.25*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (3, 3, int(1.375*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (3, 4, int(1.5*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (3, 5, int(1.625*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (3, 6, int(1.75*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (3, 7, int(1.875*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (4, 0, int(2.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (4, 1, int(2.125*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (4, 2, int(2.25*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (4, 3, int(2.375*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (4, 4, int(2.5*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (4, 5, int(2.625*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (4, 6, int(2.75*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (4, 7, int(2.875*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        self.starThresholdsP2.append( (5, 0, int(3.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        if self.guitars[playerNum].isBassGuitar:
-          #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsP2.append( (6, 0, int(4.80*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        elif self.guitars[playerNum].isDrum:
-          #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsP2.append( (6, 0, int(4.65*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-        else:   #guitar parts
-          #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsP2.append( (6, 0, int(5.30*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
-  
-        if self.starScoring == 3:   #if RB+GH scoring, 100% automatically skips you to 6 stars
-          self.starThresholdsP2.append( (6, 0, int(0.00*baseScore), int(1.00*self.playerList[playerNum].totalStreakNotes) ) )
-  
+#  def initializeStarScoringThresholds(self):
+#    #so, a 1.0x multiplier's score would be self.playerList[playerNum].totalNotes*50.0
+#    #a 2.0x multiplier's score would be (2.0)(self.playerList[playerNum].totalNotes*50.0)
+#    #and so on...
+#
+#    #for playerNum, thePlayer in enumerate(self.playerList):
+#    
+#    self.starThresholds = [[] for i in self.playerList]  #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>)
+#    self.starThresholdIndex = []
+#    self.nextScoreThreshold = []
+#    self.prevScoreThreshold = []
+#    self.nextHitNotesThreshold = []
+#    self.prevHitNotesThreshold = []
+#    self.nextStar = []
+#    self.nextPartialStar = []
+#    self.maxStarThresholdIndex = []
+#    self.avg1xScore = []
+#    self.finalScoreThreshold = []
+#    self.finalHitNotesThreshold = []
+#
+#    #MFH - add separate co-op star scoring structure
+#    #  must maintain separate scores and star scores for uploading and highscore saving
+#    #  and a setting to not play star ding sounds when catching up at end of song 
+#    #    (co op mode will catch up and calculate individual star scores here at the end of a song)
+#    #  Only display co-op score and star score for co-op mode; hide individual scores & stars
+#    self.coOpScore = 0
+#    self.coOpStars = 0
+#    self.lastCoOpStars = 0
+#    self.coOpPartialStars = 0
+#    self.coOpNotesHit = 0
+#    self.starThresholdsCoOp = []
+#    self.coOpTotalStreakNotes = 0
+#    self.coOpTotalNotes = 0
+#    self.coOpPlayerIndex = len(self.playerList)
+#
+#    
+#    for playerNum in range(len(self.playerList)):
+#      self.avg1xScore.append(self.playerList[playerNum].totalNotes*50.0)
+#      baseScore = self.avg1xScore[playerNum]
+#      self.starThresholdIndex.append(0)
+#      self.nextScoreThreshold.append(0)
+#      self.prevScoreThreshold.append(0)
+#      self.nextHitNotesThreshold.append(0)
+#      self.prevHitNotesThreshold.append(0)
+#      self.nextStar.append(0)
+#      self.nextPartialStar.append(0)
+#      self.maxStarThresholdIndex.append(0)
+#      self.finalScoreThreshold.append(0)
+#      self.finalHitNotesThreshold.append(0)
+#
+#      if self.starScoring == 1:     #GH style scoring
+#        #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (0, 0, int(0.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - first always all 0's
+#        self.starThresholds[playerNum].append( (1, 0, int(0.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - first threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (1, 1, int(0.05*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (1, 2, int(0.10*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (1, 3, int(0.15*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (1, 4, int(0.20*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (1, 5, int(0.25*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (1, 6, int(0.30*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (1, 7, int(0.35*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (2, 0, int(0.40*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (2, 1, int(0.50*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (2, 2, int(0.60*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (2, 3, int(0.70*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (2, 4, int(0.80*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (2, 5, int(0.90*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (2, 6, int(1.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (2, 7, int(1.10*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (3, 0, int(1.20*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (3, 1, int(1.30*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (3, 2, int(1.40*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (3, 3, int(1.50*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (3, 4, int(1.60*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (3, 5, int(1.70*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (3, 6, int(1.80*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (3, 7, int(1.90*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (4, 0, int(2.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (4, 1, int(2.10*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (4, 2, int(2.20*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (4, 3, int(2.30*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (4, 4, int(2.40*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (4, 5, int(2.50*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (4, 6, int(2.60*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (4, 7, int(2.70*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (5, 0, int(2.80*baseScore), int(0.90*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (6, 0, int(0.00*baseScore), int(1.00*self.playerList[playerNum].totalStreakNotes) ) )
+#    
+#          
+#      elif self.starScoring == 2 or self.starScoring == 3:   #RB style scoring
+#        #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (0, 0, int(0.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - first always all 0's
+#        self.starThresholds[playerNum].append( (0, 1, int(0.03125*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (0, 2, int(0.0625*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (0, 3, int(0.09375*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (0, 4, int(0.125*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (0, 5, int(0.15625*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (0, 6, int(0.1875*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (0, 7, int(0.21875*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (1, 0, int(0.25*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (1, 1, int(0.28125*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (1, 2, int(0.3125*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (1, 3, int(0.34375*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (1, 4, int(0.375*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (1, 5, int(0.40625*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (1, 6, int(0.4375*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (1, 7, int(0.46875*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (2, 0, int(0.5*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (2, 1, int(0.5625*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (2, 2, int(0.625*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (2, 3, int(0.6875*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (2, 4, int(0.75*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (2, 5, int(0.8125*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (2, 6, int(0.875*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (2, 7, int(0.9375*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (3, 0, int(1.0*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (3, 1, int(1.125*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (3, 2, int(1.25*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (3, 3, int(1.375*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (3, 4, int(1.5*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (3, 5, int(1.625*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (3, 6, int(1.75*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (3, 7, int(1.875*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (4, 0, int(2.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (4, 1, int(2.125*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (4, 2, int(2.25*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (4, 3, int(2.375*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (4, 4, int(2.5*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (4, 5, int(2.625*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (4, 6, int(2.75*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (4, 7, int(2.875*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        self.starThresholds[playerNum].append( (5, 0, int(3.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        if self.guitars[playerNum].isBassGuitar:
+#          #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholds[playerNum].append( (6, 0, int(4.80*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        elif self.guitars[playerNum].isDrum:
+#          #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholds[playerNum].append( (6, 0, int(4.65*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#        else:   #guitar parts
+#          #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholds[playerNum].append( (6, 0, int(5.30*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) )
+#  
+#        if self.starScoring == 3:   #if RB+GH scoring, 100% automatically skips you to 6 stars
+#          self.starThresholds[playerNum].append( (6, 0, int(0.00*baseScore), int(1.00*self.playerList[playerNum].totalStreakNotes) ) )
+#    
+#      else:   #0 = FoF scoring
+#        #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (0, 0, int(0.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - first always all 0's
+#        self.starThresholds[playerNum].append( (1, 0, int(0.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (1, 1, int(0.00*baseScore), int(0.03125*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (1, 2, int(0.00*baseScore), int(0.0625*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (1, 3, int(0.00*baseScore), int(0.09375*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (1, 4, int(0.00*baseScore), int(0.125*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (1, 5, int(0.00*baseScore), int(0.15625*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (1, 6, int(0.00*baseScore), int(0.1875*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (1, 7, int(0.00*baseScore), int(0.21875*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (2, 0, int(0.00*baseScore), int(0.25*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (2, 1, int(0.00*baseScore), int(0.28125*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (2, 2, int(0.00*baseScore), int(0.3125*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (2, 3, int(0.00*baseScore), int(0.34375*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (2, 4, int(0.00*baseScore), int(0.375*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (2, 5, int(0.00*baseScore), int(0.40625*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (2, 6, int(0.00*baseScore), int(0.4375*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (2, 7, int(0.00*baseScore), int(0.46875*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (3, 0, int(0.00*baseScore), int(0.50*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (3, 1, int(0.00*baseScore), int(0.53125*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (3, 2, int(0.00*baseScore), int(0.5625*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (3, 3, int(0.00*baseScore), int(0.59375*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (3, 4, int(0.00*baseScore), int(0.625*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (3, 5, int(0.00*baseScore), int(0.65625*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (3, 6, int(0.00*baseScore), int(0.6875*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (3, 7, int(0.00*baseScore), int(0.71875*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (4, 0, int(0.00*baseScore), int(0.75*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (4, 1, int(0.00*baseScore), int(0.775*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (4, 2, int(0.00*baseScore), int(0.80*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (4, 3, int(0.00*baseScore), int(0.825*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (4, 4, int(0.00*baseScore), int(0.85*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (4, 5, int(0.00*baseScore), int(0.875*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (4, 6, int(0.00*baseScore), int(0.90*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (4, 7, int(0.00*baseScore), int(0.925*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (5, 0, int(0.00*baseScore), int(0.95*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#        self.starThresholds[playerNum].append( (6, 0, int(0.00*baseScore), int(1.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#  
+#      self.maxStarThresholdIndex[playerNum]=len(self.starThresholds[playerNum]) - 1
+#      self.getNextStarThresholds(playerNum)   #start it at the first threshold pair to surpass
+#      tempFS, tempPS, self.finalScoreThreshold[playerNum], self.finalHitNotesThreshold[playerNum] = self.starThresholds[playerNum][-1]
+#  
+#      if self.coOpType and playerNum == self.coOpPlayerIndex:   #now create array of tuples for co-op mode star score thresholds
+#        self.coOpTotalStreakNotes = 0
+#        self.coOpTotalNotes = 0
+#        baseScore = 0
+#        for playerNum, playa in enumerate(self.playerList):   #accumulate base scoring values for co-op
+#          self.coOpTotalStreakNotes += self.playerList[playerNum].totalStreakNotes
+#          self.coOpTotalNotes += self.playerList[playerNum].totalNotes
+#          baseScore += self.avg1xScore[playerNum]
+#        self.avg1xScore.append(baseScore)
+#        self.starThresholdIndex.append(0)   #to index self.coOpPlayerIndex
+#        self.nextScoreThreshold.append(0)
+#        self.prevScoreThreshold.append(0)
+#        self.nextHitNotesThreshold.append(0)
+#        self.prevHitNotesThreshold.append(0)
+#        self.nextStar.append(0)
+#        self.nextPartialStar.append(0)
+#        self.maxStarThresholdIndex.append(0)
+#        self.finalScoreThreshold.append(0)
+#        self.finalHitNotesThreshold.append(0)
+#
+#        if self.starScoring == 1:     #GH style scoring
+#          #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (0, 0, int(0.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - first always all 0's
+#          self.starThresholdsCoOp.append( (1, 0, int(0.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - first threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (1, 1, int(0.05*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (1, 2, int(0.10*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (1, 3, int(0.15*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (1, 4, int(0.20*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (1, 5, int(0.25*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (1, 6, int(0.30*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (1, 7, int(0.35*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (2, 0, int(0.40*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (2, 1, int(0.50*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (2, 2, int(0.60*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (2, 3, int(0.70*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (2, 4, int(0.80*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (2, 5, int(0.90*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (2, 6, int(1.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (2, 7, int(1.10*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (3, 0, int(1.20*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (3, 1, int(1.30*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (3, 2, int(1.40*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (3, 3, int(1.50*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (3, 4, int(1.60*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (3, 5, int(1.70*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (3, 6, int(1.80*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (3, 7, int(1.90*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (4, 0, int(2.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (4, 1, int(2.10*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (4, 2, int(2.20*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (4, 3, int(2.30*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (4, 4, int(2.40*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (4, 5, int(2.50*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (4, 6, int(2.60*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (4, 7, int(2.70*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (5, 0, int(2.80*baseScore), int(0.90*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (6, 0, int(0.00*baseScore), int(1.00*self.coOpTotalStreakNotes) ) )
+#      
+#            
+#        elif self.starScoring == 2 or self.starScoring == 3:   #RB style scoring
+#          #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (0, 0, int(0.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - first always all 0's
+#          self.starThresholdsCoOp.append( (0, 1, int(0.03125*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (0, 2, int(0.0625*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (0, 3, int(0.09375*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (0, 4, int(0.125*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (0, 5, int(0.15625*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (0, 6, int(0.1875*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (0, 7, int(0.21875*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (1, 0, int(0.25*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (1, 1, int(0.28125*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (1, 2, int(0.3125*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (1, 3, int(0.34375*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (1, 4, int(0.375*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (1, 5, int(0.40625*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (1, 6, int(0.4375*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (1, 7, int(0.46875*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (2, 0, int(0.5*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (2, 1, int(0.5625*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (2, 2, int(0.625*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (2, 3, int(0.6875*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (2, 4, int(0.75*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (2, 5, int(0.8125*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (2, 6, int(0.875*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (2, 7, int(0.9375*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (3, 0, int(1.0*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (3, 1, int(1.125*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (3, 2, int(1.25*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (3, 3, int(1.375*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (3, 4, int(1.5*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (3, 5, int(1.625*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (3, 6, int(1.75*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (3, 7, int(1.875*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (4, 0, int(2.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (4, 1, int(2.125*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (4, 2, int(2.25*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (4, 3, int(2.375*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (4, 4, int(2.5*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (4, 5, int(2.625*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (4, 6, int(2.75*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (4, 7, int(2.875*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          self.starThresholdsCoOp.append( (5, 0, int(3.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          if self.guitars[playerNum].isBassGuitar:
+#            #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#            self.starThresholdsCoOp.append( (6, 0, int(4.80*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          elif self.guitars[playerNum].isDrum:
+#            #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#            self.starThresholdsCoOp.append( (6, 0, int(4.65*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#          else:   #guitar parts
+#            #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#            self.starThresholdsCoOp.append( (6, 0, int(5.30*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
+#    
+#          if self.starScoring == 3:   #if RB+GH scoring, 100% automatically skips you to 6 stars
+#            self.starThresholdsCoOp.append( (6, 0, int(0.00*baseScore), int(1.00*self.coOpTotalStreakNotes) ) )
+#    
+#        
+#        else:   #0 = FoF scoring
+#          #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (0, 0, int(0.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - first always all 0's
+#          self.starThresholdsCoOp.append( (1, 0, int(0.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (1, 1, int(0.00*baseScore), int(0.03125*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (1, 2, int(0.00*baseScore), int(0.0625*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (1, 3, int(0.00*baseScore), int(0.09375*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (1, 4, int(0.00*baseScore), int(0.125*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (1, 5, int(0.00*baseScore), int(0.15625*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (1, 6, int(0.00*baseScore), int(0.1875*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (1, 7, int(0.00*baseScore), int(0.21875*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (2, 0, int(0.00*baseScore), int(0.25*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (2, 1, int(0.00*baseScore), int(0.28125*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (2, 2, int(0.00*baseScore), int(0.3125*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (2, 3, int(0.00*baseScore), int(0.34375*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (2, 4, int(0.00*baseScore), int(0.375*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (2, 5, int(0.00*baseScore), int(0.40625*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (2, 6, int(0.00*baseScore), int(0.4375*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (2, 7, int(0.00*baseScore), int(0.46875*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (3, 0, int(0.00*baseScore), int(0.50*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (3, 1, int(0.00*baseScore), int(0.53125*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (3, 2, int(0.00*baseScore), int(0.5625*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (3, 3, int(0.00*baseScore), int(0.59375*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (3, 4, int(0.00*baseScore), int(0.625*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (3, 5, int(0.00*baseScore), int(0.65625*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (3, 6, int(0.00*baseScore), int(0.6875*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (3, 7, int(0.00*baseScore), int(0.71875*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (4, 0, int(0.00*baseScore), int(0.75*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (4, 1, int(0.00*baseScore), int(0.775*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (4, 2, int(0.00*baseScore), int(0.80*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (4, 3, int(0.00*baseScore), int(0.825*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (4, 4, int(0.00*baseScore), int(0.85*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (4, 5, int(0.00*baseScore), int(0.875*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (4, 6, int(0.00*baseScore), int(0.90*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (4, 7, int(0.00*baseScore), int(0.925*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (5, 0, int(0.00*baseScore), int(0.95*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#          self.starThresholdsCoOp.append( (6, 0, int(0.00*baseScore), int(1.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
+#    
+#        
+#        self.maxStarThresholdIndex[self.coOpPlayerIndex]=len(self.starThresholdsCoOp) - 1
+#        self.getNextStarThresholds(self.coOpPlayerIndex)   #start it at the first threshold pair to surpass
+#        tempFS, tempPS, self.finalScoreThreshold[self.coOpPlayerIndex], self.finalHitNotesThreshold[self.coOpPlayerIndex] = self.starThresholdsCoOp[-1]
       
-      else:   #0 = FoF scoring
-        #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (0, 0, int(0.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - first always all 0's
-        self.starThresholdsP2.append( (1, 0, int(0.00*baseScore), int(0.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (1, 1, int(0.00*baseScore), int(0.03125*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (1, 2, int(0.00*baseScore), int(0.0625*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (1, 3, int(0.00*baseScore), int(0.09375*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (1, 4, int(0.00*baseScore), int(0.125*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (1, 5, int(0.00*baseScore), int(0.15625*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (1, 6, int(0.00*baseScore), int(0.1875*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (1, 7, int(0.00*baseScore), int(0.21875*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (2, 0, int(0.00*baseScore), int(0.25*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (2, 1, int(0.00*baseScore), int(0.28125*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (2, 2, int(0.00*baseScore), int(0.3125*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (2, 3, int(0.00*baseScore), int(0.34375*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (2, 4, int(0.00*baseScore), int(0.375*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (2, 5, int(0.00*baseScore), int(0.40625*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (2, 6, int(0.00*baseScore), int(0.4375*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (2, 7, int(0.00*baseScore), int(0.46875*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (3, 0, int(0.00*baseScore), int(0.50*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (3, 1, int(0.00*baseScore), int(0.53125*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (3, 2, int(0.00*baseScore), int(0.5625*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (3, 3, int(0.00*baseScore), int(0.59375*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (3, 4, int(0.00*baseScore), int(0.625*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (3, 5, int(0.00*baseScore), int(0.65625*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (3, 6, int(0.00*baseScore), int(0.6875*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (3, 7, int(0.00*baseScore), int(0.71875*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (4, 0, int(0.00*baseScore), int(0.75*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (4, 1, int(0.00*baseScore), int(0.775*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (4, 2, int(0.00*baseScore), int(0.80*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (4, 3, int(0.00*baseScore), int(0.825*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (4, 4, int(0.00*baseScore), int(0.85*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (4, 5, int(0.00*baseScore), int(0.875*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (4, 6, int(0.00*baseScore), int(0.90*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (4, 7, int(0.00*baseScore), int(0.925*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (5, 0, int(0.00*baseScore), int(0.95*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-        self.starThresholdsP2.append( (6, 0, int(0.00*baseScore), int(1.00*self.playerList[playerNum].totalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-  
-      
-      self.maxStarThresholdIndex[playerNum]=len(self.starThresholdsP2) - 1
-      self.getNextStarThresholds(playerNum)   #start it at the first threshold pair to surpass
-      tempFS, tempPS, self.finalScoreThreshold[playerNum], self.finalHitNotesThreshold[playerNum] = self.starThresholdsP2[-1]
-    
-      #MFH - still numOfPlayers > 1:
-      if self.coOpType:   #now create array of tuples for co-op mode star score thresholds
-        self.coOpTotalStreakNotes = 0
-        self.coOpTotalNotes = 0
-        baseScore = 0
-        for playerNum, playa in enumerate(self.playerList):   #accumulate base scoring values for co-op
-          self.coOpTotalStreakNotes += self.playerList[playerNum].totalStreakNotes
-          self.coOpTotalNotes += self.playerList[playerNum].totalNotes
-          baseScore += self.avg1xScore[playerNum]
-        self.avg1xScore.append(baseScore)
-        self.starThresholdIndex.append(0)   #to index self.coOpPlayerIndex
-        self.nextScoreThreshold.append(0)
-        self.prevScoreThreshold.append(0)
-        self.nextHitNotesThreshold.append(0)
-        self.prevHitNotesThreshold.append(0)
-        self.nextStar.append(0)
-        self.nextPartialStar.append(0)
-        self.maxStarThresholdIndex.append(0)
-        self.finalScoreThreshold.append(0)
-        self.finalHitNotesThreshold.append(0)
-
-        if self.starScoring == 1:     #GH style scoring
-          #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (0, 0, int(0.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - first always all 0's
-          self.starThresholdsCoOp.append( (1, 0, int(0.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - first threshold(s) to surpass
-          self.starThresholdsCoOp.append( (1, 1, int(0.05*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (1, 2, int(0.10*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (1, 3, int(0.15*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (1, 4, int(0.20*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (1, 5, int(0.25*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (1, 6, int(0.30*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (1, 7, int(0.35*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (2, 0, int(0.40*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (2, 1, int(0.50*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (2, 2, int(0.60*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (2, 3, int(0.70*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (2, 4, int(0.80*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (2, 5, int(0.90*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (2, 6, int(1.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (2, 7, int(1.10*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (3, 0, int(1.20*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (3, 1, int(1.30*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (3, 2, int(1.40*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (3, 3, int(1.50*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (3, 4, int(1.60*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (3, 5, int(1.70*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (3, 6, int(1.80*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (3, 7, int(1.90*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (4, 0, int(2.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (4, 1, int(2.10*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (4, 2, int(2.20*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (4, 3, int(2.30*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (4, 4, int(2.40*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (4, 5, int(2.50*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (4, 6, int(2.60*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (4, 7, int(2.70*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (5, 0, int(2.80*baseScore), int(0.90*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (6, 0, int(0.00*baseScore), int(1.00*self.coOpTotalStreakNotes) ) )
-      
-            
-        elif self.starScoring == 2 or self.starScoring == 3:   #RB style scoring
-          #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (0, 0, int(0.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - first always all 0's
-          self.starThresholdsCoOp.append( (0, 1, int(0.03125*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (0, 2, int(0.0625*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (0, 3, int(0.09375*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (0, 4, int(0.125*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (0, 5, int(0.15625*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (0, 6, int(0.1875*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (0, 7, int(0.21875*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (1, 0, int(0.25*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (1, 1, int(0.28125*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (1, 2, int(0.3125*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (1, 3, int(0.34375*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (1, 4, int(0.375*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (1, 5, int(0.40625*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (1, 6, int(0.4375*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (1, 7, int(0.46875*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (2, 0, int(0.5*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (2, 1, int(0.5625*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (2, 2, int(0.625*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (2, 3, int(0.6875*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (2, 4, int(0.75*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (2, 5, int(0.8125*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (2, 6, int(0.875*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (2, 7, int(0.9375*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (3, 0, int(1.0*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (3, 1, int(1.125*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (3, 2, int(1.25*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (3, 3, int(1.375*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (3, 4, int(1.5*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (3, 5, int(1.625*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (3, 6, int(1.75*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (3, 7, int(1.875*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (4, 0, int(2.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (4, 1, int(2.125*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (4, 2, int(2.25*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (4, 3, int(2.375*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (4, 4, int(2.5*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (4, 5, int(2.625*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (4, 6, int(2.75*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (4, 7, int(2.875*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          self.starThresholdsCoOp.append( (5, 0, int(3.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          if self.guitars[playerNum].isBassGuitar:
-            #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-            self.starThresholdsCoOp.append( (6, 0, int(4.80*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          elif self.guitars[playerNum].isDrum:
-            #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-            self.starThresholdsCoOp.append( (6, 0, int(4.65*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-          else:   #guitar parts
-            #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-            self.starThresholdsCoOp.append( (6, 0, int(5.30*baseScore), int(0.00*self.coOpTotalStreakNotes) ) )
-    
-          if self.starScoring == 3:   #if RB+GH scoring, 100% automatically skips you to 6 stars
-            self.starThresholdsCoOp.append( (6, 0, int(0.00*baseScore), int(1.00*self.coOpTotalStreakNotes) ) )
-    
-        
-        else:   #0 = FoF scoring
-          #                           (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (0, 0, int(0.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - first always all 0's
-          self.starThresholdsCoOp.append( (1, 0, int(0.00*baseScore), int(0.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (1, 1, int(0.00*baseScore), int(0.03125*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (1, 2, int(0.00*baseScore), int(0.0625*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (1, 3, int(0.00*baseScore), int(0.09375*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (1, 4, int(0.00*baseScore), int(0.125*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (1, 5, int(0.00*baseScore), int(0.15625*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (1, 6, int(0.00*baseScore), int(0.1875*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (1, 7, int(0.00*baseScore), int(0.21875*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (2, 0, int(0.00*baseScore), int(0.25*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (2, 1, int(0.00*baseScore), int(0.28125*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (2, 2, int(0.00*baseScore), int(0.3125*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (2, 3, int(0.00*baseScore), int(0.34375*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (2, 4, int(0.00*baseScore), int(0.375*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (2, 5, int(0.00*baseScore), int(0.40625*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (2, 6, int(0.00*baseScore), int(0.4375*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (2, 7, int(0.00*baseScore), int(0.46875*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (3, 0, int(0.00*baseScore), int(0.50*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (3, 1, int(0.00*baseScore), int(0.53125*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (3, 2, int(0.00*baseScore), int(0.5625*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (3, 3, int(0.00*baseScore), int(0.59375*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (3, 4, int(0.00*baseScore), int(0.625*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (3, 5, int(0.00*baseScore), int(0.65625*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (3, 6, int(0.00*baseScore), int(0.6875*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (3, 7, int(0.00*baseScore), int(0.71875*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (4, 0, int(0.00*baseScore), int(0.75*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (4, 1, int(0.00*baseScore), int(0.775*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (4, 2, int(0.00*baseScore), int(0.80*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (4, 3, int(0.00*baseScore), int(0.825*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (4, 4, int(0.00*baseScore), int(0.85*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (4, 5, int(0.00*baseScore), int(0.875*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (4, 6, int(0.00*baseScore), int(0.90*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (4, 7, int(0.00*baseScore), int(0.925*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (5, 0, int(0.00*baseScore), int(0.95*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-          self.starThresholdsCoOp.append( (6, 0, int(0.00*baseScore), int(1.00*self.coOpTotalStreakNotes) ) ) #(<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>) - threshold(s) to surpass
-    
-        
-        self.maxStarThresholdIndex[self.coOpPlayerIndex]=len(self.starThresholdsCoOp) - 1
-        self.getNextStarThresholds(self.coOpPlayerIndex)   #start it at the first threshold pair to surpass
-        tempFS, tempPS, self.finalScoreThreshold[self.coOpPlayerIndex], self.finalHitNotesThreshold[self.coOpPlayerIndex] = self.starThresholdsCoOp[-1]
-      
-
-  def resetStarThresholds(self):
-    for i, player in enumerate(self.playerList):
-      self.starThresholdIndex[i] = 0
-      self.getNextStarThresholds(i)
-    if self.coOpType:
-      self.starThresholdIndex[self.coOpPlayerIndex] = 0
-      self.getNextStarThresholds(self.coOpPlayerIndex)
-
-  def getNextStarThresholds(self, playerNum):
-    #ready for a new tuple o' data
-    self.starThresholdIndex[playerNum] = self.starThresholdIndex[playerNum] + 1
-    self.prevScoreThreshold[playerNum], self.prevHitNotesThreshold[playerNum] = self.nextScoreThreshold[playerNum], self.nextHitNotesThreshold[playerNum]
-    if playerNum == 0:
-      self.nextStar[playerNum], self.nextPartialStar[playerNum], self.nextScoreThreshold[playerNum], self.nextHitNotesThreshold[playerNum] = self.starThresholdsP1[self.starThresholdIndex[playerNum]]
-    elif playerNum == 1:
-      self.nextStar[playerNum], self.nextPartialStar[playerNum], self.nextScoreThreshold[playerNum], self.nextHitNotesThreshold[playerNum] = self.starThresholdsP2[self.starThresholdIndex[playerNum]]
-    elif playerNum == self.coOpPlayerIndex:
-      self.nextStar[self.coOpPlayerIndex], self.nextPartialStar[self.coOpPlayerIndex], self.nextScoreThreshold[self.coOpPlayerIndex], self.nextHitNotesThreshold[self.coOpPlayerIndex] = self.starThresholdsCoOp[self.starThresholdIndex[self.coOpPlayerIndex]]    
-
-
-  def updateStars(self, playerNum, forceUpdate = False, tempExtraScore = 0):    #MFH - merging the two star update functions
-    if playerNum == self.coOpPlayerIndex:
-      if forceUpdate or ( (self.inGameStars == 2 or (self.inGameStars == 1 and self.theme == 2) ) and self.coOpStars < 6 ):
-        self.lastCoOpStars = self.coOpStars
-  
-        if (self.coOpScore + tempExtraScore) >= self.finalScoreThreshold[playerNum] and self.coOpNotesHit >= self.finalHitNotesThreshold[playerNum]:
-          #force last index, max stars
-          self.coOpStars = 6
-          self.coOpPartialStars = 0
-          self.starThresholdIndex[playerNum] = self.maxStarThresholdIndex[playerNum]
-  
-        #make sure we're not at the last threshold tuple, or the following might cause an infinite loop!
-        while (self.starThresholdIndex[playerNum] < self.maxStarThresholdIndex[playerNum]) and ( (self.coOpScore + tempExtraScore) >= self.nextScoreThreshold[playerNum]) and (self.coOpNotesHit >= self.nextHitNotesThreshold[playerNum]):
-          #may be ready for a new tuple, check to see if stars and partialstars already match or not:
-          #if (self.playerList[playerNum].stars < self.nextStar[playerNum]) or (self.partialStar[playerNum] < self.nextPartialStar[playerNum]):
-          self.coOpStars = self.nextStar[playerNum]
-          self.coOpPartialStars = self.nextPartialStar[playerNum]
-          self.getNextStarThresholds(playerNum)
-
-        try:
-          self.coOpStarRatio = float(self.coOpScore-self.prevScoreThreshold[playerNum])/(self.nextScoreThreshold[playerNum]-self.prevScoreThreshold[playerNum])
-        except ZeroDivisionError:
-          self.coOpStarRatio = 0.0
-    
-        if self.coOpStars != self.lastCoOpStars and self.engine.data.starDingSoundFound:  #new star gained!
-          #self.engine.data.starDingSound.setVolume(self.sfxVolume) #MFH - no need to retrieve from INI file every star ding...
-          self.engine.data.starDingSound.play()
-    
-    elif forceUpdate or ( (self.inGameStars == 2 or (self.inGameStars == 1 and self.theme == 2) ) and self.playerList[playerNum].stars < 6 ):
-      self.lastStars[playerNum] = self.playerList[playerNum].stars
-
-      #if self.nextStar[playerNum] == 0 and self.nextPartialStar[playerNum] == 0:    #need to get first threshold to surpass
-      #  self.getNextStarThresholds(playerNum)
-
-      if (self.playerList[playerNum].score + tempExtraScore) >= self.finalScoreThreshold[playerNum] and self.playerList[playerNum].notesHit >= self.finalHitNotesThreshold[playerNum]:
-        #force last index, max stars
-        self.playerList[playerNum].stars = 6
-        self.partialStar[playerNum] = 0
-        self.starThresholdIndex[playerNum] = self.maxStarThresholdIndex[playerNum]
-
-      #make sure we're not at the last threshold tuple, or the following might cause an infinite loop!
-      while (self.starThresholdIndex[playerNum] < self.maxStarThresholdIndex[playerNum]) and ( (self.playerList[playerNum].score + tempExtraScore) >= self.nextScoreThreshold[playerNum]) and (self.playerList[playerNum].notesHit >= self.nextHitNotesThreshold[playerNum]):
-        #may be ready for a new tuple, check to see if stars and partialstars already match or not:
-        #if (self.playerList[playerNum].stars < self.nextStar[playerNum]) or (self.partialStar[playerNum] < self.nextPartialStar[playerNum]):
-        self.playerList[playerNum].stars = self.nextStar[playerNum]
-        self.partialStar[playerNum] = self.nextPartialStar[playerNum]
-        self.getNextStarThresholds(playerNum)
-  
-      try:
-        self.starRatio[playerNum] = float(self.playerList[playerNum].score-self.prevScoreThreshold[playerNum])/(self.nextScoreThreshold[playerNum]-self.prevScoreThreshold[playerNum])
-      except ZeroDivisionError:
-        self.starRatio[playerNum] = 0.0
-
-      if self.playerList[playerNum].stars != self.lastStars[playerNum] and self.engine.data.starDingSoundFound:  #new star gained!
-        #self.engine.data.starDingSound.setVolume(self.sfxVolume) #MFH - no need to retrieve from INI file every star ding...
-        self.engine.data.starDingSound.play()
-
+#
+#  def resetStarThresholds(self):
+#    for i, player in enumerate(self.playerList):
+#      self.starThresholdIndex[i] = 0
+#      self.getNextStarThresholds(i)
+#    if self.coOpType:
+#      self.starThresholdIndex[self.coOpPlayerIndex] = 0
+#      self.getNextStarThresholds(self.coOpPlayerIndex)
+#
+#  def getNextStarThresholds(self, playerNum):
+#    #ready for a new tuple o' data
+#    self.starThresholdIndex[playerNum] = self.starThresholdIndex[playerNum] + 1
+#    self.prevScoreThreshold[playerNum], self.prevHitNotesThreshold[playerNum] = self.nextScoreThreshold[playerNum], self.nextHitNotesThreshold[playerNum]
+#    if playerNum == self.coOpPlayerIndex and self.coOpType:
+#      self.nextStar[self.coOpPlayerIndex], self.nextPartialStar[self.coOpPlayerIndex], self.nextScoreThreshold[self.coOpPlayerIndex], self.nextHitNotesThreshold[self.coOpPlayerIndex] = self.starThresholdsCoOp[self.starThresholdIndex[self.coOpPlayerIndex]]    
+#    else:
+#      self.nextStar[playerNum], self.nextPartialStar[playerNum], self.nextScoreThreshold[playerNum], self.nextHitNotesThreshold[playerNum] = self.starThresholds[playerNum][self.starThresholdIndex[playerNum]]
+#
+#
+#  def updateStars(self, playerNum, forceUpdate = False, tempExtraScore = 0):    #MFH - merging the two star update functions
+#    if playerNum == self.coOpPlayerIndex:
+#      if forceUpdate or ( (self.inGameStars == 2 or (self.inGameStars == 1 and self.theme == 2) ) and self.coOpStars < 6 ):
+#        self.lastCoOpStars = self.coOpStars
+#  
+#        if (self.coOpScore + tempExtraScore) >= self.finalScoreThreshold[playerNum] and self.coOpNotesHit >= self.finalHitNotesThreshold[playerNum]:
+#          #force last index, max stars
+#          self.coOpStars = 6
+#          self.coOpPartialStars = 0
+#          self.starThresholdIndex[playerNum] = self.maxStarThresholdIndex[playerNum]
+#  
+#        #make sure we're not at the last threshold tuple, or the following might cause an infinite loop!
+#        while (self.starThresholdIndex[playerNum] < self.maxStarThresholdIndex[playerNum]) and ( (self.coOpScore + tempExtraScore) >= self.nextScoreThreshold[playerNum]) and (self.coOpNotesHit >= self.nextHitNotesThreshold[playerNum]):
+#          #may be ready for a new tuple, check to see if stars and partialstars already match or not:
+#          #if (self.playerList[playerNum].stars < self.nextStar[playerNum]) or (self.partialStar[playerNum] < self.nextPartialStar[playerNum]):
+#          self.coOpStars = self.nextStar[playerNum]
+#          self.coOpPartialStars = self.nextPartialStar[playerNum]
+#          self.getNextStarThresholds(playerNum)
+#
+#        try:
+#          self.coOpStarRatio = float(self.coOpScore-self.prevScoreThreshold[playerNum])/(self.nextScoreThreshold[playerNum]-self.prevScoreThreshold[playerNum])
+#        except ZeroDivisionError:
+#          self.coOpStarRatio = 0.0
+#    
+#        if self.coOpStars != self.lastCoOpStars and self.engine.data.starDingSoundFound:  #new star gained!
+#          #self.engine.data.starDingSound.setVolume(self.sfxVolume) #MFH - no need to retrieve from INI file every star ding...
+#          self.engine.data.starDingSound.play()
+#    
+#    elif forceUpdate or ( (self.inGameStars == 2 or (self.inGameStars == 1 and self.theme == 2) ) and self.playerList[playerNum].stars < 6 ):
+#      self.lastStars[playerNum] = self.playerList[playerNum].stars
+#
+#      #if self.nextStar[playerNum] == 0 and self.nextPartialStar[playerNum] == 0:    #need to get first threshold to surpass
+#      #  self.getNextStarThresholds(playerNum)
+#
+#      if (self.playerList[playerNum].score + tempExtraScore) >= self.finalScoreThreshold[playerNum] and self.playerList[playerNum].notesHit >= self.finalHitNotesThreshold[playerNum]:
+#        #force last index, max stars
+#        self.playerList[playerNum].stars = 6
+#        self.partialStar[playerNum] = 0
+#        self.starThresholdIndex[playerNum] = self.maxStarThresholdIndex[playerNum]
+#
+#      #make sure we're not at the last threshold tuple, or the following might cause an infinite loop!
+#      while (self.starThresholdIndex[playerNum] < self.maxStarThresholdIndex[playerNum]) and ( (self.playerList[playerNum].score + tempExtraScore) >= self.nextScoreThreshold[playerNum]) and (self.playerList[playerNum].notesHit >= self.nextHitNotesThreshold[playerNum]):
+#        #may be ready for a new tuple, check to see if stars and partialstars already match or not:
+#        #if (self.playerList[playerNum].stars < self.nextStar[playerNum]) or (self.partialStar[playerNum] < self.nextPartialStar[playerNum]):
+#        self.playerList[playerNum].stars = self.nextStar[playerNum]
+#        self.partialStar[playerNum] = self.nextPartialStar[playerNum]
+#        self.getNextStarThresholds(playerNum)
+#  
+#      try:
+#        self.starRatio[playerNum] = float(self.playerList[playerNum].score-self.prevScoreThreshold[playerNum])/(self.nextScoreThreshold[playerNum]-self.prevScoreThreshold[playerNum])
+#      except ZeroDivisionError:
+#        self.starRatio[playerNum] = 0.0
+#
+#      if self.playerList[playerNum].stars != self.lastStars[playerNum] and self.engine.data.starDingSoundFound:  #new star gained!
+#        #self.engine.data.starDingSound.setVolume(self.sfxVolume) #MFH - no need to retrieve from INI file every star ding...
+#        self.engine.data.starDingSound.play()
+#
 #----------------------------------------------  
+  def getStarScores(self, playerNum, tempExtraScore = 0):
+    if self.coOpType:
+      hitAcc = self.hitAccuracy[self.coOpPlayerIndex]
+      avMult = self.avMult[self.coOpPlayerIndex]
+      oldStar = self.coOpStars
+      index = 0
+      hitThreshold = float(self.coOpScore+tempExtraScore) / float(self.coOpTotalNotes * self.baseScore)
+    else:
+      hitAcc = self.hitAccuracy[playerNum]
+      avMult = self.avMult[playerNum]
+      oldStar = self.playerList[playerNum].stars
+      index = playerNum
+      hitThreshold = float(self.playerList[playerNum].score+tempExtraScore) / float(self.playerList[playerNum].totalNotes * self.baseScore)
+    if self.starScoring == 1: #GH-style
+      if hitAcc == 1.0:
+        if oldStar < 6  and self.engine.data.starDingSoundFound:  #new star gained!
+          self.engine.data.starDingSound.play()
+        return (6, 0, 0)
+      elif hitThreshold >= 0.9 or avMult >= self.star[index][5]:
+        if oldStar < 5  and self.engine.data.starDingSoundFound:  #new star gained!
+          self.engine.data.starDingSound.play()
+        return (5, 0, 0)
+      else:
+        for i in range(4, -1, -1):
+          if avMult >= self.star[index][i]:
+            part = avMult - self.star[index][i]
+            partPct = part / (self.star[index][i+1] - self.star[index][i])
+            partStar = int(8*partPct)
+            partStar = min(partStar, 7) #catches 99.very9%, just in case
+            if oldStar < i  and self.engine.data.starDingSoundFound:  #new star gained!
+              self.engine.data.starDingSound.play()
+            return (i, partStar, partPct)
+    elif self.starScoring >= 2: #RB-style and RB+GH (and RB2)
+      hundredGold = True
+      if self.starScoring == 2: 
+        hundredGold = False
+      if (hitAcc == 1.0 and hundredGold) or avMult > self.star[index][6]:
+        if oldStar < 6  and self.engine.data.starDingSoundFound:  #new star gained!
+          self.engine.data.starDingSound.play()
+        return (6, 0, 0)
+      elif avMult >= self.star[index][5]:
+        if oldStar < 5  and self.engine.data.starDingSoundFound:  #new star gained!
+          self.engine.data.starDingSound.play()
+        return (5, 0, 0)
+      else:
+        for i in range(4, -1, -1):
+          if avMult >= self.star[index][i]:
+            part = avMult - self.star[index][i]
+            partPct = part / (self.star[index][i+1] - self.star[index][i])
+            partStar = int(8*partPct)
+            partStar = min(partStar, 7) #catches 99.very9%, just in case
+            if oldStar < i  and self.engine.data.starDingSoundFound:  #new star gained!
+              self.engine.data.starDingSound.play()
+            return (i, partStar, partPct)
+    else: #FoF
+      if hitAcc == self.star[index][6]:
+        if oldStar < 6  and self.engine.data.starDingSoundFound:  #new star gained!
+          self.engine.data.starDingSound.play()
+        return (6, 0, 0)
+      elif hitThreshold >= self.star[index][5]:
+        if oldStar < 5  and self.engine.data.starDingSoundFound:  #new star gained!
+          self.engine.data.starDingSound.play()
+        return (5, 0, 0)
+      else:
+        for i in range(4, -1, -1):
+          if hitThreshold >= self.star[index][i]:
+            part = hitThreshold - self.star[index][i]
+            partPct = part / (self.star[index][i+1] - self.star[index][i])
+            partStar = int(8*partPct)
+            partStar = min(partStar, 7) #catches 99.very9%, just in case
+            if oldStar < i  and self.engine.data.starDingSoundFound:  #new star gained!
+              self.engine.data.starDingSound.play()
+            return (i, partStar, partPct)
+
   def updateAvMult(self, playerNum):
   
     #if (self.inGameStats == 2 or (self.inGameStats == 1 and self.theme == 2) ) or (self.inGameStars == 2 or (self.inGameStars == 1 and self.theme == 2) ):   #MFH -- only process if in-game stats are enabled
@@ -8258,8 +8248,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     self.starPerfect.draw()
                   elif starNum == stars:
                     if self.starContinuousAvailable:
-                      #stump: continuous fillup
-                      ratio = (partialStars/8.0) + (ratio/8.0)
+                      #stump: continuous fillup (akedrou - the ratio will pass correctly from rewritten star score)
                       degrees = int(360*ratio) - (int(360*ratio) % 5)
                       self.starGrey.transform.reset()
                       self.starGrey.transform.scale(.080,-.080)

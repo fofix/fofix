@@ -504,6 +504,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "coffee", "themename"), #was autoapply... why?
       ConfigChoice(engine, engine.config, "video",  "resolution"),
       ConfigChoice(engine, engine.config, "video",  "fullscreen"),
+      ConfigChoice(engine, engine.config, "game", "use_graphical_submenu", autoApply = True, isQuickset = 1),
       (_("Stages Options"), StagesOptionsMenu),
       (_("Choose P1 Neck >"), lambda: Dialogs.chooseNeck(engine,player=0,prompt=_("Yellow (#3) / Blue (#4) to change:"))),
       (_("Choose P2 Neck >"), lambda: Dialogs.chooseNeck(engine,player=1,prompt=_("Yellow (#3) / Blue (#4) to change:"))),
@@ -763,6 +764,7 @@ class SettingsMenu(Menu.Menu):
       self.config.set("game", "song_display_mode", 1)
       self.config.set("game", "stage_animate", 0)
       self.config.set("game", "lyric_mode", 0)
+      self.config.set("game", "use_graphical_submenu", 0)
       self.config.set("audio", "enable_crowd_tracks", 0)
       self.config.set("performance", "in_game_stats", 0)
       self.config.set("performance", "static_strings", True)
@@ -787,6 +789,7 @@ class SettingsMenu(Menu.Menu):
       self.config.set("game", "song_listing_mode", 0)
       self.config.set("game", "stage_animate", 0)
       self.config.set("game", "lyric_mode", 2)
+      self.config.set("game", "use_graphical_submenu", 0)
       self.config.set("audio", "enable_crowd_tracks", 1)
       self.config.set("performance", "in_game_stats", 0)
       self.config.set("performance", "static_strings", True)
@@ -809,6 +812,7 @@ class SettingsMenu(Menu.Menu):
       self.config.set("game", "partial_stars", 1)
       self.config.set("game", "songlistrotation", True)
       self.config.set("game", "lyric_mode", 2)
+      self.config.set("game", "use_graphical_submenu", 1)
       self.config.set("audio", "enable_crowd_tracks", 1)
       self.config.set("performance", "in_game_stats", 2)
       self.config.set("performance", "static_strings", True)
@@ -831,6 +835,7 @@ class SettingsMenu(Menu.Menu):
       self.config.set("game", "partial_stars", 1)
       self.config.set("game", "songlistrotation", True)
       self.config.set("game", "lyric_mode", 2)
+      self.config.set("game", "use_graphical_submenu", 1)
       self.config.set("audio", "enable_crowd_tracks", 1)
       self.config.set("performance", "in_game_stats", 2)
       self.config.set("performance", "static_strings", False)
@@ -1095,6 +1100,7 @@ class BasicSettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "video",  "resolution"),
       ConfigChoice(engine, engine.config, "video",  "fullscreen"),
       ConfigChoice(engine, engine.config, "game", "stage_mode", autoApply = True),   #myfingershurt
+      ConfigChoice(engine, engine.config, "game", "use_graphical_submenu", autoApply = True, isQuickset = 1),
       (_("Choose P1 Neck >"), lambda: Dialogs.chooseNeck(engine,player=0,prompt=_("Yellow (#3) / Blue (#4) to change:"))),
       (_("Choose P2 Neck >"), lambda: Dialogs.chooseNeck(engine,player=1,prompt=_("Yellow (#3) / Blue (#4) to change:"))),
       (_("In-Game Display Settings"), InGameDisplayMenu),
@@ -1276,6 +1282,7 @@ class BasicSettingsMenu(Menu.Menu):
       self.config.set("game", "song_display_mode", 1)
       self.config.set("game", "stage_animate", 0)
       self.config.set("game", "lyric_mode", 0)
+      self.config.set("game", "use_graphical_submenu", 0)
       self.config.set("audio", "enable_crowd_tracks", 0)
       self.config.set("performance", "in_game_stats", 0)
       self.config.set("performance", "static_strings", True)
@@ -1300,6 +1307,7 @@ class BasicSettingsMenu(Menu.Menu):
       self.config.set("game", "song_listing_mode", 0)
       self.config.set("game", "stage_animate", 0)
       self.config.set("game", "lyric_mode", 2)
+      self.config.set("game", "use_graphical_submenu", 0)
       self.config.set("audio", "enable_crowd_tracks", 1)
       self.config.set("performance", "in_game_stats", 0)
       self.config.set("performance", "static_strings", True)
@@ -1322,6 +1330,7 @@ class BasicSettingsMenu(Menu.Menu):
       self.config.set("game", "partial_stars", 1)
       self.config.set("game", "songlistrotation", True)
       self.config.set("game", "lyric_mode", 2)
+      self.config.set("game", "use_graphical_submenu", 1)
       self.config.set("audio", "enable_crowd_tracks", 1)
       self.config.set("performance", "in_game_stats", 2)
       self.config.set("performance", "static_strings", True)
@@ -1344,6 +1353,7 @@ class BasicSettingsMenu(Menu.Menu):
       self.config.set("game", "partial_stars", 1)
       self.config.set("game", "songlistrotation", True)
       self.config.set("game", "lyric_mode", 2)
+      self.config.set("game", "use_graphical_submenu", 1)
       self.config.set("audio", "enable_crowd_tracks", 1)
       self.config.set("performance", "in_game_stats", 2)
       self.config.set("performance", "static_strings", False)

@@ -125,6 +125,14 @@ class Data(object):
 
     # load misc images
     self.loadImgDrawing(self, "loadingImage", os.path.join("themes",themename,"loadingbg.png"), textureSize = (256,256))
+    try:
+      self.loadImgDrawing(self, "submenuSelect", os.path.join("themes",themename,"submenuselect.png"))
+      subSelectImgW = self.submenuSelect.width1()
+      self.subSelectWFactor = 640.000/subSelectImgW
+      self.subSelectImgH = self.submenuSelect.height1()
+    except IOError:
+      self.submenuSelect = False
+      self.subSelectWFactor = 0
 
     # load all the data in parallel
     asciiOnly = not bool(Language.language) or Language.language == "Custom"
