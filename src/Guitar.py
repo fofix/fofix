@@ -181,6 +181,9 @@ class Guitar:
 
     #myfingershurt:
     self.hopoStyle        = self.engine.config.get("game", "hopo_system")
+    self.gh2sloppy        = self.engine.config.get("game", "gh2_sloppy")
+    if self.gh2sloppy == 1:
+      self.hopoStyle = 4
     self.LastStrumWasChord = False
     self.spRefillMode = self.engine.config.get("game","sp_notes_while_active")
     self.hitglow_color = self.engine.config.get("video", "hitglow_color") #this should be global, not retrieved every fret render.
