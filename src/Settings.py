@@ -695,7 +695,7 @@ class SettingsMenu(Menu.Menu):
 
 
 
-    Menu.Menu.__init__(self, engine, settings, name = "settings", onCancel = self.applySettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)   #MFH - add position to this so we can move it
+    Menu.Menu.__init__(self, engine, settings, name = "advsettings", onCancel = self.applySettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)   #MFH - add position to this so we can move it
 
   def quickset(self):
     #akedrou - quickset (based on Fablaculp's Performance Autoset)
