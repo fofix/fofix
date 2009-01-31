@@ -2551,15 +2551,18 @@ class Song(object):
 
   def isPlaying(self):
     #MFH - check here to see if any audio tracks are still playing first!
-    #return self._playing and self.music.isPlaying()
-    if self.guitarTrack and self.guitarTrack.streamIsPlaying() > 0: 
-      return True
-    if self.rhythmTrack and self.rhythmTrack.streamIsPlaying() > 0:
-      return True
-    if self.drumTrack and self.drumTrack.streamIsPlaying() > 0:
-      return True
-    else:
-      return self._playing and self.music.isPlaying() 
+    #MFH from the Future sez: but only if in slowdown mode!
+    if self.engine.audioSpeedDivisor == 1:
+      return self._playing and self.music.isPlaying()
+    else:   #altered speed mode!
+      if self.guitarTrack and self.guitarTrack.streamIsPlaying() > 0: 
+        return True
+      if self.rhythmTrack and self.rhythmTrack.streamIsPlaying() > 0:
+        return True
+      if self.drumTrack and self.drumTrack.streamIsPlaying() > 0:
+        return True
+      else:
+        return self._playing and self.music.isPlaying() 
 
   def getBeat(self):
     return self.getPosition() / self.period
