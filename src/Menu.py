@@ -343,7 +343,7 @@ class Menu(Layer, KeyListener):
           ypos = float(i+self.viewOffset)
           self.menuText.transform.reset()
           self.menuText.transform.scale(.5*self.menuScale,(-1.0/n*self.menuScale))
-          self.menuText.transform.translate(wS*self.menux,hS*self.menuy+(hS*self.vSpace)*i)
+          self.menuText.transform.translate(wS*self.menux,(hS*self.menuy)-(hS*self.vSpace)*i)
           self.menuText.draw(rect = (xpos[0],xpos[1],ypos/n,(ypos+1.0)/n))
         else:
           text = choice.getText(i + self.viewOffset == self.currentIndex)
