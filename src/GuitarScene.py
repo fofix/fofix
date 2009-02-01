@@ -1885,7 +1885,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.pauseScreen = None
     self.rockTop = None
     self.rockMsg = None
+
+    #MFH - Ensure all event tracks are destroyed before removing Song object!
+    self.song.tracks = None
+    self.song.eventTracks = None
+    self.song.midiEventTracks = None
     self.song = None
+
     self.rockOff = None
     if self.rmtype == 0:
       self.arrow = None
@@ -1955,6 +1961,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.part = [None for i in self.playerList]
     for playa in self.playerList:
       playa.lastNoteEvent = None
+    
 
     
   def loadSettings(self):
