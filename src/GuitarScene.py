@@ -1886,11 +1886,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.rockMsg = None
 
     #MFH - Ensure all event tracks are destroyed before removing Song object!
-    if self.song.tracks:
+    if self.song:
       self.song.tracks = None
-    if self.song.eventTracks:
       self.song.eventTracks = None
-    if self.song.midiEventTracks:
       self.song.midiEventTracks = None
     self.song = None
 
