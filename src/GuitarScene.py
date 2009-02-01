@@ -222,6 +222,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #MFH
     self.jurgenLogic = self.engine.config.get("game", "jurglogic")    #logic 0 = original, logic 1 = MFH-1
     self.jurgenText = self.engine.config.get("game", "jurgtext")
+
+    self.whammySavesSP = self.engine.config.get("game", "whammy_saves_starpower") #MFH
+    self.failingEnabled = self.engine.config.get("coffee", "failingEnabled")
+
     self.timeLeft = None
     self.processedFirstNoteYet = False
     
@@ -482,7 +486,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #self.decOnePlace = self.decimal('0.01')
     self.starScoring = self.engine.config.get("game", "star_scoring")#MFH
     self.ignoreOpenStrums = self.engine.config.get("game", "ignore_open_strums") #MFH
-    self.whammySavesSP = self.engine.config.get("game", "whammy_saves_starpower") #MFH
     self.muteSustainReleases = self.engine.config.get("game", "sustain_muting") #MFH
     self.hopoIndicatorEnabled = self.engine.config.get("game", "hopo_indicator") #MFH
     self.fontShadowing = self.engine.config.get("game", "in_game_font_shadowing") #MFH
@@ -664,10 +667,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.drumStart = False
     soloSlop = 100.0
     unisonCheck = []
-
-
-
-    self.failingEnabled = self.engine.config.get("coffee", "failingEnabled")
 
     if self.careerMode:
       self.failingEnabled = True
@@ -1963,6 +1962,74 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       playa.lastNoteEvent = None
     
 
+  def getHandicap(self):
+    hopoFreq = self.engine.config.get("coffee", "hopo_frequency")
+    hopoCheat = self.engine.config.get("coffee", "hopo_freq_cheat")
+    try:
+      songHopo = int(self.song.info.hopofreq)
+    except Exception, e:
+      songHopo = 1
+    for i, player in enumerate(self.playerList):
+      if self.gh2sloppy == 1: # or self.rb2sloppy == 1:
+        if (player.handicap)&1 != 1:
+          player.handicap += 0x1
+      if self.engine.audioSpeedDivisor != 1:
+        if (player.handicap>>1)&1 != 1:
+          player.handicap += 0x2
+      if not self.failingEnabled:
+        if (player.handicap>>2)&1 != 1:
+          player.handicap += 0x4
+      if self.guitars[i].twoChordMax:
+        if (player.handicap>>3)&1 != 1:
+          player.handicap += 0x8
+      if self.guitars[i].hitwcheat == 1:
+        if (player.handicap>>4)&1 != 1:
+          player.handicap += 0x10
+      elif self.guitars[i].hitwcheat == 2:
+        if (player.handicap>>5)&1 != 1:
+          player.handicap += 0x20
+      elif self.guitars[i].hitw == 1:
+        if (player.handicap>>6)&1 != 1:
+          player.handicap += 0x40
+      elif self.guitars[i].hitw == 2:
+        if (player.handicap>>7)&1 != 1:
+          player.handicap += 0x80
+      if self.hopoStyle == 0: #no taps
+        if (player.handicap>>8)&1 != 1:
+          player.handicap += 0x100
+      elif hopoFreq == 0 and songHopo != 1:
+        if (player.handicap>>9)&1 != 1:
+          player.handicap += 0x200
+      elif hopoFreq == 1 and songHopo != 1:
+        if (player.handicap>>10)&1 != 1:
+          player.handicap += 0x400
+      elif hopoCheat == 1 and songHopo != 1:
+        if (player.handicap>>11)&1 != 1:
+          player.handicap += 0x800
+      elif hopoCheat == 2 and songHopo != 1:
+        if (player.handicap>>12)&1 != 1:
+          player.handicap += 0x1000
+      elif hopoFreq == 3 and songHopo != 1:
+        if (player.handicap>>13)&1 != 1:
+          player.handicap += 0x2000
+      elif self.allTaps == 1:
+        if (player.handicap>>14)&1 != 1:
+          player.handicap += 0x4000
+      if self.whammySavesSP:
+        if (player.handicap>>15)&1 != 1:
+          player.handicap += 0x8000
+      if self.autoPlay == 0 and (self.jurg == i or self.jurg == 2): #2 as both
+        if (player.handicap>>16)&1 != 1:
+          player.handicap += 0x10000
+      if self.autoPlay == 3 and (self.jurg == i or self.jurg == 2): #2 as both
+        if (player.handicap>>17)&1 != 1:
+          player.handicap += 0x20000
+      if self.autoPlay == 2 and (self.jurg == i or self.jurg == 2): #2 as both
+        if (player.handicap>>18)&1 != 1:
+          player.handicap += 0x40000
+      if self.autoKickBass[i] == 1:
+        if (player.handicap>>19)&1 != 1:
+          player.handicap += 0x80000
     
   def loadSettings(self):
     self.stage.updateDelays()
@@ -1997,6 +2064,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     self.hopoStyle        = self.engine.config.get("game", "hopo_system")
     self.gh2sloppy        = self.engine.config.get("game", "gh2_sloppy")
+    self.allTaps          = 0
+    self.autoKickBass     = [0 for i in self.playerList]
     if self.gh2sloppy == 1:
       self.hopoStyle = 4
     self.hopoAfterChord = self.engine.config.get("game", "hopo_after_chord")
@@ -2011,6 +2080,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     for i,guitar in enumerate(self.guitars):
       guitar.leftyMode = self.engine.config.get("player%d" % (i), "leftymode")
       guitar.twoChordMax  = self.engine.config.get("player%d" % (i), "two_chord_max")
+    
+    self.getHandicap() #akedrou
 
     if self.song and self.song.readyToGo:
       #myfingershurt: ensure that after a pause or restart, the a/v sync delay is refreshed:
@@ -4391,6 +4462,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         
         #MFH - force one star scoring update before gameresults just in case star scoring is disabled:
         for i, thePlayer in enumerate(self.playerList):
+          self.updateAvMult(i, forceUpdate = True)
           if self.coOpType:
             #self.updateStars(self.coOpPlayerIndex, forceUpdate = True)
             self.coOpStars, self.coOpPartialStars, self.coOpStarRatio = self.getStarScores(i)
@@ -5283,7 +5355,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       hitThreshold = float(self.playerList[playerNum].score+tempExtraScore) / float(self.playerList[playerNum].totalNotes * self.baseScore)
     if self.starScoring == 1: #GH-style
       if hitAcc == 1.0:
-        if oldStar < 6  and self.engine.data.starDingSoundFound:  #new star gained!
+        if oldStar < 6 and self.engine.data.starDingSoundFound:  #new star gained!
           self.engine.data.starDingSound.play()
         return (6, 0, 0)
       elif hitThreshold >= 0.9 or avMult >= self.star[index][5]:
@@ -5342,10 +5414,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               self.engine.data.starDingSound.play()
             return (i, partStar, partPct)
 
-  def updateAvMult(self, playerNum):
+  def updateAvMult(self, playerNum, forceUpdate = False):
   
     #if (self.inGameStats == 2 or (self.inGameStats == 1 and self.theme == 2) ) or (self.inGameStars == 2 or (self.inGameStars == 1 and self.theme == 2) ):   #MFH -- only process if in-game stats are enabled
-    if (self.inGameStats == 2 or (self.inGameStats == 1 and self.theme == 2) ):
+    if (self.inGameStats == 2 or self.inGameStars == 2) or ((self.inGameStats == 1 or self.inGameStars == 1) and self.theme == 2) or forceUpdate:
       if self.coOpRB or self.coOpGH:
         self.hitAccuracy[self.coOpPlayerIndex] = (float(self.coOpNotesHit) / float(self.coOpTotalStreakNotes) ) * 100.0
         self.avMult[self.coOpPlayerIndex] = self.coOpScore/(self.coOpTotalNotes*50.0)
