@@ -128,10 +128,12 @@ class Data(object):
     try:
       self.loadImgDrawing(self, "submenuSelect", os.path.join("themes",themename,"submenuselect.png"))
       subSelectImgW = self.submenuSelect.width1()
+      self.submenuSelectFound = True
       self.subSelectWFactor = 640.000/subSelectImgW
       self.subSelectImgH = self.submenuSelect.height1()
     except IOError:
-      self.submenuSelect = False
+      self.submenuSelectFound = False
+      self.loadImgDrawing(self, "submenuSelect", os.path.join("themes",themename,"menu","selected.png"))
       self.subSelectWFactor = 0
 
     # load all the data in parallel

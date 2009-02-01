@@ -401,7 +401,7 @@ class Menu(Layer, KeyListener):
           if text == " >":
             text = ""
             
-          if self.engine.data.submenuSelect and len(text) > 0 and not self.mainMenu and self.useSelectedBox:
+          if self.engine.data.submenuSelectFound and len(text) > 0 and not self.mainMenu and self.useSelectedBox:
             Tw, Th = font.getStringSize(text,scale)
             lineSpacing = font.getLineSpacing(scale)
             frameWidth = Tw*1.10
