@@ -248,8 +248,13 @@ class SongInfo(object):
         result = None
 
       if result is not None:
-        self.__dict__.update(cPickle.loads(str(result[0])))
-        return
+        try:
+          self.__dict__.update(cPickle.loads(str(result[0])))
+          return
+        except:
+          # The entry is there but could not be loaded.
+          # Nuke it and let it be rebuilt further down.
+          cache.execute('DELETE FROM `songinfo` WHERE `hash` = ?', [ckey])
 
     # Read highscores and verify their hashes.
     # There ain't no security like security throught obscurity :)
