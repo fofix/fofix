@@ -526,7 +526,8 @@ class Player(object):
     
     self.hopoFreq = None
     
-    
+    self.handicapMult = 0.0 #akedrou
+    self.handicap = 0x0
     self.stars = 0
     self.totalStreakNotes = 0
     self.totalNotes = 0
