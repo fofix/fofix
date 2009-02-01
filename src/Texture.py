@@ -30,7 +30,6 @@ import StringIO
 import PngImagePlugin
 from OpenGL.GL import *
 from OpenGL.GLU import *
-from Queue import Queue, Empty
 
 Config.define("opengl", "supportfbo", bool, False)
 
@@ -45,7 +44,9 @@ class TextureException(Exception):
 
 # A queue containing (function, args) pairs that clean up deleted OpenGL handles.
 # The functions are called in the main OpenGL thread.
-cleanupQueue = Queue()
+#stump: Replaced queue with list to avoid deadlocking under
+# certain conditions due to a bug in Python.
+cleanupQueue = []
 
 class Framebuffer:
   fboSupported = None
@@ -121,7 +122,7 @@ class Framebuffer:
   def __del__(self):
     # Queue the buffers to be deleted later
     try:
-      cleanupQueue.put((glDeleteBuffers, [3, [self.depthbuf, self.stencilbuf, self.fb]]))
+      cleanupQueue.append((glDeleteBuffers, [3, [self.depthbuf, self.stencilbuf, self.fb]]))
     except NameError:
       pass
       
@@ -185,9 +186,10 @@ class Texture:
   def __init__(self, name = None, target = GL_TEXTURE_2D):
     # Delete all pending textures
     try:
-      func, args = cleanupQueue.get_nowait()
+      func, args = cleanupQueue[0]
+      del cleanupQueue[0]
       func(*args)
-    except Empty:
+    except IndexError:
       pass
     except Exception, e:    #MFH - to catch "did you call glewInit?" crashes
       Log.error("Texture.py texture deletion exception: %s" % e)
@@ -332,7 +334,7 @@ class Texture:
   def __del__(self):
     # Queue this texture to be deleted later
     try:
-      cleanupQueue.put((glDeleteTextures, [self.texture]))
+      cleanupQueue.append((glDeleteTextures, [self.texture]))
     except NameError:
       pass
 
