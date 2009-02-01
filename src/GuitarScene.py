@@ -2885,7 +2885,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           changed = False
           held = 0
           for n, k in enumerate(self.keysList[i]):
-            if self.autoPlay == 0 or (k == 1024 and self.autoPlay == 2) or ((k == 1024 or k == 512) and self.autoPlay == 3):
+            if self.autoPlay == 0 or (k == self.guitars[i].keys[4] and self.autoPlay == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.autoPlay == 3):
               if n in notes and not self.controls.getState(k):
                 changed = True
                 self.controls.toggle(k, True)
@@ -2918,7 +2918,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           held = 0
   
           for n, k in enumerate(self.keysList[i]):
-            if self.autoPlay == 0 or (k == 1024 and self.autoPlay == 2) or ((k == 1024 or k == 512) and self.autoPlay == 3):
+            if self.autoPlay == 0 or (k == self.guitars[i].keys[4] and self.autoPlay == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.autoPlay == 3):
               if n in jurgStrumNotes and not self.controls.getState(k):
                 changed = True
                 self.controls.toggle(k, True)
@@ -2950,7 +2950,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           held = 0
   
           for n, k in enumerate(self.keysList[i]):
-            if self.autoPlay == 0 or (k == 1024 and self.autoPlay == 2) or ((k == 1024 or k == 512) and self.autoPlay == 3):
+            if self.autoPlay == 0 or (k == self.guitars[i].keys[4] and self.autoPlay == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.autoPlay == 3):
               if n in jurgStrumNotes and not self.controls.getState(k):
                 changed = True
                 self.controls.toggle(k, True)
@@ -2987,7 +2987,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           if not notes or jurgStrumTime <= (pos + 30):
   
             for n, k in enumerate(self.keysList[i]):
-              if self.autoPlay == 0 or (k == 1024 and self.autoPlay == 2) or ((k == 1024 or k == 512) and self.autoPlay == 3):
+              if self.autoPlay == 0 or (k == self.guitars[i].keys[4] and self.autoPlay == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.autoPlay == 3):
                 if n in jurgStrumNotes and not self.controls.getState(k):
                   changed = True
                   self.controls.toggle(k, True)
@@ -3004,7 +3004,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               self.handlePick(i)
             #MFH - release all frets - who cares about held notes, I want a test player (actually if no keyReleased call, will hold notes fine)
             for n, k in enumerate(self.keysList[i]):
-              if self.autoPlay == 0 or (k == 1024 and self.autoPlay == 2) or ((k == 1024 or k == 512) and self.autoPlay == 3):
+              if self.autoPlay == 0 or (k == self.guitars[i].keys[4] and self.autoPlay == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.autoPlay == 3):
                 if self.controls.getState(k):
                   self.controls.toggle(k, False)
   
