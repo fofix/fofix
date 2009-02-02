@@ -247,7 +247,7 @@ class MainMenu(BackgroundLayer):
           (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
           (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
           (_("Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 5)),
-          (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),   Worldrave- Commented out of the GH Based theme's since it's not needed for GH based theme's at all. Also lessened unnessasary menu items.
+          (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),   #Worldrave - Re-added this option for now.
         ]
       elif self.theme == 1 and not self.themeCoOp:
         multPlayerMenu = [
