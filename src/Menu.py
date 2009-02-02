@@ -244,9 +244,11 @@ class Menu(Layer, KeyListener):
     elif c in Player.DOWNS + Player.ACTION2S or (c in Player.DRUM3S and self.drumNav):
       self.scrollDown = True
       self.click = False
+      self.scroll(1)
     elif c in Player.UPS + Player.ACTION1S or (c in Player.DRUM2S and self.drumNav):
       self.scrollUp = True
       self.click = False
+      self.scroll(0)
     elif c in Player.RIGHTS + Player.KEY4S:
       choice.selectNextValue()
     elif c in Player.LEFTS + Player.KEY3S:

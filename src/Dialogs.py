@@ -1320,9 +1320,11 @@ class SongChooser(Layer, KeyListener):
     elif c in Player.UPS + Player.ACTION1S or (c in Player.DRUM2S and self.drumNav):
       self.scrollUp = True
       self.click = False
+      self.scroll(0)
     elif c in Player.DOWNS + Player.ACTION2S or (c in Player.DRUM3S and self.drumNav):
       self.scrollDown = True
       self.click = False
+      self.scroll(1)
     elif key == pygame.K_BACKSPACE and not self.accepted:
       self.searchText = self.searchText[:-1]
       if self.searchText == "":
