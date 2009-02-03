@@ -119,17 +119,15 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     Log.debug("Cheer loop delay value used: %d" % self.cheerLoopDelay)
 
     self.cheerLoopCounter = self.cheerLoopDelay   #MFH - starts out ready to cheer
-    self.jurgMode = self.engine.config.get("game", "jurgmode")
+    self.jurgMode = self.engine.config.get("game", "jurgdef")
     self.jurg = self.engine.config.get("game", "jurgtype")
     if self.jurgMode == 0:
       self.cheating = True
       self.cheats[0] = "Jurgen Enabled"
-    elif self.jurgMode == 2:
-      self.cheating = True
-      self.cheats[0] = "Medium Assist Enabled"
-    elif self.jurgMode == 3:
-      self.cheating = True
-      self.cheats[0] = "Easy Assist Enabled"
+      
+    self.p1Assist = self.engine.config.get("game", "p1_assist")
+    self.p2Assist = self.engine.config.get("game", "p2_assist")
+
       
     #MFH
     self.hopoStyle        = self.engine.config.get("game", "hopo_system")
@@ -230,7 +228,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       
         scores = self.song.info.getHighscores(player.difficulty, part = player.part)
         if not scores or player.score > scores[-1][0] or len(scores) < 5:
-          if player.cheating or (self.jurgMode != 1 and self.jurg == i) or (self.jurgMode != 1 and self.jurg == 2):
+          if player.cheating or (self.jurgMode != 1 and self.jurg == i) or (self.jurgdef != 1 and self.jurg == 2):
             Dialogs.showMessage(self.engine, _("No highscores for cheaters!"))
           elif player.score == 0: #trinidude4
             Dialogs.showMessage(self.engine, _("No highscore")) #trinidude4

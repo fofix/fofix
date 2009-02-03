@@ -300,12 +300,15 @@ Config.define("performance",   "disable_libcount",    bool,  True,  text = _("Ke
 Config.define("performance",   "disable_librotation", bool,  True,  text = _("CD Mode Y-Rotation"),    options = {False: _("Enabled"), True: _("Disabled")})
 
 #Spikehead777
-#Config.define("game",   "jurgdef",             bool,  False,  text = _("Enable Jurgen"),    options = {False: _("No"), True: _("Yes")})
-Config.define("game",   "jurgmode",             int,   1,      text = _("Enable Jurgen"),    options = {0: _("Yes"), 1: _("No"), 2: _("Medium Assist"), 3: _("Easy Assist")})
+Config.define("game",   "jurgdef",             bool,  False,  text = _("Enable Jurgen"),    options = {False: _("No"), True: _("Yes")})
+#Config.define("game",   "jurgmode",             int,   1,      text = _("Enable Jurgen"),    options = {0: _("Yes"), 1: _("No"), 2: _("Medium Assist"), 3: _("Easy Assist")})
 Config.define("game",   "jurgtype",            int,   2,      text = _("Jurgen Player"), options = {0: _("1"), 1: _("2"), 2: _("Both")}  )
 #MFH
 Config.define("game",   "jurglogic",            int,   1,      text = _("Jurgen Logic"), options = {0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}  )
 Config.define("game",   "jurgtext",            int,   1,      text = _("Jurgen Text Size"), options = {0: _("Big"), 1: _("Small")})
+
+Config.define("game",   "p1_assist",            int,   0,       text = _("Player One Assist"), options = {0: _("Off"), 1: _("Easy Assist"), 2: _("Medium Assist"), 3: _("Drum Assist")})
+Config.define("game",   "p2_assist",            int,   0,       text = _("Player Two Assist"), options = {0: _("Off"), 1: _("Easy Assist"), 2: _("Medium Assist"), 3: _("Drum Assist")})
 
 Config.define("game", "use_graphical_submenu", int,   1,      text = _("Graphical Submenus"), options = {0: _("Disabled"), 1: _("Enabled")})
 
