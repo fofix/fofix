@@ -5376,7 +5376,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if oldStar < 6 and self.engine.data.starDingSoundFound:  #new star gained!
           self.engine.data.starDingSound.play()
         return (6, 0, 0)
-      elif hitThreshold >= 0.9 or avMult >= self.star[index][5]:
+      elif hitThreshold / self.star[index][5] >= 0.9:
         if oldStar < 5  and self.engine.data.starDingSoundFound:  #new star gained!
           self.engine.data.starDingSound.play()
         return (5, 0, 0)
@@ -5417,14 +5417,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if oldStar < 6  and self.engine.data.starDingSoundFound:  #new star gained!
           self.engine.data.starDingSound.play()
         return (6, 0, 0)
-      elif hitThreshold >= self.star[index][5]:
+      elif hitAcc >= self.star[index][5]:
         if oldStar < 5  and self.engine.data.starDingSoundFound:  #new star gained!
           self.engine.data.starDingSound.play()
         return (5, 0, 0)
       else:
         for i in range(4, -1, -1):
-          if hitThreshold >= self.star[index][i]:
-            part = hitThreshold - self.star[index][i]
+          if hitAcc >= self.star[index][i]:
+            part = hitAcc - self.star[index][i]
             partPct = part / (self.star[index][i+1] - self.star[index][i])
             partStar = int(8*partPct)
             partStar = min(partStar, 7) #catches 99.very9%, just in case
