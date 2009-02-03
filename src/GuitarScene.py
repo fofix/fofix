@@ -2604,6 +2604,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
   def handleWhammy(self, playerNum):
     i = playerNum
+    if self.resumeCountdown > 0:    #MFH - conditions to completely ignore whammy
+      return
+
     try:    #since analog axis might be set but joystick not present = crash
       #MFH - adding another nest of logic filtration; don't even want to run these checks unless there are playedNotes present!
       if self.guitars[i].playedNotes:
@@ -2777,6 +2780,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     i = playerNum
     num = playerNum
     guitar = self.guitars[num]
+
+    if self.resumeCountdown > 0:    #MFH - conditions to completely ignore picks
+      return
+
+
 
     #MFH - only actually pick if the player has not failed already!
     if self.rock[i] > 0:
