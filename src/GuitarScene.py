@@ -232,10 +232,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.numOfPlayers = len(self.playerList)        #MFH - MUST be in front of loadSettings call!
     
     self.autoPlay         = self.engine.config.get("game", "jurgdef")
-    self.playerAssist = [None for i in self.playerList]
+    self.playerAssist = [None] * 2
     self.playerAssist[0] = self.engine.config.get("game", "p1_assist")
-    if self.numOfPlayers > 1:
-      self.playerAssist[1] = self.engine.config.get("game", "p2_assist")
+    self.playerAssist[1] = self.engine.config.get("game", "p2_assist")
 
     
     self.jurgPlayer       = [False for i in self.playerList]
