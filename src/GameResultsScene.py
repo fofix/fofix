@@ -234,7 +234,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       
         scores = self.song.info.getHighscores(player.difficulty, part = player.part)
         if not scores or player.score > scores[-1][0] or len(scores) < 5:
-          if player.cheating or (self.jurgMode != 1 and self.jurg == i) or (self.jurgdef != 1 and self.jurg == 2):
+          if player.cheating or (self.jurgMode and self.jurg == i) or (self.jurgMode and self.jurg == 2):
             Dialogs.showMessage(self.engine, _("No highscores for cheaters!"))
           elif player.score == 0: #trinidude4
             Dialogs.showMessage(self.engine, _("No highscore")) #trinidude4
