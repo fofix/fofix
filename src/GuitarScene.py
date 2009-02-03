@@ -2858,7 +2858,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         #missedNotes = self.guitars[num].getMissedNotesMFH(self.song, pos, catchup = True)
         missedNotes = guitar.getMissedNotesMFH(self.song, pos + guitar.earlyMargin, catchup = True)  #MFh - check slightly ahead here.
         for tym, theNote in missedNotes:   #MFH - also want to mark these notes as Played so they don't count against the note total!
-          theNote.played = True
+          #theNote.played = True
+          theNote.skipped = True
           self.playerList[num].totalStreakNotes -= 1
           
         
@@ -3324,8 +3325,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if guitar.freestyleActive or guitar.drumFillsActive:  
           missedNotes = guitar.getMissedNotesMFH(self.song, pos + guitar.lateMargin*2, catchup = True)  #MFH - get all notes in the freestyle section.
           for tym, theNote in missedNotes:   #MFH - also want to mark these notes as Played so they don't count against the note total!
-            theNote.played = True
-            self.playerList[i].totalStreakNotes -= 1
+            #theNote.played = True
+            theNote.skipped = True
+            self.playerList[num].totalStreakNotes -= 1
         else:
           missedNotes = guitar.getMissedNotesMFH(self.song, pos)
           if guitar.paused:
