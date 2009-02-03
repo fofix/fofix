@@ -1057,13 +1057,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           else:
             self.star[i][6] = 5.3
       else: #hit accuracy thresholds
-        self.star[i][6] = 1.0
-        self.star[i][5] = 0.95
-        self.star[i][4] = 0.75
-        self.star[i][3] = 0.5
-        self.star[i][2] = 0.25
-        self.star[i][1] = 0.0
-        self.star[i][0] = 0.0
+        self.star[i][6] = 100
+        self.star[i][5] = 95
+        self.star[i][4] = 75
+        self.star[i][3] = 50
+        self.star[i][2] = 25
+        self.star[i][1] = 0
+        self.star[i][0] = 0
 
 
     #glorandwarf: need to store the song's beats per second (bps) for later
@@ -5372,11 +5372,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       index = playerNum
       hitThreshold = float(self.playerList[playerNum].score+tempExtraScore) / float(self.playerList[playerNum].totalNotes * self.baseScore)
     if self.starScoring == 1: #GH-style
-      if hitAcc == 1.0:
+      if hitAcc == 100.0:
         if oldStar < 6 and self.engine.data.starDingSoundFound:  #new star gained!
           self.engine.data.starDingSound.play()
         return (6, 0, 0)
-      elif hitAcc >= 0.9 or avMult >= self.star[index][5]:
+      elif hitAcc >= 90.0 or avMult >= self.star[index][5]:
         if oldStar < 5  and self.engine.data.starDingSoundFound:  #new star gained!
           self.engine.data.starDingSound.play()
         return (5, 0, 0)
@@ -5394,7 +5394,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       hundredGold = True
       if self.starScoring == 2: 
         hundredGold = False
-      if (hitAcc == 1.0 and hundredGold) or avMult > self.star[index][6]:
+      if (hitAcc == 100.0 and hundredGold) or avMult > self.star[index][6]:
         if oldStar < 6  and self.engine.data.starDingSoundFound:  #new star gained!
           self.engine.data.starDingSound.play()
         return (6, 0, 0)
