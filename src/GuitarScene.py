@@ -5376,7 +5376,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if oldStar < 6 and self.engine.data.starDingSoundFound:  #new star gained!
           self.engine.data.starDingSound.play()
         return (6, 0, 0)
-      elif hitThreshold / self.star[index][5] >= 0.9:
+      elif hitAcc >= 0.9 or avMult >= self.star[index][i]:
         if oldStar < 5  and self.engine.data.starDingSoundFound:  #new star gained!
           self.engine.data.starDingSound.play()
         return (5, 0, 0)
