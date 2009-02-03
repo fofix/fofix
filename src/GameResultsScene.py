@@ -127,6 +127,12 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       
     self.p1Assist = self.engine.config.get("game", "p1_assist")
     self.p2Assist = self.engine.config.get("game", "p2_assist")
+    if self.p1Assist != 0:
+      self.cheating = True
+      self.cheats[0] = "Jurgen Enabled"
+    if self.p2Assist != 0:
+      self.cheating = True
+      self.cheats[0] = "Jurgen Enabled"
 
       
     #MFH
