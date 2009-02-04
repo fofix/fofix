@@ -44,10 +44,7 @@ except ImportError:
   Log.warn("PyOGG not found. OGG files will be fully decoded prior to playing; expect absurd memory usage.")
   ogg = None
 
-class Audio(Task):
-  def __init__(self):
-    Task.__init__(self)
-
+class Audio:
   def pre_open(self, frequency = 22050, bits = 16, stereo = True, bufferSize = 1024):
     pygame.mixer.pre_init(frequency, -bits, stereo and 2 or 1, bufferSize)
     return True

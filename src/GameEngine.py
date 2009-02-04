@@ -521,8 +521,6 @@ class GameEngine(Engine):
     
     # Load game modifications
     Mod.init(self)
-    
-    self.addTask(self.audio, synchronized = False)
     self.addTask(self.input, synchronized = False)
     
     #self.addTask(self.view)
