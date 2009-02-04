@@ -439,7 +439,7 @@ class MainMenu(BackgroundLayer):
   def startGHImporter(self):
     self.launchLayer(lambda: GHImporter(self.engine))
   startGHImporter = catchErrors(startGHImporter)
-
+    
   def run(self, ticks):
     self.time += ticks / 50.0
     if self.engine.cmdPlay == 1:
@@ -490,30 +490,16 @@ class MainMenu(BackgroundLayer):
       if self.active:
         if self.optionsBG != None:
           wfactor = self.optionsBG.widthf(pixelw = 640.000)
-          self.optionsBG.transform.reset()
-          self.optionsBG.transform.translate(w/2+self.opt_bkg_x,h/2+self.opt_bkg_y)
-          self.optionsBG.transform.scale(wfactor,-wfactor)
-          self.optionsBG.draw()
+          self.engine.drawImage(self.optionsBG, (wfactor,-wfactor), (w/2+self.opt_bkg_x,h/2+self.opt_bkg_y))
         
-        self.optionsPanel.transform.reset()
-        self.optionsPanel.transform.scale(0.5,-0.5)
-        self.optionsPanel.transform.translate(w/1.7, h/2)
-        self.optionsPanel.draw()
+        self.engine.drawImage(self.optionsPanel, (0.5,-0.5), (w/1.7, h/2))  
 
       if self.menu.active:
         if self.background != None:
           #MFH - auto-scaling
           imgwidth = self.background.width1()
           wfactor = 640.000/imgwidth
-          self.background.transform.reset()
-          self.background.transform.translate(w/2,h/2)
-          self.background.transform.scale(wfactor,-wfactor)
-          self.background.draw()  
-          #wfactor = self.background.widthf(pixelw = 640.000)
-          #self.background.transform.reset()
-          #self.background.transform.translate(w/2,h/2)
-          #self.background.transform.scale(wfactor,-wfactor)
-          #self.background.draw()
+          self.engine.drawImage(self.background, (wfactor,-wfactor), (w/2, h/2))
 
         for i in range(0,6):
           #Item selected
@@ -524,56 +510,40 @@ class MainMenu(BackgroundLayer):
             xpos = (0,.5)
           #which item?
           ypos = 1/6.0*i
-          self.BGText.transform.reset()
-          #self.BGText.transform.scale(.5*.5,-1/6.0*.5)
-          self.BGText.transform.scale(.5*self.main_menu_scale,-1/6.0*self.main_menu_scale)
-          
-
-
-
 
 
 #============blazingamer============
 #if menux and/or menuy are not set it will use the default positions for the main text
           if self.menux == None or self.menuy == None:
             if self.theme == 0:
-              self.BGText.transform.translate(w*0.5,h*0.45-(h*self.main_menu_vspacing)*i)
+              textcoord = (w*0.5,h*0.45-(h*self.main_menu_vspacing)*i)
             elif self.theme == 1:
-              self.BGText.transform.translate(w*0.7,h*0.8-(h*self.main_menu_vspacing)*i)
+              textcoord = (w*0.7,h*0.8-(h*self.main_menu_vspacing)*i)
 #if menux and menuy are set it will use those
           else:
             try:
-              self.BGText.transform.translate(w*self.menux,h*self.menuy-(h*self.main_menu_vspacing)*i)
+              textcoord = (w*self.menux,h*self.menuy-(h*self.main_menu_vspacing)*i)
             except Exception, e:
               Log.warn("Unable to translate BGText: %s" % e) 
         
 #===================================     
-          self.BGText.draw(rect = (xpos[0],xpos[1],ypos,ypos+1/6.0))
+
+          self.engine.drawImage(self.BGText, (.5*self.main_menu_scale,-1/6.0*self.main_menu_scale), textcoord,
+                                rect = (xpos[0],xpos[1],ypos,ypos+1/6.0))
 
     elif self.theme == 2:
-
-  
-
 
       if self.active:
         if self.optionsBG != None:
           wfactor = self.optionsBG.widthf(pixelw = 640.000)
-          self.optionsBG.transform.reset()
-          self.optionsBG.transform.translate(w/2+self.opt_bkg_x,h/2+self.opt_bkg_y)
-          self.optionsBG.transform.scale(wfactor,-wfactor)
-          self.optionsBG.draw()
+          self.engine.drawImage(self.optionsBG, (wfactor,-wfactor), (w/2+self.opt_bkg_x,h/2+self.opt_bkg_y))
         
-        self.optionsPanel.transform.reset()
-        self.optionsPanel.transform.scale(0.5,-0.5)
-        self.optionsPanel.transform.translate(w*0.4, h/2)
-        self.optionsPanel.draw()
+        self.engine.drawImage(self.optionsPanel, (0.5,-0.5), (w*0.4, h/2))
+        
       if self.menu.active:
         if self.background != None:
           wfactor = self.background.widthf(pixelw = 640.000)
-          self.background.transform.reset()
-          self.background.transform.translate(w/2,h/2)
-          self.background.transform.scale(wfactor,-wfactor)
-          self.background.draw()
+          self.engine.drawImage(self.background, (wfactor,-wfactor), (w/2, h/2))
 
         for i in range(0,5):
           #Item selected
@@ -584,31 +554,27 @@ class MainMenu(BackgroundLayer):
             xpos = (0,.5)
           #which item?
           ypos = 1/5.0*i
-          self.BGText.transform.reset()
-          #self.BGText.transform.scale(.5*.5,-1/5.0*.5)
-          self.BGText.transform.scale(.5*self.main_menu_scale,(-1/5.0*self.main_menu_scale))
           
 
 #============blazingamer============
 #if menux and/or menuy are not set it will use the default positions for the main text
           if self.menux == None or self.menuy == None:
-            self.BGText.transform.translate(w*0.2,(h*0.8-(h*self.main_menu_vspacing)*i)*v)
+            textcoord = (w*0.2,(h*0.8-(h*self.main_menu_vspacing)*i)*v)
 #if menux and menuy are set it will use those
           else:
             try:
-              self.BGText.transform.translate(w*self.menux,(h*self.menuy-(h*self.main_menu_vspacing)*i)*v)
+              textcoord = (w*self.menux,(h*self.menuy-(h*self.main_menu_vspacing)*i)*v)
             except Exception, e:
               Log.warn("Unable to translate BGText: %s" % e) 
         
 #===================================
-          self.BGText.draw(rect = (xpos[0],xpos[1],ypos,ypos+1/5.0))
+
+          self.engine.drawImage(self.BGText, (.5*self.main_menu_scale,(-1/5.0*self.main_menu_scale)),
+                                textcoord, rect = (xpos[0],xpos[1],ypos,ypos+1/5.0))
 
 #racer: added version tag to main menu:
     if self.version != None:
           wfactor = self.version.widthf(pixelw = 640.000)
-          self.version.transform.reset()
-          self.version.transform.translate(w/2,h/2)
-          self.version.transform.scale(wfactor,-wfactor)
-          self.version.draw()
+          self.engine.drawImage(self.version, (wfactor,-wfactor),(w/2, h/2))
 
 

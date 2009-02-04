@@ -752,6 +752,14 @@ class GameEngine(Engine):
     """
     return self.data.loadImgDrawing(target, name, fileName, textureSize)
 
+  def drawImage(self, image, scale, coord, rot = 0, color = (1,1,1,1), rect = (0,1,0,1)):
+    
+    image.transform.reset()
+    image.transform.scale(scale[0],scale[1])
+    image.transform.rotate(rot)
+    image.transform.translate(coord[0],coord[1])
+    image.draw(color = color, rect = rect)
+
   #glorandwarf: renamed to retrieve the path of the file
   def fileExists(self, fileName):
     return self.data.fileExists(fileName)
