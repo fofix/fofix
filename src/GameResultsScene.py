@@ -121,7 +121,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.cheerLoopCounter = self.cheerLoopDelay   #MFH - starts out ready to cheer
     self.jurgMode = self.engine.config.get("game", "jurgdef")
     self.jurg = self.engine.config.get("game", "jurgtype")
-    if self.jurgMode == 0:
+    if self.jurgMode:
       self.cheating = True
       self.cheats[0] = "Jurgen Enabled"
       
