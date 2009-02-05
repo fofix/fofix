@@ -153,10 +153,16 @@ class asyncore(object):
     def set_reuse_addr(self):
       pass
     def bind(self, addr):
+      if self._socket is None:
+        raise socket.error, 'Bad file descriptor'
       self._socket.bind(addr)
     def listen(self, backlog):
+      if self._socket is None:
+        raise socket.error, 'Bad file descriptor'
       self._socket.listen(backlog)
     def accept(self):
+      if self._socket is None:
+        raise socket.error, 'Bad file descriptor'
       return self._socket.accept()
     def close(self):
       if self._socket is not None:
@@ -167,10 +173,16 @@ class asyncore(object):
       except ValueError:
         pass
     def send(self, data):
+      if self._socket is None:
+        raise socket.error, 'Bad file descriptor'
       return self._socket.send(data)
     def recv(self, length=4096):
+      if self._socket is None:
+        raise socket.error, 'Bad file descriptor'
       return self._socket.recv(length)
     def connect(self, addr):
+      if self._socket is None:
+        raise socket.error, 'Bad file descriptor'
       self._socket.connect(addr)
       self.connected = True
     def readable(self):
