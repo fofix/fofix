@@ -3334,7 +3334,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           for tym, theNote in missedNotes:   #MFH - also want to mark these notes as Played so they don't count against the note total!
             #theNote.played = True
             theNote.skipped = True
-            self.playerList[num].totalStreakNotes -= 1
+            self.playerList[i].totalStreakNotes -= 1
         else:
           missedNotes = guitar.getMissedNotesMFH(self.song, pos)
           if guitar.paused:
