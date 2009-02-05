@@ -434,10 +434,7 @@ class LoadingScreen(Layer, KeyListener):
       #MFH - auto-scaling of loading screen
       imgwidth = self.engine.data.loadingImage.width1()
       wfactor = 640.000/imgwidth
-      self.engine.data.loadingImage.transform.reset()
-      self.engine.data.loadingImage.transform.translate(w/2,h/2)
-      self.engine.data.loadingImage.transform.scale(wfactor,-wfactor)
-      self.engine.data.loadingImage.draw(color = (1, 1, 1, 1))
+      self.engine.drawImage(self.engine.data.loadingImage, scale = (wfactor,-wfactor), coord = (w/2,h/2))
 
       Theme.setBaseColor(1 - v)
       w, h = font.getStringSize(self.text)
@@ -1647,40 +1644,30 @@ class SongChooser(Layer, KeyListener):
         #MFH - auto background image scaling
         imgwidth = self.background.width1()
         wfactor = 640.000/imgwidth
-        self.background.transform.reset()
-        self.background.transform.translate(w/2,h/2)
-        self.background.transform.scale(wfactor,-wfactor)
-        self.background.draw()  
+        self.engine.drawImage(self.background, scale = (wfactor,-wfactor), coord = (w/2,h/2))
       else:
         imgwidth = self.paper.width1()
         wfactor = 640.000/imgwidth
         if self.background != None:
-          self.background.transform.reset()
-          self.background.transform.translate(w/2,h/2)
-          self.background.transform.scale(.5,-.5)
-          self.background.draw()
+          self.engine.drawImage(self.background, scale = (.5,-.5), coord = (w/2,h/2))
         else:
           self.background = None
   
-        self.paper.transform.reset()
         if self.songback:
         # evilynux - Fixed, there's a two song offset and two lines should be skipped
           if self.selectedIndex == 1 or self.selectedIndex == 2:
             y = 0
           else:
             y = h*(self.selectedIndex-2)*2/16
-          self.paper.transform.translate(w/2,y + h/2)
+          papercoord = (w/2,y + h/2)
         else:
-          self.paper.transform.translate(w/2,h/2)
-        self.paper.transform.scale(wfactor,-wfactor) 
-        self.paper.draw()  
+          papercoord = (w/2,h/2)
+
+        self.engine.drawImage(self.paper, scale = (wfactor,-wfactor), coord = papercoord)
   
         #racer: render preview graphic
       if self.previewDisabled == True and self.preview != None:
-        self.preview.transform.reset()
-        self.preview.transform.translate(w/2,h/2)
-        self.preview.transform.scale(.5,-.5)
-        self.preview.draw()
+        self.engine.drawImage(self.preview, scale = (.5,-.5), coord = (w/2, h/2))
       else:
         self.preview = None
   
@@ -1718,21 +1705,6 @@ class SongChooser(Layer, KeyListener):
           self.instrumentNice = _("Guitar")
         self.engine.config.set("game", "songlist_instrument", self.instrumentNum)
   
-  #-      if self.instrument == "Lead Guitar":
-  #-        self.instrument = "Drums"
-  #-        self.engine.config.set("game", "songlist_instrument", 4)
-  #-      elif self.instrument == "Bass Guitar":
-  #-        self.instrument = "Lead Guitar"
-  #-        self.engine.config.set("game", "songlist_instrument", 3)
-  #-      elif self.instrument == "Rhythm Guitar":
-  #-        self.instrument = "Bass Guitar"
-  #-        self.engine.config.set("game", "songlist_instrument", 2)
-  #-      elif self.instrument == "Guitar":
-  #-        self.instrument = "Rhythm Guitar"
-  #-        self.engine.config.set("game", "songlist_instrument", 1)
-  #-      else: # self.diff == 0:
-  #-        self.instrument = "Guitar"
-  #-        self.engine.config.set("game", "songlist_instrument", 0)
   
       if self.display == 0: #CDs Mode
       # render the item list
@@ -2073,10 +2045,7 @@ class SongChooser(Layer, KeyListener):
   
             #Render the selection grahics
             wfactor = self.selected.widthf(pixelw = 635.000)
-            self.selected.transform.reset()
-            self.selected.transform.scale(wfactor,-wfactor)
-            self.selected.transform.translate(w/2.1, y-h*.01)
-            self.selected.draw()
+            self.engine.drawImage(self.selected, scale = (wfactor,-wfactor), coord = (w/2.1, y-h*.01))
   
             #Render current library path
             glColor4f(1,1,1,1)
@@ -2151,44 +2120,27 @@ class SongChooser(Layer, KeyListener):
                 
                 if i == self.selectedIndex:
                   glColor4f(.7,.5,.25,1)
-                  if isinstance(item, Song.SongInfo):
-                    c1,c2,c3 = self.song_name_selected_color
-                    glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.RandomSongInfo):
+                  if isinstance(item, Song.SongInfo) or isinstance(item, Song.RandomSongInfo):
                     c1,c2,c3 = self.song_name_selected_color
                     glColor3f(c1,c2,c3)
                   if isinstance(item, Song.LibraryInfo):
                     c1,c2,c3 = self.library_selected_color
                     glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.TitleInfo):
-                    c1,c2,c3 = self.career_title_color
-                    glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.CareerResetterInfo):
-                    c1,c2,c3 = self.career_title_color
-                    glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.BlankSpaceInfo):
+                  if isinstance(item, Song.TitleInfo) or isinstance(item, Song.CareerResetterInfo) or isinstance(item, Song.BlankSpaceInfo):
                     c1,c2,c3 = self.career_title_color
                     glColor3f(c1,c2,c3)
                 else:
                   glColor4f(0,0,0,1)
-                  if isinstance(item, Song.SongInfo):
-                    c1,c2,c3 = self.song_name_text_color
-                    glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.RandomSongInfo):
+                  if isinstance(item, Song.SongInfo) or isinstance(item, Song.RandomSongInfo):
                     c1,c2,c3 = self.song_name_text_color
                     glColor3f(c1,c2,c3)
                   if isinstance(item, Song.LibraryInfo):
                     c1,c2,c3 = self.library_text_color
                     glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.TitleInfo):
+                  if isinstance(item, Song.TitleInfo) or isinstance(item, Song.CareerResetterInfo) or isinstance(item, Song.BlankSpaceInfo):
                     c1,c2,c3 = self.career_title_color
                     glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.CareerResetterInfo):
-                    c1,c2,c3 = self.career_title_color
-                    glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.BlankSpaceInfo):
-                    c1,c2,c3 = self.career_title_color
-                    glColor3f(c1,c2,c3)
+                    
                 text = item.name
                 
                 if isinstance(item, Song.SongInfo) and item.getLocked():
@@ -2199,14 +2151,7 @@ class SongChooser(Layer, KeyListener):
                     text = self.indentString + text
                 
                 # evilynux - Force uppercase display for Career titles
-                if isinstance(item, Song.TitleInfo):
-                  text = string.upper(text)
-  
-                #MFH: ...and also for the Career Resetter, to help set it apart
-                if isinstance(item, Song.CareerResetterInfo):
-                  text = string.upper(text)
-  
-                if isinstance(item, Song.BlankSpaceInfo):   #for the End of Career marker
+                if isinstance(item, Song.TitleInfo) or isinstance(item, Song.CareerResetterInfo) or isinstance(item, Song.BlankSpaceInfo):
                   text = string.upper(text)
   
                 # evilynux - automatically scale song name
@@ -2391,11 +2336,8 @@ class SongChooser(Layer, KeyListener):
             else:
               pos = (self.selectedIndex-2, self.selectedIndex+3)
               y = h*0.38
-  
-            self.selected.transform.reset()
-            self.selected.transform.scale(1,-1)
-            self.selected.transform.translate(w/2.1, y-h*.01)
-            self.selected.draw()
+
+            self.engine.drawImage(self.selected, scale = (1,-1), coord = (w/2.1, y-h*.01))
   
             glColor4f(1,1,1,1)
             text = self.library
@@ -2462,22 +2404,13 @@ class SongChooser(Layer, KeyListener):
                 
                 if i == self.selectedIndex:
                   glColor4f(.7,.5,.25,1)
-                  if isinstance(item, Song.SongInfo):
-                    c1,c2,c3 = self.song_name_selected_color
-                    glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.RandomSongInfo):
+                  if isinstance(item, Song.SongInfo) or isinstance(item, Song.RandomSongInfo):
                     c1,c2,c3 = self.song_name_selected_color
                     glColor3f(c1,c2,c3)
                   if isinstance(item, Song.LibraryInfo):
                     c1,c2,c3 = self.library_selected_color
                     glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.TitleInfo):
-                    c1,c2,c3 = self.career_title_color
-                    glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.CareerResetterInfo):
-                    c1,c2,c3 = self.career_title_color
-                    glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.BlankSpaceInfo):
+                  if isinstance(item, Song.TitleInfo) or isinstance(item, Song.CareerResetterInfo) or isinstance(item, Song.BlankSpaceInfo):
                     c1,c2,c3 = self.career_title_color
                     glColor3f(c1,c2,c3)
                 else:
@@ -2491,13 +2424,7 @@ class SongChooser(Layer, KeyListener):
                   if isinstance(item, Song.LibraryInfo):
                     c1,c2,c3 = self.library_text_color
                     glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.TitleInfo):
-                    c1,c2,c3 = self.career_title_color
-                    glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.CareerResetterInfo):
-                    c1,c2,c3 = self.career_title_color
-                    glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.BlankSpaceInfo):
+                  if isinstance(item, Song.TitleInfo) or isinstance(item, Song.CareerResetterInfo) or isinstance(item, Song.BlankSpaceInfo):
                     c1,c2,c3 = self.career_title_color
                     glColor3f(c1,c2,c3)
                 text = item.name
@@ -2509,15 +2436,8 @@ class SongChooser(Layer, KeyListener):
                   if self.tiersArePresent:
                     text = self.indentString + text
   
-                # evilynux - Force uppercase display for Career titles
-                if isinstance(item, Song.TitleInfo):
-                  text = string.upper(text)
-  
-                #MFH: ...and also for the Career Resetter, to help set it apart
-                if isinstance(item, Song.CareerResetterInfo):
-                  text = string.upper(text)
-  
-                if isinstance(item, Song.BlankSpaceInfo):
+                # evilynux/blazingamer - Force uppercase display
+                if isinstance(item, Song.TitleInfo) or isinstance(item, Song.CareerResetterInfo) or isinstance(item, Song.BlankSpaceInfo):
                   text = string.upper(text)
   
                 # evilynux - automatically scale song name
@@ -2677,17 +2597,15 @@ class SongChooser(Layer, KeyListener):
         font.render(text, (0.85-w, 0.10), scale=scale)
         self.engine.view.resetProjection()
 
-      elif self.display == 2:   #Qstick/BlazinGamer - Combo CD/List
+      elif self.display == 2:   #Qstick/Blazingamer - Combo CD/List
         item  = self.items[self.selectedIndex]
         i = self.selectedIndex
         if not self.listRotation:
           if self.itemLabels[i]:
             imgwidth = self.itemLabels[i].width1()
             wfactor = 214.000/imgwidth
-            self.itemLabels[i].transform.reset()
-            self.itemLabels[i].transform.translate(self.song_listcd_cd_xpos * w,self.song_listcd_cd_ypos*h)
-            self.itemLabels[i].transform.scale(wfactor,-wfactor)
-            self.itemLabels[i].draw() 
+            self.engine.drawImage(self.itemLabels[i], scale = (wfactor,-wfactor),
+                                  coord = (self.song_listcd_cd_xpos * w,self.song_listcd_cd_ypos*h))
         else:
           try:
             glMatrixMode(GL_PROJECTION)
@@ -2771,9 +2689,6 @@ class SongChooser(Layer, KeyListener):
           else:
             pos = (self.selectedIndex-3, self.selectedIndex+4)#Any other item than above
             y = h*0.57
-          
-
-
 
           if self.theme == 0 or self.theme == 1:
             lfont = self.engine.data.songListFont
@@ -2843,44 +2758,27 @@ class SongChooser(Layer, KeyListener):
                 
                 if i == self.selectedIndex:
                   glColor4f(.7,.5,.25,1)
-                  if isinstance(item, Song.SongInfo):
+                  if isinstance(item, Song.SongInfo) or isinstance(item, Song.RandomSongInfo):
                     c1,c2,c3 = self.song_name_selected_color
                     glColor3f(c1,c2,c3)
                   if isinstance(item, Song.LibraryInfo):
                     c1,c2,c3 = self.library_selected_color
                     glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.RandomSongInfo):
-                    c1,c2,c3 = self.song_name_selected_color
-                    glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.TitleInfo):
-                    c1,c2,c3 = self.career_title_color
-                    glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.CareerResetterInfo):
-                    c1,c2,c3 = self.career_title_color
-                    glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.BlankSpaceInfo):
+                  if isinstance(item, Song.TitleInfo) or isinstance(item, Song.CareerResetterInfo) or isinstance(item, Song.BlankSpaceInfo):
                     c1,c2,c3 = self.career_title_color
                     glColor3f(c1,c2,c3)
                 else:
                   glColor4f(0,0,0,1)
-                  if isinstance(item, Song.SongInfo):
-                    c1,c2,c3 = self.song_name_text_color
-                    glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.RandomSongInfo):
+                  if isinstance(item, Song.SongInfo) or isinstance(item, Song.RandomSongInfo):
                     c1,c2,c3 = self.song_name_text_color
                     glColor3f(c1,c2,c3)
                   if isinstance(item, Song.LibraryInfo):
                     c1,c2,c3 = self.library_text_color
                     glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.TitleInfo):
+                  if isinstance(item, Song.TitleInfo) or isinstance(item, Song.CareerResetterInfo) or isinstance(item, Song.BlankSpaceInfo):
                     c1,c2,c3 = self.career_title_color
                     glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.CareerResetterInfo):
-                    c1,c2,c3 = self.career_title_color
-                    glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.BlankSpaceInfo):
-                    c1,c2,c3 = self.career_title_color
-                    glColor3f(c1,c2,c3)
+
                 text = item.name
                 
                 if isinstance(item, Song.SongInfo) and item.getLocked():
@@ -2994,15 +2892,9 @@ class SongChooser(Layer, KeyListener):
           elif self.theme == 2:
             if self.selectedlistcd == None:
               imgwidth = self.selected.width1()
-              self.selected.transform.reset()
-              self.selected.transform.scale(.64, -1.05)
-              self.selected.transform.translate(self.song_listcd_list_xpos * w + (imgwidth*.64/2), y*1.2-h*.215)  #change depending on list Xpos
-              self.selected.draw()
+              self.engine.drawImage(self.selected, scale = (.64, -1.05), coord = (self.song_listcd_list_xpos * w + (imgwidth*.64/2), y*1.2-h*.215))
             else:
-              self.selectedlistcd.transform.reset()
-              self.selectedlistcd.transform.scale(1,-1)
-              self.selectedlistcd.transform.translate(self.song_listcd_list_xpos * w + (imgwidth/2), y*1.2-h*.215)
-              self.selectedlistcd.draw()
+              self.engine.drawImage(self.selectedlistcd, scale = (1,-1), coord =(self.song_listcd_list_xpos * w + (imgwidth/2), y*1.2-h*.215))
             
             glColor4f(1,1,1,1)
             text = self.library
@@ -3071,44 +2963,27 @@ class SongChooser(Layer, KeyListener):
                 
                 if i == self.selectedIndex:
                   glColor4f(.7,.5,.25,1)
-                  if isinstance(item, Song.SongInfo):
+                  if isinstance(item, Song.SongInfo) or isinstance(item, Song.RandomSongInfo):
                     c1,c2,c3 = self.song_name_selected_color
                     glColor3f(c1,c2,c3)
                   if isinstance(item, Song.LibraryInfo):
                     c1,c2,c3 = self.library_selected_color
                     glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.TitleInfo):
-                    c1,c2,c3 = self.career_title_color
-                    glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.CareerResetterInfo):
-                    c1,c2,c3 = self.career_title_color
-                    glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.RandomSongInfo):
-                    c1,c2,c3 = self.song_name_selected_color
-                    glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.BlankSpaceInfo):
+                  if isinstance(item, Song.TitleInfo) or isinstance(item, Song.BlankSpaceInfo) or isinstance(item, Song.CareerResetterInfo):
                     c1,c2,c3 = self.career_title_color
                     glColor3f(c1,c2,c3)
                 else:
                   glColor4f(0,0,0,1)
-                  if isinstance(item, Song.SongInfo):
+                  if isinstance(item, Song.SongInfo) or isinstance(item, Song.RandomSongInfo):
                     c1,c2,c3 = self.song_name_text_color
                     glColor3f(c1,c2,c3)
                   if isinstance(item, Song.LibraryInfo):
                     c1,c2,c3 = self.library_text_color
                     glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.TitleInfo):
+                  if isinstance(item, Song.TitleInfo) or isinstance(item, Song.CareerResetterInfo) or isinstance(item, Song.BlankSpaceInfo):
                     c1,c2,c3 = self.career_title_color
                     glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.CareerResetterInfo):
-                    c1,c2,c3 = self.career_title_color
-                    glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.RandomSongInfo):
-                    c1,c2,c3 = self.song_name_text_color
-                    glColor3f(c1,c2,c3)
-                  if isinstance(item, Song.BlankSpaceInfo):
-                    c1,c2,c3 = self.career_title_color
-                    glColor3f(c1,c2,c3)
+                    
                 text = item.name
                 
                 if isinstance(item, Song.SongInfo) and item.getLocked():
@@ -3232,25 +3107,16 @@ class SongChooser(Layer, KeyListener):
           if self.emptyLabel != None:
             imgwidth = self.emptyLabel.width1()
             wfactor = 155.000/imgwidth
-            self.emptyLabel.transform.reset()
-            self.emptyLabel.transform.translate(.21*w,.59*h)
-            self.emptyLabel.transform.scale(wfactor,-wfactor)
-            self.emptyLabel.draw()
+            self.engine.drawImage(self.emptyLabel, scale = (wfactor,-wfactor), coord = (.21*w,.59*h))
         elif self.itemLabels[i] == "Locked":   #added so that emptylabel.png is only loaded once and not on every empty song
           if self.lockedLabel != None:
             imgwidth = self.lockedLabel.width1()
             wfactor = 155.000/imgwidth
-            self.lockedLabel.transform.reset()
-            self.lockedLabel.transform.translate(.21*w,.59*h)
-            self.lockedLabel.transform.scale(wfactor,-wfactor)
-            self.lockedLabel.draw()
+            self.engine.drawImage(self.lockedLabel, scale = (wfactor,-wfactor), coord = (.21*w,.59*h))
         elif self.itemLabels[i]:
           imgwidth = self.itemLabels[i].width1()
           wfactor = 155.000/imgwidth
-          self.itemLabels[i].transform.reset()
-          self.itemLabels[i].transform.translate(.21*w,.59*h)
-          self.itemLabels[i].transform.scale(wfactor,-wfactor)
-          self.itemLabels[i].draw()
+          self.engine.drawImage(self.itemLabels[i], scale = (wfactor,-wfactor), coord = (.21*w,.59*h))
 
         self.engine.view.setOrthogonalProjection(normalize = True)
         font = self.engine.data.songListFont
@@ -3314,11 +3180,8 @@ class SongChooser(Layer, KeyListener):
             if i >= pos[0] and i <= pos[1]:
               if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
                 if self.tierbg != None:
-                  self.tierbg.transform.reset()
-                  self.tierbg.transform.scale(wfactor,-hfactor)
                   w, h, = self.engine.view.geometry[2:4]
-                  self.tierbg.transform.translate(w/1.587, h-((0.055*h)*(i+1)-pos[0]*(0.055*h))-(0.219*h))
-                  self.tierbg.draw()
+                  self.engine.drawImage(self.tierbg, scale = (wfactor,-hfactor), coord = (w/1.587, h-((0.055*h)*(i+1)-pos[0]*(0.055*h))-(0.219*h)))
 
 
           imgwidth = self.selected.width1()
@@ -3326,10 +3189,7 @@ class SongChooser(Layer, KeyListener):
           wfactor = 381.5/imgwidth
           hfactor = 36.000/imgheight
 
-          self.selected.transform.reset()
-          self.selected.transform.scale(wfactor,-hfactor)
-          self.selected.transform.translate(w/1.587, y*1.2-h*.213)
-          self.selected.draw()
+          self.engine.drawImage(self.selected, scale = (wfactor,-hfactor), coord = (w/1.587, y*1.2-h*.213))
           
           
           if self.diffimg1 != None:
@@ -3376,15 +3236,9 @@ class SongChooser(Layer, KeyListener):
             text = text + " BY BAND DIFFICULTY"
           else:
             text = text + " BY SONG COLLECTION"
-          #
+            
           font.render(text, (.13, .152), scale = 0.0017)
 
-          
-          #glColor4f(1,1,1,1)
-##          text = self.library
-##       w, h = font.getStringSize(text)
-##          if self.filepathenable:
-##            font.render(text, (.05, .01))
           
           if self.searchText:
             text = _("Filter: %s") % (self.searchText) + "|"
@@ -3393,9 +3247,6 @@ class SongChooser(Layer, KeyListener):
             font.render(text, (.05, .7 + v), scale = 0.001)
           elif self.songLoader:
             font.render(_("Loading Preview..."), (.05, .7 + v), scale = 0.001)
-            
-##          x = self.song_cdscore_xpos #Add theme.ini option for song_cdlistscore_xpos
-##          font.render(self.prompt, (self.song_listcd_score_xpos, .05-v))
           
           for i, item in enumerate(self.items):
             if i >= pos[0] and i <= pos[1]:
@@ -3408,11 +3259,8 @@ class SongChooser(Layer, KeyListener):
                       iconNum = self.itemIconNames.index(item.icon)
                       imgwidth = self.itemIcons[iconNum].width1()
                       wfactor = 23.000/imgwidth
-                      self.itemIcons[iconNum].transform.reset()
                       w, h, = self.engine.view.geometry[2:4]
-                      self.itemIcons[iconNum].transform.translate(w/2.86, h-((0.055*h)*(i+1)-pos[0]*(0.055*h))-(0.219*h))
-                      self.itemIcons[iconNum].transform.scale(wfactor,-wfactor)
-                      self.itemIcons[iconNum].draw()
+                      self.engine.drawImage(self.itemIcons[iconNum], scale = (wfactor,-wfactor), coord = (w/2.86, h-((0.055*h)*(i+1)-pos[0]*(0.055*h))-(0.219*h)))
                     except ValueError:
                       iconNum = -1
                 
@@ -3466,43 +3314,22 @@ class SongChooser(Layer, KeyListener):
               maxwidth = .45
               if i == self.selectedIndex:
                 glColor4f(.7,.5,.25,1)
-                if isinstance(item, Song.SongInfo):
+                if isinstance(item, Song.SongInfo) or isinstance(item, Song.LibraryInfo) or isinstance(item, Song.RandomSongInfo):
                   c1,c2,c3 = self.song_rb2_name_selected_color
                   glColor3f(c1,c2,c3)
-                if isinstance(item, Song.LibraryInfo):
-                  c1,c2,c3 = self.song_rb2_name_selected_color
-                  glColor3f(c1,c2,c3)
-                if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
-                  c1,c2,c3 = self.career_title_color
-                  glColor3f(c1,c2,c3)
-                if isinstance(item, Song.CareerResetterInfo):
-                  c1,c2,c3 = self.career_title_color
-                  glColor3f(c1,c2,c3)
-                if isinstance(item, Song.RandomSongInfo):
-                  c1,c2,c3 = self.song_name_selected_color
-                  glColor3f(c1,c2,c3)
-                if isinstance(item, Song.BlankSpaceInfo):
+                if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo) or isinstance(item, Song.CareerResetterInfo) or isinstance(item, Song.BlankSpaceInfo):
                   c1,c2,c3 = self.career_title_color
                   glColor3f(c1,c2,c3)
               else:
                 glColor4f(0,0,0,1)
-                if isinstance(item, Song.SongInfo):
+                if isinstance(item, Song.SongInfo) or isinstance(item, Song.LibraryInfo):
                   c1,c2,c3 = self.song_rb2_name_color
                   glColor3f(c1,c2,c3)
-                if isinstance(item, Song.LibraryInfo):
-                  c1,c2,c3 = self.song_rb2_name_color
-                  glColor3f(c1,c2,c3)
-                if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
-                  c1,c2,c3 = self.career_title_color
-                  glColor3f(c1,c2,c3)
-                if isinstance(item, Song.CareerResetterInfo):
+                if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo) or isinstance(item, Song.CareerResetterInfo) or isinstance(item, Song.BlankSpaceInfo):
                   c1,c2,c3 = self.career_title_color
                   glColor3f(c1,c2,c3)
                 if isinstance(item, Song.RandomSongInfo):
                   c1,c2,c3 = self.song_name_text_color
-                  glColor3f(c1,c2,c3)
-                if isinstance(item, Song.BlankSpaceInfo):
-                  c1,c2,c3 = self.career_title_color
                   glColor3f(c1,c2,c3)
               
               text = item.name
@@ -3517,13 +3344,9 @@ class SongChooser(Layer, KeyListener):
 
               # evilynux - Force uppercase display for Career titles
               if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
-                text = string.upper(text)
                 maxwidth = .55
                 
-              if isinstance(item, Song.CareerResetterInfo):
-                text = string.upper(text)
-
-              if isinstance(item, Song.BlankSpaceInfo):
+              if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo) or isinstance(item, Song.CareerResetterInfo) or isinstance(item, Song.BlankSpaceInfo):
                 text = string.upper(text)
                 
               scale = .0015
@@ -3609,14 +3432,11 @@ class SongChooser(Layer, KeyListener):
                   w, h = font.getStringSize(text, scale=scale)
                   
                   font.render(text, (.92-w, .0413*(i+1)-pos[0]*.0413+.15), scale=scale)
-           
-                    
   
                   if self.scoreTimer < 1000:
                     self.scoreTimer += 1
                   else:
                     self.scoreTimer = 0
-  
                     
                   if i == self.selectedIndex:
                     text = item.artist
@@ -3638,8 +3458,6 @@ class SongChooser(Layer, KeyListener):
                     
                     text = string.upper(text)
                     font.render(text, (.095, .44), scale = scale)
-                 
-  
                     
                     albumtag = item.album
                       
@@ -3655,16 +3473,10 @@ class SongChooser(Layer, KeyListener):
   
                     font.render(albumtag, (.095, .47), scale = 0.0015)
                     
-  
                     genretag = item.genre
+                    font.render(genretag, (.095, .49), scale = 0.0015)                                
   
-  
-                    font.render(genretag, (.095, .49), scale = 0.0015)                    
-                    
-  
-                    yeartag = item.year
-  
-                      
+                    yeartag = item.year           
                     font.render(yeartag, (.095, .51), scale = 0.0015)
 
                  
@@ -3692,21 +3504,12 @@ class SongChooser(Layer, KeyListener):
                           font.render("N/A", (.18, .57 + i*.025), scale = 0.0014)
                         elif diff == 6:
                           for k in range(0,5):
-                            self.diffimg3.transform.reset()
-                            self.diffimg3.transform.scale(wfactor1,-wfactor1)
-                            self.diffimg3.transform.translate((.19+.03*k)*w, (0.22-.035*i)*h)
-                            self.diffimg3.draw()
+                            self.engine.drawImage(self.diffimg3, scale = (wfactor1,-wfactor1), coord = ((.19+.03*k)*w, (0.22-.035*i)*h))
                         else:
                           for k in range(0,diff):
-                            self.diffimg2.transform.reset()
-                            self.diffimg2.transform.scale(wfactor1,-wfactor1)
-                            self.diffimg2.transform.translate((.19+.03*k)*w, (0.22-.035*i)*h)
-                            self.diffimg2.draw()
+                            self.engine.drawImage(self.diffimg2, scale = (wfactor1,-wfactor1), coord = ((.19+.03*k)*w, (0.22-.035*i)*h))
                           for k in range(0, 5-diff):
-                            self.diffimg1.transform.reset()
-                            self.diffimg1.transform.scale(wfactor1,-wfactor1)
-                            self.diffimg1.transform.translate((.31-.03*k)*w, (0.22-.035*i)*h)
-                            self.diffimg1.draw()
+                            self.engine.drawImage(self.diffimg1, scale = (wfactor1,-wfactor1), coord = ((.31-.03*k)*w, (0.22-.035*i)*h))
            
         finally:
           text = self.instrumentNice + " - " + self.diffNice
@@ -3866,20 +3669,13 @@ class FileChooser(BackgroundLayer, KeyListener):
       #MFH - auto background scaling 
       imgwidth = self.neckBlackBack.width1()
       wfactor = 640.000/imgwidth
-      self.neckBlackBack.transform.reset()
-      self.neckBlackBack.transform.translate(w/2,h/2)
-      self.neckBlackBack.transform.scale(wfactor,-wfactor)
-      self.neckBlackBack.draw()  
+      self.engine.drawImage(self.neckBlackBack, scale = (wfactor,-wfactor), coord = (w/2,h/2))
 
 
     #MFH - auto background scaling 
     imgwidth = self.background.width1()
     wfactor = 640.000/imgwidth
-    self.background.transform.reset()
-    self.background.transform.translate(w/2,h/2)
-    #self.background.transform.scale(1,-1)
-    self.background.transform.scale(wfactor,-wfactor)
-    self.background.draw()  
+    self.engine.drawImage(self.background, scale = (wfactor,-wfactor), coord = (w/2,h/2))
 
 
       
@@ -4058,10 +3854,7 @@ class NeckChooser(BackgroundLayer, KeyListener):
      #MFH - auto background scaling
      imgwidth = self.neckBlackBack.width1()
      wfactor = 640.000/imgwidth
-     self.neckBlackBack.transform.reset()
-     self.neckBlackBack.transform.translate(w/2,h/2)
-     self.neckBlackBack.transform.scale(wfactor,-wfactor)
-     self.neckBlackBack.draw()  
+     self.engine.drawImage(self.neckBlackBack, scale = (wfactor,-wfactor), coord = (w/2,h/2))
 
 
 
@@ -4131,57 +3924,34 @@ class NeckChooser(BackgroundLayer, KeyListener):
 
 
    wfactor = currentNeck.widthf(pixelw = self.wfac)
-   currentNeck.transform.reset()
    if self.theme != 2:
-     currentNeck.transform.translate(w/1.31,h/2)
+     neckcoord = (w/1.31,h/2)
    else:
-     currentNeck.transform.translate(w/1.22,h/2)
-   currentNeck.transform.scale(-wfactor,wfactor)
-   currentNeck.draw()
+     neckcoord = (w/1.22,h/2)
+   self.engine.drawImage(currentNeck, scale = (-wfactor,wfactor), coord = neckcoord)
+   
 
    wfactor = lastNeck1.widthf(pixelw = self.wfac2)
-   lastNeck1.transform.reset()
-   lastNeck1.transform.translate(self.x1,self.y1)
-   lastNeck1.transform.scale(-wfactor,wfactor)
-   lastNeck1.draw()
+   self.engine.drawImage(lastNeck1, scale = (-wfactor,wfactor), coord = (self.x1,self.y1))
    wfactor = lastNeck.widthf(pixelw = self.wfac2)
-   lastNeck.transform.reset()
-   lastNeck.transform.translate(self.x2,self.y2)
-   lastNeck.transform.scale(-wfactor,wfactor)
-   lastNeck.draw()
+   self.engine.drawImage(lastNeck, scale = (-wfactor,wfactor), coord = (self.x2,self.y2))
    wfactor = currentNeck.widthf(pixelw = self.wfac2)
-   currentNeck.transform.reset()
-   currentNeck.transform.translate(self.x3,self.y3)
-   currentNeck.transform.scale(-wfactor,wfactor)
-   currentNeck.draw()
+   self.engine.drawImage(currentNeck, scale = (-wfactor,wfactor), coord = (self.x3,self.y3))
    wfactor = nextNeck.widthf(pixelw = self.wfac2)
-   nextNeck.transform.reset()
-   nextNeck.transform.translate(self.x4,self.y4)
-   nextNeck.transform.scale(-wfactor,wfactor)
-   nextNeck.draw()
+   self.engine.drawImage(nextNeck, scale = (-wfactor,wfactor), coord = (self.x4,self.y4))   
    wfactor = nextNeck1.widthf(pixelw = self.wfac2)
-   nextNeck1.transform.reset()
-   nextNeck1.transform.translate(self.x5,self.y5)
-   nextNeck1.transform.scale(-wfactor,wfactor)
-   nextNeck1.draw()
-
+   self.engine.drawImage(nextNeck1, scale = (-wfactor,wfactor), coord = (self.x5,self.y5))
+   
    if self.menu.currentIndex == 0:
-     self.neckSelect.transform.reset()
-     self.neckSelect.transform.translate(self.x6, self.y6)
-     self.neckSelect.transform.scale(-1,1)
-     self.neckSelect.draw()
+     self.engine.drawImage(self.neckSelect, scale = (-1,1), coord = (self.x6, self.y6))
 
    #MFH - draw neck BG on top of necks
    #MFH - auto background scaling
    imgwidth = self.neckBG.width1()
    wfactor = 640.000/imgwidth
-   self.neckBG.transform.reset()
-   self.neckBG.transform.translate(w/2,h/2)
-   self.neckBG.transform.scale(wfactor,-wfactor)
-   self.neckBG.draw()  
+   self.engine.drawImage(self.neckBG, scale = (wfactor,-wfactor), coord = (w/2,h/2))
 
-
-     
+  
    self.engine.view.setOrthogonalProjection(normalize = True)
    font = self.engine.data.font
    
@@ -4281,11 +4051,7 @@ class ItemChooser(BackgroundLayer, KeyListener):
     #MFH - auto background scaling 
     imgwidth = self.background.width1()
     wfactor = 640.000/imgwidth
-    self.background.transform.reset()
-    self.background.transform.translate(w/2,h/2)
-    #self.background.transform.scale(1,-1)
-    self.background.transform.scale(wfactor,-wfactor)
-    self.background.draw()  
+    self.engine.drawImage(self.background, scale = (wfactor,-wfactor), coord = (w/2,h/2))
 
       
     self.engine.view.setOrthogonalProjection(normalize = True)
@@ -4832,10 +4598,7 @@ class LoadingSplashScreen(Layer, KeyListener):
       fadeScreen(v)
 
       w, h = self.engine.view.geometry[2:4]
-      self.engine.data.loadingImage.transform.reset()
-      self.engine.data.loadingImage.transform.translate(w / 2, h / 2)
-      self.engine.data.loadingImage.transform.scale(.5, -.5)
-      self.engine.data.loadingImage.draw(color = (1, 1, 1, 1))
+      self.engine.drawImage(self.engine.data.loadingImage, scale = (.5, -.5), coord = (w / 2, h / 2))
 
       Theme.setBaseColor(1 - v)
       
