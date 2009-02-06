@@ -232,7 +232,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     self.numOfPlayers = len(self.playerList)        #MFH - MUST be in front of loadSettings call!
     
-    self.autoPlay         = self.engine.config.get("game", "jurgdef")
+    self.autoPlay         = self.engine.config.get("game", "jurgmode")
+    if self.autoPlay == 0:
+      self.autoPlay = True
+    else:
+      self.autoPlay = False
     self.playerAssist = [None] * 2
     self.playerAssist[0] = self.engine.config.get("game", "p1_assist")
     self.playerAssist[1] = self.engine.config.get("game", "p2_assist")
@@ -2102,9 +2106,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     #MFH - no Jurgen in Career mode.
     if self.careerMode:
-      self.autoPlay = 1
+      self.autoPlay = False
     else:
-      self.autoPlay         = self.engine.config.get("game", "jurgdef")
+      self.autoPlay         = self.engine.config.get("game", "jurgmode")
+      if self.autoPlay == 0:
+        self.autoPlay = True
+      else:
+        self.autoPlay = False
 
     self.hopoStyle        = self.engine.config.get("game", "hopo_system")
     self.gh2sloppy        = self.engine.config.get("game", "gh2_sloppy")
@@ -2597,7 +2605,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             elif self.guitarSoloAccuracyDisplayPos == 3:  #racer: rock band 
               if self.hitAccuracyPos == 0: #Center - need to move solo text above this!
                 self.solo_yOffset[i] = 0.100    #above Jurgen Is Here
-              elif self.jurgPlayer[i] and self.autoPlay != 1:
+              elif self.jurgPlayer[i] and self.autoPlay:
                 self.solo_yOffset[i] = 0.140    #above Jurgen Is Here
               else:   #no jurgens here:
                 self.solo_yOffset[i] = 0.175    #was 0.210, occluded notes
