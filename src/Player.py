@@ -27,6 +27,7 @@
 import pygame
 import Config
 import Song
+import Scorekeeper
 from Language import _
 
 import Log
@@ -526,32 +527,8 @@ class Player(object):
     
     self.hopoFreq = None
     
-    self.handicapMult = 0.0 #akedrou
-    self.handicap = 0x0
-    self.stars = 0
-    self.totalStreakNotes = 0
-    self.totalNotes = 0
-    self.freestyleSkippedNotes = 0 #volshebnyi
-    
-    self.endingScore = 0    #MFH
-    self.endingStreakBroken = False   #MFH
-    self.endingAwarded = False    #MFH
-    self.lastNoteEvent = None    #MFH
-    self.freestyleWasJustActive = False  #MFH
-    
   def reset(self):
-    self.score         = 0
-    self._streak       = 0
-    self.notesHit      = 0
-    self.longestStreak = 0
-    self.cheating      = False
     self.twoChord      = 0
-    self.endingScore = 0    #MFH
-
-    self.endingStreakBroken = False   #MFH
-    self.endingAwarded = False    #MFH
-    #self.lastNoteEvent = None    #MFH
-    self.freestyleWasJustActive = False  #MFH
     
   def getName(self):
     return Config.get(self.playerstring, "name")
@@ -560,15 +537,6 @@ class Player(object):
     Config.set(self.playerstring, "name", name)
     
   name = property(getName, setName)
-  
-  def getStreak(self):
-    return self._streak
-    
-  def setStreak(self, value):
-    self._streak = value
-    self.longestStreak = max(self._streak, self.longestStreak)
-    
-  streak = property(getStreak, setStreak)
     
   def getDifficulty(self):
     return Song.difficulties.get(Config.get(self.playerstring, "difficulty"))
@@ -599,23 +567,3 @@ class Player(object):
     
   difficulty = property(getDifficulty, setDifficulty)
   part = property(getPart, setPart)
-  
-  def addScore(self, score):
-    self.score += score * self.getScoreMultiplier()
-
-  def addEndingScore(self):
-    self.score += self.endingScore
-
-  def getScoreMultiplier(self):
-    
-    #if self.getPart() == "Bass Guitar":    #myfingershurt: bass groove
-    if self.part.id == Song.BASS_PART and self.bassGrooveEnabled:    #myfingershurt: bass groove
-      try:
-        return BASS_GROOVE_SCORE_MULTIPLIER.index((self.streak / 10) * 10) + 1
-      except ValueError:
-        return len(BASS_GROOVE_SCORE_MULTIPLIER)
-    else:
-      try:
-        return SCORE_MULTIPLIER.index((self.streak / 10) * 10) + 1
-      except ValueError:
-        return len(SCORE_MULTIPLIER)

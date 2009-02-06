@@ -1930,18 +1930,27 @@ class SongChooser(Layer, KeyListener):
                 
                 if scores:
                   score, stars, name, scoreExt = scores[0]
-                  notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 = scoreExt
+                  try:
+                    notesHit, notesTotal, noteStreak, modVersion, handicap, handicapLong, originalScore = scoreExt
+                  except ValueError:
+                    notesHit, notesTotal, noteStreak, modVersion, oldScores1, oldScores2 = scoreExt
+                    handicap = 0
+                    handicapLong = "None"
+                    originalScore = score
                 else:
                   score, stars, name = "---", 0, "---"
                 Theme.setBaseColor(1 - v)
                 font.render(unicode(d),     (x, y),           scale = scale)
                 # evilynux - Fixed star size following Font render bugfix
-                if stars == 6 and self.theme == 2:    #gold stars in RB songlist
+                if stars == 7: #akedrou
+                  glColor3f(0, .5, 1) #should be customizable
+                  font.render(unicode(Data.STAR2 * 5), (x, y + h), scale = scale * 1.8)
+                elif stars == 6 and self.theme == 2:    #gold stars in RB songlist
                   glColor3f(1, 1, 0)  
-                  font.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
+                  font.render(unicode(Data.STAR2 * 5), (x, y + h), scale = scale * 1.8)
                 elif stars == 6:
                   glColor3f(0, 1, 0)  
-                  font.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
+                  font.render(unicode(Data.STAR2 * 5), (x, y + h), scale = scale * 1.8)
                 else:
                   font.render(unicode(Data.STAR2 * stars + Data.STAR1 * (5 - stars)), (x, y + h), scale = scale * 1.8)
                 Theme.setSelectedColor(1 - v)
@@ -2256,17 +2265,29 @@ class SongChooser(Layer, KeyListener):
                       scores = item.getHighscoresWithPartString(d, part = self.instrument)
                       if scores:
                         score, stars, name, scoreExt = scores[0]
-                        notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 = scoreExt
+                        try:
+                          notesHit, notesTotal, noteStreak, modVersion, handicap, handicapLong, originalScore = scoreExt
+                        except ValueError:
+                          notesHit, notesTotal, noteStreak, modVersion, oldScores1, oldScores2 = scoreExt
+                          handicap = 0
+                          handicapLong = "None"
+                          originalScore = score
                       else:
                         score, stars, name = 0, 0, "---"
   
                   #QQstarS:add  to show stars
-                  if stars == 6:
+                  if stars == 7:
+                    glColor3f(1, 1, 1)  # ought there be some special glyph for the perfect/fc scores..?
+                    if self.extraStats:
+                      lfont.render(unicode(Data.STAR4 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.1825-0.034), scale = scale * 2.0) #Worldrave - Uses STAR3 and STAR4 now w/ fallback
+                    else:
+                      lfont.render(unicode(Data.STAR4 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.2-0.034), scale = scale * 2.0) #Worldrave - Uses STAR3 and STAR4 now w/ fallback
+                  elif stars == 6:
                     glColor3f(1, 1, 1)  
                     if self.extraStats:
-                      lfont.render(unicode(Data.STAR4 * (stars -1)), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.1825-0.034), scale = scale * 2.0) #Worldrave - Uses STAR3 and STAR4 now w/ fallback
+                      lfont.render(unicode(Data.STAR4 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.1825-0.034), scale = scale * 2.0) #Worldrave - Uses STAR3 and STAR4 now w/ fallback
                     else:
-                      lfont.render(unicode(Data.STAR4 * (stars -1)), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.2-0.034), scale = scale * 2.0) #Worldrave - Uses STAR3 and STAR4 now w/ fallback
+                      lfont.render(unicode(Data.STAR4 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.2-0.034), scale = scale * 2.0) #Worldrave - Uses STAR3 and STAR4 now w/ fallback
                   elif score>0 and stars>=0 and name!="":
                     glColor3f(1, 1, 1)
                     #ShiekOdaSandz: Fixed stars so they display left to right, not right to left
@@ -2538,19 +2559,31 @@ class SongChooser(Layer, KeyListener):
                       scores = item.getHighscoresWithPartString(d, part = self.instrument)
                       if scores:
                         score, stars, name, scoreExt = scores[0]
-                        notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 = scoreExt
+                        try:
+                          notesHit, notesTotal, noteStreak, modVersion, handicap, handicapLong, originalScore = scoreExt
+                        except ValueError:
+                          notesHit, notesTotal, noteStreak, modVersion, oldScores1, oldScores2 = scoreExt
+                          handicap = 0
+                          handicapLong = "None"
+                          originalScore = score
                       else:
                         score, stars, name = 0, 0, "---"
   
                   #QQstarS:add  to show stars
                   # evilynux - Tweaked position to fit hit% and note streak
                   #            Readjusted star size following font fix
+                  if stars == 7:
+                    glColor3f(.6, .6, .75)    #platinum-y? stars in RB theme
+                    if self.extraStats:
+                      font.render(unicode(Data.STAR2 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.18-0.0145), scale = scale * 1.8)
+                    else:
+                      font.render(unicode(Data.STAR2 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.2-0.0145), scale = scale * 1.8)
                   if stars == 6:
                     glColor3f(1, 1, 0)    #gold stars in RB theme
                     if self.extraStats:
-                      font.render(unicode(Data.STAR2 * (stars -1)), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.18-0.0145), scale = scale * 1.8)
+                      font.render(unicode(Data.STAR2 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.18-0.0145), scale = scale * 1.8)
                     else:
-                      font.render(unicode(Data.STAR2 * (stars -1)), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.2-0.0145), scale = scale * 1.8)
+                      font.render(unicode(Data.STAR2 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.2-0.0145), scale = scale * 1.8)
                   elif score>0 and stars>=0 and name!="":
                     glColor3f(1, 1, 1)
                     # ShiekOdaSandz: Fixed stars so they display left to right, not right to left
@@ -2861,7 +2894,13 @@ class SongChooser(Layer, KeyListener):
                       scores =  item.getHighscoresWithPartString(d, part = self.instrument)
                       if scores:
                         score, stars, name, scoreExt = scores[0]
-                        notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 = scoreExt
+                        try:
+                          notesHit, notesTotal, noteStreak, modVersion, handicap, handicapLong, originalScore = scoreExt
+                        except ValueError:
+                          notesHit, notesTotal, noteStreak, modVersion, oldScores1, oldScores2 = scoreExt
+                          handicap = 0
+                          handicapLong = "None"
+                          originalScore = score
                       else:
                         score, stars, name = "---", 0, "---"
                       #Theme.setBaseColor(1 - v)
@@ -3061,12 +3100,24 @@ class SongChooser(Layer, KeyListener):
                       scores =  item.getHighscoresWithPartString(d, part = self.instrument)
                       if scores:
                         score, stars, name, scoreExt = scores[0]
-                        notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 = scoreExt
+                        try:
+                          notesHit, notesTotal, noteStreak, modVersion, handicap, handicapLong, originalScore = scoreExt
+                        except ValueError:
+                          notesHit, notesTotal, noteStreak, modVersion, oldScores1, oldScores2 = scoreExt
+                          handicap = 0
+                          handicapLong = "None"
+                          originalScore = score
                       else:
                         score, stars, name = "---", 0, "---"
                       
                       font.render(unicode(d),     (x, y),           scale = scale)
                       
+                      if stars == 7 and self.theme == 2:
+                        glColor3f(.6, .6, .75)  
+                        font.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
+                      elif stars == 7:
+                        glColor3f(0, .75, 1)  
+                        font.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
                       if stars == 6 and self.theme == 2:
                         glColor3f(1, 1, 0)  
                         font.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
@@ -3200,18 +3251,18 @@ class SongChooser(Layer, KeyListener):
           c1,c2,c3 = self.song_rb2_diff_color
           glColor3f(c1,c2,c3)
           
-          font.render("DIFFICULTY", (.095, .54), scale = 0.0018)
+          font.render(_("DIFFICULTY"), (.095, .54), scale = 0.0018)
           scale = 0.0014
-          text = "BAND"
+          text = _("BAND")
           w, h = font.getStringSize(text, scale = scale)
           font.render(text, (.17 - w, .57), scale = scale)
-          text = "GUITAR"
+          text = _("GUITAR")
           w, h = font.getStringSize(text, scale = scale)
           font.render(text, (.17 - w, .595), scale = scale)
-          text = "DRUM"
+          text = _("DRUM")
           w, h = font.getStringSize(text, scale = scale)
           font.render(text, (.17 - w, .62), scale = scale)
-          text = "BASS"
+          text = _("BASS")
           w, h = font.getStringSize(text, scale = scale)
           font.render(text, (.17 - w, .645), scale = scale)
 
@@ -3219,23 +3270,23 @@ class SongChooser(Layer, KeyListener):
 
 
           #Qstick - Sorting Text
-          text = "SORTING:    "
+          text = _("SORTING:") + "     "
           if self.sortOrder == 0: #title
-            text = text + " ALPHABETICALLY BY TITLE"
+            text = text + _("ALPHABETICALLY BY TITLE")
           elif self.sortOrder == 1: #artist
-            text = text + " ALPHABETICALLY BY ARTIST"
+            text = text + _("ALPHABETICALLY BY ARTIST")
           elif self.sortOrder == 2: #timesplayed
-            text = text + " BY PLAY COUNT"
+            text = text + _("BY PLAY COUNT")
           elif self.sortOrder == 3: #album
-            text = text + " ALPHABETICALLY BY ALBUM"
+            text = text + _("ALPHABETICALLY BY ALBUM")
           elif self.sortOrder == 4: #genre
-            text = text + " ALPHABETICALLY BY GENRE"
+            text = text + _("ALPHABETICALLY BY GENRE")
           elif self.sortOrder == 5: #year
-            text = text + " BY YEAR"
+            text = text + _("BY YEAR")
           elif self.sortOrder == 6: #Band Difficulty
-            text = text + " BY BAND DIFFICULTY"
+            text = text + _("BY BAND DIFFICULTY")
           else:
-            text = text + " BY SONG COLLECTION"
+            text = text + _("BY SONG COLLECTION")
             
           font.render(text, (.13, .152), scale = 0.0017)
 
@@ -3414,7 +3465,13 @@ class SongChooser(Layer, KeyListener):
                       scores = item.getHighscoresWithPartString(d, part = self.instrument)
                       if scores:
                         score, stars, name, scoreExt = scores[0]
-                        notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 = scoreExt
+                        try:
+                          notesHit, notesTotal, noteStreak, modVersion, handicap, handicapLong, originalScore = scoreExt
+                        except ValueError:
+                          notesHit, notesTotal, noteStreak, modVersion, oldScores1, oldScores2 = scoreExt
+                          handicap = 0
+                          handicapLong = "None"
+                          originalScore = score
                       else:
                         score, stars, name = 0, 0, "---"
   

@@ -276,11 +276,17 @@ class SongInfo(object):
           if scores_ext != "":
             #Someone may have mixed extended and non extended
             try:
-              hash_ext, stars2, notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 =  scores_ext[difficulty.id][i]
-              scoreExt = (notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2)
+              if len(scores_ext[difficulty.id][i]) < 9:
+                hash_ext, stars2, notesHit, notesTotal, noteStreak, modVersion, oldInfo, oldInfo2 =  scores_ext[difficulty.id][i]
+                handicapValue = 0
+                longHandicap = "None"
+                originalScore = 0
+              else:
+                hash_ext, stars2, notesHit, notesTotal, noteStreak, modVersion, handicapValue, longHandicap, originalScore =  scores_ext[difficulty.id][i]
+              scoreExt = (notesHit, notesTotal, noteStreak, modVersion, handicapValue, longHandicap, originalScore)
             except:
               hash_ext = 0
-              scoreExt = (0, 0, 0 , "RF-mod", "Default", "Default")
+              scoreExt = (0, 0, 0 , "RF-mod", 0, "None", 0)
           if self.getScoreHash(difficulty, score, stars, name) == hash:
             if scores_ext != "" and hash == hash_ext:
               self.addHighscore(difficulty, score, stars, name, part = parts[GUITAR_PART], scoreExt = scoreExt)
@@ -312,11 +318,17 @@ class SongInfo(object):
           if scores_ext != "":
             #Someone may have mixed extended and non extended
             try:
-              hash_ext, stars2, notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 =  scores_ext[difficulty.id][i]
-              scoreExt = (notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2)
+              if len(scores_ext[difficulty.id][i]) < 9:
+                hash_ext, stars2, notesHit, notesTotal, noteStreak, modVersion, oldInfo, oldInfo2 =  scores_ext[difficulty.id][i]
+                handicapValue = 0
+                longHandicap = "None"
+                originalScore = 0
+              else:
+                hash_ext, stars2, notesHit, notesTotal, noteStreak, modVersion, handicapValue, longHandicap, originalScore =  scores_ext[difficulty.id][i]
+              scoreExt = (notesHit, notesTotal, noteStreak, modVersion, handicapValue, longHandicap, originalScore)
             except:
               hash_ext = 0
-              scoreExt = (0, 0, 0 , "RF-mod", "Default", "Default")
+              scoreExt = (0, 0, 0 , "RF-mod", 0, "None", 0)
           if self.getScoreHash(difficulty, score, stars, name) == hash:
             if scores_ext != "" and hash == hash_ext:
               self.addHighscore(difficulty, score, stars, name, part = parts[RHYTHM_PART], scoreExt = scoreExt)
@@ -348,11 +360,17 @@ class SongInfo(object):
           if scores_ext != "":
             #Someone may have mixed extended and non extended
             try:
-              hash_ext, stars2, notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 =  scores_ext[difficulty.id][i]
-              scoreExt = (notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2)
+              if len(scores_ext[difficulty.id][i]) < 9:
+                hash_ext, stars2, notesHit, notesTotal, noteStreak, modVersion, oldInfo, oldInfo2 =  scores_ext[difficulty.id][i]
+                handicapValue = 0
+                longHandicap = "None"
+                originalScore = 0
+              else:
+                hash_ext, stars2, notesHit, notesTotal, noteStreak, modVersion, handicapValue, longHandicap, originalScore =  scores_ext[difficulty.id][i]
+              scoreExt = (notesHit, notesTotal, noteStreak, modVersion, handicapValue, longHandicap, originalScore)
             except:
               hash_ext = 0
-              scoreExt = (0, 0, 0 , "RF-mod", "Default", "Default")
+              scoreExt = (0, 0, 0 , "RF-mod", 0, "None", 0)
           if self.getScoreHash(difficulty, score, stars, name) == hash:
             if scores_ext != "" and hash == hash_ext:
               self.addHighscore(difficulty, score, stars, name, part = parts[BASS_PART], scoreExt = scoreExt)
@@ -384,11 +402,17 @@ class SongInfo(object):
           if scores_ext != "":
             #Someone may have mixed extended and non extended
             try:
-              hash_ext, stars2, notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 =  scores_ext[difficulty.id][i]
-              scoreExt = (notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2)
+              if len(scores_ext[difficulty.id][i]) < 9:
+                hash_ext, stars2, notesHit, notesTotal, noteStreak, modVersion, oldInfo, oldInfo2 =  scores_ext[difficulty.id][i]
+                handicapValue = 0
+                longHandicap = "None"
+                originalScore = 0
+              else:
+                hash_ext, stars2, notesHit, notesTotal, noteStreak, modVersion, handicapValue, longHandicap, originalScore =  scores_ext[difficulty.id][i]
+              scoreExt = (notesHit, notesTotal, noteStreak, modVersion, handicapValue, longHandicap, originalScore)
             except:
               hash_ext = 0
-              scoreExt = (0, 0, 0 , "RF-mod", "Default", "Default")
+              scoreExt = (0, 0, 0 , "RF-mod", 0, "None", 0)
           if self.getScoreHash(difficulty, score, stars, name) == hash:
             if scores_ext != "" and hash == hash_ext:
               self.addHighscore(difficulty, score, stars, name, part = parts[LEAD_PART], scoreExt = scoreExt)
@@ -421,11 +445,17 @@ class SongInfo(object):
           if scores_ext != "":
             #Someone may have mixed extended and non extended
             try:
-              hash_ext, stars2, notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2 =  scores_ext[difficulty.id][i]
-              scoreExt = (notesHit, notesTotal, noteStreak, modVersion, modOptions1, modOptions2)
+              if len(scores_ext[difficulty.id][i]) < 9:
+                hash_ext, stars2, notesHit, notesTotal, noteStreak, modVersion, oldInfo, oldInfo2 =  scores_ext[difficulty.id][i]
+                handicapValue = 0
+                longHandicap = "None"
+                originalScore = 0
+              else:
+                hash_ext, stars2, notesHit, notesTotal, noteStreak, modVersion, handicapValue, longHandicap, originalScore =  scores_ext[difficulty.id][i]
+              scoreExt = (notesHit, notesTotal, noteStreak, modVersion, handicapValue, longHandicap, originalScore)
             except:
               hash_ext = 0
-              scoreExt = (0, 0, 0 , "RF-mod", "Default", "Default")
+              scoreExt = (0, 0, 0 , "RF-mod", 0, "None", 0)
           if self.getScoreHash(difficulty, score, stars, name) == hash:
             if scores_ext != "" and hash == hash_ext:
               self.addHighscore(difficulty, score, stars, name, part = parts[DRUM_PART], scoreExt = scoreExt)
@@ -764,7 +794,7 @@ class SongInfo(object):
       return False
     return True
   
-  def addHighscore(self, difficulty, score, stars, name, part = parts[GUITAR_PART], scoreExt = (0, 0, 0, "RF-mod", "Default", "Default")):
+  def addHighscore(self, difficulty, score, stars, name, part = parts[GUITAR_PART], scoreExt = (0, 0, 0, "RF-mod", 0, "None", 0)):
     if part == parts[GUITAR_PART]:
       highScores = self.highScores
     elif part == parts[RHYTHM_PART]:

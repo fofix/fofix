@@ -259,6 +259,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "game", "big_rock_logic", autoApply = True),	#volshebnyi
       ConfigChoice(engine, engine.config, "game", "starpower_mode", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "party_time", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "keep_play_count", autoApply = True),
     ]
     FoFiXAdvancedSettingsMenu = Menu.Menu(engine, FoFiXAdvancedSettings)
     
@@ -602,7 +603,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "game",  "whammy_changes_sort_order", autoApply = True), #stump
       ConfigChoice(engine, engine.config, "game", "songlist_extra_stats", autoApply = True), #evilynux
       ConfigChoice(engine, engine.config, "game", "HSMovement", autoApply = True), #racer
-      ConfigChoice(engine, engine.config, "performance", "disable_libcount", autoApply = True), 
+      ConfigChoice(engine, engine.config, "performance", "disable_libcount", autoApply = True, isQuickset = 1), 
       ConfigChoice(engine, engine.config, "performance", "cache_song_metadata", autoApply = True, isQuickset = 1), #stump
     ]
     listSettingsMenu = Menu.Menu(engine, listSettings)
@@ -770,6 +771,7 @@ class SettingsMenu(Menu.Menu):
       self.config.set("audio", "enable_crowd_tracks", 0)
       self.config.set("performance", "in_game_stats", 0)
       self.config.set("performance", "static_strings", True)
+      self.config.set("performance", "disable_libcount", True)
       self.config.set("performance", "killfx", 2)
       self.config.set("performance", "star_score_updates", 0)
       self.config.set("performance", "preload_glyph_cache", False)
@@ -795,6 +797,7 @@ class SettingsMenu(Menu.Menu):
       self.config.set("audio", "enable_crowd_tracks", 1)
       self.config.set("performance", "in_game_stats", 0)
       self.config.set("performance", "static_strings", True)
+      self.config.set("performance", "disable_libcount", True)
       self.config.set("performance", "killfx", 0)
       self.config.set("performance", "star_score_updates", 0)
       self.config.set("performance", "preload_glyph_cache", True)
@@ -818,6 +821,7 @@ class SettingsMenu(Menu.Menu):
       self.config.set("audio", "enable_crowd_tracks", 1)
       self.config.set("performance", "in_game_stats", 2)
       self.config.set("performance", "static_strings", True)
+      self.config.set("performance", "disable_libcount", True)
       self.config.set("performance", "killfx", 0)
       self.config.set("performance", "star_score_updates", 1)
       self.config.set("performance", "preload_glyph_cache", True)
@@ -841,6 +845,7 @@ class SettingsMenu(Menu.Menu):
       self.config.set("audio", "enable_crowd_tracks", 1)
       self.config.set("performance", "in_game_stats", 2)
       self.config.set("performance", "static_strings", False)
+      self.config.set("performance", "disable_libcount", False)
       self.config.set("performance", "killfx", 0)
       self.config.set("performance", "star_score_updates", 1)
       self.config.set("performance", "preload_glyph_cache", True)

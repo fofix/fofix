@@ -191,13 +191,24 @@ Config.define("theme", "fail_completed_color",  str, "#FFFFFF")
 Config.define("theme", "fail_selected_color",  str, "#FFBF00")
 
 Config.define("theme", "result_score", str, ".5,.11,0.0025")
-Config.define("theme", "result_song", str, ".05,.045,.002,%s Finished!")
-Config.define("theme", "result_star", str, ".5,.35,0.0017")
-Config.define("theme", "result_stats_diff", str, ".5,.55,0.002,Difficulty: %s")
-Config.define("theme", "result_stats_part", str, ".5,.64,0.002,Part: %s")
-Config.define("theme", "result_stats_streak", str, ".5,.58,0.002,Long Streak: %s")
-Config.define("theme", "result_stats_accuracy", str, ".5,.61,0.002,Accuracy: %.1f%%")
-Config.define("theme", "result_stats_notes", str, ".5,.52,0.002,%s Notes Hit")
+Config.define("theme", "result_song", str, ".05,.045,.002")
+Config.define("theme", "result_song_text", str, "%s Finished!")
+Config.define("theme", "result_star", str, ".5,.35,0.0017,0.5")
+Config.define("theme", "result_stats_diff", str, ".5,.55,0.002,None")
+Config.define("theme", "result_stats_diff_text", str, "Difficulty: %s")
+Config.define("theme", "result_stats_part", str, ".5,.64,0.002,None")
+Config.define("theme", "result_stats_part_text", str, "Part: %s")
+Config.define("theme", "result_stats_streak", str, ".5,.58,0.002,None")
+Config.define("theme", "result_stats_streak_text", str, "Long Streak: %s")
+Config.define("theme", "result_stats_accuracy", str, ".5,.61,0.002,None")
+Config.define("theme", "result_stats_accuracy_text", str, "Accuracy: %.1f%%")
+Config.define("theme", "result_stats_notes", str, ".5,.52,0.002,None")
+Config.define("theme", "result_stats_notes_text", str, "%s Notes Hit")
+Config.define("theme", "result_cheats_info", str, ".5,.3,.002")
+Config.define("theme", "result_cheats_numbers", str, ".5,.35,.0015")
+Config.define("theme", "result_cheats_score", str, ".75,.4,.0015")
+Config.define("theme", "result_cheats_percent", str, ".45,.4,.0015")
+Config.define("theme", "result_cheats_color", str, "#FFFFFF")
 
 
 #MFH - crowd cheer loop delay in theme.ini: if not exist, use value from settings. Otherwise, use theme.ini value.
@@ -397,12 +408,24 @@ songListDisplay = None
 
 result_score = [None] * 3
 result_star = [None] * 3
-result_song = [None] * 4
+result_song = [None] * 3
+result_song_text = None
 result_stats_part = [None] * 4
+result_stats_part_text = None
 result_stats_diff = [None] * 4
+result_stats_diff_text = None
 result_stats_accuracy = [None] * 4
+restul_stats_accuracy_text = None
 result_stats_streak = [None] * 4
+result_stats_streak_text = None
 result_stats_notes = [None] * 4
+result_stats_notes_text = None
+#akedrou
+result_cheats_info = [None] * 3
+result_cheats_numbers = [None] * 3
+result_cheats_score = [None] * 3
+result_cheats_percent = [None] * 3
+result_cheats_color = None
 
 
 #Racer:
@@ -424,6 +447,15 @@ def hexToColor(color):
   elif color.lower() == "fret":
     return (-2, -2, -2)
   return (0, 0, 0)
+
+def hexToColorResults(color):
+  color = color.strip()
+  if color[0] == "#":
+    color = color[1:]
+    if len(color) == 3:
+      return (int(color[0], 16) / 15.0, int(color[1], 16) / 15.0, int(color[2], 16) / 15.0)
+    return (int(color[0:2], 16) / 255.0, int(color[2:4], 16) / 255.0, int(color[4:6], 16) / 255.0)
+  return baseColor
     
 def colorToHex(color):
   return "#" + ("".join(["%02x" % int(c * 255) for c in color]))
@@ -736,17 +768,30 @@ def setupHopoIndicator(config):
   hopoIndicatorInactiveColor = hexToColor(config.get("theme", "hopo_indicator_inactive_color"))
   
 def setupResults(config):
-  global result_score, result_star, result_song, result_stats_part, result_stats_diff
-  global result_stats_accuracy, result_stats_streak, result_stats_notes
+  global result_score, result_star, result_song, result_song_text, result_stats_part, result_stats_diff
+  global result_stats_diff_text, result_stats_part_text, result_stats_streak_text, result_stats_accuracy_text
+  global result_stats_accuracy, result_stats_streak, result_stats_notes, result_stats_notes_text
+  global result_cheats_info, result_cheats_numbers, result_cheats_percent, result_cheats_score, result_cheats_color
   
   result_score = config.get("theme", "result_score").split(",")
   result_star = config.get("theme", "result_star").split(",")
   result_song = config.get("theme", "result_song").split(",")
+  result_song_text = config.get("theme", "result_song_text").strip()
   result_stats_part = config.get("theme", "result_stats_part").split(",")
+  result_stats_part_text = config.get("theme", "result_stats_part_text").strip()
   result_stats_diff = config.get("theme", "result_stats_diff").split(",")
+  result_stats_diff_text = config.get("theme", "result_stats_diff_text").strip()
   result_stats_accuracy = config.get("theme", "result_stats_accuracy").split(",")
+  result_stats_accuracy_text = config.get("theme", "result_stats_accuracy_text").strip()
   result_stats_streak = config.get("theme", "result_stats_streak").split(",")
+  result_stats_streak_text = config.get("theme", "result_stats_streak_text").strip()
   result_stats_notes = config.get("theme", "result_stats_notes").split(",")
+  result_stats_notes_text = config.get("theme", "result_stats_notes_text").strip()
+  result_cheats_info = config.get("theme", "result_cheats_info").split(",")
+  result_cheats_numbers = config.get("theme", "result_cheats_numbers").split(",")
+  result_cheats_percent = config.get("theme", "result_cheats_percent").split(",")
+  result_cheats_score   = config.get("theme", "result_cheats_score").split(",")
+  result_cheats_color   = config.get("theme", "result_cheats_color")
 
 def setupSubmenus(config, themepath = None):
   if not themepath:

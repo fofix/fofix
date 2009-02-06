@@ -341,7 +341,9 @@ class Config:
     boardSpeed = int(self.get("game", "board_speed"))
 
     encode = "%d%d%d%d%d%d%d%d%d" % (twoChordUsed, disableVBPMUsed, hopoDisableUsed, hopoMarks, hopoStyle, pov, margin, hopo8thUsed, boardSpeed)
-    return encode
+    #return encode
+    return "000000000"
+  
   def getModOptions2(self):
     #For use with more than single digit flags
     #Do not change order

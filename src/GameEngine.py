@@ -284,7 +284,8 @@ Config.define("game", "song_icons",          bool, True,     text = _("Show Song
 Config.define("game", "preload_labels",          bool, False,     text = _("Preload Song Labels"),     options = {True: _("Yes"), False: _("No")})
 Config.define("game", "songcovertype",        bool, True,     text = _("Label Type"),      options = {True: _("CD Labels"), False: _("Album Covers")})
 Config.define("game", "songlistrotation",     bool, True,     text = _("Rotating CDs"),           options = {True: _("On"), False: _("Off")})
-Config.define("game", "tut",       bool, False,     text = _("tut"),             options = {True: _("yes"), False: _("no")})
+Config.define("game", "keep_play_count", int, 1, text = _("Remember Play Count"), options = {0: _("No"), 1: _("Yes")})
+Config.define("game", "tut",       bool, False,     text = _("tut"),             options = {True: _("Yes"), False: _("No")})
 Config.define("video", "counting",       bool, False,     text = _("Show at Song Start"),             options = {True: _("Part"), False: _("Countdown")})
 
 
@@ -296,7 +297,7 @@ Config.define("game",   "sort_order",          int,   0,      text = _("Sort Set
 Config.define("game",   "whammy_changes_sort_order", bool, True, text = _("Whammy Changes Sort Order"), options = {False: _("No"), True: _("Yes")})
 Config.define("fretboard",   "point_of_view",                 int,   5,      text = _("Point Of View"), options = {0: _("FoF"), 1: _("GH3"), 2: _("Rock Band"), 3: _("GH2"), 4: _("Rock Rev"), 5: _("Theme")}) #Racer, Blazingamer
 Config.define("game",   "party_time",          int,   30,     text = _("Party Mode Timer"), options = dict([(n, n) for n in range(1, 99)]))
-Config.define("performance",   "disable_libcount",    bool,  True,  text = _("Keep Play Count"),    options = {False: _("Yes"), True: _("No")})
+Config.define("performance",   "disable_libcount",    bool,  True,  text = _("Show Setlist Size"),    options = {False: _("Yes"), True: _("No")})
 Config.define("performance",   "disable_librotation", bool,  True,  text = _("CD Mode Y-Rotation"),    options = {False: _("Enabled"), True: _("Disabled")})
 
 #Spikehead777
