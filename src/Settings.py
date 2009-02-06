@@ -241,7 +241,7 @@ class SettingsMenu(Menu.Menu):
     LyricsSettingsMenu = Menu.Menu(engine, LyricsSettings)
     
     JurgenSettings = [
-       ConfigChoice(engine, engine.config, "game", "jurgdef", autoApply = True),#Spikehead777
+       #ConfigChoice(engine, engine.config, "game", "jurgdef", autoApply = True),#Spikehead777
        ConfigChoice(engine, engine.config, "game", "jurgtype", autoApply = True),#Spikehead777
        ConfigChoice(engine, engine.config, "game", "jurglogic", autoApply = True),#MFH
        ConfigChoice(engine, engine.config, "game", "jurgtext", autoApply = True),#hman
@@ -617,7 +617,7 @@ class SettingsMenu(Menu.Menu):
     AdvancedSettingsMenu = Menu.Menu(engine, AdvancedSettings)
     
     Cheats = [
-      ConfigChoice(engine, engine.config, "game", "jurgdef", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "jurgmode", autoApply = True),
       (_("Jurgen Settings"), JurgenSettingsMenu),
       ConfigChoice(engine, engine.config, "game", "p1_assist", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "p2_assist", autoApply = True),
@@ -1158,7 +1158,7 @@ class BasicSettingsMenu(Menu.Menu):
     listSettingsMenu = Menu.Menu(engine, listSettings)
 
     Cheats = [
-      ConfigChoice(engine, engine.config, "game", "jurgdef", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "jurgmode", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "jurgtype", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "p1_assist", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "p2_assist", autoApply = True),
