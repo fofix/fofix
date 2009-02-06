@@ -1416,7 +1416,7 @@ class GameSettingsMenu(Menu.Menu):
       Log.debug("GameSettingsMenu class init (Settings.py)...")
     
     Cheats = [
-      ConfigChoice(engine, engine.config, "game", "jurgdef", autoApply = True),#Jurgen config -- Spikehead777
+      ConfigChoice(engine, engine.config, "game", "jurgmode", autoApply = True),#Jurgen config -- Spikehead777
       ConfigChoice(engine, engine.config, "game", "jurgtype", autoApply = True),#Jurgen controls -- Spikehead777
       ConfigChoice(engine, engine.config, "game", "jurglogic", autoApply = True),#MFH
      #MFH
