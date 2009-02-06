@@ -299,7 +299,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     Dialogs.showLoadingScreen(self.engine, lambda: self.song, text = phrase)
     
   def handleWorldCharts(self, result):
-    self.highScoreResult[self.resultNum] = self.uploadResult
+    self.uploadResponse[self.resultNum] = self.uploadResult
     self.resultNum += 1
   
   def keyPressed(self, key, unicode):
@@ -449,8 +449,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         "version":  Version.version(),
         "songPart": part
       }
-      scoreHash = sha.sha("%d%d%d%s" % player.difficulty, self.finalScore[i], scoring[i].stars, d[songName]).hexdigest()
-      d["scores"] = binascii.hexlify(Cerealizer.dumps([(self.finalScore[i], scoring[i].stars, d[songName], scoreHash)]))
+      scoreHash = sha.sha("%d%d%d%s" % (player.getDifficultyInt(), self.finalScore[i], self.scoring[i].stars, d["songName"])).hexdigest()
+      d["scores"] = binascii.hexlify(Cerealizer.dumps([(self.finalScore[i], self.scoring[i].stars, d["songName"], scoreHash)]))
       d["scores_ext"] = binascii.hexlify(Cerealizer.dumps([scoreHash + scores_ext]))
       url = self.engine.config.get("game", "uploadurl_w67_starpower")
       data = urllib.urlopen(url + "?" + urllib.urlencode(d)).read()
@@ -477,9 +477,9 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         
         if self.engine.config.get("game", "uploadscores"):
           self.uploadingScores[i] = True
-          fn = lambda: self.uploadHighscores(part = self.playerList[i].part, player = i)
+          fn = lambda: self.uploadHighscores(part = self.playerList[i].part, playerNum = i)
           
-          self.engine.resource.load(self, "uploadResult", fn, onLoad = self.handleWorldChartRanking)
+          self.engine.resource.load(self, "uploadResult", fn, onLoad = self.handleWorldCharts)
     self.doneScores = True
   
   def run(self, ticks):
@@ -874,11 +874,11 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         sW, sH = font.getStringSize("A", scale = sScale)
         sYPos = .7 - ( (sH * 1.25) * j)
         Theme.setBaseColor(1 - v)
-        if self.highScoreResult[j] is None:
+        if self.uploadResponse[j] is None:
           upScoreText = _("Uploading Scores...")
           font.render("P%d (%s) %s" % (j+1, player.name, upScoreText), (.05, sYPos + v), scale = sScale)
         else:
-          result = str(self.highScoreResult[j]).split(";")
+          result = str(self.uploadResponse[j]).split(";")
           if len(result) > 0:
             upScoreText1 = _("Scores uploaded!")
             if result[0] == "True":
