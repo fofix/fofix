@@ -324,6 +324,8 @@ class Guitar:
 
 
 
+    self.hitflames1Drawing = None
+    self.hitflames2Drawing = None
 
     try:
       engine.loadImgDrawing(self, "hitflamesAnim", os.path.join("themes",themename,"hitflamesanimation.png"),  textureSize = (128, 128))
