@@ -171,12 +171,14 @@ Notice - If you just want the default phrases to show do not put these in your t
 
 ||_*Item Name*_||_*What it Does/How to use it*_ (X pos, Y pos, scale size||
 ||result_score = .5,.11,0.0025||Defines the pos of the results score score.||
-||result_song = .05,.045,.002,%s||Defines the pos of the songname (Can use text with. IE- 'result_song = .05,.045,.002,%s Finished!' will show "Back in Black's Finished!")||
+||result_song = .05,.045,.002,%s||Defines the pos of the songname||
+||result_song_text - %s Finished!|| %s Finished! will show "Back in Black's Finished!"||
 ||result_star = .5,.35,0.0017||Defines the pos of the stars value||
 ||result_stats_notes = .5,.52,0.002,%s||Defines the pos of the notes hit value (Can use text. IE- 'result_stats_notes = .5,.52,0.002,%s Notes Hit' will show "138 Notes Hit")||
 ||result_stats_diff = .5,.55,0.002,%s||Defines the pos of the difficulty stats (Can use text. IE- 'result_stats_diff = .5,.55,0.002,Difficulty: %s' will show "Difficulty:Hard")|| 
 ||result_stats_streak = .5,.58,0.002,%s||Defines the pos of the streak value (Can use text. IE- 'result_stats_streak = .5,.58,0.002,Longest Streak: %s' will show "Longest Streak: 234")|| 
 ||result_stats_accuracy = .5,.61,0.002,%.1f%%||Defines the pos of the accuracy % value. (IE- 'result_stats_accuracy = .5,.61,0.002,Accuracy: %.1f%%' will show as "Accuracy: 88.7%")|| 
+||result_stats_notes_text - %s Notes Hit|| %s Notes Hit will show "128 Notes Hit"||
 ||result_stats_part = .5,.64,0.002,Part: %s|| Defines the pos of the results part (Can use text. IE- 'result_stats_part = .5,.64,0.002,Part: %s' shows as "Part:  ")||
 ||result_cheats_info - .5,.3,.002||Defines the results cheats info position and size.||
 ||result_cheats_numbers - .5,.35,.0015||Defines the results cheats numbers position and size.||
