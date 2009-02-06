@@ -664,9 +664,9 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
               wide = star.width1()*.5
             if self.maskStars:
               if self.theme == 2:
-                self.engine.drawImage(star, scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (((w*Theme.result_star[0])+wide*j)*space**4,h*float(Theme.result_star[1])), color = (1, 1, 0))
+                self.engine.drawImage(star, scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (((w*Theme.result_star[0])+wide*j)*space**4,h*float(Theme.result_star[1])), color = (1, 1, 0, 1))
               else:
-                self.engine.drawImage(star, scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])), color = (0, 1, 0))
+                self.engine.drawImage(star, scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])), color = (0, 1, 0, 1))
             else:
               self.engine.drawImage(star, scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])))
         else:
