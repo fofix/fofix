@@ -2751,6 +2751,8 @@ class MidiReader(midi.MidiOutStream):
     self.partTrack = 0
     self.partnumber = -1
 
+    self.vocalTrack = False
+
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("MidiReader class init (song.py)...")
@@ -2873,6 +2875,11 @@ class MidiReader(midi.MidiOutStream):
       self.partnumber = parts[DRUM_PART]
       if self.logSections == 1:
         tempText2 = "DRUM_PART"
+        
+    if text == "PART VOCALS":   #MFH 
+      self.vocalTrack = True
+    else:
+      self.vocalTrack = False
     #for rock band unaltered rip compatibility
     #-elif text == "PART DRUMS" and parts[DRUM_PART] in self.song.parts:
       #-self.partnumber = parts[DRUM_PART]
@@ -2904,7 +2911,7 @@ class MidiReader(midi.MidiOutStream):
         track, number = noteMap[note]
         self.addEvent(track, Note(number, endTime - startTime, special = self.velocity[note] == 127), time = startTime)
 
-      #MFH TODO: use self.midiEventTracks to store all the special MIDI marker notes, keep the clutter out of the main notes lists
+      #MFH: use self.midiEventTracks to store all the special MIDI marker notes, keep the clutter out of the main notes lists
       #  also -- to make use of marker notes in real-time, must add a new attribute to MarkerNote class "endMarker"
       #     if this is == True, then the note is just an event to mark the end of the previous note (which has length and is used in other ways)
 
@@ -2968,98 +2975,110 @@ class MidiReader(midi.MidiOutStream):
     if text.find("GNMIDI") < 0:   #to filter out the midi class illegal usage / trial timeout messages
       #Log.debug(str(self.abs_time()) + "-MIDI Text: " + text)
       if self.readTextAndLyricEvents > 0:
-        unusedEvent = None
-        event = None
-        gSoloEvent = False
-        #also convert all underscores to spaces so it look better
-        text = text.replace("_"," ")
-        if text.lower().find("section") >= 0:
-          self.guitarSoloSectionMarkers = True      #GH1 dont use section markers... GH2+ do
-          #strip unnecessary text / chars:
-          text = text.replace("section","")
-          text = text.replace("[","")
-          text = text.replace("]","")
-          #also convert "gtr" to "Guitar"
-          text = text.replace("gtr","Guitar")
-          #event = TextEvent("SEC: " + text, 250.0)
-          event = TextEvent(text, 250.0)
-          if text.lower().find("big rock ending") >= 0:
-            curTime = self.abs_time()
-            Log.debug("Big Rock Ending section event marker found at " + str(curTime) )
-            self.song.breMarkerTime = curTime
-        
-          if text.lower().find("solo") >= 0 and text.lower().find("drum") < 0 and text.lower().find("outro") < 0 and text.lower().find("organ") < 0 and text.lower().find("synth") < 0 and text.lower().find("bass") < 0 and text.lower().find("harmonica") < 0:
-            gSoloEvent = True
-            gSolo = True
-          elif text.lower().find("guitar") >= 0 and text.lower().find("lead") >= 0:    #Foreplay Long Time "[section_gtr_lead_1]"
-            gSoloEvent = True
-            gSolo = True
-          elif text.lower().find("guitar") >= 0 and text.lower().find("line") >= 0:   #support for REM Orange Crush style solos
-            gSoloEvent = True
-            gSolo = True
-          elif text.lower().find("guitar") >= 0 and text.lower().find("ostinato") >= 0:   #support for Pleasure solos "[section gtr_ostinato]"
-            gSoloEvent = True
-            gSolo = True
-          else: #this is the cue to end solos...
-            gSoloEvent = True
-            gSolo = False
-        elif text.lower().find("solo") >= 0 and text.find("[") < 0 and text.lower().find("drum") < 0 and text.lower().find("map") < 0 and text.lower().find("play") < 0 and not self.guitarSoloSectionMarkers:
-          #event = TextEvent("SEC: " + text, 250.0)
-          event = TextEvent(text, 250.0)
-          gSoloEvent = True
-          if text.lower().find("off") >= 0:
-            gSolo = False
-          else:
-            gSolo = True
-        elif (text.lower().find("verse") >= 0 or text.lower().find("chorus") >= 0) and text.find("[") < 0 and not self.guitarSoloSectionMarkers:   #this is an alternate GH1-style solo end marker
-          #event = TextEvent("SEC: " + text, 250.0)
-          event = TextEvent(text, 250.0)
-          gSoloEvent = True
-          gSolo = False
-        elif text.lower().find("gtr") >= 0 and text.lower().find("off") >= 0 and text.find("[") < 0 and not self.guitarSoloSectionMarkers:   #this is an alternate GH1-style solo end marker
-          #also convert "gtr" to "Guitar"
-          text = text.replace("gtr","Guitar")
-          #event = TextEvent("SEC: " + text, 100.0)
-          event = TextEvent(text, 100.0)
-          gSoloEvent = True
-          gSolo = False
-        else:  #unused text event
-          #unusedEvent = TextEvent("TXT: " + text, 100.0)
-          unusedEvent = TextEvent(text, 100.0)
-        #now, check for guitar solo status change:
-        soloSlop = 150.0   
-        if gSoloEvent:
-          if gSolo:
-            if not self.guitarSoloActive:
-              self.guitarSoloActive = True
-              soloEvent = TextEvent("GSOLO ON", 250.0)
-              Log.debug("GSOLO ON event " + event.text + " found at time " + str(self.abs_time()) )
-              self.song.eventTracks[TK_GUITAR_SOLOS].addEvent(self.abs_time(), soloEvent)  #MFH - add an event to the guitar solos track
-          else: #this is the cue to end solos...
-            if self.guitarSoloActive:
-              #MFH - here, check to make sure we're not ending a guitar solo that has just started!!
-              curTime = self.abs_time()
-              if self.song.eventTracks[TK_GUITAR_SOLOS][-1][0] < curTime:
-                self.guitarSoloActive = False
-                soloEvent = TextEvent("GSOLO OFF", 250.0)
-                Log.debug("GSOLO OFF event " + event.text + " found at time " + str(curTime) )
-                self.guitarSoloIndex += 1
-                self.song.eventTracks[TK_GUITAR_SOLOS].addEvent(curTime, soloEvent)  #MFH - add an event to the guitar solos track
-    
-        if event:
-          curTime = self.abs_time()
-          if len(self.song.eventTracks[TK_SECTIONS]) <= 1:
-            self.song.eventTracks[TK_SECTIONS].addEvent(curTime, event)  #MFH - add an event to the sections track
-          elif len(self.song.eventTracks[TK_SECTIONS]) > 1:    #ensure it exists first
-            if self.song.eventTracks[TK_SECTIONS][-1][0] < curTime: #ensure we're not adding two consecutive sections to the same location!
-              self.song.eventTracks[TK_SECTIONS].addEvent(curTime, event)  #MFH - add an event to the sections track
-        elif unusedEvent:
-          self.song.eventTracks[TK_UNUSED_TEXT].addEvent(self.abs_time(), unusedEvent)  #MFH - add an event to the unused text track
-        
-        #for track in self.song.tracks:
-        #  for t in track:
-        #    t.addEvent(self.abs_time(), event)
 
+        #MFH - if sequence name is PART VOCALS then look for text event lyrics
+        if self.vocalTrack:
+          if text.find("[") < 0:    #not a marker
+            event = TextEvent(text, 400.0)
+            self.song.hasMidiLyrics = True
+            self.song.eventTracks[TK_LYRICS].addEvent(self.abs_time(), event)  #MFH - add an event to the lyrics track
+
+        else:        
+        
+
+
+          unusedEvent = None
+          event = None
+          gSoloEvent = False
+          #also convert all underscores to spaces so it look better
+          text = text.replace("_"," ")
+          if text.lower().find("section") >= 0:
+            self.guitarSoloSectionMarkers = True      #GH1 dont use section markers... GH2+ do
+            #strip unnecessary text / chars:
+            text = text.replace("section","")
+            text = text.replace("[","")
+            text = text.replace("]","")
+            #also convert "gtr" to "Guitar"
+            text = text.replace("gtr","Guitar")
+            #event = TextEvent("SEC: " + text, 250.0)
+            event = TextEvent(text, 250.0)
+            if text.lower().find("big rock ending") >= 0:
+              curTime = self.abs_time()
+              Log.debug("Big Rock Ending section event marker found at " + str(curTime) )
+              self.song.breMarkerTime = curTime
+          
+            if text.lower().find("solo") >= 0 and text.lower().find("drum") < 0 and text.lower().find("outro") < 0 and text.lower().find("organ") < 0 and text.lower().find("synth") < 0 and text.lower().find("bass") < 0 and text.lower().find("harmonica") < 0:
+              gSoloEvent = True
+              gSolo = True
+            elif text.lower().find("guitar") >= 0 and text.lower().find("lead") >= 0:    #Foreplay Long Time "[section_gtr_lead_1]"
+              gSoloEvent = True
+              gSolo = True
+            elif text.lower().find("guitar") >= 0 and text.lower().find("line") >= 0:   #support for REM Orange Crush style solos
+              gSoloEvent = True
+              gSolo = True
+            elif text.lower().find("guitar") >= 0 and text.lower().find("ostinato") >= 0:   #support for Pleasure solos "[section gtr_ostinato]"
+              gSoloEvent = True
+              gSolo = True
+            else: #this is the cue to end solos...
+              gSoloEvent = True
+              gSolo = False
+          elif text.lower().find("solo") >= 0 and text.find("[") < 0 and text.lower().find("drum") < 0 and text.lower().find("map") < 0 and text.lower().find("play") < 0 and not self.guitarSoloSectionMarkers:
+            #event = TextEvent("SEC: " + text, 250.0)
+            event = TextEvent(text, 250.0)
+            gSoloEvent = True
+            if text.lower().find("off") >= 0:
+              gSolo = False
+            else:
+              gSolo = True
+          elif (text.lower().find("verse") >= 0 or text.lower().find("chorus") >= 0) and text.find("[") < 0 and not self.guitarSoloSectionMarkers:   #this is an alternate GH1-style solo end marker
+            #event = TextEvent("SEC: " + text, 250.0)
+            event = TextEvent(text, 250.0)
+            gSoloEvent = True
+            gSolo = False
+          elif text.lower().find("gtr") >= 0 and text.lower().find("off") >= 0 and text.find("[") < 0 and not self.guitarSoloSectionMarkers:   #this is an alternate GH1-style solo end marker
+            #also convert "gtr" to "Guitar"
+            text = text.replace("gtr","Guitar")
+            #event = TextEvent("SEC: " + text, 100.0)
+            event = TextEvent(text, 100.0)
+            gSoloEvent = True
+            gSolo = False
+          else:  #unused text event
+            #unusedEvent = TextEvent("TXT: " + text, 100.0)
+            unusedEvent = TextEvent(text, 100.0)
+          #now, check for guitar solo status change:
+          soloSlop = 150.0   
+          if gSoloEvent:
+            if gSolo:
+              if not self.guitarSoloActive:
+                self.guitarSoloActive = True
+                soloEvent = TextEvent("GSOLO ON", 250.0)
+                Log.debug("GSOLO ON event " + event.text + " found at time " + str(self.abs_time()) )
+                self.song.eventTracks[TK_GUITAR_SOLOS].addEvent(self.abs_time(), soloEvent)  #MFH - add an event to the guitar solos track
+            else: #this is the cue to end solos...
+              if self.guitarSoloActive:
+                #MFH - here, check to make sure we're not ending a guitar solo that has just started!!
+                curTime = self.abs_time()
+                if self.song.eventTracks[TK_GUITAR_SOLOS][-1][0] < curTime:
+                  self.guitarSoloActive = False
+                  soloEvent = TextEvent("GSOLO OFF", 250.0)
+                  Log.debug("GSOLO OFF event " + event.text + " found at time " + str(curTime) )
+                  self.guitarSoloIndex += 1
+                  self.song.eventTracks[TK_GUITAR_SOLOS].addEvent(curTime, soloEvent)  #MFH - add an event to the guitar solos track
+      
+          if event:
+            curTime = self.abs_time()
+            if len(self.song.eventTracks[TK_SECTIONS]) <= 1:
+              self.song.eventTracks[TK_SECTIONS].addEvent(curTime, event)  #MFH - add an event to the sections track
+            elif len(self.song.eventTracks[TK_SECTIONS]) > 1:    #ensure it exists first
+              if self.song.eventTracks[TK_SECTIONS][-1][0] < curTime: #ensure we're not adding two consecutive sections to the same location!
+                self.song.eventTracks[TK_SECTIONS].addEvent(curTime, event)  #MFH - add an event to the sections track
+          elif unusedEvent:
+            self.song.eventTracks[TK_UNUSED_TEXT].addEvent(self.abs_time(), unusedEvent)  #MFH - add an event to the unused text track
+          
+          #for track in self.song.tracks:
+          #  for t in track:
+          #    t.addEvent(self.abs_time(), event)
+  
         
 
 

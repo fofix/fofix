@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-02-06 13:14-0800\n"
+"POT-Creation-Date: 2009-02-06 19:21-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -204,7 +204,7 @@ msgstr ""
 msgid "Browsing Collection..."
 msgstr ""
 
-#: Dialogs.py:990 Song.py:3778
+#: Dialogs.py:990 Song.py:3797
 msgid "End of Career"
 msgstr ""
 
