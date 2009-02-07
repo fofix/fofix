@@ -2316,11 +2316,11 @@ class Song(object):
 
 
     
-    #self.slowDownDivisor = self.engine.config.get("audio", "slow_down_divisor")
-    #self.engine.setSpeedDivisor(self.slowDownDivisor)    #MFH 
+    #self.slowDownFactor = self.engine.config.get("audio", "speed_factor")
+    #self.engine.setSpeedFactor(self.slowDownFactor)    #MFH 
 
     # load the tracks
-    #if self.engine.audioSpeedDivisor == 1:    #MFH - only use the music track   
+    #if self.engine.audioSpeedFactor == 1:    #MFH - only use the music track   
     if songTrackName:
       self.music       = Audio.Music(songTrackName)
 
@@ -2422,11 +2422,11 @@ class Song(object):
     
     #RF-mod No longer needed?
     
-    if self.engine.audioSpeedDivisor == 1:  #MFH - shut this track up if slowing audio down!    
+    if self.engine.audioSpeedFactor == 1:  #MFH - shut this track up if slowing audio down!    
       self.music.play(0, start / 1000.0)
       self.music.setVolume(1.0)
     else:
-      self.music.play(self.engine.audioSpeedDivisor, start / 1000.0)  #tell music to loop 2 times for 1/2 speed, 4 times for 1/4 speed (so it doesn't end early)
+      self.music.play(1.0/self.engine.audioSpeedFactor, start / 1000.0)  #tell music to loop 2 times for 1/2 speed, 4 times for 1/4 speed (so it doesn't end early)
       self.music.setVolume(0.0)   
     
     if self.guitarTrack:
@@ -2577,8 +2577,9 @@ class Song(object):
       pos = self.music.getPosition()
 
 
-      if self.engine.audioSpeedDivisor > 1:   #MFH - to correct for slowdown's positioning
-        pos /= self.engine.audioSpeedDivisor    
+      if self.engine.audioSpeedFactor != 1:   #MFH - to correct for slowdown's positioning
+        #pos /= self.engine.audioSpeedFactor    
+        pos *= self.engine.audioSpeedFactor
         
     if pos < 0.0:
       pos = 0.0
@@ -2587,7 +2588,7 @@ class Song(object):
   def isPlaying(self):
     #MFH - check here to see if any audio tracks are still playing first!
     #MFH from the Future sez: but only if in slowdown mode!
-    if self.engine.audioSpeedDivisor == 1:
+    if self.engine.audioSpeedFactor == 1:
       return self._playing and self.music.isPlaying()
     else:   #altered speed mode!
       if self.guitarTrack and self.guitarTrack.streamIsPlaying() > 0: 
@@ -3486,13 +3487,13 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
     drumFile = None
     crowdFile = None
 
-  slowDownDivisor = engine.config.get("audio", "slow_down_divisor")
-  engine.setSpeedDivisor(slowDownDivisor)    #MFH 
+  slowDownFactor = engine.config.get("audio", "speed_factor")
+  engine.setSpeedFactor(slowDownFactor)    #MFH 
     
 
   #MFH - check for slowdown mode here.  If slowdown, and single track song (or practice mode), 
   #  duplicate single track to a streamingAudio track so the slowed down version can be heard.
-  if engine.audioSpeedDivisor > 1:
+  if engine.audioSpeedFactor != 1:
     crowdFile = None
     #count tracks:
     audioTrackCount = 0

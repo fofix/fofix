@@ -626,7 +626,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "game", "hit_window_cheat", autoApply = True),
       ConfigChoice(engine, engine.config, "coffee", "hopo_freq_cheat", autoApply = True),
       ConfigChoice(engine, engine.config, "coffee", "failingEnabled", autoApply = True),
-      ConfigChoice(engine, engine.config, "audio",  "slow_down_divisor", autoApply = True),     #MFH
+      ConfigChoice(engine, engine.config, "audio",  "speed_factor", autoApply = True),     #MFH
       (_("Mod settings"), modSettings),
     ]
     CheatMenu = Menu.Menu(engine, Cheats)
@@ -1169,7 +1169,7 @@ class BasicSettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "game", "hit_window_cheat", autoApply = True),
       ConfigChoice(engine, engine.config, "coffee", "hopo_freq_cheat", autoApply = True),
       ConfigChoice(engine, engine.config, "coffee", "failingEnabled", autoApply = True),
-      ConfigChoice(engine, engine.config, "audio",  "slow_down_divisor", autoApply = True),     #MFH
+      ConfigChoice(engine, engine.config, "audio",  "speed_factor", autoApply = True),     #MFH
       (_("Mod settings"), modSettings),
     ]
     CheatMenu = Menu.Menu(engine, Cheats)

@@ -63,7 +63,8 @@ class Drum:
   def __init__(self, engine, editorMode = False, player = 0):
     self.engine         = engine
     
-    self.starPowerDecreaseDivisor = 200.0*self.engine.audioSpeedDivisor
+    #self.starPowerDecreaseDivisor = 200.0*self.engine.audioSpeedFactor
+    self.starPowerDecreaseDivisor = 200.0/self.engine.audioSpeedFactor
 
     
     self.isDrum = True

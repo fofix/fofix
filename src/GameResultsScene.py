@@ -168,7 +168,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     else:
       self.singleView = True
     
-    slowdown = 1.0 / self.engine.config.get("audio", "slow_down_divisor")
+    slowdown = self.engine.config.get("audio", "speed_factor")
     a = len(Scorekeeper.HANDICAPS)
     for i, scoreCard in enumerate(self.scoring):
       self.finalScore[i]    = scoreCard.score

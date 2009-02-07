@@ -449,10 +449,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.pitchBendLowestFactor = .90 #stump: perhaps read this from song.ini and fall back on a specific value?
     self.lineByLineLyricMaxLineWidth = 0.5
     self.lineByLineStartSlopMs = 750
-    self.digitalKillswitchStarpowerChunkSize = 0.05 / self.engine.audioSpeedDivisor
+    self.digitalKillswitchStarpowerChunkSize = 0.05 * self.engine.audioSpeedFactor
     self.digitalKillswitchActiveStarpowerChunkSize = self.digitalKillswitchStarpowerChunkSize / 3.0
     # evilynux: was 0.10, now much closer to actual GH3
-    self.analogKillswitchStarpowerChunkSize = 0.15 / self.engine.audioSpeedDivisor
+    self.analogKillswitchStarpowerChunkSize = 0.15 * self.engine.audioSpeedFactor
     self.analogKillswitchActiveStarpowerChunkSize = self.analogKillswitchStarpowerChunkSize / 3.0
     self.rbOverdriveBarGlowFadeInChunk = .07     #this amount added to visibility every run() cycle when fading in - original .2
     self.rbOverdriveBarGlowFadeOutChunk = .03   #this amount subtracted from visibility every run() cycle when fading out - original .07
@@ -1964,7 +1964,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if self.coOpType:
           if self.coOpScoreCard.handicap&1 != 1:
             self.coOpScoreCard.handicap += 1
-      if self.engine.audioSpeedDivisor != 1:
+      if self.engine.audioSpeedFactor != 1:
         if (scoreCard.handicap>>1)&1 != 1:
           scoreCard.handicap += 0x2
         if self.coOpType:
@@ -3657,7 +3657,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.crowdsCheering = False #catches crowdsEnabled != 3, pause before countdown, set to 3
           self.starPowersActive = 0
           self.playersInGreen = 0
-          if self.playerList[0].practiceMode and self.engine.audioSpeedDivisor == 1:
+          if self.playerList[0].practiceMode and self.engine.audioSpeedFactor == 1:
             self.playerList[0].startPos[0] -= self.song.period*4
             if self.playerList[0].startPos[0] < 0.0:
               self.playerList[0].startPos[0] = 0.0
@@ -4551,7 +4551,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           # self.coOpScore = 0
 
 
-      # if not self.engine.audioSpeedDivisor == 1:  #MFH - only allow score uploads and unlocking when songs are played at full speed.
+      # if not self.engine.audioSpeedFactor == 1:  #MFH - only allow score uploads and unlocking when songs are played at full speed.
         # noScore = True
         # self.changeSong()
 

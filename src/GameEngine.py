@@ -245,7 +245,7 @@ Config.define("debug",   "use_unedited_midis",          int, 1,    text = _("Use
 Config.define("debug",   "show_freestyle_active",          int, 0,    text = _("Show Fill Status"), options = {0: _("Off"), 1: _("On")})
 
 
-Config.define("audio",  "slow_down_divisor",  int,    1,  text = _("Slowdown"),   options = {1: _("Full Speed"), 2: _("1/2 Speed"), 4: _("1/4 Speed")})  #MFH
+Config.define("audio",  "speed_factor",  float,    1.0,  text = _("Speed Factor"),   options = {1.0: _("1.00x"), 0.75: _("0.75x"), 0.50: _("0.50x"), 0.25: _("0.25x")})  #MFH
 
 Config.define("audio",  "whammy_effect",  int,    0,  text = _("Effects Mode"),   options = {0: _("Killswitch"), 1: _("Pitchbend")})  #MFH
 
@@ -487,8 +487,12 @@ class GameEngine(Engine):
     #self.audio.pre_open(frequency = frequency, bits = bits, stereo = stereo, bufferSize = bufferSize)
     #self.audio.open(frequency = frequency, bits = bits, stereo = stereo, bufferSize = bufferSize)
     #pygame.init()
-    self.audioSpeedDivisor = 0
-    self.setSpeedDivisor(1)   #MFH - handles initialization at full speed    
+    
+    #MFH - TODO - Audio speed divisor needs to be changed to audio speed factor, so can support 0.75x (3/4 speed)
+    
+    
+    self.audioSpeedFactor = 0
+    self.setSpeedFactor(1)   #MFH - handles initialization at full speed    
     
     Log.debug("Initializing video.")
     #myfingershurt: ensuring windowed mode starts up in center of the screen instead of cascading positions:
@@ -535,7 +539,7 @@ class GameEngine(Engine):
     themename = self.data.themeLabel
 
 
-    #self.setSpeedDivisor(2)    #MFH - this is just a hack - try if you'd like, doesn't work right yet...
+    #self.setSpeedFactor(2)    #MFH - this is just a hack - try if you'd like, doesn't work right yet...
 
 
 
@@ -618,21 +622,21 @@ class GameEngine(Engine):
     Log.debug("Ready.")
     
 
-  def setSpeedDivisor(self, divisor):     #MFH - allows for slowing down streaming audio tracks
+  def setSpeedFactor(self, factor):     #MFH - allows for slowing down streaming audio tracks
     #MFH - test to see if re-initializing the mixer here at 22050 Hz after loading the sounds at 44100 Hz results in half speed playback
     #try:
     #  self.audio.close()
     #except:
     #  pass
     
-    if self.audioSpeedDivisor != divisor:   #MFH - don't re-init to the same divisor.
+    if self.audioSpeedFactor != factor:   #MFH - don't re-init to the same divisor.
       try:
         self.audio.close()    #MFH - ensure no audio is playing during the switch!
-        self.audio.pre_open(frequency = self.frequency/divisor, bits = self.bits, stereo = self.stereo, bufferSize = self.bufferSize)
-        self.audio.open(frequency = self.frequency/divisor, bits = self.bits, stereo = self.stereo, bufferSize = self.bufferSize)
-        self.audioSpeedDivisor = divisor
+        self.audio.pre_open(frequency = int(self.frequency*factor), bits = self.bits, stereo = self.stereo, bufferSize = self.bufferSize)
+        self.audio.open(frequency = int(self.frequency*factor), bits = self.bits, stereo = self.stereo, bufferSize = self.bufferSize)
+        self.audioSpeedFactor = factor
         pygame.init()
-        Log.debug("Initializing pygame.mixer & audio system at " + str(self.frequency/divisor) + " Hz." )
+        Log.debug("Initializing pygame.mixer & audio system at " + str(self.frequency*factor) + " Hz." )
       except Exception, e:
         Log.error("Failed to initialize or re-initialize pygame.mixer & audio system - crash imminent!")
   
