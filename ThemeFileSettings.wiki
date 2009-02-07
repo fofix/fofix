@@ -181,9 +181,9 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||result_song_text - %s Finished!|| %s Finished! will show "Back in Black's Finished!"||
 ||result_star = .5,.35,0.0017||Defines the pos of the stars value||
 ||result_stats_accuracy = .5,.61,0.002,None||Defines the pos of the accuracy % value.||
-||result_stats_accuracy_text  = Accuracy:  %.1f%%|| Accuracy:  %.1f%% will show as "Accuracy: 88.7%")|| 
+||result_stats_accuracy_text  = Accuracy:  %.1f%%|| Accuracy:  %.1f%% will show as "Accuracy: 88.7%"|| 
 ||result_stats_diff = .5,.55,0.002,None||Defines the pos of the difficulty stats||
-||result_stats_diff =  Difficulty: %s|| Difficulty: %s will show "Difficulty:Hard”|| 
+||result_stats_diff_text =  Difficulty: %s|| Difficulty: %s will show "Difficulty:Hard”|| 
 ||result_stats_notes = .5,.52,0.002,None||Defines the pos of the notes hit value||
 ||result_stats_notes_text - %s Notes Hit||%s Notes Hit  will show "128 Notes Hit"||
 ||result_stats_part = .5,.64,0.002,None|| Defines the pos of the results part||
