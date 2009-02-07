@@ -185,7 +185,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
             scoreCard.longHandicap += "aud,%.2f," % slowdown
           else:
             self.cheats[i].append((Scorekeeper.HANDICAP_NAMES[(a-1)-j], Scorekeeper.HANDICAPS[j]))
-            self.finalScore[i] = int(self.finalScore[i] * Scorekeeper.HANDICAPS[i])
+            self.finalScore[i] = int(self.finalScore[i] * Scorekeeper.HANDICAPS[j])
     
     self.hopoStyle = self.engine.config.get("game", "hopo_system")
     gh2sloppy      = self.engine.config.get("game", "gh2_sloppy")
