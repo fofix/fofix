@@ -39,7 +39,6 @@ from Audio import Sound
 from Language import _
 
 import Config
-import Version
 import sha
 import Cerealizer
 import binascii
@@ -112,6 +111,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.pctRoll          = 0.0
     self.vis              = 1.0
     self.pauseScroll      = None
+    self.careerStars      = self.engine.config.get("game", "career_star_min")
     self.detailedScores   = False #to do.
     self.playerList       = players
     
@@ -437,21 +437,25 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     if self.delay[playerNum] > 0:
       self.delay[playerNum] = 0
   
-  def uploadHighscores(self, part = Song.parts[Song.GUITAR_PART], playerNum = 0):
+  def uploadHighscores(self, part = Song.parts[Song.GUITAR_PART], playerNum = 0, scoreExt = None):
     player = self.playerList[playerNum]
     i      = playerNum
     try:
       d = {
-        "songName": "%s - %s" % (Dialogs.removeSongOrderPrefixFromName(self.song.info.name), self.song.info.artist),
-        "songHash": self.song.getHash,
+        "songName": "%s" % (Dialogs.removeSongOrderPrefixFromName(self.song.info.name)),
+        "songHash": self.song.getHash(),
         "scores":   None,
         "scores_ext": None,
-        "version":  Version.version(),
+        "version":  self.engine.uploadVersion,
         "songPart": part
       }
-      scoreHash = sha.sha("%d%d%d%s" % (player.getDifficultyInt(), self.finalScore[i], self.scoring[i].stars, d["songName"])).hexdigest()
-      d["scores"] = binascii.hexlify(Cerealizer.dumps([(self.finalScore[i], self.scoring[i].stars, d["songName"], scoreHash)]))
-      d["scores_ext"] = binascii.hexlify(Cerealizer.dumps([scoreHash + scores_ext]))
+      scores     = {}
+      scores_ext = {}
+      scoreHash = sha.sha("%d%d%d%s" % (player.getDifficultyInt(), self.finalScore[i], self.scoring[i].stars, self.playerList[i].name)).hexdigest()
+      scores[player.getDifficultyInt()]     = [(self.finalScore[i], self.scoring[i].stars, self.playerList[i].name, scoreHash)]
+      scores_ext[player.getDifficultyInt()] = [(scoreHash, self.scoring[i].stars) + scoreExt]
+      d["scores"] = binascii.hexlify(Cerealizer.dumps(scores))
+      d["scores_ext"] = binascii.hexlify(Cerealizer.dumps(scores_ext))
       url = self.engine.config.get("game", "uploadurl_w67_starpower")
       data = urllib.urlopen(url + "?" + urllib.urlencode(d)).read()
       Log.debug("Score upload result: %s" % data)
@@ -471,13 +475,13 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         name = Dialogs.getText(self.engine, _("%d points is a new high score! Enter your name:") % self.finalScore[i], self.playerList[i].name)
         if name:
           self.playerList[i].name = name
-        scoreExt = (scoreCard.notesHit, scoreCard.totalStreakNotes, scoreCard.hiStreak, Version.branchVersion(), scoreCard.handicap, scoreCard.longHandicap, self.originalScore[i])
+        scoreExt = (scoreCard.notesHit, scoreCard.totalStreakNotes, scoreCard.hiStreak, self.engine.uploadVersion, scoreCard.handicap, scoreCard.longHandicap, self.originalScore[i])
         self.highscoreIndex[i] = self.song.info.addHighscore(self.playerList[i].difficulty, self.finalScore[i], scoreCard.stars, self.playerList[i].name, part = self.playerList[i].part, scoreExt = scoreExt)
         self.song.info.save()
         
         if self.engine.config.get("game", "uploadscores"):
           self.uploadingScores[i] = True
-          fn = lambda: self.uploadHighscores(part = self.playerList[i].part, playerNum = i)
+          fn = lambda: self.uploadHighscores(part = self.playerList[i].part, playerNum = i, scoreExt = scoreExt)
           
           self.engine.resource.load(self, "uploadResult", fn, onLoad = self.handleWorldCharts)
     self.doneScores = True
@@ -551,7 +555,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       if not self.coOpType:
         for i, player in enumerate(self.playerList):
           if self.finalScore[i] == 0:
-            self.noScore[i] == True
+            self.noScore[i] = True
         if not self.haveRunScores:
           self.runScores()
 
@@ -564,7 +568,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         else:
           count = 0
         count += 1
-        if self.careerMode and not self.song.info.completed and self.scoring[0].stars > 2:
+        if self.careerMode and not self.song.info.completed and self.scoring[0].stars >= self.careerStars:
           Log.debug("Song completed")
           self.song.info.completed = True
         self.song.info.count = "%d" % count

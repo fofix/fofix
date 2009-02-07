@@ -267,6 +267,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "game",  "language"),
       ConfigChoice(engine, engine.config, "game", "T_sound", autoApply = True), #Faaa Drum sound
       ConfigChoice(engine, engine.config, "game", "star_scoring", autoApply = True),#myfingershurt
+      ConfigChoice(engine, engine.config, "game", "career_star_min", autoApply = True), #akedrou
       ConfigChoice(engine, engine.config, "game", "resume_countdown", autoApply = True), #akedrou
       ConfigChoice(engine, engine.config, "game", "whammy_saves_starpower", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "sp_notes_while_active", autoApply = True, isQuickset = 2),   #myfingershurt - setting for gaining more SP while active
@@ -429,7 +430,7 @@ class SettingsMenu(Menu.Menu):
     KeyChangeMenu = Menu.Menu(engine, KeyChangeSettings)
 
     keySettings = [
-      ConfigChoice(engine, engine.config, "game", "alt_keys", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "alt_keys"),
       (_("Change Controls"), KeyChangeMenu),
       (_("Test Guitars"), lambda: Dialogs.testKeys(engine)),
       (_("Test Drums"), lambda: Dialogs.testDrums(engine)),
@@ -647,6 +648,7 @@ class SettingsMenu(Menu.Menu):
                            AdvancedAudioSettings + \
 			                     AdvancedVideoSettings + \
                            FoFiXBasicSettings + \
+                           keySettings + \
                            InGameDisplaySettings + \
                            ThemeDisplaySettings + \
                            quickSettings + \
@@ -916,6 +918,7 @@ class BasicSettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "game",  "language"),
       ConfigChoice(engine, engine.config, "game", "T_sound", autoApply = True), #Faaa Drum sound
       ConfigChoice(engine, engine.config, "game", "star_scoring", autoApply = True),#myfingershurt
+      ConfigChoice(engine, engine.config, "game", "career_star_min", autoApply = True), #akedrou
       ConfigChoice(engine, engine.config, "game", "resume_countdown", autoApply = True), #akedrou
       ConfigChoice(engine, engine.config, "game", "whammy_saves_starpower", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "sp_notes_while_active", autoApply = True, isQuickset = 2),   #myfingershurt - setting for gaining more SP while active
@@ -1075,7 +1078,7 @@ class BasicSettingsMenu(Menu.Menu):
     KeyChangeMenu = Menu.Menu(engine, KeyChangeSettings)
 
     keySettings = [
-      ConfigChoice(engine, engine.config, "game", "alt_keys", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "alt_keys"),
       (_("Change Controls"), KeyChangeMenu),
       (_("Test Guitars"), lambda: Dialogs.testKeys(engine)),
       (_("Test Drums"), lambda: Dialogs.testDrums(engine)),
@@ -1184,6 +1187,7 @@ class BasicSettingsMenu(Menu.Menu):
     ]
   
     self.settingsToApply = FoFiXBasicSettings + \
+                           keySettings + \
                            videoSettings + \
                            modSettings
   

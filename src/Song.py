@@ -782,7 +782,7 @@ class SongInfo(object):
         "songHash": songHash,
         "scores":   self.getObfuscatedScores(part = part),
         "scores_ext": self.getObfuscatedScoresExt(part = part),
-        "version":  Version.version(),
+        "version":  "FoFiX-3.100",
         "songPart": part
       }
       data = urllib.urlopen(url + "?" + urllib.urlencode(d)).read()
