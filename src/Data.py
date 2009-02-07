@@ -251,10 +251,10 @@ class Data(object):
       self.loadSoundEffect(self, "starLostSound", os.path.join("themes",themename,"sounds","starlost.ogg"))
       self.starLostSoundFound = True
     else:
-      try:
+      if self.fileExists(os.path.join("sounds","starlost.ogg")):
         self.loadSoundEffect(self, "starLostSound", os.path.join("sounds","starlost.ogg"))
         self.starLostSoundFound = True
-      except IOError:
+      else:
         Log.debug("Star lost sound not found, loading another sound.")
         self.loadSoundEffect(self, "starLostSound", os.path.join("sounds","clapsound.ogg"))
         self.starLostSoundFound = False
