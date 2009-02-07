@@ -483,10 +483,8 @@ class Stage(object):
     #myfingershurt: multiple rotation modes
     if self.mode != 2:
       if self.rotationMode == 0:
-        self.background.transform.reset()
-        self.background.transform.translate(self.wFull/2,self.hFull/2)
-        self.background.transform.scale(self.backgroundScaleFactor,-self.backgroundScaleFactor)
-        self.background.draw()  
+        self.engine.drawImage(self.background, scale = (self.backgroundScaleFactor,-self.backgroundScaleFactor),
+                              coord = (self.wFull/2,self.hFull/2))
 
       #myfingershurt:
       else:
@@ -495,6 +493,8 @@ class Stage(object):
         self.imgArr[self.arrNum].transform.translate(self.wFull/2,self.hFull/2)
         self.imgArr[self.arrNum].transform.scale(self.imgArrScaleFactors[self.arrNum],-self.imgArrScaleFactors[self.arrNum])
         self.imgArr[self.arrNum].draw()
+        self.engine.drawImage(self.imgArr[self.arrNum], scale = (self.imgArrScaleFactors[self.arrNum],-self.imgArrScaleFactors[self.arrNum]),
+                              coord = (self.wFull/2,self.hFull/2))
 
   def updateDelays(self):
     self.rotateDelay = self.engine.config.get("game",  "stage_rotate_delay") #myfingershurt - user defined stage rotate delay

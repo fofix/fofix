@@ -5888,12 +5888,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               #if self.playerList[i].part.text == "Bass Guitar" and multStreak >= 40 and self.bassGrooveEnableMode == 2:   #bass groove!
               if self.guitars[i].isBassGuitar and multStreak >= 40 and self.bassGrooveEnabled:   #bass groove!
                 if self.bassgroovemult != None: #death_au : bassgroovemult image found, draw image
-                      
-                  self.bassgroovemult.transform.reset()
-                  self.bassgroovemult.transform.scale(.5,-.125) #MFH division->constant: was (.5,-.5/4.0)
-                  self.bassgroovemult.transform.translate(w*0.134,h*0.19 + self.hOffset[i]) #QQstarS:Set  new postion. I only shown it once.
-                  self.bassgroovemult.draw(rect = (0,1,multRange[0],multRange[1]))
-                
+                  self.engine.drawImage(self.bassgroovemult, scale = (.5,-.125), coord = (w*0.134,h*0.19 + self.hOffset[i]), rect = (0,1,multRange[0],multRange[1]))
                 else: #death_au: bassgroovemult not found
                   #myfingershurt: Temp text bass groove multiplier:
                   glColor3f(0,0.75,1)
@@ -5903,18 +5898,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
   
               else:
-                self.mult.transform.reset()
-                self.mult.transform.scale(.5,-.0625) #MFH division->constant: was (.5,-.5/8.0)
-                self.mult.transform.translate(w*0.134,h*0.19 + self.hOffset[i]) #QQstarS:Set  new postion. I only shown it once.
-                self.mult.draw(rect = (0,1,multRange[0],multRange[1]))
+                self.engine.drawImage(self.mult, scale = (.5,-.0625), coord = (w*0.134,h*0.19 + self.hOffset[i]), rect = (0,1,multRange[0],multRange[1]))
   
-  
-     
-          
-              self.rockmeter.transform.reset()
-              self.rockmeter.transform.scale(.5,-.5)
-              self.rockmeter.transform.translate(w*.134, h*.22 + self.hOffset[i])
-              self.rockmeter.draw()
+              self.engine.drawImage(self.rockmeter, scale = (.5, -.5), coord = (w*.134, h*.22 + self.hOffset[i]))
               
               #===============blazingamer GH2 scoremeter
               
@@ -5979,15 +5965,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 rock = self.rockLo
     
               if self.failingEnabled:
-                rock.transform.reset()
-                rock.transform.scale(.5,-.5)
-                rock.transform.translate(w*.86,h*.2 + self.hOffset[i])
-                rock.draw()
+                self.engine.drawImage(rock, scale = (.5,-.5), coord = (w*.86,h*.2 + self.hOffset[i]))
               else:
-                self.rockOff.transform.reset()
-                self.rockOff.transform.scale(.5,-.5)
-                self.rockOff.transform.translate(w*.86,h*.2 + self.hOffset[i])
-                self.rockOff.draw()
+                self.engine.drawImage(self.rockOff, scale = (.5,-.5), coord = (w*.86,h*.2 + self.hOffset[i]))
     
               currentRock = (0.0 + self.rock[i]) / (self.rockMax)
               if self.rock[i] >= 0:
@@ -5998,21 +5978,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               wfactor = self.arrow.widthf(pixelw = 60.000)
             
               if self.failingEnabled:
-                self.arrow.transform.reset()
-                self.arrow.transform.scale(wfactor,-wfactor)
-                self.arrow.transform.rotate(angle) 
-                self.arrow.transform.translate(w*.86,h*.136 + self.hOffset[i])
-                self.arrow.draw()
+                self.engine.drawImage(self.arrow, scale = (wfactor,-wfactor), coord = (w*.86,h*.136 + self.hOffset[i]), rot = angle)
+
+              self.engine.drawImage(self.rockTop, scale = (.5,-.5), coord = (w*.86,h*.2 + self.hOffset[i]))
     
-              self.rockTop.transform.reset()
-              self.rockTop.transform.scale(.5,-.5)
-              self.rockTop.transform.translate(w*.86,h*.2 + self.hOffset[i])
-              self.rockTop.draw()
-    
-              self.counter.transform.reset()
-              self.counter.transform.translate(w*.15,h*(self.counterY) + self.hOffset[i])
-              self.counter.transform.scale(.5,-.5)
-              self.counter.draw()
+              self.engine.drawImage(self.counter, scale = (.5,-.5), coord = (w*.15,h*(self.counterY) + self.hOffset[i]))
   
               if multStreak == 0:
                 r = self.basedots
@@ -6036,33 +6006,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 r = self.dt9
               else:
                 r = self.dt10
-  
-  
-    
-              r.transform.reset()
-              r.transform.scale(.65,-.65)
-              r.transform.translate(w*0.137, h*0.23+self.hOffset[i])
-              r.draw(color = color)            
-  
+             
+              self.engine.drawImage(r, scale = (.65,-.65), coord = (w*0.137, h*0.23+self.hOffset[i]))
    
               currentSP = self.guitars[i].starPower/100.0
               widthChange = w*0.11
-   
-              self.oBottom.transform.reset()
-              self.oBottom.transform.scale(.6,.6)
-              self.oBottom.transform.translate(w*.86,h*.34 + self.hOffset[i])
-              self.oBottom.draw()
-                
-              self.oFill.transform.reset()
-              self.oFill.transform.scale(.6*currentSP,.6)
-              self.oFill.transform.translate(w*.86-widthChange+widthChange*currentSP,h*.34 + self.hOffset[i])
-              self.oFill.draw(rect = (0,currentSP,0,1))
-   
-              self.oTop.transform.reset()
-              self.oTop.transform.scale(.6,.6)
-              self.oTop.transform.translate(w*.86,h*.34 + self.hOffset[i])
-              self.oTop.draw()
-  
+
+              self.engine.drawImage(self.oBottom, scale = (.6,.6), coord = (w*.86,h*.34 + self.hOffset[i]))
+              self.engine.drawImage(self.oFill, scale = (.6*currentSP,.6), coord = (w*.86-widthChange+widthChange*currentSP,h*.34 + self.hOffset[i]), rect = (0,currentSP,0,1))
+              self.engine.drawImage(self.oTop, scale = (.6,.6), coord = (w*.86,h*.34 + self.hOffset[i]))
     
               if multStreak >= 25 and not self.counterY >= 0.1125:
                 self.counterY += 0.01
@@ -6103,10 +6055,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   self.engine.data.rockSound.play()
                 if self.rockTimer < self.rockCountdown:
                   self.rockTimer += 1
-                  self.rockMsg.transform.reset()
-                  self.rockMsg.transform.scale(0.5, -0.5)
-                  self.rockMsg.transform.translate(w/2,h/2)
-                  self.rockMsg.draw()
+                  self.engine.drawImage(self.rockMsg, scale = (0.5, -0.5), coord = (w/2,h/2))
                 if self.rockTimer >= self.rockCountdown:
                   self.rockFinished = True
     
@@ -6118,27 +6067,18 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   self.engine.data.failSound.play()
                 if self.failTimer < 100:
                   self.failTimer += 1
-                  self.failMsg.transform.reset()
-                  self.failMsg.transform.scale(0.5, -0.5)
-                  self.failMsg.transform.translate(w/2,h/2)
-                  self.failMsg.draw()
+                  self.engine.drawImage(self.failMsg, scale = (0.5, -0.5), coord = (w/2,h/2))
                 else:
                   self.finalFailed = True
                 
             
               if self.pause:
                 self.engine.view.setViewport(1,0)
-                self.pauseScreen.transform.reset()
-                self.pauseScreen.transform.scale(0.75, -0.75)
-                self.pauseScreen.transform.translate(w/2+self.pause_bkg_x,h/2+self.pause_bkg_y) 
-                self.pauseScreen.draw()
+                self.engine.drawImage(self.pauseScreen, scale = (0.75, -0.75), coord = (w/2+self.pause_bkg_x,h/2+self.pause_bkg_y))
                 
               if self.finalFailed and self.song:
                 self.engine.view.setViewport(1,0)
-                self.failScreen.transform.reset()
-                self.failScreen.transform.scale(0.75, -0.75)
-                self.failScreen.transform.translate(w/2+self.fail_bkg_x,h/2+self.fail_bkg_y)
-                self.failScreen.draw()
+                self.engine.drawImage(self.failScreen, scale = (0.75, -0.75), coord = (w/2+self.fail_bkg_x,h/2+self.fail_bkg_y))
     
 
                 text = Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
@@ -9159,10 +9099,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   partImgwidth = self.part[i].width1()
                   partwFactor = 250.000/partImgwidth
                   partX = ((i*2)+1) / (self.numOfPlayers*2.0)
-                  self.part[i].transform.reset()
-                  self.part[i].transform.scale(partwFactor*0.25,partwFactor*-0.25)
-                  self.part[i].transform.translate(w*partX,h*.4)
-                  self.part[i].draw(color = (1,1,1, 3.0 - abs(4.0 - self.countdownSeconds)))
+                  self.engine.drawImage(self.part[i], scale = (partwFactor*0.25,partwFactor*-0.25), coord = (w*partX,h*.4), color = (1,1,1, 3.0 - abs(4.0 - self.countdownSeconds)))
                   Theme.setBaseColor(min(1.0, 3.0 - abs(4.0 - self.countdownSeconds)))
                   text = player.part.text
                   w, h = font.getStringSize(text)
