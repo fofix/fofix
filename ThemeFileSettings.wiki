@@ -177,18 +177,18 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||result_cheats_percent - .45,.4,.0015||Defines the results cheats percent and size.||
 ||result_cheats_score - .75,.4,.0015||Defines the results cheats score position and size.||
 ||result_score = .5,.11,0.0025||Defines the pos of the results score.||
-||result_song = .05,.045,.002,None||Defines the pos of the song name, and 'None' can be a hex color to tailor your taste||
+||result_song = .05,.045,.002,#FFFFFF||Defines the pos of the song name. Can use any hex color||
 ||result_song_text - %s Finished!|| %s Finished! will show "Back in Black's Finished!"||
 ||result_star = .5,.35,0.0017||Defines the pos of the stars value||
-||result_stats_accuracy = .5,.61,0.002,None||Defines the pos of the accuracy % value, and 'None' can be a hex color to tailor your taste.||
+||result_stats_accuracy = .5,.61,0.002,#FFFFFF||Defines the pos of the accuracy % value. Can use any hex color.||
 ||result_stats_accuracy_text  = Accuracy:  %.1f%%|| Accuracy:  %.1f%% will show as "Accuracy: 88.7%"|| 
-||result_stats_diff = .5,.55,0.002,None||Defines the pos of the difficulty stats, and 'None' can be a hex color to tailor your taste||
+||result_stats_diff = .5,.55,0.002,#FFFFFF||Defines the pos of the difficulty stats. Can use any hex color.||
 ||result_stats_diff_text =  Difficulty: %s|| Difficulty: %s will show "Difficulty:Hard”|| 
-||result_stats_notes = .5,.52,0.002,None||Defines the pos of the notes hit value, and 'None' can be a hex color to tailor your taste||
+||result_stats_notes = .5,.52,0.002,#FFFFFF||Defines the pos of the notes hit value. Can use any hex color.||
 ||result_stats_notes_text - %s Notes Hit||%s Notes Hit  will show "128 Notes Hit"||
-||result_stats_part = .5,.64,0.002,None|| Defines the pos of the results part, and 'None' can be a hex color to tailor your taste||
+||result_stats_part = .5,.64,0.002,#FFFFFF|| Defines the pos of the results part. Can use any hex color.||
 ||result_stats_part_text = Part:  %s|| Part:  %s will show as "Part:  "||
-||result_stats_streak = .5,.58,0.002,None||Defines the pos of the streak value, and 'None' can be a hex color to tailor your taste||
+||result_stats_streak = .5,.58,0.002,#FFFFFF||Defines the pos of the streak value. Can use any hex color.||
 ||result_stats_streak_text = Longest Streak: %s|| Longest Streak: %s will show "Longest Streak: 234”|| 
 
 
