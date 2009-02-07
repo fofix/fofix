@@ -33,30 +33,31 @@ Then use any of the following settings below the {{{[theme]}}} header in the the
 ==Song Selection List / CD list== 
 
 ||_*Item Name*_||_*What it Does/How to use it*_||
-||artist_text_color = #4080FF||Use a Hex color code||
 ||artist_selected_color = #4080FF||Use a Hex color code||
+||artist_text_color = #4080FF||Use a Hex color code||
 ||career_title_color = #000000||Use a Hex color code||
-||library_text_color = #FFFFFF||Use a Hex color code||
 ||library_selected_color = #FFBF00||Use a Hex color code||
+||library_text_color = #FFFFFF||Use a Hex color code||
 ||song_cd_x = 0||Can be 0 through 5, values outside this range will be clipped to 0 or 5 to prevent CDs from going off-screen||
 ||song_cdscore_x = .6||Use a decimal # between 0 - 1. IE- .34||
-||song_list_x = .15||Use a decimal # between 0 - 1. IE- .34||
-||song_listscore_x = .8||Use a decimal # between 0 - 1. IE- .34||
-||songback = True||Scrolls the Song Selection Background image. If your image isn't long enough, Use 'SongChooseBack.png' just in case, this image is static||
-||song_name_text_color = #FFFFFF||Use a Hex color code||
-||song_name_selected_color = #FFBF00||Use a Hex color code||
-||songlist_score_color = #FFFFFF||Use a Hex color code||
 ||song_list_display = 1||Sets the songlist view. Choices are - 0=CD/Cassettes / 1=List / 2=List/CD / 3=RB2 / 4=Auto (_Should not use, you only need to use 0-3_)||
+||song_list_x = .15||Use a decimal # between 0 - 1. IE- .34||
 ||song_listcd_cd_x||Controls location of 'CDs' X position in listcd songlist view. Use a decimal # between 0 - 1||
 ||song_listcd_cd_y||Controls location of 'CDs' Y position in listcd songlist view. Use a decimal # between 0 - 1||
+||song_listcd_list_x||Controls location of 'LIST' X position in listcd songlist view. Use a decimal # between 0 - 1||
 ||song_listcd_score_x||Controls location of 'SCORE' X position in listcd songlist view. Use a decimal # between 0 - 1||
 ||song_listcd_score_y||Controls location of 'SCORE' Y position in listcd songlist view. Use a decimal # between 0 - 1||
-||song_listcd_list_x||Controls location of 'LIST' X position in listcd songlist view. Use a decimal # between 0 - 1||
-||songlistcd_score_color||Controls the scores color for both CD and List/CD mode||
+||song_listscore_x = .8||Use a decimal # between 0 - 1. IE- .34||
+||song_name_selected_color = #FFBF00||Use a Hex color code||
+||song_name_text_color = #FFFFFF||Use a Hex color code||
+||song_rb2_artist_color||Controls color of the Rock Band 2 artist name's color. Use a Hex color code||
+||song_rb2_diff_color||Controls color of the Rock Band 2 Difficulty level name's color. Use a Hex color code||
 ||song_rb2_name_color||Controls color of the Rock Band name's color. Use a Hex color code||
 ||song_rb2_name_selected_color||Controls color of the Rock Band 2 name selected color. Use a Hex color code||
-||song_rb2_diff_color||Controls color of the Rock Band 2 Difficulty level name's color. Use a Hex color code||
-||song_rb2_artist_color||Controls color of the Rock Band 2 artist name's color. Use a Hex color code||
+||songback = True||Scrolls the Song Selection Background image. If your image isn't long enough, Use 'SongChooseBack.png' just in case, this image is static||
+||songlist_score_color = #FFFFFF||Use a Hex color code||
+||songlistcd_score_color||Controls the scores color for both CD and List/CD mode||
+
 
 
 
@@ -170,21 +171,26 @@ Notice - If you just want the default phrases to show do not put these in your t
 ==Game Results Screen==
 
 ||_*Item Name*_||_*What it Does/How to use it*_ (X pos, Y pos, scale size||
-||result_score = .5,.11,0.0025||Defines the pos of the results score score.||
-||result_song = .05,.045,.002,%s||Defines the pos of the songname||
-||result_song_text - %s Finished!|| %s Finished! will show "Back in Black's Finished!"||
-||result_star = .5,.35,0.0017||Defines the pos of the stars value||
-||result_stats_notes = .5,.52,0.002,%s||Defines the pos of the notes hit value (Can use text. IE- 'result_stats_notes = .5,.52,0.002,%s Notes Hit' will show "138 Notes Hit")||
-||result_stats_diff = .5,.55,0.002,%s||Defines the pos of the difficulty stats (Can use text. IE- 'result_stats_diff = .5,.55,0.002,Difficulty: %s' will show "Difficulty:Hard")|| 
-||result_stats_streak = .5,.58,0.002,%s||Defines the pos of the streak value (Can use text. IE- 'result_stats_streak = .5,.58,0.002,Longest Streak: %s' will show "Longest Streak: 234")|| 
-||result_stats_accuracy = .5,.61,0.002,%.1f%%||Defines the pos of the accuracy % value. (IE- 'result_stats_accuracy = .5,.61,0.002,Accuracy: %.1f%%' will show as "Accuracy: 88.7%")|| 
-||result_stats_notes_text - %s Notes Hit|| %s Notes Hit will show "128 Notes Hit"||
-||result_stats_part = .5,.64,0.002,Part: %s|| Defines the pos of the results part (Can use text. IE- 'result_stats_part = .5,.64,0.002,Part: %s' shows as "Part:  ")||
+||result_cheats_color - #FFFFFF||Defines the results cheats color.||
 ||result_cheats_info - .5,.3,.002||Defines the results cheats info position and size.||
 ||result_cheats_numbers - .5,.35,.0015||Defines the results cheats numbers position and size.||
-||result_cheats_score - .75,.4,.0015||Defines the results cheats score position and size.||
 ||result_cheats_percent - .45,.4,.0015||Defines the results cheats percent and size.||
-||result_cheats_color - #FFFFFF||Defines the results cheats color.||
+||result_cheats_score - .75,.4,.0015||Defines the results cheats score position and size.||
+||result_score = .5,.11,0.0025||Defines the pos of the results score.||
+||result_song = .05,.045,.002,None||Defines the pos of the song name||
+||result_song_text - %s Finished!|| %s Finished! will show "Back in Black's Finished!"||
+||result_star = .5,.35,0.0017||Defines the pos of the stars value||
+||result_stats_accuracy = .5,.61,0.002,None||Defines the pos of the accuracy % value.||
+||result_stats_accuracy_text  = Accuracy:  %.1f%%|| Accuracy:  %.1f%% will show as "Accuracy: 88.7%")|| 
+||result_stats_diff = .5,.55,0.002,None||Defines the pos of the difficulty stats||
+||result_stats_diff =  Difficulty: %s|| Difficulty: %s will show "Difficulty:Hard”|| 
+||result_stats_notes = .5,.52,0.002,None||Defines the pos of the notes hit value||
+||result_stats_notes_text - %s Notes Hit||%s Notes Hit  will show "128 Notes Hit"||
+||result_stats_part = .5,.64,0.002,None|| Defines the pos of the results part||
+||result_stats_part_text = Part:  %s|| Part:  %s will show as "Part:  "||
+||result_stats_streak = .5,.58,0.002,None||Defines the pos of the streak value||
+||result_stats_streak_text = Longest Streak: %s|| Longest Streak: %s will show "Longest Streak: 234”|| 
+
 
 ----------------------------------------------------------------------------
 
