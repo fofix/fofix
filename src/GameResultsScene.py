@@ -679,7 +679,10 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
               star = self.star4
             else:
               star = self.star3
-            wide = star.width1()*.5
+            try:
+              wide = star.width1()*float(Theme.result_star[3])
+            except IndexError:
+              wide = star.width1()*.5
             self.engine.drawImage(star, scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])))
         
         settingsText = "%s %s - %s: %s / %s, %s: %s" % (self.engine.versionString, self.tsSettings, self.tsHopos, self.hopoStyle, self.hopoFreq, self.tsHitWindow, self.hitWindow)
