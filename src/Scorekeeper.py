@@ -51,6 +51,7 @@ class ScoreCard(object):
     if logClassInits == 1:
       Log.debug("ScoreCard class init...")
     self.starScoring = Config.get("game", "star_scoring")
+    self.updateOnScore = Config.get("game", "star_score_updates")
     self.avMult = 0.0
     self.hitAccuracy = 0.0
     self.score  = 0
@@ -154,7 +155,10 @@ class ScoreCard(object):
 
   def getStarScores(self, tempExtraScore = 0):
     oldStar = self.stars
-    hitThreshold = float(self.score+tempExtraScore) / float(self.totalNotes * self.baseScore)
+    if self.updateOnScore == 1:
+      avMult = float(self.score+tempExtraScore) / float(self.totalNotes * self.baseScore)
+    else:
+      avMult = self.avMult
     if self.starScoring == 1: #GH-style
       if self.hitAccuracy == 100.0 and self.hiStreak == self.totalStreakNotes and not self.cheatsApply:
         self.stars = 7
@@ -166,15 +170,15 @@ class ScoreCard(object):
         self.partialStars = 0
         self.starRatio = 0
         return 6
-      elif (self.hitAccuracy >= 90.0 and not self.cheatsApply) or self.avMult >= self.star[5]:
+      elif (self.hitAccuracy >= 90.0 and not self.cheatsApply) or avMult >= self.star[5]:
         self.stars = 5
         self.partialStars = 0
         self.starRatio = 0
         return 5
       else:
         for i in range(4, -1, -1):
-          if self.avMult >= self.star[i]:
-            part = self.avMult - self.star[i]
+          if avMult >= self.star[i]:
+            part = avMult - self.star[i]
             partPct = part / (self.star[i+1] - self.star[i])
             partStar = int(8*partPct)
             partStar = min(partStar, 7) #catches 99.very9%, just in case
@@ -189,55 +193,55 @@ class ScoreCard(object):
       if hundredGold and self.hitAccuracy == 1.0 and self.hiStreak == self.totalStreakNotes and not self.cheatsApply:
         self.stars = 7
         self.partialStars = 0
-        self.ratio = 0
+        self.starRatio = 0
         return 7
-      if (self.hitAccuracy == 1.0 and hundredGold) or self.avMult > self.star[6]:
+      if (self.hitAccuracy == 1.0 and hundredGold) or avMult > self.star[6]:
         self.stars = 6
         self.partialStars = 0
-        self.ratio = 0
+        self.starRatio = 0
         return 6
-      elif self.avMult >= self.star[5]:
+      elif avMult >= self.star[5]:
         self.stars = 5
         self.partialStars = 0
-        self.ratio = 0
+        self.starRatio = 0
         return 5
       else:
         for i in range(4, -1, -1):
-          if self.avMult >= self.star[i]:
-            part = self.avMult - self.star[i]
+          if avMult >= self.star[i]:
+            part = avMult - self.star[i]
             partPct = part / (self.star[i+1] - self.star[i])
             partStar = int(8*partPct)
             partStar = min(partStar, 7) #catches 99.very9%, just in case
             self.stars = i
             self.partialStars = partStar
-            self.ratio = partPct
+            self.starRatio = partPct
             return i
     else: #FoF
       if self.hitAccuracy == 1.0 and self.hiStreak == self.totalStreakNotes and not self.cheatsApply:
         self.stars = 7
         self.partialStars = 0
-        self.ratio = 0
+        self.starRatio = 0
         return 7
       if self.hitAccuracy == self.star[6]:
         self.stars = 6
         self.partialStars = 0
-        self.ratio = 0
+        self.starRatio = 0
         return 6
       elif self.hitAccuracy >= self.star[5]:
         self.stars = 5
         self.partialStars = 0
-        self.ratio = 0
+        self.starRatio = 0
         return 5
       else:
         for i in range(4, -1, -1):
-          if hitThreshold >= self.star[i]:
-            part = hitThreshold - self.star[i]
+          if self.hitAccuracy >= self.star[i]:
+            part = self.hitAccuracy - self.star[i]
             partPct = part / (self.star[i+1] - self.star[i])
             partStar = int(8*partPct)
             partStar = min(partStar, 7) #catches 99.very9%, just in case
             self.stars = i
             self.partialStars = partStar
-            self.ratio = partPct
+            self.starRatio = partPct
             return i
 
   def updateAvMult(self):
