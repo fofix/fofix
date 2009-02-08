@@ -14,19 +14,20 @@ Then use any of the following settings below the {{{[theme]}}} header in the the
 ||menu_y = .842||Y Position of main menu image. Use a decimal # between 0-1||
 ||main_menu_scale = .5||Controls the size of main menu text. Use a decimal # between 0-1|| 
 ||main_menu_vspacing = 0.09||Controls the spacing between the menu text items. Use a decimal # between 0-1||
-
-
+||multiplayertext5 = .40,.35,.46,.045||.40 is X Pos, .35 is Y Position, .46 is Scaling Size, .045 is Line Spacing between menu items. Used for Multiplayer Menu (This is only used if you made the multiplayer.png and multiplayertext10.png images. The '5' in the name refers to being that, for example, the GH3 multiplayer menu has 5 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
+||solotext2 = .40,.35,.46,.045||.40 is X Pos, .35 is Y Position, .46 is Scaling Size, .045 is Line Spacing between menu items. Used for Solo Menu (This is only used if you made the solo.png and solotext2.png images. The '2' in the name refers to being that, for example, the RB solo menu has 2 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
 
 ------------------------------------------------------------------------------------------
 ==Options Menu==
 
+||advsettingstext10 = .393,.87,.49,.074||.393 is X Pos, .87 is Y Position, .49 is Scaling Size, .0741 is Line Spacing between menu items. Used for Adv. Options Menu(This is used if you made the advsettings.png and advsettingstext10.png images. The '10' in the name refers to being that, for example, the GH3 advanced options menu has 10 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
 ||opt_bkg_x = 0||0 starts from the center||
 ||opt_bkg_y = 0||0 starts from the center||
 ||opt_selected_color = #FFBF00||Selects the color of the options menu selected text. Use a Hex color code||
 ||opt_text_x = .38||Controls the Option Menu text X position||
 ||opt_text_y = .15||Controls the Option Menu text Y position||
 ||opt_text_color = #FFFFFF||Selects the color of the options menu items. Use a Hex color code||
-
+||settingstext9 = .393,.88,.50,.085||.393 is X Pos, .88 is Y Position, .50 is Scaling Size, .085 is Line Spacing between menu items. Used for Options Menu(This is used if you made the settings.png and settingstext9.png images. The '9' in the name refers to being that, for example, the GH3 options menu has 10 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
 
 
 ----------------------------------------------------------------------------
@@ -69,7 +70,7 @@ Then use any of the following settings below the {{{[theme]}}} header in the the
 ||song_select_submenu_y = 0||Controls the submenu text positions. Use a decimal # between 0 - 1, IE- .030||
 ||song_select_submenu_offset_lines = 2||Adds offset lines. Has *NO* effect if {{{song_select_submenu_x_ AND _song_select_submenu_y}}} *aren't* used.||
 ||song_select_submenu_offset_spaces = 2||Adds offset spaces. Has *NO* effect if {{{song_select_submenu_x AND song_select_submenu_y}}} *aren't* used.||
-
+||trainingtext2 = .5,.51,.76,0||.51 is X Pos, .51 is Y Position, .76 is Scaling Size, 0 is Line Spacing between menu items. Used for Training Menu(This is only used if you made the training.png and trainingtext2.png images. The '2' in the name refers to being that, for example, the GH3 training menu has 2 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
 
 
 ------------------------------------------------------------------------------------------
@@ -148,6 +149,9 @@ Notice - If you just want the default phrases to show do not put these in your t
 ----------------------------------------------------------------------------
 ==Pause Menu's==
 ||_*Item Name*_||_*What it Does/How to use it*_||
+||careerfailtext4 = .5,.51,.76,0||.393 is X Pos, .87 is Y Position, .49 is Scaling Size, .0741 is Line Spacing between menu items. Used for Career Failed Menu (This is only used if you made the careerfail.png and careerfailtext4.png images. The '4' in the name refers to being that, for example, the GH3 career failed menu has 4 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
+||careerpausetext5 = .5,.51,.76,.74||.5 is X Pos, .51 is Y Position, .76 is Scaling Size, .074 is Line Spacing between menu items. Used for Career Pause Menu (This is only used if you made the careerpause.png and careerpausetext5.png images. The '5' in the name refers to being that, for example, the GH3 career pause menu has 5 items in list. Uses the same method as how the Main Menu text image is done for example.)||
+||failtext3 = .5,.51,.76,0||.393 is X Pos, .87 is Y Position, .49 is Scaling Size, .0741 is Line Spacing between menu items. Used for Failed Menu (This is only used if you made the fail.png and failtext3.png images. The '3' in the name refers to being that, for example, the GH3 fail menu has 3 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
 ||fail_bkg_x = 0||Controls the fail menu background and text positions||
 ||fail_bkg_y = 0||Controls the fail menu background and text positions||
 ||fail_completed_color = #FFFFFF ||Controls the Fail/Completed text line color.Use a hex color||
@@ -155,6 +159,7 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||fail_text_x =   ||Default is calculated, not constant||
 ||fail_text_y = .47||Controls the fail menu background and text positions||
 ||fail_text_color = #FFFFFF||Use a Hex color code||
+||pausetext5 = .5,.51,.76,.074||.5 is X Pos, .51 is Y Position, .76 is Scaling Size, .074 is Line Spacing between menu items. Used for Pause Menu (This is only used if you made the pause.png and pausetext10.png images. The '5' in the name refers to being that, for example, the GH3 pause menu has 5 items in list. Uses the same method as how the Main Menu text image is done for example.)||
 ||pause_bkg_x = 0||0 starts from the center of the screen||
 ||pause_bkg_y = 0||0 starts from the center of the screen||
 ||pause_selected_color = #FFBF00||Use a Hex color code||
