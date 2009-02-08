@@ -1667,7 +1667,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.menu = Menu(self.engine, [
           (_("        RESUME"), self.resumeSong),
           (_("       RESTART"), self.restartSong),
-          (_("        GIVE UP"), self.changeSong),
+ #         (_("        GIVE UP"), self.changeSong),
           (_("      END SONG"), self.endSong),
           (_("       OPTIONS"), settingsMenu),
           (_("           QUIT"), self.quit),  #Worldrave - added graphic menu support "pause" for Pause menu in below line.
