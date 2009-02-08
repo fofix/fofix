@@ -760,8 +760,8 @@ class GameEngine(Engine):
   def drawImage(self, image, scale, coord, rot = 0, color = (1,1,1,1), rect = (0,1,0,1)):
     
     image.transform.reset()
-    image.transform.scale(scale[0],scale[1])
     image.transform.rotate(rot)
+    image.transform.scale(scale[0],scale[1])
     image.transform.translate(coord[0],coord[1])
     image.draw(color = color, rect = rect)
 

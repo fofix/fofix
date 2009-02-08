@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-02-07 11:16-0800\n"
+"POT-Creation-Date: 2009-02-08 11:31-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -153,7 +153,7 @@ msgid "Copyright 2006, 2007 by Unreal Voodoo"
 msgstr ""
 
 #: Credits.py:249
-msgid "Copyright 2008 by Team FoFiX"
+msgid "Copyright 2008, 2009 by Team FoFiX"
 msgstr ""
 
 #: Data.py:141
@@ -2164,46 +2164,46 @@ msgstr ""
 msgid "%d points is a new high score! Enter your name:"
 msgstr ""
 
-#: GameResultsScene.py:801
+#: GameResultsScene.py:804
 #, python-format
 msgid "%s High Scores for %s"
 msgstr ""
 
-#: GameResultsScene.py:803
+#: GameResultsScene.py:806
 #, python-format
 msgid "%s High Scores"
 msgstr ""
 
-#: GameResultsScene.py:809
+#: GameResultsScene.py:812
 #, python-format
 msgid "Difficulty: %s"
 msgstr ""
 
-#: GameResultsScene.py:882
+#: GameResultsScene.py:885
 msgid "Uploading Scores..."
 msgstr ""
 
-#: GameResultsScene.py:887
+#: GameResultsScene.py:890
 msgid "Scores uploaded!"
 msgstr ""
 
-#: GameResultsScene.py:891
+#: GameResultsScene.py:894
 msgid "Your highscore ranks"
 msgstr ""
 
-#: GameResultsScene.py:892
+#: GameResultsScene.py:895
 msgid "on the world starpower chart!"
 msgstr ""
 
-#: GameResultsScene.py:895
+#: GameResultsScene.py:898
 msgid "but your rank is unknown."
 msgstr ""
 
-#: GameResultsScene.py:898
+#: GameResultsScene.py:901
 msgid "but there was no new highscore."
 msgstr ""
 
-#: GameResultsScene.py:901
+#: GameResultsScene.py:904
 msgid "Score upload failed!  World charts may be down."
 msgstr ""
 
@@ -2251,15 +2251,15 @@ msgstr ""
 msgid "% Complete"
 msgstr ""
 
-#: GuitarScene.py:367 GuitarScene.py:8371
+#: GuitarScene.py:367 GuitarScene.py:7548
 msgid "HOPO"
 msgstr ""
 
-#: GuitarScene.py:368 GuitarScene.py:8341 GuitarScene.py:8350
+#: GuitarScene.py:368 GuitarScene.py:7518 GuitarScene.py:7527
 msgid "COMPLETED"
 msgstr ""
 
-#: GuitarScene.py:369 GuitarScene.py:8343 GuitarScene.py:8359
+#: GuitarScene.py:369 GuitarScene.py:7520 GuitarScene.py:7536
 msgid " % ON "
 msgstr ""
 
@@ -2395,10 +2395,6 @@ msgstr ""
 msgid "       RESTART"
 msgstr ""
 
-#: GuitarScene.py:1670
-msgid "        GIVE UP"
-msgstr ""
-
 #: GuitarScene.py:1671
 msgid "      END SONG"
 msgstr ""
@@ -2511,7 +2507,7 @@ msgstr ""
 msgid " QUIT"
 msgstr ""
 
-#: GuitarScene.py:9000
+#: GuitarScene.py:8177
 #, python-format
 msgid "FPS: %.2f"
 msgstr ""
