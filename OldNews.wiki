@@ -2,6 +2,24 @@
 
 = Old News =
 
+====Jan. 25th 2009 ====
+3.100 Beta 3 (SVN r862) has been released for testing.  Big Rock Endings and Drum Fills have come further since 3.100 beta 2.  Guitar picks will now repeat for menu and songlist scrolling, and lyrics will no longer show during the song countdown.
+
+  * Download 3.0xx -> 3.100 beta 3 Patch for Windows [http://www.mediafire.com/?ytkyy2jgjmg from Mediafire] / [http://rapidshare.com/files/189452982/FoFiX-3.030_r862-Patch-Windows_3.100beta3_.rar from Rapidshare]
+  * Download 3.100 beta 2 (from installer only) -> 3.100 beta 3 Patch Installer for Windows [http://www.mediafire.com/?oqzejgukmqy from Mediafire]
+  * Download 3.100 beta 3 Full for Mac [http://www.mediafire.com/?zjygy8z732x from Mediafire]
+  * Download 3.0xx -> 3.100 beta 3 Patch for Mac [http://www.mediafire.com/?2tzgzjzdzy3 from Mediafire]
+  * Download 3.x -> 3.100 beta 3 Patch for GNU/Linux (32bit) [http://www.mediafire.com/?ygydjlktjmz from Mediafire]
+  * Download 3.100 beta 3 Full for GNU/Linux (32bit) [http://www.mediafire.com/?zk11yum43a0 from Mediafire]
+
+====Jan. 18th 2009 ====
+3.100 Beta 2 (SVN r812) has been released for testing.  Big Rock Endings and Drum Fills have come much further since 3.100 beta 1, as has the settings menu.  No more double-and-triple song loading cycles, either.
+
+  * Download 3.100 beta 2 Patch for Windows [http://www.mediafire.com/?yqgyngnydow from Mediafire] / [http://rapidshare.com/files/185779080/FoFiX-3.030_r812-Patch-Windows_3.100beta2_.rar from Rapidshare]
+  * [http://www.mediafire.com/?mxqd1xcjytv Download 3.100 beta 2 Patch for GNU/Linux] (32bit)
+  * [http://www.mediafire.com/download.php?hzzmjjlmzz3 Download 3.100 beta 2 Full installer for Windows by js]
+  * [http://www.mediafire.com/?t22bvymvldz Download 3.100 beta 2 Full for Mac]
+
 ====Jan. 11th 2009 ====
 3.100 Beta 1 (SVN r762) has been released for testing.  Notable new features include very basic Big Rock Ending support, Drum Fills, MIDI instrument input support, whammy pitch-bending support, basic 3D note.dae texturing support, and songlist metadeta caching. 
 
