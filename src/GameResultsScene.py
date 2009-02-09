@@ -91,6 +91,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.finalScore       = [0 for i in scores]
     self.originalScore    = [0 for i in scores]
     self.cheatsApply      = True
+    self.skipCheats       = False
     self.showHighscores   = False
     self.singleView       = False
     self.highscoreIndex   = [-1 for i in players]
@@ -107,10 +108,10 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.resultNum        = 0    # holder for response
     self.hsRollIndex      = 0
     self.nextScene        = None
-    self.offset           = .8
+    self.offset           = 0.0
     self.pctRoll          = 0.0
     self.vis              = 1.0
-    self.pauseScroll      = None
+    self.pauseScroll      = 0
     self.careerStars      = self.engine.config.get("game", "career_star_min")
     self.detailedScores   = False #to do.
     self.playerList       = players
@@ -192,6 +193,12 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           else:
             self.cheats[i].append((Scorekeeper.HANDICAP_NAMES[(a-1)-j], Scorekeeper.HANDICAPS[j]))
             self.finalScore[i] = int(self.finalScore[i] * Scorekeeper.HANDICAPS[j])
+    
+    for cheatList in self.cheats:
+      if len(cheatList) > 0:
+        break
+    else:
+      self.skipCheats = True
     
     self.hopoStyle = self.engine.config.get("game", "hopo_system")
     gh2sloppy      = self.engine.config.get("game", "gh2_sloppy")
@@ -519,43 +526,46 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         self.progressReady = True
     
     if self.resultStep == 1:
-      for i, scoreCard in enumerate(self.scoring):
-        if self.resultSubStep[i] == 0:
-          if self.currentCheat[i] < len(self.cheats[i]):
-            self.scoreRollTimer[i] += ticks
-            if self.finishedCheat[i] == -1:
-              scoreCard.cheatsApply = True
-              self.cheatsApply = True
-            if not self.rolling[i]:
-              if self.delay[i] == 0 and self.finishedCheat[i] < self.currentCheat[i] and not self.waiting:
-                self.newScore[i] = int(self.currentScore[i] * self.cheats[i][self.currentCheat[i]][1])
-                self.totalHandicap[i] *= self.cheats[i][self.currentCheat[i]][1]
-                if self.starScoring == 0:
-                  self.starMass[i] *= self.cheats[i][self.currentCheat[i]][1]
-                  scoreCard.stars = min(int(self.starMass[i]/100),5)
-                self.startRoll(i)
-                self.finishedCheat[i] += 1
-                self.engine.data.getScrewUpSound().play()
-              elif self.delay[i] == 0 and self.finishedCheat[i] == self.currentCheat[i]:
-                self.currentCheat[i] += 1
-                self.delay[i] = 3000
-                self.waiting  = True
-              else:
-                self.processDelay(i, ticks)
-            if self.rolling[i]:
-              self.scoreRoll(i, ticks)
-              scoreCard.score = self.currentScore[i]
-              if self.starScoring > 0:
-                star = scoreCard.stars
-                scoreCard.updateAvMult()
-                scoreCard.getStarScores()
-                if star > scoreCard.stars and self.engine.data.starLostSoundFound:
-                  self.engine.data.starLostSound.play()
-          else:
-            self.resultSubStep[i] += 1
+      if self.skipCheats:
+        self.resultStep += 1
+      else:
+        for i, scoreCard in enumerate(self.scoring):
+          if self.resultSubStep[i] == 0:
+            if self.currentCheat[i] < len(self.cheats[i]):
+              self.scoreRollTimer[i] += ticks
+              if self.finishedCheat[i] == -1:
+                scoreCard.cheatsApply = True
+                self.cheatsApply = True
+              if not self.rolling[i]:
+                if self.delay[i] == 0 and self.finishedCheat[i] < self.currentCheat[i] and not self.waiting:
+                  self.newScore[i] = int(self.currentScore[i] * self.cheats[i][self.currentCheat[i]][1])
+                  self.totalHandicap[i] *= self.cheats[i][self.currentCheat[i]][1]
+                  if self.starScoring == 0:
+                    self.starMass[i] *= self.cheats[i][self.currentCheat[i]][1]
+                    scoreCard.stars = min(int(self.starMass[i]/100),5)
+                  self.startRoll(i)
+                  self.finishedCheat[i] += 1
+                  self.engine.data.getScrewUpSound().play()
+                elif self.delay[i] == 0 and self.finishedCheat[i] == self.currentCheat[i]:
+                  self.currentCheat[i] += 1
+                  self.delay[i] = 3000
+                  self.waiting  = True
+                else:
+                  self.processDelay(i, ticks)
+              if self.rolling[i]:
+                self.scoreRoll(i, ticks)
+                scoreCard.score = self.currentScore[i]
+                if self.starScoring > 0:
+                  star = scoreCard.stars
+                  scoreCard.updateAvMult()
+                  scoreCard.getStarScores()
+                  if star > scoreCard.stars and self.engine.data.starLostSoundFound:
+                    self.engine.data.starLostSound.play()
+            else:
+              self.resultSubStep[i] += 1
       
-      if min(self.resultSubStep) > 0:
-        self.progressReady = True
+        if min(self.resultSubStep) > 0:
+          self.progressReady = True
     
     if self.resultStep == 2:
       if not self.coOpType:
@@ -563,6 +573,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           if self.finalScore[i] == 0:
             self.noScore[i] = True
         if not self.haveRunScores:
+          self.nextHighScore()
           self.runScores()
 
         if self.doneScores:
@@ -582,8 +593,11 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         self.doneCount = True
       self.resultStep = 3
     
-    if self.resultStep > 3:
-      self.offset -= .001
+    if self.resultStep > 2:
+      if self.pauseScroll < 5000:
+        self.pauseScroll += ticks
+      else:
+        self.offset -= .001
     
     if self.counter > 5000 and self.taunt:
       self.taunt.setVolume(self.engine.config.get("audio", "SFX_volume"))
@@ -790,38 +804,26 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     
     w, h = self.fullView
     
-    for j,player in enumerate(self.playerList):
-      scale = 0.0017
-      endScroll = -.14
-      
-      if self.pauseScroll != None:
-        self.offset = 0.0
-      
-      if self.pauseScroll > 0.5:
-        self.pauseScroll = None
-      if self.offset == None:
-        self.offset = 0
-        self.pauseScroll = 0
-        self.nextHighScore()
-      
-      
-      # evilynux - highscore
-      if self.song is not None:
-        text = _("%s High Scores for %s") % (self.scorePart, Dialogs.removeSongOrderPrefixFromName(self.song.info.name))
-      else:
-        text = _("%s High Scores") % self.scorePart
-      w, h = font.getStringSize(text)
-      
-      Theme.setBaseColor(1 - v)
-      font.render(text, (.5 - w / 2, .01 - v + self.offset))
-      
-      text = _("Difficulty: %s") % (self.scoreDifficulty)
-      w, h = font.getStringSize(text)
-      Theme.setBaseColor(1 - v)
-      font.render(text, (.5 - w / 2, .01 - v + h + self.offset))
-      
-      x = .01
-      y = .16 + v
+    scale = 0.0017
+    endScroll = -.14
+    
+    # evilynux - highscore
+    if self.song is not None:
+      text = _("%s High Scores for %s") % (self.scorePart, Dialogs.removeSongOrderPrefixFromName(self.song.info.name))
+    else:
+      text = _("%s High Scores") % self.scorePart
+    w, h = font.getStringSize(text)
+    
+    Theme.setBaseColor(1 - v)
+    font.render(text, (.5 - w / 2, .01 - v + self.offset))
+    
+    text = _("Difficulty: %s") % (self.scoreDifficulty)
+    w, h = font.getStringSize(text)
+    Theme.setBaseColor(1 - v)
+    font.render(text, (.5 - w / 2, .01 - v + h + self.offset))
+    
+    x = .01
+    y = .16 + v
     
     if self.song:
       i = -1
@@ -879,7 +881,6 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       if self.offset < endScroll or i == -1:
         self.offset = self.scoreScrollStartOffset
         self.nextHighScore()
-        endScroll = -0.14
     
     for j,player in enumerate(self.playerList): #MFH 
       if self.uploadingScores[j]:
