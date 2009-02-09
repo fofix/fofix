@@ -7006,24 +7006,24 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               if self.pause:
                 self.engine.view.setViewport(1,0)
                 wFactor = 640.000/self.pauseScreen.width1()
-                self.engine.drawImage(self.pauseScreen, scale = (wFactor, -wFactor), coord = (w/2+self.pause_bkg_x,h/2+self.pause_bkg_y))
+                self.engine.drawImage(self.pauseScreen, scale = (wFactor, -wFactor), coord = (w/2,h/2))
                 
               if self.finalFailed and self.song:
                 self.engine.view.setViewport(1,0)
-                wFactor = 640.000/self.pauseScreen.width1()
-                self.engine.drawImage(self.failScreen, scale = (wFactor, -wFactor), coord = (w/2+self.fail_bkg_x,h/2+self.fail_bkg_y))
+                wFactor = 640.000/self.failScreen.width1()
+                self.engine.drawImage(self.failScreen, scale = (wFactor, -wFactor), coord = (w/2,h/2))
     
                 text = Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
                 size = font.getStringSize(text)
-                font.render(text, (.5-size[0]/2.0,.3-size[1]))
+                font.render(text, (0.5-size[0]/2.0,0.3-size[1]))
                 #now = self.getSongPosition()
 
                 pctComplete = min(100, int(now/self.lastEvent*100))
                 #MFH string concatenation -> modulo formatting
                 #text = str(pctComplete) + self.tsPercentComplete
-                text = "%s%s" % (str(pctComplete), self.tsPercentComplete)
+                text = "%d%s" % (pctComplete, self.tsPercentComplete)
                 size = font.getStringSize(text)
-                font.render(text, (.5-size[0]/2.0, .3))
+                font.render(text, (0.5-size[0]/2.0, 0.3))
                 if not self.failEnd:
                   self.failGame()
     

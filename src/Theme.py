@@ -408,9 +408,9 @@ starFillupColor = None
 #Qstick - misc
 songListDisplay = None
 
-result_score = [None] * 3
-result_star = [None] * 3
-result_song = [None] * 3
+result_score = [None] * 4
+result_star = [None] * 4
+result_song = [None] * 4
 result_song_text = None
 result_stats_part = [None] * 4
 result_stats_part_text = None

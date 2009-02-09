@@ -671,6 +671,11 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         wText, hText = font.getStringSize(text, scale = float(Theme.result_stats_notes[2]))
         Dialogs.wrapText(font, (float(Theme.result_stats_notes[0]) - wText/2, float(Theme.result_stats_notes[1]) + v), text, 0.9, float(Theme.result_stats_notes[2]))
         
+        try:
+          r, g, b = Theme.hexToColorResults(Theme.result_score[3])
+          glColor3f(r, g, b)
+        except IndexError:
+          Theme.setBaseColor(1-v)
         text = "%d" % self.currentScore[i]
         wText, hText = bigFont.getStringSize(text, scale = float(Theme.result_score[2]))
         bigFont.render(text, (float(Theme.result_score[0]) - wText / 2, float(Theme.result_score[1]) + v), scale = float(Theme.result_score[2]))
