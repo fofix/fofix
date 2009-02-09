@@ -273,25 +273,20 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.maskStars = False
     self.fcStars   = True
     self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "gameresults.png"))
+    self.engine.loadImgDrawing(self, "star1", os.path.join("themes",themename,"star1.png"))
+    self.engine.loadImgDrawing(self, "star2", os.path.join("themes",themename,"star2.png"))
     try:
-      self.engine.loadImgDrawing(self, "star3", os.path.join("themes",themename,"star3.png"))
-      self.engine.loadImgDrawing(self, "star4", os.path.join("themes",themename,"star4.png"))
-    except IOError:
-      self.engine.loadImgDrawing(self, "star3", os.path.join("themes",themename,"star1.png"))
-      self.engine.loadImgDrawing(self, "star4", os.path.join("themes",themename,"star2.png"))
-    try:
-      self.engine.loadImgDrawing(self, "star5", os.path.join("themes",themename,"star5.png"))
-      self.engine.loadImgDrawing(self, "star6", os.path.join("themes",themename,"star6.png"))
-    except IOError:
+      self.engine.loadImgDrawing(self, "starPerfect", os.path.join("themes",themename,"starperfect.png"))
       try:
-        self.engine.loadImgDrawing(self, "star5", os.path.join("themes",themename,"starperfect.png"))
-        self.star6   = None
-        self.fcStars = False
+        self.engine.loadImgDrawing(self, "starFC", os.path.join("themes",themename,"starfc.png"))
       except IOError:
-        self.engine.loadImgDrawing(self, "star5", os.path.join("themes",themename,"star2.png"))
-        self.star6     = None
-        self.fcStars   = False
-        self.maskStars = True
+        self.starFC = None
+        self.fcStars = False
+    except IOError:
+      self.engine.loadImgDrawing(self, "starPerfect", os.path.join("themes",themename,"star2.png"))
+      self.starFC     = None
+      self.fcStars   = False
+      self.maskStars = True
 
     
     phrase = random.choice(Theme.resultsPhrase.split("_"))
@@ -652,7 +647,11 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         text = Theme.result_song_text % Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
       except TypeError:
         text = "%s %s" % (Dialogs.removeSongOrderPrefixFromName(self.song.info.name), Theme.result_song_text)
-      
+      try:
+        r, g, b = Theme.hexToColorResults(Theme.result_song[3])
+        glColor3f(r, g, b)
+      except IndexError:
+        Theme.setBaseColor(1-v)
       wText, hText = font.getStringSize(text, scale = float(Theme.result_song[2]))
       Dialogs.wrapText(font, (float(Theme.result_song[0]), float(Theme.result_song[1]) - v), text, 0.9, float(Theme.result_song[2]))
       
@@ -664,6 +663,11 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           text = Theme.result_stats_notes_text % text
         except TypeError:
           text = "%s %s" % (text, Theme.result_stats_notes_text)
+        try:
+          r, g, b = Theme.hexToColorResults(Theme.result_stats_notes[3])
+          glColor3f(r, g, b)
+        except IndexError:
+          Theme.setBaseColor(1-v)
         wText, hText = font.getStringSize(text, scale = float(Theme.result_stats_notes[2]))
         Dialogs.wrapText(font, (float(Theme.result_stats_notes[0]) - wText/2, float(Theme.result_stats_notes[1]) + v), text, 0.9, float(Theme.result_stats_notes[2]))
         
@@ -679,9 +683,9 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         if scoreCard.stars > 5:
           for j in range(5):
             if self.fcStars and scoreCard.stars == 7:
-              star = self.star6
+              star = self.starFC
             else:
-              star = self.star5
+              star = self.starPerfect
             try:
               wide = star.width1()*float(Theme.result_star[3])
             except IndexError:
@@ -696,9 +700,9 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         else:
           for j in range(5):
             if j < scoreCard.stars:
-              star = self.star4
+              star = self.star2
             else:
-              star = self.star3
+              star = self.star1
             try:
               wide = star.width1()*float(Theme.result_star[3])
             except IndexError:

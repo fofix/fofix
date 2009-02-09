@@ -1404,7 +1404,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       
       #Pause Screen
       self.engine.loadImgDrawing(self, "pauseScreen", os.path.join("themes",themename,"pause.png"))
-      self.engine.loadImgDrawing(self, "failScreen", os.path.join("themes",themename,"pause.png"))
+      try:
+        self.engine.loadImgDrawing(self, "failScreen", os.path.join("themes",themename,"fail.png"))
+      except IOError:
+        self.engine.loadImgDrawing(self, "failScreen", os.path.join("themes",themename,"pause.png"))
       #Rockmeter
       self.engine.loadImgDrawing(self, "counter", os.path.join("themes",themename,"counter.png"))
 
@@ -1814,15 +1817,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       size = self.engine.data.pauseFont.getStringSize("Quit to Main")
       if self.careerMode:
         self.failMenu = Menu(self.engine, [
-          (_(" TRY AGAIN?"), self.restartAfterFail),
-          (_(" GIVE UP?"), self.changeAfterFail),
-          (_(" PRACTICE?"), self.practiceSong), #evilynux
+          (_(" RETRY"), self.restartAfterFail),
+          (_(" NEW SONG"), self.changeAfterFail),
+          (_(" PRACTICE"), self.practiceSong), #evilynux
           (_(" QUIT"), self.quit),  #Worldrave - added graphic menu support "careerfail" for Career Fail menu in below line.
         ], name = "careerfail", fadeScreen = False, onCancel = self.changeAfterFail, font = self.engine.data.pauseFont, pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
       else:
         self.failMenu = Menu(self.engine, [
-          (_(" TRY AGAIN?"), self.restartAfterFail),
-          (_(" GIVE UP?"), self.changeAfterFail),
+          (_(" RETRY"), self.restartAfterFail),
+          (_(" NEW SONG"), self.changeAfterFail),
           (_(" QUIT"), self.quit),  #Worldrave - added graphic menu support "fail" for Fail menu in below line.
         ], name = "fail", fadeScreen = False, onCancel = self.changeAfterFail, font = self.engine.data.pauseFont, pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
 
@@ -7002,11 +7005,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             
               if self.pause:
                 self.engine.view.setViewport(1,0)
-                self.engine.drawImage(self.pauseScreen, scale = (0.75, -0.75), coord = (w/2+self.pause_bkg_x,h/2+self.pause_bkg_y))
+                wFactor = 640.000/self.pauseScreen.width1()
+                self.engine.drawImage(self.pauseScreen, scale = (wFactor, -wFactor), coord = (w/2+self.pause_bkg_x,h/2+self.pause_bkg_y))
                 
               if self.finalFailed and self.song:
                 self.engine.view.setViewport(1,0)
-                self.engine.drawImage(self.failScreen, scale = (0.75, -0.75), coord = (w/2+self.fail_bkg_x,h/2+self.fail_bkg_y))
+                wFactor = 640.000/self.pauseScreen.width1()
+                self.engine.drawImage(self.failScreen, scale = (wFactor, -wFactor), coord = (w/2+self.fail_bkg_x,h/2+self.fail_bkg_y))
     
                 text = Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
                 size = font.getStringSize(text)
