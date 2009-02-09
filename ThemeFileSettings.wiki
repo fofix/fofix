@@ -186,7 +186,7 @@ jurgen text is rendered above everything.||
 ||result_score = .5,.11,0.0025||Defines the pos of the results score.||
 ||result_song = .05,.045,.002,#FFFFFF||Defines the pos of the song name. Can use any hex color||
 ||result_song_text = %s Finished!|| %s Finished! will show "Back in Black's Finished!"||
-||result_star = .5,.35,0.0017||Defines the pos of the stars value||
+||result_star = .5,.35,0.0017,.4||Defines the pos of the stars value. X,Y,Scale,Horiz.Pos.||
 ||result_stats_accuracy = .5,.61,0.002,#FFFFFF||Defines the pos of the accuracy % value. Can use any hex color.||
 ||result_stats_accuracy_text  = Accuracy:  %.1f%%|| Accuracy:  %.1f%% will show as "Accuracy: 88.7%"|| 
 ||result_stats_diff = .5,.55,0.002,#FFFFFF||Defines the pos of the difficulty stats. Can use any hex color.||
