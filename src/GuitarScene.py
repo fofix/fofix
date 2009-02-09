@@ -831,7 +831,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     tempEarlyHitWindowSizeFactor = 0.5
     if self.effectiveEarlyHitWindow == 1:     #none
-      tempEarlyHitWindowSizeFactor = 0.05     #really, none = about 5%
+      tempEarlyHitWindowSizeFactor = 0.10     #really, none = about 10%
     elif self.effectiveEarlyHitWindow == 2:   #half
       tempEarlyHitWindowSizeFactor = 0.5
     else:                                     #any other value will be full

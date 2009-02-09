@@ -582,9 +582,9 @@ class Drum:
       else: #Percentage mode - pre-calculated
         self.neckSpeed = self.speed
   
-      #self.earlyMargin       = 250 - bpm/5 - 70*self.hitw
+      self.earlyMargin       = 250 - bpm/5 - 70*self.hitw
       self.lateMargin        = 250 - bpm/5 - 70*self.hitw
-      self.earlyMargin = self.lateMargin * self.earlyHitWindowSizeFactor    #MFH - scale early hit window here
+      #self.earlyMargin = self.lateMargin * self.earlyHitWindowSizeFactor    #MFH - scale early hit window here
 
       #self.noteReleaseMargin = 200 - bpm/5 - 70*self.hitw
       #if (self.noteReleaseMargin < (200 - bpm/5 - 70*1.2)):   #MFH - enforce "tight" hitwindow minimum note release margin
