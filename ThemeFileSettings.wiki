@@ -106,7 +106,7 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||hopo_indicator_x = .950||Manually sets x position of hopo indicator||
 ||hopo_indicator_y = .950||Manually sets y position of hopo indicator||
 ||ingame_stats_color = #000000||Enter a Hex color here.||
-||jurg_text_pos = 1,1,0.0004||Any scale under .00035 will be resized. Any coordinates that are off the screen will automatically be moved back on to screen, and
+||jurgen_text_pos = 1,1,0.0004||Any scale under .00035 will be resized. Any coordinates that are off the screen will automatically be moved back on to screen, and
 jurgen text is rendered above everything.||
 ||mesh_color = #000000||Enter a Hex color here.||
 ||opencolor = #FF8000 ||Enter a Hec color here. Sets the Bass drum note color for 3d notes||
