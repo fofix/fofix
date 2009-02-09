@@ -168,9 +168,10 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     else:
       self.singleView = True
     
-    slowdown = self.engine.config.get("audio", "speed_factor")
+    slowdown = self.engine.audioSpeedFactor
     a = len(Scorekeeper.HANDICAPS)
     for i, scoreCard in enumerate(self.scoring):
+      earlyHitHandicap      = 1.0 #scoreCard.earlyHitWindowSizeHandicap #akedrou - replace when implementing handicap.
       self.finalScore[i]    = scoreCard.score
       self.originalScore[i] = scoreCard.score
       if self.starScoring == 0: #FoF-mode
@@ -178,11 +179,16 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       
       for j in range(a):
         if (scoreCard.handicap>>j)&1 == 1:
-          if Scorekeeper.HANDICAPS[j] == 1.0: #audio divisor - added to long handicap.
-            cut = (100.0**slowdown)/100.0
-            self.cheats[i].append((Scorekeeper.HANDICAP_NAMES[(a-1)-j], cut))
-            self.finalScore[i] = int(self.finalScore[i] * cut)
-            scoreCard.longHandicap += "aud,%.2f," % slowdown
+          if j == 1: #scalable - added to long handicap.
+            if slowdown != 1:
+              cut = (100.0**slowdown)/100.0
+              self.cheats[i].append((Scorekeeper.SCALABLE_NAMES[0], cut))
+              self.finalScore[i] = int(self.finalScore[i] * cut)
+              scoreCard.longHandicap += "aud,%.2f;" % slowdown
+            if earlyHitHandicap != 1.0:
+              self.cheats[i].append((Scorekeeper.SCALABLE_NAMES[1], earlyHitHandicap))
+              self.finalScore[i] = int(self.finalScore[i] * earlyHitHandicap)
+              scoreCard.longHandicap += "ehw,%.2f;" % earlyHitHandicap
           else:
             self.cheats[i].append((Scorekeeper.HANDICAP_NAMES[(a-1)-j], Scorekeeper.HANDICAPS[j]))
             self.finalScore[i] = int(self.finalScore[i] * Scorekeeper.HANDICAPS[j])

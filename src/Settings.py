@@ -269,7 +269,6 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "game", "star_scoring", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "career_star_min", autoApply = True), #akedrou
       ConfigChoice(engine, engine.config, "game", "resume_countdown", autoApply = True), #akedrou
-      ConfigChoice(engine, engine.config, "game", "whammy_saves_starpower", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "sp_notes_while_active", autoApply = True, isQuickset = 2),   #myfingershurt - setting for gaining more SP while active
       ConfigChoice(engine, engine.config, "game", "drum_sp_mode", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game",  "uploadscores", autoApply = True),
@@ -623,6 +622,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "game", "p1_assist", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "p2_assist", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "gh2_sloppy", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "whammy_saves_starpower", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "hit_window_cheat", autoApply = True),
       ConfigChoice(engine, engine.config, "coffee", "hopo_freq_cheat", autoApply = True),
       ConfigChoice(engine, engine.config, "coffee", "failingEnabled", autoApply = True),
@@ -921,7 +921,6 @@ class BasicSettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "game", "star_scoring", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "career_star_min", autoApply = True), #akedrou
       ConfigChoice(engine, engine.config, "game", "resume_countdown", autoApply = True), #akedrou
-      ConfigChoice(engine, engine.config, "game", "whammy_saves_starpower", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "sp_notes_while_active", autoApply = True, isQuickset = 2),   #myfingershurt - setting for gaining more SP while active
       ConfigChoice(engine, engine.config, "game", "drum_sp_mode", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game",  "uploadscores", autoApply = True),
@@ -1167,6 +1166,7 @@ class BasicSettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "game", "p1_assist", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "p2_assist", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "gh2_sloppy", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "whammy_saves_starpower", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "hit_window_cheat", autoApply = True),
       ConfigChoice(engine, engine.config, "coffee", "hopo_freq_cheat", autoApply = True),
       ConfigChoice(engine, engine.config, "coffee", "failingEnabled", autoApply = True),

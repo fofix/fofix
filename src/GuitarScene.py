@@ -821,8 +821,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         tempHandicap += ( (self.automaticEarlyHitWindow - self.effectiveEarlyHitWindow) * 0.05 )
       elif self.automaticEarlyHitWindow < self.effectiveEarlyHitWindow:   #MFH - negative handicap
         tempHandicap -= ( (self.effectiveEarlyHitWindow - self.automaticEarlyHitWindow) * 0.05 )
-      for thePlayer in self.playerList:
-        thePlayer.earlyHitWindowSizeHandicap = tempHandicap
+      for scoreCard in self.scoring:
+        scoreCard.earlyHitWindowSizeHandicap = tempHandicap
+      if self.coOpType:
+        self.coOpScoreCard.earlyHitWindowSizeHandicap = tempHandicap
       Log.debug("User-forced early hit window setting %d, effective handicap determined: %f" % (self.forceEarlyHitWindowSetting,tempHandicap) )
 
     else:
@@ -2021,7 +2023,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if self.coOpType:
           if self.coOpScoreCard.handicap&1 != 1:
             self.coOpScoreCard.handicap += 1
-      if self.engine.audioSpeedFactor != 1:
+      if self.engine.audioSpeedFactor != 1 or scoreCard.earlyHitWindowSizeHandicap != 1.0: #scalable handicaps
         if (scoreCard.handicap>>1)&1 != 1:
           scoreCard.handicap += 0x2
         if self.coOpType:
