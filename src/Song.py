@@ -89,6 +89,11 @@ TK_UNUSED_TEXT = 4    #Unused / other text events
 MIDI_TYPE_GH            = 0       #GH type MIDIs have starpower phrases marked with a long G8 note on that instrument's track
 MIDI_TYPE_RB            = 1       #RB type MIDIs have overdrive phrases marked with a long G#9 note on that instrument's track
 
+#MFH 
+EARLY_HIT_WINDOW_NONE   = 1       #GH1/RB1/RB2 = NONE
+EARLY_HIT_WINDOW_HALF   = 2       #GH2/GH3/GHA/GH80's = HALF
+EARLY_HIT_WINDOW_FULL   = 3       #FoF = FULL
+
 GUITAR_PART             = 0
 RHYTHM_PART             = 1
 BASS_PART               = 2
@@ -905,6 +910,15 @@ class SongInfo(object):
     return self.locked
 
 
+  #MFH - adding song.ini setting to allow fretter to specify early hit window size (none, half, or full)
+  def getEarlyHitWindowSize(self):  #MFH
+    return self._get("early_hit_window_size", str)
+
+  def setEarlyHitWindowSize(self, value):   #MFH
+    self._set("early_hit_window_size", value)
+
+
+
   def getHopoFreq(self):  #MFH
     return self._get("hopofreq")
 
@@ -943,6 +957,9 @@ class SongInfo(object):
   
   completed     = property(getCompleted, setCompleted)
   sections      = property(getSections)   #MFH
+
+  early_hit_window_size = property(getEarlyHitWindowSize, setEarlyHitWindowSize)   #MFH
+
 
 class LibraryInfo(object):
   def __init__(self, libraryName, infoFileName):
@@ -2296,6 +2313,9 @@ class Song(object):
 
     self.hasMidiLyrics = False
     self.midiStyle = MIDI_TYPE_GH
+
+    self.earlyHitWindowSize = EARLY_HIT_WINDOW_HALF   #MFH - holds the detected early hit window size for the current song
+
     self.hasStarpowerPaths = False
     self.hasFreestyleMarkings = False
 
@@ -2924,6 +2944,7 @@ class MidiReader(midi.MidiOutStream):
         if self.song.midiStyle != MIDI_TYPE_RB:
           Log.debug("RB-style Overdrive marking note found!  Using RB-style MIDI special notes.")
           self.song.midiStyle = MIDI_TYPE_RB
+          self.earlyHitWindowSize = EARLY_HIT_WINDOW_NONE
 
         #for diff in self.song.difficulty:
         for diff in difficulties:

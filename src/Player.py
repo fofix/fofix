@@ -527,6 +527,11 @@ class Player(object):
     
     self.hopoFreq = None
     
+    #MFH - I do not understand fully how the handicap scorecard works at the moment, nor do I have the time to figure it out.
+    #... so for now, I'm just writing some extra code here for the early hitwindow size handicap.
+    self.earlyHitWindowSizeHandicap = 1.0
+    
+    
   def reset(self):
     self.twoChord      = 0
     

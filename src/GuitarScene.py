@@ -793,6 +793,56 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         Log.debug("Drum part found, scanning for drum fills.... %d freestyle markings found (the last one may be a Big Rock Ending)." % self.numDrumFills)
     
 
+    #MFH - TODO - handle early hit window automatic type determination, and how it compares to the forced handicap if not auto
+    self.effectiveEarlyHitWindow = Song.EARLY_HIT_WINDOW_HALF
+    self.automaticEarlyHitWindow = Song.EARLY_HIT_WINDOW_HALF
+    self.forceEarlyHitWindowSetting = self.engine.config.get("handicap",   "early_hit_window")
+    if self.song.info.early_hit_window_size:
+      Log.debug("song.ini setting found speficying early_hit_window_size - %s" % self.song.info.early_hit_window_size)
+      if self.song.info.early_hit_window_size.lower() == "none":
+        self.automaticEarlyHitWindow = Song.EARLY_HIT_WINDOW_NONE
+      elif self.song.info.early_hit_window_size.lower() == "half":
+        self.automaticEarlyHitWindow = Song.EARLY_HIT_WINDOW_HALF
+      #elif self.song.info.early_hit_window_size.lower() == "full":
+      else:  #all other unrecognized cases, default to "full"
+        self.automaticEarlyHitWindow = Song.EARLY_HIT_WINDOW_FULL
+
+    else:
+      Log.debug("No song.ini setting found speficying early_hit_window_size - using automatic detection...")
+
+      if self.song.midiStyle == Song.MIDI_TYPE_RB:
+        Log.debug("Basic RB1/RB2 type MIDI found - early hitwindow of NONE is set as handicap base.")
+        self.automaticEarlyHitWindow = Song.EARLY_HIT_WINDOW_NONE
+
+    if self.forceEarlyHitWindowSetting > 0:   #MFH - if user is specifying a specific early hitwindow, then calculate handicap...
+      self.effectiveEarlyHitWindow = self.forceEarlyHitWindowSetting
+      tempHandicap = 1.00
+      if self.automaticEarlyHitWindow > self.effectiveEarlyHitWindow:   #MFH - positive handicap
+        tempHandicap += ( (self.automaticEarlyHitWindow - self.effectiveEarlyHitWindow) * 0.05 )
+      elif self.automaticEarlyHitWindow < self.effectiveEarlyHitWindow:   #MFH - negative handicap
+        tempHandicap -= ( (self.effectiveEarlyHitWindow - self.automaticEarlyHitWindow) * 0.05 )
+      for thePlayer in self.playerList:
+        thePlayer.earlyHitWindowSizeHandicap = tempHandicap
+      Log.debug("User-forced early hit window setting %d, effective handicap determined: %f" % (self.forceEarlyHitWindowSetting,tempHandicap) )
+
+    else:
+      Log.debug("Automatic early hit window mode - automatically-detected setting used: %d" % self.automaticEarlyHitWindow)
+      self.effectiveEarlyHitWindow = self.automaticEarlyHitWindow
+
+    tempEarlyHitWindowSizeFactor = 0.5
+    if self.effectiveEarlyHitWindow == 1:     #none
+      tempEarlyHitWindowSizeFactor = 0.05     #really, none = about 5%
+    elif self.effectiveEarlyHitWindow == 2:   #half
+      tempEarlyHitWindowSizeFactor = 0.5
+    else:                                     #any other value will be full
+      tempEarlyHitWindowSizeFactor = 1.0
+    
+    for theGuitar in self.guitars:    #MFH - force update of early hit window
+      theGuitar.earlyHitWindowSizeFactor = tempEarlyHitWindowSizeFactor
+      theGuitar.actualBpm = 0.0
+      theGuitar.currentBpm = 120.0
+      theGuitar.setBPM(theGuitar.currentBpm)
+
     #if self.starpowerMode == 2:     #auto-MIDI mode only
     if self.song.hasStarpowerPaths:
       for i,guitar in enumerate(self.guitars):
