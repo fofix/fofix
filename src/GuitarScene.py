@@ -5136,7 +5136,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
       #MFH: render the note sheet just on top of the background:
       if self.lyricSheet != None:
-        self.engine.drawImage(self.lyricSheet, scale = (w/2, h*0.935), coord = (self.lyricSheetScaleFactor,-self.lyricSheetScaleFactor))
+        self.engine.drawImage(self.lyricSheet, scale = (self.lyricSheetScaleFactor,-self.lyricSheetScaleFactor), coord = (w/2, h*0.935))
         #the timing line on this lyric sheet image is approx. 1/4 over from the left
   
       SceneClient.render(self, visibility, topMost) #MFH - I believe this eventually calls the renderGuitar function, which also involves two viewports... may not be easy to move this one...
