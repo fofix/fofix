@@ -646,7 +646,7 @@ def setupMisc(config):
   starFillupOutRadius = config.get("theme", "star_fillup_out_radius")
   starFillupColor = config.get("theme", "star_fillup_color")
   songListDisplay = config.get("theme", "song_list_display")
-  jurgTextPos = config.get("theme", "jurg_text_pos").split(",")
+  jurgTextPos = config.get("theme", "jurgen_text_pos").split(",")
 
 #MFH:
 def setupSonglist(config):
