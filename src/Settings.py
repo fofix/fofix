@@ -244,7 +244,7 @@ class SettingsMenu(Menu.Menu):
        #ConfigChoice(engine, engine.config, "game", "jurgdef", autoApply = True),#Spikehead777
        ConfigChoice(engine, engine.config, "game", "jurgtype", autoApply = True),#Spikehead777
        ConfigChoice(engine, engine.config, "game", "jurglogic", autoApply = True),#MFH
-       ConfigChoice(engine, engine.config, "game", "jurgtext", autoApply = True),#hman
+       #ConfigChoice(engine, engine.config, "game", "jurgtext", autoApply = True),#hman
     ]
     JurgenSettingsMenu = Menu.Menu(engine, JurgenSettings)
            

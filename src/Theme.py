@@ -210,6 +210,8 @@ Config.define("theme", "result_cheats_score", str, ".75,.4,.0015")
 Config.define("theme", "result_cheats_percent", str, ".45,.4,.0015")
 Config.define("theme", "result_cheats_color", str, "#FFFFFF")
 
+Config.define("theme", "jurgen_text_pos", str, "1,1,.00035")
+
 
 #MFH - crowd cheer loop delay in theme.ini: if not exist, use value from settings. Otherwise, use theme.ini value.
 Config.define("theme", "crowd_loop_delay",  int, None)
@@ -427,6 +429,8 @@ result_cheats_score = [None] * 3
 result_cheats_percent = [None] * 3
 result_cheats_color = None
 
+jurgTextPos = [None] * 3
+
 
 #Racer:
 fail_bkg_xPos = None
@@ -625,6 +629,7 @@ def setupMisc(config):
   global starFillupOutRadius
   global starFillupColor
   global songListDisplay
+  global jurgTextPos
 
   loadingPhrase = config.get("theme", "loading_phrase")
   resultsPhrase = config.get("theme", "results_phrase")
@@ -641,6 +646,7 @@ def setupMisc(config):
   starFillupOutRadius = config.get("theme", "star_fillup_out_radius")
   starFillupColor = config.get("theme", "star_fillup_color")
   songListDisplay = config.get("theme", "song_list_display")
+  jurgTextPos = config.get("theme", "jurg_text_pos").split(",")
 
 #MFH:
 def setupSonglist(config):

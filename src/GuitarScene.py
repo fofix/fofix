@@ -222,7 +222,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     #MFH
     self.jurgenLogic = self.engine.config.get("game", "jurglogic")    #logic 0 = original, logic 1 = MFH-1
-    self.jurgenText = self.engine.config.get("game", "jurgtext")
+    #self.jurgenText = self.engine.config.get("game", "jurgtext")
+    self.jurgenText = Theme.jurgTextPos
+    if float(self.jurgenText[2]) < 0.00035:
+      self.jurgenText[2] = 0.00035
+    if float(self.jurgenText[0]) < 0:
+      self.jurgenText[0] = 0
+    if float(self.jurgenText[1]) < 0:
+      self.jurgenText[1] = 0
 
     self.whammySavesSP = self.engine.config.get("game", "whammy_saves_starpower") #MFH
     self.failingEnabled = self.engine.config.get("coffee", "failingEnabled")
@@ -5252,26 +5259,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         for i,player in enumerate(self.playerList): #QQstarS: This part has big fix. I add the code into it,So he can shown corect
           self.engine.view.setViewportHalf(self.numOfPlayers,i)  
           
-          #Show Jurgen played Spikehead777
-          if self.jurgPlayer[i] == True:
-            if self.autoPlay:
-              if self.jurg == i or self.jurg == 2: #or whatever the "all/both players" is
-                text = self.tsJurgenIsHere
-              else:
-                text = self.tsJurgenWasHere
-            else:
-              text = self.tsJurgenWasHere
-            #jurgScale = .001/self.numOfPlayers
-            jurgScale = .00035
-            #w, h = bigFont.getStringSize(text, scale = jurgScale)
-            Theme.setBaseColor()
-            jurgX = 0.760
-            jurgY = 0.600
-            if self.jurgenText == 0:
-              bigFont.render(text,  (jurgX, jurgY), scale = jurgScale)#MFH - y was 0.4 - more positioning weirdness.
-            else:
-              bigFont.render(text,  (jurgX, jurgY), scale = jurgScale)
-          #End Jurgen Code
+
 
 
           streakFlag = 0  #set the flag to 0
@@ -8250,6 +8238,30 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
   
   
+                    #Show Jurgen played Spikehead777
+          if self.jurgPlayer[i] == True:
+            if self.autoPlay:
+              if self.jurg == i or self.jurg == 2: #or whatever the "all/both players" is
+                text = self.tsJurgenIsHere
+              else:
+                text = self.tsJurgenWasHere
+            else:
+              text = self.tsJurgenWasHere
+            #jurgScale = .001/self.numOfPlayers
+            jurgScale = float(self.jurgenText[2])
+            w, h = bigFont.getStringSize(text, scale = jurgScale)
+            Theme.setBaseColor()
+            Log.debug(1 - w)
+            jurgX = float(self.jurgenText[0])
+            if jurgX > 1 - w:
+              jurgX = 1 - w
+            jurgY = float(self.jurgenText[1])
+            if jurgY > .75 - h:
+              jurgY = .75 - h
+            
+            bigFont.render(text,  (jurgX, jurgY), scale = jurgScale)#MFH - y was 0.4 - more positioning weirdness.
+
+          #End Jurgen Code
         #MFH - Get Ready to Rock & countdown, song info during countdown, and song time left display on top of everything else
         self.engine.view.setViewport(1,0)
 
