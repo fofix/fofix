@@ -1125,10 +1125,19 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #lyric sheet!
     if self.readTextAndLyricEvents == 2 or (self.readTextAndLyricEvents == 1 and self.theme == 2):
       if self.song.hasMidiLyrics and self.midiLyricsEnabled > 0:
-        try:
-          self.engine.loadImgDrawing(self, "lyricSheet", os.path.join("themes",themename,"lyricsheet.png"))
-        except IOError:
-          self.lyricSheet = None
+        if self.midiLyricMode == 0:
+          try:
+            self.engine.loadImgDrawing(self, "lyricSheet", os.path.join("themes",themename,"lyricsheet.png"))
+          except IOError:
+            self.lyricSheet = None
+        else:
+          try:
+            self.engine.loadImgDrawing(self, "lyricSheet", os.path.join("themes",themename,"lyricsheet2.png"))
+          except IOError:
+            try:
+              self.engine.loadImgDrawing(self, "lyricSheet", os.path.join("themes",themename,"lyricsheet.png"))
+            except IOError:
+              self.lyricSheet = None
       else:
         self.lyricSheet = None
     else:
@@ -6700,7 +6709,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     else:
                       multscale = (.5,-.5/4.0)
                       multcoord = (w*0.5,h*0.05)
-                    self.engine.drawImage(self.mult2, scale = mult, coord = multcoord, rect = (0,1,multRange[0],multRange[1]))
+                    self.engine.drawImage(self.bassgroovemult, scale = multscale, coord = multcoord, rect = (0,1,multRange[0],multRange[1]))
   
                   else:
                     #myfingershurt: Temp text bass groove multiplier:
