@@ -193,7 +193,7 @@ Config.define("theme", "fail_selected_color",  str, "#FFBF00")
 Config.define("theme", "result_score", str, ".5,.11,0.0025")
 Config.define("theme", "result_song", str, ".05,.045,.002")
 Config.define("theme", "result_song_text", str, "%s Finished!")
-Config.define("theme", "result_star", str, ".5,.35,0.0017,0.5")
+Config.define("theme", "result_star", str, ".5,.35,0.5,0.5")
 Config.define("theme", "result_stats_diff", str, ".5,.55,0.002,None")
 Config.define("theme", "result_stats_diff_text", str, "Difficulty: %s")
 Config.define("theme", "result_stats_part", str, ".5,.64,0.002,None")
@@ -417,7 +417,7 @@ result_stats_part_text = None
 result_stats_diff = [None] * 4
 result_stats_diff_text = None
 result_stats_accuracy = [None] * 4
-restul_stats_accuracy_text = None
+result_stats_accuracy_text = None
 result_stats_streak = [None] * 4
 result_stats_streak_text = None
 result_stats_notes = [None] * 4
