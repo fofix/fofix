@@ -5849,7 +5849,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     dotrect = (xs[0],xs[1],ys[0],ys[1])
                 else:
                   dotrot = 0
-                  dotscale(.5,-.166666667) #MFH division->constant: was (.5,-.5*(1.0/3.0))
+                  dotscale = (.5,-.166666667) #MFH division->constant: was (.5,-.5*(1.0/3.0))
                   dotcoord = (w*.044,h*.12+t*(h*.034) + self.hOffset[i])
                   dotrect = (0.0,1.0,ys[0],ys[1])
 
@@ -6738,7 +6738,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                         multscale = (.5,-.5/8.0)
                         multcoord = (w*0.5,h*0.05)
                     else:
-                      self.mult.transform.scale(.8,-.8/8.0)
+                      multscale = (.8,-.8/8.0)
                       multcoord = (w*0.5,h*0.05)                  
                   else:
                     multscale = (.5,-.5/8.0)
