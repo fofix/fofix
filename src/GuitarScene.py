@@ -7446,7 +7446,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   for playaNum, playa in enumerate(self.playerList):
                     score += self.getExtraScoreForCurrentlyPlayedNotes(playaNum)
                 else:
-                  score=scoring[i].score
+                  score=self.scoring[i].score
                   score += self.getExtraScoreForCurrentlyPlayedNotes(i)
 
                 size      = scoreFont.getStringSize(str(score))
