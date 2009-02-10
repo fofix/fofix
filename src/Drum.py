@@ -2579,16 +2579,11 @@ class Drum:
     if self.disableFlameSFX != True:
       for n in range(self.strings):
         f = self.fretWeight[n]
-        
-        #c = self.fretColors[n]
-        c = self.fretColors[n+1]
+        c = self.fretColors[n+1]    #MFH shifted by 1 for most drum colors
         if f and controls.getState(self.keys[0]):
           f += 0.25     
         y = v + f / 6
-
         x = (self.strings / 2 -.5 - n) * w
-
-
         f = self.fretActivity[n]
 
         if f:
@@ -2708,28 +2703,14 @@ class Drum:
           
           glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-          self.hit[n] = True
+          #self.hit[n] = True
 
 
 
     if self.disableFlameSFX != True:
       flameLimit = 10.0
       flameLimitHalf = round(flameLimit/2.0)
-
-      #for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard):
-      #  if isinstance(event, Tempo):
-      #    continue
-        
-      #  if not isinstance(event, Note):
-      #    continue
-        
-      #  if (event.played or event.hopod) and event.flameCount < flameLimit:
-      
-      
-
-      
-      for fretNum in range(self.strings+1):
-
+      for fretNum in range(self.strings+1):   #need to add 1 to string count to check this correctly (bass drum doesnt count as a string)
         #MFH - must include secondary drum keys here
         #if controls.getState(self.keys[fretNum]):
         if controls.getState(self.keys[fretNum]) or (fretNum > 0 and controls.getState(self.keys[fretNum+4]) ):
@@ -2741,7 +2722,7 @@ class Drum:
               x  = (self.strings / 2 - 2) * w
             else:
               x  = (self.strings / 2 +.5 - fretNum) * w
-            #x  = (self.strings / 2 - event.number) * w
+            #x  = (self.strings / 2 - fretNum) * w
   
             xlightning = (self.strings / 2 - fretNum)*2.2*w
             ff = 1 + 0.25       

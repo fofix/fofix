@@ -329,12 +329,9 @@ class Guitar:
 
 
 
-    try:    #MFH - so that freestyle sections can still show hitflames when animated hitflames exist.
-      engine.loadImgDrawing(self, "hitflames1Drawing", os.path.join("themes",themename,"hitflames1.png"),  textureSize = (128, 128))
-      engine.loadImgDrawing(self, "hitflames2Drawing", os.path.join("themes",themename,"hitflames2.png"),  textureSize = (128, 128))
-    except IOError:
-      self.hitflames1Drawing = None
-      self.hitflames2Drawing = None
+    #MFH - ALWAYS load hitflames.
+    engine.loadImgDrawing(self, "hitflames1Drawing", os.path.join("themes",themename,"hitflames1.png"),  textureSize = (128, 128))
+    engine.loadImgDrawing(self, "hitflames2Drawing", os.path.join("themes",themename,"hitflames2.png"),  textureSize = (128, 128))
 
     try:
       engine.loadImgDrawing(self, "hitflamesAnim", os.path.join("themes",themename,"hitflamesanimation.png"),  textureSize = (128, 128))
@@ -2451,34 +2448,18 @@ class Guitar:
           
           glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-          #self.hit[n] = True   #MFH - gonna move these determinations into the runtime function, this is ridiculous
-
-
 
     if self.disableFlameSFX != True:
       flameLimit = 10.0
       flameLimitHalf = round(flameLimit/2.0)
-
-      #for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard):
-      #  if isinstance(event, Tempo):
-      #    continue
-        
-      #  if not isinstance(event, Note):
-      #    continue
-        
-      #  if (event.played or event.hopod) and self.freestyleHitFlameCounts[fretNum] < flameLimit:
-      
-      
-
-      
       for fretNum in range(self.strings):
-
         if controls.getState(self.keys[fretNum]):
-        #if controls.getState(self.keys[fretNum]) or (fretNum > 0 and controls.getState(self.keys[fretNum+4]) ):
 
           if self.freestyleHitFlameCounts[fretNum] < flameLimit:
             ms = math.sin(self.time) * .25 + 1
+  
             x  = (self.strings / 2 - fretNum) * w
+  
             xlightning = (self.strings / 2 - fretNum)*2.2*w
             ff = 1 + 0.25       
             y = v + ff / 6
@@ -2498,288 +2479,284 @@ class Guitar:
             ff += 1.5 #ff first time is 2.75 after this
   
             if self.freestyleHitFlameCounts[fretNum] < flameLimitHalf:
-
-              if self.hitflames2Drawing:    #MFH - only if it exists...
-                glColor3f(flameColor[0], flameColor[1], flameColor[2])
-                if self.starPowerActive:
-                  if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                    glColor3f(.3,.7,.9)
-                  else: #Default starcolor (Rockband)
-                    glColor3f(.1,.1,.1)
-                glEnable(GL_TEXTURE_2D)
-                self.hitflames2Drawing.texture.bind()    
-                glPushMatrix()
-                glTranslate(x, y + .20, 0)
-                glRotate(90, 1, 0, 0)
-                glScalef(.25 + .6 * ms * ff, self.freestyleHitFlameCounts[fretNum]/6.0 + .6 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 6.0 + .6 * ms * ff)
-                glBegin(GL_TRIANGLE_STRIP)
-                glTexCoord2f(0.0, 0.0)
-                glVertex3f(-flameSize * ff, 0, -flameSize * ff)
-                glTexCoord2f(1.0, 0.0)
-                glVertex3f( flameSize * ff, 0, -flameSize * ff)
-                glTexCoord2f(0.0, 1.0)
-                glVertex3f(-flameSize * ff, 0,  flameSize * ff)
-                glTexCoord2f(1.0, 1.0)
-                glVertex3f( flameSize * ff, 0,  flameSize * ff)
-                glEnd()
-                glPopMatrix()
-                glDisable(GL_TEXTURE_2D) 
-    
-                glColor3f(flameColor[0], flameColor[1], flameColor[2])
-                if self.starPowerActive:
-                  if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                    glColor3f(.3,.7,.9)
-                  else: #Default starcolor (Rockband)
-                    glColor3f(.1,.1,.1)
-                glEnable(GL_TEXTURE_2D)
-                self.hitflames2Drawing.texture.bind()    
-                glPushMatrix()
-                glTranslate(x - .005, y + .25 + .005, 0)
-                glRotate(90, 1, 0, 0)
-                glScalef(.30 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 5.5 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 5.5 + .6 * ms * ff)
-                glBegin(GL_TRIANGLE_STRIP)
-                glTexCoord2f(0.0, 0.0)
-                glVertex3f(-flameSize * ff, 0, -flameSize * ff)
-                glTexCoord2f(1.0, 0.0)
-                glVertex3f( flameSize * ff, 0, -flameSize * ff)
-                glTexCoord2f(0.0, 1.0)
-                glVertex3f(-flameSize * ff, 0,  flameSize * ff)
-                glTexCoord2f(1.0, 1.0)
-                glVertex3f( flameSize * ff, 0,  flameSize * ff)
-                glEnd()
-                glPopMatrix()	  
-                glDisable(GL_TEXTURE_2D)
-    
-                glColor3f(flameColor[0], flameColor[1], flameColor[2])
-                if self.starPowerActive:
-                  if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                    glColor3f(.3,.7,.9)
-                  else: #Default starcolor (Rockband)
-                    glColor3f(.2,.2,.2)
-                glEnable(GL_TEXTURE_2D)
-                self.hitflames2Drawing.texture.bind()    
-                glPushMatrix()
-                glTranslate(x+.005, y +.25 +.005, 0)
-                glRotate(90, 1, 0, 0)
-                glScalef(.35 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 5.0 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 5.0 + .6 * ms * ff)
-                glBegin(GL_TRIANGLE_STRIP)
-                glTexCoord2f(0.0, 0.0)
-                glVertex3f(-flameSize * ff, 0, -flameSize * ff)
-                glTexCoord2f(1.0, 0.0)
-                glVertex3f( flameSize * ff, 0, -flameSize * ff)
-                glTexCoord2f(0.0, 1.0)
-                glVertex3f(-flameSize * ff, 0,  flameSize * ff)
-                glTexCoord2f(1.0, 1.0)
-                glVertex3f( flameSize * ff, 0,  flameSize * ff)
-                glEnd()
-                glPopMatrix()	  
-                glDisable(GL_TEXTURE_2D)
-    
-                glColor3f(flameColor[0], flameColor[1], flameColor[2])
-                if self.starPowerActive:
-                  if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                    glColor3f(.3,.7,.9)
-                  else: #Default starcolor (Rockband)
-                    glColor3f(.3,.3,.3)
-                glEnable(GL_TEXTURE_2D)
-                self.hitflames2Drawing.texture.bind()    
-                glPushMatrix()
-                glTranslate(x, y +.25 +.005, 0)
-                glRotate(90, 1, 0, 0)
-                glScalef(.40 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1)/ 4.7 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 4.7 + .6 * ms * ff)
-                glBegin(GL_TRIANGLE_STRIP)
-                glTexCoord2f(0.0, 0.0)
-                glVertex3f(-flameSize * ff, 0, -flameSize * ff)
-                glTexCoord2f(1.0, 0.0)
-                glVertex3f( flameSize * ff, 0, -flameSize * ff)
-                glTexCoord2f(0.0, 1.0)
-                glVertex3f(-flameSize * ff, 0,  flameSize * ff)
-                glTexCoord2f(1.0, 1.0)
-                glVertex3f( flameSize * ff, 0,  flameSize * ff)
-                glEnd()
-                glPopMatrix()	  
-                glDisable(GL_TEXTURE_2D)
+              glColor3f(flameColor[0], flameColor[1], flameColor[2])
+              if self.starPowerActive:
+                if self.theme == 0 or self.theme == 1: #GH3 starcolor
+                  glColor3f(.3,.7,.9)
+                else: #Default starcolor (Rockband)
+                  glColor3f(.1,.1,.1)
+              glEnable(GL_TEXTURE_2D)
+              self.hitflames2Drawing.texture.bind()    
+              glPushMatrix()
+              glTranslate(x, y + .20, 0)
+              glRotate(90, 1, 0, 0)
+              glScalef(.25 + .6 * ms * ff, self.freestyleHitFlameCounts[fretNum]/6.0 + .6 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 6.0 + .6 * ms * ff)
+              glBegin(GL_TRIANGLE_STRIP)
+              glTexCoord2f(0.0, 0.0)
+              glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(1.0, 0.0)
+              glVertex3f( flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(0.0, 1.0)
+              glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+              glTexCoord2f(1.0, 1.0)
+              glVertex3f( flameSize * ff, 0,  flameSize * ff)
+              glEnd()
+              glPopMatrix()
+              glDisable(GL_TEXTURE_2D) 
+  
+              glColor3f(flameColor[0], flameColor[1], flameColor[2])
+              if self.starPowerActive:
+                if self.theme == 0 or self.theme == 1: #GH3 starcolor
+                  glColor3f(.3,.7,.9)
+                else: #Default starcolor (Rockband)
+                  glColor3f(.1,.1,.1)
+              glEnable(GL_TEXTURE_2D)
+              self.hitflames2Drawing.texture.bind()    
+              glPushMatrix()
+              glTranslate(x - .005, y + .25 + .005, 0)
+              glRotate(90, 1, 0, 0)
+              glScalef(.30 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 5.5 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 5.5 + .6 * ms * ff)
+              glBegin(GL_TRIANGLE_STRIP)
+              glTexCoord2f(0.0, 0.0)
+              glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(1.0, 0.0)
+              glVertex3f( flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(0.0, 1.0)
+              glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+              glTexCoord2f(1.0, 1.0)
+              glVertex3f( flameSize * ff, 0,  flameSize * ff)
+              glEnd()
+              glPopMatrix()	  
+              glDisable(GL_TEXTURE_2D)
+  
+              glColor3f(flameColor[0], flameColor[1], flameColor[2])
+              if self.starPowerActive:
+                if self.theme == 0 or self.theme == 1: #GH3 starcolor
+                  glColor3f(.3,.7,.9)
+                else: #Default starcolor (Rockband)
+                  glColor3f(.2,.2,.2)
+              glEnable(GL_TEXTURE_2D)
+              self.hitflames2Drawing.texture.bind()    
+              glPushMatrix()
+              glTranslate(x+.005, y +.25 +.005, 0)
+              glRotate(90, 1, 0, 0)
+              glScalef(.35 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 5.0 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 5.0 + .6 * ms * ff)
+              glBegin(GL_TRIANGLE_STRIP)
+              glTexCoord2f(0.0, 0.0)
+              glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(1.0, 0.0)
+              glVertex3f( flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(0.0, 1.0)
+              glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+              glTexCoord2f(1.0, 1.0)
+              glVertex3f( flameSize * ff, 0,  flameSize * ff)
+              glEnd()
+              glPopMatrix()	  
+              glDisable(GL_TEXTURE_2D)
+  
+              glColor3f(flameColor[0], flameColor[1], flameColor[2])
+              if self.starPowerActive:
+                if self.theme == 0 or self.theme == 1: #GH3 starcolor
+                  glColor3f(.3,.7,.9)
+                else: #Default starcolor (Rockband)
+                  glColor3f(.3,.3,.3)
+              glEnable(GL_TEXTURE_2D)
+              self.hitflames2Drawing.texture.bind()    
+              glPushMatrix()
+              glTranslate(x, y +.25 +.005, 0)
+              glRotate(90, 1, 0, 0)
+              glScalef(.40 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1)/ 4.7 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 4.7 + .6 * ms * ff)
+              glBegin(GL_TRIANGLE_STRIP)
+              glTexCoord2f(0.0, 0.0)
+              glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(1.0, 0.0)
+              glVertex3f( flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(0.0, 1.0)
+              glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+              glTexCoord2f(1.0, 1.0)
+              glVertex3f( flameSize * ff, 0,  flameSize * ff)
+              glEnd()
+              glPopMatrix()	  
+              glDisable(GL_TEXTURE_2D)
             else:
+              flameColorMod0 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
+              flameColorMod1 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
+              flameColorMod2 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
+              
+              glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
 
-              if self.hitflames1Drawing:    #MFH - only if it exists...
+              #MFH - hit lightning logic is not needed for freestyle flames...
 
-                flameColorMod0 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
-                flameColorMod1 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
-                flameColorMod2 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
-                
-                glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
+#-              if self.theme == 0 and event.finalStar and self.spEnabled:
+#-                glColor3f(1,1,1)#lightning color
+#-              elif self.theme == 1 and event.finalStar and self.spEnabled:
+#-                glColor3f(1,1,1)#lightning color
+#-              if self.starPowerActive:
+#-                if self.theme == 0 or self.theme == 1: 
+#-                  glColor3f(.3,.7,.9)#GH3 starcolor
+#-                else:
+#-                  glColor3f(.4,.4,.4)#Default starcolor (Rockband)
+#-              glEnable(GL_TEXTURE_2D)
+#-              if self.theme == 0 and event.finalStar and self.spEnabled:
+#-                self.hitlightning.texture.bind()
+#-                wid, hei, = self.engine.view.geometry[2:4]
+#-                glPushMatrix()
+#-                glTranslate(xlightning, y, 3.3)
+#-                glRotate(90, 1, 0, 0)
+#-                glScalef(.15 + .5 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 3.0 + .6 * ms * ff, 2)
+#-                glBegin(GL_TRIANGLE_STRIP)
+#-                glTexCoord2f(0.0, 0.0)
+#-                glVertex3f( .4, 0, -2)
+#-                glTexCoord2f(1.0, 0.0)
+#-                glVertex3f(-.4, 0, -2)
+#-                glTexCoord2f(0.0, 1.0)
+#-                glVertex3f( .4, 0,  2)
+#-                glTexCoord2f(1.0, 1.0)
+#-                glVertex3f(-.4, 0,  2)
+#-              elif self.theme == 1 and event.finalStar and self.spEnabled:
+#-                self.hitlightning.texture.bind()
+#-                wid, hei, = self.engine.view.geometry[2:4]
+#-                glPushMatrix()
+#-                glTranslate(xlightning, y, 3.3)
+#-                glRotate(90, 1, 0, 0)
+#-                glScalef(.15 + .5 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 3.0 + .6 * ms * ff, 2)
+#-                glBegin(GL_TRIANGLE_STRIP)
+#-                glTexCoord2f(0.0, 0.0)
+#-                glVertex3f( .4, 0, -2)
+#-                glTexCoord2f(1.0, 0.0)
+#-                glVertex3f(-.4, 0, -2)
+#-                glTexCoord2f(0.0, 1.0)
+#-                glVertex3f( .4, 0,  2)
+#-                glTexCoord2f(1.0, 1.0)
+#-                glVertex3f(-.4, 0,  2)
+#-              else:
+#-                self.hitflames1Drawing.texture.bind()
+#-                glPushMatrix()
+#-                glTranslate(x, y + .35, 0)
+#-                glRotate(90, 1, 0, 0)
+#-                glScalef(.25 + .6 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 3.0 + .6 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 3.0 + .6 * ms * ff)
+#-                glBegin(GL_TRIANGLE_STRIP)
+#-                glTexCoord2f(0.0, 0.0)
+#-                glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+#-                glTexCoord2f(1.0, 0.0)
+#-                glVertex3f( flameSize * ff, 0, -flameSize * ff)
+#-                glTexCoord2f(0.0, 1.0)
+#-                glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+#-                glTexCoord2f(1.0, 1.0)
+#-                glVertex3f( flameSize * ff, 0,  flameSize * ff)
+
+
+              glEnable(GL_TEXTURE_2D)
+              self.hitflames1Drawing.texture.bind()
+              glPushMatrix()
+              glTranslate(x, y + .35, 0)
+              glRotate(90, 1, 0, 0)
+              glScalef(.25 + .6 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 3.0 + .6 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 3.0 + .6 * ms * ff)
+              glBegin(GL_TRIANGLE_STRIP)
+              glTexCoord2f(0.0, 0.0)
+              glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(1.0, 0.0)
+              glVertex3f( flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(0.0, 1.0)
+              glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+              glTexCoord2f(1.0, 1.0)
+              glVertex3f( flameSize * ff, 0,  flameSize * ff)
+
+
+              glEnd()
+              glPopMatrix()
+              glDisable(GL_TEXTURE_2D)
   
-                #MFH - hit lightning logic is not needed for freestyle flames...
-  #-              if self.theme == 0 and self.spEnabled:
-  #-                glColor3f(1,1,1)#lightning color
-  #-              elif self.theme == 1 and self.spEnabled:
-  #-                glColor3f(1,1,1)#lightning color
-  #-              if self.starPowerActive:
-  #-                if self.theme == 0 or self.theme == 1: 
-  #-                  glColor3f(.3,.7,.9)#GH3 starcolor
-  #-                else:
-  #-                  glColor3f(.4,.4,.4)#Default starcolor (Rockband)
-  #-              glEnable(GL_TEXTURE_2D)
-  #-              if self.theme == 0 and self.spEnabled:
-  #-                self.hitlightning.texture.bind()
-  #-                wid, hei, = self.engine.view.geometry[2:4]
-  #-                glPushMatrix()
-  #-                glTranslate(xlightning, y, 3.3)
-  #-                glRotate(90, 1, 0, 0)
-  #-                glScalef(.15 + .5 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 3.0 + .6 * ms * ff, 2)
-  #-                glBegin(GL_TRIANGLE_STRIP)
-  #-                glTexCoord2f(0.0, 0.0)
-  #-                glVertex3f( .4, 0, -2)
-  #-                glTexCoord2f(1.0, 0.0)
-  #-                glVertex3f(-.4, 0, -2)
-  #-                glTexCoord2f(0.0, 1.0)
-  #-                glVertex3f( .4, 0,  2)
-  #-                glTexCoord2f(1.0, 1.0)
-  #-                glVertex3f(-.4, 0,  2)
-  #-              elif self.theme == 1 and self.spEnabled:
-  #-                self.hitlightning.texture.bind()
-  #-                wid, hei, = self.engine.view.geometry[2:4]
-  #-                glPushMatrix()
-  #-                glTranslate(xlightning, y, 3.3)
-  #-                glRotate(90, 1, 0, 0)
-  #-                glScalef(.15 + .5 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 3.0 + .6 * ms * ff, 2)
-  #-                glBegin(GL_TRIANGLE_STRIP)
-  #-                glTexCoord2f(0.0, 0.0)
-  #-                glVertex3f( .4, 0, -2)
-  #-                glTexCoord2f(1.0, 0.0)
-  #-                glVertex3f(-.4, 0, -2)
-  #-                glTexCoord2f(0.0, 1.0)
-  #-                glVertex3f( .4, 0,  2)
-  #-                glTexCoord2f(1.0, 1.0)
-  #-                glVertex3f(-.4, 0,  2)
-  #-              else:
-  #-                self.hitflames1Drawing.texture.bind()
-  #-                glPushMatrix()
-  #-                glTranslate(x, y + .35, 0)
-  #-                glRotate(90, 1, 0, 0)
-  #-                glScalef(.25 + .6 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 3.0 + .6 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 3.0 + .6 * ms * ff)
-  #-                glBegin(GL_TRIANGLE_STRIP)
-  #-                glTexCoord2f(0.0, 0.0)
-  #-                glVertex3f(-flameSize * ff, 0, -flameSize * ff)
-  #-                glTexCoord2f(1.0, 0.0)
-  #-                glVertex3f( flameSize * ff, 0, -flameSize * ff)
-  #-                glTexCoord2f(0.0, 1.0)
-  #-                glVertex3f(-flameSize * ff, 0,  flameSize * ff)
-  #-                glTexCoord2f(1.0, 1.0)
-  #-                glVertex3f( flameSize * ff, 0,  flameSize * ff)
+              flameColorMod0 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
+              flameColorMod1 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
+              flameColorMod2 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
+              
+              glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)      
+              if self.starPowerActive:
+                if self.theme == 0 or self.theme == 1: #GH3 starcolor
+                  glColor3f(.3,.7,.9)
+                else: #Default starcolor (Rockband)
+                  glColor3f(.5,.5,.5)
+              glEnable(GL_TEXTURE_2D)
+              self.hitflames1Drawing.texture.bind()    
+              glPushMatrix()
+              glTranslate(x - .005, y + .40 + .005, 0)
+              glRotate(90, 1, 0, 0)
+              glScalef(.30 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1)/ 2.5 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 2.5 + .6 * ms * ff)
+              glBegin(GL_TRIANGLE_STRIP)
+              glTexCoord2f(0.0, 0.0)
+              glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(1.0, 0.0)
+              glVertex3f( flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(0.0, 1.0)
+              glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+              glTexCoord2f(1.0, 1.0)
+              glVertex3f( flameSize * ff, 0,  flameSize * ff)
+              glEnd()
+              glPopMatrix()  
+              glDisable(GL_TEXTURE_2D)
   
-                glEnable(GL_TEXTURE_2D)
+              flameColorMod0 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
+              flameColorMod1 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
+              flameColorMod2 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
+              
+              glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
+              if self.starPowerActive:
+                if self.theme == 0 or self.theme == 1: #GH3 starcolor
+                  glColor3f(.3,.7,.9)
+                else: #Default starcolor (Rockband)
+                  glColor3f(.6,.6,.6)
+              glEnable(GL_TEXTURE_2D)
+              self.hitflames1Drawing.texture.bind()    
+              glPushMatrix()
+              glTranslate(x + .005, y + .35 + .005, 0)
+              glRotate(90, 1, 0, 0)
+              glScalef(.35 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 2.0 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 2.0 + .6 * ms * ff)
+              glBegin(GL_TRIANGLE_STRIP)
+              glTexCoord2f(0.0, 0.0)
+              glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(1.0, 0.0)
+              glVertex3f( flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(0.0, 1.0)
+              glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+              glTexCoord2f(1.0, 1.0)
+              glVertex3f( flameSize * ff, 0,  flameSize * ff)
+              glEnd()
+              glPopMatrix()  
+              glDisable(GL_TEXTURE_2D)
   
-                self.hitflames1Drawing.texture.bind()
-                glPushMatrix()
-                glTranslate(x, y + .35, 0)
-                glRotate(90, 1, 0, 0)
-                glScalef(.25 + .6 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 3.0 + .6 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 3.0 + .6 * ms * ff)
-                glBegin(GL_TRIANGLE_STRIP)
-                glTexCoord2f(0.0, 0.0)
-                glVertex3f(-flameSize * ff, 0, -flameSize * ff)
-                glTexCoord2f(1.0, 0.0)
-                glVertex3f( flameSize * ff, 0, -flameSize * ff)
-                glTexCoord2f(0.0, 1.0)
-                glVertex3f(-flameSize * ff, 0,  flameSize * ff)
-                glTexCoord2f(1.0, 1.0)
-                glVertex3f( flameSize * ff, 0,  flameSize * ff)
+              flameColorMod0 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
+              flameColorMod1 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
+              flameColorMod2 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
+              
+              glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
+              if self.starPowerActive:
+                if self.theme == 0 or self.theme == 1: #GH3 starcolor
+                  glColor3f(.3,.7,.9)
+                else: #Default starcolor (Rockband)
+                  glColor3f(.7,.7,.7)
+              glEnable(GL_TEXTURE_2D)
+              self.hitflames1Drawing.texture.bind()    
+              glPushMatrix()
+              glTranslate(x+.005, y +.35 +.005, 0)
+              glRotate(90, 1, 0, 0)
+              glScalef(.40 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 1.7 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 1.7 + .6 * ms * ff)
+              glBegin(GL_TRIANGLE_STRIP)
+              glTexCoord2f(0.0, 0.0)
+              glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(1.0, 0.0)
+              glVertex3f( flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(0.0, 1.0)
+              glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+              glTexCoord2f(1.0, 1.0)
+              glVertex3f( flameSize * ff, 0,  flameSize * ff)
+              glEnd()
+              glPopMatrix()  
+              glDisable(GL_TEXTURE_2D)
+           
   
-  
-                glEnd()
-                glPopMatrix()
-                glDisable(GL_TEXTURE_2D)
-    
-                flameColorMod0 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
-                flameColorMod1 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
-                flameColorMod2 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
-                
-                glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)      
-                if self.starPowerActive:
-                  if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                    glColor3f(.3,.7,.9)
-                  else: #Default starcolor (Rockband)
-                    glColor3f(.5,.5,.5)
-                glEnable(GL_TEXTURE_2D)
-                self.hitflames1Drawing.texture.bind()    
-                glPushMatrix()
-                glTranslate(x - .005, y + .40 + .005, 0)
-                glRotate(90, 1, 0, 0)
-                glScalef(.30 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1)/ 2.5 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 2.5 + .6 * ms * ff)
-                glBegin(GL_TRIANGLE_STRIP)
-                glTexCoord2f(0.0, 0.0)
-                glVertex3f(-flameSize * ff, 0, -flameSize * ff)
-                glTexCoord2f(1.0, 0.0)
-                glVertex3f( flameSize * ff, 0, -flameSize * ff)
-                glTexCoord2f(0.0, 1.0)
-                glVertex3f(-flameSize * ff, 0,  flameSize * ff)
-                glTexCoord2f(1.0, 1.0)
-                glVertex3f( flameSize * ff, 0,  flameSize * ff)
-                glEnd()
-                glPopMatrix()  
-                glDisable(GL_TEXTURE_2D)
-    
-                flameColorMod0 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
-                flameColorMod1 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
-                flameColorMod2 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
-                
-                glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
-                if self.starPowerActive:
-                  if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                    glColor3f(.3,.7,.9)
-                  else: #Default starcolor (Rockband)
-                    glColor3f(.6,.6,.6)
-                glEnable(GL_TEXTURE_2D)
-                self.hitflames1Drawing.texture.bind()    
-                glPushMatrix()
-                glTranslate(x + .005, y + .35 + .005, 0)
-                glRotate(90, 1, 0, 0)
-                glScalef(.35 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 2.0 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 2.0 + .6 * ms * ff)
-                glBegin(GL_TRIANGLE_STRIP)
-                glTexCoord2f(0.0, 0.0)
-                glVertex3f(-flameSize * ff, 0, -flameSize * ff)
-                glTexCoord2f(1.0, 0.0)
-                glVertex3f( flameSize * ff, 0, -flameSize * ff)
-                glTexCoord2f(0.0, 1.0)
-                glVertex3f(-flameSize * ff, 0,  flameSize * ff)
-                glTexCoord2f(1.0, 1.0)
-                glVertex3f( flameSize * ff, 0,  flameSize * ff)
-                glEnd()
-                glPopMatrix()  
-                glDisable(GL_TEXTURE_2D)
-    
-                flameColorMod0 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
-                flameColorMod1 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
-                flameColorMod2 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
-                
-                glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
-                if self.starPowerActive:
-                  if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                    glColor3f(.3,.7,.9)
-                  else: #Default starcolor (Rockband)
-                    glColor3f(.7,.7,.7)
-                glEnable(GL_TEXTURE_2D)
-                self.hitflames1Drawing.texture.bind()    
-                glPushMatrix()
-                glTranslate(x+.005, y +.35 +.005, 0)
-                glRotate(90, 1, 0, 0)
-                glScalef(.40 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 1.7 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 1.7 + .6 * ms * ff)
-                glBegin(GL_TRIANGLE_STRIP)
-                glTexCoord2f(0.0, 0.0)
-                glVertex3f(-flameSize * ff, 0, -flameSize * ff)
-                glTexCoord2f(1.0, 0.0)
-                glVertex3f( flameSize * ff, 0, -flameSize * ff)
-                glTexCoord2f(0.0, 1.0)
-                glVertex3f(-flameSize * ff, 0,  flameSize * ff)
-                glTexCoord2f(1.0, 1.0)
-                glVertex3f( flameSize * ff, 0,  flameSize * ff)
-                glEnd()
-                glPopMatrix()  
-                glDisable(GL_TEXTURE_2D)
-             
-    
-              glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-              self.freestyleHitFlameCounts[fretNum] += 1
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+            self.freestyleHitFlameCounts[fretNum] += 1
         
           else:   #MFH - flame count is done - reset it!
             self.freestyleHitFlameCounts[fretNum] = 0    #MFH
