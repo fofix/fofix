@@ -1925,8 +1925,8 @@ class SongChooser(Layer, KeyListener):
               #for p in item.parts:    #MFH - look at selected instrument!
               #  if str(p) == self.instrument:
               for d in item.difficulties:
-                #scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
-                scores = item.getHighscoresWithPartString(d, part = self.instrument)
+                scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
+                #scores = item.getHighscoresWithPartString(d, part = self.instrument)
                 
                 if scores:
                   score, stars, name, scoreExt = scores[0]
@@ -2261,8 +2261,8 @@ class SongChooser(Layer, KeyListener):
                   #  if str(p) == self.instrument:
                   for d in item.difficulties:
                     if str(d) == self.diff:
-                      #scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
-                      scores = item.getHighscoresWithPartString(d, part = self.instrument)
+                      scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
+                      #scores = item.getHighscoresWithPartString(d, part = self.instrument)
                       if scores:
                         score, stars, name, scoreExt = scores[0]
                         try:
@@ -2555,8 +2555,8 @@ class SongChooser(Layer, KeyListener):
                   #  if str(p) == self.instrument:
                   for d in item.difficulties:
                     if str(d) == self.diff:
-                      #scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
-                      scores = item.getHighscoresWithPartString(d, part = self.instrument)
+                      scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
+                      #scores = item.getHighscoresWithPartString(d, part = self.instrument)
                       if scores:
                         score, stars, name, scoreExt = scores[0]
                         try:
@@ -2891,7 +2891,8 @@ class SongChooser(Layer, KeyListener):
                     
                     #new
                     for d in item.difficulties:
-                      scores =  item.getHighscoresWithPartString(d, part = self.instrument)
+                      #scores =  item.getHighscoresWithPartString(d, part = self.instrument)
+                      scores =  item.getHighscores(d, part = Song.parts[self.instrumentNum])
                       if scores:
                         score, stars, name, scoreExt = scores[0]
                         try:
@@ -3097,7 +3098,8 @@ class SongChooser(Layer, KeyListener):
                     
                     #new
                     for d in item.difficulties:
-                      scores =  item.getHighscoresWithPartString(d, part = self.instrument)
+                      #scores =  item.getHighscoresWithPartString(d, part = self.instrument)
+                      scores =  item.getHighscores(d, part = Song.parts[self.instrumentNum])
                       if scores:
                         score, stars, name, scoreExt = scores[0]
                         try:
@@ -3461,8 +3463,8 @@ class SongChooser(Layer, KeyListener):
                   #  if str(p) == self.instrument:
                   for d in item.difficulties:
                     if str(d) == self.diff:
-                      #scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
-                      scores = item.getHighscoresWithPartString(d, part = self.instrument)
+                      scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
+                      #scores = item.getHighscoresWithPartString(d, part = self.instrument)
                       if scores:
                         score, stars, name, scoreExt = scores[0]
                         try:

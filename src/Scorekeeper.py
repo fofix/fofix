@@ -267,7 +267,7 @@ class ScoreCard(object):
     self.score += self.endingScore
 
   def getScoreMultiplier(self):
-    if self.instrument == Song.BASS_PART and self.bassGrooveEnabled:    #myfingershurt: bass groove
+    if self.instrument == [Song.BASS_PART] and self.bassGrooveEnabled:    #myfingershurt: bass groove
       try:
         return BASS_GROOVE_SCORE_MULTIPLIER.index((self.streak / 10) * 10) + 1
       except ValueError:
