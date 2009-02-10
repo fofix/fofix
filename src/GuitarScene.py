@@ -935,7 +935,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.scoring[i].totalStreakNotes = len([1 for time, event in self.song.track[i].getAllEvents() if isinstance(event, Note)])
       else:
         self.scoring[i].totalStreakNotes = len(set(time for time, event in self.song.track[i].getAllEvents() if isinstance(event, Note)))
-
       self.scoring[i].lastNoteEvent = lastDrumNoteEvent
       self.lastNoteTimes[i] = lastDrumNoteTime
       if lastDrumNoteEvent:
@@ -4609,7 +4608,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       for i, player in enumerate(self.playerList):
         if self.playerList[0].practiceMode:
           self.scoring[i].score = 0
-        if self.scoring[i] > 0:
+        if self.scoring[i].score > 0:
           noScore = False
           break
       else:
@@ -4663,6 +4662,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.session.world.deleteScene(self)
         self.freeResources()
         self.session.world.createScene("GameResultsScene", libraryName = self.libraryName, songName = self.songName, players = self.playerList, scores = scoreList, coOpType = self.coOpType, careerMode = self.careerMode)
+      
+      else:
+        self.changeSong()
 
   def keyPressed(self, key, unicode, control = None):
     #RF style HOPO playing

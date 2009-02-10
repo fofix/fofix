@@ -152,8 +152,6 @@ class ScoreCard(object):
     self.endingScore = 0    #MFH
     self.endingStreakBroken = False   #MFH
     self.endingAwarded = False    #MFH
-    self.lastNoteEvent = None    #MFH
-    self.lastNoteTime  = 0.0 #for co-op
     self.freestyleWasJustActive = False  #MFH
 
   def getStarScores(self, tempExtraScore = 0):
