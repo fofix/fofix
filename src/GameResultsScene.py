@@ -175,8 +175,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       earlyHitHandicap      = 1.0 #scoreCard.earlyHitWindowSizeHandicap #akedrou - replace when implementing handicap.
       self.finalScore[i]    = scoreCard.score
       self.originalScore[i] = scoreCard.score
-      if self.starScoring == 0: #FoF-mode
-        self.starMass[i] = 100 * scoreCard.stars
+      self.starMass[i] = 100 * scoreCard.stars
       
       for j in range(a):
         if (scoreCard.handicap>>j)&1 == 1:
@@ -185,14 +184,17 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
               cut = (100.0**slowdown)/100.0
               self.cheats[i].append((Scorekeeper.SCALABLE_NAMES[0], cut))
               self.finalScore[i] = int(self.finalScore[i] * cut)
+              self.starMass[i]   = int(self.starMass[i]   * cut)
               scoreCard.longHandicap += "aud,%.2f;" % slowdown
             if earlyHitHandicap != 1.0:
               self.cheats[i].append((Scorekeeper.SCALABLE_NAMES[1], earlyHitHandicap))
               self.finalScore[i] = int(self.finalScore[i] * earlyHitHandicap)
+              self.starMass[i]   = int(self.starMass[i]   * earlyHitHandicap)
               scoreCard.longHandicap += "ehw,%.2f;" % earlyHitHandicap
           else:
             self.cheats[i].append((Scorekeeper.HANDICAP_NAMES[(a-1)-j], Scorekeeper.HANDICAPS[j]))
             self.finalScore[i] = int(self.finalScore[i] * Scorekeeper.HANDICAPS[j])
+            self.starMass[i]   = int(self.starMass[i]   * Scorekeeper.HANDICAPS[j])
     
     for cheatList in self.cheats:
       if len(cheatList) > 0:
@@ -560,8 +562,16 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
                     self.engine.data.starLostSound.play()
             else:
               self.resultSubStep[i] += 1
+          if self.resultSubStep[i] == 1:
+            if self.starScoring == 0:
+              star = scoreCard.stars
+              scoreCard.stars = min(int(self.starMass[i]/100),5)
+              if star > scoreCard.stars and self.engine.data.starLostSoundFound:
+                self.engine.data.starLostSound.play()
+            self.resultSubStep[i] += 1
+            
       
-        if min(self.resultSubStep) > 0:
+        if min(self.resultSubStep) > 1:
           self.progressReady = True
     
     if self.resultStep == 2:
