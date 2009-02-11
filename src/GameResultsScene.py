@@ -554,6 +554,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
                   star = scoreCard.stars
                   scoreCard.updateAvMult()
                   scoreCard.getStarScores()
+                  if scoreCard.score == 0:
+                    scoreCard.stars = 0
                   if star > scoreCard.stars and self.engine.data.starLostSoundFound:
                     self.engine.data.starLostSound.play()
             else:
