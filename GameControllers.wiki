@@ -5,6 +5,10 @@ You own a Guitar Hero or Rock Band controller for the PS2, PS3, Wii or xbox360?
 You are wondering how to get it to work? You are at the right place!
 
 = Microsoft Windows =
+== PS3 ==
+Works right out of the box - just plug it in.  It uses the standard joystick driver that is part of Windows.
+
+== PS2, Xbox 360, Wii ==
 _Some knowledgeable Windows person, please fill this in._
 
 = GNU/Linux =
