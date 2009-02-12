@@ -1192,8 +1192,10 @@ class Guitar:
         glColor4f(.2 + .4, .2 + .4, .2 + .4, 1)
       else:
         glColor4f(*color)
+	#volshebnyi - tail color when sp is active
         if self.starPowerActive and self.theme != 2 and not color == (0,0,0,1):#8bit
-          glColor4f(.3,.7,.9,1)
+          c = self.fretColors[5]
+	  glColor4f(.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1) 
 
     if flat:
       glScalef(1, .1, 1)
@@ -1215,13 +1217,15 @@ class Guitar:
         if freestyleTail == 0:    #normal tail rendering
           #myfingershurt: so any theme containing appropriate files can use new tails
           if not self.simpleTails:
-              
             if big == True and tailOnly == True:
               if kill and self.killfx == 0:
                 zsize = .25
-                size = (.15, s - zsize)
+                size = (.28*abs(0.5 - pos % 350 / 350)+.03, s - zsize)
                 tex1 = self.kill1
                 tex2 = self.kill2
+	  	c = self.fretColors[6]
+		if c != (0,0,0):
+	  	  glColor4f(.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1) 
               else:
                 zsize = .25
                 size = (.17, s - zsize)
@@ -1274,9 +1278,12 @@ class Guitar:
             if big == True and tailOnly == True:
               if kill and self.killfx == 0:
                 zsize = .25
-                size = (.15, s - zsize)
+                size = (.28*abs(0.5 - pos % 350 / 350)+.03, s - zsize)
                 tex1 = self.kill1
                 tex2 = self.kill2
+	  	c = self.fretColors[6]
+		if c != (0,0,0):
+	  	  glColor4f(.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1) 
               else:
                 zsize = .25
                 size = (.11, s - zsize)
@@ -1505,9 +1512,11 @@ class Guitar:
       if spNote == True and self.threeDspin == True:
         glRotate(90 + self.time/3, 0, 1, 0)
       #death_au: fixed 3D note colours
+      #volshebnyi - note color when sp is active
       glColor4f(*color)
       if self.starPowerActive and self.theme != 2 and not color == (0,0,0,1):
-        glColor4f(.3,.7,.9, 1)
+        c = self.fretColors[5]
+	glColor4f(.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1) 
 
       if self.notetex == True and spNote == False:
         
@@ -2075,9 +2084,9 @@ class Guitar:
       glTranslatef(x, (1.0 - visibility) ** (event.number + 1), z)
       if big == True and num < self.bigMax:
         num += 1
-        self.renderTail(length, sustain = sustain, kill = killswitch, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, big = True, fret = event.number, spNote = spNote)
+        self.renderTail(length, sustain = sustain, kill = killswitch, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, big = True, fret = event.number, spNote = spNote, pos = pos)
       else:
-        self.renderTail(length, sustain = sustain, kill = killswitch, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote)
+        self.renderTail(length, sustain = sustain, kill = killswitch, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote, pos = pos)
       glPopMatrix()
   
 

@@ -52,6 +52,10 @@ Config.define("theme", "fret2_color",       str, "#FFFF22")
 Config.define("theme", "fret3_color",       str, "#3333FF")
 Config.define("theme", "fret4_color",       str, "#FF9933")
 
+#Volshebnyi - spNote and killswitch tail colors
+Config.define("theme", "fretS_color",       str, "#4CB2E5")
+Config.define("theme", "fretK_color",       str, "#000000")
+
 Config.define("theme", "flame0_1X_color",    str, "#d5ff82")
 Config.define("theme", "flame1_1X_color",    str, "#ff8880")
 Config.define("theme", "flame2_1X_color",    str, "#faf66b")
@@ -525,12 +529,16 @@ def setupFrets(config):
     
   if fretColors == None:
     fretColors = [hexToColor(config.get("theme", "fret%d_color" % i)) for i in range(5)]
+    fretColors.append(hexToColor(config.get("theme", "fretS_color"))) #Volshebnyi - spNote color
+    fretColors.append(hexToColor(config.get("theme", "fretK_color"))) #Volshebnyi - killswitch tail color
   else:
     fretColors[0] = hexToColor(config.get("theme", "fret0_color"))
     fretColors[1] = hexToColor(config.get("theme", "fret1_color"))
     fretColors[2] = hexToColor(config.get("theme", "fret2_color"))
     fretColors[3] = hexToColor(config.get("theme", "fret3_color"))
     fretColors[4] = hexToColor(config.get("theme", "fret4_color"))
+    fretColors[5] = hexToColor(config.get("theme", "fretS_color"))
+    fretColors[6] = hexToColor(config.get("theme", "fretK_color"))
 
 def setupFlameColors(config):
   global flameColors
