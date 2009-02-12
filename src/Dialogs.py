@@ -2312,9 +2312,9 @@ class SongChooser(Layer, KeyListener):
                   w, h = font.getStringSize(text, scale=scale)
                   if score > 0 and score!=_("Nil"): #QQstarS: score >0 that have the back color
                     # evilynux - No more outline
-                    lfont.render(text, (self.song_listscore_xpos+.1-w, .0935*(i+1)-pos[0]*.0935+.2*.5), scale=scale*1.28)
+                    lfont.render(text, (self.song_listscore_xpos+.1-w, .0935*(i+1)-pos[0]*.0935+.2), scale=scale*1.28)
                   else: #QQstarS: 
-                    lfont.render(text, (self.song_listscore_xpos+.1-w, .0935*(i+1)-pos[0]*.0935+.2*.5), scale=scale*1.28)
+                    lfont.render(text, (self.song_listscore_xpos+.1-w, .0935*(i+1)-pos[0]*.0935+.2), scale=scale*1.28)
   
                   if self.scoreTimer < 1000:
                     self.scoreTimer += 1
