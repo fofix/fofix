@@ -293,6 +293,7 @@ Config.define("video", "counting",       bool, False,     text = _("Show at Song
 Config.define("game",   "note_hit_window",          int, 1,    text = _("Note Hit-window"), options = {0: _("1. Standard"), 1: _("2. Tight"), 2: _("3. Tightest")})#racer blazingamer
 
 Config.define("handicap",   "early_hit_window",          int, 0,    text = _("Early Hit-window"), options = {0: _("Auto"), 1: _("None (RB2)"), 2: _("Half (GH2)"), 3: _("Full (FoF)")})  #MFH
+Config.define("handicap",  "detailed_handicap",       int, 1,     text = _("Show Detailed Handicap"), options = {0: _("No"), 1: _("Yes")})
 
 
 Config.define("game",   "hit_window_cheat",    int, 0,    text = _("Hit-Window Cheat"), options = {0: _("Off"), 1: _("Widest"), 2: _("Wide")})

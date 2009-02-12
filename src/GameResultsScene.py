@@ -86,6 +86,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.diffScore        = [0 for i in scores]
     self.totalHandicap    = [100.0 for i in scores]
     self.progressReady    = False
+    self.progressToScores = False
     self.rolling          = [False for i in scores]
     self.space            = [1 for i in scores]
     self.finalScore       = [0 for i in scores]
@@ -148,6 +149,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     
     self.congratPhrase = self.engine.config.get("game", "congrats")
     self.keepCount     = self.engine.config.get("game", "keep_play_count")
+    
+    self.showHandicap  = self.engine.config.get("handicap", "detailed_handicap")
     
     self.resultCheerLoop = self.engine.config.get("game", "result_cheer_loop")
     
@@ -321,6 +324,10 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         self.resultStep += 1
         self.resultSubStep = [0 for i in self.scoring]
         self.progressReady = False
+      elif self.progressToScores:
+        self.resultStep = 2
+        self.resultSubStep = [0 for i in self.scoring]
+        self.progressToScores = False
       for i in range(len(self.scoring)):
         if self.coOpType:
           if self.rolling[i]:
@@ -504,23 +511,45 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.animationTimer += ticks
     
     if self.resultStep == 0 and self.loaded:
-      for i, scoreCard in enumerate(self.scoring):
-        self.scoreRollTimer[i] += ticks
-        if not self.rolling[i] and self.resultSubStep[i] == 0:
-          self.newScore[i] = scoreCard.score
-          scoreCard.updateAvMult()
-          scoreCard.getStarScores()
-          self.space[i] = 1.5
-          self.startRoll(i)
-        if self.rolling[i]:
-          self.scoreRoll(i, ticks)
-        if not self.rolling[i]:
-          self.resultSubStep[i] += 1
-        if self.space[i] > 1:
-          self.shrinkSpace(i, ticks)
-      
-      if min(self.resultSubStep) > 0:
-        self.progressReady = True
+      if self.showHandicap == 0 and not self.skipCheats:
+        for i, scoreCard in enumerate(self.scoring):
+          if not self.rolling[i] and self.resultSubStep[i] == 0:
+            self.newScore[i] = self.finalScore[i]
+            scoreCard.score = self.finalScore[i]
+            for cheat in self.cheats[i]:
+              self.totalHandicap[i] *= cheat[1]
+            scoreCard.updateAvMult()
+            scoreCard.getStarScores()
+            if self.starScoring == 0:
+              scoreCard.stars = min(int(self.starMass[i]/100),5)
+            self.space[i] = 1.5
+            self.startRoll(i)
+          if self.rolling[i]:
+            self.scoreRoll(i, ticks)
+          if not self.rolling[i]:
+            self.resultSubStep[i] += 1
+          if self.space[i] > 1:
+            self.shrinkSpace(i, ticks)
+        if min(self.resultSubStep) > 0:
+          self.progressToScores = True
+      else:
+        for i, scoreCard in enumerate(self.scoring):
+          self.scoreRollTimer[i] += ticks
+          if not self.rolling[i] and self.resultSubStep[i] == 0:
+            self.newScore[i] = scoreCard.score
+            scoreCard.updateAvMult()
+            scoreCard.getStarScores()
+            self.space[i] = 1.5
+            self.startRoll(i)
+          if self.rolling[i]:
+            self.scoreRoll(i, ticks)
+          if not self.rolling[i]:
+            self.resultSubStep[i] += 1
+          if self.space[i] > 1:
+            self.shrinkSpace(i, ticks)
+        
+        if min(self.resultSubStep) > 0:
+          self.progressReady = True
     
     if self.resultStep == 1:
       if self.skipCheats:
@@ -569,8 +598,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
               if star > scoreCard.stars and self.engine.data.starLostSoundFound:
                 self.engine.data.starLostSound.play()
             self.resultSubStep[i] += 1
-            
-      
+        
         if min(self.resultSubStep) > 1:
           self.progressReady = True
     

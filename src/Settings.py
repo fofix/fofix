@@ -628,6 +628,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "coffee", "failingEnabled", autoApply = True),
       ConfigChoice(engine, engine.config, "audio",  "speed_factor", autoApply = True),     #MFH
       ConfigChoice(engine, engine.config, "handicap",  "early_hit_window", autoApply = True),     #MFH
+      ConfigChoice(engine, engine.config, "handicap", "detailed_handicap", autoApply = True),
       (_("Mod settings"), modSettings),
     ]
     CheatMenu = Menu.Menu(engine, Cheats)
