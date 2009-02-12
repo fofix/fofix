@@ -3037,7 +3037,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               if n in notes and not self.controls.getState(k):
                 changed = True
                 self.controls.toggle(k, True)
-                Log.debug(k)
                 self.keyPressed3(None, 0, k)  #mfh
               elif not n in notes and self.controls.getState(k):
                 changed = True
@@ -8330,7 +8329,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             jurgScale = float(self.jurgenText[2])
             w, h = bigFont.getStringSize(text, scale = jurgScale)
             Theme.setBaseColor()
-            Log.debug(1 - w)
             jurgX = float(self.jurgenText[0])
             if jurgX > 1 - w:
               jurgX = 1 - w
