@@ -155,7 +155,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.resultCheerLoop = self.engine.config.get("game", "result_cheer_loop")
     
     self.starScoring = self.engine.config.get("game", "star_scoring")
-    self.starMass    = [0 for i in self.playerList]
+    self.starMass    = [0 for i in self.scoring]
+    self.oldStar     = [0 for i in self.scoring]
     
     self.cheerLoopDelay  = Theme.crowdLoopDelay
     if self.cheerLoopDelay == None:
@@ -175,28 +176,30 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     slowdown = self.engine.audioSpeedFactor
     a = len(Scorekeeper.HANDICAPS)
     for i, scoreCard in enumerate(self.scoring):
+      scoreCard.updateHandicapValue()
       earlyHitHandicap      = 1.0 #scoreCard.earlyHitWindowSizeHandicap #akedrou - replace when implementing handicap.
-      self.finalScore[i]    = scoreCard.score
+      self.finalScore[i]    = int(scoreCard.score * (scoreCard.handicapValue/100.0))
       self.originalScore[i] = scoreCard.score
       self.starMass[i] = 100 * scoreCard.stars
+      self.oldStar     = scoreCard.stars
       
       for j in range(a):
         if (scoreCard.handicap>>j)&1 == 1:
           if j == 1: #scalable - added to long handicap.
             if slowdown != 1:
-              cut = (100.0**slowdown)/100.0
+              if slowdown < 1:
+                cut = (100.0**slowdown)/100.0
+              else:
+                cut = (100.0*slowdown)/100.0
               self.cheats[i].append((Scorekeeper.SCALABLE_NAMES[0], cut))
-              self.finalScore[i] = int(self.finalScore[i] * cut)
               self.starMass[i]   = int(self.starMass[i]   * cut)
               scoreCard.longHandicap += "aud,%.2f;" % slowdown
             if earlyHitHandicap != 1.0:
               self.cheats[i].append((Scorekeeper.SCALABLE_NAMES[1], earlyHitHandicap))
-              self.finalScore[i] = int(self.finalScore[i] * earlyHitHandicap)
               self.starMass[i]   = int(self.starMass[i]   * earlyHitHandicap)
               scoreCard.longHandicap += "ehw,%.2f;" % earlyHitHandicap
           else:
             self.cheats[i].append((Scorekeeper.HANDICAP_NAMES[(a-1)-j], Scorekeeper.HANDICAPS[j]))
-            self.finalScore[i] = int(self.finalScore[i] * Scorekeeper.HANDICAPS[j])
             self.starMass[i]   = int(self.starMass[i]   * Scorekeeper.HANDICAPS[j])
     
     for cheatList in self.cheats:
@@ -518,10 +521,15 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
             scoreCard.score = self.finalScore[i]
             for cheat in self.cheats[i]:
               self.totalHandicap[i] *= cheat[1]
+              if cheat[1] < 1.0:
+                scoreCard.cheatsApply = True
             scoreCard.updateAvMult()
             scoreCard.getStarScores()
             if self.starScoring == 0:
-              scoreCard.stars = min(int(self.starMass[i]/100),5)
+              if scoreCard.cheatsApply:
+                scoreCard.stars = min(int(self.starMass[i]/100),5)
+              if scoreCard.stars > self.oldStars[i]:
+                scoreCard.stars = self.oldStars[i]
             self.space[i] = 1.5
             self.startRoll(i)
           if self.rolling[i]:
@@ -560,15 +568,19 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
             if self.currentCheat[i] < len(self.cheats[i]):
               self.scoreRollTimer[i] += ticks
               if self.finishedCheat[i] == -1:
-                scoreCard.cheatsApply = True
                 self.cheatsApply = True
               if not self.rolling[i]:
                 if self.delay[i] == 0 and self.finishedCheat[i] < self.currentCheat[i] and not self.waiting:
+                  if self.cheats[i][self.currentCheat[i]][1] < 1.0:
+                    scoreCard.cheatsApply = True
                   self.newScore[i] = int(self.currentScore[i] * self.cheats[i][self.currentCheat[i]][1])
                   self.totalHandicap[i] *= self.cheats[i][self.currentCheat[i]][1]
                   if self.starScoring == 0:
                     self.starMass[i] *= self.cheats[i][self.currentCheat[i]][1]
-                    scoreCard.stars = min(int(self.starMass[i]/100),5)
+                    if scoreCard.cheatsApply:
+                      scoreCard.stars = min(int(self.starMass[i]/100),5)
+                    if scoreCard.stars > self.oldStars[i]:
+                      scoreCard.stars = self.oldStars[i]
                   self.startRoll(i)
                   self.finishedCheat[i] += 1
                   self.engine.data.getScrewUpSound().play()
@@ -594,10 +606,14 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           if self.resultSubStep[i] == 1:
             if self.starScoring == 0:
               star = scoreCard.stars
-              scoreCard.stars = min(int(self.starMass[i]/100),5)
+              if scoreCard.cheatsApply:
+                scoreCard.stars = min(int(self.starMass[i]/100),5)
+              if scoreCard.stars > self.oldStars[i]:
+                scoreCard.stars = self.oldStars[i]
               if star > scoreCard.stars and self.engine.data.starLostSoundFound:
                 self.engine.data.starLostSound.play()
             self.resultSubStep[i] += 1
+            self.currentScore[i] = self.finalScore[i]
         
         if min(self.resultSubStep) > 1:
           self.progressReady = True

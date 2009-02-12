@@ -376,6 +376,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.tsPercentOn = _(" % ON ")
     self.tsBassGroove = _("BASS GROOVE")
     self.tsBassGrooveLabel = _("Bass Groove:")
+    self.tsHandicapLabel = _("Handicap")
     self.tsAvgLabel = _("Avg")
     self.tsAccVeryLate = _("Very Late")
     self.tsAccLate = _("Late")
@@ -2052,25 +2053,25 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if self.coOpType:
           if (self.coOpScoreCard.handicap>>3)&1 != 1:
             self.coOpScoreCard.handicap += 0x8
-      if self.guitars[i].hitwcheat == 1:
+      if self.guitars[i].hitw == 0.70:
         if (scoreCard.handicap>>4)&1 != 1:
           scoreCard.handicap += 0x10
         if self.coOpType:
           if (self.coOpScoreCard.handicap>>4)&1 != 1:
             self.coOpScoreCard.handicap += 0x10
-      elif self.guitars[i].hitwcheat == 2:
+      elif self.guitars[i].hitw == 1.0:
         if (scoreCard.handicap>>5)&1 != 1:
           scoreCard.handicap += 0x20
         if self.coOpType:
           if (self.coOpScoreCard.handicap>>5)&1 != 1:
             self.coOpScoreCard.handicap += 0x20
-      elif self.guitars[i].hitw == 1:
+      elif self.guitars[i].hitw == 1.9:
         if (scoreCard.handicap>>6)&1 != 1:
           scoreCard.handicap += 0x40
         if self.coOpType:
           if (self.coOpScoreCard.handicap>>6)&1 != 1:
             self.coOpScoreCard.handicap += 0x40
-      elif self.guitars[i].hitw == 2:
+      elif self.guitars[i].hitw == 2.3:
         if (scoreCard.handicap>>7)&1 != 1:
           scoreCard.handicap += 0x80
         if self.coOpType:
@@ -2148,6 +2149,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if self.coOpType:
           if (self.coOpScoreCard.handicap>>19)&1 != 1:
             self.coOpScoreCard.handicap += 0x80000
+      scoreCard.updateHandicapValue()
+    if self.coOpType:
+      self.coOpScoreCard.updateHandicapValue()
     
   def loadSettings(self):
     self.stage.updateDelays()
@@ -5792,13 +5796,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
   
               else:
-                if self.coOpGH and self.numOfPlayers == 2:
-                  multcoord = (w*0.505,h*0.295) #Worldrave: was (w*0.5,h*0.3)
-                elif self.coOpGH:
-                  multcoord = (w*0.134,h*0.8)
-                else:
-                  multcoord = (w*0.134,h*0.19 + self.hOffset[i]) #QQstarS:Set  new postion. I only shown it once.
-                self.engine.drawImage(self.mult, scale = (.5,-.0625), coord = multcoord, rect = (0,1,multRange[0],multRange[1]))
+                multcoord = (w*0.134,h*0.19 + self.hOffset[i]) #QQstarS:Set  new postion. I only shown it once.
+                
+                if not self.coOpType: #akedrou - mult must be above co-op rockmeter.
+                  self.engine.drawImage(self.mult, scale = (.5,-.0625), coord = multcoord, rect = (0,1,multRange[0],multRange[1]))
   
               if multStreak == 0:
                 streak = 0
@@ -6021,6 +6022,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                                         rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis)) 
                 if self.coopRockmeter:
                   self.engine.drawImage(self.coopRockmeter, scale = (.5,-.5), coord = (w*.5, h*.365))
+                self.engine.drawImage(self.mult, scale = (.5,-.0625), coord = (w*0.505,h*0.295), rect = (0,1,multRange[0],multRange[1]))
               
                         
               elif self.coOp:
@@ -6374,7 +6376,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                             corockcoord = (w*.5,h*.27)
                           self.engine.drawImage(rock, scale = (.5,-.5), coord = corockcoord)
                         self.engine.drawImage(self.arrow, scale = (wfactor,-wfactor), coord = (w*.5,h*.19), rot = -angle)
-                      self.engine.drawImage(self.mult, scale = (.5,-.0625), coord = (w*0.5,h*0.2), rect = (0,1,0.0,0.125)) 
+                      self.engine.drawImage(self.mult, scale = (.5,-.0625), coord = (w*0.505,h*0.295), rect = (0,1,0.0,0.125)) 
                       if self.rockTop:
                         self.engine.drawImage(self.rockTop, scale = (.5,-.5), coord = (w*.5,h*.2))
                   
@@ -7729,11 +7731,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 sTotalNotes = self.coOpScoreCard.totalStreakNotes
                 sHitAcc = self.coOpScoreCard.hitAccuracy
                 sAvMult = self.coOpScoreCard.avMult
+                sEfHand = self.coOpScoreCard.handicapValue
               else:
                 sNotesHit   = self.scoring[i].notesHit
                 sTotalNotes = self.scoring[i].totalStreakNotes
                 sHitAcc = self.scoring[i].hitAccuracy
                 sAvMult = self.scoring[i].avMult
+                sEfHand = self.scoring[i].handicapValue
               trimmedTotalNoteAcc = self.decimal(str(sHitAcc)).quantize(self.decPlaceOffset)
               #text = str(self.playerList[i].notesHit) + "/" + str(self.playerList[i].totalStreakNotes) + ": " + str(trimmedTotalNoteAcc) + "%"
               text = "%(notesHit)s/%(totalNotes)s: %(hitAcc)s%%" % \
@@ -7762,8 +7766,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               glColor3f(c1, c2, c3)
               w, h = font.getStringSize(text,0.00160)
               font.render(text, (accDispX - w/2, accDispYam),(1, 0, 0),0.00140)     #top-centered by streak under score
+              
+              if sEfHand != 100.0:
+                text = "%s: %.1f%%" % (self.tsHandicapLabel, sEfHand)
+                w, h = font.getStringSize(text, .00160)
+                font.render(text, (.98 - w, .246), (1, 0, 0),0.00140)
             
-
             if self.coOpRB or self.coOpGH:
               self.engine.view.setViewportHalf(self.numOfPlayers,i)
             
@@ -7973,8 +7981,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
               w, h = font.getStringSize(text,0.00175)
     
-              posX = 0.90
-              posY = 0.250
+              posX = 0.98 - (w / 2)
+              if self.theme == 2:
+                posY = 0.284
+              else:
+                if self.coOpGH:
+                  posY = 0.25
+                else:
+                  posY = 0.296
     
               if self.hitAccuracyPos == 0: #Center
                 posX = .500
@@ -7991,12 +8005,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 posY = .710			
     
     
-              if self.theme == 2:
-                #RB mod
-                font.render(text, (posX - w / 2, posY - h / 2),(1, 0, 0),0.00170)    
-              else:
-                #gh3 or other standard mod
-                font.render(text, (posX - w / 2, posY - h / 2),(1, 0, 0),0.00170)    
+              font.render(text, (posX - w / 2, posY - h / 2),(1, 0, 0),0.00170)    
 
     
               if self.showAccuracy == 3:    #for displaying numerical below descriptive
@@ -8006,10 +8015,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 text = "%(acc)s %(ms)s" % \
                   {'acc': str(trimmedAccuracy), 'ms': self.msLabel}
                 w, h = font.getStringSize(text,0.00140)
-                if self.theme == 2:   #RB mod
-                  font.render(text, (posX - w / 2, posY - h / 2 + .030),(1, 0, 0),0.00140) 
-                else:   #GH3 or other standard mod
-                  font.render(text, (posX - w / 2, posY - h / 2 + .030),(1, 0, 0),0.00140) 
+                font.render(text, (posX - w / 2, posY - h / 2 + .030),(1, 0, 0),0.00140) 
                   
     
             glColor3f(1, 1, 1)

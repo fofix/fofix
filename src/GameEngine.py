@@ -214,7 +214,7 @@ Config.define("game", "partial_stars",      int, 1,  text = _("Show Partial Star
 Config.define("game", "hopo_debug_disp",      int, 0,  text = _("HO/PO Debug"), options = {0: _("Off"), 1: _("On")})
 Config.define("game", "gsolo_accuracy_disp",      int, 1,  text = _("Show Solo Stats"), options = {0: _("Off"), 1: _("Percent"), 2: _("Detail")})
 Config.define("game", "decimal_places",      int, 1,  text = _("Stat Decimal Places"), options = dict([(n, n) for n in range(0, 3)]))
-Config.define("game", "star_scoring",       int, 3,     text = _("Star Scoring Style"), options = {0: _("FoF"), 1: _("GH"), 2: _("RB"), 3: _("RB+GH"), 4: _("RB2")})#MFH
+Config.define("game", "star_scoring",       int, 3,     text = _("Star Scoring Style"), options = {0: _("Accuracy"), 1: _("GH"), 2: _("RB"), 3: _("RB+GH"), 4: _("RB2")})#MFH
 Config.define("game", "career_star_min",    int, 3,     text = _("Career Mode Advance"), options = {0: _("0 (Song Finish)"), 1: _("1 Star"), 2: _("2 Stars"), 3: _("3 Stars"), 4: _("4 Stars"), 5: _("5 Stars"), 6: _("6 (Gold Stars)"), 7: _("7 (Full Combo)")})
 Config.define("game", "gsolo_acc_pos",       int, 3,     text = _("Solo Stat Positioning"), options = {0: _("Right"), 1: _("Center"), 2: _("Left"), 3: _("Rock Band")})#MFH,(racer: added RB)
 Config.define("game", "bass_groove_enable",       int, 1,     text = _("Bass Groove"), options = {0: _("Off"), 1: _("By Theme"), 2: _("By MIDI"), 3: _("On")}) #MFH

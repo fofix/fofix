@@ -68,6 +68,7 @@ class ScoreCard(object):
     self.earlyHitWindowSizeHandicap = 1.0
     self.handicap = 0
     self.longHandicap  = ""
+    self.handicapValue = 100.0
     self.totalStreakNotes = 0
     self.totalNotes = 0
     self.cheatsApply = False
@@ -80,7 +81,7 @@ class ScoreCard(object):
       self.star[4] = 2.0
       self.star[3] = 1.2
       self.star[2] = 0.4
-      self.star[1] = 0.0
+      self.star[1] = 0.2 #akedrou - GH may start with 1 star, but why do we need to?
       self.star[0] = 0.0
     elif self.starScoring > 1: #RB-style (mult thresholds, optional 100% gold star)
       if self.starScoring == 4:
@@ -123,8 +124,8 @@ class ScoreCard(object):
       self.star[5] = 95
       self.star[4] = 75
       self.star[3] = 50
-      self.star[2] = 25
-      self.star[1] = 0
+      self.star[2] = 30
+      self.star[1] = 10
       self.star[0] = 0
     
     self.endingScore = 0    #MFH
@@ -145,6 +146,7 @@ class ScoreCard(object):
     self.cheats = []
     self.handicap = 0
     self.longHandicap  = ""
+    self.handicapValue = 100.0
     self.cheatsApply = False
     self.stars = 0
     self.partialStars = 0
@@ -248,6 +250,24 @@ class ScoreCard(object):
   def updateAvMult(self):
     self.hitAccuracy = (float(self.notesHit) / float(self.totalStreakNotes) ) * 100.0
     self.avMult      = self.score/float(self.totalNotes*self.baseScore)
+  
+  def updateHandicapValue(self):
+    self.handicapValue = 100.0
+    slowdown = Config.get("audio","speed_factor")
+    earlyHitHandicap      = 1.0 #self.earlyHitWindowSizeHandicap #akedrou - replace when implementing handicap.
+    for j in range(len(HANDICAPS)):
+      if (self.handicap>>j)&1 == 1:
+        if j == 1: #scalable
+          if slowdown != 1:
+            if slowdown < 1:
+              cut = (100.0**slowdown)/100.0
+            else:
+              cut = (100.0*slowdown)/100.0
+            self.handicapValue *= cut
+          if earlyHitHandicap != 1.0:
+            self.handicapValue *= earlyHitHandicap
+        else:
+          self.handicapValue *= HANDICAPS[j]
   
   def getStreak(self):
     return self._streak
