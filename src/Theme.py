@@ -52,10 +52,6 @@ Config.define("theme", "fret2_color",       str, "#FFFF22")
 Config.define("theme", "fret3_color",       str, "#3333FF")
 Config.define("theme", "fret4_color",       str, "#FF9933")
 
-#Volshebnyi - spNote and killswitch tail colors
-Config.define("theme", "fretS_color",       str, "#4CB2E5")
-Config.define("theme", "fretK_color",       str, "#000000")
-
 Config.define("theme", "flame0_1X_color",    str, "#d5ff82")
 Config.define("theme", "flame1_1X_color",    str, "#ff8880")
 Config.define("theme", "flame2_1X_color",    str, "#faf66b")
@@ -112,6 +108,11 @@ Config.define("theme", "pov_target_z",       float, None)
 Config.define("theme", "pov_origin_x",       float, None)
 Config.define("theme", "pov_origin_y",       float, None)
 Config.define("theme", "pov_origin_z",       float, None)
+
+#Volshebnyi - spNote and killswitch tail colors
+Config.define("theme", "fretS_color",       str, "#4CB2E5")
+Config.define("theme", "fretK_color",       str, "#000000")
+Config.define("theme", "obar_hscale",       float, 0.5)
 
 #blazingamer
 Config.define("theme", "menu_x",       float, None)
@@ -638,6 +639,7 @@ def setupMisc(config):
   global starFillupColor
   global songListDisplay
   global jurgTextPos
+  global oBarHScale
 
   loadingPhrase = config.get("theme", "loading_phrase")
   resultsPhrase = config.get("theme", "results_phrase")
@@ -655,6 +657,7 @@ def setupMisc(config):
   starFillupColor = config.get("theme", "star_fillup_color")
   songListDisplay = config.get("theme", "song_list_display")
   jurgTextPos = config.get("theme", "jurgen_text_pos").split(",")
+  oBarHScale = config.get("theme", "obar_hscale")
 
 #MFH:
 def setupSonglist(config):
