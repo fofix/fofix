@@ -1,15 +1,21 @@
 #summary How to get game controllers to work
 
 = Introduction =
-You own a Guitar Hero or Rock Band controller for the PS2, PS3, Wii or xbox360?
-You are wondering how to get it to work? You are at the right place!
+Do you own a Guitar Hero or Rock Band controller for the PS2, PS3, Wii or Xbox 360?
+Are you wondering how to get it to work? Then you're at the right place!
 
 = Microsoft Windows =
 == PS3 ==
-Works right out of the box - just plug it in.  It uses the standard joystick driver that is part of Windows.
+Works right out of the box - just plug it in. It uses the standard joystick driver that is part of Windows.
 
-== PS2, Xbox 360, Wii ==
-_Some knowledgeable Windows person, please fill this in._
+== Xbox 360 ==
+Works right out of the box - just plug it in. The driver is included in Windows.
+
+== PS2 ==
+Any PS2 to USB adapter will do. Plug it in and it will go. Beware though, that most will not work with the whammy bar, as the guitar controller has no "analog" button.
+
+== Wii ==
+Requires a compatible bluetooth receiver on your computer and [http://carl.kenner.googlepages.com/glovepie_download GlovePIE]. _More instructions needed_
 
 = GNU/Linux =
 == PS2 ==
@@ -19,8 +25,8 @@ Get your hands on a PS2 to USB adapter and it'll work out of the box.
 Depending on your distribution, it might work out of the box.
 If it does not, install the [http://pingus.seul.org/~grumbel/xboxdrv/ xboxdrv driver].
 
-*Note*: There are alternatives, like the xpad kernel module, but since the xboxdrv is a userspace kernel driver that works even with the most recent kernels with problematic Xorg !AutoAddDevices feature, we recommand that one.
+*Note*: There are alternatives, like the xpad kernel module, but since the xboxdrv is a userspace kernel driver that works even with the most recent kernels with problematic Xorg !AutoAddDevices feature, we recommend that one.
 
-= MacOS X =
+= Mac OSX =
 == xbox360 ==
 Install this [http://tattiebogle.net/index.php/ProjectRoot/Xbox360Controller/OsxDriver driver]. See the instructions on the driver page for more information.
