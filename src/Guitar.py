@@ -1220,12 +1220,18 @@ class Guitar:
             if big == True and tailOnly == True:
               if kill and self.killfx == 0:
                 zsize = .25
-                size = (.28*abs(0.5 - pos % 350 / 350)+.03, s - zsize)
                 tex1 = self.kill1
                 tex2 = self.kill2
-	  	c = self.fretColors[6]
-		if c != (0,0,0):
+
+		#volshebnyi - killswitch tail width and color change
+		kEffect = ( math.sin( pos / 50 ) + 1 ) /2
+                size = (0.02+kEffect*0.15, s - zsize)
+	  	c = [self.fretColors[6][0],self.fretColors[6][1],self.fretColors[6][2]]
+		if c != [0,0,0]:
+		  for i in range(0,3):
+		  	c[i]=c[i]*kEffect+color[i]*(1-kEffect)
 	  	  glColor4f(.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1) 
+
               else:
                 zsize = .25
                 size = (.17, s - zsize)
@@ -1278,11 +1284,16 @@ class Guitar:
             if big == True and tailOnly == True:
               if kill and self.killfx == 0:
                 zsize = .25
-                size = (.28*abs(0.5 - pos % 350 / 350)+.03, s - zsize)
                 tex1 = self.kill1
                 tex2 = self.kill2
-	  	c = self.fretColors[6]
-		if c != (0,0,0):
+
+		#volshebnyi - killswitch tail width and color change
+		kEffect = ( math.sin( pos / 50 ) + 1 ) /2
+                size = (0.02+kEffect*0.15, s - zsize)
+	  	c = [self.fretColors[6][0],self.fretColors[6][1],self.fretColors[6][2]]
+		if c != [0,0,0]:
+		  for i in range(0,3):
+		  	c[i]=c[i]*kEffect+color[i]*(1-kEffect)
 	  	  glColor4f(.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1) 
               else:
                 zsize = .25
