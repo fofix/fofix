@@ -100,6 +100,8 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||fret2_color = #FFFF22||Manually sets 3rd fret tail color||
 ||fret3_color = #3333FF||Manually sets 4tg fret tail color||
 ||fret4_color = #FF9933||Manually sets 5th fret tail color||
+||fretS_color = #4CB2E5||Manually sets all tails and notes color when StarPower is active||
+||fretK_color = #000000||Manually sets killswitch tail color FX (#000000 means color FX is disabled)||
 ||hopo_color = #EEEEEE||Enter a Hex color here.||
 ||hopo_indicator_active_color = #0000FF||Manually sets active color of hopo indicator||
 ||hopo_indicator_inactive_color = #FF0000||Manually sets inactive color of hopo indicator||
