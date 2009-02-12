@@ -112,7 +112,7 @@ Config.define("theme", "pov_origin_z",       float, None)
 #Volshebnyi - spNote and killswitch tail colors
 Config.define("theme", "fretS_color",       str, "#4CB2E5")
 Config.define("theme", "fretK_color",       str, "#000000")
-Config.define("theme", "obar_hscale",       float, 0.5)
+Config.define("theme", "obar_hscale",       float, 0.7)
 
 #blazingamer
 Config.define("theme", "menu_x",       float, None)

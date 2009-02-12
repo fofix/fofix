@@ -6688,7 +6688,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 			vCoord = - 125 * (self.countdown - 5.0)
 		else:
 			vCoord = 0
-		hScale = Theme.oBarHScale* 1.87 * self.guitars[i].boardWidth / math.sqrt(self.camera.origin[1]**2+(self.camera.origin[2]-0.5-vCoord/125)**2)
+		hScale = Theme.oBarHScale* 0.935 * self.guitars[i].boardWidth / math.sqrt(self.camera.origin[1]**2+(self.camera.origin[2]-0.5-vCoord/125)**2)
 
                 self.engine.drawImage(self.oBottom, scale = (hScale,.5), coord = (w/2,h/12+ vCoord))
                 self.engine.drawImage(self.oFill, scale = (hScale*currentSP,.5), coord = (w/2*(1+hScale*(currentSP-1)),h/12+ vCoord), rect = (0,currentSP,0,1))
