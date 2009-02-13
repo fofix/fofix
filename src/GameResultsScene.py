@@ -64,33 +64,38 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("GameResultsSceneClient class init...")
-
+    
+    if coOpType > 0:
+      self.scoring        = [scores.pop()]
+      self.coOpScoring    = scores
+    else:
+      self.scoring        = scores
+      self.coOpScoring    = None
     self.libraryName      = libraryName
-    self.cheats           = [[] for i in scores]
-    self.numCheats        = [0 for i in scores]
+    self.cheats           = [[] for i in self.scoring]
+    self.numCheats        = [0 for i in self.scoring]
     self.songName         = songName
     self.coOpType         = coOpType
     self.careerMode       = careerMode
     self.counter          = 0
     self.animationTimer   = 0
-    self.scoreRollTimer   = [0 for i in scores]
-    self.delay            = [0 for i in scores]
+    self.scoreRollTimer   = [0 for i in self.scoring]
+    self.delay            = [0 for i in self.scoring]
     self.waiting          = False
     self.resultStep       = 0
-    self.resultSubStep    = [0 for i in scores]
-    self.currentCheat     = [0 for i in scores]
-    self.finishedCheat    = [-1 for i in scores]
-    self.scoring          = scores
-    self.currentScore     = [0 for i in scores]
-    self.newScore         = [0 for i in scores]
-    self.diffScore        = [0 for i in scores]
-    self.totalHandicap    = [100.0 for i in scores]
+    self.resultSubStep    = [0 for i in self.scoring]
+    self.currentCheat     = [0 for i in self.scoring]
+    self.finishedCheat    = [-1 for i in self.scoring]
+    self.currentScore     = [0 for i in self.scoring]
+    self.newScore         = [0 for i in self.scoring]
+    self.diffScore        = [0 for i in self.scoring]
+    self.totalHandicap    = [100.0 for i in self.scoring]
     self.progressReady    = False
     self.progressToScores = False
-    self.rolling          = [False for i in scores]
-    self.space            = [1 for i in scores]
-    self.finalScore       = [0 for i in scores]
-    self.originalScore    = [0 for i in scores]
+    self.rolling          = [False for i in self.scoring]
+    self.space            = [1 for i in self.scoring]
+    self.finalScore       = [0 for i in self.scoring]
+    self.originalScore    = [0 for i in self.scoring]
     self.cheatsApply      = True
     self.skipCheats       = False
     self.showHighscores   = False
@@ -280,7 +285,15 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     
     self.maskStars = False
     self.fcStars   = True
-    self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "gameresults.png"))
+    self.part = [None for i in self.playerList]
+    self.partImage = True
+    if self.coOpType > 0:
+      try:
+        self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "gameresultscoop.png"))
+      except IOError:
+        self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "gameresults.png"))
+    else:
+      self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "gameresults.png"))
     self.engine.loadImgDrawing(self, "star1", os.path.join("themes",themename,"star1.png"))
     self.engine.loadImgDrawing(self, "star2", os.path.join("themes",themename,"star2.png"))
     try:
@@ -295,6 +308,54 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       self.starFC     = None
       self.fcStars   = False
       self.maskStars = True
+    if self.coOpType > 0:
+      for i, score in enumerate(self.coOpScoring):
+        if not self.partImage:
+          break
+        try:
+          if score.instrument == [4]:
+            self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"drum.png"))
+          elif score.instrument == [2]:
+            self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"bass.png"))
+          else:
+            self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"guitar.png"))
+        except IOError:
+          try:
+            if score.instrument == [4]:
+              self.engine.loadImgDrawing(self, "partLoad", os.path.join("drum.png"))
+            elif score.instrument == [2]:
+              self.engine.loadImgDrawing(self, "partLoad", os.path.join("bass.png"))
+            else:
+              self.engine.loadImgDrawing(self, "partLoad", os.path.join("guitar.png"))
+          except IOError:
+            self.partImage = False
+        if self.partLoad:
+          self.part[i] = self.partLoad
+    else:
+      for i, score in enumerate(self.scoring):
+        if not self.partImage:
+          break
+        try:
+          if score.instrument == [4]:
+            self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"drum.png"))
+          elif score.instrument == [2]:
+            self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"bass.png"))
+          else:
+            self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"guitar.png"))
+        except IOError:
+          try:
+            if score.instrument == [4]:
+              self.engine.loadImgDrawing(self, "partLoad", os.path.join("drum.png"))
+            elif score.instrument == [2]:
+              self.engine.loadImgDrawing(self, "partLoad", os.path.join("bass.png"))
+            else:
+              self.engine.loadImgDrawing(self, "partLoad", os.path.join("guitar.png"))
+          except IOError:
+            self.partImage = False
+        if self.partLoad:
+          self.part[i] = self.partLoad
+
+    self.partLoad = None
 
     
     phrase = random.choice(Theme.resultsPhrase.split("_"))
@@ -332,7 +393,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         self.resultSubStep = [0 for i in self.scoring]
         self.progressToScores = False
       for i in range(len(self.scoring)):
-        if self.coOpType:
+        if self.coOpType > 0:
           if self.rolling[i]:
             self.skipRoll(i)
             self.skipShrink(i)
@@ -619,7 +680,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           self.progressReady = True
     
     if self.resultStep == 2:
-      if not self.coOpType:
+      if self.coOpType == 0:
         for i, player in enumerate(self.playerList):
           if self.finalScore[i] == 0:
             self.noScore[i] = True
@@ -676,7 +737,10 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       if self.detailedScores:
         self.renderStats(visibility, topMost)
       else:
-        self.renderInitialScore(visibility, topMost)
+        if self.coOpType > 0:
+          self.renderInitialCoOpScore(visibility, topMost)
+        else:
+          self.renderInitialScore(visibility, topMost)
         if self.resultStep > 0:
           self.renderCheatList(visibility, topMost)
         if self.resultStep > 2:
@@ -741,6 +805,9 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         else:
           space = 1
         
+        scale = float(Theme.result_star[2])
+        if scale < .1:
+          scale = .25
         if scoreCard.stars > 5:
           for j in range(5):
             if self.fcStars and scoreCard.stars == 7:
@@ -753,11 +820,11 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
               wide = star.width1()*.5
             if self.maskStars:
               if self.theme == 2:
-                self.engine.drawImage(star, scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (((w*Theme.result_star[0])+wide*j)*space**4,h*float(Theme.result_star[1])), color = (1, 1, 0, 1))
+                self.engine.drawImage(star, scale = (scale,-scale), coord = (((w*Theme.result_star[0])+wide*j)*space**4,h*float(Theme.result_star[1])), color = (1, 1, 0, 1))
               else:
-                self.engine.drawImage(star, scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])), color = (0, 1, 0, 1))
+                self.engine.drawImage(star, scale = (scale,-scale), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])), color = (0, 1, 0, 1))
             else:
-              self.engine.drawImage(star, scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])))
+              self.engine.drawImage(star, scale = (scale,-scale), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])))
         else:
           for j in range(5):
             if j < scoreCard.stars:
@@ -768,7 +835,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
               wide = star.width1()*float(Theme.result_star[3])
             except IndexError:
               wide = star.width1()*.5
-            self.engine.drawImage(star, scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])))
+            self.engine.drawImage(star, scale = (scale,-scale), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])))
         
         settingsText = "%s %s - %s: %s / %s, %s: %s" % (self.engine.versionString, self.tsSettings, self.tsHopos, self.hopoStyle, self.hopoFreq, self.tsHitWindow, self.hitWindow)
         settingsScale = 0.0012
@@ -794,8 +861,6 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         font.render(text, (float(Theme.result_stats_streak[0]) - wText / 2, float(Theme.result_stats_streak[1]) + v), scale = float(Theme.result_stats_streak[2]))
         
         text = _(Theme.result_stats_diff_text) % self.playerList[i].difficulty
-        if self.coOpType:
-          text = _(Theme.result_stats_diff_text) % self.coOpDiff
         wText, hText = font.getStringSize(text)
         try:
           r, g, b = Theme.hexToColorResults(Theme.result_stats_diff[3])
@@ -804,20 +869,180 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           Theme.setBaseColor(1-v)
         font.render(text, (float(Theme.result_stats_diff[0]) - wText / 2, float(Theme.result_stats_diff[1]) + v), scale = float(Theme.result_stats_diff[2]))
         
-        text = _(Theme.result_stats_part_text) % self.playerList[i].part
-        if self.coOpType:
-          text = _(Theme.result_stats_part_text) % self.coOpPart
+        if Theme.result_stats_part_text.strip() == "$icon$" and not self.partImage:
+          text = "%s"
+        else:
+          text = Theme.result_stats_part_text.strip()
+        
+        if text == "$icon$" and self.partImage:
+          self.engine.drawImage(self.part[i], scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (w*float(Theme.result_star[0]),h*float(Theme.result_star[1])))
+        else:
+          text = _(Theme.result_stats_part_text) % self.playerList[i].part
+          wText, hText = font.getStringSize(text)
+          try:
+            r, g, b = Theme.hexToColorResults(Theme.result_stats_part[3])
+            glColor3f(r, g, b)
+          except IndexError:
+            Theme.setBaseColor(1-v)
+          font.render(text, (float(Theme.result_stats_part[0]) - wText / 2, float(Theme.result_stats_part[1]) + v), scale = float(Theme.result_stats_part[2]))
+  
+  def renderInitialCoOpScore(self, visibility, topMost):
+    bigFont = self.engine.data.bigFont
+    font    = self.engine.data.font
+    
+    v = ((1 - visibility) **2)
+    
+    w, h = self.fullView
+    if self.background:
+      wFactor = 640.000/self.background.width1()
+      self.engine.drawImage(self.background, scale = (wFactor,-wFactor), coord = (w/2,h/2))
+    
+    Theme.setBaseColor(1-v)
+    
+    if self.song:
+      try:
+        text = Theme.result_song_text % Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
+      except TypeError:
+        text = "%s %s" % (Dialogs.removeSongOrderPrefixFromName(self.song.info.name), Theme.result_song_text)
+      try:
+        r, g, b = Theme.hexToColorResults(Theme.result_song[3])
+        glColor3f(r, g, b)
+      except IndexError:
+        Theme.setBaseColor(1-v)
+      wText, hText = font.getStringSize(text, scale = float(Theme.result_song[2]))
+      Dialogs.wrapText(font, (float(Theme.result_song[0]), float(Theme.result_song[1]) - v), text, 0.9, float(Theme.result_song[2]))
+      
+      scoreCard = self.scoring[0]
+      i = 0
+      
+      try:
+        r, g, b = Theme.hexToColorResults(Theme.result_score[3])
+        glColor3f(r, g, b)
+      except IndexError:
+        Theme.setBaseColor(1-v)
+      text = "%d" % self.currentScore[i]
+      wText, hText = bigFont.getStringSize(text, scale = float(Theme.result_score[2]))
+      bigFont.render(text, (float(Theme.result_score[0]) - wText / 2, float(Theme.result_score[1]) + v), scale = float(Theme.result_score[2]))
+      
+      if self.resultStep == 0:
+        space = self.space[i]
+      else:
+        space = 1
+      
+      if scoreCard.stars > 5:
+        for j in range(5):
+          if self.fcStars and scoreCard.stars == 7:
+            star = self.starFC
+          else:
+            star = self.starPerfect
+          try:
+            wide = star.width1()*float(Theme.result_star[3])
+          except IndexError:
+            wide = star.width1()*.5
+          if self.maskStars:
+            if self.theme == 2:
+              self.engine.drawImage(star, scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (((w*Theme.result_star[0])+wide*j)*space**4,h*float(Theme.result_star[1])), color = (1, 1, 0, 1))
+            else:
+              self.engine.drawImage(star, scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])), color = (0, 1, 0, 1))
+          else:
+            self.engine.drawImage(star, scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])))
+      else:
+        for j in range(5):
+          if j < scoreCard.stars:
+            star = self.star2
+          else:
+            star = self.star1
+          try:
+            wide = star.width1()*float(Theme.result_star[3])
+          except IndexError:
+            wide = star.width1()*.5
+          self.engine.drawImage(star, scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])))
+      
+      settingsText = "%s %s - %s: %s / %s, %s: %s" % (self.engine.versionString, self.tsSettings, self.tsHopos, self.hopoStyle, self.hopoFreq, self.tsHitWindow, self.hitWindow)
+      settingsScale = 0.0012
+      wText, hText = font.getStringSize(settingsText, settingsScale)
+      font.render(settingsText, (.5 - wText/2, 0.0), scale = settingsScale)
+      
+      if self.coOpType == 2:
+        text = _(Theme.result_stats_streak_text) % scoreCard.hiStreak
         wText, hText = font.getStringSize(text)
         try:
-          r, g, b = Theme.hexToColorResults(Theme.result_stats_part[3])
+          r, g, b = Theme.hexToColorResults(Theme.result_stats_streak[3])
           glColor3f(r, g, b)
         except IndexError:
           Theme.setBaseColor(1-v)
-        font.render(text, (float(Theme.result_stats_part[0]) - wText / 2, float(Theme.result_stats_part[1]) + v), scale = float(Theme.result_stats_part[2]))
+        font.render(text, (float(Theme.result_stats_streak[0]) - wText / 2, float(Theme.result_stats_streak[1]) + v), scale = float(Theme.result_stats_streak[2]))
+      
+      for i, scoreCard in enumerate(self.coOpScoring):
+        self.engine.view.setViewportHalf(len(self.coOpScoring),i)
+        
+        text = "%d/%d" % (scoreCard.notesHit, scoreCard.totalStreakNotes)
+        try:
+          text = Theme.result_stats_notes_text % text
+        except TypeError:
+          text = "%s %s" % (text, Theme.result_stats_notes_text)
+        try:
+          r, g, b = Theme.hexToColorResults(Theme.result_stats_notes[3])
+          glColor3f(r, g, b)
+        except IndexError:
+          Theme.setBaseColor(1-v)
+        wText, hText = font.getStringSize(text, scale = float(Theme.result_stats_notes[2]))
+        Dialogs.wrapText(font, (float(Theme.result_stats_notes[0]) - wText/2, float(Theme.result_stats_notes[1]) + v), text, 0.9, float(Theme.result_stats_notes[2]))
+        
+        text = _(Theme.result_stats_accuracy_text) % scoreCard.hitAccuracy
+        wText, hText = font.getStringSize(text)
+        try:
+          r, g, b = Theme.hexToColorResults(Theme.result_stats_accuracy[3])
+          glColor3f(r, g, b)
+        except IndexError:
+          Theme.setBaseColor(1-v)
+        font.render(text, (float(Theme.result_stats_accuracy[0]) - wText / 2, float(Theme.result_stats_accuracy[1]) + v), scale = float(Theme.result_stats_accuracy[2]))
+        
+        if self.coOpType < 2: # not GH Co-Op
+          text = _(Theme.result_stats_streak_text) % scoreCard.hiStreak
+          wText, hText = font.getStringSize(text)
+          try:
+            r, g, b = Theme.hexToColorResults(Theme.result_stats_streak[3])
+            glColor3f(r, g, b)
+          except IndexError:
+            Theme.setBaseColor(1-v)
+          font.render(text, (float(Theme.result_stats_streak[0]) - wText / 2, float(Theme.result_stats_streak[1]) + v), scale = float(Theme.result_stats_streak[2]))
+        
+        text = _(Theme.result_stats_diff_text) % self.playerList[i].difficulty
+        wText, hText = font.getStringSize(text)
+        try:
+          r, g, b = Theme.hexToColorResults(Theme.result_stats_diff[3])
+          glColor3f(r, g, b)
+        except IndexError:
+          Theme.setBaseColor(1-v)
+        font.render(text, (float(Theme.result_stats_diff[0]) - wText / 2, float(Theme.result_stats_diff[1]) + v), scale = float(Theme.result_stats_diff[2]))
+        
+        if Theme.result_stats_part_text.strip() == "$icon$" and not self.partImage:
+          text = "%s"
+        else:
+          text = Theme.result_stats_part_text.strip()
+        
+        if text == "$icon$" and self.partImage:
+          self.engine.drawImage(self.part[i], scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (w*float(Theme.result_star[0]),h*float(Theme.result_star[1])))
+        else:
+          try:
+            text = text % self.playerList[i].part
+          except TypeError:
+            text = "%s %s" % (text, self.playerList[i].part)
+          wText, hText = font.getStringSize(text)
+          try:
+            r, g, b = Theme.hexToColorResults(Theme.result_stats_part[3])
+            glColor3f(r, g, b)
+          except IndexError:
+            Theme.setBaseColor(1-v)
+          font.render(text, (float(Theme.result_stats_part[0]) - wText / 2, float(Theme.result_stats_part[1]) + v), scale = float(Theme.result_stats_part[2]))
   
   def renderCheatList(self, visibility, topMost):
     bigFont = self.engine.data.bigFont
     font    = self.engine.data.font
+    
+    if self.coOpType > 0:
+      self.engine.view.setViewport(1,0)
     
     v = ((1 - visibility) **2)
     w, h = self.fullView
@@ -861,7 +1086,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       font.render(text, (float(Theme.result_cheats_score[0]) - wText / 2, float(Theme.result_cheats_score[1]) + v), scale = float(Theme.result_cheats_score[2]))
   
   def renderHighScores(self, visibility, topMost):
-    self.engine.view.setViewport(1,0)
+    if self.coOpType == 0:
+      self.engine.view.setViewport(1,0)
     bigFont = self.engine.data.bigFont
     font    = self.engine.data.font
     Dialogs.fadeScreen(.4)

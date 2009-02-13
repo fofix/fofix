@@ -58,7 +58,7 @@ class ScoreCard(object):
     self.score  = 0
     self.baseScore = 50
     self.notesHit = 0
-    self.missedNotes = 0
+    self.notesMissed = 0
     self.instrument = instrument # 0 = Guitar, 2 = Bass, 4 = Drum
     self.bassGrooveEnabled = False
     self.hiStreak = 0
@@ -140,7 +140,7 @@ class ScoreCard(object):
     self.hitAccuracy = 0.0
     self.score  = 0
     self.notesHit = 0
-    self.missedNotes = 0
+    self.notesMissed = 0
     self.hiStreak = 0
     self._streak = 0
     self.cheats = []

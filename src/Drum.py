@@ -233,6 +233,7 @@ class Drum:
     self.indexFps       = self.engine.config.get("video", "fps")
 
     self.twoChord       = 0
+    self.twoChordApply  = False
     self.hopoActive     = 0
     
     #myfingershurt: need a separate variable to track whether or not hopos are actually active

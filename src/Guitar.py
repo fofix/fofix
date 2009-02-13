@@ -220,6 +220,7 @@ class Guitar:
       self.hitw = 1.0
     
     self.twoChord       = 0
+    self.twoChordApply  = False
     self.hopoActive     = 0
     
     #myfingershurt: need a separate variable to track whether or not hopos are actually active
@@ -3525,6 +3526,7 @@ class Guitar:
       requiredKeys = self.uniqify(requiredKeys)
       
       if len(requiredKeys) > 2 and self.twoChordMax == True:
+        self.twoChordApply = True
         twochord = 0
         for n, k in enumerate(self.keys):
           if controls.getState(k):
@@ -3586,6 +3588,7 @@ class Guitar:
 
       if len(requiredKeys) > 2 and self.twoChordMax == True:
         twochord = 0
+        self.twoChordApply = True
         for n, k in enumerate(self.keys):
           if controls.getState(k):
             twochord += 1
@@ -3650,6 +3653,7 @@ class Guitar:
 
       if len(requiredKeys) > 2 and self.twoChordMax == True:
         twochord = 0
+        self.twoChordApply = True
         for n, k in enumerate(self.keys):
           if controls.getState(k):
             twochord += 1
@@ -3714,6 +3718,7 @@ class Guitar:
 
       if len(self.requiredKeys) > 2 and self.twoChordMax == True:
         twochord = 0
+        self.twoChordApply = True
         for n, k in enumerate(self.keys):
           if controls.getState(k):
             twochord += 1
