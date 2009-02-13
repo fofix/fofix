@@ -1047,7 +1047,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.nextMidiLyricLine = ""
     self.lyricHeight = 0
 
-    if self.midiLyricsEnabled == 1 and (self.midiLyricMode == 1 or self.midiLyricMode == 2):   #line-by-line lyrics mode is selected and enabled:
+    if self.midiLyricsEnabled > 0 and (self.midiLyricMode == 1 or self.midiLyricMode == 2):   #line-by-line lyrics mode is selected and enabled:
       lyricFont = self.engine.data.font
       if self.theme == 2:
         txtSize = 0.00170
