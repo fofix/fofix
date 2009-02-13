@@ -3021,19 +3021,19 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         #Allow Jurgen per player...Spikehead777
         if self.jurg != 2: #Or whatever the "all players" setting is
           if self.jurg != i: #If it's not this player
-            continue #Next player
-          self.jurgPlayer[i] = True #Jurgen Played for Player 1
+            if self.playerAssist[i] == 0:
+              continue #Next player
         else: #All else
           self.jurgPlayer[i] = True
         
-          
+        Log.debug(self.jurgPlayer[i])
         if self.jurgenLogic == 0:   #original FoF / RF-Mod style Jurgen Logic (cannot handle fast notes / can only handle 1 strum per notewindow)
           notes = guitar.getRequiredNotesMFH(self.song, pos)  #mfh - needed updatin' 
           notes = [note.number for time, note in notes]
           changed = False
           held = 0
           for n, k in enumerate(self.keysList[i]):
-            if self.autoPlay or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.guitars[i].isDrum and self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
+            if (self.autoPlay and self.jurgPlayer[i]) or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.guitars[i].isDrum and self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
               if n in notes and not self.controls.getState(k):
                 changed = True
                 self.controls.toggle(k, True)
@@ -3065,7 +3065,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           held = 0
   
           for n, k in enumerate(self.keysList[i]):
-            if self.autoPlay or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.guitars[i].isDrum and self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
+            
+            if (self.autoPlay and self.jurgPlayer[i]) or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.guitars[i].isDrum and self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
               if n in jurgStrumNotes and not self.controls.getState(k):
                 changed = True
                 self.controls.toggle(k, True)
@@ -3097,7 +3098,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           held = 0
   
           for n, k in enumerate(self.keysList[i]):
-            if self.autoPlay or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.guitars[i].isDrum and self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
+            if (self.autoPlay and self.jurgPlayer[i]) or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.guitars[i].isDrum and self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
               if n in jurgStrumNotes and not self.controls.getState(k):
                 changed = True
                 self.controls.toggle(k, True)
@@ -3132,9 +3133,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
           #MFH - check if jurgStrumTime is close enough to the current position (or behind it) before actually playing the notes:
           if not notes or jurgStrumTime <= (pos + 30):
-  
+            
             for n, k in enumerate(self.keysList[i]):
-              if self.autoPlay or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.guitars[i].isDrum and self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
+              if (self.autoPlay and self.jurgPlayer[i]) or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.guitars[i].isDrum and self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
                 if n in jurgStrumNotes and not self.controls.getState(k):
                   changed = True
                   self.controls.toggle(k, True)
@@ -3151,7 +3152,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               self.handlePick(i)
             #MFH - release all frets - who cares about held notes, I want a test player (actually if no keyReleased call, will hold notes fine)
             for n, k in enumerate(self.keysList[i]):
-              if self.autoPlay or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.guitars[i].isDrum and self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
+              if (self.autoPlay and self.jurgPlayer[i]) or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.guitars[i].isDrum and self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
                 if self.controls.getState(k):
                   self.controls.toggle(k, False)
   
