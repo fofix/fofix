@@ -3026,7 +3026,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         else: #All else
           self.jurgPlayer[i] = True
         
-        Log.debug(self.jurgPlayer[i])
         if self.jurgenLogic == 0:   #original FoF / RF-Mod style Jurgen Logic (cannot handle fast notes / can only handle 1 strum per notewindow)
           notes = guitar.getRequiredNotesMFH(self.song, pos)  #mfh - needed updatin' 
           notes = [note.number for time, note in notes]
