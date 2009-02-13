@@ -255,7 +255,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.playerAssist[i] = 0
       elif self.playerAssist[i] == 1 and player.getDifficultyInt() > 2:
         self.playerAssist[i] = 0
-
+    for assistMode in self.playerAssist:
+      if assistMode > 0:
+        self.assisting = True
+        break
+    else:
+      self.assisting = False
     
     self.jurgPlayer       = [False for i in self.playerList]
 
@@ -3022,13 +3027,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   def handleJurgen(self, pos):
     #chordFudge = 1   #MFH - was 10 - #myfingershurt - needed to detect chords
     chordFudge = self.song.track[0].chordFudge
-    for assistMode in self.playerAssist:
-      if assistMode > 0:
-        assist = True
-        break
-    else:
-      assist = False
-    if self.autoPlay or assist:
+    if self.autoPlay or self.assisting:
       for i,guitar in enumerate(self.guitars):
   
         #Allow Jurgen per player...Spikehead777
