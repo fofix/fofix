@@ -807,7 +807,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         Log.debug("Drum part found, scanning for drum fills.... %d freestyle markings found (the last one may be a Big Rock Ending)." % self.numDrumFills)
     
 
-    #MFH - TODO - handle early hit window automatic type determination, and how it compares to the forced handicap if not auto
+    #MFH - handle early hit window automatic type determination, and how it compares to the forced handicap if not auto
     self.effectiveEarlyHitWindow = Song.EARLY_HIT_WINDOW_HALF
     self.automaticEarlyHitWindow = Song.EARLY_HIT_WINDOW_HALF
     self.forceEarlyHitWindowSetting = self.engine.config.get("handicap",   "early_hit_window")
@@ -2934,6 +2934,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
       # Volshebnyi - new BRE and drum fills scoring
       if guitar.freestyleActive or (guitar.isDrum and guitar.drumFillsActive):
+        if guitar.freestyleActive:  #MFH - only for BREs, not drum fills.  Will depend on BRE sound option when implemented.
+          self.song.setInstrumentVolume(1.0, self.players[i].part)  #MFH - ensure that every freestyle pick, the volume for that track is set to 1.0
         pos = self.getSongPosition()
         score = 0
         numFreestyleHits = guitar.freestylePick(self.song, pos, self.controls)
