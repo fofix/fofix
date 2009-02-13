@@ -458,7 +458,8 @@ class SettingsMenu(Menu.Menu):
     fretSettingsMenu = Menu.Menu(engine, fretSettings)
     
     AdvancedVideoSettings = [
-      ConfigChoice(engine, engine.config, "video",  "fps"),
+      ConfigChoice(engine, engine.config, "video",  "fps", isQuickset = 1),
+      ConfigChoice(engine, engine.config, "engine", "highpriority", isQuickset = 1),
       ConfigChoice(engine, engine.config, "game", "accuracy_pos", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "gsolo_acc_pos", autoApply = True, isQuickset = 1), #MFH
       ConfigChoice(engine, engine.config, "coffee", "noterotate", autoApply = True), #blazingamer
@@ -566,7 +567,7 @@ class SettingsMenu(Menu.Menu):
     logfileSettingsMenu = Menu.Menu(engine, logfileSettings)
 
     debugSettings = [
-      ConfigChoice(engine, engine.config, "video", "show_fps", autoApply = True),#evilynux
+      ConfigChoice(engine, engine.config, "video", "show_fps"),#evilynux
       ConfigChoice(engine, engine.config, "game", "kill_debug", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "hopo_debug_disp", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "rock_band_events", autoApply = True),#myfingershurt
@@ -653,6 +654,7 @@ class SettingsMenu(Menu.Menu):
                            keySettings + \
                            InGameDisplaySettings + \
                            ThemeDisplaySettings + \
+                           debugSettings + \
                            quickSettings + \
                            modSettings
 
@@ -704,163 +706,8 @@ class SettingsMenu(Menu.Menu):
 
     Menu.Menu.__init__(self, engine, settings, name = "advsettings", onCancel = self.applySettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)   #MFH - add position to this so we can move it
 
-  def quickset(self):
-    #akedrou - quickset (based on Fablaculp's Performance Autoset)
-    self.config = self.engine.config
-    perfSetNum = self.config.get("quickset","performance")
-    gameSetNum = self.config.get("quickset","gameplay")
-    
-    if gameSetNum == 1:
-      self.config.set("game", "sp_notes_while_active", 1)
-      self.config.set("game", "bass_groove_enable", 1)
-      self.config.set("game", "big_rock_endings", 1)
-      self.config.set("game", "in_game_stars", 1)
-      self.config.set("coffee", "song_display_mode", 4)
-      Log.debug("Quickset Gameplay - Theme-Based")
-      
-    elif gameSetNum == 2:
-      self.config.set("game", "sp_notes_while_active", 2)
-      self.config.set("game", "bass_groove_enable", 2)
-      self.config.set("game", "big_rock_endings", 2)
-      Log.debug("Quickset Gameplay - MIDI-Based")
-      
-    elif gameSetNum == 3:
-      self.config.set("game", "sp_notes_while_active", 3)
-      self.config.set("game", "bass_groove_enable", 3)
-      self.config.set("game", "big_rock_endings", 2)
-      self.config.set("game", "in_game_stars", 2)
-      self.config.set("game", "counting", True)
-      Log.debug("Quickset Gameplay - RB style")
-      
-    elif gameSetNum == 4:
-      self.config.set("game", "sp_notes_while_active", 0)
-      self.config.set("game", "bass_groove_enable", 0)
-      self.config.set("game", "big_rock_endings", 0)
-      self.config.set("game", "in_game_stars", 0)
-      self.config.set("coffee", "song_display_mode", 1)
-      self.config.set("game", "counting", False)
-      Log.debug("Quickset Gameplay - GH style")
-      
-    elif gameSetNum == 5: # This needs work.
-      self.config.set("game", "sp_notes_while_active", 0)
-      self.config.set("game", "bass_groove_enable", 0)
-      self.config.set("game", "big_rock_endings", 0)
-      self.config.set("game", "in_game_stars", 0)
-      self.config.set("coffee", "song_display_mode", 1)
-      self.config.set("game", "counting", True)
-      Log.debug("Quickset Gameplay - WT style")
-      
-    # elif gameSetNum == 6: #FoFiX mode - perhaps soon.
-      
-    else:
-      Log.debug("Quickset Gameplay - Manual")
-    
-    if perfSetNum == 1:
-      self.config.set("performance", "game_priority", 2)
-      self.config.set("performance", "starspin", False)
-      self.config.set("game", "rb_midi_lyrics", 0)
-      self.config.set("game", "rb_midi_sections", 0)
-      self.config.set("game", "gsolo_acc_disp", 0)
-      self.config.set("game", "incoming_neck_mode", 0)
-      self.config.set("game", "midi_lyric_mode", 2)
-      self.config.set("video", "multisamples", 0)
-      self.config.set("coffee", "game_phrases", 0)
-      self.config.set("game", "partial_stars", 0)
-      self.config.set("game", "songlistrotation", False)
-      self.config.set("game", "song_listing_mode", 0)
-      self.config.set("game", "song_display_mode", 1)
-      self.config.set("game", "stage_animate", 0)
-      self.config.set("game", "lyric_mode", 0)
-      self.config.set("game", "use_graphical_submenu", 0)
-      self.config.set("audio", "enable_crowd_tracks", 0)
-      self.config.set("performance", "in_game_stats", 0)
-      self.config.set("performance", "static_strings", True)
-      self.config.set("performance", "disable_libcount", True)
-      self.config.set("performance", "killfx", 2)
-      self.config.set("performance", "star_score_updates", 0)
-      self.config.set("performance", "preload_glyph_cache", False)
-      self.config.set("performance", "cache_song_metadata", False)
-      Log.debug("Quickset Performance - Fastest")
-      
-    elif perfSetNum == 2:
-      self.config.set("performance", "game_priority", 2)
-      self.config.set("performance", "starspin", False)
-      self.config.set("game", "rb_midi_lyrics", 1)
-      self.config.set("game", "rb_midi_sections", 1)
-      self.config.set("game", "gsolo_acc_disp", 1)
-      self.config.set("game", "incoming_neck_mode", 1)
-      self.config.set("game", "midi_lyric_mode", 2)
-      self.config.set("video", "multisamples", 2)
-      self.config.set("coffee", "game_phrases", 1)
-      self.config.set("game", "partial_stars", 1)
-      self.config.set("game", "songlistrotation", False)
-      self.config.set("game", "song_listing_mode", 0)
-      self.config.set("game", "stage_animate", 0)
-      self.config.set("game", "lyric_mode", 2)
-      self.config.set("game", "use_graphical_submenu", 0)
-      self.config.set("audio", "enable_crowd_tracks", 1)
-      self.config.set("performance", "in_game_stats", 0)
-      self.config.set("performance", "static_strings", True)
-      self.config.set("performance", "disable_libcount", True)
-      self.config.set("performance", "killfx", 0)
-      self.config.set("performance", "star_score_updates", 0)
-      self.config.set("performance", "preload_glyph_cache", True)
-      self.config.set("performance", "cache_song_metadata", True)
-      Log.debug("Quickset Performance - Fast")
-      
-    elif perfSetNum == 3:
-      self.config.set("performance", "game_priority", 2)
-      self.config.set("performance", "starspin", True)
-      self.config.set("game", "rb_midi_lyrics", 2)
-      self.config.set("game", "rb_midi_sections", 2)
-      self.config.set("game", "gsolo_acc_disp", 1)
-      self.config.set("game", "incoming_neck_mode", 2)
-      self.config.set("game", "midi_lyric_mode", 2)
-      self.config.set("video", "multisamples", 4)
-      self.config.set("coffee", "game_phrases", 2)
-      self.config.set("game", "partial_stars", 1)
-      self.config.set("game", "songlistrotation", True)
-      self.config.set("game", "lyric_mode", 2)
-      self.config.set("game", "use_graphical_submenu", 1)
-      self.config.set("audio", "enable_crowd_tracks", 1)
-      self.config.set("performance", "in_game_stats", 2)
-      self.config.set("performance", "static_strings", True)
-      self.config.set("performance", "disable_libcount", True)
-      self.config.set("performance", "killfx", 0)
-      self.config.set("performance", "star_score_updates", 1)
-      self.config.set("performance", "preload_glyph_cache", True)
-      self.config.set("performance", "cache_song_metadata", True)
-      Log.debug("Quickset Performance - Quality")
-      
-    elif perfSetNum == 4:
-      self.config.set("performance", "game_priority", 2)
-      self.config.set("performance", "starspin", True)
-      self.config.set("game", "rb_midi_lyrics", 2)
-      self.config.set("game", "rb_midi_sections", 2)
-      self.config.set("game", "gsolo_acc_disp", 2)
-      self.config.set("game", "incoming_neck_mode", 2)
-      self.config.set("game", "midi_lyric_mode", 0)
-      self.config.set("video", "multisamples", 4)
-      self.config.set("coffee", "game_phrases", 2)
-      self.config.set("game", "partial_stars", 1)
-      self.config.set("game", "songlistrotation", True)
-      self.config.set("game", "lyric_mode", 2)
-      self.config.set("game", "use_graphical_submenu", 1)
-      self.config.set("audio", "enable_crowd_tracks", 1)
-      self.config.set("performance", "in_game_stats", 2)
-      self.config.set("performance", "static_strings", False)
-      self.config.set("performance", "disable_libcount", False)
-      self.config.set("performance", "killfx", 0)
-      self.config.set("performance", "star_score_updates", 1)
-      self.config.set("performance", "preload_glyph_cache", True)
-      self.config.set("performance", "cache_song_metadata", True)
-      Log.debug("Quickset Performance - Highest Quality")
-      
-    else:
-      Log.debug("Quickset Performance - Manual")
-  
   def applySettings(self):
-    self.quickset()
+    quickset(self.engine.config)
     if self.engine.restartRequired or self.engine.quicksetRestart:
       Dialogs.showMessage(self.engine, _("FoFiX needs to restart to apply setting changes."))
       for option in self.settingsToApply:
@@ -1231,159 +1078,8 @@ class BasicSettingsMenu(Menu.Menu):
 
     Menu.Menu.__init__(self, engine, settings, name = "settings", onCancel = self.applySettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)   #MFH - add position to this so we can move it
 
-  def quickset(self):
-    #akedrou - quickset (based on Fablaculp's Performance Autoset)
-    self.config = self.engine.config
-    perfSetNum = self.config.get("quickset","performance")
-    gameSetNum = self.config.get("quickset","gameplay")
-    
-    if gameSetNum == 1:
-      self.config.set("game", "sp_notes_while_active", 1)
-      self.config.set("game", "bass_groove_enable", 1)
-      self.config.set("game", "big_rock_endings", 1)
-      self.config.set("game", "in_game_stars", 1)
-      self.config.set("coffee", "song_display_mode", 4)
-      Log.debug("Quickset Gameplay - Theme-Based")
-      
-    elif gameSetNum == 2:
-      self.config.set("game", "sp_notes_while_active", 2)
-      self.config.set("game", "bass_groove_enable", 2)
-      self.config.set("game", "big_rock_endings", 2)
-      Log.debug("Quickset Gameplay - MIDI-Based")
-      
-    elif gameSetNum == 3:
-      self.config.set("game", "sp_notes_while_active", 3)
-      self.config.set("game", "bass_groove_enable", 3)
-      self.config.set("game", "big_rock_endings", 2)
-      self.config.set("game", "in_game_stars", 2)
-      self.config.set("game", "counting", True)
-      Log.debug("Quickset Gameplay - RB style")
-      
-    elif gameSetNum == 4:
-      self.config.set("game", "sp_notes_while_active", 0)
-      self.config.set("game", "bass_groove_enable", 0)
-      self.config.set("game", "big_rock_endings", 0)
-      self.config.set("game", "in_game_stars", 0)
-      self.config.set("coffee", "song_display_mode", 1)
-      self.config.set("game", "counting", False)
-      Log.debug("Quickset Gameplay - GH style")
-      
-    elif gameSetNum == 5: # This needs work.
-      self.config.set("game", "sp_notes_while_active", 0)
-      self.config.set("game", "bass_groove_enable", 0)
-      self.config.set("game", "big_rock_endings", 0)
-      self.config.set("game", "in_game_stars", 0)
-      self.config.set("coffee", "song_display_mode", 1)
-      self.config.set("game", "counting", True)
-      Log.debug("Quickset Gameplay - WT style")
-      
-    # elif gameSetNum == 6: #FoFiX mode - perhaps soon.
-      
-    else:
-      Log.debug("Quickset Gameplay - Manual")
-    
-    if perfSetNum == 1:
-      self.config.set("performance", "game_priority", 2)
-      self.config.set("performance", "starspin", False)
-      self.config.set("game", "rb_midi_lyrics", 0)
-      self.config.set("game", "rb_midi_sections", 0)
-      self.config.set("game", "gsolo_acc_disp", 0)
-      self.config.set("game", "incoming_neck_mode", 0)
-      self.config.set("game", "midi_lyric_mode", 2)
-      self.config.set("video", "multisamples", 0)
-      self.config.set("coffee", "game_phrases", 0)
-      self.config.set("game", "partial_stars", 0)
-      self.config.set("game", "songlistrotation", False)
-      self.config.set("game", "song_listing_mode", 0)
-      self.config.set("game", "song_display_mode", 1)
-      self.config.set("game", "stage_animate", 0)
-      self.config.set("game", "lyric_mode", 0)
-      self.config.set("game", "use_graphical_submenu", 0)
-      self.config.set("audio", "enable_crowd_tracks", 0)
-      self.config.set("performance", "in_game_stats", 0)
-      self.config.set("performance", "static_strings", True)
-      self.config.set("performance", "killfx", 2)
-      self.config.set("performance", "star_score_updates", 0)
-      self.config.set("performance", "preload_glyph_cache", False)
-      self.config.set("performance", "cache_song_metadata", False)
-      Log.debug("Quickset Performance - Fastest")
-      
-    elif perfSetNum == 2:
-      self.config.set("performance", "game_priority", 2)
-      self.config.set("performance", "starspin", False)
-      self.config.set("game", "rb_midi_lyrics", 1)
-      self.config.set("game", "rb_midi_sections", 1)
-      self.config.set("game", "gsolo_acc_disp", 1)
-      self.config.set("game", "incoming_neck_mode", 1)
-      self.config.set("game", "midi_lyric_mode", 2)
-      self.config.set("video", "multisamples", 2)
-      self.config.set("coffee", "game_phrases", 1)
-      self.config.set("game", "partial_stars", 1)
-      self.config.set("game", "songlistrotation", False)
-      self.config.set("game", "song_listing_mode", 0)
-      self.config.set("game", "stage_animate", 0)
-      self.config.set("game", "lyric_mode", 2)
-      self.config.set("game", "use_graphical_submenu", 0)
-      self.config.set("audio", "enable_crowd_tracks", 1)
-      self.config.set("performance", "in_game_stats", 0)
-      self.config.set("performance", "static_strings", True)
-      self.config.set("performance", "killfx", 0)
-      self.config.set("performance", "star_score_updates", 0)
-      self.config.set("performance", "preload_glyph_cache", True)
-      self.config.set("performance", "cache_song_metadata", True)
-      Log.debug("Quickset Performance - Fast")
-      
-    elif perfSetNum == 3:
-      self.config.set("performance", "game_priority", 2)
-      self.config.set("performance", "starspin", True)
-      self.config.set("game", "rb_midi_lyrics", 2)
-      self.config.set("game", "rb_midi_sections", 2)
-      self.config.set("game", "gsolo_acc_disp", 1)
-      self.config.set("game", "incoming_neck_mode", 2)
-      self.config.set("game", "midi_lyric_mode", 2)
-      self.config.set("video", "multisamples", 4)
-      self.config.set("coffee", "game_phrases", 2)
-      self.config.set("game", "partial_stars", 1)
-      self.config.set("game", "songlistrotation", True)
-      self.config.set("game", "lyric_mode", 2)
-      self.config.set("game", "use_graphical_submenu", 1)
-      self.config.set("audio", "enable_crowd_tracks", 1)
-      self.config.set("performance", "in_game_stats", 2)
-      self.config.set("performance", "static_strings", True)
-      self.config.set("performance", "killfx", 0)
-      self.config.set("performance", "star_score_updates", 1)
-      self.config.set("performance", "preload_glyph_cache", True)
-      self.config.set("performance", "cache_song_metadata", True)
-      Log.debug("Quickset Performance - Quality")
-      
-    elif perfSetNum == 4:
-      self.config.set("performance", "game_priority", 2)
-      self.config.set("performance", "starspin", True)
-      self.config.set("game", "rb_midi_lyrics", 2)
-      self.config.set("game", "rb_midi_sections", 2)
-      self.config.set("game", "gsolo_acc_disp", 2)
-      self.config.set("game", "incoming_neck_mode", 2)
-      self.config.set("game", "midi_lyric_mode", 0)
-      self.config.set("video", "multisamples", 4)
-      self.config.set("coffee", "game_phrases", 2)
-      self.config.set("game", "partial_stars", 1)
-      self.config.set("game", "songlistrotation", True)
-      self.config.set("game", "lyric_mode", 2)
-      self.config.set("game", "use_graphical_submenu", 1)
-      self.config.set("audio", "enable_crowd_tracks", 1)
-      self.config.set("performance", "in_game_stats", 2)
-      self.config.set("performance", "static_strings", False)
-      self.config.set("performance", "killfx", 0)
-      self.config.set("performance", "star_score_updates", 1)
-      self.config.set("performance", "preload_glyph_cache", True)
-      self.config.set("performance", "cache_song_metadata", True)
-      Log.debug("Quickset Performance - Highest Quality")
-      
-    else:
-      Log.debug("Quickset Performance - Manual")
-    
   def applySettings(self):
-    self.quickset()
+    quickset(self.engine.config)
     if self.engine.restartRequired or self.engine.quicksetRestart:
       Dialogs.showMessage(self.engine, _("FoFiX needs to restart to apply setting changes."))
       for option in self.settingsToApply:
@@ -1414,6 +1110,168 @@ class BasicSettingsMenu(Menu.Menu):
       Config.set("game", "selected_library", "songs")
       Config.set("game", "selected_song", "")
       self.engine.resource.refreshBaseLib()   #myfingershurt - to let user continue with new songpath without restart
+
+def quickset(config):
+  #akedrou - quickset (based on Fablaculp's Performance Autoset)
+  perfSetNum = config.get("quickset","performance")
+  gameSetNum = config.get("quickset","gameplay")
+  
+  if gameSetNum == 1:
+    config.set("game", "sp_notes_while_active", 1)
+    config.set("game", "bass_groove_enable", 1)
+    config.set("game", "big_rock_endings", 1)
+    config.set("game", "in_game_stars", 1)
+    config.set("coffee", "song_display_mode", 4)
+    Log.debug("Quickset Gameplay - Theme-Based")
+    
+  elif gameSetNum == 2:
+    config.set("game", "sp_notes_while_active", 2)
+    config.set("game", "bass_groove_enable", 2)
+    config.set("game", "big_rock_endings", 2)
+    Log.debug("Quickset Gameplay - MIDI-Based")
+    
+  elif gameSetNum == 3:
+    config.set("game", "sp_notes_while_active", 3)
+    config.set("game", "bass_groove_enable", 3)
+    config.set("game", "big_rock_endings", 2)
+    config.set("game", "in_game_stars", 2)
+    config.set("game", "counting", True)
+    Log.debug("Quickset Gameplay - RB style")
+    
+  elif gameSetNum == 4:
+    config.set("game", "sp_notes_while_active", 0)
+    config.set("game", "bass_groove_enable", 0)
+    config.set("game", "big_rock_endings", 0)
+    config.set("game", "in_game_stars", 0)
+    config.set("coffee", "song_display_mode", 1)
+    config.set("game", "counting", False)
+    Log.debug("Quickset Gameplay - GH style")
+    
+  elif gameSetNum == 5: # This needs work.
+    config.set("game", "sp_notes_while_active", 0)
+    config.set("game", "bass_groove_enable", 0)
+    config.set("game", "big_rock_endings", 0)
+    config.set("game", "in_game_stars", 0)
+    config.set("coffee", "song_display_mode", 1)
+    config.set("game", "counting", True)
+    Log.debug("Quickset Gameplay - WT style")
+    
+  # elif gameSetNum == 6: #FoFiX mode - perhaps soon.
+    
+  else:
+    Log.debug("Quickset Gameplay - Manual")
+  
+  if perfSetNum == 1:
+    config.set("engine", "highpriority", False)
+    config.set("performance", "game_priority", 2)
+    config.set("performance", "starspin", False)
+    config.set("game", "rb_midi_lyrics", 0)
+    config.set("game", "rb_midi_sections", 0)
+    config.set("game", "gsolo_acc_disp", 0)
+    config.set("game", "incoming_neck_mode", 0)
+    config.set("game", "midi_lyric_mode", 2)
+    config.set("video", "fps", 60)
+    config.set("video", "multisamples", 0)
+    config.set("coffee", "game_phrases", 0)
+    config.set("game", "partial_stars", 0)
+    config.set("game", "songlistrotation", False)
+    config.set("game", "song_listing_mode", 0)
+    config.set("game", "song_display_mode", 1)
+    config.set("game", "stage_animate", 0)
+    config.set("game", "lyric_mode", 0)
+    config.set("game", "use_graphical_submenu", 0)
+    config.set("audio", "enable_crowd_tracks", 0)
+    config.set("performance", "in_game_stats", 0)
+    config.set("performance", "static_strings", True)
+    config.set("performance", "disable_libcount", True)
+    config.set("performance", "killfx", 2)
+    config.set("performance", "star_score_updates", 0)
+    config.set("performance", "preload_glyph_cache", False)
+    config.set("performance", "cache_song_metadata", False)
+    Log.debug("Quickset Performance - Fastest")
+    
+  elif perfSetNum == 2:
+    config.set("engine", "highpriority", False)
+    config.set("performance", "game_priority", 2)
+    config.set("performance", "starspin", False)
+    config.set("game", "rb_midi_lyrics", 1)
+    config.set("game", "rb_midi_sections", 1)
+    config.set("game", "gsolo_acc_disp", 1)
+    config.set("game", "incoming_neck_mode", 1)
+    config.set("game", "midi_lyric_mode", 2)
+    config.set("video", "fps", 60)
+    config.set("video", "multisamples", 2)
+    config.set("coffee", "game_phrases", 1)
+    config.set("game", "partial_stars", 1)
+    config.set("game", "songlistrotation", False)
+    config.set("game", "song_listing_mode", 0)
+    config.set("game", "stage_animate", 0)
+    config.set("game", "lyric_mode", 2)
+    config.set("game", "use_graphical_submenu", 0)
+    config.set("audio", "enable_crowd_tracks", 1)
+    config.set("performance", "in_game_stats", 0)
+    config.set("performance", "static_strings", True)
+    config.set("performance", "disable_libcount", True)
+    config.set("performance", "killfx", 0)
+    config.set("performance", "star_score_updates", 0)
+    config.set("performance", "preload_glyph_cache", True)
+    config.set("performance", "cache_song_metadata", True)
+    Log.debug("Quickset Performance - Fast")
+    
+  elif perfSetNum == 3:
+    config.set("engine", "highpriority", False)
+    config.set("performance", "game_priority", 2)
+    config.set("performance", "starspin", True)
+    config.set("game", "rb_midi_lyrics", 2)
+    config.set("game", "rb_midi_sections", 2)
+    config.set("game", "gsolo_acc_disp", 1)
+    config.set("game", "incoming_neck_mode", 2)
+    config.set("game", "midi_lyric_mode", 2)
+    config.set("video", "fps", 80)
+    config.set("video", "multisamples", 4)
+    config.set("coffee", "game_phrases", 2)
+    config.set("game", "partial_stars", 1)
+    config.set("game", "songlistrotation", True)
+    config.set("game", "lyric_mode", 2)
+    config.set("game", "use_graphical_submenu", 1)
+    config.set("audio", "enable_crowd_tracks", 1)
+    config.set("performance", "in_game_stats", 2)
+    config.set("performance", "static_strings", True)
+    config.set("performance", "disable_libcount", True)
+    config.set("performance", "killfx", 0)
+    config.set("performance", "star_score_updates", 1)
+    config.set("performance", "preload_glyph_cache", True)
+    config.set("performance", "cache_song_metadata", True)
+    Log.debug("Quickset Performance - Quality")
+    
+  elif perfSetNum == 4:
+    config.set("engine", "highpriority", False)
+    config.set("performance", "game_priority", 2)
+    config.set("performance", "starspin", True)
+    config.set("game", "rb_midi_lyrics", 2)
+    config.set("game", "rb_midi_sections", 2)
+    config.set("game", "gsolo_acc_disp", 2)
+    config.set("game", "incoming_neck_mode", 2)
+    config.set("game", "midi_lyric_mode", 0)
+    config.set("video", "fps", 80)
+    config.set("video", "multisamples", 4)
+    config.set("coffee", "game_phrases", 2)
+    config.set("game", "partial_stars", 1)
+    config.set("game", "songlistrotation", True)
+    config.set("game", "lyric_mode", 2)
+    config.set("game", "use_graphical_submenu", 1)
+    config.set("audio", "enable_crowd_tracks", 1)
+    config.set("performance", "in_game_stats", 2)
+    config.set("performance", "static_strings", False)
+    config.set("performance", "disable_libcount", False)
+    config.set("performance", "killfx", 0)
+    config.set("performance", "star_score_updates", 1)
+    config.set("performance", "preload_glyph_cache", True)
+    config.set("performance", "cache_song_metadata", True)
+    Log.debug("Quickset Performance - Highest Quality")
+    
+  else:
+    Log.debug("Quickset Performance - Manual")
 
 class GameSettingsMenu(Menu.Menu):
   def __init__(self, engine, gTextColor, gSelectedColor):

@@ -90,7 +90,7 @@ else:
 
 
 # define configuration keys
-Config.define("engine", "highpriority", bool,  True)
+Config.define("engine", "highpriority", bool,  False, text = _("FPS Limiter"),           options = {False: _("On (Set Below)"), True: _("Off (Auto Max FPS)")})
 Config.define("game",   "adv_settings", bool,  False)
 Config.define("game",   "uploadscores", bool,  False, text = _("Upload Highscores"),    options = {False: _("No"), True: _("Yes")})
 Config.define("game",   "leftymode",    bool,  False, text = _("Lefty Mode"),           options = {False: _("No"), True: _("Yes")})
