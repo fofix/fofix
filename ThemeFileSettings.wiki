@@ -111,7 +111,7 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||jurgen_text_pos = 1,1,0.0004||Any scale under .00035 will be resized. Any coordinates that are off the screen will automatically be moved back on to screen, and
 jurgen text is rendered above everything.||
 ||mesh_color = #000000||Enter a Hex color here.||
-||obar_hscale = 0.7||Overdrive bar width scale. "1.0" makes oBar widh equal to fretbard width, like in RB2||
+||obar_hscale = 0.7||Overdrive bar width scale. "1.0" makes oBar widh equal to fretbard width, like in RB2. Overdrive bar images width should be 635 pixels for best fit.||
 ||opencolor = #FF8000 ||Enter a Hec color here. Sets the Bass drum note color for 3d notes||
 ||_*Note for 6 POV items below*_||_*If you have ALL 6 of these settings in your 'theme.ini', AND you are not specifying "rmtype = 3" (for GH:WT rockmeter, which requires special positioning), then "Custom" POV will be forced.*_||
 ||pov_target_x = 0.0||Controls Custom POV. -Wiki WIP. {{{Animated image Example - http://img98.imageshack.us/img98/5323/exampledx9.gif}}}||
