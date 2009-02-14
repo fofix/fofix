@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-02-13 09:55-0800\n"
+"POT-Creation-Date: 2009-02-14 11:17-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -156,7 +156,7 @@ msgstr ""
 msgid "Copyright 2008, 2009 by Team FoFiX"
 msgstr ""
 
-#: Data.py:141
+#: Data.py:150
 msgid "__lefttoright__"
 msgstr ""
 
@@ -684,6 +684,18 @@ msgstr ""
 
 #: Editor.py:825
 msgid "Importing Songs"
+msgstr ""
+
+#: GameEngine.py:93
+msgid "FPS Limiter"
+msgstr ""
+
+#: GameEngine.py:93
+msgid "On (Set Below)"
+msgstr ""
+
+#: GameEngine.py:93
+msgid "Off (Auto Max FPS)"
 msgstr ""
 
 #: GameEngine.py:95
@@ -3031,164 +3043,164 @@ msgstr ""
 msgid "HO/PO Settings"
 msgstr ""
 
-#: Settings.py:422 Settings.py:1072
+#: Settings.py:422 Settings.py:919
 msgid "Player 1 Keys"
 msgstr ""
 
-#: Settings.py:423 Settings.py:1073
+#: Settings.py:423 Settings.py:920
 msgid "Player 1 Alt. Keys"
 msgstr ""
 
-#: Settings.py:424 Settings.py:1074
+#: Settings.py:424 Settings.py:921
 msgid "Player 2 Keys"
 msgstr ""
 
-#: Settings.py:425 Settings.py:1075
+#: Settings.py:425 Settings.py:922
 msgid "Player 2 Alt. Keys"
 msgstr ""
 
-#: Settings.py:426 Settings.py:1076
+#: Settings.py:426 Settings.py:923
 msgid "Drum Keys"
 msgstr ""
 
-#: Settings.py:427 Settings.py:1077
+#: Settings.py:427 Settings.py:924
 msgid "Alt. Drum Keys"
 msgstr ""
 
-#: Settings.py:433 Settings.py:1083
+#: Settings.py:433 Settings.py:930
 msgid "Change Controls"
 msgstr ""
 
-#: Settings.py:434 Settings.py:1084
+#: Settings.py:434 Settings.py:931
 msgid "Test Guitars"
 msgstr ""
 
-#: Settings.py:435 Settings.py:1085
+#: Settings.py:435 Settings.py:932
 msgid "Test Drums"
 msgstr ""
 
-#: Settings.py:484
+#: Settings.py:485
 msgid "Theme Display Settings"
 msgstr ""
 
-#: Settings.py:503 Settings.py:1108
+#: Settings.py:504 Settings.py:955
 msgid "Video Resolution"
 msgstr ""
 
-#: Settings.py:509
+#: Settings.py:510
 msgid "Stages Options"
 msgstr ""
 
-#: Settings.py:510 Settings.py:1115
+#: Settings.py:511 Settings.py:962
 msgid "Choose P1 Neck >"
 msgstr ""
 
-#: Settings.py:510 Settings.py:511 Settings.py:1115 Settings.py:1116
+#: Settings.py:511 Settings.py:512 Settings.py:962 Settings.py:963
 msgid "Yellow (#3) / Blue (#4) to change:"
 msgstr ""
 
-#: Settings.py:511 Settings.py:1116
+#: Settings.py:512 Settings.py:963
 msgid "Choose P2 Neck >"
 msgstr ""
 
-#: Settings.py:512
+#: Settings.py:513
 msgid "Fretboard Settings"
 msgstr ""
 
-#: Settings.py:513
+#: Settings.py:514
 msgid "Lyrics Settings"
 msgstr ""
 
-#: Settings.py:514 Settings.py:1117
+#: Settings.py:515 Settings.py:964
 msgid "In-Game Display Settings"
 msgstr ""
 
-#: Settings.py:515
+#: Settings.py:516
 msgid "Advanced Video Settings"
 msgstr ""
 
-#: Settings.py:543 Settings.py:1136
+#: Settings.py:544 Settings.py:983
 msgid "Volume Settings"
 msgstr ""
 
-#: Settings.py:551
+#: Settings.py:552
 msgid "Advanced Audio Settings"
 msgstr ""
 
-#: Settings.py:587 Settings.py:1151
+#: Settings.py:588 Settings.py:998
 msgid "Change Setlist Path >"
 msgstr ""
 
-#: Settings.py:614
+#: Settings.py:615
 msgid "Debug Settings"
 msgstr ""
 
-#: Settings.py:615
+#: Settings.py:616
 msgid "Log Settings"
 msgstr ""
 
-#: Settings.py:621
+#: Settings.py:622
 msgid "Jurgen Settings"
 msgstr ""
 
-#: Settings.py:632 Settings.py:1176
+#: Settings.py:633 Settings.py:1023
 msgid "Mod settings"
 msgstr ""
 
-#: Settings.py:637 Settings.py:1181
+#: Settings.py:638 Settings.py:1028
 msgid "Gameplay Settings"
 msgstr ""
 
-#: Settings.py:638 Settings.py:1182
+#: Settings.py:639 Settings.py:1029
 msgid "Control Settings"
 msgstr ""
 
-#: Settings.py:639 Settings.py:1183
+#: Settings.py:640 Settings.py:1030
 msgid "Display Settings"
 msgstr ""
 
-#: Settings.py:640 Settings.py:1184
+#: Settings.py:641 Settings.py:1031
 msgid "Audio Settings"
 msgstr ""
 
-#: Settings.py:641 Settings.py:1185
+#: Settings.py:642 Settings.py:1032
 msgid "Setlist Settings"
 msgstr ""
 
-#: Settings.py:642
+#: Settings.py:643
 msgid "Advanced Settings"
 msgstr ""
 
-#: Settings.py:643 Settings.py:1186
+#: Settings.py:644 Settings.py:1033
 msgid "Mods, Cheats, AI"
 msgstr ""
 
-#: Settings.py:644 Settings.py:1187
+#: Settings.py:645 Settings.py:1034
 #, python-format
 msgid "%s Credits"
 msgstr ""
 
-#: Settings.py:645 Settings.py:1188
+#: Settings.py:646 Settings.py:1035
 msgid "Quickset"
 msgstr ""
 
-#: Settings.py:646
+#: Settings.py:647
 msgid "Hide Advanced Options"
 msgstr ""
 
-#: Settings.py:865 Settings.py:1388
+#: Settings.py:712 Settings.py:1084
 msgid "FoFiX needs to restart to apply setting changes."
 msgstr ""
 
-#: Settings.py:898 Settings.py:1411 SongChoosingScene.py:182
+#: Settings.py:745 Settings.py:1107 SongChoosingScene.py:182
 msgid "Choose a new songs directory."
 msgstr ""
 
-#: Settings.py:1189
+#: Settings.py:1036
 msgid "See Advanced Options"
 msgstr ""
 
-#: Settings.py:1434
+#: Settings.py:1292
 msgid "Cheats"
 msgstr ""
 

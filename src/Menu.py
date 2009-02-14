@@ -52,7 +52,7 @@ class Choice:
     else:
       self.isSubMenu = isinstance(self.callback, Menu) or isinstance(self.callback, list)
     
-  #MFH TODO - add support for passing position values to the callback "next menu"
+  #MFH - add support for passing position values to the callback "next menu"
   def trigger(self, engine = None):
     if engine and isinstance(self.callback, list):
       #MFH 

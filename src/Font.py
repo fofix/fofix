@@ -26,8 +26,35 @@ from OpenGL.GL import *
 import sys
 if not sys.version.startswith("2.4"):
   import numpy
-
 from Texture import Texture, TextureAtlas, TextureAtlasFullException
+
+DEFAULT_SCALE = 0.002
+
+class CacheElement(object):
+    def __init__(self,content):
+        self.content = content
+        self.accessed()
+
+    def accessed(self):
+        self.lastUse = pygame.time.get_ticks()
+
+class Cache(object):
+    def __init__(self,maxCount=1024):
+        self.elements = {}
+        self.maxCount = maxCount
+
+    def get(self,key):
+        e = self.elements[key]
+        e.accessed()
+        return e.content
+
+    def add(self,key,element):
+        self.elements[key] = CacheElement(element)
+        if len(self.elements) > self.maxCount:
+            keys = self.elements.keys()
+            keys.sort(key=lambda e:-self.elements[e].lastUse)
+            for k in keys[self.maxCount:]:
+                del self.elements[k]
 
 class Font:
   """A texture-mapped font."""
@@ -36,13 +63,8 @@ class Font:
     pygame.font.init()
     self.size             = size
     self.scale            = scale
-    self.glyphCache       = {}
-    self.glyphSizeCache   = {}
     self.outline          = outline
-    self.glyphTextures    = []
     self.reversed         = reversed
-    self.stringCache      = {}
-    self.stringCacheLimit = 256
     self.shadow         = shadow
     # Try loading a system font first if one was requested
     self.font           = None
@@ -56,8 +78,9 @@ class Font:
     self.font.set_bold(bold)
     self.font.set_italic(italic)
     self.font.set_underline(underline)
+    self.stringsCache = Cache(256)
 
-  def getStringSize(self, s, scale = 0.002):
+  def getStringSize(self, s, scale = DEFAULT_SCALE):
     """
     Get the dimensions of a string when rendered with this font.
 
@@ -65,57 +88,45 @@ class Font:
     @param scale:   Scale factor
     @return:        (width, height) tuple
     """
-    w = 0
-    h = 0
     scale *= self.scale
-    for ch in s:
-      try:
-        s = self.glyphSizeCache[ch]
-      except:
-        s = self.glyphSizeCache[ch] = self.font.size(ch)
-      w += s[0]
-      h = max(s[1], h)
-    return (w * scale, h * scale)
+
+    try:
+        t,w,h = self.stringsCache.get(s)
+    except KeyError:
+        w,h = self.font.size(s)
+
+    return (w*scale, h*scale)
+
+  def loadCache(self):
+      pass
 
   # evilynux - Return scaling factor needed to fit text within maxwidth
-  def scaleText(self, text, maxwidth, scale = 0.002):
-    w, h = self.getStringSize(text, scale = scale)
-    while w > maxwidth:
-      scale = scale * 0.95
-      w, h = self.getStringSize(text, scale = scale)
+  def scaleText(self, text, maxwidth, scale = DEFAULT_SCALE):
+    w, h = self.getStringSize(text)
+    scale = DEFAULT_SCALE
+    if w > maxwidth:
+        scale = w/maxwidth
     return scale
 
   def getHeight(self):
     """@return: The height of this font"""
     return self.font.get_height() * self.scale
 
-  def getLineSpacing(self, scale = 0.002):
+  def getLineSpacing(self, scale = DEFAULT_SCALE):
     """@return: Recommanded line spacing of this font"""
     return self.font.get_linesize() * self.scale * scale
 
   #MFH - needed to find the centerline of text
-  def getFontAscent(self, scale = 0.002):
+  def getFontAscent(self, scale = DEFAULT_SCALE):
     """@return: Return the height in pixels for the font ascent. 
     The ascent is the number of pixels from the font baseline to the top of the font. """
     return self.font.get_ascent() * self.scale * scale
 
   #MFH - needed to find the centerline of text
-  def getFontDescent(self, scale = 0.002):
+  def getFontDescent(self, scale = DEFAULT_SCALE):
     """@return: Return the height in pixels for the font descent. The descent 
     is the number of pixels from the font baseline to the bottom of the font.  """
     return self.font.get_descent() * self.scale * scale
-
-  #MFH - why the hell aren't we using the pygame.font.render function?  We seem to be re-inventing the wheel here, and not correctly!
-  #all the example PyGame apps I see that use pygame.font.render also use "screen.blit" or "background.blit".  
-  #not to mention that the pygame.font.render function allows setting of a font background color, which would fully solve the solo frame issue...
-  def pygameFontRender(self, text, antialias, color, background=None):
-    """
-    @return: This creates a new Surface with the specified text rendered on it.
-    Pygame provides no way to directly draw text on an existing Surface: instead you must use Font.render - 
-    draw text on a new Surface to create an image (Surface) of the text, then blit this image onto another Surface. 
-    """
-    return self.font.render(text, antialias, color, background)
-
     
   def setCustomGlyph(self, character, texture):
     """
@@ -124,77 +135,9 @@ class Font:
     @param character:   Character to replace
     @param texture:     L{Texture} instance
     """
-    texture.setFilter(GL_LINEAR, GL_LINEAR)
-    texture.setRepeat(GL_CLAMP, GL_CLAMP)
-    if sys.version.startswith("2.4"):
-      self.glyphCache[character]     = texture
-    else:
-      self.glyphCache[character]     = (texture, (0.0, 0.0, texture.size[0], texture.size[1]))
-    s = .75 * self.getHeight() / float(texture.pixelSize[0])
-    self.glyphSizeCache[character] = (texture.pixelSize[0] * s, texture.pixelSize[1] * s)
+    pass
 
-  def _renderString(self, text, pos, direction, scale):
-    if not text:
-      return
-
-    if not (text, scale) in self.stringCache:
-      currentTexture = None
-      #x, y           = pos[0], pos[1]
-      x, y           = 0.0, 0.0
-      vertices       = numpy.empty((4 * len(text), 2), numpy.float32)
-      texCoords      = numpy.empty((4 * len(text), 2), numpy.float32)
-      vertexCount    = 0
-      cacheEntry     = []
-
-      for i, ch in enumerate(text):
-        g, coordinates     = self.getGlyph(ch)
-        w, h               = self.getStringSize(ch, scale = scale)
-        tx1, ty1, tx2, ty2 = coordinates
-
-        # Set the initial texture
-        if currentTexture is None:
-          currentTexture = g
-
-        # If the texture changed, flush the geometry
-        if currentTexture != g:
-          cacheEntry.append((currentTexture, vertexCount, numpy.array(vertices[:vertexCount]), numpy.array(texCoords[:vertexCount])))
-          currentTexture = g
-          vertexCount = 0
-
-        vertices[vertexCount + 0]  = (x,     y)
-        vertices[vertexCount + 1]  = (x + w, y)
-        vertices[vertexCount + 2]  = (x + w, y + h)
-        vertices[vertexCount + 3]  = (x,     y + h)
-        texCoords[vertexCount + 0] = (tx1, ty2)
-        texCoords[vertexCount + 1] = (tx2, ty2)
-        texCoords[vertexCount + 2] = (tx2, ty1)
-        texCoords[vertexCount + 3] = (tx1, ty1)
-        vertexCount += 4
-
-        x += w * direction[0]
-        y += w * direction[1]
-      cacheEntry.append((currentTexture, vertexCount, vertices[:vertexCount], texCoords[:vertexCount]))
-
-      # Don't store very short strings
-      if len(text) > 5:
-        # Limit the cache size
-        if len(self.stringCache) > self.stringCacheLimit:
-          del self.stringCache[self.stringCache.keys()[0]]
-        self.stringCache[(text, scale)] = cacheEntry
-    else:
-      cacheEntry = self.stringCache[(text, scale)]
-
-    glPushMatrix()
-    glTranslatef(pos[0], pos[1], 0)
-    for texture, vertexCount, vertices, texCoords in cacheEntry:
-      texture.bind()
-      glVertexPointer(2, GL_FLOAT, 0, vertices)
-      glTexCoordPointer(2, GL_FLOAT, 0, texCoords)
-      glDrawArrays(GL_QUADS, 0, vertexCount)
-    glPopMatrix()
-
-  # evilynux - Rendering method for Python 2.4
-  def render24(self, text, pos = (0, 0), direction = (1, 0, 0), scale = 0.002):
+  def render(self, text, pos = (0, 0), direction = (1, 0), scale = DEFAULT_SCALE):
     """
     Draw some text.
 
@@ -203,216 +146,71 @@ class Font:
     @param direction: Text direction vector (x, y, z)
     @param scale:     Scale factor
     """
+    # deufeufeu : new drawing relaying only on pygame.font.render
+    #           : I know me miss special unicodes characters, but the gain
+    #           : is really important.
+    def drawSquare(w,h,tw,th):
+        glBegin(GL_TRIANGLE_STRIP)
+        glTexCoord2f(0.0,th)
+        glVertex2f(0,0)
+        glTexCoord2f(tw,th)
+        glVertex2f(w,0)
+        glTexCoord2f(0.0,0.0)
+        glVertex2f(0,h)
+        glTexCoord2f(tw,0.0)
+        glVertex2f(w,h)
+        glEnd()
+ 
+    if not text:
+        return
+
+    try:
+        t,w,h = self.stringsCache.get(text)
+    except KeyError:
+        s = self.font.render(text, True, (255,255,255))
+        t = Texture()
+        t.setFilter(GL_LINEAR, GL_LINEAR)
+        t.setRepeat(GL_CLAMP, GL_CLAMP)
+        t.loadSurface(s, alphaChannel = True)
+        del s
+        w, h = self.font.size(text)
+        self.stringsCache.add(text,(t,w,h))
+     
+    x, y = pos
+    scale *= self.scale
+    w, h = w*scale, h*scale
+    tw,th = t.size
     glEnable(GL_TEXTURE_2D)
-    glEnableClientState(GL_VERTEX_ARRAY)
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY)
-
     glPushMatrix()
-    glTranslatef(pos[0], pos[1], 0)
-    
-    if self.reversed:
-      text = "".join(reversed(text))
-
+    glTranslatef(x,y,0)
+    t.bind()
     if self.outline:
-      glPushAttrib(GL_CURRENT_BIT)
-      glPushMatrix()
-      glColor4f(0, 0, 0, .25 * glGetDoublev(GL_CURRENT_COLOR)[3])
-      for ch in text:
-        g = self.getGlyph(ch)
-        # evilynux - Fixed bug, self.scaling must not be applied twice!
-        w, h = self.getStringSize(ch, scale = scale)
-        tw, th = g.size
-  
-        glVertexPointerf([(0.0, 0.0, 0.0), (w, 0.0, 0.0), (0.0, h, 0.0), (w, h, 0.0)])
-        glTexCoordPointerf([(0.0, th), (tw, th), (0.0, 0.0), (tw, 0.0)])
-  
-        g.bind()
-  
-        blur = 2 * 0.002
-        for offset in [(-.7, -.7), (0, -1), (.7, -.7), (-1, 0), (1, 0), (-.7, .7), (0, 1), (.7, .7)]:
-          glPushMatrix()
-          glTranslatef( blur * offset[0], blur * offset[1], 0)
-          glDrawElementsui(GL_TRIANGLE_STRIP, [0, 1, 2, 3])
-          glPopMatrix()
+        glPushAttrib(GL_CURRENT_BIT)
+        glPushMatrix()
+        glColor4f(0, 0, 0, .25 * glGetDoublev(GL_CURRENT_COLOR)[3])
 
-        glTranslatef(w * direction[0],
-                     w * direction[1],
-                     w * direction[2])
-
-      glPopAttrib()
-      glPopMatrix()
+        blur = 2 * DEFAULT_SCALE
+        for offset in [(-.7, -.7), (0, -1), (.7, -.7), (-1, 0), 
+                       (1, 0), (-.7, .7), (0, 1), (.7, .7)]:
+            glPushMatrix()
+            glTranslatef(blur * offset[0], blur * offset[1], 0)
+            drawSquare(w,h,tw,th)
+            glPopMatrix()
+        glPopMatrix()
+        glPopAttrib()
 
     if self.shadow:
-      glPushAttrib(GL_CURRENT_BIT)
-      glPushMatrix()
-      glColor4f(0, 0, 0, 1)
-      for ch in text:
-        g = self.getGlyph(ch)
-        # evilynux - Fixed bug, self.scaling must not be applied twice!
-        w, h = self.getStringSize(ch, scale = scale)
-        tw, th = g.size
-  
-        glVertexPointerf([(0.0, 0.0, 0.0), (w, 0.0, 0.0), (0.0, h, 0.0), (w, h, 0.0)])
-        glTexCoordPointerf([(0.0, th), (tw, th), (0.0, 0.0), (tw, 0.0)])
-  
-        g.bind()
-  
+        glPushAttrib(GL_CURRENT_BIT)
         glPushMatrix()
+        glColor4f(0, 0, 0, 1)
         glTranslatef(.0022, .0005, 0)
-        glDrawElementsui(GL_TRIANGLE_STRIP, [0, 1, 2, 3])
+        drawSquare(w,h,tw,th)
         glPopMatrix()
+        glPopAttrib()
 
-        glTranslatef(w * direction[0],
-                     w * direction[1],
-                     w * direction[2])
-
-      glPopAttrib()
-      glPopMatrix()
-
-    for ch in text:
-      g = self.getGlyph(ch)
-      # evilynux - Fixed bug, self.scaling must not be applied twice!
-      w, h = self.getStringSize(ch, scale = scale)
-      tw, th = g.size
-
-      #MFH
-      # Rectangle with numbered corners for notation reference: 
-      #   3_______4   (height = h)
-      #   |       |  
-      #   |       |h  
-      #   1-------2   (width = w)
-      #       w 
-      #
-      #The VertexPointer traces around (designates) a rectangle of dimensions w * h in the following order (two triangles, or TRIANGLE_STRIPs):
-      #   1,2,3,4   (which is traced as two triangles 1-2-3 and 2-3-4)
-      #The TexCoordPointer traces around (designates) this rectangle in the following order (two triangles, or TRIANGLE_STRIPs):
-      #   3,4,1,2   (which is traced as two triangles 3-4-1 and 4-1-2)
-      #               ...which, I assume, is why normal textures show up upside-down if they are not corrected with a negative Y axis scale?
-
-      #This leads me to believe that fonts are actually rendered with their given "position" anchoring their lower left corner, as a font
-      # should be.  I must re-examine how the solo frame is generated and try some new experiments.
-      
-      #Nope - writing a "test" string at pos (0.5, 0.0) clearly shows that the position is the anchor for the TOP-LEFT corner of the text.
-
-      glVertexPointerf([(0.0, 0.0, 0.0), (w, 0.0, 0.0), (0.0, h, 0.0), (w, h, 0.0)])
-      glTexCoordPointerf([(0.0, th), (tw, th), (0.0, 0.0), (tw, 0.0)])
-
-      g.bind()
-      glDrawElementsui(GL_TRIANGLE_STRIP, [0, 1, 2, 3])
-
-      glTranslatef(w * direction[0],
-                   w * direction[1],
-                   w * direction[2])
-
+    drawSquare(w,h,tw,th)
     glPopMatrix()
 
-    glDisableClientState(GL_VERTEX_ARRAY)
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY)
     glDisable(GL_TEXTURE_2D)
-
-  def render(self, text, pos = (0, 0), direction = (1, 0), scale = 0.002):
-    """
-    Draw some text.
-
-    @param text:      Text to draw
-    @param pos:       Text coordinate tuple (x, y)
-    @param direction: Text direction vector (x, y, z)
-    @param scale:     Scale factor
-    """
-    if sys.version.startswith("2.4"):
-      self.render24(text, pos, (1,0,0), scale)
-      return
-
-    glEnable(GL_TEXTURE_2D)
-    glEnableClientState(GL_VERTEX_ARRAY)
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY)
-
-    if self.reversed:
-      text = "".join(reversed(text))
-
-    if self.outline:
-      glPushAttrib(GL_CURRENT_BIT)
-      glColor4f(0, 0, 0, glGetFloatv(GL_CURRENT_COLOR)[3])
-      self._renderString(text, (pos[0] + 0.003, pos[1] + 0.003), direction, scale)
-      glPopAttrib()
-
-    self._renderString(text, pos, direction, scale)
-    
-    glDisableClientState(GL_VERTEX_ARRAY)
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY)
-    glDisable(GL_TEXTURE_2D)
-
-  # evilynux
-  def loadCache(self):
-    """
-    Fill in the caches to speedup rendering.
-    """
-    if not sys.version.startswith("2.4"):
-      return
-    for ch in "abcdefghijklmnopqrstuvwxyz0123456789":
-      try:
-        self.glyphCache[ch]
-      except:
-        self.cacheGlyph(ch)
-
-  # evilynux
-  def cacheGlyph(self, ch):
-    """
-    Add character and size to glyph caches
-
-    @param ch: Character
-    @return:   Glyph instance
-    """
-    if not sys.version.startswith("2.4"):
-      return
-    # Font size
-    self.glyphSizeCache[ch] = self.font.size(ch)
-    # Font texture
-    s = self.font.render(ch, True, (255, 255, 255))
-    t = Texture()
-    t.setFilter(GL_LINEAR, GL_LINEAR)
-    t.setRepeat(GL_CLAMP, GL_CLAMP)
-    t.loadSurface(s, alphaChannel = True)
-    del s
-    self.glyphCache[ch] = t
-    return t
-
-  def _allocateGlyphTexture(self):
-    t = TextureAtlas(size = glGetInteger(GL_MAX_TEXTURE_SIZE))
-    t.texture.setFilter(GL_LINEAR, GL_LINEAR)
-    t.texture.setRepeat(GL_CLAMP, GL_CLAMP)
-    self.glyphTextures.append(t)
-    return t
-
-  def getGlyph(self, ch):
-    """
-    Get the L{Texture} for a given character.
-
-    @param ch:    Character
-    @return:      L{Texture} instance
-    """
-    try:
-      return self.glyphCache[ch]
-    except KeyError:
-      if sys.version.startswith("2.4"):
-        return self.cacheGlyph(ch)
-
-      s = self.font.render(ch, True, (255, 255, 255))
-
-      # Draw outlines
-      if not self.glyphTextures:
-        texture = self._allocateGlyphTexture()
-      else:
-        texture = self.glyphTextures[-1]
-
-      # Insert the texture into the glyph cache
-      try:
-        coordinates = texture.add(s)
-      except TextureAtlasFullException:
-        # Try again with a fresh atlas
-        texture = self._allocateGlyphTexture()
-        return self.getGlyph(ch)
-
-      self.glyphCache[ch] = (texture, coordinates)
-      return (texture, coordinates)
+    return
 

@@ -39,12 +39,20 @@ import sys
 import Log
 
 # these constants define a few customized letters in the default font
-STAR1 = unicode('\x10')
-STAR2 = unicode('\x11')
-LEFT  = unicode('\x12')
-RIGHT = unicode('\x13')
-STAR3 = unicode('\x14')  #Worldrave - Added new Star3
-STAR4 = unicode('\x15')  #Worldrave - Added new Star4
+#MFH - with the new simplified Font.py, no more custom glpyhs... let's do a simple replacement here for now...
+STAR1 = ' '
+STAR2 = '*'
+LEFT  = '<'
+RIGHT = '>'
+STAR3 = STAR1
+STAR4 = STAR2
+
+#-STAR1 = unicode('\x10')
+#-STAR2 = unicode('\x11')
+#-LEFT  = unicode('\x12')
+#-RIGHT = unicode('\x13')
+#-STAR3 = unicode('\x14')  #Worldrave - Added new Star3
+#-STAR4 = unicode('\x15')  #Worldrave - Added new Star4
 
 class Data(object):
   """A collection of globally used data resources such as fonts and sound effects."""
@@ -110,18 +118,19 @@ class Data(object):
 
     #Worldrave - Use new defined Star3 and star4. Using star1 and star2 as a fallback.
 
-    self.loadImgDrawing(self, "star1",   os.path.join("themes",themename,"star1.png"), textureSize = (128, 128))
-    self.loadImgDrawing(self, "star2",   os.path.join("themes",themename,"star2.png"), textureSize = (128, 128))
-    try:
-      self.loadImgDrawing(self, "star3",   os.path.join("themes",themename,"star3.png"), textureSize = (128, 128))
-      self.loadImgDrawing(self, "star4",   os.path.join("themes",themename,"star4.png"), textureSize = (128, 128))
-    except IOError:
-      self.loadImgDrawing(self, "star3",   os.path.join("themes",themename,"star1.png"), textureSize = (128, 128))
-      self.loadImgDrawing(self, "star4",   os.path.join("themes",themename,"star2.png"), textureSize = (128, 128))
-
- 
-    self.loadImgDrawing(self, "left",    "left.png",  textureSize = (128, 128))
-    self.loadImgDrawing(self, "right",   "right.png", textureSize = (128, 128))
+    #MFH - no more custom glyphs, these are wasting memory.
+#-    self.loadImgDrawing(self, "star1",   os.path.join("themes",themename,"star1.png"), textureSize = (128, 128))
+#-    self.loadImgDrawing(self, "star2",   os.path.join("themes",themename,"star2.png"), textureSize = (128, 128))
+#-    try:
+#-      self.loadImgDrawing(self, "star3",   os.path.join("themes",themename,"star3.png"), textureSize = (128, 128))
+#-      self.loadImgDrawing(self, "star4",   os.path.join("themes",themename,"star4.png"), textureSize = (128, 128))
+#-    except IOError:
+#-      self.loadImgDrawing(self, "star3",   os.path.join("themes",themename,"star1.png"), textureSize = (128, 128))
+#-      self.loadImgDrawing(self, "star4",   os.path.join("themes",themename,"star2.png"), textureSize = (128, 128))
+#-
+#- 
+#-    self.loadImgDrawing(self, "left",    "left.png",  textureSize = (128, 128))
+#-    self.loadImgDrawing(self, "right",   "right.png", textureSize = (128, 128))
 
     # load misc images
     self.loadImgDrawing(self, "loadingImage", os.path.join("themes",themename,"loadingbg.png"), textureSize = (256,256))
@@ -532,17 +541,19 @@ class Data(object):
     return os.path.exists(fileName)
 
       
+  #MFH - no more custom font glyphs
   def customizeFont(self, font):
-    # change some predefined characters to custom images
-    font.setCustomGlyph(STAR1, self.star1.texture)
-    font.setCustomGlyph(STAR2, self.star2.texture)
-    font.setCustomGlyph(STAR3, self.star3.texture)
-    font.setCustomGlyph(STAR4, self.star4.texture)
-    font.setCustomGlyph(LEFT,  self.left.texture)
-    font.setCustomGlyph(RIGHT, self.right.texture)
-    # evilynux - Load cache to speedup rendering
-    if Config.get("performance", "preload_glyph_cache"):
-      font.loadCache()
+    pass
+#-    # change some predefined characters to custom images
+#-    font.setCustomGlyph(STAR1, self.star1.texture)
+#-    font.setCustomGlyph(STAR2, self.star2.texture)
+#-    font.setCustomGlyph(STAR3, self.star3.texture)
+#-    font.setCustomGlyph(STAR4, self.star4.texture)
+#-    font.setCustomGlyph(LEFT,  self.left.texture)
+#-    font.setCustomGlyph(RIGHT, self.right.texture)
+#-    # evilynux - Load cache to speedup rendering
+#-    if Config.get("performance", "preload_glyph_cache"):
+#-      font.loadCache()
 
 #MFH - acceptSound and selectSound will now be merged into either 10 random sounds or just the acceptSound as a fallback:
   def getAcceptSound(self):
