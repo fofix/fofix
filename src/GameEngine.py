@@ -802,12 +802,19 @@ class GameEngine(Engine):
         self.drawImage(star, scale = (scale,-scale), coord = (((w*xpos)+wide*j)*space**4,h*ypos))
 
 
-
-  def drawImage(self, image, scale, coord, rot = 0, color = (1,1,1,1), rect = (0,1,0,1)):
+  #volshebnyi - now images can be resized to fit to screen
+  def drawImage(self, image, scale, coord, rot = 0, color = (1,1,1,1), rect = (0,1,0,1), stretched = 0):
     
     image.transform.reset()
     image.transform.rotate(rot)
-    image.transform.scale(scale[0],scale[1])
+    if stretched == 0: #don't sctretch
+    	image.transform.scale(scale[0],scale[1])
+    elif stretched == 1: # fit to width
+    	image.transform.scale(scale[0] / image.width1() * 640,scale[1])
+    elif stretched == 2: # fit to height
+    	image.transform.scale(scale[0],scale[1] / image.height1() * 480)
+    else: # fit to screen
+    	image.transform.scale(scale[0] / image.width1() * 640,scale[1] / image.height1() * 480)
     image.transform.translate(coord[0],coord[1])
     image.draw(color = color, rect = rect)
 

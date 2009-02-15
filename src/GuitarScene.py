@@ -6717,14 +6717,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 vCoord = 0
                 if self.countdown>5.0:
                   vCoord = - 75 * (self.countdown - 5.0)
-                  self.oBarScale = Theme.oBarHScale* 0.95 * self.guitars[i].boardWidth / math.sqrt(self.camera.origin[1]**2+(self.camera.origin[2]-0.5-vCoord/125)**2) / self.oBottom.width1() * 635
+                  self.oBarScale = Theme.oBarHScale * self.guitars[i].boardWidth / math.sqrt(self.camera.origin[1]**2+(self.camera.origin[2]-0.5-vCoord/125)**2)*0.942
 
-                self.engine.drawImage(self.oBottom, scale = (self.oBarScale,.5), coord = (w/2,h/12+ vCoord))
-                self.engine.drawImage(self.oFill, scale = (self.oBarScale*currentSP,.5), coord = (w/2*(1+self.oBarScale*(currentSP-1)),h/12+ vCoord), rect = (0,currentSP,0,1))
-                self.engine.drawImage(self.oTop, scale = (self.oBarScale,.5), coord = (w/2,h/12+ vCoord))
+                self.engine.drawImage(self.oBottom, scale = (self.oBarScale,.5), coord = (w/2,h/12+ vCoord), stretched = 1)
+                self.engine.drawImage(self.oFill, scale = (self.oBarScale*currentSP,.5), coord = (w/2*(1+self.oBarScale*(currentSP-1)),h/12+ vCoord), rect = (0,currentSP,0,1), stretched = 1)
+                self.engine.drawImage(self.oTop, scale = (self.oBarScale,.5), coord = (w/2,h/12+ vCoord), stretched = 1)
             
                 if self.rb_sp_neck_glow and self.guitars[i].starPower >= 50 and not self.guitars[i].starPowerActive:
-                  self.engine.drawImage(self.oFull, scale = (self.oBarScale,.5), coord = (w/2,h/12), color = (1,1,1,self.rbOverdriveBarGlowVisibility))
+                  self.engine.drawImage(self.oFull, scale = (self.oBarScale,.5), coord = (w/2,h/12), color = (1,1,1,self.rbOverdriveBarGlowVisibility), stretched = 1)
                 
                 #must duplicate to other theme 
                 #if self.playerList[i].part.text == "Bass Guitar" and multStreak >= 40 and self.bassGrooveEnableMode > 0:   #bass groove!
