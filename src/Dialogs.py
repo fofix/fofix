@@ -590,7 +590,7 @@ class SongChooser(Layer, KeyListener):
     except Exception, e:
       Log.warn("Unable to load Theme song_listscore_xpos: %s" % e) 
       self.song_listscore_xpos = None
-      
+
     try:
       self.song_listcd_cd_xpos = Theme.song_listcd_cd_Xpos
       Log.debug("song_listcd_cd_xpos found: " + str(self.song_listcd_cd_xpos))
@@ -1638,6 +1638,8 @@ class SongChooser(Layer, KeyListener):
       
       self.engine.view.setViewport(1,0)
       w, h, = self.engine.view.geometry[2:4]
+      screenw = w
+      screenh = h
       r = .5
   
       if self.display != 1: #
@@ -1941,18 +1943,29 @@ class SongChooser(Layer, KeyListener):
                   score, stars, name = "---", 0, "---"
                 Theme.setBaseColor(1 - v)
                 font.render(unicode(d),     (x, y),           scale = scale)
-                # evilynux - Fixed star size following Font render bugfix
-                if stars == 7: #akedrou
-                  glColor3f(0, .5, 1) #should be customizable
-                  font.render(unicode(Data.STAR2 * 5), (x, y + h), scale = scale * 1.8)
-                elif stars == 6 and self.theme == 2:    #gold stars in RB songlist
-                  glColor3f(1, 1, 0)  
-                  font.render(unicode(Data.STAR2 * 5), (x, y + h), scale = scale * 1.8)
-                elif stars == 6:
-                  glColor3f(0, 1, 0)  
-                  font.render(unicode(Data.STAR2 * 5), (x, y + h), scale = scale * 1.8)
-                else:
-                  font.render(unicode(Data.STAR2 * stars + Data.STAR1 * (5 - stars)), (x, y + h), scale = scale * 1.8)
+
+
+                #stary = y+h
+                stary = y
+                #stary = 0.5+h
+                starscale = scale*1.8
+                stary = 1.0 - (stary / self.engine.data.fontScreenBottom)
+                self.engine.drawStarScore(screenw, screenh, x, stary, stars, starscale) #MFH
+
+#-                # evilynux - Fixed star size following Font render bugfix
+#-                if stars == 7: #akedrou
+#-                  glColor3f(0, .5, 1) #should be customizable
+#-                  font.render(unicode(Data.STAR2 * 5), (x, y + h), scale = scale * 1.8)
+#-                elif stars == 6 and self.theme == 2:    #gold stars in RB songlist
+#-                  glColor3f(1, 1, 0)  
+#-                  font.render(unicode(Data.STAR2 * 5), (x, y + h), scale = scale * 1.8)
+#-                elif stars == 6:
+#-                  glColor3f(0, 1, 0)  
+#-                  font.render(unicode(Data.STAR2 * 5), (x, y + h), scale = scale * 1.8)
+#-                else:
+#-                  font.render(unicode(Data.STAR2 * stars + Data.STAR1 * (5 - stars)), (x, y + h), scale = scale * 1.8)
+
+
                 Theme.setSelectedColor(1 - v)
                 # evilynux - Also use hit%/noteStreak SongList option
                 if scores:
@@ -2274,28 +2287,40 @@ class SongChooser(Layer, KeyListener):
                           originalScore = score
                       else:
                         score, stars, name = 0, 0, "---"
-  
-                  #QQstarS:add  to show stars
-                  if stars == 7:
-                    glColor3f(1, 1, 1)  # ought there be some special glyph for the perfect/fc scores..?
-                    if self.extraStats:
-                      lfont.render(unicode(Data.STAR4 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.1825-0.034), scale = scale * 2.0) #Worldrave - Uses STAR3 and STAR4 now w/ fallback
-                    else:
-                      lfont.render(unicode(Data.STAR4 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.2-0.034), scale = scale * 2.0) #Worldrave - Uses STAR3 and STAR4 now w/ fallback
-                  elif stars == 6:
-                    glColor3f(1, 1, 1)  
-                    if self.extraStats:
-                      lfont.render(unicode(Data.STAR4 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.1825-0.034), scale = scale * 2.0) #Worldrave - Uses STAR3 and STAR4 now w/ fallback
-                    else:
-                      lfont.render(unicode(Data.STAR4 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.2-0.034), scale = scale * 2.0) #Worldrave - Uses STAR3 and STAR4 now w/ fallback
-                  elif score>0 and stars>=0 and name!="":
-                    glColor3f(1, 1, 1)
-                    #ShiekOdaSandz: Fixed stars so they display left to right, not right to left
-                    if self.extraStats:
-                      lfont.render(unicode(Data.STAR4 * stars+Data.STAR3 * (5 - stars)), (self.song_listscore_xpos+.018*.03, .0935*(i+1)-pos[0]*.0935+.1825-0.034), scale = scale * 2.0) #ShiekOdaSandz: Fixed stars so they display left to right, not right to left @Worldrave - Uses STAR3 and STAR4 now w/ fallback
-                    else:
-                      lfont.render(unicode(Data.STAR4 * stars+Data.STAR3 * (5 - stars)), (self.song_listscore_xpos+.018*.03, .0935*(i+1)-pos[0]*.0935+.2-0.034), scale = scale * 2.0) #ShiekOdaSandz: Fixed stars so they display left to right, not right to left @Worldrave - Uses STAR3 and STAR4 now w/ fallback
-                    #QQstarS: end of add
+
+                  starx = self.song_listscore_xpos+.018
+                  if self.extraStats:
+                    stary = .0935*(i+1)-pos[0]*.0935+.1825-0.034
+                  else:
+                    stary = .0935*(i+1)-pos[0]*.0935+.2-0.034
+                  #stary = 0.5
+                  starscale = scale*2.0
+                  stary = 1.0 - (stary / self.engine.data.fontScreenBottom)
+                  self.engine.drawStarScore(screenw, screenh, starx, stary, stars, starscale) #MFH
+
+#-                  #QQstarS:add  to show stars
+#-                  if stars == 7:
+#-                    glColor3f(1, 1, 1)  # ought there be some special glyph for the perfect/fc scores..?
+#-                    if self.extraStats:
+#-                      lfont.render(unicode(Data.STAR4 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.1825-0.034), scale = scale * 2.0) #Worldrave - Uses STAR3 and STAR4 now w/ fallback
+#-                    else:
+#-                      lfont.render(unicode(Data.STAR4 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.2-0.034), scale = scale * 2.0) #Worldrave - Uses STAR3 and STAR4 now w/ fallback
+#-                  elif stars == 6:
+#-                    glColor3f(1, 1, 1)  
+#-                    if self.extraStats:
+#-                      lfont.render(unicode(Data.STAR4 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.1825-0.034), scale = scale * 2.0) #Worldrave - Uses STAR3 and STAR4 now w/ fallback
+#-                    else:
+#-                      lfont.render(unicode(Data.STAR4 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.2-0.034), scale = scale * 2.0) #Worldrave - Uses STAR3 and STAR4 now w/ fallback
+#-                  elif score>0 and stars>=0 and name!="":
+#-                    glColor3f(1, 1, 1)
+#-                    #ShiekOdaSandz: Fixed stars so they display left to right, not right to left
+#-                    if self.extraStats:
+#-                      lfont.render(unicode(Data.STAR4 * stars+Data.STAR3 * (5 - stars)), (self.song_listscore_xpos+.018*.03, .0935*(i+1)-pos[0]*.0935+.1825-0.034), scale = scale * 2.0) #ShiekOdaSandz: Fixed stars so they display left to right, not right to left @Worldrave - Uses STAR3 and STAR4 now w/ fallback
+#-                    else:
+#-                      lfont.render(unicode(Data.STAR4 * stars+Data.STAR3 * (5 - stars)), (self.song_listscore_xpos+.018*.03, .0935*(i+1)-pos[0]*.0935+.2-0.034), scale = scale * 2.0) #ShiekOdaSandz: Fixed stars so they display left to right, not right to left @Worldrave - Uses STAR3 and STAR4 now w/ fallback
+#-                    #QQstarS: end of add
+
+
   
                   scale = 0.0014
                   # evilynux - score color
@@ -2569,29 +2594,42 @@ class SongChooser(Layer, KeyListener):
                       else:
                         score, stars, name = 0, 0, "---"
   
-                  #QQstarS:add  to show stars
-                  # evilynux - Tweaked position to fit hit% and note streak
-                  #            Readjusted star size following font fix
-                  if stars == 7:
-                    glColor3f(.6, .6, .75)    #platinum-y? stars in RB theme
-                    if self.extraStats:
-                      font.render(unicode(Data.STAR2 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.18-0.0145), scale = scale * 1.8)
-                    else:
-                      font.render(unicode(Data.STAR2 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.2-0.0145), scale = scale * 1.8)
-                  if stars == 6:
-                    glColor3f(1, 1, 0)    #gold stars in RB theme
-                    if self.extraStats:
-                      font.render(unicode(Data.STAR2 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.18-0.0145), scale = scale * 1.8)
-                    else:
-                      font.render(unicode(Data.STAR2 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.2-0.0145), scale = scale * 1.8)
-                  elif score>0 and stars>=0 and name!="":
-                    glColor3f(1, 1, 1)
-                    # ShiekOdaSandz: Fixed stars so they display left to right, not right to left
-                    if self.extraStats:
-                      font.render(unicode(Data.STAR2 * stars+Data.STAR1 * (5 - stars)), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.18-0.0145), scale = scale * 1.8)
-                    else:
-                      font.render(unicode(Data.STAR2 * stars+Data.STAR1 * (5 - stars)), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.2-0.0145), scale = scale * 1.8)#ShiekOdaSandz: Fixed stars so they display left to right, not right to left
-                  #QQstarS: end of add
+
+                  starx = self.song_listscore_xpos+.018
+                  if self.extraStats:
+                    stary = .0935*(i+1)-pos[0]*.0935+.18-0.0145
+                  else:
+                    stary = .0935*(i+1)-pos[0]*.0935+.2-0.0145
+                  #stary = 0.5
+                  starscale = scale*1.8
+                  stary = 1.0 - (stary / self.engine.data.fontScreenBottom)
+                  self.engine.drawStarScore(screenw, screenh, starx, stary, stars, starscale) #MFH
+
+#-                  #QQstarS:add  to show stars
+#-                  # evilynux - Tweaked position to fit hit% and note streak
+#-                  #            Readjusted star size following font fix
+#-                  if stars == 7:
+#-                    glColor3f(.6, .6, .75)    #platinum-y? stars in RB theme
+#-                    if self.extraStats:
+#-                      font.render(unicode(Data.STAR2 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.18-0.0145), scale = scale * 1.8)
+#-                    else:
+#-                      font.render(unicode(Data.STAR2 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.2-0.0145), scale = scale * 1.8)
+#-                  if stars == 6:
+#-                    glColor3f(1, 1, 0)    #gold stars in RB theme
+#-                    if self.extraStats:
+#-                      font.render(unicode(Data.STAR2 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.18-0.0145), scale = scale * 1.8)
+#-                    else:
+#-                      font.render(unicode(Data.STAR2 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.2-0.0145), scale = scale * 1.8)
+#-                  elif score>0 and stars>=0 and name!="":
+#-                    glColor3f(1, 1, 1)
+#-                    # ShiekOdaSandz: Fixed stars so they display left to right, not right to left
+#-                    if self.extraStats:
+#-                      font.render(unicode(Data.STAR2 * stars+Data.STAR1 * (5 - stars)), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.18-0.0145), scale = scale * 1.8)
+#-                    else:
+#-                      font.render(unicode(Data.STAR2 * stars+Data.STAR1 * (5 - stars)), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.2-0.0145), scale = scale * 1.8)#ShiekOdaSandz: Fixed stars so they display left to right, not right to left
+#-                  #QQstarS: end of add
+
+
   
                   scale = 0.0014
                   # evilynux - score color
@@ -2906,17 +2944,28 @@ class SongChooser(Layer, KeyListener):
                         score, stars, name = "---", 0, "---"
                       #Theme.setBaseColor(1 - v)
                       lfont.render(unicode(d),     (x, y),           scale = scale)
-                      if stars == 6 and self.theme == 2:
-                        glColor3f(1, 1, 0)  
-                        lfont.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
-                      elif stars == 6:
-                        glColor3f(0, 1, 0)  
-                        lfont.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
-                      else:
-                        lfont.render(unicode(Data.STAR2 * stars + Data.STAR1 * (5 - stars)), (x, y + h), scale = scale * 1.8)
-                      #Theme.setSelectedColor(1 - v)
+
+
+                      starx = x
+                      #stary = y+h
+                      stary = y
+                      #stary = 0.5+h
+                      starscale = scale*1.8
+                      stary = 1.0 - (stary / self.engine.data.fontScreenBottom)
+                      self.engine.drawStarScore(screenw, screenh, starx, stary, stars, starscale) #MFH
+
+#-                      if stars == 6 and self.theme == 2:
+#-                        glColor3f(1, 1, 0)  
+#-                        lfont.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
+#-                      elif stars == 6:
+#-                        glColor3f(0, 1, 0)  
+#-                        lfont.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
+#-                      else:
+#-                        lfont.render(unicode(Data.STAR2 * stars + Data.STAR1 * (5 - stars)), (x, y + h), scale = scale * 1.8)
+#-                      #Theme.setSelectedColor(1 - v)
                       
                                       
+
                       c1,c2,c3 = self.songlistcd_score_color
                       glColor3f(c1,c2,c3)
                       if scores:
@@ -3114,21 +3163,30 @@ class SongChooser(Layer, KeyListener):
                       
                       font.render(unicode(d),     (x, y),           scale = scale)
                       
-                      if stars == 7 and self.theme == 2:
-                        glColor3f(.6, .6, .75)  
-                        font.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
-                      elif stars == 7:
-                        glColor3f(0, .75, 1)  
-                        font.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
-                      if stars == 6 and self.theme == 2:
-                        glColor3f(1, 1, 0)  
-                        font.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
-                      elif stars == 6:
-                        glColor3f(0, 1, 0)  
-                        font.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
-                      else:
-                        font.render(unicode(Data.STAR2 * stars + Data.STAR1 * (5 - stars)), (x, y + h), scale = scale * 1.8)
-                      #Theme.setSelectedColor(1 - v)
+
+                      starx = x
+                      #stary = y+h
+                      stary = y
+                      #stary = 0.5+h
+                      starscale = scale*1.8
+                      stary = 1.0 - (stary / self.engine.data.fontScreenBottom)
+                      self.engine.drawStarScore(screenw, screenh, starx, stary, stars, starscale) #MFH
+
+#-                      if stars == 7 and self.theme == 2:
+#-                        glColor3f(.6, .6, .75)  
+#-                        font.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
+#-                      elif stars == 7:
+#-                        glColor3f(0, .75, 1)  
+#-                        font.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
+#-                      if stars == 6 and self.theme == 2:
+#-                        glColor3f(1, 1, 0)  
+#-                        font.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
+#-                      elif stars == 6:
+#-                        glColor3f(0, 1, 0)  
+#-                        font.render(unicode(Data.STAR2 * (stars -1)), (x, y + h), scale = scale * 1.8)
+#-                      else:
+#-                        font.render(unicode(Data.STAR2 * stars + Data.STAR1 * (5 - stars)), (x, y + h), scale = scale * 1.8)
+#-                      #Theme.setSelectedColor(1 - v)
                       
                                       
                       c1,c2,c3 = self.songlistcd_score_color

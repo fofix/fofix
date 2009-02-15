@@ -431,7 +431,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.hFontOffset = []
     self.stage.wFull = self.wFull   #MFH - needed for new stage background handling
     self.stage.hFull = self.hFull
-    self.fontScreenBottom = 0.75      #from our current viewport's constant 3:4 aspect ratio (which is always stretched to fill the video resolution)
+    #self.fontScreenBottom = 0.75      #from our current viewport's constant 3:4 aspect ratio (which is always stretched to fill the video resolution)
+    self.fontScreenBottom = self.engine.data.fontScreenBottom
     
     
     for i, thePlayer in enumerate(self.playerList):

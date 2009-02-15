@@ -763,9 +763,16 @@ class GameEngine(Engine):
     return self.data.loadImgDrawing(target, name, fileName, textureSize)
 
   #MFH
-  def drawStarScore(self, screenwidth, screenheight, xpos, ypos, stars, scale, horiz_spacing = 1.0, space = 1.0):
+  def drawStarScore(self, screenwidth, screenheight, xpos, ypos, stars, scale = None, horiz_spacing = None, space = 1.0):
+    minScale = 0.10
     w = screenwidth
     h = screenheight
+    if not scale:
+      scale = minScale
+    elif scale < minScale:
+      scale = minScale
+    if not horiz_spacing:   #MFH - auto-space to with scaling figured
+      horiz_spacing = 1.6 * scale
     if stars > 5:
       for j in range(5):
         if self.data.fcStars and stars == 7:

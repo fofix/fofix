@@ -113,6 +113,9 @@ class Data(object):
       if self.fileExists(os.path.join("themes",themename,"coop_rockmeter.png")):
         self.themeCoOp = True
 
+    self.fontScreenBottom = 0.75      #from our current viewport's constant 3:4 aspect ratio (which is always stretched to fill the video resolution)
+
+
     #myfingershurt: multi-OS compatibility file access fixes using os.path.join()
     # load font customization images
 
