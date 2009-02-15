@@ -1116,15 +1116,15 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       text = _("%s High Scores for %s") % (self.scorePart, Dialogs.removeSongOrderPrefixFromName(self.song.info.name))
     else:
       text = _("%s High Scores") % self.scorePart
-    w, h = font.getStringSize(text)
+    w1, h1 = font.getStringSize(text)
     
     Theme.setBaseColor(1 - v)
-    font.render(text, (.5 - w / 2, .01 - v + self.offset))
+    font.render(text, (.5 - w1 / 2, .01 - v + self.offset))
     
     text = _("Difficulty: %s") % (self.scoreDifficulty)
-    w, h = font.getStringSize(text)
+    w1, h1 = font.getStringSize(text)
     Theme.setBaseColor(1 - v)
-    font.render(text, (.5 - w / 2, .01 - v + h + self.offset))
+    font.render(text, (.5 - w1 / 2, .01 - v + h1 + self.offset))
     
     x = .01
     y = .16 + v
@@ -1141,14 +1141,6 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           handicap = 0
           handicapLong = "None"
           originalScore = score
-        if stars == 7: #akedrou
-          stars = 5
-          perfect = 2
-        if stars == 6:
-          stars = 5
-          perfect = 1
-        else:
-          perfect = 0
         for j,player in enumerate(self.playerList):
           if (self.time % 10.0) < 5.0 and i == self.highscoreIndex[j] and self.scoreDifficulty == player.difficulty and self.scorePart == player.part:
             Theme.setSelectedColor(1 - v)
@@ -1165,15 +1157,10 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         w2, h2 = font.getStringSize(options, scale = scale / 2)
         font.render(unicode(options), (.6 - w2, y + self.offset),   scale = scale / 2)
         # evilynux - Fixed star size following Font render bugfix
-        if perfect == 2: #akedrou - 7-star (FC) support
-          glColor3f(0, .5, 1) # these should be customizable.
-        elif perfect == 1 and self.theme == 2:
-          glColor3f(1, 1, 0) #racer: perfect is now gold for rock band
-        elif perfect == 1 and self.theme < 2:
-          glColor3f(0, 1, 0) #racer: perfect is green for any non-RB theme
+        # akedrou  - Fixed stars to render as stars after custom glyph removal... ...beautiful yPos
+        #font.render(unicode(Data.STAR2 * stars + Data.STAR1 * (5 - stars)), (x + .6, y + self.offset), scale = scale * 1.8)
+        self.engine.drawStarScore(w, h, x+.6, 1.0-((y+self.offset+h2)/self.engine.data.fontScreenBottom), stars, scale * 30)
 
-        #MFH - TODO - render scrolling highscores with real stars instead of these hacky colored text asterisks
-        font.render(unicode(Data.STAR2 * stars + Data.STAR1 * (5 - stars)), (x + .6, y + self.offset), scale = scale * 1.8)
         for j,player in enumerate(self.playerList):
           if (self.time % 10.0) < 5.0 and i == self.highscoreIndex[j] and self.scoreDifficulty == player.difficulty and self.scorePart == player.part:
             Theme.setSelectedColor(1 - v)
@@ -1181,7 +1168,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           else:
             Theme.setBaseColor(1 - v)
         font.render(name, (x + .8, y + self.offset), scale = scale)
-        y += h
+        y += h1
         endScroll -= .07
       
       if self.offset < endScroll or i == -1:

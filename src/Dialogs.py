@@ -1948,9 +1948,9 @@ class SongChooser(Layer, KeyListener):
                 #stary = y+h
                 stary = y
                 #stary = 0.5+h
-                starscale = scale*1.8
-                stary = 1.0 - (stary / self.engine.data.fontScreenBottom)
-                self.engine.drawStarScore(screenw, screenh, x, stary, stars, starscale) #MFH
+                starscale = scale*1.4
+                stary = 1.0 - (stary / self.engine.data.fontScreenBottom) - h/1.5
+                self.engine.drawStarScore(screenw, screenh, x, stary, stars, starscale, hqStar = True) #MFH
 
 #-                # evilynux - Fixed star size following Font render bugfix
 #-                if stars == 7: #akedrou
@@ -2224,6 +2224,8 @@ class SongChooser(Layer, KeyListener):
                   
                   # evilynux - automatically scale artist name and year
                   scale = font.scaleText(text, maxwidth = 0.440, scale = scale)
+                  if scale > .0014:
+                    scale = .0014
                   w, h = font.getStringSize(text, scale = scale)
 
                   lfont.render(text, (self.song_list_xpos+.05, .0935*(i+1)-pos[0]*.0935+.2), scale=scale)
@@ -2294,9 +2296,9 @@ class SongChooser(Layer, KeyListener):
                   else:
                     stary = .0935*(i+1)-pos[0]*.0935+.2-0.034
                   #stary = 0.5
-                  starscale = scale*2.0
-                  stary = 1.0 - (stary / self.engine.data.fontScreenBottom)
-                  self.engine.drawStarScore(screenw, screenh, starx, stary, stars, starscale) #MFH
+                  starscale = scale * 1.2
+                  stary = 1.0 - (stary / self.engine.data.fontScreenBottom) - h/1.5
+                  self.engine.drawStarScore(screenw, screenh, starx, stary, stars, starscale, hqStar = True) #MFH
 
 #-                  #QQstarS:add  to show stars
 #-                  if stars == 7:

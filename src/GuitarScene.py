@@ -5184,16 +5184,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
       #Theme.setBaseColor()
 
-      #MFH: render the note sheet just on top of the background:
-      if self.lyricSheet != None:
-        self.engine.drawImage(self.lyricSheet, scale = (self.lyricSheetScaleFactor,-self.lyricSheetScaleFactor), coord = (w/2, h*0.935))
-        #the timing line on this lyric sheet image is approx. 1/4 over from the left
-  
       SceneClient.render(self, visibility, topMost) #MFH - I believe this eventually calls the renderGuitar function, which also involves two viewports... may not be easy to move this one...
         
       self.visibility = v = 1.0 - ((1 - visibility) ** 2)
   
       self.engine.view.setOrthogonalProjection(normalize = True)
+
+      #MFH: render the note sheet just on top of the background:
+      if self.lyricSheet != None:
+        self.engine.drawImage(self.lyricSheet, scale = (self.lyricSheetScaleFactor,-self.lyricSheetScaleFactor), coord = (w/2, h*0.935))
+        #the timing line on this lyric sheet image is approx. 1/4 over from the left
   
       #MFH - also render the scrolling lyrics & sections before changing viewports:
       minPos = pos - ((self.guitars[0].currentPeriod * self.guitars[0].beatsPerBoard) / 2)
