@@ -142,9 +142,9 @@ class Data(object):
       self.perfectStars = True
       self.maskStars = False
     else:
-      self.loadImgDrawing(self, "starPerfect", os.path.join("themes",themename,"star2.png"), textureSize = (128,128))
+      self.starPerfect = self.star2
       self.fcStars   = False
-      self.starFC     = None
+      self.starFC     = self.star2
       self.maskStars = True
       self.perfectStars = False
 
@@ -155,7 +155,7 @@ class Data(object):
         self.fcStars   = True
       else:
         #self.starFC = None
-        self.loadImgDrawing(self, "starFC",   os.path.join("themes",themename,"star2.png"), textureSize = (128, 128))
+        self.starFC = self.starPerfect
         self.fcStars = False
       
     #self.loadImgDrawing(self, "left",    "left.png",  textureSize = (128, 128))
