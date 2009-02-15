@@ -28,7 +28,6 @@ import Theme
 import os
 import random   #MFH - needed for new stage background handling
 from Language import _
-import View
 
 class Layer(object):
   """
@@ -59,7 +58,7 @@ class Layer(object):
     @param visibility:  Floating point visibility factor (1 = opaque, 0 = invisibile)
     """
     w, h, = self.stage.engine.view.geometry[2:4]
-    v = 1.0 - visibility ** 2
+    v = 1.0
     self.drawing.transform.reset()
     self.drawing.transform.translate(w / 2, h / 2)
     if v > .01:
@@ -234,8 +233,9 @@ class Stage(object):
     self.foregroundLayers = []
     self.textures         = {}
     self.reset()
-
-    self.wFull, self.hFull = self.engine.view.geometry[2:4]    
+    
+    self.wFull = None   #MFH - needed for new stage background handling
+    self.hFull = None
     
     # evilynux - imported myfingershurt stuff from GuitarScene
     self.mode = self.engine.config.get("game", "stage_mode")
@@ -267,6 +267,14 @@ class Stage(object):
 
     self.config.read(configFileName)
 
+    # evilynux - Improved stage error handling
+    self.themename = self.engine.data.themeLabel
+    self.path = os.path.join("themes",self.themename,"stages")
+    self.pathfull = self.engine.getPath(self.path)
+    if not os.path.exists(self.pathfull): # evilynux
+      Log.warn("Stage folder does not exist: %s" % self.pathfull)
+      self.mode = 1 # Fallback to song-specific stage
+
     # Build the layers
     for i in range(32):
       section = "layer%d" % i
@@ -283,7 +291,7 @@ class Stage(object):
         try:
           drawing = self.textures[texture]
         except KeyError:
-          drawing = self.engine.loadSvgDrawing(self, None, texture, textureSize = (xres, yres))
+          drawing = self.engine.loadImgDrawing(self, None, os.path.join("themes", self.themename, texture), textureSize = (xres, yres))
           self.textures[texture] = drawing
           
         layer = Layer(self, drawing)
@@ -321,14 +329,6 @@ class Stage(object):
           self.foregroundLayers.append(layer)
         else:
           self.backgroundLayers.append(layer)
-
-    # evilynux - Improved stage error handling
-    self.themename = self.engine.data.themeLabel
-    self.path = os.path.join("themes",self.themename,"stages")
-    self.pathfull = self.engine.getPath(self.path)
-    if not os.path.exists(self.pathfull): # evilynux
-      Log.warn("Stage folder does not exist: %s" % self.pathfull)
-      self.mode = 1 # Fallback to song-specific stage
 
   def load(self, libraryName, songName, practiceMode = False):
     # evilynux - Fixes a self.background not defined crash
@@ -445,7 +445,6 @@ class Stage(object):
           imgwidth = self.backgroundA.width1()
           wfactor = 640.000/imgwidth
           self.imgArr.append(getattr(self, "backgroundA", os.path.join(self.path, files[j])))
-          #self.imgArr.append([getattr(self, "backgroundA", os.path.join(self.path, files[j])),wfactor])
           self.imgArrScaleFactors.append(wfactor)
 
     if self.mode != 2 and self.background:   #MFH - precalculating scale factor
@@ -552,4 +551,3 @@ class Stage(object):
     self._renderLayers(self.backgroundLayers, visibility)
     self.scene.renderGuitar()
     self._renderLayers(self.foregroundLayers, visibility)
-

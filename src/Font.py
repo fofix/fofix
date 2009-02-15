@@ -24,8 +24,6 @@
 import pygame
 from OpenGL.GL import *
 import sys
-if not sys.version.startswith("2.4"):
-  import numpy
 from Texture import Texture, TextureAtlas, TextureAtlasFullException
 
 DEFAULT_SCALE = 0.002
