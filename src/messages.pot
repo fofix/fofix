@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-02-14 11:17-0800\n"
+"POT-Creation-Date: 2009-02-14 16:29-0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -156,7 +156,7 @@ msgstr ""
 msgid "Copyright 2008, 2009 by Team FoFiX"
 msgstr ""
 
-#: Data.py:150
+#: Data.py:176
 msgid "__lefttoright__"
 msgstr ""
 
@@ -2158,75 +2158,75 @@ msgstr ""
 msgid "Tightest"
 msgstr ""
 
-#: GameResultsScene.py:365
+#: GameResultsScene.py:360
 msgid "Relax, it was an excellent show."
 msgstr ""
 
-#: GameResultsScene.py:367
+#: GameResultsScene.py:362
 msgid "Truly Amazing!"
 msgstr ""
 
-#: GameResultsScene.py:369
+#: GameResultsScene.py:364
 msgid "Thanks for playing!"
 msgstr ""
 
-#: GameResultsScene.py:371
+#: GameResultsScene.py:366
 msgid "One more song can't hurt!"
 msgstr ""
 
-#: GameResultsScene.py:373
+#: GameResultsScene.py:368
 msgid "What an amazing performance!"
 msgstr ""
 
-#: GameResultsScene.py:375
+#: GameResultsScene.py:370
 msgid "That's how it's done!"
 msgstr ""
 
-#: GameResultsScene.py:556
+#: GameResultsScene.py:551
 #, python-format
 msgid "%d points is a new high score! Enter your name:"
 msgstr ""
 
-#: GameResultsScene.py:1103
+#: GameResultsScene.py:1116
 #, python-format
 msgid "%s High Scores for %s"
 msgstr ""
 
-#: GameResultsScene.py:1105
+#: GameResultsScene.py:1118
 #, python-format
 msgid "%s High Scores"
 msgstr ""
 
-#: GameResultsScene.py:1111
+#: GameResultsScene.py:1124
 #, python-format
 msgid "Difficulty: %s"
 msgstr ""
 
-#: GameResultsScene.py:1183
+#: GameResultsScene.py:1198
 msgid "Uploading Scores..."
 msgstr ""
 
-#: GameResultsScene.py:1188
+#: GameResultsScene.py:1203
 msgid "Scores uploaded!"
 msgstr ""
 
-#: GameResultsScene.py:1192
+#: GameResultsScene.py:1207
 msgid "Your highscore ranks"
 msgstr ""
 
-#: GameResultsScene.py:1193
+#: GameResultsScene.py:1208
 msgid "on the world starpower chart!"
 msgstr ""
 
-#: GameResultsScene.py:1196
+#: GameResultsScene.py:1211
 msgid "but your rank is unknown."
 msgstr ""
 
-#: GameResultsScene.py:1199
+#: GameResultsScene.py:1214
 msgid "but there was no new highscore."
 msgstr ""
 
-#: GameResultsScene.py:1202
+#: GameResultsScene.py:1217
 msgid "Score upload failed!  World charts may be down."
 msgstr ""
 

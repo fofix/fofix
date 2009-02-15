@@ -135,7 +135,13 @@ class Music(object):
     pygame.mixer.music.fadeout(time)
 
   def isPlaying(self):
-    return pygame.mixer.music.get_busy()
+    #MFH - gotta catch case when mixer not initialized yet...
+    try:
+      busy = pygame.mixer.music.get_busy()
+    except Exception, e:
+      busy = True      
+    #return pygame.mixer.music.get_busy()
+    return busy
 
   def getPosition(self):
     return pygame.mixer.music.get_pos()

@@ -283,8 +283,6 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         self.p1ProgressKeys = self.progressKeys
         self.p2ProgressKeys = self.progressKeys
     
-    self.maskStars = False
-    self.fcStars   = True
     self.part = [None for i in self.playerList]
     self.partImage = True
     if self.coOpType > 0:
@@ -294,20 +292,17 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "gameresults.png"))
     else:
       self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "gameresults.png"))
-    self.engine.loadImgDrawing(self, "star1", os.path.join("themes",themename,"star1.png"))
-    self.engine.loadImgDrawing(self, "star2", os.path.join("themes",themename,"star2.png"))
-    try:
-      self.engine.loadImgDrawing(self, "starPerfect", os.path.join("themes",themename,"starperfect.png"))
-      try:
-        self.engine.loadImgDrawing(self, "starFC", os.path.join("themes",themename,"starfc.png"))
-      except IOError:
-        self.starFC = None
-        self.fcStars = False
-    except IOError:
-      self.engine.loadImgDrawing(self, "starPerfect", os.path.join("themes",themename,"star2.png"))
-      self.starFC     = None
-      self.fcStars   = False
-      self.maskStars = True
+
+    #MFH - moved all star images to Data.py, alter all references accordingly:
+    #self.star1 = self.engine.data.star1
+    #self.star2 = self.engine.data.star2
+    #self.star3 = self.engine.data.star3
+    #self.star4 = self.engine.data.star4
+    #self.starPerfect = self.engine.data.starPerfect
+    #self.starFC = self.engine.data.starFC
+    #self.fcStars = self.engine.data.fcStars
+    #self.maskStars = self.engine.data.maskStars
+    
     if self.coOpType > 0:
       for i, score in enumerate(self.coOpScoring):
         if not self.partImage:
@@ -804,38 +799,50 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           space = self.space[i]
         else:
           space = 1
-        
+
         scale = float(Theme.result_star[2])
         if scale < .1:
           scale = .25
-        if scoreCard.stars > 5:
-          for j in range(5):
-            if self.fcStars and scoreCard.stars == 7:
-              star = self.starFC
-            else:
-              star = self.starPerfect
-            try:
-              wide = star.width1()*float(Theme.result_star[3])
-            except IndexError:
-              wide = star.width1()*.5
-            if self.maskStars:
-              if self.theme == 2:
-                self.engine.drawImage(star, scale = (scale,-scale), coord = (((w*Theme.result_star[0])+wide*j)*space**4,h*float(Theme.result_star[1])), color = (1, 1, 0, 1))
-              else:
-                self.engine.drawImage(star, scale = (scale,-scale), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])), color = (0, 1, 0, 1))
-            else:
-              self.engine.drawImage(star, scale = (scale,-scale), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])))
-        else:
-          for j in range(5):
-            if j < scoreCard.stars:
-              star = self.star2
-            else:
-              star = self.star1
-            try:
-              wide = star.width1()*float(Theme.result_star[3])
-            except IndexError:
-              wide = star.width1()*.5
-            self.engine.drawImage(star, scale = (scale,-scale), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])))
+        
+
+        #MFH - TODO - migrate this positionable, scalable, spacable star score display logic into a GameEngine function like drawImage
+        #new code using drawStarScore:
+        try:
+          hspacing = float(Theme.result_star[3])
+        except IndexError:
+          hspacing = 0.5
+        self.engine.drawStarScore(w, h, float(Theme.result_star[0]), float(Theme.result_star[1]), scoreCard.stars, scale, horiz_spacing = hspacing, space = space)
+        
+#-        if scoreCard.stars > 5:
+#-          for j in range(5):
+#-            if self.fcStars and scoreCard.stars == 7:
+#-              star = self.starFC
+#-            else:
+#-              star = self.starPerfect
+#-            try:
+#-              wide = star.width1()*float(Theme.result_star[3])
+#-            except IndexError:
+#-              wide = star.width1()*.5
+#-            if self.maskStars:
+#-              if self.theme == 2:
+#-                self.engine.drawImage(star, scale = (scale,-scale), coord = (((w*Theme.result_star[0])+wide*j)*space**4,h*float(Theme.result_star[1])), color = (1, 1, 0, 1))
+#-              else:
+#-                self.engine.drawImage(star, scale = (scale,-scale), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])), color = (0, 1, 0, 1))
+#-            else:
+#-              self.engine.drawImage(star, scale = (scale,-scale), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])))
+#-        else:
+#-          for j in range(5):
+#-            if j < scoreCard.stars:
+#-              star = self.star2
+#-            else:
+#-              star = self.star1
+#-            try:
+#-              wide = star.width1()*float(Theme.result_star[3])
+#-            except IndexError:
+#-              wide = star.width1()*.5
+#-            self.engine.drawImage(star, scale = (scale,-scale), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])))
+
+
         
         settingsText = "%s %s - %s: %s / %s, %s: %s" % (self.engine.versionString, self.tsSettings, self.tsHopos, self.hopoStyle, self.hopoFreq, self.tsHitWindow, self.hitWindow)
         settingsScale = 0.0012
@@ -929,34 +936,40 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       else:
         space = 1
       
-      if scoreCard.stars > 5:
-        for j in range(5):
-          if self.fcStars and scoreCard.stars == 7:
-            star = self.starFC
-          else:
-            star = self.starPerfect
-          try:
-            wide = star.width1()*float(Theme.result_star[3])
-          except IndexError:
-            wide = star.width1()*.5
-          if self.maskStars:
-            if self.theme == 2:
-              self.engine.drawImage(star, scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (((w*Theme.result_star[0])+wide*j)*space**4,h*float(Theme.result_star[1])), color = (1, 1, 0, 1))
-            else:
-              self.engine.drawImage(star, scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])), color = (0, 1, 0, 1))
-          else:
-            self.engine.drawImage(star, scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])))
-      else:
-        for j in range(5):
-          if j < scoreCard.stars:
-            star = self.star2
-          else:
-            star = self.star1
-          try:
-            wide = star.width1()*float(Theme.result_star[3])
-          except IndexError:
-            wide = star.width1()*.5
-          self.engine.drawImage(star, scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])))
+      try:
+        hspacing = float(Theme.result_star[3])
+      except IndexError:
+        hspacing = 0.5
+      self.engine.drawStarScore(w, h, float(Theme.result_star[0]), float(Theme.result_star[1]), scoreCard.stars, scale, horiz_spacing = hspacing, space = space)
+
+#-      if scoreCard.stars > 5:
+#-        for j in range(5):
+#-          if self.fcStars and scoreCard.stars == 7:
+#-            star = self.starFC
+#-          else:
+#-            star = self.starPerfect
+#-          try:
+#-            wide = star.width1()*float(Theme.result_star[3])
+#-          except IndexError:
+#-            wide = star.width1()*.5
+#-          if self.maskStars:
+#-            if self.theme == 2:
+#-              self.engine.drawImage(star, scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (((w*Theme.result_star[0])+wide*j)*space**4,h*float(Theme.result_star[1])), color = (1, 1, 0, 1))
+#-            else:
+#-              self.engine.drawImage(star, scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])), color = (0, 1, 0, 1))
+#-          else:
+#-            self.engine.drawImage(star, scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])))
+#-      else:
+#-        for j in range(5):
+#-          if j < scoreCard.stars:
+#-            star = self.star2
+#-          else:
+#-            star = self.star1
+#-          try:
+#-            wide = star.width1()*float(Theme.result_star[3])
+#-          except IndexError:
+#-            wide = star.width1()*.5
+#-          self.engine.drawImage(star, scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])))
       
       settingsText = "%s %s - %s: %s / %s, %s: %s" % (self.engine.versionString, self.tsSettings, self.tsHopos, self.hopoStyle, self.hopoFreq, self.tsHitWindow, self.hitWindow)
       settingsScale = 0.0012
@@ -1158,6 +1171,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           glColor3f(1, 1, 0) #racer: perfect is now gold for rock band
         elif perfect == 1 and self.theme < 2:
           glColor3f(0, 1, 0) #racer: perfect is green for any non-RB theme
+
+        #MFH - TODO - render scrolling highscores with real stars instead of these hacky colored text asterisks
         font.render(unicode(Data.STAR2 * stars + Data.STAR1 * (5 - stars)), (x + .6, y + self.offset), scale = scale * 1.8)
         for j,player in enumerate(self.playerList):
           if (self.time % 10.0) < 5.0 and i == self.highscoreIndex[j] and self.scoreDifficulty == player.difficulty and self.scorePart == player.part:

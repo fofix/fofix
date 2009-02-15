@@ -119,18 +119,44 @@ class Data(object):
     #Worldrave - Use new defined Star3 and star4. Using star1 and star2 as a fallback.
 
     #MFH - no more custom glyphs, these are wasting memory.
-#-    self.loadImgDrawing(self, "star1",   os.path.join("themes",themename,"star1.png"), textureSize = (128, 128))
-#-    self.loadImgDrawing(self, "star2",   os.path.join("themes",themename,"star2.png"), textureSize = (128, 128))
-#-    try:
-#-      self.loadImgDrawing(self, "star3",   os.path.join("themes",themename,"star3.png"), textureSize = (128, 128))
-#-      self.loadImgDrawing(self, "star4",   os.path.join("themes",themename,"star4.png"), textureSize = (128, 128))
-#-    except IOError:
-#-      self.loadImgDrawing(self, "star3",   os.path.join("themes",themename,"star1.png"), textureSize = (128, 128))
-#-      self.loadImgDrawing(self, "star4",   os.path.join("themes",themename,"star2.png"), textureSize = (128, 128))
-#-
-#- 
-#-    self.loadImgDrawing(self, "left",    "left.png",  textureSize = (128, 128))
-#-    self.loadImgDrawing(self, "right",   "right.png", textureSize = (128, 128))
+    #MFH - but we do need these star1-4 images anyway.  Leaving them loaded here in the Data object.
+    self.loadImgDrawing(self, "star1",   os.path.join("themes",themename,"star1.png"), textureSize = (128, 128))
+    self.loadImgDrawing(self, "star2",   os.path.join("themes",themename,"star2.png"), textureSize = (128, 128))
+    
+    #MFH - let's not rely on errors here if we don't have to...
+    if self.fileExists(os.path.join("themes",themename,"star3.png")):
+      self.loadImgDrawing(self, "star3",   os.path.join("themes",themename,"star3.png"), textureSize = (128, 128))
+    else:
+      self.star3 = self.star1
+    if self.fileExists(os.path.join("themes",themename,"star4.png")):
+      self.loadImgDrawing(self, "star4",   os.path.join("themes",themename,"star4.png"), textureSize = (128, 128))
+    else:
+      self.star4 = self.star2
+      
+
+    if self.fileExists(os.path.join("themes",themename,"starperfect.png")):
+      self.loadImgDrawing(self, "starPerfect",   os.path.join("themes",themename,"starperfect.png"), textureSize = (128, 128))
+      self.perfectStars = True
+      self.maskStars = False
+    else:
+      self.loadImgDrawing(self, "starPerfect", os.path.join("themes",themename,"star2.png"), textureSize = (128,128))
+      self.fcStars   = False
+      self.starFC     = None
+      self.maskStars = True
+      self.perfectStars = False
+
+    #self.perfectStars = False
+    if self.perfectStars:
+      if self.fileExists(os.path.join("themes",themename,"starfc.png")):
+        self.loadImgDrawing(self, "starFC",   os.path.join("themes",themename,"starfc.png"), textureSize = (128, 128))
+        self.fcStars   = True
+      else:
+        #self.starFC = None
+        self.loadImgDrawing(self, "starFC",   os.path.join("themes",themename,"star2.png"), textureSize = (128, 128))
+        self.fcStars = False
+      
+    #self.loadImgDrawing(self, "left",    "left.png",  textureSize = (128, 128))
+    #self.loadImgDrawing(self, "right",   "right.png", textureSize = (128, 128))
 
     # load misc images
     self.loadImgDrawing(self, "loadingImage", os.path.join("themes",themename,"loadingbg.png"), textureSize = (256,256))

@@ -762,6 +762,35 @@ class GameEngine(Engine):
     """
     return self.data.loadImgDrawing(target, name, fileName, textureSize)
 
+  #MFH
+  def drawStarScore(self, screenwidth, screenheight, xpos, ypos, stars, scale, horiz_spacing = 1.0, space = 1.0):
+    w = screenwidth
+    h = screenheight
+    if stars > 5:
+      for j in range(5):
+        if self.data.fcStars and stars == 7:
+          star = self.data.starFC
+        else:
+          star = self.data.starPerfect
+        wide = star.width1()*horiz_spacing
+        if self.data.maskStars:
+          if self.data.theme == 2:
+            self.drawImage(star, scale = (scale,-scale), coord = (((w*xpos)+wide*j)*space**4,h*ypos), color = (1, 1, 0, 1))
+          else:
+            self.drawImage(star, scale = (scale,-scale), coord = (((w*xpos)+wide*j)*space**4,h*ypos), color = (0, 1, 0, 1))
+        else:
+          self.drawImage(star, scale = (scale,-scale), coord = (((w*xpos)+wide*j)*space**4,h*ypos))
+    else:
+      for j in range(5):
+        if j < stars:
+          star = self.data.star2
+        else:
+          star = self.data.star1
+        wide = star.width1()*horiz_spacing
+        self.drawImage(star, scale = (scale,-scale), coord = (((w*xpos)+wide*j)*space**4,h*ypos))
+
+
+
   def drawImage(self, image, scale, coord, rot = 0, color = (1,1,1,1), rect = (0,1,0,1)):
     
     image.transform.reset()
