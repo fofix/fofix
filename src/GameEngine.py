@@ -765,6 +765,8 @@ class GameEngine(Engine):
   #MFH
   def drawStarScore(self, screenwidth, screenheight, xpos, ypos, stars, scale = None, horiz_spacing = None, space = 1.0):
     minScale = 0.10
+    autoSpacingScaleFactor = 1.6
+    inGameStarScaleFactor = 0.34  #MFH - a bit hacky, but it corrects for size difference in perfectStars for now
     w = screenwidth
     h = screenheight
     if not scale:
@@ -772,21 +774,24 @@ class GameEngine(Engine):
     elif scale < minScale:
       scale = minScale
     if not horiz_spacing:   #MFH - auto-space to with scaling figured
-      horiz_spacing = 1.6 * scale
+      horiz_spacing = autoSpacingScaleFactor * scale
     if stars > 5:
+      inGameStarScale = inGameStarScaleFactor*scale   #MFH - a bit hacky, but it corrects for size difference in perfectStars for now
+      inGameStarSpacing = inGameStarScaleFactor*horiz_spacing    #MFH - a bit hacky, but it corrects for size difference in perfectStars for now
       for j in range(5):
         if self.data.fcStars and stars == 7:
           star = self.data.starFC
         else:
           star = self.data.starPerfect
         wide = star.width1()*horiz_spacing
+        inGameStarWide = star.width1()*inGameStarSpacing
         if self.data.maskStars:
           if self.data.theme == 2:
             self.drawImage(star, scale = (scale,-scale), coord = (((w*xpos)+wide*j)*space**4,h*ypos), color = (1, 1, 0, 1))
           else:
             self.drawImage(star, scale = (scale,-scale), coord = (((w*xpos)+wide*j)*space**4,h*ypos), color = (0, 1, 0, 1))
         else:
-          self.drawImage(star, scale = (scale,-scale), coord = (((w*xpos)+wide*j)*space**4,h*ypos))
+          self.drawImage(star, scale = (inGameStarScale,-inGameStarScale), coord = (((w*xpos)+inGameStarWide*j)*space**4,h*ypos))
     else:
       for j in range(5):
         if j < stars:
