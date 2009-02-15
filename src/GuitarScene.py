@@ -196,7 +196,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #for number formatting with commas for Rock Band:
     locale.setlocale(locale.LC_ALL, '')   #more compatible
     
-    self.visibility       = 0.0
+    self.visibility       = 1.0
     self.libraryName      = libraryName
     self.songName         = songName
     self.done             = False
@@ -5183,9 +5183,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
       #Theme.setBaseColor()
 
-
-      self.stage.renderBackground()
-
       #MFH: render the note sheet just on top of the background:
       if self.lyricSheet != None:
         self.engine.drawImage(self.lyricSheet, scale = (self.lyricSheetScaleFactor,-self.lyricSheetScaleFactor), coord = (w/2, h*0.935))
@@ -7230,10 +7227,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               if self.guitars[i].isBassGuitar and multStreak >= 40 and self.bassGrooveEnabled:   #bass groove!
                 if self.bassgroovemult != None: #death_au : bassgroovemult image found, draw image
                       
-                  self.bassgroovemult.transform.reset()
-                  self.bassgroovemult.transform.scale(.5,-.125) #MFH division->constant: was (.5,-.5/4.0)
-                  self.bassgroovemult.transform.translate(w*0.134,h*0.19 + self.hOffset[i]) #QQstarS:Set  new postion. I only shown it once.
-                  self.bassgroovemult.draw(rect = (0,1,multRange[0],multRange[1]))
+                  self.engine.drawImage(self.bassgroovemult, scale = (.5,-.125), coord = (w*0.134,h*0.19 + self.hOffset[i]),
+                                        rect = (0,1,multRange[0],multRange[1]))
                 
                 else: #death_au: bassgroovemult not found
                   #myfingershurt: Temp text bass groove multiplier:
@@ -7244,13 +7239,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
   
               else:
-                self.mult.transform.reset()
-                self.mult.transform.scale(.5,-.0625) #MFH division->constant: was (.5,-.5/8.0)
                 if self.numOfPlayers > 1:
-                  self.mult.transform.translate(w*0.752,h*0.397)
+                  multcoord = (w*0.752,h*0.397)
                 else:
-                  self.mult.transform.translate(w*0.674,h*0.397 + self.hOffset[i])
-                self.mult.draw(rect = (0,1,multRange[0],multRange[1]))
+                  multcoord = (w*0.674,h*0.397 + self.hOffset[i])
+                self.engine.drawImage(self.mult, scale = (.5,-.0625), coord = multcoord, rect = (0,1,multRange[0],multRange[1]))
   
               if multStreak == 0:
                 streak = 0
@@ -7302,18 +7295,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   
 
                 if self.halfDots:
-                  r.transform.reset()
-                  r.transform.scale(0.125,-.166666667) #MFH division->constant: was (.5*(1.0/4.0),-.5*(1.0/3.0))
                   if self.numOfPlayers > 1:
-                    r.transform.translate(w*.777+t*(w*-.0129),h*.256+t*(h*.026))
+                    rcoord = transform.translate(w*.777+t*(w*-.0129),h*.256+t*(h*.026))
                   else:
-                    r.transform.translate(w*.701+t*(w*-.0106),h*.256+t*(h*.026))
-                  r.draw(rect = (xs[0],xs[1],ys[0],ys[1]))
+                    rcoord = (w*.701+t*(w*-.0106),h*.256+t*(h*.026))
+                  self.engine.drawImage(r, scale = (0.125,-.166666667), coord = rcoord,
+                                        rect = (xs[0],xs[1],ys[0],ys[1]))
                 else:
-                  r.transform.reset()
-                  r.transform.scale(.5,-.166666667) #MFH division->constant: was (.5,-.5*(1.0/3.0))
-                  r.transform.translate(w*.044,h*.12+t*(h*.034) + self.hOffset[i])
-                  r.draw(color = color, rect = (0.0,1.0,ys[0],ys[1]))
+                  self.engine.drawImage(r, scale = (.5,-.166666667), coord = (w*.044,h*.12+t*(h*.034) + self.hOffset[i]),
+                                        color = color, rect = (0.0,1.0,ys[0],ys[1]))
   
     
               if self.x1[i] == 0: #QQstarS:Set [0] to [i]
@@ -7376,83 +7366,63 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   lightVis = self.guitars[i].starPower/16.6
     
                 wfactor = self.SP.widthf(pixelw = 23.000) #Worldrave Change - Bulb 1
-                self.SP.transform.reset()
-                self.SP.transform.rotate(.87)  #Worldrave Change
-                self.SP.transform.scale(wfactor,-wfactor*3)
-                self.SP.transform.translate(w*.036,h*.487 + self.hOffset[i]) #Worldrave Width and Height was h*0.310
-                self.SP.draw(rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
-                self.SP.transform.reset()
-                self.SP.transform.rotate(.87) #Worldrave Change
-                self.SP.transform.scale(wfactor,-wfactor*3)
-                self.SP.transform.translate(w*.036, h*.487 + self.hOffset[i]) #Worldrave Change
-                self.SP.draw(rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
+                spscale = (wfactor,-wfactor*3)
+                
+                sprot = .87
+                
+                self.engine.drawImage(self.SP, scale = spscale, coord = (w*.036,h*.487 + self.hOffset[i]), rot = sprot,
+                                      rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
+                self.engine.drawImage(self.SP, scale = spscale, coord = (w*.036,h*.487 + self.hOffset[i]), rot = sprot,
+                                      rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
+                
       
                 if self.guitars[i].starPower >= 33.2: #QQstarS:Set [0] to [i]
                   lightVis = 1
                 else:
                   lightVis = (self.guitars[i].starPower-16.6)/16.6
-                wfactor = self.SP.widthf(pixelw = 23.000) #Worldrave Change - Bulb 2
-                self.SP.transform.reset()
-                self.SP.transform.rotate(.58)  #Worldrave Change
-                self.SP.transform.scale(wfactor,-wfactor*3)
-                self.SP.transform.translate(w*.059,h*.515 + self.hOffset[i])  #Worldrave Change
-                self.SP.draw(rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
-                self.SP.transform.reset()
-                self.SP.transform.rotate(.58)  #evilynux - should be the same
-                self.SP.transform.scale(wfactor,-wfactor*3)
-                self.SP.transform.translate(w*.059,h*.515 + self.hOffset[i])  #Worldrave Change
-                self.SP.draw(rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
+
+                sprot = .58
+                
+                self.engine.drawImage(self.SP, scale = spscale, coord = (w*.059,h*.515 + self.hOffset[i]), rot = sprot,
+                                      rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
+                self.engine.drawImage(self.SP, scale = spscale, coord = (w*.059,h*.515 + self.hOffset[i]), rot = sprot,
+                                      rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
       
                 if self.guitars[i].starPower >= 49.8:
                   lightVis = 1
                 else:
                   lightVis = (self.guitars[i].starPower-32.2)/16.6
-    
-                wfactor = self.SP.widthf(pixelw = 23.000)  #Worldrave Change - Bulb 3
-                self.SP.transform.reset()
-                self.SP.transform.rotate(.37)  #Worldrave Change
-                self.SP.transform.scale(wfactor,-wfactor*3)
-                self.SP.transform.translate(w*.086,h*.532 + self.hOffset[i]) #Worldrave Width and Height was h*0.338
-                self.SP.draw(rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
-                self.SP.transform.reset()
-                self.SP.transform.rotate(.37)  #evilynux - should be the same
-                self.SP.transform.scale(wfactor,-wfactor*3)
-                self.SP.transform.translate(w*.086,h*.532 + self.hOffset[i])  #Worldrave Change
-                self.SP.draw(rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
-      
+
+                sprot = .37
+                
+                self.engine.drawImage(self.SP, scale = spscale, coord = (w*.086,h*.532 + self.hOffset[i]), rot = sprot,
+                                      rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
+                self.engine.drawImage(self.SP, scale = spscale, coord = (w*.086,h*.532 + self.hOffset[i]), rot = sprot,
+                                      rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
+                
                 if self.guitars[i].starPower >= 66.4:
                   lightVis = 1
                 else:
                   lightVis = (self.guitars[i].starPower-49.8)/16.6
-    
-                wfactor = self.SP.widthf(pixelw = 32.000) #Worldrave Change - Bulb 4
-                self.SP.transform.reset()
-                self.SP.transform.rotate(.0)  #Worldrave Change
-                self.SP.transform.scale(wfactor,-wfactor*3)
-                self.SP.transform.translate(w*self.x1[i]*0.96652469,h*self.y1[i]*1.011455279 + self.hOffset[i])  #evilynux - fixed for all resolutions
-                self.SP.draw(rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
-                self.SP.transform.reset()
-                self.SP.transform.rotate(.0)  #Worldrave Change
-                self.SP.transform.scale(wfactor,-wfactor*3)
-                self.SP.transform.translate(w*self.x1[i]*0.96652469,h*self.y1[i]*1.011455279 + self.hOffset[i])  #evilynux - fixed for all resolutions
-                self.SP.draw(rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
+
+                wfactor = self.SP.widthf(pixelw = 32.000)
+                sprot = .0
+
+                self.engine.drawImage(self.SP, scale = spscale, coord = (w*self.x1[i]*0.96652469,h*self.y1[i]*1.011455279 + self.hOffset[i]), rot = sprot,
+                                      rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
+                self.engine.drawImage(self.SP, scale = spscale, coord = (w*self.x1[i]*0.96652469,h*self.y1[i]*1.011455279 + self.hOffset[i]), rot = sprot,
+                                      rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
       
                 if self.guitars[i].starPower >= 83:
                   lightVis = 1
                 else:
                   lightVis = (self.guitars[i].starPower-66.4)/16.6
     
-                wfactor = self.SP.widthf(pixelw = 32.000)  #Worldrave Change - Bulb 5  
-                self.SP.transform.reset()
-                self.SP.transform.rotate(-.40)  #Worldrave Change
-                self.SP.transform.scale(wfactor,-wfactor*3)
-                self.SP.transform.translate(w*self.x2[i]*0.976698075,h*self.y2[i]*1.02813143 + self.hOffset[i])  #evilynux - fixed for all resolutions
-                self.SP.draw(rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
-                self.SP.transform.reset()
-                self.SP.transform.rotate(-.40)  #Worldrave Change
-                self.SP.transform.scale(wfactor,-wfactor*3)
-                self.SP.transform.translate(w*self.x2[i]*0.976698075,h*self.y2[i]*1.02813143 + self.hOffset[i])  #evilynux - fixed for all resolutions
-                self.SP.draw(rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
+                sprot = -.40
+                self.engine.drawImage(self.SP, scale = spscale, coord = (w*self.x2[i]*0.976698075,h*self.y2[i]*1.02813143 + self.hOffset[i]), rot = sprot,
+                                      rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
+                self.engine.drawImage(self.SP, scale = spscale, coord = (w*self.x2[i]*0.976698075,h*self.y2[i]*1.02813143 + self.hOffset[i]), rot = sprot,
+                                      rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
       
                 if self.guitars[i].starPower >= 100:
                   lightVis = 1
@@ -7460,24 +7430,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   lightVis = (self.guitars[i].starPower-83)/16.6
     
                 wfactor = self.SP.widthf(pixelw = 32.000) #Worldrave Change - Bulb 6
-                self.SP.transform.reset()
-                self.SP.transform.rotate(-.75)  #Worldrave Change
-                self.SP.transform.scale(wfactor,-wfactor*3)
-                self.SP.transform.translate(w*self.x3[i]*0.986664588,h*self.y3[i]*1.04973235 + self.hOffset[i])  #evilynux - fixed for all resolutions
-                self.SP.draw(rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
-                self.SP.transform.reset()
-                self.SP.transform.rotate(-.75)  #Worldrave Change
-                self.SP.transform.scale(wfactor,-wfactor*3)
-                self.SP.transform.translate(w*self.x3[i]*0.986664588,h*self.y3[i]*1.04973235 + self.hOffset[i])  #evilynux - fixed for all resolutions
-                self.SP.draw(rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
-
-                        
-              self.rockmeter.transform.reset()
-              self.rockmeter.transform.scale(.5,-.5)
-              self.rockmeter.transform.translate(w*.134, h*.23 + self.hOffset[i])
-              self.rockmeter.draw()
-
-              #if (self.coOp and i == 0) or not self.coOp:  #MFH only render for player 0 if co-op mode
+                sprot = -.75
+                self.engine.drawImage(self.SP, scale = spscale, coord = (w*self.x3[i]*0.986664588,h*self.y3[i]*1.04973235 + self.hOffset[i]), rot = sprot,
+                                      rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
+                self.engine.drawImage(self.SP, scale = spscale, coord = (w*self.x3[i]*0.986664588,h*self.y3[i]*1.04973235 + self.hOffset[i]), rot = sprot,
+                                      rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
+                
+              self.engine.drawImage(self.rockmeter, scale = (.5,-.5), coord = (w*.134, h*.23 + self.hOffset[i]))
+                  
               if (self.coOp and i == self.coOpPlayerMeter) or not self.coOp:  #MFH only render for player 1 if co-op mode
 
                 if self.coOp:
@@ -7493,16 +7453,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 # evilynux - Changed upon worldrave's request
                 c1,c2,c3 = self.rockmeter_score_color
                 glColor3f(c1,c2,c3)
-                #if self.numOfPlayers > 1 and i == 0:
-                #  scoreFont.render("%d" % (player.score + self.getExtraScoreForCurrentlyPlayedNotes(i)), (x, 0.507+self.hFontOffset[i]))
-                #else:
                 scoreFont.render("%d" % (score),  (x, 0.507+self.hFontOffset[i]))
     
               #MFH - rock measurement tristate
-              #if self.rock[i] > self.rockMax/3.0*2:
               if self.rock[i] > self.rockHiThreshold:
                 rock = self.rockHi
-              #elif self.rock[i] > self.rockMax/3.0:
               elif self.rock[i] > self.rockMedThreshold:
                 rock = self.rockMed
               else:
@@ -7511,15 +7466,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               rockx = .13
               rocky = .426
               if self.failingEnabled:
-                rock.transform.reset()
-                rock.transform.scale(.5,-.5)
-                rock.transform.translate(w*rockx,h*rocky + self.hOffset[i])
-                rock.draw()
+                self.engine.drawImage(rock, scale = (.5,-.5), coord = (w*rockx,h*rocky + self.hOffset[i]))
               else:
-                self.rockOff.transform.reset()
-                self.rockOff.transform.scale(.5,-.5)
-                self.rockOff.transform.translate(w*rockx,h*rocky + self.hOffset[i])
-                self.rockOff.draw()
+                self.engine.drawImage(self.rockOff, scale = (.5,-.5), coord = (w*rockx,h*rocky + self.hOffset[i]))
     
               currentRock = (0.0 + self.rock[i]) / (self.rockMax)
               if self.rock[i] >= 0:
@@ -7530,16 +7479,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               wfactor = self.arrow.widthf(pixelw = 60.000)
   
               if self.failingEnabled:
-                self.arrow.transform.reset()
-                self.arrow.transform.scale(wfactor,-wfactor)
-                self.arrow.transform.rotate(angle) 
-                self.arrow.transform.translate(w*rockx,h*(rocky-.056 + self.hOffset[i]))
-                self.arrow.draw()
+                self.engine.drawImage(self.arrow, scale = (wfactor,-wfactor), coord = (w*rockx,h*(rocky-.056 + self.hOffset[i])), rot = -angle)
     
-              self.rockTop.transform.reset()
-              self.rockTop.transform.scale(.5,-.5)
-              self.rockTop.transform.translate(w*rockx,h*rocky + self.hOffset[i])
-              self.rockTop.draw()
+              self.engine.drawImage(self.rockTop, scale = (.5,-.5), coord = (w*rockx,h*rocky + self.hOffset[i]))
     
 
               glColor4f(.85,.47,0,1)
@@ -7560,10 +7502,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   self.engine.data.rockSound.play()
                 if self.rockTimer < self.rockCountdown:
                   self.rockTimer += 1
-                  self.rockMsg.transform.reset()
-                  self.rockMsg.transform.scale(0.5, -0.5)
-                  self.rockMsg.transform.translate(w/2,h/2)
-                  self.rockMsg.draw()
+                  self.engine.drawImage(self.rockMsg, scale = (0.5, -0.5), coord = (w/2,h/2))
                 if self.rockTimer >= self.rockCountdown:
                   self.rockFinished = True
     
@@ -7575,27 +7514,18 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   self.engine.data.failSound.play()
                 if self.failTimer < 100:
                   self.failTimer += 1
-                  self.failMsg.transform.reset()
-                  self.failMsg.transform.scale(0.5, -0.5)
-                  self.failMsg.transform.translate(w/2,h/2)
-                  self.failMsg.draw()
+                  self.engine.drawImage(self.failMsg, scale = (0.5, -0.5), coord = (w/2,h/2))
                 else:
                   self.finalFailed = True
                 
             
               if self.pause:
                 self.engine.view.setViewport(1,0)
-                self.pauseScreen.transform.reset()
-                self.pauseScreen.transform.scale(0.75, -0.75)
-                self.pauseScreen.transform.translate(w/2+self.pause_bkg_x,h/2+self.pause_bkg_y)
-                self.pauseScreen.draw()
+                self.engine.drawImage(self.pauseScreen, scale = (0.75, -0.75), coord = (w/2+self.pause_bkg_x,h/2+self.pause_bkg_y))
                 
               if self.finalFailed and self.song:
                 self.engine.view.setViewport(1,0)
-                self.failScreen.transform.reset()
-                self.failScreen.transform.scale(0.75, -0.75)
-                self.failScreen.transform.translate(w/2+self.fail_bkg_x,h/2+self.fail_bkg_y)
-                self.failScreen.draw()
+                self.engine.drawImage(self.failScreen, scale = (0.75, -0.75), coord = (w/2+self.fail_bkg_x,h/2+self.fail_bkg_y))
     
                 # evilynux - Closer to actual GH3
                 font = self.engine.data.pauseFont
@@ -7670,88 +7600,43 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               if self.starGrey != None:
                 for starNum in range(0, 5):
                   if stars == 7:    #full combo!
-                    self.starFC.transform.reset()
-                    self.starFC.transform.scale(.080,-.080)
-                    self.starFC.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
-                    self.starFC.draw()
+                    self.engine.drawImage(self.starFC, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
                   elif stars == 6:    #perfect!
-                    self.starPerfect.transform.reset()
-                    self.starPerfect.transform.scale(.080,-.080)
-                    self.starPerfect.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
-                    self.starPerfect.draw()
+                    self.engine.drawImage(self.starPerfect, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
                   elif starNum == stars:
                     if self.starContinuousAvailable:
                       #stump: continuous fillup (akedrou - the ratio will pass correctly from rewritten star score)
                       degrees = int(360*ratio) - (int(360*ratio) % 5)
-                      self.starGrey.transform.reset()
-                      self.starGrey.transform.scale(.080,-.080)
-                      self.starGrey.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
-                      self.starGrey.draw()
-                      self.drawnOverlays[degrees].transform.reset()
-                      self.drawnOverlays[degrees].transform.scale(.080,-.080)
-                      self.drawnOverlays[degrees].transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
-                      self.drawnOverlays[degrees].draw()
+                      self.engine.drawImage(self.starGrey, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
+                      self.engine.drawImage(self.drawnOverlays[degrees], scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
                     #if self.starGrey1 and self.starScoring == 2:  #if more complex star system is enabled, and we're using Rock Band style scoring
                     elif self.starGrey1:
                       if partialStars == 0:
-                        self.starGrey.transform.reset()
-                        self.starGrey.transform.scale(.080,-.080)
-                        self.starGrey.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
-                        self.starGrey.draw()
+                        self.engine.drawImage(self.starGrey, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
                       elif partialStars == 1:
-                        self.starGrey1.transform.reset()
-                        self.starGrey1.transform.scale(.080,-.080)
-                        self.starGrey1.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
-                        self.starGrey1.draw()
+                        self.engine.drawImage(self.starGrey1, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
                       elif partialStars == 2:
-                        self.starGrey2.transform.reset()
-                        self.starGrey2.transform.scale(.080,-.080)
-                        self.starGrey2.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
-                        self.starGrey2.draw()
+                        self.engine.drawImage(self.starGrey2, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
                       elif partialStars == 3:
-                        self.starGrey3.transform.reset()
-                        self.starGrey3.transform.scale(.080,-.080)
-                        self.starGrey3.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
-                        self.starGrey3.draw()
+                        self.engine.drawImage(self.starGrey3, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
                       elif partialStars == 4:
-                        self.starGrey4.transform.reset()
-                        self.starGrey4.transform.scale(.080,-.080)
-                        self.starGrey4.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
-                        self.starGrey4.draw()
+                        self.engine.drawImage(self.starGrey4, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
                       elif partialStars == 5:
-                        self.starGrey5.transform.reset()
-                        self.starGrey5.transform.scale(.080,-.080)
-                        self.starGrey5.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
-                        self.starGrey5.draw()
+                        self.engine.drawImage(self.starGrey5, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
                       elif partialStars == 6:
-                        self.starGrey6.transform.reset()
-                        self.starGrey6.transform.scale(.080,-.080)
-                        self.starGrey6.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
-                        self.starGrey6.draw()
+                        self.engine.drawImage(self.starGrey6, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
                       elif partialStars == 7:
-                        self.starGrey7.transform.reset()
-                        self.starGrey7.transform.scale(.080,-.080)
-                        self.starGrey7.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
-                        self.starGrey7.draw()
+                        self.engine.drawImage(self.starGrey7, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
                       
                     else:
-                      self.starGrey.transform.reset()
-                      self.starGrey.transform.scale(.080,-.080)
-                      self.starGrey.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
-                      self.starGrey.draw()
+                      self.engine.drawImage(self.starGrey, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
     
                   elif starNum > stars:
                     if self.displayAllGreyStars:
-                      self.starGrey.transform.reset()
-                      self.starGrey.transform.scale(.080,-.080)
-                      self.starGrey.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
-                      self.starGrey.draw()
+                      self.engine.drawImage(self.starGrey, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
     
                   else:   #white star
-                    self.starWhite.transform.reset()
-                    self.starWhite.transform.scale(.080,-.080)
-                    self.starWhite.transform.translate(w*(0.802 + 0.040*(starNum)),h*0.7160)
-                    self.starWhite.draw()
+                    self.engine.drawImage(self.starWhite, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
   
           if self.song and self.song.readyToGo:
     
@@ -7839,12 +7724,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     frameHeight = lineSpacing*2.05
                     boxXOffset = 0.5
                     boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + lineSpacing) / self.fontScreenBottom) )
-                    self.soloFrame.transform.reset()
+                    
                     tempWScale = frameWidth*self.soloFrameWFactor
                     tempHScale = -(frameHeight)*self.soloFrameWFactor
-                    self.soloFrame.transform.scale(tempWScale,tempHScale)
-                    self.soloFrame.transform.translate(self.wPlayer[i]*boxXOffset,boxYOffset)
-                    self.soloFrame.draw()
+
+                    self.engine.drawImage(self.soloFrame, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*boxXOffset,boxYOffset))
+                    #self.soloFrame.transform.reset()
+                    #self.soloFrame.transform.scale(tempWScale,tempHScale)
+                    #self.soloFrame.transform.translate(self.wPlayer[i]*boxXOffset,boxYOffset)
+                    #self.soloFrame.draw()
+
   
                   self.solo_soloFont.render(text1, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #centered
                   self.solo_soloFont.render(text2, (0.5 - Tw2/2, yOffset+lineSpacing),(1, 0, 0),txtSize)   #centered
@@ -8075,12 +7964,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   frameWidth = tW*1.15
                   frameHeight = tH*1.07
                   boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
-                  self.breScoreFrame.transform.reset()
+                  #self.breScoreFrame.transform.reset()                  
                   tempWScale = frameWidth*self.breScoreFrameWFactor
                   tempHScale = -(frameHeight)*self.breScoreFrameWFactor
-                  self.breScoreFrame.transform.scale(tempWScale,tempHScale)
-                  self.breScoreFrame.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
-                  self.breScoreFrame.draw()
+                  self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*xOffset,boxYOffset))
+                  #self.breScoreFrame.transform.scale(tempWScale,tempHScale)
+                  #self.breScoreFrame.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
+                  #self.breScoreFrame.draw()
+
                 self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize/2.0)
 
 
@@ -8097,23 +7988,18 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   frameHeight = tH*4.0
                   frameWidth = frameHeight
                   boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
-                  self.breScoreBackground.transform.reset()
                   tempWScale = frameWidth*self.breScoreBackgroundWFactor
                   tempHScale = -(frameHeight)*self.breScoreBackgroundWFactor
-                  self.breScoreBackground.transform.scale(tempWScale,tempHScale)
-                  self.breScoreBackground.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
-                  self.breScoreBackground.draw()
+                  self.engine.drawImage(self.breScoreBackground, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*xOffset,boxYOffset))
+
 
                 if self.breScoreFrame:
                   frameWidth = tW*1.15
                   frameHeight = tH*1.07
                   boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
-                  self.breScoreFrame.transform.reset()
                   tempWScale = frameWidth*self.breScoreFrameWFactor
                   tempHScale = -(frameHeight)*self.breScoreFrameWFactor
-                  self.breScoreFrame.transform.scale(tempWScale,tempHScale)
-                  self.breScoreFrame.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
-                  self.breScoreFrame.draw()
+                  self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*xOffset,boxYOffset))
                 self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
               
               elif self.scoring[i].freestyleWasJustActive and not self.scoring[i].endingStreakBroken and self.scoring[i].endingAwarded:
@@ -8128,12 +8014,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   frameWidth = tW*1.15
                   frameHeight = tH*1.07
                   boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
-                  self.breScoreFrame.transform.reset()
                   tempWScale = frameWidth*self.breScoreFrameWFactor
                   tempHScale = -(frameHeight)*self.breScoreFrameWFactor
-                  self.breScoreFrame.transform.scale(tempWScale,tempHScale)
-                  self.breScoreFrame.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
-                  self.breScoreFrame.draw()
+                  self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*xOffset,boxYOffset))
+
                 self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize/2.0)
 
 
@@ -8150,23 +8034,17 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   frameHeight = tH*4.0
                   frameWidth = frameHeight
                   boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
-                  self.breScoreBackground.transform.reset()
                   tempWScale = frameWidth*self.breScoreBackgroundWFactor
                   tempHScale = -(frameHeight)*self.breScoreBackgroundWFactor
-                  self.breScoreBackground.transform.scale(tempWScale,tempHScale)
-                  self.breScoreBackground.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
-                  self.breScoreBackground.draw()
+                  self.engine.drawImage(self.breScoreBackground, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*xOffset,boxYOffset))
 
                 if self.breScoreFrame:
                   frameWidth = tW*1.15
                   frameHeight = tH*1.07
                   boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
-                  self.breScoreFrame.transform.reset()
                   tempWScale = frameWidth*self.breScoreFrameWFactor
                   tempHScale = -(frameHeight)*self.breScoreFrameWFactor
-                  self.breScoreFrame.transform.scale(tempWScale,tempHScale)
-                  self.breScoreFrame.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
-                  self.breScoreFrame.draw()
+                  self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*xOffset,boxYOffset))
                 self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
 
 
@@ -8185,12 +8063,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   frameWidth = tW*1.15
                   frameHeight = tH*1.07
                   boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
-                  self.soloFrame.transform.reset()
                   tempWScale = frameWidth*self.soloFrameWFactor
                   tempHScale = -(frameHeight)*self.soloFrameWFactor
-                  self.soloFrame.transform.scale(tempWScale,tempHScale)
-                  self.soloFrame.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
-                  self.soloFrame.draw()
+                  self.engine.drawImage(self.soloFrame, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*xOffset,boxYOffset))
                 self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
 
 
@@ -8249,12 +8124,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                         frameWidth = self.solo_Tw[i]*1.15
                         frameHeight = self.solo_Th[i]*1.07
                         self.solo_boxYOffset[i] = self.hPlayer[i]-(self.hPlayer[i]* ((self.solo_yOffset[i] + self.solo_Th[i]/2.0 ) / self.fontScreenBottom) )   
-                        self.soloFrame.transform.reset()
                         tempWScale = frameWidth*self.soloFrameWFactor
                         tempHScale = -(frameHeight)*self.soloFrameWFactor
-                        self.soloFrame.transform.scale(tempWScale,tempHScale)
-                        self.soloFrame.transform.translate(self.wPlayer[i]*self.solo_boxXOffset[i],self.solo_boxYOffset[i])
-                        self.soloFrame.draw()
+                        self.engine.drawImage(self.soloFrame, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*self.solo_boxXOffset[i],self.solo_boxYOffset[i]))
                       self.solo_soloFont.render(self.solo_soloText[i], (self.solo_xOffset[i], self.solo_yOffset[i]),(1, 0, 0),self.solo_txtSize)
 
                       #self.solo_soloFont.render("test", (0.5,0.0) )     #appears to render text from given position, down / right...
@@ -8304,11 +8176,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
                   fadePeriod = 500.0
                   f = (1.0 - min(1.0, abs(pos - time) / fadePeriod) * min(1.0, abs(pos - time - event.length) / fadePeriod)) ** 2
-                  picture.transform.reset()
-                  picture.transform.translate(w / 2, (f * -2 + 1) * h/2+yOffset)
+
+                  self.engine.drawImage(picture, scale = (1, -1), coord = (w / 2, (f * -2 + 1) * h/2+yOffset))
                   
-                  picture.transform.scale(1, -1)
-                  picture.draw()
                 elif isinstance(event, TextEvent):
                   if pos >= time and pos <= time + event.length and not self.ending:    #myfingershurt: to not display events after ending!
                     

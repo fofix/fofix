@@ -28,6 +28,7 @@ import Theme
 import os
 import random   #MFH - needed for new stage background handling
 from Language import _
+import View
 
 class Layer(object):
   """
@@ -233,9 +234,8 @@ class Stage(object):
     self.foregroundLayers = []
     self.textures         = {}
     self.reset()
-    
-    self.wFull = None   #MFH - needed for new stage background handling
-    self.hFull = None
+
+    self.wFull, self.hFull = self.engine.view.geometry[2:4]    
     
     # evilynux - imported myfingershurt stuff from GuitarScene
     self.mode = self.engine.config.get("game", "stage_mode")
@@ -489,10 +489,6 @@ class Stage(object):
       #myfingershurt:
       else:
         #MFH - use precalculated scale factors instead
-        self.imgArr[self.arrNum].transform.reset()
-        self.imgArr[self.arrNum].transform.translate(self.wFull/2,self.hFull/2)
-        self.imgArr[self.arrNum].transform.scale(self.imgArrScaleFactors[self.arrNum],-self.imgArrScaleFactors[self.arrNum])
-        self.imgArr[self.arrNum].draw()
         self.engine.drawImage(self.imgArr[self.arrNum], scale = (self.imgArrScaleFactors[self.arrNum],-self.imgArrScaleFactors[self.arrNum]),
                               coord = (self.wFull/2,self.hFull/2))
 
@@ -552,6 +548,8 @@ class Stage(object):
       self.triggerBeat(pos, beat)
 
   def render(self, visibility):
+    self.renderBackground()
     self._renderLayers(self.backgroundLayers, visibility)
     self.scene.renderGuitar()
     self._renderLayers(self.foregroundLayers, visibility)
+
