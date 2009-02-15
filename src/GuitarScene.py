@@ -312,6 +312,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.rockFinished = False
     self.spTimes = [[] for i in self.playerList]
     self.midiSP = False
+    self.oBarScale = 0.5 #volshebnyi - overdrive bar scale factor
 
 
     ###Capo###
@@ -6711,20 +6712,19 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 else:
                   currentSP = self.guitars[i].starPower/100.0
                   
-                #volshebnyi - overdrive bar positioning
+                #volshebnyi - overdrive bar positioning - simplified
                 self.engine.view.setViewportHalf(self.numOfPlayers,i)
+                vCoord = 0
                 if self.countdown>5.0:
                   vCoord = - 75 * (self.countdown - 5.0)
-                else:
-                  vCoord = 0
-                hScale = Theme.oBarHScale* 0.95 * self.guitars[i].boardWidth / math.sqrt(self.camera.origin[1]**2+(self.camera.origin[2]-0.5-vCoord/125)**2)
+                  self.oBarScale = Theme.oBarHScale* 0.95 * self.guitars[i].boardWidth / math.sqrt(self.camera.origin[1]**2+(self.camera.origin[2]-0.5-vCoord/125)**2) / self.oBottom.width1() * 635
 
-                self.engine.drawImage(self.oBottom, scale = (hScale,.5), coord = (w/2,h/12+ vCoord))
-                self.engine.drawImage(self.oFill, scale = (hScale*currentSP,.5), coord = (w/2*(1+hScale*(currentSP-1)),h/12+ vCoord), rect = (0,currentSP,0,1))
-                self.engine.drawImage(self.oTop, scale = (hScale,.5), coord = (w/2,h/12+ vCoord))
+                self.engine.drawImage(self.oBottom, scale = (self.oBarScale,.5), coord = (w/2,h/12+ vCoord))
+                self.engine.drawImage(self.oFill, scale = (self.oBarScale*currentSP,.5), coord = (w/2*(1+self.oBarScale*(currentSP-1)),h/12+ vCoord), rect = (0,currentSP,0,1))
+                self.engine.drawImage(self.oTop, scale = (self.oBarScale,.5), coord = (w/2,h/12+ vCoord))
             
                 if self.rb_sp_neck_glow and self.guitars[i].starPower >= 50 and not self.guitars[i].starPowerActive:
-                  self.engine.drawImage(self.oFull, scale = (hScale,.5), coord = (w/2,h/12), color = (1,1,1,self.rbOverdriveBarGlowVisibility))
+                  self.engine.drawImage(self.oFull, scale = (self.oBarScale,.5), coord = (w/2,h/12), color = (1,1,1,self.rbOverdriveBarGlowVisibility))
                 
                 #must duplicate to other theme 
                 #if self.playerList[i].part.text == "Bass Guitar" and multStreak >= 40 and self.bassGrooveEnableMode > 0:   #bass groove!
