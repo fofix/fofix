@@ -1099,8 +1099,11 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       font.render(text, (float(Theme.result_cheats_score[0]) - wText / 2, float(Theme.result_cheats_score[1]) + v), scale = float(Theme.result_cheats_score[2]))
   
   def renderHighScores(self, visibility, topMost):
-    if self.coOpType == 0:
-      self.engine.view.setViewport(1,0)
+    self.engine.view.setViewport(1,0)
+    if self.background:
+      wFactor = 640.000/self.background.width1()
+      self.engine.drawImage(self.background, scale = (wFactor,-wFactor), coord = (w/2,h/2))
+    
     bigFont = self.engine.data.bigFont
     font    = self.engine.data.font
     Dialogs.fadeScreen(.4)
