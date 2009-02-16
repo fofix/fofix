@@ -3960,7 +3960,7 @@ def compareSongsAndTitles(engine, a, b):
       elif order == 6:
         return cmp(a.diffSong, b.diffSong)
       elif order == 7:
-        return cmp(theInstrmentDiff(a), theInstrumentDiff(b))
+        return cmp(theInstrumentDiff(a), theInstrumentDiff(b))
       elif order == 8:
         return cmp(a.icon.lower(), b.icon.lower())
     else:
@@ -3979,7 +3979,7 @@ def compareSongsAndTitles(engine, a, b):
       elif order == 6:
         return cmp(b.diffSong, a.diffSong)
       elif order == 7:
-        return cmp(theInstrmentDiff(a), theInstrumentDiff(b))
+        return cmp(theInstrumentDiff(a), theInstrumentDiff(b))
       elif order == 8:
         return cmp(b.icon.lower(), a.icon.lower())
   elif gameMode1p != 2 and quickPlayCareerTiers == 2:
