@@ -100,6 +100,14 @@ BASS_PART               = 2
 LEAD_PART               = 3
 DRUM_PART               = 4
 
+instrumentDiff = {
+  0 : (lambda a: a.diffGuitar),
+  1 : (lambda a: a.diffGuitar),
+  2 : (lambda a: a.diffBass),
+  3 : (lambda a: a.diffGuitar),
+  4 : (lambda a: a.diffDrums)
+}
+
 class Part:
   def __init__(self, id, text):
     self.id   = id
@@ -3700,6 +3708,8 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
             song.setLocked(True)
       else:
         song.setLocked(False)
+  instrument = engine.config.get("game", "songlist_instrument")
+  theInstrumentDiff = instrumentDiff[instrument]
   if direction == 0:
     if order == 1:
       songs.sort(lambda a, b: cmp(a.artist.lower(), b.artist.lower()))
@@ -3716,6 +3726,8 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
     elif order == 6:
       songs.sort(lambda a, b: cmp(a.diffSong, b.diffSong))
     elif order == 7:
+      songs.sort(lambda a, b: cmp(theInstrumentDiff(a), theInstrumentDiff(b)))
+    elif order == 8:
       songs.sort(lambda a, b: cmp(a.icon.lower(), b.icon.lower()))
   else:
     if order == 1:
@@ -3733,9 +3745,10 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
     elif order == 6:
       songs.sort(lambda a, b: cmp(b.diffSong, a.diffSong))
     elif order == 7:
+      songs.sort(lambda a, b: cmp(theInstrumentDiff(b), theInstrumentDiff(a)))
+    elif order == 8:
       songs.sort(lambda a, b: cmp(b.icon.lower(), a.icon.lower()))
   return songs
-
 
   #coolguy567's unlock system
 def getSortingTitles(engine, songList = []):
@@ -3743,6 +3756,9 @@ def getSortingTitles(engine, songList = []):
   titles = []
   sortTitles = []
   
+  instrument = engine.config.get("game", "songlist_instrument")
+  theInstrumentDiff = instrumentDiff[instrument]
+
   #if sortOrder == 0:
   #  for i in range (65,90):
   #    sortTitles.append(SortTitleInfo(chr(i)))
@@ -3795,6 +3811,12 @@ def getSortingTitles(engine, songList = []):
         titles.append(songItem.diffSong)
         sortTitles.append(SortTitleInfo(str(songItem.diffSong)))
     elif sortOrder == 7:
+      try:
+        titles.index(theInstrumentDiff(songItem))
+      except ValueError:
+        titles.append(theInstrumentDiff(songItem))
+        sortTitles.append(SortTitleInfo(str(theInstrumentDiff(songItem))))
+    elif sortOrder == 8:
       try:
         titles.index(songItem.icon.lower())
       except ValueError:
@@ -3891,7 +3913,6 @@ def getAvailableSongsAndTitles(engine, library = DEFAULT_LIBRARY, includeTutoria
   return items
   
 def compareSongsAndTitles(engine, a, b):
-
   #MFH - want to push all non-career songs in a folder below all titles and career songs
   
   #When an unlock_id does not exist in song.ini, a blank string "" value is returned.
@@ -3908,6 +3929,8 @@ def compareSongsAndTitles(engine, a, b):
   #MFH - Career Mode determination:
   gameMode1p = engine.config.get("player0","mode_1p")
   order = engine.config.get("game", "sort_order")
+  instrument = engine.config.get("game", "songlist_instrument")
+  theInstrumentDiff = instrumentDiff[instrument]
   direction = engine.config.get("game", "sort_direction")
   if gameMode1p == 2:
     careerMode = True
@@ -3937,6 +3960,8 @@ def compareSongsAndTitles(engine, a, b):
       elif order == 6:
         return cmp(a.diffSong, b.diffSong)
       elif order == 7:
+        return cmp(theInstrmentDiff(a), theInstrumentDiff(b))
+      elif order == 8:
         return cmp(a.icon.lower(), b.icon.lower())
     else:
       if order == 1:
@@ -3954,6 +3979,8 @@ def compareSongsAndTitles(engine, a, b):
       elif order == 6:
         return cmp(b.diffSong, a.diffSong)
       elif order == 7:
+        return cmp(theInstrmentDiff(a), theInstrumentDiff(b))
+      elif order == 8:
         return cmp(b.icon.lower(), a.icon.lower())
   elif gameMode1p != 2 and quickPlayCareerTiers == 2:
     Aval = ""
@@ -3976,11 +4003,13 @@ def compareSongsAndTitles(engine, a, b):
       elif order == 6:
         Aval = a.diffSong
       elif order == 7:
+        Aval = theInstrumentDiff(a)
+      elif order == 8:
         Aval = a.icon.lower()
     elif isinstance(a, SortTitleInfo):
       if order == 2:
         Aval = int(a.name+str(0))
-      elif order == 6:
+      elif order == 6 or order == 7:
         Aval = int(a.name)
       else:
         Aval = a.name.lower()
@@ -4003,11 +4032,13 @@ def compareSongsAndTitles(engine, a, b):
       elif order == 6:
         Bval = b.diffSong
       elif order == 7:
+        Bval = theInstrumentDiff(b)
+      elif order == 7:
         Bval = b.icon.lower()
     elif isinstance(b, SortTitleInfo):
       if order == 2:
         Bval = int(b.name+str(0))
-      elif order == 6:
+      elif order == 6 or order == 7:
         Bval = int(b.name)
       else:
         Bval = b.name.lower()
@@ -4055,6 +4086,8 @@ def compareSongsAndTitles(engine, a, b):
           elif order == 6:
             return cmp(a.diffSong, b.diffSong)
           elif order == 7:
+            return cmp(theInstrumentDiff(a), theInstrumentDiff(b))
+          elif order == 8:
             return cmp(a.icon.lower(), b.icon.lower())
         else:
           if order == 1:
@@ -4072,6 +4105,8 @@ def compareSongsAndTitles(engine, a, b):
           elif order == 6:
             return cmp(b.diffSong, a.diffSong)
           elif order == 7:
+            return cmp(theInstrumentDiff(b), theInstrumentDiff(a))
+          elif order == 8:
             return cmp(b.icon.lower(), a.icon.lower())
     #original career sorting logic:
     elif a.getUnlockID() != b.getUnlockID():    #MFH - if returned unlock IDs are different, sort by unlock ID (this roughly sorts the tiers and shoves "bonus" songs to the top)

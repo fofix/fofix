@@ -1235,8 +1235,9 @@ class SongChooser(Layer, KeyListener):
           self.engine.view.pushLayer(self)
           
     elif c in Player.KILLS and self.engine.config.get("game", "whammy_changes_sort_order"):
+        orderings = self.engine.config.getOptions("game", "sort_order")[1]
         self.sortOrder += 1
-        if self.sortOrder > 7:
+        if self.sortOrder > len(orderings):
           self.sortOrder = 0
         self.engine.config.set("game", "sort_order", self.sortOrder)
         if self.songLoader:
@@ -1304,7 +1305,7 @@ class SongChooser(Layer, KeyListener):
     elif c in Player.KEY3S:
       self.playSong = True
 
-  #racer: highscores change on fret hit
+    #racer: highscores change on fret hit
     elif c in Player.KEY4S or (c in Player.BASEDRUMS and self.drumNav):
      self.highScoreChange = True
 
@@ -1683,8 +1684,6 @@ class SongChooser(Layer, KeyListener):
       notesHit = 0
       noteStreak = 0
 
-
-
       if self.instrumentChange:
         self.instrumentChange = False
         self.instrumentNum += 1
@@ -1706,7 +1705,13 @@ class SongChooser(Layer, KeyListener):
           self.instrument = "Guitar"
           self.instrumentNice = _("Guitar")
         self.engine.config.set("game", "songlist_instrument", self.instrumentNum)
-  
+        if self.sortOrder == 7:
+            if self.songLoader:
+              self.songLoader.stop()
+            if self.song:
+              self.song.fadeout(1000)
+            self.selectedItem = None
+            self.loadCollection()
   
       if self.display == 0: #CDs Mode
       # render the item list
@@ -3333,7 +3338,6 @@ class SongChooser(Layer, KeyListener):
 
           #Add support for lead and rhythm diff          
 
-
           #Qstick - Sorting Text
           text = _("SORTING:") + "     "
           if self.sortOrder == 0: #title
@@ -3350,12 +3354,13 @@ class SongChooser(Layer, KeyListener):
             text = text + _("BY YEAR")
           elif self.sortOrder == 6: #Band Difficulty
             text = text + _("BY BAND DIFFICULTY")
+          elif self.sortOrder == 7: #Band Difficulty
+            text = text + _("BY INSTRUMENT DIFFICULTY")
           else:
             text = text + _("BY SONG COLLECTION")
             
           font.render(text, (.13, .152), scale = 0.0017)
 
-          
           if self.searchText:
             text = _("Filter: %s") % (self.searchText) + "|"
             if not self.matchesSearch(self.items[self.selectedIndex]):
