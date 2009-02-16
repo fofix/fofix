@@ -780,7 +780,7 @@ class GameEngine(Engine):
       star = self.data.starFC
     else:
       star = self.data.starPerfect
-    wide = 250.0*horiz_spacing
+    wide = 7000.0*horiz_spacing*scale * w / star.width1()
     if centered == 1:
       ypos -= 1.5*scale*star.width1()/h
       xpos += 1.5*scale*star.width1()/w
