@@ -106,6 +106,8 @@ Config.define("performance",  "starspin", bool,     True,  text = _("Animated St
 Config.define("audio",  "frequency",    int,   44100, text = _("Sample Frequency"), options = [8000, 11025, 22050, 32000, 44100, 48000])
 Config.define("audio",  "bits",         int,   16,    text = _("Sample Bits"), options = [16, 8])
 Config.define("audio",  "stereo",       bool,  True)
+#volshebnyi - special in-game and menu FX. optional
+Config.define("video",  "special_fx", bool,   False,     text = _("Use Visual FX"), options = {True: _("Yes"), False: _("No")})
 
 #MFH - Frame Buffer Object support: nevermind, needs GLEWpy and Pyrex and some other such addon...
 #Config.define("opengl",  "supportfbo",       bool,  True)
@@ -809,7 +811,7 @@ class GameEngine(Engine):
 
 
   #volshebnyi - now images can be resized to fit to screen
-  def drawImage(self, image, scale, coord, rot = 0, color = (1,1,1,1), rect = (0,1,0,1), stretched = 0):
+  def drawImage(self, image, scale, coord, rot = 0, color = (1,1,1,1), rect = (0,1,0,1), stretched = 0, lOffset = 0.0, rOffset = 0.0):
     
     image.transform.reset()
     image.transform.rotate(rot)
@@ -819,10 +821,14 @@ class GameEngine(Engine):
     	image.transform.scale(scale[0] / image.width1() * 640,scale[1])
     elif stretched == 2: # fit to height
     	image.transform.scale(scale[0],scale[1] / image.height1() * 480)
+    elif stretched == 11: # fit to width and keep ratio
+    	image.transform.scale(scale[0] / image.width1() * 640,scale[1] / image.width1() * 640)	
+    elif stretched == 12: # fit to height and keep ratio
+    	image.transform.scale(scale[0] / image.height1() * 480,scale[1] / image.height1() * 480)
     else: # fit to screen
     	image.transform.scale(scale[0] / image.width1() * 640,scale[1] / image.height1() * 480)
     image.transform.translate(coord[0],coord[1])
-    image.draw(color = color, rect = rect)
+    image.draw(color = color, rect = rect, lOffset = lOffset, rOffset = rOffset)
 
   #glorandwarf: renamed to retrieve the path of the file
   def fileExists(self, fileName):

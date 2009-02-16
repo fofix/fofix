@@ -328,6 +328,8 @@ class Menu(Layer, KeyListener):
         self.menuBackground.transform.translate(wS/2,hS/2)
         self.menuBackground.transform.scale(wfactor,-wfactor)
         self.menuBackground.draw()
+        #volshebnyi - better menu scaling - but not compatible with current
+        #self.engine.drawImage(self.menuBackground, scale = (1.0,-1.0), coord = (wS/2,hS/2), stretched = 3)
       else:
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
@@ -347,25 +349,15 @@ class Menu(Layer, KeyListener):
           self.menuText.transform.scale(.5*self.menuScale,(-1.0/n*self.menuScale))
           self.menuText.transform.translate(wS*self.menux,(hS*self.menuy)-(hS*self.vSpace)*i)
           self.menuText.draw(rect = (xpos[0],xpos[1],ypos/n,(ypos+1.0)/n))
+          #self.engine.drawImage(self.menuText, scale = (self.menuScale,-self.menuScale*2/n), coord = (wS*self.menux,hS*(self.menuy-self.vSpace*i)), rect = (xpos[0],xpos[1],ypos/n,(ypos+1.0)/n), stretched = 11)
         else:
           text = choice.getText(i + self.viewOffset == self.currentIndex)
           glPushMatrix()
           glRotate(v * 45, 0, 0, 1)
 
-          if self.theme == 0 and self.mainMenu:#8bit
-            if not i % 2 == 1:
-              scale = 0.002
-            else:
+          scale = 0.002
+          if self.mainMenu and self.theme < 2 and i % 2 == 1:#8bit
               scale = 0.0016
-
-          elif self.theme == 1 and self.mainMenu:
-            if not i % 2 == 1:
-              scale = 0.002
-            else:
-              scale = 0.0016
-
-          else:
-            scale = 0.002
 
           w, h = font.getStringSize(" ", scale = scale)
 

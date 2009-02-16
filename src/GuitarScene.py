@@ -112,6 +112,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.gamePlayers = self.engine.config.get("game", "players")
     self.gameMode1p = self.engine.config.get("player0","mode_1p")
     self.gameMode2p = self.engine.config.get("player1","mode_2p")
+    self.fxEnabled = self.engine.config.get("video","special_fx")
 
     Players = self.gamePlayers    #ensure this gets passed correctly
 
@@ -6720,7 +6721,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   self.oBarScale = Theme.oBarHScale * self.guitars[i].boardWidth / math.sqrt(self.camera.origin[1]**2+(self.camera.origin[2]-0.5-vCoord/125)**2) * self.oBarScaleCoef
 
                 self.engine.drawImage(self.oBottom, scale = (self.oBarScale,.5), coord = (w/2,h/12+ vCoord), stretched = 1)
-                self.engine.drawImage(self.oFill, scale = (self.oBarScale*currentSP,.5), coord = (w/2*(1+self.oBarScale*(currentSP-1)),h/12+ vCoord), rect = (0,currentSP,0,1), stretched = 1)
+                
+                if self.fxEnabled:
+                  offset=(currentSP-0.5)*(1-currentSP)*0.5
+                  self.engine.drawImage(self.oFill, scale = (self.oBarScale*currentSP,.5), coord = (w/2*(1+self.oBarScale*(currentSP-1)),h/12+ vCoord), rect = (0,currentSP,0,1), stretched = 1, rOffset = offset)
+		else:
+		  self.engine.drawImage(self.oFill, scale = (self.oBarScale*currentSP,.5), coord = (w/2*(1+self.oBarScale*(currentSP-1)),h/12+ vCoord), rect = (0,currentSP,0,1), stretched = 1)
+
                 self.engine.drawImage(self.oTop, scale = (self.oBarScale,.5), coord = (w/2,h/12+ vCoord), stretched = 1)
             
                 if self.rb_sp_neck_glow and self.guitars[i].starPower >= 50 and not self.guitars[i].starPowerActive:
