@@ -732,14 +732,13 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       if self.detailedScores:
         self.renderStats(visibility, topMost)
       else:
-        if self.resultStep < 3:
-          if self.coOpType > 0:
-            self.renderInitialCoOpScore(visibility, topMost)
-          else:
-            self.renderInitialScore(visibility, topMost)
-          if self.resultStep > 0:
-            self.renderCheatList(visibility, topMost)
+        if self.coOpType > 0:
+          self.renderInitialCoOpScore(visibility, topMost)
         else:
+          self.renderInitialScore(visibility, topMost)
+        if self.resultStep > 0:
+          self.renderCheatList(visibility, topMost)
+        if self.resultStep > 2:
           self.renderHighScores(visibility, topMost)
     finally:
       self.engine.view.resetProjection()
@@ -1103,19 +1102,16 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       font.render(text, (float(Theme.result_cheats_score[0]) - wText / 2, float(Theme.result_cheats_score[1]) + v), scale = float(Theme.result_cheats_score[2]))
   
   def renderHighScores(self, visibility, topMost):
-    self.engine.view.setViewport(1,0)
+    if self.coOpType == 0:
+      self.engine.view.setViewport(1,0)
 
     bigFont = self.engine.data.bigFont
     font    = self.engine.data.font
-    Dialogs.fadeScreen(.4)
+    Dialogs.fadeScreen(.2)
     v = ((1 - visibility) **2)
     
     w, h = self.fullView
 
-    if self.background:
-      wFactor = 640.000/self.background.width1()
-      self.engine.drawImage(self.background, scale = (wFactor,-wFactor), coord = (w/2,h/2))
-    
     scale = 0.0017
     endScroll = -.14
     
