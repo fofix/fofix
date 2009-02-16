@@ -2,6 +2,18 @@
 
 = Old News =
 
+====Feb. 8th 2009 ====
+3.100 Beta 4 (SVN r960) has been released for testing.  This should be the last beta, 3.100 final is scheduled for release in a couple days - assuming there are no major problems with beta 4.
+
+  * Download 3.0xx -> 3.100 beta 4 Patch for Windows [http://www.mediafire.com/?mongfyqmy2i from Mediafire] / [http://rapidshare.com/files/195808034/FoFiX-3.030_r960-Patch-Windows_3.100beta4_.rar from Rapidshare]
+  * Download 3.0xx -> 3.100 beta 4 Patch installer for Windows [http://www.mediafire.com/?zjiyyvigoht from Mediafire] 
+  * Download 3.0xx -> 3.100 beta 4 Patch for Mac [http://www.mediafire.com/?ojzx2nowmwy from Mediafire]
+  * Download 3.100 beta 4 Full for Mac [http://www.mediafire.com/?n3yywbmzyyx from Mediafire]
+  * Download 3.100 beta 4 Full for GNU/Linux (32bit) [http://www.mediafire.com/?m4dlmmgctbl from Mediafire]
+
+*Note to GNU/Linux users*: Sorry, i screwed up creating the binaries for beta3, no more missing glx in beta4.
+
+
 ====Jan. 25th 2009 ====
 3.100 Beta 3 (SVN r862) has been released for testing.  Big Rock Endings and Drum Fills have come further since 3.100 beta 2.  Guitar picks will now repeat for menu and songlist scrolling, and lyrics will no longer show during the song countdown.
 
