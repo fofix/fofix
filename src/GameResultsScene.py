@@ -1100,16 +1100,17 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
   
   def renderHighScores(self, visibility, topMost):
     self.engine.view.setViewport(1,0)
-    if self.background:
-      wFactor = 640.000/self.background.width1()
-      self.engine.drawImage(self.background, scale = (wFactor,-wFactor), coord = (w/2,h/2))
-    
+
     bigFont = self.engine.data.bigFont
     font    = self.engine.data.font
     Dialogs.fadeScreen(.4)
     v = ((1 - visibility) **2)
     
     w, h = self.fullView
+
+    if self.background:
+      wFactor = 640.000/self.background.width1()
+      self.engine.drawImage(self.background, scale = (wFactor,-wFactor), coord = (w/2,h/2))
     
     scale = 0.0017
     endScroll = -.14
