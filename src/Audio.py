@@ -95,6 +95,9 @@ class Audio:
 class Music(object):
   def __init__(self, fileName):
     pygame.mixer.music.load(fileName)
+    self.pausePos = 0.0
+    self.isPause = False
+    self.toUnpause = False
 
   @staticmethod
   def setEndEvent(event = None):
@@ -114,6 +117,8 @@ class Music(object):
 
   def pause(self):
     pygame.mixer.music.pause()
+    self.pausePos = self.getPosition()
+    self.isPause = True
 
   def unpause(self):
     pygame.mixer.music.unpause()
@@ -144,7 +149,19 @@ class Music(object):
     return busy
 
   def getPosition(self):
-    return pygame.mixer.music.get_pos()
+    if self.isPause:
+      if pygame.mixer.music.get_pos() > (self.pausePos + 100):
+        self.toUnpause = True
+        self.isPause = False
+      return self.pausePos
+    elif self.toUnpause:
+      if pygame.mixer.music.get_pos() < (self.pausePos + 100):
+        self.toUnpause = False
+        return pygame.mixer.music.get_pos()
+      else:
+        return self.pausePos
+    else:
+      return pygame.mixer.music.get_pos()
 
 class Channel(object):
   def __init__(self, id):
