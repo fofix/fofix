@@ -921,7 +921,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       
       scoreCard = self.scoring[0]
       i = 0
-      
+
       try:
         r, g, b = Theme.hexToColorResults(Theme.result_score[3])
         glColor3f(r, g, b)
@@ -935,7 +935,11 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         space = self.space[i]
       else:
         space = 1
-      
+
+      scale = float(Theme.result_star[2])
+      if scale < .1:
+        scale = .25
+          
       try:
         hspacing = float(Theme.result_star[3])
       except IndexError:
