@@ -434,7 +434,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.stage.hFull = self.hFull
     #self.fontScreenBottom = 0.75      #from our current viewport's constant 3:4 aspect ratio (which is always stretched to fill the video resolution)
     self.fontScreenBottom = self.engine.data.fontScreenBottom
-    
+    self.oBarScaleCoef = (0.6 + 0.4 * self.numOfPlayers) * 1.256 * self.hFull / self.wFull #volshebnyi - depends on resolution and number of players 
     
     for i, thePlayer in enumerate(self.playerList):
       self.engine.view.setViewportHalf(self.numOfPlayers,i)
@@ -6715,9 +6715,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 #volshebnyi - overdrive bar positioning - simplified
                 self.engine.view.setViewportHalf(self.numOfPlayers,i)
                 vCoord = 0
-                if self.countdown>5.0:
-                  vCoord = - 75 * (self.countdown - 5.0)
-                  self.oBarScale = Theme.oBarHScale * self.guitars[i].boardWidth / math.sqrt(self.camera.origin[1]**2+(self.camera.origin[2]-0.5-vCoord/125)**2)*0.942
+                if self.countdown>3.0:
+                  vCoord = - 75 * (self.countdown - 3.0)
+                  self.oBarScale = Theme.oBarHScale * self.guitars[i].boardWidth / math.sqrt(self.camera.origin[1]**2+(self.camera.origin[2]-0.5-vCoord/125)**2) * self.oBarScaleCoef
 
                 self.engine.drawImage(self.oBottom, scale = (self.oBarScale,.5), coord = (w/2,h/12+ vCoord), stretched = 1)
                 self.engine.drawImage(self.oFill, scale = (self.oBarScale*currentSP,.5), coord = (w/2*(1+self.oBarScale*(currentSP-1)),h/12+ vCoord), rect = (0,currentSP,0,1), stretched = 1)
