@@ -732,13 +732,14 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       if self.detailedScores:
         self.renderStats(visibility, topMost)
       else:
-        if self.coOpType > 0:
-          self.renderInitialCoOpScore(visibility, topMost)
+        if self.resultStep < 3:
+          if self.coOpType > 0:
+            self.renderInitialCoOpScore(visibility, topMost)
+          else:
+            self.renderInitialScore(visibility, topMost)
+          if self.resultStep > 0:
+            self.renderCheatList(visibility, topMost)
         else:
-          self.renderInitialScore(visibility, topMost)
-        if self.resultStep > 0:
-          self.renderCheatList(visibility, topMost)
-        if self.resultStep > 2:
           self.renderHighScores(visibility, topMost)
     finally:
       self.engine.view.resetProjection()
@@ -801,7 +802,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
 
         scale = float(Theme.result_star[2])
         if scale < .1:
-          scale = .25
+          scale = .1
         
 
         #MFH - TODO - migrate this positionable, scalable, spacable star score display logic into a GameEngine function like drawImage
@@ -810,7 +811,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           hspacing = float(Theme.result_star[3])
         except IndexError:
           hspacing = 0.5
-        self.engine.drawStarScore(w, h, float(Theme.result_star[0]), float(Theme.result_star[1]), scoreCard.stars, scale, horiz_spacing = hspacing, space = space)
+        self.engine.drawStarScore(w, h, float(Theme.result_star[0]), float(Theme.result_star[1]), scoreCard.stars, scale, horiz_spacing = hspacing, space = space, centered = 2)
         
 #-        if scoreCard.stars > 5:
 #-          for j in range(5):
@@ -943,7 +944,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         hspacing = float(Theme.result_star[3])
       except IndexError:
         hspacing = 0.5
-      self.engine.drawStarScore(w, h, float(Theme.result_star[0]), float(Theme.result_star[1]), scoreCard.stars, scale, horiz_spacing = hspacing, space = space)
+      self.engine.drawStarScore(w, h, float(Theme.result_star[0]), float(Theme.result_star[1]), scoreCard.stars, scale, horiz_spacing = hspacing, space = space, centered = 2)
 
 #-      if scoreCard.stars > 5:
 #-        for j in range(5):
@@ -1102,8 +1103,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       font.render(text, (float(Theme.result_cheats_score[0]) - wText / 2, float(Theme.result_cheats_score[1]) + v), scale = float(Theme.result_cheats_score[2]))
   
   def renderHighScores(self, visibility, topMost):
-    if self.coOpType == 0:
-      self.engine.view.setViewport(1,0)
+    self.engine.view.setViewport(1,0)
 
     bigFont = self.engine.data.bigFont
     font    = self.engine.data.font
