@@ -786,8 +786,7 @@ class GameEngine(Engine):
       xpos += 1.5*scale*star.width1()/w
     if centered == 2:
       ypos += 1.5*scale*star.width1()/h
-      xpos -= 1.5*scale*star.width1()/w * min(stars-1,4)
-
+      xpos -= 1.5*scale*star.width1()/w * 4
     if stars > 5:
       for j in range(5):
 
@@ -810,7 +809,7 @@ class GameEngine(Engine):
             star = self.data.star3
           else:
             star = self.data.star1
-        self.drawImage(star, scale = (scale,-scale), coord = (((w*xpos)+wide*j)*space**4,h*ypos), stretched=11)
+        self.drawImage(star, scale = (scale,scale), coord = (((w*xpos)+wide*j)*space**4,h*ypos), stretched=11)
 
 
   #volshebnyi - now images can be resized to fit to screen
