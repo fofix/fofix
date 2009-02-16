@@ -114,9 +114,6 @@ class Music(object):
 
   def rewind(self):
     pygame.mixer.music.rewind()
-    self.isPause = False
-    self.toUnpause = False
-    self.pausePos = 0.0
 
   def pause(self):
     pygame.mixer.music.pause()

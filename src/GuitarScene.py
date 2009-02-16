@@ -3348,7 +3348,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     if self.song and self.song.readyToGo and not self.pause and not self.failed:
       SceneClient.run(self, ticks)
-      
       if not self.resumeCountdown and not self.pause:
         pos = self.getSongPosition()
 
@@ -3745,6 +3744,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.song.setRhythmVolume(self.rhythmVolume)
           self.song.setBackgroundVolume(self.songVolume)
           self.song.setCrowdVolume(0.0)
+          self.song.clearPause()
           self.crowdsCheering = False #catches crowdsEnabled != 3, pause before countdown, set to 3
           self.starPowersActive = 0
           self.playersInGreen = 0
