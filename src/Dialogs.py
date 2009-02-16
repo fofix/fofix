@@ -94,7 +94,7 @@ def wrapCenteredText(font, pos, text, rightMargin = 0.9, scale = 0.002, visibili
       font.render(sentence, (x - (w/2), y + visibility * n), scale = scale)
       glPopMatrix()
       sentence = word
-      y += h*.5 # Worldrave - Modified spacing between lines
+      y += h
     else:
       if sentence == "" or sentence == "\n":
         sentence = word
@@ -106,7 +106,7 @@ def wrapCenteredText(font, pos, text, rightMargin = 0.9, scale = 0.002, visibili
     glRotate(visibility * (n + 1) * -45, 0, 0, 1)
     font.render(sentence, (x - (w/2), y + visibility * n), scale = scale)
     glPopMatrix()
-    y += h*.5 # Worldrave - Modified spacing between lines
+    y += h
   
     #if word == "\n":
     #  continue
@@ -2503,9 +2503,9 @@ class SongChooser(Layer, KeyListener):
                   glColor3f(c1,c2,c3)
                   if self.extraStats:
                     # evilynux - tweaked position to fit hit% and note streak
-                    font.render(text, (self.song_listscore_xpos-w/2, .0935*(i+1)-pos[0]*.0935+.1775-h/2), scale=scale)
+                    font.render(text, (self.song_listscore_xpos-w*1.5, .0935*(i+1)-pos[0]*.0935+.185-h/2), scale=scale)
                   else:
-                    font.render(text, (self.song_listscore_xpos-w/2, .0935*(i+1)-pos[0]*.0935+.2-h/2), scale=scale)
+                    font.render(text, (self.song_listscore_xpos-w*1.5, .0935*(i+1)-pos[0]*.0935+.2-h/2), scale=scale)
                   
                   if not item.frets == "":
                     suffix = ", ("+item.frets+")"
@@ -2532,6 +2532,8 @@ class SongChooser(Layer, KeyListener):
   
                   # evilynux - automatically scale artist name and year
                   scale = font.scaleText(text, maxwidth = 0.554, scale = scale)
+                  if scale > .0014:
+                    scale = .0014
                   w, h = font.getStringSize(text, scale = scale)
 
                   font.render(text, (self.song_list_xpos+.05, .0935*(i+1)-pos[0]*.0935+.2), scale=scale)
@@ -2597,7 +2599,7 @@ class SongChooser(Layer, KeyListener):
                         score, stars, name = 0, 0, "---"
   
 
-                  starx = self.song_listscore_xpos+.018
+                  starx = self.song_listscore_xpos-.01
                   if self.extraStats:
                     stary = .0935*(i+1)-pos[0]*.0935+.18-0.0145
                   else:
@@ -2605,7 +2607,8 @@ class SongChooser(Layer, KeyListener):
                   #stary = 0.5
                   starscale = scale*1.8
                   stary = 1.0 - (stary / self.engine.data.fontScreenBottom)
-                  self.engine.drawStarScore(screenw, screenh, starx, stary, stars, starscale) #MFH
+                  if i < pos[1]:
+                    self.engine.drawStarScore(screenw, screenh, starx, stary, stars, starscale) #MFH
 
 #-                  #QQstarS:add  to show stars
 #-                  # evilynux - Tweaked position to fit hit% and note streak
