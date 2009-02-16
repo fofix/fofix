@@ -140,7 +140,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       (_("Quit"),           self.quit),
     ]
     
-    self.menu = Menu(self.engine, items, onCancel = self.quit, pos = (.2, .5))
+    self.menu = Menu(self.engine, items, onCancel = self.quit, pos = (Theme.result_menu_x, Theme.result_menu_y))
     
     self.engine.resource.load(self, "song", lambda: Song.loadSong(self.engine, songName, library = self.libraryName, notesOnly = True, part = [player.part for player in self.playerList]), onLoad = self.songLoaded)
     
@@ -732,13 +732,14 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       if self.detailedScores:
         self.renderStats(visibility, topMost)
       else:
-        if self.coOpType > 0:
-          self.renderInitialCoOpScore(visibility, topMost)
+        if self.resultStep < 3:
+          if self.coOpType > 0:
+            self.renderInitialCoOpScore(visibility, topMost)
+          else:
+            self.renderInitialScore(visibility, topMost)
+          if self.resultStep > 0:
+            self.renderCheatList(visibility, topMost)
         else:
-          self.renderInitialScore(visibility, topMost)
-        if self.resultStep > 0:
-          self.renderCheatList(visibility, topMost)
-        if self.resultStep > 2:
           self.renderHighScores(visibility, topMost)
     finally:
       self.engine.view.resetProjection()
@@ -881,7 +882,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           text = Theme.result_stats_part_text.strip()
         
         if text == "$icon$" and self.partImage:
-          self.engine.drawImage(self.part[i], scale = (float(Theme.result_part[2]),-float(Theme.result_part[2])), coord = (w*float(Theme.result_part[0]),h*float(Theme.result_part[1])))
+          self.engine.drawImage(self.part[i], scale = (float(Theme.result_stats_part[2]),-float(Theme.result_stats_part[2])), coord = (w*float(Theme.result_stats_part[0]),h*float(Theme.result_stats_part[1])))
         else:
           text = _(Theme.result_stats_part_text) % self.playerList[i].part
           wText, hText = font.getStringSize(text)

@@ -214,6 +214,8 @@ Config.define("theme", "result_cheats_numbers", str, ".5,.35,.0015")
 Config.define("theme", "result_cheats_score", str, ".75,.4,.0015")
 Config.define("theme", "result_cheats_percent", str, ".45,.4,.0015")
 Config.define("theme", "result_cheats_color", str, "#FFFFFF")
+Config.define("theme", "result_menu_x", float, .5)
+Config.define("theme", "result_menu_y", float, .2)
 
 Config.define("theme", "jurgen_text_pos", str, "1,1,.00035")
 
@@ -433,6 +435,8 @@ result_cheats_numbers = [None] * 3
 result_cheats_score = [None] * 3
 result_cheats_percent = [None] * 3
 result_cheats_color = None
+result_menu_x = None
+result_menu_y = None
 
 jurgTextPos = [None] * 3
 
@@ -789,6 +793,7 @@ def setupResults(config):
   global result_stats_diff_text, result_stats_part_text, result_stats_streak_text, result_stats_accuracy_text
   global result_stats_accuracy, result_stats_streak, result_stats_notes, result_stats_notes_text
   global result_cheats_info, result_cheats_numbers, result_cheats_percent, result_cheats_score, result_cheats_color
+  global result_menu_x, result_menu_y
   
   result_score = config.get("theme", "result_score").split(",")
   result_star = config.get("theme", "result_star").split(",")
@@ -809,6 +814,8 @@ def setupResults(config):
   result_cheats_percent = config.get("theme", "result_cheats_percent").split(",")
   result_cheats_score   = config.get("theme", "result_cheats_score").split(",")
   result_cheats_color   = config.get("theme", "result_cheats_color")
+  result_menu_x         = config.get("theme", "result_menu_x")
+  result_menu_y         = config.get("theme", "result_menu_y")
 
 def setupSubmenus(config, themepath = None):
   if not themepath:
