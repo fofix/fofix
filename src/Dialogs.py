@@ -837,7 +837,9 @@ class SongChooser(Layer, KeyListener):
         self.engine.loadImgDrawing(self, "diffimg2",    os.path.join("themes",themename,"menu","diff2.png"))
         self.engine.loadImgDrawing(self, "diffimg3",    os.path.join("themes",themename,"menu","diff3.png"))
       except IOError:
-        self.diffimg1 = None
+        self.diffimg1 = self.engine.data.star3
+        self.diffimg2 = self.engine.data.star4
+        self.diffimg3 = self.engine.data.starPerfect
         
       #song icon loading
       if self.songIcons:
@@ -1521,7 +1523,9 @@ class SongChooser(Layer, KeyListener):
     self.cassette.render("Mesh_001")
     glColor3f(.1, .1, .1)
     self.cassette.render("Mesh")
-
+    
+    if isinstance(label, str): #locked
+      return
     # Draw the label if there is one
     if label is not None:
       glEnable(GL_TEXTURE_2D)
@@ -1949,9 +1953,10 @@ class SongChooser(Layer, KeyListener):
                 Theme.setBaseColor(1 - v)
                 font.render(unicode(d),     (x, y),           scale = scale)
 
-                stary = 1.0 - y/self.engine.data.fontScreenBottom - h
-                starscale = 0.02
-                self.engine.drawStarScore(screenw, screenh, x+starscale/2, stary-starscale, stars, starscale, hqStar = True, centered = 1) #volshebnyi
+                starscale = scale*1.4
+                stary = 1.0 - y/self.engine.data.fontScreenBottom - h * 1.8
+                self.engine.drawStarScore(screenw, screenh, x, stary, stars, starscale, hqStar = True) #MFH
+
 #-                # evilynux - Fixed star size following Font render bugfix
 #-                if stars == 7: #akedrou
 #-                  glColor3f(0, .5, 1) #should be customizable
@@ -2117,7 +2122,7 @@ class SongChooser(Layer, KeyListener):
                     if item.songCount == 1:
                       text = _("There Is 1 Song In This Setlist")
                     elif item.songCount > 1:
-                      text = _("There are %d songs in this folder" % (item.songCount))
+                      text = _("There are %d songs in this folder") % (item.songCount)
                     else:
                       text = ""
   
@@ -2196,9 +2201,9 @@ class SongChooser(Layer, KeyListener):
                   glColor3f(c1,c2,c3)
                   # evilynux - tweaked position to fit hit% and note streak
                   if self.extraStats:
-                    lfont.render(text, (self.song_listscore_xpos-w/2, .0935*(i+1)-pos[0]*.0935+.1575-h/2), scale=scale)
+                    lfont.render(text, (self.song_listscore_xpos-w-.02, .0935*(i+1)-pos[0]*.0935+.1575-h/2), scale=scale)
                   else:
-                    lfont.render(text, (self.song_listscore_xpos-w/2, .0935*(i+1)-pos[0]*.0935+.2-h/2), scale=scale)
+                    lfont.render(text, (self.song_listscore_xpos-w-.02, .0935*(i+1)-pos[0]*.0935+.2-h/2), scale=scale)
                   if not item.frets == "":
                     suffix = ", ("+item.frets+")"
                   else:
@@ -2296,8 +2301,8 @@ class SongChooser(Layer, KeyListener):
                   else:
                     stary = .0935*(i+1)-pos[0]*.0935+.2-0.034
                   #stary = 0.5
-                  starscale = 0.02
-                  stary = 1.0 - (stary / self.engine.data.fontScreenBottom)
+                  starscale = .025
+                  stary = 1.0 - (stary / self.engine.data.fontScreenBottom) - h/2
                   self.engine.drawStarScore(screenw, screenh, starx, stary, stars, starscale, hqStar = True) #MFH
 
 #-                  #QQstarS:add  to show stars
@@ -2430,7 +2435,7 @@ class SongChooser(Layer, KeyListener):
                     if item.songCount == 1:
                       text = _("There Is 1 Song In This Setlist.")
                     elif item.songCount > 1:
-                      text = _("There Are %d Songs In This Setlist." % (item.songCount))
+                      text = _("There Are %d Songs In This Setlist.") % (item.songCount)
                     else:
                       text = ""
                 elif isinstance(item, Song.TitleInfo):
@@ -2503,9 +2508,9 @@ class SongChooser(Layer, KeyListener):
                   glColor3f(c1,c2,c3)
                   if self.extraStats:
                     # evilynux - tweaked position to fit hit% and note streak
-                    font.render(text, (self.song_listscore_xpos-w*1.5, .0935*(i+1)-pos[0]*.0935+.185-h/2), scale=scale)
+                    font.render(text, (self.song_listscore_xpos-w-.025, .0935*(i+1)-pos[0]*.0935+.185-h/2), scale=scale)
                   else:
-                    font.render(text, (self.song_listscore_xpos-w*1.5, .0935*(i+1)-pos[0]*.0935+.2-h/2), scale=scale)
+                    font.render(text, (self.song_listscore_xpos-w-.025, .0935*(i+1)-pos[0]*.0935+.2-h/2), scale=scale)
                   
                   if not item.frets == "":
                     suffix = ", ("+item.frets+")"
@@ -2601,11 +2606,11 @@ class SongChooser(Layer, KeyListener):
 
                   starx = self.song_listscore_xpos-.01
                   if self.extraStats:
-                    stary = .0935*(i+1)-pos[0]*.0935+.18-0.0145
+                    stary = .0935*(i+1)-pos[0]*.0935+.1705
                   else:
                     stary = .0935*(i+1)-pos[0]*.0935+.2-0.0145
                   #stary = 0.5
-                  starscale = 0.02
+                  starscale = scale*1.8
                   stary = 1.0 - (stary / self.engine.data.fontScreenBottom)
                   if i < pos[1]:
                     self.engine.drawStarScore(screenw, screenh, starx, stary, stars, starscale) #MFH
@@ -2812,7 +2817,7 @@ class SongChooser(Layer, KeyListener):
                     if item.songCount == 1:
                       text = _("There Is 1 Song In This Setlist.")
                     elif item.songCount > 1:
-                      text = _("There Are %d Songs In This Setlist." % (item.songCount))
+                      text = _("There Are %d Songs In This Setlist.") % (item.songCount)
                     else:
                       text = ""
                 elif isinstance(item, Song.TitleInfo):
@@ -2950,10 +2955,14 @@ class SongChooser(Layer, KeyListener):
                       #Theme.setBaseColor(1 - v)
                       lfont.render(unicode(d),     (x, y),           scale = scale)
 
-                      stary = y
-                      starscale = 0.02
-                      stary = 1.0 - (y / self.engine.data.fontScreenBottom) - h
-                      self.engine.drawStarScore(screenw, screenh, x+starscale/2, stary+starscale, stars, starscale) #MFH
+
+                      starx = x
+                      #stary = y+h
+                      stary = y+h*1.5
+                      #stary = 0.5+h
+                      starscale = .025
+                      stary = 1.0 - (stary / self.engine.data.fontScreenBottom)
+                      self.engine.drawStarScore(screenw, screenh, starx, stary, stars, starscale, hqStar = True) #MFH
 
 #-                      if stars == 6 and self.theme == 2:
 #-                        glColor3f(1, 1, 0)  
@@ -3031,7 +3040,7 @@ class SongChooser(Layer, KeyListener):
                     if item.songCount == 1:
                       text = _("There Is 1 Song In This Setlist.")
                     elif item.songCount > 1:
-                      text = _("There Are %d Songs In This Setlist." % (item.songCount))
+                      text = _("There Are %d Songs In This Setlist.") % (item.songCount)
                     else:
                       text = ""
                 elif isinstance(item, Song.TitleInfo):
@@ -3165,9 +3174,12 @@ class SongChooser(Layer, KeyListener):
                       font.render(unicode(d),     (x, y),           scale = scale)
                       
 
-                      starscale = 0.02
-                      starx = x + starscale/2
-                      stary = 1.0 - (y / self.engine.data.fontScreenBottom) - h - starscale
+                      starx = x + .01
+                      #stary = y+h
+                      stary = y + .032
+                      #stary = 0.5+h
+                      starscale = scale*1.8
+                      stary = 1.0 - (stary / self.engine.data.fontScreenBottom)
                       self.engine.drawStarScore(screenw, screenh, starx, stary, stars, starscale) #MFH
 
 #-                      if stars == 7 and self.theme == 2:
@@ -3397,7 +3409,7 @@ class SongChooser(Layer, KeyListener):
                   if item.songCount == 1:
                     text = _("There Is 1 Song In This Setlist.")
                   elif item.songCount > 1:
-                    text = _("There Are %d Songs In This Setlist." % (item.songCount))
+                    text = _("There Are %d Songs In This Setlist.") % (item.songCount)
                   else:
                     text = ""
               elif isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):

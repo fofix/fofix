@@ -3772,10 +3772,22 @@ def getSortingTitles(engine, songList = []):
         sortTitles.append(SortTitleInfo(songItem.artist))
     elif sortOrder == 0:
       try:
-        titles.index(songItem.name[0].upper())
+        if songItem.name[0].isdigit():
+          sortName = "123"
+        elif not songItem.name[0].isalnum():
+          sortName = "!@#"
+        else:
+          sortName = songItem.name[0].lower()
+        titles.index(sortName)
       except ValueError:
-        titles.append(songItem.name[0].upper())
-        sortTitles.append(SortTitleInfo(songItem.name[0].upper()))
+        if songItem.name[0].isdigit():
+          sortName = "123"
+        elif not songItem.name[0].isalnum():
+          sortName = "!@#"
+        else:
+          sortName = songItem.name[0].lower()
+        titles.append(sortName)
+        sortTitles.append(SortTitleInfo(sortName.upper()))
     elif sortOrder == 2:
       try:
         titles.index(songItem.count)
@@ -3937,10 +3949,10 @@ def compareSongsAndTitles(engine, a, b):
     quickPlayMode = False
   else:
     careerMode = False
-    if gameMode1p == 0:
-      quickPlayMode = True
-    else:
-      quickPlayMode = False
+    #if gameMode1p == 0: #akedrou - different sorting for practice mode and quickplay mode??
+    quickPlayMode = True
+    #else:
+    #  quickPlayMode = False
       
   quickPlayCareerTiers = engine.config.get("game", "quickplay_tiers")
   if quickPlayMode and quickPlayCareerTiers == 0:
@@ -3950,7 +3962,7 @@ def compareSongsAndTitles(engine, a, b):
       elif order == 2:
         return cmp(int(b.count+str(0)), int(a.count+str(0)))
       elif order == 0:
-        return cmp(a.name.lower(), b.name.lower())
+        return cmp(removeSongOrderPrefixFromName(a.name).lower(), removeSongOrderPrefixFromName(b.name).lower())
       elif order == 3:
         return cmp(a.album.lower(), b.album.lower())
       elif order == 4:
@@ -3969,7 +3981,7 @@ def compareSongsAndTitles(engine, a, b):
       elif order == 2:
         return cmp(int(a.count+str(0)), int(b.count+str(0)))
       elif order == 0:
-        return cmp(b.name.lower(), a.name.lower())
+        return cmp(removeSongOrderPrefixFromName(b.name).lower(), removeSongOrderPrefixFromName(a.name).lower())
       elif order == 3:
         return cmp(b.album.lower(), a.album.lower())
       elif order == 4:
@@ -3987,7 +3999,11 @@ def compareSongsAndTitles(engine, a, b):
     Bval = ""
     if isinstance(a, SongInfo):
       if order == 0:
-        Aval = a.name[0].lower()
+        Aval = removeSongOrderPrefixFromName(a.name)[0].lower()
+        if Aval.isdigit():
+          Aval = "123"
+        if not Aval.isalnum():
+          Aval = "!@#"
       elif order == 1:
         Aval = a.artist.lower()
       elif order == 2:
@@ -4016,7 +4032,11 @@ def compareSongsAndTitles(engine, a, b):
       
     if isinstance(b, SongInfo):
       if order == 0:
-        Bval = b.name[0].lower()
+        Bval = removeSongOrderPrefixFromName(b.name)[0].lower()
+        if Bval.isdigit():
+          Bval = "123"
+        if not Bval.isalnum():
+          Bval = "!@#"
       elif order == 1:
         Bval = b.artist.lower()
       elif order == 2:
@@ -4076,7 +4096,7 @@ def compareSongsAndTitles(engine, a, b):
           elif order == 2:
             return cmp(int(b.count+str(0)), int(a.count+str(0)))
           elif order == 0:
-            return cmp(a.name.lower(), b.name.lower())
+            return cmp(removeSongOrderPrefixFromName(a.name).lower(), removeSongOrderPrefixFromName(b.name).lower())
           elif order == 3:
             return cmp(a.album.lower(), b.album.lower())
           elif order == 4:
@@ -4095,7 +4115,7 @@ def compareSongsAndTitles(engine, a, b):
           elif order == 2:
             return cmp(int(a.count+str(0)), int(b.count+str(0)))
           elif order == 0:
-            return cmp(b.name.lower(), a.name.lower())
+            return cmp(removeSongOrderPrefixFromName(b.name).lower(), removeSongOrderPrefixFromName(a.name).lower())
           elif order == 3:
             return cmp(b.album.lower(), a.album.lower())
           elif order == 4:
@@ -4120,3 +4140,33 @@ def compareSongsAndTitles(engine, a, b):
     
     else:   #MFH - This is where career songs are sorted within tiers -- we want to force sorting by "name" only:
       return cmp(a.name.lower(), b.name.lower())    #MFH - force sort by name for career songs
+
+def isInt(possibleInt):
+  try:
+    #MFH - remove any leading zeros (for songs with 01. or 02. for example)        
+    splitName = possibleInt.split("0",1)
+    while splitName[0] == "":
+      splitName = possibleInt.split("0",1)
+      if len(splitName) > 1:
+        if splitName[0] == "":
+          possibleInt = splitName[1]
+    if str(int(possibleInt)) == str(possibleInt):
+      return True
+    else:
+      return False
+  except Exception, e:
+    return False
+
+def removeSongOrderPrefixFromName(name): #copied from Dialogs - can't import it here.
+  if not name.startswith("."):
+    splitName = name.split(".",1)
+    if isInt(splitName[0]) and len(splitName) > 1:
+      name = splitName[1]
+      splitName[0] = ""
+      while splitName[0] == "":
+        splitName = name.split(" ",1)
+        if len(splitName) > 1:
+          if splitName[0] == "":
+            name = splitName[1]
+  return name
+  

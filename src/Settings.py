@@ -469,6 +469,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "performance", "preload_glyph_cache", autoApply = True, isQuickset = 1),#evilynux
       ConfigChoice(engine, engine.config, "performance", "static_strings", autoApply = True, isQuickset = 1),      #myfingershurt
       ConfigChoice(engine, engine.config, "performance", "killfx", autoApply = True, isQuickset = 1),   #blazingamer
+      ConfigChoice(engine, engine.config, "video",  "special_fx", autoApply = True, isQuickset = 1), #volshebnyi
     ]
     AdvancedVideoSettingsMenu = Menu.Menu(engine, AdvancedVideoSettings)
     
@@ -506,7 +507,6 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "coffee", "themename"), #was autoapply... why?
       ConfigChoice(engine, engine.config, "video",  "resolution"),
       ConfigChoice(engine, engine.config, "video",  "fullscreen"),
-      ConfigChoice(engine, engine.config, "video",  "special_fx", autoApply = True), #volshebnyi
       ConfigChoice(engine, engine.config, "game", "use_graphical_submenu", autoApply = True, isQuickset = 1),
       (_("Stages Options"), StagesOptionsMenu),
       (_("Choose P1 Neck >"), lambda: Dialogs.chooseNeck(engine,player=0,prompt=_("Yellow (#3) / Blue (#4) to change:"))),
@@ -958,7 +958,6 @@ class BasicSettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "coffee", "themename"),
       ConfigChoice(engine, engine.config, "video",  "resolution"),
       ConfigChoice(engine, engine.config, "video",  "fullscreen"),
-      ConfigChoice(engine, engine.config, "video",  "special_fx", autoApply = True), #volshebnyi
       ConfigChoice(engine, engine.config, "game", "stage_mode", autoApply = True),   #myfingershurt
       ConfigChoice(engine, engine.config, "game", "use_graphical_submenu", autoApply = True, isQuickset = 1),
       (_("Choose P1 Neck >"), lambda: Dialogs.chooseNeck(engine,player=0,prompt=_("Yellow (#3) / Blue (#4) to change:"))),
@@ -1182,6 +1181,7 @@ def quickset(config):
     config.set("game", "stage_animate", 0)
     config.set("game", "lyric_mode", 0)
     config.set("game", "use_graphical_submenu", 0)
+    config.set("video", "special_fx", False)
     config.set("audio", "enable_crowd_tracks", 0)
     config.set("performance", "in_game_stats", 0)
     config.set("performance", "static_strings", True)
@@ -1210,6 +1210,7 @@ def quickset(config):
     config.set("game", "stage_animate", 0)
     config.set("game", "lyric_mode", 2)
     config.set("game", "use_graphical_submenu", 0)
+    config.set("video", "special_fx", False)
     config.set("audio", "enable_crowd_tracks", 1)
     config.set("performance", "in_game_stats", 0)
     config.set("performance", "static_strings", True)
@@ -1236,6 +1237,7 @@ def quickset(config):
     config.set("game", "songlistrotation", True)
     config.set("game", "lyric_mode", 2)
     config.set("game", "use_graphical_submenu", 1)
+    config.set("video", "special_fx", True)
     config.set("audio", "enable_crowd_tracks", 1)
     config.set("performance", "in_game_stats", 2)
     config.set("performance", "static_strings", True)
@@ -1262,6 +1264,7 @@ def quickset(config):
     config.set("game", "songlistrotation", True)
     config.set("game", "lyric_mode", 2)
     config.set("game", "use_graphical_submenu", 1)
+    config.set("video", "special_fx", True)
     config.set("audio", "enable_crowd_tracks", 1)
     config.set("performance", "in_game_stats", 2)
     config.set("performance", "static_strings", False)

@@ -100,10 +100,9 @@ class Font:
 
   # evilynux - Return scaling factor needed to fit text within maxwidth
   def scaleText(self, text, maxwidth, scale = DEFAULT_SCALE):
-    w, h = self.getStringSize(text)
-    scale = DEFAULT_SCALE
+    w, h = self.getStringSize(text, scale)
     if w > maxwidth:
-        scale = w/maxwidth
+        scale *= maxwidth/w
     return scale
 
   def getHeight(self):

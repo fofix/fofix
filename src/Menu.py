@@ -411,7 +411,7 @@ class Menu(Layer, KeyListener):
             self.engine.data.submenuSelect.transform.scale(tempWScale,tempHScale)
             self.engine.data.submenuSelect.transform.translate(boxXOffset,boxYOffset)
             self.engine.data.submenuSelect.draw()
-        
+          
           font.render(text, (x - v / 4, y), scale = scale)
         
         

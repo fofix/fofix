@@ -657,6 +657,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
                     scoreCard.stars = 0
                   if star > scoreCard.stars and self.engine.data.starLostSoundFound:
                     self.engine.data.starLostSound.play()
+                  elif star < scoreCard.stars and self.engine.data.starDingSoundFound:
+                    self.engine.data.starDingSound.play()
             else:
               self.resultSubStep[i] += 1
           if self.resultSubStep[i] == 1:
@@ -668,6 +670,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
                 scoreCard.stars = self.oldStars[i]
               if star > scoreCard.stars and self.engine.data.starLostSoundFound:
                 self.engine.data.starLostSound.play()
+              elif star < scoreCard.stars and self.engine.data.starDingSoundFound:
+                self.engine.data.starDingSound.play()
             self.resultSubStep[i] += 1
             self.currentScore[i] = self.finalScore[i]
         
@@ -783,7 +787,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         except IndexError:
           Theme.setBaseColor(1-v)
         wText, hText = font.getStringSize(text, scale = float(Theme.result_stats_notes[2]))
-        Dialogs.wrapText(font, (float(Theme.result_stats_notes[0]) - wText/2, float(Theme.result_stats_notes[1]) - v), text, 0.9, float(Theme.result_stats_notes[2]))
+        Dialogs.wrapText(font, (float(Theme.result_stats_notes[0]) - wText/2, float(Theme.result_stats_notes[1]) + v), text, 0.9, float(Theme.result_stats_notes[2]))
         
         try:
           r, g, b = Theme.hexToColorResults(Theme.result_score[3])
@@ -792,7 +796,6 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           Theme.setBaseColor(1-v)
         text = "%d" % self.currentScore[i]
         wText, hText = bigFont.getStringSize(text, scale = float(Theme.result_score[2]))
-        
         bigFont.render(text, (float(Theme.result_score[0]) - wText / 2, float(Theme.result_score[1]) + v), scale = float(Theme.result_score[2]))
         
         if self.resultStep == 0:
@@ -801,15 +804,12 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           space = 1
 
         scale = float(Theme.result_star[2])
-        
 
-        #MFH - TODO - migrate this positionable, scalable, spacable star score display logic into a GameEngine function like drawImage
-        #new code using drawStarScore:
         try:
           hspacing = float(Theme.result_star[3])
         except IndexError:
-          hspacing = 1.0
-        self.engine.drawStarScore(w, h, float(Theme.result_star[0]) - 2 * scale * hspacing, 1.0 - float(Theme.result_star[1]), scoreCard.stars, scale, space = space, horiz_spacing = hspacing)
+          hspacing = 1.1
+        self.engine.drawStarScore(w, h, float(Theme.result_star[0]), float(Theme.result_star[1]), scoreCard.stars, scale, horiz_spacing = hspacing, space = space, align = 1)
         
 #-        if scoreCard.stars > 5:
 #-          for j in range(5):
@@ -935,13 +935,12 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         space = 1
 
       scale = float(Theme.result_star[2])
-
           
       try:
         hspacing = float(Theme.result_star[3])
       except IndexError:
-        hspacing = 1.0
-      self.engine.drawStarScore(w, h, float(Theme.result_star[0]) - 2*hspacing*scale, float(Theme.result_star[1]), scoreCard.stars, scale, space = space, horiz_spacing = hspacing)
+        hspacing = 1.1
+      self.engine.drawStarScore(w, h, float(Theme.result_star[0]), float(Theme.result_star[1]), scoreCard.stars, scale, horiz_spacing = hspacing, space = space, align = 1)
 
 #-      if scoreCard.stars > 5:
 #-        for j in range(5):
@@ -1037,7 +1036,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           text = Theme.result_stats_part_text.strip()
         
         if text == "$icon$" and self.partImage:
-          self.engine.drawImage(self.part[i], scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (w*float(Theme.result_star[0]),h*float(Theme.result_star[1])))
+          self.engine.drawImage(self.part[i], scale = (float(Theme.result_stats_part[2]),-float(Theme.result_stats_part[2])), coord = (w*float(Theme.result_stats_part[0]),h*float(Theme.result_stats_part[1])))
         else:
           try:
             text = text % self.playerList[i].part
@@ -1161,7 +1160,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         # evilynux - Fixed star size following Font render bugfix
         # akedrou  - Fixed stars to render as stars after custom glyph removal... ...beautiful yPos
         #font.render(unicode(Data.STAR2 * stars + Data.STAR1 * (5 - stars)), (x + .6, y + self.offset), scale = scale * 1.8)
-        self.engine.drawStarScore(w, h, x+.6, 1.0-((y+self.offset+h2)/self.engine.data.fontScreenBottom), stars, scale * 15)
+        self.engine.drawStarScore(w, h, x+.6, 1.0-((y+self.offset+h2)/self.engine.data.fontScreenBottom), stars, scale)
 
         for j,player in enumerate(self.playerList):
           if (self.time % 10.0) < 5.0 and i == self.highscoreIndex[j] and self.scoreDifficulty == player.difficulty and self.scorePart == player.part:
