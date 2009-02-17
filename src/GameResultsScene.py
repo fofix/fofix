@@ -809,8 +809,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         try:
           hspacing = float(Theme.result_star[3])
         except IndexError:
-          hspacing = 0.5
-        self.engine.drawStarScore(w, h, float(Theme.result_star[0]), float(Theme.result_star[1]), scoreCard.stars, scale, horiz_spacing = hspacing, space = space, centered = 2)
+          hspacing = 1.0
+        self.engine.drawStarScore(w, h, float(Theme.result_star[0]), float(Theme.result_star[1]), scoreCard.stars, scale, space = space, horiz_spacing = hspacing, centered = 2)
         
 #-        if scoreCard.stars > 5:
 #-          for j in range(5):
@@ -943,7 +943,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         hspacing = float(Theme.result_star[3])
       except IndexError:
         hspacing = 0.5
-      self.engine.drawStarScore(w, h, float(Theme.result_star[0]), float(Theme.result_star[1]), scoreCard.stars, scale, horiz_spacing = hspacing, space = space, centered = 2)
+      self.engine.drawStarScore(w, h, float(Theme.result_star[0]), float(Theme.result_star[1]), scoreCard.stars, scale, space = space, horiz_spacing = hspacing, centered = 2)
 
 #-      if scoreCard.stars > 5:
 #-        for j in range(5):
@@ -1163,7 +1163,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         # evilynux - Fixed star size following Font render bugfix
         # akedrou  - Fixed stars to render as stars after custom glyph removal... ...beautiful yPos
         #font.render(unicode(Data.STAR2 * stars + Data.STAR1 * (5 - stars)), (x + .6, y + self.offset), scale = scale * 1.8)
-        self.engine.drawStarScore(w, h, x+.6, 1.0-((y+self.offset+h2)/self.engine.data.fontScreenBottom), stars, scale * 15)
+        self.engine.drawStarScore(w, h, x+.6, 1.0-((y+self.offset+h2)/self.engine.data.fontScreenBottom), stars, scale * 15, horiz_spacing = hspacing)
 
         for j,player in enumerate(self.playerList):
           if (self.time % 10.0) < 5.0 and i == self.highscoreIndex[j] and self.scoreDifficulty == player.difficulty and self.scorePart == player.part:

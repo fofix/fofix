@@ -1949,9 +1949,9 @@ class SongChooser(Layer, KeyListener):
                 Theme.setBaseColor(1 - v)
                 font.render(unicode(d),     (x, y),           scale = scale)
 
-                starscale = scale*1.4
                 stary = 1.0 - y/self.engine.data.fontScreenBottom - h * 1.2
-                self.engine.drawStarScore(screenw, screenh, x, stary, stars, starscale, horiz_spacing = starscale*40, hqStar = True, centered=1) #MFH
+                starscale = scale * 1.2
+                self.engine.drawStarScore(screenw, screenh, x, stary, stars, starscale, hqStar = True, centered = 1) #MFH
 
 #-                # evilynux - Fixed star size following Font render bugfix
 #-                if stars == 7: #akedrou

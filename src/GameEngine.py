@@ -765,38 +765,35 @@ class GameEngine(Engine):
     return self.data.loadImgDrawing(target, name, fileName, textureSize)
 
   #MFH
-  def drawStarScore(self, screenwidth, screenheight, xpos, ypos, stars, scale = None, horiz_spacing = None, space = 1.0, hqStar = False, results = False, centered = 0):
+  def drawStarScore(self, screenwidth, screenheight, xpos, ypos, stars, scale = None, horiz_spacing = 1.2, space = 1.0, hqStar = False, results = False, centered = 0):
     minScale = 0.02
-    autoSpacingScaleFactor = 2.2
     w = screenwidth
     h = screenheight
     if not scale:
       scale = minScale
     elif scale < minScale:
       scale = minScale
-    if not horiz_spacing:   #MFH - auto-space to with scaling figured
-      horiz_spacing = autoSpacingScaleFactor * scale
     if self.data.fcStars and stars == 7:
       star = self.data.starFC
     else:
       star = self.data.starPerfect
-    wide = 7000.0*horiz_spacing*scale * w / star.width1()
-    if centered == 1:
+    wide = scale * horiz_spacing
+    if centered == 1: # xpos, ypos - left top corner
       ypos -= 1.5*scale*star.width1()/h
       xpos += 1.5*scale*star.width1()/w
-    if centered == 2:
+    if centered == 2: # xpos, ypos - center coordinates
       ypos += 1.5*scale*star.width1()/h
-      xpos -= 1.5*scale*star.width1()/w * 4
-    if stars > 5:
+      xpos -= wide*2
+    if stars > 5:    
       for j in range(5):
 
         if self.data.maskStars:
           if self.data.theme == 2:
-            self.drawImage(star, scale = (scale,-scale), coord = (((w*xpos)+wide*j)*space**4,h*ypos), color = (1, 1, 0, 1), stretched=11)
+            self.drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), color = (1, 1, 0, 1), stretched=11)
           else:
-            self.drawImage(star, scale = (scale,-scale), coord = (((w*xpos)+wide*j)*space**4,h*ypos), color = (0, 1, 0, 1), stretched=11)
+            self.drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), color = (0, 1, 0, 1), stretched=11)
         else:
-          self.drawImage(star, scale = (scale,-scale), coord = (((w*xpos)+wide*j)*space**4,h*ypos), stretched=11)
+          self.drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), stretched=11)
     else:
       for j in range(5):
         if j < stars:
@@ -809,7 +806,8 @@ class GameEngine(Engine):
             star = self.data.star3
           else:
             star = self.data.star1
-        self.drawImage(star, scale = (scale,scale), coord = (((w*xpos)+wide*j)*space**4,h*ypos), stretched=11)
+
+        self.drawImage(star, scale = (scale,scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), stretched=11)
 
 
   #volshebnyi - now images can be resized to fit to screen
