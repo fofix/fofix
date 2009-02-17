@@ -256,7 +256,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "game", "decimal_places", autoApply = True), #MFH
       ConfigChoice(engine, engine.config, "game", "ignore_open_strums", autoApply = True),      #myfingershurt
       ConfigChoice(engine, engine.config, "game", "big_rock_endings", autoApply = True, isQuickset = 2),#myfingershurt
-      ConfigChoice(engine, engine.config, "game", "big_rock_logic", autoApply = True),	#volshebnyi
+      ConfigChoice(engine, engine.config, "game", "big_rock_logic", autoApply = True),#volshebnyi
       ConfigChoice(engine, engine.config, "game", "starpower_mode", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "party_time", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "keep_play_count", autoApply = True),
@@ -650,7 +650,7 @@ class SettingsMenu(Menu.Menu):
   
     self.settingsToApply = videoSettings + \
                            AdvancedAudioSettings + \
-			                     AdvancedVideoSettings + \
+                           AdvancedVideoSettings + \
                            FoFiXBasicSettings + \
                            keySettings + \
                            InGameDisplaySettings + \
@@ -664,7 +664,7 @@ class SettingsMenu(Menu.Menu):
 #-                           AdvancedAudioSettings + \
 #-                           volumeSettings + \
 #-                           keySettings + \
-#-			                     AdvancedVideoSettings + \
+#-                           AdvancedVideoSettings + \
 #-                           FoFiXBasicSettings + \11/26/2008 11:10:30 PM
 #-                           perfSettings + \
 #-                           listSettings + \

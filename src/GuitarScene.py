@@ -2420,10 +2420,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.guitars[i].freestyleLength = 0
       self.guitars[i].freestyleBonusFret = 0
       if self.guitars[i].isDrum:
-      	self.guitars[i].drumFillsCount = 0
-      	self.guitars[i].drumFillsHits = 0
+        self.guitars[i].drumFillsCount = 0
+        self.guitars[i].drumFillsHits = 0
       for i1 in range(0, 5):
-      	self.guitars[i].freestyleLastFretHitTime[i1] = 0
+        self.guitars[i].freestyleLastFretHitTime[i1] = 0
     self.failed = False
     self.finalFailed = False
     self.failEnd = False
@@ -2976,7 +2976,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             score = int( score +  guitar.freestyleBaseScore * hitspeed * ( guitar.freestylePercent + ( 100 - guitar.freestylePercent )  * brzoneremain ) / 100 )
             guitar.freestyleLastHit = pos
                 
-          if guitar.bigRockLogic == 2:	
+          if guitar.bigRockLogic == 2:
             if self.controls.getState(guitar.keys[0]):
               hitspeed = min((pos - guitar.freestyleLastFretHitTime[0]) / guitar.freestylePeriod, 1.0)
               score += guitar.freestyleBaseScore * hitspeed
@@ -2986,7 +2986,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 score += guitar.freestyleBaseScore * hitspeed
             if numFreestyleHits > 0:    #MFH - to prevent a float division!
               score = int ( score / numFreestyleHits )
-          if self.controls.getState(guitar.keys[0]):	
+          if self.controls.getState(guitar.keys[0]):
             guitar.freestyleLastFretHitTime[0] = pos
           for fret in range (1,5):
             if self.controls.getState(guitar.keys[fret]) or ( guitar.isDrum and self.controls.getState(guitar.keys[fret+4])):
@@ -5032,10 +5032,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 #-      return True  
 #-      if not self.controls.getState(self.guitars[num].keys[3]):
 #-        self.guitars[num].lastFretWasT3 = False
-#-      return True    	  
+#-      return True
 #-      if not self.controls.getState(self.guitars[num].keys[4]):
 #-        self.guitars[num].lastFretWasC = False
-#-      return True    	  
+#-      return True   
 
 
     #myfingershurt:
@@ -6725,8 +6725,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 if self.fxEnabled:
                   offset=(currentSP-0.5)*(1-currentSP)*0.5
                   self.engine.drawImage(self.oFill, scale = (self.oBarScale*currentSP,.5), coord = (w/2*(1+self.oBarScale*(currentSP-1)),h/12+ vCoord), rect = (0,currentSP,0,1), stretched = 1, rOffset = offset)
-		else:
-		  self.engine.drawImage(self.oFill, scale = (self.oBarScale*currentSP,.5), coord = (w/2*(1+self.oBarScale*(currentSP-1)),h/12+ vCoord), rect = (0,currentSP,0,1), stretched = 1)
+                else:
+                  self.engine.drawImage(self.oFill, scale = (self.oBarScale*currentSP,.5), coord = (w/2*(1+self.oBarScale*(currentSP-1)),h/12+ vCoord), rect = (0,currentSP,0,1), stretched = 1)
 
                 self.engine.drawImage(self.oTop, scale = (self.oBarScale,.5), coord = (w/2,h/12+ vCoord), stretched = 1)
             
@@ -7072,7 +7072,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 if not self.failEnd:
                   self.failGame()
     
-               #QQstarS:add the code in for loop end of here		
+               #QQstarS:add the code in for loop end of here
   
               if self.hopoIndicatorEnabled and not self.guitars[i].isDrum and not self.pause and not self.failed: #MFH - HOPO indicator (grey = strums required, white = strums not required)
                 text = self.tsHopoIndicator
@@ -7932,10 +7932,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 #  posY = y + 4 * h   -- MFH: this line causes a bad hang.
               elif self.hitAccuracyPos == 2:#Left-bottom
                 posX = .193
-                posY = .700		#(.193-size[0]/2, 0.667-size[1]/2+self.hFontOffset[i]))
+                posY = .700  #(.193-size[0]/2, 0.667-size[1]/2+self.hFontOffset[i]))
               elif self.hitAccuracyPos == 3: #Center-bottom
                 posX = .500
-                posY = .710			
+                posY = .710
     
     
               font.render(text, (posX - w / 2, posY - h / 2),(1, 0, 0),0.00170)    
@@ -8358,7 +8358,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             #if self.notesCum:
             #  f = int(100 * (float(self.playerList[0].notesHit) / self.notesCum))
             #  font.render("%d%%" % f, (.5 - w / 2, y + h))
-    			
+    
     
           
     

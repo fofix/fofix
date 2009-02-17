@@ -247,7 +247,7 @@ class Guitar:
     
     #check if BRE enabled
     if self.bigRockEndings == 2 or (self.theme == 2 and self.bigRockEndings == 1):
-    	self.freestyleEnabled = True
+      self.freestyleEnabled = True
 
     #blazingamer
     self.nstype = self.engine.config.get("game", "nstype")
@@ -1322,7 +1322,7 @@ class Guitar:
             c1, c2, c3, c4 = color
             tailGlow = 1 - (pos - self.freestyleLastFretHitTime[fret] ) / self.freestylePeriod
             if tailGlow < 0:
-            	tailGlow = 0
+              tailGlow = 0
             color = (c1 + c1*2.0*tailGlow, c2 + c2*2.0*tailGlow, c3 + c3*2.0*tailGlow, c4*0.6 + c4*0.4*tailGlow)    #MFH - this fades inactive tails' color darker       
           if freestyleTail == 2:
             #glColor4f(*color)
@@ -1644,8 +1644,8 @@ class Guitar:
             if time - self.freestyleOffset < pos:
               freestyleActive = True
               if z < -1.5:
-              	length += z +1.5
-              	z =  -1.5
+                length += z +1.5
+                z =  -1.5
   
             #MFH - render 5 freestyle tails
             for theFret in range(0,5):
@@ -2547,7 +2547,7 @@ class Guitar:
               glTexCoord2f(1.0, 1.0)
               glVertex3f( flameSize * ff, 0,  flameSize * ff)
               glEnd()
-              glPopMatrix()	  
+              glPopMatrix()
               glDisable(GL_TEXTURE_2D)
   
               glColor3f(flameColor[0], flameColor[1], flameColor[2])
@@ -2572,7 +2572,7 @@ class Guitar:
               glTexCoord2f(1.0, 1.0)
               glVertex3f( flameSize * ff, 0,  flameSize * ff)
               glEnd()
-              glPopMatrix()	  
+              glPopMatrix()
               glDisable(GL_TEXTURE_2D)
   
               glColor3f(flameColor[0], flameColor[1], flameColor[2])
@@ -2597,7 +2597,7 @@ class Guitar:
               glTexCoord2f(1.0, 1.0)
               glVertex3f( flameSize * ff, 0,  flameSize * ff)
               glEnd()
-              glPopMatrix()	  
+              glPopMatrix() 
               glDisable(GL_TEXTURE_2D)
             else:
               flameColorMod0 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
@@ -3045,7 +3045,7 @@ class Guitar:
               glTexCoord2f(1.0, 1.0)
               glVertex3f( flameSize * ff, 0,  flameSize * ff)
               glEnd()
-              glPopMatrix()	  
+              glPopMatrix()  
               glDisable(GL_TEXTURE_2D)
 
               glColor3f(flameColor[0], flameColor[1], flameColor[2])
@@ -3070,7 +3070,7 @@ class Guitar:
               glTexCoord2f(1.0, 1.0)
               glVertex3f( flameSize * ff, 0,  flameSize * ff)
               glEnd()
-              glPopMatrix()	  
+              glPopMatrix()  
               glDisable(GL_TEXTURE_2D)
 
               glColor3f(flameColor[0], flameColor[1], flameColor[2])
@@ -3095,7 +3095,7 @@ class Guitar:
               glTexCoord2f(1.0, 1.0)
               glVertex3f( flameSize * ff, 0,  flameSize * ff)
               glEnd()
-              glPopMatrix()	  
+              glPopMatrix()  
               glDisable(GL_TEXTURE_2D)
             else:
               flameColorMod0 = 0.1 * (flameLimit - event.flameCount)

@@ -800,7 +800,7 @@ class GameEngine(Engine):
             star = self.data.star3
           else:
             star = self.data.star1
-	
+
         self.drawImage(star, scale = (scale,scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), stretched=11)
 
 
@@ -810,17 +810,17 @@ class GameEngine(Engine):
     image.transform.reset()
     image.transform.rotate(rot)
     if stretched == 0: #don't sctretch
-    	image.transform.scale(scale[0],scale[1])
+      image.transform.scale(scale[0],scale[1])
     elif stretched == 1: # fit to width
-    	image.transform.scale(scale[0] / image.width1() * 640,scale[1])
+      image.transform.scale(scale[0] / image.width1() * 640,scale[1])
     elif stretched == 2: # fit to height
-    	image.transform.scale(scale[0],scale[1] / image.height1() * 480)
+      image.transform.scale(scale[0],scale[1] / image.height1() * 480)
     elif stretched == 11: # fit to width and keep ratio
-    	image.transform.scale(scale[0] / image.width1() * 640,scale[1] / image.width1() * 640)	
+      image.transform.scale(scale[0] / image.width1() * 640,scale[1] / image.width1() * 640)
     elif stretched == 12: # fit to height and keep ratio
-    	image.transform.scale(scale[0] / image.height1() * 480,scale[1] / image.height1() * 480)
+      image.transform.scale(scale[0] / image.height1() * 480,scale[1] / image.height1() * 480)
     else: # fit to screen
-    	image.transform.scale(scale[0] / image.width1() * 640,scale[1] / image.height1() * 480)
+      image.transform.scale(scale[0] / image.width1() * 640,scale[1] / image.height1() * 480)
     image.transform.translate(coord[0],coord[1])
     image.draw(color = color, rect = rect, lOffset = lOffset, rOffset = rOffset)
 
