@@ -792,6 +792,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           Theme.setBaseColor(1-v)
         text = "%d" % self.currentScore[i]
         wText, hText = bigFont.getStringSize(text, scale = float(Theme.result_score[2]))
+        
         bigFont.render(text, (float(Theme.result_score[0]) - wText / 2, float(Theme.result_score[1]) + v), scale = float(Theme.result_score[2]))
         
         if self.resultStep == 0:
@@ -800,8 +801,6 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           space = 1
 
         scale = float(Theme.result_star[2])
-        if scale < .1:
-          scale = .1
         
 
         #MFH - TODO - migrate this positionable, scalable, spacable star score display logic into a GameEngine function like drawImage
@@ -936,8 +935,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         space = 1
 
       scale = float(Theme.result_star[2])
-      if scale < .1:
-        scale = .25
+
           
       try:
         hspacing = float(Theme.result_star[3])
