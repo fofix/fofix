@@ -4033,7 +4033,7 @@ def compareSongsAndTitles(engine, a, b):
         Bval = b.diffSong
       elif order == 7:
         Bval = theInstrumentDiff(b)
-      elif order == 7:
+      elif order == 8:
         Bval = b.icon.lower()
     elif isinstance(b, SortTitleInfo):
       if order == 2:
