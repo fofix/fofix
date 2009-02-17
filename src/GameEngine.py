@@ -765,7 +765,7 @@ class GameEngine(Engine):
     return self.data.loadImgDrawing(target, name, fileName, textureSize)
 
   #MFH
-  def drawStarScore(self, screenwidth, screenheight, xpos, ypos, stars, scale = None, horiz_spacing = 1.2, space = 1.0, hqStar = False, results = False, centered = 0):
+  def drawStarScore(self, screenwidth, screenheight, xpos, ypos, stars, scale = None, horiz_spacing = 1.2, space = 1.0, hqStar = False):
     minScale = 0.02
     w = screenwidth
     h = screenheight
@@ -778,12 +778,6 @@ class GameEngine(Engine):
     else:
       star = self.data.starPerfect
     wide = scale * horiz_spacing
-    if centered == 1: # xpos, ypos - left top corner
-      ypos -= 1.5*scale*star.width1()/h
-      xpos += 1.5*scale*star.width1()/w
-    if centered == 2: # xpos, ypos - center coordinates
-      ypos += 1.5*scale*star.width1()/h
-      xpos -= wide*2
     if stars > 5:    
       for j in range(5):
 
@@ -806,7 +800,7 @@ class GameEngine(Engine):
             star = self.data.star3
           else:
             star = self.data.star1
-
+	
         self.drawImage(star, scale = (scale,scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), stretched=11)
 
 
