@@ -204,7 +204,7 @@ Config.define("game", "drum_sp_mode",      int, 0,  text = _("Drum SP"), options
 Config.define("game", "large_drum_neck",      bool, False,  text = _("Large Drum Neck"), options = {False: _("No"), True: _("Yes")})
 Config.define("game", "bass_groove_neck",      int, 1,  text = _("Bass Groove Neck"), options = {0: _("Off"), 1: _("Replace"), 2: _("Overlay")})
 Config.define("game", "guitar_solo_neck",      int, 2,  text = _("Guitar Solo Neck"), options = {0: _("Off"), 1: _("Replace"), 2: _("Overlay")})
-Config.define("game", "rock_band_events",      int, 1,  text = _("Rock Band MIDI Events"), options = {0: _("Off"), 1: _("By Theme"), 2: _("On")})
+Config.define("game", "rock_band_events",      int, 2,  text = _("Rock Band MIDI Events"), options = {0: _("Off"), 1: _("By Theme"), 2: _("On")})
 Config.define("game", "show_unused_text_events",      bool, False,  text = _("Show Unused Events"), options = {False: _("No"), True: _("Yes")})
 Config.define("game", "bass_kick_sound",      bool, False,  text = _("Kick Bass Sound"), options = {False: _("Off"), True: _("On")})
 Config.define("game", "rb_midi_lyrics",           int,  1,   text = _("Show MIDI Lyrics"), options = {0: _("Off"), 1: _("1p Only"), 2: _("Auto")})
