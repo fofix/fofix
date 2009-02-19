@@ -1953,9 +1953,9 @@ class SongChooser(Layer, KeyListener):
                 Theme.setBaseColor(1 - v)
                 font.render(unicode(d),     (x, y),           scale = scale)
 
-                starscale = scale*1.4
-                stary = 1.0 - y/self.engine.data.fontScreenBottom - h * 1.8
-                self.engine.drawStarScore(screenw, screenh, x, stary, stars, starscale, hqStar = True) #MFH
+                starscale = 0.02
+                stary = 1.0 - y/self.engine.data.fontScreenBottom - h
+                self.engine.drawStarScore(screenw, screenh, x+starscale/2, stary-starscale, stars, starscale, hqStar = True, centered = 1) #volshebnyi
 
 #-                # evilynux - Fixed star size following Font render bugfix
 #-                if stars == 7: #akedrou
@@ -2301,8 +2301,8 @@ class SongChooser(Layer, KeyListener):
                   else:
                     stary = .0935*(i+1)-pos[0]*.0935+.2-0.034
                   #stary = 0.5
-                  starscale = .025
-                  stary = 1.0 - (stary / self.engine.data.fontScreenBottom) - h/2
+                  starscale = 0.02
+                  stary = 1.0 - (stary / self.engine.data.fontScreenBottom)
                   self.engine.drawStarScore(screenw, screenh, starx, stary, stars, starscale, hqStar = True) #MFH
 
 #-                  #QQstarS:add  to show stars
@@ -2610,7 +2610,7 @@ class SongChooser(Layer, KeyListener):
                   else:
                     stary = .0935*(i+1)-pos[0]*.0935+.2-0.0145
                   #stary = 0.5
-                  starscale = scale*1.8
+                  starscale = 0.02
                   stary = 1.0 - (stary / self.engine.data.fontScreenBottom)
                   if i < pos[1]:
                     self.engine.drawStarScore(screenw, screenh, starx, stary, stars, starscale) #MFH
@@ -2955,14 +2955,9 @@ class SongChooser(Layer, KeyListener):
                       #Theme.setBaseColor(1 - v)
                       lfont.render(unicode(d),     (x, y),           scale = scale)
 
-
-                      starx = x
-                      #stary = y+h
-                      stary = y+h*1.5
-                      #stary = 0.5+h
-                      starscale = .025
-                      stary = 1.0 - (stary / self.engine.data.fontScreenBottom)
-                      self.engine.drawStarScore(screenw, screenh, starx, stary, stars, starscale, hqStar = True) #MFH
+                      starscale = 0.02
+                      stary = 1.0 - (y / self.engine.data.fontScreenBottom) - h
+                      self.engine.drawStarScore(screenw, screenh, x+starscale/2, stary+starscale, stars, starscale) #MFH
 
 #-                      if stars == 6 and self.theme == 2:
 #-                        glColor3f(1, 1, 0)  
@@ -3174,12 +3169,9 @@ class SongChooser(Layer, KeyListener):
                       font.render(unicode(d),     (x, y),           scale = scale)
                       
 
-                      starx = x + .01
-                      #stary = y+h
-                      stary = y + .032
-                      #stary = 0.5+h
-                      starscale = scale*1.8
-                      stary = 1.0 - (stary / self.engine.data.fontScreenBottom)
+                      starscale = 0.02
+                      starx = x + starscale/2
+                      stary = 1.0 - (y / self.engine.data.fontScreenBottom) - h - starscale
                       self.engine.drawStarScore(screenw, screenh, starx, stary, stars, starscale) #MFH
 
 #-                      if stars == 7 and self.theme == 2:
