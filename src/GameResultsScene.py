@@ -938,7 +938,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       wText, hText = font.getStringSize(text, scale = float(Theme.result_song[2]))
       if self.scaleTitle == 1:
         if self.centerTitle == 1:
-          max = .97 - (abs(.5 - float(Theme.result_song[0]))*2)
+          max = .94 - (abs(.5 - float(Theme.result_song[0]))*2)
           scale = font.scaleText(text, max, scale = float(Theme.result_song[2]))
           wText, hText = font.getStringSize(text, scale = scale)
           xText = float(Theme.result_song[0])-wText/2
