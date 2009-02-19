@@ -307,6 +307,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     if not titleFormat:
       titleFormat = 0
     self.scaleTitle  = titleFormat&1
+    self.centerTitle = titleFormat>>1&1
     
     if self.coOpType > 0:
       for i, score in enumerate(self.coOpScoring):
@@ -775,12 +776,23 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         glColor3f(r, g, b)
       except IndexError:
         Theme.setBaseColor(1-v)
-      wText, hText = font.getStringSize(text, scale = float(Theme.result_song[2]))
       if self.scaleTitle == 1:
-        scale = font.scaleText(text, .97 - float(Theme.result_song[0]), scale = float(Theme.result_song[2]))
-        font.render(text, (float(Theme.result_song[0]), float(Theme.result_song[1])), scale = scale)
+        if self.centerTitle == 1:
+          max = .97 - (abs(.5 - float(Theme.result_song[0]))*2)
+          scale = font.scaleText(text, max, scale = float(Theme.result_song[2]))
+          wText, hText = font.getStringSize(text, scale = scale)
+          xText = float(Theme.result_song[0])-wText/2
+          if xText < .03:
+            xText = .03
+          font.render(text, (xText, float(Theme.result_song[1])), scale = scale)
+        else:
+          scale = font.scaleText(text, .97 - float(Theme.result_song[0]), scale = float(Theme.result_song[2]))
+          font.render(text, (float(Theme.result_song[0]), float(Theme.result_song[1])), scale = scale)
       else:
-        Dialogs.wrapText(font, (float(Theme.result_song[0]), float(Theme.result_song[1]) - v), text, 0.9, float(Theme.result_song[2]))
+        if self.centerTitle == 1:
+          Dialogs.wrapCenteredText(font, (float(Theme.result_song[0]), float(Theme.result_song[1]) - v), text, 0.9, float(Theme.result_song[2]))
+        else:
+          Dialogs.wrapText(font, (float(Theme.result_song[0]), float(Theme.result_song[1]) - v), text, 0.9, float(Theme.result_song[2]))
       
       for i, scoreCard in enumerate(self.scoring):
         self.engine.view.setViewportHalf(len(self.scoring),i)
@@ -925,10 +937,22 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         Theme.setBaseColor(1-v)
       wText, hText = font.getStringSize(text, scale = float(Theme.result_song[2]))
       if self.scaleTitle == 1:
-        scale = font.scaleText(text, .97 - float(Theme.result_song[0]), scale = float(Theme.result_song[2]))
-        font.render(text, (float(Theme.result_song[0]), float(Theme.result_song[1])), scale = scale)
+        if self.centerTitle == 1:
+          max = .97 - (abs(.5 - float(Theme.result_song[0]))*2)
+          scale = font.scaleText(text, max, scale = float(Theme.result_song[2]))
+          wText, hText = font.getStringSize(text, scale = scale)
+          xText = float(Theme.result_song[0])-wText/2
+          if xText < .03:
+            xText = .03
+          font.render(text, (xText, float(Theme.result_song[1])), scale = scale)
+        else:
+          scale = font.scaleText(text, .97 - float(Theme.result_song[0]), scale = float(Theme.result_song[2]))
+          font.render(text, (float(Theme.result_song[0]), float(Theme.result_song[1])), scale = scale)
       else:
-        Dialogs.wrapText(font, (float(Theme.result_song[0]), float(Theme.result_song[1]) - v), text, 0.9, float(Theme.result_song[2]))
+        if self.centerTitle == 1:
+          Dialogs.wrapCenteredText(font, (float(Theme.result_song[0]), float(Theme.result_song[1]) - v), text, 0.9, float(Theme.result_song[2]))
+        else:
+          Dialogs.wrapText(font, (float(Theme.result_song[0]), float(Theme.result_song[1]) - v), text, 0.9, float(Theme.result_song[2]))
       
       scoreCard = self.scoring[0]
       i = 0
