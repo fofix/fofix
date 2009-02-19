@@ -298,8 +298,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.starPowersActive = 0
     self.playersInGreen = 0
     self.crowdFaderVolume = 0.0
-    self.coOpStreak = 0
-    self.coOpStreakHi =  0
     self.coOpStarPower = 0
     self.coOpStarPowerTimer = 0
     self.coOpStarPowerActive = [0 for i in self.playerList]
@@ -635,14 +633,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.guitarSoloBroken = [False for i in self.playerList]
 
 
-    self.avMult = [0.0 for i in self.playerList]
-    self.lastStars = [0 for i in self.playerList]
-    if self.coOpRB or self.coOpGH:
-      self.avMult.append(0.0)
-      self.lastStars.append(0.0)
-      self.coOpStars = 0
-      self.coOpPartialStars = 0
-      self.coOpStarRatio = 0.0
     self.deadPlayerList = [] #akedrou - keep the order failed.
     self.numDeadPlayers = 0
     coOpInstruments = []
@@ -659,16 +649,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         instrument = Song.GUITAR_PART #while different guitars exist, they don't affect scoring.
         coOpInstruments.append(instrument)
       self.scoring[i] = Scorekeeper.ScoreCard([instrument])
+    if self.coOpType:
+      self.coOpScoreCard = Scorekeeper.ScoreCard(coOpInstruments, coOpType = True)
+    else:
+      self.coOpScoreCard = None
     
     self.partialStar = [0 for i in self.playerList]
     self.starRatio = [0.0 for i in self.playerList]
     self.dispSoloReview = [False for i in self.playerList]
     self.soloReviewText = [[] for i in self.playerList]
     self.soloReviewCountdown = [0 for i in self.playerList]
-    self.hitAccuracy = [0.0 for i in self.playerList]
-    self.coOpNotesHit = 0
-    if self.coOpRB or self.coOpGH:
-      self.hitAccuracy.append(0.0)
     self.guitarSoloAccuracy = [0.0 for i in self.playerList]
     self.guitarSoloActive = [False for i in self.playerList]
     self.currentGuitarSolo = [0 for i in self.playerList]
@@ -1104,11 +1094,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     coOpTotalStreakNotes = 0
     coOpTotalNotes = 0
     self.star = [{} for i in self.playerList]
-    if self.coOpType:
-      self.coOpScoreCard = Scorekeeper.ScoreCard(coOpInstruments, coOpType = True)
+    if self.coOpScoreCard:
       self.coOpScoreCard.lastNoteTime  = max(self.lastNoteTimes)
-    else:
-      self.coOpScoreCard = None
     for i, scoreCard in enumerate(self.scoring):   #accumulate base scoring values for co-op
       if self.coOpScoreCard:
         self.coOpScoreCard.totalStreakNotes += scoreCard.totalStreakNotes
@@ -2345,8 +2332,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.lastStreak.append(0)
     self.midiLyricLineIndex = 0
     self.drumStart = False  #faaa's drum sound mod restart
-    self.avMult = [0.0 for i in self.playerList]
-    self.lastStars = [0 for i in self.playerList]
     self.dispAccuracy = [False for i in self.playerList]
     for playaNum, thePlayer in enumerate(self.playerList): 
       #thePlayer.stars = 0
@@ -2358,22 +2343,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       scoreCard.reset()
     self.crowdsCheering = False #akedrou
     if self.coOpType:
-      self.coOpScore = 0
-      self.coOpStars = 0
-      self.coOpStreak = 0
-      self.coOpStreakHi = 0
-      self.coOpNotesHit = 0
       self.coOpScoreCard.reset()
       self.coOpStarPower = 0
       self.coOpStarPowerTimer = 0
       self.coOpStarPowerActive = [0 for i in self.playerList]
-      self.lastCoOpStars = 0
-      self.coOpPartialStars = 0
-      self.coOpStarRatio = 0.0
     self.mutedLastSecondYet = False
     self.dispSoloReview = [False for i in self.playerList]
     self.soloReviewCountdown = [0 for i in self.playerList]
-    self.hitAccuracy = [0.0 for i in self.playerList]
     self.guitarSoloAccuracy = [0.0 for i in self.playerList]
     self.guitarSoloActive = [False for i in self.playerList]
     self.currentGuitarSolo = [0 for i in self.playerList]
@@ -2408,9 +2384,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.minusRock.append(0.0)
       self.plusRock.append(0.0)
       self.timesFailed = [0 for i in self.playerList]
-    if self.coOpType:
-      self.hitAccuracy.append(0.0)
-      self.avMult.append(0.0)
     for i, thePlayer in enumerate(self.playerList):
       self.guitars[i].starPower = 0   
       self.guitars[i].coOpFailed = False
@@ -6414,10 +6387,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   self.engine.drawImage(self.counter, scale = (.5,-.5), coord = (w*.5,h*.63))
                   
                   glColor4f(0,0,0,1)
-                  streak3 = self.coOpStreak/1000
-                  streak2 = (self.coOpStreak-streak3*1000)/100
-                  streak1 = (self.coOpStreak-streak3*1000-streak2*100)/10
-                  streak0 = (self.coOpStreak-streak3*1000-streak2*100-streak1*10)
+                  streak3 = self.coOpScoreCard.streak/1000
+                  streak2 = (self.coOpScoreCard.streak-streak3*1000)/100
+                  streak1 = (self.coOpScoreCard.streak-streak3*1000-streak2*100)/10
+                  streak0 = (self.coOpScoreCard.streak-streak3*1000-streak2*100-streak1*10)
                   text = str(streak0)
                   size = streakFont.getStringSize(text)
                   streakFont.render(text, (.543-size[0]/2, 0.265))
