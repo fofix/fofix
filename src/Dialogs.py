@@ -1954,8 +1954,8 @@ class SongChooser(Layer, KeyListener):
                 font.render(unicode(d),     (x, y),           scale = scale)
 
                 starscale = 0.02
-                stary = 1.0 - y/self.engine.data.fontScreenBottom - h
-                self.engine.drawStarScore(screenw, screenh, x+starscale/2, stary-starscale, stars, starscale, hqStar = True) #volshebnyi
+                stary = 1.0 - y/self.engine.data.fontScreenBottom
+                self.engine.drawStarScore(screenw, screenh, x+.01, stary-2*h, stars, starscale, hqStar = True) #volshebnyi
 
 #-                # evilynux - Fixed star size following Font render bugfix
 #-                if stars == 7: #akedrou
@@ -2303,7 +2303,7 @@ class SongChooser(Layer, KeyListener):
                   #stary = 0.5
                   starscale = 0.02
                   stary = 1.0 - (stary / self.engine.data.fontScreenBottom)
-                  self.engine.drawStarScore(screenw, screenh, starx, stary, stars, starscale, hqStar = True) #MFH
+                  self.engine.drawStarScore(screenw, screenh, starx, stary - h/2, stars, starscale, hqStar = True) #MFH
 
 #-                  #QQstarS:add  to show stars
 #-                  if stars == 7:
@@ -2604,7 +2604,7 @@ class SongChooser(Layer, KeyListener):
                         score, stars, name = 0, 0, "---"
   
 
-                  starx = self.song_listscore_xpos-.01
+                  starx = self.song_listscore_xpos+.005
                   if self.extraStats:
                     stary = .0935*(i+1)-pos[0]*.0935+.1705
                   else:
@@ -2957,7 +2957,7 @@ class SongChooser(Layer, KeyListener):
 
                       starscale = 0.02
                       stary = 1.0 - (y / self.engine.data.fontScreenBottom) - h
-                      self.engine.drawStarScore(screenw, screenh, x+starscale/2, stary+starscale, stars, starscale) #MFH
+                      self.engine.drawStarScore(screenw, screenh, x+.01, stary-h, stars, starscale) #MFH
 
 #-                      if stars == 6 and self.theme == 2:
 #-                        glColor3f(1, 1, 0)  
