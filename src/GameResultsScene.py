@@ -303,6 +303,11 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     #self.fcStars = self.engine.data.fcStars
     #self.maskStars = self.engine.data.maskStars
     
+    titleFormat = Theme.result_song_form
+    if not titleFormat:
+      titleFormat = 0
+    self.scaleTitle  = titleFormat&1
+    
     if self.coOpType > 0:
       for i, score in enumerate(self.coOpScoring):
         if not self.partImage:
@@ -771,7 +776,11 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       except IndexError:
         Theme.setBaseColor(1-v)
       wText, hText = font.getStringSize(text, scale = float(Theme.result_song[2]))
-      Dialogs.wrapText(font, (float(Theme.result_song[0]), float(Theme.result_song[1]) - v), text, 0.9, float(Theme.result_song[2]))
+      if self.scaleTitle == 1:
+        scale = font.scaleText(text, .97 - float(Theme.result_song[0]), scale = float(Theme.result_song[2]))
+        font.render(text, (float(Theme.result_song[0]), float(Theme.result_song[1])), scale = scale)
+      else:
+        Dialogs.wrapText(font, (float(Theme.result_song[0]), float(Theme.result_song[1]) - v), text, 0.9, float(Theme.result_song[2]))
       
       for i, scoreCard in enumerate(self.scoring):
         self.engine.view.setViewportHalf(len(self.scoring),i)
@@ -915,7 +924,11 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       except IndexError:
         Theme.setBaseColor(1-v)
       wText, hText = font.getStringSize(text, scale = float(Theme.result_song[2]))
-      Dialogs.wrapText(font, (float(Theme.result_song[0]), float(Theme.result_song[1]) - v), text, 0.9, float(Theme.result_song[2]))
+      if self.scaleTitle == 1:
+        scale = font.scaleText(text, .97 - float(Theme.result_song[0]), scale = float(Theme.result_song[2]))
+        font.render(text, (float(Theme.result_song[0]), float(Theme.result_song[1])), scale = scale)
+      else:
+        Dialogs.wrapText(font, (float(Theme.result_song[0]), float(Theme.result_song[1]) - v), text, 0.9, float(Theme.result_song[2]))
       
       scoreCard = self.scoring[0]
       i = 0

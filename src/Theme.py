@@ -198,6 +198,7 @@ Config.define("theme", "fail_selected_color",  str, "#FFBF00")
 
 Config.define("theme", "result_score", str, ".5,.11,0.0025,None")
 Config.define("theme", "result_song", str, ".05,.045,.002,None")
+Config.define("theme", "result_song_form", int, 0)
 Config.define("theme", "result_song_text", str, "%s Finished!")
 Config.define("theme", "result_star", str, ".5,.35,0.15,0.5")
 Config.define("theme", "result_stats_diff", str, ".5,.55,0.002,None")
@@ -419,6 +420,7 @@ songListDisplay = None
 result_score = [None] * 4
 result_star = [None] * 4
 result_song = [None] * 4
+result_song_form = None
 result_song_text = None
 result_stats_part = [None] * 4
 result_stats_part_text = None
@@ -792,7 +794,7 @@ def setupHopoIndicator(config):
   hopoIndicatorInactiveColor = hexToColor(config.get("theme", "hopo_indicator_inactive_color"))
   
 def setupResults(config):
-  global result_score, result_star, result_song, result_song_text, result_stats_part, result_stats_diff
+  global result_score, result_star, result_song, result_song_text, result_song_form, result_stats_part, result_stats_diff
   global result_stats_diff_text, result_stats_part_text, result_stats_streak_text, result_stats_accuracy_text
   global result_stats_accuracy, result_stats_streak, result_stats_notes, result_stats_notes_text
   global result_cheats_info, result_cheats_numbers, result_cheats_percent, result_cheats_score, result_cheats_color
@@ -801,6 +803,7 @@ def setupResults(config):
   result_score = config.get("theme", "result_score").split(",")
   result_star = config.get("theme", "result_star").split(",")
   result_song = config.get("theme", "result_song").split(",")
+  result_song_form = config.get("theme", "result_song_form")
   result_song_text = config.get("theme", "result_song_text").strip()
   result_stats_part = config.get("theme", "result_stats_part").split(",")
   result_stats_part_text = config.get("theme", "result_stats_part_text").strip()
