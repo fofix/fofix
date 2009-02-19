@@ -2186,9 +2186,9 @@ class SongChooser(Layer, KeyListener):
                 w, h = font.getStringSize(text, scale = scale)
 
                 if i == self.selectedIndex:
-                  sfont.render(text, (self.song_list_xpos, .0935*(i+1)-pos[0]*.0935+.15), scale = scale)
+                  sfont.render(text, (self.song_list_xpos, .0925*(i+1)-pos[0]*.0925+.15), scale = scale)
                 else:
-                  lfont.render(text, (self.song_list_xpos, .0935*(i+1)-pos[0]*.0935+.15), scale = scale)
+                  lfont.render(text, (self.song_list_xpos, .0925*(i+1)-pos[0]*.0925+.15), scale = scale)
 
 
                 #MFH - Song list score / info display:
@@ -2201,9 +2201,9 @@ class SongChooser(Layer, KeyListener):
                   glColor3f(c1,c2,c3)
                   # evilynux - tweaked position to fit hit% and note streak
                   if self.extraStats:
-                    lfont.render(text, (self.song_listscore_xpos-w-.02, .0935*(i+1)-pos[0]*.0935+.1575-h/2), scale=scale)
+                    lfont.render(text, (self.song_listscore_xpos-w-.02, .0925*(i+1)-pos[0]*.0925+.1575-h/2), scale=scale)
                   else:
-                    lfont.render(text, (self.song_listscore_xpos-w-.02, .0935*(i+1)-pos[0]*.0935+.2-h/2), scale=scale)
+                    lfont.render(text, (self.song_listscore_xpos-w-.02, .0925*(i+1)-pos[0]*.0925+.2-h/2), scale=scale)
                   if not item.frets == "":
                     suffix = ", ("+item.frets+")"
                   else:
@@ -2233,7 +2233,7 @@ class SongChooser(Layer, KeyListener):
                     scale = .0014
                   w, h = font.getStringSize(text, scale = scale)
 
-                  lfont.render(text, (self.song_list_xpos+.05, .0935*(i+1)-pos[0]*.0935+.2), scale=scale)
+                  lfont.render(text, (self.song_list_xpos+.05, .0925*(i+1)-pos[0]*.0925+.2), scale=scale)
   
                   if self.scoreTimer == 0 and self.highScoreType == 0: #racer: regular-style highscore movement
                     if self.diff == "Easy":
@@ -2295,15 +2295,15 @@ class SongChooser(Layer, KeyListener):
                       else:
                         score, stars, name = 0, 0, "---"
 
-                  starx = self.song_listscore_xpos+.018
+                  starx = self.song_listscore_xpos+.01
                   if self.extraStats:
-                    stary = .0935*(i+1)-pos[0]*.0935+.1825-0.034
+                    stary = .0925*(i+1)-pos[0]*.0925+.1825-0.034
                   else:
-                    stary = .0935*(i+1)-pos[0]*.0935+.2-0.034
+                    stary = .0925*(i+1)-pos[0]*.0925+.2-0.034
                   #stary = 0.5
-                  starscale = 0.02
+                  starscale = 0.03
                   stary = 1.0 - (stary / self.engine.data.fontScreenBottom)
-                  self.engine.drawStarScore(screenw, screenh, starx, stary - h/2, stars, starscale, hqStar = True) #MFH
+                  self.engine.drawStarScore(screenw, screenh, starx, stary - h/2, stars, starscale, horiz_spacing = 1.0, hqStar = True) #MFH
 
 #-                  #QQstarS:add  to show stars
 #-                  if stars == 7:
@@ -2338,15 +2338,15 @@ class SongChooser(Layer, KeyListener):
                     if score is not _("Nil") and score > 0 and notesTotal != 0:
                       text = "%.1f%% (%d)" % ((float(notesHit) / notesTotal) * 100.0, noteStreak)
                       w, h = font.getStringSize(text, scale=scale)
-                      lfont.render(text, (self.song_listscore_xpos+.1-w, .0935*(i+1)-pos[0]*.0935+.1725), scale=scale)
+                      lfont.render(text, (self.song_listscore_xpos+.1-w, .0925*(i+1)-pos[0]*.0925+.1725), scale=scale)
   
                   text = str(score)
                   w, h = font.getStringSize(text, scale=scale)
                   if score > 0 and score!=_("Nil"): #QQstarS: score >0 that have the back color
                     # evilynux - No more outline
-                    lfont.render(text, (self.song_listscore_xpos+.1-w, .0935*(i+1)-pos[0]*.0935+.2), scale=scale*1.28)
+                    lfont.render(text, (self.song_listscore_xpos+.1-w, .0925*(i+1)-pos[0]*.0925+.2), scale=scale*1.28)
                   else: #QQstarS: 
-                    lfont.render(text, (self.song_listscore_xpos+.1-w, .0935*(i+1)-pos[0]*.0935+.2), scale=scale*1.28)
+                    lfont.render(text, (self.song_listscore_xpos+.1-w, .0925*(i+1)-pos[0]*.0925+.2), scale=scale*1.28)
   
                   if self.scoreTimer < 1000:
                     self.scoreTimer += 1
