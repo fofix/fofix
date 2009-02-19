@@ -311,7 +311,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.rockFinished = False
     self.spTimes = [[] for i in self.playerList]
     self.midiSP = False
-    self.oBarScale = 0.5 #volshebnyi - overdrive bar scale factor
+    self.oBarScale = 0.0 #volshebnyi - overdrive bar scale factor
 
 
     ###Capo###
@@ -6695,8 +6695,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
                 self.engine.drawImage(self.oBottom, scale = (self.oBarScale,.5), coord = (w/2,h/12+ vCoord), stretched = 1)
                 
-                if self.fxEnabled:
-                  offset=(currentSP-0.5)*(1-currentSP)*0.5
+                if self.oBarScale == 0.0:
+                  self.oBarScale = Theme.oBarHScale * self.guitars[i].boardWidth / math.sqrt(self.camera.origin[1]**2+(self.camera.origin[2]-0.5-vCoord/125)**2) * self.oBarScaleCoef
+                
+                if Theme.oBar3dFill:
+                  offset=(currentSP-0.5)*(1-currentSP) / self.camera.origin[1] * 0.8
                   self.engine.drawImage(self.oFill, scale = (self.oBarScale*currentSP,.5), coord = (w/2*(1+self.oBarScale*(currentSP-1)),h/12+ vCoord), rect = (0,currentSP,0,1), stretched = 1, rOffset = offset)
                 else:
                   self.engine.drawImage(self.oFill, scale = (self.oBarScale*currentSP,.5), coord = (w/2*(1+self.oBarScale*(currentSP-1)),h/12+ vCoord), rect = (0,currentSP,0,1), stretched = 1)

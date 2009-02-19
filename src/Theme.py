@@ -113,6 +113,7 @@ Config.define("theme", "pov_origin_z",       float, None)
 Config.define("theme", "fretS_color",       str, "#4CB2E5")
 Config.define("theme", "fretK_color",       str, "#000000")
 Config.define("theme", "obar_hscale",       float, 0.7)
+Config.define("theme", "obar_3dfill",       bool, False)
 
 #blazingamer
 Config.define("theme", "menu_x",       float, None)
@@ -644,6 +645,7 @@ def setupMisc(config):
   global songListDisplay
   global jurgTextPos
   global oBarHScale
+  global oBar3dFill
 
   loadingPhrase = config.get("theme", "loading_phrase")
   resultsPhrase = config.get("theme", "results_phrase")
@@ -662,6 +664,7 @@ def setupMisc(config):
   songListDisplay = config.get("theme", "song_list_display")
   jurgTextPos = config.get("theme", "jurgen_text_pos").split(",")
   oBarHScale = config.get("theme", "obar_hscale")
+  oBar3dFill = config.get("theme", "obar_3dfill")
 
 #MFH:
 def setupSonglist(config):
