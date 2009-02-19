@@ -1955,7 +1955,7 @@ class SongChooser(Layer, KeyListener):
 
                 starscale = 0.02
                 stary = 1.0 - y/self.engine.data.fontScreenBottom - h
-                self.engine.drawStarScore(screenw, screenh, x+starscale/2, stary-starscale, stars, starscale, hqStar = True, centered = 1) #volshebnyi
+                self.engine.drawStarScore(screenw, screenh, x+starscale/2, stary-starscale, stars, starscale, hqStar = True) #volshebnyi
 
 #-                # evilynux - Fixed star size following Font render bugfix
 #-                if stars == 7: #akedrou
