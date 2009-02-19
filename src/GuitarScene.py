@@ -6026,7 +6026,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                                         rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis)) 
                 if self.coopRockmeter:
                   self.engine.drawImage(self.coopRockmeter, scale = (.5,-.5), coord = (w*.5, h*.365))
-                self.engine.drawImage(self.mult, scale = (.5,-.0625), coord = (w*0.505,h*0.295), rect = (0,1,multRange[0],multRange[1]))
               
                         
               elif self.coOp:
@@ -6342,6 +6341,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                             corockcoord = (w*.5,h*.37)
                           self.engine.drawImage(rock, scale = (.5,-.5), coord = corockcoord)
                         self.engine.drawImage(self.arrow, scale = (wfactor,-wfactor), coord = (w*.5,h*.29), rot = -angle)
+                      self.engine.drawImage(self.mult, scale = (.5,-.0625), coord = (w*0.505,h*0.295), rect = (0,1,multRange[0],multRange[1]))
                       if self.rockTop:
                         self.engine.drawImage(self.rockTop, scale = (.5,-.5), coord = (w*.5,h*.3))
                   
