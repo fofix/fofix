@@ -12,6 +12,7 @@
 "data\_sqlite.pyd"//new compiled module
 "data\pitchbend.pyd"//new compiled module
 "data\rtmidi.pyd"//new compiled module
+"data\win32gui.pyd"//new compiled module
 //-------Additional images required over 3.000--------
 "data\glow.png"//new PNG from SVG
 "data\cassette.png"//new PNG from SVG
