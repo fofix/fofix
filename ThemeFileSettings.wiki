@@ -21,8 +21,7 @@ Then use any of the following settings below the {{{[theme]}}} header in the the
 ==Options Menu==
 
 ||advsettingstext10 = .393,.87,.49,.074||.393 is X Pos, .87 is Y Position, .49 is Scaling Size, .0741 is Line Spacing between menu items. Used for Adv. Options Menu(This is used if you made the advsettings.png and advsettingstext10.png images. The '10' in the name refers to being that, for example, the GH3 advanced options menu has 10 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
-||opt_bkg_x = 0||0 starts from the center||
-||opt_bkg_y = 0||0 starts from the center||
+||opt_bkg_size = 0.5,0.5,1.0,1.0||position (x,y) of center, xScale, yScale||
 ||opt_selected_color = #FFBF00||Selects the color of the options menu selected text. Use a Hex color code||
 ||opt_text_x = .38||Controls the Option Menu text X position||
 ||opt_text_y = .15||Controls the Option Menu text Y position||
