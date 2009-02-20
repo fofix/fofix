@@ -170,8 +170,7 @@ Config.define("theme", "pause_text_y",       float, None)
 Config.define("theme", "pause_text_color",  str, "#FFFFFF")
 Config.define("theme", "pause_selected_color",  str, "#FFBF00")
 
-Config.define("theme", "opt_bkg_x",       float, None)
-Config.define("theme", "opt_bkg_y",       float, None)
+Config.define("theme", "opt_bkg",   str, "0.5,0.5,1.0,1.0")
 Config.define("theme", "opt_text_x",       float, None)
 Config.define("theme", "opt_text_y",       float, None)
 Config.define("theme", "opt_text_color",  str, "#FFFFFF")
@@ -344,8 +343,7 @@ pause_bkg_yPos = None
 pause_text_xPos = None
 pause_text_yPos = None
 
-opt_bkg_xPos = None
-opt_bkg_yPos = None
+opt_bkg_size = [None]*4
 opt_text_xPos = None
 opt_text_yPos = None
 
@@ -726,14 +724,13 @@ def setupSonglist(config):
   
 def setupPauseNOpt(config):
   global pause_bkg_xPos, pause_bkg_yPos, pause_text_xPos, pause_text_yPos
-  global opt_bkg_xPos, opt_bkg_yPos, opt_text_xPos, opt_text_yPos
+  global opt_bkg_size, opt_text_xPos, opt_text_yPos
 
   pause_bkg_xPos = config.get("theme", "pause_bkg_x")
   pause_bkg_yPos = config.get("theme", "pause_bkg_y")
   pause_text_xPos = config.get("theme", "pause_text_x")
   pause_text_yPos = config.get("theme", "pause_text_y")
-  opt_bkg_xPos = config.get("theme", "opt_bkg_x")
-  opt_bkg_yPos = config.get("theme", "opt_bkg_y")
+  opt_bkg_size = config.get("theme", "opt_bkg").split(",")
   opt_text_xPos = config.get("theme", "opt_text_x")
   opt_text_yPos = config.get("theme", "opt_text_y")
   

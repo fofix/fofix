@@ -220,15 +220,7 @@ class MainMenu(BackgroundLayer):
       (_("Practice"), lambda: self.newLocalGame(mode1p = 1)),
     ]
     
-    self.opt_bkg_x = Theme.opt_bkg_xPos
-    self.opt_bkg_y = Theme.opt_bkg_yPos
-
-    if self.opt_bkg_x == None:
-      self.opt_bkg_x = 0
-
-    if self.opt_bkg_y == None:
-      self.opt_bkg_y = 0
-
+    self.opt_bkg_size = [float(i) for i in Theme.opt_bkg_size]
 
     strCareer = ""
     strQuickplay = ""
@@ -489,17 +481,14 @@ class MainMenu(BackgroundLayer):
 
       if self.active:
         if self.optionsBG != None:
-          wfactor = self.optionsBG.widthf(pixelw = 640.000)
-          self.engine.drawImage(self.optionsBG, (wfactor,-wfactor), (w/2+self.opt_bkg_x,h/2+self.opt_bkg_y))
+          self.engine.drawImage(self.optionsBG, (self.opt_bkg_size[2],-self.opt_bkg_size[3]), (w*self.opt_bkg_size[0],h*self.opt_bkg_size[1]), stretched = 3)
         
         self.engine.drawImage(self.optionsPanel, (0.5,-0.5), (w/1.7, h/2))  
 
       if self.menu.active:
         if self.background != None:
           #MFH - auto-scaling
-          imgwidth = self.background.width1()
-          wfactor = 640.000/imgwidth
-          self.engine.drawImage(self.background, (wfactor,-wfactor), (w/2, h/2))
+          self.engine.drawImage(self.background, (1.0,-1.0), (w/2, h/2), stretched = 3)
 
         for i in range(0,6):
           #Item selected
@@ -535,15 +524,13 @@ class MainMenu(BackgroundLayer):
 
       if self.active:
         if self.optionsBG != None:
-          wfactor = self.optionsBG.widthf(pixelw = 640.000)
-          self.engine.drawImage(self.optionsBG, (wfactor,-wfactor), (w/2+self.opt_bkg_x,h/2+self.opt_bkg_y))
+          self.engine.drawImage(self.optionsBG, (self.opt_bkg_size[2],-self.opt_bkg_size[3]), (w*self.opt_bkg_size[0],h*self.opt_bkg_size[1]), stretched = 3)
         
         self.engine.drawImage(self.optionsPanel, (0.5,-0.5), (w*0.4, h/2))
         
       if self.menu.active:
         if self.background != None:
-          wfactor = self.background.widthf(pixelw = 640.000)
-          self.engine.drawImage(self.background, (wfactor,-wfactor), (w/2, h/2))
+          self.engine.drawImage(self.background, (1.0,-1.0), (w/2, h/2), stretched = 3)
 
         for i in range(0,5):
           #Item selected
