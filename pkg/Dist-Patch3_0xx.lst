@@ -14,6 +14,8 @@
 "data\rtmidi.pyd"//new compiled module
 "data\win32gui.pyd"//new compiled module
 //-------Additional images required over 3.000--------
+"data\necks\Neck_00?.png"//all
+"data\necks\Neck_010.png"//neck 10 too.
 "data\glow.png"//new PNG from SVG
 "data\cassette.png"//new PNG from SVG
 "data\left.png"//new PNG from SVG
