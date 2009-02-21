@@ -12,7 +12,7 @@
   * Download 3.100 RC1 Full for GNU/Linux (32bit) [http://www.mediafire.com/?ncyng1oj21n from Mediafire]
 
 
-====Feb. 8th 2009 ====
+====Feb. ? 2009 ====
 3.100 Beta 4 (SVN r960) has been released for testing.  This should be the last beta, 3.100 final is scheduled for release in a couple days - assuming there are no major problems with beta 4.
 
   * Download 3.0xx -> 3.100 beta 4 Patch for Windows [http://www.mediafire.com/?mongfyqmy2i from Mediafire] / [http://rapidshare.com/files/195808034/FoFiX-3.030_r960-Patch-Windows_3.100beta4_.rar from Rapidshare]
