@@ -85,7 +85,7 @@ else:
   #stump: move this here to let it be retrieved without instantiating a GameEngine.
   # This is needed so it can be embedded into generated exes.
   # If the format of the version string (except for suffixes) changes, be sure to edit setup_exe.py too.
-  version = "FoFiX v3.100" + version
+  version = "FoFiX v3.120" + version
 
 
 
