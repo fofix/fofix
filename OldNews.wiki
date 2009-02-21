@@ -3,6 +3,16 @@
 = Old News =
 
 ====Feb. 8th 2009 ====
+3.100 Release Candidate 1 (SVN r1017) has been released for testing.  
+
+  * Download 3.0xx -> 3.100 RC1 Patch for Windows [http://www.mediafire.com/?yent1wnmvmn from Mediafire] / [http://rapidshare.com/files/198617247/FoFiX-3.030_r1017-Patch-Windows_3.100RC1_.rar from Rapidshare]
+  * Download 3.100 RC1 Full for Windows [http://www.mediafire.com/?uizllmvqyzo from Mediafire] / [http://rapidshare.com/files/198617246/FoFiX-3.030_r1017-Full-Windows_3.100RC1_.rar from Rapidshare]
+  * Download 3.100beta4 -> 3.100 RC1 Patch Installer for Windows [http://www.mediafire.com/?dnyb1myyqky from Mediafire]
+  * Download 3.100 RC1 Full for Mac [http://www.mediafire.com/?y0tyytjdyyz from Mediafire]
+  * Download 3.100 RC1 Full for GNU/Linux (32bit) [http://www.mediafire.com/?ncyng1oj21n from Mediafire]
+
+
+====Feb. 8th 2009 ====
 3.100 Beta 4 (SVN r960) has been released for testing.  This should be the last beta, 3.100 final is scheduled for release in a couple days - assuming there are no major problems with beta 4.
 
   * Download 3.0xx -> 3.100 beta 4 Patch for Windows [http://www.mediafire.com/?mongfyqmy2i from Mediafire] / [http://rapidshare.com/files/195808034/FoFiX-3.030_r960-Patch-Windows_3.100beta4_.rar from Rapidshare]
