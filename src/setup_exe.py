@@ -26,6 +26,8 @@ import sys, SceneFactory, Version, glob, os
 
 try:
   import py2exe
+  from py2exe.resources.VersionInfo import RT_VERSION
+  from py2exe.resources.VersionInfo import Version as VersionResource
 except ImportError:
   pass
 
@@ -101,6 +103,10 @@ dataFiles = [
   ("data/translations",       glob.glob("../data/translations/*.mo")),
 ]
 
+#stump: grab version info from engine
+import GameEngine
+fullVersionString = GameEngine.version
+
 def setupWindows():
   setup(version = Version.version(),
         description = "Rockin' it Oldskool!",
@@ -109,7 +115,19 @@ def setupWindows():
         windows = [
           {
             "script":          "FretsOnFire.py",
-            "icon_resources":  [(1, "fof.ico")]
+            "icon_resources":  [(1, "fof.ico")],
+            "other_resources": [(RT_VERSION, 1, VersionResource(
+              #stump: the parameter below must consist only of up to four numerical fields separated by dots
+              fullVersionString[7:12],  # extract "x.yyy" from "FoFiX vx.yyy ..."
+              file_description="Frets on Fire X",
+              legal_copyright=r"© 2008-2009 FoFiX Team.  GNU GPL v2 or later.",
+              company_name="FoFiX Team",
+              internal_name="FretsOnFire.exe",
+              original_filename="FretsOnFire.exe",
+              product_name="FoFiX",
+              #stump: when run from the exe, FoFiX will claim to be "FoFiX v" + product_version
+              product_version=fullVersionString[7:]  # remove "FoFiX v" from front
+            ).resource_bytes())]
           }
         ],
         zipfile = "data/library.zip",

@@ -32,9 +32,23 @@ import fnmatch
 import sha
 
 class NsisScriptGenerator(object):
-  def __init__(self, baseFolder='.'):
+  def __init__(self, baseFolder='.', hashCache=None, oldTblName=None, newTblName=None):
     self.nodeList = []
     self.baseFolder = baseFolder
+    self.hashCache = hashCache
+    self.oldTblName = None
+    self.newTblName = None
+    if oldTblName is not None:
+      self.oldTblName = sha.sha(oldTblName).hexdigest()
+    if newTblName is not None:
+      self.newTblName = sha.sha(newTblName).hexdigest()
+    if self.hashCache is not None:
+      self.hashCache.execute('INSERT OR REPLACE INTO `verlist` (`version`) VALUES (?)', [newTblName])
+      self.hashCache.execute('DROP TABLE IF EXISTS `hashes_%s`' % self.newTblName)
+      self.hashCache.commit()
+      self.hashCache.execute('VACUUM')
+      self.hashCache.execute('CREATE TABLE `hashes_%s` (`path` STRING UNIQUE, `hash` STRING)' % self.newTblName)
+      self.hashCache.commit()
   def readList(self, listname):
     l = open(listname, 'r')
     for line in l:
@@ -49,6 +63,13 @@ class NsisScriptGenerator(object):
         for f in win32api.FindFiles(line):
           path = os.path.join(os.path.dirname(line), f[8])
           if os.path.isfile(path):
+            if self.hashCache is not None:
+              newhash = sha.sha(open(path, 'rb').read()).hexdigest()
+              self.hashCache.execute('INSERT OR REPLACE INTO `hashes_%s` (`path`, `hash`) VALUES (?, ?)' % self.newTblName, [path, newhash])
+              if self.oldTblName is not None:
+                oldhash = self.hashCache.execute('SELECT `hash` FROM `hashes_%s` WHERE `path` = ?' % self.oldTblName, [path]).fetchone()
+                if oldhash is not None and oldhash[0] == newhash:
+                  continue
             self.nodeList.append(path)
       os.chdir(oldpwd)
     l.close()

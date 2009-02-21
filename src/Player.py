@@ -27,6 +27,7 @@
 import pygame
 import Config
 import Song
+import Scorekeeper
 from Language import _
 
 import Log
@@ -516,7 +517,7 @@ class Player(object):
     self.playerstring = "player" + str(number)
     self.whichPart = Config.get(self.playerstring, "part")
     
-    self.bassGrooveEnableMode = Config.get("game", "bass_groove_enable")
+    self.bassGrooveEnabled = False
     self.currentTheme = 1
     
     #MFH - need to store selected practice mode and start position here
@@ -527,17 +528,7 @@ class Player(object):
     self.hopoFreq = None
     
     
-    self.stars = 0
-    self.totalStreakNotes = 0
-    self.totalNotes = 0
-    self.freestyleSkippedNotes = 0 #volshebnyi
-    
   def reset(self):
-    self.score         = 0
-    self._streak       = 0
-    self.notesHit      = 0
-    self.longestStreak = 0
-    self.cheating      = False
     self.twoChord      = 0
     
   def getName(self):
@@ -547,21 +538,15 @@ class Player(object):
     Config.set(self.playerstring, "name", name)
     
   name = property(getName, setName)
-  
-  def getStreak(self):
-    return self._streak
-    
-  def setStreak(self, value):
-    self._streak = value
-    self.longestStreak = max(self._streak, self.longestStreak)
-    
-  streak = property(getStreak, setStreak)
     
   def getDifficulty(self):
     return Song.difficulties.get(Config.get(self.playerstring, "difficulty"))
     
   def setDifficulty(self, difficulty):
     Config.set(self.playerstring, "difficulty", difficulty.id)
+  
+  def getDifficultyInt(self):
+    return Config.get(self.playerstring, "difficulty")
 
   def getPart(self):
     #myfingershurt: this should not be reading from the ini file each time it wants to know the part.  Also add "self."
@@ -586,20 +571,3 @@ class Player(object):
     
   difficulty = property(getDifficulty, setDifficulty)
   part = property(getPart, setPart)
-  
-  def addScore(self, score):
-    self.score += score * self.getScoreMultiplier()
-    
-  def getScoreMultiplier(self):
-    
-    #if self.getPart() == "Bass Guitar":    #myfingershurt: bass groove
-    if self.part.text == "Bass Guitar" and (self.bassGrooveEnableMode == 2 or (self.currentTheme == 2 and self.bassGrooveEnableMode == 1) ):    #myfingershurt: bass groove
-      try:
-        return BASS_GROOVE_SCORE_MULTIPLIER.index((self.streak / 10) * 10) + 1
-      except ValueError:
-        return len(BASS_GROOVE_SCORE_MULTIPLIER)
-    else:
-      try:
-        return SCORE_MULTIPLIER.index((self.streak / 10) * 10) + 1
-      except ValueError:
-        return len(SCORE_MULTIPLIER)

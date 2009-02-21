@@ -31,6 +31,12 @@ ports = None
 midi = []
 midiin = None
 portCount = 0
+
+midiOutPorts = None
+midiOutList = []
+midiout = None
+midiOutPortCount = 0
+
 try:
   import rtmidi
   haveMidi = True
@@ -41,6 +47,35 @@ except ImportError:
 #haveMidi = False  #this line disables the rtmidi module for computers with 0 midi ports...has to be this way for now to avoid crashes.
 
 if haveMidi:
+  
+  #MFH - check for and test MIDI output ports by playing a note
+  try:
+    Log.debug("Checking MIDI output ports for a wavetable or synth for sound generation...")
+    midiout = rtmidi.RtMidiOut()
+    midiOutPortCount = midiout.getPortCount()
+    Log.debug("MIDI output port count = " + str(midiOutPortCount) )
+    if midiOutPortCount > 0:
+      midiOutPortNumber = 0
+      midiOutPorts = range(midiOutPortCount)
+      for x in midiOutPorts:
+        midiOutList.append( rtmidi.RtMidiOut() )
+        midiOutPortName = midiOutList[midiOutPortNumber].getPortName(midiOutPortNumber)
+        Log.debug("MIDI Output port %d found: %s" % (midiOutPortNumber,midiOutPortName) )
+        
+        #Log.debug("Testing MIDI Output port %d (%s)..." % (midiOutPortNumber,midiOutPortName) )
+        #midiOutList[midiOutPortNumber].openPort(midiOutPortNumber)
+        #midiOutList[midiOutPortNumber].sendMessage(144, 64, 90)
+        ##midiOutList[midiOutPortNumber].closePort(midiOutPortNumber)
+
+
+        
+        midiOutPortNumber += 1
+  except Exception, e:
+    Log.error(str(e))
+    midiOutPorts = None
+
+
+  #MFH - check for MIDI input ports
   try:
     midiin = rtmidi.RtMidiIn()
     portCount = midiin.getPortCount()
@@ -52,6 +87,38 @@ if haveMidi:
   except Exception, e:
     Log.error(str(e))
     ports = None
+
+
+
+#-  // Program change: 192, 5
+#-  message.push_back( 192 );
+#-  message.push_back( 5 );
+#-  midiout->sendMessage( &message );
+#-
+#-  // Control Change: 176, 7, 100 (volume)
+#-  message[0] = 176;
+#-  message[1] = 7;
+#-  message.push_back( 100 );
+#-  midiout->sendMessage( &message );
+#-
+#-  // Note On: 144, 64, 90
+#-  message[0] = 144;
+#-  message[1] = 64;
+#-  message[2] = 90;
+#-  midiout->sendMessage( &message );
+#-
+#-  SLEEP( 500 ); // Platform-dependent ... see example in tests directory.
+#-
+#-  // Note Off: 128, 64, 40
+#-  message[0] = 128;
+#-  message[1] = 64;
+#-  message[2] = 40;
+#-  midiout->sendMessage( &message );
+#-
+#-  // Clean up
+#- cleanup:
+#-  delete midiout;
+
 
 
 from Task import Task
@@ -138,8 +205,11 @@ class Input(Task):
     if haveMidi:
       if ports:
         Log.debug("%d MIDI inputs found." % (len(ports)))
-        for i in ports:
-          midi[i].openPort(i, False)
+        try:
+          for i in ports:
+            midi[i].openPort(i, False)
+        except Exception, e:
+          Log.error("Error opening MIDI port %d: %s" % (i,str(e)) )
       else:
         Log.warn("No MIDI input ports found.")
 
@@ -195,6 +265,10 @@ class Input(Task):
 
   def encodeMidiButton(self, midi, button):
     return 0x40000 + (midi << 8 ) + button
+
+  def decodeMidiButton(self, id):
+    id -= 0x40000
+    return (id >> 8, id & 0xff)
 
   def encodeJoystickButton(self, joystick, button):
     return 0x10000 + (joystick << 8) + button
@@ -339,10 +413,24 @@ class Input(Task):
         midimsg = midi[i].getMessage()
         if len(midimsg) > 0:
           id = self.encodeMidiButton(x, midimsg[1])
-          if midimsg[0] == 153:
+          #MFH - must check for 0x80 - 0x8F for Note Off events (keyReleased) and 0x90 - 0x9F for Note On events (keyPressed)
+          #if midimsg[0] == 153:
+          noteOn = False
+          noteOff = False
+          
+          if (midimsg[0] >= 0x90) and (midimsg[0] <= 0x9F):   #note ON range
+            if midimsg[2] > 0:  #velocity > 0, confirmed note on
+              noteOn = True
+            else:   #velocity is 0 - this is pretty much a note off.
+              noteOff = True
+          elif (midimsg[0] >= 0x80) and (midimsg[0] <= 0x8F):  #note OFF range
+            noteOff = True
+
+          if noteOn:
             if not self.broadcastEvent(self.priorityKeyListeners, "keyPressed", id, u'\x00'):
               self.broadcastEvent(self.keyListeners, "keyPressed", id, u'\x00')
-          else:
+          
+          elif noteOff:
             if not self.broadcastEvent(self.priorityKeyListeners, "keyReleased", id):
               self.broadcastEvent(self.keyListeners, "keyReleased", id)
 

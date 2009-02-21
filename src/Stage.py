@@ -58,7 +58,7 @@ class Layer(object):
     @param visibility:  Floating point visibility factor (1 = opaque, 0 = invisibile)
     """
     w, h, = self.stage.engine.view.geometry[2:4]
-    v = 1.0 - visibility ** 2
+    v = 1.0
     self.drawing.transform.reset()
     self.drawing.transform.translate(w / 2, h / 2)
     if v > .01:
@@ -267,6 +267,14 @@ class Stage(object):
 
     self.config.read(configFileName)
 
+    # evilynux - Improved stage error handling
+    self.themename = self.engine.data.themeLabel
+    self.path = os.path.join("themes",self.themename,"stages")
+    self.pathfull = self.engine.getPath(self.path)
+    if not os.path.exists(self.pathfull): # evilynux
+      Log.warn("Stage folder does not exist: %s" % self.pathfull)
+      self.mode = 1 # Fallback to song-specific stage
+
     # Build the layers
     for i in range(32):
       section = "layer%d" % i
@@ -283,7 +291,7 @@ class Stage(object):
         try:
           drawing = self.textures[texture]
         except KeyError:
-          drawing = self.engine.loadSvgDrawing(self, None, texture, textureSize = (xres, yres))
+          drawing = self.engine.loadImgDrawing(self, None, os.path.join("themes", self.themename, texture), textureSize = (xres, yres))
           self.textures[texture] = drawing
           
         layer = Layer(self, drawing)
@@ -321,14 +329,6 @@ class Stage(object):
           self.foregroundLayers.append(layer)
         else:
           self.backgroundLayers.append(layer)
-
-    # evilynux - Improved stage error handling
-    self.themename = self.engine.data.themeLabel
-    self.path = os.path.join("themes",self.themename,"stages")
-    self.pathfull = self.engine.getPath(self.path)
-    if not os.path.exists(self.pathfull): # evilynux
-      Log.warn("Stage folder does not exist: %s" % self.pathfull)
-      self.mode = 1 # Fallback to song-specific stage
 
   def load(self, libraryName, songName, practiceMode = False):
     # evilynux - Fixes a self.background not defined crash
@@ -445,7 +445,6 @@ class Stage(object):
           imgwidth = self.backgroundA.width1()
           wfactor = 640.000/imgwidth
           self.imgArr.append(getattr(self, "backgroundA", os.path.join(self.path, files[j])))
-          #self.imgArr.append([getattr(self, "backgroundA", os.path.join(self.path, files[j])),wfactor])
           self.imgArrScaleFactors.append(wfactor)
 
     if self.mode != 2 and self.background:   #MFH - precalculating scale factor
@@ -483,18 +482,14 @@ class Stage(object):
     #myfingershurt: multiple rotation modes
     if self.mode != 2:
       if self.rotationMode == 0:
-        self.background.transform.reset()
-        self.background.transform.translate(self.wFull/2,self.hFull/2)
-        self.background.transform.scale(self.backgroundScaleFactor,-self.backgroundScaleFactor)
-        self.background.draw()  
+        self.engine.drawImage(self.background, scale = (self.backgroundScaleFactor,-self.backgroundScaleFactor),
+                              coord = (self.wFull/2,self.hFull/2))
 
       #myfingershurt:
       else:
         #MFH - use precalculated scale factors instead
-        self.imgArr[self.arrNum].transform.reset()
-        self.imgArr[self.arrNum].transform.translate(self.wFull/2,self.hFull/2)
-        self.imgArr[self.arrNum].transform.scale(self.imgArrScaleFactors[self.arrNum],-self.imgArrScaleFactors[self.arrNum])
-        self.imgArr[self.arrNum].draw()
+        self.engine.drawImage(self.imgArr[self.arrNum], scale = (self.imgArrScaleFactors[self.arrNum],-self.imgArrScaleFactors[self.arrNum]),
+                              coord = (self.wFull/2,self.hFull/2))
 
   def updateDelays(self):
     self.rotateDelay = self.engine.config.get("game",  "stage_rotate_delay") #myfingershurt - user defined stage rotate delay
@@ -552,6 +547,7 @@ class Stage(object):
       self.triggerBeat(pos, beat)
 
   def render(self, visibility):
+    self.renderBackground()
     self._renderLayers(self.backgroundLayers, visibility)
     self.scene.renderGuitar()
     self._renderLayers(self.foregroundLayers, visibility)

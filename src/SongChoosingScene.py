@@ -57,9 +57,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
     self.libraryName   = libraryName
     self.songName      = songName
 
-    #MFH - testing new traceback logging:
-    #raise TypeError
-
+    
 
     self.songSettings  = []
     self.gameStarted   = False
@@ -221,10 +219,21 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
           else:
             self.player.practiceMode = False
             
-          slowDownDivisor = Config.get("audio",  "slow_down_divisor")
+          slowDownDivisor = Config.get("audio",  "speed_factor")
            
           while True: #new nesting for Practice Mode - section / start time selection
-            #if self.player.practiceMode:
+            if self.player.practiceMode:
+              values, options = Config.getOptions("audio", "speed_factor")
+              if self.subMenuPosTuple:
+                slowdown = Dialogs.chooseItem(self.engine, options, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Speed Select:")), pos = self.subMenuPosTuple)
+              else:
+                slowdown = Dialogs.chooseItem(self.engine, options, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Speed Select:")))
+              for i in range(len(values)):
+                if options[i] == slowdown:
+                  Config.set("audio", "speed_factor", values[i])
+                  slowDownDivisor = values[i]
+                  break
+              
             if self.player.practiceMode and slowDownDivisor == 1:
               #self.engine.resource.load(self, "song", lambda: Song.loadSong(self.engine, songName, library = self.libraryName, notesOnly = True, part = [player.part for player in self.playerList]), onLoad = self.songLoaded)
 
@@ -391,5 +400,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
       if not self.player.part in info.parts:
         self.player.part = info.parts[0]   
         
-      self.session.world.deleteScene(self)
-      self.session.world.createScene("GuitarScene", libraryName = self.libraryName, songName = self.songName, Players = players)
+      if not self.engine.createdGuitarScene:
+        #self.engine.createdGuitarScene = True
+        self.session.world.deleteScene(self)
+        self.session.world.createScene("GuitarScene", libraryName = self.libraryName, songName = self.songName, Players = players)

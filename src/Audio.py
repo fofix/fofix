@@ -44,10 +44,7 @@ except ImportError:
   Log.warn("PyOGG not found. OGG files will be fully decoded prior to playing; expect absurd memory usage.")
   ogg = None
 
-class Audio(Task):
-  def __init__(self):
-    Task.__init__(self)
-
+class Audio:
   def pre_open(self, frequency = 22050, bits = 16, stereo = True, bufferSize = 1024):
     pygame.mixer.pre_init(frequency, -bits, stereo and 2 or 1, bufferSize)
     return True
@@ -98,6 +95,9 @@ class Audio(Task):
 class Music(object):
   def __init__(self, fileName):
     pygame.mixer.music.load(fileName)
+    self.pausePos = 0.0
+    self.isPause = False
+    self.toUnpause = False
 
   @staticmethod
   def setEndEvent(event = None):
@@ -117,6 +117,8 @@ class Music(object):
 
   def pause(self):
     pygame.mixer.music.pause()
+    self.pausePos = self.getPosition()
+    self.isPause = True
 
   def unpause(self):
     pygame.mixer.music.unpause()
@@ -138,10 +140,28 @@ class Music(object):
     pygame.mixer.music.fadeout(time)
 
   def isPlaying(self):
-    return pygame.mixer.music.get_busy()
+    #MFH - gotta catch case when mixer not initialized yet...
+    try:
+      busy = pygame.mixer.music.get_busy()
+    except Exception, e:
+      busy = True      
+    #return pygame.mixer.music.get_busy()
+    return busy
 
   def getPosition(self):
-    return pygame.mixer.music.get_pos()
+    if self.isPause:
+      if pygame.mixer.music.get_pos() > (self.pausePos + 100):
+        self.toUnpause = True
+        self.isPause = False
+      return self.pausePos
+    elif self.toUnpause:
+      if pygame.mixer.music.get_pos() < (self.pausePos + 100):
+        self.toUnpause = False
+        return pygame.mixer.music.get_pos()
+      else:
+        return self.pausePos
+    else:
+      return pygame.mixer.music.get_pos()
 
 class Channel(object):
   def __init__(self, id):

@@ -63,11 +63,14 @@ class Drum:
   def __init__(self, engine, editorMode = False, player = 0):
     self.engine         = engine
     
-    self.starPowerDecreaseDivisor = 200.0*self.engine.audioSpeedDivisor
+    #self.starPowerDecreaseDivisor = 200.0*self.engine.audioSpeedFactor
+    self.starPowerDecreaseDivisor = 200.0/self.engine.audioSpeedFactor
 
     
     self.isDrum = True
     self.isBassGuitar = False
+
+    self.bassDrumPedalDown = False
   
     self.lastFretWasBassDrum = False
     self.lastFretWasT1 = False   #Faaa Drum sound
@@ -86,6 +89,9 @@ class Drum:
 
     self.bigRockEndingMarkerSeen = False
 
+    #MFH - I do not understand fully how the handicap scorecard works at the moment, nor do I have the time to figure it out.
+    #... so for now, I'm just writing some extra code here for the early hitwindow size handicap.
+    self.earlyHitWindowSizeFactor = 0.5
 
 
     self.oNeckovr = None    #MFH - needs to be here to prevent crashes!    
@@ -118,6 +124,7 @@ class Drum:
     self.drumFillsReady = False
     self.freestyleReady = False
     self.freestyleOffset = 5
+    self.freestyleSP = False
 
     #self.drumFillOnScreen = False   #MFH 
     self.drumFillEvents = []
@@ -151,6 +158,9 @@ class Drum:
     self.leftyMode      = False
     #self.player         = player
 
+    self.freestyleHitFlameCounts = [0 for n in range(self.strings+1)]    #MFH
+
+
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("Drum class initialization!")
@@ -164,7 +174,8 @@ class Drum:
     
     self.actualBpm = 0.0
 
-    self.currentBpm     = 50.0   #MFH - need currentBpm to be 0 to force first setBPM to work!
+    self.currentBpm     = 120.0   #MFH - need currentBpm to be 0 to force first setBPM to work!
+                                  #MFH - actually, need a default 120BPM to be set in case a custom song has no tempo events.
     self.currentPeriod  = 60000.0 / self.currentBpm
     
     self.targetBpm      = self.currentBpm
@@ -222,6 +233,7 @@ class Drum:
     self.indexFps       = self.engine.config.get("video", "fps")
 
     self.twoChord       = 0
+    self.twoChordApply  = False
     self.hopoActive     = 0
     
     #myfingershurt: need a separate variable to track whether or not hopos are actually active
@@ -297,19 +309,21 @@ class Drum:
 
     self.muteSustainReleases = self.engine.config.get("game", "sustain_muting") #MFH
     
-    self.hitw = self.engine.config.get("game", "hit_window")  #this should be global, not retrieved every BPM change.
-    if self.hitw == 0:   #wide
-      self.hitw = 0.70
-    elif self.hitw == 1: #normal
-      self.hitw = 1.0
-    elif self.hitw == 2: #tight
+    self.hitw = self.engine.config.get("game", "note_hit_window")  #this should be global, not retrieved every BPM change.
+    if self.hitw == 0: 
       self.hitw = 1.2
-    elif self.hitw == 3: #blazingamer new tighter hit window
+    elif self.hitw == 1: 
       self.hitw = 1.9
-    elif self.hitw == 4: #racer: new super tight hit window
+    elif self.hitw == 2: 
       self.hitw = 2.3
     else:
-      self.hitw = 1
+      self.hitw = 1.2
+    
+    self.hitwcheat = self.engine.config.get("game", "hit_window_cheat")
+    if self.hitwcheat == 1:   
+      self.hitw = 0.70
+    elif self.hitwcheat == 2: 
+      self.hitw = 1.0
 
     if player == 0:
       self.keys = PLAYER1DRUMS 
@@ -569,9 +583,9 @@ class Drum:
       else: #Percentage mode - pre-calculated
         self.neckSpeed = self.speed
   
-      # Alarian: Hitwindows/-margins
       self.earlyMargin       = 250 - bpm/5 - 70*self.hitw
       self.lateMargin        = 250 - bpm/5 - 70*self.hitw
+      #self.earlyMargin = self.lateMargin * self.earlyHitWindowSizeFactor    #MFH - scale early hit window here
 
       #self.noteReleaseMargin = 200 - bpm/5 - 70*self.hitw
       #if (self.noteReleaseMargin < (200 - bpm/5 - 70*1.2)):   #MFH - enforce "tight" hitwindow minimum note release margin
@@ -605,6 +619,9 @@ class Drum:
   def renderFreestyleLanes(self, visibility, song, pos, controls):
     if not song:
       return
+    if not song.readyToGo:
+      return
+
 
     #MFH - check for [section big_rock_ending] to set a flag to determine how to treat the last drum fill marker note:
     #for time, event in song.eventTracks[Song.TK_SECTIONS].getEvents(pos - self.lateMargin*2, pos):
@@ -628,7 +645,7 @@ class Drum:
       #for time, event in track.getEvents(boardWindowMin, boardWindowMax):
       for time, event in track.getEvents(pos - self.freestyleOffset, boardWindowMax + self.freestyleOffset):
         if isinstance(event, Song.MarkerNote):
-          if event.number == Song.freestyleMarkingNote and not event.happened:
+          if event.number == Song.freestyleMarkingNote and (not event.happened or self.bigRockEndingMarkerSeen):  #MFH - don't kill the BRE!
             #drumFillOnScreen = True
             drumFillEvents.append(event)
             length     = (event.length - 50) / self.currentPeriod / beatsPerUnit
@@ -715,6 +732,8 @@ class Drum:
 
   def renderIncomingNeck(self, visibility, song, pos, time, neckTexture):   #MFH - attempt to "scroll" an incoming guitar solo neck towards the player
     if not song:
+      return
+    if not song.readyToGo:
       return
     
     def project(beat):
@@ -830,6 +849,8 @@ class Drum:
   def renderNeck(self, visibility, song, pos):
     if not song:
       return
+    if not song.readyToGo:
+      return
     
     def project(beat):
       return 0.125 * beat / beatsPerUnit    # glorandwarf: was 0.12
@@ -879,6 +900,8 @@ class Drum:
 
   def drawTrack(self, visibility, song, pos):
     if not song:
+      return
+    if not song.readyToGo:
       return
 
     def project(beat):
@@ -966,6 +989,8 @@ class Drum:
   def drawSideBars(self, visibility, song, pos):
     if not song:
       return
+    if not song.readyToGo:
+      return
 
     def project(beat):
       return 0.125 * beat / beatsPerUnit  # glorandwarf: was 0.12
@@ -1014,6 +1039,8 @@ class Drum:
 
   def drawBPM(self, visibility, song, pos):
     if not song:
+      return
+    if not song.readyToGo:
       return
 
     v            = visibility
@@ -1445,6 +1472,8 @@ class Drum:
   def renderIncomingNecks(self, visibility, song, pos):
     if not song:
       return
+    if not song.readyToGo:
+      return
 
     if self.incomingNeckMode > 0:   #if enabled
       boardWindowMin = pos - self.currentPeriod * 2
@@ -1496,6 +1525,8 @@ class Drum:
 
   def renderOpenNotes(self, visibility, song, pos):
     if not song:
+      return
+    if not song.readyToGo:
       return
 
     self.bigMax = 0
@@ -1603,15 +1634,19 @@ class Drum:
         spNote = True
         if event.played or event.hopod:
           if event.flameCount < 1 and not self.starPowerGained:
+
+            #if self.drumFillOnScreen:   #MFH - if there's a drum fill on the screen right now, skip it!
+            if self.starPower < 50:   #not enough starpower to activate yet, kill existing drumfills
+              for dfEvent in self.drumFillEvents:
+                dfEvent.happened = True
+            
             if self.starPower < 100:
               self.starPower += 25
             if self.starPower > 100:
               self.starPower = 100
             self.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
             self.starPowerGained = True
-            #if self.drumFillOnScreen:   #MFH - if there's a drum fill on the screen right now, skip it!
-            for dfEvent in self.drumFillEvents:
-              dfEvent.happened = True
+            
 
       #if enable:
       #  self.spEnabled = True
@@ -1658,6 +1693,8 @@ class Drum:
 
   def renderNotes(self, visibility, song, pos):
     if not song:
+      return
+    if not song.readyToGo:
       return
 
     self.bigMax = 0
@@ -1767,6 +1804,12 @@ class Drum:
         spNote = True
         if event.played or event.hopod:
           if event.flameCount < 1 and not self.starPowerGained:
+
+            #if self.drumFillOnScreen:   #MFH - if there's a drum fill on the screen right now, skip it!
+            if self.starPower < 50:   #not enough starpower to activate yet, kill existing drumfills
+              for dfEvent in self.drumFillEvents:
+                dfEvent.happened = True
+
             if self.starPower < 100:
               self.starPower += 25
             if self.starPower > 100:
@@ -2523,6 +2566,468 @@ class Drum:
 
 
 
+  def renderFreestyleFlames(self, visibility, controls):
+    if self.flameColors[0][0][0] == -1:
+      return
+
+    beatsPerUnit = self.beatsPerBoard / self.boardLength
+    w = self.boardWidth / self.strings
+    #track = song.track[self.player]
+
+    size = (.22, .22)
+    v = 1.0 - visibility
+
+    if self.disableFlameSFX != True:
+      for n in range(self.strings):
+        f = self.fretWeight[n]
+        c = self.fretColors[n+1]    #MFH shifted by 1 for most drum colors
+        if f and controls.getState(self.keys[0]):
+          f += 0.25     
+        y = v + f / 6
+        x = (self.strings / 2 -.5 - n) * w
+        f = self.fretActivity[n]
+
+        if f:
+          ms = math.sin(self.time) * .25 + 1
+          ff = f
+          ff += 1.2
+          
+          glBlendFunc(GL_ONE, GL_ONE)
+
+          flameSize = self.flameSizes[self.scoreMultiplier - 1][n]
+          if self.theme == 0 or self.theme == 1: #THIS SETS UP GH3 COLOR, ELSE ROCKBAND(which is DEFAULT in Theme.py)
+            flameColor = self.gh3flameColor
+          else:
+            flameColor = self.flameColors[self.scoreMultiplier - 1][n]
+          #Below was an if that set the "flame"-color to the same as the fret color if there was no specific flamecolor defined.
+
+          flameColorMod0 = 1.1973333333333333333333333333333
+          flameColorMod1 = 1.9710526315789473684210526315789
+          flameColorMod2 = 10.592592592592592592592592592593
+          
+          glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
+          if self.starPowerActive:
+            if self.theme == 0 or self.theme == 1: #GH3 starcolor
+              glColor3f(.3,.7,.9)
+            else: #Default starcolor (Rockband)
+              glColor3f(.9,.9,.9)
+
+          if not self.Hitanim:   
+            glEnable(GL_TEXTURE_2D)
+            self.hitglowDrawing.texture.bind()    
+            glPushMatrix()
+            glTranslate(x, y + .125, 0)
+            glRotate(90, 1, 0, 0)
+            glScalef(0.5 + .6 * ms * ff, 1.5 + .6 * ms * ff, 1 + .6 * ms * ff)
+            glBegin(GL_TRIANGLE_STRIP)
+            glTexCoord2f(0.0, 0.0)
+            glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+            glTexCoord2f(1.0, 0.0)
+            glVertex3f( flameSize * ff, 0, -flameSize * ff)
+            glTexCoord2f(0.0, 1.0)
+            glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+            glTexCoord2f(1.0, 1.0)
+            glVertex3f( flameSize * ff, 0,  flameSize * ff)
+            glEnd()
+            glPopMatrix()
+            glDisable(GL_TEXTURE_2D)
+            #Alarian: Animated hitflames
+          else:
+            self.HCount = self.HCount + 1
+            if self.HCount > self.Animspeed-1:
+              self.HCount = 0
+            HIndex = (self.HCount * 16 - (self.HCount * 16) % self.Animspeed) / self.Animspeed
+            if HIndex > 15:
+              HIndex = 0
+            texX = (HIndex*(1/16.0), HIndex*(1/16.0)+(1/16.0))
+
+            glColor3f(1,1,1)
+            glEnable(GL_TEXTURE_2D)
+            self.hitglowAnim.texture.bind()    
+            glPushMatrix()
+            glTranslate(x, y + .225, 0)
+            glRotate(90, 1, 0, 0)
+            
+            #glScalef(1.3, 1, 2)
+            #glScalef(1.7, 1, 2.6)
+            glScalef(2, 1, 2.9)   #worldrave correct flame size
+
+            
+            glBegin(GL_TRIANGLE_STRIP)
+            glTexCoord2f(texX[0], 0.0)#upper left corner of frame square in .png
+            glVertex3f(-flameSize * ff, 0, -flameSize * ff)#"upper left" corner of surface that texture is rendered on
+            glTexCoord2f(texX[1], 0.0)#upper right
+            glVertex3f( flameSize * ff, 0, -flameSize * ff)
+            glTexCoord2f(texX[0], 1.0)#lower left
+            glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+            glTexCoord2f(texX[1], 1.0)#lower right
+            glVertex3f( flameSize * ff, 0,  flameSize * ff)
+            glEnd()
+            glPopMatrix()
+            glDisable(GL_TEXTURE_2D)
+
+          ff += .3
+
+          #flameSize = self.flameSizes[self.scoreMultiplier - 1][n]
+          #flameColor = self.flameColors[self.scoreMultiplier - 1][n]
+
+          flameColorMod0 = 1.1973333333333333333333333333333
+          flameColorMod1 = 1.7842105263157894736842105263158
+          flameColorMod2 = 12.222222222222222222222222222222
+          
+          glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
+          if self.starPowerActive:
+            if self.theme == 0 or self.theme == 1: #GH3 starcolor
+              glColor3f(.3,.7,.9)
+            else: #Default starcolor (Rockband)
+              glColor3f(.8,.8,.8)
+
+          if not self.Hitanim: 
+            glEnable(GL_TEXTURE_2D)
+            self.hitglow2Drawing.texture.bind()    
+            glPushMatrix()
+            glTranslate(x, y + .25, .05)
+            glRotate(90, 1, 0, 0)
+            glScalef(.40 + .6 * ms * ff, 1.5 + .6 * ms * ff, 1 + .6 * ms * ff)
+            glBegin(GL_TRIANGLE_STRIP)
+            glTexCoord2f(0.0, 0.0)
+            glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+            glTexCoord2f(1.0, 0.0)
+            glVertex3f( flameSize * ff, 0, -flameSize * ff)
+            glTexCoord2f(0.0, 1.0)
+            glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+            glTexCoord2f(1.0, 1.0)
+            glVertex3f( flameSize * ff, 0,  flameSize * ff)
+            glEnd()
+            glPopMatrix()
+            glDisable(GL_TEXTURE_2D)
+          
+          glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
+          #self.hit[n] = True
+
+
+
+    if self.disableFlameSFX != True:
+      flameLimit = 10.0
+      flameLimitHalf = round(flameLimit/2.0)
+      for fretNum in range(self.strings+1):   #need to add 1 to string count to check this correctly (bass drum doesnt count as a string)
+        #MFH - must include secondary drum keys here
+        #if controls.getState(self.keys[fretNum]):
+        if controls.getState(self.keys[fretNum]) or (fretNum > 0 and controls.getState(self.keys[fretNum+4]) ):
+
+          if self.freestyleHitFlameCounts[fretNum] < flameLimit:
+            ms = math.sin(self.time) * .25 + 1
+  
+            if fretNum == 0:
+              x  = (self.strings / 2 - 2) * w
+            else:
+              x  = (self.strings / 2 +.5 - fretNum) * w
+            #x  = (self.strings / 2 - fretNum) * w
+  
+            xlightning = (self.strings / 2 - fretNum)*2.2*w
+            ff = 1 + 0.25       
+            y = v + ff / 6
+            glBlendFunc(GL_ONE, GL_ONE)
+  
+            if self.theme == 2:
+              y -= 0.5
+            
+            flameSize = self.flameSizes[self.scoreMultiplier - 1][fretNum]
+            if self.theme == 0 or self.theme == 1: #THIS SETS UP GH3 COLOR, ELSE ROCKBAND(which is DEFAULT in Theme.py)
+              flameColor = self.gh3flameColor
+            else:
+              flameColor = self.flameColors[self.scoreMultiplier - 1][fretNum]
+            if flameColor[0] == -2:
+              flameColor = self.fretColors[fretNum]
+            
+            ff += 1.5 #ff first time is 2.75 after this
+  
+            if self.freestyleHitFlameCounts[fretNum] < flameLimitHalf:
+              glColor3f(flameColor[0], flameColor[1], flameColor[2])
+              if self.starPowerActive:
+                if self.theme == 0 or self.theme == 1: #GH3 starcolor
+                  glColor3f(.3,.7,.9)
+                else: #Default starcolor (Rockband)
+                  glColor3f(.1,.1,.1)
+              glEnable(GL_TEXTURE_2D)
+              self.hitflames2Drawing.texture.bind()    
+              glPushMatrix()
+              glTranslate(x, y + .20, 0)
+              glRotate(90, 1, 0, 0)
+              glScalef(.25 + .6 * ms * ff, self.freestyleHitFlameCounts[fretNum]/6.0 + .6 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 6.0 + .6 * ms * ff)
+              glBegin(GL_TRIANGLE_STRIP)
+              glTexCoord2f(0.0, 0.0)
+              glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(1.0, 0.0)
+              glVertex3f( flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(0.0, 1.0)
+              glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+              glTexCoord2f(1.0, 1.0)
+              glVertex3f( flameSize * ff, 0,  flameSize * ff)
+              glEnd()
+              glPopMatrix()
+              glDisable(GL_TEXTURE_2D) 
+  
+              glColor3f(flameColor[0], flameColor[1], flameColor[2])
+              if self.starPowerActive:
+                if self.theme == 0 or self.theme == 1: #GH3 starcolor
+                  glColor3f(.3,.7,.9)
+                else: #Default starcolor (Rockband)
+                  glColor3f(.1,.1,.1)
+              glEnable(GL_TEXTURE_2D)
+              self.hitflames2Drawing.texture.bind()    
+              glPushMatrix()
+              glTranslate(x - .005, y + .25 + .005, 0)
+              glRotate(90, 1, 0, 0)
+              glScalef(.30 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 5.5 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 5.5 + .6 * ms * ff)
+              glBegin(GL_TRIANGLE_STRIP)
+              glTexCoord2f(0.0, 0.0)
+              glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(1.0, 0.0)
+              glVertex3f( flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(0.0, 1.0)
+              glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+              glTexCoord2f(1.0, 1.0)
+              glVertex3f( flameSize * ff, 0,  flameSize * ff)
+              glEnd()
+              glPopMatrix()	  
+              glDisable(GL_TEXTURE_2D)
+  
+              glColor3f(flameColor[0], flameColor[1], flameColor[2])
+              if self.starPowerActive:
+                if self.theme == 0 or self.theme == 1: #GH3 starcolor
+                  glColor3f(.3,.7,.9)
+                else: #Default starcolor (Rockband)
+                  glColor3f(.2,.2,.2)
+              glEnable(GL_TEXTURE_2D)
+              self.hitflames2Drawing.texture.bind()    
+              glPushMatrix()
+              glTranslate(x+.005, y +.25 +.005, 0)
+              glRotate(90, 1, 0, 0)
+              glScalef(.35 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 5.0 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 5.0 + .6 * ms * ff)
+              glBegin(GL_TRIANGLE_STRIP)
+              glTexCoord2f(0.0, 0.0)
+              glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(1.0, 0.0)
+              glVertex3f( flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(0.0, 1.0)
+              glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+              glTexCoord2f(1.0, 1.0)
+              glVertex3f( flameSize * ff, 0,  flameSize * ff)
+              glEnd()
+              glPopMatrix()	  
+              glDisable(GL_TEXTURE_2D)
+  
+              glColor3f(flameColor[0], flameColor[1], flameColor[2])
+              if self.starPowerActive:
+                if self.theme == 0 or self.theme == 1: #GH3 starcolor
+                  glColor3f(.3,.7,.9)
+                else: #Default starcolor (Rockband)
+                  glColor3f(.3,.3,.3)
+              glEnable(GL_TEXTURE_2D)
+              self.hitflames2Drawing.texture.bind()    
+              glPushMatrix()
+              glTranslate(x, y +.25 +.005, 0)
+              glRotate(90, 1, 0, 0)
+              glScalef(.40 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1)/ 4.7 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 4.7 + .6 * ms * ff)
+              glBegin(GL_TRIANGLE_STRIP)
+              glTexCoord2f(0.0, 0.0)
+              glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(1.0, 0.0)
+              glVertex3f( flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(0.0, 1.0)
+              glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+              glTexCoord2f(1.0, 1.0)
+              glVertex3f( flameSize * ff, 0,  flameSize * ff)
+              glEnd()
+              glPopMatrix()	  
+              glDisable(GL_TEXTURE_2D)
+            else:
+              flameColorMod0 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
+              flameColorMod1 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
+              flameColorMod2 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
+              
+              glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
+
+              #MFH - hit lightning logic is not needed for freestyle flames...
+
+#-              if self.theme == 0 and event.finalStar and self.spEnabled:
+#-                glColor3f(1,1,1)#lightning color
+#-              elif self.theme == 1 and event.finalStar and self.spEnabled:
+#-                glColor3f(1,1,1)#lightning color
+#-              if self.starPowerActive:
+#-                if self.theme == 0 or self.theme == 1: 
+#-                  glColor3f(.3,.7,.9)#GH3 starcolor
+#-                else:
+#-                  glColor3f(.4,.4,.4)#Default starcolor (Rockband)
+#-              glEnable(GL_TEXTURE_2D)
+#-              if self.theme == 0 and event.finalStar and self.spEnabled:
+#-                self.hitlightning.texture.bind()
+#-                wid, hei, = self.engine.view.geometry[2:4]
+#-                glPushMatrix()
+#-                glTranslate(xlightning, y, 3.3)
+#-                glRotate(90, 1, 0, 0)
+#-                glScalef(.15 + .5 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 3.0 + .6 * ms * ff, 2)
+#-                glBegin(GL_TRIANGLE_STRIP)
+#-                glTexCoord2f(0.0, 0.0)
+#-                glVertex3f( .4, 0, -2)
+#-                glTexCoord2f(1.0, 0.0)
+#-                glVertex3f(-.4, 0, -2)
+#-                glTexCoord2f(0.0, 1.0)
+#-                glVertex3f( .4, 0,  2)
+#-                glTexCoord2f(1.0, 1.0)
+#-                glVertex3f(-.4, 0,  2)
+#-              elif self.theme == 1 and event.finalStar and self.spEnabled:
+#-                self.hitlightning.texture.bind()
+#-                wid, hei, = self.engine.view.geometry[2:4]
+#-                glPushMatrix()
+#-                glTranslate(xlightning, y, 3.3)
+#-                glRotate(90, 1, 0, 0)
+#-                glScalef(.15 + .5 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 3.0 + .6 * ms * ff, 2)
+#-                glBegin(GL_TRIANGLE_STRIP)
+#-                glTexCoord2f(0.0, 0.0)
+#-                glVertex3f( .4, 0, -2)
+#-                glTexCoord2f(1.0, 0.0)
+#-                glVertex3f(-.4, 0, -2)
+#-                glTexCoord2f(0.0, 1.0)
+#-                glVertex3f( .4, 0,  2)
+#-                glTexCoord2f(1.0, 1.0)
+#-                glVertex3f(-.4, 0,  2)
+#-              else:
+#-                self.hitflames1Drawing.texture.bind()
+#-                glPushMatrix()
+#-                glTranslate(x, y + .35, 0)
+#-                glRotate(90, 1, 0, 0)
+#-                glScalef(.25 + .6 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 3.0 + .6 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 3.0 + .6 * ms * ff)
+#-                glBegin(GL_TRIANGLE_STRIP)
+#-                glTexCoord2f(0.0, 0.0)
+#-                glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+#-                glTexCoord2f(1.0, 0.0)
+#-                glVertex3f( flameSize * ff, 0, -flameSize * ff)
+#-                glTexCoord2f(0.0, 1.0)
+#-                glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+#-                glTexCoord2f(1.0, 1.0)
+#-                glVertex3f( flameSize * ff, 0,  flameSize * ff)
+
+
+              glEnable(GL_TEXTURE_2D)
+              self.hitflames1Drawing.texture.bind()
+              glPushMatrix()
+              glTranslate(x, y + .35, 0)
+              glRotate(90, 1, 0, 0)
+              glScalef(.25 + .6 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 3.0 + .6 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 3.0 + .6 * ms * ff)
+              glBegin(GL_TRIANGLE_STRIP)
+              glTexCoord2f(0.0, 0.0)
+              glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(1.0, 0.0)
+              glVertex3f( flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(0.0, 1.0)
+              glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+              glTexCoord2f(1.0, 1.0)
+              glVertex3f( flameSize * ff, 0,  flameSize * ff)
+
+
+              glEnd()
+              glPopMatrix()
+              glDisable(GL_TEXTURE_2D)
+  
+              flameColorMod0 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
+              flameColorMod1 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
+              flameColorMod2 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
+              
+              glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)      
+              if self.starPowerActive:
+                if self.theme == 0 or self.theme == 1: #GH3 starcolor
+                  glColor3f(.3,.7,.9)
+                else: #Default starcolor (Rockband)
+                  glColor3f(.5,.5,.5)
+              glEnable(GL_TEXTURE_2D)
+              self.hitflames1Drawing.texture.bind()    
+              glPushMatrix()
+              glTranslate(x - .005, y + .40 + .005, 0)
+              glRotate(90, 1, 0, 0)
+              glScalef(.30 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1)/ 2.5 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 2.5 + .6 * ms * ff)
+              glBegin(GL_TRIANGLE_STRIP)
+              glTexCoord2f(0.0, 0.0)
+              glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(1.0, 0.0)
+              glVertex3f( flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(0.0, 1.0)
+              glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+              glTexCoord2f(1.0, 1.0)
+              glVertex3f( flameSize * ff, 0,  flameSize * ff)
+              glEnd()
+              glPopMatrix()  
+              glDisable(GL_TEXTURE_2D)
+  
+              flameColorMod0 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
+              flameColorMod1 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
+              flameColorMod2 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
+              
+              glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
+              if self.starPowerActive:
+                if self.theme == 0 or self.theme == 1: #GH3 starcolor
+                  glColor3f(.3,.7,.9)
+                else: #Default starcolor (Rockband)
+                  glColor3f(.6,.6,.6)
+              glEnable(GL_TEXTURE_2D)
+              self.hitflames1Drawing.texture.bind()    
+              glPushMatrix()
+              glTranslate(x + .005, y + .35 + .005, 0)
+              glRotate(90, 1, 0, 0)
+              glScalef(.35 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 2.0 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 2.0 + .6 * ms * ff)
+              glBegin(GL_TRIANGLE_STRIP)
+              glTexCoord2f(0.0, 0.0)
+              glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(1.0, 0.0)
+              glVertex3f( flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(0.0, 1.0)
+              glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+              glTexCoord2f(1.0, 1.0)
+              glVertex3f( flameSize * ff, 0,  flameSize * ff)
+              glEnd()
+              glPopMatrix()  
+              glDisable(GL_TEXTURE_2D)
+  
+              flameColorMod0 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
+              flameColorMod1 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
+              flameColorMod2 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
+              
+              glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
+              if self.starPowerActive:
+                if self.theme == 0 or self.theme == 1: #GH3 starcolor
+                  glColor3f(.3,.7,.9)
+                else: #Default starcolor (Rockband)
+                  glColor3f(.7,.7,.7)
+              glEnable(GL_TEXTURE_2D)
+              self.hitflames1Drawing.texture.bind()    
+              glPushMatrix()
+              glTranslate(x+.005, y +.35 +.005, 0)
+              glRotate(90, 1, 0, 0)
+              glScalef(.40 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 1.7 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 1.7 + .6 * ms * ff)
+              glBegin(GL_TRIANGLE_STRIP)
+              glTexCoord2f(0.0, 0.0)
+              glVertex3f(-flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(1.0, 0.0)
+              glVertex3f( flameSize * ff, 0, -flameSize * ff)
+              glTexCoord2f(0.0, 1.0)
+              glVertex3f(-flameSize * ff, 0,  flameSize * ff)
+              glTexCoord2f(1.0, 1.0)
+              glVertex3f( flameSize * ff, 0,  flameSize * ff)
+              glEnd()
+              glPopMatrix()  
+              glDisable(GL_TEXTURE_2D)
+           
+  
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+            self.freestyleHitFlameCounts[fretNum] += 1
+        
+          else:   #MFH - flame count is done - reset it!
+            self.freestyleHitFlameCounts[fretNum] = 0    #MFH
+
+
+
   def render(self, visibility, song, pos, controls, killswitch):
 
     if not self.starNotesSet == True:
@@ -2622,6 +3127,8 @@ class Drum:
         self.renderFreestyleLanes(visibility, song, pos, controls) #MFH - render the lanes on top of the notes.
         self.renderFrets(visibility, song, controls)
         
+        self.renderFreestyleFlames(visibility, controls)    #MFH - freestyle hit flames
+        
       else:
       
         self.renderFreestyleLanes(visibility, song, pos, controls)
@@ -2636,13 +3143,15 @@ class Drum:
           self.renderNotes(visibility, song, pos)
           self.renderFrets(visibility, song, controls)
 
-      self.renderFlames(visibility, song, pos, controls)
+        self.renderFlames(visibility, song, pos, controls)    #MFH - only when freestyle inactive!
     
       if self.leftyMode:
         glScalef(-1, 1, 1)
 
   def getMissedNotes(self, song, pos, catchup = False):
     if not song:
+      return
+    if not song.readyToGo:
       return
 
     m1      = self.lateMargin
@@ -2662,6 +3171,8 @@ class Drum:
 
   def getMissedNotesMFH(self, song, pos, catchup = False):
     if not song:
+      return
+    if not song.readyToGo:
       return
 
     m1      = self.lateMargin
@@ -2754,42 +3265,96 @@ class Drum:
     return False
 
 
-  #volshebnyi - handle freestyle picks here
-  def freestylePick(self, song, pos, controls):
-    numHits = 0
-    if controls.getState(self.keys[0]):
-      numHits = 1
-      if self.engine.data.bassDrumSoundFound:
-        self.engine.data.bassDrumSound.play()
+  def playDrumSounds(self, controls, playBassDrumOnly = False):   #MFH - handles playing of drum sounds.  
+    #Returns list of drums that were just hit (including logic for detecting a held bass pedal)
+    #pass playBassDrumOnly = True (optional paramater) to only play the bass drum sound, but still
+    #  return a list of drums just hit (intelligently play the bass drum if it's held down during gameplay)
+    drumsJustHit = [False, False, False, False, False]
+
+    if controls.getState(self.keys[0]):   #Bass drum   
+      if not self.bassDrumPedalDown:  #MFH - gotta check if bass drum pedal is just held down!
+        if self.engine.data.bassDrumSoundFound:
+          self.engine.data.bassDrumSound.play()
+        self.bassDrumPedalDown = True
+        drumsJustHit[0] = True
+    else:
+      self.bassDrumPedalDown = False
+
     for i in range (1,5):
       if controls.getState(self.keys[i]) or controls.getState(self.keys[4+i]):
-        numHits += 1
         if i == 1:
-          if self.engine.data.T1DrumSoundFound:
+          if self.engine.data.T1DrumSoundFound and not playBassDrumOnly:
             self.engine.data.T1DrumSound.play()
+          drumsJustHit[i] = True
         if i == 2:
-          if self.engine.data.T2DrumSoundFound:
+          if self.engine.data.T2DrumSoundFound and not playBassDrumOnly:
             self.engine.data.T2DrumSound.play()
+          drumsJustHit[i] = True
         if i == 3:
-          if self.engine.data.T3DrumSoundFound:
+          if self.engine.data.T3DrumSoundFound and not playBassDrumOnly:
             self.engine.data.T3DrumSound.play()
-        if i == 4 and self.drumFillsActive and self.drumFillsHits >= 4 and not self.starPowerActive:   #MFH - must actually activate starpower!
-          if self.engine.data.CDrumSoundFound:
+          drumsJustHit[i] = True
+        if i == 4:   #MFH - must actually activate starpower!
+          if self.engine.data.CDrumSoundFound and not playBassDrumOnly:
             self.engine.data.CDrumSound.play()
-          drumFillCymbalPos = self.freestyleStart+self.freestyleLength
-          minDrumFillCymbalHitTime = drumFillCymbalPos - self.earlyMargin
-          maxDrumFillCymbalHitTime = drumFillCymbalPos + self.lateMargin
-          if (pos >= minDrumFillCymbalHitTime) and (pos <= maxDrumFillCymbalHitTime):
-            self.starPowerActive = True
-            self.engine.data.starActivateSound.play()
-            self.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
-            self.ocount = 0  #MFH - this triggers the oFlash strings & timer
+          drumsJustHit[i] = True
+    
+    return drumsJustHit
+
+
+  #volshebnyi - handle freestyle picks here
+  def freestylePick(self, song, pos, controls):
+    drumsJustHit = self.playDrumSounds(controls)
+    numHits = 0
+    for i, drumHit in enumerate(drumsJustHit):
+      if drumHit:
+        numHits += 1
+        if i == 4:
+          if not self.bigRockEndingMarkerSeen and (self.drumFillsActive or self.drumFillWasJustActive) and self.drumFillsHits >= 4 and not self.starPowerActive:
+            drumFillCymbalPos = self.freestyleStart+self.freestyleLength
+            minDrumFillCymbalHitTime = drumFillCymbalPos - self.earlyMargin
+            maxDrumFillCymbalHitTime = drumFillCymbalPos + self.lateMargin
+            if (pos >= minDrumFillCymbalHitTime) and (pos <= maxDrumFillCymbalHitTime):
+              self.freestyleSP = True
+        
+    
+    
+#-    if controls.getState(self.keys[0]):   
+#-      if not self.bassDrumPedalDown:  #MFH - gotta check if bass drum pedal is just held down!
+#-        numHits = 1
+#-        if self.engine.data.bassDrumSoundFound:
+#-          self.engine.data.bassDrumSound.play()
+#-        self.bassDrumPedalDown = True
+#-    for i in range (1,5):
+#-      if controls.getState(self.keys[i]) or controls.getState(self.keys[4+i]):
+#-        numHits += 1
+#-        if i == 1:
+#-          if self.engine.data.T1DrumSoundFound:
+#-            self.engine.data.T1DrumSound.play()
+#-        if i == 2:
+#-          if self.engine.data.T2DrumSoundFound:
+#-            self.engine.data.T2DrumSound.play()
+#-        if i == 3:
+#-          if self.engine.data.T3DrumSoundFound:
+#-            self.engine.data.T3DrumSound.play()
+#-        if i == 4:   #MFH - must actually activate starpower!
+#-          if self.engine.data.CDrumSoundFound:
+#-            self.engine.data.CDrumSound.play()
+#-          if self.drumFillsActive and self.drumFillsHits >= 4 and not self.starPowerActive:
+#-            drumFillCymbalPos = self.freestyleStart+self.freestyleLength
+#-            minDrumFillCymbalHitTime = drumFillCymbalPos - self.earlyMargin
+#-            maxDrumFillCymbalHitTime = drumFillCymbalPos + self.lateMargin
+#-            if (pos >= minDrumFillCymbalHitTime) and (pos <= maxDrumFillCymbalHitTime):
+#-              self.freestyleSP = True
+
     return numHits
 
   
   def startPick(self, song, pos, controls, hopo = False):
     if not song:
       return False
+    if not song.readyToGo:
+      return
 
     if self.lastFretWasBassDrum:
       if controls.getState(self.keys[1]) or controls.getState(self.keys[2]) or controls.getState(self.keys[3]) or controls.getState(self.keys[4]) or controls.getState(self.keys[5]) or controls.getState(self.keys[6]) or controls.getState(self.keys[7]) or controls.getState(self.keys[8]):
@@ -2889,7 +3454,8 @@ class Drum:
     Log.debug("Rescued at " + str(pos))
   
   def run(self, ticks, pos, controls):
-    self.time += ticks
+    if not self.paused:
+      self.time += ticks
     #myfingershurt: must not decrease SP if paused.
     if self.starPowerActive == True and self.paused == False:
       self.starPower -= ticks/self.starPowerDecreaseDivisor 

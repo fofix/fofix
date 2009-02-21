@@ -44,8 +44,8 @@ if language:
     trFile = os.path.join(Version.dataPath(), "translations", "%s.mo" % language.lower().replace(" ", "_"))
     catalog = gettext.GNUTranslations(open(trFile, "rb"))
     def translate(m):
-      if encoding == None:
-        return catalog.gettext(m).decode("utf-8")
+      if encoding == "None":
+        return catalog.gettext(m).decode("iso-8859-1")
       else:
         return catalog.gettext(m).decode(encoding)
     _ = translate

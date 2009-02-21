@@ -12,7 +12,10 @@
 "data\_sqlite.pyd"//new compiled module
 "data\pitchbend.pyd"//new compiled module
 "data\rtmidi.pyd"//new compiled module
+"data\win32gui.pyd"//new compiled module
 //-------Additional images required over 3.000--------
+"data\necks\Neck_00?.png"//all
+"data\necks\Neck_010.png"//neck 10 too.
 "data\glow.png"//new PNG from SVG
 "data\cassette.png"//new PNG from SVG
 "data\left.png"//new PNG from SVG
@@ -42,8 +45,20 @@
 "data\themes\MegaLight\bassgrooveneck.png"//new theme files
 "data\themes\MegaLight\lyricsheet.png"//new theme files
 "data\themes\MegaLight\star1.png"//new theme files
+"data\themes\MegaLight\brescorebackground.png"//new theme files
+"data\themes\MegaLight\brescoreframe.png"//new theme files
+"data\themes\MegaLight\soloframe.png"//new theme files
 "data\failneck.png"//new PNG
 "data\guitar.png"//new PNG
 "data\bass.png"//new PNG
 "data\drum.png"//new PNG
+"data\freestyletail1.png"//new PNG
+"data\freestyletail2.png"//new PNG
+"data\themes\MegaLight GH3\notetex_color.png"//new theme files
+"data\themes\MegaLight GH3\notetex_extra.png"//new theme files
+"data\themes\MegaLight GH3\notetex_hopo.png"//new theme files
+"data\themes\MegaLight GH3\notetex_main.png"//new theme files
+"data\themes\MegaLight GH3\note.dae"//new theme files
+"data\themes\MegaLight GH3\theme.ini"//new theme files
+
 

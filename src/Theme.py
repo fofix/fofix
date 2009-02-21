@@ -26,6 +26,7 @@
 from OpenGL.GL import *
 import Config
 import Log
+import os
 
 # read the color scheme from the config file
 Config.define("theme", "background_color",  str, "#000000")
@@ -108,6 +109,12 @@ Config.define("theme", "pov_origin_x",       float, None)
 Config.define("theme", "pov_origin_y",       float, None)
 Config.define("theme", "pov_origin_z",       float, None)
 
+#Volshebnyi - spNote and killswitch tail colors
+Config.define("theme", "fretS_color",       str, "#4CB2E5")
+Config.define("theme", "fretK_color",       str, "#000000")
+Config.define("theme", "obar_hscale",       float, 0.7)
+Config.define("theme", "obar_3dfill",       bool, False)
+
 #blazingamer
 Config.define("theme", "menu_x",       float, None)
 Config.define("theme", "menu_y",       float, None)
@@ -163,8 +170,7 @@ Config.define("theme", "pause_text_y",       float, None)
 Config.define("theme", "pause_text_color",  str, "#FFFFFF")
 Config.define("theme", "pause_selected_color",  str, "#FFBF00")
 
-Config.define("theme", "opt_bkg_x",       float, None)
-Config.define("theme", "opt_bkg_y",       float, None)
+Config.define("theme", "opt_bkg",   str, "0.5,0.5,1.0,1.0")
 Config.define("theme", "opt_text_x",       float, None)
 Config.define("theme", "opt_text_y",       float, None)
 Config.define("theme", "opt_text_color",  str, "#FFFFFF")
@@ -189,6 +195,31 @@ Config.define("theme", "fail_text_color",  str, "#FFFFFF")
 Config.define("theme", "fail_completed_color",  str, "#FFFFFF")
 Config.define("theme", "fail_selected_color",  str, "#FFBF00")
 
+Config.define("theme", "result_score", str, ".5,.11,0.0025,None")
+Config.define("theme", "result_song", str, ".05,.045,.002,None")
+Config.define("theme", "result_song_form", int, 0)
+Config.define("theme", "result_song_text", str, "%s Finished!")
+Config.define("theme", "result_star", str, ".5,.35,0.15,0.5")
+Config.define("theme", "result_stats_diff", str, ".5,.55,0.002,None")
+Config.define("theme", "result_stats_diff_text", str, "Difficulty: %s")
+Config.define("theme", "result_stats_part", str, ".5,.64,0.002,None")
+Config.define("theme", "result_stats_part_text", str, "Part: %s")
+Config.define("theme", "result_stats_streak", str, ".5,.58,0.002,None")
+Config.define("theme", "result_stats_streak_text", str, "Long Streak: %s")
+Config.define("theme", "result_stats_accuracy", str, ".5,.61,0.002,None")
+Config.define("theme", "result_stats_accuracy_text", str, "Accuracy: %.1f%%")
+Config.define("theme", "result_stats_notes", str, ".5,.52,0.002,None")
+Config.define("theme", "result_stats_notes_text", str, "%s Notes Hit")
+Config.define("theme", "result_cheats_info", str, ".5,.3,.002")
+Config.define("theme", "result_cheats_numbers", str, ".5,.35,.0015")
+Config.define("theme", "result_cheats_score", str, ".75,.4,.0015")
+Config.define("theme", "result_cheats_percent", str, ".45,.4,.0015")
+Config.define("theme", "result_cheats_color", str, "#FFFFFF")
+Config.define("theme", "result_menu_x", float, .5)
+Config.define("theme", "result_menu_y", float, .2)
+
+Config.define("theme", "jurgen_text_pos", str, "1,1,.00035")
+
 
 #MFH - crowd cheer loop delay in theme.ini: if not exist, use value from settings. Otherwise, use theme.ini value.
 Config.define("theme", "crowd_loop_delay",  int, None)
@@ -200,8 +231,13 @@ Config.define("theme", "song_select_submenu_y",  float, None)
 #MFH - for scaling song info during countdown
 Config.define("theme", "song_info_display_scale",  float, 0.0020)
 
+#Worldrave - for song info display positioning
+Config.define("theme", "song_info_display_X",  float, 0.05)
+Config.define("theme", "song_info_display_Y",  float, 0.05)
+
 #MFH - option for Rock Band 2 theme.ini - only show # of stars you are working on
 Config.define("theme", "display_all_grey_stars",  bool, True)
+Config.define("theme", "small_1x_mult", bool, True)
 
 #MFH - y offset = lines, x offset = spaces
 Config.define("theme", "song_select_submenu_offset_lines",  int, 2)
@@ -213,8 +249,17 @@ Config.define("theme", "hopo_indicator_y",       float, None)
 Config.define("theme", "hopo_indicator_active_color",   str, "#FFFFFF")
 Config.define("theme", "hopo_indicator_inactive_color",   str, "#666666")
 
+#stump - parameters for continuous fillup of stars
+Config.define("theme", "star_fillup_center_x", int, None)
+Config.define("theme", "star_fillup_center_y", int, None)
+Config.define("theme", "star_fillup_in_radius", int, None)
+Config.define("theme", "star_fillup_out_radius", int, None)
+Config.define("theme", "star_fillup_color", str, None)
+
 #Qstick - Misc
 Config.define("theme", "song_list_display",       int, None)
+
+#Qstick - Results Screen
 
 #RACER:
 Config.define("theme", "fail_bkg_x",       float, None)
@@ -222,7 +267,9 @@ Config.define("theme", "fail_bkg_y",       float, None)
 Config.define("theme", "fail_text_x",       float, None)
 Config.define("theme", "fail_text_y",       float, None)
 
-
+submenuX = {}
+submenuY = {}
+submenuV = {}
 
 backgroundColor = None
 baseColor       = None
@@ -296,8 +343,7 @@ pause_bkg_yPos = None
 pause_text_xPos = None
 pause_text_yPos = None
 
-opt_bkg_xPos = None
-opt_bkg_yPos = None
+opt_bkg_size = [None]*4
 opt_text_xPos = None
 opt_text_yPos = None
 
@@ -341,12 +387,17 @@ neck_prompt_y = None
 #MFH - for scaling song info during countdown
 songInfoDisplayScale = None
 
+#Worldrave - for position of song info display during countdown
+songInfoDisplayX = None
+songInfoDisplayY = None
+
 #MFH - y offset = lines, x offset = spaces
 songSelectSubmenuOffsetLines = None
 songSelectSubmenuOffsetSpaces = None
 
 #MFH - option for Rock Band 2 theme.ini - only show # of stars you are working on
 displayAllGreyStars = None
+smallMult = None
 
 #Qstick - hopo indicator position and color
 hopoIndicatorX = None
@@ -354,8 +405,42 @@ hopoIndicatorY = None
 hopoIndicatorActiveColor = None
 hopoIndicatorInactiveColor = None
 
+#stump - parameters for continuous fillup of stars
+starFillupCenterX = None
+starFillupCenterY = None
+starFillupInRadius = None
+starFillupOutRadius = None
+starFillupColor = None
+
 #Qstick - misc
 songListDisplay = None
+
+result_score = [None] * 4
+result_star = [None] * 4
+result_song = [None] * 4
+result_song_form = None
+result_song_text = None
+result_stats_part = [None] * 4
+result_stats_part_text = None
+result_stats_diff = [None] * 4
+result_stats_diff_text = None
+result_stats_accuracy = [None] * 4
+result_stats_accuracy_text = None
+result_stats_streak = [None] * 4
+result_stats_streak_text = None
+result_stats_notes = [None] * 4
+result_stats_notes_text = None
+#akedrou
+result_cheats_info = [None] * 3
+result_cheats_numbers = [None] * 3
+result_cheats_score = [None] * 3
+result_cheats_percent = [None] * 3
+result_cheats_color = None
+result_menu_x = None
+result_menu_y = None
+
+jurgTextPos = [None] * 3
+
 
 #Racer:
 fail_bkg_xPos = None
@@ -376,6 +461,15 @@ def hexToColor(color):
   elif color.lower() == "fret":
     return (-2, -2, -2)
   return (0, 0, 0)
+
+def hexToColorResults(color):
+  color = color.strip()
+  if color[0] == "#":
+    color = color[1:]
+    if len(color) == 3:
+      return (int(color[0], 16) / 15.0, int(color[1], 16) / 15.0, int(color[2], 16) / 15.0)
+    return (int(color[0:2], 16) / 255.0, int(color[2:4], 16) / 255.0, int(color[4:6], 16) / 255.0)
+  return baseColor
     
 def colorToHex(color):
   return "#" + ("".join(["%02x" % int(c * 255) for c in color]))
@@ -388,7 +482,7 @@ def setBaseColor(alpha = 1.0):
   
 
 
-def open(config):
+def open(config, themepath = None):
   # Read in theme.ini specific variables
   
   setupColors(config)
@@ -407,6 +501,8 @@ def open(config):
   setupRockmeter(config)
   setupNeckChooser(config)
   setupHopoIndicator(config)
+  setupResults(config)
+  setupSubmenus(config, themepath)
   
 
 def setupNeckChooser(config):
@@ -439,12 +535,16 @@ def setupFrets(config):
     
   if fretColors == None:
     fretColors = [hexToColor(config.get("theme", "fret%d_color" % i)) for i in range(5)]
+    fretColors.append(hexToColor(config.get("theme", "fretS_color"))) #Volshebnyi - spNote color
+    fretColors.append(hexToColor(config.get("theme", "fretK_color"))) #Volshebnyi - killswitch tail color
   else:
     fretColors[0] = hexToColor(config.get("theme", "fret0_color"))
     fretColors[1] = hexToColor(config.get("theme", "fret1_color"))
     fretColors[2] = hexToColor(config.get("theme", "fret2_color"))
     fretColors[3] = hexToColor(config.get("theme", "fret3_color"))
     fretColors[4] = hexToColor(config.get("theme", "fret4_color"))
+    fretColors[5] = hexToColor(config.get("theme", "fretS_color"))
+    fretColors[6] = hexToColor(config.get("theme", "fretK_color"))
 
 def setupFlameColors(config):
   global flameColors
@@ -534,16 +634,37 @@ def setupMisc(config):
   global creditSong
   global crowdLoopDelay
   global songInfoDisplayScale
-  global displayAllGreyStars
+  global songInfoDisplayX
+  global songInfoDisplayY
+  global displayAllGreyStars, smallMult
+  global starFillupCenterX
+  global starFillupCenterY
+  global starFillupInRadius
+  global starFillupOutRadius
+  global starFillupColor
   global songListDisplay
+  global jurgTextPos
+  global oBarHScale
+  global oBar3dFill
 
   loadingPhrase = config.get("theme", "loading_phrase")
   resultsPhrase = config.get("theme", "results_phrase")
   creditSong = config.get("theme", "credit_song")
   crowdLoopDelay = config.get("theme", "crowd_loop_delay")
   songInfoDisplayScale = config.get("theme", "song_info_display_scale")
+  songInfoDisplayX = config.get("theme", "song_info_display_X")
+  songInfoDisplayY = config.get("theme", "song_info_display_Y")
   displayAllGreyStars = config.get("theme", "display_all_grey_stars")
+  smallMult = config.get("theme", "small_1x_mult")
+  starFillupCenterX = config.get("theme", "star_fillup_center_x")
+  starFillupCenterY = config.get("theme", "star_fillup_center_y")
+  starFillupInRadius = config.get("theme", "star_fillup_in_radius")
+  starFillupOutRadius = config.get("theme", "star_fillup_out_radius")
+  starFillupColor = config.get("theme", "star_fillup_color")
   songListDisplay = config.get("theme", "song_list_display")
+  jurgTextPos = config.get("theme", "jurgen_text_pos").split(",")
+  oBarHScale = config.get("theme", "obar_hscale")
+  oBar3dFill = config.get("theme", "obar_3dfill")
 
 #MFH:
 def setupSonglist(config):
@@ -603,14 +724,13 @@ def setupSonglist(config):
   
 def setupPauseNOpt(config):
   global pause_bkg_xPos, pause_bkg_yPos, pause_text_xPos, pause_text_yPos
-  global opt_bkg_xPos, opt_bkg_yPos, opt_text_xPos, opt_text_yPos
+  global opt_bkg_size, opt_text_xPos, opt_text_yPos
 
   pause_bkg_xPos = config.get("theme", "pause_bkg_x")
   pause_bkg_yPos = config.get("theme", "pause_bkg_y")
   pause_text_xPos = config.get("theme", "pause_text_x")
   pause_text_yPos = config.get("theme", "pause_text_y")
-  opt_bkg_xPos = config.get("theme", "opt_bkg_x")
-  opt_bkg_yPos = config.get("theme", "opt_bkg_y")
+  opt_bkg_size = config.get("theme", "opt_bkg").split(",")
   opt_text_xPos = config.get("theme", "opt_text_x")
   opt_text_yPos = config.get("theme", "opt_text_y")
   
@@ -669,5 +789,76 @@ def setupHopoIndicator(config):
   hopoIndicatorY = config.get("theme", "hopo_indicator_y")  
   hopoIndicatorActiveColor = hexToColor(config.get("theme", "hopo_indicator_active_color"))
   hopoIndicatorInactiveColor = hexToColor(config.get("theme", "hopo_indicator_inactive_color"))
+  
+def setupResults(config):
+  global result_score, result_star, result_song, result_song_text, result_song_form, result_stats_part, result_stats_diff
+  global result_stats_diff_text, result_stats_part_text, result_stats_streak_text, result_stats_accuracy_text
+  global result_stats_accuracy, result_stats_streak, result_stats_notes, result_stats_notes_text
+  global result_cheats_info, result_cheats_numbers, result_cheats_percent, result_cheats_score, result_cheats_color
+  global result_menu_x, result_menu_y
+  
+  result_score = config.get("theme", "result_score").split(",")
+  result_star = config.get("theme", "result_star").split(",")
+  result_song = config.get("theme", "result_song").split(",")
+  result_song_form = config.get("theme", "result_song_form")
+  result_song_text = config.get("theme", "result_song_text").strip()
+  result_stats_part = config.get("theme", "result_stats_part").split(",")
+  result_stats_part_text = config.get("theme", "result_stats_part_text").strip()
+  result_stats_diff = config.get("theme", "result_stats_diff").split(",")
+  result_stats_diff_text = config.get("theme", "result_stats_diff_text").strip()
+  result_stats_accuracy = config.get("theme", "result_stats_accuracy").split(",")
+  result_stats_accuracy_text = config.get("theme", "result_stats_accuracy_text").strip()
+  result_stats_streak = config.get("theme", "result_stats_streak").split(",")
+  result_stats_streak_text = config.get("theme", "result_stats_streak_text").strip()
+  result_stats_notes = config.get("theme", "result_stats_notes").split(",")
+  result_stats_notes_text = config.get("theme", "result_stats_notes_text").strip()
+  result_cheats_info = config.get("theme", "result_cheats_info").split(",")
+  result_cheats_numbers = config.get("theme", "result_cheats_numbers").split(",")
+  result_cheats_percent = config.get("theme", "result_cheats_percent").split(",")
+  result_cheats_score   = config.get("theme", "result_cheats_score").split(",")
+  result_cheats_color   = config.get("theme", "result_cheats_color")
+  result_menu_x         = config.get("theme", "result_menu_x")
+  result_menu_y         = config.get("theme", "result_menu_y")
 
-
+def setupSubmenus(config, themepath = None):
+  if not themepath:
+    return
+  global submenuScale, submenuX, submenuY, submenuVSpace
+  allfiles = os.listdir(themepath)
+  submenuScale = {}
+  submenuX = {}
+  submenuY = {}
+  submenuVSpace = {}
+  listmenu = []
+  for name in allfiles:
+    if os.path.splitext(name)[1] == ".png":
+      if name.find("text") > -1:
+        found = os.path.splitext(name)[0]
+        if found == "maintext":
+          continue
+        Config.define("theme", found, str, None)
+        submenuScale[found] = None
+        submenuX[found] = None
+        submenuY[found] = None
+        submenuVSpace[found] = None
+        listmenu.append(found)
+  for i in listmenu:
+    if i == "maintext":
+      continue
+    try:
+      submenuX[i] = config.get("theme", i).split(",")[0].strip()
+    except IndexError:
+      submenuX[i] = None
+    try:
+      submenuY[i] = config.get("theme", i).split(",")[1].strip()
+    except IndexError:
+      submenuY[i] = None
+    try:
+      submenuScale[i] = config.get("theme", i).split(",")[2].strip()
+    except IndexError:
+      submenuScale[i] = None
+    try:
+      submenuVSpace[i] = config.get("theme", i).split(",")[3].strip()
+    except IndexError:
+      submenuVSpace[i] = None
+  

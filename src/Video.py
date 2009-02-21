@@ -22,6 +22,7 @@
 
 import pygame
 import os
+import sys
 from OpenGL.GL import *
 from OpenGL.GL.ARB.multisample import *
 import Log
@@ -73,6 +74,28 @@ class Video:
         
     pygame.display.set_caption(self.caption)
     pygame.mouse.set_visible(False)
+
+    #stump: fix the window icon under Windows
+    # Yes, I do know about pygame.display.set_icon (and the inherent cross-platformness),
+    # but PIL won't load anything but the biggest icon from the ICO, and it looks like
+    # complete garbage when scaled down to 16x16.
+    if os.name == 'nt':
+      import win32api
+      import win32gui
+      import win32con
+      hwnd = pygame.display.get_wm_info()['window']
+      if os.path.isfile('fof.ico'):
+        # case: running from source code with fof.ico present - use it
+        hicon_big = win32gui.LoadImage(0, 'fof.ico', win32gui.IMAGE_ICON, 32, 32, win32gui.LR_LOADFROMFILE)
+        win32api.SendMessage(hwnd, win32con.WM_SETICON, win32con.ICON_BIG, hicon_big)
+        hicon_small = win32gui.LoadImage(0, 'fof.ico', win32gui.IMAGE_ICON, 16, 16, win32gui.LR_LOADFROMFILE)
+        win32api.SendMessage(hwnd, win32con.WM_SETICON, win32con.ICON_SMALL, hicon_small)
+      elif hasattr(sys, 'frozen') and sys.frozen == 'windows_exe':
+        # case: running from py2exe'd exe - use the icon embedded in us
+        hicon_big = win32gui.LoadImage(win32api.GetModuleHandle(None), 1, win32gui.IMAGE_ICON, 32, 32, 0)
+        win32api.SendMessage(hwnd, win32con.WM_SETICON, win32con.ICON_BIG, hicon_big)
+        hicon_small = win32gui.LoadImage(win32api.GetModuleHandle(None), 1, win32gui.IMAGE_ICON, 16, 16, 0)
+        win32api.SendMessage(hwnd, win32con.WM_SETICON, win32con.ICON_SMALL, hicon_small)
 
     if multisamples:
       try:
