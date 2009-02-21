@@ -1365,6 +1365,10 @@ class Track:
     self.allEvents = []
     self.marked = False
 
+    self.currentIndex = 0   #MFH
+    self.maxIndex = 0   #MFH
+
+
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("Track class init (song.py)...")
@@ -3941,6 +3945,13 @@ def compareSongsAndTitles(engine, a, b):
   #MFH - Career Mode determination:
   gameMode1p = engine.config.get("player0","mode_1p")
   order = engine.config.get("game", "sort_order")
+  
+  #MFH - must check here for an invalid Sort Order setting and correct it!
+  orderings = engine.config.getOptions("game", "sort_order")[1]
+  if order >= len(orderings):
+    order = 0
+    engine.config.set("game", "sort_order", order)
+
   instrument = engine.config.get("game", "songlist_instrument")
   theInstrumentDiff = instrumentDiff[instrument]
   direction = engine.config.get("game", "sort_direction")

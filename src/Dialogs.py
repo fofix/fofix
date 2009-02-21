@@ -1239,7 +1239,8 @@ class SongChooser(Layer, KeyListener):
     elif c in Player.KILLS and self.engine.config.get("game", "whammy_changes_sort_order"):
         orderings = self.engine.config.getOptions("game", "sort_order")[1]
         self.sortOrder += 1
-        if self.sortOrder > len(orderings):
+        #if self.sortOrder > len(orderings):
+        if self.sortOrder >= len(orderings):  #MFH - must not allow this to go over the max!
           self.sortOrder = 0
         self.engine.config.set("game", "sort_order", self.sortOrder)
         if self.songLoader:
