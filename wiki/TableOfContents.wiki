@@ -1,5 +1,6 @@
 ==Other Pages==
   * [BasicInstructions]
+  * [GameControllers]
   * [FAQ]
   * [ThemeFileSettings]
   * [SongINIInstructions]

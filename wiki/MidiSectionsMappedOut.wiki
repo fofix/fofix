@@ -53,7 +53,10 @@ midi: 105-106 - multiplayer phrases
 midi: 110-112 - tom gems 
 midi: 116 - spotlight phrases 
 midi: 120-124 - drum fills 
+
 }}}
+_Note: The very last drum fill of a song can be a Big Rock Ending if and only if there is a text / section event "[section big_rock_ending]" before it (just like RB / RB2 MIDIs).  Other instrument BRE's do not require this event, but it should be there for completeness._
+
 http://img166.imageshack.us/img166/1467/gasfdgasfur2.th.jpg
 
 -----------------------------------------------------

@@ -1,0 +1,91 @@
+#summary List of Usable Images for Theme's by FoFix.
+
+= Usable Images By FoFiX=
+
+This will be a complete list of usable images that FoFiX can use. What directory they
+belong in, and if they are Required or if they are just usable if they exist.
+This is WIP status until completed. Then it will just me maintained as things are added.
+
+
+==Main Theme Directory==
+||_Filename_||_What is file for in FoFiX?_||_Required - Yes/No_||Related to Which Theme?||
+||bassgroovemult.png|| WIP || No || Rock Band Based ||
+||bassgrooveneck.png|| WIP || No || Rock Band Based ||
+||bassgrooveneckovr.png|| WIP || Yes || Basic Functionality||
+||bigtail1.png|| WIP || Yes || Basic Functionality||
+||bigtail2.png|| WIP || Yes || Basic Functionality||
+||bpm_beat.png|| WIP || Yes || Basic Functionality||
+||bpm_halfbeat.png|| WIP || Yes || Basic Functionality||
+||bpm_measure.png|| WIP || Yes || Basic Functionality||
+||center_lines.png|| WIP || Yes || Basic Functionality||
+||counter.png|| WIP || Yes || Basic Functionality||
+||drumcenterlines.png|| WIP || Yes || Basic Functionality||
+||drumnotes.png|| WIP || Yes || Basic Functionality||
+||editor.png|| WIP || Yes || Basic Functionality||
+||fretbuttons.png|| WIP || Yes || Basic Functionality||
+||gameresults.png|| WIP || Yes || Basic Functionality||
+||glow.png|| WIP || Yes || Basic Functionality||
+||guitarsoloneck.png|| WIP || No || Rock Band Based ||
+||guitarsoloneckovr.png|| WIP || No || Rock Band Based ||
+||hitflames1.png|| WIP || Yes || Basic Functionality||
+||hitflames2.png|| WIP || Yes || Basic Functionality||
+||hitglow.png|| WIP || Yes || Basic Functionality||
+||hitglow2.png|| WIP || Yes || Basic Functionality||
+||kill1.png|| WIP || Yes || Basic Functionality||
+||kill2.png|| WIP || Yes || Basic Functionality||
+||loadingbg.png|| WIP || Yes || Basic Functionality||
+||lyricsheet.png|| WIP || No || All ||
+||mult.png|| WIP || Yes || Basic Functionality||
+||mult2.png|| WIP || Yes || Basic Functionality||
+||notes.png|| WIP || Yes || Basic Functionality||
+||overdrive bottom.png|| WIP || Yes || Basic Functionality||
+||overdrive center_lines.png|| WIP || Yes || Basic Functionality||
+||overdrive fill.png|| WIP || Yes || Basic Functionality||
+||overdrive full.png|| WIP || Yes || Basic Functionality||
+||overdrive side_bars.png|| WIP || Yes || Basic Functionality||
+||overdrive top.png|| WIP || Yes || Basic Functionality||
+||overdriveneck.png|| WIP || Yes || Basic Functionality||
+||pause.png|| WIP || Yes || Basic Functionality||
+||rock_arr.png|| WIP || Yes || Basic Functionality||
+||rock_bottom.png|| WIP || Yes || Basic Functionality||
+||rock_fill.png|| WIP || Yes || Basic Functionality||
+||rock_max.png|| WIP || Yes || Basic Functionality||
+||rock_top.png|| WIP || Yes || Basic Functionality||
+||score.png|| WIP || Yes || Basic Functionality||
+||side_bars.png|| WIP || Yes || Basic Functionality||
+||soloframe.png|| WIP || No || Basic Functionality||
+||star1.png|| WIP || Yes || Basic Functionality||
+||star2.png|| WIP || Yes || Basic Functionality||
+||stargrey.png|| WIP || No || Rock Band Based ||
+||stargrey1.png|| WIP || No || Rock Band Based ||
+||stargrey2.png|| WIP || No || Rock Band Based ||
+||stargrey3.png|| WIP || No || Rock Band Based ||
+||stargrey4.png|| WIP || No || Rock Band Based ||
+||stargrey5.png|| WIP || No || Rock Band Based ||
+||stargrey6.png|| WIP || No || Rock Band Based ||
+||stargrey7.png|| WIP || No || Rock Band Based ||
+||starperfect.png|| WIP || No || Rock Band Based ||
+||starwhite.png|| WIP || No || Rock Band Based ||
+||tail1.png|| WIP || Yes || Basic Functionality||
+||tail2.png|| WIP || Yes || Basic Functionality||
+||youfailed.png|| WIP || Yes || Basic Functionality||
+||yourock.png|| WIP || Yes || Basic Functionality||
+
+
+==\Menu\ Directory==
+||_Filename_||_What is file for in FoFiX?_||_Required - Yes/No_||Related to Which Theme?||
+||mainbg.png|| WIP || Yes || Basic Functionality||
+||maintext.png|| WIP || Yes || Basic Functionality||
+||neckchoosebg.png|| WIP || Yes || Basic Functionality||
+||neckchooseselect.png|| WIP || Yes || Basic Functionality||
+||neckchoosetext.png|| WIP || Yes || Basic Functionality||
+||optionsbg.png|| WIP || Yes || Basic Functionality||
+||optionspanel.png|| WIP || Yes || Basic Functionality||
+||selected.png|| WIP || Yes || Basic Functionality||
+||songchoosepaper.png|| WIP || Yes || Basic Functionality||
+
+
+==\Stages\ Directory==
+||_Filename_||_What is file for in FoFiX?_||_Required - Yes/No_||Related to Which Theme?||
+||default.png|| WIP || Yes || Basic Functionality||
+||pratice.png|| WIP || Yes || Basic Functionality||

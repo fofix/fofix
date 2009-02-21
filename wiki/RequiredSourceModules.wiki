@@ -152,4 +152,19 @@ Then either create a patch or a full package.
   * Execute `make patch`.
 ==== Full package ====
   * Execute `make bindist`.
+
+=== Optional PitchBending ===
+==== Requirements ====
+In order to build John Stumpo's pitchbend module you first need to install...
+  * libsdl-mixer1.2-dev
+  * libsndobj-dev
+
+==== Compiling ====
+  # Get the source code: `svn co https://svn.stump.jstump.com/svnroot/pitchbend/trunk pitchbend`
+  # Move to the source folder: `cd pitchbend`
+  # Create an empty VERSION file: `touch VERSION`
+  # Build the library: `python2.4 setup.py build`
+
+==== Installing ====
+_Still to come as i (evilynux) have not tested this yet..._
 ----

@@ -2,6 +2,67 @@
 
 = Old News =
 
+====Feb. 8th 2009 ====
+3.100 Beta 4 (SVN r960) has been released for testing.  This should be the last beta, 3.100 final is scheduled for release in a couple days - assuming there are no major problems with beta 4.
+
+  * Download 3.0xx -> 3.100 beta 4 Patch for Windows [http://www.mediafire.com/?mongfyqmy2i from Mediafire] / [http://rapidshare.com/files/195808034/FoFiX-3.030_r960-Patch-Windows_3.100beta4_.rar from Rapidshare]
+  * Download 3.0xx -> 3.100 beta 4 Patch installer for Windows [http://www.mediafire.com/?zjiyyvigoht from Mediafire] 
+  * Download 3.0xx -> 3.100 beta 4 Patch for Mac [http://www.mediafire.com/?ojzx2nowmwy from Mediafire]
+  * Download 3.100 beta 4 Full for Mac [http://www.mediafire.com/?n3yywbmzyyx from Mediafire]
+  * Download 3.100 beta 4 Full for GNU/Linux (32bit) [http://www.mediafire.com/?m4dlmmgctbl from Mediafire]
+
+*Note to GNU/Linux users*: Sorry, i screwed up creating the binaries for beta3, no more missing glx in beta4.
+
+
+====Jan. 25th 2009 ====
+3.100 Beta 3 (SVN r862) has been released for testing.  Big Rock Endings and Drum Fills have come further since 3.100 beta 2.  Guitar picks will now repeat for menu and songlist scrolling, and lyrics will no longer show during the song countdown.
+
+  * Download 3.0xx -> 3.100 beta 3 Patch for Windows [http://www.mediafire.com/?ytkyy2jgjmg from Mediafire] / [http://rapidshare.com/files/189452982/FoFiX-3.030_r862-Patch-Windows_3.100beta3_.rar from Rapidshare]
+  * Download 3.100 beta 2 (from installer only) -> 3.100 beta 3 Patch Installer for Windows [http://www.mediafire.com/?oqzejgukmqy from Mediafire]
+  * Download 3.100 beta 3 Full for Mac [http://www.mediafire.com/?zjygy8z732x from Mediafire]
+  * Download 3.0xx -> 3.100 beta 3 Patch for Mac [http://www.mediafire.com/?2tzgzjzdzy3 from Mediafire]
+  * Download 3.x -> 3.100 beta 3 Patch for GNU/Linux (32bit) [http://www.mediafire.com/?ygydjlktjmz from Mediafire]
+  * Download 3.100 beta 3 Full for GNU/Linux (32bit) [http://www.mediafire.com/?zk11yum43a0 from Mediafire]
+
+====Jan. 18th 2009 ====
+3.100 Beta 2 (SVN r812) has been released for testing.  Big Rock Endings and Drum Fills have come much further since 3.100 beta 1, as has the settings menu.  No more double-and-triple song loading cycles, either.
+
+  * Download 3.100 beta 2 Patch for Windows [http://www.mediafire.com/?yqgyngnydow from Mediafire] / [http://rapidshare.com/files/185779080/FoFiX-3.030_r812-Patch-Windows_3.100beta2_.rar from Rapidshare]
+  * [http://www.mediafire.com/?mxqd1xcjytv Download 3.100 beta 2 Patch for GNU/Linux] (32bit)
+  * [http://www.mediafire.com/download.php?hzzmjjlmzz3 Download 3.100 beta 2 Full installer for Windows by js]
+  * [http://www.mediafire.com/?t22bvymvldz Download 3.100 beta 2 Full for Mac]
+
+====Jan. 11th 2009 ====
+3.100 Beta 1 (SVN r762) has been released for testing.  Notable new features include very basic Big Rock Ending support, Drum Fills, MIDI instrument input support, whammy pitch-bending support, basic 3D note.dae texturing support, and songlist metadeta caching. 
+
+  * Download 3.100 beta 1 Patch for Windows [http://www.mediafire.com/?oyzm0zzjjy2 from Mediafire] / [http://rapidshare.com/files/183238330/FoFiX-v3.030_r762-Patch-Windows_3.100beta1_.rar from Rapidshare]
+  * [http://www.mediafire.com/download.php?kymz3ondmrn Download 3.100 beta 1 Full installer for Windows]
+  * [http://www.mediafire.com/?zaxtqiynlnk Download 3.100 beta 1 Full for Mac]
+  * [http://www.mediafire.com/?rgxfzcmd0nj Download 3.100 beta 1 Patch for GNU/Linux (32bit)]`*`
+  * [http://www.mediafire.com/?czndbnh2bjv Download 3.100 beta 1 Full for GNU/Linux (32bit)]`*`
+
+`*` *Note to GNU/Linux players:* MIDI instrument support and whammy pitch bending support are *not* included. Releasing a beta w/ SndObj (required for pitchbending) requires too much work for now. (--_evilynux_)
+
+====Jan. 7th 2009 ====
+
+_Coming soon - 3.100 beta 1 (that's right, we're skipping from 3.030 directly to 3.100.  There will be no 3.035... entirely too much progress has been made for such a minor version increment.  -Chris)_
+
+====Dec. 21st 2008 ====
+3.035 Beta 2 (SVN r621) has been released for testing.  
+I would write more, but I have to go.  Someone else can edit this later :)
+(I also appear to have obliterated the beta 1 release news... I'll have to fix this later unless someone wants to take care of that for me - I forgot to paste into the oldnews, I'm a bit rushed as I have to leave in 5 minutes)
+
+  * [http://www.mediafire.com/?2mowhnyjklh Download 3.035 beta 2 Patch for Windows]
+  * [http://www.mediafire.com/?x0jgmyb4jtm Download 3.035 beta 2 Patch for GNU/Linux (32bit)]
+  * [http://www.mediafire.com/?ml3yym5vwmj Download 3.035 beta 2 Patch for GNU/Linux (64bit)]
+  * [http://www.mediafire.com/?v2zjdnoqdrl Download 3.035 beta 2 Patch for MacOS X]
+
+====Dec. 7th 2008 ====
+FoFiX has a new tutorial song, for a total of [http://fofix.googlecode.com/files/FoFiX-All4Tutorials.rar 4].  This new drum roll practice tutorial was created by venom426.
+
+Warning: playing this tutorial song in a FoFiX revision below 548 can result in incorrect scoring due to drums allowing sustained notes.  
+
+
 ====Nov. 30th 2008 ====
 
 3.035 beta 1 (SVN r469) has been released for testing.  
