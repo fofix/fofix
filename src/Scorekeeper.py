@@ -132,6 +132,7 @@ class ScoreCard(object):
     self.endingStreakBroken = False   #MFH
     self.endingAwarded = False    #MFH
     self.lastNoteEvent = None    #MFH
+    self.lastNoteTime  = 0.0
     self.freestyleWasJustActive = False  #MFH
 
   

@@ -830,7 +830,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           hspacing = float(Theme.result_star[3])
         except IndexError:
           hspacing = 1.0
-        self.engine.drawStarScore(w, h, float(Theme.result_star[0]) - 2*hspacing*scale, float(Theme.result_star[1]), scoreCard.stars, scale, space = space, horiz_spacing = hspacing)
+        self.engine.drawStarScore(w, h, float(Theme.result_star[0]), float(Theme.result_star[1]), scoreCard.stars, scale, space = space, horiz_spacing = hspacing, align = 1)
         
 #-        if scoreCard.stars > 5:
 #-          for j in range(5):
@@ -977,7 +977,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         hspacing = float(Theme.result_star[3])
       except IndexError:
         hspacing = 1.1
-      self.engine.drawStarScore(w, h, float(Theme.result_star[0]), float(Theme.result_star[1]), scoreCard.stars, scale, horiz_spacing = hspacing, space = space)
+      self.engine.drawStarScore(w, h, float(Theme.result_star[0]), float(Theme.result_star[1]), scoreCard.stars, scale, horiz_spacing = hspacing, space = space, align = 1)
 
 #-      if scoreCard.stars > 5:
 #-        for j in range(5):

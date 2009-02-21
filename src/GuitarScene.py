@@ -943,6 +943,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       else:
         self.scoring[i].totalStreakNotes = len(set(time for time, event in self.song.track[i].getAllEvents() if isinstance(event, Note)))
       self.scoring[i].lastNoteEvent = lastDrumNoteEvent
+      self.scoring[i].lastNoteTime  = lastDrumNoteTime
       self.lastNoteTimes[i] = lastDrumNoteTime
       if lastDrumNoteEvent:
         Log.debug("Last note (number %d) found for player %d at time %f" % (lastDrumNoteEvent.number, i, lastDrumNoteTime) )
@@ -1096,6 +1097,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.star = [{} for i in self.playerList]
     if self.coOpScoreCard:
       self.coOpScoreCard.lastNoteTime  = max(self.lastNoteTimes)
+      Log.debug("Last note for co-op mode found at %.2f" % self.coOpScoreCard.lastNoteTime)
     for i, scoreCard in enumerate(self.scoring):   #accumulate base scoring values for co-op
       if self.coOpScoreCard:
         self.coOpScoreCard.totalStreakNotes += scoreCard.totalStreakNotes
@@ -2969,6 +2971,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           #   and only reward if all notes after the BRE are hit without breaking streak!
           if guitar.freestyleActive:   #MFH - only want to add the score if this is a BRE - drum fills get no scoring...
             if self.coOpType:
+              self.scoring[num].endingScore += score
+              self.scoring[num].endingStreakBroken = False
+              self.scoring[num].freestyleWasJustActive = True
               self.coOpScoreCard.endingScore += score
               self.coOpScoreCard.endingStreakBroken = False
               self.coOpScoreCard.freestyleWasJustActive = True
@@ -3330,7 +3335,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       else:
         pos = self.pausePos
 
-      
       #MFH - new failing detection logic
       if self.failingEnabled:
         #if self.numOfPlayers > 1:
@@ -3375,7 +3379,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
         #MFH - check for any unplayed notes and for an unbroken streak since the BRE, then award bonus scores
         #akedrou - does not work for co-op.
-        if self.coOp:
+        if self.coOpType:
           scoreCard = self.coOpScoreCard
           if scoreCard.freestyleWasJustActive and not scoreCard.endingAwarded:
             if scoreCard.lastNoteTime < pos and not scoreCard.endingStreakBroken:
@@ -4008,6 +4012,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         scoreCard.streak = 0
         if self.coOpType:
           self.scoring[num].streak = 0
+          self.scoring[num].endingStreakBroken = True
         self.guitars[num].setMultiplier(1)
         self.currentlyAnimating = False
         self.stage.triggerMiss(pos)
@@ -4053,6 +4058,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       scoreCard.streak = 0
       if self.coOpType:
         self.scoring[num].streak = 0
+        self.scoring[num].endingStreakBroken = True
       self.guitars[num].setMultiplier(1)
       self.guitars[num].hopoActive = 0
       self.guitars[num].wasLastNoteHopod = False
@@ -4132,6 +4138,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       scoreCard.streak = 0
       if self.coOpType:
         self.scoring[num].streak = 0
+        self.scoring[num].endingStreakBroken = True
       self.guitars[num].setMultiplier(1)
       self.stage.triggerMiss(pos)
       self.guitarSoloBroken[num] = True
@@ -4169,6 +4176,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       scoreCard.streak = 0
       if self.coOpType:
         self.scoring[num].streak = 0
+        self.scoring[num].endingStreakBroken = True
       self.guitars[num].setMultiplier(1)
       self.guitars[num].hopoActive = 0
       self.guitars[num].wasLastNoteHopod = False
@@ -4201,6 +4209,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         scoreCard.streak = 0
         if self.coOpType:
           self.scoring[num].streak = 0
+          self.scoring[num].endingStreakBroken = True
         self.guitarSoloBroken[num] = True
         scoreCard.endingStreakBroken = True   #MFH
 
@@ -4267,6 +4276,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       scoreCard.streak = 0
       if self.coOpType:
         self.scoring[num].streak = 0
+        self.scoring[num].endingStreakBroken = True
       self.guitarSoloBroken[num] = True
       scoreCard.endingStreakBroken = True   #MFH
       self.guitars[num].setMultiplier(1)
@@ -4307,6 +4317,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       scoreCard.streak = 0
       if self.coOpType:
         self.scoring[num].streak = 0
+        self.scoring[num].endingStreakBroken = True
       self.guitarSoloBroken[num] = True
       scoreCard.endingStreakBroken = True   #MFH
       self.guitars[num].setMultiplier(1)
@@ -4404,6 +4415,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         scoreCard.streak = 0
         if self.coOpType:
           self.scoring[num].streak = 0
+          self.scoring[num].endingStreakBroken = True
         self.guitarSoloBroken[num] = True
         scoreCard.endingStreakBroken = True   #MFH
         self.notesMissed[num] = True #QQstarS:Set [0] to [i]
@@ -4512,6 +4524,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         scoreCard.streak = 0
         if self.coOpType:
           self.scoring[num].streak = 0
+          self.scoring[num].endingStreakBroken = True
         self.guitarSoloBroken[num] = True
         scoreCard.endingStreakBroken = True   #MFH
         self.guitars[num].setMultiplier(1)
@@ -7683,7 +7696,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             if self.dispSoloReview[i] and not self.pause and not self.failed:
               if self.soloReviewCountdown[i] < self.soloReviewDispDelay:
                 self.soloReviewCountdown[i] += 1
-                if not (self.guitars[i].freestyleActive or (self.scoring[i].freestyleWasJustActive and not self.scoring[i].endingStreakBroken) ):
+                if not (self.guitars[i].freestyleActive or self.scoring[i].freestyleWasJustActive):
                   #glColor3f(0, 0.85, 1)  #grn-blu
                   glColor3f(1, 1, 1)  #cracker white
                   text1 = self.soloReviewText[i][0]
@@ -7934,127 +7947,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             #if (self.readTextAndLyricEvents == 2 or (self.readTextAndLyricEvents == 1 and self.theme == 2)) and (not self.pause and not self.failed and not self.ending):
             if (not self.pause and not self.failed and not self.ending):
 
-              #MFH - show BRE temp score frame
-              if self.guitars[i].freestyleActive or (self.scoring[i].freestyleWasJustActive and not self.scoring[i].endingStreakBroken and not self.scoring[i].endingAwarded):
-                #to render BEFORE the bonus is awarded.
-
-                text = "End Bonus"
-                yOffset = 0.110
-                xOffset = 0.500
-                tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize/2.0)
-
-                if self.breScoreFrame:
-                  frameWidth = tW*1.15
-                  frameHeight = tH*1.07
-                  boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
-                  #self.breScoreFrame.transform.reset()                  
-                  tempWScale = frameWidth*self.breScoreFrameWFactor
-                  tempHScale = -(frameHeight)*self.breScoreFrameWFactor
-                  self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*xOffset,boxYOffset))
-                  #self.breScoreFrame.transform.scale(tempWScale,tempHScale)
-                  #self.breScoreFrame.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
-                  #self.breScoreFrame.draw()
-
-                self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize/2.0)
-
-
-                text = "%s" % self.scoring[i].endingScore
-                if self.theme == 2:
-                  text = text.replace("0","O")
-                tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
-                yOffset = 0.175
-                xOffset = 0.500
-                
-
-                if self.breScoreBackground:
-                  #frameWidth = tW*3.0
-                  frameHeight = tH*4.0
-                  frameWidth = frameHeight
-                  boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
-                  tempWScale = frameWidth*self.breScoreBackgroundWFactor
-                  tempHScale = -(frameHeight)*self.breScoreBackgroundWFactor
-                  self.engine.drawImage(self.breScoreBackground, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*xOffset,boxYOffset))
-
-
-                if self.breScoreFrame:
-                  frameWidth = tW*1.15
-                  frameHeight = tH*1.07
-                  boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
-                  tempWScale = frameWidth*self.breScoreFrameWFactor
-                  tempHScale = -(frameHeight)*self.breScoreFrameWFactor
-                  self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*xOffset,boxYOffset))
-                self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
-              
-              elif self.scoring[i].freestyleWasJustActive and not self.scoring[i].endingStreakBroken and self.scoring[i].endingAwarded:
-                #MFH - TODO - ending bonus was awarded - scale up obtained score & box to signify rockage
-
-                text = "Success!"
-                yOffset = 0.110
-                xOffset = 0.500
-                tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize/2.0)
-
-                if self.breScoreFrame: #todo - coOpRB (and GH?) BREs - one combined, all players must succeed.
-                  frameWidth = tW*1.15
-                  frameHeight = tH*1.07
-                  boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
-                  tempWScale = frameWidth*self.breScoreFrameWFactor
-                  tempHScale = -(frameHeight)*self.breScoreFrameWFactor
-                  self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*xOffset,boxYOffset))
-
-                self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize/2.0)
-
-
-                text = "%s" % self.scoring[i].endingScore
-                if self.theme == 2:
-                  text = text.replace("0","O")
-                tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
-                yOffset = 0.175
-                xOffset = 0.500
-                
-
-                if self.breScoreBackground:
-                  #frameWidth = tW*3.0
-                  frameHeight = tH*4.0
-                  frameWidth = frameHeight
-                  boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
-                  tempWScale = frameWidth*self.breScoreBackgroundWFactor
-                  tempHScale = -(frameHeight)*self.breScoreBackgroundWFactor
-                  self.engine.drawImage(self.breScoreBackground, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*xOffset,boxYOffset))
-
-                if self.breScoreFrame:
-                  frameWidth = tW*1.15
-                  frameHeight = tH*1.07
-                  boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
-                  tempWScale = frameWidth*self.breScoreFrameWFactor
-                  tempHScale = -(frameHeight)*self.breScoreFrameWFactor
-                  self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*xOffset,boxYOffset))
-                self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
-
-
-                
-              
-              elif self.scoring[i].freestyleWasJustActive and not self.scoring[i].endingStreakBroken and self.scoring[i].endingAwarded:
-                #MFH - TODO - ending bonus was awarded - scale up obtained score & box to signify rockage
-                text = "%s" % self.scoring[i].endingScore
-                if self.theme == 2:
-                  text = text.replace("0","O")
-                tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
-                yOffset = 0.215
-                xOffset = 0.500
-                
-                if self.soloFrame:
-                  frameWidth = tW*1.15
-                  frameHeight = tH*1.07
-                  boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
-                  tempWScale = frameWidth*self.soloFrameWFactor
-                  tempHScale = -(frameHeight)*self.soloFrameWFactor
-                  self.engine.drawImage(self.soloFrame, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*xOffset,boxYOffset))
-                self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
-
-
-                
-              
-              
               #MFH - only use the TK_GUITAR_SOLOS track if at least one player has no MIDI solos marked:
               if self.guitars[i].useMidiSoloMarkers:   #mark using the new MIDI solo marking system
                 for time, event in self.song.midiEventTrack[i].getEvents(minPos, maxPos):
@@ -8122,6 +8014,220 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   #self.engine.view.setViewport(1,0)
               #except Exception, e:
               #  Log.warn("Unable to render guitar solo accuracy text: %s" % e)
+              if self.coOpType: #1 BRE in co-op
+                scoreCard = self.coOpScoreCard
+                if i == 0:
+                  self.engine.view.setViewportHalf(1,0)
+                  oneTime = True
+                else:
+                  oneTime = False
+              else:
+                scoreCard = self.scoring[i]
+                oneTime = True
+              #MFH - show BRE temp score frame
+              if (self.guitars[i].freestyleActive or (scoreCard.freestyleWasJustActive and not scoreCard.endingStreakBroken and not scoreCard.endingAwarded)) and oneTime == True:
+                #to render BEFORE the bonus is awarded.
+
+                text = "End Bonus"
+                yOffset = 0.110
+                xOffset = 0.500
+                tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize/2.0)
+
+                if self.breScoreFrame:
+                  frameWidth = tW*1.15
+                  frameHeight = tH*1.07
+                  if self.coOpType:
+                    boxYOffset = (1.0-((yOffset + tH/2.0 ) / self.fontScreenBottom))*self.hFull
+                    boxXOffset = xOffset*self.wFull
+                  else:
+                    boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
+                    boxXOffset = self.wPlayer[i]*xOffset
+                  #self.breScoreFrame.transform.reset()                  
+                  tempWScale = frameWidth*self.breScoreFrameWFactor
+                  tempHScale = -(frameHeight)*self.breScoreFrameWFactor
+                  self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+                  #self.breScoreFrame.transform.scale(tempWScale,tempHScale)
+                  #self.breScoreFrame.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
+                  #self.breScoreFrame.draw()
+
+                self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize/2.0)
+
+                if self.coOpType and self.partImage:
+                  freeX = .05*(self.numOfPlayers-1)
+                  freeI = .05*self.numOfPlayers
+                  for j in xrange(self.numOfPlayers):
+                    self.engine.drawImage(self.part[j], scale = (.15,-.15), coord = (self.wFull*(.5-freeX+freeI*j),self.hFull*.58), color = (.8, .8, .8, 1))
+
+                text = "%s" % scoreCard.endingScore
+                if self.theme == 2:
+                  text = text.replace("0","O")
+                tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
+                yOffset = 0.175
+                xOffset = 0.500
+                
+
+                if self.breScoreBackground:
+                  #frameWidth = tW*3.0
+                  frameHeight = tH*4.0
+                  frameWidth = frameHeight
+                  if self.coOpType:
+                    boxYOffset = self.hFull*(1.0-(yOffset + tH/2.0 ) / self.fontScreenBottom)
+                    boxXOffset = xOffset*self.wFull
+                  else:
+                    boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
+                    boxXOffset = self.wPlayer[i]*xOffset
+                  tempWScale = frameWidth*self.breScoreBackgroundWFactor
+                  tempHScale = -(frameHeight)*self.breScoreBackgroundWFactor
+                  self.engine.drawImage(self.breScoreBackground, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+
+
+                if self.breScoreFrame:
+                  frameWidth = tW*1.15
+                  frameHeight = tH*1.07
+                  if self.coOpType:
+                    boxYOffset = self.hFull*(1.0-(yOffset + tH/2.0 ) / self.fontScreenBottom)
+                    boxXOffset = xOffset*self.wFull
+                  else:
+                    boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
+                    boxXOffset = self.wPlayer[i]*xOffset
+                  tempWScale = frameWidth*self.breScoreFrameWFactor
+                  tempHScale = -(frameHeight)*self.breScoreFrameWFactor
+                  self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+                self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
+              
+              elif scoreCard.freestyleWasJustActive and not scoreCard.endingStreakBroken and scoreCard.endingAwarded and oneTime == True:
+                #MFH - TODO - ending bonus was awarded - scale up obtained score & box to signify rockage
+
+                text = "Success!"
+                yOffset = 0.110
+                xOffset = 0.500
+                tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize/2.0)
+
+                if self.breScoreFrame:
+                  frameWidth = tW*1.15
+                  frameHeight = tH*1.07
+                  if self.coOpType:
+                    boxYOffset = self.hFull*(1.0-(yOffset + tH/2.0 ) / self.fontScreenBottom)
+                    boxXOffset = xOffset*self.wFull
+                  else:
+                    boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
+                    boxXOffset = self.wPlayer[i]*xOffset
+                  tempWScale = frameWidth*self.breScoreFrameWFactor
+                  tempHScale = -(frameHeight)*self.breScoreFrameWFactor
+                  self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+
+                self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize/2.0)
+
+                if self.coOpType and self.partImage:
+                  freeX = .05*(self.numOfPlayers-1)
+                  freeI = .05*self.numOfPlayers
+                  for j in xrange(self.numOfPlayers):
+                    self.engine.drawImage(self.part[j], scale = (.15,-.15), coord = (self.wFull*(.5-freeX+freeI*j),self.hFull*.58))
+
+                text = "%s" % scoreCard.endingScore
+                if self.theme == 2:
+                  text = text.replace("0","O")
+                tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
+                yOffset = 0.175
+                xOffset = 0.500
+                
+
+                if self.breScoreBackground:
+                  #frameWidth = tW*3.0
+                  frameHeight = tH*4.0
+                  frameWidth = frameHeight
+                  if self.coOpType:
+                    boxYOffset = self.hFull*(1.0-(yOffset + tH/2.0 ) / self.fontScreenBottom)
+                    boxXOffset = xOffset*self.wFull
+                  else:
+                    boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
+                    boxXOffset = self.wPlayer[i]*xOffset
+                  tempWScale = frameWidth*self.breScoreBackgroundWFactor
+                  tempHScale = -(frameHeight)*self.breScoreBackgroundWFactor
+                  self.engine.drawImage(self.breScoreBackground, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+
+                if self.breScoreFrame:
+                  frameWidth = tW*1.15
+                  frameHeight = tH*1.07
+                  if self.coOpType:
+                    boxYOffset = self.hFull*(1.0-(yOffset + tH/2.0 ) / self.fontScreenBottom)
+                    boxXOffset = xOffset*self.wFull
+                  else:
+                    boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
+                    boxXOffset = self.wPlayer[i]*xOffset
+                  tempWScale = frameWidth*self.breScoreFrameWFactor
+                  tempHScale = -(frameHeight)*self.breScoreFrameWFactor
+                  self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+                self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
+              
+              elif scoreCard.freestyleWasJustActive and scoreCard.endingStreakBroken and oneTime == True:
+                #akedrou - ending bonus was not awarded - scale up to signify failure
+
+                text = "Failed!"
+                yOffset = 0.110
+                xOffset = 0.500
+                tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize/2.0)
+
+                if self.breScoreFrame:
+                  frameWidth = tW*1.15
+                  frameHeight = tH*1.07
+                  if self.coOpType:
+                    boxYOffset = self.hFull*(1.0-(yOffset + tH/2.0 ) / self.fontScreenBottom)
+                    boxXOffset = xOffset*self.wFull
+                  else:
+                    boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
+                    boxXOffset = self.wPlayer[i]*xOffset
+                  tempWScale = frameWidth*self.breScoreFrameWFactor
+                  tempHScale = -(frameHeight)*self.breScoreFrameWFactor
+                  self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+
+                self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize/2.0)
+
+                if self.coOpType and self.partImage:
+                  freeX = .05*(self.numOfPlayers-1)
+                  freeI = .05*self.numOfPlayers
+                  for j in xrange(self.numOfPlayers):
+                    if self.scoring[j].endingStreakBroken:
+                      partcolor = (.4, .4, .4, 1)
+                    else:
+                      partcolor = (.8, .8, .8, 1)
+                    self.engine.drawImage(self.part[j], scale = (.15,-.15), coord = (self.wFull*(.5-freeX+freeI*j),self.hFull*.58), color = partcolor)
+
+                text = "%s" % 0
+                if self.theme == 2:
+                  text = text.replace("0","O")
+                tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
+                yOffset = 0.175
+                xOffset = 0.500
+                
+
+                if self.breScoreBackground:
+                  #frameWidth = tW*3.0
+                  frameHeight = tH*4.0
+                  frameWidth = frameHeight
+                  if self.coOpType:
+                    boxYOffset = self.hFull*(1.0-(yOffset + tH/2.0 ) / self.fontScreenBottom)
+                    boxXOffset = xOffset*self.wFull
+                  else:
+                    boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
+                    boxXOffset = self.wPlayer[i]*xOffset
+                  tempWScale = frameWidth*self.breScoreBackgroundWFactor
+                  tempHScale = -(frameHeight)*self.breScoreBackgroundWFactor
+                  self.engine.drawImage(self.breScoreBackground, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+
+                if self.breScoreFrame:
+                  frameWidth = tW*1.15
+                  frameHeight = tH*1.07
+                  if self.coOpType:
+                    boxYOffset = self.hFull*(1.0-(yOffset + tH/2.0 ) / self.fontScreenBottom)
+                    boxXOffset = xOffset*self.wFull
+                  else:
+                    boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
+                    boxXOffset = self.wPlayer[i]*xOffset
+                  tempWScale = frameWidth*self.breScoreFrameWFactor
+                  tempHScale = -(frameHeight)*self.breScoreFrameWFactor
+                  self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+                self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
             
             self.engine.view.setViewportHalf(1,0)
             # evilynux - Display framerate

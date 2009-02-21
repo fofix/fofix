@@ -779,9 +779,9 @@ class GameEngine(Engine):
       star = self.data.starPerfect
     wide = scale * horiz_spacing
     if align == 1: #center - akedrou (simplifying the alignment...)
-      xpos  -= (2 * wide)/w
+      xpos  -= (2 * wide)
     elif align == 2: #right
-      xpos  -= (4 * wide)/w
+      xpos  -= (4 * wide)
     if stars > 5:
       for j in range(5):
 
