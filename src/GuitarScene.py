@@ -1897,8 +1897,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #z=-3
 
     if self.pov == 1:
-      self.camera.target    = (0.0, 3.4, 2.8) #kk69:More like GH3
-      self.camera.origin    = (0.0, 2.8*self.boardY, -3.6)
+      self.camera.target    = (0.0, 0.6, 4.4) #kk69:More like GH3
+      self.camera.origin    = (0.0, 3.5*self.boardY, -3.8)
     elif self.pov == 2: #Racer
       self.camera.target    = (0.0, 0.0, 3.7)
       self.camera.origin    = (0.0, 2.9*self.boardY, -2.9)
