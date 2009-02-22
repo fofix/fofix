@@ -1365,8 +1365,8 @@ class Track:
     self.allEvents = []
     self.marked = False
 
-    self.currentIndex = 0   #MFH
-    self.maxIndex = 0   #MFH
+    self.currentIndex = None   #MFH
+    self.maxIndex = None   #MFH
 
 
     self.logClassInits = Config.get("game", "log_class_inits")
