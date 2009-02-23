@@ -25,7 +25,7 @@ import pygame
 from OpenGL.GL import *
 import sys
 from Texture import Texture, TextureAtlas, TextureAtlasFullException
-from numpy import *
+from Numeric import array, Float # evilynux - avoid numpy for now, fixes crash for those w/o numpy.
 
 DEFAULT_SCALE = 0.002
 
@@ -149,8 +149,8 @@ class Font:
     #           : is really important.
     # evilynux : Use arrays to increase performance
     def drawSquare(w,h,tw,th):
-        square_prim = array([[.0,.0],[w,.0],[.0,h],[w,h]], dtype=float32)
-        square_tex  = array([[.0,th],[tw,th],[.0,.0],[tw,.0]], dtype=float32)
+        square_prim = array([[.0,.0],[w,.0],[.0,h],[w,h]], Float)
+        square_tex  = array([[.0,th],[tw,th],[.0,.0],[tw,.0]], Float)
         glEnableClientState(GL_VERTEX_ARRAY)
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glVertexPointerf(square_prim)
