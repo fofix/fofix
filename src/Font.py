@@ -25,6 +25,7 @@ import pygame
 from OpenGL.GL import *
 import sys
 from Texture import Texture, TextureAtlas, TextureAtlasFullException
+from numpy import *
 
 DEFAULT_SCALE = 0.002
 
@@ -146,17 +147,17 @@ class Font:
     # deufeufeu : new drawing relaying only on pygame.font.render
     #           : I know me miss special unicodes characters, but the gain
     #           : is really important.
+    # evilynux : Use arrays to increase performance
     def drawSquare(w,h,tw,th):
-        glBegin(GL_TRIANGLE_STRIP)
-        glTexCoord2f(0.0,th)
-        glVertex2f(0,0)
-        glTexCoord2f(tw,th)
-        glVertex2f(w,0)
-        glTexCoord2f(0.0,0.0)
-        glVertex2f(0,h)
-        glTexCoord2f(tw,0.0)
-        glVertex2f(w,h)
-        glEnd()
+        square_prim = array([[.0,.0],[w,.0],[.0,h],[w,h]], dtype=float32)
+        square_tex  = array([[.0,th],[tw,th],[.0,.0],[tw,.0]], dtype=float32)
+        glEnableClientState(GL_VERTEX_ARRAY)
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glVertexPointerf(square_prim)
+        glTexCoordPointerf(square_tex)
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, square_prim.shape[0])
+        glDisableClientState(GL_VERTEX_ARRAY)
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
  
     if not text:
         return
