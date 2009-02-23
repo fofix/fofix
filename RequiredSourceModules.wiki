@@ -44,7 +44,6 @@ Versions are likely important. Don't substitute one for the other without trying
   # Download PyOgg 1.3 (this url is important, other versions dont work) - [http://thomas.paviot.free.fr/soya/pyogg-1.3.win32-py2.4.exe]
   # Download PyVorbis 1.4 (this URL is important, other versions don't work) - [http://thomas.paviot.free.fr/soya/pyvorbis-1.4.win32-py2.4.exe]
   # Download py2exe 0.6.6 - [http://downloads.sourceforge.net/py2exe/py2exe-0.6.6.win32-py2.4.exe]
-  # Download Ctypes 1.0.2 - [http://downloads.sourceforge.net/ctypes/ctypes-1.0.2.win32-py2.4.exe?use_mirror=superb-west]
   # Download the FoFiX source files from the trunk, or SVN revision / tag of your choice - [http://code.google.com/p/fofix/source/browse/MFH-Mod]
 
 *Or here's a complete package with all the files above, with a batch file that installs everything for Windows 32-bit users (installation lines included for Amanith but are commented out), in a single RAR archive - courtesy of Chris Paiano (Myfingershurt):
@@ -75,7 +74,6 @@ Versions are likely important. Don't substitute one for the other without trying
   # Install Pyogg by double clicking the .exe
   # Install Pyvorbis by double clicking the .exe
   # Install py2exe by double clicking the .exe
-  # Install Ctypes by double clicking the .exe
   # Install any optional modules by double clicking the .exe files in the order that you downloaded them.
 
 _This next part fixes a opengl/py2exe bug so it may not be necessary in the future. Only if you get an error when running the FretsOnFire.exe that says:_
