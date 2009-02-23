@@ -35,12 +35,11 @@ import random
 
 from OpenGL.GL import *
 import math
+from Numeric import array, Float # evilynux - avoid numpy for now, fixes crash for those w/o numpy.
 
 #myfingershurt: needed for multi-OS file fetching
 import os
-
 import Log
-
 import Song   #need the base song defines as well
 
 #KEYS = [Player.KEY1, Player.KEY2, Player.KEY3, Player.KEY4, Player.KEY5]
@@ -795,30 +794,41 @@ class Guitar:
     if alpha == True:
       glBlendFunc(GL_ONE, GL_ONE)
     neck.texture.bind()
-    glBegin(GL_TRIANGLE_STRIP)
-    glColor4f(color[0],color[1],color[2], 0)
-    glTexCoord2f(0.0, project(offset - 2 * beatsPerUnit))
-    glVertex3f(-w / 2, 0, -2)
-    glTexCoord2f(1.0, project(offset - 2 * beatsPerUnit))
-    glVertex3f( w / 2, 0, -2)
-    
-    glColor4f(color[0],color[1],color[2], v)
-    glTexCoord2f(0.0, project(offset - 1 * beatsPerUnit))
-    glVertex3f(-w / 2, 0, -1)
-    glTexCoord2f(1.0, project(offset - 1 * beatsPerUnit))
-    glVertex3f( w / 2, 0, -1)
-    
-    glTexCoord2f(0.0, project(offset + l * beatsPerUnit * .7))
-    glVertex3f(-w / 2, 0, l * .7)
-    glTexCoord2f(1.0, project(offset + l * beatsPerUnit * .7))
-    glVertex3f( w / 2, 0, l * .7)
-    
-    glColor4f(color[0],color[1],color[2], 0)
-    glTexCoord2f(0.0, project(offset + l * beatsPerUnit))
-    glVertex3f(-w / 2, 0, l)
-    glTexCoord2f(1.0, project(offset + l * beatsPerUnit))
-    glVertex3f( w / 2, 0, l)
-    glEnd()
+    neck_col  = array([[color[0],color[1],color[2], 0],
+                       [color[0],color[1],color[2], 0],
+                       [color[0],color[1],color[2], v],
+                       [color[0],color[1],color[2], v],
+                       [color[0],color[1],color[2], v],
+                       [color[0],color[1],color[2], v],
+                       [color[0],color[1],color[2], 0],
+                       [color[0],color[1],color[2], 0]], Float)
+    neck_vtx = array([[-w / 2, 0, -2],
+                      [w / 2, 0, -2],
+                      [-w / 2, 0, -1],
+                      [w / 2, 0, -1],
+                      [-w / 2, 0, l * .7],
+                      [w / 2, 0, l * .7],
+                      [-w / 2, 0, l],
+                      [w / 2, 0, l]], Float)
+    neck_tex  = array([[0.0, project(offset - 2 * beatsPerUnit)],
+                       [1.0, project(offset - 2 * beatsPerUnit)],
+                       [0.0, project(offset - 1 * beatsPerUnit)],
+                       [1.0, project(offset - 1 * beatsPerUnit)],
+                       [0.0, project(offset + l * beatsPerUnit * .7)],
+                       [1.0, project(offset + l * beatsPerUnit * .7)],
+                       [0.0, project(offset + l * beatsPerUnit)],
+                       [1.0, project(offset + l * beatsPerUnit)]], Float)
+    glEnableClientState(GL_VERTEX_ARRAY)
+    glEnableClientState(GL_COLOR_ARRAY)
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glVertexPointerf(neck_vtx)
+    glColorPointerf(neck_col)
+    glTexCoordPointerf(neck_tex)
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, neck_vtx.shape[0])
+    glDisableClientState(GL_VERTEX_ARRAY)
+    glDisableClientState(GL_COLOR_ARRAY)
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
     if alpha == True:
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
       
