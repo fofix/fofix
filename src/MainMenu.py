@@ -73,8 +73,6 @@ class MainMenu(BackgroundLayer):
 
     #self.tut = Config.get("game", "tut")
 
-    Config.define("coffee",   "max_neck", int, 1)      
-
     for playerNum in range(0,2):    #MFH - verify chosen necks and, if necessary, force appropriate defaults / fallbacks
       neckSettingName = "neck_choose_p%d" % (playerNum)
       self.chosenNeck = Config.get("coffee", neckSettingName )

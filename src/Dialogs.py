@@ -3894,7 +3894,6 @@ class NeckChooser(BackgroundLayer, KeyListener):
         self.maxNeck += 1
     self.maxNeck -= 1 # evilynux - confusing, but there's an offset of -1
     Config.define("coffee",   self.neckSettingName,  str,  0,  text = _("Neck"), options = self.neck)
-    Config.set("coffee",   "max_neck", self.maxNeck)
 
     self.necks.append("none")
     self.necks.append("2none")

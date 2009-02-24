@@ -308,7 +308,6 @@ class Guitar:
 
     # evilynux - Fixed random neck -- MFH: further fixing random neck
     if self.neck == "0" or self.neck == "Neck_0" or self.neck == "randomneck":
-      self.max = self.engine.config.get("coffee", "max_neck")
       self.neck = []
       # evilynux - improved loading logic to support arbitrary filenames
       for i in os.listdir(self.engine.resource.fileName("necks")):
@@ -317,7 +316,7 @@ class Guitar:
           continue
         else:
           self.neck.append(str(i)[:-4]) # evilynux - filename w/o extension
-      i = random.randint(1,self.max)
+      i = random.randint(1,len(self.neck))
       engine.loadImgDrawing(self, "neckDrawing", os.path.join("necks",self.neck[i]+".png"),  textureSize = (256, 256))
       Log.debug("Random neck chosen: " + self.neck[i])
     else:
