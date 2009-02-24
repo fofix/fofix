@@ -157,9 +157,6 @@ class Font:
         self.square_tex[1,0] = self.square_tex[3,0] = tw
         glEnableClientState(GL_VERTEX_ARRAY)
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        glVertexPointerf(square_prim)
-        glTexCoordPointerf(square_tex)
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, square_prim.shape[0])
         glVertexPointerf(self.square_prim)
         glTexCoordPointerf(self.square_tex)
         glDrawArrays(GL_TRIANGLE_STRIP, 0, self.square_prim.shape[0])
