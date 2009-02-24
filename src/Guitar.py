@@ -35,7 +35,7 @@ import random
 
 from OpenGL.GL import *
 import math
-from Numeric import array, Float # evilynux - avoid numpy for now, fixes crash for those w/o numpy.
+from numpy import array, float32
 
 #myfingershurt: needed for multi-OS file fetching
 import os
@@ -801,7 +801,7 @@ class Guitar:
                        [color[0],color[1],color[2], v],
                        [color[0],color[1],color[2], v],
                        [color[0],color[1],color[2], 0],
-                       [color[0],color[1],color[2], 0]], Float)
+                       [color[0],color[1],color[2], 0]], dtype=float32)
     neck_vtx = array([[-w / 2, 0, -2],
                       [w / 2, 0, -2],
                       [-w / 2, 0, -1],
@@ -809,7 +809,7 @@ class Guitar:
                       [-w / 2, 0, l * .7],
                       [w / 2, 0, l * .7],
                       [-w / 2, 0, l],
-                      [w / 2, 0, l]], Float)
+                      [w / 2, 0, l]], dtype=float32)
     neck_tex  = array([[0.0, project(offset - 2 * beatsPerUnit)],
                        [1.0, project(offset - 2 * beatsPerUnit)],
                        [0.0, project(offset - 1 * beatsPerUnit)],
@@ -817,7 +817,7 @@ class Guitar:
                        [0.0, project(offset + l * beatsPerUnit * .7)],
                        [1.0, project(offset + l * beatsPerUnit * .7)],
                        [0.0, project(offset + l * beatsPerUnit)],
-                       [1.0, project(offset + l * beatsPerUnit)]], Float)
+                       [1.0, project(offset + l * beatsPerUnit)]], dtype=float32)
     glEnableClientState(GL_VERTEX_ARRAY)
     glEnableClientState(GL_COLOR_ARRAY)
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);

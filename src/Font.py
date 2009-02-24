@@ -25,7 +25,7 @@ import pygame
 from OpenGL.GL import *
 import sys
 from Texture import Texture, TextureAtlas, TextureAtlasFullException
-from Numeric import array, Float # evilynux - avoid numpy for now, fixes crash for those w/o numpy.
+from numpy import array, float32
 
 DEFAULT_SCALE = 0.002
 
@@ -78,6 +78,8 @@ class Font:
     self.font.set_italic(italic)
     self.font.set_underline(underline)
     self.stringsCache = Cache(256)
+    self.square_prim = array([[.0,.0],[.0,.0],[.0,.0],[.0,.0]], dtype=float32)
+    self.square_tex  = array([[.0,.0],[.0,.0],[.0,.0],[.0,.0]], dtype=float32)
 
   def getStringSize(self, s, scale = DEFAULT_SCALE):
     """
@@ -149,13 +151,18 @@ class Font:
     #           : is really important.
     # evilynux : Use arrays to increase performance
     def drawSquare(w,h,tw,th):
-        square_prim = array([[.0,.0],[w,.0],[.0,h],[w,h]], Float)
-        square_tex  = array([[.0,th],[tw,th],[.0,.0],[tw,.0]], Float)
+        self.square_prim[1,0] = self.square_prim[3,0] = w
+        self.square_prim[2,1] = self.square_prim[3,1] = h
+        self.square_tex[0,1] = self.square_tex[1,1] = th
+        self.square_tex[1,0] = self.square_tex[3,0] = tw
         glEnableClientState(GL_VERTEX_ARRAY)
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glVertexPointerf(square_prim)
         glTexCoordPointerf(square_tex)
         glDrawArrays(GL_TRIANGLE_STRIP, 0, square_prim.shape[0])
+        glVertexPointerf(self.square_prim)
+        glTexCoordPointerf(self.square_tex)
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, self.square_prim.shape[0])
         glDisableClientState(GL_VERTEX_ARRAY)
         glDisableClientState(GL_TEXTURE_COORD_ARRAY);
  
