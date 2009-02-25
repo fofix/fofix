@@ -154,6 +154,19 @@ class Credits(Layer, KeyListener):
     c1 = (1, 1, .5, 1)
     c2 = (1, .75, 0, 1)
     self.text_size = nf.getLineSpacing(scale = hs)
+    
+    menuPath = os.path.join("data","themes",self.themename,"menu")
+    if not hasattr(sys,"frozen"): #MFH - add ".." to path only if running from sources - not if running from EXE
+      menuPath = os.path.join("..",menuPath)
+    if self.engine.data.fileExists(os.path.join(menuPath,"credits.png")):
+      self.engine.loadImgDrawing(self, "background",os.path.join(menuPath,"credits.png"))
+      if self.engine.data.fileExists(os.path.join(menuPath,"creditstop.png")): #akedrou - cool effect, but usable to hide credits...
+        self.engine.loadImgDrawing(self, "topLayer",os.path.join(menuPath,"creditstop.png"))
+      else:
+        self.topLayer = None
+    else:
+      self.background = None
+      self.topLayer = None
 
     space = Text(nf, hs, c1, "center", " ")
     self.credits = [
@@ -304,7 +317,11 @@ class Credits(Layer, KeyListener):
     w, h, = self.engine.view.geometry[2:4]
     
     self.engine.view.setOrthogonalProjection(normalize = True)
-    Dialogs.fadeScreen(.4)
+    if self.background:
+      wFactor = 640.000/self.background.width1()
+      self.engine.drawImage(self.background, scale = (wFactor,-wFactor), coord = (w/2,h/2))
+    else:
+      Dialogs.fadeScreen(.4)
     font = self.engine.data.font
     self.doneList = []
 
@@ -313,13 +330,19 @@ class Credits(Layer, KeyListener):
     glTranslatef(-(1 - v), 0, 0)
     try:
       for element in self.credits:
-        h = element.getHeight()
-        if y + h > 0.0 and y < 1.0:
+        hE = element.getHeight()
+        if y + hE > 0.0 and y < 1.0:
           element.render(y)
-        if y + h < 0.0:
+        if y + hE < 0.0:
           self.doneList.append(element)
-        y += h
+        y += hE
         if y > 1.0:
           break
+      if self.topLayer:
+        wFactor = 640.000/self.topLayer.width1()
+        hPos = h - ((self.topLayer.height1() * wFactor)*.75)
+        if hPos < h * .6:
+          hPos = h * .6
+        self.engine.drawImage(self.topLayer, scale = (wFactor,-wFactor), coord = (w/2,hPos))
     finally:
       self.engine.view.resetProjection()
