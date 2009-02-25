@@ -1,91 +1,108 @@
-#summary List of Usable Images for Theme's by FoFix.
+#summary List of Usable Images for FoFiX Themes.
 
-= Usable Images By FoFiX=
+<wiki:comment>
+What I wouldn't give for a WYSIWYG editor...
+I recommend copy-pasting all this text into a text editor (with monospaced font and option to turn off word wrapping) if you intend to edit this
+</wiki:comment>
 
-This will be a complete list of usable images that FoFiX can use. What directory they
-belong in, and if they are Required or if they are just usable if they exist.
+=Images Usable By FoFiX=
+
+This will be a complete list of usable images that FoFiX can use.
+It will list what directory they belong in, and if they are Required or if they are just usable if they exist.
+An image is marked required if FoFiX crashes/freezes when the file is not present. Sometimes files are only required for specific theme types.
+As at the time of writing there are 4 main theme types: RB, GH2, GH3 and GH:WT. Anything marked "GH Based" means it falls into all of GH2, GH3 and GH:WT (i.e., everything but RB)
 This is WIP status until completed. Then it will just me maintained as things are added.
 
 
 ==Main Theme Directory==
-||_Filename_||_What is file for in FoFiX?_||_Required - Yes/No_||Related to Which Theme?||
-||bassgroovemult.png|| WIP || No || Rock Band Based ||
-||bassgrooveneck.png|| WIP || No || Rock Band Based ||
-||bassgrooveneckovr.png|| WIP || Yes || Basic Functionality||
-||bigtail1.png|| WIP || Yes || Basic Functionality||
-||bigtail2.png|| WIP || Yes || Basic Functionality||
-||bpm_beat.png|| WIP || Yes || Basic Functionality||
-||bpm_halfbeat.png|| WIP || Yes || Basic Functionality||
-||bpm_measure.png|| WIP || Yes || Basic Functionality||
-||center_lines.png|| WIP || Yes || Basic Functionality||
-||counter.png|| WIP || Yes || Basic Functionality||
-||drumcenterlines.png|| WIP || Yes || Basic Functionality||
-||drumnotes.png|| WIP || Yes || Basic Functionality||
-||editor.png|| WIP || Yes || Basic Functionality||
-||fretbuttons.png|| WIP || Yes || Basic Functionality||
-||gameresults.png|| WIP || Yes || Basic Functionality||
-||glow.png|| WIP || Yes || Basic Functionality||
-||guitarsoloneck.png|| WIP || No || Rock Band Based ||
-||guitarsoloneckovr.png|| WIP || No || Rock Band Based ||
-||hitflames1.png|| WIP || Yes || Basic Functionality||
-||hitflames2.png|| WIP || Yes || Basic Functionality||
-||hitglow.png|| WIP || Yes || Basic Functionality||
-||hitglow2.png|| WIP || Yes || Basic Functionality||
-||kill1.png|| WIP || Yes || Basic Functionality||
-||kill2.png|| WIP || Yes || Basic Functionality||
-||loadingbg.png|| WIP || Yes || Basic Functionality||
-||lyricsheet.png|| WIP || No || All ||
-||mult.png|| WIP || Yes || Basic Functionality||
-||mult2.png|| WIP || Yes || Basic Functionality||
-||notes.png|| WIP || Yes || Basic Functionality||
-||overdrive bottom.png|| WIP || Yes || Basic Functionality||
-||overdrive center_lines.png|| WIP || Yes || Basic Functionality||
-||overdrive fill.png|| WIP || Yes || Basic Functionality||
-||overdrive full.png|| WIP || Yes || Basic Functionality||
-||overdrive side_bars.png|| WIP || Yes || Basic Functionality||
-||overdrive top.png|| WIP || Yes || Basic Functionality||
-||overdriveneck.png|| WIP || Yes || Basic Functionality||
-||pause.png|| WIP || Yes || Basic Functionality||
-||rock_arr.png|| WIP || Yes || Basic Functionality||
-||rock_bottom.png|| WIP || Yes || Basic Functionality||
-||rock_fill.png|| WIP || Yes || Basic Functionality||
-||rock_max.png|| WIP || Yes || Basic Functionality||
-||rock_top.png|| WIP || Yes || Basic Functionality||
-||score.png|| WIP || Yes || Basic Functionality||
-||side_bars.png|| WIP || Yes || Basic Functionality||
-||soloframe.png|| WIP || No || Basic Functionality||
-||star1.png|| WIP || Yes || Basic Functionality||
-||star2.png|| WIP || Yes || Basic Functionality||
-||stargrey.png|| WIP || No || Rock Band Based ||
-||stargrey1.png|| WIP || No || Rock Band Based ||
-||stargrey2.png|| WIP || No || Rock Band Based ||
-||stargrey3.png|| WIP || No || Rock Band Based ||
-||stargrey4.png|| WIP || No || Rock Band Based ||
-||stargrey5.png|| WIP || No || Rock Band Based ||
-||stargrey6.png|| WIP || No || Rock Band Based ||
-||stargrey7.png|| WIP || No || Rock Band Based ||
-||starperfect.png|| WIP || No || Rock Band Based ||
-||starwhite.png|| WIP || No || Rock Band Based ||
-||tail1.png|| WIP || Yes || Basic Functionality||
-||tail2.png|| WIP || Yes || Basic Functionality||
-||youfailed.png|| WIP || Yes || Basic Functionality||
-||yourock.png|| WIP || Yes || Basic Functionality||
-
+||  _Filename_                  ||  _What is file for in FoFiX?_  ||  _Required?_ ||  _Related to Theme Type_ ||  _Notes_||
+||  bpm_beat.png                || WIP                            || Yes          || WIP                      || ||
+||  bpm_halfbeat.png            || WIP                            || Yes          || WIP                      || ||
+||  bpm_measure.png             || WIP                            || Yes          || WIP                      || ||
+||  center_lines.png            || WIP                            || Yes          || WIP                      || ||
+||  counter.png                 || WIP                            || Yes          || WIP                      || ||
+||  editor.png                  || WIP                            || Yes          || WIP                      || ||
+||  fretbuttons.png             || WIP                            || Yes          || WIP                      || ||
+||  gameresults.png             || WIP                            || Yes          || WIP                      || ||
+||  hitflames1.png              || WIP                            || Yes          || WIP                      || ||
+||  hitflames2.png              || WIP                            || Yes          || WIP                      || ||
+||  hitglow.png                 || WIP                            || Yes          || WIP                      || ||
+||  hitglow2.png                || WIP                            || Yes          || WIP                      || ||
+||  lightning.png               || WIP                            || GH Based     || WIP                      || ||
+||  loadingbg.png               || WIP                            || Yes          || WIP                      || ||
+||  mult.png                    || WIP                            || Yes          || WIP                      || ||
+||  notes.png                   || WIP                            || Yes          || WIP                      || ||
+||  overdrive bottom.png        || WIP                            || RB Based     || WIP                      || ||
+||  overdrive fill.png          || WIP                            || RB Based     || WIP                      || ||
+||  overdrive full.png          || WIP                            || RB Based     || WIP                      || ||
+||  overdrive top.png           || WIP                            || RB Based     || WIP                      || ||
+||  pause.png                   || WIP                            || Yes          || WIP                      || ||
+||  rock_arr.png                || WIP                            || Yes          || WIP                      || ||
+||  rock_bottom.png             || WIP                            || RB Based     || WIP                      || ||
+||  rock_fill.png               || WIP                            || RB Based     || WIP                      || ||
+||  rock_max.png                || WIP                            || RB Based     || WIP                      || ||
+||  rock_hi.png                 || WIP                            || GH Based     || WIP                      || ||
+||  rock_med.png                || WIP                            || GH Based     || WIP                      || ||
+||  rock_low.png                || WIP                            || GH Based     || WIP                      || ||
+||  rock_top.png                || WIP                            || Yes          || WIP                      || ||
+||  rockmeter.png               || WIP                            || GH Based     || WIP                      || ||
+||  score.png                   || WIP                            || RB Based     || WIP                      || ||
+||  side_bars.png               || WIP                            || Yes          || WIP                      || ||
+||  spbottom.png                || WIP                            || GH2 Based    || WIP                      || ||
+||  spfill.png                  || WIP                            || GH2 Based    || WIP                      || ||
+||  spfull.png                  || WIP                            || GH2 Based    || WIP                      || ||
+||  sptop.png                   || WIP                            || GH2 Based    || WIP                      || ||
+||  splight.png                 || WIP                            || GH3 / GH:WT  || WIP                      || ||
+||  star1.png                   || WIP                            || Yes          || WIP                      || ||
+||  star2.png                   || WIP                            || Yes          || WIP                      || ||
+||  youfailed.png               || WIP                            || Yes          || WIP                      || ||
+||  yourock.png                 || WIP                            || Yes          || WIP                      || ||
+||  bassgrooveneckovr.png       || WIP                            || No           || WIP                      || ||
+||  bigtail1.png                || WIP                            || No           || WIP                      || ||
+||  bigtail2.png                || WIP                            || No           || WIP                      || ||
+||  bassgroovemult.png          || WIP                            || No           || WIP                      || ||
+||  bassgrooveneck.png          || WIP                            || No           || WIP                      || ||
+||  drumcenterlines.png         || WIP                            || No           || WIP                      || ||
+||  drumnotes.png               || WIP                            || No           || WIP                      || ||
+||  guitarsoloneck.png          || WIP                            || No           || WIP                      || ||
+||  guitarsoloneckovr.png       || WIP                            || No           || WIP                      || ||
+||  glow.png                    || WIP                            || No           || WIP                      || ||
+||  kill1.png                   || WIP                            || No           || WIP                      || ||
+||  kill2.png                   || WIP                            || No           || WIP                      || ||
+||  lyricsheet.png              || WIP                            || No           || WIP                      || ||
+||  mult2.png                   || WIP                            || No           || WIP                      || ||
+||  overdrive center_lines.png  || WIP                            || No           || WIP                      || ||
+||  overdrive side_bars.png     || WIP                            || No           || WIP                      || ||
+||  overdriveneck.png           || WIP                            || No           || WIP                      || ||
+||  soloframe.png               || WIP                            || No           || WIP                      || ||
+||  stargrey.png                || WIP                            || No           || WIP                      || ||
+||  stargrey1.png               || WIP                            || No           || WIP                      || ||
+||  stargrey2.png               || WIP                            || No           || WIP                      || ||
+||  stargrey3.png               || WIP                            || No           || WIP                      || ||
+||  stargrey4.png               || WIP                            || No           || WIP                      || ||
+||  stargrey5.png               || WIP                            || No           || WIP                      || ||
+||  stargrey6.png               || WIP                            || No           || WIP                      || ||
+||  stargrey7.png               || WIP                            || No           || WIP                      || ||
+||  starperfect.png             || WIP                            || No           || WIP                      || ||
+||  starwhite.png               || WIP                            || No           || WIP                      || ||
+||  tail1.png                   || WIP                            || No           || WIP                      || ||
+||  tail2.png                   || WIP                            || No           || WIP                      || ||
 
 ==\Menu\ Directory==
-||_Filename_||_What is file for in FoFiX?_||_Required - Yes/No_||Related to Which Theme?||
-||mainbg.png|| WIP || Yes || Basic Functionality||
-||maintext.png|| WIP || Yes || Basic Functionality||
-||neckchoosebg.png|| WIP || Yes || Basic Functionality||
-||neckchooseselect.png|| WIP || Yes || Basic Functionality||
-||neckchoosetext.png|| WIP || Yes || Basic Functionality||
-||optionsbg.png|| WIP || Yes || Basic Functionality||
-||optionspanel.png|| WIP || Yes || Basic Functionality||
-||selected.png|| WIP || Yes || Basic Functionality||
-||songchoosepaper.png|| WIP || Yes || Basic Functionality||
+||  _Filename_                  ||  _What is file for in FoFiX?_  ||  _Required?_ ||  _Related to Theme Type_ ||  _Notes_||
+||  mainbg.png                  ||  Main Menu Backround           ||  Yes         ||  WIP                     || ||
+||  maintext.png                ||  Main Menu Text                ||  Yes         ||  WIP                     || Divided into 6 rows, 2 columns for RB based themes and 5 rows, 2 columns for other themes ||
+||  neckchoosebg.png            ||  Neck select background        ||  Yes         ||  WIP                     || Staggered on GH themes, not on RB ones ||
+||  neckchooseselect.png        ||  Image that wraps selected neck||  Yes         ||  WIP                     || ||
+||  optionsbg.png               ||  Options background            ||  Yes         ||  WIP                     || ||
+||  optionspanel.png            ||  Pallet for options text       ||  Yes         ||  WIP                     || Small overlay on optionsbg for text to be displayed ||
+||  selected.png                ||  Highlights selected song      ||  Yes         ||  WIP                     || Used for "list" mode setlist view ||
+||  songchoosepaper.png         ||  Song select background        ||  Yes         ||  WIP                     || ||
+|| _neckchoosetext.png_         ||  _No longer used or necessary_ ||  _No_        ||  _None_                  || ||
 
 
 ==\Stages\ Directory==
-||_Filename_||_What is file for in FoFiX?_||_Required - Yes/No_||Related to Which Theme?||
-||default.png|| WIP || Yes || Basic Functionality||
-||pratice.png|| WIP || Yes || Basic Functionality||
+_*Note:* The stages folder is not required, however if it is present, there must be a "default.png" and a "practice.png" or FoFiX will crash_
+||  _Filename_                  ||  _What is file for in FoFiX?_  ||  _Required?_ ||  _Related to Theme Type_ ||  _Notes_||
+||  default.png                 ||  Default stage image           ||  Yes         ||  WIP                     || Stage background defaults to this image when no other images are present in this folder, or slideshow mode is set to "off". This image _is_ included in normal stage rotation ||
+||  pratice.png                 ||  Stage image in practice mode  ||  Yes         ||  WIP                     || This is displayed in the background of practice mode gameplay for guitar, and if no instrument specific practice stage is found ||
