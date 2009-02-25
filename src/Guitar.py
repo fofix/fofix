@@ -1810,7 +1810,7 @@ class Guitar:
         f = 1.0
       
       #volshebnyi - hide notes in BRE zone if BRE enabled  
-      if self.freestyleEnabled:
+      if self.freestyleEnabled and self.freestyleStart > 0:
         if time >= self.freestyleStart-self.freestyleOffset and time < self.freestyleStart + self.freestyleLength+self.freestyleOffset:
           z = -2.0
 

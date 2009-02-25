@@ -1599,7 +1599,7 @@ class Drum:
         f = 1.0
         
       #volshebnyi - hide open notes in BRE zone if BRE enabled  
-      if self.freestyleEnabled:  
+      if self.freestyleEnabled and self.freestyleStart > 0:  
         if self.drumFillsReady or self.freestyleReady:
           if time > self.freestyleStart - self.freestyleOffset and time < self.freestyleStart + self.freestyleOffset + self.freestyleLength:
             z = -2.0
