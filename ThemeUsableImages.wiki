@@ -15,23 +15,25 @@ This is WIP status until completed. Then it will just me maintained as things ar
 
 
 ==Main Theme Directory==
-||  _Filename_                  ||  _What is file for in FoFiX?_  ||  _Required?_ ||  _Related to Theme Type_ ||  _Notes_||
-||  bpm_beat.png                || WIP                            || Yes          || WIP                      || ||
-||  bpm_halfbeat.png            || WIP                            || Yes          || WIP                      || ||
-||  bpm_measure.png             || WIP                            || Yes          || WIP                      || ||
-||  center_lines.png            || WIP                            || Yes          || WIP                      || ||
-||  counter.png                 || WIP                            || Yes          || WIP                      || ||
-||  editor.png                  || WIP                            || Yes          || WIP                      || ||
-||  fretbuttons.png             || WIP                            || Yes          || WIP                      || ||
-||  gameresults.png             || WIP                            || Yes          || WIP                      || ||
-||  hitflames1.png              || WIP                            || Yes          || WIP                      || ||
-||  hitflames2.png              || WIP                            || Yes          || WIP                      || ||
-||  hitglow.png                 || WIP                            || Yes          || WIP                      || ||
-||  hitglow2.png                || WIP                            || Yes          || WIP                      || ||
-||  lightning.png               || WIP                            || GH Based     || WIP                      || ||
-||  loadingbg.png               || WIP                            || Yes          || WIP                      || ||
-||  mult.png                    || WIP                            || Yes          || WIP                      || ||
-||  notes.png                   || WIP                            || Yes          || WIP                      || ||
+||  _Filename_                  ||  _What is file for in FoFiX?_                  ||  _Required?_ ||  _Related to Theme Type_ ||  _Notes_||
+||  bpm_beat.png                || Line across the fretboard every beat           || Yes          || All                      || ||
+||  bpm_halfbeat.png            || Line across the fretboard every half beat      || Yes          || All                      || ||
+||  bpm_measure.png             || Line across the fretboard every measure        || Yes          || All                      || For example, every four beats in 4/4 time ||
+||  center_lines.png            || The "strings" running down the fretboard       || Yes          || All                      || ||
+||  counter.png                 || Background for current streak count            || Yes          || All                      || GH2/3 – Appears below score meter (bottom left) after 25 note streak (note, the font for the rightmost digit is black, while the rest is white, so it pays to have a lighter area to the right). RB – Appears below score meter (top right) always. WT – Appears below rock meter (mid left) always ||
+||  dots.png                    || Streak Dots                                    || GH3 Based    || GH3 Based                || Can also use dotshalf.png instead. Also, for GH2 themes the "dots" directory is required (See below) ||
+||  editor.png                  || Instrument and difficulty select background    || Yes          || All                      || ||
+||  fail.png                    || Image that appears after failing               || GH Based     || All                      || ||
+||  fretbuttons.png             || Buttons at bottom of neck to hit notes with    || Yes          || All                      || ||
+||  gameresults.png             || Results screen background                      || Yes          || All                      || ||
+||  hitflames1.png              || Flashes when you hit a note                    || Yes          || All                      || ||
+||  hitflames2.png              || Flashes when you hit a note                    || Yes          || All                      || ||
+||  hitglow.png                 || Shines when holding a sustain                  || Yes          || All                      || ||
+||  hitglow2.png                || Shines when holding a sustain                  || Yes          || All                      || ||
+||  lightning.png               || Flashes when star power is gained              || GH Based     || GH Based                 || ||
+||  loadingbg.png               || Shows while loading                            || Yes          || All                      || Loading phrases are displayed on this screen also||
+||  mult.png                    || Displays current multiplier                    || Yes          || All                      || Split into 8 vertically (for 1x,2x,3x,4x and sp:2x,4x,6x,8x) is displayed to the left under reockmeter.png for GH2/GH3 based themes, below the fret buttons and overdrive meter in RB based themes, and along the right-hand side of the fretboard about mid-way up on GHWT themes ||
+||  notes.png                   || Notes that come down the fretboard to be hit   || Yes          || All                      || This image is split into 5 horizontally (one for each coloured note). In GH themes it is split into 5 vertically (normal notes, hopo notes, star notes, hopo star notes, and the last row contains one sp active note on the left, followed by a sp active hopo note). In RB based themes it is spit into 6 vertically (normal notes, hopo notes, overdrive notes, overdrive hopo notes, overdrive active notes, overdrive active hopos) ||
 ||  overdrive bottom.png        || WIP                            || RB Based     || WIP                      || ||
 ||  overdrive fill.png          || WIP                            || RB Based     || WIP                      || ||
 ||  overdrive full.png          || WIP                            || RB Based     || WIP                      || ||
