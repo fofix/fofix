@@ -1,10 +1,14 @@
+# evilynux - Change this path to make it point to your cxFreeze
 CXFREEZE=/usr/src/experimental/cx_Freeze-3.0.3/FreezePython
+
 PYTHON=python2.4
 PYTHON_LIBS=/usr/lib/python2.4
 MESSAGESPOT=messages.pot
 
-# evilynux - Dynamically update the version number, this is "clever" but hard to understand... :-(
-VERSION = $(shell grep "versionString =" src/GameEngine.py | sed -e "s/\s/_/g" | sed -e "s/^.\+\(\([0-9]\.\)\+[^\"]\+\).\+/\1/")
+# evilynux - Update files from SVN and build version number at the same time. This is "clever" but hard to understand... :-(
+SVN_VERSION = $(shell svn up | sed -e "s/.\+\ \([0-9]\+\)\./\1/")
+MAIN_VERSION = $(shell grep "+ version" src/GameEngine.py | sed -e "s/\s/_/g" | sed -e "s/^.\+\(\([0-9]\.\)\+[^\"]\+\).\+/r\1/")
+VERSION = "${MAIN_VERSION}~${SVN_VERSION}"
 # evilynux - Dynamically get the architecture; only supports 32bit/64bit
 UNAME = $(shell uname -m)
 ARCH = $(shell test $(UNAME) = "i686" && echo 32bit || echo 64bit)
@@ -38,13 +42,7 @@ encodings.iso8859_1,\
 SongChoosingScene,\
 GuitarScene,\
 ctypes.util,pkg_resources,weakref,Image,\
-OpenGL.arrays.numpymodule,\
-OpenGL.arrays.ctypesarrays,\
-OpenGL.arrays.ctypesparameters,\
-OpenGL.arrays.ctypespointers,\
-OpenGL.arrays.strings,\
-OpenGL.arrays.numbers,\
-OpenGL.arrays.nones,\
+OpenGL,\
 xml.sax.drivers2.drv_pyexpat,\
 GameResultsScene src/FretsOnFire.py
 
