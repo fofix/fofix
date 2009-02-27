@@ -80,7 +80,8 @@ Then use any of the following settings below the {{{[theme]}}} header in the the
 ||loading_Y = .595||Y Position of Phrase positioning on screen. Use a decimal # between 0-1||
 ||loading_phrase = How good are You?||Put an underscore between each phrase for multiple phrases||   
 ||loading_text_color = #FFFFFF||Controls the Loading phrase color. Use a Hex Color Value.||
-||results_phrase = Jurgen is watching||Put an underscore between each phrase for multiple phrases||
+||loading_font_scale = 0.0015||Loading phrase font scale.||
+||loading_right_margin = 1.0||X offset from right side of the screen.||
 
 
 Notice - If you just want the default phrases to show do not put these in your theme.ini
