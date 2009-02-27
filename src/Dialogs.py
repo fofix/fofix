@@ -906,7 +906,6 @@ class SongChooser(Layer, KeyListener):
 
     self.instrumentChange = False   #MFH
 
-
   def loadCollection(self):
     Log.debug("Dialogs.loadCollection() function call...")
     self.loaded = False
@@ -1116,7 +1115,8 @@ class SongChooser(Layer, KeyListener):
       self.song = None
     self.engine.input.removeKeyListener(self)
     self.engine.input.disableKeyRepeat()
-    
+
+      
   def getSelectedSong(self):
     if isinstance(self.selectedItem, Song.SongInfo):
       return self.selectedItem.songName
@@ -1202,9 +1202,11 @@ class SongChooser(Layer, KeyListener):
           
           if self.listingMode == 1:
             self.library = self.selectedItem.libraryNam
-            
+          #blazingamer - stops preview from playing outside of songchooser
+          self.hidden()
           self.engine.view.popLayer(self)
           self.accepted = True
+
         elif isinstance(self.selectedItem, Song.RandomSongInfo):
           while True:
             self.selectedItem = self.items[random.randint(0,len(self.items)-1)]
@@ -1213,7 +1215,9 @@ class SongChooser(Layer, KeyListener):
           
           if self.listingMode == 1:
             self.library = self.selectedItem.libraryNam
-            
+
+          #blazingamer - stops preview from playing outside of songchooser
+          self.hidden()       
           self.engine.view.popLayer(self)
           self.accepted = True
         elif isinstance(self.selectedItem, Song.CareerResetterInfo):  #MFH - here's where to actually reset careers
@@ -1265,10 +1269,16 @@ class SongChooser(Layer, KeyListener):
           self.song.fadeout(1000)
         self.selectedItem = None
         self.loadCollection()
+        #blazingamer - stops preview from playing outside of songchooser
+        self.song = None
+        self.songLoader = None
       else:
         self.selectedItem = None
+        #blazingamer - stops preview from playing outside of songchooser
+        self.hidden()
         self.engine.view.popLayer(self)
         self.accepted = True
+
 
     # left + right to quickly skip to the item after the next title
     elif c in Player.LEFTS:
