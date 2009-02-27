@@ -48,9 +48,9 @@ Versions are likely important. Don't substitute one for the other without trying
   # Download the FoFiX source files from the trunk, or SVN revision / tag of your choice - [http://code.google.com/p/fofix/source/browse/MFH-Mod]
 
 *Or here's a complete package with all the files above, with a batch file that installs everything for Windows 32-bit users (installation lines included for Amanith but are commented out), in a single RAR archive - courtesy of Chris Paiano (Myfingershurt):
-[http://www.mediafire.com/?xdg2jriv2tn]
+[http://www.mediafire.com/?xdg2jriv2tn] - *EXCEPT NUMPY*
 
-*Or w/o Amanith files (Not needed anymore after version 3.030+. Also 10Mb Less in size)* [http://www.mediafire.com/download.php?mmz3zjqkohm]
+*Or w/o Amanith files (Not needed anymore after version 3.030+. Also 10Mb Less in size)* [http://www.mediafire.com/download.php?mmz3zjqkohm] - *EXCEPT NUMPY*
 
 *Additional, optional modules currently in use with the latest Alpha version:*
   * [http://trac2.assembla.com/pkaudio/wiki/pyrtmidi pyRtMidi] - for MIDI instruments to be used as controller inputs.  [http://www.mediafire.com/download.php?ok1vw2zjn22 Here] is a direct download link to an installer that js put together for Python 2.4.
