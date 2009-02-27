@@ -65,7 +65,7 @@ import Settings
 from Svg import ImgDrawing, SvgContext
 
 #MFH - for loading phrases
-def wrapCenteredText(font, pos, text, rightMargin = 0.9, scale = 0.002, visibility = 0.0):
+def wrapCenteredText(font, pos, text, rightMargin = 1.0, scale = 0.002, visibility = 0.0):
   """
   Wrap a piece of text inside given margins.
   
@@ -86,7 +86,7 @@ def wrapCenteredText(font, pos, text, rightMargin = 0.9, scale = 0.002, visibili
   sentence = ""
   for n, word in enumerate(text.split(" ")):
     w, h = font.getStringSize(sentence + " " + word, scale = scale)
-    if x + (w/2) > rightMargin*1.11 or word == "\n":
+    if x + (w/2) > rightMargin or word == "\n":
       w, h = font.getStringSize(sentence, scale = scale)
       #x = startXpos
       glPushMatrix()
@@ -4681,7 +4681,9 @@ class LoadingSplashScreen(Layer, KeyListener):
     self.loadingx = Theme.loadingX
     self.loadingy = Theme.loadingY  
     self.textColor = Theme.loadingColor
-    self.allowtext = self.engine.config.get("game", "lphrases")  
+    self.allowtext = self.engine.config.get("game", "lphrases") 
+    self.fScale = Theme.loadingFScale
+    self.rMargin = Theme.loadingRMargin
 
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
     if self.logClassInits == 1:
@@ -4714,44 +4716,22 @@ class LoadingSplashScreen(Layer, KeyListener):
     try:
       v = (1 - visibility) ** 2
       fadeScreen(v)
-
       w, h = self.engine.view.geometry[2:4]
-      self.engine.drawImage(self.engine.data.loadingImage, scale = (.5, -.5), coord = (w / 2, h / 2))
-
-      Theme.setBaseColor(1 - v)
+      self.engine.drawImage(self.engine.data.loadingImage, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
       
-      if self.theme == 1:
-        fscale = 0.0016
-      else:
-        fscale = 0.0015
-      w, h = font.getStringSize(self.text, scale=fscale)
-
-      if self.loadingx != None:
-        if self.loadingy != None:
-          x = self.loadingx
-          y = self.loadingy - h / 2 + v * .5
-        else:
-          x = self.loadingx
-          y = .6 - h / 2 + v * .5
-      elif self.loadingy != None:
-        x = .5
-        y = .6 - h / 2 + v * .5
-      else:
-        x = .5
-        y = .6 - h / 2 + v * .5
-
+      Theme.setBaseColor(1 - v)
+      w, h = font.getStringSize(self.text, scale=self.fScale)
+      
+      x = self.loadingx
+      y = self.loadingy - h / 2 + v * .5
+      
       #akedrou - support for Loading Text Color
       c1,c2,c3 = self.textColor
       glColor3f(c1,c2,c3)
       
       # evilynux - Made text about 2 times smaller (as requested by worldrave)
       if self.allowtext:
-        if self.theme == 1:   #GH3 themes get different right margin, and always call wrap function
-           wrapCenteredText(font, (x,y), self.text, scale = fscale, rightMargin = 0.82)
-        elif w > 0.9 or x > 0.5:   #longer than a single line?
-          wrapCenteredText(font, (x,y), self.text, scale = fscale)
-        else:
-          font.render(self.text, (x - w/2, y), scale = fscale)
+        wrapCenteredText(font, (x,y), self.text, scale = self.fScale, rightMargin = self.rMargin)
 
     finally:
       self.engine.view.resetProjection()
