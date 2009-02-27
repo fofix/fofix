@@ -6,8 +6,8 @@ PYTHON_LIBS=/usr/lib/python2.4
 MESSAGESPOT=messages.pot
 
 # evilynux - Update files from SVN and build version number at the same time. This is "clever" but hard to understand... :-(
-SVN_VERSION = $(shell svn up | sed -e "s/.\+\ \([0-9]\+\)\./\1/")
-MAIN_VERSION = $(shell grep "+ version" src/GameEngine.py | sed -e "s/\s/_/g" | sed -e "s/^.\+\(\([0-9]\.\)\+[^\"]\+\).\+/r\1/")
+SVN_VERSION = $(shell svn up | sed -e "s/.\+\ \([0-9]\+\)\./r\1/")
+MAIN_VERSION = $(shell grep "+ version" src/GameEngine.py | sed -e "s/\s/_/g" | sed -e "s/^.\+\(\([0-9]\.\)\+[^\"]\+\).\+/1/")
 VERSION = "${MAIN_VERSION}~${SVN_VERSION}"
 # evilynux - Dynamically get the architecture; only supports 32bit/64bit
 UNAME = $(shell uname -m)
