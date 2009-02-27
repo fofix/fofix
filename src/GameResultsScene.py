@@ -121,6 +121,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.careerStars      = self.engine.config.get("game", "career_star_min")
     self.detailedScores   = False #to do.
     self.playerList       = players
+    self.resultStar       = [float(i) for i in Theme.result_star]
     
     self.scoreScrollStartOffset = .8
     
@@ -824,13 +825,13 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         else:
           space = 1
 
-        scale = float(Theme.result_star[2])
+        scale = self.resultStar[2]
 
         try:
-          hspacing = float(Theme.result_star[3])
+          hspacing = self.resultStar[3]
         except IndexError:
           hspacing = 1.0
-        self.engine.drawStarScore(w, h, float(Theme.result_star[0]), float(Theme.result_star[1]), scoreCard.stars, scale, space = space, horiz_spacing = hspacing, align = 1)
+        self.engine.drawStarScore(w, h, self.resultStar[0], self.resultStar[1], scoreCard.stars, scale, space = space, horiz_spacing = hspacing, align = 1)
         
 #-        if scoreCard.stars > 5:
 #-          for j in range(5):
@@ -971,13 +972,13 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       else:
         space = 1
 
-      scale = float(Theme.result_star[2])
+      scale = self.resultStar[2]
           
       try:
-        hspacing = float(Theme.result_star[3])
+        hspacing = self.resultStar[3]
       except IndexError:
         hspacing = 1.1
-      self.engine.drawStarScore(w, h, float(Theme.result_star[0]), float(Theme.result_star[1]), scoreCard.stars, scale, horiz_spacing = hspacing, space = space, align = 1)
+      self.engine.drawStarScore(w, h, self.resultStar[0], self.resultStar[1], scoreCard.stars, scale, horiz_spacing = hspacing, space = space, align = 1)
 
 #-      if scoreCard.stars > 5:
 #-        for j in range(5):

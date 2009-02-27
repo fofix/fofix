@@ -163,10 +163,11 @@ Config.define("theme", "song_rb2_name_selected_color",       str, "#FFBF00")
 Config.define("theme", "song_rb2_diff_color",       str, "#FFBF00")
 Config.define("theme", "song_rb2_artist_color",       str, "#4080FF")
 
-Config.define("theme", "pause_bkg_x",       float, None)
-Config.define("theme", "pause_bkg_y",       float, None)
-Config.define("theme", "pause_bkg_w",       float, None)
-Config.define("theme", "pause_bkg_h",       float, None)
+#Config.define("theme", "pause_bkg_x",       float, None)
+#Config.define("theme", "pause_bkg_y",       float, None)
+#Config.define("theme", "pause_bkg_w",       float, None)
+#Config.define("theme", "pause_bkg_h",       float, None)
+Config.define("theme", "pause_bkg",       str, "0.5,0.5,1.0,1.0")
 Config.define("theme", "pause_text_x",       float, None)
 Config.define("theme", "pause_text_y",       float, None)
 Config.define("theme", "pause_text_color",  str, "#FFFFFF")
@@ -264,8 +265,9 @@ Config.define("theme", "song_list_display",       int, None)
 #Qstick - Results Screen
 
 #RACER:
-Config.define("theme", "fail_bkg_x",       float, None)
-Config.define("theme", "fail_bkg_y",       float, None)
+#Config.define("theme", "fail_bkg_x",       float, None)
+#Config.define("theme", "fail_bkg_y",       float, None)
+Config.define("theme", "fail_bkg",       str, "0.5,0.5,1.0,1.0")
 Config.define("theme", "fail_text_x",       float, None)
 Config.define("theme", "fail_text_y",       float, None)
 
@@ -342,8 +344,7 @@ song_listcd_score_Xpos = None
 song_listcd_score_Ypos = None
 song_listcd_list_Xpos = None
 
-pause_bkg_xPos = None
-pause_bkg_yPos = None
+pause_bkg_pos = [None]*4
 pause_text_xPos = None
 pause_text_yPos = None
 
@@ -447,8 +448,9 @@ jurgTextPos = [None] * 3
 
 
 #Racer:
-fail_bkg_xPos = None
-fail_bkg_yPos = None
+#fail_bkg_xPos = None
+#fail_bkg_yPos = None
+fail_bkg_pos = [None]*4
 fail_text_xPos = None
 fail_text_yPos = None
 
@@ -727,11 +729,10 @@ def setupSonglist(config):
 
   
 def setupPauseNOpt(config):
-  global pause_bkg_xPos, pause_bkg_yPos, pause_text_xPos, pause_text_yPos
+  global pause_bkg_pos, pause_text_xPos, pause_text_yPos
   global opt_bkg_size, opt_text_xPos, opt_text_yPos
 
-  pause_bkg_xPos = config.get("theme", "pause_bkg_x")
-  pause_bkg_yPos = config.get("theme", "pause_bkg_y")
+  pause_bkg_pos = config.get("theme", "pause_bkg").split(",")
   pause_text_xPos = config.get("theme", "pause_text_x")
   pause_text_yPos = config.get("theme", "pause_text_y")
   opt_bkg_size = config.get("theme", "opt_bkg").split(",")
@@ -766,10 +767,9 @@ def setupTWOD(config):
 
 #racer:
 def setupFail(config):
-  global fail_bkg_xPos, fail_bkg_yPos, fail_text_xPos, fail_text_yPos
+  global fail_bkg_pos, fail_text_xPos, fail_text_yPos
 
-  fail_bkg_xPos = config.get("theme", "fail_bkg_x") 
-  fail_bkg_yPos = config.get("theme", "fail_bkg_y")
+  fail_bkg_pos = config.get("theme", "fail_bkg").split(",")
   fail_text_xPos = config.get("theme", "fail_text_x")
   fail_text_yPos = config.get("theme", "fail_text_y")
 
