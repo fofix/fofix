@@ -39,7 +39,13 @@ from Audio import Sound
 from Language import _
 
 import Config
-import sha
+#stump: when we completely drop 2.4 support, change this to just "import hashlib"
+try:
+  import hashlib
+except ImportError:
+  import sha
+  class hashlib:
+    sha1 = sha.sha
 import Cerealizer
 import binascii
 import urllib
@@ -534,7 +540,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       }
       scores     = {}
       scores_ext = {}
-      scoreHash = sha.sha("%d%d%d%s" % (player.getDifficultyInt(), self.finalScore[i], self.scoring[i].stars, self.playerList[i].name)).hexdigest()
+      scoreHash = hashlib.sha1("%d%d%d%s" % (player.getDifficultyInt(), self.finalScore[i], self.scoring[i].stars, self.playerList[i].name)).hexdigest()
       scores[player.getDifficultyInt()]     = [(self.finalScore[i], self.scoring[i].stars, self.playerList[i].name, scoreHash)]
       scores_ext[player.getDifficultyInt()] = [(scoreHash, self.scoring[i].stars) + scoreExt]
       d["scores"] = binascii.hexlify(Cerealizer.dumps(scores))

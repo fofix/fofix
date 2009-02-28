@@ -29,7 +29,13 @@ import os
 import re
 import shutil
 import Config
-import sha
+#stump: when we completely drop 2.4 support, change this to just "import hashlib"
+try:
+  import hashlib
+except ImportError:
+  import sha
+  class hashlib:
+    sha1 = sha.sha
 import binascii
 import Cerealizer
 import urllib
@@ -696,7 +702,7 @@ class SongInfo(object):
     self._set("loading_phrase", value)
     
   def getScoreHash(self, difficulty, score, stars, name):
-    return sha.sha("%d%d%d%s" % (difficulty.id, score, stars, name)).hexdigest()
+    return hashlib.sha1("%d%d%d%s" % (difficulty.id, score, stars, name)).hexdigest()
     
   def getDelay(self):
     return self._get("delay", int, 0)
@@ -2426,7 +2432,7 @@ class Song(object):
   
 
   def getHash(self):
-    h = sha.new()
+    h = hashlib.sha1()
     f = open(self.noteFileName, "rb")
     bs = 1024
     while True:

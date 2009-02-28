@@ -35,7 +35,7 @@ from OpenGL.GLU import *
 import math
 import colorsys
 import pygame
-from Numeric import array, Float, transpose, reshape, matrixmultiply
+from numpy import array, transpose, reshape, dot
 
 Config.define("network", "updateinterval", int, 72)
 
@@ -87,7 +87,7 @@ class Actor:
 
     # calculate the z coordinate
     m = transpose(reshape(modelview, (4, 4)))
-    wz = -matrixmultiply(m, reshape((x, y, z, 1), (4, 1)))[2][0]
+    wz = -dot(m, reshape((x, y, z, 1), (4, 1)))[2][0]
 
     # don't draw anything if we're behind the viewer
     if wz < 0.1:
@@ -122,7 +122,7 @@ class BoxActor(Actor):
     T = array((R[0], R[3], R[6], 0,
                R[1], R[4], R[7], 0,
                R[2], R[5], R[8], 0,
-                  x,    y,    z, 1), Float)
+                  x,    y,    z, 1), float)
     glPushMatrix()
     glMultMatrixd(T.tolist())
     sx, sy, sz = self.size

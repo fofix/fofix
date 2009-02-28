@@ -37,6 +37,11 @@ except ImportError:
   Log.warn("Pitch bending is not supported; install john.stumpo's pitchbend module (r7 or higher) if you want it.")
   pitchBendSupported = False
 
+#stump: get around some strangeness in pygame when py2exe'd...
+if not hasattr(pygame.mixer, 'music'):
+  import sys
+  __import__('pygame.mixer_music')
+  pygame.mixer.music = sys.modules['pygame.mixer_music']
 
 try:
   import ogg.vorbis
@@ -215,8 +220,16 @@ class Sound(object):
 
 if ogg:
   import struct
-  # Must use Numeric instead of numpy, since PyGame 1.7.1 is not compatible with the former
-  import Numeric
+  if tuple(int(i) for i in pygame.__version__[:5].split('.')) < (1, 9, 0):
+    # Must use Numeric instead of numpy, since PyGame 1.7.1 is
+    # not compatible with the latter, and 1.8.x isn't either (though it claims to be).
+    import Numeric
+    def zeros(size):
+      return Numeric.zeros(size, typecode='s')   #myfingershurt: typecode s = short = int16
+  else:
+    import numpy
+    def zeros(size):
+      return numpy.zeros(size, dtype='h')
 
   class OggStream(object):
     def __init__(self, inputFileName):
@@ -239,7 +252,7 @@ if ogg:
 
         #myfingershurt: buffer is 2D array (one D for each channel) of 16-bit UNSIGNED integers / samples
         #  2*1024*64 = 131072 samples per channel
-      self.buffer       = Numeric.zeros((2 * self.bufferSize, 2), typecode = "s")   #myfingershurt: typecode s = short = int16
+      self.buffer       = zeros((2 * self.bufferSize, 2))
 
       self.decodingRate = 4
       self._reset()
@@ -249,7 +262,7 @@ if ogg:
 
         #myfingershurt: 2D buffer (L,R) of 16-bit unsigned integer samples, each channel 65536 samples long
         #.... buffersIn = a list of 9 of these.
-      self.buffersIn     = [pygame.sndarray.make_sound(Numeric.zeros((self.bufferSize, 2), typecode = "s")) for i in range(self.bufferCount + 1)]
+      self.buffersIn     = [pygame.sndarray.make_sound(zeros((self.bufferSize, 2))) for i in range(self.bufferCount + 1)]
 
       self.buffersOut    = []
       self.buffersBusy   = []

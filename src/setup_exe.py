@@ -31,10 +31,30 @@ try:
 except ImportError:
   pass
 
+#stump: if we're running pyOpenGL 3, do the necessary black magic.
+# Also bring in modules used by pygame 1.9 if necessary.
+# For some reason py2exe doesn't include them.
+import OpenGL
+import pygame
+extraIncludes = []
+if int(OpenGL.__version__[0]) > 2:
+  extraIncludes += [
+    "OpenGL.platform.win32",
+    "OpenGL.arrays.ctypesarrays",
+    "OpenGL.arrays.numpymodule",
+    "OpenGL.arrays.lists",
+    "OpenGL.arrays.numbers",
+  ]
+if tuple(int(i) for i in pygame.__version__[:5].split('.')) >= (1, 9, 0):
+  extraIncludes += [
+    "heapq",
+    "bisect",
+  ]
+
 options = {
   "py2exe": {
     "dist_dir":  "../dist",
-    "includes":  SceneFactory.scenes,
+    "includes":  SceneFactory.scenes + extraIncludes,
     "excludes":  [
       "glew.gl.apple",
       "glew.gl.ati",
@@ -74,6 +94,12 @@ options = {
       "GimpPaletteFile",
       "PaletteFile",
       "macosx",
+      "Tkinter",
+      "Pyrex",
+      "distutils",
+    ],
+    "dll_excludes":  [
+      "msvcp90.dll",
     ],
     "optimize":  2,
   }
@@ -102,6 +128,14 @@ dataFiles = [
   ("data",                    dataFiles),
   ("data/translations",       glob.glob("../data/translations/*.mo")),
 ]
+
+#stump: sometimes py2.6 py2exe thinks parts of pygame are "system" DLLs...
+__orig_isSystemDLL = py2exe.build_exe.isSystemDLL
+def isSystemDLL(pathname):
+  if pathname.lower().find('pygame') != -1:
+    return 0
+  return __orig_isSystemDLL(pathname)
+py2exe.build_exe.isSystemDLL = isSystemDLL
 
 #stump: grab version info from engine
 import GameEngine
