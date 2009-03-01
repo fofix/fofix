@@ -31,6 +31,8 @@ _It is highly recommended that when you become an Alpha tester, you keep a separ
 
 Versions are likely important. Don't substitute one for the other without trying the original versions first. These versions were tested, yours were not. I will not answer questions unless you have done the things in this document.
 
+*Note:* FoFiX is now working on moving up to Python 2.6 under Windows, though until the move is completed, FoFiX will still fully support Python 2.4.  These instructions use Python 2.4.  See RunningUnderPython26 for detailed instructions for setting up Python 2.6 to run FoFiX.
+
   # Download Active Python 2.4.3.12 (not the standard python distro) - [http://downloads.activestate.com/ActivePython/windows/2.4/ActivePython-2.4.3.12-win32-x86.msi] or [http://www.mediafire.com/?2zz5mzoybuw]
   # Download Psyco optimizing compiler 1.5.2 - [http://downloads.sourceforge.net/psyco/psyco-1.5.2.win32-py2.4.exe]
   # Download GLEW 1.4.0 - [http://downloads.sourceforge.net/glew/glew-1.4.0-win32.zip]
