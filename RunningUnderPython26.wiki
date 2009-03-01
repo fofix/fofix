@@ -35,6 +35,12 @@ The following packages are optional:
 
 Install them in the order listed above by double-clicking the .exe or .msi files that you downloaded.
 
+Note that the current FoFiX codebase under Python 2.6 no longer has some of the dependencies that it had under Python 2.4:
+
+  # pysqlite2: replaced by sqlite3, which is included with all Python releases starting with Python 2.5 as part of the standard library.
+  # glew/glewpy: while code that uses it still exists in FoFiX, there is currently no way for that code to be called from the rest of the game.
+  # Numeric: obsolete, replaced by numpy.
+
 You may need to modify one of the files in pyOpenGL.  Do so if you receive errors and the function name "glGenTextures" appears anywhere in the log.
 
   # Navigate to your Python installation folder, then go into lib/site-packages/OpenGL/GL.
