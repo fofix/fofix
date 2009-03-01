@@ -31,6 +31,7 @@ The following packages are optional:
   # psyco: Python JIT compiler (1.6: http://www.voidspace.org.uk/downloads/psyco-1.6.win32-py2.6.exe)  _Highly recommended!_
   # rtmidi: support for using MIDI instruments (svn revision 10: http://www.mediafire.com/file/njrzmkyztfg/rtmidi-0.1.win32-py2.6.exe)
   # py2exe: support for freezing the code into a standalone EXE (0.6.9: http://downloads.sourceforge.net/py2exe/py2exe-0.6.9.win32-py2.6.exe)
+  # pitchbend: support for pitch bend effect (0.3-EndOfLife: http://www.mediafire.com/file/zlinjzzj0km/pitchbend-0.3-EndOfLife.win32-py2.6.exe)  _Will be replaced with a much better implementation soon enough..._
 
 Install them in the order listed above by double-clicking the .exe or .msi files that you downloaded.
 
@@ -58,7 +59,7 @@ http://fofix.googlecode.com/svn/MFH-Mod/trunk/
 
 You do not need to change any other options in the checkout window.  Click OK to download the FoFiX source code.
 
-To run FoFiX from source, double-click "RunFofFromSources.bat" in the src/scripts folder within the source code.  If you installed py2exe, you can freeze the code into an EXE by double-clicking "RebuildWin.bat", also in src/scripts.  However, whether you are running from source or EXE has negligible impact on performance except while the game is just starting up, and even then there is practically no difference.
+To run FoFiX from source, double-click "RunFofFromSources.bat" in the src/scripts folder within the source code.  If you installed py2exe, you can freeze the code into an EXE by double-clicking "RebuildWin.bat", also in src/scripts.  However, whether you are running from source or EXE has negligible impact on performance except while the game is just starting up, and even then there is practically no difference.  Thus, there really is no point in creating the EXE unless you are going to distribute FoFiX to others.
 
 == Mac OS X ==
 
