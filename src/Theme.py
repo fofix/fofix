@@ -126,6 +126,7 @@ Config.define("theme", "loading_y",       float, 0.6)
 Config.define("theme", "loading_text_color", str, "#FFFFFF")
 Config.define("theme", "loading_font_scale", float, 0.0015)
 Config.define("theme", "loading_right_margin", float, 1.0)
+Config.define("theme", "loading_line_spacing", float, 1.0)
 
 Config.define("theme", "twoDnote",       bool, True)
 Config.define("theme", "twoDkeys",       bool, True)
@@ -317,6 +318,7 @@ loadingY = None
 loadingColor = None
 loadingFScale = None
 loadingRMargin = None
+loadingLSpacing = None
 twoDnote = None
 twoDkeys = None
 threeDspin = None
@@ -741,7 +743,7 @@ def setupPauseNOpt(config):
   
 def setupMenu(config):
   global menuX, menuY, menuRB
-  global loadingX, loadingY, loadingColor, loadingFScale, loadingRMargin
+  global loadingX, loadingY, loadingColor, loadingFScale, loadingRMargin, loadingLSpacing
   global songback, versiontag
   
   menuX = config.get("theme", "menu_x")
@@ -752,6 +754,7 @@ def setupMenu(config):
   loadingColor = hexToColor(config.get("theme", "loading_text_color"))
   loadingFScale = config.get("theme", "loading_font_scale")
   loadingRMargin = config.get("theme", "loading_right_margin")
+  loadingLSpacing = config.get ("theme", "loading_line_spacing")
   songback = config.get("theme", "songback")
   versiontag = config.get("theme", "versiontag")
 

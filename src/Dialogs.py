@@ -65,7 +65,7 @@ import Settings
 from Svg import ImgDrawing, SvgContext
 
 #MFH - for loading phrases
-def wrapCenteredText(font, pos, text, rightMargin = 1.0, scale = 0.002, visibility = 0.0):
+def wrapCenteredText(font, pos, text, rightMargin = 1.0, scale = 0.002, visibility = 0.0, linespace = 1.0):
   """
   Wrap a piece of text inside given margins.
   
@@ -94,7 +94,7 @@ def wrapCenteredText(font, pos, text, rightMargin = 1.0, scale = 0.002, visibili
       font.render(sentence, (x - (w/2), y + visibility * n), scale = scale)
       glPopMatrix()
       sentence = word
-      y += h
+      y += h * linespace
     else:
       if sentence == "" or sentence == "\n":
         sentence = word
@@ -106,7 +106,7 @@ def wrapCenteredText(font, pos, text, rightMargin = 1.0, scale = 0.002, visibili
     glRotate(visibility * (n + 1) * -45, 0, 0, 1)
     font.render(sentence, (x - (w/2), y + visibility * n), scale = scale)
     glPopMatrix()
-    y += h
+    y += h * linespace
   
     #if word == "\n":
     #  continue
@@ -4694,6 +4694,7 @@ class LoadingSplashScreen(Layer, KeyListener):
     self.allowtext = self.engine.config.get("game", "lphrases") 
     self.fScale = Theme.loadingFScale
     self.rMargin = Theme.loadingRMargin
+    self.lspacing = Theme.loadingLSpacing
 
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
     if self.logClassInits == 1:
@@ -4741,7 +4742,7 @@ class LoadingSplashScreen(Layer, KeyListener):
       
       # evilynux - Made text about 2 times smaller (as requested by worldrave)
       if self.allowtext:
-        wrapCenteredText(font, (x,y), self.text, scale = self.fScale, rightMargin = self.rMargin)
+        wrapCenteredText(font, (x,y), self.text, scale = self.fScale, rightMargin = self.rMargin, linespace = self.lspacing)
 
     finally:
       self.engine.view.resetProjection()
