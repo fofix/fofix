@@ -9,10 +9,10 @@ I recommend copy-pasting all this text into a text editor (with monospaced font 
 
 This will be a complete list of usable images that FoFiX can use.
 It will list what directory they belong in, and if they are Required or if they are just usable if they exist.
-An image is marked required if FoFiX crashes/freezes when the file is not present. Sometimes files are only required for specific theme types.
-As at the time of writing there are 4 main theme types: RB, GH2, GH3 and GH:WT. Anything marked "GH Based" means it falls into all of GH2, GH3 and GH:WT (i.e., everything but RB)
-This is WIP status until completed. Then it will just me maintained as things are added.
-
+<BR>An image is marked required if FoFiX crashes/freezes when the file is not present. Sometimes files are only required for specific theme types.
+<BR>As at the time of writing there are 4 main theme types: RB, GH2, GH3 and GH:WT. Anything marked "GH Based" means it falls into all of GH2, GH3 and GH:WT (i.e., everything but RB)
+<BR>This is WIP status until completed. Then it will just be maintained as things are added.
+<BR>*As of March 1 2009, all _required_ images (i.e. those that if missing, FoFiX will crash) are listed*
 
 ==Main Theme Directory==
 ||  _Filename_                  ||  _What is file for in FoFiX?_                  ||  _Required?_ ||  _Related to Theme Type_ ||  _Notes_||
@@ -20,7 +20,7 @@ This is WIP status until completed. Then it will just me maintained as things ar
 ||  bpm_halfbeat.png            || Line across the fretboard every half beat      || Yes          || All                      || ||
 ||  bpm_measure.png             || Line across the fretboard every measure        || Yes          || All                      || For example, every four beats in 4/4 time ||
 ||  center_lines.png            || The "strings" running down the fretboard       || Yes          || All                      || ||
-||  counter.png                 || Background for current streak count            || Yes          || All                      || GH2/3 – Appears below score meter (bottom left) after 25 note streak (note, the font for the rightmost digit is black, while the rest is white, so it pays to have a lighter area to the right). RB – Appears below score meter (top right) always. WT – Appears below rock meter (mid left) always ||
+||  counter.png                 || Background for current streak count            || Yes          || All                      || GH2/3 – Appears below score meter (bottom left) after 25 note streak (note, the font for the rightmost digit is black, while the rest is white, so it pays to have a lighter area to the right). RB – Appears below score meter (top right) always. WT – Never appears, but is required to prevent crash ||
 ||  dots.png                    || Streak Dots                                    || GH3 Based    || GH3 Based                || Can also use dotshalf.png instead. Also, for GH2 themes the "dots" directory is required (See below) ||
 ||  editor.png                  || Instrument and difficulty select background    || Yes          || All                      || ||
 ||  fail.png                    || Image that appears after failing               || GH Based     || All                      || ||
@@ -33,37 +33,36 @@ This is WIP status until completed. Then it will just me maintained as things ar
 ||  lightning.png               || Flashes when star power is gained              || GH Based     || GH Based                 || ||
 ||  loadingbg.png               || Shows while loading                            || Yes          || All                      || Loading phrases are displayed on this screen also||
 ||  mult.png                    || Displays current multiplier                    || Yes          || All                      || Split into 8 vertically (for 1x,2x,3x,4x and sp:2x,4x,6x,8x) is displayed to the left under reockmeter.png for GH2/GH3 based themes, below the fret buttons and overdrive meter in RB based themes, and along the right-hand side of the fretboard about mid-way up on GHWT themes ||
-||  notes.png                   || Notes that come down the fretboard to be hit   || Yes          || All                      || This image is split into 5 horizontally (one for each coloured note). In GH themes it is split into 5 vertically (normal notes, hopo notes, star notes, hopo star notes, and the last row contains one sp active note on the left, followed by a sp active hopo note). In RB based themes it is spit into 6 vertically (normal notes, hopo notes, overdrive notes, overdrive hopo notes, overdrive active notes, overdrive active hopos) ||
-||  overdrive bottom.png        || WIP                            || RB Based     || WIP                      || ||
-||  overdrive fill.png          || WIP                            || RB Based     || WIP                      || ||
-||  overdrive full.png          || WIP                            || RB Based     || WIP                      || ||
-||  overdrive top.png           || WIP                            || RB Based     || WIP                      || ||
-||  pause.png                   || WIP                            || Yes          || WIP                      || ||
-||  rock_arr.png                || WIP                            || Yes          || WIP                      || ||
-||  rock_bottom.png             || WIP                            || RB Based     || WIP                      || ||
-||  rock_fill.png               || WIP                            || RB Based     || WIP                      || ||
-||  rock_max.png                || WIP                            || RB Based     || WIP                      || ||
-||  rock_hi.png                 || WIP                            || GH Based     || WIP                      || ||
-||  rock_med.png                || WIP                            || GH Based     || WIP                      || ||
-||  rock_low.png                || WIP                            || GH Based     || WIP                      || ||
-||  rock_top.png                || WIP                            || Yes          || WIP                      || ||
-||  rockmeter.png               || WIP                            || GH Based     || WIP                      || ||
-||  score.png                   || WIP                            || RB Based     || WIP                      || ||
-||  side_bars.png               || WIP                            || Yes          || WIP                      || ||
-||  spbottom.png                || WIP                            || GH2 Based    || WIP                      || ||
-||  spfill.png                  || WIP                            || GH2 Based    || WIP                      || ||
-||  spfull.png                  || WIP                            || GH2 Based    || WIP                      || ||
-||  sptop.png                   || WIP                            || GH2 Based    || WIP                      || ||
-||  splight.png                 || WIP                            || GH3 / GH:WT  || WIP                      || ||
-||  star1.png                   || WIP                            || Yes          || WIP                      || ||
-||  star2.png                   || WIP                            || Yes          || WIP                      || ||
-||  youfailed.png               || WIP                            || Yes          || WIP                      || ||
-||  yourock.png                 || WIP                            || Yes          || WIP                      || ||
+||  notes.png                   || Notes that come down the fretboard to be hit   || Yes          || All                      || Split into 5 horizontally (one for each coloured note). In GH themes it is split into 5 vertically (normal notes, hopo notes, star notes, hopo star notes, and the last row contains one sp active note on the left, followed by a sp active hopo note). In RB based themes it is spit into 6 vertically (normal notes, hopo notes, overdrive notes, overdrive hopo notes, overdrive active notes, overdrive active hopos) ||
+||  overdrive bottom.png        || Bottom layer of overdrive meter                || RB Based     || RB Based                 || ||
+||  overdrive fill.png          || Indicates how much overdrive is collected      || RB Based     || RB Based                 || Revealed from left to right as more overdrive (starpower) is collected. For example, if you have 45% full overdrive, it will show the leftmost 45% of the image.||
+||  overdrive top.png           || Top layer of overdrive meter                   || RB Based     || RB Based                 || Displays on top of overdrive bottom and overdrive fill.||
+||  overdrive full.png          || Glows when overdrive can be activated          || RB Based     || RB Based                 || Fades in and out when there is enough overdrive to activate. It is rendered on top of all other overdrive bar related images||
+||  pause.png                   || Shows when the game is paused                  || Yes          || All                      || Not scaled, but is shown in the centre of the window (above all game elements). Pause menu text is rendered on top of this.||
+||  rock_arr.png                || Indicates position on the rock meter           || Yes          || All                      || On RB based themes, this moves up and down the rock meter and is rendered on top of other rock meter elements. On GH based themes, this is drawn below rock top and is rotated in a range from approx -45° and 45° (i.e. from failed, to full)||
+||  rock_bottom.png             || The bottom layer of the rock meter             || RB Based     || RB Based                 || ||
+||  rock_fill.png               || Fills up as notes are hit                      || RB Based     || RB Based                 || Revealed from bottom to top as the rock meter is filled. *Note:* This image is coloured in code (red for low, yellow for mid and green for high). It is therefore reccommended that you make this image greyscale.||
+||  rock_max.png                || Overlay of rock meter when it is full          || RB Based     || RB Based                 || ||
+||  rock_hi.png                 || Rock meter image when high                     || GH Based     || GH Based                 || These three are displayed to the right of the fretboard in GH2/GH3 themes, and to the left in GHWT themes||
+||  rock_med.png                || Rock meter image when between high and low     || GH Based     || GH Based                 || ||
+||  rock_low.png                || Rock meter image when low                      || GH Based     || GH Based                 || ||
+||  rock_top.png                || Top layer of the rock meter                    || Yes          || All                      || Displayed over the top of other rock meter elements (except rock max and rock arr in RB Based themes ONLY)||
+||  rockmeter.png               || Where the score is displayed in GH themes      || GH Based     || GH Based                 || Displayed on the left. For GH2/GH3 themes, this needs a hole, as it renders on top of mult.png. On GH2 themes, the score text is spaced and slanted to fit the GH2 theme's image. On GHWT themes, this incorperates what would normally be counter.png||
+||  score.png                   || Where the score is displayed in RB themes      || RB Based     || RB Based                 || Displayed top right, below lyrics (if any) and above counter. Background image to the current score.||
+||  side_bars.png               || Display all up the side of the fretboard       || Yes          || All                      || Stretched to fit the _entire_ width of the fretboard, and the length of the fretboard (as much as one neck image is)||
+||  spbottom.png                || The bottom layer of the star power meter       || GH2 Based    || GH2 Based                || ||
+||  spfill.png                  || Fills up as star power is collected            || GH2 Based    || GH2 Based                || ||
+||  sptop.png                   || Top layer of star power meter                  || GH2 Based    || GH2 Based                || ||
+||  spfull.png                  || _Unknown_                                      || GH2 Based    || GH2 Based                || _This image does not appear to ever display, however it is still required for GH2 based themes_||
+||  splight.png                 || Star power indication lights                   || GH3 / GH:WT  || GH3 / GH:WT Based        || Split into 3 horizontally: left - unlit globe (no starpower), middle - lit globe (star power collected), right - glowing globe (star power ready/active). As star power builds, one of the "lit" globes wil fade in over the top of the unlit globe image. Also, only 3 globes are displayed initally. When starpower is ready, the other 3 display (larger than the first 3). When not in use, these larger globes are still rendered under rock_low/rock_med/rock_high||
+||  star1.png                   || Empty star for game results                    || Yes          || All                      || ||
+||  star2.png                   || Star displayed for game results star ranking   || Yes          || All                      || To indicate a perfect ranking, these images will be rendered green in GH-based themes and yellow (gold) in RB Based themes||
+||  youfailed.png               || Indication that you failed a song              || Yes          || All                      || Appears for a few seconds before the failure menu is displayed||
+||  yourock.png                 || Indication that you finished a song successfuly|| Yes          || All                      || Appears for a few seconds after you finish a song, before the game results appear||
 ||  bassgrooveneckovr.png       || WIP                            || No           || WIP                      || ||
 ||  bigtail1.png                || WIP                            || No           || WIP                      || ||
 ||  bigtail2.png                || WIP                            || No           || WIP                      || ||
 ||  bassgroovemult.png          || WIP                            || No           || WIP                      || ||
-||  bassgrooveneck.png          || WIP                            || No           || WIP                      || ||
 ||  drumcenterlines.png         || WIP                            || No           || WIP                      || ||
 ||  drumnotes.png               || WIP                            || No           || WIP                      || ||
 ||  guitarsoloneck.png          || WIP                            || No           || WIP                      || ||
@@ -90,7 +89,14 @@ This is WIP status until completed. Then it will just me maintained as things ar
 ||  tail1.png                   || WIP                            || No           || WIP                      || ||
 ||  tail2.png                   || WIP                            || No           || WIP                      || ||
 
-==\Menu\ Directory==
+==\dots\ Directory==
+_*Note:* This folder is required only on GH2 based themes. It contains all images required for displaying "dots" (how many notes hit until multiplier increases_
+||  _Filename_                  ||  _What is file for in FoFiX?_  ||  _Required?_ ||  _Related to Theme Type_ ||  _Notes_||
+||  basedots.png                ||  Base image for no dots        ||  GH2 Based   ||  GH2 Based               ||  All these images are displayed on the left, over the score meter (rockmeter.png)||
+||  dt{X}.png (where {X}=[1-9]  ||  Images for displaying dots 1-9||  GH2 Based   ||  GH2 Based               ||  ||
+||  dtfull.png                  ||  Image for all 10 dots on      ||  GH2 Based   ||  GH2 Based               ||  ||
+
+==\menu\ Directory==
 ||  _Filename_                  ||  _What is file for in FoFiX?_  ||  _Required?_ ||  _Related to Theme Type_ ||  _Notes_||
 ||  mainbg.png                  ||  Main Menu Backround           ||  Yes         ||  WIP                     || ||
 ||  maintext.png                ||  Main Menu Text                ||  Yes         ||  WIP                     || Divided into 6 rows, 2 columns for RB based themes and 5 rows, 2 columns for other themes ||
@@ -103,7 +109,7 @@ This is WIP status until completed. Then it will just me maintained as things ar
 || _neckchoosetext.png_         ||  _No longer used or necessary_ ||  _No_        ||  _None_                  || ||
 
 
-==\Stages\ Directory==
+==\stages\ Directory==
 _*Note:* The stages folder is not required, however if it is present, there must be a "default.png" and a "practice.png" or FoFiX will crash_
 ||  _Filename_                  ||  _What is file for in FoFiX?_  ||  _Required?_ ||  _Related to Theme Type_ ||  _Notes_||
 ||  default.png                 ||  Default stage image           ||  Yes         ||  WIP                     || Stage background defaults to this image when no other images are present in this folder, or slideshow mode is set to "off". This image _is_ included in normal stage rotation ||
