@@ -76,12 +76,13 @@ Then use any of the following settings below the {{{[theme]}}} header in the the
 ==Loading Phrase Screen==   
 
 ||_*Item Name*_||_*What it Does/How to use it*_||
+||loading_font_scale = 0.0015||Loading phrase font scale.||
+||loading_line_spacinge = 1.0||Controls the amount of line spacing. Default is 1 if not used.||
+||loading_phrase = How good are You?||Put an underscore between each phrase for multiple phrases||   
+||loading_right_margin = 1.0||X offset from right side of the screen.||
+||loading_text_color = #FFFFFF||Controls the Loading phrase color. Use a Hex Color Value.||
 ||loading_X = .5||X Position of Phrase positioning on screen. Use a decimal # between 0-1||
 ||loading_Y = .595||Y Position of Phrase positioning on screen. Use a decimal # between 0-1||
-||loading_phrase = How good are You?||Put an underscore between each phrase for multiple phrases||   
-||loading_text_color = #FFFFFF||Controls the Loading phrase color. Use a Hex Color Value.||
-||loading_font_scale = 0.0015||Loading phrase font scale.||
-||loading_right_margin = 1.0||X offset from right side of the screen.||
 
 
 Notice - If you just want the default phrases to show do not put these in your theme.ini
