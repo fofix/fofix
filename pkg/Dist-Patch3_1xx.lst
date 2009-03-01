@@ -6,7 +6,7 @@
 "doc\*.*"//all other doc files
 "data\library.zip"//library
 "data\versiontag.png"//taggin
-"..\FoFiX-wiki\*.*"//all wiki pages
+"wiki\*.*"//all wiki pages
 //-------Additional files required over 3.100--------
 //-------Additional / updated compiled .PYDs required over 3.100--------
 "data\_compiled_base.pyd"//new

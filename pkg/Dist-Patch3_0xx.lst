@@ -7,7 +7,7 @@
 "doc\*.*"//all other doc files
 "data\library.zip"//library
 "data\versiontag.png"//taggin
-"..\FoFiX-wiki\*.*"//all wiki pages
+"wiki\*.*"//all wiki pages
 //-------Additional files required over 3.000--------
 "data\_sqlite.pyd"//new compiled module
 "data\pitchbend.pyd"//new compiled module
