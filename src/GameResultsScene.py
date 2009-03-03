@@ -168,7 +168,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     
     self.starScoring = self.engine.config.get("game", "star_scoring")
     self.starMass    = [0 for i in self.scoring]
-    self.oldStar     = [0 for i in self.scoring]
+    self.oldStars    = [0 for i in self.scoring]
     
     self.cheerLoopDelay  = Theme.crowdLoopDelay
     if self.cheerLoopDelay == None:
@@ -193,7 +193,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       self.finalScore[i]    = int(scoreCard.score * (scoreCard.handicapValue/100.0))
       self.originalScore[i] = scoreCard.score
       self.starMass[i] = 100 * scoreCard.stars
-      self.oldStar     = scoreCard.stars
+      self.oldStars[i] = scoreCard.stars
       
       for j in range(a):
         if (scoreCard.handicap>>j)&1 == 1:
@@ -309,7 +309,6 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     #self.starFC = self.engine.data.starFC
     #self.fcStars = self.engine.data.fcStars
     #self.maskStars = self.engine.data.maskStars
-    
     titleFormat = Theme.result_song_form
     if not titleFormat:
       titleFormat = 0
@@ -364,7 +363,6 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           self.part[i] = self.partLoad
 
     self.partLoad = None
-
     
     phrase = random.choice(Theme.resultsPhrase.split("_"))
     if phrase == "None":
