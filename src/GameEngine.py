@@ -806,7 +806,7 @@ class GameEngine(Engine):
             star = self.data.star1
         self.drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), stretched=11)
 
-
+  #blazingamer - cleans up the work for rendering an image
   #volshebnyi - now images can be resized to fit to screen
   def drawImage(self, image, scale, coord, rot = 0, color = (1,1,1,1), rect = (0,1,0,1), stretched = 0, lOffset = 0.0, rOffset = 0.0):
     
@@ -827,6 +827,96 @@ class GameEngine(Engine):
     image.transform.translate(coord[0],coord[1])
     image.draw(color = color, rect = rect, lOffset = lOffset, rOffset = rOffset)
 
+  #blazingamer - simplifies tex rendering
+  def draw3Dtex(self, image, vertex, texcoord, coord = None, scale = None, rot = None, color = (1,1,1), multiples = False, alpha = False, depth = False, vertscale = 0):
+
+#####how to set items#####
+  
+
+##    tex = self.xxx
+##    tells the system which image/resource should be mapped to the plane
+##  
+##    rot = (degrees, x-axis, y-axis, z-axis)
+##    a digit in the axis is how many times you want to rotate degrees around that axis
+##
+##    scale = (x,y,z)
+##    scales an glplane how far in each direction
+##
+##    coord = (x,y,z)
+##    where on the screen the plane will be rendered within the 3d field
+##
+##    vertex = (Left, Top, Right, Bottom)
+##    sets the points that define where the plane will be drawn
+##
+##    texcoord = (Left, Top, Right, Bottom)
+##    sets where the texture should be drawn on the plane
+##
+##    multiples = True/False
+##    defines whether or not there should be multiples of the plane drawn at the same time
+##    only really used with the rendering of the notes, keys, and flames
+##
+##    alpha = True/False
+##    defines whether or not the image should have black turned into transparent
+##    only really used with hitglows and flames
+##
+##    color = (r,g,b)
+##    sets the color of the image when rendered 0 = No Color, 1 = Full color
+##
+##    depth = True/False
+##    sets the depth by which the object is rendered
+##    only really used by keys and notes
+##      
+##    vertscale = #
+##    changes the yscale when setting vertex points
+##    only really used by notes
+
+    if alpha == True:
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE)
+
+    if enumerate(color) == 4:
+      glColor4f(color[0],color[1],color[2], color[3])
+    else:
+      glColor3f(color[0],color[1],color[2])
+    
+    glEnable(GL_TEXTURE_2D)  
+    image.texture.bind()
+    
+    if multiples == True:
+      glPushMatrix()
+      
+    if coord != None:
+      glTranslate(coord[0], coord[1], coord[2])
+    if rot != None:
+      glRotate(rot[0], rot[1], rot[2], rot[3])
+    if scale != None:
+      glScalef(scale[0], scale[1], scale[2])
+
+    if depth == True:
+      glDepthMask(1)
+      
+    glBegin(GL_TRIANGLE_STRIP)
+    
+    glTexCoord2f(texcoord[0], texcoord[1])
+    glVertex3f(vertex[0], vertscale, vertex[1])
+    glTexCoord2f(texcoord[2], texcoord[1])
+    glVertex3f(vertex[2], vertscale, vertex[1])
+    glTexCoord2f(texcoord[0], texcoord[3])
+    glVertex3f(vertex[0], -vertscale, vertex[3])
+    glTexCoord2f(texcoord[2], texcoord[3])
+    glVertex3f(vertex[2], -vertscale, vertex[3])
+      
+    glEnd()
+    
+    if depth == True:
+      glDepthMask(0)
+      
+    if multiples == True:
+      glPopMatrix()
+
+    glDisable(GL_TEXTURE_2D)
+    
+    if alpha == True:
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)                
   #glorandwarf: renamed to retrieve the path of the file
   def fileExists(self, fileName):
     return self.data.fileExists(fileName)
