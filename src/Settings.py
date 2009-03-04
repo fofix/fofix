@@ -256,7 +256,6 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "game", "decimal_places", autoApply = True), #MFH
       ConfigChoice(engine, engine.config, "game", "ignore_open_strums", autoApply = True),      #myfingershurt
       ConfigChoice(engine, engine.config, "game", "big_rock_endings", autoApply = True, isQuickset = 2),#myfingershurt
-      ConfigChoice(engine, engine.config, "game", "big_rock_logic", autoApply = True),#volshebnyi
       ConfigChoice(engine, engine.config, "game", "starpower_mode", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "party_time", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "keep_play_count", autoApply = True),
@@ -444,6 +443,16 @@ class SettingsMenu(Menu.Menu):
     ]
     keySettingsMenu = Menu.Menu(engine, keySettings)
     
+    neckTransparency = [      #volshebnyi
+      ConfigChoice(engine, engine.config, "game", "necks_alpha", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "neck_alpha", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "solo_neck_alpha", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "bg_neck_alpha", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "fail_neck_alpha", autoApply = True), 
+      ConfigChoice(engine, engine.config, "game", "overlay_neck_alpha", autoApply = True),  
+    ]
+    neckTransparencyMenu = Menu.Menu(engine, neckTransparency)
+              
     fretSettings = [
       ConfigChoice(engine, engine.config, "fretboard", "point_of_view", autoApply = True, isQuickset = 2),
       ConfigChoice(engine, engine.config, "game", "notedisappear", autoApply = True),
@@ -453,7 +462,8 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "game", "large_drum_neck", autoApply = True),      #myfingershurt
       ConfigChoice(engine, engine.config, "game", "bass_groove_neck", autoApply = True),      #myfingershurt
       ConfigChoice(engine, engine.config, "game", "guitar_solo_neck", autoApply = True),      #myfingershurt
-      ConfigChoice(engine, engine.config, "game", "incoming_neck_mode", autoApply = True, isQuickset = 1),      #myfingershurt
+      ConfigChoice(engine, engine.config, "game", "incoming_neck_mode", autoApply = True, isQuickset = 1),      #myfingershurt 
+      (_("Change Neck Transparency"), neckTransparencyMenu), #volshebnyi
     ]
     fretSettingsMenu = Menu.Menu(engine, fretSettings)
     
@@ -469,7 +479,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "performance", "preload_glyph_cache", autoApply = True, isQuickset = 1),#evilynux
       ConfigChoice(engine, engine.config, "performance", "static_strings", autoApply = True, isQuickset = 1),      #myfingershurt
       ConfigChoice(engine, engine.config, "performance", "killfx", autoApply = True, isQuickset = 1),   #blazingamer
-      ConfigChoice(engine, engine.config, "video",  "special_fx", autoApply = True, isQuickset = 1), #volshebnyi
+      #ConfigChoice(engine, engine.config, "video",  "special_fx", autoApply = True, isQuickset = 1), #volshebnyi
     ]
     AdvancedVideoSettingsMenu = Menu.Menu(engine, AdvancedVideoSettings)
     

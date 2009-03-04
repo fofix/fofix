@@ -125,6 +125,14 @@ class Drum:
     self.freestyleReady = False
     self.freestyleOffset = 5
     self.freestyleSP = False
+    
+    self.neckAlpha=[] # necks transparency
+    self.neckAlpha.append( self.engine.config.get("game", "necks_alpha") ) # all necks
+    self.neckAlpha.append( self.neckAlpha[0] * self.engine.config.get("game", "neck_alpha") ) # solo neck
+    self.neckAlpha.append( self.neckAlpha[0] * self.engine.config.get("game", "solo_neck_alpha") ) # solo neck
+    self.neckAlpha.append( self.neckAlpha[0] * self.engine.config.get("game", "overlay_neck_alpha") ) # overlay neck
+    self.neckAlpha.append( self.neckAlpha[0] * self.engine.config.get("game", "fail_neck_alpha") ) # fail neck
+    
 
     #self.drumFillOnScreen = False   #MFH 
     self.drumFillEvents = []
@@ -167,8 +175,7 @@ class Drum:
 
     self.incomingNeckMode = self.engine.config.get("game", "incoming_neck_mode")
     self.guitarSoloNeckMode = self.engine.config.get("game", "guitar_solo_neck")
-    self.bigRockEndings = self.engine.config.get("game", "big_rock_endings")    
-    self.bigRockLogic = self.engine.config.get("game", "big_rock_logic") #volshebnyi
+    self.bigRockEndings = self.engine.config.get("game", "big_rock_endings")
 
 
     
@@ -706,12 +713,7 @@ class Drum:
                 color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1.0 * visibility * f)
                 glPushMatrix()
                 glTranslatef(x, (1.0 - visibility) ** (theFret + 1), z)
-                  
-                # Volshebnyi - extra tail for bonus fret
-                if self.bigRockLogic == 1 and theFret == self.freestyleBonusFret:
-                  freestyleTailMode = 2
-                else:
-                  freestyleTailMode = 1
+                freestyleTailMode = 1
                 
                 self.renderTail(length = length, color = color, fret = theFret, freestyleTail = freestyleTailMode, pos = pos)
                 glPopMatrix()
@@ -871,10 +873,10 @@ class Drum:
       neck = self.neckDrawing
 
     if not (self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 2):
-      self.renderNeckMethod(v, offset, beatsPerUnit, neck)
+      self.renderNeckMethod(v*self.neckAlpha[1], offset, beatsPerUnit, neck)
       
     if self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 2:   #static overlay
-      self.renderNeckMethod(v, 0, beatsPerUnit, self.guitarSoloNeck)
+      self.renderNeckMethod(v*self.neckAlpha[2], 0, beatsPerUnit, self.guitarSoloNeck)
       
     if self.spcount2 != 0 and self.spcount < 1.2 and self.oNeck:   #static overlay
       if self.oNeckovr != None and (self.scoreMultiplier > 4 or self.guitarSolo):
@@ -882,7 +884,7 @@ class Drum:
       else:
         neck = self.oNeck
           
-      self.renderNeckMethod(self.spcount, offset, beatsPerUnit, neck)
+      self.renderNeckMethod(self.spcount*self.neckAlpha[3], offset, beatsPerUnit, neck)
       
     if self.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and (self.scoreMultiplier > 4 or self.guitarSolo):   #static overlay
 
@@ -892,10 +894,10 @@ class Drum:
         neck = self.oNeck
         alpha = True
 
-      self.renderNeckMethod(v, offset, beatsPerUnit, neck, alpha)
+      self.renderNeckMethod(v*self.neckAlpha[3], offset, beatsPerUnit, neck, alpha)
       
     if self.isFailing:
-      self.renderNeckMethod(self.failcount, 0, beatsPerUnit, self.failNeck)
+      self.renderNeckMethod(self.failcount*self.neckAlpha[4], 0, beatsPerUnit, self.failNeck)
 
   def drawTrack(self, visibility, song, pos):
     if not song:
@@ -1226,11 +1228,7 @@ class Drum:
       tailGlow = 1 - (pos - self.freestyleLastFretHitTime[fret] ) / self.freestylePeriod
       if tailGlow < 0:
       	tailGlow = 0
-      color = (c1 + c1*2.0*tailGlow, c2 + c2*2.0*tailGlow, c3 + c3*2.0*tailGlow, c4*0.6 + c4*0.4*tailGlow)    #MFH - this fades inactive tails' color darker       
-    if freestyleTail == 2:
-      #glColor4f(*color)
-      c1, c2, c3, c4 = color
-      color = (c1*3.0, c2*3.0, c3*3.0, c4)    #volshebnyi - bonus fret tail              
+      color = (c1 + c1*2.0*tailGlow, c2 + c2*2.0*tailGlow, c3 + c3*2.0*tailGlow, c4*0.6 + c4*0.4*tailGlow)    #MFH - this fades inactive tails' color darker                   
       
     glColor4f(*color)
     

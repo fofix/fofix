@@ -2906,16 +2906,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         numFreestyleHits = guitar.freestylePick(self.song, pos, self.controls)
         if numFreestyleHits>0 or guitar.isDrum:
           if guitar.freestyleFirstHit + guitar.freestyleLength < pos :
+          
             guitar.freestyleFirstHit = pos
-            if guitar.bigRockLogic == 1 :
-                self.guitars[num].freestylePeriod = 1500
-                score = 450
-                guitar.freestyleBaseScore = 300
-                guitar.freestyleBonusFret = random.randint(0,4)
-            if guitar.bigRockLogic == 2 :
-                guitar.freestylePeriod = 1500
-                guitar.freestyleBaseScore = 150
-                score = 600 * numFreestyleHits
+            guitar.freestylePeriod = 1500
+            guitar.freestyleBaseScore = 150
+            score = 600 * numFreestyleHits
             if guitar.isDrum:
                 guitar.drumFillsHits = 0
             guitar.freestyleLastHit = pos - guitar.freestylePeriod
@@ -2927,27 +2922,17 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             #if guitar.freestyleSP:   #MFH - this logic should be in the run() function, not conditional here...
             #  self.activateSP(num)
             #  guitar.freestyleSP = False
-  
-          if guitar.bigRockLogic == 0 or guitar.bigRockLogic == 1:
-            brzoneremain = ( guitar.freestyleLength - pos + guitar.freestyleFirstHit ) / guitar.freestyleLength
-            hitspeed = min(( pos - guitar.freestyleLastHit ) / guitar.freestylePeriod, 1.0)
-            if guitar.bigRockLogic == 1 and numFreestyleHits == 1:
-              if self.controls.getState(guitar.keys[guitar.freestyleBonusFret]) or ( guitar.isDrum and guitar.freestyleBonusFret>0 and self.controls.getState(guitar.keys[guitar.freestyleBonusFret+4]) ):
-                hitspeed = 1.0
-                guitar.freestyleBonusFret = random.randint(0,4)
-            score = int( score +  guitar.freestyleBaseScore * hitspeed * ( guitar.freestylePercent + ( 100 - guitar.freestylePercent )  * brzoneremain ) / 100 )
-            guitar.freestyleLastHit = pos
-                
-          if guitar.bigRockLogic == 2:
-            if self.controls.getState(guitar.keys[0]):
-              hitspeed = min((pos - guitar.freestyleLastFretHitTime[0]) / guitar.freestylePeriod, 1.0)
+
+          if self.controls.getState(guitar.keys[0]):
+            hitspeed = min((pos - guitar.freestyleLastFretHitTime[0]) / guitar.freestylePeriod, 1.0)
+            score += guitar.freestyleBaseScore * hitspeed
+          for fret in range (1,5):
+            if self.controls.getState(guitar.keys[fret]) or ( guitar.isDrum and self.controls.getState(guitar.keys[fret+4])):
+              hitspeed = min((pos - guitar.freestyleLastFretHitTime[fret]) / guitar.freestylePeriod, 1.0)
               score += guitar.freestyleBaseScore * hitspeed
-            for fret in range (1,5):
-              if self.controls.getState(guitar.keys[fret]) or ( guitar.isDrum and self.controls.getState(guitar.keys[fret+4])):
-                hitspeed = min((pos - guitar.freestyleLastFretHitTime[fret]) / guitar.freestylePeriod, 1.0)
-                score += guitar.freestyleBaseScore * hitspeed
-            if numFreestyleHits > 0:    #MFH - to prevent a float division!
-              score = int ( score / numFreestyleHits )
+          if numFreestyleHits > 0:    #MFH - to prevent a float division!
+            score = int ( score / numFreestyleHits )
+          
           if self.controls.getState(guitar.keys[0]):
             guitar.freestyleLastFretHitTime[0] = pos
           for fret in range (1,5):
