@@ -14,6 +14,11 @@ It will list what directory they belong in, and if they are Required or if they 
 <BR>This is WIP status until completed. Then it will just be maintained as things are added.
 <BR>*As of March 1 2009, all _required_ images (i.e. those that if missing, FoFiX will crash) are listed*
 
+<wiki:comment>
+|| This comment puts the tables underneath the nav bar on the side and makes it take up the whole width of the page ||
+|| This comment needs to contain a table for some reason, or it won't have the desired effect || (I don't get it either) ||
+</wiki:comment>
+
 ==Main Theme Directory==
 ||  _Filename_                  ||  _What is file for in FoFiX?_                  ||  _Required?_ ||  _Related to Theme Type_ ||  _Notes_||
 ||  bpm_beat.png                || Line across the fretboard every beat           || Yes          || All                      || ||
@@ -32,8 +37,8 @@ It will list what directory they belong in, and if they are Required or if they 
 ||  hitglow2.png                || Shines when holding a sustain                  || Yes          || All                      || ||
 ||  lightning.png               || Flashes when star power is gained              || GH Based     || GH Based                 || ||
 ||  loadingbg.png               || Shows while loading                            || Yes          || All                      || Loading phrases are displayed on this screen also||
-||  mult.png                    || Displays current multiplier                    || Yes          || All                      || Split into 8 vertically (for 1x,2x,3x,4x and sp:2x,4x,6x,8x) is displayed to the left under reockmeter.png for GH2/GH3 based themes, below the fret buttons and overdrive meter in RB based themes, and along the right-hand side of the fretboard about mid-way up on GHWT themes ||
-||  notes.png                   || Notes that come down the fretboard to be hit   || Yes          || All                      || Split into 5 horizontally (one for each coloured note). In GH themes it is split into 5 vertically (normal notes, hopo notes, star notes, hopo star notes, and the last row contains one sp active note on the left, followed by a sp active hopo note). In RB based themes it is spit into 6 vertically (normal notes, hopo notes, overdrive notes, overdrive hopo notes, overdrive active notes, overdrive active hopos) ||
+||  mult.png                    || Displays current multiplier                    || Yes          || All                      || Split into 8 rows (for 1x,2x,3x,4x and sp:2x,4x,6x,8x) is displayed to the left under reockmeter.png for GH2/GH3 based themes, below the fret buttons and overdrive meter in RB based themes, and along the right-hand side of the fretboard about mid-way up on GHWT themes ||
+||  notes.png                   || Notes that come down the fretboard to be hit   || Yes          || All                      || Split into 5 columns (one for each coloured note). In GH themes it is split into 5 rows (normal notes, hopo notes, star notes, hopo star notes, and the last row contains one sp active note on the left, followed by a sp active hopo note). In RB based themes it is spit into 6 rows (normal notes, hopo notes, overdrive notes, overdrive hopo notes, overdrive active notes, overdrive active hopos) ||
 ||  overdrive bottom.png        || Bottom layer of overdrive meter                || RB Based     || RB Based                 || ||
 ||  overdrive fill.png          || Indicates how much overdrive is collected      || RB Based     || RB Based                 || Revealed from left to right as more overdrive (starpower) is collected. For example, if you have 45% full overdrive, it will show the leftmost 45% of the image.||
 ||  overdrive top.png           || Top layer of overdrive meter                   || RB Based     || RB Based                 || Displays on top of overdrive bottom and overdrive fill.||
@@ -54,7 +59,7 @@ It will list what directory they belong in, and if they are Required or if they 
 ||  spfill.png                  || Fills up as star power is collected            || GH2 Based    || GH2 Based                || ||
 ||  sptop.png                   || Top layer of star power meter                  || GH2 Based    || GH2 Based                || ||
 ||  spfull.png                  || _Unknown_                                      || GH2 Based    || GH2 Based                || _This image does not appear to ever display, however it is still required for GH2 based themes_||
-||  splight.png                 || Star power indication lights                   || GH3 / GH:WT  || GH3 / GH:WT Based        || Split into 3 horizontally: left - unlit globe (no starpower), middle - lit globe (star power collected), right - glowing globe (star power ready/active). As star power builds, one of the "lit" globes wil fade in over the top of the unlit globe image. Also, only 3 globes are displayed initally. When starpower is ready, the other 3 display (larger than the first 3). When not in use, these larger globes are still rendered under rock_low/rock_med/rock_high||
+||  splight.png                 || Star power indication lights                   || GH3 / GH:WT  || GH3 / GH:WT Based        || Split into 3 columns: left - unlit globe (no starpower), middle - lit globe (star power collected), right - glowing globe (star power ready/active). As star power builds, one of the "lit" globes wil fade in over the top of the unlit globe image. Also, only 3 globes are displayed initally. When starpower is ready, the other 3 display (larger than the first 3). When not in use, these larger globes are still rendered under rock_low/rock_med/rock_high||
 ||  star1.png                   || Empty star for game results                    || Yes          || All                      || ||
 ||  star2.png                   || Star displayed for game results star ranking   || Yes          || All                      || To indicate a perfect ranking, these images will be rendered green in GH-based themes and yellow (gold) in RB Based themes||
 ||  youfailed.png               || Indication that you failed a song              || Yes          || All                      || Appears for a few seconds before the failure menu is displayed||
@@ -91,26 +96,55 @@ It will list what directory they belong in, and if they are Required or if they 
 
 ==\dots\ Directory==
 _*Note:* This folder is required only on GH2 based themes. It contains all images required for displaying "dots" (how many notes hit until multiplier increases_
-||  _Filename_                  ||  _What is file for in FoFiX?_  ||  _Required?_ ||  _Related to Theme Type_ ||  _Notes_||
-||  basedots.png                ||  Base image for no dots        ||  GH2 Based   ||  GH2 Based               ||  All these images are displayed on the left, over the score meter (rockmeter.png)||
-||  dt{X}.png (where {X}=[1-9]  ||  Images for displaying dots 1-9||  GH2 Based   ||  GH2 Based               ||  ||
-||  dtfull.png                  ||  Image for all 10 dots on      ||  GH2 Based   ||  GH2 Based               ||  ||
+||  _Filename_                  ||  _What is file for in FoFiX?_  ||  _Required?_                 ||  _Related to Theme Type_ ||  _Notes_||
+||  basedots.png                ||  Base image for no dots        ||  GH2, if Dots folder present ||  GH2 Based               ||  All these images are displayed on the left, over the score meter (rockmeter.png)||
+||  dt{X}.png (where {X}=[1-9]) ||  Images for displaying dots 1-9||  GH2, if Dots folder present ||  GH2 Based               ||  ||
+||  dtfull.png                  ||  Image for all 10 dots on      ||  GH2, if Dots folder present ||  GH2 Based               ||  ||
 
 ==\menu\ Directory==
-||  _Filename_                  ||  _What is file for in FoFiX?_  ||  _Required?_ ||  _Related to Theme Type_ ||  _Notes_||
-||  mainbg.png                  ||  Main Menu Backround           ||  Yes         ||  WIP                     || ||
-||  maintext.png                ||  Main Menu Text                ||  Yes         ||  WIP                     || Divided into 6 rows, 2 columns for RB based themes and 5 rows, 2 columns for other themes ||
-||  neckchoosebg.png            ||  Neck select background        ||  Yes         ||  WIP                     || Staggered on GH themes, not on RB ones ||
-||  neckchooseselect.png        ||  Image that wraps selected neck||  Yes         ||  WIP                     || ||
-||  optionsbg.png               ||  Options background            ||  Yes         ||  WIP                     || ||
-||  optionspanel.png            ||  Pallet for options text       ||  Yes         ||  WIP                     || Small overlay on optionsbg for text to be displayed ||
-||  selected.png                ||  Highlights selected song      ||  Yes         ||  WIP                     || Used for "list" mode setlist view ||
-||  songchoosepaper.png         ||  Song select background        ||  Yes         ||  WIP                     || ||
-|| _neckchoosetext.png_         ||  _No longer used or necessary_ ||  _No_        ||  _None_                  || ||
+||  _Filename_                  ||  _What is file for in FoFiX?_                    ||  _Required?_                         ||  _Related to Theme Type_ ||  _Notes_||
+||  mainbg.png                  ||  Main Menu Backround                             || Yes                                  ||  All                     || ||
+||  maintext.png                ||  Main Menu Text                                  || Yes                                  ||  All                     || Divided into 5 rows ("Single Player", "Multiplayer", "Training", "Options", "Quit"), 2 columns (unselected, selected) for RB based themes and 6 rows ("Career", "Quickplay", "Multiplayer", "Training", "Options" "Quit"), 2 columns (unselected, selected) for other themes ||
+||  neckchoosebg.png            ||  Neck select background                          || Yes                                  ||  All                     || Staggered on GH themes, not on RB ones ||
+||  neckchooseselect.png        ||  Image that wraps selected neck                  || Yes                                  ||  All                     || ||
+||  optionsbg.png               ||  Options background                              || Yes                                  ||  All                     || ||
+||  optionspanel.png            ||  Pallet for options text                         || Yes                                  ||  All                     || Small overlay on optionsbg for text to be displayed ||
+||  selected.png                ||  Highlights selected song                        || Yes                                  ||  All                     || Used for "list" mode setlist view ||
+||  songchoosepaper.png         ||  Song select background                          || Yes                                  ||  All                     || ||
+|| _neckchoosetext.png_         ||  _No longer used or necessary_                   || _No_                                 ||  _None_                  || ||
+|| versiontag.png               || Graphical version tag on main and options menus  || No (Fallback: \data\versiontag.png)  || All                      || Displayed in centre of screen and scaled to fit horizontally. _*Note:* It is reccommended that you *do not* use this in your theme and leave the fallback in place, as the fallback disaplys the current FoFiX version_ ||
+|| settings.png                 || Background for graphical settings menu           || No (Fallback: optionsbg.png)         || All                      || Both "settings.png" and "settingstext9.png" must be present for graphical settings menu to display ||
+|| settingstext9.png            || Graphical text for settings menu                 || No                                   || All                      || Divided into 9 rows ("Gameplay Settings", "Control Settings", "Display Settings", "Audio Settings", "Setlist Settings", "Mods, Cheats, AI", "Credits", "Quickset", "See Advanced Options") and 2 columns (unselected, selected) ||
+|| advsettings.png              || Background for graphical advanced settings menu  || No (Fallback: optionsbg.png)         || All                      || Both "advsettings.png" and "advsettingstext10.png" must be present for graphical advanced settings menu to display  ||
+|| advsettingstext10.png        || Graphical text for advanced settings menu        || No                                   || All                      || Divided into 10 rows ("Gameplay Settings", "Control Settings", "Display Settings", "Audio Settings", "Setlist Settings", "Advanced Settings", "Mods, Cheats, AI", "Credits", "Quickset", "Hide Advanced Options") and 2 columns (unselected, selected) ||
+|| training.png                 || Background for graphical training menu           || No (Fallback: optionsbg.png)         || All                      || Both "training.png" and "trainingtext2.png" must be present for graphical training menu to display ||
+|| trainingtext2.png            || Graphical text for training menu                 || No                                   || All                      || Divided into 2 rows ("Tutorials", "Practice") and 2 columns (unselcected, selected) ||
+|| multiplayer.png              || Background for graphical multiplayer menu        || No (Fallback: optionsbg.png)         || All                      || Both "multiplayer.png" and "multiplayertext{3, 5, 6}.png" must be present for graphical multiplayer menu to display. _Note: The text image required is dependant on theme. See below_ ||
+|| multiplayertext5.png         || Graphical text for multiplayer menu              || No                                   || GH Based (with coop imgs)|| Divided into 5 rows ("Face-Off", "Pro Face-Off", "Party Mode", "(GH) Co-op", "FoFiX Co-Op") and 2 columns (unselected, selected) ||
+|| multiplayertext3.png         || Graphical text for multiplayer menu              || No                                   || GH Based (w/o coop imgs) || Divided into 3 rows ("Face-Off", "Pro Face-Off", "Party Mode") and 2 columns (unselected, selected) ||
+|| multiplayertext6.png         || Graphical text for multiplayer menu              || No                                   || RB Based                 || Divided into 6 rows ("FoFiX Co-Op", "RB Co-Op", "GH Co-op", "Face-Off", "Pro Face-Off", "Party Mode") and 2 columns (unselected, selected) ||
+|| solo.png                     || Background for graphical solo menu               || No                                   || RB Based                 || Both "solo.png" and "solotext2.png" must be present for graphical solo menu to display ||
+|| solotext2.png                || Graphical text for solo menu                     || No                                   || RB Based                 || Divided into 2 rows ("Career" ("Solo Tour"), "Quickplay") and 2 columns (unselected, selected) ||
+|| preview.png                  || Overlay on the setlist                           || No                                   || All                      || Displayed in centre of screen and scaled to fit horizontally. Usually used to indicate what buttons do on the setlist. Completely optional. ||
+|| songchooselistcd.png         || Background for List/CD mode setlist              || No (Fallback: songchoosepaper.png)   || All (List/CD setlist)    || ||
+|| songchooserb2.png            || Background for RB2 mode setlist                  || No (Fallback: songchoosepaper.png)   || All (RB2 Setlist)        || ||
+|| selectedrb2.png              || Highlights selected song for RB2 mode setlist    || No (Fallback: selected.png)          || All (RB2 Setlist)        || ||
+|| tier.png                     || Displays behind tier titles in RB2 mode setlist  || No                                   || All (RB2 Setlist)        || ||
+|| diff1.png                    || Empty spot for difficulty rating                 || No (Fallback: star1.png)             || All (RB2 Setlist)        || Difficulty can be 0-6. 0 shows 5 diff1.png images, 1 shows 1 diff2.png and 4 diff1.png ... etc ... 5 shows 5 diff2.png and 6 shows 5 diff3.png ||
+|| diff2.png                    || Lit spot for difficulty rating                   || No (Fallback: star2.png)             || All (RB2 Setlist)        || ||
+|| diff3.png                    || Lit spot for highest difficulty rating           || No (Fallback: star2.png [tinted])    || All (RB2 Setlist)        || If there is no "diffX.png" images, the star images will be used. For difficulty of 6, 5 star2.png will be shown, tinted in the "perfect" color (Green for GH and yellow/gold for RB) ||
+|| emptylabel.png               || Label displayed when no label found for song     || No                                   || All (RB2 Setlist)        || Should be square, like any "album" label. Will display as label if no label is found for the selected song ||
+|| lockedlabel.png              || Label displayed for locked song in career mode   || No                                   || All (RB2 Setlist)        || Should be square, like any "album" label. Will display as label when a song in career mode marked as locked is selected. ||
+|| random.png                   || Label displayed selecting random song            || No                                   || All (RB2 Setlist)        || Should be square, like any "album" label. Will display as label for the "Random song" selection ||
 
+<wiki:comment>
+These aren't used yet, but are included in RB2 and GH3?
+|| credits.png                  || Background for credits screen                    || No (Fallback: optionsbg.png) || All                      || ||
+|| creditstop.png               || Title for credits screen                         || No                           || All                      || ||
+</wiki:comment>
 
 ==\stages\ Directory==
 _*Note:* The stages folder is not required, however if it is present, there must be a "default.png" and a "practice.png" or FoFiX will crash_
-||  _Filename_                  ||  _What is file for in FoFiX?_  ||  _Required?_ ||  _Related to Theme Type_ ||  _Notes_||
-||  default.png                 ||  Default stage image           ||  Yes         ||  WIP                     || Stage background defaults to this image when no other images are present in this folder, or slideshow mode is set to "off". This image _is_ included in normal stage rotation ||
-||  pratice.png                 ||  Stage image in practice mode  ||  Yes         ||  WIP                     || This is displayed in the background of practice mode gameplay for guitar, and if no instrument specific practice stage is found ||
+||  _Filename_                  ||  _What is file for in FoFiX?_  ||  _Required?_                   ||  _Related to Theme Type_ ||  _Notes_||
+||  default.png                 ||  Default stage image           ||  Yes, if Stages folder present ||  All                     || Stage background defaults to this image when no other images are present in this folder, or slideshow mode is set to "off". This image _is_ included in normal stage rotation ||
+||  pratice.png                 ||  Stage image in practice mode  ||  Yes, if Stages folder present ||  All                     || This is displayed in the background of practice mode gameplay for guitar, and if no instrument specific practice stage is found ||
