@@ -2548,14 +2548,14 @@ class Guitar:
           ff += 1.5 #ff first time is 2.75 after this
 
           if self.Hitanim2 == True:
+            self.HCount2 = self.HCount2 + 1
+            self.HCountAni = False
+            if self.HCount2 > 12:
+              if event.length <= 130:
+                self.HCount2 = 0
+              else:
+                self.HCountAni = True
             if event.flameCount < flameLimitHalf:
-                self.HCount2 = self.HCount2 + 1
-                self.HCountAni = False
-                if self.HCount2 > 12:
-                  if event.length <= 130:
-                    self.HCount2 = 0
-                  else:
-                    self.HCountAni = True
 
                   
                 HIndex = (self.HCount2 * 13 - (self.HCount2 * 13) % 13) / 13
