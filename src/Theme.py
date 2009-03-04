@@ -271,6 +271,8 @@ Config.define("theme", "song_list_display",       int, None)
 Config.define("theme", "fail_bkg",       str, "0.5,0.5,1.0,1.0")
 Config.define("theme", "fail_text_x",       float, None)
 Config.define("theme", "fail_text_y",       float, None)
+Config.define("theme", "fail_songname_x",  float, 0.5)
+Config.define("theme", "fail_songname_y",  float, 0.35)
 
 submenuX = {}
 submenuY = {}
@@ -770,11 +772,13 @@ def setupTWOD(config):
 
 #racer:
 def setupFail(config):
-  global fail_bkg_pos, fail_text_xPos, fail_text_yPos
+  global fail_bkg_pos, fail_text_xPos, fail_text_yPos, fail_songname_xPos, fail_songname_yPos
 
   fail_bkg_pos = config.get("theme", "fail_bkg").split(",")
   fail_text_xPos = config.get("theme", "fail_text_x")
   fail_text_yPos = config.get("theme", "fail_text_y")
+  fail_songname_xPos = config.get("theme", "fail_songname_x") 
+  fail_songname_yPos = config.get("theme", "fail_songname_y") 
 
 def setupRockmeter(config):
   global rmtype

@@ -1673,6 +1673,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.fail_text_color = Theme.hexToColor(Theme.fail_text_colorVar)
     self.fail_selected_color = Theme.hexToColor(Theme.fail_selected_colorVar)
     self.fail_completed_color = Theme.hexToColor(Theme.fail_completed_colorVar)
+    
 
     settingsMenu = Settings.GameSettingsMenu(self.engine, self.pause_text_color, self.pause_selected_color)
     settingsMenu.fadeScreen = False
@@ -1709,6 +1710,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.fail_bkg = [float(i) for i in Theme.fail_bkg_pos]
     self.fail_text_x = Theme.fail_text_xPos
     self.fail_text_y = Theme.fail_text_yPos
+    self.failSongPos=(Theme.fail_songname_xPos,Theme.fail_songname_yPos)
 
     if self.fail_text_x == None:
       self.fail_text_x = .5-size[0]/2.0
@@ -5601,13 +5603,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
                 text = Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
                 size = font.getStringSize(text)
-                font.render(text, (.5-size[0]/2.0,.35-size[1]))
+                font.render(text, (self.failSongPos[0]-size[0]/2.0,self.failSongPos[1]-size[1]))
                 #now = self.getSongPosition()
                 pctComplete = min(100, int(now/self.lastEvent*100))
                 #text = str(pctComplete) + _("% Complete")
                 text = "%s%s" % ( str(pctComplete), self.tsPercentComplete )
                 size = font.getStringSize(text)
-                font.render(text, (.5-size[0]/2.0, .35))
+                font.render(text, (self.failSongPos[0]-size[0]/2.0, self.failSongPos[1]))
                 if not self.failEnd:
                   self.failGame()
   
@@ -7019,7 +7021,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
                 text = Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
                 size = font.getStringSize(text)
-                font.render(text, (0.5-size[0]/2.0,0.3-size[1]))
+                font.render(text, (self.failSongPos[0]-size[0]/2.0,self.failSongPos[1]-size[1]))
                 #now = self.getSongPosition()
 
                 pctComplete = min(100, int(now/self.lastEvent*100))
@@ -7027,7 +7029,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 #text = str(pctComplete) + self.tsPercentComplete
                 text = "%d%s" % (pctComplete, self.tsPercentComplete)
                 size = font.getStringSize(text)
-                font.render(text, (0.5-size[0]/2.0, 0.3))
+                font.render(text, (self.failSongPos[0]-size[0]/2.0, self.failSongPos[1]))
                 if not self.failEnd:
                   self.failGame()
     
