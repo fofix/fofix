@@ -1413,6 +1413,14 @@ class Track:
     if (time, event) in self.allEvents:
       self.allEvents.remove((time, event))
 
+  def getNextEvent(self, lookAhead = 0):  #MFH
+    if self.maxIndex != None and self.currentIndex != None:
+      #lookAhead > 0 means look that many indices ahead of the Next event
+      if (self.currentIndex + lookAhead) <= self.maxIndex:
+        return self.allEvents[self.currentIndex + lookAhead]
+    return None
+  
+
   def getEvents(self, startTime, endTime):
     t1, t2 = [int(x) for x in [startTime / self.granularity, endTime / self.granularity]]
     if t1 > t2:
