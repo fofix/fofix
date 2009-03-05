@@ -1419,9 +1419,10 @@ class Track:
       self.allEvents.remove((time, event))
       
       #MFH - tracking track size
-      self.maxIndex -= 1
-      if self.maxIndex < 0:
-        self.maxIndex = None
+      if self.maxIndex != None:
+        self.maxIndex -= 1
+        if self.maxIndex < 0:
+          self.maxIndex = None
 
   def getNextEvent(self, lookAhead = 0):  #MFH
     if self.maxIndex != None and self.currentIndex != None:
