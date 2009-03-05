@@ -1404,6 +1404,11 @@ class Track:
         self.events = self.events + [[] for n in range(n)]
       self.events[t].append((time - (t * self.granularity), event))
     self.allEvents.append((time, event))
+    
+    if self.maxIndex == None:   #MFH - tracking track size
+      self.maxIndex = 0
+    else:
+      self.maxIndex += 1
 
   def removeEvent(self, time, event):
     for t in range(int(time / self.granularity), int((time + event.length) / self.granularity) + 1):
@@ -1412,6 +1417,11 @@ class Track:
         self.events[t].remove(e)
     if (time, event) in self.allEvents:
       self.allEvents.remove((time, event))
+      
+      #MFH - tracking track size
+      self.maxIndex -= 1
+      if self.maxIndex < 0:
+        self.maxIndex = None
 
   def getNextEvent(self, lookAhead = 0):  #MFH
     if self.maxIndex != None and self.currentIndex != None:
