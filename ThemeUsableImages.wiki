@@ -140,17 +140,38 @@ _*Note:* This folder is required only on GH2 based themes. It contains all image
 || emptylabel.png               || Label displayed when no label found for song     || No                                   || All (RB2 Setlist)        || Should be square, like any "album" label. Will display as label if no label is found for the selected song ||
 || lockedlabel.png              || Label displayed for locked song in career mode   || No                                   || All (RB2 Setlist)        || Should be square, like any "album" label. Will display as label when a song in career mode marked as locked is selected. ||
 || random.png                   || Label displayed selecting random song            || No                                   || All (RB2 Setlist)        || Should be square, like any "album" label. Will display as label for the "Random song" selection ||
-|| pause.png                    || Overlay on pause menu in quickplay mode          || No                                   || GH Based (needs testing) || This overlay will only appear if pausetext5.png is present in GH-Based themes _(must check about pausetext6 on RB themes)_ ||
+|| pause.png                    || Overlay on pause menu in quickplay mode          || No                                   || All                      || This overlay will only appear if pausetext5.png is present in GH-Based themes or pausetext6.png is present in RB-Based themes ||
 || pausetext5.png               || Graphical text for pause menu in quickplay mode  || No                                   || GH Based                 || Divided into 5 rows ("Resume", "Restart", "End Song", "Options", "Quit") and two columns (unselected, selected) ||
-|| careerpause.png              || Overlay on pause menu in career mode             || No                                   || GH Based (needs testing) || This overlay will only appear if careerpausetext5.png is present in GH-Based themes _(must check about careerpausetext6 on RB themes)_ ||
+|| pausetext6.png               || Graphical text for pause menu in quickplay mode  || No                                   || RB Based                 || Divided into 6 rows ("Resume", "Restart", "Practice", "End Song", "Options", "Quit") and two columns (unselected, selected) ||
+|| careerpause.png              || Overlay on pause menu in career mode             || No                                   || GH Based (needs testing) || This overlay will only appear if careerpausetext5.png is present in GH-Based themes or careerpausetext6.png is present in RB-Based themes||
 || careerpausetext5.png         || Graphical text for pause menu in career mode     || No                                   || GH Based                 || Divided into 5 rows ("Resume", "Restart", "Practice", "Options", "Quit") and two columns (unselected, selected) ||
+|| careerpausetext6.png         || Graphical text for pause menu in career mode     || No                                   || RB Based                 || Divided into 6 rows ("Resume", "Restart", "Practice", "End Song", "Options", "Quit") and two columns (unselected, selected) ||
 || fail.png                     || Overlay on fail menu in quickplay mode           || No                                   || All                      || This overlay will only appear if failtext3.png is present ||
 || failtext3.png                || Graphical text for fail menu in quickplay mode   || No                                   || All                      || Divided into 3 rows ("Retry", "New Song", "Quit") and two columns (unselected, selected) ||
 || careerfail.png               || Overlay on fail menu in career mode              || No                                   || All                      || This overlay will only appear if careerfailtext4.png is present ||
 || careerfailtext4.png          || Graphical text for fail menu in career mode      || No                                   || All                      || Divided into 4 rows ("Retry", "Practice", "New Song", "Quit") and two columns (unselected, selected) ||
-|| _Unconfirmed / buggy files_  ||
-|| pausetext6.png               || Graphical text for pause menu in quickplay mode  || No                                   || RB Based                 || Divided into 6 rows ("Resume", "Restart", "Practice", "End Song", "Options", "Quit") and two columns (unselected, selected) ||
-|| careerpausetext6.png         || Graphical text for pause menu in career mode     || No                                   || RB Based                 || Divided into 6 rows ("Resume", "Restart", "Practice", "End Song", "Options", "Quit") and two columns (unselected, selected) ||
+
+==\menu\icon\ Directory==
+This folder contains icons to be displayed next to songs in the RB2 setlist. None of these files is required, and there is no set names, as names are specified in the song.inis.
+For example, if the song has the entry "icon=rb2" in its song.ini, then on the RB2 setlist next to that song it will display "\menu\icon\rb2.png". 
+Similarly, if the song has the entry "icon=gobbldygook" in its song.ini, then on the RB2 setlist next to that song it will display "\menu\icon\gobbldygook.png".
+<BR>Here is a list of some commonly used icon titles:
+ * gh1
+ * gh2
+ * gh2dlc
+ * gh3
+ * gh3dlc
+ * gh80s
+ * gha
+ * ph1
+ * ph2
+ * ph3
+ * ph4
+ * phm
+ * rb1
+ * rb2
+ * rbdlc
+ * rbtpk
 
 ==\stages\ Directory==
 _*Note:* The stages folder is not required, however if it is present, there must be a "default.png" and a "practice.png" or FoFiX will crash_
