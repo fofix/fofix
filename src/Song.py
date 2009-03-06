@@ -1431,6 +1431,13 @@ class Track:
         return self.allEvents[self.currentIndex + lookAhead]
     return None
   
+  def getPrevEvent(self, lookBehind = 0):  #MFH - lookBehind of 0 = return previous event.
+    if self.maxIndex != None and self.currentIndex != None:
+      #lookBehind > 0 means look that many indices behind of the Prev event
+      if (self.currentIndex - 1 - lookBehind) >= 0:
+        return self.allEvents[self.currentIndex - 1 - lookBehind]
+    return None
+  
 
   def getEvents(self, startTime, endTime):
     t1, t2 = [int(x) for x in [startTime / self.granularity, endTime / self.granularity]]
@@ -2328,6 +2335,7 @@ class Song(object):
     
     self.info         = SongInfo(infoFileName)
     self.tracks       = [[Track(self.engine) for t in range(len(difficulties))] for i in range(len(partlist))]
+    
     self.difficulty   = [difficulties[EXP_DIF] for i in partlist]
     self._playing     = False
     self.start        = 0.0
@@ -2366,6 +2374,8 @@ class Song(object):
     self.eventTracks       = [Track(self.engine) for t in range(0,5)]    #MFH - should result in eventTracks[0] through [4]
 
     self.midiEventTracks   = [[Track(self.engine) for t in range(len(difficulties))] for i in range(len(partlist))]
+
+    self.tempoEventTrack = Track(self.engine)   #MFH - need a separated Tempo/BPM track!
 
     self.breMarkerTime = None
 
@@ -2854,6 +2864,17 @@ class MidiReader(midi.MidiOutStream):
         if track < len(self.song.tracks[i]):
           self.song.tracks[i][track].addEvent(time, eventcopy)
 
+  def addTempoEvent(self, event, time = None):    #MFH - universal Tempo track handling
+    if not isinstance(event, Tempo):
+      return
+
+    if time is None:
+      time = self.abs_time()
+    assert time >= 0
+    
+    #add tempo events to the universal tempo track
+    self.song.tempoEventTrack.addEvent(time, event)
+
   def addSpecialMidiEvent(self, track, event, time = None):    #MFH
     if self.partnumber == -1:
       #Looks like notes have started appearing before any part information. Lets assume its part0
@@ -2910,6 +2931,7 @@ class MidiReader(midi.MidiOutStream):
     if not self.song.bpm:
       self.song.setBpm(bpm)
     self.addEvent(None, Tempo(bpm))
+    self.addTempoEvent(Tempo(bpm))  #MFH 
 
   def sequence_name(self, text):
     #if self.get_current_track() == 0:
