@@ -1407,6 +1407,7 @@ class Track:
     
     if self.maxIndex == None:   #MFH - tracking track size
       self.maxIndex = 0
+      self.currentIndex = 0
     else:
       self.maxIndex += 1
 
@@ -1423,6 +1424,7 @@ class Track:
         self.maxIndex -= 1
         if self.maxIndex < 0:
           self.maxIndex = None
+          self.currentIndex = None
 
   def getNextEvent(self, lookAhead = 0):  #MFH
     if self.maxIndex != None and self.currentIndex != None:
