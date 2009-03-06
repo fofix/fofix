@@ -2874,6 +2874,7 @@ class MidiReader(midi.MidiOutStream):
     
     #add tempo events to the universal tempo track
     self.song.tempoEventTrack.addEvent(time, event)
+    Log.debug("Tempo event added to Tempo track: " + str(time) + " - " + str(event.bpm) + "BPM" )
 
   def addSpecialMidiEvent(self, track, event, time = None):    #MFH
     if self.partnumber == -1:
