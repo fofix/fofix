@@ -58,6 +58,7 @@ except ImportError:
   except ImportError:
     canCache = False
 
+DEFAULT_BPM = 120.0
 DEFAULT_LIBRARY         = "songs"
 
 EXP_DIF     = 0
@@ -1362,8 +1363,8 @@ class PictureEvent(Event):
   def __init__(self, fileName, length):
     Event.__init__(self, length)
     self.fileName = fileName
-    
-class Track:
+
+class Track:    #MFH - Changing Track class to a base class.  NoteTrack and TempoTrack will extend it.
   granularity = 50
   
   def __init__(self, engine):
@@ -1379,11 +1380,11 @@ class Track:
     if self.logClassInits == 1:
       Log.debug("Track class init (song.py)...")
 
-    self.chordFudge = 1
+    #self.chordFudge = 1
 
-    self.hopoTick = engine.config.get("coffee", "hopo_frequency")
-    self.hopoTickCheat = engine.config.get("coffee", "hopo_freq_cheat")
-    self.songHopoFreq = engine.config.get("game", "song_hopo_freq")
+    #self.hopoTick = engine.config.get("coffee", "hopo_frequency")
+    #self.hopoTickCheat = engine.config.get("coffee", "hopo_freq_cheat")
+    #self.songHopoFreq = engine.config.get("game", "song_hopo_freq")
 
   def __getitem__(self, index):
     #if isinstance(index, slice):
@@ -1439,7 +1440,6 @@ class Track:
       if (self.currentIndex - 1 - lookBehind) >= 0:
         return self.allEvents[self.currentIndex - 1 - lookBehind]
     return None
-  
 
   def getEvents(self, startTime, endTime):
     t1, t2 = [int(x) for x in [startTime / self.granularity, endTime / self.granularity]]
@@ -1468,62 +1468,41 @@ class Track:
         if isinstance(event, MarkerNote):
           event.happened = False
 
-  #myfingershurt: this function may be commented out, but is left in for
-  #old INI file compatibility reasons
-  #def markTappable(self):
-    # Determine which notes are tappable. The rules are:
-    #  1. Not the first note of the track
-    #  2. Previous note not the same as this one
-    #  3. Previous note not a chord
-    #  4. Previous note ends at most 161 ticks before this one starts
-    #bpm             = None
-    #ticksPerBeat    = 480
-    #tickThreshold   = 161
-    #prevNotes       = []
-    #currentNotes    = []
-    #currentTicks    = 0.0
-    #prevTicks       = 0.0
-    #epsilon         = 1e-3
 
-    #def beatsToTicks(time):
-      #return (time * bpm * ticksPerBeat) / 60000.0
+class TempoTrack(Track):    #MFH - special Track type for tempo events
+  def __init__(self, engine):
+    Track.__init__(self, engine)
 
-    #if not self.allEvents:
-      #return
+  #MFH - TODO - create function to track current tempo in realtime based on time / position
+  #def getCurrentTempo(self, pos):   #MFH
+  
+  def searchCurrentTempo(self, pos):    #MFH - will hunt through all tempo events to find it - intended for use during initializations only!
+    foundBpm = None
+    foundTime = None
+    for time, event in self.allEvents:
+      if not foundBpm or not foundTime:
+        foundBpm = event.bpm
+        foundTime = time
+      else:
+        #MFH - want to discard if the foundTime is before pos, but this event is after pos.
+        # -- also want to take newer BPM if time > foundTime >= pos
+        if time <= pos:   #MFH - first required condition.
+          if time > foundTime:    #MFH - second required condition for sorting.
+            foundBpm = event.bpm
+            foundTime = time
+    if foundBpm:
+      return foundBpm
+    else:   #MFH - return default BPM if no events
+      return DEFAULT_BPM
 
-    #for time, event in self.allEvents + [self.allEvents[-1]]:
-      #if isinstance(event, Tempo):
-        #bpm = event.bpm
-      #elif isinstance(event, Note):
-        # All notes are initially not tappable
-        #event.tappable = 0
-        #ticks = beatsToTicks(time)
-        
-        # Part of chord?
-        #if ticks < currentTicks + epsilon:
-          #currentNotes.append(event)
-          #continue
+class NoteTrack(Track):   #MFH - special Track type for note events, with marking functions
+  def __init__(self, engine):
+    Track.__init__(self, engine)
+    self.chordFudge = 1
 
-        # Previous note not a chord?
-        #if len(prevNotes) == 1:
-          # Previous note ended recently enough?
-          #prevEndTicks = prevTicks + beatsToTicks(prevNotes[0].length)
-          #if currentTicks - prevEndTicks <= tickThreshold:
-            #for note in currentNotes:
-              # Are any current notes the same as the previous one?
-              #if note.number == prevNotes[0].number:
-                #break
-            #else:
-              # If all the notes are different, mark the current notes tappable
-              #for note in currentNotes:
-                #note.tappable = 2
-
-        # Set the current notes as the previous notes
-        #prevNotes    = currentNotes
-        #prevTicks    = currentTicks
-        #currentNotes = [event]
-        #currentTicks = ticks
-#---------------------
+    self.hopoTick = engine.config.get("coffee", "hopo_frequency")
+    self.hopoTickCheat = engine.config.get("coffee", "hopo_freq_cheat")
+    self.songHopoFreq = engine.config.get("game", "song_hopo_freq")
 
   def markHopoRF(self, EighthNH, songHopoFreq):
     lastTick = 0
@@ -1683,8 +1662,7 @@ class Track:
         firstTime = 0
         continue
 
-
-#need to recompute (or carry forward) BPM at this time
+      #need to recompute (or carry forward) BPM at this time
       tick = (time * bpm * ticksPerBeat) / 60000.0
       lastTick = (lastTime * bpm * ticksPerBeat) / 60000.0
       tickDelta = tick - lastTick
@@ -2326,7 +2304,6 @@ class Track:
         self.addEvent(time, event)
 
 
-
 class Song(object):
   def __init__(self, engine, infoFileName, songTrackName, guitarTrackName, rhythmTrackName, noteFileName, scriptFileName = None, partlist = [parts[GUITAR_PART]], drumTrackName = None, crowdTrackName = None):
     self.engine        = engine
@@ -2336,7 +2313,7 @@ class Song(object):
       Log.debug("Song class init (song.py)...")
     
     self.info         = SongInfo(infoFileName)
-    self.tracks       = [[Track(self.engine) for t in range(len(difficulties))] for i in range(len(partlist))]
+    self.tracks       = [[NoteTrack(self.engine) for t in range(len(difficulties))] for i in range(len(partlist))]
     
     self.difficulty   = [difficulties[EXP_DIF] for i in partlist]
     self._playing     = False
@@ -2344,7 +2321,7 @@ class Song(object):
     self.noteFileName = noteFileName
     
     #self.bpm          = None
-    self.bpm          = 120.0     #MFH - enforcing a default / fallback tempo of 120 BPM
+    self.bpm          = DEFAULT_BPM     #MFH - enforcing a default / fallback tempo of 120 BPM
 
     #self.period       = 0
     self.period = 60000.0 / self.bpm    #MFH - enforcing a default / fallback tempo of 120 BPM
@@ -2377,7 +2354,7 @@ class Song(object):
 
     self.midiEventTracks   = [[Track(self.engine) for t in range(len(difficulties))] for i in range(len(partlist))]
 
-    self.tempoEventTrack = Track(self.engine)   #MFH - need a separated Tempo/BPM track!
+    self.tempoEventTrack = TempoTrack(self.engine)   #MFH - need a separated Tempo/BPM track!
 
     self.breMarkerTime = None
 
@@ -2461,6 +2438,9 @@ class Song(object):
       self.missVolume   = self.engine.config.get("audio", "miss_volume")
 
   
+  def getCurrentTempo(self, pos):  #MFH
+    return self.tempoEventTrack.getCurrentTempo(pos)
+
 
   def getHash(self):
     h = hashlib.sha1()
