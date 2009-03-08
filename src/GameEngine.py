@@ -629,6 +629,12 @@ class GameEngine(Engine):
     self.startupLayer       = None
     self.loadingScreenShown = False
     
+    # evilynux - Printing on the console with a frozen binary may cause a crash.
+    if hasattr(sys, "frozen"):
+      self.print_fps_in_console = False
+    else:
+      self.print_fps_in_console = True
+
     Log.debug("Ready.")
     
 
@@ -966,7 +972,8 @@ class GameEngine(Engine):
           self.elapsedTime = currentTime-self.lastTime
           self.lastTime = currentTime
           self.fpsEstimate = self.frames*(1000.0/self.elapsedTime)
-          print("%.2f fps" % self.fpsEstimate)
+          if self.print_fps_in_console == True:
+            print("%.2f fps" % self.fpsEstimate)
           self.frames = 0 
       return done
     except:
