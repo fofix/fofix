@@ -83,7 +83,8 @@ Then use any of the following settings below the {{{[theme]}}} header in the the
 ||loading_text_color = #FFFFFF||Controls the Loading phrase color. Use a Hex Color Value.||
 ||loading_X = .5||X Position of Phrase positioning on screen. Use a decimal # between 0-1||
 ||loading_Y = .595||Y Position of Phrase positioning on screen. Use a decimal # between 0-1||
-
+||shadowoffsetx = .0022 || Controls X Offset to the Loading Screen Font's Shadow. Default is .0022.||
+||shadowoffsety = .0005 || Controls Y Offset to the Loading Screen Font's Shadow. Default is .0005||
 
 Notice - If you just want the default phrases to show do not put these in your theme.ini
 
