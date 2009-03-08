@@ -58,13 +58,16 @@ class Cache(object):
 class Font:
   """A texture-mapped font."""
   def __init__(self, fileName, size, bold = False, italic = False, underline = False, outline = True,
-               scale = 1.0, reversed = False, systemFont = False, shadow = False):
+               scale = 1.0, reversed = False, systemFont = False, shadow = False, shadowoffsetx = .0022, shadowoffsety = .0005):
     pygame.font.init()
     self.size             = size
     self.scale            = scale
     self.outline          = outline
     self.reversed         = reversed
     self.shadow         = shadow
+    self.shadowoffsetx = shadowoffsetx
+    self.shadowoffsety = shadowoffsety
+    
     # Try loading a system font first if one was requested
     self.font           = None
     if systemFont and sys.platform != "win32":
@@ -137,7 +140,7 @@ class Font:
     """
     pass
 
-  def render(self, text, pos = (0, 0), direction = (1, 0), scale = DEFAULT_SCALE):
+  def render(self, text, pos = (0, 0), direction = (1, 0), scale = DEFAULT_SCALE, shadowoffset = (.0022, .0005)):
     """
     Draw some text.
 
@@ -205,7 +208,7 @@ class Font:
         glPushAttrib(GL_CURRENT_BIT)
         glPushMatrix()
         glColor4f(0, 0, 0, 1)
-        glTranslatef(.0022, .0005, 0)
+        glTranslatef(shadowoffset[0], shadowoffset[1], 0)
         drawSquare(w,h,tw,th)
         glPopMatrix()
         glPopAttrib()

@@ -65,7 +65,7 @@ import Settings
 from Svg import ImgDrawing, SvgContext
 
 #MFH - for loading phrases
-def wrapCenteredText(font, pos, text, rightMargin = 1.0, scale = 0.002, visibility = 0.0, linespace = 1.0):
+def wrapCenteredText(font, pos, text, rightMargin = 1.0, scale = 0.002, visibility = 0.0, linespace = 1.0, allowshadowoffset = False, shadowoffset = (.0022, .0005)):
   """
   Wrap a piece of text inside given margins.
   
@@ -91,7 +91,10 @@ def wrapCenteredText(font, pos, text, rightMargin = 1.0, scale = 0.002, visibili
       #x = startXpos
       glPushMatrix()
       glRotate(visibility * (n + 1) * -45, 0, 0, 1)
-      font.render(sentence, (x - (w/2), y + visibility * n), scale = scale)
+      if allowshadowoffset == True:
+        font.render(sentence, (x - (w/2), y + visibility * n), scale = scale, shadowoffset = shadowoffset)
+      else:
+        font.render(sentence, (x - (w/2), y + visibility * n), scale = scale)
       glPopMatrix()
       sentence = word
       y += h * linespace
@@ -104,7 +107,10 @@ def wrapCenteredText(font, pos, text, rightMargin = 1.0, scale = 0.002, visibili
     w, h = font.getStringSize(sentence, scale = scale)
     glPushMatrix()
     glRotate(visibility * (n + 1) * -45, 0, 0, 1)
-    font.render(sentence, (x - (w/2), y + visibility * n), scale = scale)
+    if allowshadowoffset == True:
+      font.render(sentence, (x - (w/2), y + visibility * n), scale = scale, shadowoffset = shadowoffset)
+    else:
+      font.render(sentence, (x - (w/2), y + visibility * n), scale = scale)
     glPopMatrix()
     y += h * linespace
   
@@ -453,8 +459,10 @@ class LoadingScreen(Layer, KeyListener):
         y = .6 - h / 2 + v * .5
 
       if self.allowtext:
-        font.render(self.text, (x, y))     
-
+        if self.theme == 1:
+          font.render(self.text, (x, y), shadowoffset = (Theme.shadowoffsetx, Theme.shadowoffsety))     
+        else:
+          font.render(self.text, (x, y))
     finally:
       self.engine.view.resetProjection()
 
@@ -4742,8 +4750,11 @@ class LoadingSplashScreen(Layer, KeyListener):
       
       # evilynux - Made text about 2 times smaller (as requested by worldrave)
       if self.allowtext:
-        wrapCenteredText(font, (x,y), self.text, scale = self.fScale, rightMargin = self.rMargin, linespace = self.lspacing)
-
+        if self.theme == 1:
+          wrapCenteredText(font, (x,y), self.text, scale = self.fScale, rightMargin = self.rMargin, linespace = self.lspacing, allowshadowoffset = True, shadowoffset = (Theme.shadowoffsetx, Theme.shadowoffsety))
+        else:
+          wrapCenteredText(font, (x,y), self.text, scale = self.fScale, rightMargin = self.rMargin, linespace = self.lspacing)
+            
     finally:
       self.engine.view.resetProjection()
     

@@ -137,6 +137,9 @@ Config.define("theme", "songback",       bool, False)
 Config.define("theme", "versiontag",       bool, False)
 Config.define("theme", "rmtype",       int, None)
 
+Config.define("theme", "shadowoffsetx", float, .0022)
+Config.define("theme", "shadowoffsety", float, .0005)
+
 #TWD
 Config.define("theme", "menu_neck_choose_x", float, 0.1)
 Config.define("theme", "menu_neck_choose_y", float, 0.05)
@@ -164,10 +167,6 @@ Config.define("theme", "song_rb2_name_selected_color",       str, "#FFBF00")
 Config.define("theme", "song_rb2_diff_color",       str, "#FFBF00")
 Config.define("theme", "song_rb2_artist_color",       str, "#4080FF")
 
-#Config.define("theme", "pause_bkg_x",       float, None)
-#Config.define("theme", "pause_bkg_y",       float, None)
-#Config.define("theme", "pause_bkg_w",       float, None)
-#Config.define("theme", "pause_bkg_h",       float, None)
 Config.define("theme", "pause_bkg",       str, "0.5,0.5,1.0,1.0")
 Config.define("theme", "pause_text_x",       float, None)
 Config.define("theme", "pause_text_y",       float, None)
@@ -266,8 +265,6 @@ Config.define("theme", "song_list_display",       int, None)
 #Qstick - Results Screen
 
 #RACER:
-#Config.define("theme", "fail_bkg_x",       float, None)
-#Config.define("theme", "fail_bkg_y",       float, None)
 Config.define("theme", "fail_bkg",       str, "0.5,0.5,1.0,1.0")
 Config.define("theme", "fail_text_x",       float, None)
 Config.define("theme", "fail_text_y",       float, None)
@@ -329,6 +326,8 @@ meshColor = None
 songback = None
 versiontag = None
 rmtype = None
+shadowoffsetx = None
+shadowoffsety = None
 
 #evilynux
 songlist_score_colorVar = None
@@ -746,7 +745,7 @@ def setupPauseNOpt(config):
 def setupMenu(config):
   global menuX, menuY, menuRB
   global loadingX, loadingY, loadingColor, loadingFScale, loadingRMargin, loadingLSpacing
-  global songback, versiontag
+  global songback, versiontag, shadowoffsetx, shadowoffsety
   
   menuX = config.get("theme", "menu_x")
   menuY = config.get("theme", "menu_y")
@@ -759,7 +758,8 @@ def setupMenu(config):
   loadingLSpacing = config.get ("theme", "loading_line_spacing")
   songback = config.get("theme", "songback")
   versiontag = config.get("theme", "versiontag")
-
+  shadowoffsetx = config.get("theme", "shadowoffsetx")
+  shadowoffsety = config.get("theme", "shadowoffsety")
 
 def setupTWOD(config):
   global twoDnote, twoDkeys, threeDspin, opencolor
