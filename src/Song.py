@@ -1458,6 +1458,8 @@ class Track:    #MFH - Changing Track class to a base class.  NoteTrack and Temp
     return self.allEvents
 
   def reset(self):
+    if self.maxIndex:
+      self.currentIndex = 0
     for eventList in self.events:
       for time, event in eventList:
         if isinstance(event, Note):
@@ -1472,9 +1474,21 @@ class Track:    #MFH - Changing Track class to a base class.  NoteTrack and Temp
 class TempoTrack(Track):    #MFH - special Track type for tempo events
   def __init__(self, engine):
     Track.__init__(self, engine)
+    self.currentBpm = DEFAULT_BPM
 
-  #MFH - TODO - create function to track current tempo in realtime based on time / position
-  #def getCurrentTempo(self, pos):   #MFH
+  def reset(self):
+    self.currentBpm = DEFAULT_BPM
+    
+  #MFH - function to track current tempo in realtime based on time / position
+  def getCurrentTempo(self, pos):   #MFH
+    if self.currentIndex:
+      tempEventHolder = self.getNextEvent()   #MFH - check if next BPM change is here yet
+      if tempEventHolder:
+        time, event = tempEventHolder
+        if pos >= time:
+          self.currentIndex += 1
+          self.currentBpm = event.bpm
+    return self.currentBpm
   
   def searchCurrentTempo(self, pos):    #MFH - will hunt through all tempo events to find it - intended for use during initializations only!
     foundBpm = None
