@@ -26,6 +26,8 @@ You will now need to download and install the dependency modules.  Versions are 
 
 Install them in the order listed above by double-clicking the .exe or .msi files that you downloaded.
 
+Acrox999 has put together [http://www.mediafire.com/?y02uniotmmt a package] containing required source modules to run FoFiX on Python 2.6 in a Windows environment.
+
 The following packages are optional:
 
   # psyco: Python JIT compiler (1.6: http://www.voidspace.org.uk/downloads/psyco-1.6.win32-py2.6.exe)  _Highly recommended!_
