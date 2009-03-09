@@ -1347,8 +1347,8 @@ class Guitar:
         
         self.engine.draw3Dtex(tex1, vertex = (-size[0], 0, size[0], size[1]), texcoord = (0.0, 0.0, 1.0, 1.0),
                               scale = tailscale, color = tailcol)
-        self.engine.draw3Dtex(tex2, vertex = (-size[0], size[1]-(.05), size[0], size[1] + (zsize)),
-                              scale = tailscale, texcoord = (0.0, 0.05, 1.0, 0.95), color = tailcol)
+        self.engine.draw3Dtex(tex2, vertex = (-size[0], size[1], size[0], size[1] + (zsize)),
+                              scale = tailscale, texcoord = (0.0, 0.05, 1.0, 0.95), color = tailcol) #Worldrave- Fix a 5 pixel overlap the tail tip was being drawn over the tail itself. Alignment issue fix.
 
 
 
