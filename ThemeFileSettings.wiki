@@ -189,8 +189,8 @@ jurgen text is rendered above everything.||
 ||result_cheats_numbers = .5,.35,.0015||Defines the results cheats numbers position and size.||
 ||result_cheats_percent = .45,.4,.0015||Defines the results cheats percent and size.||
 ||result_cheats_score = .75,.4,.0015||Defines the results cheats score position and size.||
-||result_menu_x = 2.10 || Controls the X position of the 'final text' on the results screen ||
-||result_menu_y = 2.10 || Controls the Y position of the 'final text' on the results screen ||
+||result_menu_x = .210 || Controls the X position of the 'final text' on the results screen.  Use a Decimal # between 0 - 1 ||
+||result_menu_y = .210 || Controls the Y position of the 'final text' on the results screen.  Use a Decimal # between 0 - 1 ||
 ||result_score = .5,.11,0.0025||Defines the pos of the results score.||
 ||result_song = .05,.045,.002,#FFFFFF||Defines the pos of the song name. Use a Hex Color Value. ||
 ||result_song_text = %s Finished!|| %s Finished! will show "Back in Black's Finished!"||
