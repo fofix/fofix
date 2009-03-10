@@ -84,6 +84,7 @@ I was tired and sick and couldn't sleep...
 ||  rock_top.png                || Top layer of the rock meter                    || Yes          || All                      || Displayed over the top of other rock meter elements (except rock max and rock arr in RB Based themes ONLY)||
 ||  rockmeter.png               || Where the score is displayed in GH themes      || GH Based     || GH Based                 || Displayed on the left. For GH2/GH3 themes, this needs a hole, as it renders on top of mult.png. On GH2 themes, the score text is spaced and slanted to fit the GH2 theme's image. On GHWT themes, this incorperates what would normally be counter.png||
 ||  score.png                   || Where the score is displayed in RB themes      || RB Based     || RB Based                 || Displayed top right, below lyrics (if any) and above counter. Background image to the current score.||
+|| setlistguidebuttons.png      || Displays a guide buttons image overlayed on the songlist Background, usefull if using the scrolling songlist background|| No || All|| Non-scaled image yet, so use GH3 setlistguidebuttons.png for the set resolution. Auto-scale will come later ||
 ||  side_bars.png               || Display all up the side of the fretboard       || Yes          || All                      || Stretched to fit the _entire_ width of the fretboard, and the length of the fretboard (as much as one neck image is)||
 ||  soloframe.png               || WIP                            || No           || WIP                      || ||
 ||  spbottom.png                || The bottom layer of the star power meter       || GH2 Based    || GH2 Based                || ||
@@ -107,7 +108,6 @@ I was tired and sick and couldn't sleep...
 ||  tail2.png                   || WIP                            || No           || WIP                      || ||
 ||  youfailed.png               || Indication that you failed a song              || Yes          || All                      || Appears for a few seconds before the failure menu is displayed||
 ||  yourock.png                 || Indication that you finished a song successfuly|| Yes          || All                      || Appears for a few seconds after you finish a song, before the game results appear||
-|| setlistguidebuttons.png      || Displays a guide buttons image overlayed on the songlist Background, usefull if using the scrolling songlist background|| No || All|| Non-scaled image yet, so use GH3 as a guide image. Auto-scale will come later ||
 
 
 ==\dots\ Directory==
