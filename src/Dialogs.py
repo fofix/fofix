@@ -902,6 +902,12 @@ class SongChooser(Layer, KeyListener):
     #myfingershurt: adding yellow fret preview again
     self.playSong = False
 
+#worldrave - Use setlistguidebuttons image if it exists.
+    try:
+      self.engine.loadImgDrawing(self, "setlistguidebuttons", os.path.join("themes",themename,"menu","setlistguidebuttons.png"))
+    except IOError:
+      self.setlistguidebuttons = None
+
 #racer: preview graphic
     try:
       self.engine.loadImgDrawing(self, "preview",  os.path.join("themes",themename,"menu","preview.png"))
@@ -1690,6 +1696,10 @@ class SongChooser(Layer, KeyListener):
 
         self.engine.drawImage(self.paper, scale = (wfactor,-wfactor), coord = papercoord)
   
+        #worldrave - render setlistpreview graphic
+      if self.setlistguidebuttons != None:
+        self.engine.drawImage(self.setlistguidebuttons, scale = (.29,-.308), coord = (w/2.45, h*.0322))
+
         #racer: render preview graphic
       if self.previewDisabled == True and self.preview != None:
         self.engine.drawImage(self.preview, scale = (.5,-.5), coord = (w/2, h/2))
