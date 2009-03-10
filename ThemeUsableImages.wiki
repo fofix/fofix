@@ -20,7 +20,7 @@ Sometimes FoFiX can be picky about the image format it uses. All filenames in th
 <BR>_The format for all PNGs_
 <BR>_Is twenty-four bit RGB_
 <BR>_Use non-interlaced_
-<BR>_and avoid pallet-based_
+<BR>_and avoid palette-based_
 <BR>_Or you can also rename JPGs_
 <BR>
 <BR>...sums it up pretty nicely, if I do say so myself. 
