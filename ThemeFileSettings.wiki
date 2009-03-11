@@ -155,7 +155,7 @@ jurgen text is rendered above everything.||
 
 
 ----------------------------------------------------------------------------
-==Pause Menu's==
+==Pause Menu / Failed Menu==
 ||_*Item Name*_||_*What it Does/How to use it*_||
 ||careerfailtext4 = .5,.51,.76,0||.393 is X Pos, .87 is Y Position, .49 is Scaling Size, .0741 is Line Spacing between menu items. Used for Career Failed Menu (This is only used if you made the careerfail.png and careerfailtext4.png images. The '4' in the name refers to being that, for example, the GH3 career failed menu has 4 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
 ||careerpausetext5 = .5,.51,.76,.74||.5 is X Pos, .51 is Y Position, .76 is Scaling Size, .074 is Line Spacing between menu items. Used for Career Pause Menu (This is only used if you made the careerpause.png and careerpausetext5.png images. The '5' in the name refers to being that, for example, the GH3 career pause menu has 5 items in list. Uses the same method as how the Main Menu text image is done for example.)||
@@ -166,8 +166,8 @@ jurgen text is rendered above everything.||
 ||fail_text_x =   ||Default is calculated, not constant||
 ||fail_text_y = .47||Controls the Y position of fail menu background and text positions||
 ||fail_text_color = #FFFFFF||Controls the Failed screen text color. Use a Hex Color Value.||
-||fail_songname_x = .5||Controls the X position of fail menu song name and "% completed"||
-||fail_songname_y = .35||Controls the Y position of fail menu song name and "% completed"||
+||fail_songname_x = .5||Controls the X position of fail menu 'Song Name' and "% completed"||
+||fail_songname_y = .35||Controls the Y position of fail menu 'Song Name' and "% completed"||
 ||pausetext5 = .5,.51,.76,.074||.5 is X Pos, .51 is Y Position, .76 is Scaling Size, .074 is Line Spacing between menu items. Used for Pause Menu (This is only used if you made the pause.png and pausetext10.png images. The '5' in the name refers to being that, for example, the GH3 pause menu has 5 items in list. Uses the same method as how the Main Menu text image is done for example.)||
 ||pause_bkg = 0.5,0.5,1.0,1.0||X,Y coordinates of pause menu center, horizontal vertical scaling. (1.0 - fit to screen)||
 ||pause_selected_color = #FFBF00||Controls the Pause Menu’s  ‘Selected’ color. Use a Hex Color Value.||
