@@ -1689,7 +1689,7 @@ class SongChooser(Layer, KeyListener):
           if self.selectedIndex == 0 or self.selectedIndex == 1:      #worldrave - Paper no longer moves up when user moves up to select '(Random)' song option. 
             y = 0
           else:
-            y = h*(self.selectedIndex-2)*2/16.05  #worldrave - Tweaked the number so the image doesn't move off sync more and more as the paper moves down.
+            y = h*(self.selectedIndex-2)*2/16.06  #worldrave - Tweaked the number so the image doesn't move off sync more and more as the paper moves down.
           papercoord = (w/2,y + h/2)
         else:
           papercoord = (w/2,h/2)
