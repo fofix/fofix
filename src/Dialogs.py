@@ -1686,7 +1686,7 @@ class SongChooser(Layer, KeyListener):
   
         if self.songback:
         # evilynux - Fixed, there's a two song offset and two lines should be skipped
-          if self.selectedIndex == 1 or self.selectedIndex == 2:
+          if self.selectedIndex == 0 or self.selectedIndex == 1:      #worldrave - Paper no longer moves up when user moves up to select '(Random)' song option. 
             y = 0
           else:
             y = h*(self.selectedIndex-2)*2/16
