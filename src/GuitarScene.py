@@ -2241,6 +2241,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.song.stop()
     self.resetVariablesToDefaults()
     self.done = True
+    # evilynux - Reset speed
+    self.engine.setSpeedFactor(1.0)
+    self.engine.config.set("audio", "speed_factor", 1.0)
+
     self.engine.view.setViewport(1,0)
     self.engine.view.popLayer(self.menu)
     self.engine.view.popLayer(self.failMenu)
@@ -2267,6 +2271,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.song.stop()
       self.song  = None
     self.resetVariablesToDefaults()
+    # evilynux - Reset speed
+    self.engine.setSpeedFactor(1.0)
+    self.engine.config.set("audio", "speed_factor", 1.0)
+
     self.engine.view.setViewport(1,0)
     self.engine.view.popLayer(self.menu)
     self.engine.view.popLayer(self.failMenu)
@@ -2279,6 +2287,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.song.stop()
       self.song  = None
     self.resetVariablesToDefaults()
+    # evilynux - Reset speed
+    self.engine.setSpeedFactor(1.0)
+    self.engine.config.set("audio", "speed_factor", 1.0)
+
     self.engine.view.setViewport(1,0)
     self.engine.view.popLayer(self.failMenu)
     self.freeResources()
@@ -4625,7 +4637,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #  if self.playerList[0].score == 0 and self.playerList[1].score == 0:
       #    noScore = True
       #    self.changeSong()
-      
       
       if not noScore:
 
