@@ -1,5 +1,5 @@
 #summary List of Audio Files and their Functions.
-
+<wiki:toc max_depth="2" />
 =Usable Audio Files for FoFiX=
 This is a list of the audio files usable in FoFiX (IE- Claps, Boo's, Ending sounds).
 It is sorted into Menu Sounds, Game SFX, and Instrument SFX. Files are not required unless indicated.

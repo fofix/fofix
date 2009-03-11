@@ -1,13 +1,12 @@
 #summary These are all the Theme.ini settings usable.
-
 First, you need to create a 'theme.ini' file in your theme's folder. Once you create the file you need to type this header at the very top of this file:
 
 _{{{[theme]}}}_
 
 Then use any of the following settings below the {{{[theme]}}} header in the theme.ini file. This list is mostly organized by which options belong mostly to which screen, but not necessarily to JUST that screen, since some items currently control things on multiple screens.
-
+<wiki:toc max_depth="1" />
 -----------------------------------------------------------------------------------------
-==Main Menu==
+=Main Menu=
 
 ||_*Item Name*_||_*What it Does/How to use it*_||
 ||menu_x = .665||X Position of main menu image. Use a decimal # between 0-1||
@@ -18,7 +17,7 @@ Then use any of the following settings below the {{{[theme]}}} header in the the
 ||solotext2 = .40,.35,.46,.045||.40 is X Pos, .35 is Y Position, .46 is Scaling Size, .045 is Line Spacing between menu items. Used for Solo Menu (This is only used if you made the solo.png and solotext2.png images. The '2' in the name refers to being that, for example, the RB solo menu has 2 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
 
 ------------------------------------------------------------------------------------------
-==Options Menu==
+=Options Menu=
 
 ||advsettingstext10 = .393,.87,.49,.074||.393 is X Pos, .87 is Y Position, .49 is Scaling Size, .0741 is Line Spacing between menu items. Used for Adv. Options Menu(This is used if you made the advsettings.png and advsettingstext10.png images. The '10' in the name refers to being that, for example, the GH3 advanced options menu has 10 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
 ||opt_bkg_size = 0.5,0.5,1.0,1.0||position (x,y) of center, xScale, yScale||
@@ -30,7 +29,7 @@ Then use any of the following settings below the {{{[theme]}}} header in the the
 
 
 ----------------------------------------------------------------------------
-==Song Selection List / CD list== 
+=Song Selection List / CD list=
 
 ||_*Item Name*_||_*What it Does/How to use it*_||
 ||artist_selected_color = #4080FF||Use a Hex Color Value.||
@@ -62,7 +61,7 @@ Then use any of the following settings below the {{{[theme]}}} header in the the
 
 
 ------------------------------------------------------------------------------------------
-==Difficulty/Instruments/Practice Select Screen==
+=Difficulty/Instruments/Practice Select Screen=
 
 ||_*Item Name*_||_*What it Does/How to use it*_||
 ||song_select_submenu_x = 0||Controls the submenu text positions. Use a decimal # between 0 - 1, IE- .012||
@@ -73,7 +72,7 @@ Then use any of the following settings below the {{{[theme]}}} header in the the
 
 
 ------------------------------------------------------------------------------------------
-==Loading Phrase Screen==   
+=Loading Phrase Screen=
 
 ||_*Item Name*_||_*What it Does/How to use it*_||
 ||loading_font_scale = 0.0015||Loading phrase font scale.||
@@ -92,7 +91,7 @@ Notice - If you just want the default phrases to show do not put these in your t
 
 
 ------------------------------------------------------------------------------------------
-==In Game==                     
+=In Game=            
 
 ||_*Item Name*_||_*What it Does/How to use it*_||
 ||crowd_loop_delay = x||x = integer.  Default user setting = 550 for sounds\crowdcheers.ogg)||
@@ -143,7 +142,7 @@ jurgen text is rendered above everything.||
 
 
 ------------------------------------------------------------------------------------------
-==Background, text, selected text colors==
+=Background, text, selected text colors=
 
 ||_*Item Name*_||_*What it Does/How to use it*_||
 ||background_color = #000000||Controls the color of the background screen. Should be black. . Use a Hex Color Value.||
@@ -155,7 +154,7 @@ jurgen text is rendered above everything.||
 
 
 ----------------------------------------------------------------------------
-==Pause Menu / Failed Menu==
+=Pause Menu / Failed Menu=
 ||_*Item Name*_||_*What it Does/How to use it*_||
 ||careerfailtext4 = .5,.51,.76,0||.393 is X Pos, .87 is Y Position, .49 is Scaling Size, .0741 is Line Spacing between menu items. Used for Career Failed Menu (This is only used if you made the careerfail.png and careerfailtext4.png images. The '4' in the name refers to being that, for example, the GH3 career failed menu has 4 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
 ||careerpausetext5 = .5,.51,.76,.74||.5 is X Pos, .51 is Y Position, .76 is Scaling Size, .074 is Line Spacing between menu items. Used for Career Pause Menu (This is only used if you made the careerpause.png and careerpausetext5.png images. The '5' in the name refers to being that, for example, the GH3 career pause menu has 5 items in list. Uses the same method as how the Main Menu text image is done for example.)||
@@ -181,7 +180,7 @@ jurgen text is rendered above everything.||
 
 
 ------------------------------------------------------------------------------------------
-==Game Results Screen==
+=Game Results Screen=
 
 ||_*Item Name*_||_*What it Does/How to use it*_ (X pos, Y pos, scale size||
 ||result_cheats_color = #FFFFFF||Defines the results cheats color . Use a Hex Color Value.||

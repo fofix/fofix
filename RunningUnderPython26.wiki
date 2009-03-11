@@ -1,5 +1,5 @@
 #summary How to set up a Python 2.6 environment for FoFiX.
-
+<wiki:toc max_depth="2" />
 = Introduction =
 
 FoFiX and its predecessors have been built upon Python 2.4 for quite some time.  However, 2.4 went into security-fix-only mode more than two years ago, and it has really started to show its age.  Thus, FoFiX is working on moving up to Python 2.6 while (for now) remaining compatible with 2.4.

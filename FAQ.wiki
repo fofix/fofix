@@ -1,7 +1,7 @@
 #summary Frequently asked questions
 #labels Phase-Support,Featured
 #sidebar TableOfContents
-
+<wiki:toc max_depth="3" />
 =Frequently Asked Questions=
 ==General==
 ===Where can I find discussions about this game?===
