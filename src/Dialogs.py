@@ -1161,6 +1161,8 @@ class SongChooser(Layer, KeyListener):
 
       elif isinstance(item, Song.LibraryInfo):
         label = self.engine.resource.fileName(item.libraryName, "label.png")
+      elif isinstance(item, Song.CareerResetterInfo):
+        label = self.engine.resource.fileName("themes",themename,"menu","resetlabel.png")
       elif isinstance(item, Song.RandomSongInfo):
         label = self.engine.resource.fileName("themes",themename,"menu","random.png")
       else:
