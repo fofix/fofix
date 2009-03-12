@@ -144,6 +144,16 @@ Config.define("theme", "shadowoffsety", float, .0005)
 Config.define("theme", "menu_neck_choose_x", float, 0.1)
 Config.define("theme", "menu_neck_choose_y", float, 0.05)
 
+#worldrave
+Config.define("theme", "setlistguidebuttonsposX", float, 0.408)
+Config.define("theme", "setlistguidebuttonsposY", float, 0.0322)
+Config.define("theme", "setlistguidebuttonsscaleX", float, 0.29)
+Config.define("theme", "setlistguidebuttonsscaleY", float, 0.308)
+Config.define("theme", "setlistpreviewbuttonposX", float, 0.5)
+Config.define("theme", "setlistpreviewbuttonposY", float, 0.5)
+Config.define("theme", "setlistpreviewbuttonscaleX", float, 0.5)
+Config.define("theme", "setlistpreviewbuttonscaleY", float, 0.5)
+
 #evilynux
 Config.define("theme", "songlist_score_color",  str, "#93C351")
 Config.define("theme", "songlistcd_score_color",  str, "#FFFFFF")
@@ -334,6 +344,16 @@ songlist_score_colorVar = None
 songlistcd_score_colorVar = None
 rockmeter_score_colorVar = None
 ingame_stats_colorVar = None
+
+#worldrave 
+setlistguidebuttonsposX = None
+setlistguidebuttonsposY = None
+setlistguidebuttonsscaleX = None
+setlistguidebuttonsscaleY = None
+setlistpreviewbuttonposX = None
+setlistpreviewbuttonposY = None
+setlistpreviewbuttonscaleY = None
+setlistpreviewbuttonscaleY = None
 
 #MFH:
 song_cd_Xpos = None         #Songlist in CD mode: horizontal position of CDs/cases
@@ -680,6 +700,8 @@ def setupSonglist(config):
   global song_cd_Xpos, song_cdscore_Xpos, song_list_Xpos, song_listscore_Xpos
   global song_listcd_cd_Xpos, song_listcd_cd_Ypos, song_listcd_score_Xpos, song_listcd_score_Ypos, song_listcd_list_Xpos
 
+  global setlistguidebuttonsposX, setlistguidebuttonsposY, setlistguidebuttonsscaleX, setlistguidebuttonsscaleY
+  global setlistpreviewbuttonposX, setlistpreviewbuttonposY, setlistpreviewbuttonscaleX, setlistpreviewbuttonscaleY
   global main_menu_scaleVar, main_menu_vspacingVar, sub_menu_xVar, sub_menu_yVar
   global career_title_colorVar, opt_text_colorVar, opt_selected_colorVar
   global song_name_text_colorVar, song_name_selected_colorVar
@@ -692,7 +714,14 @@ def setupSonglist(config):
   
   global song_rb2_name_colorVar, song_rb2_name_selected_colorVar, song_rb2_diff_colorVar, song_rb2_artist_colorVar
 
-
+  setlistguidebuttonsposX = config.get("theme", "setlistguidebuttonsposX")
+  setlistguidebuttonsposY = config.get("theme", "setlistguidebuttonsposY")
+  setlistguidebuttonsscaleX = config.get("theme", "setlistguidebuttonsscaleX")
+  setlistguidebuttonsscaleY = config.get("theme", "setlistguidebuttonsscaleY")
+  setlistpreviewbuttonposX = config.get("theme", "setlistpreviewbuttonposX")
+  setlistpreviewbuttonposY = config.get("theme", "setlistpreviewbuttonposY")
+  setlistpreviewbuttonscaleX = config.get("theme", "setlistpreviewbuttonscaleX")
+  setlistpreviewbuttonscaleY = config.get("theme", "setlistpreviewbuttonscaleY")
   songSelectSubmenuOffsetLines = config.get("theme", "song_select_submenu_offset_lines")
   songSelectSubmenuOffsetSpaces = config.get("theme", "song_select_submenu_offset_spaces")
   songSelectSubmenuX = config.get("theme", "song_select_submenu_x")

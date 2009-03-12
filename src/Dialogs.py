@@ -1698,13 +1698,13 @@ class SongChooser(Layer, KeyListener):
 
         self.engine.drawImage(self.paper, scale = (wfactor,-wfactor), coord = papercoord)
   
-        #worldrave - render setlistpreview graphic
+        #worldrave - Displays 'setlistguidebuttons.png' image, also added theme.ini control over X+Y position, as well as scaling X+Y control. 
       if self.setlistguidebuttons != None:
-        self.engine.drawImage(self.setlistguidebuttons, scale = (.29,-.308), coord = (w/2.45, h*.0322))
+        self.engine.drawImage(self.setlistguidebuttons, scale = (Theme.setlistguidebuttonsscaleX,-Theme.setlistguidebuttonsscaleY), coord = (w*Theme.setlistguidebuttonsposX, h*Theme.setlistguidebuttonsposY))
 
-        #racer: render preview graphic
+        #racer: render preview graphic    worldrave - Added theme.ini control over X+Y position, as well as scaling X+Y control.
       if self.previewDisabled == True and self.preview != None:
-        self.engine.drawImage(self.preview, scale = (.5,-.5), coord = (w/2, h/2))
+        self.engine.drawImage(self.preview, scale = (Theme.setlistpreviewbuttonposX,-Theme.setlistpreviewbuttonposY), coord = (w*Theme.setlistpreviewbuttonscaleX, h*Theme.setlistpreviewbuttonscaleY))
       else:
         self.preview = None
   
