@@ -37,6 +37,14 @@ Then use any of the following settings below the {{{[theme]}}} header in the the
 ||career_title_color = #000000||Use a Hex Color Value.||
 ||library_selected_color = #FFBF00||Use a Hex Color Value.||
 ||library_text_color = #FFFFFF||Use a Hex Color Value.||
+||setlistguidebuttonsposX = .408|| Controls Setlist Guide Buttons image 'X' Position. Use a decimal # between 0 - 1||
+||setlistguidebuttonsposY = .0322|| Controls Setlist Guide Buttons image 'Y' Position. Use a decimal # between 0 - 1||
+||setlistguidebuttonsscaleX = .29|| Controls Setlist Guide Buttons image Scaling of 'X' Size. Use a decimal # between 0 - 1||
+||setlistguidebuttonsscaleY = .308|| Controls Setlist Guide Buttons image Scaling of 'Y' Size. Use a decimal # between 0 - 1||
+||setlistpreviewbuttonposX = .5|| Controls Preview buttons X Position. Use a decimal # between 0 - 1||
+||setlistpreviewbuttonposY = .5|| Controls Preview buttons Y Position. Use a decimal # between 0 - 1||
+||setlistpreviewbuttonscaleX = .5|| Controls Preview buttons Scaling of 'X' Size. Use a decimal # between 0 - 1||
+||setlistpreviewbuttonscaleY = .5|| Controls Preview buttons Scaling of 'Y' Size. Use a decimal # between 0 - 1||
 ||song_cd_x = 0||Can be 0 through 5, values outside this range will be clipped to 0 or 5 to prevent CDs from going off-screen||
 ||song_cdscore_x = .6||Use a decimal # between 0 - 1. IE- .34||
 ||song_list_display = 1||Sets the songlist view. Choices are - 0=CD/Cassettes / 1=List / 2=List/CD / 3=RB2 / 4=Auto (_Should not use, you only need to use 0-3_)||
