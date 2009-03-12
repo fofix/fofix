@@ -259,6 +259,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "game", "starpower_mode", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "party_time", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "keep_play_count", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "lost_focus_pause", autoApply = True),
     ]
     FoFiXAdvancedSettingsMenu = Menu.Menu(engine, FoFiXAdvancedSettings)
     

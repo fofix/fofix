@@ -113,6 +113,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.gameMode1p = self.engine.config.get("player0","mode_1p")
     self.gameMode2p = self.engine.config.get("player1","mode_2p")
     self.fxEnabled = self.engine.config.get("video","special_fx")
+    self.lostFocusPause = self.engine.config.get("game", "lost_focus_pause")
 
     Players = self.gamePlayers    #ensure this gets passed correctly
 
@@ -1872,7 +1873,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
   def lostFocus(self): #akedrou - catch to pause on lostFocus
     if self.song and self.song.readyToGo:
-      if not self.failed and not self.pause:
+      if not self.failed and not self.pause and self.lostFocusPause == True:
         self.engine.view.pushLayer(self.menu)
         self.pauseGame()
   

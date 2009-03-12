@@ -140,7 +140,7 @@ Config.define("game",   "notedisappear",      bool,   False,  text = _("Missed N
 #akedrou - Quickset (based on Fablaculp's Performance Autoset)
 Config.define("quickset", "performance", int, 0, text = _("Performance"), options = {0: _("Manual"), 1: _("1 - Pure Speed"), 2: _("2 - Fast"), 3: _("3 - Effects (Recommended)"), 4: _("4 - Max Quality (Slow)")})
 Config.define("quickset", "gameplay",    int, 0, text = _("Gameplay"),    options = {0: _("Manual"), 1: _("Theme-Based"), 2: _("MIDI Based"), 3: _("RB Style"), 4: _("GH Style"), 5: _("WT Style")})
-
+Config.define("game", "lost_focus_pause", bool, True, text = _("Pause on Loss of Focus"), options = {False: _("Off"), True: _("On")})
 
 #myfingershurt: the following two lines are not used in gameplay,
 # but are still used in the encrypted score system.  Therefore, the simplest
