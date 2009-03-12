@@ -389,17 +389,19 @@ class Guitar:
         engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName("note.dae")))
         
       try:
-        engine.loadImgDrawing(self,  "notetexa",  os.path.join("themes", themename, "notetex_color.png"))
-        engine.loadImgDrawing(self,  "notetexb",  os.path.join("themes", themename, "notetex_main.png"))
-        engine.loadImgDrawing(self,  "notetexc",  os.path.join("themes", themename, "notetex_extra.png"))
-        engine.loadImgDrawing(self,  "notetexh",  os.path.join("themes", themename, "notetex_hopo.png"))
+        engine.loadImgDrawing(self,  "notetexa",  os.path.join("themes", themename, "notetex_a.png"))
+        engine.loadImgDrawing(self,  "notetexb",  os.path.join("themes", themename, "notetex_b.png"))
+        engine.loadImgDrawing(self,  "notetexc",  os.path.join("themes", themename, "notetex_c.png"))
+        engine.loadImgDrawing(self,  "notetexd",  os.path.join("themes", themename, "notetex_d.png"))
+        engine.loadImgDrawing(self,  "notetexe",  os.path.join("themes", themename, "notetex_e.png"))
         self.notetex = True
 
       except IOError:
         self.notetexa = False
         self.notetexb = False
         self.notetexc = False
-        self.notetexh = False
+        self.notetexd = False
+        self.notetexe = False
         self.notetex = False
         
       if self.engine.fileExists(os.path.join("themes", themename, "star.dae")):  
@@ -407,8 +409,21 @@ class Guitar:
       else:  
         self.starMesh = None
 
+      try:
+        engine.loadImgDrawing(self,  "startexa",  os.path.join("themes", themename, "startex_a.png"))
+        engine.loadImgDrawing(self,  "startexb",  os.path.join("themes", themename, "startex_b.png"))
+        engine.loadImgDrawing(self,  "startexc",  os.path.join("themes", themename, "startex_c.png"))
+        engine.loadImgDrawing(self,  "startexd",  os.path.join("themes", themename, "startex_d.png"))
+        engine.loadImgDrawing(self,  "startexe",  os.path.join("themes", themename, "startex_e.png"))
+        self.startex = True
 
-
+      except IOError:
+        self.startexa = False
+        self.startexb = False
+        self.startexc = False
+        self.startexd = False
+        self.startexe = False
+        self.startex = False
 
 
 
@@ -1224,12 +1239,12 @@ class Guitar:
 
     if sustain:
       if not length == None:
-        size = (.08, length + 0.00001)
+        size = (.08, length)
 
         if size[1] > self.boardLength:
           s = self.boardLength
         else:
-          s = (length + 0.00001)
+          s = length
 
     #       if freestyleTail == 1, render freestyle tail
 
@@ -1348,7 +1363,7 @@ class Guitar:
         self.engine.draw3Dtex(tex1, vertex = (-size[0], 0, size[0], size[1]), texcoord = (0.0, 0.0, 1.0, 1.0),
                               scale = tailscale, color = tailcol)
         self.engine.draw3Dtex(tex2, vertex = (-size[0], size[1], size[0], size[1] + (zsize)),
-                              scale = tailscale, texcoord = (0.0, 0.05, 1.0, 0.95), color = tailcol) #Worldrave- Fix a 5 pixel overlap the tail tip was being drawn over the tail itself. Alignment issue fix.
+                              scale = tailscale, texcoord = (0.0, 0.05, 1.0, 0.95), color = tailcol)
 
 
 
@@ -1479,60 +1494,55 @@ class Guitar:
         glColor4f(.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1) 
 
       if self.notetex == True and spNote == False:
-        
+          
+        glColor3f(1,1,1)
         glEnable(GL_TEXTURE_2D)
-        self.notetexa.texture.bind()
-        glMatrixMode(GL_TEXTURE)
-        glScalef(1, -1, 1)
-        glMatrixMode(GL_MODELVIEW)
-        self.noteMesh.render("Mesh_001")
-        glMatrixMode(GL_TEXTURE)
-        glLoadIdentity()
-        glMatrixMode(GL_MODELVIEW)
-        glDisable(GL_TEXTURE_2D)
-        
-        glEnable(GL_TEXTURE_2D)
-        if isTappable:
-          self.notetexh.texture.bind()
-        else:
+        if fret == 0: 
+          self.notetexa.texture.bind()
+        elif fret == 1:
           self.notetexb.texture.bind()
-        glColor3f(1, 1, 1)
+        elif fret == 2:
+          self.notetexc.texture.bind()
+        elif fret == 3:
+          self.notetexd.texture.bind()
+        elif fret == 4:
+          self.notetexe.texture.bind()
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
-        self.noteMesh.render("Mesh")
+        if isTappable:
+          self.noteMesh.render("Mesh_001")
+        else:
+          self.noteMesh.render("Mesh")
         glMatrixMode(GL_TEXTURE)
         glLoadIdentity()
         glMatrixMode(GL_MODELVIEW)
         glDisable(GL_TEXTURE_2D)
 
+      elif self.startex == True and spNote == True:
+        glColor3f(1,1,1)
         glEnable(GL_TEXTURE_2D)
-        self.notetexc.texture.bind()
-        glColor3f(1, 1, 1)
+        if fret == 0: 
+          self.startexa.texture.bind()
+        elif fret == 1:
+          self.startexb.texture.bind()
+        elif fret == 2:
+          self.startexc.texture.bind()
+        elif fret == 3:
+          self.startexd.texture.bind()
+        elif fret == 4:
+          self.startexe.texture.bind()
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
-        self.noteMesh.render("Mesh_002")
+        if isTappable:
+          self.starMesh.render("Mesh_001")
+        else:
+          self.starMesh.render("Mesh")
         glMatrixMode(GL_TEXTURE)
         glLoadIdentity()
         glMatrixMode(GL_MODELVIEW)
-        glDisable(GL_TEXTURE_2D)
-        
-        if(note.find("Mesh_003")) == True:
-          glEnable(GL_TEXTURE_2D)
-          if isTappable:
-            self.notetexh.texture.bind()
-          else:
-            self.notetexc.texture.bind()
-          glColor3f(1, 1, 1)
-          glMatrixMode(GL_TEXTURE)
-          glScalef(1, -1, 1)
-          glMatrixMode(GL_MODELVIEW)
-          self.noteMesh.render("Mesh_003")
-          glMatrixMode(GL_TEXTURE)
-          glLoadIdentity()
-          glMatrixMode(GL_MODELVIEW)
-          glDisable(GL_TEXTURE_2D)
+        glDisable(GL_TEXTURE_2D)          
         
       else:
         note.render("Mesh_001")
