@@ -43,7 +43,6 @@ import Version
 import Theme
 import copy
 import string
-import zlib
 import cPickle  #stump: Cerealizer and sqlite3 don't seem to like each other that much...
 from Language import _
 
@@ -167,6 +166,7 @@ defaultSections = ["Start","1/4","1/2","3/4"]
 
 # stump: manage cache files
 class CacheManager(object):
+  SCHEMA_VERSION = 2  #stump: current cache format version number
   def __init__(self):
     self.caches = {}
   def getCache(self, infoFileName):
@@ -185,7 +185,7 @@ class CacheManager(object):
     # Check that the cache is completely initialized.
     try:
       v = conn.execute("SELECT `value` FROM `config` WHERE `key` = 'version'").fetchone()[0]
-      mustReinitialize = (int(v) != 1)  #stump: current cache format version number
+      mustReinitialize = (int(v) != self.SCHEMA_VERSION)
     except:
       mustReinitialize = True
     if mustReinitialize:
@@ -194,9 +194,10 @@ class CacheManager(object):
         conn.execute('DROP TABLE `%s`' % tbl)
       conn.commit()
       conn.execute('VACUUM')
+      #stump: if you need to change the database schema, do it here, then bump the version number, a small bit above here.
       conn.execute('CREATE TABLE `config` (`key` STRING UNIQUE, `value` STRING)')
       conn.execute('CREATE TABLE `songinfo` (`hash` STRING UNIQUE, `info` STRING)')
-      conn.execute("INSERT INTO `config` (`key`, `value`) VALUES ('version', '1')")  #stump: current cache format version number
+      conn.execute('INSERT INTO `config` (`key`, `value`) VALUES (?, ?)', ('version', self.SCHEMA_VERSION))
       conn.commit()
     self.caches[cachePath] = conn
     return conn
@@ -258,11 +259,11 @@ class SongInfo(object):
     
     # stump: Check the cache for the presence of this song.
     if canCache and self.allowCacheUsage:
-      ckey = zlib.crc32(open(self.noteFileName, 'rb').read() + open(self.fileName, 'rb').read())
+      self.stateHash = hashlib.sha1(open(self.noteFileName, 'rb').read() + open(self.fileName, 'rb').read()).hexdigest()
       cache = cacheManager.getCache(self.fileName)
 
       try:    #MFH - it crashes here on previews!
-        result = cache.execute('SELECT `info` FROM `songinfo` WHERE `hash` = ?', [ckey]).fetchone()
+        result = cache.execute('SELECT `info` FROM `songinfo` WHERE `hash` = ?', [self.stateHash]).fetchone()
       except Exception, e:
         Log.error(str(e))
         result = None
@@ -274,7 +275,7 @@ class SongInfo(object):
         except:
           # The entry is there but could not be loaded.
           # Nuke it and let it be rebuilt further down.
-          cache.execute('DELETE FROM `songinfo` WHERE `hash` = ?', [ckey])
+          cache.execute('DELETE FROM `songinfo` WHERE `hash` = ?', [self.stateHash])
 
     # Read highscores and verify their hashes.
     # There ain't no security like security throught obscurity :)
@@ -493,11 +494,10 @@ class SongInfo(object):
   # stump: Write this song's info into the cache.
   def writeCache(self):
     if canCache and self.allowCacheUsage:
-      ckey = zlib.crc32(open(self.noteFileName, 'rb').read() + open(self.fileName, 'rb').read())
+      self.stateHash = hashlib.sha1(open(self.noteFileName, 'rb').read() + open(self.fileName, 'rb').read()).hexdigest()
       cache = cacheManager.getCache(self.fileName)
       pkl = cPickle.dumps(self.__dict__)
-      cache.execute('INSERT OR REPLACE INTO `songinfo` (`hash`, `info`) VALUES (?, ?)', [ckey, pkl])
-      cache.commit()
+      cache.execute('INSERT OR REPLACE INTO `songinfo` (`hash`, `info`) VALUES (?, ?)', [self.stateHash, pkl])
 
 
   def _set(self, attr, value):
@@ -3743,6 +3743,12 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
   for name in names:
     progressCallback(len(songs)/float(len(names)))
     songs.append(SongInfo(engine.resource.fileName(library, name, "song.ini", writable = True), library, allowCacheUsage=True))
+  if len(songs) and canCache:
+    cache = cacheManager.getCache(songs[0].fileName)
+    #stump: clean up the cache
+    if cache.execute('DELETE FROM `songinfo` WHERE `hash` NOT IN (' + ','.join("'%s'" % s.stateHash for s in songs) + ')').rowcount > 0:
+      cache.execute('VACUUM')  # compact the database if anything was deleted on the previous line
+    cache.commit()  # commit any changes to the cache all at once
   if not includeTutorials:
     songs = [song for song in songs if not song.tutorial]
   songs = [song for song in songs if not song.artist == '=FOLDER=']

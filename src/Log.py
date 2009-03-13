@@ -59,6 +59,8 @@ def log(cls, msg):
     import traceback
     tempTrace = traceback.format_exc()
   if tempTrace:
+    if not quiet:
+      print tempTrace
     print >>logFile, labels[cls] + " " + msg + tempTrace
     logFile.flush()  #stump: truncated tracebacks be gone!
   else:
