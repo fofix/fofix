@@ -1668,7 +1668,7 @@ class SongChooser(Layer, KeyListener):
       t = self.time / 100
       
       self.engine.view.setViewport(1,0)
-      w, h, = self.engine.view.geometry[2:4]
+      w, h = self.engine.view.geometry[2:4]
       screenw = w
       screenh = h
       r = .5
@@ -1681,6 +1681,7 @@ class SongChooser(Layer, KeyListener):
       else:
         imgwidth = self.paper.width1()
         wfactor = 640.000/imgwidth
+        imgheight = self.paper.height1()
         if self.background != None:
           self.engine.drawImage(self.background, scale = (.5,-.5), coord = (w/2,h/2))
         else:
@@ -1692,7 +1693,8 @@ class SongChooser(Layer, KeyListener):
             y = 0
           else:
             y = h*(self.selectedIndex-2)*2/16.06  #worldrave - Tweaked the number so the image doesn't move off sync more and more as the paper moves down.
-          papercoord = (w/2,y + h/2)
+          
+          papercoord = (w/2,(h - (w*(imgheight/imgwidth))/2) + y)
         else:
           papercoord = (w/2,h/2)
 
