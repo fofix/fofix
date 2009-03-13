@@ -1706,7 +1706,7 @@ class SongChooser(Layer, KeyListener):
 
         #racer: render preview graphic    worldrave - Added theme.ini control over X+Y position, as well as scaling X+Y control.
       if self.previewDisabled == True and self.preview != None:
-        self.engine.drawImage(self.preview, scale = (Theme.setlistpreviewbuttonposX,-Theme.setlistpreviewbuttonposY), coord = (w*Theme.setlistpreviewbuttonscaleX, h*Theme.setlistpreviewbuttonscaleY))
+        self.engine.drawImage(self.preview, scale = (Theme.setlistpreviewbuttonscaleX,-Theme.setlistpreviewbuttonscaleY), coord = (w*Theme.setlistpreviewbuttonposX, h*Theme.setlistpreviewbuttonposY))
       else:
         self.preview = None
   
