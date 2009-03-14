@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-03-14 11:42-0700\n"
+"POT-Creation-Date: 2009-03-14 12:52-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2204,46 +2204,46 @@ msgstr ""
 msgid "%d points is a new high score! Enter your name:"
 msgstr ""
 
-#: GameResultsScene.py:1194
+#: GameResultsScene.py:1195
 #, python-format
 msgid "%s High Scores for %s"
 msgstr ""
 
-#: GameResultsScene.py:1196
+#: GameResultsScene.py:1197
 #, python-format
 msgid "%s High Scores"
 msgstr ""
 
-#: GameResultsScene.py:1202
+#: GameResultsScene.py:1203
 #, python-format
 msgid "Difficulty: %s"
 msgstr ""
 
-#: GameResultsScene.py:1263
+#: GameResultsScene.py:1264
 msgid "Uploading Scores..."
 msgstr ""
 
-#: GameResultsScene.py:1268
+#: GameResultsScene.py:1269
 msgid "Scores uploaded!"
 msgstr ""
 
-#: GameResultsScene.py:1272
+#: GameResultsScene.py:1273
 msgid "Your highscore ranks"
 msgstr ""
 
-#: GameResultsScene.py:1273
+#: GameResultsScene.py:1274
 msgid "on the world starpower chart!"
 msgstr ""
 
-#: GameResultsScene.py:1276
+#: GameResultsScene.py:1277
 msgid "but your rank is unknown."
 msgstr ""
 
-#: GameResultsScene.py:1279
+#: GameResultsScene.py:1280
 msgid "but there was no new highscore."
 msgstr ""
 
-#: GameResultsScene.py:1282
+#: GameResultsScene.py:1283
 msgid "Score upload failed!  World charts may be down."
 msgstr ""
 

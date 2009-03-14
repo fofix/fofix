@@ -725,19 +725,20 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       #MFH - this is just a dirty hack.  Dirty, dirty hack.  Should be refined.
       scoreToUse = self.currentScore[0]
       starsToUse = self.scoring[0].stars
+      accuracyToUse = self.scoring[0].hitAccuracy
 
       #MFH TODO - utilize new functions in self.engine.data to automatically enumerate any number of the following soundfiles automatically, for issue 73
       if self.Congratphrase:
         if scoreToUse == 0:
           taunt = os.path.join("sounds","jurgen1.ogg")
-        elif self.accuracy[i] == 100.0:    #MFH - this will only play when you 100% a song
+        elif accuracyToUse == 100.0:    #MFH - this will only play when you 100% a song
           taunt = random.choice([os.path.join("sounds","100pct1.ogg"), os.path.join("sounds","100pct2.ogg"), os.path.join("sounds","100pct3.ogg")])
-        elif self.accuracy[i] >= 99.0:    #MFH - these 3 sounds will only play when you get > 99.0%
+        elif accuracyToUse >= 99.0:    #MFH - these 3 sounds will only play when you get > 99.0%
           taunt = random.choice([os.path.join("sounds","99pct1.ogg"), os.path.join("sounds","99pct2.ogg"), os.path.join("sounds","99pct3.ogg")])
 
         elif starsToUse > 0 and starsToUse < 5:
           taunt = random.choice([os.path.join("sounds","jurgen2.ogg"), os.path.join("sounds","jurgen3.ogg"), os.path.join("sounds","jurgen4.ogg"), os.path.join("sounds","jurgen5.ogg")])
-        elif self.stars[i] >= 5:
+        elif starsToUse >= 5:
           taunt = random.choice([os.path.join("sounds","perfect1.ogg"), os.path.join("sounds","perfect2.ogg"), os.path.join("sounds","perfect3.ogg")])
 
       if taunt:
