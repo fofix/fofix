@@ -159,7 +159,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     
     self.fullView = self.engine.view.geometry[2:4]
     
-    self.congratPhrase = self.engine.config.get("game", "congrats")
+    self.Congratphrase = self.engine.config.get("game", "congrats")#blazingamer
     self.keepCount     = self.engine.config.get("game", "keep_play_count")
     
     self.showHandicap  = self.engine.config.get("handicap", "detailed_handicap")
@@ -718,6 +718,35 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         self.song.info.save()
         self.doneCount = True
       self.resultStep = 3
+      
+      #MFH - re-adding taunt logic from r912:
+      taunt = None
+
+      #MFH - this is just a dirty hack.  Dirty, dirty hack.  Should be refined.
+      scoreToUse = self.currentScore[0]
+      starsToUse = self.scoring[0].stars
+
+      #MFH TODO - utilize new functions in self.engine.data to automatically enumerate any number of the following soundfiles automatically, for issue 73
+      if self.Congratphrase:
+        if scoreToUse == 0:
+          taunt = os.path.join("sounds","jurgen1.ogg")
+        elif self.accuracy[i] == 100.0:    #MFH - this will only play when you 100% a song
+          taunt = random.choice([os.path.join("sounds","100pct1.ogg"), os.path.join("sounds","100pct2.ogg"), os.path.join("sounds","100pct3.ogg")])
+        elif self.accuracy[i] >= 99.0:    #MFH - these 3 sounds will only play when you get > 99.0%
+          taunt = random.choice([os.path.join("sounds","99pct1.ogg"), os.path.join("sounds","99pct2.ogg"), os.path.join("sounds","99pct3.ogg")])
+
+        elif starsToUse > 0 and starsToUse < 5:
+          taunt = random.choice([os.path.join("sounds","jurgen2.ogg"), os.path.join("sounds","jurgen3.ogg"), os.path.join("sounds","jurgen4.ogg"), os.path.join("sounds","jurgen5.ogg")])
+        elif self.stars[i] >= 5:
+          taunt = random.choice([os.path.join("sounds","perfect1.ogg"), os.path.join("sounds","perfect2.ogg"), os.path.join("sounds","perfect3.ogg")])
+
+      if taunt:
+        try:
+          self.engine.resource.load(self, "taunt", lambda: Sound(self.engine.resource.fileName(taunt)))
+        except IOError:
+          taunt = None
+          self.taunt = None
+      
     
     if self.resultStep > 2:
       if self.pauseScroll < 5000:
@@ -725,6 +754,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       else:
         self.offset -= .001
     
+
+
     if self.counter > 5000 and self.taunt:
       self.taunt.setVolume(self.engine.config.get("audio", "SFX_volume"))
       self.taunt.play()
