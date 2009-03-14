@@ -2347,7 +2347,8 @@ class Guitar:
                 if self.theme == 0 or self.theme == 1: #GH3 starcolor
                   flamecol = (.3,.7,.9)
                 else: #Default starcolor (Rockband)
-                  flamecol = glColor3f(.2,.2,.2)
+                  #flamecol = glColor3f(.2,.2,.2)
+                  flamecol = (.2,.2,.2)
               self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x+.005, y +.25 +.005, 0), rot = (90, 1, 0, 0),
                                     scale = (.35 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 5.0 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 5.0 + .6 * ms * ff),
                                     vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
