@@ -153,6 +153,8 @@ Config.define("theme", "setlistpreviewbuttonposX", float, 0.5)
 Config.define("theme", "setlistpreviewbuttonposY", float, 0.5)
 Config.define("theme", "setlistpreviewbuttonscaleX", float, 0.5)
 Config.define("theme", "setlistpreviewbuttonscaleY", float, 0.5)
+Config.define("theme", "versiontagposX", float, 0.5)
+Config.define("theme", "versiontagposY", float, 0.5)
 
 #evilynux
 Config.define("theme", "songlist_score_color",  str, "#93C351")
@@ -418,6 +420,8 @@ songInfoDisplayScale = None
 #Worldrave - for position of song info display during countdown
 songInfoDisplayX = None
 songInfoDisplayY = None
+versiontagposX = None
+versiontagposY = None
 
 #MFH - y offset = lines, x offset = spaces
 songSelectSubmenuOffsetLines = None
@@ -711,6 +715,7 @@ def setupSonglist(config):
   global fail_text_colorVar, fail_selected_colorVar, fail_completed_colorVar
   global songSelectSubmenuX, songSelectSubmenuY
   global songSelectSubmenuOffsetLines, songSelectSubmenuOffsetSpaces
+  global versiontagposX, versiontagposY
   
   global song_rb2_name_colorVar, song_rb2_name_selected_colorVar, song_rb2_diff_colorVar, song_rb2_artist_colorVar
 
@@ -722,6 +727,8 @@ def setupSonglist(config):
   setlistpreviewbuttonposY = config.get("theme", "setlistpreviewbuttonposY")
   setlistpreviewbuttonscaleX = config.get("theme", "setlistpreviewbuttonscaleX")
   setlistpreviewbuttonscaleY = config.get("theme", "setlistpreviewbuttonscaleY")
+  versiontagposX = config.get("theme", "versiontagposX")
+  versiontagposY = config.get("theme", "versiontagposY")
   songSelectSubmenuOffsetLines = config.get("theme", "song_select_submenu_offset_lines")
   songSelectSubmenuOffsetSpaces = config.get("theme", "song_select_submenu_offset_spaces")
   songSelectSubmenuX = config.get("theme", "song_select_submenu_x")

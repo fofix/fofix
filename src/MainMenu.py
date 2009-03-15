@@ -560,6 +560,6 @@ class MainMenu(BackgroundLayer):
 #racer: added version tag to main menu:
     if self.version != None:
           wfactor = self.version.widthf(pixelw = 640.000)
-          self.engine.drawImage(self.version, (wfactor,-wfactor),(w/2, h/2))
+          self.engine.drawImage(self.version, (0.5,-0.5),(w*Theme.versiontagposX, h*Theme.versiontagposY)) #worldrave - Added theme settings to control X+Y positions of versiontag.
 
 
