@@ -925,7 +925,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.drumScoringEnabled = True
     
     
-    #count / init solos
+    #count / init solos and notes
     for i,guitar in enumerate(self.guitars):
       #MFH - go through, locate, and mark the last drum note.  When this is encountered, drum scoring should be turned off.
       lastDrumNoteTime = 0.0
@@ -969,6 +969,30 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
 
       self.scoring[i].totalNotes = len([1 for Ntime, event in self.song.track[i].getAllEvents() if isinstance(event, Note)])
+      
+      #MFH - TODO - determine which marker is BRE, and count streak notes behind it to remove from the scorecard
+      if self.song.hasFreestyleMarkings:
+        for time, event in self.song.midiEventTrack[i].getAllEvents():
+          if isinstance(event, Song.MarkerNote) and not event.endMarker:
+            if (event.number == Song.freestyleMarkingNote):
+              thisIsABre = False
+              if guitar.isDrum: 
+                if time > self.song.breMarkerTime:
+                  thisIsABre = True
+              else:   #MFH - guitar or bass; no BRE text event marker required
+                thisIsABre = True
+              
+              if thisIsABre:
+                breStart = time
+                breEnd = time + event.length
+                if guitar.isDrum:   #MFH - count drum notes individually
+                  numBreStreakNotes = len([1 for time, event in self.song.track[i].getEvents(breStart, breEnd) if isinstance(event, Note)])
+                else:   #MFH - count guitar / bass notes with grouped chords
+                  numBreStreakNotes = len(set(time for time, event in self.song.track[i].getEvents(breStart, breEnd) if isinstance(event, Note)))
+                self.scoring[i].totalStreakNotes -= numBreStreakNotes   #MFH - remove BRE notes correctly from streak count.      
+                Log.debug("Removed %d streak notes from player %d" % (numBreStreakNotes, i) )
+
+
       
       if guitar.useMidiSoloMarkers:   #mark using the new MIDI solo marking system
         for time, event in self.song.midiEventTrack[i].getAllEvents():
@@ -2978,10 +3002,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         for tym, theNote in missedNotes:   #MFH - also want to mark these notes as Played so they don't count against the note total!
           #theNote.played = True
           theNote.skipped = True
-          if self.coOpType:
-            self.coOpScoreCard.totalStreakNotes -= 1
-          else:
-            self.scoring[num].totalStreakNotes -= 1
+          #if self.coOpType:
+          #  self.coOpScoreCard.totalStreakNotes -= 1
+          #else:
+          #  self.scoring[num].totalStreakNotes -= 1
         
       else:
         if guitar.isDrum:
@@ -3442,10 +3466,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           for tym, theNote in missedNotes:   #MFH - also want to mark these notes as Played so they don't count against the note total!
             #theNote.played = True
             theNote.skipped = True
-            if self.coOpType:
-              self.coOpScoreCard.totalStreakNotes -= 1
-            else:
-              self.scoring[i].totalStreakNotes -= 1
+            #if self.coOpType:
+            #  self.coOpScoreCard.totalStreakNotes -= 1
+            #else:
+            #  self.scoring[i].totalStreakNotes -= 1
         else:
           missedNotes = guitar.getMissedNotesMFH(self.song, pos)
           if guitar.paused:
