@@ -15,6 +15,8 @@ Then use any of the following settings below the {{{[theme]}}} header in the the
 ||main_menu_vspacing = 0.09||Controls the spacing between the menu text items. Use a decimal # between 0-1||
 ||multiplayertext5 = .40,.35,.46,.045||.40 is X Pos, .35 is Y Position, .46 is Scaling Size, .045 is Line Spacing between menu items. Used for Multiplayer Menu (This is only used if you made the multiplayer.png and multiplayertext10.png images. The '5' in the name refers to being that, for example, the GH3 multiplayer menu has 5 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
 ||solotext2 = .40,.35,.46,.045||.40 is X Pos, .35 is Y Position, .46 is Scaling Size, .045 is Line Spacing between menu items. Used for Solo Menu (This is only used if you made the solo.png and solotext2.png images. The '2' in the name refers to being that, for example, the RB solo menu has 2 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
+||versiontagposX = 0.5|| Controls the X position of the Versiontag image (Default is 0.5 due to the default image being fullscreen. Change it once making image small)||
+||versiontagposY = 0.5|| Controls the Y position of the Versiontag image (Default is 0.5 due to the default image being fullscreen. Change it once making image small)||
 
 ------------------------------------------------------------------------------------------
 =Options Menu=
