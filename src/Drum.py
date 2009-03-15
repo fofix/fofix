@@ -364,14 +364,27 @@ class Drum:
         engine.loadImgDrawing(self, "neckDrawing", os.path.join("necks","Neck_"+self.neck+".png"),  textureSize = (256, 256))
 
 
-    engine.loadImgDrawing(self, "hitflames1Drawing", os.path.join("themes",themename,"hitflames1.png"),  textureSize = (128, 128))
-    engine.loadImgDrawing(self, "hitflames2Drawing", os.path.join("themes",themename,"hitflames2.png"),  textureSize = (128, 128))
+    #MFH - making hitflames optional
+    self.hitFlamesPresent = False
+    try:
+      engine.loadImgDrawing(self, "hitflames1Drawing", os.path.join("themes",themename,"hitflames1.png"),  textureSize = (128, 128))
+      engine.loadImgDrawing(self, "hitflames2Drawing", os.path.join("themes",themename,"hitflames2.png"),  textureSize = (128, 128))
+      self.hitFlamesPresent = True
+    except IOError:
+      self.hitFlamesPresent = False
+      self.hitflames1Drawing = None
+      self.hitflames2Drawing = None
 
     try:
       engine.loadImgDrawing(self, "hitglowAnim", os.path.join("themes",themename,"hitglowanimation.png"),  textureSize = (128, 128))
     except IOError:
-      engine.loadImgDrawing(self, "hitglowDrawing", os.path.join("themes",themename,"hitglow.png"),  textureSize = (128, 128))
-      engine.loadImgDrawing(self, "hitglow2Drawing", os.path.join("themes",themename,"hitglow2.png"),  textureSize = (128, 128))
+      try:
+        engine.loadImgDrawing(self, "hitglowDrawing", os.path.join("themes",themename,"hitglow.png"),  textureSize = (128, 128))
+        engine.loadImgDrawing(self, "hitglow2Drawing", os.path.join("themes",themename,"hitglow2.png"),  textureSize = (128, 128))
+      except IOError:
+        self.hitglowDrawing = None
+        self.hitglow2Drawing = None
+        self.hitFlamesPresent = False   #MFH - shut down all flames if these are missing.
       self.Hitanim = False
 
     
@@ -3124,7 +3137,8 @@ class Drum:
         self.renderFreestyleLanes(visibility, song, pos, controls) #MFH - render the lanes on top of the notes.
         self.renderFrets(visibility, song, controls)
         
-        self.renderFreestyleFlames(visibility, controls)    #MFH - freestyle hit flames
+        if self.hitFlamesPresent: #MFH - only when present!
+          self.renderFreestyleFlames(visibility, controls)    #MFH - freestyle hit flames
         
       else:
       
@@ -3140,7 +3154,8 @@ class Drum:
           self.renderNotes(visibility, song, pos)
           self.renderFrets(visibility, song, controls)
 
-        self.renderFlames(visibility, song, pos, controls)    #MFH - only when freestyle inactive!
+        if self.hitFlamesPresent: #MFH - only when present!
+          self.renderFlames(visibility, song, pos, controls)    #MFH - only when freestyle inactive!
     
       if self.leftyMode:
         glScalef(-1, 1, 1)
