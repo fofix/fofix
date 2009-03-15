@@ -3976,9 +3976,21 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.scoring[num].addScore(tempScoreValue) 
       
       scoreCard.notesHit += 1
+      #MFH - tell ScoreCard to update its totalStreak counter if we've just passed 100% for some reason:
+      if scoreCard.notesHit > scoreCard.totalStreakNotes:
+        scoreCard.totalStreakNotes = scoreCard.notesHit
+      
+      
       scoreCard.streak += 1
       if self.coOpType:
         self.scoring[num].notesHit += 1
+
+        
+        #MFH - tell ScoreCard to update its totalStreak counter if we've just passed 100% for some reason:
+        if self.scoring[num].notesHit > self.scoring[num].totalStreakNotes:
+          self.scoring[num].totalStreakNotes = self.scoring[num].notesHit
+
+        
         self.scoring[num].streak += 1
       scoreCard.updateAvMult()
       star = scoreCard.stars
@@ -4103,9 +4115,20 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.scoring[num].streak += 1
           self.scoring[num].notesHit += 1
 
+          #MFH - tell ScoreCard to update its totalStreak counter if we've just passed 100% for some reason:
+          if self.scoring[num].notesHit > self.scoring[num].totalStreakNotes:
+            self.scoring[num].totalStreakNotes = self.scoring[num].notesHit
+
+
         self.notesHit[num] = True #QQstarS:Set [0] to [i]
         
         scoreCard.notesHit += 1  # glorandwarf: was len(self.guitars[num].playedNotes)
+        
+        #MFH - tell ScoreCard to update its totalStreak counter if we've just passed 100% for some reason:
+        if scoreCard.notesHit > scoreCard.totalStreakNotes:
+          scoreCard.totalStreakNotes = scoreCard.notesHit
+        
+        
         tempScoreValue = len(self.guitars[num].playedNotes) * self.baseScore * self.multi[num]
 
       if self.coOpType and not self.coOpGH:
@@ -4242,11 +4265,23 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.notesHit[num] = True #qqstars
       self.currentlyAnimating = True        
       scoreCard.notesHit += 1  # glorandwarf: was len(self.guitars[num].playedNotes)
+      
+      #MFH - tell ScoreCard to update its totalStreak counter if we've just passed 100% for some reason:
+      if scoreCard.notesHit > scoreCard.totalStreakNotes:
+        scoreCard.totalStreakNotes = scoreCard.notesHit
+      
+      
       tempScoreValue = len(self.guitars[num].playedNotes) * self.baseScore * self.multi[num]
       
       if self.coOpType:
         self.scoring[num].streak += 1
         self.scoring[num].notesHit += 1
+        
+        #MFH - tell ScoreCard to update its totalStreak counter if we've just passed 100% for some reason:
+        if self.scoring[num].notesHit > self.scoring[num].totalStreakNotes:
+          self.scoring[num].totalStreakNotes = self.scoring[num].notesHit
+        
+        
         if self.coOpGH:
           scoreCard.addScore(tempScoreValue)
         else:
@@ -4452,11 +4487,22 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.currentlyAnimating = True        
 
       scoreCard.notesHit += 1  # glorandwarf: was len(self.guitars[num].playedNotes)
+      
+      #MFH - tell ScoreCard to update its totalStreak counter if we've just passed 100% for some reason:
+      if scoreCard.notesHit > scoreCard.totalStreakNotes:
+        scoreCard.totalStreakNotes = scoreCard.notesHit
+      
+      
       tempScoreValue = len(self.guitars[num].playedNotes) * self.baseScore * self.multi[num]
       
       if self.coOpType:
         self.scoring[num].streak += 1 #needed in co-op GH for RF HO/PO
         self.scoring[num].notesHit += 1
+
+        #MFH - tell ScoreCard to update its totalStreak counter if we've just passed 100% for some reason:
+        if self.scoring[num].notesHit > self.scoring[num].totalStreakNotes:
+          self.scoring[num].totalStreakNotes = self.scoring[num].notesHit
+
         if self.coOpGH:
           scoreCard.addScore(tempScoreValue)
         else:
