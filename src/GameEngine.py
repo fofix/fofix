@@ -577,7 +577,7 @@ class GameEngine(Engine):
           #Log.debug(name + " is not a folder, cannot list contents: " + str(e))
           thisIsAnAnimatedStageFolder = False
         for aniFile in aniStageFolderListing:
-          if os.path.splitext(aniFile)[1] == ".png":  #we've found at least one .png file here, chances are this is a valid animated stage folder
+          if os.path.splitext(aniFile)[1] == ".png" or os.path.splitext(aniFile)[1] ==  ".jpg" or os.path.splitext(aniFile)[1] == ".jpeg":  #we've found at least one .png file here, chances are this is a valid animated stage folder
             thisIsAnAnimatedStageFolder = True
         if thisIsAnAnimatedStageFolder:
           self.stageFolders.append(name)
@@ -882,7 +882,7 @@ class GameEngine(Engine):
     if alpha == True:
       glBlendFunc(GL_SRC_ALPHA, GL_ONE)
 
-    if enumerate(color) == 4:
+    if len(color) == 4:
       glColor4f(color[0],color[1],color[2], color[3])
     else:
       glColor3f(color[0],color[1],color[2])
