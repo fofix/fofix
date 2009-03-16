@@ -3,6 +3,9 @@
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
+#               2008 myfingershurt                                  #
+#               2008 Blazingamer                                    #
+#               2008 evilynux <evilynux@gmail.com>                  #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -274,7 +277,8 @@ class Stage(object):
     if not os.path.exists(self.pathfull): # evilynux
       Log.warn("Stage folder does not exist: %s" % self.pathfull)
       self.mode = 1 # Fallback to song-specific stage
-
+    suffix = ".jpg"
+    
     # Build the layers
     for i in range(32):
       section = "layer%d" % i
@@ -333,7 +337,6 @@ class Stage(object):
   def load(self, libraryName, songName, practiceMode = False):
     # evilynux - Fixes a self.background not defined crash
     self.background = None
-
     #MFH - new background stage logic:
     if self.mode == 2:   #blank / no stage
       self.songStage = 0
@@ -344,22 +347,33 @@ class Stage(object):
       self.mode = 1
       try: #separated practice stages for the instruments by k.i.d
         if self.scene.guitars[0].isDrum:
-          self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages","practicedrum.png"))
+          background = "practicedrum"
         elif self.scene.guitars[0].isBassGuitar:
-          self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages","practicebass.png"))
+          background = "practicebass"
         else:
-          self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages","practice.png"))
+          background = "practice"
+        try:
+          self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages",background + ".jpg"))
+        except IOError:
+          self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages",background + ".png"))            
       except IOError:
         #MFH - must first fall back on the old practice.png before forcing blank stage mode!
         try:
-          self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages","practice.png"))
+          try:
+            self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages","practice.jpg"))
+          except IOError:
+            self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages","practice.png"))            
         except IOError:
           Log.warn("No practice stage, fallbacking on a forced Blank stage mode") # evilynux
           self.mode = 2    #if no practice stage, just fall back on a forced Blank stage mode
+            
     elif self.songStage == 1:    #check for song-specific background
       test = True
       try:
-        self.engine.loadImgDrawing(self, "background", os.path.join(libraryName, songName, "background.png"))
+        try:
+          self.engine.loadImgDrawing(self, "background", os.path.join(libraryName, songName, "background.jpg"))
+        except IOError:
+          self.engine.loadImgDrawing(self, "background", os.path.join(libraryName, songName, "background.png"))
       except IOError:
         Log.warn("No song-specific stage found") # evilynux
         test = False
@@ -376,9 +390,12 @@ class Stage(object):
       #myfingershurt: assign this first
       if self.mode == 1:   #just use Default.png
         try:
-          self.engine.loadImgDrawing(self, "background", os.path.join(self.path, "default.png"))
+          try:
+            self.engine.loadImgDrawing(self, "background", os.path.join(self.path, "default.jpg"))
+          except IOError:
+            self.engine.loadImgDrawing(self, "background", os.path.join(self.path, "default.png"))            
         except IOError:
-          Log.warn("Default stage not found") # evilynux
+          Log.warn("No default stage, fallbacking on a forced Blank stage mode") # evilynux
           self.mode = 2    #if no practice stage, just fall back on a forced Blank stage mode
 
       ##This checks how many Stage-background we have to select from
@@ -388,7 +405,7 @@ class Stage(object):
         allfiles = os.listdir(self.pathfull)
         for name in allfiles:
 
-          if os.path.splitext(name)[1].lower() == ".png":
+          if os.path.splitext(name)[1].lower() == ".png" or os.path.splitext(name)[1].lower() == ".jpg" or os.path.splitext(name)[1].lower() == ".jpeg":
             if os.path.splitext(name)[0].lower() != "practice" and os.path.splitext(name)[0].lower() != "practicedrum" and os.path.splitext(name)[0].lower() != "practicebass":
               Log.debug("Valid background found, index (" + str(fileIndex) + "): " + name)
               files.append(name)
@@ -428,7 +445,7 @@ class Stage(object):
         allfiles = os.listdir(self.pathfull)
         for name in allfiles:
 
-          if os.path.splitext(name)[1].lower() == ".png":
+          if os.path.splitext(name)[1].lower() == ".png" or os.path.splitext(name)[1].lower() == ".jpg" or os.path.splitext(name)[1].lower() == ".jpeg":
             if os.path.splitext(name)[0].lower() != "practice" and os.path.splitext(name)[0].lower() != "practicedrum" and os.path.splitext(name)[0].lower() != "practicebass":
               Log.debug("Valid background found, index (" + str(fileIndex) + "): " + name)
               files.append(name)
