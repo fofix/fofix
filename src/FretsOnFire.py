@@ -120,8 +120,8 @@ def main():
       engine.cmdPart = int(part)
       #evilynux - Multiplayer and mode selection support
       Config.set("game", "players", nbrplayers)
-      Config.set("player0","mode_1p", mode)
-      Config.set("player1","mode_2p", mode)
+      Config.set("game", "game_mode", mode)
+      Config.set("game", "multiplayer_mode", mode)
 
     if debug == True:
       engine.setDebugModeEnabled(not engine.isDebugModeEnabled())

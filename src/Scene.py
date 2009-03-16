@@ -218,8 +218,8 @@ class SceneClient(Scene, KeyListener):
     Scene.__init__(self, engine, owner, **args)
     self.session = session
     self.player = self.session.world.getLocalPlayer()
-    self.player2 = self.session.world.getPlayer2()
-    self.controls = Player.Controls()
+    self.multiplayers = self.session.world.getMultiplayers()
+    self.controls = engine.input.controls
     self.createClient(**args)
 
   def createClient(self, **args):
@@ -248,15 +248,13 @@ class SceneClient(Scene, KeyListener):
       return True
     return False
 
-  def lostFocus(self):
-    pass
-
   def handleControlData(self, sender, owner, flags):
+    pass
     # TODO: player mapping
-    for player in self.session.world.players:
-      if player.owner == owner:
-        player.controls.flags = flags
-        break
+    # for player in self.session.world.players:
+    #   if player.owner == owner:
+    #     player.controls.flags = flags
+    #     break
 
   def handleActorData(self, sender, id, data):
     actor = self.objects[id]
@@ -305,10 +303,11 @@ class SceneServer(Scene):
 
   def handleControlData(self, sender, owner, flags):
     # TODO: player mapping
-    for player in self.server.world.players:
-      if player.owner == owner:
-        player.controls.flags = flags
-        break
+    pass
+    # for player in self.server.world.players:
+    #   if player.owner == owner:
+    #     player.controls.flags = flags
+    #     break
 
   def handleCreateActor(self, sender, name):
     id = self.objects.generateId()

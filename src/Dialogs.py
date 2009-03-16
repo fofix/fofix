@@ -224,29 +224,31 @@ class GetText(Layer, KeyListener):
     
     #if (c in Player.KEY1S or key == pygame.K_RETURN) and not self.accepted:
     #if (c in Player.KEY1S or key == pygame.K_RETURN or c in Player.DRUM4S) and not self.accepted:   #MFH - adding support for green drum "OK"
-    if (c in Player.KEY1S or key == pygame.K_RETURN or (c in Player.DRUM4S and self.drumHighScoreNav)) and not self.accepted:   #MFH - adding support for green drum "OK"
+    if unicode and ord(unicode) > 31 and not self.accepted:
+      self.text += unicode
+    elif (c in Player.key1s or key == pygame.K_RETURN or (c in Player.drum4s and self.drumHighScoreNav)) and not self.accepted:   #MFH - adding support for green drum "OK"
       self.engine.view.popLayer(self)
       self.accepted = True
-      if c in Player.KEY1S:
+      if c in Player.key1s:
         self.engine.data.acceptSound.setVolume(self.sfxVolume)  #MFH
         self.engine.data.acceptSound.play()
-    elif c in Player.CANCELS + Player.KEY2S and not self.accepted:
-      self.text = None
+    elif c in Player.cancels + Player.key2s and not self.accepted:
+      self.text = ""
       self.engine.view.popLayer(self)
       self.accepted = True
-      if c in Player.KEY2S:
+      if c in Player.key2s:
         self.engine.data.cancelSound.setVolume(self.sfxVolume)  #MFH
         self.engine.data.cancelSound.play()
-    elif (c in Player.KEY4S or key == pygame.K_BACKSPACE) and not self.accepted:
+    elif (c in Player.key4s or key == pygame.K_BACKSPACE) and not self.accepted:
       self.text = self.text[:-1]
-      if c in Player.KEY4S:
+      if c in Player.key4s:
         self.engine.data.cancelSound.setVolume(self.sfxVolume)  #MFH
         self.engine.data.cancelSound.play()
-    elif c in Player.KEY3S and not self.accepted:
+    elif c in Player.key3s and not self.accepted:
       self.text += self.text[len(self.text) - 1]
       self.engine.data.acceptSound.setVolume(self.sfxVolume)  #MFH
       self.engine.data.acceptSound.play()
-    elif c in Player.ACTION1S and not self.accepted:
+    elif c in Player.action1s and not self.accepted:
       if len(self.text) == 0:
         self.text = "A"
         return True
@@ -269,7 +271,7 @@ class GetText(Layer, KeyListener):
       self.text = self.text[:-1] + chr(letterNum)
       self.engine.data.selectSound.setVolume(self.sfxVolume)  #MFH
       self.engine.data.selectSound.play()
-    elif c in Player.ACTION2S and not self.accepted:
+    elif c in Player.action2s and not self.accepted:
       if len(self.text) == 0:
         self.text = "A"
         return True
@@ -292,8 +294,6 @@ class GetText(Layer, KeyListener):
       self.text = self.text[:-1] + chr(letterNum)
       self.engine.data.selectSound.setVolume(self.sfxVolume)  #MFH
       self.engine.data.selectSound.play()
-    elif unicode and ord(unicode) > 31 and not self.accepted:
-      self.text += unicode
     return True
     
   def run(self, ticks):
@@ -328,12 +328,13 @@ class GetText(Layer, KeyListener):
 
 class GetKey(Layer, KeyListener):
   """Key choosing layer."""
-  def __init__(self, engine, prompt = "", key = None):
+  def __init__(self, engine, prompt = "", key = None, noKey = False):
     self.key = key
     self.prompt = prompt
     self.engine = engine
     self.time = 0
     self.accepted = False
+    self.noKey    = noKey
 
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
     if self.logClassInits == 1:
@@ -346,8 +347,7 @@ class GetKey(Layer, KeyListener):
     self.engine.input.removeKeyListener(self)
     
   def keyPressed(self, key, unicode):
-    c = self.engine.input.controls.getMapping(key)
-    if c in Player.CANCELS + Player.KEY2S and not self.accepted:
+    if key == pygame.K_ESCAPE and not self.accepted:
       self.key = None
       self.engine.view.popLayer(self)
       self.accepted = True
@@ -409,7 +409,7 @@ class LoadingScreen(Layer, KeyListener):
 
   def keyPressed(self, key, unicode):
     c = self.engine.input.controls.getMapping(key)
-    if self.allowCancel and c in Player.CANCELS:
+    if self.allowCancel and c in Player.menuNo:
       self.engine.view.popLayer(self)
     return True
     
@@ -484,7 +484,7 @@ class MessageScreen(Layer, KeyListener):
 
   def keyPressed(self, key, unicode):
     c = self.engine.input.controls.getMapping(key)
-    if c in Player.KEY1S + Player.KEY2S + Player.DRUM1S + Player.DRUM4S + Player.CANCELS or key == pygame.K_RETURN or key == pygame.K_ESCAPE:
+    if c in Player.key1s + Player.key2s + Player.drum1s + Player.drum4s + Player.cancels or key == pygame.K_RETURN or key == pygame.K_ESCAPE:
       self.engine.view.popLayer(self)
     return True
     
@@ -532,8 +532,8 @@ class SongChooser(Layer, KeyListener):
 
     #MFH - retrieve game parameters:
     self.gamePlayers = self.engine.config.get("game", "players")
-    self.gameMode1p = self.engine.config.get("player0","mode_1p")
-    self.gameMode2p = self.engine.config.get("player1","mode_2p")
+    self.gameMode1p = self.engine.config.get("game","game_mode")
+    self.gameMode2p = self.engine.config.get("game","multiplayer_mode")
     if self.gameMode1p == 2:
       self.careerMode = True
     else:
@@ -557,7 +557,10 @@ class SongChooser(Layer, KeyListener):
     self.song_rb2_diff_color = Theme.hexToColor(Theme.song_rb2_diff_colorVar)
     self.song_rb2_artist_color = Theme.hexToColor(Theme.song_rb2_artist_colorVar)
 
-    
+    self.scrolling = 0
+    self.delay     = 0
+    self.rate      = 0
+    self.scroller  = [0, self.scrollUp, self.scrollDown]
 
     self.listRotation = self.engine.config.get("game", "songlistrotation")
     self.songCoverType = self.engine.config.get("game", "songcovertype")
@@ -697,9 +700,6 @@ class SongChooser(Layer, KeyListener):
     self.library        = selectedLibrary
     self.searchText     = ""
     self.searching      = False
-    self.scrollUp       = False
-    self.scrollDown     = False
-    self.click          = False
     
     self.halfTime = 0
 
@@ -1118,8 +1118,7 @@ class SongChooser(Layer, KeyListener):
 
     
   def shown(self):
-    self.engine.input.addKeyListener(self, priority = True)
-    self.engine.input.enableKeyRepeat()
+    self.engine.input.addKeyListener(self) #, priority = True
     
   def hidden(self):
     if self.songLoader:
@@ -1128,7 +1127,6 @@ class SongChooser(Layer, KeyListener):
       self.song.fadeout(1000)
       self.song = None
     self.engine.input.removeKeyListener(self)
-    self.engine.input.disableKeyRepeat()
 
       
   def getSelectedSong(self):
@@ -1199,7 +1197,8 @@ class SongChooser(Layer, KeyListener):
 
     self.lastTime = self.time
     c = self.engine.input.controls.getMapping(key)
-    if c in Player.KEY1S or key == pygame.K_RETURN or (c in Player.DRUM4S and self.drumNav):
+    if (c in Player.menuYes and not c in Player.starts) or key == pygame.K_RETURN:
+      self.scrolling = 0
       if self.matchesSearch(self.selectedItem):
         # evilynux - "song" might be in the process of being created by a song preview,
         #            stopping the songLoader is safer.
@@ -1255,7 +1254,7 @@ class SongChooser(Layer, KeyListener):
               break  
           self.engine.view.pushLayer(self)
           
-    elif c in Player.KILLS and self.engine.config.get("game", "whammy_changes_sort_order"):
+    elif c in Player.kills and self.engine.config.get("game", "whammy_changes_sort_order"):
         orderings = self.engine.config.getOptions("game", "sort_order")[1]
         self.sortOrder += 1
         #if self.sortOrder > len(orderings):
@@ -1270,7 +1269,7 @@ class SongChooser(Layer, KeyListener):
         self.loadCollection()
 
         
-    elif c in Player.CANCELS + Player.KEY2S or (c in Player.DRUM1S and self.drumNav):
+    elif c in Player.menuNo:
       # evilynux - "song" might be in the process of being created,
       #            stopping the songLoader is safer.
       if self.songLoader:
@@ -1297,7 +1296,7 @@ class SongChooser(Layer, KeyListener):
 
 
     # left + right to quickly skip to the item after the next title
-    elif c in Player.LEFTS:
+    elif c in Player.lefts or key == pygame.K_LEFT:
       #if self.tiersArePresent or self.careerMode: # if there are no titles, we'll have an infinite loop = bad
       if self.tiersArePresent: # if there are no titles, we'll have an infinite loop = bad
         self.selectedIndex = (self.selectedIndex - 1) % len(self.items)   #MFH - nudge it up one count.
@@ -1313,7 +1312,7 @@ class SongChooser(Layer, KeyListener):
             break
         self.updateSelection()
     
-    elif c in Player.RIGHTS:
+    elif c in Player.rights or key == pygame.K_RIGHT:
       #if self.tiersArePresent or self.careerMode: # if there are no titles, we'll have an infinite loop = bad
       if self.tiersArePresent: # if there are no titles, we'll have an infinite loop = bad
         self.selectedIndex = (self.selectedIndex + 1) % len(self.items) #MFH - nudge it down one count to get things started.
@@ -1330,27 +1329,27 @@ class SongChooser(Layer, KeyListener):
 
         
     #myfingershurt: adding yellow fret preview again
-    elif c in Player.KEY3S:
+    elif c in Player.key3s:
       self.playSong = True
 
     #racer: highscores change on fret hit
-    elif c in Player.KEY4S or (c in Player.BASEDRUMS and self.drumNav):
+    elif c in Player.key4s:
      self.highScoreChange = True
 
     #MFH - instrument change on 5th fret
     #elif c in Player.KEY5S or (c in Player.DRUM3S and self.drumNav):
-    elif c in Player.KEY5S:   #MFH can't use drum3, that's for down
+    elif c in Player.key5s:   #MFH can't use drum3, that's for down
      self.instrumentChange = True
 
 
-    elif c in Player.UPS + Player.ACTION1S or (c in Player.DRUM2S and self.drumNav):
-      self.scrollUp = True
-      self.click = False
-      self.scroll(0)
-    elif c in Player.DOWNS + Player.ACTION2S or (c in Player.DRUM3S and self.drumNav):
-      self.scrollDown = True
-      self.click = False
-      self.scroll(1)
+    elif c in Player.menuUp or key == pygame.K_UP:
+      self.scrolling = 1
+      self.delay = self.engine.scrollDelay
+      self.scrollUp()
+    elif c in Player.menuDown or key == pygame.K_DOWN:
+      self.scrolling = 2
+      self.delay = self.engine.scrollDelay
+      self.scrollDown()
     elif key == pygame.K_BACKSPACE and not self.accepted:
       self.searchText = self.searchText[:-1]
       if self.searchText == "":
@@ -1387,65 +1386,53 @@ class SongChooser(Layer, KeyListener):
     return True
   
   def keyReleased(self, key):
+    self.scrolling = 0
     if not self.items or self.accepted:
       return
-    c = self.engine.input.controls.getMapping(key)
-    if c in Player.UPS + Player.ACTION1S or (c in Player.DRUM2S and self.drumNav):
-      self.scrollUp = False
-      self.click = False
-    elif c in Player.DOWNS + Player.ACTION2S or (c in Player.DRUM3S and self.drumNav):
-      self.scrollDown = False
-      self.click = False
-    else:
-      self.click = False
     return True
   
-  def scroll(self, dir):
-    if not self.click or (self.click and (self.time - self.lastTime > 10)):
-      self.engine.data.selectSound.play()
-      if dir == 0:
-        #if not self.song:
-        # self.engine.data.selectSound.setVolume(self.sfxVolume)  #MFH
+  def scrollUp(self):
+    self.engine.data.selectSound.play()
+    if self.matchesSearch(self.items[self.selectedIndex]):
+      while 1:
+        #self.selectedIndex = (self.selectedIndex - 1) % len(self.items)
+        # evilynux - Skip blank lines and Tier names
+        currentIndex = self.selectedIndex
+        while 1:
+          currentIndex = (currentIndex - 1) % len(self.items)
+          if isinstance(self.items[currentIndex], Song.SongInfo) or \
+              isinstance(self.items[currentIndex], Song.CareerResetterInfo) or \
+              isinstance(self.items[currentIndex], Song.LibraryInfo) or \
+              isinstance(self.items[currentIndex], Song.RandomSongInfo) or \
+              (self.display == 0 and isinstance(self.items[currentIndex], Song.TitleInfo)):
+            break
+        self.selectedIndex = currentIndex
         if self.matchesSearch(self.items[self.selectedIndex]):
-          while 1:
-            #self.selectedIndex = (self.selectedIndex - 1) % len(self.items)
-            # evilynux - Skip blank lines and Tier names
-            currentIndex = self.selectedIndex
-            while 1:
-              currentIndex = (currentIndex - 1) % len(self.items)
-              if isinstance(self.items[currentIndex], Song.SongInfo) or \
-                 isinstance(self.items[currentIndex], Song.CareerResetterInfo) or \
-                 isinstance(self.items[currentIndex], Song.LibraryInfo) or \
-                 isinstance(self.items[currentIndex], Song.RandomSongInfo) or \
-                 (self.display == 0 and isinstance(self.items[currentIndex], Song.TitleInfo)):
-                break
-            self.selectedIndex = currentIndex
-
-            if self.matchesSearch(self.items[self.selectedIndex]):
-            #if self.matchesSearch(self.items[self.selectedIndex]) and not isinstance(self.items[self.selectedIndex], Song.TitleInfo):
-              break
-        self.updateSelection()
-      elif dir == 1:
+        #if self.matchesSearch(self.items[self.selectedIndex]) and not isinstance(self.items[self.selectedIndex], Song.TitleInfo):
+          break
+    self.updateSelection()
+  
+  def scrollDown(self):
+    self.engine.data.selectSound.play()
+    if self.matchesSearch(self.items[self.selectedIndex]):
+      while 1:
+        #self.selectedIndex = (self.selectedIndex + 1) % len(self.items)
+        # evilynux - Skip blank lines and Tier names
+        currentIndex = self.selectedIndex
+        while 1:
+          currentIndex = (currentIndex + 1) % len(self.items)
+          if isinstance(self.items[currentIndex], Song.SongInfo) or \
+              isinstance(self.items[currentIndex], Song.CareerResetterInfo) or \
+             isinstance(self.items[currentIndex], Song.LibraryInfo) or \
+             isinstance(self.items[currentIndex], Song.RandomSongInfo) or \
+             (self.display == 0 and isinstance(self.items[currentIndex], Song.TitleInfo)):
+            break
+        self.selectedIndex = currentIndex
+      
         if self.matchesSearch(self.items[self.selectedIndex]):
-          while 1:
-            #self.selectedIndex = (self.selectedIndex + 1) % len(self.items)
-            # evilynux - Skip blank lines and Tier names
-            currentIndex = self.selectedIndex
-            while 1:
-              currentIndex = (currentIndex + 1) % len(self.items)
-              if isinstance(self.items[currentIndex], Song.SongInfo) or \
-                 isinstance(self.items[currentIndex], Song.CareerResetterInfo) or \
-                 isinstance(self.items[currentIndex], Song.LibraryInfo) or \
-                 isinstance(self.items[currentIndex], Song.RandomSongInfo) or \
-                 (self.display == 0 and isinstance(self.items[currentIndex], Song.TitleInfo)):
-                break
-            self.selectedIndex = currentIndex
-          
-            if self.matchesSearch(self.items[self.selectedIndex]):
-            #if self.matchesSearch(self.items[self.selectedIndex]) and not isinstance(self.items[self.selectedIndex], Song.TitleInfo):
-              break
-        self.updateSelection()
-      self.click = True
+        #if self.matchesSearch(self.items[self.selectedIndex]) and not isinstance(self.items[self.selectedIndex], Song.TitleInfo):
+          break
+    self.updateSelection()
 
   def matchesSearch(self, item):
     if not self.searchText:
@@ -1517,12 +1504,12 @@ class SongChooser(Layer, KeyListener):
       if self.songCountdown <= 0:
         self.playSelectedSong()
     
-    self.halfTime = ~self.halfTime
-    if self.halfTime == 0:
-      if self.scrollDown:
-        self.scroll(1)
-      elif self.scrollUp:
-        self.scroll(0)
+    if self.scrolling > 0:
+      self.delay -= ticks
+      self.rate += ticks
+      if self.delay <= 0 and self.rate >= self.engine.scrollRate:
+        self.rate = 0
+        self.scroller[self.scrolling]()
 
     d = self.cameraOffset - self.selectedOffset
     self.cameraOffset -= d * ticks / 192.0
@@ -3842,35 +3829,42 @@ class FileChooser(BackgroundLayer, KeyListener):
     finally:
       self.engine.view.resetProjection()
 
-
-
-
 #==============================================================
 #MFH - on-demand Neck Select menu
-class NeckChooser(BackgroundLayer, KeyListener):
+class NeckChooser(Layer, KeyListener):
   """Item menu layer."""
-  def __init__(self, engine, selected = None, prompt = "", player = 0):
-    self.prompt         = prompt
-    self.prompt_x       = Theme.neck_prompt_x
-    self.prompt_y       = Theme.neck_prompt_y
-    self.engine         = engine
-    self.player         = player
+  def __init__(self, engine, selected = None, prompt = _("Yellow (#3) / Blue (#4) to change, Green (#1) to confirm:"), player = "default", owner = None):
+    self.prompt   = prompt
+    self.prompt_x = Theme.neck_prompt_x
+    self.prompt_y = Theme.neck_prompt_y
+    self.engine   = engine
+    self.player   = player
+    self.owner    = owner
 
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
     if self.logClassInits == 1:
-      Log.debug("Player %d NeckChooser class init (Dialogs.py)..." % (self.player))
+      Log.debug("%s NeckChooser class init (Dialogs.py)..." % (self.player))
     
     splash = showLoadingSplashScreen(self.engine, _("Loading necks..."))
 
     self.neck = []
     self.necks = ["2none", "none"]
     self.maxNeck = 0
-
-    self.neckSettingName = "neck_choose_p%d" % (self.player)
-    self.selectedNeck = Config.get("coffee", self.neckSettingName)
+    
+    self.config = Config.load(os.path.join(Player.playerpath, "default.ini"), type = 2)
+    defaultNeck = self.config.get("player", "neck")
+    self.selectedNeck = 0
+    for i, name in enumerate(Player.playername):
+      if name == player:
+        playerNeck = Player.playerpref[i][5]
+        if playerNeck == "":
+          playerNeck = defaultNeck
+        break
+    else:
+      playerNeck = defaultNeck
 
     # evilynux - improved loading logic to support arbitrary filenames
-    #          - os.listdir is not garanteed to return a sorted list, so sort it!
+    #          - os.listdir is not guaranteed to return a sorted list, so sort it!
     neckfiles = os.listdir(self.engine.resource.fileName("necks"))
     neckfiles.sort()
 
@@ -3924,7 +3918,18 @@ class NeckChooser(BackgroundLayer, KeyListener):
         self.necks.append(neckImage)
         self.maxNeck += 1
     self.maxNeck -= 1 # evilynux - confusing, but there's an offset of -1
-    Config.define("coffee",   self.neckSettingName,  str,  0,  text = _("Neck"), options = self.neck)
+    Config.define("player",   "neck",  str,  0,  text = _("Neck"), options = self.neck)
+    
+    for i, neck in enumerate(self.neck):
+      if neck == playerNeck:
+        self.selectedNeck = i
+        break
+    else:
+      for i, neck in enumerate(self.neck):
+        if neck == defaultNeck:
+          self.selectedNeck = i
+      else:
+        self.selectedNeck = 0
 
     self.necks.append("none")
     self.necks.append("2none")
@@ -3948,47 +3953,53 @@ class NeckChooser(BackgroundLayer, KeyListener):
     self.engine.loadImgDrawing(self, "neckBG", os.path.join("themes",self.themename,"menu","neckchoosebg.png"))
     self.engine.loadImgDrawing(self, "neckSelect", os.path.join("themes",self.themename,"menu","neckchooseselect.png"))
 
-    neckChooseSettings = [
-      Settings.ConfigChoice(engine, engine.config, "coffee",   self.neckSettingName, autoApply = True)
-    ]
-    self.menu = Menu(self.engine, neckChooseSettings, pos = (12,12), onClose = self.close, onCancel = self.cancel)
-
     # ready... hide the splash screen
     hideLoadingSplashScreen(self.engine, splash)
     splash = None
-
-
-
-
     
-  def _callbackForNeck(self):
-    def cb():
-      self.chooseNeck()
-    return cb
+  def shown(self):
+    self.engine.input.addKeyListener(self, priority = True)
+  
+  def hidden(self):
+    self.engine.input.removeKeyListener(self)
     
   def chooseNeck(self):
     #self.selectedNeck = neck
-    accepted = True
-    self.engine.view.popLayer(self.menu)
+    if self.player == "default":
+      self.config.set("player","neck",self.neck[self.selectedNeck])
+    if self.owner: #rather hard-coded...
+      if self.player != "default":
+        self.owner.choices[6]  = self.neck[self.selectedNeck]
     self.engine.view.popLayer(self)
     
   def cancel(self):
-    self.accepted = True
+    self.accepted = False
     self.engine.view.popLayer(self)
-
-  def close(self):
-    self.accepted = True
-    self.engine.view.popLayer(self)
-    
-  def shown(self):
-    self.engine.view.pushLayer(self.menu)
-    
+  
+  def keyPressed(self, key, unicode):
+    c = self.engine.input.controls.getMapping(key)
+    if c in Player.key1s or key == pygame.K_RETURN:
+      self.chooseNeck()
+    elif c in Player.key2s + Player.cancels or key == pygame.K_ESCAPE:
+      self.cancel()
+    elif c in Player.key3s + Player.ups + Player.action1s + Player.lefts or key == pygame.K_UP or key == pygame.K_LEFT:
+      self.selectedNeck -= 1
+      if self.selectedNeck < 0:
+        self.selectedNeck = len(self.neck) - 1
+    elif c in Player.key4s + Player.downs + Player.action2s + Player.rights or key == pygame.K_DOWN or key == pygame.K_RIGHT:
+      self.selectedNeck += 1
+      if self.selectedNeck >= len(self.neck):
+        self.selectedNeck = 0
+    return True
+  
+  def keyReleased(self, key):
+    return
+  
   def getSelectedNeck(self):
     return self.selectedNeck
   
   def run(self, ticks):
     self.time += ticks / 50.0
-    self.selectedNeck = Config.get("coffee", self.neckSettingName)    #MFH - update this in the run not render
     
   def render(self, visibility, topMost):
    v = (1 - visibility) ** 2
@@ -4005,20 +4016,6 @@ class NeckChooser(BackgroundLayer, KeyListener):
      imgwidth = self.neckBlackBack.width1()
      wfactor = 640.000/imgwidth
      self.engine.drawImage(self.neckBlackBack, scale = (wfactor,-wfactor), coord = (w/2,h/2))
-
-
-
-   #self.selectedNeck = Config.get("coffee", self.neckSettingName)
-   # evilynux - search for index number of selected neck
-   found = False
-   for i in range(len(self.neck)):
-     # Second condition of the "if" is for backward compatibility
-     if (str(self.selectedNeck) == self.neck[i]) or ("Neck_"+str(self.selectedNeck) == self.neck[i]):
-       self.selectedNeck = i
-       found = True
-       break
-   if not found:
-     self.selectedNeck = 0
 
    currentNeck = self.necks[int(self.selectedNeck)+2]
    lastNeck1 = self.necks[int(self.selectedNeck)]
@@ -4092,7 +4089,7 @@ class NeckChooser(BackgroundLayer, KeyListener):
    wfactor = nextNeck1.widthf(pixelw = self.wfac2)
    self.engine.drawImage(nextNeck1, scale = (-wfactor,wfactor), coord = (self.x5,self.y5))
    
-   if self.menu.currentIndex == 0:
+   if self.selectedNeck:
      self.engine.drawImage(self.neckSelect, scale = (-1,1), coord = (self.x6, self.y6))
 
    #MFH - draw neck BG on top of necks
@@ -4217,6 +4214,323 @@ class ItemChooser(BackgroundLayer, KeyListener):
     finally:
       self.engine.view.resetProjection()
       
+class ControlActivator(Layer, KeyListener):
+  def __init__(self, engine, players, maxplayers = None):
+    self.engine     = engine
+    self.minPlayers = players
+    if maxplayers:
+      self.maxPlayers = maxplayers
+    else:
+      self.maxPlayers = players
+    self.time       = 0.0
+    self.controls   = self.engine.input.controls.controls[:] #make a copy
+    self.ready      = False
+    
+    self.selectedItems  = []
+    self.blockedItems   = []
+    self.selectedIndex  = 0
+    self.playerNum      = 0
+    self.confirmPlayers = 0
+    self.delay          = 0
+    self.delayedIndex   = 0
+    self.fader          = 0
+    self.fadeDir        = True
+    
+    self.tsReady = _("Press Start to Begin!")
+    self.tsInfo  = _("Use the keyboard to select or just play some notes!")
+    
+    sfxVolume = self.engine.config.get("audio", "SFX_volume")
+    self.engine.data.selectSound.setVolume(sfxVolume)
+    self.engine.data.acceptSound.setVolume(sfxVolume)  #MFH
+    self.engine.data.cancelSound.setVolume(sfxVolume)
+    
+    self.controlNum = 0
+    for i, control in enumerate(self.engine.input.controls.controls):
+      self.controlNum += 1
+      if control == "None":
+        self.controls[i] = "No Controller"
+        self.blockedItems.append(i)
+        self.controlNum -= 1
+      elif control == "defaultg":
+        self.controls[i] = _("Default Guitar")
+      elif control == "defaultd":
+        self.controls[i] = _("Default Drums")
+    
+    themename = self.engine.data.themeLabel
+
+    try:
+      self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "lobby", "controlbg.png"))
+      self.bgScale = 640.000/self.background.width1()
+    except IOError:
+      self.background = None
+    try:
+      self.engine.loadImgDrawing(self, "readyImage", os.path.join("themes", themename, "lobby", "ready.png"))
+      self.readyScale = 640.000/self.readyImage.width1()
+    except IOError:
+      self.readyImage = None
+    try:
+      self.engine.loadImgDrawing(self, "selected", os.path.join("themes", themename, "lobby", "select.png"))
+    except IOError:
+      self.selected = None
+    
+    self.selectX = Theme.controlActivateSelectX
+    self.controlSelectX = Theme.controlActivateX
+    self.controlPartX   = Theme.controlActivatePartX
+    self.selectY = Theme.controlActivateY
+    self.selectScale = Theme.controlActivateScale
+    self.selectSpace = Theme.controlActivateSpace
+    self.partBig = Theme.controlCheckPartMult
+    self.checkX = Theme.controlCheckX
+    self.checkY = Theme.controlCheckY
+    self.checkYText = Theme.controlCheckTextY
+    self.checkScale = Theme.controlCheckScale
+    self.checkSpace = Theme.controlCheckSpace
+    
+    self.partSize = Theme.controlActivatePartSize
+    try:
+      self.engine.loadImgDrawing(self, "guitar", os.path.join("themes", themename, "guitar.png"))
+      self.guitarScale = self.partSize/self.guitar.width1()
+    except IOError:
+      self.engine.loadImgDrawing(self, "guitar", "guitar.png")
+      self.guitarScale = self.partSize/self.guitar.width1()
+    try:
+      self.engine.loadImgDrawing(self, "bass", os.path.join("themes", themename, "bass.png"))
+      self.bassScale = self.partSize/self.bass.width1()
+    except IOError:
+      self.engine.loadImgDrawing(self, "bass", "bass.png")
+      self.bassScale = self.partSize/self.bass.width1()
+    try:
+      self.engine.loadImgDrawing(self, "drum", os.path.join("themes", themename, "drum.png"))
+      self.drumScale = self.partSize/self.drum.width1()
+    except IOError:
+      self.engine.loadImgDrawing(self, "drum", "drum.png")
+      self.drumScale = self.partSize/self.drum.width1()
+  
+  def shown(self):
+    if self.controlNum < self.minPlayers:
+      self.confirmPlayers = 0
+      if self.controlNum == 1:
+        plural = _("controller")
+      else:
+        plural = _("controllers")
+      showMessage(self.engine, _("You only have %d %s defined. You need at least %d for this mode.") % (self.controlNum, plural, self.minPlayers))
+      self.engine.view.popLayer(self)
+    else:
+      self.engine.input.addKeyListener(self, priority = True)
+  
+  def hidden(self):
+    self.engine.input.removeKeyListener(self)
+  
+  def confirm(self):
+    self.engine.data.acceptSound.play()
+    self.engine.input.activeGameControls = self.selectedItems
+    self.engine.input.pluginControls()
+    self.confirmPlayers = self.playerNum
+    self.engine.view.popLayer(self)
+    self.engine.input.removeKeyListener(self)
+  
+  def getPlayers(self):
+    return self.confirmPlayers
+  
+  def delaySelect(self, num):
+    self.engine.data.selectSound.play()
+    self.delay = 500
+    self.delayedIndex  = num
+    self.selectedIndex = num
+  
+  def selectControl(self, num):
+    if num in self.selectedItems or self.playerNum >= self.maxPlayers:
+      return
+    self.engine.data.acceptSound.play()
+    self.playerNum += 1
+    self.selectedItems.append(num)
+    self.blockedItems.append(num)
+    self.blockedItems.sort()
+    if self.playerNum >= self.minPlayers or self.blockedItems == [0, 1, 2, 3]:
+      self.ready = True
+    self.selectedIndex += 1
+    self.delay = 0
+    catch = 0
+    while self.selectedIndex in self.blockedItems:
+      self.selectedIndex += 1
+      catch += 1
+      if self.selectedIndex > 3:
+        self.selectedIndex = 0
+      if catch > 4:
+        self.confirm()
+        break
+    else:
+      if self.selectedIndex > 3:
+        for i in range(4):
+          if i in self.blockedItems:
+            continue
+          self.selectedIndex = i
+          break
+  
+  def keyPressed(self, key, unicode):
+    c = self.engine.input.controls.getMapping(key)
+    if key == pygame.K_RETURN:
+      self.delay = 0
+      self.selectControl(self.selectedIndex)
+    if c in Player.menuYes and self.ready:
+      self.confirm()
+      return True
+    if c in Player.cancels or key == pygame.K_ESCAPE:
+      self.engine.data.cancelSound.play()
+      if len(self.selectedItems) > 0:
+        self.delay = 0
+        self.selectedIndex = 0
+        self.blockedItems.remove(self.selectedItems.pop())
+        self.playerNum = len(self.selectedItems)
+        if self.playerNum < self.minPlayers and self.ready:
+          self.ready = False
+      else:
+        self.playerNum = 0
+        self.engine.view.popLayer(self)
+        self.engine.input.removeKeyListener(self)
+    elif c in Player.ups + Player.rights or key == pygame.K_UP or key == pygame.K_RIGHT:
+      self.engine.data.selectSound.play()
+      self.selectedIndex -= 1
+      self.delay = 0
+      catch = 0
+      while self.selectedIndex in self.blockedItems:
+        self.selectedIndex -= 1
+        catch += 1
+        if self.selectedIndex < 0:
+          self.selectedIndex = 3
+        if catch > 4:
+          self.confirm()
+          break
+      else:
+        if self.selectedIndex < 0:
+          a = range(4)
+          a.reverse()
+          for i in a:
+            if i in self.blockedItems:
+              continue
+            self.selectedIndex = i
+            break
+    elif c in Player.downs + Player.lefts or key == pygame.K_DOWN or key == pygame.K_LEFT:
+      self.engine.data.selectSound.play()
+      self.selectedIndex += 1
+      self.delay = 0
+      catch = 0
+      while self.selectedIndex in self.blockedItems:
+        self.selectedIndex += 1
+        catch += 1
+        if self.selectedIndex > 3:
+          self.selectedIndex = 0
+        if catch > 4:
+          break
+      else:
+        if self.selectedIndex > 3:
+          for i in range(4):
+            if i in self.blockedItems:
+              continue
+            self.selectedIndex = i
+            break
+    if c in Player.ups + Player.downs + Player.lefts + Player.rights + Player.cancels + Player.stars + [None]:
+      pass
+    elif c in Player.starts or key == pygame.K_LCTRL or ((c in Player.key1s or key == pygame.K_RETURN) and self.ready):
+      if self.ready:
+        self.confirm()
+        return True
+    elif c in Player.CONTROL1:
+      if not 0 in self.selectedItems:
+        self.delaySelect(0)
+        return True
+    elif c in Player.CONTROL2:
+      if not 1 in self.selectedItems:
+        self.delaySelect(1)
+        return True
+    elif c in Player.CONTROL3:
+      if not 2 in self.selectedItems:
+        self.delaySelect(2)
+        return True
+    elif c in Player.CONTROL4:
+      if not 3 in self.selectedItems:
+        self.delaySelect(3)
+        return True
+    return True
+  
+  def keyReleased(self, key):
+    pass
+  
+  def run(self, ticks):
+    self.time += ticks/50.0
+    if self.delay > 0:
+      self.delay -= ticks
+      if self.delay <= 0:
+        self.selectControl(self.selectedIndex)
+    if self.ready and self.fadeDir:
+      self.fader += ticks/1000.0
+      if self.fader > 1:
+        self.fader = 1
+        self.fadeDir = False
+    elif self.ready:
+      self.fader -= ticks/1000.0
+      if self.fader < 0.2:
+        self.fader = 0.2
+        self.fadeDir = True
+  
+  def render(self, visibility, topMost):
+    try:
+      font = self.engine.data.fontDict[Theme.controlActivateFont]
+      descFont = self.engine.data.fontDict[Theme.controlDescriptionFont]
+      checkFont = self.engine.data.fontDict[Theme.controlCheckFont]
+    except KeyError:
+      font = self.engine.data.loadingFont
+      descFont = self.engine.data.font
+      checkFont = self.engine.data.font
+    bigFont = self.engine.data.bigFont
+    self.engine.view.setOrthogonalProjection(normalize = True)
+    w, h = self.engine.view.geometry[2:4]
+    v = (1-visibility)**2
+    try:
+      if self.background:
+        self.engine.drawImage(self.background, scale = (self.bgScale,-self.bgScale), coord = (w/2,h/2))
+      Theme.setBaseColor(1-v)
+      wText, hText = descFont.getStringSize(self.tsInfo, scale = Theme.controlDescriptionScale)
+      descFont.render(self.tsInfo, (Theme.controlDescriptionX-wText/2, Theme.controlDescriptionY), scale = Theme.controlDescriptionScale)
+      for i, control in enumerate(self.controls):
+        if self.selectedIndex == i:
+          if self.selected:
+            Theme.setBaseColor(1-v)
+            self.engine.drawImage(self.selected, scale = (.5,-.5), coord = (w*self.selectX,h*(1-(self.selectY+self.selectSpace*i)/self.engine.data.fontScreenBottom)))
+          else:
+            Theme.setSelectedColor(1-v)
+        elif i in self.blockedItems:
+          glColor3f(.3, .3, .3)
+        else:
+          Theme.setBaseColor(1-v)
+        wText, hText = font.getStringSize(control, scale = self.selectScale)
+        font.render(control, (self.controlSelectX-wText, self.selectY-(hText/2)+self.selectSpace*i), scale = self.selectScale)
+        color = (1, 1, 1, 1)
+        if i in self.blockedItems:
+          color = (.3, .3, .3, 1)
+        if self.engine.input.controls.type[i] < 2 and self.engine.input.controls.type[i] is not None:
+          self.engine.drawImage(self.guitar, scale = (self.guitarScale, -self.guitarScale), coord = (w*self.controlPartX-(self.partSize*1.1), h*(1-(self.selectY+self.selectSpace*i)/self.engine.data.fontScreenBottom)), color = color)
+          self.engine.drawImage(self.bass, scale = (self.bassScale, -self.bassScale), coord = (w*self.controlPartX+(self.partSize*1.1), h*(1-(self.selectY+self.selectSpace*i)/self.engine.data.fontScreenBottom)), color = color)
+        elif self.engine.input.controls.type[i] > 1 and self.engine.input.controls.type[i] is not None:
+          self.engine.drawImage(self.drum, scale = (self.drumScale, -self.drumScale), coord = (w*self.controlPartX, h*(1-(self.selectY+self.selectSpace*i)/self.engine.data.fontScreenBottom)), color = color)
+      Theme.setBaseColor(1-v)
+      for j, i in enumerate(self.selectedItems):
+        if self.engine.input.controls.type[i] < 2 and self.engine.input.controls.type[i] is not None:
+          self.engine.drawImage(self.guitar, scale = (self.guitarScale*self.partBig, -self.guitarScale*self.partBig), coord = (w*(self.checkX+self.checkSpace*j)-(self.partSize*self.partBig*1.1), h*self.checkY))
+          self.engine.drawImage(self.bass, scale = (self.bassScale*self.partBig, -self.bassScale*self.partBig), coord = (w*(self.checkX+self.checkSpace*j)+(self.partSize*self.partBig*1.1), h*self.checkY))
+        elif self.engine.input.controls.type[i] > 1 and self.engine.input.controls.type[i] is not None:
+          self.engine.drawImage(self.drum, scale = (self.drumScale*self.partBig, -self.drumScale*self.partBig), coord = (w*(self.checkX+self.checkSpace*j), h*self.checkY))
+        wText, hText = checkFont.getStringSize(self.controls[i], scale = self.checkScale)
+        checkFont.render(self.controls[i], ((self.checkX+self.checkSpace*j)-wText/2, self.checkYText*self.engine.data.fontScreenBottom), scale = self.checkScale)
+      if self.ready:
+        if self.readyImage:
+          self.engine.drawImage(self.readyImage, scale = (self.readyScale, -self.readyScale), coord = (w*.5, h*.5), color = (1, 1, 1, self.fader))
+        else:
+          Theme.setBaseColor(self.fader)
+          wText, hText = bigFont.getStringSize(self.tsReady, scale = .001)
+          bigFont.render(self.tsReady, (.5-wText/2, .3), scale = .001)
+    finally:
+      self.engine.view.resetProjection()
       
 class BpmEstimator(Layer, KeyListener):
   """Beats per minute value estimation layer."""
@@ -4254,11 +4568,11 @@ class BpmEstimator(Layer, KeyListener):
         diffs = [self.beats[i + 1] - self.beats[i] for i in range(len(self.beats) - 1)]
         self.bpm = 60000.0 / (sum(diffs) / float(len(diffs)))
         self.beats = self.beats[-12:]
-    elif c in Player.CANCELS + Player.KEY2S:
+    elif c in Player.cancels + Player.key2s:
       self.engine.view.popLayer(self)
       self.accepted = True
       self.bpm      = None
-    elif c in Player.KEY1S or key == pygame.K_RETURN:
+    elif c in Player.key1s or key == pygame.K_RETURN:
       self.engine.view.popLayer(self)
       self.accepted = True
       
@@ -4291,7 +4605,7 @@ class BpmEstimator(Layer, KeyListener):
       
 class KeyTester(Layer, KeyListener):
   """Keyboard configuration testing layer."""
-  def __init__(self, engine, prompt = ""):
+  def __init__(self, engine, control, prompt = ""):
     self.prompt         = prompt
     self.engine         = engine
     
@@ -4302,8 +4616,77 @@ class KeyTester(Layer, KeyListener):
     
     self.accepted       = False
     self.time           = 0.0
-    self.controls       = Player.Controls()
-    self.fretColors     = Theme.fretColors
+    self.controls       = self.engine.input.controls
+    self.controlNum     = control
+    self.keyList        = Player.CONTROLS[control]
+    self.type           = self.controls.type[control]
+    self.analogKillMode = self.controls.analogKill[control]
+    self.analogSPMode   = self.controls.analogSP[control]
+    self.analogSPThresh = self.controls.analogSPThresh[control]
+    self.analogSPSense  = self.controls.analogSPSense[control]
+    self.analogDrumMode = self.controls.analogDrum[control]
+    
+    if self.type < 2:
+      self.fretColors     = Theme.fretColors
+      self.names          = [_("Left"), _("Right"), _("Up"), _("Down"), _("Start!"), \
+                             _("Cancel"), _("Fret #1"), _("Solo #1"), _("Fret #2"), _("Solo #2"), \
+                             _("Fret #3"), _("Solo #3"), _("Fret #4"), _("Solo #4"), _("Fret #5"), \
+                             _("Solo #5"), _("Pick!"), _("Pick!"), _("Starpower!"), _("Whammy")]
+    elif self.type == 2:
+      colors              = Theme.fretColors
+      self.fretColors     = [colors[1], colors[2], colors[3], colors[0]]
+      self.bassColor      = colors[4]
+      self.names          = [_("Left"), _("Right"), _("Up"), _("Down"), _("Start!"), \
+                             _("Cancel"), _("Drum #1"), None, _("Drum #2"), None, \
+                             _("Drum #3"), None, None, None, _("Drum #4"), \
+                             None, _("Bass Drum"), None, _("Starpower!"), _("None")]
+    else:
+      colors              = Theme.fretColors
+      self.fretColors     = [colors[1], colors[2], colors[3], colors[4], colors[0]]
+      self.bassColor      = Theme.bassColor
+      self.names          = [_("Left"), _("Right"), _("Up"), _("Down"), _("Start!"), \
+                             _("Cancel"), _("Drum #1"), None, _("Cymbal #2"), None, \
+                             _("Drum #3"), None, _("Cymbal #4"), None, _("Drum #5"), \
+                             None, _("Bass Drum"), None, _("Starpower!"), _("None")]
+    
+    self.engine.loadImgDrawing(self, "arrow", "arrow.png")
+    self.engine.loadImgDrawing(self, "circle", "test.png")
+    self.engine.loadImgDrawing(self, "analogBar", "analog.png")
+    self.engine.loadImgDrawing(self, "analogBox", "analogback.png")
+    self.engine.loadImgDrawing(self, "analogThresh", "analogthresh.png")
+    self.analogBoxScale = 1.0/6.0
+    self.analogBarScale = 1.0/6.0
+    self.analogThreshScale = 5.000/self.analogThresh.width1()
+    
+    #evilynux - Get killswitch mode (analog or digital?)
+    # If analog, get and show attenuation. Most code taken from GuitarScene.
+    self.isKillAnalog = False
+    self.isSPAnalog = False
+    self.areDrumsAnalog = False
+    self.whichJoyKill = 0
+    self.whichAxisKill = 0
+    self.whichJoyStar = 0
+    self.whichAxisStar = 0
+    self.whichJoyDrum1 = 0
+    self.whichAxisDrum1 = 0
+    self.whichJoyDrum2 = 0
+    self.whichAxisDrum2 = 0
+    self.whichJoyDrum3 = 0
+    self.whichAxisDrum3 = 0
+    self.whichJoyDrum4 = 0
+    self.whichAxisDrum4 = 0
+    self.whichJoyDrum5 = 0
+    self.whichAxisDrum5 = 0
+    self.whammy = 0
+    self.starpower = 0
+
+    if len(self.engine.input.joysticks) != 0 and self.type < 2:
+      if self.analogKillMode > 0:
+        KillKeyCode = self.controls.getReverseMapping(self.keyList[Player.KILL])
+        self.isKillAnalog, self.whichJoyKill, self.whichAxisKill = self.engine.input.getWhammyAxis(KillKeyCode)
+      if self.analogSPMode > 0:
+        StarKeyCode = self.controls.getReverseMapping(self.keyList[Player.STAR])
+        self.isSPAnalog, self.whichJoyStar, self.whichAxisStar = self.engine.input.getWhammyAxis(StarKeyCode)
     
   def shown(self):
     self.engine.input.addKeyListener(self, priority = True)
@@ -4314,12 +4697,32 @@ class KeyTester(Layer, KeyListener):
   def keyPressed(self, key, unicode):
     if self.accepted:
       return True
-
-    self.controls.keyPressed(key)
-    c = self.engine.input.controls.getMapping(key)
-    if c in Player.CANCELS:
+    if key == pygame.K_ESCAPE:
       self.engine.view.popLayer(self)
       self.accepted = True
+      return True
+    c = self.engine.input.controls.getMapping(key)
+    self.controls.keyPressed(key)
+    if self.type > 1:
+      if c == self.keyList[Player.DRUM1]:
+        self.engine.data.T1DrumSound.play()
+      elif c == self.keyList[Player.DRUM2]:
+        if self.type == 2:
+          self.engine.data.T2DrumSound.play()
+        else:
+          self.engine.data.CDrumSound.play()
+      elif c == self.keyList[Player.DRUM3]:
+        if self.type == 2:
+          self.engine.data.T3DrumSound.play()
+        else:
+          self.engine.data.T2DrumSound.play()
+      elif c == self.keyList[Player.DRUM4]:
+        self.engine.data.CDrumSound.play()
+      elif c == self.keyList[Player.DRUM5]:
+        if self.type == 2:
+          self.engine.data.CDrumSound.play()
+        else:
+          self.engine.data.T3DrumSound.play()
     return True
 
   def keyReleased(self, key):
@@ -4327,6 +4730,17 @@ class KeyTester(Layer, KeyListener):
   
   def run(self, ticks):
     self.time += ticks
+    if self.isSPAnalog:
+      if self.starpower > (self.analogSPThresh/100.0):
+        if self.starDelay == 0 and not self.starpowerActive:
+          self.starDelay = (10-self.analogSPSense)*25
+        else:
+          self.starDelay -= ticks
+          if self.starDelay <= 0:
+            self.starpowerActive = True
+      else:
+        self.starpowerActive = False
+        self.starDelay = 0
     
   def render(self, visibility, topMost):
     v = (1 - visibility) ** 2
@@ -4334,6 +4748,28 @@ class KeyTester(Layer, KeyListener):
     self.engine.view.setViewport(1,0)
     self.engine.view.setOrthogonalProjection(normalize = True)
     font = self.engine.data.font
+    w, h = self.engine.view.geometry[2:4]
+    
+    if self.controls.getState(self.keyList[Player.UP]):
+      if self.controls.getState(self.keyList[Player.LEFT]):
+        rotateArrow = math.pi/4
+      elif self.controls.getState(self.keyList[Player.RIGHT]):
+        rotateArrow = -math.pi/4
+      else:
+        rotateArrow = 0.0
+    elif self.controls.getState(self.keyList[Player.DOWN]):
+      if self.controls.getState(self.keyList[Player.LEFT]):
+        rotateArrow = 3*math.pi/4
+      elif self.controls.getState(self.keyList[Player.RIGHT]):
+        rotateArrow = -3*math.pi/4
+      else:
+        rotateArrow = math.pi
+    elif self.controls.getState(self.keyList[Player.LEFT]):
+      rotateArrow = math.pi/2
+    elif self.controls.getState(self.keyList[Player.RIGHT]):
+      rotateArrow = -math.pi/2
+    else:
+      rotateArrow = None
     
     fadeScreen(v)
           
@@ -4343,195 +4779,141 @@ class KeyTester(Layer, KeyListener):
       glEnable(GL_COLOR_MATERIAL)
       Theme.setBaseColor(1 - v)
       wrapText(font, (.1, .2 - v), self.prompt)
+      
+      self.engine.drawImage(self.circle, scale = (.5, -.5), coord = (w*.5,h*.6))
+      if rotateArrow is not None:
+        self.engine.drawImage(self.arrow,  scale = (.5, -.5), coord = (w*.5,h*.6), rot = rotateArrow)
+      
+      #akedrou - analog starpower
+      text = self.names[Player.STAR]
+      wText, hText = font.getStringSize(text)
+      
+      if self.isSPAnalog:
+        starThresh = (self.analogSPThresh/100.0)*(w/6.0)-(w/12.0)
+        self.engine.drawImage(self.analogThresh, scale = (self.analogThreshScale, -self.analogThreshScale), coord = ((w*.25)+starThresh, h*.3))
+        #(0.0 at level, -1 upright; 1 upside down)
+        self.starpower = abs(self.engine.input.joysticks[self.whichJoyStar].get_axis(self.whichAxisStar))
 
-      for n, c in enumerate(Guitar.PLAYER1KEYS):
-        if self.controls.getState(c):
-          glColor3f(*self.fretColors[n%5])
+      if self.starpower > 0:
+        if self.starpowerActive:
+          Theme.setSelectedColor(1 - v)
         else:
           glColor3f(.4, .4, .4)
-        font.render("#%d" % (n + 1), (.5 - .15 * (2 - n), .4 + v))
-
-      for n, c in enumerate(Guitar.PLAYER2KEYS):
-        if self.controls.getState(c):
-          glColor3f(*self.fretColors[n%5])
+        font.render(text, (.25-wText/2, .45 + v))
+        starC = (1-self.starpower)*self.analogBar.width1()*self.analogBarScale*((w/384.0)-1.0/6.0) #...not really...
+        self.engine.drawImage(self.analogBar, scale = (self.analogBarScale*self.starpower, -self.analogBarScale), coord = ((w*.25)-starC, h*.3), rect = (0, self.starpower, 0, 1), stretched = 11)
+        self.engine.drawImage(self.analogBox, scale = (self.analogBoxScale, -self.analogBoxScale), coord = (w*.25, h*.3), stretched = 11)
+      else:
+        if self.controls.getState(self.keyList[Player.STAR]):
+          Theme.setSelectedColor(1 - v)
         else:
           glColor3f(.4, .4, .4)
-        #font.render("#%d" % (n + 1), (.5 - .15 * (2 - n), 0.15+.4 + v))          
-        font.render("#%d" % (n + 1), (.5 - .15 * (2 - n), 0.15+.4 + v))
-
-      if self.controls.getState(Player.STAR):
-        Theme.setSelectedColor(1 - v)
+        font.render(text, (.25-wText/2, .45 + v))
+        
+      if self.controls.getState(self.keyList[Player.CANCEL]):
+        glColor3f(.6, 0, 0)
       else:
         glColor3f(.4, .4, .4)
-      font.render(_("StarPower"), (.25, .45 + v))
+      text = _("Select")
+      wText, hText = font.getStringSize(text)
+      font.render(text, (.333-wText/2, .28 + v))
+      
+      if self.controls.getState(self.keyList[Player.START]):
+        glColor3f(0, .6, 0)
+      else:
+        glColor3f(.4, .4, .4)
+      text = _("Start")
+      wText, hText = font.getStringSize(text)
+      font.render(text, (.667-wText/2, .28 + v))
+      
+      if self.type < 2:
 
-      #evilynux - Get killswitch mode (analog or digital?)
-      # If analog, get and show attenuation. Most code taken from GuitarScene.
-      self.playerList = [0,1] # evilynux - Static for now, should be eventually made dynamic to support more players
-      self.analogKillMode = [self.engine.config.get("game", "analog_killsw_mode"),self.engine.config.get("game", "analog_killsw_mode_p2")]
-      self.whammyVolAdjStep = 0.1
-      self.isKillAnalog = [False for i in self.playerList]
-      self.whichJoy = [0 for i in self.playerList]
-      self.whichAxis = [0 for i in self.playerList]
-      self.whammyVol = [0.0 for i in self.playerList]
-      self.targetWhammyVol = [0.0 for i in self.playerList]
-      self.defaultWhammyVol = [self.analogKillMode[i]-1.0 for i, thePlayer in enumerate(self.playerList)]   #makes xbox defaults 1.0, PS2 defaults 0.0
+        for i in range(5):
+          if self.controls.getState(self.keyList[(2*i)+Player.KEY1]):
+            glColor3f(*self.fretColors[i%5])
+            text = _("Fret")
+          elif self.controls.getState(self.keyList[(2*i)+1+Player.KEY1]):
+            glColor3f(*self.fretColors[i%5])
+            text = _("Solo")
+          else:
+            glColor3f(.4, .4, .4)
+            text = _("Fret")
+          text = "%s #%d" % (text, (i + 1))
+          wText, hText = font.getStringSize(text)
+          font.render(text, ((.2 + .15 * i)-wText/2, .4 + v))
 
-      for i, thePlayer in enumerate(self.playerList):
-        if self.analogKillMode[i] == 3:   #XBOX inverted mode
-          self.defaultWhammyVol[i] = -1.0
-
-      self.actualWhammyVol = [self.defaultWhammyVol[i] for i, thePlayer in enumerate(self.playerList)]
-      self.lastWhammyVol = [self.defaultWhammyVol[i] for i, thePlayer in enumerate(self.playerList)]
-      KillKeyCode = [0 for i in self.playerList]
-
-      if len(self.engine.input.joysticks) != 0:
-        if self.analogKillMode[0] > 0:
-          KillKeyCode[0] = self.controls.getReverseMapping(Player.KILL)
-          self.isKillAnalog[0], self.whichJoy[0], self.whichAxis[0] = self.engine.input.getWhammyAxis(KillKeyCode[0])
-        if self.analogKillMode[1] > 0:
-          KillKeyCode[1] = self.controls.getReverseMapping(Player.PLAYER_2_KILL)
-          self.isKillAnalog[1], self.whichJoy[1], self.whichAxis[1] = self.engine.input.getWhammyAxis(KillKeyCode[1])
-  
         #evilynux - Compute analog killswitch value
-        for i, thePlayer in enumerate(self.playerList):
-          if self.isKillAnalog[i]:
-            if self.analogKillMode[i] == 2:  #XBOX mode: (1.0 at rest, -1.0 fully depressed)
-              self.whammyVol[i] = 1.0 - (round(10* ((self.engine.input.joysticks[self.whichJoy[i]].get_axis(self.whichAxis[i])+1.0) / 2.0 ))/10.0)
+        wText, hText = font.getStringSize(self.names[Player.KILL])
+        if self.isKillAnalog:
+          if self.analogKillMode == 2:  #XBOX mode: (1.0 at rest, -1.0 fully depressed)
+            self.whammy = 1.0 - ((self.engine.input.joysticks[self.whichJoyKill].get_axis(self.whichAxisKill)+1.0) / 2.0)
 
-            elif self.analogKillMode[i] == 3:  #XBOX Inverted mode: (-1.0 at rest, 1.0 fully depressed)
-              self.whammyVol[i] = (round(10* ((self.engine.input.joysticks[self.whichJoy[i]].get_axis(self.whichAxis[i])+1.0) / 2.0 ))/10.0)
-                
-            else: #PS2 mode: (0.0 at rest, fluctuates between 1.0 and -1.0 when pressed)
-              self.whammyVol[i] = (round(10*(abs(self.engine.input.joysticks[self.whichJoy[i]].get_axis(self.whichAxis[i]))))/10.0)
-    
-            if self.whammyVol[i] > 0.0 and self.whammyVol[i] < 0.1:
-              self.whammyVol[i] = 0.1
+          elif self.analogKillMode == 3:  #XBOX Inverted mode: (-1.0 at rest, 1.0 fully depressed)
+            self.whammy = (self.engine.input.joysticks[self.whichJoyKill].get_axis(self.whichAxisKill)+1.0) / 2.0 
+        
+          else: #PS2 mode: (0.0 at rest, fluctuates between 1.0 and -1.0 when pressed)
+            self.whammy = abs(self.engine.input.joysticks[self.whichJoyKill].get_axis(self.whichAxisKill))
 
-            self.lastWhammyVol[i] = self.whammyVol[i]
-
-          if self.whammyVol[i] > 0.0 and self.whammyVol[i] < 0.1:
-            self.whammyVol[i] = 0.1
-
-      #evilynux - Player 1 analog killswitch rendering
-      if self.whammyVol[0] > 0:
-        Theme.setSelectedColor(1 - v)
-        font.render(_("Killswitch %d%%") % (self.whammyVol[0]*100), (.55, .45 + v))
-      else:
-        if self.controls.getState(Player.KILL):
+        #evilynux - analog killswitch rendering
+        if self.whammy > 0:
+          if self.whammy > 0.1:
+            Theme.setSelectedColor(1 - v)
+          else:
+            glColor3f(.4, .4, .4)
+          font.render(self.names[Player.KILL], (.75-wText/2, .45 + v))
+          whammyC = (1-self.whammy)*self.analogBar.width1()*self.analogBarScale*((w/384.0)-1.0/6.0)
+          self.engine.drawImage(self.analogBar, scale = (self.analogBarScale*self.whammy, -self.analogBarScale), coord = (w*.75-whammyC, h*.3), rect = (0, self.whammy, 0, 1), stretched = 11)
+        else:
+          if self.controls.getState(self.keyList[Player.KILL]):
+            Theme.setSelectedColor(1 - v)
+          else:
+            glColor3f(.4, .4, .4)
+          font.render(self.names[Player.KILL], (.75-wText/2, .45 + v))
+        
+        self.engine.drawImage(self.analogBox, scale = (self.analogBoxScale, -self.analogBoxScale), coord = (w*.75, h*.3), stretched = 11)
+        if self.controls.getState(self.keyList[Player.ACTION1]) or self.controls.getState(self.keyList[Player.ACTION2]):
           Theme.setSelectedColor(1 - v)
         else:
           glColor3f(.4, .4, .4)
-        font.render(_("Killswitch"), (.55, .45 + v))
-
-
-      if self.controls.getState(Player.PLAYER_2_STAR):
-        Theme.setSelectedColor(1 - v)
-      else:
-        glColor3f(.4, .4, .4)
-      font.render(_("StarPower"), (.25, .6 + v))
-
-      #evilynux - Player 2 analog killswitch rendering
-      if self.whammyVol[1] > 0:
-        Theme.setSelectedColor(1 - v)
-        font.render(_("Killswitch %d%%") % (self.whammyVol[1]*100), (.55, .6 + v))
-      else:
-        if self.controls.getState(Player.PLAYER_2_KILL):
-          Theme.setSelectedColor(1 - v)
+        wText, hText = font.getStringSize(self.names[Player.ACTION1])
+        font.render(self.names[Player.ACTION1], (.5-wText/2, .55 + v))
+      
+      elif self.type > 1:
+        if self.type == 2:
+          drumList = [self.keyList[Player.DRUM1], self.keyList[Player.DRUM1A], self.keyList[Player.DRUM2], self.keyList[Player.DRUM2A], \
+                      self.keyList[Player.DRUM3], self.keyList[Player.DRUM3A], self.keyList[Player.DRUM5], self.keyList[Player.DRUM5A]]
+          for i in range(4):
+            if self.controls.getState(drumList[(2*i)]) or self.controls.getState(drumList[(2*i)+1]):
+              glColor3f(*self.fretColors[i%5])
+            else:
+              glColor3f(.4, .4, .4)
+            text = _("Drum")
+            text = "%s #%d" % (text, (i + 1))
+            wText, hText = font.getStringSize(text)
+            font.render(text, ((.2 + .2 * i)-wText/2, .4 + v))
+        else:
+          drumList = [self.keyList[Player.DRUM1], self.keyList[Player.DRUM1A], self.keyList[Player.DRUM2], self.keyList[Player.DRUM2A], \
+                      self.keyList[Player.DRUM3], self.keyList[Player.DRUM3A], self.keyList[Player.DRUM4], self.keyList[Player.DRUM4A], \
+                      self.keyList[Player.DRUM5], self.keyList[Player.DRUM5A]]
+          for i in range(5):
+            if self.controls.getState(drumList[(2*i)]) or self.controls.getState(drumList[(2*i)+1]):
+              glColor3f(*self.fretColors[i%5])
+            else:
+              glColor3f(.4, .4, .4)
+            text = _("Drum")
+            text = "%s #%d" % (text, (i + 1))
+            wText, hText = font.getStringSize(text)
+            font.render(text, ((.2 + .15 * i)-wText/2, .4 + v))
+  
+        if self.controls.getState(self.keyList[Player.DRUMBASS]) or self.controls.getState(self.keyList[Player.DRUMBASSA]):
+          glColor3f(*self.bassColor)
         else:
           glColor3f(.4, .4, .4)
-        font.render(_("Killswitch"), (.55, .6 + v))
-
-      if self.controls.getState(Player.ACTION1) or self.controls.getState(Player.ACTION2):
-        Theme.setSelectedColor(1 - v)
-      else:
-        glColor3f(.4, .4, .4)
-      font.render(_("Pick!"), (.45, .5 + v))
-
-      if self.controls.getState(Player.PLAYER_2_ACTION1) or self.controls.getState(Player.PLAYER_2_ACTION2):
-        Theme.setSelectedColor(1 - v)
-      else:
-        glColor3f(.4, .4, .4)          
-      font.render(_("Pick!"), (.45, 0.65 + v))
-
+        wText, hText = font.getStringSize(self.names[Player.DRUMBASS])
+        font.render(self.names[Player.DRUMBASS], (.5-wText/2, .5 + v))
         
     finally:
       self.engine.view.resetProjection()
-
-
-
-
-
-
-#myfingershurt: drums :)
-class DrumTester(KeyTester):
-  """Keyboard configuration testing layer."""
-  def __init__(self, engine, prompt = ""):
-    self.prompt         = prompt
-    self.engine         = engine
-   
-
-    self.logClassInits = self.engine.config.get("game", "log_class_inits")
-    if self.logClassInits == 1:
-      Log.debug("DrumTester class init (Dialogs.py)...")
-    
-    
-    self.accepted       = False
-    self.time           = 0.0
-    self.controls       = Player.Controls()
-    self.fretColors     = [(0, 1, 0), (1, 0, 0), (1, 1, 0), (0, 0, 1), (1, 0, 1)]
-    
-  def render(self, visibility, topMost):
-    v = (1 - visibility) ** 2
-    
-    self.engine.view.setViewport(1,0)
-    self.engine.view.setOrthogonalProjection(normalize = True)
-    font = self.engine.data.font
-    
-    fadeScreen(v)
-          
-    try:
-      glEnable(GL_BLEND)
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-      glEnable(GL_COLOR_MATERIAL)
-      Theme.setBaseColor(1 - v)
-      wrapText(font, (.1, .2 - v), self.prompt)
-
-      for n, c in enumerate(Drum.PLAYER1DRUMS): 
-        glColor3f(.4, .4, .4)
-        if n == 0:
-          if self.controls.getState(c):
-            glColor3f(*self.fretColors[0])  
-          font.render("Bass", (.5 - .13 * (2.5 - n), .5 + v))
-        elif n < 5:
-          if self.controls.getState(c):
-            glColor3f(*self.fretColors[n])
-          font.render("#%d" % (n), (.5 - .13 * (2.5 - n), .4 + v))
-        elif n < 9:
-          if self.controls.getState(c):
-            glColor3f(*self.fretColors[n-4])  
-          font.render("#%d" % (n), (.5 - .13 * (2.5 - n + 4), .45 + v))     
-      for n, c in enumerate(Drum.PLAYER2DRUMS):  
-        glColor3f(.4, .4, .4)
-        if n == 0:
-          if self.controls.getState(c):
-            glColor3f(*self.fretColors[0])  
-          font.render("Bass", (.5 - .13 * (2.5 - n), .7 + v))               
-        elif n < 5:
-          if self.controls.getState(c):
-            glColor3f(*self.fretColors[n])            
-          font.render("#%d" % (n), (.5 - .13 * (2.5 - n), .6 + v))
-        elif n < 9:
-          if self.controls.getState(c):
-            glColor3f(*self.fretColors[n-4]) 
-          font.render("#%d" % (n), (.5 - .13 * (2.5 - n + 4), .65 + v))     
-
-    finally:
-      self.engine.view.resetProjection()
-
-      
-
-
       
 def _runDialog(engine, dialog):
   """Run a dialog in a sub event loop until it is finished."""
@@ -4599,9 +4981,9 @@ def chooseFile(engine, masks = ["*.*"], path = ".", prompt = _("Choose a File"),
   _runDialog(engine, d)
   return d.getSelectedFile()
   
-def chooseItem(engine, items, prompt, selected = None, pos = None):   #MFH
+def chooseItem(engine, items, prompt = "", selected = None, pos = None):   #MFH
   """
-  Ask the user to one item from a list.
+  Ask the user to choose one item from a list.
   
   @param engine:    Game engine
   @param items:     List of items
@@ -4613,17 +4995,28 @@ def chooseItem(engine, items, prompt, selected = None, pos = None):   #MFH
   _runDialog(engine, d)
   return d.getSelectedItem()
 
-#MFH - on-demand Neck Chooser
-def chooseNeck(engine, prompt = "", selected = None, player = 0):
+def activateControllers(engine, players = 1):
   """
-  Ask the user to one item from a list.
+  Ask the user to select the active controllers for the game session.
   
   @param engine:    Game engine
-  @param items:     List of items
-  @param prompt:    Prompt shown to the user
-  @param selected:  Item selected by default
+  @type players:    int
+  @param players:   The maximum number of players.
   """
-  d = NeckChooser(engine, prompt = prompt, selected = selected, player = player)
+  d = ControlActivator(engine, players)
+  _runDialog(engine, d)
+  return d.getPlayers()
+
+#MFH - on-demand Neck Chooser
+def chooseNeck(engine, player = "default"):
+  """
+  Ask the user to choose their in-game neck.
+  
+  @param engine:    Game engine
+  @type  player:    str
+  @param player:    The active player
+  """
+  d = NeckChooser(engine, player = player)
   _runDialog(engine, d)
   return d.getSelectedNeck()
 
@@ -4632,28 +5025,16 @@ def showCredits(engine):
   d = Credits(engine)
   _runDialog(engine, d)
   
-def testKeys(engine, prompt = _("Play with the keys and press Escape when you're done.")):
+def testKeys(engine, control, prompt = _("Play with the keys and press Escape when you're done.")):
   """
   Have the user test the current keyboard configuration.
   
   @param engine:  Game engine
   @param prompt:  Prompt shown to the user
   """
-  d = KeyTester(engine, prompt = prompt)
+  d = KeyTester(engine, control, prompt = prompt)
   _runDialog(engine, d)
 
-#myfingershurt: drums
-def testDrums(engine, prompt = _("Play with the keys and press Escape when you're done.")):
-  """
-  Have the user test the current keyboard configuration.
-  
-  @param engine:  Game engine
-  @param prompt:  Prompt shown to the user
-  """
-  d = DrumTester(engine, prompt = prompt)
-  _runDialog(engine, d)
-
-  
 def showLoadingScreen(engine, condition, text = _("Loading..."), allowCancel = False):
   """
   Show a loading screen until a condition is met.
@@ -4784,7 +5165,6 @@ def changeLoadingSplashScreenText(engine, splash, text=_("Loading...")):
 
 def hideLoadingSplashScreen(engine, splash):
   engine.view.popLayer(splash)
-
 
 def isInt(possibleInt):
   try:

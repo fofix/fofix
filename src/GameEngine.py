@@ -54,6 +54,7 @@ import Dialogs
 import Theme
 import Version
 import Mod
+import Player
 
 
 # stump: if we've been py2exe'd, read our version string from the exe.
@@ -93,7 +94,6 @@ else:
 Config.define("engine", "highpriority", bool,  False, text = _("FPS Limiter"),           options = {False: _("On (Set Below)"), True: _("Off (Auto Max FPS)")})
 Config.define("game",   "adv_settings", bool,  False)
 Config.define("game",   "uploadscores", bool,  False, text = _("Upload Highscores"),    options = {False: _("No"), True: _("Yes")})
-Config.define("game",   "leftymode",    bool,  False, text = _("Lefty Mode"),           options = {False: _("No"), True: _("Yes")})
 Config.define("video",  "fullscreen",   bool,  False,  text = _("Fullscreen Mode"),      options = {False: _("No"), True: _("Yes")})
 Config.define("video",  "multisamples", int,   4,     text = _("Antialiasing Quality"), options = {0: _("None"), 2: "2x", 4: "4x", 6: "6x", 8: "8x"})
 Config.define("video",  "disable_fretsfx", bool, False, text = _("Show Fret Glow Effect"), options = {False: _("Yes"), True: _("No")})
@@ -114,13 +114,17 @@ Config.define("video",  "special_fx", bool,   True,     text = _("Advanced Visua
 
 
 #used internally:
-Config.define("game",   "players",             int,   1)
-Config.define("player0","mode_1p",           int,  0)
-Config.define("player1","mode_2p",           int,  0)
+Config.define("game",   "players",             int,  1)
+Config.define("game",   "player0",             str,  None)
+Config.define("game",   "player1",             str,  None)
+Config.define("game",   "player2",             str,  None)
+Config.define("game",   "player3",             str,  None)
+Config.define("game",   "game_mode",           int,  0)
+Config.define("game",   "multiplayer_mode",    int,  0)
 
 Config.define("game","last_theme",           str,  "")
 
-
+Config.define("game",   "joysticks",    int,   0)
 
 #myfingershurt: default buffersize changed from 4096 to 2048:
 Config.define("audio",  "buffersize",   int,   2048,  text = _("Buffer Size"), options = [256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536])
@@ -133,7 +137,6 @@ Config.define("audio",  "songvol",    float,    1.0,  text = _("Song Volume"),  
 Config.define("audio",  "rhythmvol",  float,    1.0,  text = _("Rhythm Volume"),   options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(0, 110, 10)]))
 
 Config.define("performance", "game_priority",       int,   2,      text = _("Process Priority"), options = {0: _("0 Idle"), 1: _("1 Low"), 2: _("2 Normal"), 3:_("3 Above Normal"), 4:_("4 High"), 5:_("5 Realtime")})
-Config.define("game",   "alt_keys",            bool,  False,  text = _("Keyset"), options = {False: _("Normal"), True: _("Alternate")})
 Config.define("game",   "margin",              int,   0,      text = _("Hit Margin"), options = {0: _("FoF"), 1: _("Capo")})
 Config.define("game",   "notedisappear",      bool,   False,  text = _("Missed Notes"), options = {False: _("Disappear"), True: _("Keep on going")})
 
@@ -147,6 +150,7 @@ Config.define("game", "lost_focus_pause", bool, True, text = _("Pause on Loss of
 # way to prevent users from having issues is to leave these two lines uncommented
 # (so they automatically create the entries with defaults if they do not exist)
 Config.define("game",   "tapping",      int,   0,  text = _("HO/PO"),       options = {0: _("Yes"), 1: _("No")})
+
 Config.define("game",   "hopo_mark",           int,   1,      text = _("HO/PO Note Marks"), options = {0: _("FoF"), 1: _("RFmod")})
 #myfingershurt: HOPO settings
 Config.define("game",   "hopo_system",          int,   3,      text = _("HO/PO System"), options = {0: _("None"), 1: _("RF-Mod"), 2: _("GH2 Strict"), 3: _("GH2")})
@@ -168,7 +172,6 @@ Config.define("game",   "stage_mode",           int,  0,  text = _("Stage Select
 Config.define("game",   "song_stage",           int,  1,  text = _("Song Stage"),  options = {0: _("Off"), 1: _("On") } ) #MFH
 Config.define("game",   "lyric_mode",           int,   2,   text = _("Script Lyric Display"), options = {0: _("Off"), 1: _("By Song"), 2: _("Auto"), 3: _("Dual Lyric Prevention")})#racer
 Config.define("game",   "frets_under_notes",          bool, True,  text = _("Frets Under Notes"), options = {False: _("No"), True: _("Yes")})
-#Config.define("game",   "drum_highscore_nav",          bool, False,  text = _("Drum highscore nav"), options = {False: _("Off"), True: _("On")})
 Config.define("game",   "drum_navigation",          bool, False,  text = _("Drum Navigation"), options = {False: _("Off"), True: _("On")})
 
 Config.define("game",   "ignore_open_strums",          bool, True,  text = _("Ignore Open Strums"), options = {False: _("No"), True: _("Yes")})
@@ -223,7 +226,7 @@ Config.define("game", "bass_groove_enable",       int, 1,     text = _("Bass Gro
 Config.define("game", "T_sound",      int, 2,  text = _("Drum Miss Penalty"), options = {0: _("Always"), 1: _("Song Start"), 2: _("First Note")} ) #Faaa Drum sound
 Config.define("game", "game_time",       int, 1,     text = _("Time Display Format"), options = {0: _("Off"), 1: _("Countdown"), 2: _("Elapsed")}) #MFH
 Config.define("game", "gfx_version_tag",       int, 1,     text = _("Show Theme Version Tag"), options = {0: _("No"), 1: _("Yes")}) #MFH
-Config.define("game", "p2_menu_nav",       int, 1,     text = _("P2 Menu Navigate"), options = {0: _("Off"), 1: _("On")}) #MFH
+Config.define("game", "p2_menu_nav",       int, 1,     text = _("Menu Navigation"), options = {0: _("P1 Only"), 1: _("All Players")}) #MFH
 Config.define("game", "in_game_font_shadowing",      bool, False,  text = _("In-Game Font Shadow"), options = {False: _("Off"), True: _("On")})
 Config.define("audio", "mute_last_second",       int, 0,     text = _("Mute Last Second"), options = {0: _("No"), 1: _("Yes")}) #MFH
 Config.define("game", "result_cheer_loop",       int, 2,     text = _("Results Cheer Loop"), options = {0: _("Off"), 1: _("Theme"), 2: _("Auto")}) #MFH
@@ -244,6 +247,9 @@ Config.define("game",  "bg_neck_alpha",  float,    1.0,  text = _("Bass Groove N
 Config.define("game",  "fail_neck_alpha",  float,    1.0,  text = _("Fail Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]))
 Config.define("game",  "overlay_neck_alpha",  float,    1.0,  text = _("Overlay Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]))
 Config.define("game",  "necks_alpha",  float,    1.0,  text = _("All Necks"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]))
+
+Config.define("game", "scroll_delay",             int, 500,  text = _("Scroll Delay"), options = dict([(n, n) for n in range(100, 2001, 100)]))
+Config.define("game", "scroll_rate",              int, 50,   text = _("Scroll Rate"),  options = dict([(n, 10-((n/10)-1)) for n in range(10, 101, 10)]))
 
 #MFH - debug settings
 Config.define("debug",   "use_unedited_midis",          int, 1,    text = _("Use (notes-unedited.mid)"), options = {0: _("Off"), 1: _("Auto")})
@@ -319,9 +325,6 @@ Config.define("game",   "jurgtype",            int,   2,      text = _("Jurgen P
 Config.define("game",   "jurglogic",            int,   1,      text = _("Jurgen Logic"), options = {0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}  )
 #Config.define("game",   "jurgtext",            int,   1,      text = _("Jurgen Text Size"), options = {0: _("Big"), 1: _("Small")})
 
-Config.define("game",   "p1_assist",            int,   0,       text = _("Player One Assist"), options = {0: _("Off"), 1: _("Easy Assist"), 2: _("Medium Assist"), 3: _("Drum Assist")})
-Config.define("game",   "p2_assist",            int,   0,       text = _("Player Two Assist"), options = {0: _("Off"), 1: _("Easy Assist"), 2: _("Medium Assist"), 3: _("Drum Assist")})
-
 Config.define("game", "use_graphical_submenu", int,   1,      text = _("Graphical Submenus"), options = {0: _("Disabled"), 1: _("Enabled")})
 
 
@@ -336,11 +339,6 @@ Config.define("audio",  "crowd_volume",       float, 0.8,    text = _("Crowd Vol
 Config.define("audio",  "kill_volume",         float, 0.0,    text = _("Kill Volume"), options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(0, 110, 10)]))  #MFH
 Config.define("audio",  "SFX_volume",         float, 0.7,    text = _("SFX Volume"), options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(0, 110, 10)]))  #MFH
 
-
-Config.define("player0","two_chord_max",       bool,  False,  text = _("P1 Two Key Chords Only"),  options = {False: _("No"), True: _("Yes")})
-Config.define("player0","leftymode",           bool,  False,  text = _("P1 Lefty mode"),           options = {False: _("No"), True: _("Yes")})
-Config.define("player1","two_chord_max",       bool,  False,  text = _("P2 Two Key Chords Only"),  options = {False: _("No"), True: _("Yes")}) #QQstarS
-Config.define("player1","leftymode",           bool,  False,  text = _("P2 Lefty mode"),           options = {False: _("No"), True: _("Yes")}) #QQstarS
 
 # evilynux - Preload glyph cache may require more VRAM. Disable it if you're low on VRAM e.g. less than 64MB
 Config.define("performance","preload_glyph_cache", bool,  True,  text = _("Preload Glyph Cache"), options = {False: _("No"), True: _("Yes")})
@@ -372,8 +370,7 @@ if defaultTheme != "MegaLight" and defaultTheme != "Rock Band 1":     #myfingers
 Config.define("coffee", "themename",           str,   defaultTheme,      text = _("Theme"),                options = dict([(str(themes[n]),themes[n]) for n in range(0, i)]))
 
 ##Alarian: End Get unlimited themes by foldername
-
-
+Player.loadControls()
 
 Config.define("coffee", "neckSpeed",            int,  100,      text = _("Board Speed Percent"),        options = dict([(n, n) for n in range(10, 410, 10)]))
 Config.define("coffee", "failingEnabled",       bool, True,     text = _("No Fail"),             options = {True: _("Off"), False: _("On")})
@@ -384,7 +381,6 @@ Config.define("game", "songlist_difficulty", int, 0, text = _("Difficulty (Setli
 Config.define("game", "songlist_extra_stats", bool, True, text = _("Show Additional Stats"), options = {True: _("Yes"), False: _("No")} )
 
 Config.define("game", "songlist_instrument", int, 0, text = _("Instrument (Setlist Score)"), options = {0: "Guitar", 1: "Rhythm", 2: "Bass", 3: "Lead", 4: "Drums"}  )  #MFH
-
 
 
 class FullScreenSwitcher(KeyListener):
@@ -481,7 +477,9 @@ class GameEngine(Engine):
     self.restartRequired   = False
     self.quicksetRestart   = False
     self.quicksetPerf      = self.config.get("quickset", "performance")
-
+    self.scrollRate        = self.config.get("game", "scroll_rate")
+    self.scrollDelay       = self.config.get("game", "scroll_delay")
+    
     Log.debug("Initializing audio.")
     frequency    = self.config.get("audio", "frequency")
     bits         = self.config.get("audio", "bits")
@@ -534,6 +532,7 @@ class GameEngine(Engine):
     self.server    = None
     self.sessions  = []
     self.mainloop  = self.loading
+    self.menuMusic = False
 
     
     # Load game modifications
@@ -659,6 +658,7 @@ class GameEngine(Engine):
   # evilynux - This stops the crowd cheers if they're still playing (issue 317).
   def quit(self):
     self.audio.close()
+    Player.savePlayers()
     Engine.quit(self)
 
   def setStartupLayer(self, startupLayer):
@@ -929,7 +929,7 @@ class GameEngine(Engine):
   #glorandwarf: renamed to retrieve the path of the file
   def fileExists(self, fileName):
     return self.data.fileExists(fileName)
-    
+  
   def getPath(self, fileName):
     return self.data.getPath(fileName)
 

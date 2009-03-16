@@ -144,6 +144,51 @@ Config.define("theme", "shadowoffsety", float, .0005)
 Config.define("theme", "menu_neck_choose_x", float, 0.1)
 Config.define("theme", "menu_neck_choose_y", float, 0.05)
 
+#akedrou - lobby/control activator
+Config.define("theme", "control_activate_x", float, 0.645)
+Config.define("theme", "control_activate_select_x", float, 0.5)
+Config.define("theme", "control_activate_part_x", float, 0.41)
+Config.define("theme", "control_activate_y", float, 0.18)
+Config.define("theme", "control_activate_scale", float, 0.0018)
+Config.define("theme", "control_activate_part_size", float, 22.000)
+Config.define("theme", "control_activate_space", float, 0.045)
+Config.define("theme", "control_activate_font", str, "font")
+Config.define("theme", "control_description_x", float, 0.5)
+Config.define("theme", "control_description_y", float, 0.13)
+Config.define("theme", "control_description_scale", float, 0.002)
+Config.define("theme", "control_description_font", str, "font")
+Config.define("theme", "control_check_x", float, 0.16)
+Config.define("theme", "control_check_y", float, 0.26)
+Config.define("theme", "control_check_text_y", float, 0.61)
+Config.define("theme", "control_check_part_mult", float, 2.8)
+Config.define("theme", "control_check_space", float, 0.23)
+Config.define("theme", "control_check_scale", float, 0.0018)
+Config.define("theme", "control_check_font", str, "font")
+Config.define("theme", "lobby_preview_x", float, 0.7)
+Config.define("theme", "lobby_title_x", float, 0.5)
+Config.define("theme", "lobby_title_y", float, 0.07)
+Config.define("theme", "lobby_title_character_x", float, 0.26)
+Config.define("theme", "lobby_title_character_y", float, 0.24)
+Config.define("theme", "lobby_title_scale", float, 0.0024)
+Config.define("theme", "lobby_title_font", str, "loadingFont")
+Config.define("theme", "lobby_select_x", float, 0.4)
+Config.define("theme", "lobby_select_y", float, 0.32)
+Config.define("theme", "lobby_select_image_x", float, 0.255)
+Config.define("theme", "lobby_select_image_y", float, 0.335)
+Config.define("theme", "lobby_select_scale", float, 0.0018)
+Config.define("theme", "lobby_select_space", float, 0.04)
+Config.define("theme", "lobby_select_font", str, "font")
+Config.define("theme", "character_create_x", float, 0.25)
+Config.define("theme", "character_create_y", float, 0.15)
+Config.define("theme", "character_create_help_x", float, 0.5)
+Config.define("theme", "character_create_help_y", float, 0.73)
+Config.define("theme", "character_create_help_scale", float, 0.0018)
+Config.define("theme", "character_create_option_x", float, 0.75)
+Config.define("theme", "character_create_option_font", str, "font")
+Config.define("theme", "character_create_help_font", str, "loadingFont")
+Config.define("theme", "character_create_scale", float, .0018)
+Config.define("theme", "character_create_space", float, .045)
+
 #worldrave
 Config.define("theme", "setlistguidebuttonsposX", float, 0.408)
 Config.define("theme", "setlistguidebuttonsposY", float, 0.0322)
@@ -210,26 +255,30 @@ Config.define("theme", "fail_text_color",  str, "#FFFFFF")
 Config.define("theme", "fail_completed_color",  str, "#FFFFFF")
 Config.define("theme", "fail_selected_color",  str, "#FFBF00")
 
-Config.define("theme", "result_score", str, ".5,.11,0.0025,None")
-Config.define("theme", "result_song", str, ".05,.045,.002,None")
+Config.define("theme", "result_score", str, ".5,.11,0.0025,None,None")
+Config.define("theme", "result_song", str, ".05,.045,.002,None,None")
 Config.define("theme", "result_song_form", int, 0)
 Config.define("theme", "result_song_text", str, "%s Finished!")
 Config.define("theme", "result_star", str, ".5,.4,0.15,1.1")
-Config.define("theme", "result_stats_diff", str, ".5,.55,0.002,None")
+Config.define("theme", "result_star_type", int, 0)
+Config.define("theme", "result_stats_diff", str, ".5,.55,0.002,None,None")
 Config.define("theme", "result_stats_diff_text", str, "Difficulty: %s")
-Config.define("theme", "result_stats_part", str, ".5,.64,0.002,None")
+Config.define("theme", "result_stats_part", str, ".5,.64,0.002,None,None")
 Config.define("theme", "result_stats_part_text", str, "Part: %s")
-Config.define("theme", "result_stats_streak", str, ".5,.58,0.002,None")
+Config.define("theme", "result_stats_name", str, ".5,.73,0.002,None,None")
+Config.define("theme", "result_stats_streak", str, ".5,.58,0.002,None,None")
 Config.define("theme", "result_stats_streak_text", str, "Long Streak: %s")
-Config.define("theme", "result_stats_accuracy", str, ".5,.61,0.002,None")
+Config.define("theme", "result_stats_accuracy", str, ".5,.61,0.002,None,None")
 Config.define("theme", "result_stats_accuracy_text", str, "Accuracy: %.1f%%")
-Config.define("theme", "result_stats_notes", str, ".5,.52,0.002,None")
+Config.define("theme", "result_stats_notes", str, ".5,.52,0.002,None,None")
 Config.define("theme", "result_stats_notes_text", str, "%s Notes Hit")
 Config.define("theme", "result_cheats_info", str, ".5,.3,.002")
 Config.define("theme", "result_cheats_numbers", str, ".5,.35,.0015")
 Config.define("theme", "result_cheats_score", str, ".75,.4,.0015")
 Config.define("theme", "result_cheats_percent", str, ".45,.4,.0015")
 Config.define("theme", "result_cheats_color", str, "#FFFFFF")
+Config.define("theme", "result_cheats_font", str, "font")
+Config.define("theme", "result_high_score_font", str, "font")
 Config.define("theme", "result_menu_x", float, .5)
 Config.define("theme", "result_menu_y", float, .2)
 
@@ -347,6 +396,51 @@ songlistcd_score_colorVar = None
 rockmeter_score_colorVar = None
 ingame_stats_colorVar = None
 
+#akedrou - lobby/control setup
+controlActivateX = None
+controlActivateSelectX = None
+controlActivatePartX = None
+controlActivateY = None
+controlActivateScale = None
+controlActivatePartSize = None
+controlActivateSpace = None
+controlActivateFont = None
+controlDescriptionY = None
+controlDescriptionX = None
+controlDescriptionScale = None
+controlDescriptionFont = None
+controlCheckX = None
+controlCheckY = None
+controlCheckTextY = None
+controlCheckPartMult = None
+controlCheckSpace = None
+controlCheckScale = None
+controlCheckFont  = None
+lobbyPreviewX = None
+lobbyTitleX = None
+lobbyTitleY = None
+lobbyTitleCharacterX = None
+lobbyTitleCharacterY = None
+lobbyTitleScale = None
+lobbyTitleFont = None
+lobbySelectX = None
+lobbySelectY = None
+lobbySelectImageX = None
+lobbySelectImageY = None
+lobbySelectScale = None
+lobbySelectSpace = None
+lobbySelectFont = None
+characterCreateX = None
+characterCreateY = None
+characterCreateOptionX = None
+characterCreateHelpX = None
+characterCreateHelpY = None
+characterCreateHelpScale = None
+characterCreateOptionFont = None
+characterCreateHelpFont = None
+characterCreateScale = None
+characterCreateSpace = None
+
 #worldrave 
 setlistguidebuttonsposX = None
 setlistguidebuttonsposY = None
@@ -447,20 +541,21 @@ starFillupColor = None
 #Qstick - misc
 songListDisplay = None
 
-result_score = [None] * 4
+result_score = [None] * 5
 result_star = [None] * 4
-result_song = [None] * 4
+result_song = [None] * 5
 result_song_form = None
 result_song_text = None
-result_stats_part = [None] * 4
+result_stats_part = [None] * 5
 result_stats_part_text = None
-result_stats_diff = [None] * 4
+result_stats_name = [None] * 5
+result_stats_diff = [None] * 5
 result_stats_diff_text = None
-result_stats_accuracy = [None] * 4
+result_stats_accuracy = [None] * 5
 result_stats_accuracy_text = None
-result_stats_streak = [None] * 4
+result_stats_streak = [None] * 5
 result_stats_streak_text = None
-result_stats_notes = [None] * 4
+result_stats_notes = [None] * 5
 result_stats_notes_text = None
 #akedrou
 result_cheats_info = [None] * 3
@@ -468,8 +563,11 @@ result_cheats_numbers = [None] * 3
 result_cheats_score = [None] * 3
 result_cheats_percent = [None] * 3
 result_cheats_color = None
+result_cheats_font  = None
+result_high_score_font = None
 result_menu_x = None
 result_menu_y = None
+result_star_type = None
 
 jurgTextPos = [None] * 3
 
@@ -526,6 +624,7 @@ def open(config, themepath = None):
   setupPOV(config)
   setupMisc(config)
   setupMenu(config)
+  setupLobby(config) #akedrou
   setupSonglist(config) #MFH
   setupPauseNOpt(config) #MFH
   setupTWOD(config)
@@ -797,6 +896,61 @@ def setupMenu(config):
   shadowoffsetx = config.get("theme", "shadowoffsetx")
   shadowoffsety = config.get("theme", "shadowoffsety")
 
+def setupLobby(config):
+  global controlActivateX, controlActivateY, controlActivateScale, controlActivateFont, controlCheckTextY
+  global controlActivateSelectX, controlActivatePartX, controlActivateSpace, controlActivatePartSize
+  global controlDescriptionX, controlDescriptionY, controlDescriptionScale, controlDescriptionFont, controlCheckSpace
+  global controlCheckX, controlCheckY, controlCheckScale, controlCheckPartMult, controlCheckFont, lobbyPreviewX
+  global lobbyTitleX, lobbyTitleY, lobbyTitleScale, lobbyTitleCharacterX, lobbyTitleCharacterY, lobbySelectScale
+  global lobbySelectImageX, lobbySelectImageY, lobbySelectSpace, characterCreateHelpY
+  global lobbyTitleFont, lobbySelectX, lobbySelectY, lobbySelectFont, characterCreateX, characterCreateY
+  global characterCreateOptionX, characterCreateScale, characterCreateSpace, characterCreateHelpFont
+  global characterCreateOptionFont, characterCreateHelpX, characterCreateHelpScale
+  
+  controlActivateX = config.get("theme", "control_activate_x")
+  controlActivateSelectX = config.get("theme", "control_activate_select_x")
+  controlActivatePartX = config.get("theme", "control_activate_part_x")
+  controlActivateY = config.get("theme", "control_activate_y")
+  controlActivateScale = config.get("theme", "control_activate_scale")
+  controlActivateSpace = config.get("theme", "control_activate_space")
+  controlActivatePartSize = config.get("theme", "control_activate_part_size")
+  controlActivateFont = config.get("theme", "control_activate_font")
+  controlDescriptionX = config.get("theme", "control_description_x")
+  controlDescriptionY = config.get("theme", "control_description_y")
+  controlDescriptionScale = config.get("theme", "control_description_scale")
+  controlDescriptionFont = config.get("theme", "control_description_font")
+  controlCheckX = config.get("theme", "control_check_x")
+  controlCheckY = config.get("theme", "control_check_y")
+  controlCheckTextY = config.get("theme", "control_check_text_y")
+  controlCheckPartMult = config.get("theme", "control_check_part_mult")
+  controlCheckScale = config.get("theme", "control_check_scale")
+  controlCheckSpace = config.get("theme", "control_check_space")
+  controlCheckFont  = config.get("theme", "control_check_font")
+  lobbyPreviewX = config.get("theme", "lobby_preview_x")
+  lobbyTitleX = config.get("theme", "lobby_title_x")
+  lobbyTitleY = config.get("theme", "lobby_title_y")
+  lobbyTitleCharacterX = config.get("theme", "lobby_title_character_x")
+  lobbyTitleCharacterY = config.get("theme", "lobby_title_character_y")
+  lobbyTitleScale = config.get("theme", "lobby_title_scale")
+  lobbyTitleFont = config.get("theme", "lobby_title_font")
+  lobbySelectX = config.get("theme", "lobby_select_x")
+  lobbySelectY = config.get("theme", "lobby_select_y")
+  lobbySelectImageX = config.get("theme", "lobby_select_image_x")
+  lobbySelectImageY = config.get("theme", "lobby_select_image_y")
+  lobbySelectScale = config.get("theme", "lobby_select_scale")
+  lobbySelectSpace = config.get("theme", "lobby_select_space")
+  lobbySelectFont = config.get("theme", "lobby_select_font")
+  characterCreateX = config.get("theme", "character_create_x")
+  characterCreateY = config.get("theme", "character_create_y")
+  characterCreateOptionX = config.get("theme", "character_create_option_x")
+  characterCreateHelpX = config.get("theme", "character_create_help_x")
+  characterCreateHelpY = config.get("theme", "character_create_help_y")
+  characterCreateHelpScale = config.get("theme", "character_create_help_scale")
+  characterCreateOptionFont = config.get("theme", "character_create_option_font")
+  characterCreateHelpFont = config.get("theme", "character_create_help_font")
+  characterCreateScale = config.get("theme", "character_create_scale")
+  characterCreateSpace = config.get("theme", "character_create_space")
+
 def setupTWOD(config):
   global twoDnote, twoDkeys, threeDspin, opencolor
   
@@ -844,7 +998,7 @@ def setupResults(config):
   global result_stats_diff_text, result_stats_part_text, result_stats_streak_text, result_stats_accuracy_text
   global result_stats_accuracy, result_stats_streak, result_stats_notes, result_stats_notes_text
   global result_cheats_info, result_cheats_numbers, result_cheats_percent, result_cheats_score, result_cheats_color
-  global result_menu_x, result_menu_y
+  global result_menu_x, result_menu_y, result_star_type, result_stats_name, result_cheats_font, result_high_score_font
   
   result_score = config.get("theme", "result_score").split(",")
   result_star = config.get("theme", "result_star").split(",")
@@ -853,6 +1007,7 @@ def setupResults(config):
   result_song_text = config.get("theme", "result_song_text").strip()
   result_stats_part = config.get("theme", "result_stats_part").split(",")
   result_stats_part_text = config.get("theme", "result_stats_part_text").strip()
+  result_stats_name = config.get("theme", "result_stats_name").split(",")
   result_stats_diff = config.get("theme", "result_stats_diff").split(",")
   result_stats_diff_text = config.get("theme", "result_stats_diff_text").strip()
   result_stats_accuracy = config.get("theme", "result_stats_accuracy").split(",")
@@ -866,8 +1021,11 @@ def setupResults(config):
   result_cheats_percent = config.get("theme", "result_cheats_percent").split(",")
   result_cheats_score   = config.get("theme", "result_cheats_score").split(",")
   result_cheats_color   = config.get("theme", "result_cheats_color")
+  result_cheats_font    = config.get("theme", "result_cheats_font")
+  result_high_score_font = config.get("theme", "result_high_score_font")
   result_menu_x         = config.get("theme", "result_menu_x")
   result_menu_y         = config.get("theme", "result_menu_y")
+  result_star_type      = config.get("theme", "result_star_type")
 
 def setupSubmenus(config, themepath = None):
   if not themepath:

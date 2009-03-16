@@ -33,13 +33,15 @@
 from Scene import SceneServer, SceneClient
 from Song import Note, Tempo, TextEvent, PictureEvent, loadSong, Bars
 from Menu import Menu
-from Guitar import Guitar, PLAYER1KEYS, PLAYER2KEYS, PLAYER1ACTIONS, PLAYER2ACTIONS
+from Guitar import Guitar
 
 #myfingershurt: drums :)
-from Drum import Drum, PLAYER1DRUMS, PLAYER2DRUMS
+from Drum import Drum
 
 from Language import _
 import Player
+from Player import CONTROLLER1KEYS, CONTROLLER2KEYS, CONTROLLER3KEYS, CONTROLLER1ACTIONS, CONTROLLER2ACTIONS, CONTROLLER3ACTIONS, CONTROLLER4KEYS, CONTROLLER4ACTIONS
+from Player import CONTROLLER1DRUMS, CONTROLLER2DRUMS, CONTROLLER3DRUMS, CONTROLLER4DRUMS, STAR, KILL, CANCEL
 import Dialogs
 import Data
 import Theme
@@ -69,7 +71,6 @@ import lamina
 import Image
 import ImageDraw
 from Svg import ImgDrawing
-
 
 class GuitarScene:
   pass
@@ -110,8 +111,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     #MFH - retrieve game parameters:
     self.gamePlayers = self.engine.config.get("game", "players")
-    self.gameMode1p = self.engine.config.get("player0","mode_1p")
-    self.gameMode2p = self.engine.config.get("player1","mode_2p")
+    self.gameMode1p = self.engine.config.get("game","game_mode")
+    self.gameMode2p = self.engine.config.get("game","multiplayer_mode")
     self.fxEnabled = self.engine.config.get("video","special_fx")
     self.lostFocusPause = self.engine.config.get("game", "lost_focus_pause")
 
@@ -131,8 +132,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.partySwitch      = 0
       self.partyTime        = self.engine.config.get("game", "party_time")
       self.partyPlayer      = 0
-    elif Players == 2:
-      self.playerList = self.playerList + [self.player2]
+    elif Players > 1:
+      self.playerList.extend(self.multiplayers)
       
       #MFH - check for battle mode
       if self.gameMode2p == 1:
@@ -171,26 +172,30 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #myfingershurt: drums :)
     self.guitars = []
     self.keysList = []
+    self.soloKeysList = []
     for i,player in enumerate(self.playerList):
       if player.part.id == Song.DRUM_PART:
-        self.guitars.append(Drum(self.engine,False,i))
+        self.guitars.append(Drum(self.engine,player,False,i))
       else:
-        self.guitars.append(Guitar(self.engine,False,i))
+        self.guitars.append(Guitar(self.engine,player,False,i))
         if player.part.id == Song.LEAD_PART or player.part.id == Song.GUITAR_PART:    #both these selections should get guitar solos
           self.guitars[i].canGuitarSolo = True
         elif player.part.id == Song.BASS_PART:
           self.guitars[i].isBassGuitar = True
       if player.practiceMode:
         self.practiceMode = True
-    if self.guitars[0].isDrum: 
-      self.keysList = [PLAYER1DRUMS]
-    else:
-      self.keysList = [PLAYER1KEYS]
-    if Players == 2:
-      if self.guitars[1].isDrum: 
-        self.keysList = self.keysList + [PLAYER2DRUMS]
+      player.keyList = Player.playerkeys[i]
+      player.configController()
+      if self.guitars[i].isDrum:
+        self.keysList.append(player.drums)
+        self.soloKeysList.append(player.drumSolo)
+        self.guitars[i].keys    = player.drums
+        self.guitars[i].actions = player.drums
       else:
-        self.keysList = self.keysList + [PLAYER2KEYS]
+        self.keysList.append(player.keys)
+        self.soloKeysList.append(player.soloKeys)
+        self.guitars[i].keys    = player.keys
+        self.guitars[i].actions = player.actions
     
     #Log.debug("GuitarScene keysList: " + str(self.keysList))
     Log.debug("GuitarScene keysList: %s" % str(self.keysList))
@@ -247,16 +252,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     else:
       self.autoPlay = False
     self.playerAssist = [None for i in self.playerList]
-    self.playerAssist[0] = self.engine.config.get("game", "p1_assist")
-    if self.numOfPlayers > 1:
-      self.playerAssist[1] = self.engine.config.get("game", "p2_assist")
     for i, player in enumerate(self.playerList):
-      if self.playerAssist[i] == 3 and not self.guitars[i].isDrum:
-        self.playerAssist[i] = 0
-      elif self.playerAssist[i] == 2 and player.getDifficultyInt() > 1:
-        self.playerAssist[i] = 0
-      elif self.playerAssist[i] == 1 and player.getDifficultyInt() > 2:
-        self.playerAssist[i] = 0
+      self.playerAssist[i] = player.assistMode
+      if self.guitars[i].isDrum:
+        if player.autoKick:
+          self.playerAssist[i] = 3
+      else:
+        if self.playerAssist[i] == 2 and player.getDifficultyInt() > 1:
+          self.playerAssist[i] = 0
+        elif self.playerAssist[i] == 1 and player.getDifficultyInt() > 2:
+          self.playerAssist[i] = 0
     for assistMode in self.playerAssist:
       if assistMode > 0:
         self.assisting = True
@@ -548,7 +553,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.starFillupColor = Theme.starFillupColor
     self.starContinuousAvailable = self.engine.config.get("performance", "star_continuous_fillup") and \
       None not in (self.starFillupCenterX, self.starFillupCenterY, self.starFillupInRadius, self.starFillupOutRadius, self.starFillupColor)
-    
 
 
 
@@ -587,11 +591,17 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     #myfingershurt: for checking if killswitch key is analog for whammy
     self.whammyVolAdjStep = 0.1
-    self.analogKillMode = [self.engine.config.get("game", "analog_killsw_mode"),self.engine.config.get("game", "analog_killsw_mode_p2")]
+    self.analogKillMode = [self.engine.input.getAnalogKill(i) for i, thePlayer in enumerate(self.playerList)]
     self.isKillAnalog = [False for i in self.playerList]
-    self.whichJoy = [0 for i in self.playerList]
-    self.whichAxis = [0 for i in self.playerList]
+    self.isSPAnalog   = [False for i in self.playerList]
+    self.whichJoyKill  = [0 for i in self.playerList]
+    self.whichAxisKill = [0 for i in self.playerList]
+    self.whichJoyStar  = [0 for i in self.playerList]
+    self.whichAxisStar = [0 for i in self.playerList]
     self.whammyVol = [0.0 for i in self.playerList]
+    self.starAxisVal = [0.0 for i in self.playerList]
+    self.starDelay   = [0.0 for i in self.playerList]
+    self.starActive  = [False for i in self.playerList]
     self.targetWhammyVol = [0.0 for i in self.playerList]
     
     self.defaultWhammyVol = [self.analogKillMode[i]-1.0 for i, thePlayer in enumerate(self.playerList)]   #makes xbox defaults 1.0, PS2 defaults 0.0
@@ -604,22 +614,28 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.lastWhammyVol = [self.defaultWhammyVol[i] for i, thePlayer in enumerate(self.playerList)]
     
     KillKeyCode = [0 for i in self.playerList]
+    StarKeyCode = [0 for i in self.playerList]
+    
     self.lastTapText = "tapp: -"
 
     #myfingershurt: auto drum starpower activation option
     #self.autoDrumStarpowerActivate = self.engine.config.get("game", "auto_drum_sp")
     self.autoDrumStarpowerActivate = self.engine.config.get("game", "drum_sp_mode")
+    
+    self.analogSPMode   = [self.engine.input.getAnalogSP(i) for i, thePlayer in enumerate(self.playerList)]
+    self.analogSPThresh = [self.engine.input.getAnalogSPThresh(i) for i, thePlayer in enumerate(self.playerList)]
+    self.analogSPSense  = [self.engine.input.getAnalogSPSense(i) for i, thePlayer in enumerate(self.playerList)]
 
     self.numDrumFills = 0   #MFH - count drum fills to see whether or not we should use auto SP
 
     #MFH - TODO - rewrite in an expandable fashion; requires creation of some new Player object constants that will link to the appropriate player's control based on which player the object is set to
-    if self.analogKillMode[0] > 0:
-      KillKeyCode[0] = self.controls.getReverseMapping(Player.KILL)
-      self.isKillAnalog[0], self.whichJoy[0], self.whichAxis[0] = self.engine.input.getWhammyAxis(KillKeyCode[0])
-    if self.numOfPlayers > 1 and self.analogKillMode[1] > 0:
-      KillKeyCode[1] = self.controls.getReverseMapping(Player.PLAYER_2_KILL)
-      self.isKillAnalog[1], self.whichJoy[1], self.whichAxis[1] = self.engine.input.getWhammyAxis(KillKeyCode[1])
-
+    for i, player in enumerate(self.playerList):
+      if self.analogKillMode[i] > 0:
+        KillKeyCode[i] = self.controls.getReverseMapping(player.keyList[KILL])
+        self.isKillAnalog[i], self.whichJoyKill[i], self.whichAxisKill[i] = self.engine.input.getWhammyAxis(KillKeyCode[i])
+      if self.analogSPMode[i] > 0:
+        StarKeyCode[i] = self.controls.getReverseMapping(player.keyList[STAR])
+        self.isSPAnalog[i], self.whichJoyStar[i], self.whichAxisStar[i] = self.engine.input.getWhammyAxis(StarKeyCode[i])
 
     self.inGameStats = self.engine.config.get("performance","in_game_stats")
     self.inGameStars = self.engine.config.get("game","in_game_stars")
@@ -735,10 +751,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
 
 
-
     #MFH - this is where song loading originally took place, and the loading screen was spawned.
     self.engine.resource.load(self, "song", lambda: loadSong(self.engine, songName, library = libraryName, part = [player.part for player in self.playerList], practiceMode = self.playerList[0].practiceMode), synch = True, onLoad = self.songLoaded)
-
+    
     #myfingershurt: new loading place for "loading" screen for song preparation:
     #blazingamer new loading phrases
     phrase = self.song.info.loading
@@ -915,7 +930,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       for guitar in self.guitars:
         guitar.starNotesSet = False     #fallback on auto generation.
 
-    
     
     
     
@@ -2222,9 +2236,28 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #De-emphasize non played part
       self.rhythmVolume *= 0.6
     
+    #self.controls = self.engine.input.controls
+    self.activeGameControls = self.engine.input.activeGameControls
+    
     for i,guitar in enumerate(self.guitars):
-      guitar.leftyMode = self.engine.config.get("player%d" % (i), "leftymode")
-      guitar.twoChordMax  = self.engine.config.get("player%d" % (i), "two_chord_max")
+      guitar.leftyMode   = False
+      guitar.twoChordMax = False
+      if self.playerList[i].lefty > 0:
+        guitar.leftyMode = True
+      if self.playerList[i].twoChordMax > 0:
+        guitar.twoChordMax  = True
+    
+    self.keysList = []
+    for i, player in enumerate(self.playerList):
+      player.keyList = Player.playerkeys[i]
+      player.configController()
+      if self.guitars[i].isDrum:
+        self.keysList.append(player.drums)
+      else:
+        self.keysList.append(player.keys)
+      if not self.guitars[i].twoChordMax:
+        if self.controls.twoChord[self.activeGameControls[i]] > 0:
+          self.guitars[i].twoChordMax = True
     
     if self.song and self.song.readyToGo:
       self.getHandicap() #akedrou - to be sure scoring objects are created.
@@ -2286,8 +2319,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.engine.view.popLayer(self.menu)
     self.engine.view.popLayer(self.failMenu)
     self.freeResources()
-    self.engine.config.set("player0","mode_1p", 1)
-    self.engine.config.set("player0","mode_2p", 1)
+    self.engine.config.set("game","game_mode", 1)
     self.session.world.deleteScene(self)
     self.session.world.createScene("SongChoosingScene")
 
@@ -2487,12 +2519,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       guitar.scoreMultiplier = 1
       
     if self.partyMode == True:
-      self.guitars[0].keys = PLAYER1KEYS
-      self.guitars[0].actions = PLAYER1ACTIONS
-      self.keysList   = [PLAYER1KEYS]
+      self.guitars[0].keys = self.playerList[0].keys
+      self.guitars[0].actions = self.playerList[0].actions
+      self.keysList   = self.playerList[0].keys
     if self.battle == True and self.numOfPlayers>1:
-      self.guitars[0].actions = PLAYER1ACTIONS
-      self.guitars[1].actions = PLAYER2ACTIONS
+      self.guitars[0].actions = self.playerList[0].actions
+      self.guitars[1].actions = self.playerList[1].actions
 
     self.engine.collectGarbage()
 
@@ -2764,14 +2796,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             #rounding to integers, setting volumes 0-10 and only when changed from last time:
             #want a whammy reading of 0.0 to = full volume, as that's what it reads at idle
             if self.analogKillMode[i] == 2:  #XBOX mode: (1.0 at rest, -1.0 fully depressed)
-              self.whammyVol[i] = 1.0 - (round(10* ((self.engine.input.joysticks[self.whichJoy[i]].get_axis(self.whichAxis[i])+1.0) / 2.0 ))/10.0)
+              self.whammyVol[i] = 1.0 - (round(10* ((self.engine.input.joysticks[self.whichJoyKill[i]].get_axis(self.whichAxisKill[i])+1.0) / 2.0 ))/10.0)
             elif self.analogKillMode[i] == 3:  #XBOX Inverted mode: (-1.0 at rest, 1.0 fully depressed)
-              self.whammyVol[i] = (round(10* ((self.engine.input.joysticks[self.whichJoy[i]].get_axis(self.whichAxis[i])+1.0) / 2.0 ))/10.0)
+              self.whammyVol[i] = (round(10* ((self.engine.input.joysticks[self.whichJoyKill[i]].get_axis(self.whichAxisKill[i])+1.0) / 2.0 ))/10.0)
             else: #PS2 mode: (0.0 at rest, fluctuates between 1.0 and -1.0 when pressed)
-              self.whammyVol[i] = (round(10*(abs(self.engine.input.joysticks[self.whichJoy[i]].get_axis(self.whichAxis[i]))))/10.0)
+              self.whammyVol[i] = (round(10*(abs(self.engine.input.joysticks[self.whichJoyKill[i]].get_axis(self.whichAxisKill[i]))))/10.0)
             if self.whammyVol[i] > 0.0 and self.whammyVol[i] < 0.1:
               self.whammyVol[i] = 0.1
-            
             #MFH - simple whammy tail determination:
             if self.whammyVol[i] > 0.1:
               self.killswitchEngaged[i] = True
@@ -2800,7 +2831,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               if self.whammyEffect == 0:    #killswitch
                 self.song.setInstrumentVolume(whammyVolSet, self.players[i].part)
               elif self.whammyEffect == 1:    #pitchbend
-                self.song.setInstrumentPitch(self.pitchBendLowestFactor+((1.0-self.pitchBendLowestFactor)*self.whammyVol[i]), self.players[i].part)
+                self.song.setInstrumentPitch(self.pitchBendLowestFactor+((1.0-self.pitchBendLowestFactor)*(1.0-self.whammyVol[i])), self.players[i].part)
 
 
             elif self.actualWhammyVol[i] > self.targetWhammyVol[i]:
@@ -2809,7 +2840,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               if self.whammyEffect == 0:    #killswitch
                 self.song.setInstrumentVolume(whammyVolSet, self.players[i].part)
               elif self.whammyEffect == 1:    #pitchbend
-                self.song.setInstrumentPitch(self.pitchBendLowestFactor+((1.0-self.pitchBendLowestFactor)*self.whammyVol[i]), self.players[i].part)
+                self.song.setInstrumentPitch(self.pitchBendLowestFactor+((1.0-self.pitchBendLowestFactor)*(1.0-self.whammyVol[i])), self.players[i].part)
             
           elif self.scoring[i].streak > 0:
             self.song.setInstrumentVolume(1.0, self.players[i].part)
@@ -2853,7 +2884,23 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     except Exception, e:
       self.whammyVol[i] = self.defaultWhammyVol[i] 
 
-
+  def handleAnalogSP(self, playerNum, ticks):
+    i = playerNum
+    if self.resumeCountdown > 0:
+      return
+    if self.isSPAnalog[i]:
+      self.starAxisVal[i] = abs(self.engine.input.joysticks[self.whichJoyStar[i]].get_axis(self.whichAxisStar[i]))
+      if self.starAxisVal[i] > (self.analogSPThresh[i]/100.0):
+        if self.starDelay[i] == 0 and not self.starActive[i]:
+          self.starDelay[i] = (10-self.analogSPSense[i])*25
+        else:
+          self.starDelay[i] -= ticks
+          if self.starDelay[i] <= 0:
+            self.activateSP(i)
+            self.starActive[i] = True
+      else:
+        self.starActive[i] = False
+        self.starDelay[i] = 0
 
   def handlePhrases(self, playerNum, playerStreak):
     if self.phrases > 0:
@@ -2962,20 +3009,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             #  self.activateSP(num)
             #  guitar.freestyleSP = False
 
-          if self.controls.getState(guitar.keys[0]):
-            hitspeed = min((pos - guitar.freestyleLastFretHitTime[0]) / guitar.freestylePeriod, 1.0)
-            score += guitar.freestyleBaseScore * hitspeed
-          for fret in range (1,5):
-            if self.controls.getState(guitar.keys[fret]) or ( guitar.isDrum and self.controls.getState(guitar.keys[fret+4])):
+          for fret in range (5):
+            if self.controls.getState(guitar.keys[fret]) or self.controls.getState(guitar.keys[fret+5]):
               hitspeed = min((pos - guitar.freestyleLastFretHitTime[fret]) / guitar.freestylePeriod, 1.0)
               score += guitar.freestyleBaseScore * hitspeed
           if numFreestyleHits > 0:    #MFH - to prevent a float division!
             score = int ( score / numFreestyleHits )
           
-          if self.controls.getState(guitar.keys[0]):
-            guitar.freestyleLastFretHitTime[0] = pos
-          for fret in range (1,5):
-            if self.controls.getState(guitar.keys[fret]) or ( guitar.isDrum and self.controls.getState(guitar.keys[fret+4])):
+          for fret in range (5):
+            if self.controls.getState(guitar.keys[fret]) or self.controls.getState(guitar.keys[fret+5]):
               guitar.freestyleLastFretHitTime[fret] = pos
           
           #MFH - Add all BRE score to a temporary score accumulator with a separate display box
@@ -3562,6 +3604,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.rbOverdriveBarGlowFadeOut = False
       
       for playerNum, thePlayer in enumerate(self.playerList):
+        self.handleAnalogSP(playerNum, ticks)
         self.handleWhammy(playerNum)
         self.handlePhrases(playerNum, self.scoring[i].streak)
         self.updateGuitarSolo(playerNum)
@@ -4101,7 +4144,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     hopoFudge = abs(abs(self.guitars[num].hopoActive) - pos)
     activeList = [k for k in self.keysList[num] if self.controls.getState(k)]
 
-    if len(activeList) == 1 and self.guitars[num].keys[self.guitars[num].hopoLast] == activeList[0]:
+    if len(activeList) == 1 and (self.guitars[num].keys[self.guitars[num].hopoLast] == activeList[0] or self.guitars[num].keys[self.guitars[num].hopoLast+5] == activeList[0]):
       if self.guitars[num].wasLastNoteHopod and hopoFudge > 0 and hopoFudge < self.guitars[num].lateMargin:
         return
 
@@ -4230,7 +4273,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     hopoFudge = abs(abs(self.guitars[num].hopoActive) - pos)
     activeList = [k for k in self.keysList[num] if self.controls.getState(k)]
 
-    if len(activeList) == 1 and self.guitars[num].keys[self.guitars[num].hopoLast] == activeList[0]:
+    if len(activeList) == 1 and (self.guitars[num].keys[self.guitars[num].hopoLast] == activeList[0] or self.guitars[num].keys[self.guitars[num].hopoLast+5] == activeList[0]):
       if self.guitars[num].wasLastNoteHopod and hopoFudge > 0 and hopoFudge < self.guitars[num].lateMargin:
         return
 
@@ -4416,11 +4459,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     for n, k in enumerate(self.keysList[num]):
       if self.controls.getState(k):
         activeKeyList.append(k)
-        if self.guitars[num].hopoLast == n:
+        if self.guitars[num].hopoLast == n or self.guitars[num].hopoLast == n - 5:
           LastHopoFretStillHeld = True
-        elif n > self.guitars[num].hopoLast:
+        elif (n > self.guitars[num].hopoLast and n < 5) or (n - 5 > self.guitars[num].hopoLast and n > 4):
           HigherFretsHeld = True
-        if self.guitars[num].hopoProblemNoteNum == n:
+        if self.guitars[num].hopoProblemNoteNum == n or self.guitars[num].hopoProblemNoteNum == n - 5:
           problemNoteStillHeld = True
 
     #ImpendingProblem = False
@@ -4675,6 +4718,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       for i,guitar in enumerate(self.guitars):
         self.playerList[i].twoChord = guitar.twoChord
       for i, player in enumerate(self.playerList):
+        player.cache = None
         if self.playerList[0].practiceMode:
           self.scoring[i].score = 0
         if self.scoring[i].score > 0:
@@ -4750,14 +4794,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #RF style HOPO playing
     
     #myfingershurt: drums :)
-    if self.guitars[0].isDrum and control in (self.guitars[0].keys):
-      #self.doPick(0)
-      self.handlePick(0)
-      return True  
-    elif self.numOfPlayers > 1 and self.guitars[1].isDrum and control in (self.guitars[1].keys):
-      #self.doPick(1)
-      self.handlePick(1)
-      return True
+    for i, guitar in enumerate(self.guitars):
+      if guitar.isDrum and control in (guitar.keys):
+        self.handlePick(i)
+        return True
 
     if self.hopoStyle > 0:  #HOPOs enabled 
       res = self.keyPressed3(key, unicode, control)
@@ -4784,11 +4824,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       pos   = self.getSongPosition()
       notes = self.guitars[num].getRequiredNotes(self.song, pos)
 
-      if self.scoring[num].streak > 0 and \
-         self.guitars[num].areNotesTappable(notes) and \
+      if ((self.scoring[num].streak > 0 and self.guitars[num].areNotesTappable(notes)) or \
+          (self.guitars[num].guitarSolo and control in self.soloKeys[num])) and \
          self.guitars[num].controlsMatchNotes(self.controls, notes):
         self.doPick(num)
-    elif control in Player.CANCELS:
+    elif control in Player.starts:
       if self.ending == True:
         return True
       self.pauseGame()
@@ -4810,14 +4850,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.enteredCode = []
 
     #myfingershurt: Adding starpower and killswitch for "no HOPOs" mode
-    if control == Player.STAR:
-      self.activateSP(0)
-    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_STAR: #QQstarS:Add the 2nd palyers active SP key
-      self.activateSP(1) #QQstarS:ADD
-    if control == Player.KILL and not self.isKillAnalog[0]:  #MFH - only use this logic if digital killswitch
-      self.killswitchEngaged[0] = True
-    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
-      self.killswitchEngaged[1] = True
+    for i, player in enumerate(self.playerList):
+      if (control == player.keyList[STAR] and not self.isSPAnalog[i]) or control == player.keyList[CANCEL]:
+        self.activateSP(i)
+      if control == player.keyList[KILL] and not self.isKillAnalog[i]:  #MFH - only use this logic if digital killswitch
+        self.killswitchEngaged[i] = True
 
 
   def keyPressed2(self, key, unicode, control = None):
@@ -4827,40 +4864,40 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     else:
       hopo = True
       
-    if True:
-      pressed = -1
-      if control in (self.guitars[0].actions):
-        hopo = False
-        pressed = 0;  
-      elif self.numOfPlayers > 1 and control in (self.guitars[1].actions):
-        hopo = False
+    #if True: #akedrou - Probably not the best place for ontological discussions. Let's just assume True is always True.
+    pressed = -1
+    if control in (self.guitars[0].actions):
+      hopo = False
+      pressed = 0;  
+    elif self.numOfPlayers > 1 and control in (self.guitars[1].actions):
+      hopo = False
+      pressed = 1;
+
+    numpressed = [len([1 for k in guitar.keys if self.controls.getState(k)]) for guitar in self.guitars]
+
+    activeList = [k for k in self.keysList[pressed] if self.controls.getState(k)]
+    if control in (self.guitars[0].keys) and self.song and numpressed[0] >= 1:
+      if self.guitars[0].wasLastNoteHopod and self.guitars[0].hopoActive >= 0:
+        hopo = True
+        pressed = 0;
+    elif self.numOfPlayers > 1 and control in (self.guitars[1].keys) and numpressed[1] >= 1:
+      if self.guitars[1].wasLastNoteHopod and self.guitars[1].hopoActive >= 0:
+        hopo = True
         pressed = 1;
 
-      numpressed = [len([1 for k in guitar.keys if self.controls.getState(k)]) for guitar in self.guitars]
+    if pressed >= 0:
+      for k in self.keysList[pressed]:
+        if self.controls.getState(k):
+          self.keyBurstTimeout[pressed] = None
+          break
+      else:
+        self.keyBurstTimeout[pressed] = self.engine.timer.time + self.keyBurstPeriod
+        return True
 
-      activeList = [k for k in self.keysList[pressed] if self.controls.getState(k)]
-      if control in (self.guitars[0].keys) and self.song and numpressed[0] >= 1:
-        if self.guitars[0].wasLastNoteHopod and self.guitars[0].hopoActive >= 0:
-          hopo = True
-          pressed = 0;
-      elif self.numOfPlayers > 1 and control in (self.guitars[1].keys) and numpressed[1] >= 1:
-        if self.guitars[1].wasLastNoteHopod and self.guitars[1].hopoActive >= 0:
-          hopo = True
-          pressed = 1;
-
-      if pressed >= 0:
-        for k in self.keysList[pressed]:
-          if self.controls.getState(k):
-            self.keyBurstTimeout[pressed] = None
-            break
-        else:
-          self.keyBurstTimeout[pressed] = self.engine.timer.time + self.keyBurstPeriod
-          return True
-
-      if pressed >= 0 and self.song:
-        self.doPick2(pressed, hopo)
+    if pressed >= 0 and self.song:
+      self.doPick2(pressed, hopo)
       
-    if control in Player.CANCELS:
+    if control in Player.starts:
       if self.ending == True:
         return True
       self.pauseGame()
@@ -4882,14 +4919,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       else:
         self.enteredCode = []
 
-    if control == Player.STAR:
-      self.activateSP(0)
-    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_STAR: #QQstarS:Add the 2nd palyers active SP key
-      self.activateSP(1) #QQstarS:ADD
-    if control == Player.KILL and not self.isKillAnalog[0]:  #MFH - only use this logic if digital killswitch
-      self.killswitchEngaged[0] = True
-    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
-      self.killswitchEngaged[1] = True
+    for i, player in enumerate(self.playerList):
+      if (control == player.keyList[STAR] and not self.isSPAnalog[i]) or control == player.keyList[CANCEL]:
+        self.activateSP(i)
+      if control == player.keyList[KILL] and not self.isKillAnalog[i]:  #MFH - only use this logic if digital killswitch
+        self.killswitchEngaged[i] = True
 
  
   def keyPressed3(self, key, unicode, control = None, pullOff = False):  #MFH - gonna pass whether this was called from a pull-off or not
@@ -4917,59 +4951,28 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if self.ignoreOpenStrums and len(activeList) < 1:   #MFH - filter out strums without frets
       pressed = -1
 
-
-    if control in (self.guitars[0].keys) and numpressed[0] >= 1:
-      if self.guitars[0].hopoActive > 0 or (self.guitars[0].wasLastNoteHopod and self.guitars[0].hopoActive == 0):
-
-        if not pullOff and (self.hopoStyle == 2 or self.hopoStyle == 3): #GH2 or GH2 Strict, don't allow lower-fret tapping while holding a higher fret
-
-          activeKeyList = []
-          LastHopoFretStillHeld = False
-          HigherFretsHeld = False
-          for k in self.keysList[0]:
-            if self.controls.getState(k):
-              activeKeyList.append(k)
-              if self.guitars[0].keys[self.guitars[0].hopoLast] == k:
-                LastHopoFretStillHeld = True
-              elif k > self.guitars[0].keys[self.guitars[0].hopoLast]:
-                HigherFretsHeld = True
-
-
-          if not(LastHopoFretStillHeld and not HigherFretsHeld):  #tapping a lower note should do nothing.
+    for i, guitar in enumerate(self.guitars): #akedrou- probably loopable...
+      if control in guitar.keys and numpressed[0] >= 1:
+        if guitar.hopoActive > 0 or (guitar.wasLastNoteHopod and guitar.hopoActive == 0):
+          if not pullOff and (self.hopoStyle == 2 or self.hopoStyle == 3): #GH2 or GH2 Strict, don't allow lower-fret tapping while holding a higher fret
+            activeKeyList = []
+            LastHopoFretStillHeld = False
+            HigherFretsHeld = False
+            for p, k in enumerate(self.keysList[i]):
+              if self.controls.getState(k):
+                activeKeyList.append(k)
+                if guitar.hopoLast == p or guitar.hopoLast-5 == p:
+                  LastHopoFretStillHeld = True
+                elif (p > guitar.hopoLast and p < 5) or (p > guitar.hopoLast and p > 4):
+                  HigherFretsHeld = True
+                  
+            if not(LastHopoFretStillHeld and not HigherFretsHeld):  #tapping a lower note should do nothing.
+              hopo = True
+              pressed = i
+          else:   #GH2 Sloppy or RF-Mod 
             hopo = True
-            pressed = 0;
-
-        else:   #GH2 Sloppy or RF-Mod 
-          hopo = True
-          pressed = 0;
-        
-        
-    elif self.numOfPlayers > 1 and control in (self.guitars[1].keys) and numpressed[1] >= 1:
-      if self.guitars[1].hopoActive > 0  or (self.guitars[1].wasLastNoteHopod and self.guitars[1].hopoActive == 0):
-
-        if not pullOff and (self.hopoStyle == 2 or self.hopoStyle == 3): #GH2 or GH2 Strict, don't allow lower-fret tapping while holding a higher fret
-
-          activeKeyList = []
-          LastHopoFretStillHeld = False
-          HigherFretsHeld = False
-          for k in self.keysList[1]:
-            if self.controls.getState(k):
-              activeKeyList.append(k)
-              if self.guitars[1].keys[self.guitars[1].hopoLast] == k:
-                LastHopoFretStillHeld = True
-              elif k > self.guitars[1].keys[self.guitars[1].hopoLast]:
-                HigherFretsHeld = True
-
-
-          if not(LastHopoFretStillHeld and not HigherFretsHeld):  #tapping a lower note should do nothing.
-            hopo = True
-            pressed = 1;
-
-        else:   #GH2 Sloppy or RF-Mod 
-          hopo = True
-          pressed = 1;
-
-
+            pressed = i
+        break
     
     #MFH - this is where the marked little block above used to be - possibly causing false "late pick" detections from HOPOs...
 
@@ -4985,7 +4988,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #else:   #2 = no HOPOs
       #  self.doPick(pressed)
       
-    if control in Player.CANCELS:
+    if control in Player.starts:
       if self.ending == True:
         return True
       self.pauseGame()
@@ -5007,14 +5010,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       else:
         self.enteredCode = []
 
-    if control == Player.STAR:
-      self.activateSP(0)
-    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_STAR: #QQstarS:Add the 2nd palyers active SP key
-      self.activateSP(1) #QQstarS:ADD
-    if control == Player.KILL and not self.isKillAnalog[0]:  #MFH - only use this logic if digital killswitch
-      self.killswitchEngaged[0] = True
-    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
-      self.killswitchEngaged[1] = True
+    for i, player in enumerate(self.playerList):
+      if (control == player.keyList[STAR] and not self.isSPAnalog[i]) or control == player.keyList[CANCEL]:
+        self.activateSP(i)
+      if control == player.keyList[KILL] and not self.isKillAnalog[i]:  #MFH - only use this logic if digital killswitch
+        self.killswitchEngaged[i] = True
 
 
   def CheckForValidKillswitchNote(self, num):
@@ -5061,7 +5061,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #MFH - cleaning up Faaa's drum tracking code: (which appears to determine which drum fret after key release?  TODO: why not before?)
     if self.guitars[num].isDrum:
       if control in (self.guitars[num].keys):
-        if not self.controls.getState(self.guitars[num].keys[0]):
+        if not self.controls.getState(self.guitars[num].keys[0]) and not self.controls.getState(self.guitars[num].keys[5]):
           self.guitars[num].bassDrumPedalDown = False    #MFH - this is all that's needed here...
           #self.guitars[num].lastFretWasBassDrum = False
       return True
@@ -5092,8 +5092,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       pos   = self.getSongPosition()
       notes = self.guitars[num].getRequiredNotes(self.song, pos)
 
-      if self.scoring[num].streak > 0 and \
-         self.guitars[num].areNotesTappable(notes) and \
+      if ((self.scoring[num].streak > 0 and self.guitars[num].areNotesTappable(notes)) or \
+          (self.guitars[num].guitarSolo and control in self.soloKeys[num])) and \
          self.guitars[num].controlsMatchNotes(self.controls, notes):
         self.doPick(num)
       # Otherwise we end the pick if the notes have been playing long enough
@@ -5101,10 +5101,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.endPick(num)
 
     #Digital killswitch disengage:
-    if control == Player.KILL and not self.isKillAnalog[0]:  #MFH - only use this logic if digital killswitch
-      self.killswitchEngaged[0] = False
-    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
-      self.killswitchEngaged[1] = False
+    for i, player in enumerate(self.playerList):
+      if control == player.keyList[KILL] and not self.isKillAnalog[i]:  #MFH - only use this logic if digital killswitch
+        self.killswitchEngaged[i] = False
 
 
   def keyReleased2(self, key):
@@ -5112,19 +5111,18 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     for i, keys in enumerate(self.keysList):
       if control in keys and self.song:
         for time, note in self.guitars[i].playedNotes:
-          if not self.guitars[i].wasLastNoteHopod or (self.guitars[i].hopoActive < 0 and control == self.keysList[i][note.number]):
+          if not self.guitars[i].wasLastNoteHopod or (self.guitars[i].hopoActive < 0 and (control == self.keysList[i][note.number] or control == self.keysList[i][note.number+5])):
             self.endPick(i)
 
     #Digital killswitch disengage:
-    if control == Player.KILL and not self.isKillAnalog[0]:  #MFH - only use this logic if digital killswitch
-      self.killswitchEngaged[0] = False
-    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
-      self.killswitchEngaged[1] = False
+    for i, player in enumerate(self.playerList):
+      if control == player.keyList[KILL] and not self.isKillAnalog[i]:  #MFH - only use this logic if digital killswitch
+        self.killswitchEngaged[i] = False
 
     
     for i, guitar in enumerate(self.guitars):
       activeList = [k for k in self.keysList[i] if self.controls.getState(k) and k != control]
-      if len(activeList) != 0 and guitar.wasLastNoteHopod and activeList[0] != self.keysList[i][guitar.hopoLast] and control in self.keysList[i]:
+      if len(activeList) != 0 and guitar.wasLastNoteHopod and activeList[0] != self.keysList[i][guitar.hopoLast] and activeList[0] != self.keysList[i][guitar.hopoLast+5] and control in self.keysList[i]:
         self.keyPressed2(None, 0, activeList[0])
 
   def keyReleased3(self, key):
@@ -5136,17 +5134,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           #if self.guitars[i].hopoActive == 0 or (self.guitars[i].hopoActive < 0 and control == self.keysList[i][note.number]):
           #if not self.guitars[i].wasLastNoteHopod or (self.guitars[i].hopoActive < 0 and control == self.keysList[i][note.number]):
             #myfingershurt: only end the pick if no notes are being held.
-          if (self.guitars[i].hit[note.number] == True and control == self.keysList[i][note.number]):
+          if (self.guitars[i].hit[note.number] == True and (control == self.keysList[i][note.number] or control == self.keysList[i][note.number+5])):
           #if control == self.keysList[i][note.number]:
             #if self.hopoDebugDisp == 1:
             #  Log.debug("MFH: An early sustain release was just detected.")
             self.endPick(i)
 
     #Digital killswitch disengage:
-    if control == Player.KILL and not self.isKillAnalog[0]:  #MFH - only use this logic if digital killswitch
-      self.killswitchEngaged[0] = False
-    elif self.numOfPlayers > 1 and control == Player.PLAYER_2_KILL and not self.isKillAnalog[1]: #QQstarS: new
-      self.killswitchEngaged[1] = False
+    for i, player in enumerate(self.playerList):
+      if control == player.keyList[KILL] and not self.isKillAnalog[i]:  #MFH - only use this logic if digital killswitch
+        self.killswitchEngaged[i] = False
     
     for i, guitar in enumerate(self.guitars):
       activeList = [k for k in self.keysList[i] if self.controls.getState(k) and k != control]
@@ -5159,35 +5156,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       
       else:
         #if len(activeList) != 0 and guitar.wasLastNoteHopod and activeList[0] != self.keysList[i][guitar.hopoLast] and control in self.keysList[i]:
-        if len(activeList) != 0 and guitar.hopoActive > 0 and activeList[0] != self.keysList[i][guitar.hopoLast] and control in self.keysList[i]:
+        if len(activeList) != 0 and guitar.hopoActive > 0 and activeList[0] != self.keysList[i][guitar.hopoLast] and activeList[0] != self.keysList[i][guitar.hopoLast+5] and control in self.keysList[i]:
           self.keyPressed3(None, 0, activeList[0], pullOff = True)
         
   def getPlayerNum(self, control):
-    if control in (self.guitars[0].keys + self.guitars[0].actions):
-      return(0) 
-    elif self.numOfPlayers > 1 and control in (self.guitars[1].keys + self.guitars[1].actions):
-      return(1)
+    for i, player in enumerate(self.playerList):
+      if control and control in player.keyList:
+        return i
+        break
     else:
-      return(-1)
-
-
-
-  #MFH -- OK - new way to handle star and partial star scoring in-game without needing to calculate the average multiplier in realtime:
-  #   Gonna precalculate all thresholds for star scoring as score thresholds for simple integer comparisons.
-  #   Furthermore, this will naturally reduce some of the nesting as the scoring type and instrument won't have to be checked in-game -
-  #     this information will be included in the precalculated score thresholds.
-  #   Also, instead of nesting the partial star scoring in one level, and checking each possible level from the top down each cycle,
-  #     reverse logic to check star score thresholds sequentially from the bottom up, stop when a threshold is reached, and remember the position.
-  #     then, next time, start checking from the last threshold instead of the bottom (since score won't be decreasing...)
-  #     for RB scoring: 6 star thresholds above 0, with 8 steps for stars 1,2,3,4, and 5 -- 41 thresholds to calculate
-  #     for GH scoring: 6 star thresholds above 0, with 8 steps for stars 2,3,4, and 5 -- 34 thresholds to calculate
-  #     for FoF scoring: hmm, this still uses hit percentage alone and not average multiplier
-  #       For FoF (and 5* GH) scoring, also need to precalculate the important accuracy thresholds in terms of number of notes hit (since that is also an integer quantity we have on hand)
-  #     To handle all of the above cases, perhaps a list of tuples that can be retrieved that can indicate:
-  #       (<full stars>, <partial stars>, <score threshold>, <number of notes hit threshold>)
-  #       if either threshold is set to 0 in the tuple, then it essentially does not matter.  
-  #       The proposed unified star scoring system will step the user through the list of tuples as the progressively-ordered requirements are met
-  #       Also must jump ahead and check if the last condition tuple in the list is met (which will always contain the 6* condition and, in GH scoring, might not be met sequentially)
+      return -1
         
   def render(self, visibility, topMost):  #QQstarS: Fix this function for mostly. And there are lots of change in this, I just show the main ones
 
@@ -8413,7 +8391,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   partX = ((i*2)+1) / (self.numOfPlayers*2.0)
                   self.engine.drawImage(self.part[i], scale = (partwFactor*0.25,partwFactor*-0.25), coord = (w*partX,h*.4), color = (1,1,1, 3.0 - abs(4.0 - self.countdownSeconds)))
                   Theme.setBaseColor(min(1.0, 3.0 - abs(4.0 - self.countdownSeconds)))
-                  text = player.part.text
+                  text = player.name
                   w, h = font.getStringSize(text)
                   font.render(text,  (partX - w*.5, .5))
               else:

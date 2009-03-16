@@ -35,7 +35,7 @@ import Config
 #myfingershurt: needed for multi-OS file fetching
 import os
 import sys
-
+import Player
 import Log
 
 # these constants define a few customized letters in the default font
@@ -73,6 +73,8 @@ class Data(object):
     self.themeLabel = themename
     self.themeCoOp  = False
 
+    self.players = None
+    self.players = Player.loadPlayers()
 
     #myfingershurt: check for existance of theme path
     #evilynux/MFH - fixed themes when running from src folder
@@ -275,6 +277,10 @@ class Data(object):
     resource.load(self, "songListFont",      font8, onLoad = self.customizeFont, synch = True)
     resource.load(self, "shadowfont",      font9, onLoad = self.customizeFont, synch = True)
     resource.load(self, "loadingFont",    font6, onLoad = self.customizeFont, synch = True)
+    
+    self.fontDict = {"font": self.font, "bigFont": self.bigFont, "pauseFont": self.pauseFont, "scoreFont": self.scoreFont, \
+                     "streakFont": self.streakFont, "songFont": self.songFont, "streakFont2": self.streakFont2, \
+                     "songListFont": self.songListFont, "shadowfont": self.shadowfont, "loadingFont": self.loadingFont}
 
 
     if self.fileExists(os.path.join("themes",themename,"sounds","starding.ogg")):

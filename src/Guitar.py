@@ -42,15 +42,9 @@ import os
 import Log
 import Song   #need the base song defines as well
 
-#KEYS = [Player.KEY1, Player.KEY2, Player.KEY3, Player.KEY4, Player.KEY5]
-PLAYER1KEYS    = [Player.KEY1, Player.KEY2, Player.KEY3, Player.KEY4, Player.KEY5]
-PLAYER1ACTIONS = [Player.ACTION1, Player.ACTION2]
-PLAYER2KEYS    = [Player.PLAYER_2_KEY1, Player.PLAYER_2_KEY2, Player.PLAYER_2_KEY3, Player.PLAYER_2_KEY4, Player.PLAYER_2_KEY5]
-PLAYER2ACTIONS = [Player.PLAYER_2_ACTION1, Player.PLAYER_2_ACTION2]
-
 
 class Guitar:
-  def __init__(self, engine, editorMode = False, player = 0):
+  def __init__(self, engine, playerObj, editorMode = False, player = 0):
     self.engine         = engine
 
     self.starPowerDecreaseDivisor = 200.0/self.engine.audioSpeedFactor
@@ -187,9 +181,9 @@ class Guitar:
     self.killPoints = False
 
     self.starpowerMode = self.engine.config.get("game", "starpower_mode") #MFH
-
+    
     #get difficulty
-    self.difficulty = self.engine.config.get("player%d" %(player), "difficulty")
+    self.difficulty = playerObj.getDifficultyInt()
 
     #myfingershurt:
     self.hopoStyle        = self.engine.config.get("game", "hopo_system")
@@ -244,9 +238,8 @@ class Guitar:
     self.freestyleHit = [False, False, False, False, False]
     
 
-    neckSettingName = "neck_choose_p%d" % (self.player)
-    self.neck = self.engine.config.get("coffee", neckSettingName)
-
+    self.neck = str(playerObj.neck)
+    playerObj = None
     #Get theme
     themename = self.engine.data.themeLabel
     #now theme determination logic is only in data.py:
@@ -292,12 +285,8 @@ class Guitar:
 
     self.bigMax = 1
     
-    if player == 0:
-      self.keys = PLAYER1KEYS
-      self.actions = PLAYER1ACTIONS
-    else:
-      self.keys = PLAYER2KEYS
-      self.actions = PLAYER2ACTIONS
+    self.keys = []
+    self.actions = []
 
     
     self.setBPM(self.currentBpm)
@@ -313,6 +302,9 @@ class Guitar:
 
 
     engine.loadImgDrawing(self, "glowDrawing", "glow.png")
+    
+    if not engine.data.fileExists(os.path.join("necks", self.neck + ".png")) and not engine.data.fileExists(os.path.join("necks", "Neck_" + self.neck + ".png")):
+      self.neck = str(engine.mainMenu.chosenNeck) #this neck is safe!
 
     # evilynux - Fixed random neck -- MFH: further fixing random neck
     if self.neck == "0" or self.neck == "Neck_0" or self.neck == "randomneck":
@@ -647,7 +639,7 @@ class Guitar:
     self.glowColor  = Theme.glowColor
     
     
-    self.twoChordMax = self.engine.config.get("player%d" % (player), "two_chord_max")
+    self.twoChordMax = False
     self.disableVBPM  = self.engine.config.get("game", "disable_vbpm")
     self.disableNoteSFX  = self.engine.config.get("video", "disable_notesfx")
     self.disableFretSFX  = self.engine.config.get("video", "disable_fretsfx")
@@ -2099,7 +2091,7 @@ class Guitar:
         texSize = (n/5.0,n/5.0+0.2)
 
         texY = (0.0,1.0/3.0)
-        if controls.getState(self.keys[n]):
+        if controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]):
           texY = (1.0/3.0,2.0/3.0)
         if self.hit[n]:
           texY = (2.0/3.0,1.0)
@@ -2305,7 +2297,7 @@ class Guitar:
       flameLimit = 10.0
       flameLimitHalf = round(flameLimit/2.0)
       for fretNum in range(self.strings):
-        if controls.getState(self.keys[fretNum]):
+        if controls.getState(self.keys[fretNum]) or controls.getState(self.keys[fretNum+5]):
 
           if self.freestyleHitFlameCounts[fretNum] < flameLimit:
             ms = math.sin(self.time) * .25 + 1
@@ -3049,9 +3041,8 @@ class Guitar:
       requiredKeys = self.uniqify(requiredKeys)
       
       if len(requiredKeys) > 2 and self.twoChordMax == True:
-        self.twoChordApply = True
         twochord = 0
-        for n, k in enumerate(self.keys):
+        for k in self.keys:
           if controls.getState(k):
             twochord += 1
         if twochord == 2:
@@ -3060,10 +3051,10 @@ class Guitar:
         else:
           twochord = 0
 
-      for n, k in enumerate(self.keys):
-        if n in requiredKeys and not controls.getState(k):
+      for n in range(self.strings):
+        if n in requiredKeys and not (controls.getState(self.keys[n]) or controls.getState(self.keys[n+5])):
           return False
-        if not n in requiredKeys and controls.getState(k):
+        if not n in requiredKeys and (controls.getState(self.keys[n]) or controls.getState(self.keys[n+5])):
           # The lower frets can be held down
           if n > max(requiredKeys):
             return False
@@ -3072,6 +3063,7 @@ class Guitar:
           for time, note in chord:
             note.played = True
         else:
+          self.twoChordApply = True
           for time, note in chord:
             note.skipped = True
           chord[0][1].skipped = False
@@ -3091,7 +3083,7 @@ class Guitar:
     # check each valid chord
     chords = {}
     for time, note in notes:
-      if note.hopod == True and controls.getState(self.keys[note.number]):
+      if note.hopod == True and (controls.getState(self.keys[note.number]) or controls.getState(self.keys[note.number + 5])):
       #if hopo == True and controls.getState(self.keys[note.number]):
         self.playedNotes = []
         return True
@@ -3111,7 +3103,6 @@ class Guitar:
 
       if len(requiredKeys) > 2 and self.twoChordMax == True:
         twochord = 0
-        self.twoChordApply = True
         for n, k in enumerate(self.keys):
           if controls.getState(k):
             twochord += 1
@@ -3121,10 +3112,10 @@ class Guitar:
         else:
           twochord = 0
         
-      for n, k in enumerate(self.keys):
-        if n in requiredKeys and not controls.getState(k):
+      for n in range(self.strings):
+        if n in requiredKeys and not (controls.getState(self.keys[n]) or controls.getState(self.keys[n+5])):
           return False
-        if not n in requiredKeys and controls.getState(k):
+        if not n in requiredKeys and (controls.getState(self.keys[n]) or controls.getState(self.keys[n+5])):
           # The lower frets can be held down
           if hopo == False and n >= min(requiredKeys):
             return False
@@ -3133,6 +3124,7 @@ class Guitar:
           for time, note in chord:
             note.played = True
         else:
+          self.twoChordApply = True
           for time, note in chord:
             note.skipped = True
           chord[0][1].skipped = False
@@ -3153,7 +3145,7 @@ class Guitar:
     # check each valid chord
     chords = {}
     for time, note in notes:
-      if note.hopod == True and controls.getState(self.keys[note.number]):
+      if note.hopod == True and (controls.getState(self.keys[note.number]) or controls.getState(self.keys[note.number + 5])):
       #if hopo == True and controls.getState(self.keys[note.number]):
         self.playedNotes = []
         return True
@@ -3176,7 +3168,6 @@ class Guitar:
 
       if len(requiredKeys) > 2 and self.twoChordMax == True:
         twochord = 0
-        self.twoChordApply = True
         for n, k in enumerate(self.keys):
           if controls.getState(k):
             twochord += 1
@@ -3191,6 +3182,7 @@ class Guitar:
           for time, note in chord:
             note.played = True
         else:
+          self.twoChordApply = True
           for time, note in chord:
             note.skipped = True
           chord[0][1].skipped = False
@@ -3278,13 +3270,13 @@ class Guitar:
   def controlsMatchNote3(self, controls, chordTuple, requiredKeys, hopo):
     if len(chordTuple) > 1:
     #Chords must match exactly
-      for n, k in enumerate(self.keys):
-        if (n in requiredKeys and not controls.getState(k)) or (n not in requiredKeys and controls.getState(k)):
+      for n in range(self.strings):
+        if (n in requiredKeys and not (controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]))) or (n not in requiredKeys and (controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]))):
           return False
     else:
     #Single Note must match that note
       requiredKey = requiredKeys[0]
-      if not controls.getState(self.keys[requiredKey]):
+      if not controls.getState(self.keys[requiredKey]) and not controls.getState(self.keys[requiredKey+5]):
         return False
 
 
@@ -3292,7 +3284,7 @@ class Guitar:
       if hopo == False or self.hopoStyle == 2 or self.hopoStyle == 3:
       #Check for higher numbered frets if not a HOPO or if GH2 strict mode
         for n, k in enumerate(self.keys):
-          if n > requiredKey:
+          if (n > requiredKey and n < 5) or (n > 4 and n > requiredKey + 5):
           #higher numbered frets cannot be held
             if controls.getState(k):
               return False
@@ -3433,6 +3425,13 @@ class Guitar:
       return True
     return False
 
+  def soloFreestylePick(self, song, pos, controls):
+    numHits = 0
+    for theFret in range(5):
+      self.freestyleHit[theFret] = controls.getState(self.keys[theFret+5])
+      if self.freestyleHit[theFret]:
+        numHits += 1
+    return numHits
 
   #MFH - TODO - handle freestyle picks here
   def freestylePick(self, song, pos, controls):
@@ -3443,7 +3442,7 @@ class Guitar:
     if not controls.getState(self.actions[0]) and not controls.getState(self.actions[1]):
       return 0
 
-    for theFret in range(0,5):
+    for theFret in range(5):
       self.freestyleHit[theFret] = controls.getState(self.keys[theFret])
       if self.freestyleHit[theFret]:
         numHits += 1
@@ -3507,14 +3506,17 @@ class Guitar:
     # update frets
     if self.editorMode:
       if (controls.getState(self.actions[0]) or controls.getState(self.actions[1])):
-        activeFrets = [i for i, k in enumerate(self.keys) if controls.getState(k)] or [self.selectedString]
+        for i in range(self.strings):
+          if controls.getState(self.keys[i]) or controls.getState(self.keys[i+5]):
+            activeFrets.append(i)
+        activeFrets = activeFrets or [self.selectedString]
       else:
         activeFrets = []
     else:
       activeFrets = [note.number for time, note in self.playedNotes]
     
     for n in range(self.strings):
-      if controls.getState(self.keys[n]) or (self.editorMode and self.selectedString == n):
+      if controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]) or (self.editorMode and self.selectedString == n):
         self.fretWeight[n] = 0.5
       else:
         self.fretWeight[n] = max(self.fretWeight[n] - ticks / 64.0, 0.0)

@@ -28,6 +28,7 @@ import Object
 from World import World
 from Task import Task
 import pygame
+import Player
 
 class Engine:
   """Main task scheduler."""

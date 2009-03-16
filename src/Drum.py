@@ -43,10 +43,6 @@ import random
 
 import Song   #need the base song defines as well
 
-PLAYER1DRUMS   = [Player.BASS, Player.DRUM1A, Player.DRUM2A, Player.DRUM3A, Player.DRUM4A, Player.DRUM1B, Player.DRUM2B, Player.DRUM3B, Player.DRUM4B]
-PLAYER2DRUMS   = [Player.PLAYER_2_BASS, Player.PLAYER_2_DRUM1A,Player.PLAYER_2_DRUM2A, Player.PLAYER_2_DRUM3A, Player.PLAYER_2_DRUM4A,
-                  Player.PLAYER_2_DRUM1B, Player.PLAYER_2_DRUM2B, Player.PLAYER_2_DRUM3B, Player.PLAYER_2_DRUM4B] 
-
 #Normal guitar key color order: Green, Red, Yellow, Blue, Orange
 #Drum fret color order: Red, Yellow, Blue, Green
 #actual drum note numbers:
@@ -55,12 +51,15 @@ PLAYER2DRUMS   = [Player.PLAYER_2_BASS, Player.PLAYER_2_DRUM1A,Player.PLAYER_2_D
 #2 = drum Yellow fret, normally Yellow fret
 #3 = drum Blue fret, normally Blue fret
 #4 = drum Green fret, normally Orange fret
-
+#
 #So, with regard to note number coloring, swap note.number 0's color wih note.number 4.
+
+#akedrou - 5-drum support is now available.
+# to enable it, only here and Player.drums should need changing.
 
 
 class Drum:
-  def __init__(self, engine, editorMode = False, player = 0):
+  def __init__(self, engine, playerObj, editorMode = False, player = 0):
     self.engine         = engine
     
     #self.starPowerDecreaseDivisor = 200.0*self.engine.audioSpeedFactor
@@ -164,7 +163,6 @@ class Drum:
     self.time           = 0.0
     self.pickStartPos   = 0
     self.leftyMode      = False
-    #self.player         = player
 
     self.freestyleHitFlameCounts = [0 for n in range(self.strings+1)]    #MFH
 
@@ -220,7 +218,7 @@ class Drum:
     self.totalNotes = 0
 
     #get difficulty
-    self.difficulty = self.engine.config.get("player%d" %(player), "difficulty")
+    self.difficulty = playerObj.getDifficultyInt()
 
     self.scoreMultiplier = 1
 
@@ -256,8 +254,8 @@ class Drum:
 
     self.freestyleHit = [False, False, False, False, False]
 
-    neckSettingName = "neck_choose_p%d" % (self.player)
-    self.neck = self.engine.config.get("coffee", neckSettingName)
+    self.neck = str(playerObj.neck)
+    playerObj = None
 
     #Get theme
     themename = self.engine.data.themeLabel
@@ -332,17 +330,16 @@ class Drum:
     elif self.hitwcheat == 2: 
       self.hitw = 1.0
 
-    if player == 0:
-      self.keys = PLAYER1DRUMS 
-      self.actions = PLAYER1DRUMS
-    else:
-      self.keys =  PLAYER2DRUMS
-      self.actions = PLAYER2DRUMS
+    self.keys = []
+    self.actions = []
       
     self.setBPM(self.currentBpm)
 
     engine.loadImgDrawing(self, "glowDrawing", "glow.png")
-
+    
+    if not engine.data.fileExists(os.path.join("necks", self.neck + ".png")) and not engine.data.fileExists(os.path.join("necks", "Neck_" + self.neck + ".png")):
+      self.neck = str(engine.mainMenu.chosenNeck) #this neck is safe!
+    
     # evilynux - Fixed random neck -- MFH: further fixing random neck
     if self.neck == "0" or self.neck == "Neck_0" or self.neck == "randomneck":
       self.neck = []
@@ -544,7 +541,7 @@ class Drum:
     self.gh3flameColor = Theme.gh3flameColor
     self.flameSizes = Theme.flameSizes
     self.glowColor  = Theme.glowColor
-    self.twoChordMax = self.engine.config.get("player%d" % (player), "two_chord_max")
+    self.twoChordMax = False
     self.disableVBPM  = self.engine.config.get("game", "disable_vbpm")
     self.disableNoteSFX  = self.engine.config.get("video", "disable_notesfx")
     self.disableFretSFX  = self.engine.config.get("video", "disable_fretsfx")
@@ -1890,7 +1887,7 @@ class Drum:
       else:
         c = self.fretColors[n + 1]
 
-      if f and (controls.getState(self.keys[0])):
+      if f and (controls.getState(self.keys[0]) or controls.getState(self.keys[5])):
         f += 0.25
 
       glColor4f(.1 + .8 * c[0] + f, .1 + .8 * c[1] + f, .1 + .8 * c[2] + f, visibility)
@@ -1924,7 +1921,7 @@ class Drum:
           if controls.getState(self.keys[n+1]):
             texY = (1.0/3.0,2.0/3.0)
           #myfingershurt: also want to show when alternate drumkeys are pressed!
-          if controls.getState(self.keys[n+5]):
+          if controls.getState(self.keys[n+6]):
             texY = (1.0/3.0,2.0/3.0)
           if self.hit[n]:
             texY = (2.0/3.0,1.0)
@@ -1936,7 +1933,7 @@ class Drum:
           if controls.getState(self.keys[n+1]):
             texY = (2.0/6.0,3.0/6.0)
           #myfingershurt: also want to show when alternate drumkeys are pressed!
-          if controls.getState(self.keys[n+5]):
+          if controls.getState(self.keys[n+6]):
             texY = (2.0/6.0,3.0/6.0)
           if self.hit[n]:
             texY = (4.0/6.0,5.0/6.0)
@@ -2102,7 +2099,7 @@ class Drum:
       texSize = (0.0,1.0)
       
       texY = (1.0/6.0,2.0/6.0)
-      if controls.getState(self.keys[0]):
+      if controls.getState(self.keys[0]) or controls.getState(self.keys[5]):
         texY = (3.0/6.0,4.0/6.0)
       if self.hit[0]:
         texY = (5.0/6.0,1.0)
@@ -2149,7 +2146,7 @@ class Drum:
         
         #c = self.fretColors[n]
         c = self.fretColors[n+1]
-        if f and controls.getState(self.keys[0]):
+        if f and (controls.getState(self.keys[0]) or controls.getState(self.keys[5])):
           f += 0.25     
         y = v + f / 6
 
@@ -2591,7 +2588,7 @@ class Drum:
       for n in range(self.strings):
         f = self.fretWeight[n]
         c = self.fretColors[n+1]    #MFH shifted by 1 for most drum colors
-        if f and controls.getState(self.keys[0]):
+        if f and (controls.getState(self.keys[0]) or controls.getState(self.keys[5])):
           f += 0.25     
         y = v + f / 6
         x = (self.strings / 2 -.5 - n) * w
@@ -2724,7 +2721,7 @@ class Drum:
       for fretNum in range(self.strings+1):   #need to add 1 to string count to check this correctly (bass drum doesnt count as a string)
         #MFH - must include secondary drum keys here
         #if controls.getState(self.keys[fretNum]):
-        if controls.getState(self.keys[fretNum]) or (fretNum > 0 and controls.getState(self.keys[fretNum+4]) ):
+        if controls.getState(self.keys[fretNum]) or controls.getState(self.keys[fretNum+5]):
 
           if self.freestyleHitFlameCounts[fretNum] < flameLimit:
             ms = math.sin(self.time) * .25 + 1
@@ -3283,17 +3280,16 @@ class Drum:
     #  return a list of drums just hit (intelligently play the bass drum if it's held down during gameplay)
     drumsJustHit = [False, False, False, False, False]
 
-    if controls.getState(self.keys[0]):   #Bass drum   
-      if not self.bassDrumPedalDown:  #MFH - gotta check if bass drum pedal is just held down!
-        if self.engine.data.bassDrumSoundFound:
-          self.engine.data.bassDrumSound.play()
-        self.bassDrumPedalDown = True
-        drumsJustHit[0] = True
-    else:
-      self.bassDrumPedalDown = False
-
-    for i in range (1,5):
-      if controls.getState(self.keys[i]) or controls.getState(self.keys[4+i]):
+    for i in range (5):
+      if controls.getState(self.keys[i]) or controls.getState(self.keys[5+i]):
+        if i == 0:
+          if not self.bassDrumPedalDown:  #MFH - gotta check if bass drum pedal is just held down!
+            if self.engine.data.bassDrumSoundFound:
+              self.engine.data.bassDrumSound.play()
+            self.bassDrumPedalDown = True
+            drumsJustHit[0] = True
+        else:
+          self.bassDrumPedalDown = False
         if i == 1:
           if self.engine.data.T1DrumSoundFound and not playBassDrumOnly:
             self.engine.data.T1DrumSound.play()
@@ -3369,42 +3365,42 @@ class Drum:
       return
 
     if self.lastFretWasBassDrum:
-      if controls.getState(self.keys[1]) or controls.getState(self.keys[2]) or controls.getState(self.keys[3]) or controls.getState(self.keys[4]) or controls.getState(self.keys[5]) or controls.getState(self.keys[6]) or controls.getState(self.keys[7]) or controls.getState(self.keys[8]):
+      if controls.getState(self.keys[1]) or controls.getState(self.keys[2]) or controls.getState(self.keys[3]) or controls.getState(self.keys[4]) or controls.getState(self.keys[6]) or controls.getState(self.keys[7]) or controls.getState(self.keys[8]) or controls.getState(self.keys[9]):
         self.lastFretWasBassDrum = False
-    elif controls.getState(self.keys[0]):
+    elif controls.getState(self.keys[0]) or controls.getState(self.keys[5]):
       self.lastFretWasBassDrum = True
     else:
       self.lastFretWasBassDrum = False
       
     #Faaa Drum sound
     if self.lastFretWasT1:
-      if controls.getState(self.keys[0]) or controls.getState(self.keys[2]) or controls.getState(self.keys[3]) or controls.getState(self.keys[4]) or controls.getState(self.keys[6]) or controls.getState(self.keys[7]) or controls.getState(self.keys[8]):
+      if controls.getState(self.keys[0]) or controls.getState(self.keys[2]) or controls.getState(self.keys[3]) or controls.getState(self.keys[4]) or controls.getState(self.keys[5]) or controls.getState(self.keys[7]) or controls.getState(self.keys[8]) or controls.getState(self.keys[9]):
         self.lastFretWasT1 = False
-    elif controls.getState(self.keys[1]) or controls.getState(self.keys[5]):
+    elif controls.getState(self.keys[1]) or controls.getState(self.keys[6]):
       self.lastFretWasT1 = True
     else:
       self.lastFretWasT1 = False
 
     if self.lastFretWasT2:
-      if controls.getState(self.keys[0]) or controls.getState(self.keys[1]) or controls.getState(self.keys[3]) or controls.getState(self.keys[4]) or controls.getState(self.keys[5]) or controls.getState(self.keys[7]) or controls.getState(self.keys[8]):
+      if controls.getState(self.keys[0]) or controls.getState(self.keys[1]) or controls.getState(self.keys[3]) or controls.getState(self.keys[4]) or controls.getState(self.keys[5]) or controls.getState(self.keys[6]) or controls.getState(self.keys[8]) or controls.getState(self.keys[9]):
         self.lastFretWasT2 = False
-    elif controls.getState(self.keys[2]) or controls.getState(self.keys[6]):
+    elif controls.getState(self.keys[2]) or controls.getState(self.keys[7]):
       self.lastFretWasT2 = True
     else:
       self.lastFretWasT2 = False
 
     if self.lastFretWasT3:
-      if controls.getState(self.keys[0]) or controls.getState(self.keys[1]) or controls.getState(self.keys[2]) or controls.getState(self.keys[4]) or controls.getState(self.keys[5]) or controls.getState(self.keys[6]) or controls.getState(self.keys[8]):
+      if controls.getState(self.keys[0]) or controls.getState(self.keys[1]) or controls.getState(self.keys[2]) or controls.getState(self.keys[4]) or controls.getState(self.keys[5]) or controls.getState(self.keys[6]) or controls.getState(self.keys[7]) or controls.getState(self.keys[9]):
         self.lastFretWasT3 = False
-    elif controls.getState(self.keys[3]) or controls.getState(self.keys[7]):
+    elif controls.getState(self.keys[3]) or controls.getState(self.keys[8]):
       self.lastFretWasT3 = True
     else:
       self.lastFretWasT3 = False		  
 
     if self.lastFretWasC:
-      if controls.getState(self.keys[0]) or controls.getState(self.keys[1]) or controls.getState(self.keys[2]) or controls.getState(self.keys[3]) or controls.getState(self.keys[5]) or controls.getState(self.keys[6]) or controls.getState(self.keys[7]):
+      if controls.getState(self.keys[0]) or controls.getState(self.keys[1]) or controls.getState(self.keys[2]) or controls.getState(self.keys[3]) or controls.getState(self.keys[5]) or controls.getState(self.keys[6]) or controls.getState(self.keys[7]) or controls.getState(self.keys[8]):
         self.lastFretWasC = False
-    elif controls.getState(self.keys[4]) or controls.getState(self.keys[8]):
+    elif controls.getState(self.keys[4]) or controls.getState(self.keys[9]):
       self.lastFretWasC = True
     else:
       self.lastFretWasC = False
@@ -3422,11 +3418,11 @@ class Drum:
     #adding bass drum hit every bass fret:
     
     for time, note in self.matchingNotes:
-      if ((note.number == 0 and controls.getState(self.keys[0]))
-       or (note.number == 1 and (controls.getState(self.keys[1]) or controls.getState(self.keys[5])))
-       or (note.number == 2 and (controls.getState(self.keys[2]) or controls.getState(self.keys[6]))) 
-       or (note.number == 3 and (controls.getState(self.keys[3]) or controls.getState(self.keys[7]))) 
-       or (note.number == 4 and (controls.getState(self.keys[4]) or controls.getState(self.keys[8])))):
+      if ((note.number == 0 and (controls.getState(self.keys[0]) or controls.getState(self.keys[5])))
+       or (note.number == 1 and (controls.getState(self.keys[1]) or controls.getState(self.keys[6])))
+       or (note.number == 2 and (controls.getState(self.keys[2]) or controls.getState(self.keys[7]))) 
+       or (note.number == 3 and (controls.getState(self.keys[3]) or controls.getState(self.keys[8]))) 
+       or (note.number == 4 and (controls.getState(self.keys[4]) or controls.getState(self.keys[9])))):
         if self.guitarSolo:
           self.currentGuitarSoloHitNotes += 1
         return self.hitNote(time, note)         
@@ -3480,15 +3476,15 @@ class Drum:
 
     
     for n in range(self.strings):
-      if   n == 0 and (controls.getState(self.keys[1]) or controls.getState(self.keys[5])):
+      if   n == 0 and (controls.getState(self.keys[1]) or controls.getState(self.keys[6])):
             self.fretWeight[n] = 0.5  
-      elif n == 1 and (controls.getState(self.keys[2]) or controls.getState(self.keys[6])):
+      elif n == 1 and (controls.getState(self.keys[2]) or controls.getState(self.keys[7])):
             self.fretWeight[n] = 0.5  
-      elif n == 2 and (controls.getState(self.keys[3]) or controls.getState(self.keys[7])):
+      elif n == 2 and (controls.getState(self.keys[3]) or controls.getState(self.keys[8])):
             self.fretWeight[n] = 0.5  
-      elif n == 3 and (controls.getState(self.keys[4]) or controls.getState(self.keys[8])):
+      elif n == 3 and (controls.getState(self.keys[4]) or controls.getState(self.keys[9])):
             self.fretWeight[n] = 0.5  
-      elif controls.getState(self.keys[0]):
+      elif controls.getState(self.keys[0]) or controls.getState(self.keys[5]):
             self.fretWeight[n] = 0.5
       else:
         self.fretWeight[n] = max(self.fretWeight[n] - ticks / 64.0, 0.0)

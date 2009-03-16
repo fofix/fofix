@@ -2375,7 +2375,6 @@ class Song(object):
     self.music = None
 
 
-    
     #self.slowDownFactor = self.engine.config.get("audio", "speed_factor")
     #self.engine.setSpeedFactor(self.slowDownFactor)    #MFH 
 
@@ -3716,7 +3715,7 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
     includeTutorials = True
 
   #MFH - Career Mode determination:
-  gameMode1p = engine.config.get("player0","mode_1p")
+  gameMode1p = engine.config.get("game","game_mode")
   if gameMode1p == 2:
     careerMode = True
   else:
@@ -3923,7 +3922,7 @@ def getAvailableSongsAndTitles(engine, library = DEFAULT_LIBRARY, includeTutoria
     return []
 
   #MFH - Career Mode determination:
-  gameMode1p = engine.config.get("player0","mode_1p")
+  gameMode1p = engine.config.get("game","game_mode")
   if gameMode1p == 2:
     careerMode = True
     quickPlayMode = False
@@ -3993,7 +3992,7 @@ def compareSongsAndTitles(engine, a, b):
   #>>>       return -1
 
   #MFH - Career Mode determination:
-  gameMode1p = engine.config.get("player0","mode_1p")
+  gameMode1p = engine.config.get("game","game_mode")
   order = engine.config.get("game", "sort_order")
   
   #MFH - must check here for an invalid Sort Order setting and correct it!

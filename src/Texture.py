@@ -223,7 +223,13 @@ class Texture:
       string = image.tostring('raw', 'L', 0, -1)
       self.loadRaw(image.size, string, GL_LUMINANCE, 1)
     else:
-      raise TextureException("Unsupported image mode '%s'" % image.mode)
+      try:
+        image = image.convert('RGB')
+        Log.warn("Unsupported image mode '%s' converted to 'RGB'. May have unexpected results." % image.mode)
+        string = image.tostring('raw', 'RGB', 0, -1)
+        self.loadRaw(image.size, string, GL_RGB, 3)
+      except:
+        raise TextureException("Unsupported image mode '%s'" % image.mode)
 
   def prepareRenderTarget(self, width, height, generateMipmap = True):
     self.framebuffer = Framebuffer(self.texture, width, height, generateMipmap)

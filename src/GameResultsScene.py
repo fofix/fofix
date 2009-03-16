@@ -130,6 +130,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.resultStar       = [float(i) for i in Theme.result_star]
     
     self.scoreScrollStartOffset = .8
+    for i in self.playerList:
+      i.cache = None
     
     self.coOpDiff    = _("Co-Op Mode") #To be changed to something.
     self.coOpPart    = _("Co-Op Mode") #To be changed to something.
@@ -147,7 +149,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       (_("Quit"),           self.quit),
     ]
     
-    self.menu = Menu(self.engine, items, onCancel = self.quit, pos = (Theme.result_menu_x, Theme.result_menu_y))
+    self.menu = Menu(self.engine, items, onCancel = self.quit, name = "gameresult", pos = (Theme.result_menu_x, Theme.result_menu_y))
     
     self.engine.resource.load(self, "song", lambda: Song.loadSong(self.engine, songName, library = self.libraryName, notesOnly = True, part = [player.part for player in self.playerList]), onLoad = self.songLoaded)
     
@@ -280,19 +282,15 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     jurgplay = self.engine.config.get("game", "jurgtype")
     
     self.progressKeys   = []
-    self.progressKeys.extend(Player.KEY1S)
-    self.progressKeys.extend(Player.KEY2S)
-    self.progressKeys.extend(Player.CANCELS)
-    self.progressKeys.extend(Player.DRUM1S)
-    self.progressKeys.extend(Player.DRUM4S)
-    self.p1ProgressKeys = [Player.KEY1, Player.KEY2, Player.CANCEL, Player.DRUM1A, Player.DRUM4A]
-    self.p2ProgressKeys = [Player.PLAYER_2_KEY1, Player.PLAYER_2_KEY2, Player.PLAYER_2_CANCEL, Player.PLAYER_2_DRUM1A, Player.PLAYER_2_DRUM4A]
+    self.playerProgressKeys = [[] for i in self.playerList]
+    for i, player in enumerate(self.playerList):
+      self.progressKeys.extend(player.progressKeys)
+      self.playerProgressKeys[i] = player.progressKeys
     if jurgen == 0:
       if jurgplay == 1:
-        self.p2ProgressKeys = self.progressKeys
+        self.playerProgressKeys[1] = self.progressKeys
       else:
-        self.p1ProgressKeys = self.progressKeys
-        self.p2ProgressKeys = self.progressKeys
+        self.playerProgressKeys = [self.progressKeys for i in self.playerList]
     
     self.part = [None for i in self.playerList]
     self.partImage = True
@@ -410,14 +408,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           if self.delay[i] > 0:
             self.skipDelay(i)
           break
-        elif i == 0 and (c in self.p1ProgressKeys or key == pygame.K_RETURN or key == pygame.K_ESCAPE):
-          if self.rolling[i]:
-            self.skipRoll(i)
-            self.skipShrink(i)
-          if self.delay[i] > 0:
-            self.skipDelay(i)
-          break
-        elif i == 1 and (c in self.p2ProgressKeys or key == pygame.K_RETURN or key == pygame.K_ESCAPE):
+        elif c in self.playerProgressKeys[i] or key == pygame.K_RETURN or key == pygame.K_ESCAPE:
           if self.rolling[i]:
             self.skipRoll(i)
             self.skipShrink(i)
@@ -563,9 +554,9 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         continue
       scores = self.song.info.getHighscores(self.playerList[i].difficulty, part = self.playerList[i].part)
       if not scores or self.finalScore[i] > scores[-1][0] or len(scores) < 5:
-        name = Dialogs.getText(self.engine, _("%d points is a new high score! Enter your name:") % self.finalScore[i], self.playerList[i].name)
+        name = Dialogs.getText(self.engine, _("%d points is a new high score! Enter your name:") % self.finalScore[i], self.playerList[i].upname)
         if name:
-          self.playerList[i].name = name
+          self.playerList[i].upname = name
         scoreExt = (scoreCard.notesHit, scoreCard.totalStreakNotes, scoreCard.hiStreak, self.engine.uploadVersion, scoreCard.handicap, scoreCard.longHandicap, self.originalScore[i])
         self.highscoreIndex[i] = self.song.info.addHighscore(self.playerList[i].difficulty, self.finalScore[i], scoreCard.stars, self.playerList[i].name, part = self.playerList[i].part, scoreExt = scoreExt)
         self.song.info.save()
@@ -796,7 +787,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
   
   def renderInitialScore(self, visibility, topMost):
     bigFont = self.engine.data.bigFont
-    font    = self.engine.data.font
+    defFont = self.engine.data.font
     
     v = ((1 - visibility) **2)
     
@@ -817,6 +808,10 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         glColor3f(r, g, b)
       except IndexError:
         Theme.setBaseColor(1-v)
+      try:
+        font = self.engine.data.fontDict[Theme.result_song[4]]
+      except:
+        font = defFont
       if self.scaleTitle == 1:
         if self.centerTitle == 1:
           max = .97 - (abs(.5 - float(Theme.result_song[0]))*2)
@@ -848,6 +843,10 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           glColor3f(r, g, b)
         except IndexError:
           Theme.setBaseColor(1-v)
+        try:
+          font = self.engine.data.fontDict[Theme.result_stats_notes[4]]
+        except:
+          font = defFont
         wText, hText = font.getStringSize(text, scale = float(Theme.result_stats_notes[2]))
         Dialogs.wrapText(font, (float(Theme.result_stats_notes[0]) - wText/2, float(Theme.result_stats_notes[1]) + v), text, 0.9, float(Theme.result_stats_notes[2]))
         
@@ -856,9 +855,13 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           glColor3f(r, g, b)
         except IndexError:
           Theme.setBaseColor(1-v)
+        try:
+          font = self.engine.data.fontDict[Theme.result_score[4]]
+        except:
+          font = bigFont
         text = "%d" % self.currentScore[i]
-        wText, hText = bigFont.getStringSize(text, scale = float(Theme.result_score[2]))
-        bigFont.render(text, (float(Theme.result_score[0]) - wText / 2, float(Theme.result_score[1]) + v), scale = float(Theme.result_score[2]))
+        wText, hText = font.getStringSize(text, scale = float(Theme.result_score[2]))
+        font.render(text, (float(Theme.result_score[0]) - wText / 2, float(Theme.result_score[1]) + v), scale = float(Theme.result_score[2]))
         
         if self.resultStep == 0:
           space = self.space[i]
@@ -906,9 +909,13 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         
         settingsText = "%s %s - %s: %s / %s, %s: %s" % (self.engine.versionString, self.tsSettings, self.tsHopos, self.hopoStyle, self.hopoFreq, self.tsHitWindow, self.hitWindow)
         settingsScale = 0.0012
-        wText, hText = font.getStringSize(settingsText, settingsScale)
-        font.render(settingsText, (.5 - wText/2, 0.0), scale = settingsScale)
+        wText, hText = defFont.getStringSize(settingsText, settingsScale)
+        defFont.render(settingsText, (.5 - wText/2, 0.0), scale = settingsScale)
         
+        try:
+          font = self.engine.data.fontDict[Theme.result_stats_accuracy[4]]
+        except:
+          font = defFont
         text = _(Theme.result_stats_accuracy_text) % scoreCard.hitAccuracy
         wText, hText = font.getStringSize(text)
         try:
@@ -918,6 +925,10 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           Theme.setBaseColor(1-v)
         font.render(text, (float(Theme.result_stats_accuracy[0]) - wText / 2, float(Theme.result_stats_accuracy[1]) + v), scale = float(Theme.result_stats_accuracy[2]))
         
+        try:
+          font = self.engine.data.fontDict[Theme.result_stats_streak[4]]
+        except:
+          font = defFont
         text = _(Theme.result_stats_streak_text) % scoreCard.hiStreak
         wText, hText = font.getStringSize(text)
         try:
@@ -927,6 +938,10 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           Theme.setBaseColor(1-v)
         font.render(text, (float(Theme.result_stats_streak[0]) - wText / 2, float(Theme.result_stats_streak[1]) + v), scale = float(Theme.result_stats_streak[2]))
         
+        try:
+          font = self.engine.data.fontDict[Theme.result_stats_diff[4]]
+        except:
+          font = defFont
         text = _(Theme.result_stats_diff_text) % self.playerList[i].difficulty
         wText, hText = font.getStringSize(text)
         try:
@@ -936,11 +951,28 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           Theme.setBaseColor(1-v)
         font.render(text, (float(Theme.result_stats_diff[0]) - wText / 2, float(Theme.result_stats_diff[1]) + v), scale = float(Theme.result_stats_diff[2]))
         
+        try:
+          font = self.engine.data.fontDict[Theme.result_stats_name[4]]
+        except:
+          font = defFont
+        text = self.playerList[i].name
+        wText, hText = font.getStringSize(text)
+        try:
+          r, g, b = Theme.hexToColorResults(Theme.result_stats_name[3])
+          glColor3f(r, g, b)
+        except IndexError:
+          Theme.setBaseColor(1-v)
+        font.render(text, (float(Theme.result_stats_name[0]) - wText / 2, float(Theme.result_stats_name[1]) + v), scale = float(Theme.result_stats_name[2]))
+        
         if Theme.result_stats_part_text.strip() == "$icon$" and not self.partImage:
           text = "%s"
         else:
           text = Theme.result_stats_part_text.strip()
         
+        try:
+          font = self.engine.data.fontDict[Theme.result_stats_part[4]]
+        except:
+          font = defFont
         if text == "$icon$" and self.partImage:
           self.engine.drawImage(self.part[i], scale = (float(Theme.result_stats_part[2]),-float(Theme.result_stats_part[2])), coord = (w*float(Theme.result_stats_part[0]),h*float(Theme.result_stats_part[1])))
         else:
@@ -955,7 +987,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
   
   def renderInitialCoOpScore(self, visibility, topMost):
     bigFont = self.engine.data.bigFont
-    font    = self.engine.data.font
+    defFont = self.engine.data.font
     
     v = ((1 - visibility) **2)
     
@@ -976,6 +1008,10 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         glColor3f(r, g, b)
       except IndexError:
         Theme.setBaseColor(1-v)
+      try:
+        font = self.engine.data.fontDict[Theme.result_song[4]]
+      except:
+        font = defFont
       wText, hText = font.getStringSize(text, scale = float(Theme.result_song[2]))
       if self.scaleTitle == 1:
         if self.centerTitle == 1:
@@ -1004,8 +1040,12 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       except IndexError:
         Theme.setBaseColor(1-v)
       text = "%d" % self.currentScore[i]
-      wText, hText = bigFont.getStringSize(text, scale = float(Theme.result_score[2]))
-      bigFont.render(text, (float(Theme.result_score[0]) - wText / 2, float(Theme.result_score[1]) + v), scale = float(Theme.result_score[2]))
+      try:
+        font = self.engine.data.fontDict[Theme.result_score[4]]
+      except:
+        font = bigFont
+      wText, hText = font.getStringSize(text, scale = float(Theme.result_score[2]))
+      font.render(text, (float(Theme.result_score[0]) - wText / 2, float(Theme.result_score[1]) + v), scale = float(Theme.result_score[2]))
       
       if self.resultStep == 0:
         space = self.space[i]
@@ -1055,6 +1095,10 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       font.render(settingsText, (.5 - wText/2, 0.0), scale = settingsScale)
       
       if self.coOpType == 2:
+        try:
+          font = self.engine.data.fontDict[Theme.result_stats_streak[4]]
+        except:
+          font = defFont
         text = _(Theme.result_stats_streak_text) % scoreCard.hiStreak
         wText, hText = font.getStringSize(text)
         try:
@@ -1077,10 +1121,18 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           glColor3f(r, g, b)
         except IndexError:
           Theme.setBaseColor(1-v)
+        try:
+          font = self.engine.data.fontDict[Theme.result_stats_notes[4]]
+        except:
+          font = defFont
         wText, hText = font.getStringSize(text, scale = float(Theme.result_stats_notes[2]))
         Dialogs.wrapText(font, (float(Theme.result_stats_notes[0]) - wText/2, float(Theme.result_stats_notes[1]) + v), text, 0.9, float(Theme.result_stats_notes[2]))
         
         text = _(Theme.result_stats_accuracy_text) % scoreCard.hitAccuracy
+        try:
+          font = self.engine.data.fontDict[Theme.result_stats_accuracy[4]]
+        except:
+          font = defFont
         wText, hText = font.getStringSize(text)
         try:
           r, g, b = Theme.hexToColorResults(Theme.result_stats_accuracy[3])
@@ -1091,6 +1143,10 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         
         if self.coOpType < 2: # not GH Co-Op
           text = _(Theme.result_stats_streak_text) % scoreCard.hiStreak
+          try:
+            font = self.engine.data.fontDict[Theme.result_stats_streak[4]]
+          except:
+            font = defFont
           wText, hText = font.getStringSize(text)
           try:
             r, g, b = Theme.hexToColorResults(Theme.result_stats_streak[3])
@@ -1100,6 +1156,10 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           font.render(text, (float(Theme.result_stats_streak[0]) - wText / 2, float(Theme.result_stats_streak[1]) + v), scale = float(Theme.result_stats_streak[2]))
         
         text = _(Theme.result_stats_diff_text) % self.playerList[i].difficulty
+        try:
+          font = self.engine.data.fontDict[Theme.result_stats_diff[4]]
+        except:
+          font = defFont
         wText, hText = font.getStringSize(text)
         try:
           r, g, b = Theme.hexToColorResults(Theme.result_stats_diff[3])
@@ -1107,6 +1167,19 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         except IndexError:
           Theme.setBaseColor(1-v)
         font.render(text, (float(Theme.result_stats_diff[0]) - wText / 2, float(Theme.result_stats_diff[1]) + v), scale = float(Theme.result_stats_diff[2]))
+        
+        text = self.playerList[i].name
+        try:
+          font = self.engine.data.fontDict[Theme.result_stats_name[4]]
+        except:
+          font = defFont
+        wText, hText = font.getStringSize(text)
+        try:
+          r, g, b = Theme.hexToColorResults(Theme.result_stats_name[3])
+          glColor3f(r, g, b)
+        except IndexError:
+          Theme.setBaseColor(1-v)
+        font.render(text, (float(Theme.result_stats_name[0]) - wText / 2, float(Theme.result_stats_name[1]) + v), scale = float(Theme.result_stats_name[2]))
         
         if Theme.result_stats_part_text.strip() == "$icon$" and not self.partImage:
           text = "%s"
@@ -1120,6 +1193,10 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
             text = text % self.playerList[i].part
           except TypeError:
             text = "%s %s" % (text, self.playerList[i].part)
+          try:
+            font = self.engine.data.fontDict[Theme.result_stats_part[4]]
+          except:
+            font = defFont
           wText, hText = font.getStringSize(text)
           try:
             r, g, b = Theme.hexToColorResults(Theme.result_stats_part[3])
@@ -1130,7 +1207,10 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
   
   def renderCheatList(self, visibility, topMost):
     bigFont = self.engine.data.bigFont
-    font    = self.engine.data.font
+    try:
+      font  = self.engine.data.fontDict[Theme.result_cheats_font]
+    except KeyError:
+      font  = self.engine.data.font
     
     if self.coOpType > 0:
       self.engine.view.setViewport(1,0)
@@ -1181,7 +1261,10 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       self.engine.view.setViewport(1,0)
 
     bigFont = self.engine.data.bigFont
-    font    = self.engine.data.font
+    try:
+      font  = self.engine.data.fontDict[Theme.result_high_score_font]
+    except KeyError:
+      font  = self.engine.data.font
     Dialogs.fadeScreen(.2)
     v = ((1 - visibility) **2)
     

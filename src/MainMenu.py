@@ -72,46 +72,44 @@ class MainMenu(BackgroundLayer):
     self.gfxVersionTag = Config.get("game", "gfx_version_tag")
 
     #self.tut = Config.get("game", "tut")
-
-    for playerNum in range(0,2):    #MFH - verify chosen necks and, if necessary, force appropriate defaults / fallbacks
-      neckSettingName = "neck_choose_p%d" % (playerNum)
-      self.chosenNeck = Config.get("coffee", neckSettingName )
-      #neck fallback to random if doesn't exist.
+    dPlayerConfig   = Config.load(os.path.join(Player.playerpath, "default.ini"), type = 2)
+    self.chosenNeck = dPlayerConfig.get("player", "neck")
+    exists = 0
+    #neck fallback to random if doesn't exist.
+    try:
+      # evilynux - first assume the chosenNeck contains the full filename
+      engine.loadImgDrawing(self, "ok", os.path.join("necks",self.chosenNeck+".png"))
+    except IOError:
       try:
-        # evilynux - first assume the chosenNeck contains the full filename
-        engine.loadImgDrawing(self, "ok", os.path.join("necks",self.chosenNeck+".png"))
+        engine.loadImgDrawing(self, "ok", os.path.join("necks","Neck_"+self.chosenNeck+".png"))
       except IOError:
-        try:
-          engine.loadImgDrawing(self, "ok", os.path.join("necks","Neck_"+self.chosenNeck+".png"))
-        except IOError:
-          exists = 0
-        else:
-          exists = 1
+        pass
       else:
         exists = 1
-      if exists == 0: #MFH - fallback logic now supports a couple valid default neck filenames
-        #MFH - check for Neck_1
-        try:
-          engine.loadImgDrawing(self, "ok", os.path.join("necks","Neck_1.png"))
-          exists = 1
-        except IOError:
-          exists = 0
-        if exists == 1:
-          Config.set("coffee", neckSettingName, "1")
-          Log.warn("P%d Chosen neck not valid, fallback Neck_1.png forced." % (playerNum) )
-        else:
-          #MFH - check for defaultneck
-          try:
-            engine.loadImgDrawing(self, "ok", os.path.join("necks","defaultneck.png"))
-            exists = 1
-          except IOError:
-            exists = 0
-          if exists == 1:
-            Log.warn("P%d Chosen neck not valid, fallback defaultneck.png forced." % (playerNum) )
-            Config.set("coffee", neckSettingName, "defaultneck")
-          else:
-            Log.warn("P%d Warning!  Chosen neck not valid, fallbacks Neck_1.png and defaultneck.png also not valid!  Crash imminent!" % (playerNum) )
-
+    else:
+      exists = 1
+    #MFH - fallback logic now supports a couple valid default neck filenames
+    #MFH - check for Neck_1
+    if exists == 0:
+      try:
+        engine.loadImgDrawing(self, "ok", os.path.join("necks","Neck_1.png"))
+      except IOError:
+        pass
+      else:
+        dPlayerConfig.set("player", "neck", "1")
+        Log.warn("Default chosen neck not valid; fallback Neck_1.png forced.")
+        exists = 1
+    #MFH - check for defaultneck
+    if exists == 0:
+      try:
+        engine.loadImgDrawing(self, "ok", os.path.join("necks","defaultneck.png"))
+      except IOError: #we don't really need to be accepting this except... ...yea, sorry.
+        raise IOError, "Default chosen neck not valid; fallbacks Neck_1.png and defaultneck.png also not valid!"
+      else:
+        Log.warn("Default chosen neck not valid; fallback defaultneck.png forced.")
+        dPlayerConfig.set("player", "neck", "defaultneck")
+        exists = 1
+    dPlayerConfig = None
     #Get theme
     self.theme = self.engine.data.theme
     self.themeCoOp = self.engine.data.themeCoOp
@@ -182,6 +180,7 @@ class MainMenu(BackgroundLayer):
       filename = self.files[i]
       sound = os.path.join("themes",self.themename,"sounds",filename)
       self.menumusic = True
+      engine.menuMusic = True
 
       self.song = Audio.Music(self.engine.resource.fileName(sound))
       self.song.setVolume(self.engine.config.get("audio", "songvol"))
@@ -296,20 +295,41 @@ class MainMenu(BackgroundLayer):
 
   def settingsMenu(self):
     if self.engine.advSettings:
-      return Settings.SettingsMenu(self.engine)
+      self.settingsMenuObject = Settings.SettingsMenu(self.engine)
     else:
-      return Settings.BasicSettingsMenu(self.engine)
+      self.settingsMenuObject = Settings.BasicSettingsMenu(self.engine)
+    return self.settingsMenuObject
 
   def shown(self):
     self.engine.view.pushLayer(self.menu)
     self.engine.stopServer()
+  
+  def runMusic(self):
+    if not self.song.isPlaying():   #re-randomize
+      if self.files:
+        i = random.randint(0,len(self.files)-1)
+        filename = self.files[i]
+        sound = os.path.join("themes",self.themename,"sounds",filename)
+        self.menumusic = True
+        self.engine.menuMusic = True
+    
+        #self.song = Audio.Sound(self.engine.resource.fileName(sound))
+        self.song = Audio.Music(self.engine.resource.fileName(sound))
+        self.song.setVolume(self.engine.config.get("audio", "songvol"))
+        #self.song.play(-1)
+        self.song.play(0)  #no loop
+      else:
+        self.menumusic = False
+        self.engine.menuMusic = False
         
+  def cutMusic(self):
+    if self.menumusic:
+      if self.song and not self.engine.menuMusic:
+        self.song.fadeout(1400)
+  
   def hidden(self):
     self.engine.view.popLayer(self.menu)
-    if self.menumusic:
-      if self.song:
-        self.song.fadeout(1400)
-    
+    self.cutMusic()
     if self.nextLayer:
       self.engine.view.pushLayer(self.nextLayer())
       self.nextLayer = None
@@ -357,12 +377,12 @@ class MainMenu(BackgroundLayer):
     if self.engine.isServerRunning():
       return
 
-    Config.set("player0","mode_1p", 0)    #MFH - ensure tutorial can work with new logic that depends on this mode variable
-    Config.set("player0","mode_2p", 0)    #MFH - ensure tutorial can work with new logic that depends on this mode variable
+    Config.set("game","game_mode", 0)    #MFH - ensure tutorial can work with new logic that depends on this mode variable
+    Config.set("game","multiplayer_mode", 0)    #MFH - ensure tutorial can work with new logic that depends on this mode variable
     Config.set("game", "players", 1)
     Config.set("game", "tut", True)
     
-    #Config.set("player0","mode_1p", 1) #MFH - don't force practice mode.... this is problematic.
+    #Config.set("game","game_mode", 1) #MFH - don't force practice mode.... this is problematic.
 
     self.engine.startServer()
     self.engine.resource.load(self, "session", lambda: self.engine.connect("127.0.0.1"), synch = True)
@@ -376,9 +396,15 @@ class MainMenu(BackgroundLayer):
     self.newLocalGame()   #just call start function with default settings  = 1p quickplay
   
   def newLocalGame(self, players=1, mode1p=0, mode2p=0): #mode1p=0(quickplay),1(practice),2(career) / mode2p=0(faceoff),1(profaceoff)
+    self.engine.data.acceptSound.play()
+    players = Dialogs.activateControllers(self.engine, players) #akedrou
+    if players > 2: #hey look! Multiplayer support without the hassle!
+      players = 2   #just comment these lines and everything will work! I promise!
+    elif players == 0:
+      return
     Config.set("game", "players", players)
-    Config.set("player0","mode_1p", mode1p)
-    Config.set("player1","mode_2p", mode2p)
+    Config.set("game","game_mode", mode1p)
+    Config.set("game","multiplayer_mode", mode2p)
     if Config.get("game", "tut") == True:
       Config.set("game", "tut", False)
       #Config.set("game", "selected_library", "")
@@ -392,7 +418,7 @@ class MainMenu(BackgroundLayer):
       return
     self.engine.startServer()
     self.engine.resource.load(self, "session", lambda: self.engine.connect("127.0.0.1"), synch = True)
-
+    
     if Dialogs.showLoadingScreen(self.engine, lambda: self.session and self.session.isConnected):
       self.launchLayer(lambda: Lobby(self.engine, self.session, singlePlayer = True))
   newLocalGame = catchErrors(newLocalGame)
@@ -434,26 +460,13 @@ class MainMenu(BackgroundLayer):
     self.time += ticks / 50.0
     if self.engine.cmdPlay == 1:
       #evilynux - improve cmdline support
-      self.newLocalGame(players = Config.get("game", "players"), mode1p = Config.get("player0","mode_1p"), mode2p = Config.get("player1","mode_2p"))
+      self.newLocalGame(players = Config.get("game", "players"), mode1p = Config.get("game","game_mode"), mode2p = Config.get("game","multiplayer_mode"))
     elif self.engine.cmdPlay == 2:
       self.quit()
     
     
     if self.menumusic:  #MFH 
-      if not self.song.isPlaying():   #re-randomize
-        if self.files:
-          i = random.randint(0,len(self.files)-1)
-          filename = self.files[i]
-          sound = os.path.join("themes",self.themename,"sounds",filename)
-          self.menumusic = True
-    
-          #self.song = Audio.Sound(self.engine.resource.fileName(sound))
-          self.song = Audio.Music(self.engine.resource.fileName(sound))
-          self.song.setVolume(self.engine.config.get("audio", "songvol"))
-          #self.song.play(-1)
-          self.song.play(0)  #no loop
-        else:
-          self.menumusic = False
+      self.runMusic()
     
     
   def render(self, visibility, topMost):
