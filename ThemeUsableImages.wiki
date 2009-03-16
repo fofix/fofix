@@ -58,10 +58,10 @@ I was tired and sick and couldn't sleep...
 ||  glow.png                    || WIP                            || No           || WIP                      || ||
 ||  guitarsoloneck.png          || WIP                            || No           || WIP                      || ||
 ||  guitarsoloneckovr.png       || WIP                            || No           || WIP                      || ||
-||  hitflames1.png              || Flashes when you hit a note                    || No           || All                      || ||
-||  hitflames2.png              || Flashes when you hit a note                    || No           || All                      || ||
-||  hitglow.png                 || Shines when holding a sustain                  || No           || All                      || ||
-||  hitglow2.png                || Shines when holding a sustain                  || No           || All                      || ||
+||  hitflames1.png              || Flashes when you hit a note                    || No (3.120+)|| All                      || ||
+||  hitflames2.png              || Flashes when you hit a note                    || No (3.120+)|| All                      || ||
+||  hitglow.png                 || Shines when holding a sustain                  || No (3.120+)|| All                      || ||
+||  hitglow2.png                || Shines when holding a sustain                  || No (3.120+)|| All                      || ||
 ||  kill1.png                   || WIP                            || No           || WIP                      || ||
 ||  kill2.png                   || WIP                            || No           || WIP                      || ||
 ||  lightning.png               || Flashes when star power is gained              || GH Based     || GH Based                 || ||
