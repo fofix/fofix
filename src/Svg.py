@@ -514,6 +514,10 @@ class ImgDrawing:
       # Load PNG files directly
       if ImgData.endswith(".png"):
         self.texture = Texture(ImgData)
+      elif ImgData.endswith(".jpg"):
+        self.texture = Texture(ImgData)
+      elif ImgData.endswith(".jpeg"):
+        self.texture = Texture(ImgData)
       # Check whether we have a prerendered bitmap version of the SVG file
       elif ImgData.endswith(".svg") and os.path.exists(bitmapFile):
         Log.debug("Loading cached bitmap '%s' instead of '%s'." % (bitmapFile, ImgData))
