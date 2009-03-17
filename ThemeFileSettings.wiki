@@ -147,6 +147,12 @@ jurgen text is rendered above everything.||
 ||threeDspin = False||Turns 3d Starnote spinning off.||
 ||twoDkeys = False||Use 3d keys  = False||
 ||twoDnote = False||Use 3d notes = False||
+||noterotdegrees = 2|| This number Set's the Degree's to use for rotating the notes (Textured 3d Notes Only)||
+||noterot1 = -2||This set's how many times you want the rotation degree to be applied to 1st note (Textured 3d Notes Only)||
+||noterot2 = -1||This set's how many times you want the rotation degree to be applied to 2nd note (Textured 3d Notes Only)||
+||noterot3 = 0||This set's how many times you want the rotation degree to be applied to 3rd note (Textured 3d Notes Only)||
+||noterot4 = 1||This set's how many times you want the rotation degree to be applied to 4th note (Textured 3d Notes Only)||
+||noterot5 = 2||This set's how many times you want the rotation degree to be applied to 5th note (Textured 3d Notes Only)||
 
 
 
