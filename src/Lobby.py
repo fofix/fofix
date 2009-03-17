@@ -87,7 +87,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
       except IOError:
         self.infoImg = None
       
-      self.engine.loadImgDrawing(self, "defaultAvatar", os.path.join(Player.playerpath, "default.png"))
+      self.engine.loadImgDrawing(self, "defaultAvatar", os.path.join("users", "players", "default.png"))
       self.engine.loadImgDrawing(self, "defaultNeck",   os.path.join("necks", self.engine.mainMenu.chosenNeck + ".png"))
       self.engine.loadImgDrawing(self, "randomNeck",    os.path.join("necks", "randomneck.png"))
       self.engine.loadImgDrawing(self, "buttons", os.path.join("themes", themename, "notes.png"))
@@ -182,7 +182,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
       return
     if self.selected > 1:
       try:
-        self.engine.loadImgDrawing(self, "avatar", os.path.join(Player.playerpath, self.options[self.selected] + ".png"))
+        self.engine.loadImgDrawing(self, "avatar", os.path.join("users", "players", self.options[self.selected] + ".png"))
       except IOError:
         self.avatars[self.selected] = "Empty"
         return
