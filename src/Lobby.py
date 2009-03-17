@@ -43,6 +43,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
   def __init__(self, engine, session, singlePlayer = False, tutorial = False):
     self.engine       = engine
     self.session      = session
+    self.isRunning    = False
     self.time         = 0.0
     self.scrolling    = 0
     self.rate         = 0
@@ -150,13 +151,13 @@ class Lobby(Layer, KeyListener, MessageHandler):
       self.no   = [Player.playerkeys[self.playerNum][Player.DRUM1], Player.playerkeys[self.playerNum][Player.DRUM1A]]
       self.up   = [Player.playerkeys[self.playerNum][Player.DRUM2], Player.playerkeys[self.playerNum][Player.DRUM2A]]
       self.down = [Player.playerkeys[self.playerNum][Player.DRUM3], Player.playerkeys[self.playerNum][Player.DRUM3A]]
-      self.conf = [Player.playerkeys[self.playerNum][Player.DRUMBASS], Player.playerkeys[self.playerNum][Player.DRUMBASSA]]
+      self.conf = [Player.playerkeys[self.playerNum][Player.DRUMBASS], Player.playerkeys[self.playerNum][Player.DRUMBASSA], Player.playerkeys[self.playerNum][Player.START]]
     else:
       self.yes  = [Player.playerkeys[self.playerNum][Player.KEY1], Player.playerkeys[self.playerNum][Player.KEY1A]]
       self.no   = [Player.playerkeys[self.playerNum][Player.KEY2], Player.playerkeys[self.playerNum][Player.KEY2A]]
       self.up   = [Player.playerkeys[self.playerNum][Player.ACTION1]]
       self.down = [Player.playerkeys[self.playerNum][Player.ACTION2]]
-      self.conf = [Player.playerkeys[self.playerNum][Player.KEY3], Player.playerkeys[self.playerNum][Player.KEY3A]]
+      self.conf = [Player.playerkeys[self.playerNum][Player.KEY3], Player.playerkeys[self.playerNum][Player.KEY3A], Player.playerkeys[self.playerNum][Player.START]]
     if len(self.options) > 2:
       for i, option in enumerate(self.options):
         if i < 2: #Just in case someone names their character "Create New Character" or something...
@@ -226,6 +227,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
     
   def shown(self):
     self.engine.input.addKeyListener(self)
+    self.isRunning = True
     if not self.singlePlayer:
       n = self.session.id or 1
       name = Dialogs.getText(self.engine, _("Enter your name:"), _("Player #%d") % n)
@@ -289,7 +291,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
           default = self.engine.config.get("game","player%d" % self.playerNum)
           self.getStartingSelected(default)
       return True
-    elif (c in self.conf or key == pygame.K_LCTRL):
+    elif (c in self.conf or key in [pygame.K_LCTRL, pygame.K_RCTRL]):
       self.engine.data.acceptSound.play()
       self.creator.loadPlayer(self.options[self.selected])
       self.done = False
