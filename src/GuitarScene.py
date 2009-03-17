@@ -4718,7 +4718,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       for i,guitar in enumerate(self.guitars):
         self.playerList[i].twoChord = guitar.twoChord
       for i, player in enumerate(self.playerList):
-        player.cache = None
+        player.pack()
         if self.playerList[0].practiceMode:
           self.scoring[i].score = 0
         if self.scoring[i].score > 0:

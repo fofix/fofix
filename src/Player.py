@@ -211,13 +211,13 @@ class PlayerCacheManager(object): #akedrou - basically stump's cache for the pla
     if self.caches.has_key(cachePath):
       try:
         self.caches[cachePath].execute("SELECT `value` FROM `config` WHERE `key` = 'version'").fetchone()[0]
-      except ProgrammingError:
-        self.caches[cachePath] = sqlite3.Connection('.fofix-cache')
-      return self.caches[cachePath]
+        return self.caches[cachePath]
+      except:
+        pass
     oldcwd = os.getcwd()
     try:
       os.chdir(cachePath)  #stump: work around bug in SQLite unicode path name handling
-      conn = sqlite3.Connection('.fofix-cache')
+      conn = sqlite3.Connection('FoFiX-players.cache')
     finally:
       os.chdir(oldcwd)
     # Check that the cache is completely initialized.
@@ -813,8 +813,6 @@ class Player(object):
     self.owner    = owner
     self.name     = name
     
-    self.config   = Config.load(os.path.join(playerpath,name+".ini"), type = 2)
-    
     self.reset()
     self.keyList     = None
     
@@ -875,6 +873,13 @@ class Player(object):
     self._cache = value
   
   cache = property(getCache, setCache)
+  
+  def pack(self):
+    try:
+      self.cache.close()
+    except:
+      pass
+    self.cache = None
   
   def getName(self):
     if self._upname == "" or self._upname is None:
