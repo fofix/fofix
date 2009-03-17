@@ -121,6 +121,7 @@ Config.define("game",   "player2",             str,  None)
 Config.define("game",   "player3",             str,  None)
 Config.define("game",   "game_mode",           int,  0)
 Config.define("game",   "multiplayer_mode",    int,  0)
+Config.define("game",   "default_neck",        str, "defaultneck")
 
 Config.define("game","last_theme",           str,  "")
 

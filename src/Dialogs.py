@@ -1197,7 +1197,31 @@ class SongChooser(Layer, KeyListener):
 
     self.lastTime = self.time
     c = self.engine.input.controls.getMapping(key)
-    if (c in Player.menuYes and not c in Player.starts) or key == pygame.K_RETURN:
+    if self.searching == True and unicode and ord(unicode) > 31 and not self.accepted:
+      self.searchText += unicode
+      self.doSearch()
+    elif self.searching == False and ((key >= ord('a') and key <= ord('z')) or (key >= ord('A') and key <= ord('Z')) or (key >= ord('0') and key <= ord('9'))):
+      k1 = unicode
+      k2 = k1.capitalize()
+      found = 0
+      
+      for i in range(len(self.items)):
+        if self.sortOrder == 1:
+          if not self.items[i].artist:
+            continue
+          if self.items[i].artist[0] == k1 or self.items[i].artist[0] == k2:
+            found = 1
+            break
+        else:
+          if not self.items[i].name:
+            continue
+          if self.items[i].name[0] == k1 or self.items[i].name[0] == k2:
+            found = 1
+            break
+      if found == 1 and self.selectedIndex != i:
+        self.selectedIndex = i
+        self.updateSelection() 
+    elif (c in Player.menuYes and not c in Player.starts) or key == pygame.K_RETURN:
       self.scrolling = 0
       if self.matchesSearch(self.selectedItem):
         # evilynux - "song" might be in the process of being created by a song preview,
@@ -1359,30 +1383,6 @@ class SongChooser(Layer, KeyListener):
         self.searching = True
       else:
         self.searching == False
-    elif self.searching == True and unicode and ord(unicode) > 31 and not self.accepted:
-      self.searchText += unicode
-      self.doSearch()
-    elif self.searching == False and ((key >= ord('a') and key <= ord('z')) or (key >= ord('A') and key <= ord('Z')) or (key >= ord('0') and key <= ord('9'))):
-      k1 = unicode
-      k2 = k1.capitalize()
-      found = 0
-      
-      for i in range(len(self.items)):
-        if self.sortOrder == 1:
-          if not self.items[i].artist:
-            continue
-          if self.items[i].artist[0] == k1 or self.items[i].artist[0] == k2:
-            found = 1
-            break
-        else:
-          if not self.items[i].name:
-            continue
-          if self.items[i].name[0] == k1 or self.items[i].name[0] == k2:
-            found = 1
-            break
-      if found == 1 and self.selectedIndex != i:
-        self.selectedIndex = i
-        self.updateSelection() 
     return True
   
   def keyReleased(self, key):
@@ -3851,8 +3851,7 @@ class NeckChooser(Layer, KeyListener):
     self.necks = ["2none", "none"]
     self.maxNeck = 0
     
-    self.config = Config.load(os.path.join(Player.playerpath, "default.ini"), type = 2)
-    defaultNeck = self.config.get("player", "neck")
+    defaultNeck = self.engine.config.get("game", "default_neck")
     self.selectedNeck = 0
     for i, name in enumerate(Player.playername):
       if name == player:
@@ -3966,7 +3965,7 @@ class NeckChooser(Layer, KeyListener):
   def chooseNeck(self):
     #self.selectedNeck = neck
     if self.player == "default":
-      self.config.set("player","neck",self.neck[self.selectedNeck])
+      self.engine.config.set("game","default_neck",self.neck[self.selectedNeck])
     if self.owner: #rather hard-coded...
       if self.player != "default":
         self.owner.choices[6]  = self.neck[self.selectedNeck]
