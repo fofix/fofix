@@ -376,6 +376,10 @@ class MainMenu(BackgroundLayer):
     if self.engine.isServerRunning():
       return
 
+    players = Dialogs.activateControllers(self.engine, 1) #akedrou
+    if players == 0:
+      return
+    
     Config.set("game","game_mode", 0)    #MFH - ensure tutorial can work with new logic that depends on this mode variable
     Config.set("game","multiplayer_mode", 0)    #MFH - ensure tutorial can work with new logic that depends on this mode variable
     Config.set("game", "players", 1)

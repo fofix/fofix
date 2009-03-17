@@ -275,21 +275,21 @@ class Credits(Layer, KeyListener):
     self.engine.view.popLayer(self)
 
   def keyPressed(self, key, unicode):
-    if self.engine.input.controls.getMapping(key) in (Player.CANCELS + Player.KEY1S + Player.KEY2S + Player.DRUM1S + Player.DRUM4S) or key == pygame.K_RETURN or key == pygame.K_ESCAPE:
+    if self.engine.input.controls.getMapping(key) in (Player.menuYes + Player.menuNo) or key == pygame.K_RETURN or key == pygame.K_ESCAPE:
       self.quit()
-    elif self.engine.input.controls.getMapping(key) in (Player.ACTION2S + Player.DRUM3S) or key == pygame.K_DOWN: #akedrou: so I was bored.
+    elif self.engine.input.controls.getMapping(key) in (Player.menuDown) or key == pygame.K_DOWN: #akedrou: so I was bored.
       if self.speedDiv > 1000.0:
         self.speedDiv -= 1000.0
         if self.speedDiv < 1000.0:
           self.speedDiv = 1000.0
-    elif self.engine.input.controls.getMapping(key) in (Player.ACTION1S + Player.DRUM2S) or key == pygame.K_UP:
+    elif self.engine.input.controls.getMapping(key) in (Player.menuUp) or key == pygame.K_UP:
       if self.speedDiv < 30000.0:
         self.speedDiv += 1000.0
         if self.speedDiv > 30000.0:
           self.speedDiv = 30000.0
-    elif self.engine.input.controls.getMapping(key) in (Player.KEY3S):
+    elif self.engine.input.controls.getMapping(key) in (Player.key3s):
       self.speedDir *= -1
-    elif self.engine.input.controls.getMapping(key) in (Player.KEY4S):
+    elif self.engine.input.controls.getMapping(key) in (Player.key4s):
       if self.speedDir != 0:
         self.speedDir = 0
       else:

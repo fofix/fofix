@@ -4369,8 +4369,12 @@ class ControlActivator(Layer, KeyListener):
   def keyPressed(self, key, unicode):
     c = self.engine.input.controls.getMapping(key)
     if key == pygame.K_RETURN:
-      self.delay = 0
-      self.selectControl(self.selectedIndex)
+      if self.ready:
+        self.confirm()
+      else:
+        self.delay = 0
+        self.selectControl(self.selectedIndex)
+      return True
     if c in Player.menuYes and self.ready:
       self.confirm()
       return True
