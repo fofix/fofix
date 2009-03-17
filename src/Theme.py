@@ -140,6 +140,13 @@ Config.define("theme", "rmtype",       int, None)
 Config.define("theme", "shadowoffsetx", float, .0022)
 Config.define("theme", "shadowoffsety", float, .0005)
 
+Config.define("theme", "noterotdegrees",float, 0)
+Config.define("theme", "noterot1",      float, 0)
+Config.define("theme", "noterot2",      float, 0)
+Config.define("theme", "noterot3",      float, 0)
+Config.define("theme", "noterot4",      float, 0)
+Config.define("theme", "noterot5",      float, 0)
+
 #TWD
 Config.define("theme", "menu_neck_choose_x", float, 0.1)
 Config.define("theme", "menu_neck_choose_y", float, 0.05)
@@ -953,11 +960,18 @@ def setupLobby(config):
 
 def setupTWOD(config):
   global twoDnote, twoDkeys, threeDspin, opencolor
+  global noterotdegrees, noterot1, noterot2, noterot3, noterot4, noterot5
   
   twoDnote = config.get("theme", "twoDnote")
   twoDkeys = config.get("theme", "twoDkeys")
   threeDspin = config.get("theme", "threeDspin")
   opencolor = hexToColor(config.get("theme", "opencolor"))
+  noterotdegrees = config.get("theme", "noterotdegrees")
+  noterot1 = config.get("theme", "noterot1")
+  noterot2 = config.get("theme", "noterot2")
+  noterot3 = config.get("theme", "noterot3")
+  noterot4 = config.get("theme", "noterot4")
+  noterot5 = config.get("theme", "noterot5")
 
 
 #racer:

@@ -1498,6 +1498,17 @@ class Guitar:
         c = self.fretColors[5]
         glColor4f(.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1) 
 
+      if fret == 0: 
+        glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot1)
+      elif fret == 1:
+        glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot2)
+      elif fret == 2:
+        glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot3)
+      elif fret == 3:
+        glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot4)
+      elif fret == 4:
+        glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot5)
+
       if self.notetex == True and spNote == False:
           
         glColor3f(1,1,1)
