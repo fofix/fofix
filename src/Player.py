@@ -838,7 +838,7 @@ class Player(object):
     self.autoKick    = self.cache.execute('SELECT `autokick` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
     self.neck        = self.cache.execute('SELECT `neck` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
     self.whichPart   = self.cache.execute('SELECT `part` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
-    self.upname      = self.cache.execute('SELECT `upname` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
+    self._upname      = self.cache.execute('SELECT `upname` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
     self.difficulty  = self.cache.execute('SELECT `difficulty` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
     #MFH - need to store selected practice mode and start position here
     self.practiceMode = False
@@ -877,15 +877,15 @@ class Player(object):
   cache = property(getCache, setCache)
   
   def getName(self):
-    if self.upname == "" or str(self.upname) == "None":
+    if self._upname == "" or str(self.upname) == "None":
       return self.name
     else:
-      return a
+      return self._upname
   
   def setName(self, name):
     self.cache.execute('UPDATE `players` SET `upname` = ?, `changed` = 1 WHERE `name` = ?', [name, self.name])
     self.cache.commit()
-    self.upname = name
+    self._upname = name
     
   def getDifficulty(self):
     return Song.difficulties.get(self.difficulty)
