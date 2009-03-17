@@ -95,7 +95,7 @@ class MainMenu(BackgroundLayer):
       except IOError:
         pass
       else:
-        dPlayerConfig.set("player", "neck", "1")
+        Config.set("game", "default_neck", "1")
         Log.warn("Default chosen neck not valid; fallback Neck_1.png forced.")
         exists = 1
     #MFH - check for defaultneck
@@ -106,7 +106,7 @@ class MainMenu(BackgroundLayer):
         raise IOError, "Default chosen neck not valid; fallbacks Neck_1.png and defaultneck.png also not valid!"
       else:
         Log.warn("Default chosen neck not valid; fallback defaultneck.png forced.")
-        dPlayerConfig.set("player", "neck", "defaultneck")
+        Config.set("game", "default_neck", "defaultneck")
         exists = 1
     dPlayerConfig = None
     #Get theme
