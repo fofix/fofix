@@ -839,7 +839,7 @@ class Player(object):
     self.neck        = self.cache.execute('SELECT `neck` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
     self.whichPart   = self.cache.execute('SELECT `part` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
     self._upname      = self.cache.execute('SELECT `upname` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
-    self.difficulty  = self.cache.execute('SELECT `difficulty` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
+    self._difficulty  = self.cache.execute('SELECT `difficulty` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
     #MFH - need to store selected practice mode and start position here
     self.practiceMode = False
     self.practiceSection = None
@@ -877,7 +877,7 @@ class Player(object):
   cache = property(getCache, setCache)
   
   def getName(self):
-    if self._upname == "" or str(self.upname) == "None":
+    if self._upname == "" or self._upname is None:
       return self.name
     else:
       return self._upname
@@ -888,15 +888,15 @@ class Player(object):
     self._upname = name
     
   def getDifficulty(self):
-    return Song.difficulties.get(self.difficulty)
+    return Song.difficulties.get(self._difficulty)
     
   def setDifficulty(self, difficulty):
     self.cache.execute('UPDATE `players` SET `difficulty` = ?, `changed` = 1 WHERE `name` = ?', [difficulty.id, self.name])
     self.cache.commit()
-    self.difficulty = difficulty.id
+    self._difficulty = difficulty.id
   
   def getDifficultyInt(self):
-    return self.difficulty
+    return self._difficulty
 
   def getPart(self):
     #myfingershurt: this should not be reading from the ini file each time it wants to know the part.  Also add "self."
