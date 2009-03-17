@@ -72,8 +72,7 @@ class MainMenu(BackgroundLayer):
     self.gfxVersionTag = Config.get("game", "gfx_version_tag")
 
     #self.tut = Config.get("game", "tut")
-    dPlayerConfig   = Config.load(os.path.join(Player.playerpath, "default.ini"), type = 2)
-    self.chosenNeck = dPlayerConfig.get("player", "neck")
+    self.chosenNeck = Config.get("game", "default_neck")
     exists = 0
     #neck fallback to random if doesn't exist.
     try:
