@@ -333,8 +333,10 @@ class GetKey(Layer, KeyListener):
     self.prompt = prompt
     self.engine = engine
     self.time = 0
-    self.accepted = False
-    self.noKey    = noKey
+    self.accepted  = False
+    self.noKey     = noKey
+    self.toggleEsc = False
+    self.escTimer  = 1000
 
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
     if self.logClassInits == 1:
@@ -348,17 +350,27 @@ class GetKey(Layer, KeyListener):
     
   def keyPressed(self, key, unicode):
     if key == pygame.K_ESCAPE and not self.accepted:
-      self.key = None
-      self.engine.view.popLayer(self)
-      self.accepted = True
+      self.toggleEsc = True
     elif not self.accepted:
       self.key = key
       self.engine.view.popLayer(self)
       self.accepted = True
     return True
+  
+  def keyReleased(self, key):
+    if key == pygame.K_ESCAPE and self.toggleEsc:
+      self.key = key
+      self.engine.view.popLayer(self)
+      self.accepted = True
     
   def run(self, ticks):
     self.time += ticks / 50.0
+    if self.toggleEsc:
+      self.escTimer -= ticks
+      if self.escTimer < 0:
+        self.key = None
+        self.engine.view.popLayer(self)
+        self.accepted = True
   
   def render(self, visibility, topMost):
     self.engine.view.setViewport(1,0)

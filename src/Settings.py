@@ -217,9 +217,9 @@ class KeyConfigChoice(Menu.Choice):
     else:
       text = o.text
     if self.noneOK:
-      key = Dialogs.getKey(self.engine, _("Press a key for '%s' or Escape to disable.") % text)
+      key = Dialogs.getKey(self.engine, _("Press a key for '%s' or hold Escape to disable.") % text)
     else:
-      key = Dialogs.getKey(self.engine, _("Press a key for '%s' or Escape to cancel.") % text)
+      key = Dialogs.getKey(self.engine, _("Press a key for '%s' or hold Escape to cancel.") % text)
     
     if key:
       #------------------------------------------
@@ -605,12 +605,19 @@ class SettingsMenu(Menu.Menu):
       (_("HO/PO Settings"), self.hopoSettingsMenu),
     ]
     self.basicSettingsMenu = Menu.Menu(self.engine, self.basicSettings)
-
+    
+    MicrophoneSettings = [
+      ConfigChoice(engine, engine.config, "game", "mic_device_index", autoApply=True),
+      ConfigChoice(engine, engine.config, "game", "mic_tap_sensitivity", autoApply=True),
+    ]
+    self.microphoneSettingsMenu = Menu.Menu(engine, MicrophoneSettings)
+    
     self.keyChangeSettings = [
       (_("Test Controller 1"), lambda: self.keyTest(0)),
       (_("Test Controller 2"), lambda: self.keyTest(1)),
       (_("Test Controller 3"), lambda: self.keyTest(2)),
       (_("Test Controller 4"), lambda: self.keyTest(3)),
+      (_("Test Microphone"), lambda: Dialogs.testMic(engine)),
     ]
     self.keyChangeMenu = Menu.Menu(self.engine, self.keyChangeSettings)
 
@@ -898,6 +905,7 @@ class SettingsMenu(Menu.Menu):
   def refreshKeySettings(self, init = False):
     choices = [ #the reacharound
       Menu.Choice(_("Test Controls"), self.keyChangeMenu),
+      Menu.Choice(_("Microphone Settings"), self.microphoneSettingsMenu),
       ActiveConfigChoice(self.engine, self.engine.config, "game", "control0", onChange = self.engine.input.reloadControls),
       ActiveConfigChoice(self.engine, self.engine.config, "game", "control1", onChange = self.engine.input.reloadControls),
       ActiveConfigChoice(self.engine, self.engine.config, "game", "control2", onChange = self.engine.input.reloadControls),

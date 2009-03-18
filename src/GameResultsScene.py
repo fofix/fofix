@@ -287,7 +287,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       self.progressKeys.extend(player.progressKeys)
       self.playerProgressKeys[i] = player.progressKeys
     if jurgen == 0:
-      if jurgplay == 1:
+      if jurgplay == 1 and len(self.playerList) > 1:
         self.playerProgressKeys[1] = self.progressKeys
       else:
         self.playerProgressKeys = [self.progressKeys for i in self.playerList]
