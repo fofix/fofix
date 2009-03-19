@@ -426,16 +426,54 @@ class Drum:
         engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "note.dae")))
       else:
         engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName("note.dae")))
+        
+      try:
+        engine.loadImgDrawing(self,  "notetexa",  os.path.join("themes", themename, "notetex_a.png"))
+        engine.loadImgDrawing(self,  "notetexb",  os.path.join("themes", themename, "notetex_b.png"))
+        engine.loadImgDrawing(self,  "notetexc",  os.path.join("themes", themename, "notetex_c.png"))
+        engine.loadImgDrawing(self,  "notetexd",  os.path.join("themes", themename, "notetex_d.png"))
+        engine.loadImgDrawing(self,  "notetexe",  os.path.join("themes", themename, "notetex_e.png"))
+        self.notetex = True
 
-      if self.engine.fileExists(os.path.join("themes", themename, "star.dae")):
+      except IOError:
+        self.notetexa = False
+        self.notetexb = False
+        self.notetexc = False
+        self.notetexd = False
+        self.notetexe = False
+        self.notetex = False
+        
+      if self.engine.fileExists(os.path.join("themes", themename, "star.dae")):  
         engine.resource.load(self,  "starMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "star.dae")))
       else:  
         self.starMesh = None
+
+      try:
+        engine.loadImgDrawing(self,  "startexa",  os.path.join("themes", themename, "startex_a.png"))
+        engine.loadImgDrawing(self,  "startexb",  os.path.join("themes", themename, "startex_b.png"))
+        engine.loadImgDrawing(self,  "startexc",  os.path.join("themes", themename, "startex_c.png"))
+        engine.loadImgDrawing(self,  "startexd",  os.path.join("themes", themename, "startex_d.png"))
+        engine.loadImgDrawing(self,  "startexe",  os.path.join("themes", themename, "startex_e.png"))
+        self.startex = True
+
+      except IOError:
+        self.startexa = False
+        self.startexb = False
+        self.startexc = False
+        self.startexd = False
+        self.startexe = False
+        self.startex = False
 
       if self.engine.fileExists(os.path.join("themes", themename, "open.dae")):
         engine.resource.load(self,  "openMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "open.dae")))
       else:  
         self.openMesh = None
+
+      try:
+        engine.loadImgDrawing(self,  "opentexture",  os.path.join("themes", themename, "opentex.png"))
+        self.opentex = True
+      except IOError:
+        self.opentex = False
 
 
     try:
@@ -1439,7 +1477,13 @@ class Drum:
       #mesh_001 = main note (key color) 
       #mesh_002 = top (spot or hopo if no mesh_003) 
       #mesh_003 = hopo bump (hopo color)
-    
+
+      if fret == 0:
+        #fret = 4     #fret 4 is angled, get fret 2 :)
+        fret = 2
+      elif fret == 4:
+        fret = 0
+          
       if spNote == True and self.starMesh != None and isOpen == False:
         note = self.starMesh
       elif isOpen == True and self.openMesh != None:
@@ -1458,18 +1502,80 @@ class Drum:
         glRotatef(90, 0, 1, 0)
         glRotatef(-90, 1, 0, 0)
 
-      #death_au: fixed 3D note colours
-      glColor4f(*color)
-      if self.starPowerActive and self.theme != 2 and not color == (0,0,0,1):
-        glColor4f(.3,.7,.9, 1)
-      if isOpen == True and self.starPowerActive == False:
-        glColor4f(self.opencolor[0],self.opencolor[1],self.opencolor[2], 1)
+      if self.notetex == True and spNote == False and isOpen==False:
+          
+        glColor3f(1,1,1)
+        glEnable(GL_TEXTURE_2D)
+        if fret == 0: 
+          self.notetexa.texture.bind()
+        elif fret == 1:
+          self.notetexb.texture.bind()
+        elif fret == 2:
+          self.notetexc.texture.bind()
+        elif fret == 3:
+          self.notetexd.texture.bind()
+        glMatrixMode(GL_TEXTURE)
+        glScalef(1, -1, 1)
+        glMatrixMode(GL_MODELVIEW)
+        if isTappable:
+          self.noteMesh.render("Mesh_001")
+        else:
+          self.noteMesh.render("Mesh")
+        glMatrixMode(GL_TEXTURE)
+        glLoadIdentity()
+        glMatrixMode(GL_MODELVIEW)
+        glDisable(GL_TEXTURE_2D)
 
-      note.render("Mesh_001")
-      glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
-      note.render("Mesh_002")
-      glColor3f(self.meshColor[0], self.meshColor[1], self.meshColor[2])
-      note.render("Mesh")
+      elif self.startex == True and spNote == True and isOpen==False:
+        glColor3f(1,1,1)
+        glEnable(GL_TEXTURE_2D)
+        if fret == 0: 
+          self.startexa.texture.bind()
+        elif fret == 1:
+          self.startexb.texture.bind()
+        elif fret == 2:
+          self.startexc.texture.bind()
+        elif fret == 3:
+          self.startexd.texture.bind()
+        glMatrixMode(GL_TEXTURE)
+        glScalef(1, -1, 1)
+        glMatrixMode(GL_MODELVIEW)
+        if isTappable:
+          self.starMesh.render("Mesh_001")
+        else:
+          self.starMesh.render("Mesh")
+        glMatrixMode(GL_TEXTURE)
+        glLoadIdentity()
+        glMatrixMode(GL_MODELVIEW)
+        glDisable(GL_TEXTURE_2D)
+
+      elif self.opentex == True and isOpen==True:
+        glColor3f(1,1,1)
+        glEnable(GL_TEXTURE_2D)
+        
+        self.opentexture.texture.bind()
+
+        glMatrixMode(GL_TEXTURE)
+        glScalef(1, -1, 1)
+        glMatrixMode(GL_MODELVIEW)
+        self.openMesh.render()
+        glMatrixMode(GL_TEXTURE)
+        glLoadIdentity()
+        glMatrixMode(GL_MODELVIEW)
+        glDisable(GL_TEXTURE_2D)
+      else: 
+          #death_au: fixed 3D note colours
+          glColor4f(*color)
+          if self.starPowerActive and self.theme != 2 and not color == (0,0,0,1):
+            glColor4f(.3,.7,.9, 1)
+          if isOpen == True and self.starPowerActive == False:
+            glColor4f(self.opencolor[0],self.opencolor[1],self.opencolor[2], 1)
+
+          note.render("Mesh_001")
+          glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
+          note.render("Mesh_002")
+          glColor3f(self.meshColor[0], self.meshColor[1], self.meshColor[2])
+          note.render("Mesh")
 
 
 
