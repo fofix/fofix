@@ -990,8 +990,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           if isinstance(event, Song.MarkerNote) and not event.endMarker:
             if (event.number == Song.freestyleMarkingNote):
               thisIsABre = False
-              if guitar.isDrum: 
-                if time > self.song.breMarkerTime:
+              if guitar.isDrum and self.song.breMarkerTime:   #MFH - must ensure this song HAS a BRE! 
+                if time > self.song.breMarkerTime:    
                   thisIsABre = True
               else:   #MFH - guitar or bass; no BRE text event marker required
                 thisIsABre = True
