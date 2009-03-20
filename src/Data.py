@@ -32,6 +32,7 @@ from Language import _
 import random
 import Language
 import Config
+import Version
 #myfingershurt: needed for multi-OS file fetching
 import os
 import sys
@@ -77,15 +78,10 @@ class Data(object):
     self.players = Player.loadPlayers()
 
     #myfingershurt: check for existance of theme path
-    #evilynux/MFH - fixed themes when running from src folder
-    themepath = os.path.join("data","themes")
-    if not hasattr(sys,"frozen"):
-      themepath = os.path.join("..",themepath)
+    themepath = os.path.join(Version.dataPath(), "themes")
 
     if not os.path.exists(os.path.join(themepath,themename,"notes.png")):
       #myfingershurt: here need to ensure an existing theme is selected
-      #if not hasattr(sys,"frozen"):
-      #  themepath = os.path.join("..",themepath)
       themes = []
       defaultTheme = None           #myfingershurt
       allthemes = os.listdir(themepath)

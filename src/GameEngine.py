@@ -348,9 +348,7 @@ Config.define("performance","preload_glyph_cache", bool,  True,  text = _("Prelo
 Config.define("performance", "cache_song_metadata", bool, True, text=_("Cache Song Metadata"), options={False: _("No"), True: _("Yes")})
 
 ##Alarian: Get unlimited themes by foldername
-themepath = os.path.join("data","themes")
-if not hasattr(sys,"frozen"):
-  themepath = os.path.join("..",themepath)
+themepath = os.path.join(Version.dataPath(), "themes")
 themes = []
 defaultTheme = None           #myfingershurt
 allthemes = os.listdir(themepath)
@@ -560,11 +558,7 @@ class GameEngine(Engine):
     self.stageFolders = []
     currentTheme = themename
     
-    #if not hasattr(sys,"frozen"):
-    #  themepath = os.path.join("..",themepath)
-    stagespath = os.path.join("data","themes",currentTheme,"stages")
-    if not hasattr(sys,"frozen"):   #MFH - so animated stages work with sources
-      stagespath = os.path.join("..",stagespath)
+    stagespath = os.path.join(Version.dataPath(), "themes", currentTheme, "stages")
     if os.path.exists(stagespath):
       self.stageFolders = []
       allFolders = os.listdir(stagespath)   #this also includes all the stage files - so check to see if there is at least one .png file inside each folder to be sure it's an animated stage folder
