@@ -1,17 +1,18 @@
 src:.
 doc:.
-data/translations:data/
 data/*.png:data/
 data/*.dae:data/
 data/*.ttf:data/
-data/*.ini:data/theme.ini
-data/sounds:data/
+data/*.ini:data/
+data/mods:data/
 data/necks:data/
+data/sounds:data/
+data/translations:data/
 data/tutorials/jurgenfof:data/tutorials/
 data/tutorials/drumtest:data/tutorials/
-data/mods:data/
 data/themes/MegaLight:data/themes/
 data/themes/MegaLight\ GH3:data/themes/
+data/users:data/
 dist/FretsOnFire:.
 dist/FretsOnFire.bin:.
 AUTHORS:.
