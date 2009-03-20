@@ -7,11 +7,10 @@ data/*.ini:data/
 data/mods:data/
 data/necks:data/
 data/sounds:data/
+data/themes:data/
 data/translations:data/
 data/tutorials/jurgenfof:data/tutorials/
 data/tutorials/drumtest:data/tutorials/
-data/themes/MegaLight:data/themes/
-data/themes/MegaLight\ GH3:data/themes/
 data/users:data/
 dist/FretsOnFire:.
 dist/FretsOnFire.bin:.
