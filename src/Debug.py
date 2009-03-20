@@ -121,7 +121,12 @@ class DebugLayer(Layer):
     Log.debug("Wrote a dump of %d GC garbage objects to %s." % (n, fn))
 
   def debugOut(self, engine):
-    f = open("debug.txt", "w+")
+    try:
+      f = open("debug.txt", "w+")
+    except IOError:
+      # fallback for unix (games dir read-only)
+      import Resource
+      f = open(os.path.join(Resource.getWritableResourcePath(), 'debug.txt'), "w+")
     version = Version.version()
     currentDir = os.getcwd()
     dataDir = Version.dataPath()
@@ -138,15 +143,17 @@ class DebugLayer(Layer):
     f.write("\nData Directory = %s\n" % dataDir)
     self.directoryList(f, dataDir)
 
-    f.write("\nLibrary.zip\n")
-    zip = zipfile.ZipFile(dataDir + "/library.zip", 'r')
-    for info in zip.infolist():
-      fileName = info.filename
-      fileCSize = info.compress_size
-      fileSize = info.file_size
-      fileDate = datetime.datetime(*(info.date_time))
-      f.write("%s, %s, %s, %s\n" % (fileName, fileCSize, fileSize, fileDate))
-
+    zip_path = os.path.join(dataDir, 'library.zip')
+    # no library.zip on regular unix installation
+    if os.path.exists(zip_path):
+      f.write("\nLibrary.zip\n")
+      zip = zipfile.ZipFile(zip_path, 'r')
+      for info in zip.infolist():
+        fileName = info.filename
+        fileCSize = info.compress_size
+        fileSize = info.file_size
+        fileDate = datetime.datetime(*(info.date_time))
+        f.write("%s, %s, %s, %s\n" % (fileName, fileCSize, fileSize, fileDate))
     
     f.write("\nTranslation Directory = %s\n" % translationDir)
     self.directoryList(f, translationDir)
@@ -165,8 +172,9 @@ class DebugLayer(Layer):
     f.write("\nFretsonfire.ini\n")   
     engine.config.config.write(f)
 
-    f.write("\nTheme.ini\n")   
-    Theme.write(f, engine.config)
+    # No write() in Theme
+    #f.write("\nTheme.ini\n")
+    #Theme.write(f, engine.config)
 
     f.write("\nStage.ini\n")
     stage = Stage.Stage(self, self.engine.resource.fileName("stage.ini"))
