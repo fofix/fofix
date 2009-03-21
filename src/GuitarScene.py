@@ -3610,7 +3610,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       for playerNum, thePlayer in enumerate(self.playerList):
         self.handleAnalogSP(playerNum, ticks)
         self.handleWhammy(playerNum)
-        self.handlePhrases(playerNum, self.scoring[i].streak)
+        self.handlePhrases(playerNum, self.scoring[playerNum].streak)   #MFH - streak #1 for player #1...
         self.updateGuitarSolo(playerNum)
       if self.coOpType:
         self.handlePhrases(self.coOpPhrase, self.coOpScoreCard.streak)
