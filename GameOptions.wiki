@@ -1,8 +1,9 @@
 #summary Game Options Explained
 
 = NIL Show Next Score =
+_(Created: v3.120 alpha r1227)_
 setting under (advanced menu version): Setlist Options -> NIL Show
-Next Score -> 
+Next Score
 
  * "Off" (default) - will show "NIL" for songs without the currently selected
 difficulty in the songlist
@@ -10,7 +11,6 @@ difficulty in the songlist
 difficulty's score (for example, a custom song with only Hard and Expert difficulties
 available would show the Hard score if the user was looking at Easy, Medium, or Hard
 scores).
-
 
 
 _More options to come (obviously)_
