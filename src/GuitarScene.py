@@ -990,19 +990,20 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           if isinstance(event, Song.MarkerNote) and not event.endMarker:
             if (event.number == Song.freestyleMarkingNote):
               thisIsABre = False
-              if guitar.isDrum and self.song.breMarkerTime:   #MFH - must ensure this song HAS a BRE! 
-                if time > self.song.breMarkerTime:    
-                  thisIsABre = True
-              else:   #MFH - guitar or bass; no BRE text event marker required
+              #if guitar.isDrum and self.song.breMarkerTime:   #MFH - must ensure this song HAS a BRE! 
+              #  if time > self.song.breMarkerTime:    
+              #    thisIsABre = True
+              #else:   #MFH - guitar or bass; no BRE text event marker required
+              if not guitar.isDrum:
                 thisIsABre = True
               
-              if thisIsABre:
+              if thisIsABre:  #MFH - only deal with guitar/bass BRE notes here.  Drum notes will be handled in realtime as they are encountered under a fill or BRE.
                 breStart = time
                 breEnd = time + event.length
-                if guitar.isDrum:   #MFH - count drum notes individually
-                  numBreStreakNotes = len([1 for time, event in self.song.track[i].getEvents(breStart, breEnd) if isinstance(event, Note)])
-                else:   #MFH - count guitar / bass notes with grouped chords
-                  numBreStreakNotes = len(set(time for time, event in self.song.track[i].getEvents(breStart, breEnd) if isinstance(event, Note)))
+                #if guitar.isDrum:   #MFH - count drum notes individually
+                #  numBreStreakNotes = len([1 for time, event in self.song.track[i].getEvents(breStart, breEnd) if isinstance(event, Note)])
+                #else:   #MFH - count guitar / bass notes with grouped chords
+                numBreStreakNotes = len(set(time for time, event in self.song.track[i].getEvents(breStart, breEnd) if isinstance(event, Note)))
                 self.scoring[i].totalStreakNotes -= numBreStreakNotes   #MFH - remove BRE notes correctly from streak count.      
                 Log.debug("Removed %d streak notes from player %d" % (numBreStreakNotes, i) )
 
@@ -3044,10 +3045,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         for tym, theNote in missedNotes:   #MFH - also want to mark these notes as Played so they don't count against the note total!
           #theNote.played = True
           theNote.skipped = True
-          #if self.coOpType:
-          #  self.coOpScoreCard.totalStreakNotes -= 1
-          #else:
-          #  self.scoring[num].totalStreakNotes -= 1
+          if guitar.isDrum:
+            if self.coOpType:
+              self.coOpScoreCard.totalStreakNotes -= 1
+            else:
+              self.scoring[num].totalStreakNotes -= 1
         
       else:
         if guitar.isDrum:
@@ -3508,10 +3510,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           for tym, theNote in missedNotes:   #MFH - also want to mark these notes as Played so they don't count against the note total!
             #theNote.played = True
             theNote.skipped = True
-            #if self.coOpType:
-            #  self.coOpScoreCard.totalStreakNotes -= 1
-            #else:
-            #  self.scoring[i].totalStreakNotes -= 1
+            if guitar.isDrum:
+              if self.coOpType:
+                self.coOpScoreCard.totalStreakNotes -= 1
+              else:
+                self.scoring[i].totalStreakNotes -= 1
+
         else:
           missedNotes = guitar.getMissedNotesMFH(self.song, pos)
           if guitar.paused:
