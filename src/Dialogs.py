@@ -2340,7 +2340,7 @@ class SongChooser(Layer, KeyListener):
                           handicap = 0
                           handicapLong = "None"
                           originalScore = score
-                        #break
+                        break
                       else:
                         score, stars, name = 0, 0, "---"
                       
@@ -2601,7 +2601,7 @@ class SongChooser(Layer, KeyListener):
                           handicap = 0
                           handicapLong = "None"
                           originalScore = score
-                        #break
+                        break
                       else:
                         score, stars, name = 0, 0, "---"
 
@@ -3568,7 +3568,7 @@ class SongChooser(Layer, KeyListener):
                           handicap = 0
                           handicapLong = "None"
                           originalScore = score
-                        #break
+                        break
                       else:
                         score, stars, name = 0, 0, "---"
   
