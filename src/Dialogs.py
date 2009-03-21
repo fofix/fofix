@@ -2226,6 +2226,44 @@ class SongChooser(Layer, KeyListener):
 
                 #MFH - Song list score / info display:
                 if isinstance(item, Song.SongInfo) and not item.getLocked():
+                  if self.scoreTimer == 0 and self.highScoreType == 0: #racer: regular-style highscore movement
+                    if self.diff == "Easy":
+                      self.diff = "Medium"
+                      self.diffNice = self.diffTrans[self.diff]
+                    elif self.diff == "Medium":
+                      self.diff = "Hard"
+                      self.diffNice = self.diffTrans[self.diff]
+                    elif self.diff == "Hard":
+                      self.diff = "Expert"
+                      self.diffNice = self.diffTrans[self.diff]
+                    elif self.diff == "Expert":
+                      self.diff = "Easy"
+                      self.diffNice = self.diffTrans[self.diff]
+  
+                  #racer: score can be changed by fret button:
+                  #MFH - and now they will be remembered as well
+                  if self.highScoreChange == True and self.highScoreType == 1:
+                    if self.diff == "Easy":
+                      self.diff = "Medium"
+                      self.diffNice = self.diffTrans[self.diff]
+                      self.engine.config.set("game", "songlist_difficulty", 2)
+                      self.highScoreChange = False
+                    elif self.diff == "Medium":
+                      self.diff = "Hard"
+                      self.diffNice = self.diffTrans[self.diff]
+                      self.engine.config.set("game", "songlist_difficulty", 1)
+                      self.highScoreChange = False
+                    elif self.diff == "Hard":
+                      self.diff = "Expert"
+                      self.diffNice = self.diffTrans[self.diff]
+                      self.engine.config.set("game", "songlist_difficulty", 0)
+                      self.highScoreChange = False
+                    elif self.diff == "Expert":
+                      self.diff = "Easy"
+                      self.diffNice = self.diffTrans[self.diff]
+                      self.engine.config.set("game", "songlist_difficulty", 3)
+                      self.highScoreChange = False
+
                   scale = 0.0009
                   text = self.diffNice
                   w, h = font.getStringSize(text, scale=scale)
@@ -2267,44 +2305,6 @@ class SongChooser(Layer, KeyListener):
                   w, h = font.getStringSize(text, scale = scale)
 
                   lfont.render(text, (self.song_list_xpos+.05, .0925*(i+1)-pos[0]*.0925+.2), scale=scale)
-  
-                  if self.scoreTimer == 0 and self.highScoreType == 0: #racer: regular-style highscore movement
-                    if self.diff == "Easy":
-                      self.diff = "Medium"
-                      self.diffNice = self.diffTrans[self.diff]
-                    elif self.diff == "Medium":
-                      self.diff = "Hard"
-                      self.diffNice = self.diffTrans[self.diff]
-                    elif self.diff == "Hard":
-                      self.diff = "Expert"
-                      self.diffNice = self.diffTrans[self.diff]
-                    elif self.diff == "Expert":
-                      self.diff = "Easy"
-                      self.diffNice = self.diffTrans[self.diff]
-  
-                  #racer: score can be changed by fret button:
-                  #MFH - and now they will be remembered as well
-                  if self.highScoreChange == True and self.highScoreType == 1:
-                    if self.diff == "Easy":
-                      self.diff = "Medium"
-                      self.diffNice = self.diffTrans[self.diff]
-                      self.engine.config.set("game", "songlist_difficulty", 2)
-                      self.highScoreChange = False
-                    elif self.diff == "Medium":
-                      self.diff = "Hard"
-                      self.diffNice = self.diffTrans[self.diff]
-                      self.engine.config.set("game", "songlist_difficulty", 1)
-                      self.highScoreChange = False
-                    elif self.diff == "Hard":
-                      self.diff = "Expert"
-                      self.diffNice = self.diffTrans[self.diff]
-                      self.engine.config.set("game", "songlist_difficulty", 0)
-                      self.highScoreChange = False
-                    elif self.diff == "Expert":
-                      self.diff = "Easy"
-                      self.diffNice = self.diffTrans[self.diff]
-                      self.engine.config.set("game", "songlist_difficulty", 3)
-                      self.highScoreChange = False
   
                   score = _("Nil")
                   stars = 0
@@ -2358,30 +2358,6 @@ class SongChooser(Layer, KeyListener):
                   stary = 1.0 - (stary / self.engine.data.fontScreenBottom)
                   self.engine.drawStarScore(screenw, screenh, starx, stary - h/2, stars, starscale, horiz_spacing = 1.0, hqStar = True) #MFH
 
-#-                  #QQstarS:add  to show stars
-#-                  if stars == 7:
-#-                    glColor3f(1, 1, 1)  # ought there be some special glyph for the perfect/fc scores..?
-#-                    if self.extraStats:
-#-                      lfont.render(unicode(Data.STAR4 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.1825-0.034), scale = scale * 2.0) #Worldrave - Uses STAR3 and STAR4 now w/ fallback
-#-                    else:
-#-                      lfont.render(unicode(Data.STAR4 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.2-0.034), scale = scale * 2.0) #Worldrave - Uses STAR3 and STAR4 now w/ fallback
-#-                  elif stars == 6:
-#-                    glColor3f(1, 1, 1)  
-#-                    if self.extraStats:
-#-                      lfont.render(unicode(Data.STAR4 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.1825-0.034), scale = scale * 2.0) #Worldrave - Uses STAR3 and STAR4 now w/ fallback
-#-                    else:
-#-                      lfont.render(unicode(Data.STAR4 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.2-0.034), scale = scale * 2.0) #Worldrave - Uses STAR3 and STAR4 now w/ fallback
-#-                  elif score>0 and stars>=0 and name!="":
-#-                    glColor3f(1, 1, 1)
-#-                    #ShiekOdaSandz: Fixed stars so they display left to right, not right to left
-#-                    if self.extraStats:
-#-                      lfont.render(unicode(Data.STAR4 * stars+Data.STAR3 * (5 - stars)), (self.song_listscore_xpos+.018*.03, .0935*(i+1)-pos[0]*.0935+.1825-0.034), scale = scale * 2.0) #ShiekOdaSandz: Fixed stars so they display left to right, not right to left @Worldrave - Uses STAR3 and STAR4 now w/ fallback
-#-                    else:
-#-                      lfont.render(unicode(Data.STAR4 * stars+Data.STAR3 * (5 - stars)), (self.song_listscore_xpos+.018*.03, .0935*(i+1)-pos[0]*.0935+.2-0.034), scale = scale * 2.0) #ShiekOdaSandz: Fixed stars so they display left to right, not right to left @Worldrave - Uses STAR3 and STAR4 now w/ fallback
-#-                    #QQstarS: end of add
-
-
-  
                   scale = 0.0014
                   # evilynux - score color
                   c1,c2,c3 = self.songlist_score_color
@@ -2553,6 +2529,82 @@ class SongChooser(Layer, KeyListener):
                 font.render(text, (self.song_list_xpos, .0935*(i+1)-pos[0]*.0935+.15), scale = scale)
   
                 if isinstance(item, Song.SongInfo) and not item.getLocked():
+                  if self.scoreTimer == 0 and self.highScoreType == 0: #racer: regular-style highscore movement
+                    if self.diff == "Easy":
+                      self.diff = "Medium"
+                      self.diffNice = self.diffTrans[self.diff]
+                    elif self.diff == "Medium":
+                      self.diff = "Hard"
+                      self.diffNice = self.diffTrans[self.diff]
+                    elif self.diff == "Hard":
+                      self.diff = "Expert"
+                      self.diffNice = self.diffTrans[self.diff]
+                    elif self.diff == "Expert":
+                      self.diff = "Easy"
+                      self.diffNice = self.diffTrans[self.diff]
+  
+                  #racer: score can be changed by fret button:
+                  #MFH - and now they will be remembered as well
+                  if self.highScoreChange == True and self.highScoreType == 1:
+                    if self.diff == "Easy":
+                      self.diff = "Medium"
+                      self.diffNice = self.diffTrans[self.diff]
+                      self.engine.config.set("game", "songlist_difficulty", 2)
+                      self.highScoreChange = False
+                    elif self.diff == "Medium":
+                      self.diff = "Hard"
+                      self.diffNice = self.diffTrans[self.diff]
+                      self.engine.config.set("game", "songlist_difficulty", 1)
+                      self.highScoreChange = False
+                    elif self.diff == "Hard":
+                      self.diff = "Expert"
+                      self.diffNice = self.diffTrans[self.diff]
+                      self.engine.config.set("game", "songlist_difficulty", 0)
+                      self.highScoreChange = False
+                    elif self.diff == "Expert":
+                      self.diff = "Easy"
+                      self.diffNice = self.diffTrans[self.diff]
+                      self.engine.config.set("game", "songlist_difficulty", 3)
+                      self.highScoreChange = False
+  
+                  score = _("Nil")
+                  stars = 0
+                  name = ""
+
+                  self.diffNice = self.diffTrans[self.diff]                  
+                  for d in item.difficulties:
+                    if str(d) == self.diff:
+                      #self.diffNice = self.diffTrans[str(d)]
+                      scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
+                      if scores:
+                        score, stars, name, scoreExt = scores[0]
+                        try:
+                          notesHit, notesTotal, noteStreak, modVersion, handicap, handicapLong, originalScore = scoreExt
+                        except ValueError:
+                          notesHit, notesTotal, noteStreak, modVersion, oldScores1, oldScores2 = scoreExt
+                          handicap = 0
+                          handicapLong = "None"
+                          originalScore = score
+                      else:
+                        score, stars, name = 0, 0, "---"
+                  
+                  if score == _("Nil") and self.NilShowNextScore:   #MFH
+                    for d in item.difficulties:   #MFH - just take the first valid difficulty you can find and display it.
+                      self.diffNice = self.diffTrans[str(d)]
+                      scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
+                      if scores:
+                        score, stars, name, scoreExt = scores[0]
+                        try:
+                          notesHit, notesTotal, noteStreak, modVersion, handicap, handicapLong, originalScore = scoreExt
+                        except ValueError:
+                          notesHit, notesTotal, noteStreak, modVersion, oldScores1, oldScores2 = scoreExt
+                          handicap = 0
+                          handicapLong = "None"
+                          originalScore = score
+                        #break
+                      else:
+                        score, stars, name = 0, 0, "---"
+
                   scale = 0.0009
                   text = self.diffNice
                   w, h = font.getStringSize(text, scale=scale)
@@ -2596,83 +2648,6 @@ class SongChooser(Layer, KeyListener):
 
                   font.render(text, (self.song_list_xpos+.05, .0935*(i+1)-pos[0]*.0935+.2), scale=scale)
   
-                  if self.scoreTimer == 0 and self.highScoreType == 0: #racer: regular-style highscore movement
-                    if self.diff == "Easy":
-                      self.diff = "Medium"
-                      self.diffNice = self.diffTrans[self.diff]
-                    elif self.diff == "Medium":
-                      self.diff = "Hard"
-                      self.diffNice = self.diffTrans[self.diff]
-                    elif self.diff == "Hard":
-                      self.diff = "Expert"
-                      self.diffNice = self.diffTrans[self.diff]
-                    elif self.diff == "Expert":
-                      self.diff = "Easy"
-                      self.diffNice = self.diffTrans[self.diff]
-  
-                  #racer: score can be changed by fret button:
-                  #MFH - and now they will be remembered as well
-                  if self.highScoreChange == True and self.highScoreType == 1:
-                    if self.diff == "Easy":
-                      self.diff = "Medium"
-                      self.diffNice = self.diffTrans[self.diff]
-                      self.engine.config.set("game", "songlist_difficulty", 2)
-                      self.highScoreChange = False
-                    elif self.diff == "Medium":
-                      self.diff = "Hard"
-                      self.diffNice = self.diffTrans[self.diff]
-                      self.engine.config.set("game", "songlist_difficulty", 1)
-                      self.highScoreChange = False
-                    elif self.diff == "Hard":
-                      self.diff = "Expert"
-                      self.diffNice = self.diffTrans[self.diff]
-                      self.engine.config.set("game", "songlist_difficulty", 0)
-                      self.highScoreChange = False
-                    elif self.diff == "Expert":
-                      self.diff = "Easy"
-                      self.diffNice = self.diffTrans[self.diff]
-                      self.engine.config.set("game", "songlist_difficulty", 3)
-                      self.highScoreChange = False
-  
-
-                  score = _("Nil")
-                  stars = 0
-                  name = ""
-
-                  self.diffNice = self.diffTrans[self.diff]                  
-                  for d in item.difficulties:
-                    if str(d) == self.diff:
-                      #self.diffNice = self.diffTrans[str(d)]
-                      scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
-                      if scores:
-                        score, stars, name, scoreExt = scores[0]
-                        try:
-                          notesHit, notesTotal, noteStreak, modVersion, handicap, handicapLong, originalScore = scoreExt
-                        except ValueError:
-                          notesHit, notesTotal, noteStreak, modVersion, oldScores1, oldScores2 = scoreExt
-                          handicap = 0
-                          handicapLong = "None"
-                          originalScore = score
-                      else:
-                        score, stars, name = 0, 0, "---"
-                  
-                  if score == _("Nil") and self.NilShowNextScore:   #MFH
-                    for d in item.difficulties:   #MFH - just take the first valid difficulty you can find and display it.
-                      self.diffNice = self.diffTrans[str(d)]
-                      scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
-                      if scores:
-                        score, stars, name, scoreExt = scores[0]
-                        try:
-                          notesHit, notesTotal, noteStreak, modVersion, handicap, handicapLong, originalScore = scoreExt
-                        except ValueError:
-                          notesHit, notesTotal, noteStreak, modVersion, oldScores1, oldScores2 = scoreExt
-                          handicap = 0
-                          handicapLong = "None"
-                          originalScore = score
-                        #break
-                      else:
-                        score, stars, name = 0, 0, "---"
-
                   starx = self.song_listscore_xpos+.005
                   if self.extraStats:
                     stary = .0935*(i+1)-pos[0]*.0935+.1705
