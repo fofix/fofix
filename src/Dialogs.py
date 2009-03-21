@@ -582,6 +582,8 @@ class SongChooser(Layer, KeyListener):
     
     Log.debug("Songlist artist colors: " + str(self.artist_text_color) + " / " + str(self.artist_selected_color))
 
+    self.NilShowNextScore = engine.config.get("songlist",  "nil_show_next_score")   #MFH
+
 
 
     #MFH
@@ -2307,13 +2309,12 @@ class SongChooser(Layer, KeyListener):
                   score = _("Nil")
                   stars = 0
                   name = ""
-                  
-                  #for p in item.parts:    #MFH - look at selected instrument!
-                  #  if str(p) == self.instrument:
+
+                  self.diffNice = self.diffTrans[self.diff]                  
                   for d in item.difficulties:
                     if str(d) == self.diff:
+                      #self.diffNice = self.diffTrans[str(d)]
                       scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
-                      #scores = item.getHighscoresWithPartString(d, part = self.instrument)
                       if scores:
                         score, stars, name, scoreExt = scores[0]
                         try:
@@ -2325,6 +2326,27 @@ class SongChooser(Layer, KeyListener):
                           originalScore = score
                       else:
                         score, stars, name = 0, 0, "---"
+                  
+                  if score == _("Nil") and self.NilShowNextScore:   #MFH
+                    for d in item.difficulties:   #MFH - just take the first valid difficulty you can find and display it.
+                      self.diffNice = self.diffTrans[str(d)]
+                      scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
+                      if scores:
+                        score, stars, name, scoreExt = scores[0]
+                        try:
+                          notesHit, notesTotal, noteStreak, modVersion, handicap, handicapLong, originalScore = scoreExt
+                        except ValueError:
+                          notesHit, notesTotal, noteStreak, modVersion, oldScores1, oldScores2 = scoreExt
+                          handicap = 0
+                          handicapLong = "None"
+                          originalScore = score
+                        #break
+                      else:
+                        score, stars, name = 0, 0, "---"
+                      
+                  
+                  
+
 
                   starx = self.song_listscore_xpos+.01
                   if self.extraStats:
@@ -2612,16 +2634,16 @@ class SongChooser(Layer, KeyListener):
                       self.engine.config.set("game", "songlist_difficulty", 3)
                       self.highScoreChange = False
   
+
                   score = _("Nil")
                   stars = 0
                   name = ""
-                  
-                  #for p in item.parts:    #MFH - look at selected instrument!
-                  #  if str(p) == self.instrument:
+
+                  self.diffNice = self.diffTrans[self.diff]                  
                   for d in item.difficulties:
                     if str(d) == self.diff:
+                      #self.diffNice = self.diffTrans[str(d)]
                       scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
-                      #scores = item.getHighscoresWithPartString(d, part = self.instrument)
                       if scores:
                         score, stars, name, scoreExt = scores[0]
                         try:
@@ -2633,7 +2655,23 @@ class SongChooser(Layer, KeyListener):
                           originalScore = score
                       else:
                         score, stars, name = 0, 0, "---"
-  
+                  
+                  if score == _("Nil") and self.NilShowNextScore:   #MFH
+                    for d in item.difficulties:   #MFH - just take the first valid difficulty you can find and display it.
+                      self.diffNice = self.diffTrans[str(d)]
+                      scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
+                      if scores:
+                        score, stars, name, scoreExt = scores[0]
+                        try:
+                          notesHit, notesTotal, noteStreak, modVersion, handicap, handicapLong, originalScore = scoreExt
+                        except ValueError:
+                          notesHit, notesTotal, noteStreak, modVersion, oldScores1, oldScores2 = scoreExt
+                          handicap = 0
+                          handicapLong = "None"
+                          originalScore = score
+                        #break
+                      else:
+                        score, stars, name = 0, 0, "---"
 
                   starx = self.song_listscore_xpos+.005
                   if self.extraStats:
@@ -2645,31 +2683,6 @@ class SongChooser(Layer, KeyListener):
                   stary = 1.0 - (stary / self.engine.data.fontScreenBottom)
                   if i < pos[1]:
                     self.engine.drawStarScore(screenw, screenh, starx, stary, stars, starscale) #MFH
-
-#-                  #QQstarS:add  to show stars
-#-                  # evilynux - Tweaked position to fit hit% and note streak
-#-                  #            Readjusted star size following font fix
-#-                  if stars == 7:
-#-                    glColor3f(.6, .6, .75)    #platinum-y? stars in RB theme
-#-                    if self.extraStats:
-#-                      font.render(unicode(Data.STAR2 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.18-0.0145), scale = scale * 1.8)
-#-                    else:
-#-                      font.render(unicode(Data.STAR2 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.2-0.0145), scale = scale * 1.8)
-#-                  if stars == 6:
-#-                    glColor3f(1, 1, 0)    #gold stars in RB theme
-#-                    if self.extraStats:
-#-                      font.render(unicode(Data.STAR2 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.18-0.0145), scale = scale * 1.8)
-#-                    else:
-#-                      font.render(unicode(Data.STAR2 * 5), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.2-0.0145), scale = scale * 1.8)
-#-                  elif score>0 and stars>=0 and name!="":
-#-                    glColor3f(1, 1, 1)
-#-                    # ShiekOdaSandz: Fixed stars so they display left to right, not right to left
-#-                    if self.extraStats:
-#-                      font.render(unicode(Data.STAR2 * stars+Data.STAR1 * (5 - stars)), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.18-0.0145), scale = scale * 1.8)
-#-                    else:
-#-                      font.render(unicode(Data.STAR2 * stars+Data.STAR1 * (5 - stars)), (self.song_listscore_xpos+.018, .0935*(i+1)-pos[0]*.0935+.2-0.0145), scale = scale * 1.8)#ShiekOdaSandz: Fixed stars so they display left to right, not right to left
-#-                  #QQstarS: end of add
-
 
   
                   scale = 0.0014
@@ -3549,13 +3562,12 @@ class SongChooser(Layer, KeyListener):
                   score = _("Nil")
                   stars = 0
                   name = ""
-                  
-                  #for p in item.parts:    #MFH - look at selected instrument!
-                  #  if str(p) == self.instrument:
+
+                  self.diffNice = self.diffTrans[self.diff]                  
                   for d in item.difficulties:
                     if str(d) == self.diff:
+                      #self.diffNice = self.diffTrans[str(d)]
                       scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
-                      #scores = item.getHighscoresWithPartString(d, part = self.instrument)
                       if scores:
                         score, stars, name, scoreExt = scores[0]
                         try:
@@ -3567,7 +3579,23 @@ class SongChooser(Layer, KeyListener):
                           originalScore = score
                       else:
                         score, stars, name = 0, 0, "---"
-  
+                  
+                  if score == _("Nil") and self.NilShowNextScore:   #MFH
+                    for d in item.difficulties:   #MFH - just take the first valid difficulty you can find and display it.
+                      self.diffNice = self.diffTrans[str(d)]
+                      scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
+                      if scores:
+                        score, stars, name, scoreExt = scores[0]
+                        try:
+                          notesHit, notesTotal, noteStreak, modVersion, handicap, handicapLong, originalScore = scoreExt
+                        except ValueError:
+                          notesHit, notesTotal, noteStreak, modVersion, oldScores1, oldScores2 = scoreExt
+                          handicap = 0
+                          handicapLong = "None"
+                          originalScore = score
+                        #break
+                      else:
+                        score, stars, name = 0, 0, "---"
   
                   scale = 0.0014
                   #evilynux - hit% and note streak if enabled

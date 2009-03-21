@@ -790,6 +790,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "game", "HSMovement", autoApply = True), #racer
       ConfigChoice(engine, engine.config, "performance", "disable_libcount", autoApply = True, isQuickset = 1), 
       ConfigChoice(engine, engine.config, "performance", "cache_song_metadata", autoApply = True, isQuickset = 1), #stump
+      ConfigChoice(engine, engine.config, "songlist",  "nil_show_next_score", autoApply = True), #MFH
     ]
     self.listSettingsMenu = Menu.Menu(engine, self.listSettings)
     
