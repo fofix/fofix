@@ -862,6 +862,21 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     else:                                     #any other value will be full
       tempEarlyHitWindowSizeFactor = 1.0
     
+
+    #MFH - TODO - single, global BPM here instead of in instrument objects:
+    self.tempoBpm = Song.DEFAULT_BPM
+    self.actualBpm = 0.0
+    self.currentBpm     = Song.DEFAULT_BPM
+    self.currentPeriod  = 60000.0 / self.currentBpm
+    self.targetBpm      = self.currentBpm
+    self.targetPeriod   = 60000.0 / self.targetBpm
+    self.lastBpmChange  = -1.0
+    self.baseBeat       = 0.0
+    
+    
+    
+
+
     for theGuitar in self.guitars:    #MFH - force update of early hit window
       theGuitar.earlyHitWindowSizeFactor = tempEarlyHitWindowSizeFactor
       theGuitar.actualBpm = 0.0
@@ -2781,6 +2796,25 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.laminaScreen.refresh(self.soloAcc_Rect[i])
         
         
+
+  #MFH - TODO - single, global BPM here instead of in instrument objects:
+    #self.tempoBpm = Song.DEFAULT_BPM
+    #self.actualBpm = 0.0
+    #self.currentBpm     = Song.DEFAULT_BPM
+    #self.currentPeriod  = 60000.0 / self.currentBpm
+    #self.targetBpm      = self.currentBpm
+    #self.targetPeriod   = 60000.0 / self.targetBpm
+    #self.lastBpmChange  = -1.0
+    #self.baseBeat       = 0.0
+  def handleTempo(self, song, pos):
+    if not song:
+      return
+    tempo = song.tempoEventTrack.getCurrentTempo(pos)
+    if tempo != self.targetBpm:
+      self.targetBpm = tempo
+      #recalculate all variables dependant on the tempo, apply to instrument objects:
+      
+       
 
   def handleWhammy(self, playerNum):
     i = playerNum
