@@ -137,30 +137,28 @@ def isSystemDLL(pathname):
   return __orig_isSystemDLL(pathname)
 py2exe.build_exe.isSystemDLL = isSystemDLL
 
-#stump: grab version info from engine
-import GameEngine
-fullVersionString = GameEngine.version
-
+#evilynux: Grab version info from Version class
+import Version
 def setupWindows():
-  setup(version = Version.version(),
+  setup(version = Version.VERSION,
         description = "Rockin' it Oldskool!",
-        name = "Frets on Fire",
-        url = "http://www.unrealvoodoo.org",
+        name = Version.appNameSexy(),
+        url = Version.URL,
         windows = [
           {
             "script":          "FretsOnFire.py",
             "icon_resources":  [(1, "fof.ico")],
             "other_resources": [(RT_VERSION, 1, VersionResource(
               #stump: the parameter below must consist only of up to four numerical fields separated by dots
-              fullVersionString[7:12],  # extract "x.yyy" from "FoFiX vx.yyy ..."
+              Version.VERSION,
               file_description="Frets on Fire X",
               legal_copyright=r"© 2008-2009 FoFiX Team.  GNU GPL v2 or later.",
               company_name="FoFiX Team",
               internal_name="FretsOnFire.exe",
               original_filename="FretsOnFire.exe",
-              product_name="FoFiX",
+              product_name=Version.appNameSexy(),
               #stump: when run from the exe, FoFiX will claim to be "FoFiX v" + product_version
-              product_version=fullVersionString[7:]  # remove "FoFiX v" from front
+              product_version=Version.version()
             ).resource_bytes())]
           }
         ],

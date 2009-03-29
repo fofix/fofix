@@ -23,12 +23,13 @@
 import sys
 import os
 import Resource
+import Version
 
 quiet = True
 if os.name == "posix": # evilynux - logfile in ~/.fretsonfire/ for GNU/Linux and MacOS X
-  logFile = open(os.path.join(Resource.getWritableResourcePath(), "fretsonfire.log"), "w")
+  logFile = open(os.path.join(Resource.getWritableResourcePath(), Version.appName() + ".log"), "w")
 else:
-  logFile = open("fretsonfire.log", "w")  #MFH - local logfile!
+  logFile = open(Version.appName() + ".log", "w")  #MFH - local logfile!
   
 encoding = "iso-8859-1"
 

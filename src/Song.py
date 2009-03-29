@@ -802,7 +802,7 @@ class SongInfo(object):
         "songHash": songHash,
         "scores":   self.getObfuscatedScores(part = part),
         "scores_ext": self.getObfuscatedScoresExt(part = part),
-        "version":  "FoFiX-3.100",
+        "version":  "%s-3.100" % Version.appNameSexy(),
         "songPart": part
       }
       data = urllib.urlopen(url + "?" + urllib.urlencode(d)).read()
