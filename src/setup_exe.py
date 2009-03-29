@@ -138,7 +138,6 @@ def isSystemDLL(pathname):
 py2exe.build_exe.isSystemDLL = isSystemDLL
 
 #evilynux: Grab version info from Version class
-import Version
 def setupWindows():
   setup(version = Version.VERSION,
         description = "Rockin' it Oldskool!",
