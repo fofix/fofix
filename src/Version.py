@@ -32,7 +32,8 @@ def appNameSexy():
   return "FoFiX"
 
 def revision():
-  return int("$LastChangedRevision$".split(" ")[1])
+  import svntag
+  return int(svntag.get_svn_info(os.path.dirname(__file__))['revnum'])
 
 # evilynux: Returns version number w.r.t. frozen state
 def version():
