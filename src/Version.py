@@ -33,7 +33,11 @@ def appNameSexy():
 
 def revision():
   import svntag
-  return int(svntag.get_svn_info(os.path.dirname(__file__))['revnum'])
+  try:
+    revision = "alpha (r%d)" % int(svntag.get_svn_info(os.path.dirname(__file__))['revnum'])
+  except:
+    revision = "beta 1"
+  return revision
 
 # evilynux: Returns version number w.r.t. frozen state
 def version():
@@ -46,9 +50,7 @@ def version():
     else:
       version = VERSION
   else:
-    # evilynux: Only used in Debug class.
-    #version = "%s+r%d" % (VERSION, revision())
-    version = "%s alpha (r%s)" % ( VERSION, revision() )
+    version = "%s %s" % ( VERSION, revision() )
   return version
 
 def dataPath():
