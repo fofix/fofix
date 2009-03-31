@@ -156,6 +156,7 @@ class Drum:
     self.fretWeight     = [0.0] * self.strings
     self.fretActivity   = [0.0] * self.strings
     self.fretColors     = Theme.fretColors
+    self.spColor        = self.fretColors[5]
     self.playedNotes    = []
     self.missedNotes    = []
     self.editorMode     = editorMode
@@ -848,9 +849,9 @@ class Drum:
       return 0.125 * beat / beatsPerUnit    # glorandwarf: was 0.12
     
     if self.starPowerActive and self.theme == 0:#8bit
-      color = (.3,.7,.9)
+      color = self.spColor #(.3,.7,.9)
     elif self.starPowerActive and self.theme == 1:
-      color = (.3,.7,.9)
+      color = self.spColor #(.3,.7,.9)
     else:
       color = (1,1,1)
 
@@ -1342,9 +1343,11 @@ class Drum:
       else:
         glColor4f(*color)
         if self.starPowerActive and self.theme == 0 and not color == (0,0,0,1):#8bit
-          glColor4f(.3,.7,.9,1)
+          glColor4f(self.spColor[0],self.spColor[1],self.spColor[2],1)
+          #glColor4f(.3,.7,.9,1)
         elif self.starPowerActive and self.theme == 1 and not color == (0,0,0,1):
-          glColor4f(.3,.7,.9,1)
+          glColor4f(self.spColor[0],self.spColor[1],self.spColor[2],1)
+          #glColor4f(.3,.7,.9,1)
 
     if flat:
       glScalef(1, .1, 1)
@@ -1567,7 +1570,8 @@ class Drum:
           #death_au: fixed 3D note colours
           glColor4f(*color)
           if self.starPowerActive and self.theme != 2 and not color == (0,0,0,1):
-            glColor4f(.3,.7,.9, 1)
+            glColor4f(self.spColor[0],self.spColor[1],self.spColor[2],1)
+            #glColor4f(.3,.7,.9, 1)
           if isOpen == True and self.starPowerActive == False:
             glColor4f(self.opencolor[0],self.opencolor[1],self.opencolor[2], 1)
 
@@ -2282,7 +2286,8 @@ class Drum:
           glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
           if self.starPowerActive:
             if self.theme == 0 or self.theme == 1: #GH3 starcolor
-              glColor3f(.3,.7,.9)
+              glColor3f(self.spColor[0],self.spColor[1],self.spColor[2])
+              #glColor3f(.3,.7,.9)
             else: #Default starcolor (Rockband)
               glColor3f(.9,.9,.9)
 
@@ -2352,7 +2357,8 @@ class Drum:
           glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
           if self.starPowerActive:
             if self.theme == 0 or self.theme == 1: #GH3 starcolor
-              glColor3f(.3,.7,.9)
+              glColor3f(self.spColor[0],self.spColor[1],self.spColor[2])
+              #glColor3f(.3,.7,.9)
             else: #Default starcolor (Rockband)
               glColor3f(.8,.8,.8)
 
@@ -2423,7 +2429,8 @@ class Drum:
             glColor3f(flameColor[0], flameColor[1], flameColor[2])
             if self.starPowerActive:
               if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                glColor3f(.3,.7,.9)
+                glColor3f(self.spColor[0],self.spColor[1],self.spColor[2])
+                #glColor3f(.3,.7,.9)
               else: #Default starcolor (Rockband)
                 glColor3f(.1,.1,.1)
             glEnable(GL_TEXTURE_2D)
@@ -2448,7 +2455,8 @@ class Drum:
             glColor3f(flameColor[0], flameColor[1], flameColor[2])
             if self.starPowerActive:
               if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                glColor3f(.3,.7,.9)
+                glColor3f(self.spColor[0],self.spColor[1],self.spColor[2])
+                #glColor3f(.3,.7,.9)
               else: #Default starcolor (Rockband)
                 glColor3f(.1,.1,.1)
             glEnable(GL_TEXTURE_2D)
@@ -2473,7 +2481,8 @@ class Drum:
             glColor3f(flameColor[0], flameColor[1], flameColor[2])
             if self.starPowerActive:
               if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                glColor3f(.3,.7,.9)
+                glColor3f(self.spColor[0],self.spColor[1],self.spColor[2])
+                #glColor3f(.3,.7,.9)
               else: #Default starcolor (Rockband)
                 glColor3f(.2,.2,.2)
             glEnable(GL_TEXTURE_2D)
@@ -2498,7 +2507,8 @@ class Drum:
             glColor3f(flameColor[0], flameColor[1], flameColor[2])
             if self.starPowerActive:
               if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                glColor3f(.3,.7,.9)
+                glColor3f(self.spColor[0],self.spColor[1],self.spColor[2])
+                #glColor3f(.3,.7,.9)
               else: #Default starcolor (Rockband)
                 glColor3f(.3,.3,.3)
             glEnable(GL_TEXTURE_2D)
@@ -2531,7 +2541,8 @@ class Drum:
               glColor3f(1,1,1)#lightning color
             if self.starPowerActive:
               if self.theme == 0 or self.theme == 1: 
-                glColor3f(.3,.7,.9)#GH3 starcolor
+                glColor3f(self.spColor[0],self.spColor[1],self.spColor[2])
+                #glColor3f(.3,.7,.9)#GH3 starcolor
               else:
                 glColor3f(.4,.4,.4)#Default starcolor (Rockband)
             glEnable(GL_TEXTURE_2D)
@@ -2593,7 +2604,8 @@ class Drum:
             glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)      
             if self.starPowerActive:
               if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                glColor3f(.3,.7,.9)
+                glColor3f(self.spColor[0],self.spColor[1],self.spColor[2])
+                #glColor3f(.3,.7,.9)
               else: #Default starcolor (Rockband)
                 glColor3f(.5,.5,.5)
             glEnable(GL_TEXTURE_2D)
@@ -2622,7 +2634,8 @@ class Drum:
             glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
             if self.starPowerActive:
               if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                glColor3f(.3,.7,.9)
+                glColor3f(self.spColor[0],self.spColor[1],self.spColor[2])
+                #glColor3f(.3,.7,.9)
               else: #Default starcolor (Rockband)
                 glColor3f(.6,.6,.6)
             glEnable(GL_TEXTURE_2D)
@@ -2651,7 +2664,8 @@ class Drum:
             glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
             if self.starPowerActive:
               if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                glColor3f(.3,.7,.9)
+                glColor3f(self.spColor[0],self.spColor[1],self.spColor[2])
+                #glColor3f(.3,.7,.9)
               else: #Default starcolor (Rockband)
                 glColor3f(.7,.7,.7)
             glEnable(GL_TEXTURE_2D)
@@ -2721,7 +2735,8 @@ class Drum:
           glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
           if self.starPowerActive:
             if self.theme == 0 or self.theme == 1: #GH3 starcolor
-              glColor3f(.3,.7,.9)
+              glColor3f(self.spColor[0],self.spColor[1],self.spColor[2])
+              #glColor3f(.3,.7,.9)
             else: #Default starcolor (Rockband)
               glColor3f(.9,.9,.9)
 
@@ -2791,7 +2806,8 @@ class Drum:
           glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
           if self.starPowerActive:
             if self.theme == 0 or self.theme == 1: #GH3 starcolor
-              glColor3f(.3,.7,.9)
+              glColor3f(self.spColor[0],self.spColor[1],self.spColor[2])
+              #glColor3f(.3,.7,.9)
             else: #Default starcolor (Rockband)
               glColor3f(.8,.8,.8)
 
@@ -2860,7 +2876,8 @@ class Drum:
               glColor3f(flameColor[0], flameColor[1], flameColor[2])
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  glColor3f(.3,.7,.9)
+                  glColor3f(self.spColor[0],self.spColor[1],self.spColor[2])
+                  #glColor3f(.3,.7,.9)
                 else: #Default starcolor (Rockband)
                   glColor3f(.1,.1,.1)
               glEnable(GL_TEXTURE_2D)
@@ -2885,7 +2902,8 @@ class Drum:
               glColor3f(flameColor[0], flameColor[1], flameColor[2])
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  glColor3f(.3,.7,.9)
+                  glColor3f(self.spColor[0],self.spColor[1],self.spColor[2])
+                  #glColor3f(.3,.7,.9)
                 else: #Default starcolor (Rockband)
                   glColor3f(.1,.1,.1)
               glEnable(GL_TEXTURE_2D)
@@ -2910,7 +2928,8 @@ class Drum:
               glColor3f(flameColor[0], flameColor[1], flameColor[2])
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  glColor3f(.3,.7,.9)
+                  glColor3f(self.spColor[0],self.spColor[1],self.spColor[2])
+                  #glColor3f(.3,.7,.9)
                 else: #Default starcolor (Rockband)
                   glColor3f(.2,.2,.2)
               glEnable(GL_TEXTURE_2D)
@@ -2935,7 +2954,8 @@ class Drum:
               glColor3f(flameColor[0], flameColor[1], flameColor[2])
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  glColor3f(.3,.7,.9)
+                  glColor3f(self.spColor[0],self.spColor[1],self.spColor[2])
+                  #glColor3f(.3,.7,.9)
                 else: #Default starcolor (Rockband)
                   glColor3f(.3,.3,.3)
               glEnable(GL_TEXTURE_2D)
@@ -3052,7 +3072,8 @@ class Drum:
               glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)      
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  glColor3f(.3,.7,.9)
+                  glColor3f(self.spColor[0],self.spColor[1],self.spColor[2])
+                  #glColor3f(.3,.7,.9)
                 else: #Default starcolor (Rockband)
                   glColor3f(.5,.5,.5)
               glEnable(GL_TEXTURE_2D)
@@ -3081,7 +3102,8 @@ class Drum:
               glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  glColor3f(.3,.7,.9)
+                  glColor3f(self.spColor[0],self.spColor[1],self.spColor[2])
+                #glColor3f(.3,.7,.9)
                 else: #Default starcolor (Rockband)
                   glColor3f(.6,.6,.6)
               glEnable(GL_TEXTURE_2D)
@@ -3110,7 +3132,8 @@ class Drum:
               glColor3f(flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  glColor3f(.3,.7,.9)
+                  glColor3f(self.spColor[0],self.spColor[1],self.spColor[2])
+                  #glColor3f(.3,.7,.9)
                 else: #Default starcolor (Rockband)
                   glColor3f(.7,.7,.7)
               glEnable(GL_TEXTURE_2D)

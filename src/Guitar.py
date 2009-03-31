@@ -132,6 +132,7 @@ class Guitar:
     self.fretWeight     = [0.0] * self.strings
     self.fretActivity   = [0.0] * self.strings
     self.fretColors     = Theme.fretColors
+    self.spColor        = self.fretColors[5]
     self.playedNotes    = []
 
     self.freestyleHitFlameCounts = [0 for n in range(self.strings+1)]    #MFH
@@ -803,9 +804,9 @@ class Guitar:
       return 0.125 * beat / beatsPerUnit    # glorandwarf: was 0.12
     
     if self.starPowerActive and self.theme == 0:#8bit
-      color = (.3,.7,.9)
+      color = self.spColor #(.3,.7,.9)
     elif self.starPowerActive and self.theme == 1:
-      color = (.3,.7,.9)
+      color = self.spColor #(.3,.7,.9)
     else:
       color = (1,1,1)
 
@@ -2053,7 +2054,7 @@ class Guitar:
             a1 = waveForm(t) * f1
             a2 = waveForm(t - step) * f2
             if self.starPowerActive and self.theme != 2:#8bit
-              glColor4f(.3,.7,.9,1)
+              glColor4f(self.spColor[0],self.spColor[1],self.spColor[2],1)  #(.3,.7,.9,1)
             else:
               glColor4f(c[0], c[1], c[2], .5)
             glVertex3f(x - a1, 0, z)
@@ -2062,7 +2063,7 @@ class Guitar:
             glVertex3f(x, 0, z)
             glVertex3f(x, 0, z - zStep)
             if self.starPowerActive and self.theme != 2:#8bit
-              glColor4f(.3,.7,.9,1)
+              glColor4f(self.spColor[0],self.spColor[1],self.spColor[2],1)  #(.3,.7,.9,1)
             else:
               glColor4f(c[0], c[1], c[2], .5)
             glVertex3f(x + a1, 0, z)
@@ -2339,7 +2340,7 @@ class Guitar:
               flamecol = (flameColor[0], flameColor[1], flameColor[2])
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  flamecol = (.3,.7,.9)
+                  flamecol = self.spColor #(.3,.7,.9)
                 else: #Default starcolor (Rockband)
                   flamecol = (.1,.1,.1)
               self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x, y + .20, 0), rot = (90, 1, 0, 0),
@@ -2350,7 +2351,7 @@ class Guitar:
               flamecol = (flameColor[0], flameColor[1], flameColor[2])
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  flamecol = (.3,.7,.9)
+                  flamecol = self.spColor #(.3,.7,.9)
                 else: #Default starcolor (Rockband)
                   flamecol = (.1,.1,.1)
               self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x - .005, y + .25 + .005, 0), rot = (90, 1, 0, 0),
@@ -2361,7 +2362,7 @@ class Guitar:
               flamecol = (flameColor[0], flameColor[1], flameColor[2])
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  flamecol = (.3,.7,.9)
+                  flamecol = self.spColor #(.3,.7,.9)
                 else: #Default starcolor (Rockband)
                   #flamecol = glColor3f(.2,.2,.2)
                   flamecol = (.2,.2,.2)
@@ -2373,7 +2374,7 @@ class Guitar:
               flamecol = (flameColor[0], flameColor[1], flameColor[2])
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  flamecol = (.3,.7,.9)
+                  flamecol = self.spColor #(.3,.7,.9)
                 else: #Default starcolor (Rockband)
                   flamecol = (.3,.3,.3)
               self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x, y +.25 +.005, 0), rot = (90, 1, 0, 0),
@@ -2402,7 +2403,7 @@ class Guitar:
               flamecol = (flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)      
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  flamecol = (.3,.7,.9)
+                  flamecol = self.spColor #(.3,.7,.9)
                 else: #Default starcolor (Rockband)
                   flamecol = (.5,.5,.5)
               self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x - .005, y + .40 + .005, 0), rot = (90, 1, 0, 0),
@@ -2417,7 +2418,7 @@ class Guitar:
               flamecol = (flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  flamecol = (.3,.7,.9)
+                  flamecol = self.spColor #(.3,.7,.9)
                 else: #Default starcolor (Rockband)
                   flamecol = (.6,.6,.6)
               self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x + .005, y + .35 + .005, 0), rot = (90, 1, 0, 0),
@@ -2432,7 +2433,7 @@ class Guitar:
               flamecol = (flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  flamecol = (.3,.7,.9)
+                  flamecol = self.spColor #(.3,.7,.9)
                 else: #Default starcolor (Rockband)
                   flamecol = (.7,.7,.7)
               self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x + .005, y + .35 + .005, 0), rot = (90, 1, 0, 0),
@@ -2497,7 +2498,7 @@ class Guitar:
           flamecol = (flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
           if self.starPowerActive:
             if self.theme == 0 or self.theme == 1: #GH3 starcolor
-              flamecol = (.3,.7,.9)
+              flamecol = self.spColor #(.3,.7,.9)
             else: #Default starcolor (Rockband)
               flamecol = (.9,.9,.9)
               
@@ -2529,7 +2530,7 @@ class Guitar:
           flamecol = (flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
           if self.starPowerActive:
             if self.theme == 0 or self.theme == 1: #GH3 starcolor
-              flamecol = (.3,.7,.9)
+              flamecol = self.spColor #(.3,.7,.9)
             else: #Default starcolor (Rockband)
               flamecol = (.8,.8,.8)
 
@@ -2601,9 +2602,11 @@ class Guitar:
               flameColorMod2 = 0.1 * (flameLimit - event.flameCount)
               
               flamecol = (flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
+              spcolmod = (.7,.7,.7)
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: 
-                  flamecol = (.3,.6,.7)#GH3 starcolor
+                  flamecol = (self.spColor[0]*spcolmod[0], self.spColor[1]*spcolmod[1], self.spColor[2]*spcolmod[2])
+                  #flamecol = (.3,.6,.7)#GH3 starcolor
                 else:
                   flamecol = (.4,.4,.4)#Default starcolor (Rockband)
               if self.theme != 2 and event.finalStar and self.spEnabled:
@@ -2622,9 +2625,11 @@ class Guitar:
               flameColorMod2 = 0.1 * (flameLimit - event.flameCount)
               
               flamecol = (flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)      
+              spcolmod = (.8,.8,.8)
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  flamecol = (.3,.6,.8)
+                  flamecol = (self.spColor[0]*spcolmod[0], self.spColor[1]*spcolmod[1], self.spColor[2]*spcolmod[2])
+                  #flamecol = (.3,.6,.8)
                 else: #Default starcolor (Rockband)
                   flamecol = (.5,.5,.5)
               self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x - .005, y + .40 + .005, 0), rot = (90, 1, 0, 0),
@@ -2637,9 +2642,11 @@ class Guitar:
               flameColorMod2 = 0.1 * (flameLimit - event.flameCount)
               
               flamecol = (flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
+              spcolmod = (.9,.9,.9)
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  flamecol = (.3,.7,.8)
+                  flamecol = (self.spColor[0]*spcolmod[0], self.spColor[1]*spcolmod[1], self.spColor[2]*spcolmod[2])
+                  #flamecol = (.3,.7,.8)
                 else: #Default starcolor (Rockband)
                   flamecol = (.6,.6,.6)
               self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x + .005, y + .35 + .005, 0), rot = (90, 1, 0, 0),
@@ -2653,9 +2660,11 @@ class Guitar:
               flameColorMod2 = 0.1 * (flameLimit - event.flameCount)
               
               flamecol = (flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
+              spcolmod = (1,1,1)
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  flamecol = (.3,.7,.9)
+                  flamecol = (self.spColor[0]*spcolmod[0], self.spColor[1]*spcolmod[1], self.spColor[2]*spcolmod[2])
+                  #flamecol = (.3,.7,.9)
                 else: #Default starcolor (Rockband)
                   flamecol = (.7,.7,.7)
               self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x+.005, y +.35 +.005, 0), rot = (90, 1, 0, 0),
@@ -2667,9 +2676,11 @@ class Guitar:
             self.HCountAni = True
             if event.flameCount < flameLimitHalf:
               flamecol = (flameColor[0], flameColor[1], flameColor[2])
+              spcolmod = (.3,.3,.3)
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  flamecol = (.0,.2,.4)
+                  flamecol = (self.spColor[0]*spcolmod[0], self.spColor[1]*spcolmod[1], self.spColor[2]*spcolmod[2])
+                  #flamecol = (.0,.2,.4)
                 else: #Default starcolor (Rockband)
                   flamecol = (.1,.1,.1)
               self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x, y + .20, 0), rot = (90, 1, 0, 0),
@@ -2678,9 +2689,11 @@ class Guitar:
                                       multiples = True, alpha = True, color = flamecol)
 
               flamecol = (flameColor[0], flameColor[1], flameColor[2])
+              spcolmod = (.4,.4,.4)
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  flamecol = (.1,.3,.5)
+                  flamecol = (self.spColor[0]*spcolmod[0], self.spColor[1]*spcolmod[1], self.spColor[2]*spcolmod[2])
+                  #flamecol = (.1,.3,.5)
                 else: #Default starcolor (Rockband)
                   flamecol = (.1,.1,.1)
               self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x-.005, y + .255, 0), rot = (90, 1, 0, 0),
@@ -2689,9 +2702,11 @@ class Guitar:
                                     multiples = True, alpha = True, color = flamecol)
 
               flamecol = (flameColor[0], flameColor[1], flameColor[2])
+              spcolmod = (.5,.5,.5)
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  flamecol = (.2,.4,.7)
+                  flamecol = (self.spColor[0]*spcolmod[0], self.spColor[1]*spcolmod[1], self.spColor[2]*spcolmod[2])
+                  #flamecol = (.2,.4,.7)
                 else: #Default starcolor (Rockband)
                   flamecol = (.2,.2,.2)
               self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x+.005, y+.255, 0), rot = (90, 1, 0, 0),
@@ -2700,9 +2715,11 @@ class Guitar:
                                     multiples = True, alpha = True, color = flamecol)
 
               flamecol = (flameColor[0], flameColor[1], flameColor[2])
+              spcolmod = (.6,.6,.6)
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  flamecol = (.2,.5,.7)
+                  flamecol = (self.spColor[0]*spcolmod[0], self.spColor[1]*spcolmod[1], self.spColor[2]*spcolmod[2])
+                  #flamecol = (.2,.5,.7)
                 else: #Default starcolor (Rockband)
                   flamecol = (.3,.3,.3)
 
@@ -2716,9 +2733,11 @@ class Guitar:
               flameColorMod2 = 0.1 * (flameLimit - event.flameCount)
               
               flamecol = (flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
+              spcolmod = (.7,.7,.7)
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: 
-                  flamecol = (.3,.6,.7)#GH3 starcolor
+                  flamecol = (self.spColor[0]*spcolmod[0], self.spColor[1]*spcolmod[1], self.spColor[2]*spcolmod[2])
+                  #flamecol = (.3,.6,.7)#GH3 starcolor
                 else:
                   flamecol = (.4,.4,.4)#Default starcolor (Rockband)
               if self.theme != 2 and event.finalStar and self.spEnabled:
@@ -2737,9 +2756,11 @@ class Guitar:
               flameColorMod2 = 0.1 * (flameLimit - event.flameCount)
               
               flamecol = (flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)      
+              spcolmod = (.8,.8,.8)
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  flamecol = (.3,.6,.8)
+                  flamecol = (self.spColor[0]*spcolmod[0], self.spColor[1]*spcolmod[1], self.spColor[2]*spcolmod[2])
+                  #flamecol = (.3,.6,.8)
                 else: #Default starcolor (Rockband)
                   flamecol = (.5,.5,.5)
               self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x - .005, y + .40 + .005, 0), rot = (90, 1, 0, 0),
@@ -2752,9 +2773,11 @@ class Guitar:
               flameColorMod2 = 0.1 * (flameLimit - event.flameCount)
               
               flamecol = (flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
+              spcolmod = (.9,.9,.9)
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  flamecol = (.3,.7,.8)
+                  flamecol = (self.spColor[0]*spcolmod[0], self.spColor[1]*spcolmod[1], self.spColor[2]*spcolmod[2])
+                  #flamecol = (.3,.7,.8)
                 else: #Default starcolor (Rockband)
                   flamecol = (.6,.6,.6)
               self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x + .005, y + .35 + .005, 0), rot = (90, 1, 0, 0),
@@ -2768,9 +2791,11 @@ class Guitar:
               flameColorMod2 = 0.1 * (flameLimit - event.flameCount)
               
               flamecol = (flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
+              spcolmod = (1,1,1)
               if self.starPowerActive:
                 if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  flamecol = (.3,.7,.9)
+                  flamecol = (self.spColor[0]*spcolmod[0], self.spColor[1]*spcolmod[1], self.spColor[2]*spcolmod[2])
+                  #flamecol = (.3,.7,.9)
                 else: #Default starcolor (Rockband)
                   flamecol = (.7,.7,.7)
               self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x+.005, y +.35 +.005, 0), rot = (90, 1, 0, 0),
