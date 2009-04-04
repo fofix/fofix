@@ -1,4 +1,4 @@
- #summary Game Options Explained
+#summary Game Options Explained
 
 = NIL Show Next Score =
 _(Created: v3.120 alpha r1227)_
