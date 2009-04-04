@@ -27,7 +27,13 @@ import Version
 
 quiet = True
 if os.name == "posix": # evilynux - logfile in ~/.fretsonfire/ for GNU/Linux and MacOS X
-  logFile = open(os.path.join(Resource.getWritableResourcePath(), Version.appName() + ".log"), "w")
+  # evilynux - Under MacOS X, put the logs in ~/Library/Logs
+  if( os.uname()[0] == "Darwin" ):
+    logFile = open(os.path.join(Resource.getWritableResourcePath(), 
+                                "..", "..", "Logs", Version.appName(),
+                                Version.appName() + ".log"), "w")
+  else: # GNU/Linux et al.
+    logFile = open(os.path.join(Resource.getWritableResourcePath(), Version.appName() + ".log"), "w")
 else:
   logFile = open(Version.appName() + ".log", "w")  #MFH - local logfile!
   

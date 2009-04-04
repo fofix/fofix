@@ -122,11 +122,17 @@ class DebugLayer(Layer):
 
   def debugOut(self, engine):
     try:
-      f = open("debug.txt", "w+")
+      f = open("debug.log", "w+")
     except IOError:
       # fallback for unix (games dir read-only)
       import Resource
-      f = open(os.path.join(Resource.getWritableResourcePath(), 'debug.txt'), "w+")
+      # evilynux - Under MacOS X, put the logs in ~/Library/Logs
+      if( os.uname()[0] == "Darwin" ):
+        logFile = open(os.path.join(Resource.getWritableResourcePath(), 
+                                    "..", "..", "Logs", Version.appName(),
+                                    "debug.log"), "w+")
+      else: # GNU/Linux et al.
+        f = open(os.path.join(Resource.getWritableResourcePath(), 'debug.log'), "w+")
     version = Version.version()
     currentDir = os.getcwd()
     dataDir = Version.dataPath()
