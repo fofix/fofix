@@ -264,7 +264,7 @@ def getWritableResourcePath():
     path = os.path.expanduser("~/." + appname)
     # evilynux - MacOS X, putting config files in the standard folder
     if( os.uname()[0] == "Darwin" ):
-      path = os.path.expanduser("~/Library/Preferences" + appname)
+      path = os.path.expanduser("~/Library/Preferences/" + appname)
   elif os.name == "nt":
     try:
       path = os.path.join(os.environ["APPDATA"], appname)
