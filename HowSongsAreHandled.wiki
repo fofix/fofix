@@ -1,4 +1,4 @@
-#How Songs Are Handled.
+#summary How Songs Are Handled.
 
 --------------------------------------------------------------------
 =*How Song Files Are Handled With FoFiX*=
