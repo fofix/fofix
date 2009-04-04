@@ -848,10 +848,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         scoreCard.earlyHitWindowSizeHandicap = tempHandicap
       if self.coOpType:
         self.coOpScoreCard.earlyHitWindowSizeHandicap = tempHandicap
-      Log.debug("User-forced early hit window setting %d, effective handicap determined: %f" % (self.forceEarlyHitWindowSetting,tempHandicap) )
+      #Log.debug("User-forced early hit window setting %d, effective handicap determined: %f" % (self.forceEarlyHitWindowSetting,tempHandicap) )   #MFH - not used atm
 
     else:
-      Log.debug("Automatic early hit window mode - automatically-detected setting used: %d" % self.automaticEarlyHitWindow)
+      #Log.debug("Automatic early hit window mode - automatically-detected setting used: %d" % self.automaticEarlyHitWindow)    #MFH - not used atm
       self.effectiveEarlyHitWindow = self.automaticEarlyHitWindow
 
     tempEarlyHitWindowSizeFactor = 0.5
@@ -872,7 +872,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.targetPeriod   = 60000.0 / self.targetBpm
     self.lastBpmChange  = -1.0
     self.baseBeat       = 0.0
-    
+    self.disableVBPM  = self.engine.config.get("game", "disable_vbpm")
+
     
     
 
@@ -2806,14 +2807,35 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #self.targetPeriod   = 60000.0 / self.targetBpm
     #self.lastBpmChange  = -1.0
     #self.baseBeat       = 0.0
+    #self.disableVBPM  = self.engine.config.get("game", "disable_vbpm")
   def handleTempo(self, song, pos):
     if not song:
       return
-    tempo = song.tempoEventTrack.getCurrentTempo(pos)
-    if tempo != self.targetBpm:
-      self.targetBpm = tempo
-      #recalculate all variables dependant on the tempo, apply to instrument objects:
-      
+    if self.lastBpmChange > 0 and self.disableVBPM == True:   #MFH - only handle tempo once if the VBPM feature is off. 
+      return
+    #tempo = song.tempoEventTrack.getCurrentTempo(pos)
+    #if tempo != self.targetBpm:   #MFH - get latest tempo target
+    #  self.targetBpm = tempo
+    tempEventHolder = song.getNextTempoChange(pos)
+    if tempEventHolder:
+      time, event = tempEventHolder
+      if (pos - time > self.currentPeriod or self.lastBpmChange < 0) and time > self.lastBpmChange:
+        self.baseBeat         += (time - self.lastBpmChange) / self.currentPeriod
+        #self.targetBpm = song.tempoEventTrack.getCurrentTempo(pos)
+        self.targetBpm = event.bpm
+        song.tempoEventTrack.currentIndex += 1  #MFH = manually increase current event
+        self.lastBpmChange     = time
+
+    #adjust tempo gradually to meet new target:
+    if self.targetBpm != self.currentBpm:
+      diff = self.targetBpm - self.currentBpm
+      if (round((diff * .03), 4) != 0):
+        self.currentBpm = round(self.currentBpm + (diff * .03), 4)
+      else:
+        self.currentBpm = self.targetBpm
+      #self.setBPM(self.currentBpm) # glorandwarf: was setDynamicBPM(self.currentBpm)
+    
+    #recalculate all variables dependant on the tempo, apply to instrument objects:
        
 
   def handleWhammy(self, playerNum):

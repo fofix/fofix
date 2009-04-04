@@ -1489,6 +1489,11 @@ class TempoTrack(Track):    #MFH - special Track type for tempo events
           self.currentIndex += 1
           self.currentBpm = event.bpm
     return self.currentBpm
+
+  def getNextTempoChange(self, pos):  #MFH
+    if self.currentIndex:
+      return self.getNextEvent()
+    return None 
   
   def searchCurrentTempo(self, pos):    #MFH - will hunt through all tempo events to find it - intended for use during initializations only!
     foundBpm = None
