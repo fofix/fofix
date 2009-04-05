@@ -25,20 +25,24 @@ import shutil, os, sys
 
 from GameEngine import GameEngine
 from Song import Song, Note
+import Config
+import Version
 
 class SongTest(unittest.TestCase):
   def testLoading(self):
-    e = GameEngine()
-    infoFile   = e.resource.fileName("songs", "defy", "song.ini")
-    guitarFile = e.resource.fileName("songs", "defy", "guitar.ogg")
-    songFile   = e.resource.fileName("songs", "defy", "song.ogg")
-    noteFile   = e.resource.fileName("songs", "defy", "notes.mid")
+    config = Config.load(Version.appName() + ".ini", setAsDefault = True)
+    e = GameEngine(config)
+    infoFile   = e.resource.fileName("tutorials", "bangbang", "song.ini")
+    guitarFile = e.resource.fileName("tutorials", "bangbang", "guitar.ogg")
+    songFile   = e.resource.fileName("tutorials", "bangbang", "song.ogg")
+    noteFile   = e.resource.fileName("tutorials", "bangbang", "notes.mid")
     song = Song(e, infoFile, guitarFile, songFile, None, noteFile)
 
-    assert int(song.bpm) == 122
+    assert int(song.bpm) == 120
 
   def testSaving(self):
-    e = GameEngine()
+    config = Config.load(Version.appName() + ".ini", setAsDefault = True)
+    e = GameEngine(config)
     
     # Make a temp copy
     tmp   = "songtest_tmp"
@@ -46,7 +50,7 @@ class SongTest(unittest.TestCase):
     try:
       os.mkdir(tmp)
       for f in files:
-        shutil.copy(e.resource.fileName("songs", "defy", f), tmp)
+        shutil.copy(e.resource.fileName("tutorials", "bangbang", f), tmp)
     
       infoFile   = os.path.join(tmp, "song.ini")
       guitarFile = os.path.join(tmp, "guitar.ogg")
@@ -77,7 +81,7 @@ class SongTest(unittest.TestCase):
         assert n1.number == n2.number
     finally:
       # Load another song to free the copy
-      pygame.mixer.music.load(e.resource.fileName("songs", "defy", "guitar.ogg"))
+      pygame.mixer.music.load(e.resource.fileName("tutorials", "bangbang", "guitar.ogg"))
       shutil.rmtree(tmp)
     
   
