@@ -18,8 +18,8 @@ Then, to check for and update to the very latest FoFiX alpha source code, perfor
 =Setting Up FoFiX Sources=
   * [http://code.google.com/p/fofix/wiki/RequiredSourceModules#For_GNU/Linux GNU/Linux]
   * [http://code.google.com/p/fofix/wiki/RequiredSourceModules#For_Windows Windows]
+  * [http://code.google.com/p/fofix/wiki/RequiredSourceModules#For_MacOS_X MacOS X]
 
-_Instructions for MacOS X welcome!_
 ----
 
 _It is highly recommended that when you become an Alpha tester, you keep a separate FoFiX folder containing a full install of the latest stable release - as the Alpha versions' new features and bugfixes might cause other issues affecting playability._
@@ -175,4 +175,50 @@ In order to build John Stumpo's pitchbend module you first need to install...
 
 ==== Installing ====
 _Still to come as i (evilynux) have not tested this yet..._
+----
+==For MacOS X==
+=== Get latest FoFiX ===
+  # Install [http://www.macports.org/ macports]
+  # Open a terminal (Terminal.app)
+  # Change to the directory in which you want to have FoFiX
+  # Execute `svn checkout http://fofix.googlecode.com/svn/MFH-Mod/trunk/ FoFiX-SVN`
+=== Install dependencies ===
+You need to install these packages using macports (In a terminal, type `sudo port install [package]`, where `[package]` is the name of the required package to be installed):
+  * python25
+  * py25-game
+  * py25-numpy
+  * py25-numeric
+  * py25-pil
+  * py25-pysqlite3
+  * glew¹
+You need the following packages which are not available on macports:
+  * opengl 2.x²
+  * pyogg
+  * pyvorbis
+Download the files from [http://www.mediafire.com/?jzk2ywoznwt], unzip, and place files in `/opt/local/lib/python2.5/site-packages`.
+
+
+
+Notes:
+  * ¹ Probably optional, but it is still required if you are building the py2app package.  Copy `/opt/local/lib/libGLEW.1.5.1.dylib` as `libGLEW.dylib` in a `glew/lib` directory next to your FoFiX-SVN directory (i.e., copy it to `../glew/lib/libGLEW.dylib`).  
+  * ² py25-opengl works okay but 2.x is still faster.
+
+=== Running from sources ===
+  # Change directory to `FoFiX-SVN/src`
+  # Execute `python2.5 FretsOnFire.py`
+
+=== Creating binaries ===
+*Unless you want to distribute binaries of FoFiX this is really _not_ required.*
+
+You first need to...
+  # Install py25-py2app-devel using macports
+  # Change directory to `FoFiX-SVN/src`
+  # Execute `python2.5 setup_mac.py py2app`.
+
+=== Optional PitchBending ===
+==== Requirements ====
+John Stumpo's pitchbend module is available here: [http://www.mediafire.com/?z2ewnzwntu2]
+Be careful when copying these files into your site-packages directory.  If you paste the pygame directory in, it will overwrite everything in your current pygame directory.  Copy the files individually from the zip file into the appropriate locations in your site-packages directory.
+
+_Clarifications to the MacOS X instructions may still need to be made as users go through these steps.  I (trinidude4) cannot go through the entire process of setting up the build environment since I went through a slightly more complicated procedure to make my current universal build environment._
 ----
