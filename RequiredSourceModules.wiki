@@ -123,14 +123,15 @@ To create the executable we need a few more steps:
   # Execute `svn checkout http://fofix.googlecode.com/svn/MFH-Mod/trunk/ FoFiX-SVN`
 === Install dependencies ===
 You need to install those packages:
-  * python2.4
+  * python (tested with 2.4 and 2.5)
   * python-pygame
   * python-opengl (2.x)¹
   * python-numpy
   * python-numeric
   * python-imaging
-  * python-pyvorbis (1.3)²
   * python-pyogg
+  * python-pyvorbis (1.3)²
+  * python-pysqlite2
   * python-xml
 
 Optionally, if you are in 32bit you can also install python-psyco.
