@@ -125,14 +125,19 @@ To create the executable we need a few more steps:
 You need to install those packages:
   * python2.4
   * python-pygame
-  * python-opengl (= 2.x)
+  * python-opengl (2.x)¹
   * python-numpy
   * python-numeric
   * python-imaging
-  * python-vorbis
+  * python-pyvorbis (1.3)²
+  * python-pyogg
   * python-xml
 
 Optionally, if you are in 32bit you can also install python-psyco.
+
+Notes:
+  * ¹ python-opengl 3.x works okay but 2.x is still faster.
+  * ² python-pyvorbis 1.4 crashes with a double free error (at least on Debian).
 
 === Running from sources ===
   # Change directory to `FoFiX-SVN/src`
