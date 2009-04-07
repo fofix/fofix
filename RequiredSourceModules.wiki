@@ -53,6 +53,8 @@ Versions are likely important. Don't substitute one for the other without trying
 *Additional, optional modules currently in use with the latest Alpha version:*
   * [http://trac2.assembla.com/pkaudio/wiki/pyrtmidi pyRtMidi] - for MIDI instruments to be used as controller inputs.  [http://www.mediafire.com/download.php?ok1vw2zjn22 Here] is a direct download link to an installer that js put together for Python 2.4.
   * [http://www.mediafire.com/stump jsPitchBend] - for a whammy pitchbend effect (source: [https://svn.stump.jstump.com/svnroot/pitchbend/trunk SVN Checkout], [https://svn.stump.jstump.com/websvn WebSVN]).  At least revision 7 or release 0.1 is needed for the effect to work.  ([http://www.mediafire.com/?3mgtxhagijt direct download of latest release])
+  * pyOpenGL 3.0 - for experimental shader code.  Install instead of the pyOpenGL 2.0.2.01 package from the required list.  ([http://prdownloads.sourceforge.net/pyopengl/PyOpenGL-3.0.0.win32.exe?download])
+  * ctypes - required if you install pyOpenGL 3.0  ([http://prdownloads.sourceforge.net/ctypes/ctypes-1.0.2.win32-py2.4.exe?download])
 
 *Or, here's a complete package* with all the files above, with a batch file that installs everything for Windows 32-bit users, in a single RAR archive - courtesy of Chris Paiano (Myfingershurt) - _Updated 3/4/2009_: *(Important - you will need the updated py2exe module linked above!)*
 [http://www.mediafire.com/?iu9ezgnnnnx] - Includes optional modules.
