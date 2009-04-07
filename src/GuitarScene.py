@@ -4885,7 +4885,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       notes = self.guitars[num].getRequiredNotes(self.song, pos)
 
       if ((self.scoring[num].streak > 0 and self.guitars[num].areNotesTappable(notes)) or \
-          (self.guitars[num].guitarSolo and control in self.soloKeys[num])) and \
+          (self.guitars[num].guitarSolo and control in self.soloKeysList[num])) and \
          self.guitars[num].controlsMatchNotes(self.controls, notes):
         self.doPick(num)
     elif control in Player.starts:
@@ -5012,7 +5012,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       pressed = -1
 
     for i, guitar in enumerate(self.guitars): #akedrou- probably loopable...
-      if control in guitar.keys and numpressed[0] >= 1:
+      if control in guitar.keys and numpressed[i] >= 1:
         if guitar.hopoActive > 0 or (guitar.wasLastNoteHopod and guitar.hopoActive == 0):
           if not pullOff and (self.hopoStyle == 2 or self.hopoStyle == 3): #GH2 or GH2 Strict, don't allow lower-fret tapping while holding a higher fret
             activeKeyList = []
@@ -5153,7 +5153,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       notes = self.guitars[num].getRequiredNotes(self.song, pos)
 
       if ((self.scoring[num].streak > 0 and self.guitars[num].areNotesTappable(notes)) or \
-          (self.guitars[num].guitarSolo and control in self.soloKeys[num])) and \
+          (self.guitars[num].guitarSolo and control in self.soloKeysList[num])) and \
          self.guitars[num].controlsMatchNotes(self.controls, notes):
         self.doPick(num)
       # Otherwise we end the pick if the notes have been playing long enough
