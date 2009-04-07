@@ -121,7 +121,7 @@ class Video:
   def setShaders(self, dir):
     Shader.list.build(dir)
     Shader.list.setVar("mult",0.1,False,"neck")
-    Shader.list.setVar("fade",0.5,False,"neck")
+    Shader.list.setVar("fade",0.7,False,"neck")
     Shader.list.setVar("F1",-100.0,False,"neck")
     Shader.list.setVar("F2",-100.0,False,"neck")
     Shader.list.setVar("F3",-100.0,False,"neck")

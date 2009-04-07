@@ -906,6 +906,9 @@ class Guitar:
     
     if not (self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 2):
       self.renderNeckMethod(v*self.neckAlpha[1], offset, beatsPerUnit, neck)
+      
+      
+    Shader.list.disable()
 
     if self.bgcount > 0 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 2:   #static bass groove overlay
       self.renderNeckMethod(v*self.bgcount*self.neckAlpha[3], 0, beatsPerUnit, self.bassGrooveNeck)
@@ -924,7 +927,7 @@ class Guitar:
           
       self.renderNeckMethod(self.spcount*self.neckAlpha[4], offset, beatsPerUnit, neck)
       
-    Shader.list.disable()
+    
       
     if self.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and (self.scoreMultiplier > 4 or self.guitarSolo):   #static overlay
 
