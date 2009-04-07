@@ -1,0 +1,13 @@
+uniform sampler2D Noise;
+
+varying vec3 lightDir,normal;
+varying vec3 pos;
+varying vec4 col;
+varying float alpha;
+
+void main()
+{
+	vec3 n = normalize(normal);
+	vec4 tex = texture2D(Noise,pos.xz);
+	gl_FragColor = vec4(tex.rgb+col.rgb,alpha);	
+}

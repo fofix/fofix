@@ -23,6 +23,7 @@
 import pygame
 import os
 import sys
+import Shader
 from OpenGL.GL import *
 from OpenGL.GL.ARB.multisample import *
 import Log
@@ -33,6 +34,7 @@ class Video:
     self.caption    = caption
     self.fullscreen = False
     self.flags      = True
+    self.shaders    = Shader.shaderList()
 
   def setMode(self, resolution, fullscreen = False, flags = pygame.OPENGL | pygame.DOUBLEBUF,
               multisamples = 0):
@@ -115,3 +117,13 @@ class Video:
 
   def getVideoModes(self):
     return pygame.display.list_modes()
+    
+  def setShaders(self, dir):
+    Shader.list.build(dir)
+    Shader.list.setVar("mult",0.1,False,"neck")
+    Shader.list.setVar("fade",0.5,False,"neck")
+    Shader.list.setVar("F1",-100.0,False,"neck")
+    Shader.list.setVar("F2",-100.0,False,"neck")
+    Shader.list.setVar("F3",-100.0,False,"neck")
+    Shader.list.setVar("F4",-100.0,False,"neck")
+    Shader.list.setVar("F5",-100.0,False,"neck")

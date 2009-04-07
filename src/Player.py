@@ -328,9 +328,9 @@ def savePlayers():
         del c
         cache.execute('UPDATE `players` SET `changed` = 0 WHERE `name` = ?', [pref[0]])
       except:
-        c = open(os.path.join(playerpath, str(pref[0] + ".ini")), "w")
+        c = open(os.path.join(playerpath, str(pref[0]) + ".ini"), "w")
         c.close()
-        c = Config.load(os.path.join(playerpath, str(pref[0] + ".ini")), type = 2)
+        c = Config.load(os.path.join(playerpath, str(pref[0]) + ".ini"), type = 2)
         c.set("player","leftymode",int(pref[1]))
         c.set("player","drumflip",int(pref[2]))
         c.set("player","auto_kick",int(pref[3]))

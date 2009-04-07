@@ -650,6 +650,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(self.engine, self.engine.config, "game", "gfx_version_tag", autoApply = True), #MFH
       ConfigChoice(self.engine, self.engine.config, "video",  "multisamples", isQuickset = 1),
       ConfigChoice(self.engine, self.engine.config, "game", "in_game_font_shadowing", autoApply = True),      #myfingershurt
+      ConfigChoice(self.engine, self.engine.config, "video", "use_shaders"),      #volshebnyi
       ConfigChoice(self.engine, self.engine.config, "performance", "preload_glyph_cache", autoApply = True, isQuickset = 1),#evilynux
       ConfigChoice(self.engine, self.engine.config, "performance", "static_strings", autoApply = True, isQuickset = 1),      #myfingershurt
       ConfigChoice(self.engine, self.engine.config, "performance", "killfx", autoApply = True, isQuickset = 1),   #blazingamer
@@ -1303,6 +1304,7 @@ def quickset(config):
     config.set("game", "midi_lyric_mode", 2)
     config.set("video", "fps", 60)
     config.set("video", "multisamples", 0)
+    config.set("video", "use_shaders", False)
     config.set("coffee", "game_phrases", 0)
     config.set("game", "partial_stars", 0)
     config.set("game", "songlistrotation", False)
@@ -1389,6 +1391,7 @@ def quickset(config):
     config.set("game", "midi_lyric_mode", 0)
     config.set("video", "fps", 80)
     config.set("video", "multisamples", 4)
+    config.set("video", "use_shaders", True)
     config.set("coffee", "game_phrases", 2)
     config.set("game", "partial_stars", 1)
     config.set("game", "songlistrotation", True)

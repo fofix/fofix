@@ -32,6 +32,7 @@ from Song import Note, Tempo, Bars
 from Mesh import Mesh
 import Theme
 import random
+import Shader
 
 from OpenGL.GL import *
 import math
@@ -802,6 +803,7 @@ class Guitar:
 
     def project(beat):
       return 0.125 * beat / beatsPerUnit    # glorandwarf: was 0.12
+      
     
     if self.starPowerActive and self.theme == 0:#8bit
       color = self.spColor #(.3,.7,.9)
@@ -862,13 +864,14 @@ class Guitar:
       
     glDisable(GL_TEXTURE_2D)
     
-  def renderNeck(self, visibility, song, pos):
+  def renderNeck(self, visibility, song, pos):     
     if not song:
       return
     if not song.readyToGo:
       return
     
     def project(beat):
+      print 0.125 * beat / beatsPerUnit
       return 0.125 * beat / beatsPerUnit    # glorandwarf: was 0.12
 
     v            = visibility
@@ -892,6 +895,15 @@ class Guitar:
     else:
       neck = self.neckDrawing
 
+    if Shader.list.enable("neck"):
+      Shader.list["neck"]["tex"] = (neck.texture,)
+      Shader.list.setVar("stretch",self.boardWidth)
+      Shader.list.setVar("offset",offset/3.2)
+      Shader.list.setVar("time",pos/1000.0)
+      Shader.list.update()
+
+    
+    
     if not (self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 2):
       self.renderNeckMethod(v*self.neckAlpha[1], offset, beatsPerUnit, neck)
 
@@ -911,6 +923,8 @@ class Guitar:
           neck = self.oNeck
           
       self.renderNeckMethod(self.spcount*self.neckAlpha[4], offset, beatsPerUnit, neck)
+      
+    Shader.list.disable()
       
     if self.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and (self.scoreMultiplier > 4 or self.guitarSolo):   #static overlay
 
@@ -3403,7 +3417,18 @@ class Guitar:
       return False
     if not song.readyToGo:
       return False
+      
     
+    if controls.getState(self.keys[0]):
+      Shader.list.setVar("F1",pos/1000,False,"neck")
+    if controls.getState(self.keys[1]):
+      Shader.list.setVar("F2",pos/1000,False,"neck")
+    if controls.getState(self.keys[2]):
+      Shader.list.setVar("F3",pos/1000,False,"neck")
+    if controls.getState(self.keys[3]):
+      Shader.list.setVar("F4",pos/1000,False,"neck")
+    if controls.getState(self.keys[4]):
+      Shader.list.setVar("F5",pos/1000,False,"neck")
     
     self.lastPlayedNotes = self.playedNotes
     self.playedNotes = []
