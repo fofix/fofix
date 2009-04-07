@@ -9,7 +9,7 @@ from OpenGL.GLU import *
 import os
 import sys
 
-multiTex = (GL_TEXTURE0_ARB,GL_TEXTURE1_ARB,GL_TEXTURE2_ARB,GL_TEXTURE3_ARB)
+multiTex = None
 
 class shaderList:
   def __init__(self, dir = ""):

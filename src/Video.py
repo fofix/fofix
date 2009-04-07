@@ -119,11 +119,16 @@ class Video:
     return pygame.display.list_modes()
     
   def setShaders(self, dir):
-    Shader.list.build(dir)
-    Shader.list.setVar("mult",0.1,False,"neck")
-    Shader.list.setVar("fade",0.7,False,"neck")
-    Shader.list.setVar("F1",-100.0,False,"neck")
-    Shader.list.setVar("F2",-100.0,False,"neck")
-    Shader.list.setVar("F3",-100.0,False,"neck")
-    Shader.list.setVar("F4",-100.0,False,"neck")
-    Shader.list.setVar("F5",-100.0,False,"neck")
+    try:
+      Shader.list.build(dir)
+      Shader.multiTex = (GL_TEXTURE0_ARB,GL_TEXTURE1_ARB,GL_TEXTURE2_ARB,GL_TEXTURE3_ARB)
+    except:
+      Log.warn("Multitexturing failed. Upgrade to PyOpenGL 3.00!")
+    else:
+      Shader.list.setVar("mult",0.1,False,"neck")
+      Shader.list.setVar("fade",0.7,False,"neck")
+      Shader.list.setVar("F1",-100.0,False,"neck")
+      Shader.list.setVar("F2",-100.0,False,"neck")
+      Shader.list.setVar("F3",-100.0,False,"neck")
+      Shader.list.setVar("F4",-100.0,False,"neck")
+      Shader.list.setVar("F5",-100.0,False,"neck")
