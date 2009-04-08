@@ -1536,9 +1536,6 @@ class SongChooser(Layer, KeyListener):
         self.itemAngles[i] = max(0,  self.itemAngles[i] - ticks / 2.0)
     
   def renderCassette(self, color, label):
-
-    
-
     if not self.cassette:
       return
 
@@ -1546,17 +1543,12 @@ class SongChooser(Layer, KeyListener):
       glColor3f(*color)
 
     glEnable(GL_COLOR_MATERIAL)
-    
-    
-
     if self.display == 2:
       glRotate(90, 0, 0, 1)
       if self.listRotation:
         glRotate(((self.time - self.lastTime) * 2 % 360) - 90, 1, 0, 0)
     
     self.cassette.render("Mesh_001")
-    
-    Shader.list.setVar("color", (.1, .1, .1))
     glColor3f(.1, .1, .1)
     self.cassette.render("Mesh")
     

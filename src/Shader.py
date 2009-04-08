@@ -109,11 +109,10 @@ class shaderList:
   def setVar(self, var, value, Mod = False, program = None):
     if program == None:  program = self.active
     else: program = self[program]
-    if program != 0:
+    if program != 0 and program.has_key(var):
       pos = program[var]
       if Mod: pos[1] += value
       else:   pos[1] = value
-    
       if program == self.active and program != 0:
         if type(value) == float:
           glUniform1f(pos[0],pos[1])
@@ -130,14 +129,16 @@ class shaderList:
             elif len(value) == 4: glUniform4i(pos[0],*pos[1])
         elif type(value) == long:
           glUniform1i(pos[0],pos[1])
+        return True
+    return False
         
   def enable(self, shader):
-    if self.shaders.has_key(shader):
+    try:
       glUseProgramObjectARB(self[shader]["program"])
       self.active = dict(self.shaders[shader])
       #self.setTextures()
       return True
-    else:
+    except:
       return False
           
   def update(self):

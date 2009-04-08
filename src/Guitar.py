@@ -895,20 +895,10 @@ class Guitar:
     else:
       neck = self.neckDrawing
 
-    if Shader.list.enable("neck"):
-      Shader.list["neck"]["tex"] = (neck.texture,)
-      Shader.list.setVar("stretch",self.boardWidth)
-      Shader.list.setVar("offset",offset/3.2)
-      Shader.list.setVar("time",pos/1000.0)
-      Shader.list.update()
-
     
     
     if not (self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 2):
       self.renderNeckMethod(v*self.neckAlpha[1], offset, beatsPerUnit, neck)
-      
-      
-    Shader.list.disable()
 
     if self.bgcount > 0 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 2:   #static bass groove overlay
       self.renderNeckMethod(v*self.bgcount*self.neckAlpha[3], 0, beatsPerUnit, self.bassGrooveNeck)
@@ -944,6 +934,20 @@ class Guitar:
       
     if self.isFailing:
       self.renderNeckMethod(self.failcount*self.neckAlpha[5], 0, beatsPerUnit, self.failNeck)
+      
+    if Shader.list.enable("neck"):
+      Shader.list["neck"]["tex"] = (neck.texture,)
+      Shader.list.setVar("stretch",self.boardWidth)
+      Shader.list.setVar("offset",offset/3.2)
+      Shader.list.setVar("time",pos/1000.0)
+      Shader.list.update()
+      glBegin(GL_TRIANGLE_STRIP)
+      glVertex3f(-w / 2, 0.1, -2)
+      glVertex3f(w / 2, 0.1, -2)
+      glVertex3f(-w / 2, 0.1, l)
+      glVertex3f(w / 2, 0.1, l)
+      glEnd()
+      Shader.list.disable()
 
 
   def drawTrack(self, visibility, song, pos):
@@ -3420,18 +3424,6 @@ class Guitar:
       return False
     if not song.readyToGo:
       return False
-      
-    
-    if controls.getState(self.keys[0]):
-      Shader.list.setVar("F1",pos/1000,False,"neck")
-    if controls.getState(self.keys[1]):
-      Shader.list.setVar("F2",pos/1000,False,"neck")
-    if controls.getState(self.keys[2]):
-      Shader.list.setVar("F3",pos/1000,False,"neck")
-    if controls.getState(self.keys[3]):
-      Shader.list.setVar("F4",pos/1000,False,"neck")
-    if controls.getState(self.keys[4]):
-      Shader.list.setVar("F5",pos/1000,False,"neck")
     
     self.lastPlayedNotes = self.playedNotes
     self.playedNotes = []
@@ -3469,6 +3461,17 @@ class Guitar:
       self.playedNotes.append([time, note])
       if self.guitarSolo:
         self.currentGuitarSoloHitNotes += 1
+        
+      if controls.getState(self.keys[0]):
+        Shader.list.setVar("F1",pos/1000,False,"neck")
+      if controls.getState(self.keys[1]):
+        Shader.list.setVar("F2",pos/1000,False,"neck")
+      if controls.getState(self.keys[2]):
+        Shader.list.setVar("F3",pos/1000,False,"neck")
+      if controls.getState(self.keys[3]):
+        Shader.list.setVar("F4",pos/1000,False,"neck")
+      if controls.getState(self.keys[4]):
+        Shader.list.setVar("F5",pos/1000,False,"neck")
      
     #myfingershurt: be sure to catch when a chord is played
     if len(self.playedNotes) > 1:
