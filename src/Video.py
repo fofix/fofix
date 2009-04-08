@@ -120,10 +120,14 @@ class Video:
     
   def setShaders(self, dir):
     try:
-      Shader.list.build(dir)
       Shader.multiTex = (GL_TEXTURE0_ARB,GL_TEXTURE1_ARB,GL_TEXTURE2_ARB,GL_TEXTURE3_ARB)
     except:
+      Shader.multiTex = (0,0,0,0)
       Log.warn("Multitexturing failed. Upgrade to PyOpenGL 3.00!")
+    try:
+      Shader.list.build(dir)
+    except:
+      Log.warn("Shader program compilation error!")
     else:
       Shader.list.setVar("mult",0.1,False,"neck")
       Shader.list.setVar("fade",0.7,False,"neck")
