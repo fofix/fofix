@@ -28,6 +28,7 @@ from OpenGL.GL import *
 
 import os
 import sys
+import string
 
 multiTex = None
 
@@ -67,9 +68,11 @@ class shaderList:
     
   def getVars(self,fname, program, sArray):
     for line in open(fname):
-      aline = line.split(" ")
+      aline = line[:string.find(line,";")]
+      aline = aline.split(' ')
+      if aline[0] == "void":
+        break;
       if aline[0] == "uniform":
-        aline[2] = aline[2][:-2]
         value = None
         try:    n = int(aline[1][-1])
         except: n = 4
@@ -81,7 +84,9 @@ class shaderList:
         elif aline[1][:-1] == "vec": value = (.0,)*n
         elif aline[1][:-1] == "mat": value = ((.0,)*n,)*n
         elif aline[1][:-2] == "sampler": value, self.texcount = self.texcount, self.texcount + 1
-        sArray[aline[2]] = [glGetUniformLocationARB(program, aline[2]), value]
+        aline[2] = aline[2].split(',')
+        for var in aline[2]:
+          sArray[var] = [glGetUniformLocationARB(program, var), value]
     
     
   def compile(self, vertexSource=None, fragmentSource=None):
