@@ -185,6 +185,8 @@ Config.define("theme", "lobby_select_image_y", float, 0.335)
 Config.define("theme", "lobby_select_scale", float, 0.0018)
 Config.define("theme", "lobby_select_space", float, 0.04)
 Config.define("theme", "lobby_select_font", str, "font")
+Config.define("theme", "lobby_title_color", str, "#FFFFFF")
+Config.define("theme", "lobby_info_color", str, "#FFFFFF")
 Config.define("theme", "lobby_font_color", str, "#FFFFFF")
 Config.define("theme", "lobby_select_color", str, "#FFBF00")
 Config.define("theme", "lobby_disable_color", str, "#666666")
@@ -443,6 +445,8 @@ lobbySelectImageY = None
 lobbySelectScale = None
 lobbySelectSpace = None
 lobbySelectFont = None
+lobbyTitleColor = None
+lobbyInfoColor = None
 lobbyFontColor = None
 lobbySelectColor = None
 lobbyDisableColor = None
@@ -926,7 +930,7 @@ def setupLobby(config):
   global characterCreateOptionX, characterCreateScale, characterCreateSpace, characterCreateHelpFont
   global characterCreateOptionFont, characterCreateHelpX, characterCreateHelpScale
   global characterCreateFontColor, characterCreateSelectColor, characterCreateHelpColor
-  global lobbyFontColor, lobbySelectColor, lobbyDisableColor
+  global lobbyFontColor, lobbySelectColor, lobbyDisableColor, lobbyTitleColor, lobbyInfoColor
   
   controlActivateX = config.get("theme", "control_activate_x")
   controlActivateSelectX = config.get("theme", "control_activate_select_x")
@@ -961,6 +965,8 @@ def setupLobby(config):
   lobbySelectScale = config.get("theme", "lobby_select_scale")
   lobbySelectSpace = config.get("theme", "lobby_select_space")
   lobbySelectFont = config.get("theme", "lobby_select_font")
+  lobbyTitleColor = hexToColor(config.get("theme", "lobby_title_color"))
+  lobbyInfoColor = hexToColor(config.get("theme", "lobby_info_color"))
   lobbyFontColor = hexToColor(config.get("theme", "lobby_font_color"))
   lobbySelectColor = hexToColor(config.get("theme", "lobby_select_color"))
   lobbyDisableColor = hexToColor(config.get("theme", "lobby_disable_color"))

@@ -88,6 +88,11 @@ class Lobby(Layer, KeyListener, MessageHandler):
       except IOError:
         self.infoImg = None
       
+      try:
+        self.engine.loadImgDrawing(self, "chooseCharImg", os.path.join("themes", themename, "lobby", "choosechar.png"))
+      except IOError:
+        self.chooseCharImg = None
+      
       self.engine.loadImgDrawing(self, "defaultAvatar", os.path.join("users", "players", "default.png"))
       self.engine.loadImgDrawing(self, "defaultNeck",   os.path.join("necks", self.engine.mainMenu.chosenNeck + ".png"))
       self.engine.loadImgDrawing(self, "randomNeck",    os.path.join("necks", "randomneck.png"))
@@ -414,8 +419,13 @@ class Lobby(Layer, KeyListener, MessageHandler):
       if self.background:
         wFactor = 640.000/self.background.width1()
         self.engine.drawImage(self.background, scale = (wFactor,-wFactor), coord = (w/2,h/2))
-      wText, hText = font.getStringSize(self.tsChooseChar, scale = Theme.lobbyTitleScale)
-      titleFont.render(self.tsChooseChar, (Theme.lobbyTitleX-(wText),Theme.lobbyTitleY), scale = Theme.lobbyTitleScale)
+      r, g, b = Theme.lobbyTitleColor
+      glColor3f(r, g, b)
+      if self.chooseCharImg:
+        self.engine.drawImage(self.chooseCharImg, scale = (Theme.lobbyTitleScale,-Theme.lobbyTitleScale), coord = (w*Theme.lobbyTitleX,h*Theme.lobbyTitleY))
+      else:
+        wText, hText = font.getStringSize(self.tsChooseChar, scale = Theme.lobbyTitleScale)
+        titleFont.render(self.tsChooseChar, (Theme.lobbyTitleX-(wText),Theme.lobbyTitleY), scale = Theme.lobbyTitleScale)
       wText, hText = titleFont.getStringSize(self.tsPlayerStr % (self.playerNum+1), scale = Theme.lobbyTitleScale)
       titleFont.render(self.tsPlayerStr % (self.playerNum+1), (Theme.lobbyTitleCharacterX-wText/2, Theme.lobbyTitleCharacterY), scale = Theme.lobbyTitleScale)
       for i, name in enumerate(self.options):
@@ -433,6 +443,8 @@ class Lobby(Layer, KeyListener, MessageHandler):
               self.engine.drawImage(self.defaultAvatar, scale = (self.defAvScale,-self.defAvScale), coord = (w*Theme.lobbyPreviewX,h*.75))
             else:
               self.engine.drawImage(self.avatars[i], scale = (self.avatarScale[i],-self.avatarScale[i]), coord = (w*Theme.lobbyPreviewX,h*.75))
+            r, g, b = Theme.lobbyInfoColor
+            glColor3f(r, g, b)
             if self.infoImg:
               self.engine.drawImage(self.infoImg, scale = (.5,-.5), coord = (w*Theme.lobbyPreviewX,h*.55))
             else:
