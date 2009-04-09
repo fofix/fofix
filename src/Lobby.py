@@ -443,13 +443,13 @@ class Lobby(Layer, KeyListener, MessageHandler):
               self.engine.drawImage(self.defaultAvatar, scale = (self.defAvScale,-self.defAvScale), coord = (w*Theme.lobbyPreviewX,h*.75))
             else:
               self.engine.drawImage(self.avatars[i], scale = (self.avatarScale[i],-self.avatarScale[i]), coord = (w*Theme.lobbyPreviewX,h*.75))
-            r, g, b = Theme.lobbyInfoColor
-            glColor3f(r, g, b)
             if self.infoImg:
               self.engine.drawImage(self.infoImg, scale = (.5,-.5), coord = (w*Theme.lobbyPreviewX,h*.55))
             else:
               wText, hText = titleFont.getStringSize(self.tsInfo, scale = .0025)
               titleFont.render(self.tsInfo, (Theme.lobbyPreviewX-wText/2, (.45*self.engine.data.fontScreenBottom)-hText/2), scale = .0025)
+            r, g, b = Theme.lobbyInfoColor
+            glColor3f(r, g, b)
             for k in range(1,5):
               text = self.tsList[k][self.playerPrefs[j][k]]
               wText, hText = font.getStringSize(text, scale = .0018)
