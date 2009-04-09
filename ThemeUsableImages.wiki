@@ -212,6 +212,7 @@ Similarly, if the song has the entry "icon=gobbldygook" in its song.ini, then on
 
 ==\lobby\ Directory==
 ||  _Filename_                  ||  _What is file for in FoFiX?_                 ||  _Required?_                   ||  _Related to Theme Type_ ||  _Notes_||
+||  choosechar.png              ||  Overlay on character selection screen        ||  No (fallback: text)           ||  All                     ||  If this image is not present, the text "Choose Your Character:" is displayed instead ||
 ||  controlbg.png               ||  Background to controller selection screen    ||  No (fallback: optionsbg.png)  ||  All                     ||  ||
 ||  creator.png                 ||  Background to character creation screen      ||  No (fallback: None (blank))   ||  All                     ||  ||
 ||  information.png             ||  Overlay on character selection screen        ||  No (fallback: text)           ||  All                     ||  If this image is not present, the text "Information:" is displayed instead ||
