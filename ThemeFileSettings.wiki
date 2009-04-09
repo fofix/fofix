@@ -32,14 +32,20 @@ Then use any of the following settings below the {{{[theme]}}} header in the the
 ||settingstext9 = .393,.88,.50,.085||.393 is X Pos, .88 is Y Position, .50 is Scaling Size, .085 is Line Spacing between menu items. Used for Options Menu(This is used if you made the settings.png and settingstext9.png images. The '9' in the name refers to being that, for example, the GH3 options menu has 10 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
 
 ----------------------------------------------------------------------------
-=Player Select/Creation=
+=Lobby/Player Select/Creation=
+||character_create_font_color = #FFFFFF|| Controls color value of character creation font. Use a Hex Color Value ||
+||character_create_select_color = #FFBF00|| Controls color value of character creation selected text. Use a Hex Color Value ||
+||character_create_help_color = #FFFFFF|| Controls color value of character creation help info line. Use a Hex Color Value ||
 ||character_create_help_y = .73||  Controls Y position of the character creation screen text help line.||
 ||character_create_option_x = .75||  Controls X position of the character creation screen text menu toggle options.||
 ||character_create_space = .045|| Controls the spacing between character creation screen text menu items.||
 ||character_create_scale = .0018||  Controls scaling size of the character creation screen text menu items.||
 ||character_create_x = 0.25||  Controls X position of the character creation screen text menu items.||
 ||character_create_y = 0.15||  Controls Y position of the character creation screen text menu items.||
+||lobby_disable_color = #666666|| Controls color value. Use a Hex Color Value.||
+||lobby_font_color = #FFFFFF || Controls the lobby font color. Use a Hex Color Value.||
 ||lobby_preview_x = 0.3|| Controls Player image and info below image in Lobby||
+||lobby_select_color = #FFBF00|| Controls the lobby select color. Use a Hex Color Value.||
 ||lobby_select_x = 0.9||  Controls X Position of player list text in Lobby||
 ||lobby_select_y = 0.32||  Controls Y Position of player list text in Lobby||
 ||lobby_select_font = loadingFont||  Selects lobby font. Can use "font","bigFont","pauseFont","scoreFont","streakFont","songFont","streakFont2","songListFont","shadowfont","loadingFont".||
