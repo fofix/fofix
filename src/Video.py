@@ -1,4 +1,4 @@
-#####################################################################
+##################################################################
 # -*- coding: iso-8859-1 -*-                                        #
 #                                                                   #
 # Frets on Fire                                                     #
@@ -127,13 +127,28 @@ class Video:
     try:
       Shader.list.build(dir)
     except:
-      #stump: Log.error so the traceback gets logged as well
-      Log.error("Shader program compilation error!")
+      Log.warn("Shader program compilation error!")
+      print "!!!"
     else:
-      Shader.list.setVar("mult",0.1,False,"neck")
-      Shader.list.setVar("fade",0.7,False,"neck")
-      Shader.list.setVar("F1",-100.0,False,"neck")
-      Shader.list.setVar("F2",-100.0,False,"neck")
-      Shader.list.setVar("F3",-100.0,False,"neck")
-      Shader.list.setVar("F4",-100.0,False,"neck")
-      Shader.list.setVar("F5",-100.0,False,"neck")
+      Shader.list.makeNoise3D(16)
+      
+      if Shader.list.shaders!={}:
+        Shader.list["stage"]["tex"]=(Shader.list.noise3D,)
+      Shader.list.setVar("ambientGlow",0.13,False,"stage")
+      Shader.list.setVar("color",(0.0,0.0,0.0,0.0),False,"stage")
+      Shader.list.setVar("glowStrength",100.0,False,"stage")
+      Shader.list.setVar("ambientGlowHeightScale",1.68,False,"stage")
+      Shader.list.setVar("glowFallOff",0.024,False,"stage")
+      Shader.list.setVar("height",0.44,False,"stage")
+      Shader.list.setVar("sampleDist",0.0076,False,"stage")
+      Shader.list.setVar("speed",1.86,False,"stage")
+      Shader.list.setVar("vertNoise",0.78,False,"stage")
+      Shader.list.setVar("scale",1.7,False,"stage")
+      Shader.list.setVar("offset",(0.0,-0.8),False,"stage")
+      Shader.list.var["pos"]=0.0
+      Shader.list.var["F1"]=-10.0
+      Shader.list.var["F2"]=-10.0
+      Shader.list.var["F3"]=-10.0
+      Shader.list.var["F4"]=-10.0
+      Shader.list.var["F5"]=-10.0
+      Shader.list.var["color"]=(0.0,0.0,0.0,0.0)

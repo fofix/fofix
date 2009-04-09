@@ -29,15 +29,23 @@ from OpenGL.GL import *
 import os
 import sys
 import string
+import random
+import time
 
 multiTex = None
 
 class shaderList:
   def __init__(self, dir = ""):
     self.shaders = {}
-    self.textures = []
+    self.backup = {}
     self.active = 0
     self.texcount = 0
+    self.lastcompiled = ""
+    self.noise3D = 0
+    self.noise2D = 0
+    self.noise1D = 0
+    self.var = {}
+    time.clock()
     self.build(dir)
     
   def build(self,dir = ""):
@@ -52,12 +60,16 @@ class shaderList:
       fullname = os.path.join(dir, name)
       if name[-3:] == ".ps":
         program = self.compile(open(fullname[:-3]+".vs"), open(fullname))
-        sArray = {"program": program, "name": name[:-3], "tex" : ()}
+        sArray = {"program": program, "name": name[:-3], "tex" : (), "textype" : ()}
+        self.lastCompiled = name[:-3]
         self.getVars(fullname, program, sArray)
         self.getVars(fullname[:-3]+".vs", program, sArray)
         self.shaders[name[:-3]] = sArray
-    return True
-        
+    if self.shaders!={}:
+      return True
+    else:
+      return False
+          
   def compileShader(self, source, shaderType):
     """Compile shader source of given type"""
     shader = glCreateShaderObjectARB(shaderType)
@@ -70,7 +82,7 @@ class shaderList:
     for line in open(fname):
       aline = line[:string.find(line,";")]
       aline = aline.split(' ')
-      if aline[0] == "void":
+      if '(' in aline[0]:
         break;
       if aline[0] == "uniform":
         value = None
@@ -83,7 +95,11 @@ class shaderList:
         elif aline[1][:-1] == "ivec": value = (0,)*n
         elif aline[1][:-1] == "vec": value = (.0,)*n
         elif aline[1][:-1] == "mat": value = ((.0,)*n,)*n
-        elif aline[1][:-2] == "sampler": value, self.texcount = self.texcount, self.texcount + 1
+        elif aline[1][:-2] == "sampler": 
+          value, self.texcount = self.texcount, self.texcount + 1 
+          if aline[1] == "sampler1D":   sArray["textype"] += (GL_TEXTURE_1D,)
+          elif aline[1] == "sampler2D": sArray["textype"] += (GL_TEXTURE_2D,)
+          elif aline[1] == "sampler3D": sArray["textype"] += (GL_TEXTURE_3D,)
         aline[2] = aline[2].split(',')
         for var in aline[2]:
           sArray[var] = [glGetUniformLocationARB(program, var), value]
@@ -98,7 +114,7 @@ class shaderList:
     if fragmentSource:
       fragmentShader = self.compileShader(fragmentSource, GL_FRAGMENT_SHADER_ARB)
       glAttachObjectARB(program, fragmentShader)
-      
+    
     glValidateProgramARB( program )
     glLinkProgramARB(program)
     if vertexShader: glDeleteObjectARB(vertexShader)
@@ -119,6 +135,9 @@ class shaderList:
       if Mod: pos[1] += value
       else:   pos[1] = value
       if program == self.active and program != 0:
+        if type(value) == bool:
+          if pos[1]: glUniform1i(pos[0],1)
+          else: glUniform1i(pos[0],0)
         if type(value) == float:
           glUniform1f(pos[0],pos[1])
         elif type(value) == int:
@@ -141,7 +160,9 @@ class shaderList:
     try:
       glUseProgramObjectARB(self[shader]["program"])
       self.active = dict(self.shaders[shader])
-      #self.setTextures()
+      self.setTextures()
+      self.setVar("time",self.time())
+      self.update()
       return True
     except:
       return False
@@ -155,16 +176,26 @@ class shaderList:
     glUseProgramObjectARB(0)
     self.active = 0
     
+  def turnOff(self):
+    if self.backup == {} and self.shaders != {}:
+      self.backup = self.shaders
+      self.shaders = {}
+      
+  def turnOn(self):
+    if self.backup != {} and self.shaders == {}:
+      self.shaders = self.backup
+      self.backup = {}
+    
   def enabled(self):
     if self.active !=0:
       return self.active["name"]
     else:
       return 0  
     
-  def log(self,shader):
+  def log(self):
     infologLength = 0
     charsWritten = 0
-    obj = self[shader]["program"]
+    obj = self[self.lastCompiled]["program"]
     glGetObjectParameterivARB(obj, GL_OBJECT_INFO_LOG_LENGTH_ARB, infologLength)
     glGetInfoLogARB(obj, infologLength, charsWritten, infoLog)
     return infoLog
@@ -175,13 +206,86 @@ class shaderList:
     for i in program["tex"]:
       if len(program["tex"]) > 1 and multiTex[j] != 0:
         glActiveTexture (multiTex[j])
-      glBindTexture(GL_TEXTURE_2D, i) 
+      glBindTexture(program["textype"][j], i) 
       j += 1
+      
+  def makeNoise3D(self,size=32, c = 1, type = GL_RED):
+    texels=[]
+    for i in range(size):
+      arr2 = []
+      for j in range(size):
+        arr = []
+        for k in range(size):
+          arr.append(random.random())
+        arr2.append(arr)
+      texels.append(arr2)
+          
+    self.smoothNoise3D(size, 2, texels)
+    #self.smoothNoise3D(size, 4, texels)
+    
+    for i in range(size):
+      for j in range(size):
+        for k in range(size):
+          texels[i][j][k] = int(255 * texels[i][j][k])
+
+    texture = 0
+    glBindTexture(GL_TEXTURE_3D, texture)
+    glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+    glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+    glTexImage3D(GL_TEXTURE_3D, 0, c,size, size, size, 0, type, GL_UNSIGNED_BYTE, texels)
+    self.noise3D = texture
+    
+  def makeNoise2D(self,size=64, c = 1, type = GL_RED):
+    texels=[]
+    for i in range(size):
+      texels.append([])
+      for j in range(size):
+        texels[i].append(random.random())
+    
+    self.smoothNoise(size, 2, texels)
+    self.smoothNoise(size, 3, texels)
+    self.smoothNoise(size, 4, texels)  
+    
+    for i in range(size):
+      for j in range(size):
+        texels[i][j] = int(255 * texels[i][j])
+        
+    texture = 0
+    glBindTexture(GL_TEXTURE_2D, texture)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+    glTexImage2D(GL_TEXTURE_2D, 0, c,size, size, 0, type, GL_UNSIGNED_BYTE, texels)
+    self.noise2D = texture
+    
+  def smoothNoise(self, size, c, noise):
+    for x in range(size):
+      for y in range(size):
+        col1 = noise[x][y]
+        col2 = noise[size/2/(1-c)+x/c][size/2/(1-c)+y/c]
+        noise[x][y] = (1-1/float(c))*col1+1/float(c)*col2
+    
+  def smoothNoise3D(self, size, c, noise):
+    for i in range(size):
+      for j in range(size):
+        for k in range(size):
+          col1 = noise[i][j][k]
+          col2 = noise[size/2/(1-c)+i/c][size/2/(1-c)+j/c][size/2/(1-c)+k/c]
+          noise[i][j][k] = (1-1/float(c))*col1+1/float(c)*col2
       
   def __getitem__(self, name):
     if self.shaders.has_key(name):
       return self.shaders[name]
     else:
       return 0
+      
+  def time(self):
+    return time.clock()
     
 list = shaderList()
+list.var["pos"] = 0.0
