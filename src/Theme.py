@@ -185,6 +185,9 @@ Config.define("theme", "lobby_select_image_y", float, 0.335)
 Config.define("theme", "lobby_select_scale", float, 0.0018)
 Config.define("theme", "lobby_select_space", float, 0.04)
 Config.define("theme", "lobby_select_font", str, "font")
+Config.define("theme", "lobby_font_color", str, "#FFFFFF")
+Config.define("theme", "lobby_select_color", str, "#FFBF00")
+Config.define("theme", "lobby_disable_color", str, "#666666")
 Config.define("theme", "character_create_x", float, 0.25)
 Config.define("theme", "character_create_y", float, 0.15)
 Config.define("theme", "character_create_help_x", float, 0.5)
@@ -192,6 +195,9 @@ Config.define("theme", "character_create_help_y", float, 0.73)
 Config.define("theme", "character_create_help_scale", float, 0.0018)
 Config.define("theme", "character_create_option_x", float, 0.75)
 Config.define("theme", "character_create_option_font", str, "font")
+Config.define("theme", "character_create_font_color", str, "#FFFFFF")
+Config.define("theme", "character_create_select_color", str, "#FFBF00")
+Config.define("theme", "character_create_help_color", str, "#FFFFFF")
 Config.define("theme", "character_create_help_font", str, "loadingFont")
 Config.define("theme", "character_create_scale", float, .0018)
 Config.define("theme", "character_create_space", float, .045)
@@ -437,9 +443,15 @@ lobbySelectImageY = None
 lobbySelectScale = None
 lobbySelectSpace = None
 lobbySelectFont = None
+lobbyFontColor = None
+lobbySelectColor = None
+lobbyDisableColor = None
 characterCreateX = None
 characterCreateY = None
 characterCreateOptionX = None
+characterCreateFontColor = None
+characterCreateSelectColor = None
+characterCreateHelpColor = None
 characterCreateHelpX = None
 characterCreateHelpY = None
 characterCreateHelpScale = None
@@ -913,6 +925,8 @@ def setupLobby(config):
   global lobbyTitleFont, lobbySelectX, lobbySelectY, lobbySelectFont, characterCreateX, characterCreateY
   global characterCreateOptionX, characterCreateScale, characterCreateSpace, characterCreateHelpFont
   global characterCreateOptionFont, characterCreateHelpX, characterCreateHelpScale
+  global characterCreateFontColor, characterCreateSelectColor, characterCreateHelpColor
+  global lobbyFontColor, lobbySelectColor, lobbyDisableColor
   
   controlActivateX = config.get("theme", "control_activate_x")
   controlActivateSelectX = config.get("theme", "control_activate_select_x")
@@ -947,9 +961,15 @@ def setupLobby(config):
   lobbySelectScale = config.get("theme", "lobby_select_scale")
   lobbySelectSpace = config.get("theme", "lobby_select_space")
   lobbySelectFont = config.get("theme", "lobby_select_font")
+  lobbyFontColor = hexToColor(config.get("theme", "lobby_font_color"))
+  lobbySelectColor = hexToColor(config.get("theme", "lobby_select_color"))
+  lobbyDisableColor = hexToColor(config.get("theme", "lobby_disable_color"))
   characterCreateX = config.get("theme", "character_create_x")
   characterCreateY = config.get("theme", "character_create_y")
   characterCreateOptionX = config.get("theme", "character_create_option_x")
+  characterCreateFontColor = hexToColor(config.get("theme", "character_create_font_color"))
+  characterCreateSelectColor = hexToColor(config.get("theme", "character_create_select_color"))
+  characterCreateHelpColor = hexToColor(config.get("theme", "character_create_help_color"))
   characterCreateHelpX = config.get("theme", "character_create_help_x")
   characterCreateHelpY = config.get("theme", "character_create_help_y")
   characterCreateHelpScale = config.get("theme", "character_create_help_scale")

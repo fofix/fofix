@@ -445,16 +445,20 @@ class Lobby(Layer, KeyListener, MessageHandler):
           if self.itemSelect:
             self.engine.drawImage(self.itemSelect, scale = (.5,-.5), coord = (w*Theme.lobbySelectImageX,h*(1-(Theme.lobbySelectImageY+Theme.lobbySelectSpace*(i-self.pos[0]))/self.engine.data.fontScreenBottom)))
           else:
-            Theme.setSelectedColor(1-v)
+            r, g, b = Theme.lobbySelectColor
+            glColor3f(r, g, b)
         else:
           if i in self.blockedItems and i != 1:
-            glColor3f(.4, .4, .4)
+            r, g, b = Theme.lobbyDisableColor
+            glColor3f(r, g, b)
           else:
             if i == self.selected:
               if self.itemSelect:
-                Theme.setBaseColor(1-v)
+                r, g, b = Theme.lobbyFontColor
+                glColor3f(r, g, b)
             else:
-              Theme.setBaseColor(1-v)
+              r, g, b = Theme.lobbyFontColor
+              glColor3f(r, g, b)
         if i == 1:
           wText, hText = titleFont.getStringSize(name, scale = Theme.lobbySelectScale)
           titleFont.render(name, (Theme.lobbySelectX-wText, Theme.lobbySelectY + (Theme.lobbySelectSpace*(i-self.pos[0]))), scale = Theme.lobbySelectScale)
@@ -790,13 +794,18 @@ class CreateCharacter(Layer, KeyListener):
         wFactor = 640.000/self.background.width1()
         self.engine.drawImage(self.background, scale = (wFactor,-wFactor), coord = (w/2,h/2))
       for i, option in enumerate(self.options):
-        Theme.setBaseColor(1-v)
+        r, g, b = Theme.characterCreateHelpColor
+        glColor3f(r, g, b)
         cursor = ""
         if self.selected == i:
           wText, hText = helpFont.getStringSize(option[1], scale = Theme.characterCreateScale)
           helpFont.render(option[1], (Theme.characterCreateHelpX-(wText/2), Theme.characterCreateHelpY-hText), scale = Theme.characterCreateHelpScale)
-          Theme.setSelectedColor(1-v)
+          r, g, b = Theme.characterCreateSelectColor
+          glColor3f(r, g, b)
           cursor = self.cursor
+        else:
+          r, g, b = Theme.characterCreateFontColor
+          glColor3f(r, g, b)
         wText, hText = font.getStringSize(option[0], scale = Theme.characterCreateScale)
         font.render(option[0], (Theme.characterCreateX, Theme.characterCreateY+Theme.characterCreateSpace*i), scale = Theme.characterCreateScale)
         if self.active and self.selected == i:
