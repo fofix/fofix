@@ -8,6 +8,11 @@
 "data\versiontag.png"//taggin
 "wiki\*.*"//all wiki pages
 //-------Additional files required over 3.100--------
+"data\Shaders\*.*"
+"data\users\controllers\defaultd.ini"
+"data\users\controllers\defaultg.ini"
+"data\users\players\default.ini"
+"data\users\players\default.png"
 //-------Additional / updated compiled .PYDs required over 3.100--------
 "data\_compiled_base.pyd"//new
 "data\_ctypes.pyd"//new

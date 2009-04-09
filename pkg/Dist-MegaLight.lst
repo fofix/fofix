@@ -27,4 +27,8 @@
 "data\sounds\*.*"//all base sounds
 "data\tutorials\jurgenfof\*.*"//all of the original Jurgen FoF tutorial
 "data\tutorials\drumtest\*.*"//all of the Drum Test Song
-
+"data\Shaders\*.*"
+"data\users\controllers\defaultd.ini"
+"data\users\controllers\defaultg.ini"
+"data\users\players\default.ini"
+"data\users\players\default.png"

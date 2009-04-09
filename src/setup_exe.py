@@ -44,6 +44,7 @@ if int(OpenGL.__version__[0]) > 2:
     "OpenGL.arrays.numpymodule",
     "OpenGL.arrays.lists",
     "OpenGL.arrays.numbers",
+    "OpenGL.arrays.strings",  #stump: needed by shader code
   ]
 if tuple(int(i) for i in pygame.__version__[:5].split('.')) >= (1, 9, 0):
   extraIncludes += [
@@ -139,10 +140,15 @@ py2exe.build_exe.isSystemDLL = isSystemDLL
 
 #evilynux: Grab version info from Version class
 def setupWindows():
-  setup(version = Version.VERSION,
-        description = "Rockin' it Oldskool!",
-        name = Version.appNameSexy(),
-        url = Version.URL,
+  setup(#stump: these arguments interfere with the version tagging code,
+        #  but they don't really do anything important anyway.  When the
+        #  version tagging code was modified, they suddenly became a valid
+        #  source of info for py2exe to synthesize a version info resource
+        #  of its own, which supersedes the one specified further down.
+        #version = Version.VERSION,
+        #description = "Rockin' it Oldskool!",
+        #name = Version.appNameSexy(),
+        #url = Version.URL,
         windows = [
           {
             "script":          "FretsOnFire.py",

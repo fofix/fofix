@@ -127,7 +127,8 @@ class Video:
     try:
       Shader.list.build(dir)
     except:
-      Log.warn("Shader program compilation error!")
+      #stump: Log.error so the traceback gets logged as well
+      Log.error("Shader program compilation error!")
     else:
       Shader.list.setVar("mult",0.1,False,"neck")
       Shader.list.setVar("fade",0.7,False,"neck")
