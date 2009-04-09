@@ -44,6 +44,7 @@ Then use any of the following settings below the {{{[theme]}}} header in the the
 ||character_create_y = 0.15||  Controls Y position of the character creation screen text menu items.||
 ||lobby_disable_color = #666666|| Controls color value. Use a Hex Color Value.||
 ||lobby_font_color = #FFFFFF || Controls the lobby font color. Use a Hex Color Value.||
+||lobby_info_color = #FFFFFF || Controls the lobby info color. Use a Hex Color Value. ||
 ||lobby_preview_x = 0.3|| Controls Player image and info below image in Lobby||
 ||lobby_select_color = #FFBF00|| Controls the lobby select color. Use a Hex Color Value.||
 ||lobby_select_x = 0.9||  Controls X Position of player list text in Lobby||
@@ -53,6 +54,7 @@ Then use any of the following settings below the {{{[theme]}}} header in the the
 ||lobby_select_image_y = 0.355||  Controls Y Position of the 'SELECT' image in Lobby||
 ||lobby_select_scale = 0.0018||  Controls the scale size of the Players list in Lobby||
 ||lobby_select_space = 0.04||  Controls the line-spacing between the names in the player's list in Lobby.||
+||lobby_title_color = #FFFFFF|| Controls the lobby title color. Use a Hex Color Value. ||
 ||lobby_title_x = 1||   Controls "Choose Your Character" text X pos in Lobby||
 ||lobby_title_y = 0.24||   Controls "Choose Your Character" text Y pos in Lobby|| 
 ||lobby_title_character_x = 0.26||   Controls "Player 1/2" Text  X Pos in Lobby||
