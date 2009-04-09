@@ -1,5 +1,5 @@
 #summary How to set up a Python 2.6 environment for FoFiX.
-#labels Phase-Implementation
+#labels Phase-Deployment
 <wiki:toc max_depth="2" />
 = Introduction =
 

@@ -1,5 +1,5 @@
 #summary Instructions on downloading and installing FoFiX
-#labels Phase-Deploy,Featured
+#labels Phase-Deployment,Featured
 <wiki:toc max_depth="2" />
 = Basic Instructions =
 

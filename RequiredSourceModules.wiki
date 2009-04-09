@@ -1,5 +1,5 @@
 #summary How to set up required source modules to compile FoFiX
-#labels Featured,Phase-Implementation
+#labels Featured,Phase-Deployment
 <wiki:toc max_depth="2" />
 =Checking out the latest code anonymously=
 (requires a Subversion client, such as [http://tortoisesvn.net/ TortoiseSVN], to check out and receive easy updates of the latest FoFiX source code)
