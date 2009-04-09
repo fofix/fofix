@@ -130,7 +130,12 @@ class Menu(Layer, KeyListener):
     
     if self.name and self.useGraphics > 0:
       try:
-        self.engine.loadImgDrawing(self, "menuBackground", os.path.join("themes",self.themename,"menu","%s.png" % self.name))
+        try:
+          self.engine.loadImgDrawing(self, "menuBackground", os.path.join("themes",self.themename,"menu","%s.png" % self.name))
+          if self.menuBackground.height1() == 1:
+            self.menuBackground = None
+        except IOError:
+          self.menuBackground = None
         self.gfxText = "%stext%d" % (self.name, len(choices))
         self.engine.loadImgDrawing(self, "menuText", os.path.join("themes",self.themename,"menu","%s.png" % self.gfxText))
         self.graphicMenu = True
@@ -301,6 +306,10 @@ class Menu(Layer, KeyListener):
       return
 
     self.active = True
+    if self.graphicMenu and self.menuBackground:
+      self.engine.graphicMenuShown = True
+    else:
+      self.engine.graphicMenuShown = False
     
     self.engine.view.setOrthogonalProjection(normalize = True)
     try:
@@ -317,14 +326,8 @@ class Menu(Layer, KeyListener):
       wS, hS = self.engine.view.geometry[2:4]
         
       if self.graphicMenu and self.menuBackground:
-        imgwidth = self.menuBackground.width1()
-        wfactor = 640.000/imgwidth
-        self.menuBackground.transform.reset()
-        self.menuBackground.transform.translate(wS/2,hS/2)
-        self.menuBackground.transform.scale(wfactor,-wfactor)
-        self.menuBackground.draw()
-        #volshebnyi - better menu scaling - but not compatible with current
-        #self.engine.drawImage(self.menuBackground, scale = (1.0,-1.0), coord = (wS/2,hS/2), stretched = 3)
+        #volshebnyi - better menu scaling
+        self.engine.drawImage(self.menuBackground, scale = (1.0,-1.0), coord = (wS/2,hS/2), stretched = 3)
       else:
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)

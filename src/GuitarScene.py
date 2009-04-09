@@ -5714,11 +5714,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             
               if self.pause:
                 self.engine.view.setViewport(1,0)
-                self.engine.drawImage(self.pauseScreen, scale = (self.pause_bkg[2], -self.pause_bkg[3]), coord = (w*self.pause_bkg[0],h*self.pause_bkg[1]), stretched = 3)
+                if self.engine.graphicMenuShown == False:
+                  self.engine.drawImage(self.pauseScreen, scale = (self.pause_bkg[2], -self.pause_bkg[3]), coord = (w*self.pause_bkg[0],h*self.pause_bkg[1]), stretched = 3)
                 
               if self.finalFailed and self.song:
                 self.engine.view.setViewport(1,0)
-                self.engine.drawImage(self.failScreen, scale = (self.fail_bkg[2], -self.fail_bkg[3]), coord = (w*self.fail_bkg[0],h*self.fail_bkg[1]), stretched = 3)
+                if self.engine.graphicMenuShown == False:
+                  self.engine.drawImage(self.failScreen, scale = (self.fail_bkg[2], -self.fail_bkg[3]), coord = (w*self.fail_bkg[0],h*self.fail_bkg[1]), stretched = 3)
     
 
                 text = Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
@@ -6567,11 +6569,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               
               if self.pause:
                 self.engine.view.setViewport(1,0)
-                self.engine.drawImage(self.pauseScreen, scale = (self.pause_bkg[2], -self.pause_bkg[3]), coord = (w*self.pause_bkg[0],h*self.pause_bkg[1]), stretched = 3)
+                if self.engine.graphicMenuShown == False:
+                  self.engine.drawImage(self.pauseScreen, scale = (self.pause_bkg[2], -self.pause_bkg[3]), coord = (w*self.pause_bkg[0],h*self.pause_bkg[1]), stretched = 3)
                 
               if self.finalFailed and self.song:
                 self.engine.view.setViewport(1,0)
-                self.engine.drawImage(self.failScreen, scale = (self.fail_bkg[2], -self.fail_bkg[3]), coord = (w*self.fail_bkg[0],h*self.fail_bkg[1]), stretched = 3) 
+                if self.engine.graphicMenuShown == False:
+                  self.engine.drawImage(self.failScreen, scale = (self.fail_bkg[2], -self.fail_bkg[3]), coord = (w*self.fail_bkg[0],h*self.fail_bkg[1]), stretched = 3) 
     
                 # evilynux - Closer to actual GH3
                 font = self.engine.data.pauseFont
@@ -7133,11 +7137,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             
               if self.pause:
                 self.engine.view.setViewport(1,0)
-                self.engine.drawImage(self.pauseScreen, scale = (self.pause_bkg[2], -self.pause_bkg[3]), coord = (w*self.pause_bkg[0],h*self.pause_bkg[1]), stretched = 3)
+                if self.engine.graphicMenuShown == False:
+                  self.engine.drawImage(self.pauseScreen, scale = (self.pause_bkg[2], -self.pause_bkg[3]), coord = (w*self.pause_bkg[0],h*self.pause_bkg[1]), stretched = 3)
                 
               if self.finalFailed and self.song:
                 self.engine.view.setViewport(1,0)
-                self.engine.drawImage(self.failScreen, scale = (self.fail_bkg[2], -self.fail_bkg[3]), coord = (w*self.fail_bkg[0],h*self.fail_bkg[1]), stretched = 3)
+                if self.engine.graphicMenuShown == False:
+                  self.engine.drawImage(self.failScreen, scale = (self.fail_bkg[2], -self.fail_bkg[3]), coord = (w*self.fail_bkg[0],h*self.fail_bkg[1]), stretched = 3)
     
                 text = Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
                 size = font.getStringSize(text)
@@ -7609,11 +7615,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             
               if self.pause:
                 self.engine.view.setViewport(1,0)
-                self.engine.drawImage(self.pauseScreen, scale = (self.pause_bkg[2], -self.pause_bkg[3]), coord = (w*self.pause_bkg[0],h*self.pause_bkg[1]), stretched = 3)
+                if self.engine.graphicMenuShown == False:
+                  self.engine.drawImage(self.pauseScreen, scale = (self.pause_bkg[2], -self.pause_bkg[3]), coord = (w*self.pause_bkg[0],h*self.pause_bkg[1]), stretched = 3)
                 
               if self.finalFailed and self.song:
                 self.engine.view.setViewport(1,0)
-                self.engine.drawImage(self.failScreen, scale = (self.fail_bkg[2], -self.fail_bkg[3]), coord = (w*self.fail_bkg[0],h*self.fail_bkg[1]), stretched = 3)
+                if self.engine.graphicMenuShown == False:
+                  self.engine.drawImage(self.failScreen, scale = (self.fail_bkg[2], -self.fail_bkg[3]), coord = (w*self.fail_bkg[0],h*self.fail_bkg[1]), stretched = 3)
     
                 # evilynux - Closer to actual GH3
                 font = self.engine.data.pauseFont

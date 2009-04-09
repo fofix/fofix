@@ -594,6 +594,7 @@ class GameEngine(Engine):
     self.debugLayer         = None
     self.startupLayer       = None
     self.loadingScreenShown = False
+    self.graphicMenuShown   = False
     
     # evilynux - Printing on the console with a frozen binary may cause a crash.
     if hasattr(sys, "frozen"):
