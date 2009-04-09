@@ -1,4 +1,5 @@
 #summary List of Usable Images for FoFiX Themes.
+#labels Phase-ThemeMaking
 
 <wiki:comment>
 What I wouldn't give for a WYSIWYG editor...

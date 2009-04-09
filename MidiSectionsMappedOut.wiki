@@ -1,4 +1,6 @@
 #summary This is to Keep track of the MIDI file section markings.
+#labels Phase-SongFretting
+
 <wiki:toc max_depth="1" />
 ---------------------------------------------
 =GUITAR PARTS=

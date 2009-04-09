@@ -1,4 +1,6 @@
 #summary These are all the Theme.ini settings usable.
+#labels Phase-ThemeMaking
+
 First, you need to create a 'theme.ini' file in your theme's folder. Once you create the file you need to type this header at the very top of this file:
 
 _{{{[theme]}}}_

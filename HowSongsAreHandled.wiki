@@ -1,4 +1,5 @@
 #summary How Songs Are Handled.
+#labels Phase-SongFretting
 
 --------------------------------------------------------------------
 =*How Song Files Are Handled With FoFiX*=

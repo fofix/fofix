@@ -1,4 +1,6 @@
 #summary How to get game controllers to work
+#labels Phase-Support
+
 <wiki:toc max_depth="2" />
 = Introduction =
 Do you own a Guitar Hero or Rock Band controller for the PS2, PS3, Wii or Xbox 360?
