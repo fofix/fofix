@@ -1569,6 +1569,7 @@ class SongChooser(Layer, KeyListener):
       glDisable(GL_TEXTURE_2D)
       
     
+    
     if Shader.list.enable("cd"):
       self.cassette.render("Mesh_001")
       Shader.list.disable()

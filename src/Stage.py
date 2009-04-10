@@ -571,20 +571,24 @@ class Stage(object):
     if Shader.list.enable("stage"):
       height=(2*Shader.list.var["color"][3]+6*Shader.list.var["drumcolor"][3])**2
       Shader.list.setVar("height",2*height)
-      col1 = Shader.list.getVar("color")
+      Shader.list.setVar("solofx",False)
+      Shader.list.setVar("scalexy",(1.6,1.2))
+      Shader.list.setVar("offset",(0.0,-2.5))
+      col1 = Shader.list.var["eqcolor"]
       col2 = Shader.list.var["color"]
       col3 = Shader.list.var["drumcolor"]
       col=()
       for i in range(3):
        col += (0.97 * col1[i] + 0.03 * col2[i] + 0.03 * col3[i],)
       col+=((col[0]+col[1]+col[2])/3.0,)
+      Shader.list.var["eqcolor"]=col
       Shader.list.setVar("color",col)
       Shader.list.setVar("glowStrength",20+height*20.0)
       glBegin(GL_TRIANGLE_STRIP)
-      glVertex2f(-0.7, 0.0)
-      glVertex2f(0.7, 0.0)
-      glVertex2f(-0.7, 1.0)
-      glVertex2f(0.7, 1.0)
+      glVertex3f(-2.0, 2.0,0.0)
+      glVertex3f(2.0, 2.0,0.0)
+      glVertex3f(-2.0, 3.0,0.0)
+      glVertex3f(2.0, 3.0,0.0)
       glEnd()    
       Shader.list.disable()
       

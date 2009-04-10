@@ -294,7 +294,9 @@ class shaderList:
   def reset(self):
     self.var["color"]=(0.0,)*4      #color for guitar neck flashing
     self.var["drumcolor"]=(0.0,)*4  #color for drum neck flashing
+    self.var["eqcolor"]=(0.0,)*4    #color for equalizer
     self.var["drum"]=[-10.0]*5      #last fret note hit time
     self.var["fret"]=[-10.0]*5      #last drum note hit time
+    
     
 list = shaderList()
