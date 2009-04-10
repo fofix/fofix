@@ -571,6 +571,7 @@ class Stage(object):
     if Shader.list.enable("stage"):
       height=(2*Shader.list.var["color"][3]+6*Shader.list.var["drumcolor"][3])**2
       Shader.list.setVar("height",2*height)
+      Shader.list.setVar("ambientGlow",height)
       Shader.list.setVar("solofx",False)
       Shader.list.setVar("scalexy",(1.6,1.2))
       Shader.list.setVar("offset",(0.0,-2.5))
@@ -594,3 +595,5 @@ class Stage(object):
       
     self.scene.renderGuitar()
     self._renderLayers(self.foregroundLayers, visibility)
+    
+    

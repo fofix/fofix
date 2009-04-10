@@ -117,31 +117,5 @@ class Video:
 
   def getVideoModes(self):
     return pygame.display.list_modes()
-    
-  def setShaders(self, dir):
-    try:
-      Shader.multiTex = (GL_TEXTURE0_ARB,GL_TEXTURE1_ARB,GL_TEXTURE2_ARB,GL_TEXTURE3_ARB)
-    except:
-      Shader.multiTex = (0,0,0,0)
-      Log.warn("Multitexturing failed. Upgrade to PyOpenGL 3.00!")
-    try:
-      Shader.list.build(dir)
-    except:
-      Log.warn("Shader program compilation error!")
-      #print "Shader error!"
-    else:
-      if Shader.list.shaders!={}:
-        #print "Shaders ready"
-        Shader.list.makeNoise3D(16)
-        Shader.list["stage"]["tex"]=(Shader.list.noise3D,)
-        Shader.list.setVar("ambientGlow",0.0,"stage")
-        Shader.list.setVar("color",(0.0,0.0,0.0,0.0),"stage")
-        Shader.list.setVar("glowStrength",0.0,"stage")
-        Shader.list.setVar("ambientGlowHeightScale",1.68,"stage")
-        Shader.list.setVar("glowFallOff",0.024,"stage")
-        Shader.list.setVar("height",0.44,"stage")
-        Shader.list.setVar("sampleDist",0.0076,"stage")
-        Shader.list.setVar("speed",1.86,"stage")
-        Shader.list.setVar("vertNoise",0.78,"stage")
-        Shader.list.setVar("scale",1.7,"stage")
-        Shader.list.setVar("offset",(0.0,-0.8),"stage")
+
+

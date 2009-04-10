@@ -31,8 +31,7 @@ import sys
 import string
 import random
 import time
-
-multiTex = None
+import Log
 
 class shaderList:
   def __init__(self, dir = ""):
@@ -44,6 +43,7 @@ class shaderList:
     self.noise3D = 0
     self.noise2D = 0
     self.noise1D = 0
+    self.workdir = "Data\\Shaders"
     self.var = {}
     time.clock()
     self.build(dir)
@@ -70,6 +70,25 @@ class shaderList:
       return True
     else:
       return False
+      
+  def make(self,fname = "", name = ""):
+    if fname == "": return False
+    if name == "": name = fname
+    fullname = os.path.join(self.workdir, fname)
+    Log.debug("Compiling " + fname + " shader.")
+    try:
+      program = self.compile(open(fullname+".vs"), open(fullname+".ps"))
+    except:
+      Log.error("Error occured during compilation.")
+      return False
+    else:
+      sArray = {"program": program, "name": name, "tex" : (), "textype" : ()}
+      self.lastCompiled = name
+      self.getVars(fullname+".vs", program, sArray)
+      self.getVars(fullname+".ps", program, sArray)
+      self.shaders[name] = sArray
+      return True
+
           
   def compileShader(self, source, shaderType):
     """Compile shader source of given type"""
@@ -163,7 +182,7 @@ class shaderList:
   def enable(self, shader):
     try:
       glUseProgramObjectARB(self[shader]["program"])
-      self.active = dict(self.shaders[shader])
+      self.active = self.shaders[shader]
       self.setTextures()
       self.setVar("time",self.time())
       self.update()
@@ -207,11 +226,15 @@ class shaderList:
   def setTextures(self, program = None):
     if program == None: program = self.active
     j = 0
-    for i in program["tex"]:
-      if len(program["tex"]) > 1 and multiTex[j] != 0:
-        glActiveTexture (multiTex[j])
-      glBindTexture(program["textype"][j], i) 
-      j += 1
+    if type(program["tex"]) == tuple:
+      for i in program["tex"]:
+        if len(program["tex"]) > 1 and multiTex[j] != 0:
+          glActiveTexture (multiTex[j])
+        glBindTexture(program["textype"][j], i) 
+        j += 1
+    else:
+      print type(program["tex"])
+      glBindTexture(program["textype"][0], program["tex"]) 
       
   def makeNoise3D(self,size=32, c = 1, type = GL_RED):
     texels=[]
@@ -298,5 +321,68 @@ class shaderList:
     self.var["drum"]=[-10.0]*5      #last fret note hit time
     self.var["fret"]=[-10.0]*5      #last drum note hit time
     
+  def set(self, dir):
+    self.workdir = dir
+    self.makeNoise3D(16)
+    try:
+      multiTex = (GL_TEXTURE0_ARB,GL_TEXTURE1_ARB,GL_TEXTURE2_ARB,GL_TEXTURE3_ARB)
+    except:
+      multiTex = (0,0,0,0)
+      Log.warn("Multitexturing failed. Upgrade to PyOpenGL 3.00!")  
     
+    if self.make("lightning","stage"):
+      self.enable("stage")
+      self["stage"]["tex"]=(self.noise3D,)
+      self.setVar("ambientGlowHeightScale",6.0)
+      self.setVar("color",(0.0,0.0,0.0,0.0))
+      self.setVar("glowStrength",0.0,"stage")
+      self.setVar("glowFallOff",0.024)
+      self.setVar("height",0.44)
+      self.setVar("sampleDist",0.0076)
+      self.setVar("speed",1.86)
+      self.setVar("vertNoise",0.78)
+      self.setVar("solofx",False)
+      self.setVar("scalexy",(1.6,1.2))
+      self.setVar("offset",(0.0,-2.5))
+      self.disable()
+      
+    if self.make("lightning","sololight"):
+      self.enable("sololight")
+      self["sololight"]["tex"]=(self.noise3D,)
+      self.setVar("scalexy",(5.0,1.0))
+      self.setVar("ambientGlow",0.5)
+      self.setVar("ambientGlowHeightScale",6.0)
+      self.setVar("solofx",True)
+      self.setVar("height",0.3)
+      self.setVar("glowFallOff",0.024)
+      self.setVar("sampleDist",0.0076)
+      self.setVar("speed",1.86)
+      self.setVar("vertNoise",0.78)
+      self.setVar("solofx",True)
+      self.setVar("color",(0.3,0.7,0.9,0.6))
+      self.setVar("glowStrength",100.0)  
+      self.disable()
+      
+    if self.make("lightning","tail"):
+      self.enable("tail")
+      self["tail"]["tex"]=(self.noise3D,)
+      self.setVar("scalexy",(5.0,1.0))
+      self.setVar("ambientGlow",0.5)
+      self.setVar("ambientGlowHeightScale",6.0)
+      self.setVar("solofx",True)
+      self.setVar("height",0.3)
+      self.setVar("glowFallOff",0.024)
+      self.setVar("sampleDist",0.0076)
+      self.setVar("speed",1.86)
+      self.setVar("vertNoise",0.78)
+      self.setVar("solofx",True)
+      self.setVar("color",(0.3,0.7,0.9,0.6))
+      self.setVar("glowStrength",100.0)  
+      self.disable()
+      
+    self.make("neck","neck")
+    
+    self.make("cd","cd")
+  
+multiTex = None
 list = shaderList()

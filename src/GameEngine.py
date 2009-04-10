@@ -55,6 +55,7 @@ import Theme
 import Version
 import Mod
 import Player
+import Shader
 
 # evilynux - Grab name and version from Version class.
 version = "%s v%s" % ( Version.appNameSexy(), Version.version() )
@@ -477,10 +478,9 @@ class GameEngine(Engine):
     fullscreen    = self.config.get("video", "fullscreen")
     multisamples  = self.config.get("video", "multisamples")
     self.video.setMode((width, height), fullscreen = fullscreen, multisamples = multisamples)
+    
     if self.config.get("video", "use_shaders"):
-      self.video.setShaders(os.path.join(Version.dataPath(), "Shaders"))
-    else: 
-      self.video.setShaders("")
+      Shader.list.set(os.path.join(Version.dataPath(), "Shaders"))
 
     # Enable the high priority timer if configured
     if self.priority:
