@@ -1,4 +1,5 @@
 #summary This is to explain in detail how to make shaders.
+#labels Phase-Implementation
 
 This is WIP until it's finished. This was all grabbed from Volshebnyi from the forum thread.
 
@@ -125,3 +126,8 @@ void main()
 ==Vectors, Colors, Textures==
 
 *WIP*
+
+== Shader Development Environment ==
+You can use a GLSL IDE to create your shader files and preview the effects.
+
+  * [http://lumina.sourceforge.net Lumina], a free crossplatform development environment for GLSL shaders.
