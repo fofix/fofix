@@ -958,26 +958,26 @@ class Guitar:
       if self.isFailing:
         self.renderNeckMethod(self.failcount*self.neckAlpha[5], 0, beatsPerUnit, self.failNeck)
         
-    if self.guitarSolo:   
+    if self.guitarSolo and self.theme == 1:   
       if Shader.list.enable("stage"):
-        Shader.list.setVar("scalexy",(5.0,0.5))
+        Shader.list.setVar("scalexy",(5.0,1.0))
         Shader.list.setVar("solofx",True)
         Shader.list.setVar("height",0.3)
-        Shader.list.setVar("color",(0.3,0.9,1.0,0.8))
+        Shader.list.setVar("color",(0.3,0.7,0.9,0.8))
         Shader.list.setVar("glowStrength",100.0)
         Shader.list.setVar("offset",(-3.5,-w/2))
         glBegin(GL_TRIANGLE_STRIP)
-        glVertex3f(w / 2-0.3, 0.1, -2)
+        glVertex3f(w / 2-0.3, 0.4, -2)
         glVertex3f(w / 2+0.3, 0.4, -2)
-        glVertex3f(w / 2-0.3, 0.1, l)
+        glVertex3f(w / 2-0.3, 0.4, l)
         glVertex3f(w / 2+0.3, 0.4, l)
         glEnd()   
         Shader.list.setVar("offset",(-3.5,w/2))
         glBegin(GL_TRIANGLE_STRIP)
         glVertex3f(-w / 2-0.3, 0.4, -2)
-        glVertex3f(-w / 2+0.3, 0.1, -2)
+        glVertex3f(-w / 2+0.3, 0.4, -2)
         glVertex3f(-w / 2-0.3, 0.4, l)
-        glVertex3f(-w / 2+0.3, 0.1, l)
+        glVertex3f(-w / 2+0.3, 0.4, l)
         glEnd()  
         Shader.list.disable()
 
