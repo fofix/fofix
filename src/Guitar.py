@@ -958,7 +958,7 @@ class Guitar:
       if self.isFailing:
         self.renderNeckMethod(self.failcount*self.neckAlpha[5], 0, beatsPerUnit, self.failNeck)
         
-    if self.guitarSolo and self.theme == 1:   
+    if (self.guitarSolo or self.starPowerActive) and self.theme == 1:   
       if Shader.list.enable("stage"):
         Shader.list.setVar("scalexy",(5.0,1.0))
         Shader.list.setVar("solofx",True)

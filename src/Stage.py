@@ -573,7 +573,7 @@ class Stage(object):
       Shader.list.setVar("height",2*height)
       Shader.list.setVar("solofx",False)
       Shader.list.setVar("scalexy",(1.6,1.2))
-      Shader.list.setVar("offset",(0.0,-2.5))
+      Shader.list.setVar("offset",(0.0,-3.0))
       col1 = Shader.list.var["eqcolor"]
       col2 = Shader.list.var["color"]
       col3 = Shader.list.var["drumcolor"]
@@ -585,10 +585,10 @@ class Stage(object):
       Shader.list.setVar("color",col)
       Shader.list.setVar("glowStrength",20+height*20.0)
       glBegin(GL_TRIANGLE_STRIP)
-      glVertex3f(-2.0, 2.0,0.0)
-      glVertex3f(2.0, 2.0,0.0)
-      glVertex3f(-2.0, 3.0,0.0)
-      glVertex3f(2.0, 3.0,0.0)
+      glVertex3f(-2.0, 2.5,0.0)
+      glVertex3f(2.0, 2.5,0.0)
+      glVertex3f(-2.0, 3.5,0.0)
+      glVertex3f(2.0, 3.5,0.0)
       glEnd()    
       Shader.list.disable()
       
