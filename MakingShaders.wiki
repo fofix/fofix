@@ -121,11 +121,59 @@ void main()
   gl_FragColor = vec4(1.0,0.0,1.0,alpha);   
 }
 }}}
-4) Now CD's will blink.
+4) Now CDs will blink.
 
-==Vectors, Colors, Textures==
+==Vectors, Colors==
 
-*WIP*
+Vector types are like list type in python.  There are 9 of them: 
+vec2,vec3,vec4 (n-dimensional float vector), 
+ivec2,ivec3,ivec4, (integer)
+bvec2, bvec3, bvec4, (boolean)
+{{{
+vec3 myvect; // don't forget!
+myvect = vec3(1.0,2.0,3.0); // myvect = (1.0,2.0,3.0); - wrong!!!
+myvect.x = 1.5; // myvect = vec3(1.5,2.0,3.0);
+myvect.xz = myvect.zy; // myvect = vec3(3.0,2.0,2.0);
+vec4 newvect = vec4(myvect.xy*2, 0.0, myvect.x); // vec4 newvect = vec4(6.0,4.0,0.0,3.0);
+gl_Position = newvect; // only for vertex shader!
+}}}
+
+How to use your vector in shader.
+In shader program (myshader.vs):
+{{{
+uniform vec3 vect1;
+uniform ivec4 vect2;
+}}}
+In python script:
+{{{
+Shader.list.setVar("vect1",(0.1,0.2,0.3),"myshader")
+#if shader is enabled:
+#Shader.list.setVar("vect1",(0.1,0.2,0.3))
+Shader.list.setVar("vect2",(4,3,2,1),"myshader")
+print Shader.list.getVar("vect1","myshader")
+}}}
+
+Color is vec4:
+{{{
+vec4 color = vec4(0.8,0.5,0.3,1.0); // red,green,blue,alpha
+vec2 myvec = color.br; // vec2 myvec = (0.3,0.8);
+color.a = (color.r+color.g+color.b)/3.0;
+gl_FragColor = color; //only for fragment shader!
+}}}
+
+Uniform usage.
+
+In shader program (myshader.vs):
+{{{
+uniform vec4 color;
+}}}
+
+In python script:
+{{{
+Shader.list.setVar("vect1",(1.0,1.0,0.0,1.0),"myshader") #yellow
+}}}
+
+==Textures==
 
 == Shader Development Environment ==
 You can use a GLSL IDE to create your shader files and preview the effects.
