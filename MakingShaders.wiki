@@ -179,4 +179,4 @@ Shader.list.setVar("vect1",(1.0,1.0,0.0,1.0),"myshader") #yellow
 You can use a GLSL IDE to create your shader files and preview the effects.
 
   * [http://lumina.sourceforge.net Lumina], a free crossplatform development environment for GLSL shaders.
-  * [http://developer.amd.com/gpu/rendermonkey/Pages/default.aspx], rich shader development environment, you can import shaders from it.
+  * [http://developer.amd.com/gpu/rendermonkey/Pages/default.aspx RenderMonkey], rich shader development environment (you can import shaders from it).
