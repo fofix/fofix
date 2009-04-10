@@ -128,20 +128,20 @@ class Video:
       Shader.list.build(dir)
     except:
       Log.warn("Shader program compilation error!")
-      print "!!!"
+      #print "Shader error!"
     else:
-      Shader.list.makeNoise3D(16)
-      
       if Shader.list.shaders!={}:
+        #print "Shaders ready"
+        Shader.list.makeNoise3D(16)
         Shader.list["stage"]["tex"]=(Shader.list.noise3D,)
-      Shader.list.setVar("ambientGlow",0.0,"stage")
-      Shader.list.setVar("color",(0.0,0.0,0.0,0.0),"stage")
-      Shader.list.setVar("glowStrength",0.0,"stage")
-      Shader.list.setVar("ambientGlowHeightScale",1.68,"stage")
-      Shader.list.setVar("glowFallOff",0.024,"stage")
-      Shader.list.setVar("height",0.44,"stage")
-      Shader.list.setVar("sampleDist",0.0076,"stage")
-      Shader.list.setVar("speed",1.86,"stage")
-      Shader.list.setVar("vertNoise",0.78,"stage")
-      Shader.list.setVar("scale",1.7,"stage")
-      Shader.list.setVar("offset",(0.0,-0.8),"stage")
+        Shader.list.setVar("ambientGlow",0.0,"stage")
+        Shader.list.setVar("color",(0.0,0.0,0.0,0.0),"stage")
+        Shader.list.setVar("glowStrength",0.0,"stage")
+        Shader.list.setVar("ambientGlowHeightScale",1.68,"stage")
+        Shader.list.setVar("glowFallOff",0.024,"stage")
+        Shader.list.setVar("height",0.44,"stage")
+        Shader.list.setVar("sampleDist",0.0076,"stage")
+        Shader.list.setVar("speed",1.86,"stage")
+        Shader.list.setVar("vertNoise",0.78,"stage")
+        Shader.list.setVar("scale",1.7,"stage")
+        Shader.list.setVar("offset",(0.0,-0.8),"stage")
