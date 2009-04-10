@@ -1,5 +1,127 @@
 #summary This is to explain in detail how to make shaders.
 
-This is WIP until it's finished.
+This is WIP until it's finished. This was all grabbed from Volshebnyi from the forum thread.
 
-(Worldrave is working on now.)
+What is a shader?!
+A Shader is a small program, which affects every vertex and pixel of object. There are two parts of shader: vertex shader (this one can transform any surface, for example, it can make neck wavy) and pixel (fragment) shader (it can change color of every pixel on the screen). Vertex shader + pixel shader = shader program.
+
+==How to create shader==
+There are many shader languages. The only true is GLSL. It's C-like and easy to use language. You must compile shader before you can use it in program. Let's make a simple shader program.
+1) Go to FoFiX\Data\Shaders\ and create two files: "myshader.ps" and "myshader.vs"
+
+2) Open "myshader.vs" with notepad. Here's a code:
+{{{
+void main()
+{
+  gl_Position = ftransform();
+  gl_Position.z = gl_Position.z - 0.01; //It's very-very important string!
+}
+}}}
+It'll be our vertex shader. What is it doing? Nothing! =) It just transforms object like OpenGL standart program.
+Oh, it also moves object a little bit nearer.
+
+3) Open "myshader.ps" with notepad. Here's a code:
+{{{
+void main()
+{
+  gl_FragColor = vec4(1.0,0.0,1.0,0.5);   
+}
+}}}
+It our fragment shader. It makes all pixel of our object violet and half transparent. Cool? No! But let's try!
+
+4) Shader program is ready for action! Let's use it in FoFiX. Where? CD songlist is the best option! Open src\Dialogs.py. Search "Shader.list." That's it:
+{{{
+if Shader.list.enable("cd"):
+      self.cassette.render("Mesh_001")
+      Shader.list.disable()
+}}}
+Delete these lines, we'll replace them with our new shader.
+
+5) Still "Dialogs.py", line 1608. We need to enable our shader program.
+{{{
+Shader.list.enable("myshader")
+}}}
+That's it! Our shader is enabled! What about compilation? You don't need to compile, because shader module already compiled it and put it to Shader.list.
+6) Let's draw a CDs and disable shader.
+{{{
+Shader.list.enable("myshader")
+self.cassette.render("Mesh_001") #render CD
+Shader.list.disable() # don't forget to disable shader!
+}}}
+7) Shader.list.enable() return False if shader activation failed, So we don't need to perform following actions if **** happened.
+{{{
+if Shader.list.enable("myshader"):
+  self.cassette.render("Mesh_001") #render CD
+#You may place here other objects
+  Shader.list.disable() # don't forget to disable shader!
+}}}
+8) Done! Compile FoFiX. What shall we see in CD songlist? Violet CDs.
+
+==SST. Part II: Variables==
+
+1) Edit your vertex shader code:
+{{{
+uniform float time;
+void main()
+{
+  gl_Position = ftransform(); // don't forget about semicolons. It's not a Python!
+  gl_Position.z -= 0.01; //It's very-very important string!
+}
+}}}
+We declared our first variable! Now we need to use it:
+{{{
+uniform float time;
+void main()
+{
+  gl_Position = ftransform();
+  gl_Position.z -= 0.01; //It's very-very important string!
+  gl_Position.x += sin(time); //CD dance
+}
+}}}
+2) Good. Now we need to set this variable. "Dialogs.py", line 1608
+{{{
+if Shader.list.enable("myshader"):
+      Shader.list.setVar("time",self.time)
+      self.cassette.render("Mesh_001")
+      Shader.list.disable()
+}}}
+setVar function sets active shader's variable "name" value. If your shader is not active, you may do this:
+{{{
+Shader.list.setVar("time",self.time,program="myshader")
+    if Shader.list.enable("myshader"):
+      Shader.list.update()
+      self.cassette.render("Mesh_001")
+      Shader.list.disable()
+}}}
+Shader.list.update() updates all variables in shader. But previous code is much better:
+{{{
+if Shader.list.enable("myshader"):
+      Shader.list.setVar("time",self.time)
+      self.cassette.render("Mesh_001")
+      Shader.list.disable()
+}}}
+3) Done! Now about varying type. Vertex shader's Varying variables can be used by pixel shader. A small example. Edit myshader.vs:
+{{{
+uniform float time;
+varying float alpha;
+void main()
+{
+  gl_Position = ftransform();
+  gl_Position.z -= 0.01; //It's very-very important string!
+  gl_Position.x += sin(time); //CD dance
+  alpha = abs(sin(time/10));
+}
+}}}
+myshader.ps:
+{{{
+varying float alpha;
+void main()
+{
+  gl_FragColor = vec4(1.0,0.0,1.0,alpha);   
+}
+}}}
+4) Now CD's will blink.
+
+==Vectors, Colors, Textures==
+
+*WIP*
