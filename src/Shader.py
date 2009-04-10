@@ -43,7 +43,7 @@ class shaderList:
     self.noise3D = 0
     self.noise2D = 0
     self.noise1D = 0
-    self.workdir = "Data\\Shaders"
+    self.workdir = ""
     self.var = {}
     time.clock()
     self.build(dir)
@@ -178,6 +178,19 @@ class shaderList:
           glUniform1i(pos[0],pos[1])
         return True
     return False
+    
+  def modVar(self, var, value, program = None, effect = 0.05):
+    if program == None:  program = self.active
+    else: program = self[program]
+    
+    old = self.getVar(var,program);
+    if type(old) == tuple:
+      for i in range(len(old)):
+        new = ()
+        new += old[i] * (1-effect) + value[i] * effect
+    else:
+      new = old * (1-effect) + value * effect
+    self.setVar(var,new,program)
         
   def enable(self, shader):
     try:
@@ -328,7 +341,7 @@ class shaderList:
       multiTex = (GL_TEXTURE0_ARB,GL_TEXTURE1_ARB,GL_TEXTURE2_ARB,GL_TEXTURE3_ARB)
     except:
       multiTex = (0,0,0,0)
-      Log.warn("Multitexturing failed. Upgrade to PyOpenGL 3.00!")  
+      Log.error("Multitexturing failed. Upgrade to PyOpenGL 3.00!")  
     
     if self.make("lightning","stage"):
       self.enable("stage")
@@ -345,6 +358,8 @@ class shaderList:
       self.setVar("scalexy",(1.6,1.2))
       self.setVar("offset",(0.0,-2.5))
       self.disable()
+    else:
+      Log.error("Shader has not been compiled: lightning")  
       
     if self.make("lightning","sololight"):
       self.enable("sololight")
@@ -362,6 +377,8 @@ class shaderList:
       self.setVar("color",(0.3,0.7,0.9,0.6))
       self.setVar("glowStrength",100.0)  
       self.disable()
+    else:
+      Log.error("Shader has not been compiled: lightning")  
       
     if self.make("lightning","tail"):
       self.enable("tail")
@@ -379,10 +396,14 @@ class shaderList:
       self.setVar("color",(0.3,0.7,0.9,0.6))
       self.setVar("glowStrength",100.0)  
       self.disable()
+    else:
+      Log.error("Shader has not been compiled: lightning")  
       
-    self.make("neck","neck")
+    if not self.make("neck","neck"):
+      Log.error("Shader has not been compiled: neck")  
     
-    self.make("cd","cd")
+    if not self.make("cd","cd"):
+      Log.error("Shader has not been compiled: cd")  
   
 multiTex = None
 list = shaderList()
