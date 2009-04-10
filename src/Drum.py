@@ -35,6 +35,7 @@ import Theme
 import Config
 import Log
 import pygame
+import Shader
 
 from OpenGL.GL import *
 import math
@@ -947,6 +948,30 @@ class Drum:
       
     if self.isFailing:
       self.renderNeckMethod(self.failcount*self.neckAlpha[4], 0, beatsPerUnit, self.failNeck)
+    
+    if Shader.list.enable("neck"): 
+      posx = Shader.list.time()
+      fade=0.2
+      drum = []
+      for i in range(5):
+        drum.append(3*max(posx - Shader.list.var["drum"][i] + fade,0.01))
+      r = 0.8 / drum[0] + 1.2 / drum[1] + 0.6 / drum[2]
+      g = 0.8 / drum[0] + 0.6 / drum[2] + 1.2 / drum[4]
+      b = 0.8 / drum[0] + 1.2 / drum[3]
+      a = (r+g+b)/70.0
+      Shader.list.var["drumcolor"]=(r,g,b,a)
+      Shader.list.setVar("fretcol",(r,g,b,a*1.5))
+      Shader.list.setVar("fail",self.isFailing)
+      Shader.list.update()
+      
+      glBegin(GL_TRIANGLE_STRIP)
+      glVertex3f(-w / 2, 0.1, -2)
+      glVertex3f(w / 2, 0.1, -2)
+      glVertex3f(-w / 2, 0.1, l)
+      glVertex3f(w / 2, 0.1, l)
+      glEnd()
+      Shader.list.disable() 
+    
 
   def drawTrack(self, visibility, song, pos):
     if not song:
@@ -3547,14 +3572,15 @@ class Drum:
     #adding bass drum hit every bass fret:
     
     for time, note in self.matchingNotes:
-      if ((note.number == 0 and (controls.getState(self.keys[0]) or controls.getState(self.keys[5])))
-       or (note.number == 1 and (controls.getState(self.keys[1]) or controls.getState(self.keys[6])))
-       or (note.number == 2 and (controls.getState(self.keys[2]) or controls.getState(self.keys[7]))) 
-       or (note.number == 3 and (controls.getState(self.keys[3]) or controls.getState(self.keys[8]))) 
-       or (note.number == 4 and (controls.getState(self.keys[4]) or controls.getState(self.keys[9])))):
-        if self.guitarSolo:
-          self.currentGuitarSoloHitNotes += 1
-        return self.hitNote(time, note)         
+      for i in range(5):
+        if note.number == i and (controls.getState(self.keys[i]) or controls.getState(self.keys[i+5])):
+          if self.guitarSolo:
+            self.currentGuitarSoloHitNotes += 1
+            
+          Shader.list.var["drum"][i]=Shader.list.time()
+          return self.hitNote(time, note)  
+        
+          
 
     return False        
     

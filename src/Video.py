@@ -134,21 +134,14 @@ class Video:
       
       if Shader.list.shaders!={}:
         Shader.list["stage"]["tex"]=(Shader.list.noise3D,)
-      Shader.list.setVar("ambientGlow",0.13,False,"stage")
-      Shader.list.setVar("color",(0.0,0.0,0.0,0.0),False,"stage")
-      Shader.list.setVar("glowStrength",100.0,False,"stage")
-      Shader.list.setVar("ambientGlowHeightScale",1.68,False,"stage")
-      Shader.list.setVar("glowFallOff",0.024,False,"stage")
-      Shader.list.setVar("height",0.44,False,"stage")
-      Shader.list.setVar("sampleDist",0.0076,False,"stage")
-      Shader.list.setVar("speed",1.86,False,"stage")
-      Shader.list.setVar("vertNoise",0.78,False,"stage")
-      Shader.list.setVar("scale",1.7,False,"stage")
-      Shader.list.setVar("offset",(0.0,-0.8),False,"stage")
-      Shader.list.var["pos"]=0.0
-      Shader.list.var["F1"]=-10.0
-      Shader.list.var["F2"]=-10.0
-      Shader.list.var["F3"]=-10.0
-      Shader.list.var["F4"]=-10.0
-      Shader.list.var["F5"]=-10.0
-      Shader.list.var["color"]=(0.0,0.0,0.0,0.0)
+      Shader.list.setVar("ambientGlow",0.0,"stage")
+      Shader.list.setVar("color",(0.0,0.0,0.0,0.0),"stage")
+      Shader.list.setVar("glowStrength",0.0,"stage")
+      Shader.list.setVar("ambientGlowHeightScale",1.68,"stage")
+      Shader.list.setVar("glowFallOff",0.024,"stage")
+      Shader.list.setVar("height",0.44,"stage")
+      Shader.list.setVar("sampleDist",0.0076,"stage")
+      Shader.list.setVar("speed",1.86,"stage")
+      Shader.list.setVar("vertNoise",0.78,"stage")
+      Shader.list.setVar("scale",1.7,"stage")
+      Shader.list.setVar("offset",(0.0,-0.8),"stage")

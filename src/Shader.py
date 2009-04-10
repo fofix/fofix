@@ -47,6 +47,7 @@ class shaderList:
     self.var = {}
     time.clock()
     self.build(dir)
+    self.reset()
     
   def build(self,dir = ""):
     if dir == "": return False
@@ -127,13 +128,16 @@ class shaderList:
     if program != 0:
       return program[var][1]
     
-  def setVar(self, var, value, Mod = False, program = None):
+  def setVar(self, var, value, program = None):
     if program == None:  program = self.active
     else: program = self[program]
+    
+    if type(value) == str:
+      value = self.var[value]
+    
     if program != 0 and program.has_key(var):
       pos = program[var]
-      if Mod: pos[1] += value
-      else:   pos[1] = value
+      pos[1] = value
       if program == self.active and program != 0:
         if type(value) == bool:
           if pos[1]: glUniform1i(pos[0],1)
@@ -287,5 +291,10 @@ class shaderList:
   def time(self):
     return time.clock()
     
+  def reset(self):
+    self.var["color"]=(0.0,)*4      #color for guitar neck flashing
+    self.var["drumcolor"]=(0.0,)*4  #color for drum neck flashing
+    self.var["drum"]=[-10.0]*5      #last fret note hit time
+    self.var["fret"]=[-10.0]*5      #last drum note hit time
+    
 list = shaderList()
-list.var["pos"] = 0.0

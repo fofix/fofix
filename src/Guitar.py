@@ -933,21 +933,18 @@ class Guitar:
       self.renderNeckMethod(v*self.neckAlpha[4], offset, beatsPerUnit, neck, alpha)
 
     if Shader.list.enable("neck"):
-    
       posx = Shader.list.time()
       fade=0.7
-      F1 = max(posx - Shader.list.var["F1"] + fade,0.01)
-      F2 = max(posx - Shader.list.var["F2"] + fade,0.01)
-      F3 = max(posx - Shader.list.var["F3"] + fade,0.01)
-      F4 = max(posx - Shader.list.var["F4"] + fade,0.01)
-      F5 = max(posx - Shader.list.var["F5"] + fade,0.01)
-      r = 1.2 / F2 + 0.8 / F3 + 0.9 / F5
-      g = 1.2 / F1 + 0.8 / F3 + 0.4 / F5
-      b = 1.2 / F4
+      fret = []
+      for i in range(5):
+        fret.append(max(posx - Shader.list.var["fret"][i] + fade,0.01))
+        
+      r = 1.2 / fret[1] + 0.6 / fret[2] + 0.8 / fret[4]
+      g = 1.2 / fret[0] + 0.6 / fret[2] + 0.4 / fret[4]
+      b = 1.2 / fret[3]
       a = (r+g+b)/70.0
-      Shader.list.var["color"]=(r,g,b,a)
-      
-      Shader.list.setVar("fretcol",(r,g,b,a))
+      Shader.list.var["color"]=(r,g,b,a*1.5)
+      Shader.list.setVar("fretcol","color")
       Shader.list.setVar("fail",self.isFailing)
       Shader.list.update()
       glBegin(GL_TRIANGLE_STRIP)
@@ -3449,6 +3446,8 @@ class Guitar:
     for time, note in self.matchingNotes:
       if note.played != True:
         continue
+
+      Shader.list.var["fret"][note.number]=Shader.list.time()
       
       self.pickStartPos = pos
       self.pickStartPos = max(self.pickStartPos, time)
@@ -3474,16 +3473,7 @@ class Guitar:
       if self.guitarSolo:
         self.currentGuitarSoloHitNotes += 1
         
-      if controls.getState(self.keys[0]):
-        Shader.list.var["F1"]=Shader.list.time()
-      if controls.getState(self.keys[1]):
-        Shader.list.var["F2"]=Shader.list.time()
-      if controls.getState(self.keys[2]):
-        Shader.list.var["F3"]=Shader.list.time()
-      if controls.getState(self.keys[3]):
-        Shader.list.var["F4"]=Shader.list.time()
-      if controls.getState(self.keys[4]):
-        Shader.list.var["F5"]=Shader.list.time()
+
      
     #myfingershurt: be sure to catch when a chord is played
     if len(self.playedNotes) > 1:
@@ -3509,6 +3499,7 @@ class Guitar:
     for theFret in range(5):
       self.freestyleHit[theFret] = controls.getState(self.keys[theFret+5])
       if self.freestyleHit[theFret]:
+        Shader.list.var["fret"][theFret]=Shader.list.time()
         numHits += 1
     return numHits
 
@@ -3524,6 +3515,7 @@ class Guitar:
     for theFret in range(5):
       self.freestyleHit[theFret] = controls.getState(self.keys[theFret])
       if self.freestyleHit[theFret]:
+        Shader.list.var["fret"][theFret]=Shader.list.time()
         numHits += 1
     return numHits
 

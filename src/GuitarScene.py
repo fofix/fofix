@@ -51,6 +51,7 @@ import Stage
 import Settings
 import Song
 import Scorekeeper
+import Shader
 
 import math
 import pygame
@@ -2474,6 +2475,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.guitars[i].drumFillsHits = 0
       for i1 in range(0, 5):
         self.guitars[i].freestyleLastFretHitTime[i1] = 0
+    #volshebnyi - shaders reset
+    Shader.list.reset()
     self.failed = False
     self.finalFailed = False
     self.failEnd = False
