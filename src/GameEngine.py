@@ -480,7 +480,7 @@ class GameEngine(Engine):
     self.video.setMode((width, height), fullscreen = fullscreen, multisamples = multisamples)
     
     if self.config.get("video", "use_shaders"):
-      Shader.list.set(os.path.join(Version.dataPath(), "shader"))
+      Shader.list.set(os.path.join(Version.dataPath(), "shaders"))
 
     # Enable the high priority timer if configured
     if self.priority:
