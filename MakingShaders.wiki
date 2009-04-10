@@ -1,0 +1,5 @@
+#summary This is to explain in detail how to make shaders.
+
+This is WIP until it's finished.
+
+(Worldrave is working on now.)
