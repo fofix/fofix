@@ -1001,7 +1001,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
       self.scoring[i].totalNotes = len([1 for Ntime, event in self.song.track[i].getAllEvents() if isinstance(event, Note)])
       
-      #MFH - TODO - determine which marker is BRE, and count streak notes behind it to remove from the scorecard
+      #MFH - determine which marker is BRE, and count streak notes behind it to remove from the scorecard
       if self.song.hasFreestyleMarkings:
         for time, event in self.song.midiEventTrack[i].getAllEvents():
           if isinstance(event, Song.MarkerNote) and not event.endMarker:
@@ -2819,7 +2819,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #tempo = song.tempoEventTrack.getCurrentTempo(pos)
     #if tempo != self.targetBpm:   #MFH - get latest tempo target
     #  self.targetBpm = tempo
-    tempEventHolder = song.getNextTempoChange(pos)
+    tempEventHolder = song.tempoEventTrack.getNextTempoChange(pos)
     if tempEventHolder:
       time, event = tempEventHolder
       if (pos - time > self.currentPeriod or self.lastBpmChange < 0) and time > self.lastBpmChange:

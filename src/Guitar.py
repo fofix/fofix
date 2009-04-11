@@ -1785,6 +1785,7 @@ class Guitar:
       if not isinstance(event, Note):
         continue
 
+      #MFH - TODO - remove this logic when activating the separated tempo track
       if (event.noteBpm == 0.0):
         event.noteBpm = self.tempoBpm
 
@@ -1910,7 +1911,9 @@ class Guitar:
         length = None
 
       sustain = False
+      #MFH - TODO - make the switch here from noteBpm to song.tempoEventTrack.currentBpm or song.tempoEventTrack.getCurrentTempo(pos)
       if event.length > (1.4 * (60000.0 / event.noteBpm) / 4):
+      #if event.length > (1.4 * (60000.0 / song.tempoEventTrack.currentBpm) / 4):
         sustain = True
         
       glPushMatrix()
@@ -1955,6 +1958,7 @@ class Guitar:
       if not isinstance(event, Note):
         continue
 
+      #MFH - TODO - remove this logic when activating the separated tempo track
       if (event.noteBpm == 0.0):
         event.noteBpm = self.tempoBpm
 
@@ -2060,7 +2064,9 @@ class Guitar:
         length = None
 
       sustain = False
+      #MFH - TODO - make the switch here from noteBpm to song.tempoEventTrack.currentBpm or song.tempoEventTrack.getCurrentTempo(pos)
       if event.length > (1.4 * (60000.0 / event.noteBpm) / 4):
+      #if event.length > (1.4 * (60000.0 / song.tempoEventTrack.currentBpm) / 4):
         sustain = True
         
       glPushMatrix()

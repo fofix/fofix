@@ -1702,8 +1702,8 @@ class Drum:
       if not isinstance(event, Note):
         continue
 
-      if (event.noteBpm == 0.0):
-        event.noteBpm = self.tempoBpm
+      #if (event.noteBpm == 0.0):
+      #  event.noteBpm = self.tempoBpm
       
       if self.coOpFailed:
         if self.coOpRestart:
@@ -1870,8 +1870,8 @@ class Drum:
       if not isinstance(event, Note):
         continue
 
-      if (event.noteBpm == 0.0):
-        event.noteBpm = self.tempoBpm
+      #if (event.noteBpm == 0.0):
+      #  event.noteBpm = self.tempoBpm
 
       #volshebnyi - removed
       if event.number == 0: #MFH - skip all open notes
