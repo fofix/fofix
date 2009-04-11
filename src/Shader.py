@@ -179,15 +179,13 @@ class shaderList:
         return True
     return False
     
-  def modVar(self, var, value, program = None, effect = 0.05):
-    if program == None:  program = self.active
-    else: program = self[program]
-    
-    old = self.getVar(var,program);
+  def modVar(self, var, value, effect = 0.05, alphaAmp=1.0, program = None):  
+    old = self.getVar(var,program)
     if type(old) == tuple:
+      new = ()
       for i in range(len(old)):
-        new = ()
-        new += old[i] * (1-effect) + value[i] * effect
+        if i==3: new += (old[i] * (1-effect) + value[i] * effect*alphaAmp,)
+        else: new += (old[i] * (1-effect) + value[i] * effect,)
     else:
       new = old * (1-effect) + value * effect
     self.setVar(var,new,program)
@@ -353,9 +351,11 @@ class shaderList:
   def reset(self):
     self.var["color"]=(0.0,)*4      #color for guitar neck flashing
     self.var["drumcolor"]=(0.0,)*4  #color for drum neck flashing
+    self.var["solocolor"]=(0.0,)*4  #color for GH3 solo lightnings
     self.var["eqcolor"]=(0.0,)*4    #color for equalizer
     self.var["drum"]=[-10.0]*5      #last fret note hit time
     self.var["fret"]=[-10.0]*5      #last drum note hit time
+
     
   def set(self, dir):
     self.workdir = dir
@@ -371,7 +371,6 @@ class shaderList:
       self["stage"]["tex"]=(self.noise3D,)
       self.setVar("ambientGlowHeightScale",6.0)
       self.setVar("color",(0.0,0.0,0.0,0.0))
-      self.setVar("glowStrength",0.0,"stage")
       self.setVar("glowFallOff",0.024)
       self.setVar("height",0.44)
       self.setVar("sampleDist",0.0076)
@@ -379,6 +378,7 @@ class shaderList:
       self.setVar("vertNoise",0.78)
       self.setVar("solofx",False)
       self.setVar("scalexy",(1.6,1.2))
+      self.setVar("fixalpha",True)
       self.setVar("offset",(0.0,-2.5))
       self.disable()
     else:
@@ -397,7 +397,8 @@ class shaderList:
       self.setVar("speed",1.86)
       self.setVar("vertNoise",0.78)
       self.setVar("solofx",True)
-      self.setVar("color",(0.3,0.7,0.9,0.6))
+      self.setVar("color",(0.0,0.0,0.0,0.0))
+      self.setVar("fixalpha",True)
       self.setVar("glowStrength",100.0)  
       self.disable()
     else:
@@ -407,7 +408,7 @@ class shaderList:
       self.enable("tail")
       self["tail"]["tex"]=(self.noise3D,)
       self.setVar("scalexy",(5.0,1.0))
-      self.setVar("ambientGlow",0.5)
+      self.setVar("ambientGlow",0.1)
       self.setVar("ambientGlowHeightScale",6.0)
       self.setVar("solofx",True)
       self.setVar("height",0.3)
@@ -417,7 +418,9 @@ class shaderList:
       self.setVar("vertNoise",0.78)
       self.setVar("solofx",True)
       self.setVar("color",(0.3,0.7,0.9,0.6))
-      self.setVar("glowStrength",100.0)  
+      self.setVar("glowStrength",100.0) 
+      self.setVar("fixalpha",True)
+      self.setVar("offset",(0.0,0.0)) 
       self.disable()
     else:
       Log.error("Shader has not been compiled: lightning")  

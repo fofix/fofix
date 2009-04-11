@@ -569,22 +569,11 @@ class Stage(object):
     self._renderLayers(self.backgroundLayers, visibility)
     
     if Shader.list.enable("stage"):
-      height=(3*Shader.list.var["color"][3]+7*Shader.list.var["drumcolor"][3])**2
+      height=(5*Shader.list.var["color"][3]+8*Shader.list.var["drumcolor"][3])**2
       Shader.list.setVar("height",2*height)
-      Shader.list.setVar("ambientGlow",height)
-      Shader.list.setVar("solofx",False)
-      Shader.list.setVar("scalexy",(1.6,1.2))
-      Shader.list.setVar("offset",(0.0,-2.5))
-      col1 = Shader.list.var["eqcolor"]
-      col2 = Shader.list.var["color"]
-      col3 = Shader.list.var["drumcolor"]
-      col=()
-      for i in range(3):
-       col += (0.97 * col1[i] + 0.03 * col2[i] + 0.03 * col3[i],)
-      col+=((col[0]+col[1]+col[2])/3.0,)
-      Shader.list.var["eqcolor"]=col
-      Shader.list.setVar("color",col)
-      Shader.list.setVar("glowStrength",20+height*20.0)
+      Shader.list.setVar("ambientGlow",height/1.5)
+      Shader.list.modVar("color",Shader.list.var["color"]+Shader.list.var["drumcolor"],0.05,3.0)
+      Shader.list.setVar("glowStrength",60+height*80.0)
       glBegin(GL_TRIANGLE_STRIP)
       glVertex3f(-2.0, 2.0,0.0)
       glVertex3f(2.0, 2.0,0.0)

@@ -943,7 +943,7 @@ class Guitar:
       g = 1.2 / fret[0] + 0.6 / fret[2] + 0.4 / fret[4]
       b = 1.2 / fret[3]
       a = (r+g+b)/70.0
-      Shader.list.var["color"]=(r,g,b,a*1.5)
+      Shader.list.var["color"]=(r,g,b,a*2.0)
       Shader.list.setVar("fretcol","color")
       Shader.list.setVar("fail",self.isFailing)
       Shader.list.update()
@@ -957,6 +957,11 @@ class Guitar:
     else:
       if self.isFailing:
         self.renderNeckMethod(self.failcount*self.neckAlpha[5], 0, beatsPerUnit, self.failNeck)
+        
+    if (self.guitarSolo or self.starPowerActive) and self.theme == 1:
+      Shader.list.var["solocolor"]=(0.3,0.7,0.9,0.6)
+    else:
+      Shader.list.var["solocolor"]=(0.0,)*4
 
 
   def drawTrack(self, visibility, song, pos):
@@ -1098,8 +1103,9 @@ class Guitar:
 
     glDisable(GL_TEXTURE_2D)
     
-    if (self.guitarSolo or self.starPowerActive) and self.theme == 1:   
+    if self.theme == 1:   
       if Shader.list.enable("sololight"):
+        Shader.list.modVar("color",Shader.list.var["solocolor"])
         Shader.list.setVar("offset",(-3.5,-w/2))
         glBegin(GL_TRIANGLE_STRIP)
         glVertex3f(w / 2-1.0, 0.4, -2)
@@ -1414,20 +1420,33 @@ class Guitar:
             color = (c1 + c1*2.0*tailGlow, c2 + c2*2.0*tailGlow, c3 + c3*2.0*tailGlow, c4*0.6 + c4*0.4*tailGlow)    #MFH - this fades inactive tails' color darker                    
             
           tailcol = (color)
-        
+          
+        if self.theme == 2 and big and tailOnly and Shader.list.enable("tail"):
+          if kill and self.killfx == 0:
+            Shader.list.setVar("color",(1.0,1.0,1.0,1.0))
+            Shader.list.setVar("height",0.05)
+          else:  
+            
+            Shader.list.setVar("color",color[:3]+(0.3,))
+            Shader.list.setVar("height",0.3)
+          Shader.list.setVar("scalexy",(5.0,1.0))
+          Shader.list.setVar("offset",(5.0-length,0.0))
+          size=(size[0]*4,size[1])
+          
+          
         self.engine.draw3Dtex(tex1, vertex = (-size[0], 0, size[0], size[1]), texcoord = (0.0, 0.0, 1.0, 1.0),
                               scale = tailscale, color = tailcol)
         self.engine.draw3Dtex(tex2, vertex = (-size[0], size[1], size[0], size[1] + (zsize)),
                               scale = tailscale, texcoord = (0.0, 0.05, 1.0, 0.95), color = tailcol)
 
-
+        Shader.list.disable()  
 
         #MFH - this block of code renders the tail "beginning" - before the note, for freestyle "lanes" only
         #volshebnyi
         if freestyleTail > 0 and pos < self.freestyleStart + self.freestyleLength:
           self.engine.draw3Dtex(tex2, vertex = (-size[0], 0-(zsize), size[0], 0 + (.05)),
                                 scale = tailscale, texcoord = (0.0, 0.95, 1.0, 0.05), color = tailcol)
-
+          
 
     if tailOnly:
       return
@@ -1785,7 +1804,6 @@ class Guitar:
       if not isinstance(event, Note):
         continue
 
-      #MFH - TODO - remove this logic when activating the separated tempo track
       if (event.noteBpm == 0.0):
         event.noteBpm = self.tempoBpm
 
@@ -1911,9 +1929,7 @@ class Guitar:
         length = None
 
       sustain = False
-      #MFH - TODO - make the switch here from noteBpm to song.tempoEventTrack.currentBpm or song.tempoEventTrack.getCurrentTempo(pos)
       if event.length > (1.4 * (60000.0 / event.noteBpm) / 4):
-      #if event.length > (1.4 * (60000.0 / song.tempoEventTrack.currentBpm) / 4):
         sustain = True
         
       glPushMatrix()
@@ -1958,7 +1974,6 @@ class Guitar:
       if not isinstance(event, Note):
         continue
 
-      #MFH - TODO - remove this logic when activating the separated tempo track
       if (event.noteBpm == 0.0):
         event.noteBpm = self.tempoBpm
 
@@ -2064,9 +2079,7 @@ class Guitar:
         length = None
 
       sustain = False
-      #MFH - TODO - make the switch here from noteBpm to song.tempoEventTrack.currentBpm or song.tempoEventTrack.getCurrentTempo(pos)
       if event.length > (1.4 * (60000.0 / event.noteBpm) / 4):
-      #if event.length > (1.4 * (60000.0 / song.tempoEventTrack.currentBpm) / 4):
         sustain = True
         
       glPushMatrix()
