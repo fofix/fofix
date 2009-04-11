@@ -276,7 +276,7 @@ class shaderList:
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
     glTexImage3D(GL_TEXTURE_3D, 0, c,size, size, size, 0, type, GL_UNSIGNED_BYTE, texels)
-    self.noise3D = texture
+    return texture
     
   def makeNoise2D(self,size=64, c = 1, type = GL_RED):
     texels=[]
@@ -301,7 +301,30 @@ class shaderList:
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
     glTexImage2D(GL_TEXTURE_2D, 0, c,size, size, 0, type, GL_UNSIGNED_BYTE, texels)
-    self.noise2D = texture
+    return texture
+    
+  def loadTex3D(self, fname, type = GL_RED):
+    try:
+      noise = open(os.path.join(self.workdir,fname)).read()
+      size = int(len(noise)**(1/3.0))
+    except:
+      print "noise"
+      return self.makeNoise3D(16)
+    #print noise
+          
+    #self.smoothNoise3D(size, 2, texels)
+    #self.smoothNoise3D(size, 4, texels)
+    
+
+    texture = 0
+    glBindTexture(GL_TEXTURE_3D, texture)
+    glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+    glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+    glTexImage3D(GL_TEXTURE_3D, 0, 1,size, size, size, 0, type, GL_UNSIGNED_BYTE, noise)
+    return texture
     
   def smoothNoise(self, size, c, noise):
     for x in range(size):
@@ -336,7 +359,7 @@ class shaderList:
     
   def set(self, dir):
     self.workdir = dir
-    self.makeNoise3D(16)
+    self.noise3D = self.loadTex3D("noise3d.dds")
     try:
       multiTex = (GL_TEXTURE0_ARB,GL_TEXTURE1_ARB,GL_TEXTURE2_ARB,GL_TEXTURE3_ARB)
     except:
