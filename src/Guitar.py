@@ -1426,9 +1426,9 @@ class Guitar:
             Shader.list.setVar("color",(1.0,1.0,1.0,1.0))
             Shader.list.setVar("height",0.05)
           else:  
-            color = (float(color[0]),float(color[1]),float(color[2]))
-            Shader.list.setVar("color",color[:3]+(0.3,))
-            Shader.list.setVar("height",0.3)
+            color = (color[0]*1.5,color[1]*1.5,color[2]*1.5)
+            Shader.list.setVar("color",color[:3]+(0.1,))
+            Shader.list.setVar("height",0.2)
           Shader.list.setVar("scalexy",(5.0,1.0))
           Shader.list.setVar("offset",(5.0-size[1],0.0))
           size=(size[0]*4,size[1])

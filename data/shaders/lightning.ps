@@ -44,10 +44,14 @@ void main()
   
     float ambGlow = ambientGlow * (1.0 - xs1 * xs1) * (1.0 - abs(ambientGlowHeightScale * vTexCoord.y));
     
-    vec4 col = (glowStrength * glow * glow + ambGlow) * vec4(color.rgb,color.a*(1.0-abs(vTexCoord.x))*10.0);
+    float fog = min(1.0,fading*(1.0-abs(vTexCoord.x)));
+    vec4 col = (glowStrength * glow * glow + ambGlow) * vec4(color.rgb,color.a*fog*10.0);
     if (fixalpha) 
     {
-      col.a=(col.r+col.g+col.b)*fading*(1.0-abs(vTexCoord.x));
+      float alpha = max(max(col.r,col.g),col.b);
+      col.a=alpha*fog;
+      if (col.a<1.0) col.rgb=col.rgb/col.a;
+      
     }
   
     gl_FragColor =  col;
