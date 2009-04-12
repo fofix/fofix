@@ -1522,6 +1522,15 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
     self.hopoTick = engine.config.get("coffee", "hopo_frequency")
     self.hopoTickCheat = engine.config.get("coffee", "hopo_freq_cheat")
     self.songHopoFreq = engine.config.get("game", "song_hopo_freq")
+    self.logTempoEvents = engine.config.get("log",   "log_tempo_events")
+
+  def removeTempoEvents(self):
+    for time, event in self.allEvents:
+      if isinstance(event, Tempo):
+        self.allEvents.remove((time, event))
+        if self.logTempoEvents == 1:
+          Log.debug("Tempo event removed from NoteTrack during cleanup: " + str(event.bpm) + "bpm")
+
 
   def markHopoRF(self, EighthNH, songHopoFreq):
     lastTick = 0
@@ -1585,6 +1594,7 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
         #bpm = bpmNotes[0][1].bpm
         bpmTime, bpmEvent = bpmNotes.pop(0)
         bpm = bpmEvent.bpm
+      
 
       tick = (time * bpm * ticksPerBeat) / 60000.0
       lastTick = (lastTime * bpm * ticksPerBeat) / 60000.0
@@ -2896,7 +2906,7 @@ class MidiReader(midi.MidiOutStream):
     
     #add tempo events to the universal tempo track
     self.song.tempoEventTrack.addEvent(time, event)
-    if self.logTempoEvents:
+    if self.logTempoEvents == 1:
       Log.debug("Tempo event added to Tempo track: " + str(time) + " - " + str(event.bpm) + "BPM" )
 
   def addSpecialMidiEvent(self, track, event, time = None):    #MFH

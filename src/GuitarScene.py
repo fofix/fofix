@@ -866,15 +866,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
 
     #MFH - TODO - single, global BPM here instead of in instrument objects:
-    self.tempoBpm = Song.DEFAULT_BPM
-    self.actualBpm = 0.0
+    #self.tempoBpm = Song.DEFAULT_BPM
+    #self.actualBpm = 0.0
+    #self.targetPeriod   = 60000.0 / self.targetBpm
+    self.disableVBPM  = self.engine.config.get("game", "disable_vbpm")
     self.currentBpm     = Song.DEFAULT_BPM
     self.currentPeriod  = 60000.0 / self.currentBpm
     self.targetBpm      = self.currentBpm
-    #self.targetPeriod   = 60000.0 / self.targetBpm
     self.lastBpmChange  = -1.0
     self.baseBeat       = 0.0
-    self.disableVBPM  = self.engine.config.get("game", "disable_vbpm")
 
     
     
@@ -1134,15 +1134,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       
       #MFH - test unpacking / decoding the lyrical lines:
       for midiLyricSubList in self.midiLyricLineEvents:
-        if self.logLyricEvents:
+        if self.logLyricEvents == 1:
           Log.debug("...New MIDI lyric line:")
         for lyricTuple in midiLyricSubList:
           time, event = lyricTuple
-          if self.logLyricEvents:
+          if self.logLyricEvents == 1:
             Log.debug("MIDI Line-by-line lyric unpack test - time, event = " + str(time) + ", " + event.text )
               
       for lineStartTime, midiLyricSimpleLineText in self.midiLyricLines:
-        if self.logLyricEvents:
+        if self.logLyricEvents == 1:
           Log.debug("MIDI Line-by-line simple lyric line starting at time: " + str(lineStartTime) + ", " + midiLyricSimpleLineText)
 
     self.numMidiLyricLines = len(self.midiLyricLines)
@@ -2506,6 +2506,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.nextLyricWordTime = 0
     self.nextLyricEvent = None
     self.nextLyricIsOnNewLine = False
+
+    #MFH - reset global tempo variables
+    self.currentBpm     = Song.DEFAULT_BPM
+    self.currentPeriod  = 60000.0 / self.currentBpm
+    self.targetBpm      = self.currentBpm
+    self.lastBpmChange  = -1.0
+    self.baseBeat       = 0.0
+
     
     if self.midiLyricMode == 2:
       
@@ -2587,6 +2595,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               self.song.track[i].markHopoGH2(self.song.info.EighthNoteHopo, self.hopoAfterChord, self.song.info.hopofreq)
             elif self.hopoStyle == 1:   #RF-Mod style HOPO system
               self.song.track[i].markHopoRF(self.song.info.EighthNoteHopo, self.song.info.hopofreq)
+            self.song.track[i].removeTempoEvents()  #MFH - perform a little event cleanup on these tracks
     
     #myfingershurt: removing buggy disable stats option
     lastTime = 0
@@ -2619,13 +2628,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       guitar.endPick(i)
     self.song.stop()
 
-    for i, guitar in enumerate(self.guitars):
-      #myfingershurt: next line commented to prevent everthickening BPM lines
-      if self.hopoStyle > 0 or self.song.info.hopo == "on":
-        if self.hopoStyle == 2 or self.hopoStyle == 3 or self.hopoStyle == 4:  #GH2 style HOPO system
-          self.song.track[i].markHopoGH2(self.song.info.EighthNoteHopo, self.hopoAfterChord, self.song.info.hopofreq)
-        elif self.hopoStyle == 1:   #RF-Mod style HOPO system
-          self.song.track[i].markHopoRF(self.song.info.EighthNoteHopo, self.song.info.hopofreq)
+    #MFH - unnecessary re-marking of HOPOs
+    #for i, guitar in enumerate(self.guitars):
+    #  #myfingershurt: next line commented to prevent everthickening BPM lines
+    #  if self.hopoStyle > 0 or self.song.info.hopo == "on":
+    #    if self.hopoStyle == 2 or self.hopoStyle == 3 or self.hopoStyle == 4:  #GH2 style HOPO system
+    #      self.song.track[i].markHopoGH2(self.song.info.EighthNoteHopo, self.hopoAfterChord, self.song.info.hopofreq)
+    #    elif self.hopoStyle == 1:   #RF-Mod style HOPO system
+    #      self.song.track[i].markHopoRF(self.song.info.EighthNoteHopo, self.song.info.hopofreq)
     
     lastTime = 0
     for i,guitar in enumerate(self.guitars):      
@@ -2803,7 +2813,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         
         
 
-  #MFH - TODO - single, global BPM here instead of in instrument objects:
+  #MFH - single, global BPM here instead of in instrument objects:
     #self.tempoBpm = Song.DEFAULT_BPM
     #self.actualBpm = 0.0
     #self.currentBpm     = Song.DEFAULT_BPM
