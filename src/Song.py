@@ -1813,6 +1813,10 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
     bpmNotes = []
     firstTime = 1
 
+    #MFH - to prevent crashes on songs without a BPM set
+    bpmEvent = None
+    bpm = None
+
     #If already processed abort   
     if self.marked == True:
       return
@@ -1823,6 +1827,8 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
         continue
       if not isinstance(event, Note):
         continue
+
+
       
       while bpmNotes and time >= bpmNotes[0][0]:
         #Adjust to new BPM
@@ -1830,8 +1836,12 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
         bpmTime, bpmEvent = bpmNotes.pop(0)
         bpm = bpmEvent.bpm
 
+      if not bpm:
+        bpm = DEFAULT_BPM
+
       tick = (time * bpm * ticksPerBeat) / 60000.0
       lastTick = (lastTime * bpm * ticksPerBeat) / 60000.0
+      
 
 
      
@@ -1867,10 +1877,17 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
           if not hopoNotes and lastEvent.tappable == -3:
             lastEvent.tappable = 1
           #this may be incorrect if a bpm event happened inbetween this note and last note
-          hopoNotes.append([lastTime, bpmEvent])
-          hopoNotes.append([lastTime, lastEvent])
 
-        hopoNotes.append([bpmTime, bpmEvent])
+
+          if bpmEvent:
+            hopoNotes.append([lastTime, bpmEvent])
+          
+          hopoNotes.append([lastTime, lastEvent])
+          
+
+        if bpmEvent:
+          hopoNotes.append([bpmTime, bpmEvent])
+
         hopoNotes.append([time, event])
 
 
@@ -1966,7 +1983,10 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
       #Add last note to HOPO list if applicable
       #myfingershurt:
       if noteDelta != 0 and tickDelta > self.chordFudge and tickDelta < hopoDelta and isinstance(event, Note):
-        hopoNotes.append([time, bpmEvent])
+
+        if bpmEvent:
+          hopoNotes.append([time, bpmEvent])
+
         hopoNotes.append([time, event])
 
       #myfingershurt marker: (next - FOR loop)----
