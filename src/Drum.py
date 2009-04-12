@@ -945,11 +945,8 @@ class Drum:
         alpha = True
 
       self.renderNeckMethod(v*self.neckAlpha[3], offset, beatsPerUnit, neck, alpha)
-      
-    if self.isFailing:
-      self.renderNeckMethod(self.failcount*self.neckAlpha[4], 0, beatsPerUnit, self.failNeck)
-    
-    if Shader.list.enable("neck"): 
+
+    if Shader.list.enabled:
       posx = Shader.list.time()
       fade=0.2
       drum = []
@@ -960,6 +957,8 @@ class Drum:
       b = 0.8 / drum[0] + 1.2 / drum[3]
       a = (r+g+b)/70.0
       Shader.list.var["drumcolor"]=(r,g,b,a)
+          
+    if Shader.list.enable("neck"): 
       Shader.list.setVar("fretcol",(r,g,b,a*1.5))
       Shader.list.setVar("fail",self.isFailing)
       Shader.list.update()
@@ -971,7 +970,9 @@ class Drum:
       glVertex3f(w / 2, 0.1, l)
       glEnd()
       Shader.list.disable() 
-    
+    else:
+      if self.isFailing:
+        self.renderNeckMethod(self.failcount*self.neckAlpha[4], 0, beatsPerUnit, self.failNeck)
 
   def drawTrack(self, visibility, song, pos):
     if not song:
@@ -1702,8 +1703,8 @@ class Drum:
       if not isinstance(event, Note):
         continue
 
-      #if (event.noteBpm == 0.0):
-      #  event.noteBpm = self.tempoBpm
+      if (event.noteBpm == 0.0):
+        event.noteBpm = self.tempoBpm
       
       if self.coOpFailed:
         if self.coOpRestart:
@@ -1870,8 +1871,8 @@ class Drum:
       if not isinstance(event, Note):
         continue
 
-      #if (event.noteBpm == 0.0):
-      #  event.noteBpm = self.tempoBpm
+      if (event.noteBpm == 0.0):
+        event.noteBpm = self.tempoBpm
 
       #volshebnyi - removed
       if event.number == 0: #MFH - skip all open notes

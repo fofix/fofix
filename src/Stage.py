@@ -569,7 +569,7 @@ class Stage(object):
     self._renderLayers(self.backgroundLayers, visibility)
     
     if Shader.list.enable("stage"):
-      height=(2*Shader.list.var["color"][3]+4*Shader.list.var["drumcolor"][3])**2
+      height=(3*Shader.list.var["color"][3]+5*Shader.list.var["drumcolor"][3])**2
       Shader.list.setVar("height",2*height)
       Shader.list.setVar("ambientGlow",height/1.5)
       Shader.list.modVar("color",Shader.list.var["color"]+Shader.list.var["drumcolor"],0.05,3.0)

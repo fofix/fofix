@@ -44,6 +44,7 @@ class shaderList:
     self.noise2D = 0
     self.noise1D = 0
     self.workdir = ""
+    self.enabled = False
     self.var = {}
     time.clock()
     self.build(dir)
@@ -78,15 +79,16 @@ class shaderList:
     Log.debug("Compiling " + fname + " shader.")
     try:
       program = self.compile(open(fullname+".vs"), open(fullname+".ps"))
-    except:
-      Log.error("Error occured during compilation.")
-      return False
-    else:
       sArray = {"program": program, "name": name, "tex" : (), "textype" : ()}
       self.lastCompiled = name
       self.getVars(fullname+".vs", program, sArray)
       self.getVars(fullname+".ps", program, sArray)
       self.shaders[name] = sArray
+    except:
+      Log.error("Error occured during compilation.")
+      return False
+    else:
+
       return True
 
           
@@ -220,7 +222,7 @@ class shaderList:
       self.shaders = self.backup
       self.backup = {}
     
-  def enabled(self):
+  def activeProgram(self):
     if self.active !=0:
       return self.active["name"]
     else:
@@ -358,6 +360,7 @@ class shaderList:
 
     
   def set(self, dir):
+    self.enabled = True
     self.workdir = dir
     self.noise3D = self.loadTex3D("noise3d.dds")
     try:
@@ -421,7 +424,7 @@ class shaderList:
       self.setVar("vertNoise",0.78)
       self.setVar("solofx",True)
       self.setVar("color",(0.3,0.7,0.9,0.6))
-      self.setVar("glowStrength",130.0) 
+      self.setVar("glowStrength",150.0) 
       self.setVar("fixalpha",True)
       self.setVar("offset",(0.0,0.0)) 
       self.disable()
@@ -429,7 +432,7 @@ class shaderList:
       Log.error("Shader has not been compiled: lightning")  
       
     if not self.make("neck","neck"):
-      Log.error("Shader has not been compiled: neck")  
+      Log.error("Shader has not been compiled: neck") 
     
     if not self.make("cd","cd"):
       Log.error("Shader has not been compiled: cd")  

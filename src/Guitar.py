@@ -932,18 +932,18 @@ class Guitar:
 
       self.renderNeckMethod(v*self.neckAlpha[4], offset, beatsPerUnit, neck, alpha)
 
-    if Shader.list.enable("neck"):
+    if Shader.list.enabled:
       posx = Shader.list.time()
-      fade=0.7
       fret = []
       for i in range(5):
-        fret.append(max(posx - Shader.list.var["fret"][i] + fade,0.01))
-        
+        fret.append(max(posx - Shader.list.var["fret"][i] + 0.7,0.01))
       r = 1.2 / fret[1] + 0.6 / fret[2] + 0.8 / fret[4]
       g = 1.2 / fret[0] + 0.6 / fret[2] + 0.4 / fret[4]
       b = 1.2 / fret[3]
       a = (r+g+b)/70.0
       Shader.list.var["color"]=(r,g,b,a*2.0)
+      
+    if Shader.list.enable("neck"):
       Shader.list.setVar("fretcol","color")
       Shader.list.setVar("fail",self.isFailing)
       Shader.list.update()
