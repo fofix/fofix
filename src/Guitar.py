@@ -1423,15 +1423,16 @@ class Guitar:
         if self.theme == 2 and freestyleTail == 0 and big and tailOnly and Shader.list.enable("tail"):
         
           if kill and self.killfx == 0:
-            Shader.list.setVar("color",(1.0,1.0,1.0,1.0))
-            Shader.list.setVar("height",0.05)
+            color = (color[0]*1.5,color[1]*1.5,color[2]*1.5,0.1)
+            Shader.list.setVar("color",color)
+            Shader.list.modVar("height",0.5,0.1)
           else:  
-            color = (color[0]*1.5,color[1]*1.5,color[2]*1.5)
-            Shader.list.setVar("color",color[:3]+(0.1,))
-            Shader.list.setVar("height",0.2)
+            color = (color[0]*1.5,color[1]*1.5,color[2]*1.5,0.1)
+            Shader.list.setVar("color",color)
+            Shader.list.modVar("height",0.05,0.15)
           Shader.list.setVar("scalexy",(5.0,1.0))
           Shader.list.setVar("offset",(5.0-size[1],0.0))
-          size=(size[0]*4,size[1])
+          size=(size[0]*100,size[1])
           
           
         self.engine.draw3Dtex(tex1, vertex = (-size[0], 0, size[0], size[1]), texcoord = (0.0, 0.0, 1.0, 1.0),
