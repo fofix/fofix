@@ -21,4 +21,4 @@ _Or_, perhaps you'd like an inexpensive double bass pedal for your Rock Band 1 o
 ==Donating to Vlad Emelyanov (fenolftalein/Volshebnyi)==
 
 I really need money to pay for university and to continue developing my Shader and Advanced Graphics module.
-Like RB2 tails? There would be much more modern graphics if I'll continue FoFiX development. Here is a [https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Z8TXZ3FR754JC&lc=US&item_name=Shader%20module%20for%20FOFIX%20Dev&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted link].
+Do you like RB2 tails? There would be much more modern graphics if I'll continue FoFiX development. Here is a [https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Z8TXZ3FR754JC&lc=US&item_name=Shader%20module%20for%20FOFIX%20Dev&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted link].
