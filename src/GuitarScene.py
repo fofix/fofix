@@ -3984,11 +3984,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   def renderGuitar(self):
     for i in range(self.numOfPlayers):
       self.engine.view.setViewport(self.numOfPlayers,i)
-      if self.theme == 0 or self.theme == 1 or self.theme == 2:
-        if not self.pause and not self.failed:
-          self.guitars[i].render(self.visibility, self.song, self.getSongPosition(), self.controls, self.killswitchEngaged[i])  #QQstarS: new
-      else:
-        self.guitars[i].render(self.visibility, self.song, self.getSongPosition(), self.controls, self.killswitchEngaged[i]) #QQstarS: new
+      if self.theme not in (0, 1, 2) or (not self.pause and not self.failed):
+        glPushMatrix()
+        if self.guitars[i].isDrum:
+          if self.guitars[i].bassPedalHop > 0.0:
+            glTranslatef(0.0, self.guitars[i].bassPedalHop, 0.0)  #stump: bass pedal hop
+            self.guitars[i].bassPedalHop -= 0.005
+            if self.guitars[i].bassPedalHop < 0.0:
+              self.guitars[i].bassPedalHop = 0.0
+        self.guitars[i].render(self.visibility, self.song, self.getSongPosition(), self.controls, self.killswitchEngaged[i])  #QQstarS: new
+        glPopMatrix()
 
     for i, player in enumerate(self.playerList):
       if self.coOp or self.coOpGH:

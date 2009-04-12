@@ -584,6 +584,7 @@ class Drum:
     self.disableFretSFX  = self.engine.config.get("video", "disable_fretsfx")
     self.disableFlameSFX  = self.engine.config.get("video", "disable_flamesfx")
 
+    self.bassPedalHop = 0.00  #stump
 
 
   def selectPreviousString(self):
@@ -3441,6 +3442,7 @@ class Drum:
               self.engine.data.bassDrumSound.play()
             self.bassDrumPedalDown = True
             drumsJustHit[0] = True
+            self.bassPedalHop = 0.05  #stump
         else:
           self.bassDrumPedalDown = False
         if i == 1:
