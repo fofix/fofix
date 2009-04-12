@@ -8,6 +8,7 @@ uniform float sampleDist;
 uniform float speed;
 uniform float vertNoise;
 uniform float time;
+uniform float fading;
 uniform bool fixalpha;
 uniform sampler3D Noise;
 
@@ -46,7 +47,7 @@ void main()
     vec4 col = (glowStrength * glow * glow + ambGlow) * vec4(color.rgb,color.a*(1.0-abs(vTexCoord.x))*10.0);
     if (fixalpha) 
     {
-      col.a=(col.r+col.g+col.b)*(1.0-abs(vTexCoord.x));
+      col.a=(col.r+col.g+col.b)*fading*(1.0-abs(vTexCoord.x));
     }
   
     gl_FragColor =  col;
