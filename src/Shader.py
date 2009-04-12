@@ -160,25 +160,29 @@ class shaderList:
       pos = program[var]
       pos[1] = value
       if program == self.active and program != 0:
-        if type(value) == bool:
-          if pos[1]: glUniform1i(pos[0],1)
-          else: glUniform1i(pos[0],0)
-        if type(value) == float:
-          glUniform1f(pos[0],pos[1])
-        elif type(value) == int:
-          glUniform1i(pos[0],pos[1])
-        elif type(value) == tuple:
-          if type(value[0]) == float:
-            if   len(value) == 2: glUniform2f(pos[0],*pos[1])
-            elif len(value) == 3: glUniform3f(pos[0],*pos[1])
-            elif len(value) == 4: glUniform4f(pos[0],*pos[1])
-          elif type(value[0]) == int:
-            if   len(value) == 2: glUniform2i(pos[0],*pos[1])
-            elif len(value) == 3: glUniform3i(pos[0],*pos[1])
-            elif len(value) == 4: glUniform4i(pos[0],*pos[1])
-        elif type(value) == long:
-          glUniform1i(pos[0],pos[1])
-        return True
+        try:
+          if type(value) == bool:
+            if pos[1]: glUniform1i(pos[0],1)
+            else: glUniform1i(pos[0],0)
+          if type(value) == float:
+            glUniform1f(pos[0],pos[1])
+          elif type(value) == int:
+            glUniform1i(pos[0],pos[1])
+          elif type(value) == tuple:
+            if type(value[0]) == float:
+              if   len(value) == 2: glUniform2f(pos[0],*pos[1])
+              elif len(value) == 3: glUniform3f(pos[0],*pos[1])
+              elif len(value) == 4: glUniform4f(pos[0],*pos[1])
+            elif type(value[0]) == int:
+              if   len(value) == 2: glUniform2i(pos[0],*pos[1])
+              elif len(value) == 3: glUniform3i(pos[0],*pos[1])
+              elif len(value) == 4: glUniform4i(pos[0],*pos[1])
+          elif type(value) == long:
+            glUniform1i(pos[0],pos[1])
+        except:
+          return False
+        else:
+          return True
     return False
     
   def modVar(self, var, value, effect = 0.05, alphaAmp=1.0, program = None):  

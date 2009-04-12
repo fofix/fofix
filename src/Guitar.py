@@ -1420,18 +1420,17 @@ class Guitar:
             color = (c1 + c1*2.0*tailGlow, c2 + c2*2.0*tailGlow, c3 + c3*2.0*tailGlow, c4*0.6 + c4*0.4*tailGlow)    #MFH - this fades inactive tails' color darker                    
             
           tailcol = (color)
-
         if self.theme == 2 and freestyleTail == 0 and big and tailOnly and Shader.list.enable("tail"):
         
           if kill and self.killfx == 0:
             Shader.list.setVar("color",(1.0,1.0,1.0,1.0))
             Shader.list.setVar("height",0.05)
           else:  
-            
+            color = (float(color[0]),float(color[1]),float(color[2]))
             Shader.list.setVar("color",color[:3]+(0.3,))
             Shader.list.setVar("height",0.3)
           Shader.list.setVar("scalexy",(5.0,1.0))
-          Shader.list.setVar("offset",(5.0-s,0.0))
+          Shader.list.setVar("offset",(5.0-size[1],0.0))
           size=(size[0]*4,size[1])
           
           
