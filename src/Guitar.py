@@ -451,15 +451,24 @@ class Guitar:
       #MFH - can't use IOError for fallback logic for a Mesh() call... 
       if self.engine.fileExists(os.path.join("themes", themename, "key.dae")):
         engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "key.dae")))
-        if self.engine.fileExists(os.path.join("themes", themename, "key_hold.dae")) and self.engine.fileExists(os.path.join("themes", themename, "key_hit.dae")) :
-          engine.resource.load(self,  "keyMesh2",  lambda: Mesh(engine.resource.fileName("themes", themename, "key_hold.dae")))
-          engine.resource.load(self,  "keyMesh3",  lambda: Mesh(engine.resource.fileName("themes", themename, "key_hit.dae")))
-          self.complexkey = True
-        else:
-          self.complexkey = False
       else:
         engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName("key.dae")))
 
+      try:
+        engine.loadImgDrawing(self,  "keytexa",  os.path.join("themes", themename, "keytex_a.png"))
+        engine.loadImgDrawing(self,  "keytexb",  os.path.join("themes", themename, "keytex_b.png"))
+        engine.loadImgDrawing(self,  "keytexc",  os.path.join("themes", themename, "keytex_c.png"))
+        engine.loadImgDrawing(self,  "keytexd",  os.path.join("themes", themename, "keytex_d.png"))
+        engine.loadImgDrawing(self,  "keytexe",  os.path.join("themes", themename, "keytex_e.png"))
+        self.keytex = True
+
+      except IOError:
+        self.keytexa = False
+        self.keytexb = False
+        self.keytexc = False
+        self.keytexd = False
+        self.keytexe = False
+        self.keytex = False
     
 
 
@@ -2200,30 +2209,48 @@ class Guitar:
           #Key_002 - Bottom of fret (key2_color)
           #Glow_001 - Only rendered when a note is hit along with the glow.svg
 
-          if self.complexkey == True:
-            glColor4f(.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], visibility)
+	  if self.keytex == True:
+	    glColor4f(1,1,1,visibility)
             glTranslatef(x, y, 0)
+      	    glEnable(GL_TEXTURE_2D)
+            if n == 0: 
+              self.keytexa.texture.bind()
+            elif n == 1:
+              self.keytexb.texture.bind()
+            elif n == 2:
+              self.keytexc.texture.bind()
+            elif n == 3:
+              self.keytexd.texture.bind()
+            elif n == 4:
+              self.keytexe.texture.bind()
+            glMatrixMode(GL_TEXTURE)
+            glScalef(1, -1, 1)
+      	    glMatrixMode(GL_MODELVIEW)
             if f and not self.hit[n]:
-              key = self.keyMesh2
+	      self.keyMesh.render("Mesh_001")
             elif self.hit[n]:
-              key = self.keyMesh3
-            else:
-              key = self.keyMesh
-          else:
+	      self.keyMesh.render("Mesh_002")
+	    else:
+	      self.keyMesh.render("Mesh")
+            glMatrixMode(GL_TEXTURE)
+            glLoadIdentity()
+            glMatrixMode(GL_MODELVIEW)
+            glDisable(GL_TEXTURE_2D)
+          else: 
             glColor4f(.1 + .8 * c[0] + f, .1 + .8 * c[1] + f, .1 + .8 * c[2] + f, visibility)
             glTranslatef(x, y + v * 6, 0)
             key = self.keyMesh
         
-          if(key.find("Glow_001")) == True:
-            key.render("Mesh")
-            if(key.find("Key_001")) == True:
-              glColor3f(self.keyColor[0], self.keyColor[1], self.keyColor[2])
-              key.render("Key_001")
-            if(key.find("Key_002")) == True:
-              glColor3f(self.key2Color[0], self.key2Color[1], self.key2Color[2])
-              key.render("Key_002")
-          else:
-            key.render()
+            if(key.find("Glow_001")) == True:
+              key.render("Mesh")
+              if(key.find("Key_001")) == True:
+                glColor3f(self.keyColor[0], self.keyColor[1], self.keyColor[2])
+                key.render("Key_001")
+              if(key.find("Key_002")) == True:
+                glColor3f(self.key2Color[0], self.key2Color[1], self.key2Color[2])
+                key.render("Key_002")
+            else:
+              key.render()
           
           glDisable(GL_LIGHTING)
           glDisable(GL_LIGHT0)
