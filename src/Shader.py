@@ -213,8 +213,9 @@ class shaderList:
         self.setVar(i,self.active[i][1])
     
   def disable(self):
-    glUseProgramObjectARB(0)
-    self.active = 0
+    if self.active !=0:
+      glUseProgramObjectARB(0)
+      self.active = 0
     
   def turnOff(self):
     if self.backup == {} and self.shaders != {}:
