@@ -150,15 +150,14 @@ class Guitar:
     self.leftyMode      = False
 
 
-    self.actualBpm = 0.0
-
+    #self.actualBpm = 0.0
     self.currentBpm     = 120.0
     self.currentPeriod  = 60000.0 / self.currentBpm
-
-    self.targetBpm      = self.currentBpm
-    self.targetPeriod   = 60000.0 / self.targetBpm
+    #self.targetBpm      = self.currentBpm
+    #self.targetPeriod   = 60000.0 / self.targetBpm
     self.lastBpmChange  = -1.0
     self.baseBeat       = 0.0
+
 
     self.indexFps       = self.engine.config.get("video", "fps") #QQstarS
     #########For Animations
@@ -684,61 +683,62 @@ class Guitar:
       bpm = 200
 
     #MFH - Filter out unnecessary BPM settings (when currentBPM is already set!)
-    if self.actualBpm != bpm:
-      self.actualBpm = bpm
-      self.currentBpm = bpm   #update current BPM as well
+    #if self.actualBpm != bpm:
+    #  self.actualBpm = bpm
+    self.currentBpm = bpm   #update current BPM as well
 
-      #MFH - Neck speed determination:
-      if self.nstype == 0:    #BPM mode
-        self.neckSpeed = (340 - bpm)/self.speed
-      elif self.nstype == 1:   #Difficulty mode
-        if self.difficulty == 0:    #expert
-          self.neckSpeed = 220/self.speed
-        elif self.difficulty == 1:
-          self.neckSpeed = 250/self.speed
-        elif self.difficulty == 2:
-          self.neckSpeed = 280/self.speed
-        else:   #easy
-          self.neckSpeed = 300/self.speed
-      elif self.nstype == 2:   #BPM & Diff mode
-        if self.difficulty == 0:    #expert
-          self.neckSpeed = (226-(bpm/10))/self.speed
-        elif self.difficulty == 1:
-          self.neckSpeed = (256-(bpm/10))/self.speed
-        elif self.difficulty == 2:
-          self.neckSpeed = (286-(bpm/10))/self.speed
-        else:   #easy
-          self.neckSpeed = (306-(bpm/10))/self.speed
-      else: #Percentage mode - pre-calculated
-        self.neckSpeed = self.speed
-  
-      self.earlyMargin       = 250 - bpm/5 - 70*self.hitw
-      self.lateMargin        = 250 - bpm/5 - 70*self.hitw
-      #self.earlyMargin = self.lateMargin * self.earlyHitWindowSizeFactor    #MFH - scale early hit window here
+    #MFH - Neck speed determination:
+    if self.nstype == 0:    #BPM mode
+      self.neckSpeed = (340 - bpm)/self.speed
+    elif self.nstype == 1:   #Difficulty mode
+      if self.difficulty == 0:    #expert
+        self.neckSpeed = 220/self.speed
+      elif self.difficulty == 1:
+        self.neckSpeed = 250/self.speed
+      elif self.difficulty == 2:
+        self.neckSpeed = 280/self.speed
+      else:   #easy
+        self.neckSpeed = 300/self.speed
+    elif self.nstype == 2:   #BPM & Diff mode
+      if self.difficulty == 0:    #expert
+        self.neckSpeed = (226-(bpm/10))/self.speed
+      elif self.difficulty == 1:
+        self.neckSpeed = (256-(bpm/10))/self.speed
+      elif self.difficulty == 2:
+        self.neckSpeed = (286-(bpm/10))/self.speed
+      else:   #easy
+        self.neckSpeed = (306-(bpm/10))/self.speed
+    else: #Percentage mode - pre-calculated
+      self.neckSpeed = self.speed
 
-      #self.noteReleaseMargin = 200 - bpm/5 - 70*self.hitw
-      #if (self.noteReleaseMargin < (200 - bpm/5 - 70*1.2)):   #MFH - enforce "tight" hitwindow minimum note release margin
-      #  self.noteReleaseMargin = (200 - bpm/5 - 70*1.2)
-      if self.muteSustainReleases == 4:   #tight
-        self.noteReleaseMargin = (200 - bpm/5 - 70*1.2)
-      elif self.muteSustainReleases == 3: #standard
-        self.noteReleaseMargin = (200 - bpm/5 - 70*1.0)
-      elif self.muteSustainReleases == 2: #wide
-        self.noteReleaseMargin = (200 - bpm/5 - 70*0.7)
-      else:  #ultra-wide 
-        self.noteReleaseMargin = (200 - bpm/5 - 70*0.5)
+    self.earlyMargin       = 250 - bpm/5 - 70*self.hitw
+    self.lateMargin        = 250 - bpm/5 - 70*self.hitw
+    #self.earlyMargin = self.lateMargin * self.earlyHitWindowSizeFactor    #MFH - scale early hit window here
+
+    #self.noteReleaseMargin = 200 - bpm/5 - 70*self.hitw
+    #if (self.noteReleaseMargin < (200 - bpm/5 - 70*1.2)):   #MFH - enforce "tight" hitwindow minimum note release margin
+    #  self.noteReleaseMargin = (200 - bpm/5 - 70*1.2)
+    if self.muteSustainReleases == 4:   #tight
+      self.noteReleaseMargin = (200 - bpm/5 - 70*1.2)
+    elif self.muteSustainReleases == 3: #standard
+      self.noteReleaseMargin = (200 - bpm/5 - 70*1.0)
+    elif self.muteSustainReleases == 2: #wide
+      self.noteReleaseMargin = (200 - bpm/5 - 70*0.7)
+    else:  #ultra-wide 
+      self.noteReleaseMargin = (200 - bpm/5 - 70*0.5)
 
 
-      self.accThresholdWorstLate = (0-self.lateMargin)
-      self.accThresholdVeryLate = (0-(3*self.lateMargin/4))
-      self.accThresholdLate = (0-(2*self.lateMargin/4))
-      self.accThresholdSlightlyLate = (0-(1*self.lateMargin/4))
-      self.accThresholdExcellentLate = -1.0
-      self.accThresholdPerfect = 1.0
-      self.accThresholdExcellentEarly = (1*self.lateMargin/4)
-      self.accThresholdSlightlyEarly = (2*self.lateMargin/4)
-      self.accThresholdEarly = (3*self.lateMargin/4)
-      self.accThresholdVeryEarly = (4*self.lateMargin/4)
+    #MFH - TODO - only calculate the below values if the realtime hit accuracy feedback display is enabled - otherwise this is a waste!
+    self.accThresholdWorstLate = (0-self.lateMargin)
+    self.accThresholdVeryLate = (0-(3*self.lateMargin/4))
+    self.accThresholdLate = (0-(2*self.lateMargin/4))
+    self.accThresholdSlightlyLate = (0-(1*self.lateMargin/4))
+    self.accThresholdExcellentLate = -1.0
+    self.accThresholdPerfect = 1.0
+    self.accThresholdExcellentEarly = (1*self.lateMargin/4)
+    self.accThresholdSlightlyEarly = (2*self.lateMargin/4)
+    self.accThresholdEarly = (3*self.lateMargin/4)
+    self.accThresholdVeryEarly = (4*self.lateMargin/4)
 
 
     
@@ -1786,7 +1786,7 @@ class Guitar:
 
     # Update dynamic period
     self.currentPeriod = self.neckSpeed
-    self.targetPeriod  = self.neckSpeed
+    #self.targetPeriod  = self.neckSpeed
 
     self.killPoints = False
 
@@ -1964,7 +1964,7 @@ class Guitar:
 
     # Update dynamic period
     self.currentPeriod = self.neckSpeed
-    self.targetPeriod  = self.neckSpeed
+    #self.targetPeriod  = self.neckSpeed
 
     self.killPoints = False
 
@@ -3669,13 +3669,13 @@ class Guitar:
         self.hit[n] = False
 
     # glorandwarf: moved the update bpm code - was after the for statement below
-    if self.currentBpm != self.targetBpm:
-      diff = self.targetBpm - self.currentBpm
-      if (round((diff * .03), 4) != 0):
-        self.currentBpm = round(self.currentBpm + (diff * .03), 4)
-      else:
-        self.currentBpm = self.targetBpm
-      self.setBPM(self.currentBpm) # glorandwarf: was setDynamicBPM(self.currentBpm)
+    #if self.currentBpm != self.targetBpm:
+    #  diff = self.targetBpm - self.currentBpm
+    #  if (round((diff * .03), 4) != 0):
+    #    self.currentBpm = round(self.currentBpm + (diff * .03), 4)
+    #  else:
+    #    self.currentBpm = self.targetBpm
+    #  self.setBPM(self.currentBpm) # glorandwarf: was setDynamicBPM(self.currentBpm)
 
     for time, note in self.playedNotes:
       if pos > time + note.length:

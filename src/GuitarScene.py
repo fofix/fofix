@@ -871,7 +871,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.currentBpm     = Song.DEFAULT_BPM
     self.currentPeriod  = 60000.0 / self.currentBpm
     self.targetBpm      = self.currentBpm
-    self.targetPeriod   = 60000.0 / self.targetBpm
+    #self.targetPeriod   = 60000.0 / self.targetBpm
     self.lastBpmChange  = -1.0
     self.baseBeat       = 0.0
     self.disableVBPM  = self.engine.config.get("game", "disable_vbpm")
@@ -2834,14 +2834,23 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #adjust tempo gradually to meet new target:
     if self.targetBpm != self.currentBpm:
       diff = self.targetBpm - self.currentBpm
-      if (round((diff * .03), 4) != 0):
-        self.currentBpm = round(self.currentBpm + (diff * .03), 4)
+      tempDiff = round( (diff * .03), 4)    #MFH - better to calculate this once and reuse the variable instead of recalculating every use
+      if tempDiff != 0:
+        self.currentBpm = self.currentBpm + tempDiff
       else:
         self.currentBpm = self.targetBpm
-      #self.setBPM(self.currentBpm) # glorandwarf: was setDynamicBPM(self.currentBpm)
     
-    #recalculate all variables dependant on the tempo, apply to instrument objects:
-       
+      #recalculate all variables dependant on the tempo, apply to instrument objects - only if currentBpm has changed:
+      self.currentPeriod  = 60000.0 / self.currentBpm
+      for guitar in self.guitars:
+        guitar.setBPM(self.currentBpm)
+        #guitar.currentPeriod = self.currentPeriod
+        #self.currentPeriod = guitar.currentPeriod   #MFH - this actually gets updated from the neckspeed
+        guitar.lastBpmChange = self.lastBpmChange
+        guitar.baseBeat = self.baseBeat
+
+
+
 
   def handleWhammy(self, playerNum):
     i = playerNum
@@ -3450,6 +3459,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         # update stage
       else:
         pos = self.pausePos
+
+      self.handleTempo(self.song, pos)  #MFH - new global tempo / BPM handling logic
 
       #MFH - new failing detection logic
       if self.failingEnabled:
