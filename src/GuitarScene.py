@@ -555,7 +555,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.starContinuousAvailable = self.engine.config.get("performance", "star_continuous_fillup") and \
       None not in (self.starFillupCenterX, self.starFillupCenterY, self.starFillupInRadius, self.starFillupOutRadius, self.starFillupColor)
 
-
+    self.logLyricEvents = self.engine.config.get("log",   "log_lyric_events")
+    #self.logTempoEvents = self.engine.config.get("log",   "log_tempo_events")
 
 
     #MFH - switch to midi lyric mode option
@@ -1130,18 +1131,19 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.midiLyricLines.append( (firstTime, tempLyricLine) )
       
 
-
-
       
       #MFH - test unpacking / decoding the lyrical lines:
       for midiLyricSubList in self.midiLyricLineEvents:
-        Log.debug("...New MIDI lyric line:")
+        if self.logLyricEvents:
+          Log.debug("...New MIDI lyric line:")
         for lyricTuple in midiLyricSubList:
           time, event = lyricTuple
-          Log.debug("MIDI Line-by-line lyric unpack test - time, event = " + str(time) + ", " + event.text )
+          if self.logLyricEvents:
+            Log.debug("MIDI Line-by-line lyric unpack test - time, event = " + str(time) + ", " + event.text )
               
       for lineStartTime, midiLyricSimpleLineText in self.midiLyricLines:
-        Log.debug("MIDI Line-by-line simple lyric line starting at time: " + str(lineStartTime) + ", " + midiLyricSimpleLineText)
+        if self.logLyricEvents:
+          Log.debug("MIDI Line-by-line simple lyric line starting at time: " + str(lineStartTime) + ", " + midiLyricSimpleLineText)
 
     self.numMidiLyricLines = len(self.midiLyricLines)
 

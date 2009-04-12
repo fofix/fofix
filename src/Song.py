@@ -2852,6 +2852,8 @@ class MidiReader(midi.MidiOutStream):
 
     self.logMarkerNotes = Config.get("game", "log_marker_notes")
 
+    self.logTempoEvents = Config.get("log",   "log_tempo_events")
+
     self.logSections = Config.get("game", "log_sections")
     
     self.readTextAndLyricEvents = Config.get("game","rock_band_events")
@@ -2894,7 +2896,8 @@ class MidiReader(midi.MidiOutStream):
     
     #add tempo events to the universal tempo track
     self.song.tempoEventTrack.addEvent(time, event)
-    Log.debug("Tempo event added to Tempo track: " + str(time) + " - " + str(event.bpm) + "BPM" )
+    if self.logTempoEvents:
+      Log.debug("Tempo event added to Tempo track: " + str(time) + " - " + str(event.bpm) + "BPM" )
 
   def addSpecialMidiEvent(self, track, event, time = None):    #MFH
     if self.partnumber == -1:

@@ -240,6 +240,9 @@ Config.define("game",   "log_undefined_gets",          int, 0,    text = _("Log 
 Config.define("game",   "log_marker_notes",          int, 0,    text = _("Log Marker Notes"), options = {0: _("No"), 1: _("Yes")})
 Config.define("game",   "log_starpower_misses",          int, 0,    text = _("Log SP Misses"), options = {0: _("No"), 1: _("Yes")})
 Config.define("log",   "log_unedited_midis",          int, 0,    text = _("Log Unedited MIDIs"), options = {0: _("No"), 1: _("Yes")})
+Config.define("log",   "log_lyric_events",          int, 0,    text = _("Log Lyric Events"), options = {0: _("No"), 1: _("Yes")})
+Config.define("log",   "log_tempo_events",          int, 0,    text = _("Log Tempo Events"), options = {0: _("No"), 1: _("Yes")})
+
 
 
 #racer
