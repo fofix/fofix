@@ -156,18 +156,27 @@ class Credits(Layer, KeyListener):
     c2 = (1, .75, 0, 1)
     self.text_size = nf.getLineSpacing(scale = hs)
     
-    menuPath = os.path.join("data","themes",self.themename,"menu")
-    if not hasattr(sys,"frozen"): #MFH - add ".." to path only if running from sources - not if running from EXE
-      menuPath = os.path.join("..",menuPath)
-    if self.engine.data.fileExists(os.path.join(menuPath,"credits.png")):
-      self.engine.loadImgDrawing(self, "background",os.path.join(menuPath,"credits.png"))
-      if self.engine.data.fileExists(os.path.join(menuPath,"creditstop.png")): #akedrou - cool effect, but usable to hide credits...
-        self.engine.loadImgDrawing(self, "topLayer",os.path.join(menuPath,"creditstop.png"))
-      else:
+    #menuPath = os.path.join("data","themes",self.themename,"menu")
+    #if not hasattr(sys,"frozen"): #MFH - add ".." to path only if running from sources - not if running from EXE
+    #  menuPath = os.path.join("..",menuPath)
+    #if self.engine.data.fileExists(os.path.join(menuPath,"credits.png")):
+    #  self.engine.loadImgDrawing(self, "background",os.path.join(menuPath,"credits.png"))
+    #  if self.engine.data.fileExists(os.path.join(menuPath,"creditstop.png")): #akedrou - cool effect, but usable to hide credits...
+    #    self.engine.loadImgDrawing(self, "topLayer",os.path.join(menuPath,"creditstop.png"))
+    #  else:
+    #    self.topLayer = None
+    #else:
+    #  self.background = None
+    #  self.topLayer = None
+    try:
+      self.engine.loadImgDrawing(self, 'background', os.path.join('themes', self.themename, 'menu', 'credits.png'))
+      try:
+        self.engine.loadImgDrawing(self, 'topLayer', os.path.join('themes', self.themename, 'menu', 'creditstop.png'))
+      except IOError:
         self.topLayer = None
-    else:
-      self.background = None
+    except IOError:
       self.topLayer = None
+      self.background = None
 
     space = Text(nf, hs, c1, "center", " ")
     self.credits = [
