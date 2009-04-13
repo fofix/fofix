@@ -1388,7 +1388,7 @@ class Guitar:
                     tex2 = self.taile5
           else:
             if big == True and tailOnly == True:
-              if kill and self.killfx == 0:
+              if kill:
                 zsize = .25
                 tex1 = self.kill1
                 tex2 = self.kill2
@@ -1432,15 +1432,19 @@ class Guitar:
             
           tailcol = (color)
         if self.theme == 2 and freestyleTail == 0 and big and tailOnly and Shader.list.enable("tail"):
-        
+          color = (color[0]*1.5,color[1]*1.5,color[2]*1.5,1.0)
           if kill and self.killfx == 0:
-            color = (color[0]*1.5,color[1]*1.5,color[2]*1.5,0.1)
-            Shader.list.setVar("color",color)
-            Shader.list.modVar("height",0.5,0.1)
+            if Shader.list.var["whammy"] == 0:
+              color = (1.0,1.0,1.0,1.0)
+              Shader.list.setVar("color",color)
+              Shader.list.modVar("height",0.0,0.3)
+            else:
+              Shader.list.setVar("color",color)
+              h = Shader.list.getVar("height")
+              Shader.list.modVar("height",0.5,0.06/h-0.1)
           else:  
-            color = (color[0]*1.5,color[1]*1.5,color[2]*1.5,0.1)
             Shader.list.setVar("color",color)
-            Shader.list.modVar("height",0.05,0.15)
+            Shader.list.modVar("height",0.2,0.3)
           Shader.list.setVar("scalexy",(5.0,1.0))
           Shader.list.setVar("offset",(5.0-size[1],0.0))
           size=(size[0]*100,size[1])

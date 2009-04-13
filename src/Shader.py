@@ -374,6 +374,7 @@ class shaderList:
     self.var["eqcolor"]=(0.0,)*4    #color for equalizer
     self.var["drum"]=[-10.0]*5      #last fret note hit time
     self.var["fret"]=[-10.0]*5      #last drum note hit time
+    #self.var["whammy"]=0           #whammy fx for tails
 
     
   def set(self, dir):
