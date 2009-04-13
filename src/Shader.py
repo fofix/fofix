@@ -20,10 +20,6 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-from OpenGL.GL.ARB.shader_objects import *
-from OpenGL.GL.ARB.vertex_shader import *
-from OpenGL.GL.ARB.fragment_shader import *
-
 from OpenGL.GL import *
 
 import os
@@ -32,6 +28,14 @@ import string
 import random
 import time
 import Log
+# evilynux - Do not crash If OpenGL 2.0 is not supported
+try:
+  from OpenGL.GL.ARB.shader_objects import *
+  from OpenGL.GL.ARB.vertex_shader import *
+  from OpenGL.GL.ARB.fragment_shader import *
+except:
+  Log.error("OpenGL 2.0 not supported.")
+  pass
 
 class shaderList:
   def __init__(self, dir = ""):
@@ -55,7 +59,7 @@ class shaderList:
     try:
       names = os.listdir(dir)
     except (IOError, os.error), why:
-      print u"Error: %s " % (why)
+      Log.error("Error: %s " % (why))
       raw_input()
       sys.exit()
     for name in names:
@@ -251,7 +255,7 @@ class shaderList:
         glBindTexture(program["textype"][j], i) 
         j += 1
     else:
-      print type(program["tex"])
+      Log.debug(type(program["tex"]))
       glBindTexture(program["textype"][0], program["tex"]) 
       
   def makeNoise3D(self,size=32, c = 1, type = GL_RED):
@@ -274,7 +278,11 @@ class shaderList:
           texels[i][j][k] = int(255 * texels[i][j][k])
 
     texture = 0
-    glBindTexture(GL_TEXTURE_3D, texture)
+    # evilynux - If OpenGL 2.0 is not supported, nicely return.
+    try:
+      glBindTexture(GL_TEXTURE_3D, texture)
+    except:
+      return
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT)
@@ -313,7 +321,7 @@ class shaderList:
       noise = open(os.path.join(self.workdir,fname)).read()
       size = int(len(noise)**(1/3.0))
     except:
-      print "noise"
+      Log.debug("noise")
       return self.makeNoise3D(16)
     #print noise
           
@@ -322,7 +330,11 @@ class shaderList:
     
 
     texture = 0
-    glBindTexture(GL_TEXTURE_3D, texture)
+    # evilynux - If OpenGL 2.0 is not supported, nicely return.
+    try:
+      glBindTexture(GL_TEXTURE_3D, texture)
+    except:
+      return
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT)
