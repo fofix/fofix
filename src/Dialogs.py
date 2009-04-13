@@ -329,7 +329,7 @@ class GetText(Layer, KeyListener):
 
 class GetKey(Layer, KeyListener):
   """Key choosing layer."""
-  def __init__(self, engine, prompt = "", key = None, noKey = False):
+  def __init__(self, engine, prompt = "", key = None, noKey = False, specialKeyList = []):
     self.key = key
     self.prompt = prompt
     self.engine = engine
@@ -338,6 +338,7 @@ class GetKey(Layer, KeyListener):
     self.noKey     = noKey
     self.toggleEsc = False
     self.escTimer  = 1000
+    self.specialKeyList = specialKeyList
 
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
     if self.logClassInits == 1:
@@ -352,7 +353,7 @@ class GetKey(Layer, KeyListener):
   def keyPressed(self, key, unicode):
     if key == pygame.K_ESCAPE and not self.accepted:
       self.toggleEsc = True
-    elif not self.accepted:
+    elif not self.accepted and key not in self.specialKeyList:
       self.key = key
       self.engine.view.popLayer(self)
       self.accepted = True
@@ -360,9 +361,13 @@ class GetKey(Layer, KeyListener):
   
   def keyReleased(self, key):
     if key == pygame.K_ESCAPE and self.toggleEsc:
-      self.key = key
-      self.engine.view.popLayer(self)
-      self.accepted = True
+      if key in self.specialKeyList:
+        self.escTimer = 1000
+        self.toggleEsc = False
+      else:
+        self.key = key
+        self.engine.view.popLayer(self)
+        self.accepted = True
     
   def run(self, ticks):
     self.time += ticks / 50.0
@@ -4556,7 +4561,7 @@ class ControlActivator(Layer, KeyListener):
           bigFont.render(self.tsReady, (.5-wText/2, .3), scale = .001)
     finally:
       self.engine.view.resetProjection()
-      
+
 class BpmEstimator(Layer, KeyListener):
   """Beats per minute value estimation layer."""
   def __init__(self, engine, song, prompt = ""):
@@ -4852,20 +4857,34 @@ class KeyTester(Layer, KeyListener):
       font.render(text, (.667-wText/2, .28 + v))
       
       if self.type < 2:
-
-        for i in range(5):
-          if self.controls.getState(self.keyList[(2*i)+Player.KEY1]):
-            glColor3f(*self.fretColors[i%5])
-            text = _("Fret")
-          elif self.controls.getState(self.keyList[(2*i)+1+Player.KEY1]):
-            glColor3f(*self.fretColors[i%5])
-            text = _("Solo")
-          else:
-            glColor3f(.4, .4, .4)
-            text = _("Fret")
-          text = "%s #%d" % (text, (i + 1))
-          wText, hText = font.getStringSize(text)
-          font.render(text, ((.2 + .15 * i)-wText/2, .4 + v))
+        
+        if self.type == 0:
+          for i in range(5):
+            if self.controls.getState(self.keyList[(2*i)+Player.KEY1]):
+              glColor3f(*self.fretColors[i%5])
+              text = _("Fret")
+            elif self.controls.getState(self.keyList[(2*i)+1+Player.KEY1]):
+              glColor3f(*self.fretColors[i%5])
+              text = _("Solo")
+            else:
+              glColor3f(.4, .4, .4)
+              text = _("Fret")
+            text = "%s #%d" % (text, (i + 1))
+            wText, hText = font.getStringSize(text)
+            font.render(text, ((.2 + .15 * i)-wText/2, .4 + v))
+        else:
+          for i in range(5):
+            if self.controls.getState(self.keyList[Player.KEY1A]):
+              text = _("Solo")
+            else:
+              text = _("Fret")
+            if self.controls.getState(self.keyList[(2*i)+Player.KEY1]):
+              glColor3f(*self.fretColors[i%5])
+            else:
+              glColor3f(.4, .4, .4)
+            text = "%s #%d" % (text, (i + 1))
+            wText, hText = font.getStringSize(text)
+            font.render(text, ((.2 + .15 * i)-wText/2, .4 + v))
 
         #evilynux - Compute analog killswitch value
         wText, hText = font.getStringSize(self.names[Player.KILL])
@@ -4962,15 +4981,16 @@ def getText(engine, prompt, text = ""):
   _runDialog(engine, d)
   return d.text
 
-def getKey(engine, prompt, key = None):
+def getKey(engine, prompt, key = None, specialKeyList = []):
   """
   Ask the user to choose a key.
   
-  @param engine:  Game engine
-  @param prompt:  Prompt shown to the user
-  @param key:     Default key
+  @param engine:          Game engine
+  @param prompt:          Prompt shown to the user
+  @param key:             Default key
+  @param specialKeyList:  A list of keys that are ineligible.
   """
-  d = GetKey(engine, prompt, key)
+  d = GetKey(engine, prompt, key, specialKeyList = specialKeyList)
   _runDialog(engine, d)
   return d.key
 

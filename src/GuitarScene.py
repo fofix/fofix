@@ -174,6 +174,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.guitars = []
     self.keysList = []
     self.soloKeysList = []
+    self.soloShifts   = []
     for i,player in enumerate(self.playerList):
       if player.part.id == Song.DRUM_PART:
         self.guitars.append(Drum(self.engine,player,False,i))
@@ -190,11 +191,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       if self.guitars[i].isDrum:
         self.keysList.append(player.drums)
         self.soloKeysList.append(player.drumSolo)
+        self.soloShifts.append(None)
         self.guitars[i].keys    = player.drums
         self.guitars[i].actions = player.drums
       else:
         self.keysList.append(player.keys)
         self.soloKeysList.append(player.soloKeys)
+        self.soloShifts.append(player.soloShift)
         self.guitars[i].keys    = player.keys
         self.guitars[i].actions = player.actions
     

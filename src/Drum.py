@@ -218,6 +218,7 @@ class Drum:
 
     #get difficulty
     self.difficulty = playerObj.getDifficultyInt()
+    self.controlType = playerObj.controlType
 
     self.scoreMultiplier = 1
 
@@ -331,6 +332,7 @@ class Drum:
 
     self.keys = []
     self.actions = []
+    self.soloKey = []
       
     self.setBPM(self.currentBpm)
 

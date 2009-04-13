@@ -157,7 +157,7 @@ Config.define("controller", "key_2",         str, "K_F2",       text = (_("Fret 
 Config.define("controller", "key_3",         str, "K_F3",       text = (_("Fret #3"), _("Drum #2"), _("Cymbal #2")))
 Config.define("controller", "key_4",         str, "K_F4",       text = (_("Fret #4"), _("Drum #3")))
 Config.define("controller", "key_5",         str, "K_F5",       text = (_("Fret #5"), None, _("Cymbal #4")))
-Config.define("controller", "key_1a",        str, "K_F6",       text = (_("Solo Fret #1"), _("Drum #4"), _("Drum #5")))
+Config.define("controller", "key_1a",        str, "K_F6",       text = (_("Solo Fret #1"), _("Solo Key"), _("Drum #4"), _("Drum #5")))
 Config.define("controller", "key_2a",        str, "K_F7",       text = (_("Solo Fret #2"), _("Drum #1")))
 Config.define("controller", "key_3a",        str, "K_F8",       text = (_("Solo Fret #3"), _("Drum #2"), _("Cymbal #2")))
 Config.define("controller", "key_4a",        str, "K_F9",       text = (_("Solo Fret #4"), _("Drum #3")))
@@ -166,7 +166,7 @@ Config.define("controller", "key_cancel",    str, "K_ESCAPE",   text = _("Cancel
 Config.define("controller", "key_star",      str, "K_PAGEDOWN", text = _("StarPower"))
 Config.define("controller", "key_kill",      str, "K_PAGEUP",   text = _("Whammy"))
 Config.define("controller", "key_start",     str, "K_SPACE",    text = _("Start"))
-Config.define("controller", "type",          int, 0,            text = _("Controller Type"), options = {0: _("Standard Guitar"), 2: _("Drum Set (4-Drum)")}) #1: _("Analog Slide Guitar"), 3: _("Drum Set (3-Drum 2-Cymbal)") 
+Config.define("controller", "type",          int, 0,            text = _("Controller Type"), options = {0: _("Standard Guitar"), 1: _("Solo Shift Guitar"), 2: _("Drum Set (4-Drum)")}) #, 3: _("Drum Set (3-Drum 2-Cymbal)") 
 Config.define("controller", "two_chord_max", int, 0,            text = _("Two-Chord Max"),   options = {0: _("Off"), 1: _("On")})
 Config.define("controller", "analog_sp",     int, 0,            text = _("Analog SP"),       options = {0: _("Disabled"), 1: _("Enabled")})
 Config.define("controller", "analog_sp_threshold",   int, 60,   text = _("Analog SP Threshold"), options = dict([(n, n) for n in range(10, 101, 10)]))
@@ -820,6 +820,7 @@ class Player(object):
     self.drums        = []
     self.keys         = []
     self.soloKeys     = []
+    self.soloShift    = None
     self.actions      = []
     self.controller   = -1
     self.controlType  = -1
@@ -851,15 +852,24 @@ class Player(object):
   
   def configController(self):
     if self.keyList:
-      self.keys     = [self.keyList[KEY1], self.keyList[KEY2], self.keyList[KEY3], self.keyList[KEY4], self.keyList[KEY5], \
+      if self.controlType == 1:
+        self.keys      = [self.keyList[KEY1], self.keyList[KEY2], self.keyList[KEY3], self.keyList[KEY4], self.keyList[KEY5], \
+                          self.keyList[KEY1], self.keyList[KEY2], self.keyList[KEY3], self.keyList[KEY4], self.keyList[KEY5]]
+        self.soloKeys  = [self.keyList[KEY1], self.keyList[KEY2], self.keyList[KEY3], self.keyList[KEY4], self.keyList[KEY5]]
+      else:
+        self.keys   = [self.keyList[KEY1], self.keyList[KEY2], self.keyList[KEY3], self.keyList[KEY4], self.keyList[KEY5], \
                        self.keyList[KEY1A], self.keyList[KEY2A], self.keyList[KEY3A], self.keyList[KEY4A], self.keyList[KEY5A]]
-      self.soloKeys = [self.keyList[KEY1A], self.keyList[KEY2A], self.keyList[KEY3A], self.keyList[KEY4A], self.keyList[KEY5A]]
+        self.soloKeys = [self.keyList[KEY1A], self.keyList[KEY2A], self.keyList[KEY3A], self.keyList[KEY4A], self.keyList[KEY5A]]
+      self.soloShift = self.keyList[KEY1A]
       self.drumSolo = []
       self.actions  = [self.keyList[ACTION1], self.keyList[ACTION2]]
       self.drums    = [self.keyList[DRUMBASS], self.keyList[DRUM1], self.keyList[DRUM2], self.keyList[DRUM3], self.keyList[DRUM5], \
                        self.keyList[DRUMBASSA], self.keyList[DRUM1A], self.keyList[DRUM2A], self.keyList[DRUM3A], self.keyList[DRUM5A]]
-      self.progressKeys = [self.keyList[KEY1], self.keyList[KEY1A], self.keyList[CANCEL], self.keyList[START], self.keyList[KEY2], \
-                           self.keyList[KEY2A]]
+      if self.controlType == 1:
+        self.progressKeys = [self.keyList[KEY1], self.keyList[CANCEL], self.keyList[START], self.keyList[KEY2]]
+      else:
+        self.progressKeys = [self.keyList[KEY1], self.keyList[KEY1A], self.keyList[CANCEL], self.keyList[START], self.keyList[KEY2], \
+                             self.keyList[KEY2A]]
       #akedrou - add drum4 to the drums when ready
       return True
     else:

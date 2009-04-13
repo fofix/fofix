@@ -148,7 +148,7 @@ class VolumeConfigChoice(ConfigChoice):
     sound.play()
 
 class KeyConfigChoice(Menu.Choice):
-  def __init__(self, engine, config, section, option, noneOK = False):
+  def __init__(self, engine, config, section, option, noneOK = False, shift = None):
     self.engine  = engine
 
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
@@ -161,8 +161,23 @@ class KeyConfigChoice(Menu.Choice):
     self.changed = False
     self.value   = None
     self.noneOK  = noneOK
+    self.shift   = shift
     self.type    = self.config.get("controller", "type")
     self.name    = self.config.get("controller", "name")
+    self.frets   = []
+    
+    def keycode(k):
+      try:
+        return int(k)
+      except:
+        return getattr(pygame, k)
+    
+    if self.shift:
+      self.frets.append(keycode(self.config.get("controller", "key_1")))
+      self.frets.append(keycode(self.config.get("controller", "key_2")))
+      self.frets.append(keycode(self.config.get("controller", "key_3")))
+      self.frets.append(keycode(self.config.get("controller", "key_4")))
+      self.frets.append(keycode(self.config.get("controller", "key_5")))
 
     self.keyCheckerMode = self.config.get("game","key_checker_mode")
 
@@ -216,10 +231,13 @@ class KeyConfigChoice(Menu.Choice):
           text = o.text[1]
     else:
       text = o.text
-    if self.noneOK:
-      key = Dialogs.getKey(self.engine, _("Press a key for '%s' or hold Escape to disable.") % text)
+    if self.shift:
+      key = Dialogs.getKey(self.engine, self.shift, specialKeyList = self.frets)
     else:
-      key = Dialogs.getKey(self.engine, _("Press a key for '%s' or hold Escape to cancel.") % text)
+      if self.noneOK:
+        key = Dialogs.getKey(self.engine, _("Press a key for '%s' or hold Escape to disable.") % text)
+      else:
+        key = Dialogs.getKey(self.engine, _("Press a key for '%s' or hold Escape to cancel.") % text)
     
     if key:
       #------------------------------------------
@@ -353,6 +371,7 @@ class ControlCreator(BackgroundLayer, KeyListener):
   
   def cancel(self):
     Player.loadControls()
+    self.engine.input.reloadControls()
     self.engine.view.popLayer(self.menu)
     self.engine.view.popLayer(self)
   
@@ -403,13 +422,14 @@ class ControlCreator(BackgroundLayer, KeyListener):
         (_("Rename Controller"), self.renameController),
       ]
     elif type == 1:
-      self.config.set("controller", "key_1a", None)
       self.config.set("controller", "key_2a", None)
       self.config.set("controller", "key_3a", None)
       self.config.set("controller", "key_4a", None)
       self.config.set("controller", "key_5a", None)
       if str(self.config.get("controller", "key_5")) == "None":
         self.config.set("controller", "key_5", self.config.getDefault("controller", "key_5"))
+      if str(self.config.get("controller", "key_1a")) == "None":
+        self.config.set("controller", "key_1a", self.config.getDefault("controller", "key_1a"))
       if str(self.config.get("controller", "key_kill")) == "None":
         self.config.set("controller", "key_kill", self.config.getDefault("controller", "key_kill"))
       
@@ -422,6 +442,7 @@ class ControlCreator(BackgroundLayer, KeyListener):
         KeyConfigChoice(self.engine, self.config, "controller", "key_3"),
         KeyConfigChoice(self.engine, self.config, "controller", "key_4"),
         KeyConfigChoice(self.engine, self.config, "controller", "key_5"),
+        KeyConfigChoice(self.engine, self.config, "controller", "key_1a", shift = _("Press the solo shift key. Be sure to assign the frets first! Hold Escape to cancel.")),
         KeyConfigChoice(self.engine, self.config, "controller", "key_left", True),
         KeyConfigChoice(self.engine, self.config, "controller", "key_right", True),
         KeyConfigChoice(self.engine, self.config, "controller", "key_up", True),

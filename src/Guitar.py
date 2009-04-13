@@ -185,6 +185,7 @@ class Guitar:
     
     #get difficulty
     self.difficulty = playerObj.getDifficultyInt()
+    self.controlType = playerObj.controlType
 
     #myfingershurt:
     self.hopoStyle        = self.engine.config.get("game", "hopo_system")
@@ -288,6 +289,7 @@ class Guitar:
     
     self.keys = []
     self.actions = []
+    self.soloKey = []
 
     
     self.setBPM(self.currentBpm)
