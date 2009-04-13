@@ -125,6 +125,7 @@ class Picture(Element):
     return self.height
 
   def render(self, offset):
+    offset = (offset*4.0)/3.0  #stump: get it back into alignment...
     self.drawing.transform.reset()
     w, h = self.engine.view.geometry[2:4]
     self.drawing.transform.translate(.5 * w, h - (.5 * self.height + offset) * h * float(w) / float(h))
@@ -232,10 +233,10 @@ class Credits(Layer, KeyListener):
     self.credits.extend( [
       space,
       Text(nf, ns, c1, "left",   _("Made with:")),
-      Text(nf, ns, c2, "right",  "Python 2.4"),
+      Text(nf, ns, c2, "right",  "Python " + sys.version.split(' ')[0]),  #stump: the version that's actually in use
       Text(nf, bs, c2, "right",  "http://www.python.org"),
       space,
-      Text(nf, ns, c2, "right",  "PyGame 1.7.1"),
+      Text(nf, ns, c2, "right",  "PyGame " + pygame.version.ver.replace('release', '')),  #stump: the version that's actually in use
       Text(nf, bs, c2, "right",  "http://www.pygame.org"),
       space,
       Text(nf, ns, c2, "right",  "PyOpenGL"),
