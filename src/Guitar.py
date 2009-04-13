@@ -2281,7 +2281,7 @@ class Guitar:
           glRotatef( 90, 0, 1, 0)
           glRotatef(-90, 1, 0, 0)
           glRotatef(-90, 0, 0, 1)
-          if self.twoDkeys == False:
+          if self.twoDkeys == False and self.keytex == False:
             if(self.keyMesh.find("Glow_001")) == True:
               key.render("Glow_001")
             else:
