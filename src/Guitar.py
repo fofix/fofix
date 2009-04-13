@@ -2206,6 +2206,19 @@ class Guitar:
           glRotatef(-90, 1, 0, 0)
           glRotatef(-90, 0, 0, 1)
 
+
+          if n == 0: 
+            glRotatef(Theme.noterotdegrees, 0, 0, -Theme.noterot1)
+          elif n == 1:
+            glRotatef(Theme.noterotdegrees, 0, 0, -Theme.noterot2)
+          elif n == 2:
+            glRotatef(Theme.noterotdegrees, 0, 0, -Theme.noterot3)
+          elif n == 3:
+            glRotatef(Theme.noterotdegrees, 0, 0, -Theme.noterot4)
+          elif n == 4:
+            glRotatef(Theme.noterotdegrees, 0, 0, -Theme.noterot5)
+
+
           #Mesh - Main fret
           #Key_001 - Top of fret (key_color)
           #Key_002 - Bottom of fret (key2_color)
@@ -2213,7 +2226,7 @@ class Guitar:
 
 	  if self.keytex == True:
 	    glColor4f(1,1,1,visibility)
-            glTranslatef(x, y, 0)
+            glTranslatef(x, v, 0)
       	    glEnable(GL_TEXTURE_2D)
             if n == 0: 
               self.keytexa.texture.bind()
