@@ -7424,7 +7424,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
                 if self.halfDots:
                   if self.numOfPlayers > 1:
-                    rcoord = transform.translate(w*.777+t*(w*-.0129),h*.256+t*(h*.026))
+                    rcoord = (w*.777+t*(w*-.0129),h*.256+t*(h*.026))
                   else:
                     rcoord = (w*.701+t*(w*-.0106),h*.256+t*(h*.026))
                   self.engine.drawImage(r, scale = (0.125,-.166666667), coord = rcoord,
