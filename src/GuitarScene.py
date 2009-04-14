@@ -544,10 +544,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.logStarpowerMisses = self.engine.config.get("game", "log_starpower_misses")
     self.soloFrameMode = self.engine.config.get("game", "solo_frame")
     self.whammyEffect = self.engine.config.get("audio",  "whammy_effect")
+    Shader.list.var["whammy"] = self.whammyEffect
     if self.whammyEffect == 1 and not Audio.pitchBendSupported:    #pitchbend
       Dialogs.showMessage(self.engine, "Pitchbend module not found!  Forcing Killswitch effect.")
       self.whammyEffect = 0
-    Shader.list.var["whammy"] = self.whammyEffect
     self.bigRockEndings = self.engine.config.get("game", "big_rock_endings")
     self.showFreestyleActive = self.engine.config.get("debug",   "show_freestyle_active")
     #stump: continuous star fillup
