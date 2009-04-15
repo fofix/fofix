@@ -1,4 +1,4 @@
-#####################################################################
+ #####################################################################
 # -*- coding: iso-8859-1 -*-                                        #
 #                                                                   #
 # Frets on Fire                                                     #
@@ -371,8 +371,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.hopoIndicatorInactiveColor   = Theme.hopoIndicatorInactiveColor
     
     if self.coOpGH:
-      for i, guitar in enumerate(self.guitars):
-        guitar.starPowerDecreaseDivisor /= self.numOfPlayers
+      for i in range(self.numOfPlayers):
+        self.guitars[i].starPowerDecreaseDivisor /= self.numOfPlayers
 
 
 
@@ -426,10 +426,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.tsBy = _("by ")
     self.tsFrettedBy = _(" fretted by ")
 
-
-    self.playerList[0].currentTheme = self.theme
-    if self.numOfPlayers > 1:
-      self.playerList[1].currentTheme = self.theme
+    for i in range(self.numOfPlayers):
+      self.playerList[i].currentTheme = self.theme
 
     #MFH - precalculate full and player viewports
     self.engine.view.setViewport(1,0)
@@ -445,7 +443,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.fontScreenBottom = self.engine.data.fontScreenBottom
     self.oBarScaleCoef = (0.6 + 0.4 * self.numOfPlayers) * 1.256 * self.hFull / self.wFull #volshebnyi - depends on resolution and number of players 
     
-    for i, thePlayer in enumerate(self.playerList):
+    for i in range(self.numOfPlayers):
       self.engine.view.setViewportHalf(self.numOfPlayers,i)
       w, h = self.engine.view.geometry[2:4]
       self.wPlayer.append( w )
@@ -597,7 +595,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     #myfingershurt: for checking if killswitch key is analog for whammy
     self.whammyVolAdjStep = 0.1
-    self.analogKillMode = [self.engine.input.getAnalogKill(i) for i, thePlayer in enumerate(self.playerList)]
+    self.analogKillMode = [self.engine.input.getAnalogKill(i) for i in range(self.numOfPlayers)]
     self.isKillAnalog = [False for i in self.playerList]
     self.isSPAnalog   = [False for i in self.playerList]
     self.whichJoyKill  = [0 for i in self.playerList]
@@ -610,14 +608,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.starActive  = [False for i in self.playerList]
     self.targetWhammyVol = [0.0 for i in self.playerList]
     
-    self.defaultWhammyVol = [self.analogKillMode[i]-1.0 for i, thePlayer in enumerate(self.playerList)]   #makes xbox defaults 1.0, PS2 defaults 0.0
-    for i, thePlayer in enumerate(self.playerList):
+    self.defaultWhammyVol = [self.analogKillMode[i]-1.0 for i in range(self.numOfPlayers)]   #makes xbox defaults 1.0, PS2 defaults 0.0
+    for i in range(self.numOfPlayers):
       if self.analogKillMode[i] == 3:   #XBOX inverted mode
         self.defaultWhammyVol[i] = -1.0
 
-    self.actualWhammyVol = [self.defaultWhammyVol[i] for i, thePlayer in enumerate(self.playerList)]
+    self.actualWhammyVol = [self.defaultWhammyVol[i] for i in range(self.numOfPlayers)]
     
-    self.lastWhammyVol = [self.defaultWhammyVol[i] for i, thePlayer in enumerate(self.playerList)]
+    self.lastWhammyVol = [self.defaultWhammyVol[i] for i in range(self.numOfPlayers)]
     
     KillKeyCode = [0 for i in self.playerList]
     StarKeyCode = [0 for i in self.playerList]
@@ -628,9 +626,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #self.autoDrumStarpowerActivate = self.engine.config.get("game", "auto_drum_sp")
     self.autoDrumStarpowerActivate = self.engine.config.get("game", "drum_sp_mode")
     
-    self.analogSPMode   = [self.engine.input.getAnalogSP(i) for i, thePlayer in enumerate(self.playerList)]
-    self.analogSPThresh = [self.engine.input.getAnalogSPThresh(i) for i, thePlayer in enumerate(self.playerList)]
-    self.analogSPSense  = [self.engine.input.getAnalogSPSense(i) for i, thePlayer in enumerate(self.playerList)]
+    self.analogSPMode   = [self.engine.input.getAnalogSP(i) for i in range(self.numOfPlayers)]
+    self.analogSPThresh = [self.engine.input.getAnalogSPThresh(i) for i in range(self.numOfPlayers)]
+    self.analogSPSense  = [self.engine.input.getAnalogSPSense(i) for i in range(self.numOfPlayers)]
 
     self.numDrumFills = 0   #MFH - count drum fills to see whether or not we should use auto SP
 
@@ -661,7 +659,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     coOpInstruments = []
     self.scoring = [None for i in self.playerList]
     #self.stars = [0,0]
-    for i, thePlayer in enumerate(self.playerList):   
+    for i in range(self.numOfPlayers):   
       if self.guitars[i].isDrum:
         instrument = Song.DRUM_PART
         coOpInstruments.append(instrument)
@@ -816,8 +814,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #MFH - first, count the markers for each instrument.  If a particular instrument does not have at least two starpower phrases 
     #  marked, ignore them and force auto-generation of SP paths.
     
-    for i, guitar in enumerate(self.guitars):   #MFH - count number of drum fills
-      if guitar.isDrum:   #MFH - count number of drum fill markers
+    for i in range(self.numOfPlayers):   #MFH - count number of drum fills
+      if self.guitars[i].isDrum:   #MFH - count number of drum fill markers
         self.numDrumFills = len([1 for time, event in self.song.midiEventTrack[i].getAllEvents() if (isinstance(event, Song.MarkerNote) and (event.number == Song.freestyleMarkingNote) ) ])
         Log.debug("Drum part found, scanning for drum fills.... %d freestyle markings found (the last one may be a Big Rock Ending)." % self.numDrumFills)
     
@@ -1261,7 +1259,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.part = [None for i in self.playerList]
     self.partLoad = None
     if self.counting or self.coOpType:
-      for i, thePlayer in enumerate(self.playerList):
+      for i in range(self.numOfPlayers):
         if not self.partImage:
           break
         try:
@@ -1311,17 +1309,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #if self.playerList[0].part.text == "Bass Guitar": #kk69: uses multb.png for mult.png specifically for bass
 
       #MFH - TODO - rewrite all this bass guitar multiplier code to be more expandable, and create a "mult" object for each player instead of sharing one (so 2 player will show up one bass mult correctly)
-      if self.guitars[0].isBassGuitar: #kk69: uses multb.png for mult.png specifically for bass
-        try:
-          self.engine.loadImgDrawing(self, "mult", os.path.join("themes",themename,"multb.png"))
-        except IOError:
-          self.engine.loadImgDrawing(self, "mult", os.path.join("themes",themename,"mult.png"))
-      else:
-        self.engine.loadImgDrawing(self, "mult", os.path.join("themes",themename,"mult.png"))
-
-      if self.numOfPlayers > 1:
-        #if self.playerList[1].part.text == "Bass Guitar":
-        if self.guitars[1].isBassGuitar:
+      for i in range(self.numOfPlayers):
+        if self.guitars[i].isBassGuitar:
           try:
             self.engine.loadImgDrawing(self, "mult", os.path.join("themes",themename,"multb.png"))
           except IOError:
@@ -1386,17 +1375,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
       #Multiplier
       #if self.playerList[0].part.text == "Bass Guitar": #kk69: uses multb.png for mult.png specifically for bass
-      if self.guitars[0].isBassGuitar: #kk69: uses multb.png for mult.png specifically for bass
-        try:
-          self.engine.loadImgDrawing(self, "mult", os.path.join("themes",themename,"multb.png"))
-        except IOError:
-          self.engine.loadImgDrawing(self, "mult", os.path.join("themes",themename,"mult.png"))
-      else:
-        self.engine.loadImgDrawing(self, "mult", os.path.join("themes",themename,"mult.png"))
-
-      if self.numOfPlayers > 1:
-        #if self.playerList[1].part.text == "Bass Guitar":
-        if self.guitars[1].isBassGuitar:
+      for i in range(self.numOfPlayers):
+        if self.guitars[i].isBassGuitar:
           try:
             self.engine.loadImgDrawing(self, "mult", os.path.join("themes",themename,"multb.png"))
           except IOError:
@@ -1482,7 +1462,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
       self.rockArr  = [None for i in self.playerList]
       self.scorePic = [None for i in self.playerList]
-      for i,thePlayer in enumerate(self.playerList):
+      for i in range(self.numOfPlayers):
         try:
           if self.guitars[i].isDrum:
             self.engine.loadImgDrawing(self, "scorePicLoad", os.path.join("themes",themename,"score_drums.png"))
@@ -1517,17 +1497,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
       #Multiplier
       #if self.playerList[0].part.text == "Bass Guitar": #kk69: uses multb.png for mult.png specifically for bass
-      if self.guitars[0].isBassGuitar: #kk69: uses multb.png for mult.png specifically for bass
-        try:
-          self.engine.loadImgDrawing(self, "mult", os.path.join("themes",themename,"multb.png"))
-        except IOError:
-          self.engine.loadImgDrawing(self, "mult", os.path.join("themes",themename,"mult.png"))
-      else:
-        self.engine.loadImgDrawing(self, "mult", os.path.join("themes",themename,"mult.png"))
-
-      if self.numOfPlayers > 1:
-        #if self.playerList[1].part.text == "Bass Guitar":
-        if self.guitars[1].isBassGuitar:
+      for i in range(self.numOfPlayers):
+        if self.guitars[i].isBassGuitar: #kk69: uses multb.png for mult.png specifically for bass
           try:
             self.engine.loadImgDrawing(self, "mult", os.path.join("themes",themename,"multb.png"))
           except IOError:
@@ -2417,10 +2388,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.midiLyricLineIndex = 0
     self.drumStart = False  #faaa's drum sound mod restart
     self.dispAccuracy = [False for i in self.playerList]
-    for playaNum, thePlayer in enumerate(self.playerList): 
-      #thePlayer.stars = 0
-      self.guitars[playaNum].spEnabled = True
-      self.guitars[playaNum].bigRockEndingMarkerSeen = False
+    for i in range(self.numOfPlayers): 
+      self.guitars[i].spEnabled = True
+      self.guitars[i].bigRockEndingMarkerSeen = False
     #self.partialStar = [0 for i in self.playerList]
     #self.starRatio = [0.0 for i in self.playerList]
     for scoreCard in self.scoring:
@@ -2468,7 +2438,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.minusRock.append(0.0)
       self.plusRock.append(0.0)
       self.timesFailed = [0 for i in self.playerList]
-    for i, thePlayer in enumerate(self.playerList):
+    for i in range(self.numOfPlayers):
       self.guitars[i].starPower = 0   
       self.guitars[i].coOpFailed = False
       #volshebnyi - BRE variables reset
@@ -2556,9 +2526,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.guitars[0].keys = self.playerList[0].keys
       self.guitars[0].actions = self.playerList[0].actions
       self.keysList   = self.playerList[0].keys
-    if self.battle == True and self.numOfPlayers>1:
-      self.guitars[0].actions = self.playerList[0].actions
-      self.guitars[1].actions = self.playerList[1].actions
+    if self.battle == True:
+      for i in range(self.numOfPlayers):
+        self.guitars[i].actions = self.playerList[i].actions
 
     self.engine.collectGarbage()
 
@@ -2587,14 +2557,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       guitar.endPick(i)
     self.song.stop()
 
-    for i, guitar in enumerate(self.guitars):
+    for i in range(self.numOfPlayers):
       #myfingershurt: preventing ever-thickening BPM lines after restarts
       if firstTime:
         self.song.track[i].markBars()
 
         #MFH - should only be done the first time.
         if self.hopoStyle > 0 or self.song.info.hopo == "on":
-          if not guitar.isDrum:
+          if not self.guitars[i].isDrum:
             if self.hopoStyle == 2 or self.hopoStyle == 3 or self.hopoStyle == 4:  #GH2 style HOPO system
               self.song.track[i].markHopoGH2(self.song.info.EighthNoteHopo, self.hopoAfterChord, self.song.info.hopofreq)
             elif self.hopoStyle == 1:   #RF-Mod style HOPO system
@@ -2642,7 +2612,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #      self.song.track[i].markHopoRF(self.song.info.EighthNoteHopo, self.song.info.hopofreq)
     
     lastTime = 0
-    for i,guitar in enumerate(self.guitars):      
+    for i in range(self.numOfPlayers):
       for time, event in self.song.track[i].getAllEvents():
         if not isinstance(event, Note):
           continue
@@ -3536,14 +3506,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               if scoreCard.lastNoteEvent.played or scoreCard.lastNoteEvent.hopod:
                 Log.debug("Big Rock Ending bonus awarded for player %d: %d points" % (i, scoreCard.endingScore) )
                 if scoreCard.endingScore > 0:
-                  #thePlayer.score += thePlayer.endingScore
                   scoreCard.addEndingScore()
-                  #thePlayer.endingScore = 0
                   self.engine.data.starActivateSound.play()
                 scoreCard.endingAwarded = True
-                #thePlayer.freestyleWasJustActive = False
-
-
 
 
         if guitar.starPowerGained == True:
@@ -3693,7 +3658,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         elif self.rbOverdriveBarGlowVisibility <= 0 and self.rbOverdriveBarGlowFadeOut == True:
           self.rbOverdriveBarGlowFadeOut = False
       
-      for playerNum, thePlayer in enumerate(self.playerList):
+      for playerNum in range(self.numOfPlayers):
         self.handleAnalogSP(playerNum, ticks)
         self.handleWhammy(playerNum)
         self.handlePhrases(playerNum, self.scoring[playerNum].streak)   #MFH - streak #1 for player #1...
@@ -3710,14 +3675,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.coOpStarPower = 0
       #MFH - new logic to update the starpower pre-multiplier
       #akedrou - broken up to support RB Co-op properly.
-      for i, guitar in enumerate(self.guitars):
-        if guitar.starPowerActive: 
+      for i in range(self.numOfPlayers):
+        if self.guitars[i].starPowerActive: 
           self.multi[i] = 2
           self.starPowersActive += 1
         else:
           self.multi[i] = 1
         if self.coOpGH:
-          self.coOpStarPower += guitar.starPower
+          self.coOpStarPower += self.guitars[i].starPower
       if self.coOpRB:
         if self.unisonIndex < len(self.unisonConfirm) and not self.unisonActive: #akedrou - unison bonuses
           while self.unisonConfirm[self.unisonIndex][0] < pos:
@@ -3739,10 +3704,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       if self.coOpRB:
         oldCoOpRock = self.rock[self.coOpPlayerMeter]
         coOpRock = 0.0
-      for i, guitar in enumerate(self.guitars):
+      for i in range(self.numOfPlayers):
         if (self.coOpRB and not guitar.coOpFailed) or not self.coOpRB:
           if self.notesMissed[i] or self.lessMissed[i]:   #(detects missed note or overstrum)
-            if guitar.isDrum:
+            if self.guitars[i].isDrum:
               if self.drumMisses == 0:    #mode: always
                 self.rockmeterDecrease(i)
               #elif self.drumMisses == 1 and self.countdownSeconds < 1:    #mode: song start
@@ -3757,7 +3722,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           if self.coOpRB:
             coOpRock += self.rock[i]
         else:
-          if not guitar.coOpRestart:
+          if not self.guitars[i].coOpRestart:
             self.rockmeterDrain()
           else:
             oldCoOpRock = 0.0
@@ -4762,17 +4727,17 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.coOpStarPowerActive[num] = time
         if time - min(self.coOpStarPowerActive) < 300.0:
           self.engine.data.starActivateSound.play()
-          for i, guitar in enumerate(self.guitars):
-            guitar.starPowerActive = True
-            guitar.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
-            guitar.ocount = 0  #MFH - this triggers the oFlash strings & timer
+          for i in range(self.numOfPlayers):
+            self.guitars[i].starPowerActive = True
+            self.guitars[i].overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
+            self.guitars[i].ocount = 0  #MFH - this triggers the oFlash strings & timer
         else:
           if time - self.coOpStarPowerTimer > 1000.0:
-            for i, guitar in enumerate(self.guitars):
+            for i in range(self.numOfPlayers):
               Log.debug(str(time - self.coOpStarPowerActive[i]))
               if time - self.coOpStarPowerActive[i] < 300.0:
                 continue
-              if guitar.isDrum and self.autoDrumStarpowerActivate == 0 and self.numDrumFills < 2:
+              if self.guitars[i].isDrum and self.autoDrumStarpowerActivate == 0 and self.numDrumFills < 2:
                 self.activateSP(i)
                 break
               if self.phrases > 1:
@@ -4889,8 +4854,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #RF style HOPO playing
     
     #myfingershurt: drums :)
-    for i, guitar in enumerate(self.guitars):
-      if guitar.isDrum and control in (guitar.keys):
+    for i in range(self.numOfPlayers):
+      if self.guitars[i].isDrum and control in (self.guitars[i].keys):
         self.handlePick(i)
         return True
 
@@ -4961,24 +4926,19 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       
     #if True: #akedrou - Probably not the best place for ontological discussions. Let's just assume True is always True.
     pressed = -1
-    if control in (self.guitars[0].actions):
-      hopo = False
-      pressed = 0;  
-    elif self.numOfPlayers > 1 and control in (self.guitars[1].actions):
-      hopo = False
-      pressed = 1;
+    for i in range(self.numOfPlayers):
+      if control in (self.guitars[i].actions):
+        hopo = False
+        pressed = i
 
     numpressed = [len([1 for k in guitar.keys if self.controls.getState(k)]) for guitar in self.guitars]
 
     activeList = [k for k in self.keysList[pressed] if self.controls.getState(k)]
-    if control in (self.guitars[0].keys) and self.song and numpressed[0] >= 1:
-      if self.guitars[0].wasLastNoteHopod and self.guitars[0].hopoActive >= 0:
-        hopo = True
-        pressed = 0;
-    elif self.numOfPlayers > 1 and control in (self.guitars[1].keys) and numpressed[1] >= 1:
-      if self.guitars[1].wasLastNoteHopod and self.guitars[1].hopoActive >= 0:
-        hopo = True
-        pressed = 1;
+    for i in range(self.numOfPlayers):
+      if control in (self.guitars[i].keys) and self.song and numpressed[i] >= 1:
+        if self.guitars[i].wasLastNoteHopod and self.guitars[i].hopoActive >= 0:
+          hopo = True
+          pressed = i
 
     if pressed >= 0:
       for k in self.keysList[pressed]:
@@ -5028,15 +4988,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     else:
       hopo = True
       
-    #if True: #MFH: WTF?
-    
     pressed = -1
-    if control in (self.guitars[0].actions):
-      hopo = False
-      pressed = 0;  
-    elif self.numOfPlayers > 1 and control in (self.guitars[1].actions):
-      hopo = False
-      pressed = 1;
+    for i in range(self.numOfPlayers):
+      if control in (self.guitars[i].actions):
+        hopo = False
+        pressed = i
 
     numpressed = [len([1 for k in guitar.keys if self.controls.getState(k)]) for guitar in self.guitars]
 
@@ -5046,9 +5002,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if self.ignoreOpenStrums and len(activeList) < 1:   #MFH - filter out strums without frets
       pressed = -1
 
-    for i, guitar in enumerate(self.guitars): #akedrou- probably loopable...
-      if control in guitar.keys and numpressed[i] >= 1:
-        if guitar.hopoActive > 0 or (guitar.wasLastNoteHopod and guitar.hopoActive == 0):
+    for i in range(self.numOfPlayers): #akedrou- probably loopable...
+      if control in self.guitars[i].keys and numpressed[i] >= 1:
+        if self.guitars[i].hopoActive > 0 or (self.guitars[i].wasLastNoteHopod and self.guitars[i].hopoActive == 0):
           if not pullOff and (self.hopoStyle == 2 or self.hopoStyle == 3): #GH2 or GH2 Strict, don't allow lower-fret tapping while holding a higher fret
             activeKeyList = []
             LastHopoFretStillHeld = False
@@ -5056,9 +5012,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             for p, k in enumerate(self.keysList[i]):
               if self.controls.getState(k):
                 activeKeyList.append(k)
-                if guitar.hopoLast == p or guitar.hopoLast-5 == p:
+                if self.guitars[i].hopoLast == p or self.guitars[i].hopoLast-5 == p:
                   LastHopoFretStillHeld = True
-                elif (p > guitar.hopoLast and p < 5) or (p > guitar.hopoLast and p > 4):
+                elif (p > self.guitars[i].hopoLast and p < 5) or (p > self.guitars[i].hopoLast and p > 4):
                   HigherFretsHeld = True
                   
             if not(LastHopoFretStillHeld and not HigherFretsHeld):  #tapping a lower note should do nothing.
@@ -5215,9 +5171,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.killswitchEngaged[i] = False
 
     
-    for i, guitar in enumerate(self.guitars):
+    for i in range(self.numOfPlayers):
       activeList = [k for k in self.keysList[i] if self.controls.getState(k) and k != control]
-      if len(activeList) != 0 and guitar.wasLastNoteHopod and activeList[0] != self.keysList[i][guitar.hopoLast] and activeList[0] != self.keysList[i][guitar.hopoLast+5] and control in self.keysList[i]:
+      if len(activeList) != 0 and self.guitars[i].wasLastNoteHopod and activeList[0] != self.keysList[i][self.guitars[i].hopoLast] and activeList[0] != self.keysList[i][self.guitars[i].hopoLast+5] and control in self.keysList[i]:
         self.keyPressed2(None, 0, activeList[0])
 
   def keyReleased3(self, key):
@@ -5240,18 +5196,18 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       if control == player.keyList[KILL] and not self.isKillAnalog[i]:  #MFH - only use this logic if digital killswitch
         self.killswitchEngaged[i] = False
     
-    for i, guitar in enumerate(self.guitars):
+    for i in range(self.numOfPlayers):
       activeList = [k for k in self.keysList[i] if self.controls.getState(k) and k != control]
       #myfingershurt: removing check for hopolast for GH2 system after-chord HOPOs
       #myfingershurt: also added self.hopoAfterChord conditional to ensure this logic doesn't apply without HOPOs after chord
       if self.hopoAfterChord and (self.hopoStyle == 2 or self.hopoStyle == 3 or self.hopoStyle == 4):   #for GH2 systems: so user can release lower fret from chord to "tap" held HOPO
         #if len(activeList) != 0 and guitar.wasLastNoteHopod and control in self.keysList[i]:
-        if len(activeList) != 0 and guitar.hopoActive > 0 and control in self.keysList[i]:
+        if len(activeList) != 0 and self.guitars[i].hopoActive > 0 and control in self.keysList[i]:
           self.keyPressed3(None, 0, activeList[0], pullOff = True)
       
       else:
         #if len(activeList) != 0 and guitar.wasLastNoteHopod and activeList[0] != self.keysList[i][guitar.hopoLast] and control in self.keysList[i]:
-        if len(activeList) != 0 and guitar.hopoActive > 0 and activeList[0] != self.keysList[i][guitar.hopoLast] and activeList[0] != self.keysList[i][guitar.hopoLast+5] and control in self.keysList[i]:
+        if len(activeList) != 0 and self.guitars[i].hopoActive > 0 and activeList[0] != self.keysList[i][self.guitars[i].hopoLast] and activeList[0] != self.keysList[i][self.guitars[i].hopoLast+5] and control in self.keysList[i]:
           self.keyPressed3(None, 0, activeList[0], pullOff = True)
         
   def getPlayerNum(self, control):
@@ -7139,9 +7095,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 if self.rockTimer == 1:
                   #self.sfxChannel.setVolume(self.sfxVolume)
                   self.engine.data.rockSound.play()
-                  for num, thePlayer in enumerate(self.playerList):   #MFH - flash overdrive strings in RB theme
-                    self.guitars[num].overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
-                    self.guitars[num].ocount = 0  #MFH - this triggers the oFlash strings & timer
+                  for i in range(self.numOfPlayers): #MFH - flash overdrive strings in RB theme
+                    self.guitars[i].overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
+                    self.guitars[i].ocount = 0  #MFH - this triggers the oFlash strings & timer
                 if self.rockTimer < self.rockCountdown:
                   self.rockTimer += 1
                   self.engine.drawImage(self.rockMsg, scale = (0.5, -0.5), coord = (w/2,h/2))
