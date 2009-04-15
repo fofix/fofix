@@ -1469,3 +1469,28 @@ class GameSettingsMenu(Menu.Menu):
     ]
     Menu.Menu.__init__(self, engine, settings, pos = (.360, .250), viewSize = 5, textColor = gTextColor, selectedColor = gSelectedColor) #Worldrave- Changed Pause-Submenu Position more centered until i add a theme.ini setting.
 
+class GameCareerSettingsMenu(Menu.Menu):
+  def __init__(self, engine, gTextColor, gSelectedColor):
+
+    self.logClassInits = Config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("GameSettingsMenu class init (Settings.py)...")
+    
+    settings = [
+      VolumeConfigChoice(engine, engine.config, "audio",  "guitarvol", autoApply = True),
+      VolumeConfigChoice(engine, engine.config, "audio",  "songvol", autoApply = True),
+      VolumeConfigChoice(engine, engine.config, "audio",  "rhythmvol", autoApply = True),
+      VolumeConfigChoice(engine, engine.config, "audio",  "screwupvol", autoApply = True),
+      VolumeConfigChoice(engine, engine.config, "audio",  "miss_volume", autoApply = True),
+      VolumeConfigChoice(engine, engine.config, "audio",  "single_track_miss_volume", autoApply = True),
+      VolumeConfigChoice(engine, engine.config, "audio",  "crowd_volume", autoApply = True),
+      VolumeConfigChoice(engine, engine.config, "audio",  "kill_volume", autoApply = True), #MFH
+      VolumeConfigChoice(engine, engine.config, "audio",  "SFX_volume", autoApply = True), #MFH
+      ConfigChoice(engine, engine.config, "audio", "enable_crowd_tracks", autoApply = True), #akedrou
+      ConfigChoice(engine, engine.config, "audio",  "delay", autoApply = True),   #myfingershurt: so the a/v delay can be adjusted in-game
+      ConfigChoice(engine, engine.config, "game", "stage_rotate_delay", autoApply = True),   #myfingershurt - user defined stage rotate delay
+      ConfigChoice(engine, engine.config, "game", "stage_animate_delay", autoApply = True),   #myfingershurt - user defined stage rotate delay
+      #ConfigChoice(engine, engine.config, "player0",  "leftymode", autoApply = True),
+      #ConfigChoice(engine, engine.config, "player1",  "leftymode", autoApply = True), #QQstarS
+    ]
+    Menu.Menu.__init__(self, engine, settings, pos = (.360, .250), viewSize = 5, textColor = gTextColor, selectedColor = gSelectedColor) #Worldrave- Changed Pause-Submenu Position more centered until i add a theme.ini setting.

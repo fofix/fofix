@@ -1710,7 +1710,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
 
     settingsMenu = Settings.GameSettingsMenu(self.engine, self.pause_text_color, self.pause_selected_color)
+    careerSettingsMenu = Settings.GameCareerSettingsMenu(self.engine, self.pause_text_color, self.pause_selected_color)
     settingsMenu.fadeScreen = False
+    careerSettingsMenu.fadeScreen = False
 
     
     # evilynux - More themeable options
@@ -1759,7 +1761,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           (_("        RESTART"), self.restartSong),
           #(_("        GIVE UP"), self.changeSong), *Worldrave-commented out just to match GH3. Since this is a GH3 specific instruction.
           (_("       PRACTICE"), self.practiceSong), #evilynux
-          (_("        OPTIONS"), settingsMenu),
+          (_("        OPTIONS"), careerSettingsMenu),
           (_("           QUIT"), self.quit), #Worldrave - added graphic menu support "careerpause" for Career Pause menu in below line.
         ], name = "careerpause", fadeScreen = False, onClose = self.resumeGame, font = self.engine.data.pauseFont, pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color, append_submenu_char = False)
       else:
@@ -1794,7 +1796,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           (_("  Start Over"),      self.restartSong),
           (_("  Change Song"),       self.changeSong),
           (_("  Practice"),       self.practiceSong), #evilynux
-          (_("  Settings"),          settingsMenu),
+          (_("  Settings"),          careerSettingsMenu),
           (_("  Quit to Main Menu"), self.quit),  #Worldrave - added graphic menu support "careerpause" for Career Pause menu in below line.
         ], name = "careerpause", fadeScreen = False, onClose = self.resumeGame, font = self.engine.data.pauseFont, pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color)
       else:
@@ -1830,7 +1832,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           (_("   RESTART"),      self.restartSong),
           (_("   CHANGE SONG"),       self.changeSong),
           (_("   PRACTICE"),       self.practiceSong), #evilynux
-          (_("   SETTINGS"),          settingsMenu),
+          (_("   SETTINGS"),          careerSettingsMenu),
           (_("   QUIT"), self.quit),  #Worldrave - added graphic menu support "careerpause" for Career Pause menu in below line.
         ], name = "careerpause", fadeScreen = False, onClose = self.resumeGame, font = self.engine.data.pauseFont, pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color)
       else:      
