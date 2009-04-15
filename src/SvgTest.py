@@ -23,7 +23,8 @@
 import unittest
 from GameEngine import GameEngine
 from Texture import Texture
-
+import Config
+import Version
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
@@ -41,14 +42,11 @@ class SvgTest(unittest.TestCase):
     t = Texture()
     self.e.svg.setProjection((0, 0, fullwidth, fullheight))
     
-    t.prepareRenderTarget(width, height)
-    t.setAsRenderTarget()
     glViewport(0, 0, width, height)
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     self.svg.transform.translate(width * scale / 2, height * scale / 2)
     self.svg.transform.rotate(3.141592)
     self.svg.draw()
-    t.resetDefaultRenderTarget()
 
     glViewport(0, 0, fullwidth, fullheight)
     glMatrixMode(GL_PROJECTION)
@@ -59,8 +57,6 @@ class SvgTest(unittest.TestCase):
 
     t.bind()
     glEnable(GL_TEXTURE_2D)
-    if not t.framebuffer.emulated:
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 
     glClear(GL_COLOR_BUFFER_BIT)
@@ -81,8 +77,9 @@ class SvgTest(unittest.TestCase):
     time.sleep(2)
 
   def setUp(self):
-    self.e = GameEngine()
-    self.e.loadSvgDrawing(self, "svg", "koopa.svg")
+    config = Config.load(Version.appName() + ".ini", setAsDefault = True)
+    self.e = GameEngine(config)
+    self.e.loadImgDrawing(self, "svg", "mfhlogo.png")
 
     while not self.svg:
       self.e.run()
