@@ -226,7 +226,38 @@ class MainMenu(BackgroundLayer):
     strTraining = ""
     strSettings = ""
     strQuit = ""
-
+    
+    if self.theme == 1 and self.themeCoOp: #Worldrave - Put GH Co-op ahead of FoFix co-op for GH based theme's. Made more sense.
+      multPlayerMenu = [
+        (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
+        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
+        (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
+        (_("Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 5)),
+        (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),   #Worldrave - Re-added this option for now.
+      ]
+    elif self.theme == 1 and not self.themeCoOp:
+      multPlayerMenu = [
+        (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
+        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
+        (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
+      ]
+    elif self.theme == 2:
+      multPlayerMenu = [
+        (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),
+        (_("RB Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 4)),
+        (_("GH Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 5)),
+        (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
+        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
+        (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
+      ]
+    else:
+      multPlayerMenu = [
+        (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),
+        (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
+        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
+        (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
+      ]
+    
     if self.useSoloMenu is None:
       if self.theme == 0 or self.theme == 1:    #GH themes = 6 main menu selections
         self.useSoloMenu = False
@@ -234,27 +265,6 @@ class MainMenu(BackgroundLayer):
         self.useSoloMenu = True
     
     if not self.useSoloMenu:
-      if self.theme == 1 and self.themeCoOp: #Worldrave - Put GH Co-op ahead of FoFix co-op for GH based theme's. Made more sense.
-        multPlayerMenu = [
-          (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
-          (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
-          (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
-          (_("Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 5)),
-          (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),   #Worldrave - Re-added this option for now.
-        ]
-      elif self.theme == 1 and not self.themeCoOp:
-        multPlayerMenu = [
-          (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
-          (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
-          (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
-        ]
-      else:
-        multPlayerMenu = [
-          (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),
-          (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
-          (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
-          (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
-        ]
 
       mainMenu = [
         (strCareer, lambda:   self.newLocalGame(mode1p = 2)),
@@ -270,15 +280,6 @@ class MainMenu(BackgroundLayer):
       soloMenu = [
         (_("Solo Tour"), lambda: self.newLocalGame(mode1p = 2)),
         (_("Quickplay"), lambda: self.newLocalGame()),
-      ]
-
-      multPlayerMenu = [
-        (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),
-        (_("RB Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 4)),
-        (_("GH Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 5)),
-        (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
-        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
-        (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
       ]
 
       mainMenu = [
