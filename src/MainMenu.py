@@ -113,6 +113,7 @@ class MainMenu(BackgroundLayer):
     self.theme = self.engine.data.theme
     self.themeCoOp = self.engine.data.themeCoOp
     self.themename = self.engine.data.themeLabel
+    self.useSoloMenu = Theme.use_solo_submenu
 
     try:
       #blazingamer
@@ -226,9 +227,13 @@ class MainMenu(BackgroundLayer):
     strSettings = ""
     strQuit = ""
 
-
-    if self.theme == 0 or self.theme == 1:    #GH themes = 6 main menu selections
+    if self.useSoloMenu is None:
+      if self.theme == 0 or self.theme == 1:    #GH themes = 6 main menu selections
+        self.useSoloMenu = False
+      else:    #RB themes = 5 main menu selections
+        self.useSoloMenu = True
     
+    if not self.useSoloMenu:
       if self.theme == 1 and self.themeCoOp: #Worldrave - Put GH Co-op ahead of FoFix co-op for GH based theme's. Made more sense.
         multPlayerMenu = [
           (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
@@ -259,9 +264,8 @@ class MainMenu(BackgroundLayer):
         ((strSettings,"settings"),  self.settingsMenu),
         (strQuit,        self.quit),
       ]
-
-
-    elif self.theme == 2:    #RB themes = 5 main menu selections
+      
+    else:
 
       soloMenu = [
         (_("Solo Tour"), lambda: self.newLocalGame(mode1p = 2)),
@@ -490,7 +494,7 @@ class MainMenu(BackgroundLayer):
     w, h, = self.engine.view.geometry[2:4]
     r = .5
 
-    if self.theme == 0 or self.theme == 1:
+    if not self.useSoloMenu:
 
 
       if self.active:
@@ -537,7 +541,7 @@ class MainMenu(BackgroundLayer):
           self.engine.drawImage(self.BGText, (.5*self.main_menu_scale,-1/6.0*self.main_menu_scale), textcoord,
                                 rect = (xpos[0],xpos[1],ypos,ypos+1/6.0))
 
-    elif self.theme == 2:
+    else:
 
       if self.active:
         if self.engine.view.topLayer() is not None:

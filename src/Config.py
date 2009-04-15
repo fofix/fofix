@@ -212,6 +212,8 @@ class Config:
       value = str(value).lower()
       if value in ("1", "true", "yes", "on"):
         value = True
+      elif value in ("none", ""):
+        value = default #allows None-default bools to return None
       else:
         value = False
     else:
