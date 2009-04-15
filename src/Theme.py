@@ -254,6 +254,7 @@ Config.define("theme", "opt_selected_color",  str, "#FFBF00")
 
 Config.define("theme", "main_menu_scale",       float, None)
 Config.define("theme", "main_menu_vspacing",       float, None)
+Config.define("theme", "use_solo_submenu",       bool, None)
 Config.define("theme", "sub_menu_x",       float, None)
 Config.define("theme", "sub_menu_y",       float, None)
 
@@ -496,6 +497,7 @@ opt_text_yPos = None
 
 main_menu_scaleVar = None
 main_menu_vspacingVar = None
+use_solo_submenu = None
 sub_menu_xVar = None
 sub_menu_yVar = None
 
@@ -828,7 +830,6 @@ def setupSonglist(config):
 
   global setlistguidebuttonsposX, setlistguidebuttonsposY, setlistguidebuttonsscaleX, setlistguidebuttonsscaleY
   global setlistpreviewbuttonposX, setlistpreviewbuttonposY, setlistpreviewbuttonscaleX, setlistpreviewbuttonscaleY
-  global main_menu_scaleVar, main_menu_vspacingVar, sub_menu_xVar, sub_menu_yVar
   global career_title_colorVar, opt_text_colorVar, opt_selected_colorVar
   global song_name_text_colorVar, song_name_selected_colorVar
   global artist_text_colorVar, artist_selected_colorVar
@@ -864,10 +865,6 @@ def setupSonglist(config):
   song_cdscore_Xpos = config.get("theme", "song_cdscore_x")
   song_list_Xpos = config.get("theme", "song_list_x")
   song_listscore_Xpos = config.get("theme", "song_listscore_x")
-  main_menu_scaleVar = config.get("theme", "main_menu_scale")
-  main_menu_vspacingVar = config.get("theme", "main_menu_vspacing")
-  sub_menu_xVar = config.get("theme", "sub_menu_x")
-  sub_menu_yVar = config.get("theme", "sub_menu_y")
   career_title_colorVar = config.get("theme", "career_title_color")
   opt_text_colorVar = config.get("theme", "opt_text_color")
   opt_selected_colorVar = config.get("theme", "opt_selected_color")
@@ -903,6 +900,7 @@ def setupPauseNOpt(config):
 def setupMenu(config):
   global menuX, menuY, menuRB
   global loadingX, loadingY, loadingColor, loadingFScale, loadingRMargin, loadingLSpacing
+  global main_menu_scaleVar, main_menu_vspacingVar, use_solo_submenu, sub_menu_xVar, sub_menu_yVar
   global songback, versiontag, shadowoffsetx, shadowoffsety
   
   menuX = config.get("theme", "menu_x")
@@ -914,6 +912,11 @@ def setupMenu(config):
   loadingFScale = config.get("theme", "loading_font_scale")
   loadingRMargin = config.get("theme", "loading_right_margin")
   loadingLSpacing = config.get ("theme", "loading_line_spacing")
+  main_menu_scaleVar = config.get("theme", "main_menu_scale")
+  main_menu_vspacingVar = config.get("theme", "main_menu_vspacing")
+  use_solo_submenu = config.get("theme", "use_solo_submenu")
+  sub_menu_xVar = config.get("theme", "sub_menu_x")
+  sub_menu_yVar = config.get("theme", "sub_menu_y")
   songback = config.get("theme", "songback")
   versiontag = config.get("theme", "versiontag")
   shadowoffsetx = config.get("theme", "shadowoffsetx")
