@@ -338,6 +338,7 @@ Config.define("theme", "star_fillup_color", str, None)
 
 #Qstick - Misc
 Config.define("theme", "song_list_display",       int, None)
+Config.define("theme", "neck_width",    float, 3.0)
 
 #Qstick - Results Screen
 
@@ -565,6 +566,7 @@ starFillupColor = None
 
 #Qstick - misc
 songListDisplay = None
+neckWidth = None
 
 result_score = [None] * 5
 result_star = [None] * 4
@@ -803,6 +805,7 @@ def setupMisc(config):
   global jurgTextPos
   global oBarHScale
   global oBar3dFill
+  global neckWidth
 
   loadingPhrase = config.get("theme", "loading_phrase")
   resultsPhrase = config.get("theme", "results_phrase")
@@ -822,7 +825,7 @@ def setupMisc(config):
   jurgTextPos = config.get("theme", "jurgen_text_pos").split(",")
   oBarHScale = config.get("theme", "obar_hscale")
   oBar3dFill = config.get("theme", "obar_3dfill")
-
+  neckWidth = config.get("theme", "neck_width")
 #MFH:
 def setupSonglist(config):
   global song_cd_Xpos, song_cdscore_Xpos, song_list_Xpos, song_listscore_Xpos

@@ -126,7 +126,7 @@ class Guitar:
     
     self.bigRockEndings = self.engine.config.get("game", "big_rock_endings")
     
-    self.boardWidth     = 3.0
+    self.boardWidth     = Theme.neckWidth
     self.boardLength    = 9.0
     self.beatsPerBoard  = 5.0
     self.strings        = 5
