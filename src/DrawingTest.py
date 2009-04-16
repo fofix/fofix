@@ -15,7 +15,7 @@ def init():
         [[ 0,  1, 0],
          [-1, -1, 0],
          [ 1, -1, 0]], dtype=float32)
-    triangVbo = vbo.VBO( triangVtx )
+    triangVbo = vbo.VBO( triangVtx, usage='GL_STATIC_DRAW' )
 
 def draw():
     global mode, triangVbo, triangVtx, rtri
