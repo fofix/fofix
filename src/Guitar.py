@@ -141,6 +141,7 @@ class Guitar:
                                  [-self.boardWidth / 2, 0, self.boardLength],
                                  [self.boardWidth / 2, 0, self.boardLength]], dtype=float32)
     self.beatsPerBoard  = 5.0
+    self.beatsPerUnit   = self.beatsPerBoard / self.boardLength
     self.strings        = 5
     self.fretWeight     = [0.0] * self.strings
     self.fretActivity   = [0.0] * self.strings
@@ -760,18 +761,16 @@ class Guitar:
       return
     
     def project(beat):
-      return 0.125 * beat / beatsPerUnit    # glorandwarf: was 0.12
+      return 0.125 * beat / self.beatsPerUnit    # glorandwarf: was 0.12
 
     v            = visibility
     w            = self.boardWidth
     l            = self.boardLength
 
-    beatsPerUnit = self.beatsPerBoard / self.boardLength
-
     #offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
     offset = 0
 
-    z  = ((time - pos) / self.currentPeriod) / beatsPerUnit
+    z  = ((time - pos) / self.currentPeriod) / self.beatsPerUnit
 
     color = (1,1,1)
 
@@ -782,44 +781,44 @@ class Guitar:
 
     glBegin(GL_TRIANGLE_STRIP)
     glColor4f(color[0],color[1],color[2], 0)
-    glTexCoord2f(0.0, project(offset - 2 * beatsPerUnit))
+    glTexCoord2f(0.0, project(offset - 2 * self.beatsPerUnit))
     #glVertex3f(-w / 2, 0, -2)
     glVertex3f(-w / 2, 0, z)   #point A
-    glTexCoord2f(1.0, project(offset - 2 * beatsPerUnit))
+    glTexCoord2f(1.0, project(offset - 2 * self.beatsPerUnit))
     #glVertex3f( w / 2, 0, -2)
     glVertex3f( w / 2, 0, z)   #point B
 
     
     glColor4f(color[0],color[1],color[2], v)
-    glTexCoord2f(0.0, project(offset - 1 * beatsPerUnit))
+    glTexCoord2f(0.0, project(offset - 1 * self.beatsPerUnit))
     #glVertex3f(-w / 2, 0, -1)
     glVertex3f(-w / 2, 0, z+1)   #point C
-    glTexCoord2f(1.0, project(offset - 1 * beatsPerUnit))
+    glTexCoord2f(1.0, project(offset - 1 * self.beatsPerUnit))
     #glVertex3f( w / 2, 0, -1)
     glVertex3f( w / 2, 0, z+1)   #point D
     
-    glTexCoord2f(0.0, project(offset + l * beatsPerUnit * .7))
+    glTexCoord2f(0.0, project(offset + l * self.beatsPerUnit * .7))
     #glVertex3f(-w / 2, 0, l * .7)
     glVertex3f(-w / 2, 0, z+2+l * .7) #point E
-    glTexCoord2f(1.0, project(offset + l * beatsPerUnit * .7))
+    glTexCoord2f(1.0, project(offset + l * self.beatsPerUnit * .7))
     #glVertex3f( w / 2, 0, l * .7)
     glVertex3f( w / 2, 0, z+2+l * .7) #point F
     
     glColor4f(color[0],color[1],color[2], 0)
-    glTexCoord2f(0.0, project(offset + l * beatsPerUnit))
+    glTexCoord2f(0.0, project(offset + l * self.beatsPerUnit))
     #glVertex3f(-w / 2, 0, l)
     glVertex3f(-w / 2, 0, z+2+l)    #point G
-    glTexCoord2f(1.0, project(offset + l * beatsPerUnit))
+    glTexCoord2f(1.0, project(offset + l * self.beatsPerUnit))
     #glVertex3f( w / 2, 0, l)
     glVertex3f( w / 2, 0, z+2+l)    #point H
     glEnd()
     
     glDisable(GL_TEXTURE_2D)
 
-  def renderNeckMethod(self, visibility, offset, beatsPerUnit, neck, alpha = False): #blazingamer: New neck rendering method
-
+  def renderNeckMethod(self, visibility, offset, neck, alpha = False): #blazingamer: New neck rendering method
+    
     def project(beat):
-      return 0.125 * beat / beatsPerUnit    # glorandwarf: was 0.12
+      return 0.125 * beat / self.beatsPerUnit    # glorandwarf: was 0.12
       
     
     if self.starPowerActive and self.theme == 0:#8bit
@@ -830,12 +829,8 @@ class Guitar:
       color = (1,1,1)
 
     v            = visibility
-    w            = self.boardWidth
     l            = self.boardLength
 
-    beatsPerUnit = beatsPerUnit
-    offset       = offset
-    
     glEnable(GL_TEXTURE_2D)
 
     if alpha == True:
@@ -849,14 +844,14 @@ class Guitar:
                        [color[0],color[1],color[2], v],
                        [color[0],color[1],color[2], 0],
                        [color[0],color[1],color[2], 0]], dtype=float32)
-    neck_tex  = array([[0.0, project(offset - 2 * beatsPerUnit)],
-                       [1.0, project(offset - 2 * beatsPerUnit)],
-                       [0.0, project(offset - 1 * beatsPerUnit)],
-                       [1.0, project(offset - 1 * beatsPerUnit)],
-                       [0.0, project(offset + l * beatsPerUnit * .7)],
-                       [1.0, project(offset + l * beatsPerUnit * .7)],
-                       [0.0, project(offset + l * beatsPerUnit)],
-                       [1.0, project(offset + l * beatsPerUnit)]], dtype=float32)
+    neck_tex  = array([[0.0, project(offset - 2 * self.beatsPerUnit)],
+                       [1.0, project(offset - 2 * self.beatsPerUnit)],
+                       [0.0, project(offset - 1 * self.beatsPerUnit)],
+                       [1.0, project(offset - 1 * self.beatsPerUnit)],
+                       [0.0, project(offset + l * self.beatsPerUnit * .7)],
+                       [1.0, project(offset + l * self.beatsPerUnit * .7)],
+                       [0.0, project(offset + l * self.beatsPerUnit)],
+                       [1.0, project(offset + l * self.beatsPerUnit)]], dtype=float32)
     glEnableClientState(GL_VERTEX_ARRAY)
     glEnableClientState(GL_COLOR_ARRAY)
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -879,15 +874,10 @@ class Guitar:
     if not song.readyToGo:
       return
     
-    def project(beat):
-      print 0.125 * beat / beatsPerUnit
-      return 0.125 * beat / beatsPerUnit    # glorandwarf: was 0.12
-
     v            = visibility
     w            = self.boardWidth
     l            = self.boardLength
 
-    beatsPerUnit = self.beatsPerBoard / self.boardLength
     offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
 
     #myfingershurt: every theme can have oNeck:
@@ -905,15 +895,14 @@ class Guitar:
       neck = self.neckDrawing
 
     
-    
     if not (self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 2):
-      self.renderNeckMethod(v*self.neckAlpha[1], offset, beatsPerUnit, neck)
+      self.renderNeckMethod(v*self.neckAlpha[1], offset, neck)
 
     if self.bgcount > 0 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 2:   #static bass groove overlay
-      self.renderNeckMethod(v*self.bgcount*self.neckAlpha[3], 0, beatsPerUnit, self.bassGrooveNeck)
+      self.renderNeckMethod(v*self.bgcount*self.neckAlpha[3], 0, self.bassGrooveNeck)
       
     elif self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 2:   #static overlay
-      self.renderNeckMethod(v*self.neckAlpha[2], 0, beatsPerUnit, self.guitarSoloNeck)
+      self.renderNeckMethod(v*self.neckAlpha[2], 0, self.guitarSoloNeck)
       
     if self.spcount2 != 0 and self.spcount < 1.2 and self.oNeck:   #static overlay
       if self.oNeckovr != None and (self.scoreMultiplier > 4 or self.guitarSolo):
@@ -924,7 +913,7 @@ class Guitar:
         else:
           neck = self.oNeck
           
-      self.renderNeckMethod(self.spcount*self.neckAlpha[4], offset, beatsPerUnit, neck)
+      self.renderNeckMethod(self.spcount*self.neckAlpha[4], offset, neck)
       
     
       
@@ -939,7 +928,7 @@ class Guitar:
           neck = self.oNeck
         alpha = True
 
-      self.renderNeckMethod(v*self.neckAlpha[4], offset, beatsPerUnit, neck, alpha)
+      self.renderNeckMethod(v*self.neckAlpha[4], offset, neck, alpha)
 
     if Shader.list.enabled:
       posx = Shader.list.time()
@@ -965,7 +954,7 @@ class Guitar:
       Shader.list.disable()
     else:
       if self.isFailing:
-        self.renderNeckMethod(self.failcount*self.neckAlpha[5], 0, beatsPerUnit, self.failNeck)
+        self.renderNeckMethod(self.failcount*self.neckAlpha[5], 0, self.failNeck)
         
     if (self.guitarSolo or self.starPowerActive) and self.theme == 1:
       Shader.list.var["solocolor"]=(0.3,0.7,0.9,0.6)
@@ -980,7 +969,7 @@ class Guitar:
       return
 
     def project(beat):
-      return 0.125 * beat / beatsPerUnit    # glorandwarf: was 0.12
+      return 0.125 * beat / self.beatsPerUnit    # glorandwarf: was 0.12
 
     if self.theme == 0 or self.theme == 1:
       size = 2
@@ -991,7 +980,6 @@ class Guitar:
     w            = self.boardWidth
     l            = self.boardLength
 
-    beatsPerUnit = self.beatsPerBoard / self.boardLength
     offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
 
     glEnable(GL_TEXTURE_2D)
@@ -1009,52 +997,52 @@ class Guitar:
     
       glBegin(GL_TRIANGLE_STRIP)
       glColor4f(1, 1, 1, v)
-      glTexCoord2f(0.0, project(-2 * beatsPerUnit))
+      glTexCoord2f(0.0, project(-2 * self.beatsPerUnit))
       glVertex3f(-w / 2, 0, -2+size)
-      glTexCoord2f(1.0, project(-2 * beatsPerUnit))
+      glTexCoord2f(1.0, project(-2 * self.beatsPerUnit))
       glVertex3f( w / 2, 0, -2+size)
       
       glColor4f(1, 1, 1, v)
-      glTexCoord2f(0.0, project(-1 * beatsPerUnit))
+      glTexCoord2f(0.0, project(-1 * self.beatsPerUnit))
       glVertex3f(-w / 2, 0, -1+size)
-      glTexCoord2f(1.0, project(-1 * beatsPerUnit))
+      glTexCoord2f(1.0, project(-1 * self.beatsPerUnit))
       glVertex3f( w / 2, 0, -1+size)
       
-      glTexCoord2f(0.0, project(l * beatsPerUnit * .7))
+      glTexCoord2f(0.0, project(l * self.beatsPerUnit * .7))
       glVertex3f(-w / 2, 0, l * .7)
-      glTexCoord2f(1.0, project(1 * beatsPerUnit * .7))
+      glTexCoord2f(1.0, project(1 * self.beatsPerUnit * .7))
       glVertex3f( w / 2, 0, l * .7)
       
       glColor4f(1, 1, 1, 0)
-      glTexCoord2f(0.0, project(l * beatsPerUnit))
+      glTexCoord2f(0.0, project(l * self.beatsPerUnit))
       glVertex3f(-w / 2, 0, l)
-      glTexCoord2f(1.0, project(1 * beatsPerUnit))
+      glTexCoord2f(1.0, project(1 * self.beatsPerUnit))
       glVertex3f( w / 2, 0, l)
 
     else:   #MFH: original moving strings
 
       glBegin(GL_TRIANGLE_STRIP)
       glColor4f(1, 1, 1, v)
-      glTexCoord2f(0.0, project(offset - 2 * beatsPerUnit))
+      glTexCoord2f(0.0, project(offset - 2 * self.beatsPerUnit))
       glVertex3f(-w / 2, 0, -2+size)
-      glTexCoord2f(1.0, project(offset - 2 * beatsPerUnit))
+      glTexCoord2f(1.0, project(offset - 2 * self.beatsPerUnit))
       glVertex3f( w / 2, 0, -2+size)
       
       glColor4f(1, 1, 1, v)
-      glTexCoord2f(0.0, project(offset - 1 * beatsPerUnit))
+      glTexCoord2f(0.0, project(offset - 1 * self.beatsPerUnit))
       glVertex3f(-w / 2, 0, -1+size)
-      glTexCoord2f(1.0, project(offset - 1 * beatsPerUnit))
+      glTexCoord2f(1.0, project(offset - 1 * self.beatsPerUnit))
       glVertex3f( w / 2, 0, -1+size)
       
-      glTexCoord2f(0.0, project(offset + l * beatsPerUnit * .7))
+      glTexCoord2f(0.0, project(offset + l * self.beatsPerUnit * .7))
       glVertex3f(-w / 2, 0, l * .7)
-      glTexCoord2f(1.0, project(offset + l * beatsPerUnit * .7))
+      glTexCoord2f(1.0, project(offset + l * self.beatsPerUnit * .7))
       glVertex3f( w / 2, 0, l * .7)
       
       glColor4f(1, 1, 1, 0)
-      glTexCoord2f(0.0, project(offset + l * beatsPerUnit))
+      glTexCoord2f(0.0, project(offset + l * self.beatsPerUnit))
       glVertex3f(-w / 2, 0, l)
-      glTexCoord2f(1.0, project(offset + l * beatsPerUnit))
+      glTexCoord2f(1.0, project(offset + l * self.beatsPerUnit))
       glVertex3f( w / 2, 0, l)
 
     glEnd()
@@ -1068,13 +1056,12 @@ class Guitar:
       return
 
     def project(beat):
-      return 0.125 * beat / beatsPerUnit  # glorandwarf: was 0.12
+      return 0.125 * beat / self.beatsPerUnit  # glorandwarf: was 0.12
 
     v            = visibility
     w            = self.boardWidth + 0.15
     l            = self.boardLength
 
-    beatsPerUnit = self.beatsPerBoard / self.boardLength
     offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
 
     c = (1,1,1)
@@ -1087,26 +1074,26 @@ class Guitar:
     
     glBegin(GL_TRIANGLE_STRIP)
     glColor4f(c[0], c[1], c[2], 0)
-    glTexCoord2f(0.0, project(offset - 2 * beatsPerUnit))
+    glTexCoord2f(0.0, project(offset - 2 * self.beatsPerUnit))
     glVertex3f(-w / 2, 0, -2)
-    glTexCoord2f(1.0, project(offset - 2 * beatsPerUnit))
+    glTexCoord2f(1.0, project(offset - 2 * self.beatsPerUnit))
     glVertex3f( w / 2, 0, -2)
     
     glColor4f(c[0], c[1], c[2], v)
-    glTexCoord2f(0.0, project(offset - 1 * beatsPerUnit))
+    glTexCoord2f(0.0, project(offset - 1 * self.beatsPerUnit))
     glVertex3f(-w / 2, 0, -1)
-    glTexCoord2f(1.0, project(offset - 1 * beatsPerUnit))
+    glTexCoord2f(1.0, project(offset - 1 * self.beatsPerUnit))
     glVertex3f( w / 2, 0, -1)
     
-    glTexCoord2f(0.0, project(offset + l * beatsPerUnit * .7))
+    glTexCoord2f(0.0, project(offset + l * self.beatsPerUnit * .7))
     glVertex3f(-w / 2, 0, l * .7)
-    glTexCoord2f(1.0, project(offset + l * beatsPerUnit * .7))
+    glTexCoord2f(1.0, project(offset + l * self.beatsPerUnit * .7))
     glVertex3f( w / 2, 0, l * .7)
     
     glColor4f(c[0], c[1], c[2], 0)
-    glTexCoord2f(0.0, project(offset + l * beatsPerUnit))
+    glTexCoord2f(0.0, project(offset + l * self.beatsPerUnit))
     glVertex3f(-w / 2, 0, l)
-    glTexCoord2f(1.0, project(offset + l * beatsPerUnit))
+    glTexCoord2f(1.0, project(offset + l * self.beatsPerUnit))
     glVertex3f( w / 2, 0, l)
     glEnd()
 
@@ -1142,7 +1129,6 @@ class Guitar:
     v            = visibility
     w            = self.boardWidth
 
-    beatsPerUnit = self.beatsPerBoard / self.boardLength
     track = song.track[self.player]
 
     glEnable(GL_TEXTURE_2D)
@@ -1153,8 +1139,8 @@ class Guitar:
 
       glPushMatrix()
 
-      z  = ((time - pos) / self.currentPeriod) / beatsPerUnit
-      z2 = ((time + event.length - pos) / self.currentPeriod) / beatsPerUnit
+      z  = ((time - pos) / self.currentPeriod) / self.beatsPerUnit
+      z2 = ((time + event.length - pos) / self.currentPeriod) / self.beatsPerUnit
 
       if z > self.boardLength:
         f = (self.boardLength - z) / (self.boardLength * .2)
@@ -1234,9 +1220,8 @@ class Guitar:
     w            = self.boardWidth
     v            = 1.0 - visibility
     sw           = 0.02
-    beatsPerUnit = self.beatsPerBoard / self.boardLength
     pos         -= self.lastBpmChange
-    offset       = pos / self.currentPeriod * beatsPerUnit
+    offset       = pos / self.currentPeriod * self.beatsPerUnit
     currentBeat  = pos / self.currentPeriod
     beat         = int(currentBeat)
 
@@ -1245,7 +1230,7 @@ class Guitar:
     
     glPushMatrix()
     while beat < currentBeat + self.beatsPerBoard:
-      z = (beat - currentBeat) / beatsPerUnit
+      z = (beat - currentBeat) / self.beatsPerUnit
 
       if z > self.boardLength * .8:
         c = (self.boardLength - z) / (self.boardLength * .2)
@@ -1304,8 +1289,6 @@ class Guitar:
       tailscale = (1, .1, 1)
     else:
       tailscale = None
-
-    beatsPerUnit = self.beatsPerBoard / self.boardLength
 
     if sustain:
       if not length == None:
@@ -1469,8 +1452,6 @@ class Guitar:
 
     if flat:
       glScalef(1, .1, 1)
-
-    beatsPerUnit = self.beatsPerBoard / self.boardLength
 
 
     if tailOnly:
@@ -1673,8 +1654,6 @@ class Guitar:
     #boardWindowMin = pos - self.currentPeriod * 2
     boardWindowMax = pos + self.currentPeriod * self.beatsPerBoard
     track = song.midiEventTrack[self.player]
-    #self.currentPeriod = self.neckSpeed
-    beatsPerUnit = self.beatsPerBoard / self.boardLength
 
     #MFH - render 5 freestyle tails when Song.freestyleMarkingNote comes up
     if self.freestyleEnabled:
@@ -1683,12 +1662,12 @@ class Guitar:
       for time, event in track.getEvents(pos - self.freestyleOffset , boardWindowMax + self.freestyleOffset):
         if isinstance(event, Song.MarkerNote):
           if event.number == Song.freestyleMarkingNote:
-            length     = (event.length - 50) / self.currentPeriod / beatsPerUnit
+            length     = (event.length - 50) / self.currentPeriod / self.beatsPerUnit
             w = self.boardWidth / self.strings
             self.freestyleLength = event.length #volshebnyi
             self.freestyleStart = time # volshebnyi
-            z  = ((time - pos) / self.currentPeriod) / beatsPerUnit
-            z2 = ((time + event.length - pos) / self.currentPeriod) / beatsPerUnit
+            z  = ((time - pos) / self.currentPeriod) / self.beatsPerUnit
+            z2 = ((time + event.length - pos) / self.currentPeriod) / self.beatsPerUnit
       
             if z > self.boardLength * .8:
               f = (self.boardLength - z) / (self.boardLength * .2)
@@ -1731,10 +1710,6 @@ class Guitar:
     boardWindowMin = pos - self.currentPeriod * 2
     boardWindowMax = pos + self.currentPeriod * self.beatsPerBoard
     track = song.midiEventTrack[self.player]
-    #self.currentPeriod = self.neckSpeed
-    beatsPerUnit = self.beatsPerBoard / self.boardLength
-    
-
 
 
     if self.incomingNeckMode > 0:   #if enabled
@@ -1794,7 +1769,6 @@ class Guitar:
 
     self.killPoints = False
 
-    beatsPerUnit = self.beatsPerBoard / self.boardLength
     w = self.boardWidth / self.strings
     track = song.track[self.player]
 
@@ -1835,8 +1809,8 @@ class Guitar:
       c = self.fretColors[event.number]
 
       x  = (self.strings / 2 - event.number) * w
-      z  = ((time - pos) / self.currentPeriod) / beatsPerUnit
-      z2 = ((time + event.length - pos) / self.currentPeriod) / beatsPerUnit
+      z  = ((time - pos) / self.currentPeriod) / self.beatsPerUnit
+      z2 = ((time + event.length - pos) / self.currentPeriod) / self.beatsPerUnit
 
 
       if z > self.boardLength * .8:
@@ -1853,7 +1827,7 @@ class Guitar:
 
       color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
       if event.length > 120:
-        length     = (event.length - 50) / self.currentPeriod / beatsPerUnit
+        length     = (event.length - 50) / self.currentPeriod / self.beatsPerUnit
       else:
         length     = 0
       flat       = False
@@ -1972,8 +1946,6 @@ class Guitar:
 
     self.killPoints = False
 
-    beatsPerUnit = self.beatsPerBoard / self.boardLength
-    
     w = self.boardWidth / self.strings
     
     track = song.track[self.player]
@@ -2005,8 +1977,8 @@ class Guitar:
       c = self.fretColors[event.number]
 
       x  = (self.strings / 2 - event.number) * w
-      z  = ((time - pos) / self.currentPeriod) / beatsPerUnit
-      z2 = ((time + event.length - pos) / self.currentPeriod) / beatsPerUnit
+      z  = ((time - pos) / self.currentPeriod) / self.beatsPerUnit
+      z2 = ((time + event.length - pos) / self.currentPeriod) / self.beatsPerUnit
 
 
       if z > self.boardLength * .8:
@@ -2018,7 +1990,7 @@ class Guitar:
 
       color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
       if event.length > 120:
-        length     = (event.length - 50) / self.currentPeriod / beatsPerUnit
+        length     = (event.length - 50) / self.currentPeriod / self.beatsPerUnit
       else:
         length     = 0
       flat       = False
@@ -2114,7 +2086,7 @@ class Guitar:
           x     = (self.strings / 2 - event.number) * w
           c     = self.fretColors[event.number]
           s     = t
-          proj  = 1.0 / self.currentPeriod / beatsPerUnit
+          proj  = 1.0 / self.currentPeriod / self.beatsPerUnit
           zStep = step * proj
 
           def waveForm(t):
@@ -2325,7 +2297,6 @@ class Guitar:
     if self.flameColors[0][0][0] == -1:
       return
 
-    beatsPerUnit = self.beatsPerBoard / self.boardLength
     w = self.boardWidth / self.strings
     #track = song.track[self.player]
 
@@ -2565,7 +2536,6 @@ class Guitar:
     if not song or self.flameColors[0][0][0] == -1:
       return
 
-    beatsPerUnit = self.beatsPerBoard / self.boardLength
     w = self.boardWidth / self.strings
     track = song.track[self.player]
 
