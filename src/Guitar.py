@@ -128,6 +128,18 @@ class Guitar:
     
     self.boardWidth     = Theme.neckWidth
     self.boardLength    = 9.0
+    #death_au: fixed neck size
+    if Theme.twoDnote == False or Theme.twoDkeys == False:
+      self.boardWidth     = 3.6
+      self.boardLength    = 9.0  
+    self.boardVtx       = array([[-self.boardWidth / 2, 0, -2],
+                                 [self.boardWidth / 2, 0, -2],
+                                 [-self.boardWidth / 2, 0, -1],
+                                 [self.boardWidth / 2, 0, -1],
+                                 [-self.boardWidth / 2, 0, self.boardLength * .7],
+                                 [self.boardWidth / 2, 0, self.boardLength * .7],
+                                 [-self.boardWidth / 2, 0, self.boardLength],
+                                 [self.boardWidth / 2, 0, self.boardLength]], dtype=float32)
     self.beatsPerBoard  = 5.0
     self.strings        = 5
     self.fretWeight     = [0.0] * self.strings
@@ -278,12 +290,6 @@ class Guitar:
       self.speed = self.engine.config.get("coffee", "neckSpeed")*0.01
     else:   #constant mode
       self.speed = 410 - self.engine.config.get("coffee", "neckSpeed")    #invert this value
-
-  
-    #death_au: fixed neck size
-    if self.twoDnote == False or self.twoDkeys == False:
-      self.boardWidth     = 3.6
-      self.boardLength    = 9.0  
 
     self.bigMax = 1
     
@@ -843,14 +849,6 @@ class Guitar:
                        [color[0],color[1],color[2], v],
                        [color[0],color[1],color[2], 0],
                        [color[0],color[1],color[2], 0]], dtype=float32)
-    neck_vtx = array([[-w / 2, 0, -2],
-                      [w / 2, 0, -2],
-                      [-w / 2, 0, -1],
-                      [w / 2, 0, -1],
-                      [-w / 2, 0, l * .7],
-                      [w / 2, 0, l * .7],
-                      [-w / 2, 0, l],
-                      [w / 2, 0, l]], dtype=float32)
     neck_tex  = array([[0.0, project(offset - 2 * beatsPerUnit)],
                        [1.0, project(offset - 2 * beatsPerUnit)],
                        [0.0, project(offset - 1 * beatsPerUnit)],
@@ -862,10 +860,10 @@ class Guitar:
     glEnableClientState(GL_VERTEX_ARRAY)
     glEnableClientState(GL_COLOR_ARRAY)
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glVertexPointerf(neck_vtx)
+    glVertexPointerf(self.boardVtx)
     glColorPointerf(neck_col)
     glTexCoordPointerf(neck_tex)
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, neck_vtx.shape[0])
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, self.boardVtx.shape[0])
     glDisableClientState(GL_VERTEX_ARRAY)
     glDisableClientState(GL_COLOR_ARRAY)
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
