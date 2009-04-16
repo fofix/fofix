@@ -139,12 +139,12 @@ You need to install those packages:
 Optionally, if you are in 32bit you can also install python-psyco.
 
 Notes:
-  * ¹ python-opengl 3.x works okay but 2.x is still faster.
+  * ¹ python-opengl 3.x works okay but 2.x is still much faster.
   * ² python-pyvorbis 1.4 crashes with a double free error (at least on Debian).
 
 === Running from sources ===
   # Change directory to `FoFiX-SVN/src`
-  # Execute `python2.4 FretsOnFire.py`
+  # Execute `python FretsOnFire.py`
 
 === Creating binaries ===
 *Unless you want to distribute binaries of FoFiX this is really _not_ required.*
@@ -152,6 +152,7 @@ Notes:
 You first need to...
   # Install cxFreeze 3.0.3
   # Modify FoFiX's Makefile to make CXFREEZE point on your cxFreeze binary.
+    * You may force python and pyopengl versions if you want, by default they're autodetected.
   # Substitue line 16 of `/usr/lib/python2.4/site-packages/OpenGL/__init__.py` with `__version__ = "2.0.1.09"`.
   # Get the wiki pages by executing the following in the folder that contains `FoFiX-SVN`:
     * `svn checkout http://fofix.googlecode.com/svn/wiki FoFiX-wiki`
@@ -159,9 +160,9 @@ You first need to...
 Then either create a patch or a full package.
 
 ==== Patch ====
-  * Execute `make patch`.
+  * Execute `make clean patch`.
 ==== Full package ====
-  * Execute `make bindist`.
+  * Execute `make clean bindist`.
 
 === Optional PitchBending ===
 ==== Requirements ====
@@ -173,10 +174,9 @@ In order to build John Stumpo's pitchbend module you first need to install...
   # Get the source code: `svn co https://svn.stump.jstump.com/svnroot/pitchbend/trunk pitchbend`
   # Move to the source folder: `cd pitchbend`
   # Create an empty VERSION file: `touch VERSION`
-  # Build the library: `python2.4 setup.py build`
+  # Build the library: `python setup.py build`
+  # Optionally you can install it: `sudo python setup.py install`
 
-==== Installing ====
-_Still to come as i (evilynux) have not tested this yet..._
 ----
 ==For MacOS X==
 === Get latest FoFiX ===
