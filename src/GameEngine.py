@@ -491,7 +491,12 @@ class GameEngine(Engine):
       #self.timer.highPriority = True
       self.fps = 0 # High priority
 
-    viewport = glGetIntegerv(GL_VIEWPORT)
+    # evilynux - This was generating an error on the first pass (at least under
+    #            GNU/Linux) as the Viewport was not set yet.
+    try:
+      viewport = glGetIntegerv(GL_VIEWPORT)
+    except:
+      viewport = [0, 0, width, height]
     h = viewport[3] - viewport[1]
     w = viewport[2] - viewport[0]
     geometry = (0, 0, w, h)
