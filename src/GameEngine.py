@@ -878,19 +878,26 @@ class GameEngine(Engine):
 
     if depth == True:
       glDepthMask(1)
-      
-    glBegin(GL_TRIANGLE_STRIP)
-    
-    glTexCoord2f(texcoord[0], texcoord[1])
-    glVertex3f(vertex[0], vertscale, vertex[1])
-    glTexCoord2f(texcoord[2], texcoord[1])
-    glVertex3f(vertex[2], vertscale, vertex[1])
-    glTexCoord2f(texcoord[0], texcoord[3])
-    glVertex3f(vertex[0], -vertscale, vertex[3])
-    glTexCoord2f(texcoord[2], texcoord[3])
-    glVertex3f(vertex[2], -vertscale, vertex[3])
-      
-    glEnd()
+
+    triangVtx = array(
+        [[ vertex[0],  vertscale, vertex[1]],
+         [ vertex[2],  vertscale, vertex[1]],
+         [ vertex[0], -vertscale, vertex[3]],
+         [ vertex[2], -vertscale, vertex[3]]], dtype=float)
+
+    textriangVtx = array(
+        [[texcoord[0], texcoord[1]],
+         [texcoord[2], texcoord[1]],
+         [texcoord[0], texcoord[3]],
+         [texcoord[2], texcoord[3]]], dtype=float)
+
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY)    
+    glEnableClientState(GL_VERTEX_ARRAY)
+    glTexCoordPointer(2, GL_FLOAT, 0, textriangVtx)
+    glVertexPointer(3, GL_FLOAT, 0, triangVtx)
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
+    glDisableClientState(GL_VERTEX_ARRAY)
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY)
     
     if depth == True:
       glDepthMask(0)
@@ -901,7 +908,7 @@ class GameEngine(Engine):
     glDisable(GL_TEXTURE_2D)
     
     if alpha == True:
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)                
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)                   
   #glorandwarf: renamed to retrieve the path of the file
   def fileExists(self, fileName):
     return self.data.fileExists(fileName)

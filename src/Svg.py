@@ -26,7 +26,7 @@ import re
 import os
 from xml import sax
 from OpenGL.GL import *
-from numpy import reshape, dot, transpose, identity, zeros
+from numpy import reshape, dot, transpose, identity, zeros, array
 from math import sin, cos
 
 import Log
@@ -620,18 +620,30 @@ class ImgDrawing:
       glTranslatef(-.5, -.5, 0)
       glColor4f(*color)
       
-      self.texture.bind()
+
       glEnable(GL_TEXTURE_2D)
-      glBegin(GL_TRIANGLE_STRIP)
-      glTexCoord2f(rect[0], rect[3])
-      glVertex2f(0.0-lOffset, 1.0)
-      glTexCoord2f(rect[1], rect[3])
-      glVertex2f(1.0-rOffset, 1.0)
-      glTexCoord2f(rect[0], rect[2])
-      glVertex2f(0.0+lOffset, 0.0)
-      glTexCoord2f(rect[1], rect[2])
-      glVertex2f(1.0+rOffset, 0.0)
-      glEnd()
+      self.texture.bind()
+      
+      triangVtx = array(
+        [[0.0-lOffset, 1.0],
+         [1.0-rOffset, 1.0],
+         [0.0+lOffset, 0.0],
+         [1.0+rOffset, 0.0]], dtype=float)
+
+      textriangVtx = array(
+        [[rect[0], rect[3]],
+         [rect[1], rect[3]],
+         [rect[0], rect[2]],
+         [rect[1], rect[2]]], dtype=float)
+
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY)    
+      glEnableClientState(GL_VERTEX_ARRAY)
+      glTexCoordPointer(2, GL_FLOAT, 0, textriangVtx)
+      glVertexPointer(2, GL_FLOAT, 0, triangVtx)
+      glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
+      glDisableClientState(GL_VERTEX_ARRAY)
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY)
+
       glDisable(GL_TEXTURE_2D)
     else:
       self._render(transform)
