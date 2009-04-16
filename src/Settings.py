@@ -663,8 +663,8 @@ class SettingsMenu(Menu.Menu):
     self.fretSettingsMenu = Menu.Menu(self.engine, self.fretSettings)
     
     self.advancedVideoSettings = [
-      ConfigChoice(self.engine, self.engine.config, "video",  "fps", isQuickset = 1),
       ConfigChoice(self.engine, self.engine.config, "engine", "highpriority", isQuickset = 1),
+      ConfigChoice(self.engine, self.engine.config, "video",  "fps", isQuickset = 1),
       ConfigChoice(self.engine, self.engine.config, "game", "accuracy_pos", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "game", "gsolo_acc_pos", autoApply = True, isQuickset = 1), #MFH
       ConfigChoice(self.engine, self.engine.config, "coffee", "noterotate", autoApply = True), #blazingamer
