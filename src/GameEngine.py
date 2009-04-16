@@ -29,6 +29,7 @@
 #####################################################################
 
 from OpenGL.GL import *
+from numpy import array
 import pygame
 import os
 import sys
