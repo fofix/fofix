@@ -11,14 +11,11 @@ mode = 0
 
 def init():
     global mode, triangVbo, triangVtx
-    triangVbo = vbo.VBO(
-        array([[ 0,  1, 0],
-               [-1, -1, 0],
-               [ 1, -1, 0]],dtype=float32) )
     triangVtx = array(
         [[ 0,  1, 0],
          [-1, -1, 0],
          [ 1, -1, 0]], dtype=float32)
+    triangVbo = vbo.VBO( triangVtx )
 
 def draw():
     global mode, triangVbo, triangVtx, rtri
@@ -53,6 +50,7 @@ def draw():
 
 def main():
     global rtri, mode
+    modeName = ["VBO", "Array", "Direct"]
     fps = 0
     video_flags = DOUBLEBUF|OPENGL|HWPALETTE|HWSURFACE
     
@@ -86,7 +84,7 @@ def main():
         fps = ((frames*1000)/(ticksDiff))
         ticks = pygame.time.get_ticks()
         frames = 0
-        print "mode: %s, %.2f fps" % (mode, fps)
+        print "mode: %s, %.2f fps" % (modeName[mode], fps)
       # evilynux - commented the following so we go as fast as we can
       #clock.tick(60)
 
