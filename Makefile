@@ -1,9 +1,19 @@
 # evilynux - Change this path to make it point to your cxFreeze
-CXFREEZE=/usr/src/experimental/cx_Freeze-3.0.3/FreezePython
+CXFREEZE=/usr/src/cx_Freeze-3.0.3/FreezePython
 
-PYTHON=python2.4
-PYTHON_LIBS=/usr/lib/python2.4
+# evilynux - Autodetect pyopengl and python versions.
+PYTHON_VERSION=$(shell python -V 2>&1 | sed -e "s/^.\+\ \([0-9]\.[0-9]\).\+$$/\1/")
+PYOGL_VERSION=$(shell python${PYTHON_VERSION} -c "import OpenGL; print OpenGL.__version__" | cut -d"." -f1)
+# evilynux - If you want, you may Force pyopengl and python versions below.
+#PYTHON_VERSION=2.4
+#PYOGL_VERSION=2
+
+PYTHON=python${PYTHON_VERSION}
+PYTHON_LIBS=/usr/lib/python${PYTHON_VERSION}
 MESSAGESPOT=messages.pot
+
+# evilynux - If we're using pyopengl3.x with need more dependencies
+PYOGL3_INCL=$(shell test ${PYOGL_VERSION} = "2" && echo "" || echo "OpenGL.platform.glx,OpenGL.arrays.ctypesarrays,OpenGL.arrays.numpymodule,OpenGL.arrays.lists,OpenGL.arrays.numbers,OpenGL.arrays.strings,")
 
 # evilynux - Update files from SVN and build version number at the same time. This is "clever" but hard to understand... :-(
 SVN_VERSION = $(shell svn up | sed -e "s/.\+\ \([0-9]\+\)\./r\1/")
@@ -36,13 +46,14 @@ dist:
 	@echo --- Detected version: ${VERSION}
 	@echo --- Building binary
 	$(CXFREEZE) --target-dir dist \
+--exclude-modules tcl,tk,Tkinter \
 --include-modules \
 encodings.string_escape,\
 encodings.iso8859_1,\
 SongChoosingScene,\
 GuitarScene,\
 ctypes.util,pkg_resources,weakref,Image,\
-OpenGL,\
+OpenGL,$(PYOGL3_INCL)\
 xml.sax.drivers2.drv_pyexpat,\
 GameResultsScene src/FretsOnFire.py
 
