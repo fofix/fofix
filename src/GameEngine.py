@@ -29,7 +29,7 @@
 #####################################################################
 
 from OpenGL.GL import *
-from numpy import array
+from numpy import array, float32
 import pygame
 import os
 import sys
@@ -885,19 +885,19 @@ class GameEngine(Engine):
         [[ vertex[0],  vertscale, vertex[1]],
          [ vertex[2],  vertscale, vertex[1]],
          [ vertex[0], -vertscale, vertex[3]],
-         [ vertex[2], -vertscale, vertex[3]]], dtype=float)
+         [ vertex[2], -vertscale, vertex[3]]], dtype=float32)
 
     textriangVtx = array(
         [[texcoord[0], texcoord[1]],
          [texcoord[2], texcoord[1]],
          [texcoord[0], texcoord[3]],
-         [texcoord[2], texcoord[3]]], dtype=float)
+         [texcoord[2], texcoord[3]]], dtype=float32)
 
     glEnableClientState(GL_TEXTURE_COORD_ARRAY)    
     glEnableClientState(GL_VERTEX_ARRAY)
-    glTexCoordPointer(2, GL_FLOAT, 0, textriangVtx)
-    glVertexPointer(3, GL_FLOAT, 0, triangVtx)
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
+    glTexCoordPointerf(textriangVtx)
+    glVertexPointerf(triangVtx)
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, triangVtx.shape[0])
     glDisableClientState(GL_VERTEX_ARRAY)
     glDisableClientState(GL_TEXTURE_COORD_ARRAY)
     

@@ -26,7 +26,7 @@ import re
 import os
 from xml import sax
 from OpenGL.GL import *
-from numpy import reshape, dot, transpose, identity, zeros, array
+from numpy import reshape, dot, transpose, identity, zeros, array, float32
 from math import sin, cos
 
 import Log
@@ -236,7 +236,7 @@ class SvgTransform:
     self.matrix = dot(self.matrix, transform.matrix)
 
   def reset(self):
-    self.matrix = identity(3, dtype = float)
+    self.matrix = identity(3, dtype = float32)
 
   def translate(self, dx, dy):
     m = zeros((3, 3))
@@ -245,7 +245,7 @@ class SvgTransform:
     self.matrix += m
 
   def rotate(self, angle):
-    m = identity(3, dtype = float)
+    m = identity(3, dtype = float32)
     s = sin(angle)
     c = cos(angle)
     m[0, 0] =  c
@@ -255,7 +255,7 @@ class SvgTransform:
     self.matrix = dot(self.matrix, m)
 
   def scale(self, sx, sy):
-    m = identity(3, dtype = float)
+    m = identity(3, dtype = float32)
     m[0, 0] = sx
     m[1, 1] = sy
     self.matrix = dot(self.matrix, m)
@@ -628,19 +628,19 @@ class ImgDrawing:
         [[0.0-lOffset, 1.0],
          [1.0-rOffset, 1.0],
          [0.0+lOffset, 0.0],
-         [1.0+rOffset, 0.0]], dtype=float)
+         [1.0+rOffset, 0.0]], dtype=float32)
 
       textriangVtx = array(
         [[rect[0], rect[3]],
          [rect[1], rect[3]],
          [rect[0], rect[2]],
-         [rect[1], rect[2]]], dtype=float)
+         [rect[1], rect[2]]], dtype=float32)
 
       glEnableClientState(GL_TEXTURE_COORD_ARRAY)    
       glEnableClientState(GL_VERTEX_ARRAY)
-      glTexCoordPointer(2, GL_FLOAT, 0, textriangVtx)
-      glVertexPointer(2, GL_FLOAT, 0, triangVtx)
-      glDrawArrays(GL_TRIANGLE_STRIP, 0, 4)
+      glTexCoordPointerf(textriangVtx)
+      glVertexPointerf(triangVtx)
+      glDrawArrays(GL_TRIANGLE_STRIP, 0, triangVtx.shape[0])
       glDisableClientState(GL_VERTEX_ARRAY)
       glDisableClientState(GL_TEXTURE_COORD_ARRAY)
 
