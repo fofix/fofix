@@ -193,12 +193,18 @@ class KeyConfigChoice(Menu.Choice):
     o = self.config.prototype[self.section][self.option]
     v = self.config.get(self.section, self.option)
     if isinstance(o.text, tuple):
+      type = self.type
+      if len(o.text) == 5:
+        text = o.text[type]
+      else:
+        if type == 4:
+          type = 0
       if len(o.text) == 4:
-        text = o.text[self.type]
+        text = o.text[type]
       elif len(o.text) == 3:
-        text = o.text[max(0, self.type-1)]
+        text = o.text[max(0, type-1)]
       elif len(o.text) == 2:
-        if self.type < 2:
+        if type < 2:
           text = o.text[0]
         else:
           text = o.text[1]
@@ -514,6 +520,44 @@ class ControlCreator(BackgroundLayer, KeyListener):
         ConfigChoice(   self.engine, self.config, "controller", "analog_sp_threshold", autoApply = True),
         ConfigChoice(   self.engine, self.config, "controller", "analog_sp_sensitivity", autoApply = True),
         #ConfigChoice(   self.engine, self.config, "controller", "analog_drum", autoApply = True),
+        (_("Rename Controller"), self.renameController),
+      ]
+    elif type == 4:
+      self.config.set("controller", "key_2a", None)
+      self.config.set("controller", "key_3a", None)
+      self.config.set("controller", "key_4a", None)
+      self.config.set("controller", "key_5a", None)
+      if str(self.config.get("controller", "key_5")) == "None":
+        self.config.set("controller", "key_5", self.config.getDefault("controller", "key_5"))
+      if str(self.config.get("controller", "key_1a")) == "None":
+        self.config.set("controller", "key_1a", self.config.getDefault("controller", "key_1a"))
+      if str(self.config.get("controller", "key_kill")) == "None":
+        self.config.set("controller", "key_kill", self.config.getDefault("controller", "key_kill"))
+      
+      controlKeys = [
+        ActiveConfigChoice(self.engine, self.config, "controller", "type", self.changeType),
+        KeyConfigChoice(self.engine, self.config, "controller", "key_action1"),
+        KeyConfigChoice(self.engine, self.config, "controller", "key_action2"),
+        KeyConfigChoice(self.engine, self.config, "controller", "key_1"),
+        KeyConfigChoice(self.engine, self.config, "controller", "key_2"),
+        KeyConfigChoice(self.engine, self.config, "controller", "key_3"),
+        KeyConfigChoice(self.engine, self.config, "controller", "key_4"),
+        KeyConfigChoice(self.engine, self.config, "controller", "key_5"),
+        KeyConfigChoice(self.engine, self.config, "controller", "key_1a", shift = _("Press the highest fret on the slider. Hold Escape to cancel.")),
+        KeyConfigChoice(self.engine, self.config, "controller", "key_left", True),
+        KeyConfigChoice(self.engine, self.config, "controller", "key_right", True),
+        KeyConfigChoice(self.engine, self.config, "controller", "key_up", True),
+        KeyConfigChoice(self.engine, self.config, "controller", "key_down", True),
+        KeyConfigChoice(self.engine, self.config, "controller", "key_cancel"),
+        KeyConfigChoice(self.engine, self.config, "controller", "key_start"),
+        KeyConfigChoice(self.engine, self.config, "controller", "key_star"),
+        KeyConfigChoice(self.engine, self.config, "controller", "key_kill"),
+        ConfigChoice(   self.engine, self.config, "controller", "analog_kill", autoApply = True),
+        ConfigChoice(   self.engine, self.config, "controller", "analog_slide", autoApply = True),
+        ConfigChoice(   self.engine, self.config, "controller", "analog_sp", autoApply = True),
+        ConfigChoice(   self.engine, self.config, "controller", "analog_sp_threshold", autoApply = True),
+        ConfigChoice(   self.engine, self.config, "controller", "analog_sp_sensitivity", autoApply = True),
+        #ConfigChoice(   self.engine, self.config, "controller", "analog_fx", autoApply = True),
         (_("Rename Controller"), self.renameController),
       ]
     self.menu = Menu.Menu(self.engine, controlKeys, onCancel = self.cancel)

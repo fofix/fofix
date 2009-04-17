@@ -281,7 +281,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
               while True: #new nesting for Practice Mode selection
                 selectedPlayer = False
                 choose = []
-                if player.controlType > 1:
+                if player.controlType == 2 or player.controlType == 3:
                   choose = drums
                 else:
                   choose = guitars

@@ -4538,14 +4538,14 @@ class ControlActivator(Layer, KeyListener):
         color = (1, 1, 1, 1)
         if i in self.blockedItems:
           color = (.3, .3, .3, 1)
-        if self.engine.input.controls.type[i] < 2 and self.engine.input.controls.type[i] is not None:
+        if (self.engine.input.controls.type[i] < 2 or self.engine.input.controls.type[i] == 4) and self.engine.input.controls.type[i] is not None:
           self.engine.drawImage(self.guitar, scale = (self.guitarScale, -self.guitarScale), coord = (w*self.controlPartX-(self.partSize*1.1), h*(1-(self.selectY+self.selectSpace*i)/self.engine.data.fontScreenBottom)), color = color)
           self.engine.drawImage(self.bass, scale = (self.bassScale, -self.bassScale), coord = (w*self.controlPartX+(self.partSize*1.1), h*(1-(self.selectY+self.selectSpace*i)/self.engine.data.fontScreenBottom)), color = color)
         elif self.engine.input.controls.type[i] > 1 and self.engine.input.controls.type[i] is not None:
           self.engine.drawImage(self.drum, scale = (self.drumScale, -self.drumScale), coord = (w*self.controlPartX, h*(1-(self.selectY+self.selectSpace*i)/self.engine.data.fontScreenBottom)), color = color)
       Theme.setBaseColor(1-v)
       for j, i in enumerate(self.selectedItems):
-        if self.engine.input.controls.type[i] < 2 and self.engine.input.controls.type[i] is not None:
+        if (self.engine.input.controls.type[i] < 2 or self.engine.input.controls.type[i] == 4) and self.engine.input.controls.type[i] is not None:
           self.engine.drawImage(self.guitar, scale = (self.guitarScale*self.partBig, -self.guitarScale*self.partBig), coord = (w*(self.checkX+self.checkSpace*j)-(self.partSize*self.partBig*1.1), h*self.checkY))
           self.engine.drawImage(self.bass, scale = (self.bassScale*self.partBig, -self.bassScale*self.partBig), coord = (w*(self.checkX+self.checkSpace*j)+(self.partSize*self.partBig*1.1), h*self.checkY))
         elif self.engine.input.controls.type[i] > 1 and self.engine.input.controls.type[i] is not None:
@@ -4655,8 +4655,9 @@ class KeyTester(Layer, KeyListener):
     self.analogSPThresh = self.controls.analogSPThresh[control]
     self.analogSPSense  = self.controls.analogSPSense[control]
     self.analogDrumMode = self.controls.analogDrum[control]
+    self.analogSlideMode = self.controls.analogSlide[control]
     
-    if self.type < 2:
+    if self.type < 2 or self.type == 4:
       self.fretColors     = Theme.fretColors
       self.names          = [_("Left"), _("Right"), _("Up"), _("Down"), _("Start!"), \
                              _("Cancel"), _("Fret #1"), _("Solo #1"), _("Fret #2"), _("Solo #2"), \
@@ -4692,11 +4693,14 @@ class KeyTester(Layer, KeyListener):
     # If analog, get and show attenuation. Most code taken from GuitarScene.
     self.isKillAnalog = False
     self.isSPAnalog = False
+    self.isSlideAnalog = False
     self.areDrumsAnalog = False
     self.whichJoyKill = 0
     self.whichAxisKill = 0
     self.whichJoyStar = 0
     self.whichAxisStar = 0
+    self.whichJoySlide = 0
+    self.whichAxisSlide = 0
     self.whichJoyDrum1 = 0
     self.whichAxisDrum1 = 0
     self.whichJoyDrum2 = 0
@@ -4710,13 +4714,16 @@ class KeyTester(Layer, KeyListener):
     self.whammy = 0
     self.starpower = 0
 
-    if len(self.engine.input.joysticks) != 0 and self.type < 2:
+    if len(self.engine.input.joysticks) != 0 and self.type < 2 or self.type == 4:
       if self.analogKillMode > 0:
         KillKeyCode = self.controls.getReverseMapping(self.keyList[Player.KILL])
         self.isKillAnalog, self.whichJoyKill, self.whichAxisKill = self.engine.input.getWhammyAxis(KillKeyCode)
       if self.analogSPMode > 0:
         StarKeyCode = self.controls.getReverseMapping(self.keyList[Player.STAR])
         self.isSPAnalog, self.whichJoyStar, self.whichAxisStar = self.engine.input.getWhammyAxis(StarKeyCode)
+      if self.type == 4:
+        SlideKeyCode = self.controls.getReverseMapping(self.keyList[Player.KEY1A])
+        self.isSlideAnalog, self.whichJoySlide, self.whichAxisSlide = self.engine.input.getWhammyAxis(SlideKeyCode)
     
   def shown(self):
     self.engine.input.addKeyListener(self, priority = True)
@@ -4733,7 +4740,7 @@ class KeyTester(Layer, KeyListener):
       return True
     c = self.engine.input.controls.getMapping(key)
     self.controls.keyPressed(key)
-    if self.type > 1:
+    if self.type > 1 and self.type != 4:
       if c == self.keyList[Player.DRUM1]:
         self.engine.data.T1DrumSound.play()
       elif c == self.keyList[Player.DRUM2]:
@@ -4818,6 +4825,32 @@ class KeyTester(Layer, KeyListener):
       text = self.names[Player.STAR]
       wText, hText = font.getStringSize(text)
       
+      self.slideActive = 0
+      
+      if self.isSlideAnalog:
+        if self.analogSlideMode == 1:  #XBOX mode: (1.0 at rest, -1.0 fully depressed)
+          slideVal = 1.0 - ((self.engine.input.joysticks[self.whichJoySlide].get_axis(self.whichAxisSlide)+1.0) / 2.0)
+
+        elif self.analogSlideMode == 2:  #XBOX Inverted mode: (-1.0 at rest, 1.0 fully depressed)
+          slideVal = (self.engine.input.joysticks[self.whichJoySlide].get_axis(self.whichAxisSlide)+1.0) / 2.0 
+        
+        else: #PS2 mode: (0.0 at rest, fluctuates between 1.0 and -1.0 when pressed)
+          slideVal = abs(self.engine.input.joysticks[self.whichJoySlide].get_axis(self.whichAxisSlide))
+        
+        if slideVal < .1:
+          self.slideActive = 0
+        elif slideVal < .3:
+          self.slideActive = 1
+        elif slideVal < .5:
+          self.slideActive = 2
+        elif slideVal < .7:
+          self.slideActive = 3
+        elif slideVal < .9:
+          self.slideActive = 4
+        else:
+          self.slideActive = 5
+
+      
       if self.isSPAnalog:
         starThresh = (self.analogSPThresh/100.0)*(w/6.0)-(w/12.0)
         self.engine.drawImage(self.analogThresh, scale = (self.analogThreshScale, -self.analogThreshScale), coord = ((w*.25)+starThresh, h*.3))
@@ -4856,7 +4889,7 @@ class KeyTester(Layer, KeyListener):
       wText, hText = font.getStringSize(text)
       font.render(text, (.667-wText/2, .28 + v))
       
-      if self.type < 2:
+      if self.type < 2 or self.type == 4:
         
         if self.type == 0:
           for i in range(5):
@@ -4874,11 +4907,11 @@ class KeyTester(Layer, KeyListener):
             font.render(text, ((.2 + .15 * i)-wText/2, .4 + v))
         else:
           for i in range(5):
-            if self.controls.getState(self.keyList[Player.KEY1A]):
+            if self.slideActive == i + 1:
               text = _("Solo")
             else:
               text = _("Fret")
-            if self.controls.getState(self.keyList[(2*i)+Player.KEY1]):
+            if self.controls.getState(self.keyList[(2*i)+Player.KEY1]) or self.slideActive == i+1:
               glColor3f(*self.fretColors[i%5])
             else:
               glColor3f(.4, .4, .4)

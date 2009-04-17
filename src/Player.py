@@ -157,7 +157,7 @@ Config.define("controller", "key_2",         str, "K_F2",       text = (_("Fret 
 Config.define("controller", "key_3",         str, "K_F3",       text = (_("Fret #3"), _("Drum #2"), _("Cymbal #2")))
 Config.define("controller", "key_4",         str, "K_F4",       text = (_("Fret #4"), _("Drum #3")))
 Config.define("controller", "key_5",         str, "K_F5",       text = (_("Fret #5"), None, _("Cymbal #4")))
-Config.define("controller", "key_1a",        str, "K_F6",       text = (_("Solo Fret #1"), _("Solo Key"), _("Drum #4"), _("Drum #5")))
+Config.define("controller", "key_1a",        str, "K_F6",       text = (_("Solo Fret #1"), _("Solo Key"), _("Drum #4"), _("Drum #5"), _("Analog Slider")))
 Config.define("controller", "key_2a",        str, "K_F7",       text = (_("Solo Fret #2"), _("Drum #1")))
 Config.define("controller", "key_3a",        str, "K_F8",       text = (_("Solo Fret #3"), _("Drum #2"), _("Cymbal #2")))
 Config.define("controller", "key_4a",        str, "K_F9",       text = (_("Solo Fret #4"), _("Drum #3")))
@@ -166,12 +166,13 @@ Config.define("controller", "key_cancel",    str, "K_ESCAPE",   text = _("Cancel
 Config.define("controller", "key_star",      str, "K_PAGEDOWN", text = _("StarPower"))
 Config.define("controller", "key_kill",      str, "K_PAGEUP",   text = _("Whammy"))
 Config.define("controller", "key_start",     str, "K_SPACE",    text = _("Start"))
-Config.define("controller", "type",          int, 0,            text = _("Controller Type"), options = {0: _("Standard Guitar"), 1: _("Solo Shift Guitar"), 2: _("Drum Set (4-Drum)")}) #, 3: _("Drum Set (3-Drum 2-Cymbal)") 
+Config.define("controller", "type",          int, 0,            text = _("Controller Type"), options = {0: _("Standard Guitar"), 1: _("Solo Shift Guitar"), 2: _("Drum Set (4-Drum)"), 4: _("Analog Slide Guitar")}) #, 3: _("Drum Set (3-Drum 2-Cymbal)") 
 Config.define("controller", "two_chord_max", int, 0,            text = _("Two-Chord Max"),   options = {0: _("Off"), 1: _("On")})
 Config.define("controller", "analog_sp",     int, 0,            text = _("Analog SP"),       options = {0: _("Disabled"), 1: _("Enabled")})
 Config.define("controller", "analog_sp_threshold",   int, 60,   text = _("Analog SP Threshold"), options = dict([(n, n) for n in range(10, 101, 10)]))
 Config.define("controller", "analog_sp_sensitivity", int, 4,    text = _("Analog SP Sensitivity"), options = dict([(n, n+1) for n in range(10)]))
 Config.define("controller", "analog_drum",   int, 0,            text = _("Analog Drums"),    options = {0: _("Disabled"), 1: _("PS2/PS3/Wii"), 2: _("XBOX"), 3: _("XBOX Inv.")})
+Config.define("controller", "analog_slide",  int, 0,            text = _("Analog Slider"),    options = {0: _("PS2/PS3/Wii"), 1: _("XBOX"), 2: _("XBOX Inv.")})
 Config.define("controller", "analog_kill",   int, 0,            text = _("Analog Effects"),  options = {0: _("Disabled"), 1: _("PS2/PS3/Wii"), 2: _("XBOX"), 3: _("XBOX Inv.")})
 Config.define("controller", "analog_fx",     int, 0,            text = _("Sound FX Switch"), options = {0: _("Switch"), 1: _("Cycle")}) #akedrou - aren't I bold!
 
@@ -487,6 +488,7 @@ class Controls:
     self.analogSPThresh = []
     self.analogSPSense  = []
     self.analogDrum = []
+    self.analogSlide = []
     self.analogFX   = []
     self.twoChord   = []
     
@@ -505,6 +507,7 @@ class Controls:
         self.analogSPThresh.append(i.get("controller", "analog_sp_threshold"))
         self.analogSPSense.append(i.get("controller", "analog_sp_sensitivity"))
         self.analogDrum.append(i.get("controller", "analog_drum"))
+        self.analogSlide.append(i.get("controller", "analog_slide"))
         self.analogFX.append(i.get("controller", "analog_fx"))
         self.twoChord.append(i.get("controller", "two_chord_max"))
         self.controlList.append(i.get("controller", "name"))
@@ -553,7 +556,7 @@ class Controls:
     kills = []
     
     for i, config in enumerate(self.config):
-      if self.type[i] > 1: #drum set
+      if self.type[i] > 1 and self.type[i] < 4: #drum set
         drum1s.extend([CONTROLS[i][DRUM1], CONTROLS[i][DRUM1A]])
         drum2s.extend([CONTROLS[i][DRUM2], CONTROLS[i][DRUM2A]])
         drum3s.extend([CONTROLS[i][DRUM3], CONTROLS[i][DRUM3A]])
@@ -576,7 +579,10 @@ class Controls:
           menuNext.append(CONTROLS[i][RIGHT])
           menuPrev.append(CONTROLS[i][LEFT])
       elif self.type[i] > -1:
-        key1s.extend([CONTROLS[i][KEY1], CONTROLS[i][KEY1A]])
+        if self.type[i] == 0:
+          key1s.extend([CONTROLS[i][KEY1], CONTROLS[i][KEY1A]])
+        else:
+          key1s.extend([CONTROLS[i][KEY1]])
         key2s.extend([CONTROLS[i][KEY2], CONTROLS[i][KEY2A]])
         key3s.extend([CONTROLS[i][KEY3], CONTROLS[i][KEY3A]])
         key4s.extend([CONTROLS[i][KEY4], CONTROLS[i][KEY4A]])
@@ -821,6 +827,7 @@ class Player(object):
     self.keys         = []
     self.soloKeys     = []
     self.soloShift    = None
+    self.soloSlide    = False
     self.actions      = []
     self.controller   = -1
     self.controlType  = -1
@@ -870,6 +877,10 @@ class Player(object):
       else:
         self.progressKeys = [self.keyList[KEY1], self.keyList[KEY1A], self.keyList[CANCEL], self.keyList[START], self.keyList[KEY2], \
                              self.keyList[KEY2A]]
+      if self.controlType == 4:
+        self.soloSlide = True
+      else:
+        self.soloSlide = False
       #akedrou - add drum4 to the drums when ready
       return True
     else:

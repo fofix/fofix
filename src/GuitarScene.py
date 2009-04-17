@@ -41,7 +41,7 @@ from Drum import Drum
 from Language import _
 import Player
 from Player import CONTROLLER1KEYS, CONTROLLER2KEYS, CONTROLLER3KEYS, CONTROLLER1ACTIONS, CONTROLLER2ACTIONS, CONTROLLER3ACTIONS, CONTROLLER4KEYS, CONTROLLER4ACTIONS
-from Player import CONTROLLER1DRUMS, CONTROLLER2DRUMS, CONTROLLER3DRUMS, CONTROLLER4DRUMS, STAR, KILL, CANCEL
+from Player import CONTROLLER1DRUMS, CONTROLLER2DRUMS, CONTROLLER3DRUMS, CONTROLLER4DRUMS, STAR, KILL, CANCEL, KEY1A
 import Dialogs
 import Data
 import Theme
@@ -598,14 +598,18 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.analogKillMode = [self.engine.input.getAnalogKill(i) for i in range(self.numOfPlayers)]
     self.isKillAnalog = [False for i in self.playerList]
     self.isSPAnalog   = [False for i in self.playerList]
+    self.isSlideAnalog = [False for i in self.playerList]
     self.whichJoyKill  = [0 for i in self.playerList]
     self.whichAxisKill = [0 for i in self.playerList]
     self.whichJoyStar  = [0 for i in self.playerList]
     self.whichAxisStar = [0 for i in self.playerList]
+    self.whichJoySlide = [0 for i in self.playerList]
+    self.whichAxisSlide = [0 for i in self.playerList]
     self.whammyVol = [0.0 for i in self.playerList]
     self.starAxisVal = [0.0 for i in self.playerList]
     self.starDelay   = [0.0 for i in self.playerList]
     self.starActive  = [False for i in self.playerList]
+    self.slideValue  = [-1 for i in self.playerList]
     self.targetWhammyVol = [0.0 for i in self.playerList]
     
     self.defaultWhammyVol = [self.analogKillMode[i]-1.0 for i in range(self.numOfPlayers)]   #makes xbox defaults 1.0, PS2 defaults 0.0
@@ -619,12 +623,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     KillKeyCode = [0 for i in self.playerList]
     StarKeyCode = [0 for i in self.playerList]
+    SlideKeyCode = [0 for i in self.playerList]
     
     self.lastTapText = "tapp: -"
 
     #myfingershurt: auto drum starpower activation option
     #self.autoDrumStarpowerActivate = self.engine.config.get("game", "auto_drum_sp")
     self.autoDrumStarpowerActivate = self.engine.config.get("game", "drum_sp_mode")
+    
+    self.analogSlideMode = [self.engine.input.getAnalogSlide(i) for i in range(self.numOfPlayers)]
     
     self.analogSPMode   = [self.engine.input.getAnalogSP(i) for i in range(self.numOfPlayers)]
     self.analogSPThresh = [self.engine.input.getAnalogSPThresh(i) for i in range(self.numOfPlayers)]
@@ -640,6 +647,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       if self.analogSPMode[i] > 0:
         StarKeyCode[i] = self.controls.getReverseMapping(player.keyList[STAR])
         self.isSPAnalog[i], self.whichJoyStar[i], self.whichAxisStar[i] = self.engine.input.getWhammyAxis(StarKeyCode[i])
+      if player.controlType == 4:
+        SlideKeyCode[i] = self.controls.getReverseMapping(player.keyList[KEY1A])
+        self.isSlideAnalog[i], self.whichJoySlide[i], self.whichAxisSlide[i] = self.engine.input.getWhammyAxis(SlideKeyCode[i])
 
     self.inGameStats = self.engine.config.get("performance","in_game_stats")
     self.inGameStars = self.engine.config.get("game","in_game_stars")
@@ -2958,6 +2968,43 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       else:
         self.starActive[i] = False
         self.starDelay[i] = 0
+  
+  def handleAnalogSlider(self, playerNum):
+    i = playerNum
+    if self.resumeCountdown > 0:
+      return
+    if self.isSlideAnalog[i]:
+      oldSlide = self.slideValue[i]
+      if self.analogSlideMode[i] == 1:  #XBOX mode: (1.0 at rest, -1.0 fully depressed)
+        slideVal = 1.0 - (round(10* ((self.engine.input.joysticks[self.whichJoySlide[i]].get_axis(self.whichAxisSlide[i])+1.0) / 2.0 ))/10.0)
+      elif self.analogSlideMode[i] == 2:  #XBOX Inverted mode: (-1.0 at rest, 1.0 fully depressed)
+        slideVal = (round(10* ((self.engine.input.joysticks[self.whichJoySlide[i]].get_axis(self.whichAxisSlide[i])+1.0) / 2.0 ))/10.0)
+      else: #PS2 mode: (0.0 at rest, fluctuates between 1.0 and -1.0 when pressed)
+        slideVal = (round(10*(abs(self.engine.input.joysticks[self.whichJoySlide[i]].get_axis(self.whichAxisSlide[i]))))/10.0)
+      if slideVal > 0.9:
+        self.slideValue[i] = 4
+      elif slideVal > 0.7:
+        self.slideValue[i] = 3
+      elif slideVal > 0.5:
+        self.slideValue[i] = 2
+      elif slideVal > 0.3:
+        self.slideValue[i] = 1
+      elif slideVal > 0.1:
+        self.slideValue[i] = 0
+      else:
+        self.slideValue[i] = -1
+      
+      if self.slideValue[i] != oldSlide:
+        for n, k in enumerate(self.keysList[i]):
+          if n == self.slideValue[i] and not self.controls.getState(k):
+            self.controls.toggle(k, True)
+            self.keyPressed3(None, 0, k)  #mfh
+          elif self.controls.getState(k):
+            self.controls.toggle(k, False)
+            self.keyReleased3(k)
+        
+        if self.slideValue[i] > 0:
+          self.handlePick(i)
 
   def handlePhrases(self, playerNum, playerStreak):
     if self.phrases > 0:
@@ -3067,14 +3114,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             #  guitar.freestyleSP = False
 
           for fret in range (5):
-            if self.controls.getState(guitar.keys[fret]) or self.controls.getState(guitar.keys[fret+5]):
+            if self.controls.getState(guitar.keys[fret]) or (self.playerList[i].controlType == 0 and self.controls.getState(guitar.keys[fret+5])):
               hitspeed = min((pos - guitar.freestyleLastFretHitTime[fret]) / guitar.freestylePeriod, 1.0)
               score += guitar.freestyleBaseScore * hitspeed
           if numFreestyleHits > 0:    #MFH - to prevent a float division!
             score = int ( score / numFreestyleHits )
           
           for fret in range (5):
-            if self.controls.getState(guitar.keys[fret]) or self.controls.getState(guitar.keys[fret+5]):
+            if self.controls.getState(guitar.keys[fret]) or (self.playerList[i].controlType == 0 and self.controls.getState(guitar.keys[fret+5])):
               guitar.freestyleLastFretHitTime[fret] = pos
           
           #MFH - Add all BRE score to a temporary score accumulator with a separate display box
@@ -3664,6 +3711,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.handleAnalogSP(playerNum, ticks)
         self.handleWhammy(playerNum)
         self.handlePhrases(playerNum, self.scoring[playerNum].streak)   #MFH - streak #1 for player #1...
+        if self.playerList[playerNum].controlType == 4:
+          self.handleAnalogSlider(playerNum)
         self.updateGuitarSolo(playerNum)
       if self.coOpType:
         self.handlePhrases(self.coOpPhrase, self.coOpScoreCard.streak)

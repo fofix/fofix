@@ -258,6 +258,9 @@ class Input(Task):
   def getAnalogSPSense(self, player):
     return self.controls.analogSPSense[self.activeGameControls[player]]
   
+  def getAnalogSlide(self, player):
+    return self.controls.analogSlide[self.activeGameControls[player]]
+  
   def getAnalogFX(self, player):
     return self.controls.analogFX[self.activeGameControls[player]]
   
