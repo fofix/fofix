@@ -3444,7 +3444,8 @@ class Drum:
               self.engine.data.bassDrumSound.play()
             self.bassDrumPedalDown = True
             drumsJustHit[0] = True
-            self.bassPedalHop = 0.05  #stump
+            if self.bassPedalHop < 0.04:
+              self.bassPedalHop = 0.04  #stump
         else:
           self.bassDrumPedalDown = False
         if i == 1:
@@ -3579,7 +3580,9 @@ class Drum:
         if note.number == i and (controls.getState(self.keys[i]) or controls.getState(self.keys[i+5])):
           if self.guitarSolo:
             self.currentGuitarSoloHitNotes += 1
-            
+          if i == 0 and self.bassPedalHop < 0.07:
+              self.bassPedalHop = 0.07  #stump
+
           Shader.list.var["drum"][i]=Shader.list.time()
           return self.hitNote(time, note)  
         
