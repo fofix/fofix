@@ -105,9 +105,8 @@ class ConfigChoice(Menu.Choice):
         else:
           self.engine.quicksetRestart = True
     
-    if self.autoApply:
-      self.apply()
-    else:
+    self.apply()  #stump: it wasn't correctly saving some "restart required" settings
+    if not self.autoApply:
       self.engine.restartRequired = True
 
   def apply(self):
@@ -821,6 +820,7 @@ class SettingsMenu(Menu.Menu):
     
     advancedSettings = [
       ConfigChoice(engine, engine.config, "performance", "game_priority", autoApply = True, isQuickset = 1),
+      ConfigChoice(engine, engine.config, "performance", "use_psyco"),
       (_("Debug Settings"), self.debugSettingsMenu),
       (_("Log Settings"),    self.logfileSettingsMenu),
     ]

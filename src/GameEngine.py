@@ -110,6 +110,7 @@ Config.define("audio",  "songvol",    float,    1.0,  text = _("Song Volume"),  
 Config.define("audio",  "rhythmvol",  float,    1.0,  text = _("Rhythm Volume"),   options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(0, 110, 10)]))
 
 Config.define("performance", "game_priority",       int,   2,      text = _("Process Priority"), options = {0: _("0 Idle"), 1: _("1 Low"), 2: _("2 Normal"), 3:_("3 Above Normal"), 4:_("4 High"), 5:_("5 Realtime")})
+Config.define("performance", "use_psyco", bool, True, text=_("Use Psyco"), options={False: _("No"), True: _("Yes")})  #stump
 Config.define("game",   "margin",              int,   0,      text = _("Hit Margin"), options = {0: _("FoF"), 1: _("Capo")})
 Config.define("game",   "notedisappear",      bool,   False,  text = _("Missed Notes"), options = {False: _("Disappear"), True: _("Keep on going")})
 

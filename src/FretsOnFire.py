@@ -135,11 +135,13 @@ def main():
       sys.setdefaultencoding(encoding)
     engine.setStartupLayer(MainMenu(engine))
 
-    try:
-      import psyco
-      psyco.profile()
-    except:
-      Log.warn("Unable to enable psyco.")
+    #stump: make psyco optional
+    if Config.get("performance", "use_psyco"):
+      try:
+        import psyco
+        psyco.profile()
+      except:
+        Log.warn("Unable to enable psyco.")
 
     try:
       engine.ticksAtStart = pygame.time.get_ticks()
