@@ -225,12 +225,18 @@ class KeyConfigChoice(Menu.Choice):
           value = k
           break
     if isinstance(o.text, tuple):
+      type = self.type
+      if len(o.text) == 5:
+        text = o.text[type]
+      else:
+        if type == 4:
+          type = 0
       if len(o.text) == 4:
-        text = o.text[self.type]
+        text = o.text[type]
       elif len(o.text) == 3:
-        text = o.text[max(0, self.type-1)]
+        text = o.text[max(0, type-1)]
       elif len(o.text) == 2:
-        if self.type < 2:
+        if type < 2:
           text = o.text[0]
         else:
           text = o.text[1]
