@@ -3591,7 +3591,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             else:
               if guitar.starPower >= 50 and not guitar.starPowerActive:  #QQstarS:Set [0] to [i]
                 self.newScalingText(i, self.tsStarPowerReady )
-                
+
+          self.hopFretboard(i, 0.04)  #stump
           guitar.starPowerGained = False  #QQstarS:Set [0] to [i]
 
       # update board
@@ -4016,12 +4017,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.engine.view.setViewport(self.numOfPlayers,i)
       if self.theme not in (0, 1, 2) or (not self.pause and not self.failed):
         glPushMatrix()
-        if self.guitars[i].isDrum:
-          if self.guitars[i].bassPedalHop > 0.0:
-            glTranslatef(0.0, self.guitars[i].bassPedalHop, 0.0)  #stump: bass pedal hop
-            self.guitars[i].bassPedalHop -= 0.005
-            if self.guitars[i].bassPedalHop < 0.0:
-              self.guitars[i].bassPedalHop = 0.0
+        if self.guitars[i].fretboardHop > 0.0:
+          glTranslatef(0.0, self.guitars[i].fretboardHop, 0.0)  #stump: fretboard hop
+          self.guitars[i].fretboardHop -= 0.005
+          if self.guitars[i].fretboardHop < 0.0:
+            self.guitars[i].fretboardHop = 0.0
         self.guitars[i].render(self.visibility, self.song, self.getSongPosition(), self.controls, self.killswitchEngaged[i])  #QQstarS: new
         glPopMatrix()
 
@@ -4769,6 +4769,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #if self.guitars[num].lastFretWasBassDrum:
       #  #self.sfxChannel.setVolume(self.screwUpVolume)
       #  self.engine.data.bassDrumSound.play()
+
+  #stump: hop a fretboard
+  def hopFretboard(self, num, height):
+    if self.guitars[num].fretboardHop < height:
+      self.guitars[num].fretboardHop = height
   
   def activateSP(self, num): #QQstarS: Fix this function, add a element "num"
     if self.coOpGH:
@@ -4779,6 +4784,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if time - min(self.coOpStarPowerActive) < 300.0:
           self.engine.data.starActivateSound.play()
           for i in range(self.numOfPlayers):
+            self.hopFretboard(i, 0.07)  #stump
             self.guitars[i].starPowerActive = True
             self.guitars[i].overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
             self.guitars[i].ocount = 0  #MFH - this triggers the oFlash strings & timer
@@ -4800,6 +4806,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         #self.sfxChannel.setVolume(self.sfxVolume)
         #if self.engine.data.cheerSoundFound:
           #self.engine.data.crowdSound.play()
+        self.hopFretboard(num, 0.07)  #stump
         if self.coOpRB:
           while len(self.deadPlayerList) > 0:
             i = self.deadPlayerList.pop(0) #keeps order intact (with >2 players)

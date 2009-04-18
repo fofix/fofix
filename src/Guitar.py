@@ -663,6 +663,8 @@ class Guitar:
     self.disableNoteSFX  = self.engine.config.get("video", "disable_notesfx")
     self.disableFretSFX  = self.engine.config.get("video", "disable_fretsfx")
     self.disableFlameSFX  = self.engine.config.get("video", "disable_flamesfx")
+
+    self.fretboardHop = 0.00  #stump
   
   def selectPreviousString(self):
     self.selectedString = (self.selectedString - 1) % self.strings
