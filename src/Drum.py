@@ -1280,7 +1280,7 @@ class Drum:
     glVertex3f(w / 2,  0, -sw)
     glEnd()
     
-  def renderTail(self, length, color, fret = 0, freestyleTail = 0, pos = 0):
+  def renderTail(self, length, color, flat = False, fret = 0, freestyleTail = 0, pos = 0):
 
     #volshebnyi - if freestyleTail == 1, render an freestyle tail
     #  if freestyleTail == 2, render highlighted freestyle tail
