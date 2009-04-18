@@ -2058,31 +2058,27 @@ class Drum:
           #Key_002 - Bottom of fret (key2_color)
           #Glow_001 - Only rendered when a note is hit along with the glow.svg
 
-          if fret == 0: 
-            glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot5)
-          elif fret == 1:
+          if n == 0: 
             glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot2)
-          elif fret == 2:
-            glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot1)
-          elif fret == 3:
-            glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot4)
-          elif isOpen == True:
+          elif n == 1:
             glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot3)
+          elif n == 2:
+            glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot4)
+          elif n == 3:
+            glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot1)
         
           if self.keytex == True:
             glColor4f(1,1,1,visibility)
             glTranslatef(x, v, 0)
             glEnable(GL_TEXTURE_2D)
             if n == 0: 
-              self.keytexa.texture.bind()
-            elif n == 1:
               self.keytexb.texture.bind()
-            elif n == 2:
+            elif n == 1:
               self.keytexc.texture.bind()
-            elif n == 3:
+            elif n == 2:
               self.keytexd.texture.bind()
-            elif n == 4:
-              self.keytexe.texture.bind()
+            elif n == 3:
+              self.keytexa.texture.bind()
             glMatrixMode(GL_TEXTURE)
             glScalef(1, -1, 1)
             glMatrixMode(GL_MODELVIEW)
@@ -2101,16 +2097,16 @@ class Drum:
             glTranslatef(x, y + v * 6, 0)
             key = self.keyMesh
         
-          if(key.find("Glow_001")) == True:
-            key.render("Mesh")
-            if(key.find("Key_001")) == True:
-              glColor3f(self.keyColor[0], self.keyColor[1], self.keyColor[2])
-              key.render("Key_001")
-            if(key.find("Key_002")) == True:
-              glColor3f(self.key2Color[0], self.key2Color[1], self.key2Color[2])
-              key.render("Key_002")
-          else:
-            key.render()
+            if(key.find("Glow_001")) == True:
+              key.render("Mesh")
+              if(key.find("Key_001")) == True:
+                glColor3f(self.keyColor[0], self.keyColor[1], self.keyColor[2])
+                key.render("Key_001")
+              if(key.find("Key_002")) == True:
+                glColor3f(self.key2Color[0], self.key2Color[1], self.key2Color[2])
+                key.render("Key_002")
+            else:
+              key.render()
           
           glDisable(GL_LIGHTING)
           glDisable(GL_LIGHT0)
