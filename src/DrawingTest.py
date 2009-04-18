@@ -1,44 +1,116 @@
 #!/usr/bin/env python
-# Drawing methods comparison for FoFiX by Pascal Giard <evilynux@gmail.com>
+# -*- coding: iso-8859-1 -*-
+#####################################################################
+# Drawing methods comparison (part of FoFiX)                        #
+# Copyright (C) 2009 Pascal Giard <evilynux@gmail.com>              #
+#                                                                   #
+# This program is free software; you can redistribute it and/or     #
+# modify it under the terms of the GNU General Public License       #
+# as published by the Free Software Foundation; either version 2    #
+# of the License, or (at your option) any later version.            #
+#                                                                   #
+# This program is distributed in the hope that it will be useful,   #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of    #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the     #
+# GNU General Public License for more details.                      #
+#                                                                   #
+# You should have received a copy of the GNU General Public License #
+# along with this program; if not, write to the Free Software       #
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,        #
+# MA  02110-1301, USA.                                              #
+#####################################################################
 from OpenGL.GL import *
-from OpenGL.arrays import vbo
-from numpy import array, float32
+try:
+  from OpenGL.arrays import vbo
+  vbo_support = True
+except:
+  vbo_support = False
+from numpy import array, float32, append
 import pygame
 from pygame.locals import *
+from math import cos, sin, sqrt
 
 rtri = 0.0
-mode = 0
+mode = 2
 
 def init():
-    global mode, triangVbo, triangVtx
+    global mode, triangVbo, triangVtx, spiralVtx, spiralVbo, spiralCol
     triangVtx = array(
         [[ 0,  1, 0],
          [-1, -1, 0],
          [ 1, -1, 0]], dtype=float32)
-    triangVbo = vbo.VBO( triangVtx, usage='GL_STATIC_DRAW' )
+
+    nbSteps = 200.0
+    for i in range(int(nbSteps)):
+      ratio = i/nbSteps;
+      angle = 21*ratio
+      c = cos(angle)
+      s = sin(angle);
+      r1 = 1.0 - 0.8*ratio;
+      r2 = 0.8 - 0.8*ratio;
+      alt = ratio - 0.5
+      nor = 0.5
+      up = sqrt(1.0-nor*nor)
+      if i == 0:
+        spiralVtx = array([[r1*c, alt, r1*s]],dtype=float32)
+        spiralCol = array([[1.0-ratio, 0.2, ratio]],dtype=float32)
+      else:
+        spiralVtx = append(spiralVtx,[[r1*c, alt, r1*s]],axis=0)
+        spiralCol = append(spiralCol,[[1.0-ratio, 0.2, ratio]],axis=0)
+      spiralVtx = append(spiralVtx,[[r2*c, alt+0.05, r2*s]],axis=0)
+      spiralCol = append(spiralCol,[[1.0-ratio, 0.2, ratio]],axis=0)
+
+    if vbo_support:
+      triangVbo = vbo.VBO( triangVtx, usage='GL_STATIC_DRAW' )
+      spiralVbo = vbo.VBO( spiralVtx, usage='GL_STATIC_DRAW' )
+    else:
+      print "VBO not supported, fallbacking to array-based drawing."
+      mode = 1
 
 def draw():
-    global mode, triangVbo, triangVtx, rtri
+    global mode, triangVbo, triangVtx, spiralVtx, spiralVbo, spiralCol, rtri
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
     glPushMatrix()
-    # draw triangle
+    glColor(1,1,1) # triangle color
     glScale(.5,.5,.5)
     glRotate(rtri,0,1,0)
+
     # VBO drawing
-    if mode == 0:
+    if mode == 0 and vbo_support:
+      # Draw triangle
       triangVbo.bind()
       glEnableClientState(GL_VERTEX_ARRAY);
       glVertexPointerf( triangVbo )
-      glDrawArrays(GL_TRIANGLES, 0, 3)
+      glDrawArrays(GL_TRIANGLES, 0, triangVtx.shape[0])
       glDisableClientState(GL_VERTEX_ARRAY)
       triangVbo.unbind()
-    # Array-based
+      # Draw spiral
+      # evilynux - FIXME: The following doesn't work... why?
+#       spiralVbo.bind()
+#       glEnableClientState(GL_VERTEX_ARRAY);
+#       glEnableClientState(GL_COLOR_ARRAY)
+#       glVertexPointerf( spiralVbo )
+#       glColorPointerf( spiralCol )
+#       glDrawArrays(GL_TRIANGLE_STRIP, 0, spiralVtx.shape[0])
+#       glDisableClientState(GL_COLOR_ARRAY)
+#       glDisableClientState(GL_VERTEX_ARRAY)
+#       spiralVbo.unbind()
+
+    # Array-based drawing
     elif mode == 1:
+      # Draw triangle
       glEnableClientState(GL_VERTEX_ARRAY)
       glVertexPointerf(triangVtx)
-      glDrawArrays(GL_TRIANGLES, 0, 3)
+      glDrawArrays(GL_TRIANGLES, 0, triangVtx.shape[0])
+      # Draw spiral
+      glEnableClientState(GL_COLOR_ARRAY)
+      glColorPointerf(spiralCol)
+      glVertexPointerf(spiralVtx)
+      glDrawArrays(GL_TRIANGLE_STRIP, 0, spiralVtx.shape[0])
+      glDisableClientState(GL_COLOR_ARRAY)
       glDisableClientState(GL_VERTEX_ARRAY)
+
     # Direct drawing
     else: # mode == 2
       glBegin(GL_TRIANGLES)
@@ -46,11 +118,19 @@ def draw():
       glVertex(-1,-1,0)
       glVertex( 1,-1,0)
       glEnd()
-    glPopMatrix()
 
+      # Draw spiral
+      glBegin(GL_TRIANGLE_STRIP);
+      for i in range(spiralVtx.shape[0]):
+        glColor(spiralCol[i,0], spiralCol[i,1], spiralCol[i,2])
+        glVertex3f(spiralVtx[i,0], spiralVtx[i,1], spiralVtx[i,2])
+      glEnd()
+
+    glPopMatrix()
+    
 def main():
     global rtri, mode
-    modeName = ["VBO", "Array", "Direct"]
+    modeName = ["VBO", "Array-based", "Direct-mode"]
     fps = 0
     video_flags = DOUBLEBUF|OPENGL|HWPALETTE|HWSURFACE
     
@@ -65,8 +145,16 @@ def main():
       event = pygame.event.poll()
       if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
         break
-      elif event.type == KEYDOWN and (event.key == K_RIGHT or event.key == K_LEFT):
+      elif event.type == KEYDOWN and event.key == K_RIGHT:
         mode = (mode + 1) % 3
+        if mode == 0 and not vbo_support:
+          mode = (mode + 1) % 3
+          print "VBO not supported, fallbacking to %s drawing." % modeName[mode]
+      elif event.type == KEYDOWN and event.key == K_LEFT:
+        mode = (mode - 1) % 3
+        if mode == 0 and not vbo_support:
+          mode = (mode - 1) % 3
+          print "VBO not supported, fallbacking to %s drawing." % modeName[mode]
         
       ticksDiff = pygame.time.get_ticks()-ticks
 
