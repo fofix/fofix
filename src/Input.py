@@ -241,7 +241,7 @@ class Input(Task):
     self.gameGuitars = 0
     Player.pluginControls(self.activeGameControls)
     for i in self.activeGameControls:
-      if self.controls.type[i] > 1:
+      if self.controls.type[i] == 2 or self.controls.type[i] == 3:
         self.gameDrums += 1
       else:
         self.gameGuitars += 1
