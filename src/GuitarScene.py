@@ -2975,24 +2975,35 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       return
     if self.isSlideAnalog[i]:
       oldSlide = self.slideValue[i]
-      if self.analogSlideMode[i] == 1:  #XBOX mode: (1.0 at rest, -1.0 fully depressed)
-        slideVal = 1.0 - (round(10* ((self.engine.input.joysticks[self.whichJoySlide[i]].get_axis(self.whichAxisSlide[i])+1.0) / 2.0 ))/10.0)
-      elif self.analogSlideMode[i] == 2:  #XBOX Inverted mode: (-1.0 at rest, 1.0 fully depressed)
-        slideVal = (round(10* ((self.engine.input.joysticks[self.whichJoySlide[i]].get_axis(self.whichAxisSlide[i])+1.0) / 2.0 ))/10.0)
-      else: #PS2 mode: (0.0 at rest, fluctuates between 1.0 and -1.0 when pressed)
-        slideVal = (round(10*(abs(self.engine.input.joysticks[self.whichJoySlide[i]].get_axis(self.whichAxisSlide[i]))))/10.0)
+      if self.analogSlideMode[i] == 1:  #Inverted mode
+        slideVal = -(self.engine.input.joysticks[self.whichJoySlide[i]].get_axis(self.whichAxisSlide[i])+1.0)/2.0
+      else:  #Default
+        slideVal = (self.engine.input.joysticks[self.whichJoySlide[i]].get_axis(self.whichAxisSlide[i])+1.0)/2.0
       if slideVal > 0.9:
         self.slideValue[i] = 4
-      elif slideVal > 0.7:
+      elif slideVal > 0.77:
+        self.slideValue[i] = 4
+        self.markSlide(i)
+      elif slideVal > 0.68:
         self.slideValue[i] = 3
-      elif slideVal > 0.5:
+      elif slideVal > 0.60:
+        self.slideValue[i] = 3
+        self.markSlide(i)
+      elif slideVal > 0.54:
         self.slideValue[i] = 2
-      elif slideVal > 0.3:
-        self.slideValue[i] = 1
-      elif slideVal > 0.1:
-        self.slideValue[i] = 0
-      else:
+      elif slideVal > 0.43:
         self.slideValue[i] = -1
+        #mark that sliding is not happening.
+      elif slideVal > 0.34:
+        self.slideValue[i] = 2
+        self.markSlide(i)
+      elif slideVal > 0.28:
+        self.slideValue[i] = 1
+      elif slideVal > 0.16:
+        self.slideValue[i] = 1
+        self.markSlide(i)
+      else:
+        self.slideValue[i] = 0
       
       if self.slideValue[i] != oldSlide:
         for n, k in enumerate(self.keysList[i]):
@@ -3005,6 +3016,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         
         if self.slideValue[i] > 0:
           self.handlePick(i)
+  
+  def markSlide(self, playerNum):
+    pass #akedrou - this will eventually handle the switch that you are, in fact, sliding up the analog fret bar.
 
   def handlePhrases(self, playerNum, playerStreak):
     if self.phrases > 0:

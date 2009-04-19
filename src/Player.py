@@ -172,7 +172,7 @@ Config.define("controller", "analog_sp",     int, 0,            text = _("Analog
 Config.define("controller", "analog_sp_threshold",   int, 60,   text = _("Analog SP Threshold"), options = dict([(n, n) for n in range(10, 101, 10)]))
 Config.define("controller", "analog_sp_sensitivity", int, 4,    text = _("Analog SP Sensitivity"), options = dict([(n, n+1) for n in range(10)]))
 Config.define("controller", "analog_drum",   int, 0,            text = _("Analog Drums"),    options = {0: _("Disabled"), 1: _("PS2/PS3/Wii"), 2: _("XBOX"), 3: _("XBOX Inv.")})
-Config.define("controller", "analog_slide",  int, 0,            text = _("Analog Slider"),    options = {0: _("PS2/PS3/Wii"), 1: _("XBOX"), 2: _("XBOX Inv.")})
+Config.define("controller", "analog_slide",  int, 0,            text = _("Analog Slider"),    options = {0: _("Default"), 1: _("Inverted")})
 Config.define("controller", "analog_kill",   int, 0,            text = _("Analog Effects"),  options = {0: _("Disabled"), 1: _("PS2/PS3/Wii"), 2: _("XBOX"), 3: _("XBOX Inv.")})
 Config.define("controller", "analog_fx",     int, 0,            text = _("Sound FX Switch"), options = {0: _("Switch"), 1: _("Cycle")}) #akedrou - aren't I bold!
 

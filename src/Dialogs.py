@@ -4659,26 +4659,31 @@ class KeyTester(Layer, KeyListener):
     
     if self.type < 2 or self.type == 4:
       self.fretColors     = Theme.fretColors
-      self.names          = [_("Left"), _("Right"), _("Up"), _("Down"), _("Start!"), \
-                             _("Cancel"), _("Fret #1"), _("Solo #1"), _("Fret #2"), _("Solo #2"), \
+      self.names          = [_("Left"), _("Right"), _("Up"), _("Down"), _("Start"), \
+                             _("Select"), _("Fret #1"), _("Solo #1"), _("Fret #2"), _("Solo #2"), \
                              _("Fret #3"), _("Solo #3"), _("Fret #4"), _("Solo #4"), _("Fret #5"), \
                              _("Solo #5"), _("Pick!"), _("Pick!"), _("Starpower!"), _("Whammy")]
     elif self.type == 2:
       colors              = Theme.fretColors
       self.fretColors     = [colors[1], colors[2], colors[3], colors[0]]
       self.bassColor      = colors[4]
-      self.names          = [_("Left"), _("Right"), _("Up"), _("Down"), _("Start!"), \
-                             _("Cancel"), _("Drum #1"), None, _("Drum #2"), None, \
+      self.names          = [_("Left"), _("Right"), _("Up"), _("Down"), _("Start"), \
+                             _("Select"), _("Drum #1"), None, _("Drum #2"), None, \
                              _("Drum #3"), None, None, None, _("Drum #4"), \
                              None, _("Bass Drum"), None, _("Starpower!"), _("None")]
     else:
       colors              = Theme.fretColors
       self.fretColors     = [colors[1], colors[2], colors[3], colors[4], colors[0]]
       self.bassColor      = Theme.bassColor
-      self.names          = [_("Left"), _("Right"), _("Up"), _("Down"), _("Start!"), \
-                             _("Cancel"), _("Drum #1"), None, _("Cymbal #2"), None, \
+      self.names          = [_("Left"), _("Right"), _("Up"), _("Down"), _("Start"), \
+                             _("Select"), _("Drum #1"), None, _("Cymbal #2"), None, \
                              _("Drum #3"), None, _("Cymbal #4"), None, _("Drum #5"), \
                              None, _("Bass Drum"), None, _("Starpower!"), _("None")]
+      
+    self.tsFret  = _("Fret")
+    self.tsSolo  = _("Solo")
+    self.tsDrum  = _("Drum")
+    self.tsSlide = _("Slide~")
     
     self.engine.loadImgDrawing(self, "arrow", "arrow.png")
     self.engine.loadImgDrawing(self, "circle", "test.png")
@@ -4713,6 +4718,8 @@ class KeyTester(Layer, KeyListener):
     self.whichAxisDrum5 = 0
     self.whammy = 0
     self.starpower = 0
+    self.slideActive = -1
+    self.midFret = False
 
     if len(self.engine.input.joysticks) != 0 and self.type < 2 or self.type == 4:
       if self.analogKillMode > 0:
@@ -4825,30 +4832,41 @@ class KeyTester(Layer, KeyListener):
       text = self.names[Player.STAR]
       wText, hText = font.getStringSize(text)
       
-      self.slideActive = 0
-      
       if self.isSlideAnalog:
-        if self.analogSlideMode == 1:  #XBOX mode: (1.0 at rest, -1.0 fully depressed)
-          slideVal = 1.0 - ((self.engine.input.joysticks[self.whichJoySlide].get_axis(self.whichAxisSlide)+1.0) / 2.0)
-
-        elif self.analogSlideMode == 2:  #XBOX Inverted mode: (-1.0 at rest, 1.0 fully depressed)
-          slideVal = (self.engine.input.joysticks[self.whichJoySlide].get_axis(self.whichAxisSlide)+1.0) / 2.0 
-        
-        else: #PS2 mode: (0.0 at rest, fluctuates between 1.0 and -1.0 when pressed)
-          slideVal = abs(self.engine.input.joysticks[self.whichJoySlide].get_axis(self.whichAxisSlide))
-        
-        if slideVal < .1:
-          self.slideActive = 0
-        elif slideVal < .3:
-          self.slideActive = 1
-        elif slideVal < .5:
-          self.slideActive = 2
-        elif slideVal < .7:
-          self.slideActive = 3
-        elif slideVal < .9:
+        if self.analogSlideMode == 1:  #Inverted mode
+          slideVal = -(self.engine.input.joysticks[self.whichJoySlide].get_axis(self.whichAxisSlide)+1.0)/2.0
+        else:  #Default
+          slideVal = (self.engine.input.joysticks[self.whichJoySlide].get_axis(self.whichAxisSlide)+1.0)/2.0
+        if slideVal > 0.9:
           self.slideActive = 4
+          self.midFret = False
+        elif slideVal > 0.77:
+          self.slideActive = 4
+          self.midFret = True
+        elif slideVal > 0.68:
+          self.slideActive = 3
+          self.midFret = False
+        elif slideVal > 0.60:
+          self.slideActive = 3
+          self.midFret = True
+        elif slideVal > 0.54:
+          self.slideActive = 2
+          self.midFret = False
+        elif slideVal > 0.43:
+          self.slideActive = -1
+          self.midFret = False
+        elif slideVal > 0.34:
+          self.slideActive = 2
+          self.midFret = True
+        elif slideVal > 0.28:
+          self.slideActive = 1
+          self.midFret = False
+        elif slideVal > 0.16:
+          self.slideActive = 1
+          self.midFret = True
         else:
-          self.slideActive = 5
+          self.slideActive = 0
+          self.midFret = False
 
       
       if self.isSPAnalog:
@@ -4877,7 +4895,7 @@ class KeyTester(Layer, KeyListener):
         glColor3f(.6, 0, 0)
       else:
         glColor3f(.4, .4, .4)
-      text = _("Select")
+      text = self.names[5]
       wText, hText = font.getStringSize(text)
       font.render(text, (.333-wText/2, .28 + v))
       
@@ -4885,7 +4903,7 @@ class KeyTester(Layer, KeyListener):
         glColor3f(0, .6, 0)
       else:
         glColor3f(.4, .4, .4)
-      text = _("Start")
+      text = self.names[4]
       wText, hText = font.getStringSize(text)
       font.render(text, (.667-wText/2, .28 + v))
       
@@ -4895,29 +4913,34 @@ class KeyTester(Layer, KeyListener):
           for i in range(5):
             if self.controls.getState(self.keyList[(2*i)+Player.KEY1]):
               glColor3f(*self.fretColors[i%5])
-              text = _("Fret")
+              text = self.tsFret
             elif self.controls.getState(self.keyList[(2*i)+1+Player.KEY1]):
               glColor3f(*self.fretColors[i%5])
-              text = _("Solo")
+              text = self.tsSolo
             else:
               glColor3f(.4, .4, .4)
-              text = _("Fret")
+              text = self.tsFret
             text = "%s #%d" % (text, (i + 1))
             wText, hText = font.getStringSize(text)
             font.render(text, ((.2 + .15 * i)-wText/2, .4 + v))
         else:
           for i in range(5):
-            if self.slideActive == i + 1:
-              text = _("Solo")
+            if self.slideActive == i or (self.midFret and self.slideActive == i + 1) or (self.controls.getState(self.keyList[Player.KEY1A]) and self.type == 1):
+              text = self.tsSolo
             else:
-              text = _("Fret")
-            if self.controls.getState(self.keyList[(2*i)+Player.KEY1]) or self.slideActive == i+1:
+              text = self.tsFret
+            if self.controls.getState(self.keyList[(2*i)+Player.KEY1]) or self.slideActive == i or (self.midFret and self.slideActive == i + 1):
               glColor3f(*self.fretColors[i%5])
             else:
               glColor3f(.4, .4, .4)
             text = "%s #%d" % (text, (i + 1))
             wText, hText = font.getStringSize(text)
             font.render(text, ((.2 + .15 * i)-wText/2, .4 + v))
+            if self.midFret and self.slideActive == i:
+              Theme.setSelectedColor(1 - v)
+              text = self.tsSlide
+              wText, hText = font.getStringSize(text)
+              font.render(text, ((.125 + .15 * i)-wText/2, .35 + v))
 
         #evilynux - Compute analog killswitch value
         wText, hText = font.getStringSize(self.names[Player.KILL])
@@ -4964,7 +4987,7 @@ class KeyTester(Layer, KeyListener):
               glColor3f(*self.fretColors[i%5])
             else:
               glColor3f(.4, .4, .4)
-            text = _("Drum")
+            text = self.tsDrum
             text = "%s #%d" % (text, (i + 1))
             wText, hText = font.getStringSize(text)
             font.render(text, ((.2 + .2 * i)-wText/2, .4 + v))
@@ -4977,7 +5000,7 @@ class KeyTester(Layer, KeyListener):
               glColor3f(*self.fretColors[i%5])
             else:
               glColor3f(.4, .4, .4)
-            text = _("Drum")
+            text = self.tsDrum
             text = "%s #%d" % (text, (i + 1))
             wText, hText = font.getStringSize(text)
             font.render(text, ((.2 + .15 * i)-wText/2, .4 + v))
