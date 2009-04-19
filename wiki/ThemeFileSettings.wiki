@@ -1,13 +1,14 @@
 #summary These are all the Theme.ini settings usable.
+#labels Phase-ThemeMaking
 
 First, you need to create a 'theme.ini' file in your theme's folder. Once you create the file you need to type this header at the very top of this file:
 
 _{{{[theme]}}}_
 
 Then use any of the following settings below the {{{[theme]}}} header in the theme.ini file. This list is mostly organized by which options belong mostly to which screen, but not necessarily to JUST that screen, since some items currently control things on multiple screens.
-
+<wiki:toc max_depth="1" />
 -----------------------------------------------------------------------------------------
-==Main Menu==
+=Main Menu=
 
 ||_*Item Name*_||_*What it Does/How to use it*_||
 ||menu_x = .665||X Position of main menu image. Use a decimal # between 0-1||
@@ -16,28 +17,69 @@ Then use any of the following settings below the {{{[theme]}}} header in the the
 ||main_menu_vspacing = 0.09||Controls the spacing between the menu text items. Use a decimal # between 0-1||
 ||multiplayertext5 = .40,.35,.46,.045||.40 is X Pos, .35 is Y Position, .46 is Scaling Size, .045 is Line Spacing between menu items. Used for Multiplayer Menu (This is only used if you made the multiplayer.png and multiplayertext10.png images. The '5' in the name refers to being that, for example, the GH3 multiplayer menu has 5 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
 ||solotext2 = .40,.35,.46,.045||.40 is X Pos, .35 is Y Position, .46 is Scaling Size, .045 is Line Spacing between menu items. Used for Solo Menu (This is only used if you made the solo.png and solotext2.png images. The '2' in the name refers to being that, for example, the RB solo menu has 2 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
+||versiontagposX = 0.5|| Controls the X position of the Versiontag image (Default is 0.5 due to the default image being fullscreen. Change it once making image small)||
+||versiontagposY = 0.5|| Controls the Y position of the Versiontag image (Default is 0.5 due to the default image being fullscreen. Change it once making image small)||
 
 ------------------------------------------------------------------------------------------
-==Options Menu==
+=Options Menu=
 
 ||advsettingstext10 = .393,.87,.49,.074||.393 is X Pos, .87 is Y Position, .49 is Scaling Size, .0741 is Line Spacing between menu items. Used for Adv. Options Menu(This is used if you made the advsettings.png and advsettingstext10.png images. The '10' in the name refers to being that, for example, the GH3 advanced options menu has 10 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
 ||opt_bkg_size = 0.5,0.5,1.0,1.0||position (x,y) of center, xScale, yScale||
-||opt_selected_color = #FFBF00||Selects the color of the options menu selected text. Use a Hex color code||
+||opt_selected_color = #FFBF00||Selects the color of the options menu selected text. Use a Hex Color Value.||
 ||opt_text_x = .38||Controls the Option Menu text X position||
 ||opt_text_y = .15||Controls the Option Menu text Y position||
-||opt_text_color = #FFFFFF||Selects the color of the options menu items. Use a Hex color code||
+||opt_text_color = #FFFFFF||Selects the color of the options menu items. Use a Hex Color Value.||
 ||settingstext9 = .393,.88,.50,.085||.393 is X Pos, .88 is Y Position, .50 is Scaling Size, .085 is Line Spacing between menu items. Used for Options Menu(This is used if you made the settings.png and settingstext9.png images. The '9' in the name refers to being that, for example, the GH3 options menu has 10 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
+
+----------------------------------------------------------------------------
+=Lobby/Player Select/Creation=
+||character_create_font_color = #FFFFFF|| Controls color value of character creation font. Use a Hex Color Value ||
+||character_create_select_color = #FFBF00|| Controls color value of character creation selected text. Use a Hex Color Value ||
+||character_create_help_color = #FFFFFF|| Controls color value of character creation help info line. Use a Hex Color Value ||
+||character_create_help_y = .73||  Controls Y position of the character creation screen text help line.||
+||character_create_option_x = .75||  Controls X position of the character creation screen text menu toggle options.||
+||character_create_space = .045|| Controls the spacing between character creation screen text menu items.||
+||character_create_scale = .0018||  Controls scaling size of the character creation screen text menu items.||
+||character_create_x = 0.25||  Controls X position of the character creation screen text menu items.||
+||character_create_y = 0.15||  Controls Y position of the character creation screen text menu items.||
+||lobby_disable_color = #666666|| Controls color value. Use a Hex Color Value.||
+||lobby_font_color = #FFFFFF || Controls the lobby font color. Use a Hex Color Value.||
+||lobby_info_color = #FFFFFF || Controls the lobby info color. Use a Hex Color Value. ||
+||lobby_preview_x = 0.3|| Controls Player image and info below image in Lobby||
+||lobby_select_color = #FFBF00|| Controls the lobby select color. Use a Hex Color Value.||
+||lobby_select_x = 0.9||  Controls X Position of player list text in Lobby||
+||lobby_select_y = 0.32||  Controls Y Position of player list text in Lobby||
+||lobby_select_font = loadingFont||  Selects lobby font. Can use "font","bigFont","pauseFont","scoreFont","streakFont","songFont","streakFont2","songListFont","shadowfont","loadingFont".||
+||lobby_select_image_x = 0.8||  Controls X Position of the 'SELECT' image in Lobby||
+||lobby_select_image_y = 0.355||  Controls Y Position of the 'SELECT' image in Lobby||
+||lobby_select_scale = 0.0018||  Controls the scale size of the Players list in Lobby||
+||lobby_select_space = 0.04||  Controls the line-spacing between the names in the player's list in Lobby.||
+||lobby_title_color = #FFFFFF|| Controls the lobby title color. Use a Hex Color Value. ||
+||lobby_title_x = 1||   Controls "Choose Your Character" text X pos in Lobby||
+||lobby_title_y = 0.24||   Controls "Choose Your Character" text Y pos in Lobby|| 
+||lobby_title_character_x = 0.26||   Controls "Player 1/2" Text  X Pos in Lobby||
+||lobby_title_character_y = 0.24||   Controls "Player 1/2" Text  Y Pos in Lobby||
+||lobby_title_font = font||  Selects lobby font. Can use "font","bigFont","pauseFont","scoreFont","streakFont","songFont","streakFont2","songListFont","shadowfont","loadingFont".||
+||lobby_title_scale = 0.0024||   Controls "Player 1/2" Text Font Size in Lobby||
 
 
 ----------------------------------------------------------------------------
-==Song Selection List / CD list== 
+=Song Selection List / CD list=
 
 ||_*Item Name*_||_*What it Does/How to use it*_||
-||artist_selected_color = #4080FF||Use a Hex color code||
-||artist_text_color = #4080FF||Use a Hex color code||
-||career_title_color = #000000||Use a Hex color code||
-||library_selected_color = #FFBF00||Use a Hex color code||
-||library_text_color = #FFFFFF||Use a Hex color code||
+||artist_selected_color = #4080FF||Use a Hex Color Value.||
+||artist_text_color = #4080FF||Use a Hex Color Value.||
+||career_title_color = #000000||Use a Hex Color Value.||
+||library_selected_color = #FFBF00||Use a Hex Color Value.||
+||library_text_color = #FFFFFF||Use a Hex Color Value.||
+||setlistguidebuttonsposX = .408|| Controls Setlist Guide Buttons image 'X' Position. Use a decimal # between 0 - 1||
+||setlistguidebuttonsposY = .0322|| Controls Setlist Guide Buttons image 'Y' Position. Use a decimal # between 0 - 1||
+||setlistguidebuttonsscaleX = .29|| Controls Setlist Guide Buttons image Scaling of 'X' Size. Use a decimal # between 0 - 1||
+||setlistguidebuttonsscaleY = .308|| Controls Setlist Guide Buttons image Scaling of 'Y' Size. Use a decimal # between 0 - 1||
+||setlistpreviewbuttonposX = .5|| Controls Preview buttons X Position. Use a decimal # between 0 - 1||
+||setlistpreviewbuttonposY = .5|| Controls Preview buttons Y Position. Use a decimal # between 0 - 1||
+||setlistpreviewbuttonscaleX = .5|| Controls Preview buttons Scaling of 'X' Size. Use a decimal # between 0 - 1||
+||setlistpreviewbuttonscaleY = .5|| Controls Preview buttons Scaling of 'Y' Size. Use a decimal # between 0 - 1||
 ||song_cd_x = 0||Can be 0 through 5, values outside this range will be clipped to 0 or 5 to prevent CDs from going off-screen||
 ||song_cdscore_x = .6||Use a decimal # between 0 - 1. IE- .34||
 ||song_list_display = 1||Sets the songlist view. Choices are - 0=CD/Cassettes / 1=List / 2=List/CD / 3=RB2 / 4=Auto (_Should not use, you only need to use 0-3_)||
@@ -48,21 +90,21 @@ Then use any of the following settings below the {{{[theme]}}} header in the the
 ||song_listcd_score_x||Controls location of 'SCORE' X position in listcd songlist view. Use a decimal # between 0 - 1||
 ||song_listcd_score_y||Controls location of 'SCORE' Y position in listcd songlist view. Use a decimal # between 0 - 1||
 ||song_listscore_x = .8||Use a decimal # between 0 - 1. IE- .34||
-||song_name_selected_color = #FFBF00||Use a Hex color code||
-||song_name_text_color = #FFFFFF||Use a Hex color code||
-||song_rb2_artist_color||Controls color of the Rock Band 2 artist name's color. Use a Hex color code||
-||song_rb2_diff_color||Controls color of the Rock Band 2 Difficulty level name's color. Use a Hex color code||
-||song_rb2_name_color||Controls color of the Rock Band name's color. Use a Hex color code||
-||song_rb2_name_selected_color||Controls color of the Rock Band 2 name selected color. Use a Hex color code||
+||song_name_selected_color = #FFBF00||Use a Hex Color Value.||
+||song_name_text_color = #FFFFFF||Use a Hex Color Value.||
+||song_rb2_artist_color||Controls color of the Rock Band 2 artist name's color. Use a Hex Color Value.||
+||song_rb2_diff_color||Controls color of the Rock Band 2 Difficulty level name's color. Use a Hex Color Value.||
+||song_rb2_name_color||Controls color of the Rock Band name's color. Use a Hex Color Value.||
+||song_rb2_name_selected_color||Controls color of the Rock Band 2 name selected color. Use a Hex Color Value.||
 ||songback = True||Scrolls the Song Selection Background image. If your image isn't long enough, Use 'SongChooseBack.png' just in case, this image is static||
-||songlist_score_color = #FFFFFF||Use a Hex color code||
-||songlistcd_score_color||Controls the scores color for both CD and List/CD mode||
+||songlist_score_color = #FFFFFF||Controls the Song List score color. Use a Hex Color Value.||
+||songlistcd_score_color||Controls the scores color for both CD and List/CD mode. Use a Hex Color Value.||
 
 
 
 
 ------------------------------------------------------------------------------------------
-==Difficulty/Instruments/Practice Select Screen==
+=Difficulty/Instruments/Practice Select Screen=
 
 ||_*Item Name*_||_*What it Does/How to use it*_||
 ||song_select_submenu_x = 0||Controls the submenu text positions. Use a decimal # between 0 - 1, IE- .012||
@@ -73,15 +115,18 @@ Then use any of the following settings below the {{{[theme]}}} header in the the
 
 
 ------------------------------------------------------------------------------------------
-==Loading Phrase Screen==   
+=Loading Phrase Screen=
 
 ||_*Item Name*_||_*What it Does/How to use it*_||
+||loading_font_scale = 0.0015||Loading phrase font scale.||
+||loading_line_spacinge = 1.0||Controls the amount of line spacing. Default is 1 if not used.||
+||loading_phrase = How good are You?||Put an underscore between each phrase for multiple phrases||   
+||loading_right_margin = 1.0||X offset from right side of the screen.||
+||loading_text_color = #FFFFFF||Controls the Loading phrase color. Use a Hex Color Value.||
 ||loading_X = .5||X Position of Phrase positioning on screen. Use a decimal # between 0-1||
 ||loading_Y = .595||Y Position of Phrase positioning on screen. Use a decimal # between 0-1||
-||loading_phrase = How good are You?||Put an underscore between each phrase for multiple phrases||   
-||loading_text_color = #FFFFFF||Controls the Loading phrase color. Use a hex color||
-||results_phrase = Jurgen is watching||Put an underscore between each phrase for multiple phrases||
-
+||shadowoffsetx = .0022 || Controls X Offset to the Loading Screen Font's Shadow. Default is .0022.||
+||shadowoffsety = .0005 || Controls Y Offset to the Loading Screen Font's Shadow. Default is .0005||
 
 Notice - If you just want the default phrases to show do not put these in your theme.ini
 
@@ -89,44 +134,44 @@ Notice - If you just want the default phrases to show do not put these in your t
 
 
 ------------------------------------------------------------------------------------------
-==In Game Items==                     
+=In Game=            
 
 ||_*Item Name*_||_*What it Does/How to use it*_||
 ||crowd_loop_delay = x||x = integer.  Default user setting = 550 for sounds\crowdcheers.ogg)||
 ||display_all_grey_stars = True||True - All 5 stars shown at all times. False - Only shows the grey star your currently working on||
-||fret0_color = #22FF22||Manually sets 1st fret tail color||
-||fret1_color = #FF2222||Manually sets 2nd fret tail color||
-||fret2_color = #FFFF22||Manually sets 3rd fret tail color||
-||fret3_color = #3333FF||Manually sets 4tg fret tail color||
-||fret4_color = #FF9933||Manually sets 5th fret tail color||
-||fretS_color = #4CB2E5||Manually sets all tails and notes color when StarPower is active||
-||fretK_color = #000000||Manually sets killswitch tail color FX (#000000 means color FX is disabled)||
-||hopo_color = #EEEEEE||Enter a Hex color here.||
-||hopo_indicator_active_color = #0000FF||Manually sets active color of hopo indicator||
+||fret0_color = #22FF22||Manually sets 1st fret tail color. Use a Hex Color Value.||
+||fret1_color = #FF2222||Manually sets 2nd fret tail color. Use a Hex Color Value.||
+||fret2_color = #FFFF22||Manually sets 3rd fret tail color. Use a Hex Color Value.||
+||fret3_color = #3333FF||Manually sets 4tg fret tail color. Use a Hex Color Value.||
+||fret4_color = #FF9933||Manually sets 5th fret tail color. Use a Hex Color Value.||
+||fretS_color = #4CB2E5||Manually sets all tails and notes color when StarPower is active. Use a Hex Color Value.||
+||fretK_color = #000000||Manually sets killswitch tail color FX (#000000 means color FX is disabled) . Use a Hex Color Value.||
+||hopo_color = #EEEEEE||Controls HO/PO color. Use a Hex Color Value.||
+||hopo_indicator_active_color = #0000FF||Controls the active color of HO/PO indicator. Use a Hex Color Value.||
 ||hopo_indicator_inactive_color = #FF0000||Manually sets inactive color of hopo indicator||
 ||hopo_indicator_x = .950||Manually sets x position of hopo indicator||
 ||hopo_indicator_y = .950||Manually sets y position of hopo indicator||
-||ingame_stats_color = #000000||Enter a Hex color here.||
+||ingame_stats_color = #000000||Manually chooses the In Game Stats color. Use a Hex Color Value.||
 ||jurgen_text_pos = 1,1,0.0004||Any scale under .00035 will be resized. Any coordinates that are off the screen will automatically be moved back on to screen, and
 jurgen text is rendered above everything.||
-||mesh_color = #000000||Enter a Hex color here.||
+||mesh_color = #000000||Use a Hex Color Value.||
 ||obar_hscale = 0.7||Overdrive bar width scale. "1.0" makes oBar width equal to fretboard width, like in RB2.||
 ||obar_3dfill = False||Use perspective for overdrive_fill.png.||
-||opencolor = #FF8000 ||Enter a Hec color here. Sets the Bass drum note color for 3d notes||
-||_*Note for 6 POV items below*_||_*If you have ALL 6 of these settings in your 'theme.ini', AND you are not specifying "rmtype = 3" (for GH:WT rockmeter, which requires special positioning), then "Custom" POV will be forced.*_||
-||pov_target_x = 0.0||Controls Custom POV. -Wiki WIP. {{{Animated image Example - http://img98.imageshack.us/img98/5323/exampledx9.gif}}}||
-||pov_target_y = 0.0||Controls Custom POV. -Wiki WIP. {{{Animated image Example - http://img98.imageshack.us/img98/2541/examplecb3.gif}}}||
-||pov_target_z = 3.7||Controls Custom POV. -Wiki WIP. {{{Animated image Example - http://img140.imageshack.us/img140/323/examplezh4.gif}}}||
-||pov_origin_x = 0.0||Controls Custom POV. -Wiki WIP.   {{{Animated image Example - http://img73.imageshack.us/my.php?image=exampleef7.gif}}}||
-||pov_origin_y = 2.9||Controls Custom POV. -Wiki WIP. {{{Animated image Example - http://img88.imageshack.us/img88/4791/examplepy6.gif}}}||
-||pov_origin_z = -2.9||Controls Custom POV. -Wiki WIP. {{{Animated image Example - http://img140.imageshack.us/img140/4686/examplezv4.gif}}}||
+||opencolor = #FF8000 ||Use a Hex Color Value. Sets the Bass drum note color for 3d notes||
+||_*Note for 6 POV items below*_||_*Only if you have ALL 6 of these settings in your 'theme.ini', AND you are not specifying "rmtype = 3" (for GH:WT rockmeter, which requires special positioning) will "Custom" POV will be forced.*_||
+||pov_target_x = 0.0||{{{Animated Image Example - http://img98.imageshack.us/img98/5323/exampledx9.gif. Courtesy of Worldrave}}}||
+||pov_target_y = 0.0||{{{Animated Image Example - http://img98.imageshack.us/img98/2541/examplecb3.gif. Courtesy of Worldrave}}}||
+||pov_target_z = 3.7||{{{Animated Image Example - http://img140.imageshack.us/img140/323/examplezh4.gif. Courtesy of Worldrave}}}||
+||pov_origin_x = 0.0||{{{Animated Image Example - http://img73.imageshack.us/my.php?image=exampleef7.gif. Courtesy of Worldrave}}}||
+||pov_origin_y = 2.9||{{{Animated Image Example - http://img88.imageshack.us/img88/4791/examplepy6.gif. Courtesy of Worldrave}}}||
+||pov_origin_z = -2.9||{{{Animated Image Example - http://img140.imageshack.us/img140/4686/examplezv4.gif. Courtesy of Worldrave}}}||
 ||rbmenu = true||Turns on replicating the Buttons scrolling up from the bottom at the game intro for Rock Band theme's.||
-||rockmeter_score_color = #93c351||Enter a Hex color here.||
+||rockmeter_score_color = #93c351||Controls rockmeter score color. Use a Hex Color Value.||
 ||Rotating 3d Starnotes||Default is on||
 ||song_info_display_scale = 0.0020||Controls the size of the song info shown at gameplay countdown. Use a floating point number||
 ||song_info_display_X = 0.05||Controls the X position of song info display during countdown. Use a floating point number||
 ||song_info_display_Y = 0.05||Controls the Y position of song info display during countdown. Use a floating point number||
-||spot_color = #EEEEEE||Enter a Hex color here.||
+||spot_color = #EEEEEE||Use a Hex Color Value.||
 ||star_fillup_center_x = 139||Controls the X Position of the Center of the Star Fillup||
 ||star_fillup_center_y = 151||Controls the Y Position of the Center of the Star Fillup||
 ||star_fillup_in_radius = 121||Controls the inner radius||
@@ -135,40 +180,46 @@ jurgen text is rendered above everything.||
 ||threeDspin = False||Turns 3d Starnote spinning off.||
 ||twoDkeys = False||Use 3d keys  = False||
 ||twoDnote = False||Use 3d notes = False||
+||noterotdegrees = 2|| This number Set's the Degree's to use for rotating the notes (Textured 3d Notes Only)||
+||noterot1 = -2||This set's how many times you want the rotation degree to be applied to 1st note (Textured 3d Notes Only)||
+||noterot2 = -1||This set's how many times you want the rotation degree to be applied to 2nd note (Textured 3d Notes Only)||
+||noterot3 = 0||This set's how many times you want the rotation degree to be applied to 3rd note (Textured 3d Notes Only)||
+||noterot4 = 1||This set's how many times you want the rotation degree to be applied to 4th note (Textured 3d Notes Only)||
+||noterot5 = 2||This set's how many times you want the rotation degree to be applied to 5th note (Textured 3d Notes Only)||
 
 
 
 
 ------------------------------------------------------------------------------------------
-==Background, text, selected text colors==
+=Background, text, selected text colors=
 
 ||_*Item Name*_||_*What it Does/How to use it*_||
-||background_color = #000000||Controls the color of the background screen. Should be black||
-||base_color = #FFFFFF||Controls the Unselected text color||
-||selected_color = #FFBF00||Controls the Highlighted text color||
-||versiontag = true||Forces showing the Versiontag.png on-screen|| 
+||background_color = #000000||Controls the color of the background screen. Should be black. . Use a Hex Color Value.||
+||base_color = #FFFFFF||Controls the Unselected text color. . Use a Hex Color Value.||
+||selected_color = #FFBF00||Controls the Highlighted text color. . Use a Hex Color Value.||
+||versiontag = true||Forces showing the Versiontag.png on-screen. . Use a Hex Color Value.|| 
 
 
 
 
 ----------------------------------------------------------------------------
-==Pause Menu's==
+=Pause Menu / Failed Menu=
 ||_*Item Name*_||_*What it Does/How to use it*_||
 ||careerfailtext4 = .5,.51,.76,0||.393 is X Pos, .87 is Y Position, .49 is Scaling Size, .0741 is Line Spacing between menu items. Used for Career Failed Menu (This is only used if you made the careerfail.png and careerfailtext4.png images. The '4' in the name refers to being that, for example, the GH3 career failed menu has 4 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
 ||careerpausetext5 = .5,.51,.76,.74||.5 is X Pos, .51 is Y Position, .76 is Scaling Size, .074 is Line Spacing between menu items. Used for Career Pause Menu (This is only used if you made the careerpause.png and careerpausetext5.png images. The '5' in the name refers to being that, for example, the GH3 career pause menu has 5 items in list. Uses the same method as how the Main Menu text image is done for example.)||
 ||failtext3 = .5,.51,.76,0||.393 is X Pos, .87 is Y Position, .49 is Scaling Size, .0741 is Line Spacing between menu items. Used for Failed Menu (This is only used if you made the fail.png and failtext3.png images. The '3' in the name refers to being that, for example, the GH3 fail menu has 3 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
-||fail_bkg_x = 0||Controls the fail menu background and text positions||
-||fail_bkg_y = 0||Controls the fail menu background and text positions||
-||fail_completed_color = #FFFFFF ||Controls the Fail/Completed text line color.Use a hex color||
-||fail_selected_color = #FFBF00||Use a Hex color code||
+||fail_bkg = 0.5,0.5,1.0,1.0||X,Y coordinates of fail menu center, horizontal and vertical scaling. (1.0 - fit to screen)||
+||fail_completed_color = #FFFFFF ||Controls the Fail/Completed text line color. Use a Hex Color Value.||
+||fail_selected_color = #FFBF00||Use a Hex Color Value. . Use a Hex Color Value.||
 ||fail_text_x =   ||Default is calculated, not constant||
-||fail_text_y = .47||Controls the fail menu background and text positions||
-||fail_text_color = #FFFFFF||Use a Hex color code||
+||fail_text_y = .47||Controls the Y position of fail menu background and text positions||
+||fail_text_color = #FFFFFF||Controls the Failed screen text color. Use a Hex Color Value.||
+||fail_songname_x = .5||Controls the X position of fail menu 'Song Name' and "% completed"||
+||fail_songname_y = .35||Controls the Y position of fail menu 'Song Name' and "% completed"||
 ||pausetext5 = .5,.51,.76,.074||.5 is X Pos, .51 is Y Position, .76 is Scaling Size, .074 is Line Spacing between menu items. Used for Pause Menu (This is only used if you made the pause.png and pausetext10.png images. The '5' in the name refers to being that, for example, the GH3 pause menu has 5 items in list. Uses the same method as how the Main Menu text image is done for example.)||
-||pause_bkg_x = 0||0 starts from the center of the screen||
-||pause_bkg_y = 0||0 starts from the center of the screen||
-||pause_selected_color = #FFBF00||Use a Hex color code||
-||pause_text_color = #FFFFFF||Use a Hex color code||
+||pause_bkg = 0.5,0.5,1.0,1.0||X,Y coordinates of pause menu center, horizontal vertical scaling. (1.0 - fit to screen)||
+||pause_selected_color = #FFBF00||Controls the Pause Menu’s  ‘Selected’ color. Use a Hex Color Value.||
+||pause_text_color = #FFFFFF||Controls the Pause Menu’s ‘Unselected’ color. Use a Hex Color Value.||
 ||pause_text_x = .3||Controls the Pause Menu text position. Use a Decimal # between 0 - 1, IE- .34||
 ||pause_text_y = .31||Use a decimal # between 0 - 1, IE- .34||
 ||sub_menu_x = .38||Controls the Difficult Select Screen & Instrument Select X Position||
@@ -178,27 +229,29 @@ jurgen text is rendered above everything.||
 
 
 ------------------------------------------------------------------------------------------
-==Game Results Screen==
+=Game Results Screen=
 
 ||_*Item Name*_||_*What it Does/How to use it*_ (X pos, Y pos, scale size||
-||result_cheats_color = #FFFFFF||Defines the results cheats color.||
+||result_cheats_color = #FFFFFF||Defines the results cheats color . Use a Hex Color Value.||
 ||result_cheats_info = .5,.3,.002||Defines the results cheats info position and size.||
 ||result_cheats_numbers = .5,.35,.0015||Defines the results cheats numbers position and size.||
 ||result_cheats_percent = .45,.4,.0015||Defines the results cheats percent and size.||
 ||result_cheats_score = .75,.4,.0015||Defines the results cheats score position and size.||
+||result_menu_x = .210 || Controls the X position of the 'final text' on the results screen.  Use a Decimal # between 0 - 1 ||
+||result_menu_y = .210 || Controls the Y position of the 'final text' on the results screen.  Use a Decimal # between 0 - 1 ||
 ||result_score = .5,.11,0.0025||Defines the pos of the results score.||
-||result_song = .05,.045,.002,#FFFFFF||Defines the pos of the song name. Can use any hex color||
+||result_song = .05,.045,.002,#FFFFFF||Defines the pos of the song name. Use a Hex Color Value. ||
 ||result_song_text = %s Finished!|| %s Finished! will show "Back in Black's Finished!"||
-||result_star = .5,.35,0.15,0.5||Defines the pos and scaling of the stars value. X,Y,Scale (1.0 - screen width),Spacing between stars (1.0 - star width).||
-||result_stats_accuracy = .5,.61,0.002,#FFFFFF||Defines the pos of the accuracy % value. Can use any hex color.||
+||result_star = .5,.4,0.15,1.1||Defines the pos and scaling of the stars. X,Y,Scale (1.0 - screen width),Spacing between stars (1.0 - star width).||
+||result_stats_accuracy = .5,.61,0.002,#FFFFFF||Defines the pos of the accuracy % value. Use a Hex Color Value.||
 ||result_stats_accuracy_text  = Accuracy:  %.1f%%|| Accuracy:  %.1f%% will show as "Accuracy: 88.7%"|| 
-||result_stats_diff = .5,.55,0.002,#FFFFFF||Defines the pos of the difficulty stats. Can use any hex color.||
+||result_stats_diff = .5,.55,0.002,#FFFFFF||Defines the pos of the difficulty stats. Use a Hex Color Value.||
 ||result_stats_diff_text =  Difficulty: %s|| Difficulty: %s will show "Difficulty:Hard”|| 
-||result_stats_notes = .5,.52,0.002,#FFFFFF||Defines the pos of the notes hit value. Can use any hex color.||
+||result_stats_notes = .5,.52,0.002,#FFFFFF||Defines the pos of the notes hit value. Use a Hex Color Value.||
 ||result_stats_notes_text = %s Notes Hit||%s Notes Hit  will show "128 Notes Hit"||
-||result_stats_part = .5,.64,0.002,#FFFFFF|| Defines the pos of the results part. Can use any hex color.||
+||result_stats_part = .5,.64,0.002,#FFFFFF|| Defines the pos of the results part. Use a Hex Color Value.||
 ||result_stats_part_text = Part:  %s|| Part:  %s will show as "Part:  "||
-||result_stats_streak = .5,.58,0.002,#FFFFFF||Defines the pos of the streak value. Can use any hex color.||
+||result_stats_streak = .5,.58,0.002,#FFFFFF||Defines the pos of the streak value. Use a Hex Color Value.||
 ||result_stats_streak_text = Longest Streak: %s|| Longest Streak: %s will show "Longest Streak: 234”|| 
 
 
@@ -207,4 +260,4 @@ jurgen text is rendered above everything.||
 
 Good luck with making a custom theme to all!!!
 -----------------------------------------------
-This was made and is Maintained by Worldrave
+This was made and is maintained by Worldrave

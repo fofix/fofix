@@ -1,0 +1,23 @@
+#summary Brief instructions to get members started.
+
+= Introduction =
+
+Ensure you are logged into GoogleCode, then...
+
+Go here:
+[http://code.google.com/p/fofix/source/checkout]
+
+Look for this line:
+svn checkout https://fofix.googlecode.com/svn/MFH-Mod/trunk/ fofix --username <<your username here>>
+
+Use everything after "svn checkout" as your SVN checkout address.  You may need to check out a fresh copy of FoFiX using this member-only checkout address.
+
+Click on the googlecode password link, slightly below that.  It should take you here:
+[http://code.google.com/hosting/settings]
+
+This is what you will use for your password when prompted.  Your username will be whatever it says after "--username " in the above svn checkout line.
+
+Then, an SVN Update.  Then an SVN Commit to commit new changes.  Type a log entry to describe what this commit does, then press OK.  Should work fine.
+
+
+Always update before you commit!  This will notify you if someone has just committed code that changes an area you are working on; hopefully everything merges nicely when you update.  

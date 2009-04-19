@@ -1,6 +1,6 @@
 #summary Development notes on game engine quirks
 #labels Phase-Implementation
-
+<wiki:toc max_depth="2" />
 = Introduction =
 
 This Wiki is probably only going to be of use to developers... 

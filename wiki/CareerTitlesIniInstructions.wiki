@@ -1,4 +1,5 @@
 #summary Career Mode's titles.ini Instructions
+#labels Phase-CareerMaking
 
 = How to work with Career Mode's _"titles.ini"_ Files=
 _Credit to Razlo7 for writing these instructions. Wiki Page Done by Worldrave_

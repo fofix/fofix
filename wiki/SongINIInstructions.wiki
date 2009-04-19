@@ -1,4 +1,5 @@
 #summary Usable functions in the song.ini file.
+#labels Phase-CareerMaking
 
 ------------------------------------------------------------------------------
 ==Usable functions in the song.ini file.==

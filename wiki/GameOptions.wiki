@@ -1,0 +1,106 @@
+#summary Game Options Explained
+#labels Phase-Support
+
+= NIL Show Next Score =
+_(Created: v3.120 alpha r1227)_
+setting under (advanced menu version): Setlist Options -> NIL Show
+Next Score
+
+ * "Off" (default) - will show "NIL" for songs without the currently selected
+difficulty in the songlist
+ * "Auto" - will replace "NIL" score listing with the next available song
+difficulty's score (for example, a custom song with only Hard and Expert difficulties
+available would show the Hard score if the user was looking at Easy, Medium, or Hard
+scores).
+
+
+_More options to come (obviously)_
+<wiki:comment>
+||Required junk to keep this below the Left google content ||
+|| Don't remove this so it works right.||  ||
+</wiki:comment>
+
+---------------------------------------------------------------------------------------
+|| Main Game Options    ||Sub Menu options            ||Sub Menu Items|| Sub Menu Item Choice|| Description of Choice||
+||*Gameplay Settings*     ||Language				||   || ||    ||
+||                      ||Drum Miss Penalty		||First Note|| ||    ||
+||				||					||Song Start ||      ||    ||
+||				||					||Always ||      ||    ||
+||                      ||Star Scoring Style		||Accuracy ||      ||    ||
+||				||					||GH ||      ||    ||
+||				||					||RB ||      ||    ||
+||				||					||RB2 ||      ||    ||
+||				||					||GH+RB ||      ||    ||
+||                      ||Career Mode Advance         || ||      ||    ||
+||                      ||Countdown on Resume		||Yes ||      ||    ||
+||				||					||No ||      ||    ||
+||                      ||Sp Refill Mode			||None ||      ||    ||
+||				||					||Always ||      ||    ||
+||				||					||By MIDI type ||      ||    ||
+||				||					||By Theme ||      ||    ||
+||			      ||Drum SP				||Auto/Fills ||      ||    ||
+||				||					||Manual/Fills ||      ||    ||
+||			      ||Upload Highscores		||Yes ||      ||    ||
+||				||					||No ||      ||    ||
+||			      ||AV Delay			      ||(Delay in Milliseconds) ||      ||    ||
+||			      ||Advanced Gameplay Settings  ||Note Hitwindow ||      ||    ||
+||				||					||Star Updates ||      ||    ||
+||				||					||Bass Groove ||      ||    ||
+||				||					||Loading Phrases ||      ||    ||
+||				||					||Stat Decimal Places ||      ||    ||
+||				||					||Ignore Open Strums ||      ||    ||
+||				||					||Big Rock Endings ||      ||    ||
+||				||					||SP Mode ||      ||    ||
+||				||					||Party Mode Timer ||      ||    ||
+||				||					||Remember Play Count ||      ||    ||
+||				||					||Pause on Loss of Focus ||      ||    ||
+||				||HOPO Settings               || ||      ||    ||
+||Control Settings      ||Keyset                      || ||      ||    ||
+||				||Change Controls			||Key Conflicts ||      ||    ||
+||				||					||Player 1 Keys/alt keys ||      ||    ||
+||				||					||Player 2 Keys/alt keys ||      ||    ||
+||				||					||Drum Keys/alt drum keys ||      ||    ||
+||				||Test Guitars                || || ||    ||
+||*Display Settings*	||Theme                       || || ||    ||
+||				||Video Resolution            || || ||    ||
+||				||Fullscreen Mode			|| || ||    ||
+||				||Graphical Menus			|| || ||    ||
+||				||Stages Options			||Stage Selection || ||    ||
+||				||					||Animated Stage|| ||    ||
+||				||					||Song Stage || ||    ||
+||				||					||Stage Slideshow|| ||    ||
+||				||					||Slideshow Delay|| ||    ||
+||				||					||Stage Animation|| ||    ||
+||				||					||Animation Delay|| ||    ||
+||				||					||Miss Pauses Anim.|| ||    ||
+||				||Choose P1 Neck			||	||	||    ||
+||				||Choose P2 Neck			||	||	||    ||
+||				||Fretboard Settings		||Point of View			||Theme  ||    ||
+||				||					||					||FoF  ||    ||
+||				||					||					||GH2  ||    ||
+||				||					||					||GH3  ||    ||
+||				||					||					||Rock Band  ||    ||
+||				||					||					||Rock Rev  ||    ||
+||				||					||Missed Notes			||Keep on Going  ||    ||
+||				||					||					||Disappear  ||    ||
+||				||					||Board Speed Mode		||BPM & Diff  ||    ||
+||				||					||					||BPM  ||    ||
+||				||					||					||Difficulty  ||    ||
+||				||					||					||Percentage  ||    ||
+||				||					||Board Speed Percent         ||10-400  ||    ||
+||				||					||Large Drum Neck			||Toggle extra wide drumneck  ||    ||
+||				||					||Bass Groove Neck		||Overlay  ||    ||
+||				||					||					||Replace  ||    ||
+||				||					||					||Off  ||    ||
+||				||					||Guitar Solo Neck		||Overlay  ||    ||
+||				||					||					||Replace  ||    ||
+||				||					||					||Off  ||    ||
+||				||					||Inc. Neck Mode			||Start & End  ||    ||
+||				||					||					||Start Only  ||    ||
+||				||					||					||Off  ||    ||
+||				||					||Change Neck Transparency	||All Necks  ||    ||
+||				||					||					||Main Neck  ||    ||
+||				||					||					||Solo Neck  ||    ||
+||				||					||					||Bass Groove Neck  ||    ||
+||				||					||					||Fail Neck  ||    ||
+||				||					||					||Overlay Neck  ||    ||

@@ -1,8 +1,12 @@
 #summary How to get game controllers to work
+#labels Phase-Support
 
+<wiki:toc max_depth="2" />
 = Introduction =
 Do you own a Guitar Hero or Rock Band controller for the PS2, PS3, Wii or Xbox 360?
 Are you wondering how to get it to work? Then you're at the right place!
+
+-------------------------------
 
 = Microsoft Windows =
 == PS3 ==
@@ -15,7 +19,17 @@ Works right out of the box - just plug it in. The driver is included in Windows.
 Any PS2 to USB adapter will do. Plug it in and it will go. Beware though, that most will not work with the whammy bar, as the guitar controller has no "analog" button.
 
 == Wii ==
-Requires a compatible bluetooth receiver on your computer and [http://carl.kenner.googlepages.com/glovepie_download GlovePIE]. _More instructions needed_
+Rock Band Wii instruments should work right out of the box - just plug it in.
+However Guitar Hero 3/World Tour instruments communicate via the Wiimote and require a compatible bluetooth receiver on your computer
+(see a list of compatible bluetooth devices [http://www.wiili.org/index.php/Compatible_Bluetooth_Devices here]) and [http://carl.kenner.googlepages.com/glovepie_download GlovePIE].
+ * Download [http://flightpad.net/files/GlovePIE030.zip GlovePIE 3.0] and install to your computer.
+ * Download [http://www.mediafire.com/?zdlzjt5nyzn death_au's FoFiX script v0.7] to GlovePIE's Wiimote Scripts Directory
+ * Connect your Wiimote to the computer via your bluetooth progam. Specific instructions for your bluetooth stack can be found on the [http://www.google.com/ Internet], and there is a video tutorial on how to connect using the default Windows Vista / Windows XP SP2 Bluetooth stack [http://www.youtube.com/watch?v=4_pQSGYzfKU here]
+ * Connect your Wiimote to the instrument controller as normal
+ * Open up the FoFiX script in GlovePIE and click "Run"
+Default mapping of the controls for the script correspond to the default controls in FoFiX. Please read the instuctions in the script for how to change the control mapping.
+
+----------------------------------
 
 = GNU/Linux =
 == PS2 ==
@@ -26,6 +40,8 @@ Depending on your distribution, it might work out of the box.
 If it does not, install the [http://pingus.seul.org/~grumbel/xboxdrv/ xboxdrv driver].
 
 *Note*: There are alternatives, like the xpad kernel module, but since the xboxdrv is a userspace kernel driver that works even with the most recent kernels with problematic Xorg !AutoAddDevices feature, we recommend that one.
+
+-----------------------------------
 
 = Mac OSX =
 == xbox360 ==

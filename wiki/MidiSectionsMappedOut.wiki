@@ -1,7 +1,9 @@
 #summary This is to Keep track of the MIDI file section markings.
+#labels Phase-SongFretting
 
+<wiki:toc max_depth="1" />
 ---------------------------------------------
-==GUITAR PARTS==
+=GUITAR PARTS=
 
 {{{
 allowed: MUSICIAN_COMMON_EVENTS, play_solo, map
@@ -22,7 +24,7 @@ midi: 120-124 - big rock ending
 http://img166.imageshack.us/img166/5453/bigrockendingsbd4.jpg
 
 --------------------------------------------------
-==PART BASS PARTS==
+=PART BASS PARTS=
 {{{
 allowed: MUSICIAN_COMMON_EVENTS, play_solo, map 
 midi: 12-15 - h2h camera cuts and focus notes 
@@ -37,7 +39,7 @@ midi: 120-124 - big rock ending
 }}}
 
 ---------------------------------------------------
-==DRUMS PARTS==
+=DRUMS PARTS=
 {{{ 
 allowed: mix 
 allowed: ride_side_true - ok to use side swipe on ride cym when hits are slow enough 
