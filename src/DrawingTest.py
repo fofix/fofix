@@ -25,7 +25,7 @@ try:
   vbo_support = True
 except:
   vbo_support = False
-from numpy import array, float32, append
+from numpy import array, float32, append, hstack
 import pygame
 from pygame.locals import *
 from math import cos, sin, sqrt
@@ -34,11 +34,16 @@ rtri = 0.0
 mode = 2
 
 def init():
-    global mode, triangVbo, triangVtx, spiralVtx, spiralVbo, spiralCol
+    global mode, triangVbo, triangVtx, triangCol
+    global spiralVtx, spiralVbo, spiralCol
     triangVtx = array(
         [[ 0,  1, 0],
          [-1, -1, 0],
          [ 1, -1, 0]], dtype=float32)
+    triangCol = array(
+        [[ 0,  1, 0],
+         [ 1,  0, 0],
+         [ 0,  0, 1]], dtype=float32)
 
     nbSteps = 200.0
     for i in range(int(nbSteps)):
@@ -61,14 +66,17 @@ def init():
       spiralCol = append(spiralCol,[[1.0-ratio, 0.2, ratio]],axis=0)
 
     if vbo_support:
-      triangVbo = vbo.VBO( triangVtx, usage='GL_STATIC_DRAW' )
-      spiralVbo = vbo.VBO( spiralVtx, usage='GL_STATIC_DRAW' )
+      triangArray = hstack((triangVtx, triangCol))
+      spiralArray = hstack((spiralVtx, spiralCol))
+      triangVbo = vbo.VBO( triangArray, usage='GL_STATIC_DRAW' )
+      spiralVbo = vbo.VBO( spiralArray, usage='GL_STATIC_DRAW' )
     else:
       print "VBO not supported, fallbacking to array-based drawing."
       mode = 1
 
 def draw():
-    global mode, triangVbo, triangVtx, spiralVtx, spiralVbo, spiralCol, rtri
+    global mode, triangVbo, triangVtx, triangCol
+    global spiralVtx, spiralVbo, spiralCol, rtri
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
     glPushMatrix()
@@ -81,30 +89,34 @@ def draw():
       # Draw triangle
       triangVbo.bind()
       glEnableClientState(GL_VERTEX_ARRAY);
-      glVertexPointerf( triangVbo )
+      glEnableClientState(GL_COLOR_ARRAY);
+      glVertexPointer(3, GL_FLOAT, 24, triangVbo )
+      glColorPointer(3, GL_FLOAT, 24, triangVbo+12 )
       glDrawArrays(GL_TRIANGLES, 0, triangVtx.shape[0])
-      glDisableClientState(GL_VERTEX_ARRAY)
+      glDisableClientState(GL_VERTEX_ARRAY);
+      glDisableClientState(GL_COLOR_ARRAY);
       triangVbo.unbind()
       # Draw spiral
       # evilynux - FIXME: The following doesn't work... why?
-#       spiralVbo.bind()
-#       glEnableClientState(GL_VERTEX_ARRAY);
-#       glEnableClientState(GL_COLOR_ARRAY)
-#       glVertexPointerf( spiralVbo )
-#       glColorPointerf( spiralCol )
-#       glDrawArrays(GL_TRIANGLE_STRIP, 0, spiralVtx.shape[0])
-#       glDisableClientState(GL_COLOR_ARRAY)
-#       glDisableClientState(GL_VERTEX_ARRAY)
-#       spiralVbo.unbind()
+      spiralVbo.bind()
+      glEnableClientState(GL_VERTEX_ARRAY);
+      glEnableClientState(GL_COLOR_ARRAY)
+      glVertexPointer(3, GL_FLOAT, 24, spiralVbo )
+      glColorPointer(3, GL_FLOAT, 24, spiralVbo+12 )
+      glDrawArrays(GL_TRIANGLE_STRIP, 0, spiralVtx.shape[0])
+      glDisableClientState(GL_COLOR_ARRAY)
+      glDisableClientState(GL_VERTEX_ARRAY)
+      spiralVbo.unbind()
 
     # Array-based drawing
     elif mode == 1:
       # Draw triangle
       glEnableClientState(GL_VERTEX_ARRAY)
+      glEnableClientState(GL_COLOR_ARRAY)
+      glColorPointerf(triangCol)
       glVertexPointerf(triangVtx)
       glDrawArrays(GL_TRIANGLES, 0, triangVtx.shape[0])
       # Draw spiral
-      glEnableClientState(GL_COLOR_ARRAY)
       glColorPointerf(spiralCol)
       glVertexPointerf(spiralVtx)
       glDrawArrays(GL_TRIANGLE_STRIP, 0, spiralVtx.shape[0])
@@ -114,16 +126,16 @@ def draw():
     # Direct drawing
     else: # mode == 2
       glBegin(GL_TRIANGLES)
-      glVertex( 0, 1,0)
-      glVertex(-1,-1,0)
-      glVertex( 1,-1,0)
+      for i in range(triangVtx.shape[0]):
+        glColor(triangCol[i])
+        glVertex(triangVtx[i])
       glEnd()
 
       # Draw spiral
       glBegin(GL_TRIANGLE_STRIP);
       for i in range(spiralVtx.shape[0]):
-        glColor(spiralCol[i,0], spiralCol[i,1], spiralCol[i,2])
-        glVertex3f(spiralVtx[i,0], spiralVtx[i,1], spiralVtx[i,2])
+        glColor(spiralCol[i])
+        glVertex(spiralVtx[i])
       glEnd()
 
     glPopMatrix()
