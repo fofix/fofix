@@ -30,7 +30,8 @@ import pygame
 from pygame.locals import *
 from math import cos, sin, sqrt
 
-rtri = 0.0
+rot = 0.0
+scale = 1.0
 mode = 2
 
 def init():
@@ -66,8 +67,8 @@ def init():
       spiralCol = append(spiralCol,[[1.0-ratio, 0.2, ratio]],axis=0)
 
     if vbo_support:
-      triangArray = hstack((triangVtx, triangCol))
-      spiralArray = hstack((spiralVtx, spiralCol))
+      triangArray = hstack((triangVtx, triangCol)).astype(float32)
+      spiralArray = hstack((spiralVtx, spiralCol)).astype(float32)
       triangVbo = vbo.VBO( triangArray, usage='GL_STATIC_DRAW' )
       spiralVbo = vbo.VBO( spiralArray, usage='GL_STATIC_DRAW' )
     else:
@@ -76,13 +77,13 @@ def init():
 
 def draw():
     global mode, triangVbo, triangVtx, triangCol
-    global spiralVtx, spiralVbo, spiralCol, rtri
+    global spiralVtx, spiralVbo, spiralCol, rot, scale
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
     glPushMatrix()
     glColor(1,1,1) # triangle color
-    glScale(.5,.5,.5)
-    glRotate(rtri,0,1,0)
+    glScale(scale,scale,scale)
+    glRotate(rot,0,1,0)
 
     # VBO drawing
     if mode == 0 and vbo_support:
@@ -141,7 +142,8 @@ def draw():
     glPopMatrix()
     
 def main():
-    global rtri, mode
+    global rot, scale, mode
+    scale_dir = -1
     modeName = ["VBO", "Array-based", "Direct-mode"]
     fps = 0
     video_flags = DOUBLEBUF|OPENGL|HWPALETTE|HWSURFACE
@@ -174,7 +176,10 @@ def main():
       draw()
         
       # update rotation counters
-      rtri += 0.2
+      rot += 0.2
+      scale += scale_dir*0.0002
+      if scale > 1.0 or scale < 0.5:
+        scale_dir = scale_dir*-1
 
       # make changes visible
       pygame.display.flip()
