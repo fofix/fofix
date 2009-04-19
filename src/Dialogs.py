@@ -11,7 +11,7 @@
 #               2008 evilynux <evilynux@gmail.com>                  #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
-# modify it under the terms of the GNU General Public License      #
+# modify it under the terms of the GNU General Public License       #
 # as published by the Free Software Foundation; either version 2    #
 # of the License, or (at your option) any later version.            #
 #                                                                   #
@@ -225,9 +225,7 @@ class GetText(Layer, KeyListener):
     
     #if (c in Player.KEY1S or key == pygame.K_RETURN) and not self.accepted:
     #if (c in Player.KEY1S or key == pygame.K_RETURN or c in Player.DRUM4S) and not self.accepted:   #MFH - adding support for green drum "OK"
-    if unicode and ord(unicode) > 31 and not self.accepted:
-      self.text += unicode
-    elif (c in Player.key1s or key == pygame.K_RETURN or (c in Player.drum4s and self.drumHighScoreNav)) and not self.accepted:   #MFH - adding support for green drum "OK"
+    if (c in Player.key1s or key == pygame.K_RETURN or (c in Player.drum4s and self.drumHighScoreNav)) and not self.accepted:   #MFH - adding support for green drum "OK"
       self.engine.view.popLayer(self)
       self.accepted = True
       if c in Player.key1s:
@@ -245,6 +243,8 @@ class GetText(Layer, KeyListener):
       if c in Player.key4s:
         self.engine.data.cancelSound.setVolume(self.sfxVolume)  #MFH
         self.engine.data.cancelSound.play()
+    elif unicode and ord(unicode) > 31 and not self.accepted:
+      self.text += unicode
     elif c in Player.key3s and not self.accepted:
       self.text += self.text[len(self.text) - 1]
       self.engine.data.acceptSound.setVolume(self.sfxVolume)  #MFH

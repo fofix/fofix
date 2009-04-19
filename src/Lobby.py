@@ -646,7 +646,9 @@ class CreateCharacter(Layer, KeyListener):
     self.engine.input.removeKeyListener(self)
   def keyPressed(self, key, unicode):
     c = self.engine.input.controls.getMapping(key)
-    if unicode and ord(unicode) > 31 and self.active:
+    if key == pygame.K_BACKSPACE and self.active:
+      self.choices[self.selected] = self.choices[self.selected][:-1]
+    elif unicode and ord(unicode) > 31 and self.active:
       if self.selected == 0 or self.selected == 7:
         if self.selected == 0 and ord(unicode) in (34, 42, 47, 58, 60, 62, 63, 92, 124):
           self.engine.data.cancelSound.play()
@@ -695,7 +697,7 @@ class CreateCharacter(Layer, KeyListener):
         self.choices[self.selected] += self.choices[self.selected][len(self.choices[self.selected]) - 1]
         if c in Player.key3s:
           self.engine.data.acceptSound.play()
-    elif (c in Player.key4s + Player.lefts or key == pygame.K_LEFT or key == pygame.K_BACKSPACE) and self.active:
+    elif (c in Player.key4s + Player.lefts or key == pygame.K_LEFT) and self.active:
       self.choices[self.selected] = self.choices[self.selected][:-1]
       if c in Player.key4s:
         self.engine.data.cancelSound.play()
