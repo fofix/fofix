@@ -26,7 +26,6 @@ import pygame
 import Log
 import Audio
 
-
 ports = None
 midi = []
 midiin = None
@@ -122,6 +121,7 @@ if haveMidi:
 
 
 from Task import Task
+import Player
 from Player import Controls
 
 import Config   #MFH
@@ -131,6 +131,12 @@ class KeyListener:
     pass
     
   def keyReleased(self, key):
+    pass
+  
+  def lostFocus(self):
+    pass
+  
+  def exitRequested(self):
     pass
 
 class MouseListener:
@@ -180,19 +186,32 @@ class Input(Task):
     self.systemListeners      = []
     self.priorityKeyListeners = []
     self.controls             = Controls()
+    self.activeGameControls   = []
+    self.p2Nav                = self.controls.p2Nav
+    self.type1                = self.controls.type[0]
+    self.keyCheckerMode       = Config.get("game","key_checker_mode")
     self.disableKeyRepeat()
+    
+    self.gameGuitars = 0
+    self.gameDrums   = 0
 
     # Initialize joysticks
     pygame.joystick.init()
     self.joystickAxes = {}
     self.joystickHats = {}
+    self.joyOff = False
 
     self.joysticks = [pygame.joystick.Joystick(id) for id in range(pygame.joystick.get_count())]
     for j in self.joysticks:
       j.init()
       self.joystickAxes[j.get_id()] = [0] * j.get_numaxes() 
       self.joystickHats[j.get_id()] = [(0, 0)] * j.get_numhats() 
-    Log.debug("%d joysticks found." % (len(self.joysticks)))
+    joyNum = len(self.joysticks)
+    Log.debug("%d joysticks found." % (joyNum))
+    oldJoyNum = Config.get("game", "joysticks")
+    if joyNum != oldJoyNum:
+      self.joyOff = True
+    Config.set("game", "joysticks", joyNum)
 
     # Enable music events
     Audio.Music.setEndEvent(MusicFinished)
@@ -216,6 +235,37 @@ class Input(Task):
 
   def reloadControls(self):
     self.controls = Controls()
+
+  def pluginControls(self):
+    self.gameDrums = 0
+    self.gameGuitars = 0
+    Player.pluginControls(self.activeGameControls)
+    for i in self.activeGameControls:
+      if self.controls.type[i] == 2 or self.controls.type[i] == 3:
+        self.gameDrums += 1
+      else:
+        self.gameGuitars += 1
+  
+  def getAnalogKill(self, player):
+    return self.controls.analogKill[self.activeGameControls[player]]
+  
+  def getAnalogSP(self, player):
+    return self.controls.analogSP[self.activeGameControls[player]]
+  
+  def getAnalogSPThresh(self, player):
+    return self.controls.analogSPThresh[self.activeGameControls[player]]
+  
+  def getAnalogSPSense(self, player):
+    return self.controls.analogSPSense[self.activeGameControls[player]]
+  
+  def getAnalogSlide(self, player):
+    return self.controls.analogSlide[self.activeGameControls[player]]
+  
+  def getAnalogFX(self, player):
+    return self.controls.analogFX[self.activeGameControls[player]]
+  
+  def getTwoChord(self, player):
+    return self.controls.twoChord[self.activeGameControls[player]]
 
   def disableKeyRepeat(self):
     pygame.key.set_repeat(0, 0)
@@ -444,6 +494,6 @@ class Input(Task):
       self.reloadControls()
   
   # glorandwarf: sets the new key mapping and checks for a conflict
-  def setNewKeyMapping(self, section, option, key):
-    return self.controls.setNewKeyMapping(section, option, key)
+  def setNewKeyMapping(self, section, option, key, control):
+    return Player.setNewKeyMapping(section, option, key, control)
   #-------------------------------------------

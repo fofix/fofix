@@ -23,12 +23,19 @@
 import sys
 import os
 import Resource
+import Version
 
 quiet = True
 if os.name == "posix": # evilynux - logfile in ~/.fretsonfire/ for GNU/Linux and MacOS X
-  logFile = open(os.path.join(Resource.getWritableResourcePath(), "fretsonfire.log"), "w")
+  # evilynux - Under MacOS X, put the logs in ~/Library/Logs
+  if( os.uname()[0] == "Darwin" ):
+    logFile = open(os.path.join(Resource.getWritableResourcePath(), 
+                                "..", "..", "Logs",
+                                Version.appName() + ".log"), "w")
+  else: # GNU/Linux et al.
+    logFile = open(os.path.join(Resource.getWritableResourcePath(), Version.appName() + ".log"), "w")
 else:
-  logFile = open("fretsonfire.log", "w")  #MFH - local logfile!
+  logFile = open(Version.appName() + ".log", "w")  #MFH - local logfile!
   
 encoding = "iso-8859-1"
 
@@ -59,6 +66,8 @@ def log(cls, msg):
     import traceback
     tempTrace = traceback.format_exc()
   if tempTrace:
+    if not quiet:
+      print tempTrace
     print >>logFile, labels[cls] + " " + msg + tempTrace
     logFile.flush()  #stump: truncated tracebacks be gone!
   else:

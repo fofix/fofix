@@ -36,7 +36,11 @@ logIniReads = 0   #MFH - INI reads disabled by default during the startup period
 logUndefinedGets = 0 
 
 class MyConfigParser(ConfigParser):
-  def write(self, fp):
+  def write(self, fp, type = 0):
+      if type == 1:
+        return self.writeController(fp)
+      elif type == 2:
+        return self.writePlayer(fp)
       if self._defaults:
         fp.write("[%s]\n" % DEFAULTSECT)
         for (key, value) in self._defaults.items():
@@ -45,6 +49,10 @@ class MyConfigParser(ConfigParser):
       sections = sorted(self._sections)
       for section in sections:
         if section == "theme":
+          continue
+        elif section == "controller":
+          continue
+        elif section == "player":
           continue
         fp.write("[%s]\n" % section)
         sectList = self._sections[section].items()
@@ -63,6 +71,42 @@ class MyConfigParser(ConfigParser):
       sections = sorted(self._sections)
       for section in sections:
         if section != "theme":
+          continue
+        fp.write("[%s]\n" % section)
+        sectList = self._sections[section].items()
+        sectList.sort()
+        for key, value in sectList:
+          if key != "__name__":
+            fp.write("%s = %s\n" % (key, str(value).replace('\n', '\n\t')))
+        fp.write("\n")
+  
+  def writeController(self, fp):
+      if self._defaults:
+        fp.write("[%s]\n" % DEFAULTSECT)
+        for (key, value) in self._defaults.items():
+          fp.write("%s = %s\n" % (key, str(value).replace('\n', '\n\t')))
+        fp.write("\n")
+      sections = sorted(self._sections)
+      for section in sections:
+        if section != "controller":
+          continue
+        fp.write("[%s]\n" % section)
+        sectList = self._sections[section].items()
+        sectList.sort()
+        for key, value in sectList:
+          if key != "__name__":
+            fp.write("%s = %s\n" % (key, str(value).replace('\n', '\n\t')))
+        fp.write("\n")
+  
+  def writePlayer(self, fp):
+      if self._defaults:
+        fp.write("[%s]\n" % DEFAULTSECT)
+        for (key, value) in self._defaults.items():
+          fp.write("%s = %s\n" % (key, str(value).replace('\n', '\n\t')))
+        fp.write("\n")
+      sections = sorted(self._sections)
+      for section in sections:
+        if section != "player":
           continue
         fp.write("[%s]\n" % section)
         sectList = self._sections[section].items()
@@ -99,10 +143,10 @@ def define(section, option, type, default = None, text = None, options = None, p
     
   prototype[section][option] = Option(type = type, default = default, text = text, options = options)
 
-def load(fileName = None, setAsDefault = False):
+def load(fileName = None, setAsDefault = False, type = 0):
   """Load a configuration with the default prototype"""
   global config, logIniReads, logUndefinedGets
-  c = Config(prototype, fileName)
+  c = Config(prototype, fileName, type)
   if setAsDefault and not config:
     config = c
   logIniReads = c.get("game", "log_ini_reads")
@@ -115,7 +159,7 @@ def load(fileName = None, setAsDefault = False):
 
 class Config:
   """A configuration registry."""
-  def __init__(self, prototype, fileName = None):
+  def __init__(self, prototype, fileName = None, type = 0):
     """
     @param prototype:  The configuration protype mapping
     @param fileName:   The file that holds this configuration registry
@@ -132,6 +176,7 @@ class Config:
       self.config.read(fileName)
   
     self.fileName  = fileName
+    self.type = type
   
     # fix the defaults and non-existing keys
     for section, options in prototype.items():
@@ -167,6 +212,8 @@ class Config:
       value = str(value).lower()
       if value in ("1", "true", "yes", "on"):
         value = True
+      elif value in ("none", ""):
+        value = default #allows None-default bools to return None
       else:
         value = False
     else:
@@ -291,7 +338,7 @@ class Config:
     self.config.set(section, option, value)
     
     f = open(self.fileName, "w")
-    self.config.write(f)
+    self.config.write(f, self.type)
     f.close()
 
   def getModOptions1(self, twoChord, hopo8th, compact = False):

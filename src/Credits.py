@@ -125,6 +125,7 @@ class Picture(Element):
     return self.height
 
   def render(self, offset):
+    offset = (offset*4.0)/3.0  #stump: get it back into alignment...
     self.drawing.transform.reset()
     w, h = self.engine.view.geometry[2:4]
     self.drawing.transform.translate(.5 * w, h - (.5 * self.height + offset) * h * float(w) / float(h))
@@ -154,6 +155,28 @@ class Credits(Layer, KeyListener):
     c1 = (1, 1, .5, 1)
     c2 = (1, .75, 0, 1)
     self.text_size = nf.getLineSpacing(scale = hs)
+    
+    #menuPath = os.path.join("data","themes",self.themename,"menu")
+    #if not hasattr(sys,"frozen"): #MFH - add ".." to path only if running from sources - not if running from EXE
+    #  menuPath = os.path.join("..",menuPath)
+    #if self.engine.data.fileExists(os.path.join(menuPath,"credits.png")):
+    #  self.engine.loadImgDrawing(self, "background",os.path.join(menuPath,"credits.png"))
+    #  if self.engine.data.fileExists(os.path.join(menuPath,"creditstop.png")): #akedrou - cool effect, but usable to hide credits...
+    #    self.engine.loadImgDrawing(self, "topLayer",os.path.join(menuPath,"creditstop.png"))
+    #  else:
+    #    self.topLayer = None
+    #else:
+    #  self.background = None
+    #  self.topLayer = None
+    try:
+      self.engine.loadImgDrawing(self, 'background', os.path.join('themes', self.themename, 'menu', 'credits.png'))
+      try:
+        self.engine.loadImgDrawing(self, 'topLayer', os.path.join('themes', self.themename, 'menu', 'creditstop.png'))
+      except IOError:
+        self.topLayer = None
+    except IOError:
+      self.topLayer = None
+      self.background = None
 
     space = Text(nf, hs, c1, "center", " ")
     self.credits = [
@@ -219,10 +242,10 @@ class Credits(Layer, KeyListener):
     self.credits.extend( [
       space,
       Text(nf, ns, c1, "left",   _("Made with:")),
-      Text(nf, ns, c2, "right",  "Python 2.4"),
+      Text(nf, ns, c2, "right",  "Python " + sys.version.split(' ')[0]),  #stump: the version that's actually in use
       Text(nf, bs, c2, "right",  "http://www.python.org"),
       space,
-      Text(nf, ns, c2, "right",  "PyGame 1.7.1"),
+      Text(nf, ns, c2, "right",  "PyGame " + pygame.version.ver.replace('release', '')),  #stump: the version that's actually in use
       Text(nf, bs, c2, "right",  "http://www.pygame.org"),
       space,
       Text(nf, ns, c2, "right",  "PyOpenGL"),
@@ -262,21 +285,21 @@ class Credits(Layer, KeyListener):
     self.engine.view.popLayer(self)
 
   def keyPressed(self, key, unicode):
-    if self.engine.input.controls.getMapping(key) in (Player.CANCELS + Player.KEY1S + Player.KEY2S + Player.DRUM1S + Player.DRUM4S) or key == pygame.K_RETURN or key == pygame.K_ESCAPE:
+    if self.engine.input.controls.getMapping(key) in (Player.menuYes + Player.menuNo) or key == pygame.K_RETURN or key == pygame.K_ESCAPE:
       self.quit()
-    elif self.engine.input.controls.getMapping(key) in (Player.ACTION2S + Player.DRUM3S) or key == pygame.K_DOWN: #akedrou: so I was bored.
+    elif self.engine.input.controls.getMapping(key) in (Player.menuDown) or key == pygame.K_DOWN: #akedrou: so I was bored.
       if self.speedDiv > 1000.0:
         self.speedDiv -= 1000.0
         if self.speedDiv < 1000.0:
           self.speedDiv = 1000.0
-    elif self.engine.input.controls.getMapping(key) in (Player.ACTION1S + Player.DRUM2S) or key == pygame.K_UP:
+    elif self.engine.input.controls.getMapping(key) in (Player.menuUp) or key == pygame.K_UP:
       if self.speedDiv < 30000.0:
         self.speedDiv += 1000.0
         if self.speedDiv > 30000.0:
           self.speedDiv = 30000.0
-    elif self.engine.input.controls.getMapping(key) in (Player.KEY3S):
+    elif self.engine.input.controls.getMapping(key) in (Player.key3s):
       self.speedDir *= -1
-    elif self.engine.input.controls.getMapping(key) in (Player.KEY4S):
+    elif self.engine.input.controls.getMapping(key) in (Player.key4s):
       if self.speedDir != 0:
         self.speedDir = 0
       else:
@@ -304,7 +327,11 @@ class Credits(Layer, KeyListener):
     w, h, = self.engine.view.geometry[2:4]
     
     self.engine.view.setOrthogonalProjection(normalize = True)
-    Dialogs.fadeScreen(.4)
+    if self.background:
+      wFactor = 640.000/self.background.width1()
+      self.engine.drawImage(self.background, scale = (wFactor,-wFactor), coord = (w/2,h/2))
+    else:
+      Dialogs.fadeScreen(.4)
     font = self.engine.data.font
     self.doneList = []
 
@@ -313,13 +340,19 @@ class Credits(Layer, KeyListener):
     glTranslatef(-(1 - v), 0, 0)
     try:
       for element in self.credits:
-        h = element.getHeight()
-        if y + h > 0.0 and y < 1.0:
+        hE = element.getHeight()
+        if y + hE > 0.0 and y < 1.0:
           element.render(y)
-        if y + h < 0.0:
+        if y + hE < 0.0:
           self.doneList.append(element)
-        y += h
+        y += hE
         if y > 1.0:
           break
+      if self.topLayer:
+        wFactor = 640.000/self.topLayer.width1()
+        hPos = h - ((self.topLayer.height1() * wFactor)*.75)
+        if hPos < h * .6:
+          hPos = h * .6
+        self.engine.drawImage(self.topLayer, scale = (wFactor,-wFactor), coord = (w/2,hPos))
     finally:
       self.engine.view.resetProjection()

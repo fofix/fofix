@@ -22,25 +22,36 @@
 
 import sys
 import os
-VERSION = '1.2'
+VERSION = '3.120'
+URL = 'http://fofix.googlecode.com'
 
 def appName():
-  return "fretsonfire"
+  return "fofix"
+
+def appNameSexy():
+  return "FoFiX"
 
 def revision():
-  return int("$LastChangedRevision: 451 $".split(" ")[1])
+  import svntag
+  try:
+    revision = "alpha (r%d)" % int(svntag.get_svn_info(os.path.dirname(__file__))['revnum'])
+  except:
+    revision = "beta 1"
+  return revision
 
-def branch():
-  return "RF-mod"
-
-def branchrevision():
-  return 4.15
-
-def branchVersion():
-  return "%s-%.2f" % (branch(), branchrevision())
-
+# evilynux: Returns version number w.r.t. frozen state
 def version():
-  return "%s.%d-%s" % (VERSION, revision(), branchVersion())
+  if hasattr(sys, 'frozen'):
+    # stump: if we've been py2exe'd, read our version string from the exe.
+    if sys.frozen == 'windows_exe':
+      import win32api
+      us = os.path.abspath(unicode(sys.executable, sys.getfilesystemencoding()))
+      version = win32api.GetFileVersionInfo(us, r'\StringFileInfo\%04x%04x\ProductVersion' % win32api.GetFileVersionInfo(us, r'\VarFileInfo\Translation')[0])
+    else:
+      version = VERSION
+  else:
+    version = "%s %s" % ( VERSION, revision() )
+  return version
 
 def dataPath():
   # Determine whether were running from an exe or not

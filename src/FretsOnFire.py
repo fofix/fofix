@@ -120,8 +120,8 @@ def main():
       engine.cmdPart = int(part)
       #evilynux - Multiplayer and mode selection support
       Config.set("game", "players", nbrplayers)
-      Config.set("player0","mode_1p", mode)
-      Config.set("player1","mode_2p", mode)
+      Config.set("game", "game_mode", mode)
+      Config.set("game", "multiplayer_mode", mode)
 
     if debug == True:
       engine.setDebugModeEnabled(not engine.isDebugModeEnabled())
@@ -135,11 +135,13 @@ def main():
       sys.setdefaultencoding(encoding)
     engine.setStartupLayer(MainMenu(engine))
 
-    try:
-      import psyco
-      psyco.profile()
-    except:
-      Log.warn("Unable to enable psyco.")
+    #stump: make psyco optional
+    if Config.get("performance", "use_psyco"):
+      try:
+        import psyco
+        psyco.profile()
+      except:
+        Log.warn("Unable to enable psyco.")
 
     try:
       engine.ticksAtStart = pygame.time.get_ticks()

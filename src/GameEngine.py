@@ -29,6 +29,7 @@
 #####################################################################
 
 from OpenGL.GL import *
+from numpy import array, float32
 import pygame
 import os
 import sys
@@ -54,46 +55,16 @@ import Dialogs
 import Theme
 import Version
 import Mod
+import Player
+import Shader
 
-
-# stump: if we've been py2exe'd, read our version string from the exe.
-if hasattr(sys, 'frozen') and sys.frozen == 'windows_exe':
-  import win32api
-  us = os.path.abspath(unicode(sys.executable, sys.getfilesystemencoding()))
-  version = "FoFiX v" + win32api.GetFileVersionInfo(us, r'\StringFileInfo\%04x%04x\ProductVersion' % win32api.GetFileVersionInfo(us, r'\VarFileInfo\Translation')[0])
-else:
-  #------------------
-  #MFH - the following SVN revision retrieval code is copied from john.stumpo's pitchbend source - handy!
-  import svntag
-
-  #__version__ = '$Id: GameEngine.py 5 2009-01-01 05:00:35Z stump $'
-
-  try:
-    #version = 'svn_rev%d' % \
-    #  int(svntag.get_svn_info(os.path.dirname(__file__))['revnum'])
-    version = " alpha (r" + str( int(svntag.get_svn_info(os.path.dirname(__file__))['revnum']) ) + ")"
-
-    #open(os.path.join(os.path.dirname(__file__), 'VERSION'),
-    #  'w').write(version+'\n')
-  except Exception, e:
-  #  version = open(os.path.join(os.path.dirname(__file__),
-  #    'VERSION')).read().strip()
-    #version = str(e)
-    version = " final"     #MFH - beta taggin'
-  #------------------
-
-  #stump: move this here to let it be retrieved without instantiating a GameEngine.
-  # This is needed so it can be embedded into generated exes.
-  # If the format of the version string (except for suffixes) changes, be sure to edit setup_exe.py too.
-  version = "FoFiX v3.100" + version
-
-
+# evilynux - Grab name and version from Version class.
+version = "%s v%s" % ( Version.appNameSexy(), Version.version() )
 
 # define configuration keys
 Config.define("engine", "highpriority", bool,  False, text = _("FPS Limiter"),           options = {False: _("On (Set Below)"), True: _("Off (Auto Max FPS)")})
 Config.define("game",   "adv_settings", bool,  False)
 Config.define("game",   "uploadscores", bool,  False, text = _("Upload Highscores"),    options = {False: _("No"), True: _("Yes")})
-Config.define("game",   "leftymode",    bool,  False, text = _("Lefty Mode"),           options = {False: _("No"), True: _("Yes")})
 Config.define("video",  "fullscreen",   bool,  False,  text = _("Fullscreen Mode"),      options = {False: _("No"), True: _("Yes")})
 Config.define("video",  "multisamples", int,   4,     text = _("Antialiasing Quality"), options = {0: _("None"), 2: "2x", 4: "4x", 6: "6x", 8: "8x"})
 Config.define("video",  "disable_fretsfx", bool, False, text = _("Show Fret Glow Effect"), options = {False: _("Yes"), True: _("No")})
@@ -102,6 +73,7 @@ Config.define("video",  "fps",          int,   80,    text = _("Frames per Secon
 Config.define("video",  "show_fps",     bool,   False,  text = _("Print Frames per Second"), options = {False: _("No"), True: _("Yes")})
 Config.define("video",  "hitglow_color", int,  0,     text = _("Fret Glow Color"), options = {0: _("Same as Fret"), 1: _("Actual Color")})
 Config.define("video",  "hitflame_color", int, 0,     text = _("Hitflames Color"), options = {0: _("Theme Specific"), 1: _("Same as Fret"), 2: _("Actual Color")})
+Config.define("video",  "use_shaders",     bool,   False,  text = _("Use Shaders"), options = {False: _("No"), True: _("Yes")})
 Config.define("performance",  "starspin", bool,     True,  text = _("Animated Star Notes"), options = {True: _("Yes"), False: _("No")})
 Config.define("audio",  "frequency",    int,   44100, text = _("Sample Frequency"), options = [8000, 11025, 22050, 32000, 44100, 48000])
 Config.define("audio",  "bits",         int,   16,    text = _("Sample Bits"), options = [16, 8])
@@ -114,13 +86,18 @@ Config.define("video",  "special_fx", bool,   True,     text = _("Advanced Visua
 
 
 #used internally:
-Config.define("game",   "players",             int,   1)
-Config.define("player0","mode_1p",           int,  0)
-Config.define("player1","mode_2p",           int,  0)
+Config.define("game",   "players",             int,  1)
+Config.define("game",   "player0",             str,  None)
+Config.define("game",   "player1",             str,  None)
+Config.define("game",   "player2",             str,  None)
+Config.define("game",   "player3",             str,  None)
+Config.define("game",   "game_mode",           int,  0)
+Config.define("game",   "multiplayer_mode",    int,  0)
+Config.define("game",   "default_neck",        str, "defaultneck")
 
 Config.define("game","last_theme",           str,  "")
 
-
+Config.define("game",   "joysticks",    int,   0)
 
 #myfingershurt: default buffersize changed from 4096 to 2048:
 Config.define("audio",  "buffersize",   int,   2048,  text = _("Buffer Size"), options = [256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536])
@@ -133,20 +110,21 @@ Config.define("audio",  "songvol",    float,    1.0,  text = _("Song Volume"),  
 Config.define("audio",  "rhythmvol",  float,    1.0,  text = _("Rhythm Volume"),   options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(0, 110, 10)]))
 
 Config.define("performance", "game_priority",       int,   2,      text = _("Process Priority"), options = {0: _("0 Idle"), 1: _("1 Low"), 2: _("2 Normal"), 3:_("3 Above Normal"), 4:_("4 High"), 5:_("5 Realtime")})
-Config.define("game",   "alt_keys",            bool,  False,  text = _("Keyset"), options = {False: _("Normal"), True: _("Alternate")})
+Config.define("performance", "use_psyco", bool, True, text=_("Use Psyco"), options={False: _("No"), True: _("Yes")})  #stump
 Config.define("game",   "margin",              int,   0,      text = _("Hit Margin"), options = {0: _("FoF"), 1: _("Capo")})
 Config.define("game",   "notedisappear",      bool,   False,  text = _("Missed Notes"), options = {False: _("Disappear"), True: _("Keep on going")})
 
 #akedrou - Quickset (based on Fablaculp's Performance Autoset)
 Config.define("quickset", "performance", int, 0, text = _("Performance"), options = {0: _("Manual"), 1: _("1 - Pure Speed"), 2: _("2 - Fast"), 3: _("3 - Effects (Recommended)"), 4: _("4 - Max Quality (Slow)")})
 Config.define("quickset", "gameplay",    int, 0, text = _("Gameplay"),    options = {0: _("Manual"), 1: _("Theme-Based"), 2: _("MIDI Based"), 3: _("RB Style"), 4: _("GH Style"), 5: _("WT Style")})
-
+Config.define("game", "lost_focus_pause", bool, True, text = _("Pause on Loss of Focus"), options = {False: _("Off"), True: _("On")})
 
 #myfingershurt: the following two lines are not used in gameplay,
 # but are still used in the encrypted score system.  Therefore, the simplest
 # way to prevent users from having issues is to leave these two lines uncommented
 # (so they automatically create the entries with defaults if they do not exist)
 Config.define("game",   "tapping",      int,   0,  text = _("HO/PO"),       options = {0: _("Yes"), 1: _("No")})
+
 Config.define("game",   "hopo_mark",           int,   1,      text = _("HO/PO Note Marks"), options = {0: _("FoF"), 1: _("RFmod")})
 #myfingershurt: HOPO settings
 Config.define("game",   "hopo_system",          int,   3,      text = _("HO/PO System"), options = {0: _("None"), 1: _("RF-Mod"), 2: _("GH2 Strict"), 3: _("GH2")})
@@ -168,7 +146,6 @@ Config.define("game",   "stage_mode",           int,  0,  text = _("Stage Select
 Config.define("game",   "song_stage",           int,  1,  text = _("Song Stage"),  options = {0: _("Off"), 1: _("On") } ) #MFH
 Config.define("game",   "lyric_mode",           int,   2,   text = _("Script Lyric Display"), options = {0: _("Off"), 1: _("By Song"), 2: _("Auto"), 3: _("Dual Lyric Prevention")})#racer
 Config.define("game",   "frets_under_notes",          bool, True,  text = _("Frets Under Notes"), options = {False: _("No"), True: _("Yes")})
-#Config.define("game",   "drum_highscore_nav",          bool, False,  text = _("Drum highscore nav"), options = {False: _("Off"), True: _("On")})
 Config.define("game",   "drum_navigation",          bool, False,  text = _("Drum Navigation"), options = {False: _("Off"), True: _("On")})
 
 Config.define("game",   "ignore_open_strums",          bool, True,  text = _("Ignore Open Strums"), options = {False: _("No"), True: _("Yes")})
@@ -195,12 +172,8 @@ Config.define("game", "analog_killsw_mode_p2",      int, 0,  text = _("P2 Analog
 
 #MFH wuz here.  Yeah.
 Config.define("game", "kill_debug",      bool, False,  text = _("Effects Debug"), options = {False: _("Off"), True: _("On")})
-
 #Config.define("game", "auto_drum_sp",      bool, False,  text = _("Auto Drum SP"), options = {False: _("No"), True: _("Yes")})
 Config.define("game", "drum_sp_mode",      int, 0,  text = _("Drum SP"), options = {0: _("Auto / Fills"), 1: _("Manual / Fills")})
-
-
-
 Config.define("game", "large_drum_neck",      bool, False,  text = _("Large Drum Neck"), options = {False: _("No"), True: _("Yes")})
 Config.define("game", "bass_groove_neck",      int, 1,  text = _("Bass Groove Neck"), options = {0: _("Off"), 1: _("Replace"), 2: _("Overlay")})
 Config.define("game", "guitar_solo_neck",      int, 2,  text = _("Guitar Solo Neck"), options = {0: _("Off"), 1: _("Replace"), 2: _("Overlay")})
@@ -223,7 +196,7 @@ Config.define("game", "bass_groove_enable",       int, 1,     text = _("Bass Gro
 Config.define("game", "T_sound",      int, 2,  text = _("Drum Miss Penalty"), options = {0: _("Always"), 1: _("Song Start"), 2: _("First Note")} ) #Faaa Drum sound
 Config.define("game", "game_time",       int, 1,     text = _("Time Display Format"), options = {0: _("Off"), 1: _("Countdown"), 2: _("Elapsed")}) #MFH
 Config.define("game", "gfx_version_tag",       int, 1,     text = _("Show Theme Version Tag"), options = {0: _("No"), 1: _("Yes")}) #MFH
-Config.define("game", "p2_menu_nav",       int, 1,     text = _("P2 Menu Navigate"), options = {0: _("Off"), 1: _("On")}) #MFH
+Config.define("game", "p2_menu_nav",       int, 1,     text = _("Menu Navigation"), options = {0: _("P1 Only"), 1: _("All Players")}) #MFH
 Config.define("game", "in_game_font_shadowing",      bool, False,  text = _("In-Game Font Shadow"), options = {False: _("Off"), True: _("On")})
 Config.define("audio", "mute_last_second",       int, 0,     text = _("Mute Last Second"), options = {0: _("No"), 1: _("Yes")}) #MFH
 Config.define("game", "result_cheer_loop",       int, 2,     text = _("Results Cheer Loop"), options = {0: _("Off"), 1: _("Theme"), 2: _("Auto")}) #MFH
@@ -238,9 +211,17 @@ Config.define("game",   "font_rendering_mode",          int, 0,    text = _("Fon
 Config.define("game",   "incoming_neck_mode",          int, 2,    text = _("Inc. Neck Mode"), options = {0: _("Off"), 1: _("Start Only"), 2: _("Start & End")})
 Config.define("game", "midi_lyric_mode",           int,  2,   text = _("Lyric Display Mode"), options = {0: _("Scrolling"), 1: _("Simple Lines"), 2: _("2-Line")})
 Config.define("game", "big_rock_endings",           int,  2,   text = _("Big Rock Endings"), options = {0: _("Off"), 1: _("By Theme"), 2: _("On")})
-Config.define("game", "big_rock_logic",           int,  2,   text = _("Big Rock Logic"), options = {0: _("RB simplified"), 1: _("Alternative"), 2: _("RB original")}) #volshebnyi
+Config.define("game",  "neck_alpha",  float,    1.0,  text = _("Main Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]))
+Config.define("game",  "solo_neck_alpha",  float,    1.0,  text = _("Solo Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]))
+Config.define("game",  "bg_neck_alpha",  float,    1.0,  text = _("Bass Groove Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]))
+Config.define("game",  "fail_neck_alpha",  float,    1.0,  text = _("Fail Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]))
+Config.define("game",  "overlay_neck_alpha",  float,    1.0,  text = _("Overlay Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]))
+Config.define("game",  "necks_alpha",  float,    1.0,  text = _("All Necks"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]))
+Config.define("songlist",  "nil_show_next_score", int, 0, text = _("NIL Show Next Score"), options = {0: _("Off"), 1: _("Auto")})
 
 
+Config.define("game", "scroll_delay",             int, 500,  text = _("Scroll Delay"), options = dict([(n, n) for n in range(100, 2001, 100)]))
+Config.define("game", "scroll_rate",              int, 50,   text = _("Scroll Rate"),  options = dict([(n, 10-((n/10)-1)) for n in range(10, 101, 10)]))
 
 #MFH - debug settings
 Config.define("debug",   "use_unedited_midis",          int, 1,    text = _("Use (notes-unedited.mid)"), options = {0: _("Off"), 1: _("Auto")})
@@ -261,6 +242,9 @@ Config.define("game",   "log_undefined_gets",          int, 0,    text = _("Log 
 Config.define("game",   "log_marker_notes",          int, 0,    text = _("Log Marker Notes"), options = {0: _("No"), 1: _("Yes")})
 Config.define("game",   "log_starpower_misses",          int, 0,    text = _("Log SP Misses"), options = {0: _("No"), 1: _("Yes")})
 Config.define("log",   "log_unedited_midis",          int, 0,    text = _("Log Unedited MIDIs"), options = {0: _("No"), 1: _("Yes")})
+Config.define("log",   "log_lyric_events",          int, 0,    text = _("Log Lyric Events"), options = {0: _("No"), 1: _("Yes")})
+Config.define("log",   "log_tempo_events",          int, 0,    text = _("Log Tempo Events"), options = {0: _("No"), 1: _("Yes")})
+
 
 
 #racer
@@ -316,9 +300,6 @@ Config.define("game",   "jurgtype",            int,   2,      text = _("Jurgen P
 Config.define("game",   "jurglogic",            int,   1,      text = _("Jurgen Logic"), options = {0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}  )
 #Config.define("game",   "jurgtext",            int,   1,      text = _("Jurgen Text Size"), options = {0: _("Big"), 1: _("Small")})
 
-Config.define("game",   "p1_assist",            int,   0,       text = _("Player One Assist"), options = {0: _("Off"), 1: _("Easy Assist"), 2: _("Medium Assist"), 3: _("Drum Assist")})
-Config.define("game",   "p2_assist",            int,   0,       text = _("Player Two Assist"), options = {0: _("Off"), 1: _("Easy Assist"), 2: _("Medium Assist"), 3: _("Drum Assist")})
-
 Config.define("game", "use_graphical_submenu", int,   1,      text = _("Graphical Submenus"), options = {0: _("Disabled"), 1: _("Enabled")})
 
 
@@ -334,11 +315,6 @@ Config.define("audio",  "kill_volume",         float, 0.0,    text = _("Kill Vol
 Config.define("audio",  "SFX_volume",         float, 0.7,    text = _("SFX Volume"), options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(0, 110, 10)]))  #MFH
 
 
-Config.define("player0","two_chord_max",       bool,  False,  text = _("P1 Two Key Chords Only"),  options = {False: _("No"), True: _("Yes")})
-Config.define("player0","leftymode",           bool,  False,  text = _("P1 Lefty mode"),           options = {False: _("No"), True: _("Yes")})
-Config.define("player1","two_chord_max",       bool,  False,  text = _("P2 Two Key Chords Only"),  options = {False: _("No"), True: _("Yes")}) #QQstarS
-Config.define("player1","leftymode",           bool,  False,  text = _("P2 Lefty mode"),           options = {False: _("No"), True: _("Yes")}) #QQstarS
-
 # evilynux - Preload glyph cache may require more VRAM. Disable it if you're low on VRAM e.g. less than 64MB
 Config.define("performance","preload_glyph_cache", bool,  True,  text = _("Preload Glyph Cache"), options = {False: _("No"), True: _("Yes")})
 
@@ -346,9 +322,7 @@ Config.define("performance","preload_glyph_cache", bool,  True,  text = _("Prelo
 Config.define("performance", "cache_song_metadata", bool, True, text=_("Cache Song Metadata"), options={False: _("No"), True: _("Yes")})
 
 ##Alarian: Get unlimited themes by foldername
-themepath = os.path.join("data","themes")
-if not hasattr(sys,"frozen"):
-  themepath = os.path.join("..",themepath)
+themepath = os.path.join(Version.dataPath(), "themes")
 themes = []
 defaultTheme = None           #myfingershurt
 allthemes = os.listdir(themepath)
@@ -369,8 +343,7 @@ if defaultTheme != "MegaLight" and defaultTheme != "Rock Band 1":     #myfingers
 Config.define("coffee", "themename",           str,   defaultTheme,      text = _("Theme"),                options = dict([(str(themes[n]),themes[n]) for n in range(0, i)]))
 
 ##Alarian: End Get unlimited themes by foldername
-
-
+Player.loadControls()
 
 Config.define("coffee", "neckSpeed",            int,  100,      text = _("Board Speed Percent"),        options = dict([(n, n) for n in range(10, 410, 10)]))
 Config.define("coffee", "failingEnabled",       bool, True,     text = _("No Fail"),             options = {True: _("Off"), False: _("On")})
@@ -381,7 +354,6 @@ Config.define("game", "songlist_difficulty", int, 0, text = _("Difficulty (Setli
 Config.define("game", "songlist_extra_stats", bool, True, text = _("Show Additional Stats"), options = {True: _("Yes"), False: _("No")} )
 
 Config.define("game", "songlist_instrument", int, 0, text = _("Instrument (Setlist Score)"), options = {0: "Guitar", 1: "Rhythm", 2: "Bass", 3: "Lead", 4: "Drums"}  )  #MFH
-
 
 
 class FullScreenSwitcher(KeyListener):
@@ -441,7 +413,7 @@ class GameEngine(Engine):
     self.createdGuitarScene = False   #MFH - so we only create ONE guitarscene...!
     
     self.versionString = version  #stump: other version stuff moved to allow full version string to be retrieved without instantiating GameEngine
-    self.uploadVersion = "FoFiX-3.100" #akedrou - the version passed to the upload site.
+    self.uploadVersion = "%s-3.100" % Version.appNameSexy() #akedrou - the version passed to the upload site.
 
     Log.debug(self.versionString + " starting up...")
     Log.debug("pygame version: " + str(pygame.version.ver) )
@@ -478,7 +450,9 @@ class GameEngine(Engine):
     self.restartRequired   = False
     self.quicksetRestart   = False
     self.quicksetPerf      = self.config.get("quickset", "performance")
-
+    self.scrollRate        = self.config.get("game", "scroll_rate")
+    self.scrollDelay       = self.config.get("game", "scroll_delay")
+    
     Log.debug("Initializing audio.")
     frequency    = self.config.get("audio", "frequency")
     bits         = self.config.get("audio", "bits")
@@ -509,6 +483,9 @@ class GameEngine(Engine):
     fullscreen    = self.config.get("video", "fullscreen")
     multisamples  = self.config.get("video", "multisamples")
     self.video.setMode((width, height), fullscreen = fullscreen, multisamples = multisamples)
+    
+    if self.config.get("video", "use_shaders"):
+      Shader.list.set(os.path.join(Version.dataPath(), "shaders"))
 
     # Enable the high priority timer if configured
     if self.priority:
@@ -516,7 +493,12 @@ class GameEngine(Engine):
       #self.timer.highPriority = True
       self.fps = 0 # High priority
 
-    viewport = glGetIntegerv(GL_VIEWPORT)
+    # evilynux - This was generating an error on the first pass (at least under
+    #            GNU/Linux) as the Viewport was not set yet.
+    try:
+      viewport = glGetIntegerv(GL_VIEWPORT)
+    except:
+      viewport = [0, 0, width, height]
     h = viewport[3] - viewport[1]
     w = viewport[2] - viewport[0]
     geometry = (0, 0, w, h)
@@ -531,6 +513,7 @@ class GameEngine(Engine):
     self.server    = None
     self.sessions  = []
     self.mainloop  = self.loading
+    self.menuMusic = False
 
     
     # Load game modifications
@@ -557,11 +540,7 @@ class GameEngine(Engine):
     self.stageFolders = []
     currentTheme = themename
     
-    #if not hasattr(sys,"frozen"):
-    #  themepath = os.path.join("..",themepath)
-    stagespath = os.path.join("data","themes",currentTheme,"stages")
-    if not hasattr(sys,"frozen"):   #MFH - so animated stages work with sources
-      stagespath = os.path.join("..",stagespath)
+    stagespath = os.path.join(Version.dataPath(), "themes", currentTheme, "stages")
     if os.path.exists(stagespath):
       self.stageFolders = []
       allFolders = os.listdir(stagespath)   #this also includes all the stage files - so check to see if there is at least one .png file inside each folder to be sure it's an animated stage folder
@@ -574,7 +553,7 @@ class GameEngine(Engine):
           #Log.debug(name + " is not a folder, cannot list contents: " + str(e))
           thisIsAnAnimatedStageFolder = False
         for aniFile in aniStageFolderListing:
-          if os.path.splitext(aniFile)[1] == ".png":  #we've found at least one .png file here, chances are this is a valid animated stage folder
+          if os.path.splitext(aniFile)[1] == ".png" or os.path.splitext(aniFile)[1] ==  ".jpg" or os.path.splitext(aniFile)[1] == ".jpeg":  #we've found at least one .png file here, chances are this is a valid animated stage folder
             thisIsAnAnimatedStageFolder = True
         if thisIsAnAnimatedStageFolder:
           self.stageFolders.append(name)
@@ -625,7 +604,14 @@ class GameEngine(Engine):
     self.debugLayer         = None
     self.startupLayer       = None
     self.loadingScreenShown = False
+    self.graphicMenuShown   = False
     
+    # evilynux - Printing on the console with a frozen binary may cause a crash.
+    if hasattr(sys, "frozen"):
+      self.print_fps_in_console = False
+    else:
+      self.print_fps_in_console = True
+
     Log.debug("Ready.")
     
 
@@ -650,6 +636,7 @@ class GameEngine(Engine):
   # evilynux - This stops the crowd cheers if they're still playing (issue 317).
   def quit(self):
     self.audio.close()
+    Player.savePlayers()
     Engine.quit(self)
 
   def setStartupLayer(self, startupLayer):
@@ -806,7 +793,7 @@ class GameEngine(Engine):
             star = self.data.star1
         self.drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), stretched=11)
 
-
+  #blazingamer - cleans up the work for rendering an image
   #volshebnyi - now images can be resized to fit to screen
   def drawImage(self, image, scale, coord, rot = 0, color = (1,1,1,1), rect = (0,1,0,1), stretched = 0, lOffset = 0.0, rOffset = 0.0):
     
@@ -827,10 +814,107 @@ class GameEngine(Engine):
     image.transform.translate(coord[0],coord[1])
     image.draw(color = color, rect = rect, lOffset = lOffset, rOffset = rOffset)
 
+  #blazingamer - simplifies tex rendering
+  def draw3Dtex(self, image, vertex, texcoord, coord = None, scale = None, rot = None, color = (1,1,1), multiples = False, alpha = False, depth = False, vertscale = 0):
+
+#####how to set items#####
+  
+
+##    tex = self.xxx
+##    tells the system which image/resource should be mapped to the plane
+##  
+##    rot = (degrees, x-axis, y-axis, z-axis)
+##    a digit in the axis is how many times you want to rotate degrees around that axis
+##
+##    scale = (x,y,z)
+##    scales an glplane how far in each direction
+##
+##    coord = (x,y,z)
+##    where on the screen the plane will be rendered within the 3d field
+##
+##    vertex = (Left, Top, Right, Bottom)
+##    sets the points that define where the plane will be drawn
+##
+##    texcoord = (Left, Top, Right, Bottom)
+##    sets where the texture should be drawn on the plane
+##
+##    multiples = True/False
+##    defines whether or not there should be multiples of the plane drawn at the same time
+##    only really used with the rendering of the notes, keys, and flames
+##
+##    alpha = True/False
+##    defines whether or not the image should have black turned into transparent
+##    only really used with hitglows and flames
+##
+##    color = (r,g,b)
+##    sets the color of the image when rendered 0 = No Color, 1 = Full color
+##
+##    depth = True/False
+##    sets the depth by which the object is rendered
+##    only really used by keys and notes
+##      
+##    vertscale = #
+##    changes the yscale when setting vertex points
+##    only really used by notes
+
+    if alpha == True:
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE)
+
+    if len(color) == 4:
+      glColor4f(color[0],color[1],color[2], color[3])
+    else:
+      glColor3f(color[0],color[1],color[2])
+    
+    glEnable(GL_TEXTURE_2D)  
+    image.texture.bind()
+    
+    if multiples == True:
+      glPushMatrix()
+      
+    if coord != None:
+      glTranslate(coord[0], coord[1], coord[2])
+    if rot != None:
+      glRotate(rot[0], rot[1], rot[2], rot[3])
+    if scale != None:
+      glScalef(scale[0], scale[1], scale[2])
+
+    if depth == True:
+      glDepthMask(1)
+
+    triangVtx = array(
+        [[ vertex[0],  vertscale, vertex[1]],
+         [ vertex[2],  vertscale, vertex[1]],
+         [ vertex[0], -vertscale, vertex[3]],
+         [ vertex[2], -vertscale, vertex[3]]], dtype=float32)
+
+    textriangVtx = array(
+        [[texcoord[0], texcoord[1]],
+         [texcoord[2], texcoord[1]],
+         [texcoord[0], texcoord[3]],
+         [texcoord[2], texcoord[3]]], dtype=float32)
+
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY)    
+    glEnableClientState(GL_VERTEX_ARRAY)
+    glTexCoordPointerf(textriangVtx)
+    glVertexPointerf(triangVtx)
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, triangVtx.shape[0])
+    glDisableClientState(GL_VERTEX_ARRAY)
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY)
+    
+    if depth == True:
+      glDepthMask(0)
+      
+    if multiples == True:
+      glPopMatrix()
+
+    glDisable(GL_TEXTURE_2D)
+    
+    if alpha == True:
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)                   
   #glorandwarf: renamed to retrieve the path of the file
   def fileExists(self, fileName):
     return self.data.fileExists(fileName)
-    
+  
   def getPath(self, fileName):
     return self.data.getPath(fileName)
 
@@ -873,7 +957,8 @@ class GameEngine(Engine):
           self.elapsedTime = currentTime-self.lastTime
           self.lastTime = currentTime
           self.fpsEstimate = self.frames*(1000.0/self.elapsedTime)
-          print("%.2f fps" % self.fpsEstimate)
+          if self.print_fps_in_console == True:
+            print("%.2f fps" % self.fpsEstimate)
           self.frames = 0 
       return done
     except:

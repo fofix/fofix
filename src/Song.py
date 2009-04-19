@@ -29,7 +29,13 @@ import os
 import re
 import shutil
 import Config
-import sha
+#stump: when we completely drop 2.4 support, change this to just "import hashlib"
+try:
+  import hashlib
+except ImportError:
+  import sha
+  class hashlib:
+    sha1 = sha.sha
 import binascii
 import Cerealizer
 import urllib
@@ -37,7 +43,6 @@ import Version
 import Theme
 import copy
 import string
-import zlib
 import cPickle  #stump: Cerealizer and sqlite3 don't seem to like each other that much...
 from Language import _
 
@@ -52,6 +57,7 @@ except ImportError:
   except ImportError:
     canCache = False
 
+DEFAULT_BPM = 120.0
 DEFAULT_LIBRARY         = "songs"
 
 EXP_DIF     = 0
@@ -160,6 +166,7 @@ defaultSections = ["Start","1/4","1/2","3/4"]
 
 # stump: manage cache files
 class CacheManager(object):
+  SCHEMA_VERSION = 2  #stump: current cache format version number
   def __init__(self):
     self.caches = {}
   def getCache(self, infoFileName):
@@ -178,7 +185,7 @@ class CacheManager(object):
     # Check that the cache is completely initialized.
     try:
       v = conn.execute("SELECT `value` FROM `config` WHERE `key` = 'version'").fetchone()[0]
-      mustReinitialize = (int(v) != 1)  #stump: current cache format version number
+      mustReinitialize = (int(v) != self.SCHEMA_VERSION)
     except:
       mustReinitialize = True
     if mustReinitialize:
@@ -187,9 +194,10 @@ class CacheManager(object):
         conn.execute('DROP TABLE `%s`' % tbl)
       conn.commit()
       conn.execute('VACUUM')
+      #stump: if you need to change the database schema, do it here, then bump the version number, a small bit above here.
       conn.execute('CREATE TABLE `config` (`key` STRING UNIQUE, `value` STRING)')
       conn.execute('CREATE TABLE `songinfo` (`hash` STRING UNIQUE, `info` STRING)')
-      conn.execute("INSERT INTO `config` (`key`, `value`) VALUES ('version', '1')")  #stump: current cache format version number
+      conn.execute('INSERT INTO `config` (`key`, `value`) VALUES (?, ?)', ('version', self.SCHEMA_VERSION))
       conn.commit()
     self.caches[cachePath] = conn
     return conn
@@ -251,11 +259,11 @@ class SongInfo(object):
     
     # stump: Check the cache for the presence of this song.
     if canCache and self.allowCacheUsage:
-      ckey = zlib.crc32(open(self.noteFileName, 'rb').read() + open(self.fileName, 'rb').read())
+      self.stateHash = hashlib.sha1(open(self.noteFileName, 'rb').read() + open(self.fileName, 'rb').read()).hexdigest()
       cache = cacheManager.getCache(self.fileName)
 
       try:    #MFH - it crashes here on previews!
-        result = cache.execute('SELECT `info` FROM `songinfo` WHERE `hash` = ?', [ckey]).fetchone()
+        result = cache.execute('SELECT `info` FROM `songinfo` WHERE `hash` = ?', [self.stateHash]).fetchone()
       except Exception, e:
         Log.error(str(e))
         result = None
@@ -267,7 +275,7 @@ class SongInfo(object):
         except:
           # The entry is there but could not be loaded.
           # Nuke it and let it be rebuilt further down.
-          cache.execute('DELETE FROM `songinfo` WHERE `hash` = ?', [ckey])
+          cache.execute('DELETE FROM `songinfo` WHERE `hash` = ?', [self.stateHash])
 
     # Read highscores and verify their hashes.
     # There ain't no security like security throught obscurity :)
@@ -486,11 +494,10 @@ class SongInfo(object):
   # stump: Write this song's info into the cache.
   def writeCache(self):
     if canCache and self.allowCacheUsage:
-      ckey = zlib.crc32(open(self.noteFileName, 'rb').read() + open(self.fileName, 'rb').read())
+      self.stateHash = hashlib.sha1(open(self.noteFileName, 'rb').read() + open(self.fileName, 'rb').read()).hexdigest()
       cache = cacheManager.getCache(self.fileName)
       pkl = cPickle.dumps(self.__dict__)
-      cache.execute('INSERT OR REPLACE INTO `songinfo` (`hash`, `info`) VALUES (?, ?)', [ckey, pkl])
-      cache.commit()
+      cache.execute('INSERT OR REPLACE INTO `songinfo` (`hash`, `info`) VALUES (?, ?)', [self.stateHash, pkl])
 
 
   def _set(self, attr, value):
@@ -696,7 +703,7 @@ class SongInfo(object):
     self._set("loading_phrase", value)
     
   def getScoreHash(self, difficulty, score, stars, name):
-    return sha.sha("%d%d%d%s" % (difficulty.id, score, stars, name)).hexdigest()
+    return hashlib.sha1("%d%d%d%s" % (difficulty.id, score, stars, name)).hexdigest()
     
   def getDelay(self):
     return self._get("delay", int, 0)
@@ -795,7 +802,7 @@ class SongInfo(object):
         "songHash": songHash,
         "scores":   self.getObfuscatedScores(part = part),
         "scores_ext": self.getObfuscatedScoresExt(part = part),
-        "version":  "FoFiX-3.100",
+        "version":  "%s-3.100" % Version.appNameSexy(),
         "songPart": part
       }
       data = urllib.urlopen(url + "?" + urllib.urlencode(d)).read()
@@ -1356,8 +1363,8 @@ class PictureEvent(Event):
   def __init__(self, fileName, length):
     Event.__init__(self, length)
     self.fileName = fileName
-    
-class Track:
+
+class Track:    #MFH - Changing Track class to a base class.  NoteTrack and TempoTrack will extend it.
   granularity = 50
   
   def __init__(self, engine):
@@ -1365,15 +1372,19 @@ class Track:
     self.allEvents = []
     self.marked = False
 
+    self.currentIndex = None   #MFH
+    self.maxIndex = None   #MFH
+
+
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("Track class init (song.py)...")
 
-    self.chordFudge = 1
+    #self.chordFudge = 1
 
-    self.hopoTick = engine.config.get("coffee", "hopo_frequency")
-    self.hopoTickCheat = engine.config.get("coffee", "hopo_freq_cheat")
-    self.songHopoFreq = engine.config.get("game", "song_hopo_freq")
+    #self.hopoTick = engine.config.get("coffee", "hopo_frequency")
+    #self.hopoTickCheat = engine.config.get("coffee", "hopo_freq_cheat")
+    #self.songHopoFreq = engine.config.get("game", "song_hopo_freq")
 
   def __getitem__(self, index):
     #if isinstance(index, slice):
@@ -1394,6 +1405,12 @@ class Track:
         self.events = self.events + [[] for n in range(n)]
       self.events[t].append((time - (t * self.granularity), event))
     self.allEvents.append((time, event))
+    
+    if self.maxIndex == None:   #MFH - tracking track size
+      self.maxIndex = 0
+      self.currentIndex = 0
+    else:
+      self.maxIndex += 1
 
   def removeEvent(self, time, event):
     for t in range(int(time / self.granularity), int((time + event.length) / self.granularity) + 1):
@@ -1402,6 +1419,27 @@ class Track:
         self.events[t].remove(e)
     if (time, event) in self.allEvents:
       self.allEvents.remove((time, event))
+      
+      #MFH - tracking track size
+      if self.maxIndex != None:
+        self.maxIndex -= 1
+        if self.maxIndex < 0:
+          self.maxIndex = None
+          self.currentIndex = None
+
+  def getNextEvent(self, lookAhead = 0):  #MFH
+    if self.maxIndex != None and self.currentIndex != None:
+      #lookAhead > 0 means look that many indices ahead of the Next event
+      if (self.currentIndex + lookAhead) <= self.maxIndex:
+        return self.allEvents[self.currentIndex + lookAhead]
+    return None
+  
+  def getPrevEvent(self, lookBehind = 0):  #MFH - lookBehind of 0 = return previous event.
+    if self.maxIndex != None and self.currentIndex != None:
+      #lookBehind > 0 means look that many indices behind of the Prev event
+      if (self.currentIndex - 1 - lookBehind) >= 0:
+        return self.allEvents[self.currentIndex - 1 - lookBehind]
+    return None
 
   def getEvents(self, startTime, endTime):
     t1, t2 = [int(x) for x in [startTime / self.granularity, endTime / self.granularity]]
@@ -1420,6 +1458,8 @@ class Track:
     return self.allEvents
 
   def reset(self):
+    if self.maxIndex:
+      self.currentIndex = 0
     for eventList in self.events:
       for time, event in eventList:
         if isinstance(event, Note):
@@ -1430,62 +1470,67 @@ class Track:
         if isinstance(event, MarkerNote):
           event.happened = False
 
-  #myfingershurt: this function may be commented out, but is left in for
-  #old INI file compatibility reasons
-  #def markTappable(self):
-    # Determine which notes are tappable. The rules are:
-    #  1. Not the first note of the track
-    #  2. Previous note not the same as this one
-    #  3. Previous note not a chord
-    #  4. Previous note ends at most 161 ticks before this one starts
-    #bpm             = None
-    #ticksPerBeat    = 480
-    #tickThreshold   = 161
-    #prevNotes       = []
-    #currentNotes    = []
-    #currentTicks    = 0.0
-    #prevTicks       = 0.0
-    #epsilon         = 1e-3
 
-    #def beatsToTicks(time):
-      #return (time * bpm * ticksPerBeat) / 60000.0
+class TempoTrack(Track):    #MFH - special Track type for tempo events
+  def __init__(self, engine):
+    Track.__init__(self, engine)
+    self.currentBpm = DEFAULT_BPM
 
-    #if not self.allEvents:
-      #return
+  def reset(self):
+    self.currentBpm = DEFAULT_BPM
+    
+  #MFH - function to track current tempo in realtime based on time / position
+  def getCurrentTempo(self, pos):   #MFH
+    if self.currentIndex:
+      tempEventHolder = self.getNextEvent()   #MFH - check if next BPM change is here yet
+      if tempEventHolder:
+        time, event = tempEventHolder
+        if pos >= time:
+          self.currentIndex += 1
+          self.currentBpm = event.bpm
+    return self.currentBpm
 
-    #for time, event in self.allEvents + [self.allEvents[-1]]:
-      #if isinstance(event, Tempo):
-        #bpm = event.bpm
-      #elif isinstance(event, Note):
-        # All notes are initially not tappable
-        #event.tappable = 0
-        #ticks = beatsToTicks(time)
-        
-        # Part of chord?
-        #if ticks < currentTicks + epsilon:
-          #currentNotes.append(event)
-          #continue
+  def getNextTempoChange(self, pos):  #MFH
+    if self.currentIndex:
+      return self.getNextEvent()
+    return None 
+  
+  def searchCurrentTempo(self, pos):    #MFH - will hunt through all tempo events to find it - intended for use during initializations only!
+    foundBpm = None
+    foundTime = None
+    for time, event in self.allEvents:
+      if not foundBpm or not foundTime:
+        foundBpm = event.bpm
+        foundTime = time
+      else:
+        #MFH - want to discard if the foundTime is before pos, but this event is after pos.
+        # -- also want to take newer BPM if time > foundTime >= pos
+        if time <= pos:   #MFH - first required condition.
+          if time > foundTime:    #MFH - second required condition for sorting.
+            foundBpm = event.bpm
+            foundTime = time
+    if foundBpm:
+      return foundBpm
+    else:   #MFH - return default BPM if no events
+      return DEFAULT_BPM
 
-        # Previous note not a chord?
-        #if len(prevNotes) == 1:
-          # Previous note ended recently enough?
-          #prevEndTicks = prevTicks + beatsToTicks(prevNotes[0].length)
-          #if currentTicks - prevEndTicks <= tickThreshold:
-            #for note in currentNotes:
-              # Are any current notes the same as the previous one?
-              #if note.number == prevNotes[0].number:
-                #break
-            #else:
-              # If all the notes are different, mark the current notes tappable
-              #for note in currentNotes:
-                #note.tappable = 2
+class NoteTrack(Track):   #MFH - special Track type for note events, with marking functions
+  def __init__(self, engine):
+    Track.__init__(self, engine)
+    self.chordFudge = 1
 
-        # Set the current notes as the previous notes
-        #prevNotes    = currentNotes
-        #prevTicks    = currentTicks
-        #currentNotes = [event]
-        #currentTicks = ticks
-#---------------------
+    self.hopoTick = engine.config.get("coffee", "hopo_frequency")
+    self.hopoTickCheat = engine.config.get("coffee", "hopo_freq_cheat")
+    self.songHopoFreq = engine.config.get("game", "song_hopo_freq")
+    self.logTempoEvents = engine.config.get("log",   "log_tempo_events")
+
+  def removeTempoEvents(self):
+    for time, event in self.allEvents:
+      if isinstance(event, Tempo):
+        self.allEvents.remove((time, event))
+        if self.logTempoEvents == 1:
+          Log.debug("Tempo event removed from NoteTrack during cleanup: " + str(event.bpm) + "bpm")
+
 
   def markHopoRF(self, EighthNH, songHopoFreq):
     lastTick = 0
@@ -1549,6 +1594,7 @@ class Track:
         #bpm = bpmNotes[0][1].bpm
         bpmTime, bpmEvent = bpmNotes.pop(0)
         bpm = bpmEvent.bpm
+      
 
       tick = (time * bpm * ticksPerBeat) / 60000.0
       lastTick = (lastTime * bpm * ticksPerBeat) / 60000.0
@@ -1645,8 +1691,7 @@ class Track:
         firstTime = 0
         continue
 
-
-#need to recompute (or carry forward) BPM at this time
+      #need to recompute (or carry forward) BPM at this time
       tick = (time * bpm * ticksPerBeat) / 60000.0
       lastTick = (lastTime * bpm * ticksPerBeat) / 60000.0
       tickDelta = tick - lastTick
@@ -1778,6 +1823,10 @@ class Track:
     bpmNotes = []
     firstTime = 1
 
+    #MFH - to prevent crashes on songs without a BPM set
+    bpmEvent = None
+    bpm = None
+
     #If already processed abort   
     if self.marked == True:
       return
@@ -1788,6 +1837,8 @@ class Track:
         continue
       if not isinstance(event, Note):
         continue
+
+
       
       while bpmNotes and time >= bpmNotes[0][0]:
         #Adjust to new BPM
@@ -1795,8 +1846,12 @@ class Track:
         bpmTime, bpmEvent = bpmNotes.pop(0)
         bpm = bpmEvent.bpm
 
+      if not bpm:
+        bpm = DEFAULT_BPM
+
       tick = (time * bpm * ticksPerBeat) / 60000.0
       lastTick = (lastTime * bpm * ticksPerBeat) / 60000.0
+      
 
 
      
@@ -1832,10 +1887,17 @@ class Track:
           if not hopoNotes and lastEvent.tappable == -3:
             lastEvent.tappable = 1
           #this may be incorrect if a bpm event happened inbetween this note and last note
-          hopoNotes.append([lastTime, bpmEvent])
-          hopoNotes.append([lastTime, lastEvent])
 
-        hopoNotes.append([bpmTime, bpmEvent])
+
+          if bpmEvent:
+            hopoNotes.append([lastTime, bpmEvent])
+          
+          hopoNotes.append([lastTime, lastEvent])
+          
+
+        if bpmEvent:
+          hopoNotes.append([bpmTime, bpmEvent])
+
         hopoNotes.append([time, event])
 
 
@@ -1931,7 +1993,10 @@ class Track:
       #Add last note to HOPO list if applicable
       #myfingershurt:
       if noteDelta != 0 and tickDelta > self.chordFudge and tickDelta < hopoDelta and isinstance(event, Note):
-        hopoNotes.append([time, bpmEvent])
+
+        if bpmEvent:
+          hopoNotes.append([time, bpmEvent])
+
         hopoNotes.append([time, event])
 
       #myfingershurt marker: (next - FOR loop)----
@@ -2288,7 +2353,6 @@ class Track:
         self.addEvent(time, event)
 
 
-
 class Song(object):
   def __init__(self, engine, infoFileName, songTrackName, guitarTrackName, rhythmTrackName, noteFileName, scriptFileName = None, partlist = [parts[GUITAR_PART]], drumTrackName = None, crowdTrackName = None):
     self.engine        = engine
@@ -2298,14 +2362,15 @@ class Song(object):
       Log.debug("Song class init (song.py)...")
     
     self.info         = SongInfo(infoFileName)
-    self.tracks       = [[Track(self.engine) for t in range(len(difficulties))] for i in range(len(partlist))]
+    self.tracks       = [[NoteTrack(self.engine) for t in range(len(difficulties))] for i in range(len(partlist))]
+    
     self.difficulty   = [difficulties[EXP_DIF] for i in partlist]
     self._playing     = False
     self.start        = 0.0
     self.noteFileName = noteFileName
     
     #self.bpm          = None
-    self.bpm          = 120.0     #MFH - enforcing a default / fallback tempo of 120 BPM
+    self.bpm          = DEFAULT_BPM     #MFH - enforcing a default / fallback tempo of 120 BPM
 
     #self.period       = 0
     self.period = 60000.0 / self.bpm    #MFH - enforcing a default / fallback tempo of 120 BPM
@@ -2338,12 +2403,13 @@ class Song(object):
 
     self.midiEventTracks   = [[Track(self.engine) for t in range(len(difficulties))] for i in range(len(partlist))]
 
+    self.tempoEventTrack = TempoTrack(self.engine)   #MFH - need a separated Tempo/BPM track!
+
     self.breMarkerTime = None
 
     self.music = None
 
 
-    
     #self.slowDownFactor = self.engine.config.get("audio", "speed_factor")
     #self.engine.setSpeedFactor(self.slowDownFactor)    #MFH 
 
@@ -2420,9 +2486,12 @@ class Song(object):
       self.missVolume   = self.engine.config.get("audio", "miss_volume")
 
   
+  def getCurrentTempo(self, pos):  #MFH
+    return self.tempoEventTrack.getCurrentTempo(pos)
+
 
   def getHash(self):
-    h = sha.new()
+    h = hashlib.sha1()
     f = open(self.noteFileName, "rb")
     bs = 1024
     while True:
@@ -2793,6 +2862,8 @@ class MidiReader(midi.MidiOutStream):
 
     self.logMarkerNotes = Config.get("game", "log_marker_notes")
 
+    self.logTempoEvents = Config.get("log",   "log_tempo_events")
+
     self.logSections = Config.get("game", "log_sections")
     
     self.readTextAndLyricEvents = Config.get("game","rock_band_events")
@@ -2824,6 +2895,19 @@ class MidiReader(midi.MidiOutStream):
         eventcopy = copy.deepcopy(event)
         if track < len(self.song.tracks[i]):
           self.song.tracks[i][track].addEvent(time, eventcopy)
+
+  def addTempoEvent(self, event, time = None):    #MFH - universal Tempo track handling
+    if not isinstance(event, Tempo):
+      return
+
+    if time is None:
+      time = self.abs_time()
+    assert time >= 0
+    
+    #add tempo events to the universal tempo track
+    self.song.tempoEventTrack.addEvent(time, event)
+    if self.logTempoEvents == 1:
+      Log.debug("Tempo event added to Tempo track: " + str(time) + " - " + str(event.bpm) + "BPM" )
 
   def addSpecialMidiEvent(self, track, event, time = None):    #MFH
     if self.partnumber == -1:
@@ -2881,6 +2965,7 @@ class MidiReader(midi.MidiOutStream):
     if not self.song.bpm:
       self.song.setBpm(bpm)
     self.addEvent(None, Tempo(bpm))
+    self.addTempoEvent(Tempo(bpm))  #MFH 
 
   def sequence_name(self, text):
     #if self.get_current_track() == 0:
@@ -3668,7 +3753,7 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
     includeTutorials = True
 
   #MFH - Career Mode determination:
-  gameMode1p = engine.config.get("player0","mode_1p")
+  gameMode1p = engine.config.get("game","game_mode")
   if gameMode1p == 2:
     careerMode = True
   else:
@@ -3695,6 +3780,12 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
   for name in names:
     progressCallback(len(songs)/float(len(names)))
     songs.append(SongInfo(engine.resource.fileName(library, name, "song.ini", writable = True), library, allowCacheUsage=True))
+  if len(songs) and canCache and Config.get("performance", "cache_song_metadata"):
+    cache = cacheManager.getCache(songs[0].fileName)
+    #stump: clean up the cache
+    if cache.execute('DELETE FROM `songinfo` WHERE `hash` NOT IN (' + ','.join("'%s'" % s.stateHash for s in songs) + ')').rowcount > 0:
+      cache.execute('VACUUM')  # compact the database if anything was deleted on the previous line
+    cache.commit()  # commit any changes to the cache all at once
   if not includeTutorials:
     songs = [song for song in songs if not song.tutorial]
   songs = [song for song in songs if not song.artist == '=FOLDER=']
@@ -3869,7 +3960,7 @@ def getAvailableSongsAndTitles(engine, library = DEFAULT_LIBRARY, includeTutoria
     return []
 
   #MFH - Career Mode determination:
-  gameMode1p = engine.config.get("player0","mode_1p")
+  gameMode1p = engine.config.get("game","game_mode")
   if gameMode1p == 2:
     careerMode = True
     quickPlayMode = False
@@ -3939,8 +4030,15 @@ def compareSongsAndTitles(engine, a, b):
   #>>>       return -1
 
   #MFH - Career Mode determination:
-  gameMode1p = engine.config.get("player0","mode_1p")
+  gameMode1p = engine.config.get("game","game_mode")
   order = engine.config.get("game", "sort_order")
+  
+  #MFH - must check here for an invalid Sort Order setting and correct it!
+  orderings = engine.config.getOptions("game", "sort_order")[1]
+  if order >= len(orderings):
+    order = 0
+    engine.config.set("game", "sort_order", order)
+
   instrument = engine.config.get("game", "songlist_instrument")
   theInstrumentDiff = instrumentDiff[instrument]
   direction = engine.config.get("game", "sort_direction")

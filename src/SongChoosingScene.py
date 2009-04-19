@@ -56,8 +56,14 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
     self.wizardStarted = False
     self.libraryName   = libraryName
     self.songName      = songName
+    self.gamePlayers = self.engine.config.get("game", "players")
+    self.playerList  = [self.player]
+    if self.gamePlayers > 1:
+      self.playerList.extend(self.multiplayers)
 
-    
+    for i, player in enumerate(self.playerList):
+      player.controller  = self.engine.input.activeGameControls[i]
+      player.controlType = self.engine.input.controls.type[player.controller]
 
     self.songSettings  = []
     self.gameStarted   = False
@@ -66,6 +72,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
     else:
         self.songQueue     = songQueue
     self.dialog    = None
+    self.mode      = 0
 
     self.tut = Config.get("game", "tut")
 
@@ -96,28 +103,11 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
       self.freeResources()       
       self.session.world.createScene("SongChoosingScene", songName = None, songQueue = self.songQueue)   
 
-  def changePart1(self, value):
-      self.player.part = self.songSettings[2].values[self.songSettings[2].valueIndex]
-            
-  def changePart2(self, value):   
-      self.player2.part = self.songSettings[5].values[self.songSettings[5].valueIndex]
+  def changePart(self, num, value):
+      self.playerList[num].part = self.songSettings[2].values[self.songSettings[2].valueIndex]
       
-  def changeDiff1(self, value):
-      self.player.difficulty = self.songSettings[3].values[self.songSettings[3].valueIndex]
-      
-  def changeDiff2(self, value):    
-      self.player2.difficulty = self.songSettings[6].values[self.songSettings[6].valueIndex]
-
-  def changeGameMode(self, value):
-      mode = self.songSettings[4].values[self.songSettings[4].valueIndex]
-      if mode == "Single Player":
-          Config.set("game", "selected_players", 1)
-      if mode == "2 Players Coop":
-          Config.set("game", "selected_players", 2)
-      if mode == "2 Players Versus":
-          Config.set("game", "selected_players", 3)
-      if mode == "Party Mode":
-          Config.set("game", "selected_players", -1)
+  def changeDiff(self, num, value):
+      self.playerList[num].difficulty = self.songSettings[3].values[self.songSettings[3].valueIndex]
          
   def startGame(self, value = "", queueCounter = 0):
    if not self.gameStarted:
@@ -126,7 +116,6 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
         self.player.difficulty = self.info.difficulties[0]
      if not self.player.part in self.info.parts:
         self.player.part = self.info.parts[0]
-
      if not self.player2.difficulty in self.info.difficulties:
         self.player2.difficulty = self.info.difficulties[0]
      if not self.player2.part in self.info.parts:
@@ -173,6 +162,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
 
       if not self.songName:
         while True:
+          self.mode = 1
           self.libraryName, self.songName = \
             Dialogs.chooseSong(self.engine, \
                                selectedLibrary = Config.get("game", "selected_library"),
@@ -193,7 +183,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
           if not self.tut:
             Config.set("game", "selected_library", self.libraryName)
             Config.set("game", "selected_song",    self.songName)
-          
+          self.mode = 2
           info = Song.loadSongInfo(self.engine, self.songName, library = self.libraryName)
 
           selected = False
@@ -211,10 +201,10 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
             #mode1p = 0 (quickplay), 1 (practice), 2 (career)
             #mode2p = 0 (face-off), 1 (pro face-off)
               #Config.define("game",   "players",             int,   1)
-              #Config.define("player0","mode_1p",           int,  0)
-              #Config.define("player1","mode_2p",           int,  0)
+              #Config.define("game","game_mode",           int,  0)
+              #Config.define("game","multiplayer_mode",           int,  0)
 
-          if Config.get("player0","mode_1p") == 1 and Config.get("game","players") == 1:    #practice mode
+          if Config.get("game","game_mode") == 1 and Config.get("game","players") == 1:    #practice mode
             self.player.practiceMode = True
           else:
             self.player.practiceMode = False
@@ -270,101 +260,78 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
               #break;
 
           
-          
-          
-            while True: #new nesting for Practice Mode selection
+            guitars = []
+            drums = []
+            for part in info.parts:
+              if part.id == 4:
+                drums.append(part)
+              else:
+                guitars.append(part)
+            if len(drums) == 0 and self.engine.input.gameDrums > 0:
+              Dialogs.showMessage(self.engine, _("There are no drum parts in this song. Change your controllers to play."))
+              escaped = True
+              break
+            if len(guitars) == 0 and self.engine.input.gameGuitars > 0:
+              Dialogs.showMessage(self.engine, _("There are no guitar parts in this song. Change your controllers to play."))
+              escaped = True
+              break
             
-              if len(info.parts) > 1:
-
-                if self.subMenuPosTuple:
-                  p = Dialogs.chooseItem(self.engine, info.parts, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Player 1 Choose a part:")), selected = self.player.part, pos = self.subMenuPosTuple)
+            for i, player in enumerate(self.playerList):
+              
+              while True: #new nesting for Practice Mode selection
+                selectedPlayer = False
+                choose = []
+                if player.controlType == 2 or player.controlType == 3:
+                  choose = drums
                 else:
-                  p = Dialogs.chooseItem(self.engine, info.parts, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Player 1 Choose a part:")), selected = self.player.part)
-
-              else:
-                p = info.parts[0]
-              if p:
-                self.player.part = p
-              else:
-                if not self.player.practiceMode:
-                  escaped = True
-                break;
-              while True:
-                if len(info.difficulties) > 1:
+                  choose = guitars
+                  
+                if len(choose) > 1:
 
                   if self.subMenuPosTuple:
-                    d = Dialogs.chooseItem(self.engine, info.difficulties,
-                                       "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Player 1 Choose a difficulty:")), selected = self.player.difficulty, pos = self.subMenuPosTuple)
+                    p = Dialogs.chooseItem(self.engine, choose, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("%s Choose a part:") % player.name), selected = player.part, pos = self.subMenuPosTuple)
                   else:
-                    d = Dialogs.chooseItem(self.engine, info.difficulties,
-                                       "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Player 1 Choose a difficulty:")), selected = self.player.difficulty)
+                    p = Dialogs.chooseItem(self.engine, choose, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("%s Choose a part:") % player.name), selected = player.part)
 
                 else:
-                  d = info.difficulties[0]
-                if d:
-                  self.player.difficulty = d
+                  p = choose[0]
+                if p:
+                  player.part = p
                 else:
-                  if len(info.parts) <= 1:
-                    #escape = True
+                  if not player.practiceMode:
                     escaped = True
-                  break
+                  break;
                 while True:
-                  if self.engine.config.get("game", "players") > 1:               
-                    #p = Dialogs.chooseItem(self.engine, info.parts + ["Party Mode"] + ["No Player 2"], "%s \n %s" % (info.name, _("Player 2 Choose a part:")), selected = self.player2.part)
+                  if len(info.difficulties) > 1:
 
                     if self.subMenuPosTuple:
-                      p = Dialogs.chooseItem(self.engine, info.parts, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Player 2 Choose a part:")), selected = self.player2.part, pos = self.subMenuPosTuple)
+                      d = Dialogs.chooseItem(self.engine, info.difficulties,
+                                         "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("%s Choose a difficulty:") % player.name), selected = player.difficulty, pos = self.subMenuPosTuple)
                     else:
-                      p = Dialogs.chooseItem(self.engine, info.parts, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Player 2 Choose a part:")), selected = self.player2.part)
+                      d = Dialogs.chooseItem(self.engine, info.difficulties,
+                                         "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("%s Choose a difficulty:") % player.name), selected = player.difficulty)
 
-                    #if p and p == "No Player 2":
-                    #  players = 1
-                    #  selected = True
-                    #  self.player2.part = p
-                    #  break
-                    #elif p and p == "Party Mode":
-                    #  players = -1
-                    #  selected = True
-                    #  self.player2.part = p
-                    #  break
-                    #elif p and p != "No Player 2" and p != "Party Mode":
-                    if p:
-                      players = 2
-                      self.player2.part = p
-  
-                    else:
-                      if len(info.difficulties) <= 1:
-                        escaped = True
-                      if len(info.parts) <= 1:
-                        escape = True
-                      break
-                    while True:                    
-                      if len(info.difficulties) > 1:
-
-                        if self.subMenuPosTuple:
-                          d = Dialogs.chooseItem(self.engine, info.difficulties, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Player 2 Choose a difficulty:")), selected = self.player2.difficulty, pos = self.subMenuPosTuple)
-                        else:
-                          d = Dialogs.chooseItem(self.engine, info.difficulties, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Player 2 Choose a difficulty:")), selected = self.player2.difficulty)
-
-                      else:
-                        d = info.difficulties[0]
-                      if d:
-                        self.player2.difficulty = d
-                      else:
-                        break
-                      selected = True
-                      break
                   else:
-                    selected = True
+                    d = info.difficulties[0]
+                  if d:
+                    player.difficulty = d
+                    selectedPlayer = True
+                  else:
+                    if len(choose) <= 1:
+                      #escape = True
+                      escaped = True
                     break
-                  if selected:
+                  if selectedPlayer:
                     break
-                if selected or escaped:
+                if selectedPlayer or escaped:
                   break
             
               #if selected or escaped: #new nesting for Practice Mode selection
               if selected or escaped: #new nesting for Practice Mode selection
                 break
+            
+            else:
+              selected = True
 
             if selected or escaped: #new nesting for Practice Mode section selection
               break
@@ -379,7 +346,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
           break
       else:
         #evilynux - Fixes Practice Mode from the cmdline
-        if Config.get("player0","mode_1p") == 1 and Config.get("game","players") == 1:
+        if Config.get("game","game_mode") == 1 and Config.get("game","players") == 1:
           self.player.practiceMode = True
         info = Song.loadSongInfo(self.engine, self.songName, library = self.libraryName)
 

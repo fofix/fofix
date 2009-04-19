@@ -25,6 +25,7 @@ import pygame
 from OpenGL.GL import *
 import sys
 from Texture import Texture, TextureAtlas, TextureAtlasFullException
+from numpy import array, float32
 
 DEFAULT_SCALE = 0.002
 
@@ -57,13 +58,16 @@ class Cache(object):
 class Font:
   """A texture-mapped font."""
   def __init__(self, fileName, size, bold = False, italic = False, underline = False, outline = True,
-               scale = 1.0, reversed = False, systemFont = False, shadow = False):
+               scale = 1.0, reversed = False, systemFont = False, shadow = False, shadowoffsetx = .0022, shadowoffsety = .0005):
     pygame.font.init()
     self.size             = size
     self.scale            = scale
     self.outline          = outline
     self.reversed         = reversed
     self.shadow         = shadow
+    self.shadowoffsetx = shadowoffsetx
+    self.shadowoffsety = shadowoffsety
+    
     # Try loading a system font first if one was requested
     self.font           = None
     if systemFont and sys.platform != "win32":
@@ -77,6 +81,8 @@ class Font:
     self.font.set_italic(italic)
     self.font.set_underline(underline)
     self.stringsCache = Cache(256)
+    self.square_prim = array([[.0,.0],[.0,.0],[.0,.0],[.0,.0]], dtype=float32)
+    self.square_tex  = array([[.0,.0],[.0,.0],[.0,.0],[.0,.0]], dtype=float32)
 
   def getStringSize(self, s, scale = DEFAULT_SCALE):
     """
@@ -134,7 +140,7 @@ class Font:
     """
     pass
 
-  def render(self, text, pos = (0, 0), direction = (1, 0), scale = DEFAULT_SCALE):
+  def render(self, text, pos = (0, 0), direction = (1, 0), scale = DEFAULT_SCALE, shadowoffset = (.0022, .0005)):
     """
     Draw some text.
 
@@ -146,17 +152,19 @@ class Font:
     # deufeufeu : new drawing relaying only on pygame.font.render
     #           : I know me miss special unicodes characters, but the gain
     #           : is really important.
+    # evilynux : Use arrays to increase performance
     def drawSquare(w,h,tw,th):
-        glBegin(GL_TRIANGLE_STRIP)
-        glTexCoord2f(0.0,th)
-        glVertex2f(0,0)
-        glTexCoord2f(tw,th)
-        glVertex2f(w,0)
-        glTexCoord2f(0.0,0.0)
-        glVertex2f(0,h)
-        glTexCoord2f(tw,0.0)
-        glVertex2f(w,h)
-        glEnd()
+        self.square_prim[1,0] = self.square_prim[3,0] = w
+        self.square_prim[2,1] = self.square_prim[3,1] = h
+        self.square_tex[0,1] = self.square_tex[1,1] = th
+        self.square_tex[1,0] = self.square_tex[3,0] = tw
+        glEnableClientState(GL_VERTEX_ARRAY)
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glVertexPointerf(self.square_prim)
+        glTexCoordPointerf(self.square_tex)
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, self.square_prim.shape[0])
+        glDisableClientState(GL_VERTEX_ARRAY)
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
  
     if not text:
         return
@@ -200,7 +208,7 @@ class Font:
         glPushAttrib(GL_CURRENT_BIT)
         glPushMatrix()
         glColor4f(0, 0, 0, 1)
-        glTranslatef(.0022, .0005, 0)
+        glTranslatef(shadowoffset[0], shadowoffset[1], 0)
         drawSquare(w,h,tw,th)
         glPopMatrix()
         glPopAttrib()

@@ -1,4 +1,4 @@
-#####################################################################
+##################################################################
 # -*- coding: iso-8859-1 -*-                                        #
 #                                                                   #
 # Frets on Fire                                                     #
@@ -23,6 +23,7 @@
 import pygame
 import os
 import sys
+import Shader
 from OpenGL.GL import *
 from OpenGL.GL.ARB.multisample import *
 import Log
@@ -33,6 +34,7 @@ class Video:
     self.caption    = caption
     self.fullscreen = False
     self.flags      = True
+    self.shaders    = Shader.shaderList()
 
   def setMode(self, resolution, fullscreen = False, flags = pygame.OPENGL | pygame.DOUBLEBUF,
               multisamples = 0):
@@ -115,3 +117,5 @@ class Video:
 
   def getVideoModes(self):
     return pygame.display.list_modes()
+
+

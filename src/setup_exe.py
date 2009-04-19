@@ -31,10 +31,31 @@ try:
 except ImportError:
   pass
 
+#stump: if we're running pyOpenGL 3, do the necessary black magic.
+# Also bring in modules used by pygame 1.9 if necessary.
+# For some reason py2exe doesn't include them.
+import OpenGL
+import pygame
+extraIncludes = []
+if int(OpenGL.__version__[0]) > 2:
+  extraIncludes += [
+    "OpenGL.platform.win32",
+    "OpenGL.arrays.ctypesarrays",
+    "OpenGL.arrays.numpymodule",
+    "OpenGL.arrays.lists",
+    "OpenGL.arrays.numbers",
+    "OpenGL.arrays.strings",  #stump: needed by shader code
+  ]
+if tuple(int(i) for i in pygame.__version__[:5].split('.')) >= (1, 9, 0):
+  extraIncludes += [
+    "heapq",
+    "bisect",
+  ]
+
 options = {
   "py2exe": {
     "dist_dir":  "../dist",
-    "includes":  SceneFactory.scenes,
+    "includes":  SceneFactory.scenes + extraIncludes,
     "excludes":  [
       "glew.gl.apple",
       "glew.gl.ati",
@@ -74,6 +95,12 @@ options = {
       "GimpPaletteFile",
       "PaletteFile",
       "macosx",
+      "Tkinter",
+      "Pyrex",
+      "distutils",
+    ],
+    "dll_excludes":  [
+      "msvcp90.dll",
     ],
     "optimize":  2,
   }
@@ -103,30 +130,40 @@ dataFiles = [
   ("data/translations",       glob.glob("../data/translations/*.mo")),
 ]
 
-#stump: grab version info from engine
-import GameEngine
-fullVersionString = GameEngine.version
+#stump: sometimes py2.6 py2exe thinks parts of pygame are "system" DLLs...
+__orig_isSystemDLL = py2exe.build_exe.isSystemDLL
+def isSystemDLL(pathname):
+  if pathname.lower().find('pygame') != -1:
+    return 0
+  return __orig_isSystemDLL(pathname)
+py2exe.build_exe.isSystemDLL = isSystemDLL
 
+#evilynux: Grab version info from Version class
 def setupWindows():
-  setup(version = Version.version(),
-        description = "Rockin' it Oldskool!",
-        name = "Frets on Fire",
-        url = "http://www.unrealvoodoo.org",
+  setup(#stump: these arguments interfere with the version tagging code,
+        #  but they don't really do anything important anyway.  When the
+        #  version tagging code was modified, they suddenly became a valid
+        #  source of info for py2exe to synthesize a version info resource
+        #  of its own, which supersedes the one specified further down.
+        #version = Version.VERSION,
+        #description = "Rockin' it Oldskool!",
+        #name = Version.appNameSexy(),
+        #url = Version.URL,
         windows = [
           {
             "script":          "FretsOnFire.py",
             "icon_resources":  [(1, "fof.ico")],
             "other_resources": [(RT_VERSION, 1, VersionResource(
               #stump: the parameter below must consist only of up to four numerical fields separated by dots
-              fullVersionString[7:12],  # extract "x.yyy" from "FoFiX vx.yyy ..."
+              Version.VERSION,
               file_description="Frets on Fire X",
               legal_copyright=r"© 2008-2009 FoFiX Team.  GNU GPL v2 or later.",
               company_name="FoFiX Team",
               internal_name="FretsOnFire.exe",
               original_filename="FretsOnFire.exe",
-              product_name="FoFiX",
+              product_name=Version.appNameSexy(),
               #stump: when run from the exe, FoFiX will claim to be "FoFiX v" + product_version
-              product_version=fullVersionString[7:]  # remove "FoFiX v" from front
+              product_version=Version.version()
             ).resource_bytes())]
           }
         ],

@@ -121,9 +121,12 @@ Config.define("theme", "menu_y",       float, None)
 Config.define("theme", "rbmenu",       bool, False)
 
 
-Config.define("theme", "loading_x",       float, None)
-Config.define("theme", "loading_y",       float, None)
+Config.define("theme", "loading_x",       float, 0.5)
+Config.define("theme", "loading_y",       float, 0.6)
 Config.define("theme", "loading_text_color", str, "#FFFFFF")
+Config.define("theme", "loading_font_scale", float, 0.0015)
+Config.define("theme", "loading_right_margin", float, 1.0)
+Config.define("theme", "loading_line_spacing", float, 1.0)
 
 Config.define("theme", "twoDnote",       bool, True)
 Config.define("theme", "twoDkeys",       bool, True)
@@ -134,9 +137,84 @@ Config.define("theme", "songback",       bool, False)
 Config.define("theme", "versiontag",       bool, False)
 Config.define("theme", "rmtype",       int, None)
 
+Config.define("theme", "shadowoffsetx", float, .0022)
+Config.define("theme", "shadowoffsety", float, .0005)
+
+Config.define("theme", "noterotdegrees",float, 0)
+Config.define("theme", "noterot1",      float, 0)
+Config.define("theme", "noterot2",      float, 0)
+Config.define("theme", "noterot3",      float, 0)
+Config.define("theme", "noterot4",      float, 0)
+Config.define("theme", "noterot5",      float, 0)
+
 #TWD
 Config.define("theme", "menu_neck_choose_x", float, 0.1)
 Config.define("theme", "menu_neck_choose_y", float, 0.05)
+
+#akedrou - lobby/control activator
+Config.define("theme", "control_activate_x", float, 0.645)
+Config.define("theme", "control_activate_select_x", float, 0.5)
+Config.define("theme", "control_activate_part_x", float, 0.41)
+Config.define("theme", "control_activate_y", float, 0.18)
+Config.define("theme", "control_activate_scale", float, 0.0018)
+Config.define("theme", "control_activate_part_size", float, 22.000)
+Config.define("theme", "control_activate_space", float, 0.045)
+Config.define("theme", "control_activate_font", str, "font")
+Config.define("theme", "control_description_x", float, 0.5)
+Config.define("theme", "control_description_y", float, 0.13)
+Config.define("theme", "control_description_scale", float, 0.002)
+Config.define("theme", "control_description_font", str, "font")
+Config.define("theme", "control_check_x", float, 0.16)
+Config.define("theme", "control_check_y", float, 0.26)
+Config.define("theme", "control_check_text_y", float, 0.61)
+Config.define("theme", "control_check_part_mult", float, 2.8)
+Config.define("theme", "control_check_space", float, 0.23)
+Config.define("theme", "control_check_scale", float, 0.0018)
+Config.define("theme", "control_check_font", str, "font")
+Config.define("theme", "lobby_preview_x", float, 0.7)
+Config.define("theme", "lobby_title_x", float, 0.5)
+Config.define("theme", "lobby_title_y", float, 0.07)
+Config.define("theme", "lobby_title_character_x", float, 0.26)
+Config.define("theme", "lobby_title_character_y", float, 0.24)
+Config.define("theme", "lobby_title_scale", float, 0.0024)
+Config.define("theme", "lobby_title_font", str, "loadingFont")
+Config.define("theme", "lobby_select_x", float, 0.4)
+Config.define("theme", "lobby_select_y", float, 0.32)
+Config.define("theme", "lobby_select_image_x", float, 0.255)
+Config.define("theme", "lobby_select_image_y", float, 0.335)
+Config.define("theme", "lobby_select_scale", float, 0.0018)
+Config.define("theme", "lobby_select_space", float, 0.04)
+Config.define("theme", "lobby_select_font", str, "font")
+Config.define("theme", "lobby_title_color", str, "#FFFFFF")
+Config.define("theme", "lobby_info_color", str, "#FFFFFF")
+Config.define("theme", "lobby_font_color", str, "#FFFFFF")
+Config.define("theme", "lobby_select_color", str, "#FFBF00")
+Config.define("theme", "lobby_disable_color", str, "#666666")
+Config.define("theme", "character_create_x", float, 0.25)
+Config.define("theme", "character_create_y", float, 0.15)
+Config.define("theme", "character_create_help_x", float, 0.5)
+Config.define("theme", "character_create_help_y", float, 0.73)
+Config.define("theme", "character_create_help_scale", float, 0.0018)
+Config.define("theme", "character_create_option_x", float, 0.75)
+Config.define("theme", "character_create_option_font", str, "font")
+Config.define("theme", "character_create_font_color", str, "#FFFFFF")
+Config.define("theme", "character_create_select_color", str, "#FFBF00")
+Config.define("theme", "character_create_help_color", str, "#FFFFFF")
+Config.define("theme", "character_create_help_font", str, "loadingFont")
+Config.define("theme", "character_create_scale", float, .0018)
+Config.define("theme", "character_create_space", float, .045)
+
+#worldrave
+Config.define("theme", "setlistguidebuttonsposX", float, 0.408)
+Config.define("theme", "setlistguidebuttonsposY", float, 0.0322)
+Config.define("theme", "setlistguidebuttonsscaleX", float, 0.29)
+Config.define("theme", "setlistguidebuttonsscaleY", float, 0.308)
+Config.define("theme", "setlistpreviewbuttonposX", float, 0.5)
+Config.define("theme", "setlistpreviewbuttonposY", float, 0.5)
+Config.define("theme", "setlistpreviewbuttonscaleX", float, 0.5)
+Config.define("theme", "setlistpreviewbuttonscaleY", float, 0.5)
+Config.define("theme", "versiontagposX", float, 0.5)
+Config.define("theme", "versiontagposY", float, 0.5)
 
 #evilynux
 Config.define("theme", "songlist_score_color",  str, "#93C351")
@@ -161,10 +239,7 @@ Config.define("theme", "song_rb2_name_selected_color",       str, "#FFBF00")
 Config.define("theme", "song_rb2_diff_color",       str, "#FFBF00")
 Config.define("theme", "song_rb2_artist_color",       str, "#4080FF")
 
-Config.define("theme", "pause_bkg_x",       float, None)
-Config.define("theme", "pause_bkg_y",       float, None)
-Config.define("theme", "pause_bkg_w",       float, None)
-Config.define("theme", "pause_bkg_h",       float, None)
+Config.define("theme", "pause_bkg",       str, "0.5,0.5,1.0,1.0")
 Config.define("theme", "pause_text_x",       float, None)
 Config.define("theme", "pause_text_y",       float, None)
 Config.define("theme", "pause_text_color",  str, "#FFFFFF")
@@ -179,6 +254,7 @@ Config.define("theme", "opt_selected_color",  str, "#FFBF00")
 
 Config.define("theme", "main_menu_scale",       float, None)
 Config.define("theme", "main_menu_vspacing",       float, None)
+Config.define("theme", "use_solo_submenu",       bool, None)
 Config.define("theme", "sub_menu_x",       float, None)
 Config.define("theme", "sub_menu_y",       float, None)
 
@@ -195,26 +271,30 @@ Config.define("theme", "fail_text_color",  str, "#FFFFFF")
 Config.define("theme", "fail_completed_color",  str, "#FFFFFF")
 Config.define("theme", "fail_selected_color",  str, "#FFBF00")
 
-Config.define("theme", "result_score", str, ".5,.11,0.0025,None")
-Config.define("theme", "result_song", str, ".05,.045,.002,None")
+Config.define("theme", "result_score", str, ".5,.11,0.0025,None,None")
+Config.define("theme", "result_song", str, ".05,.045,.002,None,None")
 Config.define("theme", "result_song_form", int, 0)
 Config.define("theme", "result_song_text", str, "%s Finished!")
-Config.define("theme", "result_star", str, ".5,.35,0.15,0.5")
-Config.define("theme", "result_stats_diff", str, ".5,.55,0.002,None")
+Config.define("theme", "result_star", str, ".5,.4,0.15,1.1")
+Config.define("theme", "result_star_type", int, 0)
+Config.define("theme", "result_stats_diff", str, ".5,.55,0.002,None,None")
 Config.define("theme", "result_stats_diff_text", str, "Difficulty: %s")
-Config.define("theme", "result_stats_part", str, ".5,.64,0.002,None")
+Config.define("theme", "result_stats_part", str, ".5,.64,0.002,None,None")
 Config.define("theme", "result_stats_part_text", str, "Part: %s")
-Config.define("theme", "result_stats_streak", str, ".5,.58,0.002,None")
+Config.define("theme", "result_stats_name", str, ".5,.73,0.002,None,None")
+Config.define("theme", "result_stats_streak", str, ".5,.58,0.002,None,None")
 Config.define("theme", "result_stats_streak_text", str, "Long Streak: %s")
-Config.define("theme", "result_stats_accuracy", str, ".5,.61,0.002,None")
+Config.define("theme", "result_stats_accuracy", str, ".5,.61,0.002,None,None")
 Config.define("theme", "result_stats_accuracy_text", str, "Accuracy: %.1f%%")
-Config.define("theme", "result_stats_notes", str, ".5,.52,0.002,None")
+Config.define("theme", "result_stats_notes", str, ".5,.52,0.002,None,None")
 Config.define("theme", "result_stats_notes_text", str, "%s Notes Hit")
 Config.define("theme", "result_cheats_info", str, ".5,.3,.002")
 Config.define("theme", "result_cheats_numbers", str, ".5,.35,.0015")
 Config.define("theme", "result_cheats_score", str, ".75,.4,.0015")
 Config.define("theme", "result_cheats_percent", str, ".45,.4,.0015")
 Config.define("theme", "result_cheats_color", str, "#FFFFFF")
+Config.define("theme", "result_cheats_font", str, "font")
+Config.define("theme", "result_high_score_font", str, "font")
 Config.define("theme", "result_menu_x", float, .5)
 Config.define("theme", "result_menu_y", float, .2)
 
@@ -258,14 +338,16 @@ Config.define("theme", "star_fillup_color", str, None)
 
 #Qstick - Misc
 Config.define("theme", "song_list_display",       int, None)
+Config.define("theme", "neck_width",    float, 3.0)
 
 #Qstick - Results Screen
 
 #RACER:
-Config.define("theme", "fail_bkg_x",       float, None)
-Config.define("theme", "fail_bkg_y",       float, None)
+Config.define("theme", "fail_bkg",       str, "0.5,0.5,1.0,1.0")
 Config.define("theme", "fail_text_x",       float, None)
 Config.define("theme", "fail_text_y",       float, None)
+Config.define("theme", "fail_songname_x",  float, 0.5)
+Config.define("theme", "fail_songname_y",  float, 0.35)
 
 submenuX = {}
 submenuY = {}
@@ -311,6 +393,9 @@ menuRB = None
 loadingX = None
 loadingY = None
 loadingColor = None
+loadingFScale = None
+loadingRMargin = None
+loadingLSpacing = None
 twoDnote = None
 twoDkeys = None
 threeDspin = None
@@ -319,12 +404,77 @@ meshColor = None
 songback = None
 versiontag = None
 rmtype = None
+shadowoffsetx = None
+shadowoffsety = None
 
 #evilynux
 songlist_score_colorVar = None
 songlistcd_score_colorVar = None
 rockmeter_score_colorVar = None
 ingame_stats_colorVar = None
+
+#akedrou - lobby/control setup
+controlActivateX = None
+controlActivateSelectX = None
+controlActivatePartX = None
+controlActivateY = None
+controlActivateScale = None
+controlActivatePartSize = None
+controlActivateSpace = None
+controlActivateFont = None
+controlDescriptionY = None
+controlDescriptionX = None
+controlDescriptionScale = None
+controlDescriptionFont = None
+controlCheckX = None
+controlCheckY = None
+controlCheckTextY = None
+controlCheckPartMult = None
+controlCheckSpace = None
+controlCheckScale = None
+controlCheckFont  = None
+lobbyPreviewX = None
+lobbyTitleX = None
+lobbyTitleY = None
+lobbyTitleCharacterX = None
+lobbyTitleCharacterY = None
+lobbyTitleScale = None
+lobbyTitleFont = None
+lobbySelectX = None
+lobbySelectY = None
+lobbySelectImageX = None
+lobbySelectImageY = None
+lobbySelectScale = None
+lobbySelectSpace = None
+lobbySelectFont = None
+lobbyTitleColor = None
+lobbyInfoColor = None
+lobbyFontColor = None
+lobbySelectColor = None
+lobbyDisableColor = None
+characterCreateX = None
+characterCreateY = None
+characterCreateOptionX = None
+characterCreateFontColor = None
+characterCreateSelectColor = None
+characterCreateHelpColor = None
+characterCreateHelpX = None
+characterCreateHelpY = None
+characterCreateHelpScale = None
+characterCreateOptionFont = None
+characterCreateHelpFont = None
+characterCreateScale = None
+characterCreateSpace = None
+
+#worldrave 
+setlistguidebuttonsposX = None
+setlistguidebuttonsposY = None
+setlistguidebuttonsscaleX = None
+setlistguidebuttonsscaleY = None
+setlistpreviewbuttonposX = None
+setlistpreviewbuttonposY = None
+setlistpreviewbuttonscaleY = None
+setlistpreviewbuttonscaleY = None
 
 #MFH:
 song_cd_Xpos = None         #Songlist in CD mode: horizontal position of CDs/cases
@@ -338,8 +488,7 @@ song_listcd_score_Xpos = None
 song_listcd_score_Ypos = None
 song_listcd_list_Xpos = None
 
-pause_bkg_xPos = None
-pause_bkg_yPos = None
+pause_bkg_pos = [None]*4
 pause_text_xPos = None
 pause_text_yPos = None
 
@@ -349,6 +498,7 @@ opt_text_yPos = None
 
 main_menu_scaleVar = None
 main_menu_vspacingVar = None
+use_solo_submenu = None
 sub_menu_xVar = None
 sub_menu_yVar = None
 
@@ -390,6 +540,8 @@ songInfoDisplayScale = None
 #Worldrave - for position of song info display during countdown
 songInfoDisplayX = None
 songInfoDisplayY = None
+versiontagposX = None
+versiontagposY = None
 
 #MFH - y offset = lines, x offset = spaces
 songSelectSubmenuOffsetLines = None
@@ -414,21 +566,23 @@ starFillupColor = None
 
 #Qstick - misc
 songListDisplay = None
+neckWidth = None
 
-result_score = [None] * 4
+result_score = [None] * 5
 result_star = [None] * 4
-result_song = [None] * 4
+result_song = [None] * 5
 result_song_form = None
 result_song_text = None
-result_stats_part = [None] * 4
+result_stats_part = [None] * 5
 result_stats_part_text = None
-result_stats_diff = [None] * 4
+result_stats_name = [None] * 5
+result_stats_diff = [None] * 5
 result_stats_diff_text = None
-result_stats_accuracy = [None] * 4
+result_stats_accuracy = [None] * 5
 result_stats_accuracy_text = None
-result_stats_streak = [None] * 4
+result_stats_streak = [None] * 5
 result_stats_streak_text = None
-result_stats_notes = [None] * 4
+result_stats_notes = [None] * 5
 result_stats_notes_text = None
 #akedrou
 result_cheats_info = [None] * 3
@@ -436,15 +590,19 @@ result_cheats_numbers = [None] * 3
 result_cheats_score = [None] * 3
 result_cheats_percent = [None] * 3
 result_cheats_color = None
+result_cheats_font  = None
+result_high_score_font = None
 result_menu_x = None
 result_menu_y = None
+result_star_type = None
 
 jurgTextPos = [None] * 3
 
 
 #Racer:
-fail_bkg_xPos = None
-fail_bkg_yPos = None
+#fail_bkg_xPos = None
+#fail_bkg_yPos = None
+fail_bkg_pos = [None]*4
 fail_text_xPos = None
 fail_text_yPos = None
 
@@ -493,6 +651,7 @@ def open(config, themepath = None):
   setupPOV(config)
   setupMisc(config)
   setupMenu(config)
+  setupLobby(config) #akedrou
   setupSonglist(config) #MFH
   setupPauseNOpt(config) #MFH
   setupTWOD(config)
@@ -646,6 +805,7 @@ def setupMisc(config):
   global jurgTextPos
   global oBarHScale
   global oBar3dFill
+  global neckWidth
 
   loadingPhrase = config.get("theme", "loading_phrase")
   resultsPhrase = config.get("theme", "results_phrase")
@@ -665,13 +825,14 @@ def setupMisc(config):
   jurgTextPos = config.get("theme", "jurgen_text_pos").split(",")
   oBarHScale = config.get("theme", "obar_hscale")
   oBar3dFill = config.get("theme", "obar_3dfill")
-
+  neckWidth = config.get("theme", "neck_width")
 #MFH:
 def setupSonglist(config):
   global song_cd_Xpos, song_cdscore_Xpos, song_list_Xpos, song_listscore_Xpos
   global song_listcd_cd_Xpos, song_listcd_cd_Ypos, song_listcd_score_Xpos, song_listcd_score_Ypos, song_listcd_list_Xpos
 
-  global main_menu_scaleVar, main_menu_vspacingVar, sub_menu_xVar, sub_menu_yVar
+  global setlistguidebuttonsposX, setlistguidebuttonsposY, setlistguidebuttonsscaleX, setlistguidebuttonsscaleY
+  global setlistpreviewbuttonposX, setlistpreviewbuttonposY, setlistpreviewbuttonscaleX, setlistpreviewbuttonscaleY
   global career_title_colorVar, opt_text_colorVar, opt_selected_colorVar
   global song_name_text_colorVar, song_name_selected_colorVar
   global artist_text_colorVar, artist_selected_colorVar
@@ -680,10 +841,20 @@ def setupSonglist(config):
   global fail_text_colorVar, fail_selected_colorVar, fail_completed_colorVar
   global songSelectSubmenuX, songSelectSubmenuY
   global songSelectSubmenuOffsetLines, songSelectSubmenuOffsetSpaces
+  global versiontagposX, versiontagposY
   
   global song_rb2_name_colorVar, song_rb2_name_selected_colorVar, song_rb2_diff_colorVar, song_rb2_artist_colorVar
 
-
+  setlistguidebuttonsposX = config.get("theme", "setlistguidebuttonsposX")
+  setlistguidebuttonsposY = config.get("theme", "setlistguidebuttonsposY")
+  setlistguidebuttonsscaleX = config.get("theme", "setlistguidebuttonsscaleX")
+  setlistguidebuttonsscaleY = config.get("theme", "setlistguidebuttonsscaleY")
+  setlistpreviewbuttonposX = config.get("theme", "setlistpreviewbuttonposX")
+  setlistpreviewbuttonposY = config.get("theme", "setlistpreviewbuttonposY")
+  setlistpreviewbuttonscaleX = config.get("theme", "setlistpreviewbuttonscaleX")
+  setlistpreviewbuttonscaleY = config.get("theme", "setlistpreviewbuttonscaleY")
+  versiontagposX = config.get("theme", "versiontagposX")
+  versiontagposY = config.get("theme", "versiontagposY")
   songSelectSubmenuOffsetLines = config.get("theme", "song_select_submenu_offset_lines")
   songSelectSubmenuOffsetSpaces = config.get("theme", "song_select_submenu_offset_spaces")
   songSelectSubmenuX = config.get("theme", "song_select_submenu_x")
@@ -697,10 +868,6 @@ def setupSonglist(config):
   song_cdscore_Xpos = config.get("theme", "song_cdscore_x")
   song_list_Xpos = config.get("theme", "song_list_x")
   song_listscore_Xpos = config.get("theme", "song_listscore_x")
-  main_menu_scaleVar = config.get("theme", "main_menu_scale")
-  main_menu_vspacingVar = config.get("theme", "main_menu_vspacing")
-  sub_menu_xVar = config.get("theme", "sub_menu_x")
-  sub_menu_yVar = config.get("theme", "sub_menu_y")
   career_title_colorVar = config.get("theme", "career_title_color")
   opt_text_colorVar = config.get("theme", "opt_text_color")
   opt_selected_colorVar = config.get("theme", "opt_selected_color")
@@ -723,11 +890,10 @@ def setupSonglist(config):
 
   
 def setupPauseNOpt(config):
-  global pause_bkg_xPos, pause_bkg_yPos, pause_text_xPos, pause_text_yPos
+  global pause_bkg_pos, pause_text_xPos, pause_text_yPos
   global opt_bkg_size, opt_text_xPos, opt_text_yPos
 
-  pause_bkg_xPos = config.get("theme", "pause_bkg_x")
-  pause_bkg_yPos = config.get("theme", "pause_bkg_y")
+  pause_bkg_pos = config.get("theme", "pause_bkg").split(",")
   pause_text_xPos = config.get("theme", "pause_text_x")
   pause_text_yPos = config.get("theme", "pause_text_y")
   opt_bkg_size = config.get("theme", "opt_bkg").split(",")
@@ -736,8 +902,9 @@ def setupPauseNOpt(config):
   
 def setupMenu(config):
   global menuX, menuY, menuRB
-  global loadingX, loadingY, loadingColor
-  global songback, versiontag
+  global loadingX, loadingY, loadingColor, loadingFScale, loadingRMargin, loadingLSpacing
+  global main_menu_scaleVar, main_menu_vspacingVar, use_solo_submenu, sub_menu_xVar, sub_menu_yVar
+  global songback, versiontag, shadowoffsetx, shadowoffsety
   
   menuX = config.get("theme", "menu_x")
   menuY = config.get("theme", "menu_y")
@@ -745,27 +912,109 @@ def setupMenu(config):
   loadingX = config.get("theme", "loading_x")
   loadingY = config.get("theme", "loading_y")
   loadingColor = hexToColor(config.get("theme", "loading_text_color"))
+  loadingFScale = config.get("theme", "loading_font_scale")
+  loadingRMargin = config.get("theme", "loading_right_margin")
+  loadingLSpacing = config.get ("theme", "loading_line_spacing")
+  main_menu_scaleVar = config.get("theme", "main_menu_scale")
+  main_menu_vspacingVar = config.get("theme", "main_menu_vspacing")
+  use_solo_submenu = config.get("theme", "use_solo_submenu")
+  sub_menu_xVar = config.get("theme", "sub_menu_x")
+  sub_menu_yVar = config.get("theme", "sub_menu_y")
   songback = config.get("theme", "songback")
   versiontag = config.get("theme", "versiontag")
+  shadowoffsetx = config.get("theme", "shadowoffsetx")
+  shadowoffsety = config.get("theme", "shadowoffsety")
 
+def setupLobby(config):
+  global controlActivateX, controlActivateY, controlActivateScale, controlActivateFont, controlCheckTextY
+  global controlActivateSelectX, controlActivatePartX, controlActivateSpace, controlActivatePartSize
+  global controlDescriptionX, controlDescriptionY, controlDescriptionScale, controlDescriptionFont, controlCheckSpace
+  global controlCheckX, controlCheckY, controlCheckScale, controlCheckPartMult, controlCheckFont, lobbyPreviewX
+  global lobbyTitleX, lobbyTitleY, lobbyTitleScale, lobbyTitleCharacterX, lobbyTitleCharacterY, lobbySelectScale
+  global lobbySelectImageX, lobbySelectImageY, lobbySelectSpace, characterCreateHelpY
+  global lobbyTitleFont, lobbySelectX, lobbySelectY, lobbySelectFont, characterCreateX, characterCreateY
+  global characterCreateOptionX, characterCreateScale, characterCreateSpace, characterCreateHelpFont
+  global characterCreateOptionFont, characterCreateHelpX, characterCreateHelpScale
+  global characterCreateFontColor, characterCreateSelectColor, characterCreateHelpColor
+  global lobbyFontColor, lobbySelectColor, lobbyDisableColor, lobbyTitleColor, lobbyInfoColor
+  
+  controlActivateX = config.get("theme", "control_activate_x")
+  controlActivateSelectX = config.get("theme", "control_activate_select_x")
+  controlActivatePartX = config.get("theme", "control_activate_part_x")
+  controlActivateY = config.get("theme", "control_activate_y")
+  controlActivateScale = config.get("theme", "control_activate_scale")
+  controlActivateSpace = config.get("theme", "control_activate_space")
+  controlActivatePartSize = config.get("theme", "control_activate_part_size")
+  controlActivateFont = config.get("theme", "control_activate_font")
+  controlDescriptionX = config.get("theme", "control_description_x")
+  controlDescriptionY = config.get("theme", "control_description_y")
+  controlDescriptionScale = config.get("theme", "control_description_scale")
+  controlDescriptionFont = config.get("theme", "control_description_font")
+  controlCheckX = config.get("theme", "control_check_x")
+  controlCheckY = config.get("theme", "control_check_y")
+  controlCheckTextY = config.get("theme", "control_check_text_y")
+  controlCheckPartMult = config.get("theme", "control_check_part_mult")
+  controlCheckScale = config.get("theme", "control_check_scale")
+  controlCheckSpace = config.get("theme", "control_check_space")
+  controlCheckFont  = config.get("theme", "control_check_font")
+  lobbyPreviewX = config.get("theme", "lobby_preview_x")
+  lobbyTitleX = config.get("theme", "lobby_title_x")
+  lobbyTitleY = config.get("theme", "lobby_title_y")
+  lobbyTitleCharacterX = config.get("theme", "lobby_title_character_x")
+  lobbyTitleCharacterY = config.get("theme", "lobby_title_character_y")
+  lobbyTitleScale = config.get("theme", "lobby_title_scale")
+  lobbyTitleFont = config.get("theme", "lobby_title_font")
+  lobbySelectX = config.get("theme", "lobby_select_x")
+  lobbySelectY = config.get("theme", "lobby_select_y")
+  lobbySelectImageX = config.get("theme", "lobby_select_image_x")
+  lobbySelectImageY = config.get("theme", "lobby_select_image_y")
+  lobbySelectScale = config.get("theme", "lobby_select_scale")
+  lobbySelectSpace = config.get("theme", "lobby_select_space")
+  lobbySelectFont = config.get("theme", "lobby_select_font")
+  lobbyTitleColor = hexToColor(config.get("theme", "lobby_title_color"))
+  lobbyInfoColor = hexToColor(config.get("theme", "lobby_info_color"))
+  lobbyFontColor = hexToColor(config.get("theme", "lobby_font_color"))
+  lobbySelectColor = hexToColor(config.get("theme", "lobby_select_color"))
+  lobbyDisableColor = hexToColor(config.get("theme", "lobby_disable_color"))
+  characterCreateX = config.get("theme", "character_create_x")
+  characterCreateY = config.get("theme", "character_create_y")
+  characterCreateOptionX = config.get("theme", "character_create_option_x")
+  characterCreateFontColor = hexToColor(config.get("theme", "character_create_font_color"))
+  characterCreateSelectColor = hexToColor(config.get("theme", "character_create_select_color"))
+  characterCreateHelpColor = hexToColor(config.get("theme", "character_create_help_color"))
+  characterCreateHelpX = config.get("theme", "character_create_help_x")
+  characterCreateHelpY = config.get("theme", "character_create_help_y")
+  characterCreateHelpScale = config.get("theme", "character_create_help_scale")
+  characterCreateOptionFont = config.get("theme", "character_create_option_font")
+  characterCreateHelpFont = config.get("theme", "character_create_help_font")
+  characterCreateScale = config.get("theme", "character_create_scale")
+  characterCreateSpace = config.get("theme", "character_create_space")
 
 def setupTWOD(config):
   global twoDnote, twoDkeys, threeDspin, opencolor
+  global noterotdegrees, noterot1, noterot2, noterot3, noterot4, noterot5
   
   twoDnote = config.get("theme", "twoDnote")
   twoDkeys = config.get("theme", "twoDkeys")
   threeDspin = config.get("theme", "threeDspin")
   opencolor = hexToColor(config.get("theme", "opencolor"))
+  noterotdegrees = config.get("theme", "noterotdegrees")
+  noterot1 = config.get("theme", "noterot1")
+  noterot2 = config.get("theme", "noterot2")
+  noterot3 = config.get("theme", "noterot3")
+  noterot4 = config.get("theme", "noterot4")
+  noterot5 = config.get("theme", "noterot5")
 
 
 #racer:
 def setupFail(config):
-  global fail_bkg_xPos, fail_bkg_yPos, fail_text_xPos, fail_text_yPos
+  global fail_bkg_pos, fail_text_xPos, fail_text_yPos, fail_songname_xPos, fail_songname_yPos
 
-  fail_bkg_xPos = config.get("theme", "fail_bkg_x") 
-  fail_bkg_yPos = config.get("theme", "fail_bkg_y")
+  fail_bkg_pos = config.get("theme", "fail_bkg").split(",")
   fail_text_xPos = config.get("theme", "fail_text_x")
   fail_text_yPos = config.get("theme", "fail_text_y")
+  fail_songname_xPos = config.get("theme", "fail_songname_x") 
+  fail_songname_yPos = config.get("theme", "fail_songname_y") 
 
 def setupRockmeter(config):
   global rmtype
@@ -795,7 +1044,7 @@ def setupResults(config):
   global result_stats_diff_text, result_stats_part_text, result_stats_streak_text, result_stats_accuracy_text
   global result_stats_accuracy, result_stats_streak, result_stats_notes, result_stats_notes_text
   global result_cheats_info, result_cheats_numbers, result_cheats_percent, result_cheats_score, result_cheats_color
-  global result_menu_x, result_menu_y
+  global result_menu_x, result_menu_y, result_star_type, result_stats_name, result_cheats_font, result_high_score_font
   
   result_score = config.get("theme", "result_score").split(",")
   result_star = config.get("theme", "result_star").split(",")
@@ -804,6 +1053,7 @@ def setupResults(config):
   result_song_text = config.get("theme", "result_song_text").strip()
   result_stats_part = config.get("theme", "result_stats_part").split(",")
   result_stats_part_text = config.get("theme", "result_stats_part_text").strip()
+  result_stats_name = config.get("theme", "result_stats_name").split(",")
   result_stats_diff = config.get("theme", "result_stats_diff").split(",")
   result_stats_diff_text = config.get("theme", "result_stats_diff_text").strip()
   result_stats_accuracy = config.get("theme", "result_stats_accuracy").split(",")
@@ -817,8 +1067,11 @@ def setupResults(config):
   result_cheats_percent = config.get("theme", "result_cheats_percent").split(",")
   result_cheats_score   = config.get("theme", "result_cheats_score").split(",")
   result_cheats_color   = config.get("theme", "result_cheats_color")
+  result_cheats_font    = config.get("theme", "result_cheats_font")
+  result_high_score_font = config.get("theme", "result_high_score_font")
   result_menu_x         = config.get("theme", "result_menu_x")
   result_menu_y         = config.get("theme", "result_menu_y")
+  result_star_type      = config.get("theme", "result_star_type")
 
 def setupSubmenus(config, themepath = None):
   if not themepath:

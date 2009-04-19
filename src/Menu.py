@@ -117,10 +117,10 @@ class Menu(Layer, KeyListener):
     self.useGraphics = self.engine.config.get("game", "use_graphical_submenu")
     self.gfxText = None
     
-    self.click = False
-    self.scrollUp = False
-    self.scrollDown = False
-    self.halfTime = 0
+    self.scrolling = 0
+    self.delay     = 0
+    self.rate      = 0
+    self.scroller  = [0, self.scrollUp, self.scrollDown, self.scrollLeft, self.scrollRight]
 
     self.textColor = textColor
     self.selectedColor = selectedColor
@@ -130,7 +130,12 @@ class Menu(Layer, KeyListener):
     
     if self.name and self.useGraphics > 0:
       try:
-        self.engine.loadImgDrawing(self, "menuBackground", os.path.join("themes",self.themename,"menu","%s.png" % self.name))
+        try:
+          self.engine.loadImgDrawing(self, "menuBackground", os.path.join("themes",self.themename,"menu","%s.png" % self.name))
+          if self.menuBackground.height1() == 1:
+            self.menuBackground = None
+        except IOError:
+          self.menuBackground = None
         self.gfxText = "%stext%d" % (self.name, len(choices))
         self.engine.loadImgDrawing(self, "menuText", os.path.join("themes",self.themename,"menu","%s.png" % self.gfxText))
         self.graphicMenu = True
@@ -210,11 +215,9 @@ class Menu(Layer, KeyListener):
     
   def shown(self):
     self.engine.input.addKeyListener(self)
-    self.engine.input.enableKeyRepeat()
     
   def hidden(self):
     self.engine.input.removeKeyListener(self)
-    self.engine.input.disableKeyRepeat()
     if self.onClose:
       self.onClose()
 
@@ -227,68 +230,65 @@ class Menu(Layer, KeyListener):
   #MFH added drum navigation conditional here to prevent drum nav if disabled
   #MFH updated SFX play logic to just play the new sound instead of setting volume
   def keyPressed(self, key, unicode): #racer: drum nav.
-    self.time = 0
     choice = self.choices[self.currentIndex]
     c = self.engine.input.controls.getMapping(key)
-    if c in Player.KEY1S or key == pygame.K_RETURN or (c in Player.DRUM4S and self.drumNav):
+    if c in Player.menuYes or key == pygame.K_RETURN:
+      self.scrolling = 0
       choice.trigger(self.engine)
       #self.engine.data.acceptSound.setVolume(self.sfxVolume)  #MFH
       self.engine.data.acceptSound.play()
-    elif c in Player.CANCELS + Player.KEY2S or (c in Player.DRUM1S and self.drumNav):
+    elif c in Player.menuNo or key == pygame.K_ESCAPE:
       if self.onCancel:
         self.onCancel()
       self.engine.view.popLayer(self)
       self.engine.input.removeKeyListener(self)
       #self.engine.data.cancelSound.setVolume(self.sfxVolume)  #MFH
       self.engine.data.cancelSound.play()
-    elif c in Player.DOWNS + Player.ACTION2S or (c in Player.DRUM3S and self.drumNav):
-      self.scrollDown = True
-      self.click = False
-      self.scroll(1)
-    elif c in Player.UPS + Player.ACTION1S or (c in Player.DRUM2S and self.drumNav):
-      self.scrollUp = True
-      self.click = False
-      self.scroll(0)
-    elif c in Player.RIGHTS + Player.KEY4S:
-      choice.selectNextValue()
-    elif c in Player.LEFTS + Player.KEY3S:
-      choice.selectPreviousValue()
+    elif c in Player.menuDown or key == pygame.K_DOWN:
+      self.scrolling = 2
+      self.delay = self.engine.scrollDelay
+      self.scrollDown()
+    elif c in Player.menuUp or key == pygame.K_UP:
+      self.scrolling = 1
+      self.delay = self.engine.scrollDelay
+      self.scrollUp()
+    elif c in Player.menuNext or key == pygame.K_RIGHT:
+      self.scrolling = 4
+      self.delay = self.engine.scrollDelay
+      self.scrollRight()
+    elif c in Player.menuPrev or key == pygame.K_LEFT:
+      self.scrolling = 3
+      self.delay = self.engine.scrollDelay
+      self.scrollLeft()
     return True
   
-  def scroll(self, dir):
-    if not self.click or (self.click and self.time > 10):
-      self.engine.data.selectSound.play()
-      if dir == 1:
-        self.currentIndex = (self.currentIndex + 1) % len(self.choices)
-        self.updateSelection()
-      elif dir == 0:
-        self.currentIndex = (self.currentIndex - 1) % len(self.choices)
-        self.updateSelection()
-      self.click = True
+  def scrollDown(self):
+    self.engine.data.selectSound.play()
+    self.currentIndex = (self.currentIndex + 1) % len(self.choices)
+    self.updateSelection()
+  
+  def scrollUp(self):
+    self.engine.data.selectSound.play()
+    self.currentIndex = (self.currentIndex - 1) % len(self.choices)
+    self.updateSelection()
+  
+  def scrollLeft(self):
+    self.choices[self.currentIndex].selectPreviousValue()
+    
+  def scrollRight(self):
+    self.choices[self.currentIndex].selectNextValue()
   
   def keyReleased(self, key):
-    c = self.engine.input.controls.getMapping(key)
-    if c in Player.UPS + Player.ACTION1S or (c in Player.DRUM2S and self.drumNav):
-      self.scrollUp = False
-      self.click = False
-    elif c in Player.DOWNS + Player.ACTION2S or (c in Player.DRUM3S and self.drumNav):
-      self.scrollDown = False
-      self.click = False
-    else:
-      self.click = False
-    return True
-
-  def lostFocus(self):
-    pass
+    self.scrolling = 0
     
   def run(self, ticks):
     self.time += ticks / 50.0
-    self.halfTime = ~self.halfTime
-    if self.halfTime == 0:
-      if self.scrollUp:
-        self.scroll(0)
-      elif self.scrollDown:
-        self.scroll(1)
+    if self.scrolling > 0:
+      self.delay -= ticks
+      self.rate += ticks
+      if self.delay <= 0 and self.rate >= self.engine.scrollRate:
+        self.rate = 0
+        self.scroller[self.scrolling]()
 
   def renderTriangle(self, up = (0, 1), s = .2):
     left = (-up[1], up[0])
@@ -306,6 +306,10 @@ class Menu(Layer, KeyListener):
       return
 
     self.active = True
+    if self.graphicMenu and self.menuBackground:
+      self.engine.graphicMenuShown = True
+    else:
+      self.engine.graphicMenuShown = False
     
     self.engine.view.setOrthogonalProjection(normalize = True)
     try:
@@ -322,14 +326,8 @@ class Menu(Layer, KeyListener):
       wS, hS = self.engine.view.geometry[2:4]
         
       if self.graphicMenu and self.menuBackground:
-        imgwidth = self.menuBackground.width1()
-        wfactor = 640.000/imgwidth
-        self.menuBackground.transform.reset()
-        self.menuBackground.transform.translate(wS/2,hS/2)
-        self.menuBackground.transform.scale(wfactor,-wfactor)
-        self.menuBackground.draw()
-        #volshebnyi - better menu scaling - but not compatible with current
-        #self.engine.drawImage(self.menuBackground, scale = (1.0,-1.0), coord = (wS/2,hS/2), stretched = 3)
+        #volshebnyi - better menu scaling
+        self.engine.drawImage(self.menuBackground, scale = (1.0,-1.0), coord = (wS/2,hS/2), stretched = 3)
       else:
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)

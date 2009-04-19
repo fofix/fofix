@@ -35,7 +35,7 @@ from OpenGL.GLU import *
 import math
 import colorsys
 import pygame
-from Numeric import array, Float, transpose, reshape, matrixmultiply
+from numpy import array, transpose, reshape, dot
 
 Config.define("network", "updateinterval", int, 72)
 
@@ -87,7 +87,7 @@ class Actor:
 
     # calculate the z coordinate
     m = transpose(reshape(modelview, (4, 4)))
-    wz = -matrixmultiply(m, reshape((x, y, z, 1), (4, 1)))[2][0]
+    wz = -dot(m, reshape((x, y, z, 1), (4, 1)))[2][0]
 
     # don't draw anything if we're behind the viewer
     if wz < 0.1:
@@ -122,7 +122,7 @@ class BoxActor(Actor):
     T = array((R[0], R[3], R[6], 0,
                R[1], R[4], R[7], 0,
                R[2], R[5], R[8], 0,
-                  x,    y,    z, 1), Float)
+                  x,    y,    z, 1), float)
     glPushMatrix()
     glMultMatrixd(T.tolist())
     sx, sy, sz = self.size
@@ -218,8 +218,8 @@ class SceneClient(Scene, KeyListener):
     Scene.__init__(self, engine, owner, **args)
     self.session = session
     self.player = self.session.world.getLocalPlayer()
-    self.player2 = self.session.world.getPlayer2()
-    self.controls = Player.Controls()
+    self.multiplayers = self.session.world.getMultiplayers()
+    self.controls = engine.input.controls
     self.createClient(**args)
 
   def createClient(self, **args):
@@ -248,15 +248,13 @@ class SceneClient(Scene, KeyListener):
       return True
     return False
 
-  def lostFocus(self):
-    pass
-
   def handleControlData(self, sender, owner, flags):
+    pass
     # TODO: player mapping
-    for player in self.session.world.players:
-      if player.owner == owner:
-        player.controls.flags = flags
-        break
+    # for player in self.session.world.players:
+    #   if player.owner == owner:
+    #     player.controls.flags = flags
+    #     break
 
   def handleActorData(self, sender, id, data):
     actor = self.objects[id]
@@ -305,10 +303,11 @@ class SceneServer(Scene):
 
   def handleControlData(self, sender, owner, flags):
     # TODO: player mapping
-    for player in self.server.world.players:
-      if player.owner == owner:
-        player.controls.flags = flags
-        break
+    pass
+    # for player in self.server.world.players:
+    #   if player.owner == owner:
+    #     player.controls.flags = flags
+    #     break
 
   def handleCreateActor(self, sender, name):
     id = self.objects.generateId()

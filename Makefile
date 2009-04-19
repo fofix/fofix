@@ -1,10 +1,24 @@
-CXFREEZE=/usr/src/experimental/cx_Freeze-3.0.3/FreezePython
-PYTHON=python2.4
-PYTHON_LIBS=/usr/lib/python2.4
+# evilynux - Change this path to make it point to your cxFreeze
+CXFREEZE=/usr/src/cx_Freeze-3.0.3/FreezePython
+
+# evilynux - Autodetect pyopengl and python versions.
+PYTHON_VERSION=$(shell python -V 2>&1 | sed -e "s/^.\+\ \([0-9]\.[0-9]\).\+$$/\1/")
+PYOGL_VERSION=$(shell python${PYTHON_VERSION} -c "import OpenGL; print OpenGL.__version__" | cut -d"." -f1)
+# evilynux - If you want, you may Force pyopengl and python versions below.
+#PYTHON_VERSION=2.4
+#PYOGL_VERSION=2
+
+PYTHON=python${PYTHON_VERSION}
+PYTHON_LIBS=/usr/lib/python${PYTHON_VERSION}
 MESSAGESPOT=messages.pot
 
-# evilynux - Dynamically update the version number, this is "clever" but hard to understand... :-(
-VERSION = $(shell grep "versionString =" src/GameEngine.py | sed -e "s/\s/_/g" | sed -e "s/^.\+\(\([0-9]\.\)\+[^\"]\+\).\+/\1/")
+# evilynux - If we're using pyopengl3.x with need more dependencies
+PYOGL3_INCL=$(shell test ${PYOGL_VERSION} = "2" && echo "" || echo "OpenGL.platform.glx,OpenGL.arrays.ctypesarrays,OpenGL.arrays.numpymodule,OpenGL.arrays.lists,OpenGL.arrays.numbers,OpenGL.arrays.strings,")
+
+# evilynux - Update files from SVN and build version number at the same time. This is "clever" but hard to understand... :-(
+SVN_VERSION = $(shell svn up | sed -e "s/.\+\ \([0-9]\+\)\./r\1/")
+MAIN_VERSION = $(shell grep 'VERSION = ' src/Version.py | sed -e "s/^[^0-9]\+\(.\+\)'/\1/")
+VERSION = "${MAIN_VERSION}~${SVN_VERSION}"
 # evilynux - Dynamically get the architecture; only supports 32bit/64bit
 UNAME = $(shell uname -m)
 ARCH = $(shell test $(UNAME) = "i686" && echo 32bit || echo 64bit)
@@ -32,19 +46,14 @@ dist:
 	@echo --- Detected version: ${VERSION}
 	@echo --- Building binary
 	$(CXFREEZE) --target-dir dist \
+--exclude-modules tcl,tk,Tkinter \
 --include-modules \
 encodings.string_escape,\
 encodings.iso8859_1,\
 SongChoosingScene,\
 GuitarScene,\
 ctypes.util,pkg_resources,weakref,Image,\
-OpenGL.arrays.numpymodule,\
-OpenGL.arrays.ctypesarrays,\
-OpenGL.arrays.ctypesparameters,\
-OpenGL.arrays.ctypespointers,\
-OpenGL.arrays.strings,\
-OpenGL.arrays.numbers,\
-OpenGL.arrays.nones,\
+OpenGL,$(PYOGL3_INCL)\
 xml.sax.drivers2.drv_pyexpat,\
 GameResultsScene src/FretsOnFire.py
 

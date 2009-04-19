@@ -24,6 +24,7 @@ from Player import Player
 from Session import MessageHandler, Message
 import Network
 import SceneFactory
+import Config
 
 STARTUP_SCENE = "SongChoosingScene"
 
@@ -241,8 +242,8 @@ class WorldClient(World):
       if player.owner == self.session.id:
         return player
       
-  def getPlayer2(self):
-    return self.players[1]
+  def getMultiplayers(self):
+    return self.players[1:len(self.players)]
         
   def handleSceneCreated(self, sender, id, owner, name, args):
     scene = SceneFactory.create(engine = self.engine, name = name, owner = owner, session = self.session, **args)

@@ -26,7 +26,7 @@ import re
 import os
 from xml import sax
 from OpenGL.GL import *
-from Numeric import reshape, matrixmultiply, transpose, identity, zeros, Float
+from numpy import reshape, dot, transpose, identity, zeros, array, float32
 from math import sin, cos
 
 import Log
@@ -57,7 +57,7 @@ class SvgGradient:
     self.transform = transform
 
   def applyTransform(self, transform):
-    m = matrixmultiply(transform.matrix, self.transform.matrix)
+    m = dot(transform.matrix, self.transform.matrix)
     self.gradientDesc.SetMatrix(transform.getGMatrix(m))
 
 class SvgContext:
@@ -230,13 +230,13 @@ class SvgTransform:
         e = [float(c) for c in m.groups()]
         e = [e[0], e[2], e[4], e[1], e[3], e[5], 0, 0, 1]
         m = reshape(e, (3, 3))
-        self.matrix = matrixmultiply(self.matrix, m)
+        self.matrix = dot(self.matrix, m)
 
   def transform(self, transform):
-    self.matrix = matrixmultiply(self.matrix, transform.matrix)
+    self.matrix = dot(self.matrix, transform.matrix)
 
   def reset(self):
-    self.matrix = identity(3, typecode = Float)
+    self.matrix = identity(3, dtype = float32)
 
   def translate(self, dx, dy):
     m = zeros((3, 3))
@@ -245,20 +245,20 @@ class SvgTransform:
     self.matrix += m
 
   def rotate(self, angle):
-    m = identity(3, typecode = Float)
+    m = identity(3, dtype = float32)
     s = sin(angle)
     c = cos(angle)
     m[0, 0] =  c
     m[0, 1] = -s
     m[1, 0] =  s
     m[1, 1] =  c
-    self.matrix = matrixmultiply(self.matrix, m)
+    self.matrix = dot(self.matrix, m)
 
   def scale(self, sx, sy):
-    m = identity(3, typecode = Float)
+    m = identity(3, dtype = float32)
     m[0, 0] = sx
     m[1, 1] = sy
-    self.matrix = matrixmultiply(self.matrix, m)
+    self.matrix = dot(self.matrix, m)
 
   def applyGL(self):
     # Interpret the 2D matrix as 3D
@@ -514,6 +514,10 @@ class ImgDrawing:
       # Load PNG files directly
       if ImgData.endswith(".png"):
         self.texture = Texture(ImgData)
+      elif ImgData.endswith(".jpg"):
+        self.texture = Texture(ImgData)
+      elif ImgData.endswith(".jpeg"):
+        self.texture = Texture(ImgData)
       # Check whether we have a prerendered bitmap version of the SVG file
       elif ImgData.endswith(".svg") and os.path.exists(bitmapFile):
         Log.debug("Loading cached bitmap '%s' instead of '%s'." % (bitmapFile, ImgData))
@@ -616,18 +620,30 @@ class ImgDrawing:
       glTranslatef(-.5, -.5, 0)
       glColor4f(*color)
       
-      self.texture.bind()
+
       glEnable(GL_TEXTURE_2D)
-      glBegin(GL_TRIANGLE_STRIP)
-      glTexCoord2f(rect[0], rect[3])
-      glVertex2f(0.0-lOffset, 1.0)
-      glTexCoord2f(rect[1], rect[3])
-      glVertex2f(1.0-rOffset, 1.0)
-      glTexCoord2f(rect[0], rect[2])
-      glVertex2f(0.0+lOffset, 0.0)
-      glTexCoord2f(rect[1], rect[2])
-      glVertex2f(1.0+rOffset, 0.0)
-      glEnd()
+      self.texture.bind()
+      
+      triangVtx = array(
+        [[0.0-lOffset, 1.0],
+         [1.0-rOffset, 1.0],
+         [0.0+lOffset, 0.0],
+         [1.0+rOffset, 0.0]], dtype=float32)
+
+      textriangVtx = array(
+        [[rect[0], rect[3]],
+         [rect[1], rect[3]],
+         [rect[0], rect[2]],
+         [rect[1], rect[2]]], dtype=float32)
+
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY)    
+      glEnableClientState(GL_VERTEX_ARRAY)
+      glTexCoordPointerf(textriangVtx)
+      glVertexPointerf(triangVtx)
+      glDrawArrays(GL_TRIANGLE_STRIP, 0, triangVtx.shape[0])
+      glDisableClientState(GL_VERTEX_ARRAY)
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY)
+
       glDisable(GL_TEXTURE_2D)
     else:
       self._render(transform)
