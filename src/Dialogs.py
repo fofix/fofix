@@ -4828,7 +4828,7 @@ class KeyTester(Layer, KeyListener):
       if rotateArrow is not None:
         self.engine.drawImage(self.arrow,  scale = (.5, -.5), coord = (w*.5,h*.6), rot = rotateArrow)
       
-      #akedrou - analog starpower
+      #akedrou - analog starpower, analog slider
       text = self.names[Player.STAR]
       wText, hText = font.getStringSize(text)
       
@@ -4837,7 +4837,7 @@ class KeyTester(Layer, KeyListener):
           slideVal = -(self.engine.input.joysticks[self.whichJoySlide].get_axis(self.whichAxisSlide)+1.0)/2.0
         else:  #Default
           slideVal = (self.engine.input.joysticks[self.whichJoySlide].get_axis(self.whichAxisSlide)+1.0)/2.0
-        if slideVal > 0.9:
+        if slideVal > 0.9 or slideVal < 0.01:
           self.slideActive = 4
           self.midFret = False
         elif slideVal > 0.77:

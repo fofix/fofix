@@ -2969,7 +2969,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.starActive[i] = False
         self.starDelay[i] = 0
   
-  def handleAnalogSlider(self, playerNum):
+  def handleAnalogSlider(self, playerNum): #akedrou
     i = playerNum
     if self.resumeCountdown > 0:
       return
@@ -2979,7 +2979,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         slideVal = -(self.engine.input.joysticks[self.whichJoySlide[i]].get_axis(self.whichAxisSlide[i])+1.0)/2.0
       else:  #Default
         slideVal = (self.engine.input.joysticks[self.whichJoySlide[i]].get_axis(self.whichAxisSlide[i])+1.0)/2.0
-      if slideVal > 0.9:
+      if slideVal > 0.9 or slideVal < 0.01:
         self.slideValue[i] = 4
       elif slideVal > 0.77:
         self.slideValue[i] = 4
@@ -3014,7 +3014,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             self.controls.toggle(k, False)
             self.keyReleased3(k)
         
-        if self.slideValue[i] > 0:
+        if self.slideValue[i] > -1:
           self.handlePick(i)
   
   def markSlide(self, playerNum):
