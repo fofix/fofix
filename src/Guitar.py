@@ -127,7 +127,7 @@ class Guitar:
     self.bigRockEndings = self.engine.config.get("game", "big_rock_endings")
     
     self.boardWidth     = Theme.neckWidth
-    self.boardLength    = 9.0
+    self.boardLength    = Theme.neckLength
     #death_au: fixed neck size
     if Theme.twoDnote == False or Theme.twoDkeys == False:
       self.boardWidth     = 3.6

@@ -314,6 +314,7 @@ Config.define("theme", "song_info_display_scale",  float, 0.0020)
 #Worldrave - for song info display positioning
 Config.define("theme", "song_info_display_X",  float, 0.05)
 Config.define("theme", "song_info_display_Y",  float, 0.05)
+Config.define("theme", "neck_length",    float, 9.0)
 
 #MFH - option for Rock Band 2 theme.ini - only show # of stars you are working on
 Config.define("theme", "display_all_grey_stars",  bool, True)
@@ -542,6 +543,7 @@ songInfoDisplayX = None
 songInfoDisplayY = None
 versiontagposX = None
 versiontagposY = None
+neckLength = None
 
 #MFH - y offset = lines, x offset = spaces
 songSelectSubmenuOffsetLines = None
@@ -806,6 +808,7 @@ def setupMisc(config):
   global oBarHScale
   global oBar3dFill
   global neckWidth
+  global neckLength
 
   loadingPhrase = config.get("theme", "loading_phrase")
   resultsPhrase = config.get("theme", "results_phrase")
@@ -826,6 +829,7 @@ def setupMisc(config):
   oBarHScale = config.get("theme", "obar_hscale")
   oBar3dFill = config.get("theme", "obar_3dfill")
   neckWidth = config.get("theme", "neck_width")
+  neckLength = config.get("theme", "neck_length")
 #MFH:
 def setupSonglist(config):
   global song_cd_Xpos, song_cdscore_Xpos, song_list_Xpos, song_listscore_Xpos
