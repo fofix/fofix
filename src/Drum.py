@@ -306,10 +306,10 @@ class Drum:
     #death_au: fixed neck size
     elif self.twoDnote == False or self.twoDkeys == False:
       self.boardWidth     = Theme.neckWidth + 0.6
-      self.boardLength    = 9.0  
+      self.boardLength    = Theme.neckLength  
     else:
       self.boardWidth     = Theme.neckWidth
-      self.boardLength    = 9.0
+      self.boardLength    = Theme.neckLength
 
 
     self.muteSustainReleases = self.engine.config.get("game", "sustain_muting") #MFH
