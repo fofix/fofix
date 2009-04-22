@@ -156,7 +156,8 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||jurgen_text_pos = 1,1,0.0004||Any scale under .00035 will be resized. Any coordinates that are off the screen will automatically be moved back on to screen, and
 jurgen text is rendered above everything.||
 ||mesh_color = #000000||Use a Hex Color Value.||
-||neck_width = 3.1 || Controls how wide you want the fret board to be. Use a floating point number.||
+||neck_width = 3 || Controls how wide you want the fret board to be. Use a floating point number.||
+||neck_length = 9 || Controls how long you want the fret board to be. Use a floating point number.||
 ||obar_hscale = 0.7||Overdrive bar width scale. "1.0" makes oBar width equal to fretboard width, like in RB2.||
 ||obar_3dfill = False||Use perspective for overdrive_fill.png.||
 ||opencolor = #FF8000 ||Use a Hex Color Value. Sets the Bass drum note color for 3d notes||
