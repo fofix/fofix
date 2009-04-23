@@ -438,11 +438,11 @@ class Lobby(Layer, KeyListener, MessageHandler):
             lefty = 1
             if self.playerPrefs[j][0] == 1:
               lefty = -1
-            self.engine.drawImage(self.buttons, scale = (self.buttonScale*lefty, -self.buttonScale*(1.0/6.0)), coord = (w*Theme.lobbyPreviewX,h*.35), rect = (0, 1, 0, (1.0/6.0)))
+            self.engine.drawImage(self.buttons, scale = (self.buttonScale*lefty, -self.buttonScale*(1.0/6.0)), coord = (w*Theme.lobbyPreviewX,h*.45), rect = (0, 1, 0, (1.0/6.0)))
             if self.avatars[i] == "Empty" or self.avatars[i] == None:
               self.engine.drawImage(self.defaultAvatar, scale = (self.defAvScale,-self.defAvScale), coord = (w*Theme.lobbyPreviewX,h*.75))
             else:
-              self.engine.drawImage(self.avatars[i], scale = (self.avatarScale[i]*Theme.avatarscaleX,-self.avatarScale[i]*Theme.avatarscaleY), coord = (w*Theme.lobbyPreviewX,h*.75))
+              self.engine.drawImage(self.avatars[i], scale = (self.avatarScale[i]*Theme.avatarscaleX,-self.avatarScale[i]*Theme.avatarscaleY), coord = (w*Theme.lobbyPreviewX,h*Theme.lobbyPreviewY))
             if self.infoImg:
               self.engine.drawImage(self.infoImg, scale = (.5,-.5), coord = (w*Theme.lobbyPreviewX,h*.55))
             else:
