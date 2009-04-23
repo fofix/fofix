@@ -37,6 +37,8 @@ Then use any of the following settings below the {{{[theme]}}} header in the the
 
 ||avatarscaleX = 1|| Use this to control the X size of player's avatar. Use a floating point.||
 ||avatarscaleY = 1|| Use this to control the Y size of player's avatar. Use a floating point.||
+||avatarposX = .35|| Use this to control the X position of player's avatar. Use a floating point.||
+||avatarposY = .75|| Use this to control the Y position of player's avatar. Use a floating point.||
 ||character_create_font_color = #FFFFFF|| Controls color value of character creation font. Use a Hex Color Value ||
 ||character_create_select_color = #FFBF00|| Controls color value of character creation selected text. Use a Hex Color Value ||
 ||character_create_help_color = #FFFFFF|| Controls color value of character creation help info line. Use a Hex Color Value ||
