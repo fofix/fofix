@@ -215,6 +215,9 @@ Config.define("theme", "setlistpreviewbuttonscaleX", float, 0.5)
 Config.define("theme", "setlistpreviewbuttonscaleY", float, 0.5)
 Config.define("theme", "versiontagposX", float, 0.5)
 Config.define("theme", "versiontagposY", float, 0.5)
+Config.define("theme", "avatarscaleX", float, 1)
+Config.define("theme", "avatarscaleY", float, 1)
+Config.define("theme", "lobbypreviewY", float, .75)
 
 #evilynux
 Config.define("theme", "songlist_score_color",  str, "#93C351")
@@ -476,6 +479,9 @@ setlistpreviewbuttonposX = None
 setlistpreviewbuttonposY = None
 setlistpreviewbuttonscaleY = None
 setlistpreviewbuttonscaleY = None
+avatarscaleX = None
+avatarscaleY = None
+lobbypreviewY = None
 
 #MFH:
 song_cd_Xpos = None         #Songlist in CD mode: horizontal position of CDs/cases
@@ -941,6 +947,7 @@ def setupLobby(config):
   global characterCreateOptionFont, characterCreateHelpX, characterCreateHelpScale
   global characterCreateFontColor, characterCreateSelectColor, characterCreateHelpColor
   global lobbyFontColor, lobbySelectColor, lobbyDisableColor, lobbyTitleColor, lobbyInfoColor
+  global avatarscaleX, avatarscaleY, avatarposX, lobbypreviewY
   
   controlActivateX = config.get("theme", "control_activate_x")
   controlActivateSelectX = config.get("theme", "control_activate_select_x")
@@ -993,6 +1000,9 @@ def setupLobby(config):
   characterCreateHelpFont = config.get("theme", "character_create_help_font")
   characterCreateScale = config.get("theme", "character_create_scale")
   characterCreateSpace = config.get("theme", "character_create_space")
+  avatarscaleX = config.get("theme", "avatarscaleX")
+  avatarscaleY = config.get("theme", "avatarscaleY")
+  lobbypreviewY = config.get("theme", "lobbypreviewY")
 
 def setupTWOD(config):
   global twoDnote, twoDkeys, threeDspin, opencolor
