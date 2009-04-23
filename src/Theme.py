@@ -217,7 +217,7 @@ Config.define("theme", "versiontagposX", float, 0.5)
 Config.define("theme", "versiontagposY", float, 0.5)
 Config.define("theme", "avatarscaleX", float, 1)
 Config.define("theme", "avatarscaleY", float, 1)
-Config.define("theme", "lobbyPreviewY", float, .75)
+Config.define("theme", "lobby_preview_y", float, .75)
 
 #evilynux
 Config.define("theme", "songlist_score_color",  str, "#93C351")
@@ -1002,7 +1002,7 @@ def setupLobby(config):
   characterCreateSpace = config.get("theme", "character_create_space")
   avatarscaleX = config.get("theme", "avatarscaleX")
   avatarscaleY = config.get("theme", "avatarscaleY")
-  lobbyPreviewY = config.get("theme", "lobbyPreviewY")
+  lobbyPreviewY = config.get("theme", "lobby_preview_y")
 
 def setupTWOD(config):
   global twoDnote, twoDkeys, threeDspin, opencolor
