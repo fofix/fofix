@@ -194,6 +194,7 @@ class Drum:
     #Alarian, For animated hitglow
     self.HCount         = 0
     self.Hitanim        = True
+    self.Hitanim2       = True
 
     #myfingershurt: to keep track of pause status here as well
     self.paused = False
