@@ -4276,7 +4276,7 @@ class ControlActivator(Layer, KeyListener):
     self.controlNum = 0
     for i, control in enumerate(self.engine.input.controls.controls):
       self.controlNum += 1
-      if control == "None":
+      if control == "None" or self.engine.input.controls.type[i] == 5:
         self.controls[i] = "No Controller"
         self.blockedItems.append(i)
         self.controlNum -= 1
@@ -4362,6 +4362,8 @@ class ControlActivator(Layer, KeyListener):
     return self.confirmPlayers
   
   def delaySelect(self, num):
+    if self.engine.input.controls.type[num] == 5:
+      return
     self.engine.data.selectSound.play()
     self.delay = 500
     self.delayedIndex  = num
@@ -4544,7 +4546,7 @@ class ControlActivator(Layer, KeyListener):
         if (self.engine.input.controls.type[i] < 2 or self.engine.input.controls.type[i] == 4) and self.engine.input.controls.type[i] is not None:
           self.engine.drawImage(self.guitar, scale = (self.guitarScale, -self.guitarScale), coord = (w*self.controlPartX-(self.partSize*1.1), h*(1-(self.selectY+self.selectSpace*i)/self.engine.data.fontScreenBottom)), color = color)
           self.engine.drawImage(self.bass, scale = (self.bassScale, -self.bassScale), coord = (w*self.controlPartX+(self.partSize*1.1), h*(1-(self.selectY+self.selectSpace*i)/self.engine.data.fontScreenBottom)), color = color)
-        elif self.engine.input.controls.type[i] > 1 and self.engine.input.controls.type[i] is not None:
+        elif self.engine.input.controls.type[i] > 1 and self.engine.input.controls.type[i] not in [None, 5]:
           self.engine.drawImage(self.drum, scale = (self.drumScale, -self.drumScale), coord = (w*self.controlPartX, h*(1-(self.selectY+self.selectSpace*i)/self.engine.data.fontScreenBottom)), color = color)
       Theme.setBaseColor(1-v)
       for j, i in enumerate(self.selectedItems):

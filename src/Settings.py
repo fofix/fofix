@@ -397,6 +397,14 @@ class ControlCreator(BackgroundLayer, KeyListener):
       self.config.set("controller", "name", self.control)
     type = self.config.get("controller", "type")
     
+    if type != 5:
+      self.config.set("controller", "key_1", self.config.getDefault("controller", "key_1"))
+      self.config.set("controller", "key_2", self.config.getDefault("controller", "key_2"))
+      self.config.set("controller", "key_3", self.config.getDefault("controller", "key_3"))
+      self.config.set("controller", "key_4", self.config.getDefault("controller", "key_4"))
+      self.config.set("controller", "key_action1", self.config.getDefault("controller", "key_action1"))
+      self.config.set("controller", "key_action2", self.config.getDefault("controller", "key_action2"))
+    
     if type == 0:
       if str(self.config.get("controller", "key_5")) == "None":
         self.config.set("controller", "key_5", self.config.getDefault("controller", "key_5"))
@@ -422,7 +430,7 @@ class ControlCreator(BackgroundLayer, KeyListener):
         KeyConfigChoice(self.engine, self.config, "controller", "key_down", True),
         KeyConfigChoice(self.engine, self.config, "controller", "key_cancel"),
         KeyConfigChoice(self.engine, self.config, "controller", "key_start"),
-        KeyConfigChoice(self.engine, self.config, "controller", "key_star"),
+        KeyConfigChoice(self.engine, self.config, "controller", "key_star", True),
         KeyConfigChoice(self.engine, self.config, "controller", "key_kill"),
         ConfigChoice(   self.engine, self.config, "controller", "analog_kill", autoApply = True),
         ConfigChoice(   self.engine, self.config, "controller", "analog_sp", autoApply = True),
@@ -460,7 +468,7 @@ class ControlCreator(BackgroundLayer, KeyListener):
         KeyConfigChoice(self.engine, self.config, "controller", "key_down", True),
         KeyConfigChoice(self.engine, self.config, "controller", "key_cancel"),
         KeyConfigChoice(self.engine, self.config, "controller", "key_start"),
-        KeyConfigChoice(self.engine, self.config, "controller", "key_star"),
+        KeyConfigChoice(self.engine, self.config, "controller", "key_star", True),
         KeyConfigChoice(self.engine, self.config, "controller", "key_kill"),
         ConfigChoice(   self.engine, self.config, "controller", "analog_kill", autoApply = True),
         ConfigChoice(   self.engine, self.config, "controller", "analog_sp", autoApply = True),
@@ -567,6 +575,20 @@ class ControlCreator(BackgroundLayer, KeyListener):
         (_("Rename Controller"), self.renameController),
       ]
     elif type == 5:
+      self.config.set("controller", "key_1", None)
+      self.config.set("controller", "key_2", None)
+      self.config.set("controller", "key_3", None)
+      self.config.set("controller", "key_4", None)
+      self.config.set("controller", "key_5", None)
+      self.config.set("controller", "key_1a", None)
+      self.config.set("controller", "key_2a", None)
+      self.config.set("controller", "key_3a", None)
+      self.config.set("controller", "key_4a", None)
+      self.config.set("controller", "key_5a", None)
+      self.config.set("controller", "key_kill", None)
+      self.config.set("controller", "key_star", None)
+      self.config.set("controller", "key_action1", None)
+      self.config.set("controller", "key_action2", None)
       controlKeys = [
         ActiveConfigChoice(self.engine, self.config, "controller", "type", self.changeType),
         ConfigChoice(   self.engine, self.config, "controller", "mic_device", autoApply = True),
