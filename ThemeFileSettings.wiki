@@ -7,6 +7,11 @@ _{{{[theme]}}}_
 
 Then use any of the following settings below the {{{[theme]}}} header in the theme.ini file. This list is mostly organized by which options belong mostly to which screen, but not necessarily to JUST that screen, since some items currently control things on multiple screens.
 <wiki:toc max_depth="1" />
+<wiki:comment>
+|| This comment puts the tables underneath the nav bar on the side and makes it take up the whole width of the page ||
+|| This comment needs to contain a table for some reason, or it won't have the desired effect || ||
+</wiki:comment>
+
 -----------------------------------------------------------------------------------------
 =Main Menu=
 
