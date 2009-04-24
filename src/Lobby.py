@@ -611,7 +611,8 @@ class CreateCharacter(Layer, KeyListener):
     tsYes = _("Yes")
     q = Dialogs.chooseItem(self.engine, [tsYes, _("No")], _("Are you sure you want to reset all stats for this player?"))
     if q == tsYes:
-      Player.resetStats(self.player)
+      Dialogs.showMessage(self.engine, _("No stats saved."))
+      #Player.resetStats(self.player)
   def deleteCharacter(self):
     tsYes = _("Yes")
     q = Dialogs.chooseItem(self.engine, [tsYes, _("No")], _("Are you sure you want to delete this player?"))
