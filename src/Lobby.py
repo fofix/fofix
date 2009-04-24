@@ -110,12 +110,12 @@ class Lobby(Layer, KeyListener, MessageHandler):
       self.defAvScale = min(hFactor, wFactor)
       imgheight = self.defaultNeck.height1()
       imgwidth  = self.defaultNeck.width1()
-      hFactor = 408.00/imgheight
+      hFactor = (68.00/imgheight)*6
       wFactor = 200.00/imgwidth
       self.defNeckScale = min(hFactor, wFactor)
       imgheight = self.randomNeck.height1()
       imgwidth  = self.randomNeck.width1()
-      hFactor = 408.00/imgheight
+      hFactor = (68.00/imgheight)*6
       wFactor = 200.00/imgwidth
       self.randNeckScale = min(hFactor, wFactor)
       
@@ -225,7 +225,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
     self.necks[self.selected] = self.neck
     imgheight = self.neck.height1()
     imgwidth  = self.neck.width1()
-    hFactor = 408.00/imgheight
+    hFactor = (68.00/imgheight)*6
     wFactor = 200.00/imgwidth
     self.neckScale[self.selected] = min(hFactor, wFactor)
     self.neck = None
@@ -438,22 +438,22 @@ class Lobby(Layer, KeyListener, MessageHandler):
             lefty = 1
             if self.playerPrefs[j][0] == 1:
               lefty = -1
-            self.engine.drawImage(self.buttons, scale = (self.buttonScale*lefty, -self.buttonScale*(1.0/6.0)), coord = (w*Theme.lobbyPreviewX,h*.45), rect = (0, 1, 0, (1.0/6.0)))
+            self.engine.drawImage(self.buttons, scale = (self.buttonScale*lefty, -self.buttonScale*(1.0/6.0)), coord = (w*Theme.lobbyPreviewX,h*(Theme.lobbyPreviewY+.45)), rect = (0, 1, 0, (1.0/6.0)))
             if self.avatars[i] == "Empty" or self.avatars[i] == None:
-              self.engine.drawImage(self.defaultAvatar, scale = (self.defAvScale,-self.defAvScale), coord = (w*Theme.lobbyPreviewX,h*Theme.lobbyPreviewY))
+              self.engine.drawImage(self.defaultAvatar, scale = (self.defAvScale,-self.defAvScale), coord = (w*Theme.lobbyPreviewX,h*(Theme.lobbyPreviewY+.75)))
             else:
-              self.engine.drawImage(self.avatars[i], scale = (self.avatarScale[i]*Theme.avatarscaleX,-self.avatarScale[i]*Theme.avatarscaleY), coord = (w*Theme.avatarposX,h*Theme.avatarposY))
+              self.engine.drawImage(self.avatars[i], scale = (self.avatarScale[i],-self.avatarScale[i]), coord = (w*Theme.lobbyPreviewX,h*(Theme.lobbyPreviewY+.75)))
             if self.infoImg:
-              self.engine.drawImage(self.infoImg, scale = (.5,-.5), coord = (w*Theme.lobbyPreviewX,h*.55))
+              self.engine.drawImage(self.infoImg, scale = (.5,-.5), coord = (w*Theme.lobbyPreviewX,h*(Theme.lobbyPreviewY+.55)))
             else:
               wText, hText = titleFont.getStringSize(self.tsInfo, scale = .0025)
-              titleFont.render(self.tsInfo, (Theme.lobbyPreviewX-wText/2, (.45*self.engine.data.fontScreenBottom)-hText/2), scale = .0025)
+              titleFont.render(self.tsInfo, (Theme.lobbyPreviewX-wText/2, ((.45-Theme.lobbyPreviewY)*self.engine.data.fontScreenBottom)-hText/2), scale = .0025)
             r, g, b = Theme.lobbyInfoColor
             glColor3f(r, g, b)
             for k in range(1,5):
               text = self.tsList[k][self.playerPrefs[j][k]]
               wText, hText = font.getStringSize(text, scale = .0018)
-              font.render(text, (Theme.lobbyPreviewX-wText/2,.4+(.04*k)), scale = .0018)
+              font.render(text, (Theme.lobbyPreviewX-wText/2,.4-(Theme.lobbyPreviewY*self.engine.data.fontScreenBottom)+(.04*k)), scale = .0018)
           if self.itemSelect:
             self.engine.drawImage(self.itemSelect, scale = (.5,-.5), coord = (w*Theme.lobbySelectImageX,h*(1-(Theme.lobbySelectImageY+Theme.lobbySelectSpace*(i-self.pos[0]))/self.engine.data.fontScreenBottom)))
           else:

@@ -172,6 +172,7 @@ Config.define("theme", "control_check_space", float, 0.23)
 Config.define("theme", "control_check_scale", float, 0.0018)
 Config.define("theme", "control_check_font", str, "font")
 Config.define("theme", "lobby_preview_x", float, 0.7)
+Config.define("theme", "lobby_preview_y", float, 0.7) #worldrave
 Config.define("theme", "lobby_title_x", float, 0.5)
 Config.define("theme", "lobby_title_y", float, 0.07)
 Config.define("theme", "lobby_title_character_x", float, 0.26)
@@ -215,10 +216,6 @@ Config.define("theme", "setlistpreviewbuttonscaleX", float, 0.5)
 Config.define("theme", "setlistpreviewbuttonscaleY", float, 0.5)
 Config.define("theme", "versiontagposX", float, 0.5)
 Config.define("theme", "versiontagposY", float, 0.5)
-Config.define("theme", "avatarscaleX", float, 1)
-Config.define("theme", "avatarscaleY", float, 1)
-Config.define("theme", "avatarposX", float, .3)
-Config.define("theme", "avatarposY", float, .75)
 
 #evilynux
 Config.define("theme", "songlist_score_color",  str, "#93C351")
@@ -439,6 +436,7 @@ controlCheckSpace = None
 controlCheckScale = None
 controlCheckFont  = None
 lobbyPreviewX = None
+lobbyPreviewY = None #worldrave
 lobbyTitleX = None
 lobbyTitleY = None
 lobbyTitleCharacterX = None
@@ -480,10 +478,6 @@ setlistpreviewbuttonposX = None
 setlistpreviewbuttonposY = None
 setlistpreviewbuttonscaleY = None
 setlistpreviewbuttonscaleY = None
-avatarscaleX = None
-avatarscaleY = None
-avatarposX = None
-avatarposY = None
 
 #MFH:
 song_cd_Xpos = None         #Songlist in CD mode: horizontal position of CDs/cases
@@ -943,13 +937,12 @@ def setupLobby(config):
   global controlDescriptionX, controlDescriptionY, controlDescriptionScale, controlDescriptionFont, controlCheckSpace
   global controlCheckX, controlCheckY, controlCheckScale, controlCheckPartMult, controlCheckFont, lobbyPreviewX
   global lobbyTitleX, lobbyTitleY, lobbyTitleScale, lobbyTitleCharacterX, lobbyTitleCharacterY, lobbySelectScale
-  global lobbySelectImageX, lobbySelectImageY, lobbySelectSpace, characterCreateHelpY
+  global lobbySelectImageX, lobbySelectImageY, lobbySelectSpace, characterCreateHelpY, lobbyPreviewY
   global lobbyTitleFont, lobbySelectX, lobbySelectY, lobbySelectFont, characterCreateX, characterCreateY
   global characterCreateOptionX, characterCreateScale, characterCreateSpace, characterCreateHelpFont
   global characterCreateOptionFont, characterCreateHelpX, characterCreateHelpScale
   global characterCreateFontColor, characterCreateSelectColor, characterCreateHelpColor
   global lobbyFontColor, lobbySelectColor, lobbyDisableColor, lobbyTitleColor, lobbyInfoColor
-  global avatarscaleX, avatarscaleY, avatarposX, avatarposY
   
   controlActivateX = config.get("theme", "control_activate_x")
   controlActivateSelectX = config.get("theme", "control_activate_select_x")
@@ -971,6 +964,7 @@ def setupLobby(config):
   controlCheckSpace = config.get("theme", "control_check_space")
   controlCheckFont  = config.get("theme", "control_check_font")
   lobbyPreviewX = config.get("theme", "lobby_preview_x")
+  lobbyPreviewY = config.get("theme", "lobby_preview_y")
   lobbyTitleX = config.get("theme", "lobby_title_x")
   lobbyTitleY = config.get("theme", "lobby_title_y")
   lobbyTitleCharacterX = config.get("theme", "lobby_title_character_x")
@@ -1002,12 +996,6 @@ def setupLobby(config):
   characterCreateHelpFont = config.get("theme", "character_create_help_font")
   characterCreateScale = config.get("theme", "character_create_scale")
   characterCreateSpace = config.get("theme", "character_create_space")
-  avatarscaleX = config.get("theme", "avatarscaleX")
-  avatarscaleY = config.get("theme", "avatarscaleY")
-  avatarposX = config.get("theme", "avatarposX")
-  avatarposY = config.get("theme", "avatarposY")
-  lobbypreviewY = config.get("theme", "lobbypreviewY")
-
 
 def setupTWOD(config):
   global twoDnote, twoDkeys, threeDspin, opencolor
