@@ -50,7 +50,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
     self.delay        = 0
     self.scroller     = [0, self.scrollUp, self.scrollDown]
     self.gameStarted  = False
-    self.first        = True
+    self.done         = True
     self.active       = False
     self.neckB        = 5.0/6.0
     self.neckT        = 1
@@ -145,6 +145,9 @@ class Lobby(Layer, KeyListener, MessageHandler):
     self.options.extend(self.playerNames)
     if self.selected >= len(self.options):
       self.selected = len(self.options) - 1
+    self.blockedItems = [1]
+    for i in self.selectedItems:
+      self.blockedItems.append(self.options.index(i))
     self.avatars = [None for i in self.options]
     self.avatarScale = [None for i in self.options]
     self.necks   = [None for i in self.options]
@@ -281,7 +284,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
         self.playerNum += 1
         self.blockedItems.append(self.selected)
         self.blockedItems.sort()
-        self.selectedItems.append(self.selected)
+        self.selectedItems.append(self.options[self.selected])
         if self.playerNum >= self.players:
           self.gameStarted = True
           self.engine.menuMusic = False
@@ -464,13 +467,8 @@ class Lobby(Layer, KeyListener, MessageHandler):
             r, g, b = Theme.lobbyDisableColor
             glColor3f(r, g, b)
           else:
-            if i == self.selected:
-              if self.itemSelect:
-                r, g, b = Theme.lobbyFontColor
-                glColor3f(r, g, b)
-            else:
-              r, g, b = Theme.lobbyFontColor
-              glColor3f(r, g, b)
+            r, g, b = Theme.lobbyFontColor
+            glColor3f(r, g, b)
         if i == 1:
           wText, hText = titleFont.getStringSize(name, scale = Theme.lobbySelectScale)
           titleFont.render(name, (Theme.lobbySelectX-wText, Theme.lobbySelectY + (Theme.lobbySelectSpace*(i-self.pos[0]))), scale = Theme.lobbySelectScale)
@@ -485,10 +483,10 @@ class Lobby(Layer, KeyListener, MessageHandler):
     if not visibility:
       self.active = False
       return
-    if not self.active and not self.first:
+    if not self.active:
       self.getPlayers()
     self.active = True
-    self.first  = False
+    self.done   = True
     if self.singlePlayer:
       self.renderLocalLobby(visibility, topMost)
       return

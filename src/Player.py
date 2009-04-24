@@ -896,10 +896,6 @@ class Player(object):
   cache = property(getCache, setCache)
   
   def pack(self):
-    try:
-      self.cache.close()
-    except:
-      pass
     self.cache = None
   
   def getName(self):
