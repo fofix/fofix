@@ -193,6 +193,7 @@ class Drum:
     self.indexCount     = 0
     #Alarian, For animated hitglow
     self.HCount         = 0
+    self.HCount2        = 0
     self.Hitanim        = True
     self.Hitanim2       = True
 
