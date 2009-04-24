@@ -33,6 +33,7 @@ import os
 import sys
 from Language import _
 #import Dialogs
+import Microphone  #stump
 
 #stump: turns out the sqlite3 module didn't appear until Python 2.5...
 try:
@@ -166,7 +167,6 @@ Config.define("controller", "key_cancel",    str, "K_ESCAPE",   text = _("Cancel
 Config.define("controller", "key_star",      str, "K_PAGEDOWN", text = _("StarPower"))
 Config.define("controller", "key_kill",      str, "K_PAGEUP",   text = _("Whammy"))
 Config.define("controller", "key_start",     str, "K_SPACE",    text = _("Start"))
-Config.define("controller", "type",          int, 0,            text = _("Controller Type"), options = {0: _("Standard Guitar"), 1: _("Solo Shift Guitar"), 2: _("Drum Set (4-Drum)"), 4: _("Analog Slide Guitar")}) #, 3: _("Drum Set (3-Drum 2-Cymbal)") 
 Config.define("controller", "two_chord_max", int, 0,            text = _("Two-Chord Max"),   options = {0: _("Off"), 1: _("On")})
 Config.define("controller", "analog_sp",     int, 0,            text = _("Analog SP"),       options = {0: _("Disabled"), 1: _("Enabled")})
 Config.define("controller", "analog_sp_threshold",   int, 60,   text = _("Analog SP Threshold"), options = dict([(n, n) for n in range(10, 101, 10)]))
@@ -175,6 +175,14 @@ Config.define("controller", "analog_drum",   int, 0,            text = _("Analog
 Config.define("controller", "analog_slide",  int, 0,            text = _("Analog Slider"),    options = {0: _("Default"), 1: _("Inverted")})
 Config.define("controller", "analog_kill",   int, 0,            text = _("Analog Effects"),  options = {0: _("Disabled"), 1: _("PS2/PS3/Wii"), 2: _("XBOX"), 3: _("XBOX Inv.")})
 Config.define("controller", "analog_fx",     int, 0,            text = _("Sound FX Switch"), options = {0: _("Switch"), 1: _("Cycle")}) #akedrou - aren't I bold!
+Config.define("controller", "mic_device",    int, -1,           text = _("Microphone Device"), options = Microphone.getAvailableMics()) #stump
+Config.define("controller", "mic_tap_sensitivity", int, 5,      text = _("Tap Sensitivity"), options=dict((n, n) for n in range(1, 21))) #stump
+
+def defineControllerTypes():  #stump: so this can be deferred until we have a working config file
+  type_dict = {0: _("Standard Guitar"), 1: _("Solo Shift Guitar"), 2: _("Drum Set (4-Drum)"), 4: _("Analog Slide Guitar")} #, 3: _("Drum Set (3-Drum 2-Cymbal)")
+  if Config.get("game", "mic_features_enabled"):
+    type_dict[5] = _("Microphone")
+  Config.define("controller", "type", int, 0, text = _("Controller Type"), options = type_dict)
 
 Config.define("player", "name",          str,  "")
 Config.define("player", "difficulty",    int,  Song.MED_DIF)
@@ -455,6 +463,7 @@ class Controls:
     self.maxplayers = 0
     self.guitars    = 0
     self.drums      = 0
+    self.mics       = 0
     self.overlap    = []
     
     self.p2Nav = Config.get("game", "p2_menu_nav")
@@ -491,13 +500,17 @@ class Controls:
     self.analogSlide = []
     self.analogFX   = []
     self.twoChord   = []
+    self.micDevice  = []  #stump
+    self.micTapSensitivity = []
     
     self.flags = 0
     
     for i in self.config:
       if i:
         type = i.get("controller", "type")
-        if type > 1:
+        if type == 5:
+          self.mics += 1
+        elif type > 1:
           self.guitars += 1
         else:
           self.drums += 1
@@ -509,6 +522,8 @@ class Controls:
         self.analogDrum.append(i.get("controller", "analog_drum"))
         self.analogSlide.append(i.get("controller", "analog_slide"))
         self.analogFX.append(i.get("controller", "analog_fx"))
+        self.micDevice.append(i.get("controller", "mic_device"))  #stump
+        self.micTapSensitivity.append(i.get("controller", "mic_tap_sensitivity"))
         self.twoChord.append(i.get("controller", "two_chord_max"))
         self.controlList.append(i.get("controller", "name"))
       else:
@@ -578,6 +593,14 @@ class Controls:
           menuDown.append(CONTROLS[i][DOWN])
           menuNext.append(CONTROLS[i][RIGHT])
           menuPrev.append(CONTROLS[i][LEFT])
+      elif self.type[i] == 5:  #stump: it's a mic
+        if self.p2Nav == 1 or (self.p2Nav == 0 and i == 0):
+          menuUp.append(CONTROLS[i][UP])
+          menuDown.append(CONTROLS[i][DOWN])
+          menuNext.append(CONTROLS[i][RIGHT])
+          menuPrev.append(CONTROLS[i][LEFT])
+          menuYes.append(CONTROLS[i][START])
+          menuNo.append(CONTROLS[i][CANCEL])
       elif self.type[i] > -1:
         if self.type[i] == 0:
           key1s.extend([CONTROLS[i][KEY1], CONTROLS[i][KEY1A]])

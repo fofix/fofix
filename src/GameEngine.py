@@ -355,6 +355,8 @@ Config.define("game", "songlist_extra_stats", bool, True, text = _("Show Additio
 
 Config.define("game", "songlist_instrument", int, 0, text = _("Instrument (Setlist Score)"), options = {0: "Guitar", 1: "Rhythm", 2: "Bass", 3: "Lead", 4: "Drums"}  )  #MFH
 
+Config.define("game", "mic_features_enabled", bool, False)  #stump: used internally
+
 
 class FullScreenSwitcher(KeyListener):
   """
@@ -504,6 +506,8 @@ class GameEngine(Engine):
     geometry = (0, 0, w, h)
     self.svg = SvgContext(geometry)
     glViewport(int(viewport[0]), int(viewport[1]), int(viewport[2]), int(viewport[3]))
+
+    Player.defineControllerTypes()  #stump
 
     self.input     = Input()
     self.view      = View(self, geometry)

@@ -566,6 +566,19 @@ class ControlCreator(BackgroundLayer, KeyListener):
         #ConfigChoice(   self.engine, self.config, "controller", "analog_fx", autoApply = True),
         (_("Rename Controller"), self.renameController),
       ]
+    elif type == 5:
+      controlKeys = [
+        ActiveConfigChoice(self.engine, self.config, "controller", "type", self.changeType),
+        ConfigChoice(   self.engine, self.config, "controller", "mic_device", autoApply = True),
+        KeyConfigChoice(self.engine, self.config, "controller", "key_left", True),
+        KeyConfigChoice(self.engine, self.config, "controller", "key_right", True),
+        KeyConfigChoice(self.engine, self.config, "controller", "key_up", True),
+        KeyConfigChoice(self.engine, self.config, "controller", "key_down", True),
+        KeyConfigChoice(self.engine, self.config, "controller", "key_cancel"),
+        KeyConfigChoice(self.engine, self.config, "controller", "key_start"),
+        ConfigChoice(   self.engine, self.config, "controller", "mic_tap_sensitivity", autoApply = True),
+        (_("Rename Controller"), self.renameController),
+      ]
     self.menu = Menu.Menu(self.engine, controlKeys, onCancel = self.cancel)
     self.engine.view.pushLayer(self.menu)
   

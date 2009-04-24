@@ -56,6 +56,9 @@ import Shader
 #myfingershurt: drums :)
 import Drum
 
+#stump: vocals
+import Microphone
+
 # evilynux - MFH-Alarian Mod credits
 from Credits import Credits
 
@@ -4671,6 +4674,11 @@ class KeyTester(Layer, KeyListener):
                              _("Select"), _("Drum #1"), None, _("Drum #2"), None, \
                              _("Drum #3"), None, None, None, _("Drum #4"), \
                              None, _("Bass Drum"), None, _("Starpower!"), _("None")]
+    elif self.type == 5:
+      self.names          = [_("Left"), _("Right"), _("Up"), _("Down"), _("Start"), \
+                             _("Select"), None, None, None, None, \
+                             None, None, None, None, None, \
+                             None, None, None, _("Starpower!"), None]
     else:
       colors              = Theme.fretColors
       self.fretColors     = [colors[1], colors[2], colors[3], colors[4], colors[0]]
@@ -4733,9 +4741,15 @@ class KeyTester(Layer, KeyListener):
         self.isSlideAnalog, self.whichJoySlide, self.whichAxisSlide = self.engine.input.getWhammyAxis(SlideKeyCode)
     
   def shown(self):
+    if self.type == 5:
+      self.mic = Microphone.Microphone(self.engine, self.controlNum)
+      self.mic.start()
     self.engine.input.addKeyListener(self, priority = True)
   
   def hidden(self):
+    if hasattr(self, 'mic'):
+      self.mic.stop()
+      del self.mic
     self.engine.input.removeKeyListener(self)
     
   def keyPressed(self, key, unicode):
@@ -4747,7 +4761,7 @@ class KeyTester(Layer, KeyListener):
       return True
     c = self.engine.input.controls.getMapping(key)
     self.controls.keyPressed(key)
-    if self.type > 1 and self.type != 4:
+    if self.type > 1 and self.type not in (4, 5):
       if c == self.keyList[Player.DRUM1]:
         self.engine.data.T1DrumSound.play()
       elif c == self.keyList[Player.DRUM2]:
@@ -4827,69 +4841,69 @@ class KeyTester(Layer, KeyListener):
       self.engine.drawImage(self.circle, scale = (.5, -.5), coord = (w*.5,h*.6))
       if rotateArrow is not None:
         self.engine.drawImage(self.arrow,  scale = (.5, -.5), coord = (w*.5,h*.6), rot = rotateArrow)
-      
-      #akedrou - analog starpower, analog slider
-      text = self.names[Player.STAR]
-      wText, hText = font.getStringSize(text)
-      
-      if self.isSlideAnalog:
-        if self.analogSlideMode == 1:  #Inverted mode
-          slideVal = -(self.engine.input.joysticks[self.whichJoySlide].get_axis(self.whichAxisSlide)+1.0)/2.0
-        else:  #Default
-          slideVal = (self.engine.input.joysticks[self.whichJoySlide].get_axis(self.whichAxisSlide)+1.0)/2.0
-        if slideVal > 0.9 or slideVal < 0.01:
-          self.slideActive = 4
-          self.midFret = False
-        elif slideVal > 0.77:
-          self.slideActive = 4
-          self.midFret = True
-        elif slideVal > 0.68:
-          self.slideActive = 3
-          self.midFret = False
-        elif slideVal > 0.60:
-          self.slideActive = 3
-          self.midFret = True
-        elif slideVal > 0.54:
-          self.slideActive = 2
-          self.midFret = False
-        elif slideVal > 0.43:
-          self.slideActive = -1
-          self.midFret = False
-        elif slideVal > 0.34:
-          self.slideActive = 2
-          self.midFret = True
-        elif slideVal > 0.28:
-          self.slideActive = 1
-          self.midFret = False
-        elif slideVal > 0.16:
-          self.slideActive = 1
-          self.midFret = True
-        else:
-          self.slideActive = 0
-          self.midFret = False
 
-      
-      if self.isSPAnalog:
-        starThresh = (self.analogSPThresh/100.0)*(w/6.0)-(w/12.0)
-        self.engine.drawImage(self.analogThresh, scale = (self.analogThreshScale, -self.analogThreshScale), coord = ((w*.25)+starThresh, h*.3))
-        #(0.0 at level, -1 upright; 1 upside down)
-        self.starpower = abs(self.engine.input.joysticks[self.whichJoyStar].get_axis(self.whichAxisStar))
+      if self.type != 5:
+        #akedrou - analog starpower, analog slider
+        text = self.names[Player.STAR]
+        wText, hText = font.getStringSize(text)
 
-      if self.starpower > 0:
-        if self.starpowerActive:
-          Theme.setSelectedColor(1 - v)
+        if self.isSlideAnalog:
+          if self.analogSlideMode == 1:  #Inverted mode
+            slideVal = -(self.engine.input.joysticks[self.whichJoySlide].get_axis(self.whichAxisSlide)+1.0)/2.0
+          else:  #Default
+            slideVal = (self.engine.input.joysticks[self.whichJoySlide].get_axis(self.whichAxisSlide)+1.0)/2.0
+          if slideVal > 0.9 or slideVal < 0.01:
+            self.slideActive = 4
+            self.midFret = False
+          elif slideVal > 0.77:
+            self.slideActive = 4
+            self.midFret = True
+          elif slideVal > 0.68:
+            self.slideActive = 3
+            self.midFret = False
+          elif slideVal > 0.60:
+            self.slideActive = 3
+            self.midFret = True
+          elif slideVal > 0.54:
+            self.slideActive = 2
+            self.midFret = False
+          elif slideVal > 0.43:
+            self.slideActive = -1
+            self.midFret = False
+          elif slideVal > 0.34:
+            self.slideActive = 2
+            self.midFret = True
+          elif slideVal > 0.28:
+            self.slideActive = 1
+            self.midFret = False
+          elif slideVal > 0.16:
+            self.slideActive = 1
+            self.midFret = True
+          else:
+            self.slideActive = 0
+            self.midFret = False
+
+        if self.isSPAnalog:
+          starThresh = (self.analogSPThresh/100.0)*(w/6.0)-(w/12.0)
+          self.engine.drawImage(self.analogThresh, scale = (self.analogThreshScale, -self.analogThreshScale), coord = ((w*.25)+starThresh, h*.3))
+          #(0.0 at level, -1 upright; 1 upside down)
+          self.starpower = abs(self.engine.input.joysticks[self.whichJoyStar].get_axis(self.whichAxisStar))
+
+        if self.starpower > 0:
+          if self.starpowerActive:
+            Theme.setSelectedColor(1 - v)
+          else:
+            glColor3f(.4, .4, .4)
+          font.render(text, (.25-wText/2, .45 + v))
+          starC = (1-self.starpower)*self.analogBar.width1()*self.analogBarScale*((w/384.0)-1.0/6.0) #...not really...
+          self.engine.drawImage(self.analogBar, scale = (self.analogBarScale*self.starpower, -self.analogBarScale), coord = ((w*.25)-starC, h*.3), rect = (0, self.starpower, 0, 1), stretched = 11)
+          self.engine.drawImage(self.analogBox, scale = (self.analogBoxScale, -self.analogBoxScale), coord = (w*.25, h*.3), stretched = 11)
         else:
-          glColor3f(.4, .4, .4)
-        font.render(text, (.25-wText/2, .45 + v))
-        starC = (1-self.starpower)*self.analogBar.width1()*self.analogBarScale*((w/384.0)-1.0/6.0) #...not really...
-        self.engine.drawImage(self.analogBar, scale = (self.analogBarScale*self.starpower, -self.analogBarScale), coord = ((w*.25)-starC, h*.3), rect = (0, self.starpower, 0, 1), stretched = 11)
-        self.engine.drawImage(self.analogBox, scale = (self.analogBoxScale, -self.analogBoxScale), coord = (w*.25, h*.3), stretched = 11)
-      else:
-        if self.controls.getState(self.keyList[Player.STAR]):
-          Theme.setSelectedColor(1 - v)
-        else:
-          glColor3f(.4, .4, .4)
-        font.render(text, (.25-wText/2, .45 + v))
+          if self.controls.getState(self.keyList[Player.STAR]):
+            Theme.setSelectedColor(1 - v)
+          else:
+            glColor3f(.4, .4, .4)
+          font.render(text, (.25-wText/2, .45 + v))
         
       if self.controls.getState(self.keyList[Player.CANCEL]):
         glColor3f(.6, 0, 0)
@@ -4977,7 +4991,34 @@ class KeyTester(Layer, KeyListener):
           glColor3f(.4, .4, .4)
         wText, hText = font.getStringSize(self.names[Player.ACTION1])
         font.render(self.names[Player.ACTION1], (.5-wText/2, .55 + v))
-      
+
+      elif self.type == 5:
+        Theme.setBaseColor(1 - v)
+        font.render(_('Level:'), (.3, .4 + v))
+        font.render(_('Note:'), (.3, .6 + v))
+
+        peakvol = self.mic.getPeak()
+        if peakvol < -5.0:
+          colorval = min(1.0, .4 + max(0.0, (peakvol+30.0) * .6 / 25.0))
+          glColor3f(colorval, colorval, colorval)
+        else:
+          glColor3f(1.0, max(0.0, min(1.0, (peakvol/-5.0))), max(0.0, min(1.0, (peakvol/-5.0))))
+        font.render('%5.3f dB' % peakvol, (.55, .4 + v))
+
+        if self.mic.getTap():
+          Theme.setBaseColor(1 - v)
+        else:
+          glColor3f(.4, .4, .4)
+        font.render(_('Tap'), (.55, .5 + v))
+
+        semitones = self.mic.getSemitones()
+        if semitones is None:
+          glColor3f(.4, .4, .4)
+          font.render(_('None'), (.55, .6 + v))
+        else:
+          Theme.setBaseColor(1 - v)
+          font.render(Microphone.getNoteName(semitones), (.55, .6 + v))
+
       elif self.type > 1:
         if self.type == 2:
           drumList = [self.keyList[Player.DRUM1], self.keyList[Player.DRUM1A], self.keyList[Player.DRUM2], self.keyList[Player.DRUM2A], \
@@ -5133,8 +5174,11 @@ def testKeys(engine, control, prompt = _("Play with the keys and press Escape wh
   @param engine:  Game engine
   @param prompt:  Prompt shown to the user
   """
-  d = KeyTester(engine, control, prompt = prompt)
-  _runDialog(engine, d)
+  if engine.input.controls.type[control] == 5 and not Microphone.supported:
+    showMessage(engine, 'At least one required module (pyaudio or pypitch) is missing.')
+  else:
+    d = KeyTester(engine, control, prompt = prompt)
+    _runDialog(engine, d)
 
 def showLoadingScreen(engine, condition, text = _("Loading..."), allowCancel = False):
   """
