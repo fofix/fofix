@@ -172,7 +172,7 @@ Config.define("theme", "control_check_space", float, 0.23)
 Config.define("theme", "control_check_scale", float, 0.0018)
 Config.define("theme", "control_check_font", str, "font")
 Config.define("theme", "lobby_preview_x", float, 0.7)
-Config.define("theme", "lobby_preview_y", float, 0.7) #worldrave
+Config.define("theme", "lobby_preview_y", float, 0.0) #worldrave
 Config.define("theme", "lobby_title_x", float, 0.5)
 Config.define("theme", "lobby_title_y", float, 0.07)
 Config.define("theme", "lobby_title_character_x", float, 0.26)
