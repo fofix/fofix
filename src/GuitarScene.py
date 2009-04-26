@@ -896,7 +896,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     for theGuitar in self.guitars:    #MFH - force update of early hit window
       theGuitar.earlyHitWindowSizeFactor = tempEarlyHitWindowSizeFactor
       theGuitar.actualBpm = 0.0
-      theGuitar.currentBpm = 120.0
+      theGuitar.currentBpm = Song.DEFAULT_BPM
       theGuitar.setBPM(theGuitar.currentBpm)
 
     #if self.starpowerMode == 2:     #auto-MIDI mode only
@@ -2821,11 +2821,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     tempEventHolder = song.tempoEventTrack.getNextTempoChange(pos)
     if tempEventHolder:
       time, event = tempEventHolder
-      if (pos - time > self.currentPeriod or self.lastBpmChange < 0) and time > self.lastBpmChange:
+      #if (pos - time > self.currentPeriod or self.lastBpmChange < 0) and time > self.lastBpmChange:
+      if ( (time < pos or self.lastBpmChange < 0) or (pos - time < self.currentPeriod or self.lastBpmChange < 0) ) and time > self.lastBpmChange:
         self.baseBeat         += (time - self.lastBpmChange) / self.currentPeriod
         #self.targetBpm = song.tempoEventTrack.getCurrentTempo(pos)
         self.targetBpm = event.bpm
         song.tempoEventTrack.currentIndex += 1  #MFH = manually increase current event
+        
         self.lastBpmChange     = time
 
     #adjust tempo gradually to meet new target:

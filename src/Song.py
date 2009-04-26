@@ -1492,6 +1492,7 @@ class TempoTrack(Track):    #MFH - special Track type for tempo events
 
   def getNextTempoChange(self, pos):  #MFH
     if self.currentIndex:
+      #return self.getNextEvent(lookAhead = 1)
       return self.getNextEvent()
     return None 
   
