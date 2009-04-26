@@ -556,6 +556,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.starFillupColor = Theme.starFillupColor
     self.starContinuousAvailable = self.engine.config.get("performance", "star_continuous_fillup") and \
       None not in (self.starFillupCenterX, self.starFillupCenterY, self.starFillupInRadius, self.starFillupOutRadius, self.starFillupColor)
+    self.showBpm = self.engine.config.get("debug",   "show_bpm")    #MFH
 
     self.logLyricEvents = self.engine.config.get("log",   "log_lyric_events")
     #self.logTempoEvents = self.engine.config.get("log",   "log_tempo_events")
@@ -8000,7 +8001,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   font.render(text, (killXpos - w / 2, killYpos),(1, 0, 0),killTsize)     #off to the right slightly above fretboard
             glColor3f(1, 1, 1)  #whitey reset (cracka cracka)
 
-            #MFH - TODO - freestyle active status debug display
+            #MFH - freestyle active status debug display
             if self.showFreestyleActive == 1 and not self.pause and not self.failed:    #MFH - shows when freestyle is active
               if self.guitars[i].isDrum:    #also show the active status of drum fills
                 text = "BRE: %s, Fill: %s" % ( str(self.guitars[i].freestyleActive), str(self.guitars[i].drumFillsActive) )
@@ -8010,6 +8011,18 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               freeY = .510
               freeTsize = 0.00150
               font.render(text, (freeX, freeY),(1, 0, 0),freeTsize)
+
+
+
+            #MFH - TODO - show current tempo / BPM and neckspeed if enabled for debugging
+            if self.showBpm == 1:
+              text = "BPM/Target:%.2f/%.2f, NS:%.2f" % (self.currentBpm, self.targetBpm, self.guitars[i].neckSpeed)
+              bpmX = .35
+              bpmY = .330
+              bpmTsize = 0.00120
+              font.render(text, (bpmX, bpmY),(1, 0, 0),bpmTsize)
+
+
     
             #myfingershurt: lyrical display conditional logic:
             # show the comments (lyrics)

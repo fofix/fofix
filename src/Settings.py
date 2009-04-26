@@ -867,6 +867,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "debug",   "use_unedited_midis", autoApply = True),#myfingershurt
       #ConfigChoice(engine.config, "game", "font_rendering_mode", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "debug",   "show_freestyle_active", autoApply = True),#myfingershurt
+      ConfigChoice(engine, engine.config, "debug",   "show_bpm", autoApply = True),#myfingershurt
     ]
     self.debugSettingsMenu = Menu.Menu(engine, self.debugSettings)
     
