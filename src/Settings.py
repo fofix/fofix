@@ -398,12 +398,18 @@ class ControlCreator(BackgroundLayer, KeyListener):
     type = self.config.get("controller", "type")
     
     if type != 5:
-      self.config.set("controller", "key_1", self.config.getDefault("controller", "key_1"))
-      self.config.set("controller", "key_2", self.config.getDefault("controller", "key_2"))
-      self.config.set("controller", "key_3", self.config.getDefault("controller", "key_3"))
-      self.config.set("controller", "key_4", self.config.getDefault("controller", "key_4"))
-      self.config.set("controller", "key_action1", self.config.getDefault("controller", "key_action1"))
-      self.config.set("controller", "key_action2", self.config.getDefault("controller", "key_action2"))
+      if str(self.config.get("controller", "key_1")) == "None":
+        self.config.set("controller", "key_1", self.config.getDefault("controller", "key_1"))
+      if str(self.config.get("controller", "key_2")) == "None":
+        self.config.set("controller", "key_2", self.config.getDefault("controller", "key_2"))
+      if str(self.config.get("controller", "key_3")) == "None":
+        self.config.set("controller", "key_3", self.config.getDefault("controller", "key_3"))
+      if str(self.config.get("controller", "key_4")) == "None":
+        self.config.set("controller", "key_4", self.config.getDefault("controller", "key_4"))
+      if str(self.config.get("controller", "key_action1")) == "None":
+        self.config.set("controller", "key_action1", self.config.getDefault("controller", "key_action1"))
+      if str(self.config.get("controller", "key_action2")) == "None":
+        self.config.set("controller", "key_action2", self.config.getDefault("controller", "key_action2"))
     
     if type == 0:
       if str(self.config.get("controller", "key_5")) == "None":
