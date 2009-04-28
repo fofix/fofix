@@ -255,6 +255,16 @@ Config.define("game", "beat_claps",          bool, False,  text = _("Practice Be
 Config.define("game", "board_speed",      int,   0) #racer
 Config.define("game", "HSMovement",      int,   1,   text = _("Change Score Display"),    options = {0: _("Auto"), 1: _("Blue Fret (#4)")}) #racer
 
+#Q
+Config.define("game", "battle_Whammy",      int,   1,   text = _("Whammy"),    options = {0: _("Off"), 1: _("On")}) 
+Config.define("game", "battle_Diff_Up",      int,   1,   text = _("Difficulty Up"),    options = {0: _("Off"), 1: _("On")}) 
+Config.define("game", "battle_String_Break",      int,   1,   text = _("String Break"),    options = {0: _("Off"), 1: _("On")}) 
+Config.define("game", "battle_Double",      int,   1,   text = _("Double Notes"),    options = {0: _("Off"), 1: _("On")}) 
+Config.define("game", "battle_Death_Drain",      int,   2,   text = _("Death Drain"),    options = {0: _("Off"), 1: _("On"), 2: _("Sudden Death Only")}) 
+Config.define("game", "battle_Amp_Overload",      int,   1,   text = _("Amp Overload"),    options = {0: _("Off"), 1: _("On")}) 
+Config.define("game", "battle_Switch_Controls",      int,   1,   text = _("Switch Controls"),    options = {0: _("Off"), 1: _("On")}) 
+Config.define("game", "battle_Steal",      int,   1,   text = _("Steal Object"),    options = {0: _("Off"), 1: _("On")}) 
+Config.define("game", "battle_Tune",      int,   1,   text = _("Guitar Tune"),    options = {0: _("Off"), 1: _("On")}) 
 
 #blazingamer
 Config.define("game", "congrats",       bool, True,     text = _("Score SFX"),             options = {True: _("On"), False: _("Off")})#blazingamer

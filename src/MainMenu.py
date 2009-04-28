@@ -231,6 +231,7 @@ class MainMenu(BackgroundLayer):
       multPlayerMenu = [
         (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
         (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
+        (_("GH Battle"), lambda: self.newLocalGame(players = 2, mode2p = 6)),
         (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
         (_("Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 5)),
         (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),   #Worldrave - Re-added this option for now.

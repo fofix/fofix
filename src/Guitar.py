@@ -32,6 +32,7 @@ from Song import Note, Tempo, Bars
 from Mesh import Mesh
 import Theme
 import random
+from copy import deepcopy
 import Shader
 
 from OpenGL.GL import *
@@ -54,7 +55,7 @@ class Guitar:
     self.isBassGuitar = False
     
     self.debugMode = False
-
+    self.gameMode2p = self.engine.config.get("game","multiplayer_mode")
     self.matchingNotes = []
     
     self.sameNoteHopoString = False
@@ -68,6 +69,7 @@ class Guitar:
     self.cappedScoreMult = 0
     self.starSpinFrameIndex = 0
 
+    self.starSpinFrames = 16
     self.isStarPhrase = False
     self.finalStarSeen = False
 
@@ -161,6 +163,56 @@ class Guitar:
     self.time           = 0.0
     self.pickStartPos   = 0
     self.leftyMode      = False
+    
+    self.battleSuddenDeath  = False
+    self.battleObjectsEnabled = []
+    self.battleSDObjectsEnabled = []
+    if self.engine.config.get("game", "battle_Whammy") == 1:
+      self.battleObjectsEnabled.append(4)
+    if self.engine.config.get("game", "battle_Diff_Up") == 1:
+      self.battleObjectsEnabled.append(2)
+    if self.engine.config.get("game", "battle_String_Break") == 1:
+      self.battleObjectsEnabled.append(3)
+    if self.engine.config.get("game", "battle_Double") == 1:
+      self.battleObjectsEnabled.append(7)
+    if self.engine.config.get("game", "battle_Death_Drain") == 1:
+      self.battleObjectsEnabled.append(1)
+    if self.engine.config.get("game", "battle_Amp_Overload") == 1:
+      self.battleObjectsEnabled.append(8)
+    if self.engine.config.get("game", "battle_Switch_Controls") == 1:
+      self.battleObjectsEnabled.append(6)
+    if self.engine.config.get("game", "battle_Steal") == 1:
+      self.battleObjectsEnabled.append(5)
+    #if self.engine.config.get("game", "battle_Tune") == 1:
+    #  self.battleObjectsEnabled.append(9)
+    
+    Log.debug(self.battleObjectsEnabled)
+    self.battleNextObject   = 0
+    self.battleObjects      = [0] * 3
+    self.battleBeingUsed    = [0] * 2
+    self.battleStatus       = [False] * 9
+    
+    self.battleLeftyStart   = 0
+    self.battleLeftyLength  = 8000#
+    self.battleDiffUpStart  = 0
+    self.battleDiffUpLength = 15000
+    self.battleDiffUpValue  = playerObj.getDifficultyInt()
+    self.battleDoubleStart  = 0
+    self.battleDoubleLength = 8000
+    self.battleAmpStart     = 0
+    self.battleAmpLength    = 8000
+    self.battleWhammyLimit  = 6#
+    self.battleWhammyNow    = 0
+    self.battleWhammyDown   = False
+    self.battleBreakLimit   = 8.0
+    self.battleBreakNow     = 0.0
+    self.battleBreakString  = 0
+    self.battleObjectGained = 0
+    self.battleSuddenDeath  = False
+    self.battleDrainStart   = 0
+    self.battleDrainLength  = 8000
+    
+    
 
 
     #self.actualBpm = 0.0
@@ -382,11 +434,22 @@ class Guitar:
       #myfingershurt: allowing any non-Rock Band theme to have spinning starnotes if the SpinNotes.png is available in that theme's folder
       if self.starspin == True and self.theme < 2:
         #myfingershurt: check for SpinNotes, if not there then no animation
-        try:  
-          engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"spinnotes.png"))
-        except IOError:
-          self.starspin = False
-          engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notes.png"))
+        if self.gameMode2p == 6:
+          try:  
+            engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"spinnotesbattle.png"))
+            self.starSpinFrames = 8
+          except IOError:
+            try:  
+              engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"spinnotes.png"))
+            except IOError:
+              self.starspin = False
+              engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notes.png"))
+        else:    
+          try:  
+            engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"spinnotes.png"))
+          except IOError:
+            self.starspin = False
+            engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notes.png"))
       elif self.rbnote == 1 and self.theme == 2:
         try:
           engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notesbeta.png"))
@@ -440,7 +503,11 @@ class Guitar:
         self.startexe = False
         self.startex = False
 
-
+    if self.gameMode2p == 6:
+      try:
+        engine.loadImgDrawing(self, "battleFrets", os.path.join("themes", themename,"battle_frets.png"))
+      except IOError:
+        self.battleFrets = None
 
     if self.twoDkeys == True:
       if self.theme == 2:  
@@ -1477,9 +1544,9 @@ class Guitar:
           texSize = (fret/5.0,fret/5.0+0.2)
           if spNote == True:
             if isTappable:
-              texY = (0.9-self.starSpinFrameIndex*0.05, 0.925-self.starSpinFrameIndex*0.05)
+              texY = (0.150+self.starSpinFrameIndex*0.05, 0.175+self.starSpinFrameIndex*0.05)
             else:
-              texY = (0.875-self.starSpinFrameIndex*0.05, 0.9-self.starSpinFrameIndex*0.05)
+              texY = (0.125+self.starSpinFrameIndex*0.05, 0.150+self.starSpinFrameIndex*0.05)
           else:
             if isTappable:
               texY = (0.025,0.05)
@@ -1777,8 +1844,8 @@ class Guitar:
     num = 0
     enable = True
     starEventsInView = False
-
-    for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard):
+    renderedNotes = self.getRequiredNotesForRender(song,pos)
+    for time, event in renderedNotes:
     #for time, event in reversed(track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)):    #MFH - reverse order of note rendering
       if isinstance(event, Tempo):
         self.tempoBpm = event.bpm
@@ -1861,10 +1928,23 @@ class Guitar:
         spNote = True
         if event.played or event.hopod:
           if event.flameCount < 1 and not self.starPowerGained:
-            if self.starPower < 100:
-              self.starPower += 25
-            if self.starPower > 100:
-              self.starPower = 100
+            Log.debug("star power added")
+            if self.gameMode2p == 6:
+              if self.battleSuddenDeath:
+                self.battleObjects[2] = self.battleObjects[1]
+                self.battleObjects[1] = self.battleObjects[0]
+                self.battleObjects[0] = 1
+              else:
+                self.battleObjects[2] = self.battleObjects[1]
+                self.battleObjects[1] = self.battleObjects[0]
+                self.battleObjects[0] = self.battleObjectsEnabled[random.randint(0,len(self.battleObjectsEnabled)-1)]
+              self.battleObjectGained = True
+              Log.debug("Battle Object Gained, Objects %s" % str(self.battleObjects))
+            else:
+              if self.starPower < 100:
+                self.starPower += 25
+              if self.starPower > 100:
+                self.starPower = 100
             self.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
             self.starPowerGained = True
 
@@ -1924,11 +2004,17 @@ class Guitar:
         
       glPushMatrix()
       glTranslatef(x, (1.0 - visibility) ** (event.number + 1), z)
-      if big == True and num < self.bigMax:
-        num += 1
-        self.renderNote(length, sustain = sustain, kill = killswitch, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, big = True, fret = event.number, spNote = spNote)
+
+      if self.battleStatus[8]:
+        renderNote = random.randint(0,2)
       else:
-        self.renderNote(length, sustain = sustain, kill = killswitch, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote)
+        renderNote = 0
+      if renderNote == 0:  
+        if big == True and num < self.bigMax:
+          num += 1
+          self.renderNote(length, sustain = sustain, kill = killswitch, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, big = True, fret = event.number, spNote = spNote)
+        else:
+          self.renderNote(length, sustain = sustain, kill = killswitch, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote)
       glPopMatrix()
 
     if (not starEventsInView and self.finalStarSeen):
@@ -1954,7 +2040,9 @@ class Guitar:
 
     num = 0
     enable = True
-    for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard):
+    renderedNotes = self.getRequiredNotesForRender(song,pos)
+    for time, event in renderedNotes:
+    #for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard):
       if isinstance(event, Tempo):
         self.tempoBpm = event.bpm
         continue
@@ -2008,10 +2096,22 @@ class Guitar:
         spNote = True
         if event.played or event.hopod:
           if event.flameCount < 1 and not self.starPowerGained:
-            if self.starPower < 100:
-              self.starPower += 25
-            if self.starPower > 100:
-              self.starPower = 100
+            if self.gameMode2p == 6:
+              if self.battleSuddenDeath:
+                self.battleObjects[2] = self.battleObjects[1]
+                self.battleObjects[1] = self.battleObjects[0]
+                self.battleObjects[0] = 1
+              else:
+                self.battleObjects[2] = self.battleObjects[1]
+                self.battleObjects[1] = self.battleObjects[0]
+                self.battleObjects[0] = self.battleObjectsEnabled[random.randint(0,len(self.battleObjectsEnabled)-1)]
+              self.battleObjectGained = True
+              Log.debug("Battle Object Gained, Objects %s" % str(self.battleObjects))
+            else:
+              if self.starPower < 100:
+                self.starPower += 25
+              if self.starPower > 100:
+                self.starPower = 100
             self.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
             self.starPowerGained = True
             if self.theme == 2 and self.oFlash != None:
@@ -2072,11 +2172,18 @@ class Guitar:
         
       glPushMatrix()
       glTranslatef(x, (1.0 - visibility) ** (event.number + 1), z)
-      if big == True and num < self.bigMax:
-        num += 1
-        self.renderTail(length, sustain = sustain, kill = killswitch, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, big = True, fret = event.number, spNote = spNote, pos = pos)
+
+      if self.battleStatus[8]:
+        renderNote = random.randint(0,2)
       else:
-        self.renderTail(length, sustain = sustain, kill = killswitch, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote, pos = pos)
+        renderNote = 0
+      if renderNote == 0:  
+        if big == True and num < self.bigMax:
+          num += 1
+          self.renderTail(length, sustain = sustain, kill = killswitch, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, big = True, fret = event.number, spNote = spNote, pos = pos)
+        else:
+          self.renderTail(length, sustain = sustain, kill = killswitch, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote, pos = pos)
+
       glPopMatrix()
   
 
@@ -2155,17 +2262,31 @@ class Guitar:
 
       if self.twoDkeys == True:
 
+        if self.battleStatus[4]:
+          fretWhamOffset = self.battleWhammyNow * .15
+          fretColor = (1,1,1,.5)
+        else:
+          fretWhamOffset = 0
+          fretColor = (1,1,1,1)
+
         size = (self.boardWidth/self.strings/2, self.boardWidth/self.strings/2.4)
-        texSize = (n/5.0,n/5.0+0.2)
-
-        texY = (0.0,1.0/3.0)
-        if controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]):
-          texY = (1.0/3.0,2.0/3.0)
-        if self.hit[n]:
-          texY = (2.0/3.0,1.0)
-
-        self.engine.draw3Dtex(self.fretButtons, vertex = (size[0],size[1],-size[0],-size[1]), texcoord = (texSize[0], texY[0], texSize[1], texY[1]),
-                              coord = (x,v,0), multiples = True,color = (1,1,1), depth = True)
+        if self.battleStatus[3] and self.battleFrets != None and self.battleBreakString == n:
+          texSize = (n/5.0+.042,n/5.0+0.158)
+          size = (.30, .40)
+          fretPos = 8 - round((self.battleBreakNow/self.battleBreakLimit) * 8)
+          texY = (fretPos/8.0,(fretPos + 1.0)/8)
+          self.engine.draw3Dtex(self.battleFrets, vertex = (size[0],size[1],-size[0],-size[1]), texcoord = (texSize[0], texY[0], texSize[1], texY[1]),
+                                coord = (x,v + .08 + fretWhamOffset,0), multiples = True,color = fretColor, depth = True)
+        else:
+          texSize = (n/5.0,n/5.0+0.2)
+          texY = (0.0,1.0/3.0)
+          if controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]):
+            texY = (1.0/3.0,2.0/3.0)
+          if self.hit[n] or (self.battleStatus[3] and self.battleBreakString == n):
+            texY = (2.0/3.0,1.0)
+  
+          self.engine.draw3Dtex(self.fretButtons, vertex = (size[0],size[1],-size[0],-size[1]), texcoord = (texSize[0], texY[0], texSize[1], texY[1]),
+                                coord = (x,v + fretWhamOffset,0), multiples = True,color = fretColor, depth = True)
 
       else:
 
@@ -2200,10 +2321,19 @@ class Guitar:
           #Key_002 - Bottom of fret (key2_color)
           #Glow_001 - Only rendered when a note is hit along with the glow.svg
 
-	  if self.keytex == True:
-	    glColor4f(1,1,1,visibility)
-            glTranslatef(x, v, 0)
-      	    glEnable(GL_TEXTURE_2D)
+          #if self.complexkey == True:
+          #  glColor4f(.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], visibility)
+          #  if self.battleStatus[4]:
+          #    glTranslatef(x, y + self.battleWhammyNow * .15, 0)
+          #  else:
+          #    glTranslatef(x, y, 0)
+          if self.keytex == True:
+            glColor4f(1,1,1,visibility)
+            if self.battleStatus[4]:
+              glTranslatef(x, y + self.battleWhammyNow * .15, 0)
+            else:
+              glTranslatef(x, y, 0)
+            glEnable(GL_TEXTURE_2D)
             if n == 0: 
               self.keytexa.texture.bind()
             elif n == 1:
@@ -2216,20 +2346,23 @@ class Guitar:
               self.keytexe.texture.bind()
             glMatrixMode(GL_TEXTURE)
             glScalef(1, -1, 1)
-      	    glMatrixMode(GL_MODELVIEW)
+            glMatrixMode(GL_MODELVIEW)
             if f and not self.hit[n]:
-	      self.keyMesh.render("Mesh_001")
+              self.keyMesh.render("Mesh_001")
             elif self.hit[n]:
-	      self.keyMesh.render("Mesh_002")
-	    else:
-	      self.keyMesh.render("Mesh")
+              self.keyMesh.render("Mesh_002")
+            else:
+              self.keyMesh.render("Mesh")
             glMatrixMode(GL_TEXTURE)
             glLoadIdentity()
             glMatrixMode(GL_MODELVIEW)
             glDisable(GL_TEXTURE_2D)
           else: 
             glColor4f(.1 + .8 * c[0] + f, .1 + .8 * c[1] + f, .1 + .8 * c[2] + f, visibility)
-            glTranslatef(x, y + v * 6, 0)
+            if self.battleStatus[4]:
+              glTranslatef(x, y + self.battleWhammyNow * .15 + v * 6, 0)
+            else:
+              glTranslatef(x, y + v * 6, 0)
             key = self.keyMesh
         
             if(key.find("Glow_001")) == True:
@@ -2267,7 +2400,10 @@ class Guitar:
             glColor3f(self.glowColor[0] * (1 - ms), self.glowColor[1] * (1 - ms), self.glowColor[2] * (1 - ms))
           
           glPushMatrix()
-          glTranslate(x, y, 0)
+          if self.battleStatus[4]:
+            glTranslatef(x, y + self.battleWhammyNow * .15, 0)
+          else:
+            glTranslatef(x, y, 0)
           glScalef(.1 + .02 * ms * f, .1 + .02 * ms * f, .1 + .02 * ms * f)
           glRotatef( 90, 0, 1, 0)
           glRotatef(-90, 1, 0, 0)
@@ -2288,7 +2424,12 @@ class Guitar:
 
         f += 2
 
-        self.engine.draw3Dtex(self.glowDrawing, coord = (x, y, 0.01), rot = (f * 90 + self.time, 0, 1, 0),
+        if self.battleStatus[4]:
+          self.engine.draw3Dtex(self.glowDrawing, coord = (x, y + self.battleWhammyNow * .15, 0.01), rot = (f * 90 + self.time, 0, 1, 0),
+                              texcoord = (0.0, 0.0, 1.0, 1.0), vertex = (-size[0] * f, -size[1] * f, size[0] * f, size[1] * f),
+                              multiples = True, alpha = True, color = glowcol)
+        else:
+          self.engine.draw3Dtex(self.glowDrawing, coord = (x, y, 0.01), rot = (f * 90 + self.time, 0, 1, 0),
                               texcoord = (0.0, 0.0, 1.0, 1.0), vertex = (-size[0] * f, -size[1] * f, size[0] * f, size[1] * f),
                               multiples = True, alpha = True, color = glowcol)
 
@@ -2632,7 +2773,8 @@ class Guitar:
     if self.disableFlameSFX != True:
       flameLimit = 10.0
       flameLimitHalf = round(flameLimit/2.0)
-      for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard):
+      renderedNotes = self.getRequiredNotesForRender(song,pos)
+      for time, event in renderedNotes:
         if isinstance(event, Tempo):
           continue
         
@@ -2939,6 +3081,9 @@ class Guitar:
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
       glEnable(GL_COLOR_MATERIAL)
       if self.leftyMode:
+        if not self.battleStatus[6]:
+          glScalef(-1, 1, 1)
+      elif self.battleStatus[6]:
         glScalef(-1, 1, 1)
 
       if self.ocount <= 1:
@@ -3026,8 +3171,10 @@ class Guitar:
         if self.hitFlamesPresent:   #MFH - only if present!
           self.renderFlames(visibility, song, pos, controls)    #MFH - only when freestyle inactive!
         
-    
       if self.leftyMode:
+        if not self.battleStatus[6]:
+          glScalef(-1, 1, 1)
+      elif self.battleStatus[6]:
         glScalef(-1, 1, 1)
 
   def getMissedNotes(self, song, pos, catchup = False):
@@ -3080,6 +3227,12 @@ class Guitar:
 
 
   def getRequiredNotes(self, song, pos):
+    if self.battleStatus[2] and self.difficulty != 0:
+      if pos < self.battleDiffUpStart + self.currentPeriod * self.beatsPerBoard or pos > self.battleDiffUpStart - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
+        song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue]
+      else:
+        song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue - 1]
+        
     track   = song.track[self.player]
     notes = [(time, event) for time, event in track.getEvents(pos - self.lateMargin, pos + self.earlyMargin) if isinstance(event, Note)]
     notes = [(time, event) for time, event in notes if not event.played]
@@ -3087,10 +3240,18 @@ class Guitar:
     if notes:
       t     = min([time for time, event in notes])
       notes = [(time, event) for time, event in notes if time - t < 1e-3]
+    #Log.debug(notes)
+    if self.battleStatus[7]:
+      notes = self.getDoubleNotes(notes)
     return sorted(notes, key=lambda x: x[1].number)
 
   def getRequiredNotes2(self, song, pos, hopo = False):
-
+    if self.battleStatus[2] and self.difficulty != 0:
+      if pos < self.battleDiffUpStart + self.currentPeriod * self.beatsPerBoard or pos > self.battleDiffUpStart - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
+        song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue]
+      else:
+        song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue - 1]
+        
     track   = song.track[self.player]
     notes = [(time, event) for time, event in track.getEvents(pos - self.lateMargin, pos + self.earlyMargin) if isinstance(event, Note)]
     notes = [(time, event) for time, event in notes if not (event.hopod or event.played)]
@@ -3098,21 +3259,36 @@ class Guitar:
     if notes:
       t     = min([time for time, event in notes])
       notes = [(time, event) for time, event in notes if time - t < 1e-3]
-      
+    #Log.debug(notes)
+    if self.battleStatus[7]:
+      notes = self.getDoubleNotes(notes)
     return sorted(notes, key=lambda x: x[1].number)
     
   def getRequiredNotes3(self, song, pos, hopo = False):
-
+    if self.battleStatus[2] and self.difficulty != 0:
+      if pos < self.battleDiffUpStart + self.currentPeriod * self.beatsPerBoard or pos > self.battleDiffUpStart - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
+        song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue]
+      else:
+        song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue - 1]
+        
     track   = song.track[self.player]
     notes = [(time, event) for time, event in track.getEvents(pos - self.lateMargin, pos + self.earlyMargin) if isinstance(event, Note)]
     notes = [(time, event) for time, event in notes if not (event.hopod or event.played or event.skipped)]
     notes = [(time, event) for time, event in notes if (time >= (pos - self.lateMargin)) and (time <= (pos + self.earlyMargin))]
-
+    #Log.debug(notes)
+    if self.battleStatus[7]:
+      notes = self.getDoubleNotes(notes)
     return sorted(notes, key=lambda x: x[1].number)
 
   #MFH - corrected and optimized:
   #def getRequiredNotesMFH(self, song, pos):
   def getRequiredNotesMFH(self, song, pos, hopoTroubleCheck = False):
+    if self.battleStatus[2] and self.difficulty != 0:
+      if pos < self.battleDiffUpStart + self.currentPeriod * self.beatsPerBoard or pos > self.battleDiffUpStart - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
+        song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue]
+      else:
+        song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue - 1]
+    
     track   = song.track[self.player]
     if hopoTroubleCheck:
       #notes = [(time, event) for time, event in track.getEvents(pos, pos + (self.earlyMargin*2)) if isinstance(event, Note)]
@@ -3125,16 +3301,153 @@ class Guitar:
       #MFH - this additional filtration step removes sustains whose Note On event time is now outside the hitwindow.
       notes = [(time, event) for time, event in notes if (time >= (pos - self.lateMargin)) and (time <= (pos + self.earlyMargin))]
 
-
+    sorted(notes, key=lambda x: x[0])
+    if self.battleStatus[7]:
+      notes = self.getDoubleNotes(notes)
     return sorted(notes, key=lambda x: x[0])    #MFH - what the hell, this should be sorted by TIME not note number....
 
+  def getDoubleNotes(self, notes):
+    if self.battleStatus[7] and notes != []:
+      notes = sorted(notes, key=lambda x: x[0])
+      curTime = 0
+      tempnotes = []
+      tempnumbers = []
+      tempnote = None
+      curNumbers = []
+      noteCount = 0
+      for time, note in notes:
+        noteCount += 1
+        if not isinstance(note, Note):
+          if noteCount == len(notes) and len(curNumbers) < 3 and len(curNumbers) > 0:
+            maxNote = curNumbers[0]
+            minNote = curNumbers[0]
+            for i in range(0, len(curNumbers)):
+              if curNumbers[i] > maxNote:
+                maxNote = curNumbers[i]
+              if curNumbers[i] < minNote:
+                minNote = curNumbers[i]
+            curNumbers = []
+            if maxNote < 4:
+              tempnumbers.append(maxNote + 1)
+            elif minNote > 0:
+              tempnumbers.append(minNote - 1)
+            else:
+              tempnumbers.append(2)
+          elif noteCount == len(notes) and len(curNumbers) > 2:
+            tempnumbers.append(-1)
+            curNumbers = []
+          continue
+        if time != curTime:
+          if curTime != 0 and len(curNumbers) < 3:
+            maxNote = curNumbers[0]
+            minNote = curNumbers[0]
+            for i in range(0, len(curNumbers)):
+              if curNumbers[i] > maxNote:
+                maxNote = curNumbers[i]
+              if curNumbers[i] < minNote:
+                minNote = curNumbers[i]
+            curNumbers = []
+            if maxNote < 4:
+              tempnumbers.append(maxNote + 1)
+            elif minNote > 0:
+              tempnumbers.append(minNote - 1)
+            else:
+              tempnumbers.append(2)
+          elif (curTime != 0 or noteCount == len(notes)) and len(curNumbers) > 2:
+            tempnumbers.append(-1)
+            curNumbers = []
+          tempnotes.append((time,deepcopy(note)))
+          curTime = time
+          curNumbers.append(note.number)
+          if noteCount == len(notes) and len(curNumbers) < 3:
+            maxNote = curNumbers[0]
+            minNote = curNumbers[0]
+            for i in range(0, len(curNumbers)):
+              if curNumbers[i] > maxNote:
+                maxNote = curNumbers[i]
+              if curNumbers[i] < minNote:
+                minNote = curNumbers[i]
+            curNumbers = []
+            if maxNote < 4:
+              tempnumbers.append(maxNote + 1)
+            elif minNote > 0:
+              tempnumbers.append(minNote - 1)
+            else:
+              tempnumbers.append(2)
+          elif noteCount == len(notes) and len(curNumbers) > 2:
+            tempnumbers.append(-1)
+            curNumbers = []
+        else:
+          curNumbers.append(note.number)
+          if noteCount == len(notes) and len(curNumbers) < 3:
+            maxNote = curNumbers[0]
+            minNote = curNumbers[0]
+            for i in range(0, len(curNumbers)):
+              if curNumbers[i] > maxNote:
+                maxNote = curNumbers[i]
+              if curNumbers[i] < minNote:
+                minNote = curNumbers[i]
+            curNumbers = []
+            if maxNote < 4:
+              tempnumbers.append(maxNote + 1)
+            elif minNote > 0:
+              tempnumbers.append(minNote - 1)
+            else:
+              tempnumbers.append(2)
+          elif noteCount == len(notes) and len(curNumbers) > 2:
+            tempnumbers.append(-1)
+            curNumbers = []
+      noteCount = 0
+      for time, note in tempnotes:
+        if tempnumbers[noteCount] != -1:
+          note.number = tempnumbers[noteCount]
+          noteCount += 1
+          if time > self.battleDoubleStart + self.currentPeriod * self.beatsPerBoard and time < self.battleDoubleStart - self.currentPeriod * self.beatsPerBoard + self.battleDoubleLength:
+            notes.append((time,note))
+        else:
+          noteCount += 1
+    return sorted(notes, key=lambda x: x[0])
 
+  def getRequiredNotesForRender(self, song, pos):
+    if self.battleStatus[2] and self.difficulty != 0:
+      Log.debug(self.battleDiffUpValue)
+      song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue]
+      track0 = song.track[self.player]
+      notes0 = [(time, event) for time, event in track0.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
+    
+      song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue - 1]
+      track1   = song.track[self.player]
+      notes1 = [(time, event) for time, event in track1.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
+      
+      notes = []
+      for time,note in notes0:
+        if time < self.battleDiffUpStart + self.currentPeriod * self.beatsPerBoard or time > self.battleDiffUpStart - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
+          notes.append((time,note))
+      for time,note in notes1:
+        if time > self.battleDiffUpStart + self.currentPeriod * self.beatsPerBoard and time < self.battleDiffUpStart - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
+          notes.append((time,note))
+      notes0 = None
+      notes1 = None
+      track0 = None
+      track1 = None
+      notes = sorted(notes, key=lambda x: x[0])
+      #Log.debug(notes)
+    else:
+      track   = song.track[self.player]
+      notes = [(time, event) for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
+    
+    if self.battleStatus[7]:
+      notes = self.getDoubleNotes(notes)
+    return notes
+ 
   #MFH - corrected and optimized:
   def getRequiredNotesForJurgenOnTime(self, song, pos):
     track   = song.track[self.player]
     notes = [(time, event) for time, event in track.getEvents(pos - self.lateMargin, pos + 30) if isinstance(event, Note)]
     notes = [(time, event) for time, event in notes if not (event.hopod or event.played or event.skipped)]
 
+    if self.battleStatus[7]:
+      notes = self.getDoubleNotes(notes)
     return sorted(notes, key=lambda x: x[0])    #MFH - what the hell, this should be sorted by TIME not note number....
 
 
@@ -3613,9 +3926,10 @@ class Guitar:
       self.indexCount = self.indexCount + 1
       if self.indexCount > self.Animspeed-1:
         self.indexCount = 0
-      self.starSpinFrameIndex = (self.indexCount * 16 - (self.indexCount * 16) % self.Animspeed) / self.Animspeed
-      if self.starSpinFrameIndex > 15:
+      self.starSpinFrameIndex = (self.indexCount * self.starSpinFrames - (self.indexCount * self.starSpinFrames) % self.Animspeed) / self.Animspeed
+      if self.starSpinFrameIndex > self.starSpinFrames - 1:
         self.starSpinFrameIndex = 0
+        
     
     #myfingershurt: must not decrease SP if paused.
     if self.starPowerActive == True and self.paused == False:

@@ -702,6 +702,22 @@ class SettingsMenu(Menu.Menu):
     ]
     self.advancedGameSettingsMenu = Menu.Menu(self.engine, self.advancedGameSettings)
     
+    self.battleObjectSettings = [
+      ConfigChoice(engine, engine.config, "game", "battle_Whammy", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "battle_Diff_Up", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "battle_String_Break", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "battle_Double", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "battle_Death_Drain", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "battle_Amp_Overload", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "battle_Switch_Controls", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "battle_Steal", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "battle_Tune", autoApply = True),
+    ]
+    
+    self.battleSettings = [
+      (_("Battle Objects"), self.battleObjectSettings),
+    ]
+    
     self.basicSettings = [
       ConfigChoice(self.engine, self.engine.config, "game",  "language"),
       ConfigChoice(self.engine, self.engine.config, "game", "T_sound", autoApply = True), #Faaa Drum sound
@@ -714,7 +730,9 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(self.engine, self.engine.config, "audio",  "delay", autoApply = True),     #myfingershurt: so a/v delay can be set without restarting FoF
       (_("Advanced Gameplay Settings"), self.advancedGameSettingsMenu),
       (_("HO/PO Settings"), self.hopoSettingsMenu),
+      (_("Battle Settings"), self.battleSettings),
     ]
+
     self.basicSettingsMenu = Menu.Menu(self.engine, self.basicSettings)
 
     self.keyChangeSettings = [

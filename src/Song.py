@@ -645,6 +645,9 @@ class SongInfo(object):
     
   def getIcon(self):
     return self._get("icon")
+  
+  def getBossBattle(self):
+    return self._get("boss_battle")
 
   def getDiffSong(self):
     return self._get("diff_band", int, -1)
@@ -683,6 +686,9 @@ class SongInfo(object):
     
   def setIcon(self, value):
     self._set("icon", value)
+    
+  def setBossBattle(self, value):
+    self._set("boss_battle", value)
 
   def setDiffSong(self, value):
     self._set("diff_band", value)
@@ -967,6 +973,8 @@ class SongInfo(object):
   diffGuitar   = property(getDiffGuitar, setDiffGuitar)
   diffBass     = property(getDiffBass, setDiffBass)
   diffDrums    = property(getDiffDrums, setDiffDrums)
+  #boss battles
+  bossBattle   = property(getBossBattle, setBossBattle)
   #May no longer be necessary
   folder        = False
   
