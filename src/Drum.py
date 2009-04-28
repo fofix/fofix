@@ -165,6 +165,54 @@ class Drum:
     self.time           = 0.0
     self.pickStartPos   = 0
     self.leftyMode      = False
+    
+    self.battleSuddenDeath  = False
+    self.battleObjectsEnabled = []
+    self.battleSDObjectsEnabled = []
+    if self.engine.config.get("game", "battle_Whammy") == 1:
+      self.battleObjectsEnabled.append(4)
+    if self.engine.config.get("game", "battle_Diff_Up") == 1:
+      self.battleObjectsEnabled.append(2)
+    if self.engine.config.get("game", "battle_String_Break") == 1:
+      self.battleObjectsEnabled.append(3)
+    if self.engine.config.get("game", "battle_Double") == 1:
+      self.battleObjectsEnabled.append(7)
+    if self.engine.config.get("game", "battle_Death_Drain") == 1:
+      self.battleObjectsEnabled.append(1)
+    if self.engine.config.get("game", "battle_Amp_Overload") == 1:
+      self.battleObjectsEnabled.append(8)
+    if self.engine.config.get("game", "battle_Switch_Controls") == 1:
+      self.battleObjectsEnabled.append(6)
+    if self.engine.config.get("game", "battle_Steal") == 1:
+      self.battleObjectsEnabled.append(5)
+    #if self.engine.config.get("game", "battle_Tune") == 1:
+    #  self.battleObjectsEnabled.append(9)
+    
+    Log.debug(self.battleObjectsEnabled)
+    self.battleNextObject   = 0
+    self.battleObjects      = [0] * 3
+    self.battleBeingUsed    = [0] * 2
+    self.battleStatus       = [False] * 9
+    
+    self.battleLeftyStart   = 0
+    self.battleLeftyLength  = 8000#
+    self.battleDiffUpStart  = 0
+    self.battleDiffUpLength = 15000
+    self.battleDiffUpValue  = playerObj.getDifficultyInt()
+    self.battleDoubleStart  = 0
+    self.battleDoubleLength = 8000
+    self.battleAmpStart     = 0
+    self.battleAmpLength    = 8000
+    self.battleWhammyLimit  = 6#
+    self.battleWhammyNow    = 0
+    self.battleWhammyDown   = False
+    self.battleBreakLimit   = 8.0
+    self.battleBreakNow     = 0.0
+    self.battleBreakString  = 0
+    self.battleObjectGained = 0
+    self.battleSuddenDeath  = False
+    self.battleDrainStart   = 0
+    self.battleDrainLength  = 8000
 
     self.freestyleHitFlameCounts = [0 for n in range(self.strings+1)]    #MFH
 
