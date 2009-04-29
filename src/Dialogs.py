@@ -4244,7 +4244,7 @@ class ItemChooser(BackgroundLayer, KeyListener):
       self.engine.view.resetProjection()
       
 class ControlActivator(Layer, KeyListener):
-  def __init__(self, engine, players, maxplayers = None):
+  def __init__(self, engine, players, maxplayers = None, allowGuitar = True, allowDrum = True, allowMic = False):
     self.engine     = engine
     self.minPlayers = players
     if maxplayers:
@@ -4264,6 +4264,15 @@ class ControlActivator(Layer, KeyListener):
     self.delayedIndex   = 0
     self.fader          = 0
     self.fadeDir        = True
+    self.allowed        = [True for i in self.controls]
+    
+    for i, control in enumerate(self.engine.input.controls.controls):
+      if self.engine.input.controls.type[i] in [0, 1, 4] and not allowGuitar:
+        self.allowed[i] = False
+      elif self.engine.input.controls.type[i] in [2, 3] and not allowDrum:
+        self.allowed[i] = False
+      elif self.engine.input.controls.type[i] in [5] and not allowMic:
+        self.allowed[i] = False
     
     self.tsReady = _("Press Start to Begin!")
     self.tsInfo  = _("Use the keyboard to select or just play some notes!")
@@ -4276,8 +4285,12 @@ class ControlActivator(Layer, KeyListener):
     self.controlNum = 0
     for i, control in enumerate(self.engine.input.controls.controls):
       self.controlNum += 1
-      if control == "None" or self.engine.input.controls.type[i] == 5:
-        self.controls[i] = "No Controller"
+      if control == "None":
+        self.controls[i] = _("No Controller")
+        self.blockedItems.append(i)
+        self.controlNum -= 1
+      elif self.allowed[i] == False:
+        self.controls[i] = _("Disabled Controller")
         self.blockedItems.append(i)
         self.controlNum -= 1
       elif control == "defaultg":
@@ -5139,7 +5152,7 @@ def chooseItem(engine, items, prompt = "", selected = None, pos = None):   #MFH
   _runDialog(engine, d)
   return d.getSelectedItem()
 
-def activateControllers(engine, players = 1):
+def activateControllers(engine, players = 1, maxplayers = None, allowGuitar = True, allowDrum = True, allowMic = False):
   """
   Ask the user to select the active controllers for the game session.
   
@@ -5147,7 +5160,7 @@ def activateControllers(engine, players = 1):
   @type players:    int
   @param players:   The maximum number of players.
   """
-  d = ControlActivator(engine, players)
+  d = ControlActivator(engine, players, maxplayers, allowGuitar, allowDrum, allowMic)
   _runDialog(engine, d)
   return d.getPlayers()
 
