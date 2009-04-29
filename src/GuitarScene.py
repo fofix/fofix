@@ -2414,7 +2414,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     # evilynux - Reset speed
     self.engine.setSpeedFactor(1.0)
     self.engine.config.set("audio", "speed_factor", 1.0)
-
     self.engine.view.setViewport(1,0)
     self.engine.view.popLayer(self.menu)
     self.engine.view.popLayer(self.failMenu)
@@ -3658,7 +3657,19 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         pos = self.pausePos
 
       self.handleTempo(self.song, pos)  #MFH - new global tempo / BPM handling logic
-
+      
+      if self.bossBattle and self.rock[1] < 0:
+        if self.careerMode and not self.song.info.completed:
+          if self.song.info.count:
+            count = int(self.song.info.count)
+          else:
+            count = 0
+          count += 1
+          Log.debug("Song completed")
+          self.song.info.completed = True
+          self.song.info.count = "%d" % count
+          self.song.info.save()
+          
       #MFH - new failing detection logic
       if self.failingEnabled:
         #if self.numOfPlayers > 1:
@@ -7065,17 +7076,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                       self.failTimer += 1
                       self.engine.drawImage(self.failMsg, scale = (0.5, -0.5), coord = (w/2,h/2))
                   else:
-                    if self.bossBattle and self.rock[1] < 0:
-                      if self.careerMode and not self.song.info.completed:
-                        if self.song.info.count:
-                          count = int(self.song.info.count)
-                        else:
-                          count = 0
-                        count += 1
-                        Log.debug("Song completed")
-                        self.song.info.completed = True
-                        self.song.info.count = "%d" % count
-                        self.song.info.save()
+
+                    self.ending = True
                     self.changeSong()
                 else:
                   if self.failTimer == 1:
