@@ -1040,6 +1040,7 @@ class SettingsMenu(Menu.Menu):
       Menu.Choice(_("New Controller"),    lambda: createControl(self.engine, refresh = self.refreshKeySettings)),
       Menu.Choice(_("Edit Controller"),   lambda: chooseControl(self.engine, refresh = self.refreshKeySettings)),
       Menu.Choice(_("Delete Controller"), lambda: chooseControl(self.engine, "delete", refresh = self.refreshKeySettings)),
+      ConfigChoice(self.engine, self.engine.config, "performance", "max_players", autoApply = True), #akedrou
       ActiveConfigChoice(self.engine, self.engine.config, "game", "scroll_delay", onChange = self.scrollSet),
       ActiveConfigChoice(self.engine, self.engine.config, "game", "scroll_rate", onChange = self.scrollSet),
       ActiveConfigChoice(self.engine, self.engine.config, "game", "p2_menu_nav", onChange = self.engine.input.reloadControls),#myfingershurt
