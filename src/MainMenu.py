@@ -229,8 +229,8 @@ class MainMenu(BackgroundLayer):
     
     if self.theme == 1 and self.themeCoOp: #Worldrave - Put GH Co-op ahead of FoFix co-op for GH based theme's. Made more sense.
       multPlayerMenu = [
-        (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
-        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
+        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = 3)),
+        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = 3)),
         (_("GH Battle"), lambda: self.newLocalGame(players = 2, mode2p = 6, allowDrum = True)), #akedrou- so you can block drums
         (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
         (_("Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 5)),
@@ -238,24 +238,24 @@ class MainMenu(BackgroundLayer):
       ]
     elif self.theme == 1 and not self.themeCoOp:
       multPlayerMenu = [
-        (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
-        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
+        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = 3)),
+        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = 3)),
         (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
       ]
     elif self.theme == 2:
       multPlayerMenu = [
-        (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),
-        (_("RB Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 4)),
-        (_("GH Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 5)),
-        (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
-        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
+        (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3, maxplayers = 3)),
+        (_("RB Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 4, maxplayers = 3)),
+        (_("GH Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 5, maxplayers = 3)),
+        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = 3)),
+        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = 3)),
         (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
       ]
     else:
       multPlayerMenu = [
         (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),
-        (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
-        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
+        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = 3)),
+        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = 3)),
         (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
       ]
     
@@ -407,9 +407,7 @@ class MainMenu(BackgroundLayer):
   def newLocalGame(self, players=1, mode1p=0, mode2p=0, maxplayers = None, allowGuitar = True, allowDrum = True, allowMic = False): #mode1p=0(quickplay),1(practice),2(career) / mode2p=0(faceoff),1(profaceoff)
     self.engine.data.acceptSound.play()
     players = Dialogs.activateControllers(self.engine, players, maxplayers, allowGuitar, allowDrum, allowMic) #akedrou
-    if players > 2: #hey look! Multiplayer support without the hassle!
-      players = 2   #just comment these lines and everything will work! I promise!
-    elif players == 0:
+    if players == 0:
       return
     Config.set("game", "players", players)
     Config.set("game","game_mode", mode1p)

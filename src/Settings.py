@@ -681,9 +681,10 @@ class SettingsMenu(Menu.Menu):
     
     self.jurgenSettings = [
        #ConfigChoice(self.engine, self.engine.config, "game", "jurgdef", autoApply = True),#Spikehead777
-       ConfigChoice(self.engine, self.engine.config, "game", "jurgtype", autoApply = True),#Spikehead777
+       ConfigChoice(self.engine, self.engine.config, "game", "jurg_p0", autoApply = True),
+       ConfigChoice(self.engine, self.engine.config, "game", "jurg_p1", autoApply = True),
+       ConfigChoice(self.engine, self.engine.config, "game", "jurg_p2", autoApply = True),
        ConfigChoice(self.engine, self.engine.config, "game", "jurglogic", autoApply = True),#MFH
-       #ConfigChoice(self.engine, eself.ngine.config, "game", "jurgtext", autoApply = True),#hman
     ]
     self.jurgenSettingsMenu = Menu.Menu(self.engine, self.jurgenSettings)
            
@@ -937,7 +938,6 @@ class SettingsMenu(Menu.Menu):
     self.advancedSettingsMenu = Menu.Menu(engine, advancedSettings)
     
     self.cheats = [
-      ConfigChoice(engine, engine.config, "game", "jurgmode", autoApply = True),
       (_("Jurgen Settings"), self.jurgenSettingsMenu),
       ConfigChoice(engine, engine.config, "game", "gh2_sloppy", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "whammy_saves_starpower", autoApply = True),#myfingershurt
@@ -1227,8 +1227,9 @@ class BasicSettingsMenu(Menu.Menu):
     listSettingsMenu = Menu.Menu(engine, listSettings)
 
     Cheats = [
-      ConfigChoice(engine, engine.config, "game", "jurgmode", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "jurgtype", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "jurg_p0", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "jurg_p1", autoApply = True),
+      #ConfigChoice(engine, engine.config, "game", "jurg_p2", autoApply = True), #akedrou - uncomment when ready
       ConfigChoice(engine, engine.config, "game", "gh2_sloppy", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "whammy_saves_starpower", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "hit_window_cheat", autoApply = True),
@@ -1545,18 +1546,18 @@ def quickset(config):
     Log.debug("Quickset Performance - Manual")
 
 class GameSettingsMenu(Menu.Menu):
-  def __init__(self, engine, gTextColor, gSelectedColor):
+  def __init__(self, engine, gTextColor, gSelectedColor, players):
 
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("GameSettingsMenu class init (Settings.py)...")
     
-    Cheats = [
-      ConfigChoice(engine, engine.config, "game", "jurgmode", autoApply = True),#Jurgen config -- Spikehead777
-      ConfigChoice(engine, engine.config, "game", "jurgtype", autoApply = True),#Jurgen controls -- Spikehead777
-      ConfigChoice(engine, engine.config, "game", "jurglogic", autoApply = True),#MFH
+    Cheats = []
+    
+    for i in range(players):
+      Cheats.append(ConfigChoice(engine, engine.config, "game", "jurg_p%d" % i, autoApply = True))#Jurgen config -- Spikehead777
+    Cheats.append(ConfigChoice(engine, engine.config, "game", "jurglogic", autoApply = True))#MFH
      #MFH
-    ]
     CheatMenu = Menu.Menu(engine, Cheats, pos = (.350, .310), viewSize = 5, textColor = gTextColor, selectedColor = gSelectedColor)
     
     settings = [
@@ -1580,7 +1581,7 @@ class GameSettingsMenu(Menu.Menu):
     Menu.Menu.__init__(self, engine, settings, pos = (.360, .250), viewSize = 5, textColor = gTextColor, selectedColor = gSelectedColor) #Worldrave- Changed Pause-Submenu Position more centered until i add a theme.ini setting.
 
 class GameCareerSettingsMenu(Menu.Menu):
-  def __init__(self, engine, gTextColor, gSelectedColor):
+  def __init__(self, engine, gTextColor, gSelectedColor, players):
 
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:

@@ -247,7 +247,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #self.finishedProcessingSong = False
 
     #Spikehead777
-    self.jurg             = self.engine.config.get("game", "jurgtype")
+    #self.jurg             = self.engine.config.get("game", "jurgtype")
     
     #MFH
     self.jurgenLogic = self.engine.config.get("game", "jurglogic")    #logic 0 = original, logic 1 = MFH-1
@@ -268,11 +268,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     self.numOfPlayers = len(self.playerList)        #MFH - MUST be in front of loadSettings call!
     
-    self.autoPlay         = self.engine.config.get("game", "jurgmode")
-    if self.autoPlay == 0:
-      self.autoPlay = True
-    else:
-      self.autoPlay = False
+    #self.autoPlay         = self.engine.config.get("game", "jurgmode")
+    #if self.autoPlay == 0:
+    #  self.autoPlay = True
+    #else:
+    #  self.autoPlay = False
     self.playerAssist = [None for i in self.playerList]
     for i, player in enumerate(self.playerList):
       self.playerAssist[i] = player.assistMode
@@ -291,7 +291,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     else:
       self.assisting = False
     
+    self.autoPlay         = False
     self.jurgPlayer       = [False for i in self.playerList]
+    self.jurg             = [False for i in self.playerList]
+    for i in range(len(self.playerList)):
+      if self.engine.config.get("game", "jurg_p%d" % i) == True:
+        self.jurg[i] = True
+        self.autoPlay = True
 
     self.lastPickPos      = [None for i in self.playerList]
     self.lastSongPos      = 0.0
@@ -774,10 +780,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #MFH - no Jurgen in Career mode or tutorial mode or practice mode:
     if self.careerMode or self.tut or self.playerList[0].practiceMode:
       self.autoPlay = False
-    #force jurgen player 2 for boss battles
+    #force jurgen player 2 (and only player 2) for boss battles
     if self.bossBattle:
       self.autoPlay = True
-      self.jurg = 1
+      self.jurg = [False for i in self.playerList]
+      self.jurg[1] = True
     
     self.rockFailUp  = True #akedrou - fading mech
     self.rockFailViz = 0.0
@@ -1790,8 +1797,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.fail_completed_color = Theme.hexToColor(Theme.fail_completed_colorVar)
     
 
-    settingsMenu = Settings.GameSettingsMenu(self.engine, self.pause_text_color, self.pause_selected_color)
-    careerSettingsMenu = Settings.GameCareerSettingsMenu(self.engine, self.pause_text_color, self.pause_selected_color)
+    settingsMenu = Settings.GameSettingsMenu(self.engine, self.pause_text_color, self.pause_selected_color, players = len(self.playerList))
+    careerSettingsMenu = Settings.GameCareerSettingsMenu(self.engine, self.pause_text_color, self.pause_selected_color, players = len(self.playerList))
     settingsMenu.fadeScreen = False
     careerSettingsMenu.fadeScreen = False
 
@@ -2236,7 +2243,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if self.coOpType:
           if (self.coOpScoreCard.handicap>>15)&1 != 1:
             self.coOpScoreCard.handicap += 0x8000
-      if self.autoPlay and (self.jurg == i or self.jurg == 2): #2 as both
+      if self.autoPlay and self.jurg[i]:
         if (scoreCard.handicap>>16)&1 != 1:
           scoreCard.handicap += 0x10000
         if self.coOpType:
@@ -2283,7 +2290,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.engine.data.SetAllSoundFxObjectVolumes(self.sfxVolume)
     
     #Re-apply Jurgen Settings -- Spikehead777
-    self.jurg             = self.engine.config.get("game", "jurgtype")
+    self.autoPlay         = False
+    self.jurg             = [False for i in self.playerList]
+    for i in range(len(self.playerList)):
+      if self.engine.config.get("game", "jurg_p%d" % i) == True:
+        self.jurg[i] = True
+        self.autoPlay = True
     
     #MFH
     self.jurgenLogic = self.engine.config.get("game", "jurglogic")    #logic 0 = original, logic 1 = MFH-1
@@ -2294,13 +2306,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.autoPlay = False
     elif self.bossBattle:
       self.autoPlay = True
-      self.jurg = 1
-    else:
-      self.autoPlay         = self.engine.config.get("game", "jurgmode")
-      if self.autoPlay == 0:
-        self.autoPlay = True
-      else:
-        self.autoPlay = False
+      self.jurg = [False for i in self.playerList]
+      self.jurg[1] = True
 
     self.hopoStyle        = self.engine.config.get("game", "hopo_system")
     self.gh2sloppy        = self.engine.config.get("game", "gh2_sloppy")
@@ -3329,14 +3336,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       for i,guitar in enumerate(self.guitars):
   
         #Allow Jurgen per player...Spikehead777
-        if self.jurg == 2: #All players
+        if self.jurg[i] == True: #if it is this player
           self.jurgPlayer[i] = True
-        else:
-          if self.jurg == i: #if it is this player
-            self.jurgPlayer[i] = True
-          else: #and if not
-            if self.playerAssist[i] == 0: #and no assist
-              continue
+        else: #and if not
+          if self.playerAssist[i] == 0: #and no assist
+            continue
         
         if self.jurgenLogic == 0:   #original FoF / RF-Mod style Jurgen Logic (cannot handle fast notes / can only handle 1 strum per notewindow)
           notes = guitar.getRequiredNotesMFH(self.song, pos)  #mfh - needed updatin' 
@@ -3344,7 +3348,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           changed = False
           held = 0
           for n, k in enumerate(self.keysList[i]):
-            if (self.autoPlay and self.jurgPlayer[i]) or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
+            if (self.autoPlay and self.jurg[i]) or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
               if n in notes and not self.controls.getState(k):
                 changed = True
                 self.controls.toggle(k, True)
@@ -3377,7 +3381,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
           for n, k in enumerate(self.keysList[i]):
             
-            if (self.autoPlay and self.jurgPlayer[i]) or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.guitars[i].isDrum and self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
+            if (self.autoPlay and self.jurg[i]) or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.guitars[i].isDrum and self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
               if n in jurgStrumNotes and not self.controls.getState(k):
                 changed = True
                 self.controls.toggle(k, True)
@@ -3412,7 +3416,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           held = 0
   
           for n, k in enumerate(self.keysList[i]):
-            if (self.autoPlay and self.jurgPlayer[i]) or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.guitars[i].isDrum and self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
+            if (self.autoPlay and self.jurg[i]) or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.guitars[i].isDrum and self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
               if n in jurgStrumNotes and not self.controls.getState(k):
                 changed = True
                 self.controls.toggle(k, True)
@@ -3449,7 +3453,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           if not notes or jurgStrumTime <= (pos + 30):
             
             for n, k in enumerate(self.keysList[i]):
-              if (self.autoPlay and self.jurgPlayer[i]) or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.guitars[i].isDrum and self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
+              if (self.autoPlay and self.jurg[i]) or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.guitars[i].isDrum and self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
                 if n in jurgStrumNotes and not self.controls.getState(k):
                   changed = True
                   self.controls.toggle(k, True)
@@ -3466,7 +3470,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               self.handlePick(i)
             #MFH - release all frets - who cares about held notes, I want a test player (actually if no keyReleased call, will hold notes fine)
             for n, k in enumerate(self.keysList[i]):
-              if (self.autoPlay and self.jurgPlayer[i]) or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.guitars[i].isDrum and self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
+              if (self.autoPlay and self.jurg[i]) or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.guitars[i].isDrum and self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
                 if self.controls.getState(k):
                   self.controls.toggle(k, False)
   
@@ -8338,7 +8342,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   xOffset = 0.950
                   if self.hitAccuracyPos == 0: #Center - need to move solo review above this!
                     yOffset = 0.080
-                  elif self.jurgPlayer[i] and self.autoPlay:
+                  elif self.jurgPlayer[i]: # and self.autoPlay: #akedrou - jurgPlayer checks if jurg was ever in town. This would block his notice if he came and left.
                     yOffset = 0.115    #above Jurgen Is Here
                   else:   #no jurgens here:
                     yOffset = 0.155   #was 0.180, occluded notes
@@ -8956,11 +8960,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
                     #Show Jurgen played Spikehead777
           if self.jurgPlayer[i] == True:
-            if self.autoPlay:
-              if self.jurg == i or self.jurg == 2: #or whatever the "all/both players" is
-                text = self.tsJurgenIsHere
-              else:
-                text = self.tsJurgenWasHere
+            if self.jurg[i]:
+              text = self.tsJurgenIsHere
             else:
               text = self.tsJurgenWasHere
             #jurgScale = .001/self.numOfPlayers

@@ -305,8 +305,9 @@ Config.define("performance",   "disable_librotation", bool,  True,  text = _("CD
 
 #Spikehead777
 #Config.define("game",   "jurgdef",             bool,  False,  text = _("Enable Jurgen"),    options = {False: _("No"), True: _("Yes")})
-Config.define("game",   "jurgmode",             int,   1,      text = _("Enable Jurgen"),    options = {0: _("Yes"), 1: _("No")})
-Config.define("game",   "jurgtype",            int,   2,      text = _("Jurgen Player"), options = {0: _("1"), 1: _("2"), 2: _("Both")}  )
+Config.define("game",   "jurg_p0",             bool, False,   text = _("P1 Jurgen"), options = {True: _("On"), False: _("Off")})
+Config.define("game",   "jurg_p1",             bool, False,   text = _("P2 Jurgen"), options = {True: _("On"), False: _("Off")})
+Config.define("game",   "jurg_p2",             bool, False,   text = _("P3 Jurgen"), options = {True: _("On"), False: _("Off")})
 #MFH
 Config.define("game",   "jurglogic",            int,   1,      text = _("Jurgen Logic"), options = {0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}  )
 #Config.define("game",   "jurgtext",            int,   1,      text = _("Jurgen Text Size"), options = {0: _("Big"), 1: _("Small")})

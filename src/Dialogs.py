@@ -4390,7 +4390,7 @@ class ControlActivator(Layer, KeyListener):
     self.selectedItems.append(num)
     self.blockedItems.append(num)
     self.blockedItems.sort()
-    if self.playerNum >= self.minPlayers or self.blockedItems == [0, 1, 2, 3]:
+    if self.playerNum >= self.minPlayers:
       self.ready = True
     self.selectedIndex += 1
     self.delay = 0
@@ -4414,7 +4414,7 @@ class ControlActivator(Layer, KeyListener):
   def keyPressed(self, key, unicode):
     c = self.engine.input.controls.getMapping(key)
     if key == pygame.K_RETURN:
-      if self.ready:
+      if self.ready and self.playerNum >= self.maxPlayers:
         self.confirm()
       else:
         self.delay = 0
