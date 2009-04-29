@@ -194,6 +194,7 @@ class Input(Task):
     
     self.gameGuitars = 0
     self.gameDrums   = 0
+    self.gameMics    = 0
 
     # Initialize joysticks
     pygame.joystick.init()
@@ -243,6 +244,8 @@ class Input(Task):
     for i in self.activeGameControls:
       if self.controls.type[i] == 2 or self.controls.type[i] == 3:
         self.gameDrums += 1
+      elif self.controls.type[i] == 5:
+        self.gameMics += 1
       else:
         self.gameGuitars += 1
   
@@ -352,8 +355,28 @@ class Input(Task):
     else:
       return (False, 0, 0)
   
+  def getJoysticksUsed(self, keys):
+    midis = []
+    joys  = []
+    for id in keys:
+      if id >= 0x40000:
+        midi, but = self.decodeMidiButton(id)
+        if midi not in midis:
+          midis.append(midi)
+      elif id >= 0x30000:
+        joy, axis, pos = self.decodeJoystickHat(id)
+        if joy not in joys:
+          joys.append(joy)
+      elif id >= 0x20000:
+        joy, axis, end = self.decodeJoystickAxis(id)
+        if joy not in joys:
+          joys.append(joy)
+      elif id >= 0x10000:
+        joy, but = self.decodeJoystickButton(id)
+        if joy not in joys:
+          joys.append(joy)
+      return [joys, midis]
   
-
   def getKeyName(self, id):
     if id >= 0x40000:
       midi, but = self.decodeMidiButton(id)
