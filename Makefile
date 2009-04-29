@@ -1,5 +1,7 @@
-# evilynux - Change this path to make it point to your cxFreeze
-CXFREEZE=/usr/src/cx_Freeze-3.0.3/FreezePython
+# evilynux - Change this path to make it point to your cxFreeze in case it's not
+#            in the default path. See example below.
+CXFREEZE=cxfreeze
+#CXFREEZE=/usr/src/cx_Freeze-3.0.3/FreezePython
 
 # evilynux - Autodetect pyopengl and python versions.
 PYTHON_VERSION=$(shell python -V 2>&1 | sed -e "s/^.\+\ \([0-9]\.[0-9]\).\+$$/\1/")
@@ -67,6 +69,7 @@ GameResultsScene src/FretsOnFire.py
            /usr/lib/libffi.so.5 \
            /usr/lib/liblapack.so.3gf \
            /usr/lib/libmikmod.so.2 \
+           /usr/lib/libblas.so.3gf \
            dist
 	mv dist/FretsOnFire dist/FretsOnFire.bin
 	-cp src/launcher.sh dist/FretsOnFire
