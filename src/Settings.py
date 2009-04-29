@@ -1229,7 +1229,7 @@ class BasicSettingsMenu(Menu.Menu):
     Cheats = [
       ConfigChoice(engine, engine.config, "game", "jurg_p0", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "jurg_p1", autoApply = True),
-      #ConfigChoice(engine, engine.config, "game", "jurg_p2", autoApply = True), #akedrou - uncomment when ready
+      ConfigChoice(engine, engine.config, "game", "jurg_p2", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "gh2_sloppy", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "whammy_saves_starpower", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "hit_window_cheat", autoApply = True),
