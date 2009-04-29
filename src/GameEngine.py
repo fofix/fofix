@@ -135,7 +135,7 @@ Config.define("game", "hopo_after_chord",      int,   1,   text = _("HO/PO After
 Config.define("game", "accuracy_mode",      int,   2,   text = _("Show Hit Accuracy"),    options = {0: _("Off"), 1: _("Numeric"), 2: _("Friendly"), 3: _("Both")})
 Config.define("game", "accuracy_pos",      int,   1,   text = _("Hit Accuracy Pos"),    options = {0: _("Center"), 1: _("Right-top Corner"), 2: _("Left-Bottom Corner"), 3: _("Center-Bottom")}) #QQstarS:acc show
 
-
+Config.define("performance", "max_players", int, 2, text = _("Max Players"), options = {2: 2, 3: 3})
 
 #myfingershurt:
 Config.define("game",  "stage_rotate_delay",        int,   800,   text = _("Slideshow Delay"), options = dict([(n, n) for n in range(0, 10, 1)] + [(n, n) for n in range(10, 50, 10)] + [(n, n) for n in range(50, 2001, 50)]))
