@@ -4249,7 +4249,7 @@ class ControlActivator(Layer, KeyListener):
     self.minPlayers = players
     if maxplayers:
       maxallowed = self.engine.config.get("performance", "max_players")
-      if maxplayers > maxallowed:
+      if maxplayers > maxallowed or maxplayers == -1:
         self.maxPlayers = maxallowed
       else:
         self.maxPlayers = maxplayers

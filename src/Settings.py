@@ -677,16 +677,10 @@ class SettingsMenu(Menu.Menu):
        ConfigChoice(self.engine, self.engine.config, "game", "lyric_mode", autoApply = True, isQuickset = 1),      #myfingershurt
        ConfigChoice(self.engine, self.engine.config, "game", "script_lyric_pos", autoApply = True),      #myfingershurt
     ]
-    self.lyricsSettingsMenu = Menu.Menu(engine, self.lyricsSettings)
+    self.lyricsSettingsMenu = Menu.Menu(self.engine, self.lyricsSettings)
     
-    self.jurgenSettings = [
-       #ConfigChoice(self.engine, self.engine.config, "game", "jurgdef", autoApply = True),#Spikehead777
-       ConfigChoice(self.engine, self.engine.config, "game", "jurg_p0", autoApply = True),
-       ConfigChoice(self.engine, self.engine.config, "game", "jurg_p1", autoApply = True),
-       ConfigChoice(self.engine, self.engine.config, "game", "jurg_p2", autoApply = True),
-       ConfigChoice(self.engine, self.engine.config, "game", "jurglogic", autoApply = True),#MFH
-    ]
-    self.jurgenSettingsMenu = Menu.Menu(self.engine, self.jurgenSettings)
+    jurgenSettings = self.refreshJurgenSettings(init = True)
+    self.jurgenSettingsMenu = Menu.Menu(self.engine, jurgenSettings)
            
     self.advancedGameSettings = [
       ConfigChoice(self.engine, self.engine.config, "game",   "note_hit_window", autoApply = True), #alarian: defines hit window
@@ -1030,6 +1024,16 @@ class SettingsMenu(Menu.Menu):
           option.apply()
       self.engine.restart()
   
+  def refreshJurgenSettings(self, init = False):
+    choices = []
+    maxplayer = self.engine.config.get("performance", "max_players")
+    for i in range(maxplayer):
+      choices.append(ConfigChoice(self.engine, self.engine.config, "game", "jurg_p%d" % i, autoApply = True))
+    choices.append(ConfigChoice(self.engine, self.engine.config, "game", "jurglogic", autoApply = True))#MFH
+    if init:
+      return choices
+    self.engine.mainMenu.settingsMenuObject.jurgenSettingsMenu.choices = choices
+  
   def refreshKeySettings(self, init = False):
     choices = [ #the reacharound
       Menu.Choice(_("Test Controls"), self.keyChangeMenu),
@@ -1040,7 +1044,7 @@ class SettingsMenu(Menu.Menu):
       Menu.Choice(_("New Controller"),    lambda: createControl(self.engine, refresh = self.refreshKeySettings)),
       Menu.Choice(_("Edit Controller"),   lambda: chooseControl(self.engine, refresh = self.refreshKeySettings)),
       Menu.Choice(_("Delete Controller"), lambda: chooseControl(self.engine, "delete", refresh = self.refreshKeySettings)),
-      ConfigChoice(self.engine, self.engine.config, "performance", "max_players", autoApply = True), #akedrou
+      ActiveConfigChoice(self.engine, self.engine.config, "performance", "max_players", onChange = self.refreshJurgenSettings), #akedrou
       ActiveConfigChoice(self.engine, self.engine.config, "game", "scroll_delay", onChange = self.scrollSet),
       ActiveConfigChoice(self.engine, self.engine.config, "game", "scroll_rate", onChange = self.scrollSet),
       ActiveConfigChoice(self.engine, self.engine.config, "game", "p2_menu_nav", onChange = self.engine.input.reloadControls),#myfingershurt
@@ -1227,20 +1231,8 @@ class BasicSettingsMenu(Menu.Menu):
     ]
     listSettingsMenu = Menu.Menu(engine, listSettings)
 
-    Cheats = [
-      ConfigChoice(engine, engine.config, "game", "jurg_p0", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "jurg_p1", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "jurg_p2", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "gh2_sloppy", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "whammy_saves_starpower", autoApply = True),#myfingershurt
-      ConfigChoice(engine, engine.config, "game", "hit_window_cheat", autoApply = True),
-      ConfigChoice(engine, engine.config, "coffee", "hopo_freq_cheat", autoApply = True),
-      ConfigChoice(engine, engine.config, "coffee", "failingEnabled", autoApply = True),
-      ConfigChoice(engine, engine.config, "audio",  "speed_factor", autoApply = True),     #MFH
-      ConfigChoice(engine, engine.config, "handicap",  "early_hit_window", autoApply = True),     #MFH
-      (_("Mod settings"), modSettings),
-    ]
-    CheatMenu = Menu.Menu(engine, Cheats)
+    Cheats = self.refreshCheatSettings(init = True)
+    self.cheatMenu = Menu.Menu(engine, Cheats)
     
     settings = [
       (_("Gameplay Settings"),   FoFiXBasicSettingsMenu),
@@ -1248,7 +1240,7 @@ class BasicSettingsMenu(Menu.Menu):
       (_("Display Settings"),     self.videoSettingsMenu),
       (_("Audio Settings"),      audioSettingsMenu),
       (_("Setlist Settings"),   listSettingsMenu),
-      (_("Mods, Cheats, AI"), CheatMenu),
+      (_("Mods, Cheats, AI"), self.cheatMenu),
       (_("%s Credits") % (engine.versionString), lambda: Dialogs.showCredits(engine)), # evilynux - Show Credits!
       (_("Quickset"), quicksetMenu),
       (_("See Advanced Options"), self.advancedSettings)
@@ -1321,6 +1313,24 @@ class BasicSettingsMenu(Menu.Menu):
     if init:
       return choices
     self.engine.mainMenu.settingsMenuObject.keySettingsMenu.choices = choices
+  
+  def refreshCheatSettings(self, init = False):
+    choices = []
+    maxplayers = self.engine.config.get("performance", "max_players")
+    for i in range(maxplayers):
+      choices.append(ConfigChoice(self.engine, self.engine.config, "game", "jurg_p%d" % i, autoApply = True))
+    choicesb = [ConfigChoice(engine, engine.config, "game", "gh2_sloppy", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "whammy_saves_starpower", autoApply = True),#myfingershurt
+      ConfigChoice(engine, engine.config, "game", "hit_window_cheat", autoApply = True),
+      ConfigChoice(engine, engine.config, "coffee", "hopo_freq_cheat", autoApply = True),
+      ConfigChoice(engine, engine.config, "coffee", "failingEnabled", autoApply = True),
+      ConfigChoice(engine, engine.config, "audio",  "speed_factor", autoApply = True),     #MFH
+      ConfigChoice(engine, engine.config, "handicap",  "early_hit_window", autoApply = True),     #MFH
+      (_("Mod settings"), modSettings),]
+    choices.extend(choicesb)
+    if init:
+      return choices
+    self.engine.mainMenu.settingsMenuObject.cheatMenu.choices = choices
   
   def controlCheck(self):
     control = [self.engine.config.get("game", "control0")]

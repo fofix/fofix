@@ -135,7 +135,7 @@ Config.define("game", "hopo_after_chord",      int,   1,   text = _("HO/PO After
 Config.define("game", "accuracy_mode",      int,   2,   text = _("Show Hit Accuracy"),    options = {0: _("Off"), 1: _("Numeric"), 2: _("Friendly"), 3: _("Both")})
 Config.define("game", "accuracy_pos",      int,   1,   text = _("Hit Accuracy Pos"),    options = {0: _("Center"), 1: _("Right-top Corner"), 2: _("Left-Bottom Corner"), 3: _("Center-Bottom")}) #QQstarS:acc show
 
-Config.define("performance", "max_players", int, 2, text = _("Max Players"), options = {2: 2, 3: 3})
+Config.define("performance", "max_players", int, 2, text = _("Max Players"), options = {2: 2, 3: 3, 4: 4})
 
 #myfingershurt:
 Config.define("game",  "stage_rotate_delay",        int,   800,   text = _("Slideshow Delay"), options = dict([(n, n) for n in range(0, 10, 1)] + [(n, n) for n in range(10, 50, 10)] + [(n, n) for n in range(50, 2001, 50)]))
@@ -308,6 +308,7 @@ Config.define("performance",   "disable_librotation", bool,  True,  text = _("CD
 Config.define("game",   "jurg_p0",             bool, False,   text = _("P1 Jurgen"), options = {True: _("On"), False: _("Off")})
 Config.define("game",   "jurg_p1",             bool, False,   text = _("P2 Jurgen"), options = {True: _("On"), False: _("Off")})
 Config.define("game",   "jurg_p2",             bool, False,   text = _("P3 Jurgen"), options = {True: _("On"), False: _("Off")})
+Config.define("game",   "jurg_p3",             bool, False,   text = _("P4 Jurgen"), options = {True: _("On"), False: _("Off")})
 #MFH
 Config.define("game",   "jurglogic",            int,   1,      text = _("Jurgen Logic"), options = {0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}  )
 #Config.define("game",   "jurgtext",            int,   1,      text = _("Jurgen Text Size"), options = {0: _("Big"), 1: _("Small")})

@@ -100,7 +100,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.practiceMode = False
     Log.debug("GuitarSceneClient init...")
 
-    self.coOpPlayerMeter = 1
+    self.coOpPlayerMeter = 0
 
     #MFH - testing new traceback logging:
     #raise TypeError
@@ -267,7 +267,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.processedFirstNoteYet = False
     
     self.numOfPlayers = len(self.playerList)        #MFH - MUST be in front of loadSettings call!
-    
     #self.autoPlay         = self.engine.config.get("game", "jurgmode")
     #if self.autoPlay == 0:
     #  self.autoPlay = True
