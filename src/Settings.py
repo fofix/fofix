@@ -1137,7 +1137,7 @@ class BasicSettingsMenu(Menu.Menu):
     if self.logClassInits == 1:
       Log.debug("BasicSettingsMenu class init (Settings.py)...")
       
-    modSettings = [
+    self.modSettings = [
       ConfigChoice(engine, engine.config, "mods",  "mod_" + m) for m in Mod.getAvailableMods(engine)
     ]
     
@@ -1319,14 +1319,14 @@ class BasicSettingsMenu(Menu.Menu):
     maxplayers = self.engine.config.get("performance", "max_players")
     for i in range(maxplayers):
       choices.append(ConfigChoice(self.engine, self.engine.config, "game", "jurg_p%d" % i, autoApply = True))
-    choicesb = [ConfigChoice(engine, engine.config, "game", "gh2_sloppy", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "whammy_saves_starpower", autoApply = True),#myfingershurt
-      ConfigChoice(engine, engine.config, "game", "hit_window_cheat", autoApply = True),
-      ConfigChoice(engine, engine.config, "coffee", "hopo_freq_cheat", autoApply = True),
-      ConfigChoice(engine, engine.config, "coffee", "failingEnabled", autoApply = True),
-      ConfigChoice(engine, engine.config, "audio",  "speed_factor", autoApply = True),     #MFH
-      ConfigChoice(engine, engine.config, "handicap",  "early_hit_window", autoApply = True),     #MFH
-      (_("Mod settings"), modSettings),]
+    choicesb = [ConfigChoice(self.engine, self.engine.config, "game", "gh2_sloppy", autoApply = True),
+      ConfigChoice(self.engine, self.engine.config, "game", "whammy_saves_starpower", autoApply = True),#myfingershurt
+      ConfigChoice(self.engine, self.engine.config, "game", "hit_window_cheat", autoApply = True),
+      ConfigChoice(self.engine, self.engine.config, "coffee", "hopo_freq_cheat", autoApply = True),
+      ConfigChoice(self.engine, self.engine.config, "coffee", "failingEnabled", autoApply = True),
+      ConfigChoice(self.engine, self.engine.config, "audio",  "speed_factor", autoApply = True),     #MFH
+      ConfigChoice(self.engine, self.engine.config, "handicap",  "early_hit_window", autoApply = True),     #MFH
+      (_("Mod settings"), self.modSettings),]
     choices.extend(choicesb)
     if init:
       return choices

@@ -3650,8 +3650,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
 
   def run(self, ticks): #QQstarS: Fix this funcion
-    if not self.ready:
-      return
     if self.song and self.song.readyToGo and not self.pause and not self.failed:
       SceneClient.run(self, ticks)
       if not self.resumeCountdown and not self.pause:
@@ -5634,9 +5632,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #Want to render all background / single-viewport graphics first
 
     #if self.song:
-    if not self.ready:
-      return
-
     #myfingershurt: Alarian's auto-stage scaling update
     w = self.wFull
     h = self.hFull
