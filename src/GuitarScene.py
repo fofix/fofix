@@ -98,16 +98,33 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.coOpGH = False
     self.coOpType = False
     self.practiceMode = False
+    self.bossBattle = False
+    self.ready = False
     Log.debug("GuitarSceneClient init...")
 
     self.coOpPlayerMeter = 0
 
     #MFH - testing new traceback logging:
     #raise TypeError
-    
-    splash = Dialogs.showLoadingSplashScreen(self.engine, _("Preparing...")) 
+    #myfingershurt: new loading place for "loading" screen for song preparation:
+    #blazingamer new loading phrases
     self.sinfo = Song.loadSongInfo(self.engine, songName, library = libraryName)
-    self.bossBattle = False
+    phrase = self.sinfo.loading
+    if phrase == "":
+      phrase = random.choice(Theme.loadingPhrase.split("_"))
+      if phrase == "None":
+        i = random.randint(0,4)
+        if i == 0:
+          phrase = _("Let's get this show on the Road")
+        elif i == 1:
+          phrase = _("Impress the Crowd")
+        elif i == 2:
+          phrase = _("Don't forget to strum!")
+        elif i == 3:
+          phrase = _("Rock the house!")
+        else:
+          phrase = _("Jurgen is watching")
+    splash = Dialogs.showLoadingSplashScreen(self.engine, phrase + " \n " + _("Initializing...")) 
       
 
     self.countdownSeconds = 5   #MFH - don't change this initialization value unless you alter the other related variables to match
@@ -400,10 +417,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
 
 
-
+    #Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Loading Stage..."))
     stage = os.path.join("themes",themename,"stage.ini")
     self.stage = Stage.Stage(self, self.engine.resource.fileName(stage))
-
+    
+    #Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Loading Settings..."))
     self.loadSettings()
     #MFH pre-translate text strings:
     if self.battleGH:
@@ -801,32 +819,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.counting = self.engine.config.get("video", "counting")
 
 
-
+    #Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Loading Song..."))
 
     #MFH - this is where song loading originally took place, and the loading screen was spawned.
     self.engine.resource.load(self, "song", lambda: loadSong(self.engine, songName, library = libraryName, part = [player.part for player in self.playerList], practiceMode = self.playerList[0].practiceMode), synch = True, onLoad = self.songLoaded)
     
-    #myfingershurt: new loading place for "loading" screen for song preparation:
-    #blazingamer new loading phrases
-    phrase = self.song.info.loading
-    if phrase == "":
-      phrase = random.choice(Theme.loadingPhrase.split("_"))
-      if phrase == "None":
-        i = random.randint(0,4)
-        if i == 0:
-          phrase = "Let's get this show on the Road"
-        elif i == 1:
-          phrase = "Impress the Crowd"
-        elif i == 2:
-          phrase = "Don't forget to strum!"
-        elif i == 3:
-          phrase = "Rock the house!"
-        else:
-          phrase = "Jurgen is watching"
     # glorandwarf: show the loading splash screen and load the song synchronously
-    Dialogs.hideLoadingSplashScreen(self.engine, splash)
-    splash = None
-    splash = Dialogs.showLoadingSplashScreen(self.engine, phrase)
+    #Dialogs.hideLoadingSplashScreen(self.engine, splash)
+    #splash = None
+    #splash = Dialogs.showLoadingSplashScreen(self.engine, phrase)
+    Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Preparing Note Phrases..."))
 
 
 
@@ -1234,8 +1236,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     
 
-
-
+    self.ready = True
+    Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Loading Graphics..."))
     #lyric sheet!
     if self.readTextAndLyricEvents == 2 or (self.readTextAndLyricEvents == 1 and self.theme == 2):
       if self.song.hasMidiLyrics and self.midiLyricsEnabled > 0:
@@ -3648,7 +3650,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
 
   def run(self, ticks): #QQstarS: Fix this funcion
-
+    if not self.ready:
+      return
     if self.song and self.song.readyToGo and not self.pause and not self.failed:
       SceneClient.run(self, ticks)
       if not self.resumeCountdown and not self.pause:
@@ -5631,6 +5634,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #Want to render all background / single-viewport graphics first
 
     #if self.song:
+    if not self.ready:
+      return
 
     #myfingershurt: Alarian's auto-stage scaling update
     w = self.wFull
