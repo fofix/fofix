@@ -1248,7 +1248,7 @@ class BasicSettingsMenu(Menu.Menu):
   
     self.settingsToApply = FoFiXBasicSettings + \
                            videoSettings + \
-                           modSettings
+                           self.modSettings
   
     self.opt_text_x = Theme.opt_text_xPos
     self.opt_text_y = Theme.opt_text_yPos
