@@ -439,8 +439,9 @@ class Guitar:
             engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"spinnotesbattle.png"))
             self.starSpinFrames = 8
           except IOError:
-            try:  
-              engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"spinnotes.png"))
+            try:
+              self.starspin = False
+              engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notesbattle.png"))
             except IOError:
               self.starspin = False
               engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notes.png"))
@@ -457,7 +458,13 @@ class Guitar:
           engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notes.png"))
           self.rbnote = 0
       else:
-        engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notes.png"))
+        if self.gameMode2p == 6:
+          try:
+            engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notesbattle.png"))
+          except IOError:
+            engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notes.png"))
+        else:
+          engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notes.png"))
         #mfh - adding fallback for beta option
     else:
       #MFH - can't use IOError for fallback logic for a Mesh() call... 
