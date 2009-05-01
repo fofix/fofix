@@ -61,6 +61,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
     self.players      = Config.get("game", "players")
     self.mode1p       = Config.get("game","game_mode")
     self.mode2p       = Config.get("game","multiplayer_mode")
+    self.lobbyMode    = Theme.lobbyMode
     sfxVolume = self.engine.config.get("audio", "SFX_volume")
     self.engine.data.selectSound.setVolume(sfxVolume)
     self.engine.data.acceptSound.setVolume(sfxVolume)  #MFH
@@ -133,7 +134,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
       self.selected = 0
       self.getPlayers()
       default = self.engine.config.get("game","player0")
-      self.screenOptions = 5
+      self.screenOptions = Theme.lobbySelectLength
       self.pos = (0, self.screenOptions)
       self.getStartingSelected(default)
       
@@ -429,6 +430,8 @@ class Lobby(Layer, KeyListener, MessageHandler):
       else:
         wText, hText = font.getStringSize(self.tsChooseChar, scale = Theme.lobbyTitleScale)
         titleFont.render(self.tsChooseChar, (Theme.lobbyTitleX-(wText),Theme.lobbyTitleY), scale = Theme.lobbyTitleScale)
+      r, g, b = Theme.lobbyPlayerColor
+      glColor3f(r, g, b)
       wText, hText = titleFont.getStringSize(self.tsPlayerStr % (self.playerNum+1), scale = Theme.lobbyTitleScale)
       titleFont.render(self.tsPlayerStr % (self.playerNum+1), (Theme.lobbyTitleCharacterX-wText/2, Theme.lobbyTitleCharacterY), scale = Theme.lobbyTitleScale)
       for i, name in enumerate(self.options):
@@ -442,10 +445,16 @@ class Lobby(Layer, KeyListener, MessageHandler):
             if self.playerPrefs[j][0] == 1:
               lefty = -1
             self.engine.drawImage(self.buttons, scale = (self.buttonScale*lefty, -self.buttonScale*(1.0/6.0)), coord = (w*Theme.lobbyPreviewX,h*(Theme.lobbyPreviewY+.45)), rect = (0, 1, 0, (1.0/6.0)))
-            if self.avatars[i] == "Empty" or self.avatars[i] == None:
-              self.engine.drawImage(self.defaultAvatar, scale = (self.defAvScale,-self.defAvScale), coord = (w*Theme.lobbyPreviewX,h*(Theme.lobbyPreviewY+.75)))
+            if self.lobbyMode == 1:
+              avatarCoord = (w*Theme.lobbyAvatarX,h*Theme.lobbyAvatarY)
+              avatarScale = Theme.lobbyAvatarScale
             else:
-              self.engine.drawImage(self.avatars[i], scale = (self.avatarScale[i],-self.avatarScale[i]), coord = (w*Theme.lobbyPreviewX,h*(Theme.lobbyPreviewY+.75)))
+              avatarCoord = (w*Theme.lobbyPreviewX,h*(Theme.lobbyPreviewY+.75))
+              avatarScale = 1
+            if self.avatars[i] == "Empty" or self.avatars[i] == None:
+              self.engine.drawImage(self.defaultAvatar, scale = (self.defAvScale*avatarScale,-self.defAvScale*avatarScale), coord = avatarCoord)
+            else:
+              self.engine.drawImage(self.avatars[i], scale = (self.avatarScale[i]*avatarScale,-self.avatarScale[i]*avatarScale), coord = avatarCoord)
             if self.infoImg:
               self.engine.drawImage(self.infoImg, scale = (.5,-.5), coord = (w*Theme.lobbyPreviewX,h*(Theme.lobbyPreviewY+.55)))
             else:
@@ -456,7 +465,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
             for k in range(1,5):
               text = self.tsList[k][self.playerPrefs[j][k]]
               wText, hText = font.getStringSize(text, scale = .0018)
-              font.render(text, (Theme.lobbyPreviewX-wText/2,.4-(Theme.lobbyPreviewY*self.engine.data.fontScreenBottom)+(.04*k)), scale = .0018)
+              font.render(text, (Theme.lobbyPreviewX-wText/2,.4-(Theme.lobbyPreviewY*self.engine.data.fontScreenBottom)+(Theme.lobbyPreviewSpacing*k)), scale = .0018)
           if self.itemSelect:
             self.engine.drawImage(self.itemSelect, scale = (.5,-.5), coord = (w*Theme.lobbySelectImageX,h*(1-(Theme.lobbySelectImageY+Theme.lobbySelectSpace*(i-self.pos[0]))/self.engine.data.fontScreenBottom)))
           else:
