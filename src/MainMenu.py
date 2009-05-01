@@ -504,7 +504,7 @@ class MainMenu(BackgroundLayer):
           
           self.engine.drawImage(self.optionsPanel, (0.5,-0.5), (w/1.7, h/2))
         else:
-          self.engine.drawImage(self.engine.data.loadingImage, (0.5,-0.5), (w/2, h/2), stretched = 3)
+          self.engine.drawImage(self.engine.data.loadingImage, (1.0,-1.0), (w/2, h/2), stretched = 3)
 
       if self.menu.active:
         if self.background != None:
