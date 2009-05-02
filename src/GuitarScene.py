@@ -2148,7 +2148,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     except Exception, e:
       songHopo = 1
     for i, scoreCard in enumerate(self.scoring):
-      if self.gh2sloppy == 1: # or self.rb2sloppy == 1:
+      if self.gh2sloppy == 1 and not self.guitars[i].isDrum: # or self.rb2sloppy == 1:
         if (scoreCard.handicap)&1 != 1:
           scoreCard.handicap += 1
         if self.coOpType:
@@ -2196,49 +2196,49 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if self.coOpType:
           if (self.coOpScoreCard.handicap>>7)&1 != 1:
             self.coOpScoreCard.handicap += 0x80
-      if self.hopoStyle == 0: #no taps
+      if self.hopoStyle == 0 and not self.guitars[i].isDrum: #no taps
         if (scoreCard.handicap>>8)&1 != 1:
           scoreCard.handicap += 0x100
         if self.coOpType:
           if (self.coOpScoreCard.handicap>>8)&1 != 1:
             self.coOpScoreCard.handicap += 0x100
-      elif hopoFreq == 0 and songHopo != 1:
+      elif hopoFreq == 0 and songHopo != 1 and not self.guitars[i].isDrum:
         if (scoreCard.handicap>>9)&1 != 1:
           scoreCard.handicap += 0x200
         if self.coOpType:
           if (self.coOpScoreCard.handicap>>9)&1 != 1:
             self.coOpScoreCard.handicap += 0x200
-      elif hopoFreq == 1 and songHopo != 1:
+      elif hopoFreq == 1 and songHopo != 1 and not self.guitars[i].isDrum:
         if (scoreCard.handicap>>10)&1 != 1:
           scoreCard.handicap += 0x400
         if self.coOpType:
           if (self.coOpScoreCard.handicap>>10)&1 != 1:
             self.coOpScoreCard.handicap += 0x400
-      elif hopoCheat == 1 and songHopo != 1:
+      elif hopoCheat == 1 and songHopo != 1 and not self.guitars[i].isDrum:
         if (scoreCard.handicap>>11)&1 != 1:
           scoreCard.handicap += 0x800
         if self.coOpType:
           if (self.coOpScoreCard.handicap>>11)&1 != 1:
             self.coOpScoreCard.handicap += 0x800
-      elif hopoCheat == 2 and songHopo != 1:
+      elif hopoCheat == 2 and songHopo != 1 and not self.guitars[i].isDrum:
         if (scoreCard.handicap>>12)&1 != 1:
           scoreCard.handicap += 0x1000
         if self.coOpType:
           if (self.coOpScoreCard.handicap>>12)&1 != 1:
             self.coOpScoreCard.handicap += 0x1000
-      elif hopoFreq == 3 and songHopo != 1:
+      elif hopoFreq == 3 and songHopo != 1 and not self.guitars[i].isDrum:
         if (scoreCard.handicap>>13)&1 != 1:
           scoreCard.handicap += 0x2000
         if self.coOpType:
           if (self.coOpScoreCard.handicap>>13)&1 != 1:
             self.coOpScoreCard.handicap += 0x2000
-      elif self.allTaps == 1:
+      elif self.allTaps == 1 and not self.guitars[i].isDrum:
         if (scoreCard.handicap>>14)&1 != 1:
           scoreCard.handicap += 0x4000
         if self.coOpType:
           if (self.coOpScoreCard.handicap>>14)&1 != 1:
             self.coOpScoreCard.handicap += 0x4000
-      if self.whammySavesSP:
+      if self.whammySavesSP and not self.guitars[i].isDrum:
         if (scoreCard.handicap>>15)&1 != 1:
           scoreCard.handicap += 0x8000
         if self.coOpType:
