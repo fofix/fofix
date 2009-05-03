@@ -1,5 +1,5 @@
 #summary How to set up a Python 2.6 environment for FoFiX.
-#labels Phase-Deployment
+#labels Phase-Deployment,Featured
 <wiki:toc max_depth="2" />
 = Introduction =
 
@@ -31,10 +31,12 @@ Acrox999 has put together [http://www.mediafire.com/?y02uniotmmt a package] cont
 
 The following packages are optional:
 
-  # psyco: Python JIT compiler (1.6: http://www.voidspace.org.uk/downloads/psyco-1.6.win32-py2.6.exe)  _Highly recommended!_
+  # psyco: Python JIT compiler (1.6: http://www.voidspace.org.uk/downloads/psyco-1.6.win32-py2.6.exe)  It may improve the game's performance; it may not.  If you install it, you may want to see whether you get better performance with it enabled or disabled; you can choose in the game options.
   # rtmidi: support for using MIDI instruments (svn revision 10: http://www.mediafire.com/file/njrzmkyztfg/rtmidi-0.1.win32-py2.6.exe)
   # py2exe: support for freezing the code into a standalone EXE (0.6.9: http://downloads.sourceforge.net/py2exe/py2exe-0.6.9.win32-py2.6.exe)
   # pitchbend: support for pitch bend effect (0.3-EndOfLife: http://www.mediafire.com/file/zlinjzzj0km/pitchbend-0.3-EndOfLife.win32-py2.6.exe)  _Will be replaced with a much better implementation soon enough..._
+  # pyaudio: required for experimental vocals support (0.2.3: http://people.csail.mit.edu/hubert/pyaudio/packages/pyaudio-0.2.3.py26.exe)
+  # pypitch: required for experimental vocals support (svn revision 7: http://www.mediafire.com/file/s9mtx1xqjmp/pypitch-svn_rev7.win32-py2.6.exe)
 
 Install them in the order listed above by double-clicking the .exe or .msi files that you downloaded.
 
@@ -44,6 +46,7 @@ Note that the current FoFiX codebase under Python 2.6 no longer has some of the 
   # glew/glewpy: while code that uses it still exists in FoFiX, there is currently no way for that code to be called from the rest of the game.
   # Numeric: obsolete, replaced by numpy.
 
+<wiki:comment>
 You may need to modify one of the files in pyOpenGL.  Do so if you receive errors and the function name "glGenTextures" appears anywhere in the log.
 
   # Navigate to your Python installation folder, then go into lib/site-packages/OpenGL/GL.
@@ -59,6 +62,7 @@ You may need to modify one of the files in pyOpenGL.  Do so if you receive error
   # Be sure you do not change the amount of indentation of either line, as indentation is significant in Python.  If you are in doubt, the indentation of both should match up with the line between them (which you did not edit).
   # Save the file and exit IDLE.
   # Delete the files "exceptional.pyc" and "exceptional.pyo" in the same folder.
+</wiki:comment>
 
 To obtain the FoFiX source code, you will need a Subversion client.  Download the most recent version of TortoiseSVN from http://tortoisesvn.net/downloads and double-click the .msi to install it.  _Be sure you obtain the correct package for your system.  If you have a 64-bit system, be *sure* to get the 64-bit version, and vice versa._  You will still be able to follow the rest of these steps without rebooting - a reboot is only needed to activate the icon overlay feature of TortoiseSVN.
 
