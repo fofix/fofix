@@ -40,6 +40,7 @@ import datetime
 import sys
 import Theme
 import Player
+import Shader
 
 #myfingershurt: needed for multi-OS file fetching
 import os
@@ -419,7 +420,6 @@ class MainMenu(BackgroundLayer):
 
     #MFH - testing new traceback logging:
     #raise TypeError
-
 
     if self.engine.isServerRunning():
       return

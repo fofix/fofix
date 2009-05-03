@@ -28,6 +28,9 @@ import string
 import random
 import time
 import Log
+import Texture
+import Version
+import Config
 # evilynux - Do not crash If OpenGL 2.0 is not supported
 try:
   from OpenGL.GL.ARB.shader_objects import *
@@ -83,7 +86,7 @@ class shaderList:
     Log.debug("Compiling " + fname + " shader.")
     try:
       program = self.compile(open(fullname+".vs"), open(fullname+".ps"))
-      sArray = {"program": program, "name": name, "tex" : (), "textype" : ()}
+      sArray = {"program": program, "name": name, "tex" : (), "textype" : (), "enabled" : True}
       self.lastCompiled = name
       self.getVars(fullname+".vs", program, sArray)
       self.getVars(fullname+".ps", program, sArray)
@@ -202,14 +205,18 @@ class shaderList:
         
   def enable(self, shader):
     try:
-      glUseProgramObjectARB(self[shader]["program"])
-      self.active = self.shaders[shader]
-      self.setTextures()
-      self.setVar("time",self.time())
-      self.update()
-      return True
+        if self[shader]["enabled"]:
+          glUseProgramObjectARB(self[shader]["program"])
+          self.active = self.shaders[shader]
+          self.setTextures()
+          self.setVar("time",self.time())
+          self.update()
+          return True
+        else:
+          return False
     except:
       return False
+
           
   def update(self):
     for i in self.active.keys():
@@ -321,7 +328,7 @@ class shaderList:
       noise = open(os.path.join(self.workdir,fname)).read()
       size = int(len(noise)**(1/3.0))
     except:
-      Log.debug("noise")
+      Log.debug("Can't load "+fname)
       return self.makeNoise3D(16)
     #print noise
           
@@ -342,6 +349,7 @@ class shaderList:
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
     glTexImage3D(GL_TEXTURE_3D, 0, 1,size, size, size, 0, type, GL_UNSIGNED_BYTE, noise)
     return texture
+
     
   def smoothNoise(self, size, c, noise):
     for x in range(size):
@@ -374,13 +382,36 @@ class shaderList:
     self.var["eqcolor"]=(0.0,)*4    #color for equalizer
     self.var["drum"]=[-10.0]*5      #last fret note hit time
     self.var["fret"]=[-10.0]*5      #last drum note hit time
+    self.checkIfEnabled()
     #self.var["whammy"]=0           #whammy fx for tails
-
+    
+  def checkIfEnabled(self):
+     try:
+       if Config.get("video","shader_use"):
+         if self.enabled:
+           self.turnOn()
+         else:
+           self.set(os.path.join(Version.dataPath(), "shaders"))
+       else:
+         self.turnOff()
+     except:
+       return False
+     else:
+       for i in self.shaders.keys():
+         enabled = Config.get("video","shader_"+i)
+         if enabled == None or enabled == 1:
+           self[i]["enabled"] = True
+         else:
+           self[i]["enabled"] = False
+       return True
+         
     
   def set(self, dir):
     self.enabled = True
     self.workdir = dir
     self.noise3D = self.loadTex3D("noise3d.dds")
+    self.outline = Texture.Texture(os.path.join(self.workdir, "outline.png")).texture
+
     try:
       multiTex = (GL_TEXTURE0_ARB,GL_TEXTURE1_ARB,GL_TEXTURE2_ARB,GL_TEXTURE3_ARB)
     except:
@@ -399,7 +430,7 @@ class shaderList:
       self.setVar("vertNoise",0.78)
       self.setVar("fading",1.0)
       self.setVar("solofx",False)
-      self.setVar("scalexy",(1.6,1.2))
+      self.setVar("scalexy",(5.0,2.4))
       self.setVar("fixalpha",True)
       self.setVar("offset",(0.0,-2.5))
       self.disable()
@@ -448,6 +479,18 @@ class shaderList:
       self.disable()
     else:
       Log.error("Shader has not been compiled: lightning")  
+
+    if self.make("metal","rbnotes"):
+      self.enable("rbnotes")
+      self["rbnotes"]["tex"]=(self.outline,)
+      self.setVar("view_position",(.0,.0,.0,.0))
+      self.setVar("light0",(.0,.0,.0,.0))
+      self.setVar("light1",(.0,.0,.0,.0))
+      self.setVar("light2",(.0,.0,.0,.0))
+      self.setVar("Material",(.0,.0,.0,.0))
+      self.disable()
+    else:
+      Log.error("Shader has not been compiled: metal")  
       
     if not self.make("neck","neck"):
       Log.error("Shader has not been compiled: neck") 

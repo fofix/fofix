@@ -73,7 +73,16 @@ Config.define("video",  "fps",          int,   80,    text = _("Frames per Secon
 Config.define("video",  "show_fps",     bool,   False,  text = _("Print Frames per Second"), options = {False: _("No"), True: _("Yes")})
 Config.define("video",  "hitglow_color", int,  0,     text = _("Fret Glow Color"), options = {0: _("Same as Fret"), 1: _("Actual Color")})
 Config.define("video",  "hitflame_color", int, 0,     text = _("Hitflames Color"), options = {0: _("Theme Specific"), 1: _("Same as Fret"), 2: _("Actual Color")})
-Config.define("video",  "use_shaders",     bool,   False,  text = _("Use Shaders"), options = {False: _("No"), True: _("Yes")})
+
+Config.define("video",  "shader_use",     bool,   True,  text = _("Use Shaders"), options = {False: _("No"), True: _("Yes")})
+Config.define("video",  "shader_neck",     int,   1,  text = _("Neck Flashing"), options = {0: _("Disabled"), 1: _("Enabled"), 2:_("By theme")})
+Config.define("video",  "shader_stage",     int,   1,  text = _("EQ Lightning"), options = {0: _("Disabled"), 1: _("Enabled"), 2:_("By theme")})
+Config.define("video",  "shader_stage",     int,   1,  text = _("EQ Lightning"), options = {0: _("Disabled"), 1: _("Enabled"), 2:_("By theme")})
+Config.define("video",  "shader_sololight",     int,   1,  text = _("Solo Lightnings"), options = {0: _("Disabled"), 1: _("Enabled"), 2:_("By theme")})
+Config.define("video",  "shader_tail",     int,   1,  text = _("RB2 Tails"), options = {0: _("Disabled"), 1: _("Enabled"), 2:_("By theme")})
+Config.define("video",  "shader_rbnotes",     int,   1,  text = _("Metal Notes"), options = {0: _("Disabled"), 1: _("Enabled"), 2:_("By theme")})
+Config.define("video",  "shader_cd",     int,   1,  text = _("White CDs"), options = {0: _("Disabled"), 1: _("Enabled"), 2:_("By theme")})
+
 Config.define("performance",  "starspin", bool,     True,  text = _("Animated Star Notes"), options = {True: _("Yes"), False: _("No")})
 Config.define("audio",  "frequency",    int,   44100, text = _("Sample Frequency"), options = [8000, 11025, 22050, 32000, 44100, 48000])
 Config.define("audio",  "bits",         int,   16,    text = _("Sample Bits"), options = [16, 8])
@@ -499,7 +508,7 @@ class GameEngine(Engine):
     multisamples  = self.config.get("video", "multisamples")
     self.video.setMode((width, height), fullscreen = fullscreen, multisamples = multisamples)
     
-    if self.config.get("video", "use_shaders"):
+    if self.config.get("video", "shader_use"):
       Shader.list.set(os.path.join(Version.dataPath(), "shaders"))
 
     # Enable the high priority timer if configured

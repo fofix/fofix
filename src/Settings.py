@@ -805,6 +805,17 @@ class SettingsMenu(Menu.Menu):
       (_("Change Neck Transparency"), self.neckTransparencyMenu), #volshebnyi
     ]
     self.fretSettingsMenu = Menu.Menu(self.engine, self.fretSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
+
+    self.shaderSettings = [      #volshebnyi
+      ConfigChoice(self.engine, self.engine.config, "video", "shader_use", autoApply = True), 
+      ConfigChoice(self.engine, self.engine.config, "video", "shader_neck", autoApply = True),
+      ConfigChoice(self.engine, self.engine.config, "video", "shader_stage", autoApply = True),
+      ConfigChoice(self.engine, self.engine.config, "video", "shader_sololight", autoApply = True),
+      ConfigChoice(self.engine, self.engine.config, "video", "shader_tail", autoApply = True),
+      ConfigChoice(self.engine, self.engine.config, "video", "shader_rbnotes", autoApply = True),
+      ConfigChoice(self.engine, self.engine.config, "video", "shader_cd", autoApply = True),
+    ]
+    self.shaderSettings = Menu.Menu(self.engine, self.shaderSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
     
     self.advancedVideoSettings = [
       ConfigChoice(self.engine, self.engine.config, "engine", "highpriority", isQuickset = 1),
@@ -815,11 +826,10 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(self.engine, self.engine.config, "game", "gfx_version_tag", autoApply = True), #MFH
       ConfigChoice(self.engine, self.engine.config, "video",  "multisamples", isQuickset = 1),
       ConfigChoice(self.engine, self.engine.config, "game", "in_game_font_shadowing", autoApply = True),      #myfingershurt
-      ConfigChoice(self.engine, self.engine.config, "video", "use_shaders"),      #volshebnyi
       ConfigChoice(self.engine, self.engine.config, "performance", "preload_glyph_cache", autoApply = True, isQuickset = 1),#evilynux
       ConfigChoice(self.engine, self.engine.config, "performance", "static_strings", autoApply = True, isQuickset = 1),      #myfingershurt
       ConfigChoice(self.engine, self.engine.config, "performance", "killfx", autoApply = True, isQuickset = 1),   #blazingamer
-      #ConfigChoice(self.engine, self.engine.config, "video",  "special_fx", autoApply = True, isQuickset = 1), #volshebnyi
+      (_("More Effects"), self.shaderSettings), #volshebnyi
     ]
     self.advancedVideoSettingsMenu = Menu.Menu(self.engine, self.advancedVideoSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
     
