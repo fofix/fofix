@@ -4,6 +4,7 @@
 # Frets on Fire X (FoFiX)                                           #
 # Copyright (C) 2009 myfingershurt                                  #
 #               2009 John Stumpo                                    #
+#               2009 akedrou                                        #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -133,3 +134,4 @@ else:
 # Turn a number of semitones above A into a human-readable note name.
 def getNoteName(semitones):
   return ['A', 'Bb', 'B', 'C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab'][semitones]
+

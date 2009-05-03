@@ -245,7 +245,7 @@ class MainMenu(BackgroundLayer):
     elif self.theme == 2:
       multPlayerMenu = [
         (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3, maxplayers = 4)),
-        (_("RB Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 4, maxplayers = 4)),
+        (_("RB Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 4, maxplayers = 4, allowMic = True)),
         (_("GH Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 5, maxplayers = 4)),
         (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = -1)),
         (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = -1)),

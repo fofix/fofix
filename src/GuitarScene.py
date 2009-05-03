@@ -31,7 +31,7 @@
 #####################################################################
 
 from Scene import SceneServer, SceneClient
-from Song import Note, Tempo, TextEvent, PictureEvent, loadSong, Bars
+from Song import Note, Tempo, TextEvent, PictureEvent, loadSong, Bars, VocalNote, VocalBar
 from Menu import Menu
 from Guitar import Guitar
 
@@ -52,6 +52,8 @@ import Settings
 import Song
 import Scorekeeper
 import Shader
+
+from Vocalist import Vocalist
 
 import math
 import pygame
@@ -204,12 +206,25 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.coOpType = False
 
     self.splayers = Players #Spikehead777
+    self.vplayers = 0
 
     #myfingershurt: drums :)
     self.guitars = []
+    self.vocalists = []
     self.keysList = []
     self.soloKeysList = []
     self.soloShifts   = []
+    self.vocalPlayers = [] #akedrou - vocal players need to be separated out! (Though there can only be one...)
+    for player in self.playerList[:]:
+      if player.part.id == Song.VOCAL_PART:
+        self.vocalPlayers.append(player)
+        self.vplayers += 1
+        self.splayers -= 1
+        self.playerList.remove(player)
+    
+    for i, player in enumerate(self.vocalPlayers):
+      self.vocalists.append(Vocalist(self.engine, player, False, i))
+    
     for i,player in enumerate(self.playerList):
       if player.part.id == Song.DRUM_PART:
         self.guitars.append(Drum(self.engine,player,False,i))
@@ -822,7 +837,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Loading Song..."))
 
     #MFH - this is where song loading originally took place, and the loading screen was spawned.
-    self.engine.resource.load(self, "song", lambda: loadSong(self.engine, songName, library = libraryName, part = [player.part for player in self.playerList], practiceMode = self.playerList[0].practiceMode), synch = True, onLoad = self.songLoaded)
+    vocalist = False
+    if len(self.vocalPlayers) > 0:
+      vocalist = True
+    
+    self.engine.resource.load(self, "song", lambda: loadSong(self.engine, songName, library = libraryName, part = [player.part for player in self.playerList], practiceMode = self.playerList[0].practiceMode, vocalist = vocalist), synch = True, onLoad = self.songLoaded)
     
     # glorandwarf: show the loading splash screen and load the song synchronously
     #Dialogs.hideLoadingSplashScreen(self.engine, splash)
@@ -834,8 +853,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     if self.playerList[0].practiceMode or self.song.info.tutorial or self.tut:
       self.failingEnabled = False
-
-
 
     self.playerList[0].hopoFreq = self.song.info.hopofreq
     
@@ -929,7 +946,18 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.baseBeat       = 0.0
 
     
-    
+    if len(self.vocalPlayers) > 0:
+      phraseId = 0
+      for i, vocalist in enumerate(self.vocalists):
+        for time, event in self.song.vocalEventTrack.getAllEvents():
+          if isinstance(event, Song.VocalBar):
+            if time in vocalist.phraseTimes:
+              self.song.vocalEventTrack.removeEvent(time, event)
+              continue
+            vocalist.phraseTimes.append(time)
+            phraseId += 1
+          elif isinstance(event, Song.VocalNote):
+            event.phrase = phraseId
 
 
     for theGuitar in self.guitars:    #MFH - force update of early hit window
@@ -2059,6 +2087,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.pauseScreen = None
     self.rockTop = None
     self.rockMsg = None
+    for vocalist in self.vocalists:
+      vocalist.mic.stop()
 
     #MFH - Ensure all event tracks are destroyed before removing Song object!
     if self.song:
@@ -3710,6 +3740,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       if pos > self.lastDrumNoteTime:   #MFH - disable drum scoring so that the drummer can get down with his bad self at the end of the song without penalty.
         self.drumScoringEnabled = False # ...is that what drummers do?
 
+      for vocalist in self.vocalists:
+        vocalist.requiredNote = vocalist.getCurrentNote(pos, self.song)
+        vocalist.run(ticks, pos)
       
       for i,guitar in enumerate(self.guitars):  
         self.stage.run(pos, guitar.currentPeriod)
@@ -3850,6 +3883,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if self.coOpGH:
           for k, theGuitar in enumerate(self.guitars):
             theGuitar.starPower = self.coOpStarPower/self.numOfPlayers
+        
         
         if not guitar.run(ticks, pos, self.controls):
           # done playing the current notes
@@ -4137,6 +4171,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.crowdsCheering = False #catches crowdsEnabled != 3, pause before countdown, set to 3
           self.starPowersActive = 0
           self.playersInGreen = 0
+          for vocalist in self.vocalists:
+            vocalist.mic.start()
           if self.playerList[0].practiceMode and self.engine.audioSpeedFactor == 1:
             self.playerList[0].startPos[0] -= self.song.period*4
             if self.playerList[0].startPos[0] < 0.0:
@@ -5673,7 +5709,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       if self.lyricSheet != None:
         self.engine.drawImage(self.lyricSheet, scale = (self.lyricSheetScaleFactor,-self.lyricSheetScaleFactor), coord = (w/2, h*0.935))
         #the timing line on this lyric sheet image is approx. 1/4 over from the left
-  
+      if len(self.vocalists) > 0:
+        for i, vocalist in enumerate(self.vocalists):
+          vocalist.render(visibility, None)
       #MFH - also render the scrolling lyrics & sections before changing viewports:
       minPos = pos - ((self.guitars[0].currentPeriod * self.guitars[0].beatsPerBoard) / 2)
       maxPos = pos + ((self.guitars[0].currentPeriod * self.guitars[0].beatsPerBoard) * 1.5)

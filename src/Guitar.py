@@ -170,7 +170,8 @@ class Guitar:
     if self.engine.config.get("game", "battle_Whammy") == 1:
       self.battleObjectsEnabled.append(4)
     if self.engine.config.get("game", "battle_Diff_Up") == 1:
-      self.battleObjectsEnabled.append(2)
+      if playerObj.getDifficultyInt() > 0:
+        self.battleObjectsEnabled.append(2)
     if self.engine.config.get("game", "battle_String_Break") == 1:
       self.battleObjectsEnabled.append(3)
     if self.engine.config.get("game", "battle_Double") == 1:

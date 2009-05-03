@@ -262,9 +262,12 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
           
             guitars = []
             drums = []
+            vocals = []
             for part in info.parts:
               if part.id == 4:
                 drums.append(part)
+              elif part.id == 5:
+                vocals.append(part)
               else:
                 guitars.append(part)
             if len(drums) == 0 and self.engine.input.gameDrums > 0:
@@ -275,6 +278,10 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
               Dialogs.showMessage(self.engine, _("There are no guitar parts in this song. Change your controllers to play."))
               escaped = True
               break
+            if len(vocals) == 0 and self.engine.input.gameMics > 0:
+              Dialogs.showMessage(self.engine, _("There are no vocal parts in this song. Change your controllers to play."))
+              escaped = True
+              break
             
             for i, player in enumerate(self.playerList):
               
@@ -283,6 +290,8 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
                 choose = []
                 if player.controlType == 2 or player.controlType == 3:
                   choose = drums
+                elif player.controlType == 5:
+                  choose = vocals
                 else:
                   choose = guitars
                   
