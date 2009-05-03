@@ -55,6 +55,9 @@ Versions are likely important. Don't substitute one for the other without trying
   * [http://www.mediafire.com/stump jsPitchBend] - for a whammy pitchbend effect (source: [https://svn.stump.jstump.com/svnroot/pitchbend/trunk SVN Checkout], [https://svn.stump.jstump.com/websvn WebSVN]).  At least revision 7 or release 0.1 is needed for the effect to work.  ([http://www.mediafire.com/?3mgtxhagijt direct download of latest release])
   * [http://sourceforge.net/project/downloading.php?group_id=5988&filename=PyOpenGL-3.0.0.win32.exe&a=75398406 PyOpenGL 3.0] - for experimental shader code.  Install instead of the pyOpenGL 2.0.2.01 package from the required list.  ([http://prdownloads.sourceforge.net/pyopengl/PyOpenGL-3.0.0.win32.exe?download])
   * ctypes - required if you install pyOpenGL 3.0  ([http://prdownloads.sourceforge.net/ctypes/ctypes-1.0.2.win32-py2.4.exe?download])
+  * pyAudio - required module 1 of 2 for microphone support: [http://people.csail.mit.edu/hubert/pyaudio/#binaries Download choices] / [http://people.csail.mit.edu/hubert/pyaudio/packages/pyaudio-0.2.3.py24.exe Direct download for Python 2.4]
+  * pyPitch - required module 2 of 2 for microphone support: [http://www.mediafire.com/download.php?ni03jtyzjz9 Direct download for Python 2.4]
+
 
 *Or, here's a complete package* with all the files above, with a batch file that installs everything for Windows 32-bit users, in a single RAR archive - courtesy of Chris Paiano (Myfingershurt) - _Updated 3/4/2009_: *(Important - you will need the updated py2exe module linked above!)*
 [http://www.mediafire.com/?iu9ezgnnnnx] - Includes optional modules.
