@@ -60,7 +60,7 @@ Versions are likely important. Don't substitute one for the other without trying
 
 
 *Or, here's a complete package* with all the files above, with a batch file that installs everything for Windows 32-bit users, in a single RAR archive - courtesy of Chris Paiano (Myfingershurt) - _Updated 3/4/2009_: *(Important - you will need the updated py2exe module linked above!)*
-[http://www.mediafire.com/?iu9ezgnnnnx] - Includes optional modules.
+[http://www.mediafire.com/?iu9ezgnnnnx] - Includes the first 3 optional modules.
 
 
 
