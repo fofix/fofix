@@ -289,11 +289,33 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.jurgenLogic[i] = self.engine.config.get("game", "jurg_logic_p%d" % i)
 
     self.jurgenSkill             = [0 for i in self.playerList]
+    self.jurgHitPercentage       = [0 for i in self.playerList]
+    self.jurgPlayNote            = [True for i in self.playerList]
+    self.jurgBattleWhammyTime    = [0 for i in self.playerList]
+    self.jurgBattleUseTime       = [0 for i in self.playerList]
     for i in range(len(self.playerList)):
       self.jurgenSkill[i] = self.engine.config.get("game", "jurg_skill_p%d" % i)
+      if self.jurgenSkill[i] == 0:
+        self.jurgHitPercentage[i] = 85
+        self.jurgBattleWhammyTime[i] = 1000
+        self.jurgBattleUseTime[i] = 5000
+      elif self.jurgenSkill[i] == 1:
+        self.jurgHitPercentage[i] = 90
+        self.jurgBattleWhammyTime[i] = 750
+        self.jurgBattleUseTime[i] = 2000
+      elif self.jurgenSkill[i] == 2:
+        self.jurgHitPercentage[i] = 95
+        self.jurgBattleWhammyTime[i] = 500
+        self.jurgBattleUseTime[i] = 1000
+      elif self.jurgenSkill[i] == 3:
+        self.jurgHitPercentage[i] = 97
+        self.jurgBattleWhammyTime[i] = 250
+        self.jurgBattleUseTime[i] = 0
+      elif self.jurgenSkill[i] == 4:
+        self.jurgHitPercentage[i] = 100
+        self.jurgBattleWhammyTime[i] = 200
+        self.jurgBattleUseTime[i] = 0
     
-    if self.battleGH:
-      self.jurgenLogic             = [3 for i in self.playerList]
     #self.jurgenText = self.engine.config.get("game", "jurgtext")
     
     self.jurgenText = Theme.jurgTextPos
@@ -2352,8 +2374,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     for i in range(len(self.playerList)):
       self.jurgenLogic[i] = self.engine.config.get("game", "jurg_logic_p%d" % i)
     
-    if self.battleGH:
-      self.jurgenLogic             = [3 for i in self.playerList]
       
       
     #MFH - no Jurgen in Career mode.
@@ -3397,7 +3417,20 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           if self.playerAssist[i] == 0: #and no assist
             continue
                   
-        
+        if self.battleGH: #KID,AKEDROU,QSTICK LOGIC
+          if self.guitars[i].battleObjects[0] != 0:
+            if pos > self.guitars[i].battleGetTime + self.jurgBattleUseTime[i]:
+              self.activateSP(i)
+          if self.guitars[i].battleStatus[4]:
+            if self.guitars[i].battleWhammyNow == 0:
+              self.guitars[i].battleStatus[4] = False
+              for k, nowUsed in enumerate(self.guitars[i].battleBeingUsed):
+                if self.guitars[i].battleBeingUsed[k] == 4:
+                  self.guitars[i].battleBeingUsed[k] = 0
+            if self.guitars[i].battleWhammyNow != 0:
+              if pos - self.guitars[i].battleStartTimes[4] > self.jurgBattleWhammyTime[i]:
+                self.guitars[i].battleStartTimes[4] = pos
+                self.guitars[i].battleWhammyNow -= 1
 
           
 
@@ -3432,31 +3465,41 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           if notes:
             jurgStrumTime = notes[0][0]
             jurgStrumNotes = [note.number for time, note in notes if abs(time-jurgStrumTime) <= chordFudge]
+            if self.battleJurgMissTime[i] != jurgStrumTime:
+              self.battleJurgMissTime[i] = jurgStrumTime
+              if random.randint(0,100) > self.jurgHitPercentage[i]:
+                self.jurgPlayNote[i] = False
+              else:
+                self.jurgPlayNote[i] = True
           else:
             jurgStrumNotes = []
           
           changed = False
           held = 0
-  
-          for n, k in enumerate(self.keysList[i]):
-            
-            if (self.autoPlay and self.jurg[i]) or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.guitars[i].isDrum and self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
-              if n in jurgStrumNotes and not self.controls.getState(k):
-                changed = True
-                self.controls.toggle(k, True)
-                self.keyPressed(None, 0, k)  #mfh
-              elif not n in jurgStrumNotes and self.controls.getState(k):
-                changed = True
-                self.controls.toggle(k, False)
-                self.keyReleased(k)    #mfh
-              if self.controls.getState(k):
-                held += 1
+          
 
-                
-          #if changed and held and not self.playerList[i].part.text == "Drums":  #dont need the extra pick for drums
-          if changed and held and not guitar.isDrum:  #dont need the extra pick for drums
-            #myfingershurt:
-            self.handlePick(i)
+              
+          if self.jurgPlayNote[i]:
+            
+            for n, k in enumerate(self.keysList[i]):
+              
+              if (self.autoPlay and self.jurg[i]) or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.guitars[i].isDrum and self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
+                if n in jurgStrumNotes and not self.controls.getState(k):
+                  changed = True
+                  self.controls.toggle(k, True)
+                  self.keyPressed(None, 0, k)  #mfh
+                elif not n in jurgStrumNotes and self.controls.getState(k):
+                  changed = True
+                  self.controls.toggle(k, False)
+                  self.keyReleased(k)    #mfh
+                if self.controls.getState(k):
+                  held += 1
+  
+                  
+            #if changed and held and not self.playerList[i].part.text == "Drums":  #dont need the extra pick for drums
+            if changed and held and not guitar.isDrum:  #dont need the extra pick for drums
+              #myfingershurt:
+              self.handlePick(i)
   
         elif self.jurgenLogic[i] == 2:   #Jurgen logic style MFH-OnTime1 -- Have Jurgen attempt to strum on time instead of as early as possible
           #This method simply shrinks the note retrieval window to only notes that are on time and late.  No early notes are even considered.
@@ -3467,28 +3510,38 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           if notes:
             jurgStrumTime = notes[0][0]
             jurgStrumNotes = [note.number for time, note in notes if abs(time-jurgStrumTime) <= chordFudge]
+            if self.battleJurgMissTime[i] != jurgStrumTime:
+              self.battleJurgMissTime[i] = jurgStrumTime
+              if random.randint(0,100) > self.jurgHitPercentage[i]:
+                self.jurgPlayNote[i] = False
+              else:
+                self.jurgPlayNote[i] = True
           else:
             jurgStrumNotes = []
+            self.jurgPlayNote[i] = True
           
           changed = False
           held = 0
-  
-          for n, k in enumerate(self.keysList[i]):
-            if (self.autoPlay and self.jurg[i]) or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.guitars[i].isDrum and self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
-              if n in jurgStrumNotes and not self.controls.getState(k):
-                changed = True
-                self.controls.toggle(k, True)
-                self.keyPressed(None, 0, k)  #mfh
-              elif not n in jurgStrumNotes and self.controls.getState(k):
-                changed = True
-                self.controls.toggle(k, False)
-                self.keyReleased(k)    #mfh
-              if self.controls.getState(k):
-                held += 1
-          #if changed and held and not self.playerList[i].part.text == "Drums":  #dont need the extra pick for drums
-          if changed and held and not guitar.isDrum:  #dont need the extra pick for drums
-            #myfingershurt:
-            self.handlePick(i)
+          
+
+              
+          if self.jurgPlayNote[i]:
+            for n, k in enumerate(self.keysList[i]):
+              if (self.autoPlay and self.jurg[i]) or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.guitars[i].isDrum and self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
+                if n in jurgStrumNotes and not self.controls.getState(k):
+                  changed = True
+                  self.controls.toggle(k, True)
+                  self.keyPressed(None, 0, k)  #mfh
+                elif not n in jurgStrumNotes and self.controls.getState(k):
+                  changed = True
+                  self.controls.toggle(k, False)
+                  self.keyReleased(k)    #mfh
+                if self.controls.getState(k):
+                  held += 1
+            #if changed and held and not self.playerList[i].part.text == "Drums":  #dont need the extra pick for drums
+            if changed and held and not guitar.isDrum:  #dont need the extra pick for drums
+              #myfingershurt:
+              self.handlePick(i)
   
         elif self.jurgenLogic[i] == 3:   #Jurgen logic style MFH-OnTime2 -- Have Jurgen attempt to strum on time instead of as early as possible
           #This method retrieves all notes in the window and only attempts to play them as they pass the current position, like a real player
@@ -3507,51 +3560,19 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           changed = False
           held = 0          
           
-          playNote = 0
   
           
-          if self.battleGH:
-            if self.jurgenSkill[i] == 0:
-              battleUseTime = 5000
-              battleWhammyTime = 100
-              missRatio = 5
-            elif self.jurgenSkill[i] == 1:
-              battleUseTime = 2000
-              battleWhammyTime = 750
-              missRatio = 4
-            elif self.jurgenSkill[i] == 2:
-              battleUseTime = 1000
-              battleWhammyTime = 500
-              missRatio = 3
-            elif self.jurgenSkill[i] == 3:
-              battleWhammyTime = 250
-            elif self.jurgenSkill[i] == 4:
-              battleWhammyTime = 200
-              
-            if self.jurgenSkill[i] == 0 or self.jurgenSkill[i] == 1 or self.jurgenSkill[i] == 2: #KID,AKEDROU,QSTICK LOGIC
-              if self.guitars[i].battleObjects[0] != 0:
-                if pos > self.guitars[i].battleGetTime + battleUseTime:
-                  self.activateSP(i)
-              if self.guitars[i].battleStatus[4]:
-                if self.guitars[i].battleWhammyNow == 0:
-                  self.guitars[i].battleStatus[4] = False
-                  for k, nowUsed in enumerate(self.guitars[i].battleBeingUsed):
-                    if self.guitars[i].battleBeingUsed[k] == 4:
-                      self.guitars[i].battleBeingUsed[k] = 0
-                if self.guitars[i].battleWhammyNow != 0:
-                  if pos - self.guitars[i].battleStartTimes[4] > battleWhammyTime:
-                    self.guitars[i].battleStartTimes[4] = pos
-                    self.guitars[i].battleWhammyNow -= 1
-              if self.guitars[i].battleStatus[2] or self.guitars[i].battleStatus[6] or self.guitars[i].battleStatus[7] or self.guitars[i].battleStatus[8]:
-                if self.battleJurgMissTime[i] != jurgStrumTime:
-                  self.battleJurgMissTime[i] = jurgStrumTime
-                  self.battleJurgMissCount[i] += 1
-                  if self.battleJurgMissCount[i] == missRatio:
-                    self.battleJurgMissCount[i] = 0
-                playNote = self.battleJurgMissCount[i]
+          #if self.battleGH:
+          
+          if self.battleJurgMissTime[i] != jurgStrumTime:
+            self.battleJurgMissTime[i] = jurgStrumTime
+            if random.randint(0,100) > self.jurgHitPercentage[i]:
+              self.jurgPlayNote[i] = False
+            else:
+              self.jurgPlayNote[i] = True
               
           #MFH - check if jurgStrumTime is close enough to the current position (or behind it) before actually playing the notes:
-          if (not notes or jurgStrumTime <= (pos + 30)) and playNote == 0:
+          if (not notes or jurgStrumTime <= (pos + 30)) and self.jurgPlayNote[i]:
               for n, k in enumerate(self.keysList[i]):
                 if (self.autoPlay and self.jurg[i]) or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.guitars[i].isDrum and self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
                   if n in jurgStrumNotes and not self.controls.getState(k):
