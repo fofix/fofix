@@ -28,7 +28,7 @@ import string
 import random
 import time
 import Log
-import Texture
+import pygame
 import Version
 import Config
 # evilynux - Do not crash If OpenGL 2.0 is not supported
@@ -349,6 +349,29 @@ class shaderList:
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
     glTexImage3D(GL_TEXTURE_3D, 0, 1,size, size, size, 0, type, GL_UNSIGNED_BYTE, noise)
     return texture
+    
+  def loadTex2D(self, fname, type = GL_RGB):
+    try:
+      img = pygame.image.load(os.path.join(self.workdir,fname))
+      noise = pygame.image.tostring(img, "RGB")
+    except:
+      print os.path.join(self.workdir, "outline.png")
+      Log.debug("Can't load "+fname)
+      return self.makeNoise2D(16)
+
+    texture = 0
+    # evilynux - If OpenGL 2.0 is not supported, nicely return.
+    try:
+      glBindTexture(GL_TEXTURE_2D, texture)
+    except:
+      return
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+    glTexImage2D(GL_TEXTURE_2D, 0, 1, img.get_width(), img.get_height(), 0, type, GL_UNSIGNED_BYTE, noise)
+    return texture
 
     
   def smoothNoise(self, size, c, noise):
@@ -410,7 +433,7 @@ class shaderList:
     self.enabled = True
     self.workdir = dir
     self.noise3D = self.loadTex3D("noise3d.dds")
-    self.outline = Texture.Texture(os.path.join(self.workdir, "outline.png")).texture
+    self.outline = self.loadTex2D("outline.tga")
 
     try:
       multiTex = (GL_TEXTURE0_ARB,GL_TEXTURE1_ARB,GL_TEXTURE2_ARB,GL_TEXTURE3_ARB)
@@ -484,10 +507,10 @@ class shaderList:
       self.enable("rbnotes")
       self["rbnotes"]["tex"]=(self.outline,)
       self.setVar("view_position",(.0,.0,.0,.0))
-      self.setVar("light0",(.0,.0,.0,.0))
-      self.setVar("light1",(.0,.0,.0,.0))
-      self.setVar("light2",(.0,.0,.0,.0))
-      self.setVar("Material",(.0,.0,.0,.0))
+      self.setVar("light0",(10.0,0.0,0.0,1.0))
+      self.setVar("light1",(.0,10.0,.0,1.0))
+      self.setVar("light2",(.0,.0,10.0,1.0))
+      self.setVar("Material",(1.0,.5,.0,1.0))
       self.disable()
     else:
       Log.error("Shader has not been compiled: metal")  

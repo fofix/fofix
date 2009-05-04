@@ -1669,6 +1669,7 @@ class Guitar:
           self.noteMesh.render("Mesh_001")
         else:
           self.noteMesh.render("Mesh")
+        
         glMatrixMode(GL_TEXTURE)
         glLoadIdentity()
         glMatrixMode(GL_MODELVIEW)
@@ -1700,7 +1701,10 @@ class Guitar:
         glDisable(GL_TEXTURE_2D)          
         
       else:
+        if Shader.list.enable("rbnotes"):
+          Shader.list.setVar("Material",color)
         note.render("Mesh_001")
+        Shader.list.disable()
         glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
         if isTappable:
           if self.hopoColor[0] == -2:
@@ -1713,6 +1717,7 @@ class Guitar:
         note.render("Mesh_002")
         glColor3f(self.meshColor[0], self.meshColor[1], self.meshColor[2])
         note.render("Mesh")
+        
 
 
 
