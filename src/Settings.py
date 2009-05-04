@@ -983,7 +983,7 @@ class SettingsMenu(Menu.Menu):
     self.advancedSettingsMenu = Menu.Menu(engine, advancedSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
     
     self.cheats = [
-      (_("Jurgen Settings"), self.jurgenSettingsMenu),
+      (_("AI Settings"), self.jurgenSettingsMenu),
       ConfigChoice(engine, engine.config, "game", "gh2_sloppy", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "whammy_saves_starpower", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "hit_window_cheat", autoApply = True),
@@ -1047,7 +1047,8 @@ class SettingsMenu(Menu.Menu):
     maxplayer = self.engine.config.get("performance", "max_players")
     for i in range(maxplayer):
       choices.append(ConfigChoice(self.engine, self.engine.config, "game", "jurg_p%d" % i, autoApply = True))
-    choices.append(ConfigChoice(self.engine, self.engine.config, "game", "jurglogic", autoApply = True))#MFH
+      choices.append(ConfigChoice(self.engine, self.engine.config, "game", "jurg_skill_p%d" % i, autoApply = True))
+      choices.append(ConfigChoice(self.engine, self.engine.config, "game", "jurg_logic_p%d" % i, autoApply = True))
     if init:
       return choices
     self.engine.mainMenu.settingsMenuObject.jurgenSettingsMenu.choices = choices
@@ -1589,7 +1590,7 @@ class GameSettingsMenu(Menu.Menu):
     
     for i in range(players):
       Cheats.append(ConfigChoice(engine, engine.config, "game", "jurg_p%d" % i, autoApply = True))#Jurgen config -- Spikehead777
-    Cheats.append(ConfigChoice(engine, engine.config, "game", "jurglogic", autoApply = True))#MFH
+      Cheats.append(ConfigChoice(engine, engine.config, "game", "jurg_logic_p%d" % i, autoApply = True))#MFH
      #MFH
     CheatMenu = Menu.Menu(engine, Cheats, pos = (.350, .310), viewSize = 5, textColor = gTextColor, selectedColor = gSelectedColor)
     

@@ -282,10 +282,20 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #self.jurg             = self.engine.config.get("game", "jurgtype")
     
     #MFH
-    self.jurgenLogic = self.engine.config.get("game", "jurglogic")    #logic 0 = original, logic 1 = MFH-1
+    #self.jurgenLogic = self.engine.config.get("game", "jurglogic")    #logic 0 = original, logic 1 = MFH-1
+    
+    self.jurgenLogic             = [0 for i in self.playerList]
+    for i in range(len(self.playerList)):
+      self.jurgenLogic[i] = self.engine.config.get("game", "jurg_logic_p%d" % i)
+
+    self.jurgenSkill             = [0 for i in self.playerList]
+    for i in range(len(self.playerList)):
+      self.jurgenSkill[i] = self.engine.config.get("game", "jurg_skill_p%d" % i)
+    
     if self.battleGH:
-      self.jurgenLogic = 3
+      self.jurgenLogic             = [3 for i in self.playerList]
     #self.jurgenText = self.engine.config.get("game", "jurgtext")
+    
     self.jurgenText = Theme.jurgTextPos
     if float(self.jurgenText[2]) < 0.00035:
       self.jurgenText[2] = 0.00035
@@ -294,8 +304,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if float(self.jurgenText[1]) < 0:
       self.jurgenText[1] = 0
       
-    self.battleJurgMissTime = 0
-    self.battleJurgMissCount = 0
+    self.battleJurgMissTime = [0 for i in self.playerList]
+    self.battleJurgMissCount = [0 for i in self.playerList]
 
     self.whammySavesSP = self.engine.config.get("game", "whammy_saves_starpower") #MFH
     self.failingEnabled = self.engine.config.get("coffee", "failingEnabled")
@@ -2333,11 +2343,19 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.jurg[i] = True
         self.autoPlay = True
     
-    #MFH
-    self.jurgenLogic = self.engine.config.get("game", "jurglogic")    #logic 0 = original, logic 1 = MFH-1
-    if self.battleGH:
-      self.jurgenLogic = 3
+    self.jurgenSkill             = [0 for i in self.playerList]
+    for i in range(len(self.playerList)):
+      self.jurgenSkill[i] = self.engine.config.get("game", "jurg_skill_p%d" % i)
     
+    #MFH
+    self.jurgenLogic             = [0 for i in self.playerList]
+    for i in range(len(self.playerList)):
+      self.jurgenLogic[i] = self.engine.config.get("game", "jurg_logic_p%d" % i)
+    
+    if self.battleGH:
+      self.jurgenLogic             = [3 for i in self.playerList]
+      
+      
     #MFH - no Jurgen in Career mode.
     if self.careerMode:
       self.autoPlay = False
@@ -3365,7 +3383,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             self.doPick3GH2(i, hopo, pullOff)
           else:   #2 = no HOPOs
             self.doPick(i)
-
+  
   def handleJurgen(self, pos):
     #chordFudge = 1   #MFH - was 10 - #myfingershurt - needed to detect chords
     chordFudge = self.song.track[0].chordFudge
@@ -3378,8 +3396,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         else: #and if not
           if self.playerAssist[i] == 0: #and no assist
             continue
+                  
+        
 
-        if self.jurgenLogic == 0:   #original FoF / RF-Mod style Jurgen Logic (cannot handle fast notes / can only handle 1 strum per notewindow)
+          
+
+        if self.jurgenLogic[i] == 0:   #original FoF / RF-Mod style Jurgen Logic (cannot handle fast notes / can only handle 1 strum per notewindow)
           notes = guitar.getRequiredNotesMFH(self.song, pos)  #mfh - needed updatin' 
           notes = [note.number for time, note in notes]
           changed = False
@@ -3402,7 +3424,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             #myfingershurt:
             self.handlePick(i)
         
-        elif self.jurgenLogic == 1:   #Jurgen logic style MFH-Early -- will separate notes out by time index, with chord slop detection, and strum every note
+        elif self.jurgenLogic[i] == 1:   #Jurgen logic style MFH-Early -- will separate notes out by time index, with chord slop detection, and strum every note
           #MFH - Jurgen needs some logic that can handle notes that may be coming too fast to retrieve one set at a time
           notes = guitar.getRequiredNotesMFH(self.song, pos)  #mfh - needed updatin' 
           
@@ -3436,7 +3458,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             #myfingershurt:
             self.handlePick(i)
   
-        elif self.jurgenLogic == 2:   #Jurgen logic style MFH-OnTime1 -- Have Jurgen attempt to strum on time instead of as early as possible
+        elif self.jurgenLogic[i] == 2:   #Jurgen logic style MFH-OnTime1 -- Have Jurgen attempt to strum on time instead of as early as possible
           #This method simply shrinks the note retrieval window to only notes that are on time and late.  No early notes are even considered.
           #MFH - Jurgen needs some logic that can handle notes that may be coming too fast to retrieve one set at a time
           notes = guitar.getRequiredNotesForJurgenOnTime(self.song, pos)  #mfh - needed updatin' 
@@ -3468,7 +3490,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             #myfingershurt:
             self.handlePick(i)
   
-        elif self.jurgenLogic == 3:   #Jurgen logic style MFH-OnTime2 -- Have Jurgen attempt to strum on time instead of as early as possible
+        elif self.jurgenLogic[i] == 3:   #Jurgen logic style MFH-OnTime2 -- Have Jurgen attempt to strum on time instead of as early as possible
           #This method retrieves all notes in the window and only attempts to play them as they pass the current position, like a real player
           notes = guitar.getRequiredNotesMFH(self.song, pos)  #mfh - needed updatin' 
           
@@ -3483,31 +3505,50 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             jurgStrumNotes = []
           
           changed = False
-          held = 0
+          held = 0          
+          
           playNote = 0
-          #Jurgen Battle AI
+  
           
           if self.battleGH:
-            if self.guitars[i].battleObjects[0] != 0:
-              if pos > self.guitars[i].battleGetTime + 2000:
-                self.activateSP(i)
-            if self.guitars[i].battleStatus[4]:
-              if self.guitars[i].battleWhammyNow == 0:
-                self.guitars[i].battleStatus[4] = False
-                for k, nowUsed in enumerate(self.guitars[i].battleBeingUsed):
-                  if self.guitars[i].battleBeingUsed[k] == 4:
-                    self.guitars[i].battleBeingUsed[k] = 0
-              if self.guitars[i].battleWhammyNow != 0:
-                if pos - self.guitars[i].battleStartTimes[4] > 500:
-                  self.guitars[i].battleStartTimes[4] = pos
-                  self.guitars[i].battleWhammyNow -= 1
-            if self.guitars[i].battleStatus[2] or self.guitars[i].battleStatus[6] or self.guitars[i].battleStatus[7] or self.guitars[i].battleStatus[8]:
-              if self.battleJurgMissTime != jurgStrumTime:
-                self.battleJurgMissTime = jurgStrumTime
-                self.battleJurgMissCount += 1
-                if self.battleJurgMissCount == 4:
-                  self.battleJurgMissCount = 0
-              playNote = self.battleJurgMissCount
+            if self.jurgenSkill[i] == 0:
+              battleUseTime = 5000
+              battleWhammyTime = 100
+              missRatio = 5
+            elif self.jurgenSkill[i] == 1:
+              battleUseTime = 2000
+              battleWhammyTime = 750
+              missRatio = 4
+            elif self.jurgenSkill[i] == 2:
+              battleUseTime = 1000
+              battleWhammyTime = 500
+              missRatio = 3
+            elif self.jurgenSkill[i] == 3:
+              battleWhammyTime = 250
+            elif self.jurgenSkill[i] == 4:
+              battleWhammyTime = 200
+              
+            if self.jurgenSkill[i] == 0 or self.jurgenSkill[i] == 1 or self.jurgenSkill[i] == 2: #KID,AKEDROU,QSTICK LOGIC
+              if self.guitars[i].battleObjects[0] != 0:
+                if pos > self.guitars[i].battleGetTime + battleUseTime:
+                  self.activateSP(i)
+              if self.guitars[i].battleStatus[4]:
+                if self.guitars[i].battleWhammyNow == 0:
+                  self.guitars[i].battleStatus[4] = False
+                  for k, nowUsed in enumerate(self.guitars[i].battleBeingUsed):
+                    if self.guitars[i].battleBeingUsed[k] == 4:
+                      self.guitars[i].battleBeingUsed[k] = 0
+                if self.guitars[i].battleWhammyNow != 0:
+                  if pos - self.guitars[i].battleStartTimes[4] > battleWhammyTime:
+                    self.guitars[i].battleStartTimes[4] = pos
+                    self.guitars[i].battleWhammyNow -= 1
+              if self.guitars[i].battleStatus[2] or self.guitars[i].battleStatus[6] or self.guitars[i].battleStatus[7] or self.guitars[i].battleStatus[8]:
+                if self.battleJurgMissTime[i] != jurgStrumTime:
+                  self.battleJurgMissTime[i] = jurgStrumTime
+                  self.battleJurgMissCount[i] += 1
+                  if self.battleJurgMissCount[i] == missRatio:
+                    self.battleJurgMissCount[i] = 0
+                playNote = self.battleJurgMissCount[i]
               
           #MFH - check if jurgStrumTime is close enough to the current position (or behind it) before actually playing the notes:
           if (not notes or jurgStrumTime <= (pos + 30)) and playNote == 0:
@@ -7127,20 +7168,21 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     self.engine.data.rockSound.play()
                   self.engine.view.setViewport(1,0)
                   if self.failTimer < 500:
+                    self.failTimer += 1
                     if self.p1Rocks != None:
                       imgWidth = self.battleHands.width1()
                       wFactor = 640.000/imgWidth
                       if self.rock[0] < 0:
-                        self.failTimer += 1
                         self.engine.drawImage(self.battleHands, scale = (wFactor/2, -wFactor), coord = (w*3/4,h/2))
                         self.engine.drawImage(self.p2Rocks, scale = (0.5, -0.5), coord = (w/2,h/2))
                       elif self.rock[1] < 0:
-                        self.failTimer += 1
                         self.engine.drawImage(self.battleHands, scale = (wFactor/2, -wFactor), coord = (w*1/4,h/2))
                         self.engine.drawImage(self.p1Rocks, scale = (0.5, -0.5), coord = (w/2,h/2))
                     else:
-                      self.failTimer += 1
-                      self.engine.drawImage(self.failMsg, scale = (0.5, -0.5), coord = (w/2,h/2))
+                      if self.rock[0] < 0:
+                        self.engine.drawImage(self.rockMsg, scale = (0.25, -0.25), coord = (w*3/4,h/2))
+                      elif self.rock[1] < 0:
+                        self.engine.drawImage(self.rockMsg, scale = (0.25, -0.25), coord = (w*1/4,h/2))
                   else:
 
                     self.ending = True
