@@ -354,7 +354,6 @@ class shaderList:
       img = pygame.image.load(os.path.join(self.workdir,fname))
       noise = pygame.image.tostring(img, "RGB")
     except:
-      print os.path.join(self.workdir, "outline.png")
       Log.debug("Can't load "+fname)
       return self.makeNoise2D(16)
 
