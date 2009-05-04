@@ -40,7 +40,6 @@ import datetime
 import sys
 import Theme
 import Player
-import Shader
 
 #myfingershurt: needed for multi-OS file fetching
 import os

@@ -417,13 +417,14 @@ class shaderList:
      except:
        return False
      else:
-       for i in self.shaders.keys():
-         enabled = Config.get("video","shader_"+i)
-         if enabled == None or enabled == 1:
-           self[i]["enabled"] = True
-         else:
-           self[i]["enabled"] = False
-       return True
+       if self.enabled:
+         for i in self.shaders.keys():
+           enabled = Config.get("video","shader_"+i)
+           if enabled == None or enabled == 1:
+             self.shaders[i]["enabled"] = True
+           else:
+             self.shaders[i]["enabled"] = False
+         return True
          
     
   def set(self, dir):
