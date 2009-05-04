@@ -3467,10 +3467,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             jurgStrumNotes = [note.number for time, note in notes if abs(time-jurgStrumTime) <= chordFudge]
             if self.battleJurgMissTime[i] != jurgStrumTime:
               self.battleJurgMissTime[i] = jurgStrumTime
-              if random.randint(0,100) > self.jurgHitPercentage[i]:
-                self.jurgPlayNote[i] = False
+              if self.guitars[i].battleStatus[2] or self.guitars[i].battleStatus[6] or self.guitars[i].battleStatus[7] or self.guitars[i].battleStatus[8]:
+                if random.randint(0,100) > self.jurgHitPercentage[i] - ((5-self.jurgenSkill[i])*15):
+                  self.jurgPlayNote[i] = False
+                else:
+                  self.jurgPlayNote[i] = True
               else:
-                self.jurgPlayNote[i] = True
+                if random.randint(0,100) > self.jurgHitPercentage[i]:
+                  self.jurgPlayNote[i] = False
+                else:
+                  self.jurgPlayNote[i] = True
           else:
             jurgStrumNotes = []
           
@@ -3512,10 +3518,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             jurgStrumNotes = [note.number for time, note in notes if abs(time-jurgStrumTime) <= chordFudge]
             if self.battleJurgMissTime[i] != jurgStrumTime:
               self.battleJurgMissTime[i] = jurgStrumTime
-              if random.randint(0,100) > self.jurgHitPercentage[i]:
-                self.jurgPlayNote[i] = False
+              if self.guitars[i].battleStatus[2] or self.guitars[i].battleStatus[6] or self.guitars[i].battleStatus[7] or self.guitars[i].battleStatus[8]:
+                if random.randint(0,100) > self.jurgHitPercentage[i] - ((5-self.jurgenSkill[i])*15):
+                  self.jurgPlayNote[i] = False
+                else:
+                  self.jurgPlayNote[i] = True
               else:
-                self.jurgPlayNote[i] = True
+                if random.randint(0,100) > self.jurgHitPercentage[i]:
+                  self.jurgPlayNote[i] = False
+                else:
+                  self.jurgPlayNote[i] = True
           else:
             jurgStrumNotes = []
             self.jurgPlayNote[i] = True
@@ -3566,10 +3578,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           
           if self.battleJurgMissTime[i] != jurgStrumTime:
             self.battleJurgMissTime[i] = jurgStrumTime
-            if random.randint(0,100) > self.jurgHitPercentage[i]:
-              self.jurgPlayNote[i] = False
+            if self.guitars[i].battleStatus[2] or self.guitars[i].battleStatus[6] or self.guitars[i].battleStatus[7] or self.guitars[i].battleStatus[8]:
+              if random.randint(0,100) > self.jurgHitPercentage[i] - ((5-self.jurgenSkill[i])*15):
+                self.jurgPlayNote[i] = False
+              else:
+                self.jurgPlayNote[i] = True
             else:
-              self.jurgPlayNote[i] = True
+              if random.randint(0,100) > self.jurgHitPercentage[i]:
+                self.jurgPlayNote[i] = False
+              else:
+                self.jurgPlayNote[i] = True
               
           #MFH - check if jurgStrumTime is close enough to the current position (or behind it) before actually playing the notes:
           if (not notes or jurgStrumTime <= (pos + 30)) and self.jurgPlayNote[i]:
