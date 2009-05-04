@@ -293,7 +293,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.jurgPlayNote            = [True for i in self.playerList]
     self.jurgBattleWhammyTime    = [0 for i in self.playerList]
     self.jurgBattleUseTime       = [0 for i in self.playerList]
-    for i in range(len(self.playerList)):
+    for i, player in enumerate(self.playerList):
       self.guitars[i].battleTarger = i-1
       if self.guitars[i].battleTarget == -1:  
         self.guitars[i].battleTarget = self.numOfPlayers - 1
@@ -336,7 +336,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.jurgenText[1] = 0
       
     self.battleJurgMissTime = [0 for i in self.playerList]
-    self.battleJurgMissCount = [0 for i in self.playerList]
 
     self.whammySavesSP = self.engine.config.get("game", "whammy_saves_starpower") #MFH
     self.failingEnabled = self.engine.config.get("coffee", "failingEnabled")
