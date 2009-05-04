@@ -289,29 +289,36 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.jurgenLogic[i] = self.engine.config.get("game", "jurg_logic_p%d" % i)
 
     self.jurgenSkill             = [0 for i in self.playerList]
-    self.aiHitPercentage       = [0 for i in self.playerList]
+    self.aiHitPercentage         = [0 for i in self.playerList]
     self.jurgPlayNote            = [True for i in self.playerList]
     self.jurgBattleWhammyTime    = [0 for i in self.playerList]
     self.jurgBattleUseTime       = [0 for i in self.playerList]
     for i in range(len(self.playerList)):
+      self.guitars[i].battleTarger = i-1
+      if self.guitars[i].battleTarget == -1:  
+        self.guitars[i].battleTarget = self.numOfPlayers - 1
       self.jurgenSkill[i] = self.engine.config.get("game", "jurg_skill_p%d" % i)
       if self.jurgenSkill[i] == 0:
-        self.aiHitPercentage[i] = 75 + (5*player.getDifficultyInt())
+        self.aiHitPercentage[i] = 70 + (5*player.getDifficultyInt())
         self.jurgBattleWhammyTime[i] = 1000
         self.jurgBattleUseTime[i] = 5000
       elif self.jurgenSkill[i] == 1:
-        self.aiHitPercentage[i] = 85 + (5*player.getDifficultyInt())
+        self.aiHitPercentage[i] = 80 + (5*player.getDifficultyInt())
         self.jurgBattleWhammyTime[i] = 750
         self.jurgBattleUseTime[i] = 2000
       elif self.jurgenSkill[i] == 2:
+        self.aiHitPercentage[i] = 85 + (5*player.getDifficultyInt())
+        self.jurgBattleWhammyTime[i] = 750
+        self.jurgBattleUseTime[i] = 2000
+      elif self.jurgenSkill[i] == 3:
         self.aiHitPercentage[i] = 90 + (5*player.getDifficultyInt())
         self.jurgBattleWhammyTime[i] = 500
         self.jurgBattleUseTime[i] = 1000
-      elif self.jurgenSkill[i] == 3:
+      elif self.jurgenSkill[i] == 4:
         self.aiHitPercentage[i] = 95 + (5*player.getDifficultyInt())
         self.jurgBattleWhammyTime[i] = 250
         self.jurgBattleUseTime[i] = 0
-      elif self.jurgenSkill[i] == 4:
+      elif self.jurgenSkill[i] == 5:
         self.aiHitPercentage[i] = 100
         self.jurgBattleWhammyTime[i] = 200
         self.jurgBattleUseTime[i] = 0
@@ -3419,7 +3426,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           if self.playerAssist[i] == 0: #and no assist
             continue
                   
-        if self.battleGH: #KID,AKEDROU,QSTICK LOGIC
+        if self.battleGH: #PRELIM LOGIC until algorithm goes in
           if self.guitars[i].battleObjects[0] != 0:
             if pos > self.guitars[i].battleGetTime + self.jurgBattleUseTime[i]:
               self.activateSP(i)
@@ -5181,42 +5188,32 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   def activateSP(self, num): #QQstarS: Fix this function, add a element "num"
     if self.battleGH:
       time = self.getSongPosition()
-      if num == 0:
-        otherPlayer = 1
-      else:
-        otherPlayer = 0
       if time - self.battleJustUsed[num] > 1500: #must wait 1.5sec before next object use
         if self.guitars[num].battleObjects[0] != 0:
-          self.guitars[otherPlayer].battleStatus[self.guitars[num].battleObjects[0]] = True
+          self.guitars[self.guitars[num].battleTarget].battleStatus[self.guitars[num].battleObjects[0]] = True
           #start object use on other player
           
-          self.guitars[otherPlayer].battleStartTimes[self.guitars[num].battleObjects[0]] = time
+          self.guitars[self.guitars[num].battleTarget].battleStartTimes[self.guitars[num].battleObjects[0]] = time
           
           if self.guitars[num].battleObjects[0] == 1:
-            self.guitars[otherPlayer].battleDrainStart = time
-          elif self.guitars[num].battleObjects[0] == 2: #Diff up
-            Log.debug("Diff Up Being Used")
-            #if self.guitars[otherPlayer].battleDiffUpValue != 0:
-              #self.guitars[otherPlayer].difficulty = self.guitars[otherPlayer].battleDiffUpValue - 1
-              #self.players[otherPlayer].difficulty = Song.difficulties[self.guitars[otherPlayer].battleDiffUpValue - 1]
-              #self.song.difficulty[otherPlayer] = Song.difficulties[self.guitars[otherPlayer].battleDiffUpValue - 1]
+            self.guitars[self.guitars[num].battleTarget].battleDrainStart = time
           elif self.guitars[num].battleObjects[0] == 3:
             #Log.debug("String Cut")
-            self.guitars[otherPlayer].battleBreakNow = self.guitars[otherPlayer].battleBreakLimit
-            self.guitars[otherPlayer].battleBreakString = random.randint(0,4)
-            self.endPick(otherPlayer)
+            self.guitars[oself.guitars[num].battleTarget].battleBreakNow = self.guitars[self.guitars[num].battleTarget].battleBreakLimit
+            self.guitars[self.guitars[num].battleTarget].battleBreakString = random.randint(0,4)
+            self.endPick(self.guitars[num].battleTarget)
           elif self.guitars[num].battleObjects[0] == 4:
             #Log.debug("Wammy")
-            self.guitars[otherPlayer].battleWhammyNow = self.guitars[otherPlayer].battleWhammyLimit
-            self.endPick(otherPlayer)
+            self.guitars[self.guitars[num].battleTarget].battleWhammyNow = self.guitars[self.guitars[num].battleTarget].battleWhammyLimit
+            self.endPick(self.guitars[num].battleTarget)
           elif self.guitars[num].battleObjects[0] == 5:
             #Log.debug("Take Object")
-            if self.guitars[otherPlayer].battleObjects[0] != 0:
-              self.guitars[num].battleObjects[0] = self.guitars[otherPlayer].battleObjects[0]
-              self.guitars[otherPlayer].battleObjects[0] = self.guitars[otherPlayer].battleObjects[1]
-              self.guitars[otherPlayer].battleObjects[1] = self.guitars[otherPlayer].battleObjects[2]
-              self.guitars[otherPlayer].battleObjects[2] = 0
-              self.guitars[otherPlayer].battleStatus[5] = False
+            if self.guitars[self.guitars[num].battleTarget].battleObjects[0] != 0:
+              self.guitars[num].battleObjects[0] = self.guitars[self.guitars[num].battleTarget].battleObjects[0]
+              self.guitars[self.guitars[num].battleTarget].battleObjects[0] = self.guitars[self.guitars[num].battleTarget].battleObjects[1]
+              self.guitars[self.guitars[num].battleTarget].battleObjects[1] = self.guitars[self.guitars[num].battleTarget].battleObjects[2]
+              self.guitars[self.guitars[num].battleTarget].battleObjects[2] = 0
+              self.guitars[self.guitars[num].battleTarget].battleStatus[5] = False
               self.battleText[num] = None
               self.battleTextTimer[num] = 0
               self.guitars[num].battleObjectGained = self.guitars[num].battleObjects[0]
@@ -5224,12 +5221,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               return
           
           #tells us which objects are currently running
-          if self.guitars[otherPlayer].battleBeingUsed[1] != 0:
-            self.guitars[otherPlayer].battleStatus[self.guitars[otherPlayer].battleBeingUsed[1]] = False
-          if self.guitars[otherPlayer].battleBeingUsed[0] != 0:
-            if self.guitars[otherPlayer].battleBeingUsed[0] != self.guitars[num].battleObjects[0]:
-              self.guitars[otherPlayer].battleBeingUsed[1] = self.guitars[otherPlayer].battleBeingUsed[0]
-          self.guitars[otherPlayer].battleBeingUsed[0] = self.guitars[num].battleObjects[0]
+          if self.guitars[self.guitars[num].battleTarget].battleBeingUsed[1] != 0:
+            self.guitars[self.guitars[num].battleTarget].battleStatus[self.guitars[self.guitars[num].battleTarget].battleBeingUsed[1]] = False
+          if self.guitars[self.guitars[num].battleTarget].battleBeingUsed[0] != 0:
+            if self.guitars[self.guitars[num].battleTarget].battleBeingUsed[0] != self.guitars[num].battleObjects[0]:
+              self.guitars[self.guitars[num].battleTarget].battleBeingUsed[1] = self.guitars[self.guitars[num].battleTarget].battleBeingUsed[0]
+          self.guitars[self.guitars[num].battleTarget].battleBeingUsed[0] = self.guitars[num].battleObjects[0]
           
           #bring up other objects in players queue
           self.guitars[num].battleObjects[0] = self.guitars[num].battleObjects[1]

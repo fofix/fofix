@@ -194,6 +194,7 @@ class Guitar:
     self.battleStatus       = [False] * 9
     self.battleStartTimes    = [0] * 9
     self.battleGetTime      = 0
+    self.battleTarget       = 0
     
     self.battleLeftyLength  = 8000 #
     self.battleDiffUpLength = 15000
