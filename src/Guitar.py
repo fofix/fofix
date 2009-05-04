@@ -192,15 +192,12 @@ class Guitar:
     self.battleObjects      = [0] * 3
     self.battleBeingUsed    = [0] * 2
     self.battleStatus       = [False] * 9
+    self.battleStartTimes    = [0] * 9 
     
-    self.battleLeftyStart   = 0
     self.battleLeftyLength  = 8000#
-    self.battleDiffUpStart  = 0
     self.battleDiffUpLength = 15000
     self.battleDiffUpValue  = playerObj.getDifficultyInt()
-    self.battleDoubleStart  = 0
     self.battleDoubleLength = 8000
-    self.battleAmpStart     = 0
     self.battleAmpLength    = 8000
     self.battleWhammyLimit  = 6#
     self.battleWhammyNow    = 0
@@ -3236,7 +3233,7 @@ class Guitar:
 
   def getRequiredNotes(self, song, pos):
     if self.battleStatus[2] and self.difficulty != 0:
-      if pos < self.battleDiffUpStart + self.currentPeriod * self.beatsPerBoard or pos > self.battleDiffUpStart - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
+      if pos < self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard or pos > self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
         song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue]
       else:
         song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue - 1]
@@ -3255,7 +3252,7 @@ class Guitar:
 
   def getRequiredNotes2(self, song, pos, hopo = False):
     if self.battleStatus[2] and self.difficulty != 0:
-      if pos < self.battleDiffUpStart + self.currentPeriod * self.beatsPerBoard or pos > self.battleDiffUpStart - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
+      if pos < self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard or pos > self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
         song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue]
       else:
         song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue - 1]
@@ -3274,7 +3271,7 @@ class Guitar:
     
   def getRequiredNotes3(self, song, pos, hopo = False):
     if self.battleStatus[2] and self.difficulty != 0:
-      if pos < self.battleDiffUpStart + self.currentPeriod * self.beatsPerBoard or pos > self.battleDiffUpStart - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
+      if pos < self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard or pos > self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
         song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue]
       else:
         song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue - 1]
@@ -3292,7 +3289,7 @@ class Guitar:
   #def getRequiredNotesMFH(self, song, pos):
   def getRequiredNotesMFH(self, song, pos, hopoTroubleCheck = False):
     if self.battleStatus[2] and self.difficulty != 0:
-      if pos < self.battleDiffUpStart + self.currentPeriod * self.beatsPerBoard or pos > self.battleDiffUpStart - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
+      if pos < self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard or pos > self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
         song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue]
       else:
         song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue - 1]
@@ -3410,7 +3407,7 @@ class Guitar:
         if tempnumbers[noteCount] != -1:
           note.number = tempnumbers[noteCount]
           noteCount += 1
-          if time > self.battleDoubleStart + self.currentPeriod * self.beatsPerBoard and time < self.battleDoubleStart - self.currentPeriod * self.beatsPerBoard + self.battleDoubleLength:
+          if time > self.battleStartTimes[7] + self.currentPeriod * self.beatsPerBoard and time < self.battleStartTimes[7] - self.currentPeriod * self.beatsPerBoard + self.battleDoubleLength:
             notes.append((time,note))
         else:
           noteCount += 1
@@ -3429,10 +3426,10 @@ class Guitar:
       
       notes = []
       for time,note in notes0:
-        if time < self.battleDiffUpStart + self.currentPeriod * self.beatsPerBoard or time > self.battleDiffUpStart - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
+        if time < self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard or time > self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
           notes.append((time,note))
       for time,note in notes1:
-        if time > self.battleDiffUpStart + self.currentPeriod * self.beatsPerBoard and time < self.battleDiffUpStart - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
+        if time > self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard and time < self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
           notes.append((time,note))
       notes0 = None
       notes1 = None

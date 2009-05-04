@@ -283,6 +283,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     #MFH
     self.jurgenLogic = self.engine.config.get("game", "jurglogic")    #logic 0 = original, logic 1 = MFH-1
+    if self.battleGH:
+      self.jurgenLogic = 3
     #self.jurgenText = self.engine.config.get("game", "jurgtext")
     self.jurgenText = Theme.jurgTextPos
     if float(self.jurgenText[2]) < 0.00035:
@@ -2330,7 +2332,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     #MFH
     self.jurgenLogic = self.engine.config.get("game", "jurglogic")    #logic 0 = original, logic 1 = MFH-1
-
+    if self.battleGH:
+      self.jurgenLogic = 3
     
     #MFH - no Jurgen in Career mode.
     if self.careerMode:
@@ -3372,7 +3375,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         else: #and if not
           if self.playerAssist[i] == 0: #and no assist
             continue
-        
+
         if self.jurgenLogic == 0:   #original FoF / RF-Mod style Jurgen Logic (cannot handle fast notes / can only handle 1 strum per notewindow)
           notes = guitar.getRequiredNotesMFH(self.song, pos)  #mfh - needed updatin' 
           notes = [note.number for time, note in notes]
@@ -3423,8 +3426,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 self.keyReleased(k)    #mfh
               if self.controls.getState(k):
                 held += 1
-              if self.guitars[i].battleObjects[0] != 0:
-                self.activateSP(i)
+
                 
           #if changed and held and not self.playerList[i].part.text == "Drums":  #dont need the extra pick for drums
           if changed and held and not guitar.isDrum:  #dont need the extra pick for drums
@@ -3479,7 +3481,22 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           
           changed = False
           held = 0
-  
+          
+          #Jurgen Battle AI
+          if self.battleGH:
+            #if self.guitars[i].battleObjects[0] != 0:
+              #self.activateSP(i)
+            if self.guitars[i].battleStatus[4]:
+              if self.guitars[i].battleWhammyNow == 0:
+                self.guitars[i].battleStatus[4] = False
+                for k, nowUsed in enumerate(self.guitars[i].battleBeingUsed):
+                  if self.guitars[i].battleBeingUsed[k] == 4:
+                    self.guitars[i].battleBeingUsed[k] = 0
+              if self.guitars[i].battleWhammyNow != 0:
+                if pos - self.guitars[i].battleStartTimes[4] > 1000:
+                  self.guitars[i].battleStartTimes[4] = pos
+                  self.guitars[i].battleWhammyNow -= 1
+          
           #MFH - check if jurgStrumTime is close enough to the current position (or behind it) before actually playing the notes:
           if not notes or jurgStrumTime <= (pos + 30):
             
@@ -3495,6 +3512,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   self.keyReleased(k)    #mfh
                 if self.controls.getState(k):
                   held += 1
+            
+
+                  
+                  
             #if changed and held and not self.playerList[i].part.text == "Drums":  #dont need the extra pick for drums
             if changed and held and not guitar.isDrum:  #dont need the extra pick for drums
               #myfingershurt:
@@ -3769,7 +3790,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               guitar.battleBeingUsed[k] = 0
             
           if guitar.battleStatus[6]:
-            if time - guitar.battleLeftyStart > guitar.battleLeftyLength:
+            if time - guitar.battleStartTimes[6] > guitar.battleLeftyLength:
               Log.debug("Lefty Mode for Player %d disabled" % i)
               guitar.battleStatus[6] = False
               for k, nowUsed in enumerate(guitar.battleBeingUsed):
@@ -3777,7 +3798,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   guitar.battleBeingUsed[k] = 0
           
           if guitar.battleStatus[8]:
-            if time - guitar.battleAmpStart > guitar.battleAmpLength:
+            if time - guitar.battleStartTimes[8] > guitar.battleAmpLength:
               Log.debug("Diff Up Mode for Player %d disabled" % i)
               guitar.battleStatus[8] = False
               for k, nowUsed in enumerate(guitar.battleBeingUsed):
@@ -3786,7 +3807,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 
           
           if guitar.battleStatus[7]:
-            if time - guitar.battleDoubleStart > guitar.battleDoubleLength:
+            if time - guitar.battleStartTimes[7] > guitar.battleDoubleLength:
               Log.debug("Diff Up Mode for Player %d disabled" % i)
               guitar.battleStatus[7] = False
               for k, nowUsed in enumerate(guitar.battleBeingUsed):
@@ -3802,7 +3823,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   guitar.battleBeingUsed[k] = 0
               
           if guitar.battleStatus[2]:
-            if time - guitar.battleDiffUpStart > guitar.battleDiffUpLength:
+            if time - guitar.battleStartTimes[2] > guitar.battleDiffUpLength:
               Log.debug("Diff Up Mode for Player %d disabled" % i)
               guitar.battleStatus[2] = False
               self.song.difficulty[i] = Song.difficulties[guitar.battleDiffUpValue]
@@ -5075,11 +5096,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if self.guitars[num].battleObjects[0] != 0:
           self.guitars[otherPlayer].battleStatus[self.guitars[num].battleObjects[0]] = True
           #start object use on other player
+          
+          self.guitars[otherPlayer].battleStartTimes[self.guitars[num].battleObjects[0]] = time
+          
           if self.guitars[num].battleObjects[0] == 1:
             self.guitars[otherPlayer].battleDrainStart = time
           elif self.guitars[num].battleObjects[0] == 2: #Diff up
             Log.debug("Diff Up Being Used")
-            self.guitars[otherPlayer].battleDiffUpStart = time
             #if self.guitars[otherPlayer].battleDiffUpValue != 0:
               #self.guitars[otherPlayer].difficulty = self.guitars[otherPlayer].battleDiffUpValue - 1
               #self.players[otherPlayer].difficulty = Song.difficulties[self.guitars[otherPlayer].battleDiffUpValue - 1]
@@ -5106,15 +5129,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               self.guitars[num].battleObjectGained = self.guitars[num].battleObjects[0]
               self.battleJustUsed[num] = time
               return
-          elif self.guitars[num].battleObjects[0] == 6:
-            self.guitars[otherPlayer].battleLeftyStart = time
-            #Log.debug("Switch Mode Used on Player %d" % otherPlayer)
-          elif self.guitars[num].battleObjects[0] == 7:
-            self.guitars[otherPlayer].battleDoubleStart = time
-            #Log.debug("Double Mode Used on Player %d" % otherPlayer)
-          elif self.guitars[num].battleObjects[0] == 8:
-            self.guitars[otherPlayer].battleAmpStart = time
-            #Log.debug("Amp Overload")
           
           #tells us which objects are currently running
           if self.guitars[otherPlayer].battleBeingUsed[1] != 0:

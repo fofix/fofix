@@ -193,15 +193,12 @@ class Drum:
     self.battleObjects      = [0] * 3
     self.battleBeingUsed    = [0] * 2
     self.battleStatus       = [False] * 9
+    self.battleStartTimes    = [0] * 9 
     
-    self.battleLeftyStart   = 0
     self.battleLeftyLength  = 8000#
-    self.battleDiffUpStart  = 0
     self.battleDiffUpLength = 15000
     self.battleDiffUpValue  = playerObj.getDifficultyInt()
-    self.battleDoubleStart  = 0
     self.battleDoubleLength = 8000
-    self.battleAmpStart     = 0
     self.battleAmpLength    = 8000
     self.battleWhammyLimit  = 6#
     self.battleWhammyNow    = 0
