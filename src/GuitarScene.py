@@ -3484,8 +3484,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           
           #Jurgen Battle AI
           if self.battleGH:
-            #if self.guitars[i].battleObjects[0] != 0:
-              #self.activateSP(i)
+            if self.guitars[i].battleObjects[0] != 0:
+              if pos > self.guitars[i].battleGetTime + 2000:
+                self.activateSP(i)
             if self.guitars[i].battleStatus[4]:
               if self.guitars[i].battleWhammyNow == 0:
                 self.guitars[i].battleStatus[4] = False
@@ -3493,7 +3494,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   if self.guitars[i].battleBeingUsed[k] == 4:
                     self.guitars[i].battleBeingUsed[k] = 0
               if self.guitars[i].battleWhammyNow != 0:
-                if pos - self.guitars[i].battleStartTimes[4] > 1000:
+                if pos - self.guitars[i].battleStartTimes[4] > 500:
                   self.guitars[i].battleStartTimes[4] = pos
                   self.guitars[i].battleWhammyNow -= 1
           

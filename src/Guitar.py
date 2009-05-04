@@ -192,14 +192,15 @@ class Guitar:
     self.battleObjects      = [0] * 3
     self.battleBeingUsed    = [0] * 2
     self.battleStatus       = [False] * 9
-    self.battleStartTimes    = [0] * 9 
+    self.battleStartTimes    = [0] * 9
+    self.battleGetTime      = 0
     
-    self.battleLeftyLength  = 8000#
+    self.battleLeftyLength  = 8000 #
     self.battleDiffUpLength = 15000
     self.battleDiffUpValue  = playerObj.getDifficultyInt()
     self.battleDoubleLength = 8000
     self.battleAmpLength    = 8000
-    self.battleWhammyLimit  = 6#
+    self.battleWhammyLimit  = 6 #
     self.battleWhammyNow    = 0
     self.battleWhammyDown   = False
     self.battleBreakLimit   = 8.0
@@ -1939,10 +1940,12 @@ class Guitar:
                 self.battleObjects[2] = self.battleObjects[1]
                 self.battleObjects[1] = self.battleObjects[0]
                 self.battleObjects[0] = 1
+                self.battleGetTime = pos
               else:
                 self.battleObjects[2] = self.battleObjects[1]
                 self.battleObjects[1] = self.battleObjects[0]
                 self.battleObjects[0] = self.battleObjectsEnabled[random.randint(0,len(self.battleObjectsEnabled)-1)]
+                self.battleGetTime = pos
               self.battleObjectGained = True
               Log.debug("Battle Object Gained, Objects %s" % str(self.battleObjects))
             else:
@@ -2106,10 +2109,12 @@ class Guitar:
                 self.battleObjects[2] = self.battleObjects[1]
                 self.battleObjects[1] = self.battleObjects[0]
                 self.battleObjects[0] = 1
+                self.battleGetTime = pos
               else:
                 self.battleObjects[2] = self.battleObjects[1]
                 self.battleObjects[1] = self.battleObjects[0]
                 self.battleObjects[0] = self.battleObjectsEnabled[random.randint(0,len(self.battleObjectsEnabled)-1)]
+                self.battleGetTime = pos
               self.battleObjectGained = True
               Log.debug("Battle Object Gained, Objects %s" % str(self.battleObjects))
             else:
