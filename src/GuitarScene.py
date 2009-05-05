@@ -7036,6 +7036,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   streakFont.render(text, (.482-size[0]/2, 0.265))
                 
                 elif self.battleGH:
+                  font.render("Target",(.5,.5))
                   
                   if self.guitars[i].battleStatus[4] and self.battleWhammyImg != None:
                     self.engine.drawImage(self.battleWhammyImg, scale = (.3*1.33,-.3), coord = (w*.7, h*.21 + (self.guitars[i].battleWhammyNow * (h*.03))))
@@ -8384,7 +8385,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
             w = wBak
             h = hBak
-            if (self.inGameStars == 2 or (self.inGameStars == 1 and self.theme == 2) )  and not self.pause and not self.failed: #MFH - only show stars if in-game stars enabled
+            if (self.inGameStars == 2 or (self.inGameStars == 1 and self.theme == 2) )  and not self.pause and not self.failed and not self.battleGH: #MFH - only show stars if in-game stars enabled
               if self.starGrey != None:
                 for starNum in range(0, 5):
                   if stars == 7:    #full combo!
@@ -8434,7 +8435,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             #MFH: Realtime hit accuracy display:
             
             #if ((self.inGameStats == 2 or (self.inGameStats == 1 and self.theme == 2)) and (not self.pause and not self.failed)) and ( (not self.pause and not self.failed) or self.hopoDebugDisp == 1 ):
-            if ((self.inGameStats == 2 or (self.inGameStats == 1 and self.theme == 2) or self.hopoDebugDisp == 1 ) and (not self.pause and not self.failed) and not (self.coOpType and not i==0 and not self.coOp)):
+            if ((self.inGameStats == 2 or (self.inGameStats == 1 and self.theme == 2) or self.hopoDebugDisp == 1 ) and (not self.pause and not self.failed) and not (self.coOpType and not i==0 and not self.coOp) and not self.battleGH):
               #will not show on pause screen, unless HOPO debug is on (for debugging)
               if self.coOpRB or self.coOpGH:
                 sNotesHit   = self.coOpScoreCard.notesHit
