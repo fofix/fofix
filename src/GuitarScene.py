@@ -3067,12 +3067,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           else:
               if self.guitars[i].battleWhammyDown:
                 self.guitars[i].battleWhammyDown = False
-                self.battleTarget[i] += 1
-                if self.battleTarget[i] == self.numOfPlayers:
-                  self.battleTarget[i] = 0
-                if self.battleTarget[i] == i:
-                  self.battleTarget[i] += 1
-
                 if self.guitars[i].battleStatus[4]:
                   self.guitars[i].battleWhammyNow -= 1
                   if self.guitars[i].battleWhammyNow == 0:
@@ -3080,6 +3074,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     for k, nowUsed in enumerate(self.guitars[i].battleBeingUsed):
                       if self.guitars[i].battleBeingUsed[k] == 4:
                         self.guitars[i].battleBeingUsed[k] = 0
+                else:
+                  self.battleTarget[i] += 1
+                  if self.battleTarget[i] == self.numOfPlayers:
+                    self.battleTarget[i] = 0
+                  if self.battleTarget[i] == i:
+                    self.battleTarget[i] += 1
         else:
           if self.killswitchEngaged[i] == True: #QQstarS:new Fix the killswitch
             self.killswitchEngaged[i] = True
