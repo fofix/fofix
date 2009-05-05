@@ -3051,7 +3051,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     try:    #since analog axis might be set but joystick not present = crash
       #MFH - adding another nest of logic filtration; don't even want to run these checks unless there are playedNotes present!
-      if self.guitars[i].battleStatus[4]:
+      if self.battleGH:
         if self.isKillAnalog[i]:
           if self.analogKillMode[i] == 2:  #XBOX mode: (1.0 at rest, -1.0 fully depressed)
             self.whammyVol[i] = 1.0 - (round(10* ((self.engine.input.joysticks[self.whichJoyKill[i]].get_axis(self.whichAxisKill[i])+1.0) / 2.0 ))/10.0)
@@ -3063,16 +3063,23 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             self.whammyVol[i] = 0.1
           #MFH - simple whammy tail determination:
           if self.whammyVol[i] > 0.1:
-            self.guitars[i].battleWhammyDown = True
+              self.guitars[i].battleWhammyDown = True
           else:
-            if self.guitars[i].battleWhammyDown:
-              self.guitars[i].battleWhammyNow -= 1
-              self.guitars[i].battleWhammyDown = False
-              if self.guitars[i].battleWhammyNow == 0:
-                self.guitars[i].battleStatus[4] = False
-                for k, nowUsed in enumerate(self.guitars[i].battleBeingUsed):
-                  if self.guitars[i].battleBeingUsed[k] == 4:
-                    self.guitars[i].battleBeingUsed[k] = 0
+              if self.guitars[i].battleWhammyDown:
+                self.guitars[i].battleWhammyDown = False
+                self.battleTarget[i] += 1
+                if self.battleTarget[i] == self.numOfPlayers:
+                  self.battleTarget[i] = 0
+                if self.battleTarget[i] == i:
+                  self.battleTarget[i] += 1
+
+                if self.guitars[i].battleStatus[4]:
+                  self.guitars[i].battleWhammyNow -= 1
+                  if self.guitars[i].battleWhammyNow == 0:
+                    self.guitars[i].battleStatus[4] = False
+                    for k, nowUsed in enumerate(self.guitars[i].battleBeingUsed):
+                      if self.guitars[i].battleBeingUsed[k] == 4:
+                        self.guitars[i].battleBeingUsed[k] = 0
         else:
           if self.killswitchEngaged[i] == True: #QQstarS:new Fix the killswitch
             self.killswitchEngaged[i] = True
@@ -7036,7 +7043,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   streakFont.render(text, (.482-size[0]/2, 0.265))
                 
                 elif self.battleGH:
-                  #font.render("Target",(.5,.5))
+                  
                   
                   if self.guitars[i].battleStatus[4] and self.battleWhammyImg != None:
                     self.engine.drawImage(self.battleWhammyImg, scale = (.3*1.33,-.3), coord = (w*.7, h*.21 + (self.guitars[i].battleWhammyNow * (h*.03))))
@@ -7057,15 +7064,20 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                       else:
                         self.engine.drawImage(self.battleIcons, rect = (0,1,iconRange1[0],iconRange1[1]), scale = (.837,-.063), coord = (w/2,h/2))
                     
-                  
+
+                  font.render("Target",(.18,.45))
+                  font.render("P%d" % (self.battleTarget[i]+1),(.18,.5))
+                    
                   if self.rockTopBattle != None:
                     if self.failingEnabled:
                       if i == 0:
                         rockCoord = (w*.201,h*.805)
                         arrowCoord = (w*.20,h*.736)
+                        
                       else:
                         rockCoord = (w*.799,h*.805)
                         arrowCoord = (w*.80,h*.736)
+                        
                       self.engine.drawImage(rock, scale = (.67,-.5), coord = rockCoord)
                       self.engine.drawImage(self.arrow, rot = -angle*1.15, scale = (wfactor*1.33,-wfactor), coord = arrowCoord)
                     else:
