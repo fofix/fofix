@@ -7036,7 +7036,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   streakFont.render(text, (.482-size[0]/2, 0.265))
                 
                 elif self.battleGH:
-                  font.render("Target",(.5,.5))
+                  #font.render("Target",(.5,.5))
                   
                   if self.guitars[i].battleStatus[4] and self.battleWhammyImg != None:
                     self.engine.drawImage(self.battleWhammyImg, scale = (.3*1.33,-.3), coord = (w*.7, h*.21 + (self.guitars[i].battleWhammyNow * (h*.03))))
