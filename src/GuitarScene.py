@@ -283,46 +283,48 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     #MFH
     #self.jurgenLogic = self.engine.config.get("game", "jurglogic")    #logic 0 = original, logic 1 = MFH-1
+    self.numOfPlayers = len(self.playerList)
     
     self.jurgenLogic             = [0 for i in self.playerList]
     for i in range(len(self.playerList)):
       self.jurgenLogic[i] = self.engine.config.get("game", "jurg_logic_p%d" % i)
 
-    self.jurgenSkill             = [0 for i in self.playerList]
+    self.aiSkill                 = [0 for i in self.playerList]
     self.aiHitPercentage         = [0 for i in self.playerList]
-    self.jurgPlayNote            = [True for i in self.playerList]
+    self.aiPlayNote              = [True for i in self.playerList]
     self.jurgBattleWhammyTime    = [0 for i in self.playerList]
     self.jurgBattleUseTime       = [0 for i in self.playerList]
-    self.jurgUseSP               = [0 for i in self.playerList]
+    self.aiUseSP                 = [0 for i in self.playerList]
+    self.battleItemsHolding      = [0 for i in self.playerList]
     for i, player in enumerate(self.playerList):
-      self.guitars[i].battleTarger = i-1
+      self.guitars[i].battleTarget = i-1
       if self.guitars[i].battleTarget == -1:  
         self.guitars[i].battleTarget = self.numOfPlayers - 1
-      self.jurgenSkill[i] = self.engine.config.get("game", "jurg_skill_p%d" % i)
-      if self.jurgenSkill[i] == 0:
+      self.aiSkill[i] = self.engine.config.get("game", "jurg_skill_p%d" % i)
+      if self.aiSkill[i] == 0:
         self.aiHitPercentage[i] = 70 + (5*player.getDifficultyInt())
         self.jurgBattleWhammyTime[i] = 1000
         self.jurgBattleUseTime[i] = 5000
-      elif self.jurgenSkill[i] == 1:
+      elif self.aiSkill[i] == 1:
         self.aiHitPercentage[i] = 80 + (5*player.getDifficultyInt())
         self.jurgBattleWhammyTime[i] = 750
         self.jurgBattleUseTime[i] = 2000
-      elif self.jurgenSkill[i] == 2:
+      elif self.aiSkill[i] == 2:
         self.aiHitPercentage[i] = 85 + (5*player.getDifficultyInt())
         self.jurgBattleWhammyTime[i] = 750
         self.jurgBattleUseTime[i] = 2000
-      elif self.jurgenSkill[i] == 3:
+      elif self.aiSkill[i] == 3:
         self.aiHitPercentage[i] = 90 + (5*player.getDifficultyInt())
         self.jurgBattleWhammyTime[i] = 500
         self.jurgBattleUseTime[i] = 1000
-      elif self.jurgenSkill[i] == 4:
+      elif self.aiSkill[i] == 4:
         self.aiHitPercentage[i] = 95 + (5*player.getDifficultyInt())
         self.jurgBattleWhammyTime[i] = 250
-        self.jurgBattleUseTime[i] = 0
-      elif self.jurgenSkill[i] == 5:
+        self.jurgBattleUseTime[i] = 1000 #this will be replaced by algorithm
+      elif self.aiSkill[i] == 5:
         self.aiHitPercentage[i] = 100
         self.jurgBattleWhammyTime[i] = 200
-        self.jurgBattleUseTime[i] = 0
+        self.jurgBattleUseTime[i] = 1000 #this will be replaced by algorithm
       if self.aiHitPercentage[i] > 100:
         self.aiHitPercentage[i] = 100
     
@@ -344,7 +346,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.timeLeft = None
     self.processedFirstNoteYet = False
     
-    self.numOfPlayers = len(self.playerList)        #MFH - MUST be in front of loadSettings call!
+            #MFH - MUST be in front of loadSettings call!
     #self.autoPlay         = self.engine.config.get("game", "jurgmode")
     #if self.autoPlay == 0:
     #  self.autoPlay = True
@@ -2374,9 +2376,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.jurg[i] = True
         self.autoPlay = True
     
-    self.jurgenSkill             = [0 for i in self.playerList]
+    self.aiSkill             = [0 for i in self.playerList]
     for i in range(len(self.playerList)):
-      self.jurgenSkill[i] = self.engine.config.get("game", "jurg_skill_p%d" % i)
+      self.aiSkill[i] = self.engine.config.get("game", "jurg_skill_p%d" % i)
     
     #MFH
     self.jurgenLogic             = [0 for i in self.playerList]
@@ -3425,10 +3427,25 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         else: #and if not
           if self.playerAssist[i] == 0: #and no assist
             continue
-                  
+        
+        if self.battleGH:
+          self.aiUseSP[i] = 0
+          if self.aiSkill[i] == 4 or self.aiSkill[i] == 5:
+            
+            self.aiUseSP[i] += 25 * self.battleItemsHolding[i] #Number of Items in Holding
+            if pos > self.guitars[i].battleGetTime + self.jurgBattleUseTime[i]:
+              if self.guitars[self.guitars[i].battleTarget].isStarPhrase:
+                self.aiUseSP[i] += 100 #always use when target is in starphrase
+            self.aiUseSP[i] += max((100 - (300*self.rock[self.guitars[i].battleTarget])), 0) #use when they're almost dead
+            self.aiUseSP[i] += max((100 - (500*self.rock[i])), 0) #use when they're almost dead
+            Log.debug(self.aiUseSP[i])
+          else:
+            if pos > self.guitars[i].battleGetTime + self.jurgBattleUseTime[i]:
+                self.aiUseSP[i] = 100
+        
         if self.battleGH: #PRELIM LOGIC until algorithm goes in
           if self.guitars[i].battleObjects[0] != 0:
-            if pos > self.guitars[i].battleGetTime + self.jurgBattleUseTime[i]:
+            if self.aiUseSP[i] > 50:
               self.activateSP(i)
           if self.guitars[i].battleStatus[4]:
             if self.guitars[i].battleWhammyNow == 0:
@@ -3477,15 +3494,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             if self.battleJurgMissTime[i] != jurgStrumTime:
               self.battleJurgMissTime[i] = jurgStrumTime
               if self.guitars[i].battleStatus[2] or self.guitars[i].battleStatus[6] or self.guitars[i].battleStatus[7] or self.guitars[i].battleStatus[8]:
-                if random.randint(0,100) > self.aiHitPercentage[i] - ((5-self.jurgenSkill[i])*15):
-                  self.jurgPlayNote[i] = False
+                if random.randint(0,100) > self.aiHitPercentage[i] - ((5-self.aiSkill[i])*15):
+                  self.aiPlayNote[i] = False
                 else:
-                  self.jurgPlayNote[i] = True
+                  self.aiPlayNote[i] = True
               else:
                 if random.randint(0,100) > self.aiHitPercentage[i]:
-                  self.jurgPlayNote[i] = False
+                  self.aiPlayNote[i] = False
                 else:
-                  self.jurgPlayNote[i] = True
+                  self.aiPlayNote[i] = True
           else:
             jurgStrumNotes = []
           
@@ -3494,7 +3511,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           
 
               
-          if self.jurgPlayNote[i]:
+          if self.aiPlayNote[i]:
             
             for n, k in enumerate(self.keysList[i]):
               
@@ -3528,24 +3545,24 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             if self.battleJurgMissTime[i] != jurgStrumTime:
               self.battleJurgMissTime[i] = jurgStrumTime
               if self.guitars[i].battleStatus[2] or self.guitars[i].battleStatus[6] or self.guitars[i].battleStatus[7] or self.guitars[i].battleStatus[8]:
-                if random.randint(0,100) > self.aiHitPercentage[i] - ((5-self.jurgenSkill[i])*15):
-                  self.jurgPlayNote[i] = False
+                if random.randint(0,100) > self.aiHitPercentage[i] - ((5-self.aiSkill[i])*15):
+                  self.aiPlayNote[i] = False
                 else:
-                  self.jurgPlayNote[i] = True
+                  self.aiPlayNote[i] = True
               else:
                 if random.randint(0,100) > self.aiHitPercentage[i]:
-                  self.jurgPlayNote[i] = False
+                  self.aiPlayNote[i] = False
                 else:
-                  self.jurgPlayNote[i] = True
+                  self.aiPlayNote[i] = True
           else:
             jurgStrumNotes = []
-            self.jurgPlayNote[i] = True
+            self.aiPlayNote[i] = True
           
           changed = False
           held = 0
           
               
-          if self.jurgPlayNote[i]:
+          if self.aiPlayNote[i]:
             for n, k in enumerate(self.keysList[i]):
               if (self.autoPlay and self.jurg[i]) or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.guitars[i].isDrum and self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
                 if n in jurgStrumNotes and not self.controls.getState(k):
@@ -3583,17 +3600,17 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           if self.battleJurgMissTime[i] != jurgStrumTime:
             self.battleJurgMissTime[i] = jurgStrumTime
             if self.guitars[i].battleStatus[2] or self.guitars[i].battleStatus[6] or self.guitars[i].battleStatus[7] or self.guitars[i].battleStatus[8]:
-              if random.randint(0,100) > self.aiHitPercentage[i] - ((5-self.jurgenSkill[i])*15):
-                self.jurgPlayNote[i] = False
+              if random.randint(0,100) > self.aiHitPercentage[i] - ((5-self.aiSkill[i])*15):
+                self.aiPlayNote[i] = False
               else:
-                self.jurgPlayNote[i] = True
+                self.aiPlayNote[i] = True
             else:
               if random.randint(1,100) > self.aiHitPercentage[i]:
-                self.jurgPlayNote[i] = False
+                self.aiPlayNote[i] = False
               else:
-                self.jurgPlayNote[i] = True
+                self.aiPlayNote[i] = True
           #MFH - check if jurgStrumTime is close enough to the current position (or behind it) before actually playing the notes:
-          if (not notes or jurgStrumTime <= (pos + 30)) and self.jurgPlayNote[i]:
+          if (not notes or jurgStrumTime <= (pos + 30)) and self.aiPlayNote[i]:
               for n, k in enumerate(self.keysList[i]):
                 if (self.autoPlay and self.jurg[i]) or (k == self.guitars[i].keys[4] and self.playerAssist[i] == 2) or ((k == self.guitars[i].keys[4] or k == self.guitars[i].keys[3]) and self.playerAssist[i] == 1) or (self.guitars[i].isDrum and self.playerAssist[i] == 3 and k == self.guitars[i].keys[0]):
                   if n in jurgStrumNotes and not self.controls.getState(k):
@@ -3862,12 +3879,23 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       for i,guitar in enumerate(self.guitars):  
         self.stage.run(pos, guitar.currentPeriod)
         
+
+        if guitar.battleObjects[0] != 0:
+          self.battleItemsHolding[i] = 1
+        else:
+          self.battleItemsHolding[i] = 0
+        if guitar.battleObjects[1] != 0:
+          self.battleItemsHolding[i] = 2
+        if guitar.battleObjects[2] != 0:
+          self.battleItemsHolding[i] = 3
+        
         if self.battleGH:
           if guitar.battleBeingUsed[0] == 0 and guitar.battleBeingUsed[1] != 0:
             guitar.battleBeingUsed[0] = guitar.battleBeingUsed[1]
             guitar.battleBeingUsed[1] = 0
           #Log.debug("Battle Being Used: %s" % str(guitar.battleBeingUsed))
           time = self.getSongPosition()
+          
           
           if guitar.battleStatus[1]:
             if time - guitar.battleDrainStart > guitar.battleDrainLength:
