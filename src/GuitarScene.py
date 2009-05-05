@@ -293,6 +293,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.jurgPlayNote            = [True for i in self.playerList]
     self.jurgBattleWhammyTime    = [0 for i in self.playerList]
     self.jurgBattleUseTime       = [0 for i in self.playerList]
+    self.jurgUseSP               = [0 for i in self.playerList]
     for i, player in enumerate(self.playerList):
       self.guitars[i].battleTarger = i-1
       if self.guitars[i].battleTarget == -1:  
@@ -3543,7 +3544,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           changed = False
           held = 0
           
-
               
           if self.jurgPlayNote[i]:
             for n, k in enumerate(self.keysList[i]):
@@ -3580,10 +3580,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           changed = False
           held = 0          
           
-  
-          
-          #if self.battleGH:
-          
           if self.battleJurgMissTime[i] != jurgStrumTime:
             self.battleJurgMissTime[i] = jurgStrumTime
             if self.guitars[i].battleStatus[2] or self.guitars[i].battleStatus[6] or self.guitars[i].battleStatus[7] or self.guitars[i].battleStatus[8]:
@@ -3592,11 +3588,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               else:
                 self.jurgPlayNote[i] = True
             else:
-              if random.randint(0,100) > self.aiHitPercentage[i]:
+              if random.randint(1,100) > self.aiHitPercentage[i]:
                 self.jurgPlayNote[i] = False
               else:
                 self.jurgPlayNote[i] = True
-              
           #MFH - check if jurgStrumTime is close enough to the current position (or behind it) before actually playing the notes:
           if (not notes or jurgStrumTime <= (pos + 30)) and self.jurgPlayNote[i]:
               for n, k in enumerate(self.keysList[i]):
@@ -5198,7 +5193,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             self.guitars[self.guitars[num].battleTarget].battleDrainStart = time
           elif self.guitars[num].battleObjects[0] == 3:
             #Log.debug("String Cut")
-            self.guitars[oself.guitars[num].battleTarget].battleBreakNow = self.guitars[self.guitars[num].battleTarget].battleBreakLimit
+            self.guitars[self.guitars[num].battleTarget].battleBreakNow = self.guitars[self.guitars[num].battleTarget].battleBreakLimit
             self.guitars[self.guitars[num].battleTarget].battleBreakString = random.randint(0,4)
             self.endPick(self.guitars[num].battleTarget)
           elif self.guitars[num].battleObjects[0] == 4:
