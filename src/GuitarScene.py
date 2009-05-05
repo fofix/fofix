@@ -3433,19 +3433,17 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           if self.aiSkill[i] == 4 or self.aiSkill[i] == 5:
             
             self.aiUseSP[i] += 25 * self.battleItemsHolding[i] #Number of Items in Holding
-            if pos > self.guitars[i].battleGetTime + self.jurgBattleUseTime[i]:
-              if self.guitars[self.guitars[i].battleTarget].isStarPhrase:
-                self.aiUseSP[i] += 100 #always use when target is in starphrase
+            if self.guitars[self.guitars[i].battleTarget].isStarPhrase:
+              self.aiUseSP[i] += 100 #always use when target is in starphrase
             self.aiUseSP[i] += max((100 - (300*self.rock[self.guitars[i].battleTarget])), 0) #use when they're almost dead
             self.aiUseSP[i] += max((100 - (500*self.rock[i])), 0) #use when they're almost dead
-            Log.debug(self.aiUseSP[i])
+
           else:
-            if pos > self.guitars[i].battleGetTime + self.jurgBattleUseTime[i]:
-                self.aiUseSP[i] = 100
+            self.aiUseSP[i] = 100
         
         if self.battleGH: #PRELIM LOGIC until algorithm goes in
           if self.guitars[i].battleObjects[0] != 0:
-            if self.aiUseSP[i] > 50:
+            if self.aiUseSP[i] > 50 and pos > self.guitars[i].battleGetTime + self.jurgBattleUseTime[i]:
               self.activateSP(i)
           if self.guitars[i].battleStatus[4]:
             if self.guitars[i].battleWhammyNow == 0:
