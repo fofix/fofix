@@ -31,6 +31,10 @@ import Log
 import pygame
 import Version
 import Config
+
+#for MacOS
+GL_TEXTURE_3D = 32879
+
 # evilynux - Do not crash If OpenGL 2.0 is not supported
 try:
   from OpenGL.GL.ARB.shader_objects import *
@@ -102,7 +106,6 @@ class shaderList:
   def compileShader(self, source, shaderType):
     """Compile shader source of given type"""
     shader = glCreateShaderObjectARB(shaderType)
-    #print "glShaderSourceARB:", bool(glShaderSourceARB)
     glShaderSourceARB( shader, source )
     glCompileShaderARB( shader )
     return shader
@@ -329,7 +332,6 @@ class shaderList:
     except:
       Log.debug("Can't load "+fname)
       return self.makeNoise3D(16)
-    #print noise
           
     #self.smoothNoise3D(size, 2, texels)
     #self.smoothNoise3D(size, 4, texels)
