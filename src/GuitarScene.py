@@ -3437,7 +3437,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               self.aiUseSP[i] += 100 #always use when target is in starphrase
             self.aiUseSP[i] += max((100 - (300*self.rock[self.guitars[i].battleTarget])), 0) #use when they're almost dead
             self.aiUseSP[i] += max((100 - (500*self.rock[i])), 0) #use when they're almost dead
-
           else:
             self.aiUseSP[i] = 100
         
@@ -7040,6 +7039,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   streakFont.render(text, (.482-size[0]/2, 0.265))
                 
                 elif self.battleGH:
+                  
                   if self.guitars[i].battleStatus[4] and self.battleWhammyImg != None:
                     self.engine.drawImage(self.battleWhammyImg, scale = (.3*1.33,-.3), coord = (w*.7, h*.21 + (self.guitars[i].battleWhammyNow * (h*.03))))
                   if self.guitars[i].battleStatus[3] and self.battlePushImg != None:
@@ -7062,19 +7062,19 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   
                   if self.rockTopBattle != None:
                     if self.failingEnabled:
-                      if i == 1:
-                        rockCoord = (w*.799,h*.405 + self.hOffset[i])
-                        arrowCoord = (w*.80,h*.336 + self.hOffset[i])
+                      if i == 0:
+                        rockCoord = (w*.201,h*.805)
+                        arrowCoord = (w*.20,h*.736)
                       else:
-                        rockCoord = (w*.201,h*.405 + self.hOffset[i])
-                        arrowCoord = (w*.20,h*.336 + self.hOffset[i])
+                        rockCoord = (w*.799,h*.805)
+                        arrowCoord = (w*.80,h*.736)
                       self.engine.drawImage(rock, scale = (.67,-.5), coord = rockCoord)
                       self.engine.drawImage(self.arrow, rot = -angle*1.15, scale = (wfactor*1.33,-wfactor), coord = arrowCoord)
                     else:
-                      if i == 1:
-                        rockOffCoord = (w*.80,h*.4 + self.hOffset[i])
+                      if i == 0:
+                        rockOffCoord = (w*.20,h*.8)
                       else:
-                        rockOffCoord = (w*.20,h*.4 + self.hOffset[i])
+                        rockOffCoord = (w*.80,h*.8)
                       self.engine.drawImage(rockOff, scale = (.67,-.5), coord = rockOffCoord)
                     
                     if self.battleIcons != None:
@@ -7085,53 +7085,53 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                         if icon == 0:
                           battleIconsScale = (.837,-.063)
                           if i == 0:
-                            battleIconsCoord = (w*0.199,h*0.326 + self.hOffset[i])
+                            battleIconsCoord = (w*0.199,h*0.726)
                           else:
-                            battleIconsCoord = (w*0.801,h*0.326 + self.hOffset[i])
+                            battleIconsCoord = (w*0.801,h*0.726)
                         elif icon == 1:
                           battleIconsScale = (.558,-.042)
                           if i == 0:
-                            battleIconsCoord = (w*0.140,h*0.310 + self.hOffset[i])
+                            battleIconsCoord = (w*0.140,h*0.710)
                           else:
-                            battleIconsCoord = (w*0.860,h*0.310 + self.hOffset[i])
+                            battleIconsCoord = (w*0.860,h*0.710)
                         else:
                           battleIconsScale = (.399,-.03)
                           if i == 0:
-                            battleIconsCoord = (w*0.128,h*0.276 + self.hOffset[i])
+                            battleIconsCoord = (w*0.128,h*0.676)
                           else:
-                            battleIconsCoord = (w*0.872,h*0.276 + self.hOffset[i])
+                            battleIconsCoord = (w*0.872,h*0.676)
                           
                         self.engine.drawImage(self.battleIcons, rect = (0,1,iconRange[0],iconRange[1]), scale = battleIconsScale, coord = battleIconsCoord)
                           
-                    if i == 1:
-                      rockTopScale = (.67,-.5)
-                      rockTopCoord = (w*.80,h*.375 + self.hOffset[i])
-                    else:
+                    if i == 0:
                       rockTopScale = (-.67,-.5)
-                      rockTopCoord = (w*.20,h*.375 + self.hOffset[i])
+                      rockTopCoord = (w*.20,h*.775)
+                    else:
+                      rockTopScale = (.67,-.5)
+                      rockTopCoord = (w*.80,h*.775)
                     self.engine.drawImage(self.rockTopBattle, scale = rockTopScale, coord = rockTopCoord)
                   else:
                     if self.failingEnabled:
-                      if i == 1:
-                        rockCoord = (w*.86,h*.2 + self.hOffset[i])
-                        arrowCoord = (w*.86,h*.136 + self.hOffset[i])
+                      if i == 0:
+                        rockCoord = (w*.14,h*.6)
+                        arrowCoord = (w*.14,h*.536)
                       else:
-                        rockCoord = (w*.14,h*.2 + self.hOffset[i])
-                        arrowCoord = (w*.14,h*.136 + self.hOffset[i])
+                        rockCoord = (w*.86,h*.6)
+                        arrowCoord = (w*.86,h*.536)
                       self.engine.drawImage(rock, scale = (.67,-.5), coord = rockCoord)
                       self.engine.drawImage(self.arrow, rot = -angle*1.15, scale = (wfactor*1.33,-wfactor), coord = arrowCoord)
                     else:
-                      if i == 1:
-                        rockOffCoord = (w*.86,h*.2 + self.hOffset[i])
+                      if i == 0:
+                        rockOffCoord = (w*.14,h*.6)
                       else:
-                        rockOffCoord = (w*.14,h*.2 + self.hOffset[i])
+                        rockOffCoord = (w*.86,h*.6)
                       self.engine.drawImage(rockOff, scale = (.67,-.5), coord = rockOffCoord)
-                    if i == 1:
-                      rockTopScale = (.67,-.5)
-                      rockTopCoord = (w*.86,h*.2 + self.hOffset[i])
-                    else:
+                    if i == 0:
                       rockTopScale = (-.67,-.5)
-                      rockTopCoord = (w*.14,h*.2 + self.hOffset[i])
+                      rockTopCoord = (w*.14,h*.6)
+                    else:
+                      rockTopScale = (.67,-.5)
+                      rockTopCoord = (w*.86,h*.6)
                     self.engine.drawImage(self.rockTop, scale = rockTopScale, coord = rockTopCoord)
                 elif self.coOp:
                   self.engine.view.setViewport(1,0)
