@@ -3744,9 +3744,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           if self.plusRock[i] > self.battleMax:
             self.plusRock[i] = self.battleMax
           self.rock[i] += self.plusRock[i]*self.multi[i]
-          self.rock[self.battleTarget[num]] -= self.plusRock[i]*self.multi[i]
-        if self.rock[self.battleTarget[num]] < 0:
-          self.rock[self.battleTarget[num]] = 0
+          self.rock[self.battleTarget[i]] -= self.plusRock[i]*self.multi[i]
+        if self.rock[self.battleTarget[i]] < 0:
+          self.rock[self.battleTarget[i]] = 0
         if self.rock[i] >= self.rockMax:
           self.rock[i] = self.rockMax
         if self.minusRock[i] > self.minBase:
