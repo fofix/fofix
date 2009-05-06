@@ -29,7 +29,7 @@ __version__ = '$Id$'
 import os
 import win32api
 import fnmatch
-import sha
+import hashlib
 
 class NsisScriptGenerator(object):
   def __init__(self, baseFolder='.', hashCache=None, oldTblName=None, newTblName=None):
@@ -39,9 +39,9 @@ class NsisScriptGenerator(object):
     self.oldTblName = None
     self.newTblName = None
     if oldTblName is not None:
-      self.oldTblName = sha.sha(oldTblName).hexdigest()
+      self.oldTblName = hashlib.sha1(oldTblName).hexdigest()
     if newTblName is not None:
-      self.newTblName = sha.sha(newTblName).hexdigest()
+      self.newTblName = hashlib.sha1(newTblName).hexdigest()
     if self.hashCache is not None:
       self.hashCache.execute('INSERT OR REPLACE INTO `verlist` (`version`) VALUES (?)', [newTblName])
       self.hashCache.execute('DROP TABLE IF EXISTS `hashes_%s`' % self.newTblName)
@@ -62,9 +62,9 @@ class NsisScriptGenerator(object):
       if os.path.dirname(line) == '' or os.path.isdir(os.path.dirname(line)):
         for f in win32api.FindFiles(line):
           path = os.path.join(os.path.dirname(line), f[8])
-          if os.path.isfile(path):
+          if os.path.isfile(path) and path.find('.svn') == -1:  # omit .svn folders
             if self.hashCache is not None:
-              newhash = sha.sha(open(path, 'rb').read()).hexdigest()
+              newhash = hashlib.sha1(open(path, 'rb').read()).hexdigest()
               self.hashCache.execute('INSERT OR REPLACE INTO `hashes_%s` (`path`, `hash`) VALUES (?, ?)' % self.newTblName, [path, newhash])
               if self.oldTblName is not None:
                 oldhash = self.hashCache.execute('SELECT `hash` FROM `hashes_%s` WHERE `path` = ?' % self.oldTblName, [path]).fetchone()
@@ -138,10 +138,10 @@ class NsisScriptBuilder(object):
 %s "%s" SecID_%s
 %s
 %s
-''' % (start, name, sha.sha(name).hexdigest(), instContent, end)
+''' % (start, name, hashlib.sha1(name).hexdigest(), instContent, end)
     script += '!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN\r\n'
     for name, instContent, uninstContent, desc, start, end in self.sectionScripts:
-      script += '!insertmacro MUI_DESCRIPTION_TEXT ${SecID_%s} "%s"\r\n' % (sha.sha(name).hexdigest(), desc)
+      script += '!insertmacro MUI_DESCRIPTION_TEXT ${SecID_%s} "%s"\r\n' % (hashlib.sha1(name).hexdigest(), desc)
     script += '!insertmacro MUI_FUNCTION_DESCRIPTION_END\r\n'
     for name, instContent, uninstContent, desc, start, end in reversed(self.sectionScripts):
       script += '''

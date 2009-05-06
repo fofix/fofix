@@ -1,6 +1,6 @@
 "*."//get all extentionless files
 "*.exe"//all exes
-"fretsonfire.ini"//ini
+"fofix.ini"//ini
 "*.dll"//dlls
 "src\*.*"//all src files
 "src\midi\*.*"//all src/midi files
@@ -27,7 +27,7 @@
 "data\sounds\*.*"//all base sounds
 "data\tutorials\jurgenfof\*.*"//all of the original Jurgen FoF tutorial
 "data\tutorials\drumtest\*.*"//all of the Drum Test Song
-"data\Shaders\*.*"
+"data\shaders\*.*"
 "data\users\controllers\defaultd.ini"
 "data\users\controllers\defaultg.ini"
 "data\users\players\default.ini"

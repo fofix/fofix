@@ -231,6 +231,8 @@ FunctionEnd
 Section
 """ % tuple(map(str, (theme, version, destfile, licensefile and ('!insertmacro MUI_PAGE_LICENSE "%s"' % licensefile) or '')))
   for root, dirs, files in os.walk(theme):
+    if root.find('.svn') != -1:  #stump: skip .svn folders
+      continue
     script += 'SetOutPath "$INSTDIR\\data\\themes\\%s\\%s"\r\n' % (theme, root[len(theme):])
     for f in files:
       script += 'File "%s"\r\n' % os.path.join(root, f)

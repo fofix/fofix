@@ -33,7 +33,7 @@ import ListToNSIS
 import _winreg
 import shutil
 import win32api
-import sha
+import hashlib
 try:
   import sqlite3
 except ImportError:
@@ -113,11 +113,12 @@ FunctionEnd
 !define MUI_LICENSEPAGE_RADIOBUTTONS
 !define MUI_COMPONENTSPAGE_SMALLDESC
 !define MUI_HEADERIMAGE
-!define MUI_FINISHPAGE_TEXT "FoFiX v${FOFIX_VERSION_FULL} has been installed on your computer.$\r$\n$\r$\nClick Finish to close this wizard.$\r$\n$\r$\nInstaller by John Stumpo."
+!define MUI_FINISHPAGE_TEXT "FoFiX v${FOFIX_VERSION_FULL} has been installed on your computer.$\r$\n$\r$\nClick Finish to close this wizard.$\r$\n$\r$\nInstaller by John Stumpo.$\r$\nInstaller graphics by kristijan_mkd."
 !define MUI_FINISHPAGE_TEXT_LARGE
-# gfx pending
-#!define MUI_HEADERIMAGE_BITMAP "pkg\installer_gfx\header.bmp"
-#!define MUI_HEADERIMAGE_UNBITMAP "pkg\installer_gfx\header.bmp"
+!define MUI_HEADERIMAGE_BITMAP "pkg\installer_gfx\header.bmp"
+!define MUI_HEADERIMAGE_UNBITMAP "pkg\installer_gfx\header.bmp"
+!define MUI_WELCOMEFINISHPAGE_BITMAP "pkg\installer_gfx\welcome.bmp"
+!define MUI_UNWELCOMEFINISHPAGE_BITMAP "pkg\installer_gfx\un_welcome.bmp"
 
 # The pages of the installer...
 !insertmacro MUI_PAGE_WELCOME
@@ -134,7 +135,6 @@ FunctionEnd
 !insertmacro MUI_UNPAGE_FINISH
 
 # Throw in a cool background image.
-# gfx pending
 #!define MUI_CUSTOMFUNCTION_GUIINIT startBackground
 #Function startBackground
 #  InitPluginsDir
@@ -205,16 +205,16 @@ builder.filterSection('Wiki Pages', 'FoFiX-wiki', 'Installs the FoFiX wiki pages
 
 # Unfortunately the installer graphics can only be BMPs, which are enormous.
 # Make them now out of PNGs that we'll do the real work with.
-# gfx pending
-#from PIL import Image
-#bkgd = Image.open(os.path.join('pkg', 'installer_gfx', 'background.png'))
-#bkgd.convert('RGB').save(os.path.join('pkg', 'installer_gfx', 'background.bmp'))
+from PIL import Image
+Image.open(os.path.join('pkg', 'installer_gfx', 'header.png')).convert('RGB').save(os.path.join('pkg', 'installer_gfx', 'header.bmp'))
+Image.open(os.path.join('pkg', 'installer_gfx', 'welcome.png')).convert('RGB').save(os.path.join('pkg', 'installer_gfx', 'welcome.bmp'))
+Image.open(os.path.join('pkg', 'installer_gfx', 'un_welcome.png')).convert('RGB').save(os.path.join('pkg', 'installer_gfx', 'un_welcome.bmp'))
 
 # Generate and compile the NSIS script.
 open('Setup.nsi', 'w').write(builder.getScript())
-if os.path.isfile('fretsonfire.ini'):
-  os.rename('fretsonfire.ini', 'fretsonfire.bak')
-shutil.copy(os.path.join('pkg', 'fretsonfire.fresh.ini'), 'fretsonfire.ini')
+if os.path.isfile('fofix.ini'):
+  os.rename('fofix.ini', 'fofix.bak')
+shutil.copy(os.path.join('pkg', 'fofix.fresh.ini'), 'fofix.ini')
 try:
   if os.spawnl(os.P_WAIT, makensis, 'makensis.exe', 'Setup.nsi') != 0:
     raise RuntimeError, 'Installer generation failed.'
@@ -231,7 +231,7 @@ try:
     hashcache.commit()
     os.chdir('..')
     os.unlink('Setup.nsi')
-    oldExeSha1 = hashcache.execute("SELECT `hash` FROM `hashes_%s` WHERE `path` = 'FretsOnFire.exe'" % sha.sha(v).hexdigest()).fetchone()[0]
+    oldExeSha1 = hashcache.execute("SELECT `hash` FROM `hashes_%s` WHERE `path` = 'FretsOnFire.exe'" % hashlib.sha1(v).hexdigest()).fetchone()[0]
     patcher = ListToNSIS.NsisScriptBuilder(r"""
 !define FOFIX_VERSION %s
 !define FOFIX_VERSION_FULL "%s"
@@ -281,10 +281,10 @@ FunctionEnd
 !define MUI_INSTFILESPAGE_ABORTHEADER_TEXT "Upgrade Aborted"
 !define MUI_INSTFILESPAGE_ABORTHEADER_SUBTEXT "Upgrade was aborted."
 !define MUI_FINISHPAGE_TITLE "Completing the FoFiX v${FOFIX_VERSION_OLD} to v${FOFIX_VERSION_FULL} Patch Wizard"
-!define MUI_FINISHPAGE_TEXT "FoFiX v${FOFIX_VERSION_OLD} has been upgraded to version ${FOFIX_VERSION_FULL}.$\r$\n$\r$\nClick Finish to close this wizard.$\r$\n$\r$\nInstaller by John Stumpo."
+!define MUI_FINISHPAGE_TEXT "FoFiX v${FOFIX_VERSION_OLD} has been upgraded to version ${FOFIX_VERSION_FULL}.$\r$\n$\r$\nClick Finish to close this wizard.$\r$\n$\r$\nInstaller by John Stumpo.$\r$\nInstaller graphics by kristijan_mkd."
 !define MUI_FINISHPAGE_TEXT_LARGE
-# gfx pending
-#!define MUI_HEADERIMAGE_BITMAP "pkg\installer_gfx\header.bmp"
+!define MUI_HEADERIMAGE_BITMAP "pkg\installer_gfx\header.bmp"
+!define MUI_WELCOMEFINISHPAGE_BITMAP "pkg\installer_gfx\welcome.bmp"
 
 # Function to verify the install path.
 Function verifyFoFiXInstDir
@@ -316,7 +316,6 @@ FunctionEnd
 !insertmacro MUI_PAGE_FINISH
 
 # Throw in a cool background image.
-# gfx pending
 #!define MUI_CUSTOMFUNCTION_GUIINIT startBackground
 #Function startBackground
 #  InitPluginsDir
@@ -354,14 +353,15 @@ File "%s"
 finally:
   if os.getcwd() == oldcwd:
     os.chdir('..')
-  os.unlink('fretsonfire.ini')
-  if os.path.isfile('fretsonfire.bak'):
-    os.rename('fretsonfire.bak', 'fretsonfire.ini')
+  os.unlink('fofix.ini')
+  if os.path.isfile('fofix.bak'):
+    os.rename('fofix.bak', 'fofix.ini')
   if os.path.isfile('Setup.nsi'):
     os.unlink('Setup.nsi')
   os.chdir(oldcwd)
   if os.path.isfile('uninst.exe'):
     os.unlink('uninst.exe')
 
-# gfx pending
-#os.unlink(os.path.join('pkg', 'installer_gfx', 'background.bmp'))
+os.unlink(os.path.join('installer_gfx', 'header.bmp'))
+os.unlink(os.path.join('installer_gfx', 'welcome.bmp'))
+os.unlink(os.path.join('installer_gfx', 'un_welcome.bmp'))
