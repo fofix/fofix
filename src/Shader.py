@@ -29,8 +29,9 @@ import random
 import time
 import Log
 import pygame
-import Version
+import Version, Data, Resource
 import Config
+import GameEngine
 
 #OGL constants for compatibility with all PyOpenGL versions
 #now multitexturing should work even in PyOpenGL 2.x, if your card supports ARB ext
@@ -59,6 +60,7 @@ class shaderList:
     self.noise1D = 0
     self.workdir = ""
     self.enabled = False
+    self.turnon = False
     self.var = {}
     time.clock()
     self.build(dir)
@@ -238,11 +240,13 @@ class shaderList:
     if self.backup == {} and self.shaders != {}:
       self.backup = self.shaders
       self.shaders = {}
+      self.turnon = False
       
   def turnOn(self):
     if self.backup != {} and self.shaders == {}:
       self.shaders = self.backup
       self.backup = {}
+      self.turnon = True
     
   def activeProgram(self):
     if self.active !=0:
@@ -301,7 +305,10 @@ class shaderList:
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-    glTexImage3D(GL_TEXTURE_3D, 0, c,size, size, size, 0, type, GL_UNSIGNED_BYTE, texels)
+    try:
+      glTexImage3D(GL_TEXTURE_3D, 0, c,size, size, size, 0, type, GL_UNSIGNED_BYTE, texels)
+    except:
+      return 
     return texture
     
   def makeNoise2D(self,size=64, c = 1, type = GL_RED):
@@ -351,7 +358,10 @@ class shaderList:
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-    glTexImage3D(GL_TEXTURE_3D, 0, 1,size, size, size, 0, type, GL_UNSIGNED_BYTE, noise)
+    try:
+      glTexImage3D(GL_TEXTURE_3D, 0, 1,size, size, size, 0, type, GL_UNSIGNED_BYTE, noise)
+    except:
+      return 
     return texture
     
   def loadTex2D(self, fname, type = GL_RGB):
@@ -401,14 +411,15 @@ class shaderList:
     return time.clock()
     
   def reset(self):
-    self.var["color"]=(0.0,)*4      #color for guitar neck flashing
-    self.var["drumcolor"]=(0.0,)*4  #color for drum neck flashing
-    self.var["solocolor"]=(0.0,)*4  #color for GH3 solo lightnings
-    self.var["eqcolor"]=(0.0,)*4    #color for equalizer
-    self.var["drum"]=[-10.0]*5      #last fret note hit time
-    self.var["fret"]=[-10.0]*5      #last drum note hit time
     self.checkIfEnabled()
-    #self.var["whammy"]=0           #whammy fx for tails
+    if self.turnon:
+      self.var["color"]=(0.0,)*4      #color for guitar neck flashing
+      self.var["drumcolor"]=(0.0,)*4  #color for drum neck flashing
+      self.var["solocolor"]=(0.0,)*4  #color for GH3 solo lightnings
+      self.var["eqcolor"]=(0.0,)*4    #color for equalizer
+      self.var["drum"]=[-10.0]*5      #last fret note hit time
+      self.var["fret"]=[-10.0]*5      #last drum note hit time
+      self.loadFromIni()
     
   def checkIfEnabled(self):
      try:
@@ -422,7 +433,7 @@ class shaderList:
      except:
        return False
      else:
-       if self.enabled:
+       if self.turnon:
          for i in self.shaders.keys():
            enabled = Config.get("video","shader_"+i)
            if enabled == None or enabled == 1:
@@ -431,9 +442,38 @@ class shaderList:
              self.shaders[i]["enabled"] = False
          return True
          
+  def defineConfig(self):
+    for name in self.shaders.keys():
+      for key in self[name].keys():
+        Config.define("shader", name+"_"+key,  str, "None")
+         
+  def loadFromIni(self):
+    for name in self.shaders.keys():
+      for key in self[name].keys():
+        value = Config.get("theme",name+"_"+key)
+        #print "shader_"+name+"_"+key, value
+        if value != "None":
+          if value == "True": value = True
+          elif value == "False": value = False
+          else:
+            value = value.split(",")
+            for i in range(len(value)):
+              print "shader_"+name+"_"+key, value
+              value[i] = float(value[i])
+            if len(value) == 1: value = value[0]
+            else: value = tuple(value)
+          #print self[name][key], value
+          if key == "enabled":
+            if Config.get("video","shader_"+name) == 2:
+              self[name][key] = value
+          else:
+            if len(self[name][key]) == 2:
+              self[name][key][1] = value
+         
     
   def set(self, dir):
     self.enabled = True
+    self.turnon = True
     self.workdir = dir
     self.noise3D = self.loadTex3D("noise3d.dds")
     self.outline = self.loadTex2D("outline.tga")
@@ -518,6 +558,8 @@ class shaderList:
     
     if not self.make("cd","cd"):
       Log.error("Shader has not been compiled: cd")  
+      
+    self.defineConfig()
   
 multiTex = None
 list = shaderList()
