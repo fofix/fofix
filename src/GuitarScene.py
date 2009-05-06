@@ -31,7 +31,7 @@
 #####################################################################
 
 from Scene import SceneServer, SceneClient
-from Song import Note, Tempo, TextEvent, PictureEvent, loadSong, Bars, VocalNote, VocalBar
+from Song import Note, Tempo, TextEvent, PictureEvent, loadSong, Bars, VocalNote, VocalPhrase
 from Menu import Menu
 from Guitar import Guitar
 
@@ -59,6 +59,11 @@ import math
 import pygame
 import random
 import os
+
+try:
+  set()
+except:
+  from sets import Set as set
 
 #myfingershurt: decimal class allows for better handling of fixed-point numbers
 import decimal
@@ -215,12 +220,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.soloKeysList = []
     self.soloShifts   = []
     self.vocalPlayers = [] #akedrou - vocal players need to be separated out! (Though there can only be one...)
-    for player in self.playerList[:]:
+    self.fullPlayerList = self.playerList[:]
+    for player in self.fullPlayerList:
       if player.part.id == Song.VOCAL_PART:
         self.vocalPlayers.append(player)
         self.vplayers += 1
         self.splayers -= 1
         self.playerList.remove(player)
+    self.totalPlayers = self.vplayers + self.splayers
     
     for i, player in enumerate(self.vocalPlayers):
       self.vocalists.append(Vocalist(self.engine, player, False, i))
@@ -374,6 +381,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.autoPlay         = False
     self.jurgPlayer       = [False for i in self.playerList]
     self.jurg             = [False for i in self.playerList]
+    self.customBot        = [None for i in self.playerList]
     for i in range(len(self.playerList)):
       if self.engine.config.get("game", "jurg_p%d" % i) == True:
         self.jurg[i] = True
@@ -434,7 +442,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     ###endCapo###
     
     
-    self.multi = [1 for i in self.playerList]
+    self.multi = [1 for i in self.fullPlayerList]
     self.x1 = [0 for i in self.playerList]
     self.y1 = [0 for i in self.playerList]
     self.x2 = [0 for i in self.playerList]
@@ -476,8 +484,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.hopoIndicatorInactiveColor   = Theme.hopoIndicatorInactiveColor
     
     if self.coOpGH:
-      for i in range(self.numOfPlayers):
-        self.guitars[i].starPowerDecreaseDivisor /= self.numOfPlayers
+      for guitar in self.guitars:
+        guitar.starPowerDecreaseDivisor /= self.totalPlayers
+      for vocalist in self.vocalists:
+        vocalist.starPowerDecreaseDivisor /= self.totalPlayers
 
 
 
@@ -487,6 +497,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     #Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Loading Settings..."))
     self.loadSettings()
+    self.tsBotNames = [_("KiD"), _("Stump"), _("AkedRobot"), _("Q"), _("MFH"), _("Jurgen")]
     #MFH pre-translate text strings:
     if self.battleGH:
       self.tsBattleIcons = [None] * 9
@@ -506,8 +517,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.tsStarPowerReady = _("Star Power Ready")
       self.tsCoOpStarPower  = _("Activate Star Power!") #The proper is "Tilt guitar to activate Star Power", but drums and all...
     self.tsYouFailedBattle = _("You Failed!!!!")
-    self.tsJurgenIsHere = _("Jurgen is here")
-    self.tsJurgenWasHere = _("Jurgen was here")
+    self.tsJurgenIsHere = _("%s is here")
+    self.tsJurgenWasHere = _("%s was here")
     self.tsPercentComplete = _("% Complete")
     self.tsHopoIndicator = _("HOPO")
     self.tsCompleted = _("COMPLETED")
@@ -669,8 +680,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.starFillupInRadius = Theme.starFillupInRadius
     self.starFillupOutRadius = Theme.starFillupOutRadius
     self.starFillupColor = Theme.starFillupColor
+    self.vocalFillupCenterX = 139
+    self.vocalFillupCenterY = 151
+    self.vocalFillupInRadius = 105
+    self.vocalFillupOutRadius = 139
+    self.vocalFillupColor = "#A6A6A6"
     self.starContinuousAvailable = self.engine.config.get("performance", "star_continuous_fillup") and \
       None not in (self.starFillupCenterX, self.starFillupCenterY, self.starFillupInRadius, self.starFillupOutRadius, self.starFillupColor)
+    self.vocalContinuousAvailable = self.engine.config.get("performance", "star_continuous_fillup") and \
+      None not in (self.vocalFillupCenterX, self.vocalFillupCenterY, self.vocalFillupInRadius, self.vocalFillupOutRadius, self.vocalFillupColor)
     self.showBpm = self.engine.config.get("debug",   "show_bpm")    #MFH
 
     self.logLyricEvents = self.engine.config.get("log",   "log_lyric_events")
@@ -783,32 +801,36 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.deadPlayerList = [] #akedrou - keep the order failed.
     self.numDeadPlayers = 0
     coOpInstruments = []
-    self.scoring = [None for i in self.playerList]
+    self.scoring = []
     #self.stars = [0,0]
-    for i in range(self.numOfPlayers):   
-      if self.guitars[i].isDrum:
+    for guitar in self.guitars:   
+      if guitar.isDrum:
         instrument = Song.DRUM_PART
         coOpInstruments.append(instrument)
-      elif self.guitars[i].isBassGuitar:
+      elif guitar.isBassGuitar:
         instrument = Song.BASS_PART
         coOpInstruments.append(instrument)
       else:
         instrument = Song.GUITAR_PART #while different guitars exist, they don't affect scoring.
         coOpInstruments.append(instrument)
-      self.scoring[i] = Scorekeeper.ScoreCard([instrument])
+      self.scoring.append(Scorekeeper.ScoreCard([instrument]))
+    for vocalist in self.vocalists:
+      instrument = Song.VOCAL_PART
+      coOpInstruments.append(instrument)
+      self.scoring.append(Scorekeeper.ScoreCard([instrument]))
     if self.coOpType:
       self.coOpScoreCard = Scorekeeper.ScoreCard(coOpInstruments, coOpType = True)
     else:
       self.coOpScoreCard = None
     
-    self.partialStar = [0 for i in self.playerList]
-    self.starRatio = [0.0 for i in self.playerList]
-    self.dispSoloReview = [False for i in self.playerList]
-    self.soloReviewText = [[] for i in self.playerList]
-    self.soloReviewCountdown = [0 for i in self.playerList]
-    self.guitarSoloAccuracy = [0.0 for i in self.playerList]
-    self.guitarSoloActive = [False for i in self.playerList]
-    self.currentGuitarSolo = [0 for i in self.playerList]
+    self.partialStar = [0 for i in self.fullPlayerList]
+    self.starRatio = [0.0 for i in self.fullPlayerList]
+    self.dispSoloReview = [False for i in self.fullPlayerList]
+    self.soloReviewText = [[] for i in self.fullPlayerList]
+    self.soloReviewCountdown = [0 for i in self.fullPlayerList]
+    self.guitarSoloAccuracy = [0.0 for i in self.fullPlayerList]
+    self.guitarSoloActive = [False for i in self.fullPlayerList]
+    self.currentGuitarSolo = [0 for i in self.fullPlayerList]
 
     #guitar solo display initializations
     if self.theme == 2:
@@ -997,16 +1019,48 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     if len(self.vocalPlayers) > 0:
       phraseId = 0
-      for i, vocalist in enumerate(self.vocalists):
-        for time, event in self.song.vocalEventTrack.getAllEvents():
-          if isinstance(event, Song.VocalBar):
-            if time in vocalist.phraseTimes:
-              self.song.vocalEventTrack.removeEvent(time, event)
-              continue
-            vocalist.phraseTimes.append(time)
+      stars = []
+      phraseTimes = []
+      markStars = False
+      if len(self.song.vocalEventTrack.starTimes) < 2:
+        markStars = True
+        Log.warn("This song does not appear to have any vocal star power events - falling back on auto-generation.")
+      for time, event in self.song.vocalEventTrack.getAllEvents():
+        if isinstance(event, Song.VocalPhrase):
+          if time in self.song.vocalEventTrack.starTimes and not markStars:
+            event.star = True
+          if time in phraseTimes:
+            Log.warn("Phrase repeated - some lyric phrase errors may occur.")
+            #self.song.vocalEventTrack.removeEvent(time, event)
             phraseId += 1
-          elif isinstance(event, Song.VocalNote):
-            event.phrase = phraseId
+            continue
+          if markStars and phraseId % 7 == 0:
+            event.star = True
+          phraseTimes.append(time)
+          phraseId += 1
+      index = 0
+      for time, tuple in self.song.vocalEventTrack.allNotes.iteritems():
+        phraseId = 0
+        for i, phraseTime in enumerate(self.song.vocalEventTrack.getAllEvents()):
+          if time < phraseTime[0]:
+            phraseId = i-1
+            if phraseId < 0:
+              phraseId = 0
+            break
+        tuple[1].phrase = phraseId
+        if not tuple[1].special:
+          try:
+            lyric = self.song.vocalEventTrack.allWords[tuple[0]]
+          except KeyError:
+            lyric = None
+          if lyric:
+            if lyric.find("+") >= 0:
+              tuple[1].heldNote = True
+            else:
+              tuple[1].lyric = lyric
+        else:
+          self.song.vocalEventTrack.allEvents[phraseId][1].tapPhrase = True
+        self.song.vocalEventTrack.allEvents[phraseId][1].addEvent(tuple[0], tuple[1])
 
 
     for theGuitar in self.guitars:    #MFH - force update of early hit window
@@ -1014,6 +1068,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       theGuitar.actualBpm = 0.0
       theGuitar.currentBpm = Song.DEFAULT_BPM
       theGuitar.setBPM(theGuitar.currentBpm)
+    for theSinger in self.vocalists:
+      theSinger.actualBpm = 0.0
+      theSinger.currentBpm = Song.DEFAULT_BPM
+      theSinger.setBPM(theSinger.currentBpm)
 
     #if self.starpowerMode == 2:     #auto-MIDI mode only
     if self.song.hasStarpowerPaths:
@@ -1228,7 +1286,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.nextMidiLyricLine = ""
     self.lyricHeight = 0
 
-    if self.midiLyricsEnabled > 0 and (self.midiLyricMode == 1 or self.midiLyricMode == 2):   #line-by-line lyrics mode is selected and enabled:
+    if self.midiLyricsEnabled > 0 and (self.midiLyricMode == 1 or self.midiLyricMode == 2) and len(self.vocalPlayers) == 0:   #line-by-line lyrics mode is selected and enabled:
       lyricFont = self.engine.data.font
       if self.theme == 2:
         txtSize = 0.00170
@@ -1290,7 +1348,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       if self.coOpScoreCard:
         self.coOpScoreCard.totalStreakNotes += scoreCard.totalStreakNotes
         self.coOpScoreCard.totalNotes += scoreCard.totalNotes
-    self.coOpPlayerIndex = len(self.playerList)
+    self.coOpPlayerIndex = len(range(self.totalPlayers))
 
     #glorandwarf: need to store the song's beats per second (bps) for later
     self.songBPS = self.song.bpm / 60.0
@@ -1300,23 +1358,24 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     #MFH - this determination logic should happen once, globally -- not repeatedly.
     self.showScriptLyrics = False
-    if self.song.hasMidiLyrics and self.lyricMode == 3: #racer: new option for double lyrics
-      self.showScriptLyrics = False
-    elif not self.song.hasMidiLyrics and self.lyricMode == 3: #racer
-      self.showScriptLyrics = True
-    elif self.song.info.tutorial:
-      self.showScriptLyrics = True
-    elif self.lyricMode == 1 and self.song.info.lyrics:   #lyrics: song.ini
-      self.showScriptLyrics = True
-    elif self.lyricMode == 2:   #lyrics: Auto
-      self.showScriptLyrics = True
+    if self.vplayers == 0:
+      if self.song.hasMidiLyrics and self.lyricMode == 3: #racer: new option for double lyrics
+        self.showScriptLyrics = False
+      elif not self.song.hasMidiLyrics and self.lyricMode == 3: #racer
+        self.showScriptLyrics = True
+      elif self.song.info.tutorial:
+        self.showScriptLyrics = True
+      elif self.lyricMode == 1 and self.song.info.lyrics:   #lyrics: song.ini
+        self.showScriptLyrics = True
+      elif self.lyricMode == 2:   #lyrics: Auto
+        self.showScriptLyrics = True
     
     
 
     self.ready = True
     Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Loading Graphics..."))
     #lyric sheet!
-    if self.readTextAndLyricEvents == 2 or (self.readTextAndLyricEvents == 1 and self.theme == 2):
+    if (self.readTextAndLyricEvents == 2 or (self.readTextAndLyricEvents == 1 and self.theme == 2)) and len(self.vocalPlayers) == 0:
       if self.song.hasMidiLyrics and self.midiLyricsEnabled > 0:
         if self.midiLyricMode == 0:
           try:
@@ -1340,8 +1399,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if self.lyricSheet:
       imgwidth = self.lyricSheet.width1()
       self.lyricSheetScaleFactor = 640.000/imgwidth
-      
-
+    
     #brescorebackground.png
     try:
       self.engine.loadImgDrawing(self, "breScoreBackground", os.path.join("themes",themename,"brescorebackground.png"))
@@ -1409,6 +1467,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             self.partImage = False
         if self.partLoad:
           self.part[i] = self.partLoad
+      if self.vplayers > 0:
+        try:
+          self.engine.loadImgDrawing(self, "vocalPartImg", os.path.join("themes",themename,"mic.png"))
+        except IOError:
+          self.engine.loadImgDrawing(self, "vocalPartImg", os.path.join("mic.png"))
+      else:
+        self.vocalPartImg = None
 
     self.partLoad = None
 
@@ -1622,24 +1687,32 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.engine.loadImgDrawing(self, "counter", os.path.join("themes",themename,"counter.png"))
 
 
-      self.rockArr  = [None for i in self.playerList]
-      self.scorePic = [None for i in self.playerList]
-      for i in range(self.numOfPlayers):
+      self.rockArr  = [None for i in range(self.totalPlayers)]
+      self.scorePic = [None for i in self.fullPlayerList]
+      for i in range(self.totalPlayers):
+        if self.fullPlayerList[i].guitarNum is not None:
+          instrument = self.guitars[self.fullPlayerList[i].guitarNum]
+        else:
+          instrument = self.vocalists[0]
         try:
-          if self.guitars[i].isDrum:
+          if instrument.isDrum:
             self.engine.loadImgDrawing(self, "scorePicLoad", os.path.join("themes",themename,"score_drums.png"))
-          elif self.guitars[i].isBassGuitar:
+          elif instrument.isBassGuitar:
             self.engine.loadImgDrawing(self, "scorePicLoad", os.path.join("themes",themename,"score_bass.png"))
+          elif instrument.isVocal:
+            self.engine.loadImgDrawing(self, "scorePicLoad", os.path.join("themes",themename,"score_vocal.png"))
           else:
             self.engine.loadImgDrawing(self, "scorePicLoad", os.path.join("themes",themename,"score_guitar.png"))
         except IOError:
           self.engine.loadImgDrawing(self, "scorePicLoad", os.path.join("themes",themename,"score.png"))
         self.scorePic[i] = self.scorePicLoad
         try:
-          if self.guitars[i].isDrum:
+          if instrument.isDrum:
             self.engine.loadImgDrawing(self, "rockArrLoad", os.path.join("themes",themename,"rockarr_drums.png"))
-          elif self.guitars[i].isBassGuitar:
+          elif instrument.isBassGuitar:
             self.engine.loadImgDrawing(self, "rockArrLoad", os.path.join("themes",themename,"rockarr_bass.png"))
+          elif instrument.isVocal:
+            self.engine.loadImgDrawing(self, "rockArrLoad", os.path.join("themes",themename,"rockarr_vocal.png"))
           else:
             self.engine.loadImgDrawing(self, "rockArrLoad", os.path.join("themes",themename,"rockarr_guitar.png"))
         except IOError:
@@ -1765,6 +1838,24 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       except:
         Log.error('Could not prebuild star overlay textures: ')
         self.starContinuousAvailable = False
+    if self.vplayers > 0 and self.vocalContinuousAvailable:
+      try:
+        self.drawnVocalOverlays = {}
+        basevocalFillImageSize = Image.open(self.vocalMeter.texture.name).size
+        for degrees in range(0, 360, 5):
+          overlay = Image.new('RGBA', baseStarGreyImageSize)
+          draw = ImageDraw.Draw(overlay)
+          draw.pieslice((self.vocalFillupCenterX-self.vocalFillupOutRadius, self.vocalFillupCenterY-self.vocalFillupOutRadius,
+                         self.vocalFillupCenterX+self.vocalFillupOutRadius, self.vocalFillupCenterY+self.vocalFillupOutRadius),
+                        -90, degrees-90, outline=self.vocalFillupColor, fill=self.vocalFillupColor)
+          draw.ellipse((self.vocalFillupCenterX-self.vocalFillupInRadius, self.vocalFillupCenterY-self.vocalFillupInRadius,
+                        self.vocalFillupCenterX+self.vocalFillupInRadius, self.vocalFillupCenterY+self.vocalFillupInRadius),
+                       outline=(0, 0, 0, 0), fill=(0, 0, 0, 0))
+          dispOverlay = ImgDrawing(self.engine.data.svg, overlay)
+          self.drawnVocalOverlays[degrees] = dispOverlay
+      except:
+        Log.error('Could not prebuild vocal overlay textures: ')
+        self.vocalContinuousAvailable = False
 
     self.starGrey1 = None
     if self.starWhite and self.starGrey and self.starPerfect and self.partialStars == 1 and not self.starContinuousAvailable:   #MFH - even better in-game star display, stargrey1.png - stargrey7.png (stargrey8.png is useless - that's a white star.)
@@ -1797,8 +1888,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.rockMax = 30000.0
     self.rockMedThreshold = self.rockMax/3.0    #MFH
     self.rockHiThreshold = self.rockMax/3.0*2   #MFH
-    self.rock = [self.rockMax/2 for i in self.playerList]
-    self.arrowRotation    = [.5 for i in self.playerList]
+    self.rock = [self.rockMax/2 for i in range(self.totalPlayers)]
+    self.arrowRotation    = [.5 for i in range(self.totalPlayers)]
     self.starNotesMissed = [False for i in self.playerList]  #MFH
     self.notesMissed = [False for i in self.playerList]
     self.lessMissed = [False for i in self.playerList]
@@ -1809,36 +1900,36 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.minGain = 2
     self.pluGain = 7
     self.battleMax = 300 #QQstarS:new2  the max adding when battle
-    self.minusRock = [self.minBase for i in self.playerList]
-    self.plusRock = [self.pluBase for i in self.playerList]
+    self.minusRock = [self.minBase for i in range(self.totalPlayers)]
+    self.plusRock = [self.pluBase for i in range(self.totalPlayers)]
     self.coOpMulti = 1
-    self.coOpFailDone = [False for i in self.playerList]
+    self.coOpFailDone = [False for i in range(self.totalPlayers)]
     if self.coOpRB: #akedrou
       self.coOpPlayerMeter = len(self.rock)
       self.rock.append(self.rockMax/2)
       self.minusRock.append(0.0)
       self.plusRock.append(0.0)
-      self.timesFailed  = [0 for i in self.playerList]
+      self.timesFailed  = [0 for i in range(self.totalPlayers)]
     if self.coOp or self.coOpGH:
       self.coOpPlayerMeter = len(self.rock)-1 #make sure it's the last one
 
     self.counterY = -0.1
     self.coOpPhrase = 0
 
-    self.scaleText = [0.0 for i in self.playerList]
-    self.displayText = [None for i in self.playerList]
-    self.displayTextScale = [0.0 for i in self.playerList]
+    self.scaleText = [0.0 for i in self.fullPlayerList]
+    self.displayText = [None for i in self.fullPlayerList]
+    self.displayTextScale = [0.0 for i in self.fullPlayerList]
     #self.streakFlag = None #QQstarS:Set the flag,to show which one has reach the 50 note
-    self.textTimer = [0.0 for i in self.playerList]
+    self.textTimer = [0.0 for i in self.fullPlayerList]
     #self.textChanged = False
-    self.textY = [.3 for i in self.playerList]
-    self.scaleText2 = [0.0 for i in self.playerList]
-    self.goingUP = [False for i in self.playerList]
+    self.textY = [.3 for i in self.fullPlayerList]
+    self.scaleText2 = [0.0 for i in self.fullPlayerList]
+    self.goingUP = [False for i in self.fullPlayerList]
     if self.battleGH:
       self.battleJustUsed = [0 for i in self.playerList]
       self.battleText = [None for i in self.playerList]
       self.battleTextTimer = [0.0 for i in self.playerList]
-    self.lastStreak = [0 for i in self.playerList]
+    self.lastStreak = [0 for i in self.fullPlayerList]
     if self.coOpType:
       self.coOpPhrase = len(self.scaleText)
       self.scaleText.append(0.0)
@@ -2043,6 +2134,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.pause = True
       for guitar in self.guitars:
         guitar.paused = True
+      for vocalist in self.vocalists:
+        vocalist.paused = True
+        vocalist.stopMic()
 
   def failGame(self):
     self.engine.view.pushLayer(self.failMenu)
@@ -2051,6 +2145,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.pause = False
       for guitar in self.guitars:
         guitar.paused = False
+      for vocalist in self.vocalists:
+        vocalist.paused = False
+        vocalist.stopMic()
     self.failEnd = True
 
   def resumeGame(self):
@@ -2067,6 +2164,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.pause = False
         for guitar in self.guitars:
           guitar.paused = False
+        for vocalist in self.vocalists:
+          vocalist.paused = False
+          vocalist.startMic()
 
   def resumeSong(self):
     self.engine.view.popLayer(self.menu)
@@ -2137,7 +2237,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.rockTop = None
     self.rockMsg = None
     for vocalist in self.vocalists:
-      vocalist.mic.stop()
+      vocalist.stopMic()
 
     #MFH - Ensure all event tracks are destroyed before removing Song object!
     if self.song:
@@ -2190,7 +2290,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.rockFill = None
       self.scorePic = [None for i in self.playerList]
       self.scorePicBand = None
-      self.rockArr = [None for i in self.playerList]
+      self.rockArr = [None for i in range(self.totalPlayers)]
       self.rockArrGlow = None
       self.mult2 = None
     if self.coOpRB:
@@ -2227,6 +2327,20 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     except Exception, e:
       songHopo = 1
     for i, scoreCard in enumerate(self.scoring):
+      if i >= len(self.guitars):
+        if self.engine.audioSpeedFactor != 1 or scoreCard.earlyHitWindowSizeHandicap != 1.0: #scalable handicaps
+          if (scoreCard.handicap>>1)&1 != 1:
+            scoreCard.handicap += 0x2
+          if self.coOpType:
+            if (self.coOpScoreCard.handicap>>1)&1 != 1:
+              self.coOpScoreCard.handicap += 0x2
+        if not self.failingEnabled:
+          if (scoreCard.handicap>>2)&1 != 1:
+            scoreCard.handicap += 0x4
+          if self.coOpType:
+            if (self.coOpScoreCard.handicap>>2)&1 != 1:
+              self.coOpScoreCard.handicap += 0x4
+        continue
       if self.gh2sloppy == 1 and not self.guitars[i].isDrum: # or self.rb2sloppy == 1:
         if (scoreCard.handicap)&1 != 1:
           scoreCard.handicap += 1
@@ -2371,20 +2485,29 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     #Re-apply Jurgen Settings -- Spikehead777
     self.autoPlay         = False
-    self.jurg             = [False for i in self.playerList]
-    for i in range(len(self.playerList)):
+    self.jurg             = [False for i in self.fullPlayerList]
+    p = 0
+    for i, player in enumerate(self.fullPlayerList):
+      if player.part.id == Song.VOCAL_PART:
+        continue
+      player.guitarNum = p
       if self.engine.config.get("game", "jurg_p%d" % i) == True:
-        self.jurg[i] = True
+        self.jurg[p] = True
         self.autoPlay = True
+      p += 1
     
-    self.aiSkill             = [0 for i in self.playerList]
-    for i in range(len(self.playerList)):
-      self.aiSkill[i] = self.engine.config.get("game", "jurg_skill_p%d" % i)
+    self.aiSkill             = [0 for i in self.fullPlayerList]
+    for i, player in enumerate(self.fullPlayerList):
+      if player.part.id == Song.VOCAL_PART:
+        continue
+      self.aiSkill[player.guitarNum] = self.engine.config.get("game", "jurg_skill_p%d" % i)
     
     #MFH
-    self.jurgenLogic             = [0 for i in self.playerList]
-    for i in range(len(self.playerList)):
-      self.jurgenLogic[i] = self.engine.config.get("game", "jurg_logic_p%d" % i)
+    self.jurgenLogic             = [0 for i in self.fullPlayerList]
+    for i, player in enumerate(self.fullPlayerList):
+      if player.part.id == Song.VOCAL_PART:
+        continue
+      self.jurgenLogic[player.guitarNum] = self.engine.config.get("game", "jurg_logic_p%d" % i)
     
       
       
@@ -2414,25 +2537,29 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #self.controls = self.engine.input.controls
     self.activeGameControls = self.engine.input.activeGameControls
     
-    for i,guitar in enumerate(self.guitars):
-      guitar.leftyMode   = False
-      guitar.twoChordMax = False
-      if self.playerList[i].lefty > 0:
-        guitar.leftyMode = True
-      if self.playerList[i].twoChordMax > 0:
-        guitar.twoChordMax  = True
+    for i,player in enumerate(self.fullPlayerList):
+      if player.part.id == Song.VOCAL_PART:
+        continue
+      self.guitars[player.guitarNum].leftyMode   = False
+      self.guitars[player.guitarNum].twoChordMax = False
+      if player.lefty > 0:
+        self.guitars[player.guitarNum].leftyMode = True
+      if player.twoChordMax > 0:
+        self.guitars[player.guitarNum].twoChordMax  = True
     
     self.keysList = []
-    for i, player in enumerate(self.playerList):
+    for i, player in enumerate(self.fullPlayerList):
       player.keyList = Player.playerkeys[i]
       player.configController()
-      if self.guitars[i].isDrum:
+      if player.part.id == Song.VOCAL_PART:
+        continue
+      if self.guitars[player.guitarNum].isDrum:
         self.keysList.append(player.drums)
       else:
         self.keysList.append(player.keys)
-      if not self.guitars[i].twoChordMax:
+      if not self.guitars[player.guitarNum].twoChordMax:
         if self.controls.twoChord[self.activeGameControls[i]] > 0:
-          self.guitars[i].twoChordMax = True
+          self.guitars[player.guitarNum].twoChordMax = True
     
     if self.song and self.song.readyToGo:
       self.getHandicap() #akedrou - to be sure scoring objects are created.
@@ -2449,8 +2576,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.song.setDrumVolume(self.rhythmVolume)
   
   def songLoaded(self, song):
-    for i, player in enumerate(self.playerList):
-      song.difficulty[i] = player.difficulty
+    for player in self.fullPlayerList:
+      if player.guitarNum is not None:
+        song.difficulty[player.guitarNum] = player.difficulty
+      else:
+        song.vocalDifficulty = player.difficulty
     if self.bossBattle == True:
       song.difficulty[1] = song.difficulty[0]
     
@@ -2548,14 +2678,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #self.countdown = 4.0 * self.songBPS
     self.countdownSeconds = 5   #MFH - This needs to be reset for song restarts, too!
     self.countdown = float(self.countdownSeconds) * self.songBPS
-    self.scaleText = [0.0 for i in self.playerList]
-    self.displayText = [None for i in self.playerList]
-    self.displayTextScale = [0.0 for i in self.playerList]
-    self.textTimer = [0.0 for i in self.playerList]
-    self.textY = [.3 for i in self.playerList]
-    self.scaleText2 = [0.0 for i in self.playerList]
-    self.goingUP = [False for i in self.playerList]
-    self.lastStreak = [0 for i in self.playerList]
+    self.scaleText = [0.0 for i in self.fullPlayerList]
+    self.displayText = [None for i in self.fullPlayerList]
+    self.displayTextScale = [0.0 for i in self.fullPlayerList]
+    self.textTimer = [0.0 for i in self.fullPlayerList]
+    self.textY = [.3 for i in self.fullPlayerList]
+    self.scaleText2 = [0.0 for i in self.fullPlayerList]
+    self.goingUP = [False for i in self.fullPlayerList]
+    self.lastStreak = [0 for i in self.fullPlayerList]
     if self.coOpType:
       self.coOpPhrase = len(self.scaleText)
       self.scaleText.append(0.0)
@@ -2606,23 +2736,23 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.rockFinished = False    #myfingershurt
     if self.battleGH:
       if not self.battleSuddenDeath:
-        self.rock = [self.rockMax/2 for i in self.playerList]
+        self.rock = [self.rockMax/2 for i in self.fullPlayerList]
     else:
-      self.rock = [self.rockMax/2 for i in self.playerList]
-    self.minusRock = [0.0 for i in self.playerList]
-    self.plusRock = [0.0 for i in self.playerList]
+      self.rock = [self.rockMax/2 for i in self.fullPlayerList]
+    self.minusRock = [0.0 for i in self.fullPlayerList]
+    self.plusRock = [0.0 for i in self.fullPlayerList]
     self.coOpMulti = 1
     self.deadPlayerList = []
     self.numDeadPlayers  = 0
-    self.coOpFailDone = [False for i in self.playerList]
+    self.coOpFailDone = [False for i in self.fullPlayerList]
     self.rockFailUp = True
     self.rockFailViz  = 0.0
-    self.failViz = [0.0 for i in self.playerList]
+    self.failViz = [0.0 for i in self.fullPlayerList]
     if self.coOpRB:
       self.rock.append(self.rockMax/2)
       self.minusRock.append(0.0)
       self.plusRock.append(0.0)
-      self.timesFailed = [0 for i in self.playerList]
+      self.timesFailed = [0 for i in self.fullPlayerList]
     for i in range(self.numOfPlayers):
       if self.battleGH:
         self.battleJustUsed[i] = 0
@@ -2699,7 +2829,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if self.numMidiLyricLines > self.activeMidiLyricLineIndex+2:  #is there a second line of lyrics?
           tempTime, self.currentSimpleMidiLyricLine = self.midiLyricLines[self.activeMidiLyricLineIndex+1]
 
-    for player in self.playerList:
+    for player in self.fullPlayerList:
       player.reset()
     self.stage.reset()
     self.enteredCode     = []
@@ -2714,7 +2844,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       guitar.guitarSolo = False
       guitar.currentGuitarSoloHitNotes = 0
       guitar.scoreMultiplier = 1
-      
+    
+    for vocalist in self.vocalists:
+      vocalist.phraseIndex = 0
+      vocalist.currentPhraseTime = 0
+      vocalist.currentPhraseLength = 0
+      vocalist.activePhrase = None
+    
     if self.partyMode == True:
       self.guitars[0].keys = self.playerList[0].keys
       self.guitars[0].actions = self.playerList[0].actions
@@ -2749,6 +2885,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     for i,guitar in enumerate(self.guitars):
       guitar.endPick(i)
     self.song.stop()
+    for vocalist in self.vocalists:
+      vocalist.stopMic()
 
     for i in range(self.numOfPlayers):
       #myfingershurt: preventing ever-thickening BPM lines after restarts
@@ -2807,6 +2945,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     for i,guitar in enumerate(self.guitars):
       guitar.endPick(i)
     self.song.stop()
+    for vocalist in self.vocalists:
+      vocalist.stopMic()
 
     #MFH - unnecessary re-marking of HOPOs
     #for i, guitar in enumerate(self.guitars):
@@ -2830,8 +2970,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #self.notesCum = 0
     self.noteLastTime = 0
 
-  def startSolo(self, playerNum):   #MFH - more modular and general handling of solos
-    i = playerNum
+  def startSolo(self, gPlayerNum):   #MFH - more modular and general handling of solos
+    i = gPlayerNum
      #Guitar Solo Start
     self.currentGuitarSoloTotalNotes[i] = self.guitarSolos[i][self.currentGuitarSolo[i]]
     self.guitarSoloBroken[i] = False
@@ -2839,12 +2979,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #self.displayText[i] = _("Guitar Solo!")
     instrumentSoloString = "%s %s" % (self.playerList[i].part.text, self.tsSolo)
     if self.phrases > 1:
-      self.newScalingText(i, instrumentSoloString )
+      self.newScalingText(self.playerList[i].number, instrumentSoloString )
     #self.sfxChannel.setVolume(self.sfxVolume)
     self.engine.data.crowdSound.play()
   
-  def endSolo(self, playerNum):     #MFH - more modular and general handling of solos
-    i = playerNum
+  def endSolo(self, gPlayerNum):     #MFH - more modular and general handling of solos
+    i = gPlayerNum
     #Guitar Solo End
     self.guitars[i].guitarSolo = False
     #self.sfxChannel.setVolume(self.sfxVolume)    #liquid
@@ -2899,8 +3039,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.currentGuitarSolo[i] += 1
 
 
-  def updateGuitarSolo(self, playerNum):
-    i = playerNum
+  def updateGuitarSolo(self, gPlayerNum):
+    i = gPlayerNum
     #if self.guitars[i].canGuitarSolo:
     if self.guitars[i].guitarSolo:
 
@@ -3040,12 +3180,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         #self.currentPeriod = guitar.currentPeriod   #MFH - this actually gets updated from the neckspeed
         guitar.lastBpmChange = self.lastBpmChange
         guitar.baseBeat = self.baseBeat
+      for vocalist in self.vocalists:
+        vocalist.setBPM(self.currentBpm)
+        vocalist.lastBpmChange = self.lastBpmChange
+        vocalist.baseBeat = self.baseBeat
 
-
-
-
-  def handleWhammy(self, playerNum):
-    i = playerNum
+  def handleWhammy(self, gPlayerNum):
+    i = gPlayerNum
     if self.resumeCountdown > 0:    #MFH - conditions to completely ignore whammy
       return
 
@@ -3190,8 +3331,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     except Exception, e:
       self.whammyVol[i] = self.defaultWhammyVol[i] 
 
-  def handleAnalogSP(self, playerNum, ticks):
-    i = playerNum
+  def handleAnalogSP(self, gPlayerNum, ticks):
+    i = gPlayerNum
     if self.resumeCountdown > 0:
       return
     if self.isSPAnalog[i]:
@@ -3208,8 +3349,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.starActive[i] = False
         self.starDelay[i] = 0
   
-  def handleAnalogSlider(self, playerNum): #akedrou
-    i = playerNum
+  def handleAnalogSlider(self, gPlayerNum): #akedrou
+    i = gPlayerNum
     if self.resumeCountdown > 0:
       return
     if self.isSlideAnalog[i]:
@@ -3256,7 +3397,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if self.slideValue[i] > -1:
           self.handlePick(i)
   
-  def markSlide(self, playerNum):
+  def markSlide(self, gPlayerNum):
     pass #akedrou - this will eventually handle the switch that you are, in fact, sliding up the analog fret bar.
 
   def handlePhrases(self, playerNum, playerStreak):
@@ -3332,9 +3473,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.displayText[i] = text
 
 
-  def handlePick(self, playerNum, hopo = False, pullOff = False):
-    i = playerNum
-    num = playerNum
+  def handlePick(self, gPlayerNum, hopo = False, pullOff = False):
+    i = gPlayerNum
+    num = gPlayerNum
     guitar = self.guitars[num]
 
     if self.resumeCountdown > 0:    #MFH - conditions to completely ignore picks
@@ -3645,22 +3786,25 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
   def rockmeterDecrease(self, playerNum):
     i = playerNum
+    g = self.playerList[i].guitarNum
+    if g is None:
+      return
     rockMinusAmount = 0 #akedrou - simplify the various incarnations of minusRock.
-    if self.guitars[i].isDrum: 
+    if self.guitars[g].isDrum: 
       self.drumStart = True
       if not self.drumScoringEnabled:   #MFH - ignore when drum scoring is disabled
         return
 
-    if self.starNotesMissed[i] or self.guitars[i].isStarPhrase:
-      self.guitars[i].isStarPhrase = True
-      self.guitars[i].spEnabled = False
-      #self.guitars[i].spNote = False 
+    if self.starNotesMissed[g] or self.guitars[g].isStarPhrase:
+      self.guitars[g].isStarPhrase = True
+      self.guitars[g].spEnabled = False
+      #self.guitars[g].spNote = False 
 
     if not self.failingEnabled or self.practiceMode:
       return
 
-    if self.battle and self.numOfPlayers > 1: #battle mode
-      if self.notesMissed[i]: #QQstarS:Set [i] to [i]
+    if self.battle and self.totalPlayers > 1: #battle mode
+      if self.notesMissed[g]: #akedrou - [i] to [g]
         self.minusRock[i] += self.minGain/self.multi[i]
         #self.rock[i] -= self.minusRock[i]/self.multi[i]
         if self.plusRock[i] > self.pluBase:
@@ -3673,8 +3817,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if self.plusRock[i] > self.pluBase:
           self.plusRock[i] -= self.pluGain/2.5/self.multi[i]
     
-    elif (self.coOp or self.coOpGH) and self.numOfPlayers > 1: #co-op mode
-      if self.notesMissed[i]:
+    elif (self.coOp or self.coOpGH) and self.totalPlayers > 1: #co-op mode
+      if self.notesMissed[g]:
         self.minusRock[self.coOpPlayerMeter] += self.minGain/self.multi[i]
         rockMinusAmount = self.minusRock[self.coOpPlayerMeter]/self.multi[i]
         self.rock[self.coOpPlayerMeter] -= rockMinusAmount
@@ -3682,7 +3826,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.plusRock[self.coOpPlayerMeter] -= self.pluGain*2.0/self.multi[i]
         if self.plusRock[self.coOpPlayerMeter] <= self.pluBase:
           self.plusRock[self.coOpPlayerMeter] = self.pluBase/self.multi[i]
-      if self.lessMissed[i]:
+      if self.lessMissed[g]:
         self.minusRock[self.coOpPlayerMeter] += self.minGain/5.0/self.multi[i]
         rockMinusAmount = self.minusRock[0]/5.0/self.multi[i]
         self.rock[self.coOpPlayerMeter] -= rockMinusAmount
@@ -3691,8 +3835,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       if (self.rock[self.coOpPlayerMeter]/self.rockMax <= 0.667) and ((self.rock[self.coOpPlayerMeter]+rockMinusAmount)/self.rockMax > 0.667): #akedrou
         self.playersInGreen -= 1
         
-    elif self.coOpRB and self.numOfPlayers > 1: #RB co-op mode
-      if self.notesMissed[i]:
+    elif self.coOpRB and self.totalPlayers > 1: #RB co-op mode
+      if self.notesMissed[g]:
         self.minusRock[i] += self.minGain/self.coOpMulti
         if self.numDeadPlayers > 0:
           self.minusRock[self.coOpPlayerMeter] += self.minGain/self.coOpMulti
@@ -3703,7 +3847,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.plusRock[i] -= self.pluGain*2.0/self.coOpMulti
         if self.plusRock[i] <= self.pluBase:
           self.plusRock[i] = self.pluBase/self.coOpMulti
-      if self.lessMissed[i]:
+      if self.lessMissed[g]:
         self.minusRock[i] += self.minGain/5.0/self.coOpMulti
         if self.numDeadPlayers > 0:
           self.minusRock[self.coOpPlayerMeter] += self.minGain/5.0/self.coOpMulti
@@ -3714,7 +3858,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.plusRock[i] -= self.pluGain/2.5/self.coOpMulti
 
     else:   #normal mode
-      if self.notesMissed[i]:
+      if self.notesMissed[g]:
         self.minusRock[i] += self.minGain/self.multi[i]
         rockMinusAmount = self.minusRock[i]/self.multi[i]
         self.rock[i] -= rockMinusAmount
@@ -3722,7 +3866,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.plusRock[i] -= self.pluGain*2.0/self.multi[i]
         if self.plusRock[i] <= self.pluBase:
           self.plusRock[i] = self.pluBase/self.multi[i]
-      if self.lessMissed[i]:
+      if self.lessMissed[g]:
         self.minusRock[i] += self.minGain/5.0/self.multi[i]
         rockMinusAmount = self.minusRock[i]/5.0/self.multi[i]
         self.rock[i] -= rockMinusAmount
@@ -3740,12 +3884,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
   def rockmeterIncrease(self, playerNum):
     i = playerNum
-    if self.guitars[i].isDrum: 
+    g = self.playerList[i].guitarNum
+    if g is None:
+      return
+    if self.guitars[g].isDrum: 
       self.drumStart = True
     if not self.failingEnabled or self.practiceMode:
       return
-    if self.battle and self.numOfPlayers > 1: #battle mode
-      if self.notesHit[i]:
+    if not self.notesHit[g]: return
+    if self.battle and self.totalPlayers > 1: #battle mode
+      if self.notesHit[g]:
         if self.rock[i] < self.rockMax:
           self.plusRock[i] += self.pluGain*self.multi[i]
           if self.plusRock[i] > self.battleMax:
@@ -3760,7 +3908,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.minusRock[i] -= self.minGain/2.0*self.multi[i]
     
     #MFH TODO maintain separate rock status for each player
-    elif (self.coOp or self.coOpGH) and self.numOfPlayers > 1: 
+    elif (self.coOp or self.coOpGH) and self.totalPlayers > 1: 
       if self.rock[self.coOpPlayerMeter] < self.rockMax:
         self.plusRock[self.coOpPlayerMeter] += self.pluGain*self.multi[i]
         self.rock[self.coOpPlayerMeter] += self.plusRock[self.coOpPlayerMeter]*self.multi[i]
@@ -3773,7 +3921,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           if self.engine.data.cheerSoundFound > 0: #haven't decided whether or not to cut crowdSound with crowdsEnabled = 0, but would have to do it at solos too...
             self.engine.data.crowdSound.play()
           
-    elif self.coOpRB and self.numOfPlayers > 1: 
+    elif self.coOpRB and self.totalPlayers > 1: 
       if self.rock[i] < self.rockMax:
         self.plusRock[i] += self.pluGain*self.coOpMulti
         self.rock[i] += (self.plusRock[i]*self.coOpMulti)
@@ -3845,10 +3993,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             self.failed = True
           else:
             if self.coOpRB:
-              for i, player in enumerate(self.playerList):
+              for i, player in enumerate(self.fullPlayerList):
+                g = player.guitarNum
                 if self.rock[i] <= 0 and not self.coOpFailDone[i]:
-                  self.guitars[i].coOpFailed = True
-                  self.guitars[i].starPower  = 0.0
+                  if g is not None:
+                    self.guitars[g].coOpFailed = True
+                    self.guitars[g].starPower  = 0.0
+                  else:
+                    self.vocalists[0].coOpFailed = True
+                    self.vocalists[0].starPower = 0.0
                   self.engine.data.coOpFailSound.play()
                   self.deadPlayerList.append(i)
                   self.numDeadPlayers += 1
@@ -3859,12 +4012,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     self.song.resetInstrumentPitch(self.players[i].part)
                   self.coOpFailDone[i] = True
         elif self.numOfPlayers > 1 and self.battleGH:
-          for i, player in enumerate(self.playerList):
+          for i, player in enumerate(self.fullPlayerList):
             if self.rock[i] <= 0:
               self.failed = True
         else:
           somebodyStillAlive = False
-          for i, player in enumerate(self.playerList):
+          for i, player in enumerate(self.fullPlayerList):
             if self.rock[i] > 0:
               somebodyStillAlive = True
           if not somebodyStillAlive:    #only if everybody has failed
@@ -3879,7 +4032,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       
       for i,guitar in enumerate(self.guitars):  
         self.stage.run(pos, guitar.currentPeriod)
-        
+        playerNum = self.playerList[i].number
 
         if guitar.battleObjects[0] != 0:
           self.battleItemsHolding[i] = 1
@@ -3956,7 +4109,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   guitar.battleBeingUsed[k] = 0
       
         if guitar.isDrum and guitar.freestyleSP:    #MFH - this drum fill starpower activation logic should always be checked.
-          self.activateSP(i)
+          self.activateSP(playerNum)
           guitar.freestyleSP = False
 
 
@@ -3972,11 +4125,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 self.engine.data.starActivateSound.play()
               scoreCard.endingAwarded = True
         else:
-          scoreCard = self.scoring[i]
+          scoreCard = self.scoring[playerNum]
           if scoreCard.freestyleWasJustActive and not scoreCard.endingAwarded:   
             if scoreCard.lastNoteEvent and not scoreCard.endingStreakBroken:
               if scoreCard.lastNoteEvent.played or scoreCard.lastNoteEvent.hopod:
-                Log.debug("Big Rock Ending bonus awarded for player %d: %d points" % (i, scoreCard.endingScore) )
+                Log.debug("Big Rock Ending bonus awarded for player %d: %d points" % (playerNum, scoreCard.endingScore) )
                 if scoreCard.endingScore > 0:
                   scoreCard.addEndingScore()
                   self.engine.data.starActivateSound.play()
@@ -3995,11 +4148,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             else:
               self.engine.data.starSound.play()
             if guitar.isDrum and self.autoDrumStarpowerActivate == 0 and self.numDrumFills < 2:
-              self.activateSP(i)
+              self.activateSP(playerNum)
           else:
             #myfingershurt: auto drum starpower activation option:
             if guitar.isDrum and self.autoDrumStarpowerActivate == 0 and self.numDrumFills < 2:
-              self.activateSP(i)
+              self.activateSP(playerNum)
             if guitar.starPower >= 50 and not guitar.starPowerActive:
               self.engine.data.starReadySound.play()
             else:
@@ -4017,7 +4170,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               guitar.battleObjectGained = False
             else:
               if guitar.starPower >= 50 and not guitar.starPowerActive:  #QQstarS:Set [0] to [i]
-                self.newScalingText(i, self.tsStarPowerReady )
+                self.newScalingText(playerNum, self.tsStarPowerReady )
 
           self.hopFretboard(i, 0.04)  #stump
           guitar.starPowerGained = False  #QQstarS:Set [0] to [i]
@@ -4026,7 +4179,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #for i,guitar in enumerate(self.guitars):
         if self.coOpGH:
           for k, theGuitar in enumerate(self.guitars):
-            theGuitar.starPower = self.coOpStarPower/self.numOfPlayers
+            theGuitar.starPower = self.coOpStarPower/self.totalPlayers
         
         
         if not guitar.run(ticks, pos, self.controls):
@@ -4043,7 +4196,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               if self.coOpType:
                 self.coOpScoreCard.totalStreakNotes -= 1
               else:
-                self.scoring[i].totalStreakNotes -= 1
+                self.scoring[playerNum].totalStreakNotes -= 1
 
         else:
           missedNotes = guitar.getMissedNotesMFH(self.song, pos)
@@ -4054,7 +4207,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               self.drumStart = True
             self.lessMissed[i] = True  #QQstarS:Set [0] to [i]
             for tym, theNote in missedNotes:  #MFH
-              self.scoring[i].notesMissed += 1
+              self.scoring[playerNum].notesMissed += 1
               if self.coOpType:
                 self.coOpScoreCard.notesMissed += 1
               if theNote.star or theNote.finalStar:
@@ -4072,15 +4225,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             self.currentlyAnimating = False
             guitar.setMultiplier(1)
             guitar.hopoLast = -1
-            self.song.setInstrumentVolume(0.0, self.players[i].part)
+            self.song.setInstrumentVolume(0.0, self.fullPlayerList[playerNum].part)
             if self.whammyEffect == 1:    #pitchbend
-              self.song.resetInstrumentPitch(self.players[i].part)
+              self.song.resetInstrumentPitch(self.fullPlayerList[playerNum].part)
             self.guitarSoloBroken[i] = True
             if self.coOpType:
               self.coOpScoreCard.streak = 0
               self.coOpScoreCard.endingStreakBroken = True
-            self.scoring[i].streak = 0
-            self.scoring[i].endingStreakBroken = True   #MFH
+            self.scoring[playerNum].streak = 0
+            self.scoring[playerNum].endingStreakBroken = True   #MFH
             if self.hopoDebugDisp == 1:
               missedNoteNums = [noat.number for time, noat in missedNotes]
               #Log.debug("Miss: run(), found missed note(s)... %s" % str(missedNoteNums) + ", Time left=" + str(self.timeLeft))
@@ -4136,10 +4289,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         elif self.rbOverdriveBarGlowVisibility <= 0 and self.rbOverdriveBarGlowFadeOut == True:
           self.rbOverdriveBarGlowFadeOut = False
       
+      for playerNum in range(self.totalPlayers):
+        self.handlePhrases(playerNum, self.scoring[playerNum].streak)   #MFH - streak #1 for player #1...
       for playerNum in range(self.numOfPlayers):
         self.handleAnalogSP(playerNum, ticks)
         self.handleWhammy(playerNum)
-        self.handlePhrases(playerNum, self.scoring[playerNum].streak)   #MFH - streak #1 for player #1...
         if self.playerList[playerNum].controlType == 4:
           self.handleAnalogSlider(playerNum)
         self.updateGuitarSolo(playerNum)
@@ -4155,14 +4309,24 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.coOpStarPower = 0
       #MFH - new logic to update the starpower pre-multiplier
       #akedrou - broken up to support RB Co-op properly.
-      for i in range(self.numOfPlayers):
-        if self.guitars[i].starPowerActive: 
-          self.multi[i] = 2
-          self.starPowersActive += 1
-        else:
-          self.multi[i] = 1
+      for i in range(self.totalPlayers):
+        g = self.fullPlayerList[i].guitarNum
+        try:
+          if self.guitars[g].starPowerActive: 
+            self.multi[i] = 2
+            self.starPowersActive += 1
+          else:
+            self.multi[i] = 1
+          sp = self.guitars[g].starPower
+        except TypeError:
+          if self.vocalists[0].starPowerActive:
+            self.multi[i] = 2
+            self.starPowersActive += 1
+          else:
+            self.multi[i] = 1
+          sp = self.vocalists[0].starPower
         if self.coOpGH:
-          self.coOpStarPower += self.guitars[i].starPower
+          self.coOpStarPower += sp
       if self.coOpRB:
         if self.unisonIndex < len(self.unisonConfirm) and not self.unisonActive: #akedrou - unison bonuses
           while self.unisonConfirm[self.unisonIndex][0] < pos:
@@ -4185,28 +4349,29 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         oldCoOpRock = self.rock[self.coOpPlayerMeter]
         coOpRock = 0.0
       for i in range(self.numOfPlayers):
+        p = self.playerList[i].number
         if (self.coOpRB and not guitar.coOpFailed) or not self.coOpRB:
           if self.notesMissed[i] or self.lessMissed[i]:   #(detects missed note or overstrum)
             if self.guitars[i].isDrum:
               if self.drumMisses == 0:    #mode: always
-                self.rockmeterDecrease(i)
+                self.rockmeterDecrease(p)
               #elif self.drumMisses == 1 and self.countdownSeconds < 1:    #mode: song start
               elif self.drumMisses == 1 and self.countdown < 1:    #mode: song start
-                self.rockmeterDecrease(i)
+                self.rockmeterDecrease(p)
               elif self.drumMisses == 2 and self.drumStart:    #mode: song start
-                self.rockmeterDecrease(i)
+                self.rockmeterDecrease(p)
             else:   #not drums
-              self.rockmeterDecrease(i)
+              self.rockmeterDecrease(p)
           if self.notesHit[i]:
-            self.rockmeterIncrease(i)
+            self.rockmeterIncrease(p)
           if self.coOpRB:
-            coOpRock += self.rock[i]
+            coOpRock += self.rock[p]
         else:
           if not self.guitars[i].coOpRestart:
             self.rockmeterDrain(self.coOpPlayerMeter)
           else:
             oldCoOpRock = 0.0
-            coOpRock += self.rock[i]
+            coOpRock += self.rock[p]
         self.notesMissed[i] = False 
         self.starNotesMissed[i] = False
         self.notesHit[i] = False 
@@ -4219,16 +4384,19 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           
         #battle failing
         if self.battle and self.numOfPlayers>1:
-          if self.rock[i] <= 0:
+          if self.rock[p] <= 0:
             #self.displayText[i] = "You Failed!!!!"
             #self.newScalingText(i, _("You Failed!!!!") )
-            self.newScalingText(i, self.tsYouFailedBattle )
+            self.newScalingText(p, self.tsYouFailedBattle )
             #self.streakFlag = str(i)   #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1. 
             guitar.actions = [0,0,0]
-
+      for i in self.vocalPlayers:
+        if self.coOpRB:
+          if self.numDeadPlayers == 0:
+            coOpRock += self.rock[i.number]
       if self.coOpRB: #RB co-op meter is just an average until someone dies.
         if self.numDeadPlayers == 0:
-          self.rock[self.coOpPlayerMeter] = coOpRock/self.numOfPlayers
+          self.rock[self.coOpPlayerMeter] = coOpRock/self.totalPlayers
           if (self.rock[self.coOpPlayerMeter]/self.rockMax > 0.667) and (oldCoOpRock/self.rockMax <= 0.667):
             self.playersInGreen = 1
             if self.engine.data.cheerSoundFound > 0: #haven't decided whether or not to cut crowdSound with crowdsEnabled = 0, but would have to do it at solos too...
@@ -4355,7 +4523,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         return
  
       #MFH
-      if self.midiLyricMode == 1 and self.numMidiLyricLines > 0 and (not self.noMoreMidiLineLyrics):   #line-by-line lyrics mode:
+      if self.midiLyricMode == 1 and self.numMidiLyricLines > 0 and (not self.noMoreMidiLineLyrics) and self.vplayers == 0:   #line-by-line lyrics mode:
 
         if pos >= (self.nextMidiLyricStartTime-self.lineByLineStartSlopMs): 
           self.currentSimpleMidiLyricLine = self.nextMidiLyricLine
@@ -4366,7 +4534,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           else:
             self.noMoreMidiLineLyrics = True
             
-      elif self.midiLyricMode == 2 and self.numMidiLyricLines > 0 and (not self.noMoreMidiLineLyrics):   #MFH - handle 2-line lyric mode with current-word highlighting advancement
+      elif self.midiLyricMode == 2 and self.numMidiLyricLines > 0 and (not self.noMoreMidiLineLyrics) and self.vplayers == 0:   #MFH - handle 2-line lyric mode with current-word highlighting advancement
         #MFH - first, prepare / handle the active / top line (which will have highlighted words / syllables):
         if pos >= self.nextLyricWordTime:      #time to switch to this word
           if self.nextLyricIsOnNewLine:
@@ -4444,7 +4612,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
   def render3D(self):
     self.stage.render(self.visibility)
-    
+  
+  def renderVocals(self):
+    if len(self.vocalists) == 0:
+      return
+    for i, vocalist in enumerate(self.vocalists):
+      vocalist.render(self.visibility, self.song, self.getSongPosition())
+      
   def renderGuitar(self):
     for i in range(self.numOfPlayers):
       self.engine.view.setViewport(self.numOfPlayers,i)
@@ -5209,7 +5383,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.guitars[num].fretboardHop = height
   
   def activateSP(self, num): #QQstarS: Fix this function, add a element "num"
-    if self.battleGH:
+    if self.battleGH: #from akedrou: this will die horribly if you allow vocal players in. Just sayin'. ... sorry?
       time = self.getSongPosition()
       if time - self.battleJustUsed[num] > 1500: #must wait 1.5sec before next object use
         if self.guitars[num].battleObjects[0] != 0:
@@ -5260,7 +5434,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.battleJustUsed[num] = time
           
           #Log.debug("Battle Object used, Objects left %s" % str(self.guitars[num].battleObjects))
-    elif self.coOpGH:
+    elif self.coOpGH: #akedrou also says don't let vocal players in GH Co-Op.
       if self.coOpStarPower >= (50 * self.numOfPlayers) and self.guitars[num].starPowerActive == False:
         time = self.getSongPosition()
         Log.debug("Star Power Activated at: " + str(time))
@@ -5286,30 +5460,41 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             self.coOpStarPowerTimer = time
         
     else:
-      if self.guitars[num].starPower >= 50 and self.guitars[num].starPowerActive == False: #QQstarS:Set [0] to [i]
+      g = self.fullPlayerList[num].guitarNum
+      if g is not None:
+        guitar = self.guitars[self.fullPlayerList[num].guitarNum]
+      else:
+        guitar = self.vocalists[0]
+      if guitar.starPower >= 50: #QQstarS:Set [0] to [i]
         #self.sfxChannel.setVolume(self.sfxVolume)
         #if self.engine.data.cheerSoundFound:
           #self.engine.data.crowdSound.play()
-        self.hopFretboard(num, 0.07)  #stump
+        if g is not None:
+          self.hopFretboard(g, 0.07)  #stump
         if self.coOpRB:
           while len(self.deadPlayerList) > 0:
             i = self.deadPlayerList.pop(0) #keeps order intact (with >2 players)
-            if self.guitars[i].coOpFailed and self.timesFailed[i]<3:
-              self.guitars[i].coOpRescue(self.getSongPosition())
+            if guitar.coOpFailed and self.timesFailed[i]<3:
+              guitar.coOpRescue(self.getSongPosition())
               self.rock[i] = self.rockMax * 0.667
-              self.guitars[num].starPower -= 50
+              guitar.starPower -= 50
               self.engine.data.rescueSound.play()
               self.coOpFailDone[i] = False
               self.numDeadPlayers -= 1
               break
           else:
-            self.engine.data.starActivateSound.play()
-            self.guitars[num].starPowerActive = True #QQstarS:Set [0] to [i]
-        else:
+            if not guitar.starPowerActive:
+              self.engine.data.starActivateSound.play()
+              guitar.starPowerActive = True #QQstarS:Set [0] to [i]
+              if g is not None:
+                self.guitars[g].overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
+                self.guitars[g].ocount = 0  #MFH - this triggers the oFlash strings & timer
+        elif guitar.starPower >= 50:
           self.engine.data.starActivateSound.play()
-          self.guitars[num].starPowerActive = True #QQstarS:Set [0] to [i]
-        self.guitars[num].overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
-        self.guitars[num].ocount = 0  #MFH - this triggers the oFlash strings & timer
+          guitar.starPowerActive = True #QQstarS:Set [0] to [i]
+          if g is not None:
+            self.guitars[g].overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
+            self.guitars[g].ocount = 0  #MFH - this triggers the oFlash strings & timer
 
   def goToResults(self):
     self.ending = True
@@ -5418,7 +5603,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if control == self.guitars[1].keys[self.guitars[1].battleBreakString]:
           self.guitars[1].battleBreakNow -= 1
           self.controls.toggle(control, False)
-        
+      if len(self.guitars) > 2:
+        if self.guitars[2].battleStatus[3]:
+          if control == self.guitars[2].keys[self.guitars[2].battleBreakString]:
+            self.guitars[2].battleBreakNow -= 1
+            self.controls.toggle(control, False)
+          
     if control in (self.guitars[num].actions):
       for k in self.keysList[num]:
         if self.controls.getState(k):
@@ -5484,6 +5674,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if control == self.guitars[1].keys[self.guitars[1].battleBreakString]:
           self.guitars[1].battleBreakNow -=1
           self.controls.toggle(control, False)
+      if len(self.guitars) > 2:
+        if self.guitars[2].battleStatus[3]:
+          if control == self.guitars[2].keys[self.guitars[2].battleBreakString]:
+            self.guitars[2].battleBreakNow -= 1
+            self.controls.toggle(control, False)
     
     #if True: #akedrou - Probably not the best place for ontological discussions. Let's just assume True is always True.
     pressed = -1
@@ -5558,6 +5753,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if control == self.guitars[1].keys[self.guitars[1].battleBreakString]:
           self.guitars[1].battleBreakNow -=1
           self.controls.toggle(control, False)
+      if len(self.guitars) > 2:
+        if self.guitars[2].battleStatus[3]:
+          if control == self.guitars[2].keys[self.guitars[2].battleBreakString]:
+            self.guitars[2].battleBreakNow -= 1
+            self.controls.toggle(control, False)
         
     pressed = -1
     for i in range(self.numOfPlayers):
@@ -5782,7 +5982,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.keyPressed3(None, 0, activeList[0], pullOff = True)
         
   def getPlayerNum(self, control):
-    for i, player in enumerate(self.playerList):
+    for i, player in enumerate(self.fullPlayerList):
       if control and control in player.keyList:
         return i
         break
@@ -5831,14 +6031,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.visibility = v = 1.0 - ((1 - visibility) ** 2)
   
       self.engine.view.setOrthogonalProjection(normalize = True)
-
+      
+      self.renderVocals()
       #MFH: render the note sheet just on top of the background:
-      if self.lyricSheet != None:
+      if self.lyricSheet != None and len(self.vocalists) == 0:
         self.engine.drawImage(self.lyricSheet, scale = (self.lyricSheetScaleFactor,-self.lyricSheetScaleFactor), coord = (w/2, h*0.935))
         #the timing line on this lyric sheet image is approx. 1/4 over from the left
-      if len(self.vocalists) > 0:
-        for i, vocalist in enumerate(self.vocalists):
-          vocalist.render(visibility, None)
       #MFH - also render the scrolling lyrics & sections before changing viewports:
       minPos = pos - ((self.guitars[0].currentPeriod * self.guitars[0].beatsPerBoard) / 2)
       maxPos = pos + ((self.guitars[0].currentPeriod * self.guitars[0].beatsPerBoard) * 1.5)
@@ -5883,7 +6081,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
   
           #handle the lyrics track
-          if self.midiLyricsEnabled > 0:
+          if self.midiLyricsEnabled > 0 and len(self.vocalists) == 0:
             if self.midiLyricMode == 0:   #scrolling lyrics mode:
               for time, event in self.song.eventTracks[Song.TK_LYRICS].getEvents(minPos, maxPos):
                 if self.theme == 2:
@@ -6000,8 +6198,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
         
 
-        for i,player in enumerate(self.playerList): #QQstarS: This part has big fix. I add the code into it,So he can shown corect
-          self.engine.view.setViewportHalf(self.numOfPlayers,i)  
+        for p,player in enumerate(self.fullPlayerList): #QQstarS: This part has big fix. I add the code into it,So he can shown corect
+          i = player.guitarNum
+          if i is not None:
+            self.engine.view.setViewportHalf(self.numOfPlayers,i)  
           
 
 
@@ -6015,17 +6215,17 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           if self.coOpGH:
             multStreak = self.coOpScoreCard.streak
           else:
-            multStreak = self.scoring[i].streak
-          if self.guitars[i].isBassGuitar and self.bassGrooveEnabled:
-            maxMult = 60
-          else:
-            maxMult = 40
+            multStreak = self.scoring[p].streak
+          maxMult = 40
+          if i is not None:
+            if self.guitars[i].isBassGuitar and self.bassGrooveEnabled:
+              maxMult = 60
           
           # show the streak counter and miss message
           #============Blazingamer's GHII Rock Meter=============#
   
-          if self.rmtype == 0:   #GH2 theme
-           if not self.pauseScreen == None:
+          if self.rmtype == 0 and i is not None:   #GH2 theme
+           if not self.rockOff == None: #note: this is the last required image to be loaded, and is cleared on freeResources
               w = self.wPlayer[i]
               h = self.hPlayer[i]
               wBak = w
@@ -6314,8 +6514,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
           #===================================================#
   
-          elif self.rmtype == 1:
-            if not self.pauseScreen == None:
+          elif self.rmtype == 1 and i is not None:
+            if not self.rockOff == None:
               w = self.wPlayer[i]
               h = self.hPlayer[i]
               wBak = w
@@ -7267,12 +7467,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               
               if self.pause:
                 self.engine.view.setViewport(1,0)
-                if self.engine.graphicMenuShown == False:
+                if self.engine.graphicMenuShown == False and self.pauseScreen:
                   self.engine.drawImage(self.pauseScreen, scale = (self.pause_bkg[2], -self.pause_bkg[3]), coord = (w*self.pause_bkg[0],h*self.pause_bkg[1]), stretched = 3)
                 
               if self.finalFailed and self.song:
                 self.engine.view.setViewport(1,0)
-                if self.engine.graphicMenuShown == False:
+                if self.engine.graphicMenuShown == False and self.failScreen:
                   self.engine.drawImage(self.failScreen, scale = (self.fail_bkg[2], -self.fail_bkg[3]), coord = (w*self.fail_bkg[0],h*self.fail_bkg[1]), stretched = 3) 
     
                 # evilynux - Closer to actual GH3
@@ -7348,146 +7548,149 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
                   
           elif (self.rmtype == 2):# and self.countdown<=4) or (self.theme == 1 and self.numOfPlayers==1):
-            if not self.pauseScreen == None:
-              w = self.wPlayer[i]
-              h = self.hPlayer[i]
-              wBak = w
-              hBak = h
-              if self.guitars[i].starPowerActive and not self.coOpRB:
-                #death_au: added checks for bass groove here so multiplier is correct    
-                #if self.playerList[i].part.text == "Bass Guitar" and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnableMode > 0:
-                if self.guitars[i].isBassGuitar and not self.coOpGH and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnabled:
-                  if multStreak >= 50:
-                    multiplier = 6
-                    multRange = (3.0/4.0,4.0/4.0)
+            if not self.rockOff == None:
+              w = self.wFull
+              h = self.hFull
+              if i is not None:
+                w = self.wPlayer[i]
+                h = self.hPlayer[i]
+                wBak = w
+                hBak = h
+                if self.guitars[i].starPowerActive and not self.coOpRB:
+                  #death_au: added checks for bass groove here so multiplier is correct    
+                  #if self.playerList[i].part.text == "Bass Guitar" and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnableMode > 0:
+                  if self.guitars[i].isBassGuitar and not self.coOpGH and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnabled:
+                    if multStreak >= 50:
+                      multiplier = 6
+                      multRange = (3.0/4.0,4.0/4.0)
+                      color = (.3,.7,.9,1)
+                    else:
+                      multiplier = 5
+                      multRange = (2.0/4.0,3.0/4.0)
+                      color = (.3,.7,.9,1)
+                  #death_au: end bass groove check
+                  elif multStreak >= 30:
+                    multiplier = 4
+                    multRange = (7.0/8.0,8.0/8.0)
+                    color = (.3,.7,.9,1)
+                  elif multStreak >= 20:
+                    multiplier = 3
+                    multRange = (6.0/8.0,7.0/8.0)
+                    color = (.3,.7,.9,1)
+                  elif multStreak >= 10:
+                    multiplier = 2
+                    multRange = (5.0/8.0,6.0/8.0)
                     color = (.3,.7,.9,1)
                   else:
-                    multiplier = 5
-                    multRange = (2.0/4.0,3.0/4.0)
+                    multiplier = 1
+                    multRange = (4.0/8.0,5.0/8.0)
                     color = (.3,.7,.9,1)
-                #death_au: end bass groove check
-                elif multStreak >= 30:
-                  multiplier = 4
-                  multRange = (7.0/8.0,8.0/8.0)
-                  color = (.3,.7,.9,1)
-                elif multStreak >= 20:
-                  multiplier = 3
-                  multRange = (6.0/8.0,7.0/8.0)
-                  color = (.3,.7,.9,1)
-                elif multStreak >= 10:
-                  multiplier = 2
-                  multRange = (5.0/8.0,6.0/8.0)
-                  color = (.3,.7,.9,1)
                 else:
-                  multiplier = 1
-                  multRange = (4.0/8.0,5.0/8.0)
-                  color = (.3,.7,.9,1)
-              else:
-                #death_au: added checks for bass groove here so multiplier is correct    
-                #if self.playerList[i].part.text == "Bass Guitar" and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnableMode > 0:
-                if self.guitars[i].isBassGuitar and not self.coOpGH and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnabled:
-                  if multStreak >= 50:
-                    multiplier = 6
-                    multRange = (1.0/4.0,2.0/4.0)
+                  #death_au: added checks for bass groove here so multiplier is correct    
+                  #if self.playerList[i].part.text == "Bass Guitar" and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnableMode > 0:
+                  if self.guitars[i].isBassGuitar and not self.coOpGH and self.bassgroovemult != None and multStreak >= 40 and self.bassGrooveEnabled:
+                    if multStreak >= 50:
+                      multiplier = 6
+                      multRange = (1.0/4.0,2.0/4.0)
+                      color = (1,1,-1,1)
+                    else:
+                      multiplier = 5
+                      multRange = (0.0/4.0,1.0/4.0)
+                      color = (1,1,-1,1)
+                  #death_au: end bass groove check
+                  elif multStreak >= 30:
+                    multiplier = 4
+                    multRange = (3.0/8.0,4.0/8.0)
+                    color = (1,-1,1,1)
+                  elif multStreak >= 20:
+                    multiplier = 3
+                    multRange = (2.0/8.0,3.0/8.0)
+                    color = (-1,1,-.75,1)
+                  elif multStreak >= 10:
+                    multiplier = 2
+                    multRange = (1.0/8.0,2.0/8.0)
                     color = (1,1,-1,1)
                   else:
-                    multiplier = 5
-                    multRange = (0.0/4.0,1.0/4.0)
+                    multiplier = 1
+                    multRange = (0.0/8.0,1.0/8.0)
                     color = (1,1,-1,1)
-                #death_au: end bass groove check
-                elif multStreak >= 30:
-                  multiplier = 4
-                  multRange = (3.0/8.0,4.0/8.0)
-                  color = (1,-1,1,1)
-                elif multStreak >= 20:
-                  multiplier = 3
-                  multRange = (2.0/8.0,3.0/8.0)
-                  color = (-1,1,-.75,1)
-                elif multStreak >= 10:
-                  multiplier = 2
-                  multRange = (1.0/8.0,2.0/8.0)
-                  color = (1,1,-1,1)
-                else:
-                  multiplier = 1
-                  multRange = (0.0/8.0,1.0/8.0)
-                  color = (1,1,-1,1)
     
-              #myfingershurt: for UC's RB mult
-              if self.multRbFill:
-                if multStreak == 0:
-                  streak = 0
+                #myfingershurt: for UC's RB mult
+                if self.multRbFill:
+                  if multStreak == 0:
+                    streak = 0
     
-                elif multStreak - ((multiplier-1)*10) == 1:
-                  streak = 0
+                  elif multStreak - ((multiplier-1)*10) == 1:
+                    streak = 0
     
-                elif multStreak - ((multiplier-1)*10) == 2:
-                  streak = 1
+                  elif multStreak - ((multiplier-1)*10) == 2:
+                    streak = 1
     
-                elif multStreak - ((multiplier-1)*10) == 3:
-                  streak = 2
+                  elif multStreak - ((multiplier-1)*10) == 3:
+                    streak = 2
     
-                elif multStreak - ((multiplier-1)*10) == 4:
-                  streak = 3
+                  elif multStreak - ((multiplier-1)*10) == 4:
+                    streak = 3
+
+                  elif multStreak - ((multiplier-1)*10) == 5:
+                    streak = 4
     
-                elif multStreak - ((multiplier-1)*10) == 5:
-                  streak = 4
+                  elif multStreak - ((multiplier-1)*10) == 6:
+                    streak = 5
     
-                elif multStreak - ((multiplier-1)*10) == 6:
-                  streak = 5
+                  elif multStreak - ((multiplier-1)*10) == 7:
+                    streak = 6
     
-                elif multStreak - ((multiplier-1)*10) == 7:
-                  streak = 6
+                  elif multStreak - ((multiplier-1)*10) == 8:
+                    streak = 7
     
-                elif multStreak - ((multiplier-1)*10) == 8:
-                  streak = 7
+                  elif multStreak - ((multiplier-1)*10) == 9:
+                    streak = 8
     
-                elif multStreak - ((multiplier-1)*10) == 9:
-                  streak = 8
-    
-                else:
-                  streak = 9
+                  else:
+                    streak = 9
   
-              else:
-                if multStreak == 0:
-                  streak = 0
-                  hstreak = 0
-                elif multStreak - ((multiplier-1)*10) == 1:
-                  streak = 0
-                  hstreak = 1
-                elif multStreak - ((multiplier-1)*10) == 2:
-                  streak = 1
-                  hstreak = 0
-                elif multStreak - ((multiplier-1)*10) == 3:
-                  streak = 1
-                  hstreak = 1
-                elif multStreak - ((multiplier-1)*10) == 4:
-                  streak = 2
-                  hstreak = 0
-                elif multStreak - ((multiplier-1)*10) == 5:
-                  streak = 2
-                  hstreak = 1
-                elif multStreak - ((multiplier-1)*10) == 6:
-                  streak = 3
-                  hstreak = 0
-                elif multStreak - ((multiplier-1)*10) == 7:
-                  streak = 3
-                  hstreak = 1
-                elif multStreak - ((multiplier-1)*10) == 8:
-                  streak = 4
-                  hstreak = 0
-                elif multStreak - ((multiplier-1)*10) == 9:
-                  streak = 4
-                  hstreak = 1
                 else:
-                  streak = 5
-                  hstreak = 0
+                  if multStreak == 0:
+                    streak = 0
+                    hstreak = 0
+                  elif multStreak - ((multiplier-1)*10) == 1:
+                    streak = 0
+                    hstreak = 1
+                  elif multStreak - ((multiplier-1)*10) == 2:
+                    streak = 1
+                    hstreak = 0
+                  elif multStreak - ((multiplier-1)*10) == 3:
+                    streak = 1
+                    hstreak = 1
+                  elif multStreak - ((multiplier-1)*10) == 4:
+                    streak = 2
+                    hstreak = 0
+                  elif multStreak - ((multiplier-1)*10) == 5:
+                    streak = 2
+                    hstreak = 1
+                  elif multStreak - ((multiplier-1)*10) == 6:
+                    streak = 3
+                    hstreak = 0
+                  elif multStreak - ((multiplier-1)*10) == 7:
+                    streak = 3
+                    hstreak = 1
+                  elif multStreak - ((multiplier-1)*10) == 8:
+                    streak = 4
+                    hstreak = 0
+                  elif multStreak - ((multiplier-1)*10) == 9:
+                    streak = 4
+                    hstreak = 1
+                  else:
+                    streak = 5
+                    hstreak = 0
  
-              if self.rock[i] >= 0: 
-                currentRock = (0.0 + self.rock[i]) / (self.rockMax)
+              if self.rock[p] >= 0: 
+                currentRock = (0.0 + self.rock[p]) / (self.rockMax)
               else:
                 currentRock = (0.0 + 0) / (self.rockMax)
               heightIncrease = h*0.6234375*currentRock*0.65
-              if self.coOpRB and i == 0:
+              if self.coOpRB and p == 0:
                 if self.rock[self.coOpPlayerMeter] >= 0:
                   currentRockCoOp = (0.0 + self.rock[self.coOpPlayerMeter]) / self.rockMax
                 else:
@@ -7495,106 +7698,105 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 heightIncreaseCoOp = h*0.6234375*currentRockCoOp*0.65
     
 
-    
-              if not self.pause and not self.failed and not (self.guitars[i].coOpFailed and not self.guitars[i].coOpRestart):
+              if i is not None:
+                instrument = self.guitars[i]
+              else:
+                instrument = self.vocalists[0]
+              if not self.pause and not self.failed and not (instrument.coOpFailed and not instrument.coOpRestart):
                 if self.coOpGH:
-                  currentSP = self.coOpStarPower/(100.0*self.numOfPlayers)
+                  currentSP = self.coOpStarPower/(100.0*self.totalPlayers)
                 else:
-                  currentSP = self.guitars[i].starPower/100.0
-                  
-                #volshebnyi - overdrive bar positioning - simplified
-                self.engine.view.setViewportHalf(self.numOfPlayers,i)
-                vCoord = 0
-                if self.countdown>3.0:
-                  vCoord = - 75 * (self.countdown - 3.0)
-                  self.oBarScale = Theme.oBarHScale * self.guitars[i].boardWidth / math.sqrt(self.camera.origin[1]**2+(self.camera.origin[2]-0.5-vCoord/125)**2) * self.oBarScaleCoef
+                  currentSP = instrument.starPower/100.0
+                if i is not None:
+                  #volshebnyi - overdrive bar positioning - simplified
+                  self.engine.view.setViewportHalf(self.numOfPlayers,i)
+                  vCoord = 0
+                  if self.countdown>3.0:
+                    vCoord = - 75 * (self.countdown - 3.0)
+                    self.oBarScale = Theme.oBarHScale * self.guitars[i].boardWidth / math.sqrt(self.camera.origin[1]**2+(self.camera.origin[2]-0.5-vCoord/125)**2) * self.oBarScaleCoef
 
-                self.engine.drawImage(self.oBottom, scale = (self.oBarScale,.5), coord = (w/2,h/12+ vCoord), stretched = 1)
+                  self.engine.drawImage(self.oBottom, scale = (self.oBarScale,.5), coord = (w/2,h/12+ vCoord), stretched = 1)
                 
-                if self.oBarScale == 0.0:
-                  self.oBarScale = Theme.oBarHScale * self.guitars[i].boardWidth / math.sqrt(self.camera.origin[1]**2+(self.camera.origin[2]-0.5-vCoord/125)**2) * self.oBarScaleCoef
+                  if self.oBarScale == 0.0:
+                    self.oBarScale = Theme.oBarHScale * self.guitars[i].boardWidth / math.sqrt(self.camera.origin[1]**2+(self.camera.origin[2]-0.5-vCoord/125)**2) * self.oBarScaleCoef
                 
-                if Theme.oBar3dFill:
-                  offset=(currentSP-0.5)*(1-currentSP) / self.camera.origin[1] * 0.8
-                  self.engine.drawImage(self.oFill, scale = (self.oBarScale*currentSP,.5), coord = (w/2*(1+self.oBarScale*(currentSP-1)),h/12+ vCoord), rect = (0,currentSP,0,1), stretched = 1, rOffset = offset)
-                else:
-                  self.engine.drawImage(self.oFill, scale = (self.oBarScale*currentSP,.5), coord = (w/2*(1+self.oBarScale*(currentSP-1)),h/12+ vCoord), rect = (0,currentSP,0,1), stretched = 1)
+                  if Theme.oBar3dFill:
+                    offset=(currentSP-0.5)*(1-currentSP) / self.camera.origin[1] * 0.8
+                    self.engine.drawImage(self.oFill, scale = (self.oBarScale*currentSP,.5), coord = (w/2*(1+self.oBarScale*(currentSP-1)),h/12+ vCoord), rect = (0,currentSP,0,1), stretched = 1, rOffset = offset)
+                  else:
+                    self.engine.drawImage(self.oFill, scale = (self.oBarScale*currentSP,.5), coord = (w/2*(1+self.oBarScale*(currentSP-1)),h/12+ vCoord), rect = (0,currentSP,0,1), stretched = 1)
 
-                self.engine.drawImage(self.oTop, scale = (self.oBarScale,.5), coord = (w/2,h/12+ vCoord), stretched = 1)
+                  self.engine.drawImage(self.oTop, scale = (self.oBarScale,.5), coord = (w/2,h/12+ vCoord), stretched = 1)
             
-                if self.rb_sp_neck_glow and self.guitars[i].starPower >= 50 and not self.guitars[i].starPowerActive:
-                  self.engine.drawImage(self.oFull, scale = (self.oBarScale,.5), coord = (w/2,h/12), color = (1,1,1,self.rbOverdriveBarGlowVisibility), stretched = 1)
+                  if self.rb_sp_neck_glow and self.guitars[i].starPower >= 50 and not self.guitars[i].starPowerActive:
+                    self.engine.drawImage(self.oFull, scale = (self.oBarScale,.5), coord = (w/2,h/12), color = (1,1,1,self.rbOverdriveBarGlowVisibility), stretched = 1)
                 
-                #must duplicate to other theme 
-                #if self.playerList[i].part.text == "Bass Guitar" and multStreak >= 40 and self.bassGrooveEnableMode > 0:   #bass groove!
-                if self.guitars[i].isBassGuitar and not self.coOpGH and multStreak >= 40 and self.bassGrooveEnabled:   #bass groove!
-                  #death_au: bassgroove multiplier image
-                  if self.bassgroovemult != None:
-                    text = self.tsBassGroove   #kk69: displays "Bass Groove" whenever active, like Rock Band (only for RB theme)
-                    wid, hig = font.getStringSize(text,0.00150)
+                  #must duplicate to other theme 
+                  #if self.playerList[i].part.text == "Bass Guitar" and multStreak >= 40 and self.bassGrooveEnableMode > 0:   #bass groove!
+                  if self.guitars[i].isBassGuitar and not self.coOpGH and multStreak >= 40 and self.bassGrooveEnabled:   #bass groove!
+                    #death_au: bassgroove multiplier image
+                    if self.bassgroovemult != None:
+                      text = self.tsBassGroove   #kk69: displays "Bass Groove" whenever active, like Rock Band (only for RB theme)
+                      wid, hig = font.getStringSize(text,0.00150)
                     
-                    #MFH - if Jurgen is active on the current player, raise "Bass Groove" up above "Jurgen Is Here":
-                    if self.jurgPlayer[i]:
-                      font.render(text, (0.47 - wid / 2, 0.165),(1, 0, 0),0.00210)#end kk69
-                    else:
                       font.render(text, (0.47 - wid / 2, 0.190),(1, 0, 0),0.00210)#end kk69
   
-                    #UC's mult
+                      #UC's mult
+                      if self.multRbFill and multStreak > 0:
+                        self.engine.drawImage(self.mult2, scale = (.95,-.82/8.0), coord = (w*0.5023,h*0.0585), rect = (0,1,(streak/10.0),(streak+1)/10.0))
+                        
+                      if self.multRbFill:
+                        multscale = (.8,-.8/4.0)
+                        multcoord = (w*0.5,h*0.05)                  
+                      else:
+                        multscale = (.5,-.5/4.0)
+                        multcoord = (w*0.5,h*0.05)
+                      self.engine.drawImage(self.bassgroovemult, scale = multscale, coord = multcoord, rect = (0,1,multRange[0],multRange[1]))
+  
+                    else:
+                      #myfingershurt: Temp text bass groove multiplier:
+                      glColor3f(0,0.75,1)
+
+
+                      #text = self.tsBassGrooveLabel + str(self.playerList[i].getScoreMultiplier() * self.multi[i]) + "x"
+                      text = "%s%d%s" % (self.tsBassGrooveLabel, self.scoring[p].getScoreMultiplier() * self.multi[p], "x")
+                      wid, hig = font.getStringSize(text,0.00150)
+                      font.render(text, (.500 - wid / 2, .690),(1, 0, 0),0.00150)     #replacing normal rock band multiplier text
+                  
+                  else:              
+      
+                    #myfingershurt: UC's mult
                     if self.multRbFill and multStreak > 0:
-                      self.engine.drawImage(self.mult2, scale = (.95,-.82/8.0), coord = (w*0.5023,h*0.0585), rect = (0,1,(streak/10.0),(streak+1)/10.0))
-                      
-                    if self.multRbFill:
-                      multscale = (.8,-.8/4.0)
-                      multcoord = (w*0.5,h*0.05)                  
-                    else:
-                      multscale = (.5,-.5/4.0)
-                      multcoord = (w*0.5,h*0.05)
-                    self.engine.drawImage(self.bassgroovemult, scale = multscale, coord = multcoord, rect = (0,1,multRange[0],multRange[1]))
-  
-                  else:
-                    #myfingershurt: Temp text bass groove multiplier:
-                    glColor3f(0,0.75,1)
-
-
-                    #text = self.tsBassGrooveLabel + str(self.playerList[i].getScoreMultiplier() * self.multi[i]) + "x"
-                    text = "%s%d%s" % (self.tsBassGrooveLabel, self.scoring[i].getScoreMultiplier() * self.multi[i], "x")
-                    wid, hig = font.getStringSize(text,0.00150)
-                    font.render(text, (.500 - wid / 2, .690),(1, 0, 0),0.00150)     #replacing normal rock band multiplier text
-                
-                else:              
-    
-                  #myfingershurt: UC's mult
-                  if self.multRbFill and multStreak > 0:
-                    if self.rbmfx: #blazingamer
-                      if multStreak > 9:   #draw bigger!
+                      if self.rbmfx: #blazingamer
+                        if multStreak > 9:   #draw bigger!
+                          multscale = (.95,-.82/8.0)
+                          multcoord = (w*0.5023,h*0.0585)
+                        else:
+                          #myfingershurt: overlay streak perfectly:
+                          multscale = (.6,-.5/8.0)
+                          multcoord = (w*0.501,h*0.055)
+                      else:
                         multscale = (.95,-.82/8.0)
-                        multcoord = (w*0.5023,h*0.0585)
+                        multcoord = (w*0.5023,h*0.0585)         
+                      self.engine.drawImage(self.mult2, scale = multscale, coord = multcoord, rect = (0,1,(streak/10.0),(streak+1)/10.0))
+    
+                    if self.multRbFill:
+                      if self.rbmfx:  #blazingamer
+                        if multStreak > 9:   #draw bigger!
+                          multscale = (.8,-.8/8.0)
+                          multcoord = (w*0.5,h*0.05)
+                        else:
+                          multscale = (.5,-.5/8.0)
+                          multcoord = (w*0.5,h*0.05)
                       else:
-                        #myfingershurt: overlay streak perfectly:
-                        multscale = (.6,-.5/8.0)
-                        multcoord = (w*0.501,h*0.055)
-                    else:
-                      multscale = (.95,-.82/8.0)
-                      multcoord = (w*0.5023,h*0.0585)         
-                    self.engine.drawImage(self.mult2, scale = multscale, coord = multcoord, rect = (0,1,(streak/10.0),(streak+1)/10.0))
-  
-                  if self.multRbFill:
-                    if self.rbmfx:  #blazingamer
-                      if multStreak > 9:   #draw bigger!
                         multscale = (.8,-.8/8.0)
-                        multcoord = (w*0.5,h*0.05)
-                      else:
-                        multscale = (.5,-.5/8.0)
-                        multcoord = (w*0.5,h*0.05)
+                        multcoord = (w*0.5,h*0.05)                  
                     else:
-                      multscale = (.8,-.8/8.0)
-                      multcoord = (w*0.5,h*0.05)                  
-                  else:
-                    multscale = (.5,-.5/8.0)
-                    multcoord = (w*0.5,h*0.05)
-                  self.engine.drawImage(self.mult, scale = multscale, coord = multcoord, rect = (0,1,multRange[0],multRange[1]))
+                      multscale = (.5,-.5/8.0)
+                      multcoord = (w*0.5,h*0.05)
+                    self.engine.drawImage(self.mult, scale = multscale, coord = multcoord, rect = (0,1,multRange[0],multRange[1]))
   
-              glColor4f(1,1,1,1)
+                glColor4f(1,1,1,1)
  
               if not self.coOpType:
                 self.engine.view.setViewportHalf(self.numOfPlayers,i)
@@ -7602,7 +7804,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 self.engine.view.setViewportHalf(1,i)  
 
               if currentRock == 1 and self.failingEnabled and not self.coOpRB:
-                if (self.coOpType and i == self.coOpPlayerMeter) or not self.coOpType:  #MFH only render for player 1 if co-op mode
+                if (self.coOpType and p == self.coOpPlayerMeter) or not self.coOpType:  #MFH only render for player 1 if co-op mode
                   self.engine.drawImage(self.rockFull, scale = (.5,.5), coord = (w*0.07,h*0.5))
                   failUse = False
               else:
@@ -7610,27 +7812,27 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   fillColor = (0,0,0,0)
                   if currentRock < 0.333:
                     failUse = True
-                    self.failViz[i] -= .025
-                    if self.failViz[i] < 0.0:
-                      self.failViz[i] = 1.0
+                    self.failViz[p] -= .025
+                    if self.failViz[p] < 0.0:
+                      self.failViz[p] = 1.0
                   else:
                     failUse = False
-                    self.failViz[i] = 1.0
+                    self.failViz[p] = 1.0
                 else:
                   if currentRock < 0.333:
                     fillColor = (1,0,0,1)
                     failUse = True
-                    self.failViz[i] -= .025
-                    if self.failViz[i] < 0.0:
-                      self.failViz[i] = 1.0
+                    self.failViz[p] -= .025
+                    if self.failViz[p] < 0.0:
+                      self.failViz[p] = 1.0
                   elif currentRock < 0.666:
                     fillColor = (1,1,0,1)
                     failUse = False
-                    self.failViz[i] = 1.0
+                    self.failViz[p] = 1.0
                   else:
                     fillColor = (0,1,0,1)
                     failUse = False
-                if self.coOpRB and i == 0:
+                if self.coOpRB and p == 0:
                   if self.numDeadPlayers > 0:
                     fillColorCoOp = (.67, 0, 0, 1)
                   else:
@@ -7641,45 +7843,45 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     else:
                       fillColorCoOp = (0,1,0,1)
                       
-                if (self.coOpType and i == self.coOpPlayerMeter) or (self.coOpRB and i == 0) or not self.coOpType:  #MFH only render for player 1 if co-op mode
+                if (self.coOpType and p == self.coOpPlayerMeter) or (self.coOpRB and p == 0) or not self.coOpType:  #MFH only render for player 1 if co-op mode
                   self.engine.drawImage(self.rockBottom, scale = (.5,.5), coord = (w*0.07, h*0.5))
   
                 if self.failingEnabled == False:
-                  if (self.coOpType and i == self.coOpPlayerMeter) or (self.coOpRB and i == 0) or not self.coOpType:  #MFH only render for player 1 if co-op mode
+                  if (self.coOpType and p == self.coOpPlayerMeter) or (self.coOpRB and p == 0) or not self.coOpType:  #MFH only render for player 1 if co-op mode
                     self.engine.drawImage(self.rockOff, scale = (.5,.5), coord = (w*0.07, h*0.5))
                 else:
-                  if (self.coOpType and i == self.coOpPlayerMeter) or not self.coOpType:  #MFH only render for player 1 if co-op mode
+                  if (self.coOpType and p == self.coOpPlayerMeter) or not self.coOpType:  #MFH only render for player 1 if co-op mode
                     self.engine.drawImage(self.rockFill, scale = (.5,.5*currentRock), coord = (w*0.07, h*0.3-heightIncrease/2+heightIncrease), color = fillColor)
-                  if self.coOpRB and i == 0:
+                  if self.coOpRB and p == 0:
                     self.engine.drawImage(self.rockFill, scale = (.5,.5*currentRockCoOp), coord = (w*0.07, h*0.3-heightIncreaseCoOp/2+heightIncreaseCoOp), color = fillColorCoOp)
 
-                if (self.coOpType and i == self.coOpPlayerMeter) or (self.coOpRB and i == 0) or not self.coOpType:  #MFH only render for player 1 if co-op mode
+                if (self.coOpType and p == self.coOpPlayerMeter) or (self.coOpRB and p == 0) or not self.coOpType:  #MFH only render for player 1 if co-op mode
                   self.engine.drawImage(self.rockTop, scale = (.5,.5), coord = (w*0.07, h*0.5))
                   if self.coOpRB and self.numDeadPlayers > 0:
                     self.rockFailViz += .025
                     if self.rockFailViz > 1.0:
                       self.rockFailViz = 0.0
-                    if not (self.guitars[i].coOpFailed and not self.guitars[i].coOpRestart):
+                    if not (instrument.coOpFailed and not instrument.coOpRestart):
                       failUse = True
-                      self.failViz[i] = self.rockFailViz
+                      self.failViz[p] = self.rockFailViz
                     if self.rockFailFound:
                       self.engine.drawImage(self.rockTopFail, scale = (.5,.5), coord = (w*0.07, h*0.5), color = (1,1,1,self.rockFailViz))
   
-              wfactor = self.rockArr[i].widthf(pixelw = 60.000)
+              wfactor = self.rockArr[p].widthf(pixelw = 60.000)
               
               if self.coOpRB:
-                if self.numDeadPlayers > 0 and not (self.guitars[i].coOpFailed and not self.guitars[i].coOpRestart) and not self.failed:
+                if self.numDeadPlayers > 0 and not (instrument.coOpFailed and not instrument.coOpRestart) and not self.failed:
                   failUse = True
-                  self.failViz[i] = 1.0 - self.rockFailViz
+                  self.failViz[p] = 1.0 - self.rockFailViz
 
               if failUse:
-                if (self.guitars[i].coOpFailed and not self.guitars[i].coOpRestart) or self.failed:
+                if (instrument.coOpFailed and not instrument.coOpRestart) or self.failed:
                   failUse = True
                   redBlink = 0.4
-                  self.failViz[i] = 0
+                  self.failViz[p] = 0
                 else:
-                  redBlink = .7 + (.3 * self.failViz[i])
-                failColor = (redBlink,self.failViz[i],self.failViz[i],1)
+                  redBlink = .7 + (.3 * self.failViz[p])
+                failColor = (redBlink,self.failViz[p],self.failViz[p],1)
                 
               if not self.coOpType:  #MFH only render for player 1 if co-op mode
                 if self.failingEnabled:  
@@ -7687,42 +7889,41 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     failColor = failColor
                   else:
                     failColor = (1,1,1,1)
-                  self.engine.drawImage(self.rockArr[i], scale = (wfactor,-wfactor), coord = (w*.1,h*.3+heightIncrease), color = failColor)
-                  if self.guitars[i].starPowerActive and self.rockArrGlow:
+                  self.engine.drawImage(self.rockArr[p], scale = (wfactor,-wfactor), coord = (w*.1,h*.3+heightIncrease), color = failColor)
+                  if instrument.starPowerActive and self.rockArrGlow:
                     self.engine.drawImage(self.rockArrGlow, scale = (wfactor,-wfactor), coord = (w*.1,h*.3+heightIncrease))
-
-                whichScorePic = self.scorePic[i]
+                whichScorePic = self.scorePic[p]
               elif self.coOpRB:
                 spreadOut = 0.0
-                for j in range(i+1, self.numOfPlayers):
-                  if abs(self.rock[i]-self.rock[j]) < 250.0:
+                for q in range(p+1, self.totalPlayers):
+                  if abs(self.rock[p]-self.rock[q]) < 250.0:
                     spreadOut += .04
                 if self.failingEnabled:  
                   if failUse:
                     failColor = failColor
                   else:
                     failColor = (1,1,1,1)
-                  self.engine.drawImage(self.rockArr[i], scale = (wfactor,-wfactor), coord = (w*(.1+spreadOut),h*.3+heightIncrease), color = failColor)
-                  if self.guitars[i].starPowerActive and self.rockArrGlow:
+                  self.engine.drawImage(self.rockArr[p], scale = (wfactor,-wfactor), coord = (w*(.1+spreadOut),h*.3+heightIncrease), color = failColor)
+                  if instrument.starPowerActive and self.rockArrGlow:
                     self.engine.drawImage(self.rockArrGlow, scale = (wfactor,-wfactor), coord = (w*(.1+spreadOut),h*.3+heightIncrease))
-                if i == 0:
+                if p == 0:
                   whichScorePic = self.scorePicBand
               
-              elif self.coOpType and i == self.coOpPlayerMeter:
+              elif self.coOpType and p == self.coOpPlayerMeter:
                 if self.failingEnabled:  
                   if failUse:
                     failColor = failColor
                   else:
                     failColor = (1,1,1,1)
-                  self.engine.drawImage(self.rockArr[i], scale = (wfactor,-wfactor), coord = (w*.1,h*.3+heightIncrease), color = failColor)
-                  if not self.coOp and self.guitars[i].starPowerActive and self.rockArrGlow:
+                  self.engine.drawImage(self.rockArr[p], scale = (wfactor,-wfactor), coord = (w*.1,h*.3+heightIncrease), color = failColor)
+                  if not self.coOp and instrument.starPowerActive and self.rockArrGlow:
                     self.engine.drawImage(self.rockArrGlow, scale = (wfactor,-wfactor), coord = (w*.1,h*.3+heightIncrease))
                 if self.coOp or self.coOpGH:
                   whichScorePic = self.scorePicBand
                 else:
-                  whichScorePic = self.scorePic[i]
+                  whichScorePic = self.scorePic[p]
 
-              if self.unisonActive:
+              if self.unisonActive and i is not None:
                 if self.unisonPic and i == 0:
                   self.engine.drawImage(self.unisonPic, scale = (.5,-.5), coord = (w*.5,h*.65))
                 unisonX = .05*(self.unisonNum-1)
@@ -7734,22 +7935,23 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     partcolor = (.8, .8, .8, 1)
                   else:
                     partcolor = (.6,.6,.6,1)
-                  self.engine.drawImage(self.part[i], scale = (.15,-.15), coord = (w*(.5-unisonX+unisonI*i),h*.58), color = partcolor)
+                  self.engine.drawImage(self.part[p], scale = (.15,-.15), coord = (w*(.5-unisonX+unisonI*i),h*.58), color = partcolor)
               try:
   
   
                 #myfingershurt: locale.format call adds commas to separate numbers just like Rock Band
 
                 #if (self.coOp and i == 0) or not self.coOp:  #MFH only render for player 0 if co-op mode
-                if (self.coOpType and i == self.coOpPlayerMeter) or (self.coOpRB and i == 0) or not self.coOpType:  #MFH only render for player 1 if co-op mode
+                if (self.coOpType and p == self.coOpPlayerMeter) or (self.coOpRB and p == 0) or not self.coOpType:  #MFH only render for player 1 if co-op mode
   
                   if self.coOpType:
                     score=self.coOpScoreCard.score
                     for playaNum, playa in enumerate(self.playerList):
                       score += self.getExtraScoreForCurrentlyPlayedNotes(playaNum)
                   else:
-                    score= self.scoring[i].score
-                    score += self.getExtraScoreForCurrentlyPlayedNotes(i)
+                    score= self.scoring[p].score
+                    if i is not None:
+                      score += self.getExtraScoreForCurrentlyPlayedNotes(i)
 
                   scoretext = locale.format("%d", score, grouping=True)
                   #myfingershurt: swapping the number "0" and the letter "O" in the score font for accurate Rock Band score type!
@@ -7786,12 +7988,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               
               #streak counter box:
               if self.coOpType and not self.coOp:
-                if i == 0:
+                if p == 0:
                   counterimgheight = self.counter.height1()
                   self.engine.drawImage(self.counter, scale = (.5,-.5), coord = (w*.915, h*0.7720)) 
                   streakFont.render(streaktext, (0.97-stW,0.1500 ))    #last change +0.0015
 
-              self.engine.view.setViewportHalf(self.numOfPlayers,i)
+              if i is not None:
+                self.engine.view.setViewportHalf(self.numOfPlayers,i)
 
               if not self.coOpType or self.coOp:
                 counterimgheight = self.counter.height1()
@@ -7800,33 +8003,37 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 
 
               if not self.pause and not self.failed and not self.ending:
-                if self.displayText[i] != None:
+                if self.displayText[p] != None:
                   glColor3f(.8,.75,.01)
-                  size = sphraseFont.getStringSize(self.displayText[i], scale = self.displayTextScale[i])
-                  sphraseFont.render(self.displayText[i], (.5-size[0]/2,self.textY[i]-size[1]), scale = self.displayTextScale[i])
+                  size = sphraseFont.getStringSize(self.displayText[p], scale = self.displayTextScale[p])
+                  sphraseFont.render(self.displayText[p], (.5-size[0]/2,self.textY[p]-size[1]), scale = self.displayTextScale[p])
     
               if self.youRock == True:
                 if self.rockTimer == 1:
                   #self.sfxChannel.setVolume(self.sfxVolume)
                   self.engine.data.rockSound.play()
-                  for i in range(self.numOfPlayers): #MFH - flash overdrive strings in RB theme
-                    self.guitars[i].overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
-                    self.guitars[i].ocount = 0  #MFH - this triggers the oFlash strings & timer
+                  for j in range(self.numOfPlayers): #MFH - flash overdrive strings in RB theme
+                    self.guitars[j].overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
+                    self.guitars[j].ocount = 0  #MFH - this triggers the oFlash strings & timer
                 if self.rockTimer < self.rockCountdown:
                   self.rockTimer += 1
                   self.engine.drawImage(self.rockMsg, scale = (0.5, -0.5), coord = (w/2,h/2))
                 if self.rockTimer >= self.rockCountdown:
                   self.rockFinished = True
               
-              if self.guitars[i].coOpFailed and not self.guitars[i].coOpRestart and self.coOpRB and not self.failed:
-                self.engine.drawImage(self.coOpFailImg, scale = (.5,-.5), coord = (w*.5, h*0.65))
+              if instrument.coOpFailed and not instrument.coOpRestart and self.coOpRB and not self.failed:
+                if i is not None:
+                  hAdd = 0
+                else:
+                  hAdd = .2
+                self.engine.drawImage(self.coOpFailImg, scale = (.5,-.5), coord = (w*.5, h*(0.65+hAdd)))
                 
                 checks = self.timesFailed[i] - 1
                 for box in range(3):
                   if box <= checks:
-                    self.engine.drawImage(self.rescueCheck, scale = (.1,-.1), coord = (w*(.42+(.080*box)), h*0.5))
+                    self.engine.drawImage(self.rescueCheck, scale = (.1,-.1), coord = (w*(.42+(.080*box)), h*(0.5+hAdd)))
                   else:
-                    self.engine.drawImage(self.rescueBox, scale = (.1,-.1), coord = (w*(.42+(.080*box)), h*0.5))
+                    self.engine.drawImage(self.rescueBox, scale = (.1,-.1), coord = (w*(.42+(.080*box)), h*(0.5+hAdd)))
          
               if self.failed:
                 if self.failTimer == 0:
@@ -7865,21 +8072,21 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   self.failGame()
     
                #QQstarS:add the code in for loop end of here
+              if i is not None:
+                if self.hopoIndicatorEnabled and not self.guitars[i].isDrum and not self.pause and not self.failed: #MFH - HOPO indicator (grey = strums required, white = strums not required)
+                  text = self.tsHopoIndicator
+                  if self.guitars[i].hopoActive > 0:
+                    c1,c2,c3 = self.hopoIndicatorActiveColor
+                    glColor3f(c1,c2,c3)  #white
+                  else:
+                    c1,c2,c3 = self.hopoIndicatorInactiveColor
+                    glColor3f(c1,c2,c3)  #grey
+                  w, h = font.getStringSize(text,0.00150)
+                  font.render(text, (self.hopoIndicatorX - w / 2, self.hopoIndicatorY),(1, 0, 0),0.00150)     #off to the right slightly above fretboard
+                  glColor3f(1, 1, 1)  #cracker white
   
-              if self.hopoIndicatorEnabled and not self.guitars[i].isDrum and not self.pause and not self.failed: #MFH - HOPO indicator (grey = strums required, white = strums not required)
-                text = self.tsHopoIndicator
-                if self.guitars[i].hopoActive > 0:
-                  c1,c2,c3 = self.hopoIndicatorActiveColor
-                  glColor3f(c1,c2,c3)  #white
-                else:
-                  c1,c2,c3 = self.hopoIndicatorInactiveColor
-                  glColor3f(c1,c2,c3)  #grey
-                w, h = font.getStringSize(text,0.00150)
-                font.render(text, (self.hopoIndicatorX - w / 2, self.hopoIndicatorY),(1, 0, 0),0.00150)     #off to the right slightly above fretboard
-                glColor3f(1, 1, 1)  #cracker white
-  
-          elif self.rmtype == 3:
-            if not self.pauseScreen == None:
+          elif self.rmtype == 3 and i is not None:
+            if not self.rockOff == None:
               w = self.wPlayer[i]
               h = self.hPlayer[i]
               wBak = w
@@ -8383,7 +8590,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           #MFH - new location for star system support - outside theme-specific logic:
 
           #if (self.coOp and i == 0) or not self.coOp:  #MFH only render for player 0 if co-op mode
-          if (self.coOp and i == self.coOpPlayerMeter) or ((self.coOpRB or self.coOpGH) and i == 0) or not self.coOpType:  #MFH only render for player 1 if co-op mode
+          if (self.coOp and p == self.coOpPlayerMeter) or ((self.coOpRB or self.coOpGH) and p == 0) or not self.coOpType:  #MFH only render for player 1 if co-op mode
 
             if self.coOpType:
               stars=self.coOpScoreCard.stars
@@ -8391,9 +8598,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               self.engine.view.setViewport(1,0)
               ratio=self.coOpScoreCard.starRatio
             else:
-              stars=self.scoring[i].stars
-              partialStars=self.scoring[i].partialStars
-              ratio=self.scoring[i].starRatio
+              stars=self.scoring[p].stars
+              partialStars=self.scoring[p].partialStars
+              ratio=self.scoring[p].starRatio
 
             w = wBak
             h = hBak
@@ -8456,11 +8663,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 sAvMult = self.coOpScoreCard.avMult
                 sEfHand = self.coOpScoreCard.handicapValue
               else:
-                sNotesHit   = self.scoring[i].notesHit
-                sTotalNotes = self.scoring[i].totalStreakNotes
-                sHitAcc = self.scoring[i].hitAccuracy
-                sAvMult = self.scoring[i].avMult
-                sEfHand = self.scoring[i].handicapValue
+                sNotesHit   = self.scoring[p].notesHit
+                sTotalNotes = self.scoring[p].totalStreakNotes
+                sHitAcc = self.scoring[p].hitAccuracy
+                sAvMult = self.scoring[p].avMult
+                sEfHand = self.scoring[p].handicapValue
               trimmedTotalNoteAcc = self.decimal(str(sHitAcc)).quantize(self.decPlaceOffset)
               #text = str(self.playerList[i].notesHit) + "/" + str(self.playerList[i].totalStreakNotes) + ": " + str(trimmedTotalNoteAcc) + "%"
               text = "%(notesHit)s/%(totalNotes)s: %(hitAcc)s%%" % \
@@ -8501,103 +8708,105 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 font.render(text, (.98 - w, .246), (1, 0, 0),0.00140)
             
             if self.coOpRB or self.coOpGH:
-              self.engine.view.setViewportHalf(self.numOfPlayers,i)
+              if i is not None:
+                self.engine.view.setViewportHalf(self.numOfPlayers,i)
             
-            if self.dispSoloReview[i] and not self.pause and not self.failed:
-              if self.soloReviewCountdown[i] < self.soloReviewDispDelay:
-                self.soloReviewCountdown[i] += 1
-                if not (self.guitars[i].freestyleActive or self.scoring[i].freestyleWasJustActive):
-                  #glColor3f(0, 0.85, 1)  #grn-blu
-                  glColor3f(1, 1, 1)  #cracker white
-                  text1 = self.soloReviewText[i][0]
-                  text2 = self.soloReviewText[i][1]
-                  xOffset = 0.950
-                  if self.hitAccuracyPos == 0: #Center - need to move solo review above this!
-                    yOffset = 0.080
-                  elif self.jurgPlayer[i]: # and self.autoPlay: #akedrou - jurgPlayer checks if jurg was ever in town. This would block his notice if he came and left.
-                    yOffset = 0.115    #above Jurgen Is Here
-                  else:   #no jurgens here:
-                    yOffset = 0.155   #was 0.180, occluded notes
-                  txtSize = 0.00185
-                  Tw, Th = self.solo_soloFont.getStringSize(text1,txtSize)
-                  Tw2, Th2 = self.solo_soloFont.getStringSize(text2,txtSize)
-  
-                  #MFH - scale and display self.soloFrame behind / around the text
-                  lineSpacing = self.solo_soloFont.getLineSpacing(txtSize)
-                  if self.soloFrame:
-                    frameWidth = (max(Tw,Tw2))*1.15
-                    #frameHeight = (Th+Th2)*1.10
-                    frameHeight = lineSpacing*2.05
-                    boxXOffset = 0.5
-                    boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + lineSpacing) / self.fontScreenBottom) )
+            if i is not None:
+              if self.dispSoloReview[i] and not self.pause and not self.failed:
+                if self.soloReviewCountdown[i] < self.soloReviewDispDelay:
+                  self.soloReviewCountdown[i] += 1
+                  if not (self.guitars[i].freestyleActive or self.scoring[i].freestyleWasJustActive):
+                    #glColor3f(0, 0.85, 1)  #grn-blu
+                    glColor3f(1, 1, 1)  #cracker white
+                    text1 = self.soloReviewText[i][0]
+                    text2 = self.soloReviewText[i][1]
+                    xOffset = 0.950
+                    if self.hitAccuracyPos == 0: #Center - need to move solo review above this!
+                      yOffset = 0.080
+                    elif self.jurgPlayer[i]: # and self.autoPlay: #akedrou - jurgPlayer checks if jurg was ever in town. This would block his notice if he came and left.
+                      yOffset = 0.115    #above Jurgen Is Here
+                    else:   #no jurgens here:
+                      yOffset = 0.155   #was 0.180, occluded notes
+                    txtSize = 0.00185
+                    Tw, Th = self.solo_soloFont.getStringSize(text1,txtSize)
+                    Tw2, Th2 = self.solo_soloFont.getStringSize(text2,txtSize)
+    
+                    #MFH - scale and display self.soloFrame behind / around the text
+                    lineSpacing = self.solo_soloFont.getLineSpacing(txtSize)
+                    if self.soloFrame:
+                      frameWidth = (max(Tw,Tw2))*1.15
+                      #frameHeight = (Th+Th2)*1.10
+                      frameHeight = lineSpacing*2.05
+                      boxXOffset = 0.5
+                      boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + lineSpacing) / self.fontScreenBottom) )
                     
-                    tempWScale = frameWidth*self.soloFrameWFactor
-                    tempHScale = -(frameHeight)*self.soloFrameWFactor
+                      tempWScale = frameWidth*self.soloFrameWFactor
+                      tempHScale = -(frameHeight)*self.soloFrameWFactor
 
-                    self.engine.drawImage(self.soloFrame, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*boxXOffset,boxYOffset))
-                    #self.soloFrame.transform.reset()
-                    #self.soloFrame.transform.scale(tempWScale,tempHScale)
-                    #self.soloFrame.transform.translate(self.wPlayer[i]*boxXOffset,boxYOffset)
-                    #self.soloFrame.draw()
-
+                      self.engine.drawImage(self.soloFrame, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*boxXOffset,boxYOffset))
+                      #self.soloFrame.transform.reset()
+                      #self.soloFrame.transform.scale(tempWScale,tempHScale)
+                      #self.soloFrame.transform.translate(self.wPlayer[i]*boxXOffset,boxYOffset)
+                      #self.soloFrame.draw()
   
-                  self.solo_soloFont.render(text1, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #centered
-                  self.solo_soloFont.render(text2, (0.5 - Tw2/2, yOffset+lineSpacing),(1, 0, 0),txtSize)   #centered
-              else:
-                self.dispSoloReview[i] = False 
+    
+                    self.solo_soloFont.render(text1, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #centered
+                    self.solo_soloFont.render(text2, (0.5 - Tw2/2, yOffset+lineSpacing),(1, 0, 0),txtSize)   #centered
+                else:
+                  self.dispSoloReview[i] = False 
               
               
               
-            if self.hopoDebugDisp == 1 and not self.pause and not self.failed and not self.guitars[i].isDrum:
-              #MFH: PlayedNote HOPO tappable marking
-              if self.guitars[i].playedNotes:
+              if self.hopoDebugDisp == 1 and not self.pause and not self.failed and not self.guitars[i].isDrum:
+                #MFH: PlayedNote HOPO tappable marking
+                if self.guitars[i].playedNotes:
                 
                
-                if len(self.guitars[i].playedNotes) > 1:
-                  self.lastTapText = "tapp: %d, %d" % (self.guitars[i].playedNotes[0][1].tappable, self.guitars[i].playedNotes[1][1].tappable)
-                else:
-                  self.lastTapText = "tapp: %d" % (self.guitars[i].playedNotes[0][1].tappable)
+                  if len(self.guitars[i].playedNotes) > 1:
+                    self.lastTapText = "tapp: %d, %d" % (self.guitars[i].playedNotes[0][1].tappable, self.guitars[i].playedNotes[1][1].tappable)
+                  else:
+                    self.lastTapText = "tapp: %d" % (self.guitars[i].playedNotes[0][1].tappable)
 
-                #self.lastTapText = "tapp: " + str(self.guitars[i].playedNotes[0][1].tappable)
-                #if len(self.guitars[i].playedNotes) > 1:
-                # self.lastTapText += ", " + str(self.guitars[i].playedNotes[1][1].tappable)
+                  #self.lastTapText = "tapp: " + str(self.guitars[i].playedNotes[0][1].tappable)
+                  #if len(self.guitars[i].playedNotes) > 1:
+                  # self.lastTapText += ", " + str(self.guitars[i].playedNotes[1][1].tappable)
+                   
                  
-                 
-              w, h = font.getStringSize(self.lastTapText,0.00170)
-              font.render(self.lastTapText, (.750 - w / 2, .440),(1, 0, 0),0.00170)     #off to the right slightly above fretboard
+                w, h = font.getStringSize(self.lastTapText,0.00170)
+                font.render(self.lastTapText, (.750 - w / 2, .440),(1, 0, 0),0.00170)     #off to the right slightly above fretboard
               
-              #MFH: HOPO active debug
-              #text = "HOact: "
-              if self.guitars[i].hopoActive > 0:
-                glColor3f(1, 1, 0)  #yel
-                #text += "+"
-                hoActDisp = "+"
-              elif self.guitars[i].hopoActive < 0:
-                glColor3f(0, 1, 1)  #blu-grn
-                #text += "-"
-                hoActDisp = "-"
-              else:
-                glColor3f(0.5, 0.5, 0.5)  #gry
-                #text += "0"
-                hoActDisp = "0"
-              text = "HOact: %s" % hoActDisp              
-              w, h = font.getStringSize(text,0.00175)
-              font.render(text, (.750 - w / 2, .410),(1, 0, 0),0.00170)     #off to the right slightly above fretboard
-              glColor3f(1, 1, 1)  #whitey
+                #MFH: HOPO active debug
+                #text = "HOact: "
+                if self.guitars[i].hopoActive > 0:
+                  glColor3f(1, 1, 0)  #yel
+                  #text += "+"
+                  hoActDisp = "+"
+                elif self.guitars[i].hopoActive < 0:
+                  glColor3f(0, 1, 1)  #blu-grn
+                  #text += "-"
+                  hoActDisp = "-"
+                else:
+                  glColor3f(0.5, 0.5, 0.5)  #gry
+                  #text += "0"
+                  hoActDisp = "0"
+                text = "HOact: %s" % hoActDisp              
+                w, h = font.getStringSize(text,0.00175)
+                font.render(text, (.750 - w / 2, .410),(1, 0, 0),0.00170)     #off to the right slightly above fretboard
+                glColor3f(1, 1, 1)  #whitey
               
               
-              #MFH: HOPO intention determination flag debug
-              if self.guitars[i].sameNoteHopoString:
-                glColor3f(1, 1, 0)  #yel
-              else:
-                glColor3f(0.5, 0.5, 0.5)  #gry
+                #MFH: HOPO intention determination flag debug
+                if self.guitars[i].sameNoteHopoString:
+                  glColor3f(1, 1, 0)  #yel
+                else:
+                  glColor3f(0.5, 0.5, 0.5)  #gry
             
-              #text = "HOflag: " + str(self.guitars[i].sameNoteHopoString)
-              text = "HOflag: %s" % str(self.guitars[i].sameNoteHopoString)
+                #text = "HOflag: " + str(self.guitars[i].sameNoteHopoString)
+                text = "HOflag: %s" % str(self.guitars[i].sameNoteHopoString)
             
-              w, h = font.getStringSize(text,0.00175)
-              font.render(text, (.750 - w / 2, .385),(1, 0, 0),0.00170)     #off to the right slightly above fretboard
-              glColor3f(1, 1, 1)  #whitey
+                w, h = font.getStringSize(text,0.00175)
+                font.render(text, (.750 - w / 2, .385),(1, 0, 0),0.00170)     #off to the right slightly above fretboard
+                glColor3f(1, 1, 1)  #whitey
               
               ##MFH: HOPO intention determination flag problematic note list debug
               ##glColor3f(1, 1, 1)  #whitey
@@ -8608,61 +8817,61 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               
               
               
-              #MFH: guitarSoloNoteCount list debug
-              text = str(self.guitarSolos[i])
-              glColor3f(0.9, 0.9, 0.9)  #offwhite
-              w, h = font.getStringSize(text,0.00110)
-              font.render(text, (.900 - w / 2, .540),(1, 0, 0),0.00110)     #off to the right slightly above fretboard
+                #MFH: guitarSoloNoteCount list debug
+                text = str(self.guitarSolos[i])
+                glColor3f(0.9, 0.9, 0.9)  #offwhite
+                w, h = font.getStringSize(text,0.00110)
+                font.render(text, (.900 - w / 2, .540),(1, 0, 0),0.00110)     #off to the right slightly above fretboard
     
       
-            if self.killDebugEnabled and not self.pause and not self.failed:
-              killXpos = 0.760    #last change: +0.010
-              killYpos = 0.365    #last change: -0.010
-              killTsize = 0.00160  #last change:  -0.00010
+              if self.killDebugEnabled and not self.pause and not self.failed:
+                killXpos = 0.760    #last change: +0.010
+                killYpos = 0.365    #last change: -0.010
+                killTsize = 0.00160  #last change:  -0.00010
               
-              #if self.playerList[i].part.text != "Drums":
-              if not self.guitars[i].isDrum:
-                if self.isKillAnalog[i]:
-                  
-                  if self.analogKillMode[i] == 2: #xbox mode:
-                    if self.actualWhammyVol[i] < 1.0:
-                      glColor3f(1, 1, 0)  #yel
-                    else:
-                      glColor3f(0.5, 0.5, 0.5)  #gry
-                  else: #ps2 mode:
-                    if self.actualWhammyVol[i] > 0.0:
-                      glColor3f(1, 1, 0)  #yel
-                    else:
-                      glColor3f(0.5, 0.5, 0.5)  #gry
-                  text = str(self.decimal(str(self.actualWhammyVol[i])).quantize(self.decPlaceOffset))
-                  w, h = font.getStringSize(text,killTsize)
-                  font.render(text, (killXpos - w / 2, killYpos),(1, 0, 0),killTsize)     #off to the right slightly above fretboard
-                else:
-                  if self.killswitchEngaged[i]:
-                    glColor3f(1, 1, 0)  #yel
+                #if self.playerList[i].part.text != "Drums":
+                if not self.guitars[i].isDrum:
+                  if self.isKillAnalog[i]:
+                    
+                    if self.analogKillMode[i] == 2: #xbox mode:
+                      if self.actualWhammyVol[i] < 1.0:
+                        glColor3f(1, 1, 0)  #yel
+                      else:
+                        glColor3f(0.5, 0.5, 0.5)  #gry
+                    else: #ps2 mode:
+                      if self.actualWhammyVol[i] > 0.0:
+                        glColor3f(1, 1, 0)  #yel
+                      else:
+                        glColor3f(0.5, 0.5, 0.5)  #gry
+                    text = str(self.decimal(str(self.actualWhammyVol[i])).quantize(self.decPlaceOffset))
+                    w, h = font.getStringSize(text,killTsize)
+                    font.render(text, (killXpos - w / 2, killYpos),(1, 0, 0),killTsize)     #off to the right slightly above fretboard
                   else:
-                    glColor3f(0.5, 0.5, 0.5)  #gry
-                  text = str(self.killswitchEngaged[i])
-                  w, h = font.getStringSize(text,killTsize)
-                  font.render(text, (killXpos - w / 2, killYpos),(1, 0, 0),killTsize)     #off to the right slightly above fretboard
-            glColor3f(1, 1, 1)  #whitey reset (cracka cracka)
+                    if self.killswitchEngaged[i]:
+                      glColor3f(1, 1, 0)  #yel
+                    else:
+                      glColor3f(0.5, 0.5, 0.5)  #gry
+                    text = str(self.killswitchEngaged[i])
+                    w, h = font.getStringSize(text,killTsize)
+                    font.render(text, (killXpos - w / 2, killYpos),(1, 0, 0),killTsize)     #off to the right slightly above fretboard
+              glColor3f(1, 1, 1)  #whitey reset (cracka cracka)
 
-            #MFH - freestyle active status debug display
-            if self.showFreestyleActive == 1 and not self.pause and not self.failed:    #MFH - shows when freestyle is active
-              if self.guitars[i].isDrum:    #also show the active status of drum fills
-                text = "BRE: %s, Fill: %s" % ( str(self.guitars[i].freestyleActive), str(self.guitars[i].drumFillsActive) )
-              else:
-                text = "BRE: %s" % str(self.guitars[i].freestyleActive)
-              freeX = .685
-              freeY = .510
-              freeTsize = 0.00150
-              font.render(text, (freeX, freeY),(1, 0, 0),freeTsize)
+              #MFH - freestyle active status debug display
+              if self.showFreestyleActive == 1 and not self.pause and not self.failed:    #MFH - shows when freestyle is active
+                if self.guitars[i].isDrum:    #also show the active status of drum fills
+                  text = "BRE: %s, Fill: %s" % ( str(self.guitars[i].freestyleActive), str(self.guitars[i].drumFillsActive) )
+                else:
+                  text = "BRE: %s" % str(self.guitars[i].freestyleActive)
+                freeX = .685
+                freeY = .510
+                freeTsize = 0.00150
+                font.render(text, (freeX, freeY),(1, 0, 0),freeTsize)
 
 
 
             #MFH - TODO - show current tempo / BPM and neckspeed if enabled for debugging
-            if self.showBpm == 1:
-              text = "BPM/Target:%.2f/%.2f, NS:%.2f" % (self.currentBpm, self.targetBpm, self.guitars[i].neckSpeed)
+            if self.showBpm == 1 and p == 0:
+              text = "BPM/Target:%.2f/%.2f, NS:%.2f" % (self.currentBpm, self.targetBpm, instrument.neckSpeed)
               bpmX = .35
               bpmY = .330
               bpmTsize = 0.00120
@@ -8672,384 +8881,384 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
             #myfingershurt: lyrical display conditional logic:
             # show the comments (lyrics)
-    
-            #myfingershurt: first display the accuracy readout:
-            if self.dispAccuracy[i] and not self.pause and not self.failed:
+            if i is not None:
+              #myfingershurt: first display the accuracy readout:
+              if self.dispAccuracy[i] and not self.pause and not self.failed:
   
-              trimmedAccuracy = self.decimal(str(self.accuracy[i])).quantize(self.decPlaceOffset)
-    
+                trimmedAccuracy = self.decimal(str(self.accuracy[i])).quantize(self.decPlaceOffset)
+     
             
-              if self.showAccuracy == 1:    #numeric mode
+                if self.showAccuracy == 1:    #numeric mode
                 
-                #MFH string concatenation -> modulo formatting
-                #text = str(trimmedAccuracy) + " ms"
-                text = "%s %s" % (str(trimmedAccuracy), self.msLabel)
+                  #MFH string concatenation -> modulo formatting
+                  #text = str(trimmedAccuracy) + " ms"
+                  text = "%s %s" % (str(trimmedAccuracy), self.msLabel)
 
-              elif self.showAccuracy >= 2:    #friendly / descriptive mode
+                elif self.showAccuracy >= 2:    #friendly / descriptive mode
     
-                #MFH Precalculated these hit accuracy thresholds instead of every frame
-                if (self.accuracy[i] >= self.guitars[i].accThresholdWorstLate) and (self.accuracy[i] < self.guitars[i].accThresholdVeryLate):
-                  text = self.tsAccVeryLate
-                  glColor3f(1, 0, 0)
-                elif (self.accuracy[i] >= self.guitars[i].accThresholdVeryLate) and (self.accuracy[i] < self.guitars[i].accThresholdLate):
-                  text = self.tsAccLate
-                  glColor3f(1, 1, 0)
-                elif (self.accuracy[i] >= self.guitars[i].accThresholdLate) and (self.accuracy[i] < self.guitars[i].accThresholdSlightlyLate):
-                  text = self.tsAccSlightlyLate
-                  glColor3f(1, 1, 0)
-                elif (self.accuracy[i] >= self.guitars[i].accThresholdSlightlyLate) and (self.accuracy[i] < self.guitars[i].accThresholdExcellentLate):
-                  text = self.tsAccExcellentLate
-                  glColor3f(0, 1, 0)
-                elif (self.accuracy[i] >= self.guitars[i].accThresholdExcellentLate) and (self.accuracy[i] < self.guitars[i].accThresholdPerfect):
-                  #give the "perfect" reading some slack, -1.0 to 1.0
-                  text = self.tsAccPerfect
-                  glColor3f(0, 1, 1) #changed color
-                elif (self.accuracy[i] >= self.guitars[i].accThresholdPerfect) and (self.accuracy[i] < self.guitars[i].accThresholdExcellentEarly):
-                  text = self.tsAccExcellentEarly
-                  glColor3f(0, 1, 0)
-                elif (self.accuracy[i] >= self.guitars[i].accThresholdExcellentEarly) and (self.accuracy[i] < self.guitars[i].accThresholdSlightlyEarly):
-                  text = self.tsAccSlightlyEarly
-                  glColor3f(1, 1, 0)
-                elif (self.accuracy[i] >= self.guitars[i].accThresholdSlightlyEarly) and (self.accuracy[i] < self.guitars[i].accThresholdEarly):
-                  text = self.tsAccEarly
-                  glColor3f(1, 1, 0)
-                elif (self.accuracy[i] >= self.guitars[i].accThresholdEarly) and (self.accuracy[i] < self.guitars[i].accThresholdVeryEarly):
-                  text = self.tsAccVeryEarly
-                  glColor3f(1, 0, 0)
+                  #MFH Precalculated these hit accuracy thresholds instead of every frame
+                  if (self.accuracy[i] >= self.guitars[i].accThresholdWorstLate) and (self.accuracy[i] < self.guitars[i].accThresholdVeryLate):
+                    text = self.tsAccVeryLate
+                    glColor3f(1, 0, 0)
+                  elif (self.accuracy[i] >= self.guitars[i].accThresholdVeryLate) and (self.accuracy[i] < self.guitars[i].accThresholdLate):
+                    text = self.tsAccLate
+                    glColor3f(1, 1, 0)
+                  elif (self.accuracy[i] >= self.guitars[i].accThresholdLate) and (self.accuracy[i] < self.guitars[i].accThresholdSlightlyLate):
+                    text = self.tsAccSlightlyLate
+                    glColor3f(1, 1, 0)
+                  elif (self.accuracy[i] >= self.guitars[i].accThresholdSlightlyLate) and (self.accuracy[i] < self.guitars[i].accThresholdExcellentLate):
+                    text = self.tsAccExcellentLate
+                    glColor3f(0, 1, 0)
+                  elif (self.accuracy[i] >= self.guitars[i].accThresholdExcellentLate) and (self.accuracy[i] < self.guitars[i].accThresholdPerfect):
+                    #give the "perfect" reading some slack, -1.0 to 1.0
+                    text = self.tsAccPerfect
+                    glColor3f(0, 1, 1) #changed color
+                  elif (self.accuracy[i] >= self.guitars[i].accThresholdPerfect) and (self.accuracy[i] < self.guitars[i].accThresholdExcellentEarly):
+                    text = self.tsAccExcellentEarly
+                    glColor3f(0, 1, 0)
+                  elif (self.accuracy[i] >= self.guitars[i].accThresholdExcellentEarly) and (self.accuracy[i] < self.guitars[i].accThresholdSlightlyEarly):
+                    text = self.tsAccSlightlyEarly
+                    glColor3f(1, 1, 0)
+                  elif (self.accuracy[i] >= self.guitars[i].accThresholdSlightlyEarly) and (self.accuracy[i] < self.guitars[i].accThresholdEarly):
+                    text = self.tsAccEarly
+                    glColor3f(1, 1, 0)
+                  elif (self.accuracy[i] >= self.guitars[i].accThresholdEarly) and (self.accuracy[i] < self.guitars[i].accThresholdVeryEarly):
+                    text = self.tsAccVeryEarly
+                    glColor3f(1, 0, 0)
+                  else:
+                    #bug catch - show the problematic number:            
+                    #text = str(trimmedAccuracy) + _(" ms")
+                    text = "%(acc)s %(ms)s" % \
+                      {'acc': str(trimmedAccuracy), 'ms': self.msLabel}
+                    glColor3f(1, 0, 0)
+    
+                w, h = font.getStringSize(text,0.00175)
+    
+                posX = 0.98 - (w / 2)
+                if self.theme == 2:
+                  posY = 0.284
                 else:
-                  #bug catch - show the problematic number:            
-                  #text = str(trimmedAccuracy) + _(" ms")
+                  if self.coOpGH:
+                    posY = 0.25
+                  else:
+                    posY = 0.296
+    
+                if self.hitAccuracyPos == 0: #Center
+                  posX = .500
+                  posY = .305 + h
+                  if self.showAccuracy == 3:    #for displaying numerical below descriptive
+                    posY = .305
+                  #if self.pov != 1: #not GH POV
+                  #  posY = y + 4 * h   -- MFH: this line causes a bad hang.
+                elif self.hitAccuracyPos == 2:#Left-bottom
+                  posX = .193
+                  posY = .700  #(.193-size[0]/2, 0.667-size[1]/2+self.hFontOffset[i]))
+                elif self.hitAccuracyPos == 3: #Center-bottom
+                  posX = .500
+                  posY = .710
+    
+    
+                font.render(text, (posX - w / 2, posY - h / 2),(1, 0, 0),0.00170)    
+
+    
+                if self.showAccuracy == 3:    #for displaying numerical below descriptive
+                  #text = str(self.accuracy)
+                  #text = str(trimmedAccuracy) + " ms"
+                  #msText = _("ms")
                   text = "%(acc)s %(ms)s" % \
                     {'acc': str(trimmedAccuracy), 'ms': self.msLabel}
-                  glColor3f(1, 0, 0)
-    
-              w, h = font.getStringSize(text,0.00175)
-    
-              posX = 0.98 - (w / 2)
-              if self.theme == 2:
-                posY = 0.284
-              else:
-                if self.coOpGH:
-                  posY = 0.25
-                else:
-                  posY = 0.296
-    
-              if self.hitAccuracyPos == 0: #Center
-                posX = .500
-                posY = .305 + h
-                if self.showAccuracy == 3:    #for displaying numerical below descriptive
-                  posY = .305
-                #if self.pov != 1: #not GH POV
-                #  posY = y + 4 * h   -- MFH: this line causes a bad hang.
-              elif self.hitAccuracyPos == 2:#Left-bottom
-                posX = .193
-                posY = .700  #(.193-size[0]/2, 0.667-size[1]/2+self.hFontOffset[i]))
-              elif self.hitAccuracyPos == 3: #Center-bottom
-                posX = .500
-                posY = .710
-    
-    
-              font.render(text, (posX - w / 2, posY - h / 2),(1, 0, 0),0.00170)    
-
-    
-              if self.showAccuracy == 3:    #for displaying numerical below descriptive
-                #text = str(self.accuracy)
-                #text = str(trimmedAccuracy) + " ms"
-                #msText = _("ms")
-                text = "%(acc)s %(ms)s" % \
-                  {'acc': str(trimmedAccuracy), 'ms': self.msLabel}
-                w, h = font.getStringSize(text,0.00140)
-                font.render(text, (posX - w / 2, posY - h / 2 + .030),(1, 0, 0),0.00140) 
+                  w, h = font.getStringSize(text,0.00140)
+                  font.render(text, (posX - w / 2, posY - h / 2 + .030),(1, 0, 0),0.00140) 
                   
     
-            glColor3f(1, 1, 1)
+              glColor3f(1, 1, 1)
             
 
-            #handle the guitar solo track
-            #if (self.readTextAndLyricEvents == 2 or (self.readTextAndLyricEvents == 1 and self.theme == 2)) and (not self.pause and not self.failed and not self.ending):
-            if (not self.pause and not self.failed and not self.ending):
+              #handle the guitar solo track
+              #if (self.readTextAndLyricEvents == 2 or (self.readTextAndLyricEvents == 1 and self.theme == 2)) and (not self.pause and not self.failed and not self.ending):
+              if (not self.pause and not self.failed and not self.ending):
 
-              #MFH - only use the TK_GUITAR_SOLOS track if at least one player has no MIDI solos marked:
-              if self.guitars[i].useMidiSoloMarkers:   #mark using the new MIDI solo marking system
-                for time, event in self.song.midiEventTrack[i].getEvents(minPos, maxPos):
-                  if isinstance(event, Song.MarkerNote):
-                    if (event.number == Song.starPowerMarkingNote) and (self.song.midiStyle == Song.MIDI_TYPE_RB):    #solo marker note.
-                      soloChangeNow = False
-                      xOffset = (time - pos) / eventWindow
-                      if xOffset < lyricSlop / 16.0:   #present
-                        soloChangeNow = True
-                      if soloChangeNow:
-                        if event.endMarker:   #solo ending
-                          if self.guitars[i].guitarSolo and not event.happened:
-                            self.endSolo(i)
-                            event.happened = True
-                        else:   #solo beginning
-                          if not self.guitars[i].guitarSolo and not event.happened:
-                            self.startSolo(i)
-                            event.happened = True
+                #MFH - only use the TK_GUITAR_SOLOS track if at least one player has no MIDI solos marked:
+                if self.guitars[i].useMidiSoloMarkers:   #mark using the new MIDI solo marking system
+                  for time, event in self.song.midiEventTrack[i].getEvents(minPos, maxPos):
+                    if isinstance(event, Song.MarkerNote):
+                      if (event.number == Song.starPowerMarkingNote) and (self.song.midiStyle == Song.MIDI_TYPE_RB):    #solo marker note.
+                        soloChangeNow = False
+                        xOffset = (time - pos) / eventWindow
+                        if xOffset < lyricSlop / 16.0:   #present
+                          soloChangeNow = True
+                        if soloChangeNow:
+                          if event.endMarker:   #solo ending
+                            if self.guitars[i].guitarSolo and not event.happened:
+                              self.endSolo(i)
+                              event.happened = True
+                          else:   #solo beginning
+                            if not self.guitars[i].guitarSolo and not event.happened:
+                              self.startSolo(i)
+                              event.happened = True
 
 
-              else:   #fall back on old guitar solo marking system
-                for time, event in self.song.eventTracks[Song.TK_GUITAR_SOLOS].getEvents(minPos, maxPos):
-                  #is event happening now?
-                  xOffset = (time - pos) / eventWindow
-                  EventHappeningNow = False
-                  if xOffset < (0.0 - lyricSlop * 2.0):   #past
+                else:   #fall back on old guitar solo marking system
+                  for time, event in self.song.eventTracks[Song.TK_GUITAR_SOLOS].getEvents(minPos, maxPos):
+                    #is event happening now?
+                    xOffset = (time - pos) / eventWindow
                     EventHappeningNow = False
-                  elif xOffset < lyricSlop / 16.0:   #present
-                    EventHappeningNow = True
-                  if EventHappeningNow:   #process the guitar solo event
-                    if event.text.find("ON") >= 0:
-                      if self.guitars[i].canGuitarSolo:
-                        if not self.guitars[i].guitarSolo:
-                          self.startSolo(i)
-                    else:
-                      #if self.guitars[i].canGuitarSolo:
-                      if self.guitars[i].guitarSolo:
-                        self.endSolo(i)
+                    if xOffset < (0.0 - lyricSlop * 2.0):   #past
+                      EventHappeningNow = False
+                    elif xOffset < lyricSlop / 16.0:   #present
+                      EventHappeningNow = True
+                    if EventHappeningNow:   #process the guitar solo event
+                      if event.text.find("ON") >= 0:
+                        if self.guitars[i].canGuitarSolo:
+                          if not self.guitars[i].guitarSolo:
+                            self.startSolo(i)
+                      else:
+                        #if self.guitars[i].canGuitarSolo:
+                        if self.guitars[i].guitarSolo:
+                          self.endSolo(i)
     
     
-              #MFH - render guitar solo in progress - stats
-              #try:
-              #if self.guitars[i].canGuitarSolo:
-              if self.guitars[i].guitarSolo:
+                #MFH - render guitar solo in progress - stats
+                #try:
+                #if self.guitars[i].canGuitarSolo:
+                if self.guitars[i].guitarSolo:
 
-                    #MFH - scale and display self.soloFrame behind / around the solo accuracy text display
+                      #MFH - scale and display self.soloFrame behind / around the solo accuracy text display
 
-                    if self.fontMode==0:      #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
-                      if self.soloFrame:
-                        frameWidth = self.solo_Tw[i]*1.15
-                        frameHeight = self.solo_Th[i]*1.07
-                        self.solo_boxYOffset[i] = self.hPlayer[i]-(self.hPlayer[i]* ((self.solo_yOffset[i] + self.solo_Th[i]/2.0 ) / self.fontScreenBottom) )   
-                        tempWScale = frameWidth*self.soloFrameWFactor
-                        tempHScale = -(frameHeight)*self.soloFrameWFactor
-                        self.engine.drawImage(self.soloFrame, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*self.solo_boxXOffset[i],self.solo_boxYOffset[i]))
-                      self.solo_soloFont.render(self.solo_soloText[i], (self.solo_xOffset[i], self.solo_yOffset[i]),(1, 0, 0),self.solo_txtSize)
+                      if self.fontMode==0:      #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
+                        if self.soloFrame:
+                          frameWidth = self.solo_Tw[i]*1.15
+                          frameHeight = self.solo_Th[i]*1.07
+                          self.solo_boxYOffset[i] = self.hPlayer[i]-(self.hPlayer[i]* ((self.solo_yOffset[i] + self.solo_Th[i]/2.0 ) / self.fontScreenBottom) )   
+                          tempWScale = frameWidth*self.soloFrameWFactor
+                          tempHScale = -(frameHeight)*self.soloFrameWFactor
+                          self.engine.drawImage(self.soloFrame, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*self.solo_boxXOffset[i],self.solo_boxYOffset[i]))
+                        self.solo_soloFont.render(self.solo_soloText[i], (self.solo_xOffset[i], self.solo_yOffset[i]),(1, 0, 0),self.solo_txtSize)
 
-                      #self.solo_soloFont.render("test", (0.5,0.0) )     #appears to render text from given position, down / right...
-                      #self.solo_soloFont.render("test", (0.5,0.5) )     #this test confirms that the Y scale is in units relative to the X pixel width - 1280x960 yes but 1280x1024 NO
+                        #self.solo_soloFont.render("test", (0.5,0.0) )     #appears to render text from given position, down / right...
+                        #self.solo_soloFont.render("test", (0.5,0.5) )     #this test confirms that the Y scale is in units relative to the X pixel width - 1280x960 yes but 1280x1024 NO
 
-                      #this test locates the constant that the font rendering routine always considers the "bottom" of the screen   
-                      #self.solo_soloFont.render("test", (0.5,0.75-self.solo_Th[i]), scale=self.solo_txtSize )    #ah-ha!  4:3 AR viewport = 0.75 max!
+                        #this test locates the constant that the font rendering routine always considers the "bottom" of the screen   
+                        #self.solo_soloFont.render("test", (0.5,0.75-self.solo_Th[i]), scale=self.solo_txtSize )    #ah-ha!  4:3 AR viewport = 0.75 max!
 
 
                   #self.engine.view.setViewport(1,0)
-              #except Exception, e:
-              #  Log.warn("Unable to render guitar solo accuracy text: %s" % e)
-              if self.coOpType: #1 BRE in co-op
-                scoreCard = self.coOpScoreCard
-                if i == 0:
-                  self.engine.view.setViewportHalf(1,0)
-                  oneTime = True
+                #except Exception, e:
+                #  Log.warn("Unable to render guitar solo accuracy text: %s" % e)
+                if self.coOpType: #1 BRE in co-op
+                  scoreCard = self.coOpScoreCard
+                  if p == 0:
+                    self.engine.view.setViewportHalf(1,0)
+                    oneTime = True
+                  else:
+                    oneTime = False
                 else:
-                  oneTime = False
-              else:
-                scoreCard = self.scoring[i]
-                oneTime = True
-              #MFH - show BRE temp score frame
-              if (self.guitars[i].freestyleActive or (scoreCard.freestyleWasJustActive and not scoreCard.endingStreakBroken and not scoreCard.endingAwarded)) and oneTime == True:
-                #to render BEFORE the bonus is awarded.
+                  scoreCard = self.scoring[p]
+                  oneTime = True
+                #MFH - show BRE temp score frame
+                if (self.guitars[i].freestyleActive or (scoreCard.freestyleWasJustActive and not scoreCard.endingStreakBroken and not scoreCard.endingAwarded)) and oneTime == True:
+                  #to render BEFORE the bonus is awarded.
 
-                text = "End Bonus"
-                yOffset = 0.110
-                xOffset = 0.500
-                tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize/2.0)
-
-                if self.breScoreFrame:
-                  frameWidth = tW*1.15
-                  frameHeight = tH*1.07
-                  if self.coOpType:
-                    boxYOffset = (1.0-((yOffset + tH/2.0 ) / self.fontScreenBottom))*self.hFull
-                    boxXOffset = xOffset*self.wFull
-                  else:
-                    boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
-                    boxXOffset = self.wPlayer[i]*xOffset
-                  #self.breScoreFrame.transform.reset()                  
-                  tempWScale = frameWidth*self.breScoreFrameWFactor
-                  tempHScale = -(frameHeight)*self.breScoreFrameWFactor
-                  self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
-                  #self.breScoreFrame.transform.scale(tempWScale,tempHScale)
-                  #self.breScoreFrame.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
-                  #self.breScoreFrame.draw()
-
-                self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize/2.0)
-
-                if self.coOpType and self.partImage:
-                  freeX = .05*(self.numOfPlayers-1)
-                  freeI = .05*self.numOfPlayers
-                  for j in xrange(self.numOfPlayers):
-                    self.engine.drawImage(self.part[j], scale = (.15,-.15), coord = (self.wFull*(.5-freeX+freeI*j),self.hFull*.58), color = (.8, .8, .8, 1))
-
-                text = "%s" % scoreCard.endingScore
-                if self.theme == 2:
-                  text = text.replace("0","O")
-                tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
-                yOffset = 0.175
-                xOffset = 0.500
-                
-
-                if self.breScoreBackground:
-                  #frameWidth = tW*3.0
-                  frameHeight = tH*4.0
-                  frameWidth = frameHeight
-                  if self.coOpType:
-                    boxYOffset = self.hFull*(1.0-(yOffset + tH/2.0 ) / self.fontScreenBottom)
-                    boxXOffset = xOffset*self.wFull
-                  else:
-                    boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
-                    boxXOffset = self.wPlayer[i]*xOffset
-                  tempWScale = frameWidth*self.breScoreBackgroundWFactor
-                  tempHScale = -(frameHeight)*self.breScoreBackgroundWFactor
-                  self.engine.drawImage(self.breScoreBackground, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
-
-
-                if self.breScoreFrame:
-                  frameWidth = tW*1.15
-                  frameHeight = tH*1.07
-                  if self.coOpType:
-                    boxYOffset = self.hFull*(1.0-(yOffset + tH/2.0 ) / self.fontScreenBottom)
-                    boxXOffset = xOffset*self.wFull
-                  else:
-                    boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
-                    boxXOffset = self.wPlayer[i]*xOffset
-                  tempWScale = frameWidth*self.breScoreFrameWFactor
-                  tempHScale = -(frameHeight)*self.breScoreFrameWFactor
-                  self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
-                self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
-              
-              elif scoreCard.freestyleWasJustActive and not scoreCard.endingStreakBroken and scoreCard.endingAwarded and oneTime == True:
-                #MFH - TODO - ending bonus was awarded - scale up obtained score & box to signify rockage
-
-                text = "Success!"
-                yOffset = 0.110
-                xOffset = 0.500
-                tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize/2.0)
-
-                if self.breScoreFrame:
-                  frameWidth = tW*1.15
-                  frameHeight = tH*1.07
-                  if self.coOpType:
-                    boxYOffset = self.hFull*(1.0-(yOffset + tH/2.0 ) / self.fontScreenBottom)
-                    boxXOffset = xOffset*self.wFull
-                  else:
-                    boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
-                    boxXOffset = self.wPlayer[i]*xOffset
-                  tempWScale = frameWidth*self.breScoreFrameWFactor
-                  tempHScale = -(frameHeight)*self.breScoreFrameWFactor
-                  self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
-
-                self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize/2.0)
-
-                if self.coOpType and self.partImage:
-                  freeX = .05*(self.numOfPlayers-1)
-                  freeI = .05*self.numOfPlayers
-                  for j in xrange(self.numOfPlayers):
-                    self.engine.drawImage(self.part[j], scale = (.15,-.15), coord = (self.wFull*(.5-freeX+freeI*j),self.hFull*.58))
-
-                text = "%s" % scoreCard.endingScore
-                if self.theme == 2:
-                  text = text.replace("0","O")
-                tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
-                yOffset = 0.175
-                xOffset = 0.500
-                
-
-                if self.breScoreBackground:
-                  #frameWidth = tW*3.0
-                  frameHeight = tH*4.0
-                  frameWidth = frameHeight
-                  if self.coOpType:
-                    boxYOffset = self.hFull*(1.0-(yOffset + tH/2.0 ) / self.fontScreenBottom)
-                    boxXOffset = xOffset*self.wFull
-                  else:
-                    boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
-                    boxXOffset = self.wPlayer[i]*xOffset
-                  tempWScale = frameWidth*self.breScoreBackgroundWFactor
-                  tempHScale = -(frameHeight)*self.breScoreBackgroundWFactor
-                  self.engine.drawImage(self.breScoreBackground, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
-
-                if self.breScoreFrame:
-                  frameWidth = tW*1.15
-                  frameHeight = tH*1.07
-                  if self.coOpType:
-                    boxYOffset = self.hFull*(1.0-(yOffset + tH/2.0 ) / self.fontScreenBottom)
-                    boxXOffset = xOffset*self.wFull
-                  else:
-                    boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
-                    boxXOffset = self.wPlayer[i]*xOffset
-                  tempWScale = frameWidth*self.breScoreFrameWFactor
-                  tempHScale = -(frameHeight)*self.breScoreFrameWFactor
-                  self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
-                self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
-              
-              elif scoreCard.freestyleWasJustActive and scoreCard.endingStreakBroken and oneTime == True:
-                #akedrou - ending bonus was not awarded - scale up to signify failure
-
-                text = "Failed!"
-                yOffset = 0.110
-                xOffset = 0.500
-                tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize/2.0)
-
-                if self.breScoreFrame:
-                  frameWidth = tW*1.15
-                  frameHeight = tH*1.07
-                  if self.coOpType:
-                    boxYOffset = self.hFull*(1.0-(yOffset + tH/2.0 ) / self.fontScreenBottom)
-                    boxXOffset = xOffset*self.wFull
-                  else:
-                    boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
-                    boxXOffset = self.wPlayer[i]*xOffset
-                  tempWScale = frameWidth*self.breScoreFrameWFactor
-                  tempHScale = -(frameHeight)*self.breScoreFrameWFactor
-                  self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
-
-                self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize/2.0)
-
-                if self.coOpType and self.partImage:
-                  freeX = .05*(self.numOfPlayers-1)
-                  freeI = .05*self.numOfPlayers
-                  for j in xrange(self.numOfPlayers):
-                    if self.scoring[j].endingStreakBroken:
-                      partcolor = (.4, .4, .4, 1)
+                  text = "End Bonus"
+                  yOffset = 0.110
+                  xOffset = 0.500
+                  tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize/2.0)
+ 
+                  if self.breScoreFrame:
+                    frameWidth = tW*1.15
+                    frameHeight = tH*1.07
+                    if self.coOpType:
+                      boxYOffset = (1.0-((yOffset + tH/2.0 ) / self.fontScreenBottom))*self.hFull
+                      boxXOffset = xOffset*self.wFull
                     else:
-                      partcolor = (.8, .8, .8, 1)
-                    self.engine.drawImage(self.part[j], scale = (.15,-.15), coord = (self.wFull*(.5-freeX+freeI*j),self.hFull*.58), color = partcolor)
+                      boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
+                      boxXOffset = self.wPlayer[i]*xOffset
+                    #self.breScoreFrame.transform.reset()                  
+                    tempWScale = frameWidth*self.breScoreFrameWFactor
+                    tempHScale = -(frameHeight)*self.breScoreFrameWFactor
+                    self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+                    #self.breScoreFrame.transform.scale(tempWScale,tempHScale)
+                    #self.breScoreFrame.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
+                    #self.breScoreFrame.draw()
 
-                text = "%s" % 0
-                if self.theme == 2:
-                  text = text.replace("0","O")
-                tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
-                yOffset = 0.175
-                xOffset = 0.500
+                  self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize/2.0)
+
+                  if self.coOpType and self.partImage:
+                    freeX = .05*(self.numOfPlayers-1)
+                    freeI = .05*self.numOfPlayers
+                    for j in xrange(self.numOfPlayers):
+                      self.engine.drawImage(self.part[j], scale = (.15,-.15), coord = (self.wFull*(.5-freeX+freeI*j),self.hFull*.58), color = (.8, .8, .8, 1))
+
+                  text = "%s" % scoreCard.endingScore
+                  if self.theme == 2:
+                    text = text.replace("0","O")
+                  tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
+                  yOffset = 0.175
+                  xOffset = 0.500
                 
 
-                if self.breScoreBackground:
-                  #frameWidth = tW*3.0
-                  frameHeight = tH*4.0
-                  frameWidth = frameHeight
-                  if self.coOpType:
-                    boxYOffset = self.hFull*(1.0-(yOffset + tH/2.0 ) / self.fontScreenBottom)
-                    boxXOffset = xOffset*self.wFull
-                  else:
-                    boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
-                    boxXOffset = self.wPlayer[i]*xOffset
-                  tempWScale = frameWidth*self.breScoreBackgroundWFactor
-                  tempHScale = -(frameHeight)*self.breScoreBackgroundWFactor
-                  self.engine.drawImage(self.breScoreBackground, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+                  if self.breScoreBackground:
+                    #frameWidth = tW*3.0
+                    frameHeight = tH*4.0
+                    frameWidth = frameHeight
+                    if self.coOpType:
+                      boxYOffset = self.hFull*(1.0-(yOffset + tH/2.0 ) / self.fontScreenBottom)
+                      boxXOffset = xOffset*self.wFull
+                    else:
+                      boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
+                      boxXOffset = self.wPlayer[i]*xOffset
+                    tempWScale = frameWidth*self.breScoreBackgroundWFactor
+                    tempHScale = -(frameHeight)*self.breScoreBackgroundWFactor
+                    self.engine.drawImage(self.breScoreBackground, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
 
-                if self.breScoreFrame:
-                  frameWidth = tW*1.15
-                  frameHeight = tH*1.07
-                  if self.coOpType:
-                    boxYOffset = self.hFull*(1.0-(yOffset + tH/2.0 ) / self.fontScreenBottom)
-                    boxXOffset = xOffset*self.wFull
-                  else:
-                    boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
-                    boxXOffset = self.wPlayer[i]*xOffset
-                  tempWScale = frameWidth*self.breScoreFrameWFactor
-                  tempHScale = -(frameHeight)*self.breScoreFrameWFactor
-                  self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
-                self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
+
+                  if self.breScoreFrame:
+                    frameWidth = tW*1.15
+                    frameHeight = tH*1.07
+                    if self.coOpType:
+                      boxYOffset = self.hFull*(1.0-(yOffset + tH/2.0 ) / self.fontScreenBottom)
+                      boxXOffset = xOffset*self.wFull
+                    else:
+                      boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
+                      boxXOffset = self.wPlayer[i]*xOffset
+                    tempWScale = frameWidth*self.breScoreFrameWFactor
+                    tempHScale = -(frameHeight)*self.breScoreFrameWFactor
+                    self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+                  self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
+              
+                elif scoreCard.freestyleWasJustActive and not scoreCard.endingStreakBroken and scoreCard.endingAwarded and oneTime == True:
+                  #MFH - TODO - ending bonus was awarded - scale up obtained score & box to signify rockage
+
+                  text = "Success!"
+                  yOffset = 0.110
+                  xOffset = 0.500
+                  tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize/2.0)
+
+                  if self.breScoreFrame:
+                    frameWidth = tW*1.15
+                    frameHeight = tH*1.07
+                    if self.coOpType:
+                      boxYOffset = self.hFull*(1.0-(yOffset + tH/2.0 ) / self.fontScreenBottom)
+                      boxXOffset = xOffset*self.wFull
+                    else:
+                      boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
+                      boxXOffset = self.wPlayer[i]*xOffset
+                    tempWScale = frameWidth*self.breScoreFrameWFactor
+                    tempHScale = -(frameHeight)*self.breScoreFrameWFactor
+                    self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+
+                  self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize/2.0)
+
+                  if self.coOpType and self.partImage:
+                    freeX = .05*(self.numOfPlayers-1)
+                    freeI = .05*self.numOfPlayers
+                    for j in xrange(self.numOfPlayers):
+                      self.engine.drawImage(self.part[j], scale = (.15,-.15), coord = (self.wFull*(.5-freeX+freeI*j),self.hFull*.58))
+
+                  text = "%s" % scoreCard.endingScore
+                  if self.theme == 2:
+                    text = text.replace("0","O")
+                  tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
+                  yOffset = 0.175
+                  xOffset = 0.500
+                
+
+                  if self.breScoreBackground:
+                    #frameWidth = tW*3.0
+                    frameHeight = tH*4.0
+                    frameWidth = frameHeight
+                    if self.coOpType:
+                      boxYOffset = self.hFull*(1.0-(yOffset + tH/2.0 ) / self.fontScreenBottom)
+                      boxXOffset = xOffset*self.wFull
+                    else:
+                      boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
+                      boxXOffset = self.wPlayer[i]*xOffset
+                    tempWScale = frameWidth*self.breScoreBackgroundWFactor
+                    tempHScale = -(frameHeight)*self.breScoreBackgroundWFactor
+                    self.engine.drawImage(self.breScoreBackground, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+
+                  if self.breScoreFrame:
+                    frameWidth = tW*1.15
+                    frameHeight = tH*1.07
+                    if self.coOpType:
+                      boxYOffset = self.hFull*(1.0-(yOffset + tH/2.0 ) / self.fontScreenBottom)
+                      boxXOffset = xOffset*self.wFull
+                    else:
+                      boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
+                      boxXOffset = self.wPlayer[i]*xOffset
+                    tempWScale = frameWidth*self.breScoreFrameWFactor
+                    tempHScale = -(frameHeight)*self.breScoreFrameWFactor
+                    self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+                  self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
+              
+                elif scoreCard.freestyleWasJustActive and scoreCard.endingStreakBroken and oneTime == True:
+                  #akedrou - ending bonus was not awarded - scale up to signify failure
+
+                  text = "Failed!"
+                  yOffset = 0.110
+                  xOffset = 0.500
+                  tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize/2.0)
+
+                  if self.breScoreFrame:
+                    frameWidth = tW*1.15
+                    frameHeight = tH*1.07
+                    if self.coOpType:
+                      boxYOffset = self.hFull*(1.0-(yOffset + tH/2.0 ) / self.fontScreenBottom)
+                      boxXOffset = xOffset*self.wFull
+                    else:
+                      boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
+                      boxXOffset = self.wPlayer[i]*xOffset
+                    tempWScale = frameWidth*self.breScoreFrameWFactor
+                    tempHScale = -(frameHeight)*self.breScoreFrameWFactor
+                    self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+
+                  self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize/2.0)
+
+                  if self.coOpType and self.partImage:
+                    freeX = .05*(self.numOfPlayers-1)
+                    freeI = .05*self.numOfPlayers
+                    for j in xrange(self.numOfPlayers):
+                      if self.scoring[j].endingStreakBroken:
+                        partcolor = (.4, .4, .4, 1)
+                      else:
+                        partcolor = (.8, .8, .8, 1)
+                      self.engine.drawImage(self.part[j], scale = (.15,-.15), coord = (self.wFull*(.5-freeX+freeI*j),self.hFull*.58), color = partcolor)
+
+                  text = "%s" % 0
+                  if self.theme == 2:
+                    text = text.replace("0","O")
+                  tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
+                  yOffset = 0.175
+                  xOffset = 0.500
+                
+
+                  if self.breScoreBackground:
+                    #frameWidth = tW*3.0
+                    frameHeight = tH*4.0
+                    frameWidth = frameHeight
+                    if self.coOpType:
+                      boxYOffset = self.hFull*(1.0-(yOffset + tH/2.0 ) / self.fontScreenBottom)
+                      boxXOffset = xOffset*self.wFull
+                    else:
+                      boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
+                      boxXOffset = self.wPlayer[i]*xOffset
+                    tempWScale = frameWidth*self.breScoreBackgroundWFactor
+                    tempHScale = -(frameHeight)*self.breScoreBackgroundWFactor
+                    self.engine.drawImage(self.breScoreBackground, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+
+                  if self.breScoreFrame:
+                    frameWidth = tW*1.15
+                    frameHeight = tH*1.07
+                    if self.coOpType:
+                      boxYOffset = self.hFull*(1.0-(yOffset + tH/2.0 ) / self.fontScreenBottom)
+                      boxXOffset = xOffset*self.wFull
+                    else:
+                      boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
+                      boxXOffset = self.wPlayer[i]*xOffset
+                    tempWScale = frameWidth*self.breScoreFrameWFactor
+                    tempHScale = -(frameHeight)*self.breScoreFrameWFactor
+                    self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+                  self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
             
             self.engine.view.setViewportHalf(1,0)
             # evilynux - Display framerate
@@ -9131,27 +9340,39 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
   
                     #Show Jurgen played Spikehead777
+        self.engine.view.setViewport(1,0)
+        for i in range(self.numOfPlayers):
           if self.jurgPlayer[i] == True:
             if self.jurg[i]:
-              text = self.tsJurgenIsHere
+              if self.customBot[i]:
+                text = self.tsJurgenIsHere % self.customBot[i]
+              else:
+                text = self.tsJurgenIsHere % self.tsBotNames[self.aiSkill[i]]
             else:
-              text = self.tsJurgenWasHere
+              if self.customBot[i]:
+                text = self.tsJurgenWasHere % self.customBot[i]
+              else:
+                text = self.tsJurgenWasHere % self.tsBotNames[self.aiSkill[i]]
             #jurgScale = .001/self.numOfPlayers
             jurgScale = float(self.jurgenText[2])
             w, h = bigFont.getStringSize(text, scale = jurgScale)
             Theme.setBaseColor()
+            if jurgScale > .2 or jurgScale < .0001:
+              jurgScale = .001
             jurgX = float(self.jurgenText[0])
-            if jurgX > 1 - w:
-              jurgX = 1 - w
+            if jurgX < 0:
+              jurgX = 0
+            jurgX = (jurgX+i)/self.numOfPlayers
+            if jurgX > ((i+1)/self.numOfPlayers) - w:
+              jurgX = ((i+1)/self.numOfPlayers) - w
             jurgY = float(self.jurgenText[1])
             if jurgY > .75 - h:
               jurgY = .75 - h
-            
-            bigFont.render(text,  (jurgX, jurgY), scale = jurgScale)#MFH - y was 0.4 - more positioning weirdness.
+            if not self.failed:
+              bigFont.render(text,  (jurgX, jurgY), scale = jurgScale)#MFH - y was 0.4 - more positioning weirdness.
 
           #End Jurgen Code
         #MFH - Get Ready to Rock & countdown, song info during countdown, and song time left display on top of everything else
-        self.engine.view.setViewport(1,0)
 
 
         if (not self.pause and not self.failed and not self.ending):
@@ -9167,7 +9388,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             Theme.setBaseColor(min(1.0, 3.0 - abs(4.0 - self.countdownSeconds)))
             text = self.tsGetReady
             w, h = font.getStringSize(text)
-            font.render(text,  (.5 - w / 2, .3))              
+            font.render(text,  (.5 - w / 2, .3))
             if self.countdownSeconds < 6:
               if self.counting:
                 for i,player in enumerate(self.playerList):
@@ -9181,6 +9402,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   text = player.name
                   w, h = font.getStringSize(text)
                   font.render(text,  (partX - w*.5, .5))
+                for i,player in enumerate(self.vocalPlayers):
+                  w = self.wFull
+                  h = self.hFull
+                  partImgWidth = self.vocalPartImg.width1()
+                  partwFactor = 250.000/partImgWidth
+                  self.engine.drawImage(self.vocalPartImg, scale = (partwFactor*0.25, partwFactor*-0.25), coord = (w*.5,h*.75), color = (1,1,1, 3.0 - abs(4.0 - self.countdownSeconds)))
+                  Theme.setBaseColor(min(1.0, 3.0 - abs(4.0 - self.countdownSeconds)))
+                  text = player.name
+                  w, h = font.getStringSize(text)
+                  font.render(text,  (.5 - w*.5, .25))
               else:
                 scale = 0.002 + 0.0005 * (self.countdownSeconds % 1) ** 3
                 text = "%d" % (self.countdownSeconds)

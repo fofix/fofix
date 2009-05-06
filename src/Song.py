@@ -1355,13 +1355,8 @@ class VocalNote(Event):
     self.phrase = 0
     self.accuracy = 0.0
     self.special = special
-
-class VocalBar(Event):
-  def __init__(self, length, star = False):
-    Event.__init__(self, length)
-    self.star = star
-    self.minPitch = 0
-    self.maxPitch = 0
+    self.lyric = None
+    self.heldNote = False
 
 class Bars(Event):
   def __init__(self, barType):
@@ -1404,10 +1399,10 @@ class Track:    #MFH - Changing Track class to a base class.  NoteTrack and Temp
     self.currentIndex = None   #MFH
     self.maxIndex = None   #MFH
 
-
-    self.logClassInits = Config.get("game", "log_class_inits")
-    if self.logClassInits == 1:
-      Log.debug("Track class init (song.py)...")
+    if engine is not None:
+      self.logClassInits = Config.get("game", "log_class_inits")
+      if self.logClassInits == 1:
+        Log.debug("Track class init (song.py)...")
 
     #self.chordFudge = 1
 
@@ -1500,12 +1495,30 @@ class Track:    #MFH - Changing Track class to a base class.  NoteTrack and Temp
           event.happened = False
 
 class VocalTrack(Track):
+  def __init__(self, engine):
+    self.allNotes = {}
+    self.allWords = {}
+    self.starTimes = []
+    Track.__init__(self, engine)
+    
+  def getAllNotes(self):
+    return self.allNotes
+  
   def removeTempoEvents(self):
     for time, event in self.allEvents:
       if isinstance(event, Tempo):
         self.allEvents.remove((time, event))
         if self.logTempoEvents == 1:
           Log.debug("Tempo event removed from VocalTrack during cleanup: " + str(event.bpm) + "bpm")
+
+class VocalPhrase(VocalTrack, Event):
+  def __init__(self, length, star = False):
+    Event.__init__(self, length)
+    Track.__init__(self, engine = None)
+    self.star = star
+    self.tapPhrase = False
+    self.minPitch = 0
+    self.maxPitch = 0
 
 class TempoTrack(Track):    #MFH - special Track type for tempo events
   def __init__(self, engine):
@@ -2402,6 +2415,9 @@ class Song(object):
     self.tracks       = [[NoteTrack(self.engine) for t in range(len(difficulties))] for i in range(len(partlist))]
     
     self.difficulty   = [difficulties[EXP_DIF] for i in partlist]
+    self.vocalDifficulty = None
+    if vocalist:
+      self.vocalDifficulty = difficulties[EXP_DIF]
     self._playing     = False
     self.start        = 0.0
     self.noteFileName = noteFileName
@@ -2441,7 +2457,7 @@ class Song(object):
 
     self.midiEventTracks   = [[Track(self.engine) for t in range(len(difficulties))] for i in range(len(partlist))]
     
-    self.vocalEventTrack   = Track(self.engine)
+    self.vocalEventTrack   = VocalTrack(self.engine)
 
     self.tempoEventTrack = TempoTrack(self.engine)   #MFH - need a separated Tempo/BPM track!
 
@@ -2895,6 +2911,7 @@ class MidiReader(midi.MidiOutStream):
     self.partnumber = -1
 
     self.vocalTrack = False
+    self.vocalOverlapCheck = []
 
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:
@@ -2941,7 +2958,23 @@ class MidiReader(midi.MidiOutStream):
       time = self.abs_time()
     assert time >= 0
     
-    self.song.vocalEventTrack.addEvent(time, event)
+    if isinstance(event, VocalNote):
+      self.song.vocalEventTrack.allNotes[int(time)] = (time, event)
+    else:
+      self.song.vocalEventTrack.addEvent(time, event)
+  
+  def addVocalLyric(self, text):
+    time = self.abs_time()
+    assert time >= 0
+    
+    self.song.vocalEventTrack.allWords[time] = text
+  
+  def addVocalStar(self, time):
+    if time is None:
+      time = self.abs_time()
+    assert time >= 0
+    
+    self.song.vocalEventTrack.starTimes.append(time)
 
   def addTempoEvent(self, event, time = None):    #MFH - universal Tempo track handling
     if not isinstance(event, Tempo):
@@ -3080,9 +3113,11 @@ class MidiReader(midi.MidiOutStream):
         elif note == 96: #tambourine
           self.addVocalEvent(VocalNote(note, 1, True), time = startTime)
         elif note == 105 or note == 106:
-          self.addVocalEvent(VocalBar(endTime - startTime), time = startTime)
+          if startTime not in self.vocalOverlapCheck:
+            self.addVocalEvent(VocalPhrase(endTime - startTime), time = startTime)
+            self.vocalOverlapCheck.append(startTime)
         elif note == overDriveMarkingNote:
-          self.addVocalEvent(VocalBar(endTime - startTime, True), time = startTime)
+          self.addVocalStar(startTime)
         return
       if note in noteMap:
         track, number = noteMap[note]
@@ -3158,6 +3193,7 @@ class MidiReader(midi.MidiOutStream):
         if self.vocalTrack:
           if text.find("[") < 0:    #not a marker
             event = TextEvent(text, 400.0)
+            self.addVocalLyric(text)
             self.song.hasMidiLyrics = True
             self.song.eventTracks[TK_LYRICS].addEvent(self.abs_time(), event)  #MFH - add an event to the lyrics track
 
@@ -3267,6 +3303,7 @@ class MidiReader(midi.MidiOutStream):
       if self.readTextAndLyricEvents > 0:
         #event = TextEvent("LYR: " + text, 400.0)
         event = TextEvent(text, 400.0)
+        self.addVocalLyric(text)
         self.song.hasMidiLyrics = True
         self.song.eventTracks[TK_LYRICS].addEvent(self.abs_time(), event)  #MFH - add an event to the lyrics track
         #for track in self.song.tracks:

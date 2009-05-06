@@ -315,20 +315,25 @@ Config.define("performance",   "disable_librotation", bool,  True,  text = _("CD
 #Spikehead777
 #Config.define("game",   "jurgdef",             bool,  False,  text = _("Enable Jurgen"),    options = {False: _("No"), True: _("Yes")})
 Config.define("game",   "jurg_p0",             bool, False,   text = _("P1 AI"), options = {True: _("On"), False: _("Off")})
-Config.define("game",   "jurg_skill_p0",        int, 0,   text = _("P1 AI Personality"), options = {0: _("1.KID"), 1: _("2.Stump"), 2: _("3.Akedrobot"), 3: _("4.Q"), 4: _("5.MFH"), 5: _("6.Jurgen")})
+Config.define("game",   "jurg_skill_p0",        int, 0,   text = _("P1 AI Personality"), options = {0: _("1. KiD"), 1: _("2. Stump"), 2: _("3. akedRobot"), 3: _("4. Q"), 4: _("5. MFH"), 5: _("6. Jurgen")})
 Config.define("game",   "jurg_logic_p0",            int,   1,      text = _("P1 AI Logic"), options = {0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}  )
 
 Config.define("game",   "jurg_p1",             bool, False,   text = _("P2 AI"), options = {True: _("On"), False: _("Off")})
-Config.define("game",   "jurg_skill_p1",        int, 0,   text = _("P2 AI Personality"), options = {0: _("1.KID"), 1: _("2.Stump"), 2: _("3.Akedrobot"), 3: _("4.Q"), 4: _("5.MFH"), 5: _("6.Jurgen")})
+Config.define("game",   "jurg_skill_p1",        int, 0,   text = _("P2 AI Personality"), options = {0: _("1. KiD"), 1: _("2. Stump"), 2: _("3. akedRobot"), 3: _("4. Q"), 4: _("5. MFH"), 5: _("6. Jurgen")})
 Config.define("game",   "jurg_logic_p1",            int,   1,      text = _("P2 AI Logic"), options = {0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}  )
 
 Config.define("game",   "jurg_p2",             bool, False,   text = _("P3 AI"), options = {True: _("On"), False: _("Off")})
-Config.define("game",   "jurg_skill_p2",        int, 0,   text = _("P3 AI Personality"), options = {0: _("1.KID"), 1: _("2.Stump"), 2: _("3.Akedrobot"), 3: _("4.Q"), 4: _("5.MFH"), 5: _("6.Jurgen")})
+Config.define("game",   "jurg_skill_p2",        int, 0,   text = _("P3 AI Personality"), options = {0: _("1. KiD"), 1: _("2. Stump"), 2: _("3. akedRobot"), 3: _("4. Q"), 4: _("5. MFH"), 5: _("6. Jurgen")})
 Config.define("game",   "jurg_logic_p2",            int,   1,      text = _("P3 AI Logic"), options = {0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}  )
 
 Config.define("game",   "jurg_p3",             bool, False,   text = _("P4 AI"), options = {True: _("On"), False: _("Off")})
-Config.define("game",   "jurg_skill_p3",        int, 0,   text = _("P4 AI Personality"), options = {0: _("1.KID"), 1: _("2.Stump"), 2: _("3.Akedrobot"), 3: _("4.Q"), 4: _("5.MFH"), 5: _("6.Jurgen")})
+Config.define("game",   "jurg_skill_p3",        int, 0,   text = _("P4 AI Personality"), options = {0: _("1. KiD"), 1: _("2. Stump"), 2: _("3. akedRobot"), 3: _("4. Q"), 4: _("5. MFH"), 5: _("6. Jurgen")})
 Config.define("game",   "jurg_logic_p3",            int,   1,      text = _("P4 AI Logic"), options = {0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}  )
+
+#akedrou
+Config.define("game",   "vocal_mode",          int, 0,     text = _("Lyric Display Mode"),           options = {0: _("Scrolling"), 1: _("Line-by-line")})
+Config.define("game",   "vocal_scroll",        int, 2,     text = _("Lyric Speed Mode"),             options = {0: _("BPM"), 1: _("Difficulty"), 2: _("BPM & Diff"), 3: _("Percentage")})
+Config.define("game",   "vocal_speed",         int, 100,   text = _("Lyric Speed Percent"),          options = dict([(n, n) for n in range(10, 410, 10)]))
 
 #MFH
 #Config.define("game",   "jurglogic",            int,   1,      text = _("Jurgen Logic"), options = {0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}  )

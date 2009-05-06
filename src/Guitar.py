@@ -53,6 +53,7 @@ class Guitar:
 
     self.isDrum = False
     self.isBassGuitar = False
+    self.isVocal = False
     
     self.debugMode = False
     self.gameMode2p = self.engine.config.get("game","multiplayer_mode")

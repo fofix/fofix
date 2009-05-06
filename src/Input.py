@@ -195,6 +195,7 @@ class Input(Task):
     self.gameGuitars = 0
     self.gameDrums   = 0
     self.gameMics    = 0
+    self.gameBots    = 0
 
     # Initialize joysticks
     pygame.joystick.init()
@@ -242,11 +243,13 @@ class Input(Task):
     self.gameGuitars = 0
     Player.pluginControls(self.activeGameControls)
     for i in self.activeGameControls:
-      if self.controls.type[i] == 2 or self.controls.type[i] == 3:
+      if self.controls.type[i] == -1:
+        self.gameBots += 1
+      elif self.controls.type[i] in Player.DRUMTYPES:
         self.gameDrums += 1
-      elif self.controls.type[i] == 5:
+      elif self.controls.type[i] in Player.MICTYPES:
         self.gameMics += 1
-      else:
+      elif self.controls.type[i] in Player.GUITARTYPES:
         self.gameGuitars += 1
   
   def getAnalogKill(self, player):

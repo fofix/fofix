@@ -44,6 +44,7 @@ from Mesh import Mesh
 from Menu import Menu
 from Language import _
 from Texture import Texture
+from Player import GUITARTYPES, DRUMTYPES, MICTYPES
 import Theme
 import Log
 import Song
@@ -228,13 +229,15 @@ class GetText(Layer, KeyListener):
     
     #if (c in Player.KEY1S or key == pygame.K_RETURN) and not self.accepted:
     #if (c in Player.KEY1S or key == pygame.K_RETURN or c in Player.DRUM4S) and not self.accepted:   #MFH - adding support for green drum "OK"
-    if (c in Player.key1s or key == pygame.K_RETURN or (c in Player.drum4s and self.drumHighScoreNav)) and not self.accepted:   #MFH - adding support for green drum "OK"
+    if unicode and ord(unicode) > 31 and not self.accepted:
+      self.text += unicode
+    elif (c in Player.menuYes or key == pygame.K_ENTER) and not self.accepted:   #MFH - adding support for green drum "OK"
       self.engine.view.popLayer(self)
       self.accepted = True
       if c in Player.key1s:
         self.engine.data.acceptSound.setVolume(self.sfxVolume)  #MFH
         self.engine.data.acceptSound.play()
-    elif c in Player.cancels + Player.key2s and not self.accepted:
+    elif (c in Player.menuNo or key == pygame.K_ESCAPE) and not self.accepted:
       self.text = ""
       self.engine.view.popLayer(self)
       self.accepted = True
@@ -246,8 +249,6 @@ class GetText(Layer, KeyListener):
       if c in Player.key4s:
         self.engine.data.cancelSound.setVolume(self.sfxVolume)  #MFH
         self.engine.data.cancelSound.play()
-    elif unicode and ord(unicode) > 31 and not self.accepted:
-      self.text += unicode
     elif c in Player.key3s and not self.accepted:
       self.text += self.text[len(self.text) - 1]
       self.engine.data.acceptSound.setVolume(self.sfxVolume)  #MFH
@@ -4271,11 +4272,11 @@ class ControlActivator(Layer, KeyListener):
     self.allowed        = [True for i in self.controls]
     
     for i, control in enumerate(self.engine.input.controls.controls):
-      if self.engine.input.controls.type[i] in [0, 1, 4] and not allowGuitar:
+      if self.engine.input.controls.type[i] in GUITARTYPES and not allowGuitar:
         self.allowed[i] = False
-      elif self.engine.input.controls.type[i] in [2, 3] and not allowDrum:
+      elif self.engine.input.controls.type[i] in DRUMTYPES and not allowDrum:
         self.allowed[i] = False
-      elif self.engine.input.controls.type[i] in [5] and not allowMic:
+      elif self.engine.input.controls.type[i] in MICTYPES and not allowMic:
         self.allowed[i] = False
     
     self.tsReady = _("Press Start to Begin!")
@@ -4351,6 +4352,12 @@ class ControlActivator(Layer, KeyListener):
     except IOError:
       self.engine.loadImgDrawing(self, "drum", "drum.png")
       self.drumScale = self.partSize/self.drum.width1()
+    try:
+      self.engine.loadImgDrawing(self, "mic", os.path.join("themes", themename, "mic.png"))
+      self.micScale = self.partSize/self.mic.width1()
+    except IOError:
+      self.engine.loadImgDrawing(self, "mic", "mic.png")
+      self.micScale = self.partSize/self.mic.width1()
   
   def shown(self):
     if self.controlNum < self.minPlayers:
@@ -4418,7 +4425,7 @@ class ControlActivator(Layer, KeyListener):
   def keyPressed(self, key, unicode):
     c = self.engine.input.controls.getMapping(key)
     if key == pygame.K_RETURN:
-      if self.ready and self.playerNum >= self.maxPlayers:
+      if (self.ready and self.playerNum >= self.maxPlayers) or (self.playerNum >= self.minPlayers and self.blockedItems == [0,1,2,3]):
         self.confirm()
       else:
         self.delay = 0
@@ -4560,18 +4567,22 @@ class ControlActivator(Layer, KeyListener):
         color = (1, 1, 1, 1)
         if i in self.blockedItems:
           color = (.3, .3, .3, 1)
-        if (self.engine.input.controls.type[i] < 2 or self.engine.input.controls.type[i] == 4) and self.engine.input.controls.type[i] is not None:
+        if self.engine.input.controls.type[i] in GUITARTYPES:
           self.engine.drawImage(self.guitar, scale = (self.guitarScale, -self.guitarScale), coord = (w*self.controlPartX-(self.partSize*1.1), h*(1-(self.selectY+self.selectSpace*i)/self.engine.data.fontScreenBottom)), color = color)
           self.engine.drawImage(self.bass, scale = (self.bassScale, -self.bassScale), coord = (w*self.controlPartX+(self.partSize*1.1), h*(1-(self.selectY+self.selectSpace*i)/self.engine.data.fontScreenBottom)), color = color)
-        elif self.engine.input.controls.type[i] > 1 and self.engine.input.controls.type[i] not in [None, 5]:
+        elif self.engine.input.controls.type[i] in DRUMTYPES:
           self.engine.drawImage(self.drum, scale = (self.drumScale, -self.drumScale), coord = (w*self.controlPartX, h*(1-(self.selectY+self.selectSpace*i)/self.engine.data.fontScreenBottom)), color = color)
+        elif self.engine.input.controls.type[i] in MICTYPES:
+          self.engine.drawImage(self.mic, scale = (self.micScale, -self.micScale), coord = (w*self.controlPartX, h*(1-(self.selectY+self.selectSpace*i)/self.engine.data.fontScreenBottom)), color = color)
       Theme.setBaseColor(1-v)
       for j, i in enumerate(self.selectedItems):
-        if (self.engine.input.controls.type[i] < 2 or self.engine.input.controls.type[i] == 4) and self.engine.input.controls.type[i] is not None:
+        if self.engine.input.controls.type[i] in GUITARTYPES:
           self.engine.drawImage(self.guitar, scale = (self.guitarScale*self.partBig, -self.guitarScale*self.partBig), coord = (w*(self.checkX+self.checkSpace*j)-(self.partSize*self.partBig*1.1), h*self.checkY))
           self.engine.drawImage(self.bass, scale = (self.bassScale*self.partBig, -self.bassScale*self.partBig), coord = (w*(self.checkX+self.checkSpace*j)+(self.partSize*self.partBig*1.1), h*self.checkY))
-        elif self.engine.input.controls.type[i] > 1 and self.engine.input.controls.type[i] is not None:
+        elif self.engine.input.controls.type[i] in DRUMTYPES:
           self.engine.drawImage(self.drum, scale = (self.drumScale*self.partBig, -self.drumScale*self.partBig), coord = (w*(self.checkX+self.checkSpace*j), h*self.checkY))
+        elif self.engine.input.controls.type[i] in MICTYPES:
+          self.engine.drawImage(self.mic, scale = (self.micScale*self.partBig, -self.micScale*self.partBig), coord = (w*(self.checkX+self.checkSpace*j), h*self.checkY))
         wText, hText = checkFont.getStringSize(self.controls[i], scale = self.checkScale)
         checkFont.render(self.controls[i], ((self.checkX+self.checkSpace*j)-wText/2, self.checkYText*self.engine.data.fontScreenBottom), scale = self.checkScale)
       if self.ready:

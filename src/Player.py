@@ -84,6 +84,10 @@ DRUM5A            = 7
 DRUMBASS          = 16
 DRUMBASSA         = 17
 
+GUITARTYPES = [-1, 0, 1, 4]
+DRUMTYPES   = [-1, 2, 3]
+MICTYPES    = [5]
+
 lefts    = [CONTROL1[LEFT], CONTROL2[LEFT], CONTROL3[LEFT], CONTROL4[LEFT]]
 rights   = [CONTROL1[RIGHT], CONTROL2[RIGHT], CONTROL3[RIGHT], CONTROL4[RIGHT]]
 ups      = [CONTROL1[UP], CONTROL2[UP], CONTROL3[UP], CONTROL4[UP]]
@@ -854,6 +858,9 @@ class Player(object):
     self.actions      = []
     self.controller   = -1
     self.controlType  = -1
+    
+    self.guitarNum    = None
+    self.number       = number
     
     self._cache     = None
     

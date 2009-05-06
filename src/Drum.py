@@ -69,6 +69,7 @@ class Drum:
     
     self.isDrum = True
     self.isBassGuitar = False
+    self.isVocal = False
 
     self.bassDrumPedalDown = False
   
