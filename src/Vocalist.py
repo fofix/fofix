@@ -30,6 +30,11 @@ from Microphone import Microphone, getNoteName
 from Song import VocalNote, VocalPhrase
 from OpenGL.GL import *
 
+#stump: needed for continuous star fillup (akedrou - stealing for vocals)
+import Image
+import ImageDraw
+from Svg import ImgDrawing
+
 class Vocalist:
   def __init__(self, engine, playerObj, editorMode = False, player = 0):
     self.engine = engine
@@ -95,7 +100,7 @@ class Vocalist:
     imgwidth = self.vocalLyricSheet.width1()
     self.vocalLyricSheetWFactor = 640.000/imgwidth
     try:
-      self.engine.loadImgDrawing(self, "vocalLyricSheetGlow", os.path.join("themes",themename,"vocals","lyricsheet_glow.png"))
+      self.engine.loadImgDrawing(self, "vocalLyricSheetGlow", os.path.join("themes",themename,"vocals","lyricsheetglow.png"))
       imgwidth = self.vocalLyricSheetGlow.width1()
       self.vocalLyricSheetGlowWFactor = 640.000/imgwidth
     except:
@@ -136,6 +141,32 @@ class Vocalist:
       self.engine.loadImgDrawing(self, "vocalODGlow", os.path.join("themes",themename,"vocals","glow.png"))
     except IOError:
       self.vocalODGlow = None
+
+    self.vocalFillupCenterX = 139
+    self.vocalFillupCenterY = 151
+    self.vocalFillupInRadius = 105
+    self.vocalFillupOutRadius = 139
+    self.vocalFillupColor = "#A6A6A6"
+    self.vocalContinuousAvailable = self.engine.config.get("performance", "star_continuous_fillup") and \
+      None not in (self.vocalFillupCenterX, self.vocalFillupCenterY, self.vocalFillupInRadius, self.vocalFillupOutRadius, self.vocalFillupColor)
+    if self.vocalContinuousAvailable:
+      try:
+        self.drawnVocalOverlays = {}
+        basevocalFillImageSize = Image.open(self.vocalMeter.texture.name).size
+        for degrees in range(0, 360, 5):
+          overlay = Image.new('RGBA', baseStarGreyImageSize)
+          draw = ImageDraw.Draw(overlay)
+          draw.pieslice((self.vocalFillupCenterX-self.vocalFillupOutRadius, self.vocalFillupCenterY-self.vocalFillupOutRadius,
+                         self.vocalFillupCenterX+self.vocalFillupOutRadius, self.vocalFillupCenterY+self.vocalFillupOutRadius),
+                        -90, degrees-90, outline=self.vocalFillupColor, fill=self.vocalFillupColor)
+          draw.ellipse((self.vocalFillupCenterX-self.vocalFillupInRadius, self.vocalFillupCenterY-self.vocalFillupInRadius,
+                        self.vocalFillupCenterX+self.vocalFillupInRadius, self.vocalFillupCenterY+self.vocalFillupInRadius),
+                       outline=(0, 0, 0, 0), fill=(0, 0, 0, 0))
+          dispOverlay = ImgDrawing(self.engine.data.svg, overlay)
+          self.drawnVocalOverlays[degrees] = dispOverlay
+      except:
+        Log.error('Could not prebuild vocal overlay textures: ')
+        self.vocalContinuousAvailable = False
 
     self.time = 0.0
     self.tap  = 0

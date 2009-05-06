@@ -231,8 +231,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     for i, player in enumerate(self.vocalPlayers):
       self.vocalists.append(Vocalist(self.engine, player, False, i))
-    
-    for i,player in enumerate(self.playerList):
+    i = 0
+    for j,player in enumerate(self.fullPlayerList):
+      if player.part.id == Song.VOCAL_PART:
+        continue
       if player.part.id == Song.DRUM_PART:
         self.guitars.append(Drum(self.engine,player,False,i))
       else:
@@ -243,7 +245,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.guitars[i].isBassGuitar = True
       if player.practiceMode:
         self.practiceMode = True
-      player.keyList = Player.playerkeys[i]
+      player.keyList = Player.playerkeys[j]
       player.configController()
       if self.guitars[i].isDrum:
         self.keysList.append(player.drums)
@@ -257,6 +259,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.soloShifts.append(player.soloShift)
         self.guitars[i].keys    = player.keys
         self.guitars[i].actions = player.actions
+      i += 1
     
     #Log.debug("GuitarScene keysList: " + str(self.keysList))
     Log.debug("GuitarScene keysList: %s" % str(self.keysList))
@@ -680,15 +683,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.starFillupInRadius = Theme.starFillupInRadius
     self.starFillupOutRadius = Theme.starFillupOutRadius
     self.starFillupColor = Theme.starFillupColor
-    self.vocalFillupCenterX = 139
-    self.vocalFillupCenterY = 151
-    self.vocalFillupInRadius = 105
-    self.vocalFillupOutRadius = 139
-    self.vocalFillupColor = "#A6A6A6"
     self.starContinuousAvailable = self.engine.config.get("performance", "star_continuous_fillup") and \
       None not in (self.starFillupCenterX, self.starFillupCenterY, self.starFillupInRadius, self.starFillupOutRadius, self.starFillupColor)
-    self.vocalContinuousAvailable = self.engine.config.get("performance", "star_continuous_fillup") and \
-      None not in (self.vocalFillupCenterX, self.vocalFillupCenterY, self.vocalFillupInRadius, self.vocalFillupOutRadius, self.vocalFillupColor)
     self.showBpm = self.engine.config.get("debug",   "show_bpm")    #MFH
 
     self.logLyricEvents = self.engine.config.get("log",   "log_lyric_events")
@@ -1838,24 +1834,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       except:
         Log.error('Could not prebuild star overlay textures: ')
         self.starContinuousAvailable = False
-    if self.vplayers > 0 and self.vocalContinuousAvailable:
-      try:
-        self.drawnVocalOverlays = {}
-        basevocalFillImageSize = Image.open(self.vocalMeter.texture.name).size
-        for degrees in range(0, 360, 5):
-          overlay = Image.new('RGBA', baseStarGreyImageSize)
-          draw = ImageDraw.Draw(overlay)
-          draw.pieslice((self.vocalFillupCenterX-self.vocalFillupOutRadius, self.vocalFillupCenterY-self.vocalFillupOutRadius,
-                         self.vocalFillupCenterX+self.vocalFillupOutRadius, self.vocalFillupCenterY+self.vocalFillupOutRadius),
-                        -90, degrees-90, outline=self.vocalFillupColor, fill=self.vocalFillupColor)
-          draw.ellipse((self.vocalFillupCenterX-self.vocalFillupInRadius, self.vocalFillupCenterY-self.vocalFillupInRadius,
-                        self.vocalFillupCenterX+self.vocalFillupInRadius, self.vocalFillupCenterY+self.vocalFillupInRadius),
-                       outline=(0, 0, 0, 0), fill=(0, 0, 0, 0))
-          dispOverlay = ImgDrawing(self.engine.data.svg, overlay)
-          self.drawnVocalOverlays[degrees] = dispOverlay
-      except:
-        Log.error('Could not prebuild vocal overlay textures: ')
-        self.vocalContinuousAvailable = False
 
     self.starGrey1 = None
     if self.starWhite and self.starGrey and self.starPerfect and self.partialStars == 1 and not self.starContinuousAvailable:   #MFH - even better in-game star display, stargrey1.png - stargrey7.png (stargrey8.png is useless - that's a white star.)
@@ -3786,7 +3764,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
   def rockmeterDecrease(self, playerNum):
     i = playerNum
-    g = self.playerList[i].guitarNum
+    g = self.fullPlayerList[i].guitarNum
     if g is None:
       return
     rockMinusAmount = 0 #akedrou - simplify the various incarnations of minusRock.
@@ -3884,7 +3862,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
   def rockmeterIncrease(self, playerNum):
     i = playerNum
-    g = self.playerList[i].guitarNum
+    g = self.fullPlayerList[i].guitarNum
     if g is None:
       return
     if self.guitars[g].isDrum: 
@@ -4503,6 +4481,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           missedNotes = []
           for guitar in self.guitars:
             guitar.paused = False
+          for vocalist in self.vocalists:
+            vocalist.paused = False
+            vocalist.startMic()
 
       if self.timeLeft == "0:01" and not self.mutedLastSecondYet and self.muteLastSecond == 1:
         self.song.setAllTrackVolumes(0.0)
@@ -5592,22 +5573,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     if not control:
       control = self.controls.keyPressed(key)
-
-    num = self.getPlayerNum(control)
+    
+    num = self.getPlayerNum(control, guitar = True)
+    if num is None:
+      return True
     if self.battleGH:
-      if self.guitars[0].battleStatus[3]:
-        if control == self.guitars[0].keys[self.guitars[0].battleBreakString]:
-          self.guitars[0].battleBreakNow -= 1
+      if self.guitars[num].battleStatus[3]:
+        if control == self.guitars[num].keys[self.guitars[num].battleBreakString]:
+          self.guitars[num].battleBreakNow -= 1
           self.controls.toggle(control, False)
-      if self.guitars[1].battleStatus[3]:
-        if control == self.guitars[1].keys[self.guitars[1].battleBreakString]:
-          self.guitars[1].battleBreakNow -= 1
-          self.controls.toggle(control, False)
-      if len(self.guitars) > 2:
-        if self.guitars[2].battleStatus[3]:
-          if control == self.guitars[2].keys[self.guitars[2].battleBreakString]:
-            self.guitars[2].battleBreakNow -= 1
-            self.controls.toggle(control, False)
           
     if control in (self.guitars[num].actions):
       for k in self.keysList[num]:
@@ -5743,21 +5717,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       control = self.controls.keyPressed(key)
     else:
       hopo = True
-    if self.battleGH:
-      if self.guitars[0].battleStatus[3]:
-        if control == self.guitars[0].keys[self.guitars[0].battleBreakString]:
-          self.guitars[0].battleBreakNow -=1
+    num = self.getPlayerNum(control, guitar = True)
+    if self.battleGH and num is not None:
+      if self.guitars[num].battleStatus[3]:
+        if control == self.guitars[num].keys[self.guitars[num].battleBreakString]:
+          self.guitars[num].battleBreakNow -=1
           self.controls.toggle(control, False)
-          
-      if self.guitars[1].battleStatus[3]:
-        if control == self.guitars[1].keys[self.guitars[1].battleBreakString]:
-          self.guitars[1].battleBreakNow -=1
-          self.controls.toggle(control, False)
-      if len(self.guitars) > 2:
-        if self.guitars[2].battleStatus[3]:
-          if control == self.guitars[2].keys[self.guitars[2].battleBreakString]:
-            self.guitars[2].battleBreakNow -= 1
-            self.controls.toggle(control, False)
         
     pressed = -1
     for i in range(self.numOfPlayers):
@@ -5877,7 +5842,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #RF style HOPO playing
   
     control = self.controls.keyReleased(key)
-    num = self.getPlayerNum(control) 
+    num = self.getPlayerNum(control, guitar = True)
+    if num is None:
+      return
 
     #myfingershurt: drums :)
     #MFH - cleaning up Faaa's drum tracking code: (which appears to determine which drum fret after key release?  TODO: why not before?)
@@ -5981,10 +5948,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if len(activeList) != 0 and self.guitars[i].hopoActive > 0 and activeList[0] != self.keysList[i][self.guitars[i].hopoLast] and activeList[0] != self.keysList[i][self.guitars[i].hopoLast+5] and control in self.keysList[i]:
           self.keyPressed3(None, 0, activeList[0], pullOff = True)
         
-  def getPlayerNum(self, control):
+  def getPlayerNum(self, control, guitar = False):
     for i, player in enumerate(self.fullPlayerList):
       if control and control in player.keyList:
-        return i
+        if not guitar:
+          return i
+        else:
+          return player.guitarNum
         break
     else:
       return -1
