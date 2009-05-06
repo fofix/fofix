@@ -245,8 +245,13 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
               self.player.practiceSection = startLabel
               
               #find start position in array:
-              self.player.startPos = [sPos for sLabel,sPos in info.sections if sLabel == startLabel]
-              Log.debug("Practice start position retrieved: " + str(self.player.startPos) )
+              try:
+                self.player.startPos = [sPos for sLabel,sPos in info.sections if sLabel == startLabel]
+                Log.debug("Practice start position retrieved: " + str(self.player.startPos) )
+              except:
+                Log.error("Cannot retrieve start position!")
+                self.player.startPos = [0]
+                break
               
             else:
               
