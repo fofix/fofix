@@ -1057,6 +1057,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         else:
           self.song.vocalEventTrack.allEvents[phraseId][1].tapPhrase = True
         self.song.vocalEventTrack.allEvents[phraseId][1].addEvent(tuple[0], tuple[1])
+        phrases = len(self.song.vocalEventTrack.getAllEvents())
 
 
     for theGuitar in self.guitars:    #MFH - force update of early hit window
@@ -1065,6 +1066,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       theGuitar.currentBpm = Song.DEFAULT_BPM
       theGuitar.setBPM(theGuitar.currentBpm)
     for theSinger in self.vocalists:
+      theSinger.totalPhrases = phrases
       theSinger.actualBpm = 0.0
       theSinger.currentBpm = Song.DEFAULT_BPM
       theSinger.setBPM(theSinger.currentBpm)
@@ -1145,6 +1147,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #MFH - go through, locate, and mark the last drum note.  When this is encountered, drum scoring should be turned off.
       lastDrumNoteTime = 0.0
       lastDrumNoteEvent = None
+      p = self.playerList[i].number
       for time, event in self.song.track[i].getAllEvents():
         if isinstance(event, Note):
           if time >= lastDrumNoteTime:
@@ -1155,14 +1158,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         Log.debug("Last drum note located at time = " + str(self.lastDrumNoteTime) )
         #self.lastDrumNoteEvent = lastDrumNoteEvent
 
-        self.scoring[i].totalStreakNotes = len([1 for time, event in self.song.track[i].getAllEvents() if isinstance(event, Note)])
+        self.scoring[p].totalStreakNotes = len([1 for time, event in self.song.track[i].getAllEvents() if isinstance(event, Note)])
       else:
-        self.scoring[i].totalStreakNotes = len(set(time for time, event in self.song.track[i].getAllEvents() if isinstance(event, Note)))
-      self.scoring[i].lastNoteEvent = lastDrumNoteEvent
-      self.scoring[i].lastNoteTime  = lastDrumNoteTime
+        self.scoring[p].totalStreakNotes = len(set(time for time, event in self.song.track[i].getAllEvents() if isinstance(event, Note)))
+      self.scoring[p].lastNoteEvent = lastDrumNoteEvent
+      self.scoring[p].lastNoteTime  = lastDrumNoteTime
       self.lastNoteTimes[i] = lastDrumNoteTime
       if lastDrumNoteEvent:
-        Log.debug("Last note (number %d) found for player %d at time %f" % (lastDrumNoteEvent.number, i, lastDrumNoteTime) )
+        Log.debug("Last note (number %d) found for player %d at time %f" % (lastDrumNoteEvent.number, p, lastDrumNoteTime) )
       else:
         Log.debug("Last note event not found and is None!")
 
@@ -1183,7 +1186,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 #-      self.playerList[i].totalStreakNotes -= self.playerList[i].freestyleSkippedNotes
 
 
-      self.scoring[i].totalNotes = len([1 for Ntime, event in self.song.track[i].getAllEvents() if isinstance(event, Note)])
+      self.scoring[p].totalNotes = len([1 for Ntime, event in self.song.track[i].getAllEvents() if isinstance(event, Note)])
       
       #MFH - determine which marker is BRE, and count streak notes behind it to remove from the scorecard
       if self.song.hasFreestyleMarkings:
@@ -7905,7 +7908,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     partcolor = (.8, .8, .8, 1)
                   else:
                     partcolor = (.6,.6,.6,1)
-                  self.engine.drawImage(self.part[p], scale = (.15,-.15), coord = (w*(.5-unisonX+unisonI*i),h*.58), color = partcolor)
+                  self.engine.drawImage(self.part[i], scale = (.15,-.15), coord = (w*(.5-unisonX+unisonI*i),h*.58), color = partcolor)
               try:
   
   

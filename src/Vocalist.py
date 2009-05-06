@@ -152,9 +152,9 @@ class Vocalist:
     if self.vocalContinuousAvailable:
       try:
         self.drawnVocalOverlays = {}
-        basevocalFillImageSize = Image.open(self.vocalMeter.texture.name).size
+        baseVocalFillImageSize = Image.open(self.vocalMeter.texture.name).size
         for degrees in range(0, 360, 5):
-          overlay = Image.new('RGBA', baseStarGreyImageSize)
+          overlay = Image.new('RGBA', baseVocalFillImageSize)
           draw = ImageDraw.Draw(overlay)
           draw.pieslice((self.vocalFillupCenterX-self.vocalFillupOutRadius, self.vocalFillupCenterY-self.vocalFillupOutRadius,
                          self.vocalFillupCenterX+self.vocalFillupOutRadius, self.vocalFillupCenterY+self.vocalFillupOutRadius),
@@ -280,7 +280,10 @@ class Vocalist:
         self.lastPhrase = track.allEvents[self.phraseIndex-1]
         self.phrase = track.allEvents[self.phraseIndex]
         self.phraseIndex += 1
-        self.nextPhrase = track.allEvents[self.phraseIndex]
+        if self.phraseIndex < len(track):
+          self.nextPhrase = track.allEvents[self.phraseIndex]
+        else:
+          self.nextPhrase = None
       self.currentPhraseTime = self.phrase[0]
       self.currentPhraseLength = self.phrase[1].length
     
