@@ -20,7 +20,7 @@ _Name:_ neck
 
 _Using:_ neck.ps, neck.vs
 
-_Description:_ When this shader is enabled, you can see nack flashing when you hit a note.
+_Description:_ When this shader is enabled, you can see neck flashing when you hit a note.
 
 ||_*Uniform*_||_*Type*_||_*Value*_||_*Description*_||
 ||time||float||variable||Amount of seconds passed from ShaderList loading. Updates every time on each shader activation.||
@@ -111,7 +111,7 @@ _Name:_ cd
 
 _Using:_ cd.ps, cd.vs
 
-_Description:_ faidng CDs' color. Added like a small demo of shaders.
+_Description:_ fadng CDs' color. Added like a small demo of shaders.
 
 = Metal notes =
 
