@@ -1,31 +1,28 @@
 #summary List of available shaders.
 
-= Variables for all shaders =
+= Variables used in all shaders =
 
-To use one of these variables, just declare uniform with it's name. Example:
-
+To use one of these variables, just declare it using the formula: uniform *type* _name_;
+Example:
 {{{
 uniform float time;
 }}}
 
-
 ||_*Uniform*_||_*Type*_||_*Description*_||
-||time||float||Amount of seconds passed from ShaderList loading. Updates every time on each shader activation.||
+||time||float||Time (in seconds) since ShaderList loading. Updates on each shader activation.||
 
-Add your content here.
-
-= Neck Flashing =
+= Neck Flash =
 
 _Name:_ neck
 
 _Using:_ neck.ps, neck.vs
 
-_Description:_ When this shader is enabled, you can see neck flashing when you hit a note.
+_Description:_ When this shader is enabled, the neck flashes when you hit a note.
 
 ||_*Uniform*_||_*Type*_||_*Value*_||_*Description*_||
-||time||float||variable||Amount of seconds passed from ShaderList loading. Updates every time on each shader activation.||
-||fretcol||vec4||variable||Color of flash.||
-||failcol||bool||variable||When true, fretboard edges flash with red.||
+||time||float||variable||Time (in seconds) since ShaderList loading. Updates on each shader activation.||
+||fretcol||vec4||variable||Color of the neck flash.||
+||failcol||bool||variable||When true, the fretboard edges flash red.||
 
 = Lightning EQ =
 
@@ -33,51 +30,51 @@ _Name:_ stage
 
 _Using:_ lightning.ps, lightning.vs
 
-Description: A big lightning in the center of the screen, acts like equalizer.
+Description: A large horizontal spark of lightning in the middle of the screen that acts like an equalizer.
 
 ||_*Uniform*_||_*Type*_||_*Value*_||_*Description*_||
-||time||float||variable||Amount of seconds passed from ShaderList loading. Updates every time on each shader activation.||
-||ambientGlow||float||variable||Height of ambient glow||
-||color||vec4||variable||Color of teh effect. Depends on pressed frets.||
-||glowStrength||float||variable||Brightness of lightning.||
-||ambientGlowHeightScale||float||6.0||Scale of ambient glow.||
-||glowFallOff||float||variable||Strenght of vertical blur.||
-||height||float||variable||Max height of flash.||
-||sampleDist||float||0.0076||Strenght of horizontal blur.||
-||height||speed||1.86||Speed of 3D texture moving.||
-||vertNoise||float||0.78||Distortion of lightning.||
-||fading||float||1.0||Fading near the edges of quad.||
+||time||float||variable||Time (in seconds) since ShaderList loading. Updates on each shader activation.||
+||ambientGlow||float||variable||Height of the ambient glow||
+||color||vec4||variable||Color of the effect. Depends on which frets are pressed.||
+||glowStrength||float||variable||Brightness of the lightning.||
+||ambientGlowHeightScale||float||6.0||Scale of the ambient glow.||
+||glowFallOff||float||variable||Strength of vertical blurring.||
+||height||float||variable||Max height of the flash.||
+||sampleDist||float||0.0076||Strength of horizontal blurring.||
+||height||speed||1.86||Speed of the 3D texture.||
+||vertNoise||float||0.78||Amount of distortion to the effect.||
+||fading||float||1.0||Strength of fade effect towards the edges.||
 ||fixalpha||bool||True||Alpha is always 1.0 when True.||
-||Noise||sampler3D||"noise.dds"||3D texture.||
-||offset||vec2||(0.0,-2.5)||Offset of lightning.||
-||scalexy||vec2||(5.0,2.4)||Scale of lightning.||
-||solofx||bool||False||Effect is horizontal when True.||
+||Noise||sampler3D||"noise.dds"||Points to a 3D texture.||
+||offset||vec2||(0.0,-2.5)||Offset of the lightning.||
+||scalexy||vec2||(5.0,2.4)||Scale of the lightning.||
+||solofx||bool||False||Effect is vertical when True.||
 
-= Solo lightnings =
+= Solo Lightning =
 
 _Name:_ sololight
 
 _Using:_ lightning.ps, lightning.vs
 
-_Description:_ Lighnings on the edges of fretboard when solo or SP is enabled. Only for GH-like themes.
+_Description:_ Lightning on the edges of the fretboard when solo or SP is active. Only for GH-like themes.
 
 ||_*Uniform*_||_*Type*_||_*Value*_||_*Description*_||
-||time||float||variable||Amount of seconds passed from ShaderList loading. Updates every time on each shader activation.||
-||ambientGlow||float||0.5||Height of ambient glow||
-||color||vec4||variable||Color of teh effect. Depends on SP-note color.||
-||glowStrength||float||100.0||Brightness of lightning.||
-||ambientGlowHeightScale||float||6.0||Scale of ambient glow.||
-||glowFallOff||float||0.024||Strenght of vertical blur.||
-||height||float||0.3||Max height of flash.||
-||sampleDist||float||0.0076||Strenght of horizontal blur.||
-||height||speed||1.86||Speed of 3D texture moving.||
-||vertNoise||float||0.78||Distortion of lightning.||
-||fading||float||4.0||Fading near the edges of quad.||
+||time||float||variable||Time (in seconds) since ShaderList loading. Updates on each shader activation.||
+||ambientGlow||float||variable||Height of the ambient glow||
+||color||vec4||variable||Color of the effect. Depends on which frets are pressed.||
+||glowStrength||float||variable||Brightness of the lightning.||
+||ambientGlowHeightScale||float||6.0||Scale of the ambient glow.||
+||glowFallOff||float||variable||Strength of vertical blurring.||
+||height||float||variable||Max height of the flash.||
+||sampleDist||float||0.0076||Strength of horizontal blurring.||
+||height||speed||1.86||Speed of the 3D texture.||
+||vertNoise||float||0.78||Amount of distortion to the effect.||
+||fading||float||1.0||Strength of fade effect towards the edges.||
 ||fixalpha||bool||True||Alpha is always 1.0 when True.||
-||Noise||sampler3D||"noise.dds"||3D texture.||
-||offset||vec2||(0.0,-2.5)||Offset of lightning.||
-||scalexy||vec2||(5.0,1.0)||Scale of lightning.||
-||solofx||bool||True||Effect is horizontal when True.||
+||Noise||sampler3D||"noise.dds"||Points to a 3D texture.||
+||offset||vec2||(0.0,-2.5)||Offset of the lightning.||
+||scalexy||vec2||(5.0,2.4)||Scale of the lightning.||
+||solofx||bool||True||Effect is vertical when True.||
 
 = RB2 tails =
 
@@ -85,25 +82,25 @@ _Name:_ tail
 
 _Using:_ lightning.ps, lightning.vs
 
-_Description:_ animated note tails, with different FX for whammy and pitchbend.
+_Description:_ Animated note tails with different effects for whammy and pitchbend.
 
 ||_*Uniform*_||_*Type*_||_*Value*_||_*Description*_||
-||time||float||variable||Amount of seconds passed from ShaderList loading. Updates every time on each shader activation.||
-||ambientGlow||float||0.1||Height of ambient glow||
-||color||vec4||variable||Color of teh effect. Depends on SP-note color.||
-||glowStrength||float||100.0||Brightness of lightning.||
-||ambientGlowHeightScale||float||6.0||Scale of ambient glow.||
-||glowFallOff||float||0.024||Strenght of vertical blur.||
-||height||float||0.3||Max height of flash.||
-||sampleDist||float||0.0076||Strenght of horizontal blur.||
-||height||speed||1.86||Speed of 3D texture moving.||
-||vertNoise||float||0.78||Distortion of lightning.||
-||fading||float||4.0||Fading near the edges of quad.||
+||time||float||variable||Time (in seconds) since ShaderList loading. Updates on each shader activation.||
+||ambientGlow||float||variable||Height of the ambient glow||
+||color||vec4||variable||Color of the effect. Depends on which frets are pressed.||
+||glowStrength||float||variable||Brightness of the lightning.||
+||ambientGlowHeightScale||float||6.0||Scale of the ambient glow.||
+||glowFallOff||float||variable||Strength of vertical blurring.||
+||height||float||variable||Max height of the flash.||
+||sampleDist||float||0.0076||Strength of horizontal blurring.||
+||height||speed||1.86||Speed of the 3D texture.||
+||vertNoise||float||0.78||Amount of distortion to the effect.||
+||fading||float||1.0||Strength of fade effect towards the edges.||
 ||fixalpha||bool||True||Alpha is always 1.0 when True.||
-||Noise||sampler3D||"noise.dds"||3D texture.||
-||offset||vec2||(0.0,0.0)||Offset of lightning.||
-||scalexy||vec2||(5.0,1.0)||Scale of lightning.||
-||solofx||bool||True||Effect is horizontal when True.||
+||Noise||sampler3D||"noise.dds"||Points to a 3D texture.||
+||offset||vec2||(0.0,-2.5)||Offset of the lightning.||
+||scalexy||vec2||(5.0,2.4)||Scale of the lightning.||
+||solofx||bool||True||Effect is vertical when True.||
 
 = CDlist =
 
@@ -111,7 +108,7 @@ _Name:_ cd
 
 _Using:_ cd.ps, cd.vs
 
-_Description:_ fadng CDs' color. Added like a small demo of shaders.
+_Description:_ Fades the CD color. Added as a simple demo of shader effects.
 
 = Metal notes =
 
