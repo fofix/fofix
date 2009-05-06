@@ -249,8 +249,14 @@ class ScoreCard(object):
             return i
 
   def updateAvMult(self):
-    self.hitAccuracy = (float(self.notesHit) / float(self.totalStreakNotes) ) * 100.0
-    self.avMult      = self.score/float(self.totalNotes*self.baseScore)
+    try:
+      self.hitAccuracy = (float(self.notesHit) / float(self.totalStreakNotes) ) * 100.0
+    except ZeroDivisionError:
+      self.hitAccuracy = 0.0
+    try:
+      self.avMult      = self.score/float(self.totalNotes*self.baseScore)
+    except ZeroDivisionError:
+      self.avMult      = 1.0
   
   def updateHandicapValue(self):
     self.handicapValue = 100.0
