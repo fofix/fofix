@@ -242,9 +242,11 @@ class Vocalist:
     self.engine.drawImage(self.vocalLyricSheet, scale = (self.vocalLyricSheetWFactor,-self.vocalLyricSheetWFactor), coord = (w*.5,h-height))
     
     if self.activePhrase:
-      lastnotes = [(time, event) for time, event in self.lastPhrase[1].getAllEvents() if isinstance(event, VocalNote)]
+      if self.lastPhrase:
+        lastnotes = [(time, event) for time, event in self.lastPhrase[1].getAllEvents() if isinstance(event, VocalNote)]
       notes = [(time, event) for time, event in self.activePhrase.getAllEvents() if isinstance(event, VocalNote)]
-      nextnotes = [(time, event) for time, event in self.nextPhrase[1].getAllEvents() if isinstance(event, VocalNote)]
+      if self.nextPhrase:
+        nextnotes = [(time, event) for time, event in self.nextPhrase[1].getAllEvents() if isinstance(event, VocalNote)]
       for time, event in notes:
         if self.activePhrase.tapPhrase:
           x = time - pos
