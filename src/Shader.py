@@ -32,8 +32,11 @@ import pygame
 import Version
 import Config
 
-#for MacOS
+#OGL constants for compatibility with all PyOpenGL versions
+#now multitexturing should work even in PyOpenGL 2.x, if your card supports ARB ext
 GL_TEXTURE_3D = 32879
+GL_TEXTURE_WRAP_R = 32882
+GL_TEXTURE0_ARB, GL_TEXTURE1_ARB, GL_TEXTURE2_ARB, GL_TEXTURE3_ARB = 33984, 33985, 33986, 33987
 
 # evilynux - Do not crash If OpenGL 2.0 is not supported
 try:
@@ -341,11 +344,11 @@ class shaderList:
     # evilynux - If OpenGL 2.0 is not supported, nicely return.
     try:
       glBindTexture(GL_TEXTURE_3D, texture)
-      glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT)
     except:
       return
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
     glTexImage3D(GL_TEXTURE_3D, 0, 1,size, size, size, 0, type, GL_UNSIGNED_BYTE, noise)
@@ -434,12 +437,7 @@ class shaderList:
     self.workdir = dir
     self.noise3D = self.loadTex3D("noise3d.dds")
     self.outline = self.loadTex2D("outline.tga")
-
-    try:
-      multiTex = (GL_TEXTURE0_ARB,GL_TEXTURE1_ARB,GL_TEXTURE2_ARB,GL_TEXTURE3_ARB)
-    except:
-      multiTex = (0,0,0,0)
-      Log.error("Multitexturing failed. Upgrade to PyOpenGL 3.00!")  
+    multiTex = (GL_TEXTURE0_ARB,GL_TEXTURE1_ARB,GL_TEXTURE2_ARB,GL_TEXTURE3_ARB)
     
     if self.make("lightning","stage"):
       self.enable("stage")
