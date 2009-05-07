@@ -122,6 +122,27 @@ if supported:
       #print tone
       return int(round((math.log(tone['freq']) - LN_440) * 12.0 / LN_2) % 12)
 
+    # Work out how accurately the note (passed in as a MIDI note number) is being
+    # sung.  Return a float in the range [-6.0, 6.0] representing the number of
+    # semitones difference there is from the nearest occurrence of the note.  The
+    # octave doesn't matter.  Or return None if there's no note being sung.
+    def getAccuracy(self, midiNote):
+      tone = self.analyzer.findTone()
+      if tone is None:
+        return tone
+
+      # Convert to semitones from A-440.
+      semitonesFromA440 = (math.log(tone['freq']) - LN_440) * 12.0 / LN_2
+      # midiNote % 12 = semitones above C, which is 3 semitones above A
+      semitoneDifference = (semitonesFromA440 - 3.0) - float(midiNote % 12)
+      # Adjust to the proper range.
+      acc = math.fmod(semitoneDifference, 12.0)
+      if acc > 6.0:
+        acc -= 12.0
+      elif acc < -6.0:
+        acc += 12.0
+      return acc
+
 
 else:
   def getAvailableMics():
