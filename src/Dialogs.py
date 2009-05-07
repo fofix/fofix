@@ -229,9 +229,11 @@ class GetText(Layer, KeyListener):
     
     #if (c in Player.KEY1S or key == pygame.K_RETURN) and not self.accepted:
     #if (c in Player.KEY1S or key == pygame.K_RETURN or c in Player.DRUM4S) and not self.accepted:   #MFH - adding support for green drum "OK"
-    if unicode and ord(unicode) > 31 and not self.accepted:
+    if key == pygame.K_BACKSPACE and not self.accepted:
+      self.text = self.text[:-1]
+    elif unicode and ord(unicode) > 31 and not self.accepted:
       self.text += unicode
-    elif (c in Player.menuYes or key == pygame.K_ENTER) and not self.accepted:   #MFH - adding support for green drum "OK"
+    elif (c in Player.menuYes or key == pygame.K_RETURN) and not self.accepted:   #MFH - adding support for green drum "OK"
       self.engine.view.popLayer(self)
       self.accepted = True
       if c in Player.key1s:
@@ -244,7 +246,7 @@ class GetText(Layer, KeyListener):
       if c in Player.key2s:
         self.engine.data.cancelSound.setVolume(self.sfxVolume)  #MFH
         self.engine.data.cancelSound.play()
-    elif (c in Player.key4s or key == pygame.K_BACKSPACE) and not self.accepted:
+    elif c in Player.key4s and not self.accepted:
       self.text = self.text[:-1]
       if c in Player.key4s:
         self.engine.data.cancelSound.setVolume(self.sfxVolume)  #MFH
