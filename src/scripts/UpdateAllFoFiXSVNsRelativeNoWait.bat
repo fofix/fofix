@@ -1,4 +1,6 @@
-set CloseOnEnd=0
+call backToFoFiXroot.bat
+
+set CloseOnEnd=1
 set TortoiseSVN=C:\Progra~1\TortoiseSVN\bin\
 set localpath=.\
 
