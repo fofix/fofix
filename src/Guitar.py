@@ -1015,8 +1015,8 @@ class Guitar:
       r = 1.2 / fret[1] + 0.6 / fret[2] + 0.8 / fret[4]
       g = 1.2 / fret[0] + 0.6 / fret[2] + 0.4 / fret[4]
       b = 1.2 / fret[3]
-      a = (r+g+b)/70.0
-      Shader.list.var["color"]=(r,g,b,a*2.0)
+      a = (r+g+b)/30.0
+      Shader.list.var["color"]=(r,g,b,a)
       
     if Shader.list.enable("neck"):
       Shader.list.setVar("fretcol","color")

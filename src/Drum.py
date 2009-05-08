@@ -1001,8 +1001,7 @@ class Drum:
       else:
         neck = self.oNeck
           
-      self.renderNeckMethod(self.spcount*self.neckAlpha[3], offset, beatsPerUnit, neck)
-      
+      self.renderNeckMethod(self.spcount*self.neckAlpha[3], offset, beatsPerUnit, neck) 
     if self.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and (self.scoreMultiplier > 4 or self.guitarSolo):   #static overlay
 
       if self.oNeckovr != None:
@@ -1015,14 +1014,13 @@ class Drum:
 
     if Shader.list.turnon:
       posx = Shader.list.time()
-      fade=0.2
       drum = []
       for i in range(5):
-        drum.append(3*max(posx - Shader.list.var["drum"][i] + fade,0.01))
+        drum.append(max(4.0*(posx - Shader.list.var["drum"][i] + 0.1),0.01))
       r = 0.8 / drum[0] + 1.2 / drum[1] + 0.6 / drum[2]
       g = 0.8 / drum[0] + 0.6 / drum[2] + 1.2 / drum[4]
       b = 0.8 / drum[0] + 1.2 / drum[3]
-      a = (r+g+b)/70.0
+      a = (r+g+b)/50.0
       Shader.list.var["drumcolor"]=(r,g,b,a)
           
     if Shader.list.enable("neck"): 
