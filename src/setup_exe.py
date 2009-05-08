@@ -1,8 +1,9 @@
 #####################################################################
 # -*- coding: iso-8859-1 -*-                                        #
 #                                                                   #
-# Frets on Fire                                                     #
-# Copyright (C) 2006 Sami Kyöstilä                                  #
+# Frets on Fire X                                                   #
+# Copyright (C) 2009 FoFiX Team                                     #
+#               2006 Sami Kyöstilä                                  #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -151,7 +152,7 @@ def setupWindows():
         #url = Version.URL,
         windows = [
           {
-            "script":          "FretsOnFire.py",
+            "script":          "FoFiX.py",
             "icon_resources":  [(1, "fof.ico")],
             "other_resources": [(RT_VERSION, 1, VersionResource(
               #stump: the parameter below must consist only of up to four numerical fields separated by dots
@@ -159,8 +160,8 @@ def setupWindows():
               file_description="Frets on Fire X",
               legal_copyright=r"© 2008-2009 FoFiX Team.  GNU GPL v2 or later.",
               company_name="FoFiX Team",
-              internal_name="FretsOnFire.exe",
-              original_filename="FretsOnFire.exe",
+              internal_name="FoFiX.exe",
+              original_filename="FoFiX.exe",
               product_name=Version.appNameSexy(),
               #stump: when run from the exe, FoFiX will claim to be "FoFiX v" + product_version
               product_version=Version.version()

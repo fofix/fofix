@@ -11,7 +11,7 @@ from setuptools import setup
 import sys, SceneFactory, Version
 import glob
 
-APP = ['FretsOnFire.py']
+APP = ['FoFiX.py']
 
 def songFiles(song, extra = []):
   return ["../data/songs/%s/%s" % (song, f) for f in ["guitar.ogg", "notes.mid", "song.ini", "song.ogg"] + extra]
@@ -77,7 +77,7 @@ fullVersionString = GameEngine.version
 setup(
     version=fullVersionString[7:],
     description="Frets on Fire X",
-    name="Frets on Fire",
+    name="FoFiX",
     url="http://www.unrealvoodoo.org",
     app=APP,
     data_files=dataFiles,

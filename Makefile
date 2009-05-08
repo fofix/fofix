@@ -57,7 +57,7 @@ GuitarScene,\
 ctypes.util,pkg_resources,weakref,Image,\
 OpenGL,$(PYOGL3_INCL)\
 xml.sax.drivers2.drv_pyexpat,\
-GameResultsScene src/FretsOnFire.py
+GameResultsScene src/FoFiX.py
 
 	-cp /usr/lib/libpython2.4.so.1.0 \
            /usr/lib/libSDL_ttf-2.0.so.0 \
@@ -71,9 +71,9 @@ GameResultsScene src/FretsOnFire.py
            /usr/lib/libmikmod.so.2 \
            /usr/lib/libblas.so.3gf \
            dist
-	mv dist/FretsOnFire dist/FretsOnFire.bin
-	-cp src/launcher.sh dist/FretsOnFire
-	-chmod +x dist/FretsOnFire
+	mv dist/FoFiX dist/FoFiX.bin
+	-cp src/launcher.sh dist/FoFiX
+	-chmod +x dist/FoFiX
 
 translations:
 	cd src && \

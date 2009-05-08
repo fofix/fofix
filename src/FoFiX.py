@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: iso-8859-1 -*-
 #####################################################################
-# Frets on Fire                                                     #
+# Frets on Fire X (FoFiX)                                           #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
 #               2008 evilynux <evilynux@gmail.com>                  #
 #                                                                   #
@@ -156,18 +156,18 @@ def main():
         # Determine whether were running from an exe or not
         if hasattr(sys, "frozen"):
           if os.name == "nt":
-            os.execl("FretsOnFire.exe", "FretsOnFire.exe", *sys.argv[1:])
+            os.execl("FoFiX.exe", "FoFiX.exe", *sys.argv[1:])
           elif sys.frozen == "macosx_app":
             import string
             import subprocess
             appname = string.join(string.split(sys.executable, '/')[:-1], '/')
-            appname = appname+"/Frets on Fire"
+            appname = appname+"/FoFiX"
             subprocess.Popen(`appname`, shell=True)
           else:
-            os.execl("./FretsOnFire", "./FretsOnFire", *sys.argv[1:])
+            os.execl("./FoFiX", "./FoFiX", *sys.argv[1:])
         else:
           # stump: sys.executable points to the active python interpreter
-          os.execl(sys.executable, sys.executable, "FretsOnFire.py", *sys.argv[1:])
+          os.execl(sys.executable, sys.executable, "FoFiX.py", *sys.argv[1:])
       except:
         Log.warn("Restart failed.")
         raise
@@ -239,7 +239,7 @@ def call_callback(func):
 if __name__ == '__main__':
     try:
         if debuglevel == 2:
-            trace = Trace('FretsOnFire.py')
+            trace = Trace('FoFiX.py')
             trace.go()
             call_callback(main())
             trace.stop()
