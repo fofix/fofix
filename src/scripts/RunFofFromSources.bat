@@ -1,5 +1,5 @@
 call ClearCompiledPycs
-python FretsOnFire.py
+python FoFiX.py
 pause
 rem - this new pause allows the game to restart for new settings 
 rem - - without deleting the compiled files.
