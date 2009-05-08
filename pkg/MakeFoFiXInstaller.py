@@ -39,9 +39,9 @@ try:
 except ImportError:
   import pysqlite2.dbapi2 as sqlite3
 
-us = r'..\FretsOnFire.exe'
+us = r'..\FoFiX.exe'
 if not os.path.isfile(us):
-  sys.stderr.write("There's no FretsOnFire.exe - did you compile yet?\n")
+  sys.stderr.write("There's no FoFiX.exe - did you compile yet?\n")
   sys.exit(1)
 vdict = win32api.GetFileVersionInfo(us, '\\')
 # Unfortunately we need to do some bit-twiddling to retrieve the main version number.
@@ -95,7 +95,7 @@ InstallDirRegKey HKCU 'SOFTWARE\myfingershurt\FoFiX' InstallRoot
 # Function to run FoFiX from the finish page.
 Function runFoFiX
   SetOutPath $INSTDIR
-  Exec $INSTDIR\FretsOnFire.exe
+  Exec $INSTDIR\FoFiX.exe
 FunctionEnd
 
 # More installer parameters.
@@ -177,7 +177,7 @@ SectionIn RO
 WriteRegStr HKCU "SOFTWARE\myfingershurt\FoFiX" InstallRoot $INSTDIR
 WriteUninstaller uninst.exe
 CreateDirectory "$SMPROGRAMS\FoFiX"
-CreateShortcut "$SMPROGRAMS\FoFiX\FoFiX.lnk" "$INSTDIR\FretsOnFire.exe"
+CreateShortcut "$SMPROGRAMS\FoFiX\FoFiX.lnk" "$INSTDIR\FoFiX.exe"
 CreateShortcut "$SMPROGRAMS\FoFiX\FoFiX Installation Folder.lnk" "$INSTDIR"
 CreateShortcut "$SMPROGRAMS\FoFiX\Uninstall FoFiX.lnk" "$INSTDIR\uninst.exe"
 ''' % MLDist.getInstallScript(), r'''
@@ -231,7 +231,7 @@ try:
     hashcache.commit()
     os.chdir('..')
     os.unlink('Setup.nsi')
-    oldExeSha1 = hashcache.execute("SELECT `hash` FROM `hashes_%s` WHERE `path` = 'FretsOnFire.exe'" % hashlib.sha1(v).hexdigest()).fetchone()[0]
+    oldExeSha1 = hashcache.execute("SELECT `hash` FROM `hashes_%s` WHERE `path` = 'FoFiX.exe'" % hashlib.sha1(v).hexdigest()).fetchone()[0]
     patcher = ListToNSIS.NsisScriptBuilder(r"""
 !define FOFIX_VERSION %s
 !define FOFIX_VERSION_FULL "%s"
@@ -258,7 +258,7 @@ InstallDirRegKey HKCU 'SOFTWARE\myfingershurt\FoFiX' InstallRoot
 # Function to run FoFiX from the finish page.
 Function runFoFiX
   SetOutPath $INSTDIR
-  Exec $INSTDIR\FretsOnFire.exe
+  Exec $INSTDIR\FoFiX.exe
 FunctionEnd
 
 # More installer parameters.
@@ -291,11 +291,11 @@ Function verifyFoFiXInstDir
   IfFileExists $INSTDIR haveDir
   Abort
 haveDir:
-  IfFileExists $INSTDIR\FretsOnFire.exe haveFoFexe
+  IfFileExists $INSTDIR\FoFiX.exe haveFoFexe
   MessageBox MB_YESNO|MB_ICONEXCLAMATION "This does not look like a valid FoFiX installation folder.$\r$\n$\r$\nIf you would like to merely unpack the altered files into this folder, you may continue anyway.$\r$\n$\r$\nContinue?" IDYES allow
   Abort
 haveFoFexe:
-  Crypto::HashFile "SHA1" $INSTDIR\FretsOnFire.exe
+  Crypto::HashFile "SHA1" $INSTDIR\FoFiX.exe
   Pop $0
   StrCmp $0 ${FOFIX_VERSION_OLD_EXE_SHA1} allow
   MessageBox MB_YESNO|MB_ICONEXCLAMATION "This looks like a valid FoFiX installation folder, but not version ${FOFIX_VERSION_OLD}.$\r$\n$\r$\nApplying this patch will more than likely break your installation!$\r$\n$\r$\nContinue anyway?" IDYES allow

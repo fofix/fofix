@@ -2,10 +2,10 @@ set TortoiseSVN=C:\Progra~1\TortoiseSVN\bin\
 
 set FofDrive=X:
 
-set ExportDestination=X:\Games\FretsOnFire\FoFiX_export_temp
+set ExportDestination=X:\Games\FoFiX\FoFiX_export_temp
 
-set home_srcbin_dir=X:\Games\FretsOnFire\FoFiX
-set home_src_wiki_dir=X:\Games\FretsOnFire\FoFiX-wiki
+set home_srcbin_dir=X:\Games\FoFiX\FoFiX
+set home_src_wiki_dir=X:\Games\FoFiX\FoFiX-wiki
 
 svn export %home_src_wiki_dir% %ExportDestination%\FoFiX-wiki
 svn export %home_srcbin_dir% %ExportDestination%\FoFiX
