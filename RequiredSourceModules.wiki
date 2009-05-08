@@ -59,10 +59,9 @@ Versions are likely important. Don't substitute one for the other without trying
   * pyPitch - required module 2 of 2 for microphone support: [http://www.mediafire.com/download.php?ni03jtyzjz9 Direct download for Python 2.4]
 
 
-*Or, here's a complete package* with all the files above, with a batch file that installs everything for Windows 32-bit users, in a single RAR archive - courtesy of Chris Paiano (Myfingershurt) - _Updated 3/4/2009_: *(Important - you will need the updated py2exe module linked above!)*
-[http://www.mediafire.com/?iu9ezgnnnnx] - Includes the first 3 optional modules.
-
-
+*Or, here's a complete installer package* with all the files above (as of 5/8/2009), courtesy of Chris Paiano:
+[http://www.mediafire.com/?zzizzt4zmuw MFH's Alpha Module Installer for 3.120r1454+ Win32-Py24-OGL2]
+This Includes the all optional modules for 3.120 r1454+.  _Uses versions: Python 2.4, PyOpenGL 2_.  Installer also fixes the below OpenGL 2 version error.
 
 
 ===Install In This Order===
@@ -104,7 +103,7 @@ Back to what we were initially trying:
   # *ONLY for FoFiX 3.025 or earlier* -- *REBOOT* _(required)_
   # Open a command prompt
   # cd to the new {{{src}}} directory in your FoFiX directory
-  # type {{{python FretsOnFire.py}}} (or run the {{{src\scripts\RunFofFromSources.bat}}} script)
+  # type {{{python FoFiX.py}}} (or run the {{{src\scripts\RunFofFromSources.bat}}} script)
 
 At this point you should be able to play frets on fire directly from the source.
 
