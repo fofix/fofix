@@ -1007,7 +1007,7 @@ class Guitar:
 
       self.renderNeckMethod(v*self.neckAlpha[4], offset, neck, alpha)
 
-    if Shader.list.enabled:
+    if Shader.list.turnon:
       posx = Shader.list.time()
       fret = []
       for i in range(5):
@@ -3831,8 +3831,9 @@ class Guitar:
     for time, note in self.matchingNotes:
       if note.played != True:
         continue
-
-      Shader.list.var["fret"][note.number]=Shader.list.time()
+      
+      if Shader.list.turnon:
+        Shader.list.var["fret"][note.number]=Shader.list.time()
       
       self.pickStartPos = pos
       self.pickStartPos = max(self.pickStartPos, time)

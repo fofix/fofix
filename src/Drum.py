@@ -1013,7 +1013,7 @@ class Drum:
 
       self.renderNeckMethod(v*self.neckAlpha[3], offset, beatsPerUnit, neck, alpha)
 
-    if Shader.list.enabled:
+    if Shader.list.turnon:
       posx = Shader.list.time()
       fade=0.2
       drum = []
@@ -3339,8 +3339,9 @@ class Drum:
             self.currentGuitarSoloHitNotes += 1
           if i == 0 and self.fretboardHop < 0.07:
               self.fretboardHop = 0.07  #stump
-
-          Shader.list.var["drum"][i]=Shader.list.time()
+              
+          if Shader.list.turnon:
+            Shader.list.var["drum"][i]=Shader.list.time()
           return self.hitNote(time, note)  
         
           

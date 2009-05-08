@@ -55,38 +55,12 @@ class shaderList:
     self.active = 0
     self.texcount = 0
     self.lastcompiled = ""
-    self.noise3D = 0
-    self.noise2D = 0
-    self.noise1D = 0
     self.workdir = ""
     self.enabled = False
     self.turnon = False
     self.var = {}
     time.clock()
-    self.build(dir)
     self.reset()
-    
-  def build(self,dir = ""):
-    if dir == "": return False
-    try:
-      names = os.listdir(dir)
-    except (IOError, os.error), why:
-      Log.error("Error: %s " % (why))
-      raw_input()
-      sys.exit()
-    for name in names:
-      fullname = os.path.join(dir, name)
-      if name[-3:] == ".ps":
-        program = self.compile(open(fullname[:-3]+".vs"), open(fullname))
-        sArray = {"program": program, "name": name[:-3], "tex" : (), "textype" : ()}
-        self.lastCompiled = name[:-3]
-        self.getVars(fullname, program, sArray)
-        self.getVars(fullname[:-3]+".vs", program, sArray)
-        self.shaders[name[:-3]] = sArray
-    if self.shaders!={}:
-      return True
-    else:
-      return False
       
   def make(self,fname = "", name = ""):
     if fname == "": return False
@@ -163,6 +137,7 @@ class shaderList:
     else: program = self[program]
     if program != 0:
       return program[var][1]
+      
     
   def setVar(self, var, value, program = None):
     if program == None:  program = self.active
@@ -213,7 +188,7 @@ class shaderList:
         
   def enable(self, shader):
     try:
-        if self[shader]["enabled"]:
+        if self.turnon and self[shader]["enabled"]:
           glUseProgramObjectARB(self[shader]["program"])
           self.active = self.shaders[shader]
           self.setTextures()
@@ -235,18 +210,6 @@ class shaderList:
     if self.active !=0:
       glUseProgramObjectARB(0)
       self.active = 0
-    
-  def turnOff(self):
-    if self.backup == {} and self.shaders != {}:
-      self.backup = self.shaders
-      self.shaders = {}
-      self.turnon = False
-      
-  def turnOn(self):
-    if self.backup != {} and self.shaders == {}:
-      self.shaders = self.backup
-      self.backup = {}
-      self.turnon = True
     
   def activeProgram(self):
     if self.active !=0:
@@ -425,11 +388,11 @@ class shaderList:
      try:
        if Config.get("video","shader_use"):
          if self.enabled:
-           self.turnOn()
+           self.turnon = True
          else:
            self.set(os.path.join(Version.dataPath(), "shaders"))
        else:
-         self.turnOff()
+         self.turnon = False
      except:
        return False
      else:
