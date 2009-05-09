@@ -205,8 +205,8 @@ class Guitar:
     #self.actualBpm = 0.0
     self.currentBpm     = 120.0
     self.currentPeriod  = 60000.0 / self.currentBpm
-    #self.targetBpm      = self.currentBpm
-    #self.targetPeriod   = 60000.0 / self.targetBpm
+    self.targetBpm      = self.currentBpm
+    self.targetPeriod   = 60000.0 / self.targetBpm
     self.lastBpmChange  = -1.0
     self.baseBeat       = 0.0
 
@@ -247,6 +247,9 @@ class Guitar:
     self.spRefillMode = self.engine.config.get("game","sp_notes_while_active")
     self.hitglow_color = self.engine.config.get("video", "hitglow_color") #this should be global, not retrieved every fret render.
     self.sfxVolume    = self.engine.config.get("audio", "SFX_volume")
+
+    self.vbpmLogicType = self.engine.config.get("debug",   "use_new_vbpm_beta")
+
     
     #myfingershurt: this should be retrieved once at init, not repeatedly in-game whenever tails are rendered.
     self.notedisappear = self.engine.config.get("game", "notedisappear")
@@ -3223,14 +3226,15 @@ class Guitar:
       else:
         self.hit[n] = False
 
-    # glorandwarf: moved the update bpm code - was after the for statement below
-    #if self.currentBpm != self.targetBpm:
-    #  diff = self.targetBpm - self.currentBpm
-    #  if (round((diff * .03), 4) != 0):
-    #    self.currentBpm = round(self.currentBpm + (diff * .03), 4)
-    #  else:
-    #    self.currentBpm = self.targetBpm
-    #  self.setBPM(self.currentBpm) # glorandwarf: was setDynamicBPM(self.currentBpm)
+    
+    if self.vbpmLogicType == 0:   #MFH - VBPM (old)
+      if self.currentBpm != self.targetBpm:
+        diff = self.targetBpm - self.currentBpm
+        if (round((diff * .03), 4) != 0):
+          self.currentBpm = round(self.currentBpm + (diff * .03), 4)
+        else:
+          self.currentBpm = self.targetBpm
+        self.setBPM(self.currentBpm) # glorandwarf: was setDynamicBPM(self.currentBpm)
 
     for time, note in self.playedNotes:
       if pos > time + note.length:

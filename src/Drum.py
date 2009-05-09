@@ -228,8 +228,8 @@ class Drum:
     #self.actualBpm = 0.0
     self.currentBpm     = 120.0   #MFH - need a default 120BPM to be set in case a custom song has no tempo events.
     self.currentPeriod  = 60000.0 / self.currentBpm
-    #self.targetBpm      = self.currentBpm
-    #self.targetPeriod   = 60000.0 / self.targetBpm
+    self.targetBpm      = self.currentBpm
+    self.targetPeriod   = 60000.0 / self.targetBpm
     self.lastBpmChange  = -1.0
     self.baseBeat       = 0.0
 
@@ -282,6 +282,7 @@ class Drum:
     self.fretsUnderNotes  = self.engine.config.get("game", "frets_under_notes")
     self.staticStrings  = self.engine.config.get("performance", "static_strings")
 
+    self.vbpmLogicType = self.engine.config.get("debug",   "use_new_vbpm_beta")
 
     self.indexFps       = self.engine.config.get("video", "fps")
 
@@ -2745,15 +2746,14 @@ class Drum:
       if -1 in activeFrets:
         self.fretActivity[n] = min(self.fretActivity[n] + ticks / 24.0, 0.6)
 
-    # glorandwarf: moved the update bpm code - was after the for statement below
-    # update bpm
-    #if self.currentBpm != self.targetBpm:
-    #  diff = self.targetBpm - self.currentBpm
-    #  if (round((diff * .03), 4) != 0):
-    #    self.currentBpm = round(self.currentBpm + (diff * .03), 4)
-    #  else:
-    #    self.currentBpm = self.targetBpm
-    #  self.setBPM(self.currentBpm) # glorandwarf: was setDynamicBPM(self.currentBpm)
+    if self.vbpmLogicType == 0:   #MFH - VBPM (old)
+      if self.currentBpm != self.targetBpm:
+        diff = self.targetBpm - self.currentBpm
+        if (round((diff * .03), 4) != 0):
+          self.currentBpm = round(self.currentBpm + (diff * .03), 4)
+        else:
+          self.currentBpm = self.targetBpm
+        self.setBPM(self.currentBpm) # glorandwarf: was setDynamicBPM(self.currentBpm)
 
     for time, note in self.playedNotes:
       if pos > time + note.length:

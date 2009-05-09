@@ -696,6 +696,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.logLyricEvents = self.engine.config.get("log",   "log_lyric_events")
     #self.logTempoEvents = self.engine.config.get("log",   "log_tempo_events")
 
+    self.vbpmLogicType = self.engine.config.get("debug",   "use_new_vbpm_beta")
 
     #MFH - switch to midi lyric mode option
     self.midiLyricMode = self.engine.config.get("game", "midi_lyric_mode")
@@ -1017,6 +1018,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.targetBpm      = self.currentBpm
     self.lastBpmChange  = -1.0
     self.baseBeat       = 0.0
+
+    #for guit in self.guitars:   #MFH - tell guitar / drum objects which VBPM logic to use
+    #  guit.vbpmLogicType = self.vbpmLogicType
+    
 
     
     if len(self.vocalPlayers) > 0:
@@ -2887,7 +2892,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               self.song.track[i].markHopoGH2(self.song.info.EighthNoteHopo, self.hopoAfterChord, self.song.info.hopofreq)
             elif self.hopoStyle == 1:   #RF-Mod style HOPO system
               self.song.track[i].markHopoRF(self.song.info.EighthNoteHopo, self.song.info.hopofreq)
-            self.song.track[i].removeTempoEvents()  #MFH - perform a little event cleanup on these tracks
+            #self.song.track[i].removeTempoEvents()  #MFH - perform a little event cleanup on these tracks
         
         if self.battleGH:
           if self.guitars[i].difficulty != 0:
@@ -2899,7 +2904,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   self.song.track[i].markHopoGH2(self.song.info.EighthNoteHopo, self.hopoAfterChord, self.song.info.hopofreq)
                 elif self.hopoStyle == 1:   #RF-Mod style HOPO system
                   self.song.track[i].markHopoRF(self.song.info.EighthNoteHopo, self.song.info.hopofreq)
-                self.song.track[i].removeTempoEvents()  #MFH - perform a little event cleanup on these tracks
+                #self.song.track[i].removeTempoEvents()  #MFH - perform a little event cleanup on these tracks
             self.song.difficulty[i] = Song.difficulties[self.guitars[i].difficulty]
 
     #myfingershurt: removing buggy disable stats option
@@ -3958,7 +3963,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       else:
         pos = self.pausePos
 
-      self.handleTempo(self.song, pos)  #MFH - new global tempo / BPM handling logic
+      if self.vbpmLogicType == 1:
+        self.handleTempo(self.song, pos)  #MFH - new global tempo / BPM handling logic
       
       if self.bossBattle and self.rock[1] < 0:
         if self.careerMode and not self.song.info.completed:
@@ -8851,7 +8857,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
             #MFH - TODO - show current tempo / BPM and neckspeed if enabled for debugging
             if self.showBpm == 1 and p == 0:
-              text = "BPM/Target:%.2f/%.2f, NS:%.2f" % (self.currentBpm, self.targetBpm, instrument.neckSpeed)
+              if self.vbpmLogicType == 0:   #MFH - VBPM (old)
+                currentBPM = self.guitars[i].currentBpm
+                targetBPM = self.guitars[i].targetBpm 
+              else:
+                currentBPM = self.currentBpm
+                targetBPM = self.targetBpm 
+              text = "BPM/Target:%.2f/%.2f, NS:%.2f" % (currentBPM, targetBPM, instrument.neckSpeed)
               bpmX = .35
               bpmY = .330
               bpmTsize = 0.00120

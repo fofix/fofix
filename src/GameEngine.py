@@ -236,6 +236,7 @@ Config.define("game", "scroll_rate",              int, 50,   text = _("Scroll Ra
 Config.define("debug",   "use_unedited_midis",          int, 1,    text = _("Use (notes-unedited.mid)"), options = {0: _("Off"), 1: _("Auto")})
 Config.define("debug",   "show_freestyle_active",          int, 0,    text = _("Show Fill Status"), options = {0: _("Off"), 1: _("On")})
 Config.define("debug",   "show_bpm",          int, 0,    text = _("Show BPM"), options = {0: _("Off"), 1: _("On")})
+Config.define("debug",   "use_new_vbpm_beta",          int, 0,    text = _("New BPM Logic"), options = {0: _("Off"), 1: _("On")})
 
 
 Config.define("audio",  "speed_factor",  float,    1.0,  text = _("Speed Factor"),   options = {1.0: _("1.00x"), 0.75: _("0.75x"), 0.50: _("0.50x"), 0.25: _("0.25x")})  #MFH
