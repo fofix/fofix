@@ -71,8 +71,14 @@ if supported:
       self.tapStatus = False
       self.tapThreshold = -self.engine.input.controls.micTapSensitivity[controlnum]
       self.passthroughQueue = []
-      self.passthroughStream = Audio.MicrophonePassthroughStream(engine, self)
-      self.passthroughStream.setVolume(self.engine.input.controls.micPassthroughVolume[controlnum])
+      passthroughVolume = self.engine.input.controls.micPassthroughVolume[controlnum]
+      if passthroughVolume > 0.0:
+        Log.debug('Microphone: creating passthrough stream at %d%% volume' % round(passthroughVolume * 100))
+        self.passthroughStream = Audio.MicrophonePassthroughStream(engine, self)
+        self.passthroughStream.setVolume(passthroughVolume)
+      else:
+        Log.debug('Microphone: not creating passthrough stream')
+        self.passthroughStream = None
 
     def __del__(self):
       self.stop()
@@ -84,11 +90,15 @@ if supported:
         self.mic.start_stream()
         self.engine.addTask(self, synchronized=False)
         Log.debug('Microphone: started %s' % self.devname)
-        self.passthroughStream.play()
+        if self.passthroughStream is not None:
+          Log.debug('Microphone: starting passthrough stream')
+          self.passthroughStream.play()
 
     def stop(self):
       if self.mic_started:
-        self.passthroughStream.stop()
+        if self.passthroughStream is not None:
+          Log.debug('Microphone: stopping passthrough stream')
+          self.passthroughStream.stop()
         self.engine.removeTask(self)
         self.mic.stop_stream()
         self.mic_started = False
@@ -98,8 +108,9 @@ if supported:
     def run(self, ticks):
       while self.mic.get_read_available() > 1024:
         chunk = self.mic.read(1024)
-        self.passthroughQueue.append(chunk)
-        self.analyzer.input(self.mic.read(1024))
+        if self.passthroughStream is not None:
+          self.passthroughQueue.append(chunk)
+        self.analyzer.input(chunk)
         self.analyzer.process()
         if self.analyzer.getPeak() > self.tapThreshold:
           self.tapStatus = True
