@@ -80,6 +80,9 @@ import Image
 import ImageDraw
 from Svg import ImgDrawing
 
+#blazingamer: New neck/board rendering class
+import Neck
+
 class GuitarScene:
   pass
 
@@ -243,6 +246,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.guitars[i].canGuitarSolo = True
         elif player.part.id == Song.BASS_PART:
           self.guitars[i].isBassGuitar = True
+
+      self.neckrender = Neck.Neck(self.engine, self.guitars[i], player)
+
       if player.practiceMode:
         self.practiceMode = True
       player.keyList = Player.playerkeys[j]
@@ -4613,6 +4619,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.guitars[i].fretboardHop -= 0.005
           if self.guitars[i].fretboardHop < 0.0:
             self.guitars[i].fretboardHop = 0.0
+        self.neckrender.render(self.visibility, self.song, self.getSongPosition())
         self.guitars[i].render(self.visibility, self.song, self.getSongPosition(), self.controls, self.killswitchEngaged[i])  #QQstarS: new
         glPopMatrix()
 

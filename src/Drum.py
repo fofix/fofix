@@ -63,13 +63,14 @@ class Drum:
   def __init__(self, engine, playerObj, editorMode = False, player = 0):
     self.engine         = engine
     
-    #self.starPowerDecreaseDivisor = 200.0*self.engine.audioSpeedFactor
-    self.starPowerDecreaseDivisor = 200.0/self.engine.audioSpeedFactor
 
-    
     self.isDrum = True
     self.isBassGuitar = False
     self.isVocal = False
+
+
+    #self.starPowerDecreaseDivisor = 200.0*self.engine.audioSpeedFactor
+    self.starPowerDecreaseDivisor = 200.0/self.engine.audioSpeedFactor
 
     self.bassDrumPedalDown = False
   
@@ -93,9 +94,6 @@ class Drum:
     #MFH - I do not understand fully how the handicap scorecard works at the moment, nor do I have the time to figure it out.
     #... so for now, I'm just writing some extra code here for the early hitwindow size handicap.
     self.earlyHitWindowSizeFactor = 0.5
-
-
-    self.oNeckovr = None    #MFH - needs to be here to prevent crashes!    
 
     self.starNotesInView = False
     self.openStarNotesInView = False
@@ -304,7 +302,7 @@ class Drum:
 
     self.freestyleHit = [False, False, False, False, False]
 
-    self.neck = str(playerObj.neck)
+
     playerObj = None
 
     #Get theme
@@ -388,30 +386,6 @@ class Drum:
 
     engine.loadImgDrawing(self, "glowDrawing", "glow.png")
     
-    if not engine.data.fileExists(os.path.join("necks", self.neck + ".png")) and not engine.data.fileExists(os.path.join("necks", "Neck_" + self.neck + ".png")):
-      self.neck = str(engine.mainMenu.chosenNeck) #this neck is safe!
-    
-    # evilynux - Fixed random neck -- MFH: further fixing random neck
-    if self.neck == "0" or self.neck == "Neck_0" or self.neck == "randomneck":
-      self.neck = []
-      # evilynux - improved loading logic to support arbitrary filenames
-      for i in os.listdir(self.engine.resource.fileName("necks")):
-        # evilynux - Special cases, ignore these...
-        if( str(i) == "overdriveneck.png" or str(i) == "randomneck.png"  or str(i) == "Neck_0.png" or str(i)[-4:] != ".png" ):
-          continue
-        else:
-          self.neck.append(str(i)[:-4]) # evilynux - filename w/o extension
-      i = random.randint(1,len(self.neck))
-      engine.loadImgDrawing(self, "neckDrawing", os.path.join("necks",self.neck[i]+".png"),  textureSize = (256, 256))
-      Log.debug("Random neck chosen: " + self.neck[i])
-    else:
-      try:
-        # evilynux - first assume the self.neck contains the full filename
-        engine.loadImgDrawing(self, "neckDrawing", os.path.join("necks",self.neck+".png"),  textureSize = (256, 256))
-      except IOError:
-        engine.loadImgDrawing(self, "neckDrawing", os.path.join("necks","Neck_"+self.neck+".png"),  textureSize = (256, 256))
-
-
     #MFH - making hitflames optional
     self.hitFlamesPresent = False
     try:
@@ -544,17 +518,6 @@ class Drum:
 
 
     try:
-      engine.loadImgDrawing(self, "centerLines", os.path.join("themes",themename,"drumcenterlines.png"))
-    except IOError:
-      #engine.loadImgDrawing(self, "centerLines", os.path.join("themes",themename,"center_lines.png"))
-      self.centerLines = None
-
-
-    engine.loadImgDrawing(self, "sideBars", os.path.join("themes",themename,"side_bars.png"))
-    engine.loadImgDrawing(self, "bpm_halfbeat", os.path.join("themes",themename,"bpm_halfbeat.png"))
-    engine.loadImgDrawing(self, "bpm_beat", os.path.join("themes",themename,"bpm_beat.png"))
-    engine.loadImgDrawing(self, "bpm_measure", os.path.join("themes",themename,"bpm_measure.png"))
-    try:
       engine.loadImgDrawing(self, "freestyle1", os.path.join("themes", themename, "freestyletail1.png"),  textureSize = (128, 128))
       engine.loadImgDrawing(self, "freestyle2", os.path.join("themes", themename, "freestyletail2.png"),  textureSize = (128, 128))
     except IOError:
@@ -564,68 +527,10 @@ class Drum:
     if self.theme == 0 or self.theme == 1:
       engine.loadImgDrawing(self, "hitlightning", os.path.join("themes",themename,"lightning.png"),  textureSize = (128, 128))
 
-      #myfingershurt: the starpower neck file should be in the theme folder... and also not required:
-      try:
-        engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"starpowerneck_drum.png"),  textureSize = (256, 256))
-      except IOError:
-        try:
-          engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"starpowerneck.png"),  textureSize = (256, 256))
-        except IOError:
-          self.oNeck = None
-
-    elif self.theme == 2:
-      try:
-        engine.loadImgDrawing(self, "oSideBars", os.path.join("themes",themename,"drum_overdrive_side_bars.png"),  textureSize = (256, 256))
-      except IOError:
-        self.oSideBars = None
-  
-      try:
-        engine.loadImgDrawing(self, "oCenterLines", os.path.join("themes",themename,"drum_overdrive_center_lines.png"))
-      except IOError:
-        #engine.loadImgDrawing(self, "centerLines", os.path.join("themes",themename,"center_lines.png"))
-        self.oCenterLines = None
-
-      
-      #myfingershurt: the overdrive neck file should be in the theme folder... and also not required:
-      try:
-        engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck_drum.png"),  textureSize = (256, 256))
-      except IOError:
-        try:
-          engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
-        except IOError:
-          self.oNeck = None
 
       #MFH: support for optional drum_overdrive_string_flash.png
       self.overdriveFlashCounts = self.indexFps/4   #how many cycles to display the oFlash: self.indexFps/2 = 1/2 second
       self.overdriveFlashCount = self.overdriveFlashCounts
-      try:
-        engine.loadImgDrawing(self, "oFlash", os.path.join("themes",themename,"drum_overdrive_string_flash.png"),  textureSize = (256, 256))
-      except IOError:
-        self.oFlash = None
-
-
-    #myfingershurt: Guitar Solo neck:
-    if self.guitarSoloNeckMode > 0:
-      if self.guitarSoloNeckMode == 1:  #replace neck
-        try:
-          engine.loadImgDrawing(self, "guitarSoloNeck", os.path.join("themes",themename,"guitarsoloneck.png"),  textureSize = (256, 256))
-        except IOError:
-          self.guitarSoloNeck = None
-      elif self.guitarSoloNeckMode == 2:  #overlay neck
-        try:
-          engine.loadImgDrawing(self, "guitarSoloNeck", os.path.join("themes",themename,"guitarsoloneckovr.png"),  textureSize = (256, 256))
-        except IOError:
-          self.guitarSoloNeck = None
-    else:
-      self.guitarSoloNeck = None
-
-    try:
-      engine.loadImgDrawing(self, "failNeck", os.path.join("themes",themename,"failneck.png"))
-    except IOError:
-      engine.loadImgDrawing(self, "failNeck", os.path.join("failneck.png"))
-                                                           
-
-
 
 
     #t'aint no tails in drums, yo.
@@ -652,8 +557,19 @@ class Drum:
     self.disableFretSFX  = self.engine.config.get("video", "disable_fretsfx")
     self.disableFlameSFX  = self.engine.config.get("video", "disable_flamesfx")
 
-    self.fretboardHop = 0.00  #stump
+    self.overdriveFlashCounts = self.indexFps/4   #how many cycles to display the oFlash: self.indexFps/2 = 1/2 second
 
+    #Blazingamer: These variables are updated through the guitarscene which then pass 
+    #through to the neck because it is used in both the neck.py and the guitar.py
+    self.isFailing = False
+    self.canGuitarSolo = False
+    self.guitarSolo = False
+    self.fretboardHop = 0.00  #stump
+    self.scoreMultiplier = 1
+    self.coOpFailed = False #akedrou
+    self.coOpRestart = False #akedrou
+    self.starPowerActive = False
+    self.overdriveFlashCount = self.overdriveFlashCounts
 
   def selectPreviousString(self):
     self.selectedString = (self.selectedString - 1) % self.strings
@@ -848,486 +764,6 @@ class Drum:
       self.drumFillEvents = drumFillEvents
     
 
-  def renderIncomingNeck(self, visibility, song, pos, time, neckTexture):   #MFH - attempt to "scroll" an incoming guitar solo neck towards the player
-    if not song:
-      return
-    if not song.readyToGo:
-      return
-    
-    def project(beat):
-      return 0.125 * beat / beatsPerUnit    # glorandwarf: was 0.12
-
-    v            = visibility
-    w            = self.boardWidth
-    l            = self.boardLength
-
-    beatsPerUnit = self.beatsPerBoard / self.boardLength
-
-    #offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
-    offset = 0
-
-    z  = ((time - pos) / self.currentPeriod) / beatsPerUnit
-
-    color = (1,1,1)
-
-    glEnable(GL_TEXTURE_2D)
-    if neckTexture:
-      neckTexture.texture.bind()
-
-
-    glBegin(GL_TRIANGLE_STRIP)
-    glColor4f(color[0],color[1],color[2], 0)
-    glTexCoord2f(0.0, project(offset - 2 * beatsPerUnit))
-    #glVertex3f(-w / 2, 0, -2)
-    glVertex3f(-w / 2, 0, z)   #point A
-    glTexCoord2f(1.0, project(offset - 2 * beatsPerUnit))
-    #glVertex3f( w / 2, 0, -2)
-    glVertex3f( w / 2, 0, z)   #point B
-
-    
-    glColor4f(color[0],color[1],color[2], v)
-    glTexCoord2f(0.0, project(offset - 1 * beatsPerUnit))
-    #glVertex3f(-w / 2, 0, -1)
-    glVertex3f(-w / 2, 0, z+1)   #point C
-    glTexCoord2f(1.0, project(offset - 1 * beatsPerUnit))
-    #glVertex3f( w / 2, 0, -1)
-    glVertex3f( w / 2, 0, z+1)   #point D
-    
-    glTexCoord2f(0.0, project(offset + l * beatsPerUnit * .7))
-    #glVertex3f(-w / 2, 0, l * .7)
-    glVertex3f(-w / 2, 0, z+2+l * .7) #point E
-    glTexCoord2f(1.0, project(offset + l * beatsPerUnit * .7))
-    #glVertex3f( w / 2, 0, l * .7)
-    glVertex3f( w / 2, 0, z+2+l * .7) #point F
-    
-    glColor4f(color[0],color[1],color[2], 0)
-    glTexCoord2f(0.0, project(offset + l * beatsPerUnit))
-    #glVertex3f(-w / 2, 0, l)
-    glVertex3f(-w / 2, 0, z+2+l)    #point G
-    glTexCoord2f(1.0, project(offset + l * beatsPerUnit))
-    #glVertex3f( w / 2, 0, l)
-    glVertex3f( w / 2, 0, z+2+l)    #point H
-    glEnd()
-    
-    glDisable(GL_TEXTURE_2D)
-
-  def renderNeckMethod(self, visibility, offset, beatsPerUnit, neck, alpha = False): #blazingamer: New neck rendering method
-
-    def project(beat):
-      return 0.125 * beat / beatsPerUnit    # glorandwarf: was 0.12
-    
-    if self.starPowerActive and self.theme == 0:#8bit
-      color = self.spColor #(.3,.7,.9)
-    elif self.starPowerActive and self.theme == 1:
-      color = self.spColor #(.3,.7,.9)
-    else:
-      color = (1,1,1)
-
-    v            = visibility
-    w            = self.boardWidth
-    l            = self.boardLength
-
-    beatsPerUnit = beatsPerUnit
-    offset       = offset
-    
-    glEnable(GL_TEXTURE_2D)
-
-    if alpha == True:
-      glBlendFunc(GL_ONE, GL_ONE)
-    neck.texture.bind()
-    glBegin(GL_TRIANGLE_STRIP)
-    glColor4f(color[0],color[1],color[2], 0)
-    glTexCoord2f(0.0, project(offset - 2 * beatsPerUnit))
-    glVertex3f(-w / 2, 0, -2)
-    glTexCoord2f(1.0, project(offset - 2 * beatsPerUnit))
-    glVertex3f( w / 2, 0, -2)
-    
-    glColor4f(color[0],color[1],color[2], v)
-    glTexCoord2f(0.0, project(offset - 1 * beatsPerUnit))
-    glVertex3f(-w / 2, 0, -1)
-    glTexCoord2f(1.0, project(offset - 1 * beatsPerUnit))
-    glVertex3f( w / 2, 0, -1)
-    
-    glTexCoord2f(0.0, project(offset + l * beatsPerUnit * .7))
-    glVertex3f(-w / 2, 0, l * .7)
-    glTexCoord2f(1.0, project(offset + l * beatsPerUnit * .7))
-    glVertex3f( w / 2, 0, l * .7)
-    
-    glColor4f(color[0],color[1],color[2], 0)
-    glTexCoord2f(0.0, project(offset + l * beatsPerUnit))
-    glVertex3f(-w / 2, 0, l)
-    glTexCoord2f(1.0, project(offset + l * beatsPerUnit))
-    glVertex3f( w / 2, 0, l)
-    glEnd()
-    if alpha == True:
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-      
-    glDisable(GL_TEXTURE_2D)
-    
-  def renderNeck(self, visibility, song, pos):
-    if not song:
-      return
-    if not song.readyToGo:
-      return
-    
-    def project(beat):
-      return 0.125 * beat / beatsPerUnit    # glorandwarf: was 0.12
-
-    v            = visibility
-    w            = self.boardWidth
-    l            = self.boardLength
-
-    beatsPerUnit = self.beatsPerBoard / self.boardLength
-    offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
-
-    #myfingershurt: every theme can have oNeck:
-
-    if self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 1:
-      neck = self.guitarSoloNeck
-    elif self.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck:
-      neck = self.oNeck
-    else:
-      neck = self.neckDrawing
-
-    if not (self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 2):
-      self.renderNeckMethod(v*self.neckAlpha[1], offset, beatsPerUnit, neck)
-      
-    if self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 2:   #static overlay
-      self.renderNeckMethod(v*self.neckAlpha[2], 0, beatsPerUnit, self.guitarSoloNeck)
-      
-    if self.spcount2 != 0 and self.spcount < 1.2 and self.oNeck:   #static overlay
-      if self.oNeckovr != None and (self.scoreMultiplier > 4 or self.guitarSolo):
-        neck = self.oNeckovr
-      else:
-        neck = self.oNeck
-          
-      self.renderNeckMethod(self.spcount*self.neckAlpha[3], offset, beatsPerUnit, neck) 
-    if self.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and (self.scoreMultiplier > 4 or self.guitarSolo):   #static overlay
-
-      if self.oNeckovr != None:
-        neck = self.oNeckovr
-      else:
-        neck = self.oNeck
-        alpha = True
-
-      self.renderNeckMethod(v*self.neckAlpha[3], offset, beatsPerUnit, neck, alpha)
-
-    if Shader.list.turnon:
-      posx = Shader.list.time()
-      drum = []
-      for i in range(5):
-        drum.append(max(4.0*(posx - Shader.list.var["drum"][i] + 0.1),0.01))
-      r = 0.8 / drum[0] + 1.2 / drum[1] + 0.6 / drum[2]
-      g = 0.8 / drum[0] + 0.6 / drum[2] + 1.2 / drum[4]
-      b = 0.8 / drum[0] + 1.2 / drum[3]
-      a = (r+g+b)/50.0
-      Shader.list.var["drumcolor"]=(r,g,b,a)
-          
-    if Shader.list.enable("neck"): 
-      Shader.list.setVar("fretcol",(r,g,b,a*1.5))
-      Shader.list.setVar("fail",self.isFailing)
-      Shader.list.update()
-      
-      glBegin(GL_TRIANGLE_STRIP)
-      glVertex3f(-w / 2, 0.1, -2)
-      glVertex3f(w / 2, 0.1, -2)
-      glVertex3f(-w / 2, 0.1, l)
-      glVertex3f(w / 2, 0.1, l)
-      glEnd()
-      Shader.list.disable() 
-    else:
-      if self.isFailing:
-        self.renderNeckMethod(self.failcount*self.neckAlpha[4], 0, beatsPerUnit, self.failNeck)
-
-  def drawTrack(self, visibility, song, pos):
-    if not song:
-      return
-    if not song.readyToGo:
-      return
-
-    def project(beat):
-      return 0.125 * beat / beatsPerUnit    # glorandwarf: was 0.12
-
-    if self.theme == 0 or self.theme == 1:
-      size = 2
-    else:
-      size = 0
-
-    v            = visibility
-    w            = self.boardWidth
-    l            = self.boardLength
-
-    beatsPerUnit = self.beatsPerBoard / self.boardLength
-    offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
-
-    glEnable(GL_TEXTURE_2D)
-
-    #MFH - logic to briefly display oFlash
-    if self.theme == 2 and self.overdriveFlashCount < self.overdriveFlashCounts and self.oFlash:
-      self.overdriveFlashCount = self.overdriveFlashCount + 1
-      self.oFlash.texture.bind()
-    elif self.theme == 2 and self.starPowerActive and self.oCenterLines:
-      self.oCenterLines.texture.bind()
-    elif self.centerLines != None:
-      self.centerLines.texture.bind()
-
-    if self.staticStrings:    #MFH
-    
-      glBegin(GL_TRIANGLE_STRIP)
-      glColor4f(1, 1, 1, v)
-      glTexCoord2f(0.0, project(-2 * beatsPerUnit))
-      glVertex3f(-w / 2, 0, -2+size)
-      glTexCoord2f(1.0, project(-2 * beatsPerUnit))
-      glVertex3f( w / 2, 0, -2+size)
-      
-      glColor4f(1, 1, 1, v)
-      glTexCoord2f(0.0, project(-1 * beatsPerUnit))
-      glVertex3f(-w / 2, 0, -1+size)
-      glTexCoord2f(1.0, project(-1 * beatsPerUnit))
-      glVertex3f( w / 2, 0, -1+size)
-      
-      glTexCoord2f(0.0, project(l * beatsPerUnit * .7))
-      glVertex3f(-w / 2, 0, l * .7)
-      glTexCoord2f(1.0, project(1 * beatsPerUnit * .7))
-      glVertex3f( w / 2, 0, l * .7)
-      
-      glColor4f(1, 1, 1, 0)
-      glTexCoord2f(0.0, project(l * beatsPerUnit))
-      glVertex3f(-w / 2, 0, l)
-      glTexCoord2f(1.0, project(1 * beatsPerUnit))
-      glVertex3f( w / 2, 0, l)
-
-    else:   #MFH: original moving strings
-
-      glBegin(GL_TRIANGLE_STRIP)
-      glColor4f(1, 1, 1, v)
-      glTexCoord2f(0.0, project(offset - 2 * beatsPerUnit))
-      glVertex3f(-w / 2, 0, -2+size)
-      glTexCoord2f(1.0, project(offset - 2 * beatsPerUnit))
-      glVertex3f( w / 2, 0, -2+size)
-      
-      glColor4f(1, 1, 1, v)
-      glTexCoord2f(0.0, project(offset - 1 * beatsPerUnit))
-      glVertex3f(-w / 2, 0, -1+size)
-      glTexCoord2f(1.0, project(offset - 1 * beatsPerUnit))
-      glVertex3f( w / 2, 0, -1+size)
-      
-      glTexCoord2f(0.0, project(offset + l * beatsPerUnit * .7))
-      glVertex3f(-w / 2, 0, l * .7)
-      glTexCoord2f(1.0, project(offset + l * beatsPerUnit * .7))
-      glVertex3f( w / 2, 0, l * .7)
-      
-      glColor4f(1, 1, 1, 0)
-      glTexCoord2f(0.0, project(offset + l * beatsPerUnit))
-      glVertex3f(-w / 2, 0, l)
-      glTexCoord2f(1.0, project(offset + l * beatsPerUnit))
-      glVertex3f( w / 2, 0, l)
-
-    glEnd()
-
-    glDisable(GL_TEXTURE_2D)
-
-  def drawSideBars(self, visibility, song, pos):
-    if not song:
-      return
-    if not song.readyToGo:
-      return
-
-    def project(beat):
-      return 0.125 * beat / beatsPerUnit  # glorandwarf: was 0.12
-
-    v            = visibility
-    w            = self.boardWidth + 0.15
-    l            = self.boardLength
-
-    beatsPerUnit = self.beatsPerBoard / self.boardLength
-    offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
-
-    c = (1,1,1)
-
-    glEnable(GL_TEXTURE_2D)
-    if self.theme == 2 and self.starPowerActive and self.oSideBars:
-      self.oSideBars.texture.bind()
-    else:
-      self.sideBars.texture.bind()
-    
-    glBegin(GL_TRIANGLE_STRIP)
-    glColor4f(c[0], c[1], c[2], 0)
-    glTexCoord2f(0.0, project(offset - 2 * beatsPerUnit))
-    glVertex3f(-w / 2, 0, -2)
-    glTexCoord2f(1.0, project(offset - 2 * beatsPerUnit))
-    glVertex3f( w / 2, 0, -2)
-    
-    glColor4f(c[0], c[1], c[2], v)
-    glTexCoord2f(0.0, project(offset - 1 * beatsPerUnit))
-    glVertex3f(-w / 2, 0, -1)
-    glTexCoord2f(1.0, project(offset - 1 * beatsPerUnit))
-    glVertex3f( w / 2, 0, -1)
-    
-    glTexCoord2f(0.0, project(offset + l * beatsPerUnit * .7))
-    glVertex3f(-w / 2, 0, l * .7)
-    glTexCoord2f(1.0, project(offset + l * beatsPerUnit * .7))
-    glVertex3f( w / 2, 0, l * .7)
-    
-    glColor4f(c[0], c[1], c[2], 0)
-    glTexCoord2f(0.0, project(offset + l * beatsPerUnit))
-    glVertex3f(-w / 2, 0, l)
-    glTexCoord2f(1.0, project(offset + l * beatsPerUnit))
-    glVertex3f( w / 2, 0, l)
-    glEnd()
-
-    glDisable(GL_TEXTURE_2D)
-
-  def drawBPM(self, visibility, song, pos):
-    if not song:
-      return
-    if not song.readyToGo:
-      return
-
-    v            = visibility
-    w            = self.boardWidth
-
-    beatsPerUnit = self.beatsPerBoard / self.boardLength
-    track = song.track[self.player]
-
-    glEnable(GL_TEXTURE_2D)
-
-    for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard):
-      if not isinstance(event, Bars):
-        continue   
-
-      glPushMatrix()
-
-      z  = ((time - pos) / self.currentPeriod) / beatsPerUnit
-      z2 = ((time + event.length - pos) / self.currentPeriod) / beatsPerUnit
-
-      if z > self.boardLength:
-        f = (self.boardLength - z) / (self.boardLength * .2)
-      elif z < 0:
-        f = min(1, max(0, 1 + z2))
-      else:
-        f = 1.0
-        
-      if event.barType == 0: #half-beat
-        sw  = 0.1 #width
-        self.bpm_halfbeat.texture.bind()
-      elif event.barType == 1: #beat
-        sw  = 0.1 #width
-        self.bpm_beat.texture.bind()
-      elif event.barType == 2: #measure
-        sw  = 0.1 #width
-        self.bpm_measure.texture.bind()
-
-      glColor4f(1, 1, 1, v)
-      glBegin(GL_TRIANGLE_STRIP)
-      glTexCoord2f(0.0, 1.0)
-      glVertex3f(-(w / 2), 0, z + sw)
-      glTexCoord2f(0.0, 0.0)
-      glVertex3f(-(w / 2), 0, z - sw)
-      glTexCoord2f(1.0, 1.0)
-      glVertex3f(w / 2,    0, z + sw)
-      glTexCoord2f(1.0, 0.0)
-      glVertex3f(w / 2,    0, z - sw)
-      glEnd()
-      glPopMatrix()
-
-    glDisable(GL_TEXTURE_2D)
-    
-  def renderTracks(self, visibility):
-    if self.tracksColor[0] == -1:
-      return
-    w = self.boardWidth / self.strings
-    v = 1.0 - visibility
-
-    if self.editorMode:
-      x = (self.strings / 2 - self.selectedString) * w
-      s = 2 * w / self.strings
-      z1 = -0.5 * visibility ** 2
-      z2 = (self.boardLength - 0.5) * visibility ** 2
-      
-      glColor4f(1, 1, 1, .15)
-      
-      glBegin(GL_TRIANGLE_STRIP)
-      glVertex3f(x - s, 0, z1)
-      glVertex3f(x + s, 0, z1)
-      glVertex3f(x - s, 0, z2)
-      glVertex3f(x + s, 0, z2)
-      glEnd()
-
-    sw = 0.025
-    for n in range(self.strings - 1, -1, -1):
-      glBegin(GL_TRIANGLE_STRIP)
-      glColor4f(self.tracksColor[0], self.tracksColor[1], self.tracksColor[2], 0)
-      glVertex3f((n - self.strings / 2) * w - sw, -v, -2)
-      glVertex3f((n - self.strings / 2) * w + sw, -v, -2)
-      glColor4f(self.tracksColor[0], self.tracksColor[1], self.tracksColor[2], (1.0 - v) * .75)
-      glVertex3f((n - self.strings / 2) * w - sw, -v, -1)
-      glVertex3f((n - self.strings / 2) * w + sw, -v, -1)
-      glColor4f(self.tracksColor[0], self.tracksColor[1], self.tracksColor[2], (1.0 - v) * .75)
-      glVertex3f((n - self.strings / 2) * w - sw, -v, self.boardLength * .7)
-      glVertex3f((n - self.strings / 2) * w + sw, -v, self.boardLength * .7)
-      glColor4f(self.tracksColor[0], self.tracksColor[1], self.tracksColor[2], 0)
-      glVertex3f((n - self.strings / 2) * w - sw, -v, self.boardLength)
-      glVertex3f((n - self.strings / 2) * w + sw, -v, self.boardLength)
-      glEnd()
-      v *= 2   
-
-  def renderBars(self, visibility, song, pos):
-    if not song or self.tracksColor[0] == -1:
-      return
-
-    w = self.boardWidth
-    v = 1.0 - visibility
-    sw = 0.02
-
-    beatsPerUnit = self.beatsPerBoard / self.boardLength
-    pos         -= self.lastBpmChange
-    offset       = pos / self.currentPeriod * beatsPerUnit
-    currentBeat  = pos / self.currentPeriod
-    beat         = int(currentBeat)
-
-    glEnable(GL_BLEND)
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-
-    glPushMatrix()  
-    while beat < currentBeat + self.beatsPerBoard:
-      z = (beat - currentBeat) / beatsPerUnit
-
-      if z > self.boardLength * .8:
-        c = (self.boardLength - z) / (self.boardLength * .2)
-      elif z < 0:
-        c = max(0, 1 + z)
-      else:
-        c = 1.0
-        
-      glRotate(v * 90, 0, 0, 1)
-
-      if (beat % 1.0) < 0.001:
-        glColor4f(self.barsColor[0], self.barsColor[1], self.barsColor[2], visibility * c * .75)
-      else:
-        glColor4f(self.barsColor[0], self.barsColor[1], self.barsColor[2], visibility * c * .5)
-
-      glBegin(GL_TRIANGLE_STRIP)
-      glVertex3f(-(w / 2), -v, z + sw)
-      glVertex3f(-(w / 2), -v, z - sw)
-      glVertex3f(w / 2,    -v, z + sw)
-      glVertex3f(w / 2,    -v, z - sw)
-      glEnd()      
-
-      if self.editorMode:
-        beat += 1.0 / 4.0
-      else:
-        beat += 1
-    glPopMatrix()
-
-    Theme.setSelectedColor(visibility * .5)
-    glBegin(GL_TRIANGLE_STRIP)
-    glVertex3f(-w / 2, 0,  sw)
-    glVertex3f(-w / 2, 0, -sw)
-    glVertex3f(w / 2,  0,  sw)
-    glVertex3f(w / 2,  0, -sw)
-    glEnd()
-    
   def renderTail(self, length, color, flat = False, fret = 0, freestyleTail = 0, pos = 0):
 
     #volshebnyi - if freestyleTail == 1, render an freestyle tail
@@ -1534,8 +970,6 @@ class Drum:
         glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot1)
       elif fret == 3:
         glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot4)
-      elif isOpen == True:
-        glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot3)
         
       if self.notetex == True and spNote == False and isOpen==False:
           
@@ -1617,59 +1051,6 @@ class Drum:
 
       glDepthMask(0)
       glPopMatrix()
-
-  def renderIncomingNecks(self, visibility, song, pos):
-    if not song:
-      return
-    if not song.readyToGo:
-      return
-
-    if self.incomingNeckMode > 0:   #if enabled
-      boardWindowMin = pos - self.currentPeriod * 2
-      boardWindowMax = pos + self.currentPeriod * self.beatsPerBoard
-
-
-      #if self.song.hasStarpowerPaths and self.song.midiStyle == Song.MIDI_TYPE_RB:  
-      if self.useMidiSoloMarkers:
-        track = song.midiEventTrack[self.player]
-        for time, event in track.getEvents(boardWindowMin, boardWindowMax):
-          if isinstance(event, Song.MarkerNote):
-            if event.number == Song.starPowerMarkingNote:
-              if self.guitarSoloNeck:
-                if event.endMarker:   #solo end
-                  if self.incomingNeckMode == 2:    #render both start and end incoming necks
-                    if self.guitarSolo:   #only until the end of the guitar solo!
-                      if self.starPowerActive and self.oNeck:
-                        neckImg = self.oNeck
-                      elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
-                        neckImg = self.bassGrooveNeck
-                      else:
-                        neckImg = self.neckDrawing
-                      self.renderIncomingNeck(visibility, song, pos, time, neckImg)
-                else:   #solo start
-                  if not self.guitarSolo:   #only until guitar solo starts!
-                    neckImg = self.guitarSoloNeck
-                    self.renderIncomingNeck(visibility, song, pos, time, neckImg)
-              
-
-      else:   #fall back on text-based guitar solo marking track
-        for time, event in song.eventTracks[Song.TK_GUITAR_SOLOS].getEvents(boardWindowMin, boardWindowMax):
-          if self.canGuitarSolo and self.guitarSoloNeck:
-            if event.text.find("ON") >= 0:
-              if not self.guitarSolo:   #only until guitar solo starts!
-                neckImg = self.guitarSoloNeck
-                self.renderIncomingNeck(visibility, song, pos, time, neckImg)
-            #else: #event.text.find("OFF"):
-            elif self.incomingNeckMode == 2:    #render both start and end incoming necks
-              if self.guitarSolo:   #only until the end of the guitar solo!
-                if self.starPowerActive and self.oNeck:
-                  neckImg = self.oNeck
-                elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
-                  neckImg = self.bassGrooveNeck
-                else:
-                  neckImg = self.neckDrawing
-                self.renderIncomingNeck(visibility, song, pos, time, neckImg)
-              
 
 
   def renderOpenNotes(self, visibility, song, pos):
@@ -2107,13 +1488,13 @@ class Drum:
           #Glow_001 - Only rendered when a note is hit along with the glow.svg
 
           if n == 0: 
-            glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot2)
+            glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot5)
           elif n == 1:
-            glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot3)
+            glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot2)
           elif n == 2:
-            glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot4)
-          elif n == 3:
             glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot1)
+          elif n == 3:
+            glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot4)
         
           if self.keytex == True:
             glColor4f(1,1,1,visibility)
@@ -2990,54 +2371,6 @@ class Drum:
       glEnable(GL_COLOR_MATERIAL)
       if self.leftyMode:
         glScalef(-1, 1, 1)
-
-      if self.ocount <= 1:
-        self.ocount = self.ocount + .1
-      else:
-        self.ocount = 1
-
-      if self.isFailing == True:
-        if self.failcount <= 1 and self.failcount2 == False:
-          self.failcount += .05
-        elif self.failcount >= 1 and self.failcount2 == False:
-          self.failcount = 1
-          self.failcount2 = True
-        
-        if self.failcount >= 0 and self.failcount2 == True:
-          self.failcount -= .05
-        elif self.failcount <= 0 and self.failcount2 == True:
-          self.failcount = 0
-          self.failcount2 = False
-
-      if self.isFailing == False and self.failcount > 0:
-        self.failcount -= .05
-        self.failcount2 = False
-
-      if self.starPowerActive:
-
-        if self.spcount < 1.2:
-          self.spcount += .05
-          self.spcount2 = 1
-        elif self.spcount >=1.2:
-          self.spcount = 1.2
-          self.spcount2 = 0
-      else:
-        if self.spcount > 0:
-          self.spcount -= .05
-          self.spcount2 = 2
-        elif self.spcount <=0:
-          self.spcount = 0
-          self.spcount2 = 0
-
-      self.renderNeck(visibility, song, pos)
-      self.renderIncomingNecks(visibility, song, pos) #MFH
-      if self.theme == 0 or self.theme == 1 or self.theme == 2:
-        self.drawTrack(self.ocount, song, pos)
-        self.drawBPM(visibility, song, pos)
-        self.drawSideBars(visibility, song, pos)
-      else:
-        self.renderTracks(visibility)
-        self.renderBars(visibility, song, pos)
         
       if self.freestyleActive or self.drumFillsActive:
         self.renderOpenNotes(visibility, song, pos)
@@ -3427,3 +2760,4 @@ class Drum:
         return False
 
     return True
+

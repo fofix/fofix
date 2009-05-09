@@ -45,7 +45,11 @@ class Neck:
     self.player         = part.player
     self.part         = part
 
+    self.isDrum = self.part.isDrum
+    self.isBassGuitar = self.part.isBassGuitar
+    self.isVocal = self.part.isVocal
 
+    self.oNeckovr = None    #MFH - needs to be here to prevent crashes!    
 
     self.staticStrings  = self.engine.config.get("performance", "static_strings")
 
@@ -168,43 +172,80 @@ class Neck:
               self.oNeckBass = None
           self.rbnote = 0
       else:
-        try:
-          engine.loadImgDrawing(self, "oSideBars", os.path.join("themes",themename,"overdrive side_bars.png"),  textureSize = (256, 256))
-        except IOError:
-          self.oSideBars = None
-        try:
-          engine.loadImgDrawing(self, "oCenterLines", os.path.join("themes",themename,"overdrive center_lines.png"),  textureSize = (256, 256))
-        except IOError:
-          self.oCenterLines = None
-        try:
-          engine.loadImgDrawing(self, "oNeckBass", os.path.join("themes",themename,"overdriveneck_bass.png"),  textureSize = (256, 256))
-        except IOError:
+        if self.isDrum == True:
           try:
-            engine.loadImgDrawing(self, "oNeckBass", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
+            engine.loadImgDrawing(self, "oSideBars", os.path.join("themes",themename,"drum_overdrive_side_bars.png"),  textureSize = (256, 256))
           except IOError:
-            self.oNeckBass = None
-        try:
-          engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
-        except IOError:
-          self.oNeck = None
+            self.oSideBars = None
+  
+          try:
+            engine.loadImgDrawing(self, "oCenterLines", os.path.join("themes",themename,"drum_overdrive_center_lines.png"))
+          except IOError:
+          #engine.loadImgDrawing(self, "centerLines", os.path.join("themes",themename,"center_lines.png"))
+            self.oCenterLines = None
+
+      
+          #myfingershurt: the overdrive neck file should be in the theme folder... and also not required:
+          try:
+            engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck_drum.png"),  textureSize = (256, 256))
+          except IOError:
+            try:
+              engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
+            except IOError:
+              self.oNeck = None
+
+
+        else:
+          try:
+            engine.loadImgDrawing(self, "oSideBars", os.path.join("themes",themename,"overdrive side_bars.png"),  textureSize = (256, 256))
+          except IOError:
+            self.oSideBars = None
+          try:
+            engine.loadImgDrawing(self, "oCenterLines", os.path.join("themes",themename,"overdrive center_lines.png"),  textureSize = (256, 256))
+          except IOError:
+            self.oCenterLines = None
+          try:
+            engine.loadImgDrawing(self, "oNeckBass", os.path.join("themes",themename,"overdriveneck_bass.png"),  textureSize = (256, 256))
+          except IOError:
+            try:
+              engine.loadImgDrawing(self, "oNeckBass", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
+            except IOError:
+              self.oNeckBass = None
+          try:
+            engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
+          except IOError:
+            self.oNeck = None
           
-      try:
-        engine.loadImgDrawing(self, "oNeckovr", os.path.join("themes",themename,"overdriveneckovr.png"),  textureSize = (256, 256))
-      except IOError:
-        self.oNeckovr = None
+        try:
+          engine.loadImgDrawing(self, "oNeckovr", os.path.join("themes",themename,"overdriveneckovr.png"),  textureSize = (256, 256))
+        except IOError:
+          self.oNeckovr = None
 
       #MFH: support for optional overdrive_string_flash.png
       self.overdriveFlashCounts = self.indexFps/4   #how many cycles to display the oFlash: self.indexFps/2 = 1/2 second
 
-      try:
-        engine.loadImgDrawing(self, "oFlash", os.path.join("themes",themename,"overdrive_string_flash.png"),  textureSize = (256, 256))
-      except IOError:
-        self.oFlash = None
+      if self.isDrum == True:
+        try:
+          engine.loadImgDrawing(self, "oFlash", os.path.join("themes",themename,"drum_overdrive_string_flash.png"),  textureSize = (256, 256))
+        except IOError:
+          self.oFlash = None
+      else:
+        try:
+          engine.loadImgDrawing(self, "oFlash", os.path.join("themes",themename,"overdrive_string_flash.png"),  textureSize = (256, 256))
+        except IOError:
+          self.oFlash = None
 
     self.part.oFlash = self.oFlash
 
+    if self.isDrum == True:
+      try:
+        engine.loadImgDrawing(self, "centerLines", os.path.join("themes",themename,"drumcenterlines.png"))
+      except IOError:
+        #engine.loadImgDrawing(self, "centerLines", os.path.join("themes",themename,"center_lines.png"))
+        self.centerLines = None
+    else:
+      engine.loadImgDrawing(self, "centerLines", os.path.join("themes",themename,"center_lines.png"))
 
-    engine.loadImgDrawing(self, "centerLines", os.path.join("themes",themename,"center_lines.png"))
     engine.loadImgDrawing(self, "sideBars", os.path.join("themes",themename,"side_bars.png"))
     engine.loadImgDrawing(self, "bpm_halfbeat", os.path.join("themes",themename,"bpm_halfbeat.png"))
     engine.loadImgDrawing(self, "bpm_beat", os.path.join("themes",themename,"bpm_beat.png"))
@@ -213,48 +254,66 @@ class Neck:
     if self.theme == 0 or self.theme == 1:
 
       self.oNeckovr = None #fixes GH theme crash
-      #myfingershurt: the starpower neck file should be in the theme folder... and also not required:
-      try:
-        engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"starpowerneck.png"),  textureSize = (256, 256))
-      except IOError:
-        self.oNeck = None
-      try:
-        engine.loadImgDrawing(self, "oNeckBass", os.path.join("themes",themename,"starpowerneck_bass.png"),  textureSize = (256, 256))
-      except IOError:
+
+      if self.isDrum == True:
+        #myfingershurt: the starpower neck file should be in the theme folder... and also not required:
         try:
-          engine.loadImgDrawing(self, "oNeckBass", os.path.join("themes",themename,"starpowerneck.png"),  textureSize = (256, 256))
+          engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"starpowerneck_drum.png"),  textureSize = (256, 256))
         except IOError:
-          self.oNeckBass = None
+          try:
+            engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"starpowerneck.png"),  textureSize = (256, 256))
+          except IOError:
+            self.oNeck = None
+      else:
+        #myfingershurt: the starpower neck file should be in the theme folder... and also not required:
+        try:
+          engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"starpowerneck.png"),  textureSize = (256, 256))
+        except IOError:
+          self.oNeck = None
+        try:
+          engine.loadImgDrawing(self, "oNeckBass", os.path.join("themes",themename,"starpowerneck_bass.png"),  textureSize = (256, 256))
+        except IOError:
+          try:
+            engine.loadImgDrawing(self, "oNeckBass", os.path.join("themes",themename,"starpowerneck.png"),  textureSize = (256, 256))
+          except IOError:
+            self.oNeckBass = None
+
 
     #myfingershurt: Bass Groove neck:
-    if self.bassGrooveNeckMode > 0:
-      if self.bassGrooveNeckMode == 1:  #replace neck
-        try:
-          engine.loadImgDrawing(self, "bassGrooveNeck", os.path.join("themes",themename,"bassgrooveneck.png"),  textureSize = (256, 256))
-        except IOError:
-          self.bassGrooveNeck = None
-      elif self.bassGrooveNeckMode == 2:  #overlay neck
-        try:
-          engine.loadImgDrawing(self, "bassGrooveNeck", os.path.join("themes",themename,"bassgrooveneckovr.png"),  textureSize = (256, 256))
-        except IOError:
-          self.bassGrooveNeck = None
+    if self.isBassGuitar == True:
+      if self.bassGrooveNeckMode > 0:
+        if self.bassGrooveNeckMode == 1:  #replace neck
+          try:
+            engine.loadImgDrawing(self, "bassGrooveNeck", os.path.join("themes",themename,"bassgrooveneck.png"),  textureSize = (256, 256))
+          except IOError:
+            self.bassGrooveNeck = None
+        elif self.bassGrooveNeckMode == 2:  #overlay neck
+          try:
+            engine.loadImgDrawing(self, "bassGrooveNeck", os.path.join("themes",themename,"bassgrooveneckovr.png"),  textureSize = (256, 256))
+          except IOError:
+            self.bassGrooveNeck = None
+      else:
+        self.bassGrooveNeck = None
     else:
       self.bassGrooveNeck = None
 
 
 
     #myfingershurt: Guitar Solo neck:
-    if self.guitarSoloNeckMode > 0:
-      if self.guitarSoloNeckMode == 1:  #replace neck
-        try:
-          engine.loadImgDrawing(self, "guitarSoloNeck", os.path.join("themes",themename,"guitarsoloneck.png"),  textureSize = (256, 256))
-        except IOError:
-          self.guitarSoloNeck = None
-      elif self.guitarSoloNeckMode == 2:  #overlay neck
-        try:
-          engine.loadImgDrawing(self, "guitarSoloNeck", os.path.join("themes",themename,"guitarsoloneckovr.png"),  textureSize = (256, 256))
-        except IOError:
-          self.guitarSoloNeck = None
+    if self.isBassGuitar == False and self.isVocal == False and self.isDrum == False:
+      if self.guitarSoloNeckMode > 0:
+        if self.guitarSoloNeckMode == 1:  #replace neck
+          try:
+            engine.loadImgDrawing(self, "guitarSoloNeck", os.path.join("themes",themename,"guitarsoloneck.png"),  textureSize = (256, 256))
+          except IOError:
+            self.guitarSoloNeck = None
+        elif self.guitarSoloNeckMode == 2:  #overlay neck
+          try:
+            engine.loadImgDrawing(self, "guitarSoloNeck", os.path.join("themes",themename,"guitarsoloneckovr.png"),  textureSize = (256, 256))
+          except IOError:
+            self.guitarSoloNeck = None
+      else:
+        self.guitarSoloNeck = None
     else:
       self.guitarSoloNeck = None
 
@@ -273,9 +332,6 @@ class Neck:
     self.coOpRestart = False
     self.starPowerActive = False
     self.overdriveFlashCount = self.overdriveFlashCounts
-    self.isDrum = False
-    self.isBassGuitar = False
-    self.isVocal = False
 
   def updateGuitarSettings(self):
     self.fretboardHop = self.part.fretboardHop  #stump
@@ -290,9 +346,6 @@ class Neck:
     self.currentBpm     = self.part.currentBpm
     self.currentPeriod  = self.part.currentPeriod
     self.lastBpmChange  = self.part.lastBpmChange
-    self.isDrum = self.part.isDrum
-    self.isBassGuitar = self.part.isBassGuitar
-    self.isVocal = self.part.isVocal
 
   def renderIncomingNeck(self, visibility, song, pos, time, neckTexture):   #MFH - attempt to "scroll" an incoming guitar solo neck towards the player
     if not song:

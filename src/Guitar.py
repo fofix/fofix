@@ -44,12 +44,15 @@ import os
 import Log
 import Song   #need the base song defines as well
 
-#blazingamer: New neck/board rendering class
-import Neck
 
 class Guitar:
   def __init__(self, engine, playerObj, editorMode = False, player = 0):
     self.engine         = engine
+
+
+    self.isDrum = False
+    self.isBassGuitar = False
+    self.isVocal = False
 
     self.starPowerDecreaseDivisor = 200.0/self.engine.audioSpeedFactor
     
@@ -290,7 +293,7 @@ class Guitar:
 
     self.playerObj = playerObj
 
-    self.neckrender = Neck.Neck(self.engine, self, self.playerObj)
+
 
     playerObj = None
     #Get theme
@@ -584,9 +587,6 @@ class Guitar:
     self.coOpRestart = False #akedrou
     self.starPowerActive = False
     self.overdriveFlashCount = self.overdriveFlashCounts
-    self.isDrum = False
-    self.isBassGuitar = False
-    self.isVocal = False
     
   def selectPreviousString(self):
     self.selectedString = (self.selectedString - 1) % self.strings
@@ -2391,8 +2391,6 @@ class Guitar:
         self.bgcount += .1
       if self.scoreMultiplier < 4 and self.bgcount > 0:
         self.bgcount -= .1
-    
-      self.neckrender.render(visibility, song, pos)
 
       if self.freestyleActive:
         self.renderTails(visibility, song, pos, killswitch)
