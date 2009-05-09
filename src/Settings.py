@@ -605,6 +605,7 @@ class ControlCreator(BackgroundLayer, KeyListener):
         KeyConfigChoice(self.engine, self.config, "controller", "key_cancel"),
         KeyConfigChoice(self.engine, self.config, "controller", "key_start"),
         ConfigChoice(   self.engine, self.config, "controller", "mic_tap_sensitivity", autoApply = True),
+        ConfigChoice(   self.engine, self.config, "controller", "mic_passthrough_volume", autoApply = True),
         (_("Rename Controller"), self.renameController),
       ]
     self.menu = Menu.Menu(self.engine, controlKeys, onCancel = self.cancel)

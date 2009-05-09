@@ -23,6 +23,7 @@
 #####################################################################
 
 import Log
+import Audio
 import math
 
 try:
@@ -69,6 +70,9 @@ if supported:
       self.mic_started = False
       self.tapStatus = False
       self.tapThreshold = -self.engine.input.controls.micTapSensitivity[controlnum]
+      self.passthroughQueue = []
+      self.passthroughStream = Audio.MicrophonePassthroughStream(engine, self)
+      self.passthroughStream.setVolume(self.engine.input.controls.micPassthroughVolume[controlnum])
 
     def __del__(self):
       self.stop()
@@ -80,9 +84,11 @@ if supported:
         self.mic.start_stream()
         self.engine.addTask(self, synchronized=False)
         Log.debug('Microphone: started %s' % self.devname)
+        self.passthroughStream.play()
 
     def stop(self):
       if self.mic_started:
+        self.passthroughStream.stop()
         self.engine.removeTask(self)
         self.mic.stop_stream()
         self.mic_started = False
@@ -91,6 +97,8 @@ if supported:
     # Called by the Task machinery: pump the mic and shove the data through the analyzer.
     def run(self, ticks):
       while self.mic.get_read_available() > 1024:
+        chunk = self.mic.read(1024)
+        self.passthroughQueue.append(chunk)
         self.analyzer.input(self.mic.read(1024))
         self.analyzer.process()
         if self.analyzer.getPeak() > self.tapThreshold:

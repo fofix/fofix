@@ -181,6 +181,7 @@ Config.define("controller", "analog_kill",   int, 0,            text = _("Analog
 Config.define("controller", "analog_fx",     int, 0,            text = _("Sound FX Switch"), options = {0: _("Switch"), 1: _("Cycle")}) #akedrou - aren't I bold!
 Config.define("controller", "mic_device",    int, -1,           text = _("Microphone Device"), options = Microphone.getAvailableMics()) #stump
 Config.define("controller", "mic_tap_sensitivity", int, 5,      text = _("Tap Sensitivity"), options=dict((n, n) for n in range(1, 21))) #stump
+Config.define("controller", "mic_passthrough_volume", float, 0.0, text = _("Passthrough Volume"), options=dict((n / 100.0, n) for n in range(101))) #stump
 
 def defineControllerTypes():  #stump: so this can be deferred until we have a working config file
   type_dict = {0: _("Standard Guitar"), 1: _("Solo Shift Guitar"), 2: _("Drum Set (4-Drum)"), 4: _("Analog Slide Guitar")} #, 3: _("Drum Set (3-Drum 2-Cymbal)")
@@ -506,6 +507,7 @@ class Controls:
     self.twoChord   = []
     self.micDevice  = []  #stump
     self.micTapSensitivity = []
+    self.micPassthroughVolume = []
     
     self.flags = 0
     
@@ -528,6 +530,7 @@ class Controls:
         self.analogFX.append(i.get("controller", "analog_fx"))
         self.micDevice.append(i.get("controller", "mic_device"))  #stump
         self.micTapSensitivity.append(i.get("controller", "mic_tap_sensitivity"))
+        self.micPassthroughVolume.append(i.get("controller", "mic_passthrough_volume"))
         self.twoChord.append(i.get("controller", "two_chord_max"))
         self.controlList.append(i.get("controller", "name"))
       else:

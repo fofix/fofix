@@ -24,6 +24,7 @@
 import pygame
 import Log
 import time
+import struct
 from Task import Task
 
 #stump: check for pitch bending support
@@ -218,19 +219,53 @@ class Sound(object):
   def fadeout(self, time):
     self.sound.fadeout(time)
 
-if ogg:
-  import struct
-  if tuple(int(i) for i in pygame.__version__[:5].split('.')) < (1, 9, 0):
-    # Must use Numeric instead of numpy, since PyGame 1.7.1 is
-    # not compatible with the latter, and 1.8.x isn't either (though it claims to be).
-    import Numeric
-    def zeros(size):
-      return Numeric.zeros(size, typecode='s')   #myfingershurt: typecode s = short = int16
-  else:
-    import numpy
-    def zeros(size):
-      return numpy.zeros(size, dtype='h')
+if tuple(int(i) for i in pygame.__version__[:5].split('.')) < (1, 9, 0):
+  # Must use Numeric instead of numpy, since PyGame 1.7.1 is
+  # not compatible with the latter, and 1.8.x isn't either (though it claims to be).
+  import Numeric
+  def zeros(size):
+    return Numeric.zeros(size, typecode='s')   #myfingershurt: typecode s = short = int16
+else:
+  import numpy
+  def zeros(size):
+    return numpy.zeros(size, dtype='h')
 
+#stump: mic passthrough
+class MicrophonePassthroughStream(Sound, Task):
+  def __init__(self, engine, mic):
+    Task.__init__(self)
+    self.engine = engine
+    self.channel = pygame.mixer.find_channel()
+    self.mic = mic
+    self.playing = False
+    self.volume = 1.0
+  def __del__(self):
+    self.stop()
+  def play(self):
+    if not self.playing:
+      self.engine.addTask(self, synchronized=False)
+      self.playing = True
+  def stop(self):
+    if self.playing:
+      self.channel.stop()
+      self.engine.removeTask(self)
+      self.playing = False
+  def setVolume(self, vol):
+    self.volume = vol
+  def run(self, ticks):
+    chunk = ''.join(self.mic.passthroughQueue)
+    self.mic.passthroughQueue = []
+    if chunk == '':
+      return
+    samples = len(chunk)/4
+    data = tuple(int(s * 32767) for s in struct.unpack('%df' % samples, chunk))
+    playbuf = zeros((samples, 2))
+    playbuf[:, 0] = data
+    playbuf[:, 1] = data
+    self.channel.queue(pygame.sndarray.make_sound(playbuf))
+    self.channel.set_volume(self.volume)
+
+if ogg:
   class OggStream(object):
     def __init__(self, inputFileName):
       self.file = ogg.vorbis.VorbisFile(inputFileName)
