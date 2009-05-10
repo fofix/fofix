@@ -235,7 +235,7 @@ class Neck:
         except IOError:
           self.oFlash = None
 
-    self.part.oFlash = self.oFlash
+      self.part.oFlash = self.oFlash
 
     if self.isDrum == True:
       try:
@@ -331,7 +331,7 @@ class Neck:
     self.coOpFailed = False
     self.coOpRestart = False
     self.starPowerActive = False
-    self.overdriveFlashCount = self.overdriveFlashCounts
+    self.overdriveFlashCount = self.part.overdriveFlashCounts
 
   def updateGuitarSettings(self):
     self.fretboardHop = self.part.fretboardHop  #stump
