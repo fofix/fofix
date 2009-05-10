@@ -326,6 +326,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
             self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"drum.png"))
           elif score.instrument == [2]:
             self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"bass.png"))
+          elif score.instrument == [5]:
+            self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"mic.png"))
           else:
             self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"guitar.png"))
         except IOError:
@@ -334,6 +336,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
               self.engine.loadImgDrawing(self, "partLoad", os.path.join("drum.png"))
             elif score.instrument == [2]:
               self.engine.loadImgDrawing(self, "partLoad", os.path.join("bass.png"))
+            elif score.instrument == [5]:
+              self.engine.loadImgDrawing(self, "partLoad", os.path.join("mic.png"))
             else:
               self.engine.loadImgDrawing(self, "partLoad", os.path.join("guitar.png"))
           except IOError:
@@ -349,6 +353,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
             self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"drum.png"))
           elif score.instrument == [2]:
             self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"bass.png"))
+          elif score.instrument == [5]:
+            self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"mic.png"))
           else:
             self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"guitar.png"))
         except IOError:
@@ -357,6 +363,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
               self.engine.loadImgDrawing(self, "partLoad", os.path.join("drum.png"))
             elif score.instrument == [2]:
               self.engine.loadImgDrawing(self, "partLoad", os.path.join("bass.png"))
+            elif score.instrument == [5]:
+              self.engine.loadImgDrawing(self, "partLoad", os.path.join("mic.png"))
             else:
               self.engine.loadImgDrawing(self, "partLoad", os.path.join("guitar.png"))
           except IOError:

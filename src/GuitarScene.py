@@ -5534,9 +5534,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       noScore = False
       for i,guitar in enumerate(self.guitars):
         self.playerList[i].twoChord = guitar.twoChord
-      for i, player in enumerate(self.playerList):
+      for i, player in enumerate(self.fullPlayerList):
         player.pack()
-        if self.playerList[0].practiceMode:
+        
+        if self.fullPlayerList[0].practiceMode:
           self.scoring[i].score = 0
         if self.scoring[i].score > 0:
           noScore = False
@@ -5602,7 +5603,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.engine.view.setViewport(1,0)
         self.session.world.deleteScene(self)
         self.freeResources()
-        self.session.world.createScene("GameResultsScene", libraryName = self.libraryName, songName = self.songName, players = self.playerList, scores = scoreList, coOpType = coOpType, careerMode = self.careerMode)
+        self.session.world.createScene("GameResultsScene", libraryName = self.libraryName, songName = self.songName, players = self.fullPlayerList, scores = scoreList, coOpType = coOpType, careerMode = self.careerMode)
       
       else:
         self.changeSong()
