@@ -3673,7 +3673,7 @@ class MidiPartsDiffReader(midi.MidiOutStream):
       diff = difficulties[track]
       if not diff in self.difficulties[self.currentPart]:
         self.difficulties[self.currentPart].append(diff)
-    except KeyError as e:
+    except KeyError:
       pass
 
 class MidiPartsReader(midi.MidiOutStream):
