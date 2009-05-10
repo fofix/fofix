@@ -68,6 +68,7 @@ if supported:
       self.mic = pa.open(samprate, 1, pyaudio.paFloat32, input=True, input_device_index=devnum, start=False)
       self.analyzer = pypitch.Analyzer(samprate)
       self.mic_started = False
+      self.lastPeak  = 0
       self.tapStatus = False
       self.tapThreshold = -self.engine.input.controls.micTapSensitivity[controlnum]
       self.passthroughQueue = []
@@ -112,8 +113,10 @@ if supported:
           self.passthroughQueue.append(chunk)
         self.analyzer.input(chunk)
         self.analyzer.process()
-        if self.analyzer.getPeak() > self.tapThreshold:
+        pk = self.analyzer.getPeak()
+        if pk > self.tapThreshold and pk > self.lastPeak + 5.0:
           self.tapStatus = True
+        self.lastPeak = pk
 
     # Get the amplitude (in dB) of the peak of the most recent input window.
     def getPeak(self):
@@ -130,7 +133,7 @@ if supported:
     # Returns None if there isn't one or a dictionary of information if there is.
     def getTone(self):
       return self.analyzer.findTone()
-
+    
     # Get the note currently being sung, as an integer number of semitones above A.
     # The frequency is rounded to the nearest semitone, then shifted by octaves until
     # the result is between 0 and 11 (inclusive).  Returns None is no note is being sung.
@@ -145,7 +148,7 @@ if supported:
     # sung.  Return a float in the range [-6.0, 6.0] representing the number of
     # semitones difference there is from the nearest occurrence of the note.  The
     # octave doesn't matter.  Or return None if there's no note being sung.
-    def getAccuracy(self, midiNote):
+    def getDeviation(self, midiNote):
       tone = self.analyzer.findTone()
       if tone is None:
         return tone
