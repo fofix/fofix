@@ -214,6 +214,7 @@ class SongInfo(object):
     self.libraryNam       = songLibrary[songLibrary.find(DEFAULT_LIBRARY):]
     self.info          = Config.MyConfigParser()
     self._difficulties = None
+    self._partDifficulties = {}
     self._parts        = None
     if Config.get("performance", "cache_song_metadata"):
       self.allowCacheUsage = allowCacheUsage  #stump
@@ -488,9 +489,9 @@ class SongInfo(object):
             Log.warn("Weak hack attempt detected. Better luck next time.")
             
     if canCache and self.allowCacheUsage:  #stump: preload this stuff into the cache
+      self.getParts()
       self.getDifficulties()
       self.getSections()
-      self.getParts()
     self.writeCache()
             
   # stump: Write this song's info into the cache.
@@ -606,6 +607,14 @@ class SongInfo(object):
       self._difficulties = difficulties.values()
     return self._difficulties
 
+  def getPartDifficulties(self):
+    if len(self._partDifficulties) is not 0:
+      return self._partDifficulties
+    self.getParts()
+    return self._partDifficulties
+  
+  partDifficulties = property(getPartDifficulties)
+  
   def getParts(self):
     if self._parts is not None:
       return self._parts
@@ -614,20 +623,28 @@ class SongInfo(object):
     try:
       noteFileName = self.noteFileName
       Log.debug("Retrieving parts from: " + noteFileName)
-      info = MidiPartsReader()
+      info = MidiPartsDiffReader()
 
       midiIn = midi.MidiInFile(info, noteFileName)
-      try:
-        midiIn.read()
-      except MidiPartsReader.Done:
-        pass
+      midiIn.read()
       if info.parts == []:
-        part = parts[GUITAR_PART]
-        info.parts.append(part)
+        Log.debug("Improperly named tracks. Attempting to force first track guitar.")
+        info = MidiPartsDiffReader(forceGuitar = True)
+        midiIn = midi.MidiInFile(info, noteFileName)
+        midiIn.read()
+      if info.parts == []:
+        Log.warn("No tracks found!")
+        raise Exception
       info.parts.sort(lambda b, a: cmp(b.id, a.id))
       self._parts = info.parts
+      for part in info.parts:
+        info.difficulties[part].sort(lambda a, b: cmp(a.id, b.id))
+        self._partDifficulties[part] = info.difficulties[part]
     except:
+      Log.warn("Note file not parsed correctly. Selected part and/or difficulty may not be available.")
       self._parts = parts.values()
+      for part in self._parts:
+        self._partDifficulties[part] = difficulties.values()
     return self._parts
 
   def getName(self):
@@ -1345,16 +1362,14 @@ class Note(Event):
     return "<#%d>" % self.number
 
 class VocalNote(Event):
-  def __init__(self, note, length, special = False):
+  def __init__(self, note, length, tap = False):
     Event.__init__(self, length)
     self.note = note
-    if not special:
-      self.pitch = (note + 3) % 12
-    else:
-      self.pitch = None
     self.phrase = 0
     self.accuracy = 0.0
-    self.special = special
+    self.tap = tap
+    self.speak = False
+    self.extra = False #not sure what this is yet - "^"
     self.lyric = None
     self.heldNote = False
 
@@ -1499,6 +1514,8 @@ class VocalTrack(Track):
     self.allNotes = {}
     self.allWords = {}
     self.starTimes = []
+    self.minPitch = 127
+    self.maxPitch = 0
     Track.__init__(self, engine)
     
   def getAllNotes(self):
@@ -1514,11 +1531,9 @@ class VocalTrack(Track):
 class VocalPhrase(VocalTrack, Event):
   def __init__(self, length, star = False):
     Event.__init__(self, length)
-    Track.__init__(self, engine = None)
+    VocalTrack.__init__(self, engine = None)
     self.star = star
     self.tapPhrase = False
-    self.minPitch = 0
-    self.maxPitch = 0
 
 class TempoTrack(Track):    #MFH - special Track type for tempo events
   def __init__(self, engine):
@@ -2959,8 +2974,10 @@ class MidiReader(midi.MidiOutStream):
     assert time >= 0
     
     if isinstance(event, VocalNote):
+      self.song.vocalEventTrack.minPitch = min(event.note, self.song.vocalEventTrack.minPitch)
+      self.song.vocalEventTrack.maxPitch = max(event.note, self.song.vocalEventTrack.maxPitch)
       self.song.vocalEventTrack.allNotes[int(time)] = (time, event)
-    else:
+    elif isinstance(event, VocalPhrase):
       self.song.vocalEventTrack.addEvent(time, event)
   
   def addVocalLyric(self, text):
@@ -3544,7 +3561,120 @@ class SongQueue:
     self.part1 = []
     self.part2 = [] 
 
+class MidiPartsDiffReader(midi.MidiOutStream):
+  
+  def __init__(self, forceGuitar = False):
+    midi.MidiOutStream.__init__(self)
+    self.parts = []
+    self.difficulties = {}
+    self.currentPart = -1
+    self.forceGuitar = forceGuitar
+    self.firstTrack   = False
 
+    self.logClassInits = Config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("MidiPartsDiffReader class init (song.py)...")
+
+    self.logSections = Config.get("game", "log_sections")
+  
+  def start_of_track(self, n_track=0):
+    if self.forceGuitar:
+      if not self.firstTrack:
+        if not parts[GUITAR_PART] in self.parts:
+          part = parts[GUITAR_PART]
+          self.parts.append(part)
+          self.currentPart = part
+          self.difficulties[part] = []
+          if self.logSections == 1:
+            tempText = "No recognized tracks found. Using first track, and identifying it as "
+            tempText2 = "GUITAR_PART"
+            Log.debug(tempText + tempText2)
+        self.firstTrack = True
+      else:
+        Log.notice("This song has multiple tracks, none properly named. Behavior may be erratic.")
+    
+  def sequence_name(self, text):
+
+    if self.logSections == 1:
+      tempText = "MIDI sequence_name found: " + text + ", recognized and added to list as "
+      tempText2 = ""
+
+    if text == "PART GUITAR" or text == "T1 GEMS" or text == "Click":
+      if not parts[GUITAR_PART] in self.parts:
+        part = parts[GUITAR_PART]
+        self.parts.append(part)
+        self.currentPart = part
+        self.difficulties[part] = []
+        if self.logSections == 1:
+          tempText2 = "GUITAR_PART"
+          Log.debug(tempText + tempText2)
+
+    elif text == "PART RHYTHM":
+      if not parts[RHYTHM_PART] in self.parts:
+        part = parts[RHYTHM_PART]
+        self.parts.append(part)
+        self.currentPart = part
+        self.difficulties[part] = []
+        if self.logSections == 1:
+          tempText2 = "RHYTHM_PART"
+          Log.debug(tempText + tempText2)
+     
+    elif text == "PART BASS":
+      if not parts[BASS_PART] in self.parts:
+        part = parts[BASS_PART]
+        self.parts.append(part)
+        self.currentPart = part
+        self.difficulties[part] = []
+        if self.logSections == 1:
+          tempText2 = "BASS_PART"
+          Log.debug(tempText + tempText2)
+
+    elif text == "PART GUITAR COOP":
+      if not parts[LEAD_PART] in self.parts:
+        part = parts[LEAD_PART]
+        self.parts.append(part)
+        self.currentPart = part
+        self.difficulties[part] = []
+        if self.logSections == 1:
+          tempText2 = "LEAD_PART"
+          Log.debug(tempText + tempText2)
+
+    #myfingershurt: drums, rock band rip compatible :)
+    elif text == "PART DRUM" or text == "PART DRUMS":
+      if not parts[DRUM_PART] in self.parts:
+        part = parts[DRUM_PART]
+        self.parts.append(part)
+        self.currentPart = part
+        self.difficulties[part] = []
+        if self.logSections == 1:
+          tempText2 = "DRUM_PART"
+          Log.debug(tempText + tempText2)
+    
+    elif text == "PART VOCALS":
+      if not parts[VOCAL_PART] in self.parts:
+        part = parts[VOCAL_PART]
+        self.parts.append(part)
+        self.currentPart = part
+        self.difficulties[part] = difficulties.values()
+        if self.logSections == 1:
+          tempText2 = "VOCAL_PART"
+          Log.debug(tempText + tempText2)
+    
+    else:
+      self.currentPart = -1
+
+  def note_on(self, channel, note, velocity):
+    if self.currentPart == -1:
+      return
+    try:
+      if len(self.difficulties[self.currentPart]) == len(difficulties):
+        return
+      track, number = noteMap[note]
+      diff = difficulties[track]
+      if not diff in self.difficulties[self.currentPart]:
+        self.difficulties[self.currentPart].append(diff)
+    except KeyError as e:
+      pass
 
 class MidiPartsReader(midi.MidiOutStream):
   # We exit via this exception so that we don't need to read the whole file in

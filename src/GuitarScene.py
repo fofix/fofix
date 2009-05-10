@@ -820,7 +820,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     for vocalist in self.vocalists:
       instrument = Song.VOCAL_PART
       coOpInstruments.append(instrument)
-      self.scoring.append(Scorekeeper.ScoreCard([instrument]))
+      self.scoring.append(Scorekeeper.ScoreCard([instrument], vocal = True))
     if self.coOpType:
       self.coOpScoreCard = Scorekeeper.ScoreCard(coOpInstruments, coOpType = True)
     else:
@@ -1055,7 +1055,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               phraseId = 0
             break
         tuple[1].phrase = phraseId
-        if not tuple[1].special:
+        if not tuple[1].tap:
           try:
             lyric = self.song.vocalEventTrack.allWords[tuple[0]]
           except KeyError:
@@ -1064,11 +1064,21 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             if lyric.find("+") >= 0:
               tuple[1].heldNote = True
             else:
-              tuple[1].lyric = lyric
+              if lyric.find("#") >= 0:
+                tuple[1].speak = True
+                tuple[1].lyric = lyric.strip("#")
+              elif lyric.find("^") >= 0:
+                tuple[1].extra = True
+                tuple[1].lyric = lyric.strip("^")
+              else:
+                tuple[1].lyric = lyric
         else:
           self.song.vocalEventTrack.allEvents[phraseId][1].tapPhrase = True
         self.song.vocalEventTrack.allEvents[phraseId][1].addEvent(tuple[0], tuple[1])
+        self.song.vocalEventTrack.allEvents[phraseId][1].minPitch = min(self.song.vocalEventTrack.allEvents[phraseId][1].minPitch, tuple[1].note)
+        self.song.vocalEventTrack.allEvents[phraseId][1].maxPitch = max(self.song.vocalEventTrack.allEvents[phraseId][1].maxPitch, tuple[1].note)
         phrases = len(self.song.vocalEventTrack.getAllEvents())
+        self.scoring[-1].totalStreakNotes = phrases
 
 
     for theGuitar in self.guitars:    #MFH - force update of early hit window
@@ -4020,7 +4030,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.drumScoringEnabled = False # ...is that what drummers do?
 
       for vocalist in self.vocalists:
-        vocalist.requiredNote = vocalist.getCurrentNote(pos, self.song)
+        vocalist.requiredNote = vocalist.getRequiredNote(pos, self.song)
         vocalist.run(ticks, pos)
       
       for i,guitar in enumerate(self.guitars):  
@@ -4383,10 +4393,33 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             self.newScalingText(p, self.tsYouFailedBattle )
             #self.streakFlag = str(i)   #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1. 
             guitar.actions = [0,0,0]
-      for i in self.vocalPlayers:
+      for i, vocalPlayer in enumerate(self.vocalPlayers):
+        score = self.vocalists[i].getScoreChange()
+        vocalScore = self.scoring[-1]
+        if score:
+          if score == 5:
+            self.rock[vocalPlayer.number] += 1500
+            vocalScore.score += score * vocalScore.baseScore * self.vocalists[i].scoreMultiplier * self.multi[vocalPlayer.number]
+          elif score == 4:
+            self.rock[vocalPlayer.number] += 500
+            vocalScore.score += score * vocalScore.baseScore * self.vocalists[i].scoreMultiplier * self.multi[vocalPlayer.number]
+          elif score == 3:
+            vocalScore.score += score * vocalScore.baseScore * self.vocalists[i].scoreMultiplier * self.multi[vocalPlayer.number]
+          elif score == 2:
+            self.rock[vocalPlayer.number] -= 500
+            vocalScore.score += score * vocalScore.baseScore * self.vocalists[i].scoreMultiplier * self.multi[vocalPlayer.number]
+          elif score == 1:
+            self.rock[vocalPlayer.number] -= 1000
+            vocalScore.score += score * vocalScore.baseScore * self.vocalists[i].scoreMultiplier * self.multi[vocalPlayer.number]
+          elif score == 0:
+            self.rock[vocalPlayer.number] -= 1500
+          if self.rock[vocalPlayer.number] > self.rockMax:
+            self.rock[vocalPlayer.number] = self.rockMax
+          if self.rock[vocalPlayer.number] < 0:
+            self.rock[vocalPlayer.number] = 0
         if self.coOpRB:
           if self.numDeadPlayers == 0:
-            coOpRock += self.rock[i.number]
+            coOpRock += self.rock[vocalPlayer.number]
       if self.coOpRB: #RB co-op meter is just an average until someone dies.
         if self.numDeadPlayers == 0:
           self.rock[self.coOpPlayerMeter] = coOpRock/self.totalPlayers

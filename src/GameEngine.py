@@ -189,7 +189,7 @@ Config.define("game", "guitar_solo_neck",      int, 2,  text = _("Guitar Solo Ne
 Config.define("game", "rock_band_events",      int, 2,  text = _("Rock Band MIDI Events"), options = {0: _("Off"), 1: _("By Theme"), 2: _("On")})
 Config.define("game", "show_unused_text_events",      bool, False,  text = _("Show Unused Events"), options = {False: _("No"), True: _("Yes")})
 Config.define("game", "bass_kick_sound",      bool, False,  text = _("Kick Bass Sound"), options = {False: _("Off"), True: _("On")})
-Config.define("game", "rb_midi_lyrics",           int,  1,   text = _("Show MIDI Lyrics"), options = {0: _("Off"), 1: _("1p Only"), 2: _("Auto")})
+Config.define("game", "rb_midi_lyrics",           int,  1,   text = _("Show Lyrics in All Modes"), options = {0: _("No"), 1: _("Single Player"), 2: _("Always")})
 Config.define("game", "rb_midi_sections",           int,  0,   text = _("Show MIDI Sections"), options = {0: _("Off"), 1: _("1p Only"), 2: _("Auto")})
 Config.define("game", "key_checker_mode",      int, 1,  text = _("Key Conflicts"), options = {0: _("No check"), 1: _("Notify"), 2: _("Enforce")})
 Config.define("performance", "in_game_stats",      int, 0,  text = _("Show In-Game Stats"), options = {0: _("Off"), 1: _("By Theme"), 2: _("On")})
@@ -218,7 +218,6 @@ Config.define("game",   "solo_frame",          int, 1,    text = _("Show Solo Fr
 Config.define("game",   "starpower_mode",          int, 2,    text = _("SP Mode"), options = {0: _("Off"), 1: _("FoF"), 2: _("Auto MIDI")})
 Config.define("game",   "font_rendering_mode",          int, 0,    text = _("Font Mode"), options = {0: _("oGL Hack"), 1: _("Lamina Screen"), 2: _("Lamina Frames")})
 Config.define("game",   "incoming_neck_mode",          int, 2,    text = _("Inc. Neck Mode"), options = {0: _("Off"), 1: _("Start Only"), 2: _("Start & End")})
-Config.define("game", "midi_lyric_mode",           int,  2,   text = _("Lyric Display Mode"), options = {0: _("Scrolling"), 1: _("Simple Lines"), 2: _("2-Line")})
 Config.define("game", "big_rock_endings",           int,  2,   text = _("Big Rock Endings"), options = {0: _("Off"), 1: _("By Theme"), 2: _("On")})
 Config.define("game",  "neck_alpha",  float,    1.0,  text = _("Main Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]))
 Config.define("game",  "solo_neck_alpha",  float,    1.0,  text = _("Solo Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]))
@@ -238,6 +237,7 @@ Config.define("debug",   "show_freestyle_active",          int, 0,    text = _("
 Config.define("debug",   "show_bpm",          int, 0,    text = _("Show BPM"), options = {0: _("Off"), 1: _("On")})
 Config.define("debug",   "use_new_vbpm_beta",          int, 0,    text = _("New BPM Logic"), options = {0: _("Off"), 1: _("On")})
 
+Config.define("debug",   "show_raw_vocal_data", int, 0,  text = _("Show Raw Vocal Data"), options = {0: _("Off"), 1: _("On")})
 
 Config.define("audio",  "speed_factor",  float,    1.0,  text = _("Speed Factor"),   options = {1.0: _("1.00x"), 0.75: _("0.75x"), 0.50: _("0.50x"), 0.25: _("0.25x")})  #MFH
 
@@ -332,9 +332,9 @@ Config.define("game",   "jurg_skill_p3",        int, 0,   text = _("P4 AI Person
 Config.define("game",   "jurg_logic_p3",            int,   1,      text = _("P4 AI Logic"), options = {0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}  )
 
 #akedrou
-Config.define("game",   "vocal_mode",          int, 0,     text = _("Lyric Display Mode"),           options = {0: _("Scrolling"), 1: _("Line-by-line")})
-Config.define("game",   "vocal_scroll",        int, 2,     text = _("Lyric Speed Mode"),             options = {0: _("BPM"), 1: _("Difficulty"), 2: _("BPM & Diff"), 3: _("Percentage")})
-Config.define("game",   "vocal_speed",         int, 100,   text = _("Lyric Speed Percent"),          options = dict([(n, n) for n in range(10, 410, 10)]))
+Config.define("game",   "midi_lyric_mode",     int, 2,     text = _("Lyric Display Mode"),  options = {0: _("Scrolling"), 1: _("Simple Lines"), 2: _("2-Line")})
+Config.define("game",   "vocal_scroll",        int, 2,     text = _("Lyric Speed Mode"),    options = {0: _("BPM"), 1: _("Difficulty"), 2: _("BPM & Diff")})
+Config.define("game",   "vocal_speed",         int, 100,   text = _("Lyric Speed Percent"), options = dict([(n, n) for n in range(10, 410, 10)]))
 
 #MFH
 #Config.define("game",   "jurglogic",            int,   1,      text = _("Jurgen Logic"), options = {0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}  )

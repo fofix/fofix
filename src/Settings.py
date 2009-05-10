@@ -646,6 +646,7 @@ class SettingsMenu(Menu.Menu):
       Log.debug("SettingsMenu class init (Settings.py)...")
     
     self.keyCheckerMode = Config.get("game", "key_checker_mode")
+    self.micEnabled     = Config.get("game", "mic_features_enabled")
     
     self.opt_text_x = Theme.opt_text_xPos
     self.opt_text_y = Theme.opt_text_yPos
@@ -708,13 +709,24 @@ class SettingsMenu(Menu.Menu):
     ]
     self.hopoSettingsMenu = Menu.Menu(self.engine, self.hopoSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
     
-    self.lyricsSettings = [
-       ConfigChoice(self.engine, self.engine.config, "game", "rb_midi_lyrics", autoApply = True, isQuickset = 1),      #myfingershurt
-       ConfigChoice(self.engine, self.engine.config, "game", "midi_lyric_mode", autoApply = True, isQuickset = 1),      #myfingershurt
-       ConfigChoice(self.engine, self.engine.config, "game", "rb_midi_sections", autoApply = True, isQuickset = 1),      #myfingershurt
-       ConfigChoice(self.engine, self.engine.config, "game", "lyric_mode", autoApply = True, isQuickset = 1),      #myfingershurt
-       ConfigChoice(self.engine, self.engine.config, "game", "script_lyric_pos", autoApply = True),      #myfingershurt
-    ]
+    if self.micEnabled:
+      self.lyricsSettings = [
+         ConfigChoice(self.engine, self.engine.config, "game", "midi_lyric_mode", autoApply = True, isQuickset = 1),      #myfingershurt
+         ConfigChoice(self.engine, self.engine.config, "game", "vocal_scroll", autoApply = True, isQuickset = 1),      #akedrou
+         ConfigChoice(self.engine, self.engine.config, "game", "vocal_speed", autoApply = True, isQuickset = 1),      #akedrou
+         ConfigChoice(self.engine, self.engine.config, "game", "rb_midi_lyrics", autoApply = True, isQuickset = 1),      #myfingershurt
+         ConfigChoice(self.engine, self.engine.config, "game", "rb_midi_sections", autoApply = True, isQuickset = 1),      #myfingershurt
+         ConfigChoice(self.engine, self.engine.config, "game", "lyric_mode", autoApply = True, isQuickset = 1),      #myfingershurt
+         ConfigChoice(self.engine, self.engine.config, "game", "script_lyric_pos", autoApply = True),      #myfingershurt
+      ]
+    else:
+      self.lyricsSettings = [
+         ConfigChoice(self.engine, self.engine.config, "game", "rb_midi_lyrics", autoApply = True, isQuickset = 1),      #myfingershurt
+         ConfigChoice(self.engine, self.engine.config, "game", "midi_lyric_mode", autoApply = True, isQuickset = 1),      #myfingershurt
+         ConfigChoice(self.engine, self.engine.config, "game", "rb_midi_sections", autoApply = True, isQuickset = 1),      #myfingershurt
+         ConfigChoice(self.engine, self.engine.config, "game", "lyric_mode", autoApply = True, isQuickset = 1),      #myfingershurt
+         ConfigChoice(self.engine, self.engine.config, "game", "script_lyric_pos", autoApply = True),      #myfingershurt
+      ]
     self.lyricsSettingsMenu = Menu.Menu(self.engine, self.lyricsSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
     
     jurgenSettings = self.refreshJurgenSettings(init = True)
@@ -766,6 +778,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(self.engine, self.engine.config, "game",  "uploadscores", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "audio",  "delay", autoApply = True),     #myfingershurt: so a/v delay can be set without restarting FoF
       (_("Advanced Gameplay Settings"), self.advancedGameSettingsMenu),
+      (_("Vocal Mode Settings"), self.lyricsSettingsMenu),
       (_("HO/PO Settings"), self.hopoSettingsMenu),
       (_("Battle Settings"), self.battleSettingsMenu),
     ]
@@ -872,7 +885,6 @@ class SettingsMenu(Menu.Menu):
       (_("Stages Options"), self.stagesOptionsMenu),
       (_("Choose Default Neck >"), lambda: Dialogs.chooseNeck(self.engine)),
       (_("Fretboard Settings"), self.fretSettingsMenu),
-      (_("Lyrics Settings"), self.lyricsSettingsMenu),
       (_("In-Game Display Settings"), self.inGameDisplayMenu),
       (_("Advanced Video Settings"), self.advancedVideoSettingsMenu),
     ]
@@ -937,6 +949,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "game", "show_unused_text_events", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "debug",   "use_unedited_midis", autoApply = True),#myfingershurt
       #ConfigChoice(engine.config, "game", "font_rendering_mode", autoApply = True),#myfingershurt
+      ConfigChoice(engine, engine.config, "debug", "show_raw_vocal_data", autoApply = True), #akedrou
       ConfigChoice(engine, engine.config, "debug",   "show_freestyle_active", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "debug",   "show_bpm", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "debug",   "use_new_vbpm_beta", autoApply = True),#myfingershurt

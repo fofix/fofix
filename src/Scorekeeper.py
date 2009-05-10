@@ -46,7 +46,7 @@ SCORE_MULTIPLIER = [0, 10, 20, 30]
 BASS_GROOVE_SCORE_MULTIPLIER = [0, 10, 20, 30, 40, 50]
 
 class ScoreCard(object):
-  def __init__(self, instrument, coOpType = False):
+  def __init__(self, instrument, coOpType = False, vocal = False):
     self.coOpType = coOpType
     logClassInits = Config.get("game", "log_class_inits")
     if logClassInits == 1:
@@ -56,11 +56,15 @@ class ScoreCard(object):
     self.avMult = 0.0
     self.hitAccuracy = 0.0
     self.score  = 0
-    self.baseScore = 50
+    if vocal:
+      self.baseScore = 200
+    else:
+      self.baseScore = 50
     self.notesHit = 0
     self.notesMissed = 0
     self.instrument = instrument # 0 = Guitar, 2 = Bass, 4 = Drum
     self.bassGrooveEnabled = False
+    self.vocal = vocal
     self.hiStreak = 0
     self._streak  = 0
     self.cheats = []
