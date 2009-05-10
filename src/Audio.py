@@ -235,7 +235,7 @@ class MicrophonePassthroughStream(Sound, Task):
   def __init__(self, engine, mic):
     Task.__init__(self)
     self.engine = engine
-    self.channel = pygame.mixer.find_channel()
+    self.channel = None
     self.mic = mic
     self.playing = False
     self.volume = 1.0
@@ -262,7 +262,11 @@ class MicrophonePassthroughStream(Sound, Task):
     playbuf = zeros((samples, 2))
     playbuf[:, 0] = data
     playbuf[:, 1] = data
-    self.channel.queue(pygame.sndarray.make_sound(playbuf))
+    snd = pygame.sndarray.make_sound(playbuf)
+    if self.channel is None or not self.channel.get_busy():
+      self.channel = snd.play()
+    else:
+      self.channel.queue(snd)
     self.channel.set_volume(self.volume)
 
 if ogg:

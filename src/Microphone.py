@@ -108,7 +108,14 @@ if supported:
     # Called by the Task machinery: pump the mic and shove the data through the analyzer.
     def run(self, ticks):
       while self.mic.get_read_available() > 1024:
-        chunk = self.mic.read(1024)
+        try:
+          chunk = self.mic.read(1024)
+        except IOError, e:
+          if e.args[1] == pyaudio.paInputOverflowed:
+            Log.notice('Microphone: ignoring input buffer overflow')
+            chunk = '\x00' * 4096
+          else:
+            raise
         if self.passthroughStream is not None:
           self.passthroughQueue.append(chunk)
         self.analyzer.input(chunk)
