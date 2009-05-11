@@ -32,12 +32,18 @@ import pygame
 import Version, Data, Resource
 import Config
 import GameEngine
+from ctypes import *
 
 #OGL constants for compatibility with all PyOpenGL versions
 #now multitexturing should work even in PyOpenGL 2.x, if your card supports ARB ext
 GL_TEXTURE_3D = 32879
 GL_TEXTURE_WRAP_R = 32882
 GL_TEXTURE0_ARB, GL_TEXTURE1_ARB, GL_TEXTURE2_ARB, GL_TEXTURE3_ARB = 33984, 33985, 33986, 33987
+GL_FRAGMENT_SHADER_ARB = 0x8B30
+GL_VERTEX_SHADER_ARB = 0x8B31
+GL_OBJECT_COMPILE_STATUS_ARB= 0x8B81
+GL_OBJECT_LINK_STATUS_ARB = 0x8B82
+GL_INFO_LOG_LENGTH_ARB = 0x8B84
 
 # evilynux - Do not crash If OpenGL 2.0 is not supported
 try:
@@ -67,19 +73,17 @@ class shaderList:
     if name == "": name = fname
     fullname = os.path.join(self.workdir, fname)
     Log.debug("Compiling " + fname + " shader.")
-    try:
-      program = self.compile(open(fullname+".vs"), open(fullname+".ps"))
+    program = None
+    program = self.compile(open(fullname+".vs"), open(fullname+".ps"))
+    if program:
       sArray = {"program": program, "name": name, "tex" : (), "textype" : (), "enabled" : True}
       self.lastCompiled = name
       self.getVars(fullname+".vs", program, sArray)
       self.getVars(fullname+".ps", program, sArray)
       self.shaders[name] = sArray
-    except:
-      Log.error("Error occured during compilation.")
-      return False
-    else:
-
       return True
+    else:
+      return False
 
           
   def compileShader(self, source, shaderType):
@@ -87,6 +91,11 @@ class shaderList:
     shader = glCreateShaderObjectARB(shaderType)
     glShaderSourceARB( shader, source )
     glCompileShaderARB( shader )
+    status = glGetObjectParameterivARB(shader, GL_OBJECT_COMPILE_STATUS_ARB)
+    if (not status):
+        Log.warn(self.log(shader))
+        #print self.log(shader)
+        return None
     return shader
     
   def getVars(self,fname, program, sArray):
@@ -121,16 +130,20 @@ class shaderList:
   
     if vertexSource:
       vertexShader = self.compileShader(vertexSource, GL_VERTEX_SHADER_ARB)
-      glAttachObjectARB(program, vertexShader)
+      
     if fragmentSource:
       fragmentShader = self.compileShader(fragmentSource, GL_FRAGMENT_SHADER_ARB)
+
+    if vertexShader and fragmentShader:
+      glAttachObjectARB(program, vertexShader)  
       glAttachObjectARB(program, fragmentShader)
-    
-    glValidateProgramARB( program )
-    glLinkProgramARB(program)
-    if vertexShader: glDeleteObjectARB(vertexShader)
-    if fragmentShader: glDeleteObjectARB(fragmentShader)
-    return program
+      glValidateProgramARB( program )
+      glLinkProgramARB(program)
+      glDeleteObjectARB(vertexShader)
+      glDeleteObjectARB(fragmentShader)
+      return program
+      
+    return None
     
   def getVar(self, var = "program", program = None):
     if program == None: program = self.active
@@ -217,13 +230,11 @@ class shaderList:
     else:
       return 0  
     
-  def log(self):
-    infologLength = 0
-    charsWritten = 0
-    obj = self[self.lastCompiled]["program"]
-    glGetObjectParameterivARB(obj, GL_OBJECT_INFO_LOG_LENGTH_ARB, infologLength)
-    glGetInfoLogARB(obj, infologLength, charsWritten, infoLog)
-    return infoLog
+  def log(self, shader):
+    length = glGetObjectParameterivARB(shader, GL_INFO_LOG_LENGTH)
+    if length > 0:
+        log = glGetInfoLogARB(shader)
+        return log
     
   def setTextures(self, program = None):
     if program == None: program = self.active
@@ -414,14 +425,13 @@ class shaderList:
     for name in self.shaders.keys():
       for key in self[name].keys():
         value = Config.get("theme",name+"_"+key)
-        #print "shader_"+name+"_"+key, value
         if value != "None":
           if value == "True": value = True
           elif value == "False": value = False
           else:
             value = value.split(",")
             for i in range(len(value)):
-              print "shader_"+name+"_"+key, value
+              #print "shader_"+name+"_"+key, value
               value[i] = float(value[i])
             if len(value) == 1: value = value[0]
             else: value = tuple(value)
