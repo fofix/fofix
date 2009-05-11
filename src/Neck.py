@@ -471,9 +471,9 @@ class Neck:
       
     
     if self.starPowerActive and self.theme == 0:#8bit
-      color = self.spColor #(.3,.7,.9)
+      color = Theme.fretColors[5] #self.spColor #(.3,.7,.9)
     elif self.starPowerActive and self.theme == 1:
-      color = self.spColor #(.3,.7,.9)
+      color = Theme.fretColors[5] #self.spColor #(.3,.7,.9)
     else:
       color = (1,1,1)
 
