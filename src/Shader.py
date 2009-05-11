@@ -73,8 +73,10 @@ class shaderList:
     if name == "": name = fname
     fullname = os.path.join(self.workdir, fname)
     Log.debug("Compiling " + fname + " shader.")
-    program = None
-    program = self.compile(open(fullname+".vs"), open(fullname+".ps"))
+    try:
+      program = self.compile(open(fullname+".vs"), open(fullname+".ps"))
+    except:
+      program = None
     if program:
       sArray = {"program": program, "name": name, "tex" : (), "textype" : (), "enabled" : True}
       self.lastCompiled = name
