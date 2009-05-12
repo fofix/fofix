@@ -112,6 +112,7 @@ I was tired and sick and couldn't sleep...
 ||  tail2.png                   || WIP                            || No           || WIP                      || ||
 ||  youfailed.png               || Indication that you failed a song              || Yes          || All                      || Appears for a few seconds before the failure menu is displayed||
 ||  yourock.png                 || Indication that you finished a song successfuly|| Yes          || All                      || Appears for a few seconds after you finish a song, before the game results appear||
+
 ====Battle Mode====
 ||  notesbattle.png             || Same as notes.png for battle mode              || Untested     || GH Based (Battle Mode)   || Split into 5 columns (one for each coloured note). In GH themes it is split into 5 rows (normal notes, hopo notes, battle notes, hopo battle notes, and the last row is ignored _(Needs verification)_ ||
 ||  spinnotesbattle.png         || Same as spinnotes.png for battle mode          || Untested     || GH Based (Battle Mode)   || WIP ||
