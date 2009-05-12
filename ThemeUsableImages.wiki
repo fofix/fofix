@@ -222,6 +222,22 @@ Similarly, if the song has the entry "icon=gobbldygook" in its song.ini, then on
 
 -----------------------------------------------------------------------------
 
+==\vocals\ Directory==
+||  _Filename_                  ||  _What is file for in FoFiX?_                 ||  _Required?_  ||  _Related to Theme Type_ ||  _Notes_||
+||  arrow.png                   ||  Moves to show current pitch detected by mic  ||  Untested     ||  All (Vocals)            || ||
+||  beatline.png                ||  Scrolls across at end of each vocal phrase   ||  Untested     ||  All (Vocals)            || ||
+||  fill.png                    ||  Indicates sp/overdrive for vocal parts       ||  Untested     ||  All (Vocals)            || ||
+||  glow.png                    ||  fades in an out when sp/overdrive is ready   ||  Untested     ||  All (Vocals)            || ||
+||  lyricsheet.png              ||  Alternate lyric sheet for vocal parts        ||  Untested     ||  All (Vocals)            || ||
+||  lyricsheetglow.png          ||  Overlay on lyricsheet when sp/od active      ||  Untested     ||  All (Vocals)            || ||
+||  meter.png                   ||  Bottom layer of vocal sp/overdrive meter     ||  Untested     ||  All (Vocals)            || ||
+||  mult.png                    ||  Displays current vocal multiplier            ||  Untested     ||  All (Vocals)            || Split into 8 rows (for 1x,2x,3x,4x and sp:2x,4x,6x,8x) ||
+||  tap.png                     ||  Replaces arrow when tap notes are incoming   ||  Untested     ||  All (Vocals)            || ||
+||  tap_note.png                ||  Visual representation of tap notes           ||  Untested     ||  All (Vocals)            || ||
+||  text.png                    ||  Indicates how well a vocal phrase was sung   ||  Untested     ||  All (Vocals)            || Split into 6 rows, with the top row representing a perfectly sung phrase, down to the bottom representing a completely wrong phrase ||
+
+-----------------------------------------------------------------------------
+
 ==\stages\ Directory==
 _*Note:* The stages folder is not required, however if it is present, there must be a "default.png" and a "practice.png" or FoFiX will crash_
 ||  _Filename_                  ||  _What is file for in FoFiX?_  ||  _Required?_                   ||  _Related to Theme Type_ ||  _Notes_||
