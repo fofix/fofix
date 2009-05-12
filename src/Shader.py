@@ -29,10 +29,8 @@ import random
 import time
 import Log
 import pygame
-import Version, Data, Resource
+import Version
 import Config
-import GameEngine
-from ctypes import *
 
 #OGL constants for compatibility with all PyOpenGL versions
 #now multitexturing should work even in PyOpenGL 2.x, if your card supports ARB ext
@@ -77,6 +75,7 @@ class shaderList:
       program = self.compile(open(fullname+".vs"), open(fullname+".ps"))
     except:
       program = None
+      print "!!!"
     if program:
       sArray = {"program": program, "name": name, "tex" : (), "textype" : (), "enabled" : True}
       self.lastCompiled = name
