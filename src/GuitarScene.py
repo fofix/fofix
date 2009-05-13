@@ -231,6 +231,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.splayers -= 1
         self.playerList.remove(player)
     self.totalPlayers = self.vplayers + self.splayers
+    self.neckrender = []
     
     for i, player in enumerate(self.vocalPlayers):
       self.vocalists.append(Vocalist(self.engine, player, False, i))
@@ -247,7 +248,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         elif player.part.id == Song.BASS_PART:
           self.guitars[i].isBassGuitar = True
 
-      self.neckrender = Neck.Neck(self.engine, self.guitars[i], player)
+
+      self.neckrender.append(Neck.Neck(self.engine, self.guitars[i], self.playerList[i]))
 
       if player.practiceMode:
         self.practiceMode = True
@@ -4658,7 +4660,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.guitars[i].fretboardHop -= 0.005
           if self.guitars[i].fretboardHop < 0.0:
             self.guitars[i].fretboardHop = 0.0
-        self.neckrender.render(self.visibility, self.song, self.getSongPosition())
+        self.neckrender[i].render(self.visibility, self.song, self.getSongPosition())
         self.guitars[i].render(self.visibility, self.song, self.getSongPosition(), self.controls, self.killswitchEngaged[i])  #QQstarS: new
         glPopMatrix()
 
