@@ -25,13 +25,14 @@
 import Log
 import Audio
 import math
+from PitchAnalyzer import Analyzer
+import numpy
 
 try:
-  import pypitch
   import pyaudio
   supported = True
 except ImportError:
-  Log.warn('Missing either pypitch or pyaudio - microphone support will not be possible')
+  Log.warn('Missing pyaudio - microphone support will not be possible')
   supported = False
 
 from Task import Task
@@ -66,7 +67,7 @@ if supported:
       else:
         self.devname = pa.get_device_info_by_index(devnum)['name']
       self.mic = pa.open(samprate, 1, pyaudio.paFloat32, input=True, input_device_index=devnum, start=False)
-      self.analyzer = pypitch.Analyzer(samprate)
+      self.analyzer = Analyzer(samprate)
       self.mic_started = False
       self.lastPeak  = 0
       self.tapStatus = False
@@ -118,7 +119,7 @@ if supported:
             raise
         if self.passthroughStream is not None:
           self.passthroughQueue.append(chunk)
-        self.analyzer.input(chunk)
+        self.analyzer.input(numpy.frombuffer(chunk, dtype=numpy.float32))
         self.analyzer.process()
         pk = self.analyzer.getPeak()
         if pk > self.tapThreshold and pk > self.lastPeak + 5.0:
@@ -137,7 +138,7 @@ if supported:
       return retval
 
     # Get the note currently being sung.
-    # Returns None if there isn't one or a dictionary of information if there is.
+    # Returns None if there isn't one or a PitchAnalyzer.Tone object if there is.
     def getTone(self):
       return self.analyzer.findTone()
     
@@ -149,7 +150,7 @@ if supported:
       if tone is None:
         return tone
       #print tone
-      return int(round((math.log(tone['freq']) - LN_440) * 12.0 / LN_2) % 12)
+      return int(round((math.log(tone.freq) - LN_440) * 12.0 / LN_2) % 12)
 
     # Work out how accurately the note (passed in as a MIDI note number) is being
     # sung.  Return a float in the range [-6.0, 6.0] representing the number of
@@ -161,7 +162,7 @@ if supported:
         return tone
 
       # Convert to semitones from A-440.
-      semitonesFromA440 = (math.log(tone['freq']) - LN_440) * 12.0 / LN_2
+      semitonesFromA440 = (math.log(tone.freq) - LN_440) * 12.0 / LN_2
       # midiNote % 12 = semitones above C, which is 3 semitones above A
       semitoneDifference = (semitonesFromA440 - 3.0) - float(midiNote % 12)
       # Adjust to the proper range.
