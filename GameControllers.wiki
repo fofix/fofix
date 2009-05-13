@@ -23,7 +23,7 @@ Rock Band Wii instruments should work right out of the box - just plug it in.
 However Guitar Hero 3/World Tour instruments communicate via the Wiimote and require a compatible bluetooth receiver on your computer
 (see a list of compatible bluetooth devices [http://www.wiili.org/index.php/Compatible_Bluetooth_Devices here]) and [http://carl.kenner.googlepages.com/glovepie_download GlovePIE].
  * Download [http://flightpad.net/files/GlovePIE030.zip GlovePIE 3.0] and install to your computer.
- * Download [http://www.mediafire.com/?zdlzjt5nyzn death_au's FoFiX script v0.7] to GlovePIE's Wiimote Scripts Directory
+ * Download [http://www.mediafire.com/?mcgye3ky5mg death_au's FoFiX script v0.8] to GlovePIE's Wiimote Scripts Directory
  * Connect your Wiimote to the computer via your bluetooth progam. Specific instructions for your bluetooth stack can be found on the [http://www.google.com/ Internet], and there is a video tutorial on how to connect using the default Windows Vista / Windows XP SP2 Bluetooth stack [http://www.youtube.com/watch?v=4_pQSGYzfKU here]
  * Connect your Wiimote to the instrument controller as normal
  * Open up the FoFiX script in GlovePIE and click "Run"
