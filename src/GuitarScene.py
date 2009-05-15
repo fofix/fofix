@@ -589,21 +589,26 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.fontScreenBottom = self.engine.data.fontScreenBottom
     self.oBarScaleCoef = (0.6 + 0.4 * self.numberOfGuitars) * 1.256 * self.hFull / self.wFull #volshebnyi - depends on resolution and number of players 
     
-    for i in range(self.numberOfGuitars):
-      self.engine.view.setViewportHalf(self.numberOfGuitars,i)
-      w, h = self.engine.view.geometry[2:4]
+    for i, player in enumerate(self.playerList):
+      if not self.instruments[i].isVocal:
+        self.engine.view.setViewportHalf(self.numberOfGuitars,player.guitarNum)
+        w, h = self.engine.view.geometry[2:4]
+      else:
+        w = self.wFull
+        h = self.hFull
       self.wPlayer.append( w )
       self.hPlayer.append( h )
       self.hOffset.append( h )
       self.hFontOffset.append( h )
-      self.wPlayer[i] = self.wPlayer[i]*self.numberOfGuitars #QQstarS: set the width to right one
-      if self.numberOfGuitars>1:
-        self.hPlayer[i] = self.hPlayer[i]*self.numberOfGuitars/1.5 #QQstarS: Set the hight to right one
-        self.hOffset[i] = self.hPlayer[i]*.4*(self.numberOfGuitars-1)
-      else:
-        self.hPlayer[i] = self.hPlayer[i]*self.numberOfGuitars #QQstarS: Set the hight to right one
-        self.hOffset[i] = 0
-      self.hFontOffset[i] = -self.hOffset[i]/self.hPlayer[i]*0.752 #QQstarS: font Hight Offset when there are 2 players
+      if not self.instruments[i].isVocal:
+        self.wPlayer[i] = self.wPlayer[i]*self.numberOfGuitars #QQstarS: set the width to right one
+        if self.numberOfGuitars>1:
+          self.hPlayer[i] = self.hPlayer[i]*self.numberOfGuitars/1.5 #QQstarS: Set the hight to right one
+          self.hOffset[i] = self.hPlayer[i]*.4*(self.numberOfGuitars-1)
+        else:
+          self.hPlayer[i] = self.hPlayer[i]*self.numberOfGuitars #QQstarS: Set the hight to right one
+          self.hOffset[i] = 0
+        self.hFontOffset[i] = -self.hOffset[i]/self.hPlayer[i]*0.752 #QQstarS: font Hight Offset when there are 2 players
 
     self.engine.view.setViewport(1,0)
 
@@ -6477,11 +6482,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
           elif self.rmtype == 1 and i is not None:
             if not self.rockOff == None:
-              w = self.wPlayer[i]
-              h = self.hPlayer[i]
+              w = self.wFull
+              h = self.hFull
+              if not self.instruments[i].isVocal:
+                w = self.wPlayer[i]
+                h = self.hPlayer[i]
               wBak = w
               hBak = h
-              if not self.battleGH:
+              if not self.battleGH and not self.instruments[i].isVocal:
                 if self.instruments[i].starPowerActive and not self.coOpRB: #QQstarS:Set [0] to [i]
                   
                   #myfingershurt: so that any GH theme can use dotshalf.png:
@@ -6711,268 +6719,268 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
     
 
-              if self.coOpGH and self.numOfPlayers > 1:
-                if self.x1[self.coOpPhrase] == 0:
-                  self.x1[self.coOpPhrase] = .5
-                  self.y1[self.coOpPhrase] = .365
-                  self.x2[self.coOpPhrase] = .5
-                  self.y2[self.coOpPhrase] = .365
-                  self.x3[self.coOpPhrase] = .5
-                  self.y3[self.coOpPhrase] = .365
-              elif self.coOp:
-                if self.x1[i] == 0:
-                  self.x1[i] = .134
-                  self.y1[i] = .22
-                  self.x2[i] = .124
-                  self.y2[i] = .23
-                  self.x3[i] = .114
-                  self.y3[i] = .24
-              else:
-                if self.x1[i] == 0: #QQstarS:Set [0] to [i]
-                  self.x1[i] = .86
-                  self.y1[i] = .2
-                  self.x2[i] = .86
-                  self.y2[i] = .2
-                  self.x3[i] = .86
-                  self.y3[i] = .2
+              if not self.instruments[i].isVocal:
+                if self.coOpGH and self.numOfPlayers > 1:
+                  if self.x1[self.coOpPhrase] == 0:
+                    self.x1[self.coOpPhrase] = .5
+                    self.y1[self.coOpPhrase] = .365
+                    self.x2[self.coOpPhrase] = .5
+                    self.y2[self.coOpPhrase] = .365
+                    self.x3[self.coOpPhrase] = .5
+                    self.y3[self.coOpPhrase] = .365
+                elif self.coOp:
+                  if self.x1[i] == 0:
+                    self.x1[i] = .134
+                    self.y1[i] = .22
+                    self.x2[i] = .124
+                    self.y2[i] = .23
+                    self.x3[i] = .114
+                    self.y3[i] = .24
+                else:
+                  if self.x1[i] == 0: #QQstarS:Set [0] to [i]
+                    self.x1[i] = .86
+                    self.y1[i] = .2
+                    self.x2[i] = .86
+                    self.y2[i] = .2
+                    self.x3[i] = .86
+                    self.y3[i] = .2
   
   
-              if self.coOpGH and i == self.coOpPlayerMeter:
-                if self.starfx: #blazingamer, corrected by myfingershurt, adjusted by worldrave
-                  starPowerAmount = (self.coOpStarPower/self.numOfPlayers)
-                  if starPowerAmount >= 50 or self.instruments[i].starPowerActive:
-                    if self.x1[self.coOpPhrase] < 0.522:   
-                      self.x1[self.coOpPhrase] += 0.01
-                      if self.x1[self.coOpPhrase] > 0.522:   
-                        self.x1[self.coOpPhrase] = 0.522     #Worldrave Notes - Controls 4th Bulbs X axis. Was .526
-                    if self.y1[self.coOpPhrase] < 0.464: 
-                      self.y1[self.coOpPhrase] += 0.01
-                      if self.y1[self.coOpPhrase] > 0.464:
-                        self.y1[self.coOpPhrase] = 0.464     #Worldrave Notes - Controls 4th Bulbs Y axis. Was .471
-                    if self.x2[self.coOpPhrase] < 0.563:
-                      self.x2[self.coOpPhrase] += 0.01
-                      if self.x2[self.coOpPhrase] > 0.563:
-                        self.x2[self.coOpPhrase] = 0.563     #Worldrave Notes - Controls 5th Bulbs X axis. Was .562
-                    if self.y2[self.coOpPhrase] < 0.445:
-                      self.y2[self.coOpPhrase] += 0.01
-                      if self.y2[self.coOpPhrase] > 0.445:
-                        self.y2[self.coOpPhrase] = 0.445     #Worldrave Notes - Controls 5th Bulbs Y axis. Was .449
-                    if self.x3[self.coOpPhrase] < 0.597:
-                      self.x3[self.coOpPhrase] += 0.01
-                      if self.x3[self.coOpPhrase] > 0.597:
-                        self.x3[self.coOpPhrase] = 0.597     #Worldrave Notes - Controls 6th Bulbs X axis. Was .597
-                    if self.y3[self.coOpPhrase] < 0.403:
-                      self.y3[self.coOpPhrase] += 0.01
-                      if self.y3[self.coOpPhrase] > 0.403:
-                        self.y3[self.coOpPhrase] = 0.403     #Worldrave Notes - Controls 6th Bulbs Y axis. Was .403
-                  else:
-                    if self.x1[self.coOpPhrase] > 0.5:
-                      self.x1[self.coOpPhrase] -= 0.01
-                    if self.y1[self.coOpPhrase] > 0.365:
-                      self.y1[self.coOpPhrase] -= 0.01
-                    if self.x2[self.coOpPhrase] > 0.5:
-                      self.x2[self.coOpPhrase] -= 0.01
-                    if self.y2[self.coOpPhrase] > 0.365:
-                      self.y2[self.coOpPhrase] -= 0.01
-                    if self.x3[self.coOpPhrase] > 0.5:
-                      self.x3[self.coOpPhrase] -= 0.01
-                    if self.y3[self.coOpPhrase] > 0.365:
-                      self.y3[self.coOpPhrase] -= 0.01
+                if self.coOpGH and i == self.coOpPlayerMeter:
+                  if self.starfx: #blazingamer, corrected by myfingershurt, adjusted by worldrave
+                    starPowerAmount = (self.coOpStarPower/self.numOfPlayers)
+                    if starPowerAmount >= 50 or self.instruments[i].starPowerActive:
+                      if self.x1[self.coOpPhrase] < 0.522:   
+                        self.x1[self.coOpPhrase] += 0.01
+                        if self.x1[self.coOpPhrase] > 0.522:   
+                          self.x1[self.coOpPhrase] = 0.522     #Worldrave Notes - Controls 4th Bulbs X axis. Was .526
+                      if self.y1[self.coOpPhrase] < 0.464: 
+                        self.y1[self.coOpPhrase] += 0.01
+                        if self.y1[self.coOpPhrase] > 0.464:
+                          self.y1[self.coOpPhrase] = 0.464     #Worldrave Notes - Controls 4th Bulbs Y axis. Was .471
+                      if self.x2[self.coOpPhrase] < 0.563:
+                        self.x2[self.coOpPhrase] += 0.01
+                        if self.x2[self.coOpPhrase] > 0.563:
+                          self.x2[self.coOpPhrase] = 0.563     #Worldrave Notes - Controls 5th Bulbs X axis. Was .562
+                      if self.y2[self.coOpPhrase] < 0.445:
+                        self.y2[self.coOpPhrase] += 0.01
+                        if self.y2[self.coOpPhrase] > 0.445:
+                          self.y2[self.coOpPhrase] = 0.445     #Worldrave Notes - Controls 5th Bulbs Y axis. Was .449
+                      if self.x3[self.coOpPhrase] < 0.597:
+                        self.x3[self.coOpPhrase] += 0.01
+                        if self.x3[self.coOpPhrase] > 0.597:
+                          self.x3[self.coOpPhrase] = 0.597     #Worldrave Notes - Controls 6th Bulbs X axis. Was .597
+                      if self.y3[self.coOpPhrase] < 0.403:
+                        self.y3[self.coOpPhrase] += 0.01
+                        if self.y3[self.coOpPhrase] > 0.403:
+                          self.y3[self.coOpPhrase] = 0.403     #Worldrave Notes - Controls 6th Bulbs Y axis. Was .403
+                    else:
+                      if self.x1[self.coOpPhrase] > 0.5:
+                        self.x1[self.coOpPhrase] -= 0.01
+                      if self.y1[self.coOpPhrase] > 0.365:
+                        self.y1[self.coOpPhrase] -= 0.01
+                      if self.x2[self.coOpPhrase] > 0.5:
+                        self.x2[self.coOpPhrase] -= 0.01
+                      if self.y2[self.coOpPhrase] > 0.365:
+                        self.y2[self.coOpPhrase] -= 0.01
+                      if self.x3[self.coOpPhrase] > 0.5:
+                        self.x3[self.coOpPhrase] -= 0.01
+                      if self.y3[self.coOpPhrase] > 0.365:
+                        self.y3[self.coOpPhrase] -= 0.01
         
-                  if starPowerAmount >= 50 or self.instruments[i].starPowerActive: #QQstarS:Set [0] to [i]
-                    lightPos = (0.689655172,1)  #MFH division->constant: was (2.0/2.9,1)
-                  else:
-                    lightPos = (1.0/2.9,2.0/3.1)  #MFH division->constant: ok any preprocessor worth it's salt would take care of this before runtime... this is pointless.
+                    if starPowerAmount >= 50 or self.instruments[i].starPowerActive: #QQstarS:Set [0] to [i]
+                      lightPos = (0.689655172,1)  #MFH division->constant: was (2.0/2.9,1)
+                    else:
+                      lightPos = (1.0/2.9,2.0/3.1)  #MFH division->constant: ok any preprocessor worth it's salt would take care of this before runtime... this is pointless.
         
-                  if starPowerAmount >= 16.6:
-                    lightVis = 1
-                  else:
-                    lightVis = starPowerAmount/16.6
+                    if starPowerAmount >= 16.6:
+                      lightVis = 1
+                    else:
+                      lightVis = starPowerAmount/16.6
       
-                  wfactor = self.SP.widthf(pixelw = 23.000) #bulb 1
-                  spcoord = (w*0.414 ,h*0.407)
-                  sprot = .68
-                  self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
-                                        rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
-                  self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
-                                        rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))                   
+                    wfactor = self.SP.widthf(pixelw = 23.000) #bulb 1
+                    spcoord = (w*0.414 ,h*0.407)
+                    sprot = .68
+                    self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
+                                          rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
+                    self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
+                                          rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))                   
         
-                  if starPowerAmount >= 33.2:
-                    lightVis = 1
-                  else:
-                    lightVis = (starPowerAmount-16.6)/16.6
-                  wfactor = self.SP.widthf(pixelw = 23.000) #bulb 2
-                  spcoord = (w*0.439,h*0.438)
-                  sprot = .46
-                  self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
-                                        rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
-                  self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
-                                        rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))         
-                  if starPowerAmount >= 49.8:
-                    lightVis = 1
-                  else:
-                    lightVis = (starPowerAmount-32.2)/16.6
+                    if starPowerAmount >= 33.2:
+                      lightVis = 1
+                    else:
+                      lightVis = (starPowerAmount-16.6)/16.6
+                    wfactor = self.SP.widthf(pixelw = 23.000) #bulb 2
+                    spcoord = (w*0.439,h*0.438)
+                    sprot = .46
+                    self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
+                                          rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
+                    self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
+                                          rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))         
+                    if starPowerAmount >= 49.8:
+                      lightVis = 1
+                    else:
+                      lightVis = (starPowerAmount-32.2)/16.6
       
-                  wfactor = self.SP.widthf(pixelw = 23.000) #bulb 3
-                  spcoord = (w*0.468,h*0.455)
-                  sprot = .24
-                  self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
-                                        rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
-                  self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
-                                        rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis)) 
+                    wfactor = self.SP.widthf(pixelw = 23.000) #bulb 3
+                    spcoord = (w*0.468,h*0.455)
+                    sprot = .24
+                    self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
+                                          rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
+                    self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
+                                          rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis)) 
         
-                  if starPowerAmount >= 66.4:
-                    lightVis = 1
-                  else:
-                    lightVis = (starPowerAmount-49.8)/16.6
+                    if starPowerAmount >= 66.4:
+                      lightVis = 1
+                    else:
+                      lightVis = (starPowerAmount-49.8)/16.6
       
-                  wfactor = self.SP.widthf(pixelw = 32.000) #Worldrave Change - Bulb 4
-                  spcoord = (w*self.x1[self.coOpPhrase]*0.96852469,h*self.y1[self.coOpPhrase]*1.011455279)
-                  sprot = 0
-                  self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
-                                        rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
-                  self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
-                                        rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis)) 
+                    wfactor = self.SP.widthf(pixelw = 32.000) #Worldrave Change - Bulb 4
+                    spcoord = (w*self.x1[self.coOpPhrase]*0.96852469,h*self.y1[self.coOpPhrase]*1.011455279)
+                    sprot = 0
+                    self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
+                                          rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
+                    self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
+                                          rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis)) 
         
-                  if starPowerAmount >= 83:
-                    lightVis = 1
-                  else:
-                    lightVis = (starPowerAmount-66.4)/16.6
+                    if starPowerAmount >= 83:
+                      lightVis = 1
+                    else:
+                      lightVis = (starPowerAmount-66.4)/16.6
       
-                  wfactor = self.SP.widthf(pixelw = 32.000)  #Worldrave Change - Bulb 5  
-                  spcoord = (w*self.x2[self.coOpPhrase]*0.978698075,h*self.y2[self.coOpPhrase]*1.02813143)
-                  sprot = -.34
-                  self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
-                                        rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
-                  self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
-                                        rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis)) 
+                    wfactor = self.SP.widthf(pixelw = 32.000)  #Worldrave Change - Bulb 5  
+                    spcoord = (w*self.x2[self.coOpPhrase]*0.978698075,h*self.y2[self.coOpPhrase]*1.02813143)
+                    sprot = -.34
+                    self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
+                                          rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
+                    self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
+                                          rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis)) 
         
-                  if starPowerAmount >= 100:
-                    lightVis = 1
-                  else:
-                    lightVis = (starPowerAmount-83)/16.6
+                    if starPowerAmount >= 100:
+                      lightVis = 1
+                    else:
+                      lightVis = (starPowerAmount-83)/16.6
       
-                  wfactor = self.SP.widthf(pixelw = 32.000) #Worldrave Change - Bulb 6
-                  spcoord = (w*self.x3[self.coOpPhrase]*0.990664588,h*self.y3[self.coOpPhrase]*1.04973235)
-                  sprot = -.70
-                  self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
-                                        rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
-                  self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
-                                        rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis)) 
-                if self.coopRockmeter:
-                  self.engine.drawImage(self.coopRockmeter, scale = (.5,-.5), coord = (w*.5, h*.365))
+                    wfactor = self.SP.widthf(pixelw = 32.000) #Worldrave Change - Bulb 6
+                    spcoord = (w*self.x3[self.coOpPhrase]*0.990664588,h*self.y3[self.coOpPhrase]*1.04973235)
+                    sprot = -.70
+                    self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
+                                          rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
+                    self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
+                                          rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis)) 
+                  if self.coopRockmeter:
+                    self.engine.drawImage(self.coopRockmeter, scale = (.5,-.5), coord = (w*.5, h*.365))
               
-                        
-              elif self.coOp:
-                if self.starfx:
-                  starPowerAmount = self.instruments[i].starPower
-                  if starPowerAmount >= 50 or self.instruments[i].starPowerActive:
-                    if self.x1[i] < 0.165:
-                      self.x1[i] += 0.01
-                      if self.x1[i] > 0.165:
-                        self.x1[i] = 0.165
-                    if self.x2[i] < 0.165:
-                      self.x2[i] += 0.01
-                      if self.x2[i] > 0.165:
-                        self.x2[i] = 0.165
-                    if self.x3[i] < 0.165:
-                      self.x3[i] += 0.01
-                      if self.x3[i] > 0.165:
-                        self.x3[i] = 0.165
-                  else:
-                    if self.x1[i] > 0.134:
-                      self.x1[i] -= 0.01
-                    if self.x2[i] > 0.124:
-                      self.x2[i] -= 0.01
-                    if self.x3[i] > 0.114:
-                      self.x3[i] -= 0.01
+                         
+                elif self.coOp:
+                  if self.starfx:
+                    starPowerAmount = self.instruments[i].starPower
+                    if starPowerAmount >= 50 or self.instruments[i].starPowerActive:
+                      if self.x1[i] < 0.165:
+                        self.x1[i] += 0.01
+                        if self.x1[i] > 0.165:
+                          self.x1[i] = 0.165
+                      if self.x2[i] < 0.165:
+                        self.x2[i] += 0.01
+                        if self.x2[i] > 0.165:
+                          self.x2[i] = 0.165
+                      if self.x3[i] < 0.165:
+                        self.x3[i] += 0.01
+                        if self.x3[i] > 0.165:
+                          self.x3[i] = 0.165
+                    else:
+                      if self.x1[i] > 0.134:
+                        self.x1[i] -= 0.01
+                      if self.x2[i] > 0.124:
+                        self.x2[i] -= 0.01
+                      if self.x3[i] > 0.114:
+                        self.x3[i] -= 0.01
         
-                  if starPowerAmount >= 50 or self.instruments[i].starPowerActive: #QQstarS:Set [0] to [i]
-                    lightPos = (0.689655172,1)  #MFH division->constant: was (2.0/2.9,1)
-                  else:
-                    lightPos = (1.0/2.9,2.0/3.1)  #MFH division->constant: ok any preprocessor worth it's salt would take care of this before runtime... this is pointless.
+                    if starPowerAmount >= 50 or self.instruments[i].starPowerActive: #QQstarS:Set [0] to [i]
+                      lightPos = (0.689655172,1)  #MFH division->constant: was (2.0/2.9,1)
+                    else:
+                      lightPos = (1.0/2.9,2.0/3.1)  #MFH division->constant: ok any preprocessor worth it's salt would take care of this before runtime... this is pointless.
         
-                  if starPowerAmount >= 16.6: #QQstarS:Set [0] to [i]
-                    lightVis = 1
-                  else:
-                    lightVis = starPowerAmount/16.6
+                    if starPowerAmount >= 16.6: #QQstarS:Set [0] to [i]
+                      lightVis = 1
+                    else:
+                      lightVis = starPowerAmount/16.6
       
-                  wfactor = self.SP.widthf(pixelw = 23.000) #Worldrave Change - Bulb 1
-                  spcoord = (w*0.165 ,h*0.21 + self.hOffset[i])
-                  sprot = -1.570796
-                  self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
-                                        rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
-                  self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
-                                        rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
+                    wfactor = self.SP.widthf(pixelw = 23.000) #Worldrave Change - Bulb 1
+                    spcoord = (w*0.165 ,h*0.21 + self.hOffset[i])
+                    sprot = -1.570796
+                    self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
+                                          rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
+                    self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
+                                          rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
         
-                  if starPowerAmount >= 33.2: #QQstarS:Set [0] to [i]
-                    lightVis = 1
-                  else:
-                    lightVis = (starPowerAmount-16.6)/16.6
-                  wfactor = self.SP.widthf(pixelw = 23.000) #Worldrave Change - Bulb 2
-                  spcoord = (w*0.165,h*0.2 + self.hOffset[i])
-                  sprot = -1.570796
-                  self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
-                                        rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
-                  self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
-                                        rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
+                    if starPowerAmount >= 33.2: #QQstarS:Set [0] to [i]
+                      lightVis = 1
+                    else:
+                      lightVis = (starPowerAmount-16.6)/16.6
+                    wfactor = self.SP.widthf(pixelw = 23.000) #Worldrave Change - Bulb 2
+                    spcoord = (w*0.165,h*0.2 + self.hOffset[i])
+                    sprot = -1.570796
+                    self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
+                                          rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
+                    self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
+                                          rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
                   
-                  if starPowerAmount >= 49.8:
-                    lightVis = 1
-                  else:
-                    lightVis = (starPowerAmount-32.2)/16.6
+                    if starPowerAmount >= 49.8:
+                      lightVis = 1
+                    else:
+                      lightVis = (starPowerAmount-32.2)/16.6
       
-                  wfactor = self.SP.widthf(pixelw = 23.000)  #Worldrave Change - Bulb 3
-                  spcoord = (w*0.165,h*0.19 + self.hOffset[i])
-                  sprot = -1.570796
-                  self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
-                                        rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
-                  self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
-                                        rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
+                    wfactor = self.SP.widthf(pixelw = 23.000)  #Worldrave Change - Bulb 3
+                    spcoord = (w*0.165,h*0.19 + self.hOffset[i])
+                    sprot = -1.570796
+                    self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
+                                          rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
+                    self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
+                                          rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))
+         
+                    if starPowerAmount >= 66.4:
+                      lightVis = 1
+                    else:
+                      lightVis = (starPowerAmount-49.8)/16.6
+      
+                    wfactor = self.SP.widthf(pixelw = 32.000) #Worldrave Change - Bulb 4
+                    spcoord = (w*self.x1[i]*0.96852469,h*self.y1[i]*1.011455279 + self.hOffset[i])
+                    sprot = -1.570796
+                    self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
+                                          rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
+                    self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
+                                          rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis)) 
         
-                  if starPowerAmount >= 66.4:
-                    lightVis = 1
-                  else:
-                    lightVis = (starPowerAmount-49.8)/16.6
+                    if starPowerAmount >= 83:
+                      lightVis = 1
+                    else:
+                      lightVis = (starPowerAmount-66.4)/16.6
       
-                  wfactor = self.SP.widthf(pixelw = 32.000) #Worldrave Change - Bulb 4
-                  spcoord = (w*self.x1[i]*0.96852469,h*self.y1[i]*1.011455279 + self.hOffset[i])
-                  sprot = -1.570796
-                  self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
-                                        rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
-                  self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
-                                        rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis)) 
+                    wfactor = self.SP.widthf(pixelw = 32.000)  #Worldrave Change - Bulb 5  
+                    spcoord = (w*self.x2[i]*0.978698075,h*self.y2[i]*1.02813143 + self.hOffset[i])
+                    sprot = -1.570796
+                    self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
+                                          rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
+                    self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
+                                          rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis)) 
         
-                  if starPowerAmount >= 83:
-                    lightVis = 1
-                  else:
-                    lightVis = (starPowerAmount-66.4)/16.6
-      
-                  wfactor = self.SP.widthf(pixelw = 32.000)  #Worldrave Change - Bulb 5  
-                  spcoord = (w*self.x2[i]*0.978698075,h*self.y2[i]*1.02813143 + self.hOffset[i])
-                  sprot = -1.570796
-                  self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
-                                        rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
-                  self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
-                                        rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis)) 
+                    if starPowerAmount >= 100:
+                      lightVis = 1
+                    else:
+                      lightVis = (starPowerAmount-83)/16.6
         
-                  if starPowerAmount >= 100:
-                    lightVis = 1
-                  else:
-                    lightVis = (starPowerAmount-83)/16.6
-      
-                  wfactor = self.SP.widthf(pixelw = 32.000) #Worldrave Change - Bulb 6
-                  spcoord = (w*self.x3[i]*0.990664588,h*self.y3[i]*1.04973235 + self.hOffset[i])
-                  sprot = -1.570796
-                  self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
-                                        rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
-                  self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
-                                        rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))  
+                    wfactor = self.SP.widthf(pixelw = 32.000) #Worldrave Change - Bulb 6
+                    spcoord = (w*self.x3[i]*0.990664588,h*self.y3[i]*1.04973235 + self.hOffset[i])
+                    sprot = -1.570796
+                    self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
+                                          rect = (0,1.0/3.1,0,1), color = (1,1,1,1))
+                    self.engine.drawImage(self.SP, scale = (wfactor,-wfactor*3), coord = spcoord, rot = sprot,
+                                          rect = (lightPos[0],lightPos[1],0,1), color = (1,1,1,lightVis))  
 
-                self.engine.drawImage(self.rockmeter, scale = (.5,-.5), coord = (w*.134, h*.22 + self.hOffset[i]))
+                  self.engine.drawImage(self.rockmeter, scale = (.5,-.5), coord = (w*.134, h*.22 + self.hOffset[i]))
 
-              elif not self.coOpType:
-                if not self.battleGH:
+                elif not self.coOpType and not self.battleGH:
                   if self.starfx:
                     starPowerAmount = self.instruments[i].starPower
                     if starPowerAmount >= 50 or self.instruments[i].starPowerActive:
