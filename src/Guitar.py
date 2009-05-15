@@ -97,6 +97,9 @@ class Guitar:
     self.freestylePercent = 50
     self.freestyleOffset = 5
     self.freestyleSP = False
+    
+    #empty variables for class compatibility
+    self.totalPhrases = 0
 
 
     self.accThresholdWorstLate = 0

@@ -40,6 +40,7 @@ import datetime
 import sys
 import Theme
 import Player
+import Version
 
 #myfingershurt: needed for multi-OS file fetching
 import os
@@ -114,6 +115,11 @@ class MainMenu(BackgroundLayer):
     self.themeCoOp = self.engine.data.themeCoOp
     self.themename = self.engine.data.themeLabel
     self.useSoloMenu = Theme.use_solo_submenu
+    
+    allowMic = True
+    
+    if not os.path.exists(os.path.join(Version.dataPath(), "themes", self.themename, "vocals")):
+      allowMic = False
 
     try:
       #blazingamer
@@ -234,7 +240,7 @@ class MainMenu(BackgroundLayer):
         (_("GH Battle"), lambda: self.newLocalGame(players = 2, mode2p = 6, maxplayers = -1, allowDrum = False)), #akedrou- so you can block drums
         (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
         (_("Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 5)),
-        (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),   #Worldrave - Re-added this option for now.
+        (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3, allowMic = allowMic)),   #Worldrave - Re-added this option for now.
       ]
     elif self.theme == 1 and not self.themeCoOp:
       multPlayerMenu = [
@@ -244,8 +250,8 @@ class MainMenu(BackgroundLayer):
       ]
     elif self.theme == 2:
       multPlayerMenu = [
-        (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3, maxplayers = 4)),
-        (_("RB Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 4, maxplayers = 4, allowMic = True)),
+        (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3, maxplayers = 4, allowMic = allowMic)),
+        (_("RB Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 4, maxplayers = 4, allowMic = allowMic)),
         (_("GH Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 5, maxplayers = 4)),
         (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = -1)),
         (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = -1)),
@@ -253,7 +259,7 @@ class MainMenu(BackgroundLayer):
       ]
     else:
       multPlayerMenu = [
-        (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),
+        (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3, allowMic = allowMic)),
         (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = -1)),
         (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = -1)),
         (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
@@ -268,8 +274,8 @@ class MainMenu(BackgroundLayer):
     if not self.useSoloMenu:
 
       mainMenu = [
-        (strCareer, lambda:   self.newLocalGame(mode1p = 2)),
-        (strQuickplay, lambda:        self.newLocalGame()),
+        (strCareer, lambda:   self.newLocalGame(mode1p = 2, allowMic = allowMic)),
+        (strQuickplay, lambda:        self.newLocalGame(allowMic = allowMic)),
         ((strMultiplayer,"multiplayer"), multPlayerMenu),
         ((strTraining,"training"),    trainingMenu),
         ((strSettings,"settings"),  self.settingsMenu),
@@ -279,8 +285,8 @@ class MainMenu(BackgroundLayer):
     else:
 
       soloMenu = [
-        (_("Solo Tour"), lambda: self.newLocalGame(mode1p = 2)),
-        (_("Quickplay"), lambda: self.newLocalGame()),
+        (_("Solo Tour"), lambda: self.newLocalGame(mode1p = 2, allowMic = allowMic)),
+        (_("Quickplay"), lambda: self.newLocalGame(allowMic = allowMic)),
       ]
 
       mainMenu = [

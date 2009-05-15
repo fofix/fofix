@@ -136,7 +136,10 @@ class Drum:
     #self.drumFillOnScreen = False   #MFH 
     self.drumFillEvents = []
     self.drumFillWasJustActive = False
-
+    
+    #empty variables for class compatibility
+    self.totalPhrases = 0
+    
     self.accThresholdWorstLate = 0
     self.accThresholdVeryLate = 0
     self.accThresholdLate = 0

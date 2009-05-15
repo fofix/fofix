@@ -487,6 +487,50 @@ class SongInfo(object):
               self.addHighscore(difficulty, score, stars, name, part = parts[DRUM_PART])
           else:
             Log.warn("Weak hack attempt detected. Better luck next time.")
+
+    #akedrou - vocals!
+    self.highScoresVocal = {}
+    
+    scores = self._get("scores_vocal", str, "")
+    scores_ext = self._get("scores_vocal_ext", str, "")
+    if scores:
+      scores = Cerealizer.loads(binascii.unhexlify(scores))
+      if scores_ext:
+        scores_ext = Cerealizer.loads(binascii.unhexlify(scores_ext))
+      for difficulty in scores.keys():
+        try:
+          difficulty = difficulties[difficulty]
+        except KeyError:
+          continue
+        #for score, stars, name, hash in scores[difficulty.id]:
+        #  if self.getScoreHash(difficulty, score, stars, name) == hash:
+        #    self.addHighscore(difficulty, score, stars, name, part = parts[DRUM_PART])
+        #  else:
+        #    Log.warn("Weak hack attempt detected. Better luck next time.")         
+        for i, base_scores in enumerate(scores[difficulty.id]):
+          score, stars, name, hash = base_scores
+          if scores_ext != "":
+            #Someone may have mixed extended and non extended
+            try:
+              if len(scores_ext[difficulty.id][i]) < 9:
+                hash_ext, stars2, notesHit, notesTotal, noteStreak, modVersion, oldInfo, oldInfo2 =  scores_ext[difficulty.id][i]
+                handicapValue = 0
+                longHandicap = "None"
+                originalScore = 0
+              else:
+                hash_ext, stars2, notesHit, notesTotal, noteStreak, modVersion, handicapValue, longHandicap, originalScore =  scores_ext[difficulty.id][i]
+              scoreExt = (notesHit, notesTotal, noteStreak, modVersion, handicapValue, longHandicap, originalScore)
+            except:
+              hash_ext = 0
+              scoreExt = (0, 0, 0 , "RF-mod", 0, "None", 0)
+          if self.getScoreHash(difficulty, score, stars, name) == hash:
+            if scores_ext != "" and hash == hash_ext:
+              self.addHighscore(difficulty, score, stars, name, part = parts[DRUM_PART], scoreExt = scoreExt)
+            else:
+              self.addHighscore(difficulty, score, stars, name, part = parts[DRUM_PART])
+          else:
+            Log.warn("Weak hack attempt detected. Better luck next time.")
+
             
     if canCache and self.allowCacheUsage:  #stump: preload this stuff into the cache
       self.getParts()
@@ -524,6 +568,8 @@ class SongInfo(object):
       highScores = self.highScoresLead
     elif part == parts[DRUM_PART]:
       highScores = self.highScoresDrum
+    elif part == parts[VOCAL_PART]:
+      highScores = self.highScoresVocal
     else:
       highScores = self.highScores
       
@@ -543,6 +589,8 @@ class SongInfo(object):
       highScores = self.highScoresLead
     elif part == parts[DRUM_PART]:
       highScores = self.highScoresDrum
+    elif part == parts[VOCAL_PART]:
+      highScores = self.highScoresVocal
     else:
       highScores = self.highScores
       
@@ -567,6 +615,10 @@ class SongInfo(object):
     if self.highScoresDrum != {}:
       self._set("scores_drum", self.getObfuscatedScores(part = parts[DRUM_PART]))
       self._set("scores_drum_ext", self.getObfuscatedScoresExt(part = parts[DRUM_PART]))
+    #akedrou
+    if self.highScoresVocal != {}:
+      self._set("scores_vocal", self.getObfuscatedScores(part = parts[VOCAL_PART]))
+      self._set("scores_vocal_ext", self.getObfuscatedScoresExt(part = parts[VOCAL_PART]))
     
     f = open(self.fileName, "w")
     self.info.write(f)
@@ -791,6 +843,8 @@ class SongInfo(object):
     #myfingershurt: drums :)
     elif part == str(parts[DRUM_PART]):
       highScores = self.highScoresDrum
+    elif part == str(parts[VOCAL_PART]): #akedrou - vocals!
+      highScores = self.highScoresVocal
     else:
       highScores = self.highScores
       
@@ -812,6 +866,8 @@ class SongInfo(object):
     #myfingershurt: drums :)
     elif part == parts[DRUM_PART]:
       highScores = self.highScoresDrum
+    elif part == parts[VOCAL_PART]: #akedrou - vocals!
+      highScores = self.highScoresVocal
     else:
       highScores = self.highScores
       
@@ -821,6 +877,8 @@ class SongInfo(object):
       return []
       
   def uploadHighscores(self, url, songHash, part = parts[GUITAR_PART]):
+    if part == parts[VOCAL_PART]: #not implemented
+      return False
     try:
       d = {
         "songName": self.songName,
@@ -851,6 +909,8 @@ class SongInfo(object):
     #myfingershurt: drums :)
     elif part == parts[DRUM_PART]:
       highScores = self.highScoresDrum
+    elif part == parts[VOCAL_PART]: #akedrou - vocals!
+      highScores = self.highScoresVocal
     else:
       highScores = self.highScores
 
@@ -1516,17 +1576,78 @@ class VocalTrack(Track):
     self.starTimes = []
     self.minPitch = 127
     self.maxPitch = 0
+    self.logTempoEvents = 0
+    if engine:
+      self.logTempoEvents = engine.config.get("log",   "log_tempo_events")
     Track.__init__(self, engine)
     
   def getAllNotes(self):
     return self.allNotes
   
+  def addEvent(self, time, event):
+    if isinstance(event, VocalNote) or isinstance(event, VocalPhrase):
+      Track.addEvent(self, time, event)
+
   def removeTempoEvents(self):
     for time, event in self.allEvents:
       if isinstance(event, Tempo):
         self.allEvents.remove((time, event))
         if self.logTempoEvents == 1:
           Log.debug("Tempo event removed from VocalTrack during cleanup: " + str(event.bpm) + "bpm")
+  
+  def markPhrases(self):
+    phraseId = 0
+    stars = []
+    phraseTimes = []
+    markStars = False
+    if len(self.starTimes) < 2:
+      markStars = True
+      Log.warn("This song does not appear to have any vocal star power events - falling back on auto-generation.")
+    for time, event in self.getAllEvents():
+      if isinstance(event, VocalPhrase):
+        if time in self.starTimes and not markStars:
+          event.star = True
+        if time in phraseTimes:
+          Log.warn("Phrase repeated - some lyric phrase errors may occur.")
+          #self.removeEvent(time, event)
+          phraseId += 1
+          continue
+        if markStars and phraseId+1 % 7 == 0:
+          event.star = True
+        phraseTimes.append(time)
+        phraseId += 1
+    index = 0
+    for time, tuple in self.allNotes.iteritems():
+      phraseId = 0
+      for i, phraseTime in enumerate(self.getAllEvents()):
+        if time > phraseTime[0] and time < phraseTime[0] + phraseTime[1].length:
+          phraseId = i
+          if phraseId < 0:
+            phraseId = 0
+          break
+      tuple[1].phrase = phraseId
+      if not tuple[1].tap:
+        try:
+          lyric = self.allWords[tuple[0]]
+        except KeyError:
+          lyric = None
+        if lyric:
+          if lyric.find("+") >= 0:
+            tuple[1].heldNote = True
+          else:
+            if lyric.find("#") >= 0:
+              tuple[1].speak = True
+              tuple[1].lyric = lyric.strip("#")
+            elif lyric.find("^") >= 0:
+              tuple[1].extra = True
+              tuple[1].lyric = lyric.strip("^")
+            else:
+              tuple[1].lyric = lyric
+      else:
+        self.allEvents[phraseId][1].tapPhrase = True
+      self.allEvents[phraseId][1].addEvent(tuple[0], tuple[1])
+      self.allEvents[phraseId][1].minPitch = min(self.allEvents[phraseId][1].minPitch, tuple[1].note)
+      self.allEvents[phraseId][1].maxPitch = max(self.allEvents[phraseId][1].maxPitch, tuple[1].note)
 
 class VocalPhrase(VocalTrack, Event):
   def __init__(self, length, star = False):
@@ -2419,7 +2540,7 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
 
 
 class Song(object):
-  def __init__(self, engine, infoFileName, songTrackName, guitarTrackName, rhythmTrackName, noteFileName, scriptFileName = None, partlist = [parts[GUITAR_PART]], drumTrackName = None, crowdTrackName = None, vocalist = False):
+  def __init__(self, engine, infoFileName, songTrackName, guitarTrackName, rhythmTrackName, noteFileName, scriptFileName = None, partlist = [parts[GUITAR_PART]], drumTrackName = None, crowdTrackName = None):
     self.engine        = engine
     
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
@@ -2427,12 +2548,14 @@ class Song(object):
       Log.debug("Song class init (song.py)...")
     
     self.info         = SongInfo(infoFileName)
-    self.tracks       = [[NoteTrack(self.engine) for t in range(len(difficulties))] for i in range(len(partlist))]
+    self.tracks = []
+    for i in partlist:
+      if i == parts[VOCAL_PART]:
+        self.tracks.append([VocalTrack(self.engine)])
+      else:
+        self.tracks.append([NoteTrack(self.engine) for t in range(len(difficulties))])
     
     self.difficulty   = [difficulties[EXP_DIF] for i in partlist]
-    self.vocalDifficulty = None
-    if vocalist:
-      self.vocalDifficulty = difficulties[EXP_DIF]
     self._playing     = False
     self.start        = 0.0
     self.noteFileName = noteFileName
@@ -2447,7 +2570,6 @@ class Song(object):
 
     
     self.parts        = partlist
-    self.vocalist     = vocalist
     self.delay        = self.engine.config.get("audio", "delay")
     self.delay        += self.info.delay
     self.missVolume   = self.engine.config.get("audio", "miss_volume")
@@ -2469,8 +2591,13 @@ class Song(object):
     #TK_LYRICS = 3         #RB MIDI Lyric events
     #TK_UNUSED_TEXT = 4    #Unused / other text events
     self.eventTracks       = [Track(self.engine) for t in range(0,5)]    #MFH - should result in eventTracks[0] through [4]
-
-    self.midiEventTracks   = [[Track(self.engine) for t in range(len(difficulties))] for i in range(len(partlist))]
+    
+    self.midiEventTracks   = []
+    for i in partlist:
+      if i == parts[VOCAL_PART]:
+        self.midiEventTracks.append([None])
+      else:
+        self.midiEventTracks.append([Track(self.engine) for t in range(len(difficulties))])
     
     self.vocalEventTrack   = VocalTrack(self.engine)
 
@@ -2705,7 +2832,8 @@ class Song(object):
 
     for tracks in self.midiEventTracks:
       for track in tracks:
-        track.reset()
+        if track is not None:
+          track.reset()
 
       
     if self.music:  #MFH
@@ -2926,6 +3054,7 @@ class MidiReader(midi.MidiOutStream):
     self.partnumber = -1
 
     self.vocalTrack = False
+    self.useVocalTrack = False
     self.vocalOverlapCheck = []
 
     self.logClassInits = Config.get("game", "log_class_inits")
@@ -2973,25 +3102,37 @@ class MidiReader(midi.MidiOutStream):
       time = self.abs_time()
     assert time >= 0
     
+    if not self.useVocalTrack:
+      return True
+    
+    track = [i for i,j in enumerate(self.song.parts) if self.partnumber == j][0]
     if isinstance(event, VocalNote):
-      self.song.vocalEventTrack.minPitch = min(event.note, self.song.vocalEventTrack.minPitch)
-      self.song.vocalEventTrack.maxPitch = max(event.note, self.song.vocalEventTrack.maxPitch)
-      self.song.vocalEventTrack.allNotes[int(time)] = (time, event)
+      self.song.track[track].minPitch = min(event.note, self.song.track[track].minPitch)
+      self.song.track[track].maxPitch = max(event.note, self.song.track[track].maxPitch)
+      self.song.track[track].allNotes[int(time)] = (time, event)
     elif isinstance(event, VocalPhrase):
-      self.song.vocalEventTrack.addEvent(time, event)
+      self.song.track[track].addEvent(time, event)
   
   def addVocalLyric(self, text):
     time = self.abs_time()
     assert time >= 0
     
-    self.song.vocalEventTrack.allWords[time] = text
+    if not self.useVocalTrack:
+      return True
+    
+    track = [i for i,j in enumerate(self.song.parts) if self.partnumber == j][0]
+    self.song.track[track].allWords[time] = text
   
   def addVocalStar(self, time):
     if time is None:
       time = self.abs_time()
     assert time >= 0
     
-    self.song.vocalEventTrack.starTimes.append(time)
+    if not self.useVocalTrack:
+      return True
+    
+    track = [i for i,j in enumerate(self.song.parts) if self.partnumber == j][0]
+    self.song.track[track].starTimes.append(time)
 
   def addTempoEvent(self, event, time = None):    #MFH - universal Tempo track handling
     if not isinstance(event, Tempo):
@@ -3070,7 +3211,6 @@ class MidiReader(midi.MidiOutStream):
 
     tempText = "Found sequence_name in MIDI: " + text + ", recognized as "
     tempText2 = ""
-    
     if (text == "PART GUITAR" or text == "T1 GEMS" or text == "Click" or text == "MIDI out") and parts[GUITAR_PART] in self.song.parts:
       self.partnumber = parts[GUITAR_PART]
       if self.logSections == 1:
@@ -3093,8 +3233,12 @@ class MidiReader(midi.MidiOutStream):
         tempText2 = "DRUM_PART"
     
     elif text == "PART VOCALS": # MFH 
-      self.vocalTrack = True
       self.partnumber = parts[VOCAL_PART]
+      self.vocalTrack = True
+      if self.partnumber in self.song.parts:
+        self.useVocalTrack = True
+      else:
+        self.useVocalTrack = False
     else:
       self.vocalTrack = False
     #for rock band unaltered rip compatibility
@@ -3745,7 +3889,7 @@ class MidiPartsReader(midi.MidiOutStream):
           tempText2 = "VOCAL_PART"
           Log.debug(tempText + tempText2)
 
-def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playbackOnly = False, notesOnly = False, part = [parts[GUITAR_PART]], practiceMode = False, vocalist = False):
+def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playbackOnly = False, notesOnly = False, part = [parts[GUITAR_PART]], practiceMode = False):
 
   Log.debug("loadSong function call (song.py)...")
   crowdsEnabled = engine.config.get("audio", "crowd_tracks_enabled")
@@ -3885,7 +4029,7 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
     previewFile = None
     drumFile = None
       
-  song       = Song(engine, infoFile, songFile, guitarFile, rhythmFile, noteFile, scriptFile, part, drumFile, crowdFile, vocalist = vocalist)
+  song       = Song(engine, infoFile, songFile, guitarFile, rhythmFile, noteFile, scriptFile, part, drumFile, crowdFile)
   return song
 
 def loadSongInfo(engine, name, library = DEFAULT_LIBRARY):
