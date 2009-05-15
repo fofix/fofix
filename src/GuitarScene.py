@@ -228,6 +228,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.firstGuitar     = None
     self.neckrender = []
     
+    gNum = 0
     for j,player in enumerate(self.playerList):
       guitar = True
       if player.part.id == Song.VOCAL_PART:
@@ -253,6 +254,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       player.keyList = Player.playerkeys[j]
       player.configController()
       if guitar:
+        player.guitarNum = gNum
+        gNum += 1
         if not self.firstGuitar:
           self.firstGuitar = j
         self.neckrender.append(Neck.Neck(self.engine, self.instruments[j], player))
@@ -596,9 +599,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.wPlayer[i] = self.wPlayer[i]*self.numberOfGuitars #QQstarS: set the width to right one
       if self.numberOfGuitars>1:
         self.hPlayer[i] = self.hPlayer[i]*self.numberOfGuitars/1.5 #QQstarS: Set the hight to right one
+        self.hOffset[i] = self.hPlayer[i]*.4*(self.numberOfGuitars-1)
       else:
         self.hPlayer[i] = self.hPlayer[i]*self.numberOfGuitars #QQstarS: Set the hight to right one
-      self.hOffset[i] = self.hPlayer[i]*.4*(self.numberOfGuitars-1) #QQstarS: Hight Offset when there are 2 players
+        self.hOffset[i] = 0
       self.hFontOffset[i] = -self.hOffset[i]/self.hPlayer[i]*0.752 #QQstarS: font Hight Offset when there are 2 players
 
     self.engine.view.setViewport(1,0)
