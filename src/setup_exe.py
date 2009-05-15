@@ -153,7 +153,7 @@ def setupWindows():
         windows = [
           {
             "script":          "FoFiX.py",
-            "icon_resources":  [(1, "fof.ico")],
+            "icon_resources":  [(1, "fofix.ico")],
             "other_resources": [(RT_VERSION, 1, VersionResource(
               #stump: the parameter below must consist only of up to four numerical fields separated by dots
               Version.VERSION,

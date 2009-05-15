@@ -84,11 +84,11 @@ class Video:
       import win32gui
       import win32con
       hwnd = pygame.display.get_wm_info()['window']
-      if os.path.isfile('fof.ico'):
-        # case: running from source code with fof.ico present - use it
-        hicon_big = win32gui.LoadImage(0, 'fof.ico', win32gui.IMAGE_ICON, 32, 32, win32gui.LR_LOADFROMFILE)
+      if os.path.isfile('fofix.ico'):
+        # case: running from source code with fofix.ico present - use it
+        hicon_big = win32gui.LoadImage(0, 'fofix.ico', win32gui.IMAGE_ICON, 32, 32, win32gui.LR_LOADFROMFILE)
         win32api.SendMessage(hwnd, win32con.WM_SETICON, win32con.ICON_BIG, hicon_big)
-        hicon_small = win32gui.LoadImage(0, 'fof.ico', win32gui.IMAGE_ICON, 16, 16, win32gui.LR_LOADFROMFILE)
+        hicon_small = win32gui.LoadImage(0, 'fofix.ico', win32gui.IMAGE_ICON, 16, 16, win32gui.LR_LOADFROMFILE)
         win32api.SendMessage(hwnd, win32con.WM_SETICON, win32con.ICON_SMALL, hicon_small)
       elif hasattr(sys, 'frozen') and sys.frozen == 'windows_exe':
         # case: running from py2exe'd exe - use the icon embedded in us
