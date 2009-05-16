@@ -256,7 +256,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       if guitar:
         player.guitarNum = gNum
         gNum += 1
-        if not self.firstGuitar:
+        if self.firstGuitar is None:
           self.firstGuitar = j
         self.neckrender.append(Neck.Neck(self.engine, self.instruments[j], player))
         if self.instruments[j].isDrum:
@@ -3529,7 +3529,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
   def handleJurgen(self, pos):
     #chordFudge = 1   #MFH - was 10 - #myfingershurt - needed to detect chords
-    if not self.firstGuitar:
+    if self.firstGuitar is None:
       return
     chordFudge = self.song.track[self.firstGuitar].chordFudge
     if self.autoPlay or self.assisting:
@@ -5996,15 +5996,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.engine.drawImage(self.lyricSheet, scale = (self.lyricSheetScaleFactor,-self.lyricSheetScaleFactor), coord = (w/2, h*0.935))
         #the timing line on this lyric sheet image is approx. 1/4 over from the left
       #MFH - also render the scrolling lyrics & sections before changing viewports:
-      if self.firstGuitar:
+      if self.firstGuitar is not None:
         minPos = pos - ((self.instruments[0].currentPeriod * self.instruments[0].beatsPerBoard) / 2)
         maxPos = pos + ((self.instruments[0].currentPeriod * self.instruments[0].beatsPerBoard) * 1.5)
         eventWindow = (maxPos - minPos)
         #lyricSlop = ( self.instruments[0].currentPeriod / (maxPos - minPos) ) / 4
         lyricSlop = ( self.instruments[0].currentPeriod / ((maxPos - minPos)/2) ) / 2
       else:
-        minPos = pos - (self.instruments[0].currentPeriod)
-        maxPos = pos + (self.instruments[0].currentPeriod * 2)
+        minPos = pos - (self.instruments[0].currentPeriod * 2)
+        maxPos = pos + (self.instruments[0].currentPeriod * 7)
         eventWindow = (maxPos - minPos)
         #lyricSlop = ( self.instruments[0].currentPeriod / (maxPos - minPos) ) / 4
         lyricSlop = ( self.instruments[0].currentPeriod / ((maxPos - minPos)/2) ) / 2
