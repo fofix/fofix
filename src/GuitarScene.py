@@ -3300,7 +3300,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.starDelay[i] = (10-self.analogSPSense[i])*25
         else:
           self.starDelay[i] -= ticks
-          if self.starDelay[i] <= 0:
+          if self.starDelay[i] <= 0 and not self.starActive[i]:
             self.activateSP(i)
             self.starActive[i] = True
       else:
