@@ -233,6 +233,8 @@ class GetText(Layer, KeyListener):
       self.text = self.text[:-1]
     elif unicode and ord(unicode) > 31 and not self.accepted:
       self.text += unicode
+    elif key == pygame.K_LSHIFT or key == pygame.K_RSHIFT:
+      return True
     elif (c in Player.menuYes or key == pygame.K_RETURN) and not self.accepted:   #MFH - adding support for green drum "OK"
       self.engine.view.popLayer(self)
       self.accepted = True
