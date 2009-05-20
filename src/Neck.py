@@ -580,6 +580,7 @@ class Neck:
       self.renderNeckMethod(v*self.neckAlpha[4], offset, neck, alpha)
 
     if Shader.list.enabled:
+      Shader.list.globals["songpos"] = pos
       posx = Shader.list.time()
       fret = []
       for i in range(5):

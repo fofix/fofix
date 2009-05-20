@@ -64,6 +64,7 @@ class shaderList:
     self.turnon = False
     self.var = {}
     self.assigned = {}
+    self.globals = {}
     time.clock()
     self.reset()
       
@@ -210,13 +211,18 @@ class shaderList:
           glUseProgramObjectARB(self[shader]["program"])
           self.active = self.shaders[shader]
           self.setTextures()
-          self.setVar("time",self.time())
           self.update()
+          self.globals["time"] = self.time()
+          self.setGlobals()
           return True
         else:
           return False
     except:
       return False
+      
+  def setGlobals(self):
+    for i in self.globals.keys():
+      self.setVar(i,self.globals[i])
 
           
   def update(self):
