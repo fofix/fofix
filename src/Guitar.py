@@ -846,7 +846,7 @@ class Guitar:
             Shader.list.modVar("height",0.2,0.3)
           Shader.list.setVar("scalexy",(5.0,1.0))
           Shader.list.setVar("offset",(5.0-size[1],0.0))
-          size=(size[0]*100,size[1])
+          size=(size[0]*8,size[1])
           
           
         self.engine.draw3Dtex(tex1, vertex = (-size[0], 0, size[0], size[1]), texcoord = (0.0, 0.0, 1.0, 1.0),

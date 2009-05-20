@@ -63,6 +63,7 @@ class shaderList:
     self.enabled = False
     self.turnon = False
     self.var = {}
+    self.assigned = {}
     time.clock()
     self.reset()
       
@@ -202,7 +203,10 @@ class shaderList:
         
   def enable(self, shader):
     try:
-        if self.turnon and self[shader]["enabled"]:
+        if self.assigned.has_key(shader):
+          shader = self.assigned[shader]
+          
+        if self.turnon:
           glUseProgramObjectARB(self[shader]["program"])
           self.active = self.shaders[shader]
           self.setTextures()
@@ -410,11 +414,7 @@ class shaderList:
      else:
        if self.turnon:
          for i in self.shaders.keys():
-           enabled = Config.get("video","shader_"+i)
-           if enabled == None or enabled == 1:
-             self.shaders[i]["enabled"] = True
-           else:
-             self.shaders[i]["enabled"] = False
+           self.assigned[i] = Config.get("video","shader_"+i)
          return True
          
   def defineConfig(self):
@@ -514,6 +514,16 @@ class shaderList:
       self.disable()
     else:
       Log.error("Shader has not been compiled: lightning")  
+      
+    if self.make("rockbandtail","tail2"):
+      self.enable("tail2")
+      self.setVar("height",0.0)
+      self.setVar("color",(0.0,0.6,1.0,1.0))
+      self.setVar("offset",(0.0,0.0))
+      self.setVar("scalexy",(1.0,1.0))
+      self.disable()
+    else:
+      Log.error("Shader has not been compiled: rockbandtail")  
 
     if self.make("metal","rbnotes"):
       self.enable("rbnotes")

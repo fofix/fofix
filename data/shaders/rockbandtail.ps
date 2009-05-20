@@ -1,0 +1,19 @@
+uniform float height;
+
+uniform vec4 color;
+
+varying vec3 pos;
+varying vec2 vTexCoord;
+
+void main()
+{
+   float width = 0.2;
+   float sinz = 5.0* (height-0.2) * width*abs(sin(pos.z));
+   float alpha = max(0.0,width - abs(pos.x + sinz)) + max(0.0,width - abs(pos.x - sinz));
+   alpha /= width*2;
+   alpha = pow(alpha,2.0);
+   
+   float fog = min(1.0,4.0*(1.0-abs(vTexCoord.x)));
+   
+   gl_FragColor = vec4(color.rgb,alpha*fog);
+ }
