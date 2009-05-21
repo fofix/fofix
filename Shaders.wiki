@@ -11,6 +11,14 @@ uniform float time;
 ||_*Uniform*_||_*Type*_||_*Description*_||
 ||time||float||Time (in seconds) since ShaderList loading. Updates on each shader activation.||
 
+= Global Variables = 
+
+These variables are used by any shader that have uniforms with these names.
+
+||_*Uniform*_||_*Type*_||_*Description*_||
+||time||float||Time (in seconds) since ShaderList loading. Updates on each shader activation.||
+||songpos||float||Current song position||
+
 = Neck Flash =
 
 _Name:_ neck
