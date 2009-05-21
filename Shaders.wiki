@@ -21,6 +21,9 @@ These variables are used by any shader that have uniforms with these names.
 ||dfActive||bool||True if drum fills section is active.||
 ||isDrum||bool||True if instrument is Drum.||
 ||isFailing||bool||True if rockmeter is in the red zone.||
+||isMultChanged||bool||True if player's score multiplier had been changed in this frame.||
+||killswitch||bool||True when killswitch pressed.||
+||multChangePos||float||Last multiplier change position.||
 ||notepos||vec4||Position of last F2-F5 notes hit.||
 ||rockLevel||float||Current rockmeter level. 1.0 - full rockmeter.||
 ||scoreMult||int||Current score multiplier.||
