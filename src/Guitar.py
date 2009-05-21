@@ -585,6 +585,7 @@ class Guitar:
     #Blazingamer: These variables are updated through the guitarscene which then pass 
     #through to the neck because it is used in both the neck.py and the guitar.py
     self.isFailing = False
+    self.rockLevel = 0.0
     self.canGuitarSolo = False
     self.guitarSolo = False
     self.fretboardHop = 0.00  #stump
@@ -2341,6 +2342,7 @@ class Guitar:
     if Shader.list.turnon:
       Shader.list.globals["dfActive"] = self.drumFillsActive
       Shader.list.globals["breActive"] = self.freestyleActive
+      Shader.list.globals["rockLevel"] = self.rockLevel
       
 
     if not self.starNotesSet == True:

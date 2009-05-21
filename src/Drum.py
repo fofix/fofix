@@ -331,6 +331,7 @@ class Drum:
     self.ocount = 0
     self.noterotate = self.engine.config.get("coffee", "noterotate")
     self.isFailing = False
+    self.rockLevel = 0.0
     self.failcount = 0
     self.failcount2 = False
     self.spcount = 0
@@ -2332,6 +2333,11 @@ class Drum:
 
 
   def render(self, visibility, song, pos, controls, killswitch):
+  
+    if Shader.list.turnon:
+      Shader.list.globals["dfActive"] = self.drumFillsActive
+      Shader.list.globals["breActive"] = self.freestyleActive
+      Shader.list.globals["rockLevel"] = self.rockLevel
 
     if not self.starNotesSet == True:
       self.totalNotes = 0

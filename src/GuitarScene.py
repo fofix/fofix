@@ -4607,11 +4607,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         guitar.render(self.visibility, self.song, self.getSongPosition(), self.controls, self.killswitchEngaged[i])  #QQstarS: new
         glPopMatrix()
       if self.coOp or self.coOpGH:
+        guitar.rockLevel = self.rock[self.coOpPlayerMeter] / self.rockMax
         if self.rock[self.coOpPlayerMeter]< self.rockMax/3.0 and self.failingEnabled:
           guitar.isFailing = True
         else:
           guitar.isFailing = False
       elif self.coOpRB:
+        guitar.rockLevel = self.rock[i] / self.rockMax
         if self.rock[i]< self.rockMax/3.0 and self.failingEnabled:
           guitar.isFailing = True
         elif self.numDeadPlayers > 0 and self.rock[self.coOpPlayerMeter]< self.rockMax/6.0 and self.failingEnabled:
@@ -4619,7 +4621,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         else:
           guitar.isFailing = False
       else:
-        #if self.rock[i]< self.rockMax/3.0:
+        guitar.rockLevel = self.rock[i] / self.rockMax
         if self.rock[i]< self.rockMax/3.0 and self.failingEnabled:
           guitar.isFailing = True
         else:
