@@ -35,7 +35,7 @@ import Theme
 import Config
 import Log
 import pygame
-import Shader
+from Shader import shaders
 
 from OpenGL.GL import *
 import math
@@ -2334,10 +2334,10 @@ class Drum:
 
   def render(self, visibility, song, pos, controls, killswitch):
   
-    if Shader.list.turnon:
-      Shader.list.globals["dfActive"] = self.drumFillsActive
-      Shader.list.globals["breActive"] = self.freestyleActive
-      Shader.list.globals["rockLevel"] = self.rockLevel
+    if shaders.turnon:
+      shaders.globals["dfActive"] = self.drumFillsActive
+      shaders.globals["breActive"] = self.freestyleActive
+      shaders.globals["rockLevel"] = self.rockLevel
 
     if not self.starNotesSet == True:
       self.totalNotes = 0
@@ -2681,8 +2681,8 @@ class Drum:
           if i == 0 and self.fretboardHop < 0.07:
               self.fretboardHop = 0.07  #stump
               
-          if Shader.list.turnon:
-            Shader.list.var["drum"][i]=Shader.list.time()
+          if shaders.turnon:
+            shaders.var["drum"][i]=shaders.time()
           return self.hitNote(time, note)  
         
           

@@ -41,7 +41,7 @@ import sys
 import Theme
 import Player
 import Version
-import Shader
+from Shader import shaders
 
 #myfingershurt: needed for multi-OS file fetching
 import os
@@ -317,7 +317,7 @@ class MainMenu(BackgroundLayer):
   def shown(self):
     self.engine.view.pushLayer(self.menu)
     self.engine.stopServer()
-    Shader.list.checkIfEnabled()
+    shaders.checkIfEnabled()
   
   def runMusic(self):
     if not self.song.isPlaying():   #re-randomize

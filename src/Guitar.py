@@ -33,7 +33,7 @@ from Mesh import Mesh
 import Theme
 import random
 from copy import deepcopy
-import Shader
+from Shader import shaders
 
 from OpenGL.GL import *
 import math
@@ -831,23 +831,23 @@ class Guitar:
             color = (c1 + c1*2.0*tailGlow, c2 + c2*2.0*tailGlow, c3 + c3*2.0*tailGlow, c4*0.6 + c4*0.4*tailGlow)    #MFH - this fades inactive tails' color darker                    
             
           tailcol = (color)
-        if self.theme == 2 and freestyleTail == 0 and big and tailOnly and Shader.list.enable("tail"):
+        if self.theme == 2 and freestyleTail == 0 and big and tailOnly and shaders.enable("tail"):
           color = (color[0]*1.5,color[1]*1.5,color[2]*1.5,1.0)
           if kill and self.killfx == 0:
-            if Shader.list.var["whammy"] == 0:
+            if shaders.var["whammy"] == 0:
               color = (1.0,1.0,1.0,1.0)
-              Shader.list.setVar("color",color)
-              Shader.list.modVar("height",0.0,0.3)
+              shaders.setVar("color",color)
+              shaders.modVar("height",0.0,0.3)
             else:
-              Shader.list.setVar("color",color)
-              h = Shader.list.getVar("height")
-              Shader.list.modVar("height",0.5,0.06/h-0.1)
+              shaders.setVar("color",color)
+              h = shaders.getVar("height")
+              shaders.modVar("height",0.5,0.06/h-0.1)
           else:  
-            Shader.list.setVar("color",color)
-            Shader.list.modVar("height",0.2,0.3)
-          Shader.list.setVar("scalexy",(5.0,1.0))
-          Shader.list.setVar("offset",(5.0-size[1],0.0))
-          size=(size[0]*8,size[1])
+            shaders.setVar("color",color)
+            shaders.modVar("height",0.2,0.3)
+          shaders.setVar("scalexy",(5.0,1.0))
+          shaders.setVar("offset",(5.0-size[1],0.0))
+          size=(size[0]*15,size[1])
           
           
         self.engine.draw3Dtex(tex1, vertex = (-size[0], 0, size[0], size[1]), texcoord = (0.0, 0.0, 1.0, 1.0),
@@ -855,7 +855,7 @@ class Guitar:
         self.engine.draw3Dtex(tex2, vertex = (-size[0], size[1], size[0], size[1] + (zsize)),
                               scale = tailscale, texcoord = (0.0, 0.05, 1.0, 0.95), color = tailcol)
 
-        Shader.list.disable()  
+        shaders.disable()  
 
         #MFH - this block of code renders the tail "beginning" - before the note, for freestyle "lanes" only
         #volshebnyi
@@ -1045,10 +1045,10 @@ class Guitar:
         glDisable(GL_TEXTURE_2D)          
         
       else:
-        if Shader.list.enable("rbnotes"):
-          Shader.list.setVar("Material",color)
+        if shaders.enable("rbnotes"):
+          shaders.setVar("Material",color)
         note.render("Mesh_001")
-        Shader.list.disable()
+        shaders.disable()
         glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
         if isTappable:
           if self.hopoColor[0] == -2:
@@ -2339,10 +2339,10 @@ class Guitar:
         
   def render(self, visibility, song, pos, controls, killswitch):
   
-    if Shader.list.turnon:
-      Shader.list.globals["dfActive"] = self.drumFillsActive
-      Shader.list.globals["breActive"] = self.freestyleActive
-      Shader.list.globals["rockLevel"] = self.rockLevel
+    if shaders.turnon:
+      shaders.globals["dfActive"] = self.drumFillsActive
+      shaders.globals["breActive"] = self.freestyleActive
+      shaders.globals["rockLevel"] = self.rockLevel
       
 
     if not self.starNotesSet == True:
@@ -3079,12 +3079,12 @@ class Guitar:
       if note.played != True:
         continue
       
-      if Shader.list.turnon:
-        Shader.list.var["fret"][note.number]=Shader.list.time()
+      if shaders.turnon:
+        shaders.var["fret"][note.number]=shaders.time()
         if note.number == 1:
-          Shader.list.globals["basspos"] = pos
+          shaders.globals["basspos"] = pos
         else:
-          Shader.list.globals["notepos"][note.number-1] = pos
+          shaders.globals["notepos"][note.number-1] = pos
         
       
       self.pickStartPos = pos
@@ -3137,7 +3137,7 @@ class Guitar:
     for theFret in range(5):
       self.freestyleHit[theFret] = controls.getState(self.keys[theFret+5])
       if self.freestyleHit[theFret]:
-        Shader.list.var["fret"][theFret]=Shader.list.time()
+        shaders.var["fret"][theFret]=shaders.time()
         numHits += 1
     return numHits
 
@@ -3153,7 +3153,7 @@ class Guitar:
     for theFret in range(5):
       self.freestyleHit[theFret] = controls.getState(self.keys[theFret])
       if self.freestyleHit[theFret]:
-        Shader.list.var["fret"][theFret]=Shader.list.time()
+        shaders.var["fret"][theFret]=shaders.time()
         numHits += 1
     return numHits
 

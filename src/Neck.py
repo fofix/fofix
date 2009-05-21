@@ -27,7 +27,7 @@ from Mesh import Mesh
 import Theme
 import random
 from copy import deepcopy
-import Shader
+from Shader import shaders, mixColors
 
 from OpenGL.GL import *
 import math
@@ -579,42 +579,41 @@ class Neck:
 
       self.renderNeckMethod(v*self.neckAlpha[4], offset, neck, alpha)
 
-    if Shader.list.enabled:
-      Shader.list.globals["songpos"] = pos
-      Shader.list.globals["spEnabled"] = self.starPowerActive
-      Shader.list.globals["isFailing"] = self.isFailing
-      Shader.list.globals["scoreMult"] = self.scoreMultiplier
-      Shader.list.globals["isDrum"] = self.isDrum
-      Shader.list.globals["soloActive"] = self.guitarSolo
+    if shaders.enabled:
+      shaders.globals["songpos"] = pos
+      shaders.globals["spEnabled"] = self.starPowerActive
+      shaders.globals["isFailing"] = self.isFailing
+      shaders.globals["scoreMult"] = self.scoreMultiplier
+      shaders.globals["isDrum"] = self.isDrum
+      shaders.globals["soloActive"] = self.guitarSolo
       
-      posx = Shader.list.time()
+      posx = shaders.time()
       fret = []
+      neckcol = (0,0,0)
       for i in range(5):
-        fret.append(max(posx - Shader.list.var["fret"][i] + 0.7,0.01))
-      r = 1.2 / fret[1] + 0.6 / fret[2] + 0.8 / fret[4]
-      g = 1.2 / fret[0] + 0.6 / fret[2] + 0.4 / fret[4]
-      b = 1.2 / fret[3]
-      a = (r+g+b)/70.0
-      Shader.list.var["color"]=(r,g,b,a*2.0)
+        blend = max(shaders.var["fret"][i] - posx + 1.5,0.01)
+        neckcol = mixColors(neckcol, Theme.fretColors[i], blend)
+
+      shaders.var["color"][self.player]=neckcol
       
-    if Shader.list.enable("neck"):
-      Shader.list.setVar("fretcol","color")
-      Shader.list.update()
+    if shaders.enable("neck"):
+      shaders.setVar("fretcol","color")
+      shaders.update()
       glBegin(GL_TRIANGLE_STRIP)
       glVertex3f(-w / 2, 0.1, -2)
       glVertex3f(w / 2, 0.1, -2)
       glVertex3f(-w / 2, 0.1, l)
       glVertex3f(w / 2, 0.1, l)
       glEnd()
-      Shader.list.disable()
+      shaders.disable()
     else:
       if self.isFailing:
         self.renderNeckMethod(self.failcount*self.neckAlpha[5], 0, self.failNeck)
         
     if (self.guitarSolo or self.starPowerActive) and self.theme == 1:
-      Shader.list.var["solocolor"]=(0.3,0.7,0.9,0.6)
+      shaders.var["solocolor"]=(0.3,0.7,0.9,0.6)
     else:
-      Shader.list.var["solocolor"]=(0.0,)*4
+      shaders.var["solocolor"]=(0.0,)*4
 
 
   def drawTrack(self, visibility, song, pos):
@@ -755,24 +754,24 @@ class Neck:
     glDisable(GL_TEXTURE_2D)
     
     if self.theme == 1:   
-      if Shader.list.enable("sololight"):
-        Shader.list.modVar("color",Shader.list.var["solocolor"])
-        Shader.list.setVar("offset",(-3.5,-w/2))
+      if shaders.enable("sololight"):
+        shaders.modVar("color",shaders.var["solocolor"])
+        shaders.setVar("offset",(-3.5,-w/2))
         glBegin(GL_TRIANGLE_STRIP)
         glVertex3f(w / 2-1.0, 0.4, -2)
         glVertex3f(w / 2+1.0, 0.4, -2)
         glVertex3f(w / 2-1.0, 0.4, l)
         glVertex3f(w / 2+1.0, 0.4, l)
         glEnd()   
-        Shader.list.setVar("offset",(-3.5,w/2))
-        Shader.list.setVar("time",Shader.list.time()+0.5)
+        shaders.setVar("offset",(-3.5,w/2))
+        shaders.setVar("time",shaders.time()+0.5)
         glBegin(GL_TRIANGLE_STRIP)
         glVertex3f(-w / 2+1.0, 0.4, -2)
         glVertex3f(-w / 2-1.0, 0.4, -2)
         glVertex3f(-w / 2+1.0, 0.4, l)
         glVertex3f(-w / 2-1.0, 0.4, l)
         glEnd()  
-        Shader.list.disable()
+        shaders.disable()
 
   def drawBPM(self, visibility, song, pos):
     if not song:

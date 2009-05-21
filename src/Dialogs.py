@@ -52,7 +52,7 @@ import Data
 import Player
 import Guitar
 import random
-import Shader
+from Shader import shaders
 
 #myfingershurt: drums :)
 import Drum
@@ -1583,9 +1583,9 @@ class SongChooser(Layer, KeyListener):
       
     
     
-    if Shader.list.enable("cd"):
+    if shaders.enable("cd"):
       self.cassette.render("Mesh_001")
-      Shader.list.disable()
+      shaders.disable()
   
   def renderLibrary(self, color, label):
     if not self.libraryMesh:

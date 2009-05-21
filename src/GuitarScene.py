@@ -51,7 +51,7 @@ import Stage
 import Settings
 import Song
 import Scorekeeper
-import Shader
+from Shader import shaders
 
 from Vocalist import Vocalist
 
@@ -697,7 +697,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if self.whammyEffect == 1 and not Audio.pitchBendSupported:    #pitchbend
       Dialogs.showMessage(self.engine, "Pitchbend module not found!  Forcing Killswitch effect.")
       self.whammyEffect = 0
-    Shader.list.var["whammy"] = self.whammyEffect
+    shaders.var["whammy"] = self.whammyEffect
     self.bigRockEndings = self.engine.config.get("game", "big_rock_endings")
     self.showFreestyleActive = self.engine.config.get("debug",   "show_freestyle_active")
     #stump: continuous star fillup
@@ -2796,7 +2796,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         instrument.drumFillsHits = 0
       instrument.freestyleLastFretHitTime = [0 for i in range(5)]
     #volshebnyi - shaders reset
-    Shader.list.reset()
+    shaders.reset()
     self.failed = False
     self.battleSuddenDeath = False
     self.finalFailed = False

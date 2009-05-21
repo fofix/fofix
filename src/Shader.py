@@ -400,8 +400,7 @@ class shaderList:
   def reset(self):
     self.checkIfEnabled()
     if self.turnon:
-      self.var["color"]=(0.0,)*4      #color for guitar neck flashing
-      self.var["drumcolor"]=(0.0,)*4  #color for drum neck flashing
+      self.var["color"] = {}     #color for guitar neck flashing
       self.var["solocolor"]=(0.0,)*4  #color for GH3 solo lightnings
       self.var["eqcolor"]=(0.0,)*4    #color for equalizer
       self.var["drum"]=[-10.0]*5      #last fret note hit time
@@ -553,6 +552,16 @@ class shaderList:
       Log.error("Shader has not been compiled: cd")  
       
     self.defineConfig()
+    
+def mixColors(c1,c2,blend=0.5):
+  c1 = list(c1)
+  c2 = list(c2)
+  alpha = 0.0
+  for i in range(3):
+    c1[i] =  c1[i] + blend * c2[i]
+    alpha += c1[i]
+  c1 = c1[:3] + [min(alpha / 3.0,1.0)]
+  return tuple(c1)
   
 multiTex = None
-list = shaderList()
+shaders = shaderList()

@@ -27,7 +27,7 @@ import Config
 from OpenGL.GL import *
 import math
 import Log
-import Shader
+from Shader import shaders
 import Theme
 import os
 import random   #MFH - needed for new stage background handling
@@ -567,20 +567,23 @@ class Stage(object):
   def render(self, visibility):
     self.renderBackground()
     self._renderLayers(self.backgroundLayers, visibility)
-    if Shader.list.enable("stage"):
-      height=(3.0*Shader.list.var["color"][3] + 4.5*Shader.list.var["drumcolor"][3])**2
-      Shader.list.setVar("height",2*height)
-      Shader.list.setVar("ambientGlow",height/1.5)
-      Shader.list.modVar("color",Shader.list.var["color"],0.05,5.0)
-      Shader.list.modVar("color",Shader.list.var["drumcolor"],0.05,6.0)
-      Shader.list.setVar("glowStrength",60+height*80.0)
+    if shaders.enable("stage"):
+      height = 0.0
+      for i in shaders.var["color"].keys():
+        shaders.modVar("color",shaders.var["color"][i],0.05,10.0)
+        height += shaders.var["color"][i][3]/3.0
+      height=height**2
+      shaders.setVar("height",2*height)
+      shaders.setVar("ambientGlow",height/1.5)
+
+      shaders.setVar("glowStrength",60+height*80.0)
       glBegin(GL_TRIANGLE_STRIP)
       glVertex3f(-8.0, 1.0,7.0)
       glVertex3f(8.0, 1.0,7.0)
       glVertex3f(-8.0, 4.0,7.0)
       glVertex3f(8.0, 4.0,7.0)
       glEnd()    
-      Shader.list.disable()
+      shaders.disable()
       
     self.scene.renderGuitar()
     self._renderLayers(self.foregroundLayers, visibility)
