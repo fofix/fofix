@@ -2337,6 +2337,11 @@ class Guitar:
           event.flameCount += 1
         
   def render(self, visibility, song, pos, controls, killswitch):
+  
+    if Shader.list.turnon:
+      Shader.list.globals["dfActive"] = self.drumFillsActive
+      Shader.list.globals["breActive"] = self.freestyleActive
+      
 
     if not self.starNotesSet == True:
       self.totalNotes = 0
@@ -3074,6 +3079,11 @@ class Guitar:
       
       if Shader.list.turnon:
         Shader.list.var["fret"][note.number]=Shader.list.time()
+        if note.number == 1:
+          Shader.list.globals["basspos"] = pos
+        else:
+          Shader.list.globals["notepos"][note.number-1] = pos
+        
       
       self.pickStartPos = pos
       self.pickStartPos = max(self.pickStartPos, time)

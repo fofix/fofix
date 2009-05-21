@@ -581,6 +581,12 @@ class Neck:
 
     if Shader.list.enabled:
       Shader.list.globals["songpos"] = pos
+      Shader.list.globals["spEnabled"] = self.starPowerActive
+      Shader.list.globals["isFailing"] = self.isFailing
+      Shader.list.globals["scoreMult"] = self.scoreMultiplier
+      Shader.list.globals["isDrum"] = self.isDrum
+      Shader.list.globals["soloActive"] = self.guitarSolo
+      
       posx = Shader.list.time()
       fret = []
       for i in range(5):
@@ -593,7 +599,6 @@ class Neck:
       
     if Shader.list.enable("neck"):
       Shader.list.setVar("fretcol","color")
-      Shader.list.setVar("fail",self.isFailing)
       Shader.list.update()
       glBegin(GL_TRIANGLE_STRIP)
       glVertex3f(-w / 2, 0.1, -2)

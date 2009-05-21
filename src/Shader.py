@@ -167,10 +167,12 @@ class shaderList:
       pos[1] = value
       if program == self.active and program != 0:
         try:
+          if type(value) == list:
+            value = tuple(value)
           if type(value) == bool:
             if pos[1]: glUniform1i(pos[0],1)
             else: glUniform1i(pos[0],0)
-          if type(value) == float:
+          elif type(value) == float:
             glUniform1f(pos[0],pos[1])
           elif type(value) == int:
             glUniform1i(pos[0],pos[1])
@@ -404,7 +406,8 @@ class shaderList:
       self.var["eqcolor"]=(0.0,)*4    #color for equalizer
       self.var["drum"]=[-10.0]*5      #last fret note hit time
       self.var["fret"]=[-10.0]*5      #last drum note hit time
-      self.loadFromIni()
+      self.globals["notepos"]=[-10.0]*4      #last drum note hit time
+      #self.loadFromIni()
     
   def checkIfEnabled(self):
      try:
