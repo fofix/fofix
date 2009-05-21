@@ -406,6 +406,7 @@ class shaderList:
       self.var["fret"] = {}                    #last note hit time for each player
       self.var["fretpos"] = {}                 #last note hit pos for each player
       self.var["scoreMult"] = {}               #score multiplier for each player
+      self.var["multChangePos"] = {}           #score multiplier last changing pos for each player
       #self.loadFromIni()
     
   def checkIfEnabled(self):

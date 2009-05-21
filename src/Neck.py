@@ -586,6 +586,8 @@ class Neck:
       shaders.globals["spEnabled"] = self.starPowerActive
       shaders.globals["isFailing"] = self.isFailing
       shaders.globals["isMultChanged"] = (shaders.var["scoreMult"][self.player] != self.scoreMultiplier)
+      if shaders.globals["isMultChanged"]:
+        shaders.var["multChangePos"][self.player] = pos
       shaders.globals["scoreMult"] = self.scoreMultiplier
       shaders.var["scoreMult"][self.player] = self.scoreMultiplier
       shaders.globals["isDrum"] = self.isDrum

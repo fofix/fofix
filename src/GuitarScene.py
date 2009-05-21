@@ -2802,6 +2802,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       shaders.var["fretpos"][i]=[-10.0]*5
       shaders.var["color"][i]=(.0,)*4
       shaders.var["scoreMult"][i]=1
+      shaders.var["multChangePos"][i]=-10.0
     self.failed = False
     self.battleSuddenDeath = False
     self.finalFailed = False
