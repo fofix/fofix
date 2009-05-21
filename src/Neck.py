@@ -597,7 +597,7 @@ class Neck:
       shaders.var["color"][self.player]=neckcol
       
     if shaders.enable("neck"):
-      shaders.setVar("fretcol","color")
+      shaders.setVar("fretcol",neckcol)
       shaders.update()
       glBegin(GL_TRIANGLE_STRIP)
       glVertex3f(-w / 2, 0.1, -2)
