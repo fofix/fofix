@@ -580,8 +580,8 @@ class Neck:
       self.renderNeckMethod(v*self.neckAlpha[4], offset, neck, alpha)
 
     if shaders.enabled:
-      shaders.globals["basspos"] = {}
-      shaders.globals["notepos"] = {}
+      shaders.globals["basspos"] = shaders.var["fret"][self.player][0]
+      shaders.globals["notepos"] = shaders.var["fret"][self.player][1:]
       shaders.globals["songpos"] = pos
       shaders.globals["spEnabled"] = self.starPowerActive
       shaders.globals["isFailing"] = self.isFailing

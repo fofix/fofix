@@ -13,7 +13,7 @@ void main()
    alpha /= width*2;
    alpha = pow(alpha,2.0);
    
-   float fog = min(1.0,4.0*(1.0-abs(vTexCoord.x)));
+   float fog = min(1.0,8.0*(1.0-abs(vTexCoord.x)));
    
    gl_FragColor = vec4(color.rgb,alpha*fog);
  }

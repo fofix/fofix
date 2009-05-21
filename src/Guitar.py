@@ -2343,6 +2343,7 @@ class Guitar:
       shaders.globals["dfActive"] = self.drumFillsActive
       shaders.globals["breActive"] = self.freestyleActive
       shaders.globals["rockLevel"] = self.rockLevel
+      shaders.globals["killswitch"] = killswitch
       
 
     if not self.starNotesSet == True:
