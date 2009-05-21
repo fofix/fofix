@@ -580,10 +580,14 @@ class Neck:
       self.renderNeckMethod(v*self.neckAlpha[4], offset, neck, alpha)
 
     if shaders.enabled:
+      shaders.globals["basspos"] = {}
+      shaders.globals["notepos"] = {}
       shaders.globals["songpos"] = pos
       shaders.globals["spEnabled"] = self.starPowerActive
       shaders.globals["isFailing"] = self.isFailing
+      shaders.globals["isMultChanged"] = (shaders.var["scoreMult"][self.player] != self.scoreMultiplier)
       shaders.globals["scoreMult"] = self.scoreMultiplier
+      shaders.var["scoreMult"][self.player] = self.scoreMultiplier
       shaders.globals["isDrum"] = self.isDrum
       shaders.globals["soloActive"] = self.guitarSolo
       
@@ -591,7 +595,7 @@ class Neck:
       fret = []
       neckcol = (0,0,0)
       for i in range(5):
-        blend = max(shaders.var["fret"][i] - posx + 1.5,0.01)
+        blend = max(shaders.var["fret"][self.player][i] - posx + 1.5,0.01)
         neckcol = mixColors(neckcol, Theme.fretColors[i], blend)
 
       shaders.var["color"][self.player]=neckcol

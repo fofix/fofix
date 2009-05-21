@@ -3080,11 +3080,8 @@ class Guitar:
         continue
       
       if shaders.turnon:
-        shaders.var["fret"][note.number]=shaders.time()
-        if note.number == 1:
-          shaders.globals["basspos"] = pos
-        else:
-          shaders.globals["notepos"][note.number-1] = pos
+        shaders.var["fret"][self.player][note.number]=shaders.time()
+        shaders.var["fretpos"][self.player][note.number]=pos
         
       
       self.pickStartPos = pos
@@ -3137,7 +3134,9 @@ class Guitar:
     for theFret in range(5):
       self.freestyleHit[theFret] = controls.getState(self.keys[theFret+5])
       if self.freestyleHit[theFret]:
-        shaders.var["fret"][theFret]=shaders.time()
+        if shaders.turnon:
+          shaders.var["fret"][self.player][theFret]=shaders.time()
+          shaders.var["fretpos"][self.player][theFret]=pos
         numHits += 1
     return numHits
 
@@ -3153,7 +3152,9 @@ class Guitar:
     for theFret in range(5):
       self.freestyleHit[theFret] = controls.getState(self.keys[theFret])
       if self.freestyleHit[theFret]:
-        shaders.var["fret"][theFret]=shaders.time()
+        if shaders.turnon:
+          shaders.var["fret"][self.player][theFret]=shaders.time()
+          shaders.var["fretpos"][self.player][theFret]=pos
         numHits += 1
     return numHits
 

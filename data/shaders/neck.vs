@@ -8,7 +8,7 @@ varying vec3 pos;
 
 void main()
 {
-	float alphafog = ( 2.0-gl_Vertex.z ) / 4.0;
+	float alphafog = ( 3.0-gl_Vertex.z ) / 6.0;
 	col = fretcol;
 	col.a *= alphafog;
 	failcol.rgb=vec3(1.0,0.0,0.0);

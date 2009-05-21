@@ -2682,7 +2682,9 @@ class Drum:
               self.fretboardHop = 0.07  #stump
               
           if shaders.turnon:
-            shaders.var["drum"][i]=shaders.time()
+            shaders.var["fret"][self.player][note.number]=shaders.time()
+            shaders.var["fretpos"][self.player][note.number]=pos
+            
           return self.hitNote(time, note)  
         
           

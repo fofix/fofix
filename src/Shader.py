@@ -400,12 +400,12 @@ class shaderList:
   def reset(self):
     self.checkIfEnabled()
     if self.turnon:
-      self.var["color"] = {}     #color for guitar neck flashing
-      self.var["solocolor"]=(0.0,)*4  #color for GH3 solo lightnings
-      self.var["eqcolor"]=(0.0,)*4    #color for equalizer
-      self.var["drum"]=[-10.0]*5      #last fret note hit time
-      self.var["fret"]=[-10.0]*5      #last drum note hit time
-      self.globals["notepos"]=[-10.0]*4      #last drum note hit time
+      self.var["color"] = {}                   #color for guitar neck flashing
+      self.var["solocolor"] = (0.0,)*4         #color for GH3 solo lightnings
+      self.var["eqcolor"] = (0.0,)*4           #color for equalizer
+      self.var["fret"] = {}                    #last note hit time for each player
+      self.var["fretpos"] = {}                 #last note hit pos for each player
+      self.var["scoreMult"] = {}               #score multiplier for each player
       #self.loadFromIni()
     
   def checkIfEnabled(self):
