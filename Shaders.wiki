@@ -16,8 +16,17 @@ uniform float time;
 These variables are used by any shader that have uniforms with these names.
 
 ||_*Uniform*_||_*Type*_||_*Description*_||
-||time||float||Time (in seconds) since ShaderList loading. Updates on each shader activation.||
+||basspos||float||Position of last bass note (green fret) hit.||
+||breActive||bool||True if BRE section is active.||
+||dfActive||bool||True if drum fills section is active.||
+||isDrum||bool||True if instrument is Drum.||
+||isFailing||bool||True if rockmeter is in the red zone.||
+||notepos||vec4||Position of last F2-F5 notes hit.||
+||scoreMult||int||Current score multiplier.||
+||soloActive||bool||True if solo section is active.||
 ||songpos||float||Current song position||
+||time||float||Time (in seconds) since ShaderList loading. Updates on each shader activation.||
+
 
 = Neck Flash =
 
