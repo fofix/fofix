@@ -30,31 +30,31 @@ void main()
 }}}
 It our fragment shader. It makes all pixel of our object violet and half transparent. Cool? No! But let's try!
 
-4) Shader program is ready for action! Let's use it in FoFiX. Where? CD songlist is the best option! Open src\Dialogs.py. Search "Shader.list." That's it:
+4) Shader program is ready for action! Let's use it in FoFiX. Where? CD songlist is the best option! Open src\Dialogs.py. Search "shaders." That's it:
 {{{
-if Shader.list.enable("cd"):
+if shaders.enable("cd"):
       self.cassette.render("Mesh_001")
-      Shader.list.disable()
+      shaders.disable()
 }}}
 Delete these lines, we'll replace them with our new shader.
 
 5) Still "Dialogs.py", line 1608. We need to enable our shader program.
 {{{
-Shader.list.enable("myshader")
+shaders.enable("myshader")
 }}}
-That's it! Our shader is enabled! What about compilation? You don't need to compile, because shader module already compiled it and put it to Shader.list.
+That's it! Our shader is enabled! What about compilation? You don't need to compile, because shader module already compiled it and put it to shaders.
 6) Let's draw a CDs and disable shader.
 {{{
-Shader.list.enable("myshader")
+shaders.enable("myshader")
 self.cassette.render("Mesh_001") #render CD
-Shader.list.disable() # don't forget to disable shader!
+shaders.disable() # don't forget to disable shader!
 }}}
-7) Shader.list.enable() return False if shader activation failed, So we don't need to perform following actions if **** happened.
+7) shaders.enable() return False if shader activation failed, So we don't need to perform following actions if **** happened.
 {{{
-if Shader.list.enable("myshader"):
+if shaders.enable("myshader"):
   self.cassette.render("Mesh_001") #render CD
 #You may place here other objects
-  Shader.list.disable() # don't forget to disable shader!
+  shaders.disable() # don't forget to disable shader!
 }}}
 8) Done! Compile FoFiX. What shall we see in CD songlist? Violet CDs.
 
@@ -81,25 +81,25 @@ void main()
 }}}
 2) Good. Now we need to set this variable. "Dialogs.py", line 1608
 {{{
-if Shader.list.enable("myshader"):
-      Shader.list.setVar("time",self.time)
+if shaders.enable("myshader"):
+      shaders.setVar("time",self.time)
       self.cassette.render("Mesh_001")
-      Shader.list.disable()
+      shaders.disable()
 }}}
 setVar function sets active shader's variable "name" value. If your shader is not active, you may do this:
 {{{
-Shader.list.setVar("time",self.time,program="myshader")
-    if Shader.list.enable("myshader"):
-      Shader.list.update()
+shaders.setVar("time",self.time,program="myshader")
+    if shaders.enable("myshader"):
+      shaders.update()
       self.cassette.render("Mesh_001")
-      Shader.list.disable()
+      shaders.disable()
 }}}
-Shader.list.update() updates all variables in shader. But previous code is much better:
+shaders.update() updates all variables in shader. But previous code is much better:
 {{{
-if Shader.list.enable("myshader"):
-      Shader.list.setVar("time",self.time)
+if shaders.enable("myshader"):
+      shaders.setVar("time",self.time)
       self.cassette.render("Mesh_001")
-      Shader.list.disable()
+      shaders.disable()
 }}}
 3) Done! Now about varying type. Vertex shader's Varying variables can be used by pixel shader. A small example. Edit myshader.vs:
 {{{
@@ -146,11 +146,11 @@ uniform ivec4 vect2;
 }}}
 In python script:
 {{{
-Shader.list.setVar("vect1",(0.1,0.2,0.3),"myshader")
+shaders.setVar("vect1",(0.1,0.2,0.3),"myshader")
 #if shader is enabled:
-#Shader.list.setVar("vect1",(0.1,0.2,0.3))
-Shader.list.setVar("vect2",(4,3,2,1),"myshader")
-print Shader.list.getVar("vect1","myshader")
+#shaders.setVar("vect1",(0.1,0.2,0.3))
+shaders.setVar("vect2",(4,3,2,1),"myshader")
+print shaders.getVar("vect1","myshader")
 }}}
 
 Color is vec4:
@@ -170,7 +170,7 @@ uniform vec4 color;
 
 In python script:
 {{{
-Shader.list.setVar("vect1",(1.0,1.0,0.0,1.0),"myshader") #yellow
+shaders.setVar("vect1",(1.0,1.0,0.0,1.0),"myshader") #yellow
 }}}
 
 ==Textures==
