@@ -19,7 +19,7 @@ cd ..
 del data\*.pyd
 del data\*.dll
 rem pause
-copy dist\FretsOnFire.exe FretsOnFire.exe
+copy dist\FoFiX.exe FoFiX.exe
 copy dist\w9xpopen.exe w9xpopen.exe
 copy dist\data\library.zip data\library.zip
 copy dist\data\*.pyd data\
@@ -33,4 +33,4 @@ rem ping 127.0.0.1 >nul
 ping 127.0.0.1
 
 echo Running FoFiX...
-FretsOnFire.exe
+FoFiX.exe
