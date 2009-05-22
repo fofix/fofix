@@ -1,4 +1,6 @@
 uniform float height;
+uniform float time;
+uniform float speed;
 
 uniform vec4 color;
 
@@ -8,12 +10,22 @@ varying vec2 vTexCoord;
 void main()
 {
    float width = 0.2;
-   float sinz = 5.0* (height-0.2) * width*abs(sin(pos.z));
-   float alpha = max(0.0,width - abs(pos.x + sinz)) + max(0.0,width - abs(pos.x - sinz));
-   alpha /= width*2;
-   alpha = pow(alpha,2.0);
+   float linewidth = 0.005;
+   float blureffect = 4.0;
+   float glowExp = 200.0;
    
-   float fog = min(1.0,8.0*(1.0-abs(vTexCoord.x)));
+   float fadeposition = 0.31;
+   float fadeintensity = 2.9;
+
+   float sinz = 5.0 * (height-0.2) * width * abs(sin(pos.z-(time*speed)));
    
-   gl_FragColor = vec4(color.rgb,alpha*fog);
+   float dist1 = abs(pos.x + sinz) / blureffect;
+   float glow1 = pow(clamp(1.0 - dist1+linewidth, 0.0, 1.0), glowExp);
+   float dist2 = abs(pos.x - sinz) / blureffect;
+   float glow2 = pow(clamp(1.0 - dist2+linewidth, 0.0, 1.0), glowExp);
+   
+   float glow3 = (1.0 - vTexCoord.x - fadeposition)*fadeintensity;
+   
+   gl_FragColor = vec4(color.rgb,glow3*(glow1 + glow2 - glow1 * glow2));
+   //gl_FragColor = color*glow3*(glow1 + glow2 - glow1 * glow2);
  }
