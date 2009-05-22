@@ -570,6 +570,7 @@ class Neck:
 
       if self.oNeckovr != None:
         neck = self.oNeckovr
+        alpha = False
       else:
         if self.isBassGuitar and self.oNeckBass:
           neck = self.oNeckBass
