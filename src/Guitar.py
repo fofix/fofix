@@ -833,18 +833,10 @@ class Guitar:
           tailcol = (color)
         if self.theme == 2 and freestyleTail == 0 and big and tailOnly and shaders.enable("tail"):
           color = (color[0]*1.5,color[1]*1.5,color[2]*1.5,1.0)
+          shaders.setVar("color",color)
           if kill and self.killfx == 0:
-            if shaders.var["whammy"] == 0:
-              color = (1.0,1.0,1.0,1.0)
-              shaders.setVar("color",color)
-              shaders.modVar("height",0.0,0.2)
-            else:
-              shaders.setVar("color",color)
-              h = shaders.getVar("height")
-              shaders.modVar("height",0.5,0.045/h-0.1)
-          else:  
-            shaders.setVar("color",color)
-            shaders.modVar("height",0.2,0.1)
+            h = shaders.getVar("height")
+            shaders.modVar("height",0.5,0.045/h-0.1)
           shaders.setVar("scalexy",(5.0,1.0))
           shaders.setVar("offset",(5.0-size[1],0.0))
           size=(size[0]*15,size[1])
@@ -2343,7 +2335,10 @@ class Guitar:
       shaders.globals["dfActive"] = self.drumFillsActive
       shaders.globals["breActive"] = self.freestyleActive
       shaders.globals["rockLevel"] = self.rockLevel
+      if shaders.globals["killswitch"] != killswitch:
+        shaders.globals["killswitchPos"] = pos
       shaders.globals["killswitch"] = killswitch
+      shaders.modVar("height",0.2,0.1,1.0,"tail")
       
 
     if not self.starNotesSet == True:

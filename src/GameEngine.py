@@ -78,7 +78,7 @@ Config.define("video",  "shader_use",     bool,   True,  text = _("Use Shaders")
 Config.define("video",  "shader_neck",     str,   "neck",  text = _("Neck"), options = {"None":_("Disabled"), "neck": _("Flashing"), "theme": _("By Theme")})
 Config.define("video",  "shader_stage",     str,   "stage",  text = _("Stage"), options = {"None":_("Disabled"), "stage": _("EQ Lightning"), "theme": _("By Theme")})
 Config.define("video",  "shader_sololight",     str,   "sololight",  text = _("Solo and SP"), options = {"None":_("Disabled"), "sololight": _("Lightnings"), "theme": _("By Theme")})
-Config.define("video",  "shader_tail",     str,   "tail",  text = _("Tails"), options = {"None":_("Disabled"), "tail": _("Lightnings"), "tail2": _("RB2"), "theme": _("By Theme")})
+Config.define("video",  "shader_tail",     str,   "tail2",  text = _("Tails"), options = {"None":_("Disabled"), "tail1": _("Lightnings"), "tail2": _("RB2"), "theme": _("By Theme")})
 Config.define("video",  "shader_rbnotes",     str,   "rbnotes",  text = _("Notes"), options = {"None":_("Disabled"), "rbnotes": _("Metal"), "theme": _("By Theme")})
 Config.define("video",  "shader_cd",     str,   "cd",  text = _("CDs"), options = {"None":_("Disabled"), "cd": _("White"), "theme": _("By Theme")})
 

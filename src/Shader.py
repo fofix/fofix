@@ -77,7 +77,6 @@ class shaderList:
       program = self.compile(open(fullname+".vs"), open(fullname+".ps"))
     except:
       program = None
-      print "!!!"
     if program:
       sArray = {"program": program, "name": name, "tex" : (), "textype" : (), "enabled" : True}
       self.lastCompiled = name
@@ -149,6 +148,9 @@ class shaderList:
     return None
     
   def getVar(self, var = "program", program = None):
+    if self.assigned.has_key(program):
+      program = self.assigned[program]
+      
     if program == None: program = self.active
     else: program = self[program]
     if program != 0:
@@ -156,6 +158,8 @@ class shaderList:
       
     
   def setVar(self, var, value, program = None):
+    if self.assigned.has_key(program):
+      program = self.assigned[program]
     if program == None:  program = self.active
     else: program = self[program]
     
@@ -194,7 +198,12 @@ class shaderList:
     return False
     
   def modVar(self, var, value, effect = 0.05, alphaAmp=1.0, program = None):  
+    if self.assigned.has_key(program):
+      program = self.assigned[program]
+      
     old = self.getVar(var,program)
+    if old == None:
+      return None
     if type(old) == tuple:
       new = ()
       for i in range(len(old)):
@@ -407,6 +416,21 @@ class shaderList:
       self.var["fretpos"] = {}                 #last note hit pos for each player
       self.var["scoreMult"] = {}               #score multiplier for each player
       self.var["multChangePos"] = {}           #score multiplier last changing pos for each player
+      
+      self.globals["bpm"] = 120.0
+      self.globals["breActive"] = False
+      self.globals["dfActive"] = False
+      self.globals["isDrum"] = False
+      self.globals["isFailing"] = False
+      self.globals["isMultChanged"] = False
+      self.globals["killswitch"] = False
+      self.globals["killswitchPos"] = -10.0
+      self.globals["multChangePos"] = -10.0
+      self.globals["notepos"] = -10.0
+      self.globals["rockLevel"] = 0.5
+      self.globals["scoreMult"] = 1
+      self.globals["soloActive"] = False
+      self.globals["songpos"] = 0.0
       #self.loadFromIni()
     
   def checkIfEnabled(self):
@@ -423,7 +447,9 @@ class shaderList:
      else:
        if self.turnon:
          for i in self.shaders.keys():
-           self.assigned[i] = Config.get("video","shader_"+i)
+           value = Config.get("video","shader_"+i)
+           if value != "None":
+             self.assigned[i] = value
          return True
          
   def defineConfig(self):
@@ -554,6 +580,7 @@ class shaderList:
       Log.error("Shader has not been compiled: cd")  
       
     self.defineConfig()
+    
     
 def mixColors(c1,c2,blend=0.5):
   c1 = list(c1)
