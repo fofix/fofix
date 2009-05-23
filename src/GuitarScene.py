@@ -2924,7 +2924,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       return
       
     self.partySwitch = 0
-    for i,instrument in enumerate(self.insruments):
+    for i,instrument in enumerate(self.instruments):
       if instrument.isVocal:
         instrument.stopMic()
       else:
