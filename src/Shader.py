@@ -526,7 +526,7 @@ class shaderList:
       
     if self.make("rockbandtail","tail2"):
       self.enable("tail2")
-      self.setVar("height",0.0)
+      self.setVar("height",0.2)
       self.setVar("color",(0.0,0.6,1.0,1.0))
       self.setVar("speed",9.0)
       self.setVar("offset",(0.0,0.0))

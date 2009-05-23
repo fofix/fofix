@@ -837,14 +837,14 @@ class Guitar:
             if shaders.var["whammy"] == 0:
               color = (1.0,1.0,1.0,1.0)
               shaders.setVar("color",color)
-              shaders.modVar("height",0.0,0.3)
+              shaders.modVar("height",0.0,0.2)
             else:
               shaders.setVar("color",color)
               h = shaders.getVar("height")
-              shaders.modVar("height",0.5,0.06/h-0.1)
+              shaders.modVar("height",0.5,0.045/h-0.1)
           else:  
             shaders.setVar("color",color)
-            shaders.modVar("height",0.2,0.3)
+            shaders.modVar("height",0.2,0.1)
           shaders.setVar("scalexy",(5.0,1.0))
           shaders.setVar("offset",(5.0-size[1],0.0))
           size=(size[0]*15,size[1])

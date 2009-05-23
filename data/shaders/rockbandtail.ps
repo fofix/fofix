@@ -20,7 +20,7 @@ void main()
    vec4 white = color + 0.6;
    
 
-   float sinz = 5.0 * (height-0.2) * width * abs(sin(pos.z-(time*speed)));
+   float sinz = 5.0 * max(height-0.15,0.0) * width * abs(sin(pos.z-(time*speed)));
    
    //curves
    float dist1 = abs(pos.x + sinz) / blureffect;

@@ -180,7 +180,8 @@ class CacheManager(object):
     # The cache must be opened or created.
     oldcwd = os.getcwd()
     try:
-      os.chdir(cachePath)  #stump: work around bug in SQLite unicode path name handling
+      if cachePath != 'data\\tutorials':
+        os.chdir(cachePath)  #stump: work around bug in SQLite unicode path name handling
       conn = sqlite3.Connection('.fofix-cache')
     finally:
       os.chdir(oldcwd)
