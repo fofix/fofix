@@ -583,6 +583,7 @@ class Neck:
     if shaders.enabled:
       shaders.globals["basspos"] = shaders.var["fret"][self.player][0]
       shaders.globals["notepos"] = shaders.var["fret"][self.player][1:]
+      shaders.globals["bpm"] = self.currentBpm
       shaders.globals["songpos"] = pos
       shaders.globals["spEnabled"] = self.starPowerActive
       shaders.globals["isFailing"] = self.isFailing
