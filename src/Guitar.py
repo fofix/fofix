@@ -837,7 +837,6 @@ class Guitar:
           if kill and self.killfx == 0:
             h = shaders.getVar("height")
             shaders.modVar("height",0.5,0.06/h-0.1)
-          shaders.setVar("scalexy",(5.0,1.0))
           shaders.setVar("offset",(5.0-size[1],0.0))
           size=(size[0]*15,size[1])
           

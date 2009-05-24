@@ -566,7 +566,7 @@ class shaderList:
       self.setVar("color",(0.0,0.6,1.0,1.0))
       self.setVar("speed",9.0)
       self.setVar("offset",(0.0,0.0))
-      self.setVar("scalexy",(1.0,1.0))
+      self.setVar("scalexy",(5.0,1.0))
       self.disable()
     else:
       Log.error("Shader has not been compiled: rockbandtail")  

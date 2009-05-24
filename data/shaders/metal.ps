@@ -1,6 +1,6 @@
 uniform sampler2D Outline;
 uniform vec4 Material;
-uniform bool isFailing;
+uniform bool isTextured;
 
 
 varying vec3  vNormal;
@@ -20,7 +20,7 @@ void main(void)
    lighting = max(0.0, lighting);  
    vec3 color = vec3(outline) * vec3(lighting) * Material.rgb;
    float alpha = 1.0;
-   if (isFailing)
+   if (isTextured)
    {
      float alpha = 0.5;
    }
