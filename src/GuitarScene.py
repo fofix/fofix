@@ -3999,26 +3999,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           instrument.run(ticks, pos)
           score = instrument.getScoreChange()
           if score:
-            if score == 5:
-              self.rockmeterIncrease(i, 5)
-              self.scoring[i].score += score * self.scoring[i].baseScore * instrument.scoreMultiplier * self.multi[i]
-            elif score == 4:
-              self.rockmeterIncrease(i, 4)
-              self.scoring[i].score += score * self.scoring[i].baseScore * instrument.scoreMultiplier * self.multi[i]
-            elif score == 3:
-              self.scoring[i].score += score * self.scoring[i].baseScore * instrument.scoreMultiplier * self.multi[i]
-            elif score == 2:
-              self.rockmeterDecrease(i, 2)
-              self.scoring[i].score += score * self.scoring[i].baseScore * instrument.scoreMultiplier * self.multi[i]
-            elif score == 1:
-              self.rockmeterIncrease(i, 1)
-              self.scoring[i].score += score * self.scoring[i].baseScore * instrument.scoreMultiplier * self.multi[i]
-            elif score == 0:
+            if score == 0:
               self.rockmeterIncrease(i, 0)
-            if self.rock[i] > self.rockMax:
-              self.rock[i] = self.rockMax
-            if self.rock[i] < 0:
-              self.rock[i] = 0
+            elif score < 5:
+              self.rockmeterIncrease(i, score)
+              self.scoring[i].score += score * self.scoring[i].baseScore * instrument.scoreMultiplier * self.multi[i]
+
+
+            self.rock[i] = min(self.rock[i], self.rockMax)
+            self.rock[i] = max(self.rock[i], 0)
           continue
         self.stage.run(pos, instrument.currentPeriod)
         playerNum = i
@@ -6655,40 +6644,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     self.engine.drawImage(self.mult, scale = (.5,-.0625), coord = multcoord, rect = (0,1,multRange[0],multRange[1]))
     
 
-    
-                if multStreak == 0:
-                  streak = 0
-                  hstreak = 0
-                elif multStreak - ((multiplier-1)*10) == 1:
-                  streak = 0
-                  hstreak = 1  
-                elif multStreak - ((multiplier-1)*10) == 2:
-                  streak = 1
-                  hstreak = 0
-                elif multStreak - ((multiplier-1)*10) == 3:
-                  streak = 1
-                  hstreak = 1
-                elif multStreak - ((multiplier-1)*10) == 4:
-                  streak = 2
-                  hstreak = 0
-                elif multStreak - ((multiplier-1)*10) == 5:
-                  streak = 2
-                  hstreak = 1
-                elif multStreak - ((multiplier-1)*10) == 6:
-                  streak = 3
-                  hstreak = 0
-                elif multStreak - ((multiplier-1)*10) == 7:
-                  streak = 3
-                  hstreak = 1
-                elif multStreak - ((multiplier-1)*10) == 8:
-                  streak = 4
-                  hstreak = 0
-                elif multStreak - ((multiplier-1)*10) == 9:
-                  streak = 4
-                  hstreak = 1
-                else:
-                  streak = 5
-                  hstreak = 0
+                streak = int(min(multStreak - ((multiplier-1)*10) / 2, 5))
+                hstreak = int(multStreak % 2)
     
                 r = self.dots
       
@@ -7596,71 +7553,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 if self.multRbFill:
                   if multStreak == 0:
                     streak = 0
-    
-                  elif multStreak - ((multiplier-1)*10) == 1:
-                    streak = 0
-    
-                  elif multStreak - ((multiplier-1)*10) == 2:
-                    streak = 1
-    
-                  elif multStreak - ((multiplier-1)*10) == 3:
-                    streak = 2
-    
-                  elif multStreak - ((multiplier-1)*10) == 4:
-                    streak = 3
-
-                  elif multStreak - ((multiplier-1)*10) == 5:
-                    streak = 4
-    
-                  elif multStreak - ((multiplier-1)*10) == 6:
-                    streak = 5
-    
-                  elif multStreak - ((multiplier-1)*10) == 7:
-                    streak = 6
-    
-                  elif multStreak - ((multiplier-1)*10) == 8:
-                    streak = 7
-    
-                  elif multStreak - ((multiplier-1)*10) == 9:
-                    streak = 8
-    
                   else:
-                    streak = 9
+                    streak = min(multStreak - (multiplier-1)*10 - 1,9)
   
                 else:
-                  if multStreak == 0:
-                    streak = 0
-                    hstreak = 0
-                  elif multStreak - ((multiplier-1)*10) == 1:
-                    streak = 0
-                    hstreak = 1
-                  elif multStreak - ((multiplier-1)*10) == 2:
-                    streak = 1
-                    hstreak = 0
-                  elif multStreak - ((multiplier-1)*10) == 3:
-                    streak = 1
-                    hstreak = 1
-                  elif multStreak - ((multiplier-1)*10) == 4:
-                    streak = 2
-                    hstreak = 0
-                  elif multStreak - ((multiplier-1)*10) == 5:
-                    streak = 2
-                    hstreak = 1
-                  elif multStreak - ((multiplier-1)*10) == 6:
-                    streak = 3
-                    hstreak = 0
-                  elif multStreak - ((multiplier-1)*10) == 7:
-                    streak = 3
-                    hstreak = 1
-                  elif multStreak - ((multiplier-1)*10) == 8:
-                    streak = 4
-                    hstreak = 0
-                  elif multStreak - ((multiplier-1)*10) == 9:
-                    streak = 4
-                    hstreak = 1
-                  else:
-                    streak = 5
-                    hstreak = 0
+
+                  streak = int(min(multStreak - ((multiplier-1)*10) / 2, 5))
+                  hstreak = int(multStreak % 2)
+                  
  
               if self.rock[i] >= 0: 
                 currentRock = (0.0 + self.rock[i]) / (self.rockMax)
