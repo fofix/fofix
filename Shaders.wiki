@@ -9,7 +9,7 @@ uniform float time;
 }}}
 
 ||_*Uniform*_||_*Type*_||_*Description*_||
-||time||float||Time (in seconds) since ShaderList loading. Updates on each shader activation.||
+||time||float||Time (in seconds) since shaders loading. Updates on each shader activation.||
 
 = Global Variables = 
 
@@ -25,15 +25,18 @@ These variables are used by any shader that have uniforms with these names.
 ||isMultChanged||bool||True if player's score multiplier had been changed in this frame.||
 ||killswitch||bool||True when killswitch is pressed.||
 ||multChangePos||float||Last multiplier change position.||
+||Noise3D||sampler3D||3D noise texture (noise3d.dds).)||
 ||notepos||vec4||Position of last F2-F5 notes hit.||
 ||rockLevel||float||Current rockmeter level. 1.0 - full rockmeter.||
 ||scoreMult||int||Current score multiplier.||
 ||soloActive||bool||True if solo section is active.||
 ||songpos||float||Current song position||
-||time||float||Time (in seconds) since ShaderList loading. Updates on each shader activation.||
+||time||float||Time (in seconds) since shaders loading. Updates on each shader activation.||
 
 
-= Neck Flash =
+= Neck Shaders =
+
+== Neck Flashing ==
 
 _Name:_ neck
 
@@ -42,20 +45,23 @@ _Using:_ neck.ps, neck.vs
 _Description:_ When this shader is enabled, the neck flashes when you hit a note.
 
 ||_*Uniform*_||_*Type*_||_*Value*_||_*Description*_||
-||time||float||variable||Time (in seconds) since ShaderList loading. Updates on each shader activation.||
+||time||float||variable||Time (in seconds) since shaders loading. Updates on each shader activation.||
 ||fretcol||vec4||variable||Color of the neck flash.||
 ||failcol||bool||variable||When true, the fretboard edges flash red.||
 
-= Lightning EQ =
+= Stage Shaders =
+
+== Lighting EQ ==
 
 _Name:_ stage
 
 _Using:_ lightning.ps, lightning.vs
 
+_Global Variables:_ time, Noise3D
+
 Description: A large horizontal spark of lightning in the middle of the screen that acts like an equalizer.
 
 ||_*Uniform*_||_*Type*_||_*Value*_||_*Description*_||
-||time||float||variable||Time (in seconds) since ShaderList loading. Updates on each shader activation.||
 ||ambientGlow||float||variable||Height of the ambient glow||
 ||color||vec4||variable||Color of the effect. Depends on which frets are pressed.||
 ||glowStrength||float||variable||Brightness of the lightning.||
@@ -63,16 +69,17 @@ Description: A large horizontal spark of lightning in the middle of the screen t
 ||glowFallOff||float||variable||Strength of vertical blurring.||
 ||height||float||variable||Max height of the flash.||
 ||sampleDist||float||0.0076||Strength of horizontal blurring.||
-||height||speed||1.86||Speed of the 3D texture.||
+||speed||float||1.86||Speed of the 3D texture.||
 ||vertNoise||float||0.78||Amount of distortion to the effect.||
 ||fading||float||1.0||Strength of fade effect towards the edges.||
 ||fixalpha||bool||True||Alpha is always 1.0 when True.||
-||Noise||sampler3D||"noise.dds"||Points to a 3D texture.||
 ||offset||vec2||(0.0,-2.5)||Offset of the lightning.||
 ||scalexy||vec2||(5.0,2.4)||Scale of the lightning.||
 ||solofx||bool||False||Effect is vertical when True.||
 
-= Solo Lightning =
+= Neck Solo Shaders =
+
+== Solo Lightnings ==
 
 _Name:_ sololight
 
@@ -80,8 +87,9 @@ _Using:_ lightning.ps, lightning.vs
 
 _Description:_ Lightning on the edges of the fretboard when solo or SP is active. Only for GH-like themes.
 
+_Global Variables:_ time, Noise3D
+
 ||_*Uniform*_||_*Type*_||_*Value*_||_*Description*_||
-||time||float||variable||Time (in seconds) since ShaderList loading. Updates on each shader activation.||
 ||ambientGlow||float||variable||Height of the ambient glow||
 ||color||vec4||variable||Color of the effect. Depends on which frets are pressed.||
 ||glowStrength||float||variable||Brightness of the lightning.||
@@ -89,16 +97,17 @@ _Description:_ Lightning on the edges of the fretboard when solo or SP is active
 ||glowFallOff||float||variable||Strength of vertical blurring.||
 ||height||float||variable||Max height of the flash.||
 ||sampleDist||float||0.0076||Strength of horizontal blurring.||
-||height||speed||1.86||Speed of the 3D texture.||
+||speed||float||1.86||Speed of the 3D texture.||
 ||vertNoise||float||0.78||Amount of distortion to the effect.||
 ||fading||float||1.0||Strength of fade effect towards the edges.||
 ||fixalpha||bool||True||Alpha is always 1.0 when True.||
-||Noise||sampler3D||"noise.dds"||Points to a 3D texture.||
 ||offset||vec2||(0.0,-2.5)||Offset of the lightning.||
 ||scalexy||vec2||(5.0,2.4)||Scale of the lightning.||
 ||solofx||bool||True||Effect is vertical when True.||
 
-= RB2 tails =
+= Note Tail Shaders =
+
+== Lightnings ==
 
 _Name:_ tail
 
@@ -106,8 +115,9 @@ _Using:_ lightning.ps, lightning.vs
 
 _Description:_ Animated note tails with different effects for whammy and pitchbend.
 
+_Global Variables:_ time, Noise3D
+
 ||_*Uniform*_||_*Type*_||_*Value*_||_*Description*_||
-||time||float||variable||Time (in seconds) since ShaderList loading. Updates on each shader activation.||
 ||ambientGlow||float||variable||Height of the ambient glow||
 ||color||vec4||variable||Color of the effect. Depends on which frets are pressed.||
 ||glowStrength||float||variable||Brightness of the lightning.||
@@ -115,16 +125,34 @@ _Description:_ Animated note tails with different effects for whammy and pitchbe
 ||glowFallOff||float||variable||Strength of vertical blurring.||
 ||height||float||variable||Max height of the flash.||
 ||sampleDist||float||0.0076||Strength of horizontal blurring.||
-||height||speed||1.86||Speed of the 3D texture.||
+||speed||float||1.86||Speed of the 3D texture.||
 ||vertNoise||float||0.78||Amount of distortion to the effect.||
 ||fading||float||1.0||Strength of fade effect towards the edges.||
 ||fixalpha||bool||True||Alpha is always 1.0 when True.||
-||Noise||sampler3D||"noise.dds"||Points to a 3D texture.||
 ||offset||vec2||(0.0,-2.5)||Offset of the lightning.||
 ||scalexy||vec2||(5.0,2.4)||Scale of the lightning.||
 ||solofx||bool||True||Effect is vertical when True.||
 
+== RB2 ==
+
+_Name:_ tail2
+
+_Using:_ rockbandtail.ps, rockbandtail.vs
+
+_Description:_ Animated note tails with different effects for whammy and pitchbend.
+
+_Global Variables:_ songpos
+
+||_*Uniform*_||_*Type*_||_*Value*_||_*Description*_||
+||color||vec4||variable||Color of the tail.||
+||height||float||variable||Actually represents width of tail.||
+||speed||float||9.0||Velocity of waves.||
+||offset||vec2||(0.0,-2.5)||Offset of the tail.||
+||scalexy||vec2||(5.0,2.4)||Scale of the effect.||
+
 = CDlist =
+
+== White CDs ==
 
 _Name:_ cd
 
@@ -132,10 +160,21 @@ _Using:_ cd.ps, cd.vs
 
 _Description:_ Fades the CD color. Added as a simple demo of shader effects.
 
-= Metal notes =
+= Note Shaders =
+
+== Metal Notes ==
 
 _Name:_ rbnotes
 
 _Using:_ metal.ps, metal.vs
 
 _State:_ not completed. 
+
+||_*Uniform*_||_*Type*_||_*Value*_||_*Description*_||
+||Material||vec4||variable||Color of the note.||
+||isTextured||bool||variable||True when note is textured.||
+||Outline||sampler2D||"outline.tga"||Texture for lighting effect.||
+||note_position||vec3||variable||Note position on the fretboard.||
+||light0||vec3||(2.0,2.0,-8.0)||Position of the first light source.||
+||light1||vec3||(-2.0,2.0,-5.0)||Position of the second light source.||
+||light2||vec3||(1.0,3.0,-2.0)||Position of the third light source.||
