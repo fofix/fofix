@@ -13,9 +13,10 @@ void main(void)
    vec3 norm = normalize (vNormal);
    vec2 texCoord = vec2(1.0 - dot (norm, normalize(vView)), 0.5);
    vec3 outline = texture2D(Outline, texCoord).xyz;
-   float lighting = (dot (normalize (vLight1), norm) * 0.5 + 0.5) +
-                    (dot (normalize (vLight2), norm) * 0.5 + 0.5) +
-                    (dot (normalize (vLight3), norm) * 0.5 + 0.5);
-   lighting = max(0.0, lighting);                    
-   gl_FragColor = vec4(outline,1.0)* vec4(lighting)  *  Material; 
+   float lighting = dot (normalize (vLight1), norm) * 0.5 + 0.5;
+   lighting += dot (normalize (vLight2), norm) * 0.5 + 0.5;
+   lighting += dot (normalize (vLight3), norm) * 0.5 + 0.5;
+   lighting = max(0.0, lighting);  
+   vec3 color = vec3(outline) * vec3(lighting) * Material.rgb;
+   gl_FragColor = vec4(color,1.0); 
 }   

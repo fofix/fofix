@@ -389,8 +389,8 @@ class shaderList:
       glBindTexture(GL_TEXTURE_2D, texture)
     except:
       return
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
     glTexImage2D(GL_TEXTURE_2D, 0, 1, img.get_width(), img.get_height(), 0, type, GL_UNSIGNED_BYTE, noise)
@@ -575,9 +575,9 @@ class shaderList:
       self.enable("notes")
       self.setTexture("Outline",self.outline)
       self.setVar("view_position",(.0,.0,.0))
-      self.setVar("light0",(10.0,0.0,0.0))
-      self.setVar("light1",(.0,10.0,.0))
-      self.setVar("light2",(.0,.0,10.0))
+      self.setVar("light0",(2.0,2.0,-8.0))
+      self.setVar("light1",(-2.0,2.0,-5.0))
+      self.setVar("light2",(1.0,3.0,-2.0))
       self.setVar("isTextured",False)
       self.setVar("note_position",(.0,.0,.0))
       self.setVar("Material",(1.0,.5,.0,1.0))

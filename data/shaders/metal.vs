@@ -1,4 +1,3 @@
-uniform vec3 view_position;
 uniform vec3 note_position;
 uniform vec3 light0;
 uniform vec3 light1;
@@ -15,8 +14,11 @@ void main(void)
 {
    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex; 
    vNormal = gl_Normal;
-   vView = normalize( view_position.xyz - gl_Vertex.xyz );
-   vLight1 = normalize(light0.xyz - gl_Vertex.xyz); 
-   vLight2 = normalize(light1.xyz - gl_Vertex.xyz);
-   vLight3 = normalize(light2.xyz - gl_Vertex.xyz);
+   vec3 view_pos = -note_position.xyz;
+   view_pos.z -= 8.0;
+   view_pos.y += 4.0;
+   vView = normalize(view_pos.xyz - gl_Vertex.xyz);
+   vLight1 = normalize(light0.xyz - view_pos.xyz); 
+   vLight2 = normalize(light1.xyz - view_pos.xyz);
+   vLight3 = normalize(light2.xyz - view_pos.xyz);
 }
