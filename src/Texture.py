@@ -28,6 +28,7 @@ import Image
 import pygame
 import StringIO
 import PngImagePlugin
+import JpegImagePlugin
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
