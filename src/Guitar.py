@@ -1004,15 +1004,16 @@ class Guitar:
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
         
-        if shaders.enable("notes"):
-          shaders.setTexture("Outline",tex.texture)
-          shaders.update()
-          shaders.setVar("isTextured",True)
         if isTappable:
-          self.noteMesh.render("Mesh_001")
+          mesh = "Mesh_001"
         else:
-          self.noteMesh.render("Mesh")
-        shaders.disable()
+          mesh = "Mesh"
+        self.noteMesh.render(mesh)
+        
+        if shaders.enable("notes"):
+          shaders.setVar("isTextured",True)
+          self.noteMesh.render(mesh)
+          shaders.disable()
         
         glMatrixMode(GL_TEXTURE)
         glLoadIdentity()
@@ -1037,15 +1038,18 @@ class Guitar:
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
 
-        if shaders.enable("notes"):
-          shaders.setTexture("Outline",tex.texture)
-          shaders.update()
-          shaders.setVar("isTextured",True)
+
         if isTappable:
-          self.starMesh.render("Mesh_001")
+          mesh = "Mesh_001"
         else:
-          self.starMesh.render("Mesh")
-        shaders.disable() 
+          mesh = "Mesh"
+
+        self.starMesh.render(mesh)
+        
+        if shaders.enable("notes"):
+          shaders.setVar("isTextured",True)
+          self.starMesh.render(mesh)
+          shaders.disable() 
           
         glMatrixMode(GL_TEXTURE)
         glLoadIdentity()
@@ -1054,9 +1058,7 @@ class Guitar:
         
       else:
         if shaders.enable("notes"):
-          shaders.setTexture("Outline",shaders.outline)
-          shaders.update()
-          shaders.setVar("isTextured",True)
+          shaders.setVar("isTextured",False)
         note.render("Mesh_001")
         shaders.disable()
         glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
