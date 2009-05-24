@@ -944,8 +944,8 @@ class Guitar:
                             scale = (1,1,1), multiples = True, color = (1,1,1), vertscale = .2)
 
     else:
-      if shaders.enable("notes"):
-        shaders.setVar("Material",color)
+      shaders.setVar("Material",color,"notes")
+      
       #mesh = outer ring (black) 
       #mesh_001 = main note (key color) 
       #mesh_002 = top (spot or hopo if no mesh_003) 
@@ -990,22 +990,29 @@ class Guitar:
         glColor3f(1,1,1)
         glEnable(GL_TEXTURE_2D)
         if fret == 0: 
-          self.notetexa.texture.bind()
+          tex = self.notetexa.texture
         elif fret == 1:
-          self.notetexb.texture.bind()
+          tex = self.notetexb.texture
         elif fret == 2:
-          self.notetexc.texture.bind()
+          tex = self.notetexc.texture
         elif fret == 3:
-          self.notetexd.texture.bind()
+          tex = self.notetexd.texture
         elif fret == 4:
-          self.notetexe.texture.bind()
+          tex = self.notetexe.texture
+        tex.bind()
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
+        
+        if shaders.enable("notes"):
+          shaders.setTexture("Outline",tex.texture)
+          shaders.update()
+          shaders.setVar("isTextured",True)
         if isTappable:
           self.noteMesh.render("Mesh_001")
         else:
           self.noteMesh.render("Mesh")
+        shaders.disable()
         
         glMatrixMode(GL_TEXTURE)
         glLoadIdentity()
@@ -1016,29 +1023,42 @@ class Guitar:
         glColor3f(1,1,1)
         glEnable(GL_TEXTURE_2D)
         if fret == 0: 
-          self.startexa.texture.bind()
+          tex = self.startexa.texture
         elif fret == 1:
-          self.startexb.texture.bind()
+          tex = self.startexb.texture
         elif fret == 2:
-          self.startexc.texture.bind()
+          tex = self.startexc.texture
         elif fret == 3:
-          self.startexd.texture.bind()
+          tex = self.startexd.texture
         elif fret == 4:
-          self.startexe.texture.bind()
+          tex = self.startexe.texture
+        tex.bind()
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
+
+        if shaders.enable("notes"):
+          shaders.setTexture("Outline",tex.texture)
+          shaders.update()
+          shaders.setVar("isTextured",True)
         if isTappable:
           self.starMesh.render("Mesh_001")
         else:
           self.starMesh.render("Mesh")
+        shaders.disable() 
+          
         glMatrixMode(GL_TEXTURE)
         glLoadIdentity()
         glMatrixMode(GL_MODELVIEW)
         glDisable(GL_TEXTURE_2D)          
         
       else:
+        if shaders.enable("notes"):
+          shaders.setTexture("Outline",shaders.outline)
+          shaders.update()
+          shaders.setVar("isTextured",True)
         note.render("Mesh_001")
+        shaders.disable()
         glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
         if isTappable:
           if self.hopoColor[0] == -2:
@@ -1054,7 +1074,6 @@ class Guitar:
         
 
 
-      shaders.disable()
       glDepthMask(0)
       glPopMatrix()
 

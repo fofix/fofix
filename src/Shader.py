@@ -78,7 +78,7 @@ class shaderList:
     except:
       program = None
     if program:
-      sArray = {"program": program, "name": name, "tex" : (), "textype" : (), "enabled" : True}
+      sArray = {"program": program, "name": name, "textures": []}
       self.lastCompiled = name
       self.getVars(fullname+".vs", program, sArray)
       self.getVars(fullname+".ps", program, sArray)
@@ -96,7 +96,6 @@ class shaderList:
     status = glGetObjectParameterivARB(shader, GL_OBJECT_COMPILE_STATUS_ARB)
     if (not status):
         Log.warn(self.log(shader))
-        #print self.log(shader)
         return None
     return shader
     
@@ -119,12 +118,25 @@ class shaderList:
         elif aline[1][:-1] == "mat": value = ((.0,)*n,)*n
         elif aline[1][:-2] == "sampler": 
           value, self.texcount = self.texcount, self.texcount + 1 
-          if aline[1] == "sampler1D":   sArray["textype"] += (GL_TEXTURE_1D,)
-          elif aline[1] == "sampler2D": sArray["textype"] += (GL_TEXTURE_2D,)
-          elif aline[1] == "sampler3D": sArray["textype"] += (GL_TEXTURE_3D,)
+          if aline[1] == "sampler1D":   textype = GL_TEXTURE_1D
+          elif aline[1] == "sampler2D": textype = GL_TEXTURE_2D
+          elif aline[1] == "sampler3D": textype = GL_TEXTURE_3D
+          sArray["textures"].append((aline[2],textype,None))
         aline[2] = aline[2].split(',')
         for var in aline[2]:
           sArray[var] = [glGetUniformLocationARB(program, var), value]
+          
+  def setTexture(self,name,texture,program = None):
+    if self.assigned.has_key(program):
+      program = self.assigned[program]
+    if program == None:  program = self.active
+    else: program = self[program]
+    
+    for i in range(len(program["textures"])):
+      if program["textures"][i][0] == name:
+        program["textures"][i] = (program["textures"][i][0], program["textures"][i][1], texture)
+        return True
+    return False
     
     
   def compile(self, vertexSource=None, fragmentSource=None):
@@ -238,8 +250,9 @@ class shaderList:
           
   def update(self):
     for i in self.active.keys():
-      if type(self.active[i]) == type([]) and self.active[i][1] != None:
-        self.setVar(i,self.active[i][1])
+      if i != "textures":
+        if type(self.active[i]) == type([]) and self.active[i][1] != None:
+          self.setVar(i,self.active[i][1])
     
   def disable(self):
     if self.active !=0:
@@ -259,17 +272,15 @@ class shaderList:
         return log
     
   def setTextures(self, program = None):
+    if self.assigned.has_key(program):
+      program = self.assigned[program]
     if program == None: program = self.active
-    j = 0
-    if type(program["tex"]) == tuple:
-      for i in program["tex"]:
-        if len(program["tex"]) > 1 and multiTex[j] != 0:
-          glActiveTexture (multiTex[j])
-        glBindTexture(program["textype"][j], i) 
-        j += 1
-    else:
-      Log.debug(type(program["tex"]))
-      glBindTexture(program["textype"][0], program["tex"]) 
+
+    for i in range(len(program["textures"])):
+      glActiveTexture (self.multiTex[i])
+      glBindTexture(program["textures"][i][1], program["textures"][i][2]) 
+      
+
       
   def makeNoise3D(self,size=32, c = 1, type = GL_RED):
     texels=[]
@@ -467,11 +478,9 @@ class shaderList:
           else:
             value = value.split(",")
             for i in range(len(value)):
-              #print "shader_"+name+"_"+key, value
               value[i] = float(value[i])
             if len(value) == 1: value = value[0]
             else: value = tuple(value)
-          #print self[name][key], value
           if key == "enabled":
             if Config.get("video","shader_"+name) == 2:
               self[name][key] = value
@@ -486,11 +495,11 @@ class shaderList:
     self.workdir = dir
     self.noise3D = self.loadTex3D("noise3d.dds")
     self.outline = self.loadTex2D("outline.tga")
-    multiTex = (GL_TEXTURE0_ARB,GL_TEXTURE1_ARB,GL_TEXTURE2_ARB,GL_TEXTURE3_ARB)
+    self.multiTex = (GL_TEXTURE0_ARB,GL_TEXTURE1_ARB,GL_TEXTURE2_ARB,GL_TEXTURE3_ARB)
     
     if self.make("lightning","stage"):
       self.enable("stage")
-      self["stage"]["tex"]=(self.noise3D,)
+      self.setTexture("Noise",self.noise3D)
       self.setVar("ambientGlowHeightScale",6.0)
       self.setVar("color",(0.0,0.0,0.0,0.0))
       self.setVar("glowFallOff",0.024)
@@ -509,7 +518,7 @@ class shaderList:
       
     if self.make("lightning","sololight"):
       self.enable("sololight")
-      self["sololight"]["tex"]=(self.noise3D,)
+      self.setTexture("Noise",self.noise3D)
       self.setVar("scalexy",(5.0,1.0))
       self.setVar("ambientGlow",0.5)
       self.setVar("ambientGlowHeightScale",6.0)
@@ -530,7 +539,7 @@ class shaderList:
       
     if self.make("lightning","tail"):
       self.enable("tail")
-      self["tail"]["tex"]=(self.noise3D,)
+      self.setTexture("Noise",self.noise3D)
       self.setVar("scalexy",(5.0,1.0))
       self.setVar("ambientGlow",0.1)
       self.setVar("ambientGlowHeightScale",6.0)
@@ -563,11 +572,13 @@ class shaderList:
 
     if self.make("metal","notes"):
       self.enable("notes")
-      self["notes"]["tex"]=(self.outline,)
+      self.setTexture("Outline",self.outline)
       self.setVar("view_position",(.0,.0,.0))
       self.setVar("light0",(10.0,0.0,0.0))
       self.setVar("light1",(.0,10.0,.0))
       self.setVar("light2",(.0,.0,10.0))
+      self.setVar("isTextured",False)
+      self.setVar("note_position",(.0,.0,.0))
       self.setVar("Material",(1.0,.5,.0,1.0))
       self.disable()
     else:
@@ -580,7 +591,6 @@ class shaderList:
       Log.error("Shader has not been compiled: cd")  
       
     self.defineConfig()
-    
     
 def mixColors(c1,c2,blend=0.5):
   c1 = list(c1)
