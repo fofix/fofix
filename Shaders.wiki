@@ -1,6 +1,8 @@
 #summary List of available shaders.
+#sidebar TableOfContents
+<wiki:toc max_depth="3" />
 
-= Variables used in all shaders =
+= Global Variables = 
 
 To use one of these variables, just declare it using the formula: uniform *type* _name_;
 Example:
@@ -10,10 +12,6 @@ uniform float time;
 
 ||_*Uniform*_||_*Type*_||_*Description*_||
 ||time||float||Time (in seconds) since shaders loading. Updates on each shader activation.||
-
-= Global Variables = 
-
-These variables are used by any shader that have uniforms with these names.
 
 ||_*Uniform*_||_*Type*_||_*Description*_||
 ||basspos||float||Position of last bass note (green fret) hit.||
@@ -113,7 +111,7 @@ _Name:_ tail
 
 _Using:_ lightning.ps, lightning.vs
 
-_Description:_ Animated note tails with different effects for whammy and pitchbend.
+_Description:_ Animated note tails.
 
 _Global Variables:_ time, Noise3D
 
@@ -139,7 +137,7 @@ _Name:_ tail2
 
 _Using:_ rockbandtail.ps, rockbandtail.vs
 
-_Description:_ Animated note tails with different effects for whammy and pitchbend.
+_Description:_ Copy of RockBand 2 tails.
 
 _Global Variables:_ songpos
 
@@ -147,8 +145,8 @@ _Global Variables:_ songpos
 ||color||vec4||variable||Color of the tail.||
 ||height||float||variable||Actually represents width of tail.||
 ||speed||float||9.0||Velocity of waves.||
-||offset||vec2||(0.0,-2.5)||Offset of the tail.||
-||scalexy||vec2||(5.0,2.4)||Scale of the effect.||
+||offset||vec2||variable||Offset of the tail.||
+||scalexy||vec2||(5.0,1.0)||Scale of the effect.||
 
 = CDlist =
 
@@ -167,8 +165,6 @@ _Description:_ Fades the CD color. Added as a simple demo of shader effects.
 _Name:_ rbnotes
 
 _Using:_ metal.ps, metal.vs
-
-_State:_ not completed. 
 
 ||_*Uniform*_||_*Type*_||_*Value*_||_*Description*_||
 ||Material||vec4||variable||Color of the note.||
