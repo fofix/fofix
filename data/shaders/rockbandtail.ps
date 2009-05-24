@@ -1,5 +1,5 @@
 uniform float height;
-uniform float time;
+uniform float songpos;
 uniform float speed;
 
 uniform vec4 color;
@@ -18,9 +18,8 @@ void main()
    float fadeintensity = 2.9;
 
    vec4 white = color + 0.6;
-   
 
-   float sinz = 5.0 * max(height-0.15,0.0) * width * abs(sin(pos.z-(time*speed)));
+   float sinz = 5.0 * max(height-0.15+0.02*sin(songpos / 100.0),0.0) * width * abs(sin(pos.z-(songpos / 1000.0 *speed)));
    
    //curves
    float dist1 = abs(pos.x + sinz) / blureffect;
@@ -42,4 +41,4 @@ void main()
    float backglow = pow(clamp(1.0-backdist2, 0.0, 1.0), 10.0) + pow(clamp(1.0-backdist1, 0.0, 1.0), 10.0);
    
    gl_FragColor = (endglow*color)*((glow1 + glow2 - glow1 * glow2) + 0.1 * (backglow-1.0)) + (endglow*white)*(whiteglow1 + whiteglow2 - whiteglow1 * whiteglow2);
- }
+}

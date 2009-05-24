@@ -19,13 +19,10 @@ void main(void)
    lighting += dot (normalize (vLight3), norm) * 0.5 + 0.5;
    lighting = max(0.0, lighting);  
    vec3 color = vec3(outline) * vec3(lighting) * Material.rgb;
+   float alpha = 1.0;
    if (isFailing)
    {
-     float alpha = 0.5
-   }
-   else
-   {
-     float alpha = 1.0
+     float alpha = 0.5;
    }
    gl_FragColor = vec4(color,alpha); 
 }   
