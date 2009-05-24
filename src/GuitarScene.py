@@ -83,6 +83,9 @@ from Svg import ImgDrawing
 #blazingamer: New neck/board rendering class
 import Neck
 
+#blazingamer: Little fix for RB Score font
+from pygame import version
+
 class GuitarScene:
   pass
 
@@ -7848,7 +7851,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     else:
                       bandMultRange = ((2.0/3.0), 1.0)
                     self.engine.drawImage(self.bandStarMult, scale = (.2,(-.2/3.0)), coord = (w*0.6994, h*0.8304), rect = (0,1,bandMultRange[0],bandMultRange[1]))
-                  scoreFont.render(scoretext, (0.97-scW, 0.1050 ))    #last change +0.0015
+                  if version.vernum == ((1,8,1) or (1,9,0)):#blazingamer pygame version check to fix score
+                    scoreFont.render(scoretext, (0.97-scW, 0.1125 ))    #last change +0.0015
+                  else:
+                    scoreFont.render(scoretext, (0.97-scW, 0.1050 ))    #last change +0.0015
   
               except Exception, e:
                 #Log.warn("Unable to render score/streak text: %s" % e)
@@ -7870,7 +7876,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 if i == 0:
                   counterimgheight = self.counter.height1()
                   self.engine.drawImage(self.counter, scale = (.5,-.5), coord = (w*.915, h*0.7720)) 
-                  streakFont.render(streaktext, (0.97-stW,0.1500 ))    #last change +0.0015
+                  if version.vernum == ((1,8,1) or (1,9,0)):#blazingamer pygame version check to fix score
+                    streakFont.render(streaktext, (0.97-stW,0.1580 ))    #last change +0.0015
+                  else:
+                    streakFont.render(streaktext, (0.97-stW,0.1500 ))    #last change +0.0015
 
               if not self.instruments[i].isVocal:
                 self.engine.view.setViewportHalf(self.numberOfGuitars,self.playerList[i].guitarNum)
@@ -7878,7 +7887,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               if not self.coOpType or self.coOp:
                 counterimgheight = self.counter.height1()
                 self.engine.drawImage(self.counter, scale = (.5,-.5), coord = (w*.915, h*0.7720))
-                streakFont.render(streaktext, (0.97-stW,0.1500 ))    #last change +0.0015
+                if version.vernum == ((1,8,1) or (1,9,0)):#blazingamer pygame version check to fix score
+                  streakFont.render(streaktext, (0.97-stW,0.1580 ))    #last change +0.0015                
+                else:
+                  streakFont.render(streaktext, (0.97-stW,0.1500 ))    #last change +0.0015                
                 
 
               if not self.pause and not self.failed and not self.ending:
