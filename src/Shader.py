@@ -83,6 +83,10 @@ class shaderList:
       self.getVars(fullname+".vs", program, sArray)
       self.getVars(fullname+".ps", program, sArray)
       self.shaders[name] = sArray
+      
+      if self.shaders[name].has_key("Noise3D"):
+        self.setTexture("Noise3D",self.noise3D,name)
+      
       return True
     else:
       return False
@@ -499,7 +503,6 @@ class shaderList:
     
     if self.make("lightning","stage"):
       self.enable("stage")
-      self.setTexture("Noise",self.noise3D)
       self.setVar("ambientGlowHeightScale",6.0)
       self.setVar("color",(0.0,0.0,0.0,0.0))
       self.setVar("glowFallOff",0.024)
@@ -518,7 +521,6 @@ class shaderList:
       
     if self.make("lightning","sololight"):
       self.enable("sololight")
-      self.setTexture("Noise",self.noise3D)
       self.setVar("scalexy",(5.0,1.0))
       self.setVar("ambientGlow",0.5)
       self.setVar("ambientGlowHeightScale",6.0)
@@ -539,7 +541,6 @@ class shaderList:
       
     if self.make("lightning","tail"):
       self.enable("tail")
-      self.setTexture("Noise",self.noise3D)
       self.setVar("scalexy",(5.0,1.0))
       self.setVar("ambientGlow",0.1)
       self.setVar("ambientGlowHeightScale",6.0)

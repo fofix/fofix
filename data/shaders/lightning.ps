@@ -10,7 +10,7 @@ uniform float vertNoise;
 uniform float time;
 uniform float fading;
 uniform bool fixalpha;
-uniform sampler3D Noise;
+uniform sampler3D Noise3D;
 
 varying vec2 vTexCoord;
 
@@ -28,9 +28,9 @@ void main()
     float xs1 = vTexCoord.x;
     float xs2 = vTexCoord.x + sampleDist;
     
-    float noise0 = texture3D(Noise, vec3(xs0, t)).x;
-    float noise1 = texture3D(Noise, vec3(xs1, t)).x;
-    float noise2 = texture3D(Noise, vec3(xs2, t)).x;
+    float noise0 = texture3D(Noise3D, vec3(xs0, t)).x;
+    float noise1 = texture3D(Noise3D, vec3(xs1, t)).x;
+    float noise2 = texture3D(Noise3D, vec3(xs2, t)).x;
     
     float mid0 = height * (noise0 * 2.0 - 1.0) * (1.0 - xs0 * xs0);
     float mid1 = height * (noise1 * 2.0 - 1.0) * (1.0 - xs1 * xs1);
