@@ -2,9 +2,8 @@
 # -*- coding: iso-8859-1 -*-                                        #
 #                                                                   #
 # Frets on Fire X (FoFiX)                                           #
-# Copyright (C) 2009 myfingershurt                                  #
+# Copyright (C) 2009 Team FoFiX                                     #
 #               2009 John Stumpo                                    #
-#               2009 akedrou                                        #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -69,8 +68,9 @@ if supported:
       self.mic = pa.open(samprate, 1, pyaudio.paFloat32, input=True, input_device_index=devnum, start=False)
       self.analyzer = Analyzer(samprate)
       self.mic_started = False
-      self.lastPeak  = 0
-      self.tapStatus = False
+      self.lastPeak    = 0
+      self.detectTaps  = True
+      self.tapStatus   = False
       self.tapThreshold = -self.engine.input.controls.micTapSensitivity[controlnum]
       self.passthroughQueue = []
       passthroughVolume = self.engine.input.controls.micPassthroughVolume[controlnum]
@@ -122,8 +122,9 @@ if supported:
         self.analyzer.input(numpy.frombuffer(chunk, dtype=numpy.float32))
         self.analyzer.process()
         pk = self.analyzer.getPeak()
-        if pk > self.tapThreshold and pk > self.lastPeak + 5.0:
-          self.tapStatus = True
+        if self.detectTaps:
+          if pk > self.tapThreshold and pk > self.lastPeak + 5.0:
+            self.tapStatus = True
         self.lastPeak = pk
 
     # Get the amplitude (in dB) of the peak of the most recent input window.
@@ -136,7 +137,10 @@ if supported:
       retval = self.tapStatus
       self.tapStatus = False
       return retval
-
+    
+    def getFormants(self):
+      return self.analyzer.getFormants()
+    
     # Get the note currently being sung.
     # Returns None if there isn't one or a PitchAnalyzer.Tone object if there is.
     def getTone(self):

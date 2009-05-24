@@ -32,6 +32,7 @@
 import math
 import numpy
 
+FORMANT_RANGE = [(300, 1300), (700, 2400), (1800, 3300), (3000, 4400)]
 
 try:
   # This is only guaranteed to do the right thing under Python 2.6 or later
@@ -143,6 +144,31 @@ class Analyzer(object):
   def getTones(self):
     '''Get a list of all tones detected.'''
     return self.tones
+
+  def getFormants(self):
+    if len(self.tones) == 0:
+      return [None] *3
+    formants = [0]
+    for fNum in range(3):
+      minfreq = FORMANT_RANGE[fNum][0]
+      maxfreq = FORMANT_RANGE[fNum][1]
+      maxtone = None
+      for t in self.tones:
+        if t.freq < minfreq or t.freq > maxfreq or t.age < Tone.MINAGE:
+          continue
+        if t.freq < formants[fNum]:
+          continue
+        if maxtone:
+          if t.db > maxtone.db:
+            maxtone = t
+        else:
+          maxtone = t
+      if maxtone:
+        formants.append(maxtone.freq)
+      else:
+        formants.append(None)
+    formants.remove(0)
+    return formants
 
   def findTone(self, minfreq=70.0, maxfreq=700.0):
     '''Find a tone within the singing range; prefer strong tones around 200-400 Hz.'''

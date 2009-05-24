@@ -50,7 +50,7 @@ import Audio
 import Stage
 import Settings
 import Song
-import Scorekeeper
+from Scorekeeper import ScoreCard, Rockmeter
 from Shader import shaders
 
 from Vocalist import Vocalist
@@ -839,9 +839,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       else:
         this = Song.GUITAR_PART
         coOpInstruments.append(this) #while different guitars exist, they don't affect scoring.
-      self.scoring.append(Scorekeeper.ScoreCard([this]))
+      self.scoring.append(ScoreCard([this]))
     if self.coOpType:
-      self.coOpScoreCard = Scorekeeper.ScoreCard(coOpInstruments, coOpType = True)
+      self.coOpScoreCard = ScoreCard(coOpInstruments, coOpType = True)
     else:
       self.coOpScoreCard = None
     
@@ -1104,9 +1104,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           guitar.starNotesSet = False     #fallback on auto generation.
     
     elif self.starpowerMode == 2:
-      Log.warn("This song does not appear to have any starpower or overdrive paths marked, falling back on auto-generated paths.")
-      for instrument in self.instruments:
-        instrument.starNotesSet = False     #fallback on auto generation.
+      if self.numberOfGuitars > 0:
+        Log.warn("This song does not appear to have any starpower or overdrive paths marked, falling back on auto-generated paths.")
+        for instrument in self.instruments:
+          if instrument.isVocal:
+            continue
+          instrument.starNotesSet = False     #fallback on auto generation.
 
     
     
@@ -1137,6 +1140,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               if holdingTap:
                 self.instruments[i].tapPartLength.append(holdingTapLength)
                 self.instruments[i].tapNoteTotals.append(holdingTapNotes)
+                self.instruments[i].tapNoteHits.append(0)
                 holdingTap = False
                 holdingTapLength = 0
                 holdingTapNotes = 0
@@ -1146,6 +1150,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           if holdingTap:
             self.instruments[i].tapPartLength.append(holdingTapLength)
             self.instruments[i].tapNoteTotals.append(holdingTapNotes)
+            self.instruments[i].tapNoteHits.append(0)
       else:
         #myfingershurt: preventing ever-thickening BPM lines after restarts
         self.song.track[i].markBars()
@@ -1917,7 +1922,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.engine.loadImgDrawing(self, "rockOff", os.path.join("themes",themename,"rock_fill.png"))
       else:
         self.engine.loadImgDrawing(self, "rockOff", os.path.join("themes",themename,"rock_med.png"))
-    
     
     self.rockMax = 30000.0
     self.rockMedThreshold = self.rockMax/3.0    #MFH
@@ -2866,6 +2870,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       instrument.scoreMultiplier = 1
       if instrument.isVocal:
         instrument.phraseIndex = 0
+        instrument.currentTapPhrase = -1
+        instrument.tapNoteHits = [0 for i in instrument.tapNoteTotals]
         instrument.currentPhraseTime = 0
         instrument.currentPhraseLength = 0
         instrument.activePhrase = None

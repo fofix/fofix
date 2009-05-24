@@ -1427,6 +1427,8 @@ class VocalNote(Event):
     Event.__init__(self, length)
     self.note = note
     self.phrase = 0
+    self.played = False
+    self.stopped = False
     self.accuracy = 0.0
     self.tap = tap
     self.speak = False
@@ -1649,6 +1651,17 @@ class VocalTrack(Track):
       self.allEvents[phraseId][1].addEvent(tuple[0], tuple[1])
       self.allEvents[phraseId][1].minPitch = min(self.allEvents[phraseId][1].minPitch, tuple[1].note)
       self.allEvents[phraseId][1].maxPitch = max(self.allEvents[phraseId][1].maxPitch, tuple[1].note)
+  
+  def reset(self):
+    if self.maxIndex:
+      self.currentIndex = 0
+    for eventList in self.events:
+      for time, event in eventList:
+        if isinstance(event, VocalPhrase):
+          for time, event in event.allEvents:
+            event.played = False
+            event.stopped = False
+            event.accuracy = 0.0
 
 class VocalPhrase(VocalTrack, Event):
   def __init__(self, length, star = False):

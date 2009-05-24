@@ -5052,6 +5052,20 @@ class KeyTester(Layer, KeyListener):
         else:
           Theme.setBaseColor(1 - v)
           font.render(Microphone.getNoteName(semitones), (.55, .6 + v))
+        
+        f = self.mic.getFormants()
+        if f[0] is not None:
+          Theme.setBaseColor(1 - v)
+          font.render("%.2f Hz" % f[0], (.45, .65 + v))
+        else:
+          glColor3f(.4, .4, .4)
+          font.render("None", (.45, .65 + v))
+        if f[1] is not None:
+          Theme.setBaseColor(1 - v)
+          font.render("%.2f Hz" % f[1], (.65, .65 + v))
+        else:
+          glColor3f(.4, .4, .4)
+          font.render("None", (.65, .65 + v))
 
       elif self.type > 1:
         if self.type == 2:

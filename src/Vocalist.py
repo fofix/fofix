@@ -3,7 +3,6 @@
 #                                                                   #
 # Frets on Fire X (FoFiX)                                           #
 # Copyright (C) 2009 Team FoFiX                                     #
-#               2009 myfingershurt                                  #
 #               2009 akedrou                                        #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
@@ -68,9 +67,17 @@ class Vocalist:
     self.twoChord = False
     self.keys = []
     self.actions = []
+    self.neckSpeed = 0.0
     
-    self.lateMargin  = 0
-    self.earlyMargin = 0
+    self.hitw = 1.4
+    
+    self.lateMargin  = 100.0
+    self.earlyMargin = 100.0
+    self.oldNote = 2.0
+    self.pitchFudge = 0
+    self.stayEnd  = 0
+    self.awardEnd = True
+    self.formants = [None] * 3
     self.currentNote = None
     self.currentNoteItem = None
     self.currentLyric = None
@@ -115,8 +122,6 @@ class Vocalist:
     self.oldTime = 0
     self.oldLength = 0
     self.useOld = False
-    #volshebnyi - quickfix
-    self.neckSpeed = 0.0
     
     self.arrowVis = 0
     
@@ -141,6 +146,10 @@ class Vocalist:
     except:
       self.vocalLyricSheetGlow = None
     self.engine.loadImgDrawing(self, "vocalArrow", os.path.join("themes",themename,"vocals","arrow.png"))
+    try:
+      self.engine.loadImgDrawing(self, "vocalSplitArrow", os.path.join("themes",themename,"vocals","split_arrow.png"))
+    except IOError:
+      self.vocalSplitArrow = self.vocalArrow
     self.engine.loadImgDrawing(self, "vocalBar", os.path.join("themes",themename,"vocals","beatline.png"))
     self.arrowW = self.vocalArrow.width1()
     try:
@@ -226,7 +235,8 @@ class Vocalist:
     self.tapPartLength    = []
     self.tapNoteTotals    = []
     self.tapNoteHits      = []
-    self.currentTapPhrase = 0
+    self.tapPhraseActive  = False
+    self.currentTapPhrase = -1
     
     self.difficulty      = playerObj.getDifficultyInt()
     self.tapMargin       = 100 + (100 * self.difficulty)
@@ -258,6 +268,9 @@ class Vocalist:
         self.currentPeriod = (60000.0/bpm)/self.speed
       else:   #easy
         self.currentPeriod = (70000.0/bpm)/self.speed
+    self.neckSpeed         = self.currentPeriod
+    self.earlyMargin       = 250 - bpm/5 - 70*self.hitw
+    self.lateMargin        = 250 - bpm/5 - 70*self.hitw
 
   def getScoreChange(self):
     if self.lastScore > -1:
@@ -270,16 +283,44 @@ class Vocalist:
   def getCurrentNote(self, pos):
     if not self.mic.mic_started:
       return
+    if self.tapPhraseActive:
+      if self.requiredNote is not None:
+        if self.tap > 0 and not self.currentNoteItem.played:
+          self.tapNoteHits[self.currentTapPhrase] += 1
+          self.currentNoteItem.played = True
+      self.lastPos = pos
+      self.currentNote = self.tap
+      return
     self.peak = self.mic.getPeak()
+    self.formants = self.mic.getFormants()
+    if self.currentNote is not None:
+      if abs(self.currentNote) < self.allowedDeviation:
+        self.oldNote = self.currentNote
     if self.peak < -15:
       self.currentNote = None
-    if self.requiredNote is not None and self.requiredNote > 0:
+    if self.requiredNote is not None:
       self.currentNote = self.mic.getDeviation(self.requiredNote)
+      if self.awardEnd:
+        mult = .8
+      else:
+        mult = 1
       if self.currentNote:
-        if abs(self.currentNote) < self.allowedDeviation:
+        if self.currentNoteItem.speak or self.currentNoteItem.extra:
+          self.currentNote = 0
+        if abs(self.currentNote) < self.allowedDeviation and self.formants[1] is not None:
           duration = pos - self.lastPos
-          self.currentNoteItem.accuracy += duration
-          self.phraseInTune += duration*self.difficultyModifier
+          self.currentNoteItem.accuracy += duration*mult
+          self.phraseInTune += duration*self.difficultyModifier*mult
+          self.pitchFudge = 70.0
+        elif self.currentNoteItem.played and self.stayEnd <= 0 and self.awardEnd:
+          self.currentNoteItem.accuracy += self.currentNoteItem.length * (1-mult)
+          self.phraseInTune += self.currentNoteItem.length * (1-mult) *self.difficultyModifier
+          self.pitchFudge = 0.0
+        elif abs(self.oldNote) < self.allowedDeviation and self.pitchFudge > 0:
+          if not self.currentNoteItem.played:
+            duration = pos - self.lastPos
+            self.currentNoteItem.accuracy += duration * (self.pitchFudge/100.0)
+            self.phraseInTune += duration*self.difficultyModifier
     elif self.requiredNote is not None and self.requiredNote == 0:
       self.currentNote = 0
     else:
@@ -302,18 +343,20 @@ class Vocalist:
       if self.currentNote is None:
         font.render(_('None'), (.55, .25))
       else:
-        if abs(self.currentNote) < .5:
+        if abs(self.currentNote) < .5 and not self.tapPhraseActive:
           glColor3f(0,1,0)
         font.render(str(self.currentNote), (.55, .25))
       if self.requiredNote is None:
         font.render(_('None'), (.25, .25))
       else:
-        if self.requiredNote == -1:
+        if self.tapPhraseActive:
           if self.tap > 0:
             glColor3f(0,1,0)
           font.render(_("Tap!"), (.25, .25))
         else:
           font.render("MIDI note %d" % self.requiredNote, (.25, .25))
+      if self.formants[1] is not None:
+        font.render("Second Formant: %.2f Hz" % self.formants[1], (.35, .4))
     
     height = (self.vocalLyricSheet.height1()*1.2)/2
     self.engine.drawImage(self.vocalLyricSheet, scale = (self.vocalLyricSheetWFactor,-self.vocalLyricSheetWFactor), coord = (w*.5,(h*(1-addY))-height))
@@ -336,14 +379,15 @@ class Vocalist:
         nextnotes = []
       for time, event in notes:
         if self.activePhrase.tapPhrase:
-          if self.lyricMode == 0:
-            x = time - pos
-            if x < self.currentPeriod * 6 and x > -(self.currentPeriod * 2):
-              noteX = (x/(self.currentPeriod * 8))+.25
+          if not event.played:
+            if self.lyricMode == 0:
+              x = time - pos
+              if x < self.currentPeriod * 6 and x > -(self.currentPeriod * 2):
+                noteX = (x/(self.currentPeriod * 8))+.25
+                self.engine.drawImage(self.vocalTapNote, scale = (.5,-.5), coord = (w*noteX,(h*(1-addY))-height))
+            elif self.lyricMode == 1 or self.lyricMode == 2:
+              noteX = (.75*(time - phraseTime)/phraseLength)+.12
               self.engine.drawImage(self.vocalTapNote, scale = (.5,-.5), coord = (w*noteX,(h*(1-addY))-height))
-          elif self.lyricMode == 1 or self.lyricMode == 2:
-            noteX = (.75*(time - phraseTime)/phraseLength)+.12
-            self.engine.drawImage(self.vocalTapNote, scale = (.5,-.5), coord = (w*noteX,(h*(1-addY))-height))
         else:
           now = False
           if time <= pos and time + event.length > pos:
@@ -364,7 +408,8 @@ class Vocalist:
                   glColor4f(0,1,0,v)
                 else:
                   glColor4f(.5,.5,.5,v)
-              font.render("X", (xPos, .057-(.05*val)+addYText), scale = self.lyricScale)
+              if not (event.speak or event.extra):
+                font.render("X", (xPos, .057-(.05*val)+addYText), scale = self.lyricScale)
               font.render(event.lyric, (xPos, .085+addYText), scale = self.lyricScale)
           elif self.lyricMode == 1 or self.lyricMode == 2: #line-by-line
             if time <= pos:
@@ -379,11 +424,12 @@ class Vocalist:
               font.render(event.lyric, (xPos, .085+addYText), scale = self.lyricScale)
       if self.lyricMode == 0:
         for time, event in lastnotes:
-          if self.activePhrase.tapPhrase:
-            x = time - pos
-            if x > -(self.currentPeriod * 2):
-              noteX = (x/(self.currentPeriod * 8))+.25
-              self.engine.drawImage(self.vocalTapNote, scale = (.5,-.5), coord = (w*noteX,(h*(1-addY))-height))
+          if self.lastPhrase[1].tapPhrase:
+            if not event.played:
+              x = time - pos
+              if x > -(self.currentPeriod * 2):
+                noteX = (x/(self.currentPeriod * 8))+.25
+                self.engine.drawImage(self.vocalTapNote, scale = (.5,-.5), coord = (w*noteX,(h*(1-addY))-height))
           else:
             x = time - pos
             if x > -(self.currentPeriod * 2):
@@ -392,7 +438,7 @@ class Vocalist:
               glColor4f(.5,.5,.5,v)
               font.render(event.lyric, (xPos, .085+addYText), scale = self.lyricScale)
         for time, event in nextnotes:
-          if self.activePhrase.tapPhrase:
+          if self.nextPhrase[1].tapPhrase:
             x = time - pos
             if x < self.currentPeriod * 6:
               noteX = (x/(self.currentPeriod * 8))+.25
@@ -404,9 +450,31 @@ class Vocalist:
               xPos = (x/(self.currentPeriod * 8))+.25
               font.render(event.lyric, (xPos, .085+addYText), scale = self.lyricScale)
     if self.currentNote:
-      currentOffset = .05*(self.currentNote/6)
+      rotate = 0
+      if self.requiredNote:
+        val = float(self.requiredNote-self.minPitch)/(self.pitchRange*20.0)
+      else:
+        val = 0
+      if abs(self.currentNote) < self.allowedDeviation:
+        currentOffset = 0
+        rotate = 0
+      elif self.pitchFudge > 0:
+        if self.currentNote > self.oldNote:
+          rotate = .5
+          currentOffset = .005
+        else:
+          rotate = -.5
+          currentOffset = -.005
+      else:
+        currentOffset = .05*(self.currentNote/6)
+      currentOffset += val
+      if currentOffset > .05:
+        currentOffset -= .1
+      elif currentOffset < -.05:
+        currentOffset += .1
     else:
       currentOffset = 0
+      rotate = 0
     if self.lyricMode == 1 or self.lyricMode == 2:
       self.engine.drawImage(self.vocalBar, scale = (.5,-.5), coord = (w*.87,(h*(1-addY))-height))
       if self.activePhrase: #this checks the previous phrase or the current
@@ -417,10 +485,13 @@ class Vocalist:
           self.engine.drawImage(self.vocalArrow, scale = (self.vocalLyricSheetWFactor,-self.vocalLyricSheetWFactor), coord = (w*noteX-(self.arrowW/2),h*(.92+currentOffset-addY)), color = (1,1,1,self.arrowVis/500.0))
         self.engine.drawImage(self.vocalBar, scale = (.5,-.5), coord = (w*noteX,(h*(1-addY))-height))
     elif self.lyricMode == 0:
-      if self.phrase and self.phrase[1].tapPhrase: #this checks the next phrase /or/ the current
+      if self.phrase and self.tapPhraseActive: #this checks the next phrase /or/ the current
         self.engine.drawImage(self.vocalTap, scale = (.5,-.5), coord = (w*.25,(h*(1-addY))-height))
       else:
-        self.engine.drawImage(self.vocalArrow, scale = (self.vocalLyricSheetWFactor,-self.vocalLyricSheetWFactor), coord = (w*.25-(self.arrowW/2),h*(.92+currentOffset-addY)), color = (1,1,1,self.arrowVis/500.0))
+        if self.currentNoteItem and (self.currentNoteItem.speak or self.currentNoteItem.extra):
+          self.engine.drawImage(self.vocalSplitArrow, scale = (self.vocalLyricSheetWFactor,-self.vocalLyricSheetWFactor), coord = (w*.25-(self.arrowW/2),h*(.87-addY)), color = (1,1,1,self.arrowVis/500.0))
+        else:
+          self.engine.drawImage(self.vocalArrow, scale = (self.vocalLyricSheetWFactor,-self.vocalLyricSheetWFactor), coord = (w*.25-(self.arrowW/2),h*(.92+currentOffset-addY)), rot = rotate, color = (1,1,1,self.arrowVis/500.0))
       a = []
       if self.lastPhrase:
         a.extend([self.lastPhrase[0], self.lastPhrase[1].length])
@@ -440,19 +511,22 @@ class Vocalist:
     
     if self.showText > 0:
       self.engine.drawImage(self.vocalText, scale = (.5, -.5/6.0), coord = (w*.27,h*(.9-addY)), rect = (0, 1, self.scoreBox[0], self.scoreBox[1]))
+    else:
+      self.engine.drawImage(self.vocalMeter, scale = (self.vocalMeterScale,-self.vocalMeterScale), coord = (w*0.25,h*(0.82-addY)))
+      self.engine.drawImage(self.vocalMult, scale = (.5,-.5/8.0), coord = (w*0.28,h*(0.82-addY)), rect = (0, 1, float(self.scoreMultiplier-1)/9.0, float(self.scoreMultiplier)/9.0))
     
-    self.engine.drawImage(self.vocalMeter, scale = (self.vocalMeterScale,-self.vocalMeterScale), coord = (w*0.25,h*(0.82-addY)))
-    self.engine.drawImage(self.vocalMult, scale = (.5,-.5/8.0), coord = (w*0.28,h*(0.82-addY)), rect = (0, 1, float(self.scoreMultiplier-1)/9.0, float(self.scoreMultiplier)/9.0))
-    if self.phraseNoteTime > 0:
-      ratio = self.phraseInTune/float(self.phraseNoteTime)
-      if ratio > 1:
-        ratio = 1
-      if self.vocalContinuousAvailable:
-        degrees = int(360*ratio) - (int(360*ratio) % 5)
-        self.engine.drawImage(self.drawnVocalOverlays[degrees], scale = (self.vocalMeterScale,-self.vocalMeterScale), coord = (w*0.25,h*(0.82-addY)))
-      else:
-        width = self.vocalFill.width1()
-        self.engine.drawImage(self.vocalFill, scale = (self.vocalMeterScale*ratio, -self.vocalMeterScale), coord = (w*.25-(width*ratio*self.vocalMeterScale*.5), h*(.82-addY)), rect = (0,ratio,0,1))
+      if self.phraseNoteTime > 0 and not self.tapPhraseActive:
+        ratio = self.phraseInTune/float(self.phraseNoteTime)
+        if ratio > 1:
+          ratio = 1
+        if self.vocalContinuousAvailable:
+          degrees = int(360*ratio) - (int(360*ratio) % 5)
+          self.engine.drawImage(self.drawnVocalOverlays[degrees], scale = (self.vocalMeterScale,-self.vocalMeterScale), coord = (w*0.25,h*(0.82-addY)))
+        else:
+          width = self.vocalFill.width1()
+          self.engine.drawImage(self.vocalFill, scale = (self.vocalMeterScale*ratio, -self.vocalMeterScale), coord = (w*.25-(width*ratio*self.vocalMeterScale*.5), h*(.82-addY)), rect = (0,ratio,0,1))
+    if self.tapPhraseActive:
+      font.render("%d / %d" % (self.tapNoteHits[self.currentTapPhrase], self.tapNoteTotals[self.currentTapPhrase]), (.25, .065+addYText), scale = self.lyricScale)
   
   def stopMic(self):
     self.mic.stop()
@@ -496,8 +570,14 @@ class Vocalist:
         self.phraseInTune = 0
         self.phraseNoteTime = 0
         if self.phrase[1].tapPhrase:
-          self.phraseTaps = len(self.phrase[1])
+          if not self.tapPhraseActive:
+            self.mic.detectTaps  = True
+            self.tapPhraseActive = True
+            self.currentTapPhrase += 1
         else:
+          self.tapPhraseActive = False
+          self.mic.detectTaps  = False
+          self.mic.getTap()
           for time, note in self.phrase[1]:
             self.phraseNoteTime += note.length
         self.phraseIndex += 1
@@ -531,20 +611,35 @@ class Vocalist:
         self.activePhrase = None
     
     if self.activePhrase:
+      lateMargin = 0
+      if self.activePhrase.tapPhrase:
+        lateMargin = self.lateMargin
       notes = [(time, event) for time, event in self.activePhrase.getAllEvents() if isinstance(event, VocalNote)]
+      retval = None
       for note in notes:
-        if note[0] <= pos and note[0] + note[1].length > pos:
+        if retval is not None: #this checks if the note is a held note - if it is, do not award points based on cutting off.
+          if note[1].heldNote:
+            self.awardEnd = False
+          else:
+            self.awardEnd = True
+          break
+        if note[0] <= pos and note[0] + note[1].length + lateMargin > pos:
           self.currentNoteItem = note[1]
+          if not self.activePhrase.tapPhrase:
+            if note[0] + note[1].length - pos < self.lateMargin and not note[1].played:
+              #note[1].played = True
+              self.stayEnd  = self.lateMargin/4
           if not note[1].heldNote:
             self.currentLyric = note[1].lyric
           if note[1].tap:
-            return -1
+            retval = 1
           if note[1].speak or note[1].extra: # with # or ^ markers
-            return 0
-          return note[1].note
+            retval = 0
+          retval = note[1].note
       else:
         self.currentLyric = None
         return None
+      return retval
     else:
       self.currentLyric = None
       return None
@@ -561,21 +656,27 @@ class Vocalist:
       if self.tapBuffer < 0:
         self.tapBuffer = 0
       
+      if self.pitchFudge > 0:
+        self.pitchFudge -= ticks
+      if self.stayEnd > 0 and self.formants[1] is None:
+        self.stayEnd -= ticks
+      
       if self.showText > 0:
         self.showText -= ticks
         if self.showText < 0:
           self.showText = 0
       
-      if self.currentNote is None:
+      if self.currentNote is None or (self.formants[1] is None and self.pitchFudge <= 0):
         self.arrowVis -= ticks
         if self.arrowVis < 0:
           self.arrowVis = 0
       else:
         self.arrowVis = 500
-      
-      if self.mic.getTap() and self.tapBuffer == 0:
-        self.tap = (self.tapMargin*120)/self.currentBpm #test only
-        self.tapBuffer = (self.tapBufferMargin*120)/self.currentBpm
+      if self.activePhrase:
+        if self.activePhrase.tapPhrase:
+          if self.mic.getTap() and self.tapBuffer == 0:
+            self.tap = self.earlyMargin #test only
+            self.tapBuffer = 0 #(self.tapBufferMargin*120)/self.currentBpm
       #myfingershurt: must not decrease SP if paused.
       if self.starPowerActive == True and self.paused == False:
         self.starPower -= ticks/self.starPowerDecreaseDivisor 
