@@ -564,10 +564,10 @@ class shaderList:
     if self.make("metal","rbnotes"):
       self.enable("rbnotes")
       self["rbnotes"]["tex"]=(self.outline,)
-      self.setVar("view_position",(.0,.0,.0,.0))
-      self.setVar("light0",(10.0,0.0,0.0,1.0))
-      self.setVar("light1",(.0,10.0,.0,1.0))
-      self.setVar("light2",(.0,.0,10.0,1.0))
+      self.setVar("view_position",(.0,.0,.0))
+      self.setVar("light0",(10.0,0.0,0.0))
+      self.setVar("light1",(.0,10.0,.0))
+      self.setVar("light2",(.0,.0,10.0))
       self.setVar("Material",(1.0,.5,.0,1.0))
       self.disable()
     else:

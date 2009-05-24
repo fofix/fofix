@@ -6644,7 +6644,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     self.engine.drawImage(self.mult, scale = (.5,-.0625), coord = multcoord, rect = (0,1,multRange[0],multRange[1]))
     
 
-                streak = int(min(multStreak - ((multiplier-1)*10) / 2, 5))
+                streak = int(min((multStreak - (multiplier-1)*10) / 2, 5))
                 hstreak = int(multStreak % 2)
     
                 r = self.dots
@@ -7558,7 +7558,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
                 else:
 
-                  streak = int(min(multStreak - ((multiplier-1)*10) / 2, 5))
+                  streak = int(min((multStreak - (multiplier-1)*10) / 2, 5))
                   hstreak = int(multStreak % 2)
                   
  

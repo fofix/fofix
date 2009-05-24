@@ -1,7 +1,7 @@
-uniform vec4 view_position;
-uniform vec4 light0;
-uniform vec4 light1;
-uniform vec4 light2;
+uniform vec3 view_position;
+uniform vec3 light0;
+uniform vec3 light1;
+uniform vec3 light2;
 
 varying vec3  vNormal;
 varying vec3  vLight1;
