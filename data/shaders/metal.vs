@@ -1,4 +1,5 @@
 uniform vec3 view_position;
+uniform vec3 note_position;
 uniform vec3 light0;
 uniform vec3 light1;
 uniform vec3 light2;

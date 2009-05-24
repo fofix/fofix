@@ -3294,6 +3294,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           
     except Exception, e:
       self.whammyVol[i] = self.defaultWhammyVol[i] 
+      
+    
 
   def handleAnalogSP(self, playerNum, ticks):
     i = playerNum

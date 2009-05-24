@@ -1302,7 +1302,7 @@ class Guitar:
       glTranslatef(x, (1.0 - visibility) ** (event.number + 1), z)
       
       if shaders.turnon:
-        shaders.setVar("view_position",(x, (1.0 - visibility) ** (event.number + 1), z),"rbnotes")
+        shaders.setVar("note_position",(x, (1.0 - visibility) ** (event.number + 1), z),"rbnotes")
 
       if self.battleStatus[8]:
         renderNote = random.randint(0,2)
