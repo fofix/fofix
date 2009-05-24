@@ -826,7 +826,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(self.engine, self.engine.config, "video", "shader_stage", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "video", "shader_sololight", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "video", "shader_tail", autoApply = True),
-      ConfigChoice(self.engine, self.engine.config, "video", "shader_rbnotes", autoApply = True),
+      ConfigChoice(self.engine, self.engine.config, "video", "shader_notes", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "video", "shader_cd", autoApply = True),
     ]
     self.shaderSettings = Menu.Menu(self.engine, self.shaderSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)

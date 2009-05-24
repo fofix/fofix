@@ -943,8 +943,9 @@ class Guitar:
       self.engine.draw3Dtex(self.noteButtons, vertex = (-size[0],size[1],size[0],-size[1]), texcoord = (texSize[0],texY[0],texSize[1],texY[1]),
                             scale = (1,1,1), multiples = True, color = (1,1,1), vertscale = .2)
 
-    else:  
-
+    else:
+      if shaders.enable("notes"):
+        shaders.setVar("Material",color)
       #mesh = outer ring (black) 
       #mesh_001 = main note (key color) 
       #mesh_002 = top (spot or hopo if no mesh_003) 
@@ -1037,10 +1038,7 @@ class Guitar:
         glDisable(GL_TEXTURE_2D)          
         
       else:
-        if shaders.enable("rbnotes"):
-          shaders.setVar("Material",color)
         note.render("Mesh_001")
-        shaders.disable()
         glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
         if isTappable:
           if self.hopoColor[0] == -2:
@@ -1056,7 +1054,7 @@ class Guitar:
         
 
 
-
+      shaders.disable()
       glDepthMask(0)
       glPopMatrix()
 
@@ -1302,7 +1300,7 @@ class Guitar:
       glTranslatef(x, (1.0 - visibility) ** (event.number + 1), z)
       
       if shaders.turnon:
-        shaders.setVar("note_position",(x, (1.0 - visibility) ** (event.number + 1), z),"rbnotes")
+        shaders.setVar("note_position",(x, (1.0 - visibility) ** (event.number + 1), z),"notes")
 
       if self.battleStatus[8]:
         renderNote = random.randint(0,2)

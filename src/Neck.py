@@ -469,7 +469,6 @@ class Neck:
     def project(beat):
       return 0.125 * beat / self.beatsPerUnit    # glorandwarf: was 0.12
       
-    
     if self.starPowerActive and self.theme == 0:#8bit
       color = Theme.fretColors[5] #self.spColor #(.3,.7,.9)
     elif self.starPowerActive and self.theme == 1:
@@ -598,9 +597,17 @@ class Neck:
       posx = shaders.time()
       fret = []
       neckcol = (0,0,0)
+      
+      notecolors = list(Theme.fretColors)
+      print Theme.fretColors
+      if self.isDrum:
+        notecolors[4] = notecolors[0]
+        notecolors[0] = Theme.opencolor
+        
+        
       for i in range(5):
         blend = max(shaders.var["fret"][self.player][i] - posx + 1.5,0.01)
-        neckcol = mixColors(neckcol, Theme.fretColors[i], blend)
+        neckcol = mixColors(neckcol, notecolors[i], blend)
 
       shaders.var["color"][self.player]=neckcol
       

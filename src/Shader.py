@@ -561,9 +561,9 @@ class shaderList:
     else:
       Log.error("Shader has not been compiled: rockbandtail")  
 
-    if self.make("metal","rbnotes"):
-      self.enable("rbnotes")
-      self["rbnotes"]["tex"]=(self.outline,)
+    if self.make("metal","notes"):
+      self.enable("notes")
+      self["notes"]["tex"]=(self.outline,)
       self.setVar("view_position",(.0,.0,.0))
       self.setVar("light0",(10.0,0.0,0.0))
       self.setVar("light1",(.0,10.0,.0))
