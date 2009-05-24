@@ -599,7 +599,6 @@ class Neck:
       neckcol = (0,0,0)
       
       notecolors = list(Theme.fretColors)
-      print Theme.fretColors
       if self.isDrum:
         notecolors[4] = notecolors[0]
         notecolors[0] = Theme.opencolor
