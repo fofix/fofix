@@ -115,6 +115,8 @@ class Vocalist:
     self.oldTime = 0
     self.oldLength = 0
     self.useOld = False
+    #volshebnyi - quickfix
+    self.neckSpeed = 0.0
     
     self.arrowVis = 0
     
