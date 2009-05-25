@@ -225,9 +225,8 @@ class shaderList:
         
   def enable(self, shader):
     if self.turnon:
-      if self.assigned.has_key(shader):
-        shader = self.assigned[shader]
-
+      #if self.assigned.has_key(shader):
+        #shader = self.assigned[shader]
       glUseProgramObjectARB(self[shader]["program"])
       self.active = self.shaders[shader]
       self.setTextures()
@@ -459,6 +458,11 @@ class shaderList:
       for i in self.shaders.keys():
         value = Config.get("video","shader_"+i)
         if value != "None":
+          if value == "theme":
+            if Config.get("theme","shader_"+i) == "True":
+              value = i
+            else:
+              continue
           self.assigned[i] = value
       return True
     return False
