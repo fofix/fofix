@@ -9,5 +9,6 @@
   * [ReportingBugs]
   * [RequiredSourceModules]
   * [ProjectStatistics]
+  * [Shaders]
 
   * [OldNews]
