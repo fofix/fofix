@@ -52,20 +52,21 @@ except:
   Log.error("OpenGL 2.0 not supported.")
   pass
 
+# main class for shaders library
 class shaderList:
   def __init__(self, dir = ""):
-    self.shaders = {}
-    self.backup = {}
-    self.active = 0
+    self.shaders = {}		# list of all shaders
+    self.active = 0		# active shader
     self.texcount = 0
-    self.workdir = ""
-    self.enabled = False
-    self.turnon = False
-    self.var = {}
-    self.assigned = {}
-    self.globals = {}
+    self.workdir = ""		# dir that contains shader files
+    self.enabled = False	# true if shaders are compiled
+    self.turnon = False		# true if shaders are enabled in settings
+    self.var = {}		# different variables
+    self.assigned = {}		# list for shader replacement
+    self.globals = {}		# list of global vars for every shader
     clock()
-      
+    
+  #shader program compilation  
   def make(self,fname = "", name = ""):
     if fname == "": return False
     if name == "": name = fname
@@ -98,6 +99,27 @@ class shaderList:
       return None
     return shader
     
+  def compile(self, vertexSource=None, fragmentSource=None):
+    program = glCreateProgramObjectARB()
+  
+    if vertexSource:
+      vertexShader = self.compileShader(vertexSource, GL_VERTEX_SHADER_ARB)
+      
+    if fragmentSource:
+      fragmentShader = self.compileShader(fragmentSource, GL_FRAGMENT_SHADER_ARB)
+
+    if vertexShader and fragmentShader:
+      glAttachObjectARB(program, vertexShader)  
+      glAttachObjectARB(program, fragmentShader)
+      glValidateProgramARB( program )
+      glLinkProgramARB(program)
+      glDeleteObjectARB(vertexShader)
+      glDeleteObjectARB(fragmentShader)
+      return program
+      
+    return None
+    
+  #get uniform variables from shader files
   def getVars(self,fname, program, sArray):
     for line in open(fname):
       aline = line[:string.find(line,";")]
@@ -125,6 +147,7 @@ class shaderList:
         for var in aline[2]:
           sArray[var] = [glGetUniformLocationARB(program, var), value]
           
+  #simplified texture binding function
   def setTexture(self,name,texture,program = None):
     if self.assigned.has_key(program):
       program = self.assigned[program]
@@ -137,52 +160,33 @@ class shaderList:
         return True
     return False
     
-    
-  def compile(self, vertexSource=None, fragmentSource=None):
-    program = glCreateProgramObjectARB()
-  
-    if vertexSource:
-      vertexShader = self.compileShader(vertexSource, GL_VERTEX_SHADER_ARB)
-      
-    if fragmentSource:
-      fragmentShader = self.compileShader(fragmentSource, GL_FRAGMENT_SHADER_ARB)
-
-    if vertexShader and fragmentShader:
-      glAttachObjectARB(program, vertexShader)  
-      glAttachObjectARB(program, fragmentShader)
-      glValidateProgramARB( program )
-      glLinkProgramARB(program)
-      glDeleteObjectARB(vertexShader)
-      glDeleteObjectARB(fragmentShader)
-      return program
-      
-    return None
-    
+  #return uniform variable value from the shader
   def getVar(self, var = "program", program = None):
     if self.assigned.has_key(program):
       program = self.assigned[program]
       
     if program == None: program = self.active
     else: program = self[program]
-    if program != 0 and program.has_key(var):
+    if program and program.has_key(var):
       return program[var][1]
     else:
       return None
       
-    
+  #assign uniform variable
   def setVar(self, var, value, program = None):
     if self.assigned.has_key(program):
       program = self.assigned[program]
     if program == None:  program = self.active
-    else: program = self[program]
+    else: program = self[program]    
+    
     
     if type(value) == str:
       value = self.var[value]
     
-    if program != 0 and program.has_key(var):
+    if program and program.has_key(var):
       pos = program[var]
       pos[1] = value
-      if program == self.active and program != 0:
+      if program == self.active:
         try:
           if type(value) == list:
             value = tuple(value)
@@ -209,7 +213,9 @@ class shaderList:
         else:
           return True
     return False
-    
+   
+   
+  # slightly changes uniform variable  
   def modVar(self, var, value, effect = 0.05, alphaAmp=1.0, program = None):  
     old = self.getVar(var,program)
     if old == None:
@@ -222,17 +228,15 @@ class shaderList:
     else:
       new = old * (1-effect) + value * effect
     self.setVar(var,new,program)
-        
+   
+  # enables shader program     
   def enable(self, shader):
     if self.turnon:
       if self.assigned.has_key(shader):
         shader = self.assigned[shader]
-      try:
+        
+      if self[shader]:
         glUseProgramObjectARB(self[shader]["program"])
-      except:
-        Log.warn("Cannot enable: " + self[shader] + ", " + self.assigned)
-        return False
-      else:
         self.active = self.shaders[shader]
         self.setTextures()
         self.update()
@@ -242,35 +246,40 @@ class shaderList:
         self.setGlobals()
         return True
     return False
-      
+     
+  # transmit global vars to uniforms 
   def setGlobals(self):
     for i in self.globals.keys():
       self.setVar(i,self.globals[i])
 
-          
+  # update all uniforms        
   def update(self):
     for i in self.active.keys():
       if i != "textures":
         if type(self.active[i]) == type([]) and self.active[i][1] != None:
           self.setVar(i,self.active[i][1])
-    
+   
+  # set standart OpenGL program active 
   def disable(self):
     if self.active !=0:
       glUseProgramObjectARB(0)
       self.active = 0
     
+  # return active program control
   def activeProgram(self):
     if self.active !=0:
       return self.active["name"]
     else:
       return 0  
-    
+  
+  # print log  
   def log(self, shader):
     length = glGetObjectParameterivARB(shader, GL_INFO_LOG_LENGTH)
     if length > 0:
         log = glGetInfoLogARB(shader)
         return log
     
+  # update and bind all textures
   def setTextures(self, program = None):
     if self.assigned.has_key(program):
       program = self.assigned[program]
@@ -413,7 +422,7 @@ class shaderList:
     if self.shaders.has_key(name):
       return self.shaders[name]
     else:
-      return 0
+      return None
       
   def time(self):
     return clock()
@@ -445,6 +454,7 @@ class shaderList:
       self.globals["songpos"] = 0.0
       #self.loadFromIni()
     
+  # check Settings to enable, disable or assign shaders
   def checkIfEnabled(self):
     if Config.get("video","shader_use"):
       if self.enabled:
@@ -493,7 +503,7 @@ class shaderList:
             if len(self[name][key]) == 2:
               self[name][key][1] = value
          
-    
+  # compile shaders 
   def set(self, dir):
     self.enabled = True
     self.turnon = True
