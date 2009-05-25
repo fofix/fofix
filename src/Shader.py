@@ -22,15 +22,14 @@
 
 from OpenGL.GL import *
 
-import os
-import sys
+import os.path
 import string
-import random
-import time
+from random import random
+from time import clock
 import Log
-import pygame
-import Version
+import pygame.image
 import Config
+import Version
 
 #OGL constants for compatibility with all PyOpenGL versions
 #now multitexturing should work even in PyOpenGL 2.x, if your card supports ARB ext
@@ -58,15 +57,13 @@ class shaderList:
     self.backup = {}
     self.active = 0
     self.texcount = 0
-    self.lastcompiled = ""
     self.workdir = ""
     self.enabled = False
     self.turnon = False
     self.var = {}
     self.assigned = {}
     self.globals = {}
-    time.clock()
-    self.reset()
+    clock()
       
   def make(self,fname = "", name = ""):
     if fname == "": return False
@@ -78,18 +75,15 @@ class shaderList:
     except:
       program = None
     if program:
-      sArray = {"program": program, "name": name, "textures": []}
-      self.lastCompiled = name
-      self.getVars(fullname+".vs", program, sArray)
-      self.getVars(fullname+".ps", program, sArray)
-      self.shaders[name] = sArray
-      
-      if self.shaders[name].has_key("Noise3D"):
-        self.setTexture("Noise3D",self.noise3D,name)
-      
-      return True
-    else:
-      return False
+      if os.path.exists(fullname+".vs") and os.path.exists(fullname+".ps"):
+        sArray = {"program": program, "name": name, "textures": []}
+        self.getVars(fullname+".vs", program, sArray)
+        self.getVars(fullname+".ps", program, sArray)
+        self.shaders[name] = sArray
+        if self.shaders[name].has_key("Noise3D"):
+          self.setTexture("Noise3D",self.noise3D,name)
+        return True
+    return False
 
           
   def compileShader(self, source, shaderType):
@@ -99,8 +93,8 @@ class shaderList:
     glCompileShaderARB( shader )
     status = glGetObjectParameterivARB(shader, GL_OBJECT_COMPILE_STATUS_ARB)
     if (not status):
-        Log.warn(self.log(shader))
-        return None
+      Log.warn(self.log(shader))
+      return None
     return shader
     
   def getVars(self,fname, program, sArray):
@@ -125,7 +119,7 @@ class shaderList:
           if aline[1] == "sampler1D":   textype = GL_TEXTURE_1D
           elif aline[1] == "sampler2D": textype = GL_TEXTURE_2D
           elif aline[1] == "sampler3D": textype = GL_TEXTURE_3D
-          sArray["textures"].append((aline[2],textype,None))
+          sArray["textures"].append((aline[2],textype,0))
         aline[2] = aline[2].split(',')
         for var in aline[2]:
           sArray[var] = [glGetUniformLocationARB(program, var), value]
@@ -169,8 +163,10 @@ class shaderList:
       
     if program == None: program = self.active
     else: program = self[program]
-    if program != 0:
+    if program != 0 and program.has_key(var):
       return program[var][1]
+    else:
+      return None
       
     
   def setVar(self, var, value, program = None):
@@ -214,9 +210,6 @@ class shaderList:
     return False
     
   def modVar(self, var, value, effect = 0.05, alphaAmp=1.0, program = None):  
-    if self.assigned.has_key(program):
-      program = self.assigned[program]
-      
     old = self.getVar(var,program)
     if old == None:
       return None
@@ -230,21 +223,23 @@ class shaderList:
     self.setVar(var,new,program)
         
   def enable(self, shader):
-    try:
-        if self.assigned.has_key(shader):
-          shader = self.assigned[shader]
-          
-        if self.turnon:
-          glUseProgramObjectARB(self[shader]["program"])
-          self.active = self.shaders[shader]
-          self.setTextures()
-          self.update()
-          self.globals["time"] = self.time()
-          self.setGlobals()
-          return True
-        else:
-          return False
-    except:
+    if self.turnon:
+      if self.assigned.has_key(shader):
+        shader = self.assigned[shader]
+
+      glUseProgramObjectARB(self[shader]["program"])
+      self.active = self.shaders[shader]
+      self.setTextures()
+      self.update()
+      
+      self.globals["time"] = self.time()
+      
+      if self.getVar("time"):
+        self.setVar("dt",self.globals["time"]-self.getVar("time"))
+        
+      self.setGlobals()
+      return True
+    else:
       return False
       
   def setGlobals(self):
@@ -293,19 +288,18 @@ class shaderList:
       for j in range(size):
         arr = []
         for k in range(size):
-          arr.append(random.random())
+          arr.append(random())
         arr2.append(arr)
       texels.append(arr2)
           
     self.smoothNoise3D(size, 2, texels)
-    #self.smoothNoise3D(size, 4, texels)
     
     for i in range(size):
       for j in range(size):
         for k in range(size):
           texels[i][j][k] = int(255 * texels[i][j][k])
 
-    texture = 0
+    texture = glGenTextures(1)
     # evilynux - If OpenGL 2.0 is not supported, nicely return.
     try:
       glBindTexture(GL_TEXTURE_3D, texture)
@@ -327,7 +321,7 @@ class shaderList:
     for i in range(size):
       texels.append([])
       for j in range(size):
-        texels[i].append(random.random())
+        texels[i].append(random())
     
     self.smoothNoise(size, 2, texels)
     self.smoothNoise(size, 3, texels)
@@ -337,7 +331,7 @@ class shaderList:
       for j in range(size):
         texels[i][j] = int(255 * texels[i][j])
         
-    texture = 0
+    texture = glGenTextures(1)
     glBindTexture(GL_TEXTURE_2D, texture)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
@@ -347,18 +341,19 @@ class shaderList:
     return texture
     
   def loadTex3D(self, fname, type = GL_RED):
-    try:
-      noise = open(os.path.join(self.workdir,fname)).read()
+    file = os.path.join(self.workdir,fname)
+    if os.path.exists(file):
+      noise = open(file).read()
       size = int(len(noise)**(1/3.0))
-    except:
-      Log.debug("Can't load "+fname)
+    else:
+      Log.debug("Can't load "+file)
       return self.makeNoise3D(16)
           
     #self.smoothNoise3D(size, 2, texels)
     #self.smoothNoise3D(size, 4, texels)
     
 
-    texture = 0
+    texture = glGenTextures(1)
     # evilynux - If OpenGL 2.0 is not supported, nicely return.
     try:
       glBindTexture(GL_TEXTURE_3D, texture)
@@ -376,14 +371,15 @@ class shaderList:
     return texture
     
   def loadTex2D(self, fname, type = GL_RGB):
-    try:
-      img = pygame.image.load(os.path.join(self.workdir,fname))
+    file = os.path.join(self.workdir,fname)
+    if os.path.exists(file):
+      img = pygame.image.load(file)
       noise = pygame.image.tostring(img, "RGB")
-    except:
+    else:
       Log.debug("Can't load "+fname)
       return self.makeNoise2D(16)
 
-    texture = 0
+    texture = glGenTextures(1)
     # evilynux - If OpenGL 2.0 is not supported, nicely return.
     try:
       glBindTexture(GL_TEXTURE_2D, texture)
@@ -419,7 +415,7 @@ class shaderList:
       return 0
       
   def time(self):
-    return time.clock()
+    return clock()
     
   def reset(self):
     self.checkIfEnabled()
@@ -449,25 +445,22 @@ class shaderList:
       #self.loadFromIni()
     
   def checkIfEnabled(self):
-     try:
-       if Config.get("video","shader_use"):
-         if self.enabled:
-           self.turnon = True
-         else:
-           self.set(os.path.join(Version.dataPath(), "shaders"))
-       else:
-         self.turnon = False
-     except:
-       return False
-     else:
-       if self.turnon:
-         for i in self.shaders.keys():
-           value = Config.get("video","shader_"+i)
-           if value != "None":
-             self.assigned[i] = value
-         return True
-       else:
-         return False
+    if Config.get("video","shader_use"):
+      if self.enabled:
+        self.turnon = True
+      else:
+        self.set(os.path.join(Version.dataPath(), "shaders"))
+    else:
+      self.turnon = False
+
+
+    if self.turnon:
+      for i in self.shaders.keys():
+        value = Config.get("video","shader_"+i)
+        if value != "None":
+          self.assigned[i] = value
+      return True
+    return False
          
   def defineConfig(self):
     for name in self.shaders.keys():
@@ -593,7 +586,7 @@ class shaderList:
     if not self.make("cd","cd"):
       Log.error("Shader has not been compiled: cd")  
       
-    self.defineConfig()
+    #self.defineConfig()
     
 def mixColors(c1,c2,blend=0.5):
   c1 = list(c1)
@@ -605,5 +598,4 @@ def mixColors(c1,c2,blend=0.5):
   c1 = c1[:3] + [min(alpha / 3.0,1.0)]
   return tuple(c1)
   
-multiTex = None
 shaders = shaderList()

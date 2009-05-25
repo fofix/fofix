@@ -2804,7 +2804,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       instrument.freestyleLastFretHitTime = [0 for i in range(5)]
     #volshebnyi - shaders reset
     shaders.reset()
-    if shaders.checkIfEnabled():
+    if shaders.turnon:
       for i, player in enumerate(self.playerList):
         shaders.var["fret"][i]=[-10.0]*5
         shaders.var["fretpos"][i]=[-10.0]*5
