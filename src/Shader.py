@@ -225,22 +225,23 @@ class shaderList:
         
   def enable(self, shader):
     if self.turnon:
-      #if self.assigned.has_key(shader):
-        #shader = self.assigned[shader]
-      glUseProgramObjectARB(self[shader]["program"])
-      self.active = self.shaders[shader]
-      self.setTextures()
-      self.update()
-      
-      self.globals["time"] = self.time()
-      
-      if self.getVar("time"):
-        self.setVar("dt",self.globals["time"]-self.getVar("time"))
-        
-      self.setGlobals()
-      return True
-    else:
-      return False
+      if self.assigned.has_key(shader):
+        shader = self.assigned[shader]
+      try:
+        glUseProgramObjectARB(self[shader]["program"])
+      except:
+        Log.warn("Cannot enable: " + self[shader] + ", " + self.assigned)
+        return False
+      else:
+        self.active = self.shaders[shader]
+        self.setTextures()
+        self.update()
+        self.globals["time"] = self.time()
+        if self.getVar("time"):
+          self.setVar("dt",self.globals["time"]-self.getVar("time"))
+        self.setGlobals()
+        return True
+    return False
       
   def setGlobals(self):
     for i in self.globals.keys():
