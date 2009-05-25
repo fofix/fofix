@@ -41,6 +41,7 @@ GL_VERTEX_SHADER_ARB = 0x8B31
 GL_OBJECT_COMPILE_STATUS_ARB= 0x8B81
 GL_OBJECT_LINK_STATUS_ARB = 0x8B82
 GL_INFO_LOG_LENGTH_ARB = 0x8B84
+GL_CLAMP_TO_EDGE = 33071
 
 # evilynux - Do not crash If OpenGL 2.0 is not supported
 try:
@@ -299,7 +300,7 @@ class shaderList:
         for k in range(size):
           texels[i][j][k] = int(255 * texels[i][j][k])
 
-    texture = glGenTextures(1)
+    texture = 0
     # evilynux - If OpenGL 2.0 is not supported, nicely return.
     try:
       glBindTexture(GL_TEXTURE_3D, texture)
@@ -331,7 +332,7 @@ class shaderList:
       for j in range(size):
         texels[i][j] = int(255 * texels[i][j])
         
-    texture = glGenTextures(1)
+    texture = 0
     glBindTexture(GL_TEXTURE_2D, texture)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
@@ -353,7 +354,7 @@ class shaderList:
     #self.smoothNoise3D(size, 4, texels)
     
 
-    texture = glGenTextures(1)
+    texture = 0
     # evilynux - If OpenGL 2.0 is not supported, nicely return.
     try:
       glBindTexture(GL_TEXTURE_3D, texture)
@@ -379,14 +380,14 @@ class shaderList:
       Log.debug("Can't load "+fname)
       return self.makeNoise2D(16)
 
-    texture = glGenTextures(1)
+    texture = 0
     # evilynux - If OpenGL 2.0 is not supported, nicely return.
     try:
       glBindTexture(GL_TEXTURE_2D, texture)
     except:
       return
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
     glTexImage2D(GL_TEXTURE_2D, 0, 1, img.get_width(), img.get_height(), 0, type, GL_UNSIGNED_BYTE, noise)
@@ -585,7 +586,7 @@ class shaderList:
     
     if not self.make("cd","cd"):
       Log.error("Shader has not been compiled: cd")  
-      
+    
     #self.defineConfig()
     
 def mixColors(c1,c2,blend=0.5):
