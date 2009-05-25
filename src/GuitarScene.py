@@ -81,7 +81,7 @@ import ImageDraw
 from Svg import ImgDrawing
 
 #blazingamer: New neck/board rendering class
-import Neck
+from Neck import Neck
 
 #blazingamer: Little fix for RB Score font
 from pygame import version
@@ -223,7 +223,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.keysList = []
     self.soloKeysList = []
     self.soloShifts   = []
-    self.neckrender   = []
     self.playingVocals  = False
     self.numberOfGuitars = len(self.playerList)
     self.numOfPlayers    = len(self.playerList)
@@ -261,7 +260,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         gNum += 1
         if self.firstGuitar is None:
           self.firstGuitar = j
-        self.neckrender.append(Neck.Neck(self.engine, self.instruments[j], player))
+        self.neckrender.append(Neck(self.engine, self.instruments[j], player))
         if self.instruments[j].isDrum:
           self.keysList.append(player.drums)
           self.soloKeysList.append(player.drumSolo)
@@ -279,6 +278,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.keysList.append([])
         self.soloKeysList.append([])
         self.soloShifts.append([])
+
     self.guitars = self.instruments #for compatibility - I'll try to fix this...
     #Log.debug("GuitarScene keysList: " + str(self.keysList))
     Log.debug("GuitarScene keysList: %s" % str(self.keysList))
@@ -4616,23 +4616,23 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       if self.coOp or self.coOpGH:
         guitar.rockLevel = self.rock[self.coOpPlayerMeter] / self.rockMax
         if self.rock[self.coOpPlayerMeter]< self.rockMax/3.0 and self.failingEnabled:
-          guitar.isFailing = True
+          self.neckrender[i].isFailing = True
         else:
-          guitar.isFailing = False
+          self.neckrender[i].isFailing = False
       elif self.coOpRB:
         guitar.rockLevel = self.rock[i] / self.rockMax
         if self.rock[i]< self.rockMax/3.0 and self.failingEnabled:
-          guitar.isFailing = True
+          self.neckrender[i].isFailing = True
         elif self.numDeadPlayers > 0 and self.rock[self.coOpPlayerMeter]< self.rockMax/6.0 and self.failingEnabled:
-          guitar.isFailing = True
+          self.neckrender[i].isFailing = True
         else:
-          guitar.isFailing = False
+          self.neckrender[i].isFailing = False
       else:
         guitar.rockLevel = self.rock[i] / self.rockMax
         if self.rock[i]< self.rockMax/3.0 and self.failingEnabled:
-          guitar.isFailing = True
+          self.neckrender[i].isFailing = True
         else:
-          guitar.isFailing = False
+          self.neckrender[i].isFailing = False
          
     self.engine.view.setViewport(1,0)
     

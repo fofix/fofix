@@ -28,7 +28,7 @@
 #####################################################################
 
 import Player
-from Song import Note, Tempo, Bars
+from Song import Note, Tempo
 from Mesh import Mesh
 import Theme
 import random
@@ -294,7 +294,6 @@ class Guitar:
     
     self.freestyleHit = [False, False, False, False, False]
     
-    self.fretboardHop = 0.00  #stump
     self.bgcount = 0
 
     self.playerObj = playerObj
@@ -567,7 +566,6 @@ class Guitar:
     self.keyColor = Theme.keyColor
     self.key2Color = Theme.key2Color
     self.tracksColor = Theme.tracksColor
-    self.barsColor = Theme.barsColor
     self.flameColors = Theme.flameColors
     self.gh3flameColor = Theme.gh3flameColor
     self.flameSizes = Theme.flameSizes
@@ -582,10 +580,10 @@ class Guitar:
 
     self.overdriveFlashCounts = self.indexFps/4   #how many cycles to display the oFlash: self.indexFps/2 = 1/2 second
 
+    self.rockLevel = 0.0
+
     #Blazingamer: These variables are updated through the guitarscene which then pass 
     #through to the neck because it is used in both the neck.py and the guitar.py
-    self.isFailing = False
-    self.rockLevel = 0.0
     self.canGuitarSolo = False
     self.guitarSolo = False
     self.fretboardHop = 0.00  #stump
@@ -1433,7 +1431,7 @@ class Guitar:
                 self.starPower = 100
             self.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
             self.starPowerGained = True
-            if self.theme == 2 and self.oFlash != None:
+            if self.theme == 2:
               self.ocount = 0
 
       if event.tappable < 2:
@@ -2331,6 +2329,9 @@ class Guitar:
           glScalef(-1, 1, 1)
       elif self.battleStatus[6]:
         glScalef(-1, 1, 1)
+
+    if self.theme == 2 and self.overdriveFlashCount < self.overdriveFlashCounts:
+      self.overdriveFlashCount = self.overdriveFlashCount + 1
 
   def getMissedNotes(self, song, pos, catchup = False):
     if not song:

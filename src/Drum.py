@@ -29,19 +29,20 @@
 #altered by myfingershurt to adapt to Alarian mod
 
 import Player
-from Song import Note, Tempo, Bars
+from Song import Note, Tempo
 from Mesh import Mesh
 import Theme
-import Config
-import Log
-import pygame
+import random
+from copy import deepcopy
 from Shader import shaders
 
 from OpenGL.GL import *
 import math
-import os
-import random
+from numpy import array, float32
 
+#myfingershurt: needed for multi-OS file fetching
+import os
+import Log
 import Song   #need the base song defines as well
 
 #Normal guitar key color order: Green, Red, Yellow, Blue, Orange
@@ -330,7 +331,6 @@ class Drum:
     self.opencolor = Theme.opencolor 
     self.ocount = 0
     self.noterotate = self.engine.config.get("coffee", "noterotate")
-    self.isFailing = False
     self.rockLevel = 0.0
     self.failcount = 0
     self.failcount2 = False
@@ -566,7 +566,6 @@ class Drum:
 
     #Blazingamer: These variables are updated through the guitarscene which then pass 
     #through to the neck because it is used in both the neck.py and the guitar.py
-    self.isFailing = False
     self.canGuitarSolo = False
     self.guitarSolo = False
     self.fretboardHop = 0.00  #stump
@@ -2410,6 +2409,9 @@ class Drum:
     
       if self.leftyMode:
         glScalef(-1, 1, 1)
+
+    if self.theme == 2 and self.overdriveFlashCount < self.overdriveFlashCounts:
+      self.overdriveFlashCount = self.overdriveFlashCount + 1
 
   def getMissedNotes(self, song, pos, catchup = False):
     if not song:

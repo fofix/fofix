@@ -22,15 +22,13 @@
 
 
 import Player
-from Song import Note, Tempo, Bars
-from Mesh import Mesh
+from Song import Tempo, Bars
 import Theme
 import random
 from copy import deepcopy
 from Shader import shaders, mixColors
 
 from OpenGL.GL import *
-import math
 from numpy import array, float32
 
 #myfingershurt: needed for multi-OS file fetching
@@ -235,8 +233,6 @@ class Neck:
         except IOError:
           self.oFlash = None
 
-      self.part.oFlash = self.oFlash
-
     if self.isDrum == True:
       try:
         engine.loadImgDrawing(self, "centerLines", os.path.join("themes",themename,"drumcenterlines.png"))
@@ -326,26 +322,36 @@ class Neck:
     self.isFailing = False
     self.canGuitarSolo = False
     self.guitarSolo = False
-    self.fretboardHop = 0.00  #stump
     self.scoreMultiplier = 1
     self.coOpFailed = False
     self.coOpRestart = False
     self.starPowerActive = False
     self.overdriveFlashCount = self.part.overdriveFlashCounts
+    self.paused = False
 
   def updateGuitarSettings(self):
-    self.fretboardHop = self.part.fretboardHop  #stump
-    self.canGuitarSolo = self.part.canGuitarSolo
-    self.guitarSolo = self.part.guitarSolo
-    self.overdriveFlashCount = self.part.overdriveFlashCounts
-    self.coOpFailed = self.part.coOpFailed
-    self.coOpRestart = self.part.coOpRestart
-    self.starPowerActive = self.part.starPowerActive
-    self.isFailing = self.part.isFailing
-    self.scoreMultiplier = self.part.scoreMultiplier
-    self.currentBpm     = self.part.currentBpm
-    self.currentPeriod  = self.part.currentPeriod
-    self.lastBpmChange  = self.part.lastBpmChange
+    if self.paused != self.part.paused:
+      self.paused = self.part.paused
+    if self.canGuitarSolo != self.part.canGuitarSolo:
+      self.canGuitarSolo = self.part.canGuitarSolo
+    if self.guitarSolo != self.part.guitarSolo:
+      self.guitarSolo = self.part.guitarSolo
+    if self.overdriveFlashCount != self.part.overdriveFlashCount:
+      self.overdriveFlashCount = self.part.overdriveFlashCount
+    if self.coOpFailed != self.part.coOpFailed:
+      self.coOpFailed = self.part.coOpFailed
+    if self.coOpRestart != self.part.coOpRestart:
+      self.coOpRestart = self.part.coOpRestart
+    if self.starPowerActive != self.part.starPowerActive:
+      self.starPowerActive = self.part.starPowerActive
+    if self.scoreMultiplier != self.part.scoreMultiplier:
+      self.scoreMultiplier = self.part.scoreMultiplier
+    if self.currentBpm != self.part.currentBpm:
+      self.currentBpm = self.part.currentBpm
+    if self.currentPeriod != self.part.currentPeriod:
+      self.currentPeriod = self.part.currentPeriod
+    if self.lastBpmChange != self.part.lastBpmChange:
+      self.lastBpmChange = self.part.lastBpmChange
 
   def renderIncomingNeck(self, visibility, song, pos, time, neckTexture):   #MFH - attempt to "scroll" an incoming guitar solo neck towards the player
     if not song:
@@ -654,7 +660,6 @@ class Neck:
     
     #MFH - logic to briefly display oFlash
     if self.theme == 2 and self.overdriveFlashCount < self.overdriveFlashCounts and self.oFlash:
-      self.overdriveFlashCount = self.overdriveFlashCount + 1
       self.oFlash.texture.bind()
     elif self.theme == 2 and self.starPowerActive and self.oCenterLines:
       self.oCenterLines.texture.bind()
@@ -842,99 +847,6 @@ class Neck:
 
     glDisable(GL_TEXTURE_2D)
     
-  def renderTracks(self, visibility):
-    if self.tracksColor[0] == -1:
-      return
-    w = self.boardWidth / self.strings
-    v = 1.0 - visibility
-
-    if self.editorMode:
-      x = (self.strings / 2 - self.selectedString) * w
-      s = 2 * w / self.strings
-      z1 = -0.5 * visibility ** 2
-      z2 = (self.boardLength - 0.5) * visibility ** 2
-      
-      glColor4f(1, 1, 1, .15)
-      
-      glBegin(GL_TRIANGLE_STRIP)
-      glVertex3f(x - s, 0, z1)
-      glVertex3f(x + s, 0, z1)
-      glVertex3f(x - s, 0, z2)
-      glVertex3f(x + s, 0, z2)
-      glEnd()
-
-    sw = 0.025
-    for n in range(self.strings - 1, -1, -1):
-      glBegin(GL_TRIANGLE_STRIP)
-      glColor4f(self.tracksColor[0], self.tracksColor[1], self.tracksColor[2], 0)
-      glVertex3f((n - self.strings / 2) * w - sw, -v, -2)
-      glVertex3f((n - self.strings / 2) * w + sw, -v, -2)
-      glColor4f(self.tracksColor[0], self.tracksColor[1], self.tracksColor[2], (1.0 - v) * .75)
-      glVertex3f((n - self.strings / 2) * w - sw, -v, -1)
-      glVertex3f((n - self.strings / 2) * w + sw, -v, -1)
-      glColor4f(self.tracksColor[0], self.tracksColor[1], self.tracksColor[2], (1.0 - v) * .75)
-      glVertex3f((n - self.strings / 2) * w - sw, -v, self.boardLength * .7)
-      glVertex3f((n - self.strings / 2) * w + sw, -v, self.boardLength * .7)
-      glColor4f(self.tracksColor[0], self.tracksColor[1], self.tracksColor[2], 0)
-      glVertex3f((n - self.strings / 2) * w - sw, -v, self.boardLength)
-      glVertex3f((n - self.strings / 2) * w + sw, -v, self.boardLength)
-      glEnd()
-      v *= 2
-      
-  def renderBars(self, visibility, song, pos):
-    if not song or self.tracksColor[0] == -1:
-      return
-    
-    w            = self.boardWidth
-    v            = 1.0 - visibility
-    sw           = 0.02
-    pos         -= self.lastBpmChange
-    offset       = pos / self.currentPeriod * self.beatsPerUnit
-    currentBeat  = pos / self.currentPeriod
-    beat         = int(currentBeat)
-
-    glEnable(GL_BLEND)
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-    
-    glPushMatrix()
-    while beat < currentBeat + self.beatsPerBoard:
-      z = (beat - currentBeat) / self.beatsPerUnit
-
-      if z > self.boardLength * .8:
-        c = (self.boardLength - z) / (self.boardLength * .2)
-      elif z < 0:
-        c = max(0, 1 + z)
-      else:
-        c = 1.0
-        
-      glRotate(v * 90, 0, 0, 1)
-
-      if (beat % 1.0) < 0.001:
-        glColor4f(self.barsColor[0], self.barsColor[1], self.barsColor[2], visibility * c * .75)
-      else:
-        glColor4f(self.barsColor[0], self.barsColor[1], self.barsColor[2], visibility * c * .5)
-
-      glBegin(GL_TRIANGLE_STRIP)
-      glVertex3f(-(w / 2), -v, z + sw)
-      glVertex3f(-(w / 2), -v, z - sw)
-      glVertex3f(w / 2,    -v, z + sw)
-      glVertex3f(w / 2,    -v, z - sw)
-      glEnd()
-      
-      if self.editorMode:
-        beat += 1.0 / 4.0
-      else:
-        beat += 1
-    glPopMatrix()
-
-    Theme.setSelectedColor(visibility * .5)
-    glBegin(GL_TRIANGLE_STRIP)
-    glVertex3f(-w / 2, 0,  sw)
-    glVertex3f(-w / 2, 0, -sw)
-    glVertex3f(w / 2,  0,  sw)
-    glVertex3f(w / 2,  0, -sw)
-    glEnd()
-
   def render(self, visibility, song, pos):
 
     if not (self.coOpFailed and not self.coOpRestart):
@@ -980,10 +892,8 @@ class Neck:
 
       self.renderNeck(visibility, song, pos)
       self.renderIncomingNecks(visibility, song, pos) #MFH
-      if self.theme == 0 or self.theme == 1 or self.theme == 2:
-        self.drawTrack(self.ocount, song, pos)
-        self.drawBPM(visibility, song, pos)
-        self.drawSideBars(visibility, song, pos)
-      else:
-        self.renderTracks(visibility)
-        self.renderBars(visibility, song, pos)
+
+      self.drawTrack(self.ocount, song, pos)
+      self.drawBPM(visibility, song, pos)
+      self.drawSideBars(visibility, song, pos)
+
