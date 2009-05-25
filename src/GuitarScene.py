@@ -2804,12 +2804,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       instrument.freestyleLastFretHitTime = [0 for i in range(5)]
     #volshebnyi - shaders reset
     shaders.reset()
-    for i, player in enumerate(self.playerList):
-      shaders.var["fret"][i]=[-10.0]*5
-      shaders.var["fretpos"][i]=[-10.0]*5
-      shaders.var["color"][i]=(.0,)*4
-      shaders.var["scoreMult"][i]=1
-      shaders.var["multChangePos"][i]=-10.0
+    if shaders.checkIfEnabled():
+      for i, player in enumerate(self.playerList):
+        shaders.var["fret"][i]=[-10.0]*5
+        shaders.var["fretpos"][i]=[-10.0]*5
+        shaders.var["color"][i]=(.0,)*4
+        shaders.var["scoreMult"][i]=1
+        shaders.var["multChangePos"][i]=-10.0
     self.failed = False
     self.battleSuddenDeath = False
     self.finalFailed = False

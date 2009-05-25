@@ -466,6 +466,8 @@ class shaderList:
            if value != "None":
              self.assigned[i] = value
          return True
+       else:
+         return False
          
   def defineConfig(self):
     for name in self.shaders.keys():
