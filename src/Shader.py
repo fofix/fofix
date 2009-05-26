@@ -74,14 +74,20 @@ class ShaderList:
       name = fname
     fullname = os.path.join(self.workdir, fname)
     vertname, fragname = fullname+".vert", fullname+".frag"
-    Log.debug('Compiling shader "%s" from %s and %s.' % (fname, vertname, fragname))
-    program = self.compile(open(vertname), open(fragname))
-    sArray = {"program": program, "name": name, "textures": []}
-    self.getVars(vertname, program, sArray)
-    self.getVars(fragname, program, sArray)
-    self.shaders[name] = sArray
-    if self.shaders[name].has_key("Noise3D"):
-      self.setTexture("Noise3D",self.noise3D,name)
+    Log.debug('Compiling shader "%s" from %s and %s.' % (name, vertname, fragname))
+    try:
+      program = self.compile(open(vertname), open(fragname))
+    except IOError, err:
+      Log.warn(err.strerror)
+      return False
+    else:
+      sArray = {"program": program, "name": name, "textures": []}
+      self.getVars(vertname, program, sArray)
+      self.getVars(fragname, program, sArray)
+      self.shaders[name] = sArray
+      if self.shaders[name].has_key("Noise3D"):
+        self.setTexture("Noise3D",self.noise3D,name)
+      return True
 
   def compileShader(self, source, shaderType):
     """Compile shader source of given type"""
@@ -91,6 +97,7 @@ class ShaderList:
     status = glGetObjectParameterivARB(shader, GL_OBJECT_COMPILE_STATUS_ARB)
     if not status:
       raise ShaderCompilationError, self.log(shader)
+      return None
     return shader
 
   def compile(self, vertexSource, fragmentSource):
@@ -98,14 +105,16 @@ class ShaderList:
 
     vertexShader = self.compileShader(vertexSource, GL_VERTEX_SHADER_ARB)
     fragmentShader = self.compileShader(fragmentSource, GL_FRAGMENT_SHADER_ARB)
-
-    glAttachObjectARB(program, vertexShader)  
-    glAttachObjectARB(program, fragmentShader)
-    glValidateProgramARB( program )
-    glLinkProgramARB(program)
-    glDeleteObjectARB(vertexShader)
-    glDeleteObjectARB(fragmentShader)
-    return program
+    
+    if vertexShader and fragmentShader:
+      glAttachObjectARB(program, vertexShader)  
+      glAttachObjectARB(program, fragmentShader)
+      glValidateProgramARB( program )
+      glLinkProgramARB(program)
+      glDeleteObjectARB(vertexShader)
+      glDeleteObjectARB(fragmentShader)
+      return program
+    return None
     
   #get uniform variables from shader files
   def getVars(self,fname, program, sArray):
@@ -515,11 +524,7 @@ class ShaderList:
     self.enabled = True
     self.turnon = True
     
-    try:
-      self.make("lightning","stage")
-    except:
-      Log.error("Error compiling lightning shader: ")
-    else:
+    if self.make("lightning","stage"):
       self.enable("stage")
       self.setVar("ambientGlowHeightScale",6.0)
       self.setVar("color",(0.0,0.0,0.0,0.0))
@@ -534,12 +539,10 @@ class ShaderList:
       self.setVar("fixalpha",True)
       self.setVar("offset",(0.0,-2.5))
       self.disable()
-      
-    try:
-      self.make("lightning","sololight")
-    except:
-      Log.error("Error compiling lightning shader: ")
     else:
+      Log.error("Shader has not been compiled: lightning")  
+      
+    if self.make("lightning","sololight"):
       self.enable("sololight")
       self.setVar("scalexy",(5.0,1.0))
       self.setVar("ambientGlow",0.5)
@@ -556,12 +559,10 @@ class ShaderList:
       self.setVar("fixalpha",True)
       self.setVar("glowStrength",100.0)  
       self.disable()
-      
-    try:
-      self.make("lightning","tail")
-    except:
-      Log.error("Error compiling lightning shader: ")
     else:
+      Log.error("Shader has not been compiled: lightning")  
+      
+    if self.make("lightning","tail"):
       self.enable("tail")
       self.setVar("scalexy",(5.0,1.0))
       self.setVar("ambientGlow",0.1)
@@ -579,12 +580,10 @@ class ShaderList:
       self.setVar("fixalpha",True)
       self.setVar("offset",(0.0,0.0)) 
       self.disable()
-      
-    try:
-      self.make("rockbandtail","tail2")
-    except:
-      Log.error("Error compiling rockbandtail shader: ")
     else:
+      Log.error("Shader has not been compiled: lightning")  
+      
+    if self.make("rockbandtail","tail2"):
       self.enable("tail2")
       self.setVar("height",0.2)
       self.setVar("color",(0.0,0.6,1.0,1.0))
@@ -592,21 +591,20 @@ class ShaderList:
       self.setVar("offset",(0.0,0.0))
       self.setVar("scalexy",(5.0,1.0))
       self.disable()
+    else:
+      Log.error("Shader has not been compiled: rockbandtail")  
 
-    try:
-      self.make("metal","notes")
-    except:
-      Log.error("Error compiling metal shader: ")
-
-    try:
-      self.make("neck","neck")
-    except:
-      Log.error("Error compiling neck shader: ")
-
-    try:
-      self.make("cd","cd")
-    except:
-      Log.error("Error compiling cd shader: ")
+    if self.make("metal","notes"):
+      self.enable("notes")
+      self.disable()
+    else:
+      Log.error("Shader has not been compiled: metal")  
+      
+    if not self.make("neck","neck"):
+      Log.error("Shader has not been compiled: neck") 
+    
+    if not self.make("cd","cd"):
+      Log.error("Shader has not been compiled: cd")  
 
     #self.defineConfig()
 
