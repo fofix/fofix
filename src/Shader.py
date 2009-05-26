@@ -524,6 +524,7 @@ class ShaderList:
     self.multiTex = (GL_TEXTURE0_ARB,GL_TEXTURE1_ARB,GL_TEXTURE2_ARB,GL_TEXTURE3_ARB)
     self.enabled = True
     self.turnon = True
+    self.workdir = dir
     
     if self.make("lightning","stage"):
       self.enable("stage")
