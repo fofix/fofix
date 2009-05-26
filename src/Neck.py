@@ -80,6 +80,18 @@ class Neck:
                                  [-self.boardWidth / 2, 0, self.boardLength],
                                  [self.boardWidth / 2, 0, self.boardLength]], dtype=float32)
 
+    color = (1,1,1)
+    self.vis = 1
+
+    self.board_col  = array([[color[0],color[1],color[2], 0],
+                         [color[0],color[1],color[2], 0],
+                         [color[0],color[1],color[2], self.vis],
+                         [color[0],color[1],color[2], self.vis],
+                         [color[0],color[1],color[2], self.vis],
+                         [color[0],color[1],color[2], self.vis],
+                         [color[0],color[1],color[2], 0],
+                         [color[0],color[1],color[2], 0]], dtype=float32)
+
     self.neck = str(playerObj.neck)
     playerObj = None
     #Get theme
@@ -487,31 +499,24 @@ class Neck:
 
     glEnable(GL_TEXTURE_2D)
 
+    self.board_tex  = array([[0.0, project(offset - 2 * self.beatsPerUnit)],
+                         [1.0, project(offset - 2 * self.beatsPerUnit)],
+                         [0.0, project(offset - 1 * self.beatsPerUnit)],
+                         [1.0, project(offset - 1 * self.beatsPerUnit)],
+                         [0.0, project(offset + l * self.beatsPerUnit * .7)],
+                         [1.0, project(offset + l * self.beatsPerUnit * .7)],
+                         [0.0, project(offset + l * self.beatsPerUnit)],
+                         [1.0, project(offset + l * self.beatsPerUnit)]], dtype=float32)
+
     if alpha == True:
       glBlendFunc(GL_ONE, GL_ONE)
     neck.texture.bind()
-    neck_col  = array([[color[0],color[1],color[2], 0],
-                       [color[0],color[1],color[2], 0],
-                       [color[0],color[1],color[2], v],
-                       [color[0],color[1],color[2], v],
-                       [color[0],color[1],color[2], v],
-                       [color[0],color[1],color[2], v],
-                       [color[0],color[1],color[2], 0],
-                       [color[0],color[1],color[2], 0]], dtype=float32)
-    neck_tex  = array([[0.0, project(offset - 2 * self.beatsPerUnit)],
-                       [1.0, project(offset - 2 * self.beatsPerUnit)],
-                       [0.0, project(offset - 1 * self.beatsPerUnit)],
-                       [1.0, project(offset - 1 * self.beatsPerUnit)],
-                       [0.0, project(offset + l * self.beatsPerUnit * .7)],
-                       [1.0, project(offset + l * self.beatsPerUnit * .7)],
-                       [0.0, project(offset + l * self.beatsPerUnit)],
-                       [1.0, project(offset + l * self.beatsPerUnit)]], dtype=float32)
     glEnableClientState(GL_VERTEX_ARRAY)
     glEnableClientState(GL_COLOR_ARRAY)
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glVertexPointerf(self.boardVtx)
-    glColorPointerf(neck_col)
-    glTexCoordPointerf(neck_tex)
+    glColorPointerf(self.board_col)
+    glTexCoordPointerf(self.board_tex)
     glDrawArrays(GL_TRIANGLE_STRIP, 0, self.boardVtx.shape[0])
     glDisableClientState(GL_VERTEX_ARRAY)
     glDisableClientState(GL_COLOR_ARRAY)
@@ -656,6 +661,16 @@ class Neck:
 
     offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
 
+    track_tex  = array([[0.0, project(offset - 2 * self.beatsPerUnit)],
+                         [1.0, project(offset - 2 * self.beatsPerUnit)],
+                         [0.0, project(offset - 1 * self.beatsPerUnit)],
+                         [1.0, project(offset - 1 * self.beatsPerUnit)],
+                         [0.0, project(offset + l * self.beatsPerUnit * .7)],
+                         [1.0, project(offset + l * self.beatsPerUnit * .7)],
+                         [0.0, project(offset + l * self.beatsPerUnit)],
+                         [1.0, project(offset + l * self.beatsPerUnit)]], dtype=float32)
+
+
     glEnable(GL_TEXTURE_2D)
     
     #MFH - logic to briefly display oFlash
@@ -668,57 +683,47 @@ class Neck:
 
     if self.staticStrings:    #MFH
     
-      glBegin(GL_TRIANGLE_STRIP)
-      glColor4f(1, 1, 1, v)
-      glTexCoord2f(0.0, project(-2 * self.beatsPerUnit))
-      glVertex3f(-w / 2, 0, -2+size)
-      glTexCoord2f(1.0, project(-2 * self.beatsPerUnit))
-      glVertex3f( w / 2, 0, -2+size)
-      
-      glColor4f(1, 1, 1, v)
-      glTexCoord2f(0.0, project(-1 * self.beatsPerUnit))
-      glVertex3f(-w / 2, 0, -1+size)
-      glTexCoord2f(1.0, project(-1 * self.beatsPerUnit))
-      glVertex3f( w / 2, 0, -1+size)
-      
-      glTexCoord2f(0.0, project(l * self.beatsPerUnit * .7))
-      glVertex3f(-w / 2, 0, l * .7)
-      glTexCoord2f(1.0, project(1 * self.beatsPerUnit * .7))
-      glVertex3f( w / 2, 0, l * .7)
-      
-      glColor4f(1, 1, 1, 0)
-      glTexCoord2f(0.0, project(l * self.beatsPerUnit))
-      glVertex3f(-w / 2, 0, l)
-      glTexCoord2f(1.0, project(1 * self.beatsPerUnit))
-      glVertex3f( w / 2, 0, l)
+      track_vtx       = array([[-w / 2, 0, -2+size],
+                                 [w / 2, 0, -2+size],
+                                 [-w / 2, 0, -1+size],
+                                 [w / 2, 0, -1+size],
+                                 [-w / 2, 0, l * .7],
+                                 [w / 2, 0, l * .7],
+                                 [-w / 2, 0, l],
+                                 [w / 2, 0, l]], dtype=float32)
+
+      color = (1,1,1)
+      track_col  = array([[color[0],color[1],color[2], v],
+                         [color[0],color[1],color[2], v],
+                         [color[0],color[1],color[2], v],
+                         [color[0],color[1],color[2], v],
+                         [color[0],color[1],color[2], v],
+                         [color[0],color[1],color[2], v],
+                         [color[0],color[1],color[2], 0],
+                         [color[0],color[1],color[2], 0]], dtype=float32)
+      glEnableClientState(GL_VERTEX_ARRAY)
+      glEnableClientState(GL_COLOR_ARRAY)
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+      glVertexPointerf(track_vtx)
+      glColorPointerf(track_col)
+      glTexCoordPointerf(track_tex)
+      glDrawArrays(GL_TRIANGLE_STRIP, 0, track_vtx.shape[0])
+      glDisableClientState(GL_VERTEX_ARRAY)
+      glDisableClientState(GL_COLOR_ARRAY)
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
     else:   #MFH: original moving strings
 
-      glBegin(GL_TRIANGLE_STRIP)
-      glColor4f(1, 1, 1, v)
-      glTexCoord2f(0.0, project(offset - 2 * self.beatsPerUnit))
-      glVertex3f(-w / 2, 0, -2+size)
-      glTexCoord2f(1.0, project(offset - 2 * self.beatsPerUnit))
-      glVertex3f( w / 2, 0, -2+size)
-      
-      glColor4f(1, 1, 1, v)
-      glTexCoord2f(0.0, project(offset - 1 * self.beatsPerUnit))
-      glVertex3f(-w / 2, 0, -1+size)
-      glTexCoord2f(1.0, project(offset - 1 * self.beatsPerUnit))
-      glVertex3f( w / 2, 0, -1+size)
-      
-      glTexCoord2f(0.0, project(offset + l * self.beatsPerUnit * .7))
-      glVertex3f(-w / 2, 0, l * .7)
-      glTexCoord2f(1.0, project(offset + l * self.beatsPerUnit * .7))
-      glVertex3f( w / 2, 0, l * .7)
-      
-      glColor4f(1, 1, 1, 0)
-      glTexCoord2f(0.0, project(offset + l * self.beatsPerUnit))
-      glVertex3f(-w / 2, 0, l)
-      glTexCoord2f(1.0, project(offset + l * self.beatsPerUnit))
-      glVertex3f( w / 2, 0, l)
-
-    glEnd()
+      glEnableClientState(GL_VERTEX_ARRAY)
+      glEnableClientState(GL_COLOR_ARRAY)
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+      glVertexPointerf(self.boardVtx)
+      glColorPointerf(self.board_col)
+      glTexCoordPointerf(track_tex)
+      glDrawArrays(GL_TRIANGLE_STRIP, 0, self.boardVtx.shape[0])
+      glDisableClientState(GL_VERTEX_ARRAY)
+      glDisableClientState(GL_COLOR_ARRAY)
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
     glDisable(GL_TEXTURE_2D)
 
@@ -739,37 +744,32 @@ class Neck:
 
     c = (1,1,1)
 
+    board_tex  = array([[0.0, project(offset - 2 * self.beatsPerUnit)],
+                         [1.0, project(offset - 2 * self.beatsPerUnit)],
+                         [0.0, project(offset - 1 * self.beatsPerUnit)],
+                         [1.0, project(offset - 1 * self.beatsPerUnit)],
+                         [0.0, project(offset + l * self.beatsPerUnit * .7)],
+                         [1.0, project(offset + l * self.beatsPerUnit * .7)],
+                         [0.0, project(offset + l * self.beatsPerUnit)],
+                         [1.0, project(offset + l * self.beatsPerUnit)]], dtype=float32)
+
     glEnable(GL_TEXTURE_2D)
     if self.theme == 2 and self.starPowerActive and self.oSideBars:
       self.oSideBars.texture.bind()
     else:
       self.sideBars.texture.bind()
-    
-    glBegin(GL_TRIANGLE_STRIP)
-    glColor4f(c[0], c[1], c[2], 0)
-    glTexCoord2f(0.0, project(offset - 2 * self.beatsPerUnit))
-    glVertex3f(-w / 2, 0, -2)
-    glTexCoord2f(1.0, project(offset - 2 * self.beatsPerUnit))
-    glVertex3f( w / 2, 0, -2)
-    
-    glColor4f(c[0], c[1], c[2], v)
-    glTexCoord2f(0.0, project(offset - 1 * self.beatsPerUnit))
-    glVertex3f(-w / 2, 0, -1)
-    glTexCoord2f(1.0, project(offset - 1 * self.beatsPerUnit))
-    glVertex3f( w / 2, 0, -1)
-    
-    glTexCoord2f(0.0, project(offset + l * self.beatsPerUnit * .7))
-    glVertex3f(-w / 2, 0, l * .7)
-    glTexCoord2f(1.0, project(offset + l * self.beatsPerUnit * .7))
-    glVertex3f( w / 2, 0, l * .7)
-    
-    glColor4f(c[0], c[1], c[2], 0)
-    glTexCoord2f(0.0, project(offset + l * self.beatsPerUnit))
-    glVertex3f(-w / 2, 0, l)
-    glTexCoord2f(1.0, project(offset + l * self.beatsPerUnit))
-    glVertex3f( w / 2, 0, l)
-    glEnd()
 
+    glEnableClientState(GL_VERTEX_ARRAY)
+    glEnableClientState(GL_COLOR_ARRAY)
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glVertexPointerf(self.boardVtx)
+    glColorPointerf(self.board_col)
+    glTexCoordPointerf(board_tex)
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, self.boardVtx.shape[0])
+    glDisableClientState(GL_VERTEX_ARRAY)
+    glDisableClientState(GL_COLOR_ARRAY)
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    
     glDisable(GL_TEXTURE_2D)
     
     if self.theme == 1:   
@@ -832,17 +832,32 @@ class Neck:
         sw  = 0.1 #width
         self.bpm_measure.texture.bind()
 
-      glColor4f(1, 1, 1, v)
-      glBegin(GL_TRIANGLE_STRIP)
-      glTexCoord2f(0.0, 1.0)
-      glVertex3f(-(w / 2), 0, z + sw)
-      glTexCoord2f(0.0, 0.0)
-      glVertex3f(-(w / 2), 0, z - sw)
-      glTexCoord2f(1.0, 1.0)
-      glVertex3f(w / 2,    0, z + sw)
-      glTexCoord2f(1.0, 0.0)
-      glVertex3f(w / 2,    0, z - sw)
-      glEnd()
+      bpm_vtx  = array([[-(w / 2), 0,  z + sw],
+                         [-(w / 2), 0,  z - sw],
+                         [(w / 2), 0,  z + sw],
+                         [(w / 2), 0,  z - sw]], dtype=float32)
+
+      bpm_tex  = array([[0.0, 1.0],
+                         [0.0, 0.0],
+                         [1.0, 1.0],
+                         [1.0, 0.0]], dtype=float32)
+
+      bpm_col  = array([[1, 1, 1, v],
+                         [1, 1, 1, v],
+                         [1, 1, 1, v],
+                         [1, 1, 1, v]], dtype=float32)
+
+      glEnableClientState(GL_VERTEX_ARRAY)
+      glEnableClientState(GL_COLOR_ARRAY)
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+      glVertexPointerf(bpm_vtx)
+      glColorPointerf(bpm_col)
+      glTexCoordPointerf(bpm_tex)
+      glDrawArrays(GL_TRIANGLE_STRIP, 0, bpm_vtx.shape[0])
+      glDisableClientState(GL_VERTEX_ARRAY)
+      glDisableClientState(GL_COLOR_ARRAY)
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
       glPopMatrix()
 
     glDisable(GL_TEXTURE_2D)
@@ -890,6 +905,7 @@ class Neck:
           self.spcount = 0
           self.spcount2 = 0
 
+      self.vis = visibility
       self.renderNeck(visibility, song, pos)
       self.renderIncomingNecks(visibility, song, pos) #MFH
 

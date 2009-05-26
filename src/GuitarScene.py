@@ -33,10 +33,6 @@
 from Scene import SceneServer, SceneClient
 from Song import Note, Tempo, TextEvent, PictureEvent, loadSong, Bars, VocalNote, VocalPhrase
 from Menu import Menu
-from Guitar import Guitar
-
-#myfingershurt: drums :)
-from Drum import Drum
 
 from Language import _
 import Player
@@ -53,10 +49,7 @@ import Song
 from Scorekeeper import ScoreCard, Rockmeter
 from Shader import shaders
 
-from Vocalist import Vocalist
-
 import math
-import pygame
 import random
 import os
 
@@ -234,6 +227,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     for j,player in enumerate(self.playerList):
       guitar = True
       if player.part.id == Song.VOCAL_PART:
+        from Vocalist import Vocalist
         inst = Vocalist(self.engine, player, False, j)
         self.instruments.append(inst)
         self.playingVocals = True
@@ -241,9 +235,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.numberOfGuitars -= 1
         guitar = False
       elif player.part.id == Song.DRUM_PART:
+        #myfingershurt: drums :)
+        from Drum import Drum
         inst = Drum(self.engine,player,False,j)
         self.instruments.append(inst)
       else:
+        from Guitar import Guitar
         inst = Guitar(self.engine,player,False,j)
         self.instruments.append(inst)
         if player.part.id == Song.LEAD_PART or player.part.id == Song.GUITAR_PART:    #both these selections should get guitar solos
