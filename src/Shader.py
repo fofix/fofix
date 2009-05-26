@@ -60,7 +60,7 @@ class ShaderList:
     self.shaders = {}		# list of all shaders
     self.active = 0		# active shader
     self.texcount = 0
-    self.workdir = ""		# dir that contains shader files
+    self.workdir = dir		# dir that contains shader files
     self.enabled = False	# true if shaders are compiled
     self.turnon = False		# true if shaders are enabled in settings
     self.var = {}		# different variables
@@ -78,17 +78,15 @@ class ShaderList:
     try:
       program = self.compile(open(vertname), open(fragname))
     except IOError, err:
-      Log.warn(err.strerror)
+      Log.warn(err.strerror+" "+os.getcwd())
       return False
     if program:
-      Log.warn("Shader is compiled.")
       sArray = {"program": program, "name": name, "textures": []}
       self.getVars(vertname, program, sArray)
       self.getVars(fragname, program, sArray)
       self.shaders[name] = sArray
       if self.shaders[name].has_key("Noise3D"):
         self.setTexture("Noise3D",self.noise3D,name)
-      Log.warn("Shader is compiled2.")
       return True
 
   def compileShader(self, source, shaderType):
@@ -107,7 +105,6 @@ class ShaderList:
 
     vertexShader = self.compileShader(vertexSource, GL_VERTEX_SHADER_ARB)
     fragmentShader = self.compileShader(fragmentSource, GL_FRAGMENT_SHADER_ARB)
-    Log.warn("Shaders precompilation.")
     if vertexShader and fragmentShader:
       glAttachObjectARB(program, vertexShader)  
       glAttachObjectARB(program, fragmentShader)
@@ -519,6 +516,7 @@ class ShaderList:
       return
 
     self.workdir = dir
+    print dir
     try:
       self.noise3D = self.loadTex3D("noise3d.dds")
       self.outline = self.loadTex2D("outline.tga")
