@@ -111,19 +111,18 @@ class shaderList:
     fullname = os.path.join(self.workdir, fname)
     Log.debug("Compiling " + fname + " shader.")
     try:
-      program = self.compile(open(fullname+".vs"), open(fullname+".ps"))
+      program = self.compile(open(fullname+".vert"), open(fullname+".frag"))
     except IOError, err:
       Log.warn(err.strerror)
       program = None
     if program:
-      if os.path.exists(fullname+".vs") and os.path.exists(fullname+".ps"):
-        sArray = {"program": program, "name": name, "textures": []}
-        self.getVars(fullname+".vs", program, sArray)
-        self.getVars(fullname+".ps", program, sArray)
-        self.shaders[name] = sArray
-        if self.shaders[name].has_key("Noise3D"):
-          self.setTexture("Noise3D",self.noise3D,name)
-        return True
+      sArray = {"program": program, "name": name, "textures": []}
+      self.getVars(fullname+".vert", program, sArray)
+      self.getVars(fullname+".frag", program, sArray)
+      self.shaders[name] = sArray
+      if self.shaders[name].has_key("Noise3D"):
+        self.setTexture("Noise3D",self.noise3D,name)
+      return True
     return False
 
           
