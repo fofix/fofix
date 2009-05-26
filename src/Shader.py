@@ -74,7 +74,8 @@ class shaderList:
     Log.debug("Compiling " + fname + " shader.")
     try:
       program = self.compile(open(fullname+".vs"), open(fullname+".ps"))
-    except:
+    except IOError, err:
+      Log.warn(err.strerror)
       program = None
     if program:
       if os.path.exists(fullname+".vs") and os.path.exists(fullname+".ps"):
