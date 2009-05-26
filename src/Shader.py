@@ -35,6 +35,7 @@ import Version
 # evilynux - Do not crash If OpenGL 2.0 is not supported
 try:
   from OpenGL.GL.ARB.shader_objects import *
+  import OpenGL.GL.ARB
   pyogl = OpenGL.GL.ARB.shader_objects
 except:
   Log.error("OpenGL 2.0 not supported.")
@@ -629,14 +630,6 @@ class shaderList:
 
     if self.make("metal","notes"):
       self.enable("notes")
-      self.setTexture("Outline",self.outline)
-      self.setVar("view_position",(.0,.0,.0))
-      self.setVar("light0",(2.0,2.0,-8.0))
-      self.setVar("light1",(-2.0,2.0,-5.0))
-      self.setVar("light2",(1.0,3.0,-2.0))
-      self.setVar("isTextured",False)
-      self.setVar("note_position",(.0,.0,.0))
-      self.setVar("Material",(1.0,.5,.0,1.0))
       self.disable()
     else:
       Log.error("Shader has not been compiled: metal")  
