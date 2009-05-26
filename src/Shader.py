@@ -44,7 +44,7 @@ try:
   from ctypes import *
 except:
   gl = None
-finally:
+else:
   try:
       # For OpenGL-ctypes
       from OpenGL import platform
