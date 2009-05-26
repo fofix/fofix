@@ -30,7 +30,7 @@ import Log
 import pygame.image
 import Config
 import Version
-from ctypes import *
+
 
 # evilynux - Do not crash If OpenGL 2.0 is not supported
 try:
@@ -41,19 +41,24 @@ except:
   pass
 
 try:
-    # For OpenGL-ctypes
-    from OpenGL import platform
-    gl = platform.OpenGL
-except ImportError:
-    try:
-        # For PyOpenGL
-        gl = cdll.LoadLibrary('libGL.so')
-    except OSError:
-        # Load for Mac
-        from ctypes.util import find_library
-        # finds the absolute path to the framework
-        path = find_library('OpenGL')
-        gl = cdll.LoadLibrary(path)
+  from ctypes import *
+except:
+  gl = None
+finally:
+  try:
+      # For OpenGL-ctypes
+      from OpenGL import platform
+      gl = platform.OpenGL
+  except ImportError:
+      try:
+          # For PyOpenGL
+          gl = cdll.LoadLibrary('libGL.so')
+      except OSError:
+          # Load for Mac
+          from ctypes.util import find_library
+          # finds the absolute path to the framework
+          path = find_library('OpenGL')
+          gl = cdll.LoadLibrary(path)
 
 
 #OGL constants for compatibility with all PyOpenGL versions
@@ -83,26 +88,27 @@ class shaderList:
     clock()
     
   def defineGLSL(self):
-    if not bool(pyogl.glCreateShaderObjectARB):
-      glCreateShaderObjectARB = gl.glCreateShaderObjectARB
-    if not bool(pyogl.glShaderSourceARB):
-      glShaderSourceARB = gl.glShaderSourceARB
-    if not bool(pyogl.glShaderSourceARB):
-      glCompileShaderARB = gl.glCompileShaderARB
-    if not bool(pyogl.glGetObjectParameterivARB):
-      glGetObjectParameterivARB = gl.glGetObjectParameterivARB
-    if not bool(pyogl.glCreateProgramObjectARB):
-      glCreateProgramObjectARB = gl.glCreateProgramObjectARB
-    if not bool(pyogl.glGetInfoLogARB):
-      glGetInfoLogARB = gl.glGetShaderInfoLog
-    if not bool(pyogl.glAttachObjectARB):
-      glAttachObjectARB = gl.glAttachObjectARB
-    if not bool(pyogl.glLinkProgramARB):
-      glLinkProgramARB = gl.glLinkProgramARB
-    if not bool(pyogl.glDeleteObjectARB):
-      glDeleteObjectARB = gl.glDeleteObjectARB
-    if not bool(pyogl.glShaderSourceARB):
-      glShaderSourceARB = gl.glUseProgramObjectARB
+    if gl:
+      if not bool(pyogl.glCreateShaderObjectARB):
+        glCreateShaderObjectARB = gl.glCreateShaderObjectARB
+      if not bool(pyogl.glShaderSourceARB):
+        glShaderSourceARB = gl.glShaderSourceARB
+      if not bool(pyogl.glShaderSourceARB):
+        glCompileShaderARB = gl.glCompileShaderARB
+      if not bool(pyogl.glGetObjectParameterivARB):
+        glGetObjectParameterivARB = gl.glGetObjectParameterivARB
+      if not bool(pyogl.glCreateProgramObjectARB):
+        glCreateProgramObjectARB = gl.glCreateProgramObjectARB
+      if not bool(pyogl.glGetInfoLogARB):
+        glGetInfoLogARB = gl.glGetShaderInfoLog
+      if not bool(pyogl.glAttachObjectARB):
+        glAttachObjectARB = gl.glAttachObjectARB
+      if not bool(pyogl.glLinkProgramARB):
+        glLinkProgramARB = gl.glLinkProgramARB
+      if not bool(pyogl.glDeleteObjectARB):
+        glDeleteObjectARB = gl.glDeleteObjectARB
+      if not bool(pyogl.glShaderSourceARB):
+        glShaderSourceARB = gl.glUseProgramObjectARB
     
   #shader program compilation  
   def make(self,fname = "", name = ""):
