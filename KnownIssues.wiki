@@ -25,8 +25,9 @@ To anyone who's having a problem with too many frames per second being rendered,
   * Sometimes Career songs in Career mode will still say "Play to Advance" instead of showing the number of times played. Only occurs with PH3 so same of above?
 
 ==About Double-pick problem on guitar controllers!==
-When strumming down, up, down, up, ... the game doesn't always register all the picks.
-Workaround (and brief explanation) for this double-pick problem exists in issue 165.  Actually this was solved several revisions ago, so it should no longer be a problem.
+In previous versions of FretsOnFire, RF-Mod, Alarian, and MFH-Mod, alternate strumming did not work properly. When strumming down, up, down, up, ... the game did not always register all the picks.
+
+A Workaround (and brief explanation) for this double-pick problem exists in issue 165.  Additionaly, this was seemingly solved in r353, so, it should no longer be a problem.
 
 ==About Variable/Speed-dependent Hitwindow==
 Set the hitwindow to tight and tweak the A/V-Delay so it's right when you hit the notes when listening to the music. This is now easy with the new Accuracy indicator.
