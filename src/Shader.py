@@ -96,7 +96,7 @@ class ShaderList:
     glCompileShaderARB( shader )
     status = glGetObjectParameterivARB(shader, GL_OBJECT_COMPILE_STATUS_ARB)
     if not status:
-      raise ShaderCompilationError, self.log(shader)
+      Log.error(self.log(shader))
       return None
     return shader
 
@@ -503,6 +503,9 @@ class ShaderList:
   # compile shaders
   #stump: also check here whether shaders are actually supported.
   def set(self, dir):
+    # maybe this will help
+    if not bool(glCreateProgramObjectARB):
+      return
     if not glInitShaderObjectsARB():
       Log.warn('OpenGL extension ARB_shader_objects not supported - shaders disabled')
       return

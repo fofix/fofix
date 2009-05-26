@@ -971,33 +971,15 @@ class Guitar:
       if self.starPowerActive and self.theme != 2 and not color == (0,0,0,1):
         c = self.fretColors[5]
         glColor4f(.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1) 
-
-      if fret == 0: 
-        glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot1)
-      elif fret == 1:
-        glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot2)
-      elif fret == 2:
-        glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot3)
-      elif fret == 3:
-        glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot4)
-      elif fret == 4:
-        glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot5)
+      
+      noterot = getattr(Theme, "noterot"+str(fret+1)) 
+      glRotatef(Theme.noterotdegrees, 0, 0, noterot)
 
       if self.notetex == True and spNote == False:
           
         glColor3f(1,1,1)
         glEnable(GL_TEXTURE_2D)
-        if fret == 0: 
-          tex = self.notetexa.texture
-        elif fret == 1:
-          tex = self.notetexb.texture
-        elif fret == 2:
-          tex = self.notetexc.texture
-        elif fret == 3:
-          tex = self.notetexd.texture
-        elif fret == 4:
-          tex = self.notetexe.texture
-        tex.bind()
+        getattr(self,"notetex"+chr(97+fret)).texture.bind()
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
@@ -1021,17 +1003,7 @@ class Guitar:
       elif self.startex == True and spNote == True:
         glColor3f(1,1,1)
         glEnable(GL_TEXTURE_2D)
-        if fret == 0: 
-          tex = self.startexa.texture
-        elif fret == 1:
-          tex = self.startexb.texture
-        elif fret == 2:
-          tex = self.startexc.texture
-        elif fret == 3:
-          tex = self.startexd.texture
-        elif fret == 4:
-          tex = self.startexe.texture
-        tex.bind()
+        getattr(self,"startex"+chr(97+fret)).texture.bind()
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
@@ -1242,15 +1214,10 @@ class Guitar:
             Log.debug("star power added")
             if self.gameMode2p == 6:
               if self.battleSuddenDeath:
-                self.battleObjects[2] = self.battleObjects[1]
-                self.battleObjects[1] = self.battleObjects[0]
-                self.battleObjects[0] = 1
-                self.battleGetTime = pos
+                self.battleObjects = [1] + self.battleObjects[:2]
               else:
-                self.battleObjects[2] = self.battleObjects[1]
-                self.battleObjects[1] = self.battleObjects[0]
-                self.battleObjects[0] = self.battleObjectsEnabled[random.randint(0,len(self.battleObjectsEnabled)-1)]
-                self.battleGetTime = pos
+                self.battleObjects = self.battleObjectsEnabled[random.randint(0,len(self.battleObjectsEnabled)-1)] + self.battleObjects[:2]
+              self.battleGetTime = pos
               self.battleObjectGained = True
               Log.debug("Battle Object Gained, Objects %s" % str(self.battleObjects))
             else:
@@ -1414,15 +1381,10 @@ class Guitar:
           if event.flameCount < 1 and not self.starPowerGained:
             if self.gameMode2p == 6:
               if self.battleSuddenDeath:
-                self.battleObjects[2] = self.battleObjects[1]
-                self.battleObjects[1] = self.battleObjects[0]
-                self.battleObjects[0] = 1
-                self.battleGetTime = pos
+                self.battleObjects = [1] + self.battleObjects[:2]
               else:
-                self.battleObjects[2] = self.battleObjects[1]
-                self.battleObjects[1] = self.battleObjects[0]
-                self.battleObjects[0] = self.battleObjectsEnabled[random.randint(0,len(self.battleObjectsEnabled)-1)]
-                self.battleGetTime = pos
+                self.battleObjects = self.battleObjectsEnabled[random.randint(0,len(self.battleObjectsEnabled)-1)] + self.battleObjects[:2]
+              self.battleGetTime = pos
               self.battleObjectGained = True
               Log.debug("Battle Object Gained, Objects %s" % str(self.battleObjects))
             else:
@@ -1618,20 +1580,13 @@ class Guitar:
           glLightfv(GL_LIGHT0, GL_POSITION, (5.0, 10.0, -10.0, 0.0))
           glLightfv(GL_LIGHT0, GL_AMBIENT,  (.2, .2, .2, 0.0))
           glLightfv(GL_LIGHT0, GL_DIFFUSE,  (1.0, 1.0, 1.0, 0.0))
+          
+          
           glRotatef(-90, 1, 0, 0)
           glRotatef(-90, 0, 0, 1)
 
-
-          if n == 0: 
-            glRotatef(Theme.noterotdegrees, 0, 0, -Theme.noterot1)
-          elif n == 1:
-            glRotatef(Theme.noterotdegrees, 0, 0, -Theme.noterot2)
-          elif n == 2:
-            glRotatef(Theme.noterotdegrees, 0, 0, -Theme.noterot3)
-          elif n == 3:
-            glRotatef(Theme.noterotdegrees, 0, 0, -Theme.noterot4)
-          elif n == 4:
-            glRotatef(Theme.noterotdegrees, 0, 0, -Theme.noterot5)
+          noterot = getattr(Theme, "noterot"+str(n+1)) 
+          glRotatef(Theme.noterotdegrees, 0, 0, -noterot)
 
 
           #Mesh - Main fret
@@ -1652,16 +1607,7 @@ class Guitar:
             else:
               glTranslatef(x, y, 0)
             glEnable(GL_TEXTURE_2D)
-            if n == 0: 
-              self.keytexa.texture.bind()
-            elif n == 1:
-              self.keytexb.texture.bind()
-            elif n == 2:
-              self.keytexc.texture.bind()
-            elif n == 3:
-              self.keytexd.texture.bind()
-            elif n == 4:
-              self.keytexe.texture.bind()
+            getattr(self,"keytex"+chr(97+n)).texture.bind()
             glMatrixMode(GL_TEXTURE)
             glScalef(1, -1, 1)
             glMatrixMode(GL_MODELVIEW)
@@ -2305,17 +2251,15 @@ class Guitar:
           self.renderFreestyleFlames(visibility, controls)    #MFH - freestyle hit flames
 
       else:    
+        self.renderTails(visibility, song, pos, killswitch)
         if self.fretsUnderNotes:  #MFH
           if self.twoDnote == True:
-            self.renderTails(visibility, song, pos, killswitch)
             self.renderFrets(visibility, song, controls)
             self.renderNotes(visibility, song, pos, killswitch)
           else:
-            self.renderTails(visibility, song, pos, killswitch)
             self.renderNotes(visibility, song, pos, killswitch)
             self.renderFrets(visibility, song, controls)
         else:
-          self.renderTails(visibility, song, pos, killswitch)
           self.renderNotes(visibility, song, pos, killswitch)
           self.renderFrets(visibility, song, controls)
 
