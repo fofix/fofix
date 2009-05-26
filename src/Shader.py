@@ -30,6 +30,31 @@ import Log
 import pygame.image
 import Config
 import Version
+from ctypes import *
+
+# evilynux - Do not crash If OpenGL 2.0 is not supported
+try:
+  from OpenGL.GL.ARB.shader_objects import *
+  pyogl = OpenGL.GL.ARB.shader_objects
+except:
+  Log.error("OpenGL 2.0 not supported.")
+  pass
+
+try:
+    # For OpenGL-ctypes
+    from OpenGL import platform
+    gl = platform.OpenGL
+except ImportError:
+    try:
+        # For PyOpenGL
+        gl = cdll.LoadLibrary('libGL.so')
+    except OSError:
+        # Load for Mac
+        from ctypes.util import find_library
+        # finds the absolute path to the framework
+        path = find_library('OpenGL')
+        gl = cdll.LoadLibrary(path)
+
 
 #OGL constants for compatibility with all PyOpenGL versions
 #now multitexturing should work even in PyOpenGL 2.x, if your card supports ARB ext
@@ -42,15 +67,6 @@ GL_OBJECT_COMPILE_STATUS_ARB= 0x8B81
 GL_OBJECT_LINK_STATUS_ARB = 0x8B82
 GL_INFO_LOG_LENGTH_ARB = 0x8B84
 GL_CLAMP_TO_EDGE = 33071
-
-# evilynux - Do not crash If OpenGL 2.0 is not supported
-try:
-  from OpenGL.GL.ARB.shader_objects import *
-  from OpenGL.GL.ARB.vertex_shader import *
-  from OpenGL.GL.ARB.fragment_shader import *
-except:
-  Log.error("OpenGL 2.0 not supported.")
-  pass
 
 # main class for shaders library
 class shaderList:
@@ -65,6 +81,28 @@ class shaderList:
     self.assigned = {}		# list for shader replacement
     self.globals = {}		# list of global vars for every shader
     clock()
+    
+  def defineGLSL(self):
+    if not bool(pyogl.glCreateShaderObjectARB):
+      glCreateShaderObjectARB = gl.glCreateShaderObjectARB
+    if not bool(pyogl.glShaderSourceARB):
+      glShaderSourceARB = gl.glShaderSourceARB
+    if not bool(pyogl.glShaderSourceARB):
+      glCompileShaderARB = gl.glCompileShaderARB
+    if not bool(pyogl.glGetObjectParameterivARB):
+      glGetObjectParameterivARB = gl.glGetObjectParameterivARB
+    if not bool(pyogl.glCreateProgramObjectARB):
+      glCreateProgramObjectARB = gl.glCreateProgramObjectARB
+    if not bool(pyogl.glGetInfoLogARB):
+      glGetInfoLogARB = gl.glGetShaderInfoLog
+    if not bool(pyogl.glAttachObjectARB):
+      glAttachObjectARB = gl.glAttachObjectARB
+    if not bool(pyogl.glLinkProgramARB):
+      glLinkProgramARB = gl.glLinkProgramARB
+    if not bool(pyogl.glDeleteObjectARB):
+      glDeleteObjectARB = gl.glDeleteObjectARB
+    if not bool(pyogl.glShaderSourceARB):
+      glShaderSourceARB = gl.glUseProgramObjectARB
     
   #shader program compilation  
   def make(self,fname = "", name = ""):
@@ -506,6 +544,7 @@ class shaderList:
          
   # compile shaders 
   def set(self, dir):
+    self.defineGLSL()
     self.enabled = True
     self.turnon = True
     self.workdir = dir
