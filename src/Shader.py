@@ -80,13 +80,15 @@ class ShaderList:
     except IOError, err:
       Log.warn(err.strerror)
       return False
-    else:
+    if program:
+      Log.warn("Shader is compiled.")
       sArray = {"program": program, "name": name, "textures": []}
       self.getVars(vertname, program, sArray)
       self.getVars(fragname, program, sArray)
       self.shaders[name] = sArray
       if self.shaders[name].has_key("Noise3D"):
         self.setTexture("Noise3D",self.noise3D,name)
+      Log.warn("Shader is compiled2.")
       return True
 
   def compileShader(self, source, shaderType):
@@ -105,7 +107,7 @@ class ShaderList:
 
     vertexShader = self.compileShader(vertexSource, GL_VERTEX_SHADER_ARB)
     fragmentShader = self.compileShader(fragmentSource, GL_FRAGMENT_SHADER_ARB)
-    
+    Log.warn("Shaders precompilation.")
     if vertexShader and fragmentShader:
       glAttachObjectARB(program, vertexShader)  
       glAttachObjectARB(program, fragmentShader)
