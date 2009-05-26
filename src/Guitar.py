@@ -592,6 +592,7 @@ class Guitar:
     self.coOpRestart = False #akedrou
     self.starPowerActive = False
     self.overdriveFlashCount = self.overdriveFlashCounts
+    self.ocount = 0
     
   def selectPreviousString(self):
     self.selectedString = (self.selectedString - 1) % self.strings
