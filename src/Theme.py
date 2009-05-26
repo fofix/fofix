@@ -1021,7 +1021,7 @@ def setupLobby(config):
 
 def setupTWOD(config):
   global twoDnote, twoDkeys, threeDspin, opencolor
-  global noterotdegrees, noterot1, noterot2, noterot3, noterot4, noterot5
+  global noterotdegrees, noterot
   
   twoDnote = config.get("theme", "twoDnote")
   twoDkeys = config.get("theme", "twoDkeys")
