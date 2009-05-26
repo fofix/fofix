@@ -24,6 +24,8 @@ Then, to check for and update to the very latest FoFiX alpha source code, perfor
 
 _It is highly recommended that when you become an Alpha tester, you keep a separate FoFiX folder containing a full install of the latest stable release - as the Alpha versions' new features and bugfixes might cause other issues affecting playability._
 
+_Alternatively, be familiar with your svn clients method of rolling back to previous revisions so you can downgrade to a working revision if the latest one breaks on you._
+
 
 ==For Windows==
 
@@ -124,7 +126,7 @@ To create the executable we need a few more steps:
 === Get latest FoFiX ===
   # Open a terminal
   # Change to the directory in which you want to have FoFiX
-  # Execute `svn checkout http://fofix.googlecode.com/svn/MFH-Mod/trunk/ FoFiX-SVN`
+  # Execute {{{svn checkout http://fofix.googlecode.com/svn/MFH-Mod/trunk/ FoFiX-SVN}}}
 === Install dependencies ===
 You need to install those packages:
   * python (tested with 2.4 and 2.5)
@@ -146,7 +148,9 @@ Notes:
 
 === Running from sources ===
   # Change directory to `FoFiX-SVN/src`
-  # Execute `python FretsOnFire.py`
+  # Execute {{{python FoFiX.py}}}
+
+_(Note: Prior to r1450, 'FoFiX.py' was known as 'FretsOnFire.py')_
 
 === Creating binaries ===
 *Unless you want to distribute binaries of FoFiX this is really _not_ required.*
@@ -162,9 +166,9 @@ You first need to...
 Then either create a patch or a full package.
 
 ==== Patch ====
-  * Execute `make clean patch`.
+  * Execute {{{make clean patch}}}.
 ==== Full package ====
-  * Execute `make clean bindist`.
+  * Execute {{{make clean bindist}}}.
 
 === Optional PitchBending ===
 ==== Requirements ====
@@ -173,11 +177,11 @@ In order to build John Stumpo's pitchbend module you first need to install...
   * libsndobj-dev
 
 ==== Compiling ====
-  # Get the source code: `svn co https://svn.stump.jstump.com/svnroot/pitchbend/trunk pitchbend`
-  # Move to the source folder: `cd pitchbend`
-  # Create an empty VERSION file: `touch VERSION`
-  # Build the library: `python setup.py build`
-  # Optionally you can install it: `sudo python setup.py install`
+  # Get the source code: {{{svn co https://svn.stump.jstump.com/svnroot/pitchbend/trunk pitchbend}}}
+  # Move to the source folder: {{{cd pitchbend}}}
+  # Create an empty VERSION file: {{{touch VERSION}}}
+  # Build the library: {{{python setup.py build}}}
+  # Optionally you can install it: {{{sudo python setup.py install}}}
 
 ----
 ==For MacOS X==
@@ -185,9 +189,9 @@ In order to build John Stumpo's pitchbend module you first need to install...
   # Install [http://www.macports.org/ macports]
   # Open a terminal (Terminal.app)
   # Change to the directory in which you want to have FoFiX
-  # Execute `svn checkout http://fofix.googlecode.com/svn/MFH-Mod/trunk/ FoFiX-SVN`
+  # Execute {{{svn checkout http://fofix.googlecode.com/svn/MFH-Mod/trunk/ FoFiX-SVN}}}
 === Install dependencies ===
-You need to install these packages using macports (In a terminal, type `sudo port install [package]`, where `[package]` is the name of the required package to be installed):
+You need to install these packages using macports (In a terminal, type {{{sudo port install [package]}}}, where `[package]` is the name of the required package to be installed):
   * python25
   * py25-game
   * py25-numpy
@@ -208,8 +212,10 @@ Notes:
   * ² py25-opengl works okay but 2.x is still faster.
 
 === Running from sources ===
-  # Change directory to `FoFiX-SVN/src`
-  # Execute `python2.5 FretsOnFire.py`
+  # Change directory to {{{FoFiX-SVN/src}}}
+  # Execute {{{python2.5 FoFiX.py}}}
+
+_(Note: Prior to r1450, 'FoFiX.py' was known as 'FretsOnFire.py')_
 
 === Creating binaries ===
 *Unless you want to distribute binaries of FoFiX this is really _not_ required.*
@@ -217,7 +223,7 @@ Notes:
 You first need to...
   # Install py25-py2app-devel using macports
   # Change directory to `FoFiX-SVN/src`
-  # Execute `python2.5 setup_mac.py py2app`.
+  # Execute {{{python2.5 setup_mac.py py2app}}}.
 
 === Optional PitchBending ===
 ==== Requirements ====
