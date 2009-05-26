@@ -350,6 +350,8 @@ class Neck:
       self.guitarSolo = self.part.guitarSolo
     if self.overdriveFlashCount != self.part.overdriveFlashCount:
       self.overdriveFlashCount = self.part.overdriveFlashCount
+    if self.ocount != self.part.ocount:
+      self.ocount = self.part.ocount
     if self.coOpFailed != self.part.coOpFailed:
       self.coOpFailed = self.part.coOpFailed
     if self.coOpRestart != self.part.coOpRestart:

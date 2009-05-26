@@ -1350,8 +1350,7 @@ class Drum:
               self.starPower = 100
             self.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
             self.starPowerGained = True
-            if self.theme == 2 and self.oFlash != None:
-              self.ocount = 0
+            self.ocount = 0
 
       #if enable:
       #  self.spEnabled = True
