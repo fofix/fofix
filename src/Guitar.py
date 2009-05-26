@@ -434,19 +434,11 @@ class Guitar:
         engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName("note.dae")))
         
       try:
-        engine.loadImgDrawing(self,  "notetexa",  os.path.join("themes", themename, "notetex_a.png"))
-        engine.loadImgDrawing(self,  "notetexb",  os.path.join("themes", themename, "notetex_b.png"))
-        engine.loadImgDrawing(self,  "notetexc",  os.path.join("themes", themename, "notetex_c.png"))
-        engine.loadImgDrawing(self,  "notetexd",  os.path.join("themes", themename, "notetex_d.png"))
-        engine.loadImgDrawing(self,  "notetexe",  os.path.join("themes", themename, "notetex_e.png"))
+        for i in range(5):
+          engine.loadImgDrawing(self,  "notetex"+chr(97+i),  os.path.join("themes", themename, "notetex_"+chr(97+i)+".png"))
         self.notetex = True
 
       except IOError:
-        self.notetexa = False
-        self.notetexb = False
-        self.notetexc = False
-        self.notetexd = False
-        self.notetexe = False
         self.notetex = False
         
       if self.engine.fileExists(os.path.join("themes", themename, "star.dae")):  
@@ -455,19 +447,11 @@ class Guitar:
         self.starMesh = None
 
       try:
-        engine.loadImgDrawing(self,  "startexa",  os.path.join("themes", themename, "startex_a.png"))
-        engine.loadImgDrawing(self,  "startexb",  os.path.join("themes", themename, "startex_b.png"))
-        engine.loadImgDrawing(self,  "startexc",  os.path.join("themes", themename, "startex_c.png"))
-        engine.loadImgDrawing(self,  "startexd",  os.path.join("themes", themename, "startex_d.png"))
-        engine.loadImgDrawing(self,  "startexe",  os.path.join("themes", themename, "startex_e.png"))
+        for i in range(5):
+          engine.loadImgDrawing(self,  "startex"+chr(97+i),  os.path.join("themes", themename, "startex_"+chr(97+i)+".png"))
         self.startex = True
 
       except IOError:
-        self.startexa = False
-        self.startexb = False
-        self.startexc = False
-        self.startexd = False
-        self.startexe = False
         self.startex = False
 
     if self.gameMode2p == 6:
@@ -497,19 +481,11 @@ class Guitar:
         engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName("key.dae")))
 
       try:
-        engine.loadImgDrawing(self,  "keytexa",  os.path.join("themes", themename, "keytex_a.png"))
-        engine.loadImgDrawing(self,  "keytexb",  os.path.join("themes", themename, "keytex_b.png"))
-        engine.loadImgDrawing(self,  "keytexc",  os.path.join("themes", themename, "keytex_c.png"))
-        engine.loadImgDrawing(self,  "keytexd",  os.path.join("themes", themename, "keytex_d.png"))
-        engine.loadImgDrawing(self,  "keytexe",  os.path.join("themes", themename, "keytex_e.png"))
+        for i in range(5):
+          engine.loadImgDrawing(self,  "keytex"+chr(97+i),  os.path.join("themes", themename, "keytex_"+chr(97+i)+".png"))
         self.keytex = True
 
       except IOError:
-        self.keytexa = False
-        self.keytexb = False
-        self.keytexc = False
-        self.keytexd = False
-        self.keytexe = False
         self.keytex = False
     
 
@@ -971,9 +947,8 @@ class Guitar:
       if self.starPowerActive and self.theme != 2 and not color == (0,0,0,1):
         c = self.fretColors[5]
         glColor4f(.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1) 
-      
-      noterot = getattr(Theme, "noterot"+str(fret+1)) 
-      glRotatef(Theme.noterotdegrees, 0, 0, noterot)
+
+      glRotatef(Theme.noterotdegrees, 0, 0, Theme.noterot[fret])
 
       if self.notetex == True and spNote == False:
           
@@ -1585,8 +1560,7 @@ class Guitar:
           glRotatef(-90, 1, 0, 0)
           glRotatef(-90, 0, 0, 1)
 
-          noterot = getattr(Theme, "noterot"+str(n+1)) 
-          glRotatef(Theme.noterotdegrees, 0, 0, -noterot)
+          glRotatef(Theme.noterotdegrees, 0, 0, -Theme.noterot[n])
 
 
           #Mesh - Main fret
@@ -1828,109 +1802,46 @@ class Guitar:
             ff += 1.5 #ff first time is 2.75 after this
   
             if self.freestyleHitFlameCounts[fretNum] < flameLimitHalf:
-              flamecol = (flameColor[0], flameColor[1], flameColor[2])
-              if self.starPowerActive:
-                if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  flamecol = self.spColor #(.3,.7,.9)
+              flamecol = tuple([flameColor[ifc] for ifc in range(3)])
+              rbStarColor = (.1, .1, .2, .3)
+              xOffset = (.0, - .005, .005, .0)
+              yOffset = (.20, .255, .255, .255)
+              scaleMod = .6 * ms * ff
+              scaleFix = (6.0, 5.5, 5.0, 4.7)
+              for step in range(4):
+                if self.starPowerActive and self.theme < 2:
+                  flamecol = self.spColor
                 else: #Default starcolor (Rockband)
-                  flamecol = (.1,.1,.1)
-              self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x, y + .20, 0), rot = (90, 1, 0, 0),
-                                    scale = (.25 + .6 * ms * ff, self.freestyleHitFlameCounts[fretNum]/6.0 + .6 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 6.0 + .6 * ms * ff),
+                  flamecol = (rbStarColor[step],)*3
+                hfCount = self.freestyleHitFlameCounts[fretNum]
+                if step == 0:
+                  hfCount += 1
+                self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x+xOffset[step], y+yOffset[step], 0), rot = (90, 1, 0, 0),
+                                    scale = (.25 + .05 * step + scaleMod, hfCount/scaleFix[step] + scaleMod, hfCount/scaleFix[step] + scaleMod),
                                     vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
                                     texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)
-  
-              flamecol = (flameColor[0], flameColor[1], flameColor[2])
-              if self.starPowerActive:
-                if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  flamecol = self.spColor #(.3,.7,.9)
-                else: #Default starcolor (Rockband)
-                  flamecol = (.1,.1,.1)
-              self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x - .005, y + .25 + .005, 0), rot = (90, 1, 0, 0),
-                                    scale = (.30 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 5.5 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 5.5 + .6 * ms * ff),
-                                    vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
-                                    texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)
-  
-              flamecol = (flameColor[0], flameColor[1], flameColor[2])
-              if self.starPowerActive:
-                if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  flamecol = self.spColor #(.3,.7,.9)
-                else: #Default starcolor (Rockband)
-                  #flamecol = glColor3f(.2,.2,.2)
-                  flamecol = (.2,.2,.2)
-              self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x+.005, y +.25 +.005, 0), rot = (90, 1, 0, 0),
-                                    scale = (.35 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 5.0 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 5.0 + .6 * ms * ff),
-                                    vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
-                                    texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)
-  
-              flamecol = (flameColor[0], flameColor[1], flameColor[2])
-              if self.starPowerActive:
-                if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  flamecol = self.spColor #(.3,.7,.9)
-                else: #Default starcolor (Rockband)
-                  flamecol = (.3,.3,.3)
-              self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x, y +.25 +.005, 0), rot = (90, 1, 0, 0),
-                                    scale = (.40 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1)/ 4.7 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 4.7 + .6 * ms * ff),
-                                    vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
-                                    texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)
+            
             else:
-              flameColorMod0 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
-              flameColorMod1 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
-              flameColorMod2 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
-              
-              flamecol = (flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
-
-              #MFH - hit lightning logic is not needed for freestyle flames...
-
-              self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x, y + .35, 0), rot = (90, 1, 0, 0),
-                                    scale = (.25 + .6 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 3.0 + .6 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 3.0 + .6 * ms * ff),
+              flameColorMod = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
+              flamecol = tuple([flameColor[ifc]*flameColorMod for ifc in range(3)])
+              xOffset = (.0, - .005, .005, .005)
+              yOffset = (.35, .405, .355, .355)
+              scaleMod = .6 * ms * ff
+              scaleFix = (3.0, 2.5, 2.0, 1.7)
+              for step in range(4):
+                hfCount = self.freestyleHitFlameCounts[fretNum]
+                if step == 0:
+                  hfCount += 1
+                else:  
+                  if self.starPowerActive and self.theme < 2:
+                    flamecol = self.spColor
+                  else: #Default starcolor (Rockband)
+                    flamecol = (.4+.1*step,)*3
+                
+                self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x+xOffset[step], y+yOffset[step], 0), rot = (90, 1, 0, 0),
+                                    scale = (.25 + .05 * step + scaleMod, hfCount/scaleFix[step] + scaleMod, hfCount/scaleFix[step] + scaleMod),
                                     vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
-                                    texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)
-
-  
-              flameColorMod0 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
-              flameColorMod1 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
-              flameColorMod2 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
-              
-              flamecol = (flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)      
-              if self.starPowerActive:
-                if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  flamecol = self.spColor #(.3,.7,.9)
-                else: #Default starcolor (Rockband)
-                  flamecol = (.5,.5,.5)
-              self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x - .005, y + .40 + .005, 0), rot = (90, 1, 0, 0),
-                                    scale = (.30 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1)/ 2.5 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 2.5 + .6 * ms * ff),
-                                    vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
-                                    texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)
-  
-              flameColorMod0 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
-              flameColorMod1 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
-              flameColorMod2 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
-              
-              flamecol = (flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
-              if self.starPowerActive:
-                if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  flamecol = self.spColor #(.3,.7,.9)
-                else: #Default starcolor (Rockband)
-                  flamecol = (.6,.6,.6)
-              self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x + .005, y + .35 + .005, 0), rot = (90, 1, 0, 0),
-                                    scale = (.35 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 2.0 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 2.0 + .6 * ms * ff),
-                                    vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
-                                    texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)              
-  
-              flameColorMod0 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
-              flameColorMod1 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
-              flameColorMod2 = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
-              
-              flamecol = (flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
-              if self.starPowerActive:
-                if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  flamecol = self.spColor #(.3,.7,.9)
-                else: #Default starcolor (Rockband)
-                  flamecol = (.7,.7,.7)
-              self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x + .005, y + .35 + .005, 0), rot = (90, 1, 0, 0),
-                                    scale = (.40 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 1.7 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 1.7 + .6 * ms * ff),
-                                    vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
-                                    texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)             
+                                    texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)            
 
             self.freestyleHitFlameCounts[fretNum] += 1
         

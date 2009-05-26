@@ -1028,11 +1028,7 @@ def setupTWOD(config):
   threeDspin = config.get("theme", "threeDspin")
   opencolor = hexToColor(config.get("theme", "opencolor"))
   noterotdegrees = config.get("theme", "noterotdegrees")
-  noterot1 = config.get("theme", "noterot1")
-  noterot2 = config.get("theme", "noterot2")
-  noterot3 = config.get("theme", "noterot3")
-  noterot4 = config.get("theme", "noterot4")
-  noterot5 = config.get("theme", "noterot5")
+  noterot = tuple(config.get("theme", "noterot"+str(i+1)) for i in range(5))
 
 
 #racer:

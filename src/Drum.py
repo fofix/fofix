@@ -441,19 +441,11 @@ class Drum:
         engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName("key.dae")))
 
       try:
-        engine.loadImgDrawing(self,  "keytexa",  os.path.join("themes", themename, "keytex_a.png"))
-        engine.loadImgDrawing(self,  "keytexb",  os.path.join("themes", themename, "keytex_b.png"))
-        engine.loadImgDrawing(self,  "keytexc",  os.path.join("themes", themename, "keytex_c.png"))
-        engine.loadImgDrawing(self,  "keytexd",  os.path.join("themes", themename, "keytex_d.png"))
-        engine.loadImgDrawing(self,  "keytexe",  os.path.join("themes", themename, "keytex_e.png"))
+        for i in range(5):
+          engine.loadImgDrawing(self,  "keytex"+chr(97+i),  os.path.join("themes", themename, "keytex_"+chr(97+i)+".png"))
         self.keytex = True
 
       except IOError:
-        self.keytexa = False
-        self.keytexb = False
-        self.keytexc = False
-        self.keytexd = False
-        self.keytexe = False
         self.keytex = False
         
     #Spinning starnotes or not?
@@ -474,19 +466,11 @@ class Drum:
         engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName("note.dae")))
         
       try:
-        engine.loadImgDrawing(self,  "notetexa",  os.path.join("themes", themename, "notetex_a.png"))
-        engine.loadImgDrawing(self,  "notetexb",  os.path.join("themes", themename, "notetex_b.png"))
-        engine.loadImgDrawing(self,  "notetexc",  os.path.join("themes", themename, "notetex_c.png"))
-        engine.loadImgDrawing(self,  "notetexd",  os.path.join("themes", themename, "notetex_d.png"))
-        engine.loadImgDrawing(self,  "notetexe",  os.path.join("themes", themename, "notetex_e.png"))
+        for i in range(5):
+          engine.loadImgDrawing(self,  "notetex"+chr(97+i),  os.path.join("themes", themename, "notetex_"+chr(97+i)+".png"))
         self.notetex = True
 
       except IOError:
-        self.notetexa = False
-        self.notetexb = False
-        self.notetexc = False
-        self.notetexd = False
-        self.notetexe = False
         self.notetex = False
         
       if self.engine.fileExists(os.path.join("themes", themename, "star.dae")):  
@@ -495,19 +479,11 @@ class Drum:
         self.starMesh = None
 
       try:
-        engine.loadImgDrawing(self,  "startexa",  os.path.join("themes", themename, "startex_a.png"))
-        engine.loadImgDrawing(self,  "startexb",  os.path.join("themes", themename, "startex_b.png"))
-        engine.loadImgDrawing(self,  "startexc",  os.path.join("themes", themename, "startex_c.png"))
-        engine.loadImgDrawing(self,  "startexd",  os.path.join("themes", themename, "startex_d.png"))
-        engine.loadImgDrawing(self,  "startexe",  os.path.join("themes", themename, "startex_e.png"))
+        for i in range(5):
+          engine.loadImgDrawing(self,  "startex"+chr(97+i),  os.path.join("themes", themename, "startex_"+chr(97+i)+".png"))
         self.startex = True
 
       except IOError:
-        self.startexa = False
-        self.startexb = False
-        self.startexc = False
-        self.startexd = False
-        self.startexe = False
         self.startex = False
 
       if self.engine.fileExists(os.path.join("themes", themename, "open.dae")):
@@ -967,26 +943,19 @@ class Drum:
         glRotatef(-90, 1, 0, 0)
 
       if fret == 0: 
-        glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot5)
+        glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot[4])
       elif fret == 1:
-        glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot2)
+        glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot[1])
       elif fret == 2:
-        glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot1)
+        glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot[0])
       elif fret == 3:
-        glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot4)
+        glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot[3])
         
       if self.notetex == True and spNote == False and isOpen==False:
           
         glColor3f(1,1,1)
         glEnable(GL_TEXTURE_2D)
-        if fret == 0: 
-          self.notetexa.texture.bind()
-        elif fret == 1:
-          self.notetexb.texture.bind()
-        elif fret == 2:
-          self.notetexc.texture.bind()
-        elif fret == 3:
-          self.notetexd.texture.bind()
+        getattr(self,"notetex"+chr(97+fret)).texture.bind()
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
@@ -1002,14 +971,7 @@ class Drum:
       elif self.startex == True and spNote == True and isOpen==False:
         glColor3f(1,1,1)
         glEnable(GL_TEXTURE_2D)
-        if fret == 0: 
-          self.startexa.texture.bind()
-        elif fret == 1:
-          self.startexb.texture.bind()
-        elif fret == 2:
-          self.startexc.texture.bind()
-        elif fret == 3:
-          self.startexd.texture.bind()
+        getattr(self,"startex"+chr(97+fret)).texture.bind()
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
@@ -1491,13 +1453,13 @@ class Drum:
           #Glow_001 - Only rendered when a note is hit along with the glow.svg
 
           if n == 0: 
-            glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot5)
+            glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot[4])
           elif n == 1:
-            glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot2)
+            glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot[1])
           elif n == 2:
-            glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot1)
+            glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot[0])
           elif n == 3:
-            glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot4)
+            glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot[3])
         
           if self.keytex == True:
             glColor4f(1,1,1,visibility)
