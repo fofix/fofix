@@ -1,5 +1,7 @@
-All source code and data files are copyright 2006, 2007 by Sami Kyöstilä,
-Tommi Inkilä, Joonas Kerttula, except:
+All source code and data files are
+copyright 2006, 2007 by Sami Kyöstilä, Tommi Inkilä, Joonas Kerttula
+copyright 2008, 2009 by Team FoFiX
+except:
 
   * Font data/title.ttf copyright by Astigmatic One Eye.
   * Font data/default.ttf copyright by 1001 Free Fonts.

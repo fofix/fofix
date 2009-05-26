@@ -180,8 +180,8 @@ class Credits(Layer, KeyListener):
 
     space = Text(nf, hs, c1, "center", " ")
     self.credits = [
-      Picture(self.engine, "mfhlogo.png", .10), 
-      Text(nf, ns, c1, "center", "%s" % self.engine.versionString) ]
+      Picture(self.engine, "fofixlogo_withtext.png", .10), 
+      Text(nf, ns, c1, "center", "%s" % Version.version()) ]
 
     # evilynux: Use CREDITS file as source.
     creditsPath = "CREDITS"
