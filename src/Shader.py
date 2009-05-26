@@ -514,9 +514,7 @@ class ShaderList:
     if not glInitFragmentShaderARB():
       Log.warn('OpenGL extension ARB_fragment_shader not supported - shaders disabled')
       return
-
-    self.workdir = dir
-    print dir
+      
     try:
       self.noise3D = self.loadTex3D("noise3d.dds")
       self.outline = self.loadTex2D("outline.tga")
