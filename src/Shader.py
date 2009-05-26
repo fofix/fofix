@@ -31,39 +31,9 @@ import pygame.image
 import Config
 import Version
 
-
-# evilynux - Do not crash If OpenGL 2.0 is not supported
-try:
-  from OpenGL.GL.ARB.shader_objects import *
-  import OpenGL.GL.ARB
-  pyogl = OpenGL.GL.ARB.shader_objects
-except:
-  Log.error("OpenGL 2.0 not supported.")
-  pass
-
-try:
-  from ctypes import *
-except:
-  gl = None
-else:
-  try:
-      # For OpenGL-ctypes
-      from OpenGL import platform
-      gl = platform.OpenGL
-  except ImportError:
-      try:
-          # For PyOpenGL
-          gl = cdll.LoadLibrary('libGL.so')
-      except OSError:
-          # Load for Mac
-          from ctypes.util import find_library
-          # finds the absolute path to the framework
-          path = find_library('OpenGL')
-          gl = cdll.LoadLibrary(path)
-
-
 #OGL constants for compatibility with all PyOpenGL versions
 #now multitexturing should work even in PyOpenGL 2.x, if your card supports ARB ext
+#stump: there's *got* to be a cleaner way to do this!
 GL_TEXTURE_3D = 32879
 GL_TEXTURE_WRAP_R = 32882
 GL_TEXTURE0_ARB, GL_TEXTURE1_ARB, GL_TEXTURE2_ARB, GL_TEXTURE3_ARB = 33984, 33985, 33986, 33987
@@ -74,8 +44,18 @@ GL_OBJECT_LINK_STATUS_ARB = 0x8B82
 GL_INFO_LOG_LENGTH_ARB = 0x8B84
 GL_CLAMP_TO_EDGE = 33071
 
+# stump: these don't throw the exception for being unsupported - that happens later.
+# There has to be an active OpenGL context already for the checking to occur.
+# We do the check down in ShaderList.set().
+from OpenGL.GL.ARB.shader_objects import *
+from OpenGL.GL.ARB.vertex_shader import *
+from OpenGL.GL.ARB.fragment_shader import *
+
+class ShaderCompilationError(Exception):
+  pass
+
 # main class for shaders library
-class shaderList:
+class ShaderList:
   def __init__(self, dir = ""):
     self.shaders = {}		# list of all shaders
     self.active = 0		# active shader
@@ -88,81 +68,44 @@ class shaderList:
     self.globals = {}		# list of global vars for every shader
     clock()
     
-  def defineGLSL(self):
-    if gl:
-      if not bool(pyogl.glCreateShaderObjectARB):
-        glCreateShaderObjectARB = gl.glCreateShaderObjectARB
-      if not bool(pyogl.glShaderSourceARB):
-        glShaderSourceARB = gl.glShaderSourceARB
-      if not bool(pyogl.glShaderSourceARB):
-        glCompileShaderARB = gl.glCompileShaderARB
-      if not bool(pyogl.glGetObjectParameterivARB):
-        glGetObjectParameterivARB = gl.glGetObjectParameterivARB
-      if not bool(pyogl.glCreateProgramObjectARB):
-        glCreateProgramObjectARB = gl.glCreateProgramObjectARB
-      if not bool(pyogl.glGetInfoLogARB):
-        glGetInfoLogARB = gl.glGetShaderInfoLog
-      if not bool(pyogl.glAttachObjectARB):
-        glAttachObjectARB = gl.glAttachObjectARB
-      if not bool(pyogl.glLinkProgramARB):
-        glLinkProgramARB = gl.glLinkProgramARB
-      if not bool(pyogl.glDeleteObjectARB):
-        glDeleteObjectARB = gl.glDeleteObjectARB
-      if not bool(pyogl.glShaderSourceARB):
-        glShaderSourceARB = gl.glUseProgramObjectARB
-    
   #shader program compilation  
-  def make(self,fname = "", name = ""):
-    if fname == "": return False
-    if name == "": name = fname
+  def make(self, fname, name = ""):
+    if name == "":
+      name = fname
     fullname = os.path.join(self.workdir, fname)
-    Log.debug("Compiling " + fname + " shader.")
-    try:
-      program = self.compile(open(fullname+".vert"), open(fullname+".frag"))
-    except IOError, err:
-      Log.warn(err.strerror)
-      program = None
-    if program:
-      sArray = {"program": program, "name": name, "textures": []}
-      self.getVars(fullname+".vert", program, sArray)
-      self.getVars(fullname+".frag", program, sArray)
-      self.shaders[name] = sArray
-      if self.shaders[name].has_key("Noise3D"):
-        self.setTexture("Noise3D",self.noise3D,name)
-      return True
-    return False
+    vertname, fragname = fullname+".vert", fullname+".frag"
+    Log.debug('Compiling shader "%s" from %s and %s.' % (fname, vertname, fragname))
+    program = self.compile(open(vertname), open(fragname))
+    sArray = {"program": program, "name": name, "textures": []}
+    self.getVars(vertname, program, sArray)
+    self.getVars(fragname, program, sArray)
+    self.shaders[name] = sArray
+    if self.shaders[name].has_key("Noise3D"):
+      self.setTexture("Noise3D",self.noise3D,name)
 
-          
   def compileShader(self, source, shaderType):
     """Compile shader source of given type"""
     shader = glCreateShaderObjectARB(shaderType)
     glShaderSourceARB( shader, source )
     glCompileShaderARB( shader )
     status = glGetObjectParameterivARB(shader, GL_OBJECT_COMPILE_STATUS_ARB)
-    if (not status):
-      Log.warn(self.log(shader))
-      return None
+    if not status:
+      raise ShaderCompilationError, self.log(shader)
     return shader
-    
-  def compile(self, vertexSource=None, fragmentSource=None):
-    program = glCreateProgramObjectARB()
-  
-    if vertexSource:
-      vertexShader = self.compileShader(vertexSource, GL_VERTEX_SHADER_ARB)
-      
-    if fragmentSource:
-      fragmentShader = self.compileShader(fragmentSource, GL_FRAGMENT_SHADER_ARB)
 
-    if vertexShader and fragmentShader:
-      glAttachObjectARB(program, vertexShader)  
-      glAttachObjectARB(program, fragmentShader)
-      glValidateProgramARB( program )
-      glLinkProgramARB(program)
-      glDeleteObjectARB(vertexShader)
-      glDeleteObjectARB(fragmentShader)
-      return program
-      
-    return None
+  def compile(self, vertexSource, fragmentSource):
+    program = glCreateProgramObjectARB()
+
+    vertexShader = self.compileShader(vertexSource, GL_VERTEX_SHADER_ARB)
+    fragmentShader = self.compileShader(fragmentSource, GL_FRAGMENT_SHADER_ARB)
+
+    glAttachObjectARB(program, vertexShader)  
+    glAttachObjectARB(program, fragmentShader)
+    glValidateProgramARB( program )
+    glLinkProgramARB(program)
+    glDeleteObjectARB(vertexShader)
+    glDeleteObjectARB(fragmentShader)
+    return program
     
   #get uniform variables from shader files
   def getVars(self,fname, program, sArray):
@@ -321,9 +264,9 @@ class shaderList:
   def log(self, shader):
     length = glGetObjectParameterivARB(shader, GL_INFO_LOG_LENGTH)
     if length > 0:
-        log = glGetInfoLogARB(shader)
-        return log
-    
+      log = glGetInfoLogARB(shader)
+      return log
+
   # update and bind all textures
   def setTextures(self, program = None):
     if self.assigned.has_key(program):
@@ -401,7 +344,7 @@ class shaderList:
       noise = open(file).read()
       size = int(len(noise)**(1/3.0))
     else:
-      Log.debug("Can't load "+file)
+      Log.debug("Can't load %s; generating random 3D noise instead." % file)
       return self.makeNoise3D(16)
           
     #self.smoothNoise3D(size, 2, texels)
@@ -424,14 +367,14 @@ class shaderList:
     except:
       return 
     return texture
-    
+
   def loadTex2D(self, fname, type = GL_RGB):
     file = os.path.join(self.workdir,fname)
     if os.path.exists(file):
       img = pygame.image.load(file)
       noise = pygame.image.tostring(img, "RGB")
     else:
-      Log.debug("Can't load "+fname)
+      Log.debug("Can't load %s; generating random 2D noise instead." % fname)
       return self.makeNoise2D(16)
 
     texture = 0
@@ -447,7 +390,7 @@ class shaderList:
     glTexImage2D(GL_TEXTURE_2D, 0, 1, img.get_width(), img.get_height(), 0, type, GL_UNSIGNED_BYTE, noise)
     return texture
 
-    
+
   def smoothNoise(self, size, c, noise):
     for x in range(size):
       for y in range(size):
@@ -548,17 +491,35 @@ class shaderList:
             if len(self[name][key]) == 2:
               self[name][key][1] = value
          
-  # compile shaders 
+  # compile shaders
+  #stump: also check here whether shaders are actually supported.
   def set(self, dir):
-    self.defineGLSL()
+    if not glInitShaderObjectsARB():
+      Log.warn('OpenGL extension ARB_shader_objects not supported - shaders disabled')
+      return
+    if not glInitVertexShaderARB():
+      Log.warn('OpenGL extension ARB_vertex_shader not supported - shaders disabled')
+      return
+    if not glInitFragmentShaderARB():
+      Log.warn('OpenGL extension ARB_fragment_shader not supported - shaders disabled')
+      return
+
+    self.workdir = dir
+    try:
+      self.noise3D = self.loadTex3D("noise3d.dds")
+      self.outline = self.loadTex2D("outline.tga")
+    except:
+      Log.error('Could not load shader textures - shaders disabled: ')
+      return
+    self.multiTex = (GL_TEXTURE0_ARB,GL_TEXTURE1_ARB,GL_TEXTURE2_ARB,GL_TEXTURE3_ARB)
     self.enabled = True
     self.turnon = True
-    self.workdir = dir
-    self.noise3D = self.loadTex3D("noise3d.dds")
-    self.outline = self.loadTex2D("outline.tga")
-    self.multiTex = (GL_TEXTURE0_ARB,GL_TEXTURE1_ARB,GL_TEXTURE2_ARB,GL_TEXTURE3_ARB)
     
-    if self.make("lightning","stage"):
+    try:
+      self.make("lightning","stage")
+    except:
+      Log.error("Error compiling lightning shader: ")
+    else:
       self.enable("stage")
       self.setVar("ambientGlowHeightScale",6.0)
       self.setVar("color",(0.0,0.0,0.0,0.0))
@@ -573,10 +534,12 @@ class shaderList:
       self.setVar("fixalpha",True)
       self.setVar("offset",(0.0,-2.5))
       self.disable()
-    else:
-      Log.error("Shader has not been compiled: lightning")  
       
-    if self.make("lightning","sololight"):
+    try:
+      self.make("lightning","sololight")
+    except:
+      Log.error("Error compiling lightning shader: ")
+    else:
       self.enable("sololight")
       self.setVar("scalexy",(5.0,1.0))
       self.setVar("ambientGlow",0.5)
@@ -593,10 +556,12 @@ class shaderList:
       self.setVar("fixalpha",True)
       self.setVar("glowStrength",100.0)  
       self.disable()
-    else:
-      Log.error("Shader has not been compiled: lightning")  
       
-    if self.make("lightning","tail"):
+    try:
+      self.make("lightning","tail")
+    except:
+      Log.error("Error compiling lightning shader: ")
+    else:
       self.enable("tail")
       self.setVar("scalexy",(5.0,1.0))
       self.setVar("ambientGlow",0.1)
@@ -614,10 +579,12 @@ class shaderList:
       self.setVar("fixalpha",True)
       self.setVar("offset",(0.0,0.0)) 
       self.disable()
-    else:
-      Log.error("Shader has not been compiled: lightning")  
       
-    if self.make("rockbandtail","tail2"):
+    try:
+      self.make("rockbandtail","tail2")
+    except:
+      Log.error("Error compiling rockbandtail shader: ")
+    else:
       self.enable("tail2")
       self.setVar("height",0.2)
       self.setVar("color",(0.0,0.6,1.0,1.0))
@@ -625,23 +592,24 @@ class shaderList:
       self.setVar("offset",(0.0,0.0))
       self.setVar("scalexy",(5.0,1.0))
       self.disable()
-    else:
-      Log.error("Shader has not been compiled: rockbandtail")  
 
-    if self.make("metal","notes"):
-      self.enable("notes")
-      self.disable()
-    else:
-      Log.error("Shader has not been compiled: metal")  
-      
-    if not self.make("neck","neck"):
-      Log.error("Shader has not been compiled: neck") 
-    
-    if not self.make("cd","cd"):
-      Log.error("Shader has not been compiled: cd")  
-    
+    try:
+      self.make("metal","notes")
+    except:
+      Log.error("Error compiling metal shader: ")
+
+    try:
+      self.make("neck","neck")
+    except:
+      Log.error("Error compiling neck shader: ")
+
+    try:
+      self.make("cd","cd")
+    except:
+      Log.error("Error compiling cd shader: ")
+
     #self.defineConfig()
-    
+
 def mixColors(c1,c2,blend=0.5):
   c1 = list(c1)
   c2 = list(c2)
@@ -652,4 +620,5 @@ def mixColors(c1,c2,blend=0.5):
   c1 = c1[:3] + [min(alpha / 3.0,1.0)]
   return tuple(c1)
   
-shaders = shaderList()
+shaders = ShaderList()
+del ShaderList
