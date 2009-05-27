@@ -77,9 +77,9 @@ class ShaderList:
     Log.debug('Compiling shader "%s" from %s and %s.' % (name, vertname, fragname))
     try:
       program = self.compile(open(vertname), open(fragname))
-    except IOError, err:
+    except:
       program = None
-      Log.warn(err.strerror+"; Path = "+self.workdir+"; CWD = "+os.getcwd())
+      return False
     if program:
       Log.debug('Shader is compiled.')
       sArray = {"program": program, "name": name, "textures": []}
