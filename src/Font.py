@@ -191,26 +191,22 @@ class Font:
     t.bind()
     if self.outline:
         glPushAttrib(GL_CURRENT_BIT)
-        glPushMatrix()
         glColor4f(0, 0, 0, .25 * glGetDoublev(GL_CURRENT_COLOR)[3])
 
         blur = 2 * DEFAULT_SCALE
         for offset in [(-.7, -.7), (0, -1), (.7, -.7), (-1, 0), 
                        (1, 0), (-.7, .7), (0, 1), (.7, .7)]:
-            glPushMatrix()
             glTranslatef(blur * offset[0], blur * offset[1], 0)
             drawSquare(w,h,tw,th)
-            glPopMatrix()
-        glPopMatrix()
+            glTranslatef(-blur * offset[0], -blur * offset[1], 0)
         glPopAttrib()
 
     if self.shadow:
         glPushAttrib(GL_CURRENT_BIT)
-        glPushMatrix()
         glColor4f(0, 0, 0, 1)
         glTranslatef(shadowoffset[0], shadowoffset[1], 0)
         drawSquare(w,h,tw,th)
-        glPopMatrix()
+        glTranslatef(-shadowoffset[0], -shadowoffset[1], 0)
         glPopAttrib()
 
     drawSquare(w,h,tw,th)
