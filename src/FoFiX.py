@@ -2,7 +2,7 @@
 # -*- coding: iso-8859-1 -*-
 #####################################################################
 # Frets on Fire X (FoFiX)                                           #
-# Copyright (C) 2006 Sami Kyï¿½stilï¿½                                  #
+# Copyright (C) 2006 Sami Kyöstilä                                  #
 #               2008 evilynux <evilynux@gmail.com>                  #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
