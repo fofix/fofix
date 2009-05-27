@@ -653,4 +653,4 @@ class ImgDrawing:
     glPopMatrix()
     glMatrixMode(GL_PROJECTION)
     glPopMatrix()
-    glMatrixMode(GL_MODELVIEW)
+    #glMatrixMode(GL_MODELVIEW)

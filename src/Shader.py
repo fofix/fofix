@@ -78,7 +78,7 @@ class ShaderList:
     try:
       program = self.compile(open(vertname), open(fragname))
     except IOError, err:
-      Log.warn(err.strerror+" "+os.getcwd())
+      Log.warn(err.strerror+" "+os.getcwd() +" "+fullname)
       return False
     if program:
       sArray = {"program": program, "name": name, "textures": []}
@@ -515,6 +515,7 @@ class ShaderList:
       Log.warn('OpenGL extension ARB_fragment_shader not supported - shaders disabled')
       return
       
+    self.workdir = dir  
     try:
       self.noise3D = self.loadTex3D("noise3d.dds")
       self.outline = self.loadTex2D("outline.tga")
@@ -524,7 +525,7 @@ class ShaderList:
     self.multiTex = (GL_TEXTURE0_ARB,GL_TEXTURE1_ARB,GL_TEXTURE2_ARB,GL_TEXTURE3_ARB)
     self.enabled = True
     self.turnon = True
-    self.workdir = dir
+    
     
     if self.make("lightning","stage"):
       self.enable("stage")
