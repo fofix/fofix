@@ -2,7 +2,7 @@
 # -*- coding: iso-8859-1 -*-
 #####################################################################
 # Frets on Fire X (FoFiX)                                           #
-# Copyright (C) 2006 Sami Kyöstilä                                  #
+# Copyright (C) 2006 Sami Kyï¿½stilï¿½                                  #
 #               2008 evilynux <evilynux@gmail.com>                  #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
@@ -51,7 +51,8 @@ usage = """%(prog)s [options]
 Options:
   --verbose, -v                     Verbose messages
   --debug,   -d                     Write Debug file
-  --config=, -c [configfile]        Use this instead of fretsonfire.ini
+  --config=, -c [configfile]        Use this instead of fofix.ini
+  --fullscreen=, -f [True/False]    Change fullscreen settings in fofix.ini
   --play=,   -p [SongDir]           Play a song from the commandline
   --diff=,   -D [difficulty number] Use this difficulty
   --part=,   -P [part number]       Use this part
@@ -68,13 +69,14 @@ def main():
   """Main thread"""
 
   try:
-    opts, args = getopt.getopt(sys.argv[1:], "vdc:p:D:P:m:N:", ["verbose", "debug", "config=", "play=", "diff=", "part=", "mode=", "nbrplayers="])
+    opts, args = getopt.getopt(sys.argv[1:], "vdc:f:p:D:P:m:N:", ["verbose", "debug", "config=", "fullscreen=", "play=", "diff=", "part=", "mode=", "nbrplayers="])
   except getopt.GetoptError:
     print usage
     sys.exit(1)
     
   playing = None
   configFile = None
+  fullscreen = None
   debug = False
   difficulty = 0
   part = 0
@@ -87,6 +89,8 @@ def main():
       debug = True
     if opt in ["--config", "-c"]:
       configFile = arg
+    if opt in ["--fullscreen", "-f"]:
+      fullscreen = arg
     if opt in ["--play", "-p"]:
       playing = arg
     if opt in ["--diff", "-D"]:
@@ -109,6 +113,11 @@ def main():
         config = Config.load(configFile, setAsDefault = True)
     else:
       config = Config.load(Version.appName() + ".ini", setAsDefault = True)
+
+    #Lysdestic - Allow support for manipulating fullscreen via CLI
+    if fullscreen != None:
+      Config.set("video", "fullscreen", fullscreen)
+
     engine = GameEngine(config)
     engine.cmdPlay = 0
     
