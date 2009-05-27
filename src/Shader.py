@@ -22,7 +22,7 @@
 
 from OpenGL.GL import *
 
-import os.path
+import os
 import string
 from random import random
 from time import clock
@@ -56,11 +56,11 @@ class ShaderCompilationError(Exception):
 
 # main class for shaders library
 class ShaderList:
-  def __init__(self, dir = ""):
+  def __init__(self):
     self.shaders = {}		# list of all shaders
     self.active = 0		# active shader
     self.texcount = 0
-    self.workdir = dir		# dir that contains shader files
+    self.workdir = ""		# dir that contains shader files
     self.enabled = False	# true if shaders are compiled
     self.turnon = False		# true if shaders are enabled in settings
     self.var = {}		# different variables
@@ -78,16 +78,19 @@ class ShaderList:
     try:
       program = self.compile(open(vertname), open(fragname))
     except IOError, err:
-      Log.warn(err.strerror+" "+os.getcwd() +" "+fullname)
-      return False
+      program = None
+      Log.warn(err.strerror+"; Path = "+self.workdir+"; CWD = "+os.getcwd())
     if program:
+      Log.debug('Shader is compiled.')
       sArray = {"program": program, "name": name, "textures": []}
       self.getVars(vertname, program, sArray)
       self.getVars(fragname, program, sArray)
       self.shaders[name] = sArray
+      Log.debug('Assign textures.')
       if self.shaders[name].has_key("Noise3D"):
         self.setTexture("Noise3D",self.noise3D,name)
       return True
+    return False
 
   def compileShader(self, source, shaderType):
     """Compile shader source of given type"""
@@ -95,16 +98,17 @@ class ShaderList:
     glShaderSourceARB( shader, source )
     glCompileShaderARB( shader )
     status = glGetObjectParameterivARB(shader, GL_OBJECT_COMPILE_STATUS_ARB)
-    if not status:
-      Log.error(self.log(shader))
+    if (not status):
+      Log.warn(self.log(shader))
       return None
     return shader
 
   def compile(self, vertexSource, fragmentSource):
     program = glCreateProgramObjectARB()
-
+  
     vertexShader = self.compileShader(vertexSource, GL_VERTEX_SHADER_ARB)
     fragmentShader = self.compileShader(fragmentSource, GL_FRAGMENT_SHADER_ARB)
+    Log.debug('Shaders are precompiled.')
     if vertexShader and fragmentShader:
       glAttachObjectARB(program, vertexShader)  
       glAttachObjectARB(program, fragmentShader)
@@ -113,10 +117,11 @@ class ShaderList:
       glDeleteObjectARB(vertexShader)
       glDeleteObjectARB(fragmentShader)
       return program
+      
     return None
     
   #get uniform variables from shader files
-  def getVars(self,fname, program, sArray):
+  def getVars(self, fname, program, sArray):
     for line in open(fname):
       aline = line[:string.find(line,";")]
       aline = aline.split(' ')
