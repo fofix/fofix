@@ -47,9 +47,15 @@ GL_CLAMP_TO_EDGE = 33071
 # stump: these don't throw the exception for being unsupported - that happens later.
 # There has to be an active OpenGL context already for the checking to occur.
 # We do the check down in ShaderList.set().
-from OpenGL.GL.ARB.shader_objects import *
-from OpenGL.GL.ARB.vertex_shader import *
-from OpenGL.GL.ARB.fragment_shader import *
+# evilynux : Wrapped around try/except as pyopengl < 2.0.2.x fails here.
+try:
+  from OpenGL.GL.ARB.shader_objects import *
+  from OpenGL.GL.ARB.vertex_shader import *
+  from OpenGL.GL.ARB.fragment_shader import *
+except:
+  Log.warn("Importing OpenGL ARB fails therefore shaders are disabled."\
+             " It is most likely that your version of PyOpenGL is too old.")
+  glInitShaderObjectsARB = lambda: False
 
 class ShaderCompilationError(Exception):
   pass
