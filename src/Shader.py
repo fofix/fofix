@@ -317,20 +317,13 @@ class ShaderList:
           texels[i][j][k] = int(255 * texels[i][j][k])
 
     texture = 0
-    # evilynux - If OpenGL 2.0 is not supported, nicely return.
-    try:
-      glBindTexture(GL_TEXTURE_3D, texture)
-      glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT)
-    except:
-      return
+    glBindTexture(GL_TEXTURE_3D, texture)
+    glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-    try:
-      glTexImage3D(GL_TEXTURE_3D, 0, c,size, size, size, 0, type, GL_UNSIGNED_BYTE, texels)
-    except:
-      return 
+    glTexImage3D(GL_TEXTURE_3D, 0, c,size, size, size, 0, type, GL_UNSIGNED_BYTE, texels)
     return texture
     
   def makeNoise2D(self,size=64, c = 1, type = GL_RED):
@@ -371,20 +364,13 @@ class ShaderList:
     
 
     texture = 0
-    # evilynux - If OpenGL 2.0 is not supported, nicely return.
-    try:
-      glBindTexture(GL_TEXTURE_3D, texture)
-    except:
-      return
+    glBindTexture(GL_TEXTURE_3D, texture)
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
     glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-    try:
-      glTexImage3D(GL_TEXTURE_3D, 0, 1,size, size, size, 0, type, GL_UNSIGNED_BYTE, noise)
-    except:
-      return 
+    glTexImage3D(GL_TEXTURE_3D, 0, 1,size, size, size, 0, type, GL_UNSIGNED_BYTE, noise)
     return texture
 
   def loadTex2D(self, fname, type = GL_RGB):
@@ -397,11 +383,7 @@ class ShaderList:
       return self.makeNoise2D(16)
 
     texture = 0
-    # evilynux - If OpenGL 2.0 is not supported, nicely return.
-    try:
-      glBindTexture(GL_TEXTURE_2D, texture)
-    except:
-      return
+    glBindTexture(GL_TEXTURE_2D, texture)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
