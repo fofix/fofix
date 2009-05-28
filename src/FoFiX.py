@@ -49,17 +49,17 @@ import pygame
 
 usage = """%(prog)s [options]
 Options:
-  --verbose, -v                     Verbose messages
-  --debug,   -d                     Write Debug file
-  --config=, -c [configfile]        Use this instead of fofix.ini
-  --fullscreen=, -f [true/false]    Change fullscreen settings in fofix.ini
-  --resolution=, -r [resolution]    Change game resolution from commandline.
-  --song=,   -s [songdir]           Play a song from the commandline
-  --diff=,   -d [difficulty number] Use this difficulty
-  --part=,   -p [part number]       Use this part
-  --mode=,   -m [game mode]         1P: 0-Quickplay, 1-Practice,     2-Career
-                                    2P: 0-Face-off,  1-Pro Face-off, 2-Party mode
-  --nbrplayers=,-n [1 through 4]         Number of players         
+  --verbose, -v                       Verbose messages
+  --debug,   -d                       Write Debug file
+  --config=, -c [configfile]          Use this instead of fofix.ini
+  --fullscreen=, -f [true/false]      Change fullscreen settings in fofix.ini
+  --resolution=, -r [resolution]      Change game resolution from commandline.
+  --song=,   -s [songdir]             Play a song from the commandline
+  --diff=,   -l [level of difficulty] Use this difficulty level
+  --part=,   -p [part number]         Use this part
+  --mode=,   -m [game mode]           1P: 0-Quickplay, 1-Practice,     2-Career
+                                      2P: 0-Face-off,  1-Pro Face-off, 2-Party mode
+  --nbrplayers=,-n [1 - 4]            Number of players (1 - 4)     
 """ % {"prog": sys.argv[0] }
 
 debuglevel = 0    #MFH - experimental, leave at 0
@@ -100,7 +100,7 @@ def main():
       theme = arg
     if opt in ["--song", "-s"]:
       playing = arg
-    if opt in ["--diff", "-d"]:
+    if opt in ["--diff", "-l"]:
       difficulty = arg      
     if opt in ["--part", "-p"]:
       part = arg
