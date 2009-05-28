@@ -14,5 +14,5 @@ Add the following to the end when running FoFiX.
 ||--part=,   -p (part number)||Use this part.||
 ||--mode=,   -m (game mode)||1P: 0-Quickplay, 1-Practice,     2-Career||
 ||                         ||2P: 0-Face-off,  1-Pro Face-off, 2-Party mode.||
-||--nbrplayers=,-n (1 - 4])|Number of players (1 - 4).||
-||--theme,   -t (theme)||Starts using said theme. Needs to be in " " marks. (IE- -t "Guitar Hero III"||
+||--nbrplayers=,-n (1 - 4)||Number of players (1 - 4).||
+||--theme,   -t (theme)||Starts using this theme. Needs to be in " " marks. (IE- -t "Guitar Hero III"||
