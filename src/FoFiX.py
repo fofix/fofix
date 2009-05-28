@@ -59,7 +59,8 @@ Options:
   --part=,   -p [part number]         Use this part
   --mode=,   -m [game mode]           1P: 0-Quickplay, 1-Practice,     2-Career
                                       2P: 0-Face-off,  1-Pro Face-off, 2-Party mode
-  --nbrplayers=,-n [1 - 4]            Number of players (1 - 4)     
+  --nbrplayers=,-n [1 - 4]            Number of players (1 - 4)
+  --theme,   -t (theme)               Starts using this theme. Needs to be in " " marks. (IE- -t "Guitar Hero III")     
 """ % {"prog": sys.argv[0] }
 
 debuglevel = 0    #MFH - experimental, leave at 0
