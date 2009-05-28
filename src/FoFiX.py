@@ -71,7 +71,7 @@ def main():
   """Main thread"""
 
   try:
-    opts, args = getopt.getopt(sys.argv[1:], "vdc:f:r:t:s:d:p:m:n:", ["verbose", "debug", "config=", "fullscreen=", "resolution=", "theme=", "song=", "diff=", "part=", "mode=", "nbrplayers="])
+    opts, args = getopt.getopt(sys.argv[1:], "vdc:f:r:t:s:l:p:m:n:", ["verbose", "debug", "config=", "fullscreen=", "resolution=", "theme=", "song=", "diff=", "part=", "mode=", "nbrplayers="])
   except getopt.GetoptError:
     print usage
     sys.exit(1)
