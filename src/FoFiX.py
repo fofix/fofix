@@ -52,7 +52,8 @@ Options:
   --verbose, -v                     Verbose messages
   --debug,   -d                     Write Debug file
   --config=, -c [configfile]        Use this instead of fofix.ini
-  --fullscreen=, -f [True/False]    Change fullscreen settings in fofix.ini
+  --fullscreen=, -F [True/False]    Change fullscreen settings in fofix.ini
+  --resolution=. -R [Resolution]    Change game resolution from commandline.
   --play=,   -p [SongDir]           Play a song from the commandline
   --diff=,   -D [difficulty number] Use this difficulty
   --part=,   -P [part number]       Use this part
@@ -69,7 +70,7 @@ def main():
   """Main thread"""
 
   try:
-    opts, args = getopt.getopt(sys.argv[1:], "vdc:f:p:D:P:m:N:", ["verbose", "debug", "config=", "fullscreen=", "play=", "diff=", "part=", "mode=", "nbrplayers="])
+    opts, args = getopt.getopt(sys.argv[1:], "vdc:F:R:t:p:D:P:m:N:", ["verbose", "debug", "config=", "fullscreen=", "resolution=", "theme=", "play=", "diff=", "part=", "mode=", "nbrplayers="])
   except getopt.GetoptError:
     print usage
     sys.exit(1)
@@ -77,6 +78,8 @@ def main():
   playing = None
   configFile = None
   fullscreen = None
+  resolution = None
+  theme = None
   debug = False
   difficulty = 0
   part = 0
@@ -89,8 +92,12 @@ def main():
       debug = True
     if opt in ["--config", "-c"]:
       configFile = arg
-    if opt in ["--fullscreen", "-f"]:
+    if opt in ["--fullscreen", "-F"]:
       fullscreen = arg
+    if opt in ["--resolution", "-R"]:
+      resolution = arg
+    if opt in ["--theme", "-t"]:
+      theme = arg
     if opt in ["--play", "-p"]:
       playing = arg
     if opt in ["--diff", "-D"]:
@@ -117,6 +124,14 @@ def main():
     #Lysdestic - Allow support for manipulating fullscreen via CLI
     if fullscreen != None:
       Config.set("video", "fullscreen", fullscreen)
+
+    #Lysdestic - Change resolution from CLI
+    if resolution != None:
+      Config.set("video", "resolution", resolution)
+
+    #Lysdestic - Alter theme from CLI
+    if theme != None:
+      Config.set("coffee", "themename", theme)
 
     engine = GameEngine(config)
     engine.cmdPlay = 0
