@@ -52,14 +52,14 @@ Options:
   --verbose, -v                     Verbose messages
   --debug,   -d                     Write Debug file
   --config=, -c [configfile]        Use this instead of fofix.ini
-  --fullscreen=, -F [True/False]    Change fullscreen settings in fofix.ini
-  --resolution=. -R [Resolution]    Change game resolution from commandline.
-  --play=,   -p [SongDir]           Play a song from the commandline
-  --diff=,   -D [difficulty number] Use this difficulty
-  --part=,   -P [part number]       Use this part
+  --fullscreen=, -f [true/false]    Change fullscreen settings in fofix.ini
+  --resolution=, -r [resolution]    Change game resolution from commandline.
+  --song=,   -s [songdir]           Play a song from the commandline
+  --diff=,   -d [difficulty number] Use this difficulty
+  --part=,   -p [part number]       Use this part
   --mode=,   -m [game mode]         1P: 0-Quickplay, 1-Practice,     2-Career
                                     2P: 0-Face-off,  1-Pro Face-off, 2-Party mode
-  --nbrplayers=,-N [1 or 2]         Number of players         
+  --nbrplayers=,-n [1 through 4]         Number of players         
 """ % {"prog": sys.argv[0] }
 
 debuglevel = 0    #MFH - experimental, leave at 0
@@ -70,7 +70,7 @@ def main():
   """Main thread"""
 
   try:
-    opts, args = getopt.getopt(sys.argv[1:], "vdc:F:R:t:p:D:P:m:N:", ["verbose", "debug", "config=", "fullscreen=", "resolution=", "theme=", "play=", "diff=", "part=", "mode=", "nbrplayers="])
+    opts, args = getopt.getopt(sys.argv[1:], "vdc:f:r:t:s:d:p:m:n:", ["verbose", "debug", "config=", "fullscreen=", "resolution=", "theme=", "song=", "diff=", "part=", "mode=", "nbrplayers="])
   except getopt.GetoptError:
     print usage
     sys.exit(1)
@@ -92,22 +92,22 @@ def main():
       debug = True
     if opt in ["--config", "-c"]:
       configFile = arg
-    if opt in ["--fullscreen", "-F"]:
+    if opt in ["--fullscreen", "-f"]:
       fullscreen = arg
-    if opt in ["--resolution", "-R"]:
+    if opt in ["--resolution", "-r"]:
       resolution = arg
     if opt in ["--theme", "-t"]:
       theme = arg
-    if opt in ["--play", "-p"]:
+    if opt in ["--song", "-s"]:
       playing = arg
-    if opt in ["--diff", "-D"]:
+    if opt in ["--diff", "-d"]:
       difficulty = arg      
-    if opt in ["--part", "-P"]:
+    if opt in ["--part", "-p"]:
       part = arg
     #evilynux - Multiplayer and mode selection support
     if opt in ["--mode", "-m"]:
       mode = int(arg)
-    if opt in ["--nbrplayers", "-N"]:
+    if opt in ["--nbrplayers", "-n"]:
       nbrplayers = int(arg)
       
   while True:
