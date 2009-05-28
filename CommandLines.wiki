@@ -6,13 +6,13 @@ Add the following to the end when running FoFiX.
 ||Command Line|| What it does/controls.||
 ||--verbose, -v||Verbose messages.||
 ||--debug,   -d||Write Debug file.||
-||--config=, -c (config file]||Use this instead of fofix.ini||
-||--fullscreen=, -f (true/false]||Change fullscreen settings in fofix.ini.||
-||--resolution=, -r (resolution]||Change game resolution at Runtime.||
-||--song=,   -s (song dir]||Play a song from the commandline.||
+||--config=, -c (config file)||Use this instead of fofix.ini||
+||--fullscreen=, -f (true/false)||Change fullscreen settings in fofix.ini.||
+||--resolution=, -r (resolution)||Change game resolution at Runtime.||
+||--song=,   -s (song dir)||Play a song from the commandline.||
 ||--diff=,   -l (level of difficulty)||Use this difficulty level.||
 ||--part=,   -p (part number)||Use this part.||
 ||--mode=,   -m (game mode)||1P: 0-Quickplay, 1-Practice,     2-Career||
 ||                         ||2P: 0-Face-off,  1-Pro Face-off, 2-Party mode.||
 ||--nbrplayers=,-n (1 - 4)||Number of players (1 - 4).||
-||--theme,   -t (theme)||Starts using this theme. Needs to be in " " marks. (IE- -t "Guitar Hero III"||
+||--theme,   -t (theme)||Starts using this theme. Needs to be in " " marks. (IE- -t "Guitar Hero III")||
