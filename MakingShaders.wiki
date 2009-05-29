@@ -175,6 +175,47 @@ shaders.setVar("vect1",(1.0,1.0,0.0,1.0),"myshader") #yellow
 
 ==Textures==
 
+===Theory===
+
+Any shader program gets textures from the list of active textures. That's why your video card should support ARB multitexturing to use more than one texture. You can assign texture to shader using 
+{{{
+glUniform1i(glGetUniformLocationARB("texture1",program),<ARB texture>)
+}}}
+<ARB texture> = 0 for glActive(GL_TEXTURE0_ARB)
+<ARB texture> = 1 for glActive(GL_TEXTURE1_ARB)
+and so on...
+You should reassign all textures each time shader is activated.
+
+Types of textures: sampler1D, sampler2D, sampler3D, samplerCubeMap.
+Example:
+{{{
+uniform sampler3D Noise3D;
+}}}
+
+===Shader module advantages===
+
+You can assign any texture only one time with that string
+{{{
+shaders.setTexture("texture_name", texture, "program_name")
+}}}
+And it will be assigned to a module each time you enable it.
+Parameters:
+  "texure_name" - name of your uniform;
+  texture - raw texture
+  "program_name" - name of program, that has that uniform. If this program is active, you may skip this param.
+
+Example:
+{{{
+shaders.setTexture("Noise3D", noise.texture, "stage")
+}}}
+
+You may change assigned texture any time you like, just use setTexture function again:
+
+{{{
+shaders.setTexture("Noise3D", outline.texture, "stage")
+}}}
+Don't forget to use shaders.update() if you cahnge textures in active program to use new texture immediately.
+
 == Shader Development Environment ==
 You can use a GLSL IDE to create your shader files and preview the effects.
 
