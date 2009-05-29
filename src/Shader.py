@@ -25,7 +25,7 @@ from OpenGL.GL import *
 import os
 import string
 from random import random
-from time import clock
+import time
 import Log
 import pygame.image
 import Config
@@ -33,16 +33,16 @@ import Version
 
 #OGL constants for compatibility with all PyOpenGL versions
 #now multitexturing should work even in PyOpenGL 2.x, if your card supports ARB ext
-#stump: there's *got* to be a cleaner way to do this!
-GL_TEXTURE_3D = 32879
-GL_TEXTURE_WRAP_R = 32882
-GL_TEXTURE0_ARB, GL_TEXTURE1_ARB, GL_TEXTURE2_ARB, GL_TEXTURE3_ARB = 33984, 33985, 33986, 33987
-GL_FRAGMENT_SHADER_ARB = 0x8B30
-GL_VERTEX_SHADER_ARB = 0x8B31
-GL_OBJECT_COMPILE_STATUS_ARB= 0x8B81
-GL_OBJECT_LINK_STATUS_ARB = 0x8B82
-GL_INFO_LOG_LENGTH_ARB = 0x8B84
-GL_CLAMP_TO_EDGE = 33071
+#stump: managed to eliminate the need for every one of these.  If I was wrong, please uncomment only the necessary line and notify me.
+#GL_TEXTURE_3D = 32879
+#GL_TEXTURE_WRAP_R = 32882
+#GL_TEXTURE0_ARB, GL_TEXTURE1_ARB, GL_TEXTURE2_ARB, GL_TEXTURE3_ARB = 33984, 33985, 33986, 33987
+#GL_FRAGMENT_SHADER_ARB = 0x8B30
+#GL_VERTEX_SHADER_ARB = 0x8B31
+#GL_OBJECT_COMPILE_STATUS_ARB= 0x8B81
+#GL_OBJECT_LINK_STATUS_ARB = 0x8B82
+#GL_INFO_LOG_LENGTH_ARB = 0x8B84
+#GL_CLAMP_TO_EDGE = 33071
 
 # stump: these don't throw the exception for being unsupported - that happens later.
 # There has to be an active OpenGL context already for the checking to occur.
@@ -52,13 +52,83 @@ try:
   from OpenGL.GL.ARB.shader_objects import *
   from OpenGL.GL.ARB.vertex_shader import *
   from OpenGL.GL.ARB.fragment_shader import *
+  from OpenGL.GL.ARB.multitexture import *
+  from OpenGL.GL.EXT.texture3D import *
 except:
   Log.warn("Importing OpenGL ARB fails therefore shaders are disabled."\
              " It is most likely that your version of PyOpenGL is too old.")
   glInitShaderObjectsARB = lambda: False
 
+
 class ShaderCompilationError(Exception):
   pass
+
+
+#stump: apply some fixups for pyOpenGL 2.x if necessary.
+def checkFunctionsForPyOpenGL2x():
+  global glShaderSourceARB
+  global glGetObjectParameterivARB
+
+  # Check the version of pyOpenGL.
+  import OpenGL
+  if OpenGL.__version__ < '3':
+    #stump: the binding of glShaderSourceARB() in pyOpenGL 2.x segfaults on use... ugh!
+    # (It and glGetObjectParameterivARB() also have incompatible declarations - let's fix that too.)
+
+    try:
+      from ctypes import c_int, c_char_p, POINTER, cdll, byref
+      if os.name == 'nt':
+        from ctypes import WINFUNCTYPE, windll
+      elif os.name == 'darwin':
+        from ctypes.util import find_library
+    except ImportError:
+      raise ShaderCompilationError, 'ctypes is required to use shaders with pyOpenGL 2.x.'
+    else:
+
+      if os.name == 'nt':  # Windows - look for the functions using wglGetProcAddress()
+
+        # Grab the function pointers the standard Windows way.
+        # (opengl32.dll doesn't directly export extension entry points like other platforms' OpenGL libraries do.)
+        ptr_glShaderSourceARB = windll.opengl32.wglGetProcAddress('glShaderSourceARB')
+        ptr_glGetObjectParameterivARB = windll.opengl32.wglGetProcAddress('glGetObjectParameterivARB')
+
+        # If we got good function pointers, make them callable using ctypes.
+        if ptr_glShaderSourceARB:
+          func_glShaderSourceARB = WINFUNCTYPE(None, c_int, c_int, POINTER(c_char_p), POINTER(c_int))(ptr_glShaderSourceARB)
+        else:
+          raise ShaderCompilationError, 'wglGetProcAddress("glShaderSourceARB") returned NULL - are shaders supported?'
+
+        if ptr_glGetObjectParameterivARB:
+          func_glGetObjectParameterivARB = WINFUNCTYPE(None, c_int, c_int, POINTER(c_int))(ptr_glGetObjectParameterivARB)
+        else:
+          raise ShaderCompilationError, 'wglGetProcAddress("glGetObjectParameterivARB") returned NULL - are shaders supported?'
+
+      else:  # something else - assume that the OpenGL library exports the extension entry point
+
+        # Figure out where the OpenGL library is.
+        if os.name == 'darwin':  # Mac OS X
+          glLibrary = cdll.LoadLibrary(find_library('OpenGL'))
+        else: # something else; most likely GNU/Linux
+          glLibrary = cdll.LoadLibrary('libGL.so')
+
+        try:
+          func_glShaderSourceARB = glLibrary.glShaderSourceARB
+          func_glGetObjectParameterivARB = glLibrary.glGetObjectParameterivARB
+        except:
+          raise ShaderCompilationError, 'Cannot find glShaderSourceARB() and/or glGetObjectParameterivARB() in the OpenGL library - are shaders supported?'
+
+      # Wrap supporting glShaderSource(shader object, iterable object) returning None, as used below.
+      def glShaderSourceARB(shader, source):
+        srcList = list(source)
+        srcListType = c_char_p * len(srcList)
+        func_glShaderSourceARB(shader, len(srcList), srcListType(*srcList), None)
+
+      # Wrap supporting glGetObjectParameterivARB(shader object, parameter id) returning int, as used below.
+      def glGetObjectParameterivARB(shader, param):
+        retval = c_int(0)
+        func_glGetObjectParameterivARB(shader, param, byref(retval))
+        return retval.value
+
 
 # main class for shaders library
 class ShaderList:
@@ -72,67 +142,79 @@ class ShaderList:
     self.var = {}		# different variables
     self.assigned = {}		# list for shader replacement
     self.globals = {}		# list of global vars for every shader
-    clock()
-    
-  #shader program compilation  
+
+
   def make(self, fname, name = ""):
+    """Compile a shader.
+       fname = base filename for shader files
+       name  = name to use for this shader (defaults to fname)
+
+       Returns nothing, or raises an exception on error."""
+
     if name == "":
       name = fname
     fullname = os.path.join(self.workdir, fname)
     vertname, fragname = fullname+".vert", fullname+".frag"
     Log.debug('Compiling shader "%s" from %s and %s.' % (name, vertname, fragname))
-    try:
-      program = self.compile(open(vertname), open(fragname))
-    except:
-      program = None
-      return False
-    if program:
-      Log.debug('Shader is compiled.')
-      sArray = {"program": program, "name": name, "textures": []}
-      self.getVars(vertname, program, sArray)
-      self.getVars(fragname, program, sArray)
-      self.shaders[name] = sArray
-      Log.debug('Assign textures.')
-      if self.shaders[name].has_key("Noise3D"):
-        self.setTexture("Noise3D",self.noise3D,name)
-      return True
-    return False
+    program = self.compile(open(vertname), open(fragname))
+    sArray = {"program": program, "name": name, "textures": []}
+    self.getVars(vertname, program, sArray)
+    self.getVars(fragname, program, sArray)
+    self.shaders[name] = sArray
+    if self.shaders[name].has_key("Noise3D"):
+      self.setTexture("Noise3D",self.noise3D,name)
+
 
   def compileShader(self, source, shaderType):
-    """Compile shader source of given type"""
+    """Compile shader source of given type.
+       source     = file object open to shader source code
+                    (or something else returning lines of GLSL code when iterated over)
+       shaderType = GL_VERTEX_SHADER_ARB or GL_FRAGMENT_SHADER_ARB
+
+       Returns the shader object, or raises an exception on error."""
+
     shader = glCreateShaderObjectARB(shaderType)
     glShaderSourceARB( shader, source )
     glCompileShaderARB( shader )
     status = glGetObjectParameterivARB(shader, GL_OBJECT_COMPILE_STATUS_ARB)
-    if (not status):
-      Log.warn(self.log(shader))
-      return None
-    return shader
+    if not status:
+      raise ShaderCompilationError, self.log(shader)
+    else:
+      return shader
+
 
   def compile(self, vertexSource, fragmentSource):
+    """Create an OpenGL program object from file objects open to the source files.
+       vertexSource   = file object open to vertex shader source code
+       fragmentSource = file object open to fragment shader source code
+
+       Returns the program object, or raises an exception on error."""
+
     program = glCreateProgramObjectARB()
   
     vertexShader = self.compileShader(vertexSource, GL_VERTEX_SHADER_ARB)
     fragmentShader = self.compileShader(fragmentSource, GL_FRAGMENT_SHADER_ARB)
-    Log.debug('Shaders are precompiled.')
-    if vertexShader and fragmentShader:
-      glAttachObjectARB(program, vertexShader)  
-      glAttachObjectARB(program, fragmentShader)
-      glValidateProgramARB( program )
-      glLinkProgramARB(program)
-      glDeleteObjectARB(vertexShader)
-      glDeleteObjectARB(fragmentShader)
-      return program
-      
-    return None
-    
-  #get uniform variables from shader files
+
+    glAttachObjectARB(program, vertexShader)  
+    glAttachObjectARB(program, fragmentShader)
+    glValidateProgramARB( program )
+    glLinkProgramARB(program)
+    glDeleteObjectARB(vertexShader)
+    glDeleteObjectARB(fragmentShader)
+    return program
+
+
   def getVars(self, fname, program, sArray):
+    """Read the names of uniform variables from a shader file.
+       fname   = shader filename
+       program = OpenGL program object compiled from that shader file
+       sArray  = dictionary to add variable information to"""
+
     for line in open(fname):
       aline = line[:string.find(line,";")]
       aline = aline.split(' ')
       if '(' in aline[0]:
-        break;
+        break
       if aline[0] == "uniform":
         value = None
         try:    n = int(aline[1][-1])
@@ -148,12 +230,13 @@ class ShaderList:
           value, self.texcount = self.texcount, self.texcount + 1 
           if aline[1] == "sampler1D":   textype = GL_TEXTURE_1D
           elif aline[1] == "sampler2D": textype = GL_TEXTURE_2D
-          elif aline[1] == "sampler3D": textype = GL_TEXTURE_3D
+          elif aline[1] == "sampler3D": textype = GL_TEXTURE_3D_EXT
           sArray["textures"].append((aline[2],textype,0))
         aline[2] = aline[2].split(',')
         for var in aline[2]:
           sArray[var] = [glGetUniformLocationARB(program, var), value]
-          
+
+
   #simplified texture binding function
   def setTexture(self,name,texture,program = None):
     if self.assigned.has_key(program):
@@ -166,62 +249,71 @@ class ShaderList:
         program["textures"][i] = (program["textures"][i][0], program["textures"][i][1], texture)
         return True
     return False
-    
-  #return uniform variable value from the shader
+
+
   def getVar(self, var = "program", program = None):
+    """Get a uniform variable value from a shader.
+       var     = variable name
+       program = shader name, or None (default) for the currently active shader
+
+       Returns the value.  If the variable does not exist, KeyError is raised."""
+
     if self.assigned.has_key(program):
       program = self.assigned[program]
       
-    if program == None: program = self.active
-    else: program = self[program]
-    if program and program.has_key(var):
-      return program[var][1]
+    if program is None:
+      program = self.active
     else:
-      return None
-      
-  #assign uniform variable
+      program = self[program]
+
+    return program[var][1]
+
+
   def setVar(self, var, value, program = None):
+    """Set a uniform variable value for a shader.
+       var     = variable name
+       value   = new value
+       program = shader name, or None (default) for the currently active shader
+
+       Returns nothing.  If the variable does not exist, KeyError is raised."""
+
     if self.assigned.has_key(program):
       program = self.assigned[program]
-    if program == None:  program = self.active
-    else: program = self[program]    
-    
-    
+    if program is None:
+      program = self.active
+    else:
+      program = self[program]
+
     if type(value) == str:
       value = self.var[value]
-    
-    if program and program.has_key(var):
-      pos = program[var]
-      pos[1] = value
-      if program == self.active:
-        try:
-          if type(value) == list:
-            value = tuple(value)
-          if type(value) == bool:
-            if pos[1]: glUniform1i(pos[0],1)
-            else: glUniform1i(pos[0],0)
-          elif type(value) == float:
-            glUniform1f(pos[0],pos[1])
-          elif type(value) == int:
-            glUniform1i(pos[0],pos[1])
-          elif type(value) == tuple:
-            if type(value[0]) == float:
-              if   len(value) == 2: glUniform2f(pos[0],*pos[1])
-              elif len(value) == 3: glUniform3f(pos[0],*pos[1])
-              elif len(value) == 4: glUniform4f(pos[0],*pos[1])
-            elif type(value[0]) == int:
-              if   len(value) == 2: glUniform2i(pos[0],*pos[1])
-              elif len(value) == 3: glUniform3i(pos[0],*pos[1])
-              elif len(value) == 4: glUniform4i(pos[0],*pos[1])
-          elif type(value) == long:
-            glUniform1i(pos[0],pos[1])
-        except:
-          return False
-        else:
-          return True
-    return False
-   
-   
+
+    pos = program[var]
+    pos[1] = value
+    if program == self.active:
+      if type(value) == list:
+        value = tuple(value)
+      if type(value) == bool:
+        if pos[1]: glUniform1iARB(pos[0],1)
+        else: glUniform1iARB(pos[0],0)
+      elif type(value) == float:
+        glUniform1fARB(pos[0],pos[1])
+      elif type(value) == int:
+        glUniform1iARB(pos[0],pos[1])
+      elif type(value) == tuple:
+        if type(value[0]) == float:
+          if   len(value) == 2: glUniform2fARB(pos[0],*pos[1])
+          elif len(value) == 3: glUniform3fARB(pos[0],*pos[1])
+          elif len(value) == 4: glUniform4fARB(pos[0],*pos[1])
+        elif type(value[0]) == int:
+          if   len(value) == 2: glUniform2iARB(pos[0],*pos[1])
+          elif len(value) == 3: glUniform3iARB(pos[0],*pos[1])
+          elif len(value) == 4: glUniform4iARB(pos[0],*pos[1])
+      elif type(value) == long:
+        glUniform1iARB(pos[0],pos[1])
+      else:
+        raise TypeError, 'Unsupported value type (must be bool, float, int, long, or tuple or list of float or int).'
+
+
   # slightly changes uniform variable  
   def modVar(self, var, value, effect = 0.05, alphaAmp=1.0, program = None):  
     old = self.getVar(var,program)
@@ -238,62 +330,75 @@ class ShaderList:
    
   # enables shader program     
   def enable(self, shader):
-    if self.turnon:
-      if self.assigned.has_key(shader):
-        shader = self.assigned[shader]
-        
-      if self[shader]:
-        glUseProgramObjectARB(self[shader]["program"])
-        self.active = self.shaders[shader]
-        self.setTextures()
-        self.update()
-        self.globals["time"] = self.time()
-        if self.getVar("time"):
-          self.setVar("dt",self.globals["time"]-self.getVar("time"))
-        self.setGlobals()
-        return True
-    return False
+    if not self.turnon:
+      return False
+
+    if self.assigned.has_key(shader):
+      shader = self.assigned[shader]
+      
+    glUseProgramObjectARB(self[shader]["program"])
+    self.active = self.shaders[shader]
+    self.setTextures()
+    self.update()
+    self.globals["time"] = self.time()
+    self.setGlobals()
+    try:
+      if self.getVar("time"):
+        self.setVar("dt",self.globals["time"]-self.getVar("time"))
+    except KeyError:  #stump: the shader doesn't have a time or dt variable
+      pass
+    return True
      
   # transmit global vars to uniforms 
   def setGlobals(self):
     for i in self.globals.keys():
-      self.setVar(i,self.globals[i])
+      try:
+        self.setVar(i,self.globals[i])
+      except KeyError:  #stump: the shader doesn't have a variable by that name
+        pass
 
   # update all uniforms        
   def update(self):
     for i in self.active.keys():
       if i != "textures":
-        if type(self.active[i]) == type([]) and self.active[i][1] != None:
+        if type(self.active[i]) == list and self.active[i][1] is not None:
           self.setVar(i,self.active[i][1])
-   
+
   # set standart OpenGL program active 
   def disable(self):
-    if self.active !=0:
+    if self.active != 0:
       glUseProgramObjectARB(0)
       self.active = 0
-    
+
   # return active program control
   def activeProgram(self):
-    if self.active !=0:
+    if self.active != 0:
       return self.active["name"]
     else:
-      return 0  
-  
-  # print log  
+      return 0
+
+
   def log(self, shader):
+    """Get the error log for a shader.
+       shader = object to get log from
+
+       Returns a string containing the log or None if there is no log."""
+
     length = glGetObjectParameterivARB(shader, GL_INFO_LOG_LENGTH)
     if length > 0:
       log = glGetInfoLogARB(shader)
       return log
 
+
   # update and bind all textures
   def setTextures(self, program = None):
     if self.assigned.has_key(program):
       program = self.assigned[program]
-    if program == None: program = self.active
+    if program is None:
+      program = self.active
 
     for i in range(len(program["textures"])):
-      glActiveTexture (self.multiTex[i])
+      glActiveTextureARB(self.multiTex[i])
       glBindTexture(program["textures"][i][1], program["textures"][i][2]) 
       
 
@@ -317,13 +422,13 @@ class ShaderList:
           texels[i][j][k] = int(255 * texels[i][j][k])
 
     texture = 0
-    glBindTexture(GL_TEXTURE_3D, texture)
-    glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT)
-    glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT)
-    glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT)
-    glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-    glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-    glTexImage3D(GL_TEXTURE_3D, 0, c,size, size, size, 0, type, GL_UNSIGNED_BYTE, texels)
+    glBindTexture(GL_TEXTURE_3D_EXT, texture)
+    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_R_EXT, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_S, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_T, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+    glTexImage3DEXT(GL_TEXTURE_3D_EXT, 0, c,size, size, size, 0, type, GL_UNSIGNED_BYTE, texels)
     return texture
     
   def makeNoise2D(self,size=64, c = 1, type = GL_RED):
@@ -364,13 +469,13 @@ class ShaderList:
     
 
     texture = 0
-    glBindTexture(GL_TEXTURE_3D, texture)
-    glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT)
-    glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT)
-    glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT)
-    glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-    glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-    glTexImage3D(GL_TEXTURE_3D, 0, 1,size, size, size, 0, type, GL_UNSIGNED_BYTE, noise)
+    glBindTexture(GL_TEXTURE_3D_EXT, texture)
+    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_S, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_T, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_R_EXT, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+    glTexImage3DEXT(GL_TEXTURE_3D_EXT, 0, 1,size, size, size, 0, type, GL_UNSIGNED_BYTE, noise)
     return texture
 
   def loadTex2D(self, fname, type = GL_RGB):
@@ -414,8 +519,8 @@ class ShaderList:
       return None
       
   def time(self):
-    return clock()
-    
+    return time.clock()
+
   def reset(self):
     self.checkIfEnabled()
     if self.turnon:
@@ -491,13 +596,14 @@ class ShaderList:
           else:
             if len(self[name][key]) == 2:
               self[name][key][1] = value
-         
-  # compile shaders
-  #stump: also check here whether shaders are actually supported.
+
+
   def set(self, dir):
-    # maybe this will help
-    if not bool(glCreateProgramObjectARB):
-      return
+    """Do all shader setup.
+       dir = directory to load shaders from
+    """
+
+    #stump: check whether all needed extensions are actually supported
     if not glInitShaderObjectsARB():
       Log.warn('OpenGL extension ARB_shader_objects not supported - shaders disabled')
       return
@@ -507,20 +613,41 @@ class ShaderList:
     if not glInitFragmentShaderARB():
       Log.warn('OpenGL extension ARB_fragment_shader not supported - shaders disabled')
       return
-      
-    self.workdir = dir  
+    if not glInitMultitextureARB():
+      Log.warn('OpenGL extension ARB_multitexture not supported - shaders disabled')
+      return
+    if not glInitTexture3DEXT():
+      Log.warn('OpenGL extension EXT_texture3D supported - shaders disabled')
+      return
+
+    #stump: pyOpenGL 2.x compatibility
+    try:
+      checkFunctionsForPyOpenGL2x()
+    except:
+      Log.error('Shaders disabled due to pyOpenGL 2.x compatibility issue: ')
+      return
+
+    self.workdir = dir
+
+    # Load textures needed by the shaders.
     try:
       self.noise3D = self.loadTex3D("noise3d.dds")
       self.outline = self.loadTex2D("outline.tga")
     except:
       Log.error('Could not load shader textures - shaders disabled: ')
       return
+
     self.multiTex = (GL_TEXTURE0_ARB,GL_TEXTURE1_ARB,GL_TEXTURE2_ARB,GL_TEXTURE3_ARB)
     self.enabled = True
     self.turnon = True
-    
-    
-    if self.make("lightning","stage"):
+
+    # Compile the shader objects that we are going to use.
+    # Also set uniform shader variables to default values.
+    try:
+      self.make("lightning","stage")
+    except:
+      Log.error("Error compiling lightning shader: ")
+    else:
       self.enable("stage")
       self.setVar("ambientGlowHeightScale",6.0)
       self.setVar("color",(0.0,0.0,0.0,0.0))
@@ -535,10 +662,12 @@ class ShaderList:
       self.setVar("fixalpha",True)
       self.setVar("offset",(0.0,-2.5))
       self.disable()
+
+    try:
+      self.make("lightning","sololight")
+    except:
+      Log.error("Error compiling lightning shader: ")
     else:
-      Log.error("Shader has not been compiled: lightning")  
-      
-    if self.make("lightning","sololight"):
       self.enable("sololight")
       self.setVar("scalexy",(5.0,1.0))
       self.setVar("ambientGlow",0.5)
@@ -555,10 +684,12 @@ class ShaderList:
       self.setVar("fixalpha",True)
       self.setVar("glowStrength",100.0)  
       self.disable()
+
+    try:
+      self.make("lightning","tail")
+    except:
+      Log.error("Error compiling lightning shader: ")
     else:
-      Log.error("Shader has not been compiled: lightning")  
-      
-    if self.make("lightning","tail"):
       self.enable("tail")
       self.setVar("scalexy",(5.0,1.0))
       self.setVar("ambientGlow",0.1)
@@ -576,10 +707,12 @@ class ShaderList:
       self.setVar("fixalpha",True)
       self.setVar("offset",(0.0,0.0)) 
       self.disable()
+
+    try:
+      self.make("rockbandtail","tail2")
+    except:
+      Log.error("Error compiling rockbandtail shader: ")  
     else:
-      Log.error("Shader has not been compiled: lightning")  
-      
-    if self.make("rockbandtail","tail2"):
       self.enable("tail2")
       self.setVar("height",0.2)
       self.setVar("color",(0.0,0.6,1.0,1.0))
@@ -587,20 +720,24 @@ class ShaderList:
       self.setVar("offset",(0.0,0.0))
       self.setVar("scalexy",(5.0,1.0))
       self.disable()
-    else:
-      Log.error("Shader has not been compiled: rockbandtail")  
 
-    if self.make("metal","notes"):
+    try:
+      self.make("metal","notes")
+    except:
+      Log.error("Error compiling metal shader: ")
+    else:
       self.enable("notes")
       self.disable()
-    else:
-      Log.error("Shader has not been compiled: metal")  
-      
-    if not self.make("neck","neck"):
-      Log.error("Shader has not been compiled: neck") 
-    
-    if not self.make("cd","cd"):
-      Log.error("Shader has not been compiled: cd")  
+
+    try:
+      self.make("neck","neck")
+    except:
+      Log.error("Error compiling neck shader: ")
+
+    try:
+      self.make("cd","cd")
+    except:
+      Log.error("Error compiling cd shader: ")
 
     #self.defineConfig()
 
@@ -613,6 +750,6 @@ def mixColors(c1,c2,blend=0.5):
     alpha += c1[i]
   c1 = c1[:3] + [min(alpha / 3.0,1.0)]
   return tuple(c1)
-  
+
 shaders = ShaderList()
 del ShaderList
