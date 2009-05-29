@@ -727,7 +727,7 @@ class GameEngine(Engine):
     else:
       # evilynux - With self.audio.close(), calling self.quit() results in
       #            a crash. Calling the parent directly as a workaround.
-      Engine.quit()
+      Engine.quit(self)
     
   def resizeScreen(self, width, height):
     """
@@ -1005,7 +1005,8 @@ class GameEngine(Engine):
           self.frames = 0 
       return done
     except:
-      Log.error("Loading error:")
+      Log.error("Loading error: ")
+      raise
 
   def run(self):
     try:
@@ -1035,7 +1036,13 @@ class GameEngine(Engine):
 
       clearMatrixStack(GL_PROJECTION)
       clearMatrixStack(GL_MODELVIEW)
-      
-      Dialogs.showMessage(self, str(e.__class__.__name__) + ":" + unicode(e))
+
+      #stump: reset game state as much as possible
+      self.view.popAllLayers()
+      for session in self.sessions:
+        self.disconnect(session)
+      self.stopServer()
+
+      Dialogs.showMessage(self, str(e.__class__.__name__) + ": " + unicode(e))
       self.handlingException = False
       return True
