@@ -335,7 +335,10 @@ class ShaderList:
 
     if self.assigned.has_key(shader):
       shader = self.assigned[shader]
-      
+
+    if self[shader] is None:
+      return False
+
     glUseProgramObjectARB(self[shader]["program"])
     self.active = self.shaders[shader]
     self.setTextures()
