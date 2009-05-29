@@ -266,7 +266,10 @@ class ShaderList:
     else:
       program = self[program]
 
-    return program[var][1]
+    if program is None:
+      return None
+    else:
+      return program[var][1]
 
 
   def setVar(self, var, value, program = None):
@@ -286,6 +289,9 @@ class ShaderList:
 
     if type(value) == str:
       value = self.var[value]
+
+    if program is None:
+      return
 
     pos = program[var]
     pos[1] = value
@@ -317,7 +323,7 @@ class ShaderList:
   # slightly changes uniform variable  
   def modVar(self, var, value, effect = 0.05, alphaAmp=1.0, program = None):  
     old = self.getVar(var,program)
-    if old == None:
+    if old is None:
       return None
     if type(old) == tuple:
       new = ()
