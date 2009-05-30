@@ -23,6 +23,7 @@
 from OpenGL.GL import *
 
 import os
+import sys
 import string
 from random import random
 import time
@@ -79,7 +80,7 @@ def checkFunctionsForPyOpenGL2x():
       from ctypes import c_int, c_char_p, POINTER, cdll, byref
       if os.name == 'nt':
         from ctypes import WINFUNCTYPE, windll
-      elif os.name == 'darwin':
+      elif sys.platform == 'darwin':
         from ctypes.util import find_library
     except ImportError:
       raise ShaderCompilationError, 'ctypes is required to use shaders with pyOpenGL 2.x.'
@@ -106,7 +107,7 @@ def checkFunctionsForPyOpenGL2x():
       else:  # something else - assume that the OpenGL library exports the extension entry point
 
         # Figure out where the OpenGL library is.
-        if os.name == 'darwin':  # Mac OS X
+        if sys.platform == 'darwin':  # Mac OS X
           glLibrary = cdll.LoadLibrary(find_library('OpenGL'))
         else: # something else; most likely GNU/Linux
           glLibrary = cdll.LoadLibrary('libGL.so')
@@ -230,7 +231,11 @@ class ShaderList:
           value, self.texcount = self.texcount, self.texcount + 1 
           if aline[1] == "sampler1D":   textype = GL_TEXTURE_1D
           elif aline[1] == "sampler2D": textype = GL_TEXTURE_2D
-          elif aline[1] == "sampler3D": textype = GL_TEXTURE_3D_EXT
+          elif aline[1] == "sampler3D":
+            if sys.platform == 'darwin':
+              textype = GL_TEXTURE_3D
+            else: 
+              textype = GL_TEXTURE_3D_EXT
           sArray["textures"].append((aline[2],textype,0))
         aline[2] = aline[2].split(',')
         for var in aline[2]:
@@ -431,14 +436,24 @@ class ShaderList:
           texels[i][j][k] = int(255 * texels[i][j][k])
 
     texture = 0
-    glBindTexture(GL_TEXTURE_3D_EXT, texture)
-    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_R_EXT, GL_REPEAT)
-    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_S, GL_REPEAT)
-    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_T, GL_REPEAT)
-    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-    glTexImage3DEXT(GL_TEXTURE_3D_EXT, 0, c,size, size, size, 0, type, GL_UNSIGNED_BYTE, texels)
-    return texture
+    if sys.platform == 'darwin':
+      glBindTexture(GL_TEXTURE_3D, texture)
+      glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT)
+      glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+      glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+      glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+      glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+      glTexImage3D(GL_TEXTURE_3D, 0, c,size, size, size, 0, type, GL_UNSIGNED_BYTE, texels)
+      return texture
+    else:
+      glBindTexture(GL_TEXTURE_3D_EXT, texture)
+      glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_R_EXT, GL_REPEAT)
+      glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_S, GL_REPEAT)
+      glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_T, GL_REPEAT)
+      glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+      glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+      glTexImage3DEXT(GL_TEXTURE_3D_EXT, 0, c,size, size, size, 0, type, GL_UNSIGNED_BYTE, texels)
+      return texture
     
   def makeNoise2D(self,size=64, c = 1, type = GL_RED):
     texels=[]
@@ -478,14 +493,24 @@ class ShaderList:
     
 
     texture = 0
-    glBindTexture(GL_TEXTURE_3D_EXT, texture)
-    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_S, GL_REPEAT)
-    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_T, GL_REPEAT)
-    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_R_EXT, GL_REPEAT)
-    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-    glTexImage3DEXT(GL_TEXTURE_3D_EXT, 0, 1,size, size, size, 0, type, GL_UNSIGNED_BYTE, noise)
-    return texture
+    if sys.platform == 'darwin':
+      glBindTexture(GL_TEXTURE_3D, texture)
+      glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+      glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+      glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT)
+      glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+      glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+      glTexImage3D(GL_TEXTURE_3D, 0, 1,size, size, size, 0, type, GL_UNSIGNED_BYTE, noise)
+      return texture
+    else:
+      glBindTexture(GL_TEXTURE_3D_EXT, texture)
+      glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_S, GL_REPEAT)
+      glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_T, GL_REPEAT)
+      glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_R_EXT, GL_REPEAT)
+      glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+      glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+      glTexImage3DEXT(GL_TEXTURE_3D_EXT, 0, 1,size, size, size, 0, type, GL_UNSIGNED_BYTE, noise)
+      return texture
 
   def loadTex2D(self, fname, type = GL_RGB):
     file = os.path.join(self.workdir,fname)
@@ -626,8 +651,9 @@ class ShaderList:
       Log.warn('OpenGL extension ARB_multitexture not supported - shaders disabled')
       return
     if not glInitTexture3DEXT():
-      Log.warn('OpenGL extension EXT_texture3D supported - shaders disabled')
-      return
+      if sys.platform != 'darwin':
+        Log.warn('OpenGL extension EXT_texture3D not supported - shaders disabled')
+        return
 
     #stump: pyOpenGL 2.x compatibility
     try:
