@@ -182,7 +182,7 @@ class CacheManager(object):
     try:
       if cachePath != 'data\\tutorials':
         os.chdir(cachePath)  #stump: work around bug in SQLite unicode path name handling
-      conn = sqlite3.Connection('.fofix-cache')
+      conn = sqlite3.Connection('.fofix-cache', timeout = 20.0)
     finally:
       os.chdir(oldcwd)
     # Check that the cache is completely initialized.

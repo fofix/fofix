@@ -219,6 +219,7 @@ playerstat = []
 class PlayerCacheManager(object): #akedrou - basically stump's cache for the players. Todo? Group the caching. Data?
   def __init__(self):
     self.caches = {}
+    conn = sqlite3.Connection('FoFiX-players.cache', timeout = 20.0)
   def getCache(self):
     '''Returns the Player Information Cache'''
     cachePath = playerpath
@@ -231,7 +232,7 @@ class PlayerCacheManager(object): #akedrou - basically stump's cache for the pla
     oldcwd = os.getcwd()
     try:
       os.chdir(cachePath)  #stump: work around bug in SQLite unicode path name handling
-      conn = sqlite3.Connection('FoFiX-players.cache')
+      conn = sqlite3.Connection('FoFiX-players.cache', timeout = 20.0)
     finally:
       os.chdir(oldcwd)
     # Check that the cache is completely initialized.
