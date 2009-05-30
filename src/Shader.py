@@ -60,7 +60,6 @@ except:
              " It is most likely that your version of PyOpenGL is too old.")
   glInitShaderObjectsARB = lambda: False
 
-
 class ShaderCompilationError(Exception):
   pass
 
@@ -82,7 +81,6 @@ def checkFunctionsForPyOpenGL2x():
         from ctypes import WINFUNCTYPE, windll
       elif sys.platform == 'darwin':
         from ctypes.util import find_library
-        GL_TEXTURE_3D_EXT = GL_TEXTURE_3D
         
     except ImportError:
       raise ShaderCompilationError, 'ctypes is required to use shaders with pyOpenGL 2.x.'
@@ -131,6 +129,11 @@ def checkFunctionsForPyOpenGL2x():
         retval = c_int(0)
         func_glGetObjectParameterivARB(shader, param, byref(retval))
         return retval.value
+   
+  #should be placed somewhere else  
+  if sys.platform == 'darwin':
+    GL_TEXTURE_3D_EXT = GL_TEXTURE_3D
+    glTexImage3DEXT = glTexImage3D
 
 
 # main class for shaders library
