@@ -82,6 +82,8 @@ def checkFunctionsForPyOpenGL2x():
         from ctypes import WINFUNCTYPE, windll
       elif sys.platform == 'darwin':
         from ctypes.util import find_library
+        GL_TEXTURE_3D_EXT = GL_TEXTURE_3D
+        
     except ImportError:
       raise ShaderCompilationError, 'ctypes is required to use shaders with pyOpenGL 2.x.'
     else:
@@ -231,11 +233,7 @@ class ShaderList:
           value, self.texcount = self.texcount, self.texcount + 1 
           if aline[1] == "sampler1D":   textype = GL_TEXTURE_1D
           elif aline[1] == "sampler2D": textype = GL_TEXTURE_2D
-          elif aline[1] == "sampler3D":
-            if sys.platform == 'darwin':
-              textype = GL_TEXTURE_3D
-            else: 
-              textype = GL_TEXTURE_3D_EXT
+          elif aline[1] == "sampler3D": textype = GL_TEXTURE_3D_EXT
           sArray["textures"].append((aline[2],textype,0))
         aline[2] = aline[2].split(',')
         for var in aline[2]:
@@ -271,10 +269,11 @@ class ShaderList:
     else:
       program = self[program]
 
-    if program is None:
-      return None
+    if program is None or not program.has_key(var):
+      return False
     else:
       return program[var][1]
+      return True
 
 
   def setVar(self, var, value, program = None):
@@ -292,11 +291,16 @@ class ShaderList:
     else:
       program = self[program]
 
-    if type(value) == str:
-      value = self.var[value]
 
-    if program is None:
+
+    if program is None or not program.has_key(var):
       return
+      
+    if type(value) == str:
+      if self.var.has_key(value):
+        value = self.var[value]
+      else:
+        return
 
     pos = program[var]
     pos[1] = value
@@ -329,7 +333,7 @@ class ShaderList:
   def modVar(self, var, value, effect = 0.05, alphaAmp=1.0, program = None):  
     old = self.getVar(var,program)
     if old is None:
-      return None
+      return False
     if type(old) == tuple:
       new = ()
       for i in range(len(old)):
@@ -338,6 +342,7 @@ class ShaderList:
     else:
       new = old * (1-effect) + value * effect
     self.setVar(var,new,program)
+    return True
    
   # enables shader program     
   def enable(self, shader):
@@ -356,20 +361,15 @@ class ShaderList:
     self.update()
     self.globals["time"] = self.time()
     self.setGlobals()
-    try:
-      if self.getVar("time"):
-        self.setVar("dt",self.globals["time"]-self.getVar("time"))
-    except KeyError:  #stump: the shader doesn't have a time or dt variable
-      pass
+    if self.getVar("time"):
+      self.setVar("dt",self.globals["time"]-self.getVar("time"))
+      
     return True
      
   # transmit global vars to uniforms 
   def setGlobals(self):
     for i in self.globals.keys():
-      try:
-        self.setVar(i,self.globals[i])
-      except KeyError:  #stump: the shader doesn't have a variable by that name
-        pass
+      self.setVar(i,self.globals[i])
 
   # update all uniforms        
   def update(self):
@@ -436,24 +436,15 @@ class ShaderList:
           texels[i][j][k] = int(255 * texels[i][j][k])
 
     texture = 0
-    if sys.platform == 'darwin':
-      glBindTexture(GL_TEXTURE_3D, texture)
-      glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT)
-      glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT)
-      glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT)
-      glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-      glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-      glTexImage3D(GL_TEXTURE_3D, 0, c,size, size, size, 0, type, GL_UNSIGNED_BYTE, texels)
-      return texture
-    else:
-      glBindTexture(GL_TEXTURE_3D_EXT, texture)
-      glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_R_EXT, GL_REPEAT)
-      glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_S, GL_REPEAT)
-      glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_T, GL_REPEAT)
-      glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-      glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-      glTexImage3DEXT(GL_TEXTURE_3D_EXT, 0, c,size, size, size, 0, type, GL_UNSIGNED_BYTE, texels)
-      return texture
+
+    glBindTexture(GL_TEXTURE_3D_EXT, texture)
+    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_R_EXT, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_S, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_T, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+    glTexImage3DEXT(GL_TEXTURE_3D_EXT, 0, c,size, size, size, 0, type, GL_UNSIGNED_BYTE, texels)
+    return texture
     
   def makeNoise2D(self,size=64, c = 1, type = GL_RED):
     texels=[]
@@ -493,24 +484,15 @@ class ShaderList:
     
 
     texture = 0
-    if sys.platform == 'darwin':
-      glBindTexture(GL_TEXTURE_3D, texture)
-      glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT)
-      glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT)
-      glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT)
-      glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-      glTexParameterf(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-      glTexImage3D(GL_TEXTURE_3D, 0, 1,size, size, size, 0, type, GL_UNSIGNED_BYTE, noise)
-      return texture
-    else:
-      glBindTexture(GL_TEXTURE_3D_EXT, texture)
-      glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_S, GL_REPEAT)
-      glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_T, GL_REPEAT)
-      glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_R_EXT, GL_REPEAT)
-      glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-      glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-      glTexImage3DEXT(GL_TEXTURE_3D_EXT, 0, 1,size, size, size, 0, type, GL_UNSIGNED_BYTE, noise)
-      return texture
+
+    glBindTexture(GL_TEXTURE_3D_EXT, texture)
+    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_S, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_T, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_WRAP_R_EXT, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+    glTexParameterf(GL_TEXTURE_3D_EXT, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+    glTexImage3DEXT(GL_TEXTURE_3D_EXT, 0, 1,size, size, size, 0, type, GL_UNSIGNED_BYTE, noise)
+    return texture
 
   def loadTex2D(self, fname, type = GL_RGB):
     file = os.path.join(self.workdir,fname)
