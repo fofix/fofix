@@ -171,7 +171,9 @@ class CacheManager(object):
   SCHEMA_VERSION = 2  #stump: current cache format version number
   def __init__(self):
     self.caches = {}
+    self.timeout = 50
   def getCache(self, infoFileName):
+    self.timeout = Config.get("debug","sqlite_timeout")
     '''Given the path of a song.ini, return a SQLite connection to the
     associated cache.'''
     cachePath = os.path.dirname(os.path.dirname(infoFileName))
@@ -182,7 +184,8 @@ class CacheManager(object):
     try:
       if cachePath != 'data\\tutorials':
         os.chdir(cachePath)  #stump: work around bug in SQLite unicode path name handling
-      conn = sqlite3.Connection('.fofix-cache', timeout = 100.0)
+      conn = sqlite3.Connection('.fofix-cache', timeout = self.timeout)
+      print self.timeout
     finally:
       os.chdir(oldcwd)
     # Check that the cache is completely initialized.
