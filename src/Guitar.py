@@ -1191,7 +1191,7 @@ class Guitar:
               if self.battleSuddenDeath:
                 self.battleObjects = [1] + self.battleObjects[:2]
               else:
-                self.battleObjects = self.battleObjectsEnabled[random.randint(0,len(self.battleObjectsEnabled)-1)] + self.battleObjects[:2]
+                self.battleObjects = [self.battleObjectsEnabled[random.randint(0,len(self.battleObjectsEnabled)-1)]] + self.battleObjects[:2]
               self.battleGetTime = pos
               self.battleObjectGained = True
               Log.debug("Battle Object Gained, Objects %s" % str(self.battleObjects))
@@ -1358,7 +1358,7 @@ class Guitar:
               if self.battleSuddenDeath:
                 self.battleObjects = [1] + self.battleObjects[:2]
               else:
-                self.battleObjects = self.battleObjectsEnabled[random.randint(0,len(self.battleObjectsEnabled)-1)] + self.battleObjects[:2]
+                self.battleObjects = [self.battleObjectsEnabled[random.randint(0,len(self.battleObjectsEnabled)-1)]] + self.battleObjects[:2]
               self.battleGetTime = pos
               self.battleObjectGained = True
               Log.debug("Battle Object Gained, Objects %s" % str(self.battleObjects))
