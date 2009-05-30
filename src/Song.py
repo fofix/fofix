@@ -171,8 +171,7 @@ class CacheManager(object):
   SCHEMA_VERSION = 2  #stump: current cache format version number
   def __init__(self):
     self.caches = {}
-    self.timeout = 50
-  def getCache(self, infoFileName):
+  def getCache(self, infoFileName, timeout = 20):
     self.timeout = Config.get("debug","sqlite_timeout")
     '''Given the path of a song.ini, return a SQLite connection to the
     associated cache.'''
@@ -184,7 +183,7 @@ class CacheManager(object):
     try:
       if cachePath != 'data\\tutorials':
         os.chdir(cachePath)  #stump: work around bug in SQLite unicode path name handling
-      conn = sqlite3.Connection('.fofix-cache', timeout = self.timeout)
+      conn = sqlite3.Connection('.fofix-cache', timeout = self.timeout*timeout)
     finally:
       os.chdir(oldcwd)
     # Check that the cache is completely initialized.
@@ -4174,7 +4173,8 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
     progressCallback(len(songs)/float(len(names)))
     songs.append(SongInfo(engine.resource.fileName(library, name, "song.ini", writable = True), library, allowCacheUsage=True))
   if len(songs) and canCache and Config.get("performance", "cache_song_metadata"):
-    cache = cacheManager.getCache(songs[0].fileName)
+    timeout = max(100,len(names)*30)
+    cache = cacheManager.getCache(songs[0].fileName, timeout)
     #stump: clean up the cache
     if cache.execute('DELETE FROM `songinfo` WHERE `hash` NOT IN (' + ','.join("'%s'" % s.stateHash for s in songs) + ')').rowcount > 0:
       cache.execute('VACUUM')  # compact the database if anything was deleted on the previous line

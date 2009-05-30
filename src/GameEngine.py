@@ -81,7 +81,7 @@ Config.define("video",  "shader_sololight",     str,   "sololight",  text = _("S
 Config.define("video",  "shader_tail",     str,   "tail2",  text = _("Tails"), options = {"Disabled":_("Disabled"), "tail1": _("Lightnings"), "tail2": _("RB2"), "theme": _("By Theme")})
 Config.define("video",  "shader_notes",     str,   "notes",  text = _("Notes"), options = {"Disabled":_("Disabled"), "notes": _("Metal"), "theme": _("By Theme")})
 Config.define("video",  "shader_cd",     str,   "cd",  text = _("CDs"), options = {"None":_("Disabled"), "cd": _("White"), "theme": _("By Theme")})
-Config.define("debug",  "sqlite_timeout",        int,   100,   text = _("Cache TimeOut"), options = dict([(50*2**n, "%4d%s" % (50*2**n," ms")) for n in range(0, 7)]))
+Config.define("debug",  "sqlite_timeout",        int,   1,   text = _("Cache TimeOut"), options = dict([(n, "%d%s" % (n,"x")) for n in range(1, 5)]))
 
 
 Config.define("performance",  "starspin", bool,     True,  text = _("Animated Star Notes"), options = {True: _("Yes"), False: _("No")})
