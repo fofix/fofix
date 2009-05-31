@@ -132,7 +132,11 @@ def checkFunctionsForPyOpenGL2x():
    
   #should be placed somewhere else  
   if sys.platform == 'darwin':
+    global GL_TEXTURE_3D_EXT
+    global GL_TEXTURE_WRAP_R_EXT
+    global glTexImage3DEXT
     GL_TEXTURE_3D_EXT = GL_TEXTURE_3D
+    GL_TEXTURE_WRAP_R_EXT = GL_TEXTURE_WRAP_R
     glTexImage3DEXT = glTexImage3D
 
 
