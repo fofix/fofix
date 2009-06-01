@@ -798,8 +798,8 @@ class Controls:
 def isKeyMappingOK(config, start):
   def keycode(name, config):
     k = config.get("controller", name)
-	if k is None or k == "None":
-	  return None
+    if k is None or k == "None":
+      return None
     try:
       return int(k)
     except:
