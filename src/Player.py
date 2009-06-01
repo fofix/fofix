@@ -798,6 +798,8 @@ class Controls:
 def isKeyMappingOK(config, start):
   def keycode(name, config):
     k = config.get("controller", name)
+	if k is None or k == "None":
+	  return None
     try:
       return int(k)
     except:
@@ -827,7 +829,7 @@ def setNewKeyMapping(engine, config, section, option, key):
   oldKey = config.get(section, option)
   config.set(section, option, key)
   keyCheckerMode = Config.get("game", "key_checker_mode")
-  if key == "None":
+  if key == "None" or key is None:
     return True
   b = isKeyMappingOK(config, option)
   if b != 0:
