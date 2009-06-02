@@ -559,14 +559,11 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
   def runScores(self):
     self.haveRunScores = True
     for i, scoreCard in enumerate(self.scoring):
-      whatever = self.playerList[i].upname # evilynux Make it appear in Debugger...
-      print "upname: %s" % whatever
       if self.noScore[i]:
         continue
       scores = self.song.info.getHighscores(self.playerList[i].difficulty, part = self.playerList[i].part)
       if not scores or self.finalScore[i] > scores[-1][0] or len(scores) < 5:
         name = Dialogs.getText(self.engine, _("%d points is a new high score! Enter your name:") % self.finalScore[i], self.playerList[i].upname)
-        print "name: %s" % name
         if name:
           self.playerList[i].upname = name
         scoreExt = (scoreCard.notesHit, scoreCard.totalStreakNotes, scoreCard.hiStreak, self.engine.uploadVersion, scoreCard.handicap, scoreCard.longHandicap, self.originalScore[i])
