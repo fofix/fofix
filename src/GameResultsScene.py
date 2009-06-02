@@ -541,6 +541,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       }
       scores     = {}
       scores_ext = {}
+      upname = self.playerList[i].name
       scoreHash = hashlib.sha1("%d%d%d%s" % (player.getDifficultyInt(), self.finalScore[i], self.scoring[i].stars, self.playerList[i].name)).hexdigest()
       scores[player.getDifficultyInt()]     = [(self.finalScore[i], self.scoring[i].stars, self.playerList[i].name, scoreHash)]
       scores_ext[player.getDifficultyInt()] = [(scoreHash, self.scoring[i].stars) + scoreExt]
@@ -558,11 +559,14 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
   def runScores(self):
     self.haveRunScores = True
     for i, scoreCard in enumerate(self.scoring):
+      whatever = self.playerList[i].upname # evilynux Make it appear in Debugger...
+      print "upname: %s" % whatever
       if self.noScore[i]:
         continue
       scores = self.song.info.getHighscores(self.playerList[i].difficulty, part = self.playerList[i].part)
       if not scores or self.finalScore[i] > scores[-1][0] or len(scores) < 5:
         name = Dialogs.getText(self.engine, _("%d points is a new high score! Enter your name:") % self.finalScore[i], self.playerList[i].upname)
+        print "name: %s" % name
         if name:
           self.playerList[i].upname = name
         scoreExt = (scoreCard.notesHit, scoreCard.totalStreakNotes, scoreCard.hiStreak, self.engine.uploadVersion, scoreCard.handicap, scoreCard.longHandicap, self.originalScore[i])
@@ -1363,16 +1367,16 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
               if len(result) > 1:
                 upScoreText2 = _("Your highscore ranks")
                 upScoreText3 = _("on the world starpower chart!")
-                font.render("P%d (%s) %s %s  ... %s #%d %s" % (j+1, player.name, player.part.text, upScoreText1, upScoreText2, int(result[1]), upScoreText3), (.05, sYPos + v), scale = sScale)
+                font.render("P%d (%s) %s %s  ... %s #%d %s" % (j+1, player.upname, player.part.text, upScoreText1, upScoreText2, int(result[1]), upScoreText3), (.05, sYPos + v), scale = sScale)
               else:
                 upScoreText2 = _("but your rank is unknown.")
-                font.render("P%d (%s) %s %s  ... %s" % (j+1, player.name, player.part.text, upScoreText1, upScoreText2), (.05, sYPos + v), scale = sScale)
+                font.render("P%d (%s) %s %s  ... %s" % (j+1, player.upname, player.part.text, upScoreText1, upScoreText2), (.05, sYPos + v), scale = sScale)
             else:
               upScoreText2 = _("but there was no new highscore.")
-              font.render("P%d (%s) %s %s  ... %s" % (j+1, player.name, player.part.text, upScoreText1, upScoreText2), (.05, sYPos + v), scale = sScale)
+              font.render("P%d (%s) %s %s  ... %s" % (j+1, player.upname, player.part.text, upScoreText1, upScoreText2), (.05, sYPos + v), scale = sScale)
           else:
             upScoreText1 = _("Score upload failed!  World charts may be down.")
-            font.render("P%d (%s) %s %s" % (j+1, player.name, player.part.text, upScoreText1), (.05, sYPos + v), scale = sScale)
+            font.render("P%d (%s) %s %s" % (j+1, player.upname, player.part.text, upScoreText1), (.05, sYPos + v), scale = sScale)
   
   def renderStats(self, visibility, topMost):
     pass #to be added.
