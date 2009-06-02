@@ -542,8 +542,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       scores     = {}
       scores_ext = {}
       upname = self.playerList[i].name
-      scoreHash = hashlib.sha1("%d%d%d%s" % (player.getDifficultyInt(), self.finalScore[i], self.scoring[i].stars, self.playerList[i].name)).hexdigest()
-      scores[player.getDifficultyInt()]     = [(self.finalScore[i], self.scoring[i].stars, self.playerList[i].name, scoreHash)]
+      scoreHash = hashlib.sha1("%d%d%d%s" % (player.getDifficultyInt(), self.finalScore[i], self.scoring[i].stars, self.playerList[i].upname)).hexdigest()
+      scores[player.getDifficultyInt()]     = [(self.finalScore[i], self.scoring[i].stars, self.playerList[i].upname, scoreHash)]
       scores_ext[player.getDifficultyInt()] = [(scoreHash, self.scoring[i].stars) + scoreExt]
       d["scores"] = binascii.hexlify(Cerealizer.dumps(scores))
       d["scores_ext"] = binascii.hexlify(Cerealizer.dumps(scores_ext))
@@ -1354,7 +1354,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         Theme.setBaseColor(1 - v)
         if self.uploadResponse[j] is None:
           upScoreText = _("Uploading Scores...")
-          font.render("P%d (%s) %s" % (j+1, player.name, upScoreText), (.05, sYPos + v), scale = sScale)
+          font.render("P%d (%s) %s" % (j+1, player.upname, upScoreText), (.05, sYPos + v), scale = sScale)
         else:
           result = str(self.uploadResponse[j]).split(";")
           if len(result) > 0:
