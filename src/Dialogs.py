@@ -1061,7 +1061,7 @@ class SongChooser(Layer, KeyListener):
           removingBlankSpaces = False   #finished adding blank spaces, exit while loop
           Log.debug("Dialogs.py: Finished filtering doubled blank spaces in self.songs.")
 
-    if self.listingMode == 0:
+    if self.listingMode == 0 or self.careerMode:
       self.items         = self.libraries + self.songs
     else:
       self.items         = self.songs
@@ -1267,7 +1267,7 @@ class SongChooser(Layer, KeyListener):
         elif isinstance(self.selectedItem, Song.SongInfo) and not self.selectedItem.getLocked():
         #else:
           
-          if self.listingMode == 1:
+          if self.listingMode == 1 and self.careerMode == False:
             self.library = self.selectedItem.libraryNam
           #blazingamer - stops preview from playing outside of songchooser
           self.hidden()
@@ -1280,7 +1280,7 @@ class SongChooser(Layer, KeyListener):
             if isinstance(self.selectedItem, Song.SongInfo) and not self.selectedItem.getLocked():
               break
           
-          if self.listingMode == 1:
+          if self.listingMode == 1 and self.careerMode == False:
             self.library = self.selectedItem.libraryNam
 
           #blazingamer - stops preview from playing outside of songchooser
@@ -1386,12 +1386,12 @@ class SongChooser(Layer, KeyListener):
 
     #racer: highscores change on fret hit
     elif c in Player.key4s:
-     self.highScoreChange = True
+      self.highScoreChange = True
 
     #MFH - instrument change on 5th fret
     #elif c in Player.KEY5S or (c in Player.DRUM3S and self.drumNav):
     elif c in Player.key5s:   #MFH can't use drum3, that's for down
-     self.instrumentChange = True
+      self.instrumentChange = True
 
 
     elif c in Player.menuUp or key == pygame.K_UP:
