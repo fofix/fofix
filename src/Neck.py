@@ -112,7 +112,7 @@ class Neck:
     self.spcount = 0
     self.spcount2 = 0
     self.bgcount = 0
-    self.ovroverlay = self.engine.config.get("fretboard", "ovroverlay")
+    self.ovrneckoverlay = self.engine.config.get("fretboard", "ovrneckoverlay")
     self.ocount = 0
 
     self.currentBpm     = 120.0
@@ -218,17 +218,19 @@ class Neck:
             engine.loadImgDrawing(self, "oCenterLines", os.path.join("themes",themename,"overdrive center_lines.png"),  textureSize = (256, 256))
           except IOError:
             self.oCenterLines = None
-          try:
-            engine.loadImgDrawing(self, "oNeckBass", os.path.join("themes",themename,"overdriveneck_bass.png"),  textureSize = (256, 256))
-          except IOError:
+          if self.isBassGuitar == True:
             try:
-              engine.loadImgDrawing(self, "oNeckBass", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
+              engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck_bass.png"),  textureSize = (256, 256))
             except IOError:
-              self.oNeckBass = None
-          try:
-            engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
-          except IOError:
-            self.oNeck = None
+              try:
+                engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
+              except IOError:
+                self.oNeckBass = None
+          else:
+            try:
+              engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
+            except IOError:
+              self.oNeck = None
           
         try:
           engine.loadImgDrawing(self, "oNeckovr", os.path.join("themes",themename,"overdriveneckovr.png"),  textureSize = (256, 256))
@@ -345,7 +347,7 @@ class Neck:
     self.overdriveFlashCount = self.part.overdriveFlashCounts
     self.paused = False
 
-  def updateGuitarSettings(self):
+  def updateBoardSettings(self):
     if self.paused != self.part.paused:
       self.paused = self.part.paused
     if self.canGuitarSolo != self.part.canGuitarSolo:
@@ -370,6 +372,41 @@ class Neck:
       self.currentPeriod = self.part.currentPeriod
     if self.lastBpmChange != self.part.lastBpmChange:
       self.lastBpmChange = self.part.lastBpmChange
+
+    if self.ocount <= 1:
+      self.ocount = self.ocount + .1
+    else:
+      self.ocount = 1
+
+    if self.isFailing == True:
+      if self.failcount <= 1 and self.failcount2 == False:
+        self.failcount += .05
+      elif self.failcount >= 1 and self.failcount2 == False:
+        self.failcount = 1
+        self.failcount2 = True
+        
+      if self.failcount >= 0 and self.failcount2 == True:
+        self.failcount -= .05
+      elif self.failcount <= 0 and self.failcount2 == True:
+        self.failcount = 0
+        self.failcount2 = False
+    if self.isFailing == False and self.failcount > 0:
+      self.failcount -= .05
+      self.failcount2 = False
+    if self.starPowerActive == True:
+      if self.spcount < 1.2:
+        self.spcount += .05
+        self.spcount2 = 1
+      elif self.spcount >=1.2:
+        self.spcount = 1.2
+        self.spcount2 = 0
+    else:
+      if self.spcount > 0:
+        self.spcount -= .05
+        self.spcount2 = 2
+      elif self.spcount <=0:
+        self.spcount = 0
+        self.spcount2 = 0
 
   def renderIncomingNeck(self, visibility, song, pos, time, neckTexture):   #MFH - attempt to "scroll" an incoming guitar solo neck towards the player
     if not song:
@@ -551,11 +588,8 @@ class Neck:
       neck = self.guitarSoloNeck
     elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
       neck = self.bassGrooveNeck
-    elif self.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and self.scoreMultiplier <= 4:
-      if self.isBassGuitar and self.oNeckBass:
-        neck = self.oNeckBass
-      else:
-        neck = self.oNeck
+    elif self.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and self.scoreMultiplier <= 4 and self.ovrneckoverlay == False:
+      neck = self.oNeck
     else:
       neck = self.neckDrawing
 
@@ -570,28 +604,23 @@ class Neck:
       self.renderNeckMethod(v*self.neckAlpha[2], 0, self.guitarSoloNeck)
       
     if self.spcount2 != 0 and self.spcount < 1.2 and self.oNeck:   #static overlay
-      if self.oNeckovr != None and (self.scoreMultiplier > 4 or self.guitarSolo):
+      if self.oNeckovr != None and (self.scoreMultiplier > 4 or self.guitarSolo or self.ovrneckoverlay == True):
         neck = self.oNeckovr
+        alpha = False
       else:
-        if self.isBassGuitar and self.oNeckBass:
-          neck = self.oNeckBass
-        else:
-          neck = self.oNeck
-          
-      self.renderNeckMethod(self.spcount*self.neckAlpha[4], offset, neck)
+        neck = self.oNeck
+        alpha = True          
+
+      self.renderNeckMethod(v*self.spcount*self.neckAlpha[4], offset, neck, alpha)
       
     
       
-    if self.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and (self.scoreMultiplier > 4 or self.guitarSolo):   #static overlay
-
+    if self.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and (self.scoreMultiplier > 4 or self.guitarSolo or self.ovrneckoverlay == True):   #static overlay
       if self.oNeckovr != None:
         neck = self.oNeckovr
         alpha = False
       else:
-        if self.isBassGuitar and self.oNeckBass:
-          neck = self.oNeckBass
-        else:
-          neck = self.oNeck
+        neck = self.oNeck
         alpha = True
 
       self.renderNeckMethod(v*self.neckAlpha[4], offset, neck, alpha)
@@ -639,7 +668,7 @@ class Neck:
       shaders.disable()
     else:
       if self.isFailing:
-        self.renderNeckMethod(self.failcount*self.neckAlpha[5], 0, self.failNeck)
+        self.renderNeckMethod(self.failcount, 0, self.failNeck)
         
     if (self.guitarSolo or self.starPowerActive) and self.theme == 1:
       shaders.var["solocolor"]=(0.3,0.7,0.9,0.6)
@@ -872,44 +901,7 @@ class Neck:
 
     if not (self.coOpFailed and not self.coOpRestart):
 
-      self.updateGuitarSettings()
-      if self.ocount <= 1:
-        self.ocount = self.ocount + .1
-      else:
-        self.ocount = 1
-
-      if self.isFailing == True:
-        if self.failcount <= 1 and self.failcount2 == False:
-          self.failcount += .05
-        elif self.failcount >= 1 and self.failcount2 == False:
-          self.failcount = 1
-          self.failcount2 = True
-        
-        if self.failcount >= 0 and self.failcount2 == True:
-          self.failcount -= .05
-        elif self.failcount <= 0 and self.failcount2 == True:
-          self.failcount = 0
-          self.failcount2 = False
-
-      if self.isFailing == False and self.failcount > 0:
-        self.failcount -= .05
-        self.failcount2 = False
-
-      if self.starPowerActive:
-
-        if self.spcount < 1.2:
-          self.spcount += .05
-          self.spcount2 = 1
-        elif self.spcount >=1.2:
-          self.spcount = 1.2
-          self.spcount2 = 0
-      else:
-        if self.spcount > 0:
-          self.spcount -= .05
-          self.spcount2 = 2
-        elif self.spcount <=0:
-          self.spcount = 0
-          self.spcount2 = 0
+      self.updateBoardSettings()
 
       self.vis = visibility
       self.renderNeck(visibility, song, pos)

@@ -815,7 +815,9 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(self.engine, self.engine.config, "game", "large_drum_neck", autoApply = True),      #myfingershurt
       ConfigChoice(self.engine, self.engine.config, "game", "bass_groove_neck", autoApply = True),      #myfingershurt
       ConfigChoice(self.engine, self.engine.config, "game", "guitar_solo_neck", autoApply = True),      #myfingershurt
-      ConfigChoice(self.engine, self.engine.config, "game", "incoming_neck_mode", autoApply = True, isQuickset = 1),      #myfingershurt 
+      ConfigChoice(self.engine, self.engine.config, "fretboard", "ovrneckoverlay", autoApply = True),
+      ConfigChoice(self.engine, self.engine.config, "game", "incoming_neck_mode", autoApply = True, isQuickset = 1),
+      #myfingershurt 
       (_("Change Neck Transparency"), self.neckTransparencyMenu), #volshebnyi
     ]
     self.fretSettingsMenu = Menu.Menu(self.engine, self.fretSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)

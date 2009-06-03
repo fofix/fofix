@@ -296,6 +296,7 @@ Config.define("game", "songlistrotation",     bool, True,     text = _("Rotating
 Config.define("game", "keep_play_count", int, 1, text = _("Remember Play Count"), options = {0: _("No"), 1: _("Yes")})
 Config.define("game", "tut",       bool, False,     text = _("tut"),             options = {True: _("Yes"), False: _("No")})
 Config.define("video", "counting",       bool, False,     text = _("Show at Song Start"),             options = {True: _("Part"), False: _("Countdown")})
+Config.define("fretboard", "ovrneckoverlay",       bool, False,     text = _("Overdrive Neck"),             options = {True: _("Overlay"), False: _("Replace")})
 
 
 Config.define("game",   "note_hit_window",          int, 0,    text = _("Note Hit-window"), options = {0: _("1. Standard"), 1: _("2. Tight"), 2: _("3. Tightest")})#racer blazingamer
