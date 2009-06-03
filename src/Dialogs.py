@@ -1329,7 +1329,7 @@ class SongChooser(Layer, KeyListener):
       #if not self.song:
       self.engine.data.cancelSound.setVolume(self.sfxVolume)  #MFH
       self.engine.data.cancelSound.play()
-      if self.library != Song.DEFAULT_LIBRARY and self.tut == False and self.listingMode == 0:
+      if self.library != Song.DEFAULT_LIBRARY and self.tut == False and (self.listingMode == 0 or self.careerMode):
         self.initialItem = self.library
         self.library     = os.path.dirname(self.library)
         if self.song:
