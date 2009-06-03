@@ -27,3 +27,4 @@
 "data\win32pdh.pyd"//new
 "data\win32pipe.pyd"//new
 //-------Additional images required over 3.000--------
+"data\themes\MegaLight\vocals\*.png" //new images
