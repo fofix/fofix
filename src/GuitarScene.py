@@ -5983,9 +5983,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       if self.boardY <= 1:
         self.boardY == 1
         self.setCamera()
+        readytoscale = True
       elif self.boardY > 1:
         self.boardY -= 0.01
         self.setCamera()
+        readytoscale = False
+        self.countdown = 5
       #self.setCamera()
   
       #Theme.setBaseColor()
@@ -7593,26 +7596,27 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 if not self.instruments[i].isVocal:
                   #volshebnyi - overdrive bar positioning - simplified
                   self.engine.view.setViewportHalf(self.numberOfGuitars,self.playerList[i].guitarNum)
-                  vCoord = 0
-                  if self.countdown>3.0:
-                    vCoord = - 75 * (self.countdown - 3.0)
-                    self.oBarScale = Theme.oBarHScale * self.instruments[i].boardWidth / math.sqrt(self.camera.origin[1]**2+(self.camera.origin[2]-0.5-vCoord/125)**2) * self.oBarScaleCoef
+                  if readytoscale == True:
+                    vCoord = 0
+                    if self.countdown>3.0:
+                      vCoord = - 75 * (self.countdown - 3.0)
+                      self.oBarScale = Theme.oBarHScale * self.instruments[i].boardWidth / math.sqrt(self.camera.origin[1]**2+(self.camera.origin[2]-0.5-vCoord/125)**2) * self.oBarScaleCoef
 
-                  self.engine.drawImage(self.oBottom, scale = (self.oBarScale,.5), coord = (w/2,h/12+ vCoord), stretched = 1)
+                    self.engine.drawImage(self.oBottom, scale = (self.oBarScale,.5), coord = (w/2,h/12+ vCoord), stretched = 1)
                 
-                  if self.oBarScale == 0.0:
-                    self.oBarScale = Theme.oBarHScale * self.instruments[i].boardWidth / math.sqrt(self.camera.origin[1]**2+(self.camera.origin[2]-0.5-vCoord/125)**2) * self.oBarScaleCoef
+                    if self.oBarScale == 0.0:
+                      self.oBarScale = Theme.oBarHScale * self.instruments[i].boardWidth / math.sqrt(self.camera.origin[1]**2+(self.camera.origin[2]-0.5-vCoord/125)**2) * self.oBarScaleCoef
                 
-                  if Theme.oBar3dFill:
-                    offset=(currentSP-0.5)*(1-currentSP) / self.camera.origin[1] * 0.8
-                    self.engine.drawImage(self.oFill, scale = (self.oBarScale*currentSP,.5), coord = (w/2*(1+self.oBarScale*(currentSP-1)),h/12+ vCoord), rect = (0,currentSP,0,1), stretched = 1, rOffset = offset)
-                  else:
-                    self.engine.drawImage(self.oFill, scale = (self.oBarScale*currentSP,.5), coord = (w/2*(1+self.oBarScale*(currentSP-1)),h/12+ vCoord), rect = (0,currentSP,0,1), stretched = 1)
+                    if Theme.oBar3dFill:
+                      offset=(currentSP-0.5)*(1-currentSP) / self.camera.origin[1] * 0.8
+                      self.engine.drawImage(self.oFill, scale = (self.oBarScale*currentSP,.5), coord = (w/2*(1+self.oBarScale*(currentSP-1)),h/12+ vCoord), rect = (0,currentSP,0,1), stretched = 1, rOffset = offset)
+                    else:
+                      self.engine.drawImage(self.oFill, scale = (self.oBarScale*currentSP,.5), coord = (w/2*(1+self.oBarScale*(currentSP-1)),h/12+ vCoord), rect = (0,currentSP,0,1), stretched = 1)
 
-                  self.engine.drawImage(self.oTop, scale = (self.oBarScale,.5), coord = (w/2,h/12+ vCoord), stretched = 1)
+                    self.engine.drawImage(self.oTop, scale = (self.oBarScale,.5), coord = (w/2,h/12+ vCoord), stretched = 1)
             
-                  if self.rb_sp_neck_glow and self.instruments[i].starPower >= 50 and not self.instruments[i].starPowerActive:
-                    self.engine.drawImage(self.oFull, scale = (self.oBarScale,.5), coord = (w/2,h/12), color = (1,1,1,self.rbOverdriveBarGlowVisibility), stretched = 1)
+                    if self.rb_sp_neck_glow and self.instruments[i].starPower >= 50 and not self.instruments[i].starPowerActive:
+                      self.engine.drawImage(self.oFull, scale = (self.oBarScale,.5), coord = (w/2,h/12), color = (1,1,1,self.rbOverdriveBarGlowVisibility), stretched = 1)
                 
                   #must duplicate to other theme 
                   #if self.playerList[i].part.text == "Bass Guitar" and multStreak >= 40 and self.bassGrooveEnableMode > 0:   #bass groove!
