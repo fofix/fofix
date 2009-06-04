@@ -407,6 +407,11 @@ class Neck:
       elif self.spcount <=0:
         self.spcount = 0
         self.spcount2 = 0
+    
+    if self.scoreMultiplier > 4 and self.bgcount < 1:
+      self.bgcount += .1
+    if self.scoreMultiplier < 4 and self.bgcount > 0:
+      self.bgcount -= .1
 
   def renderIncomingNeck(self, visibility, song, pos, time, neckTexture):   #MFH - attempt to "scroll" an incoming guitar solo neck towards the player
     if not song:
@@ -596,7 +601,7 @@ class Neck:
     
     if not (self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 2):
       self.renderNeckMethod(v*self.neckAlpha[1], offset, neck)
-
+    
     if self.bgcount > 0 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 2:   #static bass groove overlay
       self.renderNeckMethod(v*self.bgcount*self.neckAlpha[3], 0, self.bassGrooveNeck)
       
