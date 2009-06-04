@@ -132,14 +132,17 @@ class Lobby(Layer, KeyListener, MessageHandler):
       
       self.controlDict = Player.controlDict
       self.selected = 0
-      self.getPlayers()
-      default = self.engine.config.get("game","player0")
       self.screenOptions = Theme.lobbySelectLength
       self.pos = (0, self.screenOptions)
-      self.getStartingSelected(default)
+      self.getPlayers()
       
     
   def getPlayers(self):
+    if self.creator.updatedName:
+      default = self.creator.updatedName
+      self.creator.updatedName = None
+    else:
+      default = self.engine.config.get("game","player%d" % self.playerNum)
     self.playerNames = Player.playername
     self.playerPrefs = Player.playerpref
     self.options = [_("Create New Player"), _("Saved Characters")]
@@ -153,6 +156,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
     self.avatarScale = [None for i in self.options]
     self.necks   = [None for i in self.options]
     self.neckScale = [None for i in self.options]
+    self.getStartingSelected(default)
 
   def getStartingSelected(self, default):
     if self.engine.input.controls.type[self.engine.input.activeGameControls[self.playerNum]] > 1:
@@ -556,6 +560,7 @@ class CreateCharacter(Layer, KeyListener):
     self.name      = ""
     self.active    = False
     self.oldValue  = None
+    self.oldName   = None
     self._cache    = None
     self.selected  = 0
     self.choice    = 0
@@ -575,6 +580,7 @@ class CreateCharacter(Layer, KeyListener):
     self.newChar   = True
     self.choices   = []
     self.player    = None
+    self.updatedName = None
     self.loadPlayer()
     self.dictEnDisable = {0: _("Disabled"), 1: _("Enabled")}
     self.lefty     = {0: 1, 1: -1}
@@ -603,6 +609,7 @@ class CreateCharacter(Layer, KeyListener):
         pref = [pref[0], pref[1], pref[2], pref[3], pref[4], pref[5], pref[6], pref[9]]
         self.newChar = False
         self.player = player
+        self.oldName = pref[0]
       except: #not found
         pref = ['', 0, 0, 0, 0, 0, '', '']
         self.newChar = True
@@ -637,6 +644,7 @@ class CreateCharacter(Layer, KeyListener):
         Dialogs.showMessage(self.engine, _("That is a terrible name. Choose something not 'default'"))
       elif self.choices[0].lower() not in self.invalidNames or self.choices[0] == self.player:
         Player.updatePlayer(self.player, pref)
+        self.updatedName  = self.choices[0]
         self.engine.view.popLayer(self)
         self.engine.input.removeKeyListener(self)
       else:
@@ -687,6 +695,8 @@ class CreateCharacter(Layer, KeyListener):
     elif c in Player.key2s + Player.cancels or key == pygame.K_ESCAPE:
       self.engine.data.cancelSound.play()
       if not self.active:
+        if self.player:
+          self.updatedName  = self.oldName
         self.engine.view.popLayer(self)
         self.engine.input.removeKeyListener(self)
       else:
