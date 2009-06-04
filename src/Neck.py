@@ -373,11 +373,6 @@ class Neck:
     if self.lastBpmChange != self.part.lastBpmChange:
       self.lastBpmChange = self.part.lastBpmChange
 
-    if self.ocount <= 1:
-      self.ocount = self.ocount + .1
-    else:
-      self.ocount = 1
-
     if self.isFailing == True:
       if self.failcount <= 1 and self.failcount2 == False:
         self.failcount += .05
@@ -911,7 +906,6 @@ class Neck:
       self.vis = visibility
       self.renderNeck(visibility, song, pos)
       self.renderIncomingNecks(visibility, song, pos) #MFH
-
       self.drawTrack(self.ocount, song, pos)
       self.drawBPM(visibility, song, pos)
       self.drawSideBars(visibility, song, pos)

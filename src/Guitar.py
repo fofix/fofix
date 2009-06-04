@@ -293,8 +293,6 @@ class Guitar:
     self.hit = [False, False, False, False, False]
     
     self.freestyleHit = [False, False, False, False, False]
-    
-    self.bgcount = 0
 
     self.playerObj = playerObj
 
@@ -2145,12 +2143,10 @@ class Guitar:
       elif self.battleStatus[6]:
         glScalef(-1, 1, 1)
 
-
-
-      if self.scoreMultiplier > 4 and self.bgcount < 1:
-        self.bgcount += .1
-      if self.scoreMultiplier < 4 and self.bgcount > 0:
-        self.bgcount -= .1
+      if self.ocount <= 1:
+        self.ocount = self.ocount + .1
+      else:
+        self.ocount = 1
 
       if self.freestyleActive:
         self.renderTails(visibility, song, pos, killswitch)
