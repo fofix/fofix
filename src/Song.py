@@ -168,7 +168,7 @@ defaultSections = ["Start","1/4","1/2","3/4"]
 
 # stump: manage cache files
 class CacheManager(object):
-  SCHEMA_VERSION = 2  #stump: current cache format version number
+  SCHEMA_VERSION = 3  #stump: current cache format version number
   def __init__(self):
     self.caches = {}
   def getCache(self, infoFileName, timeout = 20):
@@ -215,7 +215,6 @@ class SongInfo(object):
     self.fileName      = infoFileName
     self.libraryNam       = songLibrary[songLibrary.find(DEFAULT_LIBRARY):]
     self.info          = Config.MyConfigParser()
-    self._difficulties = None
     self._partDifficulties = {}
     self._parts        = None
     if Config.get("performance", "cache_song_metadata"):
@@ -536,7 +535,6 @@ class SongInfo(object):
             
     if canCache and self.allowCacheUsage:  #stump: preload this stuff into the cache
       self.getParts()
-      self.getDifficulties()
       self.getSections()
     self.writeCache()
             
@@ -635,31 +633,31 @@ class SongInfo(object):
       v = type(v)
     return v
 
-  def getDifficulties(self):
-    # Tutorials only have the medium difficulty
-    if self.tutorial:
-      return [difficulties[HAR_DIF]]
-
-    if self._difficulties is not None:
-      return self._difficulties
-
-    # See which difficulties are available
-    try:
-
-      noteFileName = self.noteFileName
-      
-      Log.debug("Retrieving difficulties from: " + noteFileName)
-      info = MidiInfoReaderNoSections()
-      midiIn = midi.MidiInFile(info, noteFileName)
-      try:
-        midiIn.read()
-      except MidiInfoReaderNoSections.Done:
-        pass
-      info.difficulties.sort(lambda a, b: cmp(b.id, a.id))
-      self._difficulties = info.difficulties
-    except:
-      self._difficulties = difficulties.values()
-    return self._difficulties
+#  def getDifficulties(self):
+#    # Tutorials only have the medium difficulty
+#    if self.tutorial:
+#      return [difficulties[HAR_DIF]]
+#
+#    if self._difficulties is not None:
+#      return self._difficulties
+#
+#    # See which difficulties are available
+#    try:
+#
+#      noteFileName = self.noteFileName
+#      
+#      Log.debug("Retrieving difficulties from: " + noteFileName)
+#      info = MidiInfoReaderNoSections()
+#      midiIn = midi.MidiInFile(info, noteFileName)
+#      try:
+#        midiIn.read()
+#      except MidiInfoReaderNoSections.Done:
+#        pass
+#      info.difficulties.sort(lambda a, b: cmp(b.id, a.id))
+#      self._difficulties = info.difficulties
+#    except:
+#      self._difficulties = difficulties.values()
+#    return self._difficulties
 
   def getPartDifficulties(self):
     if len(self._partDifficulties) is not 0:
@@ -692,6 +690,9 @@ class SongInfo(object):
       info.parts.sort(lambda b, a: cmp(b.id, a.id))
       self._parts = info.parts
       for part in info.parts:
+        if self.tutorial:
+          self._partDifficulties[part] = [difficulties[HAR_DIF]]
+          continue
         info.difficulties[part].sort(lambda a, b: cmp(a.id, b.id))
         self._partDifficulties[part] = info.difficulties[part]
     except:
@@ -1034,7 +1035,7 @@ class SongInfo(object):
   loading       = property(getLoading, setLoading)
   delay         = property(getDelay, setDelay)
   tutorial      = property(isTutorial)
-  difficulties  = property(getDifficulties)
+#  difficulties  = property(getDifficulties)
   cassetteColor = property(getCassetteColor, setCassetteColor)
   #New RF-mod Items
   parts         = property(getParts)

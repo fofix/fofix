@@ -110,6 +110,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
       self.playerList[num].difficulty = self.songSettings[3].values[self.songSettings[3].valueIndex]
          
   def startGame(self, value = "", queueCounter = 0):
+   #just noting here that this is not used (and would not work were it to be). I feel like this here scene could use some work...
    if not self.gameStarted:
      self.gameStarted = True
      if not self.player.difficulty in self.info.difficulties:
@@ -128,6 +129,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
      self.session.world.createScene("GuitarScene", songName = self.songName, Players = players, songQueue = self.songQueue, queueCounter = queueCounter)
 
   def startQueue(self):
+     #obviously a fair amount of work to be done on this anyway... But note that startGame will not work.
      firstSong = self.songQueue.nextSong(0)
      Config.set("game", "selected_song", firstSong[0])
      Config.set("game", "selected_library", firstSong[1])

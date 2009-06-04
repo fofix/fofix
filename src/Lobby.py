@@ -78,6 +78,10 @@ class Lobby(Layer, KeyListener, MessageHandler):
         self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "lobby", "lobby.png"))
       except IOError:
         self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "menu", "optionsbg.png"))
+      try:
+        self.engine.loadImgDrawing(self, "backgroundTop", os.path.join("themes", themename, "lobby", "lobby_top.png"))
+      except IOError:
+        self.backgroundTop = None
       
       try:
         self.engine.loadImgDrawing(self, "itemSelect", os.path.join("themes", themename, "lobby", "select.png"))
@@ -488,7 +492,9 @@ class Lobby(Layer, KeyListener, MessageHandler):
         else:
           wText, hText = font.getStringSize(name, scale = Theme.lobbySelectScale)
           font.render(name, (Theme.lobbySelectX-wText, Theme.lobbySelectY + (Theme.lobbySelectSpace*(i-self.pos[0]))), scale = Theme.lobbySelectScale)
-      
+      if self.backgroundTop:
+        wFactor = 640.000/self.backgroundTop.width1()
+        self.engine.drawImage(self.backgroundTop, scale = (wFactor,-wFactor), coord = (w/2,h/2))
     finally:
       self.engine.view.resetProjection()
   
@@ -601,6 +607,10 @@ class CreateCharacter(Layer, KeyListener):
       self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "lobby", "creator.png"))
     except IOError:
       self.background = None
+    try:
+      self.engine.loadImgDrawing(self, "backgroundTop", os.path.join("themes", themename, "lobby", "creator_top.png"))
+    except IOError:
+      self.backgroundTop = None
   def loadPlayer(self, player = None):
     self.choices = []
     if player is not None:
@@ -848,5 +858,8 @@ class CreateCharacter(Layer, KeyListener):
         else:
           wText, hText = font.getStringSize(self.values[i-1][self.choices[i]], scale = Theme.characterCreateScale)
           font.render(self.values[i-1][self.choices[i]], (Theme.characterCreateOptionX-wText, Theme.characterCreateY+Theme.characterCreateSpace*i), scale = Theme.characterCreateScale)
+      if self.backgroundTop:
+        wFactor = 640.000/self.backgroundTop.width1()
+        self.engine.drawImage(self.backgroundTop, scale = (wFactor,-wFactor), coord = (w/2,h/2))
     finally:
       self.engine.view.resetProjection()
