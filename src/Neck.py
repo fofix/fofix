@@ -694,7 +694,10 @@ class Neck:
     w            = self.boardWidth
     l            = self.boardLength
 
-    offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
+    if self.staticStrings:
+      offset       = 0
+    else:
+      offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
 
     track_tex  = array([[0.0, project(offset - 2 * self.beatsPerUnit)],
                          [1.0, project(offset - 2 * self.beatsPerUnit)],
@@ -716,17 +719,17 @@ class Neck:
     else:
       self.centerLines.texture.bind()
 
-    if self.staticStrings:    #MFH
+      
+    track_vtx       = array([[-w / 2, 0, -2+size],
+                           [w / 2, 0, -2+size],
+                           [-w / 2, 0, -1+size],
+                           [w / 2, 0, -1+size],
+                           [-w / 2, 0, l * .7],
+                           [w / 2, 0, l * .7],
+                           [-w / 2, 0, l],
+                           [w / 2, 0, l]], dtype=float32)
     
-      track_vtx       = array([[-w / 2, 0, -2+size],
-                                 [w / 2, 0, -2+size],
-                                 [-w / 2, 0, -1+size],
-                                 [w / 2, 0, -1+size],
-                                 [-w / 2, 0, l * .7],
-                                 [w / 2, 0, l * .7],
-                                 [-w / 2, 0, l],
-                                 [w / 2, 0, l]], dtype=float32)
-
+    if self.staticStrings:    #MFH
       color = (1,1,1)
       track_col  = array([[color[0],color[1],color[2], v],
                          [color[0],color[1],color[2], v],
@@ -752,10 +755,10 @@ class Neck:
       glEnableClientState(GL_VERTEX_ARRAY)
       glEnableClientState(GL_COLOR_ARRAY)
       glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-      glVertexPointerf(self.boardVtx)
+      glVertexPointerf(track_vtx)
       glColorPointerf(self.board_col)
       glTexCoordPointerf(track_tex)
-      glDrawArrays(GL_TRIANGLE_STRIP, 0, self.boardVtx.shape[0])
+      glDrawArrays(GL_TRIANGLE_STRIP, 0, track_vtx.shape[0])
       glDisableClientState(GL_VERTEX_ARRAY)
       glDisableClientState(GL_COLOR_ARRAY)
       glDisableClientState(GL_TEXTURE_COORD_ARRAY);
