@@ -1983,12 +1983,18 @@ class SongChooser(Layer, KeyListener):
               #x = .6
               x = self.song_cdscore_xpos
               y = .5 + f / 2.0
-              if len(item.difficulties) > 3:
+              try:
+                difficulties = item.partDifficulties[Song.parts[self.instrumentNum]]
+              except KeyError:
+                difficulties = []
+              if len(difficulties) > 3:
                 y = .42 + f / 2.0
+              elif len(difficulties) == 0:
+                score, stars, name = "---", 0, "---"
               
               #for p in item.parts:    #MFH - look at selected instrument!
               #  if str(p) == self.instrument:
-              for d in item.difficulties:
+              for d in difficulties:
                 scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
                 #scores = item.getHighscoresWithPartString(d, part = self.instrument)
                 
@@ -2330,8 +2336,12 @@ class SongChooser(Layer, KeyListener):
                   stars = 0
                   name = ""
 
-                  self.diffNice = self.diffTrans[self.diff]                  
-                  for d in item.difficulties:
+                  self.diffNice = self.diffTrans[self.diff]
+                  try:
+                    difficulties = item.partDifficulties[Song.parts[self.instrumentNum]]
+                  except KeyError:
+                    difficulties = []
+                  for d in difficulties:
                     if str(d) == self.diff:
                       #self.diffNice = self.diffTrans[str(d)]
                       scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
@@ -2348,7 +2358,7 @@ class SongChooser(Layer, KeyListener):
                         score, stars, name = 0, 0, "---"
                   
                   if score == _("Nil") and self.NilShowNextScore:   #MFH
-                    for d in item.difficulties:   #MFH - just take the first valid difficulty you can find and display it.
+                    for d in difficulties:   #MFH - just take the first valid difficulty you can find and display it.
                       self.diffNice = self.diffTrans[str(d)]
                       scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
                       if scores:
@@ -2363,6 +2373,8 @@ class SongChooser(Layer, KeyListener):
                         break
                       else:
                         score, stars, name = 0, 0, "---"
+                    else:
+                      score, stars, name = _("Nil"), 0, "---"
                       
                   
                   
@@ -2592,7 +2604,11 @@ class SongChooser(Layer, KeyListener):
                   name = ""
 
                   self.diffNice = self.diffTrans[self.diff]                  
-                  for d in item.difficulties:
+                  try:
+                    difficulties = item.partDifficulties[Song.parts[self.instrumentNum]]
+                  except KeyError:
+                    difficulties = []
+                  for d in difficulties:
                     if str(d) == self.diff:
                       #self.diffNice = self.diffTrans[str(d)]
                       scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
@@ -2624,6 +2640,8 @@ class SongChooser(Layer, KeyListener):
                         break
                       else:
                         score, stars, name = 0, 0, "---"
+                    else:
+                      score, stars, name = _("Nil"), 0, "---"
 
                   scale = 0.0009
                   text = self.diffNice
@@ -2973,11 +2991,16 @@ class SongChooser(Layer, KeyListener):
                     w, h = font.getStringSize(self.prompt, scale = scale)
                     x = self.song_listcd_score_xpos
                     y = self.song_listcd_score_ypos + f / 2.0
-                    if len(item.difficulties) > 3:
+                    try:
+                      difficulties = item.partDifficulties[Song.parts[self.instrumentNum]]
+                    except KeyError:
+                      difficulties = []
+                      score, stars, name = "---", 0, "---"
+                    if len(difficulties) > 3:
                       y = self.song_listcd_score_ypos + f / 2.0
                     
                     #new
-                    for d in item.difficulties:
+                    for d in difficulties:
                       #scores =  item.getHighscoresWithPartString(d, part = self.instrument)
                       scores =  item.getHighscores(d, part = Song.parts[self.instrumentNum])
                       if scores:
@@ -3186,11 +3209,16 @@ class SongChooser(Layer, KeyListener):
                     w, h = font.getStringSize(self.prompt, scale = scale)
                     x = self.song_listcd_score_xpos
                     y = self.song_listcd_score_ypos + f / 2.0
-                    if len(item.difficulties) > 3:
+                    try:
+                      difficulties = item.partDifficulties[Song.parts[self.instrumentNum]]
+                    except KeyError:
+                      difficulties = []
+                      score, stars, name = "---", 0, "---"
+                    if len(difficulties) > 3:
                       y = self.song_listcd_score_ypos + f / 2.0
                     
                     #new
-                    for d in item.difficulties:
+                    for d in difficulties:
                       #scores =  item.getHighscoresWithPartString(d, part = self.instrument)
                       scores =  item.getHighscores(d, part = Song.parts[self.instrumentNum])
                       if scores:
@@ -3558,8 +3586,12 @@ class SongChooser(Layer, KeyListener):
                   stars = 0
                   name = ""
 
-                  self.diffNice = self.diffTrans[self.diff]                  
-                  for d in item.difficulties:
+                  self.diffNice = self.diffTrans[self.diff]
+                  try:
+                    difficulties = item.partDifficulties[Song.parts[self.instrumentNum]]
+                  except KeyError:
+                    difficulties = []
+                  for d in difficulties:
                     if str(d) == self.diff:
                       #self.diffNice = self.diffTrans[str(d)]
                       scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
@@ -3576,7 +3608,7 @@ class SongChooser(Layer, KeyListener):
                         score, stars, name = 0, 0, "---"
                   
                   if score == _("Nil") and self.NilShowNextScore:   #MFH
-                    for d in item.difficulties:   #MFH - just take the first valid difficulty you can find and display it.
+                    for d in difficulties:   #MFH - just take the first valid difficulty you can find and display it.
                       self.diffNice = self.diffTrans[str(d)]
                       scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
                       if scores:
