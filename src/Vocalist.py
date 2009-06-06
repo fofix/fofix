@@ -195,7 +195,7 @@ class Vocalist:
     except IOError:
       self.vocalODGlow = None
     height = self.vocalMeter.height1()
-    self.vocalMeterScale = 60.000/height
+    self.vocalMeterScale = (45.000/height)*.5
     olFactor = height/300.000
     self.vocalFillupCenterX = int(139*olFactor)
     self.vocalFillupCenterY = int(151*olFactor)
@@ -364,10 +364,10 @@ class Vocalist:
     w, h = self.engine.view.geometry[2:4]
     if players == 1:
       addY = .7
-      addYText = .7*self.engine.data.fontScreenBottom
+      addYText = .72*self.engine.data.fontScreenBottom
     else:
       addY = 0
-      addYText = 0
+      addYText = .02*self.engine.data.fontScreenBottom
     if not song:
       return
     glColor4f(1,1,1,1)
@@ -417,10 +417,10 @@ class Vocalist:
               x = time - pos
               if x < self.currentPeriod * 6 and x > -(self.currentPeriod * 2):
                 noteX = (x/(self.currentPeriod * 8))+.25
-                self.engine.drawImage(self.vocalTapNote, scale = (.5,-.5), coord = (w*noteX,(h*(1-addY))-height))
+                self.engine.drawImage(self.vocalTapNote, scale = (.5,-.5), coord = (w*noteX,(h*(1-(addY-.02)))-height))
             elif self.lyricMode == 1 or self.lyricMode == 2:
               noteX = (.75*(time - phraseTime)/phraseLength)+.12
-              self.engine.drawImage(self.vocalTapNote, scale = (.5,-.5), coord = (w*noteX,(h*(1-addY))-height))
+              self.engine.drawImage(self.vocalTapNote, scale = (.5,-.5), coord = (w*noteX,(h*(1-(addY-.02)))-height))
         else:
           now = False
           if time <= pos and time + event.length > pos:
@@ -493,7 +493,7 @@ class Vocalist:
               x = time - pos
               if x > -(self.currentPeriod * 2):
                 noteX = (x/(self.currentPeriod * 8))+.25
-                self.engine.drawImage(self.vocalTapNote, scale = (.5,-.5), coord = (w*noteX,(h*(1-addY))-height))
+                self.engine.drawImage(self.vocalTapNote, scale = (.5,-.5), coord = (w*noteX,(h*(1-(addY-.02)))-height))
           else:
             x = time - pos
             if x > -(self.currentPeriod * 2):
@@ -506,7 +506,7 @@ class Vocalist:
             x = time - pos
             if x < self.currentPeriod * 6:
               noteX = (x/(self.currentPeriod * 8))+.25
-              self.engine.drawImage(self.vocalTapNote, scale = (.5,-.5), coord = (w*noteX,(h*(1-addY))-height))
+              self.engine.drawImage(self.vocalTapNote, scale = (.5,-.5), coord = (w*noteX,(h*(1-(addY-.02)))-height))
           else:
             glColor4f(1, 1, 1, 1)
             x = time - pos
@@ -540,20 +540,20 @@ class Vocalist:
       currentOffset = 0
       rotate = 0
     if self.lyricMode == 1 or self.lyricMode == 2:
-      self.engine.drawImage(self.vocalBar, scale = (.5,-.5), coord = (w*.87,(h*(1-addY))-height))
+      self.engine.drawImage(self.vocalBar, scale = (.5,-.5), coord = (w*.87,(h*(1-(addY-.02))-height)))
       if self.activePhrase: #this checks the previous phrase or the current
         noteX = (.75*(pos - phraseTime)/phraseLength)+.12
         if self.activePhrase.tapPhrase:
-          self.engine.drawImage(self.vocalTap, scale = (.5,-.5), coord = (w*noteX,(h*(1-addY))-height))
+          self.engine.drawImage(self.vocalTap, scale = (.5,-.5), coord = (w*noteX,(h*(1-(addY-.02)))-height))
         else:
           self.engine.drawImage(self.vocalArrow, scale = (self.vocalLyricSheetWFactor,-self.vocalLyricSheetWFactor), coord = (w*noteX-(self.arrowW/2),h*(.92+currentOffset-addY)), color = (1,1,1,self.arrowVis/500.0))
-        self.engine.drawImage(self.vocalBar, scale = (.5,-.5), coord = (w*noteX,(h*(1-addY))-height))
+        self.engine.drawImage(self.vocalBar, scale = (.5,-.5), coord = (w*noteX,(h*(addY-.02))-height))
     elif self.lyricMode == 0:
       if self.phrase and self.tapPhraseActive: #this checks the next phrase /or/ the current
-        self.engine.drawImage(self.vocalTap, scale = (.5,-.5), coord = (w*.25,(h*(1-addY))-height))
+        self.engine.drawImage(self.vocalTap, scale = (.5,-.5), coord = (w*.25,(h*(1-(addY-.02)))-height))
       else:
         if self.currentNoteItem and (self.currentNoteItem.speak or self.currentNoteItem.extra):
-          self.engine.drawImage(self.vocalSplitArrow, scale = (self.vocalLyricSheetWFactor,-self.vocalLyricSheetWFactor), coord = (w*.25-(self.arrowW/2),h*(.87-addY)), color = (1,1,1,self.arrowVis/500.0))
+          self.engine.drawImage(self.vocalSplitArrow, scale = (self.vocalLyricSheetWFactor,-self.vocalLyricSheetWFactor), coord = (w*.25-(self.arrowW/2),h*(.8355-addY)), color = (1,1,1,self.arrowVis/500.0))
         else:
           self.engine.drawImage(self.vocalArrow, scale = (self.vocalLyricSheetWFactor,-self.vocalLyricSheetWFactor), coord = (w*.25-(self.arrowW/2),h*(.92+currentOffset-addY)), rot = rotate, color = (1,1,1,self.arrowVis/500.0))
       a = []
@@ -571,13 +571,13 @@ class Vocalist:
             v = (xPos*4)
           else:
             v = 1
-          self.engine.drawImage(self.vocalBar, scale = (.5,-.5), coord = (w*xPos,(h*(1-addY))-height), color = (1,1,1,v))
+          self.engine.drawImage(self.vocalBar, scale = (.5,-.5), coord = (w*xPos,(h*(1-(addY-.02)))-height), color = (1,1,1,v))
     
     if self.showText > 0:
       self.engine.drawImage(self.vocalText, scale = (.5, -.5/6.0), coord = (w*.27,h*(.9-addY)), rect = (0, 1, self.scoreBox[0], self.scoreBox[1]))
     else:
-      self.engine.drawImage(self.vocalMeter, scale = (self.vocalMeterScale,-self.vocalMeterScale), coord = (w*0.25,h*(0.82-addY)))
-      self.engine.drawImage(self.vocalMult, scale = (.5,-.5/8.0), coord = (w*0.28,h*(0.82-addY)), rect = (0, 1, float(self.scoreMultiplier-1)/9.0, float(self.scoreMultiplier)/9.0))
+      self.engine.drawImage(self.vocalMeter, scale = (self.vocalMeterScale,-self.vocalMeterScale), coord = (w*0.25,h*(0.8-addY)))
+      self.engine.drawImage(self.vocalMult, scale = (.5,-.5/8.0), coord = (w*0.28,h*(0.8-addY)), rect = (0, 1, float(self.scoreMultiplier-1)/9.0, float(self.scoreMultiplier)/9.0))
     
       if self.phraseNoteTime > 0 and not self.tapPhraseActive:
         ratio = self.phraseInTune/float(self.phraseNoteTime)
@@ -585,10 +585,10 @@ class Vocalist:
           ratio = 1
         if self.vocalContinuousAvailable:
           degrees = int(360*ratio) - (int(360*ratio) % 5)
-          self.engine.drawImage(self.drawnVocalOverlays[degrees], scale = (self.vocalMeterScale,-self.vocalMeterScale), coord = (w*0.25,h*(0.82-addY)))
+          self.engine.drawImage(self.drawnVocalOverlays[degrees], scale = (self.vocalMeterScale,-self.vocalMeterScale), coord = (w*0.25,h*(0.8-addY)))
         else:
           width = self.vocalFill.width1()
-          self.engine.drawImage(self.vocalFill, scale = (self.vocalMeterScale*ratio, -self.vocalMeterScale), coord = (w*.25-(width*ratio*self.vocalMeterScale*.5), h*(.82-addY)), rect = (0,ratio,0,1))
+          self.engine.drawImage(self.vocalFill, scale = (self.vocalMeterScale*ratio, -self.vocalMeterScale), coord = (w*.25-(width*ratio*self.vocalMeterScale*.5), h*(.8-addY)), rect = (0,ratio,0,1))
     if self.tapPhraseActive:
       font.render("%d / %d" % (self.tapNoteHits[self.currentTapPhrase], self.tapNoteTotals[self.currentTapPhrase]), (.25, .065+addYText), scale = self.lyricScale)
   

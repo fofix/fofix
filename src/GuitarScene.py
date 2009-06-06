@@ -7826,8 +7826,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   else:
                     partcolor = (.6,.6,.6,1)
                   self.engine.drawImage(self.part[i], scale = (.15,-.15), coord = (w*(.5-unisonX+unisonI*i),h*.58), color = partcolor)
+
+              vocaloffset = 0
+              vocaltextoffset = 0
+              if self.numOfSingers > 0 and self.numOfPlayers > 1:
+                vocaloffset = .05
+                vocaltextoffset = .038              
+
               try:
-  
   
                 #myfingershurt: locale.format call adds commas to separate numbers just like Rock Band
 
@@ -7849,7 +7855,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   scW, scH = scoreFont.getStringSize(scoretext)
   
                   scorepicheight = whichScorePic.height1()
-                  self.engine.drawImage(whichScorePic, scale = (.5,.5), coord = (w*0.9, h*0.8304))
+
+                  self.engine.drawImage(whichScorePic, scale = (.5,.5), coord = (w*0.9, h*(0.8304-vocaloffset)))
                   
                   if self.coOpRB and self.starPowersActive > 0 and self.bandMultFound:
                     if self.starPowersActive == 1:
@@ -7858,11 +7865,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                       bandMultRange = ((1.0/3.0), (2.0/3.0))
                     else:
                       bandMultRange = ((2.0/3.0), 1.0)
-                    self.engine.drawImage(self.bandStarMult, scale = (.2,(-.2/3.0)), coord = (w*0.6994, h*0.8304), rect = (0,1,bandMultRange[0],bandMultRange[1]))
-                  if version.vernum == ((1,8,1) or (1,9,0)):#blazingamer pygame version check to fix score
-                    scoreFont.render(scoretext, (0.97-scW, 0.1125 ))    #last change +0.0015
+                    self.engine.drawImage(self.bandStarMult, scale = (.2,(-.2/3.0)), coord = (w*0.6994, h*(0.8304-vocaloffset)), rect = (0,1,bandMultRange[0],bandMultRange[1]))
+                  if version.vernum >= (1,8,1):#blazingamer pygame version check to fix score
+                    scoreFont.render(scoretext, (0.97-scW, 0.1125+vocaltextoffset ))    #last change +0.0015
                   else:
-                    scoreFont.render(scoretext, (0.97-scW, 0.1050 ))    #last change +0.0015
+                    scoreFont.render(scoretext, (0.97-scW, 0.1050+vocaltextoffset ))    #last change +0.0015
   
               except Exception, e:
                 #Log.warn("Unable to render score/streak text: %s" % e)
@@ -7878,16 +7885,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               #myfingershurt: swapping the number "0" and the letter "O" in the score font for accurate Rock Band score type!
               streaktext = streaktext.replace("0","O")
               stW, stH = streakFont.getStringSize(streaktext)
-              
+
               #streak counter box:
               if self.coOpType and not self.coOp:
                 if i == 0:
                   counterimgheight = self.counter.height1()
-                  self.engine.drawImage(self.counter, scale = (.5,-.5), coord = (w*.915, h*0.7720)) 
-                  if version.vernum == ((1,8,1) or (1,9,0)):#blazingamer pygame version check to fix score
-                    streakFont.render(streaktext, (0.97-stW,0.1580 ))    #last change +0.0015
+                  self.engine.drawImage(self.counter, scale = (.5,-.5), coord = (w*.915, h*(0.7720-vocaloffset))) 
+                  if version.vernum >= (1,8,1):#blazingamer pygame version check to fix score
+                    streakFont.render(streaktext, (0.97-stW,0.1580+vocaltextoffset ))    #last change +0.0015
                   else:
-                    streakFont.render(streaktext, (0.97-stW,0.1500 ))    #last change +0.0015
+                    streakFont.render(streaktext, (0.97-stW,0.1500+vocaltextoffset ))    #last change +0.0015
 
               if not self.instruments[i].isVocal:
                 self.engine.view.setViewportHalf(self.numberOfGuitars,self.playerList[i].guitarNum)
@@ -7895,10 +7902,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               if not self.coOpType or self.coOp:
                 counterimgheight = self.counter.height1()
                 self.engine.drawImage(self.counter, scale = (.5,-.5), coord = (w*.915, h*0.7720))
-                if version.vernum == ((1,8,1) or (1,9,0)):#blazingamer pygame version check to fix score
-                  streakFont.render(streaktext, (0.97-stW,0.1580 ))    #last change +0.0015                
+                if version.vernum >= (1,8,1):#blazingamer pygame version check to fix score
+                  streakFont.render(streaktext, (0.97-stW,0.1580+vocaltextoffset ))    #last change +0.0015                
                 else:
-                  streakFont.render(streaktext, (0.97-stW,0.1500 ))    #last change +0.0015                
+                  streakFont.render(streaktext, (0.97-stW,0.1500+vocaltextoffset ))    #last change +0.0015                
                 
 
               if not self.pause and not self.failed and not self.ending:
@@ -8505,47 +8512,52 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
             w = wBak
             h = hBak
+            vocaloffset = 0
+            if self.numOfSingers > 0 and self.numOfPlayers > 1:
+              vocaloffset = .05
+
             if (self.inGameStars == 2 or (self.inGameStars == 1 and self.theme == 2) )  and not self.pause and not self.failed and not self.battleGH: #MFH - only show stars if in-game stars enabled
               if self.starGrey != None:
                 for starNum in range(0, 5):
+                  xstarpos = w*((0.802 + 0.040*(starNum))-vocaloffset)
+                  ystarpos = h*(0.7160-vocaloffset)
                   if stars == 7:    #full combo!
-                    self.engine.drawImage(self.starFC, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
+                    self.engine.drawImage(self.starFC, scale = (.080,-.080), coord = (xstarpos,ystarpos))
                   elif stars == 6:    #perfect!
-                    self.engine.drawImage(self.starPerfect, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
+                    self.engine.drawImage(self.starPerfect, scale = (.080,-.080), coord = (xstarpos,ystarpos))
                   elif starNum == stars:
                     if self.starContinuousAvailable:
                       #stump: continuous fillup (akedrou - the ratio will pass correctly from rewritten star score)
                       degrees = int(360*ratio) - (int(360*ratio) % 5)
-                      self.engine.drawImage(self.starGrey, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
-                      self.engine.drawImage(self.drawnOverlays[degrees], scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
+                      self.engine.drawImage(self.starGrey, scale = (.080,-.080), coord = (xstarpos,ystarpos))
+                      self.engine.drawImage(self.drawnOverlays[degrees], scale = (.080,-.080), coord = (xstarpos,ystarpos))
                     #if self.starGrey1 and self.starScoring == 2:  #if more complex star system is enabled, and we're using Rock Band style scoring
                     elif self.starGrey1:
                       if partialStars == 0:
-                        self.engine.drawImage(self.starGrey, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
+                        self.engine.drawImage(self.starGrey, scale = (.080,-.080), coord = (xstarpos,ystarpos))
                       elif partialStars == 1:
-                        self.engine.drawImage(self.starGrey1, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
+                        self.engine.drawImage(self.starGrey1, scale = (.080,-.080), coord = (xstarpos,ystarpos))
                       elif partialStars == 2:
-                        self.engine.drawImage(self.starGrey2, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
+                        self.engine.drawImage(self.starGrey2, scale = (.080,-.080), coord = (xstarpos,ystarpos)) 
                       elif partialStars == 3:
-                        self.engine.drawImage(self.starGrey3, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
+                        self.engine.drawImage(self.starGrey3, scale = (.080,-.080), coord = (xstarpos,ystarpos)) 
                       elif partialStars == 4:
-                        self.engine.drawImage(self.starGrey4, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
+                        self.engine.drawImage(self.starGrey4, scale = (.080,-.080), coord = (xstarpos,ystarpos)) 
                       elif partialStars == 5:
-                        self.engine.drawImage(self.starGrey5, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
+                        self.engine.drawImage(self.starGrey5, scale = (.080,-.080), coord = (xstarpos,ystarpos)) 
                       elif partialStars == 6:
-                        self.engine.drawImage(self.starGrey6, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
+                        self.engine.drawImage(self.starGrey6, scale = (.080,-.080), coord = (xstarpos,ystarpos)) 
                       elif partialStars == 7:
-                        self.engine.drawImage(self.starGrey7, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
-                      
+                        self.engine.drawImage(self.starGrey7, scale = (.080,-.080), coord = (xstarpos,ystarpos))                       
                     else:
-                      self.engine.drawImage(self.starGrey, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
+                      self.engine.drawImage(self.starGrey, scale = (.080,-.080), coord = (xstarpos,ystarpos))
     
                   elif starNum > stars:
                     if self.displayAllGreyStars:
-                      self.engine.drawImage(self.starGrey, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
+                      self.engine.drawImage(self.starGrey, scale = (.080,-.080), coord = (xstarpos,ystarpos))
     
                   else:   #white star
-                    self.engine.drawImage(self.starWhite, scale = (.080,-.080), coord = (w*(0.802 + 0.040*(starNum)),h*0.7160))
+                    self.engine.drawImage(self.starWhite, scale = (.080,-.080), coord = (xstarpos,ystarpos))
   
           if self.song and self.song.readyToGo:
     
@@ -9389,7 +9401,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 self.timeLeft = "%d:%02d" % (pos / 60000, (pos % 60000) / 1000)
               if self.gameTimeMode > 0 or self.hopoDebugDisp == 1:
                 w, h = font.getStringSize(self.timeLeft)
-                if self.lyricSheet != None:   #shift this stuff down so it don't look so bad over top the lyricsheet:
+                if self.lyricSheet != None or (self.numOfSingers > 0 and self.numOfPlayers > 1):   #shift this stuff down so it don't look so bad over top the lyricsheet:
                   font.render(self.timeLeft,  (.5 - w / 2, .055 - h / 2 - (1.0 - v) * .2))
                 else:
                   font.render(self.timeLeft,  (.5 - w / 2, y))
