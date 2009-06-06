@@ -28,6 +28,7 @@ from Language import _
 from Microphone import Microphone, getNoteName
 from Song import VocalNote, VocalPhrase
 from OpenGL.GL import *
+from numpy import array, float32
 
 #stump: needed for continuous star fillup (akedrou - stealing for vocals)
 import Image
@@ -35,6 +36,9 @@ import ImageDraw
 from Svg import ImgDrawing
 
 diffMod = {0: 1, 1: 1.25, 2: 1.5, 3: 1.75}
+
+NOTE_LANE_SIZE = .002  #stump
+NOTE_GLOW_SIZE = 6 * NOTE_LANE_SIZE  #stump
 
 class Vocalist:
   def __init__(self, engine, playerObj, editorMode = False, player = 0):
@@ -326,7 +330,35 @@ class Vocalist:
     else:
       self.currentNote = self.mic.getDeviation(6)
     self.lastPos = pos
-  
+
+  #stump: draw a vocal note lane, vaguely RB2-style
+  def drawNoteLane(self, colors, xStartPos, xEndPos, yStartPos, yEndPos):
+    colorArray = array([colors[i] for i in (4, 5, 6, 6, 0, 1, 1, 0, 2, 3, 3, 2, 6, 6, 5, 4)], dtype=float32)
+    vertexArray = array([[xStartPos,                yStartPos-NOTE_LANE_SIZE, 0],
+                         [xEndPos,                  yEndPos  -NOTE_LANE_SIZE, 0],
+                         [xEndPos,                  yEndPos  -NOTE_GLOW_SIZE, 0],
+                         [xStartPos,                yStartPos-NOTE_GLOW_SIZE, 0],
+                         [xStartPos-NOTE_LANE_SIZE, yStartPos,                0],
+                         [xEndPos  +NOTE_LANE_SIZE, yEndPos,                  0],
+                         [xEndPos,                  yEndPos  -NOTE_LANE_SIZE, 0],
+                         [xStartPos,                yStartPos-NOTE_LANE_SIZE, 0],
+                         [xStartPos,                yStartPos+NOTE_LANE_SIZE, 0],
+                         [xEndPos,                  yEndPos  +NOTE_LANE_SIZE, 0],
+                         [xEndPos  +NOTE_LANE_SIZE, yEndPos,                  0],
+                         [xStartPos-NOTE_LANE_SIZE, yStartPos,                0],
+                         [xStartPos,                yStartPos+NOTE_GLOW_SIZE, 0],
+                         [xEndPos,                  yEndPos  +NOTE_GLOW_SIZE, 0],
+                         [xEndPos,                  yEndPos  +NOTE_LANE_SIZE, 0],
+                         [xStartPos,                yStartPos+NOTE_LANE_SIZE, 0]],
+                           dtype=float32)
+    glEnableClientState(GL_VERTEX_ARRAY)
+    glEnableClientState(GL_COLOR_ARRAY)
+    glVertexPointerf(vertexArray)
+    glColorPointerf(colorArray)
+    glDrawArrays(GL_QUADS, 0, len(colorArray))
+    glDisableClientState(GL_COLOR_ARRAY)
+    glDisableClientState(GL_VERTEX_ARRAY)
+
   def render(self, visibility, song, pos, players):
     font = self.engine.data.font
     w, h = self.engine.view.geometry[2:4]
@@ -377,6 +409,7 @@ class Vocalist:
         nextnotes = [(time, event) for time, event in self.nextPhrase[1].getAllEvents() if isinstance(event, VocalNote)]
       else:
         nextnotes = []
+      lastNoteEnd = None  #stump
       for time, event in notes:
         if self.activePhrase.tapPhrase:
           if not event.played:
@@ -398,19 +431,47 @@ class Vocalist:
             else:
               glColor4f(1,1,1,1)
           if self.lyricMode == 0: #scrolling
-            x = time - pos
-            if x < self.currentPeriod * 6 and x > -(self.currentPeriod * 2):
-              xPos = (x/(self.currentPeriod * 8))+.25
+            xStart = time - pos
+            xEnd = time + event.length - pos
+            if xStart < self.currentPeriod * 6 and xEnd > -(self.currentPeriod * 2):
+              xStartPos = (xStart/(self.currentPeriod * 8))+.25
+              xEndPos = (xEnd/(self.currentPeriod * 8))+.25
               val = float(event.note-self.minPitch)/float(self.pitchRange)
+              vStart = (xStartPos*4)
+              vEnd = (xEndPos*4)
               if time < pos:
-                v = (xPos*4)
                 if now:
-                  glColor4f(0,1,0,v)
+                  glColor4f(0,1,0,vStart)
                 else:
-                  glColor4f(.5,.5,.5,v)
+                  glColor4f(.5,.5,.5,vStart)
+              font.render(event.lyric, (xStartPos, .085+addYText), scale = self.lyricScale)
               if not (event.speak or event.extra):
-                font.render("X", (xPos, .057-(.05*val)+addYText), scale = self.lyricScale)
-              font.render(event.lyric, (xPos, .085+addYText), scale = self.lyricScale)
+                #font.render("X", (xStartPos, .057-(.05*val)+addYText), scale = self.lyricScale)
+                #stump: note lanes with RB2-like glow
+                baseY = .057-(.05*val)+addY
+                if self.activePhrase.star:
+                  colors = [[1.0, 1.0, 0.5, vStart],
+                            [1.0, 1.0, 0.5, vEnd],
+                            [1.0, 1.0, 0.75, vStart],
+                            [1.0, 1.0, 0.75, vEnd],
+                            [1.0, 1.0, 0.0, vStart*0.6],
+                            [1.0, 1.0, 0.0, vEnd*0.6],
+                            [1.0, 1.0, 0.0, 0.0]]
+                else:
+                  colors = [[0.6, 1.0, 0.5, vStart],
+                            [0.6, 1.0, 0.5, vEnd],
+                            [0.8, 1.0, 0.75, vStart],
+                            [0.8, 1.0, 0.75, vEnd],
+                            [0.2, 1.0, 0.0, vStart*0.6],
+                            [0.2, 1.0, 0.0, vEnd*0.6],
+                            [0.2, 1.0, 0.0, 0.0]]
+                #stump: apparently we don't necessarily get the notes in strict chronological order.
+                # This lane-connecting code would work nicely if not for that, but under these conditions it tends to make a big mess.
+                # (Seriously, uncomment it and see for yourself.)
+                #if event.lyric is None and lastNoteEnd is not None:
+                #  self.drawNoteLane(colors, lastNoteEnd[0], xStartPos, lastNoteEnd[1], baseY)
+                self.drawNoteLane(colors, xStartPos, xEndPos, baseY, baseY)
+                lastNoteEnd = (xEndPos, baseY)
           elif self.lyricMode == 1 or self.lyricMode == 2: #line-by-line
             if time <= pos:
               if time + event.length > pos:
