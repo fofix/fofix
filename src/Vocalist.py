@@ -449,9 +449,9 @@ class Vocalist:
                 #font.render("X", (xStartPos, .057-(.05*val)+addYText), scale = self.lyricScale)
                 #stump: note lanes with RB2-like glow
                 if players == 1:
-                  baseY = -.117-(.05*val)+addY
+                  baseY = -.1-(.05*val)+addY
                 else:
-                  baseY = .057-(.05*val)+addY
+                  baseY = .1-(.05*val)+addY
                 if self.activePhrase.star:
                   colors = [[1.0, 1.0, 0.5, vStart],
                             [1.0, 1.0, 0.5, vEnd],
