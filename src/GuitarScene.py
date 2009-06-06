@@ -1250,7 +1250,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 #  if time > self.song.breMarkerTime:    
                 #    thisIsABre = True
                 #else:   #MFH - guitar or bass; no BRE text event marker required
-                if not guitar.isDrum:
+                if not instrument.isDrum:
                   thisIsABre = True
               
                 if thisIsABre:  #MFH - only deal with guitar/bass BRE notes here.  Drum notes will be handled in realtime as they are encountered under a fill or BRE.
