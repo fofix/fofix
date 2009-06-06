@@ -6005,18 +6005,25 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.engine.drawImage(self.lyricSheet, scale = (self.lyricSheetScaleFactor,-self.lyricSheetScaleFactor), coord = (w/2, h*0.935))
         #the timing line on this lyric sheet image is approx. 1/4 over from the left
       #MFH - also render the scrolling lyrics & sections before changing viewports:
-      if self.firstGuitar is not None:
-        minPos = pos - ((self.instruments[0].currentPeriod * self.instruments[0].beatsPerBoard) / 2)
-        maxPos = pos + ((self.instruments[0].currentPeriod * self.instruments[0].beatsPerBoard) * 1.5)
-        eventWindow = (maxPos - minPos)
-        #lyricSlop = ( self.instruments[0].currentPeriod / (maxPos - minPos) ) / 4
-        lyricSlop = ( self.instruments[0].currentPeriod / ((maxPos - minPos)/2) ) / 2
-      else:
-        minPos = pos - (self.instruments[0].currentPeriod * 2)
-        maxPos = pos + (self.instruments[0].currentPeriod * 7)
-        eventWindow = (maxPos - minPos)
-        #lyricSlop = ( self.instruments[0].currentPeriod / (maxPos - minPos) ) / 4
-        lyricSlop = ( self.instruments[0].currentPeriod / ((maxPos - minPos)/2) ) / 2
+
+      notvocal = []
+      for n, instrument in enumerate(self.instruments):
+        if instrument.isVocal == False:
+          notvocal.append(instrument)
+
+      if notvocal != []:        
+        if self.firstGuitar is not None:
+          minPos = pos - ((notvocal[0].currentPeriod * notvocal[0].beatsPerBoard) / 2)
+          maxPos = pos + ((notvocal[0].currentPeriod * notvocal[0].beatsPerBoard) * 1.5)
+          eventWindow = (maxPos - minPos)
+          #lyricSlop = ( self.instruments[0].currentPeriod / (maxPos - minPos) ) / 4
+          lyricSlop = ( notvocal[0].currentPeriod / ((maxPos - minPos)/2) ) / 2
+        else:
+          minPos = pos - (notvocal[0].currentPeriod * 2)
+          maxPos = pos + (notvocal[0].currentPeriod * 7)
+          eventWindow = (maxPos - minPos)
+          #lyricSlop = ( self.instruments[0].currentPeriod / (maxPos - minPos) ) / 4
+          lyricSlop = ( notvocal[0].currentPeriod / ((maxPos - minPos)/2) ) / 2
 
       if (self.readTextAndLyricEvents == 2 or (self.readTextAndLyricEvents == 1 and self.theme == 2)) and (not self.pause and not self.failed and not self.ending):
   
