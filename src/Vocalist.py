@@ -577,10 +577,10 @@ class Vocalist:
             v = 1
           self.engine.drawImage(self.vocalBar, scale = (.5,-.5), coord = (w*xPos,tappos), color = (1,1,1,v))
     
-    if self.showText > 0:
-      self.engine.drawImage(self.vocalText, scale = (.5, -.5/6.0), coord = (w*.27,h*(.9-addY)), rect = (0, 1, self.scoreBox[0], self.scoreBox[1]))
-    else:
-      self.engine.drawImage(self.vocalMeter, scale = (self.vocalMeterScale,-self.vocalMeterScale), coord = (w*0.25,h*(0.8-addY)))
+      if self.showText > 0:
+        self.engine.drawImage(self.vocalText, scale = (.5, -.5/6.0), coord = (w*.25,h*(.8-addY)), rect = (0, 1, self.scoreBox[0], self.scoreBox[1]))
+      else:
+        self.engine.drawImage(self.vocalMeter, scale = (self.vocalMeterScale,-self.vocalMeterScale), coord = (w*0.25,h*(0.8-addY)))
       self.engine.drawImage(self.vocalMult, scale = (.5,-.5/8.0), coord = (w*0.28,h*(0.8-addY)), rect = (0, 1, float(self.scoreMultiplier-1)/9.0, float(self.scoreMultiplier)/9.0))
     
       if self.phraseNoteTime > 0 and not self.tapPhraseActive:
