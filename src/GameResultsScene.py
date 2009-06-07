@@ -541,9 +541,12 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       }
       scores     = {}
       scores_ext = {}
-      upname = self.playerList[i].name
-      scoreHash = hashlib.sha1("%d%d%d%s" % (player.getDifficultyInt(), self.finalScore[i], self.scoring[i].stars, self.playerList[i].upname)).hexdigest()
-      scores[player.getDifficultyInt()]     = [(self.finalScore[i], self.scoring[i].stars, self.playerList[i].upname, scoreHash)]
+      upname = self.playerList[i].upname
+      # evilynux - the str() around the upname is not there for fun,
+      #            it's used to convert the unicode string so the server 
+      #            scripts accept it. 
+      scoreHash = hashlib.sha1("%d%d%d%s" % (player.getDifficultyInt(), self.finalScore[i], self.scoring[i].stars, str(upname))).hexdigest()
+      scores[player.getDifficultyInt()]     = [(self.finalScore[i], self.scoring[i].stars, str(upname), scoreHash)]
       scores_ext[player.getDifficultyInt()] = [(scoreHash, self.scoring[i].stars) + scoreExt]
       d["scores"] = binascii.hexlify(Cerealizer.dumps(scores))
       d["scores_ext"] = binascii.hexlify(Cerealizer.dumps(scores_ext))
