@@ -48,6 +48,7 @@ class CerealizerTest(unittest.TestCase):
     self.assertEqual(result, expected)
 
   def testHash(self):
+    # For the record, the worldchart rejects those hashes:
     scoresHash = "63657265616c310a330a646963740a6c6973740a7475706c650a340a"\
                  "6936333834360a69350a7531310a50617363616c4769617264733430"\
                  "0a343839666538656632343239646564373637363835373930303936"\
@@ -55,6 +56,14 @@ class CerealizerTest(unittest.TestCase):
     scores = Cerealizer.loads(binascii.unhexlify(scoresHash))
     #print scores[1][0][2]
     self.assertEqual(scores[1][0][2], "PascalGiard")
+
+    #scoreExtHash = "63657265616c310a330a646963740a6c6973740a7475706c650a"\
+    #               "390a7334300a3438396665386566323432396465643736373638"\
+    #               "353739303039363132353163313630366237386369350a693236"\
+    #               "310a693237300a6937320a7331310a466f4669582d332e313030"\
+    #               "69300a73300a6936333834360a310a72310a69310a310a72320a"\
+    #               "72300a"
+    #songHash = "6551c0f99efddfd3c5c7ef2d407c81b8e3001a43"
 
 if __name__ == "__main__":
   unittest.main()
