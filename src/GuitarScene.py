@@ -6207,7 +6207,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           #============Blazingamer's GHII Rock Meter=============#
   
           if self.rmtype == 0 and i is not None:   #GH2 theme
-           if not self.rockOff == None: #note: this is the last required image to be loaded, and is cleared on freeResources
+            if not self.rockOff == None: #note: this is the last required image to be loaded, and is cleared on freeResources
               w = self.wPlayer[i]
               h = self.hPlayer[i]
               wBak = w
