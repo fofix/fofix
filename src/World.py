@@ -25,6 +25,7 @@ from Session import MessageHandler, Message
 import Network
 import SceneFactory
 import Config
+from Scene import SuppressScene
 
 STARTUP_SCENE = "SongChoosingScene"
 
@@ -179,7 +180,10 @@ class WorldServer(World):
     self.leaveScene(scene, player)
 
   def handleSceneCreated(self, sender, id, owner, name, args):
-    scene = SceneFactory.create(engine = self.engine, name = name, owner = owner, server = self.server, **args)
+    try:
+      scene = SceneFactory.create(engine = self.engine, name = name, owner = owner, server = self.server, **args)
+    except SuppressScene:
+      return  #stump
     self.broker.addMessageHandler(scene)
     self.engine.addTask(scene)
     self.scenes.append(scene)
@@ -246,7 +250,10 @@ class WorldClient(World):
     return self.players[1:len(self.players)]
         
   def handleSceneCreated(self, sender, id, owner, name, args):
-    scene = SceneFactory.create(engine = self.engine, name = name, owner = owner, session = self.session, **args)
+    try:
+      scene = SceneFactory.create(engine = self.engine, name = name, owner = owner, session = self.session, **args)
+    except SuppressScene:
+      return  #stump
     self.broker.addMessageHandler(scene)
     self.scenes.append(scene)
     self.objects[id] = scene

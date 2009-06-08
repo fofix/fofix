@@ -30,7 +30,7 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-from Scene import SceneServer, SceneClient
+from Scene import SceneServer, SceneClient, SuppressScene
 from Song import Note, Tempo, TextEvent, PictureEvent, loadSong, Bars, VocalNote, VocalPhrase
 from Menu import Menu
 
@@ -90,7 +90,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
     if self.engine.createdGuitarScene:  #MFH - dual / triple loading cycle fix
       Log.warn("Extra GuitarSceneClient was instantiated, but detected and shut down.  Cause unknown.")
-      return
+      raise SuppressScene  #stump
     else:
       self.engine.createdGuitarScene = True
 
