@@ -172,6 +172,7 @@ Config.define("controller", "key_star",      str, "K_PAGEDOWN", text = _("StarPo
 Config.define("controller", "key_kill",      str, "K_PAGEUP",   text = _("Whammy"))
 Config.define("controller", "key_start",     str, "K_SPACE",    text = _("Start"))
 Config.define("controller", "two_chord_max", int, 0,            text = _("Two-Chord Max"),   options = {0: _("Off"), 1: _("On")})
+Config.define("controller", "type",          int, 0,            text = _("Controller Type"), options = {0: _("Standard Guitar"), 1: _("Solo Shift Guitar"), 2: _("Drum Set (4-Drum)"), 4: _("Analog Slide Guitar"), 5: _("Microphone")}) #, 3: _("Drum Set (3-Drum 2-Cymbal)")
 Config.define("controller", "analog_sp",     int, 0,            text = _("Analog SP"),       options = {0: _("Disabled"), 1: _("Enabled")})
 Config.define("controller", "analog_sp_threshold",   int, 60,   text = _("Analog SP Threshold"), options = dict([(n, n) for n in range(10, 101, 10)]))
 Config.define("controller", "analog_sp_sensitivity", int, 4,    text = _("Analog SP Sensitivity"), options = dict([(n, n+1) for n in range(10)]))
@@ -182,12 +183,6 @@ Config.define("controller", "analog_fx",     int, 0,            text = _("Sound 
 Config.define("controller", "mic_device",    int, -1,           text = _("Microphone Device"), options = Microphone.getAvailableMics()) #stump
 Config.define("controller", "mic_tap_sensitivity", int, 5,      text = _("Tap Sensitivity"), options=dict((n, n) for n in range(1, 21))) #stump
 Config.define("controller", "mic_passthrough_volume", float, 0.0, text = _("Passthrough Volume"), options=dict((n / 100.0, n) for n in range(101))) #stump
-
-def defineControllerTypes():  #stump: so this can be deferred until we have a working config file
-  type_dict = {0: _("Standard Guitar"), 1: _("Solo Shift Guitar"), 2: _("Drum Set (4-Drum)"), 4: _("Analog Slide Guitar")} #, 3: _("Drum Set (3-Drum 2-Cymbal)")
-  if Config.get("game", "mic_features_enabled"):
-    type_dict[5] = _("Microphone")
-  Config.define("controller", "type", int, 0, text = _("Controller Type"), options = type_dict)
 
 Config.define("player", "name",          str,  "")
 Config.define("player", "difficulty",    int,  Song.MED_DIF)

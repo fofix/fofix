@@ -5255,7 +5255,7 @@ def testKeys(engine, control, prompt = _("Play with the keys and press Escape wh
   @param prompt:  Prompt shown to the user
   """
   if engine.input.controls.type[control] == 5 and not Microphone.supported:
-    showMessage(engine, 'At least one required module (pyaudio or pypitch) is missing.')
+    showMessage(engine, 'A required module for microphone support is missing.')
   else:
     d = KeyTester(engine, control, prompt = prompt)
     _runDialog(engine, d)
