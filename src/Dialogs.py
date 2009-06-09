@@ -1275,7 +1275,7 @@ class SongChooser(Layer, KeyListener):
           self.accepted = True
 
         elif isinstance(self.selectedItem, Song.RandomSongInfo):
-          while True:
+          while 1:
             self.selectedItem = self.items[random.randint(0,len(self.items)-1)]
             if isinstance(self.selectedItem, Song.SongInfo) and not self.selectedItem.getLocked():
               break
@@ -1289,7 +1289,7 @@ class SongChooser(Layer, KeyListener):
           self.accepted = True
         elif isinstance(self.selectedItem, Song.CareerResetterInfo):  #MFH - here's where to actually reset careers
           self.engine.view.popLayer(self)
-          while True:
+          while 1:
             isYouSure = chooseItem(self.engine, [_("No"),_("Yes")], _("Are you sure you want to reset this entire career?") )
             if isYouSure:
               if isYouSure == _("Yes"):

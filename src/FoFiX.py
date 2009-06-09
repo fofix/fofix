@@ -111,7 +111,7 @@ def main():
     if opt in ["--nbrplayers", "-n"]:
       nbrplayers = int(arg)
       
-  while True:
+  while 1:
     if configFile != None:
       if configFile.lower() == "reset":
         fileName = os.path.join(Resource.getWritableResourcePath(), Version.appName() + ".ini")

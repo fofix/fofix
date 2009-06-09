@@ -2708,7 +2708,7 @@ class Song(object):
     h = hashlib.sha1()
     f = open(self.noteFileName, "rb")
     bs = 1024
-    while True:
+    while 1:
       data = f.read(bs)
       if not data: break
       h.update(data)

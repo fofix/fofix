@@ -163,7 +163,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
         self.engine.cmdPlay = 2
 
       if not self.songName:
-        while True:
+        while 1:
           self.mode = 1
           self.libraryName, self.songName = \
             Dialogs.chooseSong(self.engine, \
@@ -213,7 +213,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
             
           slowDownDivisor = Config.get("audio",  "speed_factor")
            
-          while True: #new nesting for Practice Mode - section / start time selection
+          while 1: #new nesting for Practice Mode - section / start time selection
             if self.player.practiceMode:
               values, options = Config.getOptions("audio", "speed_factor")
               if self.subMenuPosTuple:
@@ -292,7 +292,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
             
             for i, player in enumerate(self.playerList):
               
-              while True: #new nesting for Practice Mode selection
+              while 1: #new nesting for Practice Mode selection
                 selectedPlayer = False
                 choose = []
                 if player.controlType == 2 or player.controlType == 3:
@@ -317,7 +317,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
                   if not player.practiceMode:
                     escaped = True
                   break;
-                while True:
+                while 1:
                   if len(info.partDifficulties[p]) > 1:
 
                     if self.subMenuPosTuple:
