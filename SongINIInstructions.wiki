@@ -9,10 +9,10 @@
 ||icon = rb2||Sets icon to use for song title. (Examples- rb1,rb2,rbdlc,rbtpk,gh1,gh2,gh2dlc,gh3,gh3dlc,gh80s,gha,ghm,ph1,ph2,ph3,ph4,phm)||
 ||name = Hold On Loosely||Indicates that the song name is "Hold On Loosely"||
 ||tags = cover||Indicates that is not an original master. So it will show "As Made famous by" instead of "As performed by" at the beginning of the song.||
-||diff_guitar = (0-5)||Set the Difficulty for Guitar. (Rock Band 2 Setlists)||
-||diff_drums = (0-5)||Set the Difficulty for Drums. (Rock Band 2 Setlists)||
-||diff_bass = (0-5)||Set the Difficulty for Bass. (Rock Band 2 Setlists)||
-||diff_band = (0-5)||Set the Difficulty for full Band. (Rock Band 2 Setlists)||
+||diff_guitar = (0-6)||Set the Difficulty for Guitar. (Rock Band 2 Setlists)||
+||diff_drums = (0-6)||Set the Difficulty for Drums. (Rock Band 2 Setlists)||
+||diff_bass = (0-6)||Set the Difficulty for Bass. (Rock Band 2 Setlists)||
+||diff_band = (0-6)||Set the Difficulty for full Band. (Rock Band 2 Setlists)||
 ||unlock_id = gh80_3||For career mode, indicates the Tier it belongs to.||
 ||unlock_require = gh80_2enc||For career mode, indicates the unlock_id of the songs you have to complete to be able to play this song.||
 ||unlock_text = Finish Tier 2 Encore To Unlock||This is a text that is displayed when the song is locked and you try to select it.||
