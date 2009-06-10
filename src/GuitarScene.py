@@ -4193,7 +4193,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.endPick(i)
 
         
-        if guitar.drumFillsActive:
+        if guitar.drumFillsActive > 0:
           if self.muteDrumFill:
             self.song.setInstrumentVolume(0.0, self.playerList[i].part)
           
