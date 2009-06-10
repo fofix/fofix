@@ -1192,10 +1192,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #MFH - go through, locate, and mark the last drum note.  When this is encountered, drum scoring should be turned off.
       lastDrumNoteTime = 0.0
       lastDrumNoteEvent = None
-      try:
-        startPos = self.playerList[i].startPos[0]
-      except IndexError:
-        startPos = 0.0
       for time, event in self.song.track[i].getAllEvents():
         if isinstance(event, Note) or isinstance(event, VocalPhrase):
           if time >= lastDrumNoteTime:
@@ -1205,12 +1201,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.lastDrumNoteTime = lastDrumNoteTime
         Log.debug("Last drum note located at time = " + str(self.lastDrumNoteTime) )
         #self.lastDrumNoteEvent = lastDrumNoteEvent
-
-        self.scoring[i].totalStreakNotes = len([1 for time, event in self.song.track[i].getEvents(startPos,self.lastEvent) if isinstance(event, Note)])
+        self.scoring[i].totalStreakNotes = len([1 for time, event in self.song.track[i].getEvents(self.playerList[i].startPos,self.lastEvent) if isinstance(event, Note)])
       elif instrument.isVocal:
-        self.scoring[i].totalStreakNotes = len([1 for time, event in self.song.track[i].getEvents(startPos,self.lastEvent) if isinstance(event, VocalPhrase)])
+        self.scoring[i].totalStreakNotes = len([1 for time, event in self.song.track[i].getEvents(self.playerList[i].startPos,self.lastEvent) if isinstance(event, VocalPhrase)])
       else:
-        self.scoring[i].totalStreakNotes = len(set(time for time, event in self.song.track[i].getEvents(startPos,self.lastEvent) if isinstance(event, Note)))
+        self.scoring[i].totalStreakNotes = len(set(time for time, event in self.song.track[i].getEvents(self.playerList[i].startPos,self.lastEvent) if isinstance(event, Note)))
         #self.song.track[i].allEvents[self.song.track[i].maxIndex][0]
         #self.scoring[i].totalStreakNotes = len(set(time for time, event in self.song.track[i].getAllEvents() if isinstance(event, Note)))
       self.scoring[i].lastNoteEvent = lastDrumNoteEvent
@@ -4467,10 +4462,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             if instrument.isVocal:
               instrument.mic.start()
           if self.playerList[0].practiceMode and self.engine.audioSpeedFactor == 1:
-            self.playerList[0].startPos[0] -= self.song.period*4
-            if self.playerList[0].startPos[0] < 0.0:
-              self.playerList[0].startPos[0] = 0.0
-            self.song.play(start = self.playerList[0].startPos[0])
+            self.playerList[0].startPos -= self.song.period*4
+            if self.playerList[0].startPos < 0.0:
+              self.playerList[0].startPos = 0.0
+            self.song.play(start = self.playerList[0].startPos)
           else:
             self.song.play()
       
