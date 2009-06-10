@@ -2,7 +2,8 @@
 # -*- coding: iso-8859-1 -*-                                        #
 #                                                                   #
 # Frets on Fire                                                     #
-# Copyright (C) 2009 Team FoFiX                                     ##               2009 Blazingamer(n_hydock@comcast.net)              #
+# Copyright (C) 2009 Team FoFiX                                     #
+#               2009 Blazingamer(n_hydock@comcast.net)              #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -79,14 +80,43 @@ class Neck:
     color = (1,1,1)
     self.vis = 1
 
+    # evilynux - Neck color
     self.board_col  = array([[color[0],color[1],color[2], 0],
-                         [color[0],color[1],color[2], 0],
-                         [color[0],color[1],color[2], self.vis],
-                         [color[0],color[1],color[2], self.vis],
-                         [color[0],color[1],color[2], self.vis],
-                         [color[0],color[1],color[2], self.vis],
-                         [color[0],color[1],color[2], 0],
-                         [color[0],color[1],color[2], 0]], dtype=float32)
+                             [color[0],color[1],color[2], 0],
+                             [color[0],color[1],color[2], self.vis],
+                             [color[0],color[1],color[2], self.vis],
+                             [color[0],color[1],color[2], self.vis],
+                             [color[0],color[1],color[2], self.vis],
+                             [color[0],color[1],color[2], 0],
+                             [color[0],color[1],color[2], 0]], dtype=float32)
+
+    w            = self.boardWidth
+    l            = self.boardLength
+
+    # evilynux - Neck vertices
+    self.board_vtx = array([[-w / 2, 0, -2],
+                            [w / 2, 0, -2],
+                            [-w/ 2, 0, -1],
+                            [w / 2, 0, -1],
+                            [-w / 2, 0, l * .7],
+                            [w / 2, 0, l * .7],
+                            [-w / 2, 0, l],
+                            [w / 2, 0, l]], dtype=float32)
+    # evilynux - Sidebars vertices
+    w += 0.15
+    self.sidebars_vtx = array([[-w / 2, 0, -2],
+                               [w / 2, 0, -2],
+                               [-w/ 2, 0, -1],
+                               [w / 2, 0, -1],
+                               [-w / 2, 0, l * .7],
+                               [w / 2, 0, l * .7],
+                               [-w / 2, 0, l],
+                               [w / 2, 0, l]], dtype=float32)
+
+    # evilynux - Just in case the type has became double, convert to float32
+    self.board_col = self.board_col.astype(float32)
+    self.board_vtx = self.board_vtx.astype(float32)
+    self.sidebars_vtx = self.sidebars_vtx.astype(float32)
 
     self.neck = str(playerObj.neck)
     playerObj = None
@@ -530,19 +560,9 @@ class Neck:
       color = (1,1,1)
 
     v            = visibility
-    w            = self.boardWidth
     l            = self.boardLength
 
     glEnable(GL_TEXTURE_2D)
-
-    boardVtx       = array([[-w / 2, 0, -2],
-                            [w / 2, 0, -2],
-                            [-w/ 2, 0, -1],
-                            [w / 2, 0, -1],
-                            [-w / 2, 0, l * .7],
-                            [w / 2, 0, l * .7],
-                            [-w / 2, 0, l],
-                            [w / 2, 0, l]], dtype=float32)
 
     board_tex  = array([[0.0, project(offset - 2 * self.beatsPerUnit)],
                          [1.0, project(offset - 2 * self.beatsPerUnit)],
@@ -559,10 +579,10 @@ class Neck:
     glEnableClientState(GL_VERTEX_ARRAY)
     glEnableClientState(GL_COLOR_ARRAY)
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glVertexPointerf(boardVtx)
+    glVertexPointerf(self.board_vtx)
     glColorPointerf(self.board_col)
     glTexCoordPointerf(board_tex)
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, boardVtx.shape[0])
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, self.board_vtx.shape[0])
     glDisableClientState(GL_VERTEX_ARRAY)
     glDisableClientState(GL_COLOR_ARRAY)
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -793,16 +813,6 @@ class Neck:
                          [0.0, project(offset + l * self.beatsPerUnit)],
                          [1.0, project(offset + l * self.beatsPerUnit)]], dtype=float32)
 
-    boardVtx       = array([[-w / 2, 0, -2],
-                            [w / 2, 0, -2],
-                            [-w / 2, 0, -1],
-                            [w / 2, 0, -1],
-                            [-w / 2, 0, l * .7],
-                            [w / 2, 0, l * .7],
-                            [-w / 2, 0, l],
-                            [w / 2, 0, l]], dtype=float32)
-
-
     glEnable(GL_TEXTURE_2D)
     if self.theme == 2 and self.starPowerActive and self.oSideBars:
       self.oSideBars.texture.bind()
@@ -812,10 +822,10 @@ class Neck:
     glEnableClientState(GL_VERTEX_ARRAY)
     glEnableClientState(GL_COLOR_ARRAY)
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glVertexPointerf(boardVtx)
+    glVertexPointerf(self.sidebars_vtx)
     glColorPointerf(self.board_col)
     glTexCoordPointerf(board_tex)
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, boardVtx.shape[0])
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, self.sidebars_vtx.shape[0])
     glDisableClientState(GL_VERTEX_ARRAY)
     glDisableClientState(GL_COLOR_ARRAY)
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
