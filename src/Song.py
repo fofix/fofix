@@ -620,9 +620,10 @@ class SongInfo(object):
       self._set("scores_vocal", self.getObfuscatedScores(part = parts[VOCAL_PART]))
       self._set("scores_vocal_ext", self.getObfuscatedScoresExt(part = parts[VOCAL_PART]))
     
-    f = open(self.fileName, "w")
-    self.info.write(f)
-    f.close()
+    if os.access(os.path.dirname(self.fileName), os.W_OK) == True:
+      f = open(self.fileName, "w")
+      self.info.write(f)
+      f.close()
     
   def _get(self, attr, type = None, default = ""):
     try:
@@ -1112,9 +1113,10 @@ class LibraryInfo(object):
     self.info.set("library", attr, value)
     
   def save(self):
-    f = open(self.fileName, "w")
-    self.info.write(f)
-    f.close()
+    if os.access(os.path.dirname(self.fileName), os.W_OK) == True:
+      f = open(self.fileName, "w")
+      self.info.write(f)
+      f.close()
     
   def _get(self, attr, type = None, default = ""):
     try:
