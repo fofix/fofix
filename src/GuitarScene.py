@@ -3769,7 +3769,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   def rockmeterDecrease(self, playerNum, vScore = 0):
     i = playerNum
     if self.instruments[i].isVocal:
-      self.rock[i] -= 500 * (3 - vScore)
+      rockMinusAmount = 500 * (3 - vScore)
+      self.rock[i] -= rockMinusAmount
+      if (not self.coOpRB) and (self.rock[i]/self.rockMax <= 0.667) and ((self.rock[i]+rockMinusAmount)/self.rockMax > 0.667): #akedrou
+        self.playersInGreen -= 1
       return
     rockMinusAmount = 0 #akedrou - simplify the various incarnations of minusRock.
     if self.instruments[i].isDrum: 
@@ -3867,7 +3870,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   def rockmeterIncrease(self, playerNum, vScore = 0):
     i = playerNum
     if self.instruments[i].isVocal:
-      self.rock[i] += 500 + (500 * (vScore-2))
+      rockPlusAmt = 500 + (500 * (vScore-2))
+      self.rock[i] += rockPlusAmt
+      if self.rock[i] >= self.rockMax:
+        self.rock[i] = self.rockMax
+      if not self.coOpRB:
+        if (self.rock[i]/self.rockMax > 0.667) and ((self.rock[i]-rockPlusAmt)/self.rockMax <= 0.667):
+          self.playersInGreen += 1
+          if self.engine.data.cheerSoundFound > 0: #haven't decided whether or not to cut crowdSound with crowdsEnabled = 0, but would have to do it at solos too...
+            self.engine.data.crowdSound.play()
       return
     if self.instruments[i].isDrum: 
       self.drumStart = True
@@ -4008,17 +4019,21 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if instrument.isVocal:
           instrument.requiredNote = instrument.getRequiredNote(pos, self.song)
           instrument.run(ticks, pos)
-          score = instrument.getScoreChange()
-          if score:
-            if score == 0:
-              self.rockmeterIncrease(i, 0)
-            elif score < 5:
-              self.rockmeterIncrease(i, score)
-              self.scoring[i].score += score * self.scoring[i].baseScore * instrument.scoreMultiplier * self.multi[i]
-
-
-            self.rock[i] = min(self.rock[i], self.rockMax)
-            self.rock[i] = max(self.rock[i], 0)
+          scoreThresh = instrument.getScoreChange()
+          if scoreThresh is not None:
+            if scoreThresh > 3:
+              self.rockmeterIncrease(i, scoreThresh)
+              self.scoring[i].score += scoreThresh * self.scoring[i].baseScore * instrument.scoreMultiplier * self.multi[i]
+              self.scoring[i].notesHit += 1
+              self.scoring[i].streak += 1
+            elif scoreThresh == 3:
+              self.scoring[i].score += scoreThresh * self.scoring[i].baseScore * instrument.scoreMultiplier * self.multi[i]
+              self.scoring[i].streak = 0 
+            elif scoreThresh < 3:
+              self.rockmeterDecrease(i, scoreThresh)
+              self.scoring[i].streak = 0
+            self.scoring[i].updateAvMult()
+            self.scoring[i].getStarScores()
           continue
         self.stage.run(pos, instrument.currentPeriod)
         playerNum = i
@@ -9277,7 +9292,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   
                     #Show Jurgen played Spikehead777
         self.engine.view.setViewport(1,0)
+        gN = 0
         for i in range(self.numOfPlayers):
+          if self.instruments[i].isVocal:
+            continue
           if self.jurgPlayer[i] == True:
             if self.jurg[i]:
               if self.customBot[i]:
@@ -9298,14 +9316,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             jurgX = float(self.jurgenText[0])
             if jurgX < 0:
               jurgX = 0
-            jurgX = (jurgX+i)/self.numOfPlayers
-            if jurgX > ((i+1)/self.numOfPlayers) - w:
-              jurgX = ((i+1)/self.numOfPlayers) - w
+            jurgX = (jurgX+gN)/self.numberOfGuitars
+            if jurgX > ((gN+1)/self.numberOfGuitars) - w:
+              jurgX = ((gN+1)/self.numberOfGuitars) - w
             jurgY = float(self.jurgenText[1])
             if jurgY > .75 - h:
               jurgY = .75 - h
             if not self.failed:
               bigFont.render(text,  (jurgX, jurgY), scale = jurgScale)#MFH - y was 0.4 - more positioning weirdness.
+          gN += 1
 
           #End Jurgen Code
         #MFH - Get Ready to Rock & countdown, song info during countdown, and song time left display on top of everything else

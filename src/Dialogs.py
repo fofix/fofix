@@ -510,7 +510,7 @@ class MessageScreen(Layer, KeyListener):
 
   def keyPressed(self, key, unicode):
     c = self.engine.input.controls.getMapping(key)
-    if c in Player.key1s + Player.key2s + Player.drum1s + Player.drum4s + Player.cancels or key == pygame.K_RETURN or key == pygame.K_ESCAPE:
+    if c in (Player.menuYes + Player.menuNo) or key in [pygame.K_RETURN, pygame.K_ESCAPE, pygame.K_LCTRL, pygame.K_RCTRL]:
       self.engine.view.popLayer(self)
     return True
     

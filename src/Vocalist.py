@@ -282,7 +282,7 @@ class Vocalist:
       self.lastScore = -1
       return score
     else:
-      return False
+      return None
   
   def getCurrentNote(self, pos):
     if not self.mic.mic_started:
