@@ -214,6 +214,7 @@ Config.define("game",  "cheer_loop_delay",        int,   550,   text = _("Cheer 
 Config.define("game", "miss_pauses_anim",       int, 1,     text = _("Miss Pauses Anim"), options = {0: _("Off"), 1: _("On")}) #MFH
 Config.define("game", "song_hopo_freq",       int, 1,     text = _("Song HO/PO Freq"), options = {0: _("Off"), 1: _("Auto")}) #MFH
 #Config.define("game",   "mute_sustain_releases",          bool, False,  text = _("Mute sustain releases"), options = {False: _("No"), True: _("Yes")})
+Config.define("game",   "mute_drum_fill",           int, 1,    text = _("Mute Drum Track During Fills"), options = {0: _("No"), 1:_("Yes")})
 Config.define("game",   "sustain_muting",          int, 1,    text = _("Sustain Muting"), options = {0: _("Off"), 1: _("Ultra Wide"), 2: _("Wide"), 3: _("Standard"), 4: _("Tight")})
 Config.define("game",   "solo_frame",          int, 1,    text = _("Show Solo Frame"), options = {0: _("Off"), 1: _("Auto")})
 Config.define("game",   "starpower_mode",          int, 2,    text = _("SP Mode"), options = {0: _("Off"), 1: _("FoF"), 2: _("Auto MIDI")})

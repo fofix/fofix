@@ -918,6 +918,7 @@ class SettingsMenu(Menu.Menu):
     self.audioSettings = [
       (_("Volume Settings"),    self.volumeSettingsMenu),
       ConfigChoice(engine, engine.config, "game", "sustain_muting", autoApply = True),   #myfingershurt
+      ConfigChoice(engine, engine.config, "game", "mute_drum_fill", autoApply = True),
       ConfigChoice(engine, engine.config, "audio", "mute_last_second", autoApply = True), #MFH
       ConfigChoice(engine, engine.config, "game", "bass_kick_sound", autoApply = True),   #myfingershurt
       ConfigChoice(engine, engine.config, "game", "star_claps", autoApply = True),      #myfingershurt

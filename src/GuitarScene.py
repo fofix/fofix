@@ -685,6 +685,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.fontShadowing = self.engine.config.get("game", "in_game_font_shadowing") #MFH
     self.muteLastSecond = self.engine.config.get("audio", "mute_last_second") #MFH
     self.mutedLastSecondYet = False
+    self.muteDrumFill = self.engine.config.get("game", "mute_drum_fill") #MFH
     self.starScoreUpdates = self.engine.config.get("performance", "star_score_updates") #MFH
     self.currentlyAnimating = True
     self.missPausesAnim = self.engine.config.get("game", "miss_pauses_anim") #MFH
@@ -4176,6 +4177,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           # done playing the current notes
           self.endPick(i)
 
+        
+        if guitar.drumFillsActive:
+          if self.muteDrumFill:
+            self.song.setInstrumentVolume(0.0, self.playerList[i].part)
+          
         #MFH - ensure this missed notes check doesn't fail you during a freestyle section
         if guitar.freestyleActive or guitar.drumFillsActive:  
           missedNotes = guitar.getMissedNotesMFH(self.song, pos + guitar.lateMargin*2, catchup = True)  #MFH - get all notes in the freestyle section.
