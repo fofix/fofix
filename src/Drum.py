@@ -2477,10 +2477,10 @@ class Drum:
 
   
   def hitNote(self, time, note):
-     self.pickStartPos = max(self.pickStartPos, time)
-     self.playedNotes = [(time, note)]
-     note.played       = True
-     return True  
+    self.pickStartPos = max(self.pickStartPos, time)
+    self.playedNotes = [(time, note)]
+    note.played       = True
+    return True  
 
   def areNotesTappable(self, notes):
     if not notes:
