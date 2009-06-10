@@ -110,37 +110,37 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
       self.playerList[num].difficulty = self.songSettings[3].values[self.songSettings[3].valueIndex]
          
   def startGame(self, value = "", queueCounter = 0):
-   #just noting here that this is not used (and would not work were it to be). I feel like this here scene could use some work...
-   if not self.gameStarted:
-     self.gameStarted = True
-     if not self.player.difficulty in self.info.difficulties:
+    #just noting here that this is not used (and would not work were it to be). I feel like this here scene could use some work...
+    if not self.gameStarted:
+      self.gameStarted = True
+      if not self.player.difficulty in self.info.difficulties:
         self.player.difficulty = self.info.difficulties[0]
-     if not self.player.part in self.info.parts:
+      if not self.player.part in self.info.parts:
         self.player.part = self.info.parts[0]
-     if not self.player2.difficulty in self.info.difficulties:
+      if not self.player2.difficulty in self.info.difficulties:
         self.player2.difficulty = self.info.difficulties[0]
-     if not self.player2.part in self.info.parts:
+      if not self.player2.part in self.info.parts:
         self.player2.part = self.info.parts[0]
-     players = Config.get("game", "selected_players")
-     if self.dialog:
-       self.dialog.close()
-     self.session.world.deleteScene(self)
-     self.freeResources()       
-     self.session.world.createScene("GuitarScene", songName = self.songName, Players = players, songQueue = self.songQueue, queueCounter = queueCounter)
+      players = Config.get("game", "selected_players")
+      if self.dialog:
+        self.dialog.close()
+      self.session.world.deleteScene(self)
+      self.freeResources()       
+      self.session.world.createScene("GuitarScene", songName = self.songName, Players = players, songQueue = self.songQueue, queueCounter = queueCounter)
 
   def startQueue(self):
-     #obviously a fair amount of work to be done on this anyway... But note that startGame will not work.
-     firstSong = self.songQueue.nextSong(0)
-     Config.set("game", "selected_song", firstSong[0])
-     Config.set("game", "selected_library", firstSong[1])
-     Config.set("game", "selected_players", firstSong[2])
-     self.player.difficulty = firstSong[3]
-     self.player2.difficulty =  firstSong[4]
-     self.player.part = firstSong[5]
-     self.player2.part = firstSong[6]
-     self.info = Song.loadSongInfo(self.engine, firstSong[0])
-     self.songName = firstSong[0]
-     self.startGame(queueCounter =  1)
+    #obviously a fair amount of work to be done on this anyway... But note that startGame will not work.
+    firstSong = self.songQueue.nextSong(0)
+    Config.set("game", "selected_song", firstSong[0])
+    Config.set("game", "selected_library", firstSong[1])
+    Config.set("game", "selected_players", firstSong[2])
+    self.player.difficulty = firstSong[3]
+    self.player2.difficulty =  firstSong[4]
+    self.player.part = firstSong[5]
+    self.player2.part = firstSong[6]
+    self.info = Song.loadSongInfo(self.engine, firstSong[0])
+    self.songName = firstSong[0]
+    self.startGame(queueCounter =  1)
 
   def freeResources(self):
     self.songs = None
