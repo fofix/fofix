@@ -4193,8 +4193,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.endPick(i)
 
         
-        if guitar.drumFillsActive > 0:
-          if self.muteDrumFill:
+        if guitar.drumFillsActive:
+          if self.muteDrumFill > 0:
             self.song.setInstrumentVolume(0.0, self.playerList[i].part)
           
         #MFH - ensure this missed notes check doesn't fail you during a freestyle section
