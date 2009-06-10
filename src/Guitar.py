@@ -1100,7 +1100,7 @@ class Guitar:
     num = 0
     enable = True
     starEventsInView = False
-    renderedNotes = self.getRequiredNotesForRender(song,pos)
+    renderedNotes = reversed(self.getRequiredNotesForRender(song,pos))
     for time, event in renderedNotes:
     #for time, event in reversed(track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)):    #MFH - reverse order of note rendering
       if isinstance(event, Tempo):
