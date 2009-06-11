@@ -4326,6 +4326,7 @@ def getSortingTitles(engine, songList = []):
   
   
 def getAvailableTitles(engine, library = DEFAULT_LIBRARY):
+  gameMode1p = engine.config.get("game","game_mode")
   if library == None:
     return []
   
@@ -4342,7 +4343,8 @@ def getAvailableTitles(engine, library = DEFAULT_LIBRARY):
     for section in sections.split():
       titles.append(TitleInfo(config, section))
     
-    titles.append(BlankSpaceInfo(_("End of Career")))
+    if gameMode1p == 2:
+      titles.append(BlankSpaceInfo(_("End of Career")))
     
   except:
     Log.debug("titles.ini could not be read (song.py)")
@@ -4579,6 +4581,8 @@ def compareSongsAndTitles(engine, a, b):
       return -1
     elif a.getUnlockID() == "" and b.getUnlockID() == "":   #MFH - a and b are both bonus songs; apply sorting logic.
       #MFH: catch BlankSpaceInfo ("end of career") marker, ensure it goes to the top of the bonus songlist
+      Log.debug(a)
+      Log.debug(b)
       if isinstance(a, SongInfo) and isinstance(b, BlankSpaceInfo):   #a is a bonus song, b is a blank space (end of career marker)
         return 1
       elif isinstance(a, BlankSpaceInfo) and isinstance(b, SongInfo):   #a is a blank space, b is a bonus song (end of career marker) - this is fine.
