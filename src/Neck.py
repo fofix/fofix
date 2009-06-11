@@ -394,6 +394,8 @@ class Neck:
       self.currentPeriod = self.part.currentPeriod
     if self.lastBpmChange != self.part.lastBpmChange:
       self.lastBpmChange = self.part.lastBpmChange
+    if self.baseBeat != self.part.baseBeat:
+      self.baseBeat = self.part.baseBeat
 
     if self.isFailing == True:
       if self.failcount <= 1 and self.failcount2 == False:
