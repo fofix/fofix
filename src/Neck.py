@@ -574,6 +574,16 @@ class Neck:
                          [1.0, project(offset + l * self.beatsPerUnit * .7)],
                          [0.0, project(offset + l * self.beatsPerUnit)],
                          [1.0, project(offset + l * self.beatsPerUnit)]], dtype=float32)
+    
+    #must be seperate for neck flashing.
+    board_col  = array([[color[0],color[1],color[2], 0],
+                             [color[0],color[1],color[2], 0],
+                             [color[0],color[1],color[2], v],
+                             [color[0],color[1],color[2], v],
+                             [color[0],color[1],color[2], v],
+                             [color[0],color[1],color[2], v],
+                             [color[0],color[1],color[2], 0],
+                             [color[0],color[1],color[2], 0]], dtype=float32)
 
     if alpha == True:
       glBlendFunc(GL_ONE, GL_ONE)
@@ -582,7 +592,7 @@ class Neck:
     glEnableClientState(GL_COLOR_ARRAY)
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glVertexPointerf(self.board_vtx)
-    glColorPointerf(self.board_col)
+    glColorPointerf(board_col)
     glTexCoordPointerf(board_tex)
     glDrawArrays(GL_TRIANGLE_STRIP, 0, self.board_vtx.shape[0])
     glDisableClientState(GL_VERTEX_ARRAY)
