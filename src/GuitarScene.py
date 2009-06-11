@@ -5471,8 +5471,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if self.coOpRB:
           while len(self.deadPlayerList) > 0:
             i = self.deadPlayerList.pop(0) #keeps order intact (with >2 players)
-            if guitar.coOpFailed and self.timesFailed[i]<3:
-              guitar.coOpRescue(self.getSongPosition())
+            if self.instruments[i].coOpFailed and self.timesFailed[i]<3:
+              self.instruments[i].coOpRescue(self.getSongPosition())
               self.rock[i] = self.rockMax * 0.667
               guitar.starPower -= 50
               self.engine.data.rescueSound.play()

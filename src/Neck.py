@@ -925,11 +925,10 @@ class Neck:
     glDisable(GL_TEXTURE_2D)
     
   def render(self, visibility, song, pos):
-
+    self.updateBoardSettings() #Q update this before we check for coop becuase coop must be updated
     if not (self.coOpFailed and not self.coOpRestart):
 
-      self.updateBoardSettings()
-
+      
       self.vis = visibility
       self.renderNeck(visibility, song, pos)
       self.renderIncomingNecks(visibility, song, pos) #MFH
