@@ -358,6 +358,12 @@ class Vocalist:
     glDrawArrays(GL_QUADS, 0, len(colorArray))
     glDisableClientState(GL_COLOR_ARRAY)
     glDisableClientState(GL_VERTEX_ARRAY)
+  
+  def coOpRescue(self, pos):
+    self.coOpRestart = True #initializes Restart Timer
+    self.coOpRescueTime  = pos
+    self.starPower  = 0
+    Log.debug("Rescued at " + str(pos))
 
   def render(self, visibility, song, pos, players):
     font = self.engine.data.font
