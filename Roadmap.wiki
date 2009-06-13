@@ -4,8 +4,8 @@
 
 
 == Milestone: 3.120 ==
-==== Beta 2: June 20 ====
-==== Final: June 27 ====
+*Beta 2: June 20,*
+*Final: June 27*
 ==== Blockers: ====
 Issue 816
 Issue 804
