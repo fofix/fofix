@@ -474,7 +474,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     
     found = 0  
     for part in self.song.info.parts:
-      for difficulty in self.song.info.partDifficulties[part]:
+      for difficulty in self.song.info.partDifficulties[part.id]:
         if found == 1:
           self.scoreDifficulty = difficulty
           self.scorePart = part
@@ -483,7 +483,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         if self.scoreDifficulty == difficulty and self.scorePart == part:
           found = 1
 
-    self.scoreDifficulty = self.song.info.partDifficulties[self.song.info.parts[0]][0]
+    self.scoreDifficulty = self.song.info.partDifficulties[0][0]
     self.scorePart = self.song.info.parts[0]
   
   def startRoll(self, playerNum):

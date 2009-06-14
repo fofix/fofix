@@ -396,7 +396,7 @@ Config.define("coffee", "failingEnabled",       bool, True,     text = _("No Fai
 Config.define("game", "songlist_difficulty", int, 0, text = _("Difficulty (Setlist Score)"), options = {0: "Expert", 1: "Hard", 2: "Medium", 3: "Easy"}  )
 Config.define("game", "songlist_extra_stats", bool, True, text = _("Show Additional Stats"), options = {True: _("Yes"), False: _("No")} )
 
-Config.define("game", "songlist_instrument", int, 0, text = _("Instrument (Setlist Score)"), options = {0: "Guitar", 1: "Rhythm", 2: "Bass", 3: "Lead", 4: "Drums"}  )  #MFH
+Config.define("game", "songlist_instrument", int, 0, text = _("Instrument (Setlist Score)"), options = {0: "Guitar", 1: "Rhythm", 2: "Bass", 3: "Lead", 4: "Drums", 5: "Vocals"}  )  #MFH
 
 
 class FullScreenSwitcher(KeyListener):

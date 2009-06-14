@@ -320,17 +320,17 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
                     escaped = True
                   break;
                 while 1:
-                  if len(info.partDifficulties[p]) > 1:
+                  if len(info.partDifficulties[p.id]) > 1:
 
                     if self.subMenuPosTuple:
-                      d = Dialogs.chooseItem(self.engine, info.partDifficulties[p],
+                      d = Dialogs.chooseItem(self.engine, info.partDifficulties[p.id],
                                          "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("%s Choose a difficulty:") % player.name), selected = player.difficulty, pos = self.subMenuPosTuple)
                     else:
-                      d = Dialogs.chooseItem(self.engine, info.partDifficulties[p],
+                      d = Dialogs.chooseItem(self.engine, info.partDifficulties[p.id],
                                          "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("%s Choose a difficulty:") % player.name), selected = player.difficulty)
 
                   else:
-                    d = info.partDifficulties[p][0]
+                    d = info.partDifficulties[p.id][0]
                   if d:
                     player.difficulty = d
                     selectedPlayer = True
@@ -371,15 +371,15 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
       if self.engine.cmdPlay == 2:
         if len(info.parts) >= self.engine.cmdPart:
           self.player.part = info.parts[self.engine.cmdPart]
-        if len(info.partDifficulties[self.player.part]) >= self.engine.cmdDiff:
-          self.player.difficulty = info.partDifficulties[self.player.part][self.engine.cmdDiff]
+        if len(info.partDifficulties[self.player.part.id]) >= self.engine.cmdDiff:
+          self.player.difficulty = info.partDifficulties[self.player.part.id][self.engine.cmdDiff]
         
           
       # Make sure the difficulty we chose is available
       if not self.player.part in info.parts:
         self.player.part = info.parts[0]
-      if not self.player.difficulty in info.partDifficulties[self.player.part]:
-        self.player.difficulty = info.partDifficulties[self.player.part][0]
+      if not self.player.difficulty in info.partDifficulties[self.player.part.id]:
+        self.player.difficulty = info.partDifficulties[self.player.part.id][0]
         
       if not self.engine.createdGuitarScene:
         #self.engine.createdGuitarScene = True

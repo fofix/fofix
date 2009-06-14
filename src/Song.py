@@ -112,7 +112,8 @@ instrumentDiff = {
   1 : (lambda a: a.diffGuitar),
   2 : (lambda a: a.diffBass),
   3 : (lambda a: a.diffGuitar),
-  4 : (lambda a: a.diffDrums)
+  4 : (lambda a: a.diffDrums),
+  5 : (lambda a: a.diffVocals)
 }
 
 class Part:
@@ -168,7 +169,7 @@ defaultSections = ["Start","1/4","1/2","3/4"]
 
 # stump: manage cache files
 class CacheManager(object):
-  SCHEMA_VERSION = 3  #stump: current cache format version number
+  SCHEMA_VERSION = 4  #stump: current cache format version number
   def __init__(self):
     self.caches = {}
   def getCache(self, infoFileName, timeout = 20):
@@ -692,15 +693,15 @@ class SongInfo(object):
       self._parts = info.parts
       for part in info.parts:
         if self.tutorial:
-          self._partDifficulties[part] = [difficulties[HAR_DIF]]
+          self._partDifficulties[part.id] = [difficulties[HAR_DIF]]
           continue
-        info.difficulties[part].sort(lambda a, b: cmp(a.id, b.id))
-        self._partDifficulties[part] = info.difficulties[part]
+        info.difficulties[part.id].sort(lambda a, b: cmp(a.id, b.id))
+        self._partDifficulties[part.id] = info.difficulties[part.id]
     except:
       Log.warn("Note file not parsed correctly. Selected part and/or difficulty may not be available.")
       self._parts = parts.values()
       for part in self._parts:
-        self._partDifficulties[part] = difficulties.values()
+        self._partDifficulties[part.id] = difficulties.values()
     return self._parts
 
   def getName(self):
@@ -3745,8 +3746,8 @@ class MidiPartsDiffReader(midi.MidiOutStream):
         if not parts[GUITAR_PART] in self.parts:
           part = parts[GUITAR_PART]
           self.parts.append(part)
-          self.currentPart = part
-          self.difficulties[part] = []
+          self.currentPart = part.id
+          self.difficulties[part.id] = []
           if self.logSections == 1:
             tempText = "No recognized tracks found. Using first track, and identifying it as "
             tempText2 = "GUITAR_PART"
@@ -3765,8 +3766,8 @@ class MidiPartsDiffReader(midi.MidiOutStream):
       if not parts[GUITAR_PART] in self.parts:
         part = parts[GUITAR_PART]
         self.parts.append(part)
-        self.currentPart = part
-        self.difficulties[part] = []
+        self.currentPart = part.id
+        self.difficulties[part.id] = []
         if self.logSections == 1:
           tempText2 = "GUITAR_PART"
           Log.debug(tempText + tempText2)
@@ -3775,8 +3776,8 @@ class MidiPartsDiffReader(midi.MidiOutStream):
       if not parts[RHYTHM_PART] in self.parts:
         part = parts[RHYTHM_PART]
         self.parts.append(part)
-        self.currentPart = part
-        self.difficulties[part] = []
+        self.currentPart = part.id
+        self.difficulties[part.id] = []
         if self.logSections == 1:
           tempText2 = "RHYTHM_PART"
           Log.debug(tempText + tempText2)
@@ -3785,8 +3786,8 @@ class MidiPartsDiffReader(midi.MidiOutStream):
       if not parts[BASS_PART] in self.parts:
         part = parts[BASS_PART]
         self.parts.append(part)
-        self.currentPart = part
-        self.difficulties[part] = []
+        self.currentPart = part.id
+        self.difficulties[part.id] = []
         if self.logSections == 1:
           tempText2 = "BASS_PART"
           Log.debug(tempText + tempText2)
@@ -3795,8 +3796,8 @@ class MidiPartsDiffReader(midi.MidiOutStream):
       if not parts[LEAD_PART] in self.parts:
         part = parts[LEAD_PART]
         self.parts.append(part)
-        self.currentPart = part
-        self.difficulties[part] = []
+        self.currentPart = part.id
+        self.difficulties[part.id] = []
         if self.logSections == 1:
           tempText2 = "LEAD_PART"
           Log.debug(tempText + tempText2)
@@ -3806,8 +3807,8 @@ class MidiPartsDiffReader(midi.MidiOutStream):
       if not parts[DRUM_PART] in self.parts:
         part = parts[DRUM_PART]
         self.parts.append(part)
-        self.currentPart = part
-        self.difficulties[part] = []
+        self.currentPart = part.id
+        self.difficulties[part.id] = []
         if self.logSections == 1:
           tempText2 = "DRUM_PART"
           Log.debug(tempText + tempText2)
@@ -3816,8 +3817,8 @@ class MidiPartsDiffReader(midi.MidiOutStream):
       if not parts[VOCAL_PART] in self.parts:
         part = parts[VOCAL_PART]
         self.parts.append(part)
-        self.currentPart = part
-        self.difficulties[part] = difficulties.values()
+        self.currentPart = part.id
+        self.difficulties[part.id] = difficulties.values()
         if self.logSections == 1:
           tempText2 = "VOCAL_PART"
           Log.debug(tempText + tempText2)

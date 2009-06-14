@@ -779,7 +779,10 @@ class SongChooser(Layer, KeyListener):
     #MFH configurable default instrument display with 5th / orange fret
     #   need to keep track of the instrument number and instrument name
     self.instrumentNum = self.engine.config.get("game", "songlist_instrument")
-    if self.instrumentNum == 4:
+    if self.instrumentNum == 5:
+      self.instrument = "Vocals"
+      self.instrumentNice = _("Vocals")
+    elif self.instrumentNum == 4:
       self.instrument = "Drums"
       self.instrumentNice = _("Drums")
     elif self.instrumentNum == 3:
@@ -1744,9 +1747,12 @@ class SongChooser(Layer, KeyListener):
       if self.instrumentChange:
         self.instrumentChange = False
         self.instrumentNum += 1
-        if self.instrumentNum > 4:
+        if self.instrumentNum > 5:
           self.instrumentNum = 0
-        if self.instrumentNum == 4:
+        if self.instrumentNum == 5:
+          self.instrument = "Vocals"
+          self.instrumentNice = _("Vocals")
+        elif self.instrumentNum == 4:
           self.instrument = "Drums"
           self.instrumentNice = _("Drums")
         elif self.instrumentNum == 3:
@@ -1984,7 +1990,7 @@ class SongChooser(Layer, KeyListener):
               x = self.song_cdscore_xpos
               y = .5 + f / 2.0
               try:
-                difficulties = item.partDifficulties[Song.parts[self.instrumentNum]]
+                difficulties = item.partDifficulties[self.instrumentNum]
               except KeyError:
                 difficulties = []
               if len(difficulties) > 3:
@@ -2338,7 +2344,7 @@ class SongChooser(Layer, KeyListener):
 
                   self.diffNice = self.diffTrans[self.diff]
                   try:
-                    difficulties = item.partDifficulties[Song.parts[self.instrumentNum]]
+                    difficulties = item.partDifficulties[self.instrumentNum]
                   except KeyError:
                     difficulties = []
                   for d in difficulties:
@@ -2605,7 +2611,7 @@ class SongChooser(Layer, KeyListener):
 
                   self.diffNice = self.diffTrans[self.diff]                  
                   try:
-                    difficulties = item.partDifficulties[Song.parts[self.instrumentNum]]
+                    difficulties = item.partDifficulties[self.instrumentNum]
                   except KeyError:
                     difficulties = []
                   for d in difficulties:
@@ -2992,7 +2998,7 @@ class SongChooser(Layer, KeyListener):
                     x = self.song_listcd_score_xpos
                     y = self.song_listcd_score_ypos + f / 2.0
                     try:
-                      difficulties = item.partDifficulties[Song.parts[self.instrumentNum]]
+                      difficulties = item.partDifficulties[self.instrumentNum]
                     except KeyError:
                       difficulties = []
                       score, stars, name = "---", 0, "---"
@@ -3210,7 +3216,7 @@ class SongChooser(Layer, KeyListener):
                     x = self.song_listcd_score_xpos
                     y = self.song_listcd_score_ypos + f / 2.0
                     try:
-                      difficulties = item.partDifficulties[Song.parts[self.instrumentNum]]
+                      difficulties = item.partDifficulties[self.instrumentNum]
                     except KeyError:
                       difficulties = []
                       score, stars, name = "---", 0, "---"
@@ -3588,7 +3594,7 @@ class SongChooser(Layer, KeyListener):
 
                   self.diffNice = self.diffTrans[self.diff]
                   try:
-                    difficulties = item.partDifficulties[Song.parts[self.instrumentNum]]
+                    difficulties = item.partDifficulties[self.instrumentNum]
                   except KeyError:
                     difficulties = []
                   for d in difficulties:
