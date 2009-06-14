@@ -123,10 +123,11 @@ class Music(object):
 
   def pause(self):
     pygame.mixer.music.pause()
-    self.pausePos = self.getPosition()
+    self.pausePos = pygame.mixer.music.get_pos()
     self.isPause = True
 
   def unpause(self):
+    self.isPause = False
     pygame.mixer.music.unpause()
 
   def setVolume(self, volume):
@@ -156,12 +157,10 @@ class Music(object):
 
   def getPosition(self):
     if self.isPause:
-      if pygame.mixer.music.get_pos() > (self.pausePos + 100):
-        self.toUnpause = True
-        self.isPause = False
+      self.toUnpause = True
       return self.pausePos
     elif self.toUnpause:
-      if pygame.mixer.music.get_pos() < (self.pausePos + 100):
+      if pygame.mixer.music.get_pos() < (self.pausePos + 90):
         self.toUnpause = False
         return pygame.mixer.music.get_pos()
       else:
