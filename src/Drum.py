@@ -924,12 +924,12 @@ class Drum:
       elif fret == 4:
         fret = 0
 
-      if spNote == True and self.starMesh != None and isOpen == False:
-        note = self.starMesh
-      elif isOpen == True and self.openMesh != None:
-        note = self.openMesh
+      if spNote == True and self.starMesh is not None and isOpen == False:
+        meshObj = self.starMesh
+      elif isOpen == True and self.openMesh is not None:
+        meshObj = self.openMesh
       else:
-        note = self.noteMesh
+        meshObj = self.noteMesh
 
       glPushMatrix()
       glEnable(GL_DEPTH_TEST)
@@ -960,9 +960,9 @@ class Drum:
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
         if isTappable:
-          self.noteMesh.render("Mesh_001")
+          meshObj.render("Mesh_001")
         else:
-          self.noteMesh.render("Mesh")
+          meshObj.render("Mesh")
         glMatrixMode(GL_TEXTURE)
         glLoadIdentity()
         glMatrixMode(GL_MODELVIEW)
@@ -976,9 +976,9 @@ class Drum:
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
         if isTappable:
-          self.starMesh.render("Mesh_001")
+          meshObj.render("Mesh_001")
         else:
-          self.starMesh.render("Mesh")
+          meshObj.render("Mesh")
         glMatrixMode(GL_TEXTURE)
         glLoadIdentity()
         glMatrixMode(GL_MODELVIEW)
@@ -993,7 +993,7 @@ class Drum:
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
-        self.openMesh.render()
+        meshObj.render()
         glMatrixMode(GL_TEXTURE)
         glLoadIdentity()
         glMatrixMode(GL_MODELVIEW)
@@ -1007,11 +1007,11 @@ class Drum:
         if isOpen == True and self.starPowerActive == False:
           glColor4f(self.opencolor[0],self.opencolor[1],self.opencolor[2], 1)
 
-        note.render("Mesh_001")
+        meshObj.render("Mesh_001")
         glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
-        note.render("Mesh_002")
+        meshObj.render("Mesh_002")
         glColor3f(self.meshColor[0], self.meshColor[1], self.meshColor[2])
-        note.render("Mesh")
+        meshObj.render("Mesh")
 
 
 

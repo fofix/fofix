@@ -923,10 +923,10 @@ class Guitar:
       #mesh_002 = top (spot or hopo if no mesh_003) 
       #mesh_003 = hopo bump (hopo color)
     
-      if spNote == True and self.starMesh != None:
-        note = self.starMesh
+      if spNote == True and self.starMesh is not None:
+        meshObj = self.starMesh
       else:
-        note = self.noteMesh
+        meshObj = self.noteMesh
 
       glPushMatrix()
       glEnable(GL_DEPTH_TEST)
@@ -961,11 +961,11 @@ class Guitar:
           mesh = "Mesh_001"
         else:
           mesh = "Mesh"
-        self.noteMesh.render(mesh)
+        meshObj.render(mesh)
         
         if shaders.enable("notes"):
           shaders.setVar("isTextured",True)
-          self.noteMesh.render(mesh)
+          meshObj.render(mesh)
           shaders.disable()
         
         glMatrixMode(GL_TEXTURE)
@@ -987,7 +987,7 @@ class Guitar:
         else:
           mesh = "Mesh"
 
-        self.starMesh.render(mesh)
+        meshObj.render(mesh)
         
         if shaders.enable("notes"):
           shaders.setVar("isTextured",True)
@@ -1002,7 +1002,7 @@ class Guitar:
       else:
         if shaders.enable("notes"):
           shaders.setVar("isTextured",False)
-        note.render("Mesh_001")
+        meshObj.render("Mesh_001")
         shaders.disable()
         glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
         if isTappable:
@@ -1010,12 +1010,12 @@ class Guitar:
             glColor4f(*color)
           else:
             glColor3f(self.hopoColor[0], self.hopoColor[1], self.hopoColor[2])
-          if(note.find("Mesh_003")) == True:
-            note.render("Mesh_003")
+          if(meshObj.find("Mesh_003")) == True:
+            meshObj.render("Mesh_003")
             glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
-        note.render("Mesh_002")
+        meshObj.render("Mesh_002")
         glColor3f(self.meshColor[0], self.meshColor[1], self.meshColor[2])
-        note.render("Mesh")
+        meshObj.render("Mesh")
         
 
 
