@@ -11,6 +11,7 @@ Issue 816
 Issue 804
 Issue 46
 Issue 670
+Issue 755
 
 == Milestone: 4.0.0 ==
 *Final: ??*
