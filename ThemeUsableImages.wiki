@@ -40,44 +40,45 @@ I was tired and sick and couldn't sleep...
 
 ==Main Theme Directory==
 ||  _Filename_                  ||  _What is file for in FoFiX?_                  ||  _Required?_ ||  _Related to Theme Type_ ||  _Notes_||
-||  bassgroovemult.png          || WIP                            || No           || WIP                      || ||
-||  bassgrooveneckovr.png       || WIP                            || No           || WIP                      || ||
-||  bigtail1.png                || WIP                            || No           || WIP                      || ||
-||  bigtail2.png                || WIP                            || No           || WIP                      || ||
+||  bassgroovemult.png          || Used as a replacement multiplier when bassgroove is active     || No           || All                      || This is split into 4 rows: 5x, 6x and when in overdrive 10x, 12x||
+||  bassgrooveneckovr.png       || Displays over the neck when in bassgroove  || No           || All                      || ||
+||  bigtail1.png                || Long part of the tail used when a note or chord is being held || No           || All                     || ||
+||  bigtail2.png                || End of the tail when a note or chord is held  || No           || All                     || ||
 ||  bpm_beat.png                || Line across the fretboard every beat           || Yes          || All                      || ||
 ||  bpm_halfbeat.png            || Line across the fretboard every half beat      || Yes          || All                      || ||
 ||  bpm_measure.png             || Line across the fretboard every measure        || Yes          || All                      || For example, every four beats in 4/4 time ||
 ||  center_lines.png            || The "strings" running down the fretboard       || Yes          || All                      || ||
 ||  counter.png                 || Background for current streak count            || Yes          || All                      || GH2/3 – Appears below score meter (bottom left) after 25 note streak (note, the font for the rightmost digit is black, while the rest is white, so it pays to have a lighter area to the right). RB – Appears below score meter (top right) always. WT – Never appears, but is required to prevent crash ||
 ||  dots.png                    || Streak Dots                                    || GH3 Based    || GH3 Based                || Can also use dotshalf.png instead. Also, for GH2 themes the "dots" directory is required (See below) ||
-||  drumcenterlines.png         || WIP                            || No           || WIP                      || ||
-||  drumnotes.png               || WIP                            || No           || WIP                      || ||
+||  drumcenterlines.png         || If present these lines will be used instead of centerlines.png when the player is a drum part  || No           || All                      || ||
+||  drumnotes.png               || Used instead of notes.png if player part is a drum part, contains a row just for the bass bar for a cleaner look  || No           || All  || ||
 ||  editor.png                  || Instrument and difficulty select background    || Yes          || All                      || ||
 ||  fail.png                    || Image that appears after failing               || GH Based     || All                      || ||
 ||  fretbuttons.png             || Buttons at bottom of neck to hit notes with    || Yes          || All                      || ||
 ||  gameresults.png             || Results screen background                      || Yes          || All                      || ||
-||  glow.png                    || WIP                            || No           || WIP                      || ||
-||  guitarsoloneck.png          || WIP                            || No           || WIP                      || ||
-||  guitarsoloneckovr.png       || WIP                            || No           || WIP                      || ||
+||  glow.png                    || Little glow that shows when a note is held. || No           || All                      || Not to be confused with hitglow.png, this shows on top of the fret button and will change color if the option is on ||
+||  guitarsoloneck.png          || This neck will replace the player's neck if the player is in a guitarsolo     || No           || All                      || ||
+||  guitarsoloneckovr.png       || If present and the option is turned on, instead of the neck being replace in a guitar solo, this will overlay on top of it  || No           || All                      || ||
 ||  hitflames1.png              || Flashes when you hit a note                    || No (3.120+)|| All                      || ||
 ||  hitflames2.png              || Flashes when you hit a note                    || No (3.120+)|| All                      || ||
 ||  hitglow.png                 || Shines when holding a sustain                  || No (3.120+)|| All                      || ||
 ||  hitglow2.png                || Shines when holding a sustain                  || No (3.120+)|| All                      || ||
-||  kill1.png                   || WIP                            || No           || WIP                      || ||
-||  kill2.png                   || WIP                            || No           || WIP                      || ||
+||  kill1.png                   || If killswitch tails are set to static and shaders are turned off, this will become the long part of the tail on the note held when killswitch is activated.  || No           || All                      || ||
+||  kill2.png                   || If killswitch tails are set to static and shaders are turned off, this will become the end of the tail on the note held when killswitch is activated.                             || No           || All                      || ||
 ||  lightning.png               || Flashes when star power is gained              || GH Based     || GH Based                 || ||
 ||  loadingbg.png               || Shows while loading                            || Yes          || All                      || Loading phrases are displayed on this screen also||
-||  lyricsheet.png              || WIP                            || No           || WIP                      || ||
+||  lyricsheet.png              || If rb-styled lyrics are present in the song and the player is not playing a vocal part, this will be displayed at the top for lyrics to scroll across  || No           || All || Even though vocals can not be played in GH Based themes, this will still show if lyrics are present in the song being played.||
 ||  mult.png                    || Displays current multiplier                    || Yes          || All                      || Split into 8 rows (for 1x,2x,3x,4x and sp:2x,4x,6x,8x) is displayed to the left under reockmeter.png for GH2/GH3 based themes, below the fret buttons and overdrive meter in RB based themes, and along the right-hand side of the fretboard about mid-way up on GHWT themes ||
 ||  mult2.png                   || WIP                            || No           || WIP                      || ||
 ||  notes.png                   || Notes that come down the fretboard to be hit   || Yes          || All                      || Split into 5 columns (one for each coloured note). In GH themes it is split into 5 rows (normal notes, hopo notes, star notes, hopo star notes, and the last row contains one sp active note on the left, followed by a sp active hopo note). In RB based themes it is spit into 6 rows (normal notes, hopo notes, overdrive notes, overdrive hopo notes, overdrive active notes, overdrive active hopos) ||
 ||  overdrive bottom.png        || Bottom layer of overdrive meter                || RB Based     || RB Based                 || ||
-||  overdrive center_lines.png  || WIP                            || No           || WIP                      || ||
+||  overdrive center_lines.png  || These lines will replace the center lines during overdrive if present        || No           || RB Based                   || Drums also have their own center_lines called drum_overdrive_center_lines.png||
+||  overdrive_string_flash.png  || When a series of overdrive notes are hit, these will display as if to show the strings flashing  || No           || RB Based                   || Drums also have their own called drum_overdrive_string_flash.png||
 ||  overdrive fill.png          || Indicates how much overdrive is collected      || RB Based     || RB Based                 || Revealed from left to right as more overdrive (starpower) is collected. For example, if you have 45% full overdrive, it will show the leftmost 45% of the image.||
 ||  overdrive full.png          || Glows when overdrive can be activated          || RB Based     || RB Based                 || Fades in and out when there is enough overdrive to activate. It is rendered on top of all other overdrive bar related images|| 
-||  overdrive side_bars.png     || WIP                            || No           || WIP                      || ||
+||  overdrive side_bars.png     || These side bars will replace the normal sidebars during overdrive if present   || No           || RB Based                      || Drums also have their own center_lines called drum_overdrive_side_bars.png ||
 ||  overdrive top.png           || Top layer of overdrive meter                   || RB Based     || RB Based                 || Displays on top of overdrive bottom and overdrive fill.||
-||  overdriveneck.png           || WIP                            || No           || WIP                      || ||
+||  overdriveneck.png           || During overdrive, this neck will replace the player's normal neck          || No           || RB Based                      || Different parts can also have their own overdrive necks, these are overdriveneck_bass.png and overdriveneck_drum.png.  GH Based theme also have their own variant called starpowerneck.png (part necks follow same rules).||
 ||  pause.png                   || Shows when the game is paused                  || Yes          || All                      || Not scaled, but is shown in the centre of the window (above all game elements). Pause menu text is rendered on top of this.||
 ||  rock_arr.png                || Indicates position on the rock meter           || Yes          || All                      || On RB based themes, this moves up and down the rock meter and is rendered on top of other rock meter elements. On GH based themes, this is drawn below rock top and is rotated in a range from approx -45° and 45° (i.e. from failed, to full)||
 ||  rock_bottom.png             || The bottom layer of the rock meter             || RB Based     || RB Based                 || ||
@@ -90,7 +91,7 @@ I was tired and sick and couldn't sleep...
 ||  rockmeter.png               || Where the score is displayed in GH themes      || GH Based     || GH Based                 || Displayed on the left. For GH2/GH3 themes, this needs a hole, as it renders on top of mult.png. On GH2 themes, the score text is spaced and slanted to fit the GH2 theme's image. On GHWT themes, this incorperates what would normally be counter.png||
 ||  score.png                   || Where the score is displayed in RB themes      || RB Based     || RB Based                 || Displayed top right, below lyrics (if any) and above counter. Background image to the current score.||
 ||  side_bars.png               || Display all up the side of the fretboard       || Yes          || All                      || Stretched to fit the _entire_ width of the fretboard, and the length of the fretboard (as much as one neck image is)||
-||  soloframe.png               || WIP                            || No           || WIP                      || ||
+||  soloframe.png               || During a solo, this frame will create a box in which the percentage or numbers of the player's progress/accuracy will display.                            || No           || WIP                      || ||
 ||  spbottom.png                || The bottom layer of the star power meter       || GH2 Based    || GH2 Based                || ||
 ||  spfill.png                  || Fills up as star power is collected            || GH2 Based    || GH2 Based                || ||
 ||  spfull.png                  || _Unknown_                                      || GH2 Based    || GH2 Based                || _This image does not appear to ever display, however it is still required for GH2 based themes_||
@@ -98,18 +99,12 @@ I was tired and sick and couldn't sleep...
 ||  sptop.png                   || Top layer of star power meter                  || GH2 Based    || GH2 Based                || ||
 ||  star1.png                   || Empty star for game results                    || Yes          || All                      || ||
 ||  star2.png                   || Star displayed for game results star ranking   || Yes          || All                      || To indicate a perfect ranking, these images will be rendered green in GH-based themes and yellow (gold) in RB Based themes||
-||  stargrey.png                || WIP                            || No           || WIP                      || ||
-||  stargrey1.png               || WIP                            || No           || WIP                      || ||
-||  stargrey2.png               || WIP                            || No           || WIP                      || ||
-||  stargrey3.png               || WIP                            || No           || WIP                      || ||
-||  stargrey4.png               || WIP                            || No           || WIP                      || ||
-||  stargrey5.png               || WIP                            || No           || WIP                      || ||
-||  stargrey6.png               || WIP                            || No           || WIP                      || ||
-||  stargrey7.png               || WIP                            || No           || WIP                      || ||
-||  starperfect.png             || WIP                            || No           || WIP                      || ||
-||  starwhite.png               || WIP                            || No           || WIP                      || ||
-||  tail1.png                   || WIP                            || No           || WIP                      || ||
-||  tail2.png                   || WIP                            || No           || WIP                      || ||
+||  stargrey.png                || Used in partial stars, this is the image the stars start out as.            || No           || All                      || ||
+||  stargrey{X}.png (where {X}=[1-7])    || Used in partial stars          || No           || All                      || ||
+||  starperfect.png             || Used in partial stars and on the results screen, displayed if player 6 stars or FC's the song                   || No           || All                      || ||
+||  starwhite.png               || Used in partial stars, displayed once a star is filled                          || No           || All                      || ||
+||  tail1.png                   || Long part of a tail before it is hit or if it is not played.                            || No           || All                      || ||
+||  tail2.png                   || End of a tail before it is hit or if it is not played.                            || No           || All                      || ||
 ||  youfailed.png               || Indication that you failed a song              || Yes          || All                      || Appears for a few seconds before the failure menu is displayed||
 ||  yourock.png                 || Indication that you finished a song successfuly|| Yes          || All                      || Appears for a few seconds after you finish a song, before the game results appear||
 
