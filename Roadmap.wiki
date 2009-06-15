@@ -8,11 +8,7 @@
 *Beta 2: June 20, *
 *Final: June 27*
 ==== Blockers: ====
-Issue 816
-Issue 804
-Issue 46
-Issue 670
-Issue 755
+[http://code.google.com/p/fofix/issues/list?can=2&q=milestone:Release-3.120 3.120 Issues to Fix]
 
 == Milestone: 4.0.0 ==
 *Final: ??*
@@ -50,4 +46,3 @@ Issue 755
   * Rewrite Note Handling
   * Make more read-only-data-folder friendly
   * Switch to new version scheme
-
