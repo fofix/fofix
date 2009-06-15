@@ -17,4 +17,37 @@ Issue 755
 == Milestone: 4.0.0 ==
 *Final: ??*
 ==== Planned Features: ====
-==== Blockers: ====
+=====New Features=====
+  * Theme Necks < append theme necks to list of necks with current folder
+    * Option for random neck to be taken from theme folder/currneckfolder/all necks
+  * Difficulty based Careers
+  * Single song database
+  * Virtual File-system Layer (get rid of conditionals in loading files)
+  * Online play
+  * Multithreading
+  * More to come
+=====Rework=====
+  * Menu.py
+    * Redo Menu to allow for tool-tip
+    * Layer based menus
+  * Dialogs.py
+    * Move SongChooser into SongChooseScene
+    * Look at redoing itemChooser
+      * Separate difficulty/part from itemchoosing
+      * Other reworking
+    * Remove theme-type forks for songChooser
+  * GuitarScene.py
+    * Rewrite render effectively removing theme-type and transferring all settings to theme control
+      * Separate rock meter
+      * Establish single version of notes.png(maybe new file name)
+  * Theme.py
+    * Rewrite theme.ini > new name will be needed
+    * Theme Compatibility will be broken (wiki or tutorial will be needed for themers to update there themes)
+  * Song.py
+    * Vocal audio track support
+  * Neck.py
+    * Do a bit of housekeeping, clean it up.
+  * Rewrite Note Handling
+  * Make more read-only-data-folder friendly
+  * Switch to new version scheme
+
