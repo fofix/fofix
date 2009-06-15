@@ -7,7 +7,6 @@
 == Milestone: 3.120 ==
 *Beta 2: June 20, *
 *Final: June 27*
-==== Blockers: ====
 [http://code.google.com/p/fofix/issues/list?can=2&q=milestone:Release-3.120 3.120 Issues to Fix]
 
 == Milestone: 4.0.0 ==
@@ -27,12 +26,12 @@
     * Redo Menu to allow for tool-tip
     * Layer based menus
   * Dialogs.py
-    * Move SongChooser into SongChooseScene
+    * Move !SongChooser into !SongChooseScene
     * Look at redoing itemChooser
       * Separate difficulty/part from itemchoosing
       * Other reworking
     * Remove theme-type forks for songChooser
-  * GuitarScene.py
+  * !GuitarScene.py
     * Rewrite render effectively removing theme-type and transferring all settings to theme control
       * Separate rock meter
       * Establish single version of notes.png(maybe new file name)
