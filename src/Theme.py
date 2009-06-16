@@ -136,6 +136,7 @@ Config.define("theme", "opencolor",       str, "#FF9933")
 Config.define("theme", "songback",       bool, False)
 Config.define("theme", "versiontag",       bool, False)
 Config.define("theme", "rmtype",       int, None)
+Config.define("theme", "mark_solo_sections", int, 2)
 
 Config.define("theme", "shadowoffsetx", float, .0022)
 Config.define("theme", "shadowoffsety", float, .0005)
@@ -585,6 +586,7 @@ starFillupColor = None
 #Qstick - misc
 songListDisplay = None
 neckWidth = None
+markSolos = None
 
 result_score = [None] * 5
 result_star = [None] * 4
@@ -825,6 +827,7 @@ def setupMisc(config):
   global oBar3dFill
   global neckWidth
   global neckLength
+  global markSolos
 
   loadingPhrase = config.get("theme", "loading_phrase")
   resultsPhrase = config.get("theme", "results_phrase")
@@ -846,6 +849,7 @@ def setupMisc(config):
   oBar3dFill = config.get("theme", "obar_3dfill")
   neckWidth = config.get("theme", "neck_width")
   neckLength = config.get("theme", "neck_length")
+  markSolos = config.get("theme", "mark_solo_sections")
 #MFH:
 def setupSonglist(config):
   global song_cd_Xpos, song_cdscore_Xpos, song_list_Xpos, song_listscore_Xpos

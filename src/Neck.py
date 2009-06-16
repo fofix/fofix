@@ -153,6 +153,7 @@ class Neck:
 
 
     self.useMidiSoloMarkers = False
+    self.markSolos = 0
 
     if not engine.data.fileExists(os.path.join("necks", self.neck + ".png")) and not engine.data.fileExists(os.path.join("necks", "Neck_" + self.neck + ".png")):
       self.neck = str(engine.mainMenu.chosenNeck) #this neck is safe!
@@ -530,7 +531,7 @@ class Neck:
                     self.renderIncomingNeck(visibility, song, pos, time, neckImg)
               
 
-      else:   #fall back on text-based guitar solo marking track
+      elif self.markSolos == 1:   #fall back on text-based guitar solo marking track
         for time, event in song.eventTracks[Song.TK_GUITAR_SOLOS].getEvents(boardWindowMin, boardWindowMax):
           if self.canGuitarSolo and self.guitarSoloNeck:
             if event.text.find("ON") >= 0:

@@ -294,7 +294,7 @@ def chooseControl(engine, mode = "edit", refresh = None):
   mode     = mode == "delete" and 1 or 0
   options  = []
   for i in Player.controllerDict.keys():
-    if i != "defaultg" and i != "None" and i != "defaultd":
+    if i != "defaultg" and i != "None" and i != "defaultd" and i != "defaultm":
       options.append(i)
   options.sort()
   if len(options) == 0:
@@ -361,7 +361,7 @@ class ControlCreator(BackgroundLayer, KeyListener):
       Log.debug("ControlCreator class init (Settings.py)...")
     
     self.time   = 0.0
-    self.badname     = []
+    self.badname     = ["defaultg", "defaultd", "defaultm"] #ensures that defaultm is included - duplicate is ok
     for i in Player.controllerDict.keys():
       self.badname.append(i.lower())
     
@@ -770,6 +770,7 @@ class SettingsMenu(Menu.Menu):
     self.basicSettings = [
       ConfigChoice(self.engine, self.engine.config, "game",  "language"),
       ConfigChoice(self.engine, self.engine.config, "game", "T_sound", autoApply = True), #Faaa Drum sound
+      ConfigChoice(self.engine, self.engine.config, "game", "mark_solo_sections", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "game", "star_scoring", autoApply = True),#myfingershurt
       ConfigChoice(self.engine, self.engine.config, "game", "career_star_min", autoApply = True), #akedrou
       ConfigChoice(self.engine, self.engine.config, "game", "resume_countdown", autoApply = True), #akedrou
@@ -948,7 +949,6 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "video", "show_fps"),#evilynux
       ConfigChoice(engine, engine.config, "game", "kill_debug", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "hopo_debug_disp", autoApply = True),#myfingershurt
-      ConfigChoice(engine, engine.config, "game", "rock_band_events", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "show_unused_text_events", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "debug",   "use_unedited_midis", autoApply = True),#myfingershurt
       #ConfigChoice(engine.config, "game", "font_rendering_mode", autoApply = True),#myfingershurt
@@ -1441,12 +1441,14 @@ def quickset(config):
     config.set("game", "big_rock_endings", 1)
     config.set("game", "in_game_stars", 1)
     config.set("coffee", "song_display_mode", 4)
+    config.set("game", "mark_solo_sections", 2)
     Log.debug("Quickset Gameplay - Theme-Based")
     
   elif gameSetNum == 2:
     config.set("game", "sp_notes_while_active", 2)
     config.set("game", "bass_groove_enable", 2)
     config.set("game", "big_rock_endings", 2)
+    config.set("game", "mark_solo_sections", 3)
     Log.debug("Quickset Gameplay - MIDI-Based")
     
   elif gameSetNum == 3:
@@ -1455,6 +1457,7 @@ def quickset(config):
     config.set("game", "big_rock_endings", 2)
     config.set("game", "in_game_stars", 2)
     config.set("game", "counting", True)
+    config.set("game", "mark_solo_sections", 1)
     Log.debug("Quickset Gameplay - RB style")
     
   elif gameSetNum == 4:
@@ -1464,6 +1467,7 @@ def quickset(config):
     config.set("game", "in_game_stars", 0)
     config.set("coffee", "song_display_mode", 1)
     config.set("game", "counting", False)
+    config.set("game", "mark_solo_sections", 0)
     Log.debug("Quickset Gameplay - GH style")
     
   elif gameSetNum == 5: # This needs work.
@@ -1473,6 +1477,7 @@ def quickset(config):
     config.set("game", "in_game_stars", 0)
     config.set("coffee", "song_display_mode", 1)
     config.set("game", "counting", True)
+    config.set("game", "mark_solo_sections", 1)
     Log.debug("Quickset Gameplay - WT style")
     
   # elif gameSetNum == 6: #FoFiX mode - perhaps soon.

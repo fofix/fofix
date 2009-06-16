@@ -668,7 +668,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.midiLyricsEnabled = 0
     if self.numOfPlayers > 1 and self.midiSectionsEnabled == 1:
       self.midiSectionsEnabled = 0
-    self.readTextAndLyricEvents = self.engine.config.get("game","rock_band_events")
     self.hopoDebugDisp = self.engine.config.get("game","hopo_debug_disp")
     if self.hopoDebugDisp == 1:
       for instrument in self.instruments:
@@ -691,6 +690,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.missPausesAnim = self.engine.config.get("game", "miss_pauses_anim") #MFH
     self.displayAllGreyStars = Theme.displayAllGreyStars
     self.starpowerMode = self.engine.config.get("game", "starpower_mode") #MFH
+    self.useMidiSoloMarkers = False
     self.logMarkerNotes = self.engine.config.get("game", "log_marker_notes")
     self.logStarpowerMisses = self.engine.config.get("game", "log_starpower_misses")
     self.soloFrameMode = self.engine.config.get("game", "solo_frame")
@@ -715,7 +715,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #self.logTempoEvents = self.engine.config.get("log",   "log_tempo_events")
 
     self.vbpmLogicType = self.engine.config.get("debug",   "use_new_vbpm_beta")
-
+    
     #MFH - switch to midi lyric mode option
     self.midiLyricMode = self.engine.config.get("game", "midi_lyric_mode")
     #self.midiLyricMode = 0
@@ -1043,6 +1043,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       instrument.setBPM(instrument.currentBpm)
 
     #if self.starpowerMode == 2:     #auto-MIDI mode only
+    self.markSolos = self.engine.config.get("game", "mark_solo_sections")
+    if self.markSolos == 2:
+      if Theme.markSolos == 2:
+        if self.theme == 2:
+          self.markSolos = 1
+        else:
+          self.markSolos = 0
+      else:
+        self.markSolos = Theme.markSolos
+    
     if self.song.hasStarpowerPaths:
       for i,guitar in enumerate(self.instruments):
         if guitar.isVocal:
@@ -1056,8 +1066,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         # for this instrument
         if self.song.midiStyle == Song.MIDI_TYPE_RB:
           numMidiSoloMarkerNotes = len([1 for time, event in self.song.midiEventTrack[i].getAllEvents() if (isinstance(event, Song.MarkerNote) and not event.endMarker and event.number == Song.starPowerMarkingNote ) ])          
-          if numMidiSoloMarkerNotes > 0:  #if at least 1 solo marked in this fashion, tell that guitar to ignore text solo events
+          if numMidiSoloMarkerNotes > 0 and self.markSolos > 0:  #if at least 1 solo marked in this fashion, tell that guitar to ignore text solo events
+            self.useMidiSoloMarkers = True
             guitar.useMidiSoloMarkers = True
+            self.neckrender[self.playerList[i].guitarNum].useMidiSoloMarkers = True
             
         if numOfSpMarkerNotes > 1:
         
@@ -1108,9 +1120,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           if instrument.isVocal:
             continue
           instrument.starNotesSet = False     #fallback on auto generation.
-
     
-    
+    if self.useMidiSoloMarkers or self.song.midiStyle == Song.MIDI_TYPE_RB or self.markSolos == 3: #assume RB Midi-types with no solos don't want any, dammit!
+      self.markSolos = 0
+    for i, player in enumerate(self.playerList):
+      if player.guitarNum is not None:
+        self.instruments[i].markSolos = self.markSolos
+        self.neckrender[player.guitarNum].markSolos = self.markSolos
     
     self.lastDrumNoteTime = 0.0
     self.lastNoteTimes = [0.0 for i in self.playerList]
@@ -1277,7 +1293,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 self.guitarSolos[i].append(guitarSoloNoteCount - 1)
                 Log.debug("P" + str(i+1) + " MIDI " + self.playerList[i].part.text + " Solo found from: " + str(startTime) + " to: " + str(endTime) + ", containing " + str(guitarSoloNoteCount) + " notes." )
         
-        else:   #mark using the old text-based system
+        elif instrument.markSolos == 1:   #mark using the old text-based system
       
           #Ntime now should contain the last note time - this can be used for guitar solo finishing
           #MFH - use new self.song.eventTracks[Song.TK_GUITAR_SOLOS] -- retrieve a gsolo on / off combo, then use it to count notes
@@ -1426,7 +1442,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     self.ready = True
     #lyric sheet!
-    if (self.readTextAndLyricEvents == 2 or (self.readTextAndLyricEvents == 1 and self.theme == 2)) and not self.playingVocals:
+    if not self.playingVocals:
       if self.song.hasMidiLyrics and self.midiLyricsEnabled > 0:
         if self.midiLyricMode == 0:
           try:
@@ -6049,7 +6065,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #lyricSlop = ( self.instruments[0].currentPeriod / (maxPos - minPos) ) / 4
       lyricSlop = ( slopPer / ((maxPos - minPos)/2) ) / 2
 
-      if (self.readTextAndLyricEvents == 2 or (self.readTextAndLyricEvents == 1 and self.theme == 2)) and (not self.pause and not self.failed and not self.ending):
+      if not self.pause and not self.failed and not self.ending:
   
         if self.countdown <= 0: #MFH - only attempt to handle sections / lyrics / text events if the countdown is complete!
 
@@ -8951,7 +8967,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                               event.happened = True
 
 
-                else:   #fall back on old guitar solo marking system
+                elif self.markSolos == 1:   #fall back on old guitar solo marking system
                   for time, event in self.song.eventTracks[Song.TK_GUITAR_SOLOS].getEvents(minPos, maxPos):
                     #is event happening now?
                     xOffset = (time - pos) / eventWindow
