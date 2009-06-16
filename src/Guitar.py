@@ -363,8 +363,6 @@ class Guitar:
     try:
       engine.loadImgDrawing(self, "hitflamesAnim", os.path.join("themes",themename,"hitflamesanimation.png"),  textureSize = (128, 128))
     except IOError:
-      #engine.loadImgDrawing(self, "hitflames1Drawing", os.path.join("themes",themename,"hitflames1.png"),  textureSize = (128, 128))
-      #engine.loadImgDrawing(self, "hitflames2Drawing", os.path.join("themes",themename,"hitflames2.png"),  textureSize = (128, 128))
       self.Hitanim2 = False
       
     try:
@@ -1682,92 +1680,6 @@ class Guitar:
     size = (.22, .22)
     v = 1.0 - visibility
 
-    #blazingamer- hitglow logic is not required for BRE since you can not perform holds during it, uncomment out if you disagree with this
-    
-##    if self.disableFlameSFX != True and self.HCountAni == True and self.HCount2 > 12:
-##      for n in range(self.strings):
-##        f = self.fretWeight[n]
-##        c = self.fretColors[n]
-##        if f and (controls.getState(self.actions[0]) or controls.getState(self.actions[1])):
-##          f += 0.25      
-##        y = v + f / 6
-##        x = (self.strings / 2 - n) * w
-##        f = self.fretActivity[n]
-##
-##        if f:
-##          ms = math.sin(self.time) * .25 + 1
-##          ff = f
-##          ff += 1.2
-##          
-##          
-##          #myfingershurt: need to cap flameSizes use of scoreMultiplier to 4x, the 5x and 6x bass groove mults cause crash:
-##          if self.scoreMultiplier > 4:
-##            #cappedScoreMult = 4
-##            self.cappedScoreMult = 4
-##          else:
-##            self.cappedScoreMult = self.scoreMultiplier
-##          
-##          #flameSize = self.flameSizes[self.scoreMultiplier - 1][n]
-##          flameSize = self.flameSizes[self.cappedScoreMult - 1][n]
-##          if self.theme == 0 or self.theme == 1: #THIS SETS UP GH3 COLOR, ELSE ROCKBAND(which is DEFAULT in Theme.py)
-##            flameColor = self.gh3flameColor
-##          else:
-##            #flameColor = self.flameColors[self.scoreMultiplier - 1][n]
-##            flameColor = self.flameColors[self.cappedScoreMult - 1][n]
-##          #Below was an if that set the "flame"-color to the same as the fret color if there was no specific flamecolor defined.
-##
-##          flameColorMod0 = 1.1973333333333333333333333333333
-##          flameColorMod1 = 1.9710526315789473684210526315789
-##          flameColorMod2 = 10.592592592592592592592592592593
-##          
-##          flamecol = (flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
-##          if self.starPowerActive:
-##            if self.theme == 0 or self.theme == 1: #GH3 starcolor
-##              flamecol = (.3,.7,.9)
-##            else: #Default starcolor (Rockband)
-##              flamecol = (.9,.9,.9)
-##              
-##          if not self.Hitanim:   
-##            self.engine.draw3Dtex(self.hitglowDrawing, coord = (x, y + .125, 0), rot = (90, 1, 0, 0),
-##                                  scale = (0.5 + .6 * ms * ff, 1.5 + .6 * ms * ff, 1 + .6 * ms * ff),
-##                                  vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
-##                                  texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)
-##            #Alarian: Animated hitflames
-##          else:
-##            self.HCount = self.HCount + 1
-##            if self.HCount > self.Animspeed-1:
-##              self.HCount = 0
-##            HIndex = (self.HCount * 16 - (self.HCount * 16) % self.Animspeed) / self.Animspeed
-##            if HIndex > 15:
-##              HIndex = 0
-##            texX = (HIndex*(1/16.0), HIndex*(1/16.0)+(1/16.0))
-##
-##            self.engine.draw3Dtex(self.hitglowAnim, coord = (x, y + .225, 0), rot = (90, 1, 0, 0), scale = (2.4, 1, 3.3),
-##                                  vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
-##                                  texcoord = (texX[0],0.0,texX[1],1.0), multiples = True, alpha = True, color = (1,1,1))
-##
-##
-##          ff += .3
-##
-##          flameColorMod0 = 1.1973333333333333333333333333333
-##          flameColorMod1 = 1.7842105263157894736842105263158
-##          flameColorMod2 = 12.222222222222222222222222222222
-##          
-##          flamecol = (flameColor[0] * flameColorMod0, flameColor[1] * flameColorMod1, flameColor[2] * flameColorMod2)
-##
-##          if self.starPowerActive:
-##            if self.theme == 0 or self.theme == 1: #GH3 starcolor
-##              flamecol = (.3,.7,.9)
-##            else: #Default starcolor (Rockband)
-##              flamecol = (.8,.8,.8)
-##
-##          if not self.Hitanim: 
-##            self.engine.draw3Dtex(self.hitglow2Drawing, coord = (x, y + .25, .05), rot = (90, 1, 0, 0),
-##                                  scale = (.40 + .6 * ms * ff, 1.5 + .6 * ms * ff, 1 + .6 * ms * ff),
-##                                  vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
-##                                  texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)
-
-
     if self.disableFlameSFX != True:
       flameLimit = 10.0
       flameLimitHalf = round(flameLimit/2.0)
@@ -1857,7 +1769,7 @@ class Guitar:
     size = (.22, .22)
     v = 1.0 - visibility
 
-    if self.disableFlameSFX != True and self.HCountAni == True and self.HCount2 > 12:
+    if self.disableFlameSFX != True and (self.HCountAni == True and self.HCount2 > 12):
       for n in range(self.strings):
         f = self.fretWeight[n]
         c = self.fretColors[n]
@@ -1963,7 +1875,7 @@ class Guitar:
             self.HCount2 = self.HCount2 + 1
             self.HCountAni = False
             if self.HCount2 > 12:
-              if event.length <= 130:
+              if not event.length > (1.4 * (60000.0 / event.noteBpm) / 4):
                 self.HCount2 = 0
               else:
                 self.HCountAni = True
@@ -2008,12 +1920,13 @@ class Guitar:
                   else:
                     flamecol = (.4+step*.1,)*3#Default starcolor (Rockband)
                 
-                self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x - .005, y + yOffset[step], 0), rot = (90, 1, 0, 0),
+                if self.hitFlamesPresent == True:
+                  self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x - .005, y + yOffset[step], 0), rot = (90, 1, 0, 0),
                                 scale = (.25 + step*.05 + scaleMod, yzscaleMod + scaleMod, yzscaleMod + scaleMod),
                                 vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
                                 multiples = True, alpha = True, color = flamecol)
                                     
-          else:
+          elif self.hitFlamesPresent == True and self.Hitanim2 == False:
             self.HCount2 = 13
             self.HCountAni = True
             if event.flameCount < flameLimitHalf:
