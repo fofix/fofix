@@ -387,7 +387,7 @@ def loadControls():
   global controllerDict
   controllers = []
   allcontrollers = os.listdir(controlpath)
-  default = ["defaultd.ini", "defaultg.ini"]
+  default = ["defaultd.ini", "defaultg.ini", "defaultm.ini"]
   for name in allcontrollers:
     if name.lower().endswith(".ini") and len(name) > 4:
       if name in default:
@@ -398,13 +398,17 @@ def loadControls():
   controllerDict = dict([(str(controllers[n]),controllers[n]) for n in range(0, i)])
   controllerDict["defaultg"] = _("Default Guitar")
   controllerDict["defaultd"] = _("Default Drum")
+  defMic = None
+  if Microphone.supported:
+    controllerDict["defaultm"] = _("Default Microphone")
+    defMic = "defaultm"
 
   Config.define("game", "control0",           str,   "defaultg", text = _("Controller 1"),                options = controllerDict)
   
   controllerDict["None"] = None
   
   Config.define("game", "control1",           str,   "defaultd", text = _("Controller 2"),                options = controllerDict)
-  Config.define("game", "control2",           str,   None,       text = _("Controller 3"),                options = controllerDict)
+  Config.define("game", "control2",           str,   defMic,     text = _("Controller 3"),                options = controllerDict)
   Config.define("game", "control3",           str,   None,       text = _("Controller 4"),                options = controllerDict)
 
 
@@ -486,9 +490,12 @@ class Controls:
       else:
         self.config.append(None)
     else:
+      confM = None
+      if Microphone.supported:
+        confM = Config.load(os.path.join(controlpath,"defaultm.ini"), type = 1)
       self.config.append(Config.load(os.path.join(controlpath,"defaultg.ini"), type = 1))
       self.config.append(Config.load(os.path.join(controlpath,"defaultd.ini"), type = 1))
-      self.config.append(None)
+      self.config.append(confM)
       self.config.append(None)
     
     self.type       = []
