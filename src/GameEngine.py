@@ -478,7 +478,18 @@ class GameEngine(Engine):
     self.title             = self.versionString
     self.restartRequested  = False
     self.handlingException = False
-    self.video             = Video(self.title)
+
+    # evilynux - Check if theme icon exists first, then fallback on FoFiX icon.
+    themename = self.config.get("coffee", "themename")
+    themeicon = os.path.join(Version.dataPath(), "themes", themename, "icon.png")
+    fofixicon = os.path.join(Version.dataPath(), "fofix_icon.png")
+    icon = None
+    if os.path.exists(themeicon):
+      icon = themeicon
+    elif os.path.exists(fofixicon):
+      icon = fofixicon
+
+    self.video             = Video(self.title, icon)
 
     self.config.set("game",   "font_rendering_mode", 0) #force oGL mode
 
@@ -569,7 +580,6 @@ class GameEngine(Engine):
     self.addTask(self.resource, synchronized = False)
 
     self.data = Data(self.resource, self.svg)
-    themename = self.data.themeLabel
 
 
     #self.setSpeedFactor(2)    #MFH - this is just a hack - try if you'd like, doesn't work right yet...

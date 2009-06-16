@@ -28,9 +28,10 @@ from OpenGL.GL.ARB.multisample import *
 import Log
 
 class Video:
-  def __init__(self, caption = "Game"):
+  def __init__(self, caption = "Game", icon = None):
     self.screen     = None
     self.caption    = caption
+    self.icon       = icon
     self.fullscreen = False
     self.flags      = True
 
@@ -57,6 +58,13 @@ class Video:
     if multisamples:
       pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLEBUFFERS, 1);
       pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLESAMPLES, multisamples);
+
+    # evilynux - Setting window icon for platforms other than MS Windows.
+    #            pygame claims that some window manager requires this to be
+    #            before display.set_mode(), so there it is!
+    #            Note: For the MS Windows icon, see below.
+    if not os.name == "nt" and self.icon != None:
+      pygame.display.set_icon(pygame.image.load(self.icon))
 
     try:
       self.screen = pygame.display.set_mode(resolution, flags)
