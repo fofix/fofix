@@ -63,6 +63,7 @@ I was tired and sick and couldn't sleep...
 ||  hitflames2.png              || Flashes when you hit a note                    || No (3.120+)|| All                      || ||
 ||  hitglow.png                 || Shines when holding a sustain                  || No (3.120+)|| All                      || ||
 ||  hitglow2.png                || Shines when holding a sustain                  || No (3.120+)|| All                      || ||
+||  icon.png                    || Changes the window and status bar icons        || No (3.120+)|| All                      || By default, the FoFiX icon is used ||
 ||  kill1.png                   || If killswitch tails are set to static and shaders are turned off, this will become the long part of the tail on the note held when killswitch is activated.  || No           || All                      || ||
 ||  kill2.png                   || If killswitch tails are set to static and shaders are turned off, this will become the end of the tail on the note held when killswitch is activated.                             || No           || All                      || ||
 ||  lightning.png               || Flashes when star power is gained              || GH Based     || GH Based                 || ||
