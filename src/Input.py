@@ -241,6 +241,7 @@ class Input(Task):
   def pluginControls(self):
     self.gameDrums = 0
     self.gameGuitars = 0
+    self.gameMics = 0
     Player.pluginControls(self.activeGameControls)
     for i in self.activeGameControls:
       if self.controls.type[i] == -1:
