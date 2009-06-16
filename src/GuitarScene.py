@@ -518,6 +518,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.loadSettings()
     self.tsBotNames = [_("KiD"), _("Stump"), _("AkedRobot"), _("Q"), _("MFH"), _("Jurgen")]
     #MFH pre-translate text strings:
+    self.powerUpName = Theme.power_up_name
+    if self.powerUpName == "None":
+      if self.theme == 2:
+        self.powerUpName = _("Overdrive")
+      else:
+        self.powerUpName = _("Starpower")
     if self.battleGH:
       self.tsBattleIcons = [None] * 9
       self.tsBattleIcons[1] = _("Death Drain")
@@ -530,12 +536,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.tsBattleIcons[8] = _("Amp Overload")
     self.tsNoteStreak = _("Note Streak!!!")
     self.tsPhraseStreak = _("Phrase Streak!!!")
-    if self.theme == 2:
-      self.tsStarPowerReady = _("Overdrive Ready")
-      self.tsCoOpStarPower  = _("Activate Overdrive!")
-    else:
-      self.tsStarPowerReady = _("Star Power Ready")
-      self.tsCoOpStarPower  = _("Activate Star Power!") #The proper is "Tilt guitar to activate Star Power", but drums and all...
+    self.tsStarPowerReady = _("%s Ready") % self.powerUpName
+    self.tsCoOpStarPower  = _("Activate %s!") % self.powerUpName
     self.tsYouFailedBattle = _("You Failed!!!!")
     self.tsJurgenIsHere = _("%s is here")
     self.tsJurgenWasHere = _("%s was here")

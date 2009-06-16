@@ -349,6 +349,7 @@ Config.define("theme", "star_fillup_color", str, None)
 #Qstick - Misc
 Config.define("theme", "song_list_display",       int, None)
 Config.define("theme", "neck_width",    float, 3.0)
+Config.define("theme", "power_up_name", str, None)
 
 #Qstick - Results Screen
 
@@ -587,6 +588,7 @@ starFillupColor = None
 songListDisplay = None
 neckWidth = None
 markSolos = None
+power_up_name = None #akedrou
 
 result_score = [None] * 5
 result_star = [None] * 4
@@ -828,6 +830,7 @@ def setupMisc(config):
   global neckWidth
   global neckLength
   global markSolos
+  global power_up_name
 
   loadingPhrase = config.get("theme", "loading_phrase")
   resultsPhrase = config.get("theme", "results_phrase")
@@ -850,6 +853,7 @@ def setupMisc(config):
   neckWidth = config.get("theme", "neck_width")
   neckLength = config.get("theme", "neck_length")
   markSolos = config.get("theme", "mark_solo_sections")
+  power_up_name = config.get("theme", "power_up_name")
 #MFH:
 def setupSonglist(config):
   global song_cd_Xpos, song_cdscore_Xpos, song_list_Xpos, song_listscore_Xpos

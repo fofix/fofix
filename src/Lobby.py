@@ -219,7 +219,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
     if self.necks[self.selected] is not None:
       return
     if self.selected > 1:
-      chosenNeck = Player.playerpref[self.selected-2][5]
+      chosenNeck = str(Player.playerpref[self.selected-2][6])
       if chosenNeck == "randomneck" or chosenNeck == "0" or chosenNeck.lower() == "neck_0":
         self.necks[self.selected] = "random"
         return
@@ -586,11 +586,13 @@ class CreateCharacter(Layer, KeyListener):
     self.newChar   = True
     self.choices   = []
     self.player    = None
+    self.neck      = None
     self.updatedName = None
     self.loadPlayer()
     self.dictEnDisable = {0: _("Disabled"), 1: _("Enabled")}
     self.lefty     = {0: 1, 1: -1}
-    self.values    = (self.dictEnDisable, self.dictEnDisable, self.dictEnDisable, {0: _("Disabled"), 1: _("Easy Assist"), 2: _("Medium Assist")}, self.dictEnDisable)
+    neckDict       = {0: _("Default Neck"), 1: _("Theme Neck"), 2: _("Select a Neck")}
+    self.values    = (self.dictEnDisable, self.dictEnDisable, self.dictEnDisable, {0: _("Disabled"), 1: _("Easy Assist"), 2: _("Medium Assist")}, self.dictEnDisable, neckDict)
     self.options   = [(_("Name"),             _("Name your character!")), \
                       (_("Lefty Mode"),       _("Flip the guitar frets for left-handed playing!")), \
                       (_("Drum Flip"),        _("Flip the drum sounds - red hits become green, and so on")), \
@@ -616,16 +618,19 @@ class CreateCharacter(Layer, KeyListener):
     if player is not None:
       try:
         pref = self.cache.execute('SELECT * FROM `players` WHERE `name` = ?', [player]).fetchone()
-        pref = [pref[0], pref[1], pref[2], pref[3], pref[4], pref[5], pref[6], pref[9]]
+        pref = [pref[0], pref[1], pref[2], pref[3], pref[4], pref[5], pref[6], pref[10]]
+        self.neck = pref[7]
         self.newChar = False
         self.player = player
         self.oldName = pref[0]
       except: #not found
-        pref = ['', 0, 0, 0, 0, 0, '', '']
+        pref = ['', 0, 0, 0, 0, 0, 0, '']
+        self.neck = ''
         self.newChar = True
         self.player = None
     else:
-      pref = ['', 0, 0, 0, 0, 0, '', '']
+      pref = ['', 0, 0, 0, 0, 0, 0, 0, '']
+      self.neck = ''
       self.newChar = True
       self.player = None
     for i in pref:
@@ -649,6 +654,7 @@ class CreateCharacter(Layer, KeyListener):
       self.engine.input.removeKeyListener(self)
   def saveCharacter(self):
     pref = self.choices[0:8]
+    pref.insert(7, self.neck)
     if len(self.choices[0]) > 0:
       if self.choices[0].lower() == "default":
         Dialogs.showMessage(self.engine, _("That is a terrible name. Choose something not 'default'"))
@@ -693,8 +699,9 @@ class CreateCharacter(Layer, KeyListener):
           self.active = True
           self.oldValue = self.choices[self.selected]
       elif self.selected == 6:
-        self.engine.view.pushLayer(Dialogs.NeckChooser(self.engine, player = self.player, owner = self))
-        self.keyActive = False
+        if self.choices[6] == 2:
+          self.engine.view.pushLayer(Dialogs.NeckChooser(self.engine, player = self.player, owner = self))
+          self.keyActive = False
       elif self.selected == 8:
         self.resetStats()
       elif self.selected == 9:
@@ -730,18 +737,18 @@ class CreateCharacter(Layer, KeyListener):
       if c in Player.key4s:
         self.engine.data.cancelSound.play()
     elif c in Player.rights or key == pygame.K_RIGHT:
-      if self.selected in (0, 6, 7, 8, 9, 10):
+      if self.selected in (0, 7, 8, 9, 10):
         pass
-      elif self.selected == 4:
+      elif self.selected in [4, 6]:
         self.choices[self.selected]+=1
         if self.choices[self.selected] > 2:
           self.choices[self.selected] = 0
       else:
         self.choices[self.selected] = 1 and (self.choices[self.selected] == 0) or 0
     elif c in Player.lefts or key == pygame.K_LEFT:
-      if self.selected in (0, 6, 7, 8, 9, 10):
+      if self.selected in (0, 7, 8, 9, 10):
         pass
-      elif self.selected == 4:
+      elif self.selected in [4, 6]:
         self.choices[self.selected]-=1
         if self.choices[self.selected] < 0:
           self.choices[self.selected] = 2
@@ -852,12 +859,16 @@ class CreateCharacter(Layer, KeyListener):
         font.render(option[0], (Theme.characterCreateX, Theme.characterCreateY+Theme.characterCreateSpace*i), scale = Theme.characterCreateScale)
         if self.active and self.selected == i:
           Theme.setSelectedColor(1-v)
-        if i == 0 or i > 5:
+        if i == 0 or i > 6:
           wText, hText = font.getStringSize(self.choices[i], scale = Theme.characterCreateScale)
           font.render(self.choices[i]+cursor, (Theme.characterCreateOptionX-wText, Theme.characterCreateY+Theme.characterCreateSpace*i), scale = Theme.characterCreateScale)
         else:
-          wText, hText = font.getStringSize(self.values[i-1][self.choices[i]], scale = Theme.characterCreateScale)
-          font.render(self.values[i-1][self.choices[i]], (Theme.characterCreateOptionX-wText, Theme.characterCreateY+Theme.characterCreateSpace*i), scale = Theme.characterCreateScale)
+          if i == self.selected:
+            str = "< %s >" % self.values[i-1][self.choices[i]]
+          else:
+            str = self.values[i-1][self.choices[i]]
+          wText, hText = font.getStringSize(str, scale = Theme.characterCreateScale)
+          font.render(str, (Theme.characterCreateOptionX-wText, Theme.characterCreateY+Theme.characterCreateSpace*i), scale = Theme.characterCreateScale)
       if self.backgroundTop:
         wFactor = 640.000/self.backgroundTop.width1()
         self.engine.drawImage(self.backgroundTop, scale = (wFactor,-wFactor), coord = (w/2,h/2))

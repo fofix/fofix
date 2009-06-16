@@ -118,8 +118,12 @@ class Neck:
     self.board_vtx = self.board_vtx.astype(float32)
     self.sidebars_vtx = self.sidebars_vtx.astype(float32)
 
-    self.neck = str(playerObj.neck)
-    playerObj = None
+    self.neckType = playerObj.neckType
+    if self.neckType == 0:
+      self.neck = engine.mainMenu.chosenNeck
+    else:
+      self.neck = str(playerObj.neck)
+    playerObj  = None
     #Get theme
     themename = self.engine.data.themeLabel
     #now theme determination logic is only in data.py:
@@ -154,29 +158,40 @@ class Neck:
 
     self.useMidiSoloMarkers = False
     self.markSolos = 0
-
-    if not engine.data.fileExists(os.path.join("necks", self.neck + ".png")) and not engine.data.fileExists(os.path.join("necks", "Neck_" + self.neck + ".png")):
-      self.neck = str(engine.mainMenu.chosenNeck) #this neck is safe!
-
-    # evilynux - Fixed random neck -- MFH: further fixing random neck
-    if self.neck == "0" or self.neck == "Neck_0" or self.neck == "randomneck":
-      self.neck = []
-      # evilynux - improved loading logic to support arbitrary filenames
-      for i in os.listdir(self.engine.resource.fileName("necks")):
-        # evilynux - Special cases, ignore these...
-        if( str(i) == "overdriveneck.png" or str(i) == "randomneck.png"  or str(i) == "Neck_0.png" or str(i)[-4:] != ".png" ):
-          continue
-        else:
-          self.neck.append(str(i)[:-4]) # evilynux - filename w/o extension
-      i = random.randint(1,len(self.neck))
-      engine.loadImgDrawing(self, "neckDrawing", os.path.join("necks",self.neck[i]+".png"),  textureSize = (256, 256))
-      Log.debug("Random neck chosen: " + self.neck[i])
-    else:
-      try:
-        # evilynux - first assume the self.neck contains the full filename
-        engine.loadImgDrawing(self, "neckDrawing", os.path.join("necks",self.neck+".png"),  textureSize = (256, 256))
-      except IOError:
-        engine.loadImgDrawing(self, "neckDrawing", os.path.join("necks","Neck_"+self.neck+".png"),  textureSize = (256, 256))
+    
+    neckFind = True
+    themeNeckPath = os.path.join(self.engine.resource.fileName("themes", themename, "necks"))
+    if self.neckType == 1 and os.path.exists(themeNeckPath):
+      themeNeck = []
+      for i in os.listdir(themeNeckPath):
+        if str(i)[-4:] == ".png":
+          themeNeck.append(str(i))
+      if len(themeNeck) > 0:
+        i = random.randint(1,len(themeNeck))
+        engine.loadImgDrawing(self, "neckDrawing", os.path.join("themes", themename, "necks", themeNeck[i-1]), textureSize = (256, 256))
+        neckFind = False
+    if neckFind:
+      if not engine.data.fileExists(os.path.join("necks", self.neck + ".png")) and not engine.data.fileExists(os.path.join("necks", "Neck_" + self.neck + ".png")):
+        self.neck = str(engine.mainMenu.chosenNeck) #this neck is safe!
+      # evilynux - Fixed random neck -- MFH: further fixing random neck
+      if self.neck == "0" or self.neck == "Neck_0" or self.neck == "randomneck":
+        self.neck = []
+        # evilynux - improved loading logic to support arbitrary filenames
+        for i in os.listdir(self.engine.resource.fileName("necks")):
+          # evilynux - Special cases, ignore these...
+          if( str(i) == "overdriveneck.png" or str(i) == "randomneck.png"  or str(i) == "Neck_0.png" or str(i)[-4:] != ".png" ):
+            continue
+          else:
+            self.neck.append(str(i)[:-4]) # evilynux - filename w/o extension
+        i = random.randint(1,len(self.neck))
+        engine.loadImgDrawing(self, "neckDrawing", os.path.join("necks",self.neck[i]+".png"),  textureSize = (256, 256))
+        Log.debug("Random neck chosen: " + self.neck[i])
+      else:
+        try:
+          # evilynux - first assume the self.neck contains the full filename
+          engine.loadImgDrawing(self, "neckDrawing", os.path.join("necks",self.neck+".png"),  textureSize = (256, 256))
+        except IOError:
+          engine.loadImgDrawing(self, "neckDrawing", os.path.join("necks","Neck_"+self.neck+".png"),  textureSize = (256, 256))
 
 
 

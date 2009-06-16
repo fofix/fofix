@@ -188,6 +188,7 @@ Config.define("player", "name",          str,  "")
 Config.define("player", "difficulty",    int,  Song.MED_DIF)
 Config.define("player", "part",          int,  Song.GUITAR_PART)
 Config.define("player", "neck",          str,  "")
+Config.define("player", "necktype",      str,  2, text = _("Neck Type"),     options = {0: _("Default Neck"), 1: _("Theme Neck"), 2: _("Specific Neck")})
 Config.define("player", "leftymode",     int,  0, text = _("Lefty Mode"),    options = {0: _("Off"), 1: _("On")})
 Config.define("player", "drumflip",      int,  0, text = _("Drum Flip"),     options = {0: _("Off"), 1: _("On")})
 Config.define("player", "two_chord_max", int,  0, text = _("Two-Chord Max"), options = {0: _("Off"), 1: _("On")})
@@ -233,7 +234,7 @@ class PlayerCacheManager(object): #akedrou - basically stump's cache for the pla
     updateTables = 0
     try:
       v = conn.execute("SELECT `value` FROM `config` WHERE `key` = 'version'").fetchone()[0]
-      if int(v) != 1:
+      if int(v) != 2:
         updateTables = 2 #an old version. We don't want to just burn old tables.
     except:
       updateTables = 1 #no good table
@@ -243,10 +244,10 @@ class PlayerCacheManager(object): #akedrou - basically stump's cache for the pla
       conn.commit()
       conn.execute('VACUUM')
       conn.execute('CREATE TABLE `config` (`key` STRING UNIQUE, `value` STRING)')
-      conn.execute('CREATE TABLE `players` (`name` STRING UNIQUE, `lefty` INT, `drumflip` INT, `autokick` INT, `assist` INT, `twochord` INT, `neck` STRING, `part` INT, \
-                     `difficulty` INT, `upname` STRING, `control` INT, `changed` INT, `loaded` INT)')
+      conn.execute('CREATE TABLE `players` (`name` STRING UNIQUE, `lefty` INT, `drumflip` INT, `autokick` INT, `assist` INT, `twochord` INT, `necktype` INT, `neck` STRING, \
+                     `part` INT, `difficulty` INT, `upname` STRING, `control` INT, `changed` INT, `loaded` INT)')
       conn.execute('CREATE TABLE `stats` (`song` STRING, `hash` STRING, `player` STRING)')
-      conn.execute("INSERT INTO `config` (`key`, `value`) VALUES ('version', '1')")  #stump: current cache format version number
+      conn.execute("INSERT INTO `config` (`key`, `value`) VALUES ('version', '2')")  #stump: current cache format version number
       conn.commit()
     self.caches[cachePath] = conn
     return conn
@@ -277,7 +278,7 @@ def loadPlayers():
       if cache:
         pref = cache.execute('SELECT * FROM `players` WHERE `name` = ?', [playername[-1]]).fetchone()
         try:
-          if len(pref) == 13:
+          if len(pref) == 14:
             playerpref.append((pref[1], pref[2], pref[3], pref[4], pref[5], pref[6], pref[7], pref[8], pref[9], pref[10]))
         except TypeError:
           try:
@@ -288,16 +289,17 @@ def loadPlayers():
             assist = c.get("player","assist_mode")
             twoch  = c.get("player","two_chord_max")
             neck   = c.get("player","neck")
+            neckt  = c.get("player","necktype")
             part   = c.get("player","part")
             diff   = c.get("player","difficulty")
             upname = c.get("player","name")
             control= c.get("player","controller")
             del c
-            cache.execute('INSERT INTO `players` VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1)', [playername[-1], lefty, drumf, autok, assist, twoch, neck, part, diff, upname, control])
-            playerpref.append((lefty, drumf, autok, assist, twoch, neck, part, diff, upname))
+            cache.execute('INSERT INTO `players` VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1)', [playername[-1], lefty, drumf, autok, assist, twoch, neckt, neck, part, diff, upname, control])
+            playerpref.append((lefty, drumf, autok, assist, twoch, neckt, neck, part, diff, upname))
           except IOError:
-            cache.execute('INSERT INTO `players` VALUES (?, 0, 0, 0, 0, 0, ``, 0, 2, ``, 0, 0, 1)', [playername[-1]])
-            playerpref.append((0, 0, 0, 0, 0, '', 0, 2, '', 0))
+            cache.execute('INSERT INTO `players` VALUES (?, 0, 0, 0, 0, 0, 0, ``, 0, 2, ``, 0, 0, 1)', [playername[-1]])
+            playerpref.append((0, 0, 0, 0, 0, 0, '', 0, 2, '', 0))
         cache.execute('UPDATE `players` SET `loaded` = 1 WHERE `name` = ?', [playername[-1]])
         cache.commit()
       else:
@@ -308,14 +310,15 @@ def loadPlayers():
           autok  = c.get("player","autokick")
           assist = c.get("player","assist_mode")
           neck   = c.get("player","neck")
+          neckt  = c.get("player","necktype")
           twoch  = c.get("player","two_chord_max")
           part   = c.get("player","part")
           diff   = c.get("player","difficulty")
           upname = c.get("player","name")
           del c
-          playerpref.append((lefty, drumf, autok, assist, twoch, neck, part, diff, upname))
+          playerpref.append((lefty, drumf, autok, assist, twoch, neckt, neck, part, diff, upname))
         except IOError, e:
-          playerpref.append((0, 0, 0, 0, 0, "", 0, 2, ""))
+          playerpref.append((0, 0, 0, 0, 0, 0, "", 0, 2, ""))
   return 1
 
 def savePlayers():
@@ -329,11 +332,12 @@ def savePlayers():
         c.set("player","auto_kick",int(pref[3]))
         c.set("player","assist_mode",int(pref[4]))
         c.set("player","two_chord_max",int(pref[5]))
-        c.set("player","neck",str(pref[6]))
-        c.set("player","part",int(pref[7]))
-        c.set("player","difficulty",int(pref[8]))
-        c.set("player","name",str(pref[9]))
-        c.set("player","controller",int(pref[10]))
+        c.set("player","necktype",int(pref[6]))
+        c.set("player","neck",str(pref[7]))
+        c.set("player","part",int(pref[8]))
+        c.set("player","difficulty",int(pref[9]))
+        c.set("player","name",str(pref[10]))
+        c.set("player","controller",int(pref[11]))
         del c
         cache.execute('UPDATE `players` SET `changed` = 0 WHERE `name` = ?', [pref[0]])
       except:
@@ -345,11 +349,12 @@ def savePlayers():
         c.set("player","auto_kick",int(pref[3]))
         c.set("player","assist_mode",int(pref[4]))
         c.set("player","two_chord_max",int(pref[5]))
-        c.set("player","neck",str(pref[6]))
-        c.set("player","part",int(pref[7]))
-        c.set("player","difficulty",int(pref[8]))
-        c.set("player","name",str(pref[9]))
-        c.set("player","controller",int(pref[10]))
+        c.set("player","necktype",int(pref[6]))
+        c.set("player","neck",str(pref[7]))
+        c.set("player","part",int(pref[8]))
+        c.set("player","difficulty",int(pref[9]))
+        c.set("player","name",str(pref[10]))
+        c.set("player","controller",int(pref[11]))
         del c
         cache.execute('UPDATE `players` SET `changed` = 0 WHERE `name` = ?', [pref[0]])
     #cache.execute('DELETE FROM `players` WHERE `loaded` = 0')
@@ -365,10 +370,10 @@ def updatePlayer(player, pref):
     except:
       a = None
     if a is not None:
-      cache.execute('UPDATE `players` SET `name` = ?, `lefty` = ?, `drumflip` = ?, `autokick` = ?, `assist` = ?, `twochord` = ?, `neck` = ?, \
+      cache.execute('UPDATE `players` SET `name` = ?, `lefty` = ?, `drumflip` = ?, `autokick` = ?, `assist` = ?, `twochord` = ?, `necktype` = ?, `neck` = ?, \
                      `part` = 0, `difficulty` = 2, `upname` = ?, `control` = 0, `changed` = 1, `loaded` = 1 WHERE `name` = ?', pref + [player])
     else:
-      cache.execute('INSERT INTO `players` VALUES (?, ?, ?, ?, ?, ?, ?, 0, 2, ?, 0, 1, 1)', pref)
+      cache.execute('INSERT INTO `players` VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 2, ?, 0, 1, 1)', pref)
     cache.commit()
   savePlayers()
   loadPlayers()
@@ -880,6 +885,7 @@ class Player(object):
     self.assistMode  = self.cache.execute('SELECT `assist` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
     self.autoKick    = self.cache.execute('SELECT `autokick` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
     self.neck        = self.cache.execute('SELECT `neck` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
+    self.neckType    = self.cache.execute('SELECT `necktype` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
     self.whichPart   = self.cache.execute('SELECT `part` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
     self._upname      = self.cache.execute('SELECT `upname` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
     self._difficulty  = self.cache.execute('SELECT `difficulty` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]

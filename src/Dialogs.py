@@ -3928,7 +3928,7 @@ class NeckChooser(Layer, KeyListener):
     self.selectedNeck = 0
     for i, name in enumerate(Player.playername):
       if name == player:
-        playerNeck = Player.playerpref[i][5]
+        playerNeck = Player.playerpref[i][6]
         if playerNeck == "":
           playerNeck = defaultNeck
         break
@@ -4041,7 +4041,7 @@ class NeckChooser(Layer, KeyListener):
       self.engine.config.set("game","default_neck",self.neck[self.selectedNeck])
     if self.owner: #rather hard-coded...
       if self.player != "default":
-        self.owner.choices[6]  = self.neck[self.selectedNeck]
+        self.owner.neck  = self.neck[self.selectedNeck]
     self.engine.view.popLayer(self)
     
   def cancel(self):
@@ -4476,7 +4476,7 @@ class ControlActivator(Layer, KeyListener):
     if c in Player.menuYes and self.ready:
       self.confirm()
       return True
-    if c in Player.cancels or key == pygame.K_ESCAPE:
+    if c in Player.menuNo or key == pygame.K_ESCAPE:
       self.engine.data.cancelSound.play()
       if len(self.selectedItems) > 0:
         self.delay = 0
