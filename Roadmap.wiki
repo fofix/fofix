@@ -40,6 +40,7 @@
   * Song.py
     * Vocal audio track support
   * Neck.py
+    * Merge with evilynux's (never released) array-based drawing code
     * Do a bit of housekeeping, clean it up.
   * Rewrite Note Handling
   * Make more read-only-data-folder friendly
