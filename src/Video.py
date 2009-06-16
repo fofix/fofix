@@ -25,7 +25,9 @@ import os
 import sys
 from OpenGL.GL import *
 from OpenGL.GL.ARB.multisample import *
+import Image
 import Log
+import struct
 
 class Video:
   def __init__(self, caption = "Game", icon = None):
@@ -84,26 +86,53 @@ class Video:
     pygame.mouse.set_visible(False)
 
     #stump: fix the window icon under Windows
-    # Yes, I do know about pygame.display.set_icon (and the inherent cross-platformness),
-    # but PIL won't load anything but the biggest icon from the ICO, and it looks like
-    # complete garbage when scaled down to 16x16.
+    # We would use pygame.display.set_icon(), but due to what appears to be
+    # a bug in SDL, the alpha channel is lost and some parts of the image are
+    # corrupted.  As a result, we go the long way and load and set the icon
+    # by hand to work around the bug.
     if os.name == 'nt':
       import win32api
       import win32gui
       import win32con
       hwnd = pygame.display.get_wm_info()['window']
-      if os.path.isfile('fofix.ico'):
-        # case: running from source code with fofix.ico present - use it
-        hicon_big = win32gui.LoadImage(0, 'fofix.ico', win32gui.IMAGE_ICON, 32, 32, win32gui.LR_LOADFROMFILE)
-        win32api.SendMessage(hwnd, win32con.WM_SETICON, win32con.ICON_BIG, hicon_big)
-        hicon_small = win32gui.LoadImage(0, 'fofix.ico', win32gui.IMAGE_ICON, 16, 16, win32gui.LR_LOADFROMFILE)
-        win32api.SendMessage(hwnd, win32con.WM_SETICON, win32con.ICON_SMALL, hicon_small)
-      elif hasattr(sys, 'frozen') and sys.frozen == 'windows_exe':
-        # case: running from py2exe'd exe - use the icon embedded in us
-        hicon_big = win32gui.LoadImage(win32api.GetModuleHandle(None), 1, win32gui.IMAGE_ICON, 32, 32, 0)
-        win32api.SendMessage(hwnd, win32con.WM_SETICON, win32con.ICON_BIG, hicon_big)
-        hicon_small = win32gui.LoadImage(win32api.GetModuleHandle(None), 1, win32gui.IMAGE_ICON, 16, 16, 0)
-        win32api.SendMessage(hwnd, win32con.WM_SETICON, win32con.ICON_SMALL, hicon_small)
+
+      # The Windows icon functions want the byte order in memory to be "BGRx"
+      # for some reason.  Use the alpha channel as a placeholder for the "x"
+      # and swap the channels to fit.  Also turn the image upside down as the
+      # API wants.
+      icon = Image.open(self.icon)
+      iconFixedUp = Image.merge('RGBA', [icon.split()[i] for i in (2, 1, 0, 3)]).transpose(Image.FLIP_TOP_BOTTOM)
+
+      # Scale the images to the icon sizes needed.
+      bigIcon = iconFixedUp.resize((32, 32), Image.BICUBIC)
+      smallIcon = iconFixedUp.resize((16, 16), Image.BICUBIC)
+
+      # The icon resources hold two bitmaps: the first is 32-bit pixel data
+      # (which for some reason doesn't hold the alpha, though we used the alpha
+      # channel to fill up that space - the fourth channel is ignored) and the
+      # second is a 1-bit alpha mask.  For some reason, we need to invert the
+      # alpha channel before turning it into the mask.
+      bigIconColorData = bigIcon.tostring()
+      bigIconMaskData = bigIcon.split()[3].point(lambda p: 255 - p).convert('1').tostring()
+      smallIconColorData = smallIcon.tostring()
+      smallIconMaskData = smallIcon.split()[3].point(lambda p: 255 - p).convert('1').tostring()
+
+      # Put together icon resource structures - a header, then the pixel data,
+      # then the alpha mask.  See documentation for the BITMAPINFOHEADER
+      # structure for what the fields mean.  Not all fields are used -
+      # http://msdn.microsoft.com/en-us/library/ms997538.aspx says which ones
+      # don't matter and says to set them to zero.  We double the height for
+      # reasons mentioned on that page, too.
+      bigIconData = struct.pack('<LllHHLLllLL', 40, 32, 64, 1, 32, 0, len(bigIconColorData+bigIconMaskData), 0, 0, 0, 0) + bigIconColorData + bigIconMaskData
+      smallIconData = struct.pack('<LllHHLLllLL', 40, 16, 32, 1, 32, 0, len(smallIconColorData+smallIconMaskData), 0, 0, 0, 0) + smallIconColorData + smallIconMaskData
+
+      # Finally actually create the icons from the icon resource structures.
+      hIconBig = win32gui.CreateIconFromResource(bigIconData, True, 0x00030000)
+      hIconSmall = win32gui.CreateIconFromResource(smallIconData, True, 0x00030000)
+
+      # And set the window's icon to our fresh new icon handles.
+      win32api.SendMessage(hwnd, win32con.WM_SETICON, win32con.ICON_BIG, hIconBig)
+      win32api.SendMessage(hwnd, win32con.WM_SETICON, win32con.ICON_SMALL, hIconSmall)
 
     if multisamples:
       try:

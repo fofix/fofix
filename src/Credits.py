@@ -23,7 +23,7 @@
 #####################################################################
 
 import pygame
-from OpenGL import version as OpenGLVersion
+import OpenGL
 from OpenGL.GL import *
 from OpenGL.GLU import *
 import math
@@ -198,7 +198,7 @@ class Credits(Layer, KeyListener):
       Text(nf, ns, c2, "right",  "PyGame " + pygame.version.ver.replace('release', '')),  #stump: the version that's actually in use
       Text(nf, bs, c2, "right",  "http://www.pygame.org"),
       space,
-      Text(nf, ns, c2, "right",  "PyOpenGL " + OpenGLVersion.__version__), #evilynux: the version that's actually in use
+      Text(nf, ns, c2, "right",  "PyOpenGL " + OpenGL.__version__), #evilynux: the version that's actually in use
       Text(nf, bs, c2, "right",  "http://pyopengl.sourceforge.net"),
       space,
       #Text(nf, ns, c2, "right",  "Amanith Framework"),
