@@ -19,6 +19,7 @@
   * Virtual File-system Layer (get rid of conditionals in loading files)
   * Online play
   * Multithreading
+  * Controller calibrator (delay, axis deadzone/offset, etc.) - Issue 836
   * More to come
 =====Rework=====
   * Menu.py
