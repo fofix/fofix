@@ -171,7 +171,7 @@ class Credits(Layer, KeyListener):
 
     space = Text(nf, hs, c1, "center", " ")
     self.credits = [
-      Picture(self.engine, "fofixlogo_withtext.png", .10), 
+      Picture(self.engine, "fofix_logo.png", .10), 
       Text(nf, ns, c1, "center", "%s" % Version.version()) ]
 
     # evilynux: Main FoFiX credits (taken from CREDITS).
