@@ -4245,6 +4245,8 @@ class AvatarChooser(BackgroundLayer, KeyListener):
         self.maxAv += 1
     self.themeAvs = len(self.avatars)
     for i in avatarfiles:
+      if str(i).lower()[-4:] != ".png":
+        continue
       try:
         image = engine.loadImgDrawing(self, "av"+str(i), os.path.join("avatars",str(i)))
 
@@ -4262,6 +4264,7 @@ class AvatarChooser(BackgroundLayer, KeyListener):
         self.avatar.append(str(i)[:-4]) # evilynux - filename w/o extension
         self.avatars.append(image)
         self.maxAv += 1
+    Log.debug("%d Theme Avatars found; %d total." % (self.themeAvs, len(self.avatars)))
     self.avScale = []
     for avatar in self.avatars:
       imgheight = avatar.height1()
@@ -4273,6 +4276,7 @@ class AvatarChooser(BackgroundLayer, KeyListener):
     
     self.accepted       = False
     self.time           = 0.0
+    self.dist           = 1.0
     
 
     #MFH - added simple black background to place in front of Options background, behind Neck BG, for transparent neck displays
@@ -4339,13 +4343,13 @@ class AvatarChooser(BackgroundLayer, KeyListener):
       self.scrollDown()
     return True
     
-  def scrollDown(self):
+  def scrollUp(self):
     self.engine.data.selectSound.play()
     self.selectedAv -= 1
     if self.selectedAv < 0:
       self.selectedAv = len(self.avatars) - 1
   
-  def scrollUp(self):
+  def scrollDown(self):
     self.engine.data.selectSound.play()
     self.selectedAv += 1
     if self.selectedAv >= len(self.avatars):
@@ -4363,6 +4367,10 @@ class AvatarChooser(BackgroundLayer, KeyListener):
   
   def run(self, ticks):
     self.time += ticks / 50.0
+    if self.dist > 0:
+      self.dist -= ticks / 750.0
+      if self.dist < 0:
+        self.dist = 0
     if self.scrolling > 0:
       self.delay -= ticks
       self.rate += ticks
@@ -4384,28 +4392,33 @@ class AvatarChooser(BackgroundLayer, KeyListener):
       else:
         fadeScreen(v)
       Theme.setBaseColor(1 - v)
-      
-      lastAv2i  = (int(self.selectedAv)-2) % len(self.avatars)
-      lastAvi   = (int(self.selectedAv)-1) % len(self.avatars)
-      nextAvi   = (int(self.selectedAv)+1) % len(self.avatars)
-      nextAv2i  = (int(self.selectedAv)+2) % len(self.avatars)
+      if len(self.avatars) > 1:
+        lastAv2i  = (int(self.selectedAv)-2) % len(self.avatars)
+        lastAvi   = (int(self.selectedAv)-1) % len(self.avatars)
+        nextAvi   = (int(self.selectedAv)+1) % len(self.avatars)
+        nextAv2i  = (int(self.selectedAv)+2) % len(self.avatars)
+      else:
+        lastAv2i  = 0
+        lastAvi   = 0
+        nextAvi   = 0
+        nextAv2i  = 0
       lastAv2   = self.avatars[lastAv2i]
       lastAv    = self.avatars[lastAvi]
       currentAv = self.avatars[int(self.selectedAv)]
       nextAv    = self.avatars[nextAvi]
       nextAv2   = self.avatars[nextAv2i]
       
-      self.x1 = w*0.07
-      self.x2 = w*0.17
-      self.x3 = w*0.24
-      self.x4 = w*0.17
-      self.x5 = w*0.07
+      self.x1 = w*(0.07-self.dist/2)
+      self.x2 = w*(0.17-self.dist/2)
+      self.x3 = w*(0.24-self.dist/2)
+      self.x4 = w*(0.17-self.dist/2)
+      self.x5 = w*(0.07-self.dist/2)
       self.y1 = h*0.75
       self.y2 = h*0.68
       self.y3 = h*0.5
       self.y4 = h*0.32
       self.y5 = h*0.25
-      bigCoord = (w*.667,h*.5)
+      bigCoord = (w*(.667+self.dist),h*.5)
       
       if self.avFrame:
         self.engine.drawImage(self.avFrame, scale = (self.avFrameScale[0]*1.75,self.avFrameScale[1]*1.75), coord = bigCoord)
