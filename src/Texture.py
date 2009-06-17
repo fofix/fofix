@@ -32,12 +32,6 @@ import JpegImagePlugin
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-try:
-  from glew import *
-except ImportError:
-  #Log.warn("GLEWpy not found -> Emulating Render to texture functionality.")
-  pass
-
 class TextureException(Exception):
   pass
 
