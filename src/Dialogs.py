@@ -4186,7 +4186,7 @@ class NeckChooser(Layer, KeyListener):
 
     
     
-class AvatarChooser(BackgroundLayer, KeyListener):
+class AvatarChooser(Layer, KeyListener):
   """Avatar choosing layer"""
   def __init__(self, engine):
     self.engine   = engine
@@ -4290,6 +4290,16 @@ class AvatarChooser(BackgroundLayer, KeyListener):
     except IOError:
       self.avSelFrame = self.avFrame
     
+    try:
+      self.engine.loadImgDrawing(self, "avBigFrame", os.path.join("themes",self.themename,"lobby","avatarmainframe.png"))
+    except IOError:
+      self.avBigFrame = self.avFrame
+    
+    try:
+      self.engine.loadImgDrawing(self, "avText", os.path.join("themes",self.themename,"lobby","avatartext.png"))
+    except IOError:
+      self.avText = None
+    
     self.avFrameScale = None
     if self.avFrame:
       imgheight = self.avFrame.height1()
@@ -4305,6 +4315,16 @@ class AvatarChooser(BackgroundLayer, KeyListener):
       hFactor = 110.00/imgheight
       wFactor = 178.00/imgwidth
       self.avSelFrameScale = (wFactor, -hFactor)
+    
+    self.avBigFrameScale = None
+    if self.avBigFrame:
+      imgheight = self.avBigFrame.height1()
+      imgwidth  = self.avBigFrame.width1()
+      hFactor = 110.00/imgheight
+      wFactor = 178.00/imgwidth
+      self.avBigFrameScale = (wFactor, -hFactor)
+    
+    self.avatarText = _("Select Your Avatar:")
     
     try:
       self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"lobby","avatarbg.png"))
@@ -4418,10 +4438,10 @@ class AvatarChooser(BackgroundLayer, KeyListener):
       self.y3 = h*0.5
       self.y4 = h*0.32
       self.y5 = h*0.25
-      bigCoord = (w*(.667+self.dist),h*.5)
+      bigCoord = (w*(Theme.avatarSelectAvX+self.dist),h*Theme.avatarSelectAvY)
       
-      if self.avFrame:
-        self.engine.drawImage(self.avFrame, scale = (self.avFrameScale[0]*1.75,self.avFrameScale[1]*1.75), coord = bigCoord)
+      if self.avBigFrame:
+        self.engine.drawImage(self.avFrame, scale = (self.avBigFrameScale[0]*1.75,self.avBigFrameScale[1]*1.75), coord = bigCoord)
       self.engine.drawImage(currentAv, scale = (self.avScale[self.selectedAv]*1.75,-self.avScale[self.selectedAv]*1.75), coord = bigCoord)
       
       if self.avFrame:
@@ -4444,7 +4464,10 @@ class AvatarChooser(BackgroundLayer, KeyListener):
         font = self.engine.data.fontDict[Theme.avatarSelectFont]
       except:
         font = self.engine.data.font
-      wrapText(font, (Theme.avatarSelectTextX, Theme.avatarSelectTextY - v), _("Select Your Avatar:"), scale = Theme.avatarSelectTextScale)
+      if self.avText:
+        self.engine.drawImage(self.avText, scale = Theme.avatarSelectTextScale, coord = (Theme.avatarSelectTextX, Theme.avatarSelectTextY - v))
+      else:
+        font.render(self.avatarText, (Theme.avatarSelectTextX, Theme.avatarSelectTextY - v), scale = Theme.avatarSelectTextScale)
     finally:
       self.engine.view.resetProjection()
     #==============================================================
