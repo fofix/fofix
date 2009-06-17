@@ -39,7 +39,10 @@ Then use any of the following settings below the {{{[theme]}}} header in the the
 
 ----------------------------------------------------------------------------
 =Lobby/Player Select/Creation=
-
+||avatar_select_text_x = .44||Define's the X position of the avatar select text. Use a floating point number||
+||avatar_select_text_y = .16||Define's the Y position of the avatar select text. Use a floating point number||
+||avatar_select_text_scale = .0027  ||Define's the size of the font used in avatar select. Use a floating point number||
+||avatar_select_font = (fontname) || Define's the font used for avatar select area||
 ||avatarscaleX = 1|| Use this to control the X size of player's avatar. Use a floating point.||
 ||avatarscaleY = 1|| Use this to control the Y size of player's avatar. Use a floating point.||
 ||avatarposX = .35|| Use this to control the X position of player's avatar. Use a floating point.||
