@@ -11,7 +11,7 @@ If you would rather stick with the tried-and-true 2.4 instructions, see Required
 
 == Windows ==
 
-First, you will need Python 2.6 itself.  Go to http://www.python.org/download/ and select the most recent 2.6.x release.  The most recent 2.6.x at the time of this writing is 2.6.1 (http://www.python.org/ftp/python/2.6.1/python-2.6.1.msi).  _Select the *32-bit* Windows binary installer, even if you have a 64-bit system._  Not all of the dependency modules are available for 64-bit systems.  Install by double-clicking the .msi file, but read the next paragraph before doing so.
+First, you will need Python 2.6 itself.  Go to http://www.python.org/download/ and select the most recent 2.6.x release.  The most recent 2.6.x at the time of this writing is 2.6.2 (http://www.python.org/ftp/python/2.6.2/python-2.6.2.msi).  _Select the *32-bit* Windows binary installer, even if you have a 64-bit system._  Not all of the dependency modules are available for 64-bit systems.  Install by double-clicking the .msi file, but read the next paragraph before doing so.
 
 You will need to add the Python installation folder to the PATH.  You can do this while the screen is showing in the installer that allows you to choose which folder Python will be installed to.  Select the folder name and copy it to the Clipboard.  Then open the Start menu, right-click on "My Computer" (XP/2003) or "Computer" (Vista/2008/Win7), and choose Properties.  Go to the Advanced tab, then click Environment Variables.  Under System Variables, find where the variable "PATH" (or "Path") is set, and double-click it to edit it.  Add a semicolon (;) to the end of the existing value, then paste the folder name in after it.  Click OK in each window until you are out of System Properties, then continue installing Python.
 
@@ -35,8 +35,9 @@ The following packages are optional:
   # rtmidi: support for using MIDI instruments (svn revision 10: http://www.mediafire.com/file/njrzmkyztfg/rtmidi-0.1.win32-py2.6.exe)
   # py2exe: support for freezing the code into a standalone EXE (0.6.9: http://downloads.sourceforge.net/py2exe/py2exe-0.6.9.win32-py2.6.exe)
   # pitchbend: support for pitch bend effect (0.3-EndOfLife: http://www.mediafire.com/file/zlinjzzj0km/pitchbend-0.3-EndOfLife.win32-py2.6.exe)  _Will be replaced with a much better implementation soon enough..._
-  # pyaudio: required for experimental vocals support (0.2.3: http://people.csail.mit.edu/hubert/pyaudio/packages/pyaudio-0.2.3.py26.exe)
-  # pypitch: required for experimental vocals support (svn revision 7: http://www.mediafire.com/file/s9mtx1xqjmp/pypitch-svn_rev7.win32-py2.6.exe)
+  # pyaudio: required for vocals support (0.2.3: http://people.csail.mit.edu/hubert/pyaudio/packages/pyaudio-0.2.3.py26.exe)
+  # pypitch: optional alternative to the pitch analysis engine built into FoFiX (svn revision 9: http://www.mediafire.com/file/zzgman2dzot/pypitch-svn_rev9.win32-py2.6.exe)
+    * *At least r9 is REQUIRED or you will get crashes when you try to play using pypitch!*  (You can choose between pypitch and the built-in analyzer in Debug Settings.)
 
 Install them in the order listed above by double-clicking the .exe or .msi files that you downloaded.
 

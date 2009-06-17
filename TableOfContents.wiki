@@ -8,6 +8,7 @@
   * [KnownIssues]
   * [ReportingBugs]
   * [RequiredSourceModules]
+  * [RunningUnderPython26]
   * [Roadmap]
   * [ProjectStatistics]
   * [Shaders]
