@@ -976,7 +976,7 @@ def setupLobby(config):
   global lobbySelectImageX, lobbySelectImageY, lobbySelectSpace, characterCreateHelpY, lobbyPreviewY
   global lobbyTitleFont, lobbySelectX, lobbySelectY, lobbySelectFont, characterCreateX, characterCreateY
   global characterCreateOptionX, characterCreateScale, characterCreateSpace, characterCreateHelpFont
-  global characterCreateOptionFont, characterCreateHelpX, characterCreateHelpScale, avatarWheelY
+  global characterCreateOptionFont, characterCreateHelpX, characterCreateHelpScale, avatarSelectWheelY
   global characterCreateFontColor, characterCreateSelectColor, characterCreateHelpColor
   global lobbyFontColor, lobbySelectColor, lobbyDisableColor, lobbyTitleColor, lobbyInfoColor, lobbyPlayerColor
   global lobbySelectLength, lobbyMode, lobbyPreviewSpacing, lobbyAvatarX, lobbyAvatarY, lobbyAvatarScale
