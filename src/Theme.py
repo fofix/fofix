@@ -218,6 +218,7 @@ Config.define("theme", "avatar_select_text_scale",   float, .0027)
 Config.define("theme", "avatar_select_font",   str, "font")
 Config.define("theme", "avatar_select_avatar_x", float, .667)
 Config.define("theme", "avatar_select_avatar_y", float, .5)
+Config.define("theme", "avatar_select_wheel_y", float, 0.0)
 
 #worldrave
 Config.define("theme", "setlistguidebuttonsposX", float, 0.408)
@@ -496,6 +497,7 @@ avatarSelectTextScale = None
 avatarSelectFont = None
 avatarSelectAvX = None
 avatarSelectAvY = None
+avatarSelectWheelY = None
 
 #worldrave 
 setlistguidebuttonsposX = None
@@ -974,7 +976,7 @@ def setupLobby(config):
   global lobbySelectImageX, lobbySelectImageY, lobbySelectSpace, characterCreateHelpY, lobbyPreviewY
   global lobbyTitleFont, lobbySelectX, lobbySelectY, lobbySelectFont, characterCreateX, characterCreateY
   global characterCreateOptionX, characterCreateScale, characterCreateSpace, characterCreateHelpFont
-  global characterCreateOptionFont, characterCreateHelpX, characterCreateHelpScale
+  global characterCreateOptionFont, characterCreateHelpX, characterCreateHelpScale, avatarWheelY
   global characterCreateFontColor, characterCreateSelectColor, characterCreateHelpColor
   global lobbyFontColor, lobbySelectColor, lobbyDisableColor, lobbyTitleColor, lobbyInfoColor, lobbyPlayerColor
   global lobbySelectLength, lobbyMode, lobbyPreviewSpacing, lobbyAvatarX, lobbyAvatarY, lobbyAvatarScale
@@ -1045,6 +1047,7 @@ def setupLobby(config):
   avatarSelectFont = config.get("theme","avatar_select_font")
   avatarSelectAvX = config.get("theme","avatar_select_avatar_x")
   avatarSelectAvY = config.get("theme","avatar_select_avatar_y")
+  avatarSelectWheelY = config.get("theme","avatar_select_wheel_y")
 
 def setupTWOD(config):
   global twoDnote, twoDkeys, threeDspin, opencolor

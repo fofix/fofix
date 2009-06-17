@@ -659,11 +659,11 @@ class CreateCharacter(Layer, KeyListener):
         Player.updatePlayer(self.player, pref)
         self.updatedName  = self.choices[0]
         if self.avatar is not None:
-          shutil.copy(self.engine.resource.fileName(self.avatar),self.engine.resource.fileName(os.path.join("users","players",self.choices[0]+".png")))
+          shutil.copy(self.engine.resource.fileName(self.avatar),os.path.join(self.engine.data.path,"users","players",self.choices[0]+".png"))
         if self.oldName:
           if os.path.exists(self.engine.resource.fileName(os.path.join("users","players",self.oldName+".png"))) and self.oldName != self.choices[0]:
             if self.avatar is None:
-              os.rename(self.engine.resource.fileName(os.path.join("users","players",self.oldName+".png")), self.engine.resource.fileName(os.path.join("users","players",self.choices[0]+".png")))
+              os.rename(self.engine.resource.fileName(os.path.join("users","players",self.oldName+".png")), os.path.join(self.engine.data.path,"users","players",self.choices[0]+".png"))
             else:
               os.remove(self.engine.resource.fileName(os.path.join("users","players",self.oldName+".png")))
         self.engine.view.popLayer(self)

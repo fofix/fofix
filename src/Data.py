@@ -79,6 +79,8 @@ class Data(object):
 
     #myfingershurt: check for existance of theme path
     themepath = os.path.join(Version.dataPath(), "themes")
+    self.themepath = themepath
+    self.path = Version.dataPath()
 
     if not os.path.exists(os.path.join(themepath,themename,"notes.png")):
       #myfingershurt: here need to ensure an existing theme is selected

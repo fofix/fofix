@@ -4433,11 +4433,11 @@ class AvatarChooser(Layer, KeyListener):
       self.x3 = w*(0.24-self.dist/2)
       self.x4 = w*(0.17-self.dist/2)
       self.x5 = w*(0.07-self.dist/2)
-      self.y1 = h*0.75
-      self.y2 = h*0.68
-      self.y3 = h*0.5
-      self.y4 = h*0.32
-      self.y5 = h*0.25
+      self.y1 = h*(0.75+Theme.avatarSelectWheelY)
+      self.y2 = h*(0.68+Theme.avatarSelectWheelY)
+      self.y3 = h*(0.5+Theme.avatarSelectWheelY)
+      self.y4 = h*(0.32+Theme.avatarSelectWheelY)
+      self.y5 = h*(0.25+Theme.avatarSelectWheelY)
       bigCoord = (w*(Theme.avatarSelectAvX+self.dist),h*Theme.avatarSelectAvY)
       
       if self.avBigFrame:
