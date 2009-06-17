@@ -15,7 +15,7 @@
   * Theme Necks < append theme necks to list of necks with current folder
     * Option for random neck to be taken from theme folder/currneckfolder/all necks
   * Difficulty based Careers
-  * Single song database
+  * Single song database - Issue 346
   * Virtual File-system Layer (get rid of conditionals in loading files)
   * Online play
   * Multithreading
@@ -43,6 +43,6 @@
   * Neck.py
     * Merge with evilynux's (never released) array-based drawing code
     * Do a bit of housekeeping, clean it up.
-  * Rewrite Note Handling
+  * Rewrite Note Handling - Issue 491
   * Make more read-only-data-folder friendly
   * Switch to new version scheme
