@@ -3729,8 +3729,10 @@ class MidiPartsDiffReader(midi.MidiOutStream):
     self.parts = []
     self.difficulties = {}
     self.currentPart = -1
+    self.nextPart    = 0
     self.forceGuitar = forceGuitar
     self.firstTrack   = False
+    self.notesFound   = [0, 0, 0, 0]
 
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:
@@ -3744,7 +3746,9 @@ class MidiPartsDiffReader(midi.MidiOutStream):
         if not parts[GUITAR_PART] in self.parts:
           part = parts[GUITAR_PART]
           self.parts.append(part)
+          self.nextPart = None
           self.currentPart = part.id
+          self.notesFound  = [0, 0, 0, 0]
           self.difficulties[part.id] = []
           if self.logSections == 1:
             tempText = "No recognized tracks found. Using first track, and identifying it as "
@@ -3762,40 +3766,36 @@ class MidiPartsDiffReader(midi.MidiOutStream):
 
     if text == "PART GUITAR" or text == "T1 GEMS" or text == "Click":
       if not parts[GUITAR_PART] in self.parts:
-        part = parts[GUITAR_PART]
-        self.parts.append(part)
-        self.currentPart = part.id
-        self.difficulties[part.id] = []
+        self.nextPart = parts[GUITAR_PART]
+        self.currentPart = self.nextPart.id
+        self.notesFound  = [0, 0, 0, 0]
         if self.logSections == 1:
           tempText2 = "GUITAR_PART"
           Log.debug(tempText + tempText2)
 
     elif text == "PART RHYTHM":
       if not parts[RHYTHM_PART] in self.parts:
-        part = parts[RHYTHM_PART]
-        self.parts.append(part)
-        self.currentPart = part.id
-        self.difficulties[part.id] = []
+        self.nextPart = parts[RHYTHM_PART]
+        self.currentPart = self.nextPart.id
+        self.notesFound  = [0, 0, 0, 0]
         if self.logSections == 1:
           tempText2 = "RHYTHM_PART"
           Log.debug(tempText + tempText2)
      
     elif text == "PART BASS":
       if not parts[BASS_PART] in self.parts:
-        part = parts[BASS_PART]
-        self.parts.append(part)
-        self.currentPart = part.id
-        self.difficulties[part.id] = []
+        self.nextPart = parts[BASS_PART]
+        self.currentPart = self.nextPart.id
+        self.notesFound  = [0, 0, 0, 0]
         if self.logSections == 1:
           tempText2 = "BASS_PART"
           Log.debug(tempText + tempText2)
 
     elif text == "PART GUITAR COOP":
       if not parts[LEAD_PART] in self.parts:
-        part = parts[LEAD_PART]
-        self.parts.append(part)
-        self.currentPart = part.id
-        self.difficulties[part.id] = []
+        self.nextPart = parts[LEAD_PART]
+        self.currentPart = self.nextPart.id
+        self.notesFound  = [0, 0, 0, 0]
         if self.logSections == 1:
           tempText2 = "LEAD_PART"
           Log.debug(tempText + tempText2)
@@ -3803,10 +3803,9 @@ class MidiPartsDiffReader(midi.MidiOutStream):
     #myfingershurt: drums, rock band rip compatible :)
     elif text == "PART DRUM" or text == "PART DRUMS":
       if not parts[DRUM_PART] in self.parts:
-        part = parts[DRUM_PART]
-        self.parts.append(part)
-        self.currentPart = part.id
-        self.difficulties[part.id] = []
+        self.nextPart = parts[DRUM_PART]
+        self.currentPart = self.nextPart.id
+        self.notesFound  = [0, 0, 0, 0]
         if self.logSections == 1:
           tempText2 = "DRUM_PART"
           Log.debug(tempText + tempText2)
@@ -3815,6 +3814,7 @@ class MidiPartsDiffReader(midi.MidiOutStream):
       if not parts[VOCAL_PART] in self.parts:
         part = parts[VOCAL_PART]
         self.parts.append(part)
+        self.nextPart = None
         self.currentPart = part.id
         self.difficulties[part.id] = difficulties.values()
         if self.logSections == 1:
@@ -3823,17 +3823,29 @@ class MidiPartsDiffReader(midi.MidiOutStream):
     
     else:
       self.currentPart = -1
-
+  
+  def addPart(self):
+    self.parts.append(self.nextPart)
+    self.difficulties[self.nextPart.id] = []
+    self.nextPart = None
+  
   def note_on(self, channel, note, velocity):
     if self.currentPart == -1:
       return
     try:
-      if len(self.difficulties[self.currentPart]) == len(difficulties):
-        return
+      try:
+        if len(self.difficulties[self.currentPart]) == len(difficulties):
+          return
+      except KeyError:
+        pass
       track, number = noteMap[note]
-      diff = difficulties[track]
-      if not diff in self.difficulties[self.currentPart]:
-        self.difficulties[self.currentPart].append(diff)
+      self.notesFound[track] += 1
+      if self.notesFound[track] > 5:
+        if self.nextPart is not None:
+          self.addPart()
+        diff = difficulties[track]
+        if not diff in self.difficulties[self.currentPart]:
+          self.difficulties[self.currentPart].append(diff)
     except KeyError:
       pass
 

@@ -372,6 +372,8 @@ def updatePlayer(player, pref):
     if a is not None:
       cache.execute('UPDATE `players` SET `name` = ?, `lefty` = ?, `drumflip` = ?, `autokick` = ?, `assist` = ?, `twochord` = ?, `necktype` = ?, `neck` = ?, \
                      `part` = 0, `difficulty` = 2, `upname` = ?, `control` = 0, `changed` = 1, `loaded` = 1 WHERE `name` = ?', pref + [player])
+      if player != pref[0]:
+        os.rename(os.path.join(playerpath,player+".ini"),os.path.join(playerpath,pref[0]+".ini"))
     else:
       cache.execute('INSERT INTO `players` VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 2, ?, 0, 1, 1)', pref)
     cache.commit()

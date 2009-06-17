@@ -26,6 +26,7 @@ from OpenGL.GL import *
 import math
 import colorsys
 import os
+import shutil
 
 from View import Layer
 from Input import KeyListener
@@ -98,7 +99,10 @@ class Lobby(Layer, KeyListener, MessageHandler):
       except IOError:
         self.chooseCharImg = None
       
-      self.engine.loadImgDrawing(self, "defaultAvatar", os.path.join("users", "players", "default.png"))
+      if os.path.exists(self.engine.resource.fileName(os.path.join("themes",themename,"avatars","default.png"))):
+        self.engine.loadImgDrawing(self, "defaultAvatar", os.path.join("themes", themename, "avatars", "default.png"))
+      else:
+        self.engine.loadImgDrawing(self, "defaultAvatar", os.path.join("users", "players", "default.png"))
       self.engine.loadImgDrawing(self, "defaultNeck",   os.path.join("necks", self.engine.mainMenu.chosenNeck + ".png"))
       self.engine.loadImgDrawing(self, "randomNeck",    os.path.join("necks", "randomneck.png"))
       self.engine.loadImgDrawing(self, "buttons", os.path.join("themes", themename, "notes.png"))
@@ -317,12 +321,10 @@ class Lobby(Layer, KeyListener, MessageHandler):
     if self.playerNum >= self.players:
       return True
     if c in self.up + [Player.playerkeys[self.playerNum][Player.UP]] or key == pygame.K_UP:
-      self.engine.data.selectSound.play()
       self.scrolling = 1
       self.scrollUp()
       self.delay = self.engine.scrollDelay
     elif c in self.down + [Player.playerkeys[self.playerNum][Player.DOWN]] or key == pygame.K_DOWN:
-      self.engine.data.selectSound.play()
       self.scrolling = 2
       self.scrollDown()
       self.delay = self.engine.scrollDelay
@@ -333,6 +335,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
     return True
   
   def scrollUp(self):
+    self.engine.data.selectSound.play()
     self.selected -= 1
     if self.selected < 0:
       self.selected = len(self.options) - 1
@@ -346,6 +349,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
         self.pos = (self.selected, self.selected+self.screenOptions)
     
   def scrollDown(self):
+    self.engine.data.selectSound.play()
     self.selected += 1
     while self.selected in self.blockedItems:
       self.selected += 1
@@ -585,6 +589,7 @@ class CreateCharacter(Layer, KeyListener):
       self.invalidNames.append(i.lower())
     self.newChar   = True
     self.choices   = []
+    self.avatar    = None
     self.player    = None
     self.neck      = None
     self.updatedName = None
@@ -601,7 +606,7 @@ class CreateCharacter(Layer, KeyListener):
                       (_("Two-Chord Max"),    _("Cut those jumbo chords down to a more manageable size!")), \
                       (_("Neck"),             _("Set a custom neck image just for you!")), \
                       (_("Upload Name"),      _("'Harry Potter' is all well and good, but...")), \
-                      (_("Reset Stats"),      _("Sometimes it's better to start from scratch.")), \
+                      (_("Choose Avatar"),    _("Sometimes I wonder what you look like.")), \
                       (_("Delete Character"), _("Come on... I didn't mean it. Really, I promise!")), \
                       (_("Done"),             _("All finished? Let's do this thing!"))]
     themename = self.engine.data.themeLabel
@@ -629,21 +634,13 @@ class CreateCharacter(Layer, KeyListener):
         self.newChar = True
         self.player = None
     else:
-      pref = ['', 0, 0, 0, 0, 0, 0, 0, '']
+      pref = ['', 0, 0, 0, 0, 0, 0, '']
       self.neck = ''
       self.newChar = True
       self.player = None
     for i in pref:
       self.choices.append(i)
     self.choices.extend(["", "", ""])
-  def resetStats(self):
-    if not self.player:
-      return
-    tsYes = _("Yes")
-    q = Dialogs.chooseItem(self.engine, [tsYes, _("No")], _("Are you sure you want to reset all stats for this player?"))
-    if q == tsYes:
-      Dialogs.showMessage(self.engine, _("No stats saved."))
-      #Player.resetStats(self.player)
   def deleteCharacter(self):
     tsYes = _("Yes")
     q = Dialogs.chooseItem(self.engine, [tsYes, _("No")], _("Are you sure you want to delete this player?"))
@@ -661,6 +658,14 @@ class CreateCharacter(Layer, KeyListener):
       elif self.choices[0].lower() not in self.invalidNames or self.choices[0] == self.player:
         Player.updatePlayer(self.player, pref)
         self.updatedName  = self.choices[0]
+        if self.avatar is not None:
+          shutil.copy(self.engine.resource.fileName(self.avatar),self.engine.resource.fileName(os.path.join("users","players",self.choices[0]+".png")))
+        if self.oldName:
+          if os.path.exists(self.engine.resource.fileName(os.path.join("users","players",self.oldName+".png"))) and self.oldName != self.choices[0]:
+            if self.avatar is None:
+              os.rename(self.engine.resource.fileName(os.path.join("users","players",self.oldName+".png")), self.engine.resource.fileName(os.path.join("users","players",self.choices[0]+".png")))
+            else:
+              os.remove(self.engine.resource.fileName(os.path.join("users","players",self.oldName+".png")))
         self.engine.view.popLayer(self)
         self.engine.input.removeKeyListener(self)
       else:
@@ -691,6 +696,7 @@ class CreateCharacter(Layer, KeyListener):
         return
     if c in Player.key1s or key == pygame.K_RETURN:
       self.scrolling = 0
+      self.engine.data.acceptSound.play()
       if self.selected in (0, 7):
         if self.active:
           self.active = False
@@ -703,12 +709,11 @@ class CreateCharacter(Layer, KeyListener):
           self.engine.view.pushLayer(Dialogs.NeckChooser(self.engine, player = self.player, owner = self))
           self.keyActive = False
       elif self.selected == 8:
-        self.resetStats()
+        self.avatar = Dialogs.chooseAvatar(self.engine)
       elif self.selected == 9:
         self.deleteCharacter()
       elif self.selected == 10:
         self.saveCharacter()
-      self.engine.data.acceptSound.play()
     elif c in Player.key2s + Player.cancels or key == pygame.K_ESCAPE:
       self.engine.data.cancelSound.play()
       if not self.active:
