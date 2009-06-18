@@ -4465,7 +4465,7 @@ class AvatarChooser(Layer, KeyListener):
       except:
         font = self.engine.data.font
       if self.avText:
-        self.engine.drawImage(self.avText, scale = Theme.avatarSelectTextScale, coord = (Theme.avatarSelectTextX, Theme.avatarSelectTextY - v))
+        self.engine.drawImage(self.avText, scale = (Theme.avatarSelectTextScale, -Theme.avatarSelectTextScale), coord = (Theme.avatarSelectTextX, Theme.avatarSelectTextY - v))
       else:
         font.render(self.avatarText, (Theme.avatarSelectTextX, Theme.avatarSelectTextY - v), scale = Theme.avatarSelectTextScale)
     finally:
