@@ -5406,6 +5406,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       time = self.getSongPosition()
       if time - self.battleJustUsed[num] > 1500: #must wait 1.5sec before next object use
         if self.instruments[num].battleObjects[0] != 0:
+          self.engine.data.battleUsedSound.play()
           self.instruments[self.battleTarget[num]].battleStatus[self.instruments[num].battleObjects[0]] = True
           #start object use on other player
           
