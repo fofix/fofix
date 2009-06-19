@@ -26,6 +26,7 @@ import Log
 import time
 import struct
 from Task import Task
+import Config
 
 #stump: check for pitch bending support
 try:
@@ -104,6 +105,7 @@ class Music(object):
     self.pausePos = 0.0
     self.isPause = False
     self.toUnpause = False
+    self.buffersize = Config.get("audio","buffersize")
 
   @staticmethod
   def setEndEvent(event = None):
@@ -160,7 +162,7 @@ class Music(object):
       self.toUnpause = True
       return self.pausePos
     elif self.toUnpause:
-      if pygame.mixer.music.get_pos() < (self.pausePos + 90):
+      if pygame.mixer.music.get_pos() < (self.pausePos + 60 + (self.buffersize/32)): #this should technically be buffersize*1000/samplerate; 32 keeps it integer, 60 allows for processing time
         self.toUnpause = False
         return pygame.mixer.music.get_pos()
       else:

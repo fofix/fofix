@@ -3612,6 +3612,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           changed = False
           held = 0
           for n, k in enumerate(self.keysList[i]):
+            if n > 4: break
             if (self.autoPlay and self.jurg[i]) or (k == guitar.keys[4] and self.playerAssist[i] == 2) or ((k == guitar.keys[4] or k == guitar.keys[3]) and self.playerAssist[i] == 1) or (self.playerAssist[i] == 3 and k == guitar.keys[0]):
               if n in notes and not self.controls.getState(k):
                 changed = True
@@ -3660,7 +3661,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           if self.aiPlayNote[i]:
             
             for n, k in enumerate(self.keysList[i]):
-              
+              if n > 4: break
               if (self.autoPlay and self.jurg[i]) or (k == guitar.keys[4] and self.playerAssist[i] == 2) or ((k == guitar.keys[4] or k == guitar.keys[3]) and self.playerAssist[i] == 1) or (guitar.isDrum and self.playerAssist[i] == 3 and k == guitar.keys[0]):
                 if n in jurgStrumNotes and not self.controls.getState(k):
                   changed = True
@@ -3710,6 +3711,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               
           if self.aiPlayNote[i]:
             for n, k in enumerate(self.keysList[i]):
+              if n > 4: break
               if (self.autoPlay and self.jurg[i]) or (k == guitar.keys[4] and self.playerAssist[i] == 2) or ((k == guitar.keys[4] or k == guitar.keys[3]) and self.playerAssist[i] == 1) or (guitar.isDrum and self.playerAssist[i] == 3 and k == guitar.keys[0]):
                 if n in jurgStrumNotes and not self.controls.getState(k):
                   changed = True
@@ -3758,6 +3760,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           #MFH - check if jurgStrumTime is close enough to the current position (or behind it) before actually playing the notes:
           if (not notes or jurgStrumTime <= (pos + 30)) and self.aiPlayNote[i]:
               for n, k in enumerate(self.keysList[i]):
+                if n > 4: break
                 if (self.autoPlay and self.jurg[i]) or (k == guitar.keys[4] and self.playerAssist[i] == 2) or ((k == guitar.keys[4] or k == guitar.keys[3]) and self.playerAssist[i] == 1) or (guitar.isDrum and self.playerAssist[i] == 3 and k == guitar.keys[0]):
                   if n in jurgStrumNotes and not self.controls.getState(k):
                     changed = True
