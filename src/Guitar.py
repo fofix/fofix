@@ -989,7 +989,7 @@ class Guitar:
         
         if shaders.enable("notes"):
           shaders.setVar("isTextured",True)
-          self.starMesh.render(mesh)
+          meshObj.render(mesh)
           shaders.disable() 
           
         glMatrixMode(GL_TEXTURE)
