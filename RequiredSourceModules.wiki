@@ -132,7 +132,7 @@ You need to install those packages:
   * python-numeric
   * python-imaging
   * python-pyogg
-  * python-pyvorbis (1.3)²
+  * python-pyvorbis²
   * python-pysqlite2
   * python-xml
 
@@ -140,7 +140,7 @@ Optionally, if you are in 32bit you can also install python-psyco.
 
 Notes:
   * ¹ python-opengl 3.x works okay but 2.x is still much faster.
-  * ² python-pyvorbis 1.4 crashes with a double free error (at least on Debian).
+  * ² Under Debian unstable, make sure you have python-pyvorbis 1.3 or 1.4-2 but not 1.4-1. The latter crashes with a double free error.
 
 === Running from sources ===
   # Change directory to `FoFiX-SVN/src`
