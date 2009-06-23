@@ -229,6 +229,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       if player.part.id == Song.VOCAL_PART:
         from Vocalist import Vocalist
         inst = Vocalist(self.engine, player, False, j)
+        if self.coOpRB:
+          inst.coOpRB = True
         self.instruments.append(inst)
         self.playingVocals = True
         self.numOfSingers += 1
@@ -4055,6 +4057,18 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               self.scoring[i].streak = 0
             self.scoring[i].updateAvMult()
             self.scoring[i].getStarScores()
+          if instrument.starPowerGained:
+            if instrument.starPower >= 50 and not instrument.starPowerActive:
+              self.engine.data.starReadySound.play()
+            else:
+              self.engine.data.starSound.play()
+            if self.phrases > 1:
+              if instrument.starPower >= 50 and not instrument.starPowerActive:
+                self.newScalingText(i, self.tsStarPowerReady)
+            instrument.starPowerGained = False
+          if instrument.starPowerActivate:
+            self.activateSP(i)
+            instrument.starPowerActivate = False
           continue
         self.stage.run(pos, instrument.currentPeriod)
         playerNum = i

@@ -94,6 +94,7 @@ TK_UNUSED_TEXT = 4    #Unused / other text events
 #MFH
 MIDI_TYPE_GH            = 0       #GH type MIDIs have starpower phrases marked with a long G8 note on that instrument's track
 MIDI_TYPE_RB            = 1       #RB type MIDIs have overdrive phrases marked with a long G#9 note on that instrument's track
+MIDI_TYPE_WT            = 2       #WT type MIDIs have six notes and HOPOs marked on F# of the track
 
 #MFH 
 EARLY_HIT_WINDOW_NONE   = 1       #GH1/RB1/RB2 = NONE
@@ -216,6 +217,7 @@ class SongInfo(object):
     self.info          = Config.MyConfigParser()
     self._partDifficulties = {}
     self._parts        = None
+    self._midiStyle    = None
     if Config.get("performance", "cache_song_metadata"):
       self.allowCacheUsage = allowCacheUsage  #stump
     else:
@@ -667,6 +669,14 @@ class SongInfo(object):
   
   partDifficulties = property(getPartDifficulties)
   
+  def getMidiStyle(self):
+    if self._midiStyle is not None:
+      return self._midiStyle
+    self.getParts()
+    return self._midiStyle
+  
+  midiStyle = property(getMidiStyle)
+  
   def getParts(self):
     if self._parts is not None:
       return self._parts
@@ -687,6 +697,7 @@ class SongInfo(object):
       if info.parts == []:
         Log.warn("No tracks found!")
         raise Exception
+      self._midiStyle = info.midiStyle
       info.parts.sort(lambda b, a: cmp(b.id, a.id))
       self._parts = info.parts
       for part in info.parts:
@@ -950,11 +961,11 @@ class SongInfo(object):
     try:
       noteFileName = self.noteFileName
       Log.debug("Retrieving sections from: " + noteFileName)
-      info = MidiInfoReader()
+      info = MidiSectionReader()
       midiIn = midi.MidiInFile(info, noteFileName)
       try:
         midiIn.read()
-      except MidiInfoReader.Done:
+      except MidiSectionReader.Done:
         pass
       self._sections = info.sections
       if len(self._sections) <= 1:
@@ -1654,6 +1665,9 @@ class VocalTrack(Track):
       self.allEvents[phraseId][1].addEvent(tuple[0], tuple[1])
       self.allEvents[phraseId][1].minPitch = min(self.allEvents[phraseId][1].minPitch, tuple[1].note)
       self.allEvents[phraseId][1].maxPitch = max(self.allEvents[phraseId][1].maxPitch, tuple[1].note)
+    for time, event in self.getAllEvents():
+      if isinstance(event, VocalPhrase):
+        event.sort()
   
   def reset(self):
     if self.maxIndex:
@@ -1661,10 +1675,10 @@ class VocalTrack(Track):
     for eventList in self.events:
       for time, event in eventList:
         if isinstance(event, VocalPhrase):
-          for time, event in event.allEvents:
-            event.played = False
-            event.stopped = False
-            event.accuracy = 0.0
+          for time, note in event.allEvents:
+            note.played = False
+            note.stopped = False
+            note.accuracy = 0.0
 
 class VocalPhrase(VocalTrack, Event):
   def __init__(self, length, star = False):
@@ -1672,6 +1686,18 @@ class VocalPhrase(VocalTrack, Event):
     VocalTrack.__init__(self, engine = None)
     self.star = star
     self.tapPhrase = False
+  
+  def sort(self):
+    eventDict = {}
+    newEvents = []
+    for time, event in self.allEvents:
+      if isinstance(event, VocalNote):
+        eventDict[int(time)] = (time, event)
+    times = eventDict.keys()
+    times.sort()
+    for time in times:
+      newEvents.append(eventDict[time])
+    self.allEvents = newEvents
 
 class TempoTrack(Track):    #MFH - special Track type for tempo events
   def __init__(self, engine):
@@ -2076,12 +2102,11 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
       
       tickDelta = tick - lastTick        
       noteDelta = event.number - lastEvent.number
-
       #myfingershurt: This initial sweep drops any notes within the timing 
       # threshold into the hopoNotes array (which would be more aptly named,
       #  the "potentialHopoNotes" array).  Another loop down below 
       #   further refines the HOPO determinations...
-
+      
       #previous note and current note HOPOable      
       if tickDelta <= hopoDelta:
         #Add both notes to HOPO list even if duplicate.  Will come out in processing
@@ -2477,7 +2502,6 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
             note.tappable = -4
           else:
             note.tappable = 3      
-
     self.marked = True
 
   def markBars(self):
@@ -2593,7 +2617,7 @@ class Song(object):
     #self.songVolume   = self.engine.config.get("audio", "songvol") #akedrou
 
     self.hasMidiLyrics = False
-    self.midiStyle = MIDI_TYPE_GH
+    self.midiStyle = self.info.midiStyle
 
     self.earlyHitWindowSize = EARLY_HIT_WINDOW_HALF   #MFH - holds the detected early hit window size for the current song
 
@@ -3286,7 +3310,7 @@ class MidiReader(midi.MidiOutStream):
       endTime   = self.abs_time()
       del self.heldNotes[(self.get_current_track(), channel, note)]
       if self.vocalTrack:
-        if note > 24 and note < 84:
+        if note > 39 and note < 84:
           self.addVocalEvent(VocalNote(note, endTime - startTime), time = startTime)
         elif note == 96: #tambourine
           self.addVocalEvent(VocalNote(note, 1, True), time = startTime)
@@ -3310,10 +3334,7 @@ class MidiReader(midi.MidiOutStream):
       
       elif note == overDriveMarkingNote:    #MFH
         self.song.hasStarpowerPaths = True
-        if self.song.midiStyle != MIDI_TYPE_RB:
-          Log.debug("RB-style Overdrive marking note found!  Using RB-style MIDI special notes.")
-          self.song.midiStyle = MIDI_TYPE_RB
-          self.earlyHitWindowSize = EARLY_HIT_WINDOW_NONE
+        self.earlyHitWindowSize = EARLY_HIT_WINDOW_NONE
 
         #for diff in self.song.difficulty:
         for diff in difficulties:
@@ -3342,8 +3363,6 @@ class MidiReader(midi.MidiOutStream):
           #self.addSpecialMidiEvent(diff, MarkerNote(note, 1, endMarker = True), time = endTime+1)   #ending marker note
           if self.logMarkerNotes == 1:
             Log.debug("RB freestyle section (drum fill or BRE) at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, difficulties[diff] ) )
-
-
 
       else:
         #Log.warn("MIDI note 0x%x at %d does not map to any game note." % (note, self.abs_time()))
@@ -3488,9 +3507,7 @@ class MidiReader(midi.MidiOutStream):
         #  for t in track:
         #    t.addEvent(self.abs_time(), event)
 
-  
-
-class MidiInfoReaderNoSections(midi.MidiOutStream):
+class MidiSectionReader(midi.MidiOutStream):
   # We exit via this exception so that we don't need to read the whole file in
   class Done: pass
   
@@ -3500,41 +3517,7 @@ class MidiInfoReaderNoSections(midi.MidiOutStream):
 
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:
-      Log.debug("MidiInfoReaderNoSections class init (song.py)...")
-
-    #MFH: practice section support:
-    self.ticksPerBeat = 480
-    self.sections = []
-    self.tempoMarkers = []
-    self.guitarSoloSectionMarkers = False
-    self.bpm = None
-
-  def note_on(self, channel, note, velocity):
-    try:
-      track, number = noteMap[note]
-      diff = difficulties[track]
-      if not diff in self.difficulties:
-        self.difficulties.append(diff)
-        #ASSUMES ALL parts (lead, rhythm, bass) have same difficulties of guitar part!
-        if len(self.difficulties) == len(difficulties):
-           raise Done
-    except KeyError:
-      pass
-
-
-
-
-class MidiInfoReader(midi.MidiOutStream):
-  # We exit via this exception so that we don't need to read the whole file in
-  class Done: pass
-  
-  def __init__(self):
-    midi.MidiOutStream.__init__(self)
-    self.difficulties = []
-
-    self.logClassInits = Config.get("game", "log_class_inits")
-    if self.logClassInits == 1:
-      Log.debug("MidiInfoReader class init (song.py)...")
+      Log.debug("MidiSectionReader class init (song.py)...")
 
     self.logSections = Config.get("game", "log_sections")
 
@@ -3586,14 +3569,6 @@ class MidiInfoReader(midi.MidiOutStream):
         Log.debug("Found potential default practice section: " + str(pos) + " - " + text)
 
       self.noteCountSections.append([text,pos])
-
-    try:
-      track, number = noteMap[note]
-      diff = difficulties[track]
-      if not diff in self.difficulties:
-        self.difficulties.append(diff)
-    except KeyError:
-      pass
 
   def lyric(self, text):  #filter lyric events
     if text.find("GNMIDI") < 0:   #to filter out the midi class illegal usage / trial timeout messages
@@ -3733,12 +3708,27 @@ class MidiPartsDiffReader(midi.MidiOutStream):
     self.forceGuitar = forceGuitar
     self.firstTrack   = False
     self.notesFound   = [0, 0, 0, 0]
+    self._drumFound   = False
+    self._ODNoteFound = False
+    self._SPNoteFound = False
 
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("MidiPartsDiffReader class init (song.py)...")
 
     self.logSections = Config.get("game", "log_sections")
+  
+  def getMidiStyle(self):
+    if self._ODNoteFound:
+      Log.debug("MIDI Type identified as RB")
+      return MIDI_TYPE_RB
+    elif self._drumFound and self._SPNoteFound:
+      Log.debug("MIDI Type identified as WT")
+      return MIDI_TYPE_WT
+    else:
+      Log.debug("MIDI Type identified as GH")
+      return MIDI_TYPE_GH
+  midiStyle = property(getMidiStyle)
   
   def start_of_track(self, n_track=0):
     if self.forceGuitar:
@@ -3806,6 +3796,7 @@ class MidiPartsDiffReader(midi.MidiOutStream):
         self.nextPart = parts[DRUM_PART]
         self.currentPart = self.nextPart.id
         self.notesFound  = [0, 0, 0, 0]
+        self._drumFound  = True #drum parts appear to be obligatory in WT songs, even if phantom.
         if self.logSections == 1:
           tempText2 = "DRUM_PART"
           Log.debug(tempText + tempText2)
@@ -3832,6 +3823,10 @@ class MidiPartsDiffReader(midi.MidiOutStream):
   def note_on(self, channel, note, velocity):
     if self.currentPart == -1:
       return
+    if note == overDriveMarkingNote:
+      self._ODNoteFound = True
+    elif note == starPowerMarkingNote:
+      self._SPNoteFound = True
     try:
       try:
         if len(self.difficulties[self.currentPart]) == len(difficulties):
@@ -3848,75 +3843,6 @@ class MidiPartsDiffReader(midi.MidiOutStream):
           self.difficulties[self.currentPart].append(diff)
     except KeyError:
       pass
-
-class MidiPartsReader(midi.MidiOutStream):
-  # We exit via this exception so that we don't need to read the whole file in
-  class Done: pass
-  
-  def __init__(self):
-    midi.MidiOutStream.__init__(self)
-    self.parts = []
-
-    self.logClassInits = Config.get("game", "log_class_inits")
-    if self.logClassInits == 1:
-      Log.debug("MidiPartsReader class init (song.py)...")
-
-    self.logSections = Config.get("game", "log_sections")
-    
-  def sequence_name(self, text):
-
-    if self.logSections == 1:
-      tempText = "MIDI sequence_name found: " + text + ", recognized and added to list as "
-      tempText2 = ""
-
-    if text == "PART GUITAR" or text == "T1 GEMS" or text == "Click":
-      if not parts[GUITAR_PART] in self.parts:
-        part = parts[GUITAR_PART]
-        self.parts.append(part)
-        if self.logSections == 1:
-          tempText2 = "GUITAR_PART"
-          Log.debug(tempText + tempText2)
-
-    if text == "PART RHYTHM":
-      if not parts[RHYTHM_PART] in self.parts:
-        part = parts[RHYTHM_PART]
-        self.parts.append(part)        
-        if self.logSections == 1:
-          tempText2 = "RHYTHM_PART"
-          Log.debug(tempText + tempText2)
-     
-    if text == "PART BASS":
-      if not parts[BASS_PART] in self.parts:
-        part = parts[BASS_PART]
-        self.parts.append(part)
-        if self.logSections == 1:
-          tempText2 = "BASS_PART"
-          Log.debug(tempText + tempText2)
-
-    if text == "PART GUITAR COOP":
-      if not parts[LEAD_PART] in self.parts:
-        part = parts[LEAD_PART]
-        self.parts.append(part)
-        if self.logSections == 1:
-          tempText2 = "LEAD_PART"
-          Log.debug(tempText + tempText2)
-
-    #myfingershurt: drums, rock band rip compatible :)
-    if text == "PART DRUM" or text == "PART DRUMS":
-      if not parts[DRUM_PART] in self.parts:
-        part = parts[DRUM_PART]
-        self.parts.append(part)
-        if self.logSections == 1:
-          tempText2 = "DRUM_PART"
-          Log.debug(tempText + tempText2)
-    
-    if text == "PART VOCALS":
-      if not parts[VOCAL_PART] in self.parts:
-        part = parts[VOCAL_PART]
-        self.parts.append(part)
-        if self.logSections == 1:
-          tempText2 = "VOCAL_PART"
-          Log.debug(tempText + tempText2)
 
 def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playbackOnly = False, notesOnly = False, part = [parts[GUITAR_PART]], practiceMode = False):
 
