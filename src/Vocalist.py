@@ -170,6 +170,10 @@ class Vocalist:
     self.engine.loadImgDrawing(self, "vocalMult", os.path.join("themes",themename,"vocals","mult.png"))
     self.engine.loadImgDrawing(self, "vocalMeter", os.path.join("themes",themename,"vocals","meter.png"))
     try:
+      self.engine.loadImgDrawing(self, "vocalFill", os.path.join("themes",themename,"vocals","meter_fill.png"))
+    except IOError:
+      self.vocalFill = self.vocalMeter
+    try:
       self.engine.loadImgDrawing(self, "vocalGlow", os.path.join("themes",themename,"vocals","meter_glow.png"))
     except IOError:
       self.vocalGlow = None
@@ -182,10 +186,16 @@ class Vocalist:
     self.engine.loadImgDrawing(self, "vocalODBottom", os.path.join("themes",themename,"vocals","bottom.png"))
     self.engine.loadImgDrawing(self, "vocalODFill", os.path.join("themes",themename,"vocals","fill.png"))
     self.vocalODFillWidth = self.vocalODFill.width1()*.5*(self.engine.view.geometry[2]/640.0)
-    self.engine.loadImgDrawing(self, "vocalODTop", os.path.join("themes",themename,"vocals","top.png"))
-    self.engine.loadImgDrawing(self, "vocalODGlow", os.path.join("themes",themename,"vocals","glow.png"))
+    try:
+      self.engine.loadImgDrawing(self, "vocalODTop", os.path.join("themes",themename,"vocals","top.png"))
+    except IOError:
+      self.vocalODTop = None
+    try:
+      self.engine.loadImgDrawing(self, "vocalODGlow", os.path.join("themes",themename,"vocals","glow.png"))
+    except IOError:
+      self.vocalODGlow = None
     
-    height = self.vocalMeter.height1()
+    height = self.vocalFill.height1()
     self.vocalMeterScale = (45.000/height)*.5
     olFactor = height/300.000
     self.vocalFillupCenterX = int(139*olFactor)
@@ -778,11 +788,13 @@ class Vocalist:
     if self.starPower > 0:
       currentSP = self.starPower/100.0
       self.engine.drawImage(self.vocalODFill, scale = (.5*currentSP,-.5), coord = ((w*.5)-(.5*self.vocalODFillWidth*(1-currentSP)),h*(.8-addY)), rect = (0,currentSP,0,1), stretched = 1)
-    self.engine.drawImage(self.vocalODTop, scale = (.5,-.5), coord = (w*.5,h*(.8-addY)), stretched = 1)
+    if self.vocalODTop:
+      self.engine.drawImage(self.vocalODTop, scale = (.5,-.5), coord = (w*.5,h*(.8-addY)), stretched = 1)
     if self.starPowerActive:
       if self.vocalLyricSheetGlow:
         self.engine.drawImage(self.vocalLyricSheetGlow, scale = (self.vocalLyricSheetWFactor,-self.vocalLyricSheetWFactor), coord = (w*.5,vsheetpos))
-      self.engine.drawImage(self.vocalODGlow, scale = (.5,-.5), coord = (w*.5,h*(.8-addY)), stretched = 1)
+      if self.vocalODGlow:
+        self.engine.drawImage(self.vocalODGlow, scale = (.5,-.5), coord = (w*.5,h*(.8-addY)), stretched = 1)
     if self.tapPhraseActive:
       font.render("%d / %d" % (self.tapNoteHits[self.currentTapPhrase], self.tapNoteTotals[self.currentTapPhrase]), (.25, .065+addYText), scale = self.lyricScale)
   
