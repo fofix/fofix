@@ -5251,7 +5251,7 @@ class KeyTester(Layer, KeyListener):
           else:
             glColor3f(.4, .4, .4)
           font.render(text, (.25-wText/2, .45 + v))
-          starC = (1-self.starpower)*self.analogBar.width1()*self.analogBarScale*((w/384.0)-1.0/6.0) #...not really...
+          starC = (1-self.starpower)*.5*w*self.analogBarScale
           self.engine.drawImage(self.analogBar, scale = (self.analogBarScale*self.starpower, -self.analogBarScale), coord = ((w*.25)-starC, h*.3), rect = (0, self.starpower, 0, 1), stretched = 11)
           self.engine.drawImage(self.analogBox, scale = (self.analogBoxScale, -self.analogBoxScale), coord = (w*.25, h*.3), stretched = 11)
         else:
@@ -5331,7 +5331,7 @@ class KeyTester(Layer, KeyListener):
           else:
             glColor3f(.4, .4, .4)
           font.render(self.names[Player.KILL], (.75-wText/2, .45 + v))
-          whammyC = (1-self.whammy)*self.analogBar.width1()*self.analogBarScale*((w/384.0)-1.0/6.0)
+          whammyC = (1-self.whammy)*.5*w*self.analogBarScale
           self.engine.drawImage(self.analogBar, scale = (self.analogBarScale*self.whammy, -self.analogBarScale), coord = (w*.75-whammyC, h*.3), rect = (0, self.whammy, 0, 1), stretched = 11)
         else:
           if self.controls.getState(self.keyList[Player.KILL]):

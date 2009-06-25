@@ -29,6 +29,7 @@ from Microphone import Microphone, getNoteName
 from Song import VocalNote, VocalPhrase
 from OpenGL.GL import *
 from numpy import array, float32
+import Theme
 
 #stump: needed for continuous star fillup (akedrou - stealing for vocals)
 import Image
@@ -36,9 +37,6 @@ import ImageDraw
 from Svg import ImgDrawing
 
 diffMod = {0: 1.2, 1: 1.4, 2: 1.6, 3: 1.8}
-
-NOTE_LANE_SIZE = .002  #stump
-NOTE_GLOW_SIZE = 6 * NOTE_LANE_SIZE  #stump
 
 class Vocalist:
   def __init__(self, engine, playerObj, editorMode = False, player = 0):
@@ -85,6 +83,7 @@ class Vocalist:
     self.formants = [None] * 3
     self.currentNote = None
     self.currentNoteItem = None
+    self.currentNoteTime = 0
     self.currentLyric = None
     self.requiredNote = None
     self.lastPhrase = None
@@ -97,6 +96,7 @@ class Vocalist:
     self.phraseMin   = 0
     self.phraseMax   = 0
     self.phraseTimes = []
+    self.doneLastPhrase = False
     
     #scoring variables
     self.allowedDeviation = 1.4
@@ -142,7 +142,7 @@ class Vocalist:
     #akedrou
     self.coOpFailed = False
     self.coOpRestart = False
-    self.coOpRescueTime = 0.0
+    self.coOpRescueTime = 0
     
     self.lyricScale = .00170
     
@@ -185,7 +185,7 @@ class Vocalist:
       self.vocalText = None
     self.engine.loadImgDrawing(self, "vocalODBottom", os.path.join("themes",themename,"vocals","bottom.png"))
     self.engine.loadImgDrawing(self, "vocalODFill", os.path.join("themes",themename,"vocals","fill.png"))
-    self.vocalODFillWidth = self.vocalODFill.width1()*.5*(self.engine.view.geometry[2]/640.0)
+    self.vocalODFillWidth = self.vocalODFill.width1()/1280.000
     try:
       self.engine.loadImgDrawing(self, "vocalODTop", os.path.join("themes",themename,"vocals","top.png"))
     except IOError:
@@ -195,18 +195,18 @@ class Vocalist:
     except IOError:
       self.vocalODGlow = None
     
-    height = self.vocalFill.height1()
-    self.vocalMeterScale = (45.000/height)*.5
-    olFactor = height/300.000
-    self.vocalFillupCenterX = int(139*olFactor)
-    self.vocalFillupCenterY = int(151*olFactor)
-    self.vocalFillupInRadius = int(25*olFactor)
-    self.vocalFillupOutRadius = int(139*olFactor)
-    self.vocalFillupColor = "#DFDFDE"
-    self.vocalContinuousAvailable = self.engine.config.get("performance", "star_continuous_fillup") and \
+    height = self.vocalMeter.height1()
+    vocalSize = Theme.vocalMeterSize
+    self.vocalMeterScale = (vocalSize/height)*.5
+    self.vocalFillWidth = self.vocalFill.width1()*self.vocalMeterScale/640.000
+    olFactor = height/Theme.vocalFillupFactor
+    self.vocalFillupCenterX = int(Theme.vocalFillupCenterX*olFactor)
+    self.vocalFillupCenterY = int(Theme.vocalFillupCenterY*olFactor)
+    self.vocalFillupInRadius = int(Theme.vocalFillupInRadius*olFactor)
+    self.vocalFillupOutRadius = int(Theme.vocalFillupOutRadius*olFactor)
+    self.vocalFillupColor = Theme.vocalFillupColor
+    self.vocalContinuousAvailable = Theme.vocalCircularFillup and \
       None not in (self.vocalFillupCenterX, self.vocalFillupCenterY, self.vocalFillupInRadius, self.vocalFillupOutRadius, self.vocalFillupColor)
-    if self.engine.data.themeLabel == "MegaLight":
-      self.vocalContinuousAvailable = False
     if self.vocalContinuousAvailable:
       try:
         self.drawnVocalOverlays = {}
@@ -225,12 +225,29 @@ class Vocalist:
       except:
         Log.error('Could not prebuild vocal overlay textures: ')
         self.vocalContinuousAvailable = False
-
+    
+    self.vocalLaneSize        = Theme.vocalLaneSize
+    self.vocalGlowSize        = Theme.vocalGlowSize
+    self.vocalGlowFade        = Theme.vocalGlowFade
+    self.vocalLaneColor       = list(Theme.vocalLaneColor)
+    self.vocalShadowColor     = list(Theme.vocalShadowColor)
+    self.vocalGlowColor       = list(Theme.vocalGlowColor)
+    self.vocalLaneColorStar   = list(Theme.vocalLaneColorStar)
+    self.vocalShadowColorStar = list(Theme.vocalShadowColorStar)
+    self.vocalGlowColorStar   = list(Theme.vocalGlowColorStar)
+    
+    self.vocalMeterX = Theme.vocalMeterX
+    self.vocalMeterY = Theme.vocalMeterY
+    self.vocalMultX  = Theme.vocalMultX
+    self.vocalMultY  = Theme.vocalMultY
+    self.vocalPowerX = Theme.vocalPowerX
+    self.vocalPowerY = Theme.vocalPowerY
+    
     self.time = 0.0
     self.tap  = 0
     self.tapBuffer = 0
     self.peak = -100.0
-    self.starPowerDecreaseDivisor = 200.0/self.engine.audioSpeedFactor
+    self.starPowerDecreaseDivisor = 400.0/self.engine.audioSpeedFactor
     self.starPower = 0
     self.starPowerActive = False
     self.starPowerGained = False
@@ -318,10 +335,9 @@ class Vocalist:
       if abs(self.currentNote) < self.allowedDeviation:
         self.oldNote = self.currentNote
     if self.peak < -15:
-      self.currentNote = None
       self.starPowerCountdown = False
       self.starPowerTimer = 200
-    elif self.requiredNote is not None and self.requiredNote:
+    elif self.requiredNote is not None:
       self.currentNote = self.mic.getDeviation(self.requiredNote)
       #if self.awardEnd:
       #  mult = .8
@@ -352,22 +368,22 @@ class Vocalist:
   #stump: draw a vocal note lane, vaguely RB2-style
   def drawNoteLane(self, colors, xStartPos, xEndPos, yStartPos, yEndPos):
     colorArray = array([colors[i] for i in (4, 5, 6, 6, 0, 1, 1, 0, 2, 3, 3, 2, 6, 6, 5, 4)], dtype=float32)
-    vertexArray = array([[xStartPos,                yStartPos-NOTE_LANE_SIZE, 0],
-                         [xEndPos,                  yEndPos  -NOTE_LANE_SIZE, 0],
-                         [xEndPos,                  yEndPos  -NOTE_GLOW_SIZE, 0],
-                         [xStartPos,                yStartPos-NOTE_GLOW_SIZE, 0],
-                         [xStartPos-NOTE_LANE_SIZE, yStartPos,                0],
-                         [xEndPos  +NOTE_LANE_SIZE, yEndPos,                  0],
-                         [xEndPos,                  yEndPos  -NOTE_LANE_SIZE, 0],
-                         [xStartPos,                yStartPos-NOTE_LANE_SIZE, 0],
-                         [xStartPos,                yStartPos+NOTE_LANE_SIZE, 0],
-                         [xEndPos,                  yEndPos  +NOTE_LANE_SIZE, 0],
-                         [xEndPos  +NOTE_LANE_SIZE, yEndPos,                  0],
-                         [xStartPos-NOTE_LANE_SIZE, yStartPos,                0],
-                         [xStartPos,                yStartPos+NOTE_GLOW_SIZE, 0],
-                         [xEndPos,                  yEndPos  +NOTE_GLOW_SIZE, 0],
-                         [xEndPos,                  yEndPos  +NOTE_LANE_SIZE, 0],
-                         [xStartPos,                yStartPos+NOTE_LANE_SIZE, 0]],
+    vertexArray = array([[xStartPos,                    yStartPos-self.vocalLaneSize, 0],
+                         [xEndPos,                      yEndPos  -self.vocalLaneSize, 0],
+                         [xEndPos,                      yEndPos  -self.vocalGlowSize, 0],
+                         [xStartPos,                    yStartPos-self.vocalGlowSize, 0],
+                         [xStartPos-self.vocalLaneSize, yStartPos,                    0],
+                         [xEndPos  +self.vocalLaneSize, yEndPos,                      0],
+                         [xEndPos,                      yEndPos  -self.vocalLaneSize, 0],
+                         [xStartPos,                    yStartPos-self.vocalLaneSize, 0],
+                         [xStartPos,                    yStartPos+self.vocalLaneSize, 0],
+                         [xEndPos,                      yEndPos  +self.vocalLaneSize, 0],
+                         [xEndPos  +self.vocalLaneSize, yEndPos,                      0],
+                         [xStartPos-self.vocalLaneSize, yStartPos,                    0],
+                         [xStartPos,                    yStartPos+self.vocalGlowSize, 0],
+                         [xEndPos,                      yEndPos  +self.vocalGlowSize, 0],
+                         [xEndPos,                      yEndPos  +self.vocalLaneSize, 0],
+                         [xStartPos,                    yStartPos+self.vocalLaneSize, 0]],
                            dtype=float32)
     glEnableClientState(GL_VERTEX_ARRAY)
     glEnableClientState(GL_COLOR_ARRAY)
@@ -379,7 +395,7 @@ class Vocalist:
   
   def coOpRescue(self, pos):
     self.coOpRestart = True #initializes Restart Timer
-    self.coOpRescueTime  = pos
+    self.coOpRescueTime  = 3000
     self.starPower  = 0
     Log.debug("Rescued at " + str(pos))
 
@@ -420,6 +436,8 @@ class Vocalist:
         font.render("Second Formant: %.2f Hz" % self.formants[1], (.35, .4))
     
     self.engine.drawImage(self.vocalLyricSheet, scale = (self.vocalLyricSheetWFactor,-self.vocalLyricSheetWFactor), coord = (w*.5,vsheetpos))
+    if self.coOpFailed:
+      return
     if self.useOld:
       phraseTime   = self.oldTime
       phraseLength = self.oldLength
@@ -428,13 +446,19 @@ class Vocalist:
       phraseLength = self.currentPhraseLength
     
     if self.activePhrase:
-      if self.lastPhrase:
+      if self.lastPhrase and not self.coOpRestart:
         lastnotes = self.lastPhrase[1].getAllEvents()
       else:
         lastnotes = []
-      notes = self.activePhrase.getAllEvents()
+      if self.coOpRestart:
+        notes = []
+      else:
+        notes = self.activePhrase.getAllEvents()
       if self.nextPhrase:
-        nextnotes = self.nextPhrase[1].getAllEvents()
+        if self.nextPhrase[0]-pos > self.coOpRescueTime:
+          nextnotes = self.nextPhrase[1].getAllEvents()
+        else:
+          nextnotes = []
       else:
         nextnotes = []
       lastNoteEnd = None  #stump
@@ -484,21 +508,21 @@ class Vocalist:
                 else:
                   baseY = .075-(.05*val)+addY
                 if self.activePhrase.star:
-                  colors = [[1.0, 1.0, 0.5, vStart],
-                            [1.0, 1.0, 0.5, vEnd],
-                            [1.0, 1.0, 0.75, vStart],
-                            [1.0, 1.0, 0.75, vEnd],
-                            [1.0, 1.0, 0.0, vStart*0.6],
-                            [1.0, 1.0, 0.0, vEnd*0.6],
-                            [1.0, 1.0, 0.0, 0.0]]
+                  colors = [self.vocalLaneColorStar + [vStart],
+                            self.vocalLaneColorStar + [vEnd],
+                            self.vocalShadowColorStar + [vStart],
+                            self.vocalShadowColorStar + [vEnd],
+                            self.vocalGlowColorStar + [vStart*self.vocalGlowFade],
+                            self.vocalGlowColorStar + [vEnd*self.vocalGlowFade],
+                            self.vocalGlowColorStar + [0.0]]
                 else:
-                  colors = [[0.6, 1.0, 0.5, vStart],
-                            [0.6, 1.0, 0.5, vEnd],
-                            [0.8, 1.0, 0.75, vStart],
-                            [0.8, 1.0, 0.75, vEnd],
-                            [0.2, 1.0, 0.0, vStart*0.6],
-                            [0.2, 1.0, 0.0, vEnd*0.6],
-                            [0.2, 1.0, 0.0, 0.0]]
+                  colors = [self.vocalLaneColor + [vStart],
+                            self.vocalLaneColor + [vEnd],
+                            self.vocalShadowColor + [vStart],
+                            self.vocalShadowColor + [vEnd],
+                            self.vocalGlowColor + [vStart*self.vocalGlowFade],
+                            self.vocalGlowColor + [vEnd*self.vocalGlowFade],
+                            self.vocalGlowColor + [0.0]]
                 #stump: apparently we don't necessarily get the notes in strict chronological order.
                 # This lane-connecting code would work nicely if not for that, but under these conditions it tends to make a big mess.
                 # (Seriously, uncomment it and see for yourself.)
@@ -532,21 +556,21 @@ class Vocalist:
                 else:
                   baseY = .075-(.05*val)+addY
                 if self.activePhrase.star:
-                  colors = [[1.0, 1.0, 0.5, vStart],
-                            [1.0, 1.0, 0.5, vEnd],
-                            [1.0, 1.0, 0.75, vStart],
-                            [1.0, 1.0, 0.75, vEnd],
-                            [1.0, 1.0, 0.0, vStart*0.6],
-                            [1.0, 1.0, 0.0, vEnd*0.6],
-                            [1.0, 1.0, 0.0, 0.0]]
+                  colors = [self.vocalLaneColorStar + [vStart],
+                            self.vocalLaneColorStar + [vEnd],
+                            self.vocalShadowColorStar + [vStart],
+                            self.vocalShadowColorStar + [vEnd],
+                            self.vocalGlowColorStar + [vStart*self.vocalGlowFade],
+                            self.vocalGlowColorStar + [vEnd*self.vocalGlowFade],
+                            self.vocalGlowColorStar + [0.0]]
                 else:
-                  colors = [[0.6, 1.0, 0.5, vStart],
-                            [0.6, 1.0, 0.5, vEnd],
-                            [0.8, 1.0, 0.75, vStart],
-                            [0.8, 1.0, 0.75, vEnd],
-                            [0.2, 1.0, 0.0, vStart*0.6],
-                            [0.2, 1.0, 0.0, vEnd*0.6],
-                            [0.2, 1.0, 0.0, 0.0]]
+                  colors = [self.vocalLaneColor + [vStart],
+                            self.vocalLaneColor + [vEnd],
+                            self.vocalShadowColor + [vStart],
+                            self.vocalShadowColor + [vEnd],
+                            self.vocalGlowColor + [vStart*self.vocalGlowFade],
+                            self.vocalGlowColor + [vEnd*self.vocalGlowFade],
+                            self.vocalGlowColor + [0.0]]
                 if event.lyric is None and lastNoteEnd is not None:
                   self.drawNoteLane(colors, lastNoteEnd[0], xStartPos, lastNoteEnd[1], baseY)
                 self.drawNoteLane(colors, xStartPos, xEndPos, baseY, baseY)
@@ -582,21 +606,21 @@ class Vocalist:
                 else:
                   baseY = .075-(.05*val)+addY
                 if self.lastPhrase[1].star:
-                  colors = [[1.0, 1.0, 0.5, vStart],
-                            [1.0, 1.0, 0.5, vEnd],
-                            [1.0, 1.0, 0.75, vStart],
-                            [1.0, 1.0, 0.75, vEnd],
-                            [1.0, 1.0, 0.0, vStart*0.6],
-                            [1.0, 1.0, 0.0, vEnd*0.6],
-                            [1.0, 1.0, 0.0, 0.0]]
+                  colors = [self.vocalLaneColorStar + [vStart],
+                            self.vocalLaneColorStar + [vEnd],
+                            self.vocalShadowColorStar + [vStart],
+                            self.vocalShadowColorStar + [vEnd],
+                            self.vocalGlowColorStar + [vStart*self.vocalGlowFade],
+                            self.vocalGlowColorStar + [vEnd*self.vocalGlowFade],
+                            self.vocalGlowColorStar + [0.0]]
                 else:
-                  colors = [[0.6, 1.0, 0.5, vStart],
-                            [0.6, 1.0, 0.5, vEnd],
-                            [0.8, 1.0, 0.75, vStart],
-                            [0.8, 1.0, 0.75, vEnd],
-                            [0.2, 1.0, 0.0, vStart*0.6],
-                            [0.2, 1.0, 0.0, vEnd*0.6],
-                            [0.2, 1.0, 0.0, 0.0]]
+                  colors = [self.vocalLaneColor + [vStart],
+                            self.vocalLaneColor + [vEnd],
+                            self.vocalShadowColor + [vStart],
+                            self.vocalShadowColor + [vEnd],
+                            self.vocalGlowColor + [vStart*self.vocalGlowFade],
+                            self.vocalGlowColor + [vEnd*self.vocalGlowFade],
+                            self.vocalGlowColor + [0.0]]
                 if event.lyric is None and lastNoteEnd is not None:
                   self.drawNoteLane(colors, lastNoteEnd[0], xStartPos, lastNoteEnd[1], baseY)
                 self.drawNoteLane(colors, xStartPos, xEndPos, baseY, baseY)
@@ -632,21 +656,21 @@ class Vocalist:
                 else:
                   baseY = .075-(.05*val)+addY
                 if self.nextPhrase[1].star:
-                  colors = [[1.0, 1.0, 0.5, vStart],
-                            [1.0, 1.0, 0.5, vEnd],
-                            [1.0, 1.0, 0.75, vStart],
-                            [1.0, 1.0, 0.75, vEnd],
-                            [1.0, 1.0, 0.0, vStart*0.6],
-                            [1.0, 1.0, 0.0, vEnd*0.6],
-                            [1.0, 1.0, 0.0, 0.0]]
+                  colors = [self.vocalLaneColorStar + [vStart],
+                            self.vocalLaneColorStar + [vEnd],
+                            self.vocalShadowColorStar + [vStart],
+                            self.vocalShadowColorStar + [vEnd],
+                            self.vocalGlowColorStar + [vStart*self.vocalGlowFade],
+                            self.vocalGlowColorStar + [vEnd*self.vocalGlowFade],
+                            self.vocalGlowColorStar + [0.0]]
                 else:
-                  colors = [[0.6, 1.0, 0.5, vStart],
-                            [0.6, 1.0, 0.5, vEnd],
-                            [0.8, 1.0, 0.75, vStart],
-                            [0.8, 1.0, 0.75, vEnd],
-                            [0.2, 1.0, 0.0, vStart*0.6],
-                            [0.2, 1.0, 0.0, vEnd*0.6],
-                            [0.2, 1.0, 0.0, 0.0]]
+                  colors = [self.vocalLaneColor + [vStart],
+                            self.vocalLaneColor + [vEnd],
+                            self.vocalShadowColor + [vStart],
+                            self.vocalShadowColor + [vEnd],
+                            self.vocalGlowColor + [vStart*self.vocalGlowFade],
+                            self.vocalGlowColor + [vEnd*self.vocalGlowFade],
+                            self.vocalGlowColor + [0.0]]
                 if event.lyric is None and lastNoteEnd is not None:
                   self.drawNoteLane(colors, lastNoteEnd[0], xStartPos, lastNoteEnd[1], baseY)
                 self.drawNoteLane(colors, xStartPos, xEndPos, baseY, baseY)
@@ -654,7 +678,7 @@ class Vocalist:
     if self.currentNote:
       rotate = 0
       if self.requiredNote:
-        val = float(self.requiredNote-self.minPitch)/(self.pitchRange*20.0)
+        val = float(self.requiredNote-self.minPitch)/(self.pitchRange)
       else:
         val = 0
       if abs(self.currentNote) < self.allowedDeviation:
@@ -662,21 +686,25 @@ class Vocalist:
         rotate = 0
       elif self.pitchFudge > 0:
         if self.currentNote > self.oldNote:
-          rotate = .5
+          rotate = .2
           currentOffset = .005
         else:
-          rotate = -.5
+          rotate = -.2
           currentOffset = -.005
       else:
-        currentOffset = .05*(self.currentNote/6)
-      currentOffset += val
-      if currentOffset > .05:
-        currentOffset -= .1
-      elif currentOffset < -.05:
-        currentOffset += .1
+        currentOffset = (self.currentNote/12)
+      val += currentOffset
+      if val > 1:
+        val -= 1
+      elif val < 0:
+        val += 1
     else:
-      currentOffset = 0
+      val = .5
       rotate = 0
+    if players == 1:
+      baseY = .89+(.05*val)-addY
+    else:
+      baseY = .92+(.05*val)-addY
     if self.lyricMode == 1 or self.lyricMode == 2:
       self.engine.drawImage(self.vocalBar, scale = (.5,-.5), coord = (w*.87,tappos))
       if self.activePhrase: #this checks the previous phrase or the current
@@ -684,7 +712,7 @@ class Vocalist:
         if self.activePhrase.tapPhrase:
           self.engine.drawImage(self.vocalTap, scale = (.5,-.5), coord = (w*noteX,tappos))
         else:
-          self.engine.drawImage(self.vocalArrow, scale = (self.vocalLyricSheetWFactor,-self.vocalLyricSheetWFactor), coord = (w*noteX-(self.arrowW/2),h*(.92+currentOffset-addY)), color = (1,1,1,self.arrowVis/500.0))
+          self.engine.drawImage(self.vocalArrow, scale = (self.vocalLyricSheetWFactor,-self.vocalLyricSheetWFactor), coord = (w*noteX-(self.arrowW/2),h*baseY), color = (1,1,1,self.arrowVis/500.0))
         self.engine.drawImage(self.vocalBar, scale = (.5,-.5), coord = (w*noteX,tappos))
     elif self.lyricMode == 0:
       if self.phrase and self.tapPhraseActive: #this checks the next phrase /or/ the current
@@ -693,7 +721,7 @@ class Vocalist:
         if self.currentNoteItem and (self.currentNoteItem.speak or self.currentNoteItem.extra):
           self.engine.drawImage(self.vocalSplitArrow, scale = (self.vocalLyricSheetWFactor,-self.vocalLyricSheetWFactor), coord = (w*.25-(self.arrowW/2),h*(.8355-addY)), color = (1,1,1,self.arrowVis/500.0))
         else:
-          self.engine.drawImage(self.vocalArrow, scale = (self.vocalLyricSheetWFactor,-self.vocalLyricSheetWFactor), coord = (w*.25-(self.arrowW/2),h*(.92+currentOffset-addY)), rot = rotate, color = (1,1,1,self.arrowVis/500.0))
+          self.engine.drawImage(self.vocalArrow, scale = (self.vocalLyricSheetWFactor,-self.vocalLyricSheetWFactor), coord = (w*.25-(self.arrowW/2),h*baseY), rot = rotate, color = (1,1,1,self.arrowVis/500.0))
       a = [0] #this sticks a bar in at the beginning, so at least you know the vocal code is aware the song started.
       if self.lastPhrase:
         a.extend([self.lastPhrase[0], self.lastPhrase[0]+self.lastPhrase[1].length])
@@ -763,38 +791,36 @@ class Vocalist:
           self.engine.drawImage(self.vocalBar, scale = (.5,-.5), coord = (w*noteX,tappos))
     if self.showText > 0:
       if self.vocalText:
-        self.engine.drawImage(self.vocalText, scale = (.5, (-.5/6.0)*(1-self.textTrans)), coord = (w*.25,h*(.8-addY)), rect = (0, 1, self.scoreBox[0], self.scoreBox[1]-(self.textTrans/6.0)), color = (1,1,1,1-self.textTrans))
+        self.engine.drawImage(self.vocalText, scale = (.5, (-.5/6.0)*(1-self.textTrans)), coord = (w*self.vocalMeterX,h*(self.vocalMeterY-addY)), rect = (0, 1, self.scoreBox[0], self.scoreBox[1]-(self.textTrans/6.0)), color = (1,1,1,1-self.textTrans))
       else:
         glColor4f(1,1,1,1-self.textTrans)
-        font.render(self.scorePhrases[self.textScore],(.25,(.2+addYText)), .002)
+        font.render(self.scorePhrases[self.textScore],(self.vocalMeterX,((1-self.vocalMeterY)*self.engine.data.fontScreenBottom+addYText)), .002)
     if self.showText <= 0 or self.textTrans > 0:
       val1,val2 = self.getMultVals()
-      self.engine.drawImage(self.vocalMeter, scale = (self.vocalMeterScale,-self.vocalMeterScale), coord = (w*0.25,h*(0.8-addY)), color = (1,1,1,self.textTrans))
+      self.engine.drawImage(self.vocalMeter, scale = (self.vocalMeterScale,-self.vocalMeterScale), coord = (w*self.vocalMeterX,h*(self.vocalMeterY-addY)), color = (1,1,1,self.textTrans))
       if self.vocalGlow and self.starPowerActive:
-        self.engine.drawImage(self.vocalGlow, scale = (self.vocalMeterScale,-self.vocalMeterScale), coord = (w*0.25,h*(0.8-addY)), color = (1,1,1,self.textTrans))
-      self.engine.drawImage(self.vocalMult, scale = (.5,-.5/8.0), coord = (w*0.28,h*(0.8-addY)), rect = (0, 1, float(val1)/9.0, float(val2)/9.0), color = (1,1,1,self.textTrans))
-  
-      if self.phraseNoteTime > 0 and not self.tapPhraseActive:
+        self.engine.drawImage(self.vocalGlow, scale = (self.vocalMeterScale,-self.vocalMeterScale), coord = (w*self.vocalMeterX,h*(self.vocalMeterY-addY)), color = (1,1,1,self.textTrans))
+      self.engine.drawImage(self.vocalMult, scale = (.5,-.5/8.0), coord = (w*self.vocalMultX,h*(self.vocalMultY-addY)), rect = (0, 1, float(val1)/9.0, float(val2)/9.0), color = (1,1,1,self.textTrans))
+      if self.phraseNoteTime > 0 and self.phraseInTune > 0 and not self.tapPhraseActive:
         ratio = self.phraseInTune/float(self.phraseNoteTime)
         if ratio > 1:
           ratio = 1
         if self.vocalContinuousAvailable:
           degrees = int(360*ratio) - (int(360*ratio) % 5)
-          self.engine.drawImage(self.drawnVocalOverlays[degrees], scale = (self.vocalMeterScale,-self.vocalMeterScale), coord = (w*0.25,h*(0.8-addY)), color = (1,1,1,self.textTrans))
+          self.engine.drawImage(self.drawnVocalOverlays[degrees], scale = (self.vocalMeterScale,-self.vocalMeterScale), coord = (w*self.vocalMeterX,h*(self.vocalMeterY-addY)), color = (1,1,1,self.textTrans))
         else:
-          width = self.vocalFill.width1()
-          self.engine.drawImage(self.vocalFill, scale = (self.vocalMeterScale*ratio, -self.vocalMeterScale), coord = (w*.25-(width*ratio*self.vocalMeterScale*.5), h*(.8-addY)), rect = (0,ratio,0,1), color = (1,1,1,self.textTrans))
-    self.engine.drawImage(self.vocalODBottom, scale = (.5,-.5), coord = (w*.5,h*(.8-addY)), stretched = 1)
+          self.engine.drawImage(self.vocalFill, scale = (self.vocalFillWidth*ratio, -self.vocalFillWidth), coord = (w*self.vocalMeterX-(ratio*self.vocalFillWidth*w*.5), h*(self.vocalMeterY-addY)), rect = (0,ratio,0,1), color = (1,1,1,self.textTrans), stretched = 11)
+    self.engine.drawImage(self.vocalODBottom, scale = (.5,-.5), coord = (w*self.vocalPowerX,h*(self.vocalPowerY-addY)))
     if self.starPower > 0:
       currentSP = self.starPower/100.0
-      self.engine.drawImage(self.vocalODFill, scale = (.5*currentSP,-.5), coord = ((w*.5)-(.5*self.vocalODFillWidth*(1-currentSP)),h*(.8-addY)), rect = (0,currentSP,0,1), stretched = 1)
+      self.engine.drawImage(self.vocalODFill, scale = (self.vocalODFillWidth*currentSP,-self.vocalODFillWidth), coord = (w*self.vocalPowerX-((1-currentSP)*self.vocalODFillWidth*w*.5),h*(self.vocalPowerY-addY)), rect = (0,currentSP,0,1), stretched = 11)
     if self.vocalODTop:
-      self.engine.drawImage(self.vocalODTop, scale = (.5,-.5), coord = (w*.5,h*(.8-addY)), stretched = 1)
+      self.engine.drawImage(self.vocalODTop, scale = (.5,-.5), coord = (w*self.vocalPowerX,h*(self.vocalPowerY-addY)))
     if self.starPowerActive:
       if self.vocalLyricSheetGlow:
         self.engine.drawImage(self.vocalLyricSheetGlow, scale = (self.vocalLyricSheetWFactor,-self.vocalLyricSheetWFactor), coord = (w*.5,vsheetpos))
       if self.vocalODGlow:
-        self.engine.drawImage(self.vocalODGlow, scale = (.5,-.5), coord = (w*.5,h*(.8-addY)), stretched = 1)
+        self.engine.drawImage(self.vocalODGlow, scale = (.5,-.5), coord = (w*self.vocalPowerX,h*(self.vocalPowerY-addY)))
     if self.tapPhraseActive:
       font.render("%d / %d" % (self.tapNoteHits[self.currentTapPhrase], self.tapNoteTotals[self.currentTapPhrase]), (.25, .065+addYText), scale = self.lyricScale)
   
@@ -813,6 +839,8 @@ class Vocalist:
   
   def getRequiredNote(self, pos, song, lyric = False):
     track = song.track[self.player]
+    if self.doneLastPhrase:
+      return
     if pos > self.currentPhraseTime + self.currentPhraseLength - 20:
       if self.phraseIndex < len(track):
         if self.phraseIndex > 0:
@@ -822,21 +850,24 @@ class Vocalist:
             score = float(self.phraseTapsHit)/float(self.phraseTaps)
           else:
             score = (self.phraseInTune/self.phraseNoteTime)
-          for i, thresh in enumerate(self.scoreThresholds):
-            if score >= thresh:
-              if i < 2:
-                if self.phrase[1].star:
-                  self.starPower += 25
-                  self.starPowerGained = True
-                self.addMult()
-              if i >= 2:
-                self.resetMult()
-              self.lastScore = i
-              self.textScore = i
-              self.scoredPhrases[i] += 1
-              self.showText = 1000
-              self.scoreBox = (i/6.0, float(i+1)/6.0)
-              break
+          if not self.coOpRestart and not self.coOpFailed:
+            for i, thresh in enumerate(self.scoreThresholds):
+              if score >= thresh:
+                if i < 2:
+                  if self.phrase[1].star:
+                    self.starPower += 25
+                    self.starPowerGained = True
+                    if self.starPower > 100:
+                      self.starPower = 100
+                  self.addMult()
+                if i >= 2:
+                  self.resetMult()
+                self.lastScore = i
+                self.textScore = i
+                self.scoredPhrases[i] += 1
+                self.showText = 1000
+                self.scoreBox = (i/6.0, float(i+1)/6.0)
+                break
         else:
           self.minPitch = track.minPitch
           self.maxPitch = track.maxPitch
@@ -864,6 +895,39 @@ class Vocalist:
           self.nextPhrase = track.allEvents[self.phraseIndex]
         else:
           self.nextPhrase = None
+      elif self.phraseIndex == len(track):
+        self.phraseNoteTime = max(self.phraseNoteTime, 1)
+        if self.activePhrase.tapPhrase:
+          score = float(self.phraseTapsHit)/float(self.phraseTaps)
+        else:
+          score = (self.phraseInTune/self.phraseNoteTime)
+        if not self.coOpFailed and not self.coOpRestart:
+          for i, thresh in enumerate(self.scoreThresholds):
+            if score >= thresh:
+              if i < 2:
+                if self.phrase[1].star:
+                  self.starPower += 25
+                  self.starPowerGained = True
+                  if self.starPower > 100:
+                    self.starPower = 100
+                self.addMult()
+              if i >= 2:
+                self.resetMult()
+              self.lastScore = i
+              self.textScore = i
+              self.scoredPhrases[i] += 1
+              self.showText = 1000
+              self.scoreBox = (i/6.0, float(i+1)/6.0)
+              break
+        self.phraseInTune = 0
+        self.phraseNoteTime = 0
+        self.phraseTaps = 0
+        self.phraseTapsHit = 0
+        self.doneLastPhrase = True
+      if self.coOpFailed and self.coOpRestart:
+        self.coOpFailed = False
+      if self.coOpRestart and self.coOpRescueTime == 0:
+        self.coOpRestart = False
       self.currentPhraseTime = self.phrase[0]
       self.currentPhraseLength = self.phrase[1].length
     self.useOld = False
@@ -903,7 +967,7 @@ class Vocalist:
             self.awardEnd = True
           break
         if note[0] <= pos and note[0] + note[1].length + lateMargin > pos:
-          curNoteTime = note[0]
+          self.currentNoteTime = note[0]
           self.currentNoteItem = note[1]
           if not note[1].heldNote:
             self.currentLyric = note[1].lyric
@@ -916,11 +980,13 @@ class Vocalist:
         else:
           self.currentNoteItem = None
       else:
-        self.currentLyric = None
-        self.currentNoteItem = None
-        return None
+        self.awardEnd = True
+        if retval is None:
+          self.currentLyric = None
+          self.currentNoteItem = None
       return retval
     else:
+      self.awardEnd = True
       self.currentLyric = None
       self.currentNoteItem = None
       return None
@@ -952,6 +1018,11 @@ class Vocalist:
             self.textTrans = 0
       else:
         self.textTrans = 1
+      
+      if self.coOpRescueTime > 0:
+        self.coOpRescueTime -= ticks
+        if self.coOpRescueTime < 0:
+          self.coOpRescueTime = 0
       
       if not self.starPowerEnable:
         self.starPowerCountdown = False

@@ -220,6 +220,31 @@ Config.define("theme", "avatar_select_avatar_x", float, .667)
 Config.define("theme", "avatar_select_avatar_y", float, .5)
 Config.define("theme", "avatar_select_wheel_y", float, 0.0)
 
+#akedrou, with the vocals, in notepad++
+Config.define("theme", "vocal_meter_size", float, 45.000)
+Config.define("theme", "vocal_meter_x", float, .25)
+Config.define("theme", "vocal_meter_y", float, .8)
+Config.define("theme", "vocal_mult_x", float, .28)
+Config.define("theme", "vocal_mult_y", float, .8)
+Config.define("theme", "vocal_power_x", float, .5)
+Config.define("theme", "vocal_power_y", float, .8)
+Config.define("theme", "vocal_fillup_center_x", int, 139)
+Config.define("theme", "vocal_fillup_center_y", int, 151)
+Config.define("theme", "vocal_fillup_in_radius", int, 25)
+Config.define("theme", "vocal_fillup_out_radius", int, 139)
+Config.define("theme", "vocal_fillup_color", str, "#DFDFDE")
+Config.define("theme", "vocal_fillup_factor", float, 300.000)
+Config.define("theme", "vocal_circular_fillup", bool, True)
+Config.define("theme", "vocal_lane_size", float, .002)
+Config.define("theme", "vocal_glow_size", float, .012)
+Config.define("theme", "vocal_glow_fade", float, .6)
+Config.define("theme", "vocal_lane_color", str, "#99FF80")
+Config.define("theme", "vocal_shadow_color", str, "#CCFFBF")
+Config.define("theme", "vocal_glow_color", str, "#33FF00")
+Config.define("theme", "vocal_lane_color_star", str, "#FFFF80")
+Config.define("theme", "vocal_shadow_color_star", str, "#FFFFBF")
+Config.define("theme", "vocal_glow_color_star", str, "#FFFF00")
+
 #worldrave
 Config.define("theme", "setlistguidebuttonsposX", float, 0.408)
 Config.define("theme", "setlistguidebuttonsposY", float, 0.0322)
@@ -499,6 +524,30 @@ avatarSelectAvX = None
 avatarSelectAvY = None
 avatarSelectWheelY = None
 
+vocalMeterSize = None
+vocalMeterX = None
+vocalMeterY = None
+vocalMultX  = None
+vocalMultY  = None
+vocalPowerX = None
+vocalPowerY = None
+vocalFillupCenterX = None
+vocalFillupCenterY = None
+vocalFillupInRadius = None
+vocalFillupOutRadius = None
+vocalFillupColor = None
+vocalFillupFactor = None
+vocalCircularFillup = None
+vocalLaneSize = None
+vocalGlowSize = None
+vocalGlowFade = None
+vocalLaneColor = None
+vocalShadowColor = None
+vocalGlowColor = None
+vocalLaneColorStar = None
+vocalShadowColorStar = None
+vocalGlowColorStar = None
+
 #worldrave 
 setlistguidebuttonsposX = None
 setlistguidebuttonsposY = None
@@ -688,6 +737,7 @@ def open(config, themepath = None):
   setupMisc(config)
   setupMenu(config)
   setupLobby(config) #akedrou
+  setupVocals(config) #akedrou
   setupSonglist(config) #MFH
   setupPauseNOpt(config) #MFH
   setupTWOD(config)
@@ -804,7 +854,7 @@ def setupFlameSizes(config):
     flameSizes[3][2] = config.get("theme", "flame2_4X_size")
     flameSizes[3][3] = config.get("theme", "flame3_4X_size")
     flameSizes[3][4] = config.get("theme", "flame4_4X_size")
-
+    
 def setupSpinny(config):
   global spinnySongDisabled, spinnyEditorDisabled, spinnyResultsDisabled, spinnyMenuDisabled
 
@@ -1048,6 +1098,36 @@ def setupLobby(config):
   avatarSelectAvX = config.get("theme","avatar_select_avatar_x")
   avatarSelectAvY = config.get("theme","avatar_select_avatar_y")
   avatarSelectWheelY = config.get("theme","avatar_select_wheel_y")
+
+def setupVocals(config):
+  global vocalMeterSize, vocalMeterX, vocalMeterY, vocalMultX, vocalMultY, vocalPowerX, vocalPowerY
+  global vocalFillupCenterX, vocalFillupCenterY, vocalFillupInRadius, vocalFillupOutRadius
+  global vocalFillupColor, vocalFillupFactor, vocalCircularFillup, vocalLaneSize, vocalGlowSize, vocalGlowFade
+  global vocalLaneColor, vocalShadowColor, vocalGlowColor, vocalLaneColorStar, vocalShadowColorStar, vocalGlowColorStar
+  
+  vocalMeterSize = config.get("theme", "vocal_meter_size")
+  vocalMeterX = config.get("theme", "vocal_meter_x")
+  vocalMeterY = config.get("theme", "vocal_meter_y")
+  vocalMultX  = config.get("theme", "vocal_mult_x")
+  vocalMultY  = config.get("theme", "vocal_mult_y")
+  vocalPowerX = config.get("theme", "vocal_power_x")
+  vocalPowerY = config.get("theme", "vocal_power_y")
+  vocalFillupCenterX = config.get("theme", "vocal_fillup_center_x")
+  vocalFillupCenterY = config.get("theme", "vocal_fillup_center_y")
+  vocalFillupInRadius = config.get("theme", "vocal_fillup_in_radius")
+  vocalFillupOutRadius = config.get("theme", "vocal_fillup_out_radius")
+  vocalFillupFactor = config.get("theme", "vocal_fillup_factor")
+  vocalFillupColor = config.get("theme", "vocal_fillup_color")
+  vocalCircularFillup = config.get("theme", "vocal_circular_fillup")
+  vocalLaneSize = config.get("theme", "vocal_lane_size")
+  vocalGlowSize = config.get("theme", "vocal_glow_size")
+  vocalGlowFade = config.get("theme", "vocal_glow_fade")
+  vocalLaneColor = hexToColorResults(config.get("theme","vocal_lane_color"))
+  vocalShadowColor = hexToColorResults(config.get("theme","vocal_shadow_color"))
+  vocalGlowColor = hexToColorResults(config.get("theme","vocal_glow_color"))
+  vocalLaneColorStar = hexToColorResults(config.get("theme","vocal_lane_color_star"))
+  vocalShadowColorStar = hexToColorResults(config.get("theme","vocal_shadow_color_star"))
+  vocalGlowColorStar = hexToColorResults(config.get("theme","vocal_glow_color_star"))
 
 def setupTWOD(config):
   global twoDnote, twoDkeys, threeDspin, opencolor
