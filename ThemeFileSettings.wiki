@@ -169,8 +169,7 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||hopo_indicator_x = .950||Manually sets x position of hopo indicator||
 ||hopo_indicator_y = .950||Manually sets y position of hopo indicator||
 ||ingame_stats_color = #000000||Manually chooses the In Game Stats color. Use a Hex Color Value.||
-||jurgen_text_pos = 1,1,0.0004||Any scale under .00035 will be resized. Any coordinates that are off the screen will automatically be moved back on to screen, and
-jurgen text is rendered above everything.||
+||jurgen_text_pos = 1,1,0.0004||Any scale under .00035 will be resized.Any coordinates that are off the screen will automatically be moved back on to screen, and jurgen text is rendered above everything.||
 ||mesh_color = #000000||Use a Hex Color Value.||
 ||neck_width = 3 || Controls how wide you want the fret board to be. Use a floating point number.||
 ||neck_length = 9 || Controls how long you want the fret board to be. Use a floating point number.||
@@ -205,6 +204,29 @@ jurgen text is rendered above everything.||
 ||noterot3 = 0||This set's how many times you want the rotation degree to be applied to 3rd note (Textured 3d Notes Only)||
 ||noterot4 = 1||This set's how many times you want the rotation degree to be applied to 4th note (Textured 3d Notes Only)||
 ||noterot5 = 2||This set's how many times you want the rotation degree to be applied to 5th note (Textured 3d Notes Only)||
+||vocal_meter_size = 45.000   || -=Working on=- (Use a floating number)||
+||vocal_meter_x = .25   || -=Working on=- (Use a floating number)||
+||vocal_meter_y = .8   || -=Working on=- (Use a floating number)||
+||vocal_mult_x =  .28  || -=Working on=- (Use a floating number)||
+||vocal_mult_y = .8   || -=Working on=- (Use a floating number)||
+||vocal_power_x =  .5  || -=Working on=- (Use a floating number)||
+||vocal_power_y = .5   || -=Working on=- (Use a floating number)||
+||vocal_fillup_center_x = 139   || -=Working on=- (Use an Int number)||
+||vocal_fillup_center_y = 151   || -=Working on=- (Use an Int number)||
+||vocal_fillup_in_radius = 25   || -=Working on=- (Use an Int number)||
+||vocal_fillup_out_radius = 139   || -=Working on=- (Use an Int number)||
+||vocal_fillup_color = #DFDFDE   || -=Working on=-  (Use a hex color value)||
+||vocal_fillup_factor = 300.000   || -=Working on=- (Use a floating number)||
+||vocal_circular_fillup = True   || -=Working on=- (Use True or False)||
+||vocal_lane_size = .002   || -=Working on=- (Use a floating number)||
+||vocal_glow_size = .012   || -=Working on=- (Use a floating number)||
+||vocal_glow_fade = .6   || -=Working on=- (Use a floating number)||
+||vocal_lane_color = #99FF80   || -=Working on=- (Use a hex color value)||
+||vocal_shadow_color = #CCFFBF   || -=Working on=- (Use a hex color value)||
+||vocal_glow_color = #33FF00   || -=Working on=- (Use a hex color value)||
+||vocal_lane_color_star = #FFFF80   || -=Working on=- (Use a hex color value)||
+||vocal_shadow_color_star = #FFFFBF || -=Working on=- (Use a hex color value)||
+||vocal_glow_color_star = #FFFF00   || -=Working on=- (Use a hex color value)||
 
 
 
