@@ -132,6 +132,7 @@ class Credits(Layer, KeyListener):
     self.bank['coders']     = [_("Active Coders:")]
     self.bank['pastCoders'] = [_("Past Coders:")]
     self.bank['graphics']   = [_("Main Graphic Contributors:")]
+    self.bank['translators']= [_("Translators:")]
     self.bank['Team Hero']  = [_("Team Hero:")]
     self.bank['careerMode'] = [_("Creators of Career Mode")]
     self.bank['honorary']   = [_("Honorary Credits to:")]
@@ -158,6 +159,16 @@ class Credits(Layer, KeyListener):
     # evilynux - Theme strings
     self.bank['themeCreators'] = [_("%s theme credits:") % self.themename]
     self.bank['themeThanks']   = [_("%s theme specific thanks:") % self.themename]
+    # Languages
+    self.bank['brazilian']     = [_("Brazilian portuguese")]
+    self.bank['french']        = [_("French")]
+    self.bank['german']        = [_("German")]
+    self.bank['italian']       = [_("Italian")]
+    self.bank['piglatin']      = [_("Pig latin")]
+    self.bank['russian']       = [_("Russian")]
+    self.bank['spanish']       = [_("Spanish")]
+    self.bank['swedish']       = [_("Swedish")]
+
     
     try:
       self.engine.loadImgDrawing(self, 'background', os.path.join('themes', self.themename, 'menu', 'credits.png'))
