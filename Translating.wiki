@@ -1,0 +1,42 @@
+#summary How to translate FoFiX in another language
+#labels Phase-Implementation
+
+= Translating FoFiX =
+
+This quick tutorial is a modified version of a [http://www.fretsonfire.net/forums/viewtopic.php?f=32&t=34231&st=0&sk=t&sd=a&sid=c3b5739d1a6c4e02d9ee368375f7951c&start=3045#p415843 post by BlackJack on FoFFF]. Thanks BlackJack!
+
+== Use Case ==
+I saw that the _any language_ translation is missing a whole lot of stuff or worst, FoFiX has not been translated in that language yet! I would be willing to do the translation if someone would explain me how to do it.
+
+== Procedure == 
+In the following, we assume the translation language is German.
+
+  # Download the latest versions of [http://fofix.googlecode.com/svn/MFH-Mod/trunk/src/messages.pot messages.pot] and [http://fofix.googlecode.com/svn/MFH-Mod/trunk/src/tutorial.pot tutorial.pot]
+  # Merge the two files together _i.e._ copy the content of `tutorial.pot` in `messages.pot` and save it as `german.po`
+  # Edit the `.po` file
+    * Any text editor will do but using a `.po` editor is recommended (_e.g._ poedit or gtranslator)
+    # Translate every `msgid` in its corresponding `msgstr` (see example below).
+    # Update the header with _your_ information (if not already done by you or your editor)
+    # Convert your `.po` file into a `.mo` file (using your editor or a tool like gettext)
+  # Copy your `.mo` file to the `data/translations` folder of FoFiX
+  # Go in-game and check if it's working as expected
+  # If so, please [http://code.google.com/p/fofix/issues/entry create an issue] about your translation and add your `.mo` file as an attachment
+
+=== Translation Example ===
+Before:
+{{{
+  Select all
+  msgid "%d points is a new high score! Enter your name:"
+  msgstr ""
+}}}
+
+After :
+{{{
+  Select all
+  msgid "%d points is a new high score! Enter your name:"
+  msgstr "%d Punkte ist ein neuer Highscore! Bitte Namen eingeben :"
+}}}
+
+=== Advices ===
+  * Don't wait to have everything translated before testing your file in game
+  * *MAKE BACKUPS*
