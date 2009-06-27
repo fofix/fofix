@@ -9,8 +9,9 @@
   * [ReportingBugs]
   * [RequiredSourceModules]
   * [RunningUnderPython26]
+  * [Translating]
+  * [Shaders]
   * [Roadmap]
   * [ProjectStatistics]
-  * [Shaders]
 
   * [OldNews]
