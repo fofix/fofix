@@ -6,6 +6,7 @@ data/*.ttf:data/
 data/*.ini:data/
 data/mods:data/
 data/necks:data/
+data/shaders:data/
 data/sounds:data/
 data/themes:data/
 data/translations:data/
