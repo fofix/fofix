@@ -20,7 +20,7 @@ In the following, we assume the translation language is German.
     # Convert your `.po` file into a `.mo` file (using your editor or a tool like gettext)
   # Copy your `.mo` file to the `data/translations` folder of FoFiX
   # Go in-game and check if it's working as expected
-  # If so, please [http://code.google.com/p/fofix/issues/entry create an issue] about your translation and add your `.mo` file as an attachment
+  # If so, please [http://code.google.com/p/fofix/issues/entry create an issue] about your translation and add your `.po` and `.mo` files as an attachments
 
 === Translation Example ===
 Before:
