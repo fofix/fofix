@@ -12,7 +12,7 @@ I saw that the translation for my language is missing a whole lot of stuff or wo
 In the following, we assume the translation language is German.
 
   # Download the latest versions of [http://fofix.googlecode.com/svn/MFH-Mod/trunk/src/messages.pot messages.pot] and [http://fofix.googlecode.com/svn/MFH-Mod/trunk/src/tutorial.pot tutorial.pot]
-  # Merge the two files together _i.e._ copy the content of `tutorial.pot` in `messages.pot` and save it as `german.po`
+  # Merge the two files together _i.e._ copy the contents of `tutorial.pot` in `messages.pot` and save it as `german.po`
   # Edit the `.po` file
     * Any text editor will do but using a `.po` editor is recommended (_e.g._ poedit or gtranslator)
     # Translate every `msgid` in its corresponding `msgstr` (see example below).
