@@ -1,4 +1,4 @@
-#summary How to translate FoFiX in another language
+#summary How to translate FoFiX to another language
 #labels Phase-Implementation
 
 = Translating FoFiX =
@@ -6,7 +6,7 @@
 This quick tutorial is a modified version of a [http://www.fretsonfire.net/forums/viewtopic.php?f=32&t=34231&st=0&sk=t&sd=a&sid=c3b5739d1a6c4e02d9ee368375f7951c&start=3045#p415843 post by BlackJack on FoFFF]. Thanks BlackJack!
 
 == Use Case ==
-I saw that the _any language_ translation is missing a whole lot of stuff or worst, FoFiX has not been translated in that language yet! I would be willing to do the translation if someone would explain me how to do it.
+I saw that the translation for my language is missing a whole lot of stuff or worse, FoFiX has not been translated to that language yet! I would be willing to do the translation if someone would explain to me how to do it.
 
 == Procedure == 
 In the following, we assume the translation language is German.
@@ -20,7 +20,7 @@ In the following, we assume the translation language is German.
     # Convert your `.po` file into a `.mo` file (using your editor or a tool like gettext)
   # Copy your `.mo` file to the `data/translations` folder of FoFiX
   # Go in-game and check if it's working as expected
-  # If so, please [http://code.google.com/p/fofix/issues/entry create an issue] about your translation and add your `.po` and `.mo` files as an attachments
+  # If so, please [http://code.google.com/p/fofix/issues/entry create an issue] about your translation and add your `.po` and `.mo` files as attachments
 
 === Translation Example ===
 Before:
@@ -37,6 +37,6 @@ After :
   msgstr "%d Punkte ist ein neuer Highscore! Bitte Namen eingeben :"
 }}}
 
-=== Advices ===
+=== Advice ===
   * Don't wait to have everything translated before testing your file in game
   * *MAKE BACKUPS*
