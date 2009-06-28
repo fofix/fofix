@@ -1,10 +1,11 @@
 #!/bin/sh
 #
-# Frets On Fire startup script
+# FoFiX startup script
 #
 
 # Function to find the real directory a program resides in.
 # Feb. 17, 2000 - Sam Lantinga, Loki Entertainment Software
+# Jun. 28, 2009 - Pascal Giard, modified for FoFiX
 FindPath()
 {
     fullpath="`echo $1 | grep /`"
@@ -35,20 +36,20 @@ FindPath()
 }
 
 # Set the home if not already set.
-if [ "${FRETSONFIRE_DATA_PATH}" = "" ]; then
-    FRETSONFIRE_DATA_PATH="`FindPath $0`"
+if [ "${FOFIX_DATA_PATH}" = "" ]; then
+    FOFIX_DATA_PATH="`FindPath $0`"
 fi
 
-LD_LIBRARY_PATH=.:${FRETSONFIRE_DATA_PATH}:${LD_LIBRARY_PATH}
+LD_LIBRARY_PATH=.:${FOFIX_DATA_PATH}:${LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH
 
 # Let's ROCK!
-if [ -x "${FRETSONFIRE_DATA_PATH}/FretsOnFire.bin" ]
+if [ -x "${FOFIX_DATA_PATH}/FoFiX.bin" ]
 then
-	cd "${FRETSONFIRE_DATA_PATH}/"
-	exec "./FretsOnFire.bin" "$@"
+	cd "${FOFIX_DATA_PATH}/"
+	exec "./FoFiX.bin" "$@"
 fi
-echo "Couldn't run Frets On Fire (FretsOnFire.bin). Is FRETSONFIRE_DATA_PATH set?"
+echo "Couldn't run FoFiX (FoFiX.bin). Is FOFIX_DATA_PATH set?"
 exit 1
 
 # end of concert...
