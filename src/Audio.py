@@ -24,7 +24,9 @@
 import pygame
 import Log
 import time
+import struct
 from Task import Task
+import Config
 
 #stump: check for pitch bending support
 try:
@@ -103,6 +105,7 @@ class Music(object):
     self.pausePos = 0.0
     self.isPause = False
     self.toUnpause = False
+    self.buffersize = Config.get("audio","buffersize")
 
   @staticmethod
   def setEndEvent(event = None):
@@ -122,10 +125,11 @@ class Music(object):
 
   def pause(self):
     pygame.mixer.music.pause()
-    self.pausePos = self.getPosition()
+    self.pausePos = pygame.mixer.music.get_pos()
     self.isPause = True
 
   def unpause(self):
+    self.isPause = False
     pygame.mixer.music.unpause()
 
   def setVolume(self, volume):
@@ -155,12 +159,10 @@ class Music(object):
 
   def getPosition(self):
     if self.isPause:
-      if pygame.mixer.music.get_pos() > (self.pausePos + 100):
-        self.toUnpause = True
-        self.isPause = False
+      self.toUnpause = True
       return self.pausePos
     elif self.toUnpause:
-      if pygame.mixer.music.get_pos() < (self.pausePos + 100):
+      if pygame.mixer.music.get_pos() < (self.pausePos + 60 + (self.buffersize/32)): #this should technically be buffersize*1000/samplerate; 32 keeps it integer, 60 allows for processing time
         self.toUnpause = False
         return pygame.mixer.music.get_pos()
       else:
@@ -218,19 +220,57 @@ class Sound(object):
   def fadeout(self, time):
     self.sound.fadeout(time)
 
-if ogg:
-  import struct
-  if tuple(int(i) for i in pygame.__version__[:5].split('.')) < (1, 9, 0):
-    # Must use Numeric instead of numpy, since PyGame 1.7.1 is
-    # not compatible with the latter, and 1.8.x isn't either (though it claims to be).
-    import Numeric
-    def zeros(size):
-      return Numeric.zeros(size, typecode='s')   #myfingershurt: typecode s = short = int16
-  else:
-    import numpy
-    def zeros(size):
-      return numpy.zeros(size, dtype='h')
+if tuple(int(i) for i in pygame.__version__[:5].split('.')) < (1, 9, 0):
+  # Must use Numeric instead of numpy, since PyGame 1.7.1 is
+  # not compatible with the latter, and 1.8.x isn't either (though it claims to be).
+  import Numeric
+  def zeros(size):
+    return Numeric.zeros(size, typecode='s')   #myfingershurt: typecode s = short = int16
+else:
+  import numpy
+  def zeros(size):
+    return numpy.zeros(size, dtype='h')
 
+#stump: mic passthrough
+class MicrophonePassthroughStream(Sound, Task):
+  def __init__(self, engine, mic):
+    Task.__init__(self)
+    self.engine = engine
+    self.channel = None
+    self.mic = mic
+    self.playing = False
+    self.volume = 1.0
+  def __del__(self):
+    self.stop()
+  def play(self):
+    if not self.playing:
+      self.engine.addTask(self, synchronized=False)
+      self.playing = True
+  def stop(self):
+    if self.playing:
+      self.channel.stop()
+      self.engine.removeTask(self)
+      self.playing = False
+  def setVolume(self, vol):
+    self.volume = vol
+  def run(self, ticks):
+    chunk = ''.join(self.mic.passthroughQueue)
+    self.mic.passthroughQueue = []
+    if chunk == '':
+      return
+    samples = len(chunk)/4
+    data = tuple(int(s * 32767) for s in struct.unpack('%df' % samples, chunk))
+    playbuf = zeros((samples, 2))
+    playbuf[:, 0] = data
+    playbuf[:, 1] = data
+    snd = pygame.sndarray.make_sound(playbuf)
+    if self.channel is None or not self.channel.get_busy():
+      self.channel = snd.play()
+    else:
+      self.channel.queue(snd)
+    self.channel.set_volume(self.volume)
+
+if ogg:
   class OggStream(object):
     def __init__(self, inputFileName):
       self.file = ogg.vorbis.VorbisFile(inputFileName)

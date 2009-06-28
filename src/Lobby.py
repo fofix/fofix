@@ -26,6 +26,7 @@ from OpenGL.GL import *
 import math
 import colorsys
 import os
+import shutil
 
 from View import Layer
 from Input import KeyListener
@@ -50,7 +51,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
     self.delay        = 0
     self.scroller     = [0, self.scrollUp, self.scrollDown]
     self.gameStarted  = False
-    self.first        = True
+    self.done         = True
     self.active       = False
     self.neckB        = 5.0/6.0
     self.neckT        = 1
@@ -61,6 +62,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
     self.players      = Config.get("game", "players")
     self.mode1p       = Config.get("game","game_mode")
     self.mode2p       = Config.get("game","multiplayer_mode")
+    self.lobbyMode    = Theme.lobbyMode
     sfxVolume = self.engine.config.get("audio", "SFX_volume")
     self.engine.data.selectSound.setVolume(sfxVolume)
     self.engine.data.acceptSound.setVolume(sfxVolume)  #MFH
@@ -77,6 +79,10 @@ class Lobby(Layer, KeyListener, MessageHandler):
         self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "lobby", "lobby.png"))
       except IOError:
         self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "menu", "optionsbg.png"))
+      try:
+        self.engine.loadImgDrawing(self, "backgroundTop", os.path.join("themes", themename, "lobby", "lobby_top.png"))
+      except IOError:
+        self.backgroundTop = None
       
       try:
         self.engine.loadImgDrawing(self, "itemSelect", os.path.join("themes", themename, "lobby", "select.png"))
@@ -93,7 +99,10 @@ class Lobby(Layer, KeyListener, MessageHandler):
       except IOError:
         self.chooseCharImg = None
       
-      self.engine.loadImgDrawing(self, "defaultAvatar", os.path.join("users", "players", "default.png"))
+      if os.path.exists(self.engine.resource.fileName(os.path.join("themes",themename,"avatars","default.png"))):
+        self.engine.loadImgDrawing(self, "defaultAvatar", os.path.join("themes", themename, "avatars", "default.png"))
+      else:
+        self.engine.loadImgDrawing(self, "defaultAvatar", os.path.join("users", "players", "default.png"))
       self.engine.loadImgDrawing(self, "defaultNeck",   os.path.join("necks", self.engine.mainMenu.chosenNeck + ".png"))
       self.engine.loadImgDrawing(self, "randomNeck",    os.path.join("necks", "randomneck.png"))
       self.engine.loadImgDrawing(self, "buttons", os.path.join("themes", themename, "notes.png"))
@@ -131,24 +140,31 @@ class Lobby(Layer, KeyListener, MessageHandler):
       
       self.controlDict = Player.controlDict
       self.selected = 0
-      self.getPlayers()
-      default = self.engine.config.get("game","player0")
-      self.screenOptions = 5
+      self.screenOptions = Theme.lobbySelectLength
       self.pos = (0, self.screenOptions)
-      self.getStartingSelected(default)
+      self.getPlayers()
       
     
   def getPlayers(self):
+    if self.creator.updatedName:
+      default = self.creator.updatedName
+      self.creator.updatedName = None
+    else:
+      default = self.engine.config.get("game","player%d" % self.playerNum)
     self.playerNames = Player.playername
     self.playerPrefs = Player.playerpref
     self.options = [_("Create New Player"), _("Saved Characters")]
     self.options.extend(self.playerNames)
     if self.selected >= len(self.options):
       self.selected = len(self.options) - 1
+    self.blockedItems = [1]
+    for i in self.selectedItems:
+      self.blockedItems.append(self.options.index(i))
     self.avatars = [None for i in self.options]
     self.avatarScale = [None for i in self.options]
     self.necks   = [None for i in self.options]
     self.neckScale = [None for i in self.options]
+    self.getStartingSelected(default)
 
   def getStartingSelected(self, default):
     if self.engine.input.controls.type[self.engine.input.activeGameControls[self.playerNum]] > 1:
@@ -207,7 +223,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
     if self.necks[self.selected] is not None:
       return
     if self.selected > 1:
-      chosenNeck = Player.playerpref[self.selected-2][5]
+      chosenNeck = str(Player.playerpref[self.selected-2][6])
       if chosenNeck == "randomneck" or chosenNeck == "0" or chosenNeck.lower() == "neck_0":
         self.necks[self.selected] = "random"
         return
@@ -281,7 +297,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
         self.playerNum += 1
         self.blockedItems.append(self.selected)
         self.blockedItems.sort()
-        self.selectedItems.append(self.selected)
+        self.selectedItems.append(self.options[self.selected])
         if self.playerNum >= self.players:
           self.gameStarted = True
           self.engine.menuMusic = False
@@ -305,12 +321,10 @@ class Lobby(Layer, KeyListener, MessageHandler):
     if self.playerNum >= self.players:
       return True
     if c in self.up + [Player.playerkeys[self.playerNum][Player.UP]] or key == pygame.K_UP:
-      self.engine.data.selectSound.play()
       self.scrolling = 1
       self.scrollUp()
       self.delay = self.engine.scrollDelay
     elif c in self.down + [Player.playerkeys[self.playerNum][Player.DOWN]] or key == pygame.K_DOWN:
-      self.engine.data.selectSound.play()
       self.scrolling = 2
       self.scrollDown()
       self.delay = self.engine.scrollDelay
@@ -321,6 +335,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
     return True
   
   def scrollUp(self):
+    self.engine.data.selectSound.play()
     self.selected -= 1
     if self.selected < 0:
       self.selected = len(self.options) - 1
@@ -334,6 +349,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
         self.pos = (self.selected, self.selected+self.screenOptions)
     
   def scrollDown(self):
+    self.engine.data.selectSound.play()
     self.selected += 1
     while self.selected in self.blockedItems:
       self.selected += 1
@@ -426,6 +442,8 @@ class Lobby(Layer, KeyListener, MessageHandler):
       else:
         wText, hText = font.getStringSize(self.tsChooseChar, scale = Theme.lobbyTitleScale)
         titleFont.render(self.tsChooseChar, (Theme.lobbyTitleX-(wText),Theme.lobbyTitleY), scale = Theme.lobbyTitleScale)
+      r, g, b = Theme.lobbyPlayerColor
+      glColor3f(r, g, b)
       wText, hText = titleFont.getStringSize(self.tsPlayerStr % (self.playerNum+1), scale = Theme.lobbyTitleScale)
       titleFont.render(self.tsPlayerStr % (self.playerNum+1), (Theme.lobbyTitleCharacterX-wText/2, Theme.lobbyTitleCharacterY), scale = Theme.lobbyTitleScale)
       for i, name in enumerate(self.options):
@@ -438,22 +456,28 @@ class Lobby(Layer, KeyListener, MessageHandler):
             lefty = 1
             if self.playerPrefs[j][0] == 1:
               lefty = -1
-            self.engine.drawImage(self.buttons, scale = (self.buttonScale*lefty, -self.buttonScale*(1.0/6.0)), coord = (w*Theme.lobbyPreviewX,h*.45), rect = (0, 1, 0, (1.0/6.0)))
-            if self.avatars[i] == "Empty" or self.avatars[i] == None:
-              self.engine.drawImage(self.defaultAvatar, scale = (self.defAvScale,-self.defAvScale), coord = (w*Theme.lobbyPreviewX,h*.75))
+            self.engine.drawImage(self.buttons, scale = (self.buttonScale*lefty, -self.buttonScale*(1.0/6.0)), coord = (w*Theme.lobbyPreviewX,h*(Theme.lobbyPreviewY+.45)), rect = (0, 1, 0, (1.0/6.0)))
+            if self.lobbyMode == 1:
+              avatarCoord = (w*Theme.lobbyAvatarX,h*Theme.lobbyAvatarY)
+              avatarScale = Theme.lobbyAvatarScale
             else:
-              self.engine.drawImage(self.avatars[i], scale = (self.avatarScale[i],-self.avatarScale[i]), coord = (w*Theme.lobbyPreviewX,h*.75))
+              avatarCoord = (w*Theme.lobbyPreviewX,h*(Theme.lobbyPreviewY+.75))
+              avatarScale = 1
+            if self.avatars[i] == "Empty" or self.avatars[i] == None:
+              self.engine.drawImage(self.defaultAvatar, scale = (self.defAvScale*avatarScale,-self.defAvScale*avatarScale), coord = avatarCoord)
+            else:
+              self.engine.drawImage(self.avatars[i], scale = (self.avatarScale[i]*avatarScale,-self.avatarScale[i]*avatarScale), coord = avatarCoord)
             if self.infoImg:
-              self.engine.drawImage(self.infoImg, scale = (.5,-.5), coord = (w*Theme.lobbyPreviewX,h*.55))
+              self.engine.drawImage(self.infoImg, scale = (.5,-.5), coord = (w*Theme.lobbyPreviewX,h*(Theme.lobbyPreviewY+.55)))
             else:
               wText, hText = titleFont.getStringSize(self.tsInfo, scale = .0025)
-              titleFont.render(self.tsInfo, (Theme.lobbyPreviewX-wText/2, (.45*self.engine.data.fontScreenBottom)-hText/2), scale = .0025)
+              titleFont.render(self.tsInfo, (Theme.lobbyPreviewX-wText/2, ((.45-Theme.lobbyPreviewY)*self.engine.data.fontScreenBottom)-hText/2), scale = .0025)
             r, g, b = Theme.lobbyInfoColor
             glColor3f(r, g, b)
             for k in range(1,5):
               text = self.tsList[k][self.playerPrefs[j][k]]
               wText, hText = font.getStringSize(text, scale = .0018)
-              font.render(text, (Theme.lobbyPreviewX-wText/2,.4+(.04*k)), scale = .0018)
+              font.render(text, (Theme.lobbyPreviewX-wText/2,.4-(Theme.lobbyPreviewY*self.engine.data.fontScreenBottom)+(Theme.lobbyPreviewSpacing*k)), scale = .0018)
           if self.itemSelect:
             self.engine.drawImage(self.itemSelect, scale = (.5,-.5), coord = (w*Theme.lobbySelectImageX,h*(1-(Theme.lobbySelectImageY+Theme.lobbySelectSpace*(i-self.pos[0]))/self.engine.data.fontScreenBottom)))
           else:
@@ -464,20 +488,17 @@ class Lobby(Layer, KeyListener, MessageHandler):
             r, g, b = Theme.lobbyDisableColor
             glColor3f(r, g, b)
           else:
-            if i == self.selected:
-              if self.itemSelect:
-                r, g, b = Theme.lobbyFontColor
-                glColor3f(r, g, b)
-            else:
-              r, g, b = Theme.lobbyFontColor
-              glColor3f(r, g, b)
+            r, g, b = Theme.lobbyFontColor
+            glColor3f(r, g, b)
         if i == 1:
           wText, hText = titleFont.getStringSize(name, scale = Theme.lobbySelectScale)
           titleFont.render(name, (Theme.lobbySelectX-wText, Theme.lobbySelectY + (Theme.lobbySelectSpace*(i-self.pos[0]))), scale = Theme.lobbySelectScale)
         else:
           wText, hText = font.getStringSize(name, scale = Theme.lobbySelectScale)
           font.render(name, (Theme.lobbySelectX-wText, Theme.lobbySelectY + (Theme.lobbySelectSpace*(i-self.pos[0]))), scale = Theme.lobbySelectScale)
-      
+      if self.backgroundTop:
+        wFactor = 640.000/self.backgroundTop.width1()
+        self.engine.drawImage(self.backgroundTop, scale = (wFactor,-wFactor), coord = (w/2,h/2))
     finally:
       self.engine.view.resetProjection()
   
@@ -485,10 +506,10 @@ class Lobby(Layer, KeyListener, MessageHandler):
     if not visibility:
       self.active = False
       return
-    if not self.active and not self.first:
+    if not self.active:
       self.getPlayers()
     self.active = True
-    self.first  = False
+    self.done   = True
     if self.singlePlayer:
       self.renderLocalLobby(visibility, topMost)
       return
@@ -549,6 +570,7 @@ class CreateCharacter(Layer, KeyListener):
     self.name      = ""
     self.active    = False
     self.oldValue  = None
+    self.oldName   = None
     self._cache    = None
     self.selected  = 0
     self.choice    = 0
@@ -567,11 +589,15 @@ class CreateCharacter(Layer, KeyListener):
       self.invalidNames.append(i.lower())
     self.newChar   = True
     self.choices   = []
+    self.avatar    = None
     self.player    = None
+    self.neck      = None
+    self.updatedName = None
     self.loadPlayer()
     self.dictEnDisable = {0: _("Disabled"), 1: _("Enabled")}
     self.lefty     = {0: 1, 1: -1}
-    self.values    = (self.dictEnDisable, self.dictEnDisable, self.dictEnDisable, {0: _("Disabled"), 1: _("Easy Assist"), 2: _("Medium Assist")}, self.dictEnDisable)
+    neckDict       = {0: _("Default Neck"), 1: _("Theme Neck"), 2: _("Select a Neck")}
+    self.values    = (self.dictEnDisable, self.dictEnDisable, self.dictEnDisable, {0: _("Disabled"), 1: _("Easy Assist"), 2: _("Medium Assist")}, self.dictEnDisable, neckDict)
     self.options   = [(_("Name"),             _("Name your character!")), \
                       (_("Lefty Mode"),       _("Flip the guitar frets for left-handed playing!")), \
                       (_("Drum Flip"),        _("Flip the drum sounds - red hits become green, and so on")), \
@@ -580,7 +606,7 @@ class CreateCharacter(Layer, KeyListener):
                       (_("Two-Chord Max"),    _("Cut those jumbo chords down to a more manageable size!")), \
                       (_("Neck"),             _("Set a custom neck image just for you!")), \
                       (_("Upload Name"),      _("'Harry Potter' is all well and good, but...")), \
-                      (_("Reset Stats"),      _("Sometimes it's better to start from scratch.")), \
+                      (_("Choose Avatar"),    _("Sometimes I wonder what you look like.")), \
                       (_("Delete Character"), _("Come on... I didn't mean it. Really, I promise!")), \
                       (_("Done"),             _("All finished? Let's do this thing!"))]
     themename = self.engine.data.themeLabel
@@ -588,32 +614,33 @@ class CreateCharacter(Layer, KeyListener):
       self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "lobby", "creator.png"))
     except IOError:
       self.background = None
+    try:
+      self.engine.loadImgDrawing(self, "backgroundTop", os.path.join("themes", themename, "lobby", "creator_top.png"))
+    except IOError:
+      self.backgroundTop = None
   def loadPlayer(self, player = None):
     self.choices = []
     if player is not None:
       try:
         pref = self.cache.execute('SELECT * FROM `players` WHERE `name` = ?', [player]).fetchone()
-        pref = [pref[0], pref[1], pref[2], pref[3], pref[4], pref[5], pref[6], pref[9]]
+        pref = [pref[0], pref[1], pref[2], pref[3], pref[4], pref[5], pref[6], pref[10]]
+        self.neck = pref[7]
         self.newChar = False
         self.player = player
+        self.oldName = pref[0]
       except: #not found
-        pref = ['', 0, 0, 0, 0, 0, '', '']
+        pref = ['', 0, 0, 0, 0, 0, 0, '']
+        self.neck = ''
         self.newChar = True
         self.player = None
     else:
-      pref = ['', 0, 0, 0, 0, 0, '', '']
+      pref = ['', 0, 0, 0, 0, 0, 0, '']
+      self.neck = ''
       self.newChar = True
       self.player = None
     for i in pref:
       self.choices.append(i)
     self.choices.extend(["", "", ""])
-  def resetStats(self):
-    if not self.player:
-      return
-    tsYes = _("Yes")
-    q = Dialogs.chooseItem(self.engine, [tsYes, _("No")], _("Are you sure you want to reset all stats for this player?"))
-    if q == tsYes:
-      Player.resetStats(self.player)
   def deleteCharacter(self):
     tsYes = _("Yes")
     q = Dialogs.chooseItem(self.engine, [tsYes, _("No")], _("Are you sure you want to delete this player?"))
@@ -624,11 +651,21 @@ class CreateCharacter(Layer, KeyListener):
       self.engine.input.removeKeyListener(self)
   def saveCharacter(self):
     pref = self.choices[0:8]
+    pref.insert(7, self.neck)
     if len(self.choices[0]) > 0:
       if self.choices[0].lower() == "default":
         Dialogs.showMessage(self.engine, _("That is a terrible name. Choose something not 'default'"))
       elif self.choices[0].lower() not in self.invalidNames or self.choices[0] == self.player:
         Player.updatePlayer(self.player, pref)
+        self.updatedName  = self.choices[0]
+        if self.avatar is not None:
+          shutil.copy(self.engine.resource.fileName(self.avatar),os.path.join(self.engine.data.path,"users","players",self.choices[0]+".png"))
+        if self.oldName:
+          if os.path.exists(self.engine.resource.fileName(os.path.join("users","players",self.oldName+".png"))) and self.oldName != self.choices[0]:
+            if self.avatar is None:
+              os.rename(self.engine.resource.fileName(os.path.join("users","players",self.oldName+".png")), os.path.join(self.engine.data.path,"users","players",self.choices[0]+".png"))
+            else:
+              os.remove(self.engine.resource.fileName(os.path.join("users","players",self.oldName+".png")))
         self.engine.view.popLayer(self)
         self.engine.input.removeKeyListener(self)
       else:
@@ -659,6 +696,7 @@ class CreateCharacter(Layer, KeyListener):
         return
     if c in Player.key1s or key == pygame.K_RETURN:
       self.scrolling = 0
+      self.engine.data.acceptSound.play()
       if self.selected in (0, 7):
         if self.active:
           self.active = False
@@ -667,18 +705,20 @@ class CreateCharacter(Layer, KeyListener):
           self.active = True
           self.oldValue = self.choices[self.selected]
       elif self.selected == 6:
-        self.engine.view.pushLayer(Dialogs.NeckChooser(self.engine, player = self.player, owner = self))
-        self.keyActive = False
+        if self.choices[6] == 2:
+          self.engine.view.pushLayer(Dialogs.NeckChooser(self.engine, player = self.player, owner = self))
+          self.keyActive = False
       elif self.selected == 8:
-        self.resetStats()
+        self.avatar = Dialogs.chooseAvatar(self.engine)
       elif self.selected == 9:
         self.deleteCharacter()
       elif self.selected == 10:
         self.saveCharacter()
-      self.engine.data.acceptSound.play()
     elif c in Player.key2s + Player.cancels or key == pygame.K_ESCAPE:
       self.engine.data.cancelSound.play()
       if not self.active:
+        if self.player:
+          self.updatedName  = self.oldName
         self.engine.view.popLayer(self)
         self.engine.input.removeKeyListener(self)
       else:
@@ -702,18 +742,18 @@ class CreateCharacter(Layer, KeyListener):
       if c in Player.key4s:
         self.engine.data.cancelSound.play()
     elif c in Player.rights or key == pygame.K_RIGHT:
-      if self.selected in (0, 6, 7, 8, 9, 10):
+      if self.selected in (0, 7, 8, 9, 10):
         pass
-      elif self.selected == 4:
+      elif self.selected in [4, 6]:
         self.choices[self.selected]+=1
         if self.choices[self.selected] > 2:
           self.choices[self.selected] = 0
       else:
         self.choices[self.selected] = 1 and (self.choices[self.selected] == 0) or 0
     elif c in Player.lefts or key == pygame.K_LEFT:
-      if self.selected in (0, 6, 7, 8, 9, 10):
+      if self.selected in (0, 7, 8, 9, 10):
         pass
-      elif self.selected == 4:
+      elif self.selected in [4, 6]:
         self.choices[self.selected]-=1
         if self.choices[self.selected] < 0:
           self.choices[self.selected] = 2
@@ -824,11 +864,18 @@ class CreateCharacter(Layer, KeyListener):
         font.render(option[0], (Theme.characterCreateX, Theme.characterCreateY+Theme.characterCreateSpace*i), scale = Theme.characterCreateScale)
         if self.active and self.selected == i:
           Theme.setSelectedColor(1-v)
-        if i == 0 or i > 5:
+        if i == 0 or i > 6:
           wText, hText = font.getStringSize(self.choices[i], scale = Theme.characterCreateScale)
           font.render(self.choices[i]+cursor, (Theme.characterCreateOptionX-wText, Theme.characterCreateY+Theme.characterCreateSpace*i), scale = Theme.characterCreateScale)
         else:
-          wText, hText = font.getStringSize(self.values[i-1][self.choices[i]], scale = Theme.characterCreateScale)
-          font.render(self.values[i-1][self.choices[i]], (Theme.characterCreateOptionX-wText, Theme.characterCreateY+Theme.characterCreateSpace*i), scale = Theme.characterCreateScale)
+          if i == self.selected:
+            str = "< %s >" % self.values[i-1][self.choices[i]]
+          else:
+            str = self.values[i-1][self.choices[i]]
+          wText, hText = font.getStringSize(str, scale = Theme.characterCreateScale)
+          font.render(str, (Theme.characterCreateOptionX-wText, Theme.characterCreateY+Theme.characterCreateSpace*i), scale = Theme.characterCreateScale)
+      if self.backgroundTop:
+        wFactor = 640.000/self.backgroundTop.width1()
+        self.engine.drawImage(self.backgroundTop, scale = (wFactor,-wFactor), coord = (w/2,h/2))
     finally:
       self.engine.view.resetProjection()

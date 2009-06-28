@@ -56,7 +56,10 @@ class ScoreCard(object):
     self.avMult = 0.0
     self.hitAccuracy = 0.0
     self.score  = 0
-    self.baseScore = 50
+    if instrument == [5]:
+      self.baseScore = 200
+    else:
+      self.baseScore = 50
     self.notesHit = 0
     self.notesMissed = 0
     self.instrument = instrument # 0 = Guitar, 2 = Bass, 4 = Drum
@@ -249,8 +252,14 @@ class ScoreCard(object):
             return i
 
   def updateAvMult(self):
-    self.hitAccuracy = (float(self.notesHit) / float(self.totalStreakNotes) ) * 100.0
-    self.avMult      = self.score/float(self.totalNotes*self.baseScore)
+    try:
+      self.hitAccuracy = (float(self.notesHit) / float(self.totalStreakNotes) ) * 100.0
+    except ZeroDivisionError:
+      self.hitAccuracy = 0.0
+    try:
+      self.avMult      = self.score/float(self.totalNotes*self.baseScore)
+    except ZeroDivisionError:
+      self.avMult      = 1.0
   
   def updateHandicapValue(self):
     self.handicapValue = 100.0
@@ -291,6 +300,8 @@ class ScoreCard(object):
         return BASS_GROOVE_SCORE_MULTIPLIER.index((self.streak / 10) * 10) + 1
       except ValueError:
         return len(BASS_GROOVE_SCORE_MULTIPLIER)
+    elif self.instrument == [Song.VOCAL_PART]:
+      return min(self.streak + 1, 4)
     else:
       try:
         return SCORE_MULTIPLIER.index((self.streak / 10) * 10) + 1

@@ -57,7 +57,7 @@ def dataPath():
   # Determine whether were running from an exe or not
   if hasattr(sys, "frozen"):
     if os.name == "posix":
-      dataPath = os.path.join(os.path.dirname(sys.argv[0]), "../lib/fretsonfire")
+      dataPath = os.path.join(os.path.dirname(sys.argv[0]), "../lib/fofix")
       if not os.path.isdir(dataPath):
         dataPath = "data"
     else:

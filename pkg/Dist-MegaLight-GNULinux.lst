@@ -6,14 +6,15 @@ data/*.ttf:data/
 data/*.ini:data/
 data/mods:data/
 data/necks:data/
+data/shaders:data/
 data/sounds:data/
 data/themes:data/
 data/translations:data/
 data/tutorials/jurgenfof:data/tutorials/
 data/tutorials/drumtest:data/tutorials/
 data/users:data/
-dist/FretsOnFire:.
-dist/FretsOnFire.bin:.
+dist/FoFiX:.
+dist/FoFiX.bin:.
 AUTHORS:.
 COPYING:.
 CREDITS:.

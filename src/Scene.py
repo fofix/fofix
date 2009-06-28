@@ -39,6 +39,10 @@ from numpy import array, transpose, reshape, dot
 
 Config.define("network", "updateinterval", int, 72)
 
+#stump: raised by a scene constructor to abort scene processing
+class SuppressScene(Exception):
+  pass
+
 # Messages from client to server
 class CreateActor(Message): pass
 class ControlEvent(Message): pass

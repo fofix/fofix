@@ -40,6 +40,8 @@ import datetime
 import sys
 import Theme
 import Player
+import Version
+from Shader import shaders
 
 #myfingershurt: needed for multi-OS file fetching
 import os
@@ -114,6 +116,13 @@ class MainMenu(BackgroundLayer):
     self.themeCoOp = self.engine.data.themeCoOp
     self.themename = self.engine.data.themeLabel
     self.useSoloMenu = Theme.use_solo_submenu
+    
+    allowMic = True
+    
+    if not os.path.exists(os.path.join(Version.dataPath(), "themes", self.themename, "vocals")):
+      allowMic = False
+    if self.theme == 0:
+      allowMic = False
 
     try:
       #blazingamer
@@ -229,32 +238,33 @@ class MainMenu(BackgroundLayer):
     
     if self.theme == 1 and self.themeCoOp: #Worldrave - Put GH Co-op ahead of FoFix co-op for GH based theme's. Made more sense.
       multPlayerMenu = [
-        (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
-        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
+        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = -1)),
+        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = -1)),
+        (_("GH Battle"), lambda: self.newLocalGame(players = 2, mode2p = 6, maxplayers = -1, allowDrum = False)), #akedrou- so you can block drums
         (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
         (_("Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 5)),
-        (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),   #Worldrave - Re-added this option for now.
+        (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3, allowMic = allowMic)),   #Worldrave - Re-added this option for now.
       ]
     elif self.theme == 1 and not self.themeCoOp:
       multPlayerMenu = [
-        (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
-        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
+        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = -1)),
+        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = -1)),
         (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
       ]
     elif self.theme == 2:
       multPlayerMenu = [
-        (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),
-        (_("RB Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 4)),
-        (_("GH Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 5)),
-        (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
-        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
+        (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3, maxplayers = 4, allowMic = allowMic)),
+        (_("RB Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 4, maxplayers = 4, allowMic = allowMic)),
+        (_("GH Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 5, maxplayers = 4)),
+        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = -1)),
+        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = -1)),
         (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
       ]
     else:
       multPlayerMenu = [
-        (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3)),
-        (_("Face-Off"), lambda: self.newLocalGame(players = 2)),
-        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1)),
+        (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3, allowMic = allowMic)),
+        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = -1)),
+        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = -1)),
         (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
       ]
     
@@ -267,8 +277,8 @@ class MainMenu(BackgroundLayer):
     if not self.useSoloMenu:
 
       mainMenu = [
-        (strCareer, lambda:   self.newLocalGame(mode1p = 2)),
-        (strQuickplay, lambda:        self.newLocalGame()),
+        (strCareer, lambda:   self.newLocalGame(mode1p = 2, allowMic = allowMic)),
+        (strQuickplay, lambda:        self.newLocalGame(allowMic = allowMic)),
         ((strMultiplayer,"multiplayer"), multPlayerMenu),
         ((strTraining,"training"),    trainingMenu),
         ((strSettings,"settings"),  self.settingsMenu),
@@ -278,8 +288,8 @@ class MainMenu(BackgroundLayer):
     else:
 
       soloMenu = [
-        (_("Solo Tour"), lambda: self.newLocalGame(mode1p = 2)),
-        (_("Quickplay"), lambda: self.newLocalGame()),
+        (_("Solo Tour"), lambda: self.newLocalGame(mode1p = 2, allowMic = allowMic)),
+        (_("Quickplay"), lambda: self.newLocalGame(allowMic = allowMic)),
       ]
 
       mainMenu = [
@@ -307,6 +317,7 @@ class MainMenu(BackgroundLayer):
   def shown(self):
     self.engine.view.pushLayer(self.menu)
     self.engine.stopServer()
+    shaders.checkIfEnabled()
   
   def runMusic(self):
     if not self.song.isPlaying():   #re-randomize
@@ -403,12 +414,10 @@ class MainMenu(BackgroundLayer):
   def newSinglePlayerGame(self):
     self.newLocalGame()   #just call start function with default settings  = 1p quickplay
   
-  def newLocalGame(self, players=1, mode1p=0, mode2p=0): #mode1p=0(quickplay),1(practice),2(career) / mode2p=0(faceoff),1(profaceoff)
+  def newLocalGame(self, players=1, mode1p=0, mode2p=0, maxplayers = None, allowGuitar = True, allowDrum = True, allowMic = False): #mode1p=0(quickplay),1(practice),2(career) / mode2p=0(faceoff),1(profaceoff)
     self.engine.data.acceptSound.play()
-    players = Dialogs.activateControllers(self.engine, players) #akedrou
-    if players > 2: #hey look! Multiplayer support without the hassle!
-      players = 2   #just comment these lines and everything will work! I promise!
-    elif players == 0:
+    players = Dialogs.activateControllers(self.engine, players, maxplayers, allowGuitar, allowDrum, allowMic) #akedrou
+    if players == 0:
       return
     Config.set("game", "players", players)
     Config.set("game","game_mode", mode1p)
@@ -420,7 +429,6 @@ class MainMenu(BackgroundLayer):
 
     #MFH - testing new traceback logging:
     #raise TypeError
-
 
     if self.engine.isServerRunning():
       return
@@ -505,7 +513,7 @@ class MainMenu(BackgroundLayer):
           
           self.engine.drawImage(self.optionsPanel, (0.5,-0.5), (w/1.7, h/2))
         else:
-          self.engine.drawImage(self.engine.data.loadingImage, (0.5,-0.5), (w/2, h/2), stretched = 3)
+          self.engine.drawImage(self.engine.data.loadingImage, (1.0,-1.0), (w/2, h/2), stretched = 3)
 
       if self.menu.active:
         if self.background != None:

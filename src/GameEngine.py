@@ -56,7 +56,7 @@ import Theme
 import Version
 import Mod
 import Player
-import Shader
+from Shader import shaders
 
 # evilynux - Grab name and version from Version class.
 version = "%s v%s" % ( Version.appNameSexy(), Version.version() )
@@ -73,7 +73,15 @@ Config.define("video",  "fps",          int,   80,    text = _("Frames per Secon
 Config.define("video",  "show_fps",     bool,   False,  text = _("Print Frames per Second"), options = {False: _("No"), True: _("Yes")})
 Config.define("video",  "hitglow_color", int,  0,     text = _("Fret Glow Color"), options = {0: _("Same as Fret"), 1: _("Actual Color")})
 Config.define("video",  "hitflame_color", int, 0,     text = _("Hitflames Color"), options = {0: _("Theme Specific"), 1: _("Same as Fret"), 2: _("Actual Color")})
-Config.define("video",  "use_shaders",     bool,   False,  text = _("Use Shaders"), options = {False: _("No"), True: _("Yes")})
+
+Config.define("video",  "shader_use",     bool,   True,  text = _("Use Shaders"), options = {False: _("No"), True: _("Yes")})
+Config.define("video",  "shader_neck",     str,   "neck",  text = _("Neck"), options = {"Disabled":_("Disabled"), "neck": _("Flashing"), "theme": _("By Theme")})
+Config.define("video",  "shader_stage",     str,   "stage",  text = _("Stage"), options = {"Disabled":_("Disabled"), "stage": _("EQ Lightning"), "theme": _("By Theme")})
+Config.define("video",  "shader_sololight",     str,   "sololight",  text = _("Solo and SP"), options = {"Disabled":_("Disabled"), "sololight": _("Lightnings"), "theme": _("By Theme")})
+Config.define("video",  "shader_tail",     str,   "tail2",  text = _("Tails"), options = {"Disabled":_("Disabled"), "tail1": _("Lightnings"), "tail2": _("RB2"), "theme": _("By Theme")})
+Config.define("video",  "shader_notes",     str,   "notes",  text = _("Notes"), options = {"Disabled":_("Disabled"), "notes": _("Metal"), "theme": _("By Theme")})
+Config.define("video",  "shader_cd",     str,   "cd",  text = _("CDs"), options = {"None":_("Disabled"), "cd": _("White"), "theme": _("By Theme")})
+
 Config.define("performance",  "starspin", bool,     True,  text = _("Animated Star Notes"), options = {True: _("Yes"), False: _("No")})
 Config.define("audio",  "frequency",    int,   44100, text = _("Sample Frequency"), options = [8000, 11025, 22050, 32000, 44100, 48000])
 Config.define("audio",  "bits",         int,   16,    text = _("Sample Bits"), options = [16, 8])
@@ -135,7 +143,7 @@ Config.define("game", "hopo_after_chord",      int,   1,   text = _("HO/PO After
 Config.define("game", "accuracy_mode",      int,   2,   text = _("Show Hit Accuracy"),    options = {0: _("Off"), 1: _("Numeric"), 2: _("Friendly"), 3: _("Both")})
 Config.define("game", "accuracy_pos",      int,   1,   text = _("Hit Accuracy Pos"),    options = {0: _("Center"), 1: _("Right-top Corner"), 2: _("Left-Bottom Corner"), 3: _("Center-Bottom")}) #QQstarS:acc show
 
-
+Config.define("performance", "max_players", int, 2, text = _("Max Players"), options = {2: 2, 3: 3, 4: 4})
 
 #myfingershurt:
 Config.define("game",  "stage_rotate_delay",        int,   800,   text = _("Slideshow Delay"), options = dict([(n, n) for n in range(0, 10, 1)] + [(n, n) for n in range(10, 50, 10)] + [(n, n) for n in range(50, 2001, 50)]))
@@ -177,10 +185,9 @@ Config.define("game", "drum_sp_mode",      int, 0,  text = _("Drum SP"), options
 Config.define("game", "large_drum_neck",      bool, False,  text = _("Large Drum Neck"), options = {False: _("No"), True: _("Yes")})
 Config.define("game", "bass_groove_neck",      int, 1,  text = _("Bass Groove Neck"), options = {0: _("Off"), 1: _("Replace"), 2: _("Overlay")})
 Config.define("game", "guitar_solo_neck",      int, 2,  text = _("Guitar Solo Neck"), options = {0: _("Off"), 1: _("Replace"), 2: _("Overlay")})
-Config.define("game", "rock_band_events",      int, 2,  text = _("Rock Band MIDI Events"), options = {0: _("Off"), 1: _("By Theme"), 2: _("On")})
 Config.define("game", "show_unused_text_events",      bool, False,  text = _("Show Unused Events"), options = {False: _("No"), True: _("Yes")})
 Config.define("game", "bass_kick_sound",      bool, False,  text = _("Kick Bass Sound"), options = {False: _("Off"), True: _("On")})
-Config.define("game", "rb_midi_lyrics",           int,  1,   text = _("Show MIDI Lyrics"), options = {0: _("Off"), 1: _("1p Only"), 2: _("Auto")})
+Config.define("game", "rb_midi_lyrics",           int,  1,   text = _("Show Lyrics in All Modes"), options = {0: _("No"), 1: _("Single Player"), 2: _("Always")})
 Config.define("game", "rb_midi_sections",           int,  0,   text = _("Show MIDI Sections"), options = {0: _("Off"), 1: _("1p Only"), 2: _("Auto")})
 Config.define("game", "key_checker_mode",      int, 1,  text = _("Key Conflicts"), options = {0: _("No check"), 1: _("Notify"), 2: _("Enforce")})
 Config.define("performance", "in_game_stats",      int, 0,  text = _("Show In-Game Stats"), options = {0: _("Off"), 1: _("By Theme"), 2: _("On")})
@@ -204,12 +211,13 @@ Config.define("game",  "cheer_loop_delay",        int,   550,   text = _("Cheer 
 Config.define("game", "miss_pauses_anim",       int, 1,     text = _("Miss Pauses Anim"), options = {0: _("Off"), 1: _("On")}) #MFH
 Config.define("game", "song_hopo_freq",       int, 1,     text = _("Song HO/PO Freq"), options = {0: _("Off"), 1: _("Auto")}) #MFH
 #Config.define("game",   "mute_sustain_releases",          bool, False,  text = _("Mute sustain releases"), options = {False: _("No"), True: _("Yes")})
+Config.define("game",   "mute_drum_fill",           int, 1,    text = _("Mute Drum Track During Fills"), options = {0: _("No"), 1:_("Yes")})
 Config.define("game",   "sustain_muting",          int, 1,    text = _("Sustain Muting"), options = {0: _("Off"), 1: _("Ultra Wide"), 2: _("Wide"), 3: _("Standard"), 4: _("Tight")})
 Config.define("game",   "solo_frame",          int, 1,    text = _("Show Solo Frame"), options = {0: _("Off"), 1: _("Auto")})
+Config.define("game",   "mark_solo_sections",  int, 1,    text = _("Enable Guitar Solos"), options = {0: _("Never"), 1: _("Always"), 2: _("By Theme"), 3: _("MIDI Only")})
 Config.define("game",   "starpower_mode",          int, 2,    text = _("SP Mode"), options = {0: _("Off"), 1: _("FoF"), 2: _("Auto MIDI")})
 Config.define("game",   "font_rendering_mode",          int, 0,    text = _("Font Mode"), options = {0: _("oGL Hack"), 1: _("Lamina Screen"), 2: _("Lamina Frames")})
 Config.define("game",   "incoming_neck_mode",          int, 2,    text = _("Inc. Neck Mode"), options = {0: _("Off"), 1: _("Start Only"), 2: _("Start & End")})
-Config.define("game", "midi_lyric_mode",           int,  2,   text = _("Lyric Display Mode"), options = {0: _("Scrolling"), 1: _("Simple Lines"), 2: _("2-Line")})
 Config.define("game", "big_rock_endings",           int,  2,   text = _("Big Rock Endings"), options = {0: _("Off"), 1: _("By Theme"), 2: _("On")})
 Config.define("game",  "neck_alpha",  float,    1.0,  text = _("Main Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]))
 Config.define("game",  "solo_neck_alpha",  float,    1.0,  text = _("Solo Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]))
@@ -226,7 +234,10 @@ Config.define("game", "scroll_rate",              int, 50,   text = _("Scroll Ra
 #MFH - debug settings
 Config.define("debug",   "use_unedited_midis",          int, 1,    text = _("Use (notes-unedited.mid)"), options = {0: _("Off"), 1: _("Auto")})
 Config.define("debug",   "show_freestyle_active",          int, 0,    text = _("Show Fill Status"), options = {0: _("Off"), 1: _("On")})
+Config.define("debug",   "show_bpm",          int, 0,    text = _("Show BPM"), options = {0: _("Off"), 1: _("On")})
+Config.define("debug",   "use_new_vbpm_beta",          int, 0,    text = _("New BPM Logic"), options = {0: _("Off"), 1: _("On")})
 
+Config.define("debug",   "show_raw_vocal_data", int, 0,  text = _("Show Raw Vocal Data"), options = {0: _("Off"), 1: _("On")})
 
 Config.define("audio",  "speed_factor",  float,    1.0,  text = _("Speed Factor"),   options = {1.0: _("1.00x"), 0.75: _("0.75x"), 0.50: _("0.50x"), 0.25: _("0.25x")})  #MFH
 
@@ -254,6 +265,16 @@ Config.define("game", "beat_claps",          bool, False,  text = _("Practice Be
 Config.define("game", "board_speed",      int,   0) #racer
 Config.define("game", "HSMovement",      int,   1,   text = _("Change Score Display"),    options = {0: _("Auto"), 1: _("Blue Fret (#4)")}) #racer
 
+#Q
+Config.define("game", "battle_Whammy",      int,   1,   text = _("Whammy"),    options = {0: _("Off"), 1: _("On")}) 
+Config.define("game", "battle_Diff_Up",      int,   1,   text = _("Difficulty Up"),    options = {0: _("Off"), 1: _("On")}) 
+Config.define("game", "battle_String_Break",      int,   1,   text = _("String Break"),    options = {0: _("Off"), 1: _("On")}) 
+Config.define("game", "battle_Double",      int,   1,   text = _("Double Notes"),    options = {0: _("Off"), 1: _("On")}) 
+Config.define("game", "battle_Death_Drain",      int,   2,   text = _("Death Drain"),    options = {0: _("Off"), 1: _("On"), 2: _("Sudden Death Only")}) 
+Config.define("game", "battle_Amp_Overload",      int,   1,   text = _("Amp Overload"),    options = {0: _("Off"), 1: _("On")}) 
+Config.define("game", "battle_Switch_Controls",      int,   1,   text = _("Switch Controls"),    options = {0: _("Off"), 1: _("On")}) 
+Config.define("game", "battle_Steal",      int,   1,   text = _("Steal Object"),    options = {0: _("Off"), 1: _("On")}) 
+Config.define("game", "battle_Tune",      int,   1,   text = _("Guitar Tune"),    options = {0: _("Off"), 1: _("On")}) 
 
 #blazingamer
 Config.define("game", "congrats",       bool, True,     text = _("Score SFX"),             options = {True: _("On"), False: _("Off")})#blazingamer
@@ -274,6 +295,7 @@ Config.define("game", "songlistrotation",     bool, True,     text = _("Rotating
 Config.define("game", "keep_play_count", int, 1, text = _("Remember Play Count"), options = {0: _("No"), 1: _("Yes")})
 Config.define("game", "tut",       bool, False,     text = _("tut"),             options = {True: _("Yes"), False: _("No")})
 Config.define("video", "counting",       bool, False,     text = _("Show at Song Start"),             options = {True: _("Part"), False: _("Countdown")})
+Config.define("fretboard", "ovrneckoverlay",       bool, False,     text = _("Overdrive Neck"),             options = {True: _("Overlay"), False: _("Replace")})
 
 
 Config.define("game",   "note_hit_window",          int, 0,    text = _("Note Hit-window"), options = {0: _("1. Standard"), 1: _("2. Tight"), 2: _("3. Tightest")})#racer blazingamer
@@ -294,10 +316,29 @@ Config.define("performance",   "disable_librotation", bool,  True,  text = _("CD
 
 #Spikehead777
 #Config.define("game",   "jurgdef",             bool,  False,  text = _("Enable Jurgen"),    options = {False: _("No"), True: _("Yes")})
-Config.define("game",   "jurgmode",             int,   1,      text = _("Enable Jurgen"),    options = {0: _("Yes"), 1: _("No")})
-Config.define("game",   "jurgtype",            int,   2,      text = _("Jurgen Player"), options = {0: _("1"), 1: _("2"), 2: _("Both")}  )
+Config.define("game",   "jurg_p0",             bool, False,   text = _("P1 AI"), options = {True: _("On"), False: _("Off")})
+Config.define("game",   "jurg_skill_p0",        int, 0,   text = _("P1 AI Personality"), options = {0: _("1. KiD"), 1: _("2. Stump"), 2: _("3. akedRobot"), 3: _("4. Q"), 4: _("5. MFH"), 5: _("6. Jurgen")})
+Config.define("game",   "jurg_logic_p0",            int,   1,      text = _("P1 AI Logic"), options = {0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}  )
+
+Config.define("game",   "jurg_p1",             bool, False,   text = _("P2 AI"), options = {True: _("On"), False: _("Off")})
+Config.define("game",   "jurg_skill_p1",        int, 0,   text = _("P2 AI Personality"), options = {0: _("1. KiD"), 1: _("2. Stump"), 2: _("3. akedRobot"), 3: _("4. Q"), 4: _("5. MFH"), 5: _("6. Jurgen")})
+Config.define("game",   "jurg_logic_p1",            int,   1,      text = _("P2 AI Logic"), options = {0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}  )
+
+Config.define("game",   "jurg_p2",             bool, False,   text = _("P3 AI"), options = {True: _("On"), False: _("Off")})
+Config.define("game",   "jurg_skill_p2",        int, 0,   text = _("P3 AI Personality"), options = {0: _("1. KiD"), 1: _("2. Stump"), 2: _("3. akedRobot"), 3: _("4. Q"), 4: _("5. MFH"), 5: _("6. Jurgen")})
+Config.define("game",   "jurg_logic_p2",            int,   1,      text = _("P3 AI Logic"), options = {0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}  )
+
+Config.define("game",   "jurg_p3",             bool, False,   text = _("P4 AI"), options = {True: _("On"), False: _("Off")})
+Config.define("game",   "jurg_skill_p3",        int, 0,   text = _("P4 AI Personality"), options = {0: _("1. KiD"), 1: _("2. Stump"), 2: _("3. akedRobot"), 3: _("4. Q"), 4: _("5. MFH"), 5: _("6. Jurgen")})
+Config.define("game",   "jurg_logic_p3",            int,   1,      text = _("P4 AI Logic"), options = {0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}  )
+
+#akedrou
+Config.define("game",   "midi_lyric_mode",     int, 2,     text = _("Lyric Display Mode"),  options = {0: _("Scrolling"), 1: _("Simple Lines"), 2: _("2-Line")})
+Config.define("game",   "vocal_scroll",        int, 2,     text = _("Lyric Speed Mode"),    options = {0: _("BPM"), 1: _("Difficulty"), 2: _("BPM & Diff")})
+Config.define("game",   "vocal_speed",         int, 100,   text = _("Lyric Speed Percent"), options = dict([(n, n) for n in range(10, 410, 10)]))
+
 #MFH
-Config.define("game",   "jurglogic",            int,   1,      text = _("Jurgen Logic"), options = {0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}  )
+#Config.define("game",   "jurglogic",            int,   1,      text = _("Jurgen Logic"), options = {0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}  )
 #Config.define("game",   "jurgtext",            int,   1,      text = _("Jurgen Text Size"), options = {0: _("Big"), 1: _("Small")})
 
 Config.define("game", "use_graphical_submenu", int,   1,      text = _("Graphical Submenus"), options = {0: _("Disabled"), 1: _("Enabled")})
@@ -320,6 +361,10 @@ Config.define("performance","preload_glyph_cache", bool,  True,  text = _("Prelo
 
 #stump: allow metadata caching to be turned off
 Config.define("performance", "cache_song_metadata", bool, True, text=_("Cache Song Metadata"), options={False: _("No"), True: _("Yes")})
+
+#stump: choice of pitch analysis engines
+Config.define('game', 'use_new_pitch_analyzer', bool, True, text=_('Pitch Analysis Code'), options={False: 'pypitch', True: 'PitchAnalyzer.py'})
+
 
 ##Alarian: Get unlimited themes by foldername
 themepath = os.path.join(Version.dataPath(), "themes")
@@ -353,7 +398,7 @@ Config.define("coffee", "failingEnabled",       bool, True,     text = _("No Fai
 Config.define("game", "songlist_difficulty", int, 0, text = _("Difficulty (Setlist Score)"), options = {0: "Expert", 1: "Hard", 2: "Medium", 3: "Easy"}  )
 Config.define("game", "songlist_extra_stats", bool, True, text = _("Show Additional Stats"), options = {True: _("Yes"), False: _("No")} )
 
-Config.define("game", "songlist_instrument", int, 0, text = _("Instrument (Setlist Score)"), options = {0: "Guitar", 1: "Rhythm", 2: "Bass", 3: "Lead", 4: "Drums"}  )  #MFH
+Config.define("game", "songlist_instrument", int, 0, text = _("Instrument (Setlist Score)"), options = {0: "Guitar", 1: "Rhythm", 2: "Bass", 3: "Lead", 4: "Drums", 5: "Vocals"}  )  #MFH
 
 
 class FullScreenSwitcher(KeyListener):
@@ -435,7 +480,18 @@ class GameEngine(Engine):
     self.title             = self.versionString
     self.restartRequested  = False
     self.handlingException = False
-    self.video             = Video(self.title)
+
+    # evilynux - Check if theme icon exists first, then fallback on FoFiX icon.
+    themename = self.config.get("coffee", "themename")
+    themeicon = os.path.join(Version.dataPath(), "themes", themename, "icon.png")
+    fofixicon = os.path.join(Version.dataPath(), "fofix_icon.png")
+    icon = None
+    if os.path.exists(themeicon):
+      icon = themeicon
+    elif os.path.exists(fofixicon):
+      icon = fofixicon
+
+    self.video             = Video(self.title, icon)
 
     self.config.set("game",   "font_rendering_mode", 0) #force oGL mode
 
@@ -484,8 +540,8 @@ class GameEngine(Engine):
     multisamples  = self.config.get("video", "multisamples")
     self.video.setMode((width, height), fullscreen = fullscreen, multisamples = multisamples)
     
-    if self.config.get("video", "use_shaders"):
-      Shader.list.set(os.path.join(Version.dataPath(), "shaders"))
+    if self.config.get("video", "shader_use"):
+      shaders.set(os.path.join(Version.dataPath(), "shaders"))
 
     # Enable the high priority timer if configured
     if self.priority:
@@ -526,7 +582,6 @@ class GameEngine(Engine):
     self.addTask(self.resource, synchronized = False)
 
     self.data = Data(self.resource, self.svg)
-    themename = self.data.themeLabel
 
 
     #self.setSpeedFactor(2)    #MFH - this is just a hack - try if you'd like, doesn't work right yet...
@@ -684,7 +739,7 @@ class GameEngine(Engine):
     else:
       # evilynux - With self.audio.close(), calling self.quit() results in
       #            a crash. Calling the parent directly as a workaround.
-      Engine.quit()
+      Engine.quit(self)
     
   def resizeScreen(self, width, height):
     """
@@ -962,7 +1017,8 @@ class GameEngine(Engine):
           self.frames = 0 
       return done
     except:
-      Log.error("Loading error:")
+      Log.error("Loading error: ")
+      raise
 
   def run(self):
     try:
@@ -992,7 +1048,13 @@ class GameEngine(Engine):
 
       clearMatrixStack(GL_PROJECTION)
       clearMatrixStack(GL_MODELVIEW)
-      
-      Dialogs.showMessage(self, str(e.__class__.__name__) + ":" + unicode(e))
+
+      #stump: reset game state as much as possible
+      self.view.popAllLayers()
+      for session in self.sessions:
+        self.disconnect(session)
+      self.stopServer()
+
+      Dialogs.showMessage(self, str(e.__class__.__name__) + ": " + unicode(e))
       self.handlingException = False
       return True

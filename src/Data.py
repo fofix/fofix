@@ -79,6 +79,8 @@ class Data(object):
 
     #myfingershurt: check for existance of theme path
     themepath = os.path.join(Version.dataPath(), "themes")
+    self.themepath = themepath
+    self.path = Version.dataPath()
 
     if not os.path.exists(os.path.join(themepath,themename,"notes.png")):
       #myfingershurt: here need to ensure an existing theme is selected
@@ -385,6 +387,16 @@ class Data(object):
     else: #MFH: Fallback on starpower.ogg
       self.loadSoundEffect(self, "starActivateSound", os.path.join("themes",themename,"sounds","starpower.ogg"))
       Log.warn(themename + "\sounds\staractivate.ogg not found -- using starpower.ogg instead.")
+      
+    if self.fileExists(os.path.join("themes",themename,"sounds","battleused.ogg")):
+      self.loadSoundEffect(self, "battleUsedSound", os.path.join("themes",themename,"sounds","battleused.ogg"))
+    elif self.fileExists(os.path.join("themes",themename,"sounds","staractivate.ogg")):
+      self.loadSoundEffect(self, "battleUsedSound", os.path.join("themes",themename,"sounds","staractivate.ogg"))
+      Log.warn(themename + "\sounds\battleused.ogg not found -- using staractive.ogg instead.")
+    else: #Fallback on starpower.ogg
+      self.loadSoundEffect(self, "battleUsedSound", os.path.join("themes",themename,"sounds","starpower.ogg"))
+      Log.warn(themename + "\sounds\battleused.ogg not found -- using starpower.ogg instead.")
+
 
     if self.fileExists(os.path.join("themes",themename,"sounds","stardeactivate.ogg")):
       self.loadSoundEffect(self, "starDeActivateSound", os.path.join("themes",themename,"sounds","stardeactivate.ogg"))
@@ -455,6 +467,7 @@ class Data(object):
     self.rockSound.setVolume(volume)
     self.starDeActivateSound.setVolume(volume)
     self.starActivateSound.setVolume(volume)
+    self.battleUsedSound.setVolume(volume)
     self.rescueSound.setVolume(volume)
     self.coOpFailSound.setVolume(volume)
     self.crowdSound.setVolume(volume)

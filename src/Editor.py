@@ -380,7 +380,7 @@ class Importer(Layer):
     self.wizardStarted = True
 
     name = ""
-    while True:
+    while 1:
       masks = ["*.ogg"]
       name  = Dialogs.getText(self.engine, prompt = _("Enter a name for the song."), text = name)
 
@@ -549,7 +549,7 @@ class GHImporter(Layer):
 
     startPos = f.tell()
 
-    while True:
+    while 1:
       self.stageProgress = float(f.tell() - startPos) / length
 
       d = f.read(1)
@@ -795,7 +795,7 @@ class GHImporter(Layer):
     Dialogs.showMessage(self.engine, _("Make sure you have at least 500 megabytes of free disk space before using this importer."))
 
     path = ""
-    while True:
+    while 1:
       path = Dialogs.getText(self.engine, prompt = _("Enter the path to the mounted Guitar Hero (tm) DVD"), text = path)
 
       if not path:

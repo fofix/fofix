@@ -136,6 +136,7 @@ Config.define("theme", "opencolor",       str, "#FF9933")
 Config.define("theme", "songback",       bool, False)
 Config.define("theme", "versiontag",       bool, False)
 Config.define("theme", "rmtype",       int, None)
+Config.define("theme", "mark_solo_sections", int, 2)
 
 Config.define("theme", "shadowoffsetx", float, .0022)
 Config.define("theme", "shadowoffsety", float, .0005)
@@ -151,7 +152,7 @@ Config.define("theme", "noterot5",      float, 0)
 Config.define("theme", "menu_neck_choose_x", float, 0.1)
 Config.define("theme", "menu_neck_choose_y", float, 0.05)
 
-#akedrou - lobby/control activator
+#akedrou - lobby/control activator/avatars
 Config.define("theme", "control_activate_x", float, 0.645)
 Config.define("theme", "control_activate_select_x", float, 0.5)
 Config.define("theme", "control_activate_part_x", float, 0.41)
@@ -171,13 +172,19 @@ Config.define("theme", "control_check_part_mult", float, 2.8)
 Config.define("theme", "control_check_space", float, 0.23)
 Config.define("theme", "control_check_scale", float, 0.0018)
 Config.define("theme", "control_check_font", str, "font")
+Config.define("theme", "lobby_mode", int, 0)
 Config.define("theme", "lobby_preview_x", float, 0.7)
+Config.define("theme", "lobby_preview_y", float, 0.0) #worldrave
+Config.define("theme", "lobby_preview_spacing", float, 0.04)
 Config.define("theme", "lobby_title_x", float, 0.5)
 Config.define("theme", "lobby_title_y", float, 0.07)
 Config.define("theme", "lobby_title_character_x", float, 0.26)
 Config.define("theme", "lobby_title_character_y", float, 0.24)
 Config.define("theme", "lobby_title_scale", float, 0.0024)
 Config.define("theme", "lobby_title_font", str, "loadingFont")
+Config.define("theme", "lobby_avatar_x", float, 0.7)
+Config.define("theme", "lobby_avatar_y", float, 0.75)
+Config.define("theme", "lobby_avatar_scale", float, 1.0)
 Config.define("theme", "lobby_select_x", float, 0.4)
 Config.define("theme", "lobby_select_y", float, 0.32)
 Config.define("theme", "lobby_select_image_x", float, 0.255)
@@ -185,7 +192,9 @@ Config.define("theme", "lobby_select_image_y", float, 0.335)
 Config.define("theme", "lobby_select_scale", float, 0.0018)
 Config.define("theme", "lobby_select_space", float, 0.04)
 Config.define("theme", "lobby_select_font", str, "font")
+Config.define("theme", "lobby_select_length", int, 5)
 Config.define("theme", "lobby_title_color", str, "#FFFFFF")
+Config.define("theme", "lobby_player_color", str, "#FFFFFF")
 Config.define("theme", "lobby_info_color", str, "#FFFFFF")
 Config.define("theme", "lobby_font_color", str, "#FFFFFF")
 Config.define("theme", "lobby_select_color", str, "#FFBF00")
@@ -203,6 +212,38 @@ Config.define("theme", "character_create_help_color", str, "#FFFFFF")
 Config.define("theme", "character_create_help_font", str, "loadingFont")
 Config.define("theme", "character_create_scale", float, .0018)
 Config.define("theme", "character_create_space", float, .045)
+Config.define("theme", "avatar_select_text_x",   float, .44)
+Config.define("theme", "avatar_select_text_y",   float, .16)
+Config.define("theme", "avatar_select_text_scale",   float, .0027)
+Config.define("theme", "avatar_select_font",   str, "font")
+Config.define("theme", "avatar_select_avatar_x", float, .667)
+Config.define("theme", "avatar_select_avatar_y", float, .5)
+Config.define("theme", "avatar_select_wheel_y", float, 0.0)
+
+#akedrou, with the vocals, in notepad++
+Config.define("theme", "vocal_meter_size", float, 45.000)
+Config.define("theme", "vocal_meter_x", float, .25)
+Config.define("theme", "vocal_meter_y", float, .8)
+Config.define("theme", "vocal_mult_x", float, .28)
+Config.define("theme", "vocal_mult_y", float, .8)
+Config.define("theme", "vocal_power_x", float, .5)
+Config.define("theme", "vocal_power_y", float, .8)
+Config.define("theme", "vocal_fillup_center_x", int, 139)
+Config.define("theme", "vocal_fillup_center_y", int, 151)
+Config.define("theme", "vocal_fillup_in_radius", int, 25)
+Config.define("theme", "vocal_fillup_out_radius", int, 139)
+Config.define("theme", "vocal_fillup_color", str, "#DFDFDE")
+Config.define("theme", "vocal_fillup_factor", float, 300.000)
+Config.define("theme", "vocal_circular_fillup", bool, True)
+Config.define("theme", "vocal_lane_size", float, .002)
+Config.define("theme", "vocal_glow_size", float, .012)
+Config.define("theme", "vocal_glow_fade", float, .6)
+Config.define("theme", "vocal_lane_color", str, "#99FF80")
+Config.define("theme", "vocal_shadow_color", str, "#CCFFBF")
+Config.define("theme", "vocal_glow_color", str, "#33FF00")
+Config.define("theme", "vocal_lane_color_star", str, "#FFFF80")
+Config.define("theme", "vocal_shadow_color_star", str, "#FFFFBF")
+Config.define("theme", "vocal_glow_color_star", str, "#FFFF00")
 
 #worldrave
 Config.define("theme", "setlistguidebuttonsposX", float, 0.408)
@@ -314,6 +355,7 @@ Config.define("theme", "song_info_display_scale",  float, 0.0020)
 #Worldrave - for song info display positioning
 Config.define("theme", "song_info_display_X",  float, 0.05)
 Config.define("theme", "song_info_display_Y",  float, 0.05)
+Config.define("theme", "neck_length",    float, 9.0)
 
 #MFH - option for Rock Band 2 theme.ini - only show # of stars you are working on
 Config.define("theme", "display_all_grey_stars",  bool, True)
@@ -339,6 +381,7 @@ Config.define("theme", "star_fillup_color", str, None)
 #Qstick - Misc
 Config.define("theme", "song_list_display",       int, None)
 Config.define("theme", "neck_width",    float, 3.0)
+Config.define("theme", "power_up_name", str, None)
 
 #Qstick - Results Screen
 
@@ -433,13 +476,19 @@ controlCheckPartMult = None
 controlCheckSpace = None
 controlCheckScale = None
 controlCheckFont  = None
+lobbyMode = None
 lobbyPreviewX = None
+lobbyPreviewY = None #worldrave
+lobbyPreviewSpacing = None
 lobbyTitleX = None
 lobbyTitleY = None
 lobbyTitleCharacterX = None
 lobbyTitleCharacterY = None
 lobbyTitleScale = None
 lobbyTitleFont = None
+lobbyAvatarX = None
+lobbyAvatarY = None
+lobbyAvatarScale = None
 lobbySelectX = None
 lobbySelectY = None
 lobbySelectImageX = None
@@ -447,9 +496,11 @@ lobbySelectImageY = None
 lobbySelectScale = None
 lobbySelectSpace = None
 lobbySelectFont = None
+lobbySelectLength = None
 lobbyTitleColor = None
 lobbyInfoColor = None
 lobbyFontColor = None
+lobbyPlayerColor = None
 lobbySelectColor = None
 lobbyDisableColor = None
 characterCreateX = None
@@ -465,6 +516,37 @@ characterCreateOptionFont = None
 characterCreateHelpFont = None
 characterCreateScale = None
 characterCreateSpace = None
+avatarSelectTextX = None
+avatarSelectTextY = None
+avatarSelectTextScale = None
+avatarSelectFont = None
+avatarSelectAvX = None
+avatarSelectAvY = None
+avatarSelectWheelY = None
+
+vocalMeterSize = None
+vocalMeterX = None
+vocalMeterY = None
+vocalMultX  = None
+vocalMultY  = None
+vocalPowerX = None
+vocalPowerY = None
+vocalFillupCenterX = None
+vocalFillupCenterY = None
+vocalFillupInRadius = None
+vocalFillupOutRadius = None
+vocalFillupColor = None
+vocalFillupFactor = None
+vocalCircularFillup = None
+vocalLaneSize = None
+vocalGlowSize = None
+vocalGlowFade = None
+vocalLaneColor = None
+vocalShadowColor = None
+vocalGlowColor = None
+vocalLaneColorStar = None
+vocalShadowColorStar = None
+vocalGlowColorStar = None
 
 #worldrave 
 setlistguidebuttonsposX = None
@@ -542,6 +624,7 @@ songInfoDisplayX = None
 songInfoDisplayY = None
 versiontagposX = None
 versiontagposY = None
+neckLength = None
 
 #MFH - y offset = lines, x offset = spaces
 songSelectSubmenuOffsetLines = None
@@ -567,6 +650,8 @@ starFillupColor = None
 #Qstick - misc
 songListDisplay = None
 neckWidth = None
+markSolos = None
+power_up_name = None #akedrou
 
 result_score = [None] * 5
 result_star = [None] * 4
@@ -652,6 +737,7 @@ def open(config, themepath = None):
   setupMisc(config)
   setupMenu(config)
   setupLobby(config) #akedrou
+  setupVocals(config) #akedrou
   setupSonglist(config) #MFH
   setupPauseNOpt(config) #MFH
   setupTWOD(config)
@@ -768,7 +854,7 @@ def setupFlameSizes(config):
     flameSizes[3][2] = config.get("theme", "flame2_4X_size")
     flameSizes[3][3] = config.get("theme", "flame3_4X_size")
     flameSizes[3][4] = config.get("theme", "flame4_4X_size")
-
+    
 def setupSpinny(config):
   global spinnySongDisabled, spinnyEditorDisabled, spinnyResultsDisabled, spinnyMenuDisabled
 
@@ -806,6 +892,9 @@ def setupMisc(config):
   global oBarHScale
   global oBar3dFill
   global neckWidth
+  global neckLength
+  global markSolos
+  global power_up_name
 
   loadingPhrase = config.get("theme", "loading_phrase")
   resultsPhrase = config.get("theme", "results_phrase")
@@ -826,6 +915,9 @@ def setupMisc(config):
   oBarHScale = config.get("theme", "obar_hscale")
   oBar3dFill = config.get("theme", "obar_3dfill")
   neckWidth = config.get("theme", "neck_width")
+  neckLength = config.get("theme", "neck_length")
+  markSolos = config.get("theme", "mark_solo_sections")
+  power_up_name = config.get("theme", "power_up_name")
 #MFH:
 def setupSonglist(config):
   global song_cd_Xpos, song_cdscore_Xpos, song_list_Xpos, song_listscore_Xpos
@@ -931,12 +1023,14 @@ def setupLobby(config):
   global controlDescriptionX, controlDescriptionY, controlDescriptionScale, controlDescriptionFont, controlCheckSpace
   global controlCheckX, controlCheckY, controlCheckScale, controlCheckPartMult, controlCheckFont, lobbyPreviewX
   global lobbyTitleX, lobbyTitleY, lobbyTitleScale, lobbyTitleCharacterX, lobbyTitleCharacterY, lobbySelectScale
-  global lobbySelectImageX, lobbySelectImageY, lobbySelectSpace, characterCreateHelpY
+  global lobbySelectImageX, lobbySelectImageY, lobbySelectSpace, characterCreateHelpY, lobbyPreviewY
   global lobbyTitleFont, lobbySelectX, lobbySelectY, lobbySelectFont, characterCreateX, characterCreateY
   global characterCreateOptionX, characterCreateScale, characterCreateSpace, characterCreateHelpFont
-  global characterCreateOptionFont, characterCreateHelpX, characterCreateHelpScale
+  global characterCreateOptionFont, characterCreateHelpX, characterCreateHelpScale, avatarSelectWheelY
   global characterCreateFontColor, characterCreateSelectColor, characterCreateHelpColor
-  global lobbyFontColor, lobbySelectColor, lobbyDisableColor, lobbyTitleColor, lobbyInfoColor
+  global lobbyFontColor, lobbySelectColor, lobbyDisableColor, lobbyTitleColor, lobbyInfoColor, lobbyPlayerColor
+  global lobbySelectLength, lobbyMode, lobbyPreviewSpacing, lobbyAvatarX, lobbyAvatarY, lobbyAvatarScale
+  global avatarSelectTextX, avatarSelectTextY, avatarSelectTextScale, avatarSelectFont, avatarSelectAvX, avatarSelectAvY
   
   controlActivateX = config.get("theme", "control_activate_x")
   controlActivateSelectX = config.get("theme", "control_activate_select_x")
@@ -957,13 +1051,19 @@ def setupLobby(config):
   controlCheckScale = config.get("theme", "control_check_scale")
   controlCheckSpace = config.get("theme", "control_check_space")
   controlCheckFont  = config.get("theme", "control_check_font")
+  lobbyMode = config.get("theme", "lobby_mode")
   lobbyPreviewX = config.get("theme", "lobby_preview_x")
+  lobbyPreviewY = config.get("theme", "lobby_preview_y")
+  lobbyPreviewSpacing = config.get("theme", "lobby_preview_spacing")
   lobbyTitleX = config.get("theme", "lobby_title_x")
   lobbyTitleY = config.get("theme", "lobby_title_y")
   lobbyTitleCharacterX = config.get("theme", "lobby_title_character_x")
   lobbyTitleCharacterY = config.get("theme", "lobby_title_character_y")
   lobbyTitleScale = config.get("theme", "lobby_title_scale")
   lobbyTitleFont = config.get("theme", "lobby_title_font")
+  lobbyAvatarX = config.get("theme", "lobby_avatar_x")
+  lobbyAvatarY = config.get("theme", "lobby_avatar_y")
+  lobbyAvatarScale = config.get("theme", "lobby_avatar_scale")
   lobbySelectX = config.get("theme", "lobby_select_x")
   lobbySelectY = config.get("theme", "lobby_select_y")
   lobbySelectImageX = config.get("theme", "lobby_select_image_x")
@@ -971,9 +1071,11 @@ def setupLobby(config):
   lobbySelectScale = config.get("theme", "lobby_select_scale")
   lobbySelectSpace = config.get("theme", "lobby_select_space")
   lobbySelectFont = config.get("theme", "lobby_select_font")
+  lobbySelectLength = config.get("theme", "lobby_select_length")
   lobbyTitleColor = hexToColor(config.get("theme", "lobby_title_color"))
   lobbyInfoColor = hexToColor(config.get("theme", "lobby_info_color"))
   lobbyFontColor = hexToColor(config.get("theme", "lobby_font_color"))
+  lobbyPlayerColor = hexToColor(config.get("theme", "lobby_player_color"))
   lobbySelectColor = hexToColor(config.get("theme", "lobby_select_color"))
   lobbyDisableColor = hexToColor(config.get("theme", "lobby_disable_color"))
   characterCreateX = config.get("theme", "character_create_x")
@@ -989,21 +1091,54 @@ def setupLobby(config):
   characterCreateHelpFont = config.get("theme", "character_create_help_font")
   characterCreateScale = config.get("theme", "character_create_scale")
   characterCreateSpace = config.get("theme", "character_create_space")
+  avatarSelectTextX = config.get("theme","avatar_select_text_x")
+  avatarSelectTextY = config.get("theme","avatar_select_text_y")
+  avatarSelectTextScale = config.get("theme","avatar_select_text_scale")
+  avatarSelectFont = config.get("theme","avatar_select_font")
+  avatarSelectAvX = config.get("theme","avatar_select_avatar_x")
+  avatarSelectAvY = config.get("theme","avatar_select_avatar_y")
+  avatarSelectWheelY = config.get("theme","avatar_select_wheel_y")
+
+def setupVocals(config):
+  global vocalMeterSize, vocalMeterX, vocalMeterY, vocalMultX, vocalMultY, vocalPowerX, vocalPowerY
+  global vocalFillupCenterX, vocalFillupCenterY, vocalFillupInRadius, vocalFillupOutRadius
+  global vocalFillupColor, vocalFillupFactor, vocalCircularFillup, vocalLaneSize, vocalGlowSize, vocalGlowFade
+  global vocalLaneColor, vocalShadowColor, vocalGlowColor, vocalLaneColorStar, vocalShadowColorStar, vocalGlowColorStar
+  
+  vocalMeterSize = config.get("theme", "vocal_meter_size")
+  vocalMeterX = config.get("theme", "vocal_meter_x")
+  vocalMeterY = config.get("theme", "vocal_meter_y")
+  vocalMultX  = config.get("theme", "vocal_mult_x")
+  vocalMultY  = config.get("theme", "vocal_mult_y")
+  vocalPowerX = config.get("theme", "vocal_power_x")
+  vocalPowerY = config.get("theme", "vocal_power_y")
+  vocalFillupCenterX = config.get("theme", "vocal_fillup_center_x")
+  vocalFillupCenterY = config.get("theme", "vocal_fillup_center_y")
+  vocalFillupInRadius = config.get("theme", "vocal_fillup_in_radius")
+  vocalFillupOutRadius = config.get("theme", "vocal_fillup_out_radius")
+  vocalFillupFactor = config.get("theme", "vocal_fillup_factor")
+  vocalFillupColor = config.get("theme", "vocal_fillup_color")
+  vocalCircularFillup = config.get("theme", "vocal_circular_fillup")
+  vocalLaneSize = config.get("theme", "vocal_lane_size")
+  vocalGlowSize = config.get("theme", "vocal_glow_size")
+  vocalGlowFade = config.get("theme", "vocal_glow_fade")
+  vocalLaneColor = hexToColorResults(config.get("theme","vocal_lane_color"))
+  vocalShadowColor = hexToColorResults(config.get("theme","vocal_shadow_color"))
+  vocalGlowColor = hexToColorResults(config.get("theme","vocal_glow_color"))
+  vocalLaneColorStar = hexToColorResults(config.get("theme","vocal_lane_color_star"))
+  vocalShadowColorStar = hexToColorResults(config.get("theme","vocal_shadow_color_star"))
+  vocalGlowColorStar = hexToColorResults(config.get("theme","vocal_glow_color_star"))
 
 def setupTWOD(config):
   global twoDnote, twoDkeys, threeDspin, opencolor
-  global noterotdegrees, noterot1, noterot2, noterot3, noterot4, noterot5
+  global noterotdegrees, noterot
   
   twoDnote = config.get("theme", "twoDnote")
   twoDkeys = config.get("theme", "twoDkeys")
   threeDspin = config.get("theme", "threeDspin")
   opencolor = hexToColor(config.get("theme", "opencolor"))
   noterotdegrees = config.get("theme", "noterotdegrees")
-  noterot1 = config.get("theme", "noterot1")
-  noterot2 = config.get("theme", "noterot2")
-  noterot3 = config.get("theme", "noterot3")
-  noterot4 = config.get("theme", "noterot4")
-  noterot5 = config.get("theme", "noterot5")
+  noterot = tuple(config.get("theme", "noterot"+str(i+1)) for i in range(5))
 
 
 #racer:

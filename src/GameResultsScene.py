@@ -326,6 +326,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
             self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"drum.png"))
           elif score.instrument == [2]:
             self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"bass.png"))
+          elif score.instrument == [5]:
+            self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"mic.png"))
           else:
             self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"guitar.png"))
         except IOError:
@@ -334,6 +336,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
               self.engine.loadImgDrawing(self, "partLoad", os.path.join("drum.png"))
             elif score.instrument == [2]:
               self.engine.loadImgDrawing(self, "partLoad", os.path.join("bass.png"))
+            elif score.instrument == [5]:
+              self.engine.loadImgDrawing(self, "partLoad", os.path.join("mic.png"))
             else:
               self.engine.loadImgDrawing(self, "partLoad", os.path.join("guitar.png"))
           except IOError:
@@ -349,6 +353,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
             self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"drum.png"))
           elif score.instrument == [2]:
             self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"bass.png"))
+          elif score.instrument == [5]:
+            self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"mic.png"))
           else:
             self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"guitar.png"))
         except IOError:
@@ -357,6 +363,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
               self.engine.loadImgDrawing(self, "partLoad", os.path.join("drum.png"))
             elif score.instrument == [2]:
               self.engine.loadImgDrawing(self, "partLoad", os.path.join("bass.png"))
+            elif score.instrument == [5]:
+              self.engine.loadImgDrawing(self, "partLoad", os.path.join("mic.png"))
             else:
               self.engine.loadImgDrawing(self, "partLoad", os.path.join("guitar.png"))
           except IOError:
@@ -466,7 +474,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     
     found = 0  
     for part in self.song.info.parts:
-      for difficulty in self.song.info.difficulties:
+      for difficulty in self.song.info.partDifficulties[part.id]:
         if found == 1:
           self.scoreDifficulty = difficulty
           self.scorePart = part
@@ -475,7 +483,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         if self.scoreDifficulty == difficulty and self.scorePart == part:
           found = 1
 
-    self.scoreDifficulty = self.song.info.difficulties[0]
+    self.scoreDifficulty = self.song.info.partDifficulties[0][0]
     self.scorePart = self.song.info.parts[0]
   
   def startRoll(self, playerNum):
@@ -533,8 +541,12 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       }
       scores     = {}
       scores_ext = {}
-      scoreHash = hashlib.sha1("%d%d%d%s" % (player.getDifficultyInt(), self.finalScore[i], self.scoring[i].stars, self.playerList[i].name)).hexdigest()
-      scores[player.getDifficultyInt()]     = [(self.finalScore[i], self.scoring[i].stars, self.playerList[i].name, scoreHash)]
+      upname = self.playerList[i].upname
+      # evilynux - the str() around the upname is not there for fun,
+      #            it's used to convert the unicode string so the server 
+      #            scripts accept it. 
+      scoreHash = hashlib.sha1("%d%d%d%s" % (player.getDifficultyInt(), self.finalScore[i], self.scoring[i].stars, str(upname))).hexdigest()
+      scores[player.getDifficultyInt()]     = [(self.finalScore[i], self.scoring[i].stars, str(upname), scoreHash)]
       scores_ext[player.getDifficultyInt()] = [(scoreHash, self.scoring[i].stars) + scoreExt]
       d["scores"] = binascii.hexlify(Cerealizer.dumps(scores))
       d["scores_ext"] = binascii.hexlify(Cerealizer.dumps(scores_ext))
@@ -1345,7 +1357,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         Theme.setBaseColor(1 - v)
         if self.uploadResponse[j] is None:
           upScoreText = _("Uploading Scores...")
-          font.render("P%d (%s) %s" % (j+1, player.name, upScoreText), (.05, sYPos + v), scale = sScale)
+          font.render("P%d (%s) %s" % (j+1, player.upname, upScoreText), (.05, sYPos + v), scale = sScale)
         else:
           result = str(self.uploadResponse[j]).split(";")
           if len(result) > 0:
@@ -1355,16 +1367,16 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
               if len(result) > 1:
                 upScoreText2 = _("Your highscore ranks")
                 upScoreText3 = _("on the world starpower chart!")
-                font.render("P%d (%s) %s %s  ... %s #%d %s" % (j+1, player.name, player.part.text, upScoreText1, upScoreText2, int(result[1]), upScoreText3), (.05, sYPos + v), scale = sScale)
+                font.render("P%d (%s) %s %s  ... %s #%d %s" % (j+1, player.upname, player.part.text, upScoreText1, upScoreText2, int(result[1]), upScoreText3), (.05, sYPos + v), scale = sScale)
               else:
                 upScoreText2 = _("but your rank is unknown.")
-                font.render("P%d (%s) %s %s  ... %s" % (j+1, player.name, player.part.text, upScoreText1, upScoreText2), (.05, sYPos + v), scale = sScale)
+                font.render("P%d (%s) %s %s  ... %s" % (j+1, player.upname, player.part.text, upScoreText1, upScoreText2), (.05, sYPos + v), scale = sScale)
             else:
               upScoreText2 = _("but there was no new highscore.")
-              font.render("P%d (%s) %s %s  ... %s" % (j+1, player.name, player.part.text, upScoreText1, upScoreText2), (.05, sYPos + v), scale = sScale)
+              font.render("P%d (%s) %s %s  ... %s" % (j+1, player.upname, player.part.text, upScoreText1, upScoreText2), (.05, sYPos + v), scale = sScale)
           else:
             upScoreText1 = _("Score upload failed!  World charts may be down.")
-            font.render("P%d (%s) %s %s" % (j+1, player.name, player.part.text, upScoreText1), (.05, sYPos + v), scale = sScale)
+            font.render("P%d (%s) %s %s" % (j+1, player.upname, player.part.text, upScoreText1), (.05, sYPos + v), scale = sScale)
   
   def renderStats(self, visibility, topMost):
     pass #to be added.

@@ -44,6 +44,7 @@ from Mesh import Mesh
 from Menu import Menu
 from Language import _
 from Texture import Texture
+from Player import GUITARTYPES, DRUMTYPES, MICTYPES
 import Theme
 import Log
 import Song
@@ -51,10 +52,13 @@ import Data
 import Player
 import Guitar
 import random
-import Shader
+from Shader import shaders
 
 #myfingershurt: drums :)
 import Drum
+
+#stump: vocals
+import Microphone
 
 # evilynux - MFH-Alarian Mod credits
 from Credits import Credits
@@ -225,26 +229,30 @@ class GetText(Layer, KeyListener):
     
     #if (c in Player.KEY1S or key == pygame.K_RETURN) and not self.accepted:
     #if (c in Player.KEY1S or key == pygame.K_RETURN or c in Player.DRUM4S) and not self.accepted:   #MFH - adding support for green drum "OK"
-    if (c in Player.key1s or key == pygame.K_RETURN or (c in Player.drum4s and self.drumHighScoreNav)) and not self.accepted:   #MFH - adding support for green drum "OK"
+    if key == pygame.K_BACKSPACE and not self.accepted:
+      self.text = self.text[:-1]
+    elif unicode and ord(unicode) > 31 and not self.accepted:
+      self.text += unicode
+    elif key == pygame.K_LSHIFT or key == pygame.K_RSHIFT:
+      return True
+    elif (c in Player.menuYes or key == pygame.K_RETURN) and not self.accepted:   #MFH - adding support for green drum "OK"
       self.engine.view.popLayer(self)
       self.accepted = True
       if c in Player.key1s:
         self.engine.data.acceptSound.setVolume(self.sfxVolume)  #MFH
         self.engine.data.acceptSound.play()
-    elif c in Player.cancels + Player.key2s and not self.accepted:
+    elif (c in Player.menuNo or key == pygame.K_ESCAPE) and not self.accepted:
       self.text = ""
       self.engine.view.popLayer(self)
       self.accepted = True
       if c in Player.key2s:
         self.engine.data.cancelSound.setVolume(self.sfxVolume)  #MFH
         self.engine.data.cancelSound.play()
-    elif (c in Player.key4s or key == pygame.K_BACKSPACE) and not self.accepted:
+    elif c in Player.key4s and not self.accepted:
       self.text = self.text[:-1]
       if c in Player.key4s:
         self.engine.data.cancelSound.setVolume(self.sfxVolume)  #MFH
         self.engine.data.cancelSound.play()
-    elif unicode and ord(unicode) > 31 and not self.accepted:
-      self.text += unicode
     elif c in Player.key3s and not self.accepted:
       self.text += self.text[len(self.text) - 1]
       self.engine.data.acceptSound.setVolume(self.sfxVolume)  #MFH
@@ -502,7 +510,7 @@ class MessageScreen(Layer, KeyListener):
 
   def keyPressed(self, key, unicode):
     c = self.engine.input.controls.getMapping(key)
-    if c in Player.key1s + Player.key2s + Player.drum1s + Player.drum4s + Player.cancels or key == pygame.K_RETURN or key == pygame.K_ESCAPE:
+    if c in (Player.menuYes + Player.menuNo) or key in [pygame.K_RETURN, pygame.K_ESCAPE, pygame.K_LCTRL, pygame.K_RCTRL]:
       self.engine.view.popLayer(self)
     return True
     
@@ -771,7 +779,10 @@ class SongChooser(Layer, KeyListener):
     #MFH configurable default instrument display with 5th / orange fret
     #   need to keep track of the instrument number and instrument name
     self.instrumentNum = self.engine.config.get("game", "songlist_instrument")
-    if self.instrumentNum == 4:
+    if self.instrumentNum == 5:
+      self.instrument = "Vocals"
+      self.instrumentNice = _("Vocals")
+    elif self.instrumentNum == 4:
       self.instrument = "Drums"
       self.instrumentNice = _("Drums")
     elif self.instrumentNum == 3:
@@ -1053,7 +1064,7 @@ class SongChooser(Layer, KeyListener):
           removingBlankSpaces = False   #finished adding blank spaces, exit while loop
           Log.debug("Dialogs.py: Finished filtering doubled blank spaces in self.songs.")
 
-    if self.listingMode == 0:
+    if self.listingMode == 0 or self.careerMode:
       self.items         = self.libraries + self.songs
     else:
       self.items         = self.songs
@@ -1259,7 +1270,7 @@ class SongChooser(Layer, KeyListener):
         elif isinstance(self.selectedItem, Song.SongInfo) and not self.selectedItem.getLocked():
         #else:
           
-          if self.listingMode == 1:
+          if self.listingMode == 1 and self.careerMode == False:
             self.library = self.selectedItem.libraryNam
           #blazingamer - stops preview from playing outside of songchooser
           self.hidden()
@@ -1267,12 +1278,12 @@ class SongChooser(Layer, KeyListener):
           self.accepted = True
 
         elif isinstance(self.selectedItem, Song.RandomSongInfo):
-          while True:
+          while 1:
             self.selectedItem = self.items[random.randint(0,len(self.items)-1)]
             if isinstance(self.selectedItem, Song.SongInfo) and not self.selectedItem.getLocked():
               break
           
-          if self.listingMode == 1:
+          if self.listingMode == 1 and self.careerMode == False:
             self.library = self.selectedItem.libraryNam
 
           #blazingamer - stops preview from playing outside of songchooser
@@ -1281,7 +1292,7 @@ class SongChooser(Layer, KeyListener):
           self.accepted = True
         elif isinstance(self.selectedItem, Song.CareerResetterInfo):  #MFH - here's where to actually reset careers
           self.engine.view.popLayer(self)
-          while True:
+          while 1:
             isYouSure = chooseItem(self.engine, [_("No"),_("Yes")], _("Are you sure you want to reset this entire career?") )
             if isYouSure:
               if isYouSure == _("Yes"):
@@ -1321,7 +1332,7 @@ class SongChooser(Layer, KeyListener):
       #if not self.song:
       self.engine.data.cancelSound.setVolume(self.sfxVolume)  #MFH
       self.engine.data.cancelSound.play()
-      if self.library != Song.DEFAULT_LIBRARY and self.tut == False and self.listingMode == 0:
+      if self.library != Song.DEFAULT_LIBRARY and self.tut == False and (self.listingMode == 0 or self.careerMode):
         self.initialItem = self.library
         self.library     = os.path.dirname(self.library)
         if self.song:
@@ -1378,12 +1389,12 @@ class SongChooser(Layer, KeyListener):
 
     #racer: highscores change on fret hit
     elif c in Player.key4s:
-     self.highScoreChange = True
+      self.highScoreChange = True
 
     #MFH - instrument change on 5th fret
     #elif c in Player.KEY5S or (c in Player.DRUM3S and self.drumNav):
     elif c in Player.key5s:   #MFH can't use drum3, that's for down
-     self.instrumentChange = True
+      self.instrumentChange = True
 
 
     elif c in Player.menuUp or key == pygame.K_UP:
@@ -1575,9 +1586,9 @@ class SongChooser(Layer, KeyListener):
       
     
     
-    if Shader.list.enable("cd"):
+    if shaders.enable("cd"):
       self.cassette.render("Mesh_001")
-      Shader.list.disable()
+      shaders.disable()
   
   def renderLibrary(self, color, label):
     if not self.libraryMesh:
@@ -1736,9 +1747,12 @@ class SongChooser(Layer, KeyListener):
       if self.instrumentChange:
         self.instrumentChange = False
         self.instrumentNum += 1
-        if self.instrumentNum > 4:
+        if self.instrumentNum > 5:
           self.instrumentNum = 0
-        if self.instrumentNum == 4:
+        if self.instrumentNum == 5:
+          self.instrument = "Vocals"
+          self.instrumentNice = _("Vocals")
+        elif self.instrumentNum == 4:
           self.instrument = "Drums"
           self.instrumentNice = _("Drums")
         elif self.instrumentNum == 3:
@@ -1975,12 +1989,18 @@ class SongChooser(Layer, KeyListener):
               #x = .6
               x = self.song_cdscore_xpos
               y = .5 + f / 2.0
-              if len(item.difficulties) > 3:
+              try:
+                difficulties = item.partDifficulties[self.instrumentNum]
+              except KeyError:
+                difficulties = []
+              if len(difficulties) > 3:
                 y = .42 + f / 2.0
+              elif len(difficulties) == 0:
+                score, stars, name = "---", 0, "---"
               
               #for p in item.parts:    #MFH - look at selected instrument!
               #  if str(p) == self.instrument:
-              for d in item.difficulties:
+              for d in difficulties:
                 scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
                 #scores = item.getHighscoresWithPartString(d, part = self.instrument)
                 
@@ -2322,8 +2342,12 @@ class SongChooser(Layer, KeyListener):
                   stars = 0
                   name = ""
 
-                  self.diffNice = self.diffTrans[self.diff]                  
-                  for d in item.difficulties:
+                  self.diffNice = self.diffTrans[self.diff]
+                  try:
+                    difficulties = item.partDifficulties[self.instrumentNum]
+                  except KeyError:
+                    difficulties = []
+                  for d in difficulties:
                     if str(d) == self.diff:
                       #self.diffNice = self.diffTrans[str(d)]
                       scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
@@ -2340,7 +2364,7 @@ class SongChooser(Layer, KeyListener):
                         score, stars, name = 0, 0, "---"
                   
                   if score == _("Nil") and self.NilShowNextScore:   #MFH
-                    for d in item.difficulties:   #MFH - just take the first valid difficulty you can find and display it.
+                    for d in difficulties:   #MFH - just take the first valid difficulty you can find and display it.
                       self.diffNice = self.diffTrans[str(d)]
                       scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
                       if scores:
@@ -2355,6 +2379,8 @@ class SongChooser(Layer, KeyListener):
                         break
                       else:
                         score, stars, name = 0, 0, "---"
+                    else:
+                      score, stars, name = _("Nil"), 0, "---"
                       
                   
                   
@@ -2584,7 +2610,11 @@ class SongChooser(Layer, KeyListener):
                   name = ""
 
                   self.diffNice = self.diffTrans[self.diff]                  
-                  for d in item.difficulties:
+                  try:
+                    difficulties = item.partDifficulties[self.instrumentNum]
+                  except KeyError:
+                    difficulties = []
+                  for d in difficulties:
                     if str(d) == self.diff:
                       #self.diffNice = self.diffTrans[str(d)]
                       scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
@@ -2616,6 +2646,8 @@ class SongChooser(Layer, KeyListener):
                         break
                       else:
                         score, stars, name = 0, 0, "---"
+                    else:
+                      score, stars, name = _("Nil"), 0, "---"
 
                   scale = 0.0009
                   text = self.diffNice
@@ -2965,11 +2997,16 @@ class SongChooser(Layer, KeyListener):
                     w, h = font.getStringSize(self.prompt, scale = scale)
                     x = self.song_listcd_score_xpos
                     y = self.song_listcd_score_ypos + f / 2.0
-                    if len(item.difficulties) > 3:
+                    try:
+                      difficulties = item.partDifficulties[self.instrumentNum]
+                    except KeyError:
+                      difficulties = []
+                      score, stars, name = "---", 0, "---"
+                    if len(difficulties) > 3:
                       y = self.song_listcd_score_ypos + f / 2.0
                     
                     #new
-                    for d in item.difficulties:
+                    for d in difficulties:
                       #scores =  item.getHighscoresWithPartString(d, part = self.instrument)
                       scores =  item.getHighscores(d, part = Song.parts[self.instrumentNum])
                       if scores:
@@ -3178,11 +3215,16 @@ class SongChooser(Layer, KeyListener):
                     w, h = font.getStringSize(self.prompt, scale = scale)
                     x = self.song_listcd_score_xpos
                     y = self.song_listcd_score_ypos + f / 2.0
-                    if len(item.difficulties) > 3:
+                    try:
+                      difficulties = item.partDifficulties[self.instrumentNum]
+                    except KeyError:
+                      difficulties = []
+                      score, stars, name = "---", 0, "---"
+                    if len(difficulties) > 3:
                       y = self.song_listcd_score_ypos + f / 2.0
                     
                     #new
-                    for d in item.difficulties:
+                    for d in difficulties:
                       #scores =  item.getHighscoresWithPartString(d, part = self.instrument)
                       scores =  item.getHighscores(d, part = Song.parts[self.instrumentNum])
                       if scores:
@@ -3550,8 +3592,12 @@ class SongChooser(Layer, KeyListener):
                   stars = 0
                   name = ""
 
-                  self.diffNice = self.diffTrans[self.diff]                  
-                  for d in item.difficulties:
+                  self.diffNice = self.diffTrans[self.diff]
+                  try:
+                    difficulties = item.partDifficulties[self.instrumentNum]
+                  except KeyError:
+                    difficulties = []
+                  for d in difficulties:
                     if str(d) == self.diff:
                       #self.diffNice = self.diffTrans[str(d)]
                       scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
@@ -3568,7 +3614,7 @@ class SongChooser(Layer, KeyListener):
                         score, stars, name = 0, 0, "---"
                   
                   if score == _("Nil") and self.NilShowNextScore:   #MFH
-                    for d in item.difficulties:   #MFH - just take the first valid difficulty you can find and display it.
+                    for d in difficulties:   #MFH - just take the first valid difficulty you can find and display it.
                       self.diffNice = self.diffTrans[str(d)]
                       scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
                       if scores:
@@ -3882,7 +3928,7 @@ class NeckChooser(Layer, KeyListener):
     self.selectedNeck = 0
     for i, name in enumerate(Player.playername):
       if name == player:
-        playerNeck = Player.playerpref[i][5]
+        playerNeck = Player.playerpref[i][6]
         if playerNeck == "":
           playerNeck = defaultNeck
         break
@@ -3995,7 +4041,7 @@ class NeckChooser(Layer, KeyListener):
       self.engine.config.set("game","default_neck",self.neck[self.selectedNeck])
     if self.owner: #rather hard-coded...
       if self.player != "default":
-        self.owner.choices[6]  = self.neck[self.selectedNeck]
+        self.owner.neck  = self.neck[self.selectedNeck]
     self.engine.view.popLayer(self)
     
   def cancel(self):
@@ -4140,7 +4186,291 @@ class NeckChooser(Layer, KeyListener):
 
     
     
+class AvatarChooser(Layer, KeyListener):
+  """Avatar choosing layer"""
+  def __init__(self, engine):
+    self.engine   = engine
 
+    self.logClassInits = self.engine.config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("AvatarChooser class init (Dialogs.py)...")
+    
+    splash = showLoadingSplashScreen(self.engine, _("Loading avatars..."))
+    
+    #Get theme
+    self.themename = self.engine.data.themeLabel
+    self.theme = self.engine.data.theme
+    
+    self.avatar = []
+    self.avatars = []
+    self.maxAv = 0
+    self.themeAvs = 0
+    
+    self.selectedAv = 0
+    
+    self.scrolling = 0
+    self.delay     = 0
+    self.rate      = 0
+    self.scroller  = [0, self.scrollUp, self.scrollDown]
+
+    # evilynux - improved loading logic to support arbitrary filenames
+    #          - os.listdir is not guaranteed to return a sorted list, so sort it!
+    avatarfiles = os.listdir(self.engine.resource.fileName("avatars"))
+    avatarfiles.sort()
+    
+    themeavatarfiles = []
+    if os.path.exists(self.engine.resource.fileName(os.path.join("themes",self.themename,"avatars"))):
+      themeavatarfiles = os.listdir(self.engine.resource.fileName(os.path.join("themes",self.themename,"avatars")))
+    themeavatarfiles.sort()
+    
+    for i in themeavatarfiles:
+      if str(i).lower()[-4:] != ".png":
+        continue
+      try:
+        image = engine.loadImgDrawing(self, "av"+str(i), os.path.join("themes",self.themename,"avatars",str(i)))
+
+      except IOError:
+        exists = 0
+        break
+      else:
+        # evilynux - Warning, pseudo valid images like Thumbs.db won't fail - we need to catch those bastards
+        if image is None:
+         exists = 0
+        else:
+         exists = 1
+
+      if exists == 1:
+        self.avatar.append(str(i)[:-4]) # evilynux - filename w/o extension
+        self.avatars.append(image)
+        self.maxAv += 1
+    self.themeAvs = len(self.avatars)
+    for i in avatarfiles:
+      if str(i).lower()[-4:] != ".png":
+        continue
+      try:
+        image = engine.loadImgDrawing(self, "av"+str(i), os.path.join("avatars",str(i)))
+
+      except IOError:
+        exists = 0
+        break
+      else:
+        # evilynux - Warning, pseudo valid images like Thumbs.db won't fail - we need to catch those bastards
+        if image is None:
+         exists = 0
+        else:
+         exists = 1
+
+      if exists == 1:
+        self.avatar.append(str(i)[:-4]) # evilynux - filename w/o extension
+        self.avatars.append(image)
+        self.maxAv += 1
+    Log.debug("%d Theme Avatars found; %d total." % (self.themeAvs, len(self.avatars)))
+    self.avScale = []
+    for avatar in self.avatars:
+      imgheight = avatar.height1()
+      imgwidth  = avatar.width1()
+      hFactor = 110.00/imgheight
+      wFactor = 178.00/imgwidth
+      self.avScale.append(min(hFactor, wFactor))
+    self.maxAv -= 1 # evilynux - confusing, but there's an offset of -1
+    
+    self.accepted       = False
+    self.time           = 0.0
+    self.dist           = 1.0
+    
+
+    #MFH - added simple black background to place in front of Options background, behind Neck BG, for transparent neck displays
+    try:
+      self.engine.loadImgDrawing(self, "avFrame", os.path.join("themes",self.themename,"lobby","avatarframe.png"))
+    except IOError:
+      self.avFrame = None
+    
+    try:
+      self.engine.loadImgDrawing(self, "avSelFrame", os.path.join("themes",self.themename,"lobby","avatarselectframe.png"))
+    except IOError:
+      self.avSelFrame = self.avFrame
+    
+    try:
+      self.engine.loadImgDrawing(self, "avBigFrame", os.path.join("themes",self.themename,"lobby","avatarmainframe.png"))
+    except IOError:
+      self.avBigFrame = self.avFrame
+    
+    try:
+      self.engine.loadImgDrawing(self, "avText", os.path.join("themes",self.themename,"lobby","avatartext.png"))
+    except IOError:
+      self.avText = None
+    
+    self.avFrameScale = None
+    if self.avFrame:
+      imgheight = self.avFrame.height1()
+      imgwidth  = self.avFrame.width1()
+      hFactor = 110.00/imgheight
+      wFactor = 178.00/imgwidth
+      self.avFrameScale = (wFactor, -hFactor)
+    
+    self.avSelFrameScale = None
+    if self.avSelFrame:
+      imgheight = self.avSelFrame.height1()
+      imgwidth  = self.avSelFrame.width1()
+      hFactor = 110.00/imgheight
+      wFactor = 178.00/imgwidth
+      self.avSelFrameScale = (wFactor, -hFactor)
+    
+    self.avBigFrameScale = None
+    if self.avBigFrame:
+      imgheight = self.avBigFrame.height1()
+      imgwidth  = self.avBigFrame.width1()
+      hFactor = 110.00/imgheight
+      wFactor = 178.00/imgwidth
+      self.avBigFrameScale = (wFactor, -hFactor)
+    
+    self.avatarText = _("Select Your Avatar:")
+    
+    try:
+      self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"lobby","avatarbg.png"))
+    except IOError:
+      self.background = None
+
+    hideLoadingSplashScreen(self.engine, splash)
+    splash = None
+    
+  def shown(self):
+    self.engine.input.addKeyListener(self, priority = True)
+  
+  def hidden(self):
+    self.engine.input.removeKeyListener(self)
+    
+  def cancel(self):
+    self.accepted = False
+    self.engine.view.popLayer(self)
+  
+  def keyPressed(self, key, unicode):
+    c = self.engine.input.controls.getMapping(key)
+    if c in Player.key1s or key == pygame.K_RETURN:
+      self.accepted = True
+      self.engine.data.acceptSound.play()
+      self.engine.view.popLayer(self)
+    elif c in Player.key2s + Player.cancels or key == pygame.K_ESCAPE:
+      self.engine.data.cancelSound.play()
+      self.cancel()
+    elif c in Player.key3s + Player.ups + Player.action1s + Player.lefts or key == pygame.K_UP or key == pygame.K_LEFT:
+      self.scrolling = 1
+      self.delay = self.engine.scrollDelay
+      self.scrollUp()
+    elif c in Player.key4s + Player.downs + Player.action2s + Player.rights or key == pygame.K_DOWN or key == pygame.K_RIGHT:
+      self.scrolling = 2
+      self.delay = self.engine.scrollDelay
+      self.scrollDown()
+    return True
+    
+  def scrollUp(self):
+    self.engine.data.selectSound.play()
+    self.selectedAv -= 1
+    if self.selectedAv < 0:
+      self.selectedAv = len(self.avatars) - 1
+  
+  def scrollDown(self):
+    self.engine.data.selectSound.play()
+    self.selectedAv += 1
+    if self.selectedAv >= len(self.avatars):
+      self.selectedAv = 0
+    
+  def keyReleased(self, key):
+    self.scrolling = 0
+  
+  def getAvatar(self):
+    if self.accepted:
+      t = self.selectedAv < self.themeAvs and os.path.join("themes",self.themename,"avatars",self.avatar[self.selectedAv]+".png") or os.path.join("avatars",self.avatar[self.selectedAv]+".png")
+      return t
+    else:
+      return None
+  
+  def run(self, ticks):
+    self.time += ticks / 50.0
+    if self.dist > 0:
+      self.dist -= ticks / 750.0
+      if self.dist < 0:
+        self.dist = 0
+    if self.scrolling > 0:
+      self.delay -= ticks
+      self.rate += ticks
+      if self.delay <= 0 and self.rate >= self.engine.scrollRate:
+        self.rate = 0
+        self.scroller[self.scrolling]()
+    
+  def render(self, visibility, topMost):
+    v = (1 - visibility) ** 2
+    t = self.time / 100
+    self.engine.view.setViewport(1,0)
+    self.engine.view.setOrthogonalProjection(normalize = True)
+    w, h, = self.engine.view.geometry[2:4]
+    
+    try:
+      if self.background:
+        wFactor = 640.000/self.background.width1()
+        self.engine.drawImage(self.background, scale = (wFactor, -wFactor), coord = (w/2,h/2))
+      else:
+        fadeScreen(v)
+      Theme.setBaseColor(1 - v)
+      if len(self.avatars) > 1:
+        lastAv2i  = (int(self.selectedAv)-2) % len(self.avatars)
+        lastAvi   = (int(self.selectedAv)-1) % len(self.avatars)
+        nextAvi   = (int(self.selectedAv)+1) % len(self.avatars)
+        nextAv2i  = (int(self.selectedAv)+2) % len(self.avatars)
+      else:
+        lastAv2i  = 0
+        lastAvi   = 0
+        nextAvi   = 0
+        nextAv2i  = 0
+      lastAv2   = self.avatars[lastAv2i]
+      lastAv    = self.avatars[lastAvi]
+      currentAv = self.avatars[int(self.selectedAv)]
+      nextAv    = self.avatars[nextAvi]
+      nextAv2   = self.avatars[nextAv2i]
+      
+      self.x1 = w*(0.07-self.dist/2)
+      self.x2 = w*(0.17-self.dist/2)
+      self.x3 = w*(0.24-self.dist/2)
+      self.x4 = w*(0.17-self.dist/2)
+      self.x5 = w*(0.07-self.dist/2)
+      self.y1 = h*(0.75+Theme.avatarSelectWheelY)
+      self.y2 = h*(0.68+Theme.avatarSelectWheelY)
+      self.y3 = h*(0.5+Theme.avatarSelectWheelY)
+      self.y4 = h*(0.32+Theme.avatarSelectWheelY)
+      self.y5 = h*(0.25+Theme.avatarSelectWheelY)
+      bigCoord = (w*(Theme.avatarSelectAvX+self.dist),h*Theme.avatarSelectAvY)
+      
+      if self.avBigFrame:
+        self.engine.drawImage(self.avFrame, scale = (self.avBigFrameScale[0]*1.75,self.avBigFrameScale[1]*1.75), coord = bigCoord)
+      self.engine.drawImage(currentAv, scale = (self.avScale[self.selectedAv]*1.75,-self.avScale[self.selectedAv]*1.75), coord = bigCoord)
+      
+      if self.avFrame:
+        self.engine.drawImage(self.avFrame, scale = self.avFrameScale, coord = (self.x1,self.y1))
+      self.engine.drawImage(lastAv2, scale = (self.avScale[lastAv2i],-self.avScale[lastAv2i]), coord = (self.x1,self.y1))
+      if self.avFrame:
+        self.engine.drawImage(self.avFrame, scale = self.avFrameScale, coord = (self.x2,self.y2))
+      self.engine.drawImage(lastAv, scale = (self.avScale[lastAvi], -self.avScale[lastAvi]), coord = (self.x2,self.y2))
+      if self.avFrame:
+        self.engine.drawImage(self.avFrame, scale = self.avFrameScale, coord = (self.x5,self.y5))
+      self.engine.drawImage(nextAv2, scale = (self.avScale[nextAv2i],-self.avScale[nextAv2i]), coord = (self.x5,self.y5))
+      if self.avFrame:
+        self.engine.drawImage(self.avFrame, scale = self.avFrameScale, coord = (self.x4,self.y4))
+      self.engine.drawImage(nextAv, scale = (self.avScale[nextAvi],-self.avScale[nextAvi]), coord = (self.x4,self.y4))   
+      if self.avSelFrame:
+        self.engine.drawImage(self.avSelFrame, scale = self.avSelFrameScale, coord = (self.x3,self.y3))
+      self.engine.drawImage(currentAv, scale = (self.avScale[int(self.selectedAv)],-self.avScale[int(self.selectedAv)]), coord = (self.x3,self.y3))
+      
+      try:
+        font = self.engine.data.fontDict[Theme.avatarSelectFont]
+      except:
+        font = self.engine.data.font
+      if self.avText:
+        self.engine.drawImage(self.avText, scale = (Theme.avatarSelectTextScale, -Theme.avatarSelectTextScale), coord = (Theme.avatarSelectTextX, Theme.avatarSelectTextY - v))
+      else:
+        font.render(self.avatarText, (Theme.avatarSelectTextX, Theme.avatarSelectTextY - v), scale = Theme.avatarSelectTextScale)
+    finally:
+      self.engine.view.resetProjection()
+    #==============================================================
 
 class ItemChooser(BackgroundLayer, KeyListener):
   """Item menu layer."""
@@ -4241,11 +4571,15 @@ class ItemChooser(BackgroundLayer, KeyListener):
       self.engine.view.resetProjection()
       
 class ControlActivator(Layer, KeyListener):
-  def __init__(self, engine, players, maxplayers = None):
+  def __init__(self, engine, players, maxplayers = None, allowGuitar = True, allowDrum = True, allowMic = False):
     self.engine     = engine
     self.minPlayers = players
     if maxplayers:
-      self.maxPlayers = maxplayers
+      maxallowed = self.engine.config.get("performance", "max_players")
+      if maxplayers > maxallowed or maxplayers == -1:
+        self.maxPlayers = maxallowed
+      else:
+        self.maxPlayers = maxplayers
     else:
       self.maxPlayers = players
     self.time       = 0.0
@@ -4261,6 +4595,15 @@ class ControlActivator(Layer, KeyListener):
     self.delayedIndex   = 0
     self.fader          = 0
     self.fadeDir        = True
+    self.allowed        = [True for i in self.controls]
+    
+    for i, control in enumerate(self.engine.input.controls.controls):
+      if self.engine.input.controls.type[i] in GUITARTYPES and not allowGuitar:
+        self.allowed[i] = False
+      elif self.engine.input.controls.type[i] in DRUMTYPES and not allowDrum:
+        self.allowed[i] = False
+      elif self.engine.input.controls.type[i] in MICTYPES and not allowMic:
+        self.allowed[i] = False
     
     self.tsReady = _("Press Start to Begin!")
     self.tsInfo  = _("Use the keyboard to select or just play some notes!")
@@ -4274,7 +4617,11 @@ class ControlActivator(Layer, KeyListener):
     for i, control in enumerate(self.engine.input.controls.controls):
       self.controlNum += 1
       if control == "None":
-        self.controls[i] = "No Controller"
+        self.controls[i] = _("No Controller")
+        self.blockedItems.append(i)
+        self.controlNum -= 1
+      elif self.allowed[i] == False:
+        self.controls[i] = _("Disabled Controller")
         self.blockedItems.append(i)
         self.controlNum -= 1
       elif control == "defaultg":
@@ -4331,6 +4678,12 @@ class ControlActivator(Layer, KeyListener):
     except IOError:
       self.engine.loadImgDrawing(self, "drum", "drum.png")
       self.drumScale = self.partSize/self.drum.width1()
+    try:
+      self.engine.loadImgDrawing(self, "mic", os.path.join("themes", themename, "mic.png"))
+      self.micScale = self.partSize/self.mic.width1()
+    except IOError:
+      self.engine.loadImgDrawing(self, "mic", "mic.png")
+      self.micScale = self.partSize/self.mic.width1()
   
   def shown(self):
     if self.controlNum < self.minPlayers:
@@ -4359,6 +4712,8 @@ class ControlActivator(Layer, KeyListener):
     return self.confirmPlayers
   
   def delaySelect(self, num):
+    if self.engine.input.controls.type[num] == 5:
+      return
     self.engine.data.selectSound.play()
     self.delay = 500
     self.delayedIndex  = num
@@ -4372,7 +4727,7 @@ class ControlActivator(Layer, KeyListener):
     self.selectedItems.append(num)
     self.blockedItems.append(num)
     self.blockedItems.sort()
-    if self.playerNum >= self.minPlayers or self.blockedItems == [0, 1, 2, 3]:
+    if self.playerNum >= self.minPlayers:
       self.ready = True
     self.selectedIndex += 1
     self.delay = 0
@@ -4396,7 +4751,7 @@ class ControlActivator(Layer, KeyListener):
   def keyPressed(self, key, unicode):
     c = self.engine.input.controls.getMapping(key)
     if key == pygame.K_RETURN:
-      if self.ready:
+      if (self.ready and self.playerNum >= self.maxPlayers) or (self.playerNum >= self.minPlayers and self.blockedItems == [0,1,2,3]):
         self.confirm()
       else:
         self.delay = 0
@@ -4405,7 +4760,7 @@ class ControlActivator(Layer, KeyListener):
     if c in Player.menuYes and self.ready:
       self.confirm()
       return True
-    if c in Player.cancels or key == pygame.K_ESCAPE:
+    if c in Player.menuNo or key == pygame.K_ESCAPE:
       self.engine.data.cancelSound.play()
       if len(self.selectedItems) > 0:
         self.delay = 0
@@ -4538,18 +4893,22 @@ class ControlActivator(Layer, KeyListener):
         color = (1, 1, 1, 1)
         if i in self.blockedItems:
           color = (.3, .3, .3, 1)
-        if (self.engine.input.controls.type[i] < 2 or self.engine.input.controls.type[i] == 4) and self.engine.input.controls.type[i] is not None:
+        if self.engine.input.controls.type[i] in GUITARTYPES:
           self.engine.drawImage(self.guitar, scale = (self.guitarScale, -self.guitarScale), coord = (w*self.controlPartX-(self.partSize*1.1), h*(1-(self.selectY+self.selectSpace*i)/self.engine.data.fontScreenBottom)), color = color)
           self.engine.drawImage(self.bass, scale = (self.bassScale, -self.bassScale), coord = (w*self.controlPartX+(self.partSize*1.1), h*(1-(self.selectY+self.selectSpace*i)/self.engine.data.fontScreenBottom)), color = color)
-        elif self.engine.input.controls.type[i] > 1 and self.engine.input.controls.type[i] is not None:
+        elif self.engine.input.controls.type[i] in DRUMTYPES:
           self.engine.drawImage(self.drum, scale = (self.drumScale, -self.drumScale), coord = (w*self.controlPartX, h*(1-(self.selectY+self.selectSpace*i)/self.engine.data.fontScreenBottom)), color = color)
+        elif self.engine.input.controls.type[i] in MICTYPES:
+          self.engine.drawImage(self.mic, scale = (self.micScale, -self.micScale), coord = (w*self.controlPartX, h*(1-(self.selectY+self.selectSpace*i)/self.engine.data.fontScreenBottom)), color = color)
       Theme.setBaseColor(1-v)
       for j, i in enumerate(self.selectedItems):
-        if (self.engine.input.controls.type[i] < 2 or self.engine.input.controls.type[i] == 4) and self.engine.input.controls.type[i] is not None:
+        if self.engine.input.controls.type[i] in GUITARTYPES:
           self.engine.drawImage(self.guitar, scale = (self.guitarScale*self.partBig, -self.guitarScale*self.partBig), coord = (w*(self.checkX+self.checkSpace*j)-(self.partSize*self.partBig*1.1), h*self.checkY))
           self.engine.drawImage(self.bass, scale = (self.bassScale*self.partBig, -self.bassScale*self.partBig), coord = (w*(self.checkX+self.checkSpace*j)+(self.partSize*self.partBig*1.1), h*self.checkY))
-        elif self.engine.input.controls.type[i] > 1 and self.engine.input.controls.type[i] is not None:
+        elif self.engine.input.controls.type[i] in DRUMTYPES:
           self.engine.drawImage(self.drum, scale = (self.drumScale*self.partBig, -self.drumScale*self.partBig), coord = (w*(self.checkX+self.checkSpace*j), h*self.checkY))
+        elif self.engine.input.controls.type[i] in MICTYPES:
+          self.engine.drawImage(self.mic, scale = (self.micScale*self.partBig, -self.micScale*self.partBig), coord = (w*(self.checkX+self.checkSpace*j), h*self.checkY))
         wText, hText = checkFont.getStringSize(self.controls[i], scale = self.checkScale)
         checkFont.render(self.controls[i], ((self.checkX+self.checkSpace*j)-wText/2, self.checkYText*self.engine.data.fontScreenBottom), scale = self.checkScale)
       if self.ready:
@@ -4671,6 +5030,11 @@ class KeyTester(Layer, KeyListener):
                              _("Select"), _("Drum #1"), None, _("Drum #2"), None, \
                              _("Drum #3"), None, None, None, _("Drum #4"), \
                              None, _("Bass Drum"), None, _("Starpower!"), _("None")]
+    elif self.type == 5:
+      self.names          = [_("Left"), _("Right"), _("Up"), _("Down"), _("Start"), \
+                             _("Select"), None, None, None, None, \
+                             None, None, None, None, None, \
+                             None, None, None, _("Starpower!"), None]
     else:
       colors              = Theme.fretColors
       self.fretColors     = [colors[1], colors[2], colors[3], colors[4], colors[0]]
@@ -4733,9 +5097,15 @@ class KeyTester(Layer, KeyListener):
         self.isSlideAnalog, self.whichJoySlide, self.whichAxisSlide = self.engine.input.getWhammyAxis(SlideKeyCode)
     
   def shown(self):
+    if self.type == 5:
+      self.mic = Microphone.Microphone(self.engine, self.controlNum)
+      self.mic.start()
     self.engine.input.addKeyListener(self, priority = True)
   
   def hidden(self):
+    if hasattr(self, 'mic'):
+      self.mic.stop()
+      del self.mic
     self.engine.input.removeKeyListener(self)
     
   def keyPressed(self, key, unicode):
@@ -4747,7 +5117,7 @@ class KeyTester(Layer, KeyListener):
       return True
     c = self.engine.input.controls.getMapping(key)
     self.controls.keyPressed(key)
-    if self.type > 1 and self.type != 4:
+    if self.type > 1 and self.type not in (4, 5):
       if c == self.keyList[Player.DRUM1]:
         self.engine.data.T1DrumSound.play()
       elif c == self.keyList[Player.DRUM2]:
@@ -4827,69 +5197,69 @@ class KeyTester(Layer, KeyListener):
       self.engine.drawImage(self.circle, scale = (.5, -.5), coord = (w*.5,h*.6))
       if rotateArrow is not None:
         self.engine.drawImage(self.arrow,  scale = (.5, -.5), coord = (w*.5,h*.6), rot = rotateArrow)
-      
-      #akedrou - analog starpower
-      text = self.names[Player.STAR]
-      wText, hText = font.getStringSize(text)
-      
-      if self.isSlideAnalog:
-        if self.analogSlideMode == 1:  #Inverted mode
-          slideVal = -(self.engine.input.joysticks[self.whichJoySlide].get_axis(self.whichAxisSlide)+1.0)/2.0
-        else:  #Default
-          slideVal = (self.engine.input.joysticks[self.whichJoySlide].get_axis(self.whichAxisSlide)+1.0)/2.0
-        if slideVal > 0.9:
-          self.slideActive = 4
-          self.midFret = False
-        elif slideVal > 0.77:
-          self.slideActive = 4
-          self.midFret = True
-        elif slideVal > 0.68:
-          self.slideActive = 3
-          self.midFret = False
-        elif slideVal > 0.60:
-          self.slideActive = 3
-          self.midFret = True
-        elif slideVal > 0.54:
-          self.slideActive = 2
-          self.midFret = False
-        elif slideVal > 0.43:
-          self.slideActive = -1
-          self.midFret = False
-        elif slideVal > 0.34:
-          self.slideActive = 2
-          self.midFret = True
-        elif slideVal > 0.28:
-          self.slideActive = 1
-          self.midFret = False
-        elif slideVal > 0.16:
-          self.slideActive = 1
-          self.midFret = True
-        else:
-          self.slideActive = 0
-          self.midFret = False
 
-      
-      if self.isSPAnalog:
-        starThresh = (self.analogSPThresh/100.0)*(w/6.0)-(w/12.0)
-        self.engine.drawImage(self.analogThresh, scale = (self.analogThreshScale, -self.analogThreshScale), coord = ((w*.25)+starThresh, h*.3))
-        #(0.0 at level, -1 upright; 1 upside down)
-        self.starpower = abs(self.engine.input.joysticks[self.whichJoyStar].get_axis(self.whichAxisStar))
+      if self.type != 5:
+        #akedrou - analog starpower, analog slider
+        text = self.names[Player.STAR]
+        wText, hText = font.getStringSize(text)
 
-      if self.starpower > 0:
-        if self.starpowerActive:
-          Theme.setSelectedColor(1 - v)
+        if self.isSlideAnalog:
+          if self.analogSlideMode == 1:  #Inverted mode
+            slideVal = -(self.engine.input.joysticks[self.whichJoySlide].get_axis(self.whichAxisSlide)+1.0)/2.0
+          else:  #Default
+            slideVal = (self.engine.input.joysticks[self.whichJoySlide].get_axis(self.whichAxisSlide)+1.0)/2.0
+          if slideVal > 0.9 or slideVal < 0.01:
+            self.slideActive = 4
+            self.midFret = False
+          elif slideVal > 0.77:
+            self.slideActive = 4
+            self.midFret = True
+          elif slideVal > 0.68:
+            self.slideActive = 3
+            self.midFret = False
+          elif slideVal > 0.60:
+            self.slideActive = 3
+            self.midFret = True
+          elif slideVal > 0.54:
+            self.slideActive = 2
+            self.midFret = False
+          elif slideVal > 0.43:
+            self.slideActive = -1
+            self.midFret = False
+          elif slideVal > 0.34:
+            self.slideActive = 2
+            self.midFret = True
+          elif slideVal > 0.28:
+            self.slideActive = 1
+            self.midFret = False
+          elif slideVal > 0.16:
+            self.slideActive = 1
+            self.midFret = True
+          else:
+            self.slideActive = 0
+            self.midFret = False
+
+        if self.isSPAnalog:
+          starThresh = (self.analogSPThresh/100.0)*(w/6.0)-(w/12.0)
+          self.engine.drawImage(self.analogThresh, scale = (self.analogThreshScale, -self.analogThreshScale), coord = ((w*.25)+starThresh, h*.3))
+          #(0.0 at level, -1 upright; 1 upside down)
+          self.starpower = abs(self.engine.input.joysticks[self.whichJoyStar].get_axis(self.whichAxisStar))
+
+        if self.starpower > 0:
+          if self.starpowerActive:
+            Theme.setSelectedColor(1 - v)
+          else:
+            glColor3f(.4, .4, .4)
+          font.render(text, (.25-wText/2, .45 + v))
+          starC = (1-self.starpower)*.5*w*self.analogBarScale
+          self.engine.drawImage(self.analogBar, scale = (self.analogBarScale*self.starpower, -self.analogBarScale), coord = ((w*.25)-starC, h*.3), rect = (0, self.starpower, 0, 1), stretched = 11)
+          self.engine.drawImage(self.analogBox, scale = (self.analogBoxScale, -self.analogBoxScale), coord = (w*.25, h*.3), stretched = 11)
         else:
-          glColor3f(.4, .4, .4)
-        font.render(text, (.25-wText/2, .45 + v))
-        starC = (1-self.starpower)*self.analogBar.width1()*self.analogBarScale*((w/384.0)-1.0/6.0) #...not really...
-        self.engine.drawImage(self.analogBar, scale = (self.analogBarScale*self.starpower, -self.analogBarScale), coord = ((w*.25)-starC, h*.3), rect = (0, self.starpower, 0, 1), stretched = 11)
-        self.engine.drawImage(self.analogBox, scale = (self.analogBoxScale, -self.analogBoxScale), coord = (w*.25, h*.3), stretched = 11)
-      else:
-        if self.controls.getState(self.keyList[Player.STAR]):
-          Theme.setSelectedColor(1 - v)
-        else:
-          glColor3f(.4, .4, .4)
-        font.render(text, (.25-wText/2, .45 + v))
+          if self.controls.getState(self.keyList[Player.STAR]):
+            Theme.setSelectedColor(1 - v)
+          else:
+            glColor3f(.4, .4, .4)
+          font.render(text, (.25-wText/2, .45 + v))
         
       if self.controls.getState(self.keyList[Player.CANCEL]):
         glColor3f(.6, 0, 0)
@@ -4961,7 +5331,7 @@ class KeyTester(Layer, KeyListener):
           else:
             glColor3f(.4, .4, .4)
           font.render(self.names[Player.KILL], (.75-wText/2, .45 + v))
-          whammyC = (1-self.whammy)*self.analogBar.width1()*self.analogBarScale*((w/384.0)-1.0/6.0)
+          whammyC = (1-self.whammy)*.5*w*self.analogBarScale
           self.engine.drawImage(self.analogBar, scale = (self.analogBarScale*self.whammy, -self.analogBarScale), coord = (w*.75-whammyC, h*.3), rect = (0, self.whammy, 0, 1), stretched = 11)
         else:
           if self.controls.getState(self.keyList[Player.KILL]):
@@ -4977,7 +5347,48 @@ class KeyTester(Layer, KeyListener):
           glColor3f(.4, .4, .4)
         wText, hText = font.getStringSize(self.names[Player.ACTION1])
         font.render(self.names[Player.ACTION1], (.5-wText/2, .55 + v))
-      
+
+      elif self.type == 5:
+        Theme.setBaseColor(1 - v)
+        font.render(_('Level:'), (.3, .4 + v))
+        font.render(_('Note:'), (.3, .6 + v))
+
+        peakvol = self.mic.getPeak()
+        if peakvol < -5.0:
+          colorval = min(1.0, .4 + max(0.0, (peakvol+30.0) * .6 / 25.0))
+          glColor3f(colorval, colorval, colorval)
+        else:
+          glColor3f(1.0, max(0.0, min(1.0, (peakvol/-5.0))), max(0.0, min(1.0, (peakvol/-5.0))))
+        font.render('%5.3f dB' % peakvol, (.55, .4 + v))
+
+        if self.mic.getTap():
+          Theme.setBaseColor(1 - v)
+        else:
+          glColor3f(.4, .4, .4)
+        font.render(_('Tap'), (.55, .5 + v))
+
+        semitones = self.mic.getSemitones()
+        if semitones is None:
+          glColor3f(.4, .4, .4)
+          font.render(_('None'), (.55, .6 + v))
+        else:
+          Theme.setBaseColor(1 - v)
+          font.render(Microphone.getNoteName(semitones), (.55, .6 + v))
+        
+        f = self.mic.getFormants()
+        if f[0] is not None:
+          Theme.setBaseColor(1 - v)
+          font.render("%.2f Hz" % f[0], (.45, .65 + v))
+        else:
+          glColor3f(.4, .4, .4)
+          font.render("None", (.45, .65 + v))
+        if f[1] is not None:
+          Theme.setBaseColor(1 - v)
+          font.render("%.2f Hz" % f[1], (.65, .65 + v))
+        else:
+          glColor3f(.4, .4, .4)
+          font.render("None", (.65, .65 + v))
+
       elif self.type > 1:
         if self.type == 2:
           drumList = [self.keyList[Player.DRUM1], self.keyList[Player.DRUM1A], self.keyList[Player.DRUM2], self.keyList[Player.DRUM2A], \
@@ -5096,7 +5507,7 @@ def chooseItem(engine, items, prompt = "", selected = None, pos = None):   #MFH
   _runDialog(engine, d)
   return d.getSelectedItem()
 
-def activateControllers(engine, players = 1):
+def activateControllers(engine, players = 1, maxplayers = None, allowGuitar = True, allowDrum = True, allowMic = False):
   """
   Ask the user to select the active controllers for the game session.
   
@@ -5104,7 +5515,7 @@ def activateControllers(engine, players = 1):
   @type players:    int
   @param players:   The maximum number of players.
   """
-  d = ControlActivator(engine, players)
+  d = ControlActivator(engine, players, maxplayers, allowGuitar, allowDrum, allowMic)
   _runDialog(engine, d)
   return d.getPlayers()
 
@@ -5121,6 +5532,16 @@ def chooseNeck(engine, player = "default"):
   _runDialog(engine, d)
   return d.getSelectedNeck()
 
+def chooseAvatar(engine):
+  """
+  Have the user select an avatar.
+  
+  @param engine:   Game engine
+  """
+  d = AvatarChooser(engine)
+  _runDialog(engine, d)
+  return d.getAvatar()
+
 # evilynux - Show creadits
 def showCredits(engine):
   d = Credits(engine)
@@ -5133,8 +5554,11 @@ def testKeys(engine, control, prompt = _("Play with the keys and press Escape wh
   @param engine:  Game engine
   @param prompt:  Prompt shown to the user
   """
-  d = KeyTester(engine, control, prompt = prompt)
-  _runDialog(engine, d)
+  if engine.input.controls.type[control] == 5 and not Microphone.supported:
+    showMessage(engine, 'A required module for microphone support is missing.')
+  else:
+    d = KeyTester(engine, control, prompt = prompt)
+    _runDialog(engine, d)
 
 def showLoadingScreen(engine, condition, text = _("Loading..."), allowCancel = False):
   """

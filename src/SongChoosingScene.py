@@ -110,35 +110,37 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
       self.playerList[num].difficulty = self.songSettings[3].values[self.songSettings[3].valueIndex]
          
   def startGame(self, value = "", queueCounter = 0):
-   if not self.gameStarted:
-     self.gameStarted = True
-     if not self.player.difficulty in self.info.difficulties:
+    #just noting here that this is not used (and would not work were it to be). I feel like this here scene could use some work...
+    if not self.gameStarted:
+      self.gameStarted = True
+      if not self.player.difficulty in self.info.difficulties:
         self.player.difficulty = self.info.difficulties[0]
-     if not self.player.part in self.info.parts:
+      if not self.player.part in self.info.parts:
         self.player.part = self.info.parts[0]
-     if not self.player2.difficulty in self.info.difficulties:
+      if not self.player2.difficulty in self.info.difficulties:
         self.player2.difficulty = self.info.difficulties[0]
-     if not self.player2.part in self.info.parts:
+      if not self.player2.part in self.info.parts:
         self.player2.part = self.info.parts[0]
-     players = Config.get("game", "selected_players")
-     if self.dialog:
-       self.dialog.close()
-     self.session.world.deleteScene(self)
-     self.freeResources()       
-     self.session.world.createScene("GuitarScene", songName = self.songName, Players = players, songQueue = self.songQueue, queueCounter = queueCounter)
+      players = Config.get("game", "selected_players")
+      if self.dialog:
+        self.dialog.close()
+      self.session.world.deleteScene(self)
+      self.freeResources()       
+      self.session.world.createScene("GuitarScene", songName = self.songName, Players = players, songQueue = self.songQueue, queueCounter = queueCounter)
 
   def startQueue(self):
-     firstSong = self.songQueue.nextSong(0)
-     Config.set("game", "selected_song", firstSong[0])
-     Config.set("game", "selected_library", firstSong[1])
-     Config.set("game", "selected_players", firstSong[2])
-     self.player.difficulty = firstSong[3]
-     self.player2.difficulty =  firstSong[4]
-     self.player.part = firstSong[5]
-     self.player2.part = firstSong[6]
-     self.info = Song.loadSongInfo(self.engine, firstSong[0])
-     self.songName = firstSong[0]
-     self.startGame(queueCounter =  1)
+    #obviously a fair amount of work to be done on this anyway... But note that startGame will not work.
+    firstSong = self.songQueue.nextSong(0)
+    Config.set("game", "selected_song", firstSong[0])
+    Config.set("game", "selected_library", firstSong[1])
+    Config.set("game", "selected_players", firstSong[2])
+    self.player.difficulty = firstSong[3]
+    self.player2.difficulty =  firstSong[4]
+    self.player.part = firstSong[5]
+    self.player2.part = firstSong[6]
+    self.info = Song.loadSongInfo(self.engine, firstSong[0])
+    self.songName = firstSong[0]
+    self.startGame(queueCounter =  1)
 
   def freeResources(self):
     self.songs = None
@@ -161,7 +163,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
         self.engine.cmdPlay = 2
 
       if not self.songName:
-        while True:
+        while 1:
           self.mode = 1
           self.libraryName, self.songName = \
             Dialogs.chooseSong(self.engine, \
@@ -211,7 +213,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
             
           slowDownDivisor = Config.get("audio",  "speed_factor")
            
-          while True: #new nesting for Practice Mode - section / start time selection
+          while 1: #new nesting for Practice Mode - section / start time selection
             if self.player.practiceMode:
               values, options = Config.getOptions("audio", "speed_factor")
               if self.subMenuPosTuple:
@@ -245,12 +247,19 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
               self.player.practiceSection = startLabel
               
               #find start position in array:
-              self.player.startPos = [sPos for sLabel,sPos in info.sections if sLabel == startLabel]
-              Log.debug("Practice start position retrieved: " + str(self.player.startPos) )
-              
+              try:
+                tempStart = [sPos for sLabel,sPos in info.sections if sLabel == startLabel]
+                if tempStart == []:
+                  self.player.startPos = 0.0
+                else:
+                  self.player.startPos = tempStart[0]
+                Log.debug("Practice start position retrieved: " + str(self.player.startPos))
+              except:
+                Log.error("Cannot retrieve start position!")
+                self.player.startPos = 0.0
+                break
             else:
-              
-              #self.player.startPos = [0]
+              #self.player.startPos = 0.0
               
               break;
             #if not self.player.practiceMode:
@@ -262,9 +271,12 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
           
             guitars = []
             drums = []
+            vocals = []
             for part in info.parts:
               if part.id == 4:
                 drums.append(part)
+              elif part.id == 5:
+                vocals.append(part)
               else:
                 guitars.append(part)
             if len(drums) == 0 and self.engine.input.gameDrums > 0:
@@ -275,14 +287,20 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
               Dialogs.showMessage(self.engine, _("There are no guitar parts in this song. Change your controllers to play."))
               escaped = True
               break
+            if len(vocals) == 0 and self.engine.input.gameMics > 0:
+              Dialogs.showMessage(self.engine, _("There are no vocal parts in this song. Change your controllers to play."))
+              escaped = True
+              break
             
             for i, player in enumerate(self.playerList):
               
-              while True: #new nesting for Practice Mode selection
+              while 1: #new nesting for Practice Mode selection
                 selectedPlayer = False
                 choose = []
                 if player.controlType == 2 or player.controlType == 3:
                   choose = drums
+                elif player.controlType == 5:
+                  choose = vocals
                 else:
                   choose = guitars
                   
@@ -301,18 +319,18 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
                   if not player.practiceMode:
                     escaped = True
                   break;
-                while True:
-                  if len(info.difficulties) > 1:
+                while 1:
+                  if len(info.partDifficulties[p.id]) > 1:
 
                     if self.subMenuPosTuple:
-                      d = Dialogs.chooseItem(self.engine, info.difficulties,
+                      d = Dialogs.chooseItem(self.engine, info.partDifficulties[p.id],
                                          "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("%s Choose a difficulty:") % player.name), selected = player.difficulty, pos = self.subMenuPosTuple)
                     else:
-                      d = Dialogs.chooseItem(self.engine, info.difficulties,
+                      d = Dialogs.chooseItem(self.engine, info.partDifficulties[p.id],
                                          "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("%s Choose a difficulty:") % player.name), selected = player.difficulty)
 
                   else:
-                    d = info.difficulties[0]
+                    d = info.partDifficulties[p.id][0]
                   if d:
                     player.difficulty = d
                     selectedPlayer = True
@@ -351,21 +369,17 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
         info = Song.loadSongInfo(self.engine, self.songName, library = self.libraryName)
 
       if self.engine.cmdPlay == 2:
-        if len(info.difficulties) >= self.engine.cmdDiff:
-          self.player.difficulty = info.difficulties[self.engine.cmdDiff]
         if len(info.parts) >= self.engine.cmdPart:
           self.player.part = info.parts[self.engine.cmdPart]
+        if len(info.partDifficulties[self.player.part.id]) >= self.engine.cmdDiff:
+          self.player.difficulty = info.partDifficulties[self.player.part.id][self.engine.cmdDiff]
+        
           
       # Make sure the difficulty we chose is available
-      if not self.player.difficulty in info.difficulties:
-        self.player.difficulty = info.difficulties[0]
       if not self.player.part in info.parts:
         self.player.part = info.parts[0]
-
-      if not self.player.difficulty in info.difficulties:
-        self.player.difficulty = info.difficulties[0]
-      if not self.player.part in info.parts:
-        self.player.part = info.parts[0]   
+      if not self.player.difficulty in info.partDifficulties[self.player.part.id]:
+        self.player.difficulty = info.partDifficulties[self.player.part.id][0]
         
       if not self.engine.createdGuitarScene:
         #self.engine.createdGuitarScene = True

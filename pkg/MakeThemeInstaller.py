@@ -177,7 +177,7 @@ InstallDirRegKey HKCU 'SOFTWARE\myfingershurt\FoFiX' InstallRoot
 # Function to run FoFiX from the finish page.
 Function runFoFiX
   SetOutPath $INSTDIR
-  Exec $INSTDIR\FretsOnFire.exe
+  Exec $INSTDIR\FoFiX.exe
 FunctionEnd
 
 # More installer parameters.
@@ -199,7 +199,7 @@ Function verifyFoFiXInstDir
   IfFileExists $INSTDIR haveDir
   Abort
 haveDir:
-  IfFileExists $INSTDIR\FretsOnFire.exe allow
+  IfFileExists $INSTDIR\FoFiX.exe allow
   MessageBox MB_YESNO|MB_ICONEXCLAMATION "This does not look like a valid FoFiX installation folder.$\r$\n$\r$\nIf you would like to merely unpack the theme files into this folder, you may continue anyway.$\r$\n$\r$\nContinue?" IDYES allow
   Abort
 allow:
@@ -231,6 +231,8 @@ FunctionEnd
 Section
 """ % tuple(map(str, (theme, version, destfile, licensefile and ('!insertmacro MUI_PAGE_LICENSE "%s"' % licensefile) or '')))
   for root, dirs, files in os.walk(theme):
+    if root.find('.svn') != -1:  #stump: skip .svn folders
+      continue
     script += 'SetOutPath "$INSTDIR\\data\\themes\\%s\\%s"\r\n' % (theme, root[len(theme):])
     for f in files:
       script += 'File "%s"\r\n' % os.path.join(root, f)

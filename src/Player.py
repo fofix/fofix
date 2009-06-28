@@ -33,6 +33,7 @@ import os
 import sys
 from Language import _
 #import Dialogs
+import Microphone  #stump
 
 #stump: turns out the sqlite3 module didn't appear until Python 2.5...
 try:
@@ -82,6 +83,10 @@ DRUM5             = 6
 DRUM5A            = 7
 DRUMBASS          = 16
 DRUMBASSA         = 17
+
+GUITARTYPES = [-1, 0, 1, 4]
+DRUMTYPES   = [-1, 2, 3]
+MICTYPES    = [5]
 
 lefts    = [CONTROL1[LEFT], CONTROL2[LEFT], CONTROL3[LEFT], CONTROL4[LEFT]]
 rights   = [CONTROL1[RIGHT], CONTROL2[RIGHT], CONTROL3[RIGHT], CONTROL4[RIGHT]]
@@ -166,8 +171,8 @@ Config.define("controller", "key_cancel",    str, "K_ESCAPE",   text = _("Cancel
 Config.define("controller", "key_star",      str, "K_PAGEDOWN", text = _("StarPower"))
 Config.define("controller", "key_kill",      str, "K_PAGEUP",   text = _("Whammy"))
 Config.define("controller", "key_start",     str, "K_SPACE",    text = _("Start"))
-Config.define("controller", "type",          int, 0,            text = _("Controller Type"), options = {0: _("Standard Guitar"), 1: _("Solo Shift Guitar"), 2: _("Drum Set (4-Drum)"), 4: _("Analog Slide Guitar")}) #, 3: _("Drum Set (3-Drum 2-Cymbal)") 
 Config.define("controller", "two_chord_max", int, 0,            text = _("Two-Chord Max"),   options = {0: _("Off"), 1: _("On")})
+Config.define("controller", "type",          int, 0,            text = _("Controller Type"), options = {0: _("Standard Guitar"), 1: _("Solo Shift Guitar"), 2: _("Drum Set (4-Drum)"), 4: _("Analog Slide Guitar"), 5: _("Microphone")}) #, 3: _("Drum Set (3-Drum 2-Cymbal)")
 Config.define("controller", "analog_sp",     int, 0,            text = _("Analog SP"),       options = {0: _("Disabled"), 1: _("Enabled")})
 Config.define("controller", "analog_sp_threshold",   int, 60,   text = _("Analog SP Threshold"), options = dict([(n, n) for n in range(10, 101, 10)]))
 Config.define("controller", "analog_sp_sensitivity", int, 4,    text = _("Analog SP Sensitivity"), options = dict([(n, n+1) for n in range(10)]))
@@ -175,11 +180,15 @@ Config.define("controller", "analog_drum",   int, 0,            text = _("Analog
 Config.define("controller", "analog_slide",  int, 0,            text = _("Analog Slider"),    options = {0: _("Default"), 1: _("Inverted")})
 Config.define("controller", "analog_kill",   int, 0,            text = _("Analog Effects"),  options = {0: _("Disabled"), 1: _("PS2/PS3/Wii"), 2: _("XBOX"), 3: _("XBOX Inv.")})
 Config.define("controller", "analog_fx",     int, 0,            text = _("Sound FX Switch"), options = {0: _("Switch"), 1: _("Cycle")}) #akedrou - aren't I bold!
+Config.define("controller", "mic_device",    int, -1,           text = _("Microphone Device"), options = Microphone.getAvailableMics()) #stump
+Config.define("controller", "mic_tap_sensitivity", int, 5,      text = _("Tap Sensitivity"), options=dict((n, n) for n in range(1, 21))) #stump
+Config.define("controller", "mic_passthrough_volume", float, 0.0, text = _("Passthrough Volume"), options=dict((n / 100.0, n) for n in range(101))) #stump
 
 Config.define("player", "name",          str,  "")
 Config.define("player", "difficulty",    int,  Song.MED_DIF)
 Config.define("player", "part",          int,  Song.GUITAR_PART)
 Config.define("player", "neck",          str,  "")
+Config.define("player", "necktype",      str,  2, text = _("Neck Type"),     options = {0: _("Default Neck"), 1: _("Theme Neck"), 2: _("Specific Neck")})
 Config.define("player", "leftymode",     int,  0, text = _("Lefty Mode"),    options = {0: _("Off"), 1: _("On")})
 Config.define("player", "drumflip",      int,  0, text = _("Drum Flip"),     options = {0: _("Off"), 1: _("On")})
 Config.define("player", "two_chord_max", int,  0, text = _("Two-Chord Max"), options = {0: _("Off"), 1: _("On")})
@@ -203,7 +212,7 @@ playername = []
 playerpref = []
 playerstat = []
 
-class PlayerCacheManager(object): #akedrou - basically stump's cache for the players. Todo? Group the caching. Data?
+class PlayerCacheManager(object): #akedrou - basically stump's cache for the players. Todo? Group the caching. .fofix/appdata?
   def __init__(self):
     self.caches = {}
   def getCache(self):
@@ -211,7 +220,7 @@ class PlayerCacheManager(object): #akedrou - basically stump's cache for the pla
     cachePath = playerpath
     if self.caches.has_key(cachePath):
       try:
-        self.caches[cachePath].execute("SELECT `value` FROM `config` WHERE `key` = 'version'").fetchone()[0]
+        self.caches[cachePath].commit()
         return self.caches[cachePath]
       except:
         pass
@@ -225,7 +234,7 @@ class PlayerCacheManager(object): #akedrou - basically stump's cache for the pla
     updateTables = 0
     try:
       v = conn.execute("SELECT `value` FROM `config` WHERE `key` = 'version'").fetchone()[0]
-      if int(v) != 1:
+      if int(v) != 2:
         updateTables = 2 #an old version. We don't want to just burn old tables.
     except:
       updateTables = 1 #no good table
@@ -235,10 +244,10 @@ class PlayerCacheManager(object): #akedrou - basically stump's cache for the pla
       conn.commit()
       conn.execute('VACUUM')
       conn.execute('CREATE TABLE `config` (`key` STRING UNIQUE, `value` STRING)')
-      conn.execute('CREATE TABLE `players` (`name` STRING UNIQUE, `lefty` INT, `drumflip` INT, `autokick` INT, `assist` INT, `twochord` INT, `neck` STRING, `part` INT, \
-                     `difficulty` INT, `upname` STRING, `control` INT, `changed` INT, `loaded` INT)')
+      conn.execute('CREATE TABLE `players` (`name` STRING UNIQUE, `lefty` INT, `drumflip` INT, `autokick` INT, `assist` INT, `twochord` INT, `necktype` INT, `neck` STRING, \
+                     `part` INT, `difficulty` INT, `upname` STRING, `control` INT, `changed` INT, `loaded` INT)')
       conn.execute('CREATE TABLE `stats` (`song` STRING, `hash` STRING, `player` STRING)')
-      conn.execute("INSERT INTO `config` (`key`, `value`) VALUES ('version', '1')")  #stump: current cache format version number
+      conn.execute("INSERT INTO `config` (`key`, `value`) VALUES ('version', '2')")  #stump: current cache format version number
       conn.commit()
     self.caches[cachePath] = conn
     return conn
@@ -269,7 +278,7 @@ def loadPlayers():
       if cache:
         pref = cache.execute('SELECT * FROM `players` WHERE `name` = ?', [playername[-1]]).fetchone()
         try:
-          if len(pref) == 13:
+          if len(pref) == 14:
             playerpref.append((pref[1], pref[2], pref[3], pref[4], pref[5], pref[6], pref[7], pref[8], pref[9], pref[10]))
         except TypeError:
           try:
@@ -280,16 +289,17 @@ def loadPlayers():
             assist = c.get("player","assist_mode")
             twoch  = c.get("player","two_chord_max")
             neck   = c.get("player","neck")
+            neckt  = c.get("player","necktype")
             part   = c.get("player","part")
             diff   = c.get("player","difficulty")
             upname = c.get("player","name")
             control= c.get("player","controller")
             del c
-            cache.execute('INSERT INTO `players` VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1)', [playername[-1], lefty, drumf, autok, assist, twoch, neck, part, diff, upname, control])
-            playerpref.append((lefty, drumf, autok, assist, twoch, neck, part, diff, upname))
+            cache.execute('INSERT INTO `players` VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1)', [playername[-1], lefty, drumf, autok, assist, twoch, neckt, neck, part, diff, upname, control])
+            playerpref.append((lefty, drumf, autok, assist, twoch, neckt, neck, part, diff, upname))
           except IOError:
-            cache.execute('INSERT INTO `players` VALUES (?, 0, 0, 0, 0, 0, ``, 0, 2, ``, 0, 0, 1)', [playername[-1]])
-            playerpref.append((0, 0, 0, 0, 0, '', 0, 2, '', 0))
+            cache.execute('INSERT INTO `players` VALUES (?, 0, 0, 0, 0, 0, 0, ``, 0, 2, ``, 0, 0, 1)', [playername[-1]])
+            playerpref.append((0, 0, 0, 0, 0, 0, '', 0, 2, '', 0))
         cache.execute('UPDATE `players` SET `loaded` = 1 WHERE `name` = ?', [playername[-1]])
         cache.commit()
       else:
@@ -300,14 +310,15 @@ def loadPlayers():
           autok  = c.get("player","autokick")
           assist = c.get("player","assist_mode")
           neck   = c.get("player","neck")
+          neckt  = c.get("player","necktype")
           twoch  = c.get("player","two_chord_max")
           part   = c.get("player","part")
           diff   = c.get("player","difficulty")
           upname = c.get("player","name")
           del c
-          playerpref.append((lefty, drumf, autok, assist, twoch, neck, part, diff, upname))
+          playerpref.append((lefty, drumf, autok, assist, twoch, neckt, neck, part, diff, upname))
         except IOError, e:
-          playerpref.append((0, 0, 0, 0, 0, "", 0, 2, ""))
+          playerpref.append((0, 0, 0, 0, 0, 0, "", 0, 2, ""))
   return 1
 
 def savePlayers():
@@ -321,11 +332,12 @@ def savePlayers():
         c.set("player","auto_kick",int(pref[3]))
         c.set("player","assist_mode",int(pref[4]))
         c.set("player","two_chord_max",int(pref[5]))
-        c.set("player","neck",str(pref[6]))
-        c.set("player","part",int(pref[7]))
-        c.set("player","difficulty",int(pref[8]))
-        c.set("player","name",str(pref[9]))
-        c.set("player","controller",int(pref[10]))
+        c.set("player","necktype",int(pref[6]))
+        c.set("player","neck",str(pref[7]))
+        c.set("player","part",int(pref[8]))
+        c.set("player","difficulty",int(pref[9]))
+        c.set("player","name",str(pref[10]))
+        c.set("player","controller",int(pref[11]))
         del c
         cache.execute('UPDATE `players` SET `changed` = 0 WHERE `name` = ?', [pref[0]])
       except:
@@ -337,11 +349,12 @@ def savePlayers():
         c.set("player","auto_kick",int(pref[3]))
         c.set("player","assist_mode",int(pref[4]))
         c.set("player","two_chord_max",int(pref[5]))
-        c.set("player","neck",str(pref[6]))
-        c.set("player","part",int(pref[7]))
-        c.set("player","difficulty",int(pref[8]))
-        c.set("player","name",str(pref[9]))
-        c.set("player","controller",int(pref[10]))
+        c.set("player","necktype",int(pref[6]))
+        c.set("player","neck",str(pref[7]))
+        c.set("player","part",int(pref[8]))
+        c.set("player","difficulty",int(pref[9]))
+        c.set("player","name",str(pref[10]))
+        c.set("player","controller",int(pref[11]))
         del c
         cache.execute('UPDATE `players` SET `changed` = 0 WHERE `name` = ?', [pref[0]])
     #cache.execute('DELETE FROM `players` WHERE `loaded` = 0')
@@ -357,10 +370,12 @@ def updatePlayer(player, pref):
     except:
       a = None
     if a is not None:
-      cache.execute('UPDATE `players` SET `name` = ?, `lefty` = ?, `drumflip` = ?, `autokick` = ?, `assist` = ?, `twochord` = ?, `neck` = ?, \
+      cache.execute('UPDATE `players` SET `name` = ?, `lefty` = ?, `drumflip` = ?, `autokick` = ?, `assist` = ?, `twochord` = ?, `necktype` = ?, `neck` = ?, \
                      `part` = 0, `difficulty` = 2, `upname` = ?, `control` = 0, `changed` = 1, `loaded` = 1 WHERE `name` = ?', pref + [player])
+      if player != pref[0]:
+        os.rename(os.path.join(playerpath,player+".ini"),os.path.join(playerpath,pref[0]+".ini"))
     else:
-      cache.execute('INSERT INTO `players` VALUES (?, ?, ?, ?, ?, ?, ?, 0, 2, ?, 0, 1, 1)', pref)
+      cache.execute('INSERT INTO `players` VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 2, ?, 0, 1, 1)', pref)
     cache.commit()
   savePlayers()
   loadPlayers()
@@ -379,7 +394,7 @@ def loadControls():
   global controllerDict
   controllers = []
   allcontrollers = os.listdir(controlpath)
-  default = ["defaultd.ini", "defaultg.ini"]
+  default = ["defaultd.ini", "defaultg.ini", "defaultm.ini"]
   for name in allcontrollers:
     if name.lower().endswith(".ini") and len(name) > 4:
       if name in default:
@@ -390,13 +405,17 @@ def loadControls():
   controllerDict = dict([(str(controllers[n]),controllers[n]) for n in range(0, i)])
   controllerDict["defaultg"] = _("Default Guitar")
   controllerDict["defaultd"] = _("Default Drum")
+  defMic = None
+  if Microphone.supported:
+    controllerDict["defaultm"] = _("Default Microphone")
+    defMic = "defaultm"
 
   Config.define("game", "control0",           str,   "defaultg", text = _("Controller 1"),                options = controllerDict)
   
   controllerDict["None"] = None
   
   Config.define("game", "control1",           str,   "defaultd", text = _("Controller 2"),                options = controllerDict)
-  Config.define("game", "control2",           str,   None,       text = _("Controller 3"),                options = controllerDict)
+  Config.define("game", "control2",           str,   defMic,     text = _("Controller 3"),                options = controllerDict)
   Config.define("game", "control3",           str,   None,       text = _("Controller 4"),                options = controllerDict)
 
 
@@ -455,6 +474,7 @@ class Controls:
     self.maxplayers = 0
     self.guitars    = 0
     self.drums      = 0
+    self.mics       = 0
     self.overlap    = []
     
     self.p2Nav = Config.get("game", "p2_menu_nav")
@@ -477,9 +497,12 @@ class Controls:
       else:
         self.config.append(None)
     else:
+      confM = None
+      if Microphone.supported:
+        confM = Config.load(os.path.join(controlpath,"defaultm.ini"), type = 1)
       self.config.append(Config.load(os.path.join(controlpath,"defaultg.ini"), type = 1))
       self.config.append(Config.load(os.path.join(controlpath,"defaultd.ini"), type = 1))
-      self.config.append(None)
+      self.config.append(confM)
       self.config.append(None)
     
     self.type       = []
@@ -491,13 +514,18 @@ class Controls:
     self.analogSlide = []
     self.analogFX   = []
     self.twoChord   = []
+    self.micDevice  = []  #stump
+    self.micTapSensitivity = []
+    self.micPassthroughVolume = []
     
     self.flags = 0
     
     for i in self.config:
       if i:
         type = i.get("controller", "type")
-        if type > 1:
+        if type == 5:
+          self.mics += 1
+        elif type > 1:
           self.guitars += 1
         else:
           self.drums += 1
@@ -509,6 +537,9 @@ class Controls:
         self.analogDrum.append(i.get("controller", "analog_drum"))
         self.analogSlide.append(i.get("controller", "analog_slide"))
         self.analogFX.append(i.get("controller", "analog_fx"))
+        self.micDevice.append(i.get("controller", "mic_device"))  #stump
+        self.micTapSensitivity.append(i.get("controller", "mic_tap_sensitivity"))
+        self.micPassthroughVolume.append(i.get("controller", "mic_passthrough_volume"))
         self.twoChord.append(i.get("controller", "two_chord_max"))
         self.controlList.append(i.get("controller", "name"))
       else:
@@ -578,6 +609,14 @@ class Controls:
           menuDown.append(CONTROLS[i][DOWN])
           menuNext.append(CONTROLS[i][RIGHT])
           menuPrev.append(CONTROLS[i][LEFT])
+      elif self.type[i] == 5:  #stump: it's a mic
+        if self.p2Nav == 1 or (self.p2Nav == 0 and i == 0):
+          menuUp.append(CONTROLS[i][UP])
+          menuDown.append(CONTROLS[i][DOWN])
+          menuNext.append(CONTROLS[i][RIGHT])
+          menuPrev.append(CONTROLS[i][LEFT])
+          menuYes.append(CONTROLS[i][START])
+          menuNo.append(CONTROLS[i][CANCEL])
       elif self.type[i] > -1:
         if self.type[i] == 0:
           key1s.extend([CONTROLS[i][KEY1], CONTROLS[i][KEY1A]])
@@ -767,6 +806,8 @@ class Controls:
 def isKeyMappingOK(config, start):
   def keycode(name, config):
     k = config.get("controller", name)
+    if k is None or k == "None":
+      return None
     try:
       return int(k)
     except:
@@ -796,7 +837,7 @@ def setNewKeyMapping(engine, config, section, option, key):
   oldKey = config.get(section, option)
   config.set(section, option, key)
   keyCheckerMode = Config.get("game", "key_checker_mode")
-  if key == "None":
+  if key == "None" or key is None:
     return True
   b = isKeyMappingOK(config, option)
   if b != 0:
@@ -832,6 +873,9 @@ class Player(object):
     self.controller   = -1
     self.controlType  = -1
     
+    self.guitarNum    = None
+    self.number       = number
+    
     self._cache     = None
     
     self.bassGrooveEnabled = False
@@ -843,6 +887,7 @@ class Player(object):
     self.assistMode  = self.cache.execute('SELECT `assist` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
     self.autoKick    = self.cache.execute('SELECT `autokick` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
     self.neck        = self.cache.execute('SELECT `neck` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
+    self.neckType    = self.cache.execute('SELECT `necktype` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
     self.whichPart   = self.cache.execute('SELECT `part` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
     self._upname      = self.cache.execute('SELECT `upname` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
     self._difficulty  = self.cache.execute('SELECT `difficulty` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
@@ -896,10 +941,6 @@ class Player(object):
   cache = property(getCache, setCache)
   
   def pack(self):
-    try:
-      self.cache.close()
-    except:
-      pass
     self.cache = None
   
   def getName(self):
