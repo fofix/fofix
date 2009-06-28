@@ -38,6 +38,7 @@ It is sorted into Menu Sounds, Game SFX, and Instrument SFX. Files are not requi
 || *starpower.ogg* ||Completing a starpower phrase||
 ||starpowerready.ogg||Star Power/Overdrive is ready||
 || *start.ogg* ||At the beginning of a song (in-game)||
+||battleused.ogg||Battle Object Used||
 
 --------------------------------------------------
 ==Instrument SFX==

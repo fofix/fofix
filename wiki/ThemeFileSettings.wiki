@@ -7,6 +7,11 @@ _{{{[theme]}}}_
 
 Then use any of the following settings below the {{{[theme]}}} header in the theme.ini file. This list is mostly organized by which options belong mostly to which screen, but not necessarily to JUST that screen, since some items currently control things on multiple screens.
 <wiki:toc max_depth="1" />
+<wiki:comment>
+|| This comment puts the tables underneath the nav bar on the side and makes it take up the whole width of the page ||
+|| This comment needs to contain a table for some reason, or it won't have the desired effect || ||
+</wiki:comment>
+
 -----------------------------------------------------------------------------------------
 =Main Menu=
 
@@ -17,6 +22,7 @@ Then use any of the following settings below the {{{[theme]}}} header in the the
 ||main_menu_vspacing = 0.09||Controls the spacing between the menu text items. Use a decimal # between 0-1||
 ||multiplayertext5 = .40,.35,.46,.045||.40 is X Pos, .35 is Y Position, .46 is Scaling Size, .045 is Line Spacing between menu items. Used for Multiplayer Menu (This is only used if you made the multiplayer.png and multiplayertext10.png images. The '5' in the name refers to being that, for example, the GH3 multiplayer menu has 5 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
 ||solotext2 = .40,.35,.46,.045||.40 is X Pos, .35 is Y Position, .46 is Scaling Size, .045 is Line Spacing between menu items. Used for Solo Menu (This is only used if you made the solo.png and solotext2.png images. The '2' in the name refers to being that, for example, the RB solo menu has 2 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
+||use_solo_submenu = False||Lets you decide which menu system you want in your game, overriding the theme-detection. (true -> uses solo submenu [RB-Theme like], false -> does NOT use solo submenu, GH-Theme like.)||
 ||versiontagposX = 0.5|| Controls the X position of the Versiontag image (Default is 0.5 due to the default image being fullscreen. Change it once making image small)||
 ||versiontagposY = 0.5|| Controls the Y position of the Versiontag image (Default is 0.5 due to the default image being fullscreen. Change it once making image small)||
 
@@ -33,6 +39,17 @@ Then use any of the following settings below the {{{[theme]}}} header in the the
 
 ----------------------------------------------------------------------------
 =Lobby/Player Select/Creation=
+||avatar_select_avatar_x = .667||Define's the X position of the avatar select screens avatar image. Use a floating point number||
+||avatar_select_avatar_y = .5||Define's the Y position of the avatar select screens avatar image. Use a floating point number||
+||avatar_select_text_x = .44||Define's the X position of the avatar select text. Use a floating point number||
+||avatar_select_text_y = .16||Define's the Y position of the avatar select text. Use a floating point number||
+||avatar_select_text_scale = .0027  ||Define's the size of the font used in avatar select. Use a floating point number||
+||avatar_select_font = (fontname) || Define's the font used for avatar select area||
+||avatar_select_wheel_y = 0.0||Define's the Y position of the avatar select screens avatar choice selection (half wheel shaped format). Use a floating point number||
+||avatarscaleX = 1|| Use this to control the X size of player's avatar. Use a floating point.||
+||avatarscaleY = 1|| Use this to control the Y size of player's avatar. Use a floating point.||
+||avatarposX = .35|| Use this to control the X position of player's avatar. Use a floating point.||
+||avatarposY = .75|| Use this to control the Y position of player's avatar. Use a floating point.||
 ||character_create_font_color = #FFFFFF|| Controls color value of character creation font. Use a Hex Color Value ||
 ||character_create_select_color = #FFBF00|| Controls color value of character creation selected text. Use a Hex Color Value ||
 ||character_create_help_color = #FFFFFF|| Controls color value of character creation help info line. Use a Hex Color Value ||
@@ -152,9 +169,10 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||hopo_indicator_x = .950||Manually sets x position of hopo indicator||
 ||hopo_indicator_y = .950||Manually sets y position of hopo indicator||
 ||ingame_stats_color = #000000||Manually chooses the In Game Stats color. Use a Hex Color Value.||
-||jurgen_text_pos = 1,1,0.0004||Any scale under .00035 will be resized. Any coordinates that are off the screen will automatically be moved back on to screen, and
-jurgen text is rendered above everything.||
+||jurgen_text_pos = 1,1,0.0004||Any scale under .00035 will be resized.Any coordinates that are off the screen will automatically be moved back on to screen, and jurgen text is rendered above everything.||
 ||mesh_color = #000000||Use a Hex Color Value.||
+||neck_width = 3 || Controls how wide you want the fret board to be. Use a floating point number.||
+||neck_length = 9 || Controls how long you want the fret board to be. Use a floating point number.||
 ||obar_hscale = 0.7||Overdrive bar width scale. "1.0" makes oBar width equal to fretboard width, like in RB2.||
 ||obar_3dfill = False||Use perspective for overdrive_fill.png.||
 ||opencolor = #FF8000 ||Use a Hex Color Value. Sets the Bass drum note color for 3d notes||
@@ -186,6 +204,29 @@ jurgen text is rendered above everything.||
 ||noterot3 = 0||This set's how many times you want the rotation degree to be applied to 3rd note (Textured 3d Notes Only)||
 ||noterot4 = 1||This set's how many times you want the rotation degree to be applied to 4th note (Textured 3d Notes Only)||
 ||noterot5 = 2||This set's how many times you want the rotation degree to be applied to 5th note (Textured 3d Notes Only)||
+||vocal_meter_size = 45.000   || -=Working on=- (Use a floating number)||
+||vocal_meter_x = .25   || -=Working on=- (Use a floating number)||
+||vocal_meter_y = .8   || -=Working on=- (Use a floating number)||
+||vocal_mult_x =  .28  || -=Working on=- (Use a floating number)||
+||vocal_mult_y = .8   || -=Working on=- (Use a floating number)||
+||vocal_power_x =  .5  || -=Working on=- (Use a floating number)||
+||vocal_power_y = .5   || -=Working on=- (Use a floating number)||
+||vocal_fillup_center_x = 139   || -=Working on=- (Use an Int number)||
+||vocal_fillup_center_y = 151   || -=Working on=- (Use an Int number)||
+||vocal_fillup_in_radius = 25   || -=Working on=- (Use an Int number)||
+||vocal_fillup_out_radius = 139   || -=Working on=- (Use an Int number)||
+||vocal_fillup_color = #DFDFDE   || -=Working on=-  (Use a hex color value)||
+||vocal_fillup_factor = 300.000   || -=Working on=- (Use a floating number)||
+||vocal_circular_fillup = True   || -=Working on=- (Use True or False)||
+||vocal_lane_size = .002   || -=Working on=- (Use a floating number)||
+||vocal_glow_size = .012   || -=Working on=- (Use a floating number)||
+||vocal_glow_fade = .6   || -=Working on=- (Use a floating number)||
+||vocal_lane_color = #99FF80   || -=Working on=- (Use a hex color value)||
+||vocal_shadow_color = #CCFFBF   || -=Working on=- (Use a hex color value)||
+||vocal_glow_color = #33FF00   || -=Working on=- (Use a hex color value)||
+||vocal_lane_color_star = #FFFF80   || -=Working on=- (Use a hex color value)||
+||vocal_shadow_color_star = #FFFFBF || -=Working on=- (Use a hex color value)||
+||vocal_glow_color_star = #FFFF00   || -=Working on=- (Use a hex color value)||
 
 
 

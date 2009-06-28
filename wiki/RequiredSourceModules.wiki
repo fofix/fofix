@@ -24,6 +24,8 @@ Then, to check for and update to the very latest FoFiX alpha source code, perfor
 
 _It is highly recommended that when you become an Alpha tester, you keep a separate FoFiX folder containing a full install of the latest stable release - as the Alpha versions' new features and bugfixes might cause other issues affecting playability._
 
+_Alternatively, be familiar with your svn clients method of rolling back to previous revisions so you can downgrade to a working revision if the latest one breaks on you._
+
 
 ==For Windows==
 
@@ -34,10 +36,7 @@ Versions are likely important. Don't substitute one for the other without trying
 *Note:* FoFiX is now working on moving up to Python 2.6 under Windows, though until the move is completed, FoFiX will still fully support Python 2.4.  These instructions use Python 2.4.  See RunningUnderPython26 for detailed instructions for setting up Python 2.6 to run FoFiX.
 
   # Download Active Python 2.4.3.12 (not the standard python distro) - [http://downloads.activestate.com/ActivePython/windows/2.4/ActivePython-2.4.3.12-win32-x86.msi] or [http://www.mediafire.com/?2zz5mzoybuw]
-  # Download Psyco optimizing compiler 1.5.2 - [http://downloads.sourceforge.net/psyco/psyco-1.5.2.win32-py2.4.exe]
-  # Download GLEW 1.4.0 - [http://downloads.sourceforge.net/glew/glew-1.4.0-win32.zip]
   # Download PyOpenGL 2.0.2.01 - [http://downloads.sourceforge.net/pyopengl/PyOpenGL-2.0.2.01.py2.4-numpy23.exe]
-  # Download GLEWpy 0.7.4 - [http://downloads.sourceforge.net/glewpy/glewpy-0.7.4.win32-py2.4.exe]
   # Download PyGame 1.7.1 - [http://www.pygame.org/ftp/pygame-1.7.1release.win32-py2.4.exe]
   # Download PIL 1.1.6 - [http://effbot.org/downloads/PIL-1.1.6.win32-py2.4.exe]
   # Download Numeric 2.4.2 - [http://downloads.sourceforge.net/numpy/Numeric-24.2.win32-py2.4.exe]
@@ -51,25 +50,26 @@ Versions are likely important. Don't substitute one for the other without trying
   # Download the FoFiX source files from the trunk, or SVN revision / tag of your choice - [http://code.google.com/p/fofix/source/browse/MFH-Mod]
 
 *Additional, optional modules currently in use with the latest Alpha version:*
+  * [http://psyco.sourceforge.net/ Psyco] - just-in-time compiler for Python ([http://downloads.sourceforge.net/psyco/psyco-1.5.2.win32-py2.4.exe Direct download])
   * [http://trac2.assembla.com/pkaudio/wiki/pyrtmidi pyRtMidi] - for MIDI instruments to be used as controller inputs.  [http://www.mediafire.com/download.php?ok1vw2zjn22 Here] is a direct download link to an installer that js put together for Python 2.4.
   * [http://www.mediafire.com/stump jsPitchBend] - for a whammy pitchbend effect (source: [https://svn.stump.jstump.com/svnroot/pitchbend/trunk SVN Checkout], [https://svn.stump.jstump.com/websvn WebSVN]).  At least revision 7 or release 0.1 is needed for the effect to work.  ([http://www.mediafire.com/?3mgtxhagijt direct download of latest release])
-  * [http://sourceforge.net/project/downloading.php?group_id=5988&filename=PyOpenGL-3.0.0.win32.exe&a=75398406 PyOpenGL 3.0] - for experimental shader code.  Install instead of the pyOpenGL 2.0.2.01 package from the required list.  ([http://prdownloads.sourceforge.net/pyopengl/PyOpenGL-3.0.0.win32.exe?download])
-  * ctypes - required if you install pyOpenGL 3.0  ([http://prdownloads.sourceforge.net/ctypes/ctypes-1.0.2.win32-py2.4.exe?download])
+  * [http://sourceforge.net/project/downloading.php?group_id=5988&filename=PyOpenGL-3.0.0.win32.exe&a=75398406 PyOpenGL 3.0] - for experimental shader code.  Install *instead of* the pyOpenGL 2.0.2.01 package from the required list.  ([http://prdownloads.sourceforge.net/pyopengl/PyOpenGL-3.0.0.win32.exe?download])
+    * *NO LONGER REQUIRED to use shaders - they now work under PyOpenGL 2.x, as long as you have ctypes!*
+  * ctypes - required if you install pyOpenGL 3.0 or want shaders under pyOpenGL 2.x  ([http://prdownloads.sourceforge.net/ctypes/ctypes-1.0.2.win32-py2.4.exe?download])
+  * pyAudio - required for microphone support: [http://people.csail.mit.edu/hubert/pyaudio/#binaries Download choices] / [http://people.csail.mit.edu/hubert/pyaudio/packages/pyaudio-0.2.3.py24.exe Direct download for Python 2.4]
+  * pyPitch - optional alternative to the pitch analysis engine built into FoFiX: [http://www.mediafire.com/file/j5mmkd212mi/pypitch-svn_rev9.win32-py2.4.exe Direct download of r9 for Python 2.4]
+    * *At least r9 is REQUIRED or you will get crashes when you try to play using pypitch!*  (You can choose between pypitch and the built-in analyzer in Debug Settings.)
 
-*Or, here's a complete package* with all the files above, with a batch file that installs everything for Windows 32-bit users, in a single RAR archive - courtesy of Chris Paiano (Myfingershurt) - _Updated 3/4/2009_: *(Important - you will need the updated py2exe module linked above!)*
-[http://www.mediafire.com/?iu9ezgnnnnx] - Includes optional modules.
 
-
+*Or, here's a complete installer package* with all the files above (as of 5/8/2009), courtesy of Chris Paiano:
+[http://www.mediafire.com/?zzizzt4zmuw MFH's Alpha Module Installer for 3.120r1454+ Win32-Py24-OGL2]
+This Includes the all optional modules for 3.120 r1454+.  _Uses versions: Python 2.4, PyOpenGL 2_.  Installer also fixes the below OpenGL 2 version error.
 
 
 ===Install In This Order===
 
   #  Install active python by double clicking the .msi
-  #  Install psyco by double clicking the .exe
-  #  Unzip GLEW (no easy install)
-  #  Install glew by copying the 'glew32.dll' file in 'bin' to your 'system32' dir under C:\Windows (or equivalent)   _*64bit OS users - Copy to 'C:\Windows' instead of '\system32'*_
   #  Install PyOpenGL by double clicking the .exe
-  #  Install GLEWpy by double clicking the .exe
   #  Install PyGame by double clicking the .exe
   #  Install Numpy by double clicking the .exe
   #  Install PIL by double clicking the .exe
@@ -101,7 +101,7 @@ Back to what we were initially trying:
   # *ONLY for FoFiX 3.025 or earlier* -- *REBOOT* _(required)_
   # Open a command prompt
   # cd to the new {{{src}}} directory in your FoFiX directory
-  # type {{{python FretsOnFire.py}}} (or run the {{{src\scripts\RunFofFromSources.bat}}} script)
+  # type {{{python FoFiX.py}}} (or run the {{{src\scripts\RunFofFromSources.bat}}} script)
 
 At this point you should be able to play frets on fire directly from the source.
 
@@ -122,7 +122,7 @@ To create the executable we need a few more steps:
 === Get latest FoFiX ===
   # Open a terminal
   # Change to the directory in which you want to have FoFiX
-  # Execute `svn checkout http://fofix.googlecode.com/svn/MFH-Mod/trunk/ FoFiX-SVN`
+  # Execute {{{svn checkout http://fofix.googlecode.com/svn/MFH-Mod/trunk/ FoFiX-SVN}}}
 === Install dependencies ===
 You need to install those packages:
   * python (tested with 2.4 and 2.5)
@@ -132,7 +132,7 @@ You need to install those packages:
   * python-numeric
   * python-imaging
   * python-pyogg
-  * python-pyvorbis (1.3)²
+  * python-pyvorbis²
   * python-pysqlite2
   * python-xml
 
@@ -140,11 +140,13 @@ Optionally, if you are in 32bit you can also install python-psyco.
 
 Notes:
   * ¹ python-opengl 3.x works okay but 2.x is still much faster.
-  * ² python-pyvorbis 1.4 crashes with a double free error (at least on Debian).
+  * ² Under Debian unstable, make sure you have python-pyvorbis 1.3 or 1.4-2 but not 1.4-1. The latter crashes with a double free error.
 
 === Running from sources ===
   # Change directory to `FoFiX-SVN/src`
-  # Execute `python FretsOnFire.py`
+  # Execute {{{python FoFiX.py}}}
+
+_(Note: Prior to r1450, 'FoFiX.py' was known as 'FretsOnFire.py')_
 
 === Creating binaries ===
 *Unless you want to distribute binaries of FoFiX this is really _not_ required.*
@@ -160,9 +162,9 @@ You first need to...
 Then either create a patch or a full package.
 
 ==== Patch ====
-  * Execute `make clean patch`.
+  * Execute {{{make clean patch}}}.
 ==== Full package ====
-  * Execute `make clean bindist`.
+  * Execute {{{make clean bindist}}}.
 
 === Optional PitchBending ===
 ==== Requirements ====
@@ -171,11 +173,11 @@ In order to build John Stumpo's pitchbend module you first need to install...
   * libsndobj-dev
 
 ==== Compiling ====
-  # Get the source code: `svn co https://svn.stump.jstump.com/svnroot/pitchbend/trunk pitchbend`
-  # Move to the source folder: `cd pitchbend`
-  # Create an empty VERSION file: `touch VERSION`
-  # Build the library: `python setup.py build`
-  # Optionally you can install it: `sudo python setup.py install`
+  # Get the source code: {{{svn co https://svn.stump.jstump.com/svnroot/pitchbend/trunk pitchbend}}}
+  # Move to the source folder: {{{cd pitchbend}}}
+  # Create an empty VERSION file: {{{touch VERSION}}}
+  # Build the library: {{{python setup.py build}}}
+  # Optionally you can install it: {{{sudo python setup.py install}}}
 
 ----
 ==For MacOS X==
@@ -183,9 +185,9 @@ In order to build John Stumpo's pitchbend module you first need to install...
   # Install [http://www.macports.org/ macports]
   # Open a terminal (Terminal.app)
   # Change to the directory in which you want to have FoFiX
-  # Execute `svn checkout http://fofix.googlecode.com/svn/MFH-Mod/trunk/ FoFiX-SVN`
+  # Execute {{{svn checkout http://fofix.googlecode.com/svn/MFH-Mod/trunk/ FoFiX-SVN}}}
 === Install dependencies ===
-You need to install these packages using macports (In a terminal, type `sudo port install [package]`, where `[package]` is the name of the required package to be installed):
+You need to install these packages using macports (In a terminal, type {{{sudo port install [package]}}}, where `[package]` is the name of the required package to be installed):
   * python25
   * py25-game
   * py25-numpy
@@ -206,8 +208,10 @@ Notes:
   * ² py25-opengl works okay but 2.x is still faster.
 
 === Running from sources ===
-  # Change directory to `FoFiX-SVN/src`
-  # Execute `python2.5 FretsOnFire.py`
+  # Change directory to {{{FoFiX-SVN/src}}}
+  # Execute {{{python2.5 FoFiX.py}}}
+
+_(Note: Prior to r1450, 'FoFiX.py' was known as 'FretsOnFire.py')_
 
 === Creating binaries ===
 *Unless you want to distribute binaries of FoFiX this is really _not_ required.*
@@ -215,7 +219,7 @@ Notes:
 You first need to...
   # Install py25-py2app-devel using macports
   # Change directory to `FoFiX-SVN/src`
-  # Execute `python2.5 setup_mac.py py2app`.
+  # Execute {{{python2.5 setup_mac.py py2app}}}.
 
 === Optional PitchBending ===
 ==== Requirements ====

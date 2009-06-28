@@ -31,6 +31,23 @@ Every so often, it is recommended that you quit the game completely and restart 
 *Update:* Windows users have a workaround option to handle the memory leak -- _[http://www.snapfiles.com/get/minimem.html MiniMem]_ can be set to automatically "optimize" memory usage and free leaked memory for {{{FretsOnFire.exe}}}
 
 ----
+===Audio Glitches===
+*Problem*: When I play FoFiX, all of the audio has static in it. 
+I get the noise with all audio from the game including songs.
+FoFiX is the only program for which I have this issue.
+
+*Solution*: Increase the Audio buffer size. Pick one of these two procedures.
+====Through the menus====
+  # Start FoFiX, select Options then Advanced Options
+  # You're back in the main menu, select Options, Audio Settings and then Advanced Audio Settings
+  # You should now see the Buffer Size value. Increase this value and restart FoFiX.
+
+====By editing your fofix.ini file====
+Increase the buffersize value located in the audio section.
+
+The possible values are: 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536.
+
+----
 
 ===Animated Stage Selection===
 Under "Theme Settings" there is a setting for "Animated Stage"

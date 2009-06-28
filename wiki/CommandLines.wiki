@@ -1,0 +1,23 @@
+#summary This is a list of all the command-line switches that are available for FoFiX.py
+#labels Phase-Deployment,Phase-QA
+
+= Usable Command-Line Switches =
+
+Add the following to the end when running FoFiX.
+||Switch|| What it does/controls.||
+||--verbose, -v||Verbose output.||
+||--debug,   -d||Write Debug file.||
+||--config=, -c (config file)||Use this instead of fofix.ini||
+||--fullscreen=, -f (true/false)||Change fullscreen settings in fofix.ini.||
+||--resolution=, -r (resolution)||Change game resolution at runtime.||
+||--song=,   -s (song dir)||Play a song from the commandline.||
+||--diff=,   -l (level of difficulty)||Use this difficulty level.||
+||--part=,   -p (part number)||Use this part.||
+||--mode=,   -m (game mode)||1P: 0-Quickplay, 1-Practice,     2-Career||
+||                         ||2P: 0-Face-off,  1-Pro Face-off, 2-Party mode.||
+||--nbrplayers=,-n (1 - 4)||Number of players (1 - 4).||
+||--theme,   -t (theme)||Starts using this theme. If the theme name contains spaces, it must be in quotation marks. (IE- -t "Guitar Hero III")||
+
+*Example*
+
+{{{python2.6 FoFiX.py --theme=RB2 --resolution=800x600 --fullscreen=False -d -v}}}

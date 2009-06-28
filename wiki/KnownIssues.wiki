@@ -18,15 +18,13 @@ To anyone who's having a problem with too many frames per second being rendered,
   * Options are sorted alphabetically; sometimes this is not desirable but this is the way it is.
   * Guitar solos require an unbroken streak to get a 100% - even if you overstrum and hit all the notes, your guitar solo will be forced down to 99.0%. I do not plan to change this; it's like this for a reason, and was tough enough to get working.
   * Browsing a folder with only 4 entries in song "list" mode results in the list jumping up and down - it has been this way for a long time - [http://www.fretsonfire.net/cgi-bin/ikonboard.cgi?act=ST&f=11&t=24664&st=4660#entry307107 detail post]
-  * Sometimes, the game will start with fonts displayed all incorrectly. It has been this way for a long time. Just exit and restart. *Fixed[?]*
   * Any image files (stages, backgrounds, etc) MUST have a lowercase ".png" extension - THE GAME CAN NOT HANDLE CAPITALIZED ".PNG" EXTENSIONS! *Likely Fixed*
   * While in the songlist, the game ignores keypresses while loading a song preview either via the yellow fret or auto preview (of course... just like the game ignores inputs while it's loading anything else)
   * PH3 career songs always say "Play to advance"? - [http://www.fretsonfire.net/forums/viewtopic.php?f=11&t=25040&st=0&sk=t&sd=a&start=705#p295165 post], [http://www.mediafire.com/?ygyynwyq22z log]
   * Sometimes Career songs in Career mode will still say "Play to Advance" instead of showing the number of times played. Only occurs with PH3 so same of above?
 
 ==About Double-pick problem on guitar controllers!==
-When strumming down, up, down, up, ... the game doesn't always register all the picks.
-Workaround (and brief explanation) for this double-pick problem exists in issue 165.  Actually this was solved several revisions ago, so it should no longer be a problem.
+This was fixed long ago. Please get a newer version of FoFiX.
 
 ==About Variable/Speed-dependent Hitwindow==
 Set the hitwindow to tight and tweak the A/V-Delay so it's right when you hit the notes when listening to the music. This is now easy with the new Accuracy indicator.
