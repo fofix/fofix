@@ -2,6 +2,52 @@
 
 = Old News =
 
+====Apr. 20th 2009 ====
+3.120 beta 1 (SVN r1352) released for testing. 
+There are tons of changes, hope you'll like it ;-)
+
+Here's a summary:
+  * Added experimental shaders support¹
+  * Added player profiles
+  * Added controller profiles
+  * Added support for GH:WT xbox360 guitar solo frets
+  * Added more themeable settings
+  * Added more options (e.g. enable/disable pause on lost focus)
+  * Fixed various game crash or freeze (BRE, neck selection, overdrive, etc.)
+  * Fixed face-off battle note streaks
+  * Fixed MacOS X paths for configuration files and logs
+  * Improved setlist
+  * Simplified 3D rendering
+  * Alot of other small and smaller fixes
+
+¹ Requires a videocard implementing OpenGL >= 2.0 and pyopengl 3.x.
+
+Find the detailed list of [http://code.google.com/p/fofix/issues/list?can=1&q=status%3Afixed%2Cverified%2Cdone+milestone%3Arelease-3.120 resolved issues here]
+
+Download the package that suits you:
+  * Recommended for performance:
+    * Full package for GNU/Linux 32bit with python 2.4 and pyopengl 2.x [http://www.usaupload.net/d/nadghtggwop from USAupload]
+    * Full package for GNU/Linux 64bit with python 2.4 and pyopengl 2.x [http://www.mediafire.com/?5bndentm8jc from Mediafire]
+    * Full package for MacOS X with python 2.5 and pyopengl 2.x [http://www.mediafire.com/?izktz2whmr0 from Mediafire] (*Updated on april 28th*)
+    * 3.100 Final to 3.120~beta1 Patch for Windows with python 2.4 and pyopengl 2.x [http://www.mediafire.com/download.php?mwyjnmz5dmj installer] or [http://www.mediafire.com/download.php?zmiojzmlccu archive] from Mediafire
+  * Generally slower but includes shaders support:
+    * Full package for GNU/Linux 32bit with python 2.5 and pyopengl 3.x [http://www.usaupload.net/d/meozbdkfodj from USAupload]
+    * Full package for GNU/Linux 64bit with python 2.5 and pyopengl 3.x [http://www.mediafire.com/?yit1zkyjkit from Mediafire]
+    * Full package for MacOS X with python 2.6 and pyopengl 3.x [http://www.mediafire.com/?gwanmititzk from Mediafire] (*Updated on april 26th*)
+    * 3.100 Final to 3.120~beta1 Patch for Windows with python 2.6 and pyopengl 3.x [http://www.mediafire.com/download.php?f4yy01gjyyk installer] or [http://www.mediafire.com/download.php?znujzymuyzh archive] from Mediafire
+
+====Feb. 21st 2009 ====
+3.100 Final (SVN r1075) has been released (12:30am PST)
+([http://code.google.com/p/fofix/issues/list?can=1&q=status%3Afixed%2Cverified%2Cdone+milestone%3Arelease-3.100 Issues resolved since 3.030]):
+
+  * Download 3.100 Full for Windows (Archive) [http://fofix.googlecode.com/files/FoFiX-3.100-Full-Win32.rar from GoogleCode] / [http://www.mediafire.com/?nojwzlmyzjg from Mediafire] / [http://rapidshare.com/files/200684438/FoFiX-3.100-Full-Win32.rar from Rapidshare]
+  * Download 3.100 Full for Windows (Installer) [http://www.mediafire.com/download.php?zqnwanyimzy from Mediafire]
+  * Download 3.0xx -> 3.100 Patch for Windows (Archive) [http://fofix.googlecode.com/files/FoFiX-3.100-PatchFrom3_0xx-Win32.rar from GoogleCode] / [http://www.mediafire.com/?mmzzhvijnw0 from Mediafire] / [http://rapidshare.com/files/200684439/FoFiX-3.100-PatchFrom3_0xx-Win32.rar from Rapidshare]
+  * Download 3.100~rc1 -> 3.100 Patch for Windows (Installer) [http://www.mediafire.com/download.php?mgmzdn00y2c from Mediafire]
+  * Download 3.100 Full for GNU/Linux 32bit [http://fofix.googlecode.com/files/FoFiX-3.100-Full-GNULinux-32bit.tar.bz2 from GoogleCode]
+  * Download 3.100 Full for GNU/Linux 64bit [http://fofix.googlecode.com/files/FoFiX-3.100-Full-GNULinux-64bit.tar.bz2 from GoogleCode]
+  * Download 3.100 Full for MacOS X [http://fofix.googlecode.com/files/FoFiX-3.100-Full-MacOSX-Universal.zip from GoogleCode] / [http://www.mediafire.com/?3qmrzkojb53 from Mediafire]
+
 ====Feb. 8th 2009 ====
 3.100 Release Candidate 1 (SVN r1017) has been released for testing.  
 
