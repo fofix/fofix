@@ -843,7 +843,6 @@ class SettingsMenu(Menu.Menu):
     self.themeDisplaySettings = [
       ConfigChoice(self.engine, self.engine.config, "game", "rb_sp_neck_glow", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "game",   "small_rb_mult", autoApply = True), #blazingamer
-      ConfigChoice(self.engine, self.engine.config, "game", "rbnote", autoApply = True), #racer
       ConfigChoice(self.engine, self.engine.config, "game", "starfx", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "performance", "starspin", autoApply = True, isQuickset = 1),
     ]

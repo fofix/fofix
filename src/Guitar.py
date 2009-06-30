@@ -376,9 +376,6 @@ class Guitar:
         self.hitglow2Drawing = None
         self.hitFlamesPresent = False   #MFH - shut down all flames if these are missing.
       self.Hitanim = False
-      
-    #racer: added RB beta frets option:
-    self.rbnote = self.engine.config.get("game", "rbnote")
     
     #myfingershurt:
     self.bassGrooveNeckMode = self.engine.config.get("game", "bass_groove_neck")
@@ -407,12 +404,6 @@ class Guitar:
           except IOError:
             self.starspin = False
             engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notes.png"))
-      elif self.rbnote == 1 and self.theme == 2:
-        try:
-          engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notesbeta.png"))
-        except IOError:
-          engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notes.png"))
-          self.rbnote = 0
       else:
         if self.gameMode2p == 6:
           try:
@@ -457,18 +448,7 @@ class Guitar:
         self.battleFrets = None
 
     if self.twoDkeys == True:
-      if self.theme == 2:  
-        if self.rbnote == 1:
-          #mfh - adding fallback for beta option
-          try:
-            engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"fretbuttonsbeta.png"))
-          except IOError:
-            engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"fretbuttons.png"))
-            self.rbnote = 0
-        else:
-          engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"fretbuttons.png"))
-      else:   #not RB theme
-        engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"fretbuttons.png"))
+      engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"fretbuttons.png"))
     else:
       #MFH - can't use IOError for fallback logic for a Mesh() call... 
       if self.engine.fileExists(os.path.join("themes", themename, "key.dae")):

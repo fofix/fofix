@@ -259,7 +259,7 @@ Config.define("log",   "log_tempo_events",          int, 0,    text = _("Log Tem
 
 
 #racer
-Config.define("game", "rbnote",      int,   0,   text = _("RB Graphic Mode"),    options = {0: _("Regular"), 1: _("Beta")}) #racer
+#Config.define("game", "rbnote",      int,   0,   text = _("RB Graphic Mode"),    options = {0: _("Regular"), 1: _("Beta")}) #racer
 Config.define("game", "beat_claps",          bool, False,  text = _("Practice Beat Claps"), options = {False: _("Off"), True: _("On")}) #racer
 #Fixed invalid ini error finally!!!
 Config.define("game", "board_speed",      int,   0) #racer

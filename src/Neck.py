@@ -146,11 +146,6 @@ class Neck:
     self.lastBpmChange  = -1.0
     self.baseBeat       = 0.0
 
-
-
-    #racer: added RB beta frets option:
-    self.rbnote = self.engine.config.get("game", "rbnote")
-
     #myfingershurt:
     self.bassGrooveNeckMode = self.engine.config.get("game", "bass_groove_neck")
     self.guitarSoloNeckMode = self.engine.config.get("game", "guitar_solo_neck")
@@ -196,84 +191,55 @@ class Neck:
 
 
     if self.theme == 2:
-      if self.rbnote == 1:
-        #mfh - adding fallback for beta option
+      if self.isDrum == True:
         try:
-          engine.loadImgDrawing(self, "oSideBars", os.path.join("themes",themename,"overdrive side_barsbeta.png"),  textureSize = (256, 256))
-          engine.loadImgDrawing(self, "oCenterLines", os.path.join("themes",themename,"overdrive center_linesbeta.png"),  textureSize = (256, 256))
-          engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneckbeta.png"),  textureSize = (256, 256))
+          engine.loadImgDrawing(self, "oSideBars", os.path.join("themes",themename,"drum_overdrive_side_bars.png"),  textureSize = (256, 256))
         except IOError:
-          try:
-            engine.loadImgDrawing(self, "oSideBars", os.path.join("themes",themename,"overdrive side_bars.png"),  textureSize = (256, 256))
-          except IOError:
-            self.oSideBars = None
-          try:
-            engine.loadImgDrawing(self, "oCenterLines", os.path.join("themes",themename,"overdrive center_lines.png"),  textureSize = (256, 256))
-          except IOError:
-            self.oCenterLines = None
+          self.oSideBars = None
+  
+        try:
+          engine.loadImgDrawing(self, "oCenterLines", os.path.join("themes",themename,"drum_overdrive_center_lines.png"))
+        except IOError:
+          #engine.loadImgDrawing(self, "centerLines", os.path.join("themes",themename,"center_lines.png"))
+          self.oCenterLines = None
+
+      
+        #myfingershurt: the overdrive neck file should be in the theme folder... and also not required:
+        try:
+          engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck_drum.png"),  textureSize = (256, 256))
+        except IOError:
           try:
             engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
           except IOError:
             self.oNeck = None
+
+      else:
+        try:
+          engine.loadImgDrawing(self, "oSideBars", os.path.join("themes",themename,"overdrive side_bars.png"),  textureSize = (256, 256))
+        except IOError:
+          self.oSideBars = None
+        try:
+          engine.loadImgDrawing(self, "oCenterLines", os.path.join("themes",themename,"overdrive center_lines.png"),  textureSize = (256, 256))
+        except IOError:
+          self.oCenterLines = None
+        if self.isBassGuitar == True:
           try:
-            engine.loadImgDrawing(self, "oNeckBass", os.path.join("themes",themename,"overdriveneck_bass.png"),  textureSize = (256, 256))
+            engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck_bass.png"),  textureSize = (256, 256))
           except IOError:
             try:
-              engine.loadImgDrawing(self, "oNeckBass", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
+              engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
             except IOError:
               self.oNeckBass = None
-          self.rbnote = 0
-      else:
-        if self.isDrum == True:
-          try:
-            engine.loadImgDrawing(self, "oSideBars", os.path.join("themes",themename,"drum_overdrive_side_bars.png"),  textureSize = (256, 256))
-          except IOError:
-            self.oSideBars = None
-  
-          try:
-            engine.loadImgDrawing(self, "oCenterLines", os.path.join("themes",themename,"drum_overdrive_center_lines.png"))
-          except IOError:
-          #engine.loadImgDrawing(self, "centerLines", os.path.join("themes",themename,"center_lines.png"))
-            self.oCenterLines = None
-
-      
-          #myfingershurt: the overdrive neck file should be in the theme folder... and also not required:
-          try:
-            engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck_drum.png"),  textureSize = (256, 256))
-          except IOError:
-            try:
-              engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
-            except IOError:
-              self.oNeck = None
-
-
         else:
           try:
-            engine.loadImgDrawing(self, "oSideBars", os.path.join("themes",themename,"overdrive side_bars.png"),  textureSize = (256, 256))
+            engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
           except IOError:
-            self.oSideBars = None
-          try:
-            engine.loadImgDrawing(self, "oCenterLines", os.path.join("themes",themename,"overdrive center_lines.png"),  textureSize = (256, 256))
-          except IOError:
-            self.oCenterLines = None
-          if self.isBassGuitar == True:
-            try:
-              engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck_bass.png"),  textureSize = (256, 256))
-            except IOError:
-              try:
-                engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
-              except IOError:
-                self.oNeckBass = None
-          else:
-            try:
-              engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
-            except IOError:
-              self.oNeck = None
+            self.oNeck = None
           
-        try:
-          engine.loadImgDrawing(self, "oNeckovr", os.path.join("themes",themename,"overdriveneckovr.png"),  textureSize = (256, 256))
-        except IOError:
-          self.oNeckovr = None
+      try:
+        engine.loadImgDrawing(self, "oNeckovr", os.path.join("themes",themename,"overdriveneckovr.png"),  textureSize = (256, 256))
+      except IOError:
+        self.oNeckovr = None
 
       #MFH: support for optional overdrive_string_flash.png
       self.overdriveFlashCounts = self.indexFps/4   #how many cycles to display the oFlash: self.indexFps/2 = 1/2 second
@@ -386,32 +352,19 @@ class Neck:
     self.paused = False
 
   def updateBoardSettings(self):
-    if self.paused != self.part.paused:
-      self.paused = self.part.paused
-    if self.canGuitarSolo != self.part.canGuitarSolo:
-      self.canGuitarSolo = self.part.canGuitarSolo
-    if self.guitarSolo != self.part.guitarSolo:
-      self.guitarSolo = self.part.guitarSolo
-    if self.overdriveFlashCount != self.part.overdriveFlashCount:
-      self.overdriveFlashCount = self.part.overdriveFlashCount
-    if self.ocount != self.part.ocount:
-      self.ocount = self.part.ocount
-    if self.coOpFailed != self.part.coOpFailed:
-      self.coOpFailed = self.part.coOpFailed
-    if self.coOpRestart != self.part.coOpRestart:
-      self.coOpRestart = self.part.coOpRestart
-    if self.starPowerActive != self.part.starPowerActive:
-      self.starPowerActive = self.part.starPowerActive
-    if self.scoreMultiplier != self.part.scoreMultiplier:
-      self.scoreMultiplier = self.part.scoreMultiplier
-    if self.currentBpm != self.part.currentBpm:
-      self.currentBpm = self.part.currentBpm
-    if self.currentPeriod != self.part.currentPeriod:
-      self.currentPeriod = self.part.currentPeriod
-    if self.lastBpmChange != self.part.lastBpmChange:
-      self.lastBpmChange = self.part.lastBpmChange
-    if self.baseBeat != self.part.baseBeat:
-      self.baseBeat = self.part.baseBeat
+    self.paused = self.part.paused
+    self.canGuitarSolo = self.part.canGuitarSolo
+    self.guitarSolo = self.part.guitarSolo
+    self.overdriveFlashCount = self.part.overdriveFlashCount
+    self.ocount = self.part.ocount
+    self.coOpFailed = self.part.coOpFailed
+    self.coOpRestart = self.part.coOpRestart
+    self.starPowerActive = self.part.starPowerActive
+    self.scoreMultiplier = self.part.scoreMultiplier
+    self.currentBpm = self.part.currentBpm
+    self.currentPeriod = self.part.currentPeriod
+    self.lastBpmChange = self.part.lastBpmChange
+    self.baseBeat = self.part.baseBeat
 
     if self.isFailing == True:
       if self.failcount <= 1 and self.failcount2 == False:
