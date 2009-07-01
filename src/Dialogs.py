@@ -4775,6 +4775,7 @@ class ControlActivator(Layer, KeyListener):
         self.playerNum = 0
         self.engine.view.popLayer(self)
         self.engine.input.removeKeyListener(self)
+      return True
     elif c in Player.ups + Player.rights or key == pygame.K_UP or key == pygame.K_RIGHT:
       self.engine.data.selectSound.play()
       self.selectedIndex -= 1
