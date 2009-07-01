@@ -246,7 +246,6 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     songHopoFreq    = self.playerList[0].hopoFreq
     hopoFreqCheat   = self.engine.config.get("coffee", "hopo_freq_cheat")
     noteHitWindow   = self.engine.config.get("game", "note_hit_window")
-    hitWindowCheat  = self.engine.config.get("game", "hit_window_cheat")
     try:
       songHopoFreq  = abs(int(songHopoFreq))
     except Exception, e:
@@ -267,13 +266,13 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     elif self.hopoFreq == 3:
       self.hopoFreq = _("Most")
     
-    if hitWindowCheat == 1:
+    if noteHitWindow == 0:
       self.hitWindow = _("Widest")
-    elif hitWindowCheat == 2:
-      self.hitWindow = _("Wide")
-    elif noteHitWindow == 2:
-      self.hitWindow = _("Tightest")
     elif noteHitWindow == 1:
+      self.hitWindow = _("Wide")
+    elif noteHitWindow == 4:
+      self.hitWindow = _("Tightest")
+    elif noteHitWindow == 3:
       self.hitWindow = _("Tight")
     else:
       self.hitWindow = _("Standard")

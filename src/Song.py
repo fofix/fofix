@@ -745,6 +745,9 @@ class SongInfo(object):
 
   def getDiffBass(self):
     return self._get("diff_bass", int, -1)     
+  
+  def getDiffVocals(self):
+    return self._get("diff_vocals", int, -1)
 
   def getYear(self):
     return self._get("year")
@@ -786,6 +789,9 @@ class SongInfo(object):
 
   def setDiffBass(self, value):
     self._set("diff_bass", value)       
+  
+  def setDiffVocals(self, value):
+    self._set("diff_vocals", value)
 
   def setYear(self, value):
     self._set("year", value)
@@ -1066,6 +1072,7 @@ class SongInfo(object):
   diffGuitar   = property(getDiffGuitar, setDiffGuitar)
   diffBass     = property(getDiffBass, setDiffBass)
   diffDrums    = property(getDiffDrums, setDiffDrums)
+  diffVocals   = property(getDiffVocals, setDiffVocals)
   #boss battles
   bossBattle   = property(getBossBattle, setBossBattle)
   #May no longer be necessary
@@ -1749,7 +1756,6 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
     self.chordFudge = 1
 
     self.hopoTick = engine.config.get("coffee", "hopo_frequency")
-    self.hopoTickCheat = engine.config.get("coffee", "hopo_freq_cheat")
     self.songHopoFreq = engine.config.get("game", "song_hopo_freq")
     self.logTempoEvents = engine.config.get("log",   "log_tempo_events")
 
@@ -1760,6 +1766,10 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
         if self.logTempoEvents == 1:
           Log.debug("Tempo event removed from NoteTrack during cleanup: " + str(event.bpm) + "bpm")
 
+  def flipDrums(self):
+    for time, event in self.allEvents:
+      if isinstance(event, Note):
+        event.number = (5-event.number)%5
 
   def markHopoRF(self, EighthNH, songHopoFreq):
     lastTick = 0
@@ -1792,14 +1802,13 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
       ticksPerBeat = 720
     elif self.hopoTick == 2:
       ticksPerBeat = 480
+    elif self.hopoTick == 3:
+      ticksPerBeat = 360
+    elif self.hopoTick == 4:
+      ticksPerBeat = 240
     else:
       ticksPerBeat = 240
       hopoDelta = 250
-      
-    if self.hopoTickCheat == 1:
-      ticksPerBeat = 360
-    elif self.hopoTickCheat == 2:
-      ticksPerBeat = 240
       
     hopoNotes = []
     chordNotes = []
@@ -2033,14 +2042,15 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
       ticksPerBeat = 720
     elif self.hopoTick == 2:
       ticksPerBeat = 480
+    elif self.hopoTick == 3:
+      ticksPerBeat = 360
+    elif self.hopoTick == 4:
+      ticksPerBeat = 240
     else:
       ticksPerBeat = 240
       hopoDelta = 250
       
-    if self.hopoTickCheat == 1:
-      ticksPerBeat = 360
-    elif self.hopoTickCheat == 2:
-      ticksPerBeat = 240
+
       
     hopoNotes = []
 

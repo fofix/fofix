@@ -153,6 +153,7 @@ class Guitar:
     self.time           = 0.0
     self.pickStartPos   = 0
     self.leftyMode      = False
+    self.drumFlip       = False
     
     self.battleSuddenDeath  = False
     self.battleObjectsEnabled = []
@@ -264,19 +265,17 @@ class Guitar:
 
     self.hitw = self.engine.config.get("game", "note_hit_window")  #this should be global, not retrieved every BPM change.
     if self.hitw == 0: 
-      self.hitw = 1.2
+      self.hitw = 2.3
     elif self.hitw == 1: 
       self.hitw = 1.9
     elif self.hitw == 2: 
-      self.hitw = 2.3
+      self.hitw = 1.2
+    elif self.hitw == 3:  
+      self.hitw = 1.0
+    elif self.hitw == 4:  
+      self.hitw = 0.70
     else:
       self.hitw = 1.2
-    
-    self.hitwcheat = self.engine.config.get("game", "hit_window_cheat")
-    if self.hitwcheat == 1:   
-      self.hitw = 0.70
-    elif self.hitwcheat == 2: 
-      self.hitw = 1.0
     
     self.twoChord       = 0
     self.twoChordApply  = False

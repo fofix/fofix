@@ -4628,6 +4628,8 @@ class ControlActivator(Layer, KeyListener):
         self.controls[i] = _("Default Guitar")
       elif control == "defaultd":
         self.controls[i] = _("Default Drums")
+      elif control == "defaultm":
+        self.controls[i] = _("Default Microphone")
     
     themename = self.engine.data.themeLabel
 

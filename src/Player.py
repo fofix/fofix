@@ -35,6 +35,34 @@ from Language import _
 #import Dialogs
 import Microphone  #stump
 
+class ConfigOption:
+  def __init__(self, id, text):
+    self.id   = id
+    self.text = text
+  
+  def __str__(self):
+    return self.text
+  
+  def __repr__(self):
+    return self.text
+  
+  def __cmp__(self, other):
+    try:
+      if self.id > other.id:
+        return 1
+      elif self.id == other.id:
+        return 0
+      else:
+        return -1
+    except:
+      return -1
+
+def sortOptionsByKey(dict):
+  a = {}
+  for k in dict.keys():
+    a[k] = ConfigOption(k, dict[k])
+  return a
+
 #stump: turns out the sqlite3 module didn't appear until Python 2.5...
 try:
   import sqlite3
@@ -150,7 +178,7 @@ player3 = []
 playerkeys = []
 
 # define configuration keys
-Config.define("controller", "name",          str)
+Config.define("controller", "name",          str, tipText = _("Name your controller."))
 Config.define("controller", "key_left",      str, "K_LEFT",     text = _("Move left"))
 Config.define("controller", "key_right",     str, "K_RIGHT",    text = _("Move right"))
 Config.define("controller", "key_up",        str, "K_UP",       text = _("Move up"))
@@ -171,18 +199,18 @@ Config.define("controller", "key_cancel",    str, "K_ESCAPE",   text = _("Cancel
 Config.define("controller", "key_star",      str, "K_PAGEDOWN", text = _("StarPower"))
 Config.define("controller", "key_kill",      str, "K_PAGEUP",   text = _("Whammy"))
 Config.define("controller", "key_start",     str, "K_SPACE",    text = _("Start"))
-Config.define("controller", "two_chord_max", int, 0,            text = _("Two-Chord Max"),   options = {0: _("Off"), 1: _("On")})
-Config.define("controller", "type",          int, 0,            text = _("Controller Type"), options = {0: _("Standard Guitar"), 1: _("Solo Shift Guitar"), 2: _("Drum Set (4-Drum)"), 4: _("Analog Slide Guitar"), 5: _("Microphone")}) #, 3: _("Drum Set (3-Drum 2-Cymbal)")
-Config.define("controller", "analog_sp",     int, 0,            text = _("Analog SP"),       options = {0: _("Disabled"), 1: _("Enabled")})
-Config.define("controller", "analog_sp_threshold",   int, 60,   text = _("Analog SP Threshold"), options = dict([(n, n) for n in range(10, 101, 10)]))
-Config.define("controller", "analog_sp_sensitivity", int, 4,    text = _("Analog SP Sensitivity"), options = dict([(n, n+1) for n in range(10)]))
-Config.define("controller", "analog_drum",   int, 0,            text = _("Analog Drums"),    options = {0: _("Disabled"), 1: _("PS2/PS3/Wii"), 2: _("XBOX"), 3: _("XBOX Inv.")})
-Config.define("controller", "analog_slide",  int, 0,            text = _("Analog Slider"),    options = {0: _("Default"), 1: _("Inverted")})
-Config.define("controller", "analog_kill",   int, 0,            text = _("Analog Effects"),  options = {0: _("Disabled"), 1: _("PS2/PS3/Wii"), 2: _("XBOX"), 3: _("XBOX Inv.")})
+Config.define("controller", "two_chord_max", int, 0,            text = _("Two-Chord Max"),   options = {0: _("Off"), 1: _("On")}, tipText = _("When enabled, the highest notes in large note chords are auto-played."))
+Config.define("controller", "type",          int, 0,            text = _("Controller Type"), options = sortOptionsByKey({0: _("Standard Guitar"), 1: _("Solo Shift Guitar"), 2: _("Drum Set (4-Drum)"), 4: _("Analog Slide Guitar"), 5: _("Microphone")}), tipText = _("'Standard Guitar' is for keyboards and pre-WT GH-series guitars. 'Solo Shift Guitar' is for RB-series guitars and keyboards who want to use a shift key for solo frets. 'Analog Slide Guitar' is for guitars with an analog slider bar.")) #, 3: _("Drum Set (3-Drum 2-Cymbal)")
+Config.define("controller", "analog_sp",     int, 0,            text = _("Analog SP"),       options = {0: _("Disabled"), 1: _("Enabled")}, tipText = _("Enables analog SP (as in the XBOX Xplorer controller.)"))
+Config.define("controller", "analog_sp_threshold",   int, 60,   text = _("Analog SP Threshold"), options = dict([(n, n) for n in range(10, 101, 10)]), tipText = _("Sets a threshold level for activating SP in analog mode."))
+Config.define("controller", "analog_sp_sensitivity", int, 4,    text = _("Analog SP Sensitivity"), options = dict([(n, n+1) for n in range(10)]), tipText = _("Sets the sensitivity for activating SP in analog mode."))
+Config.define("controller", "analog_drum",   int, 0,            text = _("Analog Drums"),    options = {0: _("Disabled"), 1: _("PS2/PS3/Wii"), 2: _("XBOX"), 3: _("XBOX Inv.")}, tipText = _("Enables analog drums as in RB2 and GH drumsets."))
+Config.define("controller", "analog_slide",  int, 0,            text = _("Analog Slider"),    options = {0: _("Default"), 1: _("Inverted")}, tipText = _("Experimental testing for the analog slide mode."))
+Config.define("controller", "analog_kill",   int, 0,            text = _("Analog Effects"),  options = {0: _("Disabled"), 1: _("PS2/PS3/Wii"), 2: _("XBOX"), 3: _("XBOX Inv.")}, tipText = _("Enables analog whammy bar. Set to the system your controller was designed for."))
 Config.define("controller", "analog_fx",     int, 0,            text = _("Sound FX Switch"), options = {0: _("Switch"), 1: _("Cycle")}) #akedrou - aren't I bold!
 Config.define("controller", "mic_device",    int, -1,           text = _("Microphone Device"), options = Microphone.getAvailableMics()) #stump
-Config.define("controller", "mic_tap_sensitivity", int, 5,      text = _("Tap Sensitivity"), options=dict((n, n) for n in range(1, 21))) #stump
-Config.define("controller", "mic_passthrough_volume", float, 0.0, text = _("Passthrough Volume"), options=dict((n / 100.0, n) for n in range(101))) #stump
+Config.define("controller", "mic_tap_sensitivity", int, 5,      text = _("Tap Sensitivity"), options=dict((n, n) for n in range(1, 21)), tipText = _("Sets how sensitive the microphone is to being tapped.")) #stump
+Config.define("controller", "mic_passthrough_volume", float, 0.0, text = _("Passthrough Volume"), options=dict((n / 100.0, n) for n in range(101)), tipText = _("Sets how loud you hear yourself singing.")) #stump
 
 Config.define("player", "name",          str,  "")
 Config.define("player", "difficulty",    int,  Song.MED_DIF)
@@ -409,14 +437,16 @@ def loadControls():
   if Microphone.supported:
     controllerDict["defaultm"] = _("Default Microphone")
     defMic = "defaultm"
-
-  Config.define("game", "control0",           str,   "defaultg", text = _("Controller 1"),                options = controllerDict)
+  tsControl    = _("Controller %d")
+  tsControlTip = _("Select the controller for slot %d")
+  i = 1
+  Config.define("game", "control0",           str,   "defaultg", text = tsControl % 1,                options = controllerDict, tipText = tsControlTip % 1)
   
   controllerDict["None"] = None
   
-  Config.define("game", "control1",           str,   "defaultd", text = _("Controller 2"),                options = controllerDict)
-  Config.define("game", "control2",           str,   defMic,     text = _("Controller 3"),                options = controllerDict)
-  Config.define("game", "control3",           str,   None,       text = _("Controller 4"),                options = controllerDict)
+  Config.define("game", "control1",           str,   "defaultd", text = tsControl % 2,                options = controllerDict, tipText = tsControlTip % 2)
+  Config.define("game", "control2",           str,   defMic,     text = tsControl % 3,                options = controllerDict, tipText = tsControlTip % 3)
+  Config.define("game", "control3",           str,   None,       text = tsControl % 4,                options = controllerDict, tipText = tsControlTip % 4)
 
 
 def deleteControl(control):

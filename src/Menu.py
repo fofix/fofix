@@ -37,7 +37,7 @@ import Player
 import Log
 
 class Choice:
-  def __init__(self, text, callback, name = None, values = None, valueIndex = 0, append_submenu_char = True):
+  def __init__(self, text, callback, name = None, values = None, valueIndex = 0, append_submenu_char = True, tipText = None):
     #Log.debug("Choice class init (Menu.py)...")
     self.text       = unicode(text)
     self.callback   = callback
@@ -45,6 +45,7 @@ class Choice:
     self.values     = values
     self.valueIndex = valueIndex
     self.append_submenu_char = append_submenu_char
+    self.tipText    = tipText
 
     if self.text.endswith(" >"):
       self.text = text[:-2]
@@ -90,7 +91,7 @@ class Choice:
       return "%s: %s" % (self.text, self.values[self.valueIndex])
           
 class Menu(Layer, KeyListener):
-  def __init__(self, engine, choices, name = None, onClose = None, onCancel = None, pos = (.2, .66 - .35), viewSize = 6, fadeScreen = False, font = "font", mainMenu = None, textColor = None, selectedColor = None, append_submenu_char = True, selectedIndex = None, selectedBox = False):
+  def __init__(self, engine, choices, name = None, onClose = None, onCancel = None, pos = (.2, .66 - .35), viewSize = 6, fadeScreen = False, font = "font", mainMenu = None, textColor = None, selectedColor = None, append_submenu_char = True, selectedIndex = None, showTips = True, selectedBox = False):
     self.engine       = engine
 
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
@@ -124,6 +125,7 @@ class Menu(Layer, KeyListener):
 
     self.textColor = textColor
     self.selectedColor = selectedColor
+    self.tipColor = Theme.menuTipTextColor
 
     #self.sfxVolume    = self.engine.config.get("audio", "SFX_volume")
     self.drumNav = self.engine.config.get("game", "drum_navigation")  #MFH
@@ -192,9 +194,30 @@ class Menu(Layer, KeyListener):
     self.pos          = pos
     self.viewSize     = viewSize
     self.fadeScreen   = fadeScreen
-    self.font = font
+    self.font         = font
+    if self.font == "font":
+      self.font = self.engine.data.font
+    self.tipFont = Theme.menuTipTextFont
+    if self.tipFont == "None":
+      self.tipFont = self.font
+    else:
+      self.tipFont = self.engine.data.fontDict[self.tipFont]
     self.active = False
     self.mainMenu = mainMenu
+    
+    self.showTips = showTips
+    if self.showTips:
+      self.showTips = Theme.menuTipTextDisplay
+    self.tipDelay = 700
+    self.tipTimerEnabled = False
+    self.tipScroll = 0
+    self.tipScrollB = None
+    self.tipScrollSpace = Theme.menuTipTextScrollSpace
+    self.tipScale = Theme.menuTipTextScale
+    self.tipDir = 0
+    self.tipSize = 0
+    self.tipY = Theme.menuTipTextY
+    self.tipScrollMode = Theme.menuTipTextScrollMode # - 0 for constant scroll; 1 for back and forth
     
     for c in choices:
       try:
@@ -206,9 +229,20 @@ class Menu(Layer, KeyListener):
             c = Choice(text[0], callback, values = text[2], valueIndex = text[1], append_submenu_char = append_submenu_char)
         else:
           c = Choice(text, callback, append_submenu_char = append_submenu_char)
+      except ValueError:
+        text, callback, tipText = c
+        if isinstance(text, tuple):
+          if len(text) == 2: # a submenu's name
+            c = Choice(text[0], callback, name = text[1], append_submenu_char = append_submenu_char, tipText = tipText)
+          else: # Dialogs menus - FileChooser, NeckChooser, ItemChooser - this last to be changed soon
+            c = Choice(text[0], callback, values = text[2], valueIndex = text[1], append_submenu_char = append_submenu_char, tipText = tipText)
+        else:
+          c = Choice(text, callback, append_submenu_char = append_submenu_char, tipText = tipText)
       except TypeError:
         pass
       self.choices.append(c)
+    
+    self.setTipScroll()
       
   def selectItem(self, index):
     self.currentIndex = index
@@ -222,6 +256,7 @@ class Menu(Layer, KeyListener):
       self.onClose()
 
   def updateSelection(self):
+    self.setTipScroll()
     if self.currentIndex > self.viewOffset + self.viewSize - 1:
       self.viewOffset = self.currentIndex - self.viewSize + 1
     if self.currentIndex < self.viewOffset:
@@ -289,6 +324,29 @@ class Menu(Layer, KeyListener):
       if self.delay <= 0 and self.rate >= self.engine.scrollRate:
         self.rate = 0
         self.scroller[self.scrolling]()
+    if self.tipTimerEnabled:
+      if self.tipDelay > 0:
+        self.tipDelay -= ticks
+        if self.tipDelay <= 0:
+          self.tipDelay = 0
+          self.tipDir = (self.tipDir+1)&1
+      elif self.tipDir == 1 and self.tipScrollMode == 1:
+        self.tipScroll -= ticks/8000.0
+        if self.tipScroll < -(self.tipSize-.98):
+          self.tipScroll = -(self.tipSize-.98)
+          self.tipDelay = 900
+      elif self.tipDir == 0 and self.tipScrollMode == 1:
+        self.tipScroll += ticks/8000.0
+        if self.tipScroll > .02:
+          self.tipScroll = .02
+          self.tipDelay = 900
+      elif self.tipScrollMode == 0:
+        self.tipScroll  -= ticks/8000.0
+        self.tipScrollB -= ticks/8000.0
+        if self.tipScroll < -(self.tipSize):
+          self.tipScroll = self.tipScrollB + self.tipSize + self.tipScrollSpace
+        if self.tipScrollB < -(self.tipSize):
+          self.tipScrollB = self.tipScroll + self.tipSize + self.tipScrollSpace
 
   def renderTriangle(self, up = (0, 1), s = .2):
     left = (-up[1], up[0])
@@ -297,6 +355,25 @@ class Menu(Layer, KeyListener):
     glVertex2f((-up[0] + left[0]) * s, (-up[1] + left[1]) * s)
     glVertex2f((-up[0] - left[0]) * s, (-up[1] - left[1]) * s)
     glEnd()
+  
+  def setTipScroll(self):
+    if self.choices[self.currentIndex].tipText is None:
+      return
+    tipW, tipH = self.tipFont.getStringSize(self.choices[self.currentIndex].tipText, self.tipScale)
+    if tipW > .99:
+      self.tipSize = tipW
+      self.tipDelay = 1000
+      self.tipTimerEnabled = True
+      self.tipScroll = 0.02
+      self.tipScrollB = 0.02 + self.tipSize + self.tipScrollSpace
+      self.tipWait = False
+      self.tipDir = 0
+    else:
+      self.tipScroll = .5 - tipW/2
+      self.tipScrollB = None
+      self.tipTimerEnabled = False
+      self.tipDir = 0
+      self.tipSize = tipW
   
   def render(self, visibility, topMost):
     #MFH - display version in any menu:
@@ -315,10 +392,9 @@ class Menu(Layer, KeyListener):
     try:
       v = (1 - visibility) ** 2
       # Default to this font if none was specified
-      if self.font == "font":
-        font = self.engine.data.font
-      else:
-        font = self.font
+
+      font = self.font
+      tipFont = self.tipFont
 
       if self.fadeScreen:
         Dialogs.fadeScreen(v)
@@ -374,6 +450,21 @@ class Menu(Layer, KeyListener):
             glPopMatrix()
 
           if i + self.viewOffset == self.currentIndex:
+            if choice.tipText and self.showTips:
+              if self.tipColor:
+                c1, c2, c3 = self.tipColor
+                glColor3f(c1,c2,c3)
+              elif self.textColor:
+                c1, c2, c3 = self.textColor
+                glColor3f(c1,c2,c3)
+              else:
+                Theme.setBaseColor(1-v)
+              tipScale = self.tipScale
+              if self.tipScroll > -(self.tipSize) and self.tipScroll < 1:
+                tipFont.render(choice.tipText, (self.tipScroll, self.tipY), scale = tipScale)
+              if self.tipScrollMode == 0:
+                if self.tipScrollB > -(self.tipSize) and self.tipScrollB < 1:
+                  tipFont.render(choice.tipText, (self.tipScrollB, self.tipY), scale = tipScale)
             a = (math.sin(self.time) * .15 + .75) * (1 - v * 2)
             Theme.setSelectedColor(a)
             a *= -.005

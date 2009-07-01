@@ -57,4 +57,4 @@ if language:
 langOptions = {"": "English"}
 for lang in getAvailableLanguages():
   langOptions[lang] = _(lang)
-Config.define("game", "language", str, "", _("Language"), langOptions)
+Config.define("game", "language", str, "", _("Language"), langOptions, tipText = _("Change the game language!"))
