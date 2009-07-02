@@ -1009,14 +1009,14 @@ class SongInfo(object):
   # This takes True or False, not the value in the ini
   def setCompleted(self, value):
     if value:
-      self._set("unlock_completed", len(self.name) * len(self.artist) + 1)
+      self._set("unlock_completed", len(removeSongOrderPrefixFromName(self.name)) * len(self.artist) + 1)
     else:
       self._set("unlock_completed", 0)
     
   # This returns True or False, not the value in the ini
   def getCompleted(self):
     iniValue = self._get("unlock_completed", int, default = 0)
-    if iniValue == len(self.name) * len(self.artist) + 1: # yay, security through obscurity!
+    if iniValue == len(removeSongOrderPrefixFromName(self.name)) * len(self.artist) + 1: # yay, security through obscurity!
       return True
     else:
       return False
