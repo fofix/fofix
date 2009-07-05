@@ -560,15 +560,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.tsAccEarly = _("Early")
     self.tsAccVeryEarly = _("Very Early")
     self.msLabel = _("ms")
-    #self.tsSolo = _("Guitar Solo!")
     self.tsSolo = _("Solo!")
-    self.tsPerfectSolo = _("Perfect")
-    self.tsAwesomeSolo = _("Awesome")
-    self.tsGreatSolo = _("Great")
-    self.tsGoodSolo = _("Good")
-    self.tsSolidSolo = _("Solid")
-    self.tsOkaySolo = _("Okay")
-    self.tsMessySolo = _("Messy")
+    self.tsPerfectSolo = _("Perfect Solo!")
+    self.tsAwesomeSolo = _("Awesome Solo!")
+    self.tsGreatSolo = _("Great Solo!")
+    self.tsGoodSolo = _("Good Solo!")
+    self.tsSolidSolo = _("Solid Solo!")
+    self.tsOkaySolo = _("Okay Solo")
+    self.tsMessySolo = _("Messy Solo")
     self.tsPtsLabel = _("pts")
     self.tsGetReady = _("Get Ready to Rock")
     self.tsAsMadeFamousBy = _("as made famous by")
@@ -3028,28 +3027,28 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.guitarSoloAccuracy[i] = 99.0
 
     if self.guitarSoloAccuracy[i] == 100.0: #fablaculp: soloDescs changed
-      soloDesc = "%s %s" % (self.tsPerfectSolo, self.tsSolo)
+      soloDesc = self.tsPerfectSolo
       soloScoreMult = 100
       self.engine.data.crowdSound.play()    #liquid
     elif self.guitarSoloAccuracy[i] >= 95.0:
-      soloDesc = "%s %s" % (self.tsAwesomeSolo, self.tsSolo)
+      soloDesc = self.tsAwesomeSolo
       soloScoreMult = 50
       self.engine.data.crowdSound.play()    #liquid
     elif self.guitarSoloAccuracy[i] >= 90.0:
-      soloDesc = "%s %s" % (self.tsGreatSolo, self.tsSolo)
+      soloDesc = self.tsGreatSolo
       soloScoreMult = 30
       self.engine.data.crowdSound.play()    #liquid
     elif self.guitarSoloAccuracy[i] >= 80.0:
-      soloDesc = "%s %s" % (self.tsGoodSolo, self.tsSolo)
+      soloDesc = self.tsGoodSolo
       soloScoreMult = 20
     elif self.guitarSoloAccuracy[i] >= 70.0:
-      soloDesc = "%s %s" % (self.tsSolidSolo, self.tsSolo)
+      soloDesc = self.tsSolidSolo
       soloScoreMult = 10
     elif self.guitarSoloAccuracy[i] >= 60.0:
-      soloDesc = "%s %s" % (self.tsOkaySolo, self.tsSolo)
+      soloDesc = self.tsOkaySolo
       soloScoreMult = 5
     else:   #0% - 59.9%
-      soloDesc = "%s %s" % (self.tsMessySolo, self.tsSolo)
+      soloDesc = self.tsMessySolo
       soloScoreMult = 0
       self.engine.data.failSound.play()    #liquid
     soloBonusScore = soloScoreMult * self.instruments[i].currentGuitarSoloHitNotes
