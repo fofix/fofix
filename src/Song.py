@@ -108,7 +108,8 @@ LEAD_PART               = 3
 DRUM_PART               = 4
 VOCAL_PART              = 5
 
-PART_SORT               = [0,2,3,1,4,5]
+PART_SORT               = [0,2,3,1,4,5] # these put Lead before Rhythm in menus.
+SORT_PART               = [0,3,1,2,4,5]
 
 instrumentDiff = {
   0 : (lambda a: a.diffGuitar),
@@ -132,7 +133,7 @@ class Part:
     if isinstance(other, Part):
       return cmp(PART_SORT[self.id], PART_SORT[other.id])
     else:
-      return cmp(PART_SORT[self.id], other)
+      return cmp(self.id, other) #if it's not being compared with a part, we probably want its real ID.
   
   def __str__(self):
     return self.text

@@ -1698,7 +1698,7 @@ class SongChooser(Layer, KeyListener):
 
       if self.instrumentChange:
         self.instrumentChange = False
-        self.instrument = Song.parts[(self.instrument.id+1)%len(Song.parts)]
+        self.instrument = Song.parts[Song.SORT_PART[(Song.PART_SORT[self.instrument.id]+1)%len(Song.parts)]] # or do you want to order this properly?
         self.engine.config.set("game", "songlist_instrument", self.instrument.id)
         if self.sortOrder == 7:
             if self.songLoader:
