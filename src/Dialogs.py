@@ -778,31 +778,7 @@ class SongChooser(Layer, KeyListener):
 
     #MFH configurable default instrument display with 5th / orange fret
     #   need to keep track of the instrument number and instrument name
-    self.instrumentNum = self.engine.config.get("game", "songlist_instrument")
-    if self.instrumentNum == 5:
-      self.instrument = "Vocals"
-      self.instrumentNice = _("Vocals")
-    elif self.instrumentNum == 4:
-      self.instrument = "Drums"
-      self.instrumentNice = _("Drums")
-    elif self.instrumentNum == 3:
-      self.instrument = "Lead Guitar"
-      self.instrumentNice = _("Lead")
-    elif self.instrumentNum == 2:
-      self.instrument = "Bass Guitar"
-      self.instrumentNice = _("Bass")
-    elif self.instrumentNum == 1:
-      self.instrument = "Rhythm Guitar"
-      self.instrumentNice = _("Rhythm")
-    else: 
-      self.instrument = "Guitar"
-      self.instrumentNice = _("Guitar")
-
-    self.diffTrans = {}
-    self.diffTrans["Expert"] = _("Expert")
-    self.diffTrans["Hard"]   = _("Hard")
-    self.diffTrans["Medium"] = _("Medium")
-    self.diffTrans["Easy"]   = _("Easy")
+    self.instrument = Song.parts[self.engine.config.get("game", "songlist_instrument")]
 
     if self.display == 0:
       self.engine.resource.load(self, "cassette",     lambda: Mesh(self.engine.resource.fileName("cassette.dae")), synch = True)
@@ -821,19 +797,7 @@ class SongChooser(Layer, KeyListener):
       self.scoreTimer = 0
 
       # evilynux - configurable default highscores difficulty display
-      self.diff = self.engine.config.get("game", "songlist_difficulty")
-      if self.diff == 3:
-        self.diff = "Easy"
-        self.diffNice = self.diffTrans[self.diff]
-      elif self.diff == 2:
-        self.diff = "Medium"
-        self.diffNice = self.diffTrans[self.diff]
-      elif self.diff == 1:
-        self.diff = "Hard"
-        self.diffNice = self.diffTrans[self.diff]
-      else: # self.diff == 0:
-        self.diff = "Expert"
-        self.diffNice = self.diffTrans[self.diff]
+      self.diff = Song.difficulties[self.engine.config.get("game", "songlist_difficulty")]
     elif self.display == 2:
       self.engine.resource.load(self, "cassette",     lambda: Mesh(self.engine.resource.fileName("cassette.dae")), synch = True)
       self.engine.resource.load(self, "label",        lambda: Mesh(self.engine.resource.fileName("label.dae")), synch = True)
@@ -898,19 +862,7 @@ class SongChooser(Layer, KeyListener):
       self.scoreTimer = 0
 
       # evilynux - configurable default highscores difficulty display
-      self.diff = self.engine.config.get("game", "songlist_difficulty")
-      if self.diff == 3:
-        self.diff = "Easy"
-        self.diffNice = self.diffTrans[self.diff]
-      elif self.diff == 2:
-        self.diff = "Medium"
-        self.diffNice = self.diffTrans[self.diff]
-      elif self.diff == 1:
-        self.diff = "Hard"
-        self.diffNice = self.diffTrans[self.diff]
-      else: # self.diff == 0:
-        self.diff = "Expert"
-        self.diffNice = self.diffTrans[self.diff]
+      self.diff = Song.difficulties[self.engine.config.get("game", "songlist_difficulty")]
         
       #if self.rotationDisabled:
       #  item = self.items[self.selectedIndex]
@@ -1746,28 +1698,8 @@ class SongChooser(Layer, KeyListener):
 
       if self.instrumentChange:
         self.instrumentChange = False
-        self.instrumentNum += 1
-        if self.instrumentNum > 5:
-          self.instrumentNum = 0
-        if self.instrumentNum == 5:
-          self.instrument = "Vocals"
-          self.instrumentNice = _("Vocals")
-        elif self.instrumentNum == 4:
-          self.instrument = "Drums"
-          self.instrumentNice = _("Drums")
-        elif self.instrumentNum == 3:
-          self.instrument = "Lead Guitar"
-          self.instrumentNice = _("Lead")
-        elif self.instrumentNum == 2:
-          self.instrument = "Bass Guitar"
-          self.instrumentNice = _("Bass")
-        elif self.instrumentNum == 1:
-          self.instrument = "Rhythm Guitar"
-          self.instrumentNice = _("Rhythm")
-        else: 
-          self.instrument = "Guitar"
-          self.instrumentNice = _("Guitar")
-        self.engine.config.set("game", "songlist_instrument", self.instrumentNum)
+        self.instrument = Song.parts[(self.instrument.id+1)%len(Song.parts)]
+        self.engine.config.set("game", "songlist_instrument", self.instrument.id)
         if self.sortOrder == 7:
             if self.songLoader:
               self.songLoader.stop()
@@ -1990,7 +1922,7 @@ class SongChooser(Layer, KeyListener):
               x = self.song_cdscore_xpos
               y = .5 + f / 2.0
               try:
-                difficulties = item.partDifficulties[self.instrumentNum]
+                difficulties = item.partDifficulties[self.instrument.id]
               except KeyError:
                 difficulties = []
               if len(difficulties) > 3:
@@ -2001,7 +1933,7 @@ class SongChooser(Layer, KeyListener):
               #for p in item.parts:    #MFH - look at selected instrument!
               #  if str(p) == self.instrument:
               for d in difficulties:
-                scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
+                scores = item.getHighscores(d, part = self.instrument)
                 #scores = item.getHighscoresWithPartString(d, part = self.instrument)
                 
                 if scores:
@@ -2016,7 +1948,7 @@ class SongChooser(Layer, KeyListener):
                 else:
                   score, stars, name = "---", 0, "---"
                 Theme.setBaseColor(1 - v)
-                font.render(unicode(d),     (x, y),           scale = scale)
+                font.render(Song.difficulties[d.id].text,     (x, y),           scale = scale) # akedrou: This is absolute nonsense, but needed for translation because of caching!
 
                 starscale = 0.02
                 stary = 1.0 - y/self.engine.data.fontScreenBottom
@@ -2079,7 +2011,7 @@ class SongChooser(Layer, KeyListener):
               wrapText(font, (x, pos[1] + 3 * font.getHeight() * 0.0016), careerResetText, visibility = f, scale = 0.0016)
   
           #MFH CD list
-          text = self.instrumentNice
+          text = self.instrument.text
           scale = 0.00250
           #glColor3f(1, 1, 1)
           c1,c2,c3 = self.song_name_selected_color
@@ -2259,45 +2191,18 @@ class SongChooser(Layer, KeyListener):
                 #MFH - Song list score / info display:
                 if isinstance(item, Song.SongInfo) and not item.getLocked():
                   if self.scoreTimer == 0 and self.highScoreType == 0: #racer: regular-style highscore movement
-                    if self.diff == "Easy":
-                      self.diff = "Medium"
-                      self.diffNice = self.diffTrans[self.diff]
-                    elif self.diff == "Medium":
-                      self.diff = "Hard"
-                      self.diffNice = self.diffTrans[self.diff]
-                    elif self.diff == "Hard":
-                      self.diff = "Expert"
-                      self.diffNice = self.diffTrans[self.diff]
-                    elif self.diff == "Expert":
-                      self.diff = "Easy"
-                      self.diffNice = self.diffTrans[self.diff]
+                    self.diff = Song.difficulties[(self.diff.id-1)%len(Song.difficulties)]
+                    
   
                   #racer: score can be changed by fret button:
                   #MFH - and now they will be remembered as well
                   if self.highScoreChange == True and self.highScoreType == 1:
-                    if self.diff == "Easy":
-                      self.diff = "Medium"
-                      self.diffNice = self.diffTrans[self.diff]
-                      self.engine.config.set("game", "songlist_difficulty", 2)
-                      self.highScoreChange = False
-                    elif self.diff == "Medium":
-                      self.diff = "Hard"
-                      self.diffNice = self.diffTrans[self.diff]
-                      self.engine.config.set("game", "songlist_difficulty", 1)
-                      self.highScoreChange = False
-                    elif self.diff == "Hard":
-                      self.diff = "Expert"
-                      self.diffNice = self.diffTrans[self.diff]
-                      self.engine.config.set("game", "songlist_difficulty", 0)
-                      self.highScoreChange = False
-                    elif self.diff == "Expert":
-                      self.diff = "Easy"
-                      self.diffNice = self.diffTrans[self.diff]
-                      self.engine.config.set("game", "songlist_difficulty", 3)
-                      self.highScoreChange = False
+                    self.diff = Song.difficulties[(self.diff.id-1)%len(Song.difficulties)]
+                    self.engine.config.set("game", "songlist_difficulty", self.diff.id)
+                    self.highScoreChange = False
 
                   scale = 0.0009
-                  text = self.diffNice
+                  text = self.diff.text
                   w, h = font.getStringSize(text, scale=scale)
                   # evilynux - score color
                   c1,c2,c3 = self.songlist_score_color
@@ -2342,15 +2247,13 @@ class SongChooser(Layer, KeyListener):
                   stars = 0
                   name = ""
 
-                  self.diffNice = self.diffTrans[self.diff]
                   try:
-                    difficulties = item.partDifficulties[self.instrumentNum]
+                    difficulties = item.partDifficulties[self.instrument.id]
                   except KeyError:
                     difficulties = []
                   for d in difficulties:
-                    if str(d) == self.diff:
-                      #self.diffNice = self.diffTrans[str(d)]
-                      scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
+                    if d.id == self.diff.id:
+                      scores = item.getHighscores(d, part = self.instrument)
                       if scores:
                         score, stars, name, scoreExt = scores[0]
                         try:
@@ -2365,8 +2268,7 @@ class SongChooser(Layer, KeyListener):
                   
                   if score == _("Nil") and self.NilShowNextScore:   #MFH
                     for d in difficulties:   #MFH - just take the first valid difficulty you can find and display it.
-                      self.diffNice = self.diffTrans[str(d)]
-                      scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
+                      scores = item.getHighscores(d, part = self.instrument)
                       if scores:
                         score, stars, name, scoreExt = scores[0]
                         try:
@@ -2568,56 +2470,26 @@ class SongChooser(Layer, KeyListener):
   
                 if isinstance(item, Song.SongInfo) and not item.getLocked():
                   if self.scoreTimer == 0 and self.highScoreType == 0: #racer: regular-style highscore movement
-                    if self.diff == "Easy":
-                      self.diff = "Medium"
-                      self.diffNice = self.diffTrans[self.diff]
-                    elif self.diff == "Medium":
-                      self.diff = "Hard"
-                      self.diffNice = self.diffTrans[self.diff]
-                    elif self.diff == "Hard":
-                      self.diff = "Expert"
-                      self.diffNice = self.diffTrans[self.diff]
-                    elif self.diff == "Expert":
-                      self.diff = "Easy"
-                      self.diffNice = self.diffTrans[self.diff]
+                    self.diff = Song.difficulties[(self.diff.id-1)%len(Song.difficulties)]
   
                   #racer: score can be changed by fret button:
                   #MFH - and now they will be remembered as well
                   if self.highScoreChange == True and self.highScoreType == 1:
-                    if self.diff == "Easy":
-                      self.diff = "Medium"
-                      self.diffNice = self.diffTrans[self.diff]
-                      self.engine.config.set("game", "songlist_difficulty", 2)
-                      self.highScoreChange = False
-                    elif self.diff == "Medium":
-                      self.diff = "Hard"
-                      self.diffNice = self.diffTrans[self.diff]
-                      self.engine.config.set("game", "songlist_difficulty", 1)
-                      self.highScoreChange = False
-                    elif self.diff == "Hard":
-                      self.diff = "Expert"
-                      self.diffNice = self.diffTrans[self.diff]
-                      self.engine.config.set("game", "songlist_difficulty", 0)
-                      self.highScoreChange = False
-                    elif self.diff == "Expert":
-                      self.diff = "Easy"
-                      self.diffNice = self.diffTrans[self.diff]
-                      self.engine.config.set("game", "songlist_difficulty", 3)
-                      self.highScoreChange = False
+                    self.diff = Song.difficulties[(self.diff.id-1)%len(Song.difficulties)]
+                    self.engine.config.set("game", "songlist_difficulty", self.diff.id)
+                    self.highScoreChange = False
   
                   score = _("Nil")
                   stars = 0
                   name = ""
 
-                  self.diffNice = self.diffTrans[self.diff]                  
                   try:
-                    difficulties = item.partDifficulties[self.instrumentNum]
+                    difficulties = item.partDifficulties[self.instrument.id]
                   except KeyError:
                     difficulties = []
                   for d in difficulties:
-                    if str(d) == self.diff:
-                      #self.diffNice = self.diffTrans[str(d)]
-                      scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
+                    if d.id == self.diff.id:
+                      scores = item.getHighscores(d, part = self.instrument)
                       if scores:
                         score, stars, name, scoreExt = scores[0]
                         try:
@@ -2632,8 +2504,7 @@ class SongChooser(Layer, KeyListener):
                   
                   if score == _("Nil") and self.NilShowNextScore:   #MFH
                     for d in item.difficulties:   #MFH - just take the first valid difficulty you can find and display it.
-                      self.diffNice = self.diffTrans[str(d)]
-                      scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
+                      scores = item.getHighscores(d, part = self.instrument)
                       if scores:
                         score, stars, name, scoreExt = scores[0]
                         try:
@@ -2650,7 +2521,7 @@ class SongChooser(Layer, KeyListener):
                       score, stars, name = _("Nil"), 0, "---"
 
                   scale = 0.0009
-                  text = self.diffNice
+                  text = self.diff.text
                   w, h = font.getStringSize(text, scale=scale)
                   # evilynux - score color
                   c1,c2,c3 = self.songlist_score_color
@@ -2734,7 +2605,7 @@ class SongChooser(Layer, KeyListener):
             nuttin = True
         
         #MFH - after songlist / CD and theme conditionals - common executions
-        text = self.instrumentNice
+        text = self.instrument.text
         scale = 0.00250
         glColor3f(1, 1, 1)
         w, h = font.getStringSize(text, scale=scale)
@@ -2998,7 +2869,7 @@ class SongChooser(Layer, KeyListener):
                     x = self.song_listcd_score_xpos
                     y = self.song_listcd_score_ypos + f / 2.0
                     try:
-                      difficulties = item.partDifficulties[self.instrumentNum]
+                      difficulties = item.partDifficulties[self.instrument.id]
                     except KeyError:
                       difficulties = []
                       score, stars, name = "---", 0, "---"
@@ -3008,7 +2879,7 @@ class SongChooser(Layer, KeyListener):
                     #new
                     for d in difficulties:
                       #scores =  item.getHighscoresWithPartString(d, part = self.instrument)
-                      scores =  item.getHighscores(d, part = Song.parts[self.instrumentNum])
+                      scores =  item.getHighscores(d, part = self.instrument)
                       if scores:
                         score, stars, name, scoreExt = scores[0]
                         try:
@@ -3021,7 +2892,7 @@ class SongChooser(Layer, KeyListener):
                       else:
                         score, stars, name = "---", 0, "---"
                       #Theme.setBaseColor(1 - v)
-                      lfont.render(unicode(d),     (x, y),           scale = scale)
+                      lfont.render(Song.difficulties[d.id].text,     (x, y),           scale = scale) # akedrou: This is absolute nonsense, but needed for translation because of caching!
 
                       starscale = 0.02
                       stary = 1.0 - (y / self.engine.data.fontScreenBottom) - h
@@ -3216,7 +3087,7 @@ class SongChooser(Layer, KeyListener):
                     x = self.song_listcd_score_xpos
                     y = self.song_listcd_score_ypos + f / 2.0
                     try:
-                      difficulties = item.partDifficulties[self.instrumentNum]
+                      difficulties = item.partDifficulties[self.instrument.id]
                     except KeyError:
                       difficulties = []
                       score, stars, name = "---", 0, "---"
@@ -3226,7 +3097,7 @@ class SongChooser(Layer, KeyListener):
                     #new
                     for d in difficulties:
                       #scores =  item.getHighscoresWithPartString(d, part = self.instrument)
-                      scores =  item.getHighscores(d, part = Song.parts[self.instrumentNum])
+                      scores =  item.getHighscores(d, part = self.instrument)
                       if scores:
                         score, stars, name, scoreExt = scores[0]
                         try:
@@ -3239,7 +3110,7 @@ class SongChooser(Layer, KeyListener):
                       else:
                         score, stars, name = "---", 0, "---"
                       
-                      font.render(unicode(d),     (x, y),           scale = scale)
+                      font.render(Song.difficulties[d.id].text,     (x, y),           scale = scale) # akedrou: This is absolute nonsense, but needed for translation because of caching!
                       
 
                       starscale = 0.02
@@ -3277,7 +3148,7 @@ class SongChooser(Layer, KeyListener):
                       y += 2 * h + f / 4.0
               
         finally:
-          text = self.instrumentNice
+          text = self.instrument.text
           scale = 0.00250
           glColor3f(1, 1, 1)
           w, h = font.getStringSize(text, scale=scale)
@@ -3550,57 +3421,27 @@ class SongChooser(Layer, KeyListener):
 
               if isinstance(item, Song.SongInfo):
                 if self.scoreTimer == 0 and self.highScoreType == 0: #racer: regular-style highscore movement
-                  if self.diff == "Easy":
-                    self.diff = "Medium"
-                    self.diffNice = self.diffTrans[self.diff]
-                  elif self.diff == "Medium":
-                    self.diff = "Hard"
-                    self.diffNice = self.diffTrans[self.diff]
-                  elif self.diff == "Hard":
-                    self.diff = "Expert"
-                    self.diffNice = self.diffTrans[self.diff]
-                  elif self.diff == "Expert":
-                    self.diff = "Easy"
-                    self.diffNice = self.diffTrans[self.diff]
+                  self.diff = Song.difficulties[(self.diff.id-1)%len(Song.difficulties)]
                 
                 #racer: score can be changed by fret button:
                 #MFH - and now they will be remembered as well
                 if self.highScoreChange == True and self.highScoreType == 1:
-                  if self.diff == "Easy":
-                    self.diff = "Medium"
-                    self.diffNice = self.diffTrans[self.diff]
-                    self.engine.config.set("game", "songlist_difficulty", 2)
-                    self.highScoreChange = False
-                  elif self.diff == "Medium":
-                    self.diff = "Hard"
-                    self.diffNice = self.diffTrans[self.diff]
-                    self.engine.config.set("game", "songlist_difficulty", 1)
-                    self.highScoreChange = False
-                  elif self.diff == "Hard":
-                    self.diff = "Expert"
-                    self.diffNice = self.diffTrans[self.diff]
-                    self.engine.config.set("game", "songlist_difficulty", 0)
-                    self.highScoreChange = False
-                  elif self.diff == "Expert":
-                    self.diff = "Easy"
-                    self.diffNice = self.diffTrans[self.diff]
-                    self.engine.config.set("game", "songlist_difficulty", 3)
-                    self.highScoreChange = False
+                  self.diff = Song.difficulties[(self.diff.id-1)%len(Song.difficulties)]
+                  self.engine.config.set("game", "songlist_difficulty", self.diff.id)
+                  self.highScoreChange = False
 
                 if not (item.getLocked()):
                   score = _("Nil")
                   stars = 0
                   name = ""
 
-                  self.diffNice = self.diffTrans[self.diff]
                   try:
-                    difficulties = item.partDifficulties[self.instrumentNum]
+                    difficulties = item.partDifficulties[self.instrument.id]
                   except KeyError:
                     difficulties = []
                   for d in difficulties:
-                    if str(d) == self.diff:
-                      #self.diffNice = self.diffTrans[str(d)]
-                      scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
+                    if d.id == self.diff.id:
+                      scores = item.getHighscores(d, part = self.instrument)
                       if scores:
                         score, stars, name, scoreExt = scores[0]
                         try:
@@ -3615,8 +3456,7 @@ class SongChooser(Layer, KeyListener):
                   
                   if score == _("Nil") and self.NilShowNextScore:   #MFH
                     for d in difficulties:   #MFH - just take the first valid difficulty you can find and display it.
-                      self.diffNice = self.diffTrans[str(d)]
-                      scores = item.getHighscores(d, part = Song.parts[self.instrumentNum])
+                      scores = item.getHighscores(d, part = self.instrument)
                       if scores:
                         score, stars, name, scoreExt = scores[0]
                         try:
@@ -3706,9 +3546,9 @@ class SongChooser(Layer, KeyListener):
                           font.render("N/A", (.18, .57 + i*.025), scale = 0.0014)
                         elif diff == 6:
                           glColor3f(1, 1, 0)  
-                          font.render(unicode(Data.STAR2 * (diff -1)), (.18, 0.575 + i*.025), scale = 0.003)
+                          font.render(str(Data.STAR2 * (diff -1)), (.18, 0.575 + i*.025), scale = 0.003)
                         else:
-                          font.render(unicode(Data.STAR2 * diff + Data.STAR1 * (5 - diff)), (.18, 0.575 + i*.025), scale = 0.003)
+                          font.render(str(Data.STAR2 * diff + Data.STAR1 * (5 - diff)), (.18, 0.575 + i*.025), scale = 0.003)
                       else:
                         w, h, = self.engine.view.geometry[2:4]
                         if diff == -1:
@@ -3723,7 +3563,7 @@ class SongChooser(Layer, KeyListener):
                             self.engine.drawImage(self.diffimg1, scale = (wfactor1,-wfactor1), coord = ((.31-.03*k)*w, (0.22-.035*i)*h))
            
         finally:
-          text = self.instrumentNice + " - " + self.diffNice
+          text = self.instrument.text + " - " + self.diff.text
           scale = 0.0017
           glColor3f(1, 1, 1)
           w, h = font.getStringSize(text, scale=scale)

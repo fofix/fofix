@@ -535,8 +535,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.tsBattleIcons[6] = _("Switch Controls")
       self.tsBattleIcons[7] = _("Double Notes")
       self.tsBattleIcons[8] = _("Amp Overload")
-    self.tsNoteStreak = _("Note Streak!!!")
-    self.tsPhraseStreak = _("Phrase Streak!!!")
+    self.tsNoteStreak = _("%d Note Streak!!!")
+    self.tsPhraseStreak = _("%d Phrase Streak!!!")
     self.tsStarPowerReady = _("%s Ready") % self.powerUpName
     self.tsCoOpStarPower  = _("Activate %s!") % self.powerUpName
     self.tsYouFailedBattle = _("You Failed!!!!")
@@ -3444,11 +3444,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if vocalPart:
           streakModulo = playerStreak % 5
           if ( (streakModulo == 0) or (self.lastStreak[i] % 5 > streakModulo) ) and playerStreak > 4 and textChanged:
-            self.newScalingText(i, "%d %s" % (playerStreak - streakModulo, self.tsPhraseStreak) )
+            self.newScalingText(i, self.tsPhraseStreak % (playerStreak - streakModulo) )
         elif (playerStreak == 50 or (self.lastStreak[i] < 50 and playerStreak > 50) ) and textChanged:
           #self.displayText[i] = _("50 Note Streak!!!") #kk69: more GH3-like
           #self.newScalingText(i, _("50 Note Streak!!!") )
-          self.newScalingText(i, "50 %s" % self.tsNoteStreak)
+          self.newScalingText(i, self.tsNoteStreak % 50)
           #self.streakFlag = "%d" % (i)   #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1. 
         #MFH - I think a simple integer modulo would be more efficient here: 
         else:
@@ -3457,7 +3457,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             #self.displayText[i] = _("%d Note Streak!!!") % playerStreak #kk69: more GH3-like
             #self.newScalingText(i, _("%d Note Streak!!!") % playerStreak )
             #self.newScalingText(i, _("%d Note Streak!!!") % (playerStreak - streakModulo) )
-            self.newScalingText(i, "%d %s" % (playerStreak - streakModulo, self.tsNoteStreak) )
+            self.newScalingText(i, self.tsNoteStreak % (playerStreak - streakModulo) )
             #self.streakFlag = "%d" % (i)  #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1.
   
       if self.scaleText[i] >= self.maxDisplayTextScale:

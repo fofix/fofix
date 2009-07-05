@@ -72,12 +72,7 @@ class ConfigOption:
   
   def __cmp__(self, other):
     try:
-      if self.id > other.id:
-        return 1
-      elif self.id == other.id:
-        return 0
-      else:
-        return -1
+      return cmp(self.id, other.id)
     except:
       return -1
 

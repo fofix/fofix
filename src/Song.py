@@ -125,7 +125,13 @@ class Part:
     #self.logClassInits = Config.get("game", "log_class_inits")
     #if self.logClassInits == 1:
     #  Log.debug("Part class init (song.py)...")
-    
+  
+  def __cmp__(self, other):
+    if isinstance(other, Part):
+      return cmp(self.id, other.id)
+    else:
+      return cmp(self.id, other)
+  
   def __str__(self):
     return self.text
 
@@ -149,8 +155,13 @@ class Difficulty:
     #self.logClassInits = Config.get("game", "log_class_inits")
     #if self.logClassInits == 1:
     #  Log.debug("Difficulty class init (song.py)...")
-
-    
+  
+  def __cmp__(self, other):
+    if isinstance(other, Difficulty):
+      return cmp(self.id, other.id)
+    else:
+      return cmp(self.id, other)
+  
   def __str__(self):
     return self.text
 
@@ -869,7 +880,7 @@ class SongInfo(object):
       highScores = self.highScores
       
     try:
-      return highScores[difficulty]
+      return highScores[difficulty.id]
     except KeyError:
       return []
 
@@ -892,7 +903,7 @@ class SongInfo(object):
       highScores = self.highScores
       
     try:
-      return highScores[difficulty]
+      return highScores[difficulty.id]
     except KeyError:
       return []
       
@@ -933,13 +944,12 @@ class SongInfo(object):
       highScores = self.highScoresVocal
     else:
       highScores = self.highScores
-
-    if not difficulty in highScores:
-      highScores[difficulty] = []
-    highScores[difficulty].append((score, stars, name, scoreExt))
-    highScores[difficulty].sort(lambda a, b: {True: -1, False: 1}[a[0] > b[0]])
-    highScores[difficulty] = highScores[difficulty][:5]
-    for i, scores in enumerate(highScores[difficulty]):
+    if not difficulty.id in highScores:
+      highScores[difficulty.id] = []
+    highScores[difficulty.id].append((score, stars, name, scoreExt))
+    highScores[difficulty.id].sort(lambda a, b: {True: -1, False: 1}[a[0] > b[0]])
+    highScores[difficulty.id] = highScores[difficulty.id][:5]
+    for i, scores in enumerate(highScores[difficulty.id]):
       _score, _stars, _name, _scores_ext = scores
       if _score == score and _stars == stars and _name == name:
         return i
