@@ -108,6 +108,8 @@ LEAD_PART               = 3
 DRUM_PART               = 4
 VOCAL_PART              = 5
 
+PART_SORT               = [0,2,3,1,4,5]
+
 instrumentDiff = {
   0 : (lambda a: a.diffGuitar),
   1 : (lambda a: a.diffGuitar),
@@ -128,9 +130,9 @@ class Part:
   
   def __cmp__(self, other):
     if isinstance(other, Part):
-      return cmp(self.id, other.id)
+      return cmp(PART_SORT[self.id], PART_SORT[other.id])
     else:
-      return cmp(self.id, other)
+      return cmp(PART_SORT[self.id], other)
   
   def __str__(self):
     return self.text
