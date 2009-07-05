@@ -589,7 +589,11 @@ class SongInfo(object):
       highScores = self.highScores
       
     for difficulty in highScores.keys():
-      s[difficulty.id] = [(score, stars, name, self.getScoreHash(difficulty, score, stars, name)) for score, stars, name, scores_ext in highScores[difficulty]]
+      if isinstance(difficulty, Difficulty):
+        diff = diff.id
+      else:
+        diff = difficulty
+      s[diff] = [(score, stars, name, self.getScoreHash(difficulty, score, stars, name)) for score, stars, name, scores_ext in highScores[difficulty]]
     return binascii.hexlify(Cerealizer.dumps(s))
 
   def getObfuscatedScoresExt(self, part = parts[GUITAR_PART]):
@@ -610,7 +614,11 @@ class SongInfo(object):
       highScores = self.highScores
       
     for difficulty in highScores.keys():
-      s[difficulty.id] = [(self.getScoreHash(difficulty, score, stars, name), stars) + scores_ext for score, stars, name, scores_ext in highScores[difficulty]]
+      if isinstance(difficulty, Difficulty):
+        diff = diff.id
+      else:
+        diff = difficulty
+      s[diff] = [(self.getScoreHash(difficulty, score, stars, name), stars) + scores_ext for score, stars, name, scores_ext in highScores[difficulty]]
     return binascii.hexlify(Cerealizer.dumps(s))
 
   def save(self):
@@ -814,7 +822,9 @@ class SongInfo(object):
     self._set("loading_phrase", value)
     
   def getScoreHash(self, difficulty, score, stars, name):
-    return hashlib.sha1("%d%d%d%s" % (difficulty.id, score, stars, name)).hexdigest()
+    if isinstance(difficulty, Difficulty):
+      difficulty = difficulty.id
+    return hashlib.sha1("%d%d%d%s" % (difficulty, score, stars, name)).hexdigest()
     
   def getDelay(self):
     return self._get("delay", int, 0)
