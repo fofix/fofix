@@ -30,6 +30,14 @@ Then use any of the following settings below the {{{[theme]}}} header in the the
 =Options Menu=
 
 ||advsettingstext10 = .393,.87,.49,.074||.393 is X Pos, .87 is Y Position, .49 is Scaling Size, .0741 is Line Spacing between menu items. Used for Adv. Options Menu(This is used if you made the advsettings.png and advsettingstext10.png images. The '10' in the name refers to being that, for example, the GH3 advanced options menu has 10 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
+||menu_tip_text_display = False|| Displays menu text help in options menu area (True or False)||
+if display is True:
+||menu_tip_text_y = .7|| Controls the Y position of the help text (.7 looks pretty good on RB2) [This is used is above ('text display') is 'True']||
+||menu_tip_text_font = font|| (default: font) - you can use any of the fonts you use in the other settings.||
+||menu_tip_text_scale 0.2|| Controls the scale size of tip text||
+||menu_tip_text_color = #FFFFFF|| Controls the text color of tip text (Use a hex color)||
+||menu_tip_text_scroll_mode = 0|| what to do when an explanation is too big to show. 0 = constant scroll; 1 = back and forth.||
+||menu_tip_text_scroll_space = .25 || Controls how much space to put between the end and the beginning. (this function is used if above [scroll mode] = 0)||
 ||opt_bkg_size = 0.5,0.5,1.0,1.0||position (x,y) of center, xScale, yScale||
 ||opt_selected_color = #FFBF00||Selects the color of the options menu selected text. Use a Hex Color Value.||
 ||opt_text_x = .38||Controls the Option Menu text X position||
