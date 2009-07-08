@@ -946,7 +946,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     #MFH - this is where song loading originally took place, and the loading screen was spawned.
     
-    self.engine.resource.load(self, "song", lambda: loadSong(self.engine, songName, library = libraryName, part = [player.part for player in self.playerList], practiceMode = self.playerList[0].practiceMode), synch = True, onLoad = self.songLoaded)
+    self.engine.resource.load(self, "song", lambda: loadSong(self.engine, songName, library = libraryName, part = [player.part for player in self.playerList], practiceMode = self.playerList[0].practiceMode, practiceSpeed = self.playerList[0].practiceSpeed), synch = True, onLoad = self.songLoaded)
     
     # glorandwarf: show the loading splash screen and load the song synchronously
     #Dialogs.hideLoadingSplashScreen(self.engine, splash)
@@ -2674,7 +2674,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.done = True
     # evilynux - Reset speed
     self.engine.setSpeedFactor(1.0)
-    self.engine.config.set("audio", "speed_factor", 1.0)
 
     self.engine.view.setViewport(1,0)
     self.engine.view.popLayer(self.menu)
@@ -2703,7 +2702,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.resetVariablesToDefaults()
     # evilynux - Reset speed
     self.engine.setSpeedFactor(1.0)
-    self.engine.config.set("audio", "speed_factor", 1.0)
     self.engine.view.setViewport(1,0)
     self.engine.view.popLayer(self.menu)
     self.engine.view.popLayer(self.failMenu)
@@ -2718,7 +2716,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.resetVariablesToDefaults()
     # evilynux - Reset speed
     self.engine.setSpeedFactor(1.0)
-    self.engine.config.set("audio", "speed_factor", 1.0)
 
     self.engine.view.setViewport(1,0)
     self.engine.view.popLayer(self.failMenu)
@@ -5506,7 +5503,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         time = self.getSongPosition()
         Log.debug("Star Power Activated at: " + str(time))
         self.coOpStarPowerActive[num] = time
-        if time - min(self.coOpStarPowerActive) < 300.0:
+        if time - min(self.coOpStarPowerActive) < 300.0 and not self.instruments[i].starPowerActive:
           self.engine.data.starActivateSound.play()
           for i in range(self.numOfPlayers):
             self.hopFretboard(i, 0.07)  #stump
@@ -5532,8 +5529,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         #self.sfxChannel.setVolume(self.sfxVolume)
         #if self.engine.data.cheerSoundFound:
           #self.engine.data.crowdSound.play()
-        if not guitar.isVocal:
-          self.hopFretboard(num, 0.07)  #stump
         if self.coOpRB:
           while len(self.deadPlayerList) > 0:
             i = self.deadPlayerList.pop(0) #keeps order intact (with >2 players)
@@ -5544,20 +5539,27 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               self.engine.data.rescueSound.play()
               self.coOpFailDone[i] = False
               self.numDeadPlayers -= 1
+              if not guitar.isVocal:
+                self.hopFretboard(num, 0.07)  #stump
+                guitar.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
+                guitar.ocount = 0  #MFH - this triggers the oFlash strings & timer
               break
           else:
             if not guitar.starPowerActive:
               self.engine.data.starActivateSound.play()
               guitar.starPowerActive = True #QQstarS:Set [0] to [i]
               if not guitar.isVocal:
+                self.hopFretboard(num, 0.07)  #stump
                 guitar.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
                 guitar.ocount = 0  #MFH - this triggers the oFlash strings & timer
-        elif guitar.starPower >= 50:
-          self.engine.data.starActivateSound.play()
-          guitar.starPowerActive = True #QQstarS:Set [0] to [i]
-          if not guitar.isVocal:
-            guitar.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
-            guitar.ocount = 0  #MFH - this triggers the oFlash strings & timer
+        else:
+          if not guitar.starPowerActive:
+            self.engine.data.starActivateSound.play()
+            guitar.starPowerActive = True #QQstarS:Set [0] to [i]
+            if not guitar.isVocal:
+              self.hopFretboard(num, 0.07)  #stump
+              guitar.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
+              guitar.ocount = 0  #MFH - this triggers the oFlash strings & timer
 
   def goToResults(self):
     self.ending = True

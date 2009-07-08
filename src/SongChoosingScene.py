@@ -222,7 +222,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
                 slowdown = Dialogs.chooseItem(self.engine, options, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("Speed Select:")))
               for i in range(len(values)):
                 if options[i] == slowdown:
-                  Config.set("audio", "speed_factor", values[i])
+                  self.player.practiceSpeed = values[i]
                   slowDownDivisor = values[i]
                   break
               

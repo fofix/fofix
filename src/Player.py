@@ -923,6 +923,7 @@ class Player(object):
     self._difficulty  = self.cache.execute('SELECT `difficulty` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
     #MFH - need to store selected practice mode and start position here
     self.practiceMode = False
+    self.practiceSpeed = 1.0
     self.practiceSection = None
     self.startPos = 0.0
     

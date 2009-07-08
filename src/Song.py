@@ -28,6 +28,7 @@ import Config
 import os
 import re
 import shutil
+import math
 import Config
 #stump: when we completely drop 2.4 support, change this to just "import hashlib"
 try:
@@ -2795,7 +2796,7 @@ class Song(object):
       self.music.play(0, start / 1000.0)
       self.music.setVolume(1.0)
     else:
-      self.music.play(1.0/self.engine.audioSpeedFactor, start / 1000.0)  #tell music to loop 2 times for 1/2 speed, 4 times for 1/4 speed (so it doesn't end early)
+      self.music.play(int(math.ceil(1.0/self.engine.audioSpeedFactor)), start / 1000.0)  #tell music to loop 2 times for 1/2 speed, 4 times for 1/4 speed (so it doesn't end early) (it wants an int, though)
       self.music.setVolume(0.0)   
     
     if self.guitarTrack:
@@ -3877,7 +3878,7 @@ class MidiPartsDiffReader(midi.MidiOutStream):
     except KeyError:
       pass
 
-def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playbackOnly = False, notesOnly = False, part = [parts[GUITAR_PART]], practiceMode = False):
+def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playbackOnly = False, notesOnly = False, part = [parts[GUITAR_PART]], practiceMode = False, practiceSpeed = 1.0):
 
   Log.debug("loadSong function call (song.py)...")
   crowdsEnabled = engine.config.get("audio", "crowd_tracks_enabled")
@@ -3970,8 +3971,9 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
     rhythmFile = None
     drumFile = None
     crowdFile = None
-
-  slowDownFactor = engine.config.get("audio", "speed_factor")
+    slowDownFactor = practiceSpeed
+  else:
+    slowDownFactor = engine.config.get("audio", "speed_factor")
   engine.setSpeedFactor(slowDownFactor)    #MFH 
     
 

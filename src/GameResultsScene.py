@@ -190,7 +190,6 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     slowdown = self.engine.audioSpeedFactor
     # evilynux - Reset speed
     self.engine.setSpeedFactor(1.0)
-    self.engine.config.set("audio", "speed_factor", 1.0)
 
     a = len(Scorekeeper.HANDICAPS)
     for i, scoreCard in enumerate(self.scoring):
