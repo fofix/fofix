@@ -1,92 +1,156 @@
-#summary These are all the Theme.ini settings usable.
+#summary A list of theme.ini settings and usage information.
 #labels Phase-ThemeMaking
 
-First, you need to create a 'theme.ini' file in your theme's folder. Once you create the file you need to type this header at the very top of this file:
+Many of the detailed theme customizations available in FoFiX are controlled through a special configuration file named `theme.ini` and located in the root folder of your theme - knowing the ins and outs of this file is essential to creating a truly customized theme. FoFiX theme customizability expanded rapidly in the 3.x version cycle, and themes that worked in one may not work as expected in a later version. The keys were added at different times by different coders without an established convention for naming, and so the usage can get a bit confusing. Here is our best attempt at informing you of what exactly we have coded into the game. Good luck!
 
-_{{{[theme]}}}_
+First things first: all theme files must have a section header at the top of the file. On the first line of any valid `theme.ini` will be:
 
-Then use any of the following settings below the {{{[theme]}}} header in the theme.ini file. This list is mostly organized by which options belong mostly to which screen, but not necessarily to JUST that screen, since some items currently control things on multiple screens.
-<wiki:toc max_depth="1" />
-<wiki:comment>
-|| This comment puts the tables underneath the nav bar on the side and makes it take up the whole width of the page ||
-|| This comment needs to contain a table for some reason, or it won't have the desired effect || ||
-</wiki:comment>
+`[theme]`
+
+Following that, the keys can be entered in any order, one per line, formatted as follows:
+
+`key = value`
+
+Spacing doesn't matter, and the program strips any extra spaces around your values, so don't worry about that.
+
+What follows now is a list of the various keys you can use. We've grouped them here into sections so as to make them as readable as possible, but feel free to put them however works best for you in your file. None of the values are required - which is why we list the default values that will be used if you don't include that line. The default values are also useful in determining appropriate values for your theme.
+
+Usage Notes:
+If a default value is "None", then it has a predetermined setting based on other factors. If you don't want the function that the key controls, don't add that key to your `theme.ini` file.
+
+Types refer to the variable type that the program is expecting. Here are a few common types:
+  * `int` is an integer - a whole number.
+  * `float` is a floating point decimal - any number.
+     * When these are used for X and Y positioning, typically you will use a value between 0 and 1. Use the defaults as guides.
+  * `hexcolor` is a hexadecimal number that starts with the # sign and has six digits - e.g. #0e3b4c
+    * These are used for colors - most image editing programs will show you a color's hex value.
+  * `bool` is a Boolean value - True or False.
+  * `str` is a string - or text.
+  * `comma-separated` is a comma-separated value list - such as `0, 1, 2, 3`.
+
+Some settings allow you to enter a specific font. At this time you must choose one of the following settings, and the fonts are pre-loaded depending on various theme settings and files available.
+||font||bigFont||pauseFont||scoreFont||streakFont||
+||songFont||streakFont2||songListFont||shadowFont||loadingFont||
+
+===Table of Contents===
+<wiki:toc max_depth="2" />
 
 -----------------------------------------------------------------------------------------
-=Main Menu=
+=Menu Systems=
 
-||_*Item Name*_||_*What it Does/How to use it*_||
-||menu_x = .665||X Position of main menu image. Use a decimal # between 0-1||
-||menu_y = .842||Y Position of main menu image. Use a decimal # between 0-1||
-||main_menu_scale = .5||Controls the size of main menu text. Use a decimal # between 0-1|| 
-||main_menu_vspacing = 0.09||Controls the spacing between the menu text items. Use a decimal # between 0-1||
-||multiplayertext5 = .40,.35,.46,.045||.40 is X Pos, .35 is Y Position, .46 is Scaling Size, .045 is Line Spacing between menu items. Used for Multiplayer Menu (This is only used if you made the multiplayer.png and multiplayertext10.png images. The '5' in the name refers to being that, for example, the GH3 multiplayer menu has 5 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
-||solotext2 = .40,.35,.46,.045||.40 is X Pos, .35 is Y Position, .46 is Scaling Size, .045 is Line Spacing between menu items. Used for Solo Menu (This is only used if you made the solo.png and solotext2.png images. The '2' in the name refers to being that, for example, the RB solo menu has 2 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
-||use_solo_submenu = False||Lets you decide which menu system you want in your game, overriding the theme-detection. (true -> uses solo submenu [RB-Theme like], false -> does NOT use solo submenu, GH-Theme like.)||
-||versiontagposX = 0.5|| Controls the X position of the Versiontag image (Default is 0.5 due to the default image being fullscreen. Change it once making image small)||
-||versiontagposY = 0.5|| Controls the Y position of the Versiontag image (Default is 0.5 due to the default image being fullscreen. Change it once making image small)||
 
-------------------------------------------------------------------------------------------
-=Options Menu=
+==General==
+||_*Item Name*_||_*Default Value*_||_*Type*_||_*Function*_||
+||`background_color`||#000000||`hexcolor`||Controls the color of the background screen. Should be black.||
+||`base_color`||#FFFFFF||`hexcolor`||Controls the default unselected text color.||
+||`selected_color`||#FFBF00||`hexcolor`||Controls the default selected text color.||
+||`versiontag`||True||`bool`||Shows the version tag in menus. (versiontag.png)||
+||`versiontagposX`||0.5||`float`||X position of version tag. (versiontag.png)||
+||`versiontagposY`||0.5||`float`||Y position of the version tag. (versiontag.png)||
 
-||advsettingstext10 = .393,.87,.49,.074||.393 is X Pos, .87 is Y Position, .49 is Scaling Size, .0741 is Line Spacing between menu items. Used for Adv. Options Menu(This is used if you made the advsettings.png and advsettingstext10.png images. The '10' in the name refers to being that, for example, the GH3 advanced options menu has 10 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
-||menu_tip_text_display = False|| Displays menu text help in options menu area (True or False)||
-if display is True:
-||menu_tip_text_y = .7|| Controls the Y position of the help text (.7 looks pretty good on RB2) [This is used is above ('text display') is 'True']||
-||menu_tip_text_font = font|| (default: font) - you can use any of the fonts you use in the other settings.||
-||menu_tip_text_scale 0.2|| Controls the scale size of tip text||
-||menu_tip_text_color = #FFFFFF|| Controls the text color of tip text (Use a hex color)||
-||menu_tip_text_scroll_mode = 0|| what to do when an explanation is too big to show. 0 = constant scroll; 1 = back and forth.||
-||menu_tip_text_scroll_space = .25 || Controls how much space to put between the end and the beginning. (this function is used if above [scroll mode] = 0)||
-||opt_bkg_size = 0.5,0.5,1.0,1.0||position (x,y) of center, xScale, yScale||
-||opt_selected_color = #FFBF00||Selects the color of the options menu selected text. Use a Hex Color Value.||
-||opt_text_x = .38||Controls the Option Menu text X position||
-||opt_text_y = .15||Controls the Option Menu text Y position||
-||opt_text_color = #FFFFFF||Selects the color of the options menu items. Use a Hex Color Value.||
-||settingstext9 = .393,.88,.50,.085||.393 is X Pos, .88 is Y Position, .50 is Scaling Size, .085 is Line Spacing between menu items. Used for Options Menu(This is used if you made the settings.png and settingstext9.png images. The '9' in the name refers to being that, for example, the GH3 options menu has 10 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
+==Main Menu==
+||_*Item Name*_||_*Default Value*_||_*Type*_||_*Function*_||
+||`menu_x`||.665||`float`||X position of main menu text. (maintext.png)||
+||`menu_y`||.842||`float`||Y position of the main menu text. (maintext.png)||
+||`main_menu_scale`||.5||`float`||Controls the size of main menu text. (maintext.png)|| 
+||`main_menu_vspacing`||0.09||`float`||Controls the spacing between the main menu items.||
+||`use_solo_submenu`||None||`bool`||Lets you decide which menu system you want in your game. True enables the RB-like "Solo" submenu and false uses the GH-like "Career" and "Quickplay" items. No setting uses theme-type determination.||
+||`rbmenu`||False||`bool`||Sets whether to scroll the main menu items in.||
+
+==Graphical Submenus==
+In order to enable graphical submenus, you must have an image with the menu name with the word "text" and the number of options on that menu. (One of "solotext2", "settingstext9" or "advsettingstext10", "trainingtext2" and "multiplayertext#", where the number of options available depends on your theme type.) The values do the same thing as the main menu values above.
+||_*Item Name*_||_*Default Value*_||_*Type*_||_*Function*_||
+||`XXXtext#`||.40, .35, .46, .045||4 `comma-separated` `float`s||Controls the graphical submenu of the appropriate name. The first is the X Position, second is Y Position, third is size, and fourth is spacing between menu items.||
+
+==Options Menu==
+
+||_*Item Name*_||_*Default Value*_||_*Type*_||_*Function*_||
+||`menu_tip_text_display`||False||`bool`||Displays menu text help in options menu.||
+||`menu_tip_text_y`||.7||`float`||Y position of the help text (if enabled).||
+||`menu_tip_text_font`||font||`str`||Controls the font of the help text (if enabled) - see above.||
+||`menu_tip_text_scale`||.002||`float`||Controls the scale size of help text (if enabled).||
+||`menu_tip_text_color`||#FFFFFF||`hexcolor`||Controls the text color of the help text (if enabled).||
+||`menu_tip_text_scroll_mode`||0||`int`||Controls animation when an explanation is too big to show. 0 = constant scroll; 1 = back and forth.||
+||`menu_tip_text_scroll_space`||.25||`float`||Controls how much space to put between the end and the beginning (if above `menu_tip_text_scroll_mode` is 0).||
+||`opt_bkg_size`||0.5, 0.5, 1.0, 1.0||4 `comma-separated` `float`s||Controls the background of the option menu. The first is the X Position, second is Y Position, third is the X scaling, fourth is Y scaling.||
+||`opt_text_x`||.38||`float`||X position of the option menu text.||
+||`opt_text_y`||.15||`float`||Y position of the option menu text.||
+||`opt_text_color`||#FFFFFF||`hexcolor`||Controls the color of the other menu items.||
+||`opt_selected_color`||#FFBF00||`hexcolor`||Controls the color of the currently-selected menu option.||
 
 ----------------------------------------------------------------------------
-=Lobby/Player Select/Creation=
-||avatar_select_avatar_x = .667||Define's the X position of the avatar select screens avatar image. Use a floating point number||
-||avatar_select_avatar_y = .5||Define's the Y position of the avatar select screens avatar image. Use a floating point number||
-||avatar_select_text_x = .44||Define's the X position of the avatar select text. Use a floating point number||
-||avatar_select_text_y = .16||Define's the Y position of the avatar select text. Use a floating point number||
-||avatar_select_text_scale = .0027  ||Define's the size of the font used in avatar select. Use a floating point number||
-||avatar_select_font = (fontname) || Define's the font used for avatar select area||
-||avatar_select_wheel_y = 0.0||Define's the Y position of the avatar select screens avatar choice selection (half wheel shaped format). Use a floating point number||
-||avatarscaleX = 1|| Use this to control the X size of player's avatar. Use a floating point.||
-||avatarscaleY = 1|| Use this to control the Y size of player's avatar. Use a floating point.||
-||avatarposX = .35|| Use this to control the X position of player's avatar. Use a floating point.||
-||avatarposY = .75|| Use this to control the Y position of player's avatar. Use a floating point.||
-||character_create_font_color = #FFFFFF|| Controls color value of character creation font. Use a Hex Color Value ||
-||character_create_select_color = #FFBF00|| Controls color value of character creation selected text. Use a Hex Color Value ||
-||character_create_help_color = #FFFFFF|| Controls color value of character creation help info line. Use a Hex Color Value ||
-||character_create_help_y = .73||  Controls Y position of the character creation screen text help line.||
-||character_create_option_x = .75||  Controls X position of the character creation screen text menu toggle options.||
-||character_create_space = .045|| Controls the spacing between character creation screen text menu items.||
-||character_create_scale = .0018||  Controls scaling size of the character creation screen text menu items.||
-||character_create_x = 0.25||  Controls X position of the character creation screen text menu items.||
-||character_create_y = 0.15||  Controls Y position of the character creation screen text menu items.||
-||lobby_disable_color = #666666|| Controls color value. Use a Hex Color Value.||
-||lobby_font_color = #FFFFFF || Controls the lobby font color. Use a Hex Color Value.||
-||lobby_info_color = #FFFFFF || Controls the lobby info color. Use a Hex Color Value. ||
-||lobby_preview_x = 0.3|| Controls Player image and info below image in Lobby||
-||lobby_select_color = #FFBF00|| Controls the lobby select color. Use a Hex Color Value.||
-||lobby_select_x = 0.9||  Controls X Position of player list text in Lobby||
-||lobby_select_y = 0.32||  Controls Y Position of player list text in Lobby||
-||lobby_select_font = loadingFont||  Selects lobby font. Can use "font","bigFont","pauseFont","scoreFont","streakFont","songFont","streakFont2","songListFont","shadowfont","loadingFont".||
-||lobby_select_image_x = 0.8||  Controls X Position of the 'SELECT' image in Lobby||
-||lobby_select_image_y = 0.355||  Controls Y Position of the 'SELECT' image in Lobby||
-||lobby_select_scale = 0.0018||  Controls the scale size of the Players list in Lobby||
-||lobby_select_space = 0.04||  Controls the line-spacing between the names in the player's list in Lobby.||
-||lobby_title_color = #FFFFFF|| Controls the lobby title color. Use a Hex Color Value. ||
-||lobby_title_x = 1||   Controls "Choose Your Character" text X pos in Lobby||
-||lobby_title_y = 0.24||   Controls "Choose Your Character" text Y pos in Lobby|| 
-||lobby_title_character_x = 0.26||   Controls "Player 1/2" Text  X Pos in Lobby||
-||lobby_title_character_y = 0.24||   Controls "Player 1/2" Text  Y Pos in Lobby||
-||lobby_title_font = font||  Selects lobby font. Can use "font","bigFont","pauseFont","scoreFont","streakFont","songFont","streakFont2","songListFont","shadowfont","loadingFont".||
-||lobby_title_scale = 0.0024||   Controls "Player 1/2" Text Font Size in Lobby||
+=Game Setup=
 
+==Controller Select Screen==
+||_*Item Name*_||_*Default Value*_||_*Type*_||_*Function*_||
+||`control_activate_x`||0.645||`float`||X position of the list of available controls.||
+||`control_activate_y`||0.18||`float`||Y position of the list of available controls.||
+||`control_activate_scale`||0.0018||`float`||Controls the size of the available control text.||
+||`control_activate_select_x`||0.5||`float`||X position of the select image on the list of available controls.||
+||`control_activate_part_x`||0.41||`float`||X position of the part images shown on the list of available controls.||
+||`control_activate_part_size`||22.000||`float`||Width (in rendered pixels) of the part images on the list of available controls.||
+||`control_activate_space`||0.045||`float`||Controls the spacing between each available control.||
+||`control_activate_font`||font||`str`||Controls the available controller font - see above.||
+||`control_description_x`||0.5||`float`||X position of the information text.||
+||`control_description_y`||0.13||`float`||Y position of the information text.||
+||`control_description_scale`||0.002||`float`||Controls the size of the information text.||
+||`control_description_font`||font||`str`||Controls the information text font - see above.||
+||`control_check_x`||0.16||`float`||X position of the first confirmed control.||
+||`control_check_y`||0.26||`float`||Y position of the confirmed controls.||
+||`control_check_text_y`||0.61||`float`||Y position of the names of confrimed controls.||
+||`control_check_part_mult`||2.8||`float`||Number of times larger than `control_activate_part_size` confirmed parts should be.||
+||`control_check_space`||0.23||`float`||Amount of space between each confirmed controller.||
+||`control_check_scale`||0.0018||`float`||Controls the size of the names of confirmed controls.||
+||`control_check_font`||font||`str`||Controls the font of the names of confirmed controls.||
+
+==Player Lobby==
+||_*Item Name*_||_*Default Value*_||_*Type*_||_*Function*_||
+||`lobby_mode`||0||`int`||Sets the lobby mode. 0 = locked avatar; 1 = floating avatar||
+||`lobby_font_color`||#FFFFFF||`hexcolor`||Controls the color of player names.||
+||`lobby_select_color`||#FFBF00||`hexcolor`||Controls the color of the name of the selected player, if not using a select image.||
+||`lobby_disable_color`||#666666||`hexcolor`||Controls the color of already-selected player names.||
+||`lobby_info_color`||#FFFFFF||`hexcolor`||Controls the color of the information text about the currently-selected player.||
+||`lobby_select_x`||0.9||`float`||X position of the player list.||
+||`lobby_select_y`||0.32||`float`||Y position of the player list.||
+||`lobby_select_scale`||0.0018||`float`||Controls the size of the player list font.||
+||`lobby_select_font`||loadingFont||`str`||Controls the font of the player list - see above.||
+||`lobby_select_space`||0.04||`float`||Controls the spacing between the names in the player list.||
+||`lobby_select_length`||5||`int`||Controls the number of items to show at a time in the player list.||
+||`lobby_preview_x`||0.3||`float`||X position of the selected player's preview info.||
+||`lobby_preview_y`||0.0||`float`||Sets the Y offset of the selected player's preview info.||
+||`lobby_preview_spacing`||0.04||`float`||Controls the spacing between lines in the selected player's preview info.||
+||`lobby_avatar_x`||0.7||`float`||In lobby mode 1, X position of the selected player's avatar.||
+||`lobby_avatar_y`||0.75||`float`||In lobby mode 1, Y position of the selected player's avatar.||
+||`lobby_avatar_scale`||1.0||`float`||In lobby mode 1, controls the size of the selected player's avatar.||
+||`lobby_select_image_x`||0.8||`float`||X position of the image behind the selected item, if available.||
+||`lobby_select_image_y`||0.355||`float`||Y position of the image behind the selected item, if available.||
+||`lobby_title_x`||0.5||`float`||X position of the "Choose Your Character" text/image.||
+||`lobby_title_y`||0.24||`float`||Y position of the "Choose Your Character" text/image.|| 
+||`lobby_title_character_x`||0.26||`float`||X position of the "Player #" text.||
+||`lobby_title_character_y`||0.24||`float`||Y position of the "Player #" text.||
+||`lobby_title_scale`||0.0024||`float`||Controls the size of the title font.||
+||`lobby_title_color`||#FFFFFF||`hexcolor`||Controls the color of the "Choose Your Character" text, if not using an image.||
+||`lobby_player_color`||#FFFFFF||`hexcolor`||Controls the color of the "Player #" text.||
+||`lobby_title_font`||font||`str`||Controls the font of the title text - see above.||
+
+==Player Creation==
+||_*Item Name*_||_*Default Value*_||_*Type*_||_*Function*_||
+||`character_create_font_color`||#FFFFFF||`hexcolor`||Controls the color of the menu options.||
+||`character_create_select_color`||#FFBF00||`hexcolor`||Controls the color of the currently-selected menu item.||
+||`character_create_help_color`||#FFFFFF||`hexcolor`||Controls the color of the menu option help information.||
+||`character_create_help_y`||.73||`float`||Y position of the menu option help information.||
+||`character_create_x`||0.25||`float`||X position of the menu option names.||
+||`character_create_option_x`||0.75||`float`||X position of the selectable option values.||
+||`character_create_y`||0.15||`float`||Y position of the first menu item.||
+||`character_create_scale`||.0018||`float`||Controls the size of the text.||
+||`character_create_space`||.045||`float`||Controls the spacing between the menu items.||
+||`avatar_select_text_x`||.44||`float`||X position of the "Choose Your Avatar" text.||
+||`avatar_select_text_y`||.16||`float`||Y position of the "Choose Your Avatar" text.||
+||`avatar_select_text_scale`||.0027||`float`||Controls the size of the "Choose Your Avatar" text.||
+||`avatar_select_font`||font||`str`||Controls the font used for the "Choose Your Avatar" text - see above.||
+||`avatar_select_wheel_y`||0.0||`float`||Controls the Y offset of the avatar choice wheel.||
+||`avatar_select_avatar_x`||.667||`float`||X position of the currently-selected avatar.||
+||`avatar_select_avatar_y`||.5||`float`||Y position of the currently-selected avatar.||
 
 ----------------------------------------------------------------------------
 =Song Selection List / CD list=
@@ -136,7 +200,6 @@ if display is True:
 ||song_select_submenu_y = 0||Controls the submenu text positions. Use a decimal # between 0 - 1, IE- .030||
 ||song_select_submenu_offset_lines = 2||Adds offset lines. Has *NO* effect if {{{song_select_submenu_x_ AND _song_select_submenu_y}}} *aren't* used.||
 ||song_select_submenu_offset_spaces = 2||Adds offset spaces. Has *NO* effect if {{{song_select_submenu_x AND song_select_submenu_y}}} *aren't* used.||
-||trainingtext2 = .5,.51,.76,0||.51 is X Pos, .51 is Y Position, .76 is Scaling Size, 0 is Line Spacing between menu items. Used for Training Menu(This is only used if you made the training.png and trainingtext2.png images. The '2' in the name refers to being that, for example, the GH3 training menu has 2 choices in list. Uses the same method as how the Main Menu text image is done for example.)||
 
 
 ------------------------------------------------------------------------------------------
@@ -161,9 +224,20 @@ Notice - If you just want the default phrases to show do not put these in your t
 ------------------------------------------------------------------------------------------
 =In Game=            
 
+==All Instruments==
 ||_*Item Name*_||_*What it Does/How to use it*_||
-||crowd_loop_delay = x||x = integer.  Default user setting = 550 for sounds\crowdcheers.ogg)||
 ||display_all_grey_stars = True||True - All 5 stars shown at all times. False - Only shows the grey star your currently working on||
+||ingame_stats_color = #000000||Manually chooses the In Game Stats color. Use a Hex Color Value.||
+||song_info_display_scale = 0.0020||Controls the size of the song info shown at gameplay countdown. Use a floating point number||
+||song_info_display_X = 0.05||Controls the X position of song info display during countdown. Use a floating point number||
+||song_info_display_Y = 0.05||Controls the Y position of song info display during countdown. Use a floating point number||
+||star_fillup_center_x = 139||Controls the X Position of the Center of the Star Fillup||
+||star_fillup_center_y = 151||Controls the Y Position of the Center of the Star Fillup||
+||star_fillup_in_radius = 121||Controls the inner radius||
+||star_fillup_out_radius = 138||Controls the outer radius||
+||star_fillup_color = #FFF25E||Controls the color of the star fill up.||
+
+==Guitars and Drums==
 ||fret0_color = #22FF22||Manually sets 1st fret tail color. Use a Hex Color Value.||
 ||fret1_color = #FF2222||Manually sets 2nd fret tail color. Use a Hex Color Value.||
 ||fret2_color = #FFFF22||Manually sets 3rd fret tail color. Use a Hex Color Value.||
@@ -176,7 +250,6 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||hopo_indicator_inactive_color = #FF0000||Manually sets inactive color of hopo indicator||
 ||hopo_indicator_x = .950||Manually sets x position of hopo indicator||
 ||hopo_indicator_y = .950||Manually sets y position of hopo indicator||
-||ingame_stats_color = #000000||Manually chooses the In Game Stats color. Use a Hex Color Value.||
 ||jurgen_text_pos = 1,1,0.0004||Any scale under .00035 will be resized.Any coordinates that are off the screen will automatically be moved back on to screen, and jurgen text is rendered above everything.||
 ||mesh_color = #000000||Use a Hex Color Value.||
 ||neck_width = 3 || Controls how wide you want the fret board to be. Use a floating point number.||
@@ -194,15 +267,7 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||rbmenu = true||Turns on replicating the Buttons scrolling up from the bottom at the game intro for Rock Band theme's.||
 ||rockmeter_score_color = #93c351||Controls rockmeter score color. Use a Hex Color Value.||
 ||Rotating 3d Starnotes||Default is on||
-||song_info_display_scale = 0.0020||Controls the size of the song info shown at gameplay countdown. Use a floating point number||
-||song_info_display_X = 0.05||Controls the X position of song info display during countdown. Use a floating point number||
-||song_info_display_Y = 0.05||Controls the Y position of song info display during countdown. Use a floating point number||
 ||spot_color = #EEEEEE||Use a Hex Color Value.||
-||star_fillup_center_x = 139||Controls the X Position of the Center of the Star Fillup||
-||star_fillup_center_y = 151||Controls the Y Position of the Center of the Star Fillup||
-||star_fillup_in_radius = 121||Controls the inner radius||
-||star_fillup_out_radius = 138||Controls the outer radius||
-||star_fillup_color = #FFF25E||Controls the color of the star fill up.||
 ||threeDspin = False||Turns 3d Starnote spinning off.||
 ||twoDkeys = False||Use 3d keys  = False||
 ||twoDnote = False||Use 3d notes = False||
@@ -212,6 +277,9 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||noterot3 = 0||This set's how many times you want the rotation degree to be applied to 3rd note (Textured 3d Notes Only)||
 ||noterot4 = 1||This set's how many times you want the rotation degree to be applied to 4th note (Textured 3d Notes Only)||
 ||noterot5 = 2||This set's how many times you want the rotation degree to be applied to 5th note (Textured 3d Notes Only)||
+
+==Vocals==
+||_*Item Name = default*_||_*What It Does/How to Use*_||
 ||vocal_meter_size = 45.000   || -=Working on=- (Use a floating number)||
 ||vocal_meter_x = .25   || -=Working on=- (Use a floating number)||
 ||vocal_meter_y = .8   || -=Working on=- (Use a floating number)||
@@ -235,21 +303,6 @@ Notice - If you just want the default phrases to show do not put these in your t
 ||vocal_lane_color_star = #FFFF80   || -=Working on=- (Use a hex color value)||
 ||vocal_shadow_color_star = #FFFFBF || -=Working on=- (Use a hex color value)||
 ||vocal_glow_color_star = #FFFF00   || -=Working on=- (Use a hex color value)||
-
-
-
-
-------------------------------------------------------------------------------------------
-=Background, text, selected text colors=
-
-||_*Item Name*_||_*What it Does/How to use it*_||
-||background_color = #000000||Controls the color of the background screen. Should be black. . Use a Hex Color Value.||
-||base_color = #FFFFFF||Controls the Unselected text color. . Use a Hex Color Value.||
-||selected_color = #FFBF00||Controls the Highlighted text color. . Use a Hex Color Value.||
-||versiontag = true||Forces showing the Versiontag.png on-screen. . Use a Hex Color Value.|| 
-
-
-
 
 ----------------------------------------------------------------------------
 =Pause Menu / Failed Menu=
@@ -281,6 +334,7 @@ Notice - If you just want the default phrases to show do not put these in your t
 =Game Results Screen=
 
 ||_*Item Name*_||_*What it Does/How to use it*_ (X pos, Y pos, scale size||
+||crowd_loop_delay = x||x = integer.  Default user setting = 550 for sounds\crowdcheers.ogg)||
 ||result_cheats_color = #FFFFFF||Defines the results cheats color . Use a Hex Color Value.||
 ||result_cheats_info = .5,.3,.002||Defines the results cheats info position and size.||
 ||result_cheats_numbers = .5,.35,.0015||Defines the results cheats numbers position and size.||
@@ -308,5 +362,3 @@ Notice - If you just want the default phrases to show do not put these in your t
 
 
 Good luck with making a custom theme to all!!!
------------------------------------------------
-This was made and is maintained by Worldrave
