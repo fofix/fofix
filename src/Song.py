@@ -654,6 +654,8 @@ class SongInfo(object):
       v = self.info.get("song", attr)
     except:
       v = default
+    if v == "": #key found, but empty - need to catch as int("") will burn.
+      v = default
     if v is not None and type:
       v = type(v)
     return v
