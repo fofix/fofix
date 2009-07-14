@@ -29,6 +29,7 @@ from Microphone import Microphone, getNoteName
 from Song import VocalNote, VocalPhrase
 from OpenGL.GL import *
 from numpy import array, float32
+from random import random
 import Theme
 
 #stump: needed for continuous star fillup (akedrou - stealing for vocals)
@@ -36,7 +37,7 @@ import Image
 import ImageDraw
 from Svg import ImgDrawing
 
-diffMod = {0: 1.2, 1: 1.4, 2: 1.6, 3: 1.8}
+diffMod = {0: 1.4, 1: 1.6, 2: 1.75, 3: 1.9}
 
 class Vocalist:
   def __init__(self, engine, playerObj, editorMode = False, player = 0):
@@ -272,6 +273,10 @@ class Vocalist:
     self.tapBufferMargin = 300 - (50 * self.difficulty)
     self.accuracy        = 5000 - (self.difficulty * 1000)
     self.difficultyModifier = diffMod[self.difficulty]
+    
+    #Controls Jurgen in vocal parts
+    self.jurgenEnabled   = False
+    self.jurgenSkill     = 5
   
   def setBPM(self, bpm):
     if bpm > 200:
@@ -319,6 +324,24 @@ class Vocalist:
     else:
       return None
   
+  def getJurgenPct(self):
+    #Controls Jurgen in vocal parts
+    j = self.jurgenSkill
+    if not self.jurgenEnabled:
+      return 1
+    if j == 0:
+      return min((.70 + (.05*self.difficulty*random())), 1)
+    elif j == 1:
+      return min((.80 + (.05*self.difficulty*random())), 1)
+    elif j == 2:
+      return min((.85 + (.05*self.difficulty*random())), 1)
+    elif j == 3:
+      return min((.90 + (.05*self.difficulty*random())), 1)
+    elif j == 4:
+      return min((.95 + (.05*self.difficulty*random())), 1)
+    else:
+      return 1
+  
   def getCurrentNote(self, pos):
     if not self.mic.mic_started:
       return
@@ -331,8 +354,12 @@ class Vocalist:
       self.lastPos = pos
       self.currentNote = self.tap
       return
-    self.peak = self.mic.getPeak()
-    self.formants = self.mic.getFormants()
+    if not self.jurgenEnabled:
+      self.peak = self.mic.getPeak()
+      self.formants = self.mic.getFormants()
+    else:
+      self.peak = -10
+      self.formants = [100, 600]
     if self.currentNote is not None:
       if abs(self.currentNote) < self.allowedDeviation:
         self.oldNote = self.currentNote
@@ -340,7 +367,10 @@ class Vocalist:
       self.starPowerCountdown = False
       self.starPowerTimer = 200
     elif self.requiredNote is not None:
-      self.currentNote = self.mic.getDeviation(self.requiredNote)
+      if self.jurgenEnabled:
+        self.currentNote = 0
+      else:
+        self.currentNote = self.mic.getDeviation(self.requiredNote)
       #if self.awardEnd:
       #  mult = .8
       #else:
@@ -350,8 +380,8 @@ class Vocalist:
           self.currentNote = 0
         if abs(self.currentNote) < self.allowedDeviation and self.formants[1] is not None:
           duration = pos - self.lastPos
-          self.currentNoteItem.accuracy += duration*mult
-          self.phraseInTune += duration*self.difficultyModifier*mult
+          self.currentNoteItem.accuracy += duration*mult*self.getJurgenPct()
+          self.phraseInTune += duration*self.difficultyModifier*mult*self.getJurgenPct()
           self.pitchFudge = 70.0
         # elif self.currentNoteItem.played and self.stayEnd <= 0 and self.awardEnd:
           # self.currentNoteItem.accuracy += self.currentNoteItem.length * (1-mult)

@@ -706,6 +706,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         if self.doneScores:
           if len(self.playerList) > 1 and self.playerList[0].part == self.playerList[1].part and self.playerList[0].difficulty == self.playerList[1].difficulty and self.highscoreIndex[0] != -1 and self.highscoreIndex[1] != -1 and self.highscoreIndex[1] <= self.highscoreIndex[0]:
             self.highscoreIndex[0] += 1
+      else:
+        self.nextHighScore()
       if self.keepCount > 0 and not self.doneCount:
         if self.song.info.count:
           count = int(self.song.info.count)
@@ -1345,6 +1347,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       
       if self.offset < endScroll or i == -1:
         self.offset = self.scoreScrollStartOffset
+        self.hsRollIndex = (self.hsRollIndex+1)%len(self.playerList)
         self.nextHighScore()
     
     for j,player in enumerate(self.playerList): #MFH 

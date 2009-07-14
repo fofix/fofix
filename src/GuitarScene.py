@@ -2042,8 +2042,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.fail_completed_color = Theme.hexToColor(Theme.fail_completed_colorVar)
     
 
-    settingsMenu = Settings.GameSettingsMenu(self.engine, self.pause_text_color, self.pause_selected_color, players = len(self.playerList))
-    careerSettingsMenu = Settings.GameCareerSettingsMenu(self.engine, self.pause_text_color, self.pause_selected_color, players = len(self.playerList))
+    settingsMenu = Settings.GameSettingsMenu(self.engine, self.pause_text_color, self.pause_selected_color, players = self.playerList)
+    careerSettingsMenu = Settings.GameCareerSettingsMenu(self.engine, self.pause_text_color, self.pause_selected_color, players = self.playerList)
     settingsMenu.fadeScreen = False
     careerSettingsMenu.fadeScreen = False
 
@@ -2563,12 +2563,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.aiSkill             = [0 for i in self.playerList]
     
     for i, player in enumerate(self.playerList):
-      if player.part.id == Song.VOCAL_PART:
-        continue
-      if self.engine.config.get("game", "jurg_p%d" % i) == True:
+      jurgen = self.engine.config.get("game", "jurg_p%d" % i)
+      if jurgen == True:
         self.jurg[i] = True
         self.autoPlay = True
       self.aiSkill[i] = self.engine.config.get("game", "jurg_skill_p%d" % i)
+      if player.part.id == Song.VOCAL_PART:
+        self.instruments[i].jurgenEnabled = jurgen
+        self.instruments[i].jurgenSkill   = self.aiSkill[i]
       self.jurgenLogic[i] = self.engine.config.get("game", "jurg_logic_p%d" % i)    
       
       
@@ -4256,7 +4258,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
         
         if guitar.drumFillsActive:
-          if self.muteDrumFill > 0:
+          if self.muteDrumFill > 0 and not self.jurg[i]:
             self.song.setInstrumentVolume(0.0, self.playerList[i].part)
           
         #MFH - ensure this missed notes check doesn't fail you during a freestyle section

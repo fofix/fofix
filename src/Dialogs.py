@@ -3257,20 +3257,23 @@ class SongChooser(Layer, KeyListener):
           c1,c2,c3 = self.song_rb2_diff_color
           glColor3f(c1,c2,c3)
           
-          font.render(_("DIFFICULTY"), (.095, .54), scale = 0.0018)
+          font.render(_("DIFFICULTY"), (.095, .5325), scale = 0.0018)
           scale = 0.0014
           text = _("BAND")
           w, h = font.getStringSize(text, scale = scale)
-          font.render(text, (.17 - w, .57), scale = scale)
+          font.render(text, (.17 - w, .5585), scale = scale)
           text = _("GUITAR")
           w, h = font.getStringSize(text, scale = scale)
-          font.render(text, (.17 - w, .595), scale = scale)
+          font.render(text, (.17 - w, .5835), scale = scale)
           text = _("DRUM")
           w, h = font.getStringSize(text, scale = scale)
-          font.render(text, (.17 - w, .62), scale = scale)
+          font.render(text, (.17 - w, .6085), scale = scale)
           text = _("BASS")
           w, h = font.getStringSize(text, scale = scale)
-          font.render(text, (.17 - w, .645), scale = scale)
+          font.render(text, (.17 - w, .6335), scale = scale)
+          text = _("VOCALS")
+          w, h = font.getStringSize(text, scale = scale)
+          font.render(text, (.17 - w, .6585), scale = scale)
 
           #Add support for lead and rhythm diff          
 
@@ -3531,36 +3534,38 @@ class SongChooser(Layer, KeyListener):
                     font.render(yeartag, (.095, .51), scale = 0.0015)
 
                  
-                    for i in range(0,4):
+                    for i in range(5):
                       glColor3f(1, 1, 1) 
                       if i == 0:
                         diff = item.diffSong
-                      if i == 1:
+                      elif i == 1:
                         diff = item.diffGuitar
-                      if i == 2:
+                      elif i == 2:
                         diff = item.diffDrums
-                      if i == 3:
+                      elif i == 3:
                         diff = item.diffBass
+                      elif i == 4:
+                        diff = item.diffVocals
                       if self.diffimg1 == None:
                         if diff == -1:
-                          font.render("N/A", (.18, .57 + i*.025), scale = 0.0014)
+                          font.render("N/A", (.18, .5585 + i*.025), scale = 0.0014)
                         elif diff == 6:
                           glColor3f(1, 1, 0)  
-                          font.render(str(Data.STAR2 * (diff -1)), (.18, 0.575 + i*.025), scale = 0.003)
+                          font.render(str(Data.STAR2 * (diff -1)), (.18, 0.5685 + i*.025), scale = 0.003)
                         else:
-                          font.render(str(Data.STAR2 * diff + Data.STAR1 * (5 - diff)), (.18, 0.575 + i*.025), scale = 0.003)
+                          font.render(str(Data.STAR2 * diff + Data.STAR1 * (5 - diff)), (.18, 0.5685 + i*.025), scale = 0.003)
                       else:
                         w, h, = self.engine.view.geometry[2:4]
                         if diff == -1:
-                          font.render("N/A", (.18, .57 + i*.025), scale = 0.0014)
+                          font.render("N/A", (.18, .5585 + i*.025), scale = 0.0014)
                         elif diff == 6:
                           for k in range(0,5):
-                            self.engine.drawImage(self.diffimg3, scale = (wfactor1,-wfactor1), coord = ((.19+.03*k)*w, (0.22-.035*i)*h))
+                            self.engine.drawImage(self.diffimg3, scale = (wfactor1,-wfactor1), coord = ((.19+.03*k)*w, (0.2354-.0333*i)*h))
                         else:
                           for k in range(0,diff):
-                            self.engine.drawImage(self.diffimg2, scale = (wfactor1,-wfactor1), coord = ((.19+.03*k)*w, (0.22-.035*i)*h))
+                            self.engine.drawImage(self.diffimg2, scale = (wfactor1,-wfactor1), coord = ((.19+.03*k)*w, (0.2354-.0333*i)*h))
                           for k in range(0, 5-diff):
-                            self.engine.drawImage(self.diffimg1, scale = (wfactor1,-wfactor1), coord = ((.31-.03*k)*w, (0.22-.035*i)*h))
+                            self.engine.drawImage(self.diffimg1, scale = (wfactor1,-wfactor1), coord = ((.31-.03*k)*w, (0.2354-.0333*i)*h))
            
         finally:
           text = self.instrument.text + " - " + self.diff.text

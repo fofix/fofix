@@ -38,6 +38,7 @@ import Audio
 import Player
 from View import BackgroundLayer
 from Input import KeyListener
+from Song import VOCAL_PART
 
 import pygame
 import os
@@ -1591,9 +1592,10 @@ class GameSettingsMenu(Menu.Menu):
     
     Cheats = []
     
-    for i in range(players):
+    for i, player in enumerate(players):
       Cheats.append(ConfigChoice(engine, engine.config, "game", "jurg_p%d" % i, autoApply = True))#Jurgen config -- Spikehead777
-      Cheats.append(ConfigChoice(engine, engine.config, "game", "jurg_logic_p%d" % i, autoApply = True))#MFH
+      if player.part.id != VOCAL_PART:
+        Cheats.append(ConfigChoice(engine, engine.config, "game", "jurg_logic_p%d" % i, autoApply = True))#MFH
      #MFH
     CheatMenu = Menu.Menu(engine, Cheats, pos = (.350, .310), viewSize = 5, textColor = gTextColor, selectedColor = gSelectedColor)
     
@@ -1623,7 +1625,7 @@ class GameCareerSettingsMenu(Menu.Menu):
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("GameSettingsMenu class init (Settings.py)...")
-    
+    players = None
     settings = [
       VolumeConfigChoice(engine, engine.config, "audio",  "guitarvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "songvol", autoApply = True),
