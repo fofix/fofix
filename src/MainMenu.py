@@ -119,8 +119,6 @@ class MainMenu(BackgroundLayer):
     
     allowMic = True
     
-    if not os.path.exists(os.path.join(Version.dataPath(), "themes", self.themename, "vocals")):
-      allowMic = False
     if self.theme == 0:
       allowMic = False
 

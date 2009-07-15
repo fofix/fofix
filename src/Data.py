@@ -101,7 +101,11 @@ class Data(object):
       themename = defaultTheme
       self.themeLabel = themename
 
-
+    
+    if not os.path.exists(os.path.join(Version.dataPath(), "themes", themename, "vocals")):
+      self.vocalPath = "vocals"
+    else:
+      self.vocalPath = os.path.join("themes",themename,"vocals")
 
     if self.fileExists(os.path.join("themes",themename,"spfill.png")):
       self.theme = 0

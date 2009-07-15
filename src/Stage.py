@@ -376,7 +376,7 @@ class Stage(object):
         except IOError:
           self.engine.loadImgDrawing(self, "background", os.path.join(libraryName, songName, "background.png"))
       except IOError:
-        Log.warn("No song-specific stage found") # evilynux
+        Log.notice("No song-specific stage found") # evilynux
         test = False
       if test:  #does a song-specific background exist?
         self.rotationMode = 0
@@ -396,7 +396,7 @@ class Stage(object):
           except IOError:
             self.engine.loadImgDrawing(self, "background", os.path.join(self.path, "default.png"))            
         except IOError:
-          Log.warn("No default stage, fallbacking on a forced Blank stage mode") # evilynux
+          Log.warn("No default stage; falling back on a forced Blank stage mode") # evilynux
           self.mode = 2    #if no practice stage, just fall back on a forced Blank stage mode
 
       ##This checks how many Stage-background we have to select from
@@ -464,6 +464,9 @@ class Stage(object):
           wfactor = 640.000/imgwidth
           self.imgArr.append(getattr(self, "backgroundA", os.path.join(self.path, files[j])))
           self.imgArrScaleFactors.append(wfactor)
+    
+    if self.rotationMode > 0 and len(self.imgArr) == 0:
+      self.rotationMode = 0
 
     if self.mode != 2 and self.background:   #MFH - precalculating scale factor
       imgwidth = self.background.width1()
