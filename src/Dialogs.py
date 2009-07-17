@@ -966,7 +966,7 @@ class SongChooser(Layer, KeyListener):
 
   def songListLoaded(self, songs):
     if self.songLoader:
-      self.songLoader.stop() # evilynux - cancel() became stop()
+      self.songLoader.cancel() # evilynux - cancel() became stop() - akedrou: when?
     self.selectedIndex = 0
     if self.display != 4:
       #MFH: Here, scan self.songs for a SongInfo followed by a TitleInfo.  Insert a BlankSpaceInfo object in between them. (one will already be in front of a CareerResetterInfo)
@@ -1105,7 +1105,7 @@ class SongChooser(Layer, KeyListener):
     
   def hidden(self):
     if self.songLoader:
-      self.songLoader.stop() # evilynux - cancel() became stop()
+      self.songLoader.cancel() # evilynux - cancel() became stop() - akedrou: when?
     if self.song:
       self.song.fadeout(1000)
       self.song = None
@@ -1210,7 +1210,7 @@ class SongChooser(Layer, KeyListener):
         # evilynux - "song" might be in the process of being created by a song preview,
         #            stopping the songLoader is safer.
         if self.songLoader:
-          self.songLoader.stop()
+          self.songLoader.cancel()
         #if not self.song: #MFH - play the sound immediately, THEN process.
         self.engine.data.acceptSound.setVolume(self.sfxVolume)  #MFH
         self.engine.data.acceptSound.play()
@@ -1269,7 +1269,7 @@ class SongChooser(Layer, KeyListener):
           self.sortOrder = 0
         self.engine.config.set("game", "sort_order", self.sortOrder)
         if self.songLoader:
-          self.songLoader.stop()
+          self.songLoader.cancel()
         if self.song:
           self.song.fadeout(1000)
         self.selectedItem = None
@@ -1280,7 +1280,7 @@ class SongChooser(Layer, KeyListener):
       # evilynux - "song" might be in the process of being created,
       #            stopping the songLoader is safer.
       if self.songLoader:
-        self.songLoader.stop()
+        self.songLoader.cancel()
       #if not self.song:
       self.engine.data.cancelSound.setVolume(self.sfxVolume)  #MFH
       self.engine.data.cancelSound.play()
@@ -1449,6 +1449,12 @@ class SongChooser(Layer, KeyListener):
     song.setRhythmVolume(self.engine.config.get("audio", "rhythmvol"))
     song.play()
     self.song = song
+  
+  def songCanceled(self):
+    self.songLoader = None
+    if self.song:
+      self.song.stop()
+    self.song = None
 
   def playSelectedSong(self):
     song = self.getSelectedSong()
@@ -1467,11 +1473,11 @@ class SongChooser(Layer, KeyListener):
     # evilynux - Stop already playing song if any
     if self.songLoader:
       try:
-        self.songLoader.stop()
+        self.songLoader.cancel()
       except:
         self.songLoader = None
 
-    self.songLoader = self.engine.resource.load(self, None, lambda: Song.loadSong(self.engine, song, playbackOnly = True, library = self.library), synch = False, onLoad = self.songLoaded) #Blazingamer - asynchronous preview loading allows "Loading Preview..." to correctly disappear.
+    self.songLoader = self.engine.resource.load(self, None, lambda: Song.loadSong(self.engine, song, playbackOnly = True, library = self.library), synch = False, onLoad = self.songLoaded, onCancel = self.songCanceled) #Blazingamer - asynchronous preview loading allows "Loading Preview..." to correctly disappear.
 
   def run(self, ticks):
     self.time += ticks / 50.0
@@ -1702,7 +1708,7 @@ class SongChooser(Layer, KeyListener):
         self.engine.config.set("game", "songlist_instrument", self.instrument.id)
         if self.sortOrder == 7:
             if self.songLoader:
-              self.songLoader.stop()
+              self.songLoader.cancel()
             if self.song:
               self.song.fadeout(1000)
             self.selectedItem = None
