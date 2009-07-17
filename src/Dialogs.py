@@ -1336,7 +1336,7 @@ class SongChooser(Layer, KeyListener):
 
         
     #myfingershurt: adding yellow fret preview again
-    elif c in Player.key3s:
+    elif c in Player.key3s or key == pygame.K_F3:
       self.playSong = True
 
     #racer: highscores change on fret hit
@@ -1444,9 +1444,9 @@ class SongChooser(Layer, KeyListener):
     if self.song:
       self.song.stop()
     
-    song.setGuitarVolume(self.engine.config.get("audio", "guitarvol"))
-    song.setBackgroundVolume(self.engine.config.get("audio", "songvol"))
-    song.setRhythmVolume(self.engine.config.get("audio", "rhythmvol"))
+    song.crowdVolume = 0
+    song.activeAudioTracks = [Song.GUITAR_TRACK, Song.RHYTHM_TRACK, Song.DRUM_TRACK]
+    song.setAllTrackVolumes(1)
     song.play()
     self.song = song
   

@@ -119,14 +119,22 @@ class ActiveConfigChoice(ConfigChoice):
   """
   ConfigChoice with an additional callback function.
   """
-  def __init__(self, engine, config, section, option, onChange, autoApply = True):
+  def __init__(self, engine, config, section, option, onChange, autoApply = True, volume = False):
     ConfigChoice.__init__(self, engine, config, section, option, autoApply = autoApply)
     self.engine   = engine
     self.onChange = onChange
+    self.volume   = volume
     
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("ActiveConfigChoice class init (Settings.py)...")
+  
+  def change(self, value):
+    ConfigChoice.change(self, value)
+    if self.volume:
+      sound = self.engine.data.screwUpSound
+      sound.setVolume(self.value)
+      sound.play()
   
   def apply(self):
     ConfigChoice.apply(self)
@@ -885,13 +893,13 @@ class SettingsMenu(Menu.Menu):
     self.volumeSettings = [
       VolumeConfigChoice(engine, engine.config, "audio",  "guitarvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "songvol", autoApply = True),
-      VolumeConfigChoice(engine, engine.config, "audio",  "rhythmvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "screwupvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "miss_volume", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "single_track_miss_volume", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "crowd_volume", autoApply = True), #akedrou
       VolumeConfigChoice(engine, engine.config, "audio",  "kill_volume", autoApply = True), #MFH
-      VolumeConfigChoice(engine, engine.config, "audio",  "SFX_volume", autoApply = True), #MFH
+      ActiveConfigChoice(engine, engine.config, "audio",  "SFX_volume", autoApply = True, onChange = self.engine.data.SetAllSoundFxObjectVolumes, volume = True), #MFH
+      ActiveConfigChoice(engine, engine.config, "audio",  "menu_volume", autoApply = True, onChange = self.engine.mainMenu.setMenuVolume),
     ]
     self.volumeSettingsMenu = Menu.Menu(engine, self.volumeSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
     
@@ -1255,13 +1263,13 @@ class BasicSettingsMenu(Menu.Menu):
     volumeSettings = [
       VolumeConfigChoice(engine, engine.config, "audio",  "guitarvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "songvol", autoApply = True),
-      VolumeConfigChoice(engine, engine.config, "audio",  "rhythmvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "screwupvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "miss_volume", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "single_track_miss_volume", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "crowd_volume", autoApply = True), #akedrou
       VolumeConfigChoice(engine, engine.config, "audio",  "kill_volume", autoApply = True), #MFH
-      VolumeConfigChoice(engine, engine.config, "audio",  "SFX_volume", autoApply = True), #MFH
+      ActiveConfigChoice(engine, engine.config, "audio",  "SFX_volume", autoApply = True, onChange = self.engine.data.SetAllSoundFxObjectVolumes, volume = True), #MFH
+      ActiveConfigChoice(engine, engine.config, "audio",  "menu_volume", autoApply = True, onChange = self.engine.mainMenu.setMenuVolume),
     ]
     volumeSettingsMenu = Menu.Menu(engine, volumeSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
 
@@ -1603,13 +1611,12 @@ class GameSettingsMenu(Menu.Menu):
       (_("Cheats"), CheatMenu),
       VolumeConfigChoice(engine, engine.config, "audio",  "guitarvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "songvol", autoApply = True),
-      VolumeConfigChoice(engine, engine.config, "audio",  "rhythmvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "screwupvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "miss_volume", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "single_track_miss_volume", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "crowd_volume", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "kill_volume", autoApply = True), #MFH
-      VolumeConfigChoice(engine, engine.config, "audio",  "SFX_volume", autoApply = True), #MFH
+      ActiveConfigChoice(engine, engine.config, "audio",  "SFX_volume", autoApply = True, onChange = engine.data.SetAllSoundFxObjectVolumes, volume = True), #MFH
       ConfigChoice(engine, engine.config, "audio", "enable_crowd_tracks", autoApply = True), #akedrou
       ConfigChoice(engine, engine.config, "audio",  "delay", autoApply = True),   #myfingershurt: so the a/v delay can be adjusted in-game
       ConfigChoice(engine, engine.config, "game", "stage_rotate_delay", autoApply = True),   #myfingershurt - user defined stage rotate delay
@@ -1629,13 +1636,12 @@ class GameCareerSettingsMenu(Menu.Menu):
     settings = [
       VolumeConfigChoice(engine, engine.config, "audio",  "guitarvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "songvol", autoApply = True),
-      VolumeConfigChoice(engine, engine.config, "audio",  "rhythmvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "screwupvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "miss_volume", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "single_track_miss_volume", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "crowd_volume", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "kill_volume", autoApply = True), #MFH
-      VolumeConfigChoice(engine, engine.config, "audio",  "SFX_volume", autoApply = True), #MFH
+      ActiveConfigChoice(engine, engine.config, "audio",  "SFX_volume", autoApply = True, onChange = engine.data.SetAllSoundFxObjectVolumes, volume = True), #MFH
       ConfigChoice(engine, engine.config, "audio", "enable_crowd_tracks", autoApply = True), #akedrou
       ConfigChoice(engine, engine.config, "audio",  "delay", autoApply = True),   #myfingershurt: so the a/v delay can be adjusted in-game
       ConfigChoice(engine, engine.config, "game", "stage_rotate_delay", autoApply = True),   #myfingershurt - user defined stage rotate delay

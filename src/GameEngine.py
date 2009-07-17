@@ -134,9 +134,10 @@ Config.define("audio",  "delay",        int,   100,   text = _("A/V Delay"), opt
 Config.define("audio",  "screwupvol", float,   0.25,  text = _("Screw-Up Sounds"), options = sortOptionsByKey({0.0: _("Off"), .25: _("Quiet"), .5: _("Loud"), 1.0: _("Painful")}), tipText = _("How loud should the sound of your screwing up be? Very."))
 
 #MFH: below are normal 0-10 volume settings.
-Config.define("audio",  "guitarvol",  float,    1.0,  text = _("Guitar Volume"),   options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(0, 110, 10)]), tipText = _("Lead guitar volume."))
-Config.define("audio",  "songvol",    float,    1.0,  text = _("Song Volume"),     options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(0, 110, 10)]), tipText = _("Vocals and other background volume."))
-Config.define("audio",  "rhythmvol",  float,    1.0,  text = _("Rhythm Volume"),   options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(0, 110, 10)]), tipText = _("Bass, rhythm guitar, and drum volume."))
+#akedrou - these are 1-10 (not 0-10) because a setting of 0 will trigger the "miss volume"
+Config.define("audio",  "guitarvol",  float,    1.0,  text = _("Active Track Volume"),   options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(10, 110, 10)]), tipText = _("Volume of the parts you are playing."))
+Config.define("audio",  "songvol",    float,    0.8,  text = _("Background Volume"),     options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(10, 110, 10)]), tipText = _("Volume of the parts you are not playing."))
+#Config.define("audio",  "rhythmvol",  float,    1.0,  text = ("Rhythm Volume"),   options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(0, 110, 10)]), tipText = ("Bass, rhythm guitar, and drum volume."))
 
 Config.define("performance", "game_priority",       int,   2,      text = _("Process Priority"), options = sortOptionsByKey({0: _("Idle"), 1: _("Low"), 2: _("Normal"), 3:_("Above Normal"), 4:_("High"), 5:_("Realtime")}), tipText = _("Change this to increase the priority of the FoFiX process. Don't change this unless you know what you're doing. DO NOT set this to Realtime. Ever."))
 Config.define("performance", "use_psyco", bool, True, text=_("Use Psyco"), options={False: _("No"), True: _("Yes")}, tipText = _("Enable or disable the Psyco specializing compiler. Tests have indicated the game runs faster with it off."))  #stump
@@ -353,6 +354,7 @@ Config.define("audio",  "enable_crowd_tracks", int,  1,      text = _("Crowd Che
 #Config.define("audio",  "single_track_miss_volume",         float, 0.9,    text = _("Single Track Miss"), options = dict([(n / 100.0, "%d%%" % n) for n in range(0, 100, 10)]))
 Config.define("audio",  "miss_volume",         float, 0.2,    text = _("Miss Volume"), options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(0, 110, 10)]), tipText = _("Set the volume of the active track when you miss a note."))  #MFH
 Config.define("audio",  "single_track_miss_volume",         float, 0.9,    text = _("Single Track Miss"), options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(0, 110, 10)]), tipText = _("When playing a song with only a single track, this sets the volume of the track when you miss a note."))  #MFH
+Config.define("audio",  "menu_volume",         float, 0.6,    text = _("Menu Volume"), options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(0, 110, 10)]), tipText = _("Set the volume of the background menu music.")) #akedrou
 
 Config.define("audio",  "crowd_volume",       float, 0.8,    text = _("Crowd Volume"), options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(0, 110, 10)]), tipText = _("Set the volume of the crowd.")) #akedrou
 

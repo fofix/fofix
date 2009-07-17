@@ -455,8 +455,11 @@ class Data(object):
     for s in self.screwUpsoundsDrums:
       s.setVolume(volume)
   
-  def SetAllSoundFxObjectVolumes(self, volume):   #MFH - single function to go through all sound objects (and iterate through all sound lists) and set object volume to the given volume
+  def SetAllSoundFxObjectVolumes(self, volume = None):   #MFH - single function to go through all sound objects (and iterate through all sound lists) and set object volume to the given volume
     #MFH TODO - set every sound object's volume here...
+    if volume is None:
+      self.sfxVolume = Config.get("audio", "SFX_volume")
+      volume = self.sfxVolume
     self.starDingSound.setVolume(volume)
     self.bassDrumSound.setVolume(volume)
     self.T1DrumSound.setVolume(volume)

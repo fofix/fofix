@@ -2541,20 +2541,18 @@ class GuitarSceneClient(GuitarScene, SceneClient):
   def loadSettings(self):
     self.stage.updateDelays()
 
-    self.guitarVolume     = self.engine.config.get("audio", "guitarvol")
-    self.songVolume       = self.engine.config.get("audio", "songvol")
-    self.rhythmVolume     = self.engine.config.get("audio", "rhythmvol")
+    self.activeVolume     = self.engine.config.get("audio", "guitarvol")
     self.screwUpVolume    = self.engine.config.get("audio", "screwupvol")
     self.killVolume       = self.engine.config.get("audio", "kill_volume")
-    self.sfxVolume        = self.engine.config.get("audio", "SFX_volume")
+    #self.sfxVolume        = self.engine.config.get("audio", "SFX_volume")
     self.crowdVolume      = self.engine.config.get("audio", "crowd_volume") #akedrou
     self.crowdsEnabled    = self.engine.config.get("audio", "enable_crowd_tracks")
-    self.engine.data.sfxVolume = self.sfxVolume   #MFH - keep Data updated
+    #self.engine.data.sfxVolume = self.sfxVolume   #MFH - keep Data updated
     self.engine.data.crowdVolume = self.crowdVolume
 
     #MFH - now update volume of all screwup sounds and other SFX:
     self.engine.data.SetAllScrewUpSoundFxObjectVolumes(self.screwUpVolume)
-    self.engine.data.SetAllSoundFxObjectVolumes(self.sfxVolume)
+    #self.engine.data.SetAllSoundFxObjectVolumes(self.sfxVolume)
     
     #Re-apply Jurgen Settings -- Spikehead777
     self.autoPlay         = False
@@ -2593,10 +2591,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.pov              = self.engine.config.get("fretboard", "point_of_view")
     #CoffeeMod
 
-    if self.numOfPlayers == 1:
-      #De-emphasize non played part
-      self.rhythmVolume *= 0.6
-    
     #self.controls = self.engine.input.controls
     self.activeGameControls = self.engine.input.activeGameControls
     
@@ -2633,14 +2627,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #myfingershurt: ensure that after a pause or restart, the a/v sync delay is refreshed:
       self.song.refreshAudioDelay()
       #myfingershurt: ensuring the miss volume gets refreshed:
-      self.song.refreshMissVolume()
+      self.song.refreshVolumes()
+      self.song.setAllTrackVolumes(1)
       if self.crowdsCheering == True:
-        self.song.setCrowdVolume(self.crowdVolume)
+        self.song.setCrowdVolume(1)
       else:
         self.song.setCrowdVolume(0.0)
-      self.song.setBackgroundVolume(self.songVolume)
-      self.song.setRhythmVolume(self.rhythmVolume)
-      self.song.setDrumVolume(self.rhythmVolume)
   
   def songLoaded(self, song):
     for i, player in enumerate(self.playerList):
@@ -3292,11 +3284,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             self.lastWhammyVol[i] = self.whammyVol[i]
             
             #here, scale whammyVol to match kill volume setting:
-            self.targetWhammyVol[i] = self.whammyVol[i] * (1.0 - self.killVolume)
+            self.targetWhammyVol[i] = self.whammyVol[i] * (self.activeVolume - self.killVolume)
   
             if self.actualWhammyVol[i] < self.targetWhammyVol[i]:
               self.actualWhammyVol[i] += self.whammyVolAdjStep
-              whammyVolSet = 1.0 - self.actualWhammyVol[i]
+              whammyVolSet = self.activeVolume - self.actualWhammyVol[i]
               if self.whammyEffect == 0:    #killswitch
                 self.song.setInstrumentVolume(whammyVolSet, self.players[i].part)
               elif self.whammyEffect == 1:    #pitchbend
@@ -4535,9 +4527,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           #RF-mod should we collect garbage when we start?
           self.engine.collectGarbage()
           self.getHandicap()
-          self.song.setGuitarVolume(self.guitarVolume)
-          self.song.setRhythmVolume(self.rhythmVolume)
-          self.song.setBackgroundVolume(self.songVolume)
+          self.song.setAllTrackVolumes(1)
           self.song.setCrowdVolume(0.0)
           self.song.clearPause()
           self.crowdsCheering = False #catches crowdsEnabled != 3, pause before countdown, set to 3
@@ -4790,7 +4780,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
       if self.instruments[num].isDrum:
         self.drumStart = True
-      self.song.setInstrumentVolume(self.guitarVolume, self.playerList[num].part)
+      self.song.setInstrumentVolume(1.0, self.playerList[num].part)
       self.currentlyAnimating = True
       
       self.notesHit[num] = True #QQstarS:Set [0] to [i]
@@ -4933,7 +4923,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     self.killswitchEngaged[num] = False   #always reset killswitch status when picking / tapping
     if self.instruments[num].startPick2(self.song, pos, self.controls, hopo):
-      self.song.setInstrumentVolume(self.guitarVolume, self.playerList[num].part)
+      self.song.setInstrumentVolume(1.0, self.playerList[num].part)
       if self.instruments[num].playedNotes:
         scoreCard.streak += 1
         self.currentlyAnimating = True
@@ -5063,7 +5053,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.killswitchEngaged[num] = False   #always reset killswitch status when picking / tapping
     if self.instruments[num].startPick3(self.song, pos, self.controls, hopo):
       self.processedFirstNoteYet = True
-      self.song.setInstrumentVolume(self.guitarVolume, self.playerList[num].part)
+      self.song.setInstrumentVolume(1.0, self.playerList[num].part)
       #Any previous notes missed, but new ones hit, reset streak counter
       if len(self.instruments[num].missedNotes) != 0:
         scoreCard.streak = 0
@@ -5273,7 +5263,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.killswitchEngaged[num] = False   #always reset killswitch status when picking / tapping
     if self.instruments[num].startPick3(self.song, pos, self.controls, hopo):
       self.processedFirstNoteYet = True
-      self.song.setInstrumentVolume(self.guitarVolume, self.playerList[num].part)
+      self.song.setInstrumentVolume(1.0, self.playerList[num].part)
       #Any previous notes missed, but new ones hit, reset streak counter
       if len(self.instruments[num].missedNotes) > 0:
 

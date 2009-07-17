@@ -87,6 +87,9 @@ TK_UNUSED_TEXT = 4    #Unused / other text events
 #self.song.eventTracks[Song.TK_LYRICS]
 #self.song.eventTracks[Song.TK_UNUSED_TEXT]
 
+GUITAR_TRACK             = 0
+RHYTHM_TRACK             = 1
+DRUM_TRACK               = 2
 
 #FOF_TYPE                = 0
 #GH1_TYPE                = 1
@@ -2650,7 +2653,9 @@ class Song(object):
     self.delay        = self.engine.config.get("audio", "delay")
     self.delay        += self.info.delay
     self.missVolume   = self.engine.config.get("audio", "miss_volume")
-    #self.songVolume   = self.engine.config.get("audio", "songvol") #akedrou
+    self.backVolume   = self.engine.config.get("audio", "songvol") #akedrou
+    self.activeVolume = self.engine.config.get("audio", "guitarvol")
+    self.crowdVolume  = self.engine.config.get("audio", "crowd_volume")
 
     self.hasMidiLyrics = False
     self.midiStyle = self.info.midiStyle
@@ -2670,11 +2675,18 @@ class Song(object):
     self.eventTracks       = [Track(self.engine) for t in range(0,5)]    #MFH - should result in eventTracks[0] through [4]
     
     self.midiEventTracks   = []
+    self.activeAudioTracks = []
     for i in partlist:
       if i == parts[VOCAL_PART]:
         self.midiEventTracks.append([None])
       else:
         self.midiEventTracks.append([Track(self.engine) for t in range(len(difficulties))])
+        if i == parts[GUITAR_PART] or i == parts[LEAD_PART]:
+          self.activeAudioTracks.append(GUITAR_TRACK)
+        elif i == parts[RHYTHM_PART] or i == parts[BASS_PART]:
+          self.activeAudioTracks.append(RHYTHM_TRACK)
+        elif i == parts[DRUM_PART]:
+          self.activeAudioTracks.append(DRUM_TRACK)
     
     self.vocalEventTrack   = VocalTrack(self.engine)
 
@@ -2754,11 +2766,13 @@ class Song(object):
     self.delay        += self.info.delay
 
   #myfingershurt: new function to refresh the miss volume after a pause
-  def refreshMissVolume(self):  
+  def refreshVolumes(self):  
     if self.singleTrackSong:
       self.missVolume = self.engine.config.get("audio", "single_track_miss_volume")   #MFH - force single-track miss volume setting instead
     else:
       self.missVolume   = self.engine.config.get("audio", "miss_volume")
+    self.activeVolume   = self.engine.config.get("audio", "guitarvol")
+    self.backVolume     = self.engine.config.get("audio", "songvol")
 
   
   def getCurrentTempo(self, pos):  #MFH
@@ -2796,7 +2810,10 @@ class Song(object):
     
     if self.engine.audioSpeedFactor == 1:  #MFH - shut this track up if slowing audio down!    
       self.music.play(0, start / 1000.0)
-      self.music.setVolume(1.0)
+      if self.singleTrackSong:
+        self.music.setVolume(self.activeVolume)
+      else:
+        self.music.setVolume(self.backVolume)
     else:
       self.music.play(int(math.ceil(1.0/self.engine.audioSpeedFactor)), start / 1000.0)  #tell music to loop 2 times for 1/2 speed, 4 times for 1/4 speed (so it doesn't end early) (it wants an int, though)
       self.music.setVolume(0.0)   
@@ -2825,12 +2842,14 @@ class Song(object):
     self.engine.audio.unpause()
 
   def setInstrumentVolume(self, volume, part):
-    if part == parts[GUITAR_PART]:
+    if self.singleTrackSong:
       self.setGuitarVolume(volume)
-    elif part == parts[BASS_PART]:
-      self.setRhythmVolume(volume)
-    elif part == parts[RHYTHM_PART]:
-      self.setRhythmVolume(volume)
+    elif part == parts[GUITAR_PART]:
+      self.setGuitarVolume(volume)
+    # elif part == parts[BASS_PART]:
+      # self.setRhythmVolume(volume)
+    # elif part == parts[RHYTHM_PART]:
+      # self.setRhythmVolume(volume)
     elif part == parts[DRUM_PART]:
       self.setDrumVolume(volume)
     else:
@@ -2840,12 +2859,22 @@ class Song(object):
     if self.guitarTrack:
       if volume == 0:
         self.guitarTrack.setVolume(self.missVolume)
+      elif volume == 1:
+        if GUITAR_TRACK in self.activeAudioTracks or self.singleTrackSong:
+          self.guitarTrack.setVolume(self.activeVolume)
+        else:
+          self.guitarTrack.setVolume(self.backVolume)
       else:
         self.guitarTrack.setVolume(volume)
     #This is only used if there is no guitar.ogg to lower the volume of song.ogg instead of muting this track
     else:
       if volume == 0:
-        self.music.setVolume(self.missVolume * 1.5)
+        self.music.setVolume(self.missVolume)
+      elif volume == 1:
+        if GUITAR_TRACK in self.activeAudioTracks or self.singleTrackSong:
+          self.guitarTrack.setVolume(self.activeVolume)
+        else:
+          self.guitarTrack.setVolume(self.backVolume)
       else:
         self.music.setVolume(volume)
 
@@ -2853,6 +2882,11 @@ class Song(object):
     if self.rhythmTrack:
       if volume == 0:
         self.rhythmTrack.setVolume(self.missVolume)
+      elif volume == 1:
+        if RHYTHM_TRACK in self.activeAudioTracks:
+          self.rhythmTrack.setVolume(self.activeVolume)
+        else:
+          self.rhythmTrack.setVolume(self.backVolume)
       else:
         self.rhythmTrack.setVolume(volume)
   
@@ -2860,6 +2894,11 @@ class Song(object):
     if self.drumTrack:
       if volume == 0:
         self.drumTrack.setVolume(self.missVolume)
+      elif volume == 1:
+        if DRUM_TRACK in self.activeAudioTracks:
+          self.drumTrack.setVolume(self.activeVolume)
+        else:
+          self.drumTrack.setVolume(self.backVolume)
       else:
         self.drumTrack.setVolume(volume)
         
@@ -2889,11 +2928,17 @@ class Song(object):
         self.rhythmTrack.stopPitchBend()
 
   def setBackgroundVolume(self, volume):
-    self.music.setVolume(volume)
+    if volume == 1:
+      self.music.setVolume(self.backVolume)
+    else:
+      self.music.setVolume(volume)
   
   def setCrowdVolume(self, volume):
     if self.crowdTrack:
-      self.crowdTrack.setVolume(volume)
+      if volume == 1:
+        self.crowdTrack.setVolume(self.crowdVolume)
+      else:
+        self.crowdTrack.setVolume(volume)
   
   def setAllTrackVolumes(self, volume):
     self.setBackgroundVolume(volume)

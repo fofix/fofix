@@ -38,15 +38,15 @@ import Log
 import Song   #need the base song defines as well
 
 class Neck:
-  def __init__(self, engine, part, playerObj):
+  def __init__(self, engine, instrument, playerObj):
 
     self.engine         = engine
-    self.player         = part.player
-    self.part         = part
+    self.player         = instrument.player
+    self.instrument     = instrument
 
-    self.isDrum = self.part.isDrum
-    self.isBassGuitar = self.part.isBassGuitar
-    self.isVocal = self.part.isVocal
+    self.isDrum       = self.instrument.isDrum
+    self.isBassGuitar = self.instrument.isBassGuitar
+    self.isVocal      = self.instrument.isVocal
 
     self.oNeckovr = None    #MFH - needs to be here to prevent crashes!    
 
@@ -348,23 +348,23 @@ class Neck:
     self.coOpFailed = False
     self.coOpRestart = False
     self.starPowerActive = False
-    self.overdriveFlashCount = self.part.overdriveFlashCounts
+    self.overdriveFlashCount = self.instrument.overdriveFlashCounts
     self.paused = False
 
   def updateBoardSettings(self):
-    self.paused = self.part.paused
-    self.canGuitarSolo = self.part.canGuitarSolo
-    self.guitarSolo = self.part.guitarSolo
-    self.overdriveFlashCount = self.part.overdriveFlashCount
-    self.ocount = self.part.ocount
-    self.coOpFailed = self.part.coOpFailed
-    self.coOpRestart = self.part.coOpRestart
-    self.starPowerActive = self.part.starPowerActive
-    self.scoreMultiplier = self.part.scoreMultiplier
-    self.currentBpm = self.part.currentBpm
-    self.currentPeriod = self.part.currentPeriod
-    self.lastBpmChange = self.part.lastBpmChange
-    self.baseBeat = self.part.baseBeat
+    self.paused = self.instrument.paused
+    self.canGuitarSolo = self.instrument.canGuitarSolo
+    self.guitarSolo = self.instrument.guitarSolo
+    self.overdriveFlashCount = self.instrument.overdriveFlashCount
+    self.ocount = self.instrument.ocount
+    self.coOpFailed = self.instrument.coOpFailed
+    self.coOpRestart = self.instrument.coOpRestart
+    self.starPowerActive = self.instrument.starPowerActive
+    self.scoreMultiplier = self.instrument.scoreMultiplier
+    self.currentBpm = self.instrument.currentBpm
+    self.currentPeriod = self.instrument.currentPeriod
+    self.lastBpmChange = self.instrument.lastBpmChange
+    self.baseBeat = self.instrument.baseBeat
 
     if self.isFailing == True:
       if self.failcount <= 1 and self.failcount2 == False:
