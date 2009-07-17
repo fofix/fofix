@@ -7787,7 +7787,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                 glColor4f(1,1,1,1)
  
               if not self.coOpType:
-                if self.playerList[i].guitarNum:
+                if self.playerList[i].guitarNum is not None:
                   self.engine.view.setViewportHalf(self.numberOfGuitars,self.playerList[i].guitarNum)
                 else:
                   self.engine.view.setViewportHalf(1,0)
@@ -8663,7 +8663,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           if self.song and self.song.readyToGo:
     
             if not self.coOpRB and not self.coOpGH:
-              if self.playerList[i].guitarNum:
+              if self.playerList[i].guitarNum is not None:
                 self.engine.view.setViewportHalf(self.numberOfGuitars,self.playerList[i].guitarNum)
               else:
                 self.engine.view.setViewportHalf(1,0)
