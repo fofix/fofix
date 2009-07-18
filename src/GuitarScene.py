@@ -1093,7 +1093,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           if numMidiSoloMarkerNotes > 0 and self.markSolos > 0:  #if at least 1 solo marked in this fashion, tell that guitar to ignore text solo events
             self.useMidiSoloMarkers = True
             guitar.useMidiSoloMarkers = True
-            self.neckrender[self.playerList[i].guitarNum].useMidiSoloMarkers = True
+            if self.neckrender[self.playerList[i].guitarNum] is not None:
+              self.neckrender[self.playerList[i].guitarNum].useMidiSoloMarkers = True
             
         if numOfSpMarkerNotes > 1:
         
@@ -1150,7 +1151,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     for i, player in enumerate(self.playerList):
       if player.guitarNum is not None:
         self.instruments[i].markSolos = self.markSolos
-        self.neckrender[player.guitarNum].markSolos = self.markSolos
+        if self.neckrender[player.guitarNum] is not None:
+          self.neckrender[player.guitarNum].markSolos = self.markSolos
     
     self.lastDrumNoteTime = 0.0
     self.lastNoteTimes = [0.0 for i in self.playerList]
@@ -9561,4 +9563,5 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           # self.laminaFrame_soloAcc.display()
         #self.engine.view.setViewport(1,0)
         self.engine.view.resetProjection()
+
 
