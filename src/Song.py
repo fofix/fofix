@@ -2867,14 +2867,15 @@ class Song(object):
       else:
         self.guitarTrack.setVolume(volume)
     #This is only used if there is no guitar.ogg to lower the volume of song.ogg instead of muting this track
+    # evilynux - It also falls on this with buggy pygame < 1.9 on 64bit CPUs.
     else:
       if volume == 0:
         self.music.setVolume(self.missVolume)
       elif volume == 1:
         if GUITAR_TRACK in self.activeAudioTracks or self.singleTrackSong:
-          self.guitarTrack.setVolume(self.activeVolume)
+          self.music.setVolume(self.activeVolume)
         else:
-          self.guitarTrack.setVolume(self.backVolume)
+          self.music.setVolume(self.backVolume)
       else:
         self.music.setVolume(volume)
 
