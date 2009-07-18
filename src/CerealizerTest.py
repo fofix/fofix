@@ -48,7 +48,7 @@ class CerealizerTest(unittest.TestCase):
     self.assertEqual(result, expected)
 
   def testHash(self):
-    # For the record, the worldchart rejects the following 3 hashes...
+    # For the record, the worldchart used to reject the following 3 hashes...
     # (name strings are UTF8 encoded)
     scoresHash = "63657265616c310a330a646963740a6c6973740a7475706c650a340a"\
                  "6936333834360a69350a7531310a50617363616c4769617264733430"\
@@ -74,7 +74,7 @@ class CerealizerTest(unittest.TestCase):
     self.assertEqual(scores[0][0][2], "Azzco")
     #print scores[0][0] # Shows that name string IS NOT UTF8 encoded
 
-    # Worldchart rejects this one (name string is UTF8 encoded)
+    # Worldchart used to reject this one (name string is UTF8 encoded)
     scoresHash = "63657265616c310a330a646963740a6c6973740a7475706c650a340a"\
                  "693135313632390a69340a75350a417a7a636f7334300a3661306562"\
                  "35346438343962613065376464363836396430373966386631316366"\
