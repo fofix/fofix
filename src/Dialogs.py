@@ -1294,6 +1294,12 @@ class SongChooser(Layer, KeyListener):
         #blazingamer - stops preview from playing outside of songchooser
         self.song = None
         self.songLoader = None
+        if self.library == os.path.join("..", self.engine.config.get("game", "base_library")):
+          self.selectedItem = None
+          #blazingamer - stops preview from playing outside of songchooser
+          self.hidden()
+          self.engine.view.popLayer(self)
+          self.accepted = True
       else:
         self.selectedItem = None
         #blazingamer - stops preview from playing outside of songchooser
