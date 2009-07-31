@@ -725,7 +725,7 @@ class SongChooser(Layer, KeyListener):
     self.songCountdown  = 1024
     self.songLoader     = None
     self.initialItem    = selectedSong
-    self.library        = selectedLibrary
+    self.library        = os.path.join(self.engine.config.get("game", "base_library"), selectedLibrary)
     self.searchText     = ""
     self.searching      = False
     

@@ -1152,10 +1152,10 @@ class SettingsMenu(Menu.Menu):
       
   def baseLibrarySelect(self):
     Log.debug("settings.baseLibrarySelect function call...")
-    newPath = Dialogs.chooseFile(self.engine, masks = ["*/songs"], prompt = _("Choose a new songs directory."), dirSelect = True)
+    newPath = Dialogs.chooseFile(self.engine, masks = ["*/*"], prompt = _("Choose a new songs directory."), dirSelect = True)
     if newPath != None:
       Config.set("game", "base_library", os.path.dirname(newPath))
-      Config.set("game", "selected_library", "songs")
+      Config.set("game", "selected_library", os.path.basename(newPath))
       Config.set("game", "selected_song", "")
       self.engine.resource.refreshBaseLib()   #myfingershurt - to let user continue with new songpath without restart
     
@@ -1419,10 +1419,10 @@ class BasicSettingsMenu(Menu.Menu):
 
   def baseLibrarySelect(self):
     Log.debug("settings.baseLibrarySelect function call...")
-    newPath = Dialogs.chooseFile(self.engine, masks = ["*/songs"], prompt = _("Choose a new songs directory."), dirSelect = True)
+    newPath = Dialogs.chooseFile(self.engine, masks = ["*/*"], prompt = _("Choose a new songs directory."), dirSelect = True)
     if newPath != None:
       Config.set("game", "base_library", os.path.dirname(newPath))
-      Config.set("game", "selected_library", "songs")
+      Config.set("game", "selected_library", os.path.basename(newPath))
       Config.set("game", "selected_song", "")
       self.engine.resource.refreshBaseLib()   #myfingershurt - to let user continue with new songpath without restart
 

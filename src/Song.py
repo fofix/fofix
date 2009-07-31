@@ -201,7 +201,11 @@ class CacheManager(object):
     oldcwd = os.getcwd()
     try:
       os.chdir(cachePath)  #stump: work around bug in SQLite unicode path name handling
-      conn = sqlite3.Connection('.fofix-cache')
+      try:
+        conn = sqlite3.Connection('.fofix-cache')
+      except sqlite3.OperationalError:
+        conn = None
+        return conn
     finally:
       os.chdir(oldcwd)
     # Check that the cache is completely initialized.
@@ -284,21 +288,21 @@ class SongInfo(object):
     if canCache and self.allowCacheUsage:
       self.stateHash = hashlib.sha1(open(self.noteFileName, 'rb').read() + open(self.fileName, 'rb').read()).hexdigest()
       cache = cacheManager.getCache(self.fileName)
+      if cache != None:
+        try:    #MFH - it crashes here on previews!
+          result = cache.execute('SELECT `info` FROM `songinfo` WHERE `hash` = ?', [self.stateHash]).fetchone()
+        except Exception, e:
+          Log.error(str(e))
+          result = None
 
-      try:    #MFH - it crashes here on previews!
-        result = cache.execute('SELECT `info` FROM `songinfo` WHERE `hash` = ?', [self.stateHash]).fetchone()
-      except Exception, e:
-        Log.error(str(e))
-        result = None
-
-      if result is not None:
-        try:
-          self.__dict__.update(cPickle.loads(str(result[0])))
-          return
-        except:
-          # The entry is there but could not be loaded.
-          # Nuke it and let it be rebuilt further down.
-          cache.execute('DELETE FROM `songinfo` WHERE `hash` = ?', [self.stateHash])
+        if result is not None:
+          try:
+            self.__dict__.update(cPickle.loads(str(result[0])))
+            return
+          except:
+            # The entry is there but could not be loaded.
+            # Nuke it and let it be rebuilt further down.
+            cache.execute('DELETE FROM `songinfo` WHERE `hash` = ?', [self.stateHash])
 
     # Read highscores and verify their hashes.
     # There ain't no security like security throught obscurity :)
@@ -563,7 +567,8 @@ class SongInfo(object):
       self.stateHash = hashlib.sha1(open(self.noteFileName, 'rb').read() + open(self.fileName, 'rb').read()).hexdigest()
       cache = cacheManager.getCache(self.fileName)
       pkl = cPickle.dumps(self.__dict__)
-      cache.execute('INSERT OR REPLACE INTO `songinfo` (`hash`, `info`) VALUES (?, ?)', [self.stateHash, pkl])
+      if cache != None:
+        cache.execute('INSERT OR REPLACE INTO `songinfo` (`hash`, `info`) VALUES (?, ?)', [self.stateHash, pkl])
 
 
   def _set(self, attr, value):
@@ -4197,10 +4202,11 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
     songs.append(SongInfo(engine.resource.fileName(library, name, "song.ini", writable = True), library, allowCacheUsage=True))
   if len(songs) and canCache and Config.get("performance", "cache_song_metadata"):
     cache = cacheManager.getCache(songs[0].fileName)
-    #stump: clean up the cache
-    if cache.execute('DELETE FROM `songinfo` WHERE `hash` NOT IN (' + ','.join("'%s'" % s.stateHash for s in songs) + ')').rowcount > 0:
-      cache.execute('VACUUM')  # compact the database if anything was deleted on the previous line
-    cache.commit()  # commit any changes to the cache all at once
+    if cache != None:
+      #stump: clean up the cache
+      if cache.execute('DELETE FROM `songinfo` WHERE `hash` NOT IN (' + ','.join("'%s'" % s.stateHash for s in songs) + ')').rowcount > 0:
+        cache.execute('VACUUM')  # compact the database if anything was deleted on the previous line
+      cache.commit()  # commit any changes to the cache all at once
   if not includeTutorials:
     songs = [song for song in songs if not song.tutorial]
   songs = [song for song in songs if not song.artist == '=FOLDER=']
