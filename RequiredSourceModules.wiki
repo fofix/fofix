@@ -61,6 +61,10 @@ Versions are likely important. Don't substitute one for the other without trying
     * *At least r9 is REQUIRED or you will get crashes when you try to play using pypitch!*  (You can choose between pypitch and the built-in analyzer in Debug Settings.)
 
 
+UPDATE 08/02/09 : Pygame 1.9 is released ! [http://pygame.org/ftp/pygame-1.9.0release.win32-py2.4.exe]
+In association with ActivePython 2.4.5.14 [http://downloads.activestate.com/ActivePython/windows/2.4/ActivePython-2.4.5.14-win32-x86.msi], my fps are twice as usual.
+
+
 *Or, here's a complete installer package* with all the files above (as of 5/8/2009), courtesy of Chris Paiano:
 [http://www.mediafire.com/?zzizzt4zmuw MFH's Alpha Module Installer for 3.120r1454+ Win32-Py24-OGL2]
 This Includes the all optional modules for 3.120 r1454+.  _Uses versions: Python 2.4, PyOpenGL 2_.  Installer also fixes the below OpenGL 2 version error.
