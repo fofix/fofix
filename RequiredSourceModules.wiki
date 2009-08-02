@@ -61,7 +61,7 @@ Versions are likely important. Don't substitute one for the other without trying
     * *At least r9 is REQUIRED or you will get crashes when you try to play using pypitch!*  (You can choose between pypitch and the built-in analyzer in Debug Settings.)
 
 
-UPDATE 08/02/09 : Pygame 1.9 is released ! [http://pygame.org/ftp/pygame-1.9.0release.win32-py2.4.exe]
+*UPDATE 08/02/09* : Pygame 1.9 is released ! [http://pygame.org/ftp/pygame-1.9.0release.win32-py2.4.exe]
 In association with ActivePython 2.4.5.14 [http://downloads.activestate.com/ActivePython/windows/2.4/ActivePython-2.4.5.14-win32-x86.msi], my fps are twice as usual.
 
 
