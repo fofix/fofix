@@ -17,8 +17,3 @@ You too can make a difference!
 With your donation, you can leave a comment to direct MFH to work on the feature you'd like to see done most!
 
 _Or_, perhaps you'd like an inexpensive double bass pedal for your Rock Band 1 or Rock Band 2 drumset?  Check [http://www.cpeproto.com/doubleBassPedalKit.html this] page out!
-
-==Donating to Vlad Emelyanov (fenolftalein/Volshebnyi)==
-
-I really need money to pay for university and to continue developing my Shader and Advanced Graphics module.
-Do you like RB2 tails? There would be much more modern graphics if I'll continue FoFiX development. Here is a [https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Z8TXZ3FR754JC&lc=US&item_name=Shader%20module%20for%20FOFIX%20Dev&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted link].
