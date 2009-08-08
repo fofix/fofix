@@ -439,6 +439,14 @@ class Guitar:
 
       except IOError:
         self.startex = False
+        
+      try:
+        for i in range(5):
+          engine.loadImgDrawing(self,  "staratex"+chr(97+i),  os.path.join("themes", themename, "staratex_"+chr(97+i)+".png"))
+        self.staratex = True
+
+      except IOError:
+        self.staratex = False
 
     if self.gameMode2p == 6:
       try:
@@ -925,7 +933,33 @@ class Guitar:
 
       glRotatef(Theme.noterotdegrees, 0, 0, Theme.noterot[fret])
 
-      if self.notetex == True and spNote == False:
+      if self.staratex == True and self.starPowerActive:
+        glColor3f(1,1,1)
+        glEnable(GL_TEXTURE_2D)
+        getattr(self,"startex"+chr(97+fret)).texture.bind()
+        glMatrixMode(GL_TEXTURE)
+        glScalef(1, -1, 1)
+        glMatrixMode(GL_MODELVIEW)
+
+
+        if isTappable:
+          mesh = "Mesh_001"
+        else:
+          mesh = "Mesh"
+
+        meshObj.render(mesh)
+        
+        if shaders.enable("notes"):
+          shaders.setVar("isTextured",True)
+          meshObj.render(mesh)
+          shaders.disable() 
+          
+        glMatrixMode(GL_TEXTURE)
+        glLoadIdentity()
+        glMatrixMode(GL_MODELVIEW)
+        glDisable(GL_TEXTURE_2D)          
+      
+      elif self.notetex == True and spNote == False:
           
         glColor3f(1,1,1)
         glEnable(GL_TEXTURE_2D)

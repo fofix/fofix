@@ -484,6 +484,14 @@ class Drum:
 
       except IOError:
         self.startex = False
+        
+      try:
+        for i in range(5):
+          engine.loadImgDrawing(self,  "staratex"+chr(97+i),  os.path.join("themes", themename, "staratex_"+chr(97+i)+".png"))
+        self.staratex = True
+
+      except IOError:
+        self.staratex = False
 
       if self.engine.fileExists(os.path.join("themes", themename, "open.dae")):
         engine.resource.load(self,  "openMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "open.dae")))
@@ -495,7 +503,18 @@ class Drum:
         self.opentex = True
       except IOError:
         self.opentex = False
-
+        
+      try:
+        engine.loadImgDrawing(self,  "opentexture_star",  os.path.join("themes", themename, "opentex_star.png"))
+        self.opentex_star = True
+      except IOError:
+        self.opentex_star = False
+      
+      try:
+        engine.loadImgDrawing(self,  "opentexture_stara",  os.path.join("themes", themename, "opentex_stara.png"))
+        self.opentex_stara = True
+      except IOError:
+        self.opentex_stara = False
 
     try:
       engine.loadImgDrawing(self, "freestyle1", os.path.join("themes", themename, "freestyletail1.png"),  textureSize = (128, 128))
@@ -950,7 +969,23 @@ class Drum:
       elif fret == 3:
         glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot[3])
 
-      if self.notetex == True and spNote == False and isOpen==False:
+      if self.staratex == True and self.starPowerActive and isOpen==False:
+        glColor3f(1,1,1)
+        glEnable(GL_TEXTURE_2D)
+        getattr(self,"startex"+chr(97+fret)).texture.bind()
+        glMatrixMode(GL_TEXTURE)
+        glScalef(1, -1, 1)
+        glMatrixMode(GL_MODELVIEW)
+        if isTappable:
+          meshObj.render("Mesh_001")
+        else:
+          meshObj.render("Mesh")
+        glMatrixMode(GL_TEXTURE)
+        glLoadIdentity()
+        glMatrixMode(GL_MODELVIEW)
+        glDisable(GL_TEXTURE_2D)
+        
+      elif self.notetex == True and spNote == False and isOpen==False:
 
         glColor3f(1,1,1)
         glEnable(GL_TEXTURE_2D)
@@ -983,11 +1018,41 @@ class Drum:
         glMatrixMode(GL_MODELVIEW)
         glDisable(GL_TEXTURE_2D)
 
-      elif self.opentex == True and isOpen==True:
+      elif self.opentex_stara == True and isOpen==True and spNote==False and self.starPowerActive:
+        glColor3f(1,1,1)
+        glEnable(GL_TEXTURE_2D)
+
+        self.opentexture_stara.texture.bind()
+
+        glMatrixMode(GL_TEXTURE)
+        glScalef(1, -1, 1)
+        glMatrixMode(GL_MODELVIEW)
+        meshObj.render()
+        glMatrixMode(GL_TEXTURE)
+        glLoadIdentity()
+        glMatrixMode(GL_MODELVIEW)
+        glDisable(GL_TEXTURE_2D)
+      
+      elif self.opentex == True and isOpen==True and spNote==False:
         glColor3f(1,1,1)
         glEnable(GL_TEXTURE_2D)
 
         self.opentexture.texture.bind()
+
+        glMatrixMode(GL_TEXTURE)
+        glScalef(1, -1, 1)
+        glMatrixMode(GL_MODELVIEW)
+        meshObj.render()
+        glMatrixMode(GL_TEXTURE)
+        glLoadIdentity()
+        glMatrixMode(GL_MODELVIEW)
+        glDisable(GL_TEXTURE_2D)
+      
+      elif self.opentex_star == True and isOpen==True and spNote==True:
+        glColor3f(1,1,1)
+        glEnable(GL_TEXTURE_2D)
+
+        self.opentexture_star.texture.bind()
 
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
