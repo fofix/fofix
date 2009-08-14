@@ -58,12 +58,12 @@ class SongTest(unittest.TestCase):
       noteFile   = os.path.join(tmp, "notes.mid")
       song       = Song(e, infoFile, guitarFile, songFile, None, noteFile)
       
-      events1 = song.track.allEvents[:]
+      events1 = song.track[0].getAllEvents()
       
       song.save()
       song       = Song(e, infoFile, guitarFile, songFile, None, noteFile)
       
-      events2 = song.track.allEvents[:]
+      events2 = song.track[0].getAllEvents()
 
       notes1 = [(time, event) for time, event in events1 if isinstance(event, Note)]      
       notes2 = [(time, event) for time, event in events2 if isinstance(event, Note)]

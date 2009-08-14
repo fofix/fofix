@@ -1,8 +1,9 @@
 #####################################################################
 # -*- coding: iso-8859-1 -*-                                        #
 #                                                                   #
-# Frets on Fire                                                     #
-# Copyright (C) 2006 Sami Kyöstilä                                  #
+# FoFiX                                                             #
+# Copyright (C) 2009 Team FoFiX                                     #
+#               2006 Sami Kyöstilä                                  #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -23,6 +24,8 @@
 import unittest
 from GameEngine import GameEngine
 from Menu import Menu
+import Config
+import Version
 
 subMenu = [
   ("Bar 1", lambda: 0),
@@ -41,13 +44,9 @@ class MenuTest(unittest.TestCase):
     m = Menu(self.e, rootMenu)
     self.e.view.pushLayer(m)
 
-    while self.e.view.layers and 0:
-      rootMenu[0][0] = "%.1f FPS" % self.e.timer.fpsEstimate
-      self.e.run()
-    # FIXME: keyboard event injection for testing
-     
   def setUp(self):
-    self.e = GameEngine()
+    config = Config.load(Version.appName() + ".ini", setAsDefault = True)
+    self.e = GameEngine(config)
     
   def tearDown(self):
     self.e.quit()
@@ -58,11 +57,11 @@ class MenuTestInteractive(unittest.TestCase):
     self.e.view.pushLayer(m)
 
     while self.e.view.layers:
-      rootMenu[0][0] = "%.1f FPS" % self.e.timer.fpsEstimate
       self.e.run()
 
   def setUp(self):
-    self.e = GameEngine()
+    config = Config.load(Version.appName() + ".ini", setAsDefault = True)
+    self.e = GameEngine(config)
     
   def tearDown(self):
     self.e.quit()

@@ -1,8 +1,9 @@
 #####################################################################
 # -*- coding: iso-8859-1 -*-                                        #
 #                                                                   #
-# Frets on Fire                                                     #
-# Copyright (C) 2006 Sami Kyöstilä                                  #
+# FoFiX                                                             #
+# Copyright (C) 2009 Team FoFiX                                     #
+#               2006 Sami Kyöstilä                                  #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -24,6 +25,8 @@ import unittest
 from GameEngine import GameEngine
 from Dialogs import getText
 from View import Layer
+import Config
+import Version
 
 class TestLayer(Layer):
   def __init__(self, engine):
@@ -40,7 +43,8 @@ class DialogTestInteractive(unittest.TestCase):
     text = getText(self.e, "Please enter your name:", "Wario")
      
   def setUp(self):
-    self.e = GameEngine()
+    config = Config.load(Version.appName() + ".ini", setAsDefault = True)
+    self.e = GameEngine(config)
     
   def tearDown(self):
     self.e.quit()

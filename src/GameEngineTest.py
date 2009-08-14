@@ -22,10 +22,13 @@
 
 import unittest
 from GameEngine import GameEngine
+import Config
+import Version
 
 class EngineTest(unittest.TestCase):
   def testNetworking(self):
-    e1 = GameEngine()
+    config = Config.load(Version.appName() + ".ini", setAsDefault = True)
+    e1 = GameEngine(config)
     
     e1.startServer()
     session1 = e1.connect("localhost")
