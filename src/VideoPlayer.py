@@ -49,6 +49,7 @@ class VideoPlayer(BackgroundLayer):
     self.fps = framerate
     self.textureSetup((vidWidth, vidHeight))
     self.vidSetup(vidSource)
+    self.clock = pygame.time.Clock()
 
   def textureSetup(self, (vidWidth, vidHeight)):
     self.vidWidth = vidWidth
@@ -125,6 +126,7 @@ class VideoPlayer(BackgroundLayer):
 
   def run(self, ticks):
     self.myPipeline.set_state(gst.STATE_PLAYING)
+    self.clock.tick(self.fps)
     
   def render(self, visibility, topMost):
     try:
