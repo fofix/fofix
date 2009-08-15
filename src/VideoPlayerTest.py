@@ -30,14 +30,18 @@ from VideoPlayer import VideoPlayer
 # Note that video codecs/format supported depends on the gstreamer plugins
 # you've installed. On my machine that means pretty much anything e.g. XviD,
 # Ogg Theora, Flash, FFmpeg H.264, etc.).
-winSize = (800, 600) # Window width and height
-framerate = 24       # Number of frames per seconds (-1 = as fast as it can)
+framerate = 24 # Number of frames per seconds (-1 = as fast as it can)
+# vidSource    # Path to video; relative to the current directory
+# vidSize      # Video width and height
+
+# FIXME: Should autodetect video width and height values.
+
+# Video examples
+#=====================
+# XviD/MPEG-4
 # vidSource = "t1.avi" # Path to video; relative to the current directory
 # vidSize = (320, 240) # Video width and height
-# FIXME: Autodetect video width and height values.
 
-# Other video examples
-#=====================
 # FFmpeg H.264
 vidSource = "t2.m4v"
 vidSize = (640, 368)
