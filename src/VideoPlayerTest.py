@@ -32,13 +32,25 @@ from VideoPlayer import VideoPlayer
 # Ogg Theora, Flash, FFmpeg H.264, etc.).
 winSize = (800, 600) # Window width and height
 framerate = 24       # Number of frames per seconds (-1 = as fast as it can)
-vidSource = "t1.avi" # Path to video; relative to the current directory
-vidSize = (320, 240) # Video width and height
+# vidSource = "t1.avi" # Path to video; relative to the current directory
+# vidSize = (320, 240) # Video width and height
 # FIXME: Autodetect video width and height values.
 
-# Another video example I use (FFmpeg H.264)
-# vidSource = "t2.m4v"
-# vidSize = (640, 368)
+# Other video examples
+#=====================
+# FFmpeg H.264
+vidSource = "t2.m4v"
+vidSize = (640, 368)
+
+# Macromedia Flash
+# vidSource = "t3.flv"
+# vidSize = (320, 240)
+# vidSource = "t3.1.flv" # 24 seconds
+# vidSize = (320, 214)
+
+# Xiph Ogg Theora
+# vidSource = "t4.ogv"
+# vidSize = (320, 240)
 
 class VideoPlayerTest(unittest.TestCase):
   def testVideoPlayer(self):

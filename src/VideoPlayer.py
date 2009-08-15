@@ -77,10 +77,10 @@ class VideoPlayer(BackgroundLayer):
     vtxX = 1.0
     vtxY = 1.0
     if winRes > vidRes:
-      r = float(self.winHeight/vidHeight)
+      r = float(self.winHeight)/float(vidHeight)
       vtxX = 1.0 - abs(self.winWidth-r*vidWidth) / (2*self.winWidth)
     elif winRes < vidRes:
-      r = self.winWidth/vidWidth
+      r = float(self.winWidth)/float(vidWidth)
       vtxY = 1.0 - abs(self.winHeight-r*vidHeight) / (2*self.winHeight)
 
     # Create a compiled OpenGL call list
@@ -106,14 +106,32 @@ class VideoPlayer(BackgroundLayer):
     src = os.path.join(os.getcwd(), vidSource)
     if not os.path.exists(src):
       Log.error("Video %s does not exist!" % src)
-      raise
     s = 'filesrc name=input ! decodebin name=dbin dbin. ! ffmpegcolorspace ! video/x-raw-rgb ! fakesink name=output signal-handoffs=true sync=true dbin. ! queue ! audioconvert ! audiorate ! autoaudiosink'
-    self.myPipeline = gst.parse_launch(s)
-    self.myInput  = self.myPipeline.get_by_name('input')
-    self.myFakeSink = self.myPipeline.get_by_name('output')
-    self.myInput.set_property("location", os.getcwd() + '/' + vidSource)
-    self.myFakeSink.connect ("handoff", self.texUpdate)
- 
+    self.player = gst.parse_launch(s)
+    self.input  = self.player.get_by_name('input')
+    self.fakeSink = self.player.get_by_name('output')
+    self.input.set_property("location", os.getcwd() + '/' + vidSource)
+    self.fakeSink.connect ("handoff", self.texUpdate)
+    # Catch the end of file as well as errors
+    # FIXME: Doesn't work!?! The event is never received
+    bus = self.player.get_bus()
+    bus.add_signal_watch()
+    bus.enable_sync_message_emission()
+    bus.connect("message", self.onMessage)
+
+  # Handle bus event e.g. end of video or unsupported formats/codecs
+  def onMessage(self, bus, message):
+    type = message.type
+    print "Message %s" % type
+    if type == gst.MESSAGE_EOS:
+      print "End of video"
+      self.player.set_state(gst.STATE_NULL)
+    elif type == gst.MESSAGE_ERROR:
+      err, debug = message.parse_error()
+      Log.error("Error: %s" % err, debug)
+      self.player.set_state(gst.STATE_NULL)
+
+  # Handle new video frames coming from the decoder
   def texUpdate(self, sink, buffer, pad):
     self.videoBuffer = buffer
     self.updated = True
@@ -122,11 +140,13 @@ class VideoPlayer(BackgroundLayer):
     gobject.threads_init()
   
   def hidden(self):
-    self.myPipeline.set_state(gst.STATE_NULL)
+    self.player.set_state(gst.STATE_NULL)
 
   def run(self, ticks):
-    self.myPipeline.set_state(gst.STATE_PLAYING)
+    self.player.set_state(gst.STATE_PLAYING)
     self.clock.tick(self.fps)
+#     s = self.fakeSink.get_property("last-message")
+#     print "State: %s" % str(s)
     
   def render(self, visibility, topMost):
     try:
