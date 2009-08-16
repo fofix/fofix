@@ -33,6 +33,8 @@ import os
 import random   #MFH - needed for new stage background handling
 from Language import _
 
+from VideoPlayer import VideoPlayer
+
 class Layer(object):
   """
   A graphical stage layer that can have a number of animation effects associated with it.
@@ -335,6 +337,18 @@ class Stage(object):
         else:
           self.backgroundLayers.append(layer)
 
+  def loadVideo(self, libraryName, songName):
+    if self.songStage == 1 and os.path.exists(os.path.join(libraryName, songName, "video.mp4")):
+      vidSource = os.path.join(libraryName, songName, "video.mp4") # Path to video; relative to the current directory
+      vidSize = (320, 240) # Video width and height
+    else:
+      vidSource = os.path.join("..", "data", "video.mp4") # Path to video; relative to the current directory
+      vidSize = (320, 240) # Video width and height
+
+    self.vidPlayer = VideoPlayer(self.engine, 24, vidSource, vidSize)
+    self.engine.view.pushLayer(self.vidPlayer)
+    self.vidPlayer.paused = True
+
   def load(self, libraryName, songName, practiceMode = False):
     # evilynux - Fixes a self.background not defined crash
     self.background = None
@@ -568,7 +582,8 @@ class Stage(object):
       self.triggerBeat(pos, beat)
 
   def render(self, visibility):
-    self.renderBackground()
+    if self.mode != 3:
+      self.renderBackground()
     self._renderLayers(self.backgroundLayers, visibility)
     if shaders.enable("stage"):
       height = 0.0

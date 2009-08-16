@@ -1450,7 +1450,10 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Loading Graphics..."))
     
     # evilynux - Load stage background(s)
-    self.stage.load(self.libraryName, self.songName, self.playerList[0].practiceMode)
+    if self.engine.config.get("game", "stage_mode") == 3:
+      self.stage.loadVideo(self.libraryName, self.songName)
+    else:
+      self.stage.load(self.libraryName, self.songName, self.playerList[0].practiceMode)
 
     #MFH - this determination logic should happen once, globally -- not repeatedly.
     self.showScriptLyrics = False
@@ -4666,6 +4669,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.scoring[num].addScore(scoreTemp)
 
   def render3D(self):
+    if self.engine.config.get("game", "stage_mode") == 3:
+      if self.countdown <= 0:
+        if self.pause == True or self.failed == True:
+          self.stage.vidPlayer.paused = True
+        else:
+          self.stage.vidPlayer.paused = False
+      else:
+        self.stage.vidPlayer.paused = True
+
     self.stage.render(self.visibility)
   
   def renderVocals(self):
@@ -4678,7 +4690,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       if guitar.isVocal:
         continue
       self.engine.view.setViewport(self.numberOfGuitars,self.playerList[i].guitarNum)
-      if self.theme not in (0, 1, 2) or (not self.pause and not self.failed):
+      if self.theme not in (0, 1, 2) or (not self.pause and not self.failed):          
         glPushMatrix()
         if guitar.fretboardHop > 0.0:
           glTranslatef(0.0, guitar.fretboardHop, 0.0)  #stump: fretboard hop

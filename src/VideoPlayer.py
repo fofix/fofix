@@ -50,6 +50,7 @@ class VideoPlayer(BackgroundLayer):
     self.textureSetup((vidWidth, vidHeight))
     self.vidSetup(vidSource)
     self.clock = pygame.time.Clock()
+    self.paused = False
 
   def textureSetup(self, (vidWidth, vidHeight)):
     self.vidWidth = vidWidth
@@ -143,7 +144,10 @@ class VideoPlayer(BackgroundLayer):
     self.player.set_state(gst.STATE_NULL)
 
   def run(self, ticks):
-    self.player.set_state(gst.STATE_PLAYING)
+    if self.paused == True:
+      self.player.set_state(gst.STATE_PAUSED)
+    else:
+      self.player.set_state(gst.STATE_PLAYING)
     self.clock.tick(self.fps)
 #     s = self.fakeSink.get_property("last-message")
 #     print "State: %s" % str(s)

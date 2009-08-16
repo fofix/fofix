@@ -1104,7 +1104,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       settingsText = "%s %s - %s: %s / %s, %s: %s" % (self.engine.versionString, self.tsSettings, self.tsHopos, self.hopoStyle, self.hopoFreq, self.tsHitWindow, self.hitWindow)
       settingsScale = 0.0012
       wText, hText = font.getStringSize(settingsText, settingsScale)
-      font.render(settingsText, (.5 - wText/2, 0.0), scale = settingsScale)
+      defFont.render(settingsText, (.5 - wText/2, 0.0), scale = settingsScale)
       
       if self.coOpType == 2:
         try:
