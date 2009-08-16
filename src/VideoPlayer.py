@@ -78,10 +78,10 @@ class VideoPlayer(BackgroundLayer):
     vtxY = 1.0
     if winRes > vidRes:
       r = float(self.winHeight)/float(vidHeight)
-      vtxX = 1.0 - abs(self.winWidth-r*vidWidth) / (2*self.winWidth)
+      vtxX = 1.0 - abs(self.winWidth-r*vidWidth) / (float(self.winWidth))
     elif winRes < vidRes:
       r = float(self.winWidth)/float(vidWidth)
-      vtxY = 1.0 - abs(self.winHeight-r*vidHeight) / (2*self.winHeight)
+      vtxY = 1.0 - abs(self.winHeight-r*vidHeight) / (float(self.winHeight))
 
     # Create a compiled OpenGL call list
     self.videoList = glGenLists(1)
@@ -176,7 +176,6 @@ class VideoPlayer(BackgroundLayer):
       # Draw the polygon and apply texture
       glBindTexture(GL_TEXTURE_2D, self.videoTex)
       glCallList(self.videoList)
-      glDisable(GL_TEXTURE_2D)
       # Restore both transformation matrices
       glPopMatrix()
       glMatrixMode(GL_PROJECTION)

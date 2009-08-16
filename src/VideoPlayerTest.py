@@ -39,12 +39,12 @@ framerate = 24 # Number of frames per seconds (-1 = as fast as it can)
 # Video examples
 #=====================
 # XviD/MPEG-4
-# vidSource = "t1.avi" # Path to video; relative to the current directory
-# vidSize = (320, 240) # Video width and height
+vidSource = "t1.avi" # Path to video; relative to the current directory
+vidSize = (800, 340) # Video width and height
 
 # FFmpeg H.264
-vidSource = "t2.m4v"
-vidSize = (640, 368)
+# vidSource = "t2.m4v"
+# vidSize = (640, 368)
 
 # Macromedia Flash
 # vidSource = "t3.flv"
