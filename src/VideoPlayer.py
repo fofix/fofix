@@ -39,12 +39,13 @@ import Log
 
 # Simple video player
 class VideoPlayer(BackgroundLayer):
-  def __init__(self, engine, framerate, vidSource, (vidWidth, vidHeight)):
+  def __init__(self, engine, framerate, vidSource, (vidWidth, vidHeight), mute = False):
     self.updated = False
     self.videoList = None
     self.videoTex = None
     self.videoBuffer = None
     self.engine = engine
+    self.mute = mute
     self.winWidth, self.winHeight = engine.view.geometry[2:4]
     self.fps = framerate
     self.textureSetup((vidWidth, vidHeight))
@@ -107,7 +108,10 @@ class VideoPlayer(BackgroundLayer):
     src = os.path.join(os.getcwd(), vidSource)
     if not os.path.exists(src):
       Log.error("Video %s does not exist!" % src)
-    s = 'filesrc name=input ! decodebin name=dbin dbin. ! ffmpegcolorspace ! video/x-raw-rgb ! fakesink name=output signal-handoffs=true sync=true dbin. ! queue ! audioconvert ! audiorate ! autoaudiosink'
+    with_audio = ""
+    if not self.mute:
+      with_audio = "! queue ! audioconvert ! audiorate ! autoaudiosink"
+    s = "filesrc name=input ! decodebin name=dbin dbin. ! ffmpegcolorspace ! video/x-raw-rgb ! fakesink name=output signal-handoffs=true sync=true dbin. %s" % with_audio
     self.player = gst.parse_launch(s)
     self.input  = self.player.get_by_name('input')
     self.fakeSink = self.player.get_by_name('output')
@@ -115,10 +119,15 @@ class VideoPlayer(BackgroundLayer):
     self.fakeSink.connect ("handoff", self.texUpdate)
     # Catch the end of file as well as errors
     # FIXME: Doesn't work!?! The event is never received
-    bus = self.player.get_bus()
-    bus.add_signal_watch()
-    bus.enable_sync_message_emission()
-    bus.connect("message", self.onMessage)
+#     bus = self.player.get_bus()
+#     bus.add_signal_watch()
+#     bus.enable_sync_message_emission()
+#     bus.connect("message", self.onMessage)
+#     bus.connect("message::eos", self.onEndOfStream)
+
+  # Handle end of video
+  def onEndOfStream(self):
+    print "The END"
 
   # Handle bus event e.g. end of video or unsupported formats/codecs
   def onMessage(self, bus, message):
