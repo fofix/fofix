@@ -123,7 +123,7 @@ class VideoPlayer(BackgroundLayer):
     # FIXME: Doesn't work!?! The event is never received
     # Ok, messages are sent if i use the following in run():
     #  gobject.MainLoop().get_context().iteration(True)
-    # BUT the fakesink synch events then stop working... why?!
+    # BUT the main python thread then freezes after ~5 seconds... why?!
     # See run() for the current hackish workaround.
 #     bus = self.player.get_bus()
 #     bus.add_signal_watch()
