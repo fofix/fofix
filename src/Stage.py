@@ -345,7 +345,7 @@ class Stage(object):
       vidSource = os.path.join("..", "data", "video.mp4") # Path to video; relative to the current directory
       vidSize = (320, 240) # Video width and height
 
-    self.vidPlayer = VideoPlayer(self.engine, -1, vidSource, vidSize, mute = True)
+    self.vidPlayer = VideoPlayer(self.engine, -1, vidSource, vidSize, mute = True, loop = True)
     self.engine.view.pushLayer(self.vidPlayer)
     self.vidPlayer.paused = True
 

@@ -39,19 +39,22 @@ import Log
 
 # Simple video player
 class VideoPlayer(BackgroundLayer):
-  def __init__(self, engine, framerate, vidSource, (vidWidth, vidHeight), mute = False):
+  def __init__(self, engine, framerate, vidSource, (vidWidth, vidHeight), mute = False, loop = False):
     self.updated = False
     self.videoList = None
     self.videoTex = None
     self.videoBuffer = None
+    self.videoSrc = os.path.join(os.getcwd(), vidSource)
     self.engine = engine
     self.mute = mute
+    self.loop = loop
     self.winWidth, self.winHeight = engine.view.geometry[2:4]
     self.fps = framerate
     self.textureSetup((vidWidth, vidHeight))
-    self.vidSetup(vidSource)
+    self.vidSetup()
     self.clock = pygame.time.Clock()
     self.paused = False
+    self.finished = False
 
   def textureSetup(self, (vidWidth, vidHeight)):
     self.vidWidth = vidWidth
@@ -104,10 +107,9 @@ class VideoPlayer(BackgroundLayer):
     glEndList()
 
   # Setup GStreamer's pipeline
-  def vidSetup(self, vidSource):
-    src = os.path.join(os.getcwd(), vidSource)
-    if not os.path.exists(src):
-      Log.error("Video %s does not exist!" % src)
+  def vidSetup(self):
+    if not os.path.exists(self.videoSrc):
+      Log.error("Video %s does not exist!" % self.videoSrc)
     with_audio = ""
     if not self.mute:
       with_audio = "! queue ! audioconvert ! audiorate ! autoaudiosink"
@@ -115,10 +117,14 @@ class VideoPlayer(BackgroundLayer):
     self.player = gst.parse_launch(s)
     self.input  = self.player.get_by_name('input')
     self.fakeSink = self.player.get_by_name('output')
-    self.input.set_property("location", os.getcwd() + '/' + vidSource)
+    self.input.set_property("location", self.videoSrc)
     self.fakeSink.connect ("handoff", self.texUpdate)
     # Catch the end of file as well as errors
     # FIXME: Doesn't work!?! The event is never received
+    # Ok, messages are sent if i use the following in run():
+    #  gobject.MainLoop().get_context().iteration(True)
+    # BUT the fakesink synch events then stop working... why?!
+    # See run() for the current hackish workaround.
 #     bus = self.player.get_bus()
 #     bus.add_signal_watch()
 #     bus.enable_sync_message_emission()
@@ -136,10 +142,12 @@ class VideoPlayer(BackgroundLayer):
     if type == gst.MESSAGE_EOS:
       print "End of video"
       self.player.set_state(gst.STATE_NULL)
+      self.finished = True
     elif type == gst.MESSAGE_ERROR:
       err, debug = message.parse_error()
       Log.error("Error: %s" % err, debug)
       self.player.set_state(gst.STATE_NULL)
+      self.finished = True
 
   # Handle new video frames coming from the decoder
   def texUpdate(self, sink, buffer, pad):
@@ -157,9 +165,22 @@ class VideoPlayer(BackgroundLayer):
       self.player.set_state(gst.STATE_PAUSED)
     else:
       self.player.set_state(gst.STATE_PLAYING)
+      self.finished = False
+    # HACKISH: The following is a freakin' ugly hack to workaround the gst
+    # threading issue (see comments at the bottom of vidSetup).
+    # It'd be nice to get this working properly i.e. using onMessage.
+    s = self.fakeSink.get_property("last-message")
+    if s and s.find("type: 86") != -1: # 86 means EndOfStream (EOS)
+      if self.loop:
+        self.player.set_state(gst.STATE_NULL)
+        # HACKISH: Need to recreate the pipepile altogether...
+        # For some reason going through STATE_NULL, STATE_READY, STATE_PLAYING
+        # doesn't work as I would expect.
+        self.vidSetup()
+      else:
+        self.player.set_state(gst.STATE_NULL)
+        self.finished = True
     self.clock.tick(self.fps)
-#     s = self.fakeSink.get_property("last-message")
-#     print "State: %s" % str(s)
     
   def render(self, visibility, topMost):
     try:
