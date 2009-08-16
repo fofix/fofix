@@ -22,6 +22,11 @@ In the following, we assume the translation language is German.
   # Go in-game and check if it's working as expected
   # If so, please [http://code.google.com/p/fofix/issues/entry create an issue] about your translation and add your `.po` and `.mo` files as attachments
 
+=== Standards ===
+FoFiX uses the following translation standards:
+ # Please encode your translation in ISO-8859-1 - we aim to switch to Unicode eventually, but for now this is the way to go.
+ # Please use all proper accents. While it is true that some fonts do not properly support accented characters, this should not be reflected in the official translations.
+
 === Translation Example ===
 Before:
 {{{
