@@ -44,7 +44,7 @@ class VideoPlayer(BackgroundLayer):
     self.videoList = None
     self.videoTex = None
     self.videoBuffer = None
-    self.videoSrc = os.path.join(os.getcwd(), vidSource)
+    self.videoSrc = vidSource
     self.engine = engine
     self.mute = mute
     self.loop = loop

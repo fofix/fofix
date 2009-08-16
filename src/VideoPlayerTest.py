@@ -21,6 +21,8 @@
 #####################################################################
 
 import unittest
+import os
+
 from GameEngine import GameEngine
 import Config
 import Version
@@ -58,7 +60,8 @@ vidSize = (800, 340) # Video width and height
 
 class VideoPlayerTest(unittest.TestCase):
   def testVideoPlayer(self):
-    vidPlayer = VideoPlayer(self.e, framerate, vidSource, vidSize)
+    src = os.path.join(Version.dataPath(), vidSource)
+    vidPlayer = VideoPlayer(self.e, framerate, src, vidSize, loop = True)
     self.e.view.pushLayer(vidPlayer)
 
     while self.e.view.layers:
