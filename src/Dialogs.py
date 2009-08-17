@@ -4443,6 +4443,18 @@ class ControlActivator(Layer, KeyListener):
     self.controls   = self.engine.input.controls.controls[:] #make a copy
     self.ready      = False
     
+    if self.engine.cmdPlay == 2:
+      if self.engine.cmdPart is not None:
+        if self.engine.cmdPart == 4:
+          allowGuitar = False
+          allowMic    = False
+        elif self.engine.cmdPart == 5:
+          allowGuitar = False
+          allowDrum   = False
+        else:
+          allowDrum   = False
+          allowMic    = False
+    
     self.selectedItems  = []
     self.blockedItems   = []
     self.selectedIndex  = 0
@@ -4489,7 +4501,11 @@ class ControlActivator(Layer, KeyListener):
         self.controls[i] = _("Default Microphone")
     
     themename = self.engine.data.themeLabel
-
+    while self.selectedIndex in self.blockedItems:
+      self.selectedIndex += 1
+      if self.selectedIndex > 3:
+        self.selectedIndex = 0
+        break
     try:
       self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "lobby", "controlbg.png"))
       self.bgScale = 640.000/self.background.width1()

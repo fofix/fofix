@@ -157,30 +157,29 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
     if not self.wizardStarted:
       self.wizardStarted = True
 
-      if self.engine.cmdPlay == 1:
-        self.songName = Config.get("game", "selected_song")
-        self.libraryName = Config.get("game", "selected_library")
-        self.engine.cmdPlay = 2
-
       if not self.songName:
         while 1:
-          self.mode = 1
-          self.libraryName, self.songName = \
-            Dialogs.chooseSong(self.engine, \
+          if self.engine.cmdPlay == 2:
+            self.songName = Config.get("game", "selected_song")
+            self.libraryName = Config.get("game", "selected_library")
+          else:
+            self.mode = 1
+            self.libraryName, self.songName = \
+              Dialogs.chooseSong(self.engine, \
                                selectedLibrary = Config.get("game", "selected_library"),
                                selectedSong    = Config.get("game", "selected_song"))
 
-          if self.libraryName == None:
-            newPath = Dialogs.chooseFile(self.engine, masks = ["*/songs"], prompt = _("Choose a new songs directory."), dirSelect = True)
-            if newPath != None:
-              Config.set("game", "base_library", os.path.dirname(newPath))
-              Config.set("game", "selected_library", "songs")
-              Config.set("game", "selected_song", "")
-              self.engine.resource.refreshBaseLib()   #myfingershurt - to let user continue with new songpath without restart
+            if self.libraryName == None:
+              newPath = Dialogs.chooseFile(self.engine, masks = ["*/songs"], prompt = _("Choose a new songs directory."), dirSelect = True)
+              if newPath != None:
+                Config.set("game", "base_library", os.path.dirname(newPath))
+                Config.set("game", "selected_library", "songs")
+                Config.set("game", "selected_song", "")
+                self.engine.resource.refreshBaseLib()   #myfingershurt - to let user continue with new songpath without restart
             
-          if not self.songName:
-            self.session.world.finishGame()
-            return
+            if not self.songName:
+              self.session.world.finishGame()
+              return
 
           if not self.tut:
             Config.set("game", "selected_library", self.libraryName)
@@ -272,6 +271,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
             guitars = []
             drums = []
             vocals = []
+            autoPart = None
             for part in info.parts:
               if part.id == 4:
                 drums.append(part)
@@ -279,82 +279,108 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
                 vocals.append(part)
               else:
                 guitars.append(part)
-            if len(drums) == 0 and self.engine.input.gameDrums > 0:
-              Dialogs.showMessage(self.engine, _("There are no drum parts in this song. Change your controllers to play."))
-              escaped = True
-              break
-            if len(guitars) == 0 and self.engine.input.gameGuitars > 0:
-              Dialogs.showMessage(self.engine, _("There are no guitar parts in this song. Change your controllers to play."))
-              escaped = True
-              break
-            if len(vocals) == 0 and self.engine.input.gameMics > 0:
-              Dialogs.showMessage(self.engine, _("There are no vocal parts in this song. Change your controllers to play."))
-              escaped = True
-              break
-            
-            for i, player in enumerate(self.playerList):
-              
-              while 1: #new nesting for Practice Mode selection
-                selectedPlayer = False
-                choose = []
-                if player.controlType == 2 or player.controlType == 3:
-                  choose = drums
-                elif player.controlType == 5:
-                  choose = vocals
-                else:
-                  choose = guitars
-                  
-                if len(choose) > 1:
-
-                  if self.subMenuPosTuple:
-                    p = Dialogs.chooseItem(self.engine, choose, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("%s Choose a part:") % player.name), selected = player.part, pos = self.subMenuPosTuple)
-                  else:
-                    p = Dialogs.chooseItem(self.engine, choose, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("%s Choose a part:") % player.name), selected = player.part)
-
-                else:
-                  p = choose[0]
-                if p:
-                  player.part = p
-                else:
-                  if not player.practiceMode:
-                    escaped = True
-                  break;
-                while 1:
-                  if len(info.partDifficulties[p.id]) > 1:
-
-                    if self.subMenuPosTuple:
-                      d = Dialogs.chooseItem(self.engine, info.partDifficulties[p.id],
-                                         "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("%s Choose a difficulty:") % player.name), selected = player.difficulty, pos = self.subMenuPosTuple)
-                    else:
-                      d = Dialogs.chooseItem(self.engine, info.partDifficulties[p.id],
-                                         "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("%s Choose a difficulty:") % player.name), selected = player.difficulty)
-
-                  else:
-                    d = info.partDifficulties[p.id][0]
-                  if d:
-                    player.difficulty = d
-                    selectedPlayer = True
-                  else:
-                    if len(choose) <= 1:
-                      #escape = True
-                      escaped = True
-                    break
-                  if selectedPlayer:
-                    break
-                if selectedPlayer or escaped:
-                  break
-            
-              #if selected or escaped: #new nesting for Practice Mode selection
-              if selected or escaped: #new nesting for Practice Mode selection
+              if self.engine.cmdPlay == 2 and self.engine.cmdPart is not None and len(self.playerList) == 1:
+                if self.engine.cmdPart == part.id:
+                  Log.debug("Command-line mode: Part found!")
+                  if part.id == 4 and self.engine.input.gameDrums > 0:
+                    autoPart = part.id
+                  elif part.id == 5 and self.engine.input.gameMics > 0:
+                    autoPart = part.id
+                  elif self.engine.input.gameGuitars > 0:
+                    autoPart = part.id
+            if autoPart is None:
+              if len(drums) == 0 and self.engine.input.gameDrums > 0:
+                Dialogs.showMessage(self.engine, _("There are no drum parts in this song. Change your controllers to play."))
+                escaped = True
+                if self.engine.cmdPlay == 2:
+                  self.engine.cmdPlay = 0
+                break
+              if len(guitars) == 0 and self.engine.input.gameGuitars > 0:
+                Dialogs.showMessage(self.engine, _("There are no guitar parts in this song. Change your controllers to play."))
+                escaped = True
+                if self.engine.cmdPlay == 2:
+                  self.engine.cmdPlay = 0
+                break
+              if len(vocals) == 0 and self.engine.input.gameMics > 0:
+                Dialogs.showMessage(self.engine, _("There are no vocal parts in this song. Change your controllers to play."))
+                escaped = True
+                if self.engine.cmdPlay == 2:
+                  self.engine.cmdPlay = 0
                 break
             
+              for i, player in enumerate(self.playerList):
+                
+                while 1: #new nesting for Practice Mode selection
+                  selectedPlayer = False
+                  choose = []
+                  if player.controlType == 2 or player.controlType == 3:
+                    choose = drums
+                  elif player.controlType == 5:
+                    choose = vocals
+                  else:
+                    choose = guitars
+                    
+                  if len(choose) > 1:
+
+                    if self.subMenuPosTuple:
+                      p = Dialogs.chooseItem(self.engine, choose, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("%s Choose a part:") % player.name), selected = player.part, pos = self.subMenuPosTuple)
+                    else:
+                      p = Dialogs.chooseItem(self.engine, choose, "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("%s Choose a part:") % player.name), selected = player.part)
+
+                  else:
+                    p = choose[0]
+                  if p:
+                    player.part = p
+                  else:
+                    if not player.practiceMode:
+                      escaped = True
+                    break;
+                  while 1:
+                    if len(info.partDifficulties[p.id]) > 1:
+
+                      if self.subMenuPosTuple:
+                        d = Dialogs.chooseItem(self.engine, info.partDifficulties[p.id],
+                                           "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("%s Choose a difficulty:") % player.name), selected = player.difficulty, pos = self.subMenuPosTuple)
+                      else:
+                        d = Dialogs.chooseItem(self.engine, info.partDifficulties[p.id],
+                                           "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("%s Choose a difficulty:") % player.name), selected = player.difficulty)
+
+                    else:
+                      d = info.partDifficulties[p.id][0]
+                    if d:
+                      player.difficulty = d
+                      selectedPlayer = True
+                    else:
+                      if len(choose) <= 1:
+                        #escape = True
+                        escaped = True
+                      break
+                    if selectedPlayer:
+                      break
+                  if selectedPlayer or escaped:
+                    break
+              
+                #if selected or escaped: #new nesting for Practice Mode selection
+                if selected or escaped: #new nesting for Practice Mode selection
+                  break
+              
+              else:
+                selected = True
+
+              if selected or escaped: #new nesting for Practice Mode section selection
+                break
+
             else:
+              self.playerList[0].part = Song.parts[autoPart]
+              for diff in info.partDifficulties[autoPart]:
+                if self.engine.cmdDiff == diff.id:
+                  self.playerList[0].difficulty = diff
+                  break
+              else:
+                self.playerList[0].difficulty = info.partDifficulties[autoPart][0]
               selected = True
-
-            if selected or escaped: #new nesting for Practice Mode section selection
               break
-
-          
+                
           #useless practice mode nesting
           #if selected or escape:
           #  break
@@ -368,7 +394,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
           self.player.practiceMode = True
         info = Song.loadSongInfo(self.engine, self.songName, library = self.libraryName)
 
-      if self.engine.cmdPlay == 2:
+      if self.engine.cmdPlay == 3:
         if len(info.parts) >= self.engine.cmdPart:
           self.player.part = info.parts[self.engine.cmdPart]
         if len(info.partDifficulties[self.player.part.id]) >= self.engine.cmdDiff:
@@ -382,6 +408,7 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
         self.player.difficulty = info.partDifficulties[self.player.part.id][0]
         
       if not self.engine.createdGuitarScene:
+        self.engine.cmdPlay = 3
         #self.engine.createdGuitarScene = True
         self.session.world.deleteScene(self)
         self.session.world.createScene("GuitarScene", libraryName = self.libraryName, songName = self.songName, Players = players)

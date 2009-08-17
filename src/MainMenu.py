@@ -420,6 +420,8 @@ class MainMenu(BackgroundLayer):
     self.engine.data.acceptSound.play()
     players = Dialogs.activateControllers(self.engine, players, maxplayers, allowGuitar, allowDrum, allowMic) #akedrou
     if players == 0:
+      if self.engine.cmdPlay == 2:
+        self.engine.cmdPlay = 0
       return
     Config.set("game", "players", players)
     Config.set("game","game_mode", mode1p)
@@ -478,8 +480,9 @@ class MainMenu(BackgroundLayer):
     self.time += ticks / 50.0
     if self.engine.cmdPlay == 1:
       #evilynux - improve cmdline support
+      self.engine.cmdPlay = 2
       self.newLocalGame(players = Config.get("game", "players"), mode1p = Config.get("game","game_mode"), mode2p = Config.get("game","multiplayer_mode"))
-    elif self.engine.cmdPlay == 2:
+    elif self.engine.cmdPlay == 3:
       self.quit()
     
     

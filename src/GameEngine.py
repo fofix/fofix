@@ -526,6 +526,9 @@ class GameEngine(Engine):
     self.stereo = stereo
     self.bufferSize = bufferSize
     
+    self.cmdPlay           = 0
+    self.cmdDiff           = None
+    self.cmdPart           = None
 
     #self.audio.pre_open(frequency = frequency, bits = bits, stereo = stereo, bufferSize = bufferSize)
     #self.audio.open(frequency = frequency, bits = bits, stereo = stereo, bufferSize = bufferSize)
@@ -545,6 +548,10 @@ class GameEngine(Engine):
     fullscreen    = self.config.get("video", "fullscreen")
     multisamples  = self.config.get("video", "multisamples")
     self.video.setMode((width, height), fullscreen = fullscreen, multisamples = multisamples)
+    
+    if self.video.default:
+      self.config.set("video", "fullscreen", False)
+      self.config.set("video", "resolution", "800x600")
     
     if self.config.get("video", "shader_use"):
       shaders.set(os.path.join(Version.dataPath(), "shaders"))
