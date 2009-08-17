@@ -1451,12 +1451,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     # evilynux - Load stage background(s)
     stageMode = self.engine.config.get("game", "stage_mode")
-    if stageMode == 3 and Stage.videoAvailable:
-      self.stage.loadVideo(self.libraryName, self.songName)
-    else:
-      if stageMode == 3:
-        self.engine.config.set("game", "stage_mode", 0)
-      self.stage.load(self.libraryName, self.songName, self.playerList[0].practiceMode)
+    # if stageMode == 3:
+      # self.stage.loadVideo(self.libraryName, self.songName)
+    # else:
+      # if stageMode == 3:
+        # self.engine.config.set("game", "stage_mode", 0)
+    self.stage.load(self.libraryName, self.songName, self.playerList[0].practiceMode)
 
     #MFH - this determination logic should happen once, globally -- not repeatedly.
     self.showScriptLyrics = False
