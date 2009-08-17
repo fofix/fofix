@@ -1450,9 +1450,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Loading Graphics..."))
     
     # evilynux - Load stage background(s)
-    if self.engine.config.get("game", "stage_mode") == 3:
+    stageMode = self.engine.config.get("game", "stage_mode")
+    if stageMode == 3 and Stage.videoAvailable:
       self.stage.loadVideo(self.libraryName, self.songName)
     else:
+      if stageMode == 3:
+        self.engine.config.set("game", "stage_mode", 0)
       self.stage.load(self.libraryName, self.songName, self.playerList[0].practiceMode)
 
     #MFH - this determination logic should happen once, globally -- not repeatedly.
@@ -5667,6 +5670,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     num = self.getPlayerNum(control)
     if num is None:
       return True
+    if self.instruments[num].isDrum and control in self.instruments[num].keys:
+      if control in Player.bassdrums:
+        self.instruments[num].bassDrumPedalPressed = True
     if self.battleGH:
       if self.instruments[num].battleStatus[3]:
         if control == self.instruments[num].keys[self.instruments[num].battleBreakString]:
@@ -5816,6 +5822,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         
     pressed = -1
     for i in range(self.numOfPlayers):
+      if self.instruments[i].isDrum and control in self.instruments[i].keys:
+        if control in Player.bassdrums:
+          self.instruments[i].bassDrumPedalPressed = True
       if control in (self.instruments[i].actions):
         hopo = False
         pressed = i

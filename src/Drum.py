@@ -74,6 +74,7 @@ class Drum:
     self.starPowerDecreaseDivisor = 200.0/self.engine.audioSpeedFactor
 
     self.bassDrumPedalDown = False
+    self.bassDrumPedalPressed = False
 
     self.lastFretWasBassDrum = False
     self.lastFretWasT1 = False   #Faaa Drum sound
@@ -2564,15 +2565,13 @@ class Drum:
     for i in range (5):
       if controls.getState(self.keys[i]) or controls.getState(self.keys[5+i]):
         if i == 0:
-          if not self.bassDrumPedalDown:  #MFH - gotta check if bass drum pedal is just held down!
+          if self.bassDrumPedalPressed:  #MFH - gotta check if bass drum pedal is just held down!
             if self.engine.data.bassDrumSoundFound:
               self.engine.data.bassDrumSound.play()
-            self.bassDrumPedalDown = True
+            self.bassDrumPedalPressed = False
             drumsJustHit[0] = True
             if self.fretboardHop < 0.04:
               self.fretboardHop = 0.04  #stump
-        else:
-          self.bassDrumPedalDown = False
         if i == 1:
           if self.engine.data.T1DrumSoundFound and not playBassDrumOnly:
             self.engine.data.T1DrumSound.play()

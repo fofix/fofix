@@ -33,7 +33,12 @@ import os
 import random   #MFH - needed for new stage background handling
 from Language import _
 
-from VideoPlayer import VideoPlayer
+videoAvailable = True
+try:
+  from VideoPlayer import VideoPlayer
+except ImportError:
+  videoAvailable = False
+
 import Version # Provides dataPath
 
 class Layer(object):
@@ -339,6 +344,8 @@ class Stage(object):
           self.backgroundLayers.append(layer)
 
   def loadVideo(self, libraryName, songName):
+    if not videoAvailable:
+      return -1
     if self.songStage == 1 and os.path.exists(os.path.join(libraryName, songName, "video.mp4")):
       vidSource = os.path.join(libraryName, songName, "video.mp4")
       vidSize = (320, 240) # Video width and height
