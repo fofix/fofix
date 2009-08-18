@@ -2069,8 +2069,8 @@ class Guitar:
       elif self.battleStatus[6]:
         glScalef(-1, 1, 1)
 
-      if self.ocount <= 1:
-        self.ocount = self.ocount + .1
+      if self.ocount < 1:
+        self.ocount += .1
       else:
         self.ocount = 1
 

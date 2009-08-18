@@ -5663,15 +5663,18 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if self.hopoStyle > 0:  #HOPOs enabled 
       res = self.keyPressed3(key, unicode, control)
       return res
-
+    
+    actual = False
     if not control:
+      actual  = True
       control = self.controls.keyPressed(key)
     
     num = self.getPlayerNum(control)
     if num is None:
       return True
     if self.instruments[num].isDrum and control in self.instruments[num].keys:
-      if control in Player.bassdrums:
+      if control in Player.bassdrums and actual:
+        self.instruments[num].bassDrumPedalDown = 100
         self.instruments[num].bassDrumPedalPressed = True
     if self.battleGH:
       if self.instruments[num].battleStatus[3]:
@@ -5809,7 +5812,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
  
   def keyPressed3(self, key, unicode, control = None, pullOff = False):  #MFH - gonna pass whether this was called from a pull-off or not
     hopo = False
+    actual = False
     if not control:
+      actual  = True
       control = self.controls.keyPressed(key)
     else:
       hopo = True
@@ -5823,7 +5828,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     pressed = -1
     for i in range(self.numOfPlayers):
       if self.instruments[i].isDrum and control in self.instruments[i].keys:
-        if control in Player.bassdrums:
+        if control in Player.bassdrums and actual:
+          self.instruments[i].bassDrumPedalDown    = 100
           self.instruments[i].bassDrumPedalPressed = True
       if control in (self.instruments[i].actions):
         hopo = False
@@ -5950,7 +5956,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if self.instruments[num].isDrum:
       if control in (self.instruments[num].keys):
         if not self.controls.getState(self.instruments[num].keys[0]) and not self.controls.getState(self.instruments[num].keys[5]):
-          self.instruments[num].bassDrumPedalDown = False    #MFH - this is all that's needed here...
+          self.instruments[num].bassDrumPedalDown = 0    #MFH - this is all that's needed here...
           #self.instruments[num].lastFretWasBassDrum = False
       return True
     

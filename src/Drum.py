@@ -73,7 +73,7 @@ class Drum:
     #self.starPowerDecreaseDivisor = 200.0*self.engine.audioSpeedFactor
     self.starPowerDecreaseDivisor = 200.0/self.engine.audioSpeedFactor
 
-    self.bassDrumPedalDown = False
+    self.bassDrumPedalDown = 0
     self.bassDrumPedalPressed = False
 
     self.lastFretWasBassDrum = False
@@ -1631,10 +1631,11 @@ class Drum:
       texSize = (0.0,1.0)
 
       texY = (1.0/6.0,2.0/6.0)
-      if controls.getState(self.keys[0]) or controls.getState(self.keys[5]):
-        texY = (3.0/6.0,4.0/6.0)
-      if self.hit[0]:
-        texY = (5.0/6.0,1.0)
+      if self.bassDrumPedalDown > 0:
+        if (controls.getState(self.keys[0]) or controls.getState(self.keys[5])):
+          texY = (3.0/6.0,4.0/6.0)
+        if self.hit[0]:
+          texY = (5.0/6.0,1.0)
 
       self.engine.draw3Dtex(self.drumFretButtons, vertex = (size[0],size[1],-size[0],-size[1]), texcoord = (texSize[0], texY[0], texSize[1], texY[1]),
                             coord = (x,v,0), multiples = True,color = (1,1,1), depth = True)
@@ -2407,6 +2408,11 @@ class Drum:
       if self.leftyMode:
         glScalef(-1, 1, 1)
 
+      if self.ocount < 1:
+        self.ocount += .1
+      else:
+        self.ocount = 1
+
       if self.freestyleActive or self.drumFillsActive:
         self.renderOpenNotes(visibility, song, pos)
         self.renderNotes(visibility, song, pos)
@@ -2704,7 +2710,7 @@ class Drum:
         if note.number == i and (controls.getState(self.keys[i]) or controls.getState(self.keys[i+5])):
           if self.guitarSolo:
             self.currentGuitarSoloHitNotes += 1
-          if i == 0 and self.fretboardHop < 0.07:
+          if i == 0 and self.fretboardHop < 0.07 and self.bassDrumPedalDown > 0:
             self.fretboardHop = 0.07  #stump
 
           if shaders.turnon:
@@ -2758,7 +2764,11 @@ class Drum:
       if self.starPower <= 0:
         self.starPower = 0
         self.starPowerActive = False
-
+    
+    if self.bassDrumPedalDown > 0:
+      self.bassDrumPedalDown -= ticks
+      if self.bassDrumPedalDown < 0:
+        self.bassDrumPedalDown = 0
 
     activeFrets = [(note.number - 1) for time, note in self.playedNotes]
 
