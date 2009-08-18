@@ -54,11 +54,13 @@ Options:
   --config=, -c [configfile]          Use this instead of fofix.ini
   --fullscreen=, -f [true/false]      Change fullscreen settings in fofix.ini
   --resolution=, -r [resolution]      Change game resolution from commandline.
-  --song=,   -s [songdir]             Play a song from the commandline
-  --diff=,   -l [level of difficulty] Use this difficulty level
-  --part=,   -p [part number]         Use this part
-  --mode=,   -m [game mode]           0: Quickplay, 1: Practice, 2: Career
   --theme,   -t (theme)               Starts using this theme. Needs to be in " " marks. (IE- -t "Guitar Hero III")     
+  --song=,   -s [songdir]             Play a song from the commandline
+  The following settings only apply if "song" is set.
+  --diff=,   -l [level of difficulty] 0: Expert, 1: Hard, 2: Medium, 3: Easy (Only if 'part' is set)
+  --part=,   -p [part number]         0: Guitar, 1: Rhythm, 2: Bass, 3: Lead
+                                      4: Drum,   5: Vocals
+  --mode=,   -m [game mode]           0: Quickplay, 1: Practice, 2: Career
 """ % {"prog": sys.argv[0] }
 
 debuglevel = 0    #MFH - experimental, leave at 0

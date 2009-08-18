@@ -198,7 +198,6 @@ class MainMenu(BackgroundLayer):
    
  #####======= Racer: New Main Menu ======####
 
-
     self.opt_text_color = Theme.hexToColor(Theme.opt_text_colorVar)
     self.opt_selected_color = Theme.hexToColor(Theme.opt_selected_colorVar)
 
@@ -475,10 +474,12 @@ class MainMenu(BackgroundLayer):
   def startGHImporter(self):
     self.launchLayer(lambda: GHImporter(self.engine))
   startGHImporter = catchErrors(startGHImporter)
-    
+  
   def run(self, ticks):
     self.time += ticks / 50.0
     if self.engine.cmdPlay == 1:
+      self.engine.cmdPlay = 4
+    elif self.engine.cmdPlay == 4: #this frame runs the engine an extra loop to allow the font to load...
       #evilynux - improve cmdline support
       self.engine.cmdPlay = 2
       self.newLocalGame(players = Config.get("game", "players"), mode1p = Config.get("game","game_mode"), mode2p = Config.get("game","multiplayer_mode"))
@@ -507,9 +508,8 @@ class MainMenu(BackgroundLayer):
     t = self.time / 100
     w, h, = self.engine.view.geometry[2:4]
     r = .5
-
+    
     if not self.useSoloMenu:
-
 
       if self.active:
         if self.engine.view.topLayer() is not None:
@@ -520,7 +520,7 @@ class MainMenu(BackgroundLayer):
         else:
           self.engine.drawImage(self.engine.data.loadingImage, (1.0,-1.0), (w/2, h/2), stretched = 3)
 
-      if self.menu.active:
+      if self.menu.active and self.engine.cmdPlay == 0:
         if self.background != None:
           #MFH - auto-scaling
           self.engine.drawImage(self.background, (1.0,-1.0), (w/2, h/2), stretched = 3)
@@ -566,7 +566,7 @@ class MainMenu(BackgroundLayer):
         else:
           self.engine.drawImage(self.engine.data.loadingImage, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
         
-      if self.menu.active:
+      if self.menu.active and self.engine.cmdPlay == 0:
         if self.background != None:
           self.engine.drawImage(self.background, (1.0,-1.0), (w/2, h/2), stretched = 3)
 
