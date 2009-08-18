@@ -22,6 +22,9 @@
 
 import unittest
 import os
+import pygame
+from pygame.locals import *
+from OpenGL.GL import *
 
 from GameEngine import GameEngine
 import Config
@@ -34,7 +37,6 @@ from VideoPlayer import VideoPlayer
 # Ogg Theora, Flash, FFmpeg H.264, etc.).
 framerate = 24 # Number of frames per seconds (-1 = as fast as it can)
 # vidSource    # Path to video; relative to FoFiX data/ directory
-# vidSize      # Video width and height
 
 # FIXME: Should autodetect video width and height values.
 
@@ -48,25 +50,90 @@ framerate = 24 # Number of frames per seconds (-1 = as fast as it can)
 
 # Macromedia Flash
 # vidSource = "t3.flv"
-# vidSource = "t3.1.flv" # 24 seconds
+vidSource = "t3.1.flv" # 24 seconds
 
 # Xiph Ogg Theora
 # vidSource = "t4.ogv"
 
-vidSource = "video.flv"
-
 class VideoPlayerTest(unittest.TestCase):
-  def testVideoPlayer(self):
-    src = os.path.join(Version.dataPath(), vidSource)
-    vidPlayer = VideoPlayer(self.e, framerate, src, loop = True)
+  # Simplest way to use the video player, use it as a Layer
+  def testVideoPlayerLayer(self):
+    vidPlayer = VideoPlayer(self.e, framerate, self.src, loop = False)
     self.e.view.pushLayer(vidPlayer)
-
-    while self.e.view.layers:
+    while not vidPlayer.finished:
       self.e.run()
+
+  # Keep tight control over the video player
+  def testVideoPlayerSlave(self):
+    winWidth, winHeight = 800, 600
+    pygame.init()
+    flags = DOUBLEBUF|OPENGL|HWPALETTE|HWSURFACE
+    vidPlayer = VideoPlayer(self.e, framerate, self.src, (winWidth, winHeight))
+    pygame.display.set_mode((winWidth, winHeight), flags)
+    glViewport(0, 0, winWidth, winHeight) # Required as GameEngine changes it
+    font = self.e.data.font
+    while not vidPlayer.finished:
+      vidPlayer.run()
+      vidPlayer.render()
+      pygame.display.flip()
+
+  # Grab the texture, use the CallList and do whatever we want with it;
+  # We could also _just_ use the texture and take care of the polygons ourselves
+  def testVideoPlayerSlaveShowOff(self):
+    winWidth, winHeight = 500, 500
+    pygame.init()
+    flags = DOUBLEBUF|OPENGL|HWPALETTE|HWSURFACE
+    vidPlayer = VideoPlayer(self.e, -1, self.src, (winWidth, winHeight))
+    pygame.display.set_mode((winWidth, winHeight), flags)
+    glViewport(0, 0, winWidth, winHeight) # Required as GameEngine changes it
+    glClearColor(0, 0, 0, 1.)
+    x, y = 0.0, 1.0
+    fx, fy, ftheta = 1, 1, 1
+    theta = 0.0
+    time = 0.0
+    clock = pygame.time.Clock()
+    while not vidPlayer.finished:
+      vidPlayer.run()
+      vidPlayer.textureUpdate()
+      # Save and clear both transformation matrices
+      glMatrixMode(GL_PROJECTION)
+      glPushMatrix()
+      glLoadIdentity()
+      glMatrixMode(GL_MODELVIEW)
+      glPushMatrix()
+      glLoadIdentity()
+
+      glClear(GL_COLOR_BUFFER_BIT)
+      glColor3f(1., 1., 1.)
+      glBindTexture(GL_TEXTURE_2D, vidPlayer.videoTex)
+      glTranslatef(x, y, 0)
+      glRotatef(theta, 0, 0, 1.)
+      glScalef(.5, .5, 1.)
+      glCallList(vidPlayer.videoList)
+
+      # Restore both transformation matrices
+      glPopMatrix()
+      glMatrixMode(GL_PROJECTION)
+      glPopMatrix()
+
+      pygame.display.flip()
+
+      x = (x + fx*time)
+      y = (y + fy*time)
+      theta = theta + ftheta
+      if x > 1.0 or x < -1.0:
+        fx = fx * -1
+      if y > 1.0 or y < -1.0:
+        fy = fy * -1
+      if theta > 90 or theta < -90:
+        ftheta = ftheta * -1
+      time = time + 0.00001
+      clock.tick(60)
 
   def setUp(self):
     config = Config.load(Version.appName() + ".ini", setAsDefault = True)
     self.e = GameEngine(config)
+    self.src = os.path.join(Version.dataPath(), vidSource)
     
   def tearDown(self):
     self.e.quit()

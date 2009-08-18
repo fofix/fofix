@@ -40,7 +40,7 @@ import Log
 
 # Simple video player
 class VideoPlayer(BackgroundLayer):
-  def __init__(self, engine, framerate, vidSource, mute = False, loop = False):
+  def __init__(self, engine, framerate, vidSource, (winWidth, winHeight) = (None, None), mute = False, loop = False):
     self.updated = False
     self.videoList = None
     self.videoTex = None
@@ -49,7 +49,10 @@ class VideoPlayer(BackgroundLayer):
     self.engine = engine
     self.mute = mute
     self.loop = loop
-    self.winWidth, self.winHeight = engine.view.geometry[2:4]
+    if winWidth is not None and winHeight is not None:
+      self.winWidth, self.winHeight = winWidth, winHeight
+    else:
+      self.winWidth, self.winHeight = engine.view.geometry[2:4]
     self.vidWidth, self.vidHeight = -1, -1
     self.fps = framerate
     self.clock = pygame.time.Clock()
@@ -111,7 +114,7 @@ class VideoPlayer(BackgroundLayer):
       r = float(self.winHeight)/float(self.vidHeight)
       vtxX = 1.0 - abs(self.winWidth-r*self.vidWidth) / (float(self.winWidth))
     elif winRes < vidRes:
-      r = float(self.winWidth)/float(vidWidth)
+      r = float(self.winWidth)/float(self.vidWidth)
       vtxY = 1.0 - abs(self.winHeight-r*self.vidHeight) / (float(self.winHeight))
 
     # Create a compiled OpenGL call list
@@ -144,7 +147,7 @@ class VideoPlayer(BackgroundLayer):
     self.input  = self.player.get_by_name('input')
     self.fakeSink = self.player.get_by_name('output')
     self.input.set_property("location", self.videoSrc)
-    self.fakeSink.connect ("handoff", self.texUpdate)
+    self.fakeSink.connect ("handoff", self.newFrame)
     # Catch the end of file as well as errors
     # FIXME: Doesn't work!?! The event is never received
     # Ok, messages are sent if i use the following in run():
@@ -176,9 +179,26 @@ class VideoPlayer(BackgroundLayer):
       self.finished = True
 
   # Handle new video frames coming from the decoder
-  def texUpdate(self, sink, buffer, pad):
+  def newFrame(self, sink, buffer, pad):
     self.videoBuffer = buffer
     self.updated = True
+
+  def textureUpdate(self):
+    if self.updated:
+      img = pygame.image.frombuffer(self.videoBuffer,
+                                    (self.vidWidth, self.vidHeight),
+                                    'RGB')
+      glBindTexture(GL_TEXTURE_2D, self.videoTex)
+      surfaceData = pygame.image.tostring(img ,'RGB', True)
+      gluBuild2DMipmaps(GL_TEXTURE_2D,
+                        GL_RGB, self.vidWidth, self.vidHeight,
+                        GL_RGB, GL_UNSIGNED_BYTE,
+                        surfaceData)
+      glTexParameteri(GL_TEXTURE_2D,
+                      GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+      glTexParameteri(GL_TEXTURE_2D,
+                      GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+      self.updated = False
 
   def shown(self):
     gobject.threads_init()
@@ -186,7 +206,7 @@ class VideoPlayer(BackgroundLayer):
   def hidden(self):
     self.player.set_state(gst.STATE_NULL)
 
-  def run(self, ticks):
+  def run(self, ticks = None):
     if self.paused == True:
       self.player.set_state(gst.STATE_PAUSED)
     else:
@@ -208,24 +228,11 @@ class VideoPlayer(BackgroundLayer):
         self.finished = True
     self.clock.tick(self.fps)
     
-  def render(self, visibility, topMost):
+  # Render texture to polygon
+  # Note: Both visibility and topMost are currently unused.
+  def render(self, visibility = 1.0, topMost = False):
     try:
-      if self.updated:
-        img = pygame.image.frombuffer(self.videoBuffer,
-                                      (self.vidWidth, self.vidHeight),
-                                      'RGB')
-        glBindTexture(GL_TEXTURE_2D, self.videoTex)
-        surfaceData = pygame.image.tostring(img ,'RGB', True)
-        gluBuild2DMipmaps(GL_TEXTURE_2D,
-                          GL_RGB, self.vidWidth, self.vidHeight,
-                          GL_RGB, GL_UNSIGNED_BYTE,
-                          surfaceData)
-        glTexParameteri(GL_TEXTURE_2D,
-                        GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-        glTexParameteri(GL_TEXTURE_2D,
-                        GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-        self.updated = False
-
+      self.textureUpdate()
       # Save and clear both transformation matrices
       glMatrixMode(GL_PROJECTION)
       glPushMatrix()
