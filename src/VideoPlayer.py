@@ -21,12 +21,13 @@
 #####################################################################
 import os
 import sys
+import gobject
 
 from math import fabs as abs # Absolute value
 
 # Almighty GStreamer
-import gobject
 import gst
+from gst.extend import discoverer # Video property detection
 
 import pygame
 from pygame.locals import *
@@ -39,7 +40,7 @@ import Log
 
 # Simple video player
 class VideoPlayer(BackgroundLayer):
-  def __init__(self, engine, framerate, vidSource, (vidWidth, vidHeight), mute = False, loop = False):
+  def __init__(self, engine, framerate, vidSource, mute = False, loop = False):
     self.updated = False
     self.videoList = None
     self.videoTex = None
@@ -49,17 +50,42 @@ class VideoPlayer(BackgroundLayer):
     self.mute = mute
     self.loop = loop
     self.winWidth, self.winHeight = engine.view.geometry[2:4]
+    self.vidWidth, self.vidHeight = -1, -1
     self.fps = framerate
-    self.textureSetup((vidWidth, vidHeight))
-    self.vidSetup()
     self.clock = pygame.time.Clock()
     self.paused = False
     self.finished = False
+    self.discovered = False
+    self.loadVideo(vidSource) # Load the video
 
-  def textureSetup(self, (vidWidth, vidHeight)):
-    self.vidWidth = vidWidth
-    self.vidHeight = vidHeight
-    blankSurface = pygame.Surface((vidWidth, vidHeight),
+  # Load a new video:
+  # 1) Detect video resolution
+  # 2) Setup OpenGL texture
+  # 3) Setup GStreamer pipeline
+  def loadVideo(self, vidSource):
+    if not os.path.exists(vidSource):
+      Log.error("Video %s does not exist!" % vidSource)
+    self.videoSrc = vidSource
+    d = discoverer.Discoverer(self.videoSrc)
+    d.connect('discovered', self.videoDiscover)
+    d.discover()
+    gobject.threads_init() # Start C threads
+    while not self.discovered:
+      # Force C threads iteration
+      gobject.MainLoop().get_context().iteration(True)
+    self.textureSetup()
+    self.videoSetup()
+
+  # Use GStreamer's video discoverer to autodetect video properties
+  def videoDiscover(self, d, isMedia):
+    if isMedia and d.is_video:
+      self.vidWidth, self.vidHeight = d.videowidth, d.videoheight
+    else:
+      Log.error("Invalid video file: %s" % self.videoSrc)
+    self.discovered = True
+
+  def textureSetup(self):
+    blankSurface = pygame.Surface((self.vidWidth, self.vidHeight),
                                   HWSURFACE, 24)
     blankSurface.fill((0,0,0))
 
@@ -68,7 +94,7 @@ class VideoPlayer(BackgroundLayer):
     self.videoTex = glGenTextures(1)
     glBindTexture(GL_TEXTURE_2D, self.videoTex)
     gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB,
-                      vidWidth, vidHeight, GL_RGB,
+                      self.vidWidth, self.vidHeight, GL_RGB,
                       GL_UNSIGNED_BYTE, surfaceData)
     glTexParameteri(GL_TEXTURE_2D, 
                     GL_TEXTURE_MAG_FILTER, GL_LINEAR)
@@ -78,15 +104,15 @@ class VideoPlayer(BackgroundLayer):
     # Resize video (polygon) to respect resolution ratio
     # (The math is actually simple, take the time to draw it down if required)
     winRes = float(self.winWidth)/float(self.winHeight)
-    vidRes = float(vidWidth)/float(vidHeight)
+    vidRes = float(self.vidWidth)/float(self.vidHeight)
     vtxX = 1.0
     vtxY = 1.0
     if winRes > vidRes:
-      r = float(self.winHeight)/float(vidHeight)
-      vtxX = 1.0 - abs(self.winWidth-r*vidWidth) / (float(self.winWidth))
+      r = float(self.winHeight)/float(self.vidHeight)
+      vtxX = 1.0 - abs(self.winWidth-r*self.vidWidth) / (float(self.winWidth))
     elif winRes < vidRes:
       r = float(self.winWidth)/float(vidWidth)
-      vtxY = 1.0 - abs(self.winHeight-r*vidHeight) / (float(self.winHeight))
+      vtxY = 1.0 - abs(self.winHeight-r*self.vidHeight) / (float(self.winHeight))
 
     # Create a compiled OpenGL call list
     self.videoList = glGenLists(1)
@@ -107,9 +133,9 @@ class VideoPlayer(BackgroundLayer):
     glEndList()
 
   # Setup GStreamer's pipeline
-  def vidSetup(self):
-    if not os.path.exists(self.videoSrc):
-      Log.error("Video %s does not exist!" % self.videoSrc)
+  # Note: playbin2 seems also suitable, we might want to experiment with it
+  #       if decodebin is proven problematic
+  def videoSetup(self):
     with_audio = ""
     if not self.mute:
       with_audio = "! queue ! audioconvert ! audiorate ! autoaudiosink"
@@ -167,7 +193,7 @@ class VideoPlayer(BackgroundLayer):
       self.player.set_state(gst.STATE_PLAYING)
       self.finished = False
     # HACKISH: The following is a freakin' ugly hack to workaround the gst
-    # threading issue (see comments at the bottom of vidSetup).
+    # threading issue (see comments at the bottom of videoSetup).
     # It'd be nice to get this working properly i.e. using onMessage.
     s = self.fakeSink.get_property("last-message")
     if s and s.find("type: 86") != -1: # 86 means EndOfStream (EOS)
@@ -176,7 +202,7 @@ class VideoPlayer(BackgroundLayer):
         # HACKISH: Need to recreate the pipepile altogether...
         # For some reason going through STATE_NULL, STATE_READY, STATE_PLAYING
         # doesn't work as I would expect.
-        self.vidSetup()
+        self.videoSetup()
       else:
         self.player.set_state(gst.STATE_NULL)
         self.finished = True

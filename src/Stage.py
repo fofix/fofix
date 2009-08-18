@@ -342,12 +342,10 @@ class Stage(object):
       # return -1
     # if self.songStage == 1 and os.path.exists(os.path.join(libraryName, songName, "video.mp4")):
       # vidSource = os.path.join(libraryName, songName, "video.mp4")
-      # vidSize = (320, 240) # Video width and height
     # else:
       # vidSource = os.path.join(Version.dataPath(), "video.mp4")
-      # vidSize = (320, 240) # Video width and height
 
-    # self.vidPlayer = VideoPlayer(self.engine, -1, vidSource, vidSize, mute = True, loop = True)
+    # self.vidPlayer = VideoPlayer(self.engine, -1, vidSource, mute = True, loop = True)
     # self.engine.view.pushLayer(self.vidPlayer)
     # self.vidPlayer.paused = True
 

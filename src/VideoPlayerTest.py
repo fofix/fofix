@@ -33,7 +33,7 @@ from VideoPlayer import VideoPlayer
 # you've installed. On my machine that means pretty much anything e.g. XviD,
 # Ogg Theora, Flash, FFmpeg H.264, etc.).
 framerate = 24 # Number of frames per seconds (-1 = as fast as it can)
-# vidSource    # Path to video; relative to the current directory
+# vidSource    # Path to video; relative to FoFiX data/ directory
 # vidSize      # Video width and height
 
 # FIXME: Should autodetect video width and height values.
@@ -41,27 +41,24 @@ framerate = 24 # Number of frames per seconds (-1 = as fast as it can)
 # Video examples
 #=====================
 # XviD/MPEG-4
-vidSource = "t1.avi" # Path to video; relative to the current directory
-vidSize = (800, 340) # Video width and height
+# vidSource = "t1.avi"
 
 # FFmpeg H.264
 # vidSource = "t2.m4v"
-# vidSize = (640, 368)
 
 # Macromedia Flash
 # vidSource = "t3.flv"
-# vidSize = (320, 240)
 # vidSource = "t3.1.flv" # 24 seconds
-# vidSize = (320, 214)
 
 # Xiph Ogg Theora
 # vidSource = "t4.ogv"
-# vidSize = (320, 240)
+
+vidSource = "video.flv"
 
 class VideoPlayerTest(unittest.TestCase):
   def testVideoPlayer(self):
     src = os.path.join(Version.dataPath(), vidSource)
-    vidPlayer = VideoPlayer(self.e, framerate, src, vidSize, loop = True)
+    vidPlayer = VideoPlayer(self.e, framerate, src, loop = True)
     self.e.view.pushLayer(vidPlayer)
 
     while self.e.view.layers:
