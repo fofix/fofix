@@ -408,7 +408,8 @@ class SongChoosingSceneClient(SongChoosingScene, SceneClient):
         self.player.difficulty = info.partDifficulties[self.player.part.id][0]
         
       if not self.engine.createdGuitarScene:
-        self.engine.cmdPlay = 3
+        if self.engine.cmdPlay > 0:
+          self.engine.cmdPlay = 3
         #self.engine.createdGuitarScene = True
         self.session.world.deleteScene(self)
         self.session.world.createScene("GuitarScene", libraryName = self.libraryName, songName = self.songName, Players = players)
