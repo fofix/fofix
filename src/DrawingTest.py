@@ -47,6 +47,7 @@ def init():
          [ 0,  0, 1]], dtype=float32)
 
     nbSteps = 200.0
+    
     for i in range(int(nbSteps)):
       ratio = i/nbSteps;
       angle = 21*ratio
@@ -125,18 +126,22 @@ def draw():
       glDisableClientState(GL_VERTEX_ARRAY)
 
     # Direct drawing
+    # With pyopengl3.x, glVertex3fv() is much slower than glVertex3f().
     else: # mode == 2
       glBegin(GL_TRIANGLES)
       for i in range(triangVtx.shape[0]):
         glColor(triangCol[i])
-        glVertex(triangVtx[i])
+        #glVertex3fv(triangVtx[i])
+        glVertex3f(triangVtx[i][0],triangVtx[i][1],triangVtx[i][2])
       glEnd()
 
       # Draw spiral
       glBegin(GL_TRIANGLE_STRIP);
       for i in range(spiralVtx.shape[0]):
-        glColor(spiralCol[i])
-        glVertex(spiralVtx[i])
+        #glColor(spiralCol[i])
+        #glVertex3fv(spiralVtx[i])
+        glColor(spiralCol[i][0],spiralCol[i][1],spiralCol[i][2])
+        glVertex3f(spiralVtx[i][0],spiralVtx[i][1],spiralVtx[i][2])
       glEnd()
 
     glPopMatrix()
