@@ -141,7 +141,7 @@ class VideoPlayer(BackgroundLayer):
   def videoSetup(self):
     with_audio = ""
     if not self.mute:
-      with_audio = "! queue ! audioconvert ! audiorate ! autoaudiosink"
+      with_audio = "! queue ! audioconvert ! audiorate ! audioresample ! autoaudiosink"
     s = "filesrc name=input ! decodebin name=dbin dbin. ! ffmpegcolorspace ! video/x-raw-rgb ! fakesink name=output signal-handoffs=true sync=true dbin. %s" % with_audio
     self.player = gst.parse_launch(s)
     self.input  = self.player.get_by_name('input')
