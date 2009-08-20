@@ -155,7 +155,6 @@ class VideoPlayer(BackgroundLayer):
     # BUT the main python thread then freezes after ~5 seconds...
     # unless we use gobject.idle_add(self.player.elements)
     # See run() for another hackish workaround.
-    gobject.idle_add(self.player.elements)
     bus = self.player.get_bus()
     bus.add_signal_watch()
     bus.enable_sync_message_emission()
