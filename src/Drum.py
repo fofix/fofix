@@ -928,7 +928,7 @@ class Drum:
           size = (self.boardWidth/2.0, (self.boardWidth/self.strings)/40.0)
 
       self.engine.draw3Dtex(self.noteButtons, vertex = (-size[0],size[1],size[0],-size[1]), texcoord = (texSize[0],texY[0],texSize[1],texY[1]),
-                            scale = (1,1,1), multiples = True, color = (1,1,1), vertscale = .2)
+                            scale = (1,1,1), multiples = True, color = color, vertscale = .2)
 
     else:  
 
@@ -1223,7 +1223,7 @@ class Drum:
           if length <= 0:
             continue
         if z < 0 and not (event.played or event.hopod): 
-          color = (.2 + .4, .2 + .4, .2 + .4, .5 * visibility * f)
+          color = (.6, .6, .6, .5 * visibility * f)
           flat  = True
         ###endCapo###
       else:#Notes disappear when missed
@@ -1235,7 +1235,7 @@ class Drum:
             if length <= 0:
               continue
           else:
-            color = (.2 + .4, .2 + .4, .2 + .4, .5 * visibility * f)
+            color = (.6, .6, .6, .5 * visibility * f)
             flat  = True
 
       sustain = False
@@ -1342,7 +1342,10 @@ class Drum:
           if time > self.freestyleStart - self.freestyleOffset and time < self.freestyleStart + self.freestyleOffset + self.freestyleLength:
             z = -2.0
 
-      color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
+      if self.twoDnote == True:
+        color      = (1,1,1, 1 * visibility * f)
+      else:
+        color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
       length = 0
       flat       = False
       tailOnly   = False
@@ -1393,7 +1396,7 @@ class Drum:
           if length <= 0:
             continue
         if z < 0 and not (event.played or event.hopod): 
-          color = (.2 + .4, .2 + .4, .2 + .4, .5 * visibility * f)
+          color = (.6, .6, .6, .5 * visibility * f)
           flat  = True
         ###endCapo###
       else:#Notes disappear when missed
@@ -1405,7 +1408,7 @@ class Drum:
             if length <= 0:
               continue
           else:
-            color = (.2 + .4, .2 + .4, .2 + .4, .5 * visibility * f)
+            color = (.6, .6, .6, .5 * visibility * f)
             flat  = True
 
       sustain = False

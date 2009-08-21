@@ -651,16 +651,16 @@ class Guitar:
     #  if freestyleTail == 2, render highlighted freestyle tail
 
     if not self.simpleTails:#Tail Colors
-      tailcol = (1,1,1,1)
+      tailcol = (1,1,1, color[3])
     else:
       if big == False and tailOnly == True:
-        tailcol = (.2 + .4, .2 + .4, .2 + .4, 1)
+        tailcol = (.6, .6, .6, color[3])
       else:
         tailcol = (color)
         #volshebnyi - tail color when sp is active
         if self.starPowerActive and self.theme != 2 and not color == (0,0,0,1):#8bit
           c = self.fretColors[5]
-          tailcol = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1) 
+          tailcol = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], color[3]) 
 
     if flat:
       tailscale = (1, .1, 1)
@@ -898,7 +898,7 @@ class Guitar:
             texY = (4*0.166667, 5*0.166667)
 
       self.engine.draw3Dtex(self.noteButtons, vertex = (-size[0],size[1],size[0],-size[1]), texcoord = (texSize[0],texY[0],texSize[1],texY[1]),
-                            scale = (1,1,1), multiples = True, color = (1,1,1), vertscale = .2)
+                            scale = (1,1,1), multiples = True, color = color, vertscale = .2)
 
     else:
       shaders.setVar("Material",color,"notes")
@@ -1161,7 +1161,10 @@ class Guitar:
         if time >= self.freestyleStart-self.freestyleOffset and time < self.freestyleStart + self.freestyleLength+self.freestyleOffset:
           z = -2.0
 
-      color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
+      if self.twoDnote == True:
+        color      = (1,1,1, 1 * visibility * f)
+      else:
+        color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
       if event.length > 120:
         length     = (event.length - 50) / self.currentPeriod / self.beatsPerUnit
       else:
@@ -1228,7 +1231,7 @@ class Guitar:
           if length <= 0:
             continue
         if z < 0 and not (event.played or event.hopod): 
-          color = (.2 + .4, .2 + .4, .2 + .4, .5 * visibility * f)
+          color = (.6, .6, .6, .5 * visibility * f)
           flat  = True
         ###endCapo###
       else:#Notes disappear when missed
@@ -1240,7 +1243,7 @@ class Guitar:
             if length <= 0:
               continue
           else:
-            color = (.2 + .4, .2 + .4, .2 + .4, .5 * visibility * f)
+            color = (.6, .6, .6, .5 * visibility * f)
             flat  = True
           
       big = False
@@ -1397,7 +1400,7 @@ class Guitar:
           if length <= 0:
             continue
         if z < 0 and not (event.played or event.hopod): 
-          color = (.2 + .4, .2 + .4, .2 + .4, .5 * visibility * f)
+          color = (.6, .6, .6, .5 * visibility * f)
           flat  = True
         ###endCapo###
       else:#Notes disappear when missed
@@ -1409,7 +1412,7 @@ class Guitar:
             if length <= 0:
               continue
           else:
-            color = (.2 + .4, .2 + .4, .2 + .4, .5 * visibility * f)
+            color = (.6, .6, .6, .5 * visibility * f)
             flat  = True
           
       big = False
