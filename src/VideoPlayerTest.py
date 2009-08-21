@@ -68,8 +68,8 @@ class VideoPlayerTest(unittest.TestCase):
     winWidth, winHeight = 800, 600
     pygame.init()
     flags = DOUBLEBUF|OPENGL|HWPALETTE|HWSURFACE
-    vidPlayer = VideoPlayer(self.e, framerate, self.src, (winWidth, winHeight))
     pygame.display.set_mode((winWidth, winHeight), flags)
+    vidPlayer = VideoPlayer(self.e, framerate, self.src, (winWidth, winHeight))
     glViewport(0, 0, winWidth, winHeight) # Required as GameEngine changes it
     font = self.e.data.font
     while not vidPlayer.finished:
@@ -83,8 +83,8 @@ class VideoPlayerTest(unittest.TestCase):
     winWidth, winHeight = 500, 500
     pygame.init()
     flags = DOUBLEBUF|OPENGL|HWPALETTE|HWSURFACE
-    vidPlayer = VideoPlayer(self.e, -1, self.src, (winWidth, winHeight))
     pygame.display.set_mode((winWidth, winHeight), flags)
+    vidPlayer = VideoPlayer(self.e, -1, self.src, (winWidth, winHeight))
     glViewport(0, 0, winWidth, winHeight) # Required as GameEngine changes it
     glClearColor(0, 0, 0, 1.)
     x, y = 0.0, 1.0
