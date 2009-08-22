@@ -109,6 +109,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.highscoreIndex   = [-1 for i in players]
     self.haveRunScores    = False
     self.doneScores       = False
+    self.shownScores      = False
     self.doneCount        = False
     self.noScore          = [False for i in players]
     self.scorePart        = None
@@ -464,10 +465,14 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.loaded = True
   
   def nextHighScore(self):
-    if self.scoreDifficulty == None:
+    if self.hsRollIndex < len(self.playerList):
       self.scoreDifficulty = self.playerList[self.hsRollIndex].difficulty
-    if self.scorePart == None:
       self.scorePart = self.playerList[self.hsRollIndex].part
+      return
+    elif not self.shownScores:
+      self.scorePart = self.song.info.parts[0]
+      self.scoreDifficulty = self.song.info.partDifficulties[self.scorePart.id][0]
+      self.shownScores = True
       return
     
     found = 0  
@@ -481,11 +486,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         if self.scoreDifficulty == difficulty and self.scorePart == part:
           found = 1
     
-    for part in self.song.info.parts:
-      for difficulty in self.song.info.partDifficulties[part.id]:
-        self.scoreDifficulty = difficulty
-        self.scorePart = part
-        return
+    self.scorePart = self.song.info.parts[0]
+    self.scoreDifficulty = self.song.info.partDifficulties[self.scorePart.id][0]
   
   def startRoll(self, playerNum):
     self.diffScore[playerNum] = self.newScore[playerNum] - self.currentScore[playerNum]
@@ -580,6 +582,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           
           self.engine.resource.load(self, "uploadResult", fn, onLoad = self.handleWorldCharts)
     self.doneScores = True
+    self.hsRollIndex = 0
+    self.nextHighScore()
   
   def run(self, ticks):
     SceneClient.run(self, ticks)
@@ -1348,9 +1352,9 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         y += h1
         endScroll -= .07
       
-      if self.offset < endScroll or i == -1:
+      if self.offset < endScroll or (i == -1 and self.doneScores):
         self.offset = self.scoreScrollStartOffset
-        self.hsRollIndex = (self.hsRollIndex+1)%len(self.playerList)
+        self.hsRollIndex += 1
         self.nextHighScore()
     
     for j,player in enumerate(self.playerList): #MFH 
