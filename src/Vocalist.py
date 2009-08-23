@@ -470,7 +470,12 @@ class Vocalist:
     
     self.engine.drawImage(self.vocalLyricSheet, scale = (self.vocalLyricSheetWFactor,-self.vocalLyricSheetWFactor), coord = (w*.5,vsheetpos))
     if self.coOpFailed:
-      return
+      if self.coOpRestart == True:
+        self.coOpFailed = False
+        self.coOpRestart = False
+        Log.debug("Turning off coOpFailed. Rescue successful.")
+      else:
+        return
     if self.useOld:
       phraseTime   = self.oldTime
       phraseLength = self.oldLength
