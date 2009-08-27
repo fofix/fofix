@@ -11,6 +11,7 @@
 "data\shaders\*.*"
 "data\users\controllers\defaultd.ini"
 "data\users\controllers\defaultg.ini"
+"data\users\controllers\defaultm.ini"
 "data\users\players\default.ini"
 "data\users\players\default.png"
 //-------Additional / updated compiled .PYDs required over 3.100--------
