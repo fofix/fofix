@@ -19,7 +19,7 @@ You will now need to download and install the dependency modules.  Versions are 
 
   # pyWin32 (build 213: http://downloads.sourceforge.net/pywin32/pywin32-213.win32-py2.6.exe)
   # numpy (1.3.0: http://downloads.sourceforge.net/numpy/numpy-1.3.0-win32-superpack-python2.6.exe)
-  # pygame (svn trunk revision 1954: http://www.mediafire.com/file/dnynwa5iem3/pygame-1.9.0a0_r1954.win32-py2.6.msi)  Stable release 1.8.1 will not work; stable release 1.9.0 (when it comes out) will.
+  # pygame  Stable release 1.8.1 will not work; stable release 1.9.1 (http://pygame.org/ftp/pygame-1.9.1.win32-py2.6.msi) will. Try (svn trunk revision 1954: http://www.mediafire.com/file/dnynwa5iem3/pygame-1.9.0a0_r1954.win32-py2.6.msi) if you have problems with 1.9.1
   # pyOpenGL (3.0.0: http://downloads.sourceforge.net/pyopengl/PyOpenGL-3.0.0.win32.exe)
   # Python Imaging Library (1.1.6: http://effbot.org/downloads/PIL-1.1.6.win32-py2.6.exe)
   # pyogg (1.3: http://www.mediafire.com/file/qlw2hwyy0rz/pyogg-1.3.win32-py2.6.exe)

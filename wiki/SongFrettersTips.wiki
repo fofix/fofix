@@ -2,6 +2,23 @@
 #labels Phase-CareerMaking
 ----
 ----
+== Fretting tutorials ==
+The following is quoted from the [http://www.fretsonfire.net/forums/viewtopic.php?f=1&t=1945 ***** HOW TO MAKE SONGS FOR FRETS ON FIRE *****] stickied thread on the Frets on Fire Fan Forums:
+
+    If you want to make songs for fretsonfire, it is recommended that you read these topics, peoples favourites being the Feedback and EOF editors.
+
+    [http://www.fretsonfire.net/forums/viewtopic.php?t=1773 Guide to making songs using the Freetar Editor.] - by Keith<br/>
+    [http://www.fretsonfire.net/forums/viewtopic.php?p=333461#p333461 Another guide to making songs using the Freetar Editor.] - by dexgod
+
+    [http://www.fretsonfire.net/forums/viewtopic.php?t=1856 Guide to making songs using Midi Editors, in this example - Fruity Loops.] - by Nobby76
+
+    [http://www.fretsonfire.net/forums/viewtopic.php?t=1938 Guide to making songs using the EOF Editor.] - by coolguy567
+
+    [http://www.fretsonfire.net/forums/viewtopic.php?t=1897 Guide to making songs using the Feedback Editor.] / [http://www.fretsonfire.net/forums/viewtopic.php?t=1913 Part 2] - by Puppetz_86
+
+Read on for some more tips for fretters.
+
+----
 
 == Special MIDI Marker Notes ==
 

@@ -4,20 +4,16 @@
 
 Ensure you are logged into GoogleCode, then...
 
-Go here:
-[http://code.google.com/p/fofix/source/checkout]
+Create a new folder on your PC named as you want and choose "SVN Checkout".
 
-Look for this line:
-svn checkout https://fofix.googlecode.com/svn/MFH-Mod/trunk/ fofix --username <<your username here>>
+Use "https://fofix.googlecode.com/svn/MFH-Mod/trunk/" as your SVN checkout address, enter when prompted your username and your password. Here you find them:
 
-Use everything after "svn checkout" as your SVN checkout address.  You may need to check out a fresh copy of FoFiX using this member-only checkout address.
+   Username: [http://code.google.com/p/fofix/source/checkout] 
+             (usually it's your email address on google code)
 
-Click on the googlecode password link, slightly below that.  It should take you here:
-[http://code.google.com/hosting/settings]
+   Password: [http://code.google.com/hosting/settings]
+             (it's the one in your google code profile settings page)
 
-This is what you will use for your password when prompted.  Your username will be whatever it says after "--username " in the above svn checkout line.
+Now should start the update and once finished you are ready for committing. Remember to do a "SVN Update" before you start editing any file, because you could work on some code that someone just edited. When you've finished choose "SVN Commit". Also remember to write a short log entry to describe what you did. Good work!
 
-Then, an SVN Update.  Then an SVN Commit to commit new changes.  Type a log entry to describe what this commit does, then press OK.  Should work fine.
-
-
-Always update before you commit!  This will notify you if someone has just committed code that changes an area you are working on; hopefully everything merges nicely when you update.  
+ 

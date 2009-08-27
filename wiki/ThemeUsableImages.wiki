@@ -121,6 +121,17 @@ I was tired and sick and couldn't sleep...
 ||  p2rocks.png                 || Shows that Player 2 is the winner of battle    || Untested     || GH Based (Battle Mode)   || Displays over battle_hands.png if Player 2 is the winner of battle mode ||
 ||  battle_frets.png            || Fret buttons for a broken string attack        || Untested     || GH Based (Battle Mode)   || Replaces a fret button if that fret button is under a broken string attack. Divided into 5 columns (one for each fret color) and 8 rows (top row is most broken, bottom is least broken, in between should be a progression between these) ||
 
+====3D Notes====
+||  note.dae                    || 3D model for 3D notes                          || No           || All (3D notes)           || This model is in COLLADA (dae) format ||
+||  notetex_{a-e}.png           || Textures for 3D notes                          || No           || All (3D notes)           || All 5 note color textures must be defined ('a' is for the leftmost fret, and 'e' is for the rightmost). You can't just draw a png for this image, you must map the texture properly using a 3D model editor such as Blender ||
+||  open.dae                    || 3D model for open (bass) note                  || No           || All (3D notes)           || This model is in COLLADA (dae) format. If not defined, and 3D notes is on, it will use a normal note of the 5th color (usually orange) in the middle of the fretboard ||
+||  opentex.png                 || Texture for 3D open (bass) note                || No           || All (3D notes)           || You can't just draw a png for this image, you must map the texture properly using a 3D model editor such as Blender ||
+||  opentex_star.png            || Texture for 3D open (bass) starpower note      || No           || All (3D notes)           || This texture is for notes that give you starpower ||
+||  opentex_stara.png           || Texture for 3D open (bass) starpower active note || No         || All (3D notes)           || This texture is for notes that appear while starpower is active ||
+||  startex_{a-e}.png           || Textures for 3D starpower notes                ||              || All (3D notes)           || All 5 note color textures must be defined ('a' is for the leftmost fret, and 'e' is for the rightmost). These textures are for notes that give you starpower ||
+||  staratex_{a-e}.png          || Textures for 3D starpower active notes         ||              || All (3D notes)           || All 5 note color textures must be defined ('a' is for the leftmost fret, and 'e' is for the rightmost). These textures are for notes that appear while starpower is active ||
+
+
 ----------------------------------------------------------------------------
 
 ==\dots\ Directory==
