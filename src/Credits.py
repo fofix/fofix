@@ -160,11 +160,11 @@ class Credits(Layer, KeyListener):
     self.bank['themeCreators'] = [_("%s theme credits:") % self.themename]
     self.bank['themeThanks']   = [_("%s theme specific thanks:") % self.themename]
     # Languages
-    self.bank['brazilian']     = [_("Brazilian portuguese")]
     self.bank['french']        = [_("French")]
     self.bank['german']        = [_("German")]
     self.bank['italian']       = [_("Italian")]
-    self.bank['piglatin']      = [_("Pig latin")]
+    self.bank['piglatin']      = [_("Pig Latin")]
+    self.bank['portuguese-b']  = [_("Portuguese (Brazilian)")]
     self.bank['russian']       = [_("Russian")]
     self.bank['spanish']       = [_("Spanish")]
     self.bank['swedish']       = [_("Swedish")]

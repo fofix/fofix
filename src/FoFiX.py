@@ -54,13 +54,13 @@ Options:
   --config=, -c [configfile]          Use this instead of fofix.ini
   --fullscreen=, -f [true/false]      Change fullscreen settings in fofix.ini
   --resolution=, -r [resolution]      Change game resolution from commandline.
-  --song=,   -s [songdir]             Play a song from the commandline
-  --diff=,   -l [level of difficulty] Use this difficulty level
-  --part=,   -p [part number]         Use this part
-  --mode=,   -m [game mode]           1P: 0-Quickplay, 1-Practice,     2-Career
-                                      2P: 0-Face-off,  1-Pro Face-off, 2-Party mode
-  --nbrplayers=,-n [1 - 4]            Number of players (1 - 4)
   --theme,   -t (theme)               Starts using this theme. Needs to be in " " marks. (IE- -t "Guitar Hero III")     
+  --song=,   -s [songdir]             Play a song from the commandline
+  The following settings only apply if "song" is set.
+  --diff=,   -l [level of difficulty] 0: Expert, 1: Hard, 2: Medium, 3: Easy (Only if 'part' is set)
+  --part=,   -p [part number]         0: Guitar, 1: Rhythm, 2: Bass, 3: Lead
+                                      4: Drum,   5: Vocals
+  --mode=,   -m [game mode]           0: Quickplay, 1: Practice, 2: Career
 """ % {"prog": sys.argv[0] }
 
 debuglevel = 0    #MFH - experimental, leave at 0
@@ -82,8 +82,8 @@ def main():
   resolution = None
   theme = None
   debug = False
-  difficulty = 0
-  part = 0
+  difficulty = None
+  part = None
   mode = 0
   nbrplayers = 1
   for opt, arg in opts:
@@ -141,12 +141,17 @@ def main():
       Config.set("game", "selected_library", "songs")
       Config.set("game", "selected_song", playing)
       engine.cmdPlay = 1
-      engine.cmdDiff = int(difficulty)
-      engine.cmdPart = int(part)
+      if difficulty is not None:
+        engine.cmdDiff = int(difficulty)
+      if part is not None:
+        engine.cmdPart = int(part)
       #evilynux - Multiplayer and mode selection support
       Config.set("game", "players", nbrplayers)
-      Config.set("game", "game_mode", mode)
-      Config.set("game", "multiplayer_mode", mode)
+      if nbrplayers == 1:
+        Config.set("game", "game_mode", mode)
+      else:
+        Config.set("game", "game_mode", 0)
+        Config.set("game", "multiplayer_mode", mode)
 
     if debug == True:
       engine.setDebugModeEnabled(not engine.isDebugModeEnabled())

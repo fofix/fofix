@@ -35,7 +35,7 @@ import Log
 import Version
 
 class Loader(Thread):
-  def __init__(self, target, name, function, resultQueue, loaderSemaphore, onLoad = None):
+  def __init__(self, target, name, function, resultQueue, loaderSemaphore, onLoad = None, onCancel = None):
     Thread.__init__(self)
     self.semaphore   = loaderSemaphore
     self.target      = target
@@ -44,6 +44,7 @@ class Loader(Thread):
     self.resultQueue = resultQueue
     self.result      = None
     self.onLoad      = onLoad
+    self.onCancel    = onCancel
     self.exception   = None
     self.time        = 0.0
     self.canceled    = False
@@ -117,6 +118,8 @@ class Loader(Thread):
 
   def finish(self):
     if self.canceled:
+      if self.onCancel:
+        self.onCancel()
       return
     
     if self.logLoadings == 1:
@@ -232,12 +235,12 @@ class Resource(Task):
   def makeWritable(self, path):
     os.chmod(path, stat.S_IWRITE | stat.S_IREAD | stat.S_IEXEC)
   
-  def load(self, target = None, name = None, function = lambda: None, synch = False, onLoad = None):
+  def load(self, target = None, name = None, function = lambda: None, synch = False, onLoad = None, onCancel = None):
 
     if self.logLoadings == 1:
       Log.notice("Loading %s.%s %s" % (target.__class__.__name__, name, synch and "synchronously" or "asynchronously"))
 
-    l = Loader(target, name, function, self.resultQueue, self.loaderSemaphore, onLoad = onLoad)
+    l = Loader(target, name, function, self.resultQueue, self.loaderSemaphore, onLoad = onLoad, onCancel = onCancel)
     if synch:
       l.load()
       return l.finish()

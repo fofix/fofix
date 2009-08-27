@@ -46,7 +46,7 @@ KEYS = PLAYER1KEYS
 
 class Editor(Layer, KeyListener):
   """Song editor layer."""
-  def __init__(self, engine, songName = None, libraryName = DEFAULT_LIBRARY):
+  def __init_str(self, engine, songName = None, libraryName = DEFAULT_LIBRARY):
     self.engine      = engine
     self.time        = 0.0
     self.guitar      = Guitar(self.engine, editorMode = True)
@@ -68,22 +68,22 @@ class Editor(Layer, KeyListener):
     self.spinnyDisabled   = self.engine.config.get("game", "disable_spinny")    
 
     mainMenu = [
-      (_("Save Song"),                  self.save),
-      (_("Set Song Name"),              self.setSongName),
-      (_("Set Artist Name"),            self.setArtistName),
-      (_("Set Beats per Minute"),       self.setBpm),
-      (_("Estimate Beats per Minute"),  self.estimateBpm),
-      (_("Set A/V delay"),              self.setAVDelay),
-      (_("Set Cassette Color"),         self.setCassetteColor),
-      (_("Set Cassette Label"),         self.setCassetteLabel),
-      (_("Editing Help"),               self.help),
-      (_("Quit to Main Menu"),          self.quit),
+      (str("Save Song"),                  self.save),
+      (str("Set Song Name"),              self.setSongName),
+      (str("Set Artist Name"),            self.setArtistName),
+      (str("Set Beats per Minute"),       self.setBpm),
+      (str("Estimate Beats per Minute"),  self.estimateBpm),
+      (str("Set A/V delay"),              self.setAVDelay),
+      (str("Set Cassette Color"),         self.setCassetteColor),
+      (str("Set Cassette Label"),         self.setCassetteLabel),
+      (str("Editing Help"),               self.help),
+      (str("Quit to Main Menu"),          self.quit),
     ]
     self.menu = Menu(self.engine, mainMenu)
 
   def save(self):
     if not self.modified:
-      Dialogs.showMessage(self.engine, _("There are no changes to save."))
+      Dialogs.showMessage(self.engine, str("There are no changes to save."))
       return
 
     def save():
@@ -91,50 +91,50 @@ class Editor(Layer, KeyListener):
       self.modified = False
 
     self.engine.resource.load(function = save)
-    Dialogs.showLoadingScreen(self.engine, lambda: not self.modified, text = _("Saving..."))
-    Dialogs.showMessage(self.engine, _("'%s' saved.") % self.song.info.name)
+    Dialogs.showLoadingScreen(self.engine, lambda: not self.modified, text = str("Saving..."))
+    Dialogs.showMessage(self.engine, str("'%s' saved.") % self.song.info.name)
 
   def help(self):
-    Dialogs.showMessage(self.engine, _("Editing keys: ") +
-                                     _("Arrows - Move cursor, ") +
-                                     _("Space - Play/pause song, ") +
-                                     _("Enter - Make note (hold and move for long notes), ") +
-                                     _("Delete - Delete note, ") +
-                                     _("Page Up/Down - Change difficulty"))
+    Dialogs.showMessage(self.engine, str("Editing keys: ") +
+                                     str("Arrows - Move cursor, ") +
+                                     str("Space - Play/pause song, ") +
+                                     str("Enter - Make note (hold and move for long notes), ") +
+                                     str("Delete - Delete note, ") +
+                                     str("Page Up/Down - Change difficulty"))
 
 
   def setSongName(self):
-    name = Dialogs.getText(self.engine, _("Enter Song Name"), self.song.info.name)
+    name = Dialogs.getText(self.engine, str("Enter Song Name"), self.song.info.name)
     if name:
       self.song.info.name = name
       self.modified = True
 
   def setArtistName(self):
-    name = Dialogs.getText(self.engine, _("Enter Artist Name"), self.song.info.artist)
+    name = Dialogs.getText(self.engine, str("Enter Artist Name"), self.song.info.artist)
     if name:
       self.song.info.artist = name
       self.modified = True
 
   def setAVDelay(self):
-    delay = Dialogs.getText(self.engine, _("Enter A/V delay in milliseconds"), unicode(self.song.info.delay))
+    delay = Dialogs.getText(self.engine, str("Enter A/V delay in milliseconds"), unicode(self.song.info.delay))
     if delay:
       try:
         self.song.info.delay = int(delay)
         self.modified = True
       except ValueError:
-        Dialogs.showMessage(self.engine, _("That isn't a number."))
+        Dialogs.showMessage(self.engine, str("That isn't a number."))
 
   def setBpm(self):
-    bpm = Dialogs.getText(self.engine, _("Enter Beats per Minute Value"), unicode(self.song.bpm))
+    bpm = Dialogs.getText(self.engine, str("Enter Beats per Minute Value"), unicode(self.song.bpm))
     if bpm:
       try:
         self.song.setBpm(float(bpm))
         self.modified = True
       except ValueError:
-        Dialogs.showMessage(self.engine, _("That isn't a number."))
+        Dialogs.showMessage(self.engine, str("That isn't a number."))
 
   def estimateBpm(self):
-    bpm = Dialogs.estimateBpm(self.engine, self.song, _("Tap the Space bar to the beat of the song. Press Enter when done or Escape to cancel."))
+    bpm = Dialogs.estimateBpm(self.engine, self.song, str("Tap the Space bar to the beat of the song. Press Enter when done or Escape to cancel."))
     if bpm is not None:
       self.song.setBpm(bpm)
       self.modified = True
@@ -144,16 +144,16 @@ class Editor(Layer, KeyListener):
       color = Theme.colorToHex(self.song.info.cassetteColor)
     else:
       color = ""
-    color = Dialogs.getText(self.engine, _("Enter cassette color in HTML (#RRGGBB) format."), color)
+    color = Dialogs.getText(self.engine, str("Enter cassette color in HTML (#RRGGBB) format."), color)
     if color:
       try:
         self.song.info.setCassetteColor(Theme.hexToColor(color))
         self.modified = True
       except ValueError:
-        Dialogs.showMessage(self.engine, _("That isn't a color."))
+        Dialogs.showMessage(self.engine, str("That isn't a color."))
 
   def setCassetteLabel(self):
-    label = Dialogs.chooseFile(self.engine, masks = ["*.png"], prompt = _("Choose a 256x128 PNG format label image."))
+    label = Dialogs.chooseFile(self.engine, masks = ["*.png"], prompt = str("Choose a 256x128 PNG format label image."))
     if label:
       songPath = self.engine.resource.fileName("songs", self.songName, writable = True)
       shutil.copyfile(label, os.path.join(songPath, "label.png"))
@@ -170,7 +170,7 @@ class Editor(Layer, KeyListener):
       return
 
     self.engine.resource.load(self, "song", lambda: loadSong(self.engine, self.songName, seekable = True, library = self.libraryName))
-    Dialogs.showLoadingScreen(self.engine, lambda: self.song, text = _("Loading song..."))
+    Dialogs.showLoadingScreen(self.engine, lambda: self.song, text = str("Loading song..."))
 
   def hidden(self):
     if self.song:
@@ -339,9 +339,9 @@ class Editor(Layer, KeyListener):
       w, h = font.getStringSize(" ")
 
       if self.song.isPlaying():
-        status = _("Playing")
+        status = str("Playing")
       else:
-        status = _("Stopped")
+        status = str("Stopped")
 
       t = "%d.%02d'%03d" % (self.pos / 60000, (self.pos % 60000) / 1000, self.pos % 1000)
       font.render(t, (.05, .05 - h / 2))
@@ -362,7 +362,7 @@ class Importer(Layer):
   and the other is the guitar track. The importer will create a blank note and info files
   and copy the tracks under the data directory.
   """
-  def __init__(self, engine):
+  def __init_str(self, engine):
     self.engine        = engine
     self.wizardStarted = False
     self.song          = None
@@ -382,7 +382,7 @@ class Importer(Layer):
     name = ""
     while 1:
       masks = ["*.ogg"]
-      name  = Dialogs.getText(self.engine, prompt = _("Enter a name for the song."), text = name)
+      name  = Dialogs.getText(self.engine, prompt = str("Enter a name for the song."), text = name)
 
       if not name:
         self.engine.view.popLayer(self)
@@ -390,21 +390,21 @@ class Importer(Layer):
 
       path = os.path.abspath(self.engine.resource.fileName("songs", name))
       if os.path.isdir(path):
-        Dialogs.showMessage(self.engine, _("That song already exists."))
+        Dialogs.showMessage(self.engine, str("That song already exists."))
       else:
         break
 
-    guitarTrack     = Dialogs.chooseFile(self.engine, masks = masks, prompt = _("Choose the Instrument Track (OGG format)."))
+    guitarTrack     = Dialogs.chooseFile(self.engine, masks = masks, prompt = str("Choose the Instrument Track (OGG format)."))
 
     if not guitarTrack:
       self.engine.view.popLayer(self)
       return
 
-    backgroundTrack = Dialogs.chooseFile(self.engine, masks = masks, prompt = _("Choose the Background Track (OGG format) or press Escape to skip."))
+    backgroundTrack = Dialogs.chooseFile(self.engine, masks = masks, prompt = str("Choose the Background Track (OGG format) or press Escape to skip."))
 
     # Create the song
     loader = self.engine.resource.load(self, "song", lambda: createSong(self.engine, name, guitarTrack, backgroundTrack))
-    Dialogs.showLoadingScreen(self.engine, lambda: self.song or loader.exception, text = _("Importing..."))
+    Dialogs.showLoadingScreen(self.engine, lambda: self.song or loader.exception, text = str("Importing..."))
 
     if not loader.exception:
       self.songName = name
@@ -417,7 +417,7 @@ class ArkFile(object):
   The format of the archive and the index file was studied from
   Game Extractor by WATTO Studios.
   """
-  def __init__(self, indexFileName, dataFileName):
+  def __init_str(self, indexFileName, dataFileName):
     self.dataFileName = dataFileName
 
     # Read the available files from the index
@@ -486,7 +486,7 @@ class GHImporter(Layer):
   This importer takes the original Guitar Hero PS2 DVD and extracts the songs from it.
   Thanks to Sami Vaarala for the initial implementation!
   """
-  def __init__(self, engine):
+  def __init_str(self, engine):
     self.engine        = engine
     self.wizardStarted = False
     self.done          = False
@@ -515,7 +515,7 @@ class GHImporter(Layer):
 
     class StreamDecoder:
       """XA ADPCM decoder"""
-      def __init__(self):
+      def __init_str(self):
         self.s_1     = 0.0
         self.s_2     = 0.0
         self.samples = [0.0] * 28
@@ -595,7 +595,7 @@ class GHImporter(Layer):
 
   def decodeVgsFile(self, vgsFile, length, outputSongOggFile, outputGuitarOggFile, outputRhythmOggFile, workPath):
     # Split the file into different tracks
-    self.stageInfoText = _("Stage 1/8: Splitting VGS file")
+    self.stageInfoText = str("Stage 1/8: Splitting VGS file")
 
     f         = vgsFile
     blockSize = 16
@@ -630,11 +630,11 @@ class GHImporter(Layer):
     guitarWaveFile = os.path.join(workPath, "guitar.wav")
     rhythmWaveFile = os.path.join(workPath, "rhythm.wav")
 
-    self.stageInfoText = _("Stage 6/8: Joining song stereo tracks")
+    self.stageInfoText = str("Stage 6/8: Joining song stereo tracks")
     self.joinPcmFiles(os.path.join(workPath, "chan0.pcm"),
                       os.path.join(workPath, "chan1.pcm"),
                       songWaveFile, sampleRate = streams[0][0])
-    self.stageInfoText = _("Stage 7/8: Joining guitar stereo tracks")
+    self.stageInfoText = str("Stage 7/8: Joining guitar stereo tracks")
     self.joinPcmFiles(os.path.join(workPath, "chan2.pcm"),
                       os.path.join(workPath, "chan3.pcm"),
                       guitarWaveFile, sampleRate = streams[2][0])
@@ -649,7 +649,7 @@ class GHImporter(Layer):
                         rhythmWaveFile, sampleRate = streams[4][0])
 
     # Compress wave files
-    self.stageInfoText = _("Stage 8/8: Compressing tracks")
+    self.stageInfoText = str("Stage 8/8: Compressing tracks")
     self.stageProgress = 0.0 / channels
     Log.notice("Compressing song and guitar tracks")
     self.compressWaveFileToOgg(songWaveFile,   outputSongOggFile)
@@ -684,14 +684,14 @@ class GHImporter(Layer):
         pass
 
       # Read the song map
-      self.statusText = _("Reading the song list.")
+      self.statusText = str("Reading the song list.")
       songMap = {}
       vgsMap =  {}
       for line in open(self.engine.resource.fileName("ghmidimap.txt")):
         songName, fullName, artist = map(lambda s: s.strip(), line.strip().split(";"))
         songMap[songName] = (fullName, artist)
 
-      self.statusText = _("Reading the archive index.")
+      self.statusText = str("Reading the archive index.")
       archive = ArkFile(headerPath, archivePath)
       songPath = self.engine.resource.fileName("songs", writable = True)
       songs    = []
@@ -715,7 +715,7 @@ class GHImporter(Layer):
         fullName, artist = data
 
         Log.notice("Extracting song '%s'" % songName)
-        self.statusText = _("Extracting %s by %s. %d of %d songs imported. Yeah, this is going to take forever.") % (fullName, artist, len(songs), len(songMap))
+        self.statusText = str("Extracting %s by %s. %d of %d songs imported. Yeah, this is going to take forever.") % (fullName, artist, len(songs), len(songMap))
 
         archiveMidiFile = "songs/%s/%s.mid" % (songName, songName)
         archiveVgsFile  = vgsMap[songName]
@@ -760,7 +760,7 @@ class GHImporter(Layer):
       # Clean up
       shutil.rmtree(workPath)
 
-      self.stageInfoText = _("Ready")
+      self.stageInfoText = str("Ready")
       self.stageProgress = 1.0
       Log.debug("Songs imported: " + ", ".join(songs))
       return songs
@@ -775,9 +775,9 @@ class GHImporter(Layer):
       self.done = None
       self.statusText = ""
       if songs:
-        Dialogs.showMessage(self.engine, _("All done! %d songs imported. Have fun!") % (len(songs)))
+        Dialogs.showMessage(self.engine, str("All done! %d songs imported. Have fun!") % (len(songs)))
       else:
-        Dialogs.showMessage(self.engine, _("No songs could be imported, sorry. Check the log files for more information."))
+        Dialogs.showMessage(self.engine, str("No songs could be imported, sorry. Check the log files for more information."))
       self.engine.view.popLayer(self)
     if self.wizardStarted:
       return
@@ -786,17 +786,17 @@ class GHImporter(Layer):
     # Check for necessary software
     if not self.isOggEncoderPresent():
       if os.name == "nt":
-        Dialogs.showMessage(self.engine, _("Ogg Vorbis encoder (oggenc.exe) not found. Please install it to the game directory and try again."))
+        Dialogs.showMessage(self.engine, str("Ogg Vorbis encoder (oggenc.exe) not found. Please install it to the game directory and try again."))
       else:
-        Dialogs.showMessage(self.engine, _("Ogg Vorbis encoder (oggenc) not found. Please install it and try again."))
+        Dialogs.showMessage(self.engine, str("Ogg Vorbis encoder (oggenc) not found. Please install it and try again."))
       self.engine.view.popLayer(self)
       return
 
-    Dialogs.showMessage(self.engine, _("Make sure you have at least 500 megabytes of free disk space before using this importer."))
+    Dialogs.showMessage(self.engine, str("Make sure you have at least 500 megabytes of free disk space before using this importer."))
 
     path = ""
     while 1:
-      path = Dialogs.getText(self.engine, prompt = _("Enter the path to the mounted Guitar Hero (tm) DVD"), text = path)
+      path = Dialogs.getText(self.engine, prompt = str("Enter the path to the mounted Guitar Hero (tm) DVD"), text = path)
 
       if not path:
         self.engine.view.popLayer(self)
@@ -805,7 +805,7 @@ class GHImporter(Layer):
       headerPath  = os.path.join(path, "gen", "main.hdr")
       archivePath = os.path.join(path, "gen", "main_0.ark")
       if not os.path.isfile(headerPath) or not os.path.isfile(archivePath):
-        Dialogs.showMessage(self.engine, _("That's not it. Try again."))
+        Dialogs.showMessage(self.engine, str("That's not it. Try again."))
       else:
        break
 
@@ -822,7 +822,7 @@ class GHImporter(Layer):
       w, h = font.getStringSize(" ")
 
       Theme.setSelectedColor()
-      font.render(_("Importing Songs"), (.05, .05 - v))
+      font.render(str("Importing Songs"), (.05, .05 - v))
       if self.stageInfoText:
         font.render("%s (%d%%)" % (self.stageInfoText, 100 * self.stageProgress), (.05, .7 + v), scale = 0.001)
 

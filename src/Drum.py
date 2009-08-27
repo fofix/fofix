@@ -73,7 +73,8 @@ class Drum:
     #self.starPowerDecreaseDivisor = 200.0*self.engine.audioSpeedFactor
     self.starPowerDecreaseDivisor = 200.0/self.engine.audioSpeedFactor
 
-    self.bassDrumPedalDown = False
+    self.bassDrumPedalDown = 0
+    self.bassDrumPedalPressed = False
 
     self.lastFretWasBassDrum = False
     self.lastFretWasT1 = False   #Faaa Drum sound
@@ -168,6 +169,7 @@ class Drum:
     self.time           = 0.0
     self.pickStartPos   = 0
     self.leftyMode      = False
+    self.drumFlip       = False
 
     self.battleSuddenDeath  = False
     self.battleObjectsEnabled = []
@@ -369,19 +371,17 @@ class Drum:
 
     self.hitw = self.engine.config.get("game", "note_hit_window")  #this should be global, not retrieved every BPM change.
     if self.hitw == 0: 
-      self.hitw = 1.2
+      self.hitw = 2.3
     elif self.hitw == 1: 
       self.hitw = 1.9
     elif self.hitw == 2: 
-      self.hitw = 2.3
+      self.hitw = 1.2
+    elif self.hitw == 3:  
+      self.hitw = 1.0
+    elif self.hitw == 4:  
+      self.hitw = 0.70
     else:
       self.hitw = 1.2
-
-    self.hitwcheat = self.engine.config.get("game", "hit_window_cheat")
-    if self.hitwcheat == 1:   
-      self.hitw = 0.70
-    elif self.hitwcheat == 2: 
-      self.hitw = 1.0
 
     self.keys = []
     self.actions = []
@@ -485,6 +485,14 @@ class Drum:
 
       except IOError:
         self.startex = False
+        
+      try:
+        for i in range(5):
+          engine.loadImgDrawing(self,  "staratex"+chr(97+i),  os.path.join("themes", themename, "staratex_"+chr(97+i)+".png"))
+        self.staratex = True
+
+      except IOError:
+        self.staratex = False
 
       if self.engine.fileExists(os.path.join("themes", themename, "open.dae")):
         engine.resource.load(self,  "openMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "open.dae")))
@@ -496,7 +504,18 @@ class Drum:
         self.opentex = True
       except IOError:
         self.opentex = False
-
+        
+      try:
+        engine.loadImgDrawing(self,  "opentexture_star",  os.path.join("themes", themename, "opentex_star.png"))
+        self.opentex_star = True
+      except IOError:
+        self.opentex_star = False
+      
+      try:
+        engine.loadImgDrawing(self,  "opentexture_stara",  os.path.join("themes", themename, "opentex_stara.png"))
+        self.opentex_stara = True
+      except IOError:
+        self.opentex_stara = False
 
     try:
       engine.loadImgDrawing(self, "freestyle1", os.path.join("themes", themename, "freestyletail1.png"),  textureSize = (128, 128))
@@ -909,7 +928,7 @@ class Drum:
           size = (self.boardWidth/2.0, (self.boardWidth/self.strings)/40.0)
 
       self.engine.draw3Dtex(self.noteButtons, vertex = (-size[0],size[1],size[0],-size[1]), texcoord = (texSize[0],texY[0],texSize[1],texY[1]),
-                            scale = (1,1,1), multiples = True, color = (1,1,1), vertscale = .2)
+                            scale = (1,1,1), multiples = True, color = color, vertscale = .2)
 
     else:  
 
@@ -951,7 +970,23 @@ class Drum:
       elif fret == 3:
         glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot[3])
 
-      if self.notetex == True and spNote == False and isOpen==False:
+      if self.staratex == True and self.starPowerActive and isOpen==False:
+        glColor3f(1,1,1)
+        glEnable(GL_TEXTURE_2D)
+        getattr(self,"startex"+chr(97+fret)).texture.bind()
+        glMatrixMode(GL_TEXTURE)
+        glScalef(1, -1, 1)
+        glMatrixMode(GL_MODELVIEW)
+        if isTappable:
+          meshObj.render("Mesh_001")
+        else:
+          meshObj.render("Mesh")
+        glMatrixMode(GL_TEXTURE)
+        glLoadIdentity()
+        glMatrixMode(GL_MODELVIEW)
+        glDisable(GL_TEXTURE_2D)
+        
+      elif self.notetex == True and spNote == False and isOpen==False:
 
         glColor3f(1,1,1)
         glEnable(GL_TEXTURE_2D)
@@ -984,11 +1019,41 @@ class Drum:
         glMatrixMode(GL_MODELVIEW)
         glDisable(GL_TEXTURE_2D)
 
-      elif self.opentex == True and isOpen==True:
+      elif self.opentex_stara == True and isOpen==True and spNote==False and self.starPowerActive:
+        glColor3f(1,1,1)
+        glEnable(GL_TEXTURE_2D)
+
+        self.opentexture_stara.texture.bind()
+
+        glMatrixMode(GL_TEXTURE)
+        glScalef(1, -1, 1)
+        glMatrixMode(GL_MODELVIEW)
+        meshObj.render()
+        glMatrixMode(GL_TEXTURE)
+        glLoadIdentity()
+        glMatrixMode(GL_MODELVIEW)
+        glDisable(GL_TEXTURE_2D)
+      
+      elif self.opentex == True and isOpen==True and spNote==False:
         glColor3f(1,1,1)
         glEnable(GL_TEXTURE_2D)
 
         self.opentexture.texture.bind()
+
+        glMatrixMode(GL_TEXTURE)
+        glScalef(1, -1, 1)
+        glMatrixMode(GL_MODELVIEW)
+        meshObj.render()
+        glMatrixMode(GL_TEXTURE)
+        glLoadIdentity()
+        glMatrixMode(GL_MODELVIEW)
+        glDisable(GL_TEXTURE_2D)
+      
+      elif self.opentex_star == True and isOpen==True and spNote==True:
+        glColor3f(1,1,1)
+        glEnable(GL_TEXTURE_2D)
+
+        self.opentexture_star.texture.bind()
 
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
@@ -1158,7 +1223,7 @@ class Drum:
           if length <= 0:
             continue
         if z < 0 and not (event.played or event.hopod): 
-          color = (.2 + .4, .2 + .4, .2 + .4, .5 * visibility * f)
+          color = (.6, .6, .6, .5 * visibility * f)
           flat  = True
         ###endCapo###
       else:#Notes disappear when missed
@@ -1170,7 +1235,7 @@ class Drum:
             if length <= 0:
               continue
           else:
-            color = (.2 + .4, .2 + .4, .2 + .4, .5 * visibility * f)
+            color = (.6, .6, .6, .5 * visibility * f)
             flat  = True
 
       sustain = False
@@ -1230,7 +1295,7 @@ class Drum:
       #volshebnyi - removed
       if event.number == 0: #MFH - skip all open notes
         continue
-
+      
       if self.coOpFailed:
         if self.coOpRestart:
           if time - self.coOpRescueTime < (self.currentPeriod * self.beatsPerBoard * 2):
@@ -1277,7 +1342,10 @@ class Drum:
           if time > self.freestyleStart - self.freestyleOffset and time < self.freestyleStart + self.freestyleOffset + self.freestyleLength:
             z = -2.0
 
-      color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
+      if self.twoDnote == True:
+        color      = (1,1,1, 1 * visibility * f)
+      else:
+        color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
       length = 0
       flat       = False
       tailOnly   = False
@@ -1328,7 +1396,7 @@ class Drum:
           if length <= 0:
             continue
         if z < 0 and not (event.played or event.hopod): 
-          color = (.2 + .4, .2 + .4, .2 + .4, .5 * visibility * f)
+          color = (.6, .6, .6, .5 * visibility * f)
           flat  = True
         ###endCapo###
       else:#Notes disappear when missed
@@ -1340,7 +1408,7 @@ class Drum:
             if length <= 0:
               continue
           else:
-            color = (.2 + .4, .2 + .4, .2 + .4, .5 * visibility * f)
+            color = (.6, .6, .6, .5 * visibility * f)
             flat  = True
 
       sustain = False
@@ -1566,10 +1634,11 @@ class Drum:
       texSize = (0.0,1.0)
 
       texY = (1.0/6.0,2.0/6.0)
-      if controls.getState(self.keys[0]) or controls.getState(self.keys[5]):
-        texY = (3.0/6.0,4.0/6.0)
-      if self.hit[0]:
-        texY = (5.0/6.0,1.0)
+      if self.bassDrumPedalDown > 0:
+        if (controls.getState(self.keys[0]) or controls.getState(self.keys[5])):
+          texY = (3.0/6.0,4.0/6.0)
+        if self.hit[0]:
+          texY = (5.0/6.0,1.0)
 
       self.engine.draw3Dtex(self.drumFretButtons, vertex = (size[0],size[1],-size[0],-size[1]), texcoord = (texSize[0], texY[0], texSize[1], texY[1]),
                             coord = (x,v,0), multiples = True,color = (1,1,1), depth = True)
@@ -2342,6 +2411,11 @@ class Drum:
       if self.leftyMode:
         glScalef(-1, 1, 1)
 
+      if self.ocount < 1:
+        self.ocount += .1
+      else:
+        self.ocount = 1
+
       if self.freestyleActive or self.drumFillsActive:
         self.renderOpenNotes(visibility, song, pos)
         self.renderNotes(visibility, song, pos)
@@ -2500,15 +2574,13 @@ class Drum:
     for i in range (5):
       if controls.getState(self.keys[i]) or controls.getState(self.keys[5+i]):
         if i == 0:
-          if not self.bassDrumPedalDown:  #MFH - gotta check if bass drum pedal is just held down!
+          if self.bassDrumPedalPressed:  #MFH - gotta check if bass drum pedal is just held down!
             if self.engine.data.bassDrumSoundFound:
               self.engine.data.bassDrumSound.play()
-            self.bassDrumPedalDown = True
+            self.bassDrumPedalPressed = False
             drumsJustHit[0] = True
             if self.fretboardHop < 0.04:
               self.fretboardHop = 0.04  #stump
-        else:
-          self.bassDrumPedalDown = False
         if i == 1:
           if self.engine.data.T1DrumSoundFound and not playBassDrumOnly:
             self.engine.data.T1DrumSound.play()
@@ -2641,7 +2713,7 @@ class Drum:
         if note.number == i and (controls.getState(self.keys[i]) or controls.getState(self.keys[i+5])):
           if self.guitarSolo:
             self.currentGuitarSoloHitNotes += 1
-          if i == 0 and self.fretboardHop < 0.07:
+          if i == 0 and self.fretboardHop < 0.07 and self.bassDrumPedalDown > 0:
             self.fretboardHop = 0.07  #stump
 
           if shaders.turnon:
@@ -2695,7 +2767,11 @@ class Drum:
       if self.starPower <= 0:
         self.starPower = 0
         self.starPowerActive = False
-
+    
+    if self.bassDrumPedalDown > 0:
+      self.bassDrumPedalDown -= ticks
+      if self.bassDrumPedalDown < 0:
+        self.bassDrumPedalDown = 0
 
     activeFrets = [(note.number - 1) for time, note in self.playedNotes]
 

@@ -119,8 +119,6 @@ class MainMenu(BackgroundLayer):
     
     allowMic = True
     
-    if not os.path.exists(os.path.join(Version.dataPath(), "themes", self.themename, "vocals")):
-      allowMic = False
     if self.theme == 0:
       allowMic = False
 
@@ -192,14 +190,13 @@ class MainMenu(BackgroundLayer):
       engine.menuMusic = True
 
       self.song = Audio.Music(self.engine.resource.fileName(sound))
-      self.song.setVolume(self.engine.config.get("audio", "songvol"))
+      self.song.setVolume(self.engine.config.get("audio", "menu_volume"))
       self.song.play(0)  #no loop
     else:
       self.menumusic = False
 
    
  #####======= Racer: New Main Menu ======####
-
 
     self.opt_text_color = Theme.hexToColor(Theme.opt_text_colorVar)
     self.opt_selected_color = Theme.hexToColor(Theme.opt_selected_colorVar)
@@ -330,13 +327,17 @@ class MainMenu(BackgroundLayer):
     
         #self.song = Audio.Sound(self.engine.resource.fileName(sound))
         self.song = Audio.Music(self.engine.resource.fileName(sound))
-        self.song.setVolume(self.engine.config.get("audio", "songvol"))
+        self.song.setVolume(self.engine.config.get("audio", "menu_volume"))
         #self.song.play(-1)
         self.song.play(0)  #no loop
       else:
         self.menumusic = False
         self.engine.menuMusic = False
-        
+  
+  def setMenuVolume(self):
+    if self.menumusic and self.song.isPlaying():
+      self.song.setVolume(self.engine.config.get("audio", "menu_volume"))
+  
   def cutMusic(self):
     if self.menumusic:
       if self.song and not self.engine.menuMusic:
@@ -418,6 +419,8 @@ class MainMenu(BackgroundLayer):
     self.engine.data.acceptSound.play()
     players = Dialogs.activateControllers(self.engine, players, maxplayers, allowGuitar, allowDrum, allowMic) #akedrou
     if players == 0:
+      if self.engine.cmdPlay == 2:
+        self.engine.cmdPlay = 0
       return
     Config.set("game", "players", players)
     Config.set("game","game_mode", mode1p)
@@ -471,13 +474,16 @@ class MainMenu(BackgroundLayer):
   def startGHImporter(self):
     self.launchLayer(lambda: GHImporter(self.engine))
   startGHImporter = catchErrors(startGHImporter)
-    
+  
   def run(self, ticks):
     self.time += ticks / 50.0
     if self.engine.cmdPlay == 1:
+      self.engine.cmdPlay = 4
+    elif self.engine.cmdPlay == 4: #this frame runs the engine an extra loop to allow the font to load...
       #evilynux - improve cmdline support
+      self.engine.cmdPlay = 2
       self.newLocalGame(players = Config.get("game", "players"), mode1p = Config.get("game","game_mode"), mode2p = Config.get("game","multiplayer_mode"))
-    elif self.engine.cmdPlay == 2:
+    elif self.engine.cmdPlay == 3:
       self.quit()
     
     
@@ -502,9 +508,8 @@ class MainMenu(BackgroundLayer):
     t = self.time / 100
     w, h, = self.engine.view.geometry[2:4]
     r = .5
-
+    
     if not self.useSoloMenu:
-
 
       if self.active:
         if self.engine.view.topLayer() is not None:
@@ -515,7 +520,7 @@ class MainMenu(BackgroundLayer):
         else:
           self.engine.drawImage(self.engine.data.loadingImage, (1.0,-1.0), (w/2, h/2), stretched = 3)
 
-      if self.menu.active:
+      if self.menu.active and self.engine.cmdPlay == 0:
         if self.background != None:
           #MFH - auto-scaling
           self.engine.drawImage(self.background, (1.0,-1.0), (w/2, h/2), stretched = 3)
@@ -561,7 +566,7 @@ class MainMenu(BackgroundLayer):
         else:
           self.engine.drawImage(self.engine.data.loadingImage, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
         
-      if self.menu.active:
+      if self.menu.active and self.engine.cmdPlay == 0:
         if self.background != None:
           self.engine.drawImage(self.background, (1.0,-1.0), (w/2, h/2), stretched = 3)
 

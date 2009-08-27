@@ -109,6 +109,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.highscoreIndex   = [-1 for i in players]
     self.haveRunScores    = False
     self.doneScores       = False
+    self.shownScores      = False
     self.doneCount        = False
     self.noScore          = [False for i in players]
     self.scorePart        = None
@@ -190,7 +191,6 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     slowdown = self.engine.audioSpeedFactor
     # evilynux - Reset speed
     self.engine.setSpeedFactor(1.0)
-    self.engine.config.set("audio", "speed_factor", 1.0)
 
     a = len(Scorekeeper.HANDICAPS)
     for i, scoreCard in enumerate(self.scoring):
@@ -246,7 +246,6 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     songHopoFreq    = self.playerList[0].hopoFreq
     hopoFreqCheat   = self.engine.config.get("coffee", "hopo_freq_cheat")
     noteHitWindow   = self.engine.config.get("game", "note_hit_window")
-    hitWindowCheat  = self.engine.config.get("game", "hit_window_cheat")
     try:
       songHopoFreq  = abs(int(songHopoFreq))
     except Exception, e:
@@ -267,13 +266,13 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     elif self.hopoFreq == 3:
       self.hopoFreq = _("Most")
     
-    if hitWindowCheat == 1:
+    if noteHitWindow == 0:
       self.hitWindow = _("Widest")
-    elif hitWindowCheat == 2:
-      self.hitWindow = _("Wide")
-    elif noteHitWindow == 2:
-      self.hitWindow = _("Tightest")
     elif noteHitWindow == 1:
+      self.hitWindow = _("Wide")
+    elif noteHitWindow == 4:
+      self.hitWindow = _("Tightest")
+    elif noteHitWindow == 3:
       self.hitWindow = _("Tight")
     else:
       self.hitWindow = _("Standard")
@@ -466,10 +465,14 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.loaded = True
   
   def nextHighScore(self):
-    if self.scoreDifficulty == None:
+    if self.hsRollIndex < len(self.playerList):
       self.scoreDifficulty = self.playerList[self.hsRollIndex].difficulty
-    if self.scorePart == None:
       self.scorePart = self.playerList[self.hsRollIndex].part
+      return
+    elif not self.shownScores:
+      self.scorePart = self.song.info.parts[0]
+      self.scoreDifficulty = self.song.info.partDifficulties[self.scorePart.id][0]
+      self.shownScores = True
       return
     
     found = 0  
@@ -482,9 +485,9 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         
         if self.scoreDifficulty == difficulty and self.scorePart == part:
           found = 1
-
-    self.scoreDifficulty = self.song.info.partDifficulties[0][0]
+    
     self.scorePart = self.song.info.parts[0]
+    self.scoreDifficulty = self.song.info.partDifficulties[self.scorePart.id][0]
   
   def startRoll(self, playerNum):
     self.diffScore[playerNum] = self.newScore[playerNum] - self.currentScore[playerNum]
@@ -579,6 +582,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
           
           self.engine.resource.load(self, "uploadResult", fn, onLoad = self.handleWorldCharts)
     self.doneScores = True
+    self.hsRollIndex = 0
+    self.nextHighScore()
   
   def run(self, ticks):
     SceneClient.run(self, ticks)
@@ -708,6 +713,8 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         if self.doneScores:
           if len(self.playerList) > 1 and self.playerList[0].part == self.playerList[1].part and self.playerList[0].difficulty == self.playerList[1].difficulty and self.highscoreIndex[0] != -1 and self.highscoreIndex[1] != -1 and self.highscoreIndex[1] <= self.highscoreIndex[0]:
             self.highscoreIndex[0] += 1
+      else:
+        self.nextHighScore()
       if self.keepCount > 0 and not self.doneCount:
         if self.song.info.count:
           count = int(self.song.info.count)
@@ -1104,7 +1111,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       settingsText = "%s %s - %s: %s / %s, %s: %s" % (self.engine.versionString, self.tsSettings, self.tsHopos, self.hopoStyle, self.hopoFreq, self.tsHitWindow, self.hitWindow)
       settingsScale = 0.0012
       wText, hText = font.getStringSize(settingsText, settingsScale)
-      font.render(settingsText, (.5 - wText/2, 0.0), scale = settingsScale)
+      defFont.render(settingsText, (.5 - wText/2, 0.0), scale = settingsScale)
       
       if self.coOpType == 2:
         try:
@@ -1345,8 +1352,9 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         y += h1
         endScroll -= .07
       
-      if self.offset < endScroll or i == -1:
+      if self.offset < endScroll or (i == -1 and self.doneScores):
         self.offset = self.scoreScrollStartOffset
+        self.hsRollIndex += 1
         self.nextHighScore()
     
     for j,player in enumerate(self.playerList): #MFH 

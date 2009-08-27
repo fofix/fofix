@@ -28,6 +28,7 @@ import Config
 import os
 import re
 import shutil
+import math
 import Config
 #stump: when we completely drop 2.4 support, change this to just "import hashlib"
 try:
@@ -86,6 +87,9 @@ TK_UNUSED_TEXT = 4    #Unused / other text events
 #self.song.eventTracks[Song.TK_LYRICS]
 #self.song.eventTracks[Song.TK_UNUSED_TEXT]
 
+GUITAR_TRACK             = 0
+RHYTHM_TRACK             = 1
+DRUM_TRACK               = 2
 
 #FOF_TYPE                = 0
 #GH1_TYPE                = 1
@@ -108,6 +112,9 @@ LEAD_PART               = 3
 DRUM_PART               = 4
 VOCAL_PART              = 5
 
+PART_SORT               = [0,2,3,1,4,5] # these put Lead before Rhythm in menus.
+SORT_PART               = [0,3,1,2,4,5]
+
 instrumentDiff = {
   0 : (lambda a: a.diffGuitar),
   1 : (lambda a: a.diffGuitar),
@@ -125,7 +132,13 @@ class Part:
     #self.logClassInits = Config.get("game", "log_class_inits")
     #if self.logClassInits == 1:
     #  Log.debug("Part class init (song.py)...")
-    
+  
+  def __cmp__(self, other):
+    if isinstance(other, Part):
+      return cmp(PART_SORT[self.id], PART_SORT[other.id])
+    else:
+      return cmp(self.id, other) #if it's not being compared with a part, we probably want its real ID.
+  
   def __str__(self):
     return self.text
 
@@ -149,8 +162,13 @@ class Difficulty:
     #self.logClassInits = Config.get("game", "log_class_inits")
     #if self.logClassInits == 1:
     #  Log.debug("Difficulty class init (song.py)...")
-
-    
+  
+  def __cmp__(self, other):
+    if isinstance(other, Difficulty):
+      return cmp(self.id, other.id)
+    else:
+      return cmp(self.id, other)
+  
   def __str__(self):
     return self.text
 
@@ -183,7 +201,11 @@ class CacheManager(object):
     oldcwd = os.getcwd()
     try:
       os.chdir(cachePath)  #stump: work around bug in SQLite unicode path name handling
-      conn = sqlite3.Connection('.fofix-cache')
+      try:
+        conn = sqlite3.Connection('.fofix-cache')
+      except sqlite3.OperationalError:
+        conn = None
+        return conn
     finally:
       os.chdir(oldcwd)
     # Check that the cache is completely initialized.
@@ -266,21 +288,21 @@ class SongInfo(object):
     if canCache and self.allowCacheUsage:
       self.stateHash = hashlib.sha1(open(self.noteFileName, 'rb').read() + open(self.fileName, 'rb').read()).hexdigest()
       cache = cacheManager.getCache(self.fileName)
+      if cache != None:
+        try:    #MFH - it crashes here on previews!
+          result = cache.execute('SELECT `info` FROM `songinfo` WHERE `hash` = ?', [self.stateHash]).fetchone()
+        except Exception, e:
+          Log.error(str(e))
+          result = None
 
-      try:    #MFH - it crashes here on previews!
-        result = cache.execute('SELECT `info` FROM `songinfo` WHERE `hash` = ?', [self.stateHash]).fetchone()
-      except Exception, e:
-        Log.error(str(e))
-        result = None
-
-      if result is not None:
-        try:
-          self.__dict__.update(cPickle.loads(str(result[0])))
-          return
-        except:
-          # The entry is there but could not be loaded.
-          # Nuke it and let it be rebuilt further down.
-          cache.execute('DELETE FROM `songinfo` WHERE `hash` = ?', [self.stateHash])
+        if result is not None:
+          try:
+            self.__dict__.update(cPickle.loads(str(result[0])))
+            return
+          except:
+            # The entry is there but could not be loaded.
+            # Nuke it and let it be rebuilt further down.
+            cache.execute('DELETE FROM `songinfo` WHERE `hash` = ?', [self.stateHash])
 
     # Read highscores and verify their hashes.
     # There ain't no security like security throught obscurity :)
@@ -545,7 +567,8 @@ class SongInfo(object):
       self.stateHash = hashlib.sha1(open(self.noteFileName, 'rb').read() + open(self.fileName, 'rb').read()).hexdigest()
       cache = cacheManager.getCache(self.fileName)
       pkl = cPickle.dumps(self.__dict__)
-      cache.execute('INSERT OR REPLACE INTO `songinfo` (`hash`, `info`) VALUES (?, ?)', [self.stateHash, pkl])
+      if cache != None:
+        cache.execute('INSERT OR REPLACE INTO `songinfo` (`hash`, `info`) VALUES (?, ?)', [self.stateHash, pkl])
 
 
   def _set(self, attr, value):
@@ -575,7 +598,11 @@ class SongInfo(object):
       highScores = self.highScores
       
     for difficulty in highScores.keys():
-      s[difficulty.id] = [(score, stars, name, self.getScoreHash(difficulty, score, stars, name)) for score, stars, name, scores_ext in highScores[difficulty]]
+      if isinstance(difficulty, Difficulty):
+        diff = diff.id
+      else:
+        diff = difficulty
+      s[diff] = [(score, stars, name, self.getScoreHash(difficulty, score, stars, name)) for score, stars, name, scores_ext in highScores[difficulty]]
     return binascii.hexlify(Cerealizer.dumps(s))
 
   def getObfuscatedScoresExt(self, part = parts[GUITAR_PART]):
@@ -596,7 +623,11 @@ class SongInfo(object):
       highScores = self.highScores
       
     for difficulty in highScores.keys():
-      s[difficulty.id] = [(self.getScoreHash(difficulty, score, stars, name), stars) + scores_ext for score, stars, name, scores_ext in highScores[difficulty]]
+      if isinstance(difficulty, Difficulty):
+        diff = diff.id
+      else:
+        diff = difficulty
+      s[diff] = [(self.getScoreHash(difficulty, score, stars, name), stars) + scores_ext for score, stars, name, scores_ext in highScores[difficulty]]
     return binascii.hexlify(Cerealizer.dumps(s))
 
   def save(self):
@@ -630,6 +661,8 @@ class SongInfo(object):
     try:
       v = self.info.get("song", attr)
     except:
+      v = default
+    if v == "": #key found, but empty - need to catch as int("") will burn.
       v = default
     if v is not None and type:
       v = type(v)
@@ -745,6 +778,9 @@ class SongInfo(object):
 
   def getDiffBass(self):
     return self._get("diff_bass", int, -1)     
+  
+  def getDiffVocals(self):
+    return self._get("diff_vocals", int, -1)
 
   def getYear(self):
     return self._get("year")
@@ -786,6 +822,9 @@ class SongInfo(object):
 
   def setDiffBass(self, value):
     self._set("diff_bass", value)       
+  
+  def setDiffVocals(self, value):
+    self._set("diff_vocals", value)
 
   def setYear(self, value):
     self._set("year", value)
@@ -794,7 +833,9 @@ class SongInfo(object):
     self._set("loading_phrase", value)
     
   def getScoreHash(self, difficulty, score, stars, name):
-    return hashlib.sha1("%d%d%d%s" % (difficulty.id, score, stars, name)).hexdigest()
+    if isinstance(difficulty, Difficulty):
+      difficulty = difficulty.id
+    return hashlib.sha1("%d%d%d%s" % (difficulty, score, stars, name)).hexdigest()
     
   def getDelay(self):
     return self._get("delay", int, 0)
@@ -863,7 +904,7 @@ class SongInfo(object):
       highScores = self.highScores
       
     try:
-      return highScores[difficulty]
+      return highScores[difficulty.id]
     except KeyError:
       return []
 
@@ -886,7 +927,7 @@ class SongInfo(object):
       highScores = self.highScores
       
     try:
-      return highScores[difficulty]
+      return highScores[difficulty.id]
     except KeyError:
       return []
       
@@ -927,13 +968,12 @@ class SongInfo(object):
       highScores = self.highScoresVocal
     else:
       highScores = self.highScores
-
-    if not difficulty in highScores:
-      highScores[difficulty] = []
-    highScores[difficulty].append((score, stars, name, scoreExt))
-    highScores[difficulty].sort(lambda a, b: {True: -1, False: 1}[a[0] > b[0]])
-    highScores[difficulty] = highScores[difficulty][:5]
-    for i, scores in enumerate(highScores[difficulty]):
+    if not difficulty.id in highScores:
+      highScores[difficulty.id] = []
+    highScores[difficulty.id].append((score, stars, name, scoreExt))
+    highScores[difficulty.id].sort(lambda a, b: {True: -1, False: 1}[a[0] > b[0]])
+    highScores[difficulty.id] = highScores[difficulty.id][:5]
+    for i, scores in enumerate(highScores[difficulty.id]):
       _score, _stars, _name, _scores_ext = scores
       if _score == score and _stars == stars and _name == name:
         return i
@@ -1003,14 +1043,14 @@ class SongInfo(object):
   # This takes True or False, not the value in the ini
   def setCompleted(self, value):
     if value:
-      self._set("unlock_completed", len(self.name) * len(self.artist) + 1)
+      self._set("unlock_completed", len(removeSongOrderPrefixFromName(self.name)) * len(self.artist) + 1)
     else:
       self._set("unlock_completed", 0)
     
   # This returns True or False, not the value in the ini
   def getCompleted(self):
     iniValue = self._get("unlock_completed", int, default = 0)
-    if iniValue == len(self.name) * len(self.artist) + 1: # yay, security through obscurity!
+    if iniValue == len(removeSongOrderPrefixFromName(self.name)) * len(self.artist) + 1: # yay, security through obscurity!
       return True
     else:
       return False
@@ -1066,6 +1106,7 @@ class SongInfo(object):
   diffGuitar   = property(getDiffGuitar, setDiffGuitar)
   diffBass     = property(getDiffBass, setDiffBass)
   diffDrums    = property(getDiffDrums, setDiffDrums)
+  diffVocals   = property(getDiffVocals, setDiffVocals)
   #boss battles
   bossBattle   = property(getBossBattle, setBossBattle)
   #May no longer be necessary
@@ -1749,7 +1790,6 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
     self.chordFudge = 1
 
     self.hopoTick = engine.config.get("coffee", "hopo_frequency")
-    self.hopoTickCheat = engine.config.get("coffee", "hopo_freq_cheat")
     self.songHopoFreq = engine.config.get("game", "song_hopo_freq")
     self.logTempoEvents = engine.config.get("log",   "log_tempo_events")
 
@@ -1760,6 +1800,10 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
         if self.logTempoEvents == 1:
           Log.debug("Tempo event removed from NoteTrack during cleanup: " + str(event.bpm) + "bpm")
 
+  def flipDrums(self):
+    for time, event in self.allEvents:
+      if isinstance(event, Note):
+        event.number = (5-event.number)%5
 
   def markHopoRF(self, EighthNH, songHopoFreq):
     lastTick = 0
@@ -1792,14 +1836,13 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
       ticksPerBeat = 720
     elif self.hopoTick == 2:
       ticksPerBeat = 480
+    elif self.hopoTick == 3:
+      ticksPerBeat = 360
+    elif self.hopoTick == 4:
+      ticksPerBeat = 240
     else:
       ticksPerBeat = 240
       hopoDelta = 250
-      
-    if self.hopoTickCheat == 1:
-      ticksPerBeat = 360
-    elif self.hopoTickCheat == 2:
-      ticksPerBeat = 240
       
     hopoNotes = []
     chordNotes = []
@@ -2033,14 +2076,15 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
       ticksPerBeat = 720
     elif self.hopoTick == 2:
       ticksPerBeat = 480
+    elif self.hopoTick == 3:
+      ticksPerBeat = 360
+    elif self.hopoTick == 4:
+      ticksPerBeat = 240
     else:
       ticksPerBeat = 240
       hopoDelta = 250
       
-    if self.hopoTickCheat == 1:
-      ticksPerBeat = 360
-    elif self.hopoTickCheat == 2:
-      ticksPerBeat = 240
+
       
     hopoNotes = []
 
@@ -2614,7 +2658,9 @@ class Song(object):
     self.delay        = self.engine.config.get("audio", "delay")
     self.delay        += self.info.delay
     self.missVolume   = self.engine.config.get("audio", "miss_volume")
-    #self.songVolume   = self.engine.config.get("audio", "songvol") #akedrou
+    self.backVolume   = self.engine.config.get("audio", "songvol") #akedrou
+    self.activeVolume = self.engine.config.get("audio", "guitarvol")
+    self.crowdVolume  = self.engine.config.get("audio", "crowd_volume")
 
     self.hasMidiLyrics = False
     self.midiStyle = self.info.midiStyle
@@ -2634,11 +2680,18 @@ class Song(object):
     self.eventTracks       = [Track(self.engine) for t in range(0,5)]    #MFH - should result in eventTracks[0] through [4]
     
     self.midiEventTracks   = []
+    self.activeAudioTracks = []
     for i in partlist:
       if i == parts[VOCAL_PART]:
         self.midiEventTracks.append([None])
       else:
         self.midiEventTracks.append([Track(self.engine) for t in range(len(difficulties))])
+        if i == parts[GUITAR_PART] or i == parts[LEAD_PART]:
+          self.activeAudioTracks.append(GUITAR_TRACK)
+        elif i == parts[RHYTHM_PART] or i == parts[BASS_PART]:
+          self.activeAudioTracks.append(RHYTHM_TRACK)
+        elif i == parts[DRUM_PART]:
+          self.activeAudioTracks.append(DRUM_TRACK)
     
     self.vocalEventTrack   = VocalTrack(self.engine)
 
@@ -2718,11 +2771,13 @@ class Song(object):
     self.delay        += self.info.delay
 
   #myfingershurt: new function to refresh the miss volume after a pause
-  def refreshMissVolume(self):  
+  def refreshVolumes(self):  
     if self.singleTrackSong:
       self.missVolume = self.engine.config.get("audio", "single_track_miss_volume")   #MFH - force single-track miss volume setting instead
     else:
       self.missVolume   = self.engine.config.get("audio", "miss_volume")
+    self.activeVolume   = self.engine.config.get("audio", "guitarvol")
+    self.backVolume     = self.engine.config.get("audio", "songvol")
 
   
   def getCurrentTempo(self, pos):  #MFH
@@ -2760,9 +2815,12 @@ class Song(object):
     
     if self.engine.audioSpeedFactor == 1:  #MFH - shut this track up if slowing audio down!    
       self.music.play(0, start / 1000.0)
-      self.music.setVolume(1.0)
+      if self.singleTrackSong:
+        self.music.setVolume(self.activeVolume)
+      else:
+        self.music.setVolume(self.backVolume)
     else:
-      self.music.play(1.0/self.engine.audioSpeedFactor, start / 1000.0)  #tell music to loop 2 times for 1/2 speed, 4 times for 1/4 speed (so it doesn't end early)
+      self.music.play(int(math.ceil(1.0/self.engine.audioSpeedFactor)), start / 1000.0)  #tell music to loop 2 times for 1/2 speed, 4 times for 1/4 speed (so it doesn't end early) (it wants an int, though)
       self.music.setVolume(0.0)   
     
     if self.guitarTrack:
@@ -2789,12 +2847,14 @@ class Song(object):
     self.engine.audio.unpause()
 
   def setInstrumentVolume(self, volume, part):
-    if part == parts[GUITAR_PART]:
+    if self.singleTrackSong:
       self.setGuitarVolume(volume)
-    elif part == parts[BASS_PART]:
-      self.setRhythmVolume(volume)
-    elif part == parts[RHYTHM_PART]:
-      self.setRhythmVolume(volume)
+    elif part == parts[GUITAR_PART]:
+      self.setGuitarVolume(volume)
+    # elif part == parts[BASS_PART]:
+      # self.setRhythmVolume(volume)
+    # elif part == parts[RHYTHM_PART]:
+      # self.setRhythmVolume(volume)
     elif part == parts[DRUM_PART]:
       self.setDrumVolume(volume)
     else:
@@ -2804,12 +2864,23 @@ class Song(object):
     if self.guitarTrack:
       if volume == 0:
         self.guitarTrack.setVolume(self.missVolume)
+      elif volume == 1:
+        if GUITAR_TRACK in self.activeAudioTracks or self.singleTrackSong:
+          self.guitarTrack.setVolume(self.activeVolume)
+        else:
+          self.guitarTrack.setVolume(self.backVolume)
       else:
         self.guitarTrack.setVolume(volume)
     #This is only used if there is no guitar.ogg to lower the volume of song.ogg instead of muting this track
+    # evilynux - It also falls on this with buggy pygame < 1.9 on 64bit CPUs.
     else:
       if volume == 0:
-        self.music.setVolume(self.missVolume * 1.5)
+        self.music.setVolume(self.missVolume)
+      elif volume == 1:
+        if GUITAR_TRACK in self.activeAudioTracks or self.singleTrackSong:
+          self.music.setVolume(self.activeVolume)
+        else:
+          self.music.setVolume(self.backVolume)
       else:
         self.music.setVolume(volume)
 
@@ -2817,6 +2888,11 @@ class Song(object):
     if self.rhythmTrack:
       if volume == 0:
         self.rhythmTrack.setVolume(self.missVolume)
+      elif volume == 1:
+        if RHYTHM_TRACK in self.activeAudioTracks:
+          self.rhythmTrack.setVolume(self.activeVolume)
+        else:
+          self.rhythmTrack.setVolume(self.backVolume)
       else:
         self.rhythmTrack.setVolume(volume)
   
@@ -2824,6 +2900,11 @@ class Song(object):
     if self.drumTrack:
       if volume == 0:
         self.drumTrack.setVolume(self.missVolume)
+      elif volume == 1:
+        if DRUM_TRACK in self.activeAudioTracks:
+          self.drumTrack.setVolume(self.activeVolume)
+        else:
+          self.drumTrack.setVolume(self.backVolume)
       else:
         self.drumTrack.setVolume(volume)
         
@@ -2853,11 +2934,17 @@ class Song(object):
         self.rhythmTrack.stopPitchBend()
 
   def setBackgroundVolume(self, volume):
-    self.music.setVolume(volume)
+    if volume == 1:
+      self.music.setVolume(self.backVolume)
+    else:
+      self.music.setVolume(volume)
   
   def setCrowdVolume(self, volume):
     if self.crowdTrack:
-      self.crowdTrack.setVolume(volume)
+      if volume == 1:
+        self.crowdTrack.setVolume(self.crowdVolume)
+      else:
+        self.crowdTrack.setVolume(volume)
   
   def setAllTrackVolumes(self, volume):
     self.setBackgroundVolume(volume)
@@ -3844,7 +3931,7 @@ class MidiPartsDiffReader(midi.MidiOutStream):
     except KeyError:
       pass
 
-def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playbackOnly = False, notesOnly = False, part = [parts[GUITAR_PART]], practiceMode = False):
+def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playbackOnly = False, notesOnly = False, part = [parts[GUITAR_PART]], practiceMode = False, practiceSpeed = 1.0):
 
   Log.debug("loadSong function call (song.py)...")
   crowdsEnabled = engine.config.get("audio", "crowd_tracks_enabled")
@@ -3937,8 +4024,9 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
     rhythmFile = None
     drumFile = None
     crowdFile = None
-
-  slowDownFactor = engine.config.get("audio", "speed_factor")
+    slowDownFactor = practiceSpeed
+  else:
+    slowDownFactor = engine.config.get("audio", "speed_factor")
   engine.setSpeedFactor(slowDownFactor)    #MFH 
     
 
@@ -4114,10 +4202,11 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
     songs.append(SongInfo(engine.resource.fileName(library, name, "song.ini", writable = True), library, allowCacheUsage=True))
   if len(songs) and canCache and Config.get("performance", "cache_song_metadata"):
     cache = cacheManager.getCache(songs[0].fileName)
-    #stump: clean up the cache
-    if cache.execute('DELETE FROM `songinfo` WHERE `hash` NOT IN (' + ','.join("'%s'" % s.stateHash for s in songs) + ')').rowcount > 0:
-      cache.execute('VACUUM')  # compact the database if anything was deleted on the previous line
-    cache.commit()  # commit any changes to the cache all at once
+    if cache != None:
+      #stump: clean up the cache
+      if cache.execute('DELETE FROM `songinfo` WHERE `hash` NOT IN (' + ','.join("'%s'" % s.stateHash for s in songs) + ')').rowcount > 0:
+        cache.execute('VACUUM')  # compact the database if anything was deleted on the previous line
+      cache.commit()  # commit any changes to the cache all at once
   if not includeTutorials:
     songs = [song for song in songs if not song.tutorial]
   songs = [song for song in songs if not song.artist == '=FOLDER=']

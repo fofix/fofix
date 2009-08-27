@@ -33,6 +33,8 @@ import os
 import random   #MFH - needed for new stage background handling
 from Language import _
 
+import Version # Provides dataPath
+
 class Layer(object):
   """
   A graphical stage layer that can have a number of animation effects associated with it.
@@ -335,6 +337,18 @@ class Stage(object):
         else:
           self.backgroundLayers.append(layer)
 
+  # def loadVideo(self, libraryName, songName):
+    # if not videoAvailable:
+      # return -1
+    # if self.songStage == 1 and os.path.exists(os.path.join(libraryName, songName, "video.mp4")):
+      # vidSource = os.path.join(libraryName, songName, "video.mp4")
+    # else:
+      # vidSource = os.path.join(Version.dataPath(), "video.mp4")
+
+    # self.vidPlayer = VideoPlayer(self.engine, -1, vidSource, mute = True, loop = True)
+    # self.engine.view.pushLayer(self.vidPlayer)
+    # self.vidPlayer.paused = True
+
   def load(self, libraryName, songName, practiceMode = False):
     # evilynux - Fixes a self.background not defined crash
     self.background = None
@@ -376,7 +390,7 @@ class Stage(object):
         except IOError:
           self.engine.loadImgDrawing(self, "background", os.path.join(libraryName, songName, "background.png"))
       except IOError:
-        Log.warn("No song-specific stage found") # evilynux
+        Log.notice("No song-specific stage found") # evilynux
         test = False
       if test:  #does a song-specific background exist?
         self.rotationMode = 0
@@ -396,7 +410,7 @@ class Stage(object):
           except IOError:
             self.engine.loadImgDrawing(self, "background", os.path.join(self.path, "default.png"))            
         except IOError:
-          Log.warn("No default stage, fallbacking on a forced Blank stage mode") # evilynux
+          Log.warn("No default stage; falling back on a forced Blank stage mode") # evilynux
           self.mode = 2    #if no practice stage, just fall back on a forced Blank stage mode
 
       ##This checks how many Stage-background we have to select from
@@ -464,6 +478,9 @@ class Stage(object):
           wfactor = 640.000/imgwidth
           self.imgArr.append(getattr(self, "backgroundA", os.path.join(self.path, files[j])))
           self.imgArrScaleFactors.append(wfactor)
+    
+    if self.rotationMode > 0 and len(self.imgArr) == 0:
+      self.rotationMode = 0
 
     if self.mode != 2 and self.background:   #MFH - precalculating scale factor
       imgwidth = self.background.width1()
@@ -565,7 +582,8 @@ class Stage(object):
       self.triggerBeat(pos, beat)
 
   def render(self, visibility):
-    self.renderBackground()
+    if self.mode != 3:
+      self.renderBackground()
     self._renderLayers(self.backgroundLayers, visibility)
     if shaders.enable("stage"):
       height = 0.0

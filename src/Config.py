@@ -122,7 +122,7 @@ class Option:
     for key, value in args.items():
       setattr(self, key, value)
       
-def define(section, option, type, default = None, text = None, options = None, prototype = prototype):
+def define(section, option, type, default = None, text = None, options = None, prototype = prototype, tipText = None):
   """
   Define a configuration key.
   
@@ -134,6 +134,7 @@ def define(section, option, type, default = None, text = None, options = None, p
   @param options:    Either a mapping of values to text descriptions
                     (e.g. {True: 'Yes', False: 'No'}) or a list of possible values
   @param prototype:  Configuration prototype mapping
+  @param tipText:    Helpful tip text to display in option menus.
   """
   if not section in prototype:
     prototype[section] = {}
@@ -141,7 +142,7 @@ def define(section, option, type, default = None, text = None, options = None, p
   if type == bool and not options:
     options = [True, False]
     
-  prototype[section][option] = Option(type = type, default = default, text = text, options = options)
+  prototype[section][option] = Option(type = type, default = default, text = text, options = options, tipText = tipText)
 
 def load(fileName = None, setAsDefault = False, type = 0):
   """Load a configuration with the default prototype"""
@@ -269,6 +270,29 @@ class Config:
     if logIniReads == 1:
       Log.debug("Config.getOptions: %s.%s = %s" % (section, option, str(optionList)))
     return optionList, options
+  
+  def getTipText(self, section, option):
+    """
+    Return the tip text for a configuration key.
+    
+    @param section:   Section name
+    @param option:    Option name
+    @return:          Tip Text String
+    """
+    
+    global logIniReads, logUndefinedGets
+
+    try:
+      text = self.prototype[section][option].tipText
+    except KeyError:
+      if logUndefinedGets == 1:
+        Log.warn("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
+      text = None
+      
+    #myfingershurt: verbose log output
+    if logIniReads == 1:
+      Log.debug("Config.getTipText: %s.%s = %s" % (section, option, text))
+    return text
 
 #-------------------------
 # glorandwarf: returns the default value of a configuration key
@@ -357,15 +381,12 @@ class Config:
     disableVBPMUsed = int(self.get("game", "disable_vbpm"))
 
     #2    
-    #Value 0 on / 1 on
-    if self.get("game", "tapping") == False:
-      hopoDisableUsed = 0
-    else:
-      hopoDisableUsed = 1
+    #Value 0 on / 1 on - removed.
+    hopoDisableUsed = 0
 
     #3
     #Value 0 FoF / 1 RFmod
-    hopoMarks = int(self.get("game", "hopo_mark"))
+    hopoMarks = 1
 
     #4    
     #Value 0 FoF / 1 RFmod / 2 RFmod2
@@ -376,8 +397,8 @@ class Config:
     pov = int(self.get("fretboard", "point_of_view"))
 
     #6    
-    #Value 0 FoF / 1 Capo
-    margin = int(self.get("game", "margin"))
+    #Value 0 FoF / 1 Capo -- akedrou: no game effect - removing key.
+    margin = 0
 
     #7    
     #Value 0 no / 1 yes
@@ -385,7 +406,7 @@ class Config:
 
     #8    
     #Value 0 bpm / 1 difficulty
-    boardSpeed = int(self.get("game", "board_speed"))
+    boardSpeed = 0
 
     encode = "%d%d%d%d%d%d%d%d%d" % (twoChordUsed, disableVBPMUsed, hopoDisableUsed, hopoMarks, hopoStyle, pov, margin, hopo8thUsed, boardSpeed)
     #return encode
@@ -396,7 +417,7 @@ class Config:
     #Do not change order
     #Will be used for some of the Cmod values
     encode = ""
-    boardSpeedMult = self.get("game", "board_speed")
+    boardSpeedMult = 0
     return encode
     
 
@@ -475,6 +496,17 @@ def getDefault(section, option):
   """
   global config
   return config.getDefault(section, option)
+
+def getTipText(section, option):
+  """
+  Return the tip text for a global configuration key.
+  
+  @param section:   Section name
+  @param option:    Option name
+  @return:          Tip Text String
+  """
+  global config
+  return config.getTipText(section, option)
 
 #-------------------------
 def getOptions(section, option):

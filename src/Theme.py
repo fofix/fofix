@@ -299,6 +299,14 @@ Config.define("theme", "use_solo_submenu",       bool, None)
 Config.define("theme", "sub_menu_x",       float, None)
 Config.define("theme", "sub_menu_y",       float, None)
 
+Config.define("theme", "menu_tip_text_y", float, .7)
+Config.define("theme", "menu_tip_text_font", str, "font")
+Config.define("theme", "menu_tip_text_scale", float, .002)
+Config.define("theme", "menu_tip_text_color", str, None)
+Config.define("theme", "menu_tip_text_scroll_space", float, .25)
+Config.define("theme", "menu_tip_text_scroll_mode", int, 0)
+Config.define("theme", "menu_tip_text_display", bool, False)
+
 Config.define("theme", "career_title_color",  str, "#000000")
 Config.define("theme", "song_name_text_color",  str, "#FFFFFF")
 Config.define("theme", "song_name_selected_color",  str, "#FFBF00")
@@ -449,6 +457,15 @@ versiontag = None
 rmtype = None
 shadowoffsetx = None
 shadowoffsety = None
+
+#akedrou
+menuTipTextY = None
+menuTipTextFont = None
+menuTipTextScale = None
+menuTipTextColor = None
+menuTipTextScrollSpace = None
+menuTipTextScrollMode = None
+menuTipTextDisplay = None
 
 #evilynux
 songlist_score_colorVar = None
@@ -723,7 +740,13 @@ def setSelectedColor(alpha = 1.0):
 def setBaseColor(alpha = 1.0):
   glColor4f(*(baseColor + (alpha,)))
   
-
+def packTupleKey(key, type = str):
+  vals = key.split(',')
+  if isinstance(type, list):
+    retval = tuple(type[i](n.strip()) for i, n in enumerate(vals))
+  else:
+    retval = tuple(type(n.strip()) for n in vals)
+  return retval
 
 def open(config, themepath = None):
   # Read in theme.ini specific variables
@@ -996,7 +1019,8 @@ def setupMenu(config):
   global menuX, menuY, menuRB
   global loadingX, loadingY, loadingColor, loadingFScale, loadingRMargin, loadingLSpacing
   global main_menu_scaleVar, main_menu_vspacingVar, use_solo_submenu, sub_menu_xVar, sub_menu_yVar
-  global songback, versiontag, shadowoffsetx, shadowoffsety
+  global songback, versiontag, shadowoffsetx, shadowoffsety, menuTipTextY, menuTipTextScrollSpace
+  global menuTipTextFont, menuTipTextScale, menuTipTextScrollMode, menuTipTextDisplay, menuTipTextColor
   
   menuX = config.get("theme", "menu_x")
   menuY = config.get("theme", "menu_y")
@@ -1016,6 +1040,13 @@ def setupMenu(config):
   versiontag = config.get("theme", "versiontag")
   shadowoffsetx = config.get("theme", "shadowoffsetx")
   shadowoffsety = config.get("theme", "shadowoffsety")
+  menuTipTextY = config.get("theme", "menu_tip_text_y")
+  menuTipTextFont = config.get("theme", "menu_tip_text_font")
+  menuTipTextScale = config.get("theme", "menu_tip_text_scale")
+  menuTipTextColor = hexToColorResults(config.get("theme", "menu_tip_text_color"))
+  menuTipTextScrollSpace = config.get("theme", "menu_tip_text_scroll_space")
+  menuTipTextScrollMode = config.get("theme", "menu_tip_text_scroll_mode")
+  menuTipTextDisplay = config.get("theme", "menu_tip_text_display")
 
 def setupLobby(config):
   global controlActivateX, controlActivateY, controlActivateScale, controlActivateFont, controlCheckTextY

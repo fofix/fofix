@@ -29,6 +29,7 @@ from Microphone import Microphone, getNoteName
 from Song import VocalNote, VocalPhrase
 from OpenGL.GL import *
 from numpy import array, float32
+from random import random
 import Theme
 
 #stump: needed for continuous star fillup (akedrou - stealing for vocals)
@@ -36,7 +37,7 @@ import Image
 import ImageDraw
 from Svg import ImgDrawing
 
-diffMod = {0: 1.2, 1: 1.4, 2: 1.6, 3: 1.8}
+diffMod = {0: 1.4, 1: 1.6, 2: 1.75, 3: 1.9}
 
 class Vocalist:
   def __init__(self, engine, playerObj, editorMode = False, player = 0):
@@ -67,6 +68,8 @@ class Vocalist:
     self.freestyleBonusFret = 0
     self.freestyleLastFretHitTime = [0 for i in range(5)]
     self.twoChord = False
+    self.leftyMode = False
+    self.drumFlip = False
     self.keys = []
     self.actions = []
     self.neckSpeed = 0.0
@@ -146,52 +149,52 @@ class Vocalist:
     
     self.lyricScale = .00170
     
-    self.engine.loadImgDrawing(self, "vocalLyricSheet", os.path.join("themes",themename,"vocals","lyricsheet.png"))
+    self.engine.loadImgDrawing(self, "vocalLyricSheet", os.path.join(self.engine.data.vocalPath,"lyricsheet.png"))
     imgwidth = self.vocalLyricSheet.width1()
     self.vocalLyricSheetWFactor = 640.000/imgwidth
     try:
-      self.engine.loadImgDrawing(self, "vocalLyricSheetGlow", os.path.join("themes",themename,"vocals","lyricsheetglow.png"))
+      self.engine.loadImgDrawing(self, "vocalLyricSheetGlow", os.path.join(self.engine.data.vocalPath,"lyricsheetglow.png"))
       imgwidth = self.vocalLyricSheetGlow.width1()
       self.vocalLyricSheetGlowWFactor = 640.000/imgwidth
     except:
       self.vocalLyricSheetGlow = None
     try:
-      self.engine.loadImgDrawing(self, "vocalLyricSheetSP", os.path.join("themes",themename,"vocals","lyricsheetactivate.png"))
+      self.engine.loadImgDrawing(self, "vocalLyricSheetSP", os.path.join(self.engine.data.vocalPath,"lyricsheetactivate.png"))
       self.vocalSheetSPWidth = float(self.vocalLyricSheetSP.width1()*self.vocalLyricSheetWFactor)*(self.engine.view.geometry[2]/640.0)
     except:
       self.vocalLyricSheetSP = None
-    self.engine.loadImgDrawing(self, "vocalArrow", os.path.join("themes",themename,"vocals","arrow.png"))
+    self.engine.loadImgDrawing(self, "vocalArrow", os.path.join(self.engine.data.vocalPath,"arrow.png"))
     try:
-      self.engine.loadImgDrawing(self, "vocalSplitArrow", os.path.join("themes",themename,"vocals","split_arrow.png"))
+      self.engine.loadImgDrawing(self, "vocalSplitArrow", os.path.join(self.engine.data.vocalPath,"split_arrow.png"))
     except IOError:
       self.vocalSplitArrow = self.vocalArrow
-    self.engine.loadImgDrawing(self, "vocalBar", os.path.join("themes",themename,"vocals","beatline.png"))
+    self.engine.loadImgDrawing(self, "vocalBar", os.path.join(self.engine.data.vocalPath,"beatline.png"))
     self.arrowW = self.vocalArrow.width1()
-    self.engine.loadImgDrawing(self, "vocalMult", os.path.join("themes",themename,"vocals","mult.png"))
-    self.engine.loadImgDrawing(self, "vocalMeter", os.path.join("themes",themename,"vocals","meter.png"))
+    self.engine.loadImgDrawing(self, "vocalMult", os.path.join(self.engine.data.vocalPath,"mult.png"))
+    self.engine.loadImgDrawing(self, "vocalMeter", os.path.join(self.engine.data.vocalPath,"meter.png"))
     try:
-      self.engine.loadImgDrawing(self, "vocalFill", os.path.join("themes",themename,"vocals","meter_fill.png"))
+      self.engine.loadImgDrawing(self, "vocalFill", os.path.join(self.engine.data.vocalPath,"meter_fill.png"))
     except IOError:
       self.vocalFill = self.vocalMeter
     try:
-      self.engine.loadImgDrawing(self, "vocalGlow", os.path.join("themes",themename,"vocals","meter_glow.png"))
+      self.engine.loadImgDrawing(self, "vocalGlow", os.path.join(self.engine.data.vocalPath,"meter_glow.png"))
     except IOError:
       self.vocalGlow = None
-    self.engine.loadImgDrawing(self, "vocalTap", os.path.join("themes",themename,"vocals","tap.png"))
-    self.engine.loadImgDrawing(self, "vocalTapNote", os.path.join("themes",themename,"vocals","tap_note.png"))
+    self.engine.loadImgDrawing(self, "vocalTap", os.path.join(self.engine.data.vocalPath,"tap.png"))
+    self.engine.loadImgDrawing(self, "vocalTapNote", os.path.join(self.engine.data.vocalPath,"tap_note.png"))
     try:
-      self.engine.loadImgDrawing(self, "vocalText", os.path.join("themes",themename,"vocals","text.png"))
+      self.engine.loadImgDrawing(self, "vocalText", os.path.join(self.engine.data.vocalPath,"text.png"))
     except IOError:
       self.vocalText = None
-    self.engine.loadImgDrawing(self, "vocalODBottom", os.path.join("themes",themename,"vocals","bottom.png"))
-    self.engine.loadImgDrawing(self, "vocalODFill", os.path.join("themes",themename,"vocals","fill.png"))
+    self.engine.loadImgDrawing(self, "vocalODBottom", os.path.join(self.engine.data.vocalPath,"bottom.png"))
+    self.engine.loadImgDrawing(self, "vocalODFill", os.path.join(self.engine.data.vocalPath,"fill.png"))
     self.vocalODFillWidth = self.vocalODFill.width1()/1280.000
     try:
-      self.engine.loadImgDrawing(self, "vocalODTop", os.path.join("themes",themename,"vocals","top.png"))
+      self.engine.loadImgDrawing(self, "vocalODTop", os.path.join(self.engine.data.vocalPath,"top.png"))
     except IOError:
       self.vocalODTop = None
     try:
-      self.engine.loadImgDrawing(self, "vocalODGlow", os.path.join("themes",themename,"vocals","glow.png"))
+      self.engine.loadImgDrawing(self, "vocalODGlow", os.path.join(self.engine.data.vocalPath,"glow.png"))
     except IOError:
       self.vocalODGlow = None
     
@@ -236,6 +239,7 @@ class Vocalist:
     self.vocalShadowColorStar = list(Theme.vocalShadowColorStar)
     self.vocalGlowColorStar   = list(Theme.vocalGlowColorStar)
     
+    self.lastVal     = 0
     self.vocalMeterX = Theme.vocalMeterX
     self.vocalMeterY = Theme.vocalMeterY
     self.vocalMultX  = Theme.vocalMultX
@@ -270,6 +274,10 @@ class Vocalist:
     self.tapBufferMargin = 300 - (50 * self.difficulty)
     self.accuracy        = 5000 - (self.difficulty * 1000)
     self.difficultyModifier = diffMod[self.difficulty]
+    
+    #Controls Jurgen in vocal parts
+    self.jurgenEnabled   = False
+    self.jurgenSkill     = 5
   
   def setBPM(self, bpm):
     if bpm > 200:
@@ -317,20 +325,42 @@ class Vocalist:
     else:
       return None
   
+  def getJurgenPct(self):
+    #Controls Jurgen in vocal parts
+    j = self.jurgenSkill
+    if not self.jurgenEnabled:
+      return 1
+    if j == 0:
+      return min((.70 + (.05*self.difficulty*random())), 1)
+    elif j == 1:
+      return min((.80 + (.05*self.difficulty*random())), 1)
+    elif j == 2:
+      return min((.85 + (.05*self.difficulty*random())), 1)
+    elif j == 3:
+      return min((.90 + (.05*self.difficulty*random())), 1)
+    elif j == 4:
+      return min((.95 + (.05*self.difficulty*random())), 1)
+    else:
+      return 1
+  
   def getCurrentNote(self, pos):
     if not self.mic.mic_started:
       return
     if self.tapPhraseActive:
       if self.requiredNote is not None:
-        if self.tap > 0 and not self.currentNoteItem.played:
+        if (self.tap > 0 or self.jurgenEnabled) and not self.currentNoteItem.played:
           self.tapNoteHits[self.currentTapPhrase] += 1
           self.phraseTapsHit += 1
           self.currentNoteItem.played = True
       self.lastPos = pos
       self.currentNote = self.tap
       return
-    self.peak = self.mic.getPeak()
-    self.formants = self.mic.getFormants()
+    if not self.jurgenEnabled:
+      self.peak = self.mic.getPeak()
+      self.formants = self.mic.getFormants()
+    else:
+      self.peak = -10
+      self.formants = [100, 600]
     if self.currentNote is not None:
       if abs(self.currentNote) < self.allowedDeviation:
         self.oldNote = self.currentNote
@@ -338,18 +368,21 @@ class Vocalist:
       self.starPowerCountdown = False
       self.starPowerTimer = 200
     elif self.requiredNote is not None:
-      self.currentNote = self.mic.getDeviation(self.requiredNote)
+      if self.jurgenEnabled:
+        self.currentNote = 0.0
+      else:
+        self.currentNote = self.mic.getDeviation(self.requiredNote)
       #if self.awardEnd:
       #  mult = .8
       #else:
       mult = 1
-      if self.currentNote:
+      if self.currentNote is not None:
         if self.currentNoteItem.speak or self.currentNoteItem.extra:
           self.currentNote = 0
         if abs(self.currentNote) < self.allowedDeviation and self.formants[1] is not None:
           duration = pos - self.lastPos
-          self.currentNoteItem.accuracy += duration*mult
-          self.phraseInTune += duration*self.difficultyModifier*mult
+          self.currentNoteItem.accuracy += duration*mult*self.getJurgenPct()
+          self.phraseInTune += duration*self.difficultyModifier*mult*self.getJurgenPct()
           self.pitchFudge = 70.0
         # elif self.currentNoteItem.played and self.stayEnd <= 0 and self.awardEnd:
           # self.currentNoteItem.accuracy += self.currentNoteItem.length * (1-mult)
@@ -437,7 +470,12 @@ class Vocalist:
     
     self.engine.drawImage(self.vocalLyricSheet, scale = (self.vocalLyricSheetWFactor,-self.vocalLyricSheetWFactor), coord = (w*.5,vsheetpos))
     if self.coOpFailed:
-      return
+      if self.coOpRestart:
+        self.coOpFailed = False
+        self.coOpRestart = False
+        Log.debug("Turning off coOpFailed. Rescue successful.")
+      else:
+        return
     if self.useOld:
       phraseTime   = self.oldTime
       phraseLength = self.oldLength
@@ -675,12 +713,13 @@ class Vocalist:
                   self.drawNoteLane(colors, lastNoteEnd[0], xStartPos, lastNoteEnd[1], baseY)
                 self.drawNoteLane(colors, xStartPos, xEndPos, baseY, baseY)
                 lastNoteEnd = (xEndPos, baseY)
-    if self.currentNote:
+    if self.currentNote is not None:
       rotate = 0
       if self.requiredNote:
         val = float(self.requiredNote-self.minPitch)/(self.pitchRange)
+        self.lastVal = val
       else:
-        val = 0
+        val = self.lastVal
       if abs(self.currentNote) < self.allowedDeviation:
         currentOffset = 0
         rotate = 0
@@ -692,7 +731,7 @@ class Vocalist:
           rotate = -.2
           currentOffset = -.005
       else:
-        currentOffset = (self.currentNote/12)
+        currentOffset = (self.currentNote/12.0)
       val += currentOffset
       if val > 1:
         val -= 1

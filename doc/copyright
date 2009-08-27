@@ -3,7 +3,10 @@ copyright 2006, 2007 by Sami Kyöstilä, Tommi Inkilä, Joonas Kerttula
 copyright 2008, 2009 by Team FoFiX
 except:
 
-  * Fonts data/*.ttf are (c) Bitstream (see below).
+  * Fonts data/*.ttf
+          data/themes/UberLight/*.ttf
+          data/themes/MegaLight/*.ttf
+          data/themes/MegaLight GH3/*.ttf are (c) Red Hat, Inc. (see below).
 
 Distribution, modification or commercial usage of the songs is not allowed.
 
@@ -14,118 +17,69 @@ have differing licenses.
 
 ----------------------------------------------------------------------------
 
-Bitstream Vera Fonts Copyright
-------------------------------
+LICENSE AGREEMENT AND LIMITED PRODUCT WARRANTY
+LIBERATION FONT SOFTWARE
 
-Copyright (c) 2003 by Bitstream, Inc. All Rights Reserved. Bitstream Vera is
-a trademark of Bitstream, Inc.
+This agreement governs the use of the Software and any updates to the
+Software, regardless of the delivery mechanism. Subject to the following
+terms, Red Hat, Inc. ("Red Hat") grants to the user ("Client") a license to
+this work pursuant to the GNU General Public License v.2 with the exceptions
+set forth below and such other terms as are set forth in this End User
+License Agreement.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of the fonts accompanying this license ("Fonts") and associated
-documentation files (the "Font Software"), to reproduce and distribute the
-Font Software, including without limitation the rights to use, copy, merge,
-publish, distribute, and/or sell copies of the Font Software, and to permit
-persons to whom the Font Software is furnished to do so, subject to the
-following conditions:
+ 1. The Software and License Exception. LIBERATION font software
+ (the "Software") consists of TrueType-OpenType formatted font software for
+ rendering LIBERATION typefaces in sans-serif, serif, and monospaced character
+ styles. You are licensed to use, modify, copy, and distribute the Software
+ pursuant to the GNU General Public License v.2 with the following exceptions:  
 
-The above copyright and trademark notices and this permission notice shall
-be included in all copies of one or more of the Font Software typefaces.
+  (a) As a special exception, if you create a document which uses this font,
+  and embed this font or unaltered portions of this font into the document, 
+  this font does not by itself cause the resulting document to be covered 
+  by the GNU General Public License. This exception does not however invalidate
+  any other reasons why the document might be covered by the GNU General Public License.
+  If you modify this font, you may extend this exception to your version of the font,
+  but you are not obligated to do so. If you do not wish to do so,
+  delete this exception statement from your version.
 
-The Font Software may be modified, altered, or added to, and in particular
-the designs of glyphs or characters in the Fonts may be modified and
-additional glyphs or characters may be added to the Fonts, only if the fonts
-are renamed to names not containing either the words "Bitstream" or the word
-"Vera".
+  (b) As a further exception, any distribution of the object code of the Software in
+  a physical product must provide you the right to access and modify the source code
+  for the Software and to reinstall that modified version of the Software in object
+  code form on the same physical product on which you received it.
 
-This License becomes null and void to the extent applicable to Fonts or Font
-Software that has been modified and is distributed under the "Bitstream
-Vera" names.
+ 2. Intellectual Property Rights. The Software and each of its components, including
+ the source code, documentation, appearance, structure and organization are owned by
+ Red Hat and others and are protected under copyright and other laws. Title to the
+ Software and any component, or to any copy, modification, or merged portion shall
+ remain with the aforementioned, subject to the applicable license. The "LIBERATION"
+ trademark is a trademark of Red Hat, Inc. in the U.S. and other countries. This
+ agreement does not permit Client to distribute modified versions of the Software
+ using Red Hat's trademarks. If Client makes a redistribution of a modified version
+ of the Software, then Client must modify the files names to remove any reference to
+ the Red Hat trademarks and must not use the Red Hat trademarks in any way to reference
+ or promote the modified Software. 
 
-The Font Software may be sold as part of a larger software package but no
-copy of one or more of the Font Software typefaces may be sold by itself.
+ 3. Limited Warranty. To the maximum extent permitted under applicable law, the Software
+ is provided and licensed "as is" without warranty of any kind, expressed or implied,
+ including the implied warranties of merchantability, non-infringement or fitness for a
+ particular purpose. Red Hat does not warrant that the functions contained in the Software
+ will meet Client's requirements or that the operation of the Software will be entirely
+ error free or appear precisely as described in the accompanying documentation. 
 
-THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF COPYRIGHT, PATENT,
-TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL BITSTREAM OR THE GNOME
-FOUNDATION BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, INCLUDING
-ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES,
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
-THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM OTHER DEALINGS IN THE
-FONT SOFTWARE.
+ 4. Limitation of Remedies and Liability. To the maximum extent permitted by applicable
+ law, Red Hat or any Red Hat authorized dealer will not be liable to Client for any
+ incidental or consequential damages, including lost profits or lost savings arising out
+ of the use or inability to use the Software, even if Red Hat or such dealer has been
+ advised of the possibility of such damages. 
 
-Except as contained in this notice, the names of Gnome, the Gnome
-Foundation, and Bitstream Inc., shall not be used in advertising or
-otherwise to promote the sale, use or other dealings in this Font Software
-without prior written authorization from the Gnome Foundation or Bitstream
-Inc., respectively. For further information, contact: fonts at gnome dot
-org.
-
-Copyright FAQ
-=============
-
-   1. I don't understand the resale restriction... What gives?
-
-      Bitstream is giving away these fonts, but wishes to ensure its
-      competitors can't just drop the fonts as is into a font sale system
-      and sell them as is. It seems fair that if Bitstream can't make money
-      from the Bitstream Vera fonts, their competitors should not be able to
-      do so either. You can sell the fonts as part of any software package,
-      however.
-
-   2. I want to package these fonts separately for distribution and
-      sale as part of a larger software package or system.  Can I do so?
-
-      Yes. A RPM or Debian package is a "larger software package" to begin 
-      with, and you aren't selling them independently by themselves. 
-      See 1. above.
-
-   3. Are derivative works allowed?
-      Yes!
-
-   4. Can I change or add to the font(s)?
-      Yes, but you must change the name(s) of the font(s).
-
-   5. Under what terms are derivative works allowed?
-
-      You must change the name(s) of the fonts. This is to ensure the
-      quality of the fonts, both to protect Bitstream and Gnome. We want to
-      ensure that if an application has opened a font specifically of these
-      names, it gets what it expects (though of course, using fontconfig,
-      substitutions could still could have occurred during font
-      opening). You must include the Bitstream copyright. Additional
-      copyrights can be added, as per copyright law. Happy Font Hacking!
-
-   6. If I have improvements for Bitstream Vera, is it possible they might get 
-       adopted in future versions?
-
-      Yes. The contract between the Gnome Foundation and Bitstream has
-      provisions for working with Bitstream to ensure quality additions to
-      the Bitstream Vera font family. Please contact us if you have such
-      additions. Note, that in general, we will want such additions for the
-      entire family, not just a single font, and that you'll have to keep
-      both Gnome and Jim Lyles, Vera's designer, happy! To make sense to add
-      glyphs to the font, they must be stylistically in keeping with Vera's
-      design. Vera cannot become a "ransom note" font. Jim Lyles will be
-      providing a document describing the design elements used in Vera, as a
-      guide and aid for people interested in contributing to Vera.
-
-   7. I want to sell a software package that uses these fonts: Can I do so?
-
-      Sure. Bundle the fonts with your software and sell your software
-      with the fonts. That is the intent of the copyright.
-
-   8. If applications have built the names "Bitstream Vera" into them, 
-      can I override this somehow to use fonts of my choosing?
-
-      This depends on exact details of the software. Most open source
-      systems and software (e.g., Gnome, KDE, etc.) are now converting to
-      use fontconfig (see www.fontconfig.org) to handle font configuration,
-      selection and substitution; it has provisions for overriding font
-      names and subsituting alternatives. An example is provided by the
-      supplied local.conf file, which chooses the family Bitstream Vera for
-      "sans", "serif" and "monospace".  Other software (e.g., the XFree86
-      core server) has other mechanisms for font substitution.
+ 5. General. If any provision of this agreement is held to be unenforceable, that shall
+ not affect the enforceability of the remaining provisions. This agreement shall be
+ governed by the laws of the State of North Carolina and of the United States, without
+ regard to any conflict of laws provisions, except that the United Nations Convention
+ on the International Sale of Goods shall not apply.
+ 
+Copyright © 2007 Red Hat, Inc. All rights reserved. LIBERATION is a trademark of
+Red Hat, Inc.
 
 
 ----------------------------------------------------------------------------

@@ -1,8 +1,9 @@
 #####################################################################
 # -*- coding: iso-8859-1 -*-                                        #
 #                                                                   #
-# Frets on Fire                                                     #
-# Copyright (C) 2006 Sami Kyöstilä                                  #
+# FoFiX                                                             #
+# Copyright (C) 2009 Team FoFiX                                     #
+#               2006 Sami Kyöstilä                                  #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -25,6 +26,8 @@ import time
 
 from Engine import Engine
 from Resource import Resource
+import Config
+import Version
 
 def loader():
   return 0xdada
@@ -76,6 +79,10 @@ class ResourceTest(unittest.TestCase):
     assert self.fuuba == self.quux
      
   def setUp(self):
+    Config.load(Version.appName() + ".ini", setAsDefault = True)
+    # Resource expects game_priority to be an integer,
+    # Config won't know unless we define it as such.
+    Config.define("performance", "game_priority", int, 2)
     self.e = Engine()
     
   def tearDown(self):

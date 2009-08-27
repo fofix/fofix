@@ -31,19 +31,23 @@ import struct
 
 class Video:
   def __init__(self, caption = "Game", icon = None):
-    self.screen     = None
-    self.caption    = caption
-    self.icon       = icon
-    self.fullscreen = False
-    self.flags      = True
+    self.screen       = None
+    self.caption      = caption
+    self.icon         = icon
+    self.fullscreen   = False
+    self.flags        = True
+    self.multisamples = 0
+    
+    self.default      = False
 
   def setMode(self, resolution, fullscreen = False, flags = pygame.OPENGL | pygame.DOUBLEBUF,
               multisamples = 0):
     if fullscreen:
       flags |= pygame.FULLSCREEN
       
-    self.flags      = flags
-    self.fullscreen = fullscreen
+    self.flags        = flags
+    self.fullscreen   = fullscreen
+    self.multisamples = multisamples
 
     try:    
       pygame.display.quit()
@@ -67,20 +71,15 @@ class Video:
     #            Note: For the MS Windows icon, see below.
     if not os.name == "nt" and self.icon != None:
       pygame.display.set_icon(pygame.image.load(self.icon))
-
+    
     try:
       self.screen = pygame.display.set_mode(resolution, flags)
     except Exception, e:
-      Log.error(str(e))
-      if multisamples:
-        Log.warn("Video setup failed. Trying without antialiasing.")
-        pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLEBUFFERS, 0);
-        pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLESAMPLES, 0);
-        multisamples = 0
-        self.screen = pygame.display.set_mode(resolution, flags)
-      else:
-        Log.error("Video setup failed. Make sure your graphics card supports 32 bit display modes.")
-        raise
+      errortype = str(e)
+      if "video mode" in errortype:
+        self.resolutionReset()
+      else: # "Couldn't find matching GLX visual"
+        self.multisampleReset(resolution)
         
     pygame.display.set_caption(self.caption)
     pygame.mouse.set_visible(False)
@@ -141,6 +140,37 @@ class Video:
         pass
 
     return bool(self.screen)
+    
+  def screenError(self):
+    Log.error("Video setup failed. Make sure your graphics card supports 32-bit display modes.")
+    raise
+  
+  def resolutionReset(self):
+    Log.warn("Video setup failed. Trying default windowed resolution.")
+    if self.fullscreen:
+      self.flags ^= pygame.FULLSCREEN
+      self.fullscreen = False
+    try:
+      self.screen = pygame.display.set_mode((800,600), self.flags)
+      self.default = True
+    except Exception, e:
+      if self.multisamples:
+        self.multisampleReset((800, 600))
+      else:
+        self.screenError()
+  
+  def multisampleReset(self, resolution):
+    Log.warn("Video setup failed. Trying without antialiasing.")
+    pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLEBUFFERS, 0)
+    pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLESAMPLES, 0)
+    self.multisamples = 0
+    try:
+      self.screen = pygame.display.set_mode(resolution, self.flags)
+    except Exception, e:
+      if "video mode" in str(e):
+        self.resolutionReset()
+      else:
+        self.screenError()
     
   def toggleFullscreen(self):
     assert self.screen

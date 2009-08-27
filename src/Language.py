@@ -52,9 +52,10 @@ if language:
   except Exception, x:
     Log.warn("Unable to select language '%s': %s" % (language, x))
     language = None
+    Config.set("game", "language", "")
 
 # Define the config key again now that we have some options for it
 langOptions = {"": "English"}
 for lang in getAvailableLanguages():
   langOptions[lang] = _(lang)
-Config.define("game", "language", str, "", _("Language"), langOptions)
+Config.define("game", "language", str, "", _("Language"), langOptions, tipText = _("Change the game language!"))
