@@ -113,7 +113,7 @@ FunctionEnd
 !define MUI_LICENSEPAGE_RADIOBUTTONS
 !define MUI_COMPONENTSPAGE_SMALLDESC
 !define MUI_HEADERIMAGE
-!define MUI_FINISHPAGE_TEXT "FoFiX v${FOFIX_VERSION_FULL} has been installed on your computer.$\r$\n$\r$\nClick Finish to close this wizard.$\r$\n$\r$\nInstaller by John Stumpo.$\r$\nInstaller graphics by kristijan_mkd."
+!define MUI_FINISHPAGE_TEXT "FoFiX v${FOFIX_VERSION_FULL} has been installed on your computer.$\r$\n$\r$\nClick Finish to close this wizard.$\r$\n$\r$\nInstaller by John Stumpo.$\r$\nInstaller graphics by akedrou."
 !define MUI_FINISHPAGE_TEXT_LARGE
 !define MUI_HEADERIMAGE_BITMAP "pkg\installer_gfx\header.bmp"
 !define MUI_HEADERIMAGE_UNBITMAP "pkg\installer_gfx\header.bmp"
@@ -193,13 +193,14 @@ DeleteRegKey /ifempty HKCU "SOFTWARE\myfingershurt"
 RmDir "$INSTDIR"
 ''' % MLDist.getUninstallScript(), 'Installs the core of FoFiX (required).')
 builder.filterSection('MegaLight GH3', r'data\themes\MegaLight GH3', 'Installs the MegaLight GH3 theme.', secStart='SectionGroup /e "Themes"\r\nSection')
-builder.filterSection('MegaLight', r'data\themes\MegaLight', 'Installs the MegaLight theme.', secEnd='SectionEnd\r\nSectionGroupEnd')
+builder.filterSection('MegaLight', r'data\themes\MegaLight', 'Installs the MegaLight theme.')
+builder.filterSection('UberLight', r'data\themes\UberLight', 'Installs the UberLight theme.', secEnd='SectionEnd\r\nSectionGroupEnd') 
 builder.filterSection('Low Poly CD List', r'data\mods\Low Poly CD List', 'Installs less complex CD meshes for the song list.', secStart='SectionGroup /e "Mods"\r\nSection')
 builder.filterSection('MegaLight RB Notes', r'data\mods\MegaLight RB Notes', 'Installs Rock Band-like notes for the MegaLight theme.', secEnd='SectionEnd\r\nSectionGroupEnd')
 builder.filterSection('Jurgen Tutorial', r'data\tutorials\jurgenfof', 'Installs the tutorial from the original Frets on Fire.', secStart='SectionGroup /e "Tutorials"\r\nSection')
 builder.filterSection('Bang Bang, Mystery Man', r'data\tutorials\bangbang', r'Installs $\"Bang Bang, Mystery Man$\" as a tutorial song.')
 builder.filterSection('Drum Test Song', r'data\tutorials\drumtest', 'Installs a short song for testing drum functionality.', secStart='Section /o', secEnd='SectionEnd\r\nSectionGroupEnd')
-builder.filterSection('Stock Necks', r'data\necks\Neck_', 'Installs all stock guitar neck images.', instHeader='SetOutPath "$INSTDIR\\data\\necks"\r\n')
+builder.filterSection('Hollowmind Necks', r'data\necks\hollow', 'Installs the Hollowmind neck images.', instHeader='SetOutPath "$INSTDIR\\data\\necks"\r\n')
 builder.filterSection('Source Code', 'src', 'Installs the FoFiX source code.', secStart='Section /o')
 builder.filterSection('Wiki Pages', 'FoFiX-wiki', 'Installs the FoFiX wiki pages.', secStart='Section /o')
 
@@ -281,7 +282,7 @@ FunctionEnd
 !define MUI_INSTFILESPAGE_ABORTHEADER_TEXT "Upgrade Aborted"
 !define MUI_INSTFILESPAGE_ABORTHEADER_SUBTEXT "Upgrade was aborted."
 !define MUI_FINISHPAGE_TITLE "Completing the FoFiX v${FOFIX_VERSION_OLD} to v${FOFIX_VERSION_FULL} Patch Wizard"
-!define MUI_FINISHPAGE_TEXT "FoFiX v${FOFIX_VERSION_OLD} has been upgraded to version ${FOFIX_VERSION_FULL}.$\r$\n$\r$\nClick Finish to close this wizard.$\r$\n$\r$\nInstaller by John Stumpo.$\r$\nInstaller graphics by kristijan_mkd."
+!define MUI_FINISHPAGE_TEXT "FoFiX v${FOFIX_VERSION_OLD} has been upgraded to version ${FOFIX_VERSION_FULL}.$\r$\n$\r$\nClick Finish to close this wizard.$\r$\n$\r$\nInstaller by John Stumpo.$\r$\nInstaller graphics by akedrou."
 !define MUI_FINISHPAGE_TEXT_LARGE
 !define MUI_HEADERIMAGE_BITMAP "pkg\installer_gfx\header.bmp"
 !define MUI_WELCOMEFINISHPAGE_BITMAP "pkg\installer_gfx\welcome.bmp"

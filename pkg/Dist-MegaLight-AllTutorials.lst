@@ -22,6 +22,9 @@
 "data\themes\MegaLight GH3\menu\*.*"//all
 "data\themes\MegaLight GH3\sounds\*.*"//all
 "data\themes\MegaLight GH3\stages\*.png"//all
+"data\themes\UberLight\*.*"//all
+"data\themes\UberLight\menu\*.*"//all
+"data\themes\UberLight\sounds\*.*"//all
 "data\sounds\*.*"//all base sounds
 "data\tutorials\bangbang\*.*"//all of Bang Bang Mystery Man
 "data\tutorials\jurgenfof\*.*"//all of the original Jurgen FoF tutorial
