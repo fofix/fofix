@@ -123,37 +123,10 @@ To create the executable we need a few more steps:
 
 ----
 ==For GNU/Linux==
-=== Get latest FoFiX ===
-  # Open a terminal
-  # Change to the directory in which you want to have FoFiX
-  # Execute {{{svn checkout http://fofix.googlecode.com/svn/MFH-Mod/trunk/ FoFiX-SVN}}}
-=== Install dependencies ===
-You need to install those packages:
-  * python (tested with 2.4 and 2.5)
-  * python-pygame (>= 1.9 required for 64bit CPUs)
-  * python-opengl (2.x)¹
-  * python-numpy
-  * python-numeric
-  * python-imaging
-  * python-pyogg
-  * python-pyvorbis²
-  * python-pysqlite2
-  * python-xml
-
-Optionally, if you are in 32bit you can also install python-psyco.
-
-Notes:
-  * ¹ python-opengl 3.x works okay but 2.x is still much faster.
-  * ² Under Debian unstable, make sure you have python-pyvorbis 1.3 or 1.4-2 but not 1.4-1. The latter crashes with a double free error.
-
-=== Running from sources ===
-  # Change directory to `FoFiX-SVN/src`
-  # Execute {{{python FoFiX.py}}}
-
-_(Note: Prior to r1450, 'FoFiX.py' was known as 'FretsOnFire.py')_
+Please see the dedicated [RunningUnderGNULinux running under GNU/Linux page] for instructions on getting and running FoFiX.
 
 === Creating binaries ===
-*Unless you want to distribute binaries of FoFiX this is really _not_ required.*
+*Unless you want to distribute binaries of FoFiX this is really _not_ required. Furthermore this section is depricated.*
 
 You first need to...
   # Install cxFreeze 3.0.3
@@ -169,19 +142,6 @@ Then either create a patch or a full package.
   * Execute {{{make clean patch}}}.
 ==== Full package ====
   * Execute {{{make clean bindist}}}.
-
-=== Optional PitchBending ===
-==== Requirements ====
-In order to build John Stumpo's pitchbend module you first need to install...
-  * libsdl-mixer1.2-dev
-  * libsndobj-dev
-
-==== Compiling ====
-  # Get the source code: {{{svn co https://svn.stump.jstump.com/svnroot/pitchbend/trunk pitchbend}}}
-  # Move to the source folder: {{{cd pitchbend}}}
-  # Create an empty VERSION file: {{{touch VERSION}}}
-  # Build the library: {{{python setup.py build}}}
-  # Optionally you can install it: {{{sudo python setup.py install}}}
 
 ----
 ==For MacOS X==
