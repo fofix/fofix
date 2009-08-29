@@ -130,7 +130,7 @@ To create the executable we need a few more steps:
 === Install dependencies ===
 You need to install those packages:
   * python (tested with 2.4 and 2.5)
-  * python-pygame
+  * python-pygame (>= 1.9 required for 64bit CPUs)
   * python-opengl (2.x)¹
   * python-numpy
   * python-numeric
