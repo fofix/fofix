@@ -18,19 +18,16 @@ _Alternatively, be familiar with your svn clients method of rolling back to prev
 You need to install these packages:
   * Python (tested with 2.4 and 2.5)
   * pygame (>= 1.9 required for 64bit CPUs)
-  * PyOpenGL (2.x)¹
+  * PyOpenGL (2.x is recommanded as it's much faster than 3.x for most users)
   * NumPy
   * (Python) Numeric
   * Python Imaging Library (PIL)
   * PyOgg
-  * PyVorbis²
+  * PyVorbis
   * PySqlite2
   * PyXML
 
 Optionally, if you are in 32bit you can also install Psyco.
-
-Notes:
-  * ¹ PyOpenGL 3.x works okay but 2.x is still much faster.
 
 === Optional Voice Support ===
   # Build pyaudio.
@@ -52,7 +49,10 @@ In order to build John Stumpo's pitchbend module you first need to install...
   # Optionally you can install it: {{{sudo python setup.py install}}}
 
 == Debian ==
-Execute the following as root: {{{apt-get install python-pygame python-opengl python-numpy python-numeric python-imaging python-pyogg python-vorbis python-pysqlite2 python-xml}}} .
+Execute the following as root:
+{{{
+apt-get install python-pygame python-opengl python-numpy python-numeric python-imaging python-pyogg python-vorbis python-pysqlite2 python-xml
+}}}
 
 Notes:
   * *If you are running in a 64bit environment, pygame >= 1.9 is required*. You'll need to build it yourself. Note that you don't have to install it, you can use the PYTHONPATH environment variable to point python to your pygame library (see below for an example).
@@ -63,4 +63,7 @@ Notes:
   # Change directory to the `src` folder of your FoFiX directory _e.g._ `~/fofix-svn/src`.
   # Execute {{{python FoFiX.py}}}
 
-*Note*: If you are using custom built but not installed libraries, use the PYTHONPATH environment variable _e.g._ {{{PYTHONPATH=~/pygame-1.9.1release/build/lib.linux-x86_64-2.5:~/pyaudio/build/lib.linux-x86_64-2.5 python FoFiX.py:}}} .
+*Note*: If you are using custom built but not installed libraries, use the PYTHONPATH environment variable _e.g._
+{{{
+PYTHONPATH=~/pygame-1.9.1release/build/lib.linux-x86_64-2.5:~/pyaudio/build/lib.linux-x86_64-2.5 python FoFiX.py
+}}}
