@@ -6,8 +6,8 @@ You are required to have the {{{svn}}} client.
   # Open a terminal
   # Change to the directory in which you want to have FoFiX
   # Execute one of the following depending on the version you want:
-    # Stable: {{{svn checkout http://fofix.googlecode.com/svn/MFH-Mod/tags/Release_3.120_rc1 fofix-3.120~rc1}}}
-    # Testing: {{{svn checkout http://fofix.googlecode.com/svn/MFH-Mod/tags/Release_3.100 fofix-3.100}}}
+    # Stable: {{{svn checkout http://fofix.googlecode.com/svn/MFH-Mod/tags/Release_3.100 fofix-3.100}}}
+    # Testing: {{{svn checkout http://fofix.googlecode.com/svn/MFH-Mod/tags/Release_3.120_rc1 fofix-3.120~rc1}}}
     # Unstable: {{{svn checkout http://fofix.googlecode.com/svn/MFH-Mod/trunk/ fofix-svn}}}
 
 _It is highly recommended that when you use the unstable version (when you become an Alpha tester), you keep a separate FoFiX folder containing a full install of the latest stable release - as the Alpha versions' new features and bugfixes might cause other issues affecting playability._
