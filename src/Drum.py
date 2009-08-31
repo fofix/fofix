@@ -973,7 +973,7 @@ class Drum:
       if self.staratex == True and self.starPowerActive and isOpen==False:
         glColor3f(1,1,1)
         glEnable(GL_TEXTURE_2D)
-        getattr(self,"startex"+chr(97+fret)).texture.bind()
+        getattr(self,"staratex"+chr(97+fret)).texture.bind()
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
