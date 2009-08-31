@@ -48,16 +48,24 @@ In order to build John Stumpo's pitchbend module you first need to install...
   # Build the library: {{{python setup.py build}}}
   # Optionally you can install it: {{{sudo python setup.py install}}}
 
-== Debian ==
-Execute the following as root:
+== Debian and Ubuntu ==
+Execute the following as root to install the dependencies:
 {{{
-apt-get install python-pygame python-opengl python-numpy python-numeric python-imaging python-pyogg python-vorbis python-pysqlite2 python-xml
+apt-get install python-pygame python-opengl python-numpy python-imaging python-ogg python-pyvorbis python-pysqlite2 python-xml python2.5-dev
 }}}
 
 Notes:
   * *If you are running in a 64bit environment, pygame >= 1.9 is required*. You'll need to build it yourself. Note that you don't have to install it, you can use the PYTHONPATH environment variable to point python to your pygame library (see below for an example).
 
   * Under Debian unstable, make sure you have python-pyvorbis 1.3 or >= 1.4-2 but not 1.4-1. The latter crashes with a double free error.
+
+=== Getting and installing pygame 1.9.1 ===
+{{{
+wget http://www.pygame.org/ftp/pygame-1.9.1release.tar.gz
+tar xvf pygame-1.9.1release.tar.gz
+cd pygame-1.9.1release/
+sudo python2.5 setup.py
+}}}
 
 = Running the game =
   # Change directory to the `src` folder of your FoFiX directory _e.g._ `~/fofix-svn/src`.
