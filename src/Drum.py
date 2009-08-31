@@ -970,7 +970,7 @@ class Drum:
       elif fret == 3:
         glRotate(Theme.noterotdegrees, 0, 0, Theme.noterot[3])
 
-      if self.staratex == True and self.starPowerActive and isOpen==False:
+      if self.staratex == True and self.starPowerActive and isOpen==False and spNote == False:
         glColor3f(1,1,1)
         glEnable(GL_TEXTURE_2D)
         getattr(self,"staratex"+chr(97+fret)).texture.bind()

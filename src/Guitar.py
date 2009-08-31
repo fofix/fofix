@@ -933,7 +933,7 @@ class Guitar:
 
       glRotatef(Theme.noterotdegrees, 0, 0, Theme.noterot[fret])
 
-      if self.staratex == True and self.starPowerActive:
+      if self.staratex == True and self.starPowerActive and spNote == False:
         glColor3f(1,1,1)
         glEnable(GL_TEXTURE_2D)
         getattr(self,"staratex"+chr(97+fret)).texture.bind()
