@@ -67,6 +67,15 @@ cd pygame-1.9.1release/
 sudo python2.5 setup.py
 }}}
 
+= Links to your songs and themes =
+You may very well use symbolic links to point to your songs and themes.
+That prevents you from having to copy your files over and over.
+Here are two examples:
+{{{
+ln -s ~/games/FoFiX/data/songs/ ~/games/fofix-3.120~rc1/data/songs
+ln -s ~/games/FoFiX/data/themes/RB2\ Spanish ~/games/fofix-3.120~rc1/data/themes/RB2\ Spanish
+}}}
+
 = Running the game =
   # Change directory to the `src` folder of your FoFiX directory _e.g._ `~/fofix-svn/src`.
   # Execute {{{python FoFiX.py}}}
