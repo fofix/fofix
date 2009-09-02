@@ -40,7 +40,7 @@ You need to install these packages:
 Optionally, if you are in 32bit you can also install Psyco.
 
 === Getting and installing pygame 1.9.x ===
-The following builds the latest pygame release. Note that the last step needs to be done as root (_e.g._ using `sudo`).
+The following downloads and builds the latest pygame release. Note that the last step needs to be done as root (_e.g._ using `sudo`) if you choose to install pygame (system-wide).
 {{{
 wget http://www.pygame.org/ftp/pygame-1.9.1release.tar.gz
 tar xvf pygame-1.9.1release.tar.gz
