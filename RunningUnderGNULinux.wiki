@@ -1,6 +1,13 @@
 #summary How to run FoFiX under GNU/Linux
 #labels Phase-Deployment
 <wiki:toc max_depth="2" />
+= Introduction =
+The following provides instructions to get FoFiX running on (hopefully) any (modern?) GNU/Linux distribution.
+
+Comments and suggestions are always welcome.
+
+*Note:* In all places where the python interpreter is called, `python` can be replaced by a specific version _e.g._ `python2.5`. Remember that if you do it once, you'll have to do it everywhere.
+
 =Getting FoFiX=
 You are required to have the {{{svn}}} client.
   # Open a terminal
@@ -86,7 +93,7 @@ ln -s ~/games/FoFiX/data/themes/RB2\ Spanish ~/games/fofix-3.120~rc1/data/themes
   # Change directory to the `src` folder of your FoFiX directory _e.g._ `~/fofix-svn/src`.
   # Execute {{{python FoFiX.py}}}
 
-*Note*: If you are using custom built but not installed libraries, use the PYTHONPATH environment variable _e.g._
+*Note:* If you are using custom built but not installed libraries, use the PYTHONPATH environment variable _e.g._
 {{{
 PYTHONPATH=~/pygame-1.9.1release/build/lib.linux-x86_64-2.5:~/pyaudio/build/lib.linux-x86_64-2.5 python FoFiX.py
 }}}
