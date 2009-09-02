@@ -39,12 +39,13 @@ You need to install these packages:
 
 Optionally, if you are in 32bit you can also install Psyco.
 
-=== Getting and installing pygame 1.9.1 ===
+=== Getting and installing pygame 1.9.x ===
+The following builds the latest pygame release. Note that the last step needs to be done as root (_e.g._ using `sudo`).
 {{{
 wget http://www.pygame.org/ftp/pygame-1.9.1release.tar.gz
 tar xvf pygame-1.9.1release.tar.gz
 cd pygame-1.9.1release/
-sudo python2.5 setup.py
+python setup.py
 }}}
 
 === Optional Voice Support ===
@@ -66,6 +67,24 @@ In order to build John Stumpo's pitchbend module you first need to install...
   # Build the library: {{{python setup.py build}}}
   # Optionally you can install it: {{{sudo python setup.py install}}}
 
+== Links to your songs and themes ==
+You may very well use symbolic links to point to your songs and themes.
+That prevents you from having to copy your files over and over.
+Here are two examples:
+{{{
+ln -s ~/games/FoFiX/data/songs/ ~/games/fofix-3.120~rc1/data/songs
+ln -s ~/games/FoFiX/data/themes/RB2\ Spanish ~/games/fofix-3.120~rc1/data/themes/RB2\ Spanish
+}}}
+
+== Running the game ==
+  # Change directory to the `src` folder of your FoFiX directory _e.g._ `~/fofix-svn/src`.
+  # Execute {{{python FoFiX.py}}}
+
+*Note:* If you are using custom built but not installed libraries, use the PYTHONPATH environment variable _e.g._
+{{{
+PYTHONPATH=~/pygame-1.9.1release/build/lib.linux-x86_64-2.5:~/pyaudio/build/lib.linux-x86_64-2.5 python FoFiX.py
+}}}
+
 = Distribution-specific instructions =
 If your distribution is not listed here and you got FoFiX to work, please create a wishlist item on our issues tracker to share the required procedure.
 
@@ -75,27 +94,9 @@ Execute the following as root to install the dependencies:
 apt-get install python-pygame python-opengl python-numpy python-imaging python-ogg python-pyvorbis python-pysqlite2 python-xml python2.5-dev
 }}}
 
-Notes:
-  * *If you are running in a 64bit environment, pygame >= 1.9 is required*. You'll need to build it yourself (See [#Getting_and_installing_pygame_1.9.1]). Note that you don't have to install it, you can use the PYTHONPATH environment variable to point python to your pygame library (see below for an example).
+*Notes:*
+  * *If you are running in a 64bit environment, pygame >= 1.9 is required*. You'll need to build it yourself (See [#Getting_and_installing_pygame_1.9.x]). Note that you don't have to install it, you can use the PYTHONPATH environment variable to point python to your pygame library (see below for an example).
 
   * Under Debian unstable, make sure you have python-pyvorbis 1.3 or >= 1.4-2 but not 1.4-1. The latter crashes with a double free error.
 
   * Under Ubuntu, make sure you use python2.5 all over the place.
-
-= Links to your songs and themes =
-You may very well use symbolic links to point to your songs and themes.
-That prevents you from having to copy your files over and over.
-Here are two examples:
-{{{
-ln -s ~/games/FoFiX/data/songs/ ~/games/fofix-3.120~rc1/data/songs
-ln -s ~/games/FoFiX/data/themes/RB2\ Spanish ~/games/fofix-3.120~rc1/data/themes/RB2\ Spanish
-}}}
-
-= Running the game =
-  # Change directory to the `src` folder of your FoFiX directory _e.g._ `~/fofix-svn/src`.
-  # Execute {{{python FoFiX.py}}}
-
-*Note:* If you are using custom built but not installed libraries, use the PYTHONPATH environment variable _e.g._
-{{{
-PYTHONPATH=~/pygame-1.9.1release/build/lib.linux-x86_64-2.5:~/pyaudio/build/lib.linux-x86_64-2.5 python FoFiX.py
-}}}
