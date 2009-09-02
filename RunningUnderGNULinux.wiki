@@ -80,6 +80,8 @@ Notes:
 
   * Under Debian unstable, make sure you have python-pyvorbis 1.3 or >= 1.4-2 but not 1.4-1. The latter crashes with a double free error.
 
+  * Under Ubuntu, make sure you use python2.5 all over the place.
+
 = Links to your songs and themes =
 You may very well use symbolic links to point to your songs and themes.
 That prevents you from having to copy your files over and over.
