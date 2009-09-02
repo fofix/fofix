@@ -14,7 +14,10 @@ _It is highly recommended that when you use the unstable version (when you becom
 
 _Alternatively, be familiar with your svn clients method of rolling back to previous revisions so you can downgrade to a working revision if the latest one breaks on you e.g. at the commandline, you may use {{{svn up -r<revision_number>}}} to rollback to the specified version._
 
-= Install dependencies =
+= Generic instructions =
+The following gives instructions that should work on most GNU/Linux distributions. If there are specific instructions for your distribution, you may want to have a look at that section instead of this one.
+ 
+== Install dependencies ==
 You need to install these packages:
   * Python (tested with 2.4 and 2.5)
   * pygame (>= 1.9 required for 64bit CPUs)
@@ -28,6 +31,14 @@ You need to install these packages:
   * PyXML
 
 Optionally, if you are in 32bit you can also install Psyco.
+
+=== Getting and installing pygame 1.9.1 ===
+{{{
+wget http://www.pygame.org/ftp/pygame-1.9.1release.tar.gz
+tar xvf pygame-1.9.1release.tar.gz
+cd pygame-1.9.1release/
+sudo python2.5 setup.py
+}}}
 
 === Optional Voice Support ===
   # Build pyaudio.
@@ -48,6 +59,9 @@ In order to build John Stumpo's pitchbend module you first need to install...
   # Build the library: {{{python setup.py build}}}
   # Optionally you can install it: {{{sudo python setup.py install}}}
 
+= Distribution-specific instructions =
+If your distribution is not listed here and you got FoFiX to work, please create a wishlist item on our issues tracker to share the required procedure.
+
 == Debian and Ubuntu ==
 Execute the following as root to install the dependencies:
 {{{
@@ -55,17 +69,9 @@ apt-get install python-pygame python-opengl python-numpy python-imaging python-o
 }}}
 
 Notes:
-  * *If you are running in a 64bit environment, pygame >= 1.9 is required*. You'll need to build it yourself. Note that you don't have to install it, you can use the PYTHONPATH environment variable to point python to your pygame library (see below for an example).
+  * *If you are running in a 64bit environment, pygame >= 1.9 is required*. You'll need to build it yourself (See [#Getting_and_installing_pygame_1.9.1]). Note that you don't have to install it, you can use the PYTHONPATH environment variable to point python to your pygame library (see below for an example).
 
   * Under Debian unstable, make sure you have python-pyvorbis 1.3 or >= 1.4-2 but not 1.4-1. The latter crashes with a double free error.
-
-=== Getting and installing pygame 1.9.1 ===
-{{{
-wget http://www.pygame.org/ftp/pygame-1.9.1release.tar.gz
-tar xvf pygame-1.9.1release.tar.gz
-cd pygame-1.9.1release/
-sudo python2.5 setup.py
-}}}
 
 = Links to your songs and themes =
 You may very well use symbolic links to point to your songs and themes.
