@@ -687,7 +687,7 @@ class CreateCharacter(Layer, KeyListener):
       self.choices[self.selected] = self.choices[self.selected][:-1]
     elif unicode and ord(unicode) > 31 and self.active:
       if self.selected == 0 or self.selected == 7:
-        if self.selected == 0 and ord(unicode) in (34, 42, 47, 58, 60, 62, 63, 92, 124):
+        if self.selected == 0 and (ord(unicode) in (34, 42, 47, 58, 60, 62, 63, 92, 124) or ord(unicode) > 126): #ascii only
           self.engine.data.cancelSound.play()
           return True
         if len(self.choices[self.selected]) > 24:
