@@ -54,10 +54,10 @@ class Vocalist:
     self.isDrum = False
     self.isBassGuitar = False
     self.isVocal = True
+    self.neck = None
     self.canGuitarSolo = False
     self.guitarSolo    = False
     self.useMidiSoloMarkers = False
-    self.neckrender = None
     self.earlyHitWindowSizeFactor = 0
     self.starNotesSet = True
     self.spEnabled = False

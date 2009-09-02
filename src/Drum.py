@@ -31,6 +31,7 @@
 import Player
 from Song import Note, Tempo
 from Mesh import Mesh
+from Neck import Neck
 import Theme
 import random
 from copy import deepcopy
@@ -68,7 +69,6 @@ class Drum:
     self.isDrum = True
     self.isBassGuitar = False
     self.isVocal = False
-
 
     #self.starPowerDecreaseDivisor = 200.0*self.engine.audioSpeedFactor
     self.starPowerDecreaseDivisor = 200.0/self.engine.audioSpeedFactor
@@ -254,7 +254,6 @@ class Drum:
 
     self.spEnabled = True
     self.starPower = 0
-    self.starPowerActive = False
     self.starPowerGained = False
 
     self.starpowerMode = self.engine.config.get("game", "starpower_mode") #MFH
@@ -310,8 +309,6 @@ class Drum:
     self.freestyleHit = [False, False, False, False, False]
 
 
-    playerObj = None
-
     #Get theme
     themename = self.engine.data.themeLabel
     #now theme determination logic is only in data.py:
@@ -331,7 +328,6 @@ class Drum:
     self.twoDkeys = Theme.twoDkeys 
     self.threeDspin = Theme.threeDspin 
     self.opencolor = Theme.opencolor 
-    self.ocount = 0
     self.noterotate = self.engine.config.get("coffee", "noterotate")
     self.rockLevel = 0.0
     self.failcount = 0
@@ -528,11 +524,6 @@ class Drum:
       engine.loadImgDrawing(self, "hitlightning", os.path.join("themes",themename,"lightning.png"),  textureSize = (128, 128))
 
 
-      #MFH: support for optional drum_overdrive_string_flash.png
-      self.overdriveFlashCounts = self.indexFps/4   #how many cycles to display the oFlash: self.indexFps/2 = 1/2 second
-      self.overdriveFlashCount = self.overdriveFlashCounts
-
-
     #t'aint no tails in drums, yo.
     self.simpleTails = True
     self.tail1 = None
@@ -557,10 +548,6 @@ class Drum:
     self.disableFretSFX  = self.engine.config.get("video", "disable_fretsfx")
     self.disableFlameSFX  = self.engine.config.get("video", "disable_flamesfx")
 
-    self.overdriveFlashCounts = self.indexFps/4   #how many cycles to display the oFlash: self.indexFps/2 = 1/2 second
-
-    #Blazingamer: These variables are updated through the guitarscene which then pass 
-    #through to the neck because it is used in both the neck.py and the guitar.py
     self.canGuitarSolo = False
     self.guitarSolo = False
     self.fretboardHop = 0.00  #stump
@@ -568,8 +555,8 @@ class Drum:
     self.coOpFailed = False #akedrou
     self.coOpRestart = False #akedrou
     self.starPowerActive = False
-    self.overdriveFlashCount = self.overdriveFlashCounts
-
+    self.neck = Neck(self.engine, self, playerObj)
+    
   def selectPreviousString(self):
     self.selectedString = (self.selectedString - 1) % self.strings
 
@@ -651,6 +638,7 @@ class Drum:
 
   def setMultiplier(self, multiplier):
     self.scoreMultiplier = multiplier
+    self.neck.scoreMultiplier = multiplier
 
 
   #volshebnyi
@@ -1112,9 +1100,11 @@ class Drum:
         if self.lastBpmChange > 0 and self.disableVBPM == True:
           continue
         if (pos - time > self.currentPeriod or self.lastBpmChange < 0) and time > self.lastBpmChange:
-          self.baseBeat         += (time - self.lastBpmChange) / self.currentPeriod
-          self.targetBpm         = event.bpm
-          self.lastBpmChange     = time
+          self.baseBeat          += (time - self.lastBpmChange) / self.currentPeriod
+          self.targetBpm          = event.bpm
+          self.lastBpmChange      = time
+          self.neck.lastBpmChange = time
+          self.neck.baseBeat      = self.baseBeat
         #  self.setBPM(self.targetBpm) # glorandwarf: was setDynamicBPM(self.targetBpm)
         continue
 
@@ -1280,9 +1270,11 @@ class Drum:
         if self.lastBpmChange > 0 and self.disableVBPM == True:
           continue
         if (pos - time > self.currentPeriod or self.lastBpmChange < 0) and time > self.lastBpmChange:
-          self.baseBeat         += (time - self.lastBpmChange) / self.currentPeriod
-          self.targetBpm         = event.bpm
-          self.lastBpmChange     = time
+          self.baseBeat          += (time - self.lastBpmChange) / self.currentPeriod
+          self.targetBpm          = event.bpm
+          self.lastBpmChange      = time
+          self.neck.lastBpmChange = time
+          self.neck.baseBeat      = self.baseBeat
         #  self.setBPM(self.targetBpm) # glorandwarf: was setDynamicBPM(self.targetBpm)
         continue
 
@@ -1380,7 +1372,7 @@ class Drum:
               self.starPower = 100
             self.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
             self.starPowerGained = True
-            self.ocount = 0
+            self.neck.ocount = 0
 
       #if enable:
       #  self.spEnabled = True
@@ -2411,11 +2403,6 @@ class Drum:
       if self.leftyMode:
         glScalef(-1, 1, 1)
 
-      if self.ocount < 1:
-        self.ocount += .1
-      else:
-        self.ocount = 1
-
       if self.freestyleActive or self.drumFillsActive:
         self.renderOpenNotes(visibility, song, pos)
         self.renderNotes(visibility, song, pos)
@@ -2444,9 +2431,6 @@ class Drum:
 
       if self.leftyMode:
         glScalef(-1, 1, 1)
-
-    if self.theme == 2 and self.overdriveFlashCount < self.overdriveFlashCounts:
-      self.overdriveFlashCount = self.overdriveFlashCount + 1
 
   def getMissedNotes(self, song, pos, catchup = False):
     if not song:

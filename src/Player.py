@@ -442,7 +442,7 @@ def loadControls():
   i = 1
   Config.define("game", "control0",           str,   "defaultg", text = tsControl % 1,                options = controllerDict, tipText = tsControlTip % 1)
   
-  controllerDict["None"] = None
+  controllerDict[_("None")] = None
   
   Config.define("game", "control1",           str,   "defaultd", text = tsControl % 2,                options = controllerDict, tipText = tsControlTip % 2)
   Config.define("game", "control2",           str,   defMic,     text = tsControl % 3,                options = controllerDict, tipText = tsControlTip % 3)
@@ -784,7 +784,7 @@ class Controls:
         if value in okconflict:
           if self.getMapping(key) in okconflict:
             continue
-        a.append("%s conflicts with %s" % (keyName(value), keyName(self.getMapping(key))))
+        a.append(_("%s conflicts with %s") % (keyName(value), keyName(self.getMapping(key))))
     if len(a) == 0:
       return newDict
     self.overlap.extend(a)
@@ -872,7 +872,7 @@ def setNewKeyMapping(engine, config, section, option, key):
   b = isKeyMappingOK(config, option)
   if b != 0:
     if keyCheckerMode > 0:
-      Dialogs.showMessage(engine, "This key conflicts with the following keys: %s" % str(b))
+      Dialogs.showMessage(engine, _("This key conflicts with the following keys: %s") % str(b))
     if keyCheckerMode == 2:   #enforce no conflicts!
       config.set(section, option, oldKey)
     return False

@@ -422,6 +422,7 @@ class ControlCreator(BackgroundLayer, KeyListener):
         self.config.set("controller", "key_action2", self.config.getDefault("controller", "key_action2"))
     
     if type == 0:
+      self.config.set("controller", "key_1a", None)
       if str(self.config.get("controller", "key_5")) == "None":
         self.config.set("controller", "key_5", self.config.getDefault("controller", "key_5"))
       if str(self.config.get("controller", "key_kill")) == "None":
@@ -1107,8 +1108,9 @@ class SettingsMenu(Menu.Menu):
       if len(self.engine.input.controls.overlap) > 0 and self.keyCheckerMode > 0:
         n = 0
         for i in self.engine.input.controls.overlap:
-          if n > 1:
-            Dialogs.showMessage(self.engine, _("%d more conflicts.") % (len(self.engine.input.controls.overlap)-2))
+          if n > 2 and len(self.engine.input.controls.overlap) > 4:
+            Dialogs.showMessage(self.engine, _("%d more conflicts.") % (len(self.engine.input.controls.overlap)-3))
+            break
           Dialogs.showMessage(self.engine, i)
           n+= 1
         if self.keyCheckerMode == 2:

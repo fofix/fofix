@@ -73,9 +73,6 @@ import Image
 import ImageDraw
 from Svg import ImgDrawing
 
-#blazingamer: New neck/board rendering class
-from Neck import Neck
-
 #blazingamer: Little fix for RB Score font
 from pygame import version
 
@@ -258,7 +255,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         gNum += 1
         if self.firstGuitar is None:
           self.firstGuitar = j
-        self.neckrender.append(Neck(self.engine, self.instruments[j], player))
+        self.neckrender.append(self.instruments[j].neck)
         if self.instruments[j].isDrum:
           self.keysList.append(player.drums)
           self.soloKeysList.append(player.drumSolo)
@@ -2220,6 +2217,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         instrument.paused = True
         if instrument.isVocal:
           instrument.stopMic()
+        else:
+          instrument.neck.paused = True
 
   def failGame(self):
     self.engine.view.pushLayer(self.failMenu)
@@ -2230,6 +2229,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         instrument.paused = False
         if instrument.isVocal:
           instrument.stopMic()
+        else:
+          instrument.neck.paused = False
     self.failEnd = True
 
   def resumeGame(self):
@@ -2248,6 +2249,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           instrument.paused = False
           if instrument.isVocal:
             instrument.startMic()
+          else:
+            instrument.neck.paused = False
 
   def resumeSong(self):
     self.engine.view.popLayer(self.menu)
@@ -2931,6 +2934,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       instrument.sameNoteHopoString = False
       instrument.hopoLast = -1
       instrument.guitarSolo = False
+      instrument.neck.guitarSolo = False
       instrument.currentGuitarSoloHitNotes = 0
     
     if self.partyMode == True:
@@ -3004,6 +3008,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.currentGuitarSoloTotalNotes[i] = self.guitarSolos[i][self.currentGuitarSolo[i]]
     self.guitarSoloBroken[i] = False
     self.instruments[i].guitarSolo = True
+    if not self.instruments[i].isVocal:
+      self.instruments[i].neck.guitarSolo = True
     #self.displayText[i] = _("Guitar Solo!")
     instrumentSoloString = "%s %s" % (self.playerList[i].part.text, self.tsSolo)
     if self.phrases > 1:
@@ -3015,6 +3021,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     i = playerNum
     #Guitar Solo End
     self.instruments[i].guitarSolo = False
+    if not self.instruments[i].isVocal:
+      self.instruments[i].neck.guitarSolo = False
     #self.sfxChannel.setVolume(self.sfxVolume)    #liquid
     self.guitarSoloAccuracy[i] = (float(self.instruments[i].currentGuitarSoloHitNotes) / float(self.currentGuitarSoloTotalNotes[i]) ) * 100.0
     if not self.guitarSoloBroken[i]:    #backup perfect solo detection
@@ -5517,8 +5525,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           for i in range(self.numOfPlayers):
             self.hopFretboard(i, 0.07)  #stump
             self.instruments[i].starPowerActive = True
-            self.instruments[i].overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
-            self.instruments[i].ocount = 0  #MFH - this triggers the oFlash strings & timer
+            self.instruments[i].neck.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
+            self.instruments[i].neck.ocount = 0  #MFH - this triggers the oFlash strings & timer
         else:
           if time - self.coOpStarPowerTimer > 1000.0:
             for i in range(self.numOfPlayers):
@@ -5550,8 +5558,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               self.numDeadPlayers -= 1
               if not guitar.isVocal:
                 self.hopFretboard(num, 0.07)  #stump
-                guitar.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
-                guitar.ocount = 0  #MFH - this triggers the oFlash strings & timer
+                guitar.neck.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
+                guitar.neck.ocount = 0  #MFH - this triggers the oFlash strings & timer
               break
           else:
             if not guitar.starPowerActive:
@@ -5559,16 +5567,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               guitar.starPowerActive = True #QQstarS:Set [0] to [i]
               if not guitar.isVocal:
                 self.hopFretboard(num, 0.07)  #stump
-                guitar.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
-                guitar.ocount = 0  #MFH - this triggers the oFlash strings & timer
+                guitar.neck.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
+                guitar.neck.ocount = 0  #MFH - this triggers the oFlash strings & timer
         else:
           if not guitar.starPowerActive:
             self.engine.data.starActivateSound.play()
             guitar.starPowerActive = True #QQstarS:Set [0] to [i]
             if not guitar.isVocal:
               self.hopFretboard(num, 0.07)  #stump
-              guitar.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
-              guitar.ocount = 0  #MFH - this triggers the oFlash strings & timer
+              guitar.neck.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
+              guitar.neck.ocount = 0  #MFH - this triggers the oFlash strings & timer
 
   def goToResults(self):
     self.ending = True
@@ -8041,8 +8049,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   for j in self.instruments: #MFH - flash overdrive strings in RB theme
                     if j.isVocal:
                       continue
-                    j.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
-                    j.ocount = 0  #MFH - this triggers the oFlash strings & timer
+                    j.neck.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
+                    j.neck.ocount = 0  #MFH - this triggers the oFlash strings & timer
                 if self.rockTimer < self.rockCountdown:
                   self.rockTimer += 1
                   self.engine.drawImage(self.rockMsg, scale = (0.5, -0.5), coord = (w/2,h/2))

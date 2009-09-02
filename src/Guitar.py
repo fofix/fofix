@@ -30,6 +30,7 @@
 import Player
 from Song import Note, Tempo
 from Mesh import Mesh
+from Neck import Neck
 import Theme
 import random
 from copy import deepcopy
@@ -293,11 +294,6 @@ class Guitar:
     
     self.freestyleHit = [False, False, False, False, False]
 
-    self.playerObj = playerObj
-
-
-
-    playerObj = None
     #Get theme
     themename = self.engine.data.themeLabel
     #now theme determination logic is only in data.py:
@@ -537,12 +533,8 @@ class Guitar:
     self.disableFretSFX  = self.engine.config.get("video", "disable_fretsfx")
     self.disableFlameSFX  = self.engine.config.get("video", "disable_flamesfx")
 
-    self.overdriveFlashCounts = self.indexFps/4   #how many cycles to display the oFlash: self.indexFps/2 = 1/2 second
-
     self.rockLevel = 0.0
 
-    #Blazingamer: These variables are updated through the guitarscene which then pass 
-    #through to the neck because it is used in both the neck.py and the guitar.py
     self.canGuitarSolo = False
     self.guitarSolo = False
     self.fretboardHop = 0.00  #stump
@@ -550,9 +542,8 @@ class Guitar:
     self.coOpFailed = False #akedrou
     self.coOpRestart = False #akedrou
     self.starPowerActive = False
-    self.overdriveFlashCount = self.overdriveFlashCounts
-    self.ocount = 0
-    
+    self.neck = Neck(self.engine, self, playerObj)
+  
   def selectPreviousString(self):
     self.selectedString = (self.selectedString - 1) % self.strings
 
@@ -642,6 +633,7 @@ class Guitar:
     
   def setMultiplier(self, multiplier):
     self.scoreMultiplier = multiplier
+    self.neck.scoreMultiplier = multiplier
 
 
   def renderTail(self, length, sustain, kill, color, flat = False, tailOnly = False, isTappable = False, big = False, fret = 0, spNote = False, freestyleTail = 0, pos = 0):
@@ -1119,9 +1111,11 @@ class Guitar:
         if self.lastBpmChange > 0 and self.disableVBPM == True:
             continue
         if (pos - time > self.currentPeriod or self.lastBpmChange < 0) and time > self.lastBpmChange:
-          self.baseBeat         += (time - self.lastBpmChange) / self.currentPeriod
-          self.targetBpm         = event.bpm
-          self.lastBpmChange     = time
+          self.baseBeat          += (time - self.lastBpmChange) / self.currentPeriod
+          self.targetBpm          = event.bpm
+          self.lastBpmChange      = time
+          self.neck.lastBpmChange = time
+          self.neck.baseBeat      = self.baseBeat
         #  self.setBPM(self.targetBpm) # glorandwarf: was setDynamicBPM(self.targetBpm)
         continue
       
@@ -1212,7 +1206,7 @@ class Guitar:
                 self.starPower += 25
               if self.starPower > 100:
                 self.starPower = 100
-            self.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
+            self.neck.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
             self.starPowerGained = True
 
       if event.tappable < 2:
@@ -1379,10 +1373,9 @@ class Guitar:
                 self.starPower += 25
               if self.starPower > 100:
                 self.starPower = 100
-            self.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
+            self.neck.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
             self.starPowerGained = True
-            if self.theme == 2:
-              self.ocount = 0
+            self.neck.ocount = 0
 
       if event.tappable < 2:
         isTappable = False
@@ -2072,11 +2065,6 @@ class Guitar:
       elif self.battleStatus[6]:
         glScalef(-1, 1, 1)
 
-      if self.ocount < 1:
-        self.ocount += .1
-      else:
-        self.ocount = 1
-
       if self.freestyleActive:
         self.renderTails(visibility, song, pos, killswitch)
         self.renderNotes(visibility, song, pos, killswitch)
@@ -2110,9 +2098,6 @@ class Guitar:
           glScalef(-1, 1, 1)
       elif self.battleStatus[6]:
         glScalef(-1, 1, 1)
-
-    if self.theme == 2 and self.overdriveFlashCount < self.overdriveFlashCounts:
-      self.overdriveFlashCount = self.overdriveFlashCount + 1
 
   def getMissedNotes(self, song, pos, catchup = False):
     if not song:
@@ -2830,9 +2815,6 @@ class Guitar:
           shaders.var["fretpos"][self.player][theFret]=pos
         numHits += 1
     return numHits
-
-
-
 
   def endPick(self, pos):
     for time, note in self.playedNotes:

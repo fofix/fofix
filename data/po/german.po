@@ -5,17 +5,18 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: 1.00\n"
+"Project-Id-Version: FoFiX v3.120\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: \n"
-"PO-Revision-Date: 2009-07-20 12:08+0100\n"
-"Last-Translator: Felix <felixottoraab@yahoo.de>\n"
+"POT-Creation-Date: 2009-09-02 04:03-0600\n"
+"PO-Revision-Date: 2009-09-02 04:21-0700\n"
+"Last-Translator: \n"
 "Language-Team: icke01 <FORaab@gmail.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-Language: German\n"
 "X-Poedit-Country: GERMANY\n"
+"X-Poedit-SourceCharset: iso-8859-1\n"
 
 #: Credits.py:126
 msgid "This mod was built on Alarian's mod,"
@@ -164,46 +165,50 @@ msgid "French"
 msgstr "Französisch"
 
 #: Credits.py:164
+msgid "French (reform 1990)"
+msgstr "Französisch (Reform 1990)"
+
+#: Credits.py:165
 msgid "German"
 msgstr "Deutsch"
 
-#: Credits.py:165
+#: Credits.py:166
 msgid "Italian"
 msgstr "Italienisch"
 
-#: Credits.py:166
+#: Credits.py:167
 msgid "Pig Latin"
 msgstr "Pig Latin"
 
-#: Credits.py:167
+#: Credits.py:168
 msgid "Portuguese (Brazilian)"
 msgstr "Portugiesisch (Brasilianisch)"
 
-#: Credits.py:168
+#: Credits.py:169
 msgid "Russian"
 msgstr "Russisch"
 
-#: Credits.py:169
+#: Credits.py:170
 msgid "Spanish"
 msgstr "Spanisch"
 
-#: Credits.py:170
+#: Credits.py:171
 msgid "Swedish"
 msgstr "Schwedisch"
 
-#: Credits.py:205
+#: Credits.py:206
 msgid "Made with:"
 msgstr "Erstellt mit:"
 
-#: Credits.py:228
+#: Credits.py:229
 msgid "Source Code available under the GNU General Public License"
 msgstr "Source Code verfügbar unter der GNU General Public License"
 
-#: Credits.py:232
+#: Credits.py:233
 msgid "Copyright 2006, 2007 by Unreal Voodoo"
 msgstr "Copyright 2006, 2007 von Unreal Voodoo"
 
-#: Credits.py:233
+#: Credits.py:234
 msgid "Copyright 2008, 2009 by Team FoFiX"
 msgstr "Copyright 2008, 2009 von Team FoFiX"
 
@@ -221,7 +226,7 @@ msgid "Browsing Collection..."
 msgstr "Durchsuche Verzeichnis"
 
 #: Dialogs.py:987
-#: Song.py:4365
+#: Song.py:4372
 msgid "End of Career"
 msgstr "Ende der Karriere"
 
@@ -330,536 +335,537 @@ msgstr "Bist du sicher das du die gesamte Karriere zurücksetzen möchtest?"
 msgid "Resetting career..."
 msgstr "Karriere zurücksetzen..."
 
-#: Dialogs.py:1845
-#: Dialogs.py:2086
-#: Dialogs.py:2377
-#: Dialogs.py:2725
-#: Dialogs.py:2945
-#: Dialogs.py:3310
+#: Dialogs.py:1851
+#: Dialogs.py:2092
+#: Dialogs.py:2383
+#: Dialogs.py:2731
+#: Dialogs.py:2951
+#: Dialogs.py:3316
 #, python-format
 msgid "Filter: %s"
 msgstr "Filter: %s"
 
-#: Dialogs.py:1847
-#: Dialogs.py:2088
-#: Dialogs.py:2379
-#: Dialogs.py:2727
-#: Dialogs.py:2947
-#: Dialogs.py:3312
+#: Dialogs.py:1853
+#: Dialogs.py:2094
+#: Dialogs.py:2385
+#: Dialogs.py:2733
+#: Dialogs.py:2953
+#: Dialogs.py:3318
 msgid "Not found"
 msgstr "Nicht gefunden"
 
-#: Dialogs.py:1850
-#: Dialogs.py:2091
-#: Dialogs.py:2382
-#: Dialogs.py:2730
-#: Dialogs.py:2950
-#: Dialogs.py:3315
+#: Dialogs.py:1856
+#: Dialogs.py:2097
+#: Dialogs.py:2388
+#: Dialogs.py:2736
+#: Dialogs.py:2956
+#: Dialogs.py:3321
 msgid "Loading Preview..."
 msgstr "Vorschau laden..."
 
-#: Dialogs.py:1870
-#: Dialogs.py:2177
-#: Dialogs.py:2461
-#: Dialogs.py:2806
-#: Dialogs.py:3029
-#: Dialogs.py:3404
+#: Dialogs.py:1876
+#: Dialogs.py:2183
+#: Dialogs.py:2467
+#: Dialogs.py:2812
+#: Dialogs.py:3035
+#: Dialogs.py:3410
 msgid "-- Locked --"
 msgstr "--Nicht freigeschaltet--"
 
-#: Dialogs.py:1901
+#: Dialogs.py:1907
 #, python-format
 msgid "Played %d time"
 msgstr "%d mal gespielt"
 
-#: Dialogs.py:1903
+#: Dialogs.py:1909
 #, python-format
 msgid "Played %d times"
 msgstr "%d mal gespielt"
 
-#: Dialogs.py:1908
-#: Dialogs.py:1915
-#: Dialogs.py:2110
+#: Dialogs.py:1914
+#: Dialogs.py:1921
+#: Dialogs.py:2116
 msgid "Play To Advance."
 msgstr "Spiele um weiter zu kommen"
 
-#: Dialogs.py:1995
+#: Dialogs.py:2001
 msgid "One Song In This Setlist"
 msgstr "Ein Song in der Liste"
 
-#: Dialogs.py:1997
+#: Dialogs.py:2003
 #, python-format
 msgid "%d Songs In This Setlist"
 msgstr "%d Songs in der Liste"
 
-#: Dialogs.py:2007
-#: Dialogs.py:2138
-#: Dialogs.py:2421
-#: Dialogs.py:2768
-#: Dialogs.py:2991
-#: Dialogs.py:3367
+#: Dialogs.py:2013
+#: Dialogs.py:2144
+#: Dialogs.py:2427
+#: Dialogs.py:2774
+#: Dialogs.py:2997
+#: Dialogs.py:3373
 msgid "Reset this entire career"
 msgstr "Gesamte Karriere zurücksetzen"
-
-#: Dialogs.py:2112
-#: Dialogs.py:2397
-#: Dialogs.py:2744
-#: Dialogs.py:2967
-#: Dialogs.py:3341
-#: MainMenu.py:224
-msgid "Practice"
-msgstr "Üben"
-
-#: Dialogs.py:2116
-#: Dialogs.py:2401
-#: Dialogs.py:2748
-#: Dialogs.py:2971
-#: Dialogs.py:3345
-msgid "Played Once"
-msgstr "Einmal gespielt"
 
 #: Dialogs.py:2118
 #: Dialogs.py:2403
 #: Dialogs.py:2750
 #: Dialogs.py:2973
 #: Dialogs.py:3347
+#: MainMenu.py:223
+msgid "Practice"
+msgstr "Üben"
+
+#: Dialogs.py:2122
+#: Dialogs.py:2407
+#: Dialogs.py:2754
+#: Dialogs.py:2977
+#: Dialogs.py:3351
+msgid "Played Once"
+msgstr "Einmal gespielt"
+
+#: Dialogs.py:2124
+#: Dialogs.py:2409
+#: Dialogs.py:2756
+#: Dialogs.py:2979
+#: Dialogs.py:3353
 #, python-format
 msgid "Played %d times."
 msgstr "%d mal gespielt"
 
-#: Dialogs.py:2120
-#: Dialogs.py:2405
-#: Dialogs.py:2752
-#: Dialogs.py:2975
-#: Dialogs.py:3349
-#: MainMenu.py:290
-msgid "Quickplay"
-msgstr "Schnelles Spiel"
-
 #: Dialogs.py:2126
-msgid "There Is 1 Song In This Setlist"
-msgstr "Es ist 1 Song in dieser Liste"
-
-#: Dialogs.py:2128
-#, python-format
-msgid "There are %d songs in this folder"
-msgstr "Es sind %d Songs in diesem Verzeichnis"
-
-#: Dialogs.py:2133
-#: Dialogs.py:2417
-#: Dialogs.py:2764
-#: Dialogs.py:2987
-#: Dialogs.py:3361
-msgid "Tier"
-msgstr "Stufe"
-
-#: Dialogs.py:2142
-#: Dialogs.py:2425
-#: Dialogs.py:2772
-#: Dialogs.py:2995
-#: Dialogs.py:3372
-msgid "Random Song"
-msgstr "Zufälliger Song"
-
-#: Dialogs.py:2252
-#: Dialogs.py:2275
-#: Dialogs.py:2291
-#: Dialogs.py:2313
-#: Dialogs.py:2320
-#: Dialogs.py:2488
-#: Dialogs.py:2511
-#: Dialogs.py:2527
-#: Dialogs.py:2590
-#: Dialogs.py:3443
-#: Dialogs.py:3466
-#: Dialogs.py:3486
-msgid "Nil"
-msgstr "Nil"
-
-#: Dialogs.py:2395
-#: Dialogs.py:2742
-#: Dialogs.py:2965
-#: Dialogs.py:3339
-msgid "Play To Advance"
-msgstr "Spiele um fortzuscheiten"
-
 #: Dialogs.py:2411
 #: Dialogs.py:2758
 #: Dialogs.py:2981
 #: Dialogs.py:3355
+#: MainMenu.py:289
+msgid "Quickplay"
+msgstr "Schnelles Spiel"
+
+#: Dialogs.py:2132
+msgid "There Is 1 Song In This Setlist"
+msgstr "Es ist 1 Song in dieser Liste"
+
+#: Dialogs.py:2134
+#, python-format
+msgid "There are %d songs in this folder"
+msgstr "Es sind %d Songs in diesem Verzeichnis"
+
+#: Dialogs.py:2139
+#: Dialogs.py:2423
+#: Dialogs.py:2770
+#: Dialogs.py:2993
+#: Dialogs.py:3367
+msgid "Tier"
+msgstr "Stufe"
+
+#: Dialogs.py:2148
+#: Dialogs.py:2431
+#: Dialogs.py:2778
+#: Dialogs.py:3001
+#: Dialogs.py:3378
+msgid "Random Song"
+msgstr "Zufälliger Song"
+
+#: Dialogs.py:2258
+#: Dialogs.py:2281
+#: Dialogs.py:2297
+#: Dialogs.py:2319
+#: Dialogs.py:2326
+#: Dialogs.py:2494
+#: Dialogs.py:2517
+#: Dialogs.py:2533
+#: Dialogs.py:2596
+#: Dialogs.py:3449
+#: Dialogs.py:3472
+#: Dialogs.py:3492
+msgid "Nil"
+msgstr "Nil"
+
+#: Dialogs.py:2401
+#: Dialogs.py:2748
+#: Dialogs.py:2971
+#: Dialogs.py:3345
+msgid "Play To Advance"
+msgstr "Spiele um fortzuscheiten"
+
+#: Dialogs.py:2417
+#: Dialogs.py:2764
+#: Dialogs.py:2987
+#: Dialogs.py:3361
 msgid "There Is 1 Song In This Setlist."
 msgstr "Es ist 1 Song in dieser Liste."
 
-#: Dialogs.py:2413
-#: Dialogs.py:2760
-#: Dialogs.py:2983
-#: Dialogs.py:3357
+#: Dialogs.py:2419
+#: Dialogs.py:2766
+#: Dialogs.py:2989
+#: Dialogs.py:3363
 #, python-format
 msgid "There Are %d Songs In This Setlist."
 msgstr "Es befinden sich %d Songs in dieser Liste."
 
-#: Dialogs.py:3266
+#: Dialogs.py:3272
 msgid "DIFFICULTY"
 msgstr "SCHWIERIGKEIT"
 
-#: Dialogs.py:3268
+#: Dialogs.py:3274
 msgid "BAND"
 msgstr "BAND"
 
-#: Dialogs.py:3271
+#: Dialogs.py:3277
 msgid "GUITAR"
 msgstr "GITARRE"
 
-#: Dialogs.py:3274
+#: Dialogs.py:3280
 msgid "DRUM"
 msgstr "SCHLAG"
 
-#: Dialogs.py:3277
+#: Dialogs.py:3283
 msgid "BASS"
 msgstr "BASS"
 
-#: Dialogs.py:3280
+#: Dialogs.py:3286
 msgid "VOCALS"
 msgstr "GESANG"
 
-#: Dialogs.py:3287
+#: Dialogs.py:3293
 msgid "SORTING:"
 msgstr "ANORDNUNG."
 
-#: Dialogs.py:3289
+#: Dialogs.py:3295
 msgid "ALPHABETICALLY BY TITLE"
 msgstr "ALPHABETISCH NACH TITEL"
 
-#: Dialogs.py:3291
+#: Dialogs.py:3297
 msgid "ALPHABETICALLY BY ARTIST"
 msgstr "ALPHABETISCH NACH INTERPRETEN"
 
-#: Dialogs.py:3293
+#: Dialogs.py:3299
 msgid "BY PLAY COUNT"
 msgstr "NACH SPIELEANZAHL"
 
-#: Dialogs.py:3295
+#: Dialogs.py:3301
 msgid "ALPHABETICALLY BY ALBUM"
 msgstr "ALPHABETISCH NACH ALBUM"
 
-#: Dialogs.py:3297
+#: Dialogs.py:3303
 msgid "ALPHABETICALLY BY GENRE"
 msgstr "ALPHABETISCH NACH GENRE"
 
-#: Dialogs.py:3299
+#: Dialogs.py:3305
 msgid "BY YEAR"
 msgstr "NACH JAHR"
 
-#: Dialogs.py:3301
+#: Dialogs.py:3307
 msgid "BY BAND DIFFICULTY"
 msgstr "NACH BAND SCHWIERIGKEIT"
 
-#: Dialogs.py:3303
+#: Dialogs.py:3309
 msgid "BY INSTRUMENT DIFFICULTY"
 msgstr "NACH INSTRUMENTEN SCHWIERIGKEIT"
 
-#: Dialogs.py:3305
+#: Dialogs.py:3311
 msgid "BY SONG COLLECTION"
 msgstr "NACH SONGSAMMLUNG"
 
-#: Dialogs.py:3625
+#: Dialogs.py:3631
 msgid "[Parent Folder]"
 msgstr "[Übergeordnetes Verzeichnis]"
 
-#: Dialogs.py:3629
+#: Dialogs.py:3635
 msgid "[Accept Folder]"
 msgstr "[Akzeptiere Verzeichnis]"
 
-#: Dialogs.py:3631
+#: Dialogs.py:3637
 #, python-format
 msgid "%s [Folder]"
 msgstr "%s [Verzeichnis]"
 
-#: Dialogs.py:3760
+#: Dialogs.py:3766
 msgid "Yellow (#3) / Blue (#4) to change, Green (#1) to confirm:"
 msgstr "Gelb (#3) / Blau (#4) um ändern, Grün (#1) zum bestätigen:"
 
-#: Dialogs.py:3772
+#: Dialogs.py:3778
 msgid "Loading necks..."
 msgstr "Lade Necks..."
 
-#: Dialogs.py:3844
+#: Dialogs.py:3850
 #: GameEngine.py:101
 #: Lobby.py:607
 msgid "Neck"
 msgstr "Neck"
 
-#: Dialogs.py:4049
+#: Dialogs.py:4055
 msgid "Loading avatars..."
 msgstr "Lade Avatare..."
 
-#: Dialogs.py:4178
+#: Dialogs.py:4184
 msgid "Select Your Avatar:"
 msgstr "Wähle deinen Avatar:"
 
-#: Dialogs.py:4459
+#: Dialogs.py:4477
 msgid "Press Start to Begin!"
 msgstr "Drücke Start um zu beginnen!"
 
-#: Dialogs.py:4460
+#: Dialogs.py:4478
 msgid "Use the keyboard to select or just play some notes!"
 msgstr "Benutze die Tastatur zum wählen oder spiele einfach ein paar Noten!"
 
-#: Dialogs.py:4471
+#: Dialogs.py:4489
 msgid "No Controller"
 msgstr "Kein Controller"
 
-#: Dialogs.py:4475
+#: Dialogs.py:4493
 msgid "Disabled Controller"
 msgstr "Controller abschalten"
 
-#: Dialogs.py:4479
+#: Dialogs.py:4497
 #: Player.py:434
 msgid "Default Guitar"
 msgstr "Standard Gitarre"
 
-#: Dialogs.py:4481
+#: Dialogs.py:4499
 msgid "Default Drums"
 msgstr "Standard Schlagzeug"
 
-#: Dialogs.py:4483
+#: Dialogs.py:4501
 #: Player.py:438
 msgid "Default Microphone"
 msgstr "Standard Mikrofon"
 
-#: Dialogs.py:4545
+#: Dialogs.py:4567
 msgid "controller"
 msgstr "controller"
 
-#: Dialogs.py:4547
+#: Dialogs.py:4569
 msgid "controllers"
 msgstr "controller"
 
-#: Dialogs.py:4548
+#: Dialogs.py:4570
 #, python-format
 msgid "You only have %d %s defined. You need at least %d for this mode."
 msgstr "Du hast nur %d %s definiert. Du brauchst mindestens %d für diesen Modus."
 
-#: Dialogs.py:4845
+#: Dialogs.py:4867
 #, python-format
 msgid "%.2f beats per minute"
 msgstr "%.2f Beats pro Minute"
 
-#: Dialogs.py:4875
-#: Dialogs.py:4883
-#: Dialogs.py:4888
-#: Dialogs.py:4896
+#: Dialogs.py:4897
+#: Dialogs.py:4905
+#: Dialogs.py:4910
+#: Dialogs.py:4918
 #: GameEngine.py:210
 msgid "Left"
 msgstr "Links"
 
-#: Dialogs.py:4875
-#: Dialogs.py:4883
-#: Dialogs.py:4888
-#: Dialogs.py:4896
+#: Dialogs.py:4897
+#: Dialogs.py:4905
+#: Dialogs.py:4910
+#: Dialogs.py:4918
 #: GameEngine.py:210
 msgid "Right"
 msgstr "Rechts"
 
-#: Dialogs.py:4875
-#: Dialogs.py:4883
-#: Dialogs.py:4888
-#: Dialogs.py:4896
+#: Dialogs.py:4897
+#: Dialogs.py:4905
+#: Dialogs.py:4910
+#: Dialogs.py:4918
 msgid "Up"
 msgstr "Hoch"
 
-#: Dialogs.py:4875
-#: Dialogs.py:4883
-#: Dialogs.py:4888
-#: Dialogs.py:4896
+#: Dialogs.py:4897
+#: Dialogs.py:4905
+#: Dialogs.py:4910
+#: Dialogs.py:4918
 msgid "Down"
 msgstr "Runter"
 
-#: Dialogs.py:4875
-#: Dialogs.py:4883
-#: Dialogs.py:4888
-#: Dialogs.py:4896
+#: Dialogs.py:4897
+#: Dialogs.py:4905
+#: Dialogs.py:4910
+#: Dialogs.py:4918
 #: Player.py:201
 msgid "Start"
 msgstr "Start"
 
-#: Dialogs.py:4876
-#: Dialogs.py:4884
-#: Dialogs.py:4889
-#: Dialogs.py:4897
+#: Dialogs.py:4898
+#: Dialogs.py:4906
+#: Dialogs.py:4911
+#: Dialogs.py:4919
 msgid "Select"
 msgstr "Auswählen"
 
-#: Dialogs.py:4876
+#: Dialogs.py:4898
 #: Player.py:188
 msgid "Fret #1"
 msgstr "Fret #1"
 
-#: Dialogs.py:4876
+#: Dialogs.py:4898
 msgid "Solo #1"
 msgstr "Solo #1"
 
-#: Dialogs.py:4876
+#: Dialogs.py:4898
 #: Player.py:189
 msgid "Fret #2"
 msgstr "Fret #2"
 
-#: Dialogs.py:4876
+#: Dialogs.py:4898
 msgid "Solo #2"
 msgstr "Solo #2"
 
-#: Dialogs.py:4877
+#: Dialogs.py:4899
 #: Player.py:190
 msgid "Fret #3"
 msgstr "Fret #3"
 
-#: Dialogs.py:4877
+#: Dialogs.py:4899
 msgid "Solo #3"
 msgstr "Solo #3"
 
-#: Dialogs.py:4877
+#: Dialogs.py:4899
 #: Player.py:191
 msgid "Fret #4"
 msgstr "Fret #4"
 
-#: Dialogs.py:4877
+#: Dialogs.py:4899
 msgid "Solo #4"
 msgstr "Solo #4"
 
-#: Dialogs.py:4877
+#: Dialogs.py:4899
 #: Player.py:192
 msgid "Fret #5"
 msgstr "Fret #5"
 
-#: Dialogs.py:4878
+#: Dialogs.py:4900
 msgid "Solo #5"
 msgstr "Solo #5"
 
-#: Dialogs.py:4878
+#: Dialogs.py:4900
 msgid "Pick!"
 msgstr "Auswählen!"
 
-#: Dialogs.py:4878
-#: Dialogs.py:4886
-#: Dialogs.py:4891
-#: Dialogs.py:4899
+#: Dialogs.py:4900
+#: Dialogs.py:4908
+#: Dialogs.py:4913
+#: Dialogs.py:4921
 msgid "Starpower!"
 msgstr "Starpower!"
 
-#: Dialogs.py:4878
+#: Dialogs.py:4900
 #: GameEngine.py:275
-#: GuitarScene.py:533
+#: GuitarScene.py:530
 #: Player.py:200
 msgid "Whammy"
 msgstr "Whammy"
 
-#: Dialogs.py:4884
-#: Dialogs.py:4897
+#: Dialogs.py:4906
+#: Dialogs.py:4919
 #: Player.py:189
 #: Player.py:194
 msgid "Drum #1"
 msgstr "Trommel #1"
 
-#: Dialogs.py:4884
+#: Dialogs.py:4906
 #: Player.py:190
 #: Player.py:195
 msgid "Drum #2"
 msgstr "Trommel #2"
 
-#: Dialogs.py:4885
-#: Dialogs.py:4898
+#: Dialogs.py:4907
+#: Dialogs.py:4920
 #: Player.py:191
 #: Player.py:196
 msgid "Drum #3"
 msgstr "Trommel #3"
 
-#: Dialogs.py:4885
+#: Dialogs.py:4907
 #: Player.py:188
 #: Player.py:193
 msgid "Drum #4"
 msgstr "Trommel #4"
 
-#: Dialogs.py:4886
-#: Dialogs.py:4899
+#: Dialogs.py:4908
+#: Dialogs.py:4921
 #: Player.py:186
 msgid "Bass Drum"
 msgstr "Bass Trommel"
 
-#: Dialogs.py:4886
-#: Dialogs.py:4899
-#: Dialogs.py:5227
+#: Dialogs.py:4908
+#: Dialogs.py:4921
+#: Dialogs.py:5249
 #: GameEngine.py:93
 #: GameEngine.py:152
 #: GameEngine.py:188
-#: GameEngine.py:648
-#: GameResultsScene.py:233
-#: Stage.py:255
+#: GameEngine.py:655
+#: GameResultsScene.py:234
+#: Player.py:445
+#: Stage.py:257
 #: Vocalist.py:454
 #: Vocalist.py:460
 msgid "None"
 msgstr "Keine"
 
-#: Dialogs.py:4897
+#: Dialogs.py:4919
 #: Player.py:190
 #: Player.py:195
 msgid "Cymbal #2"
 msgstr "Cymbal #2"
 
-#: Dialogs.py:4898
+#: Dialogs.py:4920
 #: Player.py:192
 #: Player.py:197
 msgid "Cymbal #4"
 msgstr "Cymbal #4"
 
-#: Dialogs.py:4898
+#: Dialogs.py:4920
 #: Player.py:188
 #: Player.py:193
 msgid "Drum #5"
 msgstr "Trommel #5"
 
-#: Dialogs.py:4901
+#: Dialogs.py:4923
 msgid "Fret"
 msgstr "Fret"
 
-#: Dialogs.py:4902
+#: Dialogs.py:4924
 msgid "Solo"
 msgstr "Solo"
 
-#: Dialogs.py:4903
+#: Dialogs.py:4925
 msgid "Drum"
 msgstr "Schlagzeug"
 
-#: Dialogs.py:4904
+#: Dialogs.py:4926
 msgid "Slide~"
 msgstr "Schiebe~"
 
-#: Dialogs.py:5207
+#: Dialogs.py:5229
 msgid "Level:"
 msgstr "Level:"
 
-#: Dialogs.py:5208
+#: Dialogs.py:5230
 msgid "Note:"
 msgstr "Note:"
 
-#: Dialogs.py:5222
+#: Dialogs.py:5244
 msgid "Tap"
 msgstr "Anschlagen"
 
-#: Dialogs.py:5318
+#: Dialogs.py:5340
 msgid "Choose a Song"
 msgstr "Wähle einen Song"
 
-#: Dialogs.py:5337
+#: Dialogs.py:5359
 msgid "Choose a File"
 msgstr "Wähle eine Datei"
 
-#: Dialogs.py:5404
+#: Dialogs.py:5426
 msgid "Play with the keys and press Escape when you're done."
 msgstr "Spiele mit den Tasten und drücke Escape wenn du fertig bist."
 
-#: Dialogs.py:5417
-#: Dialogs.py:5535
-#: Dialogs.py:5541
+#: Dialogs.py:5439
+#: Dialogs.py:5557
+#: Dialogs.py:5563
 msgid "Loading..."
 msgstr "Laden..."
 
@@ -1217,7 +1223,7 @@ msgstr "Niedrig"
 #: GameEngine.py:154
 #: GameEngine.py:176
 #: GameEngine.py:296
-#: GameResultsScene.py:264
+#: GameResultsScene.py:265
 msgid "Normal"
 msgstr "Normal"
 
@@ -1383,18 +1389,18 @@ msgid "HO/PO System"
 msgstr "HO/PO System"
 
 #: GameEngine.py:152
-#: GameResultsScene.py:235
+#: GameResultsScene.py:236
 msgid "RF-Mod"
 msgstr "RF-Mod"
 
 #: GameEngine.py:152
-#: GameResultsScene.py:237
+#: GameResultsScene.py:238
 msgid "GH2 Strict"
 msgstr "GH2 Streng"
 
 #: GameEngine.py:152
 #: GameEngine.py:317
-#: GameResultsScene.py:239
+#: GameResultsScene.py:240
 msgid "GH2"
 msgstr "GH2"
 
@@ -1415,27 +1421,27 @@ msgid "HO/PO Frequency"
 msgstr "HO/PO Frequenz"
 
 #: GameEngine.py:154
-#: GameResultsScene.py:260
+#: GameResultsScene.py:261
 msgid "Least"
 msgstr "Wenigste"
 
 #: GameEngine.py:154
-#: GameResultsScene.py:262
+#: GameResultsScene.py:263
 msgid "Less"
 msgstr "Wenig"
 
 #: GameEngine.py:154
-#: GameResultsScene.py:256
+#: GameResultsScene.py:257
 msgid "More"
 msgstr "Mehr"
 
 #: GameEngine.py:154
-#: GameResultsScene.py:258
+#: GameResultsScene.py:259
 msgid "Even More"
 msgstr "Noch Mehr"
 
 #: GameEngine.py:154
-#: GameResultsScene.py:266
+#: GameResultsScene.py:267
 msgid "Most"
 msgstr "Am Meisten"
 
@@ -1527,7 +1533,7 @@ msgstr "Bühnen Diashow"
 #: GameEngine.py:164
 #: GameEngine.py:165
 #: GameEngine.py:166
-#: GameEngine.py:633
+#: GameEngine.py:640
 msgid "Random"
 msgstr "Zufällig"
 
@@ -2147,18 +2153,18 @@ msgid "Never Mute"
 msgstr "Schalte niemals stumm"
 
 #: GameEngine.py:224
-#: GuitarScene.py:561
+#: GuitarScene.py:558
 msgid "Very Early"
 msgstr "Sehr Früh"
 
 #: GameEngine.py:224
-#: GuitarScene.py:560
+#: GuitarScene.py:557
 msgid "Early"
 msgstr "Früh"
 
 #: GameEngine.py:224
 #: GameEngine.py:307
-#: GameResultsScene.py:277
+#: GameResultsScene.py:278
 msgid "Standard"
 msgstr "Standard"
 
@@ -2500,7 +2506,7 @@ msgid "Makes opponent miss notes until the whammy bar is pushed a few times"
 msgstr "Veranlasst den Gegner Noten zu verpassen wenn der Whammy ein paar mal gedrückt wird"
 
 #: GameEngine.py:276
-#: GuitarScene.py:531
+#: GuitarScene.py:528
 msgid "Difficulty Up"
 msgstr "Schwierigkeit hoch"
 
@@ -2517,7 +2523,7 @@ msgid "Breaks a string, causing your opponent to miss notes on that fret until t
 msgstr "Zerbricht eine Saite, was deinen Gegner dazu veranlasst Noten zu verpassen bis er den Fret mehrfach drückt."
 
 #: GameEngine.py:278
-#: GuitarScene.py:536
+#: GuitarScene.py:533
 msgid "Double Notes"
 msgstr "Doppel Noten"
 
@@ -2526,7 +2532,7 @@ msgid "Makes single notes into chords, and chords into even bigger ones."
 msgstr "Macht einfache Noten zu Akkorden und Akkorde zu noch grösseren."
 
 #: GameEngine.py:279
-#: GuitarScene.py:530
+#: GuitarScene.py:527
 msgid "Death Drain"
 msgstr "Todesstrudel"
 
@@ -2539,7 +2545,7 @@ msgid "Drains your opponents life until they die. 'Sudden Death Only' keeps this
 msgstr "Vermindert deines Gegners Leben bis er stirbt. 'Nur sofortiger Tod' blockt diese Funktion ausser wenn du plötzlichen Todesmodus erreichst."
 
 #: GameEngine.py:280
-#: GuitarScene.py:537
+#: GuitarScene.py:534
 msgid "Amp Overload"
 msgstr "Amp Overload"
 
@@ -2548,7 +2554,7 @@ msgid "Makes opponent's amp flip out, making notes disappear and reappear random
 msgstr "Des Gegner's Amp wird ausflippen. Noten erscheinen und verschwinden rein zufällig."
 
 #: GameEngine.py:281
-#: GuitarScene.py:535
+#: GuitarScene.py:532
 msgid "Switch Controls"
 msgstr "Ändere Steuerung"
 
@@ -2793,22 +2799,22 @@ msgid "Note Hit Window"
 msgstr "Noten Treff Fenster"
 
 #: GameEngine.py:307
-#: GameResultsScene.py:273
+#: GameResultsScene.py:274
 msgid "Tightest"
 msgstr "Kleinstes"
 
 #: GameEngine.py:307
-#: GameResultsScene.py:275
+#: GameResultsScene.py:276
 msgid "Tight"
 msgstr "Klein"
 
 #: GameEngine.py:307
-#: GameResultsScene.py:271
+#: GameResultsScene.py:272
 msgid "Wide"
 msgstr "Groß"
 
 #: GameEngine.py:307
-#: GameResultsScene.py:269
+#: GameResultsScene.py:270
 msgid "Widest"
 msgstr "Größtes"
 
@@ -3147,7 +3153,7 @@ msgstr "2-lienig"
 
 #: GameEngine.py:341
 msgid "Sets the display mode for MIDI lyrics. Both 'Simple Lines' and '2-Line' will show as single phrases when playing the vocal part."
-msgstr "Bestimmt den Anzeige Modus für MIDI Songtexte. Beide 'Einfache Linien' und '2-lienig' werden einfache Phrasen im Gesangsmodus zeigen.\v"
+msgstr "Bestimmt den Anzeige Modus für MIDI Songtexte. Beide 'Einfache Linien' und '2-lienig' werden einfache Phrasen im Gesangsmodus zeigen."
 
 #: GameEngine.py:342
 msgid "Lyric Speed Mode"
@@ -3305,129 +3311,129 @@ msgstr "Instrument (Setlist Ergebnis)"
 msgid "Sets the default part displayed in the setlist score."
 msgstr "Bestimmt die Standart Rolle die in der Setliste angezeigt wird."
 
-#: GameEngine.py:631
+#: GameEngine.py:638
 msgid "Slideshow"
 msgstr "Diashow"
 
-#: GameEngine.py:634
-#: GameEngine.py:648
+#: GameEngine.py:641
+#: GameEngine.py:655
 msgid "Animated Stage"
 msgstr "Animierte Bühne"
 
-#: GameResultsScene.py:136
 #: GameResultsScene.py:137
+#: GameResultsScene.py:138
 msgid "Co-Op Mode"
 msgstr "Co-Op Modus"
 
-#: GameResultsScene.py:139
+#: GameResultsScene.py:140
 msgid "settings"
 msgstr "Einstellungen"
 
-#: GameResultsScene.py:140
+#: GameResultsScene.py:141
 msgid "HOPOs"
 msgstr "HOPOs"
 
-#: GameResultsScene.py:141
+#: GameResultsScene.py:142
 msgid "Hit Window"
 msgstr "Treff Fenster"
 
-#: GameResultsScene.py:142
+#: GameResultsScene.py:143
 msgid "Adjusted Score Multiplier:"
 msgstr "Adjustiere Ergebnis Vervielfacher"
 
-#: GameResultsScene.py:143
+#: GameResultsScene.py:144
 msgid "Original Score:"
 msgstr "Original Ergebnis:"
 
-#: GameResultsScene.py:146
+#: GameResultsScene.py:147
 msgid "Continue"
 msgstr "Fortsetzen"
 
-#: GameResultsScene.py:147
+#: GameResultsScene.py:148
 msgid "Replay"
 msgstr "Wiederholen"
 
-#: GameResultsScene.py:149
+#: GameResultsScene.py:150
 msgid "Quit"
 msgstr "Beenden"
 
-#: GameResultsScene.py:231
+#: GameResultsScene.py:232
 msgid "GH2 Sloppy"
 msgstr "GH2 Schlampig"
 
-#: GameResultsScene.py:241
+#: GameResultsScene.py:242
 msgid "New System"
 msgstr "Neues System"
 
-#: GameResultsScene.py:379
+#: GameResultsScene.py:380
 msgid "Relax, it was an excellent show."
 msgstr "Relaxe, das war 'ne exzellente Show."
 
-#: GameResultsScene.py:381
+#: GameResultsScene.py:382
 msgid "Truly Amazing!"
 msgstr "Wirklich Beeindruckend!"
 
-#: GameResultsScene.py:383
+#: GameResultsScene.py:384
 msgid "Thanks for playing!"
 msgstr "Danke für's Spielen!"
 
-#: GameResultsScene.py:385
+#: GameResultsScene.py:386
 msgid "One more song can't hurt!"
 msgstr "Noch ein Song kann nich schaden!"
 
-#: GameResultsScene.py:387
+#: GameResultsScene.py:388
 msgid "What an amazing performance!"
 msgstr "Was für eine beeindruckende Leistung!"
 
-#: GameResultsScene.py:389
+#: GameResultsScene.py:390
 msgid "That's how it's done!"
 msgstr "Genau so wird's gemacht!"
 
-#: GameResultsScene.py:567
+#: GameResultsScene.py:572
 #, python-format
 msgid "%d points is a new high score! Enter your name:"
 msgstr "%d Punkte ist der neue Highscore! Gib deinen Namen an:"
 
-#: GameResultsScene.py:1290
+#: GameResultsScene.py:1297
 #, python-format
 msgid "%s High Scores for %s"
 msgstr "%s Highscores für %s"
 
-#: GameResultsScene.py:1292
+#: GameResultsScene.py:1299
 #, python-format
 msgid "%s High Scores"
 msgstr "%s Highscores"
 
-#: GameResultsScene.py:1298
+#: GameResultsScene.py:1305
 #, python-format
 msgid "Difficulty: %s"
 msgstr "Schwierigkeit: %s"
 
-#: GameResultsScene.py:1360
+#: GameResultsScene.py:1367
 msgid "Uploading Scores..."
 msgstr "Lade Punkte hoch..."
 
-#: GameResultsScene.py:1365
+#: GameResultsScene.py:1372
 msgid "Scores uploaded!"
 msgstr "Punkte Hochgeladen!"
 
-#: GameResultsScene.py:1369
+#: GameResultsScene.py:1376
 msgid "Your highscore ranks"
 msgstr "Dein Highscore ist"
 
-#: GameResultsScene.py:1370
+#: GameResultsScene.py:1377
 msgid "on the world starpower chart!"
 msgstr "auf der World Starpower Chart!"
 
-#: GameResultsScene.py:1373
+#: GameResultsScene.py:1380
 msgid "but your rank is unknown."
 msgstr "aber dein Rank ist unbekannt."
 
-#: GameResultsScene.py:1376
+#: GameResultsScene.py:1383
 msgid "but there was no new highscore."
 msgstr "aber du hast keinen neuen Highscore erzielt."
 
-#: GameResultsScene.py:1379
+#: GameResultsScene.py:1386
 msgid "Score upload failed!  World charts may be down."
 msgstr "Ergebnis hochladen fehlgeschlagen! Die World Charts könnten kaputt sein."
 
@@ -3435,391 +3441,391 @@ msgstr "Ergebnis hochladen fehlgeschlagen! Die World Charts könnten kaputt sein.
 msgid "Connection lost."
 msgstr "Verbindung verloren."
 
-#: GuitarScene.py:124
+#: GuitarScene.py:121
 msgid "Let's get this show on the Road"
 msgstr "Lasst uns diese Show auf die Straße bringen"
 
-#: GuitarScene.py:126
+#: GuitarScene.py:123
 msgid "Impress the Crowd"
 msgstr "Beeindrucke die Menge"
 
-#: GuitarScene.py:128
+#: GuitarScene.py:125
 msgid "Don't forget to strum!"
 msgstr "Vergiss nicht anzuschlagen!"
 
-#: GuitarScene.py:130
+#: GuitarScene.py:127
 msgid "Rock the house!"
 msgstr "Rocke das Haus!"
 
-#: GuitarScene.py:132
+#: GuitarScene.py:129
 msgid "Jurgen is watching"
 msgstr "Jurgen beobachtet dich"
 
-#: GuitarScene.py:133
+#: GuitarScene.py:130
 msgid "Initializing..."
 msgstr "Initialisiere..."
 
-#: GuitarScene.py:520
+#: GuitarScene.py:517
 msgid "KiD"
 msgstr "KiD"
 
-#: GuitarScene.py:520
+#: GuitarScene.py:517
 msgid "Stump"
 msgstr "Stump"
 
-#: GuitarScene.py:520
+#: GuitarScene.py:517
 msgid "AkedRobot"
 msgstr "AkedRobot"
 
-#: GuitarScene.py:520
+#: GuitarScene.py:517
 msgid "Q"
 msgstr "Q"
 
-#: GuitarScene.py:520
+#: GuitarScene.py:517
 msgid "MFH"
 msgstr "MFH"
 
-#: GuitarScene.py:520
+#: GuitarScene.py:517
 msgid "Jurgen"
 msgstr "Jurgen"
 
-#: GuitarScene.py:525
+#: GuitarScene.py:522
 msgid "Overdrive"
 msgstr "Overdrive"
 
-#: GuitarScene.py:527
+#: GuitarScene.py:524
 msgid "Starpower"
 msgstr "Starpower"
 
-#: GuitarScene.py:532
+#: GuitarScene.py:529
 msgid "Broken String"
 msgstr "Kaputte Saite"
 
-#: GuitarScene.py:534
+#: GuitarScene.py:531
 msgid "Powerup Steal"
 msgstr "Powerup Diebstahl"
 
-#: GuitarScene.py:538
+#: GuitarScene.py:535
 #, python-format
 msgid "%d Note Streak!!!"
 msgstr "%d Noten Streak!!!"
 
-#: GuitarScene.py:539
+#: GuitarScene.py:536
 #, python-format
 msgid "%d Phrase Streak!!!"
 msgstr "%d Phrasen Streak!!!"
 
-#: GuitarScene.py:540
+#: GuitarScene.py:537
 #, python-format
 msgid "%s Ready"
 msgstr "%s Bereit"
 
-#: GuitarScene.py:541
+#: GuitarScene.py:538
 #, python-format
 msgid "Activate %s!"
 msgstr "Aktiviere %s!"
 
-#: GuitarScene.py:542
+#: GuitarScene.py:539
 msgid "You Failed!!!!"
 msgstr "Du bist gescheitert!!!"
 
-#: GuitarScene.py:543
+#: GuitarScene.py:540
 #, python-format
 msgid "%s is here"
 msgstr "%s ist hier"
 
-#: GuitarScene.py:544
+#: GuitarScene.py:541
 #, python-format
 msgid "%s was here"
 msgstr "%s war hier"
 
-#: GuitarScene.py:545
+#: GuitarScene.py:542
 msgid "% Complete"
 msgstr "% komplett"
 
-#: GuitarScene.py:546
-#: GuitarScene.py:8580
+#: GuitarScene.py:543
+#: GuitarScene.py:8617
 msgid "HOPO"
 msgstr "HOPO"
 
-#: GuitarScene.py:547
-#: GuitarScene.py:8550
-#: GuitarScene.py:8559
+#: GuitarScene.py:544
+#: GuitarScene.py:8587
+#: GuitarScene.py:8596
 msgid "COMPLETED"
 msgstr "KOMPLETTIERT"
 
-#: GuitarScene.py:548
-#: GuitarScene.py:8552
-#: GuitarScene.py:8568
+#: GuitarScene.py:545
+#: GuitarScene.py:8589
+#: GuitarScene.py:8605
 msgid " % ON "
 msgstr "% AN"
 
-#: GuitarScene.py:549
+#: GuitarScene.py:546
 msgid "BASS GROOVE"
 msgstr "BASS GROOVE"
 
-#: GuitarScene.py:550
+#: GuitarScene.py:547
 msgid "Bass Groove:"
 msgstr "Bass Groove:"
 
-#: GuitarScene.py:551
+#: GuitarScene.py:548
 msgid "Handicap"
 msgstr "Handicap"
 
-#: GuitarScene.py:552
+#: GuitarScene.py:549
 msgid "Avg"
 msgstr "Durchschnitt"
 
-#: GuitarScene.py:553
+#: GuitarScene.py:550
 msgid "Very Late"
 msgstr "Sehr Spät"
 
-#: GuitarScene.py:554
+#: GuitarScene.py:551
 msgid "Late"
 msgstr "Spät"
 
-#: GuitarScene.py:555
+#: GuitarScene.py:552
 msgid "Slightly Late"
 msgstr "Etwas zu spät"
 
-#: GuitarScene.py:556
+#: GuitarScene.py:553
 msgid "-Excellent!"
 msgstr "-Exzellent!"
 
-#: GuitarScene.py:557
+#: GuitarScene.py:554
 msgid "Perfect!!"
 msgstr "Perfekt!!"
 
-#: GuitarScene.py:558
+#: GuitarScene.py:555
 msgid "+Excellent!"
 msgstr "+Exzellent!"
 
-#: GuitarScene.py:559
+#: GuitarScene.py:556
 msgid "Slightly Early"
 msgstr "Etwas zu früh"
 
-#: GuitarScene.py:562
+#: GuitarScene.py:559
 msgid "ms"
 msgstr "ms"
 
-#: GuitarScene.py:563
+#: GuitarScene.py:560
 msgid "Solo!"
 msgstr "Solo!"
 
-#: GuitarScene.py:564
+#: GuitarScene.py:561
 msgid "Perfect Solo!"
 msgstr "Perfektes Solo!"
 
-#: GuitarScene.py:565
+#: GuitarScene.py:562
 msgid "Awesome Solo!"
 msgstr "Tolles Solo!"
 
-#: GuitarScene.py:566
+#: GuitarScene.py:563
 msgid "Great Solo!"
 msgstr "Großartiges Solo!"
 
-#: GuitarScene.py:567
+#: GuitarScene.py:564
 msgid "Good Solo!"
 msgstr "Gutes Solo!"
 
-#: GuitarScene.py:568
+#: GuitarScene.py:565
 msgid "Solid Solo!"
 msgstr "Solides Solo!"
 
-#: GuitarScene.py:569
+#: GuitarScene.py:566
 msgid "Okay Solo"
 msgstr "OK Solo"
 
-#: GuitarScene.py:570
+#: GuitarScene.py:567
 msgid "Messy Solo"
 msgstr "Stümperhaftes Solo"
 
-#: GuitarScene.py:571
+#: GuitarScene.py:568
 msgid "pts"
 msgstr "Punkte"
 
-#: GuitarScene.py:572
+#: GuitarScene.py:569
 msgid "Get Ready to Rock"
 msgstr "Bereite dich vor zu Rocken"
 
-#: GuitarScene.py:573
+#: GuitarScene.py:570
 msgid "as made famous by"
 msgstr "berühmt gemacht von"
 
-#: GuitarScene.py:574
+#: GuitarScene.py:571
 msgid "by "
 msgstr "von"
 
-#: GuitarScene.py:575
+#: GuitarScene.py:572
 msgid " fretted by "
 msgstr " erstellt von "
 
-#: GuitarScene.py:955
+#: GuitarScene.py:952
 msgid "Preparing Note Phrases..."
 msgstr "Bereite Noten Abschnitte vor..."
 
-#: GuitarScene.py:1448
+#: GuitarScene.py:1447
 msgid "Loading Graphics..."
 msgstr "Lade Grafiken..."
 
-#: GuitarScene.py:2093
+#: GuitarScene.py:2098
 msgid "         RESUME"
 msgstr "         FORTSETZEN"
 
-#: GuitarScene.py:2094
+#: GuitarScene.py:2099
 msgid "        RESTART"
 msgstr "        NEUSTART"
 
-#: GuitarScene.py:2096
+#: GuitarScene.py:2101
 msgid "       PRACTICE"
 msgstr "       ÜBUNG"
 
-#: GuitarScene.py:2097
+#: GuitarScene.py:2102
 msgid "        OPTIONS"
 msgstr "        OPTIONEN"
 
-#: GuitarScene.py:2098
-#: GuitarScene.py:2107
+#: GuitarScene.py:2103
+#: GuitarScene.py:2112
 msgid "           QUIT"
 msgstr "           BEENDEN"
 
-#: GuitarScene.py:2102
+#: GuitarScene.py:2107
 msgid "        RESUME"
 msgstr "        FORTSETZEN"
 
-#: GuitarScene.py:2103
+#: GuitarScene.py:2108
 msgid "       RESTART"
 msgstr "       NEUSTART"
 
-#: GuitarScene.py:2105
+#: GuitarScene.py:2110
 msgid "      END SONG"
 msgstr "     SONG BEENDEN"
 
-#: GuitarScene.py:2106
+#: GuitarScene.py:2111
 msgid "       OPTIONS"
 msgstr "       OPTIONEN"
 
-#: GuitarScene.py:2112
-#: GuitarScene.py:2119
+#: GuitarScene.py:2117
+#: GuitarScene.py:2124
 msgid "RETRY SONG"
 msgstr "NOCHMAL PROBIEREN"
 
-#: GuitarScene.py:2113
+#: GuitarScene.py:2118
 msgid "  PRACTICE"
 msgstr "  ÜBUNG"
 
-#: GuitarScene.py:2114
-#: GuitarScene.py:2120
-#: GuitarScene.py:2184
-#: GuitarScene.py:2191
+#: GuitarScene.py:2119
+#: GuitarScene.py:2125
+#: GuitarScene.py:2189
+#: GuitarScene.py:2196
 msgid " NEW SONG"
 msgstr "NEUER SONG"
 
-#: GuitarScene.py:2115
-#: GuitarScene.py:2121
+#: GuitarScene.py:2120
+#: GuitarScene.py:2126
 msgid "     QUIT"
 msgstr "     BEENDEN"
 
-#: GuitarScene.py:2128
-#: GuitarScene.py:2137
+#: GuitarScene.py:2133
+#: GuitarScene.py:2142
 msgid "  Resume"
 msgstr "  Fortsetzen"
 
-#: GuitarScene.py:2129
-#: GuitarScene.py:2138
+#: GuitarScene.py:2134
+#: GuitarScene.py:2143
 msgid "  Start Over"
 msgstr "  Neustart"
 
-#: GuitarScene.py:2130
-#: GuitarScene.py:2139
+#: GuitarScene.py:2135
+#: GuitarScene.py:2144
 msgid "  Change Song"
 msgstr "  Song wechseln"
 
-#: GuitarScene.py:2131
+#: GuitarScene.py:2136
 msgid "  Practice"
 msgstr "  Übung"
 
-#: GuitarScene.py:2132
-#: GuitarScene.py:2141
+#: GuitarScene.py:2137
+#: GuitarScene.py:2146
 msgid "  Settings"
 msgstr "  Einstellungen"
 
-#: GuitarScene.py:2133
-#: GuitarScene.py:2142
+#: GuitarScene.py:2138
+#: GuitarScene.py:2147
 msgid "  Quit to Main Menu"
 msgstr "  Zurück zum Hauptmenü"
 
-#: GuitarScene.py:2140
+#: GuitarScene.py:2145
 msgid "  End Song"
 msgstr "  Song beenden"
 
-#: GuitarScene.py:2147
-#: GuitarScene.py:2154
+#: GuitarScene.py:2152
+#: GuitarScene.py:2159
 msgid " Try Again?"
 msgstr " Nochmal Versuchen?"
 
-#: GuitarScene.py:2148
-#: GuitarScene.py:2155
+#: GuitarScene.py:2153
+#: GuitarScene.py:2160
 msgid "  Give Up?"
 msgstr " Aufgeben?"
 
-#: GuitarScene.py:2149
+#: GuitarScene.py:2154
 msgid "  Practice?"
 msgstr "  Üben?"
 
-#: GuitarScene.py:2150
-#: GuitarScene.py:2156
+#: GuitarScene.py:2155
+#: GuitarScene.py:2161
 msgid "Quit to Main"
 msgstr "Zurück zum Hauptmenü"
 
-#: GuitarScene.py:2164
-#: GuitarScene.py:2173
+#: GuitarScene.py:2169
+#: GuitarScene.py:2178
 msgid "   RESUME"
 msgstr "  FORTSETZEN"
 
-#: GuitarScene.py:2165
-#: GuitarScene.py:2174
+#: GuitarScene.py:2170
+#: GuitarScene.py:2179
 msgid "   RESTART"
 msgstr "   NEUSTART"
 
-#: GuitarScene.py:2166
-#: GuitarScene.py:2175
+#: GuitarScene.py:2171
+#: GuitarScene.py:2180
 msgid "   CHANGE SONG"
 msgstr "   SONG WECHSELN"
 
-#: GuitarScene.py:2167
+#: GuitarScene.py:2172
 msgid "   PRACTICE"
 msgstr "   ÜBEN"
 
-#: GuitarScene.py:2168
-#: GuitarScene.py:2177
+#: GuitarScene.py:2173
+#: GuitarScene.py:2182
 msgid "   SETTINGS"
 msgstr "   EINSTELLUNGEN"
 
-#: GuitarScene.py:2169
-#: GuitarScene.py:2178
+#: GuitarScene.py:2174
+#: GuitarScene.py:2183
 msgid "   QUIT"
 msgstr "   BEENDEN"
 
-#: GuitarScene.py:2176
+#: GuitarScene.py:2181
 msgid "   END SONG"
 msgstr "   SONG BEENDEN"
 
-#: GuitarScene.py:2183
-#: GuitarScene.py:2190
+#: GuitarScene.py:2188
+#: GuitarScene.py:2195
 msgid " RETRY"
 msgstr " NOCHMAL PROBIEREN"
 
-#: GuitarScene.py:2185
+#: GuitarScene.py:2190
 msgid " PRACTICE"
 msgstr " ÜBEN"
 
-#: GuitarScene.py:2186
-#: GuitarScene.py:2192
+#: GuitarScene.py:2191
+#: GuitarScene.py:2197
 msgid " QUIT"
 msgstr " BEENDEN"
 
-#: GuitarScene.py:9281
+#: GuitarScene.py:9318
 #, python-format
 msgid "FPS: %.2f"
 msgstr "FPS: %.2f"
@@ -4030,86 +4036,86 @@ msgstr "Dieser Name existiert bereits!"
 msgid "Please enter a name!"
 msgstr "Gib bitte einen Namen ein!"
 
-#: MainMenu.py:212
+#: MainMenu.py:211
 msgid "Host Multiplayer Game"
 msgstr "Hoste ein Multiplayer Spiel"
 
-#: MainMenu.py:213
+#: MainMenu.py:212
 msgid "Join Multiplayer Game"
 msgstr "Tritt Multiplayer Spiel bei"
 
-#: MainMenu.py:217
+#: MainMenu.py:216
 msgid "Edit Existing Song"
 msgstr "Bearbeite existierenden Song"
 
-#: MainMenu.py:218
+#: MainMenu.py:217
 msgid "Import New Song"
 msgstr "Importiere Neuen Song"
 
-#: MainMenu.py:219
+#: MainMenu.py:218
 msgid "Import GH(tm) Songs"
 msgstr "Importiere GH(tm) Songs"
 
-#: MainMenu.py:223
+#: MainMenu.py:222
 msgid "Tutorials"
 msgstr "Tutorials"
+
+#: MainMenu.py:238
+#: MainMenu.py:247
+#: MainMenu.py:256
+#: MainMenu.py:263
+msgid "Face-Off"
+msgstr "Konfrontation"
 
 #: MainMenu.py:239
 #: MainMenu.py:248
 #: MainMenu.py:257
 #: MainMenu.py:264
-msgid "Face-Off"
-msgstr "Konfrontation"
-
-#: MainMenu.py:240
-#: MainMenu.py:249
-#: MainMenu.py:258
-#: MainMenu.py:265
 msgid "Pro Face-Off"
 msgstr "Pro Konfrontation"
 
-#: MainMenu.py:241
+#: MainMenu.py:240
 msgid "GH Battle"
 msgstr "GH Zweikampf"
 
-#: MainMenu.py:242
-#: MainMenu.py:250
-#: MainMenu.py:259
-#: MainMenu.py:266
+#: MainMenu.py:241
+#: MainMenu.py:249
+#: MainMenu.py:258
+#: MainMenu.py:265
 msgid "Party Mode"
 msgstr "Party Modus"
 
-#: MainMenu.py:243
+#: MainMenu.py:242
 msgid "Co-Op"
 msgstr "Co-Op"
 
-#: MainMenu.py:244
-#: MainMenu.py:254
-#: MainMenu.py:263
+#: MainMenu.py:243
+#: MainMenu.py:253
+#: MainMenu.py:262
 msgid "FoFiX Co-Op"
 msgstr "FoFix Co-Op"
 
-#: MainMenu.py:255
+#: MainMenu.py:254
 msgid "RB Co-Op"
 msgstr "RB Co-Op"
 
-#: MainMenu.py:256
+#: MainMenu.py:255
 msgid "GH Co-Op"
 msgstr "GH Co-Op"
 
-#: MainMenu.py:289
+#: MainMenu.py:288
 msgid "Solo Tour"
 msgstr "Solo Tour"
 
-#: MainMenu.py:391
+#: MainMenu.py:390
 msgid "No tutorials found!"
 msgstr "Keine Tutorials gefunden!"
 
-#: MainMenu.py:454
+#: MainMenu.py:455
 msgid "Enter the server address:"
 msgstr "Gib eine Server Adresse ein:"
 
-#: MainMenu.py:461
+#: MainMenu.py:462
 msgid "Connecting..."
 msgstr "Verbinden..."
 
@@ -4343,6 +4349,16 @@ msgstr "Controller %d"
 msgid "Select the controller for slot %d"
 msgstr "Wähle Controller für Platz %d"
 
+#: Player.py:787
+#, python-format
+msgid "%s conflicts with %s"
+msgstr "Tastenkonflikte: %s und %s"
+
+#: Player.py:875
+#, python-format
+msgid "This key conflicts with the following keys: %s"
+msgstr "Diese Taste kollidiert mit der folgenden Tasten: %s"
+
 #: Scorekeeper.py:39
 msgid "Auto Kick Bass"
 msgstr "Auto Tritt Bass"
@@ -4450,422 +4466,422 @@ msgid "Please name your controller"
 msgstr "Bitte benenne deinen Controller"
 
 #: Settings.py:385
-#: Settings.py:633
+#: Settings.py:634
 msgid "That name is already taken."
 msgstr "Dieser Name wird bereits verwendet."
 
 #: Settings.py:387
-#: Settings.py:635
+#: Settings.py:636
 msgid "Canceled."
 msgstr "Abgebrochen."
 
-#: Settings.py:457
-#: Settings.py:494
-#: Settings.py:524
-#: Settings.py:553
-#: Settings.py:591
-#: Settings.py:619
+#: Settings.py:458
+#: Settings.py:495
+#: Settings.py:525
+#: Settings.py:554
+#: Settings.py:592
+#: Settings.py:620
 msgid "Rename Controller"
 msgstr "Controller umbenennen"
 
-#: Settings.py:480
+#: Settings.py:481
 msgid "Press the solo shift key. Be sure to assign the frets first! Hold Escape to cancel."
 msgstr "Drücke die Solo Shift Taste. Stelle sicher die Frets erst festzulegen! Halte Escapre um abzubrechen."
 
-#: Settings.py:576
+#: Settings.py:577
 msgid "Press the highest fret on the slider. Hold Escape to cancel."
 msgstr "Drücke den höchsten Fret auf dem Schieber. Halte Escape um abzubrechen."
 
-#: Settings.py:631
+#: Settings.py:632
 msgid "Please rename your controller"
 msgstr "Bitte benenne deinen Controller um"
 
-#: Settings.py:764
+#: Settings.py:765
 msgid "Battle Objects"
 msgstr "Zweikampf Objekte"
 
-#: Settings.py:764
+#: Settings.py:765
 msgid "Set which objects can appear in Battle Mode"
 msgstr "Bestimme welche Objekte im Zweikampf Modus auftauchen können"
 
-#: Settings.py:779
+#: Settings.py:780
 msgid "Advanced Gameplay Settings"
 msgstr "Fortgeschrittene Gamplay Einstellungen"
 
-#: Settings.py:779
+#: Settings.py:780
 msgid "Set advanced gameplay settings that affect the game rules."
 msgstr "Bestimme fortgeschrittene gameplay Einstellungen die die Spielregeln beeinflussen."
 
-#: Settings.py:780
+#: Settings.py:781
 msgid "Vocal Mode Settings"
 msgstr "Gesangs Modus Einstellungen"
 
-#: Settings.py:780
+#: Settings.py:781
 msgid "Change settings that affect lyrics and in-game vocals."
 msgstr "Ändere Einstellungen die Auswirkungen auf Songtexte und Gesang im Spiel hat."
 
-#: Settings.py:781
+#: Settings.py:782
 msgid "HO/PO Settings"
 msgstr "HO/PO Einstellungen"
 
-#: Settings.py:781
+#: Settings.py:782
 msgid "Change settings that affect hammer-ons and pull-offs (HO/PO)."
 msgstr "Ändere Einstellungen die hammer-ons und pull-offs (HO/PO) beeinflussen."
 
-#: Settings.py:782
+#: Settings.py:783
 msgid "Battle Settings"
 msgstr "Zweikampf Einstellungen"
 
-#: Settings.py:782
+#: Settings.py:783
 msgid "Change settings that affect battle mode."
 msgstr "Ändere Einstellungen die den Zweikampf Modus beeinflussen."
 
-#: Settings.py:788
-#: Settings.py:1229
+#: Settings.py:789
+#: Settings.py:1231
 msgid "Test Controller 1"
 msgstr "Teste Controller 1"
 
-#: Settings.py:788
-#: Settings.py:1229
+#: Settings.py:789
+#: Settings.py:1231
 msgid "Test the controller configured for slot 1."
 msgstr "Teste den Contoller der für Platz 1 konfiguriert ist."
 
-#: Settings.py:789
-#: Settings.py:1230
+#: Settings.py:790
+#: Settings.py:1232
 msgid "Test Controller 2"
 msgstr "Teste Controller 2"
 
-#: Settings.py:789
-#: Settings.py:1230
+#: Settings.py:790
+#: Settings.py:1232
 msgid "Test the controller configured for slot 2."
 msgstr "Teste den Contoller der für Platz 2 konfiguriert ist."
 
-#: Settings.py:790
-#: Settings.py:1231
+#: Settings.py:791
+#: Settings.py:1233
 msgid "Test Controller 3"
 msgstr "Teste Controller 3"
 
-#: Settings.py:790
-#: Settings.py:1231
+#: Settings.py:791
+#: Settings.py:1233
 msgid "Test the controller configured for slot 3."
 msgstr "Teste den Contoller der für Platz 3 konfiguriert ist."
 
-#: Settings.py:791
-#: Settings.py:1232
+#: Settings.py:792
+#: Settings.py:1234
 msgid "Test Controller 4"
 msgstr "Teste Controller "
 
-#: Settings.py:791
-#: Settings.py:1232
+#: Settings.py:792
+#: Settings.py:1234
 msgid "Test the controller configured for slot 4."
 msgstr "Teste den Contoller der für Platz 4 konfiguriert ist."
 
-#: Settings.py:830
+#: Settings.py:831
 msgid "More Effects"
 msgstr "Mehr Effekte"
 
-#: Settings.py:830
+#: Settings.py:831
 msgid "Change the settings of the shader system."
 msgstr "Ändere die Einstellungen für das Shader System."
 
-#: Settings.py:846
+#: Settings.py:847
 msgid "Change Neck Transparency"
 msgstr "Ändere Neck Durchsichtigkeit"
 
-#: Settings.py:846
+#: Settings.py:847
 msgid "Change the transparency of the various in-game necks."
 msgstr "Ändere die Durchsichtigkeit für die verschiedenen Necks im Spiel."
 
-#: Settings.py:859
+#: Settings.py:860
 msgid "Theme Display Settings"
 msgstr "Themen Anzeige Einstellungen"
 
-#: Settings.py:859
+#: Settings.py:860
 msgid "Change settings that only affect certain theme types."
 msgstr "Ändere Einstellungen die nur bestimmte Themenarten beeinflussen."
 
-#: Settings.py:878
-#: Settings.py:1250
+#: Settings.py:879
+#: Settings.py:1252
 msgid "Video Resolution"
 msgstr "Auflösung"
 
-#: Settings.py:878
-#: Settings.py:1250
+#: Settings.py:879
+#: Settings.py:1252
 msgid "Set the resolution of the game. In windowed mode, higher values mean a larger screen."
 msgstr "Bestimme die Auflösung des Spiels. In Fenstermodus bedeuten höhere Zahlen ein größeres Bild."
 
-#: Settings.py:884
+#: Settings.py:885
 msgid "Stages Options"
 msgstr "Bühnen Optionen"
 
-#: Settings.py:884
+#: Settings.py:885
 msgid "Change settings related to the in-game background."
 msgstr "Ändere Einstellungen die mit dem Hintergrund im Spiel zu tun haben."
 
-#: Settings.py:885
-#: Settings.py:1257
+#: Settings.py:886
+#: Settings.py:1259
 msgid "Choose Default Neck >"
 msgstr "Wähle Standard Neck>"
 
-#: Settings.py:885
-#: Settings.py:1257
+#: Settings.py:886
+#: Settings.py:1259
 msgid "Choose your default neck. You still have to choose which neck you use for your character in the character select screen."
 msgstr "Wähle dein standard Neck. Du musst trotzdem noch wählen welches Neck du für deinen Charakter im Charakter Auswahl Bildschirm benutzen möchtest."
 
-#: Settings.py:886
+#: Settings.py:887
 msgid "Fretboard Settings"
 msgstr "Fretbrett Einstellungen"
 
-#: Settings.py:886
+#: Settings.py:887
 msgid "Change settings related to the fretboard."
 msgstr "Ändere Einstellungen die mit dem Fretbrett zu tun haben."
 
-#: Settings.py:887
-#: Settings.py:1258
+#: Settings.py:888
+#: Settings.py:1260
 msgid "In-Game Display Settings"
 msgstr "Anzeige Einstellungen im Spiel"
 
-#: Settings.py:887
-#: Settings.py:1258
+#: Settings.py:888
+#: Settings.py:1260
 msgid "Change what and where things appear in-game."
 msgstr "Ändere was im Spiel gezeigt wird und wo."
 
-#: Settings.py:888
+#: Settings.py:889
 msgid "Advanced Video Settings"
 msgstr "Fortgeschrittene Video Einstellungen"
 
-#: Settings.py:888
+#: Settings.py:889
 msgid "Change advanced video settings."
 msgstr "Ändere Fortgeschrittene Video Einstellungen"
 
-#: Settings.py:916
-#: Settings.py:1277
+#: Settings.py:917
+#: Settings.py:1279
 msgid "Volume Settings"
 msgstr "Lautstärke Einstellungen"
 
-#: Settings.py:916
-#: Settings.py:1277
+#: Settings.py:917
+#: Settings.py:1279
 msgid "Change the volume of game sounds."
 msgstr "Ändere die Lautstärke von Geräuschen im Spiel."
 
-#: Settings.py:925
+#: Settings.py:926
 msgid "Advanced Audio Settings"
 msgstr "Fortgeschrittene Ton Einstellungen"
 
-#: Settings.py:925
+#: Settings.py:926
 msgid "Change advanced audio settings."
 msgstr "Ändere fortgeschrittene Ton Einstellungen"
 
-#: Settings.py:966
-#: Settings.py:1292
+#: Settings.py:967
+#: Settings.py:1294
 msgid "Change Setlist Path >"
 msgstr "Ändere Setlist Pfad>"
 
-#: Settings.py:966
-#: Settings.py:1292
+#: Settings.py:967
+#: Settings.py:1294
 msgid "Set the path to a folder named 'songs' that contains your songs."
 msgstr "Wähle den Pfad zu einem Ordner mit dem Namen 'songs' welcher deine Songs beinhaltet."
 
-#: Settings.py:995
+#: Settings.py:996
 msgid "Debug Settings"
 msgstr "Fehlerbehebungs Einstellungen"
 
-#: Settings.py:995
+#: Settings.py:996
 msgid "Settings for coders to debug. Probably not worth changing."
 msgstr "Einstellungen für Programmierer zur Fehlerbehebung. Wahrscheinlich unnötig was dran zu machen."
 
-#: Settings.py:996
+#: Settings.py:997
 msgid "Log Settings"
 msgstr "Aufzeichnungs Optionen"
 
-#: Settings.py:996
+#: Settings.py:997
 msgid "Adds junk information to the logfile. Probably not useful in bug reports."
 msgstr "Fügt Nutzlose Informationen zur Logdatei hinzu. Wahrscheinlich sinnlos es zu ändern."
 
-#: Settings.py:1001
+#: Settings.py:1002
 msgid "AI Settings"
 msgstr "AI Einstellungen"
 
-#: Settings.py:1001
+#: Settings.py:1002
 msgid "Change the settings of the AI"
 msgstr "Ändere die AI Einstellungen"
 
-#: Settings.py:1010
-#: Settings.py:1367
+#: Settings.py:1011
+#: Settings.py:1369
 msgid "Mod settings"
 msgstr "Mod Einstellungen"
 
-#: Settings.py:1010
-#: Settings.py:1367
+#: Settings.py:1011
+#: Settings.py:1369
 msgid "Enable or disable any mods you have installed."
 msgstr "Schalte alle Mods an und ab die du hast."
 
-#: Settings.py:1015
-#: Settings.py:1309
+#: Settings.py:1016
+#: Settings.py:1311
 msgid "Gameplay Settings"
 msgstr "Gameplay Einstellungen"
 
-#: Settings.py:1015
-#: Settings.py:1309
+#: Settings.py:1016
+#: Settings.py:1311
 msgid "Settings that affect the rules of the game."
 msgstr "Einstellungen die die Regeln des Spiels beeinflussen."
 
-#: Settings.py:1016
-#: Settings.py:1310
+#: Settings.py:1017
+#: Settings.py:1312
 msgid "Control Settings"
 msgstr "Steuerung"
 
-#: Settings.py:1016
-#: Settings.py:1310
+#: Settings.py:1017
+#: Settings.py:1312
 msgid "Create, delete, and edit your controls."
 msgstr "Erstelle, lösche und bearbeite deine Steuerung."
 
-#: Settings.py:1017
-#: Settings.py:1311
+#: Settings.py:1018
+#: Settings.py:1313
 msgid "Display Settings"
 msgstr "Anzeige Optionen"
 
-#: Settings.py:1017
-#: Settings.py:1311
+#: Settings.py:1018
+#: Settings.py:1313
 msgid "Theme, neck, resolution, etc."
 msgstr "Theme, Neck, Auflösung, etc."
 
-#: Settings.py:1018
-#: Settings.py:1312
+#: Settings.py:1019
+#: Settings.py:1314
 msgid "Audio Settings"
 msgstr "Ton Einstellungen"
 
-#: Settings.py:1018
-#: Settings.py:1312
+#: Settings.py:1019
+#: Settings.py:1314
 msgid "Volume controls, etc."
 msgstr "Volumen bearbeiten, etc."
 
-#: Settings.py:1019
-#: Settings.py:1313
+#: Settings.py:1020
+#: Settings.py:1315
 msgid "Setlist Settings"
 msgstr "Setlist Einstellungen"
 
-#: Settings.py:1019
-#: Settings.py:1313
+#: Settings.py:1020
+#: Settings.py:1315
 msgid "Settings that affect the setlist."
 msgstr "Einstellungen die Einfluss auf die Setlist haben."
 
-#: Settings.py:1020
+#: Settings.py:1021
 msgid "Advanced Settings"
 msgstr "Fortgeschrittene Einstellungen"
 
-#: Settings.py:1020
+#: Settings.py:1021
 msgid "Settings that probably don't need to be changed."
 msgstr "Einstellungen die wahrscheinlich nicht geändert werden müssen."
 
-#: Settings.py:1021
-#: Settings.py:1314
+#: Settings.py:1022
+#: Settings.py:1316
 msgid "Mods, Cheats, AI"
 msgstr "Mods, Cheats, AI"
 
-#: Settings.py:1021
-#: Settings.py:1314
+#: Settings.py:1022
+#: Settings.py:1316
 msgid "Set Jurgen to play for you, or other cheats."
 msgstr "Lass Jurgen für dich spielen und andere Cheats."
 
-#: Settings.py:1022
-#: Settings.py:1315
+#: Settings.py:1023
+#: Settings.py:1317
 #, python-format
 msgid "%s Credits"
 msgstr "%s Credits"
 
-#: Settings.py:1022
-#: Settings.py:1315
+#: Settings.py:1023
+#: Settings.py:1317
 msgid "See who made this game."
 msgstr "Sieh wer das Spiel erstellt hat."
 
-#: Settings.py:1023
-#: Settings.py:1316
+#: Settings.py:1024
+#: Settings.py:1318
 msgid "Quickset"
 msgstr "Schnelleinstellung"
 
-#: Settings.py:1023
-#: Settings.py:1316
+#: Settings.py:1024
+#: Settings.py:1318
 msgid "A quick way to set many advanced settings."
 msgstr "Ein schneller Weg viele fortgeschrittene Einstellungen zu ändern."
 
-#: Settings.py:1024
+#: Settings.py:1025
 msgid "Hide Advanced Options"
 msgstr "Fortgeschrittene Optionen verstecken"
 
-#: Settings.py:1054
-#: Settings.py:1331
+#: Settings.py:1055
+#: Settings.py:1333
 msgid "FoFiX needs to restart to apply setting changes."
 msgstr "FoFix muss neu starten um die neuen Einstellungen anzuwenden."
 
-#: Settings.py:1073
-#: Settings.py:1339
+#: Settings.py:1074
+#: Settings.py:1341
 msgid "Test Controls"
 msgstr "Teste Steuerung"
 
-#: Settings.py:1073
-#: Settings.py:1339
+#: Settings.py:1074
+#: Settings.py:1341
 msgid "Go here to test your controllers."
 msgstr "Gehe hier um deine Controller zu testen."
 
-#: Settings.py:1078
-#: Settings.py:1344
+#: Settings.py:1079
+#: Settings.py:1346
 msgid "New Controller"
 msgstr "Neuer Controller"
 
-#: Settings.py:1078
-#: Settings.py:1344
+#: Settings.py:1079
+#: Settings.py:1346
 msgid "Create a new controller to use."
 msgstr "Lege einen neuen Controller zur Benutzung an."
 
-#: Settings.py:1079
-#: Settings.py:1345
+#: Settings.py:1080
+#: Settings.py:1347
 msgid "Edit Controller"
 msgstr "Controller bearbeiten"
 
-#: Settings.py:1079
-#: Settings.py:1345
+#: Settings.py:1080
+#: Settings.py:1347
 msgid "Edit a controller you have created."
 msgstr "Bearbeite einen Controller den du erstellt hast."
 
-#: Settings.py:1080
-#: Settings.py:1346
+#: Settings.py:1081
+#: Settings.py:1348
 msgid "Delete Controller"
 msgstr "Controller löschen"
 
-#: Settings.py:1080
-#: Settings.py:1346
+#: Settings.py:1081
+#: Settings.py:1348
 msgid "Delete a controller you have created."
 msgstr "Lösche einen Controller den du erstellt hast."
 
-#: Settings.py:1096
-#: Settings.py:1377
+#: Settings.py:1097
+#: Settings.py:1379
 msgid "You must specify a controller for slot 1!"
 msgstr "Du musst einen Controller für Platz 1 festlegen!"
 
-#: Settings.py:1102
-#: Settings.py:1383
+#: Settings.py:1103
+#: Settings.py:1385
 #, python-format
 msgid "Controllers in slots %d and %d conflict. Setting %d to None."
 msgstr "Controller auf den Plätzen %d und %d kollidieren. Setze %d zu nichts."
 
-#: Settings.py:1111
-#: Settings.py:1392
+#: Settings.py:1112
+#: Settings.py:1394
 #, python-format
 msgid "%d more conflicts."
 msgstr "Noch %d Konflikte"
 
-#: Settings.py:1155
-#: Settings.py:1422
-#: SongChoosingScene.py:174
+#: Settings.py:1157
+#: Settings.py:1424
+#: SongChoosingScene.py:173
 msgid "Choose a new songs directory."
 msgstr "Wähle einen neuen Songordner."
 
-#: Settings.py:1317
+#: Settings.py:1319
 msgid "See Advanced Options"
 msgstr "Zeige fortgeschrittene Optionen"
 
-#: Settings.py:1611
+#: Settings.py:1613
 msgid "Cheats"
 msgstr "Cheats"
 
@@ -4909,52 +4925,52 @@ msgstr "Hart"
 msgid "Expert"
 msgstr "Experte"
 
-#: Song.py:250
+#: Song.py:254
 msgid "NoName"
 msgstr "KeinName"
 
-#: Song.py:1036
+#: Song.py:1041
 msgid "This song is locked."
 msgstr "Dieser Song ist gesperrt."
 
-#: Song.py:1279
+#: Song.py:1284
 msgid "Reset Career"
 msgstr "Karriere neu starten"
 
-#: Song.py:1326
+#: Song.py:1331
 msgid "   (Random Song)"
 msgstr "   (Zufälliger Song)"
 
-#: SongChoosingScene.py:220
-#: SongChoosingScene.py:222
+#: SongChoosingScene.py:219
+#: SongChoosingScene.py:221
 msgid "Speed Select:"
 msgstr "Geschwindigkeit wählen:"
 
-#: SongChoosingScene.py:238
-#: SongChoosingScene.py:240
+#: SongChoosingScene.py:237
+#: SongChoosingScene.py:239
 msgid "Start Section:"
 msgstr "Starte Abschnitt:"
 
-#: SongChoosingScene.py:283
+#: SongChoosingScene.py:293
 msgid "There are no drum parts in this song. Change your controllers to play."
 msgstr "Es existieren keine Schlagzeug Noten für diesen Song. Ändere deine Controller um zu spielen."
 
-#: SongChoosingScene.py:287
+#: SongChoosingScene.py:299
 msgid "There are no guitar parts in this song. Change your controllers to play."
 msgstr "Es existieren keine Gitarren Noten für diesen Song. Ändere deine Controller um zu spielen."
 
-#: SongChoosingScene.py:291
+#: SongChoosingScene.py:305
 msgid "There are no vocal parts in this song. Change your controllers to play."
 msgstr "Es existieren keine Gesangs Noten für diesen Song. Ändere deine Controller um zu spielen."
 
-#: SongChoosingScene.py:310
-#: SongChoosingScene.py:312
+#: SongChoosingScene.py:326
+#: SongChoosingScene.py:328
 #, python-format
 msgid "%s Choose a part:"
 msgstr "%s Wähle ein Instrument:"
 
-#: SongChoosingScene.py:327
-#: SongChoosingScene.py:330
+#: SongChoosingScene.py:343
+#: SongChoosingScene.py:346
 #, python-format
 msgid "%s Choose a difficulty:"
 msgstr "%s Wähle eine Schwierigkeit:"
@@ -4988,6 +5004,9 @@ msgid "Terrible..."
 msgstr "Schrecklich..."
 
 #: Vocalist.py:465
+msgid "Tap!"
+msgstr "Klopf!"
+
 msgid "Ah yes, I know. I'm amazing."
 msgstr "Ja, ich weiß. Ich bin unglaublich."
 
@@ -5142,8 +5161,6 @@ msgstr "Ich bin euer neuer Gott, ihr kleinen Mädchen."
 #~ msgstr "Rythmus Lautstärke"
 #~ msgid "Bass, rhythm guitar, and drum volume."
 #~ msgstr "Bass, Rythmus Gitarre und Schlagzeug Lautstärke."
-#~ msgid "Tap!"
-#~ msgstr "Klopf!"
 #~ msgid "Brazilian portuguese"
 #~ msgstr "Brasilianisches Portugiesisch"
 #~ msgid "Save Song"
