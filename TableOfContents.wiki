@@ -9,6 +9,7 @@
   * [ReportingBugs]
   * [RequiredSourceModules]
   * [RunningUnderPython26]
+  * [RunningUnderGNULinux]
   * [Translating]
   * [Shaders]
   * [Roadmap]
