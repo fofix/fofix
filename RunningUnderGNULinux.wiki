@@ -26,7 +26,7 @@ The following gives instructions that should work on most GNU/Linux distribution
  
 == Install dependencies ==
 You need to install these packages:
-  * Python (tested with 2.4 and 2.5)
+  * Python (tested with 2.4, 2.5, and 2.6 on Karmic)
   * pygame (>= 1.9 required for 64bit CPUs)
   * PyOpenGL (2.x is recommanded as it's much faster than 3.x for most users)
   * NumPy
