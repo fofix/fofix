@@ -57,10 +57,11 @@ class ScoreCard(object):
     self.hitAccuracy = 0.0
     self.score  = 0
     if instrument == [5]:
-      self.baseScore = 200
+      self.baseScore = 0
     else:
       self.baseScore = 50
     self.notesHit = 0
+    self.percNotesHit = 0
     self.notesMissed = 0
     self.instrument = instrument # 0 = Guitar, 2 = Bass, 4 = Drum
     self.bassGrooveEnabled = False
@@ -74,6 +75,7 @@ class ScoreCard(object):
     self.handicapValue = 100.0
     self.totalStreakNotes = 0
     self.totalNotes = 0
+    self.totalPercNotes = 0
     self.cheatsApply = False
     self.stars = 0
     self.partialStars = 0
@@ -94,11 +96,13 @@ class ScoreCard(object):
           self.star[4] = 2.77
           self.star[3] = 0.90
           self.star[2] = 0.50
-          self.star[1] = 0.46
+          self.star[1] = 0.21
           self.star[0] = 0.0
         else:
           if self.instrument[0] == Song.DRUM_PART and not self.coOpType:
             self.star[6] = 4.29
+          elif self.instrument[0] == Song.VOCAL_PART and not self.coOpType:
+            self.star[6] = 4.18
           else:
             self.star[6] = 4.52
           self.star[5] = 3.08
@@ -162,7 +166,7 @@ class ScoreCard(object):
 
   def getStarScores(self, tempExtraScore = 0):
     oldStar = self.stars
-    if self.updateOnScore == 1:
+    if self.updateOnScore == 1 and self.instrument[0] != Song.VOCAL_PART:
       avMult = float(self.score+tempExtraScore) / float(self.totalNotes * self.baseScore)
     else:
       avMult = self.avMult
@@ -257,7 +261,10 @@ class ScoreCard(object):
     except ZeroDivisionError:
       self.hitAccuracy = 0.0
     try:
-      self.avMult      = self.score/float(self.totalNotes*self.baseScore)
+      if self.instrument[0] == Song.VOCAL_PART and not self.coOpType:
+        self.avMult = float(self.score)/float(self.baseScore)
+      else:
+        self.avMult      = self.score/float(self.totalNotes*self.baseScore)
     except ZeroDivisionError:
       self.avMult      = 1.0
   

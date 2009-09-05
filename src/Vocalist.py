@@ -37,7 +37,8 @@ import Image
 import ImageDraw
 from Svg import ImgDrawing
 
-diffMod = {0: 1.4, 1: 1.6, 2: 1.75, 3: 1.9}
+diffMod    = {0: 1.4, 1: 1.6, 2: 1.75, 3: 1.9}
+baseScores = {0: 1000, 1: 800, 2: 400, 3: 200}
 
 class Vocalist:
   def __init__(self, engine, playerObj, editorMode = False, player = 0):
@@ -119,7 +120,7 @@ class Vocalist:
     self.scoreBox  = (0,1)
     self.scorePhrases = [_("Amazing!"), _("Great!"), _("Decent"), _("Average"), _("Meh"), _("Bad"), _("Terrible...")]
     self.textScore = -1
-    self.lastScore = -1
+    self.lastScore = None
     self.coOpRB = False
     
     self.phraseIndex = 0
@@ -274,6 +275,8 @@ class Vocalist:
     self.tapBufferMargin = 300 - (50 * self.difficulty)
     self.accuracy        = 5000 - (self.difficulty * 1000)
     self.difficultyModifier = diffMod[self.difficulty]
+    self.baseScore        = 50
+    self.vocalBaseScore   = baseScores[self.difficulty]
     
     #Controls Jurgen in vocal parts
     self.jurgenEnabled   = False
@@ -318,9 +321,9 @@ class Vocalist:
       return multDict[self.scoreMultiplier]
   
   def getScoreChange(self):
-    if self.lastScore > -1:
-      score = 5 - self.lastScore
-      self.lastScore = -1
+    if self.lastScore is not None:
+      score = self.lastScore
+      self.lastScore = None
       return score
     else:
       return None
@@ -887,8 +890,12 @@ class Vocalist:
           self.phraseNoteTime = max(self.phraseNoteTime, 1)
           if self.activePhrase.tapPhrase:
             score = float(self.phraseTapsHit)/float(self.phraseTaps)
+            scorePt = self.phraseTapsHit * self.baseScore
+            taps = self.phraseTapsHit
           else:
             score = (self.phraseInTune/self.phraseNoteTime)
+            scorePt = int(score * self.vocalBaseScore)
+            taps = 0
           if not self.coOpRestart and not self.coOpFailed:
             for i, thresh in enumerate(self.scoreThresholds):
               if score >= thresh:
@@ -901,7 +908,7 @@ class Vocalist:
                   self.addMult()
                 if i >= 2:
                   self.resetMult()
-                self.lastScore = i
+                self.lastScore = (scorePt, i, taps)
                 self.textScore = i
                 self.scoredPhrases[i] += 1
                 self.showText = 1000
@@ -938,8 +945,12 @@ class Vocalist:
         self.phraseNoteTime = max(self.phraseNoteTime, 1)
         if self.activePhrase.tapPhrase:
           score = float(self.phraseTapsHit)/float(self.phraseTaps)
+          scorePt = self.phraseTapsHit * self.baseScore
+          taps = self.phraseTapsHit
         else:
           score = (self.phraseInTune/self.phraseNoteTime)
+          scorePt = int(score * self.vocalBaseScore)
+          taps = 0
         if not self.coOpFailed and not self.coOpRestart:
           for i, thresh in enumerate(self.scoreThresholds):
             if score >= thresh:
@@ -952,7 +963,7 @@ class Vocalist:
                 self.addMult()
               if i >= 2:
                 self.resetMult()
-              self.lastScore = i
+              self.lastScore = (scorePt, i, taps)
               self.textScore = i
               self.scoredPhrases[i] += 1
               self.showText = 1000

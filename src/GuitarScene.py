@@ -1276,7 +1276,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 #-      self.playerList[i].totalStreakNotes -= self.playerList[i].freestyleSkippedNotes
 
       if instrument.isVocal:
-        self.scoring[i].totalNotes = self.scoring[i].totalStreakNotes
+        self.scoring[i].totalNotes = self.scoring[i].totalStreakNotes - len(instrument.tapNoteTotals)
+        self.scoring[i].totalPercNotes = sum(instrument.tapNoteTotals)
+        self.scoring[i].baseScore  = (instrument.vocalBaseScore * self.scoring[i].totalNotes) + (self.scoring[i].totalPercNotes * instrument.baseScore)
       else:
         self.scoring[i].totalNotes = len([1 for Ntime, event in self.song.track[i].getAllEvents() if isinstance(event, Note)])
       
@@ -4080,15 +4082,17 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if instrument.isVocal:
           instrument.requiredNote = instrument.getRequiredNote(pos, self.song)
           instrument.run(ticks, pos)
-          scoreThresh = instrument.getScoreChange()
-          if scoreThresh is not None:
+          scoreBack = instrument.getScoreChange()
+          if scoreBack is not None:
+            points, scoreThresh, taps = scoreBack
+            self.scoring[i].score += points * instrument.scoreMultiplier * self.multi[i]
+            self.scoring[i].percNotesHit += taps
+            scoreThresh = 5-scoreThresh
             if scoreThresh > 3:
               self.rockmeterIncrease(i, scoreThresh)
-              self.scoring[i].score += scoreThresh * self.scoring[i].baseScore * instrument.scoreMultiplier * self.multi[i]
               self.scoring[i].notesHit += 1
               self.scoring[i].streak += 1
             elif scoreThresh == 3:
-              self.scoring[i].score += scoreThresh * self.scoring[i].baseScore * instrument.scoreMultiplier * self.multi[i]
               self.scoring[i].streak = 0 
             elif scoreThresh < 3:
               self.rockmeterDecrease(i, scoreThresh)
