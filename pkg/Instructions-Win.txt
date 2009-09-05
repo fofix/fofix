@@ -4,5 +4,5 @@ required Programs:
 - NSIS (http://nsis.sourceforge.net/)
 
 1) svn export the tag you want to distribute
-2) foldername should be something like: FoFiX v3.120 RC1 (py2.6 gl3)
-3) run pkg\buildBinaryWin.cmd from the exported dir
+2) folder name should follow Version.appNameSexy() + Version.revision(), and include the python/gl version. i.e. "FoFiX v3.120 beta 63 (py2.6 gl3)"
+3) run pkg\buildWin.cmd from the exported dir
