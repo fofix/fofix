@@ -53,7 +53,7 @@ hashcache = sqlite3.Connection('HashCache')
 hashcache.execute('CREATE TABLE IF NOT EXISTS `verlist` (`version` STRING UNIQUE)')
 hashcache.commit()
 MLDist = ListToNSIS.NsisScriptGenerator('..', hashcache, newTblName=FOFIX_VERSION_FULL)
-MLDist.readList('Dist-MegaLight-AllTutorials.lst')
+MLDist.readList('Dist-All.lst')
 MLDist.readExcludeList('filesToExclude.lst')
 hashcache.commit()
 
@@ -195,14 +195,20 @@ RmDir "$INSTDIR"
 builder.filterSection('MegaLight GH3', r'data\themes\MegaLight GH3', 'Installs the MegaLight GH3 theme.', secStart='SectionGroup /e "Themes"\r\nSection')
 builder.filterSection('MegaLight', r'data\themes\MegaLight', 'Installs the MegaLight theme.')
 builder.filterSection('UberLight', r'data\themes\UberLight', 'Installs the UberLight theme.', secEnd='SectionEnd\r\nSectionGroupEnd') 
-builder.filterSection('Low Poly CD List', r'data\mods\Low Poly CD List', 'Installs less complex CD meshes for the song list.', secStart='SectionGroup /e "Mods"\r\nSection')
+
+builder.filterSection('Cassettes Only', r'data\mods\Cassettes', 'Replace CDs in the songlist with the original FoF cassettes.', secStart='SectionGroup /e "Mods"\r\nSection')
+builder.filterSection('Guitar Cases Only', r'data\mods\Guitar Cases', 'Replace CD Cases in the songlist by the Guitar Cases created by FoZZ.')
+builder.filterSection('Low Poly CD List', r'data\mods\Low Poly CD List', 'Installs less complex CD meshes for the song list.')
 builder.filterSection('MegaLight RB Notes', r'data\mods\MegaLight RB Notes', 'Installs Rock Band-like notes for the MegaLight theme.', secEnd='SectionEnd\r\nSectionGroupEnd')
+
+#builder.filterSection('Tutorials', r'data\tutorials', 'Installs tutorials', secStart='Section')
 builder.filterSection('Jurgen Tutorial', r'data\tutorials\jurgenfof', 'Installs the tutorial from the original Frets on Fire.', secStart='SectionGroup /e "Tutorials"\r\nSection')
 builder.filterSection('Bang Bang, Mystery Man', r'data\tutorials\bangbang', r'Installs $\"Bang Bang, Mystery Man$\" as a tutorial song.')
 builder.filterSection('Drum Test Song', r'data\tutorials\drumtest', 'Installs a short song for testing drum functionality.', secStart='Section /o', secEnd='SectionEnd\r\nSectionGroupEnd')
+
 builder.filterSection('Hollowmind Necks', r'data\necks\hollow', 'Installs the Hollowmind neck images.', instHeader='SetOutPath "$INSTDIR\\data\\necks"\r\n')
 builder.filterSection('Source Code', 'src', 'Installs the FoFiX source code.', secStart='Section /o')
-builder.filterSection('Wiki Pages', 'FoFiX-wiki', 'Installs the FoFiX wiki pages.', secStart='Section /o')
+builder.filterSection('Wiki Pages', 'wiki', 'Installs the FoFiX wiki pages.', secStart='Section /o')
 
 # Unfortunately the installer graphics can only be BMPs, which are enormous.
 # Make them now out of PNGs that we'll do the real work with.
@@ -227,7 +233,7 @@ try:
   for v in versions:
     os.chdir(oldcwd)
     MLDist = ListToNSIS.NsisScriptGenerator('..', hashcache, oldTblName=v, newTblName=FOFIX_VERSION_FULL)
-    MLDist.readList('Dist-MegaLight-AllTutorials.lst')
+    MLDist.readList('Dist-All.lst')
     MLDist.readExcludeList('filesToExclude.lst')
     hashcache.commit()
     os.chdir('..')

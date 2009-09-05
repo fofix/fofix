@@ -125,7 +125,7 @@ Config.define("game",   "multiplayer_mode",    int,  0)
 Config.define("game",   "default_neck",        str, "defaultneck")
 
 Config.define("game","last_theme",           str,  "")
-
+Config.define("game", "base_library", str, "")
 Config.define("game",   "joysticks",    int,   0)
 
 #myfingershurt: default buffersize changed from 4096 to 2048:

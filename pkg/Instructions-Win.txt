@@ -1,0 +1,8 @@
+required Programs:
+- Subversion (http://subversion.tigris.org/getting.html#windows)
+- 7-Zip (http://www.7-zip.org/)
+- NSIS (http://nsis.sourceforge.net/)
+
+1) svn export the tag you want to distribute
+2) foldername should be something like: FoFiX v3.120 RC1 (py2.6 gl3)
+3) run pkg\buildBinaryWin.cmd from the exported dir

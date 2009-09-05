@@ -133,6 +133,13 @@ def main():
     #Lysdestic - Alter theme from CLI
     if theme != None:
       Config.set("coffee", "themename", theme)
+    
+    if playing != None:
+      library = Config.get("game","base_library")
+      basefolder = os.path.join(Version.dataPath(),library,"songs",playing)
+      if not (os.path.exists(os.path.join(basefolder, "song.ini")) and (os.path.exists(os.path.join(basefolder, "notes.mid")) or os.path.exists(os.path.join(basefolder, "notes-unedited.mid"))) and (os.path.exists(os.path.join(basefolder, "song.ogg")) or os.path.exists(os.path.join(basefolder, "guitar.ogg")))):
+        Log.warn("Song directory provided ('%s') is not a valid song directory. Starting up FoFiX in standard mode." % playing)
+        playing = None
 
     engine = GameEngine(config)
     engine.cmdPlay = 0

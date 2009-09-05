@@ -3602,10 +3602,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             self.doPick(i)
   
   def handleJurgen(self, pos):
-    #chordFudge = 1   #MFH - was 10 - #myfingershurt - needed to detect chords
-    if self.firstGuitar is None:
-      return
-    chordFudge = self.song.track[self.firstGuitar].chordFudge
+    chordFudge = 1   #MFH - was 10 - #myfingershurt - needed to detect chords
+    if self.firstGuitar is not None:
+      chordFudge = self.song.track[self.firstGuitar].chordFudge
     if self.autoPlay or self.assisting:
       for i,instrument in enumerate(self.instruments):
   
@@ -3615,6 +3614,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         else: #and if not
           if self.playerAssist[i] == 0: #and no assist
             continue
+        if instrument.isVocal:
+          continue
         guitar = instrument
         if self.battleGH:
           self.aiUseSP[i] = 0
