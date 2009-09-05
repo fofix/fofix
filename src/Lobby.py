@@ -272,6 +272,8 @@ class Lobby(Layer, KeyListener, MessageHandler):
   def keyPressedSP(self, key, unicode):
     c = self.engine.input.controls.getMapping(key)
     i = self.playerNum
+    if self.gameStarted:
+      return True
     if c in Player.cancels + self.no or key == pygame.K_ESCAPE:
 #      if self.playerNum == 0: #akedrou - needs fixing.
       self.engine.data.cancelSound.play()
