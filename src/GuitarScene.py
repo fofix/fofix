@@ -421,8 +421,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.originX          = Theme.povOriginX
     self.originY          = Theme.povOriginY
     self.originZ          = Theme.povOriginZ
+    self.customPOV        = False
     self.ending           = False
     
+    povList = [str(self.targetX), str(self.targetY), str(self.targetZ), str(self.originX), str(self.originY), str(self.originZ)]
+    if "None" not in povList:
+      self.customPOV = True
+      Log.debug("All theme POV set. Using custom camera POV.")
 
     self.pause = False
     self.failed = False
@@ -2273,39 +2278,38 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #y=2 rotate front
     #z=-3
 
-    if self.pov == 1: #GH3
-      self.camera.target    = (0.0, 0.6, 4.4)
-      self.camera.origin    = (0.0, 3.5*self.boardY, -3.8)
-    elif self.pov == 2: #RB
-      self.camera.target    = (0.0, 0.0, 3.7)
-      self.camera.origin    = (0.0, 2.9*self.boardY, -2.9)
-    elif self.pov == 3: #GH2
-      self.camera.target    = (0.0, 1.6, 2.0)
-      self.camera.origin    = (0.0, 2.6*self.boardY, -3.6)
-    elif self.pov == 4: #Rock Rev
-      self.camera.target    = (0.0, -6.0, 2.6666666666)
-      self.camera.origin    = (0.0, 6.0, 2.6666666665) 
-    elif self.pov == 5: #Theme
-      if self.rmtype == 0:
-        self.camera.target    = (0.0, 1.6, 2.0)
-        self.camera.origin    = (0.0, 2.6*self.boardY, -3.6)
-      elif self.rmtype == 1:
-        self.camera.target    = (0.0, 0.6, 4.4) #Worldrave - Perfected the proper GH3 POV
-        self.camera.origin    = (0.0, 3.5*self.boardY, -3.8)
-      elif self.rmtype == 2:
-        self.camera.target    = (0.0, 0.0, 3.7)
-        self.camera.origin    = (0.0, 2.9*self.boardY, -2.9)
-    else: # FoF
-      self.camera.target    = (0.0, 0.0, 4.0)
-      self.camera.origin    = (0.0, 3.0*self.boardY, -3.0)
-    povList = [str(self.targetX), str(self.targetY), str(self.targetZ), str(self.originX), str(self.originY), str(self.originZ)]
     if self.rmtype == 3:
       self.camera.target    = (0.0, 1.4, 1.8)
       self.camera.origin    = (0.0, 2.8, -3.6)
-    elif "None" not in povList:
-      Log.debug("All theme POV set. Using custom camera POV.")
+    elif self.customPOV:
       self.camera.target    = (self.targetX, self.targetY, self.targetZ)
       self.camera.origin    = (self.originX, self.originY*self.boardY, self.originZ)
+    else:
+      if self.pov == 1: #GH3
+        self.camera.target    = (0.0, 0.6, 4.4)
+        self.camera.origin    = (0.0, 3.5*self.boardY, -3.8)
+      elif self.pov == 2: #RB
+        self.camera.target    = (0.0, 0.0, 3.7)
+        self.camera.origin    = (0.0, 2.9*self.boardY, -2.9)
+      elif self.pov == 3: #GH2
+        self.camera.target    = (0.0, 1.6, 2.0)
+        self.camera.origin    = (0.0, 2.6*self.boardY, -3.6)
+      elif self.pov == 4: #Rock Rev
+        self.camera.target    = (0.0, -6.0, 2.6666666666)
+        self.camera.origin    = (0.0, 6.0, 2.6666666665) 
+      elif self.pov == 5: #Theme
+        if self.rmtype == 0:
+          self.camera.target    = (0.0, 1.6, 2.0)
+          self.camera.origin    = (0.0, 2.6*self.boardY, -3.6)
+        elif self.rmtype == 1:
+          self.camera.target    = (0.0, 0.6, 4.4) #Worldrave - Perfected the proper GH3 POV
+          self.camera.origin    = (0.0, 3.5*self.boardY, -3.8)
+        elif self.rmtype == 2:
+          self.camera.target    = (0.0, 0.0, 3.7)
+          self.camera.origin    = (0.0, 2.9*self.boardY, -2.9)
+      else: # FoF
+        self.camera.target    = (0.0, 0.0, 4.0)
+        self.camera.origin    = (0.0, 3.0*self.boardY, -3.0)
 
     #if self.fontMode == 1:    #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
     #  self.laminaScreen.refreshPosition()   #needs to be called whenever camera position changes
