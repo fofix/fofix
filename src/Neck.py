@@ -69,9 +69,9 @@ class Neck:
     if self.isDrum and self.engine.config.get("game", "large_drum_neck"):
       self.boardWidth     = 4.0
       self.boardLength    = 12.0
-    elif Theme.twoDnote == False or Theme.twoDkeys == False:
-      self.boardWidth     = 3.6
-      self.boardLength    = 9.0  
+    #elif Theme.twoDnote == False or Theme.twoDkeys == False:
+      #self.boardWidth     = 3.6
+      #self.boardLength    = 9.0  
 
     self.beatsPerBoard  = 5.0
     self.beatsPerUnit   = self.beatsPerBoard / self.boardLength

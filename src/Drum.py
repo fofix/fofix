@@ -355,9 +355,9 @@ class Drum:
       self.boardWidth     = 4.0
       self.boardLength    = 12.0
     #death_au: fixed neck size
-    elif self.twoDnote == False or self.twoDkeys == False:
-      self.boardWidth     = Theme.neckWidth + 0.6
-      self.boardLength    = Theme.neckLength  
+    # elif self.twoDnote == False or self.twoDkeys == False:
+      # self.boardWidth     = Theme.neckWidth + 0.6
+      # self.boardLength    = Theme.neckLength  
     else:
       self.boardWidth     = Theme.neckWidth
       self.boardLength    = Theme.neckLength

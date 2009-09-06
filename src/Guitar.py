@@ -129,9 +129,9 @@ class Guitar:
     self.boardWidth     = Theme.neckWidth
     self.boardLength    = Theme.neckLength
     #death_au: fixed neck size
-    if Theme.twoDnote == False or Theme.twoDkeys == False:
-      self.boardWidth     = 3.6
-      self.boardLength    = 9.0  
+    #if Theme.twoDnote == False or Theme.twoDkeys == False:
+      #self.boardWidth     = 3.6
+      #self.boardLength    = 9.0  
 
     self.beatsPerBoard  = 5.0
     self.beatsPerUnit   = self.beatsPerBoard / self.boardLength

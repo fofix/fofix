@@ -2273,19 +2273,19 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #y=2 rotate front
     #z=-3
 
-    if self.pov == 1:
-      self.camera.target    = (0.0, 0.6, 4.4) #kk69:More like GH3
+    if self.pov == 1: #GH3
+      self.camera.target    = (0.0, 0.6, 4.4)
       self.camera.origin    = (0.0, 3.5*self.boardY, -3.8)
-    elif self.pov == 2: #Racer
+    elif self.pov == 2: #RB
       self.camera.target    = (0.0, 0.0, 3.7)
       self.camera.origin    = (0.0, 2.9*self.boardY, -2.9)
-    elif self.pov == 3: #Racer
+    elif self.pov == 3: #GH2
       self.camera.target    = (0.0, 1.6, 2.0)
       self.camera.origin    = (0.0, 2.6*self.boardY, -3.6)
-    elif self.pov == 4: #blazingamer
+    elif self.pov == 4: #Rock Rev
       self.camera.target    = (0.0, -6.0, 2.6666666666)
       self.camera.origin    = (0.0, 6.0, 2.6666666665) 
-    elif self.pov == 5: #Blazingamer theme-dependant
+    elif self.pov == 5: #Theme
       if self.rmtype == 0:
         self.camera.target    = (0.0, 1.6, 2.0)
         self.camera.origin    = (0.0, 2.6*self.boardY, -3.6)
@@ -2295,15 +2295,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       elif self.rmtype == 2:
         self.camera.target    = (0.0, 0.0, 3.7)
         self.camera.origin    = (0.0, 2.9*self.boardY, -2.9)
-    else:
+    else: # FoF
       self.camera.target    = (0.0, 0.0, 4.0)
       self.camera.origin    = (0.0, 3.0*self.boardY, -3.0)
-
+    povList = [str(self.targetX), str(self.targetY), str(self.targetZ), str(self.originX), str(self.originY), str(self.originZ)]
     if self.rmtype == 3:
-      self.camera.target    = (0.0, 1.4, 1.8) #kk69:More like GH3
+      self.camera.target    = (0.0, 1.4, 1.8)
       self.camera.origin    = (0.0, 2.8, -3.6)
-
-    if (self.targetX and self.targetY and self.targetZ and self.originX and self.originY and self.originZ != None) and self.rmtype != 3:
+    elif "None" not in povList:
+      Log.debug("All theme POV set. Using custom camera POV.")
       self.camera.target    = (self.targetX, self.targetY, self.targetZ)
       self.camera.origin    = (self.originX, self.originY*self.boardY, self.originZ)
 
