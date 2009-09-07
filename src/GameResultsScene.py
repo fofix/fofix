@@ -244,7 +244,6 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.hopoFreq   = self.engine.config.get("coffee", "hopo_frequency")
     useSongHopoFreq = self.engine.config.get("game", "song_hopo_freq")
     songHopoFreq    = self.playerList[0].hopoFreq
-    hopoFreqCheat   = self.engine.config.get("coffee", "hopo_freq_cheat")
     noteHitWindow   = self.engine.config.get("game", "note_hit_window")
     try:
       songHopoFreq  = abs(int(songHopoFreq))
@@ -253,27 +252,27 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     if useSongHopoFreq == 1 and songHopoFreq < 6:
       self.hopoFreq = songHopoFreq
     
-    if hopoFreqCheat == 1:
-      self.hopoFreq = _("More")
-    elif hopoFreqCheat == 2:
-      self.hopoFreq = _("Even More")
-    elif self.hopoFreq == 0:
+    if self.hopoFreq == 0:
       self.hopoFreq = _("Least")
     elif self.hopoFreq == 1:
       self.hopoFreq = _("Less")
     elif self.hopoFreq == 2:
       self.hopoFreq = _("Normal")
     elif self.hopoFreq == 3:
+      self.hopoFreq = _("More")
+    elif self.hopoFreq == 4:
+      self.hopoFreq = _("Even More")
+    elif self.hopoFreq == 5:
       self.hopoFreq = _("Most")
     
     if noteHitWindow == 0:
-      self.hitWindow = _("Widest")
+      self.hitWindow = _("Tightest")
     elif noteHitWindow == 1:
+      self.hitWindow = _("Tight")
+    elif noteHitWindow == 3:
       self.hitWindow = _("Wide")
     elif noteHitWindow == 4:
-      self.hitWindow = _("Tightest")
-    elif noteHitWindow == 3:
-      self.hitWindow = _("Tight")
+      self.hitWindow = _("Widest")
     else:
       self.hitWindow = _("Standard")
     
