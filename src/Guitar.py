@@ -132,6 +132,8 @@ class Guitar:
     #if Theme.twoDnote == False or Theme.twoDkeys == False:
       #self.boardWidth     = 3.6
       #self.boardLength    = 9.0  
+    
+    self.boardScaleX    = float(self.boardWidth)/3.0
 
     self.beatsPerBoard  = 5.0
     self.beatsPerUnit   = self.beatsPerBoard / self.boardLength
@@ -932,6 +934,7 @@ class Guitar:
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
+        glScalef(self.boardScaleX, 1, 1)
 
 
         if isTappable:
@@ -959,6 +962,7 @@ class Guitar:
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
+        glScalef(self.boardScaleX, 1, 1)
         
         if isTappable:
           mesh = "Mesh_001"
@@ -983,6 +987,7 @@ class Guitar:
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
+        glScalef(self.boardScaleX, 1, 1)
 
 
         if isTappable:
@@ -1590,6 +1595,7 @@ class Guitar:
             glMatrixMode(GL_TEXTURE)
             glScalef(1, -1, 1)
             glMatrixMode(GL_MODELVIEW)
+            glScalef(self.boardScaleX, 1, 1)
             if f and not self.hit[n]:
               self.keyMesh.render("Mesh_001")
             elif self.hit[n]:
