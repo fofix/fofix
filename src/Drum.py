@@ -361,7 +361,8 @@ class Drum:
       self.boardWidth     *= (4.0/3.0)
       self.boardLength    *= (4.0/3.0)
     
-    self.boardScaleX = float(self.boardWidth)/3.0
+    self.boardScaleX    = self.boardWidth/3.6
+    self.boardScaleY    = self.boardLength/9.0
 
 
     self.muteSustainReleases = self.engine.config.get("game", "sustain_muting") #MFH
@@ -966,7 +967,7 @@ class Drum:
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
-        glScalef(self.boardScaleX, 1, 1)
+        glScalef(self.boardScaleX, self.boardScaleY, 1)
         if isTappable:
           meshObj.render("Mesh_001")
         else:
@@ -984,7 +985,7 @@ class Drum:
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
-        glScalef(self.boardScaleX, 1, 1)
+        glScalef(self.boardScaleX, self.boardScaleY, 1)
         if isTappable:
           meshObj.render("Mesh_001")
         else:
@@ -1001,7 +1002,7 @@ class Drum:
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
-        glScalef(self.boardScaleX, 1, 1)
+        glScalef(self.boardScaleX, self.boardScaleY, 1)
         if isTappable:
           meshObj.render("Mesh_001")
         else:
@@ -1020,7 +1021,7 @@ class Drum:
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
-        glScalef(self.boardScaleX, 1, 1)
+        glScalef(self.boardScaleX, self.boardScaleY, 1)
         meshObj.render()
         glMatrixMode(GL_TEXTURE)
         glLoadIdentity()
@@ -1036,7 +1037,7 @@ class Drum:
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
-        glScalef(self.boardScaleX, 1, 1)
+        glScalef(self.boardScaleX, self.boardScaleY, 1)
         meshObj.render()
         glMatrixMode(GL_TEXTURE)
         glLoadIdentity()
@@ -1052,7 +1053,7 @@ class Drum:
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
-        glScalef(self.boardScaleX, 1, 1)
+        glScalef(self.boardScaleX, self.boardScaleY, 1)
         meshObj.render()
         glMatrixMode(GL_TEXTURE)
         glLoadIdentity()
@@ -1543,7 +1544,7 @@ class Drum:
             glMatrixMode(GL_TEXTURE)
             glScalef(1, -1, 1)
             glMatrixMode(GL_MODELVIEW)
-            glScalef(self.boardScaleX, 1, 1)
+            glScalef(self.boardScaleX, self.boardScaleY, 1)
             if f and not self.hit[n]:
               self.keyMesh.render("Mesh_001")
             elif self.hit[n]:
