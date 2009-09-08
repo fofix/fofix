@@ -351,16 +351,15 @@ class Drum:
 
     self.bigMax = 1
 
-    if self.engine.config.get("game", "large_drum_neck"):
-      self.boardWidth     = 4.0
-      self.boardLength    = 12.0
     #death_au: fixed neck size
     # elif self.twoDnote == False or self.twoDkeys == False:
       # self.boardWidth     = Theme.neckWidth + 0.6
       # self.boardLength    = Theme.neckLength  
-    else:
-      self.boardWidth     = Theme.neckWidth
-      self.boardLength    = Theme.neckLength
+    self.boardWidth     = Theme.neckWidth
+    self.boardLength    = Theme.neckLength
+    if self.engine.config.get("game", "large_drum_neck"):
+      self.boardWidth     *= (4.0/3.0)
+      self.boardLength    *= (4.0/3.0)
     
     self.boardScaleX = float(self.boardWidth)/3.0
 
