@@ -43,14 +43,14 @@ framerate = 24 # Number of frames per seconds (-1 = as fast as it can)
 # Video examples
 #=====================
 # XviD/MPEG-4
-# vidSource = "t1.avi"
+vidSource = "t1.avi"
 
 # FFmpeg H.264
 # vidSource = "t2.m4v"
 
 # Macromedia Flash
 # vidSource = "t3.flv"
-vidSource = "t3.1.flv" # 24 seconds
+#vidSource = "t3.1.flv" # 24 seconds
 
 # Xiph Ogg Theora
 # vidSource = "t4.ogv"
@@ -62,6 +62,8 @@ class VideoPlayerTest(unittest.TestCase):
     self.e.view.pushLayer(vidPlayer)
     while not vidPlayer.finished:
       self.e.run()
+    self.e.view.popLayer(vidPlayer)
+    pygame.quit()
 
   # Keep tight control over the video player
   def testVideoPlayerSlave(self):
@@ -70,12 +72,14 @@ class VideoPlayerTest(unittest.TestCase):
     flags = DOUBLEBUF|OPENGL|HWPALETTE|HWSURFACE
     pygame.display.set_mode((winWidth, winHeight), flags)
     vidPlayer = VideoPlayer(self.e, framerate, self.src, (winWidth, winHeight))
-    glViewport(0, 0, winWidth, winHeight) # Required as GameEngine changes it
-    font = self.e.data.font
+    glViewport(0, 0, winWidth, winHeight) # Both required as...
+    glScissor(0, 0, winWidth, winHeight)  # ...GameEngine changes it
+    glClearColor(0, 0, 0, 1.)
     while not vidPlayer.finished:
       vidPlayer.run()
       vidPlayer.render()
       pygame.display.flip()
+    pygame.quit()
 
   # Grab the texture, use the CallList and do whatever we want with it;
   # We could also _just_ use the texture and take care of the polygons ourselves
@@ -85,7 +89,8 @@ class VideoPlayerTest(unittest.TestCase):
     flags = DOUBLEBUF|OPENGL|HWPALETTE|HWSURFACE
     pygame.display.set_mode((winWidth, winHeight), flags)
     vidPlayer = VideoPlayer(self.e, -1, self.src, (winWidth, winHeight))
-    glViewport(0, 0, winWidth, winHeight) # Required as GameEngine changes it
+    glViewport(0, 0, winWidth, winHeight) # Both required as...
+    glScissor(0, 0, winWidth, winHeight)  # ...GameEngine changes it
     glClearColor(0, 0, 0, 1.)
     x, y = 0.0, 1.0
     fx, fy, ftheta = 1, 1, 1
@@ -129,6 +134,7 @@ class VideoPlayerTest(unittest.TestCase):
         ftheta = ftheta * -1
       time = time + 0.00001
       clock.tick(60)
+    pygame.quit()
 
   def setUp(self):
     config = Config.load(Version.appName() + ".ini", setAsDefault = True)

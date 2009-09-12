@@ -34,6 +34,8 @@ from pygame.locals import *
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
+# Array-based drawing
+from numpy import array, float32
 
 from View import View, BackgroundLayer
 import Log
@@ -117,21 +119,34 @@ class VideoPlayer(BackgroundLayer):
       r = float(self.winWidth)/float(self.vidWidth)
       vtxY = 1.0 - abs(self.winHeight-r*self.vidHeight) / (float(self.winHeight))
 
-    # Create a compiled OpenGL call list
+    # Vertices
+    videoVtx = array([[-vtxX,  vtxY],
+                      [ vtxX, -vtxY],
+                      [ vtxX,  vtxY],
+                      [-vtxX,  vtxY],
+                      [-vtxX, -vtxY],
+                      [ vtxX, -vtxY]], dtype=float32)
+    # Texture coordinates
+    videoTex = array([[0.0, 1.0],
+                      [1.0, 0.0],
+                      [1.0, 1.0],
+                      [0.0, 1.0],
+                      [0.0, 0.0],
+                      [1.0, 0.0]], dtype=float32)
+    
+    # Create a compiled OpenGL call list and do array-based drawing
+    # Could have used GL_QUADS but IIRC triangles are recommended
     self.videoList = glGenLists(1)
     glNewList(self.videoList, GL_COMPILE)
     glEnable(GL_TEXTURE_2D)
     glColor3f(1., 1., 1.)
-    # Could have used GL_QUADS but IIRC triangles are recommended
-    glBegin(GL_TRIANGLE_STRIP)
-    glNormal3f(0.0, 0.0, 1.0)
-    glTexCoord2f(0.0, 1.0); glVertex3f(-vtxX,  vtxY, 0)
-    glTexCoord2f(1.0, 0.0); glVertex3f( vtxX, -vtxY, 0)
-    glTexCoord2f(1.0, 1.0); glVertex3f( vtxX,  vtxY, 0)
-    glTexCoord2f(0.0, 1.0); glVertex3f(-vtxX,  vtxY, 0)
-    glTexCoord2f(0.0, 0.0); glVertex3f(-vtxX, -vtxY, 0)
-    glTexCoord2f(1.0, 0.0); glVertex3f( vtxX, -vtxY, 0)
-    glEnd()
+    glEnableClientState(GL_VERTEX_ARRAY)
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glVertexPointerf(videoVtx)
+    glTexCoordPointerf(videoTex)
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, videoVtx.shape[0])
+    glDisableClientState(GL_VERTEX_ARRAY)
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     glDisable(GL_TEXTURE_2D)
     glEndList()
 
@@ -149,31 +164,25 @@ class VideoPlayer(BackgroundLayer):
     self.input.set_property("location", self.videoSrc)
     self.fakeSink.connect ("handoff", self.newFrame)
     # Catch the end of file as well as errors
-    # FIXME: Doesn't work!?! The event is never received
-    # Ok, messages are sent if i use the following in run():
-    #  gobject.MainLoop().get_context().iteration(True)
-    # BUT the main python thread then freezes after ~5 seconds...
-    # unless we use gobject.idle_add(self.player.elements)
-    # See run() for another hackish workaround.
+    # FIXME:
+    #  Messages are sent if i use the following in run():
+    #   gobject.MainLoop().get_context().iteration(True)
+    #  BUT the main python thread then freezes after ~5 seconds...
+    #  unless we use gobject.idle_add(self.player.elements)
     bus = self.player.get_bus()
     bus.add_signal_watch()
     bus.enable_sync_message_emission()
     bus.connect("message", self.onMessage)
-#     bus.connect("message::eos", self.onEndOfStream)
     # Required to prevent the main python thread from freezing, why?!
     # Thanks to max26199 for finding this!
     gobject.idle_add(self.player.elements)
-
-  # Handle end of video
-#   def onEndOfStream(self, bus, message):
-#     print "The END"
 
   # Handle bus event e.g. end of video or unsupported formats/codecs
   def onMessage(self, bus, message):
     type = message.type
 #     print "Message %s" % type
+    # End of video
     if type == gst.MESSAGE_EOS:
-#       print "End of video"
       if self.loop:
         self.player.set_state(gst.STATE_NULL)
         # HACKISH: Need to recreate the pipepile altogether...
@@ -183,6 +192,7 @@ class VideoPlayer(BackgroundLayer):
       else:
         self.player.set_state(gst.STATE_NULL)
         self.finished = True
+    # Error
     elif type == gst.MESSAGE_ERROR:
       err, debug = message.parse_error()
       Log.error("Error: %s" % err, debug)
@@ -223,20 +233,6 @@ class VideoPlayer(BackgroundLayer):
     else:
       self.player.set_state(gst.STATE_PLAYING)
       self.finished = False
-    # HACKISH: The following is a freakin' ugly hack to workaround the gst
-    # threading issue (see comments at the bottom of videoSetup).
-    # Thanks to max26199, this is no longer necessary
-#     s = self.fakeSink.get_property("last-message")
-#     if s and s.find("type: 86") != -1: # 86 means EndOfStream (EOS)
-#       if self.loop:
-#         self.player.set_state(gst.STATE_NULL)
-#         # HACKISH: Need to recreate the pipepile altogether...
-#         # For some reason going through STATE_NULL, STATE_READY, STATE_PLAYING
-#         # doesn't work as I would expect.
-#         self.videoSetup()
-#       else:
-#         self.player.set_state(gst.STATE_NULL)
-#         self.finished = True
     gobject.MainLoop().get_context().iteration(True)
     self.clock.tick(self.fps)
     
