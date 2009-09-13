@@ -85,6 +85,11 @@ class VideoPlayer(BackgroundLayer):
   def videoDiscover(self, d, isMedia):
     if isMedia and d.is_video:
       self.vidWidth, self.vidHeight = d.videowidth, d.videoheight
+      # Force mute is no sound track is available or
+      # else you'll get nothing but a black screen!
+      if not d.is_audio and not self.mute:
+        Log.warn("Video has no sound ==> forcing mute.")
+        self.mute = True
     else:
       Log.error("Invalid video file: %s" % self.videoSrc)
     self.discovered = True
@@ -195,9 +200,15 @@ class VideoPlayer(BackgroundLayer):
     # Error
     elif type == gst.MESSAGE_ERROR:
       err, debug = message.parse_error()
-      Log.error("Error: %s" % err, debug)
+      Log.error("GStreamer error: %s" % err, debug)
       self.player.set_state(gst.STATE_NULL)
       self.finished = True
+    elif type == gst.MESSAGE_WARNING:
+      warning, debug = message.parse_warning()
+      Log.warn("GStreamer warning: %s" % warn, debug)
+    # elif type == gst.MESSAGE_STATE_CHANGED:
+    #   oldstate, newstate, pending = message.parse_state_changed()
+    #   Log.debug("GStreamer state: %s" % newstate)
 
   # Handle new video frames coming from the decoder
   def newFrame(self, sink, buffer, pad):

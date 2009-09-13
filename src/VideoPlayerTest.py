@@ -50,7 +50,7 @@ vidSource = "t1.avi"
 
 # Macromedia Flash
 # vidSource = "t3.flv"
-#vidSource = "t3.1.flv" # 24 seconds
+# vidSource = "t3.1.flv" # 24 seconds
 
 # Xiph Ogg Theora
 # vidSource = "t4.ogv"
@@ -58,16 +58,22 @@ vidSource = "t1.avi"
 class VideoPlayerTest(unittest.TestCase):
   # Simplest way to use the video player, use it as a Layer
   def testVideoPlayerLayer(self):
+    config = Config.load(Version.appName() + ".ini", setAsDefault = True)
+    self.e = GameEngine(config)
     vidPlayer = VideoPlayer(self.e, framerate, self.src, loop = False)
     self.e.view.pushLayer(vidPlayer)
     while not vidPlayer.finished:
       self.e.run()
     self.e.view.popLayer(vidPlayer)
-    pygame.quit()
+    # pygame.quit()
+    self.e.audio.close()
+    self.e.quit()
 
   # Keep tight control over the video player
   def testVideoPlayerSlave(self):
     winWidth, winHeight = 800, 600
+    config = Config.load(Version.appName() + ".ini", setAsDefault = True)
+    self.e = GameEngine(config)
     pygame.init()
     flags = DOUBLEBUF|OPENGL|HWPALETTE|HWSURFACE
     pygame.display.set_mode((winWidth, winHeight), flags)
@@ -79,12 +85,15 @@ class VideoPlayerTest(unittest.TestCase):
       vidPlayer.run()
       vidPlayer.render()
       pygame.display.flip()
-    pygame.quit()
+    self.e.audio.close()
+    self.e.quit()
 
   # Grab the texture, use the CallList and do whatever we want with it;
   # We could also _just_ use the texture and take care of the polygons ourselves
   def testVideoPlayerSlaveShowOff(self):
     winWidth, winHeight = 500, 500
+    config = Config.load(Version.appName() + ".ini", setAsDefault = True)
+    self.e = GameEngine(config)
     pygame.init()
     flags = DOUBLEBUF|OPENGL|HWPALETTE|HWSURFACE
     pygame.display.set_mode((winWidth, winHeight), flags)
@@ -134,15 +143,15 @@ class VideoPlayerTest(unittest.TestCase):
         ftheta = ftheta * -1
       time = time + 0.00001
       clock.tick(60)
-    pygame.quit()
+    self.e.audio.close()
+    self.e.quit()
 
   def setUp(self):
-    config = Config.load(Version.appName() + ".ini", setAsDefault = True)
-    self.e = GameEngine(config)
     self.src = os.path.join(Version.dataPath(), vidSource)
-    
+    self.assert_(os.path.exists(self.src), "File %s does not exist!" % self.src)
+   
   def tearDown(self):
-    self.e.quit()
+    pass
 
 if __name__ == "__main__":
   unittest.main()
