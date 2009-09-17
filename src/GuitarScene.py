@@ -5693,19 +5693,19 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if self.instruments[num].isDrum and control in self.instruments[num].keys:
       if actual:
         if control in Player.bassdrums:
-          self.instruments[num].drumsHeldDown[0] = 180
+          self.instruments[num].drumsHeldDown[0] = 100
           self.instruments[num].playedSound[0] = False
         elif control in Player.drum1s:
-          self.instruments[num].drumsHeldDown[1] = 180
+          self.instruments[num].drumsHeldDown[1] = 100
           self.instruments[num].playedSound[1] = False
         elif control in Player.drum2s:
-          self.instruments[num].drumsHeldDown[2] = 180
+          self.instruments[num].drumsHeldDown[2] = 100
           self.instruments[num].playedSound[2] = False
         elif control in Player.drum3s:
-          self.instruments[num].drumsHeldDown[3] = 180
+          self.instruments[num].drumsHeldDown[3] = 100
           self.instruments[num].playedSound[3] = False
         elif control in Player.drum5s:
-          self.instruments[num].drumsHeldDown[4] = 180
+          self.instruments[num].drumsHeldDown[4] = 100
           self.instruments[num].playedSound[4] = False
     if self.battleGH:
       if self.instruments[num].battleStatus[3]:

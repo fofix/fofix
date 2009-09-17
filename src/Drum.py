@@ -1479,7 +1479,7 @@ class Drum:
     #self.hitglow_color = self.engine.config.get("video", "hitglow_color")
 
     for n in range(self.strings):
-      f = self.drumsHeldDown[n+1]/360.0
+      f = self.drumsHeldDown[n+1]/200.0
       pressed = self.drumsHeldDown[n+1]
 
       if n == 3:
