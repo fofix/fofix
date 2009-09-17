@@ -927,8 +927,12 @@ class Neck:
     
     if self.scoreMultiplier > 4 and self.bgcount < 1:
       self.bgcount += .1
+      if self.bgcount > 1:
+        self.bgcount = 1
     if self.scoreMultiplier < 4 and self.bgcount > 0:
       self.bgcount -= .1
+      if self.bgcount < 0:
+        self.bgcount = 0
     if not (self.instrument.coOpFailed and not self.instrument.coOpRestart):
 
       if self.ocount < 1:

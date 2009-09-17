@@ -239,12 +239,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.instruments.append(inst)
       else:
         from Guitar import Guitar
-        inst = Guitar(self.engine,player,False,j)
+        bass = False
+        if player.part.id == Song.BASS_PART:
+          bass = True
+        inst = Guitar(self.engine,player,False,j, bass = bass)
         self.instruments.append(inst)
         if player.part.id == Song.LEAD_PART or player.part.id == Song.GUITAR_PART:    #both these selections should get guitar solos
           self.instruments[j].canGuitarSolo = True
-        elif player.part.id == Song.BASS_PART:
-          self.instruments[j].isBassGuitar = True
 
       if player.practiceMode:
         self.practiceMode = True
@@ -5690,9 +5691,22 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if num is None:
       return True
     if self.instruments[num].isDrum and control in self.instruments[num].keys:
-      if control in Player.bassdrums and actual:
-        self.instruments[num].bassDrumPedalDown = 100
-        self.instruments[num].bassDrumPedalPressed = True
+      if actual:
+        if control in Player.bassdrums:
+          self.instruments[num].drumsHeldDown[0] = 180
+          self.instruments[num].playedSound[0] = False
+        elif control in Player.drum1s:
+          self.instruments[num].drumsHeldDown[1] = 180
+          self.instruments[num].playedSound[1] = False
+        elif control in Player.drum2s:
+          self.instruments[num].drumsHeldDown[2] = 180
+          self.instruments[num].playedSound[2] = False
+        elif control in Player.drum3s:
+          self.instruments[num].drumsHeldDown[3] = 180
+          self.instruments[num].playedSound[3] = False
+        elif control in Player.drum5s:
+          self.instruments[num].drumsHeldDown[4] = 180
+          self.instruments[num].playedSound[4] = False
     if self.battleGH:
       if self.instruments[num].battleStatus[3]:
         if control == self.instruments[num].keys[self.instruments[num].battleBreakString]:
@@ -5844,10 +5858,22 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         
     pressed = -1
     for i in range(self.numOfPlayers):
-      if self.instruments[i].isDrum and control in self.instruments[i].keys:
-        if control in Player.bassdrums and actual:
-          self.instruments[i].bassDrumPedalDown    = 100
-          self.instruments[i].bassDrumPedalPressed = True
+      if self.instruments[i].isDrum and control in self.instruments[i].keys and actual:
+        if control in Player.bassdrums:
+          self.instruments[num].drumsHeldDown[0] = 180
+          self.instruments[num].playedSound[0] = False
+        elif control in Player.drum1s:
+          self.instruments[num].drumsHeldDown[1] = 180
+          self.instruments[num].playedSound[1] = False
+        elif control in Player.drum2s:
+          self.instruments[num].drumsHeldDown[2] = 180
+          self.instruments[num].playedSound[2] = False
+        elif control in Player.drum3s:
+          self.instruments[num].drumsHeldDown[3] = 180
+          self.instruments[num].playedSound[3] = False
+        elif control in Player.drum5s:
+          self.instruments[num].drumsHeldDown[4] = 180
+          self.instruments[num].playedSound[4] = False
       if control in (self.instruments[i].actions):
         hopo = False
         pressed = i
@@ -5968,28 +5994,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if num is None:
       return
 
-    #myfingershurt: drums :)
-    #MFH - cleaning up Faaa's drum tracking code: (which appears to determine which drum fret after key release?  TODO: why not before?)
     if self.instruments[num].isDrum:
-      if control in (self.instruments[num].keys):
-        if not self.controls.getState(self.instruments[num].keys[0]) and not self.controls.getState(self.instruments[num].keys[5]):
-          self.instruments[num].bassDrumPedalDown = 0    #MFH - this is all that's needed here...
-          #self.instruments[num].lastFretWasBassDrum = False
       return True
-    
-#-      if not self.controls.getState(self.instruments[num].keys[1]):
-#-        self.instruments[num].lastFretWasT1 = False
-#-      return True
-#-      if not self.controls.getState(self.instruments[num].keys[2]):
-#-        self.instruments[num].lastFretWasT2 = False
-#-      return True  
-#-      if not self.controls.getState(self.instruments[num].keys[3]):
-#-        self.instruments[num].lastFretWasT3 = False
-#-      return True
-#-      if not self.controls.getState(self.instruments[num].keys[4]):
-#-        self.instruments[num].lastFretWasC = False
-#-      return True   
-
 
     #myfingershurt:
   

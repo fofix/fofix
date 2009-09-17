@@ -47,12 +47,12 @@ import Song   #need the base song defines as well
 
 
 class Guitar:
-  def __init__(self, engine, playerObj, editorMode = False, player = 0):
+  def __init__(self, engine, playerObj, editorMode = False, player = 0, bass = False):
     self.engine         = engine
 
 
     self.isDrum = False
-    self.isBassGuitar = False
+    self.isBassGuitar = bass
     self.isVocal = False
 
     self.starPowerDecreaseDivisor = 200.0/self.engine.audioSpeedFactor
@@ -133,7 +133,7 @@ class Guitar:
       #self.boardWidth     = 3.6
       #self.boardLength    = 9.0  
     
-    self.boardScaleX    = self.boardWidth/3.6
+    self.boardScaleX    = self.boardWidth/3.0
     self.boardScaleY    = self.boardLength/9.0
 
     self.beatsPerBoard  = 5.0
@@ -926,7 +926,17 @@ class Guitar:
         c = self.fretColors[5]
         glColor4f(.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1) 
 
-      glRotatef(Theme.noterotdegrees, 0, 0, Theme.noterot[fret])
+      if fret == 0: # green note
+        glRotate(Theme.noterot[0], 0, 0, 1), glTranslatef(0, Theme.notepos[0], 0)
+      elif fret == 1: # red note
+        glRotate(Theme.noterot[1], 0, 0, 1), glTranslatef(0, Theme.notepos[1], 0)
+      elif fret == 2: # yellow
+        glRotate(Theme.noterot[2], 0, 0, 1), glTranslatef(0, Theme.notepos[2], 0)
+      elif fret == 3:# blue note
+        glRotate(Theme.noterot[3], 0, 0, 1), glTranslatef(0, Theme.notepos[3], 0)
+      elif fret == 4:# blue note
+        glRotate(Theme.noterot[4], 0, 0, 1), glTranslatef(0, Theme.notepos[4], 0)
+
 
       if self.staratex == True and self.starPowerActive and spNote == False:
         glColor3f(1,1,1)
@@ -1571,7 +1581,16 @@ class Guitar:
           glRotatef(-90, 1, 0, 0)
           glRotatef(-90, 0, 0, 1)
 
-          glRotatef(Theme.noterotdegrees, 0, 0, -Theme.noterot[n])
+          if n == 0: #green fret button
+            glRotate(Theme.keyrot[0], 0, 1, 0), glTranslatef(0, 0, Theme.keypos[0])
+          elif n == 1: #red fret button
+            glRotate(Theme.keyrot[1], 0, 1, 0), glTranslatef(0, 0, Theme.keypos[1])
+          elif n == 2: #yellow fret button
+            glRotate(Theme.keyrot[2], 0, 1, 0), glTranslatef(0, 0, Theme.keypos[2])
+          elif n == 3: #blue fret button
+            glRotate(Theme.keyrot[3], 0, 1, 0), glTranslatef(0, 0, Theme.keypos[3])
+          elif n == 4: #orange fret button
+            glRotate(Theme.keyrot[4], 0, 1, 0), glTranslatef(0, 0, Theme.keypos[4])
 
 
           #Mesh - Main fret
