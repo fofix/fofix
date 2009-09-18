@@ -366,7 +366,7 @@ class Drum:
     
     self.boardScaleX    = self.boardWidth/3.0
     self.boardScaleY    = self.boardLength/9.0
-    self.boardScaleOpen = 5.0/6.0
+    self.fretPress      = Theme.fret_press
 
     self.muteSustainReleases = self.engine.config.get("game", "sustain_muting") #MFH
 
@@ -422,7 +422,6 @@ class Drum:
         self.hitFlamesPresent = False   #MFH - shut down all flames if these are missing.
       self.Hitanim = False
 
-
     if self.twoDkeys == True: #death_au
       #myfingershurt: adding drumfretshacked.png for image-corrected drum fret angles in RB:
       try:
@@ -435,6 +434,7 @@ class Drum:
       except IOError:
         self.drumFretButtons = None
     else: #death_au
+      defaultKey = False
       #MFH - can't use IOError for fallback logic for a Mesh() call... 
       if self.engine.fileExists(os.path.join("themes", themename, "key_drum.dae")):
         engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "key_drum.dae")))
@@ -442,24 +442,29 @@ class Drum:
         engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "key.dae")))
       else:
         engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName("key.dae")))
+        defaultKey = True
 
       if self.engine.fileExists(os.path.join("themes", themename, "key_open.dae")):
         engine.resource.load(self,  "keyMeshOpen",  lambda: Mesh(engine.resource.fileName("themes", themename, "key_open.dae")))
       else:
         engine.resource.load(self,  "keyMeshOpen",  lambda: Mesh(engine.resource.fileName("key_open.dae")))
 
-      try:
-        for i in range(5):
-          engine.loadImgDrawing(self,  "keytex"+chr(97+i),  os.path.join("themes", themename, "keytex_"+chr(97+i)+".png"))
-        self.keytex = True
-
-      except IOError:
+      if defaultKey:
         self.keytex = False
-      
-      try:
-        engine.loadImgDrawing(self, "keytexopen", os.path.join("themes",themename,"keytex_open.png"))
-      except IOError:
         self.keytexopen = None
+      else:
+        try:
+          for i in range(5):
+            engine.loadImgDrawing(self,  "keytex"+chr(97+i),  os.path.join("themes", themename, "keytex_"+chr(97+i)+".png"))
+          self.keytex = True
+
+        except IOError:
+          self.keytex = False
+      
+        try:
+          engine.loadImgDrawing(self, "keytexopen", os.path.join("themes",themename,"keytex_open.png"))
+        except IOError:
+          self.keytexopen = None
 
     #Spinning starnotes or not?
     self.starspin = False
@@ -472,6 +477,7 @@ class Drum:
         engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notes.png"))
         self.separateDrumNotes = False
     else:
+      defaultNote = False
       #MFH - can't use IOError for fallback logic for a Mesh() call... 
       if self.engine.fileExists(os.path.join("themes", themename, "note_drum.dae")):
         engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "note_drum.dae")))
@@ -479,42 +485,50 @@ class Drum:
         engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "note.dae")))
       else:
         engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName("note.dae")))
+        defaultNote = True
 
-      try:
-        for i in range(5):
-          engine.loadImgDrawing(self,  "notetex"+chr(97+i),  os.path.join("themes", themename, "notetex_"+chr(97+i)+".png"))
-        self.notetex = True
-
-      except IOError:
+      if defaultNote:
         self.notetex = False
-
-      if self.engine.fileExists(os.path.join("themes", themename, "star_drum.dae")):  
-        engine.resource.load(self,  "starMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "star_drum.dae")))
-      elif self.engine.fileExists(os.path.join("themes", themename, "star.dae")):  
-        engine.resource.load(self,  "starMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "star.dae")))
-      else:  
         self.starMesh = None
-
-      try:
-        for i in range(5):
-          engine.loadImgDrawing(self,  "startex"+chr(97+i),  os.path.join("themes", themename, "startex_"+chr(97+i)+".png"))
-        self.startex = True
-
-      except IOError:
         self.startex = False
-        
-      try:
-        for i in range(5):
-          engine.loadImgDrawing(self,  "staratex"+chr(97+i),  os.path.join("themes", themename, "staratex_"+chr(97+i)+".png"))
-        self.staratex = True
-
-      except IOError:
         self.staratex = False
-      
-      try:
-        engine.loadImgDrawing(self, "spActTex", os.path.join("themes",themename,"spacttex.png"))
-      except IOError:
         self.spActTex = None
+      else:
+        try:
+          for i in range(5):
+            engine.loadImgDrawing(self,  "notetex"+chr(97+i),  os.path.join("themes", themename, "notetex_"+chr(97+i)+".png"))
+          self.notetex = True
+  
+        except IOError:
+          self.notetex = False
+
+        if self.engine.fileExists(os.path.join("themes", themename, "star_drum.dae")):  
+          engine.resource.load(self,  "starMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "star_drum.dae")))
+        elif self.engine.fileExists(os.path.join("themes", themename, "star.dae")):  
+          engine.resource.load(self,  "starMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "star.dae")))
+        else:  
+          self.starMesh = None
+        
+        try:
+          for i in range(5):
+            engine.loadImgDrawing(self,  "startex"+chr(97+i),  os.path.join("themes", themename, "startex_"+chr(97+i)+".png"))
+          self.startex = True
+
+        except IOError:
+          self.startex = False
+        
+        try:
+          for i in range(5):
+            engine.loadImgDrawing(self,  "staratex"+chr(97+i),  os.path.join("themes", themename, "staratex_"+chr(97+i)+".png"))
+          self.staratex = True
+
+        except IOError:
+          self.staratex = False
+        
+        try:
+          engine.loadImgDrawing(self, "spActTex", os.path.join("themes",themename,"spacttex.png"))
+        except IOError:
+          self.spActTex = None
       
       if self.engine.fileExists(os.path.join("themes", themename, "open.dae")):
         engine.resource.load(self,  "openMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "open.dae")))
@@ -1064,7 +1078,7 @@ class Drum:
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
-        glScalef(self.boardScaleX*self.boardScaleOpen, self.boardScaleY, 1)
+        glScalef(self.boardScaleX, self.boardScaleY, 1)
         meshObj.render()
         glMatrixMode(GL_TEXTURE)
         glLoadIdentity()
@@ -1080,7 +1094,7 @@ class Drum:
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
-        glScalef(self.boardScaleX*self.boardScaleOpen, self.boardScaleY, 1)
+        glScalef(self.boardScaleX, self.boardScaleY, 1)
         meshObj.render()
         glMatrixMode(GL_TEXTURE)
         glLoadIdentity()
@@ -1096,7 +1110,7 @@ class Drum:
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
-        glScalef(self.boardScaleX*self.boardScaleOpen, self.boardScaleY, 1)
+        glScalef(self.boardScaleX, self.boardScaleY, 1)
         meshObj.render()
         glMatrixMode(GL_TEXTURE)
         glLoadIdentity()
@@ -1488,7 +1502,10 @@ class Drum:
         c = self.fretColors[n + 1]
 
       glColor4f(.1 + .8 * c[0] + f, .1 + .8 * c[1] + f, .1 + .8 * c[2] + f, visibility)
-      y = v + f / 6
+      if self.fretPress:
+        y = v + f / 6 #this allows the keys to "press"
+      else:
+        y = v / 6
       x = (self.strings / 2 - .5 - n) * w
 
       if self.twoDkeys == True: #death_au
@@ -1693,14 +1710,11 @@ class Drum:
           glMatrixMode(GL_TEXTURE)
           glScalef(1, -1, 1)
           glMatrixMode(GL_MODELVIEW)
-          glScalef(self.boardScaleX*self.boardScaleOpen, self.boardScaleY, 1)
-          if self.drumsHeldDown[0] > 0:
-            if (controls.getState(self.keys[0]) or controls.getState(self.keys[5])):
-              self.keyMeshOpen.render("Mesh_001")
-            elif self.hit[0]:
-              self.keyMeshOpen.render("Mesh_002")
-            else:
-              self.keyMeshOpen.render("Mesh")
+          glScalef(self.boardScaleX, self.boardScaleY, 1)
+          if self.hit[0]:
+            self.keyMeshOpen.render("Mesh_002")
+          elif self.drumsHeldDown[0] > 0:
+            self.keyMeshOpen.render("Mesh_001")
           else:
             self.keyMeshOpen.render("Mesh")
           glMatrixMode(GL_TEXTURE)
@@ -1743,10 +1757,9 @@ class Drum:
 
       texY = (1.0/6.0,2.0/6.0)
       if self.drumsHeldDown[0] > 0:
-        if (controls.getState(self.keys[0]) or controls.getState(self.keys[5])):
-          texY = (3.0/6.0,4.0/6.0)
-        if self.hit[0]:
-          texY = (5.0/6.0,1.0)
+        texY = (3.0/6.0,4.0/6.0)
+      if self.hit[0]:
+        texY = (5.0/6.0,1.0)
 
       self.engine.draw3Dtex(self.drumFretButtons, vertex = (size[0],size[1],-size[0],-size[1]), texcoord = (texSize[0], texY[0], texSize[1], texY[1]),
                             coord = (x,v,0), multiples = True,color = (1,1,1), depth = True)

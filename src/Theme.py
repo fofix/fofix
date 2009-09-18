@@ -132,6 +132,7 @@ Config.define("theme", "loading_line_spacing", float, 1.0)
 Config.define("theme", "twoDnote",       bool, True)
 Config.define("theme", "twoDkeys",       bool, True)
 Config.define("theme", "threeDspin",       bool, True)
+Config.define("theme", "fret_press",     bool,  True)
 Config.define("theme", "opencolor",       str, "#FF9933")
 
 Config.define("theme", "songback",       bool, False)
@@ -493,6 +494,7 @@ loadingLSpacing = None
 twoDnote = None
 twoDkeys = None
 threeDspin = None
+fret_press = None
 opencolor = None
 meshColor = None
 songback = None
@@ -1214,13 +1216,14 @@ def setupVocals(config):
   vocalGlowColorStar = hexToColorResults(config.get("theme","vocal_glow_color_star"))
 
 def setupTWOD(config):
-  global twoDnote, twoDkeys, threeDspin, opencolor
+  global twoDnote, twoDkeys, threeDspin, opencolor, fret_press
   global noterot, keyrot, drumnoterot, drumkeyrot
   global notepos, keypos, drumnotepos, drumkeypos
   
   twoDnote = config.get("theme", "twoDnote")
   twoDkeys = config.get("theme", "twoDkeys")
   threeDspin = config.get("theme", "threeDspin")
+  fret_press = config.get("theme", "fret_press")
   opencolor = hexToColor(config.get("theme", "opencolor"))
   noterot = [config.get("theme", "noterot"+str(i+1)) for i in range(5)]
   keyrot  = [config.get("theme", "keyrot"+str(i+1)) for i in range(5)]

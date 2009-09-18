@@ -205,7 +205,7 @@ class VideoPlayer(BackgroundLayer):
       self.finished = True
     elif type == gst.MESSAGE_WARNING:
       warning, debug = message.parse_warning()
-      Log.warn("GStreamer warning: %s" % warn, debug)
+      Log.warn("GStreamer warning: %s" % warning, debug)
     # elif type == gst.MESSAGE_STATE_CHANGED:
     #   oldstate, newstate, pending = message.parse_state_changed()
     #   Log.debug("GStreamer state: %s" % newstate)

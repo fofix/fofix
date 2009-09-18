@@ -135,6 +135,8 @@ class Guitar:
     
     self.boardScaleX    = self.boardWidth/3.0
     self.boardScaleY    = self.boardLength/9.0
+    
+    self.fretPress      = Theme.fret_press
 
     self.beatsPerBoard  = 5.0
     self.beatsPerUnit   = self.beatsPerBoard / self.boardLength
@@ -456,19 +458,24 @@ class Guitar:
     if self.twoDkeys == True:
       engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"fretbuttons.png"))
     else:
+      defaultKey = False
       #MFH - can't use IOError for fallback logic for a Mesh() call... 
       if self.engine.fileExists(os.path.join("themes", themename, "key.dae")):
         engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "key.dae")))
       else:
         engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName("key.dae")))
-
-      try:
-        for i in range(5):
-          engine.loadImgDrawing(self,  "keytex"+chr(97+i),  os.path.join("themes", themename, "keytex_"+chr(97+i)+".png"))
-        self.keytex = True
-
-      except IOError:
+        defaultKey = True
+      
+      if self.defaultKey:
         self.keytex = False
+      else:
+        try:
+          for i in range(5):
+            engine.loadImgDrawing(self,  "keytex"+chr(97+i),  os.path.join("themes", themename, "keytex_"+chr(97+i)+".png"))
+          self.keytex = True
+
+        except IOError:
+          self.keytex = False
     
 
 
@@ -1533,7 +1540,10 @@ class Guitar:
         f += 0.25
 
       glColor4f(.1 + .8 * c[0] + f, .1 + .8 * c[1] + f, .1 + .8 * c[2] + f, visibility)
-      y = v + f / 6
+      if self.fretPress:
+        y = v + f / 6
+      else:
+        y = v / 6
       x = (self.strings / 2 - n) * w
 
       if self.twoDkeys == True:

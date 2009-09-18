@@ -5675,6 +5675,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #myfingershurt: drums :)
     for i in range(self.numOfPlayers):
       if self.instruments[i].isDrum and control in (self.instruments[i].keys):
+        if control in Player.bassdrums:
+          self.instruments[i].drumsHeldDown[0] = 100
+        elif control in Player.drum1s:
+          self.instruments[i].drumsHeldDown[1] = 100
+        elif control in Player.drum2s:
+          self.instruments[i].drumsHeldDown[2] = 100
+        elif control in Player.drum3s:
+          self.instruments[i].drumsHeldDown[3] = 100
+        elif control in Player.drum5s:
+          self.instruments[i].drumsHeldDown[4] = 100
         self.handlePick(i)
         return True
 
@@ -5860,19 +5870,19 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     for i in range(self.numOfPlayers):
       if self.instruments[i].isDrum and control in self.instruments[i].keys and actual:
         if control in Player.bassdrums:
-          self.instruments[num].drumsHeldDown[0] = 180
+          self.instruments[num].drumsHeldDown[0] = 100
           self.instruments[num].playedSound[0] = False
         elif control in Player.drum1s:
-          self.instruments[num].drumsHeldDown[1] = 180
+          self.instruments[num].drumsHeldDown[1] = 100
           self.instruments[num].playedSound[1] = False
         elif control in Player.drum2s:
-          self.instruments[num].drumsHeldDown[2] = 180
+          self.instruments[num].drumsHeldDown[2] = 100
           self.instruments[num].playedSound[2] = False
         elif control in Player.drum3s:
-          self.instruments[num].drumsHeldDown[3] = 180
+          self.instruments[num].drumsHeldDown[3] = 100
           self.instruments[num].playedSound[3] = False
         elif control in Player.drum5s:
-          self.instruments[num].drumsHeldDown[4] = 180
+          self.instruments[num].drumsHeldDown[4] = 100
           self.instruments[num].playedSound[4] = False
       if control in (self.instruments[i].actions):
         hopo = False
