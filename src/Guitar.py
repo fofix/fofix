@@ -466,7 +466,7 @@ class Guitar:
         engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName("key.dae")))
         defaultKey = True
       
-      if self.defaultKey:
+      if defaultKey:
         self.keytex = False
       else:
         try:

@@ -1002,7 +1002,7 @@ class Drum:
         glRotate(Theme.drumnoterot[4], 0, 0, 1), glTranslatef(0, Theme.drumnotepos[4], 0)
 
       if self.spActTex is not None and isOpen == False and spNote == False and spAct == True:
-        glColor3f(1,1,1)
+        glColor3f(1.5,1.5,1.5) #glow
         glEnable(GL_TEXTURE_2D)
         self.spActTex.texture.bind()
         glMatrixMode(GL_TEXTURE)
