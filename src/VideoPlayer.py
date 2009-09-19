@@ -42,19 +42,20 @@ import Log
 
 # Simple video player
 class VideoPlayer(BackgroundLayer):
-  def __init__(self, engine, framerate, vidSource, (winWidth, winHeight) = (None, None), mute = False, loop = False):
+  def __init__(self, framerate, vidSource, (winWidth, winHeight) = (None, None), mute = False, loop = False):
     self.updated = False
     self.videoList = None
     self.videoTex = None
     self.videoBuffer = None
     self.videoSrc = vidSource
-    self.engine = engine
     self.mute = mute
     self.loop = loop
     if winWidth is not None and winHeight is not None:
       self.winWidth, self.winHeight = winWidth, winHeight
-    else:
-      self.winWidth, self.winHeight = engine.view.geometry[2:4]
+    else: # default
+      self.winWidth, self.winHeight = (640, 480)
+      Log.warning("VideoPlayer: No resolution specified (default %dx%d)",
+                  self.winWidth, self.winHeight)
     self.vidWidth, self.vidHeight = -1, -1
     self.fps = framerate
     self.clock = pygame.time.Clock()

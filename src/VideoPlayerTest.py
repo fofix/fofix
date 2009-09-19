@@ -60,24 +60,23 @@ class VideoPlayerTest(unittest.TestCase):
   def testVideoPlayerLayer(self):
     config = Config.load(Version.appName() + ".ini", setAsDefault = True)
     self.e = GameEngine(config)
-    vidPlayer = VideoPlayer(self.e, framerate, self.src, loop = False)
+    winWidth, winHeight = (self.e.view.geometry[2], self.e.view.geometry[3])
+    vidPlayer = VideoPlayer(framerate, self.src, (winWidth, winHeight),
+                            loop = False)
     self.e.view.pushLayer(vidPlayer)
     while not vidPlayer.finished:
       self.e.run()
     self.e.view.popLayer(vidPlayer)
-    # pygame.quit()
     self.e.audio.close()
     self.e.quit()
 
   # Keep tight control over the video player
   def testVideoPlayerSlave(self):
     winWidth, winHeight = 800, 600
-    config = Config.load(Version.appName() + ".ini", setAsDefault = True)
-    self.e = GameEngine(config)
     pygame.init()
     flags = DOUBLEBUF|OPENGL|HWPALETTE|HWSURFACE
     pygame.display.set_mode((winWidth, winHeight), flags)
-    vidPlayer = VideoPlayer(self.e, framerate, self.src, (winWidth, winHeight))
+    vidPlayer = VideoPlayer(framerate, self.src, (winWidth, winHeight))
     glViewport(0, 0, winWidth, winHeight) # Both required as...
     glScissor(0, 0, winWidth, winHeight)  # ...GameEngine changes it
     glClearColor(0, 0, 0, 1.)
@@ -85,19 +84,16 @@ class VideoPlayerTest(unittest.TestCase):
       vidPlayer.run()
       vidPlayer.render()
       pygame.display.flip()
-    self.e.audio.close()
-    self.e.quit()
+    pygame.quit()
 
   # Grab the texture, use the CallList and do whatever we want with it;
   # We could also _just_ use the texture and take care of the polygons ourselves
   def testVideoPlayerSlaveShowOff(self):
     winWidth, winHeight = 500, 500
-    config = Config.load(Version.appName() + ".ini", setAsDefault = True)
-    self.e = GameEngine(config)
     pygame.init()
     flags = DOUBLEBUF|OPENGL|HWPALETTE|HWSURFACE
     pygame.display.set_mode((winWidth, winHeight), flags)
-    vidPlayer = VideoPlayer(self.e, -1, self.src, (winWidth, winHeight))
+    vidPlayer = VideoPlayer(-1, self.src, (winWidth, winHeight))
     glViewport(0, 0, winWidth, winHeight) # Both required as...
     glScissor(0, 0, winWidth, winHeight)  # ...GameEngine changes it
     glClearColor(0, 0, 0, 1.)
@@ -143,8 +139,7 @@ class VideoPlayerTest(unittest.TestCase):
         ftheta = ftheta * -1
       time = time + 0.00001
       clock.tick(60)
-    self.e.audio.close()
-    self.e.quit()
+    pygame.quit()
 
   def setUp(self):
     self.src = os.path.join(Version.dataPath(), vidSource)
