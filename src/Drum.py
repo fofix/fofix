@@ -161,7 +161,6 @@ class Drum:
     self.fretActivity   = [0.0] * self.strings
     self.fretColors     = Theme.fretColors
     self.spColor        = self.fretColors[5]
-    self.openFretWeight = 0.0
     self.openFretActivity = 0.0
     self.openFretColor  = Theme.openFretColor
     self.playedNotes    = []
@@ -435,6 +434,7 @@ class Drum:
         self.drumFretButtons = None
     else: #death_au
       defaultKey = False
+      defaultOpenKey = False
       #MFH - can't use IOError for fallback logic for a Mesh() call... 
       if self.engine.fileExists(os.path.join("themes", themename, "key_drum.dae")):
         engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "key_drum.dae")))
@@ -448,6 +448,7 @@ class Drum:
         engine.resource.load(self,  "keyMeshOpen",  lambda: Mesh(engine.resource.fileName("themes", themename, "key_open.dae")))
       else:
         engine.resource.load(self,  "keyMeshOpen",  lambda: Mesh(engine.resource.fileName("key_open.dae")))
+        defaultOpenKey = True
 
       if defaultKey:
         self.keytex = False
@@ -460,7 +461,9 @@ class Drum:
 
         except IOError:
           self.keytex = False
-      
+      if defaultOpenKey:
+        self.keytexopen = None
+      else:
         try:
           engine.loadImgDrawing(self, "keytexopen", os.path.join("themes",themename,"keytex_open.png"))
         except IOError:
@@ -1677,7 +1680,7 @@ class Drum:
     #are under the other frets and openGL culls them. So I just leave it disabled
     if self.twoDkeys == False: #death_au
     
-      f = self.openFretWeight
+      f = self.drumsHeldDown[0]/200.0
 
       c = self.openFretColor
 
@@ -1765,6 +1768,8 @@ class Drum:
                             coord = (x,v,0), multiples = True,color = (1,1,1), depth = True)
 
     ###############################################
+    else:
+      glDisable(GL_DEPTH_TEST)
 
 
 
