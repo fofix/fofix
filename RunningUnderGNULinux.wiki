@@ -61,7 +61,7 @@ In order to build John Stumpo's pitchbend module you first need to install...
   * libsndobj-dev
 
 ==== Compiling ====
-  # Get the source code: {{{svn co https://svn.stump.jstump.com/svnroot/pitchbend/trunk pitchbend}}}
+  # Get the source code: {{{svn co http://svn.jstump.com/r/pitchbend/trunk/ pitchbend}}}
   # Move to the source folder: {{{cd pitchbend}}}
   # Create an empty VERSION file: {{{touch VERSION}}}
   # Build the library: {{{python setup.py build}}}
