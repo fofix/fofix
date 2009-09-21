@@ -161,6 +161,7 @@ class Drum:
     self.fretActivity   = [0.0] * self.strings
     self.fretColors     = Theme.fretColors
     self.spColor        = self.fretColors[5]
+    self.useFretColors  = Theme.use_fret_colors
     self.openFretActivity = 0.0
     self.openFretColor  = Theme.openFretColor
     self.playedNotes    = []
@@ -1196,17 +1197,13 @@ class Drum:
       if event.number != 0:   #skip all regular notes
         continue
 
-      c = self.fretColors[event.number]
+      # c = self.fretColors[event.number]
 
-      isOpen = False
-      if event.number == 0: #treat open string note differently
-        x  = (self.strings / 2 - .5 - 1.5) * w
-        isOpen     = True
-        c = self.fretColors[4]          #myfingershurt: need to swap note 0 and note 4 colors for drums:
-      else:   #one of the other 4 drum notes
-        x  = (self.strings / 2 - .5 - (event.number - 1)) * w
-        if event.number == 4:
-          c = self.fretColors[0]        #myfingershurt: need to swap note 0 and note 4 colors for drums:
+      # isOpen = False
+      # if event.number == 0: #treat open string note differently - also haven't we already ensured that event.number == 0?
+      x  = (self.strings / 2 - .5 - 1.5) * w
+      isOpen     = True
+      c = self.openFretColor
 
       z  = ((time - pos) / self.currentPeriod) / beatsPerUnit
       z2 = ((time + event.length - pos) / self.currentPeriod) / beatsPerUnit
@@ -1224,7 +1221,10 @@ class Drum:
           if time > self.freestyleStart - self.freestyleOffset and time < self.freestyleStart + self.freestyleOffset + self.freestyleLength:
             z = -2.0
 
-      color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
+      if self.twoDnote == True and not self.useFretColors:
+        color      = (1,1,1, 1 * visibility * f)
+      else:
+        color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
       length = 0
       flat       = False
       tailOnly   = False
@@ -1377,14 +1377,10 @@ class Drum:
         self.starNotesInView = True
 
       isOpen = False
-      if event.number == 0: #treat open string note differently
-        x  = (self.strings / 2 - .5 - 1.5) * w
-        isOpen     = True
-        c = self.openFretColor
-      else:   #one of the other 4 drum notes
-        x  = (self.strings / 2 - .5 - (event.number - 1)) * w
-        if event.number == 4:
-          c = self.fretColors[0]        #myfingershurt: need to swap note 0 and note 4 colors for drums:
+      
+      x  = (self.strings / 2 - .5 - (event.number - 1)) * w
+      if event.number == 4:
+        c = self.fretColors[0]        #myfingershurt: need to swap note 0 and note 4 colors for drums:
 
       z  = ((time - pos) / self.currentPeriod) / beatsPerUnit
       z2 = ((time + event.length - pos) / self.currentPeriod) / beatsPerUnit
@@ -1402,7 +1398,7 @@ class Drum:
           if time > self.freestyleStart - self.freestyleOffset and time < self.freestyleStart + self.freestyleOffset + self.freestyleLength:
             z = -2.0
 
-      if self.twoDnote == True:
+      if self.twoDnote == True and not self.useFretColors:
         color      = (1,1,1, 1 * visibility * f)
       else:
         color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
@@ -2534,8 +2530,8 @@ class Drum:
       glEnable(GL_BLEND)
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
       glEnable(GL_COLOR_MATERIAL)
-      if self.leftyMode:
-        glScalef(-1, 1, 1)
+      # if self.leftyMode:
+        # glScalef(-1, 1, 1)
 
       if self.freestyleActive or self.drumFillsActive:
         self.renderOpenNotes(visibility, song, pos)
@@ -2563,8 +2559,8 @@ class Drum:
         if self.hitFlamesPresent: #MFH - only when present!
           self.renderFlames(visibility, song, pos, controls)    #MFH - only when freestyle inactive!
 
-      if self.leftyMode:
-        glScalef(-1, 1, 1)
+      # if self.leftyMode:
+        # glScalef(-1, 1, 1)
 
   def getMissedNotes(self, song, pos, catchup = False):
     if not song:

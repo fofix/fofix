@@ -113,6 +113,7 @@ Config.define("theme", "pov_origin_z",       float, None)
 #Volshebnyi - spNote and killswitch tail colors
 Config.define("theme", "fretS_color",       str, "#4CB2E5")
 Config.define("theme", "fretK_color",       str, "#000000")
+Config.define("theme", "use_fret_colors",   bool, False)
 Config.define("theme", "obar_hscale",       float, 0.7)
 Config.define("theme", "obar_3dfill",       bool, False)
 
@@ -452,6 +453,7 @@ baseColor       = None
 selectedColor   = None
 fretColors      = None
 gh3flameColor   = None
+use_fret_colors = None
 
 hopoColor       = None
 spotColor       = None
@@ -853,7 +855,7 @@ def setupColors(config):
   glowColor = hexToColor(config.get("theme", "glow_color"))
  
 def setupFrets(config):
-  global fretColors, openFretColor
+  global fretColors, openFretColor, use_fret_colors
     
   if fretColors == None:
     fretColors = [hexToColor(config.get("theme", "fret%d_color" % i)) for i in range(5)]
@@ -868,6 +870,7 @@ def setupFrets(config):
     fretColors[5] = hexToColor(config.get("theme", "fretS_color"))
     fretColors[6] = hexToColor(config.get("theme", "fretK_color"))
   openFretColor = hexToColor(config.get("theme", "open_fret_color"))
+  use_fret_colors = config.get("theme", "use_fret_colors")
 
 def setupFlameColors(config):
   global flameColors

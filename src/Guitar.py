@@ -145,6 +145,7 @@ class Guitar:
     self.fretActivity   = [0.0] * self.strings
     self.fretColors     = Theme.fretColors
     self.spColor        = self.fretColors[5]
+    self.useFretColors  = Theme.use_fret_colors
     self.playedNotes    = []
 
     self.freestyleHitFlameCounts = [0 for n in range(self.strings+1)]    #MFH
@@ -838,7 +839,7 @@ class Guitar:
         else:
           notecol = (1,1,1)
       tailOnly == True
-      
+
       if self.theme < 2:
         if self.starspin:
           size = (self.boardWidth/self.strings/2, self.boardWidth/self.strings/2)
@@ -1178,7 +1179,7 @@ class Guitar:
         if time >= self.freestyleStart-self.freestyleOffset and time < self.freestyleStart + self.freestyleLength+self.freestyleOffset:
           z = -2.0
 
-      if self.twoDnote == True:
+      if self.twoDnote == True and not self.useFretColors:
         color      = (1,1,1, 1 * visibility * f)
       else:
         color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
