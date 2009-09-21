@@ -1233,6 +1233,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #self.notesCum = 0
     self.noteLastTime = 0
     
+    totalBreNotes = 0
     #count / init solos and notes
     for i,instrument in enumerate(self.instruments):
       #MFH - go through, locate, and mark the last drum note.  When this is encountered, drum scoring should be turned off.
@@ -1311,6 +1312,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   numBreStreakNotes = len(set(time for time, event in self.song.track[i].getEvents(breStart, breEnd) if isinstance(event, Note)))
                   self.scoring[i].totalStreakNotes -= numBreStreakNotes   #MFH - remove BRE notes correctly from streak count.      
                   Log.debug("Removed %d streak notes from player %d" % (numBreStreakNotes, i) )
+                  totalBreNotes += numBreStreakNotes
 
 
       
@@ -1448,6 +1450,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.coOpScoreCard.totalStreakNotes += scoreCard.totalStreakNotes
         self.coOpScoreCard.totalNotes += scoreCard.totalNotes
     self.coOpPlayerIndex = len(range(self.numOfPlayers))
+    if self.coOpScoreCard:
+      self.coOpScoreCard.totalStreakNotes -= totalBreNotes
 
     #glorandwarf: need to store the song's beats per second (bps) for later
     self.songBPS = self.song.bpm / 60.0
@@ -2409,6 +2413,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       scoreCard.lastNoteEvent = None
     if self.coOpType:
       self.coOpScoreCard.lastNoteEvent = None
+    if self.whammyEffect == 1:
+      self.song.resetInstrumentPitch(-1)
     
 
   def getHandicap(self):
@@ -4288,8 +4294,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             if guitar.isDrum:
               if self.coOpType:
                 self.coOpScoreCard.totalStreakNotes -= 1
-              else:
-                self.scoring[playerNum].totalStreakNotes -= 1
+              self.scoring[playerNum].totalStreakNotes -= 1
 
         else:
           missedNotes = guitar.getMissedNotesMFH(self.song, pos)

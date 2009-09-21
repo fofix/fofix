@@ -2777,47 +2777,6 @@ class Drum:
     if not song.readyToGo:
       return
 
-    if self.lastFretWasBassDrum:
-      if controls.getState(self.keys[1]) or controls.getState(self.keys[2]) or controls.getState(self.keys[3]) or controls.getState(self.keys[4]) or controls.getState(self.keys[6]) or controls.getState(self.keys[7]) or controls.getState(self.keys[8]) or controls.getState(self.keys[9]):
-        self.lastFretWasBassDrum = False
-    elif controls.getState(self.keys[0]) or controls.getState(self.keys[5]):
-      self.lastFretWasBassDrum = True
-    else:
-      self.lastFretWasBassDrum = False
-
-    #Faaa Drum sound
-    if self.lastFretWasT1:
-      if controls.getState(self.keys[0]) or controls.getState(self.keys[2]) or controls.getState(self.keys[3]) or controls.getState(self.keys[4]) or controls.getState(self.keys[5]) or controls.getState(self.keys[7]) or controls.getState(self.keys[8]) or controls.getState(self.keys[9]):
-        self.lastFretWasT1 = False
-    elif controls.getState(self.keys[1]) or controls.getState(self.keys[6]):
-      self.lastFretWasT1 = True
-    else:
-      self.lastFretWasT1 = False
-
-    if self.lastFretWasT2:
-      if controls.getState(self.keys[0]) or controls.getState(self.keys[1]) or controls.getState(self.keys[3]) or controls.getState(self.keys[4]) or controls.getState(self.keys[5]) or controls.getState(self.keys[6]) or controls.getState(self.keys[8]) or controls.getState(self.keys[9]):
-        self.lastFretWasT2 = False
-    elif controls.getState(self.keys[2]) or controls.getState(self.keys[7]):
-      self.lastFretWasT2 = True
-    else:
-      self.lastFretWasT2 = False
-
-    if self.lastFretWasT3:
-      if controls.getState(self.keys[0]) or controls.getState(self.keys[1]) or controls.getState(self.keys[2]) or controls.getState(self.keys[4]) or controls.getState(self.keys[5]) or controls.getState(self.keys[6]) or controls.getState(self.keys[7]) or controls.getState(self.keys[9]):
-        self.lastFretWasT3 = False
-    elif controls.getState(self.keys[3]) or controls.getState(self.keys[8]):
-      self.lastFretWasT3 = True
-    else:
-      self.lastFretWasT3 = False		  
-
-    if self.lastFretWasC:
-      if controls.getState(self.keys[0]) or controls.getState(self.keys[1]) or controls.getState(self.keys[2]) or controls.getState(self.keys[3]) or controls.getState(self.keys[5]) or controls.getState(self.keys[6]) or controls.getState(self.keys[7]) or controls.getState(self.keys[8]):
-        self.lastFretWasC = False
-    elif controls.getState(self.keys[4]) or controls.getState(self.keys[9]):
-      self.lastFretWasC = True
-    else:
-      self.lastFretWasC = False
-
     #self.matchingNotes = self.getRequiredNotes(song, pos)
     self.matchingNotes = self.getRequiredNotesMFH(song, pos)    #MFH - ignore skipped notes please!
 
@@ -2832,10 +2791,10 @@ class Drum:
 
     for time, note in self.matchingNotes:
       for i in range(5):
-        if note.number == i and (controls.getState(self.keys[i]) or controls.getState(self.keys[i+5])):
+        if note.number == i and (controls.getState(self.keys[i]) or controls.getState(self.keys[i+5])) and self.drumsHeldDown[i] > 0:
           if self.guitarSolo:
             self.currentGuitarSoloHitNotes += 1
-          if i == 0 and self.fretboardHop < 0.07 and self.drumsHeldDown[0] > 0:
+          if i == 0 and self.fretboardHop < 0.07:
             self.fretboardHop = 0.07  #stump
 
           if shaders.turnon:
