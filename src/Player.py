@@ -198,7 +198,7 @@ Config.define("controller", "key_5a",        str, "K_F10",      text = (_("Solo 
 Config.define("controller", "key_cancel",    str, "K_ESCAPE",   text = _("Cancel"))
 Config.define("controller", "key_star",      str, "K_PAGEDOWN", text = _("StarPower"))
 Config.define("controller", "key_kill",      str, "K_PAGEUP",   text = _("Whammy"))
-Config.define("controller", "key_start",     str, "K_SPACE",    text = _("Start"))
+Config.define("controller", "key_start",     str, "K_LCTRL",    text = _("Start"))
 Config.define("controller", "two_chord_max", int, 0,            text = _("Two-Chord Max"),   options = {0: _("Off"), 1: _("On")}, tipText = _("When enabled, the highest notes in large note chords are auto-played."))
 Config.define("controller", "type",          int, 0,            text = _("Controller Type"), options = sortOptionsByKey({0: _("Standard Guitar"), 1: _("Solo Shift Guitar"), 2: _("Drum Set (4-Drum)"), 4: _("Analog Slide Guitar"), 5: _("Microphone")}), tipText = _("'Standard Guitar' is for keyboards and pre-WT GH-series guitars. 'Solo Shift Guitar' is for RB-series guitars and keyboards who want to use a shift key for solo frets. 'Analog Slide Guitar' is for guitars with an analog slider bar.")) #, 3: _("Drum Set (3-Drum 2-Cymbal)")
 Config.define("controller", "analog_sp",     int, 0,            text = _("Analog SP"),       options = {0: _("Disabled"), 1: _("Enabled")}, tipText = _("Enables analog SP (as in the XBOX Xplorer controller.)"))
@@ -518,14 +518,20 @@ class Controls:
         self.config.append(Config.load(os.path.join(controlpath,self.controls[1] + ".ini"), type = 1))
       else:
         self.config.append(None)
+        Config.set("game", "control1", None)
+        self.controls[1] = "None"
       if os.path.exists(os.path.join(controlpath,self.controls[2] + ".ini")) and self.controls[2] != "None":
         self.config.append(Config.load(os.path.join(controlpath,self.controls[2] + ".ini"), type = 1))
       else:
         self.config.append(None)
+        Config.set("game", "control2", None)
+        self.controls[2] = "None"
       if os.path.exists(os.path.join(controlpath,self.controls[3] + ".ini")) and self.controls[3] != "None":
         self.config.append(Config.load(os.path.join(controlpath,self.controls[3] + ".ini"), type = 1))
       else:
         self.config.append(None)
+        Config.set("game", "control3", None)
+        self.controls[3] = "None"
     else:
       confM = None
       if Microphone.supported:
@@ -534,6 +540,17 @@ class Controls:
       self.config.append(Config.load(os.path.join(controlpath,"defaultd.ini"), type = 1))
       self.config.append(confM)
       self.config.append(None)
+      Config.set("game", "control0", "defaultg")
+      Config.set("game", "control1", "defaultd")
+      self.controls = ["defaultg", "defaultd"]
+      if confM is not None:
+        Config.set("game", "control2", "defaultm")
+        self.controls.append("defaultm")
+      else:
+        Config.set("game", "control2", None)
+        self.controls.append("None")
+      Config.set("game", "control3", None)
+      self.controls.append("None")
     
     self.type       = []
     self.analogKill = []
