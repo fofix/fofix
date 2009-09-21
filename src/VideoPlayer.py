@@ -86,7 +86,7 @@ class VideoPlayer(BackgroundLayer):
   def videoDiscover(self, d, isMedia):
     if isMedia and d.is_video:
       self.vidWidth, self.vidHeight = d.videowidth, d.videoheight
-      # Force mute is no sound track is available or
+      # Force mute if no sound track is available or
       # else you'll get nothing but a black screen!
       if not d.is_audio and not self.mute:
         Log.warn("Video has no sound ==> forcing mute.")
@@ -223,10 +223,9 @@ class VideoPlayer(BackgroundLayer):
                                     'RGB')
       glBindTexture(GL_TEXTURE_2D, self.videoTex)
       surfaceData = pygame.image.tostring(img ,'RGB', True)
-      gluBuild2DMipmaps(GL_TEXTURE_2D,
-                        GL_RGB, self.vidWidth, self.vidHeight,
-                        GL_RGB, GL_UNSIGNED_BYTE,
-                        surfaceData)
+      # Use linear filtering
+      glTexImage2D(GL_TEXTURE_2D, 0, 3, self.vidWidth, self.vidHeight, 0,
+                   GL_RGB, GL_UNSIGNED_BYTE, surfaceData)
       glTexParameteri(GL_TEXTURE_2D,
                       GL_TEXTURE_MAG_FILTER, GL_LINEAR)
       glTexParameteri(GL_TEXTURE_2D,
