@@ -69,18 +69,16 @@ This Includes the all optional modules for 3.120 r1454+.  _Uses versions: Python
 
 ===Install In This Order===
 
-  #  Install active python by double clicking the .msi
-  #  Install PyOpenGL by double clicking the .exe
-  #  Install PyGame by double clicking the .exe
-  #  Install Numpy by double clicking the .exe
-  #  Install PIL by double clicking the .exe
-  #  Install Numeric by double clicking the .exe
-  # *ONLY for FoFiX 3.025 or earlier* -- Install Amanith by double clicking the .exe
-  # *ONLY for FoFiX 3.025 or earlier* -- Select reboot later
-  # *ONLY for FoFiX 3.025 or earlier* -- Install PyAmanith by double clicking the .exe
-  # Install Pyogg by double clicking the .exe
-  # Install Pyvorbis by double clicking the .exe
-  # Install py2exe by double clicking the .exe
+  # Install Python by double clicking the .msi
+  # Install pyWin32 by double clicking the .exe
+  # Install PyOpenGL by double clicking the .exe
+  # Install PyGame by double clicking the .exe
+  # Install PIL by double clicking the .exe
+  # Install Numeric by double clicking the .exe
+  # Install Numpy by double clicking the .exe
+  # Install PyOgg by double clicking the .exe
+  # Install PyVorbis by double clicking the .exe
+  # Install PySQLite by double clicking the .exe
   # Install any optional modules by double clicking the .exe files in the order that you downloaded them.
 
 _This next part fixes a opengl/py2exe bug so it may not be necessary in the future. Only if you get an error when running the FretsOnFire.exe that says:_
