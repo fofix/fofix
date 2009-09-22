@@ -14,6 +14,7 @@
   * Online play
   * Multithreading
   * Controller calibrator (delay, axis deadzone/offset, etc.) - Issue 836
+  * Video playback
   * More to come
 =====Rework=====
   * Menu.py
