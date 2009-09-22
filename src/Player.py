@@ -241,6 +241,7 @@ playerpref = []
 playerstat = []
 
 class PlayerCacheManager(object): #akedrou - basically stump's cache for the players. Todo? Group the caching. .fofix/appdata?
+  SCHEMA_VERSION = 3
   def __init__(self):
     self.caches = {}
   def getCache(self):
@@ -262,7 +263,7 @@ class PlayerCacheManager(object): #akedrou - basically stump's cache for the pla
     updateTables = 0
     try:
       v = conn.execute("SELECT `value` FROM `config` WHERE `key` = 'version'").fetchone()[0]
-      if int(v) != 2:
+      if int(v) != self.SCHEMA_VERSION:
         updateTables = 2 #an old version. We don't want to just burn old tables.
     except:
       updateTables = 1 #no good table
@@ -275,7 +276,7 @@ class PlayerCacheManager(object): #akedrou - basically stump's cache for the pla
       conn.execute('CREATE TABLE `players` (`name` STRING UNIQUE, `lefty` INT, `drumflip` INT, `autokick` INT, `assist` INT, `twochord` INT, `necktype` INT, `neck` STRING, \
                      `part` INT, `difficulty` INT, `upname` STRING, `control` INT, `changed` INT, `loaded` INT)')
       conn.execute('CREATE TABLE `stats` (`song` STRING, `hash` STRING, `player` STRING)')
-      conn.execute("INSERT INTO `config` (`key`, `value`) VALUES ('version', '2')")  #stump: current cache format version number
+      conn.execute("INSERT INTO `config` (`key`, `value`) VALUES (?, ?)", ('version', self.SCHEMA_VERSION))
       conn.commit()
     self.caches[cachePath] = conn
     return conn
