@@ -2,6 +2,44 @@
 
 = Old News =
 
+====June 29th 2009 ====
+3.120 beta 2 (SVN r1740) released for testing. 
+
+Although there are some new features and settings, this is mostly a bugfix release.
+So it fixes issues related to Animated Hitflames, Big Rock Endings, Cache, Drums,
+Pratice Mode and Rendering. It also fixes issues appearing when pausing then
+unpausing the game, Scoring issues i.e. note hits, note streaks and accuracy,
+and Cache issues. Lot's of other bugs, crashes and freezes were fixed.
+
+You may consult the [http://code.google.com/p/fofix/issues/list?can=1&q=status%3Afixed%2Cverified%2Cdone+milestone%3Arelease-3.120 detailed list of changes] since the latest stable release 3.100.
+
+Download the package that suits you:
+  * Some will get more performance out of these:
+    * Full package for MS Windows with python 2.4 and pyopengl 2.0.2.x [http://www.mediafire.com/?za22muyk4zc archive] or [http://www.mediafire.com/?wqwgbmymwyz installer] from Mediafire
+    * Full package for GNU/Linux 32bit with python 2.4 and pyopengl 2.0.1.x ¹ [http://www.megaupload.com/?d=83O2W7RH from Megaupload]
+    * Full package for GNU/Linux 64bit with python 2.4 and pyopengl 2.0.1.x ¹ ² [http://www.megaupload.com/?d=D8QE6W9X from Megaupload]
+    * Full package for MacOS X with python 2.5 and pyopengl 2.0.2.x [http://www.mediafire.com/?t3zmm4ny4zm from Mediafire]
+  * Slower to some, exact same performance for others:
+    * Full package for MS Windows with python 2.6 and pyopengl 3.x [http://www.mediafire.com/?efrzyzujmoy archive] or [http://www.mediafire.com/?yohjzznn310 installer] from Mediafire
+    * Full package for GNU/Linux 32bit with python 2.5 and pyopengl 3.x [http://www.megaupload.com/?d=L00LPGC1 from Megaupload]
+    * Full package for MacOS X with python 2.6 and pyopengl 3.x [http://www.mediafire.com/?jymg2ewj1mm from Mediafire]
+
+¹ PyOpenGL 2.0.1.x does not support shaders. Shaders support was introduced in 2.0.2.x.
+Thus, to get shaders under GNU/Linux, you'll have to use the python2.5 build.
+
+² Always crashes when starting a song? See issue 882 and issue 887. Please report how it works for you. That'll determine if i remove it or not.
+
+*Note about GNU/Linux builds*: Vocals and pitchbend are disabled. I haven't yet took the time to build the required dependencies. I've postponed that to the next beta or final release instead of rushing it out the door and having it half-broken.
+
+==== May 30th 2009 ====
+Please note that we are currently in FeatureFreeze thus we are slowly moving toward a new Beta release and eventually a Final version. It's useless to ask when a new Beta will be released as no one is working full-time on this hence we can not have a strict roadmap. We are doing the best we can to bring you new features AND stability.
+
+In the meantime, if you know how to use the code from our SVN and you know what you are doing, please help us by reporting and describing bugs in our issue tracker.
+
+Cheers,
+
+-Pascal (evilynux) on behalf of the FoFiX Team
+
 ====Apr. 20th 2009 ====
 3.120 beta 1 (SVN r1352) released for testing. 
 There are tons of changes, hope you'll like it ;-)
