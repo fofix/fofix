@@ -375,10 +375,10 @@ class Data(object):
 
     #MFH - fallback on sounds\crowdcheers.ogg, and then starpower.ogg.  Note if the fallback crowdcheers was used or not.    
     if self.fileExists(os.path.join("themes",themename,"sounds","crowdcheers.ogg")):
-      self.loadSoundEffect(self, "crowdSound", os.path.join("themes",themename,"sounds","crowdcheers.ogg"))
+      self.loadSoundEffect(self, "crowdSound", os.path.join("themes",themename,"sounds","crowdcheers.ogg"), crowd = True)
       self.cheerSoundFound = 2
     elif self.fileExists(os.path.join("sounds","crowdcheers.ogg")):
-      self.loadSoundEffect(self, "crowdSound", os.path.join("sounds","crowdcheers.ogg"))
+      self.loadSoundEffect(self, "crowdSound", os.path.join("sounds","crowdcheers.ogg"), crowd = True)
       self.cheerSoundFound = 1
       Log.warn(themename + "\sounds\crowdcheers.ogg not found -- using data\sounds\crowdcheers.ogg instead.")
     else: #MFH: Fallback on starpower.ogg
@@ -459,6 +459,7 @@ class Data(object):
     #MFH TODO - set every sound object's volume here...
     if volume is None:
       self.sfxVolume = Config.get("audio", "SFX_volume")
+      self.crowdVolume = Config.get("audio", "crowd_volume")
       volume = self.sfxVolume
     self.starDingSound.setVolume(volume)
     self.bassDrumSound.setVolume(volume)
@@ -477,7 +478,7 @@ class Data(object):
     self.battleUsedSound.setVolume(volume)
     self.rescueSound.setVolume(volume)
     self.coOpFailSound.setVolume(volume)
-    self.crowdSound.setVolume(volume)
+    self.crowdSound.setVolume(self.crowdVolume)
     self.starReadySound.setVolume(volume)
     self.clapSound.setVolume(volume)
     self.failSound.setVolume(volume)
@@ -488,8 +489,10 @@ class Data(object):
     self.selectSound3.setVolume(volume)
     
 
-  def loadSoundEffect(self, target, name, fileName):
+  def loadSoundEffect(self, target, name, fileName, crowd = False):
     volume   = self.sfxVolume
+    if crowd:
+      volume = self.crowdVolume
     fileName = self.resource.fileName(fileName)
     self.resource.load(target, name, lambda: Sound(fileName), onLoad = lambda s: s.setVolume(volume))
 

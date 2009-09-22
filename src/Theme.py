@@ -51,6 +51,7 @@ Config.define("theme", "fret1_color",       str, "#FF2222")
 Config.define("theme", "fret2_color",       str, "#FFFF22")
 Config.define("theme", "fret3_color",       str, "#3333FF")
 Config.define("theme", "fret4_color",       str, "#FF9933")
+Config.define("theme", "open_fret_color",   str, "#CC22CC")
 
 Config.define("theme", "flame0_1X_color",    str, "#d5ff82")
 Config.define("theme", "flame1_1X_color",    str, "#ff8880")
@@ -112,6 +113,7 @@ Config.define("theme", "pov_origin_z",       float, None)
 #Volshebnyi - spNote and killswitch tail colors
 Config.define("theme", "fretS_color",       str, "#4CB2E5")
 Config.define("theme", "fretK_color",       str, "#000000")
+Config.define("theme", "use_fret_colors",   bool, False)
 Config.define("theme", "obar_hscale",       float, 0.7)
 Config.define("theme", "obar_3dfill",       bool, False)
 
@@ -131,6 +133,7 @@ Config.define("theme", "loading_line_spacing", float, 1.0)
 Config.define("theme", "twoDnote",       bool, True)
 Config.define("theme", "twoDkeys",       bool, True)
 Config.define("theme", "threeDspin",       bool, True)
+Config.define("theme", "fret_press",     bool,  True)
 Config.define("theme", "opencolor",       str, "#FF9933")
 
 Config.define("theme", "songback",       bool, False)
@@ -141,12 +144,53 @@ Config.define("theme", "mark_solo_sections", int, 2)
 Config.define("theme", "shadowoffsetx", float, .0022)
 Config.define("theme", "shadowoffsety", float, .0005)
 
-Config.define("theme", "noterotdegrees",float, 0)
 Config.define("theme", "noterot1",      float, 0)
 Config.define("theme", "noterot2",      float, 0)
 Config.define("theme", "noterot3",      float, 0)
 Config.define("theme", "noterot4",      float, 0)
 Config.define("theme", "noterot5",      float, 0)
+
+Config.define("theme", "keyrot1",      float, 0)
+Config.define("theme", "keyrot2",      float, 0)
+Config.define("theme", "keyrot3",      float, 0)
+Config.define("theme", "keyrot4",      float, 0)
+Config.define("theme", "keyrot5",      float, 0)
+
+Config.define("theme", "drumnoterot1",      float, 0)
+Config.define("theme", "drumnoterot2",      float, 0)
+Config.define("theme", "drumnoterot3",      float, 0)
+Config.define("theme", "drumnoterot4",      float, 0)
+Config.define("theme", "drumnoterot5",      float, 0)
+
+Config.define("theme", "drumkeyrot1",      float, 0)
+Config.define("theme", "drumkeyrot2",      float, 0)
+Config.define("theme", "drumkeyrot3",      float, 0)
+Config.define("theme", "drumkeyrot4",      float, 0)
+Config.define("theme", "drumkeyrot5",      float, 0)
+
+Config.define("theme", "notepos1",      float, 0)
+Config.define("theme", "notepos2",      float, 0)
+Config.define("theme", "notepos3",      float, 0)
+Config.define("theme", "notepos4",      float, 0)
+Config.define("theme", "notepos5",      float, 0)
+
+Config.define("theme", "drumnotepos1",      float, 0)
+Config.define("theme", "drumnotepos2",      float, 0)
+Config.define("theme", "drumnotepos3",      float, 0)
+Config.define("theme", "drumnotepos4",      float, 0)
+Config.define("theme", "drumnotepos5",      float, 0)
+
+Config.define("theme", "keypos1",      float, 0)
+Config.define("theme", "keypos2",      float, 0)
+Config.define("theme", "keypos3",      float, 0)
+Config.define("theme", "keypos4",      float, 0)
+Config.define("theme", "keypos5",      float, 0)
+
+Config.define("theme", "drumkeypos1",      float, 0)
+Config.define("theme", "drumkeypos2",      float, 0)
+Config.define("theme", "drumkeypos3",      float, 0)
+Config.define("theme", "drumkeypos4",      float, 0)
+Config.define("theme", "drumkeypos5",      float, 0)
 
 #TWD
 Config.define("theme", "menu_neck_choose_x", float, 0.1)
@@ -409,6 +453,7 @@ baseColor       = None
 selectedColor   = None
 fretColors      = None
 gh3flameColor   = None
+use_fret_colors = None
 
 hopoColor       = None
 spotColor       = None
@@ -419,6 +464,7 @@ barsColor       = None
 glowColor       = None
 
 flameColors     = None
+openFretColor   = None
 flameSizes      = None
 loadingPhrase   = None
 resultsPhrase   = None
@@ -450,6 +496,7 @@ loadingLSpacing = None
 twoDnote = None
 twoDkeys = None
 threeDspin = None
+fret_press = None
 opencolor = None
 meshColor = None
 songback = None
@@ -574,6 +621,15 @@ setlistpreviewbuttonposX = None
 setlistpreviewbuttonposY = None
 setlistpreviewbuttonscaleY = None
 setlistpreviewbuttonscaleY = None
+
+noterot = [0]*5
+notepos = [0]*5
+drumnoterot = [0]*5
+drumnotepos = [0]*5
+keyrot = [0]*5
+keypos = [0]*5
+drumkeyrot = [0]*5
+drumkeypos = [0]*5
 
 #MFH:
 song_cd_Xpos = None         #Songlist in CD mode: horizontal position of CDs/cases
@@ -799,7 +855,7 @@ def setupColors(config):
   glowColor = hexToColor(config.get("theme", "glow_color"))
  
 def setupFrets(config):
-  global fretColors
+  global fretColors, openFretColor, use_fret_colors
     
   if fretColors == None:
     fretColors = [hexToColor(config.get("theme", "fret%d_color" % i)) for i in range(5)]
@@ -813,6 +869,8 @@ def setupFrets(config):
     fretColors[4] = hexToColor(config.get("theme", "fret4_color"))
     fretColors[5] = hexToColor(config.get("theme", "fretS_color"))
     fretColors[6] = hexToColor(config.get("theme", "fretK_color"))
+  openFretColor = hexToColor(config.get("theme", "open_fret_color"))
+  use_fret_colors = config.get("theme", "use_fret_colors")
 
 def setupFlameColors(config):
   global flameColors
@@ -1161,16 +1219,23 @@ def setupVocals(config):
   vocalGlowColorStar = hexToColorResults(config.get("theme","vocal_glow_color_star"))
 
 def setupTWOD(config):
-  global twoDnote, twoDkeys, threeDspin, opencolor
-  global noterotdegrees, noterot
+  global twoDnote, twoDkeys, threeDspin, opencolor, fret_press
+  global noterot, keyrot, drumnoterot, drumkeyrot
+  global notepos, keypos, drumnotepos, drumkeypos
   
   twoDnote = config.get("theme", "twoDnote")
   twoDkeys = config.get("theme", "twoDkeys")
   threeDspin = config.get("theme", "threeDspin")
+  fret_press = config.get("theme", "fret_press")
   opencolor = hexToColor(config.get("theme", "opencolor"))
-  noterotdegrees = config.get("theme", "noterotdegrees")
-  noterot = tuple(config.get("theme", "noterot"+str(i+1)) for i in range(5))
-
+  noterot = [config.get("theme", "noterot"+str(i+1)) for i in range(5)]
+  keyrot  = [config.get("theme", "keyrot"+str(i+1)) for i in range(5)]
+  drumnoterot = [config.get("theme", "drumnoterot"+str(i+1)) for i in range(5)]
+  drumkeyrot = [config.get("theme", "drumkeyrot"+str(i+1)) for i in range(5)]
+  notepos = [config.get("theme", "notepos"+str(i+1)) for i in range(5)]
+  keypos  = [config.get("theme", "keypos"+str(i+1)) for i in range(5)]
+  drumnotepos = [config.get("theme", "drumnotepos"+str(i+1)) for i in range(5)]
+  drumkeypos = [config.get("theme", "drumkeypos"+str(i+1)) for i in range(5)]
 
 #racer:
 def setupFail(config):

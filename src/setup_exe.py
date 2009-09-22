@@ -102,6 +102,8 @@ options = {
     ],
     "dll_excludes":  [
       "msvcp90.dll",
+      "mswsock.dll",
+      "powrprof.dll"
     ],
     "optimize":  2,
   }

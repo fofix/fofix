@@ -36,7 +36,7 @@ def revision():
   try:
     revision = "alpha (r%d)" % int(svntag.get_svn_info(os.path.dirname(__file__))['revnum'])
   except:
-    revision = "RC 1"
+    revision = "Final"
   return revision
 
 # evilynux: Returns version number w.r.t. frozen state

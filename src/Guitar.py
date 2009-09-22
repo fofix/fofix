@@ -30,6 +30,7 @@
 import Player
 from Song import Note, Tempo
 from Mesh import Mesh
+from Neck import Neck
 import Theme
 import random
 from copy import deepcopy
@@ -46,12 +47,12 @@ import Song   #need the base song defines as well
 
 
 class Guitar:
-  def __init__(self, engine, playerObj, editorMode = False, player = 0):
+  def __init__(self, engine, playerObj, editorMode = False, player = 0, bass = False):
     self.engine         = engine
 
 
     self.isDrum = False
-    self.isBassGuitar = False
+    self.isBassGuitar = bass
     self.isVocal = False
 
     self.starPowerDecreaseDivisor = 200.0/self.engine.audioSpeedFactor
@@ -128,9 +129,14 @@ class Guitar:
     self.boardWidth     = Theme.neckWidth
     self.boardLength    = Theme.neckLength
     #death_au: fixed neck size
-    if Theme.twoDnote == False or Theme.twoDkeys == False:
-      self.boardWidth     = 3.6
-      self.boardLength    = 9.0  
+    #if Theme.twoDnote == False or Theme.twoDkeys == False:
+      #self.boardWidth     = 3.6
+      #self.boardLength    = 9.0  
+    
+    self.boardScaleX    = self.boardWidth/3.0
+    self.boardScaleY    = self.boardLength/9.0
+    
+    self.fretPress      = Theme.fret_press
 
     self.beatsPerBoard  = 5.0
     self.beatsPerUnit   = self.beatsPerBoard / self.boardLength
@@ -139,6 +145,7 @@ class Guitar:
     self.fretActivity   = [0.0] * self.strings
     self.fretColors     = Theme.fretColors
     self.spColor        = self.fretColors[5]
+    self.useFretColors  = Theme.use_fret_colors
     self.playedNotes    = []
 
     self.freestyleHitFlameCounts = [0 for n in range(self.strings+1)]    #MFH
@@ -293,11 +300,6 @@ class Guitar:
     
     self.freestyleHit = [False, False, False, False, False]
 
-    self.playerObj = playerObj
-
-
-
-    playerObj = None
     #Get theme
     themename = self.engine.data.themeLabel
     #now theme determination logic is only in data.py:
@@ -457,19 +459,24 @@ class Guitar:
     if self.twoDkeys == True:
       engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"fretbuttons.png"))
     else:
+      defaultKey = False
       #MFH - can't use IOError for fallback logic for a Mesh() call... 
       if self.engine.fileExists(os.path.join("themes", themename, "key.dae")):
         engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "key.dae")))
       else:
         engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName("key.dae")))
-
-      try:
-        for i in range(5):
-          engine.loadImgDrawing(self,  "keytex"+chr(97+i),  os.path.join("themes", themename, "keytex_"+chr(97+i)+".png"))
-        self.keytex = True
-
-      except IOError:
+        defaultKey = True
+      
+      if defaultKey:
         self.keytex = False
+      else:
+        try:
+          for i in range(5):
+            engine.loadImgDrawing(self,  "keytex"+chr(97+i),  os.path.join("themes", themename, "keytex_"+chr(97+i)+".png"))
+          self.keytex = True
+
+        except IOError:
+          self.keytex = False
     
 
 
@@ -537,12 +544,8 @@ class Guitar:
     self.disableFretSFX  = self.engine.config.get("video", "disable_fretsfx")
     self.disableFlameSFX  = self.engine.config.get("video", "disable_flamesfx")
 
-    self.overdriveFlashCounts = self.indexFps/4   #how many cycles to display the oFlash: self.indexFps/2 = 1/2 second
-
     self.rockLevel = 0.0
 
-    #Blazingamer: These variables are updated through the guitarscene which then pass 
-    #through to the neck because it is used in both the neck.py and the guitar.py
     self.canGuitarSolo = False
     self.guitarSolo = False
     self.fretboardHop = 0.00  #stump
@@ -550,9 +553,8 @@ class Guitar:
     self.coOpFailed = False #akedrou
     self.coOpRestart = False #akedrou
     self.starPowerActive = False
-    self.overdriveFlashCount = self.overdriveFlashCounts
-    self.ocount = 0
-    
+    self.neck = Neck(self.engine, self, playerObj)
+  
   def selectPreviousString(self):
     self.selectedString = (self.selectedString - 1) % self.strings
 
@@ -642,6 +644,7 @@ class Guitar:
     
   def setMultiplier(self, multiplier):
     self.scoreMultiplier = multiplier
+    self.neck.scoreMultiplier = multiplier
 
 
   def renderTail(self, length, sustain, kill, color, flat = False, tailOnly = False, isTappable = False, big = False, fret = 0, spNote = False, freestyleTail = 0, pos = 0):
@@ -836,7 +839,7 @@ class Guitar:
         else:
           notecol = (1,1,1)
       tailOnly == True
-      
+
       if self.theme < 2:
         if self.starspin:
           size = (self.boardWidth/self.strings/2, self.boardWidth/self.strings/2)
@@ -931,15 +934,26 @@ class Guitar:
         c = self.fretColors[5]
         glColor4f(.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1) 
 
-      glRotatef(Theme.noterotdegrees, 0, 0, Theme.noterot[fret])
+      if fret == 0: # green note
+        glRotate(Theme.noterot[0], 0, 0, 1), glTranslatef(0, Theme.notepos[0], 0)
+      elif fret == 1: # red note
+        glRotate(Theme.noterot[1], 0, 0, 1), glTranslatef(0, Theme.notepos[1], 0)
+      elif fret == 2: # yellow
+        glRotate(Theme.noterot[2], 0, 0, 1), glTranslatef(0, Theme.notepos[2], 0)
+      elif fret == 3:# blue note
+        glRotate(Theme.noterot[3], 0, 0, 1), glTranslatef(0, Theme.notepos[3], 0)
+      elif fret == 4:# blue note
+        glRotate(Theme.noterot[4], 0, 0, 1), glTranslatef(0, Theme.notepos[4], 0)
 
-      if self.staratex == True and self.starPowerActive:
+
+      if self.staratex == True and self.starPowerActive and spNote == False:
         glColor3f(1,1,1)
         glEnable(GL_TEXTURE_2D)
-        getattr(self,"startex"+chr(97+fret)).texture.bind()
+        getattr(self,"staratex"+chr(97+fret)).texture.bind()
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
+        glScalef(self.boardScaleX, self.boardScaleY, 1)
 
 
         if isTappable:
@@ -967,6 +981,7 @@ class Guitar:
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
+        glScalef(self.boardScaleX, self.boardScaleY, 1)
         
         if isTappable:
           mesh = "Mesh_001"
@@ -991,6 +1006,7 @@ class Guitar:
         glMatrixMode(GL_TEXTURE)
         glScalef(1, -1, 1)
         glMatrixMode(GL_MODELVIEW)
+        glScalef(self.boardScaleX, self.boardScaleY, 1)
 
 
         if isTappable:
@@ -1119,9 +1135,11 @@ class Guitar:
         if self.lastBpmChange > 0 and self.disableVBPM == True:
             continue
         if (pos - time > self.currentPeriod or self.lastBpmChange < 0) and time > self.lastBpmChange:
-          self.baseBeat         += (time - self.lastBpmChange) / self.currentPeriod
-          self.targetBpm         = event.bpm
-          self.lastBpmChange     = time
+          self.baseBeat          += (time - self.lastBpmChange) / self.currentPeriod
+          self.targetBpm          = event.bpm
+          self.lastBpmChange      = time
+          self.neck.lastBpmChange = time
+          self.neck.baseBeat      = self.baseBeat
         #  self.setBPM(self.targetBpm) # glorandwarf: was setDynamicBPM(self.targetBpm)
         continue
       
@@ -1161,7 +1179,7 @@ class Guitar:
         if time >= self.freestyleStart-self.freestyleOffset and time < self.freestyleStart + self.freestyleLength+self.freestyleOffset:
           z = -2.0
 
-      if self.twoDnote == True:
+      if self.twoDnote == True and not self.useFretColors:
         color      = (1,1,1, 1 * visibility * f)
       else:
         color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
@@ -1212,7 +1230,7 @@ class Guitar:
                 self.starPower += 25
               if self.starPower > 100:
                 self.starPower = 100
-            self.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
+            self.neck.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
             self.starPowerGained = True
 
       if event.tappable < 2:
@@ -1379,10 +1397,9 @@ class Guitar:
                 self.starPower += 25
               if self.starPower > 100:
                 self.starPower = 100
-            self.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
+            self.neck.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
             self.starPowerGained = True
-            if self.theme == 2:
-              self.ocount = 0
+            self.neck.ocount = 0
 
       if event.tappable < 2:
         isTappable = False
@@ -1524,7 +1541,10 @@ class Guitar:
         f += 0.25
 
       glColor4f(.1 + .8 * c[0] + f, .1 + .8 * c[1] + f, .1 + .8 * c[2] + f, visibility)
-      y = v + f / 6
+      if self.fretPress:
+        y = v + f / 6
+      else:
+        y = v / 6
       x = (self.strings / 2 - n) * w
 
       if self.twoDkeys == True:
@@ -1572,7 +1592,16 @@ class Guitar:
           glRotatef(-90, 1, 0, 0)
           glRotatef(-90, 0, 0, 1)
 
-          glRotatef(Theme.noterotdegrees, 0, 0, -Theme.noterot[n])
+          if n == 0: #green fret button
+            glRotate(Theme.keyrot[0], 0, 1, 0), glTranslatef(0, 0, Theme.keypos[0])
+          elif n == 1: #red fret button
+            glRotate(Theme.keyrot[1], 0, 1, 0), glTranslatef(0, 0, Theme.keypos[1])
+          elif n == 2: #yellow fret button
+            glRotate(Theme.keyrot[2], 0, 1, 0), glTranslatef(0, 0, Theme.keypos[2])
+          elif n == 3: #blue fret button
+            glRotate(Theme.keyrot[3], 0, 1, 0), glTranslatef(0, 0, Theme.keypos[3])
+          elif n == 4: #orange fret button
+            glRotate(Theme.keyrot[4], 0, 1, 0), glTranslatef(0, 0, Theme.keypos[4])
 
 
           #Mesh - Main fret
@@ -1597,6 +1626,7 @@ class Guitar:
             glMatrixMode(GL_TEXTURE)
             glScalef(1, -1, 1)
             glMatrixMode(GL_MODELVIEW)
+            glScalef(self.boardScaleX, self.boardScaleY, 1)
             if f and not self.hit[n]:
               self.keyMesh.render("Mesh_001")
             elif self.hit[n]:
@@ -2072,11 +2102,6 @@ class Guitar:
       elif self.battleStatus[6]:
         glScalef(-1, 1, 1)
 
-      if self.ocount < 1:
-        self.ocount += .1
-      else:
-        self.ocount = 1
-
       if self.freestyleActive:
         self.renderTails(visibility, song, pos, killswitch)
         self.renderNotes(visibility, song, pos, killswitch)
@@ -2110,9 +2135,6 @@ class Guitar:
           glScalef(-1, 1, 1)
       elif self.battleStatus[6]:
         glScalef(-1, 1, 1)
-
-    if self.theme == 2 and self.overdriveFlashCount < self.overdriveFlashCounts:
-      self.overdriveFlashCount = self.overdriveFlashCount + 1
 
   def getMissedNotes(self, song, pos, catchup = False):
     if not song:
@@ -2830,9 +2852,6 @@ class Guitar:
           shaders.var["fretpos"][self.player][theFret]=pos
         numHits += 1
     return numHits
-
-
-
 
   def endPick(self, pos):
     for time, note in self.playedNotes:

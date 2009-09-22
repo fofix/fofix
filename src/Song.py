@@ -188,7 +188,7 @@ defaultSections = ["Start","1/4","1/2","3/4"]
 
 # stump: manage cache files
 class CacheManager(object):
-  SCHEMA_VERSION = 4  #stump: current cache format version number
+  SCHEMA_VERSION = 5  #stump: current cache format version number
   def __init__(self):
     self.caches = {}
   def getCache(self, infoFileName):
@@ -2922,7 +2922,9 @@ class Song(object):
         self.rhythmTrack.setPitchBend(pitch)
 
   def resetInstrumentPitch(self, part):
-    if part == parts[GUITAR_PART]:
+    if part == -1: #this is just a convenient way to ensure we grab the 'music' channel when resetting pitch (rather; reset bending on all output)
+      self.music.stopPitchBend()
+    elif part == parts[GUITAR_PART]:
       if self.guitarTrack:
         self.guitarTrack.stopPitchBend()
       else:

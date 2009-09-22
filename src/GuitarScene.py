@@ -73,9 +73,6 @@ import Image
 import ImageDraw
 from Svg import ImgDrawing
 
-#blazingamer: New neck/board rendering class
-from Neck import Neck
-
 #blazingamer: Little fix for RB Score font
 from pygame import version
 
@@ -242,12 +239,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.instruments.append(inst)
       else:
         from Guitar import Guitar
-        inst = Guitar(self.engine,player,False,j)
+        bass = False
+        if player.part.id == Song.BASS_PART:
+          bass = True
+        inst = Guitar(self.engine,player,False,j, bass = bass)
         self.instruments.append(inst)
         if player.part.id == Song.LEAD_PART or player.part.id == Song.GUITAR_PART:    #both these selections should get guitar solos
           self.instruments[j].canGuitarSolo = True
-        elif player.part.id == Song.BASS_PART:
-          self.instruments[j].isBassGuitar = True
 
       if player.practiceMode:
         self.practiceMode = True
@@ -258,7 +256,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         gNum += 1
         if self.firstGuitar is None:
           self.firstGuitar = j
-        self.neckrender.append(Neck(self.engine, self.instruments[j], player))
+        self.neckrender.append(self.instruments[j].neck)
         if self.instruments[j].isDrum:
           self.keysList.append(player.drums)
           self.soloKeysList.append(player.drumSolo)
@@ -424,8 +422,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.originX          = Theme.povOriginX
     self.originY          = Theme.povOriginY
     self.originZ          = Theme.povOriginZ
+    self.customPOV        = False
     self.ending           = False
     
+    povList = [str(self.targetX), str(self.targetY), str(self.targetZ), str(self.originX), str(self.originY), str(self.originZ)]
+    if "None" not in povList:
+      self.customPOV = True
+      Log.debug("All theme POV set. Using custom camera POV.")
 
     self.pause = False
     self.failed = False
@@ -1230,6 +1233,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #self.notesCum = 0
     self.noteLastTime = 0
     
+    totalBreNotes = 0
     #count / init solos and notes
     for i,instrument in enumerate(self.instruments):
       #MFH - go through, locate, and mark the last drum note.  When this is encountered, drum scoring should be turned off.
@@ -1279,7 +1283,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 #-      self.playerList[i].totalStreakNotes -= self.playerList[i].freestyleSkippedNotes
 
       if instrument.isVocal:
-        self.scoring[i].totalNotes = self.scoring[i].totalStreakNotes
+        self.scoring[i].totalNotes = self.scoring[i].totalStreakNotes - len(instrument.tapNoteTotals)
+        self.scoring[i].totalPercNotes = sum(instrument.tapNoteTotals)
+        self.scoring[i].baseScore  = (instrument.vocalBaseScore * self.scoring[i].totalNotes) + (self.scoring[i].totalPercNotes * instrument.baseScore)
       else:
         self.scoring[i].totalNotes = len([1 for Ntime, event in self.song.track[i].getAllEvents() if isinstance(event, Note)])
       
@@ -1306,6 +1312,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   numBreStreakNotes = len(set(time for time, event in self.song.track[i].getEvents(breStart, breEnd) if isinstance(event, Note)))
                   self.scoring[i].totalStreakNotes -= numBreStreakNotes   #MFH - remove BRE notes correctly from streak count.      
                   Log.debug("Removed %d streak notes from player %d" % (numBreStreakNotes, i) )
+                  totalBreNotes += numBreStreakNotes
 
 
       
@@ -1443,6 +1450,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.coOpScoreCard.totalStreakNotes += scoreCard.totalStreakNotes
         self.coOpScoreCard.totalNotes += scoreCard.totalNotes
     self.coOpPlayerIndex = len(range(self.numOfPlayers))
+    if self.coOpScoreCard:
+      self.coOpScoreCard.totalStreakNotes -= totalBreNotes
 
     #glorandwarf: need to store the song's beats per second (bps) for later
     self.songBPS = self.song.bpm / 60.0
@@ -2220,6 +2229,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         instrument.paused = True
         if instrument.isVocal:
           instrument.stopMic()
+        else:
+          instrument.neck.paused = True
 
   def failGame(self):
     self.engine.view.pushLayer(self.failMenu)
@@ -2230,6 +2241,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         instrument.paused = False
         if instrument.isVocal:
           instrument.stopMic()
+        else:
+          instrument.neck.paused = False
     self.failEnd = True
 
   def resumeGame(self):
@@ -2248,6 +2261,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           instrument.paused = False
           if instrument.isVocal:
             instrument.startMic()
+          else:
+            instrument.neck.paused = False
 
   def resumeSong(self):
     self.engine.view.popLayer(self.menu)
@@ -2268,39 +2283,38 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #y=2 rotate front
     #z=-3
 
-    if self.pov == 1:
-      self.camera.target    = (0.0, 0.6, 4.4) #kk69:More like GH3
-      self.camera.origin    = (0.0, 3.5*self.boardY, -3.8)
-    elif self.pov == 2: #Racer
-      self.camera.target    = (0.0, 0.0, 3.7)
-      self.camera.origin    = (0.0, 2.9*self.boardY, -2.9)
-    elif self.pov == 3: #Racer
-      self.camera.target    = (0.0, 1.6, 2.0)
-      self.camera.origin    = (0.0, 2.6*self.boardY, -3.6)
-    elif self.pov == 4: #blazingamer
-      self.camera.target    = (0.0, -6.0, 2.6666666666)
-      self.camera.origin    = (0.0, 6.0, 2.6666666665) 
-    elif self.pov == 5: #Blazingamer theme-dependant
-      if self.rmtype == 0:
-        self.camera.target    = (0.0, 1.6, 2.0)
-        self.camera.origin    = (0.0, 2.6*self.boardY, -3.6)
-      elif self.rmtype == 1:
-        self.camera.target    = (0.0, 0.6, 4.4) #Worldrave - Perfected the proper GH3 POV
-        self.camera.origin    = (0.0, 3.5*self.boardY, -3.8)
-      elif self.rmtype == 2:
-        self.camera.target    = (0.0, 0.0, 3.7)
-        self.camera.origin    = (0.0, 2.9*self.boardY, -2.9)
-    else:
-      self.camera.target    = (0.0, 0.0, 4.0)
-      self.camera.origin    = (0.0, 3.0*self.boardY, -3.0)
-
     if self.rmtype == 3:
-      self.camera.target    = (0.0, 1.4, 1.8) #kk69:More like GH3
+      self.camera.target    = (0.0, 1.4, 1.8)
       self.camera.origin    = (0.0, 2.8, -3.6)
-
-    if (self.targetX and self.targetY and self.targetZ and self.originX and self.originY and self.originZ != None) and self.rmtype != 3:
+    elif self.customPOV:
       self.camera.target    = (self.targetX, self.targetY, self.targetZ)
       self.camera.origin    = (self.originX, self.originY*self.boardY, self.originZ)
+    else:
+      if self.pov == 1: #GH3
+        self.camera.target    = (0.0, 0.6, 4.4)
+        self.camera.origin    = (0.0, 3.5*self.boardY, -3.8)
+      elif self.pov == 2: #RB
+        self.camera.target    = (0.0, 0.0, 3.7)
+        self.camera.origin    = (0.0, 2.9*self.boardY, -2.9)
+      elif self.pov == 3: #GH2
+        self.camera.target    = (0.0, 1.6, 2.0)
+        self.camera.origin    = (0.0, 2.6*self.boardY, -3.6)
+      elif self.pov == 4: #Rock Rev
+        self.camera.target    = (0.0, -6.0, 2.6666666666)
+        self.camera.origin    = (0.0, 6.0, 2.6666666665) 
+      elif self.pov == 5: #Theme
+        if self.rmtype == 0:
+          self.camera.target    = (0.0, 1.6, 2.0)
+          self.camera.origin    = (0.0, 2.6*self.boardY, -3.6)
+        elif self.rmtype == 1:
+          self.camera.target    = (0.0, 0.6, 4.4) #Worldrave - Perfected the proper GH3 POV
+          self.camera.origin    = (0.0, 3.5*self.boardY, -3.8)
+        elif self.rmtype == 2:
+          self.camera.target    = (0.0, 0.0, 3.7)
+          self.camera.origin    = (0.0, 2.9*self.boardY, -2.9)
+      else: # FoF
+        self.camera.target    = (0.0, 0.0, 4.0)
+        self.camera.origin    = (0.0, 3.0*self.boardY, -3.0)
 
     #if self.fontMode == 1:    #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
     #  self.laminaScreen.refreshPosition()   #needs to be called whenever camera position changes
@@ -2399,6 +2413,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       scoreCard.lastNoteEvent = None
     if self.coOpType:
       self.coOpScoreCard.lastNoteEvent = None
+    if self.whammyEffect == 1:
+      self.song.resetInstrumentPitch(-1)
     
 
   def getHandicap(self):
@@ -2931,6 +2947,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       instrument.sameNoteHopoString = False
       instrument.hopoLast = -1
       instrument.guitarSolo = False
+      instrument.neck.guitarSolo = False
       instrument.currentGuitarSoloHitNotes = 0
     
     if self.partyMode == True:
@@ -3004,6 +3021,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.currentGuitarSoloTotalNotes[i] = self.guitarSolos[i][self.currentGuitarSolo[i]]
     self.guitarSoloBroken[i] = False
     self.instruments[i].guitarSolo = True
+    if not self.instruments[i].isVocal:
+      self.instruments[i].neck.guitarSolo = True
     #self.displayText[i] = _("Guitar Solo!")
     instrumentSoloString = "%s %s" % (self.playerList[i].part.text, self.tsSolo)
     if self.phrases > 1:
@@ -3015,6 +3034,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     i = playerNum
     #Guitar Solo End
     self.instruments[i].guitarSolo = False
+    if not self.instruments[i].isVocal:
+      self.instruments[i].neck.guitarSolo = False
     #self.sfxChannel.setVolume(self.sfxVolume)    #liquid
     self.guitarSoloAccuracy[i] = (float(self.instruments[i].currentGuitarSoloHitNotes) / float(self.currentGuitarSoloTotalNotes[i]) ) * 100.0
     if not self.guitarSoloBroken[i]:    #backup perfect solo detection
@@ -3594,10 +3615,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             self.doPick(i)
   
   def handleJurgen(self, pos):
-    #chordFudge = 1   #MFH - was 10 - #myfingershurt - needed to detect chords
-    if self.firstGuitar is None:
-      return
-    chordFudge = self.song.track[self.firstGuitar].chordFudge
+    chordFudge = 1   #MFH - was 10 - #myfingershurt - needed to detect chords
+    if self.firstGuitar is not None:
+      chordFudge = self.song.track[self.firstGuitar].chordFudge
     if self.autoPlay or self.assisting:
       for i,instrument in enumerate(self.instruments):
   
@@ -3607,6 +3627,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         else: #and if not
           if self.playerAssist[i] == 0: #and no assist
             continue
+        if instrument.isVocal:
+          continue
         guitar = instrument
         if self.battleGH:
           self.aiUseSP[i] = 0
@@ -4071,15 +4093,17 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         if instrument.isVocal:
           instrument.requiredNote = instrument.getRequiredNote(pos, self.song)
           instrument.run(ticks, pos)
-          scoreThresh = instrument.getScoreChange()
-          if scoreThresh is not None:
+          scoreBack = instrument.getScoreChange()
+          if scoreBack is not None:
+            points, scoreThresh, taps = scoreBack
+            self.scoring[i].score += points * instrument.scoreMultiplier * self.multi[i]
+            self.scoring[i].percNotesHit += taps
+            scoreThresh = 5-scoreThresh
             if scoreThresh > 3:
               self.rockmeterIncrease(i, scoreThresh)
-              self.scoring[i].score += scoreThresh * self.scoring[i].baseScore * instrument.scoreMultiplier * self.multi[i]
               self.scoring[i].notesHit += 1
               self.scoring[i].streak += 1
             elif scoreThresh == 3:
-              self.scoring[i].score += scoreThresh * self.scoring[i].baseScore * instrument.scoreMultiplier * self.multi[i]
               self.scoring[i].streak = 0 
             elif scoreThresh < 3:
               self.rockmeterDecrease(i, scoreThresh)
@@ -4270,8 +4294,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             if guitar.isDrum:
               if self.coOpType:
                 self.coOpScoreCard.totalStreakNotes -= 1
-              else:
-                self.scoring[playerNum].totalStreakNotes -= 1
+              self.scoring[playerNum].totalStreakNotes -= 1
 
         else:
           missedNotes = guitar.getMissedNotesMFH(self.song, pos)
@@ -5517,8 +5540,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           for i in range(self.numOfPlayers):
             self.hopFretboard(i, 0.07)  #stump
             self.instruments[i].starPowerActive = True
-            self.instruments[i].overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
-            self.instruments[i].ocount = 0  #MFH - this triggers the oFlash strings & timer
+            self.instruments[i].neck.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
+            self.instruments[i].neck.ocount = 0  #MFH - this triggers the oFlash strings & timer
         else:
           if time - self.coOpStarPowerTimer > 1000.0:
             for i in range(self.numOfPlayers):
@@ -5550,8 +5573,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               self.numDeadPlayers -= 1
               if not guitar.isVocal:
                 self.hopFretboard(num, 0.07)  #stump
-                guitar.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
-                guitar.ocount = 0  #MFH - this triggers the oFlash strings & timer
+                guitar.neck.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
+                guitar.neck.ocount = 0  #MFH - this triggers the oFlash strings & timer
               break
           else:
             if not guitar.starPowerActive:
@@ -5559,16 +5582,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
               guitar.starPowerActive = True #QQstarS:Set [0] to [i]
               if not guitar.isVocal:
                 self.hopFretboard(num, 0.07)  #stump
-                guitar.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
-                guitar.ocount = 0  #MFH - this triggers the oFlash strings & timer
+                guitar.neck.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
+                guitar.neck.ocount = 0  #MFH - this triggers the oFlash strings & timer
         else:
           if not guitar.starPowerActive:
             self.engine.data.starActivateSound.play()
             guitar.starPowerActive = True #QQstarS:Set [0] to [i]
             if not guitar.isVocal:
               self.hopFretboard(num, 0.07)  #stump
-              guitar.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
-              guitar.ocount = 0  #MFH - this triggers the oFlash strings & timer
+              guitar.neck.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
+              guitar.neck.ocount = 0  #MFH - this triggers the oFlash strings & timer
 
   def goToResults(self):
     self.ending = True
@@ -5657,6 +5680,16 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #myfingershurt: drums :)
     for i in range(self.numOfPlayers):
       if self.instruments[i].isDrum and control in (self.instruments[i].keys):
+        if control in Player.bassdrums:
+          self.instruments[i].drumsHeldDown[0] = 100
+        elif control in Player.drum1s:
+          self.instruments[i].drumsHeldDown[1] = 100
+        elif control in Player.drum2s:
+          self.instruments[i].drumsHeldDown[2] = 100
+        elif control in Player.drum3s:
+          self.instruments[i].drumsHeldDown[3] = 100
+        elif control in Player.drum5s:
+          self.instruments[i].drumsHeldDown[4] = 100
         self.handlePick(i)
         return True
 
@@ -5673,9 +5706,22 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if num is None:
       return True
     if self.instruments[num].isDrum and control in self.instruments[num].keys:
-      if control in Player.bassdrums and actual:
-        self.instruments[num].bassDrumPedalDown = 100
-        self.instruments[num].bassDrumPedalPressed = True
+      if actual:
+        if control in Player.bassdrums:
+          self.instruments[num].drumsHeldDown[0] = 100
+          self.instruments[num].playedSound[0] = False
+        elif control in Player.drum1s:
+          self.instruments[num].drumsHeldDown[1] = 100
+          self.instruments[num].playedSound[1] = False
+        elif control in Player.drum2s:
+          self.instruments[num].drumsHeldDown[2] = 100
+          self.instruments[num].playedSound[2] = False
+        elif control in Player.drum3s:
+          self.instruments[num].drumsHeldDown[3] = 100
+          self.instruments[num].playedSound[3] = False
+        elif control in Player.drum5s:
+          self.instruments[num].drumsHeldDown[4] = 100
+          self.instruments[num].playedSound[4] = False
     if self.battleGH:
       if self.instruments[num].battleStatus[3]:
         if control == self.instruments[num].keys[self.instruments[num].battleBreakString]:
@@ -5827,10 +5873,22 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         
     pressed = -1
     for i in range(self.numOfPlayers):
-      if self.instruments[i].isDrum and control in self.instruments[i].keys:
-        if control in Player.bassdrums and actual:
-          self.instruments[i].bassDrumPedalDown    = 100
-          self.instruments[i].bassDrumPedalPressed = True
+      if self.instruments[i].isDrum and control in self.instruments[i].keys and actual:
+        if control in Player.bassdrums:
+          self.instruments[num].drumsHeldDown[0] = 100
+          self.instruments[num].playedSound[0] = False
+        elif control in Player.drum1s:
+          self.instruments[num].drumsHeldDown[1] = 100
+          self.instruments[num].playedSound[1] = False
+        elif control in Player.drum2s:
+          self.instruments[num].drumsHeldDown[2] = 100
+          self.instruments[num].playedSound[2] = False
+        elif control in Player.drum3s:
+          self.instruments[num].drumsHeldDown[3] = 100
+          self.instruments[num].playedSound[3] = False
+        elif control in Player.drum5s:
+          self.instruments[num].drumsHeldDown[4] = 100
+          self.instruments[num].playedSound[4] = False
       if control in (self.instruments[i].actions):
         hopo = False
         pressed = i
@@ -5951,28 +6009,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if num is None:
       return
 
-    #myfingershurt: drums :)
-    #MFH - cleaning up Faaa's drum tracking code: (which appears to determine which drum fret after key release?  TODO: why not before?)
     if self.instruments[num].isDrum:
-      if control in (self.instruments[num].keys):
-        if not self.controls.getState(self.instruments[num].keys[0]) and not self.controls.getState(self.instruments[num].keys[5]):
-          self.instruments[num].bassDrumPedalDown = 0    #MFH - this is all that's needed here...
-          #self.instruments[num].lastFretWasBassDrum = False
       return True
-    
-#-      if not self.controls.getState(self.instruments[num].keys[1]):
-#-        self.instruments[num].lastFretWasT1 = False
-#-      return True
-#-      if not self.controls.getState(self.instruments[num].keys[2]):
-#-        self.instruments[num].lastFretWasT2 = False
-#-      return True  
-#-      if not self.controls.getState(self.instruments[num].keys[3]):
-#-        self.instruments[num].lastFretWasT3 = False
-#-      return True
-#-      if not self.controls.getState(self.instruments[num].keys[4]):
-#-        self.instruments[num].lastFretWasC = False
-#-      return True   
-
 
     #myfingershurt:
   
@@ -8041,8 +8079,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                   for j in self.instruments: #MFH - flash overdrive strings in RB theme
                     if j.isVocal:
                       continue
-                    j.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
-                    j.ocount = 0  #MFH - this triggers the oFlash strings & timer
+                    j.neck.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
+                    j.neck.ocount = 0  #MFH - this triggers the oFlash strings & timer
                 if self.rockTimer < self.rockCountdown:
                   self.rockTimer += 1
                   self.engine.drawImage(self.rockMsg, scale = (0.5, -0.5), coord = (w/2,h/2))

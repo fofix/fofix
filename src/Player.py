@@ -198,7 +198,7 @@ Config.define("controller", "key_5a",        str, "K_F10",      text = (_("Solo 
 Config.define("controller", "key_cancel",    str, "K_ESCAPE",   text = _("Cancel"))
 Config.define("controller", "key_star",      str, "K_PAGEDOWN", text = _("StarPower"))
 Config.define("controller", "key_kill",      str, "K_PAGEUP",   text = _("Whammy"))
-Config.define("controller", "key_start",     str, "K_SPACE",    text = _("Start"))
+Config.define("controller", "key_start",     str, "K_LCTRL",    text = _("Start"))
 Config.define("controller", "two_chord_max", int, 0,            text = _("Two-Chord Max"),   options = {0: _("Off"), 1: _("On")}, tipText = _("When enabled, the highest notes in large note chords are auto-played."))
 Config.define("controller", "type",          int, 0,            text = _("Controller Type"), options = sortOptionsByKey({0: _("Standard Guitar"), 1: _("Solo Shift Guitar"), 2: _("Drum Set (4-Drum)"), 4: _("Analog Slide Guitar"), 5: _("Microphone")}), tipText = _("'Standard Guitar' is for keyboards and pre-WT GH-series guitars. 'Solo Shift Guitar' is for RB-series guitars and keyboards who want to use a shift key for solo frets. 'Analog Slide Guitar' is for guitars with an analog slider bar.")) #, 3: _("Drum Set (3-Drum 2-Cymbal)")
 Config.define("controller", "analog_sp",     int, 0,            text = _("Analog SP"),       options = {0: _("Disabled"), 1: _("Enabled")}, tipText = _("Enables analog SP (as in the XBOX Xplorer controller.)"))
@@ -241,6 +241,7 @@ playerpref = []
 playerstat = []
 
 class PlayerCacheManager(object): #akedrou - basically stump's cache for the players. Todo? Group the caching. .fofix/appdata?
+  SCHEMA_VERSION = 3
   def __init__(self):
     self.caches = {}
   def getCache(self):
@@ -262,7 +263,7 @@ class PlayerCacheManager(object): #akedrou - basically stump's cache for the pla
     updateTables = 0
     try:
       v = conn.execute("SELECT `value` FROM `config` WHERE `key` = 'version'").fetchone()[0]
-      if int(v) != 2:
+      if int(v) != self.SCHEMA_VERSION:
         updateTables = 2 #an old version. We don't want to just burn old tables.
     except:
       updateTables = 1 #no good table
@@ -275,7 +276,7 @@ class PlayerCacheManager(object): #akedrou - basically stump's cache for the pla
       conn.execute('CREATE TABLE `players` (`name` STRING UNIQUE, `lefty` INT, `drumflip` INT, `autokick` INT, `assist` INT, `twochord` INT, `necktype` INT, `neck` STRING, \
                      `part` INT, `difficulty` INT, `upname` STRING, `control` INT, `changed` INT, `loaded` INT)')
       conn.execute('CREATE TABLE `stats` (`song` STRING, `hash` STRING, `player` STRING)')
-      conn.execute("INSERT INTO `config` (`key`, `value`) VALUES ('version', '2')")  #stump: current cache format version number
+      conn.execute("INSERT INTO `config` (`key`, `value`) VALUES (?, ?)", ('version', self.SCHEMA_VERSION))
       conn.commit()
     self.caches[cachePath] = conn
     return conn
@@ -442,7 +443,7 @@ def loadControls():
   i = 1
   Config.define("game", "control0",           str,   "defaultg", text = tsControl % 1,                options = controllerDict, tipText = tsControlTip % 1)
   
-  controllerDict["None"] = None
+  controllerDict[_("None")] = None
   
   Config.define("game", "control1",           str,   "defaultd", text = tsControl % 2,                options = controllerDict, tipText = tsControlTip % 2)
   Config.define("game", "control2",           str,   defMic,     text = tsControl % 3,                options = controllerDict, tipText = tsControlTip % 3)
@@ -518,14 +519,20 @@ class Controls:
         self.config.append(Config.load(os.path.join(controlpath,self.controls[1] + ".ini"), type = 1))
       else:
         self.config.append(None)
+        Config.set("game", "control1", None)
+        self.controls[1] = "None"
       if os.path.exists(os.path.join(controlpath,self.controls[2] + ".ini")) and self.controls[2] != "None":
         self.config.append(Config.load(os.path.join(controlpath,self.controls[2] + ".ini"), type = 1))
       else:
         self.config.append(None)
+        Config.set("game", "control2", None)
+        self.controls[2] = "None"
       if os.path.exists(os.path.join(controlpath,self.controls[3] + ".ini")) and self.controls[3] != "None":
         self.config.append(Config.load(os.path.join(controlpath,self.controls[3] + ".ini"), type = 1))
       else:
         self.config.append(None)
+        Config.set("game", "control3", None)
+        self.controls[3] = "None"
     else:
       confM = None
       if Microphone.supported:
@@ -534,6 +541,17 @@ class Controls:
       self.config.append(Config.load(os.path.join(controlpath,"defaultd.ini"), type = 1))
       self.config.append(confM)
       self.config.append(None)
+      Config.set("game", "control0", "defaultg")
+      Config.set("game", "control1", "defaultd")
+      self.controls = ["defaultg", "defaultd"]
+      if confM is not None:
+        Config.set("game", "control2", "defaultm")
+        self.controls.append("defaultm")
+      else:
+        Config.set("game", "control2", None)
+        self.controls.append("None")
+      Config.set("game", "control3", None)
+      self.controls.append("None")
     
     self.type       = []
     self.analogKill = []
@@ -784,7 +802,7 @@ class Controls:
         if value in okconflict:
           if self.getMapping(key) in okconflict:
             continue
-        a.append("%s conflicts with %s" % (keyName(value), keyName(self.getMapping(key))))
+        a.append(_("%s conflicts with %s") % (keyName(value), keyName(self.getMapping(key))))
     if len(a) == 0:
       return newDict
     self.overlap.extend(a)
@@ -872,7 +890,7 @@ def setNewKeyMapping(engine, config, section, option, key):
   b = isKeyMappingOK(config, option)
   if b != 0:
     if keyCheckerMode > 0:
-      Dialogs.showMessage(engine, "This key conflicts with the following keys: %s" % str(b))
+      Dialogs.showMessage(engine, _("This key conflicts with the following keys: %s") % str(b))
     if keyCheckerMode == 2:   #enforce no conflicts!
       config.set(section, option, oldKey)
     return False

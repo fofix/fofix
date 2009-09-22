@@ -34,7 +34,12 @@ import random   #MFH - needed for new stage background handling
 from Language import _
 
 import Version # Provides dataPath
-
+# try:
+#   from VideoPlayer import VideoPlayer
+#   videoAvailable = True
+# except:
+#   videoAvailable = False
+  
 class Layer(object):
   """
   A graphical stage layer that can have a number of animation effects associated with it.
@@ -337,17 +342,19 @@ class Stage(object):
         else:
           self.backgroundLayers.append(layer)
 
-  # def loadVideo(self, libraryName, songName):
-    # if not videoAvailable:
-      # return -1
-    # if self.songStage == 1 and os.path.exists(os.path.join(libraryName, songName, "video.mp4")):
-      # vidSource = os.path.join(libraryName, songName, "video.mp4")
-    # else:
-      # vidSource = os.path.join(Version.dataPath(), "video.mp4")
+#   def loadVideo(self, libraryName, songName):
+#     if not videoAvailable:
+#       return -1
+#     if self.songStage == 1 and os.path.exists(os.path.join(libraryName, songName, "video.mp4")):
+#       vidSource = os.path.join(libraryName, songName, "video.mp4")
+#     else:
+#       vidSource = os.path.join(Version.dataPath(), "video.mp4")
 
-    # self.vidPlayer = VideoPlayer(self.engine, -1, vidSource, mute = True, loop = True)
-    # self.engine.view.pushLayer(self.vidPlayer)
-    # self.vidPlayer.paused = True
+#     winWidth, winHeight = (self.engine.view.geometry[2], self.engine.view.geometry[3])
+#     self.vidPlayer = VideoPlayer(-1, vidSource, (winWidth, winHeight),
+#                                  mute = True, loop = True)
+#     self.engine.view.pushLayer(self.vidPlayer)
+#     self.vidPlayer.paused = True
 
   def load(self, libraryName, songName, practiceMode = False):
     # evilynux - Fixes a self.background not defined crash

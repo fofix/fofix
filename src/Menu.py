@@ -163,6 +163,10 @@ class Menu(Layer, KeyListener):
       except IOError:
         self.menuBackground = None
         self.menuText = None
+      except KeyError:
+        Log.warn("Your theme does not appear to properly support the %s graphical submenu. Check to be sure you have the latest version of your theme." % self.name)
+        self.menuBackground = None
+        self.menuText = None
 
 
     if pos == (.2, .66 - .35):  #MFH - default position, not called with a special one - this is a submenu:

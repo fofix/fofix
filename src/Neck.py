@@ -69,9 +69,9 @@ class Neck:
     if self.isDrum and self.engine.config.get("game", "large_drum_neck"):
       self.boardWidth     = 4.0
       self.boardLength    = 12.0
-    elif Theme.twoDnote == False or Theme.twoDkeys == False:
-      self.boardWidth     = 3.6
-      self.boardLength    = 9.0  
+    #elif Theme.twoDnote == False or Theme.twoDkeys == False:
+      #self.boardWidth     = 3.6
+      #self.boardLength    = 9.0  
 
     self.beatsPerBoard  = 5.0
     self.beatsPerUnit   = self.beatsPerBoard / self.boardLength
@@ -140,9 +140,8 @@ class Neck:
     self.bgcount = 0
     self.ovrneckoverlay = self.engine.config.get("fretboard", "ovrneckoverlay")
     self.ocount = 0
-
-    self.currentBpm     = 120.0
-    self.currentPeriod  = 60000.0 / self.currentBpm
+    
+    self.currentPeriod  = 60000.0 / self.instrument.currentBpm
     self.lastBpmChange  = -1.0
     self.baseBeat       = 0.0
 
@@ -240,9 +239,6 @@ class Neck:
         engine.loadImgDrawing(self, "oNeckovr", os.path.join("themes",themename,"overdriveneckovr.png"),  textureSize = (256, 256))
       except IOError:
         self.oNeckovr = None
-
-      #MFH: support for optional overdrive_string_flash.png
-      self.overdriveFlashCounts = self.indexFps/4   #how many cycles to display the oFlash: self.indexFps/2 = 1/2 second
 
       if self.isDrum == True:
         try:
@@ -376,64 +372,13 @@ class Neck:
 
 
     self.isFailing = False
-    self.canGuitarSolo = False
+    self.canGuitarSolo = self.instrument.canGuitarSolo
     self.guitarSolo = False
     self.scoreMultiplier = 1
-    self.coOpFailed = False
-    self.coOpRestart = False
-    self.starPowerActive = False
-    self.overdriveFlashCount = self.instrument.overdriveFlashCounts
+    self.overdriveFlashCounts = self.indexFps/4   #how many cycles to display the oFlash: self.indexFps/2 = 1/2 second
+    self.overdriveFlashCount = self.overdriveFlashCounts
+    self.ocount = 0
     self.paused = False
-
-  def updateBoardSettings(self):
-    self.paused = self.instrument.paused
-    self.canGuitarSolo = self.instrument.canGuitarSolo
-    self.guitarSolo = self.instrument.guitarSolo
-    self.overdriveFlashCount = self.instrument.overdriveFlashCount
-    self.ocount = self.instrument.ocount
-    self.coOpFailed = self.instrument.coOpFailed
-    self.coOpRestart = self.instrument.coOpRestart
-    self.starPowerActive = self.instrument.starPowerActive
-    self.scoreMultiplier = self.instrument.scoreMultiplier
-    self.currentBpm = self.instrument.currentBpm
-    self.currentPeriod = self.instrument.currentPeriod
-    self.lastBpmChange = self.instrument.lastBpmChange
-    self.baseBeat = self.instrument.baseBeat
-
-    if self.isFailing == True:
-      if self.failcount <= 1 and self.failcount2 == False:
-        self.failcount += .05
-      elif self.failcount >= 1 and self.failcount2 == False:
-        self.failcount = 1
-        self.failcount2 = True
-        
-      if self.failcount >= 0 and self.failcount2 == True:
-        self.failcount -= .05
-      elif self.failcount <= 0 and self.failcount2 == True:
-        self.failcount = 0
-        self.failcount2 = False
-    if self.isFailing == False and self.failcount > 0:
-      self.failcount -= .05
-      self.failcount2 = False
-    if self.starPowerActive == True:
-      if self.spcount < 1.2:
-        self.spcount += .05
-        self.spcount2 = 1
-      elif self.spcount >=1.2:
-        self.spcount = 1.2
-        self.spcount2 = 0
-    else:
-      if self.spcount > 0:
-        self.spcount -= .05
-        self.spcount2 = 2
-      elif self.spcount <=0:
-        self.spcount = 0
-        self.spcount2 = 0
-    
-    if self.scoreMultiplier > 4 and self.bgcount < 1:
-      self.bgcount += .1
-    if self.scoreMultiplier < 4 and self.bgcount > 0:
-      self.bgcount -= .1
 
   def renderIncomingNeck(self, visibility, song, pos, time, neckTexture):   #MFH - attempt to "scroll" an incoming guitar solo neck towards the player
     if not song:
@@ -520,7 +465,7 @@ class Neck:
                 if event.endMarker:   #solo end
                   if self.incomingNeckMode == 2:    #render both start and end incoming necks
                     if self.guitarSolo:   #only until the end of the guitar solo!
-                      if self.starPowerActive and self.oNeck and self.ovrneckoverlay == False:
+                      if self.instrument.starPowerActive and self.oNeck and self.ovrneckoverlay == False:
                         neckImg = self.oNeck
                         alpha   = self.neckAlpha[4]
                       elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
@@ -554,7 +499,7 @@ class Neck:
             #else: #event.text.find("OFF"):
             elif self.incomingNeckMode == 2:    #render both start and end incoming necks
               if self.guitarSolo:   #only until the end of the guitar solo!
-                if self.starPowerActive and self.oNeck:
+                if self.instrument.starPowerActive and self.oNeck:
                   neckImg = self.oNeck
                 elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
                   neckImg = self.bassGrooveNeck
@@ -568,9 +513,9 @@ class Neck:
     def project(beat):
       return 0.125 * beat / self.beatsPerUnit    # glorandwarf: was 0.12
       
-    if self.starPowerActive and self.theme == 0:#8bit
+    if self.instrument.starPowerActive and self.theme == 0:#8bit
       color = Theme.fretColors[5] #self.spColor #(.3,.7,.9)
-    elif self.starPowerActive and self.theme == 1:
+    elif self.instrument.starPowerActive and self.theme == 1:
       color = Theme.fretColors[5] #self.spColor #(.3,.7,.9)
     else:
       color = (1,1,1)
@@ -636,7 +581,7 @@ class Neck:
       neck = self.guitarSoloNeck
     elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
       neck = self.bassGrooveNeck
-    elif self.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and self.scoreMultiplier <= 4 and self.ovrneckoverlay == False:
+    elif self.instrument.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and self.scoreMultiplier <= 4 and self.ovrneckoverlay == False:
       neck = self.oNeck
     else:
       neck = self.neckDrawing
@@ -662,7 +607,7 @@ class Neck:
       
     
       
-    if self.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and (self.scoreMultiplier > 4 or self.guitarSolo or self.ovrneckoverlay == True):   #static overlay
+    if self.instrument.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and (self.scoreMultiplier > 4 or self.guitarSolo or self.ovrneckoverlay == True):   #static overlay
       if self.oNeckovr != None:
         neck = self.oNeckovr
         alpha = False
@@ -675,9 +620,9 @@ class Neck:
     if shaders.enabled:
       shaders.globals["basspos"] = shaders.var["fret"][self.player][0]
       shaders.globals["notepos"] = shaders.var["fret"][self.player][1:]
-      shaders.globals["bpm"] = self.currentBpm
+      shaders.globals["bpm"] = self.instrument.currentBpm
       shaders.globals["songpos"] = pos
-      shaders.globals["spEnabled"] = self.starPowerActive
+      shaders.globals["spEnabled"] = self.instrument.starPowerActive
       shaders.globals["isFailing"] = self.isFailing
       shaders.globals["isMultChanged"] = (shaders.var["scoreMult"][self.player] != self.scoreMultiplier)
       if shaders.globals["isMultChanged"]:
@@ -717,7 +662,7 @@ class Neck:
       if self.isFailing:
         self.renderNeckMethod(self.failcount, 0, self.failNeck)
         
-    if (self.guitarSolo or self.starPowerActive) and self.theme == 1:
+    if (self.guitarSolo or self.instrument.starPowerActive) and self.theme == 1:
       shaders.var["solocolor"]=(0.3,0.7,0.9,0.6)
     else:
       shaders.var["solocolor"]=(0.0,)*4
@@ -761,7 +706,7 @@ class Neck:
     #MFH - logic to briefly display oFlash
     if self.theme == 2 and self.overdriveFlashCount < self.overdriveFlashCounts and self.oFlash:
       self.oFlash.texture.bind()
-    elif self.theme == 2 and self.starPowerActive and self.oCenterLines:
+    elif self.theme == 2 and self.instrument.starPowerActive and self.oCenterLines:
       self.oCenterLines.texture.bind()
     else:
       self.centerLines.texture.bind()
@@ -839,7 +784,7 @@ class Neck:
                          [1.0, project(offset + l * self.beatsPerUnit)]], dtype=float32)
 
     glEnable(GL_TEXTURE_2D)
-    if self.theme == 2 and self.starPowerActive and self.oSideBars:
+    if self.theme == 2 and self.instrument.starPowerActive and self.oSideBars:
       self.oSideBars.texture.bind()
     else:
       self.sideBars.texture.bind()
@@ -948,10 +893,52 @@ class Neck:
     glDisable(GL_TEXTURE_2D)
     
   def render(self, visibility, song, pos):
-    self.updateBoardSettings() #Q update this before we check for coop becuase coop must be updated
-    if not (self.coOpFailed and not self.coOpRestart):
+    self.currentPeriod = self.instrument.neckSpeed
+    
+    if self.isFailing == True:
+      if self.failcount <= 1 and self.failcount2 == False:
+        self.failcount += .05
+      elif self.failcount >= 1 and self.failcount2 == False:
+        self.failcount = 1
+        self.failcount2 = True
+        
+      if self.failcount >= 0 and self.failcount2 == True:
+        self.failcount -= .05
+      elif self.failcount <= 0 and self.failcount2 == True:
+        self.failcount = 0
+        self.failcount2 = False
+    if self.isFailing == False and self.failcount > 0:
+      self.failcount -= .05
+      self.failcount2 = False
+    if self.instrument.starPowerActive == True:
+      if self.spcount < 1.2:
+        self.spcount += .05
+        self.spcount2 = 1
+      elif self.spcount >=1.2:
+        self.spcount = 1.2
+        self.spcount2 = 0
+    else:
+      if self.spcount > 0:
+        self.spcount -= .05
+        self.spcount2 = 2
+      elif self.spcount <=0:
+        self.spcount = 0
+        self.spcount2 = 0
+    
+    if self.scoreMultiplier > 4 and self.bgcount < 1:
+      self.bgcount += .1
+      if self.bgcount > 1:
+        self.bgcount = 1
+    if self.scoreMultiplier < 4 and self.bgcount > 0:
+      self.bgcount -= .1
+      if self.bgcount < 0:
+        self.bgcount = 0
+    if not (self.instrument.coOpFailed and not self.instrument.coOpRestart):
 
-      
+      if self.ocount < 1:
+        self.ocount += .1
+      else:
+        self.ocount = 1
       self.vis = visibility
       self.renderNeck(visibility, song, pos)
       self.renderIncomingNecks(visibility, song, pos) #MFH
@@ -959,3 +946,6 @@ class Neck:
       self.drawBPM(visibility, song, pos)
       self.drawSideBars(visibility, song, pos)
 
+
+    if self.theme == 2 and self.overdriveFlashCount < self.overdriveFlashCounts:
+      self.overdriveFlashCount = self.overdriveFlashCount + 1
