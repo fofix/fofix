@@ -2340,6 +2340,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.song.tracks = None
       self.song.eventTracks = None
       self.song.midiEventTracks = None
+      if self.whammyEffect == 1:
+        self.song.resetInstrumentPitch(-1)
     self.song = None
 
     self.rockOff = None
@@ -2413,8 +2415,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       scoreCard.lastNoteEvent = None
     if self.coOpType:
       self.coOpScoreCard.lastNoteEvent = None
-    if self.whammyEffect == 1:
-      self.song.resetInstrumentPitch(-1)
     
 
   def getHandicap(self):
