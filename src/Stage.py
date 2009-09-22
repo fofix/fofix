@@ -367,36 +367,22 @@ class Stage(object):
       self.songStage = 0
       self.rotationMode = 0
       self.mode = 1
-      try: #separated practice stages for the instruments by k.i.d
-        if self.scene.guitars[0].isDrum:
-          background = "practicedrum"
-        elif self.scene.guitars[0].isBassGuitar:
-          background = "practicebass"
-        else:
-          background = "practice"
-        try:
-          self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages",background + ".jpg"))
-        except IOError:
-          self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages",background + ".png"))            
-      except IOError:
+      #separated practice stages for the instruments by k.i.d
+      if self.scene.guitars[0].isDrum:
+        background = "practicedrum"
+      elif self.scene.guitars[0].isBassGuitar:
+        background = "practicebass"
+      else:
+        background = "practice"
+      if not self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages",background)):
         #MFH - must first fall back on the old practice.png before forcing blank stage mode!
-        try:
-          try:
-            self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages","practice.jpg"))
-          except IOError:
-            self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages","practice.png"))            
-        except IOError:
+        if not self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages","practice")):
           Log.warn("No practice stage, fallbacking on a forced Blank stage mode") # evilynux
           self.mode = 2    #if no practice stage, just fall back on a forced Blank stage mode
             
     elif self.songStage == 1:    #check for song-specific background
       test = True
-      try:
-        try:
-          self.engine.loadImgDrawing(self, "background", os.path.join(libraryName, songName, "background.jpg"))
-        except IOError:
-          self.engine.loadImgDrawing(self, "background", os.path.join(libraryName, songName, "background.png"))
-      except IOError:
+      if not self.engine.loadImgDrawing(self, "background", os.path.join(libraryName, songName, "background")):
         Log.notice("No song-specific stage found") # evilynux
         test = False
       if test:  #does a song-specific background exist?
@@ -411,12 +397,7 @@ class Stage(object):
     if self.mode != 2 and self.songStage == 0 and not practiceMode: #still need to load stage(s)
       #myfingershurt: assign this first
       if self.mode == 1:   #just use Default.png
-        try:
-          try:
-            self.engine.loadImgDrawing(self, "background", os.path.join(self.path, "default.jpg"))
-          except IOError:
-            self.engine.loadImgDrawing(self, "background", os.path.join(self.path, "default.png"))            
-        except IOError:
+        if not self.engine.loadImgDrawing(self, "background", os.path.join(self.path, "default")):
           Log.warn("No default stage; falling back on a forced Blank stage mode") # evilynux
           self.mode = 2    #if no practice stage, just fall back on a forced Blank stage mode
 

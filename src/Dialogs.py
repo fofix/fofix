@@ -787,10 +787,7 @@ class SongChooser(Layer, KeyListener):
       self.engine.resource.load(self, "libraryLabel", lambda: Mesh(self.engine.resource.fileName("library_label.dae")), synch = True)
       self.engine.loadImgDrawing(self, "background",  os.path.join("themes",themename,"menu","songchoosepaper.png"))
     elif self.display == 1:
-
-      try:
-        self.engine.loadImgDrawing(self, "background",  os.path.join("themes",themename,"menu","songchooseback.png"))
-      except IOError:
+      if not self.engine.loadImgDrawing(self, "background",  os.path.join("themes",themename,"menu","songchooseback.png")):
         self.background = None
       self.engine.loadImgDrawing(self, "paper",       os.path.join("themes",themename,"menu","songchoosepaper.png"))
       self.engine.loadImgDrawing(self, "selected",    os.path.join("themes",themename,"menu","selected.png"))
@@ -803,44 +800,28 @@ class SongChooser(Layer, KeyListener):
       self.engine.resource.load(self, "label",        lambda: Mesh(self.engine.resource.fileName("label.dae")), synch = True)
       self.engine.resource.load(self, "libraryMesh",  lambda: Mesh(self.engine.resource.fileName("library.dae")), synch = True)
       self.engine.resource.load(self, "libraryLabel", lambda: Mesh(self.engine.resource.fileName("library_label.dae")), synch = True)
-      try:
-        self.engine.loadImgDrawing(self, "background",       os.path.join("themes",themename,"menu","songchooselistcd.png"))
-      except IOError:
+      if not self.engine.loadImgDrawing(self, "background",       os.path.join("themes",themename,"menu","songchooselistcd.png")):
         self.engine.loadImgDrawing(self, "background",       os.path.join("themes",themename,"menu","songchoosepaper.png"))
-      try:
-        self.engine.loadImgDrawing(self, "selectedlistcd",    os.path.join("themes",themename,"menu","selectedlistcd.png"))
-      except IOError:
+      if not self.engine.loadImgDrawing(self, "selectedlistcd",    os.path.join("themes",themename,"menu","selectedlistcd.png")):
         self.engine.loadImgDrawing(self, "selected",    os.path.join("themes",themename,"menu","selected.png"))
         self.selectedlistcd = None
     elif self.display == 3:
-      try:
-        self.engine.loadImgDrawing(self, "background",  os.path.join("themes",themename,"menu","songchooserb2.png"))
-      except IOError:
+      if not self.engine.loadImgDrawing(self, "background",  os.path.join("themes",themename,"menu","songchooserb2.png")):
         self.background = None
         self.engine.loadImgDrawing(self, "background",       os.path.join("themes",themename,"menu","songchoosepaper.png"))
-      try:
-        self.engine.loadImgDrawing(self, "selected",    os.path.join("themes",themename,"menu","selectedrb2.png"))
-      except IOError:
+      if not self.engine.loadImgDrawing(self, "selected",    os.path.join("themes",themename,"menu","selectedrb2.png")):
         self.engine.loadImgDrawing(self, "selected",    os.path.join("themes",themename,"menu","selected.png"))
-      try:
-        self.engine.loadImgDrawing(self, "tierbg",    os.path.join("themes",themename,"menu","tier.png"))
-      except IOError:
+      if not self.engine.loadImgDrawing(self, "tierbg",    os.path.join("themes",themename,"menu","tier.png")):
         self.tierbg = None
-      try:
-        self.engine.loadImgDrawing(self, "emptyLabel",    os.path.join("themes",themename,"menu","emptylabel.png"))
-      except IOError:
+      if not self.engine.loadImgDrawing(self, "emptyLabel",    os.path.join("themes",themename,"menu","emptylabel.png")):
         self.emptyLabel = None
-      try:
-        self.engine.loadImgDrawing(self, "lockedLabel",    os.path.join("themes",themename,"menu","lockedlabel.png"))
-      except IOError:
+      if not self.engine.loadImgDrawing(self, "lockedLabel",    os.path.join("themes",themename,"menu","lockedlabel.png")):
         self.lockedLabel = self.emptyLabel
-      try:
-        self.engine.loadImgDrawing(self, "diffimg1",    os.path.join("themes",themename,"menu","diff1.png"))
-        self.engine.loadImgDrawing(self, "diffimg2",    os.path.join("themes",themename,"menu","diff2.png"))
-        self.engine.loadImgDrawing(self, "diffimg3",    os.path.join("themes",themename,"menu","diff3.png"))
-      except IOError:
+      if not self.engine.loadImgDrawing(self, "diffimg1",    os.path.join("themes",themename,"menu","diff1.png")):
         self.diffimg1 = self.engine.data.star3
+      if not self.engine.loadImgDrawing(self, "diffimg2",    os.path.join("themes",themename,"menu","diff2.png")):
         self.diffimg2 = self.engine.data.star4
+      if not self.engine.loadImgDrawing(self, "diffimg3",    os.path.join("themes",themename,"menu","diff3.png")):
         self.diffimg3 = self.engine.data.starPerfect
         
       #song icon loading
@@ -886,15 +867,11 @@ class SongChooser(Layer, KeyListener):
     self.playSong = False
 
 #worldrave - Use setlistguidebuttons image if it exists.
-    try:
-      self.engine.loadImgDrawing(self, "setlistguidebuttons", os.path.join("themes",themename,"menu","setlistguidebuttons.png"))
-    except IOError:
+    if not self.engine.loadImgDrawing(self, "setlistguidebuttons", os.path.join("themes",themename,"menu","setlistguidebuttons.png")):
       self.setlistguidebuttons = None
 
 #racer: preview graphic
-    try:
-      self.engine.loadImgDrawing(self, "preview",  os.path.join("themes",themename,"menu","preview.png"))
-    except IOError:
+    if not self.engine.loadImgDrawing(self, "preview",  os.path.join("themes",themename,"menu","preview.png")):
       self.preview = None
 
 #racer: highscores are changed by fret
@@ -3614,11 +3591,8 @@ class FileChooser(BackgroundLayer, KeyListener):
     self.theme = self.engine.data.theme
 
    #MFH - added simple black background to place in front of Options background, behind Neck BG, for transparent neck displays
-    try:
-      self.engine.loadImgDrawing(self, "neckBlackBack", ("neckblackback.png"))
-    except IOError:
+    if not self.engine.loadImgDrawing(self, "neckBlackBack", ("neckblackback.png")):
       self.neckBlackBack = None
-
 
     self.engine.loadImgDrawing(self, "background", os.path.join("themes",themename,"editor.png"))
     
@@ -3801,12 +3775,10 @@ class NeckChooser(Layer, KeyListener):
       if ( str(i) == "randomneck.png"  or str(i) == "Neck_0.png" ):    #MFH 
         randomNeck = i
         #exists = 1
-        
-        try:
-          neckImage = engine.loadImgDrawing(self, "neck"+str(i), os.path.join("necks",str(i)))
+
+        neckImage = engine.loadImgDrawing(self, "neck"+str(i), os.path.join("necks",str(i)))
+        if not neckImage:
           # evilynux - Warning, Thumbs.db won't fail at engine.loadImgDrawing
-  
-        except IOError:
           exists = 0
           break
 
@@ -3828,11 +3800,10 @@ class NeckChooser(Layer, KeyListener):
       if( str(i) == "overdriveneck.png" or str(i) == "randomneck.png"  or str(i) == "Neck_0.png" or str(i)[-4:] != ".png" ):    #MFH 
         exists = 0
         continue
-      try:
-        neckImage = engine.loadImgDrawing(self, "neck"+str(i), os.path.join("necks",str(i)))
-        # evilynux - Warning, Thumbs.db won't fail at engine.loadImgDrawing
 
-      except IOError:
+      neckImage = engine.loadImgDrawing(self, "neck"+str(i), os.path.join("necks",str(i)))
+      if not neckImage:
+        # evilynux - Warning, Thumbs.db won't fail at engine.loadImgDrawing
         exists = 0
         break
       else:
@@ -3872,9 +3843,7 @@ class NeckChooser(Layer, KeyListener):
     self.theme = self.engine.data.theme
 
    #MFH - added simple black background to place in front of Options background, behind Neck BG, for transparent neck displays
-    try:
-      self.engine.loadImgDrawing(self, "neckBlackBack", ("neckblackback.png"))
-    except IOError:
+    if not self.engine.loadImgDrawing(self, "neckBlackBack", ("neckblackback.png")):
       self.neckBlackBack = None
 
    
@@ -4083,10 +4052,9 @@ class AvatarChooser(Layer, KeyListener):
     for i in themeavatarfiles:
       if str(i).lower()[-4:] != ".png":
         continue
-      try:
-        image = engine.loadImgDrawing(self, "av"+str(i), os.path.join("themes",self.themename,"avatars",str(i)))
 
-      except IOError:
+      image = engine.loadImgDrawing(self, "av"+str(i), os.path.join("themes",self.themename,"avatars",str(i)))
+      if not image:
         exists = 0
         break
       else:
@@ -4104,10 +4072,9 @@ class AvatarChooser(Layer, KeyListener):
     for i in avatarfiles:
       if str(i).lower()[-4:] != ".png":
         continue
-      try:
-        image = engine.loadImgDrawing(self, "av"+str(i), os.path.join("avatars",str(i)))
 
-      except IOError:
+      image = engine.loadImgDrawing(self, "av"+str(i), os.path.join("avatars",str(i)))
+      if not image:
         exists = 0
         break
       else:
@@ -4137,24 +4104,16 @@ class AvatarChooser(Layer, KeyListener):
     
 
     #MFH - added simple black background to place in front of Options background, behind Neck BG, for transparent neck displays
-    try:
-      self.engine.loadImgDrawing(self, "avFrame", os.path.join("themes",self.themename,"lobby","avatarframe.png"))
-    except IOError:
+    if not self.engine.loadImgDrawing(self, "avFrame", os.path.join("themes",self.themename,"lobby","avatarframe.png")):
       self.avFrame = None
-    
-    try:
-      self.engine.loadImgDrawing(self, "avSelFrame", os.path.join("themes",self.themename,"lobby","avatarselectframe.png"))
-    except IOError:
+
+    if not self.engine.loadImgDrawing(self, "avSelFrame", os.path.join("themes",self.themename,"lobby","avatarselectframe.png")):
       self.avSelFrame = self.avFrame
-    
-    try:
-      self.engine.loadImgDrawing(self, "avBigFrame", os.path.join("themes",self.themename,"lobby","avatarmainframe.png"))
-    except IOError:
+
+    if not self.engine.loadImgDrawing(self, "avBigFrame", os.path.join("themes",self.themename,"lobby","avatarmainframe.png")):
       self.avBigFrame = self.avFrame
-    
-    try:
-      self.engine.loadImgDrawing(self, "avText", os.path.join("themes",self.themename,"lobby","avatartext.png"))
-    except IOError:
+
+    if not self.engine.loadImgDrawing(self, "avText", os.path.join("themes",self.themename,"lobby","avatartext.png")):
       self.avText = None
     
     self.avFrameScale = None
@@ -4182,10 +4141,8 @@ class AvatarChooser(Layer, KeyListener):
       self.avBigFrameScale = (wFactor, -hFactor)
     
     self.avatarText = _("Select Your Avatar:")
-    
-    try:
-      self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"lobby","avatarbg.png"))
-    except IOError:
+
+    if not self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"lobby","avatarbg.png")):
       self.background = None
 
     hideLoadingSplashScreen(self.engine, splash)
@@ -4506,19 +4463,18 @@ class ControlActivator(Layer, KeyListener):
       if self.selectedIndex > 3:
         self.selectedIndex = 0
         break
-    try:
-      self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "lobby", "controlbg.png"))
+
+    if self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "lobby", "controlbg.png")):
       self.bgScale = 640.000/self.background.width1()
-    except IOError:
+    else:
       self.background = None
-    try:
-      self.engine.loadImgDrawing(self, "readyImage", os.path.join("themes", themename, "lobby", "ready.png"))
+
+    if self.engine.loadImgDrawing(self, "readyImage", os.path.join("themes", themename, "lobby", "ready.png")):
       self.readyScale = 640.000/self.readyImage.width1()
-    except IOError:
+    else:
       self.readyImage = None
-    try:
-      self.engine.loadImgDrawing(self, "selected", os.path.join("themes", themename, "lobby", "select.png"))
-    except IOError:
+
+    if not self.engine.loadImgDrawing(self, "selected", os.path.join("themes", themename, "lobby", "select.png")):
       self.selected = None
     
     self.selectX = Theme.controlActivateSelectX
@@ -4535,28 +4491,28 @@ class ControlActivator(Layer, KeyListener):
     self.checkSpace = Theme.controlCheckSpace
     
     self.partSize = Theme.controlActivatePartSize
-    try:
-      self.engine.loadImgDrawing(self, "guitar", os.path.join("themes", themename, "guitar.png"))
+
+    if self.engine.loadImgDrawing(self, "guitar", os.path.join("themes", themename, "guitar")):
       self.guitarScale = self.partSize/self.guitar.width1()
-    except IOError:
+    else:
       self.engine.loadImgDrawing(self, "guitar", "guitar.png")
       self.guitarScale = self.partSize/self.guitar.width1()
-    try:
-      self.engine.loadImgDrawing(self, "bass", os.path.join("themes", themename, "bass.png"))
+
+    if self.engine.loadImgDrawing(self, "bass", os.path.join("themes", themename, "bass.png")):
       self.bassScale = self.partSize/self.bass.width1()
-    except IOError:
+    else:
       self.engine.loadImgDrawing(self, "bass", "bass.png")
       self.bassScale = self.partSize/self.bass.width1()
-    try:
-      self.engine.loadImgDrawing(self, "drum", os.path.join("themes", themename, "drum.png"))
+
+    if self.engine.loadImgDrawing(self, "drum", os.path.join("themes", themename, "drum.png")):
       self.drumScale = self.partSize/self.drum.width1()
-    except IOError:
+    else:
       self.engine.loadImgDrawing(self, "drum", "drum.png")
       self.drumScale = self.partSize/self.drum.width1()
-    try:
-      self.engine.loadImgDrawing(self, "mic", os.path.join("themes", themename, "mic.png"))
+
+    if self.engine.loadImgDrawing(self, "mic", os.path.join("themes", themename, "mic.png")):
       self.micScale = self.partSize/self.mic.width1()
-    except IOError:
+    else:
       self.engine.loadImgDrawing(self, "mic", "mic.png")
       self.micScale = self.partSize/self.mic.width1()
   

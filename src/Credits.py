@@ -170,16 +170,11 @@ class Credits(Layer, KeyListener):
     self.bank['spanish']       = [_("Spanish")]
     self.bank['swedish']       = [_("Swedish")]
 
-    
-    try:
-      self.engine.loadImgDrawing(self, 'background', os.path.join('themes', self.themename, 'menu', 'credits.png'))
-      try:
-        self.engine.loadImgDrawing(self, 'topLayer', os.path.join('themes', self.themename, 'menu', 'creditstop.png'))
-      except IOError:
-        self.topLayer = None
-    except IOError:
-      self.topLayer = None
+
+    if not self.engine.loadImgDrawing(self, 'background', os.path.join('themes', self.themename, 'menu', 'credits.png')):
       self.background = None
+    if not self.engine.loadImgDrawing(self, 'topLayer', os.path.join('themes', self.themename, 'menu', 'creditstop.png')):
+        self.topLayer = None
 
     space = Text(nf, hs, c1, "center", " ")
     self.credits = [

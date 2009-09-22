@@ -132,14 +132,14 @@ class Menu(Layer, KeyListener):
     
     if self.name and self.useGraphics > 0:
       try:
-        try:
-          self.engine.loadImgDrawing(self, "menuBackground", os.path.join("themes",self.themename,"menu","%s.png" % self.name))
+        if self.engine.loadImgDrawing(self, "menuBackground", os.path.join("themes",self.themename,"menu","%s.png" % self.name)):
           if self.menuBackground.height1() == 1:
-            self.menuBackground = None
-        except IOError:
-          self.menuBackground = None
+            raise KeyError
+        else:
+          raise KeyError
         self.gfxText = "%stext%d" % (self.name, len(choices))
-        self.engine.loadImgDrawing(self, "menuText", os.path.join("themes",self.themename,"menu","%s.png" % self.gfxText))
+        if not self.engine.loadImgDrawing(self, "menuText", os.path.join("themes",self.themename,"menu","%s.png" % self.gfxText)):
+          raise KeyError
         self.graphicMenu = True
         self.menux = Theme.submenuX[self.gfxText]
         self.menuy = Theme.submenuY[self.gfxText]
@@ -160,9 +160,6 @@ class Menu(Layer, KeyListener):
         else:
           self.vSpace = .08
         Log.debug("Graphic menu enabled for submenu: %s" % self.name)
-      except IOError:
-        self.menuBackground = None
-        self.menuText = None
       except KeyError:
         Log.warn("Your theme does not appear to properly support the %s graphical submenu. Check to be sure you have the latest version of your theme." % self.name)
         self.menuBackground = None

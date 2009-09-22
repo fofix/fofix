@@ -394,44 +394,36 @@ class Drum:
 
     #MFH - making hitflames optional
     self.hitFlamesPresent = False
-    try:
-      engine.loadImgDrawing(self, "hitflames1Drawing", os.path.join("themes",themename,"hitflames1.png"),  textureSize = (128, 128))
-      engine.loadImgDrawing(self, "hitflames2Drawing", os.path.join("themes",themename,"hitflames2.png"),  textureSize = (128, 128))
-      self.hitFlamesPresent = True
-    except IOError:
-      self.hitFlamesPresent = False
+    if engine.loadImgDrawing(self, "hitflames1Drawing", os.path.join("themes",themename,"hitflames1.png"),  textureSize = (128, 128)):
+      if engine.loadImgDrawing(self, "hitflames2Drawing", os.path.join("themes",themename,"hitflames2.png"),  textureSize = (128, 128)):
+        self.hitFlamesPresent = True
+      else:
+        self.hitflames2Drawing = None
+    else:
       self.hitflames1Drawing = None
       self.hitflames2Drawing = None
 
-    try:
-      engine.loadImgDrawing(self, "hitflamesAnim", os.path.join("themes",themename,"hitflamesanimation.png"),  textureSize = (128, 128))
-    except IOError:
+    if not engine.loadImgDrawing(self, "hitflamesAnim", os.path.join("themes",themename,"hitflamesanimation.png"),  textureSize = (128, 128)):
       #engine.loadImgDrawing(self, "hitflames1Drawing", os.path.join("themes",themename,"hitflames1.png"),  textureSize = (128, 128))
       #engine.loadImgDrawing(self, "hitflames2Drawing", os.path.join("themes",themename,"hitflames2.png"),  textureSize = (128, 128))
       self.Hitanim2 = False
 
-    try:
-      engine.loadImgDrawing(self, "hitglowAnim", os.path.join("themes",themename,"hitglowanimation.png"),  textureSize = (128, 128))
-    except IOError:
-      try:
-        engine.loadImgDrawing(self, "hitglowDrawing", os.path.join("themes",themename,"hitglow.png"),  textureSize = (128, 128))
-        engine.loadImgDrawing(self, "hitglow2Drawing", os.path.join("themes",themename,"hitglow2.png"),  textureSize = (128, 128))
-      except IOError:
+    if not engine.loadImgDrawing(self, "hitglowAnim", os.path.join("themes",themename,"hitglowanimation.png"),  textureSize = (128, 128)):
+      if engine.loadImgDrawing(self, "hitglowDrawing", os.path.join("themes",themename,"hitglow.png"),  textureSize = (128, 128)):
+        if not engine.loadImgDrawing(self, "hitglow2Drawing", os.path.join("themes",themename,"hitglow2.png"),  textureSize = (128, 128)):
+          self.hitglow2Drawing = None
+          self.hitFlamesPresent = False   #MFH - shut down all flames if these are missing.
+      else:
         self.hitglowDrawing = None
-        self.hitglow2Drawing = None
         self.hitFlamesPresent = False   #MFH - shut down all flames if these are missing.
       self.Hitanim = False
 
     if self.twoDkeys == True: #death_au
       #myfingershurt: adding drumfretshacked.png for image-corrected drum fret angles in RB:
-      try:
-        engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"drumfretshacked.png"))
-      except IOError:
+      if not engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"drumfretshacked.png")):
         engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"fretbuttons.png"))
       #death_au: adding drumfrets.png (with bass drum frets seperate)
-      try:
-        engine.loadImgDrawing(self, "drumFretButtons", os.path.join("themes",themename,"drumfrets.png"))
-      except IOError:
+      if not engine.loadImgDrawing(self, "drumFretButtons", os.path.join("themes",themename,"drumfrets.png")):
         self.drumFretButtons = None
     else: #death_au
       defaultKey = False
@@ -455,31 +447,28 @@ class Drum:
         self.keytex = False
         self.keytexopen = None
       else:
-        try:
-          for i in range(5):
-            engine.loadImgDrawing(self,  "keytex"+chr(97+i),  os.path.join("themes", themename, "keytex_"+chr(97+i)+".png"))
-          self.keytex = True
+        for i in range(5):
+          if engine.loadImgDrawing(self,  "keytex"+chr(97+i),  os.path.join("themes", themename, "keytex_"+chr(97+i)+".png")):
+            self.keytex = True
+          else:
+            self.keytex = False
+            break
 
-        except IOError:
-          self.keytex = False
       if defaultOpenKey:
         self.keytexopen = None
       else:
-        try:
-          engine.loadImgDrawing(self, "keytexopen", os.path.join("themes",themename,"keytex_open.png"))
-        except IOError:
+        if not engine.loadImgDrawing(self, "keytexopen", os.path.join("themes",themename,"keytex_open.png")):
           self.keytexopen = None
 
     #Spinning starnotes or not?
     self.starspin = False
 
     if self.twoDnote == True:  
-      try:
-        engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"drumnotes.png"))
+      if engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"drumnotes.png")):
         self.separateDrumNotes = True
-      except IOError:
-        engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notes.png"))
+      else:
         self.separateDrumNotes = False
+        engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notes.png"))
     else:
       defaultNote = False
       #MFH - can't use IOError for fallback logic for a Mesh() call... 
@@ -498,13 +487,12 @@ class Drum:
         self.staratex = False
         self.spActTex = None
       else:
-        try:
-          for i in range(5):
-            engine.loadImgDrawing(self,  "notetex"+chr(97+i),  os.path.join("themes", themename, "notetex_"+chr(97+i)+".png"))
-          self.notetex = True
-  
-        except IOError:
-          self.notetex = False
+        for i in range(5):
+          if engine.loadImgDrawing(self,  "notetex"+chr(97+i),  os.path.join("themes", themename, "notetex_"+chr(97+i)+".png")):
+            self.notetex = True
+          else:
+            self.notetex = False
+            break
 
         if self.engine.fileExists(os.path.join("themes", themename, "star_drum.dae")):  
           engine.resource.load(self,  "starMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "star_drum.dae")))
@@ -512,26 +500,22 @@ class Drum:
           engine.resource.load(self,  "starMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "star.dae")))
         else:  
           self.starMesh = None
-        
-        try:
-          for i in range(5):
-            engine.loadImgDrawing(self,  "startex"+chr(97+i),  os.path.join("themes", themename, "startex_"+chr(97+i)+".png"))
-          self.startex = True
 
-        except IOError:
-          self.startex = False
-        
-        try:
-          for i in range(5):
-            engine.loadImgDrawing(self,  "staratex"+chr(97+i),  os.path.join("themes", themename, "staratex_"+chr(97+i)+".png"))
-          self.staratex = True
+        for i in range(5):
+          if engine.loadImgDrawing(self,  "startex"+chr(97+i),  os.path.join("themes", themename, "startex_"+chr(97+i)+".png")):
+            self.startex = True
+          else:
+            self.startex = False
+            break
 
-        except IOError:
-          self.staratex = False
-        
-        try:
-          engine.loadImgDrawing(self, "spActTex", os.path.join("themes",themename,"spacttex.png"))
-        except IOError:
+        for i in range(5):
+          if engine.loadImgDrawing(self,  "staratex"+chr(97+i),  os.path.join("themes", themename, "staratex_"+chr(97+i)+".png")):
+            self.staratex = True
+          else:
+            self.staratex = False
+            break
+
+        if not engine.loadImgDrawing(self, "spActTex", os.path.join("themes",themename,"spacttex.png")):
           self.spActTex = None
       
       if self.engine.fileExists(os.path.join("themes", themename, "open.dae")):
@@ -539,29 +523,24 @@ class Drum:
       else:  
         self.openMesh = None
 
-      try:
-        engine.loadImgDrawing(self,  "opentexture",  os.path.join("themes", themename, "opentex.png"))
+      if engine.loadImgDrawing(self,  "opentexture",  os.path.join("themes", themename, "opentex.png")):
         self.opentex = True
-      except IOError:
+      else:
         self.opentex = False
-        
-      try:
-        engine.loadImgDrawing(self,  "opentexture_star",  os.path.join("themes", themename, "opentex_star.png"))
+
+      if engine.loadImgDrawing(self,  "opentexture_star",  os.path.join("themes", themename, "opentex_star.png")):
         self.opentex_star = True
-      except IOError:
+      else:
         self.opentex_star = False
-      
-      try:
-        engine.loadImgDrawing(self,  "opentexture_stara",  os.path.join("themes", themename, "opentex_stara.png"))
+
+      if engine.loadImgDrawing(self,  "opentexture_stara",  os.path.join("themes", themename, "opentex_stara.png")):
         self.opentex_stara = True
-      except IOError:
+      else:
         self.opentex_stara = False
 
-    try:
-      engine.loadImgDrawing(self, "freestyle1", os.path.join("themes", themename, "freestyletail1.png"),  textureSize = (128, 128))
-      engine.loadImgDrawing(self, "freestyle2", os.path.join("themes", themename, "freestyletail2.png"),  textureSize = (128, 128))
-    except IOError:
+    if not engine.loadImgDrawing(self, "freestyle1", os.path.join("themes", themename, "freestyletail1.png"),  textureSize = (128, 128)):
       engine.loadImgDrawing(self, "freestyle1", "freestyletail1.png",  textureSize = (128, 128))
+    if not engine.loadImgDrawing(self, "freestyle2", os.path.join("themes", themename, "freestyletail2.png"),  textureSize = (128, 128)):
       engine.loadImgDrawing(self, "freestyle2", "freestyletail2.png",  textureSize = (128, 128))
 
     if self.theme == 0 or self.theme == 1:

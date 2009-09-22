@@ -352,29 +352,25 @@ class Guitar:
 
     #MFH - making hitflames optional
     self.hitFlamesPresent = False
-    try:
-      engine.loadImgDrawing(self, "hitflames1Drawing", os.path.join("themes",themename,"hitflames1.png"),  textureSize = (128, 128))
-      engine.loadImgDrawing(self, "hitflames2Drawing", os.path.join("themes",themename,"hitflames2.png"),  textureSize = (128, 128))
-      self.hitFlamesPresent = True
-    except IOError:
-      self.hitFlamesPresent = False
+    if engine.loadImgDrawing(self, "hitflames1Drawing", os.path.join("themes",themename,"hitflames1.png"),  textureSize = (128, 128)):
+      if engine.loadImgDrawing(self, "hitflames2Drawing", os.path.join("themes",themename,"hitflames2.png"),  textureSize = (128, 128)):
+        self.hitFlamesPresent = True
+      else:
+        self.hitflames2Drawing = None
+    else:
       self.hitflames1Drawing = None
       self.hitflames2Drawing = None
 
-    try:
-      engine.loadImgDrawing(self, "hitflamesAnim", os.path.join("themes",themename,"hitflamesanimation.png"),  textureSize = (128, 128))
-    except IOError:
+    if not engine.loadImgDrawing(self, "hitflamesAnim", os.path.join("themes",themename,"hitflamesanimation.png"),  textureSize = (128, 128)):
       self.Hitanim2 = False
-      
-    try:
-      engine.loadImgDrawing(self, "hitglowAnim", os.path.join("themes",themename,"hitglowanimation.png"),  textureSize = (128, 128))
-    except IOError:
-      try:
-        engine.loadImgDrawing(self, "hitglowDrawing", os.path.join("themes",themename,"hitglow.png"),  textureSize = (128, 128))
-        engine.loadImgDrawing(self, "hitglow2Drawing", os.path.join("themes",themename,"hitglow2.png"),  textureSize = (128, 128))
-      except IOError:
+
+    if not engine.loadImgDrawing(self, "hitglowAnim", os.path.join("themes",themename,"hitglowanimation.png"),  textureSize = (128, 128)):
+      if engine.loadImgDrawing(self, "hitglowDrawing", os.path.join("themes",themename,"hitglow.png"),  textureSize = (128, 128)):
+        if not engine.loadImgDrawing(self, "hitglow2Drawing", os.path.join("themes",themename,"hitglow2.png"),  textureSize = (128, 128)):
+          self.hitglow2Drawing = None
+          self.hitFlamesPresent = False   #MFH - shut down all flames if these are missing. 
+      else:
         self.hitglowDrawing = None
-        self.hitglow2Drawing = None
         self.hitFlamesPresent = False   #MFH - shut down all flames if these are missing.
       self.Hitanim = False
     
@@ -389,27 +385,19 @@ class Guitar:
       if self.starspin == True and self.theme < 2:
         #myfingershurt: check for SpinNotes, if not there then no animation
         if self.gameMode2p == 6:
-          try:  
-            engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"spinnotesbattle.png"))
+          if engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"spinnotesbattle.png")):
             self.starSpinFrames = 8
-          except IOError:
-            try:
-              self.starspin = False
-              engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notesbattle.png"))
-            except IOError:
-              self.starspin = False
+          else:
+            self.starspin = False
+            if not engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notesbattle.png")):
               engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notes.png"))
-        else:    
-          try:  
-            engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"spinnotes.png"))
-          except IOError:
+        else: 
+          if not engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"spinnotes.png")):
             self.starspin = False
             engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notes.png"))
       else:
         if self.gameMode2p == 6:
-          try:
-            engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notesbattle.png"))
-          except IOError:
+          if not engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notesbattle.png")):
             engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notes.png"))
         else:
           engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notes.png"))
@@ -420,40 +408,35 @@ class Guitar:
         engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "note.dae")))
       else:
         engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName("note.dae")))
-        
-      try:
-        for i in range(5):
-          engine.loadImgDrawing(self,  "notetex"+chr(97+i),  os.path.join("themes", themename, "notetex_"+chr(97+i)+".png"))
-        self.notetex = True
 
-      except IOError:
-        self.notetex = False
+      for i in range(5):
+        if engine.loadImgDrawing(self,  "notetex"+chr(97+i),  os.path.join("themes", themename, "notetex_"+chr(97+i)+".png")):
+          self.notetex = True
+        else:
+          self.notetex = False
+          break
         
       if self.engine.fileExists(os.path.join("themes", themename, "star.dae")):  
         engine.resource.load(self,  "starMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "star.dae")))
       else:  
         self.starMesh = None
 
-      try:
-        for i in range(5):
-          engine.loadImgDrawing(self,  "startex"+chr(97+i),  os.path.join("themes", themename, "startex_"+chr(97+i)+".png"))
-        self.startex = True
+      for i in range(5):
+        if engine.loadImgDrawing(self,  "startex"+chr(97+i),  os.path.join("themes", themename, "startex_"+chr(97+i)+".png")):
+          self.startex = True
+        else:
+          self.startex = False
+          break
 
-      except IOError:
-        self.startex = False
-        
-      try:
-        for i in range(5):
-          engine.loadImgDrawing(self,  "staratex"+chr(97+i),  os.path.join("themes", themename, "staratex_"+chr(97+i)+".png"))
-        self.staratex = True
-
-      except IOError:
-        self.staratex = False
+      for i in range(5):
+        if engine.loadImgDrawing(self,  "staratex"+chr(97+i),  os.path.join("themes", themename, "staratex_"+chr(97+i)+".png")):
+          self.staratex = True
+        else:
+          self.staratex = False
+          break
 
     if self.gameMode2p == 6:
-      try:
-        engine.loadImgDrawing(self, "battleFrets", os.path.join("themes", themename,"battle_frets.png"))
-      except IOError:
+      if not engine.loadImgDrawing(self, "battleFrets", os.path.join("themes", themename,"battle_frets.png")):
         self.battleFrets = None
 
     if self.twoDkeys == True:
@@ -470,13 +453,12 @@ class Guitar:
       if defaultKey:
         self.keytex = False
       else:
-        try:
-          for i in range(5):
-            engine.loadImgDrawing(self,  "keytex"+chr(97+i),  os.path.join("themes", themename, "keytex_"+chr(97+i)+".png"))
-          self.keytex = True
-
-        except IOError:
-          self.keytex = False
+        for i in range(5):
+          if engine.loadImgDrawing(self,  "keytex"+chr(97+i),  os.path.join("themes", themename, "keytex_"+chr(97+i)+".png")):
+            self.keytex = True
+          else:
+            self.keytex = False
+            break
     
 
 
@@ -488,40 +470,41 @@ class Guitar:
     #myfingershurt: must ensure the new tails don't affect the Rock Band mod...
     self.simpleTails = False
 
-    try:
-      for i in range(0,7):
-        engine.loadImgDrawing(self, "tail"+str(i), os.path.join("themes",themename,"tails","tail"+str(i)+".png"),  textureSize = (128, 128))
-        engine.loadImgDrawing(self, "taile"+str(i), os.path.join("themes",themename,"tails","taile"+str(i)+".png"),  textureSize = (128, 128))
-        engine.loadImgDrawing(self, "btail"+str(i), os.path.join("themes",themename,"tails","btail"+str(i)+".png"),  textureSize = (128, 128))
-        engine.loadImgDrawing(self, "btaile"+str(i), os.path.join("themes",themename,"tails","btaile"+str(i)+".png"),  textureSize = (128, 128))
-        
-    except IOError:
-      self.simpleTails = True
+    for i in range(0,7):
+      if not engine.loadImgDrawing(self, "tail"+str(i), os.path.join("themes",themename,"tails","tail"+str(i)+".png"),  textureSize = (128, 128)):
+        self.simpleTails = True
+        break
+      if not engine.loadImgDrawing(self, "taile"+str(i), os.path.join("themes",themename,"tails","taile"+str(i)+".png"),  textureSize = (128, 128)):
+        self.simpleTails = True
+        break
+      if not engine.loadImgDrawing(self, "btail"+str(i), os.path.join("themes",themename,"tails","btail"+str(i)+".png"),  textureSize = (128, 128)):
+        self.simpleTails = True
+        break
+      if not engine.loadImgDrawing(self, "btaile"+str(i), os.path.join("themes",themename,"tails","btaile"+str(i)+".png"),  textureSize = (128, 128)):
+        self.simpleTails = True
+        break
+    
+    if self.simpleTails:
       Log.debug("Simple tails used; complex tail loading error...")
-      try:
-        engine.loadImgDrawing(self, "tail1", os.path.join("themes",themename,"tail1.png"),  textureSize = (128, 128))
-        engine.loadImgDrawing(self, "tail2", os.path.join("themes",themename,"tail2.png"),  textureSize = (128, 128))
-        engine.loadImgDrawing(self, "bigTail1", os.path.join("themes",themename,"bigtail1.png"),  textureSize = (128, 128))
-        engine.loadImgDrawing(self, "bigTail2", os.path.join("themes",themename,"bigtail2.png"),  textureSize = (128, 128))
-      except IOError:
+      if not engine.loadImgDrawing(self, "tail1", os.path.join("themes",themename,"tail1.png"),  textureSize = (128, 128)):
         engine.loadImgDrawing(self, "tail1", "tail1.png",  textureSize = (128, 128))
+      if not engine.loadImgDrawing(self, "tail2", os.path.join("themes",themename,"tail2.png"),  textureSize = (128, 128)):
         engine.loadImgDrawing(self, "tail2", "tail2.png",  textureSize = (128, 128))
+      if not engine.loadImgDrawing(self, "bigTail1", os.path.join("themes",themename,"bigtail1.png"),  textureSize = (128, 128)):
         engine.loadImgDrawing(self, "bigTail1", "bigtail1.png",  textureSize = (128, 128))
+      if not engine.loadImgDrawing(self, "bigTail2", os.path.join("themes",themename,"bigtail2.png"),  textureSize = (128, 128)):
         engine.loadImgDrawing(self, "bigTail2", "bigtail2.png",  textureSize = (128, 128))
 
-    try:
-      engine.loadImgDrawing(self, "kill1", os.path.join("themes", themename, "kill1.png"),  textureSize = (128, 128))
-      engine.loadImgDrawing(self, "kill2", os.path.join("themes", themename, "kill2.png"),  textureSize = (128, 128))
-    except IOError:
+
+    if not engine.loadImgDrawing(self, "kill1", os.path.join("themes", themename, "kill1.png"),  textureSize = (128, 128)):
       engine.loadImgDrawing(self, "kill1", "kill1.png",  textureSize = (128, 128))
+    if not engine.loadImgDrawing(self, "kill2", os.path.join("themes", themename, "kill2.png"),  textureSize = (128, 128)):
       engine.loadImgDrawing(self, "kill2", "kill2.png",  textureSize = (128, 128))
 
     #MFH - freestyle tails (for drum fills & BREs)
-    try:
-      engine.loadImgDrawing(self, "freestyle1", os.path.join("themes", themename, "freestyletail1.png"),  textureSize = (128, 128))
-      engine.loadImgDrawing(self, "freestyle2", os.path.join("themes", themename, "freestyletail2.png"),  textureSize = (128, 128))
-    except IOError:
+    if not engine.loadImgDrawing(self, "freestyle1", os.path.join("themes", themename, "freestyletail1.png"),  textureSize = (128, 128)):
       engine.loadImgDrawing(self, "freestyle1", "freestyletail1.png",  textureSize = (128, 128))
+    if not engine.loadImgDrawing(self, "freestyle2", os.path.join("themes", themename, "freestyletail2.png"),  textureSize = (128, 128)):
       engine.loadImgDrawing(self, "freestyle2", "freestyletail2.png",  textureSize = (128, 128))
 
 

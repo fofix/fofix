@@ -75,33 +75,23 @@ class Lobby(Layer, KeyListener, MessageHandler):
     if self.singlePlayer:
       themename  = self.engine.data.themeLabel
       self.theme = self.engine.data.theme
-      try:
-        self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "lobby", "lobby.png"))
-      except IOError:
+
+      if not self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "lobby", "lobby.png")):
         self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "menu", "optionsbg.png"))
-      try:
-        self.engine.loadImgDrawing(self, "backgroundTop", os.path.join("themes", themename, "lobby", "lobby_top.png"))
-      except IOError:
+
+      if not self.engine.loadImgDrawing(self, "backgroundTop", os.path.join("themes", themename, "lobby", "lobby_top.png")):
         self.backgroundTop = None
-      
-      try:
-        self.engine.loadImgDrawing(self, "itemSelect", os.path.join("themes", themename, "lobby", "select.png"))
-      except IOError:
+
+      if not self.engine.loadImgDrawing(self, "itemSelect", os.path.join("themes", themename, "lobby", "select.png")):
         self.itemSelect = None
-      
-      try:
-        self.engine.loadImgDrawing(self, "infoImg", os.path.join("themes", themename, "lobby", "information.png"))
-      except IOError:
+
+      if not self.engine.loadImgDrawing(self, "infoImg", os.path.join("themes", themename, "lobby", "information.png")):
         self.infoImg = None
-      
-      try:
-        self.engine.loadImgDrawing(self, "chooseCharImg", os.path.join("themes", themename, "lobby", "choosechar.png"))
-      except IOError:
+
+      if not self.engine.loadImgDrawing(self, "chooseCharImg", os.path.join("themes", themename, "lobby", "choosechar.png")):
         self.chooseCharImg = None
-      
-      if os.path.exists(self.engine.resource.fileName(os.path.join("themes",themename,"avatars","default.png"))):
-        self.engine.loadImgDrawing(self, "defaultAvatar", os.path.join("themes", themename, "avatars", "default.png"))
-      else:
+
+      if not self.engine.loadImgDrawing(self, "defaultAvatar", os.path.join("themes", themename, "avatars", "default.png")):
         self.engine.loadImgDrawing(self, "defaultAvatar", os.path.join("users", "players", "default.png"))
       self.engine.loadImgDrawing(self, "defaultNeck",   os.path.join("necks", self.engine.mainMenu.chosenNeck + ".png"))
       self.engine.loadImgDrawing(self, "randomNeck",    os.path.join("necks", "randomneck.png"))
@@ -203,9 +193,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
     if self.avatars[self.selected] is not None:
       return
     if self.selected > 1:
-      try:
-        self.engine.loadImgDrawing(self, "avatar", os.path.join("users", "players", self.options[self.selected] + ".png"))
-      except IOError:
+      if not self.engine.loadImgDrawing(self, "avatar", os.path.join("users", "players", self.options[self.selected] + ".png")):
         self.avatars[self.selected] = "Empty"
         return
     else:
@@ -230,9 +218,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
       elif chosenNeck == "" or chosenNeck.lower() == "default":
         self.necks[self.selected] = "Default"
         return
-      try:
-        self.engine.loadImgDrawing(self, "neck", os.path.join("necks",str(chosenNeck+".png")))
-      except IOError:
+      if not self.engine.loadImgDrawing(self, "neck", os.path.join("necks",str(chosenNeck+".png"))):
         self.necks[self.selected] = "Default"
         return
     else:
@@ -612,14 +598,12 @@ class CreateCharacter(Layer, KeyListener):
                       (_("Delete Character"), _("Come on... I didn't mean it. Really, I promise!")), \
                       (_("Done"),             _("All finished? Let's do this thing!"))]
     themename = self.engine.data.themeLabel
-    try:
-      self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "lobby", "creator.png"))
-    except IOError:
+
+    if not self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "lobby", "creator.png")):
       self.background = None
-    try:
-      self.engine.loadImgDrawing(self, "backgroundTop", os.path.join("themes", themename, "lobby", "creator_top.png"))
-    except IOError:
+    if not self.engine.loadImgDrawing(self, "backgroundTop", os.path.join("themes", themename, "lobby", "creator_top.png")):
       self.backgroundTop = None
+
   def loadPlayer(self, player = None):
     self.choices = []
     if player is not None:

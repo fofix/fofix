@@ -1486,17 +1486,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if not self.playingVocals:
       if self.song.hasMidiLyrics and self.midiLyricsEnabled > 0:
         if self.midiLyricMode == 0:
-          try:
-            self.engine.loadImgDrawing(self, "lyricSheet", os.path.join("themes",themename,"lyricsheet.png"))
-          except IOError:
+          if not self.engine.loadImgDrawing(self, "lyricSheet", os.path.join("themes",themename,"lyricsheet.png")):
             self.lyricSheet = None
         else:
-          try:
-            self.engine.loadImgDrawing(self, "lyricSheet", os.path.join("themes",themename,"lyricsheet2.png"))
-          except IOError:
-            try:
-              self.engine.loadImgDrawing(self, "lyricSheet", os.path.join("themes",themename,"lyricsheet.png"))
-            except IOError:
+          if not self.engine.loadImgDrawing(self, "lyricSheet", os.path.join("themes",themename,"lyricsheet2.png")):
+            if not self.engine.loadImgDrawing(self, "lyricSheet", os.path.join("themes",themename,"lyricsheet.png")):
               self.lyricSheet = None
       else:
         self.lyricSheet = None
@@ -1509,40 +1503,36 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.lyricSheetScaleFactor = 640.000/imgwidth
     
     #brescorebackground.png
-    try:
-      self.engine.loadImgDrawing(self, "breScoreBackground", os.path.join("themes",themename,"brescorebackground.png"))
+    if self.engine.loadImgDrawing(self, "breScoreBackground", os.path.join("themes",themename,"brescorebackground.png")):
       breScoreBackgroundImgwidth = self.breScoreBackground.width1()
       self.breScoreBackgroundWFactor = 640.000/breScoreBackgroundImgwidth
-    except IOError:
+    else:
       Log.debug("BRE score background image loading problem!")
       self.breScoreBackground = None
       self.breScoreBackgroundWFactor = None
 
     #brescoreframe.png
-    try:
-      self.engine.loadImgDrawing(self, "breScoreFrame", os.path.join("themes",themename,"brescoreframe.png"))
+    if self.engine.loadImgDrawing(self, "breScoreFrame", os.path.join("themes",themename,"brescoreframe.png")):
       breScoreFrameImgwidth = self.breScoreFrame.width1()
       self.breScoreFrameWFactor = 640.000/breScoreFrameImgwidth
-    except IOError:
-
-      try:    #MFH - fallback on using soloframe.png if no brescoreframe.png is found
-        self.engine.loadImgDrawing(self, "breScoreFrame", os.path.join("themes",themename,"soloframe.png"))
+    else:
+      #MFH - fallback on using soloframe.png if no brescoreframe.png is found
+      if self.engine.loadImgDrawing(self, "breScoreFrame", os.path.join("themes",themename,"soloframe.png")):
         breScoreFrameImgwidth = self.breScoreFrame.width1()
         self.breScoreFrameWFactor = 640.000/breScoreFrameImgwidth
-      except IOError:
+      else:
         self.breScoreFrame = None
         self.breScoreFrameWFactor = None
 
 
-    
-    try:
-      self.engine.loadImgDrawing(self, "soloFrame", os.path.join("themes",themename,"soloframe.png"))
+
+    if self.engine.loadImgDrawing(self, "soloFrame", os.path.join("themes",themename,"soloframe.png")):
       soloImgwidth = self.soloFrame.width1()
       self.soloFrameWFactor = 640.000/soloImgwidth
       #soloImgheight = self.soloFrame.height1()
       #soloHeightYFactor = (640.000*self.hFull)/self.wFull
       #self.soloFrameHFactor = soloHeightYFactor/soloImgheight
-    except IOError:
+    else:
       self.soloFrame = None
       self.soloFrameWFactor = None
       #self.soloFrameHFactor = None
@@ -1555,28 +1545,26 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       for i in range(self.numOfPlayers):
         if not self.partImage:
           break
-        try:
-          if self.instruments[i].isDrum:
-            self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"drum.png"))
-          elif self.instruments[i].isBassGuitar:
-            self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"bass.png"))
-          elif self.instruments[i].isVocal:
-            self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"mic.png"))
-          else:
-            self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"guitar.png"))
-        except IOError:
-          try:
-            if self.instruments[i].isDrum:
-              self.engine.loadImgDrawing(self, "partLoad", os.path.join("drum.png"))
-            elif self.instruments[i].isBassGuitar:
-              self.engine.loadImgDrawing(self, "partLoad", os.path.join("bass.png"))
-            elif self.instruments[i].isVocal:
-              self.engine.loadImgDrawing(self, "partLoad", os.path.join("mic.png"))
-            else:
-              self.engine.loadImgDrawing(self, "partLoad", os.path.join("guitar.png"))
-          except IOError:
-            self.counting = False
-            self.partImage = False
+        if self.instruments[i].isDrum:
+          if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"drum.png")):
+            if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("drum.png")):
+              self.counting = False
+              self.partImage = False
+        elif self.instruments[i].isBassGuitar:
+          if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"bass.png")):
+            if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("bass.png")):
+              self.counting = False
+              self.partImage = False
+        elif self.instruments[i].isVocal:
+          if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"mic.png")):
+            if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("mic.png")):
+              self.counting = False
+              self.partImage = False
+        else:
+          if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"guitar.png")):
+            if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("guitar.png")):
+              self.counting = False
+              self.partImage = False
         if self.partLoad:
           self.part[i] = self.partLoad
 
@@ -1612,16 +1600,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           tryb = True
           break
       if tryb:
-        try:
-          self.engine.loadImgDrawing(self, "mult", os.path.join("themes",themename,"multb.png"))
-        except IOError:
+        if not self.engine.loadImgDrawing(self, "mult", os.path.join("themes",themename,"multb.png")):
           self.engine.loadImgDrawing(self, "mult", os.path.join("themes",themename,"mult.png"))
       else:
         self.engine.loadImgDrawing(self, "mult", os.path.join("themes",themename,"mult.png"))
       #death_au: Bass groove multiplier (with fall-back logic)
-      try:
-        self.engine.loadImgDrawing(self, "bassgroovemult", os.path.join("themes",themename,"bassgroovemult.png"))
-      except IOError:
+      if not self.engine.loadImgDrawing(self, "bassgroovemult", os.path.join("themes",themename,"bassgroovemult.png")):
         self.bassgroovemult = None
       
       self.engine.loadImgDrawing(self, "basedots", os.path.join("themes",themename,"dots","basedots.png"))
@@ -1653,41 +1637,32 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.engine.loadImgDrawing(self, "failScreen", os.path.join("themes",themename,"fail.png"))
       #Rockmeter
       if self.battleGH:
-        try:
-          self.engine.loadImgDrawing(self, "p1Rocks", os.path.join("themes",themename,"p1rocks.png"))
-          self.engine.loadImgDrawing(self, "p2Rocks", os.path.join("themes",themename,"p2rocks.png"))
-          self.engine.loadImgDrawing(self, "battleHands", os.path.join("themes", themename, "battle_hands.png"))
-        except IOError:
+        if not self.engine.loadImgDrawing(self, "p1Rocks", os.path.join("themes",themename,"p1rocks.png")):
           self.p1Rocks = None
+        if not self.engine.loadImgDrawing(self, "p2Rocks", os.path.join("themes",themename,"p2rocks.png")):
           self.p2Rocks = None
+        if not self.engine.loadImgDrawing(self, "battleHands", os.path.join("themes", themename, "battle_hands.png")):
           self.battleHands = None
-        try:
-          self.engine.loadImgDrawing(self, "rockTopBattle", os.path.join("themes",themename,"battle_rock_top.png"))
-        except IOError:
+
+        if not self.engine.loadImgDrawing(self, "rockTopBattle", os.path.join("themes",themename,"battle_rock_top.png")):
           self.engine.loadImgDrawing(self, "rockTop", os.path.join("themes",themename,"rock_top.png"))
           self.rockTopBattle = None
-        try:
-          self.engine.loadImgDrawing(self, "battleWhammyImg", os.path.join("themes",themename,"battle_whammy.png"))
-        except IOError:
+
+        if not self.engine.loadImgDrawing(self, "battleWhammyImg", os.path.join("themes",themename,"battle_whammy.png")):
           self.battleWhammyImg = None
-        try:
-          self.engine.loadImgDrawing(self, "battlePushImg", os.path.join("themes",themename,"battle_push.png"))
-        except IOError:
+
+        if not self.engine.loadImgDrawing(self, "battlePushImg", os.path.join("themes",themename,"battle_push.png")):
           self.battlePushImg = None
       elif self.coOpType:
-        try:
-          self.engine.loadImgDrawing(self, "coopRockmeter", os.path.join("themes",themename,"coop_rockmeter.png"))
-        except IOError:
+        if not self.engine.loadImgDrawing(self, "coopRockmeter", os.path.join("themes",themename,"coop_rockmeter.png")):
           self.coopRockmeter = None
           Log.warn("No valid co-op rockmeter found. Weirdness ensuing.")
-        try:
-          self.engine.loadImgDrawing(self, "rockTop", os.path.join("themes",themename,"coop_rock_top.png"))
-        except IOError:
+
+        if not self.engine.loadImgDrawing(self, "rockTop", os.path.join("themes",themename,"coop_rock_top.png")):
           self.rockTop   = None
           Log.warn("No valid co-op rock top found. Continuing without display!")
-        try:
-          self.engine.loadImgDrawing(self, "counter", os.path.join("themes",themename,"coop_counter.png"))
-        except IOError:
+
+        if not self.engine.loadImgDrawing(self, "counter", os.path.join("themes",themename,"coop_counter.png")):
           self.engine.loadImgDrawing(self, "counter", os.path.join("themes",themename,"counter.png"))
       else:
         self.engine.loadImgDrawing(self, "rockTop", os.path.join("themes",themename,"rock_top.png"))
@@ -1703,16 +1678,12 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           tryb = True
           break
       if tryb:
-        try:
-          self.engine.loadImgDrawing(self, "mult", os.path.join("themes",themename,"multb.png"))
-        except IOError:
+        if not self.engine.loadImgDrawing(self, "mult", os.path.join("themes",themename,"multb.png")):
           self.engine.loadImgDrawing(self, "mult", os.path.join("themes",themename,"mult.png"))
       else:
         self.engine.loadImgDrawing(self, "mult", os.path.join("themes",themename,"mult.png"))
       #death_au: Bass groove multiplier (with fall-back logic)
-      try:
-        self.engine.loadImgDrawing(self, "bassgroovemult", os.path.join("themes",themename,"bassgroovemult.png"))
-      except IOError:
+      if not self.engine.loadImgDrawing(self, "bassgroovemult", os.path.join("themes",themename,"bassgroovemult.png")):
         self.bassgroovemult = None
       
       
@@ -1720,22 +1691,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #myfingershurt: determine which type of dots are included with this theme - dots.png = 10 small dots, dotshalf.png = 5 larger dots with half-dot increments
       self.halfDots = True
       if self.coOpType:
-        try:
-          try:
-            self.engine.loadImgDrawing(self, "dots", os.path.join("themes",themename,"coop_dotshalf.png"))
-          except IOError:
-            self.engine.loadImgDrawing(self, "dots", os.path.join("themes",themename,"coop_dots.png"))
+        if not self.engine.loadImgDrawing(self, "dots", os.path.join("themes",themename,"coop_dotshalf.png")):
+          if self.engine.loadImgDrawing(self, "dots", os.path.join("themes",themename,"coop_dots.png")):
             self.halfDots = False
-        except IOError:
-          try:
-            self.engine.loadImgDrawing(self, "dots", os.path.join("themes",themename,"dotshalf.png"))
-          except IOError:
-            self.engine.loadImgDrawing(self, "dots", os.path.join("themes",themename,"dots.png"))
-            self.halfDots = False
+          else:
+            if not self.engine.loadImgDrawing(self, "dots", os.path.join("themes",themename,"dotshalf.png")):
+              self.engine.loadImgDrawing(self, "dots", os.path.join("themes",themename,"dots.png"))
+              self.halfDots = False
       else:
-        try:
-          self.engine.loadImgDrawing(self, "dots", os.path.join("themes",themename,"dotshalf.png"))
-        except IOError:
+        if not self.engine.loadImgDrawing(self, "dots", os.path.join("themes",themename,"dotshalf.png")):
           self.engine.loadImgDrawing(self, "dots", os.path.join("themes",themename,"dots.png"))
           self.halfDots = False
       
@@ -1743,34 +1707,26 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       #rockmeter
       if self.battleGH:
         self.engine.loadImgDrawing(self, "arrow", os.path.join("themes",themename,"rock_arr.png"))
-        try:
-          self.engine.loadImgDrawing(self, "battleIcons", os.path.join("themes",themename,"battle_icons.png"))
-        except IOError:
+        if not self.engine.loadImgDrawing(self, "battleIcons", os.path.join("themes",themename,"battle_icons.png")):
           self.battleIcons = None
-        try:
-          self.engine.loadImgDrawing(self, "rockHi", os.path.join("themes",themename,"rock_hi.png"))
-          self.engine.loadImgDrawing(self, "rockLo", os.path.join("themes",themename,"rock_low.png"))
-          self.engine.loadImgDrawing(self, "rockMed", os.path.join("themes",themename,"rock_med.png"))     
-        except IOError:
+        if not self.engine.loadImgDrawing(self, "rockHi", os.path.join("themes",themename,"rock_hi.png")):
           self.rockHi  = None
-          self.rockMed = None
+        if not self.engine.loadImgDrawing(self, "rockLo", os.path.join("themes",themename,"rock_low.png")):
           self.rockLo  = None
+        if not self.engine.loadImgDrawing(self, "rockMed", os.path.join("themes",themename,"rock_med.png")):
+          self.rockMed = None
       elif self.coOpType:
-        try:
-          self.engine.loadImgDrawing(self, "rockHi", os.path.join("themes",themename,"coop_rock_hi.png"))
-          self.engine.loadImgDrawing(self, "rockLo", os.path.join("themes",themename,"coop_rock_low.png"))
-          self.engine.loadImgDrawing(self, "rockMed", os.path.join("themes",themename,"coop_rock_med.png"))
-          self.engine.loadImgDrawing(self, "arrow", os.path.join("themes",themename,"coop_arr.png"))
-          self.engine.loadImgDrawing(self, "rockTop", os.path.join("themes",themename,"coop_rock_top.png"))
-        except IOError:
-          self.engine.loadImgDrawing(self, "arrow", os.path.join("themes",themename,"rock_arr.png"))
-          self.rockTop = None
+        if not self.engine.loadImgDrawing(self, "rockHi", os.path.join("themes",themename,"coop_rock_hi.png")):
           self.rockHi  = None
-          self.rockMed = None
+        if not self.engine.loadImgDrawing(self, "rockLo", os.path.join("themes",themename,"coop_rock_low.png")):
           self.rockLo  = None
-        try:
-          self.engine.loadImgDrawing(self, "scorePicBand", os.path.join("themes",themename,"coop_score.png"))
-        except IOError:
+        if not self.engine.loadImgDrawing(self, "rockMed", os.path.join("themes",themename,"coop_rock_med.png")):
+          self.rockMed = None
+        if not self.engine.loadImgDrawing(self, "arrow", os.path.join("themes",themename,"coop_arr.png")):
+          self.engine.loadImgDrawing(self, "arrow", os.path.join("themes",themename,"rock_arr.png"))
+        if not self.engine.loadImgDrawing(self, "rockTop", os.path.join("themes",themename,"coop_rock_top.png")):
+          self.rockTop = None
+        if not self.engine.loadImgDrawing(self, "scorePicBand", os.path.join("themes",themename,"coop_score.png")):
           self.scorePicBand = None
       else:
           self.engine.loadImgDrawing(self, "rockHi", os.path.join("themes",themename,"rock_hi.png"))
@@ -1792,9 +1748,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       
       #Pause Screen
       self.engine.loadImgDrawing(self, "pauseScreen", os.path.join("themes",themename,"pause.png"))
-      try:
-        self.engine.loadImgDrawing(self, "failScreen", os.path.join("themes",themename,"fail.png"))
-      except IOError:
+      if not self.engine.loadImgDrawing(self, "failScreen", os.path.join("themes",themename,"fail.png")):
         self.engine.loadImgDrawing(self, "failScreen", os.path.join("themes",themename,"pause.png"))
       #Rockmeter
       self.engine.loadImgDrawing(self, "counter", os.path.join("themes",themename,"counter.png"))
@@ -1803,33 +1757,35 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.rockArr  = [None for i in range(self.numOfPlayers)]
       self.scorePic = [None for i in self.playerList]
       for i, instrument in enumerate(self.instruments):
-        try:
-          if instrument.isDrum:
-            self.engine.loadImgDrawing(self, "scorePicLoad", os.path.join("themes",themename,"score_drums.png"))
-          elif instrument.isBassGuitar:
-            self.engine.loadImgDrawing(self, "scorePicLoad", os.path.join("themes",themename,"score_bass.png"))
-          elif instrument.isVocal:
-            self.engine.loadImgDrawing(self, "scorePicLoad", os.path.join("themes",themename,"score_vocal.png"))
-          else:
-            self.engine.loadImgDrawing(self, "scorePicLoad", os.path.join("themes",themename,"score_guitar.png"))
-        except IOError:
-          self.engine.loadImgDrawing(self, "scorePicLoad", os.path.join("themes",themename,"score.png"))
+        if instrument.isDrum:
+          if not self.engine.loadImgDrawing(self, "scorePicLoad", os.path.join("themes",themename,"score_drums.png")):
+            self.engine.loadImgDrawing(self, "scorePicLoad", os.path.join("themes",themename,"score.png"))
+        elif instrument.isBassGuitar:
+          if not self.engine.loadImgDrawing(self, "scorePicLoad", os.path.join("themes",themename,"score_bass.png")):
+            self.engine.loadImgDrawing(self, "scorePicLoad", os.path.join("themes",themename,"score.png"))
+        elif instrument.isVocal:
+          if not self.engine.loadImgDrawing(self, "scorePicLoad", os.path.join("themes",themename,"score_vocal.png")):
+            self.engine.loadImgDrawing(self, "scorePicLoad", os.path.join("themes",themename,"score.png"))
+        else:
+          if not self.engine.loadImgDrawing(self, "scorePicLoad", os.path.join("themes",themename,"score_guitar.png")):
+            self.engine.loadImgDrawing(self, "scorePicLoad", os.path.join("themes",themename,"score.png"))
+
         self.scorePic[i] = self.scorePicLoad
-        try:
-          if instrument.isDrum:
-            self.engine.loadImgDrawing(self, "rockArrLoad", os.path.join("themes",themename,"rockarr_drums.png"))
-          elif instrument.isBassGuitar:
-            self.engine.loadImgDrawing(self, "rockArrLoad", os.path.join("themes",themename,"rockarr_bass.png"))
-          elif instrument.isVocal:
-            self.engine.loadImgDrawing(self, "rockArrLoad", os.path.join("themes",themename,"rockarr_vocal.png"))
-          else:
-            self.engine.loadImgDrawing(self, "rockArrLoad", os.path.join("themes",themename,"rockarr_guitar.png"))
-        except IOError:
-          self.engine.loadImgDrawing(self, "rockArrLoad", os.path.join("themes",themename,"rock_arr.png"))
+        if instrument.isDrum:
+          if not self.engine.loadImgDrawing(self, "rockArrLoad", os.path.join("themes",themename,"rockarr_drums.png")):
+            self.engine.loadImgDrawing(self, "rockArrLoad", os.path.join("themes",themename,"rock_arr.png"))
+        elif instrument.isBassGuitar:
+          if not self.engine.loadImgDrawing(self, "rockArrLoad", os.path.join("themes",themename,"rockarr_bass.png")):
+            self.engine.loadImgDrawing(self, "rockArrLoad", os.path.join("themes",themename,"rock_arr.png"))
+        elif instrument.isVocal:
+          if not self.engine.loadImgDrawing(self, "rockArrLoad", os.path.join("themes",themename,"rockarr_vocal.png")):
+            self.engine.loadImgDrawing(self, "rockArrLoad", os.path.join("themes",themename,"rock_arr.png"))
+        else:
+          if not self.engine.loadImgDrawing(self, "rockArrLoad", os.path.join("themes",themename,"rockarr_guitar.png")):
+            self.engine.loadImgDrawing(self, "rockArrLoad", os.path.join("themes",themename,"rock_arr.png"))
         self.rockArr[i] = self.rockArrLoad
-      try:
-        self.engine.loadImgDrawing(self, "rockArrGlow", os.path.join("themes",themename,"rock_arr_glow.png"))
-      except IOError:
+
+      if not self.engine.loadImgDrawing(self, "rockArrGlow", os.path.join("themes",themename,"rock_arr_glow.png")):
         self.rockArrGlow = None
       
       self.scorePicLoad = None
@@ -1847,23 +1803,18 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           tryb = True
           break
       if tryb:
-        try:
-          self.engine.loadImgDrawing(self, "mult", os.path.join("themes",themename,"multb.png"))
-        except IOError:
+        if not self.engine.loadImgDrawing(self, "mult", os.path.join("themes",themename,"multb.png")):
           self.engine.loadImgDrawing(self, "mult", os.path.join("themes",themename,"mult.png"))
       else:
         self.engine.loadImgDrawing(self, "mult", os.path.join("themes",themename,"mult.png"))
       #death_au: Bass groove multiplier (with fall-back logic)
-      try:
-        self.engine.loadImgDrawing(self, "bassgroovemult", os.path.join("themes",themename,"bassgroovemult.png"))
-      except IOError:
+      if not self.engine.loadImgDrawing(self, "bassgroovemult", os.path.join("themes",themename,"bassgroovemult.png")):
         self.bassgroovemult = None
       
       #UC's new multiplier - check if mult2 is present, if so use new mult code:
-      try:
-        self.engine.loadImgDrawing(self, "mult2",os.path.join("themes",themename,"mult2.png"))
+      if self.engine.loadImgDrawing(self, "mult2",os.path.join("themes",themename,"mult2.png")):
         self.multRbFill = True
-      except IOError:
+      else:
         self.multRbFill = False
       
       
@@ -1871,29 +1822,25 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       self.engine.loadImgDrawing(self, "rockTop", os.path.join("themes",themename,"rock_top.png"))
       self.engine.loadImgDrawing(self, "rockBottom", os.path.join("themes",themename,"rock_bottom.png"))
       if self.coOpRB:
-        try:
-          self.engine.loadImgDrawing(self, "rockTopFail", os.path.join("themes",themename,"rock_top_fail.png"))
+        if self.engine.loadImgDrawing(self, "rockTopFail", os.path.join("themes",themename,"rock_top_fail.png")):
           self.rockFailFound = True
-        except IOError:
+        else:
           self.rockFailFound = False
-        try:
-          self.engine.loadImgDrawing(self, "rescueBox", os.path.join("themes",themename,"rescuebox.png"))
-          self.engine.loadImgDrawing(self, "rescueCheck", os.path.join("themes",themename,"rescuecheck.png"))
-        except IOError:
+
+        if not self.engine.loadImgDrawing(self, "rescueBox", os.path.join("themes",themename,"rescuebox.png")):
           self.engine.loadImgDrawing(self, "rescueBox", os.path.join("themes",themename,"starwhite.png"))
+        if not self.engine.loadImgDrawing(self, "rescueCheck", os.path.join("themes",themename,"rescuecheck.png")):
           self.engine.loadImgDrawing(self, "rescueCheck", os.path.join("themes",themename,"stargrey.png"))
-        try:
-          self.engine.loadImgDrawing(self, "bandStarMult", os.path.join("themes",themename,"bandstarmult.png"))
+
+        if self.engine.loadImgDrawing(self, "bandStarMult", os.path.join("themes",themename,"bandstarmult.png")):
           self.bandMultFound = True
-        except IOError:
+        else:
           self.bandMultFound = False
-        try:
-          self.engine.loadImgDrawing(self, "coOpFailImg", os.path.join("themes",themename,"coop_fail.png"))
-        except IOError:
+
+        if not self.engine.loadImgDrawing(self, "coOpFailImg", os.path.join("themes",themename,"coop_fail.png")):
           self.engine.loadImgDrawing(self, "coOpFailImg", os.path.join("themes",themename,"youfailed.png"))
-        try:
-          self.engine.loadImgDrawing(self, "unisonPic", os.path.join("themes",themename,"unison.png"))
-        except IOError:
+
+        if not self.engine.loadImgDrawing(self, "unisonPic", os.path.join("themes",themename,"unison.png")):
           self.unisonPic = None
          
       #myfingershurt: Rock Band theme gets instrument-dependant rock meter arrows:
@@ -1915,20 +1862,15 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     
     #MFH - in-game star display:
-    try:
-      self.engine.loadImgDrawing(self, "starWhite", os.path.join("themes",themename,"starwhite.png"))
-      self.engine.loadImgDrawing(self, "starGrey", os.path.join("themes",themename,"stargrey.png"))
-      self.engine.loadImgDrawing(self, "starPerfect", os.path.join("themes",themename,"starperfect.png"))
-    except IOError:
+    if not self.engine.loadImgDrawing(self, "starWhite", os.path.join("themes",themename,"starwhite.png")):
       self.starWhite = None
+    if not self.engine.loadImgDrawing(self, "starGrey", os.path.join("themes",themename,"stargrey.png")):
       self.starGrey = None
+    if not self.engine.loadImgDrawing(self, "starPerfect", os.path.join("themes",themename,"starperfect.png")):
       self.starPerfect = None
-    try:
-      self.engine.loadImgDrawing(self, "starFC", os.path.join("themes",themename,"starfc.png"))
-    except IOError:
-      try:
-        self.engine.loadImgDrawing(self, "starFC", os.path.join("themes",themename,"starperfect.png"))
-      except IOError:
+
+    if not self.engine.loadImgDrawing(self, "starFC", os.path.join("themes",themename,"starfc.png")):
+      if not self.engine.loadImgDrawing(self, "starFC", os.path.join("themes",themename,"starperfect.png")):
         self.starFC = None
 
     #stump: continuous partial stars
@@ -1954,26 +1896,22 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
     self.starGrey1 = None
     if self.starWhite and self.starGrey and self.starPerfect and self.partialStars == 1 and not self.starContinuousAvailable:   #MFH - even better in-game star display, stargrey1.png - stargrey7.png (stargrey8.png is useless - that's a white star.)
-      try:
-        self.engine.loadImgDrawing(self, "starGrey1", os.path.join("themes",themename,"stargrey1.png"))
-        self.engine.loadImgDrawing(self, "starGrey2", os.path.join("themes",themename,"stargrey2.png"))
-        self.engine.loadImgDrawing(self, "starGrey3", os.path.join("themes",themename,"stargrey3.png"))
-        self.engine.loadImgDrawing(self, "starGrey4", os.path.join("themes",themename,"stargrey4.png"))
-        self.engine.loadImgDrawing(self, "starGrey5", os.path.join("themes",themename,"stargrey5.png"))
-        self.engine.loadImgDrawing(self, "starGrey6", os.path.join("themes",themename,"stargrey6.png"))
-        self.engine.loadImgDrawing(self, "starGrey7", os.path.join("themes",themename,"stargrey7.png"))
-      except IOError:
+      if not self.engine.loadImgDrawing(self, "starGrey1", os.path.join("themes",themename,"stargrey1.png")):
         self.starGrey1 = None
+      if not self.engine.loadImgDrawing(self, "starGrey2", os.path.join("themes",themename,"stargrey2.png")):
         self.starGrey2 = None
+      if not self.engine.loadImgDrawing(self, "starGrey3", os.path.join("themes",themename,"stargrey3.png")):
         self.starGrey3 = None
+      if not self.engine.loadImgDrawing(self, "starGrey4", os.path.join("themes",themename,"stargrey4.png")):
         self.starGrey4 = None
+      if not self.engine.loadImgDrawing(self, "starGrey5", os.path.join("themes",themename,"stargrey5.png")):
         self.starGrey5 = None
+      if not self.engine.loadImgDrawing(self, "starGrey6", os.path.join("themes",themename,"stargrey6.png")):
         self.starGrey6 = None
+      if not self.engine.loadImgDrawing(self, "starGrey7", os.path.join("themes",themename,"stargrey7.png")):
         self.starGrey7 = None
-   
-    try:
-      self.engine.loadImgDrawing(self, "rockOff", os.path.join("themes",themename,"rock_off.png"))
-    except IOError:
+
+    if not self.engine.loadImgDrawing(self, "rockOff", os.path.join("themes",themename,"rock_off.png")):
       if self.rmtype == 2:
         self.engine.loadImgDrawing(self, "rockOff", os.path.join("themes",themename,"rock_fill.png"))
       else:

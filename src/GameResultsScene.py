@@ -293,9 +293,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.part = [None for i in self.playerList]
     self.partImage = True
     if self.coOpType > 0:
-      try:
-        self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "gameresultscoop.png"))
-      except IOError:
+      if not self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "gameresultscoop.png")):
         self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "gameresults.png"))
     else:
       self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "gameresults.png"))
@@ -319,54 +317,44 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
       for i, score in enumerate(self.coOpScoring):
         if not self.partImage:
           break
-        try:
-          if score.instrument == [4]:
-            self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"drum.png"))
-          elif score.instrument == [2]:
-            self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"bass.png"))
-          elif score.instrument == [5]:
-            self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"mic.png"))
-          else:
-            self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"guitar.png"))
-        except IOError:
-          try:
-            if score.instrument == [4]:
-              self.engine.loadImgDrawing(self, "partLoad", os.path.join("drum.png"))
-            elif score.instrument == [2]:
-              self.engine.loadImgDrawing(self, "partLoad", os.path.join("bass.png"))
-            elif score.instrument == [5]:
-              self.engine.loadImgDrawing(self, "partLoad", os.path.join("mic.png"))
-            else:
-              self.engine.loadImgDrawing(self, "partLoad", os.path.join("guitar.png"))
-          except IOError:
-            self.partImage = False
+        if score.instrument == [4]:
+          if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"drum.png")):
+            if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("drum.png")):
+              self.partImage = False
+        elif score.instrument == [2]:
+          if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"bass.png")):
+            if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("bass.png")):
+              self.partImage = False
+        elif score.instrument == [5]:
+          if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"mic.png")):
+            if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("mic.png")):
+              self.partImage = False
+        else:
+          if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"guitar.png")):
+            if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("guitar.png")):
+              self.partImage = False
         if self.partLoad:
           self.part[i] = self.partLoad
     else:
       for i, score in enumerate(self.scoring):
         if not self.partImage:
           break
-        try:
-          if score.instrument == [4]:
-            self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"drum.png"))
-          elif score.instrument == [2]:
-            self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"bass.png"))
-          elif score.instrument == [5]:
-            self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"mic.png"))
-          else:
-            self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"guitar.png"))
-        except IOError:
-          try:
-            if score.instrument == [4]:
-              self.engine.loadImgDrawing(self, "partLoad", os.path.join("drum.png"))
-            elif score.instrument == [2]:
-              self.engine.loadImgDrawing(self, "partLoad", os.path.join("bass.png"))
-            elif score.instrument == [5]:
-              self.engine.loadImgDrawing(self, "partLoad", os.path.join("mic.png"))
-            else:
-              self.engine.loadImgDrawing(self, "partLoad", os.path.join("guitar.png"))
-          except IOError:
-            self.partImage = False
+        if score.instrument == [4]:
+          if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"drum.png")):
+            if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("drum.png")):
+              self.partImage = False
+        elif score.instrument == [2]:
+          if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"bass.png")):
+            if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("bass.png")):
+              self.partImage = False
+        elif score.instrument == [5]:
+          if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"mic.png")):
+            if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("mic.png")):
+              self.partImage = False
+        else:
+          if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"guitar.png")):
+            if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("guitar.png")):
+              self.partImage = False
         if self.partLoad:
           self.part[i] = self.partLoad
 

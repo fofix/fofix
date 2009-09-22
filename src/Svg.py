@@ -510,25 +510,26 @@ class ImgDrawing:
     if type(ImgData) == file:
       self.ImgData = ImgData.read()
     elif type(ImgData) == str:
-      bitmapFile = ImgData.replace(".svg", ".png")
-      # Load PNG files directly
-      if ImgData.endswith(".png"):
-        self.texture = Texture(ImgData)
-      elif ImgData.endswith(".jpg"):
-        self.texture = Texture(ImgData)
-      elif ImgData.endswith(".jpeg"):
-        self.texture = Texture(ImgData)
+      self.texture = Texture(ImgData)
+#      bitmapFile = ImgData.replace(".svg", ".png")
+#      # Load PNG files directly
+#      if ImgData.endswith(".png"):
+#        self.texture = Texture(ImgData)
+#      elif ImgData.endswith(".jpg"):
+#        self.texture = Texture(ImgData)
+#      elif ImgData.endswith(".jpeg"):
+#        self.texture = Texture(ImgData)
       # Check whether we have a prerendered bitmap version of the SVG file
-      elif ImgData.endswith(".svg") and os.path.exists(bitmapFile):
-        Log.debug("Loading cached bitmap '%s' instead of '%s'." % (bitmapFile, ImgData))
-        self.texture = Texture(bitmapFile)
-      else:
-        if not haveAmanith:
-          e = "PyAmanith support is deprecated and you are trying to load an SVG file."
-          Log.error(e)
-          raise RuntimeError(e)
-        Log.debug("Loading SVG file '%s'." % (ImgData))
-        self.ImgData = open(ImgData).read()
+#      elif ImgData.endswith(".svg") and os.path.exists(bitmapFile):
+#        Log.debug("Loading cached bitmap '%s' instead of '%s'." % (bitmapFile, ImgData))
+#        self.texture = Texture(bitmapFile)
+#      else:
+#        if not haveAmanith:
+#          e = "PyAmanith support is deprecated and you are trying to load an SVG file."
+#          Log.error(e)
+#          raise RuntimeError(e)
+#        Log.debug("Loading SVG file '%s'." % (ImgData))
+#        self.ImgData = open(ImgData).read()
     elif isinstance(ImgData, Image.Image): #stump: let a PIL image be passed in
       self.texture = Texture()
       self.texture.loadImage(ImgData)

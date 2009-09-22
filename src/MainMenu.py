@@ -77,39 +77,30 @@ class MainMenu(BackgroundLayer):
     self.chosenNeck = Config.get("game", "default_neck")
     exists = 0
     #neck fallback to random if doesn't exist.
-    try:
-      # evilynux - first assume the chosenNeck contains the full filename
-      engine.loadImgDrawing(self, "ok", os.path.join("necks",self.chosenNeck+".png"))
-    except IOError:
-      try:
-        engine.loadImgDrawing(self, "ok", os.path.join("necks","Neck_"+self.chosenNeck+".png"))
-      except IOError:
-        pass
-      else:
-        exists = 1
-    else:
+
+    # evilynux - first assume the chosenNeck contains the full filename
+    if engine.loadImgDrawing(self, "ok", os.path.join("necks",self.chosenNeck+".png")):
       exists = 1
+    elif engine.loadImgDrawing(self, "ok", os.path.join("necks","Neck_"+self.chosenNeck+".png")):
+      exists = 1
+
     #MFH - fallback logic now supports a couple valid default neck filenames
     #MFH - check for Neck_1
     if exists == 0:
-      try:
-        engine.loadImgDrawing(self, "ok", os.path.join("necks","Neck_1.png"))
-      except IOError:
-        pass
-      else:
+      if engine.loadImgDrawing(self, "ok", os.path.join("necks","Neck_1.png")):
         Config.set("game", "default_neck", "1")
         Log.warn("Default chosen neck not valid; fallback Neck_1.png forced.")
         exists = 1
+
     #MFH - check for defaultneck
     if exists == 0:
-      try:
-        engine.loadImgDrawing(self, "ok", os.path.join("necks","defaultneck.png"))
-      except IOError: #we don't really need to be accepting this except... ...yea, sorry.
-        raise IOError, "Default chosen neck not valid; fallbacks Neck_1.png and defaultneck.png also not valid!"
-      else:
+      if engine.loadImgDrawing(self, "ok", os.path.join("necks","defaultneck.png")):
         Log.warn("Default chosen neck not valid; fallback defaultneck.png forced.")
         Config.set("game", "default_neck", "defaultneck")
         exists = 1
+      else:
+        Log.error("Default chosen neck not valid; fallbacks Neck_1.png and defaultneck.png also not valid!")
+
     dPlayerConfig = None
     #Get theme
     self.theme = self.engine.data.theme
@@ -143,35 +134,21 @@ class MainMenu(BackgroundLayer):
       self.main_menu_vspacing = 0.09
 
 
-    
-    
-  
-
-    try:
-      self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"menu","mainbg.png"))
-    except IOError:
+    if not self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"menu","mainbg.png")):
       self.background = None
     self.engine.loadImgDrawing(self, "BGText", os.path.join("themes",self.themename,"menu","maintext.png"))
-    try:
-      self.engine.loadImgDrawing(self, "optionsBG", os.path.join("themes",self.themename,"menu","optionsbg.png"))
-    except IOError:
+    if not self.engine.loadImgDrawing(self, "optionsBG", os.path.join("themes",self.themename,"menu","optionsbg.png")):
       self.optionsBG = None
     self.engine.loadImgDrawing(self, "optionsPanel", os.path.join("themes",self.themename,"menu","optionspanel.png"))
       
     #racer: added version tag
     if self.gfxVersionTag or Theme.versiontag == True:
-      try:
-        self.engine.loadImgDrawing(self, "version", os.path.join("themes",self.themename,"menu","versiontag.png"))
-      except IOError:
-        try:
-          self.engine.loadImgDrawing(self, "version", "versiontag.png")   #falls back on default versiontag.png in data\ folder
-        except IOError:
+      if not self.engine.loadImgDrawing(self, "version", os.path.join("themes",self.themename,"menu","versiontag.png")):
+        if not self.engine.loadImgDrawing(self, "version", "versiontag.png"): #falls back on default versiontag.png in data\ folder
           self.version = None
     else:
       self.version = None
 
-
-    
     #myfingershurt: random main menu music function, menu.ogg and menuXX.ogg (any filename with "menu" as the first 4 letters)
     filepath = self.engine.getPath(os.path.join("themes",self.themename,"sounds"))
     self.files = []

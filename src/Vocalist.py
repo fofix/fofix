@@ -153,50 +153,43 @@ class Vocalist:
     self.engine.loadImgDrawing(self, "vocalLyricSheet", os.path.join(self.engine.data.vocalPath,"lyricsheet.png"))
     imgwidth = self.vocalLyricSheet.width1()
     self.vocalLyricSheetWFactor = 640.000/imgwidth
-    try:
-      self.engine.loadImgDrawing(self, "vocalLyricSheetGlow", os.path.join(self.engine.data.vocalPath,"lyricsheetglow.png"))
+
+    if self.engine.loadImgDrawing(self, "vocalLyricSheetGlow", os.path.join(self.engine.data.vocalPath,"lyricsheetglow.png")):
       imgwidth = self.vocalLyricSheetGlow.width1()
       self.vocalLyricSheetGlowWFactor = 640.000/imgwidth
-    except:
+    else:
       self.vocalLyricSheetGlow = None
-    try:
-      self.engine.loadImgDrawing(self, "vocalLyricSheetSP", os.path.join(self.engine.data.vocalPath,"lyricsheetactivate.png"))
+
+    if self.engine.loadImgDrawing(self, "vocalLyricSheetSP", os.path.join(self.engine.data.vocalPath,"lyricsheetactivate.png")):
       self.vocalSheetSPWidth = float(self.vocalLyricSheetSP.width1()*self.vocalLyricSheetWFactor)*(self.engine.view.geometry[2]/640.0)
-    except:
+    else:
       self.vocalLyricSheetSP = None
+
     self.engine.loadImgDrawing(self, "vocalArrow", os.path.join(self.engine.data.vocalPath,"arrow.png"))
-    try:
-      self.engine.loadImgDrawing(self, "vocalSplitArrow", os.path.join(self.engine.data.vocalPath,"split_arrow.png"))
-    except IOError:
+    if not self.engine.loadImgDrawing(self, "vocalSplitArrow", os.path.join(self.engine.data.vocalPath,"split_arrow.png")):
       self.vocalSplitArrow = self.vocalArrow
+
     self.engine.loadImgDrawing(self, "vocalBar", os.path.join(self.engine.data.vocalPath,"beatline.png"))
     self.arrowW = self.vocalArrow.width1()
     self.engine.loadImgDrawing(self, "vocalMult", os.path.join(self.engine.data.vocalPath,"mult.png"))
     self.engine.loadImgDrawing(self, "vocalMeter", os.path.join(self.engine.data.vocalPath,"meter.png"))
-    try:
-      self.engine.loadImgDrawing(self, "vocalFill", os.path.join(self.engine.data.vocalPath,"meter_fill.png"))
-    except IOError:
+    if not self.engine.loadImgDrawing(self, "vocalFill", os.path.join(self.engine.data.vocalPath,"meter_fill.png")):
       self.vocalFill = self.vocalMeter
-    try:
-      self.engine.loadImgDrawing(self, "vocalGlow", os.path.join(self.engine.data.vocalPath,"meter_glow.png"))
-    except IOError:
+    if not self.engine.loadImgDrawing(self, "vocalGlow", os.path.join(self.engine.data.vocalPath,"meter_glow.png")):
       self.vocalGlow = None
     self.engine.loadImgDrawing(self, "vocalTap", os.path.join(self.engine.data.vocalPath,"tap.png"))
     self.engine.loadImgDrawing(self, "vocalTapNote", os.path.join(self.engine.data.vocalPath,"tap_note.png"))
-    try:
-      self.engine.loadImgDrawing(self, "vocalText", os.path.join(self.engine.data.vocalPath,"text.png"))
-    except IOError:
+
+    if not self.engine.loadImgDrawing(self, "vocalText", os.path.join(self.engine.data.vocalPath,"text.png")):
       self.vocalText = None
     self.engine.loadImgDrawing(self, "vocalODBottom", os.path.join(self.engine.data.vocalPath,"bottom.png"))
     self.engine.loadImgDrawing(self, "vocalODFill", os.path.join(self.engine.data.vocalPath,"fill.png"))
     self.vocalODFillWidth = self.vocalODFill.width1()/1280.000
-    try:
-      self.engine.loadImgDrawing(self, "vocalODTop", os.path.join(self.engine.data.vocalPath,"top.png"))
-    except IOError:
+
+    if not self.engine.loadImgDrawing(self, "vocalODTop", os.path.join(self.engine.data.vocalPath,"top.png")):
       self.vocalODTop = None
-    try:
-      self.engine.loadImgDrawing(self, "vocalODGlow", os.path.join(self.engine.data.vocalPath,"glow.png"))
-    except IOError:
+
+    if not self.engine.loadImgDrawing(self, "vocalODGlow", os.path.join(self.engine.data.vocalPath,"glow.png")):
       self.vocalODGlow = None
     
     height = self.vocalMeter.height1()
