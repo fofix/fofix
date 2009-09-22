@@ -9,12 +9,14 @@ Comments and suggestions are always welcome.
 *Note:* In all places where the python interpreter is called, `python` can be replaced by a specific version _e.g._ `python2.5`. Remember that if you do it once, you'll have to do it everywhere.
 
 =Getting FoFiX=
-You are required to have the {{{svn}}} client.
+You can either get the latest stable release in the form of an archive or get the source from our Subversion server. If you choose the first possibility, head to our [http://code.google.com/p/fofix/downloads/list?q=opsys=Linux download] page and get and extract the source archive.
+
+If you choose the second option, you are required to have the {{{svn}}} client to do the following:
   # Open a terminal
   # Change to the directory in which you want to have FoFiX
   # Execute one of the following depending on the version you want:
-    # Stable: {{{svn checkout http://fofix.googlecode.com/svn/MFH-Mod/tags/Release_3.100 fofix-3.100}}}
-    # Testing: {{{svn checkout http://fofix.googlecode.com/svn/MFH-Mod/tags/Release_3.120_rc1 fofix-3.120~rc1}}}
+    # Stable: {{{svn checkout http://fofix.googlecode.com/svn/MFH-Mod/tags/Release_3.120_final fofix-3.120}}}
+    # Testing: _none at the moment_
     # Unstable: {{{svn checkout http://fofix.googlecode.com/svn/MFH-Mod/trunk/ fofix-svn}}}
 
 _It is highly recommended that when you use the unstable version (when you become an Alpha tester), you keep a separate FoFiX folder containing a full install of the latest stable release - as the Alpha versions' new features and bugfixes might cause other issues affecting playability._
