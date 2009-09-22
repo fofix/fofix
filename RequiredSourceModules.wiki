@@ -35,21 +35,20 @@ Versions are likely important. Don't substitute one for the other without trying
 
 *Note:* FoFiX is now working on moving up to Python 2.6 under Windows, though until the move is completed, FoFiX will still fully support Python 2.4.  These instructions use Python 2.4.  See RunningUnderPython26 for detailed instructions for setting up Python 2.6 to run FoFiX.
 
-  # Download Active Python 2.4.3.12 (not the standard python distro) - [http://downloads.activestate.com/ActivePython/windows/2.4/ActivePython-2.4.3.12-win32-x86.msi] or [http://www.mediafire.com/?2zz5mzoybuw]
+  # Download Python 2.4.4 - [http://www.python.org/ftp/python/2.4.4/python-2.4.4.msi]
+  # Download pyWin32 build 214 - [http://downloads.sourceforge.net/pywin32/pywin32-214.win32-py2.4.exe]
   # Download PyOpenGL 2.0.2.01 - [http://downloads.sourceforge.net/pyopengl/PyOpenGL-2.0.2.01.py2.4-numpy23.exe]
-  # Download PyGame 1.7.1 - [http://www.pygame.org/ftp/pygame-1.7.1release.win32-py2.4.exe]
+  # Download PyGame 1.9.1 - [http://pygame.org/ftp/pygame-1.9.1release.win32-py2.4.exe]
   # Download PIL 1.1.6 - [http://effbot.org/downloads/PIL-1.1.6.win32-py2.4.exe]
   # Download Numeric 2.4.2 - [http://downloads.sourceforge.net/numpy/Numeric-24.2.win32-py2.4.exe]
-  # *ONLY for FoFiX 3.025 or earlier* -- Download Amanith 0.3 - [http://fretsonfire.phonotheque.ca/setup_amanith_03.rar]
-  # *ONLY for FoFiX 3.025 or earlier* -- Download PyAmanith 0.3.34 - [http://muksuluuri.ath.cx/~skyostil/projects/pyamanith/dist/PyAmanith-0.3.34.win32-py2.4.exe]
-  # *REQUIRED for FoFiX 3.120 alphas and later* -- Download Numpy 1.2.1 - [http://downloads.sourceforge.net/numpy/numpy-1.2.1-win32-superpack-python2.4.exe?use_mirror=superb-east]
+  # Download Numpy 1.2.1 - [http://downloads.sourceforge.net/numpy/numpy-1.2.1-win32-superpack-python2.4.exe?use_mirror=superb-east]
   # Download PyOgg 1.3 (this url is important, other versions dont work) - [http://xivilization.net/flyserver/binaries/py24/pyogg-1.3.win32-py2.4.exe]
   # Download PyVorbis 1.4 (this URL is important, other versions don't work) - [http://xivilization.net/flyserver/binaries/py24/pyvorbis-1.4.win32-py2.4.exe]
-  # *New version REQUIRED for FoFiX 3.120 alphas and later* -- Download py2exe 0.6.9 - [http://prdownloads.sourceforge.net/py2exe/py2exe-0.6.9.win32-py2.4.exe?download]
-  # *REQUIRED for FoFiX 3.120 alphas and later* -- Download PySQLite 2.5.1 - [http://oss.itsystementwicklung.de/download/pysqlite/2.5/2.5.1/pysqlite-2.5.1.win32-py2.4.exe]
+  # Download PySQLite 2.5.5 - [http://oss.itsystementwicklung.de/download/pysqlite/2.5/2.5.5/pysqlite-2.5.5.win32-py2.4.exe]
   # Download the FoFiX source files from the trunk, or SVN revision / tag of your choice - [http://code.google.com/p/fofix/source/browse/MFH-Mod]
 
 *Additional, optional modules currently in use with the latest Alpha version:*
+  * py2exe: support for freezing the code into a standalone EXE (0.6.9: [http://downloads.sourceforge.net/py2exe/py2exe-0.6.9.win32-py2.4.exe])
   * [http://psyco.sourceforge.net/ Psyco] - just-in-time compiler for Python ([http://downloads.sourceforge.net/psyco/psyco-1.5.2.win32-py2.4.exe Direct download])
   * [http://trac2.assembla.com/pkaudio/wiki/pyrtmidi pyRtMidi] - for MIDI instruments to be used as controller inputs.  [http://www.mediafire.com/download.php?ok1vw2zjn22 Here] is a direct download link to an installer that js put together for Python 2.4.
   * [http://www.mediafire.com/stump jsPitchBend] - for a whammy pitchbend effect (source: [https://svn.stump.jstump.com/svnroot/pitchbend/trunk SVN Checkout], [https://svn.stump.jstump.com/websvn WebSVN]).  At least revision 7 or release 0.1 is needed for the effect to work.  ([http://www.mediafire.com/?3mgtxhagijt direct download of latest release])
@@ -61,9 +60,7 @@ Versions are likely important. Don't substitute one for the other without trying
     * *At least r9 is REQUIRED or you will get crashes when you try to play using pypitch!*  (You can choose between pypitch and the built-in analyzer in Debug Settings.)
 
 
-*UPDATE 08/02/09* : Pygame 1.9 is released ! [http://pygame.org/ftp/pygame-1.9.0release.win32-py2.4.exe]
-In association with ActivePython 2.4.5.14 [http://downloads.activestate.com/ActivePython/windows/2.4/ActivePython-2.4.5.14-win32-x86.msi], my fps are twice as usual.
-
+Here's a *package containing all dependencys* (as of 2009-09-21): [http://www.mediafire.com/download.php?e2inzrizjl3]
 
 *Or, here's a complete installer package* with all the files above (as of 5/8/2009), courtesy of Chris Paiano:
 [http://www.mediafire.com/?zzizzt4zmuw MFH's Alpha Module Installer for 3.120r1454+ Win32-Py24-OGL2]
