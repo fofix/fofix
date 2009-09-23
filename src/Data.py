@@ -562,6 +562,31 @@ class Data(object):
   def loadSyncsounds(self):
     return [Sound(self.resource.fileName("sync%d.ogg" % i)) for i in range(1, 2)]
   
+  def getImgDrawing(self, fileName):
+    imgDrawing = None
+    for dataPath in self.resource.dataPaths:
+      fileName1 = os.path.join(dataPath, fileName)
+      #check if fileName1 exists (has extension)
+      if os.path.exists(fileName1):
+        try:      
+          imgDrawing = ImgDrawing(self.svg, fileName1)
+          return imgDrawing
+        except IOError:
+          Log.warn("Unable to load image file: %s" % fileName1)
+      else:
+        #find extension
+        fileName1 = os.path.splitext(fileName1)[0]
+        files = glob.glob('%s.*' % fileName1)
+        for i in range(len(files)):
+          try:
+            imgDrawing = ImgDrawing(self.svg, files[i])
+            return imgDrawing
+          except IOError:
+            Log.warn("Unable to load image file: %s" % files[i])
+    #image not found
+    Log.warn("Image not found: %s" % fileName)
+    return False
+
   def loadImgDrawing(self, target, name, fileName, textureSize = None):
     """
     Load an SVG drawing synchronously.
@@ -573,26 +598,8 @@ class Data(object):
                         be rendered to an x by y texture
     @return:            L{ImgDrawing} instance
     """
-    fileName = os.path.join(self.resource.dataPaths[0], fileName)
-    #check if fileName exists (has extension)
-    imgDrawing = None
-    if os.path.exists(fileName):
-      try:      
-        imgDrawing = ImgDrawing(self.svg, fileName)
-      except IOError:
-        Log.warn("Unable to load image file: %s" % fileName)
-    else:
-      #find extension
-      fileName = os.path.splitext(fileName)[0]
-      files = glob.glob('%s.*' % fileName)
-      for i in range(len(files)):
-        try:
-          imgDrawing = ImgDrawing(self.svg, files[i])
-          break
-        except IOError:
-          Log.warn("Unable to load image file: %s" % files[i])
+    imgDrawing = self.getImgDrawing(fileName)
     if not imgDrawing:
-      Log.warn("Image not found: %s" % fileName)
       return False
 
     drawing  = self.resource.load(target, name, lambda: imgDrawing, synch = True)
