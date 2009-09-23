@@ -25,7 +25,7 @@
 
 from Font import Font
 from Texture import Texture
-from Svg import ImgDrawing, SvgContext
+from Svg import ImgDrawing
 from Texture import Texture
 from Audio import Sound
 from Language import _

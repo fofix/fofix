@@ -67,7 +67,7 @@ import Config
 import Settings
 
 #MFH - for cd/song list
-from Svg import ImgDrawing, SvgContext
+from Svg import ImgDrawing
 
 #MFH - for loading phrases
 def wrapCenteredText(font, pos, text, rightMargin = 1.0, scale = 0.002, visibility = 0.0, linespace = 1.0, allowshadowoffset = False, shadowoffset = (.0022, .0005)):
