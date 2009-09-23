@@ -1,4 +1,4 @@
-####################################################################
+#####################################################################
 # -*- coding: iso-8859-1 -*-                                        #
 #                                                                   #
 # Frets on Fire                                                     #
@@ -189,12 +189,6 @@ class MainMenu(BackgroundLayer):
       (_("Join Multiplayer Game"), self.joinMultiplayerGame),
     ]
     
-    editorMenu = Menu(self.engine, [
-      (_("Edit Existing Song"),            self.startEditor),
-      (_("Import New Song"),               self.startImporter),
-      (_("Import GH(tm) Songs"),  self.startGHImporter),
-    ])
-
     trainingMenu = [
       (_("Tutorials"), self.showTutorial),
       (_("Practice"), lambda: self.newLocalGame(mode1p = 1)),
@@ -440,18 +434,6 @@ class MainMenu(BackgroundLayer):
       self.launchLayer(lambda: Lobby(self.engine, self.session))
   joinMultiplayerGame = catchErrors(joinMultiplayerGame)
 
-  def startEditor(self):
-    self.launchLayer(lambda: Editor(self.engine))
-  startEditor = catchErrors(startEditor)
-
-  def startImporter(self):
-    self.launchLayer(lambda: Importer(self.engine))
-  startImporter = catchErrors(startImporter)
-
-  def startGHImporter(self):
-    self.launchLayer(lambda: GHImporter(self.engine))
-  startGHImporter = catchErrors(startGHImporter)
-  
   def run(self, ticks):
     self.time += ticks / 50.0
     if self.engine.cmdPlay == 1:
