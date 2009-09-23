@@ -573,7 +573,7 @@ class Data(object):
                         be rendered to an x by y texture
     @return:            L{ImgDrawing} instance
     """
-    fileName = self.resource.fileName(fileName)
+    fileName = os.path.join(self.resource.dataPaths[0], fileName)
     #check if fileName exists (has extension)
     imgDrawing = None
     if os.path.exists(fileName):
