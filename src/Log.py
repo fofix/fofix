@@ -58,7 +58,7 @@ else:
   }
 
 def log(cls, msg):
-  msg = unicode(msg).encode(encoding, "ignore")
+  msg = unicode(msg, encoding).encode(encoding, "ignore")
   if not quiet:
     print labels[cls] + " " + msg
   tempTrace = None
