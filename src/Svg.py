@@ -22,11 +22,9 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-import re
 import os
 from OpenGL.GL import *
-from numpy import reshape, dot, transpose, identity, zeros, array, float32
-from math import sin, cos
+from numpy import array, float32
 
 import Log
 import Config
@@ -64,50 +62,32 @@ class SvgContext(object):
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
 
-# stump: TODO: Replace this with something OpenGL-based.
 class SvgTransform(object):
   def __init__(self, baseTransform = None):
     self.reset()
-    
-    if baseTransform:
-      self.matrix = baseTransform.matrix.copy()
+    if baseTransform is not None:
+      self.ops = baseTransform.ops[:]
 
   def transform(self, transform):
-    self.matrix = dot(self.matrix, transform.matrix)
+    self.ops.extend(transform.ops)
 
   def reset(self):
-    self.matrix = identity(3, dtype = float32)
+    self.ops = []
 
   def translate(self, dx, dy):
-    m = zeros((3, 3))
-    m[0, 2] = dx
-    m[1, 2] = dy
-    self.matrix += m
+    # The old code did this with a matrix addition, not a multiplication.
+    # We get the same effect by doing the translations before anything else.
+    self.ops.insert(0, lambda: glTranslatef(dx, dy, 0))
 
   def rotate(self, angle):
-    m = identity(3, dtype = float32)
-    s = sin(angle)
-    c = cos(angle)
-    m[0, 0] =  c
-    m[0, 1] = -s
-    m[1, 0] =  s
-    m[1, 1] =  c
-    self.matrix = dot(self.matrix, m)
+    self.ops.append(lambda: glRotatef(angle, 0.0, 0.0, 1.0))
 
   def scale(self, sx, sy):
-    m = identity(3, dtype = float32)
-    m[0, 0] = sx
-    m[1, 1] = sy
-    self.matrix = dot(self.matrix, m)
+    self.ops.append(lambda: glScalef(sx, sy, 1.0))
 
   def applyGL(self):
-    # Interpret the 2D matrix as 3D
-    m = self.matrix
-    m = [m[0, 0], m[1, 0], 0.0, 0.0,
-         m[0, 1], m[1, 1], 0.0, 0.0,
-             0.0,     0.0, 1.0, 0.0,
-         m[0, 2], m[1, 2], 0.0, 1.0]
-    glMultMatrixf(m)
+    for op in self.ops:
+      op()
 
 
 class ImgDrawing(object):
@@ -201,9 +181,8 @@ class ImgDrawing(object):
     self.context.setProjection()
     glMatrixMode(GL_MODELVIEW)
 
-    transform = self._getEffectiveTransform()
     glLoadIdentity()
-    transform.applyGL()
+    self._getEffectiveTransform().applyGL()
 
     glScalef(self.texture.pixelSize[0], self.texture.pixelSize[1], 1)
     glTranslatef(-.5, -.5, 0)
