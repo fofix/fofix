@@ -173,13 +173,13 @@ class ImgDrawing(object):
       return 0    
 
   def draw(self, color = (1, 1, 1, 1), rect = (0,1,0,1), lOffset = 0.0, rOffset = 0.0):
-    glPushMatrix()
     glMatrixMode(GL_TEXTURE)
     glPushMatrix()
     glMatrixMode(GL_PROJECTION)
     glPushMatrix()
     self.context.setProjection()
     glMatrixMode(GL_MODELVIEW)
+    glPushMatrix()
 
     glLoadIdentity()
     self._getEffectiveTransform().applyGL()
@@ -213,9 +213,9 @@ class ImgDrawing(object):
     glDisableClientState(GL_TEXTURE_COORD_ARRAY)
 
     glDisable(GL_TEXTURE_2D)
+    glPopMatrix()
     glMatrixMode(GL_TEXTURE)
     glPopMatrix()
     glMatrixMode(GL_PROJECTION)
     glPopMatrix()
     glMatrixMode(GL_MODELVIEW)
-    glPopMatrix()
