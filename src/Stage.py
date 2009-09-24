@@ -407,7 +407,7 @@ class Stage(object):
         fileIndex = 0
         allfiles = os.listdir(self.pathfull)
         for name in allfiles:
-          if os.path.splitext(name)[0].lower() != "practice" and os.path.splitext(name)[0].lower() != "practicedrum" and os.path.splitext(name)[0].lower() != "practicebass":
+          if os.path.splitext(name)[0].lower() != "practice" and os.path.splitext(name)[0].lower() != "practicedrum" and os.path.splitext(name)[0].lower() != "practicebass" and name != ".svn":
             Log.debug("Valid background found, index (" + str(fileIndex) + "): " + name)
             files.append(name)
             fileIndex += 1
