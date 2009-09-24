@@ -831,13 +831,10 @@ class SongChooser(Layer, KeyListener):
         iconFolder = engine.resource.fileName(os.path.join("themes",themename,"menu","icon"))
         if os.path.exists(iconFolder):
           for filename in os.listdir(iconFolder):
-            if os.path.splitext(filename)[1].lower() == ".png":
-              
-              thisfile = self.engine.resource.fileName("themes",themename,"menu","icon",filename)
-              if os.path.exists(thisfile):
-                self.itemIcons.append(ImgDrawing(self.engine.data.svg, thisfile))
-                self.itemIconNames.append(os.path.splitext(filename)[0])
-             
+            imgDrawing = self.engine.data.getImgDrawing(os.path.join("themes",themename,"menu","icon",filename))
+            if imgDrawing:
+              self.itemIcons.append(imgDrawing)
+              self.itemIconNames.append(os.path.splitext(filename)[0])
   
         
       self.scoreTimer = 0
@@ -1120,23 +1117,26 @@ class SongChooser(Layer, KeyListener):
       elif isinstance(item, Song.LibraryInfo):
         label = self.engine.resource.fileName(item.libraryName, "label.png")
       elif isinstance(item, Song.CareerResetterInfo):
-        label = self.engine.resource.fileName("themes",themename,"menu","resetlabel.png")
+        label = os.path.join("themes",themename,"menu","resetlabel.png")
       elif isinstance(item, Song.RandomSongInfo):
-        label = self.engine.resource.fileName("themes",themename,"menu","random.png")
+        label = os.path.join("themes",themename,"menu","random.png")
       else:
         return
-      if os.path.exists(label):
+
+      imgDrawing = self.engine.data.getImgDrawing(label)
+      if imgDrawing:
         #MFH - load as 2D drawing and not a texture when in CD/List mode:
         if self.display == 2 and not self.listRotation:
           #self.engine.loadImgDrawing(self, "itemLabels[i]",  label)
-          self.itemLabels[i] = ImgDrawing(self.engine.data.svg, label)
+          self.itemLabels[i] = imgDrawing
         elif self.display == 3:
-          self.itemLabels[i] = ImgDrawing(self.engine.data.svg, label)
+          self.itemLabels[i] = imgDrawing
         else:
-          self.itemLabels[i] = Texture(label)
+          self.itemLabels[i] = imgDrawing.texture
       else:
         if self.display == 3:
           self.itemLabels[i] = "Empty"
+
 
   def updateSelection(self):
   
@@ -3768,36 +3768,35 @@ class NeckChooser(Layer, KeyListener):
 
     # evilynux - improved loading logic to support arbitrary filenames
     #          - os.listdir is not guaranteed to return a sorted list, so sort it!
-    neckfiles = os.listdir(self.engine.resource.fileName("necks"))
+    path = self.engine.resource.fileName("necks")
+    # only list files
+    neckfiles = [ f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) ] 
     neckfiles.sort()
 
     for i in neckfiles:   #MFH - first go through and find the random neck
-      if ( str(i) == "randomneck.png"  or str(i) == "Neck_0.png" ):    #MFH 
+      if ( os.path.splitext(i)[0] == "randomneck" ):    #MFH 
         randomNeck = i
-        #exists = 1
+        exists = 1
 
         neckImage = engine.loadImgDrawing(self, "neck"+str(i), os.path.join("necks",str(i)))
         if not neckImage:
           # evilynux - Warning, Thumbs.db won't fail at engine.loadImgDrawing
           exists = 0
-          break
-
-        if neckImage is None:
-          exists = 0
+          continue
         else:
           exists = 1
   
         if exists == 1:
           self.neck.append(str(i)[:-4]) # evilynux - filename w/o extension
           self.necks.append(neckImage)
-
+          break
 
     for i in neckfiles:
       # evilynux - Special cases, ignore these...
       #if( str(i) == "overdriveneck.png" or str(i)[-4:] != ".png" ):
       #exists = 1
       #if( str(i) == "overdriveneck.png" or not i.endswith(".png") ):
-      if( str(i) == "overdriveneck.png" or str(i) == "randomneck.png"  or str(i) == "Neck_0.png" or str(i)[-4:] != ".png" ):    #MFH 
+      if( os.path.splitext(i)[0] == "randomneck" or os.path.splitext(i)[0] == "overdriveneck" ):    #MFH 
         exists = 0
         continue
 
@@ -3805,18 +3804,15 @@ class NeckChooser(Layer, KeyListener):
       if not neckImage:
         # evilynux - Warning, Thumbs.db won't fail at engine.loadImgDrawing
         exists = 0
-        break
+        continue
       else:
-        # evilynux - Warning, pseudo valid images like Thumbs.db won't fail - we need to catch those bastards
-        if neckImage is None:
-         exists = 0
-        else:
-         exists = 1
+        exists = 1
 
       if exists == 1:
         self.neck.append(str(i)[:-4]) # evilynux - filename w/o extension
         self.necks.append(neckImage)
         self.maxNeck += 1
+
     self.maxNeck -= 1 # evilynux - confusing, but there's an offset of -1
     Config.define("player",   "neck",  str,  0,  text = _("Neck"), options = self.neck)
     
@@ -4041,53 +4037,43 @@ class AvatarChooser(Layer, KeyListener):
 
     # evilynux - improved loading logic to support arbitrary filenames
     #          - os.listdir is not guaranteed to return a sorted list, so sort it!
-    avatarfiles = os.listdir(self.engine.resource.fileName("avatars"))
+    avatarpath = self.engine.resource.fileName("avatars")
+    avatarfiles = [ f for f in os.listdir(avatarpath) if os.path.isfile(os.path.join(avatarpath, f)) ]
     avatarfiles.sort()
     
     themeavatarfiles = []
-    if os.path.exists(self.engine.resource.fileName(os.path.join("themes",self.themename,"avatars"))):
-      themeavatarfiles = os.listdir(self.engine.resource.fileName(os.path.join("themes",self.themename,"avatars")))
-    themeavatarfiles.sort()
-    
-    for i in themeavatarfiles:
-      if str(i).lower()[-4:] != ".png":
-        continue
+    themeavatarpath = self.engine.resource.fileName(os.path.join("themes",self.themename,"avatars"))
+    if os.path.exists(themeavatarpath):
+      themeavatarfiles = [ f for f in os.listdir(themeavatarpath) if os.path.isfile(os.path.join(themeavatarpath, f)) ] 
+      themeavatarfiles.sort()
 
+    for i in themeavatarfiles:
       image = engine.loadImgDrawing(self, "av"+str(i), os.path.join("themes",self.themename,"avatars",str(i)))
       if not image:
         exists = 0
-        break
+        continue
       else:
-        # evilynux - Warning, pseudo valid images like Thumbs.db won't fail - we need to catch those bastards
-        if image is None:
-         exists = 0
-        else:
-         exists = 1
+        exists = 1
 
       if exists == 1:
         self.avatar.append(str(i)[:-4]) # evilynux - filename w/o extension
         self.avatars.append(image)
         self.maxAv += 1
     self.themeAvs = len(self.avatars)
-    for i in avatarfiles:
-      if str(i).lower()[-4:] != ".png":
-        continue
 
+    for i in avatarfiles:
       image = engine.loadImgDrawing(self, "av"+str(i), os.path.join("avatars",str(i)))
       if not image:
         exists = 0
-        break
+        continue
       else:
-        # evilynux - Warning, pseudo valid images like Thumbs.db won't fail - we need to catch those bastards
-        if image is None:
-         exists = 0
-        else:
-         exists = 1
+        exists = 1
 
       if exists == 1:
         self.avatar.append(str(i)[:-4]) # evilynux - filename w/o extension
         self.avatars.append(image)
         self.maxAv += 1
+
     Log.debug("%d Theme Avatars found; %d total." % (self.themeAvs, len(self.avatars)))
     self.avScale = []
     for avatar in self.avatars:
@@ -4194,7 +4180,8 @@ class AvatarChooser(Layer, KeyListener):
   
   def getAvatar(self):
     if self.accepted:
-      t = self.selectedAv < self.themeAvs and os.path.join("themes",self.themename,"avatars",self.avatar[self.selectedAv]+".png") or os.path.join("avatars",self.avatar[self.selectedAv]+".png")
+      #t = self.selectedAv < self.themeAvs and os.path.join("themes",self.themename,"avatars",self.avatar[self.selectedAv]+".123") or os.path.join("avatars",self.avatar[self.selectedAv]+".123")
+      t = self.selectedAv < self.themeAvs and self.avatars[self.selectedAv].filename
       return t
     else:
       return None

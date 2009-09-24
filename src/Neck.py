@@ -157,29 +157,41 @@ class Neck:
     themeNeckPath = os.path.join(self.engine.resource.fileName("themes", themename, "necks"))
     if self.neckType == 1 and os.path.exists(themeNeckPath):
       themeNeck = []
-      for i in os.listdir(themeNeckPath):
-        if str(i)[-4:] == ".png":
-          themeNeck.append(str(i))
+      neckfiles = [ f for f in os.listdir(themeNeckPath) if os.path.isfile(os.path.join(themeNeckPath, f)) ] 
+      neckfiles.sort()
+      for i in neckfiles:
+        themeNeck.append(str(i))
       if len(themeNeck) > 0:
-        i = random.randint(1,len(themeNeck))
-        engine.loadImgDrawing(self, "neckDrawing", os.path.join("themes", themename, "necks", themeNeck[i-1]), textureSize = (256, 256))
-        neckFind = False
+        i = random.randint(0,len(themeNeck)-1)
+        if engine.loadImgDrawing(self, "neckDrawing", os.path.join("themes", themename, "necks", themeNeck[i]), textureSize = (256, 256)):
+          neckFind = False
+          Log.debug("Random theme neck chosen: " + themeNeck[i])
+        else:
+          Log.error("Unable to load theme neck: " + themeNeck[i])
+          # fall back to defaultneck
+          self.neck = "defaultneck"
     if neckFind:
-      if not engine.data.fileExists(os.path.join("necks", self.neck + ".png")) and not engine.data.fileExists(os.path.join("necks", "Neck_" + self.neck + ".png")):
-        self.neck = str(engine.mainMenu.chosenNeck) #this neck is safe!
       # evilynux - Fixed random neck -- MFH: further fixing random neck
       if self.neck == "0" or self.neck == "Neck_0" or self.neck == "randomneck":
         self.neck = []
         # evilynux - improved loading logic to support arbitrary filenames
-        for i in os.listdir(self.engine.resource.fileName("necks")):
+        path = self.engine.resource.fileName("necks")
+        neckfiles = [ f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) ] 
+        neckfiles.sort()
+        for i in neckfiles:
           # evilynux - Special cases, ignore these...
-          if( str(i) == "overdriveneck.png" or str(i) == "randomneck.png"  or str(i) == "Neck_0.png" or str(i)[-4:] != ".png" ):
+          if( os.path.splitext(i)[0] == "randomneck" or os.path.splitext(i)[0] == "overdriveneck" ):
             continue
           else:
             self.neck.append(str(i)[:-4]) # evilynux - filename w/o extension
-        i = random.randint(1,len(self.neck))
-        engine.loadImgDrawing(self, "neckDrawing", os.path.join("necks",self.neck[i]+".png"),  textureSize = (256, 256))
-        Log.debug("Random neck chosen: " + self.neck[i])
+
+        i = random.randint(0,len(self.neck)-1)
+        if engine.loadImgDrawing(self, "neckDrawing", os.path.join("necks",self.neck[i]+".png"),  textureSize = (256, 256)):
+          Log.debug("Random neck chosen: " + self.neck[i])
+        else:
+          Log.error("Unable to load neck: " + self.neck[i])
+          self.neck = "defaultneck"
+          engine.loadImgDrawing(self, "neckDrawing", os.path.join("necks",self.neck+".png"),  textureSize = (256, 256))
       else:
         # evilynux - first assume the self.neck contains the full filename
         if not engine.loadImgDrawing(self, "neckDrawing", os.path.join("necks",self.neck+".png"),  textureSize = (256, 256)):

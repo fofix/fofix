@@ -83,13 +83,13 @@ class Data(object):
     self.themepath = themepath
     self.path = Version.dataPath()
 
-    if not os.path.exists(os.path.join(themepath,themename,"notes.png")):
+    if not self.checkImgDrawing(os.path.join(themepath,themename,"notes.png")):
       #myfingershurt: here need to ensure an existing theme is selected
       themes = []
       defaultTheme = None           #myfingershurt
       allthemes = os.listdir(themepath)
       for name in allthemes:
-        if os.path.exists(os.path.join(themepath,name,"notes.png")):
+        if self.checkImgDrawing(os.path.join(themepath,name,"notes.png")):
           themes.append(name)
           if name == "MegaLight":         #myfingershurt
             defaultTheme = name     #myfingershurt
@@ -108,14 +108,14 @@ class Data(object):
     else:
       self.vocalPath = os.path.join("themes",themename,"vocals")
 
-    if self.fileExists(os.path.join("themes",themename,"spfill.png")):
+    if self.checkImgDrawing(os.path.join("themes",themename,"spfill.png")):
       self.theme = 0
-    elif self.fileExists(os.path.join("themes",themename,"overdrive fill.png")):
+    elif self.checkImgDrawing(os.path.join("themes",themename,"overdrive fill.png")):
       self.theme = 2
       self.themeCoOp = True
     else:
       self.theme = 1
-      if self.fileExists(os.path.join("themes",themename,"coop_rockmeter.png")):
+      if self.checkImgDrawing(os.path.join("themes",themename,"coop_rockmeter.png")):
         self.themeCoOp = True
 
     self.fontScreenBottom = 0.75      #from our current viewport's constant 3:4 aspect ratio (which is always stretched to fill the video resolution)
@@ -562,29 +562,38 @@ class Data(object):
   def loadSyncsounds(self):
     return [Sound(self.resource.fileName("sync%d.ogg" % i)) for i in range(1, 2)]
   
-  def getImgDrawing(self, fileName):
+  def checkImgDrawing(self, fileName):
+    return self.getImgDrawing(fileName, False)
+  
+  def getImgDrawing(self, fileName, openImage=True):
     imgDrawing = None
     for dataPath in self.resource.dataPaths:
       fileName1 = os.path.join(dataPath, fileName)
       #check if fileName1 exists (has extension)
       if os.path.exists(fileName1):
-        try:      
-          imgDrawing = ImgDrawing(self.svg, fileName1)
-          return imgDrawing
-        except IOError:
-          Log.warn("Unable to load image file: %s" % fileName1)
+        if openImage == True:
+          try:      
+            imgDrawing = ImgDrawing(self.svg, fileName1)
+            return imgDrawing
+          except IOError:
+            Log.warn("Unable to load image file: %s" % fileName1)
+        else:
+          return True
       else:
         #find extension
         fileName1 = os.path.splitext(fileName1)[0]
         files = glob.glob('%s.*' % fileName1)
-        for i in range(len(files)):
-          try:
-            imgDrawing = ImgDrawing(self.svg, files[i])
-            return imgDrawing
-          except IOError:
-            Log.warn("Unable to load image file: %s" % files[i])
+        if openImage == True:
+          for i in range(len(files)):
+            try:
+              imgDrawing = ImgDrawing(self.svg, files[i])
+              return imgDrawing
+            except IOError:
+              Log.warn("Unable to load image file: %s" % files[i])
+        elif len(files) > 0:
+            return True
     #image not found
-    Log.warn("Image not found: %s" % fileName)
+    Log.debug("Image not found: %s" % fileName)
     return False
 
   def loadImgDrawing(self, target, name, fileName, textureSize = None):

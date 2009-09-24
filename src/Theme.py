@@ -1315,17 +1315,16 @@ def setupSubmenus(config, themepath = None):
   submenuVSpace = {}
   listmenu = []
   for name in allfiles:
-    if os.path.splitext(name)[1] == ".png":
-      if name.find("text") > -1:
-        found = os.path.splitext(name)[0]
-        if found == "maintext":
-          continue
-        Config.define("theme", found, str, None)
-        submenuScale[found] = None
-        submenuX[found] = None
-        submenuY[found] = None
-        submenuVSpace[found] = None
-        listmenu.append(found)
+    if name.find("text") > -1:
+      found = os.path.splitext(name)[0]
+      if found == "maintext":
+        continue
+      Config.define("theme", found, str, None)
+      submenuScale[found] = None
+      submenuX[found] = None
+      submenuY[found] = None
+      submenuVSpace[found] = None
+      listmenu.append(found)
   for i in listmenu:
     if i == "maintext":
       continue

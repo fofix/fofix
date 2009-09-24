@@ -407,14 +407,12 @@ class Stage(object):
         fileIndex = 0
         allfiles = os.listdir(self.pathfull)
         for name in allfiles:
-
-          if os.path.splitext(name)[1].lower() == ".png" or os.path.splitext(name)[1].lower() == ".jpg" or os.path.splitext(name)[1].lower() == ".jpeg":
-            if os.path.splitext(name)[0].lower() != "practice" and os.path.splitext(name)[0].lower() != "practicedrum" and os.path.splitext(name)[0].lower() != "practicebass":
-              Log.debug("Valid background found, index (" + str(fileIndex) + "): " + name)
-              files.append(name)
-              fileIndex += 1
-            else:
-              Log.debug("Practice background filtered: " + name)
+          if os.path.splitext(name)[0].lower() != "practice" and os.path.splitext(name)[0].lower() != "practicedrum" and os.path.splitext(name)[0].lower() != "practicebass":
+            Log.debug("Valid background found, index (" + str(fileIndex) + "): " + name)
+            files.append(name)
+            fileIndex += 1
+          else:
+            Log.debug("Practice background filtered: " + name)
   
         # evilynux - improved error handling, fallback to blank background if no background are found
         if fileIndex == 0:
@@ -424,7 +422,8 @@ class Stage(object):
           i = random.randint(0,len(files)-1)
           filename = files[i]
       ##End check number of Stage-backgrounds
-          self.engine.loadImgDrawing(self, "background", os.path.join(self.path, filename))
+          if not self.engine.loadImgDrawing(self, "background", os.path.join(self.path, filename)):
+            self.mode = 2;
 
       elif self.rotationMode > 0 and self.mode != 2:
         files = []

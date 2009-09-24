@@ -97,6 +97,7 @@ class ImgDrawing(object):
     self.context = context
     self.cache = None
     self.transform = SvgTransform()
+    self.filename = ImgData
 
     # Detect the type of data passed in
     if type(ImgData) == file:
