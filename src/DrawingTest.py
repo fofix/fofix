@@ -25,14 +25,15 @@ try:
   vbo_support = True
 except:
   vbo_support = False
-from numpy import array, float32, append, hstack
+import numpy as np
+from numpy import array, float32
 import pygame
 from pygame.locals import *
 from math import cos, sin, sqrt
 
 rot = 0.0
 scale = 1.0
-mode = 2
+mode = 1
 
 def init():
     global mode, triangVbo, triangVtx, triangCol
@@ -46,9 +47,12 @@ def init():
          [ 1,  0, 0],
          [ 0,  0, 1]], dtype=float32)
 
-    nbSteps = 200.0
+    nbSteps = 400.0
     
-    for i in range(int(nbSteps)):
+    #np.append changes dtype=f to dtype=d -> don't use it
+    spiralVtx = np.zeros((nbSteps, 3), dtype=float32)
+    spiralCol = np.zeros((nbSteps, 3), dtype=float32)
+    for i in range(0, int(nbSteps), 2):
       ratio = i/nbSteps;
       angle = 21*ratio
       c = cos(angle)
@@ -58,18 +62,17 @@ def init():
       alt = ratio - 0.5
       nor = 0.5
       up = sqrt(1.0-nor*nor)
-      if i == 0:
-        spiralVtx = array([[r1*c, alt, r1*s]],dtype=float32)
-        spiralCol = array([[1.0-ratio, 0.2, ratio]],dtype=float32)
-      else:
-        spiralVtx = append(spiralVtx,[[r1*c, alt, r1*s]],axis=0)
-        spiralCol = append(spiralCol,[[1.0-ratio, 0.2, ratio]],axis=0)
-      spiralVtx = append(spiralVtx,[[r2*c, alt+0.05, r2*s]],axis=0)
-      spiralCol = append(spiralCol,[[1.0-ratio, 0.2, ratio]],axis=0)
+      np.put(spiralVtx[i], [0,1,2] ,[r1*c, alt, r1*s])
+      np.put(spiralCol[i], [0,1,2] ,[1.0-ratio, 0.2, ratio])
+      np.put(spiralVtx[i+1], [0,1,2] ,[r2*c, alt+0.05, r2*s])
+      np.put(spiralCol[i+1], [0,1,2] ,[1.0-ratio, 0.2, ratio])
 
     if vbo_support:
-      triangArray = hstack((triangVtx, triangCol)).astype(float32)
-      spiralArray = hstack((spiralVtx, spiralCol)).astype(float32)
+      #after hstack array isn't contiguous -> make it contiguous
+      triangArray = np.ascontiguousarray(np.hstack((triangVtx, triangCol)))
+      spiralArray = np.ascontiguousarray(np.hstack((spiralVtx, spiralCol)))
+      #print "triangArray cont: ", triangArray.flags['C_CONTIGUOUS']
+      #print "triangArray dtype: ", triangArray.dtype.char
       triangVbo = vbo.VBO( triangArray, usage='GL_STATIC_DRAW' )
       spiralVbo = vbo.VBO( spiralArray, usage='GL_STATIC_DRAW' )
     else:
@@ -88,63 +91,73 @@ def draw():
 
     # VBO drawing
     if mode == 0 and vbo_support:
-      # Draw triangle
-      triangVbo.bind()
-      glEnableClientState(GL_VERTEX_ARRAY);
-      glEnableClientState(GL_COLOR_ARRAY);
-      glVertexPointer(3, GL_FLOAT, 24, triangVbo )
-      glColorPointer(3, GL_FLOAT, 24, triangVbo+12 )
-      glDrawArrays(GL_TRIANGLES, 0, triangVtx.shape[0])
-      glDisableClientState(GL_VERTEX_ARRAY);
-      glDisableClientState(GL_COLOR_ARRAY);
-      triangVbo.unbind()
-      # Draw spiral
-      # evilynux - FIXME: The following doesn't work... why?
-      spiralVbo.bind()
-      glEnableClientState(GL_VERTEX_ARRAY);
-      glEnableClientState(GL_COLOR_ARRAY)
-      glVertexPointer(3, GL_FLOAT, 24, spiralVbo )
-      glColorPointer(3, GL_FLOAT, 24, spiralVbo+12 )
-      glDrawArrays(GL_TRIANGLE_STRIP, 0, spiralVtx.shape[0])
-      glDisableClientState(GL_COLOR_ARRAY)
-      glDisableClientState(GL_VERTEX_ARRAY)
-      spiralVbo.unbind()
+      drawVBO()
 
     # Array-based drawing
     elif mode == 1:
-      # Draw triangle
-      glEnableClientState(GL_VERTEX_ARRAY)
-      glEnableClientState(GL_COLOR_ARRAY)
-      glColorPointerf(triangCol)
-      glVertexPointerf(triangVtx)
-      glDrawArrays(GL_TRIANGLES, 0, triangVtx.shape[0])
-      # Draw spiral
-      glColorPointerf(spiralCol)
-      glVertexPointerf(spiralVtx)
-      glDrawArrays(GL_TRIANGLE_STRIP, 0, spiralVtx.shape[0])
-      glDisableClientState(GL_COLOR_ARRAY)
-      glDisableClientState(GL_VERTEX_ARRAY)
+      drawArray()
 
     # Direct drawing
-    # With pyopengl3.x, glVertex3fv() is much slower than glVertex3f().
     else: # mode == 2
-      glBegin(GL_TRIANGLES)
-      for i in range(triangVtx.shape[0]):
-        glColor(triangCol[i])
-        #glVertex3fv(triangVtx[i])
-        glVertex3f(triangVtx[i][0],triangVtx[i][1],triangVtx[i][2])
-      glEnd()
-
-      # Draw spiral
-      glBegin(GL_TRIANGLE_STRIP);
-      for i in range(spiralVtx.shape[0]):
-        #glColor(spiralCol[i])
-        #glVertex3fv(spiralVtx[i])
-        glColor(spiralCol[i][0],spiralCol[i][1],spiralCol[i][2])
-        glVertex3f(spiralVtx[i][0],spiralVtx[i][1],spiralVtx[i][2])
-      glEnd()
+      drawDirect()
 
     glPopMatrix()
+
+def drawDirect():
+    # With pyopengl3.x, glVertex3fv() is much slower than glVertex3f().
+    glBegin(GL_TRIANGLES)
+    for i in range(triangVtx.shape[0]):
+      #glColor(triangCol[i])
+      #glVertex3fv(triangVtx[i])
+      glColor3f(triangCol[i][0],triangCol[i][1],triangCol[i][2])
+      glVertex3f(triangVtx[i][0],triangVtx[i][1],triangVtx[i][2])
+    glEnd()
+
+    # Draw spiral
+    glBegin(GL_TRIANGLE_STRIP);
+    for i in range(spiralVtx.shape[0]):
+      #glColor(spiralCol[i])
+      #glVertex3fv(spiralVtx[i])
+      glColor3f(spiralCol[i][0],spiralCol[i][1],spiralCol[i][2])
+      glVertex3f(spiralVtx[i][0],spiralVtx[i][1],spiralVtx[i][2])
+    glEnd()
+
+def drawArray():
+    # Draw triangle
+    glEnableClientState(GL_VERTEX_ARRAY)
+    glEnableClientState(GL_COLOR_ARRAY)
+    glColorPointerf(triangCol)
+    glVertexPointerf(triangVtx)
+    glDrawArrays(GL_TRIANGLES, 0, triangVtx.shape[0])
+    # Draw spiral
+    glColorPointerf(spiralCol)
+    glVertexPointerf(spiralVtx)
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, spiralVtx.shape[0])
+    glDisableClientState(GL_COLOR_ARRAY)
+    glDisableClientState(GL_VERTEX_ARRAY)
+    
+def drawVBO():
+    # Draw triangle
+    triangVbo.bind()
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 24, triangVbo )
+    glColorPointer(3, GL_FLOAT, 24, triangVbo+12 )
+    glDrawArrays(GL_TRIANGLES, 0, triangVtx.shape[0])
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
+    triangVbo.unbind()
+    # Draw spiral
+    # evilynux - FIXME: The following doesn't work... why?
+    spiralVbo.bind()
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY)
+    glVertexPointer(3, GL_FLOAT, 24, spiralVbo )
+    glColorPointer(3, GL_FLOAT, 24, spiralVbo+12 )
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, spiralVtx.shape[0])
+    glDisableClientState(GL_COLOR_ARRAY)
+    glDisableClientState(GL_VERTEX_ARRAY)
+    spiralVbo.unbind()
     
 def main():
     global rot, scale, mode
@@ -199,4 +212,3 @@ def main():
       #clock.tick(60)
 
 if __name__ == '__main__': main()
-
