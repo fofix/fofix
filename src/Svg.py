@@ -27,6 +27,7 @@ from OpenGL.GL import *
 
 import numpy as np
 from numpy import array, float32
+import math
 
 import Log
 import Config
@@ -82,7 +83,7 @@ class SvgTransform(object):
     self.ops.insert(0, lambda: glTranslatef(dx, dy, 0))
 
   def rotate(self, angle):
-    self.ops.append(lambda: glRotatef(angle, 0.0, 0.0, 1.0))
+    self.ops.append(lambda: glRotatef(math.degrees(angle), 0.0, 0.0, 1.0))
 
   def scale(self, sx, sy):
     self.ops.append(lambda: glScalef(sx, sy, 1.0))
