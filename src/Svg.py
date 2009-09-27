@@ -24,6 +24,8 @@
 
 import os
 from OpenGL.GL import *
+
+import numpy as np
 from numpy import array, float32
 
 import Log
@@ -98,6 +100,8 @@ class ImgDrawing(object):
     self.cache = None
     self.transform = SvgTransform()
     self.filename = ImgData
+    self.triangVtx = np.zeros((4,2), dtype=float32)
+    self.textriangVtx = np.zeros((4,2), dtype=float32)
 
     # Detect the type of data passed in
     if type(ImgData) == file:
@@ -192,27 +196,33 @@ class ImgDrawing(object):
 
     glEnable(GL_TEXTURE_2D)
     self.texture.bind()
-
-    triangVtx = array(
-      [[0.0-lOffset, 1.0],
-       [1.0-rOffset, 1.0],
-       [0.0+lOffset, 0.0],
-       [1.0+rOffset, 0.0]], dtype=float32)
-
-    textriangVtx = array(
-      [[rect[0], rect[3]],
-       [rect[1], rect[3]],
-       [rect[0], rect[2]],
-       [rect[1], rect[2]]], dtype=float32)
-
+    
+    self.triangVtx[0,0] = 0.0-lOffset
+    self.triangVtx[0,1] = 1.0
+    self.triangVtx[1,0] = 1.0-rOffset
+    self.triangVtx[1,1] = 1.0
+    self.triangVtx[2,0] = 0.0+lOffset
+    self.triangVtx[2,1] = 0.0
+    self.triangVtx[3,0] = 1.0+rOffset
+    self.triangVtx[3,1] = 0.0
+    
+    self.textriangVtx[0,0] = rect[0]
+    self.textriangVtx[0,1] = rect[3]
+    self.textriangVtx[1,0] = rect[1]
+    self.textriangVtx[1,1] = rect[3]
+    self.textriangVtx[2,0] = rect[0]
+    self.textriangVtx[2,1] = rect[2]
+    self.textriangVtx[3,0] = rect[1]
+    self.textriangVtx[3,1] = rect[2]
+    
     glEnableClientState(GL_TEXTURE_COORD_ARRAY)    
     glEnableClientState(GL_VERTEX_ARRAY)
-    glTexCoordPointerf(textriangVtx)
-    glVertexPointerf(triangVtx)
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, triangVtx.shape[0])
+    glVertexPointerf(self.triangVtx)
+    glTexCoordPointerf(self.textriangVtx)
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, self.triangVtx.shape[0])
     glDisableClientState(GL_VERTEX_ARRAY)
     glDisableClientState(GL_TEXTURE_COORD_ARRAY)
-
+    
     glDisable(GL_TEXTURE_2D)
     glPopMatrix()
     glMatrixMode(GL_TEXTURE)

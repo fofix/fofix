@@ -597,7 +597,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     for i, player in enumerate(self.playerList):
       if not self.instruments[i].isVocal:
         self.engine.view.setViewportHalf(self.numberOfGuitars,player.guitarNum)
-        w, h = self.engine.view.geometry[2:4]
+        w = self.engine.view.geometryAllHalf[self.numberOfGuitars-1,player.guitarNum,2]
+        h = self.engine.view.geometryAllHalf[self.numberOfGuitars-1,player.guitarNum,3]
       else:
         w = self.wFull
         h = self.hFull
@@ -7780,14 +7781,14 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                     self.engine.drawImage(self.mult, scale = multscale, coord = multcoord, rect = (0,1,multRange[0],multRange[1]))
   
                 glColor4f(1,1,1,1)
- 
+                
               if not self.coOpType:
                 if self.playerList[i].guitarNum is not None:
                   self.engine.view.setViewportHalf(self.numberOfGuitars,self.playerList[i].guitarNum)
                 else:
                   self.engine.view.setViewportHalf(1,0)
               else:
-                self.engine.view.setViewportHalf(1,i)  
+                self.engine.view.setViewportHalf(1,0)  
 
               if currentRock == 1 and self.failingEnabled and not self.coOpRB:
                 if (self.coOpType and i == self.coOpPlayerMeter) or not self.coOpType:  #MFH only render for player 1 if co-op mode
