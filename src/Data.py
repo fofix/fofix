@@ -83,13 +83,13 @@ class Data(object):
     self.themepath = themepath
     self.path = Version.dataPath()
 
-    if not self.checkImgDrawing(os.path.join(themepath,themename,"notes.png")):
+    if not self.checkImgDrawing(os.path.join("themes",themename,"notes.png")):
       #myfingershurt: here need to ensure an existing theme is selected
       themes = []
       defaultTheme = None           #myfingershurt
       allthemes = os.listdir(themepath)
       for name in allthemes:
-        if self.checkImgDrawing(os.path.join(themepath,name,"notes.png")):
+        if self.checkImgDrawing(os.path.join("themes",name,"notes.png")):
           themes.append(name)
           if name == "MegaLight":         #myfingershurt
             defaultTheme = name     #myfingershurt
