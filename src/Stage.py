@@ -42,9 +42,10 @@ class Stage(object):
     self.scene            = guitarScene
     self.engine           = guitarScene.engine
     self.config           = Config.MyConfigParser()
-    self.Layers = []
+    self.layers = []
     self.reset()
     
+
     self.wFull = None   #MFH - needed for new stage background handling
     self.hFull = None
     
@@ -86,8 +87,7 @@ class Stage(object):
       Log.warn("Stage folder does not exist: %s" % self.pathfull)
       self.mode = 1 # Fallback to song-specific stage
     suffix = ".jpg"
-    
-
+   
   # def loadVideo(self, libraryName, songName):
     # if not videoAvailable:
       # return -1
@@ -100,114 +100,10 @@ class Stage(object):
     # self.engine.view.pushLayer(self.vidPlayer)
     # self.vidPlayer.paused = True
 
+
   def load(self, libraryName, songName, practiceMode = False):
-    # Build the layers
-    for i in range(32):
-      section = "layer%d" % i
-      if self.config.has_section(section):
-        def get(value, type = str, default = None):
-          if self.config.has_option(section, value):
-            return type(self.config.get(section, value))
-          return default
-        
-        xres    = get("xres", int, 256)
-        yres    = get("yres", int, 256)
-        texture = get("texture")
-        text    = get("text")
-        font    = get("font")
-        part    = get("part")
-        issplights  = get("issplights")
-
-        instrument = self.scene.instruments[0]
-        if instrument.isDrum and part == "drum": 
-          add = True
-        elif instrument.isVocal and part == "vocal":
-          add = True
-        elif instrument.isBassGuitar and part == "bass":
-          add = True
-        elif (not instrument.isBassGuitar and not instrument.isVocal and not instrument.isDrum) and part == "guitar":
-          add = True
-        elif part == None:
-          add = True
-        else:
-          add = False
-
-        if texture and add == True and not issplights == "True":           
-          drawing = self.engine.loadImgDrawing(self, None, os.path.join("themes", self.themename, texture))
-          layer = Rockmeter.Layer(self, drawing)
-         
-          try:
-            layer.position    = (get("xpos",   float, 0.0), get("ypos",   float, 0.0))
-          except:
-            layer.position    = (eval(get("xpos")), eval(get("xpos")))
-
-          try:
-            layer.scale       = (get("xscale", float, 1.0), get("yscale", float, 1.0))
-          except:
-            layer.scale       = (eval(get("xscale")), eval(get("yscale")))
-
-          layer.angle       = get("angle", float, 0.0)
-          layer.color       = (get("color_r", float, 1.0), get("color_g", float, 1.0), get("color_b", float, 1.0), get("color_a", float, 1.0))
-
-          # Load any effects
-          fxClasses = {
-            "rock":           Rockmeter.RockEffect,
-            "mult":           Rockmeter.MultEffect,
-            "streak":         Rockmeter.StreakEffect,
-            "power":          Rockmeter.PowerEffect,
-          }
-        
-          for j in range(32):
-            fxSection = "layer%d:fx%d" % (i, j)
-            if self.config.has_section(fxSection):
-              type = self.config.get(fxSection, "type")
-
-              if not type in fxClasses:
-                continue
-
-              options = self.config.options(fxSection)
-              options = dict([(opt, self.config.get(fxSection, opt)) for opt in options])
-
-              fx = fxClasses[type](layer, options)
-              layer.effects.append(fx)
-        elif text:
-          layer = Rockmeter.FontLayer(self, section, font)
-          Wid, Hgt = self.engine.data.fontDict[font].getStringSize(text)
-        elif issplights == "True":
-          drawing = self.engine.loadImgDrawing(self, None, os.path.join("themes", self.themename, texture)) 
-          for i in range(len(self.scene.instruments)):
-            layer = Rockmeter.SPLightsLayer(self, drawing, i)
-
-          if not get("xstatic") == None:
-            xstatic = get("xstatic").split(",")
-            layer.xstatic = [float(i) for i in xstatic]
-          if not get("ystatic") == None:
-            ystatic = get("ystatic").split(",")         
-            layer.ystatic = [float(i) for i in ystatic]
-          if not get("xstart") == None:
-            xstart = get("xstart").split(",")
-            layer.xstart = [float(i) for i in xstart]
-          if not get("ystart") == None:
-            ystart = get("ystart").split(",")
-            layer.ystart = [float(i) for i in ystart]
-          if not get("xend") == None:
-            xend = get("xend").split(",")
-            layer.xend = [float(i) for i in xend]
-          if not get("yend") == None:
-            yend = get("yend").split(",")
-            layer.yend = [float(i) for i in yend]
-          if not get("scale") == None:
-            scale = get("scale").split(",")
-            layer.scale = [float(i) for i in scale]
-          if not get("angle") == None:
-            angle = get("angle").split(",")
-            layer.angle = [float(i) for i in angle]
-
-        else:
-          layer = None
-
-        if layer != None:
-          self.Layers.append(layer)
+    rockmeter = self.engine.resource.fileName(os.path.join("themes", self.themename,"rockmeter.ini"))
+    self.rockmeter        = Rockmeter.Rockmeter(self.scene, rockmeter)
 
     # evilynux - Fixes a self.background not defined crash
     self.background = None
@@ -423,6 +319,7 @@ class Stage(object):
   def render(self, visibility):
     if self.mode != 3:
       self.renderBackground()
+    self.renderLayers(self.layers, visibility)
     if shaders.enable("stage"):
       height = 0.0
       for i in shaders.var["color"].keys():
@@ -442,6 +339,6 @@ class Stage(object):
       shaders.disable()
       
     self.scene.renderGuitar()
-    self.renderLayers(self.Layers, visibility)
+    self.rockmeter.render(visibility)
     
     

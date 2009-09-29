@@ -881,6 +881,8 @@ class GameEngine(Engine):
     else: # fit to screen
       image.transform.scale(scale[0] / image.width1() * 640,scale[1] / image.height1() * 480)
     image.transform.translate(coord[0],coord[1])
+    if len(color) == 3:
+      color = (color[0], color[1], color[2], 1.0)
     image.draw(color = color, rect = rect, lOffset = lOffset, rOffset = rOffset)
 
   #blazingamer - simplifies tex rendering
