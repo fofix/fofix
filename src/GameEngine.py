@@ -140,6 +140,7 @@ Config.define("audio",  "songvol",    float,    0.8,  text = _("Background Volum
 #Config.define("audio",  "rhythmvol",  float,    1.0,  text = ("Rhythm Volume"),   options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(0, 110, 10)]), tipText = ("Bass, rhythm guitar, and drum volume."))
 
 Config.define("performance", "game_priority",       int,   2,      text = _("Process Priority"), options = sortOptionsByKey({0: _("Idle"), 1: _("Low"), 2: _("Normal"), 3:_("Above Normal"), 4:_("High"), 5:_("Realtime")}), tipText = _("Change this to increase the priority of the FoFiX process. Don't change this unless you know what you're doing. DO NOT set this to Realtime. Ever."))
+Config.define("performance", "restrict_to_first_processor", bool, False, text=_("Restrict to First Core (Win32 Only)"), options={False: _("No"), True: _("Yes")}, tipText=_("Choose whether to restrict the game to running on only the first processor core on the system. Only has an effect under Windows."))  #stump
 Config.define("performance", "use_psyco", bool, False, text=_("Use Psyco"), options={False: _("No"), True: _("Yes")}, tipText = _("Enable or disable the Psyco specializing compiler. Tests have indicated the game runs faster with it off."))  #stump
 Config.define("game",   "notedisappear",      bool,   False,  text = _("Missed Notes"), options = {False: _("Disappear"), True: _("Keep on going")}, tipText = _("When you miss a note, this sets whether they disappear from the fretboard or scroll off the bottom of the screen."))
 

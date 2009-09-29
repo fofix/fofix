@@ -97,7 +97,8 @@ class Loader(Thread):
     pid = win32api.GetCurrentProcessId()
     handle = win32api.OpenProcess(win32con.PROCESS_ALL_ACCESS, True, pid)
     win32process.SetPriorityClass(handle, priorityClasses[priority])
-    win32process.SetProcessAffinityMask(handle, 1)
+    if Config.get('performance', 'restrict_to_first_processor'):
+      win32process.SetProcessAffinityMask(handle, 1)
 
 #  def enableScreenSaver(self, on):
 #    import ctypes
