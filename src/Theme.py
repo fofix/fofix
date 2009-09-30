@@ -27,6 +27,8 @@ from OpenGL.GL import *
 import Config
 import Log
 import os
+import sys
+import imp
 
 # read the color scheme from the config file
 Config.define("theme", "background_color",  str, "#000000")
@@ -809,6 +811,19 @@ def packTupleKey(key, type = str):
 def open(config, themepath = None):
   # Read in theme.ini specific variables
   
+  try:
+    filepath = os.path.split(themepath)[0]
+    fp, pathname, description = imp.find_module("ThemeNew",[filepath])
+    if description[0] == ".py":
+      TT = imp.load_module("ThemeNew", fp, pathname, description)
+      CustomTheme = TT.CustomTheme()
+      Log.debug("Custom Theme Files Loaded")
+    else:
+      Log.debug("No Theme Files Found")
+  except:
+    CustomTheme = None
+    Log.debug("No Theme Files Found")
+  
   setupColors(config)
   setupFrets(config)
   setupFlameColors(config)
@@ -829,6 +844,8 @@ def open(config, themepath = None):
   setupHopoIndicator(config)
   setupResults(config)
   setupSubmenus(config, themepath)
+
+ 
   
 
 def setupNeckChooser(config):
