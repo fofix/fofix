@@ -63,6 +63,7 @@ class Data(object):
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("Data class init (Data.py)...")
+    self.logLoadings = Config.get("game", "log_loadings")
     
     self.resource = resource
     self.svg      = svg
@@ -569,6 +570,11 @@ class Data(object):
     imgDrawing = None
     for dataPath in self.resource.dataPaths:
       fileName1 = os.path.join(dataPath, fileName)
+      if self.logLoadings == 1:
+        if openImage:
+            Log.notice("Trying to load image: %s" % fileName1)
+        else:
+            Log.notice("Checking image: %s" % fileName1)
       #check if fileName1 exists (has extension)
       if os.path.exists(fileName1):
         if openImage == True:

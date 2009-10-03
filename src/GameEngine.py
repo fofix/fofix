@@ -29,6 +29,8 @@
 #####################################################################
 
 from OpenGL.GL import *
+import numpy
+from PIL import Image
 from numpy import array, float32
 import pygame
 import os
@@ -468,7 +470,12 @@ class GameEngine(Engine):
     self.uploadVersion = "%s-3.100" % Version.appNameSexy() #akedrou - the version passed to the upload site.
 
     Log.debug(self.versionString + " starting up...")
-    Log.debug("pygame version: " + str(pygame.version.ver) )
+    Log.debug("Python version: " + sys.version.split(' ')[0])
+    Log.debug("Pygame version: " + str(pygame.version.ver) )
+    Log.debug("PyOpenGL version: " + OpenGL.__version__)
+    Log.debug("Numpy version: " + numpy.__version__)
+    Log.debug("PIL version: " + Image.VERSION)
+    
     """
     Constructor.
     @param config:  L{Config} instance for settings
