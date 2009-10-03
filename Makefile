@@ -25,8 +25,8 @@ VERSION = "${MAIN_VERSION}~${SVN_VERSION}"
 UNAME = $(shell uname -m)
 ARCH = $(shell test $(UNAME) = "i686" && echo 32bit || echo 64bit)
 # evilynux - Folder names for both patches and full releases
-DIRFULL=FoFiX-${VERSION}-Full-GNULinux-${ARCH}
-DIRPATCH=FoFiX-${VERSION}-Patch-GNULinux-${ARCH}
+DIRFULL=FoFiX-${VERSION}-Full-GNULinux-${ARCH}-py${PYTHON_VERSION}
+DIRPATCH=FoFiX-${VERSION}-Patch-GNULinux-${ARCH}-py${PYTHON_VERSION}
 
 all:	dist
 
@@ -56,10 +56,9 @@ SongChoosingScene,\
 GuitarScene,\
 ctypes.util,pkg_resources,weakref,Image,\
 OpenGL,$(PYOGL3_INCL)\
-xml.sax.drivers2.drv_pyexpat,\
 GameResultsScene src/FoFiX.py
 
-	-cp /usr/lib/libpython2.4.so.1.0 \
+	-cp /usr/lib/libpython${PYTHON_VERSION}.so.1.0 \
            /usr/lib/libSDL_ttf-2.0.so.0 \
            /usr/lib/libSDL_mixer-1.2.so.0 \
            /usr/lib/libvorbisfile.so.3 \
