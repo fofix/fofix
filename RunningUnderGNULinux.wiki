@@ -103,8 +103,10 @@ apt-get install python-pygame python-opengl python-numpy python-imaging python-o
 
   * Under Ubuntu versions earlier than Karmic, make sure you use `python2.5` all over the place.
 
+See the [#Generic_instructions generic instructions] above for getting and executing FoFiX.
+
 ==Archlinux ==
-Get and install using the latest PKGBUILD from [http://aur.archlinux.org/packages.php?ID=20454 this page].
+Get and install the latest PKGBUILD from [http://aur.archlinux.org/packages.php?ID=20454 this page].
 
 ==OpenSUSE==
 Get and install the latest RPM from [http://packman.links2linux.org/package/fofix this page].
