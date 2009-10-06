@@ -45,18 +45,14 @@ import Theme
 import copy
 import string
 import cPickle  #stump: Cerealizer and sqlite3 don't seem to like each other that much...
+import Resource
 from Language import _
 
 #stump: turns out the sqlite3 module didn't appear until Python 2.5...
 try:
   import sqlite3
-  canCache = True
 except ImportError:
-  try:
-    import pysqlite2.dbapi2 as sqlite3  # close enough
-    canCache = True
-  except ImportError:
-    canCache = False
+  import pysqlite2.dbapi2 as sqlite3  # close enough
 
 DEFAULT_BPM = 120.0
 DEFAULT_LIBRARY         = "songs"
@@ -188,45 +184,36 @@ defaultSections = ["Start","1/4","1/2","3/4"]
 
 # stump: manage cache files
 class CacheManager(object):
-  SCHEMA_VERSION = 5  #stump: current cache format version number
+  SCHEMA_VERSION = 6  #stump: current cache format version number
   def __init__(self):
-    self.caches = {}
-  def getCache(self, infoFileName):
-    '''Given the path of a song.ini, return a SQLite connection to the
-    associated cache.'''
-    cachePath = os.path.dirname(os.path.dirname(infoFileName))
-    if self.caches.has_key(cachePath):
-      return self.caches[cachePath]
-    # The cache must be opened or created.
+    cacheName = os.path.join(Resource.getWritableResourcePath(), 'SongCache.sqlite')
     oldcwd = os.getcwd()
     try:
-      os.chdir(cachePath)  #stump: work around bug in SQLite unicode path name handling
-      try:
-        conn = sqlite3.Connection('.fofix-cache')
-      except sqlite3.OperationalError:
-        conn = None
-        return conn
+      os.chdir(os.path.dirname(cacheName))  #stump: work around bug in SQLite unicode path name handling
+      self.cache = sqlite3.Connection(os.path.basename(cacheName))
     finally:
       os.chdir(oldcwd)
     # Check that the cache is completely initialized.
     try:
-      v = conn.execute("SELECT `value` FROM `config` WHERE `key` = 'version'").fetchone()[0]
+      v = self.cache.execute("SELECT `value` FROM `config` WHERE `key` = 'version'").fetchone()[0]
       mustReinitialize = (int(v) != self.SCHEMA_VERSION)
+      if mustReinitialize:
+        Log.debug('Song cache has wrong schema version; forcing reinitialization.')
     except:
       mustReinitialize = True
     if mustReinitialize:
+      Log.debug('Initializing song cache.')
       # Clean out the database, then make our tables.
-      for tbl in conn.execute("SELECT `name` FROM `sqlite_master` WHERE `type` = 'table'").fetchall():
-        conn.execute('DROP TABLE `%s`' % tbl)
-      conn.commit()
-      conn.execute('VACUUM')
+      for tbl in self.cache.execute("SELECT `name` FROM `sqlite_master` WHERE `type` = 'table'").fetchall():
+        self.cache.execute('DROP TABLE `%s`' % tbl)
+      self.cache.execute('VACUUM')
       #stump: if you need to change the database schema, do it here, then bump the version number, a small bit above here.
-      conn.execute('CREATE TABLE `config` (`key` STRING UNIQUE, `value` STRING)')
-      conn.execute('CREATE TABLE `songinfo` (`hash` STRING UNIQUE, `info` STRING)')
-      conn.execute('INSERT INTO `config` (`key`, `value`) VALUES (?, ?)', ('version', self.SCHEMA_VERSION))
-      conn.commit()
-    self.caches[cachePath] = conn
-    return conn
+      self.cache.execute('CREATE TABLE `config` (`key` STRING UNIQUE, `value` STRING)')
+      self.cache.execute('CREATE TABLE `songinfo` (`hash` STRING UNIQUE, `info` STRING)')
+      self.cache.execute('INSERT INTO `config` (`key`, `value`) VALUES (?, ?)', ('version', self.SCHEMA_VERSION))
+      self.cache.commit()
+  def getCache(self):
+    return self.cache
 cacheManager = CacheManager()  # singleton instance
 del CacheManager
 
@@ -240,6 +227,7 @@ class SongInfo(object):
     self._partDifficulties = {}
     self._parts        = None
     self._midiStyle    = None
+    self.cache         = cacheManager.getCache()
     if Config.get("performance", "cache_song_metadata"):
       self.allowCacheUsage = allowCacheUsage  #stump
     else:
@@ -258,7 +246,7 @@ class SongInfo(object):
       self.info.read(infoFileName)
     except:
       pass
-    
+
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("SongInfo class init (song.py): " + self.name)
@@ -284,26 +272,6 @@ class SongInfo(object):
         Log.debug("notes-unedited.mid not found, using notes.mid - " + self.name)
     self.noteFileName = os.path.join(os.path.dirname(self.fileName), notefile)
     
-    # stump: Check the cache for the presence of this song.
-    if canCache and self.allowCacheUsage:
-      self.stateHash = hashlib.sha1(open(self.noteFileName, 'rb').read() + open(self.fileName, 'rb').read()).hexdigest()
-      cache = cacheManager.getCache(self.fileName)
-      if cache != None:
-        try:    #MFH - it crashes here on previews!
-          result = cache.execute('SELECT `info` FROM `songinfo` WHERE `hash` = ?', [self.stateHash]).fetchone()
-        except Exception, e:
-          Log.error(str(e))
-          result = None
-
-        if result is not None:
-          try:
-            self.__dict__.update(cPickle.loads(str(result[0])))
-            return
-          except:
-            # The entry is there but could not be loaded.
-            # Nuke it and let it be rebuilt further down.
-            cache.execute('DELETE FROM `songinfo` WHERE `hash` = ?', [self.stateHash])
-
     # Read highscores and verify their hashes.
     # There ain't no security like security throught obscurity :)
     self.highScores = {}
@@ -556,19 +524,38 @@ class SongInfo(object):
             Log.warn("Weak hack attempt detected. Better luck next time.")
 
             
-    if canCache and self.allowCacheUsage:  #stump: preload this stuff into the cache
+    #stump: metadata caching
+    if self.allowCacheUsage:
+      songhash = hashlib.sha1(open(self.noteFileName, 'rb').read()).hexdigest()
+      try:    #MFH - it crashes here on previews!
+        result = self.cache.execute('SELECT `info` FROM `songinfo` WHERE `hash` = ?', [songhash]).fetchone()
+        if result is None:
+          Log.debug('Song %s was not found in the cache.' % infoFileName)
+      except Exception, e:
+        Log.error('Cache retrieval failed for %s: ' % infoFileName)
+        result = None
+
+      if result is not None:
+        try:
+          self.__dict__.update(cPickle.loads(str(result[0])))
+          Log.debug('Song %s successfully loaded from cache.' % infoFileName)
+          return
+        except:
+          # The entry is there but could not be loaded.
+          # Nuke it and let it be rebuilt.
+          Log.error('Song %s has invalid cache data (will rebuild): ' % infoFileName)
+          self.cache.execute('DELETE FROM `songinfo` WHERE `hash` = ?', [self.stateHash])
+
+      #stump: preload this stuff...
       self.getParts()
       self.getSections()
-    self.writeCache()
-            
-  # stump: Write this song's info into the cache.
-  def writeCache(self):
-    if canCache and self.allowCacheUsage:
-      self.stateHash = hashlib.sha1(open(self.noteFileName, 'rb').read() + open(self.fileName, 'rb').read()).hexdigest()
-      cache = cacheManager.getCache(self.fileName)
-      pkl = cPickle.dumps(self.__dict__)
-      if cache != None:
-        cache.execute('INSERT OR REPLACE INTO `songinfo` (`hash`, `info`) VALUES (?, ?)', [self.stateHash, pkl])
+
+      #stump: Write this song's info into the cache.
+      Log.debug('Writing out cache for song %s.' % self.fileName)
+      pdict = {}
+      for key in ('_parts', '_partDifficulties', '_midiStyle', '_sections'):
+        pdict[key] = getattr(self, key)
+      self.cache.execute('INSERT OR REPLACE INTO `songinfo` (`hash`, `info`) VALUES (?, ?)', [songhash, cPickle.dumps(pdict)])
 
 
   def _set(self, attr, value):
@@ -667,32 +654,6 @@ class SongInfo(object):
     if v is not None and type:
       v = type(v)
     return v
-
-#  def getDifficulties(self):
-#    # Tutorials only have the medium difficulty
-#    if self.tutorial:
-#      return [difficulties[HAR_DIF]]
-#
-#    if self._difficulties is not None:
-#      return self._difficulties
-#
-#    # See which difficulties are available
-#    try:
-#
-#      noteFileName = self.noteFileName
-#      
-#      Log.debug("Retrieving difficulties from: " + noteFileName)
-#      info = MidiInfoReaderNoSections()
-#      midiIn = midi.MidiInFile(info, noteFileName)
-#      try:
-#        midiIn.read()
-#      except MidiInfoReaderNoSections.Done:
-#        pass
-#      info.difficulties.sort(lambda a, b: cmp(b.id, a.id))
-#      self._difficulties = info.difficulties
-#    except:
-#      self._difficulties = difficulties.values()
-#    return self._difficulties
 
   def getPartDifficulties(self):
     if len(self._partDifficulties) is not 0:
@@ -2800,13 +2761,6 @@ class Song(object):
 
   def save(self):
     self.info.save()
-    f = open(self.noteFileName + ".tmp", "wb")
-    midiOut = MidiWriter(self, midi.MidiOutFile(f))
-    midiOut.write()
-    f.close()
-
-    # Rename the output file after it has been succesfully written
-    shutil.move(self.noteFileName + ".tmp", self.noteFileName)
 
   def play(self, start = 0.0):
     self.start = start
@@ -3084,63 +3038,6 @@ freestyleMarkingNote = 124      #notes 120 - 124 = drum fills & BREs - always al
 
 reverseNoteMap = dict([(v, k) for k, v in noteMap.items()])
 
-
-class MidiWriter:
-  def __init__(self, song, out):
-    self.song         = song
-    self.out          = out
-    self.ticksPerBeat = 480
-
-    self.logClassInits = Config.get("game", "log_class_inits")
-    if self.logClassInits == 1:
-      Log.debug("MidiWriter class init (song.py)...")
-    
-
-  def midiTime(self, time):
-    return int(self.song.bpm * self.ticksPerBeat * time / 60000.0)
-
-  def write(self):
-    self.out.header(division = self.ticksPerBeat)
-    self.out.start_of_track()
-    self.out.update_time(0)
-    if self.song.bpm:
-      self.out.tempo(int(60.0 * 10.0**6 / self.song.bpm))
-    else:
-      self.out.tempo(int(60.0 * 10.0**6 / 122.0))
-
-    # Collect all events
-    events = [zip([difficulty] * len(track.getAllEvents()), track.getAllEvents()) for difficulty, track in enumerate(self.song.tracks[0])]
-    events = reduce(lambda a, b: a + b, events)
-    events.sort(lambda a, b: {True: 1, False: -1}[a[1][0] > b[1][0]])
-    heldNotes = []
-
-    for difficulty, event in events:
-      time, event = event
-      if isinstance(event, Note):
-        time = self.midiTime(time)
-
-        # Turn off any held notes that were active before this point in time
-        for note, endTime in list(heldNotes):
-          if endTime <= time:
-            self.out.update_time(endTime, relative = 0)
-            self.out.note_off(0, note)
-            heldNotes.remove((note, endTime))
-
-        note = reverseNoteMap[(difficulty, event.number)]
-        self.out.update_time(time, relative = 0)
-        self.out.note_on(0, note, event.special and 127 or 100)
-        heldNotes.append((note, time + self.midiTime(event.length)))
-        heldNotes.sort(lambda a, b: {True: 1, False: -1}[a[1] > b[1]])
-
-    # Turn off any remaining notes
-    for note, endTime in heldNotes:
-      self.out.update_time(endTime, relative = 0)
-      self.out.note_off(0, note)
-      
-    self.out.update_time(0)
-    self.out.end_of_track()
-    self.out.eof()
-    self.out.write()
 
 class ScriptReader:
   def __init__(self, song, scriptFile):
@@ -3989,10 +3886,7 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
 
   if songFile != None and guitarFile != None:
     #check for the same file
-    songStat = os.stat(songFile)
-    guitarStat = os.stat(guitarFile)
-    #Simply checking file size, no md5
-    if songStat.st_size == guitarStat.st_size:
+    if hashlib.sha1(open(songFile, 'rb').read()).hexdigest() == hashlib.sha1(open(guitarFile, 'rb').read()).hexdigest():
       guitarFile = None
 
 
@@ -4064,46 +3958,6 @@ def loadSongInfo(engine, name, library = DEFAULT_LIBRARY):
   infoFile   = engine.resource.fileName(library, name, "song.ini", writable = True)
   return SongInfo(infoFile, library)
   
-def createSong(engine, name, guitarTrackName, backgroundTrackName, rhythmTrackName = None, library = DEFAULT_LIBRARY):
-  #RF-mod (not needed?)
-  path = os.path.abspath(engine.resource.fileName(library, name, writable = True))
-  os.makedirs(path)
-  
-  guitarFile = engine.resource.fileName(library, name, "guitar.ogg", writable = True)
-  songFile   = engine.resource.fileName(library, name, "song.ogg",   writable = True)
-  noteFile   = engine.resource.fileName(library, name, "notes.mid",  writable = True)
-  infoFile   = engine.resource.fileName(library, name, "song.ini",   writable = True)
-  
-  shutil.copy(guitarTrackName, guitarFile)
-  
-  if backgroundTrackName:
-    shutil.copy(backgroundTrackName, songFile)
-  else:
-    songFile   = guitarFile
-    guitarFile = None
-
-  if rhythmTrackName:
-    rhythmFile = engine.resource.fileName(library, name, "rhythm.ogg", writable = True)
-    shutil.copy(rhythmTrackName, rhythmFile)
-  else:
-    rhythmFile = None
-    
-  f = open(noteFile, "wb")
-  m = midi.MidiOutFile(f)
-  m.header()
-  m.start_of_track()
-  m.update_time(0)
-  m.end_of_track()
-  m.eof()
-  m.write()
-  f.close()
-
-  song = Song(engine, infoFile, songFile, guitarFile, rhythmFile, noteFile)
-  song.info.name = name
-  song.save()
-  
-  return song
-
 def getDefaultLibrary(engine):
   return LibraryInfo(DEFAULT_LIBRARY, engine.resource.fileName(DEFAULT_LIBRARY, "library.ini"))
 
@@ -4184,13 +4038,8 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
   for name in names:
     progressCallback(len(songs)/float(len(names)))
     songs.append(SongInfo(engine.resource.fileName(library, name, "song.ini", writable = True), library, allowCacheUsage=True))
-  if len(songs) and canCache and Config.get("performance", "cache_song_metadata"):
-    cache = cacheManager.getCache(songs[0].fileName)
-    if cache != None:
-      #stump: clean up the cache
-      if cache.execute('DELETE FROM `songinfo` WHERE `hash` NOT IN (' + ','.join("'%s'" % s.stateHash for s in songs) + ')').rowcount > 0:
-        cache.execute('VACUUM')  # compact the database if anything was deleted on the previous line
-      cache.commit()  # commit any changes to the cache all at once
+  if Config.get("performance", "cache_song_metadata"):
+    cacheManager.getCache().commit()
   if not includeTutorials:
     songs = [song for song in songs if not song.tutorial]
   songs = [song for song in songs if not song.artist == '=FOLDER=']
