@@ -65,6 +65,8 @@ class Data(object):
       Log.debug("Data class init (Data.py)...")
     self.logLoadings = Config.get("game", "log_loadings")
     
+    self.logImageNotFound = Config.get("log", "log_image_not_found")
+    
     self.resource = resource
     self.svg      = svg
 
@@ -566,7 +568,7 @@ class Data(object):
   def checkImgDrawing(self, fileName):
     return self.getImgDrawing(fileName, False)
   
-  def getImgDrawing(self, fileName, openImage=True):
+  def getImgDrawing(self, fileName, openImage=True, dirLoad=False):
     imgDrawing = None
     for dataPath in self.resource.dataPaths:
       fileName1 = os.path.join(dataPath, fileName)
@@ -599,10 +601,12 @@ class Data(object):
         elif len(files) > 0:
             return True
     #image not found
-    Log.debug("Image not found: %s" % fileName)
+    log = self.logImageNotFound - (dirLoad and 1 or 0)
+    if log > 0:
+      Log.debug("Image not found: %s" % fileName)
     return False
 
-  def loadImgDrawing(self, target, name, fileName, textureSize = None):
+  def loadImgDrawing(self, target, name, fileName, textureSize = None, dirLoad = False):
     """
     Load an SVG drawing synchronously.
 
@@ -613,14 +617,44 @@ class Data(object):
                         be rendered to an x by y texture
     @return:            L{ImgDrawing} instance
     """
-    imgDrawing = self.getImgDrawing(fileName)
+    imgDrawing = self.getImgDrawing(fileName, dirLoad = dirLoad)
     if not imgDrawing:
       return False
-
-    drawing  = self.resource.load(target, name, lambda: imgDrawing, synch = True)
+    
+    if target is not None:
+      drawing  = self.resource.load(target, name, lambda: imgDrawing, synch = True)
+    else:
+      drawing = imgDrawing
     if textureSize:
       drawing.convertToTexture(textureSize[0], textureSize[1])
     return drawing
+  
+  def loadAllImages(self, target, directory, prefix = "img_", textureSize = None): #akedrou
+    """
+    Loads all images found in a folder to a given target.
+    
+    @param target:      An object that will own the drawings
+    @param directory:   The directory that will be searched for image files.
+    @param textureSize: Either None or (x, y), in which case the files will
+                        be rendered to an x by y texture
+    """
+    if not os.path.isdir(os.path.join(self.path, directory)):
+      return None
+    imgDict = {}
+    for file in os.listdir(os.path.join(self.path, directory)):
+      if file == "thumbs.db":
+        continue
+      elif file[0] == ".":
+        continue
+      elif os.path.isdir(os.path.join(self.path, directory, file)):
+        continue
+      name = os.path.splitext(file)[0]
+      name = prefix+name
+      img = self.loadImgDrawing(target, name, os.path.join(directory, file), textureSize, dirLoad = True)
+      if img and target is None:
+        imgDict[name] = img
+    if target is None and len(imgDict) > 0:
+      return imgDict
   
   #glorandwarf: changed name to getPath
   def getPath(self, fileName):

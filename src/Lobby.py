@@ -1,9 +1,11 @@
 #####################################################################
 # -*- coding: iso-8859-1 -*-                                        #
 #                                                                   #
-# Frets on Fire                                                     #
+# Frets on Fire X                                                   #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
 #               2008 rchiav                                         #
+#               2009 Team FoFiX                                     #
+#               2009 akedrou                                        #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -30,8 +32,6 @@ import shutil
 
 from View import Layer
 from Input import KeyListener
-from GameTask import GameTask
-from Session import MessageHandler
 from Language import _
 import Dialogs
 import Player
@@ -40,10 +40,10 @@ import Song
 import Theme
 import Config
 
-class Lobby(Layer, KeyListener, MessageHandler):
-  def __init__(self, engine, session, singlePlayer = False, tutorial = False):
+class Lobby(Layer, KeyListener): #MessageHandler
+  def __init__(self, engine, singlePlayer = False, tutorial = False):
     self.engine       = engine
-    self.session      = session
+    # self.session      = session
     self.isRunning    = False
     self.time         = 0.0
     self.scrolling    = 0
@@ -68,7 +68,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
     self.engine.data.acceptSound.setVolume(sfxVolume)  #MFH
     self.engine.data.cancelSound.setVolume(sfxVolume)  #MFH
     self.fullView     = self.engine.view.geometry[2:4]
-    self.session.broker.addMessageHandler(self)
+    # self.session.broker.addMessageHandler(self)
     self.music        = True
     self.creator      = CreateCharacter(self.engine)
     
@@ -235,24 +235,24 @@ class Lobby(Layer, KeyListener, MessageHandler):
   def shown(self):
     self.engine.input.addKeyListener(self)
     self.isRunning = True
-    if not self.singlePlayer:
-      n = self.session.id or 1
-      name = Dialogs.getText(self.engine, _("Enter your name:"), _("Player #%d") % n)
-      if name:
-        self.session.world.createPlayer(name)
-      else:
-        self.engine.view.popLayer(self)
+    # if not self.singlePlayer:
+      # n = self.session.id or 1
+      # name = Dialogs.getText(self.engine, _("Enter your name:"), _("Player #%d") % n)
+      # if name:
+        # self.session.world.createPlayer(name)
+      # else:
+        # self.engine.view.popLayer(self)
 
   def hidden(self):
     self.engine.input.removeKeyListener(self)
-    self.session.broker.removeMessageHandler(self)
+    # self.session.broker.removeMessageHandler(self)
     if not self.gameStarted:
-      self.session.close()
+      # self.session.close()
       self.engine.view.pushLayer(self.engine.mainMenu)    #rchiav: use already-existing MainMenu instance
 
-  def handleGameStarted(self, sender):
+  def handleGameStarted(self):
     self.gameStarted = True
-    self.engine.addTask(GameTask(self.engine, self.session), synchronized = False)
+    self.engine.gameStarted = True
     self.engine.view.popLayer(self)
 
   def keyPressedSP(self, key, unicode):
@@ -280,7 +280,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
         self.creator.loadPlayer()
         self.engine.view.pushLayer(self.creator)
       elif self.selected > 1:
-        self.session.world.createPlayer(self.options[self.selected])
+        self.engine.world.createPlayer(self.options[self.selected])
         self.engine.config.set("game", "player%d" % self.playerNum, self.options[self.selected])
         self.playerNum += 1
         self.blockedItems.append(self.selected)
@@ -293,9 +293,11 @@ class Lobby(Layer, KeyListener, MessageHandler):
           self.engine.mainMenu.cutMusic()
           if self.tutorial:
             self.engine.config.set("game", "selected_library", "songs")
-            self.session.world.startGame(libraryName = Song.DEFAULT_LIBRARY, songName = "tutorial")
+            self.engine.world.startGame(libraryName = Song.DEFAULT_LIBRARY, songName = "tutorial")
+            self.handleGameStarted()
           else:
-            self.session.world.startGame()
+            self.engine.world.startGame()
+            self.handleGameStarted()
         else:
           default = self.engine.config.get("game","player%d" % self.playerNum)
           self.getStartingSelected(default)
@@ -361,7 +363,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
       self.engine.view.popLayer(self)
     elif (c in [Player.key1s] or key == pygame.K_RETURN) and self.canStartGame():
       self.gameStarted = True
-      self.session.world.startGame()      
+      self.engine.world.startGame()      
     return True
 
   def keyReleased(self, key):
@@ -383,7 +385,8 @@ class Lobby(Layer, KeyListener, MessageHandler):
       self.engine.mainMenu.runMusic()
 
   def canStartGame(self):
-    return len(self.session.world.players) >= self.players and self.session.isPrimary() and not self.gameStarted
+    # return len(self.session.world.players) >= self.players and self.session.isPrimary() and not self.gameStarted
+    return True
   
   def drawNeck(self, w, h, i):
     twoNeck = False
@@ -512,7 +515,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
       glBlendFunc(GL_SRC_ALPHA, GL_ONE)
       glEnable(GL_COLOR_MATERIAL)
 
-      text = _("Lobby (%d players)") % len(self.session.world.players)
+      text = _("Lobby (%d players)") % len(self.engine.world.players)
       w, h = font.getStringSize(text)
 
       x = .5 - w / 2
@@ -536,7 +539,7 @@ class Lobby(Layer, KeyListener, MessageHandler):
       y = .2 + (1 - v) / 4
       glColor4f(1, 1, 1, v)
       
-      for player in self.session.world.players:
+      for player in self.engine.world.players:
         font.render(player.name, (x, y))
         y += .08
 

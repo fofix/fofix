@@ -23,9 +23,6 @@
 
 import gc
 
-import Network
-import Object
-from World import World
 from Task import Task
 import pygame
 import Player

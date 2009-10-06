@@ -24,10 +24,14 @@
 import pygame
 from OpenGL.GL import *
 import sys
-from Texture import Texture, TextureAtlas, TextureAtlasFullException
+from Texture import Texture
 from numpy import array, float32
 
 DEFAULT_SCALE = 0.002
+
+LEFT   = 0
+CENTER = 1
+RIGHT  = 2
 
 class CacheElement(object):
     def __init__(self,content):
@@ -140,13 +144,13 @@ class Font:
     """
     pass
 
-  def render(self, text, pos = (0, 0), direction = (1, 0), scale = DEFAULT_SCALE, shadowoffset = (.0022, .0005)):
+  def render(self, text, pos = (0, 0), rotate = 0, scale = DEFAULT_SCALE, shadowoffset = (.0022, .0005), align = LEFT):
     """
     Draw some text.
 
     @param text:      Text to draw
     @param pos:       Text coordinate tuple (x, y)
-    @param direction: Text direction vector (x, y, z)
+    @param rotate:    Angle to rotate text, in degrees
     @param scale:     Scale factor
     """
     # deufeufeu : new drawing relaying only on pygame.font.render
@@ -168,7 +172,7 @@ class Font:
  
     if not text:
         return
-
+    
     try:
         t,w,h = self.stringsCache.get(text)
     except KeyError:
@@ -184,9 +188,18 @@ class Font:
     x, y = pos
     scale *= self.scale
     w, h = w*scale, h*scale
+    if align == CENTER: #we have already done all the calculating. Why not add this? - akedrou
+      x = x - (w/2)
+    elif align == RIGHT:
+      x = x - w
     tw,th = t.size
     glEnable(GL_TEXTURE_2D)
     glPushMatrix()
+    if rotate:
+      if not isinstance(rotate, tuple):
+        glRotatef(rotate, 0, 0, 1.0)
+      else:
+        glRotatef(0, *rotate)
     glTranslatef(x,y,0)
     t.bind()
     if self.outline:

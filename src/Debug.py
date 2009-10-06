@@ -1,8 +1,10 @@
 #####################################################################
 # -*- coding: iso-8859-1 -*-                                        #
 #                                                                   #
-# Frets on Fire                                                     #
+# Frets on Fire X (FoFiX)                                           #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
+# Copyright (C) 2009 FoFiX Team                                     #
+# Copyright (C) 2009 akedrou                                        #                                     
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -60,16 +62,33 @@ class DebugLayer(Layer):
         
       x, y = (.5, .05)
       font.render("Layers:", (x, y), scale = scale)
-      for layer in self.engine.view.layers + self.engine.view.incoming + self.engine.view.outgoing + self.engine.view.visibility.keys():
-        font.render(self.className(layer), (x + .1, y), scale = scale)
+      for layer in self.engine.view.layers:
+        try:
+          v = self.engine.view.visibility[layer]
+        except KeyError:
+          v = -1
+        font.render("%s - v = %.2f" % (self.className(layer), v), (x + .1, y), scale = scale)
         y += h
-        
+      glColor3f(.25, 1, .75)
+      for layer in self.engine.view.incoming:
+        font.render("Adding %s..."%self.className(layer), (x + .1, y), scale = scale)
+        y += h
+      glColor3f(1, .25, .25)
+      for layer in self.engine.view.outgoing:
+        font.render("Removing %s..."%self.className(layer), (x + .1, y), scale = scale)
+        y += h
+      
+      glColor3f(.25, 1, .25)
       x, y = (.05, .4)
-      font.render("Scenes:", (x, y), scale = scale)
-      if "world" in dir(self.engine.server):
-        for scene in self.engine.server.world.scenes:
-          font.render(self.className(scene), (x + .1, y), scale = scale)
-          y += h
+      font.render("Current Scene:", (x, y), scale = scale)
+      if self.engine.world:
+        text = self.engine.world.sceneName
+        if text == "":
+          text = "None (In Lobby)"
+      else:
+        text = "None (In Menu)"
+      font.render(text, (x + .1, y), scale = scale)
+      y += h
         
       x, y = (.5, .4)
       font.render("Loaders:", (x, y), scale = scale)
@@ -81,9 +100,11 @@ class DebugLayer(Layer):
       font.render("Input:", (x, y), scale = scale)
       for listener in self.engine.input.mouseListeners + \
                       self.engine.input.keyListeners + \
-                      self.engine.input.systemListeners + \
-                      self.engine.input.priorityKeyListeners:
+                      self.engine.input.systemListeners:
         font.render(self.className(listener), (x + .1, y), scale = scale)
+        y += h
+      for listener in self.engine.input.priorityKeyListeners:
+        font.render(self.className(listener)+" (Priority)", (x + .1, y), scale = scale)
         y += h
         
       x, y = (.05, .55)
@@ -91,8 +112,8 @@ class DebugLayer(Layer):
       font.render("%d threads" % threading.activeCount(), (x + .1, y), scale = scale)
       y += h
       font.render("%.2f fps" % self.engine.fpsEstimate, (x + .1, y), scale = scale)
-      y += h
-      font.render("%d sessions, server %s" % (len(self.engine.sessions), self.engine.server and "on" or "off"), (x + .1, y), scale = scale)
+      #y += h
+      #font.render("%d sessions, server %s" % (len(self.engine.sessions), self.engine.server and "on" or "off"), (x + .1, y), scale = scale)
       #y += h
       #font.render("%d gc objects" % len(gc.get_objects()), (x + .1, y), scale = scale)
       #y += h
@@ -175,7 +196,7 @@ class DebugLayer(Layer):
         f.write("\nMod Directory = %s\n" % modDir)
         self.directoryList(f, modDir)
 
-    f.write("\nFretsonfire.ini\n")   
+    f.write("\nFofix.ini\n")   
     engine.config.config.write(f)
 
     # No write() in Theme

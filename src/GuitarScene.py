@@ -30,7 +30,7 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-from Scene import SceneServer, SceneClient, SuppressScene
+from Scene import Scene, SuppressScene
 from Song import Note, Tempo, TextEvent, PictureEvent, loadSong, Bars, VocalNote, VocalPhrase
 from Menu import Menu
 
@@ -76,22 +76,18 @@ from Svg import ImgDrawing
 #blazingamer: Little fix for RB Score font
 from pygame import version
 
-class GuitarScene:
-  pass
-
-class GuitarSceneServer(GuitarScene, SceneServer):
-  pass
-
-class GuitarSceneClient(GuitarScene, SceneClient):
-  def createClient(self, libraryName, songName, Players):
-  
-    if self.engine.createdGuitarScene:  #MFH - dual / triple loading cycle fix
-      Log.warn("Extra GuitarSceneClient was instantiated, but detected and shut down.  Cause unknown.")
+class GuitarScene(Scene):
+  def __init__(self, engine, libraryName, songName):
+    Scene.__init__(self, engine)
+    
+    if self.engine.world.sceneName == "GuitarScene":  #MFH - dual / triple loading cycle fix
+      Log.warn("Extra GuitarScene was instantiated, but detected and shut down.  Cause unknown.")
       raise SuppressScene  #stump
     else:
       self.engine.createdGuitarScene = True
+      self.engine.world.sceneName = "GuitarScene"
 
-    self.playerList   = [self.player]
+    self.playerList   = self.players
 
     self.partyMode = False
     self.battle = False #QQstarS:new2 Bettle
@@ -103,7 +99,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.practiceMode = False
     self.bossBattle = False
     self.ready = False
-    Log.debug("GuitarSceneClient init...")
+    Log.debug("GuitarScene init...")
 
     self.coOpPlayerMeter = 0
 
@@ -128,23 +124,24 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         else:
           phrase = _("Jurgen is watching")
     splash = Dialogs.showLoadingSplashScreen(self.engine, phrase + " \n " + _("Initializing...")) 
+    Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Initializing..."))
       
 
-    self.countdownSeconds = 5   #MFH - don't change this initialization value unless you alter the other related variables to match
-    self.countdown = 10   #MFH - arbitrary value to prevent song from starting right away
+    self.countdownSeconds = 3   #MFH - don't change this initialization value unless you alter the other related variables to match
+    self.countdown = 100   #MFH - arbitrary value to prevent song from starting right away
+    self.countdownOK = False
     
     #MFH - retrieve game parameters:
     self.gamePlayers = self.engine.config.get("game", "players")
     self.gameMode1p = self.engine.config.get("game","game_mode")
     self.gameMode2p = self.engine.config.get("game","multiplayer_mode")
     self.lostFocusPause = self.engine.config.get("game", "lost_focus_pause")
-    Players = self.gamePlayers    #ensure this gets passed correctly
 
-    if self.sinfo.bossBattle == "True" and self.gameMode1p == 2 and Players == 1:
+    if self.sinfo.bossBattle == "True" and self.gameMode1p == 2 and self.gamePlayers == 1:
       self.bossBattle = True
       self.engine.config.set("player1","mode_2p","6")
       self.gameMode2p = 6
-      Players = 2
+      self.gamePlayers = 2
     if self.gameMode1p == 2:
       self.careerMode = True
     else:
@@ -155,13 +152,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     #MFH - check for party mode
     if self.gameMode2p == 2:
       self.partyMode  = True
-      Players         = 1
+      self.gamePlayers      = 1
       self.partySwitch      = 0
       self.partyTime        = self.engine.config.get("game", "party_time")
       self.partyPlayer      = 0
-    elif Players > 1:
-      self.playerList.extend(self.multiplayers)
-      
+    elif self.gamePlayers > 1:
       #MFH - check for battle mode
       if self.gameMode2p == 1:
         self.battle   = True
@@ -205,7 +200,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.coOpGH   = False
         self.coOpType = False
 
-    self.splayers = Players #Spikehead777
+    self.splayers = self.gamePlayers #Spikehead777
 
     #myfingershurt: drums :)
     self.instruments = [] # akedrou - this combines Guitars, Drums, and Vocalists
@@ -974,7 +969,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.counting = self.engine.config.get("video", "counting")
 
 
-    #Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Loading Song..."))
+    Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Loading Song..."))
 
     #MFH - this is where song loading originally took place, and the loading screen was spawned.
     
@@ -1606,9 +1601,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             
     #Pause Screen
     self.engine.loadImgDrawing(self, "pauseScreen", os.path.join("themes",themename,"pause.png"))
-    try:
-      self.engine.loadImgDrawing(self, "failScreen", os.path.join("themes",themename,"fail.png"))
-    except IOError:
+    if not self.engine.loadImgDrawing(self, "failScreen", os.path.join("themes",themename,"fail.png")):
       self.engine.loadImgDrawing(self, "failScreen", os.path.join("themes",themename,"pause.png"))
 
     #failMessage
@@ -1869,8 +1862,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           (_(" QUIT"), self.quit),  #Worldrave - added graphic menu support "fail" for Fail menu in below line.
         ], name = "fail", fadeScreen = False, onCancel = self.changeAfterFail, font = self.engine.data.pauseFont, pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
 
-    FirstTime = True
-    self.restartSong(FirstTime)
+    self.restartSong(firstTime = True)
 
     # hide the splash screen
     Dialogs.hideLoadingSplashScreen(self.engine, splash)
@@ -2303,7 +2295,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.engine.view.popLayer(self.menu)
     self.engine.view.popLayer(self.failMenu)
     self.freeResources()
-    self.session.world.finishGame()
+    self.engine.world.finishGame()
 
   # evilynux - Switch to Practice
   def practiceSong(self):
@@ -2316,8 +2308,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.engine.view.popLayer(self.failMenu)
     self.freeResources()
     self.engine.config.set("game","game_mode", 1)
-    self.session.world.deleteScene(self)
-    self.session.world.createScene("SongChoosingScene")
+    # self.session.world.deleteScene(self)
+    self.engine.world.createScene("SongChoosingScene")
 
   def changeSong(self):
     if self.song:
@@ -2330,8 +2322,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.engine.view.popLayer(self.menu)
     self.engine.view.popLayer(self.failMenu)
     self.freeResources()
-    self.session.world.deleteScene(self)
-    self.session.world.createScene("SongChoosingScene")
+    # self.session.world.deleteScene(self)
+    self.engine.world.createScene("SongChoosingScene")
 
   def changeAfterFail(self):
     if self.song:
@@ -2344,8 +2336,8 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.engine.view.setViewport(1,0)
     self.engine.view.popLayer(self.failMenu)
     self.freeResources()
-    self.session.world.deleteScene(self)
-    self.session.world.createScene("SongChoosingScene")
+    # self.session.world.deleteScene(self)
+    self.engine.world.createScene("SongChoosingScene")
 
   def initBeatAndSpClaps(self):
     ###Capo###
@@ -2363,7 +2355,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     if self.song:
       self.song.readyToGo = False
     #self.countdown = 4.0 * self.songBPS
-    self.countdownSeconds = 5   #MFH - This needs to be reset for song restarts, too!
+    self.countdownSeconds = 3   #MFH - This needs to be reset for song restarts, too!
     self.countdown = float(self.countdownSeconds) * self.songBPS
     self.scaleText = [0.0 for i in self.playerList]
     self.displayText = [None for i in self.playerList]
@@ -3635,7 +3627,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
   def run(self, ticks): #QQstarS: Fix this funcion
     if self.song and self.song.readyToGo and not self.pause and not self.failed:
-      SceneClient.run(self, ticks)
+      Scene.run(self, ticks)
       if not self.resumeCountdown and not self.pause:
         pos = self.getSongPosition()
 
@@ -4156,7 +4148,7 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           self.crowdFaderVolume = 0.0
         self.song.setCrowdVolume(self.crowdFaderVolume)
             
-      if self.countdown > 0: #MFH won't start song playing if you failed or pause
+      if self.countdown > 0 and self.countdownOK: #MFH won't start song playing if you failed or pause
         self.countdown = max(self.countdown - ticks / self.song.period, 0)
         self.countdownSeconds = self.countdown / self.songBPS + 1
         
@@ -5273,9 +5265,9 @@ class GuitarSceneClient(GuitarScene, SceneClient):
           coOpType = 0
 
         self.engine.view.setViewport(1,0)
-        self.session.world.deleteScene(self)
+        #self.session.world.deleteScene(self)
         self.freeResources()
-        self.session.world.createScene("GameResultsScene", libraryName = self.libraryName, songName = self.songName, players = self.playerList, scores = scoreList, coOpType = coOpType, careerMode = self.careerMode)
+        self.engine.world.createScene("GameResultsScene", libraryName = self.libraryName, songName = self.songName, scores = scoreList, coOpType = coOpType, careerMode = self.careerMode)
       
       else:
         self.changeSong()
@@ -5736,19 +5728,18 @@ class GuitarSceneClient(GuitarScene, SceneClient):
       pos = self.getSongPosition()
   
       if self.boardY <= 1:
-        self.boardY == 1
         self.setCamera()
-        readytoscale = True
+        if self.countdown > 0:
+          self.countdownOK = True
+          self.boardY = 1
       elif self.boardY > 1:
         self.boardY -= 0.01
         self.setCamera()
-        readytoscale = False
-        self.countdown = 5
       #self.setCamera()
   
       #Theme.setBaseColor()
 
-      SceneClient.render(self, visibility, topMost) #MFH - I believe this eventually calls the renderGuitar function, which also involves two viewports... may not be easy to move this one...
+      Scene.render(self, visibility, topMost) #MFH - I believe this eventually calls the renderGuitar function, which also involves two viewports... may not be easy to move this one...
         
       self.visibility = v = 1.0 - ((1 - visibility) ** 2)
   

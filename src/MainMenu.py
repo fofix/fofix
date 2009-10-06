@@ -24,22 +24,16 @@
 #####################################################################
 
 from OpenGL.GL import *
-import math
-from FakeNetworking import socket
 
 from View import BackgroundLayer
 from Menu import Menu
 from Lobby import Lobby
-from Svg import ImgDrawing
 from Language import _
 import Dialogs
 import Config
 import Audio
 import Settings
-import datetime
-import sys
 import Theme
-import Player
 import Version
 from Shader import shaders
 
@@ -64,7 +58,8 @@ class MainMenu(BackgroundLayer):
     self.nextLayer           = None
     self.visibility          = 0.0
     self.active              = False
-    Player.practiceMode      = False    
+    
+    self.showStartupMessages = False
 
     #myfingershurt: removing neck menu requirement:
     #self.neckMenuEnabled = False
@@ -184,11 +179,6 @@ class MainMenu(BackgroundLayer):
       self.opt_selected_color = (1,0.75,0)
 
 
-    newMultiplayerMenu = [
-      (_("Host Multiplayer Game"), self.hostMultiplayerGame),
-      (_("Join Multiplayer Game"), self.joinMultiplayerGame),
-    ]
-    
     trainingMenu = [
       (_("Tutorials"), self.showTutorial),
       (_("Practice"), lambda: self.newLocalGame(mode1p = 1)),
@@ -284,7 +274,6 @@ class MainMenu(BackgroundLayer):
 
   def shown(self):
     self.engine.view.pushLayer(self.menu)
-    self.engine.stopServer()
     shaders.checkIfEnabled()
   
   def runMusic(self):
@@ -336,8 +325,8 @@ class MainMenu(BackgroundLayer):
           Log.error("Traceback:" + traceback.format_exc() )
           traceback.print_exc()
           raise
-      except socket.error, e:
-        Dialogs.showMessage(self.engine, unicode(e[1]))
+      # except socket.error, e:
+        # Dialogs.showMessage(self.engine, unicode(e[1]))
       except KeyboardInterrupt:
         pass
       except Exception, e:
@@ -375,11 +364,13 @@ class MainMenu(BackgroundLayer):
     
     #Config.set("game","game_mode", 1) #MFH - don't force practice mode.... this is problematic.
 
-    self.engine.startServer()
-    self.engine.resource.load(self, "session", lambda: self.engine.connect("127.0.0.1"), synch = True)
+    # self.engine.startServer()
+    # self.engine.resource.load(self, "session", lambda: self.engine.connect("127.0.0.1"), synch = True)
+    
+    self.engine.startWorld()
 
-    if Dialogs.showLoadingScreen(self.engine, lambda: self.session and self.session.isConnected):
-      self.launchLayer(lambda: Lobby(self.engine, self.session, singlePlayer = True))
+    # if Dialogs.showLoadingScreen(self.engine, lambda: self.session and self.session.isConnected):
+    self.launchLayer(lambda: Lobby(self.engine, singlePlayer = True))
   showTutorial = catchErrors(showTutorial)
 
   #MFH: adding deprecated support for EOF's method of quickstarting a song to test it
@@ -404,38 +395,50 @@ class MainMenu(BackgroundLayer):
     #MFH - testing new traceback logging:
     #raise TypeError
 
-    if self.engine.isServerRunning():
-      return
-    self.engine.startServer()
-    self.engine.resource.load(self, "session", lambda: self.engine.connect("127.0.0.1"), synch = True)
+    # if self.engine.isServerRunning():
+      # return
+    # self.engine.startServer()
+    # self.engine.resource.load(self, "session", lambda: self.engine.connect("127.0.0.1"), synch = True)
     
-    if Dialogs.showLoadingScreen(self.engine, lambda: self.session and self.session.isConnected):
-      self.launchLayer(lambda: Lobby(self.engine, self.session, singlePlayer = True))
+    self.engine.startWorld()
+    
+    # if Dialogs.showLoadingScreen(self.engine, lambda: self.session and self.session.isConnected):
+    self.launchLayer(lambda: Lobby(self.engine, singlePlayer = True))
   newLocalGame = catchErrors(newLocalGame)
+  
+  def showMessages(self):
+    msg = self.engine.startupMessages.pop()
+    self.showStartupMessages = False
+    Dialogs.showMessage(self.engine, msg)
+  
+  # def hostMultiplayerGame(self):
+    # self.engine.startServer()
+    # self.engine.resource.load(self, "session", lambda: self.engine.connect("127.0.0.1"))
 
-  def hostMultiplayerGame(self):
-    self.engine.startServer()
-    self.engine.resource.load(self, "session", lambda: self.engine.connect("127.0.0.1"))
+    # if Dialogs.showLoadingScreen(self.engine, lambda: self.session and self.session.isConnected):
+      # self.launchLayer(lambda: Lobby(self.engine, self.session))
+  # hostMultiplayerGame = catchErrors(hostMultiplayerGame)
 
-    if Dialogs.showLoadingScreen(self.engine, lambda: self.session and self.session.isConnected):
-      self.launchLayer(lambda: Lobby(self.engine, self.session))
-  hostMultiplayerGame = catchErrors(hostMultiplayerGame)
+  # def joinMultiplayerGame(self, address = None):
+    # if not address:
+      # address = Dialogs.getText(self.engine, _("Enter the server address:"), "127.0.0.1")
 
-  def joinMultiplayerGame(self, address = None):
-    if not address:
-      address = Dialogs.getText(self.engine, _("Enter the server address:"), "127.0.0.1")
-
-    if not address:
-      return
+    # if not address:
+      # return
     
-    self.engine.resource.load(self, "session", lambda: self.engine.connect(address))
+    # self.engine.resource.load(self, "session", lambda: self.engine.connect(address))
 
-    if Dialogs.showLoadingScreen(self.engine, lambda: self.session and self.session.isConnected, text = _("Connecting...")):
-      self.launchLayer(lambda: Lobby(self.engine, self.session))
-  joinMultiplayerGame = catchErrors(joinMultiplayerGame)
+    # if Dialogs.showLoadingScreen(self.engine, lambda: self.session and self.session.isConnected, text = _("Connecting...")):
+      # self.launchLayer(lambda: Lobby(self.engine, self.session))
+  # joinMultiplayerGame = catchErrors(joinMultiplayerGame)
 
   def run(self, ticks):
     self.time += ticks / 50.0
+    if self.showStartupMessages:
+      self.showMessages()
+    if len(self.engine.startupMessages) > 0:
+      self.showStartupMessages = True
+    
     if self.engine.cmdPlay == 1:
       self.engine.cmdPlay = 4
     elif self.engine.cmdPlay == 4: #this frame runs the engine an extra loop to allow the font to load...
@@ -445,8 +448,7 @@ class MainMenu(BackgroundLayer):
     elif self.engine.cmdPlay == 3:
       self.quit()
     
-    
-    if self.menumusic:  #MFH 
+    if (not self.engine.world) or (not self.engine.world.scene):  #MFH 
       self.runMusic()
     
     

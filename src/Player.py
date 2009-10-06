@@ -899,13 +899,12 @@ def setNewKeyMapping(engine, config, section, option, key):
   #----------------------------------------------------------
 
 class Player(object):
-  def __init__(self, owner, name, number):
+  def __init__(self, name, number):
 
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("Player class init (Player.py)...")
 
-    self.owner    = owner
     self.name     = name
     
     self.reset()

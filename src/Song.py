@@ -3737,54 +3737,36 @@ class SongQueue:
   def __init__(self):
     self.songName = []
     self.library = []
-    self.players = []
-    self.difficulty1 = []
-    self.difficulty2 = []
-    self.part1 = []
-    self.part2 = []     
+    self.diffs = []
+    self.parts = [] 
 
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("SongQueue class init (song.py)...")
-        
-  def addSong(self, songName, library, players, difficulty1, difficulty2, part1, part2):
+
+  def __len__(self):
+    return len(self.songName)
+  
+  def addSong(self, songName, library):
     self.songName.append(songName)
     self.library.append(library)
-    self.players.append(players)
-    self.difficulty1.append(difficulty1)
-    self.difficulty2.append(difficulty2)
-    self.part1.append(part1)
-    self.part2.append(part2)
   
-  def nextSong(self, counter): #should be called getSong now, but don't know how to refactor in python
-    nextSong = [self.songName[counter], self.library[counter], self.players[counter], 
-                self.difficulty1[counter], self.difficulty2[counter], 
-                self.part1[counter], self.part2[counter]]
-    return nextSong
+  def getSong(self):
+    song = self.songName.pop(0)
+    library = self.library.pop(0)
+    return song, library
   
-  def load(self, engine, loadfile):        
-    path = os.path.abspath(engine.resource.loadfile("queues", loadame))
-    self = pickle.load("%s%s" %path %loadfile)
+  def getParts(self):
+    return self.parts
   
-  def save(self, engine, fileName):
-    if not fileName:
-        return False
-    path = os.path.abspath(engine.resource.fileName("queues", fileName))
-    if os.path.isdir(path):
-        return False
-    savefile = open(("%(p)s%(f)s.que") % {"p" : path, "f": fileName}, "w")
-    pickle.dump(self, savefile)
-    savefile.close
-    return True
+  def getDiffs(self):
+    return self.diffs
   
   def reset(self):
     self.songName = []
     self.library = []
-    self.players = []
-    self.difficulty1 = []
-    self.difficulty2 = []
-    self.part1 = []
-    self.part2 = [] 
+    self.diffs = []
+    self.parts = []
 
 class MidiPartsDiffReader(midi.MidiOutStream):
   
@@ -4285,21 +4267,16 @@ def getSortingTitles(engine, songList = []):
         titles.append(songItem.artist.lower())
         sortTitles.append(SortTitleInfo(songItem.artist))
     elif sortOrder == 0:
+      name = removeSongOrderPrefixFromName(songItem.name)
+      if name[0].isdigit():
+        sortName = "123"
+      elif not name[0].isalnum():
+        sortName = "!@#"
+      else:
+        sortName = name[0].lower()
       try:
-        if songItem.name[0].isdigit():
-          sortName = "123"
-        elif not songItem.name[0].isalnum():
-          sortName = "!@#"
-        else:
-          sortName = songItem.name[0].lower()
         titles.index(sortName)
       except ValueError:
-        if songItem.name[0].isdigit():
-          sortName = "123"
-        elif not songItem.name[0].isalnum():
-          sortName = "!@#"
-        else:
-          sortName = songItem.name[0].lower()
         titles.append(sortName)
         sortTitles.append(SortTitleInfo(sortName.upper()))
     elif sortOrder == 2:
@@ -4380,67 +4357,58 @@ def getAvailableTitles(engine, library = DEFAULT_LIBRARY):
   return titles
   
 def getAvailableSongsAndTitles(engine, library = DEFAULT_LIBRARY, includeTutorials = False, progressCallback = lambda p: None):
-  listingMode = engine.config.get("game","song_listing_mode")
+
+  #NOTE: list-all mode and career modes are BROKEN as of now
+  #listingMode = engine.config.get("game","song_listing_mode")
   if library == None:
     return []
 
   #MFH - Career Mode determination:
-  gameMode1p = engine.config.get("game","game_mode")
-  if gameMode1p == 2:
-    careerMode = True
-    quickPlayMode = False
-  else:
-    careerMode = False
-    if gameMode1p == 0:
-      quickPlayMode = True
-    else:
-      quickPlayMode = False
-      
+  careerMode = (engine.config.get("game","game_mode") == 2)
+  career = False
   quickPlayCareerTiers = engine.config.get("game", "quickplay_tiers")
 
-
-  if listingMode == 0 or careerMode:
-    items = getAvailableSongs(engine, library, includeTutorials, progressCallback=progressCallback)
-    if quickPlayMode and quickPlayCareerTiers == 0:
-      titles = []
-    else:
-      if quickPlayCareerTiers == 1 or careerMode:
-        titles = getAvailableTitles(engine, library)
-      else:
-        titles = getSortingTitles(engine, items)
-    items = items + titles
+  #if listingMode == 0 or careerMode:
+  items = getAvailableSongs(engine, library, includeTutorials, progressCallback=progressCallback)
+  if quickPlayCareerTiers == 1 or careerMode:
+    titles = getAvailableTitles(engine, library)
+  if titles == []:
+    titles = getSortingTitles(engine, items)
   else:
-    items = []
-    titles = []
-    rootDir = engine.resource.fileName(DEFAULT_LIBRARY)
+    career = True
+  items = items + titles
+  # else:
+    # items = []
+    # titles = []
+    # rootDir = engine.resource.fileName(DEFAULT_LIBRARY)
 
-    items = getAvailableSongs(engine, rootDir, includeTutorials, progressCallback=progressCallback)
-    for root, subFolders, files in os.walk(rootDir):
-      for folder in subFolders:
-        libName = os.path.join(root,folder)
-        items = items + getAvailableSongs(engine, libName, includeTutorials, progressCallback=progressCallback)
-        if quickPlayMode and quickPlayCareerTiers == 0:
-          titles = []
-        else:
-          if quickPlayCareerTiers == 1:
-            titles = titles + getAvailableTitles(engine, libName)
-    if quickPlayCareerTiers == 2:
-      titles = getSortingTitles(engine, items)
-    items = items + titles
+    # items = getAvailableSongs(engine, rootDir, includeTutorials, progressCallback=progressCallback)
+    # for root, subFolders, files in os.walk(rootDir):
+      # for folder in subFolders:
+        # libName = os.path.join(root,folder)
+        # items = items + getAvailableSongs(engine, libName, includeTutorials, progressCallback=progressCallback)
+        # if quickPlayMode and quickPlayCareerTiers == 0:
+          # titles = []
+        # else:
+          # if quickPlayCareerTiers == 1:
+            # titles = titles + getAvailableTitles(engine, libName)
+    # if quickPlayCareerTiers == 2:
+      # titles = getSortingTitles(engine, items)
+    # items = items + titles
         
-  items.sort(lambda a, b: compareSongsAndTitles(engine, a, b))
+  items.sort(lambda a, b: compareSongsAndTitles(engine, a, b, career))
   
   
-  if quickPlayMode and len(items) != 0:
+  if (not careerMode) and len(items) != 0:
     items.insert(0, RandomSongInfo())
 
-  if careerMode and titles != []:
-    items.append(BlankSpaceInfo())
-    items.append(CareerResetterInfo())
+  # if careerMode and titles != []:
+    # items.append(BlankSpaceInfo())
+    # items.append(CareerResetterInfo())
   
   return items
   
-def compareSongsAndTitles(engine, a, b):
+def compareSongsAndTitles(engine, a, b, career):
   #MFH - want to push all non-career songs in a folder below all titles and career songs
   
   #When an unlock_id does not exist in song.ini, a blank string "" value is returned.
@@ -4454,8 +4422,6 @@ def compareSongsAndTitles(engine, a, b):
   #>>>    else: # x<y
   #>>>       return -1
 
-  #MFH - Career Mode determination:
-  gameMode1p = engine.config.get("game","game_mode")
   order = engine.config.get("game", "sort_order")
   
   #MFH - must check here for an invalid Sort Order setting and correct it!
@@ -4467,57 +4433,47 @@ def compareSongsAndTitles(engine, a, b):
   instrument = engine.config.get("game", "songlist_instrument")
   theInstrumentDiff = instrumentDiff[instrument]
   direction = engine.config.get("game", "sort_direction")
-  if gameMode1p == 2:
-    careerMode = True
-    quickPlayMode = False
-  else:
-    careerMode = False
-    #if gameMode1p == 0: #akedrou - different sorting for practice mode and quickplay mode??
-    quickPlayMode = True
-    #else:
-    #  quickPlayMode = False
-      
-  quickPlayCareerTiers = engine.config.get("game", "quickplay_tiers")
-  if quickPlayMode and quickPlayCareerTiers == 0:
-    if direction == 0:
-      if order == 1:
-        return cmp(a.artist.lower(), b.artist.lower())
-      elif order == 2:
-        return cmp(int(b.count+str(0)), int(a.count+str(0)))
-      elif order == 0:
-        return cmp(removeSongOrderPrefixFromName(a.name).lower(), removeSongOrderPrefixFromName(b.name).lower())
-      elif order == 3:
-        return cmp(a.album.lower(), b.album.lower())
-      elif order == 4:
-        return cmp(a.genre.lower(), b.genre.lower())
-      elif order == 5:
-        return cmp(a.year.lower(), b.year.lower())
-      elif order == 6:
-        return cmp(a.diffSong, b.diffSong)
-      elif order == 7:
-        return cmp(theInstrumentDiff(a), theInstrumentDiff(b))
-      elif order == 8:
-        return cmp(a.icon.lower(), b.icon.lower())
-    else:
-      if order == 1:
-        return cmp(b.artist.lower(), a.artist.lower())
-      elif order == 2:
-        return cmp(int(a.count+str(0)), int(b.count+str(0)))
-      elif order == 0:
-        return cmp(removeSongOrderPrefixFromName(b.name).lower(), removeSongOrderPrefixFromName(a.name).lower())
-      elif order == 3:
-        return cmp(b.album.lower(), a.album.lower())
-      elif order == 4:
-        return cmp(b.genre.lower(), a.genre.lower())
-      elif order == 5:
-        return cmp(b.year.lower(), a.year.lower())
-      elif order == 6:
-        return cmp(b.diffSong, a.diffSong)
-      elif order == 7:
-        return cmp(theInstrumentDiff(a), theInstrumentDiff(b))
-      elif order == 8:
-        return cmp(b.icon.lower(), a.icon.lower())
-  elif gameMode1p != 2 and quickPlayCareerTiers == 2:
+  
+  # if (not careerMode) and quickPlayCareerTiers == 0:
+    # if direction == 0:
+      # if order == 1:
+        # return cmp(a.artist.lower(), b.artist.lower())
+      # elif order == 2:
+        # return cmp(int(b.count+str(0)), int(a.count+str(0)))
+      # elif order == 0:
+        # return cmp(removeSongOrderPrefixFromName(a.name).lower(), removeSongOrderPrefixFromName(b.name).lower())
+      # elif order == 3:
+        # return cmp(a.album.lower(), b.album.lower())
+      # elif order == 4:
+        # return cmp(a.genre.lower(), b.genre.lower())
+      # elif order == 5:
+        # return cmp(a.year.lower(), b.year.lower())
+      # elif order == 6:
+        # return cmp(a.diffSong, b.diffSong)
+      # elif order == 7:
+        # return cmp(theInstrumentDiff(a), theInstrumentDiff(b))
+      # elif order == 8:
+        # return cmp(a.icon.lower(), b.icon.lower())
+    # else:
+      # if order == 1:
+        # return cmp(b.artist.lower(), a.artist.lower())
+      # elif order == 2:
+        # return cmp(int(a.count+str(0)), int(b.count+str(0)))
+      # elif order == 0:
+        # return cmp(removeSongOrderPrefixFromName(b.name).lower(), removeSongOrderPrefixFromName(a.name).lower())
+      # elif order == 3:
+        # return cmp(b.album.lower(), a.album.lower())
+      # elif order == 4:
+        # return cmp(b.genre.lower(), a.genre.lower())
+      # elif order == 5:
+        # return cmp(b.year.lower(), a.year.lower())
+      # elif order == 6:
+        # return cmp(b.diffSong, a.diffSong)
+      # elif order == 7:
+        # return cmp(theInstrumentDiff(a), theInstrumentDiff(b))
+      # elif order == 8:
+        # return cmp(b.icon.lower(), a.icon.lower())
+  if not career:# and quickPlayCareerTiers == 2:
     Aval = ""
     Bval = ""
     if isinstance(a, SongInfo):
@@ -4599,7 +4555,6 @@ def compareSongsAndTitles(engine, a, b):
       return 1
     else:
       return cmp(a.name, b.name)
-
   else:
     #Log.debug("Unlock IDs found, a=" + str(a.getUnlockID()) + ", b=" + str(b.getUnlockID()) )
     if a.getUnlockID() == "" and b.getUnlockID() != "":   #MFH - a is a bonus song, b is involved in career mode

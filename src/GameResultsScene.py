@@ -27,7 +27,7 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-from Scene import SceneServer, SceneClient
+from Scene import Scene, SuppressScene
 import Player
 import Scorekeeper
 import Dialogs
@@ -57,20 +57,21 @@ import random
 import os
 from OpenGL.GL import *
 
-
-class GameResultsScene:
-  pass
-
-class GameResultsSceneServer(GameResultsScene, SceneServer):
-  pass
-
-class GameResultsSceneClient(GameResultsScene, SceneClient):
-  def createClient(self, libraryName, songName, players = 1, scores = None, coOpType = False, careerMode = False):
-  
+class GameResultsScene(Scene):
+  def __init__(self, engine, libraryName, songName, scores = None, coOpType = False, careerMode = False):
+    Scene.__init__(self, engine)
+    
+    if self.engine.world.sceneName == "GameResultsScene":  #MFH - dual / triple loading cycle fix
+      Log.warn("Extra GameResultsScene was instantiated, but detected and shut down.  Cause unknown.")
+      raise SuppressScene  #stump
+    else:
+      self.engine.world.sceneName = "GameResultsScene"
+    
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
     if self.logClassInits == 1:
-      Log.debug("GameResultsSceneClient class init...")
+      Log.debug("GameResultsScene class init...")
     
+    players = self.players
     if coOpType > 0:
       self.scoring        = [scores.pop()]
       self.coOpScoring    = scores
@@ -120,14 +121,13 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.uploadResult     = None # holder for response.
     self.resultNum        = 0    # holder for response
     self.hsRollIndex      = 0
-    self.nextScene        = None
     self.offset           = 0.0
     self.pctRoll          = 0.0
     self.vis              = 1.0
     self.pauseScroll      = 0
     self.careerStars      = self.engine.config.get("game", "career_star_min")
     self.detailedScores   = False #to do.
-    self.playerList       = players
+    self.playerList       = self.players
     self.resultStar       = [float(i) for i in Theme.result_star]
     
     self.scoreScrollStartOffset = .8
@@ -382,7 +382,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.resultNum += 1
   
   def keyPressed(self, key, unicode):
-    ret = SceneClient.keyPressed(self, key, unicode)
+    ret = Scene.keyPressed(self, key, unicode)
     c = self.controls.keyPressed(key)
     
     if self.song and (c in self.progressKeys or key == pygame.K_RETURN or key == pygame.K_ESCAPE):
@@ -417,30 +417,25 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
         self.engine.view.pushLayer(self.menu)
         self.resultStep += 1
   
-  def hidden(self):
-    SceneClient.hidden(self)
-    if self.nextScene:
-      self.nextScene()
-  
   def quit(self):
     self.background = None
     self.song = None
     self.engine.view.popLayer(self.menu)
-    self.session.world.finishGame()
+    self.engine.world.finishGame()
   
   def replay(self):
     self.background = None
     self.song = None
     self.engine.view.popLayer(self.menu)
-    self.session.world.deleteScene(self)
-    self.nextScene = lambda: self.session.world.createScene("GuitarScene", libraryName = self.libraryName, songName = self.songName, Players = len(self.playerList))
+    # self.session.world.deleteScene(self)
+    self.engine.world.createScene("GuitarScene", libraryName = self.libraryName, songName = self.songName, Players = len(self.playerList))
   
   def changeSong(self):
     self.background = None
     self.song = None
     self.engine.view.popLayer(self.menu)
-    self.session.world.deleteScene(self)
-    self.nextScene = lambda: self.session.world.createScene("SongChoosingScene")
+    # self.session.world.deleteScene(self)
+    self.engine.world.createScene("SongChoosingScene")
   
   def stats(self):
     self.detailedScores = True
@@ -573,7 +568,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
     self.nextHighScore()
   
   def run(self, ticks):
-    SceneClient.run(self, ticks)
+    Scene.run(self, ticks)
     
     self.time           += ticks / 50.0
     self.counter        += ticks
@@ -768,7 +763,7 @@ class GameResultsSceneClient(GameResultsScene, SceneClient):
   
   def render(self, visibility, topMost):
     self.engine.view.setViewport(1,0)
-    SceneClient.render(self, visibility, topMost)
+    Scene.render(self, visibility, topMost)
     
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)

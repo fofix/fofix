@@ -32,6 +32,13 @@ import Log
 from Task import Task
 
 class Layer(Task):
+  def __getattr__(self, name): #for new out-themed rendering
+    if name.startswith("img_"):
+      return None
+    else:
+      e = str(self.__class__).split(".")[1] + " has no attribute '%s'" % name
+      raise AttributeError(e)
+  
   def render(self, visibility, topMost):
     pass
     

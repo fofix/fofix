@@ -28,6 +28,7 @@ from OpenGL.GL.ARB.multisample import *
 import Image
 import Log
 import struct
+from Language import _
 
 class Video:
   def __init__(self, caption = "Game", icon = None):
@@ -37,7 +38,7 @@ class Video:
     self.fullscreen   = False
     self.flags        = True
     self.multisamples = 0
-    
+    self.error        = []
     self.default      = False
 
   def setMode(self, resolution, fullscreen = False, flags = pygame.OPENGL | pygame.DOUBLEBUF,
@@ -147,6 +148,7 @@ class Video:
   
   def resolutionReset(self):
     Log.warn("Video setup failed. Trying default windowed resolution.")
+    self.error.append(_("Video setup failed with your resolution settings, and so were reset to defaults."))
     if self.fullscreen:
       self.flags ^= pygame.FULLSCREEN
       self.fullscreen = False

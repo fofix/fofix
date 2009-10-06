@@ -4,6 +4,8 @@
 # Frets on Fire X (FoFiX)                                           #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
 #               2008 evilynux <evilynux@gmail.com>                  #
+#               2009 FoFiX Team                                     #
+#               2009 akedrou                                        #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -37,6 +39,7 @@ assert codecs.lookup("utf-8")
 import Config
 from GameEngine import GameEngine
 from MainMenu import MainMenu
+from Language import _
 import Log
 import Version
 
@@ -134,16 +137,17 @@ def main():
     if theme != None:
       Config.set("coffee", "themename", theme)
     
+    engine = GameEngine(config)
+    engine.cmdPlay = 0
+    
     if playing != None:
       library = Config.get("game","base_library")
       basefolder = os.path.join(Version.dataPath(),library,"songs",playing)
       if not (os.path.exists(os.path.join(basefolder, "song.ini")) and (os.path.exists(os.path.join(basefolder, "notes.mid")) or os.path.exists(os.path.join(basefolder, "notes-unedited.mid"))) and (os.path.exists(os.path.join(basefolder, "song.ogg")) or os.path.exists(os.path.join(basefolder, "guitar.ogg")))):
         Log.warn("Song directory provided ('%s') is not a valid song directory. Starting up FoFiX in standard mode." % playing)
+        engine.startupMessages.append(_("Song directory provided ('%s') is not a valid song directory. Starting up FoFiX in standard mode.") % playing)
         playing = None
 
-    engine = GameEngine(config)
-    engine.cmdPlay = 0
-    
     if playing != None:
       Config.set("game", "selected_library", "songs")
       Config.set("game", "selected_song", playing)

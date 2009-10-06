@@ -939,6 +939,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "log",   "log_unedited_midis", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "log",   "log_lyric_events", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "log",   "log_tempo_events", autoApply = True),#myfingershurt
+      ConfigChoice(engine, engine.config, "log",   "log_image_not_found", autoApply = True),
     ]
     self.logfileSettingsMenu = Menu.Menu(engine, self.logfileSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
 
@@ -965,23 +966,25 @@ class SettingsMenu(Menu.Menu):
 
     self.listSettings = [
       (_("Change Setlist Path >"), self.baseLibrarySelect, _("Set the path to a folder named 'songs' that contains your songs.")),
-      ConfigChoice(engine, engine.config, "coffee", "song_display_mode", autoApply = True),
+      #ConfigChoice(engine, engine.config, "coffee", "song_display_mode", autoApply = True),
       ConfigChoice(engine, engine.config, "game",  "sort_order", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "sort_direction", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "song_listing_mode", autoApply = True, isQuickset = 2),
+      #ConfigChoice(engine, engine.config, "game", "song_listing_mode", autoApply = True, isQuickset = 2),
       ConfigChoice(engine, engine.config, "game", "quickplay_tiers", autoApply = True),  #myfingershurt
       ConfigChoice(engine, engine.config, "coffee", "songfilepath", autoApply = True),
       #(_("Select List All Folder >"), self.listAllFolderSelect), #- Not Working Yet - Qstick
       ConfigChoice(engine, engine.config, "game", "songcovertype", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "songlistrotation", autoApply = True, isQuickset = 1),
-      ConfigChoice(engine, engine.config, "performance", "disable_librotation", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "song_icons", autoApply = True),
+      #ConfigChoice(engine, engine.config, "game", "songlistrotation", autoApply = True, isQuickset = 1),
+      #ConfigChoice(engine, engine.config, "performance", "disable_librotation", autoApply = True),
+      #ConfigChoice(engine, engine.config, "game", "song_icons", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "queue_parts", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "queue_diff", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "preload_labels", autoApply = True),
       ConfigChoice(engine, engine.config, "audio", "disable_preview", autoApply = True),  #myfingershurt
       ConfigChoice(engine, engine.config, "game", "songlist_instrument", autoApply = True), #MFH
       ConfigChoice(engine, engine.config, "game", "songlist_difficulty", autoApply = True), #evilynux
       ConfigChoice(engine, engine.config, "game",  "whammy_changes_sort_order", autoApply = True), #stump
-      ConfigChoice(engine, engine.config, "game", "songlist_extra_stats", autoApply = True), #evilynux
+      #ConfigChoice(engine, engine.config, "game", "songlist_extra_stats", autoApply = True), #evilynux
       ConfigChoice(engine, engine.config, "game", "HSMovement", autoApply = True), #racer
       ConfigChoice(engine, engine.config, "performance", "disable_libcount", autoApply = True, isQuickset = 1), 
       ConfigChoice(engine, engine.config, "performance", "cache_song_metadata", autoApply = True, isQuickset = 1), #stump
@@ -1293,13 +1296,13 @@ class BasicSettingsMenu(Menu.Menu):
 
     listSettings = [
       (_("Change Setlist Path >"), self.baseLibrarySelect, _("Set the path to a folder named 'songs' that contains your songs.")),
-      ConfigChoice(engine, engine.config, "coffee", "song_display_mode", autoApply = True),
+      #ConfigChoice(engine, engine.config, "coffee", "song_display_mode", autoApply = True),
       ConfigChoice(engine, engine.config, "game",  "sort_order", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "sort_direction", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "song_listing_mode", autoApply = True, isQuickset = 2),
+      #ConfigChoice(engine, engine.config, "game", "song_listing_mode", autoApply = True, isQuickset = 2),
       ConfigChoice(engine, engine.config, "game", "quickplay_tiers", autoApply = True),  #myfingershurt
       ConfigChoice(engine, engine.config, "game", "songcovertype", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "song_icons", autoApply = True),
+      #ConfigChoice(engine, engine.config, "game", "song_icons", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "songlist_instrument", autoApply = True), #MFH
       ConfigChoice(engine, engine.config, "game", "songlist_difficulty", autoApply = True), #evilynux
     ]
@@ -1624,8 +1627,6 @@ class GameSettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "audio",  "delay", autoApply = True),   #myfingershurt: so the a/v delay can be adjusted in-game
       ConfigChoice(engine, engine.config, "game", "stage_rotate_delay", autoApply = True),   #myfingershurt - user defined stage rotate delay
       ConfigChoice(engine, engine.config, "game", "stage_animate_delay", autoApply = True),   #myfingershurt - user defined stage rotate delay
-      #ConfigChoice(engine, engine.config, "player0",  "leftymode", autoApply = True),
-      #ConfigChoice(engine, engine.config, "player1",  "leftymode", autoApply = True), #QQstarS
     ]
     Menu.Menu.__init__(self, engine, settings, pos = (.360, .250), viewSize = 5, textColor = gTextColor, selectedColor = gSelectedColor, showTips = False) #Worldrave- Changed Pause-Submenu Position more centered until i add a theme.ini setting.
 

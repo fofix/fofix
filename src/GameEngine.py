@@ -43,14 +43,14 @@ from View import View
 from Input import Input, KeyListener, SystemEventListener
 from Resource import Resource
 from Data import Data
-from Server import Server
-from Session import ClientSession
+#from Server import Server
+#from Session import ClientSession
+from World import World
 from Svg import SvgContext, ImgDrawing
 #alarian
 #from Song import EAS_DIF, MED_DIF, HAR_DIF, EXP_DIF
 from Debug import DebugLayer
 from Language import _
-import Network
 import Log
 import Config
 import Dialogs
@@ -115,6 +115,8 @@ Config.define("audio",  "stereo",       bool,  True)
 #MFH - Frame Buffer Object support: nevermind, needs GLEWpy and Pyrex and some other such addon...
 #Config.define("opengl",  "supportfbo",       bool,  True)
 
+Config.define("game", "selected_library",  str, "")
+Config.define("game", "selected_song",     str, "")
 
 #used internally:
 Config.define("game",   "players",             int,  1)
@@ -266,7 +268,7 @@ Config.define("game",   "log_starpower_misses",          int, 0,    text = _("Lo
 Config.define("log",   "log_unedited_midis",          int, 0,    text = _("Log Unedited MIDIs"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs when notes-unedited.mid is used. This is unnecessary information."))
 Config.define("log",   "log_lyric_events",          int, 0,    text = _("Log Lyric Events"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs MIDI lyric events. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."))
 Config.define("log",   "log_tempo_events",          int, 0,    text = _("Log Tempo Events"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs MIDI tempo events. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."))
-
+Config.define("log",   "log_image_not_found",       int, 0,    text = _("Log Missing Images"), options = {0: _("No"), 1:_("Only on single images"), 2:_("Always")}, tipText = _("Logs when files loaded are not found. 'Only on single images' skips logging when directories are loaded."))
 
 
 #racer
@@ -306,6 +308,8 @@ Config.define("game", "tut",       bool, False) #-tutorial
 Config.define("video", "counting",       bool, False,     text = _("Show at Song Start"),             options = {True: _("Part"), False: _("Countdown")}, tipText = _("Sets whether to show a countdown or your name and part at the song's start."))
 Config.define("fretboard", "ovrneckoverlay",       bool, True,     text = _("Overdrive Neck"),             options = {True: _("Overlay"), False: _("Replace")}, tipText = _("Sets the style of the Overdrive neck. 'Replace' replaces your neck with the special neck, while 'Overlay' lays the neck over top."))
 
+Config.define("game", "queue_parts", int, 0, text = _("Song Queue Parts"), options = {0: _("Closest Available"), 1: _("Always Ask")}, tipText = _("Choose the behavior when the chosen part is not available in all queued songs. 'Closest Available' will match lead parts to guitar; and bass to rhythm, or guitar if no rhythm parts are available. 'Always Ask' brings up the part select screen."))
+Config.define("game", "queue_diff",  int, 0, text = _("Song Queue Difficulty"), options = {0: _("Closest Down"), 1: _("Closest Up"), 2: _("Always Ask")}, tipText = _("Choose the behavior when the chosen difficulty is not available in all queued songs. 'Closest Up' will prefer a harder difficulty, while 'Closest Down' will prefer an easier one. 'Always Ask' brings up the difficulty select screen."))
 
 Config.define("game",   "note_hit_window",          int, 2,    text = _("Note Hit Window"), options = sortOptionsByKey({0: _("Tightest"), 1: _("Tight"), 2: _("Standard"), 3: _("Wide"), 4: _("Widest")}), tipText = _("Sets how accurate you need to be while playing."))#racer blazingamer
 
@@ -465,9 +469,10 @@ class GameEngine(Engine):
     self.mainMenu = None    #placeholder for main menu object - to prevent reinstantiation
     
     self.createdGuitarScene = False   #MFH - so we only create ONE guitarscene...!
+    self.currentScene = None
     
     self.versionString = version  #stump: other version stuff moved to allow full version string to be retrieved without instantiating GameEngine
-    self.uploadVersion = "%s-3.100" % Version.appNameSexy() #akedrou - the version passed to the upload site.
+    self.uploadVersion = "%s-4.0" % Version.appNameSexy() #akedrou - the version passed to the upload site.
 
     Log.debug(self.versionString + " starting up...")
     Log.debug("Python version: " + sys.version.split(' ')[0])
@@ -537,6 +542,10 @@ class GameEngine(Engine):
     self.cmdPlay           = 0
     self.cmdDiff           = None
     self.cmdPart           = None
+    self.startupMessages   = self.video.error
+    
+    self.gameStarted       = False
+    self.world             = None
 
     #self.audio.pre_open(frequency = frequency, bits = bits, stereo = stereo, bufferSize = bufferSize)
     #self.audio.open(frequency = frequency, bits = bits, stereo = stereo, bufferSize = bufferSize)
@@ -591,6 +600,8 @@ class GameEngine(Engine):
     self.sessions  = []
     self.mainloop  = self.loading
     self.menuMusic = False
+    
+    self.setlistMsg = None
 
     
     # Load game modifications
@@ -772,47 +783,57 @@ class GameEngine(Engine):
     self.view.setGeometry((0, 0, width, height))
     self.svg.setGeometry((0, 0, width, height))
     
-  def isServerRunning(self):
-    return bool(self.server)
+  # def isServerRunning(self):
+    # return bool(self.server)
 
-  def startServer(self):
-    """Start the game server."""
-    if not self.server:
-      Log.debug("Starting server.")
-      self.server = Server(self)
-      self.addTask(self.server, synchronized = False)
+  # def startServer(self):
+    # """Start the game server."""
+    # if not self.server:
+      # Log.debug("Starting server.")
+      # self.server = Server(self)
+      # self.addTask(self.server, synchronized = False)
 
-  def connect(self, host):
-    """
-    Connect to a game server.
+  # def connect(self, host):
+    # """
+    # Connect to a game server.
 
-    @param host:  Name of host to connect to
-    @return:      L{Session} connected to remote server
-    """
-    Log.debug("Connecting to host %s." % host)
-    session = ClientSession(self)
-    session.connect(host)
-    self.addTask(session, synchronized = False)
-    self.sessions.append(session)
-    return session
+    # @param host:  Name of host to connect to
+    # @return:      L{Session} connected to remote server
+    # """
+    # Log.debug("Connecting to host %s." % host)
+    # session = ClientSession(self)
+    # session.connect(host)
+    # self.addTask(session, synchronized = False)
+    # self.sessions.append(session)
+    # return session
 
-  def stopServer(self):
-    """Stop the game server."""
-    if self.server:
-      Log.debug("Stopping server.")
-      self.removeTask(self.server)
-      self.server = None
+  # def stopServer(self):
+    # """Stop the game server."""
+    # if self.server:
+      # Log.debug("Stopping server.")
+      # self.removeTask(self.server)
+      # self.server = None
 
-  def disconnect(self, session):
-    """
-    Disconnect a L{Session}
+  # def disconnect(self, session):
+    # """
+    # Disconnect a L{Session}
 
-    param session:    L{Session} to disconnect
-    """
-    if session in self.sessions:
-      Log.debug("Disconnecting.")
-      self.removeTask(session)
-      self.sessions.remove(session)
+    # param session:    L{Session} to disconnect
+    # """
+    # if session in self.sessions:
+      # Log.debug("Disconnecting.")
+      # self.removeTask(session)
+      # self.sessions.remove(session)
+  
+  def startWorld(self):
+    self.world = World(self)
+  
+  def finishGame(self):
+    self.world.finishGame()
+    self.world = None
+    self.gameStarted = False
+    self.view.pushLayer(self.mainMenu)
+    self.mainMenu.shown()
 
   def loadImgDrawing(self, target, name, fileName, textureSize = None):
     """
@@ -871,26 +892,50 @@ class GameEngine(Engine):
 
   #blazingamer - cleans up the work for rendering an image
   #volshebnyi - now images can be resized to fit to screen
-  def drawImage(self, image, scale, coord, rot = 0, color = (1,1,1,1), rect = (0,1,0,1), stretched = 0, lOffset = 0.0, rOffset = 0.0):
+  def drawImage(self, image, scale, coord, rot = 0, color = (1,1,1,1), rect = (0,1,0,1), stretched = 0, fit = 0, repeat = 0, repeatOffset = 0, lOffset = 0.0, rOffset = 0.0):
     
     image.transform.reset()
     image.transform.rotate(rot)
+    scale = list(scale)
+    coord = list(coord)
     if stretched == 0: #don't sctretch
       image.transform.scale(scale[0],scale[1])
     elif stretched == 1: # fit to width
-      image.transform.scale(scale[0] / image.width1() * 640,scale[1])
+      scale[0] = scale[0] / image.width1() * 640
+      image.transform.scale(scale[0],scale[1])
     elif stretched == 2: # fit to height
-      image.transform.scale(scale[0],scale[1] / image.height1() * 480)
+      scale[1] = scale[1] / image.height1() * 480
+      image.transform.scale(scale[0],scale[1])
     elif stretched == 11: # fit to width and keep ratio
-      image.transform.scale(scale[0] / image.width1() * 640,scale[1] / image.width1() * 640)
+      scale[0] = scale[0] / image.width1() * 640
+      scale[1] = scale[1] / image.width1() * 640
+      image.transform.scale(scale[0],scale[1])
     elif stretched == 12: # fit to height and keep ratio
-      image.transform.scale(scale[0] / image.height1() * 480,scale[1] / image.height1() * 480)
+      scale[0] = scale[0] / image.height1() * 480
+      scale[1] = scale[1] / image.height1() * 480
+      image.transform.scale(scale[0],scale[1])
     else: # fit to screen
-      image.transform.scale(scale[0] / image.width1() * 640,scale[1] / image.height1() * 480)
-    image.transform.translate(coord[0],coord[1])
+      scale[0] = scale[0] / image.width1() * 640
+      scale[1] = scale[1] / image.height1() * 480
+      image.transform.scale(scale[0],scale[1])
+    if fit == 1: #y is on top (not center)
+      coord[1] = coord[1] - ((image.height1() * abs(scale[1]))*.5*(self.view.geometry[3]/float(480)))
+    elif fit == 2: #y is on bottom
+      coord[1] = coord[1] + ((image.height1() * abs(scale[1]))*.5*(self.view.geometry[3]/float(480)))
     if len(color) == 3:
       color = (color[0], color[1], color[2], 1.0)
-    image.draw(color = color, rect = rect, lOffset = lOffset, rOffset = rOffset)
+    if repeat == 1: #repeat-y
+      coord[1] += repeatOffset
+      height = (image.height1() * abs(scale[1]))*(self.view.geometry[3]/float(480))
+      image.transform.translate(coord[0],coord[1])
+      while coord[1] > -height/2.0:
+        if coord[1] < self.view.geometry[3] + (height/2.0):
+          image.draw(color = color, rect = rect, lOffset = lOffset, rOffset = rOffset)
+        coord[1] -= height
+        image.transform.translate(0,-height)
+    else:
+      image.transform.translate(coord[0],coord[1])
+      image.draw(color = color, rect = rect, lOffset = lOffset, rOffset = rOffset)
 
   #blazingamer - simplifies tex rendering
   def draw3Dtex(self, image, vertex, texcoord, coord = None, scale = None, rot = None, color = (1,1,1), multiples = False, alpha = False, depth = False, vertscale = 0):
@@ -1083,9 +1128,8 @@ class GameEngine(Engine):
 
       #stump: reset game state as much as possible
       self.view.popAllLayers()
-      for session in self.sessions:
-        self.disconnect(session)
-      self.stopServer()
+      if self.gameStarted:
+        self.finishGame()
 
       Dialogs.showMessage(self, str(e.__class__.__name__) + ": " + unicode(e))
       self.handlingException = False
