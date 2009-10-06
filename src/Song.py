@@ -4369,6 +4369,7 @@ def getAvailableSongsAndTitles(engine, library = DEFAULT_LIBRARY, includeTutoria
   quickPlayCareerTiers = engine.config.get("game", "quickplay_tiers")
 
   #if listingMode == 0 or careerMode:
+  titles = []
   items = getAvailableSongs(engine, library, includeTutorials, progressCallback=progressCallback)
   if quickPlayCareerTiers == 1 or careerMode:
     titles = getAvailableTitles(engine, library)

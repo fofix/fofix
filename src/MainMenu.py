@@ -350,9 +350,6 @@ class MainMenu(BackgroundLayer):
       Dialogs.showMessage(self.engine, _("No tutorials found!"))
       return
 
-    if self.engine.isServerRunning():
-      return
-
     players = Dialogs.activateControllers(self.engine, 1) #akedrou
     if players == 0:
       return

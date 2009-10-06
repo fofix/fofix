@@ -247,8 +247,9 @@ class SongChoosingScene(Scene):
       if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
         if self.showCareerTiers == 2:
           if isinstance(item, Song.TitleInfo):
-            if isinstance(shownItems[-1], Song.TitleInfo):
-              shownItems.pop()
+            if len(shownItems) > 0:
+              if isinstance(shownItems[-1], Song.TitleInfo):
+                shownItems.pop()
             shownItems.append(item)
           elif isinstance(item, Song.SortTitleInfo):
             continue
@@ -258,8 +259,9 @@ class SongChoosingScene(Scene):
           elif isinstance(item, Song.SortTitleInfo):
             if not self.showSortTiers:
               continue
-            if isinstance(shownItems[-1], Song.SortTitleInfo):
-              shownItems.pop()
+            if len(shownItems) > 0:
+              if isinstance(shownItems[-1], Song.SortTitleInfo):
+                shownItems.pop()
             shownItems.append(item)
       elif isinstance(item, Song.SongInfo):
         if self.careerMode and not self.showLockedSongs:
