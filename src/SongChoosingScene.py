@@ -157,6 +157,7 @@ class SongChoosingScene(Scene):
       return
     
     #begin to load images...
+    self.itemIcons = {}
     if os.path.isdir(os.path.join(Version.dataPath(),"themes",themename,"setlist")):
       self.engine.data.loadAllImages(self, os.path.join("themes",themename,"setlist"))
       if os.path.isdir(os.path.join(Version.dataPath(),"themes",themename,"setlist","icon")):

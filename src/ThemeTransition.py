@@ -28,6 +28,7 @@
 import Config
 import Theme
 import Song
+import Data
 from OpenGL.GL import *
 from OpenGL.GLU import *
 import string
