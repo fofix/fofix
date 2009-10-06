@@ -238,7 +238,8 @@ class SongChoosingScene(Scene):
       self.items = self.libraries + self.songs
     else:
       self.items = self.songs
-    
+    self.itemRenderAngles = [0.0]  * len(self.items)
+    self.itemLabels       = [None] * len(self.items)
     self.searchText       = ""
     
     shownItems = []
@@ -271,6 +272,12 @@ class SongChoosingScene(Scene):
     if len(shownItems) > 0:
       if isinstance(shownItems[-1], Song.TitleInfo) or isinstance(shownItems[-1], Song.SortTitleInfo):
         shownItems.pop()
+    
+    if len(self.items) > 0 and len(shownItems) == 0:
+      msg = _("No songs in this setlist are available to play!")
+      if self.careerMode:
+        msg = msg + " " + _("Make sure you have a working career pack!")
+      Dialogs.showMessage(self.engine, msg)
     
     self.items = shownItems
     
@@ -615,7 +622,6 @@ class SongChoosingScene(Scene):
   
   def freeResources(self):
     self.songs = None
-    self.cassette = None
     self.folder = None
     self.label = None
     self.song = None

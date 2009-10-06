@@ -866,7 +866,7 @@ def renderItem(self, color, label):
     glMatrixMode(GL_MODELVIEW)
     glDisable(GL_TEXTURE_2D)
     if shaders.enable("cd"):
-      self.cassette.render("Mesh_001")
+      self.itemMesh.render("Mesh_001")
       shaders.disable()
 
 def renderLibrary(self, color, label):
