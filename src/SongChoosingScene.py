@@ -241,7 +241,7 @@ class SongChoosingScene(Scene):
             if isinstance(shownItems[-1], Song.TitleInfo):
               shownItems.pop()
             shownItems.append(item)
-          elif isinstance(Song.SortTitleInfo):
+          elif isinstance(item, Song.SortTitleInfo):
             continue
         else:
           if isinstance(item, Song.TitleInfo):
