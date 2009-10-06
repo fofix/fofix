@@ -172,6 +172,14 @@ class SongChoosingScene(Scene):
       self.engine.resource.load(self, "libraryMesh", lambda: Mesh(self.engine.resource.fileName("themes",themename,"setlist","library.dae")), synch = True)
     else:
       self.libraryMesh = None
+    if os.path.exists(os.path.join(Version.dataPath(),"themes",themename,"setlist","label.dae")):
+      self.engine.resource.load(self, "label", lambda: Mesh(self.engine.resource.fileName("themes",themename,"setlist","label.dae")), synch = True)
+    else:
+      self.label = None
+    if os.path.exists(os.path.join(Version.dataPath(),"themes",themename,"setlist","library_label.dae")):
+      self.engine.resource.load(self, "libraryLabel", lambda: Mesh(self.engine.resource.fileName("themes",themename,"setlist","library_label.dae")), synch = True)
+    else:
+      self.libraryLabel = None
     if os.path.exists(os.path.join(Version.dataPath(),"themes",themename,"setlist","tier.dae")):
       self.engine.resource.load(self, "tierMesh", lambda: Mesh(self.engine.resource.fileName("themes",themename,"setlist","tier.dae")), synch = True)
     else:

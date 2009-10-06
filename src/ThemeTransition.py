@@ -853,7 +853,7 @@ def renderItem(self, color, label):
   self.itemMesh.render("Mesh_001")
   glColor3f(.1, .1, .1)
   self.itemMesh.render("Mesh")
-  if label:
+  if label and self.label:
     glEnable(GL_TEXTURE_2D)
     label.bind()
     glColor3f(1, 1, 1)
@@ -886,7 +886,7 @@ def renderLibrary(self, color, label):
   self.libraryMesh.render("Mesh")
 
   # Draw the label if there is one
-  if label:
+  if label and self.libraryLabel:
     glEnable(GL_TEXTURE_2D)
     label.bind()
     glColor3f(1, 1, 1)
