@@ -28,7 +28,6 @@
 import Config
 import Theme
 import Song
-import Data
 from OpenGL.GL import *
 from OpenGL.GLU import *
 import string
@@ -1535,9 +1534,9 @@ def renderSelectedInfo(self):
             font.render("N/A", (.18, .5585 + i*.025), scale = 0.0014)
           elif diff == 6:
             glColor3f(1, 1, 0)  
-            font.render(str(Data.STAR2 * (diff -1)), (.18, 0.5685 + i*.025), scale = 0.003)
+            font.render(str("*" * (diff -1)), (.18, 0.5685 + i*.025), scale = 0.003)
           else:
-            font.render(str(Data.STAR2 * diff + Data.STAR1 * (5 - diff)), (.18, 0.5685 + i*.025), scale = 0.003)
+            font.render(str("*" * diff + " " * (5 - diff)), (.18, 0.5685 + i*.025), scale = 0.003)
         else:
           if diff == -1:
             font.render("N/A", (.18, .5585 + i*.025), scale = 0.0014)
