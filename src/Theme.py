@@ -1061,6 +1061,8 @@ class Theme:
     return (0, 0, 0)
 
   def colorToHex(self, color):
+    if isinstance(color, str):
+      return color
     return "#" + ("".join(["%02x" % int(c * 255) for c in color]))
 
   def packTupleKey(self, key, type = str):

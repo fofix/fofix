@@ -731,7 +731,7 @@ class GuitarScene(Scene):
     self.starFillupCenterY = self.engine.theme.starFillupCenterY
     self.starFillupInRadius = self.engine.theme.starFillupInRadius
     self.starFillupOutRadius = self.engine.theme.starFillupOutRadius
-    self.starFillupColor = self.engine.theme.starFillupColor
+    self.starFillupColor = self.engine.theme.colorToHex(self.engine.theme.starFillupColor)
     self.starContinuousAvailable = self.engine.config.get("performance", "star_continuous_fillup") and \
       None not in (self.starFillupCenterX, self.starFillupCenterY, self.starFillupInRadius, self.starFillupOutRadius, self.starFillupColor)
     self.showBpm = self.engine.config.get("debug",   "show_bpm")    #MFH

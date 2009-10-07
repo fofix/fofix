@@ -585,6 +585,8 @@ class Data(object):
             return imgDrawing
           except IOError:
             Log.warn("Unable to load image file: %s" % fileName1)
+          except OverflowError:
+            Log.warn("Unable to read image file: %s" % fileName1)
         else:
           return True
       else:
@@ -642,7 +644,7 @@ class Data(object):
       return None
     imgDict = {}
     for file in os.listdir(os.path.join(self.path, directory)):
-      if file == "thumbs.db":
+      if file == "thumbs.db" or file == "Thumbs.db":
         continue
       elif file[0] == ".":
         continue
