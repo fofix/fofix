@@ -1738,9 +1738,12 @@ class SetlistBase:
                   handicap = 0
                   handicapLong = "None"
                   originalScore = score
+                break
               else:
                 score, stars, name = 0, 0, "---"
-          
+          else:
+            score, stars, name = _("Nil"), 0, "---"
+            
           if score == _("Nil") and scene.nilShowNextScore:   #MFH
             for d in difficulties:   #MFH - just take the first valid difficulty you can find and display it.
               scores = item.getHighscores(d, part = scene.scorePart)
@@ -1756,8 +1759,8 @@ class SetlistBase:
                 break
               else:
                 score, stars, name = 0, 0, "---"
-            else:
-              score, stars, name = _("Nil"), 0, "---"
+          else:
+            score, stars, name = _("Nil"), 0, "---"
 
           #evilynux - hit% and note streak if enabled
           scale = 0.0009
