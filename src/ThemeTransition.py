@@ -98,11 +98,8 @@ career_title_color = Theme.hexToColor(Theme.career_title_colorVar)
 song_name_text_color = Theme.hexToColor(Theme.song_name_text_colorVar)
 song_cd_xpos = Theme.song_cd_Xpos
 song_cdscore_xpos = Theme.song_cdscore_Xpos
-song_rb2_name_color = Theme.hexToColor(Theme.song_rb2_name_colorVar)
 song_name_selected_color = Theme.hexToColor(Theme.song_name_selected_colorVar)
-song_rb2_name_selected_color = Theme.hexToColor(Theme.song_rb2_name_selected_colorVar)
 song_rb2_diff_color = Theme.hexToColor(Theme.song_rb2_diff_colorVar)
-song_rb2_artist_color = Theme.hexToColor(Theme.song_rb2_artist_colorVar)
 artist_text_color = Theme.hexToColor(Theme.artist_text_colorVar)
 artist_selected_color = Theme.hexToColor(Theme.artist_selected_colorVar)
 library_text_color = Theme.hexToColor(Theme.library_text_colorVar)
@@ -363,13 +360,13 @@ def renderUnselectedItem(self, i, n):
         pass
     
     if isinstance(item, Song.SongInfo) or isinstance(item, Song.LibraryInfo):
-      c1,c2,c3 = song_rb2_name_color
+      c1,c2,c3 = song_name_text_color
       glColor4f(c1,c2,c3,1)
     elif isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
       c1,c2,c3 = career_title_color
       glColor4f(c1,c2,c3,1)
     elif isinstance(item, Song.RandomSongInfo):
-      c1,c2,c3 = song_rb2_name_color
+      c1,c2,c3 = song_name_text_color
       glColor4f(c1,c2,c3,1)
     
     text = item.name
@@ -706,7 +703,7 @@ def renderSelectedItem(self, n):
         except KeyError:
           pass
       
-      c1,c2,c3 = song_rb2_name_selected_color
+      c1,c2,c3 = song_name_selected_color
       glColor3f(c1,c2,c3)
       if item.getLocked():
         text = item.getUnlockText()
@@ -758,7 +755,7 @@ def renderSelectedItem(self, n):
     
     maxwidth = .45
     if isinstance(item, Song.SongInfo) or isinstance(item, Song.LibraryInfo) or isinstance(item, Song.RandomSongInfo):
-      c1,c2,c3 = song_rb2_name_selected_color
+      c1,c2,c3 = song_name_selected_color
       glColor4f(c1,c2,c3,1)
     if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
       c1,c2,c3 = career_title_color
@@ -810,8 +807,11 @@ def renderSelectedItem(self, n):
                 handicap = 0
                 handicapLong = "None"
                 originalScore = score
+              break
             else:
               score, stars, name = 0, 0, "---"
+        else:
+          score, stars, name = _("Nil"), 0, "---"
         
         if score == _("Nil") and self.nilShowNextScore:   #MFH
           for d in difficulties:   #MFH - just take the first valid difficulty you can find and display it.
@@ -1151,7 +1151,7 @@ def renderAlbumArt(self):
         imgwidth = self.img_locked_label.width1()
         wfactor2 = 155.000/imgwidth
         lockImg = self.img_locked_label
-      else:
+      elif self.img_empty_label:
         imgwidth = self.img_empty_label.width1()
         wfactor = 155.000/imgwidth
         img = self.img_empty_label
@@ -1486,7 +1486,7 @@ def renderSelectedInfo(self):
         if wt < .22:
           break
         
-      c1,c2,c3 = song_rb2_artist_color
+      c1,c2,c3 = artist_text_color
       glColor3f(c1,c2,c3)
       
       text = string.upper(text)
