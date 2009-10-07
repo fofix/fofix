@@ -849,35 +849,6 @@ class SongChoosingScene(Scene):
         if self.moreInfoTime < 0:
           self.moreInfoTime = 0
   
-  def renderSongObject(self, label): #work on this (copypasted)
-    if not self.itemMesh:
-      return
-    glEnable(GL_COLOR_MATERIAL)
-    if self.listRotation:
-      glRotate(((self.time - self.lastTime) * 2 % 360) - 90, 1, 0, 0)
-    
-    self.itemMesh.render("Mesh_001")
-    glColor3f(.1, .1, .1)
-    self.itemMesh.render("Mesh")
-    
-    if isinstance(label, str): #locked
-      return
-    if label:
-      glEnable(GL_TEXTURE_2D)
-      label.bind()
-      glColor3f(1, 1, 1)
-      glMatrixMode(GL_TEXTURE)
-      glScalef(1, -1, 1)
-      glMatrixMode(GL_MODELVIEW)
-      self.label.render("Mesh_001")
-      glMatrixMode(GL_TEXTURE)
-      glLoadIdentity()
-      glMatrixMode(GL_MODELVIEW)
-      glDisable(GL_TEXTURE_2D)
-  
-  def renderMoreInfo(self, visibility, topMost):
-    TT.renderMoreInfo(self)
-  
   def renderSetlist(self, visibility, topMost):
     w, h = self.engine.view.geometry[2:4]
     font = self.engine.data.font
@@ -920,6 +891,8 @@ class SongChoosingScene(Scene):
         if i == self.selectedIndex:
           ns = n
           continue
+        if isinstance(self.items[i], Song.BlankSpaceInfo):
+          continue
         TT.renderUnselectedItem(self, i, n) #ideally something like self.engine.theme.setlist.renderUnselectedItem(self, i, n)
     TT.renderSelectedItem(self, ns) #we render this last to allow overlapping effects.
     
@@ -949,7 +922,7 @@ class SongChoosingScene(Scene):
       if self.mode == 0:
         self.renderSetlist(visibility, topMost)
         if self.moreInfoTime > 0:
-          self.renderMoreInfo(visibility, topMost)
+          TT.renderMoreInfo(self)
       # I am unsure how I want to handle this for now. Perhaps as dialogs, perhaps in SCS.
       # elif self.mode == 1:
         # self.renderPartSelect(visibility, topMost)

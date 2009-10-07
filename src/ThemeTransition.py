@@ -1221,7 +1221,7 @@ def renderForeground(self):
       font.render(_("Loading Preview..."), (.05, .7), scale = 0.001)
     return
   if self.img_list_button_guide:
-    self.engine.drawImage(self.img_list_button_guide, scale = (.5, -.5), coord = (w*.4,h*.4))
+    self.engine.drawImage(self.img_list_button_guide, scale = (.5, -.5), coord = (w*.5,0), fit = 2)
   if self.songLoader:
     font.render(_("Loading Preview..."), (.5, .7), align = 1)
   if self.img_list_fg:
@@ -1529,7 +1529,7 @@ def renderSelectedInfo(self):
           diff = item.diffBass
         elif i == 4:
           diff = item.diffVocals
-        if self.img_diff1 == None:
+        if self.img_diff1 == None or self.img_diff2 == None or self.img_diff3 == None:
           if diff == -1:
             font.render("N/A", (.18, .5585 + i*.025), scale = 0.0014)
           elif diff == 6:
