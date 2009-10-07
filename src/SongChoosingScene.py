@@ -262,9 +262,8 @@ class SongChoosingScene(Scene):
                 shownItems.pop()
             shownItems.append(item)
       elif isinstance(item, Song.SongInfo):
-        if self.careerMode and not self.showLockedSongs:
-          if item.getLocked(): #TODO: SongDB
-            continue
+        if self.careerMode and not self.showLockedSongs and item.getLocked():
+          continue
         else:
           shownItems.append(item)
       else:
@@ -278,8 +277,17 @@ class SongChoosingScene(Scene):
       if self.careerMode:
         msg = msg + " " + _("Make sure you have a working career pack!")
       Dialogs.showMessage(self.engine, msg)
-    
-    self.items = shownItems
+    elif len(shownItems) > 0:
+      for item in shownItems:
+        if isinstance(item, Song.SongInfo):
+          self.items = shownItems #make sure at least one song is in the library
+          break
+      else:
+        msg = _("No songs in this setlist are available to play!")
+        if self.careerMode:
+          msg = msg + " " + _("Make sure you have a working career pack!")
+        Dialogs.showMessage(self.engine, msg)
+        self.items = []
     
     if self.items == []:    #MFH: Catch when there ain't a damn thing in the current folder - back out!
       if self.library != Song.DEFAULT_LIBRARY:
