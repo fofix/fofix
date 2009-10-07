@@ -42,7 +42,7 @@ from Camera import Camera
 from Mesh import Mesh
 from Texture import Texture
 
-import ThemeTransition as TT #akedrou - TEMPORARY!
+#import ThemeTransition as TT #akedrou - TEMPORARY!
 
 import Log    #MFH
 
@@ -131,19 +131,19 @@ class SongChoosingScene(Scene):
     self.theme = self.engine.data.theme
     
     #theme configurables
-    self.setlistStyle      = TT.setlistStyle    #0 = Normal; 1 = List; 2 = Circular
-    self.headerSkip        = TT.headerSkip      #items taken up by header (non-static only)
-    self.footerSkip        = TT.footerSkip      #items taken up by footer (non-static only)
-    self.itemSize          = TT.itemSize        #delta (X, Y) (0..1) for each item (non-static only)
-    self.labelType         = TT.labelType       #Album covers (0) or CD labels (1)
-    self.labelDistance     = TT.labelDistance   #number of labels away to preload
-    self.showMoreLabels    = TT.showMoreLabels  #whether or not additional unselected labels are rendered on-screen
-    self.texturedLabels    = TT.texturedLabels  #render the art as a texture?
-    self.itemsPerPage      = TT.itemsPerPage    #number of items to show on screen
+    self.setlistStyle      = self.engine.theme.setlist.setlistStyle    #0 = Normal; 1 = List; 2 = Circular
+    self.headerSkip        = self.engine.theme.setlist.headerSkip      #items taken up by header (non-static only)
+    self.footerSkip        = self.engine.theme.setlist.footerSkip      #items taken up by footer (non-static only)
+    self.itemSize          = self.engine.theme.setlist.itemSize        #delta (X, Y) (0..1) for each item (non-static only)
+    self.labelType         = self.engine.theme.setlist.labelType       #Album covers (0) or CD labels (1)
+    self.labelDistance     = self.engine.theme.setlist.labelDistance   #number of labels away to preload
+    self.showMoreLabels    = self.engine.theme.setlist.showMoreLabels  #whether or not additional unselected labels are rendered on-screen
+    self.texturedLabels    = self.engine.theme.setlist.texturedLabels  #render the art as a texture?
+    self.itemsPerPage      = self.engine.theme.setlist.itemsPerPage    #number of items to show on screen
     self.followItemPos     = (self.itemsPerPage+1)/2
-    self.showLockedSongs   = TT.showLockedSongs #whether or not to even show locked songs
-    self.showSortTiers     = TT.showSortTiers   #whether or not to show sorting tiers - career tiers take precedence.
-    self.selectTiers       = TT.selectTiers     #whether or not tiers should be selectable as a quick setlist.
+    self.showLockedSongs   = self.engine.theme.setlist.showLockedSongs #whether or not to even show locked songs
+    self.showSortTiers     = self.engine.theme.setlist.showSortTiers   #whether or not to show sorting tiers - career tiers take precedence.
+    self.selectTiers       = self.engine.theme.setlist.selectTiers     #whether or not tiers should be selectable as a quick setlist.
     
     if self.engine.cmdPlay == 2:
       self.songName = Config.get("game", "selected_song")
@@ -870,10 +870,10 @@ class SongChoosingScene(Scene):
       o = (-self.itemSize[1]*h*maxPos) + self.yPos
       self.engine.drawImage(self.img_list_foot, scale = (1.0, -1.0), coord = (w/2,o), stretched = 11, fit = 2)
     
-    TT.renderHeader(self)
+    self.engine.theme.setlist.renderHeader(self)
     
     #render the artwork
-    TT.renderAlbumArt(self)
+    self.engine.theme.setlist.renderAlbumArt(self)
     
     #render the item list itself
     ns = 0   #the n value of the selectedItem
@@ -883,7 +883,7 @@ class SongChoosingScene(Scene):
           ns = n
           continue
         i = i%len(self.items)
-        TT.renderUnselectedItem(self, i, n) #ideally something like self.engine.theme.setlist.renderUnselectedItem(self, i, n)
+        self.engine.theme.setlist.renderUnselectedItem(self, i, n) #ideally something like self.engine.theme.setlist.renderUnselectedItem(self, i, n)
     else:
       for n, i in enumerate(range(self.pos, self.pos+self.itemsPerPage)):
         if i >= len(self.items):
@@ -893,14 +893,14 @@ class SongChoosingScene(Scene):
           continue
         if isinstance(self.items[i], Song.BlankSpaceInfo):
           continue
-        TT.renderUnselectedItem(self, i, n) #ideally something like self.engine.theme.setlist.renderUnselectedItem(self, i, n)
-    TT.renderSelectedItem(self, ns) #we render this last to allow overlapping effects.
-    
+        self.engine.theme.setlist.renderUnselectedItem(self, i, n) #ideally something like self.engine.theme.setlist.renderUnselectedItem(self, i, n)
+    self.engine.theme.setlist.renderSelectedItem(self, ns) #we render this last to allow overlapping effects.
+
     #render the additional information for the selected item
-    TT.renderSelectedInfo(self)
+    self.engine.theme.setlist.renderSelectedInfo(self)
     
     #render the foreground stuff last
-    TT.renderForeground(self)
+    self.engine.theme.setlist.renderForeground(self)
   
   def renderPartSelect(self, visibility, topMost):
     pass
@@ -922,7 +922,7 @@ class SongChoosingScene(Scene):
       if self.mode == 0:
         self.renderSetlist(visibility, topMost)
         if self.moreInfoTime > 0:
-          TT.renderMoreInfo(self)
+          self.engine.theme.setlist.renderMoreInfo(self)
       # I am unsure how I want to handle this for now. Perhaps as dialogs, perhaps in SCS.
       # elif self.mode == 1:
         # self.renderPartSelect(visibility, topMost)

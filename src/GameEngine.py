@@ -55,6 +55,7 @@ import Log
 import Config
 import Dialogs
 import Theme
+from Theme import ThemeTrans
 import Version
 import Mod
 import Player
@@ -682,6 +683,8 @@ class GameEngine(Engine):
     except IOError:
       theme = Config.load(self.resource.fileName("theme.ini"))
     Theme.open(theme, self.getPath(os.path.join("themes",self.data.themeLabel,"menu")))
+    
+    self.theme = ThemeTrans(self.getPath(os.path.join("themes",self.data.themeLabel)))
   
 
     
