@@ -1071,7 +1071,23 @@ class Theme:
       retval = tuple(type(n.strip()) for n in vals)
     return retval
   
-  def importThemeModule(self, moduleName):
+  def fadeScreen(self, v):
+    glEnable(GL_BLEND)
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+    glEnable(GL_COLOR_MATERIAL)
+
+    glBegin(GL_TRIANGLE_STRIP)
+    glColor4f(0, 0, 0, .3 - v * .3)
+    glVertex2f(0, 0)
+    glColor4f(0, 0, 0, .3 - v * .3)
+    glVertex2f(1, 0)
+    glColor4f(0, 0, 0, .9 - v * .9)
+    glVertex2f(0, 1)
+    glColor4f(0, 0, 0, .9 - v * .9)
+    glVertex2f(1, 1)
+    glEnd()
+  
+  def loadThemeModule(self, moduleName):
     try:
       fp, pathname, description = imp.find_module(moduleName,[self.path])
       module = imp.load_module(moduleName, fp, pathname, description)
