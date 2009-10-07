@@ -24,7 +24,6 @@
 import Config
 import math
 import Log
-import Theme
 import os
 import random   #MFH - needed for new stage background handling
 
@@ -62,7 +61,7 @@ class Layer(object):  #A graphical stage layer that is used to render the rockme
       or (self.canrender == 2 and self.engine.config.get("coffee", "failingEnabled") == False)) and self.drawing:
         self.engine.drawImage(self.drawing, scale = (self.scale[0], self.scale[1]), 
                           coord = (self.position[0] * w, self.position[1] * h), 
-                          rot = self.angle, color = Theme.hexToColor(self.color), rect = self.rect, 
+                          rot = self.angle, color = self.engine.theme.hexToColor(self.color), rect = self.rect, 
                           stretched = 0)
 
       # Blend in all the effects
@@ -138,7 +137,7 @@ class FontLayer(object): #defines layers that are just font instead of images
 
       try:  self.position    = (get("xpos",   float, 0.0), get("ypos",   float, 0.0))
       except:  self.position    = (eval(get("xpos")), eval(get("ypos")))
-      glColor3f(*Theme.hexToColor(self.color))
+      glColor3f(*self.engine.theme.hexToColor(self.color))
 
       self.font.render(str(self.text), self.position)
 
@@ -285,10 +284,11 @@ class RockEffect(Effect):
       self.layer.drawing = self.drawings[int(math.ceil(currentRock*len(self.drawings))-1)]
 
 class PowerEffect(Effect):
-  def __init__(self, layer, options):
+  def __init__(self, layer, options, oBarHScale):
     Effect.__init__(self, layer, options)
-
+    
     self.opt = options
+    self.oBarHScale = oBarHScale
 
     self.layer.canrender = -1
 
@@ -305,7 +305,7 @@ class PowerEffect(Effect):
   def apply(self, i):
     self.layer.canrender = -1
 
-    oBarScale = Theme.oBarHScale * self.stage.scene.instruments[i].boardWidth / math.sqrt(self.stage.scene.camera.origin[1]**2+(self.stage.scene.camera.origin[2]-0.5)**2) * self.stage.scene.oBarScaleCoef
+    oBarScale = self.oBarHScale * self.stage.scene.instruments[i].boardWidth / math.sqrt(self.stage.scene.camera.origin[1]**2+(self.stage.scene.camera.origin[2]-0.5)**2) * self.stage.scene.oBarScaleCoef
     currentSP = self.stage.scene.instruments[i].starPower/100.0
 
     try:  self.position    = (float(self.opt.get("xpos",0.0)), float(self.opt.get("ypos", 0.0)))
@@ -515,8 +515,11 @@ class Rockmeter:
 
               options = self.config.options(fxSection)
               options = dict([(opt, self.config.get(fxSection, opt)) for opt in options])
-
-              fx = fxClasses[type](layer, options)
+              
+              if type == "power": #skeevy but works. To be fixed, obviously.
+                fx = fxClasses[type](layer, options, self.engine.theme.oBarHScale)
+              else:
+                fx = fxClasses[type](layer, options)
               layer.effects.append(fx)
         elif text:
           layer = FontLayer(self, section, font)

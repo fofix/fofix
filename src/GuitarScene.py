@@ -40,7 +40,6 @@ from Player import CONTROLLER1KEYS, CONTROLLER2KEYS, CONTROLLER3KEYS, CONTROLLER
 from Player import CONTROLLER1DRUMS, CONTROLLER2DRUMS, CONTROLLER3DRUMS, CONTROLLER4DRUMS, STAR, KILL, CANCEL, KEY1A
 import Dialogs
 import Data
-import Theme
 import View
 import Audio
 import Stage
@@ -110,8 +109,9 @@ class GuitarScene(Scene):
     self.sinfo = Song.loadSongInfo(self.engine, songName, library = libraryName)
     phrase = self.sinfo.loading
     if phrase == "":
-      phrase = random.choice(Theme.loadingPhrase.split("_"))
-      if phrase == "None":
+      try:
+        phrase = random.choice(self.engine.theme.loadingPhrase)
+      except:
         i = random.randint(0,4)
         if i == 0:
           phrase = _("Let's get this show on the Road")
@@ -351,7 +351,7 @@ class GuitarScene(Scene):
     
     #self.jurgenText = self.engine.config.get("game", "jurgtext")
     
-    self.jurgenText = Theme.jurgTextPos
+    self.jurgenText = self.engine.theme.jurgTextPos
     if float(self.jurgenText[2]) < 0.00035:
       self.jurgenText[2] = 0.00035
     if float(self.jurgenText[0]) < 0:
@@ -411,12 +411,12 @@ class GuitarScene(Scene):
     self.camera.target    = (0.0, 1.0, 8.0)
     self.camera.origin    = (0.0, 2.0, -3.4)
 
-    self.targetX          = Theme.povTargetX
-    self.targetY          = Theme.povTargetY
-    self.targetZ          = Theme.povTargetZ
-    self.originX          = Theme.povOriginX
-    self.originY          = Theme.povOriginY
-    self.originZ          = Theme.povOriginZ
+    self.targetX          = self.engine.theme.povTargetX
+    self.targetY          = self.engine.theme.povTargetY
+    self.targetZ          = self.engine.theme.povTargetZ
+    self.originX          = self.engine.theme.povOriginX
+    self.originY          = self.engine.theme.povOriginY
+    self.originZ          = self.engine.theme.povOriginZ
     self.customPOV        = False
     self.ending           = False
     
@@ -485,23 +485,20 @@ class GuitarScene(Scene):
     themename = self.engine.data.themeLabel
     self.theme = self.engine.data.theme
 
-    if Theme.rmtype != None:
-      self.rmtype = Theme.rmtype
-    else:
-      self.rmtype = self.theme
+    self.rmtype = self.theme
 
-    if Theme.hopoIndicatorX != None:
-      self.hopoIndicatorX   = Theme.hopoIndicatorX
+    if self.engine.theme.hopoIndicatorX != None:
+      self.hopoIndicatorX   = self.engine.theme.hopoIndicatorX
     else:
       self.hopoIndicatorX = .950
       
-    if Theme.hopoIndicatorY != None:
-      self.hopoIndicatorY   = Theme.hopoIndicatorY
+    if self.engine.theme.hopoIndicatorY != None:
+      self.hopoIndicatorY   = self.engine.theme.hopoIndicatorY
     else:
       self.hopoIndicatorY = .710
      
-    self.hopoIndicatorActiveColor   = Theme.hopoIndicatorActiveColor
-    self.hopoIndicatorInactiveColor   = Theme.hopoIndicatorInactiveColor
+    self.hopoIndicatorActiveColor   = self.engine.theme.hopoIndicatorActiveColor
+    self.hopoIndicatorInactiveColor   = self.engine.theme.hopoIndicatorInactiveColor
     
     if self.coOpGH:
       for instrument in self.instruments:
@@ -545,7 +542,7 @@ class GuitarScene(Scene):
     self.loadSettings()
     self.tsBotNames = [_("KiD"), _("Stump"), _("AkedRobot"), _("Q"), _("MFH"), _("Jurgen")]
     #MFH pre-translate text strings:
-    self.powerUpName = Theme.power_up_name
+    self.powerUpName = self.engine.theme.power_up_name
     if self.powerUpName == "None":
       if self.theme == 2:
         self.powerUpName = _("Overdrive")
@@ -673,9 +670,9 @@ class GuitarScene(Scene):
     self.displayTextScaleStep2 = 0.00008    #orig 0.00008
     self.displayTextScaleStep1 = 0.0001     #orig 0.0001
     self.textTimeToDisplay = 100
-    self.songInfoDisplayScale = Theme.songInfoDisplayScale
-    self.songInfoDisplayX = Theme.songInfoDisplayX             #Worldrave - This controls the X position of song info display during countdown
-    self.songInfoDisplayY = Theme.songInfoDisplayY             #Worldrave - This controls the Y position of song info display during countdown
+    self.songInfoDisplayScale = self.engine.theme.songInfoDisplayScale
+    self.songInfoDisplayX = self.engine.theme.songInfoDisplayX             #Worldrave - This controls the X position of song info display during countdown
+    self.songInfoDisplayY = self.engine.theme.songInfoDisplayY             #Worldrave - This controls the Y position of song info display during countdown
     self.lyricMode = self.engine.config.get("game", "lyric_mode")
     self.scriptLyricPos = self.engine.config.get("game", "script_lyric_pos")
     self.starClaps = self.engine.config.get("game", "star_claps")
@@ -717,7 +714,7 @@ class GuitarScene(Scene):
     self.starScoreUpdates = self.engine.config.get("performance", "star_score_updates") #MFH
     self.currentlyAnimating = True
     self.missPausesAnim = self.engine.config.get("game", "miss_pauses_anim") #MFH
-    self.displayAllGreyStars = Theme.displayAllGreyStars
+    self.displayAllGreyStars = self.engine.theme.displayAllGreyStars
     self.starpowerMode = self.engine.config.get("game", "starpower_mode") #MFH
     self.useMidiSoloMarkers = False
     self.logMarkerNotes = self.engine.config.get("game", "log_marker_notes")
@@ -731,11 +728,11 @@ class GuitarScene(Scene):
     self.bigRockEndings = self.engine.config.get("game", "big_rock_endings")
     self.showFreestyleActive = self.engine.config.get("debug",   "show_freestyle_active")
     #stump: continuous star fillup
-    self.starFillupCenterX = Theme.starFillupCenterX
-    self.starFillupCenterY = Theme.starFillupCenterY
-    self.starFillupInRadius = Theme.starFillupInRadius
-    self.starFillupOutRadius = Theme.starFillupOutRadius
-    self.starFillupColor = Theme.starFillupColor
+    self.starFillupCenterX = self.engine.theme.starFillupCenterX
+    self.starFillupCenterY = self.engine.theme.starFillupCenterY
+    self.starFillupInRadius = self.engine.theme.starFillupInRadius
+    self.starFillupOutRadius = self.engine.theme.starFillupOutRadius
+    self.starFillupColor = self.engine.theme.starFillupColor
     self.starContinuousAvailable = self.engine.config.get("performance", "star_continuous_fillup") and \
       None not in (self.starFillupCenterX, self.starFillupCenterY, self.starFillupInRadius, self.starFillupOutRadius, self.starFillupColor)
     self.showBpm = self.engine.config.get("debug",   "show_bpm")    #MFH
@@ -961,7 +958,7 @@ class GuitarScene(Scene):
     self.starfx = self.engine.config.get("game", "starfx")#blazingamer
     smallMult = self.engine.config.get("game","small_rb_mult")
     self.rbmfx = False
-    if smallMult == 2 or (smallMult == 1 and Theme.smallMult):
+    if smallMult == 2 or (smallMult == 1 and self.engine.theme.smallMult):
       self.rbmfx = True
     self.boardY = 2
     self.rbOverdriveBarGlowVisibility = 0
@@ -1096,13 +1093,13 @@ class GuitarScene(Scene):
     #if self.starpowerMode == 2:     #auto-MIDI mode only
     self.markSolos = self.engine.config.get("game", "mark_solo_sections")
     if self.markSolos == 2:
-      if Theme.markSolos == 2:
+      if self.engine.theme.markSolos == 2:
         if self.theme == 2:
           self.markSolos = 1
         else:
           self.markSolos = 0
       else:
-        self.markSolos = Theme.markSolos
+        self.markSolos = self.engine.theme.markSolos
     
     if self.song.hasStarpowerPaths:
       for i,guitar in enumerate(self.instruments):
@@ -1692,9 +1689,9 @@ class GuitarScene(Scene):
 
 
     #MFH - retrieve theme.ini pause background & text positions 
-    self.pause_bkg = [float(i) for i in Theme.pause_bkg_pos]
-    self.pause_text_x = Theme.pause_text_xPos
-    self.pause_text_y = Theme.pause_text_yPos
+    self.pause_bkg = [float(i) for i in self.engine.theme.pause_bkg_pos]
+    self.pause_text_x = self.engine.theme.pause_text_xPos
+    self.pause_text_y = self.engine.theme.pause_text_yPos
 
     if self.pause_text_x == None:
       self.pause_text_x = .3
@@ -1705,11 +1702,11 @@ class GuitarScene(Scene):
 
     #MFH - new theme.ini color options:
 
-    self.pause_text_color = Theme.hexToColor(Theme.pause_text_colorVar)
-    self.pause_selected_color = Theme.hexToColor(Theme.pause_selected_colorVar)
-    self.fail_text_color = Theme.hexToColor(Theme.fail_text_colorVar)
-    self.fail_selected_color = Theme.hexToColor(Theme.fail_selected_colorVar)
-    self.fail_completed_color = Theme.hexToColor(Theme.fail_completed_colorVar)
+    self.pause_text_color = self.engine.theme.hexToColor(self.engine.theme.pause_text_colorVar)
+    self.pause_selected_color = self.engine.theme.hexToColor(self.engine.theme.pause_selected_colorVar)
+    self.fail_text_color = self.engine.theme.hexToColor(self.engine.theme.fail_text_colorVar)
+    self.fail_selected_color = self.engine.theme.hexToColor(self.engine.theme.fail_selected_colorVar)
+    self.fail_completed_color = self.engine.theme.hexToColor(self.engine.theme.fail_completed_colorVar)
     
 
     settingsMenu = Settings.GameSettingsMenu(self.engine, self.pause_text_color, self.pause_selected_color, players = self.playerList)
@@ -1719,15 +1716,14 @@ class GuitarScene(Scene):
 
     
     # evilynux - More themeable options
-    self.rockmeter_score_color = Theme.hexToColor(Theme.rockmeter_score_colorVar)
+    self.rockmeter_score_color = self.engine.theme.rockmeter_score_colorVar
     
-    #self.fail_completed_color = Theme.hexToColor(Theme.song_name_selected_colorVar) # text same color as selected song
-    #self.fail_completed_color = Theme.hexToColor(Theme.fail_text_colorVar)  #No, now same as fail_text color.
+    #self.fail_completed_color = self.engine.theme.hexToColor(self.engine.theme.song_name_selected_colorVar) # text same color as selected song
+    #self.fail_completed_color = self.engine.theme.hexToColor(self.engine.theme.fail_text_colorVar)  #No, now same as fail_text color.
     
-    self.ingame_stats_color = Theme.hexToColor(Theme.ingame_stats_colorVar)
+    self.ingame_stats_color = self.engine.theme.ingame_stats_colorVar
 
-    Log.debug("Pause text / selected hex colors: " + Theme.pause_text_colorVar + " / " + Theme.pause_selected_colorVar)
-
+    
     if self.pause_text_color == None:
       self.pause_text_color = (1,1,1)
     if self.pause_selected_color == None:
@@ -1746,10 +1742,10 @@ class GuitarScene(Scene):
 
 #racer: theme.ini fail positions
     size = self.engine.data.pauseFont.getStringSize("Quit to Main")
-    self.fail_bkg = [float(i) for i in Theme.fail_bkg_pos]
-    self.fail_text_x = Theme.fail_text_xPos
-    self.fail_text_y = Theme.fail_text_yPos
-    self.failSongPos=(Theme.fail_songname_xPos,Theme.fail_songname_yPos)
+    self.fail_bkg = [float(i) for i in self.engine.theme.fail_bkg_pos]
+    self.fail_text_x = self.engine.theme.fail_text_xPos
+    self.fail_text_y = self.engine.theme.fail_text_yPos
+    self.failSongPos=(self.engine.theme.fail_songname_xPos,self.engine.theme.fail_songname_yPos)
 
     if self.fail_text_x == None:
       self.fail_text_x = .5-size[0]/2.0
@@ -5737,7 +5733,7 @@ class GuitarScene(Scene):
         self.setCamera()
       #self.setCamera()
   
-      #Theme.setBaseColor()
+      #self.engine.theme.setBaseColor()
 
       Scene.render(self, visibility, topMost) #MFH - I believe this eventually calls the renderGuitar function, which also involves two viewports... may not be easy to move this one...
         
@@ -5939,7 +5935,7 @@ class GuitarScene(Scene):
             #self.engine.view.setViewportHalf(self.numOfPlayers,i)
           if self.coOpGH and self.rmtype != 2:
             self.engine.view.setViewport(1,0)
-          Theme.setBaseColor()
+          self.engine.theme.setBaseColor()
 
           if i is not None:
             if self.song:  
@@ -6815,7 +6811,7 @@ class GuitarScene(Scene):
             #jurgScale = .001/self.numOfPlayers
             jurgScale = float(self.jurgenText[2])
             w, h = bigFont.getStringSize(text, scale = jurgScale)
-            Theme.setBaseColor()
+            self.engine.theme.setBaseColor()
             if jurgScale > .2 or jurgScale < .0001:
               jurgScale = .001
             jurgX = float(self.jurgenText[0])
@@ -6845,7 +6841,7 @@ class GuitarScene(Scene):
           # show countdown
           # glorandwarf: fixed the countdown timer
           if self.countdownSeconds > 1:
-            Theme.setBaseColor(min(1.0, 3.0 - abs(4.0 - self.countdownSeconds)))
+            self.engine.theme.setBaseColor(min(1.0, 3.0 - abs(4.0 - self.countdownSeconds)))
             text = self.tsGetReady
             w, h = font.getStringSize(text)
             font.render(text,  (.5 - w / 2, .3))
@@ -6859,7 +6855,7 @@ class GuitarScene(Scene):
                     partwFactor = 250.000/partImgwidth
                     partX = ((i*2)+1) / (self.numOfPlayers*2.0)
                     self.engine.drawImage(self.part[i], scale = (partwFactor*0.25,partwFactor*-0.25), coord = (w*partX,h*.4), color = (1,1,1, 3.0 - abs(4.0 - self.countdownSeconds)))
-                    Theme.setBaseColor(min(1.0, 3.0 - abs(4.0 - self.countdownSeconds)))
+                    self.engine.theme.setBaseColor(min(1.0, 3.0 - abs(4.0 - self.countdownSeconds)))
                     text = player.name
                     w, h = font.getStringSize(text)
                     font.render(text,  (partX - w*.5, .5))
@@ -6869,7 +6865,7 @@ class GuitarScene(Scene):
                     partImgWidth = self.part[i].width1()
                     partwFactor = 250.000/partImgWidth
                     self.engine.drawImage(self.part[i], scale = (partwFactor*0.25, partwFactor*-0.25), coord = (w*.5,h*.75), color = (1,1,1, 3.0 - abs(4.0 - self.countdownSeconds)))
-                    Theme.setBaseColor(min(1.0, 3.0 - abs(4.0 - self.countdownSeconds)))
+                    self.engine.theme.setBaseColor(min(1.0, 3.0 - abs(4.0 - self.countdownSeconds)))
                     text = player.name
                     w, h = font.getStringSize(text)
                     font.render(text,  (.5 - w*.5, .25))
@@ -6877,14 +6873,14 @@ class GuitarScene(Scene):
                 scale = 0.002 + 0.0005 * (self.countdownSeconds % 1) ** 3
                 text = "%d" % (self.countdownSeconds)
                 w, h = bigFont.getStringSize(text, scale = scale)
-                Theme.setBaseColor()
+                self.engine.theme.setBaseColor()
                 bigFont.render(text,  (.5 - w / 2, .45 - h / 2), scale = scale)
           
           if self.resumeCountdownSeconds > 1:
             scale = 0.002 + 0.0005 * (self.resumeCountdownSeconds % 1) ** 3
             text = "%d" % (self.resumeCountdownSeconds)
             w, h = bigFont.getStringSize(text, scale = scale)
-            Theme.setBaseColor()
+            self.engine.theme.setBaseColor()
             bigFont.render(text,  (.5 - w / 2, .45 - h / 2), scale = scale)
     
           w, h = font.getStringSize(" ")
@@ -6902,7 +6898,7 @@ class GuitarScene(Scene):
                 cover = "" #kk69: for RB
               else:
                 cover = self.tsBy   #kk69: for GH
-            Theme.setBaseColor(min(1.0, 4.0 - abs(4.0 - self.countdown)))
+            self.engine.theme.setBaseColor(min(1.0, 4.0 - abs(4.0 - self.countdown)))
             comma = ""
             extra = ""
             if self.song.info.year: #add comma between year and artist
@@ -6922,7 +6918,7 @@ class GuitarScene(Scene):
               pos = 0
             if countdownPos < 0:
               countdownPos = 0
-            Theme.setBaseColor()
+            self.engine.theme.setBaseColor()
     
     
             #if countdownPos == 0:   #MFH - reset drumStart so that the drummer can get down with his bad self at the end of the song without penalty.

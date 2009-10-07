@@ -33,7 +33,6 @@ import Scorekeeper
 import Dialogs
 import Song
 import Data
-import Theme
 from Menu import Menu
 from Audio import Sound
 from Language import _
@@ -128,7 +127,7 @@ class GameResultsScene(Scene):
     self.careerStars      = self.engine.config.get("game", "career_star_min")
     self.detailedScores   = False #to do.
     self.playerList       = self.players
-    self.resultStar       = [float(i) for i in Theme.result_star]
+    self.resultStar       = [float(i) for i in self.engine.theme.result_star]
     
     self.scoreScrollStartOffset = .8
     for i in self.playerList:
@@ -150,7 +149,7 @@ class GameResultsScene(Scene):
       (_("Quit"),           self.quit),
     ]
     
-    self.menu = Menu(self.engine, items, onCancel = self.quit, name = "gameresult", pos = (Theme.result_menu_x, Theme.result_menu_y))
+    self.menu = Menu(self.engine, items, onCancel = self.quit, name = "gameresult", pos = (self.engine.theme.result_menu_x, self.engine.theme.result_menu_y))
     
     self.engine.resource.load(self, "song", lambda: Song.loadSong(self.engine, songName, library = self.libraryName, notesOnly = True, part = [player.part for player in self.playerList]), onLoad = self.songLoaded)
     
@@ -173,7 +172,7 @@ class GameResultsScene(Scene):
     self.starMass    = [0 for i in self.scoring]
     self.oldStars    = [0 for i in self.scoring]
     
-    self.cheerLoopDelay  = Theme.crowdLoopDelay
+    self.cheerLoopDelay  = self.engine.theme.crowdLoopDelay
     if self.cheerLoopDelay == None:
       self.cheerLoopDelay = self.engine.config.get("game", "cheer_loop_delay")
     Log.debug("Cheer loop delay used: %d" % self.cheerLoopDelay)
@@ -307,7 +306,7 @@ class GameResultsScene(Scene):
     #self.starFC = self.engine.data.starFC
     #self.fcStars = self.engine.data.fcStars
     #self.maskStars = self.engine.data.maskStars
-    titleFormat = Theme.result_song_form
+    titleFormat = self.engine.theme.result_song_form
     if not titleFormat:
       titleFormat = 0
     self.scaleTitle  = titleFormat&1
@@ -360,8 +359,9 @@ class GameResultsScene(Scene):
 
     self.partLoad = None
     
-    phrase = random.choice(Theme.resultsPhrase.split("_"))
-    if phrase == "None":
+    try:
+      phrase = random.choice(self.engine.theme.resultsPhrase)
+    except:
       i = random.randint(0,5)
       if i == 0:
         phrase = _("Relax, it was an excellent show.")
@@ -797,72 +797,72 @@ class GameResultsScene(Scene):
       wFactor = 640.000/self.background.width1()
       self.engine.drawImage(self.background, scale = (wFactor,-wFactor), coord = (w/2,h/2))
     
-    Theme.setBaseColor(1-v)
+    self.engine.theme.setBaseColor(1-v)
     
     if self.song:
       try:
-        text = Theme.result_song_text % Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
+        text = self.engine.theme.result_song_text % Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
       except TypeError:
-        text = "%s %s" % (Dialogs.removeSongOrderPrefixFromName(self.song.info.name), Theme.result_song_text)
+        text = "%s %s" % (Dialogs.removeSongOrderPrefixFromName(self.song.info.name), self.engine.theme.result_song_text)
       try:
-        r, g, b = Theme.hexToColorResults(Theme.result_song[3])
+        r, g, b = self.engine.theme.hexToColorResults(self.engine.theme.result_song[3])
         glColor3f(r, g, b)
       except IndexError:
-        Theme.setBaseColor(1-v)
+        self.engine.theme.setBaseColor(1-v)
       try:
-        font = self.engine.data.fontDict[Theme.result_song[4]]
+        font = self.engine.data.fontDict[self.engine.theme.result_song[4]]
       except:
         font = defFont
       if self.scaleTitle == 1:
         if self.centerTitle == 1:
-          max = .97 - (abs(.5 - float(Theme.result_song[0]))*2)
-          scale = font.scaleText(text, max, scale = float(Theme.result_song[2]))
+          max = .97 - (abs(.5 - float(self.engine.theme.result_song[0]))*2)
+          scale = font.scaleText(text, max, scale = float(self.engine.theme.result_song[2]))
           wText, hText = font.getStringSize(text, scale = scale)
-          xText = float(Theme.result_song[0])-wText/2
+          xText = float(self.engine.theme.result_song[0])-wText/2
           if xText < .03:
             xText = .03
-          font.render(text, (xText, float(Theme.result_song[1])), scale = scale)
+          font.render(text, (xText, float(self.engine.theme.result_song[1])), scale = scale)
         else:
-          scale = font.scaleText(text, .97 - float(Theme.result_song[0]), scale = float(Theme.result_song[2]))
-          font.render(text, (float(Theme.result_song[0]), float(Theme.result_song[1])), scale = scale)
+          scale = font.scaleText(text, .97 - float(self.engine.theme.result_song[0]), scale = float(self.engine.theme.result_song[2]))
+          font.render(text, (float(self.engine.theme.result_song[0]), float(self.engine.theme.result_song[1])), scale = scale)
       else:
         if self.centerTitle == 1:
-          Dialogs.wrapCenteredText(font, (float(Theme.result_song[0]), float(Theme.result_song[1]) - v), text, 0.9, float(Theme.result_song[2]))
+          Dialogs.wrapCenteredText(font, (float(self.engine.theme.result_song[0]), float(self.engine.theme.result_song[1]) - v), text, 0.9, float(self.engine.theme.result_song[2]))
         else:
-          Dialogs.wrapText(font, (float(Theme.result_song[0]), float(Theme.result_song[1]) - v), text, 0.9, float(Theme.result_song[2]))
+          Dialogs.wrapText(font, (float(self.engine.theme.result_song[0]), float(self.engine.theme.result_song[1]) - v), text, 0.9, float(self.engine.theme.result_song[2]))
       
       for i, scoreCard in enumerate(self.scoring):
         self.engine.view.setViewportHalf(len(self.scoring),i)
         
         text = "%d/%d" % (scoreCard.notesHit, scoreCard.totalStreakNotes)
         try:
-          text = Theme.result_stats_notes_text % text
+          text = self.engine.theme.result_stats_notes_text % text
         except TypeError:
-          text = "%s %s" % (text, Theme.result_stats_notes_text)
+          text = "%s %s" % (text, self.engine.theme.result_stats_notes_text)
         try:
-          r, g, b = Theme.hexToColorResults(Theme.result_stats_notes[3])
+          r, g, b = self.engine.theme.hexToColorResults(self.engine.theme.result_stats_notes[3])
           glColor3f(r, g, b)
         except IndexError:
-          Theme.setBaseColor(1-v)
+          self.engine.theme.setBaseColor(1-v)
         try:
-          font = self.engine.data.fontDict[Theme.result_stats_notes[4]]
+          font = self.engine.data.fontDict[self.engine.theme.result_stats_notes[4]]
         except:
           font = defFont
-        wText, hText = font.getStringSize(text, scale = float(Theme.result_stats_notes[2]))
-        Dialogs.wrapText(font, (float(Theme.result_stats_notes[0]) - wText/2, float(Theme.result_stats_notes[1]) + v), text, 0.9, float(Theme.result_stats_notes[2]))
+        wText, hText = font.getStringSize(text, scale = float(self.engine.theme.result_stats_notes[2]))
+        Dialogs.wrapText(font, (float(self.engine.theme.result_stats_notes[0]) - wText/2, float(self.engine.theme.result_stats_notes[1]) + v), text, 0.9, float(self.engine.theme.result_stats_notes[2]))
         
         try:
-          r, g, b = Theme.hexToColorResults(Theme.result_score[3])
+          r, g, b = self.engine.theme.hexToColorResults(self.engine.theme.result_score[3])
           glColor3f(r, g, b)
         except IndexError:
-          Theme.setBaseColor(1-v)
+          self.engine.theme.setBaseColor(1-v)
         try:
-          font = self.engine.data.fontDict[Theme.result_score[4]]
+          font = self.engine.data.fontDict[self.engine.theme.result_score[4]]
         except:
           font = bigFont
         text = "%d" % self.currentScore[i]
-        wText, hText = font.getStringSize(text, scale = float(Theme.result_score[2]))
-        font.render(text, (float(Theme.result_score[0]) - wText / 2, float(Theme.result_score[1]) + v), scale = float(Theme.result_score[2]))
+        wText, hText = font.getStringSize(text, scale = float(self.engine.theme.result_score[2]))
+        font.render(text, (float(self.engine.theme.result_score[0]) - wText / 2, float(self.engine.theme.result_score[1]) + v), scale = float(self.engine.theme.result_score[2]))
         
         if self.resultStep == 0:
           space = self.space[i]
@@ -884,16 +884,16 @@ class GameResultsScene(Scene):
 #-            else:
 #-              star = self.starPerfect
 #-            try:
-#-              wide = star.width1()*float(Theme.result_star[3])
+#-              wide = star.width1()*float(self.engine.theme.result_star[3])
 #-            except IndexError:
 #-              wide = star.width1()*.5
 #-            if self.maskStars:
 #-              if self.theme == 2:
-#-                self.engine.drawImage(star, scale = (scale,-scale), coord = (((w*Theme.result_star[0])+wide*j)*space**4,h*float(Theme.result_star[1])), color = (1, 1, 0, 1))
+#-                self.engine.drawImage(star, scale = (scale,-scale), coord = (((w*self.engine.theme.result_star[0])+wide*j)*space**4,h*float(self.engine.theme.result_star[1])), color = (1, 1, 0, 1))
 #-              else:
-#-                self.engine.drawImage(star, scale = (scale,-scale), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])), color = (0, 1, 0, 1))
+#-                self.engine.drawImage(star, scale = (scale,-scale), coord = (((w*float(self.engine.theme.result_star[0]))+wide*j)*space**4,h*float(self.engine.theme.result_star[1])), color = (0, 1, 0, 1))
 #-            else:
-#-              self.engine.drawImage(star, scale = (scale,-scale), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])))
+#-              self.engine.drawImage(star, scale = (scale,-scale), coord = (((w*float(self.engine.theme.result_star[0]))+wide*j)*space**4,h*float(self.engine.theme.result_star[1])))
 #-        else:
 #-          for j in range(5):
 #-            if j < scoreCard.stars:
@@ -901,10 +901,10 @@ class GameResultsScene(Scene):
 #-            else:
 #-              star = self.star1
 #-            try:
-#-              wide = star.width1()*float(Theme.result_star[3])
+#-              wide = star.width1()*float(self.engine.theme.result_star[3])
 #-            except IndexError:
 #-              wide = star.width1()*.5
-#-            self.engine.drawImage(star, scale = (scale,-scale), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])))
+#-            self.engine.drawImage(star, scale = (scale,-scale), coord = (((w*float(self.engine.theme.result_star[0]))+wide*j)*space**4,h*float(self.engine.theme.result_star[1])))
 
 
         
@@ -914,77 +914,77 @@ class GameResultsScene(Scene):
         defFont.render(settingsText, (.5 - wText/2, 0.0), scale = settingsScale)
         
         try:
-          font = self.engine.data.fontDict[Theme.result_stats_accuracy[4]]
+          font = self.engine.data.fontDict[self.engine.theme.result_stats_accuracy[4]]
         except:
           font = defFont
-        text = _(Theme.result_stats_accuracy_text) % scoreCard.hitAccuracy
+        text = _(self.engine.theme.result_stats_accuracy_text) % scoreCard.hitAccuracy
         wText, hText = font.getStringSize(text)
         try:
-          r, g, b = Theme.hexToColorResults(Theme.result_stats_accuracy[3])
+          r, g, b = self.engine.theme.hexToColorResults(self.engine.theme.result_stats_accuracy[3])
           glColor3f(r, g, b)
         except IndexError:
-          Theme.setBaseColor(1-v)
-        font.render(text, (float(Theme.result_stats_accuracy[0]) - wText / 2, float(Theme.result_stats_accuracy[1]) + v), scale = float(Theme.result_stats_accuracy[2]))
+          self.engine.theme.setBaseColor(1-v)
+        font.render(text, (float(self.engine.theme.result_stats_accuracy[0]) - wText / 2, float(self.engine.theme.result_stats_accuracy[1]) + v), scale = float(self.engine.theme.result_stats_accuracy[2]))
         
         try:
-          font = self.engine.data.fontDict[Theme.result_stats_streak[4]]
+          font = self.engine.data.fontDict[self.engine.theme.result_stats_streak[4]]
         except:
           font = defFont
-        text = _(Theme.result_stats_streak_text) % scoreCard.hiStreak
+        text = _(self.engine.theme.result_stats_streak_text) % scoreCard.hiStreak
         wText, hText = font.getStringSize(text)
         try:
-          r, g, b = Theme.hexToColorResults(Theme.result_stats_streak[3])
+          r, g, b = self.engine.theme.hexToColorResults(self.engine.theme.result_stats_streak[3])
           glColor3f(r, g, b)
         except IndexError:
-          Theme.setBaseColor(1-v)
-        font.render(text, (float(Theme.result_stats_streak[0]) - wText / 2, float(Theme.result_stats_streak[1]) + v), scale = float(Theme.result_stats_streak[2]))
+          self.engine.theme.setBaseColor(1-v)
+        font.render(text, (float(self.engine.theme.result_stats_streak[0]) - wText / 2, float(self.engine.theme.result_stats_streak[1]) + v), scale = float(self.engine.theme.result_stats_streak[2]))
         
         try:
-          font = self.engine.data.fontDict[Theme.result_stats_diff[4]]
+          font = self.engine.data.fontDict[self.engine.theme.result_stats_diff[4]]
         except:
           font = defFont
-        text = _(Theme.result_stats_diff_text) % self.playerList[i].difficulty
+        text = _(self.engine.theme.result_stats_diff_text) % self.playerList[i].difficulty
         wText, hText = font.getStringSize(text)
         try:
-          r, g, b = Theme.hexToColorResults(Theme.result_stats_diff[3])
+          r, g, b = self.engine.theme.hexToColorResults(self.engine.theme.result_stats_diff[3])
           glColor3f(r, g, b)
         except IndexError:
-          Theme.setBaseColor(1-v)
-        font.render(text, (float(Theme.result_stats_diff[0]) - wText / 2, float(Theme.result_stats_diff[1]) + v), scale = float(Theme.result_stats_diff[2]))
+          self.engine.theme.setBaseColor(1-v)
+        font.render(text, (float(self.engine.theme.result_stats_diff[0]) - wText / 2, float(self.engine.theme.result_stats_diff[1]) + v), scale = float(self.engine.theme.result_stats_diff[2]))
         
         try:
-          font = self.engine.data.fontDict[Theme.result_stats_name[4]]
+          font = self.engine.data.fontDict[self.engine.theme.result_stats_name[4]]
         except:
           font = defFont
         text = self.playerList[i].name
         wText, hText = font.getStringSize(text)
         try:
-          r, g, b = Theme.hexToColorResults(Theme.result_stats_name[3])
+          r, g, b = self.engine.theme.hexToColorResults(self.engine.theme.result_stats_name[3])
           glColor3f(r, g, b)
         except IndexError:
-          Theme.setBaseColor(1-v)
-        font.render(text, (float(Theme.result_stats_name[0]) - wText / 2, float(Theme.result_stats_name[1]) + v), scale = float(Theme.result_stats_name[2]))
+          self.engine.theme.setBaseColor(1-v)
+        font.render(text, (float(self.engine.theme.result_stats_name[0]) - wText / 2, float(self.engine.theme.result_stats_name[1]) + v), scale = float(self.engine.theme.result_stats_name[2]))
         
-        if Theme.result_stats_part_text.strip() == "$icon$" and not self.partImage:
+        if self.engine.theme.result_stats_part_text.strip() == "$icon$" and not self.partImage:
           text = "%s"
         else:
-          text = Theme.result_stats_part_text.strip()
+          text = self.engine.theme.result_stats_part_text.strip()
         
         try:
-          font = self.engine.data.fontDict[Theme.result_stats_part[4]]
+          font = self.engine.data.fontDict[self.engine.theme.result_stats_part[4]]
         except:
           font = defFont
         if text == "$icon$" and self.partImage:
-          self.engine.drawImage(self.part[i], scale = (float(Theme.result_stats_part[2]),-float(Theme.result_stats_part[2])), coord = (w*float(Theme.result_stats_part[0]),h*float(Theme.result_stats_part[1])))
+          self.engine.drawImage(self.part[i], scale = (float(self.engine.theme.result_stats_part[2]),-float(self.engine.theme.result_stats_part[2])), coord = (w*float(self.engine.theme.result_stats_part[0]),h*float(self.engine.theme.result_stats_part[1])))
         else:
-          text = _(Theme.result_stats_part_text) % self.playerList[i].part
+          text = _(self.engine.theme.result_stats_part_text) % self.playerList[i].part
           wText, hText = font.getStringSize(text)
           try:
-            r, g, b = Theme.hexToColorResults(Theme.result_stats_part[3])
+            r, g, b = self.engine.theme.hexToColorResults(self.engine.theme.result_stats_part[3])
             glColor3f(r, g, b)
           except IndexError:
-            Theme.setBaseColor(1-v)
-          font.render(text, (float(Theme.result_stats_part[0]) - wText / 2, float(Theme.result_stats_part[1]) + v), scale = float(Theme.result_stats_part[2]))
+            self.engine.theme.setBaseColor(1-v)
+          font.render(text, (float(self.engine.theme.result_stats_part[0]) - wText / 2, float(self.engine.theme.result_stats_part[1]) + v), scale = float(self.engine.theme.result_stats_part[2]))
   
   def renderInitialCoOpScore(self, visibility, topMost):
     bigFont = self.engine.data.bigFont
@@ -997,56 +997,56 @@ class GameResultsScene(Scene):
       wFactor = 640.000/self.background.width1()
       self.engine.drawImage(self.background, scale = (wFactor,-wFactor), coord = (w/2,h/2))
     
-    Theme.setBaseColor(1-v)
+    self.engine.theme.setBaseColor(1-v)
     
     if self.song:
       try:
-        text = Theme.result_song_text % Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
+        text = self.engine.theme.result_song_text % Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
       except TypeError:
-        text = "%s %s" % (Dialogs.removeSongOrderPrefixFromName(self.song.info.name), Theme.result_song_text)
+        text = "%s %s" % (Dialogs.removeSongOrderPrefixFromName(self.song.info.name), self.engine.theme.result_song_text)
       try:
-        r, g, b = Theme.hexToColorResults(Theme.result_song[3])
+        r, g, b = self.engine.theme.hexToColorResults(self.engine.theme.result_song[3])
         glColor3f(r, g, b)
       except IndexError:
-        Theme.setBaseColor(1-v)
+        self.engine.theme.setBaseColor(1-v)
       try:
-        font = self.engine.data.fontDict[Theme.result_song[4]]
+        font = self.engine.data.fontDict[self.engine.theme.result_song[4]]
       except:
         font = defFont
-      wText, hText = font.getStringSize(text, scale = float(Theme.result_song[2]))
+      wText, hText = font.getStringSize(text, scale = float(self.engine.theme.result_song[2]))
       if self.scaleTitle == 1:
         if self.centerTitle == 1:
-          max = .94 - (abs(.5 - float(Theme.result_song[0]))*2)
-          scale = font.scaleText(text, max, scale = float(Theme.result_song[2]))
+          max = .94 - (abs(.5 - float(self.engine.theme.result_song[0]))*2)
+          scale = font.scaleText(text, max, scale = float(self.engine.theme.result_song[2]))
           wText, hText = font.getStringSize(text, scale = scale)
-          xText = float(Theme.result_song[0])-wText/2
+          xText = float(self.engine.theme.result_song[0])-wText/2
           if xText < .03:
             xText = .03
-          font.render(text, (xText, float(Theme.result_song[1])), scale = scale)
+          font.render(text, (xText, float(self.engine.theme.result_song[1])), scale = scale)
         else:
-          scale = font.scaleText(text, .97 - float(Theme.result_song[0]), scale = float(Theme.result_song[2]))
-          font.render(text, (float(Theme.result_song[0]), float(Theme.result_song[1])), scale = scale)
+          scale = font.scaleText(text, .97 - float(self.engine.theme.result_song[0]), scale = float(self.engine.theme.result_song[2]))
+          font.render(text, (float(self.engine.theme.result_song[0]), float(self.engine.theme.result_song[1])), scale = scale)
       else:
         if self.centerTitle == 1:
-          Dialogs.wrapCenteredText(font, (float(Theme.result_song[0]), float(Theme.result_song[1]) - v), text, 0.9, float(Theme.result_song[2]))
+          Dialogs.wrapCenteredText(font, (float(self.engine.theme.result_song[0]), float(self.engine.theme.result_song[1]) - v), text, 0.9, float(self.engine.theme.result_song[2]))
         else:
-          Dialogs.wrapText(font, (float(Theme.result_song[0]), float(Theme.result_song[1]) - v), text, 0.9, float(Theme.result_song[2]))
+          Dialogs.wrapText(font, (float(self.engine.theme.result_song[0]), float(self.engine.theme.result_song[1]) - v), text, 0.9, float(self.engine.theme.result_song[2]))
       
       scoreCard = self.scoring[0]
       i = 0
 
       try:
-        r, g, b = Theme.hexToColorResults(Theme.result_score[3])
+        r, g, b = self.engine.theme.hexToColorResults(self.engine.theme.result_score[3])
         glColor3f(r, g, b)
       except IndexError:
-        Theme.setBaseColor(1-v)
+        self.engine.theme.setBaseColor(1-v)
       text = "%d" % self.currentScore[i]
       try:
-        font = self.engine.data.fontDict[Theme.result_score[4]]
+        font = self.engine.data.fontDict[self.engine.theme.result_score[4]]
       except:
         font = bigFont
-      wText, hText = font.getStringSize(text, scale = float(Theme.result_score[2]))
-      font.render(text, (float(Theme.result_score[0]) - wText / 2, float(Theme.result_score[1]) + v), scale = float(Theme.result_score[2]))
+      wText, hText = font.getStringSize(text, scale = float(self.engine.theme.result_score[2]))
+      font.render(text, (float(self.engine.theme.result_score[0]) - wText / 2, float(self.engine.theme.result_score[1]) + v), scale = float(self.engine.theme.result_score[2]))
       
       if self.resultStep == 0:
         space = self.space[i]
@@ -1068,16 +1068,16 @@ class GameResultsScene(Scene):
 #-          else:
 #-            star = self.starPerfect
 #-          try:
-#-            wide = star.width1()*float(Theme.result_star[3])
+#-            wide = star.width1()*float(self.engine.theme.result_star[3])
 #-          except IndexError:
 #-            wide = star.width1()*.5
 #-          if self.maskStars:
 #-            if self.theme == 2:
-#-              self.engine.drawImage(star, scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (((w*Theme.result_star[0])+wide*j)*space**4,h*float(Theme.result_star[1])), color = (1, 1, 0, 1))
+#-              self.engine.drawImage(star, scale = (float(self.engine.theme.result_star[2]),-float(self.engine.theme.result_star[2])), coord = (((w*self.engine.theme.result_star[0])+wide*j)*space**4,h*float(self.engine.theme.result_star[1])), color = (1, 1, 0, 1))
 #-            else:
-#-              self.engine.drawImage(star, scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])), color = (0, 1, 0, 1))
+#-              self.engine.drawImage(star, scale = (float(self.engine.theme.result_star[2]),-float(self.engine.theme.result_star[2])), coord = (((w*float(self.engine.theme.result_star[0]))+wide*j)*space**4,h*float(self.engine.theme.result_star[1])), color = (0, 1, 0, 1))
 #-          else:
-#-            self.engine.drawImage(star, scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])))
+#-            self.engine.drawImage(star, scale = (float(self.engine.theme.result_star[2]),-float(self.engine.theme.result_star[2])), coord = (((w*float(self.engine.theme.result_star[0]))+wide*j)*space**4,h*float(self.engine.theme.result_star[1])))
 #-      else:
 #-        for j in range(5):
 #-          if j < scoreCard.stars:
@@ -1085,10 +1085,10 @@ class GameResultsScene(Scene):
 #-          else:
 #-            star = self.star1
 #-          try:
-#-            wide = star.width1()*float(Theme.result_star[3])
+#-            wide = star.width1()*float(self.engine.theme.result_star[3])
 #-          except IndexError:
 #-            wide = star.width1()*.5
-#-          self.engine.drawImage(star, scale = (float(Theme.result_star[2]),-float(Theme.result_star[2])), coord = (((w*float(Theme.result_star[0]))+wide*j)*space**4,h*float(Theme.result_star[1])))
+#-          self.engine.drawImage(star, scale = (float(self.engine.theme.result_star[2]),-float(self.engine.theme.result_star[2])), coord = (((w*float(self.engine.theme.result_star[0]))+wide*j)*space**4,h*float(self.engine.theme.result_star[1])))
       
       settingsText = "%s %s - %s: %s / %s, %s: %s" % (self.engine.versionString, self.tsSettings, self.tsHopos, self.hopoStyle, self.hopoFreq, self.tsHitWindow, self.hitWindow)
       settingsScale = 0.0012
@@ -1097,119 +1097,119 @@ class GameResultsScene(Scene):
       
       if self.coOpType == 2:
         try:
-          font = self.engine.data.fontDict[Theme.result_stats_streak[4]]
+          font = self.engine.data.fontDict[self.engine.theme.result_stats_streak[4]]
         except:
           font = defFont
-        text = _(Theme.result_stats_streak_text) % scoreCard.hiStreak
+        text = _(self.engine.theme.result_stats_streak_text) % scoreCard.hiStreak
         wText, hText = font.getStringSize(text)
         try:
-          r, g, b = Theme.hexToColorResults(Theme.result_stats_streak[3])
+          r, g, b = self.engine.theme.hexToColorResults(self.engine.theme.result_stats_streak[3])
           glColor3f(r, g, b)
         except IndexError:
-          Theme.setBaseColor(1-v)
-        font.render(text, (float(Theme.result_stats_streak[0]) - wText / 2, float(Theme.result_stats_streak[1]) + v), scale = float(Theme.result_stats_streak[2]))
+          self.engine.theme.setBaseColor(1-v)
+        font.render(text, (float(self.engine.theme.result_stats_streak[0]) - wText / 2, float(self.engine.theme.result_stats_streak[1]) + v), scale = float(self.engine.theme.result_stats_streak[2]))
       
       for i, scoreCard in enumerate(self.coOpScoring):
         self.engine.view.setViewportHalf(len(self.coOpScoring),i)
         
         text = "%d/%d" % (scoreCard.notesHit, scoreCard.totalStreakNotes)
         try:
-          text = Theme.result_stats_notes_text % text
+          text = self.engine.theme.result_stats_notes_text % text
         except TypeError:
-          text = "%s %s" % (text, Theme.result_stats_notes_text)
+          text = "%s %s" % (text, self.engine.theme.result_stats_notes_text)
         try:
-          r, g, b = Theme.hexToColorResults(Theme.result_stats_notes[3])
+          r, g, b = self.engine.theme.hexToColorResults(self.engine.theme.result_stats_notes[3])
           glColor3f(r, g, b)
         except IndexError:
-          Theme.setBaseColor(1-v)
+          self.engine.theme.setBaseColor(1-v)
         try:
-          font = self.engine.data.fontDict[Theme.result_stats_notes[4]]
+          font = self.engine.data.fontDict[self.engine.theme.result_stats_notes[4]]
         except:
           font = defFont
-        wText, hText = font.getStringSize(text, scale = float(Theme.result_stats_notes[2]))
-        Dialogs.wrapText(font, (float(Theme.result_stats_notes[0]) - wText/2, float(Theme.result_stats_notes[1]) + v), text, 0.9, float(Theme.result_stats_notes[2]))
+        wText, hText = font.getStringSize(text, scale = float(self.engine.theme.result_stats_notes[2]))
+        Dialogs.wrapText(font, (float(self.engine.theme.result_stats_notes[0]) - wText/2, float(self.engine.theme.result_stats_notes[1]) + v), text, 0.9, float(self.engine.theme.result_stats_notes[2]))
         
-        text = _(Theme.result_stats_accuracy_text) % scoreCard.hitAccuracy
+        text = _(self.engine.theme.result_stats_accuracy_text) % scoreCard.hitAccuracy
         try:
-          font = self.engine.data.fontDict[Theme.result_stats_accuracy[4]]
+          font = self.engine.data.fontDict[self.engine.theme.result_stats_accuracy[4]]
         except:
           font = defFont
         wText, hText = font.getStringSize(text)
         try:
-          r, g, b = Theme.hexToColorResults(Theme.result_stats_accuracy[3])
+          r, g, b = self.engine.theme.hexToColorResults(self.engine.theme.result_stats_accuracy[3])
           glColor3f(r, g, b)
         except IndexError:
-          Theme.setBaseColor(1-v)
-        font.render(text, (float(Theme.result_stats_accuracy[0]) - wText / 2, float(Theme.result_stats_accuracy[1]) + v), scale = float(Theme.result_stats_accuracy[2]))
+          self.engine.theme.setBaseColor(1-v)
+        font.render(text, (float(self.engine.theme.result_stats_accuracy[0]) - wText / 2, float(self.engine.theme.result_stats_accuracy[1]) + v), scale = float(self.engine.theme.result_stats_accuracy[2]))
         
         if self.coOpType < 2: # not GH Co-Op
-          text = _(Theme.result_stats_streak_text) % scoreCard.hiStreak
+          text = _(self.engine.theme.result_stats_streak_text) % scoreCard.hiStreak
           try:
-            font = self.engine.data.fontDict[Theme.result_stats_streak[4]]
+            font = self.engine.data.fontDict[self.engine.theme.result_stats_streak[4]]
           except:
             font = defFont
           wText, hText = font.getStringSize(text)
           try:
-            r, g, b = Theme.hexToColorResults(Theme.result_stats_streak[3])
+            r, g, b = self.engine.theme.hexToColorResults(self.engine.theme.result_stats_streak[3])
             glColor3f(r, g, b)
           except IndexError:
-            Theme.setBaseColor(1-v)
-          font.render(text, (float(Theme.result_stats_streak[0]) - wText / 2, float(Theme.result_stats_streak[1]) + v), scale = float(Theme.result_stats_streak[2]))
+            self.engine.theme.setBaseColor(1-v)
+          font.render(text, (float(self.engine.theme.result_stats_streak[0]) - wText / 2, float(self.engine.theme.result_stats_streak[1]) + v), scale = float(self.engine.theme.result_stats_streak[2]))
         
-        text = _(Theme.result_stats_diff_text) % self.playerList[i].difficulty
+        text = _(self.engine.theme.result_stats_diff_text) % self.playerList[i].difficulty
         try:
-          font = self.engine.data.fontDict[Theme.result_stats_diff[4]]
+          font = self.engine.data.fontDict[self.engine.theme.result_stats_diff[4]]
         except:
           font = defFont
         wText, hText = font.getStringSize(text)
         try:
-          r, g, b = Theme.hexToColorResults(Theme.result_stats_diff[3])
+          r, g, b = self.engine.theme.hexToColorResults(self.engine.theme.result_stats_diff[3])
           glColor3f(r, g, b)
         except IndexError:
-          Theme.setBaseColor(1-v)
-        font.render(text, (float(Theme.result_stats_diff[0]) - wText / 2, float(Theme.result_stats_diff[1]) + v), scale = float(Theme.result_stats_diff[2]))
+          self.engine.theme.setBaseColor(1-v)
+        font.render(text, (float(self.engine.theme.result_stats_diff[0]) - wText / 2, float(self.engine.theme.result_stats_diff[1]) + v), scale = float(self.engine.theme.result_stats_diff[2]))
         
         text = self.playerList[i].name
         try:
-          font = self.engine.data.fontDict[Theme.result_stats_name[4]]
+          font = self.engine.data.fontDict[self.engine.theme.result_stats_name[4]]
         except:
           font = defFont
         wText, hText = font.getStringSize(text)
         try:
-          r, g, b = Theme.hexToColorResults(Theme.result_stats_name[3])
+          r, g, b = self.engine.theme.hexToColorResults(self.engine.theme.result_stats_name[3])
           glColor3f(r, g, b)
         except IndexError:
-          Theme.setBaseColor(1-v)
-        font.render(text, (float(Theme.result_stats_name[0]) - wText / 2, float(Theme.result_stats_name[1]) + v), scale = float(Theme.result_stats_name[2]))
+          self.engine.theme.setBaseColor(1-v)
+        font.render(text, (float(self.engine.theme.result_stats_name[0]) - wText / 2, float(self.engine.theme.result_stats_name[1]) + v), scale = float(self.engine.theme.result_stats_name[2]))
         
-        if Theme.result_stats_part_text.strip() == "$icon$" and not self.partImage:
+        if self.engine.theme.result_stats_part_text.strip() == "$icon$" and not self.partImage:
           text = "%s"
         else:
-          text = Theme.result_stats_part_text.strip()
+          text = self.engine.theme.result_stats_part_text.strip()
         
         if text == "$icon$" and self.partImage:
-          self.engine.drawImage(self.part[i], scale = (float(Theme.result_stats_part[2]),-float(Theme.result_stats_part[2])), coord = (w*float(Theme.result_stats_part[0]),h*float(Theme.result_stats_part[1])))
+          self.engine.drawImage(self.part[i], scale = (float(self.engine.theme.result_stats_part[2]),-float(self.engine.theme.result_stats_part[2])), coord = (w*float(self.engine.theme.result_stats_part[0]),h*float(self.engine.theme.result_stats_part[1])))
         else:
           try:
             text = text % self.playerList[i].part
           except TypeError:
             text = "%s %s" % (text, self.playerList[i].part)
           try:
-            font = self.engine.data.fontDict[Theme.result_stats_part[4]]
+            font = self.engine.data.fontDict[self.engine.theme.result_stats_part[4]]
           except:
             font = defFont
           wText, hText = font.getStringSize(text)
           try:
-            r, g, b = Theme.hexToColorResults(Theme.result_stats_part[3])
+            r, g, b = self.engine.theme.hexToColorResults(self.engine.theme.result_stats_part[3])
             glColor3f(r, g, b)
           except IndexError:
-            Theme.setBaseColor(1-v)
-          font.render(text, (float(Theme.result_stats_part[0]) - wText / 2, float(Theme.result_stats_part[1]) + v), scale = float(Theme.result_stats_part[2]))
+            self.engine.theme.setBaseColor(1-v)
+          font.render(text, (float(self.engine.theme.result_stats_part[0]) - wText / 2, float(self.engine.theme.result_stats_part[1]) + v), scale = float(self.engine.theme.result_stats_part[2]))
   
   def renderCheatList(self, visibility, topMost):
     bigFont = self.engine.data.bigFont
     try:
-      font  = self.engine.data.fontDict[Theme.result_cheats_font]
+      font  = self.engine.data.fontDict[self.engine.theme.result_cheats_font]
     except KeyError:
       font  = self.engine.data.font
     
@@ -1241,21 +1241,21 @@ class GameResultsScene(Scene):
           text2 += "%.1f%%" % (self.cheats[i][j][1] * 100)
         text3 = self.totalHandicap[i]
         text4 = self.originalScore[i]
-      wText, hText = font.getStringSize(text, scale = float(Theme.result_cheats_info[2]))
+      wText, hText = font.getStringSize(text, scale = float(self.engine.theme.result_cheats_info[2]))
       try:
-        r, g, b = Theme.hexToColorResults(Theme.result_cheats_color)
+        r, g, b = self.engine.theme.hexToColorResults(self.engine.theme.result_cheats_color)
         glColor3f(r, g, b)
       except IndexError:
-        Theme.setBaseColor(1-v)
-      font.render(text, (float(Theme.result_cheats_info[0]) - wText / 2, float(Theme.result_cheats_info[1]) + v), scale = float(Theme.result_cheats_info[2]))
+        self.engine.theme.setBaseColor(1-v)
+      font.render(text, (float(self.engine.theme.result_cheats_info[0]) - wText / 2, float(self.engine.theme.result_cheats_info[1]) + v), scale = float(self.engine.theme.result_cheats_info[2]))
       wText, hText = font.getStringSize(text2, scale = .0015)
-      font.render(text2, (float(Theme.result_cheats_numbers[0]) - wText / 2, float(Theme.result_cheats_numbers[1]) + v), scale = float(Theme.result_cheats_numbers[2]))
+      font.render(text2, (float(self.engine.theme.result_cheats_numbers[0]) - wText / 2, float(self.engine.theme.result_cheats_numbers[1]) + v), scale = float(self.engine.theme.result_cheats_numbers[2]))
       text = "%s %.1f%%" % (self.tsHandicap, text3)
-      wText, hText = font.getStringSize(text, scale = float(Theme.result_cheats_percent[2]))
-      font.render(text, (float(Theme.result_cheats_percent[0]) - wText / 2, float(Theme.result_cheats_percent[1]) + v), scale = float(Theme.result_cheats_percent[2]))
+      wText, hText = font.getStringSize(text, scale = float(self.engine.theme.result_cheats_percent[2]))
+      font.render(text, (float(self.engine.theme.result_cheats_percent[0]) - wText / 2, float(self.engine.theme.result_cheats_percent[1]) + v), scale = float(self.engine.theme.result_cheats_percent[2]))
       text = "%s %d" % (self.tsOriginal, text4)
-      wText, hText = font.getStringSize(text2, scale = float(Theme.result_cheats_score[2]))
-      font.render(text, (float(Theme.result_cheats_score[0]) - wText / 2, float(Theme.result_cheats_score[1]) + v), scale = float(Theme.result_cheats_score[2]))
+      wText, hText = font.getStringSize(text2, scale = float(self.engine.theme.result_cheats_score[2]))
+      font.render(text, (float(self.engine.theme.result_cheats_score[0]) - wText / 2, float(self.engine.theme.result_cheats_score[1]) + v), scale = float(self.engine.theme.result_cheats_score[2]))
   
   def renderHighScores(self, visibility, topMost):
     if self.coOpType == 0:
@@ -1263,7 +1263,7 @@ class GameResultsScene(Scene):
 
     bigFont = self.engine.data.bigFont
     try:
-      font  = self.engine.data.fontDict[Theme.result_high_score_font]
+      font  = self.engine.data.fontDict[self.engine.theme.result_high_score_font]
     except KeyError:
       font  = self.engine.data.font
     Dialogs.fadeScreen(.2)
@@ -1281,12 +1281,12 @@ class GameResultsScene(Scene):
       text = _("%s High Scores") % self.scorePart
     w1, h1 = font.getStringSize(text)
     
-    Theme.setBaseColor(1 - v)
+    self.engine.theme.setBaseColor(1 - v)
     font.render(text, (.5 - w1 / 2, .01 - v + self.offset))
     
     text = _("Difficulty: %s") % (self.scoreDifficulty)
     w1, h1 = font.getStringSize(text)
-    Theme.setBaseColor(1 - v)
+    self.engine.theme.setBaseColor(1 - v)
     font.render(text, (.5 - w1 / 2, .01 - v + h1 + self.offset))
     
     x = .01
@@ -1306,10 +1306,10 @@ class GameResultsScene(Scene):
           originalScore = score
         for j,player in enumerate(self.playerList):
           if (self.time % 10.0) < 5.0 and i == self.highscoreIndex[j] and self.scoreDifficulty == player.difficulty and self.scorePart == player.part:
-            Theme.setSelectedColor(1 - v)
+            self.engine.theme.setSelectedColor(1 - v)
             break
           else:
-            Theme.setBaseColor(1 - v)
+            self.engine.theme.setBaseColor(1 - v)
         font.render("%d." % (i + 1), (x, y + self.offset),    scale = scale)
         if notesTotal != 0:
           score = "%s %.1f%%" % (score, (float(notesHit) / notesTotal) * 100.0)
@@ -1326,10 +1326,10 @@ class GameResultsScene(Scene):
 
         for j,player in enumerate(self.playerList):
           if (self.time % 10.0) < 5.0 and i == self.highscoreIndex[j] and self.scoreDifficulty == player.difficulty and self.scorePart == player.part:
-            Theme.setSelectedColor(1 - v)
+            self.engine.theme.setSelectedColor(1 - v)
             break
           else:
-            Theme.setBaseColor(1 - v)
+            self.engine.theme.setBaseColor(1 - v)
         font.render(name, (x + .8, y + self.offset), scale = scale)
         y += h1
         endScroll -= .07
@@ -1344,7 +1344,7 @@ class GameResultsScene(Scene):
         sScale = 0.001
         sW, sH = font.getStringSize("A", scale = sScale)
         sYPos = .7 - ( (sH * 1.25) * j)
-        Theme.setBaseColor(1 - v)
+        self.engine.theme.setBaseColor(1 - v)
         if self.uploadResponse[j] is None:
           upScoreText = _("Uploading Scores...")
           font.render("P%d (%s) %s" % (j+1, player.upname, upScoreText), (.05, sYPos + v), scale = sScale)

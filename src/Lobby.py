@@ -37,7 +37,6 @@ import Dialogs
 import Player
 import Menu
 import Song
-import Theme
 import Config
 
 class Lobby(Layer, KeyListener): #MessageHandler
@@ -62,7 +61,7 @@ class Lobby(Layer, KeyListener): #MessageHandler
     self.players      = Config.get("game", "players")
     self.mode1p       = Config.get("game","game_mode")
     self.mode2p       = Config.get("game","multiplayer_mode")
-    self.lobbyMode    = Theme.lobbyMode
+    self.lobbyMode    = self.engine.theme.lobbyMode
     sfxVolume = self.engine.config.get("audio", "SFX_volume")
     self.engine.data.selectSound.setVolume(sfxVolume)
     self.engine.data.acceptSound.setVolume(sfxVolume)  #MFH
@@ -130,7 +129,7 @@ class Lobby(Layer, KeyListener): #MessageHandler
       
       self.controlDict = Player.controlDict
       self.selected = 0
-      self.screenOptions = Theme.lobbySelectLength
+      self.screenOptions = self.engine.theme.lobbySelectLength
       self.pos = (0, self.screenOptions)
       self.getPlayers()
       
@@ -415,8 +414,8 @@ class Lobby(Layer, KeyListener): #MessageHandler
       return
     self.engine.view.setOrthogonalProjection(normalize = True)
     try:
-      font = self.engine.data.fontDict[Theme.lobbySelectFont]
-      titleFont = self.engine.data.fontDict[Theme.lobbyTitleFont]
+      font = self.engine.data.fontDict[self.engine.theme.lobbySelectFont]
+      titleFont = self.engine.data.fontDict[self.engine.theme.lobbyTitleFont]
     except KeyError:
       font = self.engine.data.font
       titleFont = self.engine.data.loadingFont
@@ -426,17 +425,17 @@ class Lobby(Layer, KeyListener): #MessageHandler
       if self.background:
         wFactor = 640.000/self.background.width1()
         self.engine.drawImage(self.background, scale = (wFactor,-wFactor), coord = (w/2,h/2))
-      r, g, b = Theme.lobbyTitleColor
+      r, g, b = self.engine.theme.lobbyTitleColor
       glColor3f(r, g, b)
       if self.chooseCharImg:
-        self.engine.drawImage(self.chooseCharImg, scale = (Theme.lobbyTitleScale,-Theme.lobbyTitleScale), coord = (w*Theme.lobbyTitleX,h*Theme.lobbyTitleY))
+        self.engine.drawImage(self.chooseCharImg, scale = (self.engine.theme.lobbyTitleScale,-self.engine.theme.lobbyTitleScale), coord = (w*self.engine.theme.lobbyTitleX,h*self.engine.theme.lobbyTitleY))
       else:
-        wText, hText = font.getStringSize(self.tsChooseChar, scale = Theme.lobbyTitleScale)
-        titleFont.render(self.tsChooseChar, (Theme.lobbyTitleX-(wText),Theme.lobbyTitleY), scale = Theme.lobbyTitleScale)
-      r, g, b = Theme.lobbyPlayerColor
+        wText, hText = font.getStringSize(self.tsChooseChar, scale = self.engine.theme.lobbyTitleScale)
+        titleFont.render(self.tsChooseChar, (self.engine.theme.lobbyTitleX-(wText),self.engine.theme.lobbyTitleY), scale = self.engine.theme.lobbyTitleScale)
+      r, g, b = self.engine.theme.lobbyPlayerColor
       glColor3f(r, g, b)
-      wText, hText = titleFont.getStringSize(self.tsPlayerStr % (self.playerNum+1), scale = Theme.lobbyTitleScale)
-      titleFont.render(self.tsPlayerStr % (self.playerNum+1), (Theme.lobbyTitleCharacterX-wText/2, Theme.lobbyTitleCharacterY), scale = Theme.lobbyTitleScale)
+      wText, hText = titleFont.getStringSize(self.tsPlayerStr % (self.playerNum+1), scale = self.engine.theme.lobbyTitleScale)
+      titleFont.render(self.tsPlayerStr % (self.playerNum+1), (self.engine.theme.lobbyTitleCharacterX-wText/2, self.engine.theme.lobbyTitleCharacterY), scale = self.engine.theme.lobbyTitleScale)
       for i, name in enumerate(self.options):
         if i < self.pos[0] or i > self.pos[1]:
           continue
@@ -447,46 +446,46 @@ class Lobby(Layer, KeyListener): #MessageHandler
             lefty = 1
             if self.playerPrefs[j][0] == 1:
               lefty = -1
-            self.engine.drawImage(self.buttons, scale = (self.buttonScale*lefty, -self.buttonScale*(1.0/6.0)), coord = (w*Theme.lobbyPreviewX,h*(Theme.lobbyPreviewY+.45)), rect = (0, 1, 0, (1.0/6.0)))
+            self.engine.drawImage(self.buttons, scale = (self.buttonScale*lefty, -self.buttonScale*(1.0/6.0)), coord = (w*self.engine.theme.lobbyPreviewX,h*(self.engine.theme.lobbyPreviewY+.45)), rect = (0, 1, 0, (1.0/6.0)))
             if self.lobbyMode == 1:
-              avatarCoord = (w*Theme.lobbyAvatarX,h*Theme.lobbyAvatarY)
-              avatarScale = Theme.lobbyAvatarScale
+              avatarCoord = (w*self.engine.theme.lobbyAvatarX,h*self.engine.theme.lobbyAvatarY)
+              avatarScale = self.engine.theme.lobbyAvatarScale
             else:
-              avatarCoord = (w*Theme.lobbyPreviewX,h*(Theme.lobbyPreviewY+.75))
+              avatarCoord = (w*self.engine.theme.lobbyPreviewX,h*(self.engine.theme.lobbyPreviewY+.75))
               avatarScale = 1
             if self.avatars[i] == "Empty" or self.avatars[i] == None:
               self.engine.drawImage(self.defaultAvatar, scale = (self.defAvScale*avatarScale,-self.defAvScale*avatarScale), coord = avatarCoord)
             else:
               self.engine.drawImage(self.avatars[i], scale = (self.avatarScale[i]*avatarScale,-self.avatarScale[i]*avatarScale), coord = avatarCoord)
             if self.infoImg:
-              self.engine.drawImage(self.infoImg, scale = (.5,-.5), coord = (w*Theme.lobbyPreviewX,h*(Theme.lobbyPreviewY+.55)))
+              self.engine.drawImage(self.infoImg, scale = (.5,-.5), coord = (w*self.engine.theme.lobbyPreviewX,h*(self.engine.theme.lobbyPreviewY+.55)))
             else:
               wText, hText = titleFont.getStringSize(self.tsInfo, scale = .0025)
-              titleFont.render(self.tsInfo, (Theme.lobbyPreviewX-wText/2, ((.45-Theme.lobbyPreviewY)*self.engine.data.fontScreenBottom)-hText/2), scale = .0025)
-            r, g, b = Theme.lobbyInfoColor
+              titleFont.render(self.tsInfo, (self.engine.theme.lobbyPreviewX-wText/2, ((.45-self.engine.theme.lobbyPreviewY)*self.engine.data.fontScreenBottom)-hText/2), scale = .0025)
+            r, g, b = self.engine.theme.lobbyInfoColor
             glColor3f(r, g, b)
             for k in range(1,5):
               text = self.tsList[k][self.playerPrefs[j][k]]
               wText, hText = font.getStringSize(text, scale = .0018)
-              font.render(text, (Theme.lobbyPreviewX-wText/2,.4-(Theme.lobbyPreviewY*self.engine.data.fontScreenBottom)+(Theme.lobbyPreviewSpacing*k)), scale = .0018)
+              font.render(text, (self.engine.theme.lobbyPreviewX-wText/2,.4-(self.engine.theme.lobbyPreviewY*self.engine.data.fontScreenBottom)+(self.engine.theme.lobbyPreviewSpacing*k)), scale = .0018)
           if self.itemSelect:
-            self.engine.drawImage(self.itemSelect, scale = (.5,-.5), coord = (w*Theme.lobbySelectImageX,h*(1-(Theme.lobbySelectImageY+Theme.lobbySelectSpace*(i-self.pos[0]))/self.engine.data.fontScreenBottom)))
+            self.engine.drawImage(self.itemSelect, scale = (.5,-.5), coord = (w*self.engine.theme.lobbySelectImageX,h*(1-(self.engine.theme.lobbySelectImageY+self.engine.theme.lobbySelectSpace*(i-self.pos[0]))/self.engine.data.fontScreenBottom)))
           else:
-            r, g, b = Theme.lobbySelectColor
+            r, g, b = self.engine.theme.lobbySelectColor
             glColor3f(r, g, b)
         else:
           if i in self.blockedItems and i != 1:
-            r, g, b = Theme.lobbyDisableColor
+            r, g, b = self.engine.theme.lobbyDisableColor
             glColor3f(r, g, b)
           else:
-            r, g, b = Theme.lobbyFontColor
+            r, g, b = self.engine.theme.lobbyFontColor
             glColor3f(r, g, b)
         if i == 1:
-          wText, hText = titleFont.getStringSize(name, scale = Theme.lobbySelectScale)
-          titleFont.render(name, (Theme.lobbySelectX-wText, Theme.lobbySelectY + (Theme.lobbySelectSpace*(i-self.pos[0]))), scale = Theme.lobbySelectScale)
+          wText, hText = titleFont.getStringSize(name, scale = self.engine.theme.lobbySelectScale)
+          titleFont.render(name, (self.engine.theme.lobbySelectX-wText, self.engine.theme.lobbySelectY + (self.engine.theme.lobbySelectSpace*(i-self.pos[0]))), scale = self.engine.theme.lobbySelectScale)
         else:
-          wText, hText = font.getStringSize(name, scale = Theme.lobbySelectScale)
-          font.render(name, (Theme.lobbySelectX-wText, Theme.lobbySelectY + (Theme.lobbySelectSpace*(i-self.pos[0]))), scale = Theme.lobbySelectScale)
+          wText, hText = font.getStringSize(name, scale = self.engine.theme.lobbySelectScale)
+          font.render(name, (self.engine.theme.lobbySelectX-wText, self.engine.theme.lobbySelectY + (self.engine.theme.lobbySelectSpace*(i-self.pos[0]))), scale = self.engine.theme.lobbySelectScale)
       if self.backgroundTop:
         wFactor = 640.000/self.backgroundTop.width1()
         self.engine.drawImage(self.backgroundTop, scale = (wFactor,-wFactor), coord = (w/2,h/2))
@@ -824,8 +823,8 @@ class CreateCharacter(Layer, KeyListener):
       self.scrollDown()
   def render(self, visibility, topMost):
     try:
-      font = self.engine.data.fontDict[Theme.characterCreateOptionFont]
-      helpFont = self.engine.data.fontDict[Theme.characterCreateHelpFont]
+      font = self.engine.data.fontDict[self.engine.theme.characterCreateOptionFont]
+      helpFont = self.engine.data.fontDict[self.engine.theme.characterCreateHelpFont]
     except KeyError:
       font = self.engine.data.font
       helpFont = self.engine.data.loadingFont
@@ -837,32 +836,32 @@ class CreateCharacter(Layer, KeyListener):
         wFactor = 640.000/self.background.width1()
         self.engine.drawImage(self.background, scale = (wFactor,-wFactor), coord = (w/2,h/2))
       for i, option in enumerate(self.options):
-        r, g, b = Theme.characterCreateHelpColor
+        r, g, b = self.engine.theme.characterCreateHelpColor
         glColor3f(r, g, b)
         cursor = ""
         if self.selected == i:
-          wText, hText = helpFont.getStringSize(option[1], scale = Theme.characterCreateScale)
-          helpFont.render(option[1], (Theme.characterCreateHelpX-(wText/2), Theme.characterCreateHelpY-hText), scale = Theme.characterCreateHelpScale)
-          r, g, b = Theme.characterCreateSelectColor
+          wText, hText = helpFont.getStringSize(option[1], scale = self.engine.theme.characterCreateScale)
+          helpFont.render(option[1], (self.engine.theme.characterCreateHelpX-(wText/2), self.engine.theme.characterCreateHelpY-hText), scale = self.engine.theme.characterCreateHelpScale)
+          r, g, b = self.engine.theme.characterCreateSelectColor
           glColor3f(r, g, b)
           cursor = self.cursor
         else:
-          r, g, b = Theme.characterCreateFontColor
+          r, g, b = self.engine.theme.characterCreateFontColor
           glColor3f(r, g, b)
-        wText, hText = font.getStringSize(option[0], scale = Theme.characterCreateScale)
-        font.render(option[0], (Theme.characterCreateX, Theme.characterCreateY+Theme.characterCreateSpace*i), scale = Theme.characterCreateScale)
+        wText, hText = font.getStringSize(option[0], scale = self.engine.theme.characterCreateScale)
+        font.render(option[0], (self.engine.theme.characterCreateX, self.engine.theme.characterCreateY+self.engine.theme.characterCreateSpace*i), scale = self.engine.theme.characterCreateScale)
         if self.active and self.selected == i:
-          Theme.setSelectedColor(1-v)
+          self.engine.theme.setSelectedColor(1-v)
         if i == 0 or i > 6:
-          wText, hText = font.getStringSize(self.choices[i], scale = Theme.characterCreateScale)
-          font.render(self.choices[i]+cursor, (Theme.characterCreateOptionX-wText, Theme.characterCreateY+Theme.characterCreateSpace*i), scale = Theme.characterCreateScale)
+          wText, hText = font.getStringSize(self.choices[i], scale = self.engine.theme.characterCreateScale)
+          font.render(self.choices[i]+cursor, (self.engine.theme.characterCreateOptionX-wText, self.engine.theme.characterCreateY+self.engine.theme.characterCreateSpace*i), scale = self.engine.theme.characterCreateScale)
         else:
           if i == self.selected:
             str = "< %s >" % self.values[i-1][self.choices[i]]
           else:
             str = self.values[i-1][self.choices[i]]
-          wText, hText = font.getStringSize(str, scale = Theme.characterCreateScale)
-          font.render(str, (Theme.characterCreateOptionX-wText, Theme.characterCreateY+Theme.characterCreateSpace*i), scale = Theme.characterCreateScale)
+          wText, hText = font.getStringSize(str, scale = self.engine.theme.characterCreateScale)
+          font.render(str, (self.engine.theme.characterCreateOptionX-wText, self.engine.theme.characterCreateY+self.engine.theme.characterCreateSpace*i), scale = self.engine.theme.characterCreateScale)
       if self.backgroundTop:
         wFactor = 640.000/self.backgroundTop.width1()
         self.engine.drawImage(self.backgroundTop, scale = (wFactor,-wFactor), coord = (w/2,h/2))

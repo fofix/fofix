@@ -42,8 +42,6 @@ from Camera import Camera
 from Mesh import Mesh
 from Texture import Texture
 
-#import ThemeTransition as TT #akedrou - TEMPORARY!
-
 import Log    #MFH
 
 import Theme  #MFH

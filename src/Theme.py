@@ -1,7 +1,7 @@
 #####################################################################
 # -*- coding: iso-8859-1 -*-                                        #
 #                                                                   #
-# Frets on Fire                                                     #
+# Frets on Fire X (FoFiX)                                           #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
 #               2008 myfingershurt                                  #
 #               2008 Blazingamer                                    #
@@ -24,6 +24,7 @@
 #####################################################################
 
 import Log
+import Version
 import os
 import sys
 import imp
@@ -34,8 +35,11 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 import string
 import math
-from Language import _
+import Language
 from Shader import shaders
+
+#this is so custom themes can get at Language (without getting it on their own)
+_ = Language._(str)
 
 # read the color scheme from the config file
 Config.define("theme", "background_color",  str, "#000000")
@@ -53,63 +57,13 @@ Config.define("theme", "glow_color",        str, "fret")
 
 Config.define("theme", "loading_phrase",    str, None)
 Config.define("theme", "results_phrase",    str, None)
-Config.define("theme", "credit_song",       str, "Unknown")
 
 Config.define("theme", "fret0_color",       str, "#22FF22")
 Config.define("theme", "fret1_color",       str, "#FF2222")
 Config.define("theme", "fret2_color",       str, "#FFFF22")
 Config.define("theme", "fret3_color",       str, "#3333FF")
 Config.define("theme", "fret4_color",       str, "#FF9933")
-Config.define("theme", "open_fret_color",   str, "#CC22CC")
-
-Config.define("theme", "flame0_1X_color",    str, "#d5ff82")
-Config.define("theme", "flame1_1X_color",    str, "#ff8880")
-Config.define("theme", "flame2_1X_color",    str, "#faf66b")
-Config.define("theme", "flame3_1X_color",    str, "#a4f8ff")
-Config.define("theme", "flame4_1X_color",    str, "#ffde8c")
-Config.define("theme", "flame0_2X_color",    str, "#d5ff82")
-Config.define("theme", "flame1_2X_color",    str, "#ff8880")
-Config.define("theme", "flame2_2X_color",    str, "#faf66b")
-Config.define("theme", "flame3_2X_color",    str, "#a4f8ff")
-Config.define("theme", "flame4_2X_color",    str, "#ffde8c")
-Config.define("theme", "flame0_3X_color",    str, "#d5ff82")
-Config.define("theme", "flame1_3X_color",    str, "#ff8880")
-Config.define("theme", "flame2_3X_color",    str, "#faf66b")
-Config.define("theme", "flame3_3X_color",    str, "#a4f8ff")
-Config.define("theme", "flame4_3X_color",    str, "#ffde8c")
-Config.define("theme", "flame0_4X_color",    str, "#d5ff82")
-Config.define("theme", "flame1_4X_color",    str, "#ff8880")
-Config.define("theme", "flame2_4X_color",    str, "#faf66b")
-Config.define("theme", "flame3_4X_color",    str, "#a4f8ff")
-Config.define("theme", "flame4_4X_color",    str, "#ffde8c")
-
-Config.define("theme", "flame_gh3_color",    str, "#BF6006")
-
-Config.define("theme", "flame0_1X_size",     float, 0.075)
-Config.define("theme", "flame1_1X_size",     float, 0.075)
-Config.define("theme", "flame2_1X_size",     float, 0.075)
-Config.define("theme", "flame3_1X_size",     float, 0.075)
-Config.define("theme", "flame4_1X_size",     float, 0.075)
-Config.define("theme", "flame0_2X_size",     float, 0.075)
-Config.define("theme", "flame1_2X_size",     float, 0.075)
-Config.define("theme", "flame2_2X_size",     float, 0.075)
-Config.define("theme", "flame3_2X_size",     float, 0.075)
-Config.define("theme", "flame4_2X_size",     float, 0.075)
-Config.define("theme", "flame0_3X_size",     float, 0.075)
-Config.define("theme", "flame1_3X_size",     float, 0.075)
-Config.define("theme", "flame2_3X_size",     float, 0.075)
-Config.define("theme", "flame3_3X_size",     float, 0.075)
-Config.define("theme", "flame4_3X_size",     float, 0.075)
-Config.define("theme", "flame0_4X_size",     float, 0.075)
-Config.define("theme", "flame1_4X_size",     float, 0.075)
-Config.define("theme", "flame2_4X_size",     float, 0.075)
-Config.define("theme", "flame3_4X_size",     float, 0.075)
-Config.define("theme", "flame4_4X_size",     float, 0.075)
-
-Config.define("theme", "disable_song_spinny",    bool, False)
-Config.define("theme", "disable_editor_spinny",  bool, False)
-Config.define("theme", "disable_results_spinny", bool, False)
-Config.define("theme", "disable_menu_spinny",    bool, False)
+Config.define("theme", "fret5_color",       str, "#CC22CC")
 
 Config.define("theme", "pov_target_x",       float, None)
 Config.define("theme", "pov_target_y",       float, None)
@@ -145,7 +99,6 @@ Config.define("theme", "threeDspin",       bool, True)
 Config.define("theme", "fret_press",     bool,  True)
 Config.define("theme", "opencolor",       str, "#FF9933")
 
-Config.define("theme", "songback",       bool, False)
 Config.define("theme", "versiontag",       bool, False)
 Config.define("theme", "rmtype",       int, None)
 Config.define("theme", "mark_solo_sections", int, 2)
@@ -317,16 +270,16 @@ Config.define("theme", "rockmeter_score_color",  str, "#FFFFFF")
 Config.define("theme", "ingame_stats_color",  str, "#FFFFFF")
 
 #MFH
-Config.define("theme", "song_cd_x",       float, None)
-Config.define("theme", "song_cdscore_x",       float, None)
-Config.define("theme", "song_list_x",       float, None)
-Config.define("theme", "song_listscore_x",       float, None)
+Config.define("theme", "song_cd_x",       float, 0.0)
+Config.define("theme", "song_cdscore_x",       float, 0.6)
+Config.define("theme", "song_list_x",       float, 0.15)
+Config.define("theme", "song_listscore_x",       float, 0.8)
 
-Config.define("theme", "song_listcd_cd_x",       float, None)
-Config.define("theme", "song_listcd_cd_y",       float, None)
-Config.define("theme", "song_listcd_score_x",       float, None)
-Config.define("theme", "song_listcd_score_y",       float, None)
-Config.define("theme", "song_listcd_list_x",       float, None)
+Config.define("theme", "song_listcd_cd_x",       float, .75)
+Config.define("theme", "song_listcd_cd_y",       float, .6)
+Config.define("theme", "song_listcd_score_x",       float, .6)
+Config.define("theme", "song_listcd_score_y",       float, .5)
+Config.define("theme", "song_listcd_list_x",       float, .1)
 
 Config.define("theme", "song_rb2_name_color",       str, "#FFFFFF")
 Config.define("theme", "song_rb2_name_selected_color",       str, "#FFBF00")
@@ -453,1012 +406,765 @@ Config.define("theme", "fail_text_y",       float, None)
 Config.define("theme", "fail_songname_x",  float, 0.5)
 Config.define("theme", "fail_songname_y",  float, 0.35)
 
-submenuX = {}
-submenuY = {}
-submenuV = {}
-
-backgroundColor = None
-baseColor       = None
-selectedColor   = None
-fretColors      = None
-gh3flameColor   = None
-use_fret_colors = None
-
-hopoColor       = None
-spotColor       = None
-keyColor        = None
-key2Color       = None
-tracksColor     = None
-barsColor       = None
-glowColor       = None
-
-flameColors     = None
-openFretColor   = None
-flameSizes      = None
-loadingPhrase   = None
-resultsPhrase   = None
-startingPhrase  = None
-
-spinnySongDisabled = None
-spinnyEditorDisabled = None
-spinnyResultsDisabled = None
-spinnyMenuDisabled = None
-
-creditSong = None
-povTargetX = None
-povTargetY = None
-povTargetZ = None
-povOriginX = None
-povOriginY = None
-povOriginZ = None
-
-#Blazingamer
-menuX = None
-menuY = None
-menuRB = None
-loadingX = None
-loadingY = None
-loadingColor = None
-loadingFScale = None
-loadingRMargin = None
-loadingLSpacing = None
-twoDnote = None
-twoDkeys = None
-threeDspin = None
-fret_press = None
-opencolor = None
-meshColor = None
-songback = None
-versiontag = None
-rmtype = None
-shadowoffsetx = None
-shadowoffsety = None
-
-#akedrou
-menuTipTextY = None
-menuTipTextFont = None
-menuTipTextScale = None
-menuTipTextColor = None
-menuTipTextScrollSpace = None
-menuTipTextScrollMode = None
-menuTipTextDisplay = None
-
-#evilynux
-songlist_score_colorVar = None
-songlistcd_score_colorVar = None
-rockmeter_score_colorVar = None
-ingame_stats_colorVar = None
-
-#akedrou - lobby/control setup
-controlActivateX = None
-controlActivateSelectX = None
-controlActivatePartX = None
-controlActivateY = None
-controlActivateScale = None
-controlActivatePartSize = None
-controlActivateSpace = None
-controlActivateFont = None
-controlDescriptionY = None
-controlDescriptionX = None
-controlDescriptionScale = None
-controlDescriptionFont = None
-controlCheckX = None
-controlCheckY = None
-controlCheckTextY = None
-controlCheckPartMult = None
-controlCheckSpace = None
-controlCheckScale = None
-controlCheckFont  = None
-lobbyMode = None
-lobbyPreviewX = None
-lobbyPreviewY = None #worldrave
-lobbyPreviewSpacing = None
-lobbyTitleX = None
-lobbyTitleY = None
-lobbyTitleCharacterX = None
-lobbyTitleCharacterY = None
-lobbyTitleScale = None
-lobbyTitleFont = None
-lobbyAvatarX = None
-lobbyAvatarY = None
-lobbyAvatarScale = None
-lobbySelectX = None
-lobbySelectY = None
-lobbySelectImageX = None
-lobbySelectImageY = None
-lobbySelectScale = None
-lobbySelectSpace = None
-lobbySelectFont = None
-lobbySelectLength = None
-lobbyTitleColor = None
-lobbyInfoColor = None
-lobbyFontColor = None
-lobbyPlayerColor = None
-lobbySelectColor = None
-lobbyDisableColor = None
-characterCreateX = None
-characterCreateY = None
-characterCreateOptionX = None
-characterCreateFontColor = None
-characterCreateSelectColor = None
-characterCreateHelpColor = None
-characterCreateHelpX = None
-characterCreateHelpY = None
-characterCreateHelpScale = None
-characterCreateOptionFont = None
-characterCreateHelpFont = None
-characterCreateScale = None
-characterCreateSpace = None
-avatarSelectTextX = None
-avatarSelectTextY = None
-avatarSelectTextScale = None
-avatarSelectFont = None
-avatarSelectAvX = None
-avatarSelectAvY = None
-avatarSelectWheelY = None
-
-vocalMeterSize = None
-vocalMeterX = None
-vocalMeterY = None
-vocalMultX  = None
-vocalMultY  = None
-vocalPowerX = None
-vocalPowerY = None
-vocalFillupCenterX = None
-vocalFillupCenterY = None
-vocalFillupInRadius = None
-vocalFillupOutRadius = None
-vocalFillupColor = None
-vocalFillupFactor = None
-vocalCircularFillup = None
-vocalLaneSize = None
-vocalGlowSize = None
-vocalGlowFade = None
-vocalLaneColor = None
-vocalShadowColor = None
-vocalGlowColor = None
-vocalLaneColorStar = None
-vocalShadowColorStar = None
-vocalGlowColorStar = None
-
-#worldrave 
-setlistguidebuttonsposX = None
-setlistguidebuttonsposY = None
-setlistguidebuttonsscaleX = None
-setlistguidebuttonsscaleY = None
-setlistpreviewbuttonposX = None
-setlistpreviewbuttonposY = None
-setlistpreviewbuttonscaleY = None
-setlistpreviewbuttonscaleY = None
-
-noterot = [0]*5
-notepos = [0]*5
-drumnoterot = [0]*5
-drumnotepos = [0]*5
-keyrot = [0]*5
-keypos = [0]*5
-drumkeyrot = [0]*5
-drumkeypos = [0]*5
-
-#MFH:
-song_cd_Xpos = None         #Songlist in CD mode: horizontal position of CDs/cases
-song_cdscore_Xpos = None    #Songlist in CD mode: horizontal position of score info
-song_list_Xpos = None       #Songlist in List mode: horizontal position of song names/artists
-song_listscore_Xpos = None  #Songlist in List mode: horizontal position of score info
-
-song_listcd_cd_Xpos = None
-song_listcd_cd_Ypos = None
-song_listcd_score_Xpos = None
-song_listcd_score_Ypos = None
-song_listcd_list_Xpos = None
-
-pause_bkg_pos = [None]*4
-pause_text_xPos = None
-pause_text_yPos = None
-
-opt_bkg_size = [None]*4
-opt_text_xPos = None
-opt_text_yPos = None
-
-main_menu_scaleVar = None
-main_menu_vspacingVar = None
-use_solo_submenu = None
-sub_menu_xVar = None
-sub_menu_yVar = None
-
-career_title_colorVar = None
-opt_text_colorVar = None
-opt_selected_colorVar = None
-song_name_text_colorVar = None
-song_name_selected_colorVar = None
-artist_text_colorVar = None
-artist_selected_colorVar = None
-library_text_colorVar = None
-library_selected_colorVar = None
-
-song_rb2_name_colorVar = None
-song_rb2_name_selected_colorVar = None
-song_rb2_diff_colorVar = None
-song_rb2_artist_colorVar = None
-
-pause_text_colorVar = None
-pause_selected_colorVar = None
-fail_completed_colorVar = None
-fail_text_colorVar = None
-fail_selected_colorVar = None
-
-#MFH - crowd cheer loop delay in ini: if not exist, use value from settings. Otherwise, use ini value.
-crowdLoopDelay = None
-
-#MFH - for instrument / difficulty / practice section submenu positioning
-songSelectSubmenuX = None
-songSelectSubmenuY = None
-
-#TWD - for neck chooser text positionning
-neck_prompt_x = None
-neck_prompt_y = None
-
-#MFH - for scaling song info during countdown
-songInfoDisplayScale = None
-
-#Worldrave - for position of song info display during countdown
-songInfoDisplayX = None
-songInfoDisplayY = None
-versiontagposX = None
-versiontagposY = None
-neckLength = None
-
-#MFH - y offset = lines, x offset = spaces
-songSelectSubmenuOffsetLines = None
-songSelectSubmenuOffsetSpaces = None
-
-#MFH - option for Rock Band 2 ini - only show # of stars you are working on
-displayAllGreyStars = None
-smallMult = None
-
-#Qstick - hopo indicator position and color
-hopoIndicatorX = None
-hopoIndicatorY = None
-hopoIndicatorActiveColor = None
-hopoIndicatorInactiveColor = None
-
-#stump - parameters for continuous fillup of stars
-starFillupCenterX = None
-starFillupCenterY = None
-starFillupInRadius = None
-starFillupOutRadius = None
-starFillupColor = None
-
-#Qstick - misc
-songListDisplay = None
-neckWidth = None
-markSolos = None
-power_up_name = None #akedrou
-
-result_score = [None] * 5
-result_star = [None] * 4
-result_song = [None] * 5
-result_song_form = None
-result_song_text = None
-result_stats_part = [None] * 5
-result_stats_part_text = None
-result_stats_name = [None] * 5
-result_stats_diff = [None] * 5
-result_stats_diff_text = None
-result_stats_accuracy = [None] * 5
-result_stats_accuracy_text = None
-result_stats_streak = [None] * 5
-result_stats_streak_text = None
-result_stats_notes = [None] * 5
-result_stats_notes_text = None
-#akedrou
-result_cheats_info = [None] * 3
-result_cheats_numbers = [None] * 3
-result_cheats_score = [None] * 3
-result_cheats_percent = [None] * 3
-result_cheats_color = None
-result_cheats_font  = None
-result_high_score_font = None
-result_menu_x = None
-result_menu_y = None
-result_star_type = None
-
-jurgTextPos = [None] * 3
-
-
-#Racer:
-#fail_bkg_xPos = None
-#fail_bkg_yPos = None
-fail_bkg_pos = [None]*4
-fail_text_xPos = None
-fail_text_yPos = None
-
-
-
-def hexToColor(color):
-  if color[0] == "#":
-    color = color[1:]
-    if len(color) == 3:
-      return (int(color[0], 16) / 15.0, int(color[1], 16) / 15.0, int(color[2], 16) / 15.0)
-    elif len(color) == 4:
-      return (int(color[0], 16) / 15.0, int(color[1], 16) / 15.0, int(color[2], 16) / 15.0, int(color[2], 16) / 15.0)
-    return (int(color[0:2], 16) / 255.0, int(color[2:4], 16) / 255.0, int(color[4:6], 16) / 255.0)
-  elif color.lower() == "off":
-    return (-1, -1, -1)
-  elif color.lower() == "fret":
-    return (-2, -2, -2)
-  return (0, 0, 0)
-
-def hexToColorResults(color):
-  color = color.strip()
-  if color[0] == "#":
-    color = color[1:]
-    if len(color) == 3:
-      return (int(color[0], 16) / 15.0, int(color[1], 16) / 15.0, int(color[2], 16) / 15.0)
-    return (int(color[0:2], 16) / 255.0, int(color[2:4], 16) / 255.0, int(color[4:6], 16) / 255.0)
-  return baseColor
+class Theme:
+  def __init__(self, path, name, iniFile = True):
+    self.name = name
+    self.path = path
     
-def colorToHex(color):
-  return "#" + ("".join(["%02x" % int(c * 255) for c in color]))
-
-def setSelectedColor(alpha = 1.0):
-  glColor4f(*(selectedColor + (alpha,)))
-
-def setBaseColor(alpha = 1.0):
-  glColor4f(*(baseColor + (alpha,)))
-  
-def packTupleKey(key, type = str):
-  vals = key.split(',')
-  if isinstance(type, list):
-    retval = tuple(type[i](n.strip()) for i, n in enumerate(vals))
-  else:
-    retval = tuple(type(n.strip()) for n in vals)
-  return retval
-
-def open(config, themepath = None):
-  # Read in ini specific variables
-
-  
-  setupColors(config)
-  setupFrets(config)
-  setupFlameColors(config)
-  setupFlameSizes(config)
-  setupSpinny(config)
-  setupPOV(config)
-  setupMisc(config)
-  setupMenu(config)
-  setupLobby(config) #akedrou
-  setupVocals(config) #akedrou
-  setupSonglist(config) #MFH
-  setupPauseNOpt(config) #MFH
-  setupTWOD(config)
-  setupFail(config) #racer
-  setupEvilynux(config)
-  setupRockmeter(config)
-  setupNeckChooser(config)
-  setupHopoIndicator(config)
-  setupResults(config)
-  setupSubmenus(config, themepath)
-
- 
-  
-
-def setupNeckChooser(config):
-  global neck_prompt_x, neck_prompt_y
-  
-  neck_prompt_x = config.get("theme", "menu_neck_choose_x")
-  neck_prompt_y = config.get("theme", "menu_neck_choose_y")
-
-
-def setupColors(config):
-  global backgroundColor, baseColor, selectedColor
-  global hopoColor, spotColor, meshColor
-  global keyColor, key2Color
-  global tracksColor, barsColor, glowColor
-  
-  backgroundColor = hexToColor(config.get("theme", "background_color"))  
-  baseColor = hexToColor(config.get("theme", "base_color"))
-  selectedColor = hexToColor(config.get("theme", "selected_color"))
-  meshColor = hexToColor(config.get("theme", "mesh_color"))
-  hopoColor = hexToColor(config.get("theme", "hopo_color"))
-  spotColor = hexToColor(config.get("theme", "spot_color"))
-  keyColor = hexToColor(config.get("theme", "key_color"))
-  key2Color = hexToColor(config.get("theme", "key2_color"))
-  tracksColor = hexToColor(config.get("theme", "tracks_color"))
-  barsColor = hexToColor(config.get("theme", "bars_color"))
-  glowColor = hexToColor(config.get("theme", "glow_color"))
- 
-def setupFrets(config):
-  global fretColors, openFretColor, use_fret_colors
-    
-  if fretColors == None:
-    fretColors = [hexToColor(config.get("theme", "fret%d_color" % i)) for i in range(5)]
-    fretColors.append(hexToColor(config.get("theme", "fretS_color"))) #Volshebnyi - spNote color
-    fretColors.append(hexToColor(config.get("theme", "fretK_color"))) #Volshebnyi - killswitch tail color
-  else:
-    fretColors[0] = hexToColor(config.get("theme", "fret0_color"))
-    fretColors[1] = hexToColor(config.get("theme", "fret1_color"))
-    fretColors[2] = hexToColor(config.get("theme", "fret2_color"))
-    fretColors[3] = hexToColor(config.get("theme", "fret3_color"))
-    fretColors[4] = hexToColor(config.get("theme", "fret4_color"))
-    fretColors[5] = hexToColor(config.get("theme", "fretS_color"))
-    fretColors[6] = hexToColor(config.get("theme", "fretK_color"))
-  openFretColor = hexToColor(config.get("theme", "open_fret_color"))
-  use_fret_colors = config.get("theme", "use_fret_colors")
-
-def setupFlameColors(config):
-  global flameColors
-  global gh3flameColor
-
-  temp = config.get("theme", "flame_gh3_color")
-  gh3flameColor = hexToColor(temp)
-  if flameColors == None:
-    flameColors = [[hexToColor(config.get("theme", "flame%d_1X_color" % i)) for i in range(5)]]
-    flameColors.append([hexToColor(config.get("theme", "flame%d_2X_color" % i)) for i in range(5)])
-    flameColors.append([hexToColor(config.get("theme", "flame%d_3X_color" % i)) for i in range(5)])
-    flameColors.append([hexToColor(config.get("theme", "flame%d_4X_color" % i)) for i in range(5)])
-  else:
-    flameColors[0][0] = hexToColor(config.get("theme", "flame0_1X_color"))
-    flameColors[0][1] = hexToColor(config.get("theme", "flame1_1X_color"))
-    flameColors[0][2] = hexToColor(config.get("theme", "flame2_1X_color"))
-    flameColors[0][3] = hexToColor(config.get("theme", "flame3_1X_color"))
-    flameColors[0][4] = hexToColor(config.get("theme", "flame4_1X_color"))
-    flameColors[1][0] = hexToColor(config.get("theme", "flame0_2X_color"))
-    flameColors[1][1] = hexToColor(config.get("theme", "flame1_2X_color"))
-    flameColors[1][2] = hexToColor(config.get("theme", "flame2_2X_color"))
-    flameColors[1][3] = hexToColor(config.get("theme", "flame3_2X_color"))
-    flameColors[1][4] = hexToColor(config.get("theme", "flame4_2X_color"))
-    flameColors[2][0] = hexToColor(config.get("theme", "flame0_3X_color"))
-    flameColors[2][1] = hexToColor(config.get("theme", "flame1_3X_color"))
-    flameColors[2][2] = hexToColor(config.get("theme", "flame2_3X_color")) 
-    flameColors[2][3] = hexToColor(config.get("theme", "flame3_3X_color"))
-    flameColors[2][4] = hexToColor(config.get("theme", "flame4_3X_color"))
-    flameColors[3][0] = hexToColor(config.get("theme", "flame0_4X_color"))
-    flameColors[3][1] = hexToColor(config.get("theme", "flame1_4X_color"))
-    flameColors[3][2] = hexToColor(config.get("theme", "flame2_4X_color"))
-    flameColors[3][3] = hexToColor(config.get("theme", "flame3_4X_color"))
-    flameColors[3][4] = hexToColor(config.get("theme", "flame4_4X_color"))
-
-        
-def setupFlameSizes(config):
-  global flameSizes
-
-  if flameSizes == None:
-    flameSizes = [[config.get("theme", "flame%d_1X_size" % i) for i in range(5)]]
-    flameSizes.append([config.get("theme", "flame%d_2X_size" % i) for i in range(5)])
-    flameSizes.append([config.get("theme", "flame%d_3X_size" % i) for i in range(5)])
-    flameSizes.append([config.get("theme", "flame%d_4X_size" % i) for i in range(5)])
-  else:
-    flameSizes[0][0] = config.get("theme", "flame0_1X_size")
-    flameSizes[0][1] = config.get("theme", "flame1_1X_size")
-    flameSizes[0][2] = config.get("theme", "flame2_1X_size")
-    flameSizes[0][3] = config.get("theme", "flame3_1X_size")
-    flameSizes[0][4] = config.get("theme", "flame4_1X_size")
-    flameSizes[1][0] = config.get("theme", "flame0_2X_size")
-    flameSizes[1][1] = config.get("theme", "flame1_2X_size")
-    flameSizes[1][2] = config.get("theme", "flame2_2X_size")
-    flameSizes[1][3] = config.get("theme", "flame3_2X_size")
-    flameSizes[1][4] = config.get("theme", "flame4_2X_size")
-    flameSizes[2][0] = config.get("theme", "flame0_3X_size")
-    flameSizes[2][1] = config.get("theme", "flame1_3X_size")
-    flameSizes[2][2] = config.get("theme", "flame2_3X_size") 
-    flameSizes[2][3] = config.get("theme", "flame3_3X_size")
-    flameSizes[2][4] = config.get("theme", "flame4_3X_size")
-    flameSizes[3][0] = config.get("theme", "flame0_4X_size")
-    flameSizes[3][1] = config.get("theme", "flame1_4X_size")
-    flameSizes[3][2] = config.get("theme", "flame2_4X_size")
-    flameSizes[3][3] = config.get("theme", "flame3_4X_size")
-    flameSizes[3][4] = config.get("theme", "flame4_4X_size")
-    
-def setupSpinny(config):
-  global spinnySongDisabled, spinnyEditorDisabled, spinnyResultsDisabled, spinnyMenuDisabled
-
-  spinnySongDisabled = config.get("theme", "disable_song_spinny")
-  spinnyEditorDisabled = config.get("theme", "disable_editor_spinny")
-  spinnyResultsDisabled = config.get("theme", "disable_results_spinny")
-  spinnyMenuDisabled = config.get("theme", "disable_menu_spinny")
-  
-def setupPOV(config):
-  global povTargetX, povTargetY, povTargetZ
-  global povOriginX, povOriginY, povOriginZ
-  
-  povTargetX = config.get("theme", "pov_target_x")  
-  povTargetY = config.get("theme", "pov_target_y")
-  povTargetZ = config.get("theme", "pov_target_z")
-  povOriginX = config.get("theme", "pov_origin_x")
-  povOriginY = config.get("theme", "pov_origin_y")
-  povOriginZ = config.get("theme", "pov_origin_z")
-
-def setupMisc(config):
-  global loadingPhrase, resultsPhrase
-  global creditSong
-  global crowdLoopDelay
-  global songInfoDisplayScale
-  global songInfoDisplayX
-  global songInfoDisplayY
-  global displayAllGreyStars, smallMult
-  global starFillupCenterX
-  global starFillupCenterY
-  global starFillupInRadius
-  global starFillupOutRadius
-  global starFillupColor
-  global songListDisplay
-  global jurgTextPos
-  global oBarHScale
-  global oBar3dFill
-  global neckWidth
-  global neckLength
-  global markSolos
-  global power_up_name
-
-  loadingPhrase = config.get("theme", "loading_phrase")
-  resultsPhrase = config.get("theme", "results_phrase")
-  creditSong = config.get("theme", "credit_song")
-  crowdLoopDelay = config.get("theme", "crowd_loop_delay")
-  songInfoDisplayScale = config.get("theme", "song_info_display_scale")
-  songInfoDisplayX = config.get("theme", "song_info_display_X")
-  songInfoDisplayY = config.get("theme", "song_info_display_Y")
-  displayAllGreyStars = config.get("theme", "display_all_grey_stars")
-  smallMult = config.get("theme", "small_1x_mult")
-  starFillupCenterX = config.get("theme", "star_fillup_center_x")
-  starFillupCenterY = config.get("theme", "star_fillup_center_y")
-  starFillupInRadius = config.get("theme", "star_fillup_in_radius")
-  starFillupOutRadius = config.get("theme", "star_fillup_out_radius")
-  starFillupColor = config.get("theme", "star_fillup_color")
-  songListDisplay = config.get("theme", "song_list_display")
-  jurgTextPos = config.get("theme", "jurgen_text_pos").split(",")
-  oBarHScale = config.get("theme", "obar_hscale")
-  oBar3dFill = config.get("theme", "obar_3dfill")
-  neckWidth = config.get("theme", "neck_width")
-  neckLength = config.get("theme", "neck_length")
-  markSolos = config.get("theme", "mark_solo_sections")
-  power_up_name = config.get("theme", "power_up_name")
-#MFH:
-def setupSonglist(config):
-  global song_cd_Xpos, song_cdscore_Xpos, song_list_Xpos, song_listscore_Xpos
-  global song_listcd_cd_Xpos, song_listcd_cd_Ypos, song_listcd_score_Xpos, song_listcd_score_Ypos, song_listcd_list_Xpos
-
-  global setlistguidebuttonsposX, setlistguidebuttonsposY, setlistguidebuttonsscaleX, setlistguidebuttonsscaleY
-  global setlistpreviewbuttonposX, setlistpreviewbuttonposY, setlistpreviewbuttonscaleX, setlistpreviewbuttonscaleY
-  global career_title_colorVar, opt_text_colorVar, opt_selected_colorVar
-  global song_name_text_colorVar, song_name_selected_colorVar
-  global artist_text_colorVar, artist_selected_colorVar
-  global library_text_colorVar, library_selected_colorVar
-  global pause_text_colorVar, pause_selected_colorVar
-  global fail_text_colorVar, fail_selected_colorVar, fail_completed_colorVar
-  global songSelectSubmenuX, songSelectSubmenuY
-  global songSelectSubmenuOffsetLines, songSelectSubmenuOffsetSpaces
-  global versiontagposX, versiontagposY
-  
-  global song_rb2_name_colorVar, song_rb2_name_selected_colorVar, song_rb2_diff_colorVar, song_rb2_artist_colorVar
-
-  setlistguidebuttonsposX = config.get("theme", "setlistguidebuttonsposX")
-  setlistguidebuttonsposY = config.get("theme", "setlistguidebuttonsposY")
-  setlistguidebuttonsscaleX = config.get("theme", "setlistguidebuttonsscaleX")
-  setlistguidebuttonsscaleY = config.get("theme", "setlistguidebuttonsscaleY")
-  setlistpreviewbuttonposX = config.get("theme", "setlistpreviewbuttonposX")
-  setlistpreviewbuttonposY = config.get("theme", "setlistpreviewbuttonposY")
-  setlistpreviewbuttonscaleX = config.get("theme", "setlistpreviewbuttonscaleX")
-  setlistpreviewbuttonscaleY = config.get("theme", "setlistpreviewbuttonscaleY")
-  versiontagposX = config.get("theme", "versiontagposX")
-  versiontagposY = config.get("theme", "versiontagposY")
-  songSelectSubmenuOffsetLines = config.get("theme", "song_select_submenu_offset_lines")
-  songSelectSubmenuOffsetSpaces = config.get("theme", "song_select_submenu_offset_spaces")
-  songSelectSubmenuX = config.get("theme", "song_select_submenu_x")
-  songSelectSubmenuY = config.get("theme", "song_select_submenu_y")
-  song_cd_Xpos = config.get("theme", "song_cd_x")
-  song_listcd_cd_Xpos = config.get("theme", "song_listcd_cd_x")
-  song_listcd_cd_Ypos = config.get("theme", "song_listcd_cd_y")
-  song_listcd_score_Xpos = config.get("theme", "song_listcd_score_x")
-  song_listcd_score_Ypos = config.get("theme", "song_listcd_score_y")
-  song_listcd_list_Xpos = config.get("theme", "song_listcd_list_x")
-  song_cdscore_Xpos = config.get("theme", "song_cdscore_x")
-  song_list_Xpos = config.get("theme", "song_list_x")
-  song_listscore_Xpos = config.get("theme", "song_listscore_x")
-  career_title_colorVar = config.get("theme", "career_title_color")
-  opt_text_colorVar = config.get("theme", "opt_text_color")
-  opt_selected_colorVar = config.get("theme", "opt_selected_color")
-  song_name_text_colorVar = config.get("theme", "song_name_text_color")
-  song_name_selected_colorVar = config.get("theme", "song_name_selected_color")
-  artist_text_colorVar = config.get("theme", "artist_text_color")
-  artist_selected_colorVar = config.get("theme", "artist_selected_color")
-  library_text_colorVar = config.get("theme", "library_text_color")
-  library_selected_colorVar = config.get("theme", "library_selected_color")
-  pause_text_colorVar = config.get("theme", "pause_text_color")
-  pause_selected_colorVar = config.get("theme", "pause_selected_color")
-  fail_completed_colorVar = config.get("theme", "fail_completed_color")
-  fail_text_colorVar = config.get("theme", "fail_text_color")
-  fail_selected_colorVar = config.get("theme", "fail_selected_color")
-  
-  song_rb2_name_colorVar = config.get("theme", "song_rb2_name_color")
-  song_rb2_name_selected_colorVar = config.get("theme", "song_rb2_name_selected_color")
-  song_rb2_diff_colorVar = config.get("theme", "song_rb2_diff_color")
-  song_rb2_artist_colorVar = config.get("theme", "song_rb2_artist_color")
-
-  
-def setupPauseNOpt(config):
-  global pause_bkg_pos, pause_text_xPos, pause_text_yPos
-  global opt_bkg_size, opt_text_xPos, opt_text_yPos
-
-  pause_bkg_pos = config.get("theme", "pause_bkg").split(",")
-  pause_text_xPos = config.get("theme", "pause_text_x")
-  pause_text_yPos = config.get("theme", "pause_text_y")
-  opt_bkg_size = config.get("theme", "opt_bkg").split(",")
-  opt_text_xPos = config.get("theme", "opt_text_x")
-  opt_text_yPos = config.get("theme", "opt_text_y")
-  
-def setupMenu(config):
-  global menuX, menuY, menuRB
-  global loadingX, loadingY, loadingColor, loadingFScale, loadingRMargin, loadingLSpacing
-  global main_menu_scaleVar, main_menu_vspacingVar, use_solo_submenu, sub_menu_xVar, sub_menu_yVar
-  global songback, versiontag, shadowoffsetx, shadowoffsety, menuTipTextY, menuTipTextScrollSpace
-  global menuTipTextFont, menuTipTextScale, menuTipTextScrollMode, menuTipTextDisplay, menuTipTextColor
-  
-  menuX = config.get("theme", "menu_x")
-  menuY = config.get("theme", "menu_y")
-  menuRB = config.get("theme", "rbmenu")
-  loadingX = config.get("theme", "loading_x")
-  loadingY = config.get("theme", "loading_y")
-  loadingColor = hexToColor(config.get("theme", "loading_text_color"))
-  loadingFScale = config.get("theme", "loading_font_scale")
-  loadingRMargin = config.get("theme", "loading_right_margin")
-  loadingLSpacing = config.get ("theme", "loading_line_spacing")
-  main_menu_scaleVar = config.get("theme", "main_menu_scale")
-  main_menu_vspacingVar = config.get("theme", "main_menu_vspacing")
-  use_solo_submenu = config.get("theme", "use_solo_submenu")
-  sub_menu_xVar = config.get("theme", "sub_menu_x")
-  sub_menu_yVar = config.get("theme", "sub_menu_y")
-  songback = config.get("theme", "songback")
-  versiontag = config.get("theme", "versiontag")
-  shadowoffsetx = config.get("theme", "shadowoffsetx")
-  shadowoffsety = config.get("theme", "shadowoffsety")
-  menuTipTextY = config.get("theme", "menu_tip_text_y")
-  menuTipTextFont = config.get("theme", "menu_tip_text_font")
-  menuTipTextScale = config.get("theme", "menu_tip_text_scale")
-  menuTipTextColor = hexToColorResults(config.get("theme", "menu_tip_text_color"))
-  menuTipTextScrollSpace = config.get("theme", "menu_tip_text_scroll_space")
-  menuTipTextScrollMode = config.get("theme", "menu_tip_text_scroll_mode")
-  menuTipTextDisplay = config.get("theme", "menu_tip_text_display")
-
-def setupLobby(config):
-  global controlActivateX, controlActivateY, controlActivateScale, controlActivateFont, controlCheckTextY
-  global controlActivateSelectX, controlActivatePartX, controlActivateSpace, controlActivatePartSize
-  global controlDescriptionX, controlDescriptionY, controlDescriptionScale, controlDescriptionFont, controlCheckSpace
-  global controlCheckX, controlCheckY, controlCheckScale, controlCheckPartMult, controlCheckFont, lobbyPreviewX
-  global lobbyTitleX, lobbyTitleY, lobbyTitleScale, lobbyTitleCharacterX, lobbyTitleCharacterY, lobbySelectScale
-  global lobbySelectImageX, lobbySelectImageY, lobbySelectSpace, characterCreateHelpY, lobbyPreviewY
-  global lobbyTitleFont, lobbySelectX, lobbySelectY, lobbySelectFont, characterCreateX, characterCreateY
-  global characterCreateOptionX, characterCreateScale, characterCreateSpace, characterCreateHelpFont
-  global characterCreateOptionFont, characterCreateHelpX, characterCreateHelpScale, avatarSelectWheelY
-  global characterCreateFontColor, characterCreateSelectColor, characterCreateHelpColor
-  global lobbyFontColor, lobbySelectColor, lobbyDisableColor, lobbyTitleColor, lobbyInfoColor, lobbyPlayerColor
-  global lobbySelectLength, lobbyMode, lobbyPreviewSpacing, lobbyAvatarX, lobbyAvatarY, lobbyAvatarScale
-  global avatarSelectTextX, avatarSelectTextY, avatarSelectTextScale, avatarSelectFont, avatarSelectAvX, avatarSelectAvY
-  
-  controlActivateX = config.get("theme", "control_activate_x")
-  controlActivateSelectX = config.get("theme", "control_activate_select_x")
-  controlActivatePartX = config.get("theme", "control_activate_part_x")
-  controlActivateY = config.get("theme", "control_activate_y")
-  controlActivateScale = config.get("theme", "control_activate_scale")
-  controlActivateSpace = config.get("theme", "control_activate_space")
-  controlActivatePartSize = config.get("theme", "control_activate_part_size")
-  controlActivateFont = config.get("theme", "control_activate_font")
-  controlDescriptionX = config.get("theme", "control_description_x")
-  controlDescriptionY = config.get("theme", "control_description_y")
-  controlDescriptionScale = config.get("theme", "control_description_scale")
-  controlDescriptionFont = config.get("theme", "control_description_font")
-  controlCheckX = config.get("theme", "control_check_x")
-  controlCheckY = config.get("theme", "control_check_y")
-  controlCheckTextY = config.get("theme", "control_check_text_y")
-  controlCheckPartMult = config.get("theme", "control_check_part_mult")
-  controlCheckScale = config.get("theme", "control_check_scale")
-  controlCheckSpace = config.get("theme", "control_check_space")
-  controlCheckFont  = config.get("theme", "control_check_font")
-  lobbyMode = config.get("theme", "lobby_mode")
-  lobbyPreviewX = config.get("theme", "lobby_preview_x")
-  lobbyPreviewY = config.get("theme", "lobby_preview_y")
-  lobbyPreviewSpacing = config.get("theme", "lobby_preview_spacing")
-  lobbyTitleX = config.get("theme", "lobby_title_x")
-  lobbyTitleY = config.get("theme", "lobby_title_y")
-  lobbyTitleCharacterX = config.get("theme", "lobby_title_character_x")
-  lobbyTitleCharacterY = config.get("theme", "lobby_title_character_y")
-  lobbyTitleScale = config.get("theme", "lobby_title_scale")
-  lobbyTitleFont = config.get("theme", "lobby_title_font")
-  lobbyAvatarX = config.get("theme", "lobby_avatar_x")
-  lobbyAvatarY = config.get("theme", "lobby_avatar_y")
-  lobbyAvatarScale = config.get("theme", "lobby_avatar_scale")
-  lobbySelectX = config.get("theme", "lobby_select_x")
-  lobbySelectY = config.get("theme", "lobby_select_y")
-  lobbySelectImageX = config.get("theme", "lobby_select_image_x")
-  lobbySelectImageY = config.get("theme", "lobby_select_image_y")
-  lobbySelectScale = config.get("theme", "lobby_select_scale")
-  lobbySelectSpace = config.get("theme", "lobby_select_space")
-  lobbySelectFont = config.get("theme", "lobby_select_font")
-  lobbySelectLength = config.get("theme", "lobby_select_length")
-  lobbyTitleColor = hexToColor(config.get("theme", "lobby_title_color"))
-  lobbyInfoColor = hexToColor(config.get("theme", "lobby_info_color"))
-  lobbyFontColor = hexToColor(config.get("theme", "lobby_font_color"))
-  lobbyPlayerColor = hexToColor(config.get("theme", "lobby_player_color"))
-  lobbySelectColor = hexToColor(config.get("theme", "lobby_select_color"))
-  lobbyDisableColor = hexToColor(config.get("theme", "lobby_disable_color"))
-  characterCreateX = config.get("theme", "character_create_x")
-  characterCreateY = config.get("theme", "character_create_y")
-  characterCreateOptionX = config.get("theme", "character_create_option_x")
-  characterCreateFontColor = hexToColor(config.get("theme", "character_create_font_color"))
-  characterCreateSelectColor = hexToColor(config.get("theme", "character_create_select_color"))
-  characterCreateHelpColor = hexToColor(config.get("theme", "character_create_help_color"))
-  characterCreateHelpX = config.get("theme", "character_create_help_x")
-  characterCreateHelpY = config.get("theme", "character_create_help_y")
-  characterCreateHelpScale = config.get("theme", "character_create_help_scale")
-  characterCreateOptionFont = config.get("theme", "character_create_option_font")
-  characterCreateHelpFont = config.get("theme", "character_create_help_font")
-  characterCreateScale = config.get("theme", "character_create_scale")
-  characterCreateSpace = config.get("theme", "character_create_space")
-  avatarSelectTextX = config.get("theme","avatar_select_text_x")
-  avatarSelectTextY = config.get("theme","avatar_select_text_y")
-  avatarSelectTextScale = config.get("theme","avatar_select_text_scale")
-  avatarSelectFont = config.get("theme","avatar_select_font")
-  avatarSelectAvX = config.get("theme","avatar_select_avatar_x")
-  avatarSelectAvY = config.get("theme","avatar_select_avatar_y")
-  avatarSelectWheelY = config.get("theme","avatar_select_wheel_y")
-
-def setupVocals(config):
-  global vocalMeterSize, vocalMeterX, vocalMeterY, vocalMultX, vocalMultY, vocalPowerX, vocalPowerY
-  global vocalFillupCenterX, vocalFillupCenterY, vocalFillupInRadius, vocalFillupOutRadius
-  global vocalFillupColor, vocalFillupFactor, vocalCircularFillup, vocalLaneSize, vocalGlowSize, vocalGlowFade
-  global vocalLaneColor, vocalShadowColor, vocalGlowColor, vocalLaneColorStar, vocalShadowColorStar, vocalGlowColorStar
-  
-  vocalMeterSize = config.get("theme", "vocal_meter_size")
-  vocalMeterX = config.get("theme", "vocal_meter_x")
-  vocalMeterY = config.get("theme", "vocal_meter_y")
-  vocalMultX  = config.get("theme", "vocal_mult_x")
-  vocalMultY  = config.get("theme", "vocal_mult_y")
-  vocalPowerX = config.get("theme", "vocal_power_x")
-  vocalPowerY = config.get("theme", "vocal_power_y")
-  vocalFillupCenterX = config.get("theme", "vocal_fillup_center_x")
-  vocalFillupCenterY = config.get("theme", "vocal_fillup_center_y")
-  vocalFillupInRadius = config.get("theme", "vocal_fillup_in_radius")
-  vocalFillupOutRadius = config.get("theme", "vocal_fillup_out_radius")
-  vocalFillupFactor = config.get("theme", "vocal_fillup_factor")
-  vocalFillupColor = config.get("theme", "vocal_fillup_color")
-  vocalCircularFillup = config.get("theme", "vocal_circular_fillup")
-  vocalLaneSize = config.get("theme", "vocal_lane_size")
-  vocalGlowSize = config.get("theme", "vocal_glow_size")
-  vocalGlowFade = config.get("theme", "vocal_glow_fade")
-  vocalLaneColor = hexToColorResults(config.get("theme","vocal_lane_color"))
-  vocalShadowColor = hexToColorResults(config.get("theme","vocal_shadow_color"))
-  vocalGlowColor = hexToColorResults(config.get("theme","vocal_glow_color"))
-  vocalLaneColorStar = hexToColorResults(config.get("theme","vocal_lane_color_star"))
-  vocalShadowColorStar = hexToColorResults(config.get("theme","vocal_shadow_color_star"))
-  vocalGlowColorStar = hexToColorResults(config.get("theme","vocal_glow_color_star"))
-
-def setupTWOD(config):
-  global twoDnote, twoDkeys, threeDspin, opencolor, fret_press
-  global noterot, keyrot, drumnoterot, drumkeyrot
-  global notepos, keypos, drumnotepos, drumkeypos
-  
-  twoDnote = config.get("theme", "twoDnote")
-  twoDkeys = config.get("theme", "twoDkeys")
-  threeDspin = config.get("theme", "threeDspin")
-  fret_press = config.get("theme", "fret_press")
-  opencolor = hexToColor(config.get("theme", "opencolor"))
-  noterot = [config.get("theme", "noterot"+str(i+1)) for i in range(5)]
-  keyrot  = [config.get("theme", "keyrot"+str(i+1)) for i in range(5)]
-  drumnoterot = [config.get("theme", "drumnoterot"+str(i+1)) for i in range(5)]
-  drumkeyrot = [config.get("theme", "drumkeyrot"+str(i+1)) for i in range(5)]
-  notepos = [config.get("theme", "notepos"+str(i+1)) for i in range(5)]
-  keypos  = [config.get("theme", "keypos"+str(i+1)) for i in range(5)]
-  drumnotepos = [config.get("theme", "drumnotepos"+str(i+1)) for i in range(5)]
-  drumkeypos = [config.get("theme", "drumkeypos"+str(i+1)) for i in range(5)]
-
-#racer:
-def setupFail(config):
-  global fail_bkg_pos, fail_text_xPos, fail_text_yPos, fail_songname_xPos, fail_songname_yPos
-
-  fail_bkg_pos = config.get("theme", "fail_bkg").split(",")
-  fail_text_xPos = config.get("theme", "fail_text_x")
-  fail_text_yPos = config.get("theme", "fail_text_y")
-  fail_songname_xPos = config.get("theme", "fail_songname_x") 
-  fail_songname_yPos = config.get("theme", "fail_songname_y") 
-
-def setupRockmeter(config):
-  global rmtype
-
-  rmtype = config.get("theme", "rmtype")
-
-def setupEvilynux(config):
-  global songlist_score_colorVar, songlistcd_score_colorVar, rockmeter_score_colorVar, ingame_stats_colorVar
-
-  songlist_score_colorVar = config.get("theme", "songlist_score_color")
-  songlistcd_score_colorVar = config.get("theme", "songlistcd_score_color")
-  rockmeter_score_colorVar = config.get("theme", "rockmeter_score_color")
-  ingame_stats_colorVar = config.get("theme", "ingame_stats_color")
-
-    
-def setupHopoIndicator(config):
-  global hopoIndicatorX, hopoIndicatorY
-  global hopoIndicatorActiveColor, hopoIndicatorInactiveColor
-  
-  hopoIndicatorX = config.get("theme", "hopo_indicator_x")
-  hopoIndicatorY = config.get("theme", "hopo_indicator_y")  
-  hopoIndicatorActiveColor = hexToColor(config.get("theme", "hopo_indicator_active_color"))
-  hopoIndicatorInactiveColor = hexToColor(config.get("theme", "hopo_indicator_inactive_color"))
-  
-def setupResults(config):
-  global result_score, result_star, result_song, result_song_text, result_song_form, result_stats_part, result_stats_diff
-  global result_stats_diff_text, result_stats_part_text, result_stats_streak_text, result_stats_accuracy_text
-  global result_stats_accuracy, result_stats_streak, result_stats_notes, result_stats_notes_text
-  global result_cheats_info, result_cheats_numbers, result_cheats_percent, result_cheats_score, result_cheats_color
-  global result_menu_x, result_menu_y, result_star_type, result_stats_name, result_cheats_font, result_high_score_font
-  
-  result_score = config.get("theme", "result_score").split(",")
-  result_star = config.get("theme", "result_star").split(",")
-  result_song = config.get("theme", "result_song").split(",")
-  result_song_form = config.get("theme", "result_song_form")
-  result_song_text = config.get("theme", "result_song_text").strip()
-  result_stats_part = config.get("theme", "result_stats_part").split(",")
-  result_stats_part_text = config.get("theme", "result_stats_part_text").strip()
-  result_stats_name = config.get("theme", "result_stats_name").split(",")
-  result_stats_diff = config.get("theme", "result_stats_diff").split(",")
-  result_stats_diff_text = config.get("theme", "result_stats_diff_text").strip()
-  result_stats_accuracy = config.get("theme", "result_stats_accuracy").split(",")
-  result_stats_accuracy_text = config.get("theme", "result_stats_accuracy_text").strip()
-  result_stats_streak = config.get("theme", "result_stats_streak").split(",")
-  result_stats_streak_text = config.get("theme", "result_stats_streak_text").strip()
-  result_stats_notes = config.get("theme", "result_stats_notes").split(",")
-  result_stats_notes_text = config.get("theme", "result_stats_notes_text").strip()
-  result_cheats_info = config.get("theme", "result_cheats_info").split(",")
-  result_cheats_numbers = config.get("theme", "result_cheats_numbers").split(",")
-  result_cheats_percent = config.get("theme", "result_cheats_percent").split(",")
-  result_cheats_score   = config.get("theme", "result_cheats_score").split(",")
-  result_cheats_color   = config.get("theme", "result_cheats_color")
-  result_cheats_font    = config.get("theme", "result_cheats_font")
-  result_high_score_font = config.get("theme", "result_high_score_font")
-  result_menu_x         = config.get("theme", "result_menu_x")
-  result_menu_y         = config.get("theme", "result_menu_y")
-  result_star_type      = config.get("theme", "result_star_type")
-
-def setupSubmenus(config, themepath = None):
-  if not themepath:
-    return
-  global submenuScale, submenuX, submenuY, submenuVSpace
-  allfiles = os.listdir(themepath)
-  submenuScale = {}
-  submenuX = {}
-  submenuY = {}
-  submenuVSpace = {}
-  listmenu = []
-  for name in allfiles:
-    if name.find("text") > -1:
-      found = os.path.splitext(name)[0]
-      if found == "maintext":
-        continue
-      Config.define("theme", found, str, None)
-      submenuScale[found] = None
-      submenuX[found] = None
-      submenuY[found] = None
-      submenuVSpace[found] = None
-      listmenu.append(found)
-  for i in listmenu:
-    if i == "maintext":
-      continue
-    try:
-      submenuX[i] = config.get("theme", i).split(",")[0].strip()
-    except IndexError:
-      submenuX[i] = None
-    try:
-      submenuY[i] = config.get("theme", i).split(",")[1].strip()
-    except IndexError:
-      submenuY[i] = None
-    try:
-      submenuScale[i] = config.get("theme", i).split(",")[2].strip()
-    except IndexError:
-      submenuScale[i] = None
-    try:
-      submenuVSpace[i] = config.get("theme", i).split(",")[3].strip()
-    except IndexError:
-      submenuVSpace[i] = None
-
-
-
-
-
-
-
+    if iniFile:
+      self.config = Config.load(os.path.join(Version.dataPath(),"themes", name, "theme.ini"))
+      config = self.config
       
-class ThemeTrans:
-  def __init__(self,themepath):
+      #Colors
+      self.backgroundColor = self.hexToColor(self.config.get("theme", "background_color"))  
+      self.baseColor = self.hexToColor(self.config.get("theme", "base_color"))
+      self.selectedColor = self.hexToColor(self.config.get("theme", "selected_color"))
+      self.meshColor = self.hexToColor(self.config.get("theme", "mesh_color"))
+      self.hopoColor = self.hexToColor(self.config.get("theme", "hopo_color"))
+      self.spotColor = self.hexToColor(self.config.get("theme", "spot_color"))
+      self.keyColor = self.hexToColor(self.config.get("theme", "key_color"))
+      self.key2Color = self.hexToColor(self.config.get("theme", "key2_color"))
+      self.tracksColor = self.hexToColor(self.config.get("theme", "tracks_color"))
+      self.barsColor = self.hexToColor(self.config.get("theme", "bars_color"))
+      self.glowColor = self.hexToColor(self.config.get("theme", "glow_color"))
+      
+      #Note Colors (this applies to frets and notes)
+      self.noteColors = [self.hexToColor(config.get("theme", "fret%d_color" % i)) for i in range(6)]
+      self.spNoteColor = self.hexToColor(config.get("theme", "fretS_color"))
+      self.killNoteColor = self.hexToColor(config.get("theme", "fretK_color"))
+      self.use_fret_colors = config.get("theme", "use_fret_colors")
+      
+      #Point of View
+      self.povTargetX = config.get("theme", "pov_target_x")  
+      self.povTargetY = config.get("theme", "pov_target_y")
+      self.povTargetZ = config.get("theme", "pov_target_z")
+      self.povOriginX = config.get("theme", "pov_origin_x")
+      self.povOriginY = config.get("theme", "pov_origin_y")
+      self.povOriginZ = config.get("theme", "pov_origin_z")
+      
+      #Loading phrases
+      self.loadingPhrase = config.get("theme", "loading_phrase").split('_')
+      self.resultsPhrase = config.get("theme", "results_phrase").split('_')
+      
+      #Miscellany (aka Garbage no one cares about)
+      self.crowdLoopDelay = config.get("theme", "crowd_loop_delay")
+      self.songInfoDisplayScale = config.get("theme", "song_info_display_scale")
+      self.songInfoDisplayX = config.get("theme", "song_info_display_X")
+      self.songInfoDisplayY = config.get("theme", "song_info_display_Y")
+      self.displayAllGreyStars = config.get("theme", "display_all_grey_stars")
+      self.smallMult = config.get("theme", "small_1x_mult")
+      self.jurgTextPos = config.get("theme", "jurgen_text_pos").split(",")
+      self.oBarHScale = config.get("theme", "obar_hscale")
+      self.oBar3dFill = config.get("theme", "obar_3dfill")
+      self.power_up_name = config.get("theme", "power_up_name")
+      
+      #Continuous star fillup!
+      self.starFillupCenterX = config.get("theme", "star_fillup_center_x")
+      self.starFillupCenterY = config.get("theme", "star_fillup_center_y")
+      self.starFillupInRadius = config.get("theme", "star_fillup_in_radius")
+      self.starFillupOutRadius = config.get("theme", "star_fillup_out_radius")
+      self.starFillupColor = config.get("theme", "star_fillup_color")
+      
+      #Neck size, neck choose (yeah? you got a problem with that goruping?)
+      self.neckWidth = config.get("theme", "neck_width")
+      self.neckLength = config.get("theme", "neck_length")
+      self.neck_prompt_x = config.get("theme", "menu_neck_choose_x")
+      self.neck_prompt_y = config.get("theme", "menu_neck_choose_y")
+      
+      #Setlist
+      self.songListDisplay = config.get("theme", "song_list_display")
+      self.setlistguidebuttonsposX = config.get("theme", "setlistguidebuttonsposX")
+      self.setlistguidebuttonsposY = config.get("theme", "setlistguidebuttonsposY")
+      self.setlistguidebuttonsscaleX = config.get("theme", "setlistguidebuttonsscaleX")
+      self.setlistguidebuttonsscaleY = config.get("theme", "setlistguidebuttonsscaleY")
+      self.setlistpreviewbuttonposX = config.get("theme", "setlistpreviewbuttonposX")
+      self.setlistpreviewbuttonposY = config.get("theme", "setlistpreviewbuttonposY")
+      self.setlistpreviewbuttonscaleX = config.get("theme", "setlistpreviewbuttonscaleX")
+      self.setlistpreviewbuttonscaleY = config.get("theme", "setlistpreviewbuttonscaleY")
+      self.versiontagposX = config.get("theme", "versiontagposX")
+      self.versiontagposY = config.get("theme", "versiontagposY")
+      self.songSelectSubmenuOffsetLines = config.get("theme", "song_select_submenu_offset_lines")
+      self.songSelectSubmenuOffsetSpaces = config.get("theme", "song_select_submenu_offset_spaces")
+      self.songSelectSubmenuX = config.get("theme", "song_select_submenu_x")
+      self.songSelectSubmenuY = config.get("theme", "song_select_submenu_y")
+      self.song_cd_Xpos = config.get("theme", "song_cd_x")
+      self.song_listcd_cd_Xpos = config.get("theme", "song_listcd_cd_x")
+      self.song_listcd_cd_Ypos = config.get("theme", "song_listcd_cd_y")
+      self.song_listcd_score_Xpos = config.get("theme", "song_listcd_score_x")
+      self.song_listcd_score_Ypos = config.get("theme", "song_listcd_score_y")
+      self.songlist_score_colorVar = self.hexToColor(config.get("theme", "songlist_score_color"))
+      self.songlistcd_score_colorVar = self.hexToColor(config.get("theme", "songlistcd_score_color"))
+      self.song_listcd_list_Xpos = config.get("theme", "song_listcd_list_x")
+      self.song_cdscore_Xpos = config.get("theme", "song_cdscore_x")
+      self.song_list_Xpos = config.get("theme", "song_list_x")
+      self.song_listscore_Xpos = config.get("theme", "song_listscore_x")
+      self.career_title_colorVar = self.hexToColor(config.get("theme", "career_title_color"))
+      self.opt_text_colorVar = self.hexToColor(config.get("theme", "opt_text_color"))
+      self.opt_selected_colorVar = self.hexToColor(config.get("theme", "opt_selected_color"))
+      self.song_name_text_colorVar = self.hexToColor(config.get("theme", "song_name_text_color"))
+      self.song_name_selected_colorVar = self.hexToColor(config.get("theme", "song_name_selected_color"))
+      self.artist_text_colorVar = self.hexToColor(config.get("theme", "artist_text_color"))
+      self.artist_selected_colorVar = self.hexToColor(config.get("theme", "artist_selected_color"))
+      self.library_text_colorVar = self.hexToColor(config.get("theme", "library_text_color"))
+      self.library_selected_colorVar = self.hexToColor(config.get("theme", "library_selected_color"))
+      self.pause_text_colorVar = self.hexToColor(config.get("theme", "pause_text_color"))
+      self.pause_selected_colorVar = self.hexToColor(config.get("theme", "pause_selected_color"))
+      self.fail_completed_colorVar = self.hexToColor(config.get("theme", "fail_completed_color"))
+      self.fail_text_colorVar = self.hexToColor(config.get("theme", "fail_text_color"))
+      self.fail_selected_colorVar = self.hexToColor(config.get("theme", "fail_selected_color"))
+      self.song_rb2_diff_colorVar = self.hexToColor(config.get("theme", "song_rb2_diff_color"))
+      
+      #pause menu and fail menu
+      self.pause_bkg_pos = config.get("theme", "pause_bkg").split(",")
+      self.pause_text_xPos = config.get("theme", "pause_text_x")
+      self.pause_text_yPos = config.get("theme", "pause_text_y")
+      self.opt_bkg_size = config.get("theme", "opt_bkg").split(",")
+      self.opt_text_xPos = config.get("theme", "opt_text_x")
+      self.opt_text_yPos = config.get("theme", "opt_text_y")
+      self.fail_bkg_pos = config.get("theme", "fail_bkg").split(",")
+      self.fail_text_xPos = config.get("theme", "fail_text_x")
+      self.fail_text_yPos = config.get("theme", "fail_text_y")
+      self.fail_songname_xPos = config.get("theme", "fail_songname_x") 
+      self.fail_songname_yPos = config.get("theme", "fail_songname_y") 
+      
+      #main menu system
+      self.menuX = config.get("theme", "menu_x")
+      self.menuY = config.get("theme", "menu_y")
+      self.menuRB = config.get("theme", "rbmenu")
+      self.loadingX = config.get("theme", "loading_x")
+      self.loadingY = config.get("theme", "loading_y")
+      self.loadingColor = self.hexToColor(config.get("theme", "loading_text_color"))
+      self.loadingFScale = config.get("theme", "loading_font_scale")
+      self.loadingRMargin = config.get("theme", "loading_right_margin")
+      self.loadingLSpacing = config.get ("theme", "loading_line_spacing")
+      self.main_menu_scaleVar = config.get("theme", "main_menu_scale")
+      self.main_menu_vspacingVar = config.get("theme", "main_menu_vspacing")
+      self.use_solo_submenu = config.get("theme", "use_solo_submenu")
+      self.sub_menu_xVar = config.get("theme", "sub_menu_x")
+      self.sub_menu_yVar = config.get("theme", "sub_menu_y")
+      self.songback = config.get("theme", "songback")
+      self.versiontag = config.get("theme", "versiontag")
+      self.shadowoffsetx = config.get("theme", "shadowoffsetx")
+      self.shadowoffsety = config.get("theme", "shadowoffsety")
+      self.menuTipTextY = config.get("theme", "menu_tip_text_y")
+      self.menuTipTextFont = config.get("theme", "menu_tip_text_font")
+      self.menuTipTextScale = config.get("theme", "menu_tip_text_scale")
+      self.menuTipTextColor = self.hexToColorResults(config.get("theme", "menu_tip_text_color"))
+      self.menuTipTextScrollSpace = config.get("theme", "menu_tip_text_scroll_space")
+      self.menuTipTextScrollMode = config.get("theme", "menu_tip_text_scroll_mode")
+      self.menuTipTextDisplay = config.get("theme", "menu_tip_text_display")
+      
+      #Lobby
+      self.controlActivateX = config.get("theme", "control_activate_x")
+      self.controlActivateSelectX = config.get("theme", "control_activate_select_x")
+      self.controlActivatePartX = config.get("theme", "control_activate_part_x")
+      self.controlActivateY = config.get("theme", "control_activate_y")
+      self.controlActivateScale = config.get("theme", "control_activate_scale")
+      self.controlActivateSpace = config.get("theme", "control_activate_space")
+      self.controlActivatePartSize = config.get("theme", "control_activate_part_size")
+      self.controlActivateFont = config.get("theme", "control_activate_font")
+      self.controlDescriptionX = config.get("theme", "control_description_x")
+      self.controlDescriptionY = config.get("theme", "control_description_y")
+      self.controlDescriptionScale = config.get("theme", "control_description_scale")
+      self.controlDescriptionFont = config.get("theme", "control_description_font")
+      self.controlCheckX = config.get("theme", "control_check_x")
+      self.controlCheckY = config.get("theme", "control_check_y")
+      self.controlCheckTextY = config.get("theme", "control_check_text_y")
+      self.controlCheckPartMult = config.get("theme", "control_check_part_mult")
+      self.controlCheckScale = config.get("theme", "control_check_scale")
+      self.controlCheckSpace = config.get("theme", "control_check_space")
+      self.controlCheckFont  = config.get("theme", "control_check_font")
+      self.lobbyMode = config.get("theme", "lobby_mode")
+      self.lobbyPreviewX = config.get("theme", "lobby_preview_x")
+      self.lobbyPreviewY = config.get("theme", "lobby_preview_y")
+      self.lobbyPreviewSpacing = config.get("theme", "lobby_preview_spacing")
+      self.lobbyTitleX = config.get("theme", "lobby_title_x")
+      self.lobbyTitleY = config.get("theme", "lobby_title_y")
+      self.lobbyTitleCharacterX = config.get("theme", "lobby_title_character_x")
+      self.lobbyTitleCharacterY = config.get("theme", "lobby_title_character_y")
+      self.lobbyTitleScale = config.get("theme", "lobby_title_scale")
+      self.lobbyTitleFont = config.get("theme", "lobby_title_font")
+      self.lobbyAvatarX = config.get("theme", "lobby_avatar_x")
+      self.lobbyAvatarY = config.get("theme", "lobby_avatar_y")
+      self.lobbyAvatarScale = config.get("theme", "lobby_avatar_scale")
+      self.lobbySelectX = config.get("theme", "lobby_select_x")
+      self.lobbySelectY = config.get("theme", "lobby_select_y")
+      self.lobbySelectImageX = config.get("theme", "lobby_select_image_x")
+      self.lobbySelectImageY = config.get("theme", "lobby_select_image_y")
+      self.lobbySelectScale = config.get("theme", "lobby_select_scale")
+      self.lobbySelectSpace = config.get("theme", "lobby_select_space")
+      self.lobbySelectFont = config.get("theme", "lobby_select_font")
+      self.lobbySelectLength = config.get("theme", "lobby_select_length")
+      self.lobbyTitleColor = self.hexToColor(config.get("theme", "lobby_title_color"))
+      self.lobbyInfoColor = self.hexToColor(config.get("theme", "lobby_info_color"))
+      self.lobbyFontColor = self.hexToColor(config.get("theme", "lobby_font_color"))
+      self.lobbyPlayerColor = self.hexToColor(config.get("theme", "lobby_player_color"))
+      self.lobbySelectColor = self.hexToColor(config.get("theme", "lobby_select_color"))
+      self.lobbyDisableColor = self.hexToColor(config.get("theme", "lobby_disable_color"))
+      self.characterCreateX = config.get("theme", "character_create_x")
+      self.characterCreateY = config.get("theme", "character_create_y")
+      self.characterCreateOptionX = config.get("theme", "character_create_option_x")
+      self.characterCreateFontColor = self.hexToColor(config.get("theme", "character_create_font_color"))
+      self.characterCreateSelectColor = self.hexToColor(config.get("theme", "character_create_select_color"))
+      self.characterCreateHelpColor = self.hexToColor(config.get("theme", "character_create_help_color"))
+      self.characterCreateHelpX = config.get("theme", "character_create_help_x")
+      self.characterCreateHelpY = config.get("theme", "character_create_help_y")
+      self.characterCreateHelpScale = config.get("theme", "character_create_help_scale")
+      self.characterCreateOptionFont = config.get("theme", "character_create_option_font")
+      self.characterCreateHelpFont = config.get("theme", "character_create_help_font")
+      self.characterCreateScale = config.get("theme", "character_create_scale")
+      self.characterCreateSpace = config.get("theme", "character_create_space")
+      self.avatarSelectTextX = config.get("theme","avatar_select_text_x")
+      self.avatarSelectTextY = config.get("theme","avatar_select_text_y")
+      self.avatarSelectTextScale = config.get("theme","avatar_select_text_scale")
+      self.avatarSelectFont = config.get("theme","avatar_select_font")
+      self.avatarSelectAvX = config.get("theme","avatar_select_avatar_x")
+      self.avatarSelectAvY = config.get("theme","avatar_select_avatar_y")
+      self.avatarSelectWheelY = config.get("theme","avatar_select_wheel_y")
+      
+      #Vocal mode
+      self.vocalMeterSize = config.get("theme", "vocal_meter_size")
+      self.vocalMeterX = config.get("theme", "vocal_meter_x")
+      self.vocalMeterY = config.get("theme", "vocal_meter_y")
+      self.vocalMultX  = config.get("theme", "vocal_mult_x")
+      self.vocalMultY  = config.get("theme", "vocal_mult_y")
+      self.vocalPowerX = config.get("theme", "vocal_power_x")
+      self.vocalPowerY = config.get("theme", "vocal_power_y")
+      self.vocalFillupCenterX = config.get("theme", "vocal_fillup_center_x")
+      self.vocalFillupCenterY = config.get("theme", "vocal_fillup_center_y")
+      self.vocalFillupInRadius = config.get("theme", "vocal_fillup_in_radius")
+      self.vocalFillupOutRadius = config.get("theme", "vocal_fillup_out_radius")
+      self.vocalFillupFactor = config.get("theme", "vocal_fillup_factor")
+      self.vocalFillupColor = config.get("theme", "vocal_fillup_color")
+      self.vocalCircularFillup = config.get("theme", "vocal_circular_fillup")
+      self.vocalLaneSize = config.get("theme", "vocal_lane_size")
+      self.vocalGlowSize = config.get("theme", "vocal_glow_size")
+      self.vocalGlowFade = config.get("theme", "vocal_glow_fade")
+      self.vocalLaneColor = self.hexToColorResults(config.get("theme","vocal_lane_color"))
+      self.vocalShadowColor = self.hexToColorResults(config.get("theme","vocal_shadow_color"))
+      self.vocalGlowColor = self.hexToColorResults(config.get("theme","vocal_glow_color"))
+      self.vocalLaneColorStar = self.hexToColorResults(config.get("theme","vocal_lane_color_star"))
+      self.vocalShadowColorStar = self.hexToColorResults(config.get("theme","vocal_shadow_color_star"))
+      self.vocalGlowColorStar = self.hexToColorResults(config.get("theme","vocal_glow_color_star"))
+      
+      #3D Note/Fret rendering system
+      self.twoDnote = config.get("theme", "twoDnote")
+      self.twoDkeys = config.get("theme", "twoDkeys")
+      self.threeDspin = config.get("theme", "threeDspin")
+      self.fret_press = config.get("theme", "fret_press")
+      self.noterot = [config.get("theme", "noterot"+str(i+1)) for i in range(5)]
+      self.keyrot  = [config.get("theme", "keyrot"+str(i+1)) for i in range(5)]
+      self.drumnoterot = [config.get("theme", "drumnoterot"+str(i+1)) for i in range(5)]
+      self.drumkeyrot = [config.get("theme", "drumkeyrot"+str(i+1)) for i in range(5)]
+      self.notepos = [config.get("theme", "notepos"+str(i+1)) for i in range(5)]
+      self.keypos  = [config.get("theme", "keypos"+str(i+1)) for i in range(5)]
+      self.drumnotepos = [config.get("theme", "drumnotepos"+str(i+1)) for i in range(5)]
+      self.drumkeypos = [config.get("theme", "drumkeypos"+str(i+1)) for i in range(5)]
+      
+      #In-game rendering
+      self.rockmeter_score_colorVar = self.hexToColorResults(config.get("theme", "rockmeter_score_color"))
+      self.ingame_stats_colorVar = self.hexToColorResults(config.get("theme", "ingame_stats_color"))
+      self.hopoIndicatorX = config.get("theme", "hopo_indicator_x")
+      self.hopoIndicatorY = config.get("theme", "hopo_indicator_y")  
+      self.hopoIndicatorActiveColor = self.hexToColor(config.get("theme", "hopo_indicator_active_color"))
+      self.hopoIndicatorInactiveColor = self.hexToColor(config.get("theme", "hopo_indicator_inactive_color"))
+      self.markSolos = config.get("theme","mark_solo_sections")
+      
+      #Game results scene
+      self.result_score = config.get("theme", "result_score").split(",")
+      self.result_star = config.get("theme", "result_star").split(",")
+      self.result_song = config.get("theme", "result_song").split(",")
+      self.result_song_form = config.get("theme", "result_song_form")
+      self.result_song_text = config.get("theme", "result_song_text").strip()
+      self.result_stats_part = config.get("theme", "result_stats_part").split(",")
+      self.result_stats_part_text = config.get("theme", "result_stats_part_text").strip()
+      self.result_stats_name = config.get("theme", "result_stats_name").split(",")
+      self.result_stats_diff = config.get("theme", "result_stats_diff").split(",")
+      self.result_stats_diff_text = config.get("theme", "result_stats_diff_text").strip()
+      self.result_stats_accuracy = config.get("theme", "result_stats_accuracy").split(",")
+      self.result_stats_accuracy_text = config.get("theme", "result_stats_accuracy_text").strip()
+      self.result_stats_streak = config.get("theme", "result_stats_streak").split(",")
+      self.result_stats_streak_text = config.get("theme", "result_stats_streak_text").strip()
+      self.result_stats_notes = config.get("theme", "result_stats_notes").split(",")
+      self.result_stats_notes_text = config.get("theme", "result_stats_notes_text").strip()
+      self.result_cheats_info = config.get("theme", "result_cheats_info").split(",")
+      self.result_cheats_numbers = config.get("theme", "result_cheats_numbers").split(",")
+      self.result_cheats_percent = config.get("theme", "result_cheats_percent").split(",")
+      self.result_cheats_score   = config.get("theme", "result_cheats_score").split(",")
+      self.result_cheats_color   = config.get("theme", "result_cheats_color")
+      self.result_cheats_font    = config.get("theme", "result_cheats_font")
+      self.result_high_score_font = config.get("theme", "result_high_score_font")
+      self.result_menu_x         = config.get("theme", "result_menu_x")
+      self.result_menu_y         = config.get("theme", "result_menu_y")
+      self.result_star_type      = config.get("theme", "result_star_type")
+      
+      #Submenus
+      allfiles = os.listdir(os.path.join(Version.dataPath(),"themes",name,"menu"))
+      self.submenuScale = {}
+      self.submenuX = {}
+      self.submenuY = {}
+      self.submenuVSpace = {}
+      listmenu = []
+      for name in allfiles:
+        if name.find("text") > -1:
+          found = os.path.splitext(name)[0]
+          if found == "maintext":
+            continue
+          Config.define("theme", found, str, None)
+          self.submenuScale[found] = None
+          self.submenuX[found] = None
+          self.submenuY[found] = None
+          self.submenuVSpace[found] = None
+          listmenu.append(found)
+      for i in listmenu:
+        if i == "maintext":
+          continue
+        try:
+          self.submenuX[i] = config.get("theme", i).split(",")[0].strip()
+        except IndexError:
+          self.submenuX[i] = None
+        try:
+          self.submenuY[i] = config.get("theme", i).split(",")[1].strip()
+        except IndexError:
+          self.submenuY[i] = None
+        try:
+          self.submenuScale[i] = config.get("theme", i).split(",")[2].strip()
+        except IndexError:
+          self.submenuScale[i] = None
+        try:
+          self.submenuVSpace[i] = config.get("theme", i).split(",")[3].strip()
+        except IndexError:
+          self.submenuVSpace[i] = None
+    
+      self.setlist = Setlist(self)
+    else:
+      #Colors
+      self.backgroundColor = (0,0,0)
+      self.baseColor = (1,1,1)
+      self.selectedColor = (1,.75,0)
+      self.meshColor = (0,0,0)
+      self.hopoColor = (0,.667,.667)
+      self.spotColor = (1,1,1)
+      self.keyColor = (.2,.2,.2)
+      self.key2Color = (0,0,0)
+      self.tracksColor = (1,1,.5)
+      self.barsColor = (1,1,.5)
+      self.glowColor = (-2,-2,-2)
+      
+      #Note Colors (this applies to frets and notes)
+      self.noteColors = [(.133,1,.133),(1,.133,.133),(1,1,.133),(.2,.2,1),(1,.6,.3),(.8,.133,.8)]
+      self.spNoteColor = (.3,.7,.9)
+      self.killNoteColor = (0,0,0)
+      self.use_fret_colors = False
+      
+      #Point of View
+      self.povTargetX = None
+      self.povTargetY = None
+      self.povTargetZ = None
+      self.povOriginX = None
+      self.povOriginY = None
+      self.povOriginZ = None
+      
+      #Loading phrases
+      self.loadingPhrase = []
+      self.resultsPhrase = []
+      
+      #Miscellany (aka Garbage no one cares about)
+      self.crowdLoopDelay = None
+      self.songInfoDisplayScale = .0020
+      self.songInfoDisplayX = .05
+      self.songInfoDisplayY = .05
+      self.displayAllGreyStars = True
+      self.smallMult = True
+      self.jurgTextPos = [1,1,.00035]
+      self.oBarHScale = .7
+      self.oBar3dFill = False
+      self.power_up_name = None
+      
+      #Continuous star fillup!
+      self.starFillupCenterX = None
+      self.starFillupCenterY = None
+      self.starFillupInRadius = None
+      self.starFillupOutRadius = None
+      self.starFillupColor = None
+      
+      #Neck size, neck choose (yeah? you got a problem with that goruping?)
+      self.neckWidth = 3.0
+      self.neckLength = 9.0
+      self.neck_prompt_x = .1
+      self.neck_prompt_y = .05
+      
+      #Setlist
+      self.songListDisplay = 1
+      self.setlistguidebuttonsposX = .408
+      self.setlistguidebuttonsposY = .0322
+      self.setlistguidebuttonsscaleX = .29
+      self.setlistguidebuttonsscaleY = .308
+      self.setlistpreviewbuttonposX = .5
+      self.setlistpreviewbuttonposY = .5
+      self.setlistpreviewbuttonscaleX = .5
+      self.setlistpreviewbuttonscaleY = .5
+      self.versiontagposX = .5
+      self.versiontagposY = .5
+      self.songSelectSubmenuOffsetLines = 2
+      self.songSelectSubmenuOffsetSpaces = 2
+      self.songSelectSubmenuX = None
+      self.songSelectSubmenuY = None
+      self.song_cd_Xpos = 0.0
+      self.song_listcd_cd_Xpos = .75
+      self.song_listcd_cd_Ypos = .6
+      self.song_listcd_score_Xpos = .6
+      self.song_listcd_score_Ypos = .5
+      self.songlist_score_colorVar = (.58,.76,.32)
+      self.songlistcd_score_colorVar = (1,1,1)
+      self.song_listcd_list_Xpos = .1
+      self.song_cdscore_Xpos = .6
+      self.song_list_Xpos = .15
+      self.song_listscore_Xpos = .8
+      self.career_title_colorVar = (0,0,0)
+      self.song_name_text_colorVar = (1,1,1)
+      self.song_name_selected_colorVar = (1,.75,0)
+      self.artist_text_colorVar = (.25,.5,1)
+      self.artist_selected_colorVar = (.25,.5,1)
+      self.library_text_colorVar = (1,1,1)
+      self.library_selected_colorVar = (1,.75,0)
+      self.pause_text_colorVar = (1,1,1)
+      self.pause_selected_colorVar = (1,.75,0)
+      self.fail_completed_colorVar = (1,1,1)
+      self.fail_text_colorVar = (1,1,1)
+      self.fail_selected_colorVar = (1,.75,0)
+      self.song_rb2_diff_colorVar = (1,.75,0)
+      
+      #pause menu and fail menu
+      self.pause_bkg_pos = [.5,.5,1.0,1.0]
+      self.pause_text_xPos = None
+      self.pause_text_yPos = None
+      self.opt_text_colorVar = (1,1,1)
+      self.opt_selected_colorVar = (1,.75,0)
+      self.opt_bkg_size = [.5,.5,1.0,1.0]
+      self.opt_text_xPos = None
+      self.opt_text_yPos = None
+      self.fail_bkg_pos = [.5,.5,1.0,1.0]
+      self.fail_text_xPos = None
+      self.fail_text_yPos = None
+      self.fail_songname_xPos = .5
+      self.fail_songname_yPos = .35
+      
+      #main menu system
+      self.menuX = None
+      self.menuY = None
+      self.menuRB = False
+      self.loadingX = .5
+      self.loadingY = .6
+      self.loadingColor = (1,1,1)
+      self.loadingFScale = .0015
+      self.loadingRMargin = 1.0
+      self.loadingLSpacing = 1.0
+      self.main_menu_scaleVar = None
+      self.main_menu_vspacingVar = None
+      self.use_solo_submenu = None
+      self.sub_menu_xVar = None
+      self.sub_menu_yVar = None
+      self.versiontag = False
+      self.shadowoffsetx = .0022
+      self.shadowoffsety = .0005
+      self.menuTipTextY = .7
+      self.menuTipTextFont = "font"
+      self.menuTipTextScale = .002
+      self.menuTipTextColor = None
+      self.menuTipTextScrollSpace = .25
+      self.menuTipTextScrollMode = 0
+      self.menuTipTextDisplay = False
+      
+      #Lobby
+      self.controlActivateX = .645
+      self.controlActivateSelectX = .5
+      self.controlActivatePartX = .41
+      self.controlActivateY = .18
+      self.controlActivateScale = .0018
+      self.controlActivateSpace = .045
+      self.controlActivatePartSize = 22.000
+      self.controlActivateFont = "font"
+      self.controlDescriptionX = .5
+      self.controlDescriptionY = .13
+      self.controlDescriptionScale = .002
+      self.controlDescriptionFont = "font"
+      self.controlCheckX = .16
+      self.controlCheckY = .26
+      self.controlCheckTextY = .61
+      self.controlCheckPartMult = 2.8
+      self.controlCheckScale = .0018
+      self.controlCheckSpace = .23
+      self.controlCheckFont  = "font"
+      self.lobbyMode = 0
+      self.lobbyPreviewX = .7
+      self.lobbyPreviewY = 0.0
+      self.lobbyPreviewSpacing = .04
+      self.lobbyTitleX = .5
+      self.lobbyTitleY = .07
+      self.lobbyTitleCharacterX = .26
+      self.lobbyTitleCharacterY = .24
+      self.lobbyTitleScale = .0024
+      self.lobbyTitleFont = "loadingFont"
+      self.lobbyAvatarX = .7
+      self.lobbyAvatarY = .75
+      self.lobbyAvatarScale = 1.0
+      self.lobbySelectX = .4
+      self.lobbySelectY = .32
+      self.lobbySelectImageX = .255
+      self.lobbySelectImageY = .335
+      self.lobbySelectScale = .0018
+      self.lobbySelectSpace = .04
+      self.lobbySelectFont = "font"
+      self.lobbySelectLength = 5
+      self.lobbyTitleColor = (1,1,1)
+      self.lobbyInfoColor = (1,1,1)
+      self.lobbyFontColor = (1,1,1)
+      self.lobbyPlayerColor = (1,1,1)
+      self.lobbySelectColor = (1,.75,0)
+      self.lobbyDisableColor = (.4,.4,.4)
+      self.characterCreateX = .25
+      self.characterCreateY = .15
+      self.characterCreateOptionX = .75
+      self.characterCreateFontColor = (1,1,1)
+      self.characterCreateSelectColor = (1,.75,0)
+      self.characterCreateHelpColor = (1,1,1)
+      self.characterCreateHelpX = .5
+      self.characterCreateHelpY = .73
+      self.characterCreateHelpScale = .0018
+      self.characterCreateOptionFont = "font"
+      self.characterCreateHelpFont = "loadingFont"
+      self.characterCreateScale = .0018
+      self.characterCreateSpace = .045
+      self.avatarSelectTextX = .44
+      self.avatarSelectTextY = .16
+      self.avatarSelectTextScale = .0027
+      self.avatarSelectFont = "font"
+      self.avatarSelectAvX = .667
+      self.avatarSelectAvY = .5
+      self.avatarSelectWheelY = 0.0
+      
+      #Vocal mode
+      self.vocalMeterSize = 45.000
+      self.vocalMeterX = .25
+      self.vocalMeterY = .8
+      self.vocalMultX  = .28
+      self.vocalMultY  = .8
+      self.vocalPowerX = .5
+      self.vocalPowerY = .8
+      self.vocalFillupCenterX = 139
+      self.vocalFillupCenterY = 151
+      self.vocalFillupInRadius = 25
+      self.vocalFillupOutRadius = 139
+      self.vocalFillupFactor = 300.000
+      self.vocalFillupColor = (.87,.87,.87)
+      self.vocalCircularFillup = True
+      self.vocalLaneSize = .002
+      self.vocalGlowSize = .012
+      self.vocalGlowFade = .6
+      self.vocalLaneColor = (.6,1,.5)
+      self.vocalShadowColor = (.8,1,.75)
+      self.vocalGlowColor = (.2,1,0)
+      self.vocalLaneColorStar = (1,1,.5)
+      self.vocalShadowColorStar = (1,1,.75)
+      self.vocalGlowColorStar = (1,1,0)
+      
+      #3D Note/Fret rendering system
+      self.twoDnote = True
+      self.twoDkeys = True
+      self.threeDspin = True
+      self.fret_press = True
+      self.noterot = [0 for i in range(5)]
+      self.keyrot  = [0 for i in range(5)]
+      self.drumnoterot = [0 for i in range(5)]
+      self.drumkeyrot = [0 for i in range(5)]
+      self.notepos = [0 for i in range(5)]
+      self.keypos  = [0 for i in range(5)]
+      self.drumnotepos = [0 for i in range(5)]
+      self.drumkeypos = [0 for i in range(5)]
+      
+      #In-game rendering
+      self.rockmeter_score_colorVar = (1,1,1)
+      self.ingame_stats_colorVar = (1,1,1)
+      self.hopoIndicatorX = None
+      self.hopoIndicatorY = None
+      self.hopoIndicatorActiveColor = (1,1,1)
+      self.hopoIndicatorInactiveColor = (.6,.6,.6)
+      self.markSolos = 2
+      
+      #Game results scene
+      self.result_score = [.5,.11,.0025,None,None]
+      self.result_star = [.5,.4,.15,1.1]
+      self.result_song = [.05,.045,.002,None,None]
+      self.result_song_form = 0
+      self.result_song_text = "%s Finished!"
+      self.result_stats_part = [.5,.64,0.002,None,None]
+      self.result_stats_part_text = "Part: %s"
+      self.result_stats_name = [.5,.73,0.002,None,None]
+      self.result_stats_diff = [.5,.55,.002,None,None]
+      self.result_stats_diff_text = "Difficulty: %s"
+      self.result_stats_accuracy = [.5,.61,.002,None,None]
+      self.result_stats_accuracy_text = "Accuracy: %.1f%%"
+      self.result_stats_streak = [.5,.58,.002,None,None]
+      self.result_stats_streak_text = "Longest Streak: %d"
+      self.result_stats_notes = [.5,.52,.002,None,None]
+      self.result_stats_notes_text = "%s Notes Hit"
+      self.result_cheats_info = [.5,.3,.002]
+      self.result_cheats_numbers = [.5,.35,.0015]
+      self.result_cheats_percent = [.45,.4,.0015]
+      self.result_cheats_score   = [.75,.4,.0015]
+      self.result_cheats_color   = (1,1,1)
+      self.result_cheats_font    = "font"
+      self.result_high_score_font = "font"
+      self.result_menu_x         = .5
+      self.result_menu_y         = .2
+      self.result_star_type      = 0
+      
+      #Submenus
+      self.submenuScale = {}
+      self.submenuX = {}
+      self.submenuY = {}
+      self.submenuVSpace = {}
+  
+  def setSelectedColor(self, alpha = 1.0):
+    glColor4f(*(self.selectedColor + (alpha,)))
+
+  def setBaseColor(self, alpha = 1.0):
+    glColor4f(*(self.baseColor + (alpha,)))
+  
+  def hexToColorResults(self, color):
+    if isinstance(color, tuple):
+      return color
+    color = color.strip()
+    if color[0] == "#":
+      color = color[1:]
+      if len(color) == 3:
+        return (int(color[0], 16) / 15.0, int(color[1], 16) / 15.0, int(color[2], 16) / 15.0)
+      return (int(color[0:2], 16) / 255.0, int(color[2:4], 16) / 255.0, int(color[4:6], 16) / 255.0)
+    return self.baseColor
+  
+  def hexToColor(self, color):
+    if isinstance(color, tuple):
+      return color
+    if color[0] == "#":
+      color = color[1:]
+      if len(color) == 3:
+        return (int(color[0], 16) / 15.0, int(color[1], 16) / 15.0, int(color[2], 16) / 15.0)
+      elif len(color) == 4:
+        return (int(color[0], 16) / 15.0, int(color[1], 16) / 15.0, int(color[2], 16) / 15.0, int(color[2], 16) / 15.0)
+      return (int(color[0:2], 16) / 255.0, int(color[2:4], 16) / 255.0, int(color[4:6], 16) / 255.0)
+    elif color.lower() == "off":
+      return (-1, -1, -1)
+    elif color.lower() == "fret":
+      return (-2, -2, -2)
+    return (0, 0, 0)
+
+  def colorToHex(self, color):
+    return "#" + ("".join(["%02x" % int(c * 255) for c in color]))
+
+  def packTupleKey(self, key, type = str):
+    vals = key.split(',')
+    if isinstance(type, list):
+      retval = tuple(type[i](n.strip()) for i, n in enumerate(vals))
+    else:
+      retval = tuple(type(n.strip()) for n in vals)
+    return retval
+  
+  def importThemeModule(self, moduleName):
     try:
-      fp, pathname, description = imp.find_module("ThemeSetlist",[themepath])
-      if description[0] == ".py":
-        TT = imp.load_module("ThemeSetlist", fp, pathname, description)
-        self.setlist = TT.Setlist()
-        Log.debug("Custom Theme Files Loaded")
+      fp, pathname, description = imp.find_module(moduleName,[self.path])
+      module = imp.load_module(moduleName, fp, pathname, description)
+      if moduleName in ["CustomSetlist", "Setlist"]:
+        return module.CustomSetlist(self)
       else:
-        Log.debug("No Theme Files Found")
-    except:
-      self.setlist = SetlistBase()
-      Log.debug("No Theme Files Found")
+        return None
+    except ImportError:
+      if moduleName in ["CustomSetlist", "Setlist"]:
+        return Setlist(self)
+      else:
+        return None
       
-class SetlistBase:
-  setlist_type = 3
-  if setlist_type == 0: #CD mode
-    setlistStyle = 0
-    headerSkip = 0
-    footerSkip = 0
-    labelType = 1
-    labelDistance = 2
-    showMoreLabels = True
-    texturedLabels = True
-    itemsPerPage = 1
-    showLockedSongs = False
-    showSortTiers = True
-    selectTiers = False
-    itemSize = (0,.125)
-  elif setlist_type == 1: #List mode
-    setlistStyle = 1
-    headerSkip = 2
-    footerSkip = 1
-    labelType = 0
-    labelDistance = 0
-    showMoreLabels = False
-    texturedLabels = False
-    itemsPerPage = 7
-    showLockedSongs = False
-    showSortTiers = True
-    selectTiers = False
-    itemSize = (0,.125)
-  elif setlist_type == 2: #List/CD mode
-    setlistStyle = 1
-    headerSkip = 0
-    footerSkip = 1
-    labelType = 1
-    labelDistance = 1
-    showMoreLabels = False
-    texturedLabels = True
-    itemsPerPage = 8
-    showLockedSongs = False
-    showSortTiers = True
-    selectTiers = False
-    itemSize = (0,.125)
-  else: #RB2 mode
-    setlistStyle = 0
-    headerSkip = 0
-    footerSkip = 0
-    labelType = 0
-    labelDistance = 1
-    showMoreLabels = False
-    texturedLabels = False
-    itemsPerPage = 12
-    showLockedSongs = True
-    showSortTiers = True
-    selectTiers = False
-    itemSize = (0,.07)
+class Setlist:
+  def __init__(self, theme):
+    self.theme = theme
+    self.setlist_type = theme.songListDisplay
+    if self.setlist_type is None:
+      self.setlist_type = 1
+    if self.setlist_type == 0: #CD mode
+      self.setlistStyle = 0
+      self.headerSkip = 0
+      self.footerSkip = 0
+      self.labelType = 1
+      self.labelDistance = 2
+      self.showMoreLabels = True
+      self.texturedLabels = True
+      self.itemsPerPage = 1
+      self.showLockedSongs = False
+      self.showSortTiers = True
+      self.selectTiers = False
+      self.itemSize = (0,.125)
+    elif self.setlist_type == 1: #List mode
+      self.setlistStyle = 1
+      self.headerSkip = 2
+      self.footerSkip = 1
+      self.labelType = 0
+      self.labelDistance = 0
+      self.showMoreLabels = False
+      self.texturedLabels = False
+      self.itemsPerPage = 7
+      self.showLockedSongs = False
+      self.showSortTiers = True
+      self.selectTiers = False
+      self.itemSize = (0,.126)
+    elif self.setlist_type == 2: #List/CD mode
+      self.setlistStyle = 1
+      self.headerSkip = 0
+      self.footerSkip = 1
+      self.labelType = 1
+      self.labelDistance = 1
+      self.showMoreLabels = False
+      self.texturedLabels = True
+      self.itemsPerPage = 8
+      self.showLockedSongs = False
+      self.showSortTiers = True
+      self.selectTiers = False
+      self.itemSize = (0,.125)
+    else: #RB2 mode
+      self.setlistStyle = 0
+      self.headerSkip = 0
+      self.footerSkip = 0
+      self.labelType = 0
+      self.labelDistance = 1
+      self.showMoreLabels = False
+      self.texturedLabels = False
+      self.itemsPerPage = 12
+      self.showLockedSongs = True
+      self.showSortTiers = True
+      self.selectTiers = False
+      self.itemSize = (0,.07)
 
-  career_title_color = hexToColor("#FFFFFF")
-  song_name_text_color = hexToColor("#FFFFFF")
-  song_name_selected_color = hexToColor("#FFBF00")
-  song_rb2_diff_color = hexToColor("#FFFFFF")
-  artist_text_color = hexToColor("#FFFFFF")
-  artist_selected_color = hexToColor("#FFBF00")
-  library_text_color = hexToColor("#FFFFFF")
-  library_selected_color = hexToColor("#FFBF00")
-  songlist_score_color = hexToColor("#FFFFFF")
-  songlistcd_score_color = hexToColor("#FFFFFF")
+    self.career_title_color = self.theme.career_title_colorVar
+    self.song_name_text_color = self.theme.song_name_text_colorVar
+    self.song_name_selected_color = self.theme.song_name_selected_colorVar
+    self.song_rb2_diff_color = self.theme.song_rb2_diff_colorVar
+    self.artist_text_color = self.theme.artist_text_colorVar
+    self.artist_selected_color = self.theme.artist_selected_colorVar
+    self.library_text_color = self.theme.library_text_colorVar
+    self.library_selected_color = self.theme.library_selected_colorVar
+    self.songlist_score_color = self.theme.songlist_score_colorVar
+    self.songlistcd_score_color = self.theme.songlistcd_score_colorVar
 
-  song_cd_xpos = 0.0
-  song_cdscore_xpos = 0.6
-  song_list_xpos = 0.15
-  song_listscore_xpos = 0.8
-  song_listcd_list_xpos = .1
-  song_listcd_cd_xpos = .75
-  song_listcd_cd_ypos = .6
-  song_listcd_score_xpos = 0.6
-  song_listcd_score_ypos = 0.5
-
-
-  def renderHeader(self, scene): #self here used to make it easier on me, yo
-    pass
+    self.song_cd_xpos = theme.song_cd_Xpos
+    self.song_cdscore_xpos = theme.song_cdscore_Xpos
+    self.song_list_xpos = theme.song_list_Xpos
+    self.song_listscore_xpos = theme.song_listscore_Xpos
+    self.song_listcd_list_xpos = theme.song_listcd_list_Xpos
+    self.song_listcd_cd_xpos = theme.song_listcd_cd_Xpos
+    self.song_listcd_cd_ypos = theme.song_listcd_cd_Ypos
+    self.song_listcd_score_xpos = theme.song_listcd_score_Xpos
+    self.song_listcd_score_ypos = theme.song_listcd_score_Ypos
+  
+  def renderHeader(self, scene):
     pass
   def renderUnselectedItem(self, scene, i, n):
     w, h = scene.engine.view.geometry[2:4]
@@ -1743,7 +1449,7 @@ class SetlistBase:
                 score, stars, name = 0, 0, "---"
           else:
             score, stars, name = _("Nil"), 0, "---"
-            
+          
           if score == _("Nil") and scene.nilShowNextScore:   #MFH
             for d in difficulties:   #MFH - just take the first valid difficulty you can find and display it.
               scores = item.getHighscores(d, part = scene.scorePart)
@@ -2323,9 +2029,9 @@ class SetlistBase:
           d = (y + h * .5 + scene.camera.origin[1]) / (4 * (scene.camera.target[2] - scene.camera.origin[2]))
           if i == scene.selectedIndex:
             scene.selectedOffset = y + h / 2
-            setSelectedColor()
+            self.theme.setSelectedColor()
           else:
-            setBaseColor()
+            self.theme.setBaseColor()
           
           glTranslatef(0, -h / 2, 0)
           glPushMatrix()
@@ -2445,7 +2151,7 @@ class SetlistBase:
       glEnable(GL_BLEND)
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
       glEnable(GL_COLOR_MATERIAL)
-      setBaseColor(1)
+      self.theme.setBaseColor(1)
     elif self.setlist_type == 3:
       w, h = scene.engine.view.geometry[2:4]
       item  = scene.items[scene.selectedIndex]
@@ -2550,7 +2256,7 @@ class SetlistBase:
       font.render(_("Loading Preview..."), (.5, .7), align = 1)
     if scene.img_list_fg:
       scene.engine.drawImage(scene.img_list_fg, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 3)
-
+  
   def renderSelectedInfo(self, scene):
     if self.setlist_type == 0: #note... clean this up. this was a rush job.
       if not scene.selectedItem:
@@ -2578,7 +2284,7 @@ class SetlistBase:
       glEnable(GL_BLEND)
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
       glEnable(GL_COLOR_MATERIAL)
-      setBaseColor(1)
+      self.theme.setBaseColor(1)
 
       if scene.songLoader:
         font.render(_("Loading Preview..."), (.05, .7), scale = 0.001)
@@ -2587,7 +2293,7 @@ class SetlistBase:
       x = self.song_cdscore_xpos
       y = .15
 
-      setSelectedColor(1)
+      self.theme.setSelectedColor(1)
 
       c1,c2,c3 = self.song_name_selected_color
       glColor3f(c1,c2,c3)
@@ -2605,7 +2311,7 @@ class SetlistBase:
       lfont.render(cText, (x, y), scale = 0.0016)
 
       if isinstance(item, Song.SongInfo):
-        setBaseColor(1)
+        self.theme.setBaseColor(1)
 
         c1,c2,c3 = self.artist_selected_color
         glColor3f(c1,c2,c3)
@@ -2623,7 +2329,7 @@ class SetlistBase:
         lfont.render(cText, (x, y+fh), scale = 0.0016)
 
         if item.count:
-          setSelectedColor(1)
+          self.theme.setSelectedColor(1)
 
           c1,c2,c3 = self.song_name_selected_color
           glColor3f(c1,c2,c3)
@@ -2647,7 +2353,7 @@ class SetlistBase:
             text = _("Play To Advance.")
           lfont.render(text, (x, y+3*fh), scale = 0.001)
 
-        setSelectedColor(1 - v)
+        self.theme.setSelectedColor(1 - v)
 
         c1,c2,c3 = self.songlistcd_score_color
         glColor3f(c1,c2,c3)
@@ -2680,14 +2386,14 @@ class SetlistBase:
               originalScore = score
           else:
             score, stars, name = "---", 0, "---"
-          setBaseColor(1)
+          self.theme.setBaseColor(1)
           font.render(Song.difficulties[d.id].text, (x, y), scale = scale)
 
           starscale = 0.02
           stary = 1.0 - y/scene.engine.data.fontScreenBottom
           scene.engine.drawStarScore(screenw, screenh, x+.01, stary-2*fh, stars, starscale, hqStar = True) #volshebnyi
 
-          setSelectedColor(1)
+          self.theme.setSelectedColor(1)
           # evilynux - Also use hit%/noteStreak SongList option
           if scores:
             if notesTotal != 0:
@@ -2698,7 +2404,7 @@ class SetlistBase:
           font.render(name,       (x + .15, y + fh),     scale = scale)
           y += 2 * fh
       elif isinstance(item, Song.LibraryInfo):
-        setBaseColor(1)
+        self.theme.setBaseColor(1)
         c1,c2,c3 = self.library_selected_color
         
         glColor3f(c1,c2,c3)
@@ -2710,7 +2416,7 @@ class SetlistBase:
         font.render(songCount, (x, y + 3*fh), scale = 0.0016)
         
       elif isinstance(item, Song.RandomSongInfo):
-        setBaseColor(1 - v)
+        self.theme.setBaseColor(1 - v)
 
         c1,c2,c3 = self.song_name_selected_color
         glColor3f(c1,c2,c3)
@@ -2744,7 +2450,7 @@ class SetlistBase:
         angle = scene.itemRenderAngles[scene.selectedIndex]
         f = ((90.0 - angle) / 90.0) ** 2
 
-        setSelectedColor(1)
+        self.theme.setSelectedColor(1)
         
         c1,c2,c3 = self.songlistcd_score_color
         glColor4f(c1,c2,c3,1)

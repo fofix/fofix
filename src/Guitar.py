@@ -31,7 +31,6 @@ import Player
 from Song import Note, Tempo
 from Mesh import Mesh
 from Neck import Neck
-import Theme
 import random
 from copy import deepcopy
 from Shader import shaders
@@ -126,26 +125,27 @@ class Guitar:
     
     self.bigRockEndings = self.engine.config.get("game", "big_rock_endings")
     
-    self.boardWidth     = Theme.neckWidth
-    self.boardLength    = Theme.neckLength
+    self.boardWidth     = self.engine.theme.neckWidth
+    self.boardLength    = self.engine.theme.neckLength
     #death_au: fixed neck size
-    #if Theme.twoDnote == False or Theme.twoDkeys == False:
+    #if self.engine.theme.twoDnote == False or self.engine.theme.twoDkeys == False:
       #self.boardWidth     = 3.6
       #self.boardLength    = 9.0  
     
     self.boardScaleX    = self.boardWidth/3.0
     self.boardScaleY    = self.boardLength/9.0
     
-    self.fretPress      = Theme.fret_press
+    self.fretPress      = self.engine.theme.fret_press
 
     self.beatsPerBoard  = 5.0
     self.beatsPerUnit   = self.beatsPerBoard / self.boardLength
     self.strings        = 5
     self.fretWeight     = [0.0] * self.strings
     self.fretActivity   = [0.0] * self.strings
-    self.fretColors     = Theme.fretColors
-    self.spColor        = self.fretColors[5]
-    self.useFretColors  = Theme.use_fret_colors
+    self.fretColors     = self.engine.theme.noteColors
+    self.spColor        = self.engine.theme.spNoteColor
+    self.killColor      = self.engine.theme.killNoteColor
+    self.useFretColors  = self.engine.theme.use_fret_colors
     self.playedNotes    = []
 
     self.freestyleHitFlameCounts = [0 for n in range(self.strings+1)]    #MFH
@@ -311,9 +311,9 @@ class Guitar:
 
     #blazingamer
     self.nstype = self.engine.config.get("game", "nstype")
-    self.twoDnote = Theme.twoDnote
-    self.twoDkeys = Theme.twoDkeys 
-    self.threeDspin = Theme.threeDspin 
+    self.twoDnote = self.engine.theme.twoDnote
+    self.twoDkeys = self.engine.theme.twoDkeys 
+    self.threeDspin = self.engine.theme.threeDspin 
     self.killfx = self.engine.config.get("performance", "killfx")
     self.killCount         = 0
     self.noterotate = self.engine.config.get("coffee", "noterotate")
@@ -509,16 +509,18 @@ class Guitar:
 
 
 
-    self.meshColor  = Theme.meshColor
-    self.hopoColor  = Theme.hopoColor
-    self.spotColor = Theme.spotColor   
-    self.keyColor = Theme.keyColor
-    self.key2Color = Theme.key2Color
-    self.tracksColor = Theme.tracksColor
-    self.flameColors = Theme.flameColors
-    self.gh3flameColor = Theme.gh3flameColor
-    self.flameSizes = Theme.flameSizes
-    self.glowColor  = Theme.glowColor
+    self.meshColor  = self.engine.theme.meshColor
+    self.hopoColor  = self.engine.theme.hopoColor
+    self.spotColor = self.engine.theme.spotColor   
+    self.keyColor = self.engine.theme.keyColor
+    self.key2Color = self.engine.theme.key2Color
+    self.tracksColor = self.engine.theme.tracksColor
+    fC = [(.84, 1, .51), (1, .53, .5), (.98, .96, .42), (.64, .97, 1), (1, .87, .55)]
+    self.flameColors = [fC,fC,fC,fC]
+    self.gh3flameColor = (.75,.36,.02)
+    fS = [.075]*5
+    self.flameSizes = [fS,fS,fS,fS]
+    self.glowColor  = self.engine.theme.glowColor
     
     
     self.twoChordMax = False
@@ -676,7 +678,7 @@ class Guitar:
                 #volshebnyi - killswitch tail width and color change
                 kEffect = ( math.sin( pos / 50 ) + 1 ) /2
                 size = (0.02+kEffect*0.15, s - zsize)
-                c = [self.fretColors[6][0],self.fretColors[6][1],self.fretColors[6][2]]
+                c = [self.killColor[0],self.killColor[1],self.killColor[2]]
                 if c != [0,0,0]:
                   for i in range(0,3):
                     c[i]=c[i]*kEffect+color[i]*(1-kEffect)
@@ -739,7 +741,7 @@ class Guitar:
                 #volshebnyi - killswitch tail width and color change
                 kEffect = ( math.sin( pos / 50 ) + 1 ) /2
                 size = (0.02+kEffect*0.15, s - zsize)
-                c = [self.fretColors[6][0],self.fretColors[6][1],self.fretColors[6][2]]
+                c = [self.killColor[0],self.killColor[1],self.killColor[2]]
                 if c != [0,0,0]:
                   for i in range(0,3):
                     c[i]=c[i]*kEffect+color[i]*(1-kEffect)
@@ -918,15 +920,15 @@ class Guitar:
         glColor4f(.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1) 
 
       if fret == 0: # green note
-        glRotate(Theme.noterot[0], 0, 0, 1), glTranslatef(0, Theme.notepos[0], 0)
+        glRotate(self.engine.theme.noterot[0], 0, 0, 1), glTranslatef(0, self.engine.theme.notepos[0], 0)
       elif fret == 1: # red note
-        glRotate(Theme.noterot[1], 0, 0, 1), glTranslatef(0, Theme.notepos[1], 0)
+        glRotate(self.engine.theme.noterot[1], 0, 0, 1), glTranslatef(0, self.engine.theme.notepos[1], 0)
       elif fret == 2: # yellow
-        glRotate(Theme.noterot[2], 0, 0, 1), glTranslatef(0, Theme.notepos[2], 0)
+        glRotate(self.engine.theme.noterot[2], 0, 0, 1), glTranslatef(0, self.engine.theme.notepos[2], 0)
       elif fret == 3:# blue note
-        glRotate(Theme.noterot[3], 0, 0, 1), glTranslatef(0, Theme.notepos[3], 0)
+        glRotate(self.engine.theme.noterot[3], 0, 0, 1), glTranslatef(0, self.engine.theme.notepos[3], 0)
       elif fret == 4:# blue note
-        glRotate(Theme.noterot[4], 0, 0, 1), glTranslatef(0, Theme.notepos[4], 0)
+        glRotate(self.engine.theme.noterot[4], 0, 0, 1), glTranslatef(0, self.engine.theme.notepos[4], 0)
 
 
       if self.staratex == True and self.starPowerActive and spNote == False:
@@ -1576,15 +1578,15 @@ class Guitar:
           glRotatef(-90, 0, 0, 1)
 
           if n == 0: #green fret button
-            glRotate(Theme.keyrot[0], 0, 1, 0), glTranslatef(0, 0, Theme.keypos[0])
+            glRotate(self.engine.theme.keyrot[0], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.keypos[0])
           elif n == 1: #red fret button
-            glRotate(Theme.keyrot[1], 0, 1, 0), glTranslatef(0, 0, Theme.keypos[1])
+            glRotate(self.engine.theme.keyrot[1], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.keypos[1])
           elif n == 2: #yellow fret button
-            glRotate(Theme.keyrot[2], 0, 1, 0), glTranslatef(0, 0, Theme.keypos[2])
+            glRotate(self.engine.theme.keyrot[2], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.keypos[2])
           elif n == 3: #blue fret button
-            glRotate(Theme.keyrot[3], 0, 1, 0), glTranslatef(0, 0, Theme.keypos[3])
+            glRotate(self.engine.theme.keyrot[3], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.keypos[3])
           elif n == 4: #orange fret button
-            glRotate(Theme.keyrot[4], 0, 1, 0), glTranslatef(0, 0, Theme.keypos[4])
+            glRotate(self.engine.theme.keyrot[4], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.keypos[4])
 
 
           #Mesh - Main fret

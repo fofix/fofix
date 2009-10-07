@@ -33,7 +33,6 @@ import Dialogs
 import Config
 import Audio
 import Settings
-import Theme
 import Version
 from Shader import shaders
 
@@ -101,7 +100,7 @@ class MainMenu(BackgroundLayer):
     self.theme = self.engine.data.theme
     self.themeCoOp = self.engine.data.themeCoOp
     self.themename = self.engine.data.themeLabel
-    self.useSoloMenu = Theme.use_solo_submenu
+    self.useSoloMenu = self.engine.theme.use_solo_submenu
     
     allowMic = True
     
@@ -110,18 +109,18 @@ class MainMenu(BackgroundLayer):
 
     try:
       #blazingamer
-      self.menux = Theme.menuX
-      self.menuy = Theme.menuY
+      self.menux = self.engine.theme.menuX
+      self.menuy = self.engine.theme.menuY
     except Exception, e:
       Log.warn("Unable to load Theme menuX / Y positions: %s" % e) 
       self.menux = None
       self.menuy = None
 
-    self.rbmenu = Theme.menuRB
+    self.rbmenu = self.engine.theme.menuRB
  
     #MFH
-    self.main_menu_scale = Theme.main_menu_scaleVar
-    self.main_menu_vspacing = Theme.main_menu_vspacingVar
+    self.main_menu_scale = self.engine.theme.main_menu_scaleVar
+    self.main_menu_vspacing = self.engine.theme.main_menu_vspacingVar
 
     if self.main_menu_scale == None:
       self.main_menu_scale = .5
@@ -137,7 +136,7 @@ class MainMenu(BackgroundLayer):
     self.engine.loadImgDrawing(self, "optionsPanel", os.path.join("themes",self.themename,"menu","optionspanel.png"))
       
     #racer: added version tag
-    if self.gfxVersionTag or Theme.versiontag == True:
+    if self.gfxVersionTag or self.engine.theme.versiontag == True:
       if not self.engine.loadImgDrawing(self, "version", os.path.join("themes",self.themename,"menu","versiontag.png")):
         if not self.engine.loadImgDrawing(self, "version", "versiontag.png"): #falls back on default versiontag.png in data\ folder
           self.version = None
@@ -170,8 +169,8 @@ class MainMenu(BackgroundLayer):
    
  #####======= Racer: New Main Menu ======####
 
-    self.opt_text_color = Theme.hexToColor(Theme.opt_text_colorVar)
-    self.opt_selected_color = Theme.hexToColor(Theme.opt_selected_colorVar)
+    self.opt_text_color = self.engine.theme.hexToColor(self.engine.theme.opt_text_colorVar)
+    self.opt_selected_color = self.engine.theme.hexToColor(self.engine.theme.opt_selected_colorVar)
 
     if self.opt_text_color == None:
       self.opt_text_color = (1,1,1)
@@ -184,7 +183,7 @@ class MainMenu(BackgroundLayer):
       (_("Practice"), lambda: self.newLocalGame(mode1p = 1)),
     ]
     
-    self.opt_bkg_size = [float(i) for i in Theme.opt_bkg_size]
+    self.opt_bkg_size = [float(i) for i in self.engine.theme.opt_bkg_size]
 
     strCareer = ""
     strQuickplay = ""
@@ -558,6 +557,6 @@ class MainMenu(BackgroundLayer):
 #racer: added version tag to main menu:
     if self.version != None:
           wfactor = self.version.widthf(pixelw = 640.000)
-          self.engine.drawImage(self.version, (0.5,-0.5),(w*Theme.versiontagposX, h*Theme.versiontagposY)) #worldrave - Added theme settings to control X+Y positions of versiontag.
+          self.engine.drawImage(self.version, (0.5,-0.5),(w*self.engine.theme.versiontagposX, h*self.engine.theme.versiontagposY)) #worldrave - Added theme settings to control X+Y positions of versiontag.
 
 

@@ -24,7 +24,6 @@
 
 import Player
 from Song import Tempo, Bars
-import Theme
 import random
 from copy import deepcopy
 from Shader import shaders, mixColors
@@ -62,8 +61,8 @@ class Neck:
     self.neckAlpha.append( self.neckAlpha[0] * self.engine.config.get("game", "overlay_neck_alpha") ) # overlay neck
     self.neckAlpha.append( self.neckAlpha[0] * self.engine.config.get("game", "fail_neck_alpha") ) # fail neck
 
-    self.boardWidth     = Theme.neckWidth
-    self.boardLength    = Theme.neckLength
+    self.boardWidth     = self.engine.theme.neckWidth
+    self.boardLength    = self.engine.theme.neckLength
     #death_au: fixed neck size
     
     if self.isDrum and self.engine.config.get("game", "large_drum_neck"):
@@ -464,9 +463,9 @@ class Neck:
       return 0.125 * beat / self.beatsPerUnit    # glorandwarf: was 0.12
       
     if self.instrument.starPowerActive and self.theme == 0:#8bit
-      color = Theme.fretColors[5] #self.spColor #(.3,.7,.9)
+      color = self.engine.theme.spNoteColor #self.spColor #(.3,.7,.9)
     elif self.instrument.starPowerActive and self.theme == 1:
-      color = Theme.fretColors[5] #self.spColor #(.3,.7,.9)
+      color = self.engine.theme.spNoteColor #self.spColor #(.3,.7,.9)
     else:
       color = (1,1,1)
 
@@ -586,10 +585,10 @@ class Neck:
       fret = []
       neckcol = (0,0,0)
       
-      notecolors = list(Theme.fretColors)
+      notecolors = list(self.engine.theme.noteColors)
       if self.isDrum:
         notecolors[4] = notecolors[0]
-        notecolors[0] = Theme.opencolor
+        notecolors[0] = self.engine.theme.noteColors[5]
         
         
       for i in range(5):

@@ -45,8 +45,6 @@ import os
 
 import Log
 
-import Theme
-
 class ConfigChoice(Menu.Choice):
   def __init__(self, engine, config, section, option, autoApply = False, isQuickset = 0):
     self.engine    = engine
@@ -658,8 +656,8 @@ class SettingsMenu(Menu.Menu):
     
     self.keyCheckerMode = Config.get("game", "key_checker_mode")
     
-    self.opt_text_x = Theme.opt_text_xPos
-    self.opt_text_y = Theme.opt_text_yPos
+    self.opt_text_x = self.engine.theme.opt_text_xPos
+    self.opt_text_y = self.engine.theme.opt_text_yPos
 
     if engine.data.theme == 0:
       if self.opt_text_x == None:
@@ -678,18 +676,13 @@ class SettingsMenu(Menu.Menu):
         self.opt_text_y = .14
 
 
-    self.opt_text_color = Theme.hexToColor(Theme.opt_text_colorVar)
-    self.opt_selected_color = Theme.hexToColor(Theme.opt_selected_colorVar)
-
-    Log.debug("Option text / selected hex colors: " + Theme.opt_text_colorVar + " / " + Theme.opt_selected_colorVar)
-
+    self.opt_text_color = self.engine.theme.hexToColor(self.engine.theme.opt_text_colorVar)
+    self.opt_selected_color = self.engine.theme.hexToColor(self.engine.theme.opt_selected_colorVar)
 
     if self.opt_text_color == None:
       self.opt_text_color = (1,1,1)
     if self.opt_selected_color == None:
       self.opt_selected_color = (1,0.75,0)
-
-    Log.debug("Option text / selected colors: " + str(self.opt_text_color) + " / " + str(self.opt_selected_color))
 
     self.modSettings = [
       ConfigChoice(engine, engine.config, "mods",  "mod_" + m) for m in Mod.getAvailableMods(engine)
@@ -1177,8 +1170,8 @@ class BasicSettingsMenu(Menu.Menu):
     if self.logClassInits == 1:
       Log.debug("BasicSettingsMenu class init (Settings.py)...")
       
-    self.opt_text_x = Theme.opt_text_xPos
-    self.opt_text_y = Theme.opt_text_yPos
+    self.opt_text_x = self.engine.theme.opt_text_xPos
+    self.opt_text_y = self.engine.theme.opt_text_yPos
 
     if engine.data.theme == 0:
       if self.opt_text_x == None:
@@ -1197,18 +1190,13 @@ class BasicSettingsMenu(Menu.Menu):
         self.opt_text_y = .14
 
 
-    self.opt_text_color = Theme.hexToColor(Theme.opt_text_colorVar)
-    self.opt_selected_color = Theme.hexToColor(Theme.opt_selected_colorVar)
-
-    Log.debug("Option text / selected hex colors: " + Theme.opt_text_colorVar + " / " + Theme.opt_selected_colorVar)
-
+    self.opt_text_color = self.engine.theme.hexToColor(self.engine.theme.opt_text_colorVar)
+    self.opt_selected_color = self.engine.theme.hexToColor(self.engine.theme.opt_selected_colorVar)
 
     if self.opt_text_color == None:
       self.opt_text_color = (1,1,1)
     if self.opt_selected_color == None:
       self.opt_selected_color = (1,0.75,0)
-
-    Log.debug("Option text / selected colors: " + str(self.opt_text_color) + " / " + str(self.opt_selected_color))
 
     self.modSettings = [
       ConfigChoice(engine, engine.config, "mods",  "mod_" + m) for m in Mod.getAvailableMods(engine)

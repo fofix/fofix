@@ -32,7 +32,6 @@ import Player
 from Song import Note, Tempo
 from Mesh import Mesh
 from Neck import Neck
-import Theme
 import random
 from copy import deepcopy
 from Shader import shaders
@@ -159,11 +158,11 @@ class Drum:
     self.strings        = 4
     self.fretWeight     = [0.0] * self.strings
     self.fretActivity   = [0.0] * self.strings
-    self.fretColors     = Theme.fretColors
-    self.spColor        = self.fretColors[5]
-    self.useFretColors  = Theme.use_fret_colors
+    self.fretColors     = self.engine.theme.noteColors
+    self.spColor        = self.engine.theme.spNoteColor
+    self.useFretColors  = self.engine.theme.use_fret_colors
     self.openFretActivity = 0.0
-    self.openFretColor  = Theme.openFretColor
+    self.openFretColor  = self.fretColors[5]
     self.playedNotes    = []
     self.missedNotes    = []
     self.editorMode     = editorMode
@@ -327,10 +326,10 @@ class Drum:
 
     #blazingamer
     self.nstype = self.engine.config.get("game", "nstype")
-    self.twoDnote = Theme.twoDnote
-    self.twoDkeys = Theme.twoDkeys 
-    self.threeDspin = Theme.threeDspin 
-    self.opencolor = Theme.opencolor 
+    self.twoDnote = self.engine.theme.twoDnote
+    self.twoDkeys = self.engine.theme.twoDkeys 
+    self.threeDspin = self.engine.theme.threeDspin 
+    self.opencolor = self.fretColors[5]
     self.noterotate = self.engine.config.get("coffee", "noterotate")
     self.rockLevel = 0.0
     self.failcount = 0
@@ -358,15 +357,15 @@ class Drum:
     # elif self.twoDnote == False or self.twoDkeys == False:
       # self.boardWidth     = Theme.neckWidth + 0.6
       # self.boardLength    = Theme.neckLength  
-    self.boardWidth     = Theme.neckWidth
-    self.boardLength    = Theme.neckLength
+    self.boardWidth     = self.engine.theme.neckWidth
+    self.boardLength    = self.engine.theme.neckLength
     if self.engine.config.get("game", "large_drum_neck"):
       self.boardWidth     *= (4.0/3.0)
       self.boardLength    *= (4.0/3.0)
     
     self.boardScaleX    = self.boardWidth/3.0
     self.boardScaleY    = self.boardLength/9.0
-    self.fretPress      = Theme.fret_press
+    self.fretPress      = self.engine.theme.fret_press
 
     self.muteSustainReleases = self.engine.config.get("game", "sustain_muting") #MFH
 
@@ -554,17 +553,19 @@ class Drum:
     self.bigTail1 = None
     self.bigTail2 = None  
 
-    self.meshColor  = Theme.meshColor    
-    self.hopoColor  = Theme.hopoColor
-    self.spotColor = Theme.spotColor   
-    self.keyColor = Theme.keyColor
-    self.key2Color = Theme.key2Color
-    self.tracksColor = Theme.tracksColor
-    self.barsColor = Theme.barsColor
-    self.flameColors = Theme.flameColors
-    self.gh3flameColor = Theme.gh3flameColor
-    self.flameSizes = Theme.flameSizes
-    self.glowColor  = Theme.glowColor
+    self.meshColor  = self.engine.theme.meshColor    
+    self.hopoColor  = self.engine.theme.hopoColor
+    self.spotColor = self.engine.theme.spotColor   
+    self.keyColor = self.engine.theme.keyColor
+    self.key2Color = self.engine.theme.key2Color
+    self.tracksColor = self.engine.theme.tracksColor
+    self.barsColor = self.engine.theme.barsColor
+    fC = [(.84, 1, .51), (1, .53, .5), (.98, .96, .42), (.64, .97, 1), (1, .87, .55)]
+    self.flameColors = [fC,fC,fC,fC]
+    self.gh3flameColor = (.75,.36,.02)
+    fS = [.075]*5
+    self.flameSizes = [fS,fS,fS,fS]
+    self.glowColor  = self.engine.theme.glowColor
     self.twoChordMax = False
     self.disableVBPM  = self.engine.config.get("game", "disable_vbpm")
     self.disableNoteSFX  = self.engine.config.get("video", "disable_notesfx")
@@ -974,15 +975,15 @@ class Drum:
         glRotatef(-90, 1, 0, 0)
 
       if fret == 0: # green note
-        glRotate(Theme.drumnoterot[0], 0, 0, 1), glTranslatef(0, Theme.drumnotepos[0], 0)
+        glRotate(self.engine.theme.drumnoterot[0], 0, 0, 1), glTranslatef(0, self.engine.theme.drumnotepos[0], 0)
       elif fret == 1: # red note
-        glRotate(Theme.drumnoterot[1], 0, 0, 1), glTranslatef(0, Theme.drumnotepos[1], 0)
+        glRotate(self.engine.theme.drumnoterot[1], 0, 0, 1), glTranslatef(0, self.engine.theme.drumnotepos[1], 0)
       elif fret == 2: # yellow
-        glRotate(Theme.drumnoterot[2], 0, 0, 1), glTranslatef(0, Theme.drumnotepos[2], 0)
+        glRotate(self.engine.theme.drumnoterot[2], 0, 0, 1), glTranslatef(0, self.engine.theme.drumnotepos[2], 0)
       elif fret == 3:# blue note
-        glRotate(Theme.drumnoterot[3], 0, 0, 1), glTranslatef(0, Theme.drumnotepos[3], 0)
+        glRotate(self.engine.theme.drumnoterot[3], 0, 0, 1), glTranslatef(0, self.engine.theme.drumnotepos[3], 0)
       elif fret == 4: #open note
-        glRotate(Theme.drumnoterot[4], 0, 0, 1), glTranslatef(0, Theme.drumnotepos[4], 0)
+        glRotate(self.engine.theme.drumnoterot[4], 0, 0, 1), glTranslatef(0, self.engine.theme.drumnotepos[4], 0)
 
       if self.spActTex is not None and isOpen == False and spNote == False and spAct == True:
         glColor3f(1.5,1.5,1.5) #glow
@@ -1551,13 +1552,13 @@ class Drum:
           #Glow_001 - Only rendered when a note is hit along with the glow.svg
 		  
           if n == 0: #red fret button
-            glRotate(Theme.drumkeyrot[0], 0, 1, 0), glTranslatef(0, 0, Theme.drumkeypos[0])
+            glRotate(self.engine.theme.drumkeyrot[0], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.drumkeypos[0])
           elif n == 1:
-            glRotate(Theme.drumkeyrot[1], 0, 1, 0), glTranslatef(0, 0, Theme.drumkeypos[1])
+            glRotate(self.engine.theme.drumkeyrot[1], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.drumkeypos[1])
           elif n == 2:
-            glRotate(Theme.drumkeyrot[2], 0, 1, 0), glTranslatef(0, 0, Theme.drumkeypos[2])
+            glRotate(self.engine.theme.drumkeyrot[2], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.drumkeypos[2])
           elif n == 3: #green fret button
-            glRotate(Theme.drumkeyrot[3], 0, 1, 0), glTranslatef(0, 0, Theme.drumkeypos[3])
+            glRotate(self.engine.theme.drumkeyrot[3], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.drumkeypos[3])
 
           if self.keytex == True:
             glColor4f(1,1,1,visibility)
@@ -1678,7 +1679,7 @@ class Drum:
         glRotatef(-90, 0, 0, 1)
         #glColor4f(.1 + .8 * c[0] + f, .1 + .8 * c[1] + f, .1 + .8 * c[2] + f, visibility)
 
-        glRotate(Theme.drumkeyrot[4], 0, 1, 0), glTranslatef(0, 0, Theme.drumkeypos[4])
+        glRotate(self.engine.theme.drumkeyrot[4], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.drumkeypos[4])
 
         if self.keytexopen is not None:
           glColor4f(1,1,1,visibility)

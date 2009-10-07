@@ -35,6 +35,7 @@ from numpy import array, float32
 import pygame
 import os
 import sys
+import imp
 
 from Engine import Engine, Task
 from Video import Video
@@ -54,8 +55,7 @@ from Language import _
 import Log
 import Config
 import Dialogs
-import Theme
-from Theme import ThemeTrans
+from Theme import Theme
 import Version
 import Mod
 import Player
@@ -543,7 +543,6 @@ class GameEngine(Engine):
     self.cmdPlay           = 0
     self.cmdDiff           = None
     self.cmdPart           = None
-    self.startupMessages   = self.video.error
     
     self.gameStarted       = False
     self.world             = None
@@ -592,6 +591,7 @@ class GameEngine(Engine):
     self.svg = SvgContext(geometry)
     glViewport(int(viewport[0]), int(viewport[1]), int(viewport[2]), int(viewport[3]))
 
+    self.startupMessages   = self.video.error
     self.input     = Input()
     self.view      = View(self, geometry)
     self.resizeScreen(w, h)
@@ -629,6 +629,7 @@ class GameEngine(Engine):
     currentTheme = themename
     
     stagespath = os.path.join(Version.dataPath(), "themes", currentTheme, "stages")
+    themepath  = os.path.join(Version.dataPath(), "themes", currentTheme)
     if os.path.exists(stagespath):
       self.stageFolders = []
       allFolders = os.listdir(stagespath)   #this also includes all the stage files - so check to see if there is at least one .png file inside each folder to be sure it's an animated stage folder
@@ -677,14 +678,13 @@ class GameEngine(Engine):
       self.config.set("game","animated_stage_folder", "None") #MFH: force "None" when Stages folder can't be found
 
     
-    # Load default theme
-    try:
-      theme = Config.load(self.resource.fileName("themes", themename, "theme.ini"))
-    except IOError:
-      theme = Config.load(self.resource.fileName("theme.ini"))
-    Theme.open(theme, self.getPath(os.path.join("themes",self.data.themeLabel,"menu")))
     
-    self.theme = ThemeTrans(self.getPath(os.path.join("themes",self.data.themeLabel)))
+    try:
+      fp, pathname, description = imp.find_module("CustomTheme",[themepath])
+      theme = imp.load_module("CustomTheme", fp, pathname, description)
+      self.theme = theme.CustomTheme(themepath, themename)
+    except ImportError:
+      self.theme = Theme(themepath, themename)
   
 
     
@@ -930,6 +930,8 @@ class GameEngine(Engine):
     if repeat == 1: #repeat-y
       coord[1] += repeatOffset
       height = (image.height1() * abs(scale[1]))*(self.view.geometry[3]/float(480))
+      while coord[1] > self.view.geometry[3]+height:
+        coord[1] -= height
       image.transform.translate(coord[0],coord[1])
       while coord[1] > -height/2.0:
         if coord[1] < self.view.geometry[3] + (height/2.0):
@@ -1070,7 +1072,7 @@ class GameEngine(Engine):
     return done
 
   def clearScreen(self):
-    self.svg.clear(*Theme.backgroundColor)
+    self.svg.clear(*self.theme.backgroundColor)
 
   def main(self):
     """Main state loop."""

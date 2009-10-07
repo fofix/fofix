@@ -45,11 +45,13 @@ if not hasattr(pygame.mixer, 'music'):
   __import__('pygame.mixer_music')
   pygame.mixer.music = sys.modules['pygame.mixer_music']
 
+oggErr = False
 try:
   import ogg.vorbis
 except ImportError:
   Log.warn("PyOGG not found. OGG files will be fully decoded prior to playing; expect absurd memory usage.")
   ogg = None
+  oggErr = True
 
 class Audio:
   def pre_open(self, frequency = 22050, bits = 16, stereo = True, bufferSize = 1024):

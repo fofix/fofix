@@ -30,7 +30,6 @@ import os
 from View import Layer
 from Input import KeyListener
 import Data
-import Theme
 import Dialogs
 import Player
 
@@ -125,7 +124,7 @@ class Menu(Layer, KeyListener):
 
     self.textColor = textColor
     self.selectedColor = selectedColor
-    self.tipColor = Theme.menuTipTextColor
+    self.tipColor = self.engine.theme.menuTipTextColor
 
     #self.sfxVolume    = self.engine.config.get("audio", "SFX_volume")
     self.drumNav = self.engine.config.get("game", "drum_navigation")  #MFH
@@ -141,10 +140,10 @@ class Menu(Layer, KeyListener):
         if not self.engine.loadImgDrawing(self, "menuText", os.path.join("themes",self.themename,"menu","%s.png" % self.gfxText)):
           raise KeyError
         self.graphicMenu = True
-        self.menux = Theme.submenuX[self.gfxText]
-        self.menuy = Theme.submenuY[self.gfxText]
-        self.menuScale = Theme.submenuScale[self.gfxText]
-        self.vSpace = Theme.submenuVSpace[self.gfxText]
+        self.menux = self.engine.theme.submenuX[self.gfxText]
+        self.menuy = self.engine.theme.submenuY[self.gfxText]
+        self.menuScale = self.engine.theme.submenuScale[self.gfxText]
+        self.vSpace = self.engine.theme.submenuVSpace[self.gfxText]
         if str(self.menux) != "None" and str(self.menuy) != "None":
           self.menux = float(self.menux)
           self.menuy = float(self.menuy)
@@ -167,8 +166,8 @@ class Menu(Layer, KeyListener):
 
 
     if pos == (.2, .66 - .35):  #MFH - default position, not called with a special one - this is a submenu:
-      self.sub_menu_x = Theme.sub_menu_xVar
-      self.sub_menu_y = Theme.sub_menu_yVar
+      self.sub_menu_x = self.engine.theme.sub_menu_xVar
+      self.sub_menu_y = self.engine.theme.sub_menu_yVar
   
       if engine.data.theme == 0:
         if self.sub_menu_x == None:
@@ -198,7 +197,7 @@ class Menu(Layer, KeyListener):
     self.font         = font
     if self.font == "font":
       self.font = self.engine.data.font
-    self.tipFont = Theme.menuTipTextFont
+    self.tipFont = self.engine.theme.menuTipTextFont
     if self.tipFont == "None":
       self.tipFont = self.font
     else:
@@ -208,17 +207,17 @@ class Menu(Layer, KeyListener):
     
     self.showTips = showTips
     if self.showTips:
-      self.showTips = Theme.menuTipTextDisplay
+      self.showTips = self.engine.theme.menuTipTextDisplay
     self.tipDelay = 700
     self.tipTimerEnabled = False
     self.tipScroll = 0
     self.tipScrollB = None
-    self.tipScrollSpace = Theme.menuTipTextScrollSpace
-    self.tipScale = Theme.menuTipTextScale
+    self.tipScrollSpace = self.engine.theme.menuTipTextScrollSpace
+    self.tipScale = self.engine.theme.menuTipTextScale
     self.tipDir = 0
     self.tipSize = 0
-    self.tipY = Theme.menuTipTextY
-    self.tipScrollMode = Theme.menuTipTextScrollMode # - 0 for constant scroll; 1 for back and forth
+    self.tipY = self.engine.theme.menuTipTextY
+    self.tipScrollMode = self.engine.theme.menuTipTextScrollMode # - 0 for constant scroll; 1 for back and forth
     
     for c in choices:
       try:
@@ -438,13 +437,13 @@ class Menu(Layer, KeyListener):
 
           # Draw arrows if scrolling is needed to see all items
           if i == 0 and self.viewOffset > 0:
-            Theme.setBaseColor((1 - v) * max(.1, 1 - (1.0 / self.viewOffset) / 3))
+            self.engine.theme.setBaseColor((1 - v) * max(.1, 1 - (1.0 / self.viewOffset) / 3))
             glPushMatrix()
             glTranslatef(x - v / 4 - w * 2, y + h / 2, 0)
             self.renderTriangle(up = (0, -1), s = .015)
             glPopMatrix()
           elif i == self.viewSize - 1 and self.viewOffset + self.viewSize < n:
-            Theme.setBaseColor((1 - v) * max(.1, 1 - (1.0 / (n - self.viewOffset - self.viewSize)) / 3))
+            self.engine.theme.setBaseColor((1 - v) * max(.1, 1 - (1.0 / (n - self.viewOffset - self.viewSize)) / 3))
             glPushMatrix()
             glTranslatef(x - v / 4 - w * 2, y + h / 2, 0)
             self.renderTriangle(up = (0, 1), s = .015)
@@ -459,7 +458,7 @@ class Menu(Layer, KeyListener):
                 c1, c2, c3 = self.textColor
                 glColor3f(c1,c2,c3)
               else:
-                Theme.setBaseColor(1-v)
+                self.engine.theme.setBaseColor(1-v)
               tipScale = self.tipScale
               if self.tipScroll > -(self.tipSize) and self.tipScroll < 1:
                 tipFont.render(choice.tipText, (self.tipScroll, self.tipY), scale = tipScale)
@@ -467,11 +466,11 @@ class Menu(Layer, KeyListener):
                 if self.tipScrollB > -(self.tipSize) and self.tipScrollB < 1:
                   tipFont.render(choice.tipText, (self.tipScrollB, self.tipY), scale = tipScale)
             a = (math.sin(self.time) * .15 + .75) * (1 - v * 2)
-            Theme.setSelectedColor(a)
+            self.engine.theme.setSelectedColor(a)
             a *= -.005
             glTranslatef(a, a, a)
           else:
-            Theme.setBaseColor(1 - v)      
+            self.engine.theme.setBaseColor(1 - v)      
         
           #MFH - settable color through Menu constructor
           if i + self.viewOffset == self.currentIndex and self.selectedColor:

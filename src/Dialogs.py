@@ -45,7 +45,6 @@ from Menu import Menu
 from Language import _
 from Texture import Texture
 from Player import GUITARTYPES, DRUMTYPES, MICTYPES
-import Theme
 import Log
 import Song
 import Data
@@ -317,7 +316,7 @@ class GetText(Layer, KeyListener):
       v = (1 - visibility) ** 2
       
       fadeScreen(v)
-      Theme.setBaseColor(1 - v)
+      self.engine.theme.setBaseColor(1 - v)
 
       if (self.time % 10) < 5 and visibility > .9:
         cursor = "|"
@@ -326,7 +325,7 @@ class GetText(Layer, KeyListener):
 
       pos = wrapText(font, (.1, .33 - v), self.prompt)
 
-      Theme.setSelectedColor(1 - v)
+      self.engine.theme.setSelectedColor(1 - v)
       
       if self.text is not None:
         pos = wrapText(font, (.1, (pos[1] + v) + .08 + v / 4), self.text)
@@ -395,11 +394,11 @@ class GetKey(Layer, KeyListener):
       v = (1 - visibility) ** 2
       
       fadeScreen(v)
-      Theme.setBaseColor(1 - v)
+      self.engine.theme.setBaseColor(1 - v)
 
       pos = wrapText(font, (.1, .33 - v), self.prompt)
 
-      Theme.setSelectedColor(1 - v)
+      self.engine.theme.setSelectedColor(1 - v)
 
       if self.key is not None:
         text = pygame.key.name(self.key).capitalize()
@@ -422,8 +421,8 @@ class LoadingScreen(Layer, KeyListener):
     if self.logClassInits == 1:
       Log.debug("LoadingScreen class init (Dialogs.py)...")
 
-    self.loadingx = Theme.loadingX
-    self.loadingy = Theme.loadingY
+    self.loadingx = self.engine.theme.loadingX
+    self.loadingy = self.engine.theme.loadingY
     self.allowtext = self.engine.config.get("game", "lphrases")    
 
     #Get theme
@@ -467,7 +466,7 @@ class LoadingScreen(Layer, KeyListener):
       #Volshebnyi - fit to screen applied
       self.engine.drawImage(self.engine.data.loadingImage, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
 
-      Theme.setBaseColor(1 - v)
+      self.engine.theme.setBaseColor(1 - v)
       w, h = font.getStringSize(self.text)
 
       if self.loadingx != None:
@@ -486,7 +485,7 @@ class LoadingScreen(Layer, KeyListener):
 
       if self.allowtext:
         if self.theme == 1:
-          font.render(self.text, (x, y), shadowoffset = (Theme.shadowoffsetx, Theme.shadowoffsety))     
+          font.render(self.text, (x, y), shadowoffset = (self.engine.theme.shadowoffsetx, self.engine.theme.shadowoffsety))     
         else:
           font.render(self.text, (x, y))
     finally:
@@ -534,13 +533,13 @@ class MessageScreen(Layer, KeyListener):
 
       x = .1
       y = .3 + v * 2
-      Theme.setBaseColor(1 - v)
+      self.engine.theme.setBaseColor(1 - v)
       pos = wrapText(font, (x, y), self.text, visibility = v)
 
       w, h = font.getStringSize(self.prompt, scale = 0.001)
       x = .5 - w / 2
       y = pos[1] + 3 * h + v * 2
-      Theme.setSelectedColor(1 - v)
+      self.engine.theme.setSelectedColor(1 - v)
       font.render(self.prompt, (x, y), scale = 0.001)
       
     finally:
@@ -709,7 +708,7 @@ class FileChooser(BackgroundLayer, KeyListener):
       glEnable(GL_BLEND)
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
       glEnable(GL_COLOR_MATERIAL)
-      Theme.setBaseColor(1 - v)
+      self.engine.theme.setBaseColor(1 - v)
       wrapText(font, (.1, .05 - v), self.prompt)
     finally:
       self.engine.view.resetProjection()
@@ -720,8 +719,8 @@ class NeckChooser(Layer, KeyListener):
   """Item menu layer."""
   def __init__(self, engine, selected = None, prompt = _("Yellow (#3) / Blue (#4) to change, Green (#1) to confirm:"), player = "default", owner = None):
     self.prompt   = prompt
-    self.prompt_x = Theme.neck_prompt_x
-    self.prompt_y = Theme.neck_prompt_y
+    self.prompt_x = self.engine.theme.neck_prompt_x
+    self.prompt_y = self.engine.theme.neck_prompt_y
     self.engine   = engine
     self.player   = player
     self.owner    = owner
@@ -981,7 +980,7 @@ class NeckChooser(Layer, KeyListener):
      glEnable(GL_BLEND)
      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
      glEnable(GL_COLOR_MATERIAL)
-     Theme.setBaseColor(1 - v)
+     self.engine.theme.setBaseColor(1 - v)
      wrapText(font, (self.prompt_x, self.prompt_y - v), self.prompt)
    finally:
      self.engine.view.resetProjection()
@@ -1193,7 +1192,7 @@ class AvatarChooser(Layer, KeyListener):
         self.engine.drawImage(self.background, scale = (wFactor, -wFactor), coord = (w/2,h/2))
       else:
         fadeScreen(v)
-      Theme.setBaseColor(1 - v)
+      self.engine.theme.setBaseColor(1 - v)
       if len(self.avatars) > 1:
         lastAv2i  = (int(self.selectedAv)-2) % len(self.avatars)
         lastAvi   = (int(self.selectedAv)-1) % len(self.avatars)
@@ -1215,12 +1214,12 @@ class AvatarChooser(Layer, KeyListener):
       self.x3 = w*(0.24-self.dist/2)
       self.x4 = w*(0.17-self.dist/2)
       self.x5 = w*(0.07-self.dist/2)
-      self.y1 = h*(0.75+Theme.avatarSelectWheelY)
-      self.y2 = h*(0.68+Theme.avatarSelectWheelY)
-      self.y3 = h*(0.5+Theme.avatarSelectWheelY)
-      self.y4 = h*(0.32+Theme.avatarSelectWheelY)
-      self.y5 = h*(0.25+Theme.avatarSelectWheelY)
-      bigCoord = (w*(Theme.avatarSelectAvX+self.dist),h*Theme.avatarSelectAvY)
+      self.y1 = h*(0.75+self.engine.theme.avatarSelectWheelY)
+      self.y2 = h*(0.68+self.engine.theme.avatarSelectWheelY)
+      self.y3 = h*(0.5+self.engine.theme.avatarSelectWheelY)
+      self.y4 = h*(0.32+self.engine.theme.avatarSelectWheelY)
+      self.y5 = h*(0.25+self.engine.theme.avatarSelectWheelY)
+      bigCoord = (w*(self.engine.theme.avatarSelectAvX+self.dist),h*self.engine.theme.avatarSelectAvY)
       
       if self.avBigFrame:
         self.engine.drawImage(self.avFrame, scale = (self.avBigFrameScale[0]*1.75,self.avBigFrameScale[1]*1.75), coord = bigCoord)
@@ -1243,13 +1242,13 @@ class AvatarChooser(Layer, KeyListener):
       self.engine.drawImage(currentAv, scale = (self.avScale[int(self.selectedAv)],-self.avScale[int(self.selectedAv)]), coord = (self.x3,self.y3))
       
       try:
-        font = self.engine.data.fontDict[Theme.avatarSelectFont]
+        font = self.engine.data.fontDict[self.engine.theme.avatarSelectFont]
       except:
         font = self.engine.data.font
       if self.avText:
-        self.engine.drawImage(self.avText, scale = (Theme.avatarSelectTextScale, -Theme.avatarSelectTextScale), coord = (Theme.avatarSelectTextX, Theme.avatarSelectTextY - v))
+        self.engine.drawImage(self.avText, scale = (self.engine.theme.avatarSelectTextScale, -self.engine.theme.avatarSelectTextScale), coord = (self.engine.theme.avatarSelectTextX, self.engine.theme.avatarSelectTextY - v))
       else:
-        font.render(self.avatarText, (Theme.avatarSelectTextX, Theme.avatarSelectTextY - v), scale = Theme.avatarSelectTextScale)
+        font.render(self.avatarText, (self.engine.theme.avatarSelectTextX, self.engine.theme.avatarSelectTextY - v), scale = self.engine.theme.avatarSelectTextScale)
     finally:
       self.engine.view.resetProjection()
     #==============================================================
@@ -1274,8 +1273,8 @@ class ItemChooser(BackgroundLayer, KeyListener):
     widthOfSpace, heightOfSpace = self.font.getStringSize(" ", scale=self.promptScale)
 
     if pos: #MFH
-      self.songSelectSubmenuOffsetLines = Theme.songSelectSubmenuOffsetLines
-      self.songSelectSubmenuOffsetSpaces = Theme.songSelectSubmenuOffsetSpaces
+      self.songSelectSubmenuOffsetLines = self.engine.theme.songSelectSubmenuOffsetLines
+      self.songSelectSubmenuOffsetSpaces = self.engine.theme.songSelectSubmenuOffsetSpaces
       self.posX, self.posY = pos
       wrapX, wrapY = wrapText(self.font, (self.posX, self.posY), self.prompt, scale = self.promptScale)
       #self.posY += self.promptHeight*2
@@ -1346,7 +1345,7 @@ class ItemChooser(BackgroundLayer, KeyListener):
       glEnable(GL_BLEND)
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
       glEnable(GL_COLOR_MATERIAL)
-      Theme.setBaseColor(1 - v)
+      self.engine.theme.setBaseColor(1 - v)
       #wrapText(self.font, (.1, .05 - v), self.prompt)
       wrapText(self.font, (self.posX, self.posY - v), self.prompt, scale = self.promptScale)
     finally:
@@ -1445,20 +1444,20 @@ class ControlActivator(Layer, KeyListener):
     if not self.engine.loadImgDrawing(self, "selected", os.path.join("themes", themename, "lobby", "select.png")):
       self.selected = None
     
-    self.selectX = Theme.controlActivateSelectX
-    self.controlSelectX = Theme.controlActivateX
-    self.controlPartX   = Theme.controlActivatePartX
-    self.selectY = Theme.controlActivateY
-    self.selectScale = Theme.controlActivateScale
-    self.selectSpace = Theme.controlActivateSpace
-    self.partBig = Theme.controlCheckPartMult
-    self.checkX = Theme.controlCheckX
-    self.checkY = Theme.controlCheckY
-    self.checkYText = Theme.controlCheckTextY
-    self.checkScale = Theme.controlCheckScale
-    self.checkSpace = Theme.controlCheckSpace
+    self.selectX = self.engine.theme.controlActivateSelectX
+    self.controlSelectX = self.engine.theme.controlActivateX
+    self.controlPartX   = self.engine.theme.controlActivatePartX
+    self.selectY = self.engine.theme.controlActivateY
+    self.selectScale = self.engine.theme.controlActivateScale
+    self.selectSpace = self.engine.theme.controlActivateSpace
+    self.partBig = self.engine.theme.controlCheckPartMult
+    self.checkX = self.engine.theme.controlCheckX
+    self.checkY = self.engine.theme.controlCheckY
+    self.checkYText = self.engine.theme.controlCheckTextY
+    self.checkScale = self.engine.theme.controlCheckScale
+    self.checkSpace = self.engine.theme.controlCheckSpace
     
-    self.partSize = Theme.controlActivatePartSize
+    self.partSize = self.engine.theme.controlActivatePartSize
 
     if self.engine.loadImgDrawing(self, "guitar", os.path.join("themes", themename, "guitar")):
       self.guitarScale = self.partSize/self.guitar.width1()
@@ -1660,9 +1659,9 @@ class ControlActivator(Layer, KeyListener):
   
   def render(self, visibility, topMost):
     try:
-      font = self.engine.data.fontDict[Theme.controlActivateFont]
-      descFont = self.engine.data.fontDict[Theme.controlDescriptionFont]
-      checkFont = self.engine.data.fontDict[Theme.controlCheckFont]
+      font = self.engine.data.fontDict[self.engine.theme.controlActivateFont]
+      descFont = self.engine.data.fontDict[self.engine.theme.controlDescriptionFont]
+      checkFont = self.engine.data.fontDict[self.engine.theme.controlCheckFont]
     except KeyError:
       font = self.engine.data.loadingFont
       descFont = self.engine.data.font
@@ -1674,20 +1673,20 @@ class ControlActivator(Layer, KeyListener):
     try:
       if self.background:
         self.engine.drawImage(self.background, scale = (self.bgScale,-self.bgScale), coord = (w/2,h/2))
-      Theme.setBaseColor(1-v)
-      wText, hText = descFont.getStringSize(self.tsInfo, scale = Theme.controlDescriptionScale)
-      descFont.render(self.tsInfo, (Theme.controlDescriptionX-wText/2, Theme.controlDescriptionY), scale = Theme.controlDescriptionScale)
+      self.engine.theme.setBaseColor(1-v)
+      wText, hText = descFont.getStringSize(self.tsInfo, scale = self.engine.theme.controlDescriptionScale)
+      descFont.render(self.tsInfo, (self.engine.theme.controlDescriptionX-wText/2, self.engine.theme.controlDescriptionY), scale = self.engine.theme.controlDescriptionScale)
       for i, control in enumerate(self.controls):
         if self.selectedIndex == i:
           if self.selected:
-            Theme.setBaseColor(1-v)
+            self.engine.theme.setBaseColor(1-v)
             self.engine.drawImage(self.selected, scale = (.5,-.5), coord = (w*self.selectX,h*(1-(self.selectY+self.selectSpace*i)/self.engine.data.fontScreenBottom)))
           else:
-            Theme.setSelectedColor(1-v)
+            self.engine.theme.setSelectedColor(1-v)
         elif i in self.blockedItems:
           glColor3f(.3, .3, .3)
         else:
-          Theme.setBaseColor(1-v)
+          self.engine.theme.setBaseColor(1-v)
         wText, hText = font.getStringSize(control, scale = self.selectScale)
         font.render(control, (self.controlSelectX-wText, self.selectY-(hText/2)+self.selectSpace*i), scale = self.selectScale)
         color = (1, 1, 1, 1)
@@ -1700,7 +1699,7 @@ class ControlActivator(Layer, KeyListener):
           self.engine.drawImage(self.drum, scale = (self.drumScale, -self.drumScale), coord = (w*self.controlPartX, h*(1-(self.selectY+self.selectSpace*i)/self.engine.data.fontScreenBottom)), color = color)
         elif self.engine.input.controls.type[i] in MICTYPES:
           self.engine.drawImage(self.mic, scale = (self.micScale, -self.micScale), coord = (w*self.controlPartX, h*(1-(self.selectY+self.selectSpace*i)/self.engine.data.fontScreenBottom)), color = color)
-      Theme.setBaseColor(1-v)
+      self.engine.theme.setBaseColor(1-v)
       for j, i in enumerate(self.selectedItems):
         if self.engine.input.controls.type[i] in GUITARTYPES:
           self.engine.drawImage(self.guitar, scale = (self.guitarScale*self.partBig, -self.guitarScale*self.partBig), coord = (w*(self.checkX+self.checkSpace*j)-(self.partSize*self.partBig*1.1), h*self.checkY))
@@ -1715,7 +1714,7 @@ class ControlActivator(Layer, KeyListener):
         if self.readyImage:
           self.engine.drawImage(self.readyImage, scale = (self.readyScale, -self.readyScale), coord = (w*.5, h*.5), color = (1, 1, 1, self.fader))
         else:
-          Theme.setBaseColor(self.fader)
+          self.engine.theme.setBaseColor(self.fader)
           wText, hText = bigFont.getStringSize(self.tsReady, scale = .001)
           bigFont.render(self.tsReady, (.5-wText/2, .3), scale = .001)
     finally:
@@ -1783,11 +1782,11 @@ class BpmEstimator(Layer, KeyListener):
       glEnable(GL_BLEND)
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
       glEnable(GL_COLOR_MATERIAL)
-      Theme.setBaseColor(1 - v)
+      self.engine.theme.setBaseColor(1 - v)
       wrapText(font, (.1, .2 - v), self.prompt)
       
       if self.bpm is not None:
-        Theme.setSelectedColor(1 - v)
+        self.engine.theme.setSelectedColor(1 - v)
         wrapText(font, (.1, .5 + v),  _("%.2f beats per minute") % (self.bpm))
     finally:
       self.engine.view.resetProjection()
@@ -1817,13 +1816,13 @@ class KeyTester(Layer, KeyListener):
     self.analogSlideMode = self.controls.analogSlide[control]
     
     if self.type < 2 or self.type == 4:
-      self.fretColors     = Theme.fretColors
+      self.fretColors     = self.engine.theme.noteColors
       self.names          = [_("Left"), _("Right"), _("Up"), _("Down"), _("Start"), \
                              _("Select"), _("Fret #1"), _("Solo #1"), _("Fret #2"), _("Solo #2"), \
                              _("Fret #3"), _("Solo #3"), _("Fret #4"), _("Solo #4"), _("Fret #5"), \
                              _("Solo #5"), _("Pick!"), _("Pick!"), _("Starpower!"), _("Whammy")]
     elif self.type == 2:
-      colors              = Theme.fretColors
+      colors              = self.engine.theme.noteColors
       self.fretColors     = [colors[1], colors[2], colors[3], colors[0]]
       self.bassColor      = colors[4]
       self.names          = [_("Left"), _("Right"), _("Up"), _("Down"), _("Start"), \
@@ -1836,9 +1835,9 @@ class KeyTester(Layer, KeyListener):
                              None, None, None, None, None, \
                              None, None, None, _("Starpower!"), None]
     else:
-      colors              = Theme.fretColors
+      colors              = self.engine.theme.noteColors
       self.fretColors     = [colors[1], colors[2], colors[3], colors[4], colors[0]]
-      self.bassColor      = Theme.bassColor
+      self.bassColor      = self.engine.theme.colors[5]
       self.names          = [_("Left"), _("Right"), _("Up"), _("Down"), _("Start"), \
                              _("Select"), _("Drum #1"), None, _("Cymbal #2"), None, \
                              _("Drum #3"), None, _("Cymbal #4"), None, _("Drum #5"), \
@@ -1991,7 +1990,7 @@ class KeyTester(Layer, KeyListener):
       glEnable(GL_BLEND)
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
       glEnable(GL_COLOR_MATERIAL)
-      Theme.setBaseColor(1 - v)
+      self.engine.theme.setBaseColor(1 - v)
       wrapText(font, (.1, .2 - v), self.prompt)
       
       self.engine.drawImage(self.circle, scale = (.5, -.5), coord = (w*.5,h*.6))
@@ -2047,7 +2046,7 @@ class KeyTester(Layer, KeyListener):
 
         if self.starpower > 0:
           if self.starpowerActive:
-            Theme.setSelectedColor(1 - v)
+            self.engine.theme.setSelectedColor(1 - v)
           else:
             glColor3f(.4, .4, .4)
           font.render(text, (.25-wText/2, .45 + v))
@@ -2056,7 +2055,7 @@ class KeyTester(Layer, KeyListener):
           self.engine.drawImage(self.analogBox, scale = (self.analogBoxScale, -self.analogBoxScale), coord = (w*.25, h*.3), stretched = 11)
         else:
           if self.controls.getState(self.keyList[Player.STAR]):
-            Theme.setSelectedColor(1 - v)
+            self.engine.theme.setSelectedColor(1 - v)
           else:
             glColor3f(.4, .4, .4)
           font.render(text, (.25-wText/2, .45 + v))
@@ -2107,7 +2106,7 @@ class KeyTester(Layer, KeyListener):
             wText, hText = font.getStringSize(text)
             font.render(text, ((.2 + .15 * i)-wText/2, .4 + v))
             if self.midFret and self.slideActive == i:
-              Theme.setSelectedColor(1 - v)
+              self.engine.theme.setSelectedColor(1 - v)
               text = self.tsSlide
               wText, hText = font.getStringSize(text)
               font.render(text, ((.125 + .15 * i)-wText/2, .35 + v))
@@ -2127,7 +2126,7 @@ class KeyTester(Layer, KeyListener):
         #evilynux - analog killswitch rendering
         if self.whammy > 0:
           if self.whammy > 0.1:
-            Theme.setSelectedColor(1 - v)
+            self.engine.theme.setSelectedColor(1 - v)
           else:
             glColor3f(.4, .4, .4)
           font.render(self.names[Player.KILL], (.75-wText/2, .45 + v))
@@ -2135,21 +2134,21 @@ class KeyTester(Layer, KeyListener):
           self.engine.drawImage(self.analogBar, scale = (self.analogBarScale*self.whammy, -self.analogBarScale), coord = (w*.75-whammyC, h*.3), rect = (0, self.whammy, 0, 1), stretched = 11)
         else:
           if self.controls.getState(self.keyList[Player.KILL]):
-            Theme.setSelectedColor(1 - v)
+            self.engine.theme.setSelectedColor(1 - v)
           else:
             glColor3f(.4, .4, .4)
           font.render(self.names[Player.KILL], (.75-wText/2, .45 + v))
         
         self.engine.drawImage(self.analogBox, scale = (self.analogBoxScale, -self.analogBoxScale), coord = (w*.75, h*.3), stretched = 11)
         if self.controls.getState(self.keyList[Player.ACTION1]) or self.controls.getState(self.keyList[Player.ACTION2]):
-          Theme.setSelectedColor(1 - v)
+          self.engine.theme.setSelectedColor(1 - v)
         else:
           glColor3f(.4, .4, .4)
         wText, hText = font.getStringSize(self.names[Player.ACTION1])
         font.render(self.names[Player.ACTION1], (.5-wText/2, .55 + v))
 
       elif self.type == 5:
-        Theme.setBaseColor(1 - v)
+        self.engine.theme.setBaseColor(1 - v)
         font.render(_('Level:'), (.3, .4 + v))
         font.render(_('Note:'), (.3, .6 + v))
 
@@ -2162,7 +2161,7 @@ class KeyTester(Layer, KeyListener):
         font.render('%5.3f dB' % peakvol, (.55, .4 + v))
 
         if self.mic.getTap():
-          Theme.setBaseColor(1 - v)
+          self.engine.theme.setBaseColor(1 - v)
         else:
           glColor3f(.4, .4, .4)
         font.render(_('Tap'), (.55, .5 + v))
@@ -2172,18 +2171,18 @@ class KeyTester(Layer, KeyListener):
           glColor3f(.4, .4, .4)
           font.render(_('None'), (.55, .6 + v))
         else:
-          Theme.setBaseColor(1 - v)
+          self.engine.theme.setBaseColor(1 - v)
           font.render(Microphone.getNoteName(semitones), (.55, .6 + v))
         
         f = self.mic.getFormants()
         if f[0] is not None:
-          Theme.setBaseColor(1 - v)
+          self.engine.theme.setBaseColor(1 - v)
           font.render("%.2f Hz" % f[0], (.45, .65 + v))
         else:
           glColor3f(.4, .4, .4)
           font.render("None", (.45, .65 + v))
         if f[1] is not None:
-          Theme.setBaseColor(1 - v)
+          self.engine.theme.setBaseColor(1 - v)
           font.render("%.2f Hz" % f[1], (.65, .65 + v))
         else:
           glColor3f(.4, .4, .4)
@@ -2397,13 +2396,13 @@ class LoadingSplashScreen(Layer, KeyListener):
     self.engine       = engine
     self.text         = text
     self.time         = 0.0
-    self.loadingx = Theme.loadingX
-    self.loadingy = Theme.loadingY  
-    self.textColor = Theme.loadingColor
+    self.loadingx = self.engine.theme.loadingX
+    self.loadingy = self.engine.theme.loadingY  
+    self.textColor = self.engine.theme.loadingColor
     self.allowtext = self.engine.config.get("game", "lphrases") 
-    self.fScale = Theme.loadingFScale
-    self.rMargin = Theme.loadingRMargin
-    self.lspacing = Theme.loadingLSpacing
+    self.fScale = self.engine.theme.loadingFScale
+    self.rMargin = self.engine.theme.loadingRMargin
+    self.lspacing = self.engine.theme.loadingLSpacing
 
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
     if self.logClassInits == 1:
@@ -2439,7 +2438,7 @@ class LoadingSplashScreen(Layer, KeyListener):
       w, h = self.engine.view.geometry[2:4]
       self.engine.drawImage(self.engine.data.loadingImage, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
       
-      Theme.setBaseColor(1 - v)
+      self.engine.theme.setBaseColor(1 - v)
       w, h = font.getStringSize(self.text, scale=self.fScale)
       
       x = self.loadingx
@@ -2452,7 +2451,7 @@ class LoadingSplashScreen(Layer, KeyListener):
       # evilynux - Made text about 2 times smaller (as requested by worldrave)
       if self.allowtext:
         if self.theme == 1:
-          wrapCenteredText(font, (x,y), self.text, scale = self.fScale, rightMargin = self.rMargin, linespace = self.lspacing, allowshadowoffset = True, shadowoffset = (Theme.shadowoffsetx, Theme.shadowoffsety))
+          wrapCenteredText(font, (x,y), self.text, scale = self.fScale, rightMargin = self.rMargin, linespace = self.lspacing, allowshadowoffset = True, shadowoffset = (self.engine.theme.shadowoffsetx, self.engine.theme.shadowoffsety))
         else:
           wrapCenteredText(font, (x,y), self.text, scale = self.fScale, rightMargin = self.rMargin, linespace = self.lspacing)
             

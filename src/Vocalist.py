@@ -30,7 +30,6 @@ from Song import VocalNote, VocalPhrase
 from OpenGL.GL import *
 from numpy import array, float32
 from random import random
-import Theme
 
 #stump: needed for continuous star fillup (akedrou - stealing for vocals)
 import Image
@@ -193,16 +192,16 @@ class Vocalist:
       self.vocalODGlow = None
     
     height = self.vocalMeter.height1()
-    vocalSize = Theme.vocalMeterSize
+    vocalSize = self.engine.theme.vocalMeterSize
     self.vocalMeterScale = (vocalSize/height)*.5
     self.vocalFillWidth = self.vocalFill.width1()*self.vocalMeterScale/640.000
-    olFactor = height/Theme.vocalFillupFactor
-    self.vocalFillupCenterX = int(Theme.vocalFillupCenterX*olFactor)
-    self.vocalFillupCenterY = int(Theme.vocalFillupCenterY*olFactor)
-    self.vocalFillupInRadius = int(Theme.vocalFillupInRadius*olFactor)
-    self.vocalFillupOutRadius = int(Theme.vocalFillupOutRadius*olFactor)
-    self.vocalFillupColor = Theme.vocalFillupColor
-    self.vocalContinuousAvailable = Theme.vocalCircularFillup and \
+    olFactor = height/self.engine.theme.vocalFillupFactor
+    self.vocalFillupCenterX = int(self.engine.theme.vocalFillupCenterX*olFactor)
+    self.vocalFillupCenterY = int(self.engine.theme.vocalFillupCenterY*olFactor)
+    self.vocalFillupInRadius = int(self.engine.theme.vocalFillupInRadius*olFactor)
+    self.vocalFillupOutRadius = int(self.engine.theme.vocalFillupOutRadius*olFactor)
+    self.vocalFillupColor = self.engine.theme.vocalFillupColor
+    self.vocalContinuousAvailable = self.engine.theme.vocalCircularFillup and \
       None not in (self.vocalFillupCenterX, self.vocalFillupCenterY, self.vocalFillupInRadius, self.vocalFillupOutRadius, self.vocalFillupColor)
     if self.vocalContinuousAvailable:
       try:
@@ -223,23 +222,23 @@ class Vocalist:
         Log.error('Could not prebuild vocal overlay textures: ')
         self.vocalContinuousAvailable = False
     
-    self.vocalLaneSize        = Theme.vocalLaneSize
-    self.vocalGlowSize        = Theme.vocalGlowSize
-    self.vocalGlowFade        = Theme.vocalGlowFade
-    self.vocalLaneColor       = list(Theme.vocalLaneColor)
-    self.vocalShadowColor     = list(Theme.vocalShadowColor)
-    self.vocalGlowColor       = list(Theme.vocalGlowColor)
-    self.vocalLaneColorStar   = list(Theme.vocalLaneColorStar)
-    self.vocalShadowColorStar = list(Theme.vocalShadowColorStar)
-    self.vocalGlowColorStar   = list(Theme.vocalGlowColorStar)
+    self.vocalLaneSize        = self.engine.theme.vocalLaneSize
+    self.vocalGlowSize        = self.engine.theme.vocalGlowSize
+    self.vocalGlowFade        = self.engine.theme.vocalGlowFade
+    self.vocalLaneColor       = list(self.engine.theme.vocalLaneColor)
+    self.vocalShadowColor     = list(self.engine.theme.vocalShadowColor)
+    self.vocalGlowColor       = list(self.engine.theme.vocalGlowColor)
+    self.vocalLaneColorStar   = list(self.engine.theme.vocalLaneColorStar)
+    self.vocalShadowColorStar = list(self.engine.theme.vocalShadowColorStar)
+    self.vocalGlowColorStar   = list(self.engine.theme.vocalGlowColorStar)
     
     self.lastVal     = 0
-    self.vocalMeterX = Theme.vocalMeterX
-    self.vocalMeterY = Theme.vocalMeterY
-    self.vocalMultX  = Theme.vocalMultX
-    self.vocalMultY  = Theme.vocalMultY
-    self.vocalPowerX = Theme.vocalPowerX
-    self.vocalPowerY = Theme.vocalPowerY
+    self.vocalMeterX = self.engine.theme.vocalMeterX
+    self.vocalMeterY = self.engine.theme.vocalMeterY
+    self.vocalMultX  = self.engine.theme.vocalMultX
+    self.vocalMultY  = self.engine.theme.vocalMultY
+    self.vocalPowerX = self.engine.theme.vocalPowerX
+    self.vocalPowerY = self.engine.theme.vocalPowerY
     
     self.time = 0.0
     self.tap  = 0
