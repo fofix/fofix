@@ -262,7 +262,7 @@ class SongChoosingScene(Scene):
                 shownItems.pop()
             shownItems.append(item)
       elif isinstance(item, Song.SongInfo):
-        if self.careerMode and not self.showLockedSongs and item.getLocked():
+        if self.careerMode and (not self.showLockedSongs) and item.getLocked():
           continue
         else:
           shownItems.append(item)
@@ -279,8 +279,8 @@ class SongChoosingScene(Scene):
       Dialogs.showMessage(self.engine, msg)
     elif len(shownItems) > 0:
       for item in shownItems:
-        if isinstance(item, Song.SongInfo):
-          self.items = shownItems #make sure at least one song is in the library
+        if isinstance(item, Song.SongInfo) or isinstance(item, Song.LibraryInfo):
+          self.items = shownItems #make sure at least one item is selectable
           break
       else:
         msg = _("No songs in this setlist are available to play!")
