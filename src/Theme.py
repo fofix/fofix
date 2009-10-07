@@ -281,10 +281,7 @@ Config.define("theme", "song_listcd_score_x",       float, .6)
 Config.define("theme", "song_listcd_score_y",       float, .5)
 Config.define("theme", "song_listcd_list_x",       float, .1)
 
-Config.define("theme", "song_rb2_name_color",       str, "#FFFFFF")
-Config.define("theme", "song_rb2_name_selected_color",       str, "#FFBF00")
 Config.define("theme", "song_rb2_diff_color",       str, "#FFBF00")
-Config.define("theme", "song_rb2_artist_color",       str, "#4080FF")
 
 Config.define("theme", "pause_bkg",       str, "0.5,0.5,1.0,1.0")
 Config.define("theme", "pause_text_x",       float, None)
@@ -766,8 +763,8 @@ class Theme:
       self.povOriginZ = None
       
       #Loading phrases
-      self.loadingPhrase = []
-      self.resultsPhrase = []
+      self.loadingPhrase = ["None"]
+      self.resultsPhrase = ["None"]
       
       #Miscellany (aka Garbage no one cares about)
       self.crowdLoopDelay = None
@@ -1035,6 +1032,8 @@ class Theme:
   def hexToColorResults(self, color):
     if isinstance(color, tuple):
       return color
+    elif color is None:
+      return self.baseColor
     color = color.strip()
     if color[0] == "#":
       color = color[1:]
@@ -1046,6 +1045,8 @@ class Theme:
   def hexToColor(self, color):
     if isinstance(color, tuple):
       return color
+    elif color is None:
+      return (0,0,0)
     if color[0] == "#":
       color = color[1:]
       if len(color) == 3:

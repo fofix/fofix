@@ -109,9 +109,8 @@ class GuitarScene(Scene):
     self.sinfo = Song.loadSongInfo(self.engine, songName, library = libraryName)
     phrase = self.sinfo.loading
     if phrase == "":
-      try:
-        phrase = random.choice(self.engine.theme.loadingPhrase)
-      except:
+      phrase = random.choice(self.engine.theme.loadingPhrase)
+      if phrase == "None":
         i = random.randint(0,4)
         if i == 0:
           phrase = _("Let's get this show on the Road")

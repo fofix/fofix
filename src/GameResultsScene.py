@@ -359,9 +359,8 @@ class GameResultsScene(Scene):
 
     self.partLoad = None
     
-    try:
-      phrase = random.choice(self.engine.theme.resultsPhrase)
-    except:
+    phrase = random.choice(self.engine.theme.resultsPhrase)
+    if phrase == "None":
       i = random.randint(0,5)
       if i == 0:
         phrase = _("Relax, it was an excellent show.")
