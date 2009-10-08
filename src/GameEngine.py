@@ -29,6 +29,7 @@
 #####################################################################
 
 from OpenGL.GL import *
+from OpenGL import __version__ as OpenGLVersion
 import numpy
 from PIL import Image
 from numpy import array, float32
@@ -479,7 +480,7 @@ class GameEngine(Engine):
     Log.debug(self.versionString + " starting up...")
     Log.debug("Python version: " + sys.version.split(' ')[0])
     Log.debug("Pygame version: " + str(pygame.version.ver) )
-    Log.debug("PyOpenGL version: " + OpenGL.__version__)
+    Log.debug("PyOpenGL version: " + OpenGLVersion)
     Log.debug("Numpy version: " + numpy.__version__)
     Log.debug("PIL version: " + Image.VERSION)
     Log.debug("os.name: " + os.name)
