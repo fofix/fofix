@@ -250,6 +250,7 @@ Config.define("debug",   "use_unedited_midis",          int, 1,    text = _("Use
 Config.define("debug",   "show_freestyle_active",          int, 0,    text = _("Show Fill Status"), options = {0: _("No"), 1: _("Yes")}, tipText = _("When enabled, whether or not you are in a drum fill/freestyle ending will be displayed in text on the screen."))
 Config.define("debug",   "show_bpm",          int, 0,    text = _("Show BPM"), options = {0: _("No"), 1: _("Yes")}, tipText = _("When enabled, the current song BPM will be shown on screen."))
 Config.define("debug",   "use_new_vbpm_beta",          int, 0,    text = _("New BPM Logic"), options = {0: _("Off"), 1: _("On")}, tipText = _("If enabled, the game will attempt to use the new BPM logic. This is not a finished feature. Use at your own risk."))
+Config.define("debug", "use_new_song_database", bool, False, text=_("New Song Database Code"), options={False: _("Off"), True: _("On")}, tipText=_("Activates the new, incomplete song database code."))  #stump
 
 Config.define("debug",   "show_raw_vocal_data", int, 0,  text = _("Show Raw Vocal Data"), options = {0: _("Off"), 1: _("On")}, tipText = _("If enabled, various information about the microphone input will be show in text on screen. Probably only needed for vocal debugging."))
 
@@ -481,7 +482,14 @@ class GameEngine(Engine):
     Log.debug("PyOpenGL version: " + OpenGL.__version__)
     Log.debug("Numpy version: " + numpy.__version__)
     Log.debug("PIL version: " + Image.VERSION)
-    
+    Log.debug("os.name: " + os.name)
+    Log.debug("sys.platform: " + sys.platform)
+    if os.name == 'nt':
+      import win32api
+      Log.debug("win32api.GetVersionEx(1): " + repr(win32api.GetVersionEx(1)))
+    elif os.name == 'posix':
+      Log.debug("os.uname(): " + repr(os.uname()))
+
     """
     Constructor.
     @param config:  L{Config} instance for settings
