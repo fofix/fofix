@@ -30,7 +30,6 @@ import sys
 import imp
 
 import Config
-import Dialogs
 import Song
 from OpenGL.GL import *
 from OpenGL.GLU import *
