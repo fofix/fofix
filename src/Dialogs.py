@@ -719,8 +719,8 @@ class NeckChooser(Layer, KeyListener):
   """Item menu layer."""
   def __init__(self, engine, selected = None, prompt = _("Yellow (#3) / Blue (#4) to change, Green (#1) to confirm:"), player = "default", owner = None):
     self.prompt   = prompt
-    self.prompt_x = self.engine.theme.neck_prompt_x
-    self.prompt_y = self.engine.theme.neck_prompt_y
+    self.prompt_x = engine.theme.neck_prompt_x
+    self.prompt_y = engine.theme.neck_prompt_y
     self.engine   = engine
     self.player   = player
     self.owner    = owner
