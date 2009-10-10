@@ -396,8 +396,14 @@ for name in allthemes:
       defaultTheme = name     #myfingershurt
 
 i = len(themes)
-if i == 0:
-  Log.error("No themes found! ")
+#if i == 0:
+if 1:
+  if os.name == 'posix':
+    Log.error("No valid theme found!\n"+\
+              "Make sure theme files are properly cased "+\
+              "e.g. notes.png works, Notes.png doesn't\n")
+  else:
+    Log.error("No valid theme found!")
   sys.exit(1);
   
 if defaultTheme != "MegaLight" and defaultTheme != "Rock Band 1":     #myfingershurt
