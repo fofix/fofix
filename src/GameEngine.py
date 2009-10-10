@@ -396,8 +396,7 @@ for name in allthemes:
       defaultTheme = name     #myfingershurt
 
 i = len(themes)
-#if i == 0:
-if 1:
+if i == 0:
   if os.name == 'posix':
     Log.error("No valid theme found!\n"+\
               "Make sure theme files are properly cased "+\
