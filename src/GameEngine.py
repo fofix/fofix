@@ -396,7 +396,10 @@ for name in allthemes:
       defaultTheme = name     #myfingershurt
 
 i = len(themes)
-
+if i == 0:
+  Log.error("No themes found! ")
+  sys.exit(1);
+  
 if defaultTheme != "MegaLight" and defaultTheme != "Rock Band 1":     #myfingershurt
   defaultTheme = themes[0]    #myfingershurt
 
@@ -477,6 +480,7 @@ class GameEngine(Engine):
     self.versionString = version  #stump: other version stuff moved to allow full version string to be retrieved without instantiating GameEngine
     self.uploadVersion = "%s-4.0" % Version.appNameSexy() #akedrou - the version passed to the upload site.
 
+    self.dataPath = Version.dataPath()
     Log.debug(self.versionString + " starting up...")
     Log.debug("Python version: " + sys.version.split(' ')[0])
     Log.debug("Pygame version: " + str(pygame.version.ver) )
