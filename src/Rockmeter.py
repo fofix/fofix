@@ -57,6 +57,9 @@ class Layer(object):  #A graphical stage layer that is used to render the rockme
       else:
         self.engine.view.setViewport(1,0)  
 
+      if self.rect == None:
+        self.rect = (0.0,1.0,0.0,1.0)
+
       if (self.canrender == 0 or (self.canrender == 1 and self.engine.config.get("coffee", "failingEnabled") == True)
       or (self.canrender == 2 and self.engine.config.get("coffee", "failingEnabled") == False)) and self.drawing:
         self.engine.drawImage(self.drawing, scale = (self.scale[0], self.scale[1]), 
@@ -251,7 +254,7 @@ class RockEffect(Effect):
     try: self.angle  = float(self.opt.get("angle", 0))
     except: self.angle       = eval(self.opt.get("angle"))
 
-    self.color       = str(self.opt.get("color", '#FFFFFF')).split(";")
+    self.color       = self.opt.get("color", '#FFFFFF').split(";")
     self.rockmax     = int(self.opt.get("rockmax", 0))
 
     self.rect       = (0.0, 1.0, 0.0, 1.0)
@@ -275,10 +278,10 @@ class RockEffect(Effect):
     self.layer.color = self.color[int(math.ceil(currentRock*len(self.color))-1)]
     if (self.rockmax == 1 and currentRock != 1) or (self.rockmax == 2 and currentRock == 1):
       self.layer.canrender = -1
-    vertrect = int(self.opt.get("vertrect", 1))
-    if vertrect >= 2:
-      self.rect       = (0.0, 1.0, float(currentRock)/vertrect-(1/vertrect), float(currentRock)/vertrect)
-    self.layer.rect = self.rect
+
+    self.rect        = self.opt.get("rect")
+    if self.rect != None:
+      self.layer.rect = eval(self.rect)
 
     if self.texture != None:
       self.layer.drawing = self.drawings[int(math.ceil(currentRock*len(self.drawings))-1)]
@@ -298,9 +301,9 @@ class PowerEffect(Effect):
     self.position    = (0.0,0.0)
     self.scale       = (0.0,0.0)
 
-    self.color       = str(self.opt.get("color", '#FFFFFF')).split(";")
+    self.color       = self.opt.get("color", '#FFFFFF').split(";")
     self.show        = float(self.opt.get("show", 0))
-    self.rect        = eval(str(self.opt.get("rect")))
+    self.rect        = self.opt.get("rect")
 
   def apply(self, i):
     self.layer.canrender = -1
@@ -314,16 +317,17 @@ class PowerEffect(Effect):
     try:  self.scale       = (float(self.opt.get("xscale", 1.0)), float(self.opt.get("yscale", 1.0)))
     except:  self.scale       = (eval(self.opt.get("xscale")), eval(self.opt.get("yscale")))
 
-    self.color       = str(self.opt.get("color", '#FFFFFF')).split(";")
+    self.color       = self.opt.get("color", '#FFFFFF').split(";")
     self.show        = float(self.opt.get("show", 0))
-    self.rect = eval(str(self.opt.get("rect")))
+    self.rect = self.opt.get("rect")
 
     self.layer.position = self.position
     self.layer.scale = self.scale    
     if currentSP >= self.show:
       self.layer.canrender = 0
       
-    self.layer.rect = self.rect
+    if self.rect != None:
+      self.layer.rect = eval(self.rect)
 
 class StreakEffect(Effect):
   def __init__(self, layer, options):
@@ -369,12 +373,16 @@ class StreakEffect(Effect):
       self.layer.canrender = -1
     else:
       self.layer.canrender = 0
-      if bool(self.multdiv) == True:
-        self.rect       = ((multiplier-1)*.25, multiplier*.25, float(streak-1)*.1, float(streak)*.1)
-        self.layer.scale = (self.scale[0]*.25, self.scale[1]*.1)
+      self.rect        = self.opt.get("rect")
+      if self.rect == None:
+        if bool(self.multdiv) == True:
+          self.rect       = ((multiplier-1)*.25, multiplier*.25, float(streak-1)*.1, float(streak)*.1)
+          self.layer.scale = (self.scale[0]*.25, self.scale[1]*.1)
+        else:
+          self.rect       = (0.0, 1.0, float(streak-1)*.1, float(streak)*.1)
+          self.layer.scale = (self.scale[0], self.scale[1]*.1)
       else:
-        self.rect       = (0.0, 1.0, float(streak-1)*.1, float(streak)*.1)
-        self.layer.scale = (self.scale[0], self.scale[1]*.1)
+        self.rect = eval(self.rect)
       self.layer.rect = self.rect
 
     self.layer.position = self.position
@@ -397,7 +405,7 @@ class MultEffect(Effect):
 
     self.angle       = float(self.opt.get("angle", 0.0))
 
-    self.rect       = (0.0, 1.0, 0.0, 1.0)
+    self.rect        = self.opt.get("rect")
 
   def apply(self, i):
     multStreak = self.stage.scene.scoring[i].streak
@@ -424,13 +432,16 @@ class MultEffect(Effect):
     except:  self.scale       = (eval(self.opt.get("xscale")), eval(self.opt.get("yscale")))
 
     self.angle       = float(self.opt.get("angle", 0.0))
-    if self.stage.scene.instruments[i].isBassGuitar:
-      self.scale = (self.scale[0], self.scale[1]*0.083333333)
-      self.rect       = (0.0, 1.0, float(multiplier-1)*0.083333333, float(multiplier)*0.083333333)
+    self.rect        = self.opt.get("rect")
+    if self.rect == None:
+      if self.stage.scene.instruments[i].isBassGuitar:
+        self.scale = (self.scale[0], self.scale[1]*0.083333333)
+        self.rect       = (0.0, 1.0, float(multiplier-1)*0.083333333, float(multiplier)*0.083333333)
+      else:
+        self.scale = (self.scale[0], self.scale[1]*0.125)
+        self.rect       = (0.0, 1.0, float(multiplier-1)*0.125, float(multiplier)*0.125)
     else:
-      self.scale = (self.scale[0], self.scale[1]*0.125)
-      self.rect       = (0.0, 1.0, float(multiplier-1)*0.125, float(multiplier)*0.125)
-
+      self.rect = eval(self.rect)
 
     self.layer.position = self.position
     self.layer.scale = self.scale
@@ -497,6 +508,9 @@ class Rockmeter:
           layer.angle       = get("angle", float, 0.0)
           layer.color       = get("color", str, "#FFFFFF")
 
+          if get("rect") != None:
+            layer.rect        = eval(get("rect"))
+            
           # Load any effects
           fxClasses = {
             "rock":           RockEffect,
@@ -511,6 +525,11 @@ class Rockmeter:
               type = self.config.get(fxSection, "type")
 
               if not type in fxClasses:
+                continue
+
+              #blazingamer: temp fix to get vocals working again with the rockmeter
+              if not type == "rock" and instrument.isVocal:
+                layer = None
                 continue
 
               options = self.config.options(fxSection)
