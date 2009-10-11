@@ -237,7 +237,7 @@ del CacheManager
 
 
 class SongInfo(object):
-  def __init__(self, infoFileName, songLibrary = DEFAULT_LIBRARY, allowCacheUsage = False):
+  def __init__(self, infoFileName, songLibrary = DEFAULT_LIBRARY):
     self.songName      = os.path.basename(os.path.dirname(infoFileName))
     self.fileName      = infoFileName
     self.libraryNam       = songLibrary[songLibrary.find(DEFAULT_LIBRARY):]
@@ -246,10 +246,6 @@ class SongInfo(object):
     self._parts        = None
     self._midiStyle    = None
     self.cache         = cacheManager.getCache()
-    if Config.get("performance", "cache_song_metadata"):
-      self.allowCacheUsage = allowCacheUsage  #stump
-    else:
-      self.allowCacheUsage = False
 
     self.locked = False
 
@@ -543,7 +539,7 @@ class SongInfo(object):
 
             
     #stump: metadata caching
-    if self.allowCacheUsage:
+    if Config.get("performance", "cache_song_metadata"):
       songhash = hashlib.sha1(open(self.noteFileName, 'rb').read()).hexdigest()
       try:    #MFH - it crashes here on previews!
         result = self.cache.execute('SELECT `info` FROM `songinfo` WHERE `hash` = ?', [songhash]).fetchone()
@@ -4056,7 +4052,7 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
   songs = []
   for name in names:
     progressCallback(len(songs)/float(len(names)))
-    songs.append(SongInfo(engine.resource.fileName(library, name, "song.ini", writable = True), library, allowCacheUsage=True))
+    songs.append(SongInfo(engine.resource.fileName(library, name, "song.ini", writable = True), library))
   if Config.get("performance", "cache_song_metadata"):
     cacheManager.getCache().commit()
   if not includeTutorials:

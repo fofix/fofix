@@ -151,14 +151,30 @@ class GameResultsScene(Scene):
     
     self.menu = Menu(self.engine, items, onCancel = self.quit, name = "gameresult", pos = (self.engine.theme.result_menu_x, self.engine.theme.result_menu_y))
     
-    self.engine.resource.load(self, "song", lambda: Song.loadSong(self.engine, songName, library = self.libraryName, notesOnly = True, part = [player.part for player in self.playerList]), onLoad = self.songLoaded)
-    
     #Get theme information
     themename  = self.engine.data.themeLabel
     self.theme = self.engine.data.theme
     
     self.loaded = False
     
+    phrase = random.choice(self.engine.theme.resultsPhrase)
+    if phrase == "None":
+      i = random.randint(0,5)
+      if i == 0:
+        phrase = _("Relax, it was an excellent show.")
+      elif i == 1:
+        phrase = _("Truly Amazing!")
+      elif i == 2:
+        phrase = _("Thanks for playing!")
+      elif i == 3:
+        phrase = _("One more song can't hurt!")
+      elif i == 4:
+        phrase = _("What an amazing performance!")
+      else:
+        phrase = _("That's how it's done!")
+    loadingScreen = Dialogs.showLoadingSplashScreen(self.engine, phrase)
+    self.engine.resource.load(self, "song", lambda: Song.loadSong(self.engine, songName, library = self.libraryName, notesOnly = True, part = [player.part for player in self.playerList]), onLoad = self.songLoaded, synch = True)
+
     self.fullView = self.engine.view.geometry[2:4]
     
     self.Congratphrase = self.engine.config.get("game", "congrats")#blazingamer
@@ -359,23 +375,8 @@ class GameResultsScene(Scene):
 
     self.partLoad = None
     
-    phrase = random.choice(self.engine.theme.resultsPhrase)
-    if phrase == "None":
-      i = random.randint(0,5)
-      if i == 0:
-        phrase = _("Relax, it was an excellent show.")
-      elif i == 1:
-        phrase = _("Truly Amazing!")
-      elif i == 2:
-        phrase = _("Thanks for playing!")
-      elif i == 3:
-        phrase = _("One more song can't hurt!")
-      elif i == 4:
-        phrase = _("What an amazing performance!")
-      else:
-        phrase = _("That's how it's done!")
-    Dialogs.showLoadingScreen(self.engine, lambda: self.song, text = phrase)
-    
+    Dialogs.hideLoadingSplashScreen(self.engine, loadingScreen)
+ 
   def handleWorldCharts(self, result):
     self.uploadResponse[self.resultNum] = self.uploadResult
     self.resultNum += 1
@@ -783,6 +784,7 @@ class GameResultsScene(Scene):
         if self.resultStep > 2:
           self.renderHighScores(visibility, topMost)
     finally:
+      self.engine.view.setViewport(1,0)
       self.engine.view.resetProjection()
   
   def renderInitialScore(self, visibility, topMost):
