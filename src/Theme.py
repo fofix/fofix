@@ -407,9 +407,19 @@ class Theme:
   def __init__(self, path, name, iniFile = True):
     self.name = name
     self.path = path
-    
+
+    self.themePath = os.path.join(Version.dataPath(),"themes", name)
+    if not os.path.exists(self.themePath):
+      Log.error("Theme: %s does not exist!\n" % self.themePath)
+      name = Config.get("coffee", "themename")
+      Log.notice("Theme: Attempting fallback to default theme \"%s\"." % name)
+      self.themePath = os.path.join(Version.dataPath(),"themes", name)
+      if not os.path.exists(self.themePath):
+        Log.error("Theme: %s does not exist!\nExiting.\n" % self.themePath)
+        sys.exit(1)
+
     if iniFile:
-      self.config = Config.load(os.path.join(Version.dataPath(),"themes", name, "theme.ini"))
+      self.config = Config.load(os.path.join(self.themePath, "theme.ini"))
       config = self.config
       
       #Colors
@@ -696,7 +706,7 @@ class Theme:
       self.result_star_type      = config.get("theme", "result_star_type")
       
       #Submenus
-      allfiles = os.listdir(os.path.join(Version.dataPath(),"themes",name,"menu"))
+      allfiles = os.listdir(os.path.join(self.themePath,"menu"))
       self.submenuScale = {}
       self.submenuX = {}
       self.submenuY = {}
