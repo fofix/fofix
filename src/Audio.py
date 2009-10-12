@@ -45,13 +45,17 @@ if not hasattr(pygame.mixer, 'music'):
   __import__('pygame.mixer_music')
   pygame.mixer.music = sys.modules['pygame.mixer_music']
 
-oggErr = False
+ogg = None
+OggStreamer = None
 try:
-  import ogg.vorbis
+  import OggStreamer
+  Log.debug('Using new OggStreamer module for ogg streaming.')
 except ImportError:
-  Log.warn("PyOGG not found. OGG files will be fully decoded prior to playing; expect absurd memory usage.")
-  ogg = None
-  oggErr = True
+  Log.warn('OggStreamer not found.  Falling back to legacy pyogg/pyvorbis based ogg streamer.')
+  try:
+    import ogg.vorbis
+  except ImportError:
+    Log.warn("PyOGG not found. OGG files will be fully decoded prior to playing; expect absurd memory usage.")
 
 class Audio:
   def pre_open(self, frequency = 22050, bits = 16, stereo = True, bufferSize = 1024):
@@ -272,7 +276,7 @@ class MicrophonePassthroughStream(Sound, Task):
       self.channel.queue(snd)
     self.channel.set_volume(self.volume)
 
-if ogg:
+if OggStreamer is None and ogg is not None:
   class OggStream(object):
     def __init__(self, inputFileName):
       self.file = ogg.vorbis.VorbisFile(inputFileName)
@@ -433,6 +437,9 @@ class StreamingSound(Sound, Task):
     self.channel = channel
 
   def __new__(cls, engine, channel, fileName):
+    if OggStreamer is not None:
+      return OggStreamer.StreamingOggSound(channel.channel, fileName)
+
     frequency, format, stereo = pygame.mixer.get_init()
     if fileName.lower().endswith(".ogg"):
       
