@@ -573,8 +573,6 @@ class FileChooser(BackgroundLayer, KeyListener):
    #MFH - added simple black background to place in front of Options background, behind Neck BG, for transparent neck displays
     if not self.engine.loadImgDrawing(self, "neckBlackBack", ("neckblackback.png")):
       self.neckBlackBack = None
-
-    self.engine.loadImgDrawing(self, "background", os.path.join("themes",themename,"editor.png"))
     
   def _getFileCallback(self, fileName):
     return lambda: self.chooseFile(fileName)
@@ -695,9 +693,9 @@ class FileChooser(BackgroundLayer, KeyListener):
 
 
     #MFH - auto background scaling 
-    imgwidth = self.background.width1()
+    imgwidth = self.engine.data.choiceImage.width1()
     wfactor = 640.000/imgwidth
-    self.engine.drawImage(self.background, scale = (wfactor,-wfactor), coord = (w/2,h/2))
+    self.engine.drawImage(self.engine.data.choiceImage, scale = (wfactor,-wfactor), coord = (w/2,h/2))
 
 
       
@@ -1293,7 +1291,6 @@ class ItemChooser(BackgroundLayer, KeyListener):
     #Get theme
     themename = self.engine.data.themeLabel
     self.theme = self.engine.data.theme
-    self.engine.loadImgDrawing(self, "background", os.path.join("themes",themename,"editor.png"))
     
   def _callbackForItem(self, item):
     def cb():
@@ -1333,9 +1330,9 @@ class ItemChooser(BackgroundLayer, KeyListener):
     r = .5
 
     #MFH - auto background scaling 
-    imgwidth = self.background.width1()
+    imgwidth = self.engine.data.choiceImage.width1()
     wfactor = 640.000/imgwidth
-    self.engine.drawImage(self.background, scale = (wfactor,-wfactor), coord = (w/2,h/2))
+    self.engine.drawImage(self.engine.data.choiceImage, scale = (wfactor,-wfactor), coord = (w/2,h/2))
 
       
     self.engine.view.setOrthogonalProjection(normalize = True)
