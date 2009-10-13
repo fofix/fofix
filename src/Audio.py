@@ -438,7 +438,7 @@ class StreamingSound(Sound, Task):
 
   def __new__(cls, engine, channel, fileName):
     if OggStreamer is not None:
-      return OggStreamer.StreamingOggSound(channel.channel, fileName)
+      return OggStreamer.StreamingOggSound(channel.id, fileName)
 
     frequency, format, stereo = pygame.mixer.get_init()
     if fileName.lower().endswith(".ogg"):
