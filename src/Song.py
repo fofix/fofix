@@ -235,7 +235,6 @@ class CacheManager(object):
 cacheManager = CacheManager()  # singleton instance
 del CacheManager
 
-
 class SongInfo(object):
   def __init__(self, infoFileName, songLibrary = DEFAULT_LIBRARY):
     self.songName      = os.path.basename(os.path.dirname(infoFileName))
@@ -767,10 +766,10 @@ class SongInfo(object):
   def getCassetteColor(self):
     c = self._get("cassettecolor")
     if c:
-      return Theme.hexToColor(c)
+      return hexToColor(c)
   
   def setCassetteColor(self, color):
-    self._set("cassettecolor", Theme.colorToHex(color))
+    self._set("cassettecolor", colorToHex(color))
   
   def setArtist(self, value):
     self._set("artist", value)
@@ -4512,6 +4511,30 @@ def removeSongOrderPrefixFromName(name): #copied from Dialogs - can't import it 
           if splitName[0] == "":
             name = splitName[1]
   return name
+
+#death_au: Copied from Theme.py, as songinfo needs them and theme is now a class
+def hexToColor(color):
+  if isinstance(color, tuple):
+    return color
+  elif color is None:
+    return (0,0,0)
+  if color[0] == "#":
+    color = color[1:]
+    if len(color) == 3:
+      return (int(color[0], 16) / 15.0, int(color[1], 16) / 15.0, int(color[2], 16) / 15.0)
+    elif len(color) == 4:
+      return (int(color[0], 16) / 15.0, int(color[1], 16) / 15.0, int(color[2], 16) / 15.0, int(color[2], 16) / 15.0)
+    return (int(color[0:2], 16) / 255.0, int(color[2:4], 16) / 255.0, int(color[4:6], 16) / 255.0)
+  elif color.lower() == "off":
+    return (-1, -1, -1)
+  elif color.lower() == "fret":
+    return (-2, -2, -2)
+  return (0, 0, 0)
+
+def colorToHex(color):
+  if isinstance(color, str):
+    return color
+  return "#" + ("".join(["%02x" % int(c * 255) for c in color]))
 
 #stump
 def updateSongDatabase(engine):
