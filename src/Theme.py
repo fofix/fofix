@@ -1052,7 +1052,8 @@ class Theme:
       return (int(color[0:2], 16) / 255.0, int(color[2:4], 16) / 255.0, int(color[4:6], 16) / 255.0)
     return self.baseColor
   
-  def hexToColor(self, color):
+  @staticmethod
+  def hexToColor(color):
     if isinstance(color, tuple):
       return color
     elif color is None:
@@ -1070,7 +1071,8 @@ class Theme:
       return (-2, -2, -2)
     return (0, 0, 0)
 
-  def colorToHex(self, color):
+  @staticmethod
+  def colorToHex(color):
     if isinstance(color, str):
       return color
     return "#" + ("".join(["%02x" % int(c * 255) for c in color]))
