@@ -239,7 +239,7 @@ class SongInfo(object):
   def __init__(self, infoFileName, songLibrary = DEFAULT_LIBRARY):
     self.songName      = os.path.basename(os.path.dirname(infoFileName))
     self.fileName      = infoFileName
-    self.libraryNam       = songLibrary[songLibrary.find(DEFAULT_LIBRARY):]
+    self.libraryNam       = songLibrary[:]
     self.info          = Config.MyConfigParser()
     self._partDifficulties = {}
     self._parts        = None
