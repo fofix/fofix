@@ -1605,56 +1605,6 @@ class GuitarScene(Scene):
     #myfingershurt: youRockMessage
     self.engine.loadImgDrawing(self, "rockMsg", os.path.join("themes",themename,"yourock.png"))
 
-    
-    #MFH - in-game star display:
-    if not self.engine.loadImgDrawing(self, "starWhite", os.path.join("themes",themename,"starwhite.png")):
-      self.starWhite = None
-    if not self.engine.loadImgDrawing(self, "starGrey", os.path.join("themes",themename,"stargrey.png")):
-      self.starGrey = None
-    if not self.engine.loadImgDrawing(self, "starPerfect", os.path.join("themes",themename,"starperfect.png")):
-      self.starPerfect = None
-
-    if not self.engine.loadImgDrawing(self, "starFC", os.path.join("themes",themename,"starfc.png")):
-      if not self.engine.loadImgDrawing(self, "starFC", os.path.join("themes",themename,"starperfect.png")):
-        self.starFC = None
-
-    #stump: continuous partial stars
-    # This is (compared to the other stuff) SLOOOOW!  Thus we generate the images now so we don't have to during gameplay...
-    if self.starContinuousAvailable:
-      try:
-        self.drawnOverlays = {}
-        baseStarGreyImageSize = Image.open(self.starGrey.texture.name).size
-        for degrees in range(0, 360, 5):
-          overlay = Image.new('RGBA', baseStarGreyImageSize)
-          draw = ImageDraw.Draw(overlay)
-          draw.pieslice((self.starFillupCenterX-self.starFillupOutRadius, self.starFillupCenterY-self.starFillupOutRadius,
-                         self.starFillupCenterX+self.starFillupOutRadius, self.starFillupCenterY+self.starFillupOutRadius),
-                        -90, degrees-90, outline=self.starFillupColor, fill=self.starFillupColor)
-          draw.ellipse((self.starFillupCenterX-self.starFillupInRadius, self.starFillupCenterY-self.starFillupInRadius,
-                        self.starFillupCenterX+self.starFillupInRadius, self.starFillupCenterY+self.starFillupInRadius),
-                       outline=(0, 0, 0, 0), fill=(0, 0, 0, 0))
-          dispOverlay = ImgDrawing(self.engine.data.svg, overlay)
-          self.drawnOverlays[degrees] = dispOverlay
-      except:
-        Log.error('Could not prebuild star overlay textures: ')
-        self.starContinuousAvailable = False
-
-    self.starGrey1 = None
-    if self.starWhite and self.starGrey and self.starPerfect and self.partialStars == 1 and not self.starContinuousAvailable:   #MFH - even better in-game star display, stargrey1.png - stargrey7.png (stargrey8.png is useless - that's a white star.)
-      if not self.engine.loadImgDrawing(self, "starGrey1", os.path.join("themes",themename,"stargrey1.png")):
-        self.starGrey1 = None
-      if not self.engine.loadImgDrawing(self, "starGrey2", os.path.join("themes",themename,"stargrey2.png")):
-        self.starGrey2 = None
-      if not self.engine.loadImgDrawing(self, "starGrey3", os.path.join("themes",themename,"stargrey3.png")):
-        self.starGrey3 = None
-      if not self.engine.loadImgDrawing(self, "starGrey4", os.path.join("themes",themename,"stargrey4.png")):
-        self.starGrey4 = None
-      if not self.engine.loadImgDrawing(self, "starGrey5", os.path.join("themes",themename,"stargrey5.png")):
-        self.starGrey5 = None
-      if not self.engine.loadImgDrawing(self, "starGrey6", os.path.join("themes",themename,"stargrey6.png")):
-        self.starGrey6 = None
-      if not self.engine.loadImgDrawing(self, "starGrey7", os.path.join("themes",themename,"stargrey7.png")):
-        self.starGrey7 = None
 
     self.counterY = -0.1
     self.coOpPhrase = 0
@@ -6045,49 +5995,6 @@ class GuitarScene(Scene):
             if self.numOfSingers > 0 and self.numOfPlayers > 1:
               vocaloffset = .05
 
-            if (self.inGameStars == 2 or (self.inGameStars == 1 and self.theme == 2) )  and not self.pause and not self.failed and not self.battleGH: #MFH - only show stars if in-game stars enabled
-              if self.starGrey != None:
-                for starNum in range(0, 5):
-                  xstarpos = w*((0.802 + 0.040*(starNum))-vocaloffset)
-                  ystarpos = h*(0.7160-vocaloffset)
-                  if stars == 7:    #full combo!
-                    self.engine.drawImage(self.starFC, scale = (.080,-.080), coord = (xstarpos,ystarpos))
-                  elif stars == 6:    #perfect!
-                    self.engine.drawImage(self.starPerfect, scale = (.080,-.080), coord = (xstarpos,ystarpos))
-                  elif starNum == stars:
-                    if self.starContinuousAvailable:
-                      #stump: continuous fillup (akedrou - the ratio will pass correctly from rewritten star score)
-                      degrees = int(360*ratio) - (int(360*ratio) % 5)
-                      self.engine.drawImage(self.starGrey, scale = (.080,-.080), coord = (xstarpos,ystarpos))
-                      self.engine.drawImage(self.drawnOverlays[degrees], scale = (.080,-.080), coord = (xstarpos,ystarpos))
-                    #if self.starGrey1 and self.starScoring == 2:  #if more complex star system is enabled, and we're using Rock Band style scoring
-                    elif self.starGrey1:
-                      if partialStars == 0:
-                        self.engine.drawImage(self.starGrey, scale = (.080,-.080), coord = (xstarpos,ystarpos))
-                      elif partialStars == 1:
-                        self.engine.drawImage(self.starGrey1, scale = (.080,-.080), coord = (xstarpos,ystarpos))
-                      elif partialStars == 2:
-                        self.engine.drawImage(self.starGrey2, scale = (.080,-.080), coord = (xstarpos,ystarpos)) 
-                      elif partialStars == 3:
-                        self.engine.drawImage(self.starGrey3, scale = (.080,-.080), coord = (xstarpos,ystarpos)) 
-                      elif partialStars == 4:
-                        self.engine.drawImage(self.starGrey4, scale = (.080,-.080), coord = (xstarpos,ystarpos)) 
-                      elif partialStars == 5:
-                        self.engine.drawImage(self.starGrey5, scale = (.080,-.080), coord = (xstarpos,ystarpos)) 
-                      elif partialStars == 6:
-                        self.engine.drawImage(self.starGrey6, scale = (.080,-.080), coord = (xstarpos,ystarpos)) 
-                      elif partialStars == 7:
-                        self.engine.drawImage(self.starGrey7, scale = (.080,-.080), coord = (xstarpos,ystarpos))                       
-                    else:
-                      self.engine.drawImage(self.starGrey, scale = (.080,-.080), coord = (xstarpos,ystarpos))
-    
-                  elif starNum > stars:
-                    if self.displayAllGreyStars:
-                      self.engine.drawImage(self.starGrey, scale = (.080,-.080), coord = (xstarpos,ystarpos))
-    
-                  else:   #white star
-                    self.engine.drawImage(self.starWhite, scale = (.080,-.080), coord = (xstarpos,ystarpos))
-  
           if self.song and self.song.readyToGo:
     
             if not self.coOpRB and not self.coOpGH:

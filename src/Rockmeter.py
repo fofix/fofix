@@ -31,6 +31,11 @@ import Version # Provides dataPath
 
 from OpenGL.GL import *
 
+#stump: needed for continuous star fillup
+import Image
+import ImageDraw
+from Svg import ImgDrawing
+
 class Layer(object):  #A graphical stage layer that is used to render the rockmeter.
   def __init__(self, stage, drawing):
 
@@ -121,7 +126,7 @@ class FontLayer(object): #defines layers that are just font instead of images
       score = self.stage.scene.scoring[i].score
       streak = self.stage.scene.scoring[i].streak
       power = self.stage.scene.instruments[i].starPower/100.0
-      stars = self.stage.scene.scoring[i].stars
+      stars = self.stage.scene.scoring[i].stars + 1
       rock = self.stage.scene.rock[i] / self.stage.scene.rockMax
       if streak >= 30:
         multiplier = 4
@@ -219,6 +224,127 @@ class SPLightsLayer(object):  #Layer for specifically the SP Lights
                           rot = float(self.angle[i]), color = (1,1,1,lightVis), rect = self.rect, 
                           stretched = 0)
 
+class StarLayer(object):  #Layer used for rendering stars
+  def __init__(self, stage, drawing):
+
+    self.fontlayer   = False
+    self.stage       = stage
+    self.engine      = stage.engine
+    self.drawing     = drawing
+    self.position    = [(0.802, 0.7160),(0.842, 0.7160),(0.882, 0.7160),(0.922, 0.7160),(0.962, 0.7160)]
+    self.angle       = 0.0
+    self.scale       = [(.08, -.08),(.08, -.08),(.08, -.08),(.08, -.08),(.08, -.08)]
+    self.color       = "#FFFFFF"
+      
+    self.rect        = None
+    self.canrender   = 0
+    self.rendernum   = 1
+
+  def render(self, visibility):
+    w, h, = self.stage.engine.view.geometry[2:4]
+    v = 1.0
+    for i,player in enumerate(self.stage.scene.playerList):
+      p = player.guitarNum
+      if p is not None:
+        self.engine.view.setViewport(self.stage.scene.numberOfGuitars,p)  
+      else:
+        self.engine.view.setViewport(1,0)  
+
+      if self.rect == None:
+        self.rect = (0.0,1.0,0.0,1.0)
+
+      stars = self.stage.scene.scoring[i].stars
+      partialStars=self.stage.scene.scoring[i].partialStars
+      ratio=self.stage.scene.scoring[i].starRatio
+
+      for n in range(5):
+        if (self.canrender == 0 or (self.canrender == 1 and self.engine.config.get("coffee", "failingEnabled") == True)
+        or (self.canrender == 2 and self.engine.config.get("coffee", "failingEnabled") == False)) and self.drawing:
+          if n == stars:
+            self.engine.drawImage(self.drawing[1], scale = (self.scale[n][0], self.scale[n][1]), 
+                            coord = (self.position[n][0] * w, self.position[n][1] * h), 
+                            rot = self.angle, color = self.engine.theme.hexToColor(self.color), rect = self.rect, 
+                            stretched = 0)
+          elif n > stars:
+            self.engine.drawImage(self.drawing[0], scale = (self.scale[n][0], self.scale[n][1]), 
+                            coord = (self.position[n][0] * w, self.position[n][1] * h), 
+                            rot = self.angle, color = self.engine.theme.hexToColor(self.color), rect = self.rect, 
+                            stretched = 0)
+     
+class PartialStarLayer(object):  #Layer used for rendering partial stars
+  def __init__(self, stage, drawing, filltype):
+
+    self.fontlayer   = False
+    self.stage       = stage
+    self.engine      = stage.engine
+    self.drawing     = drawing
+    self.position    = [(0.802, 0.7160),(0.842, 0.7160),(0.882, 0.7160),(0.922, 0.7160),(0.962, 0.7160)]
+    self.angle       = 0.0
+    self.scale       = [(.08, -.08),(.08, -.08),(.08, -.08),(.08, -.08),(.08, -.08)]
+    self.filltype    = filltype
+    self.color       = "#FFFFFF"
+    if self.filltype == "circle":
+      self.starFillupCenterX = None
+      self.starFillupCenterY = None
+      self.starFillupInRadius = None
+      self.starFillupOutRadius = None
+      self.starFillupColor = None
+
+    self.rect        = None
+    self.canrender   = 0
+    self.rendernum   = 1
+
+  def loadCircle(self):
+    #stump: continuous star fillup
+    self.drawnOverlays = {}
+    baseStarGreyImageSize = Image.open(self.drawing.texture.name).size
+    for degrees in range(0, 360, 5):
+      overlay = Image.new('RGBA', baseStarGreyImageSize)
+      draw = ImageDraw.Draw(overlay)
+      draw.pieslice((self.starFillupCenterX-self.starFillupOutRadius, self.starFillupCenterY-self.starFillupOutRadius,
+                     self.starFillupCenterX+self.starFillupOutRadius, self.starFillupCenterY+self.starFillupOutRadius),
+                    -90, degrees-90, outline=self.starFillupColor, fill=self.starFillupColor)
+      draw.ellipse((self.starFillupCenterX-self.starFillupInRadius, self.starFillupCenterY-self.starFillupInRadius,
+                    self.starFillupCenterX+self.starFillupInRadius, self.starFillupCenterY+self.starFillupInRadius),
+                   outline=(0, 0, 0, 0), fill=(0, 0, 0, 0))
+      dispOverlay = ImgDrawing(self.engine.data.svg, overlay)
+      self.drawnOverlays[degrees] = dispOverlay
+
+  def render(self, visibility):
+    w, h, = self.stage.engine.view.geometry[2:4]
+    v = 1.0
+    for i,player in enumerate(self.stage.scene.playerList):
+      p = player.guitarNum
+      if p is not None:
+        self.engine.view.setViewport(self.stage.scene.numberOfGuitars,p)  
+      else:
+        self.engine.view.setViewport(1,0)  
+
+      if self.rect == None:
+        self.rect = (0.0,1.0,0.0,1.0)
+
+      stars = self.stage.scene.scoring[i].stars
+      partialStars=self.stage.scene.scoring[i].partialStars
+      ratio=self.stage.scene.scoring[i].starRatio
+
+      for n in range(5):
+        if (self.canrender == 0 or (self.canrender == 1 and self.engine.config.get("coffee", "failingEnabled") == True)
+        or (self.canrender == 2 and self.engine.config.get("coffee", "failingEnabled") == False)) and self.drawing: 
+          if n == stars + 1:
+            if self.filltype == "circle":
+              #stump: continuous fillup (akedrou - the ratio will pass correctly from rewritten star score)
+              degrees = int(360*ratio) - (int(360*ratio) % 5)
+              self.engine.drawImage(self.drawing, scale = (self.scale[n][0],self.scale[n][1]), 
+                                    coord = (self.position[n][0]*w,self.position[n][1]*h))
+              self.engine.drawImage(self.drawnOverlays[degrees], scale = (self.scale[n][0],self.scale[n][1]), 
+                                    coord = (self.position[n][0]*w,self.position[n][1]*h))
+            else:
+              self.engine.drawImage(self.drawing, scale = (self.scale[n][0], self.scale[n][1]), 
+                                  coord = (self.position[n][0] * w, self.position[n][1] * h), 
+                                  rot = self.angle, color = self.engine.theme.hexToColor(self.color), rect = self.rect, 
+                                  stretched = 0)
+
+                
 class Effect(object): #defines what type of object the layer is
   def __init__(self, layer, options):
     self.layer       = layer
@@ -238,7 +364,7 @@ class RockEffect(Effect):
     if self.texture != None:
       self.drawings = []
       for texture in str(self.texture).split(";"):
-        self.drawings.append(self.stage.engine.loadImgDrawing(self, None, os.path.join("themes", self.stage.themename, texture)))
+        self.drawings.append(self.stage.engine.loadImgDrawing(self, None, os.path.join("themes", self.stage.themename, "rockmeter", texture)))
 
     self.rock        = self.stage.scene.rockMax/2 * .01
     self.failingoff  = int(self.opt.get("failingoff", 0))
@@ -476,6 +602,8 @@ class Rockmeter:
         font    = get("font")
         part    = get("part")
         issplights  = get("issplights")
+        isStars  = get("isStars")
+        isPartialStars  = get("isPartialStars")
 
         instrument = self.scene.instruments[0]
         if instrument.isDrum and part == "drum": 
@@ -491,60 +619,48 @@ class Rockmeter:
         else:
           add = False
 
-        if texture and add == True and not issplights == "True":           
-          drawing = self.engine.loadImgDrawing(self, None, os.path.join("themes", self.themename, texture))
-          layer = Layer(self, drawing)
-         
-          try:
-            layer.position    = (get("xpos",   float, 0.0), get("ypos",   float, 0.0))
-          except:
-            layer.position    = (eval(get("xpos")), eval(get("xpos")))
+        if isStars == "True":    
+          drawing = (self.engine.loadImgDrawing(self, None, os.path.join("themes", self.themename, "rockmeter", texture.split(",")[0])),
+                     self.engine.loadImgDrawing(self, None, os.path.join("themes", self.themename, "rockmeter", texture.split(",")[1])))
+          layer = StarLayer(self, drawing)
 
-          try:
-            layer.scale       = (get("xscale", float, 1.0), get("yscale", float, 1.0))
-          except:
-            layer.scale       = (eval(get("xscale")), eval(get("yscale")))
+          if get("pos") != None:
+            layer.position = []
+            for coord in get("pos").split(";"):
+              layer.position.append((float(coord.split(",")[0]), float(coord.split(",")[1])))
+          if get("scale") != None:
+            layer.scale = []
+            for scale in get("scale").split(";"):
+              layer.scale.append((float(scale.split(",")[0]), float(scale.split(",")[1])))
 
-          layer.angle       = get("angle", float, 0.0)
-          layer.color       = get("color", str, "#FFFFFF")
+        elif isPartialStars == "True":
+          drawing = self.engine.loadImgDrawing(self, None, os.path.join("themes", self.themename, "rockmeter", texture))
+          layer = PartialStarLayer(self, drawing, get("filltype"))
 
+          if get("pos") != None:
+            layer.position = []
+            for coord in get("pos").split(";"):
+              layer.position.append((float(coord.split(",")[0]), float(coord.split(",")[1])))
+          if get("scale") != None:
+            layer.scale = []
+            for scale in get("scale").split(";"):
+              layer.scale.append((float(scale.split(",")[0]), float(scale.split(",")[1])))
           if get("rect") != None:
-            layer.rect        = eval(get("rect"))
-            
-          # Load any effects
-          fxClasses = {
-            "rock":           RockEffect,
-            "mult":           MultEffect,
-            "streak":         StreakEffect,
-            "power":          PowerEffect,
-          }
-        
-          for j in range(32):
-            fxSection = "layer%d:fx%d" % (i, j)
-            if self.config.has_section(fxSection):
-              type = self.config.get(fxSection, "type")
+            layer.rect       = get("rect").split(";").split(",")
 
-              if not type in fxClasses:
-                continue
+          if get("filltype") == "circle":
+            layer.starFillupCenterX = get("star_fillup_center_x", int)
+            layer.starFillupCenterY = get("star_fillup_center_y", int)
+            layer.starFillupInRadius = get("star_fillup_in_radius", int)
+            layer.starFillupOutRadius = get("star_fillup_out_radius", int)
+            layer.starFillupColor = get("star_fillup_color")
+            layer.loadCircle()
 
-              #blazingamer: temp fix to get vocals working again with the rockmeter
-              if not type == "rock" and instrument.isVocal:
-                layer = None
-                continue
-
-              options = self.config.options(fxSection)
-              options = dict([(opt, self.config.get(fxSection, opt)) for opt in options])
-              
-              if type == "power": #skeevy but works. To be fixed, obviously.
-                fx = fxClasses[type](layer, options, self.engine.theme.oBarHScale)
-              else:
-                fx = fxClasses[type](layer, options)
-              layer.effects.append(fx)
         elif text:
           layer = FontLayer(self, section, font)
           Wid, Hgt = self.engine.data.fontDict[font].getStringSize(text)
         elif issplights == "True":
-          drawing = self.engine.loadImgDrawing(self, None, os.path.join("themes", self.themename, texture)) 
+          drawing = self.engine.loadImgDrawing(self, None, os.path.join("themes", self.themename, "rockmeter", texture)) 
           for i in range(len(self.scene.instruments)):
             layer = SPLightsLayer(self, drawing, i)
 
@@ -574,7 +690,58 @@ class Rockmeter:
             layer.angle = [float(i) for i in angle]
 
         else:
-          layer = None
+          try:
+            drawing = self.engine.loadImgDrawing(self, None, os.path.join("themes", self.themename, "rockmeter", texture))
+            layer = Layer(self, drawing)
+         
+            try:
+              layer.position    = (get("xpos",   float, 0.0), get("ypos",   float, 0.0))
+            except:
+              layer.position    = (eval(get("xpos")), eval(get("xpos")))
+
+            try:
+              layer.scale       = (get("xscale", float, 1.0), get("yscale", float, 1.0))
+            except:
+              layer.scale       = (eval(get("xscale")), eval(get("yscale")))
+
+            layer.angle       = get("angle", float, 0.0)
+            layer.color       = get("color", str, "#FFFFFF")
+
+            if get("rect") != None:
+              layer.rect        = eval(get("rect"))
+            
+            # Load any effects
+            fxClasses = {
+              "rock":           RockEffect,
+              "mult":           MultEffect,
+              "streak":         StreakEffect,
+              "power":          PowerEffect,
+            }
+        
+            for j in range(32):
+              fxSection = "layer%d:fx%d" % (i, j)
+              if self.config.has_section(fxSection):
+                type = self.config.get(fxSection, "type")
+
+                if not type in fxClasses:
+                  continue
+
+                #blazingamer: temp fix to get vocals working again with the rockmeter
+                if not type == "rock" and instrument.isVocal:
+                  layer = None
+                  continue
+
+                options = self.config.options(fxSection)
+                options = dict([(opt, self.config.get(fxSection, opt)) for opt in options])
+              
+                if type == "power": #skeevy but works. To be fixed, obviously.
+                  fx = fxClasses[type](layer, options, self.engine.theme.oBarHScale)
+                else:
+                  fx = fxClasses[type](layer, options)
+                layer.effects.append(fx)
+          
+          except:
+            layer = None
 
         if layer != None:
           self.layers.append(layer)
