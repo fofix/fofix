@@ -1479,12 +1479,14 @@ class GuitarScene(Scene):
     Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Loading Graphics..."))
     
     # evilynux - Load stage background(s)
-    stageMode = self.engine.config.get("game", "stage_mode")
-    # if stageMode == 3:
-      # self.stage.loadVideo(self.libraryName, self.songName)
-    # else:
-      # if stageMode == 3:
-        # self.engine.config.set("game", "stage_mode", 0)
+    if self.stage.mode == 3:
+      if Stage.videoAvailable:
+        self.stage.loadVideo(self.libraryName, self.songName)
+      else:
+        Log.warn("Video playback is not supported. GStreamer or its python bindings can't be found")
+        self.engine.config.set("game", "stage_mode", 1)
+        self.stage.mode = 1
+
     self.stage.load(self.libraryName, self.songName, self.playerList[0].practiceMode)
 
     #MFH - this determination logic should happen once, globally -- not repeatedly.
@@ -1958,7 +1960,9 @@ class GuitarScene(Scene):
       scoreCard.lastNoteEvent = None
     if self.coOpType:
       self.coOpScoreCard.lastNoteEvent = None
-    
+
+    if self.stage.mode == 3 and Stage.videoAvailable:
+      self.engine.view.popLayer(self.stage.vidPlayer)
 
   def getHandicap(self):
     hopoFreq = self.engine.config.get("coffee", "hopo_frequency")
@@ -2532,7 +2536,11 @@ class GuitarScene(Scene):
     self.song.stop()
 
     self.initBeatAndSpClaps()
-            
+
+    if self.stage.mode == 3:
+      self.stage.restartVideo()
+
+
   def restartAfterFail(self):  #QQstarS: Fix this function
     self.resetVariablesToDefaults()
     self.engine.data.startSound.play()
@@ -4238,7 +4246,7 @@ class GuitarScene(Scene):
         self.scoring[num].addScore(scoreTemp)
 
   def render3D(self):
-    if self.engine.config.get("game", "stage_mode") == 3:
+    if self.stage.mode == 3 and Stage.videoAvailable:
       if self.countdown <= 0:
         if self.pause == True or self.failed == True:
           self.stage.vidPlayer.paused = True

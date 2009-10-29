@@ -54,8 +54,8 @@ class VideoPlayer(BackgroundLayer):
       self.winWidth, self.winHeight = winWidth, winHeight
     else: # default
       self.winWidth, self.winHeight = (640, 480)
-      Log.warning("VideoPlayer: No resolution specified (default %dx%d)",
-                  self.winWidth, self.winHeight)
+      Log.warn("VideoPlayer: No resolution specified (default %dx%d)" %
+               (self.winWidth, self.winHeight))
     self.vidWidth, self.vidHeight = -1, -1
     self.fps = framerate
     self.clock = pygame.time.Clock()
@@ -200,8 +200,8 @@ class VideoPlayer(BackgroundLayer):
         self.finished = True
     # Error
     elif type == gst.MESSAGE_ERROR:
-      err, debug = message.parse_error()
-      Log.error("GStreamer error: %s" % err, debug)
+      err = message.parse_error()
+      Log.error("GStreamer error: %s" % err)
       self.player.set_state(gst.STATE_NULL)
       self.finished = True
     elif type == gst.MESSAGE_WARNING:

@@ -34,7 +34,12 @@ import random   #MFH - needed for new stage background handling
 from Language import _
 
 import Version # Provides dataPath
-
+try:
+  from VideoPlayer import VideoPlayer
+  videoAvailable = True
+except:
+  videoAvailable = False
+  
 import Rockmeter #blazingamer - new 4.0 code for rendering rockmeters through stage.ini
 
 class Stage(object):
@@ -87,20 +92,28 @@ class Stage(object):
       Log.warn("Stage folder does not exist: %s" % self.pathfull)
       self.mode = 1 # Fallback to song-specific stage
     suffix = ".jpg"
-   
-  # def loadVideo(self, libraryName, songName):
-    # if not videoAvailable:
-      # return -1
-    # if self.songStage == 1 and os.path.exists(os.path.join(libraryName, songName, "video.mp4")):
-      # vidSource = os.path.join(libraryName, songName, "video.mp4")
-    # else:
-      # vidSource = os.path.join(Version.dataPath(), "video.mp4")
 
-    # self.vidPlayer = VideoPlayer(self.engine, -1, vidSource, mute = True, loop = True)
-    # self.engine.view.pushLayer(self.vidPlayer)
-    # self.vidPlayer.paused = True
+  def loadVideo(self, libraryName, songName):
+    if not videoAvailable:
+      raise NameError('Video (gstreamer) is not available!')
+    if self.songStage == 1 and os.path.exists(os.path.join(libraryName, songName, "default.avi")):
+      self.vidSource = os.path.join(libraryName, songName, "default.avi")
+    else:
+      self.vidSource = os.path.join(self.pathfull, "default.avi")
+      if not os.path.exists(self.vidSource):
+        Log.warn("No video found, fallbacking to default static image mode for now")
+        self.mode = 1 # Fallback
+        return
+      
+    self.vidPlayer = VideoPlayer(-1, self.vidSource, mute = True, loop = True)
+    self.engine.view.pushLayer(self.vidPlayer)
+    self.vidPlayer.paused = True
 
-
+  def restartVideo(self):
+    if not videoAvailable or not self.mode == 3:
+      return
+    self.vidPlayer.loadVideo(self.vidSource)
+    
   def load(self, libraryName, songName, practiceMode = False):
     rockmeter = self.engine.resource.fileName(os.path.join("themes", self.themename,"rockmeter.ini"))
     self.rockmeter        = Rockmeter.Rockmeter(self.scene, rockmeter)
@@ -142,7 +155,7 @@ class Stage(object):
     #MFH - now, after the above logic, we can run the normal stage mode logic
     #      only worrying about checking for Blank, song-specific and
     #      practice stage modes
-    if self.mode != 2 and self.songStage == 0 and not practiceMode: #still need to load stage(s)
+    if self.mode != 2 and self.mode != 3 and self.songStage == 0 and not practiceMode: #still need to load stage(s)
       #myfingershurt: assign this first
       if self.mode == 1:   #just use Default.png
         if not self.engine.loadImgDrawing(self, "background", os.path.join(self.path, "default")):
