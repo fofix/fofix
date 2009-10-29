@@ -126,7 +126,7 @@ class FontLayer(object): #defines layers that are just font instead of images
       score = self.stage.scene.scoring[i].score
       streak = self.stage.scene.scoring[i].streak
       power = self.stage.scene.instruments[i].starPower/100.0
-      stars = self.stage.scene.scoring[i].stars + 1
+      stars = self.stage.scene.scoring[i].stars
       rock = self.stage.scene.rock[i] / self.stage.scene.rockMax
       if streak >= 30:
         multiplier = 4
@@ -257,7 +257,7 @@ class StarLayer(object):  #Layer used for rendering stars
       partialStars=self.stage.scene.scoring[i].partialStars
       ratio=self.stage.scene.scoring[i].starRatio
 
-      for n in range(5):
+      for n in range(0,5):
         if (self.canrender == 0 or (self.canrender == 1 and self.engine.config.get("coffee", "failingEnabled") == True)
         or (self.canrender == 2 and self.engine.config.get("coffee", "failingEnabled") == False)) and self.drawing:
           if n == stars:
@@ -327,7 +327,7 @@ class PartialStarLayer(object):  #Layer used for rendering partial stars
       partialStars=self.stage.scene.scoring[i].partialStars
       ratio=self.stage.scene.scoring[i].starRatio
 
-      for n in range(5):
+      for n in range(0,5):
         if (self.canrender == 0 or (self.canrender == 1 and self.engine.config.get("coffee", "failingEnabled") == True)
         or (self.canrender == 2 and self.engine.config.get("coffee", "failingEnabled") == False)) and self.drawing: 
           if n == stars + 1:
@@ -691,6 +691,9 @@ class Rockmeter:
 
         else:
           try:
+            if add != True:
+              continue
+
             drawing = self.engine.loadImgDrawing(self, None, os.path.join("themes", self.themename, "rockmeter", texture))
             layer = Layer(self, drawing)
          
