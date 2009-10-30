@@ -62,7 +62,7 @@ class VideoPlayerTest(unittest.TestCase):
     self.e = GameEngine(config)
     winWidth, winHeight = (self.e.view.geometry[2], self.e.view.geometry[3])
     vidPlayer = VideoPlayer(framerate, self.src, (winWidth, winHeight),
-                            loop = False)
+                            loop = False, startTime = 10000, endTime = 14000)
     self.e.view.pushLayer(vidPlayer)
     while not vidPlayer.finished:
       self.e.run()

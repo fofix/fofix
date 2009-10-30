@@ -42,7 +42,7 @@ import Log
 
 # Simple video player
 class VideoPlayer(BackgroundLayer):
-  def __init__(self, framerate, vidSource, (winWidth, winHeight) = (None, None), mute = False, loop = False):
+  def __init__(self, framerate, vidSource, (winWidth, winHeight) = (None, None), mute = False, loop = False, startTime = None, endTime = None):
     self.updated = False
     self.videoList = None
     self.videoTex = None
@@ -50,6 +50,8 @@ class VideoPlayer(BackgroundLayer):
     self.videoSrc = vidSource
     self.mute = mute
     self.loop = loop
+    self.startTime = startTime
+    self.endTime = endTime
     if winWidth is not None and winHeight is not None:
       self.winWidth, self.winHeight = winWidth, winHeight
     else: # default
@@ -62,6 +64,8 @@ class VideoPlayer(BackgroundLayer):
     self.paused = False
     self.finished = False
     self.discovered = False
+    self.timeFormat = gst.Format(gst.FORMAT_TIME)
+
     self.loadVideo(vidSource) # Load the video
 
   # Load a new video:
@@ -160,6 +164,19 @@ class VideoPlayer(BackgroundLayer):
   # Note: playbin2 seems also suitable, we might want to experiment with it
   #       if decodebin is proven problematic
   def videoSetup(self):
+    if self.startTime is not None or self.endTime is not None:
+      self.setTime = True
+    else:
+      self.setTime = False
+    if self.startTime is not None:
+      self.startNs = self.startTime * 1000000 # From ms to ns
+    else:
+      self.startNs = 0
+    if self.endTime is not None:
+      self.endNs = self.endTime * 1000000
+    else:
+      self.endNs = -1
+
     with_audio = ""
     if not self.mute:
       with_audio = "! queue ! audioconvert ! audiorate ! audioresample ! autoaudiosink"
@@ -169,6 +186,7 @@ class VideoPlayer(BackgroundLayer):
     self.fakeSink = self.player.get_by_name('output')
     self.input.set_property("location", self.videoSrc)
     self.fakeSink.connect ("handoff", self.newFrame)
+      
     # Catch the end of file as well as errors
     # FIXME:
     #  Messages are sent if i use the following in run():
@@ -190,11 +208,10 @@ class VideoPlayer(BackgroundLayer):
     # End of video
     if type == gst.MESSAGE_EOS:
       if self.loop:
-        self.player.set_state(gst.STATE_NULL)
-        # HACKISH: Need to recreate the pipepile altogether...
-        # For some reason going through STATE_NULL, STATE_READY, STATE_PLAYING
-        # doesn't work as I would expect.
-        self.videoSetup()
+        # Seek back to start time and set end time
+        self.player.seek(1, self.timeFormat, gst.SEEK_FLAG_FLUSH,
+                         gst.SEEK_TYPE_SET, self.startNs,
+                         gst.SEEK_TYPE_SET, self.endNs)
       else:
         self.player.set_state(gst.STATE_NULL)
         self.finished = True
@@ -207,9 +224,19 @@ class VideoPlayer(BackgroundLayer):
     elif type == gst.MESSAGE_WARNING:
       warning, debug = message.parse_warning()
       Log.warn("GStreamer warning: %s" % warning, debug)
-    # elif type == gst.MESSAGE_STATE_CHANGED:
-    #   oldstate, newstate, pending = message.parse_state_changed()
-    #   Log.debug("GStreamer state: %s" % newstate)
+    elif type == gst.MESSAGE_STATE_CHANGED:
+      oldstate, newstate, pending = message.parse_state_changed()
+#       Log.debug("GStreamer state: %s" % newstate)
+      if newstate == gst.STATE_READY:
+        # Set start and end time
+        if self.setTime:
+          # Note: Weirdly, contrary to loop logic, i need a wait here!
+          #       Moreover, at the beginning, we're ready more than once!?
+          pygame.time.wait(1000) # Why, oh why... isn't ready, READY?!
+          self.player.seek(1, self.timeFormat, gst.SEEK_FLAG_FLUSH,
+                           gst.SEEK_TYPE_SET, self.startNs,
+                           gst.SEEK_TYPE_SET, self.endNs)
+          self.setTime = False # Execute just once
 
   # Handle new video frames coming from the decoder
   def newFrame(self, sink, buffer, pad):
