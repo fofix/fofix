@@ -105,8 +105,11 @@ class Stage(object):
         self.mode = 1 # Fallback
         return
       
+    winWidth, winHeight = (self.engine.view.geometry[2],
+                           self.engine.view.geometry[3])
     try: # Catches invalid video files or unsupported formats
-      self.vidPlayer = VideoPlayer(-1, self.vidSource, mute = True, loop = True)
+      self.vidPlayer = VideoPlayer(-1, self.vidSource, (winWidth, winHeight),
+                                   mute = True, loop = True)
       self.engine.view.pushLayer(self.vidPlayer)
       self.vidPlayer.paused = True
     except:
