@@ -1481,7 +1481,17 @@ class GuitarScene(Scene):
     # evilynux - Load stage background(s)
     if self.stage.mode == 3:
       if Stage.videoAvailable:
-        self.stage.loadVideo(self.libraryName, self.songName)
+        songVideo = None
+        if self.song.info.video is not None:
+          songVideo = self.song.info.video
+          songVideoStartTime = self.song.info.video_start_time
+          songVideoEndTime = self.song.info.video_end_time
+          if songVideoEndTime == -1:
+            songVideoEndTime = None
+        self.stage.loadVideo(self.libraryName, self.songName,
+                             songVideo = songVideo,
+                             songVideoStartTime = songVideoStartTime,
+                             songVideoEndTime = songVideoEndTime)
       else:
         Log.warn("Video playback is not supported. GStreamer or its python bindings can't be found")
         self.engine.config.set("game", "stage_mode", 1)

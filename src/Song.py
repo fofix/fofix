@@ -4,6 +4,7 @@
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
 #               2008 myfingershurt                                  #
+#               2009 Pascal Giard                                   #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -860,6 +861,24 @@ class SongInfo(object):
   def setLyrics(self, value):
     self._set("lyrics", value)    
         
+  def getVideo(self):
+    return self._get("video")
+
+  def getVideoStartTime(self):
+    return self._get("video_start_time", int, 0)
+
+  def getVideoEndTime(self):
+    return self._get("video_end_time", int, -1)
+
+  def setVideo(self, value):
+    self._set("video", value)
+
+  def setVideoStartTime(self, value):
+    self._set("video_start_time", value)
+
+  def setVideoEndTime(self, value):
+    self._set("video_end_time", value)
+
 
   def getHighscoresWithPartString(self, difficulty, part = str(parts[GUITAR_PART]) ):
     if part == str(parts[GUITAR_PART]):
@@ -1092,6 +1111,9 @@ class SongInfo(object):
 
   early_hit_window_size = property(getEarlyHitWindowSize, setEarlyHitWindowSize)   #MFH
 
+  video            = property(getVideo, setVideo)
+  video_start_time = property(getVideoStartTime, setVideoStartTime)
+  video_end_time   = property(getVideoEndTime, getVideoEndTime)
 
 class LibraryInfo(object):
   def __init__(self, libraryName, infoFileName):

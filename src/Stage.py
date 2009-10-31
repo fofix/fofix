@@ -93,27 +93,47 @@ class Stage(object):
       self.mode = 1 # Fallback to song-specific stage
     suffix = ".jpg"
 
-  def loadVideo(self, libraryName, songName):
+  def loadVideo(self, libraryName, songName, songVideo = None,
+                songVideoStartTime = None, songVideoEndTime = None):
     if not videoAvailable:
       raise NameError('Video (gstreamer) is not available!')
-    if self.songStage == 1 and os.path.exists(os.path.join(libraryName, songName, "default.avi")):
-      self.vidSource = os.path.join(libraryName, songName, "default.avi")
-    else:
+    self.vidSource = None
+    if self.songStage == 1:
+      if songVideo is not None and os.path.exists(os.path.join(libraryName, songName, songVideo)):
+        self.vidSource = os.path.join(libraryName, songName, songVideo)
+      elif os.path.exists(os.path.join(libraryName, songName, "default.avi")):
+        Log.warn("Video not found: %s" % \
+                 os.path.join(libraryName, songName, songVideo))
+        self.vidSource = os.path.join(libraryName, songName, "default.avi")
+    if self.vidSource is None:
+      Log.warn("Video not found: %s" % \
+               os.path.join(libraryName, songName, "default.avi"))
+      songVideoStartTime = None
+      songVideoEndTime = None
       self.vidSource = os.path.join(self.pathfull, "default.avi")
-      if not os.path.exists(self.vidSource):
-        Log.warn("No video found, fallbacking to default static image mode for now")
-        self.mode = 1 # Fallback
-        return
+
+    if not os.path.exists(self.vidSource):
+      Log.warn("Video not found: %s" % \
+               os.path.join(self.pathfull, "default.avi"))
+      Log.warn("No video found, fallbacking to default static image mode for now")
+      self.mode = 1 # Fallback
+      self.vidSource = None
+      return
       
     winWidth, winHeight = (self.engine.view.geometry[2],
                            self.engine.view.geometry[3])
+    Log.debug("Attempting to load video: %s" % self.vidSource)
     try: # Catches invalid video files or unsupported formats
+      Log.debug("Attempting to load video: %s" % self.vidSource)
       self.vidPlayer = VideoPlayer(-1, self.vidSource, (winWidth, winHeight),
-                                   mute = True, loop = True)
+                                   mute = True, loop = True,
+                                   startTime = songVideoStartTime,
+                                   endTime = songVideoEndTime)
       self.engine.view.pushLayer(self.vidPlayer)
       self.vidPlayer.paused = True
     except:
       self.mode = 1
+      Log.warn("Failed to load video, fallback to default stage mode.")
 
   def restartVideo(self):
     if not videoAvailable or not self.mode == 3:
