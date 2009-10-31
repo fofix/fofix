@@ -83,11 +83,14 @@ class VideoPlayer(BackgroundLayer):
     while not self.discovered:
       # Force C threads iteration
       gobject.MainLoop().get_context().iteration(True)
+    if not self.validFile:
+      Log.error("Invalid video file: %s\n" % self.videoSrc)
     self.textureSetup()
     self.videoSetup()
 
   # Use GStreamer's video discoverer to autodetect video properties
   def videoDiscover(self, d, isMedia):
+    self.validFile = True
     if isMedia and d.is_video:
       self.vidWidth, self.vidHeight = d.videowidth, d.videoheight
       # Force mute if no sound track is available or
@@ -96,7 +99,8 @@ class VideoPlayer(BackgroundLayer):
         Log.warn("Video has no sound ==> forcing mute.")
         self.mute = True
     else:
-      Log.error("Invalid video file: %s" % self.videoSrc)
+      self.validFile = False
+      
     self.discovered = True
 
   def textureSetup(self):
@@ -221,6 +225,7 @@ class VideoPlayer(BackgroundLayer):
       Log.error("GStreamer error: %s" % err)
       self.player.set_state(gst.STATE_NULL)
       self.finished = True
+#      raise NameError("GStreamer error: %s" % err)
     elif type == gst.MESSAGE_WARNING:
       warning, debug = message.parse_warning()
       Log.warn("GStreamer warning: %s" % warning, debug)

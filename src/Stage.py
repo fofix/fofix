@@ -105,9 +105,12 @@ class Stage(object):
         self.mode = 1 # Fallback
         return
       
-    self.vidPlayer = VideoPlayer(-1, self.vidSource, mute = True, loop = True)
-    self.engine.view.pushLayer(self.vidPlayer)
-    self.vidPlayer.paused = True
+    try: # Catches invalid video files or unsupported formats
+      self.vidPlayer = VideoPlayer(-1, self.vidSource, mute = True, loop = True)
+      self.engine.view.pushLayer(self.vidPlayer)
+      self.vidPlayer.paused = True
+    except:
+      self.mode = 1
 
   def restartVideo(self):
     if not videoAvailable or not self.mode == 3:
