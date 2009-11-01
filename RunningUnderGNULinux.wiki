@@ -32,12 +32,13 @@ You need to install these packages:
   * pygame (>= 1.9 required for 64bit CPUs)
   * PyOpenGL (2.x is recommanded as it's much faster than 3.x for most users)
   * NumPy
-  * (Python) Numeric
   * Python Imaging Library (PIL)
   * PyOgg
   * PyVorbis
   * PySqlite2
   * PyXML
+  * Python GStreamer and gstreamer-plugin-ffmpeg (*Only required if you want video playback support*)
+  * (Python) Numeric (*Only required if you have pygame < 1.9*)
 
 Optionally, if you are in 32bit you can also install Psyco.
 
@@ -93,14 +94,15 @@ If your distribution is not listed here and you got FoFiX to work, please create
 == Debian or Ubuntu ==
 Execute the following as root to install the dependencies:
 {{{
-apt-get install python-pygame python-opengl python-numpy python-imaging python-ogg python-pyvorbis python-pysqlite2 python-xml python2.5-dev
+apt-get install python-pygame python-opengl python-numpy python-imaging \
+python-ogg python-pyvorbis python-pysqlite2 python-xml python2.5-dev \
+gstreamer-plugin-ffmpeg python-gst0.10
 }}}
 
 *Notes:*
   * *If you are running in a 64bit environment, pygame >= 1.9 is required*. You'll need to build it yourself (See [#Getting_and_installing_pygame_1.9.x]). Note that you don't have to install it, you can use the PYTHONPATH environment variable to point python to your pygame library (see below for an example).
-
+  * *If you are using pygame < 1.9, you NEED python-numeric*.
   * Under Debian unstable, make sure you have python-pyvorbis 1.3 or >= 1.4-2 but not 1.4-1. The latter crashes with a double free error.
-
   * Under Ubuntu versions earlier than Karmic, make sure you use `python2.5` all over the place.
 
 See the [#Generic_instructions generic instructions] above for getting and executing FoFiX.
