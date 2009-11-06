@@ -26,6 +26,8 @@ import gobject
 from math import fabs as abs # Absolute value
 
 # Almighty GStreamer
+import pygst
+pygst.require('0.10')
 import gst
 from gst.extend import discoverer # Video property detection
 
