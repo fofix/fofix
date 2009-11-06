@@ -78,7 +78,7 @@ To run FoFiX from source, double-click "RunFofFromSources.bat" in the src/script
 === Video Playback ===
 To play videos in FoFiX you need to install GStreamer.
 
-*1) Install GStreamer*
+*1) Install GStreamer *
 
 http://www.gstreamer-winbuild.ylatuya.es
 
@@ -90,7 +90,7 @@ check if environmental variables are correctly set:
 
     GST_PLUGIN_PATH: c:\gstreamer\lib\gstreamer-0.10
 
-*2) Install PyGst*
+*2) Install PyGst *
 
 http://forja.rediris.es/frs/download.php/1414/Pygst-0.10.15.1-Python26.exe
 
@@ -100,13 +100,9 @@ There is an error in the Installer.
 You have to manually create the file "pygst.pth" in "C:\Python26\Lib\site-packages".
 Content of the file: "gst-0.10" (without the ")
 
-*3) Install PyGobject*
+*3) Install PyGobject *
 
 http://ftp.gnome.org/pub/GNOME/binaries/win32/pygobject/2.14/pygobject-2.14.2-2.win32-py2.6.exe
-
-*4) Install PyGTK*
-
-http://ftp.gnome.org/pub/GNOME/binaries/win32/pygtk/2.12/pygtk-2.12.1-3.win32-py2.6.exe
 
 == Mac OS X ==
 
