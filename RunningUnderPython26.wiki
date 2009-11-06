@@ -94,12 +94,6 @@ check if environmental variables are correctly set:
 
 http://forja.rediris.es/frs/download.php/1414/Pygst-0.10.15.1-Python26.exe
 
-NOTE:
-
-There is an error in the Installer.
-You have to manually create the file "pygst.pth" in "C:\Python26\Lib\site-packages".
-Content of the file: "gst-0.10" (without the ")
-
 *3) Install PyGobject *
 
 http://ftp.gnome.org/pub/GNOME/binaries/win32/pygobject/2.14/pygobject-2.14.2-2.win32-py2.6.exe
