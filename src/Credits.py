@@ -43,6 +43,12 @@ import Config
 import Dialogs
 import Theme
 
+try:
+  from VideoPlayer import VideoPlayer
+  videoAvailable = True
+except:
+  videoAvailable = False
+
 class Element:
   """A basic element in the credits scroller."""
   def getHeight(self):
@@ -170,9 +176,32 @@ class Credits(Layer, KeyListener):
     self.bank['spanish']       = [_("Spanish")]
     self.bank['swedish']       = [_("Swedish")]
 
+    self.videoLayer = False
+    self.background = None
 
-    if not self.engine.loadImgDrawing(self, 'background', os.path.join('themes', self.themename, 'menu', 'credits.png')):
+    if videoAvailable:
+      # TODO: Parameters to add to theme.ini:
+      #  - credits_video_file
+      #  - credits_video_start_time
+      #  - credits_video_end_time
+      vidSource = os.path.join(Version.dataPath(), 'themes', self.themename, \
+                               'menu', 'credits.avi')
+      if os.path.exists(vidSource):
+        winWidth, winHeight = self.engine.view.geometry[2:4]
+        songVideoStartTime = 0
+        songVideoEndTime = None
+        self.vidPlayer = VideoPlayer(-1, vidSource, (winWidth, winHeight),
+                                     mute = True, loop = True,
+                                     startTime = songVideoStartTime,
+                                     endTime = songVideoEndTime)
+        if self.vidPlayer.validFile:
+          self.engine.view.pushLayer(self.vidPlayer)
+          self.videoLayer = True
+
+    if not self.videoLayer and \
+       not self.engine.loadImgDrawing(self, 'background', os.path.join('themes', self.themename, 'menu', 'credits.png')):
       self.background = None
+
     if not self.engine.loadImgDrawing(self, 'topLayer', os.path.join('themes', self.themename, 'menu', 'creditstop.png')):
         self.topLayer = None
 
@@ -307,6 +336,8 @@ class Credits(Layer, KeyListener):
     self.engine.view.pushLayer(self.engine.mainMenu)    #rchiav: use already-existing MainMenu instance
 
   def quit(self):
+    if self.videoLayer:
+      self.engine.view.popLayer(self.vidPlayer)
     self.engine.view.popLayer(self)
 
   def keyPressed(self, key, unicode):
@@ -349,7 +380,7 @@ class Credits(Layer, KeyListener):
     
     # render the background    
     t = self.time / 100 + 34
-    w, h, = self.engine.view.geometry[2:4]
+    w, h = self.engine.view.geometry[2:4]
     
     self.engine.view.setOrthogonalProjection(normalize = True)
     if self.background:

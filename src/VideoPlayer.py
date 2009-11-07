@@ -75,6 +75,7 @@ class VideoPlayer(BackgroundLayer):
   # 2) Setup OpenGL texture
   # 3) Setup GStreamer pipeline
   def loadVideo(self, vidSource):
+    Log.debug("Attempting to load video: %s" % self.videoSrc)
     if not os.path.exists(vidSource):
       Log.error("Video %s does not exist!" % vidSource)
     self.videoSrc = vidSource
@@ -87,8 +88,10 @@ class VideoPlayer(BackgroundLayer):
       gobject.MainLoop().get_context().iteration(True)
     if not self.validFile:
       Log.error("Invalid video file: %s\n" % self.videoSrc)
+      return False
     self.textureSetup()
     self.videoSetup()
+    return True
 
   # Use GStreamer's video discoverer to autodetect video properties
   def videoDiscover(self, d, isMedia):
@@ -106,6 +109,8 @@ class VideoPlayer(BackgroundLayer):
     self.discovered = True
 
   def textureSetup(self):
+    if not self.validFile:
+      return
     blankSurface = pygame.Surface((self.vidWidth, self.vidHeight),
                                   HWSURFACE, 24)
     blankSurface.fill((0,0,0))
@@ -268,11 +273,13 @@ class VideoPlayer(BackgroundLayer):
 
   def shown(self):
     gobject.threads_init()
-  
+
   def hidden(self):
     self.player.set_state(gst.STATE_NULL)
 
   def run(self, ticks = None):
+    if not self.validFile:
+      return
     if self.paused == True:
       self.player.set_state(gst.STATE_PAUSED)
     else:
@@ -302,3 +309,4 @@ class VideoPlayer(BackgroundLayer):
       glPopMatrix()
     except:
       Log.error("Error attempting to play video")
+

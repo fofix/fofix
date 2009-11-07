@@ -43,6 +43,12 @@ from Language import _
 import Log
 import Version
 
+try:
+  from VideoPlayer import VideoPlayer
+  videoAvailable = True
+except:
+  videoAvailable = False
+
 import getopt
 import sys
 import os
@@ -174,7 +180,37 @@ def main():
     if encoding != None:
       reload(sys)
       sys.setdefaultencoding(encoding)
-    engine.setStartupLayer(MainMenu(engine))
+
+    videoLayer = False
+    if videoAvailable:
+      # TODO: Parameters to add to theme.ini:
+      #  - intro_video_file
+      #  - intro_video_start_time
+      #  - intro_video_end_time
+      themename = Config.get("coffee", "themename")
+      vidSource = os.path.join(Version.dataPath(), 'themes', themename, \
+                               'menu', 'intro.avi')
+      if os.path.exists(vidSource):
+        winWidth, winHeight = engine.view.geometry[2:4]
+        songVideoStartTime = 0
+        songVideoEndTime = None
+        vidPlayer = VideoPlayer(-1, vidSource, (winWidth, winHeight),
+                                startTime = songVideoStartTime,
+                                endTime = songVideoEndTime)
+        if vidPlayer.validFile:
+          engine.view.pushLayer(vidPlayer)
+          videoLayer = True
+          try:
+            engine.ticksAtStart = pygame.time.get_ticks()
+            while not vidPlayer.finished:
+              engine.run()
+            engine.view.popLayer(vidPlayer)
+            engine.view.pushLayer(MainMenu(engine))
+          except KeyboardInterrupt:
+            engine.view.popLayer(vidPlayer)
+            engine.view.pushLayer(MainMenu(engine))
+    if not videoLayer:
+      engine.setStartupLayer(MainMenu(engine))
 
     #stump: make psyco optional
     if Config.get("performance", "use_psyco"):

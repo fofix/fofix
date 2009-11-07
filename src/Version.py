@@ -70,5 +70,6 @@ def dataPath():
       dataPath = "data"
   else:
     dataPath = os.path.join("..", "data")
+  dataPath = os.path.abspath(dataPath)
   return dataPath
   
