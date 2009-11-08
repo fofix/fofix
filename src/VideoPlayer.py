@@ -147,6 +147,12 @@ class VideoPlayer(BackgroundLayer):
                       [-vtxX,  vtxY],
                       [-vtxX, -vtxY],
                       [ vtxX, -vtxY]], dtype=float32)
+    backVtx =  array([[-1.0,  1.0],
+                      [ 1.0, -1.0],
+                      [ 1.0,  1.0],
+                      [-1.0,  1.0],
+                      [-1.0, -1.0],
+                      [ 1.0, -1.0]], dtype=float32)
     # Texture coordinates
     videoTex = array([[0.0, 1.0],
                       [1.0, 0.0],
@@ -159,6 +165,13 @@ class VideoPlayer(BackgroundLayer):
     # Could have used GL_QUADS but IIRC triangles are recommended
     self.videoList = glGenLists(1)
     glNewList(self.videoList, GL_COMPILE)
+    # Draw borders where video aspect is different than specified width/height
+    glEnableClientState(GL_VERTEX_ARRAY)
+    glColor3f(0., 0., 0.)
+    glVertexPointerf(backVtx)
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, backVtx.shape[0])
+    glDisableClientState(GL_VERTEX_ARRAY)
+    # Draw video
     glEnable(GL_TEXTURE_2D)
     glColor3f(1., 1., 1.)
     glEnableClientState(GL_VERTEX_ARRAY)
@@ -215,7 +228,7 @@ class VideoPlayer(BackgroundLayer):
   # Handle bus event e.g. end of video or unsupported formats/codecs
   def onMessage(self, bus, message):
     type = message.type
-#     print "Message %s" % type
+#    print "Message %s" % type
     # End of video
     if type == gst.MESSAGE_EOS:
       if self.loop:
