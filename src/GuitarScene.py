@@ -67,11 +67,6 @@ from OpenGL.GL import *
 #MFH: experimental 2D font rendering module
 import lamina
 
-#stump: needed for continuous star fillup
-import Image
-import ImageDraw
-from Svg import ImgDrawing
-
 #blazingamer: Little fix for RB Score font
 from pygame import version
 

@@ -32,8 +32,7 @@ import Version # Provides dataPath
 from OpenGL.GL import *
 
 #stump: needed for continuous star fillup
-import Image
-import ImageDraw
+from PIL import Image, ImageDraw
 from Svg import ImgDrawing
 
 class Layer(object):  #A graphical stage layer that is used to render the rockmeter.

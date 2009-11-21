@@ -32,7 +32,7 @@ import math
 import Log
 import Config
 from Texture import Texture, TextureException
-import Image
+from PIL import Image
 
 #stump: the last few stubs of DummyAmanith.py are inlined here since this
 # is the only place in the whole program that uses it now that we've pruned

@@ -32,8 +32,7 @@ from numpy import array, float32
 from random import random
 
 #stump: needed for continuous star fillup (akedrou - stealing for vocals)
-import Image
-import ImageDraw
+from PIL import Image, ImageDraw
 from Svg import ImgDrawing
 
 diffMod    = {0: 1.4, 1: 1.6, 2: 1.75, 3: 1.9}

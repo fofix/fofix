@@ -25,7 +25,7 @@ import os
 import sys
 from OpenGL.GL import *
 from OpenGL.GL.ARB.multisample import *
-import Image
+from PIL import Image
 import Log
 import struct
 from Language import _
