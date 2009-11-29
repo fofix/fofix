@@ -37,6 +37,7 @@ import pygame
 import os
 import sys
 import imp
+import traceback
 
 from Engine import Engine, Task
 from Video import Video
@@ -853,8 +854,8 @@ class GameEngine(Engine):
     self.world.finishGame()
     self.world = None
     self.gameStarted = False
-    self.view.pushLayer(self.mainMenu)
-    self.mainMenu.shown()
+    if not self.handlingException:
+      self.view.pushLayer(self.mainMenu)
 
   def loadImgDrawing(self, target, name, fileName, textureSize = None):
     """
@@ -1094,40 +1095,34 @@ class GameEngine(Engine):
 
   def main(self):
     """Main state loop."""
-    try:
-      done = Engine.run(self)
-      self.clearScreen()
-      self.view.render()
-      if self.debugLayer:
-        self.debugLayer.render(1.0, True)
-      self.video.flip()
-      # evilynux - Estimate the rendered frames per second.
-      if self.show_fps:
-        self.frames = self.frames+1
-        # Estimate every 120 frames when highpriority is True.
-        # Estimate every 2*config.fps when highpriority is False,
-        # if you are on target, that should be every 2 seconds.
-        if( not self.priority and self.frames == (self.fps << 1) ) or ( self.priority and self.frames == 120 ):
-          currentTime = pygame.time.get_ticks()
-          self.elapsedTime = currentTime-self.lastTime
-          self.lastTime = currentTime
-          self.fpsEstimate = self.frames*(1000.0/self.elapsedTime)
-          if self.print_fps_in_console == True:
-            print("%.2f fps" % self.fpsEstimate)
-          self.frames = 0 
-      return done
-    except:
-      Log.error("Loading error: ")
-      raise
+    done = Engine.run(self)
+    self.clearScreen()
+    self.view.render()
+    if self.debugLayer:
+      self.debugLayer.render(1.0, True)
+    self.video.flip()
+    # evilynux - Estimate the rendered frames per second.
+    if self.show_fps:
+      self.frames = self.frames+1
+      # Estimate every 120 frames when highpriority is True.
+      # Estimate every 2*config.fps when highpriority is False,
+      # if you are on target, that should be every 2 seconds.
+      if( not self.priority and self.frames == (self.fps << 1) ) or ( self.priority and self.frames == 120 ):
+        currentTime = pygame.time.get_ticks()
+        self.elapsedTime = currentTime-self.lastTime
+        self.lastTime = currentTime
+        self.fpsEstimate = self.frames*(1000.0/self.elapsedTime)
+        if self.print_fps_in_console == True:
+          print("%.2f fps" % self.fpsEstimate)
+        self.frames = 0 
+    return done
 
   def run(self):
     try:
       return self.mainloop()
-    except KeyboardInterrupt:
-      sys.exit(0)
-    except SystemExit:
-      sys.exit(0)
-    except Exception, e:
+    except (KeyboardInterrupt, SystemExit):
+      raise
+    except:
       def clearMatrixStack(stack):
         try:
           glMatrixMode(stack)
@@ -1138,13 +1133,11 @@ class GameEngine(Engine):
 
       if self.handlingException:
         # A recursive exception is fatal as we can't reliably reset the GL state
-        Log.error("Recursive exception:")
-        sys.exit(1)
+        Log.error('Recursive main loop exception: ')
+        raise
 
       self.handlingException = True
-      Log.error("%s, %s: %s" % (e.__class__.__name__,e.__class__, e))
-      import traceback
-      traceback.print_exc()
+      Log.error('Exception occurred in main loop: ')
 
       clearMatrixStack(GL_PROJECTION)
       clearMatrixStack(GL_MODELVIEW)
@@ -1154,6 +1147,9 @@ class GameEngine(Engine):
       if self.gameStarted:
         self.finishGame()
 
-      Dialogs.showMessage(self, str(e.__class__.__name__) + ": " + unicode(e))
+      etype, evalue, etraceback = sys.exc_info()
+      Dialogs.showMessage(self, ''.join(traceback.format_exception_only(etype, evalue)))
       self.handlingException = False
+      self.view.pushLayer(self.mainMenu)
+
       return True

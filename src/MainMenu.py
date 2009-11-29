@@ -309,7 +309,8 @@ class MainMenu(BackgroundLayer):
       self.engine.view.pushLayer(self.nextLayer())
       self.nextLayer = None
     else:
-      self.engine.quit()
+      if not self.engine.handlingException:
+        self.engine.quit()
 
   def quit(self):
     self.engine.view.popLayer(self.menu)

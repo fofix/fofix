@@ -23,8 +23,6 @@ import os
 import sys
 import gobject
 
-from math import fabs as abs # Absolute value
-
 # Almighty GStreamer
 import pygst
 pygst.require('0.10')
@@ -32,7 +30,6 @@ import gst
 from gst.extend import discoverer # Video property detection
 
 import pygame
-from pygame.locals import *
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
@@ -41,6 +38,7 @@ from numpy import array, float32
 
 from View import View, BackgroundLayer
 import Log
+from Texture import Texture
 
 # Simple video player
 class VideoPlayer(BackgroundLayer):
@@ -111,21 +109,11 @@ class VideoPlayer(BackgroundLayer):
   def textureSetup(self):
     if not self.validFile:
       return
-    blankSurface = pygame.Surface((self.vidWidth, self.vidHeight),
-                                  HWSURFACE, 24)
-    blankSurface.fill((0,0,0))
 
-    surfaceData = pygame.image.tostring(blankSurface, "RGB", True)
-    self.videoBuffer = surfaceData
-    self.videoTex = glGenTextures(1)
-    glBindTexture(GL_TEXTURE_2D, self.videoTex)
-    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB,
-                      self.vidWidth, self.vidHeight, GL_RGB,
-                      GL_UNSIGNED_BYTE, surfaceData)
-    glTexParameteri(GL_TEXTURE_2D, 
-                    GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-    glTexParameteri(GL_TEXTURE_2D,
-                    GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+    self.videoTex = Texture(useMipmaps=False)
+    self.videoBuffer = '\x00\x00\x00' * self.vidWidth * self.vidHeight
+    self.updated = True
+    self.textureUpdate()
 
     # Resize video (polygon) to respect resolution ratio
     # (The math is actually simple, take the time to draw it down if required)
@@ -154,12 +142,12 @@ class VideoPlayer(BackgroundLayer):
                       [-1.0, -1.0],
                       [ 1.0, -1.0]], dtype=float32)
     # Texture coordinates
-    videoTex = array([[0.0, 1.0],
-                      [1.0, 0.0],
-                      [1.0, 1.0],
-                      [0.0, 1.0],
-                      [0.0, 0.0],
-                      [1.0, 0.0]], dtype=float32)
+    videoTex = array([[0.0,                   self.videoTex.size[1]],
+                      [self.videoTex.size[0], 0.0],
+                      [self.videoTex.size[0], self.videoTex.size[1]],
+                      [0.0,                   self.videoTex.size[1]],
+                      [0.0,                   0.0],
+                      [self.videoTex.size[0], 0.0]], dtype=float32)
     
     # Create a compiled OpenGL call list and do array-based drawing
     # Could have used GL_QUADS but IIRC triangles are recommended
@@ -273,15 +261,8 @@ class VideoPlayer(BackgroundLayer):
       img = pygame.image.frombuffer(self.videoBuffer,
                                     (self.vidWidth, self.vidHeight),
                                     'RGB')
-      glBindTexture(GL_TEXTURE_2D, self.videoTex)
-      surfaceData = pygame.image.tostring(img ,'RGB', True)
-      # Use linear filtering
-      glTexImage2D(GL_TEXTURE_2D, 0, 3, self.vidWidth, self.vidHeight, 0,
-                   GL_RGB, GL_UNSIGNED_BYTE, surfaceData)
-      glTexParameteri(GL_TEXTURE_2D,
-                      GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-      glTexParameteri(GL_TEXTURE_2D,
-                      GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+      self.videoTex.loadSurface(img)
+      self.videoTex.setFilter()
       self.updated = False
 
   def shown(self):
@@ -314,12 +295,12 @@ class VideoPlayer(BackgroundLayer):
       glPushMatrix()
       glLoadIdentity()
       # Draw the polygon and apply texture
-      glBindTexture(GL_TEXTURE_2D, self.videoTex)
+      self.videoTex.bind()
       glCallList(self.videoList)
       # Restore both transformation matrices
       glPopMatrix()
       glMatrixMode(GL_PROJECTION)
       glPopMatrix()
-    except:
+    except Exception:
       Log.error("Error attempting to play video")
 
