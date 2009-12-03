@@ -22,7 +22,7 @@
 
 import sys
 import os
-VERSION = '3.120'
+VERSION = '3.'
 URL = 'http://fofix.googlecode.com'
 
 def appName():
@@ -34,9 +34,9 @@ def appNameSexy():
 def revision():
   import svntag
   try:
-    revision = "alpha (r%d)" % int(svntag.get_svn_info(os.path.dirname(__file__))['revnum'])
+    revision = "x Maintenance (r%d)" % int(svntag.get_svn_info(os.path.dirname(__file__))['revnum'])
   except:
-    revision = "Final"
+    revision = "121 Final"
   return revision
 
 # evilynux: Returns version number w.r.t. frozen state
@@ -50,7 +50,7 @@ def version():
     else:
       version = VERSION
   else:
-    version = "%s %s" % ( VERSION, revision() )
+    version = "%s%s" % ( VERSION, revision() )
   return version
 
 def dataPath():

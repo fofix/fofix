@@ -65,12 +65,8 @@ import locale
 
 from OpenGL.GL import *
 
-#MFH: experimental 2D font rendering module
-import lamina
-
 #stump: needed for continuous star fillup
-import Image
-import ImageDraw
+from PIL import Image, ImageDraw
 from Svg import ImgDrawing
 
 #blazingamer: Little fix for RB Score font
@@ -727,22 +723,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.currentSimpleMidiLyricLine = ""
     self.noMoreMidiLineLyrics = False
 
-    
-    #self.fontMode = self.engine.config.get("game", "font_rendering_mode")   #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
-    # self.laminaScreen = None
-    # if self.fontMode == 1:    #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
-      # #self.laminaScreen = lamina.LaminaScreenSurface(0.985)
-      # self.laminaScreen = lamina.LaminaScreenSurface(1.0)
-      # self.laminaScreen.clear()
-      # self.laminaScreen.refresh()
-      # self.laminaScreen.refreshPosition()
-    # elif self.fontMode == 2:    #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
-      # #self.laminaScreen = lamina.LaminaScreenSurface(0.985)
-      # self.laminaFrame_soloAcc = lamina.LaminaPanelSurface(quadDims=(-1,-1,500,500))
-      # self.laminaFrame_soloAcc.surf.fill( (0,0,255) )
-      # self.laminaFrame_soloAcc.refresh()
-
-
     self.screenCenterX = self.engine.video.screen.get_rect().centerx
     self.screenCenterY = self.engine.video.screen.get_rect().centery
   
@@ -944,17 +924,11 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     self.rbOverdriveBarGlowFadeOut = False
     self.counting = self.engine.config.get("video", "counting")
 
-
-    #Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Loading Song..."))
-
     #MFH - this is where song loading originally took place, and the loading screen was spawned.
     
     self.engine.resource.load(self, "song", lambda: loadSong(self.engine, songName, library = libraryName, part = [player.part for player in self.playerList], practiceMode = self.playerList[0].practiceMode, practiceSpeed = self.playerList[0].practiceSpeed), synch = True, onLoad = self.songLoaded)
     
     # glorandwarf: show the loading splash screen and load the song synchronously
-    #Dialogs.hideLoadingSplashScreen(self.engine, splash)
-    #splash = None
-    #splash = Dialogs.showLoadingSplashScreen(self.engine, phrase)
     Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Preparing Note Phrases..."))
 
 
@@ -1460,11 +1434,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
     
     # evilynux - Load stage background(s)
     stageMode = self.engine.config.get("game", "stage_mode")
-    # if stageMode == 3:
-      # self.stage.loadVideo(self.libraryName, self.songName)
-    # else:
-      # if stageMode == 3:
-        # self.engine.config.set("game", "stage_mode", 0)
     self.stage.load(self.libraryName, self.songName, self.playerList[0].practiceMode)
 
     #MFH - this determination logic should happen once, globally -- not repeatedly.
@@ -2316,10 +2285,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.camera.target    = (0.0, 0.0, 4.0)
         self.camera.origin    = (0.0, 3.0*self.boardY, -3.0)
 
-    #if self.fontMode == 1:    #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
-    #  self.laminaScreen.refreshPosition()   #needs to be called whenever camera position changes
-    #above does not work......
-
            
   def freeResources(self):
     self.engine.view.setViewport(1,0)
@@ -3138,48 +3103,13 @@ class GuitarSceneClient(GuitarScene, SceneClient):
             #soloFont.render(soloText, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #rock band
           else:   #left
             self.solo_boxXOffset[i] += self.solo_Tw[i]/2
-            #soloFont.render(soloText, (xOffset, yOffset),(1, 0, 0),txtSize)   #left-justified
-
-          # elif self.fontMode==1:      #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
-            # #only update if the text will have changed!
-            # #trying new rendering method...
-            # tempSurface = self.solo_soloFont.pygameFontRender(self.solo_soloText[i], antialias=False, color=(0,0,255), background=(0,0,0)  )
-            # # Create a rectangle
-            # self.soloAcc_Rect[i] = tempSurface.get_rect()
-            # # Center the rectangle
-            # self.soloAcc_Rect[i].centerx = self.screenCenterX
-            # self.soloAcc_Rect[i].centery = self.screenCenterY
-            # # Blit the text
-            # #self.engine.video.screen.blit(tempSurface, tempRect)
-            # self.laminaScreen.surf.blit(tempSurface, self.soloAcc_Rect[i])
-            # #self.laminaScreen.refresh()         #needs to be called whenever text contents change
-            # self.laminaScreen.refresh([self.soloAcc_Rect[i]])         #needs to be called whenever text contents change
-            # #self.laminaScreen.refreshPosition()   #needs to be called whenever camera position changes                        
-            # #self.laminaScreen.display()
-
-          # elif self.fontMode==2:  #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
-            # #trying new rendering method...
-            # tempSurface = self.solo_soloFont.pygameFontRender(self.solo_soloText[i], antialias=False, color=(0,0,255), background=(0,0,0)  )
-            # # Create a rectangle
-            # tempRect = tempSurface.get_rect()
-            # # Center the rectangle
-            # #tempRect.centerx = self.screenCenterX
-            # #tempRect.centery = self.screenCenterY
-            # # Blit the text
-            # #self.engine.video.screen.blit(tempSurface, tempRect)
-            # self.laminaFrame_soloAcc.surf.blit(tempSurface, tempRect)
-            # self.laminaFrame_soloAcc.refresh()
 
           self.guitarSoloShown[i] = True
 
     else:   #not currently a guitar solo - clear Lamina solo accuracy surface (but only once!)
       if self.guitarSoloShown[i]:
         self.guitarSoloShown[i] = False
-        self.currentGuitarSoloLastHitNotes[i] = 1
-        # if self.fontMode==1 and self.soloAcc_Rect[i]:
-          # self.laminaScreen.clear()
-          # self.laminaScreen.refresh(self.soloAcc_Rect[i])
-        
+        self.currentGuitarSoloLastHitNotes[i] = 1        
         
 
   #MFH - single, global BPM here instead of in instrument objects:
@@ -4695,15 +4625,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
         self.scoring[num].addScore(scoreTemp)
 
   def render3D(self):
-    if self.engine.config.get("game", "stage_mode") == 3:
-      if self.countdown <= 0:
-        if self.pause == True or self.failed == True:
-          self.stage.vidPlayer.paused = True
-        else:
-          self.stage.vidPlayer.paused = False
-      else:
-        self.stage.vidPlayer.paused = True
-
     self.stage.render(self.visibility)
   
   def renderVocals(self):
@@ -9115,16 +9036,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
                         self.engine.drawImage(self.soloFrame, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*self.solo_boxXOffset[i],self.solo_boxYOffset[i]))
                       self.solo_soloFont.render(self.solo_soloText[i], (self.solo_xOffset[i], self.solo_yOffset[i]),(1, 0, 0),self.solo_txtSize)
 
-                        #self.solo_soloFont.render("test", (0.5,0.0) )     #appears to render text from given position, down / right...
-                        #self.solo_soloFont.render("test", (0.5,0.5) )     #this test confirms that the Y scale is in units relative to the X pixel width - 1280x960 yes but 1280x1024 NO
-
-                        #this test locates the constant that the font rendering routine always considers the "bottom" of the screen   
-                        #self.solo_soloFont.render("test", (0.5,0.75-self.solo_Th[i]), scale=self.solo_txtSize )    #ah-ha!  4:3 AR viewport = 0.75 max!
-
-
-                  #self.engine.view.setViewport(1,0)
-                #except Exception, e:
-                #  Log.warn("Unable to render guitar solo accuracy text: %s" % e)
                 if self.coOpType: #1 BRE in co-op
                   scoreCard = self.coOpScoreCard
                   if i == 0:
@@ -9621,12 +9532,6 @@ class GuitarSceneClient(GuitarScene, SceneClient):
 
   
       finally:
-        # if self.fontMode==1:      #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
-          # self.laminaScreen.refreshPosition() 
-          # self.laminaScreen.display()
-        # elif self.fontMode==2:  #0 = oGL Hack, 1=LaminaScreen, 2=LaminaFrames
-          # self.laminaFrame_soloAcc.display()
-        #self.engine.view.setViewport(1,0)
         self.engine.view.resetProjection()
 
 
