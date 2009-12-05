@@ -35,11 +35,8 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 import string
 import math
-import Language
+from Language import _
 from Shader import shaders
-
-#this is so custom themes can get at Language (without getting it on their own)
-_ = Language._(str)
 
 # read the color scheme from the config file
 Config.define("theme", "background_color",  str, "#000000")
