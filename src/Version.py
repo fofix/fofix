@@ -34,9 +34,9 @@ def appNameSexy():
 def revision():
   import svntag
   try:
-    revision = "x Maintenance (r%d)" % int(svntag.get_svn_info(os.path.dirname(__file__))['revnum'])
+    revision = " Maintenance (r%d)" % int(svntag.get_svn_info(os.path.dirname(__file__))['revnum'])
   except:
-    revision = "Final"
+    revision = " Final"
   return revision
 
 # evilynux: Returns version number w.r.t. frozen state
