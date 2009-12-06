@@ -1,6 +1,21 @@
 #summary How to set up required source modules to compile FoFiX
 #labels Featured,Phase-Deployment
 <wiki:toc max_depth="2" />
+=== `**` If you haven't read [http://www.fretsonfire.net/forums/viewtopic.php?f=32&t=37631 this page] yet in its entirety, please be sure to do so before you continue! `**` ===
+
+----
+
+= These instructions are deprecated! =
+
+Support for running FoFiX under Python 2.4 with PyOpenGL 2.x is being phased out.  There are only a few issues remaining before 2.4/gl2 support will be dropped for good.  If you still want to run a *deprecated* 2.4/gl2 setup, use the instructions below, but bear in mind that *support can be removed at any time, at which time you will need to reconstruct your entire environment using Python 2.6 and PyOpenGL 3.x.*
+
+== What should I use instead? ==
+
+The current up-to-date setup consists of Python 2.6 and PyOpenGL 3.x.  Instructions can be found on the RunningUnderPython26 page.
+
+----
+----
+
 =Checking out the latest code anonymously=
 (requires a Subversion client, such as [http://tortoisesvn.net/ TortoiseSVN], to check out and receive easy updates of the latest FoFiX source code)
 
@@ -13,7 +28,7 @@ _(Note - it is recommended that you download the latest "full" release of FoFiX 
 Perform an "SVN Checkout" on the following URL to a local folder of your choosing: 
 {{{http://fofix.googlecode.com/svn/MFH-Mod/trunk/}}}
 
-Then, to check for and update to the very latest FoFiX alpha source code, perform an "SVN Update" on the folder where you checked out the source files.  
+Then, to check for and update to the very latest FoFiX source code from svn, perform an "SVN Update" on the folder where you checked out the source files.  
 
 =Setting Up FoFiX Sources=
   * [http://code.google.com/p/fofix/wiki/RequiredSourceModules#For_GNU/Linux GNU/Linux]
@@ -22,7 +37,7 @@ Then, to check for and update to the very latest FoFiX alpha source code, perfor
 
 ----
 
-_It is highly recommended that when you become an Alpha tester, you keep a separate FoFiX folder containing a full install of the latest stable release - as the Alpha versions' new features and bugfixes might cause other issues affecting playability._
+_It is highly recommended that when you become an svn tester, you keep a separate FoFiX folder containing a full install of the latest stable release - as svn's new features and bugfixes might cause other issues affecting playability._
 
 _Alternatively, be familiar with your svn clients method of rolling back to previous revisions so you can downgrade to a working revision if the latest one breaks on you._
 
@@ -42,12 +57,12 @@ Versions are likely important. Don't substitute one for the other without trying
   # Download PIL 1.1.6 - [http://effbot.org/downloads/PIL-1.1.6.win32-py2.4.exe]
   # Download Numeric 2.4.2 - [http://downloads.sourceforge.net/numpy/Numeric-24.2.win32-py2.4.exe]
   # Download Numpy 1.2.1 - [http://downloads.sourceforge.net/numpy/numpy-1.2.1-win32-superpack-python2.4.exe?use_mirror=superb-east]
-  # Download PyOgg 1.3 (this url is important, other versions dont work) - [http://xivilization.net/flyserver/binaries/py24/pyogg-1.3.win32-py2.4.exe]
-  # Download PyVorbis 1.4 (this URL is important, other versions don't work) - [http://xivilization.net/flyserver/binaries/py24/pyvorbis-1.4.win32-py2.4.exe]
+  # Download PyOgg 1.3 (this url is important, other versions dont work) - [http://www.mediafire.com/file/tzjhetkzkyl/pyogg-1.3.win32-py2.4.exe]
+  # Download PyVorbis 1.4 (this URL is important, other versions don't work) - [http://www.mediafire.com/file/jnx4jenjzmi/pyvorbis-1.4.win32-py2.4.exe]
   # Download PySQLite 2.5.5 - [http://oss.itsystementwicklung.de/download/pysqlite/2.5/2.5.5/pysqlite-2.5.5.win32-py2.4.exe]
   # Download the FoFiX source files from the trunk, or SVN revision / tag of your choice - [http://code.google.com/p/fofix/source/browse/MFH-Mod]
 
-*Additional, optional modules currently in use with the latest Alpha version:*
+*Additional, optional modules currently in use with the latest svn revision:*
   * py2exe: support for freezing the code into a standalone EXE (0.6.9: [http://downloads.sourceforge.net/py2exe/py2exe-0.6.9.win32-py2.4.exe])
   * [http://psyco.sourceforge.net/ Psyco] - just-in-time compiler for Python ([http://downloads.sourceforge.net/psyco/psyco-1.5.2.win32-py2.4.exe Direct download])
   * [http://trac2.assembla.com/pkaudio/wiki/pyrtmidi pyRtMidi] - for MIDI instruments to be used as controller inputs.  [http://www.mediafire.com/download.php?ok1vw2zjn22 Here] is a direct download link to an installer that js put together for Python 2.4.
@@ -63,7 +78,7 @@ Versions are likely important. Don't substitute one for the other without trying
 Here's a *package containing all dependencys* (as of 2009-09-21): [http://www.mediafire.com/download.php?e2inzrizjl3]
 
 *Or, here's a complete installer package* with all the files above (as of 5/8/2009), courtesy of Chris Paiano:
-[http://www.mediafire.com/?zzizzt4zmuw MFH's Alpha Module Installer for 3.120r1454+ Win32-Py24-OGL2]
+[http://www.mediafire.com/?zzizzt4zmuw MFH's SVN Module Installer for 3.120r1454+ Win32-Py24-OGL2]
 This Includes the all optional modules for 3.120 r1454+.  _Uses versions: Python 2.4, PyOpenGL 2_.  Installer also fixes the below OpenGL 2 version error.
 
 

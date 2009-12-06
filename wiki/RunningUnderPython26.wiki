@@ -1,17 +1,19 @@
 #summary How to set up a Python 2.6 environment for FoFiX.
 #labels Phase-Deployment,Featured
 <wiki:toc max_depth="2" />
+=== `**` If you haven't read [http://www.fretsonfire.net/forums/viewtopic.php?f=32&t=37631 this page] yet in its entirety, please be sure to do so before you continue! `**` ===
+
 = Introduction =
 
-FoFiX and its predecessors have been built upon Python 2.4 for quite some time.  However, 2.4 went into security-fix-only mode more than two years ago, and it has really started to show its age.  Thus, FoFiX is working on moving up to Python 2.6 while (for now) remaining compatible with 2.4.
+FoFiX and its predecessors have been built upon Python 2.4 for quite some time.  However, 2.4 went into security-fix-only mode more than two years ago, and it has really started to show its age.  FoFiX's transition from Python 2.4 to Python 2.6 is almost complete, save for some performance issues with PyOpenGL 3.x.  Compatibility with Python 2.4 and PyOpenGL 2.x will only be maintained until this is no longer an issue.
 
-If you would rather stick with the tried-and-true 2.4 instructions, see RequiredSourceModules.
+If you would prefer the *deprecated* 2.4/gl2 instructions, see RequiredSourceModules, but be aware that support for it *can be removed at any time*.  Otherwise, see below for the Python 2.6 instructions.
 
 = Setting up Python 2.6 and FoFiX Sources =
 
 == Windows ==
 
-First, you will need Python 2.6 itself.  Go to http://www.python.org/download/ and select the most recent 2.6.x release.  The most recent 2.6.x at the time of this writing is 2.6.2 (http://www.python.org/ftp/python/2.6.2/python-2.6.2.msi).  _Select the *32-bit* Windows binary installer, even if you have a 64-bit system._  Not all of the dependency modules are available for 64-bit systems.  Install by double-clicking the .msi file, but read the next paragraph before doing so.
+First, you will need Python 2.6 itself.  Go to http://www.python.org/download/ and select the most recent 2.6.x release.  The most recent 2.6.x at the time of this writing is 2.6.4 (http://www.python.org/ftp/python/2.6.4/python-2.6.4.msi).  _Select the *32-bit* Windows binary installer, even if you have a 64-bit system._  Not all of the dependency modules are available for 64-bit systems.  Install by double-clicking the .msi file, but read the next paragraph before doing so.
 
 You will need to add the Python installation folder to the PATH.  You can do this while the screen is showing in the installer that allows you to choose which folder Python will be installed to.  Select the folder name and copy it to the Clipboard.  Then open the Start menu, right-click on "My Computer" (XP/2003) or "Computer" (Vista/2008/Win7), and choose Properties.  Go to the Advanced tab, then click Environment Variables.  Under System Variables, find where the variable "PATH" (or "Path") is set, and double-click it to edit it.  Add a semicolon (;) to the end of the existing value, then paste the folder name in after it.  Click OK in each window until you are out of System Properties, then continue installing Python.
 
@@ -20,7 +22,7 @@ You will now need to download and install the dependency modules.  Versions are 
   # pyWin32 (build 214: http://downloads.sourceforge.net/pywin32/pywin32-214.win32-py2.6.exe)
   # numpy (1.3.0: http://downloads.sourceforge.net/numpy/numpy-1.3.0-win32-superpack-python2.6.exe)
   # pygame  (1.9.1: http://pygame.org/ftp/pygame-1.9.1.win32-py2.6.msi) (DLL for PNG suppport was not compiled into 1.9.0 release, use 1.9.1 to fix this.)
-  # pyOpenGL (3.0.0: http://downloads.sourceforge.net/pyopengl/PyOpenGL-3.0.0.win32.exe)
+  # pyOpenGL (3.0.1b1: http://www.mediafire.com/file/lgwbzj3tank/PyOpenGL-3.0.1b1.win32.exe)
   # Python Imaging Library (1.1.6: http://effbot.org/downloads/PIL-1.1.6.win32-py2.6.exe)
   # pyogg (1.3: http://www.mediafire.com/file/qlw2hwyy0rz/pyogg-1.3.win32-py2.6.exe)
   # pyvorbis (1.5a: http://www.mediafire.com/file/i21ewawljtw/pyvorbis-1.5.win32-py2.6.exe)
@@ -31,6 +33,7 @@ The following packages are optional:
 
   # psyco: Python JIT compiler (1.6: http://www.voidspace.org.uk/downloads/psyco-1.6.win32-py2.6.exe)  It may improve the game's performance; it may not.  If you install it, you may want to see whether you get better performance with it enabled or disabled; you can choose in the game options.
   # rtmidi: support for using MIDI instruments (svn revision 10: http://www.mediafire.com/file/njrzmkyztfg/rtmidi-0.1.win32-py2.6.exe)
+  # pyopengl-accelerate: support for making PyOpenGL go a bit faster (3.0.1b1: http://pypi.python.org/packages/2.6/P/PyOpenGL-accelerate/PyOpenGL-accelerate-3.0.1b1.win32-py2.6.exe)  _Highly recommended!_
   # py2exe: support for freezing the code into a standalone EXE (0.6.9: http://downloads.sourceforge.net/py2exe/py2exe-0.6.9.win32-py2.6.exe)
   # pitchbend: support for pitch bend effect (0.3-EndOfLife: http://www.mediafire.com/file/zlinjzzj0km/pitchbend-0.3-EndOfLife.win32-py2.6.exe)  _Will be replaced with a much better implementation soon enough..._
   # pyaudio: required for vocals support (0.2.3: http://people.csail.mit.edu/hubert/pyaudio/packages/pyaudio-0.2.3.py26.exe)
@@ -39,13 +42,15 @@ The following packages are optional:
 
 Install them in the order listed above by double-clicking the .exe or .msi files that you downloaded.
 
-Here's a *package containing all dependencys* (as of 2009-09-21): [http://www.mediafire.com/download.php?o2uzjoznij4]
+Here's a *package containing all dependencies* (as of 2009-09-21): [http://www.mediafire.com/download.php?o2uzjoznij4]
 
+<wiki:comment>
 Note that the current FoFiX codebase under Python 2.6 no longer has some of the dependencies that it had under Python 2.4:
 
   # pysqlite2: replaced by sqlite3, which is included with all Python releases starting with Python 2.5 as part of the standard library.
   # glew/glewpy: while code that uses it still exists in FoFiX, there is currently no way for that code to be called from the rest of the game.
   # Numeric: obsolete, replaced by numpy.
+</wiki:comment>
 
 <wiki:comment>
 You may need to modify one of the files in pyOpenGL.  Do so if you receive errors and the function name "glGenTextures" appears anywhere in the log.
@@ -73,7 +78,32 @@ http://fofix.googlecode.com/svn/MFH-Mod/trunk/
 
 You do not need to change any other options in the checkout window.  Click OK to download the FoFiX source code.
 
-To run FoFiX from source, double-click "RunFofFromSources.bat" in the src/scripts folder within the source code.  If you installed py2exe, you can freeze the code into an EXE by double-clicking "RebuildWin.bat", also in src/scripts.  However, whether you are running from source or EXE has negligible impact on performance except while the game is just starting up, and even then there is practically no difference.  Thus, there really is no point in creating the EXE unless you are going to distribute FoFiX to others.
+To run FoFiX from source, double-click "RunFofFromSources.bat" in the src/scripts folder within the source code.  If you installed py2exe, you can freeze the code into an EXE by double-clicking "RebuildWin.bat", also in src/scripts.  However, whether you are running from source or EXE has negligible impact on performance except while the game is just starting up, and even then there is practically no difference.  Thus, there really is no point in creating the EXE unless you are going to distribute FoFiX to others.  _Unofficial binaries are completely unsupported and will warn the user accordingly when they are started._
+
+=== Video Playback (Optional) ===
+To play videos in FoFiX you need to install GStreamer.
+
+*_ This process is going to be greatly simplified in the near future.  For now, though, you can use these instructions. _*
+
+*1) Install GStreamer *
+
+http://www.gstreamer-winbuild.ylatuya.es
+
+direct link: http://ossbuild.googlecode.com/files/GStreamerWinBuild-0.10.4.exe
+
+check if environmental variables are correctly set:
+
+    PATH: c:\gstreamer\bin
+
+    GST_PLUGIN_PATH: c:\gstreamer\lib\gstreamer-0.10
+
+*2) Install PyGst *
+
+http://forja.rediris.es/frs/download.php/1414/Pygst-0.10.15.1-Python26.exe
+
+*3) Install PyGobject *
+
+http://ftp.gnome.org/pub/GNOME/binaries/win32/pygobject/2.14/pygobject-2.14.2-2.win32-py2.6.exe
 
 == Mac OS X ==
 
