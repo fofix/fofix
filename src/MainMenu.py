@@ -42,8 +42,7 @@ import Theme
 import Player
 import Version
 from Shader import shaders
-
-#myfingershurt: needed for multi-OS file fetching
+import sys
 import os
 
 #myfingershurt: needed for random menu music:
@@ -304,6 +303,9 @@ class MainMenu(BackgroundLayer):
 
     engine.mainMenu = self    #Points engine.mainMenu to the one and only MainMenu object instance
 
+    ## whether the main menu has come into view at least once
+    self.shownOnce = False
+
   def settingsMenu(self):
     if self.engine.advSettings:
       self.settingsMenuObject = Settings.SettingsMenu(self.engine)
@@ -315,7 +317,19 @@ class MainMenu(BackgroundLayer):
     self.engine.view.pushLayer(self.menu)
     self.engine.stopServer()
     shaders.checkIfEnabled()
-  
+    if not self.shownOnce:
+      self.shownOnce = True
+      if hasattr(sys, 'frozen'):
+        #stump: Check whether this is a non-svn binary being run from an svn working copy.
+        if os.path.isdir(os.path.join('src', '.svn')) and 'development' not in Version.version():
+          Dialogs.showMessage(self.engine, _('This binary release is being run from a Subversion working copy. This is not the correct way to run FoFiX from Subversion. Please see one of the following web pages to set your Subversion working copy up correctly:') +
+                                           '\n\nhttp://code.google.com/p/fofix/wiki/RunningUnderPython26' +
+                                           '\nhttp://code.google.com/p/fofix/wiki/RequiredSourceModules')
+        #stump: Check whether this is an svn binary not being run from an svn working copy
+        elif not os.path.isdir(os.path.join('src', '.svn')) and 'development' in Version.version():
+          Dialogs.showMessage(self.engine, _('This binary was built from a Subversion working copy but is not running from one. The FoFiX Team will not provide any support whatsoever for this binary. Please see the following site for official binary releases:') +
+                                           '\n\nhttp://code.google.com/p/fofix/')
+
   def runMusic(self):
     if not self.song.isPlaying():   #re-randomize
       if self.files:

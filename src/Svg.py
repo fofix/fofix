@@ -32,7 +32,7 @@ from math import sin, cos
 import Log
 import Config
 from Texture import Texture, TextureException
-import Image
+from PIL import Image
 
 import DummyAmanith as amanith
 haveAmanith = True

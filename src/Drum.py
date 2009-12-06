@@ -195,7 +195,7 @@ class Drum:
     #if self.engine.config.get("game", "battle_Tune") == 1:
     #  self.battleObjectsEnabled.append(9)
 
-    Log.debug(self.battleObjectsEnabled)
+    Log.debug("Battle Objects Enabled: "+str(self.battleObjectsEnabled))
     self.battleNextObject   = 0
     self.battleObjects      = [0] * 3
     self.battleBeingUsed    = [0] * 2

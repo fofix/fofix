@@ -24,11 +24,10 @@ from __future__ import division
 
 import Log
 import Config
-import Image
+from PIL import Image
 import pygame
 import StringIO
-import PngImagePlugin
-import JpegImagePlugin
+
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
