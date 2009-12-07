@@ -2,6 +2,24 @@
 
 = Old News =
 
+====September 22, 2009====
+*What's that? A release?*
+(FoFiX v3.120 Final: r1881)
+
+Yep, that's right. It's finally time to call 3.120 complete and get on with the next big thing. Check out the download links _right here on the front page under Featured Downloads_! (It's to your right - you can also click the Downloads tab up top for more options)
+
+Grab the version for your OS. If you don't know which version to get for Windows, *try the 2.6 version first*.
+
+*Note:* _GNU/Linux players, download the [http://fofix.googlecode.com/files/fofix-3.120.tar.gz source archive] and follow the instructions on our [RunningUnderGNULinux] wiki page._ -evilynux
+
+What's new in version 3.120? A lot! Over 170 issues were resolved by this latest version, including new Vocal support, 3 and 4-player modes, theme-customizable necks, basic character support, revamped control systems supporting more types of controllers, customizable AI difficulty, and many more enhancements and bugfixes! Check out [http://code.google.com/p/fofix/issues/list?can=1&q=status%3Afixed%2Cverified%2Cdone+milestone%3Arelease-3.120 the list of things we've fixed for this version]!
+
+As a reminder, if you are upgrading from a beta version of FoFiX 3.120 - check your "Note Hit Window" setting in the "Mods, Cheats, and AI" menu. There is a chance it may have been set to Tightest. Most players will want Normal.
+
+P.S. I forgot to update the credits, of all things, before packaging and so I'm making it very clear that Steven Knapman (aka knapman) provided the 3D texture used as key_open.dae in the data folder, as well as giving a lot of very helpful input on the 3D notes coding in the run up to release. Thanks a lot, Steven! (and sorry!)
+
+-akedrou
+
 ==== September 1st 2009 ====
 *To all*: If you are upgrading from a previous version of FoFiX (including previous betas), your hit window setting will have changed. In the "Mods, Cheats, and AI" section of the Settings menu, check your "Note Hit Window". Most players will want "Normal". See issue 956 for details.
 
