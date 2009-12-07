@@ -57,8 +57,8 @@ Versions are likely important. Don't substitute one for the other without trying
   # Download PIL 1.1.6 - [http://effbot.org/downloads/PIL-1.1.6.win32-py2.4.exe]
   # Download Numeric 2.4.2 - [http://downloads.sourceforge.net/numpy/Numeric-24.2.win32-py2.4.exe]
   # Download Numpy 1.2.1 - [http://downloads.sourceforge.net/numpy/numpy-1.2.1-win32-superpack-python2.4.exe?use_mirror=superb-east]
-  # Download PyOgg 1.3 (this url is important, other versions dont work) - [http://xivilization.net/flyserver/binaries/py24/pyogg-1.3.win32-py2.4.exe]
-  # Download PyVorbis 1.4 (this URL is important, other versions don't work) - [http://xivilization.net/flyserver/binaries/py24/pyvorbis-1.4.win32-py2.4.exe]
+  # Download PyOgg 1.3 (this url is important, other versions dont work) - [http://www.mediafire.com/file/tzjhetkzkyl/pyogg-1.3.win32-py2.4.exe]
+  # Download PyVorbis 1.4 (this URL is important, other versions don't work) - [http://www.mediafire.com/file/jnx4jenjzmi/pyvorbis-1.4.win32-py2.4.exe]
   # Download PySQLite 2.5.5 - [http://oss.itsystementwicklung.de/download/pysqlite/2.5/2.5.5/pysqlite-2.5.5.win32-py2.4.exe]
   # Download the FoFiX source files from the trunk, or SVN revision / tag of your choice - [http://code.google.com/p/fofix/source/browse/MFH-Mod]
 
