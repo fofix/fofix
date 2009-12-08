@@ -21,9 +21,21 @@
 #####################################################################
 import os
 import sys
-import gobject
+
+# Twiddle the appropriate envvars under Windows so we can load gstreamer
+# directly from [FoFiX root]/gstreamer and not have the ugliness of
+# requiring the user to install and configure it separately...
+if os.name == 'nt':
+  if hasattr(sys, 'frozen'):
+    _gstpath = 'gstreamer'
+  else:
+    _gstpath = os.path.join('..', 'gstreamer')
+  if os.path.isdir(_gstpath):
+    os.environ['PATH'] = os.path.abspath(os.path.join(_gstpath, 'bin')) + os.pathsep + os.environ['PATH']
+    os.environ['GST_PLUGIN_PATH'] = os.path.abspath(os.path.join(_gstpath, 'lib', 'gstreamer-0.10'))
 
 # Almighty GStreamer
+import gobject
 import pygst
 pygst.require('0.10')
 import gst
@@ -103,7 +115,7 @@ class VideoPlayer(BackgroundLayer):
         self.mute = True
     else:
       self.validFile = False
-      
+
     self.discovered = True
 
   def textureSetup(self):
@@ -148,7 +160,7 @@ class VideoPlayer(BackgroundLayer):
                       [0.0,                   self.videoTex.size[1]],
                       [0.0,                   0.0],
                       [self.videoTex.size[0], 0.0]], dtype=float32)
-    
+
     # Create a compiled OpenGL call list and do array-based drawing
     # Could have used GL_QUADS but IIRC triangles are recommended
     self.videoList = glGenLists(1)
@@ -198,7 +210,7 @@ class VideoPlayer(BackgroundLayer):
     self.fakeSink = self.player.get_by_name('output')
     self.input.set_property("location", self.videoSrc)
     self.fakeSink.connect ("handoff", self.newFrame)
-      
+
     # Catch the end of file as well as errors
     # FIXME:
     #  Messages are sent if i use the following in run():
@@ -281,7 +293,7 @@ class VideoPlayer(BackgroundLayer):
       self.finished = False
     gobject.MainLoop().get_context().iteration(True)
     self.clock.tick(self.fps)
-    
+
   # Render texture to polygon
   # Note: Both visibility and topMost are currently unused.
   def render(self, visibility = 1.0, topMost = False):

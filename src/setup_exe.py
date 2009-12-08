@@ -40,7 +40,6 @@ extraIncludes = [
 
 #stump: if we're running pyOpenGL 3, do the necessary black magic.
 import OpenGL
-import pygame
 if int(OpenGL.__version__[0]) > 2:
   extraIncludes += [
     "OpenGL.platform.win32",
@@ -59,6 +58,14 @@ try:
   extraIncludes.append("OpenGL_accelerate.formathandler")
 except ImportError:
   pass
+
+#stump: get the pygst dirs into sys.path if they're there
+try:
+  import pygst
+  pygst.require('0.10')
+  extraDllExcludes = [os.path.basename(d) for d in glob.glob(os.path.join('..', 'gstreamer', 'bin', 'libgst*.dll'))]
+except ImportError:
+  extraDllExcludes = []
 
 options = {
   "py2exe": {
@@ -95,8 +102,14 @@ options = {
     "dll_excludes":  [
       "msvcp90.dll",
       "mswsock.dll",
-      "powrprof.dll"
-    ],
+      "powrprof.dll",
+      "w9xpopen.exe",
+      "libgio-2.0-0.dll",
+      "libglib-2.0-0.dll",
+      "libgmodule-2.0-0.dll",
+      "libgobject-2.0-0.dll",
+      "libgthread-2.0-0.dll",
+    ] + extraDllExcludes,
     "optimize":  2,
   }
 }
