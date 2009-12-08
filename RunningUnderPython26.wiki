@@ -81,9 +81,10 @@ You do not need to change any other options in the checkout window.  Click OK to
 To run FoFiX from source, double-click "RunFofFromSources.bat" in the src/scripts folder within the source code.  If you installed py2exe, you can freeze the code into an EXE by double-clicking "RebuildWin.bat", also in src/scripts.  However, whether you are running from source or EXE has negligible impact on performance except while the game is just starting up, and even then there is practically no difference.  Thus, there really is no point in creating the EXE unless you are going to distribute FoFiX to others.  _Unofficial binaries are completely unsupported and will warn the user accordingly when they are started._
 
 === Video Playback (Optional) ===
-To play videos in FoFiX you need to install GStreamer.
+To play videos in FoFiX you need to install GStreamer.  There are two ways to do this; the new way solves some problems with the old way.  Either will work, though we recommend the new way.
 
-*_ This process is going to be greatly simplified in the near future.  For now, though, you can use these instructions. _*
+----
+==== The Old Way ====
 
 *1) Install GStreamer *
 
@@ -104,6 +105,30 @@ http://forja.rediris.es/frs/download.php/1414/Pygst-0.10.15.1-Python26.exe
 *3) Install PyGobject *
 
 http://ftp.gnome.org/pub/GNOME/binaries/win32/pygobject/2.14/pygobject-2.14.2-2.win32-py2.6.exe
+
+----
+==== The New Way ====
+
+(No more twiddling of environment variables needed - now FoFiX does this for you before it loads gstreamer.)
+
+*1. Unpack the gstreamer binaries. *
+
+Download this:
+http://www.mediafire.com/file/zwzwzgyiggc/gstreamer.7z
+
+Use 7-Zip or a compatible archiving program to unpack it into the root of the FoFiX environment.  (If done correctly, this should create a folder named "gstreamer" on the same level as "data", "doc", "pkg", "src", and "svg", and the "gstreamer" folder should have as its direct children folders named "bin", "etc", "lib", "share", and "src" and a file named "COPYING".  Carefully check how you unpacked it if this is not the case.)
+
+*2. Install PyGObject *
+
+Download and run this:
+http://ftp.gnome.org/pub/GNOME/binaries/win32/pygobject/2.14/pygobject-2.14.2-2.win32-py2.6.exe
+
+*3. Install PyGst *
+
+Download and run this:
+http://www.mediafire.com/file/l2ntmxyqjdf/pygst-0.10.23.0.win32-py2.6.exe
+
+----
 
 == Mac OS X ==
 
