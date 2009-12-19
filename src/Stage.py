@@ -99,17 +99,18 @@ class Stage(object):
       raise NameError('Video (gstreamer) is not available!')
     self.vidSource = None
     if self.songStage == 1:
-      songAbsPath = os.path.join(self.pathfull, libraryName, songName)
+      songAbsPath = os.path.join(libraryName, songName)
       if songVideo is not None and \
-             os.path.exists(os.path.join(songAbsPath, songVideo)):
+             os.path.isfile(os.path.join(songAbsPath, songVideo)):
         self.vidSource = os.path.join(songAbsPath, songVideo)
       elif os.path.exists(os.path.join(songAbsPath, "default.avi")):
         Log.warn("Video not found: %s" % \
                  os.path.join(songAbsPath, songVideo))
         self.vidSource = os.path.join(songAbsPath, "default.avi")
     if self.vidSource is None:
-      Log.warn("Video not found: %s" % \
-               os.path.join(songAbsPath, "default.avi"))
+      if self.songStage == 1:
+        Log.warn("Video not found: %s" % \
+                 os.path.join(songAbsPath, "default.avi"))
       songVideoStartTime = None
       songVideoEndTime = None
       self.vidSource = os.path.join(self.pathfull, "default.avi")
