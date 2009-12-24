@@ -138,6 +138,7 @@ class Loader(Thread):
     self.join()
     return self.result
 
+#stump: The VFS is probably going to render a lot of this obsolete.
 class Resource(Task):
   def __init__(self, dataPath = os.path.join("..", "data")):
     self.resultQueue = Queue()
@@ -258,6 +259,7 @@ class Resource(Task):
     except Empty:
       pass
 
+#stump: VFS does this now too; it's just a case of converting stuff to use it
 def getWritableResourcePath():
   """
   Returns a path that holds the configuration for the application.

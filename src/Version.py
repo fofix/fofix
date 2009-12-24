@@ -59,6 +59,7 @@ def version():
     version = "%d.%d.%d %s" % ( MAJOR_VERSION, MINOR_VERSION, REVISION, revision() )
   return version
 
+#stump: VFS will take care of this
 def dataPath():
   # Determine whether were running from an exe or not
   if hasattr(sys, "frozen"):
