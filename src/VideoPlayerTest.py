@@ -115,7 +115,7 @@ class VideoPlayerTest(unittest.TestCase):
 
       glClear(GL_COLOR_BUFFER_BIT)
       glColor3f(1., 1., 1.)
-      glBindTexture(GL_TEXTURE_2D, vidPlayer.videoTex)
+      vidPlayer.videoTex.bind()
       glTranslatef(x, y, 0)
       glRotatef(theta, 0, 0, 1.)
       glScalef(.5, .5, 1.)
@@ -144,7 +144,7 @@ class VideoPlayerTest(unittest.TestCase):
   def setUp(self):
     self.src = os.path.join(Version.dataPath(), vidSource)
     self.assert_(os.path.exists(self.src), "File %s does not exist!" % self.src)
-   
+
   def tearDown(self):
     pass
 
