@@ -51,29 +51,23 @@ class Layer(object):  #A graphical stage layer that is used to render the rockme
     self.canrender   = 0
     self.rendernum   = 1
 
-  def render(self, visibility):
+  def render(self, visibility, playerNum):
     w, h, = self.stage.engine.view.geometry[2:4]
     v = 1.0
-    for i,player in enumerate(self.stage.scene.playerList):
-      p = player.guitarNum
-      if p is not None:
-        self.engine.view.setViewport(self.stage.scene.numberOfGuitars,p)  
-      else:
-        self.engine.view.setViewport(1,0)  
 
-      if self.rect == None:
-        self.rect = (0.0,1.0,0.0,1.0)
+    if self.rect == None:
+      self.rect = (0.0,1.0,0.0,1.0)
 
-      if (self.canrender == 0 or (self.canrender == 1 and self.engine.config.get("coffee", "failingEnabled") == True)
-      or (self.canrender == 2 and self.engine.config.get("coffee", "failingEnabled") == False)) and self.drawing:
-        self.engine.drawImage(self.drawing, scale = (self.scale[0], self.scale[1]), 
+    if (self.canrender == 0 or (self.canrender == 1 and self.engine.config.get("coffee", "failingEnabled") == True)
+    or (self.canrender == 2 and self.engine.config.get("coffee", "failingEnabled") == False)) and self.drawing:
+      self.engine.drawImage(self.drawing, scale = (self.scale[0], self.scale[1]), 
                           coord = (self.position[0] * w, self.position[1] * h), 
                           rot = self.angle, color = self.engine.theme.hexToColor(self.color), rect = self.rect, 
                           stretched = 0)
 
-      # Blend in all the effects
-      for effect in self.effects:
-        effect.apply(i)
+    # Blend in all the effects
+    for effect in self.effects:
+      effect.apply(playerNum)
 
 class FontLayer(object): #defines layers that are just font instead of images
   def __init__(self, stage, section, font):
@@ -105,48 +99,48 @@ class FontLayer(object): #defines layers that are just font instead of images
 
     self.color = get("color",   str, "#FFFFFF")
 
-  def render(self, visibility):
+  def render(self, visibility, playerNum):
     w, h, = self.stage.engine.view.geometry[2:4]
     v = 1.0
+
+    scene = self.stage.scene
 
     def get(value, type = str, default = None):
       if self.config.has_option(self.section, value):
         return type(self.config.get(self.section, value))
       return default
 
-    for i,player in enumerate(self.stage.scene.playerList):
-      p = player.guitarNum
-      if p is not None:
-        self.engine.view.setViewport(self.stage.scene.numberOfGuitars,p)  
-      else:
-        self.engine.view.setViewport(1,0)  
+    if self in self.stage.sharedlayers:
+      score = scene.coOpScoreCard.score
+      stars = scene.coOpScoreCard.stars
+      rock = scene.rock[scene.coOpPlayerMeter] / scene.rockMax
+    else:
+      score = scene.scoring[playerNum].score
+      stars = scene.scoring[playerNum].stars
+      rock = scene.rock[playerNum] / scene.rockMax
 
-    for i in range(len(self.stage.scene.playerList)):
-      score = self.stage.scene.scoring[i].score
-      streak = self.stage.scene.scoring[i].streak
-      power = self.stage.scene.instruments[i].starPower/100.0
-      stars = self.stage.scene.scoring[i].stars
-      rock = self.stage.scene.rock[i] / self.stage.scene.rockMax
-      if streak >= 30:
-        multiplier = 4
-      else:
-        multiplier = int(streak*.1) + 1
+    streak = scene.scoring[playerNum].streak
+    power = scene.instruments[playerNum].starPower/100.0
+    if streak >= 30:
+      multiplier = 4
+    else:
+      multiplier = int(streak*.1) + 1
 
-      self.text = eval(get("text"))
-      self.replace    = get("replace")
+    self.text = eval(get("text"))
+    self.replace    = get("replace")
 
-      if self.replace != None:
-        self.replace = self.replace.split(";")
-        for replace in self.replace:
-          self.text = str(self.text).replace(replace.split(",")[0],replace.split(",")[1])
+    if self.replace != None:
+      self.replace = self.replace.split(";")
+      for replace in self.replace:
+        self.text = str(self.text).replace(replace.split(",")[0],replace.split(",")[1])
 
-      wid, hgt = self.font.getStringSize(str(self.text))
+    wid, hgt = self.font.getStringSize(str(self.text))
 
-      try:  self.position    = (get("xpos",   float, 0.0), get("ypos",   float, 0.0))
-      except:  self.position    = (eval(get("xpos")), eval(get("ypos")))
-      glColor3f(*self.engine.theme.hexToColor(self.color))
+    try:  self.position    = (get("xpos",   float, 0.0), get("ypos",   float, 0.0))
+    except:  self.position    = (eval(get("xpos")), eval(get("ypos")))
+    glColor3f(*self.engine.theme.hexToColor(self.color))
 
-      self.font.render(str(self.text), self.position)
+    self.font.render(str(self.text), self.position)
 
 class SPLightsLayer(object):  #Layer for specifically the SP Lights
   def __init__(self, stage, drawing, playernum):
@@ -171,26 +165,26 @@ class SPLightsLayer(object):  #Layer for specifically the SP Lights
       
     self.angle = [.87, .58, .37, 0, -.34, -.70]
     self.scale = (23.0000, 32.0000)
-    self.playernum = playernum
 
-  def render(self, visibility):
+  def render(self, visibility, playerNum):
     w, h, = self.stage.engine.view.geometry[2:4]
     v = 1.0
+    scene = self.stage.scene
 
-    starPowerAmount = self.stage.scene.instruments[self.playernum].starPower
+    starPowerAmount = scene.instruments[playerNum].starPower
     for i in range(0, 6):
       if starPowerAmount >= 100:
         lightVis = 1
       else:
         lightVis = (starPowerAmount-(i*16.6))*.166
 
-      if starPowerAmount >= 50 or self.stage.scene.instruments[self.playernum].starPowerActive:
+      if starPowerAmount >= 50 or scene.instruments[playerNum].starPowerActive:
         self.rect = (0.6666, 1, 0, 1)
       else:
         self.rect = (0.3333, 0.6666, 0, 1)
       
       if i >= 3:
-        if starPowerAmount >= 50 or self.stage.scene.instruments[self.playernum].starPowerActive:
+        if starPowerAmount >= 50 or scene.instruments[playerNum].starPowerActive:
           if self.x[i] < self.xend[i-3]:
             self.x[i] += 0.01
             if self.x[i] >= self.xend[i-3]:
@@ -239,33 +233,27 @@ class StarLayer(object):  #Layer used for rendering stars
     self.canrender   = 0
     self.rendernum   = 1
 
-  def render(self, visibility):
+  def render(self, visibility, playerNum):
     w, h, = self.stage.engine.view.geometry[2:4]
     v = 1.0
-    for i,player in enumerate(self.stage.scene.playerList):
-      p = player.guitarNum
-      if p is not None:
-        self.engine.view.setViewport(self.stage.scene.numberOfGuitars,p)  
-      else:
-        self.engine.view.setViewport(1,0)  
 
-      if self.rect == None:
-        self.rect = (0.0,1.0,0.0,1.0)
+    if self.rect == None:
+      self.rect = (0.0,1.0,0.0,1.0)
 
-      stars = self.stage.scene.scoring[i].stars
-      partialStars=self.stage.scene.scoring[i].partialStars
-      ratio=self.stage.scene.scoring[i].starRatio
+    stars = self.stage.scene.scoring[playerNum].stars
+    partialStars=self.stage.scene.scoring[playerNum].partialStars
+    ratio=self.stage.scene.scoring[playerNum].starRatio
 
-      for n in range(0,5):
-        if (self.canrender == 0 or (self.canrender == 1 and self.engine.config.get("coffee", "failingEnabled") == True)
-        or (self.canrender == 2 and self.engine.config.get("coffee", "failingEnabled") == False)) and self.drawing:
-          if n == stars:
-            self.engine.drawImage(self.drawing[1], scale = (self.scale[n][0], self.scale[n][1]), 
+    for n in range(0,5):
+      if (self.canrender == 0 or (self.canrender == 1 and self.engine.config.get("coffee", "failingEnabled") == True)
+      or (self.canrender == 2 and self.engine.config.get("coffee", "failingEnabled") == False)) and self.drawing:
+        if n == stars:
+          self.engine.drawImage(self.drawing[1], scale = (self.scale[n][0], self.scale[n][1]), 
                             coord = (self.position[n][0] * w, self.position[n][1] * h), 
                             rot = self.angle, color = self.engine.theme.hexToColor(self.color), rect = self.rect, 
                             stretched = 0)
-          elif n > stars:
-            self.engine.drawImage(self.drawing[0], scale = (self.scale[n][0], self.scale[n][1]), 
+        elif n > stars:
+          self.engine.drawImage(self.drawing[0], scale = (self.scale[n][0], self.scale[n][1]), 
                             coord = (self.position[n][0] * w, self.position[n][1] * h), 
                             rot = self.angle, color = self.engine.theme.hexToColor(self.color), rect = self.rect, 
                             stretched = 0)
@@ -309,36 +297,30 @@ class PartialStarLayer(object):  #Layer used for rendering partial stars
       dispOverlay = ImgDrawing(self.engine.data.svg, overlay)
       self.drawnOverlays[degrees] = dispOverlay
 
-  def render(self, visibility):
+  def render(self, visibility, playerNum):
     w, h, = self.stage.engine.view.geometry[2:4]
     v = 1.0
-    for i,player in enumerate(self.stage.scene.playerList):
-      p = player.guitarNum
-      if p is not None:
-        self.engine.view.setViewport(self.stage.scene.numberOfGuitars,p)  
-      else:
-        self.engine.view.setViewport(1,0)  
 
-      if self.rect == None:
-        self.rect = (0.0,1.0,0.0,1.0)
+    if self.rect == None:
+      self.rect = (0.0,1.0,0.0,1.0)
 
-      stars = self.stage.scene.scoring[i].stars
-      partialStars=self.stage.scene.scoring[i].partialStars
-      ratio=self.stage.scene.scoring[i].starRatio
+    stars = self.stage.scene.scoring[playerNum].stars
+    partialStars=self.stage.scene.scoring[playerNum].partialStars
+    ratio=self.stage.scene.scoring[playerNum].starRatio
 
-      for n in range(0,5):
-        if (self.canrender == 0 or (self.canrender == 1 and self.engine.config.get("coffee", "failingEnabled") == True)
-        or (self.canrender == 2 and self.engine.config.get("coffee", "failingEnabled") == False)) and self.drawing: 
-          if n == stars + 1:
-            if self.filltype == "circle":
-              #stump: continuous fillup (akedrou - the ratio will pass correctly from rewritten star score)
-              degrees = int(360*ratio) - (int(360*ratio) % 5)
-              self.engine.drawImage(self.drawing, scale = (self.scale[n][0],self.scale[n][1]), 
+    for n in range(0,5):
+      if (self.canrender == 0 or (self.canrender == 1 and self.engine.config.get("coffee", "failingEnabled") == True)
+      or (self.canrender == 2 and self.engine.config.get("coffee", "failingEnabled") == False)) and self.drawing: 
+        if n == stars + 1:
+          if self.filltype == "circle":
+            #stump: continuous fillup (akedrou - the ratio will pass correctly from rewritten star score)
+            degrees = int(360*ratio) - (int(360*ratio) % 5)
+            self.engine.drawImage(self.drawing, scale = (self.scale[n][0],self.scale[n][1]), 
                                     coord = (self.position[n][0]*w,self.position[n][1]*h))
-              self.engine.drawImage(self.drawnOverlays[degrees], scale = (self.scale[n][0],self.scale[n][1]), 
+            self.engine.drawImage(self.drawnOverlays[degrees], scale = (self.scale[n][0],self.scale[n][1]), 
                                     coord = (self.position[n][0]*w,self.position[n][1]*h))
-            else:
-              self.engine.drawImage(self.drawing, scale = (self.scale[n][0], self.scale[n][1]), 
+          else:
+            self.engine.drawImage(self.drawing, scale = (self.scale[n][0], self.scale[n][1]), 
                                   coord = (self.position[n][0] * w, self.position[n][1] * h), 
                                   rot = self.angle, color = self.engine.theme.hexToColor(self.color), rect = self.rect, 
                                   stretched = 0)
@@ -386,8 +368,15 @@ class RockEffect(Effect):
 
   def apply(self, i):
     self.layer.canrender = self.failingoff
+    scene = self.stage.scene
 
-    currentRock = self.stage.scene.rock[i] / self.stage.scene.rockMax
+    if self.layer in self.stage.sharedlayers:
+      if scene.rock[scene.coOpPlayerMeter] >= 0:
+        currentRock = (0.0 + scene.rock[scene.coOpPlayerMeter]) / scene.rockMax
+      else:
+        currentRock = 0
+    else:
+      currentRock = scene.rock[i] / scene.rockMax
 
     self.arrowRotation += (currentRock - self.arrowRotation) / 5.0
     arrowRotation = float(self.arrowRotation)
@@ -574,12 +563,14 @@ class MultEffect(Effect):
 
 
 class Rockmeter:
-  def __init__(self, guitarScene, configFileName):
+  def __init__(self, guitarScene, configFileName, coOp = False):
 
     self.scene            = guitarScene
     self.engine           = guitarScene.engine
     self.layers = []
+    self.sharedlayers = [] #these layers are for coOp use only
 
+    self.coOp = coOp
     self.config = Config.MyConfigParser()
     self.config.read(configFileName)
 
@@ -603,6 +594,8 @@ class Rockmeter:
         issplights  = get("issplights")
         isStars  = get("isStars")
         isPartialStars  = get("isPartialStars")
+        shared = get("shared", bool, False)
+        split = get("split", bool, True)
 
         instrument = self.scene.instruments[0]
         if instrument.isDrum and part == "drum": 
@@ -632,6 +625,8 @@ class Rockmeter:
             for scale in get("scale").split(";"):
               layer.scale.append((float(scale.split(",")[0]), float(scale.split(",")[1])))
 
+          if coOp == True:
+            shared = True
         elif isPartialStars == "True":
           drawing = self.engine.loadImgDrawing(self, None, os.path.join("themes", self.themename, "rockmeter", texture))
           layer = PartialStarLayer(self, drawing, get("filltype"))
@@ -655,9 +650,17 @@ class Rockmeter:
             layer.starFillupColor = get("star_fillup_color")
             layer.loadCircle()
 
+          if coOp == True:
+            shared = True
+
         elif text:
+          if coOp == True and (text == "score" or text == "stars"):
+            shared = True
+          
           layer = FontLayer(self, section, font)
+
           Wid, Hgt = self.engine.data.fontDict[font].getStringSize(text)
+
         elif issplights == "True":
           drawing = self.engine.loadImgDrawing(self, None, os.path.join("themes", self.themename, "rockmeter", texture)) 
           for i in range(len(self.scene.instruments)):
@@ -745,14 +748,29 @@ class Rockmeter:
           except:
             layer = None
 
-        if layer != None:
-          self.layers.append(layer)
+        if shared == True and coOp == True:
+          self.sharedlayers.append(layer)
+        else:
+          if layer != None:
+            self.layers.append(layer)
+  
 
   def render(self, visibility):
     self.engine.view.setOrthogonalProjection(normalize = True)
     try:
-      for layer in self.layers:
-        layer.render(visibility)
+      for i,player in enumerate(self.scene.playerList):
+        p = player.guitarNum
+        if p is not None:
+          self.engine.view.setViewportHalf(self.scene.numberOfGuitars,p)
+        else:
+          self.engine.view.setViewportHalf(1,0)  
+        for layer in self.layers:
+          layer.render(visibility, p)
+
+      self.engine.view.setViewportHalf(1,0)
+      for layer in self.sharedlayers:
+        layer.render(visibility, 0)
+
     finally:
       self.engine.view.resetProjection()
 

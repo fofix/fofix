@@ -144,8 +144,16 @@ class Stage(object):
     self.vidPlayer.loadVideo(self.vidSource)
     
   def load(self, libraryName, songName, practiceMode = False):
-    rockmeter = self.engine.resource.fileName(os.path.join("themes", self.themename,"rockmeter.ini"))
-    self.rockmeter        = Rockmeter.Rockmeter(self.scene, rockmeter)
+    rm = os.path.join("themes", self.themename, "rockmeter.ini")
+    if self.scene.coOpType == True:
+      rm = os.path.join("themes", self.themename, "rockmeter_coop.ini")
+    elif self.scene.battle == True:
+      rm = os.path.join("themes", self.themename, "rockmeter_faceoff.ini")
+    elif self.scene.battleGH == True:
+      rm = os.path.join("themes", self.themename, "rockmeter_profaceoff.ini")
+    
+    rockmeter = self.engine.resource.fileName(rm)
+    self.rockmeter = Rockmeter.Rockmeter(self.scene, rockmeter, self.scene.coOpType)
 
     # evilynux - Fixes a self.background not defined crash
     self.background = None
