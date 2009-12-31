@@ -193,7 +193,22 @@ def fadeScreen(v):
   glColor4f(0, 0, 0, .9 - v * .9)
   glVertex2f(1, 1)
   glEnd()
+
+class MainDialog(Layer, KeyListener):
+  def __init__(self, engine):
+    self.engine           = engine
+    self.fontDict         = self.engine.data.fontDict
+    self.geometry         = self.engine.view.geometry[2:4]
+    self.fontScreenBottom = self.engine.data.fontScreenBottom
+    self.aspectRatio      = self.engine.view.aspectRatio
+    self.drawImage        = self.engine.drawImage
+    self.drawStarScore    = self.engine.drawStarScore
   
+  def shown(self):
+    self.engine.input.addKeyListener(self, priority = True)
+  
+  def hidden(self):
+    self.engine.input.removeKeyListener(self)
 
 class GetText(Layer, KeyListener):
   """Text input layer."""
@@ -1250,6 +1265,205 @@ class AvatarChooser(Layer, KeyListener):
     finally:
       self.engine.view.resetProjection()
     #==============================================================
+
+class PartDiffChooser(MainDialog):
+  """Part and difficulty select layer"""
+  def __init__(self, engine, parts, info, players, back = False):
+    MainDialog.__init__(self, engine)
+    self.parts   = parts
+    self.info    = info
+    self.players = players
+    self.theme   = engine.theme
+    
+    self.retVal  = None
+    
+    self.logClassInits = self.engine.config.get("game", "log_class_inits")
+    if self.logClassInits == 1:
+      Log.debug("PartDiffChooser class init (Dialogs.py)...")
+    self.time    = 0.0
+    
+    self.yes        = []
+    self.no         = []
+    self.conf       = []
+    self.up         = []
+    self.down       = []
+    
+    for player in self.players:
+      self.yes.extend(player.yes)
+      self.no.extend(player.no)
+      self.conf.extend(player.conf)
+      self.up.extend(player.up)
+      self.down.extend(player.down)
+    
+    self.keyControl     = 0
+    self.scrolling      = [0 for i in self.players]
+    self.rate           = [0 for i in self.players]
+    self.delay          = [0 for i in self.players]
+    self.scroller       = [0, self.scrollUp, self.scrollDown]
+    self.selected       = []
+    self.mode           = [back and 1 or 0 for i in self.players]
+    self.readyPlayers   = []
+    for i in range(len(self.players)):
+      if self.mode[i] == 1:
+        if len(self.info.partDifficulties[self.players[i].part.id]) == 1:
+          self.mode[i] -= 1
+        else:
+          for j, d in enumerate(self.info.partDifficulties[self.players[i].part]):
+            if d == self.players[i].difficulty:
+              self.selected.append(j)
+              break
+          else:
+            self.selected.append(0)
+      if self.mode[i] == 0:
+        if len(self.parts[i]) == 1:
+          self.players[i].part = self.parts[i][0]
+          self.mode[i] += 1
+          if len(self.info.partDifficulties[self.players[i].part.id]) == 1:
+            self.players[i].difficulty = self.info.partDifficulties[self.players[i].part][0]
+            self.readyPlayers.append(i)
+            self.selected.append(0)
+          else:
+            for j, d in enumerate(self.info.partDifficulties[self.players[i].part]):
+              if d == self.players[i].difficulty:
+                self.selected.append(j)
+                break
+            else:
+              self.selected.append(0)
+        else:
+          for j, p in enumerate(self.parts[i]):
+            if p == self.players[i].part:
+              self.selected.append(j)
+              break
+          else:
+            self.selected.append(0)
+    if len(self.readyPlayers) == len(self.players):
+      self.retval = True
+      self.engine.view.popLayer(self)
+      return
+    
+    if os.path.isdir(os.path.join(self.engine.data.path,"themes",self.engine.data.themeLabel,"setlist","parts")):
+      self.engine.data.loadAllImages(self, os.path.join("themes",self.engine.data.themeLabel,"setlist","parts"))
+  
+  def scrollUp(self, i):
+    self.selected[i] -= 1
+    if self.selected[i] < 0:
+      if self.mode[i] == 0:
+        self.selected[i] = len(self.parts[i])
+      elif self.mode[i] == 1:
+        self.selected[i] = len(self.info.partDifficulties[self.players[i].part.id])
+  
+  def scrollDown(self, i):
+    self.selected[i] += 1
+    if self.mode[i] == 0:
+      if self.selected[i] == len(self.parts[i]):
+        self.selected[i] = 0
+    elif self.mode[i] == 1:
+      if self.selected[i] == len(self.info.partDifficulties[self.players[i].part.id]):
+        self.selected[i] = 0
+  
+  def keyPressed(self, key, unicode):
+    c = self.engine.input.controls.getMapping(key)
+    for i in range(len(self.players)):
+      if key in [pygame.K_ESCAPE, pygame.K_RETURN, pygame.K_LCTRL, pygame.K_RCTRL, pygame.K_UP, pygame.K_DOWN, pygame.K_RIGHT, pygame.K_LEFT, pygame.K_SPACE]:
+        continue
+      if c and c in self.players[i].keyList:
+        break
+    else:
+      i = self.keyControl
+    if c in self.yes + [self.players[i].keyList[Player.UP]] or key == pygame.K_RETURN:
+      if self.mode[i] == 0:
+        self.players[i].part = self.parts[i][self.selected[i]]
+        for j, d in enumerate(self.info.partDifficulties[self.players[i].part.id]):
+          if d == self.players[i].difficulty:
+            self.selected[i] = j
+        else:
+          self.selected[i] = 0
+        self.mode[i] += 1
+      elif self.mode[i] == 1:
+        self.players[i].difficulty = self.info.partDifficulties[self.players[i].part.id][self.selected[i]]
+        if i not in self.readyPlayers:
+          self.engine.data.acceptSound.play()
+          self.readyPlayers.append(i)
+        if len(self.readyPlayers) == len(self.players):
+          self.retVal = True
+          self.engine.view.popLayer(self)
+      return True
+    elif c in self.no + [self.players[i].keyList[Player.KEY2]] or key == pygame.K_ESCAPE:
+      if self.mode[i] == 0:
+        if c in Player.menuNo:
+          self.engine.data.cancelSound.play()
+          self.retVal = False
+          self.engine.view.popLayer(self)
+      elif self.mode[i] == 1:
+        self.engine.data.cancelSound.play()
+        if i in self.readyPlayers:
+          self.readyPlayers.remove(i)
+        else:
+          self.mode[i] = 0
+          for j, p in enumerate(self.parts[i]):
+            if p == self.players[i].part:
+              self.selected[i] = j
+              break
+          else:
+            self.selected[i] = 0
+      return True
+    elif key == pygame.K_LEFT:
+      self.scrolling[self.keyControl] = 0
+      self.keyControl -= 1
+      if self.keyControl < 0:
+        self.keyControl = len(self.players)
+    elif key == pygame.K_RIGHT:
+      self.scrolling[self.keyControl] = 0
+      self.keyControl += 1
+      if self.keyControl >= len(self.players):
+        self.keyControl = 0
+    elif i in self.readyPlayers:
+      return True
+    elif c in self.up + [self.players[i].keyList[Player.UP]] or key == pygame.K_UP:
+      self.scrolling[i] = 1
+      self.scrollUp(i)
+      self.delay[i] = self.engine.scrollDelay
+    elif c in self.down + [self.players[i].keyList[Player.DOWN]] or key == pygame.K_DOWN:
+      self.scrolling[i] = 2
+      self.scrollDown(i)
+      self.delay[i] = self.engine.scrollDelay
+    elif key == pygame.K_SPACE:
+      pass
+    return True
+  
+  def keyReleased(self, key):
+    c = self.engine.input.controls.getMapping(key)
+    for i in range(len(self.players)):
+      if key in [pygame.K_ESCAPE, pygame.K_RETURN, pygame.K_LCTRL, pygame.K_RCTRL, pygame.K_UP, pygame.K_DOWN, pygame.K_RIGHT, pygame.K_LEFT]:
+        continue
+      if c and c in self.players[i].keyList:
+        break
+    else:
+      i = self.keyControl
+    self.scrolling[i] = 0
+  
+  def run(self, ticks):
+    self.time += ticks/50.0
+    for i in range(len(self.players)):
+      if self.scrolling[i] > 0:
+        self.delay[i] -= ticks
+        self.rate[i] += ticks
+        if self.delay[i] <= 0 and self.rate[i] >= self.engine.scrollRate:
+          self.rate[i] = 0
+          self.scroller[self.scrolling[i]](i)
+    self.engine.theme.partDiff.run(ticks)
+  
+  def render(self, visibility, topMost):
+    self.engine.view.setOrthogonalProjection(normalize = True)
+    self.engine.view.setViewport(1,0)
+    w, h = self.geometry
+    
+    if self.img_background:
+      self.engine.drawImage(self.img_background, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 3)
+    try:
+      self.theme.partDiff.renderPanels(self)
+    finally:
+      self.engine.view.resetProjection()
 
 class ItemChooser(BackgroundLayer, KeyListener):
   """Item menu layer."""
@@ -2318,6 +2532,15 @@ def chooseAvatar(engine):
   d = AvatarChooser(engine)
   _runDialog(engine, d)
   return d.getAvatar()
+
+def choosePartDiffs(engine, parts, info, players):
+  """
+  Have the user select their part and difficulty.
+  
+  """
+  d = PartDiffChooser(engine, parts, info, players)
+  _runDialog(engine, d)
+  return d.retVal
 
 # evilynux - Show creadits
 def showCredits(engine):

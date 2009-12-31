@@ -56,7 +56,7 @@ class Guitar(Instrument):
 
     
     self.debugMode = False
-    self.gameMode2p = self.engine.config.get("game","multiplayer_mode")
+    self.gameMode2p = self.engine.world.multiMode
     self.matchingNotes = []
     
     self.starSpinFrameIndex = 0

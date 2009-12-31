@@ -44,6 +44,14 @@ class Scene(BackgroundLayer, KeyListener):
     self.actors  = []
     self.players = self.engine.world.getPlayers()
     self.controls = engine.input.controls
+    
+    #for simplification of theme writing
+    self.fontDict         = self.engine.data.fontDict
+    self.geometry         = self.engine.view.geometry[2:4]
+    self.fontScreenBottom = self.engine.data.fontScreenBottom
+    self.aspectRatio      = self.engine.view.aspectRatio
+    self.drawImage        = self.engine.drawImage
+    self.drawStarScore    = self.engine.drawStarScore
   
   def addPlayer(self, player):
     self.players.append(player)

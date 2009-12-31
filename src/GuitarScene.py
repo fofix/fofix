@@ -123,14 +123,14 @@ class GuitarScene(Scene):
     self.countdownOK = False
     
     #MFH - retrieve game parameters:
-    self.gamePlayers = self.engine.config.get("game", "players")
-    self.gameMode1p = self.engine.config.get("game","game_mode")
-    self.gameMode2p = self.engine.config.get("game","multiplayer_mode")
+    self.gamePlayers = len(self.engine.world.players)
+    self.gameMode1p = self.engine.world.gameMode
+    self.gameMode2p = self.engine.world.multiMode
     self.lostFocusPause = self.engine.config.get("game", "lost_focus_pause")
 
     if self.sinfo.bossBattle == "True" and self.gameMode1p == 2 and self.gamePlayers == 1:
       self.bossBattle = True
-      self.engine.config.set("player1","mode_2p","6")
+      self.engine.world.multiMode = 6
       self.gameMode2p = 6
       self.gamePlayers = 2
     if self.gameMode1p == 2:
@@ -235,8 +235,6 @@ class GuitarScene(Scene):
 
       if player.practiceMode:
         self.practiceMode = True
-      player.keyList = Player.playerkeys[j]
-      player.configController()
       if guitar:
         player.guitarNum = gNum
         gNum += 1
@@ -2161,8 +2159,6 @@ class GuitarScene(Scene):
     
     self.keysList = []
     for i, player in enumerate(self.playerList):
-      player.keyList = Player.playerkeys[i]
-      player.configController()
       if self.instruments[i].isDrum:
         self.keysList.append(player.drums)
       elif self.instruments[i].isVocal:
@@ -2237,8 +2233,7 @@ class GuitarScene(Scene):
     self.engine.view.popLayer(self.menu)
     self.engine.view.popLayer(self.failMenu)
     self.freeResources()
-    self.engine.config.set("game","game_mode", 1)
-    # self.session.world.deleteScene(self)
+    self.engine.world.gameMode = 1
     self.engine.world.createScene("SongChoosingScene")
 
   def changeSong(self):

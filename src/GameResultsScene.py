@@ -142,12 +142,28 @@ class GameResultsScene(Scene):
     self.tsHandicap  = _("Adjusted Score Multiplier:")
     self.tsOriginal  = _("Original Score:")
     
-    items = [
-      (_("Continue"),       self.changeSong),
-      (_("Replay"),         self.replay),
-      #(_("Detailed Stats"), self.stats), #akedrou - to do
-      (_("Quit"),           self.quit),
-    ]
+    if len(self.engine.world.songQueue) == 0:
+      if self.engine.world.playingQueue:
+        items = [
+        (_("Continue"),       self.changeSong),
+        (_("Replay Setlist"), self.replaySetlist),
+        #(_("Detailed Stats"), self.stats), #akedrou - to do
+        (_("Quit"),           self.quit),
+      ]
+      else:
+        items = [
+          (_("Continue"),       self.changeSong),
+          (_("Replay"),         self.replay),
+          #(_("Detailed Stats"), self.stats), #akedrou - to do
+          (_("Quit"),           self.quit),
+        ]
+    else:
+      items = [
+        (_("Continue"),       self.changeSong),
+        (_("End Setlist"),    self.endSetlist),
+        #(_("Detailed Stats"), self.stats), #akedrou - to do
+        (_("Quit"),           self.quit),
+      ]
     
     self.menu = Menu(self.engine, items, onCancel = self.quit, name = "gameresult", pos = (self.engine.theme.result_menu_x, self.engine.theme.result_menu_y))
     
@@ -427,14 +443,32 @@ class GameResultsScene(Scene):
     self.background = None
     self.song = None
     self.engine.view.popLayer(self.menu)
-    # self.session.world.deleteScene(self)
     self.engine.world.createScene("GuitarScene", libraryName = self.libraryName, songName = self.songName, Players = len(self.playerList))
+  
+  def replaySetlist(self):
+    self.background = None
+    self.song = None
+    self.engine.view.popLayer(self.menu)
+    self.engine.world.songQueue.replayFullQueue()
+    self.engine.world.createScene("SongChoosingScene")
+  
+  def endSetlist(self):
+    self.background = None
+    self.song = None
+    self.engine.view.popLayer(self.menu)
+    self.engine.world.songQueue.reset()
+    self.engine.world.playingQueue = False
+    self.engine.world.createScene("SongChoosingScene")
   
   def changeSong(self):
     self.background = None
     self.song = None
     self.engine.view.popLayer(self.menu)
-    # self.session.world.deleteScene(self)
+    if self.engine.world.playingQueue:
+      if self.coOpScoring:
+        self.engine.world.songQueue.addScores(self.coOpScoring)
+      else:
+        self.engine.world.songQueue.addScores(self.scoring)
     self.engine.world.createScene("SongChoosingScene")
   
   def stats(self):
@@ -535,7 +569,7 @@ class GameResultsScene(Scene):
       scores_ext[player.getDifficultyInt()] = [(scoreHash, self.scoring[i].stars) + scoreExt]
       d["scores"] = binascii.hexlify(Cerealizer.dumps(scores))
       d["scores_ext"] = binascii.hexlify(Cerealizer.dumps(scores_ext))
-      url = self.engine.config.get("game", "uploadurl_w67_starpower")
+      url = self.engine.config.get("network", "uploadurl_w67_starpower")
       data = urllib.urlopen(url + "?" + urllib.urlencode(d)).read()
       Log.debug("Score upload result: %s" % data)
       return data   #MFH - want to return the actual result data.
@@ -558,7 +592,7 @@ class GameResultsScene(Scene):
         self.highscoreIndex[i] = self.song.info.addHighscore(self.playerList[i].difficulty, self.finalScore[i], scoreCard.stars, self.playerList[i].name, part = self.playerList[i].part, scoreExt = scoreExt)
         self.song.info.save()
         
-        if self.engine.config.get("game", "uploadscores"):
+        if self.engine.config.get("network", "uploadscores"):
           self.uploadingScores[i] = True
           fn = lambda: self.uploadHighscores(part = self.playerList[i].part, playerNum = i, scoreExt = scoreExt)
           

@@ -768,7 +768,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(self.engine, self.engine.config, "game", "resume_countdown", autoApply = True), #akedrou
       ConfigChoice(self.engine, self.engine.config, "game", "sp_notes_while_active", autoApply = True, isQuickset = 2),   #myfingershurt - setting for gaining more SP while active
       ConfigChoice(self.engine, self.engine.config, "game", "drum_sp_mode", autoApply = True),#myfingershurt
-      ConfigChoice(self.engine, self.engine.config, "game",  "uploadscores", autoApply = True),
+      ConfigChoice(self.engine, self.engine.config, "network",  "uploadscores", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "audio",  "delay", autoApply = True),     #myfingershurt: so a/v delay can be set without restarting FoF
       (_("Advanced Gameplay Settings"), self.advancedGameSettingsMenu, _("Set advanced gameplay settings that affect the game rules.")),
       (_("Vocal Mode Settings"), self.lyricsSettingsMenu, _("Change settings that affect lyrics and in-game vocals.")),
@@ -1155,9 +1155,9 @@ class SettingsMenu(Menu.Menu):
     Log.debug("settings.baseLibrarySelect function call...")
     newPath = Dialogs.chooseFile(self.engine, masks = ["*/*"], prompt = _("Choose a new songs directory."), dirSelect = True)
     if newPath != None:
-      Config.set("game", "base_library", os.path.dirname(newPath))
-      Config.set("game", "selected_library", os.path.basename(newPath))
-      Config.set("game", "selected_song", "")
+      Config.set("setlist", "base_library", os.path.dirname(newPath))
+      Config.set("setlist", "selected_library", os.path.basename(newPath))
+      Config.set("setlist", "selected_song", "")
       self.engine.resource.refreshBaseLib()   #myfingershurt - to let user continue with new songpath without restart
     
 
@@ -1216,7 +1216,7 @@ class BasicSettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "game", "resume_countdown", autoApply = True), #akedrou
       ConfigChoice(engine, engine.config, "game", "sp_notes_while_active", autoApply = True, isQuickset = 2),   #myfingershurt - setting for gaining more SP while active
       ConfigChoice(engine, engine.config, "game", "drum_sp_mode", autoApply = True),#myfingershurt
-      ConfigChoice(engine, engine.config, "game",  "uploadscores", autoApply = True),
+      ConfigChoice(engine, engine.config, "network",  "uploadscores", autoApply = True),
       ConfigChoice(engine, engine.config, "audio",  "delay", autoApply = True),     #myfingershurt: so a/v delay can be set without restarting FoF
     ]
     FoFiXBasicSettingsMenu = Menu.Menu(engine, FoFiXBasicSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
@@ -1417,9 +1417,9 @@ class BasicSettingsMenu(Menu.Menu):
     Log.debug("settings.baseLibrarySelect function call...")
     newPath = Dialogs.chooseFile(self.engine, masks = ["*/*"], prompt = _("Choose a new songs directory."), dirSelect = True)
     if newPath != None:
-      Config.set("game", "base_library", os.path.dirname(newPath))
-      Config.set("game", "selected_library", os.path.basename(newPath))
-      Config.set("game", "selected_song", "")
+      Config.set("setlist", "base_library", os.path.dirname(newPath))
+      Config.set("setlist", "selected_library", os.path.basename(newPath))
+      Config.set("setlist", "selected_song", "")
       self.engine.resource.refreshBaseLib()   #myfingershurt - to let user continue with new songpath without restart
 
 def quickset(config):

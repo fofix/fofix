@@ -29,6 +29,8 @@ from numpy import array, float32
 
 DEFAULT_SCALE = 0.002
 
+SCREEN_BOTTOM = .75
+
 LEFT   = 0
 CENTER = 1
 RIGHT  = 2
@@ -62,15 +64,16 @@ class Cache(object):
 class Font:
   """A texture-mapped font."""
   def __init__(self, fileName, size, bold = False, italic = False, underline = False, outline = True,
-               scale = 1.0, reversed = False, systemFont = False, shadow = False, shadowoffsetx = .0022, shadowoffsety = .0005):
+               scale = 1.0, reversed = False, systemFont = False, shadow = False, shadowoffsetx = .0022, shadowoffsety = .0005, aspectRatio = (4.0/3.0)):
     pygame.font.init()
-    self.size             = size
-    self.scale            = scale
-    self.outline          = outline
-    self.reversed         = reversed
-    self.shadow         = shadow
-    self.shadowoffsetx = shadowoffsetx
-    self.shadowoffsety = shadowoffsety
+    self.size              = size
+    self.scale             = scale
+    self.outline           = outline
+    self.reversed          = reversed
+    self.shadow            = shadow
+    self.shadowoffsetx     = shadowoffsetx
+    self.shadowoffsety     = shadowoffsety
+    self.aspectRatioFactor = (4.0/3.0)/aspectRatio
     
     # Try loading a system font first if one was requested
     self.font           = None
@@ -103,7 +106,7 @@ class Font:
     except KeyError:
         w,h = self.font.size(s)
 
-    return (w*scale, h*scale)
+    return (w*scale*self.aspectRatioFactor, h*scale)
 
   def loadCache(self):
       pass
@@ -144,7 +147,7 @@ class Font:
     """
     pass
 
-  def render(self, text, pos = (0, 0), rotate = 0, scale = DEFAULT_SCALE, shadowoffset = (.0022, .0005), align = LEFT):
+  def render(self, text, pos = (0, 0), rotate = 0, scale = DEFAULT_SCALE, shadowoffset = (.0022, .0005), align = LEFT, new = False):
     """
     Draw some text.
 
@@ -187,11 +190,12 @@ class Font:
      
     x, y = pos
     scale *= self.scale
-    w, h = w*scale, h*scale
+    w, h = w*scale*self.aspectRatioFactor, h*scale
     if align == CENTER: #we have already done all the calculating. Why not add this? - akedrou
-      x = x - (w/2)
+      x -= (w/2)
     elif align == RIGHT:
-      x = x - w
+      x -= w
+    y -= (h/2)
     tw,th = t.size
     glEnable(GL_TEXTURE_2D)
     glPushMatrix()

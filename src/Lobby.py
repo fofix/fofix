@@ -25,271 +25,315 @@
 
 import pygame
 from OpenGL.GL import *
-import math
-import colorsys
 import os
 import shutil
 
 from View import Layer
 from Input import KeyListener
 from Language import _
+from Player import GUITARTYPES, DRUMTYPES, MICTYPES
 import Dialogs
 import Player
 import Menu
 import Song
 import Config
 
-class Lobby(Layer, KeyListener): #MessageHandler
-  def __init__(self, engine, singlePlayer = False, tutorial = False):
-    self.engine       = engine
-    # self.session      = session
-    self.isRunning    = False
-    self.time         = 0.0
-    self.scrolling    = 0
-    self.rate         = 0
-    self.delay        = 0
-    self.scroller     = [0, self.scrollUp, self.scrollDown]
-    self.gameStarted  = False
-    self.done         = True
-    self.active       = False
-    self.neckB        = 5.0/6.0
-    self.neckT        = 1
-    self.blockedItems  = [1]
-    self.selectedItems = []
-    self.singlePlayer = singlePlayer
-    self.tutorial     = tutorial
-    self.players      = Config.get("game", "players")
-    self.mode1p       = Config.get("game","game_mode")
-    self.mode2p       = Config.get("game","multiplayer_mode")
-    self.lobbyMode    = self.engine.theme.lobbyMode
-    sfxVolume = self.engine.config.get("audio", "SFX_volume")
-    self.engine.data.selectSound.setVolume(sfxVolume)
-    self.engine.data.acceptSound.setVolume(sfxVolume)  #MFH
-    self.engine.data.cancelSound.setVolume(sfxVolume)  #MFH
+class ControlConfigError(Exception):
+  def __str__(self):
+    return _("Your controls are not properly set up for this mode. Please check your settings.")
+
+class WorldNotStarted(Exception):
+  def __str__(self):
+    return _("World error. Please try again.")
+
+class Lobby(Layer, KeyListener):
+  def __init__(self, engine):
+    if not engine.world:
+     raise WorldNotStarted
+    self.engine         = engine
+    self.minPlayers     = self.engine.world.minPlayers
+    self.maxPlayers     = self.engine.world.maxPlayers
+    self.tutorial       = self.engine.world.tutorial
+    self.gameMode       = self.engine.world.gameMode
+    self.multiMode      = self.engine.world.multiMode
+    self.time           = 0.0
+    self.keyControl     = 0
+    self.keyGrab        = False
+    self.scrolling      = [0,0,0,0]
+    self.rate           = [0,0,0,0]
+    self.delay          = [0,0,0,0]
+    self.scroller       = [0, self.scrollUp, self.scrollDown]
+    self.gameStarted    = False
+    self.done           = True
+    self.active         = False
+    self.blockedItems   = [1]
+    self.selectedItems  = []
+    self.blockedPlayers = []
+    self.selectedPlayers = []
+    self.playerList     = [None for i in range(4)]
     self.fullView     = self.engine.view.geometry[2:4]
-    # self.session.broker.addMessageHandler(self)
     self.music        = True
     self.creator      = CreateCharacter(self.engine)
     
-    if self.singlePlayer:
-      themename  = self.engine.data.themeLabel
-      self.theme = self.engine.data.theme
+    #key vars
+    self.fontDict         = self.engine.data.fontDict
+    self.geometry         = self.engine.view.geometry[2:4]
+    self.fontScreenBottom = self.engine.data.fontScreenBottom
+    self.aspectRatio      = self.engine.view.aspectRatio
+    self.drawImage        = self.engine.drawImage
+    self.drawStarScore    = self.engine.drawStarScore
+    
+    self.yes        = []
+    self.no         = []
+    self.conf       = []
+    self.up         = []
+    self.down       = []
+    self.controls   = [j for j in self.engine.input.controls.controls]
+    self.allowed    = [True for i in range(4)]
+    for i, type in enumerate(self.engine.input.controls.type):
+      if type in GUITARTYPES:
+        if not self.engine.world.allowGuitar:
+          self.allowed[i] = False
+        else:
+          self.yes.extend([Player.CONTROLS[i][Player.KEY1], Player.CONTROLS[i][Player.KEY1A], Player.CONTROLS[i][Player.START]])
+          self.no.extend([Player.CONTROLS[i][Player.KEY2], Player.CONTROLS[i][Player.KEY2A], Player.CONTROLS[i][Player.CANCEL]])
+          self.conf.extend([Player.CONTROLS[i][Player.KEY3], Player.CONTROLS[i][Player.KEY3A]])
+          self.up.extend([Player.CONTROLS[i][Player.ACTION1], Player.CONTROLS[i][Player.UP]])
+          self.down.extend([Player.CONTROLS[i][Player.ACTION2], Player.CONTROLS[i][Player.DOWN]])
+      elif type in DRUMTYPES:
+        if not self.engine.world.allowDrum:
+          self.allowed[i] = False
+        else:
+          self.yes.extend([Player.CONTROLS[i][Player.DRUM5], Player.CONTROLS[i][Player.DRUM5A], Player.CONTROLS[i][Player.START]])
+          self.no.extend([Player.CONTROLS[i][Player.DRUM1], Player.CONTROLS[i][Player.DRUM1A], Player.CONTROLS[i][Player.CANCEL]])
+          self.conf.extend([Player.CONTROLS[i][Player.DRUMBASS], Player.CONTROLS[i][Player.DRUMBASSA]])
+          self.up.extend([Player.CONTROLS[i][Player.DRUM2], Player.CONTROLS[i][Player.DRUM2A], Player.CONTROLS[i][Player.UP]])
+          self.down.extend([Player.CONTROLS[i][Player.DRUM3], Player.CONTROLS[i][Player.DRUM3A], Player.CONTROLS[i][Player.DOWN]])
+      elif type in MICTYPES:
+        if not self.engine.world.allowMic:
+          self.allowed[i] = False
+        else:
+          self.yes.extend([Player.CONTROLS[i][Player.START]])
+          self.no.extend([Player.CONTROLS[i][Player.CANCEL]])
+          self.up.extend([Player.CONTROLS[i][Player.UP]])
+          self.down.extend([Player.CONTROLS[i][Player.DOWN]])
+    
+    for i, control in enumerate(self.engine.input.controls.controls):
+      if control == "None":
+        self.controls[i] = _("No Controller")
+        self.blockedPlayers.append(i)
+      elif self.allowed[i] == False:
+        self.controls[i] = _("Disabled Controller")
+        self.blockedPlayers.append(i)
+      elif control == "defaultg":
+        self.controls[i] = _("Default Guitar")
+      elif control == "defaultd":
+        self.controls[i] = _("Default Drums")
+      elif control == "defaultm":
+        self.controls[i] = _("Default Microphone")
+    
+    if 4 - len(self.blockedPlayers) < self.minPlayers:
+      raise ControlConfigError
+    
+    self.engine.input.activeGameControls = [i for i in range(4) if i not in self.blockedPlayers]
+    self.engine.input.pluginControls()
+    self.panelOrder = range(4)
+    self.oldOrder   = range(4)
+    
+    themename  = self.engine.data.themeLabel
+    self.theme = self.engine.data.theme
 
-      if not self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "lobby", "lobby.png")):
-        self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "menu", "optionsbg.png"))
-
-      if not self.engine.loadImgDrawing(self, "backgroundTop", os.path.join("themes", themename, "lobby", "lobby_top.png")):
-        self.backgroundTop = None
-
-      if not self.engine.loadImgDrawing(self, "itemSelect", os.path.join("themes", themename, "lobby", "select.png")):
-        self.itemSelect = None
-
-      if not self.engine.loadImgDrawing(self, "infoImg", os.path.join("themes", themename, "lobby", "information.png")):
-        self.infoImg = None
-
-      if not self.engine.loadImgDrawing(self, "chooseCharImg", os.path.join("themes", themename, "lobby", "choosechar.png")):
-        self.chooseCharImg = None
-
-      if not self.engine.loadImgDrawing(self, "defaultAvatar", os.path.join("themes", themename, "avatars", "default.png")):
-        self.engine.loadImgDrawing(self, "defaultAvatar", os.path.join("users", "players", "default.png"))
-      self.engine.loadImgDrawing(self, "defaultNeck",   os.path.join("necks", self.engine.mainMenu.chosenNeck + ".png"))
-      self.engine.loadImgDrawing(self, "randomNeck",    os.path.join("necks", "randomneck.png"))
-      self.engine.loadImgDrawing(self, "buttons", os.path.join("themes", themename, "notes.png"))
-      
-      imgheight = self.buttons.height1()
-      imgwidth  = self.buttons.width1()
-      hFactor = (70.00/imgheight)*6
-      wFactor = 200.00/imgwidth
-      self.buttonScale = min(hFactor, wFactor)
-      imgheight = self.defaultAvatar.height1()
-      imgwidth  = self.defaultAvatar.width1()
+    self.engine.data.loadAllImages(self, os.path.join("themes",themename,"lobby"))
+    
+    if not self.img_default_av:
+      self.engine.data.loadImgDrawing(self, "img_default_av", os.path.join("users", "players", "default.png"))
+    if not self.img_newchar_av:
+      self.engine.data.loadImgDrawing(self, "img_newchar_av", os.path.join("users", "players", "newchar_av.png"))
+    
+    if self.img_default_av:
+      imgheight = self.img_default_av.height1()
+      imgwidth  = self.img_default_av.width1()
       hFactor = 110.00/imgheight
       wFactor = 200.00/imgwidth
-      self.defAvScale = min(hFactor, wFactor)
-      imgheight = self.defaultNeck.height1()
-      imgwidth  = self.defaultNeck.width1()
-      hFactor = (68.00/imgheight)*6
+      self.defaultAvScale = min(hFactor, wFactor)
+    if self.img_newchar_av:
+      imgheight = self.img_newchar_av.height1()
+      imgwidth  = self.img_newchar_av.width1()
+      hFactor = 110.00/imgheight
       wFactor = 200.00/imgwidth
-      self.defNeckScale = min(hFactor, wFactor)
-      imgheight = self.randomNeck.height1()
-      imgwidth  = self.randomNeck.width1()
-      hFactor = (68.00/imgheight)*6
-      wFactor = 200.00/imgwidth
-      self.randNeckScale = min(hFactor, wFactor)
-      
-      self.tsChooseChar = _("Choose Your Character")
-      self.tsPlayerStr  = _("Player %d")
-      self.playerNum  = 0
-      self.tsDrumFlip = (_("Regular Drums"), _("Flipped Drums"))
-      self.tsAutoKick = (_("Pedal-Using"), _("Footless"))
-      self.tsAssist   = (_("Assist Mode Off"), _("Easy Assist"), _("Medium Assist"))
-      self.tsTwoChord = (_("Chordmaster"), _("Two Notes Max"))
-      self.tsInfo     = _("Information:")
-      self.tsList     = [("0","1"), self.tsDrumFlip, self.tsAutoKick, self.tsAssist, self.tsTwoChord]
-      
-      self.controlDict = Player.controlDict
-      self.selected = 0
-      self.screenOptions = self.engine.theme.lobbySelectLength
-      self.pos = (0, self.screenOptions)
-      self.getPlayers()
+      self.newCharAvScale = min(hFactor, wFactor)
+    
+    self.tsChooseChar = _("Choose Your Character")
+    self.tsPlayerStr  = _("Player %d")
+    self.playerNum  = 0
+    self.tsDrumFlip = (_("Regular Drums"), _("Flipped Drums"))
+    self.tsAutoKick = (_("Pedal-Using"), _("Footless"))
+    self.tsAssist   = (_("Assist Mode Off"), _("Easy Assist"), _("Medium Assist"))
+    self.tsTwoChord = (_("Chordmaster"), _("Two Notes Max"))
+    self.tsInfo     = _("Information:")
+    self.tsList     = [("0","1"), self.tsDrumFlip, self.tsAutoKick, self.tsAssist, self.tsTwoChord]
+    
+    self.controlDict = Player.controlDict
+    self.selected = [0,0,0,0]
+    self.panelMode = [0,0,0,0] #panel mode: 0 = select; 1 = create/edit
+    self.screenOptions = self.engine.theme.lobbySelectLength
+    self.pos = [(0, self.screenOptions), (0, self.screenOptions), (0, self.screenOptions), (0, self.screenOptions)]
+    self.getPlayers()
       
     
   def getPlayers(self):
-    if self.creator.updatedName:
-      default = self.creator.updatedName
-      self.creator.updatedName = None
-    else:
-      default = self.engine.config.get("game","player%d" % self.playerNum)
     self.playerNames = Player.playername
     self.playerPrefs = Player.playerpref
     self.options = [_("Create New Player"), _("Saved Characters")]
     self.options.extend(self.playerNames)
-    if self.selected >= len(self.options):
-      self.selected = len(self.options) - 1
+    for i in range(4):
+      if self.selected[i] >= len(self.options):
+        self.selected[i] = len(self.options) - 1
     self.blockedItems = [1]
     for i in self.selectedItems:
       self.blockedItems.append(self.options.index(i))
     self.avatars = [None for i in self.options]
     self.avatarScale = [None for i in self.options]
-    self.necks   = [None for i in self.options]
-    self.neckScale = [None for i in self.options]
-    self.getStartingSelected(default)
+    self.getStartingSelected()
 
-  def getStartingSelected(self, default):
-    if self.engine.input.controls.type[self.engine.input.activeGameControls[self.playerNum]] > 1:
-      self.yes  = [Player.playerkeys[self.playerNum][Player.DRUM5], Player.playerkeys[self.playerNum][Player.DRUM5A]]
-      self.no   = [Player.playerkeys[self.playerNum][Player.DRUM1], Player.playerkeys[self.playerNum][Player.DRUM1A]]
-      self.up   = [Player.playerkeys[self.playerNum][Player.DRUM2], Player.playerkeys[self.playerNum][Player.DRUM2A]]
-      self.down = [Player.playerkeys[self.playerNum][Player.DRUM3], Player.playerkeys[self.playerNum][Player.DRUM3A]]
-      self.conf = [Player.playerkeys[self.playerNum][Player.DRUMBASS], Player.playerkeys[self.playerNum][Player.DRUMBASSA], Player.playerkeys[self.playerNum][Player.START]]
-    else:
-      self.yes  = [Player.playerkeys[self.playerNum][Player.KEY1], Player.playerkeys[self.playerNum][Player.KEY1A]]
-      self.no   = [Player.playerkeys[self.playerNum][Player.KEY2], Player.playerkeys[self.playerNum][Player.KEY2A]]
-      self.up   = [Player.playerkeys[self.playerNum][Player.ACTION1]]
-      self.down = [Player.playerkeys[self.playerNum][Player.ACTION2]]
-      self.conf = [Player.playerkeys[self.playerNum][Player.KEY3], Player.playerkeys[self.playerNum][Player.KEY3A], Player.playerkeys[self.playerNum][Player.START]]
-    if len(self.options) > 2:
-      for i, option in enumerate(self.options):
-        if i < 2: #Just in case someone names their character "Create New Character" or something...
-          continue
-        if option == default:
-          self.selected = i
-          break
+  def getStartingSelected(self):
+    for num in range(4):
+      if self.creator.updatedName and self.creator.playerNum == num:
+        default = self.creator.updatedName
+        self.creator.updatedName = None
+      default = self.engine.config.get("game","player%d" % num)
+      if len(self.options) > 2:
+        for i, option in enumerate(self.options):
+          if i < 2: #Just in case someone names their character "Create New Character" or something...
+            continue
+          if option == default:
+            self.selected[num] = i
+            break
+        else:
+          self.selected[num] = 2
       else:
-        self.selected = 2
-    else:
-      self.selected = 0
-    if self.selected > self.pos[1]:
-      self.pos = (self.selected-self.screenOptions, self.selected)
-    elif self.selected < self.pos[0]:
-      self.pos = (self.selected, self.selected+self.screenOptions)
-    self.loadAvatar()
-    self.loadNeck()
-    if self.selected in self.blockedItems:
-      self.scrollDown()
+        self.selected[num] = 0
+      if self.selected[num] > self.pos[num][1]:
+        self.pos[num] = (self.selected[num]-self.screenOptions, self.selected[num])
+      elif self.selected[num] < self.pos[num][0]:
+        self.pos[num] = (self.selected[num], self.selected[num]+self.screenOptions)
+      self.loadAvatar(num)
+      if self.selected[num] in self.blockedItems:
+        self.scrollDown(num)
   
-  def loadAvatar(self):
-    if self.avatars[self.selected] is not None:
+  def loadAvatar(self, num):
+    if self.avatars[self.selected[num]] is not None:
       return
-    if self.selected > 1:
-      if not self.engine.loadImgDrawing(self, "avatar", os.path.join("users", "players", self.options[self.selected] + ".png")):
-        self.avatars[self.selected] = "Empty"
+    if self.selected[num] > 1:
+      avatar = self.engine.loadImgDrawing(None, "avatar", os.path.join("users", "players", self.options[self.selected[num]] + ".png"))
+      if not avatar:
         return
     else:
-      self.avatars[self.selected] = "Empty"
+      self.avatars[self.selected[num]] = False
       return
-    self.avatars[self.selected] = self.avatar
-    imgheight = self.avatar.height1()
-    imgwidth  = self.avatar.width1()
+    self.avatars[self.selected[num]] = avatar
+    imgheight = avatar.height1()
+    imgwidth  = avatar.width1()
     hFactor = 110.00/imgheight
     wFactor = 200.00/imgwidth
-    self.avatarScale[self.selected] = min(hFactor, wFactor)
-    self.avatar = None
-    
-  def loadNeck(self):
-    if self.necks[self.selected] is not None:
-      return
-    if self.selected > 1:
-      chosenNeck = str(Player.playerpref[self.selected-2][6])
-      if chosenNeck == "randomneck" or chosenNeck == "0" or chosenNeck.lower() == "neck_0":
-        self.necks[self.selected] = "random"
-        return
-      elif chosenNeck == "" or chosenNeck.lower() == "default":
-        self.necks[self.selected] = "Default"
-        return
-      if not self.engine.loadImgDrawing(self, "neck", os.path.join("necks",str(chosenNeck+".png"))):
-        self.necks[self.selected] = "Default"
-        return
-    else:
-      self.necks[self.selected] = "Default"
-      return
-    self.necks[self.selected] = self.neck
-    imgheight = self.neck.height1()
-    imgwidth  = self.neck.width1()
-    hFactor = (68.00/imgheight)*6
-    wFactor = 200.00/imgwidth
-    self.neckScale[self.selected] = min(hFactor, wFactor)
-    self.neck = None
+    self.avatarScale[self.selected[num]] = min(hFactor, wFactor)
     
   def shown(self):
     self.engine.input.addKeyListener(self)
-    self.isRunning = True
-    # if not self.singlePlayer:
-      # n = self.session.id or 1
-      # name = Dialogs.getText(self.engine, _("Enter your name:"), _("Player #%d") % n)
-      # if name:
-        # self.session.world.createPlayer(name)
-      # else:
-        # self.engine.view.popLayer(self)
 
   def hidden(self):
     self.engine.input.removeKeyListener(self)
-    # self.session.broker.removeMessageHandler(self)
     if not self.gameStarted:
-      # self.session.close()
       self.engine.view.pushLayer(self.engine.mainMenu)    #rchiav: use already-existing MainMenu instance
 
+  def preparePlayers(self):
+    c = []
+    n = []
+    for i, name in enumerate(self.playerList):
+      if name is None:
+        continue
+      c.append(name[0])
+      n.append(name[1])
+      self.engine.config.set("game", "player%d" % i, name[1])
+    self.engine.input.activeGameControls = c
+    self.engine.input.pluginControls()
+    for name in n: #this needs to be done after pluginControls so controller assignments are handled properly.
+      self.engine.world.createPlayer(name)
+  
   def handleGameStarted(self):
     self.gameStarted = True
     self.engine.gameStarted = True
     self.engine.view.popLayer(self)
 
-  def keyPressedSP(self, key, unicode):
-    c = self.engine.input.controls.getMapping(key)
-    i = self.playerNum
+  def scrollUp(self, num):
+    self.engine.data.selectSound.play()
+    self.selected[num] -= 1
+    if self.selected[num] < 0:
+      self.selected[num] = len(self.options) - 1
+    while self.selected[num] in self.blockedItems:
+      self.selected[num] -= 1
+    self.loadAvatar(num)
+    if self.selected[num] > self.pos[num][1]:
+      self.pos[num] = (self.selected[num] - self.screenOptions, self.selected[num])
+    elif self.selected[num] < self.pos[num][0]:
+        self.pos[num] = (self.selected[num], self.selected[num]+self.screenOptions)
+    
+  def scrollDown(self, num):
+    self.engine.data.selectSound.play()
+    self.selected[num] += 1
+    while self.selected[num] in self.blockedItems:
+      self.selected[num] += 1
+    if self.selected[num] >= len(self.options):
+      self.selected[num] = 0
+    self.loadAvatar(num)
+    if self.selected[num] > self.pos[num][1]:
+      self.pos[num] = (self.selected[num] - self.screenOptions, self.selected[num])
+    elif self.selected[num] < self.pos[num][0]:
+        self.pos[num] = (self.selected[num], self.selected[num]+self.screenOptions)
+  
+  def keyPressed(self, key, unicode):
+    if not self.active:
+      return
     if self.gameStarted:
       return True
+    c = self.engine.input.controls.getMapping(key)
+    for i in range(4):
+      if key in [pygame.K_ESCAPE, pygame.K_RETURN, pygame.K_LCTRL, pygame.K_RCTRL, pygame.K_UP, pygame.K_DOWN, pygame.K_RIGHT, pygame.K_LEFT, pygame.K_SPACE]:
+        continue
+      if c and c in Player.playerkeys[i]:
+        break
+    else:
+      i = self.keyControl
+      # if self.keyGrab:
+        # if key not in [pygame.K_LEFT, pygame.K_RIGHT, pygame.K_SPACE, pygame.K_ESCAPE, pygame.K_RETURN]:
+          # return True
+        # elif key == pygame.K_RETURN or key == pygame.K_ESCAPE:
+          # key = pygame.K_SPACE
+        # elif key == pygame.K_ESCAPE:
+          # self.panelOrder = self.oldOrder
+          # self.engine.input.activeGameControls = self.panelOrder
+          # self.engine.input.pluginControls()
+          # print "Panel order cancelled: %s" % str(self.panelOrder)
     if c in Player.cancels + self.no or key == pygame.K_ESCAPE:
-#      if self.playerNum == 0: #akedrou - needs fixing.
-      self.engine.data.cancelSound.play()
-      self.engine.view.popLayer(self)
-#      else:
-#        self.playerNum -= 1
-#        self.session.world.deletePlayer(self.session.world.players[self.playerNum])
-#        self.blockedItems.remove(self.selectedItems.pop())
-#        self.engine.data.cancelSound.play()
-#        default = self.engine.config.get("game","player%d" % self.playerNum)
-#        self.getStartingSelected(default)
+      if self.playerList[i] is None and (key==pygame.K_ESCAPE or self.engine.input.p2Nav or i == 0):
+        self.engine.data.cancelSound.play()
+        self.engine.view.popLayer(self)
+      elif self.playerList[i] is not None:
+        self.engine.data.cancelSound.play()
+        self.playerList[i] = None
+        self.blockedItems.remove(self.selected[i])
+        self.blockedPlayers.remove(i)
+        self.selectedItems.remove(self.options[self.selected[i]])
+        self.selectedPlayers.remove(i)
       return True
     elif c in self.yes or key == pygame.K_RETURN:
-      self.engine.data.acceptSound.play()
-      self.scrolling = 0
-      if self.selected == 0:
-        self.done = False
-        self.creator.loadPlayer()
-        self.engine.view.pushLayer(self.creator)
-      elif self.selected > 1:
-        self.engine.world.createPlayer(self.options[self.selected])
-        self.engine.config.set("game", "player%d" % self.playerNum, self.options[self.selected])
-        self.playerNum += 1
-        self.blockedItems.append(self.selected)
-        self.blockedItems.sort()
-        self.selectedItems.append(self.options[self.selected])
-        if self.playerNum >= self.players:
+      if self.playerList[i] is not None:
+        if len([1 for p in self.playerList if p]) >= self.minPlayers and (key==pygame.K_RETURN or self.engine.input.p2Nav or i == 0):
           self.gameStarted = True
           self.engine.menuMusic = False
           self.music = False
           self.engine.mainMenu.cutMusic()
+          self.preparePlayers()
           if self.tutorial:
             self.engine.config.set("game", "selected_library", "songs")
             self.engine.world.startGame(libraryName = Song.DEFAULT_LIBRARY, songName = "tutorial")
@@ -297,120 +341,108 @@ class Lobby(Layer, KeyListener): #MessageHandler
           else:
             self.engine.world.startGame()
             self.handleGameStarted()
-        else:
-          default = self.engine.config.get("game","player%d" % self.playerNum)
-          self.getStartingSelected(default)
+        return True
+      self.engine.data.acceptSound.play()
+      self.scrolling[i] = 0
+      if self.selected[i] == 0:
+        self.done = False
+        self.creator.loadPlayer(i)
+        self.engine.view.pushLayer(self.creator)
+      elif self.selected > 1:
+        self.playerList[i] = (i, self.options[self.selected[i]])
+        self.blockedPlayers.append(i)
+        self.blockedItems.append(self.selected[i])
+        self.blockedItems.sort()
+        self.selectedItems.append(self.options[self.selected[i]])
+        self.selectedPlayers.append(i)
+      return True
+    elif key == pygame.K_SPACE: #todo (allow space to alter the panel order)
+      pass
+      #self.keyGrab ^= True
+      #self.oldOrder = self.panelOrder
+    elif key == pygame.K_LEFT:
+      if self.keyGrab:
+        a = self.panelOrder[self.keyControl]
+      self.scrolling[self.keyControl] = 0
+      self.keyControl -= 1
+      if self.keyControl < 0:
+        self.keyControl = 3
+      if self.keyGrab:
+        self.panelOrder.remove(a)
+        self.panelOrder.insert(self.keyControl, a)
+        self.engine.input.activeGameControls = self.panelOrder
+        self.engine.input.pluginControls()
+    elif key == pygame.K_RIGHT:
+      if self.keyGrab:
+        a = self.panelOrder[self.keyControl]
+      self.scrolling[self.keyControl] = 0
+      self.keyControl += 1
+      if self.keyControl > 3:
+        self.keyControl = 0
+      if self.keyGrab:
+        self.panelOrder.remove(a)
+        self.panelOrder.insert(self.keyControl, a)
+        self.engine.input.activeGameControls = self.panelOrder
+        self.engine.input.pluginControls()
+    elif self.playerList[i] is not None or len([1 for p in self.playerList if p]) >= self.maxPlayers:
+      return True
+    elif i in self.blockedPlayers:
       return True
     elif (c in self.conf or key in [pygame.K_LCTRL, pygame.K_RCTRL]):
       self.engine.data.acceptSound.play()
-      self.creator.loadPlayer(self.options[self.selected])
+      self.creator.loadPlayer(i, self.options[self.selected])
       self.done = False
       self.engine.view.pushLayer(self.creator)
       return True
-    if self.playerNum >= self.players:
-      return True
-    if c in self.up + [Player.playerkeys[self.playerNum][Player.UP]] or key == pygame.K_UP:
-      self.scrolling = 1
-      self.scrollUp()
-      self.delay = self.engine.scrollDelay
+    elif c in self.up + [Player.playerkeys[self.playerNum][Player.UP]] or key == pygame.K_UP:
+      self.scrolling[i] = 1
+      self.scrollUp(i)
+      self.delay[i] = self.engine.scrollDelay
     elif c in self.down + [Player.playerkeys[self.playerNum][Player.DOWN]] or key == pygame.K_DOWN:
-      self.scrolling = 2
-      self.scrollDown()
-      self.delay = self.engine.scrollDelay
-    if self.selected > self.pos[1]:
-      self.pos = (self.selected - self.screenOptions, self.selected)
-    elif self.selected < self.pos[0]:
-        self.pos = (self.selected, self.selected+self.screenOptions)
-    return True
-  
-  def scrollUp(self):
-    self.engine.data.selectSound.play()
-    self.selected -= 1
-    if self.selected < 0:
-      self.selected = len(self.options) - 1
-    while self.selected in self.blockedItems:
-      self.selected -= 1
-    self.loadAvatar()
-    #self.loadNeck()
-    if self.selected > self.pos[1]:
-      self.pos = (self.selected - self.screenOptions, self.selected)
-    elif self.selected < self.pos[0]:
-        self.pos = (self.selected, self.selected+self.screenOptions)
-    
-  def scrollDown(self):
-    self.engine.data.selectSound.play()
-    self.selected += 1
-    while self.selected in self.blockedItems:
-      self.selected += 1
-    if self.selected >= len(self.options):
-      self.selected = 0
-    self.loadAvatar()
-    #self.loadNeck()
-    if self.selected > self.pos[1]:
-      self.pos = (self.selected - self.screenOptions, self.selected)
-    elif self.selected < self.pos[0]:
-        self.pos = (self.selected, self.selected+self.screenOptions)
-  
-  def keyPressed(self, key, unicode):
-    if not self.active:
-      return
-    if self.singlePlayer:
-      return self.keyPressedSP(key, unicode)
-    
-    c = self.engine.input.controls.getMapping(key)
-    if c in Player.cancels + Player.key2s or key == pygame.K_ESCAPE:
-      self.engine.view.popLayer(self)
-    elif (c in [Player.key1s] or key == pygame.K_RETURN) and self.canStartGame():
-      self.gameStarted = True
-      self.engine.world.startGame()      
+      self.scrolling[i] = 2
+      self.scrollDown(i)
+      self.delay[i] = self.engine.scrollDelay
+    if self.selected[i] > self.pos[i][1]:
+      self.pos[i] = (self.selected[i] - self.screenOptions, self.selected[i])
+    elif self.selected[i] < self.pos[i][0]:
+      self.pos[i] = (self.selected[i], self.selected[i]+self.screenOptions)
     return True
 
   def keyReleased(self, key):
-    self.scrolling = 0
+    if self.gameStarted:
+      return True
+    c = self.engine.input.controls.getMapping(key)
+    for i in range(4):
+      if key in [pygame.K_ESCAPE, pygame.K_RETURN, pygame.K_LCTRL, pygame.K_RCTRL, pygame.K_UP, pygame.K_DOWN, pygame.K_RIGHT, pygame.K_LEFT]:
+        continue
+      if c and c in Player.playerkeys[i]:
+        break
+    else:
+      i = self.keyControl
+    self.scrolling[i] = 0
 
   def run(self, ticks):
     self.time += ticks / 50.0
-    self.neckT -= ticks/2000.0
-    if self.neckT < 0.0:
-      self.neckT = 1
-    self.neckB = self.neckT - (1.0/6.0)
-    if self.scrolling > 0:
-      self.delay -= ticks
-      self.rate += ticks
-      if self.delay <= 0 and self.rate >= self.engine.scrollRate:
-        self.rate = 0
-        self.scroller[self.scrolling]()
+    for i in range(4):
+      if self.scrolling[i] > 0:
+        self.delay[i] -= ticks
+        self.rate[i] += ticks
+        if self.delay[i] <= 0 and self.rate[i] >= self.engine.scrollRate:
+          self.rate[i] = 0
+          self.scroller[self.scrolling[i]](i)
     if self.music:
       self.engine.mainMenu.runMusic()
-
-  def canStartGame(self):
-    # return len(self.session.world.players) >= self.players and self.session.isPrimary() and not self.gameStarted
-    return True
+    self.engine.theme.themeLobby.run(ticks)
   
-  def drawNeck(self, w, h, i):
-    twoNeck = False
-    if self.neckB < 0:
-      neckB = 1 - (self.neckB * -1)
-      neckT = 1
-      self.neckB = 0
-      twoNeck = True
-    if self.necks[i] == "Default" or self.necks[i] == None:
-      neck = self.defaultNeck
-      scale = self.defNeckScale
-    elif self.necks[i] == "random":
-      neck = self.randomNeck
-      scale = self.randNeckScale
-    else:
-      neck = self.necks[i]
-      scale = self.neckScale[i]
-    hn = neck.height1()*scale*(self.neckT-self.neckB)
-    self.engine.drawImage(neck, scale = (scale, scale*(self.neckT-self.neckB)), coord = (w*.7, h*.6-(hn/2)), rect = (0, 1, self.neckB, self.neckT))
-    if twoNeck:
-      h2 = neck.height1()*scale*(neckT-neckB)
-      self.engine.drawImage(neck, scale = (scale, scale*(neckT-neckB)), coord = (w*.7, (h*.6)-hn-(h2/2)), rect = (0, 1, neckB, neckT))
-  
-  def renderLocalLobby(self, visibility, topMost):
-    if self.playerNum >= self.players:
+  def render(self, visibility, topMost):
+    if not visibility:
+      self.active = False
+      return
+    if not self.active:
+      self.getPlayers()
+    self.active = True
+    self.done   = True
+    if self.playerNum >= self.maxPlayers:
       return
     self.engine.view.setOrthogonalProjection(normalize = True)
     try:
@@ -422,132 +454,9 @@ class Lobby(Layer, KeyListener): #MessageHandler
     v = ((1 - visibility) **2)
     w, h = self.fullView
     try:
-      if self.background:
-        wFactor = 640.000/self.background.width1()
-        self.engine.drawImage(self.background, scale = (wFactor,-wFactor), coord = (w/2,h/2))
-      r, g, b = self.engine.theme.lobbyTitleColor
-      glColor3f(r, g, b)
-      if self.chooseCharImg:
-        self.engine.drawImage(self.chooseCharImg, scale = (self.engine.theme.lobbyTitleScale,-self.engine.theme.lobbyTitleScale), coord = (w*self.engine.theme.lobbyTitleX,h*self.engine.theme.lobbyTitleY))
-      else:
-        wText, hText = font.getStringSize(self.tsChooseChar, scale = self.engine.theme.lobbyTitleScale)
-        titleFont.render(self.tsChooseChar, (self.engine.theme.lobbyTitleX-(wText),self.engine.theme.lobbyTitleY), scale = self.engine.theme.lobbyTitleScale)
-      r, g, b = self.engine.theme.lobbyPlayerColor
-      glColor3f(r, g, b)
-      wText, hText = titleFont.getStringSize(self.tsPlayerStr % (self.playerNum+1), scale = self.engine.theme.lobbyTitleScale)
-      titleFont.render(self.tsPlayerStr % (self.playerNum+1), (self.engine.theme.lobbyTitleCharacterX-wText/2, self.engine.theme.lobbyTitleCharacterY), scale = self.engine.theme.lobbyTitleScale)
-      for i, name in enumerate(self.options):
-        if i < self.pos[0] or i > self.pos[1]:
-          continue
-        if i == self.selected:
-          if i > 1:
-            #self.drawNeck(w, h, i)
-            j = i-2 #player corresponding
-            lefty = 1
-            if self.playerPrefs[j][0] == 1:
-              lefty = -1
-            self.engine.drawImage(self.buttons, scale = (self.buttonScale*lefty, -self.buttonScale*(1.0/6.0)), coord = (w*self.engine.theme.lobbyPreviewX,h*(self.engine.theme.lobbyPreviewY+.45)), rect = (0, 1, 0, (1.0/6.0)))
-            if self.lobbyMode == 1:
-              avatarCoord = (w*self.engine.theme.lobbyAvatarX,h*self.engine.theme.lobbyAvatarY)
-              avatarScale = self.engine.theme.lobbyAvatarScale
-            else:
-              avatarCoord = (w*self.engine.theme.lobbyPreviewX,h*(self.engine.theme.lobbyPreviewY+.75))
-              avatarScale = 1
-            if self.avatars[i] == "Empty" or self.avatars[i] == None:
-              self.engine.drawImage(self.defaultAvatar, scale = (self.defAvScale*avatarScale,-self.defAvScale*avatarScale), coord = avatarCoord)
-            else:
-              self.engine.drawImage(self.avatars[i], scale = (self.avatarScale[i]*avatarScale,-self.avatarScale[i]*avatarScale), coord = avatarCoord)
-            if self.infoImg:
-              self.engine.drawImage(self.infoImg, scale = (.5,-.5), coord = (w*self.engine.theme.lobbyPreviewX,h*(self.engine.theme.lobbyPreviewY+.55)))
-            else:
-              wText, hText = titleFont.getStringSize(self.tsInfo, scale = .0025)
-              titleFont.render(self.tsInfo, (self.engine.theme.lobbyPreviewX-wText/2, ((.45-self.engine.theme.lobbyPreviewY)*self.engine.data.fontScreenBottom)-hText/2), scale = .0025)
-            r, g, b = self.engine.theme.lobbyInfoColor
-            glColor3f(r, g, b)
-            for k in range(1,5):
-              text = self.tsList[k][self.playerPrefs[j][k]]
-              wText, hText = font.getStringSize(text, scale = .0018)
-              font.render(text, (self.engine.theme.lobbyPreviewX-wText/2,.4-(self.engine.theme.lobbyPreviewY*self.engine.data.fontScreenBottom)+(self.engine.theme.lobbyPreviewSpacing*k)), scale = .0018)
-          if self.itemSelect:
-            self.engine.drawImage(self.itemSelect, scale = (.5,-.5), coord = (w*self.engine.theme.lobbySelectImageX,h*(1-(self.engine.theme.lobbySelectImageY+self.engine.theme.lobbySelectSpace*(i-self.pos[0]))/self.engine.data.fontScreenBottom)))
-          else:
-            r, g, b = self.engine.theme.lobbySelectColor
-            glColor3f(r, g, b)
-        else:
-          if i in self.blockedItems and i != 1:
-            r, g, b = self.engine.theme.lobbyDisableColor
-            glColor3f(r, g, b)
-          else:
-            r, g, b = self.engine.theme.lobbyFontColor
-            glColor3f(r, g, b)
-        if i == 1:
-          wText, hText = titleFont.getStringSize(name, scale = self.engine.theme.lobbySelectScale)
-          titleFont.render(name, (self.engine.theme.lobbySelectX-wText, self.engine.theme.lobbySelectY + (self.engine.theme.lobbySelectSpace*(i-self.pos[0]))), scale = self.engine.theme.lobbySelectScale)
-        else:
-          wText, hText = font.getStringSize(name, scale = self.engine.theme.lobbySelectScale)
-          font.render(name, (self.engine.theme.lobbySelectX-wText, self.engine.theme.lobbySelectY + (self.engine.theme.lobbySelectSpace*(i-self.pos[0]))), scale = self.engine.theme.lobbySelectScale)
-      if self.backgroundTop:
-        wFactor = 640.000/self.backgroundTop.width1()
-        self.engine.drawImage(self.backgroundTop, scale = (wFactor,-wFactor), coord = (w/2,h/2))
-    finally:
-      self.engine.view.resetProjection()
-  
-  def render(self, visibility, topMost):
-    if not visibility:
-      self.active = False
-      return
-    if not self.active:
-      self.getPlayers()
-    self.active = True
-    self.done   = True
-    if self.singlePlayer:
-      self.renderLocalLobby(visibility, topMost)
-      return
-    
-    self.engine.view.setOrthogonalProjection(normalize = True)
-    font = self.engine.data.font
-
-    try:
-      v = 1.0 - ((1 - visibility) ** 2)
-      
-      glEnable(GL_BLEND)
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE)
-      glEnable(GL_COLOR_MATERIAL)
-
-      text = _("Lobby (%d players)") % len(self.engine.world.players)
-      w, h = font.getStringSize(text)
-
-      x = .5 - w / 2
-      d = 0.0
-      c = 1 - .25 * v
-
-      y = .1 - (1.0 - v) * .2
-        
-      for i, ch in enumerate(text):
-        w, h = font.getStringSize(ch)
-        c = i * .05
-        glColor3f(*colorsys.hsv_to_rgb(.75, c, 1))
-        glPushMatrix()
-        s = .25 * (math.sin(i / 2 + self.time / 4) + 2)
-        glTranslate(-s * w / 2, -s * h / 2, 0)
-        font.render(ch, (x, y), scale = 0.002 * s)
-        glPopMatrix()
-        x += w
-
-      x = .1
-      y = .2 + (1 - v) / 4
-      glColor4f(1, 1, 1, v)
-      
-      for player in self.engine.world.players:
-        font.render(player.name, (x, y))
-        y += .08
-
-      if self.canStartGame():
-        s = _("Press Enter to Start Game")
-        sz = 0.0013
-        w, h = font.getStringSize(s, scale = sz)
-        font.render(s, (.5 - w / 2, .65), scale = sz)
-        
+      if self.img_background:
+        self.engine.drawImage(self.img_background, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 3)
+      self.engine.theme.themeLobby.renderPanels(self)
     finally:
       self.engine.view.resetProjection()
 
@@ -563,7 +472,6 @@ class CreateCharacter(Layer, KeyListener):
     self.oldName   = None
     self._cache    = None
     self.selected  = 0
-    self.choice    = 0
     self.scrolling = 0
     self.scrollRate  = self.engine.scrollRate
     self.scrollDelay = self.engine.scrollDelay
@@ -581,23 +489,24 @@ class CreateCharacter(Layer, KeyListener):
     self.choices   = []
     self.avatar    = None
     self.player    = None
+    self.playerNum = 0
     self.neck      = None
     self.updatedName = None
-    self.loadPlayer()
+    self.loadPlayer(0)
     self.dictEnDisable = {0: _("Disabled"), 1: _("Enabled")}
     self.lefty     = {0: 1, 1: -1}
     neckDict       = {0: _("Default Neck"), 1: _("Theme Neck"), 2: _("Select a Neck")}
     self.values    = (self.dictEnDisable, self.dictEnDisable, self.dictEnDisable, {0: _("Disabled"), 1: _("Easy Assist"), 2: _("Medium Assist")}, self.dictEnDisable, neckDict)
     self.options   = [(_("Name"),             _("Name your character!")), \
                       (_("Lefty Mode"),       _("Flip the guitar frets for left-handed playing!")), \
-                      (_("Drum Flip"),        _("Flip the drum sounds - red hits become green, and so on")), \
+                      (_("Drum Flip"),        _("Flip the drum sounds - snare becomes crash, and so on")), \
                       (_("Auto-Kick Bass"),   _("Feet uncooperative? Broke your pedal? Not to worry!")), \
                       (_("Assist Mode"),      _("Play hard and expert, even when you're not that good!")), \
-                      (_("Two-Chord Max"),    _("Cut those jumbo chords down to a more manageable size!")), \
-                      (_("Neck"),             _("Set a custom neck image just for you!")), \
-                      (_("Upload Name"),      _("'Harry Potter' is all well and good, but...")), \
-                      (_("Choose Avatar"),    _("Sometimes I wonder what you look like.")), \
-                      (_("Delete Character"), _("Come on... I didn't mean it. Really, I promise!")), \
+                      (_("Two-Chord Max"),    _("For those still playing with uncooperative keyboards.")), \
+                      (_("Neck"),             _("Give the endless procession of notes a bit of flair!")), \
+                      (_("Upload Name"),      _("To the internet, you are GUITARGOD23047124!")), \
+                      (_("Choose Avatar"),    _("A 256x256 window into your soul.")), \
+                      (_("Delete Character"), _("Quitter.")), \
                       (_("Done"),             _("All finished? Let's do this thing!"))]
     themename = self.engine.data.themeLabel
 
@@ -606,8 +515,9 @@ class CreateCharacter(Layer, KeyListener):
     if not self.engine.loadImgDrawing(self, "backgroundTop", os.path.join("themes", themename, "lobby", "creator_top.png")):
       self.backgroundTop = None
 
-  def loadPlayer(self, player = None):
+  def loadPlayer(self, playerNum, player = None):
     self.choices = []
+    self.playerNum = playerNum
     if player is not None:
       try:
         pref = self.cache.execute('SELECT * FROM `players` WHERE `name` = ?', [player]).fetchone()
@@ -681,6 +591,9 @@ class CreateCharacter(Layer, KeyListener):
         if len(self.choices[self.selected]) > 24:
           self.choices[self.selected] = self.choices[self.selected][:-1]
         self.choices[self.selected] += unicode
+        return
+    if c and not (c in Player.playerkeys[self.playerNum]):
+      if key not in [pygame.K_RETURN, pygame.K_ESCAPE, pygame.K_DOWN, pygame.K_UP, pygame.K_LEFT, pygame.K_RIGHT]:
         return
     if c in Player.key1s or key == pygame.K_RETURN:
       self.scrolling = 0
@@ -835,6 +748,7 @@ class CreateCharacter(Layer, KeyListener):
       if self.background:
         wFactor = 640.000/self.background.width1()
         self.engine.drawImage(self.background, scale = (wFactor,-wFactor), coord = (w/2,h/2))
+      helpFont.render(_("Player %d") % (self.playerNum + 1), pos = (.5, .1), scale = self.engine.theme.characterCreateScale, align = 1)
       for i, option in enumerate(self.options):
         r, g, b = self.engine.theme.characterCreateHelpColor
         glColor3f(r, g, b)

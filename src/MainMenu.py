@@ -27,7 +27,7 @@ from OpenGL.GL import *
 
 from View import BackgroundLayer
 from Menu import Menu
-from Lobby import Lobby
+from Lobby import Lobby, ControlConfigError
 from Language import _
 import Dialogs
 import Config
@@ -59,19 +59,11 @@ class MainMenu(BackgroundLayer):
     
     self.showStartupMessages = False
 
-    #myfingershurt: removing neck menu requirement:
-    #self.neckMenuEnabled = False
-    
-    #self.neckMenuEnabled = Config.get("game", "neck_select_enabled")
-
     self.gfxVersionTag = Config.get("game", "gfx_version_tag")
-
-    #self.tut = Config.get("game", "tut")
+    
     self.chosenNeck = Config.get("game", "default_neck")
     exists = 0
-    #neck fallback to random if doesn't exist.
 
-    # evilynux - first assume the chosenNeck contains the full filename
     if engine.loadImgDrawing(self, "ok", os.path.join("necks",self.chosenNeck+".png")):
       exists = 1
     elif engine.loadImgDrawing(self, "ok", os.path.join("necks","Neck_"+self.chosenNeck+".png")):
@@ -94,7 +86,6 @@ class MainMenu(BackgroundLayer):
       else:
         Log.error("Default chosen neck not valid; fallbacks Neck_1.png and defaultneck.png also not valid!")
 
-    dPlayerConfig = None
     #Get theme
     self.theme = self.engine.data.theme
     self.themeCoOp = self.engine.data.themeCoOp
@@ -103,11 +94,7 @@ class MainMenu(BackgroundLayer):
     
     allowMic = True
     
-    if self.theme == 0:
-      allowMic = False
-
     try:
-      #blazingamer
       self.menux = self.engine.theme.menuX
       self.menuy = self.engine.theme.menuY
     except Exception, e:
@@ -249,7 +236,6 @@ class MainMenu(BackgroundLayer):
       ]
 
       mainMenu = [
-        #( ( _(strSolo), 1, (0,0) ), soloMenu),
         ((strSolo,"solo"), soloMenu),
         ((strMultiplayer,"multiplayer"), multPlayerMenu),
         ((strTraining,"training"),    trainingMenu),
@@ -298,11 +284,9 @@ class MainMenu(BackgroundLayer):
         self.menumusic = True
         self.engine.menuMusic = True
     
-        #self.song = Audio.Sound(self.engine.resource.fileName(sound))
         self.song = Audio.Music(self.engine.resource.fileName(sound))
         self.song.setVolume(self.engine.config.get("audio", "menu_volume"))
-        #self.song.play(-1)
-        self.song.play(0)  #no loop
+        self.song.play(0)
       else:
         self.menumusic = False
         self.engine.menuMusic = False
@@ -339,12 +323,11 @@ class MainMenu(BackgroundLayer):
           Log.error("Traceback:" + traceback.format_exc() )
           traceback.print_exc()
           raise
-      # except socket.error, e:
-        # Dialogs.showMessage(self.engine, unicode(e[1]))
       except KeyboardInterrupt:
         pass
+      except ControlConfigError:
+        Dialogs.showMessage(self.engine, _("Your controls are not properly set up for this mode. Please check your settings."))
       except Exception, e:
-        #MFH - enhancing error trapping and locating logic
         if e:
           Dialogs.showMessage(self.engine, unicode(e))
     return harness
@@ -364,24 +347,13 @@ class MainMenu(BackgroundLayer):
       Dialogs.showMessage(self.engine, _("No tutorials found!"))
       return
 
-    players = Dialogs.activateControllers(self.engine, 1) #akedrou
-    if players == 0:
-      return
+    # players = Dialogs.activateControllers(self.engine, 1) #akedrou
+    # if players == 0:
+      # return
     
-    Config.set("game","game_mode", 0)    #MFH - ensure tutorial can work with new logic that depends on this mode variable
-    Config.set("game","multiplayer_mode", 0)    #MFH - ensure tutorial can work with new logic that depends on this mode variable
-    Config.set("game", "players", 1)
-    Config.set("game", "tut", True)
-    
-    #Config.set("game","game_mode", 1) #MFH - don't force practice mode.... this is problematic.
+    self.engine.startWorld(1, None, 0, 0, tutorial = True)
 
-    # self.engine.startServer()
-    # self.engine.resource.load(self, "session", lambda: self.engine.connect("127.0.0.1"), synch = True)
-    
-    self.engine.startWorld()
-
-    # if Dialogs.showLoadingScreen(self.engine, lambda: self.session and self.session.isConnected):
-    self.launchLayer(lambda: Lobby(self.engine, singlePlayer = True))
+    self.launchLayer(lambda: Lobby(self.engine))
   showTutorial = catchErrors(showTutorial)
 
   #MFH: adding deprecated support for EOF's method of quickstarting a song to test it
@@ -390,58 +362,26 @@ class MainMenu(BackgroundLayer):
   
   def newLocalGame(self, players=1, mode1p=0, mode2p=0, maxplayers = None, allowGuitar = True, allowDrum = True, allowMic = False): #mode1p=0(quickplay),1(practice),2(career) / mode2p=0(faceoff),1(profaceoff)
     self.engine.data.acceptSound.play()
-    players = Dialogs.activateControllers(self.engine, players, maxplayers, allowGuitar, allowDrum, allowMic) #akedrou
-    if players == 0:
-      if self.engine.cmdPlay == 2:
-        self.engine.cmdPlay = 0
-      return
-    Config.set("game", "players", players)
-    Config.set("game","game_mode", mode1p)
-    Config.set("game","multiplayer_mode", mode2p)
-    if Config.get("game", "tut") == True:
-      Config.set("game", "tut", False)
-      #Config.set("game", "selected_library", "")
-      #Config.set("game", "selected_song", "")
-
-    #MFH - testing new traceback logging:
-    #raise TypeError
-
-    # if self.engine.isServerRunning():
+    # players = Dialogs.activateControllers(self.engine, players, maxplayers, allowGuitar, allowDrum, allowMic) #akedrou
+    # if players == 0:
+      # if self.engine.cmdPlay == 2:
+        # self.engine.cmdPlay = 0
       # return
-    # self.engine.startServer()
-    # self.engine.resource.load(self, "session", lambda: self.engine.connect("127.0.0.1"), synch = True)
+
+    self.engine.startWorld(players, maxplayers, mode1p, mode2p, allowGuitar, allowDrum, allowMic)
     
-    self.engine.startWorld()
-    
-    # if Dialogs.showLoadingScreen(self.engine, lambda: self.session and self.session.isConnected):
-    self.launchLayer(lambda: Lobby(self.engine, singlePlayer = True))
+    self.launchLayer(lambda: Lobby(self.engine))
   newLocalGame = catchErrors(newLocalGame)
+  
+  def restartGame(self):
+    splash = Dialogs.showLoadingSplashScreen(self.engine, "")
+    self.engine.view.pushLayer(Lobby(self.engine))
+    Dialogs.hideLoadingSplashScreen(self.engine, splash)
   
   def showMessages(self):
     msg = self.engine.startupMessages.pop()
     self.showStartupMessages = False
     Dialogs.showMessage(self.engine, msg)
-  
-  # def hostMultiplayerGame(self):
-    # self.engine.startServer()
-    # self.engine.resource.load(self, "session", lambda: self.engine.connect("127.0.0.1"))
-
-    # if Dialogs.showLoadingScreen(self.engine, lambda: self.session and self.session.isConnected):
-      # self.launchLayer(lambda: Lobby(self.engine, self.session))
-  # hostMultiplayerGame = catchErrors(hostMultiplayerGame)
-
-  # def joinMultiplayerGame(self, address = None):
-    # if not address:
-      # address = Dialogs.getText(self.engine, _("Enter the server address:"), "127.0.0.1")
-
-    # if not address:
-      # return
-    
-    # self.engine.resource.load(self, "session", lambda: self.engine.connect(address))
-
-    # if Dialogs.showLoadingScreen(self.engine, lambda: self.session and self.session.isConnected, text = _("Connecting...")):
-      # self.launchLayer(lambda: Lobby(self.engine, self.session))
-  # joinMultiplayerGame = catchErrors(joinMultiplayerGame)
 
   def run(self, ticks):
     self.time += ticks / 50.0
@@ -455,7 +395,8 @@ class MainMenu(BackgroundLayer):
     elif self.engine.cmdPlay == 4: #this frame runs the engine an extra loop to allow the font to load...
       #evilynux - improve cmdline support
       self.engine.cmdPlay = 2
-      self.newLocalGame(players = Config.get("game", "players"), mode1p = Config.get("game","game_mode"), mode2p = Config.get("game","multiplayer_mode"))
+      players, mode1p, mode2p = self.engine.cmdMode
+      self.newLocalGame(players = players, mode1p = mode1p, mode2p = mode2p)
     elif self.engine.cmdPlay == 3:
       self.quit()
     
@@ -475,8 +416,7 @@ class MainMenu(BackgroundLayer):
 
     if self.menu.active and not self.active:
       self.active = True
-
-      
+    
     t = self.time / 100
     w, h, = self.engine.view.geometry[2:4]
     r = .5

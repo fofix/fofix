@@ -46,8 +46,6 @@ from View import View
 from Input import Input, KeyListener, SystemEventListener
 from Resource import Resource
 from Data import Data
-#from Server import Server
-#from Session import ClientSession
 from World import World
 from Svg import SvgContext, ImgDrawing
 #alarian
@@ -93,7 +91,6 @@ version = "%s v%s" % ( Version.appNameSexy(), Version.version() )
 # define configuration keys
 Config.define("engine", "highpriority", bool,  False, text = _("FPS Limiter"),           options = {False: _("On (Set Below)"), True: _("Off (Auto Max FPS)")}, tipText = _("Use this to enable or disable the FPS Limiter. If off, the game will render as many frames as possible. (This is affected by the 'Performance' quickset)"))
 Config.define("game",   "adv_settings", bool,  False)
-Config.define("game",   "uploadscores", bool,  False, text = _("Upload Highscores"),    options = {False: _("No"), True: _("Yes")}, tipText = _("If enabled, your high scores will be sent to the server to rank you against other players."))
 Config.define("video",  "fullscreen",   bool,  False,  text = _("Fullscreen Mode"),      options = {False: _("No"), True: _("Yes")}, tipText = _("Play either in fullscreen ('Yes') or windowed ('No') mode."))
 Config.define("video",  "multisamples", int,   4,     text = _("Antialiasing Quality"), options = {0: _("None"), 2: "2x", 4: "4x", 6: "6x", 8: "8x"}, tipText = _("Sets the antialiasing quality of openGL rendering. Higher values reduce jaggediness, but could affect performance. (This is affected by the 'Performance' quickset)"))
 Config.define("video",  "disable_fretsfx", bool, False, text = _("Show Fret Glow Effect"), options = {False: _("Yes"), True: _("No")}, tipText = _("Turn on or off the glow that appears around a fret when you press it."))
@@ -118,11 +115,16 @@ Config.define("audio",  "frequency",    int,   44100, text = _("Sample Frequency
 Config.define("audio",  "bits",         int,   16,    text = _("Sample Bits"), options = [16, 8], tipText = _("Set the sample bits for the audio in the game. You almost certainly want to leave this at 16-bit unless you really know what you're doing."))
 Config.define("audio",  "stereo",       bool,  True)
 
-#MFH - Frame Buffer Object support: nevermind, needs GLEWpy and Pyrex and some other such addon...
-#Config.define("opengl",  "supportfbo",       bool,  True)
+Config.define("network",   "uploadscores", bool,  False, text = _("Upload Highscores"),    options = {False: _("No"), True: _("Yes")}, tipText = _("If enabled, your high scores will be sent to the server to rank you against other players."))
+Config.define("network",   "uploadurl_w67_starpower",    str,   "http://www.wembley1967.com/chart/uploadsp.php") # evilynux - new one starting 20080902
 
-Config.define("game", "selected_library",  str, "")
-Config.define("game", "selected_song",     str, "")
+Config.define("setlist", "selected_library",  str, "")
+Config.define("setlist", "selected_song",     str, "")
+
+Config.define("game", "queue_format", int, 0, text = _("Song Queue System"),     options = {0: _("Disabled"), 1: _("Automatic")}, tipText = _("Enables or disables creating multi-song sets in the setlist."))
+Config.define("game", "queue_order",  int, 0, text = _("Song Queue Order"),      options = {0: _("In Order"), 1: _("Random")}, tipText = _("Sets the order in which songs added to the queue will be played."))
+Config.define("game", "queue_parts",  int, 0, text = _("Song Queue Parts"),      options = {0: _("Closest Available"), 1: _("Always Ask")}, tipText = _("Choose the behavior when the chosen part is not available in all queued songs. 'Closest Available' will match lead parts to guitar and bass to rhythm, or guitar if no rhythm parts are available. 'Always Ask' brings up the part select screen."))
+Config.define("game", "queue_diff",   int, 0, text = _("Song Queue Difficulty"), options = {0: _("Closest Down"), 1: _("Closest Up"), 2: _("Always Ask")}, tipText = _("Choose the behavior when the chosen difficulty is not available in all queued songs. 'Closest Up' will prefer a harder difficulty, while 'Closest Down' will prefer an easier one. 'Always Ask' brings up the difficulty select screen."))
 
 #used internally:
 Config.define("game",   "players",             int,  1)
@@ -130,8 +132,6 @@ Config.define("game",   "player0",             str,  None)
 Config.define("game",   "player1",             str,  None)
 Config.define("game",   "player2",             str,  None)
 Config.define("game",   "player3",             str,  None)
-Config.define("game",   "game_mode",           int,  0)
-Config.define("game",   "multiplayer_mode",    int,  0)
 Config.define("game",   "default_neck",        str, "defaultneck")
 
 Config.define("game","last_theme",           str,  "")
@@ -194,7 +194,6 @@ Config.define("game", "script_lyric_pos",      int,   0,   text = _("Script Lyri
 
 Config.define("game",   "star_claps",          bool, False,  text = _("Starpower Claps"), options = {False: _("Off"), True: _("On")}, tipText = _("Enables a clapping sound effect to be used on the beats in Starpower."))
 Config.define("audio", "disable_preview",      bool, True,  text = _("Song Previews"), options = {False: _("Automatic"), True: _("Yellow Fret (#3)")}, tipText = _("If set to 'Automatic', songs will automatically start previewing when you select them. Otherwise you must press the third fret."))
-Config.define("game", "uploadurl_w67_starpower",    str,   "http://www.wembley1967.com/chart/uploadsp.php") # evilynux - new one starting 20080902
 Config.define("game", "rb_sp_neck_glow",      bool, False,  text = _("RB SP Neck Glow"), options = {False: _("Off"), True: _("On")}, tipText = _("Sets a neck glow effect during SP in RB-type themes."))
 Config.define("game",   "sp_notes_while_active",  int,  2,  text = _("SP Refill Mode"),  options = sortOptionsByKey({0: _("None"), 1: _("By Theme"), 2: _("By MIDI Type"), 3: _("Always")}), tipText = _("Sets whether you can earn more starpower while using it. In 'By MIDI Type', only MIDIs that mark RB-style sections will use this. (This is set by the 'Gameplay' quickset)")) 
 
@@ -314,9 +313,6 @@ Config.define("game", "keep_play_count", int, 1, text = _("Remember Play Count")
 Config.define("game", "tut",       bool, False) #-tutorial
 Config.define("video", "counting",       bool, False,     text = _("Show at Song Start"),             options = {True: _("Part"), False: _("Countdown")}, tipText = _("Sets whether to show a countdown or your name and part at the song's start."))
 Config.define("fretboard", "ovrneckoverlay",       bool, True,     text = _("Overdrive Neck"),             options = {True: _("Overlay"), False: _("Replace")}, tipText = _("Sets the style of the Overdrive neck. 'Replace' replaces your neck with the special neck, while 'Overlay' lays the neck over top."))
-
-Config.define("game", "queue_parts", int, 0, text = _("Song Queue Parts"), options = {0: _("Closest Available"), 1: _("Always Ask")}, tipText = _("Choose the behavior when the chosen part is not available in all queued songs. 'Closest Available' will match lead parts to guitar; and bass to rhythm, or guitar if no rhythm parts are available. 'Always Ask' brings up the part select screen."))
-Config.define("game", "queue_diff",  int, 0, text = _("Song Queue Difficulty"), options = {0: _("Closest Down"), 1: _("Closest Up"), 2: _("Always Ask")}, tipText = _("Choose the behavior when the chosen difficulty is not available in all queued songs. 'Closest Up' will prefer a harder difficulty, while 'Closest Down' will prefer an easier one. 'Always Ask' brings up the difficulty select screen."))
 
 Config.define("game",   "note_hit_window",          int, 2,    text = _("Note Hit Window"), options = sortOptionsByKey({0: _("Tightest"), 1: _("Tight"), 2: _("Standard"), 3: _("Wide"), 4: _("Widest")}), tipText = _("Sets how accurate you need to be while playing."))#racer blazingamer
 
@@ -565,6 +561,7 @@ class GameEngine(Engine):
     self.bufferSize = bufferSize
     
     self.cmdPlay           = 0
+    self.cmdMode           = None
     self.cmdDiff           = None
     self.cmdPart           = None
     
@@ -709,7 +706,8 @@ class GameEngine(Engine):
       self.theme = theme.CustomTheme(themepath, themename)
     except ImportError:
       self.theme = Theme(themepath, themename)
-  
+    
+    self.addTask(self.theme)
 
     
     self.input.addKeyListener(FullScreenSwitcher(self), priority = True)
@@ -752,7 +750,7 @@ class GameEngine(Engine):
     self.audio.close()
     Player.savePlayers()
     Engine.quit(self)
-
+  
   def setStartupLayer(self, startupLayer):
     """
     Set the L{Layer} that will be shown when the all
@@ -809,53 +807,14 @@ class GameEngine(Engine):
     """
     self.view.setGeometry((0, 0, width, height))
     self.svg.setGeometry((0, 0, width, height))
-    
-  # def isServerRunning(self):
-    # return bool(self.server)
-
-  # def startServer(self):
-    # """Start the game server."""
-    # if not self.server:
-      # Log.debug("Starting server.")
-      # self.server = Server(self)
-      # self.addTask(self.server, synchronized = False)
-
-  # def connect(self, host):
-    # """
-    # Connect to a game server.
-
-    # @param host:  Name of host to connect to
-    # @return:      L{Session} connected to remote server
-    # """
-    # Log.debug("Connecting to host %s." % host)
-    # session = ClientSession(self)
-    # session.connect(host)
-    # self.addTask(session, synchronized = False)
-    # self.sessions.append(session)
-    # return session
-
-  # def stopServer(self):
-    # """Stop the game server."""
-    # if self.server:
-      # Log.debug("Stopping server.")
-      # self.removeTask(self.server)
-      # self.server = None
-
-  # def disconnect(self, session):
-    # """
-    # Disconnect a L{Session}
-
-    # param session:    L{Session} to disconnect
-    # """
-    # if session in self.sessions:
-      # Log.debug("Disconnecting.")
-      # self.removeTask(session)
-      # self.sessions.remove(session)
   
-  def startWorld(self):
-    self.world = World(self)
+  def startWorld(self, players, maxplayers = None, gameMode = 0, multiMode = 0, allowGuitar = True, allowDrum = True, allowMic = False, tutorial = False):
+    self.world = World(self, players, maxplayers, gameMode, multiMode, allowGuitar, allowDrum, allowMic, tutorial)
   
   def finishGame(self):
+    if not self.world:
+      Log.notice("GameEngine.finishGame called before World created.")
+      return
     self.world.finishGame()
     self.world = None
     self.gameStarted = False

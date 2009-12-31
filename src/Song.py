@@ -30,6 +30,7 @@ import os
 import re
 import shutil
 import math
+import random
 import Config
 #stump: when we completely drop 2.4 support, change this to just "import hashlib"
 try:
@@ -3663,15 +3664,16 @@ class MidiSectionReader(midi.MidiOutStream):
         text = ""
 
 
-
-
-
+## Stores a list of songs to be played.
 class SongQueue:
   def __init__(self):
     self.songName = []
     self.library = []
     self.diffs = []
     self.parts = [] 
+    self.totalSongName = []
+    self.totalLibrary  = []
+    self.scores = []
 
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:
@@ -3680,13 +3682,55 @@ class SongQueue:
   def __len__(self):
     return len(self.songName)
   
+  def isLastSong(self, songName, library):
+    if len(self.songName) == 0 or len(self.library) == 0:
+      return False
+    if songName == self.songName[-1] and library == self.library[-1]:
+      return True
+    return False
+  
   def addSong(self, songName, library):
+    # Adds a song to the SongQueue.
     self.songName.append(songName)
     self.library.append(library)
   
+  def addSongCheckReady(self, songName, library):
+    # Checks if a song should be added to the SongQueue. If the song is the same as the
+    # previous, assume the player intended to start the game instead.
+    # returns True if game should be started, and False if the song is added to the queue.
+    # @param   songName   folder name of song to be queued.
+    # @param   library    path from the default library to the song's parent folder.
+    # @return  bool       True if game is ready; False if song is added to queue. 
+    if self.isLastSong(songName, library):
+      return True
+    else:
+      self.addSong(songName, library)
+      return False
+  
+  def setFullQueue(self):
+    self.totalSongName = self.songName[:]
+    self.totalLibrary  = self.library[:]
+  
+  def replayFullQueue(self):
+    self.songName = self.totalSongName[:]
+    self.library = self.totalLibrary[:]
+    self.scores = []
+  
   def getSong(self):
+    if len(self.songName) == 0 or len(self.library) == 0:
+      Log.warn("SongQueue.getSong: Empty queue get.")
+      return False
     song = self.songName.pop(0)
     library = self.library.pop(0)
+    return song, library
+  
+  def getRandomSong(self):
+    if len(self.songName) == 0 or len(self.library) == 0:
+      Log.warn("SongQueue.getRandomSong: Empty queue get.")
+      return False
+    n = random.randint(0,len(self.songName)-1)
+    song = self.songName.pop(n)
+    library = self.library.pop(n)
     return song, library
   
   def getParts(self):
@@ -3695,11 +3739,17 @@ class SongQueue:
   def getDiffs(self):
     return self.diffs
   
+  def addScores(self, scores):
+    self.scores.append(scores)
+  
   def reset(self):
+    self.totalSongName = []
+    self.totalLibrary  = []
     self.songName = []
     self.library = []
     self.diffs = []
     self.parts = []
+    self.scores = []
 
 class MidiPartsDiffReader(midi.MidiOutStream):
   
@@ -4047,7 +4097,7 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
     includeTutorials = True
 
   #MFH - Career Mode determination:
-  gameMode1p = engine.config.get("game","game_mode")
+  gameMode1p = engine.world.gameMode
   if gameMode1p == 2:
     careerMode = True
   else:
@@ -4215,7 +4265,7 @@ def getSortingTitles(engine, songList = []):
   
   
 def getAvailableTitles(engine, library = DEFAULT_LIBRARY):
-  gameMode1p = engine.config.get("game","game_mode")
+  gameMode1p = engine.world.gameMode
   if library == None:
     return []
   
@@ -4249,7 +4299,7 @@ def getAvailableSongsAndTitles(engine, library = DEFAULT_LIBRARY, includeTutoria
     return []
 
   #MFH - Career Mode determination:
-  careerMode = (engine.config.get("game","game_mode") == 2)
+  careerMode = (engine.world.gameMode == 2)
   career = False
   quickPlayCareerTiers = engine.config.get("game", "quickplay_tiers")
 
@@ -4263,24 +4313,6 @@ def getAvailableSongsAndTitles(engine, library = DEFAULT_LIBRARY, includeTutoria
   else:
     career = True
   items = items + titles
-  # else:
-    # items = []
-    # titles = []
-    # rootDir = engine.resource.fileName(DEFAULT_LIBRARY)
-
-    # items = getAvailableSongs(engine, rootDir, includeTutorials, progressCallback=progressCallback)
-    # for root, subFolders, files in os.walk(rootDir):
-      # for folder in subFolders:
-        # libName = os.path.join(root,folder)
-        # items = items + getAvailableSongs(engine, libName, includeTutorials, progressCallback=progressCallback)
-        # if quickPlayMode and quickPlayCareerTiers == 0:
-          # titles = []
-        # else:
-          # if quickPlayCareerTiers == 1:
-            # titles = titles + getAvailableTitles(engine, libName)
-    # if quickPlayCareerTiers == 2:
-      # titles = getSortingTitles(engine, items)
-    # items = items + titles
         
   items.sort(lambda a, b: compareSongsAndTitles(engine, a, b, career))
   

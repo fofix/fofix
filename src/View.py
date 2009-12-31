@@ -32,8 +32,8 @@ import Log
 from Task import Task
 
 class Layer(Task):
-  def __getattr__(self, name): #for new out-themed rendering
-    if name.startswith("img_"):
+  def __getattr__(self, name):  #for new out-themed rendering
+    if name.startswith("img_"): #rather than try-except, just expect None on no image.
       return None
     else:
       e = str(self.__class__).split(".")[1] + " has no attribute '%s'" % name
@@ -41,7 +41,7 @@ class Layer(Task):
   
   def render(self, visibility, topMost):
     pass
-    
+  
   def shown(self):
     pass
   
@@ -194,7 +194,7 @@ class View(Task):
             layer.hidden()
           if layer in self.incoming:
             self.incoming.remove(layer)
-      elif layer in self.incoming or layer is topLayer:
+      elif layer in self.incoming or layer is topLayer or layer.isBackgroundLayer():
         if self.visibility[layer] < 1.0:
           self.visibility[layer] = min(1.0, self.visibility[layer] + t)
         else:
