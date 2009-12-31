@@ -248,7 +248,7 @@ class VideoPlayer(BackgroundLayer):
 #      raise NameError("GStreamer error: %s" % err)
     elif type == gst.MESSAGE_WARNING:
       warning, debug = message.parse_warning()
-      Log.warn("GStreamer warning: %s" % warning, debug)
+      Log.warn("GStreamer warning: %s\n(---) %s" % (warning, debug))
     elif type == gst.MESSAGE_STATE_CHANGED:
       oldstate, newstate, pending = message.parse_state_changed()
 #       Log.debug("GStreamer state: %s" % newstate)
@@ -315,4 +315,3 @@ class VideoPlayer(BackgroundLayer):
       glPopMatrix()
     except Exception:
       Log.error("Error attempting to play video")
-
