@@ -874,6 +874,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "coffee", "themename"), #was autoapply... why?
       ConfigChoice(engine, engine.config, "video",  "resolution"),
       ConfigChoice(engine, engine.config, "video",  "fullscreen"),
+      ConfigChoice(engine, engine.config, "video", "disable_screensaver"),  #stump
       ConfigChoice(engine, engine.config, "game", "use_graphical_submenu", autoApply = True, isQuickset = 1),
       (_("Stages Options"), self.stagesOptionsMenu, _("Change settings related to the in-game background.")),
       (_("Choose Default Neck >"), lambda: Dialogs.chooseNeck(self.engine), _("Choose your default neck. You still have to choose which neck you use for your character in the character select screen.")),

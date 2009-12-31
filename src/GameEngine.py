@@ -110,6 +110,9 @@ Config.define("video",  "shader_tail",     str,   "tail2",  text = _("Tails"), o
 Config.define("video",  "shader_notes",     str,   "theme",  text = _("Notes"), options = {"Disabled":_("Disabled"), "notes": _("Metal"), "theme": _("By Theme")}, tipText = _("Gives your notes a metallic sheen. 'By Theme' leaves it to the theme creator."))
 Config.define("video",  "shader_cd",     str,   "cd",  text = _("CDs"), options = {"None":_("Disabled"), "cd": _("White"), "theme": _("By Theme")}, tipText = _("Adds a soft lighting effect to CD labels in CD setlist mode."))
 
+#stump
+Config.define('video',  'disable_screensaver', bool, True, text=_('Disable Screensaver'), options={True: _('Yes'), False: _('No')}, tipText=_('Set whether the game disables the screensaver while it is running.  Does not necessarily work on all platforms.'))
+
 Config.define("performance",  "starspin", bool,     True,  text = _("Animated Star Notes"), options = {True: _("Yes"), False: _("No")}, tipText = _("This will animate star notes as they come towards you, if that is included in your theme. This can have a hit on performance. (This is affected by the 'Performance' quickset)"))
 Config.define("audio",  "frequency",    int,   44100, text = _("Sample Frequency"), options = [8000, 11025, 22050, 32000, 44100, 48000], tipText = _("Set the sample frequency for the audio in the game. You almost certainly want to leave this at 44100 Hz unless you really know what you're doing."))
 Config.define("audio",  "bits",         int,   16,    text = _("Sample Bits"), options = [16, 8], tipText = _("Set the sample bits for the audio in the game. You almost certainly want to leave this at 16-bit unless you really know what you're doing."))
@@ -531,6 +534,8 @@ class GameEngine(Engine):
       icon = fofixicon
 
     self.video             = Video(self.title, icon)
+    if self.config.get("video", "disable_screensaver"):
+      self.video.disableScreensaver()
 
     #self.config.set("game",   "font_rendering_mode", 0) #force oGL mode
 

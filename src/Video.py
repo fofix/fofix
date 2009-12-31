@@ -185,4 +185,31 @@ class Video:
   def getVideoModes(self):
     return pygame.display.list_modes()
 
+  #stump
+  def disableScreensaver(self):
+    if os.name == 'nt':
+      # See the DisableScreensaver and RestoreScreensaver functions in
+      # modules/video_output/msw/common.c in the source code for VLC.
+      import win32gui
+      import win32con
+      import atexit
 
+      Log.debug('Disabling screensaver.')
+
+      old_lowpowertimeout = win32gui.SystemParametersInfo(win32con.SPI_GETLOWPOWERTIMEOUT)
+      if old_lowpowertimeout != 0:
+        atexit.register(lambda: win32gui.SystemParametersInfo(win32con.SPI_SETLOWPOWERTIMEOUT, old_lowpowertimeout))
+        win32gui.SystemParametersInfo(win32con.SPI_SETLOWPOWERTIMEOUT, 0)
+
+      old_powerofftimeout = win32gui.SystemParametersInfo(win32con.SPI_GETPOWEROFFTIMEOUT)
+      if old_powerofftimeout != 0:
+        atexit.register(lambda: win32gui.SystemParametersInfo(win32con.SPI_SETPOWEROFFTIMEOUT, old_powerofftimeout))
+        win32gui.SystemParametersInfo(win32con.SPI_SETPOWEROFFTIMEOUT, 0)
+
+      old_screensavetimeout = win32gui.SystemParametersInfo(win32con.SPI_GETSCREENSAVETIMEOUT)
+      if old_screensavetimeout != 0:
+        atexit.register(lambda: win32gui.SystemParametersInfo(win32con.SPI_SETSCREENSAVETIMEOUT, old_screensavetimeout))
+        win32gui.SystemParametersInfo(win32con.SPI_SETSCREENSAVETIMEOUT, 0)
+
+    else:
+      Log.debug('Screensaver disabling is not implemented on this platform.')
