@@ -1319,11 +1319,11 @@ class PartDiffChooser(MainDialog):
           self.players[i].part = self.parts[i][0]
           self.mode[i] += 1
           if len(self.info.partDifficulties[self.players[i].part.id]) == 1:
-            self.players[i].difficulty = self.info.partDifficulties[self.players[i].part][0]
+            self.players[i].difficulty = self.info.partDifficulties[self.players[i].part.id][0]
             self.readyPlayers.append(i)
             self.selected.append(0)
           else:
-            for j, d in enumerate(self.info.partDifficulties[self.players[i].part]):
+            for j, d in enumerate(self.info.partDifficulties[self.players[i].part.id]):
               if d == self.players[i].difficulty:
                 self.selected.append(j)
                 break
