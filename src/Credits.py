@@ -115,8 +115,6 @@ class Credits(Layer, KeyListener):
     self.speedDir    = 1.0
     self.doneList    = []
     self.themename = Config.get("coffee", "themename")
-    
-    Config.set("game", "selected_library", "songs")
 
     nf = self.engine.data.font
     bf = self.engine.data.bigFont
