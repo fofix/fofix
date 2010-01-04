@@ -1348,9 +1348,9 @@ class PartDiffChooser(MainDialog):
     self.selected[i] -= 1
     if self.selected[i] < 0:
       if self.mode[i] == 0:
-        self.selected[i] = len(self.parts[i])
+        self.selected[i] = len(self.parts[i]) - 1
       elif self.mode[i] == 1:
-        self.selected[i] = len(self.info.partDifficulties[self.players[i].part.id])
+        self.selected[i] = len(self.info.partDifficulties[self.players[i].part.id]) - 1
   
   def scrollDown(self, i):
     self.selected[i] += 1
