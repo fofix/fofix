@@ -989,7 +989,7 @@ class Player(object):
         self.up   = [self.keyList[ACTION1]]
         self.down = [self.keyList[ACTION2]]
       elif self.controlType == 2:
-        self.yes  = [self.keyList[DRUM4], self.keyList[DRUM4A]]
+        self.yes  = [self.keyList[DRUM5], self.keyList[DRUM5A]]
         self.no   = [self.keyList[DRUM1], self.keyList[DRUM1A]]
         self.up   = [self.keyList[DRUM2], self.keyList[DRUM2A]]
         self.down = [self.keyList[DRUM3], self.keyList[DRUM3A]]
