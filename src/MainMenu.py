@@ -181,17 +181,17 @@ class MainMenu(BackgroundLayer):
     
     if self.theme == 1 and self.themeCoOp: #Worldrave - Put GH Co-op ahead of FoFix co-op for GH based theme's. Made more sense.
       multPlayerMenu = [
-        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = -1)),
-        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = -1)),
-        (_("GH Battle"), lambda: self.newLocalGame(players = 2, mode2p = 6, maxplayers = -1, allowDrum = False)), #akedrou- so you can block drums
+        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = 4)),
+        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = 4)),
+        (_("GH Battle"), lambda: self.newLocalGame(players = 2, mode2p = 6, allowDrum = False)), #akedrou- so you can block drums
         (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
         (_("Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 5)),
         (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3, allowMic = allowMic)),   #Worldrave - Re-added this option for now.
       ]
     elif self.theme == 1 and not self.themeCoOp:
       multPlayerMenu = [
-        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = -1)),
-        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = -1)),
+        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = 4)),
+        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = 4)),
         (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
       ]
     elif self.theme == 2:
@@ -199,15 +199,15 @@ class MainMenu(BackgroundLayer):
         (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3, maxplayers = 4, allowMic = allowMic)),
         (_("RB Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 4, maxplayers = 4, allowMic = allowMic)),
         (_("GH Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 5, maxplayers = 4)),
-        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = -1)),
-        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = -1)),
+        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = 4)),
+        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = 4)),
         (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
       ]
     else:
       multPlayerMenu = [
         (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3, allowMic = allowMic)),
-        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = -1)),
-        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = -1)),
+        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = 4)),
+        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = 4)),
         (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
       ]
     
