@@ -141,7 +141,7 @@ class Lobby(Layer, KeyListener):
     self.oldOrder   = range(4)
     
     themename  = self.engine.data.themeLabel
-    self.theme = self.engine.data.theme
+    self.theme = self.engine.theme
 
     self.engine.data.loadAllImages(self, os.path.join("themes",themename,"lobby"))
     
@@ -153,14 +153,14 @@ class Lobby(Layer, KeyListener):
     if self.img_default_av:
       imgheight = self.img_default_av.height1()
       imgwidth  = self.img_default_av.width1()
-      hFactor = 110.00/imgheight
-      wFactor = 200.00/imgwidth
+      hFactor = self.theme.panelAvatarDimension[1]/imgheight
+      wFactor = self.theme.panelAvatarDimension[0]/imgwidth
       self.defaultAvScale = min(hFactor, wFactor)
     if self.img_newchar_av:
       imgheight = self.img_newchar_av.height1()
       imgwidth  = self.img_newchar_av.width1()
-      hFactor = 110.00/imgheight
-      wFactor = 200.00/imgwidth
+      hFactor = self.theme.panelAvatarDimension[1]/imgheight
+      wFactor = self.theme.panelAvatarDimension[0]/imgwidth
       self.newCharAvScale = min(hFactor, wFactor)
     
     self.tsChooseChar = _("Choose Your Character")
@@ -353,6 +353,11 @@ class Lobby(Layer, KeyListener):
         self.blockedPlayers.append(i)
         self.blockedItems.append(self.selected[i])
         self.blockedItems.sort()
+        for p in range(4):
+          if p == i:
+            continue
+          if self.selected[p] in self.blockedItems:
+            self.scrollDown(p)
         self.selectedItems.append(self.options[self.selected[i]])
         self.selectedPlayers.append(i)
       return True
@@ -390,7 +395,7 @@ class Lobby(Layer, KeyListener):
       return True
     elif (c in self.conf or key in [pygame.K_LCTRL, pygame.K_RCTRL]):
       self.engine.data.acceptSound.play()
-      self.creator.loadPlayer(i, self.options[self.selected])
+      self.creator.loadPlayer(i, self.options[self.selected[i]])
       self.done = False
       self.engine.view.pushLayer(self.creator)
       return True

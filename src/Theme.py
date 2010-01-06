@@ -39,6 +39,12 @@ from Language import _
 from Shader import shaders
 from Task import Task
 
+#Theme Constants.
+
+LEFT   = 0
+CENTER = 1
+RIGHT  = 2
+
 # read the color scheme from the config file
 Config.define("theme", "background_color",  str, "#000000")
 Config.define("theme", "base_color",        str, "#FFFFFF")
@@ -401,7 +407,71 @@ Config.define("theme", "fail_text_y",       float, None)
 Config.define("theme", "fail_songname_x",  float, 0.5)
 Config.define("theme", "fail_songname_y",  float, 0.35)
 
+defaultDict = {}
+defaultDict['panelAvatarDimension'] = (200.00, 110.00)
+defaultDict['lobbyTitleText']      = _("Lobby")
+defaultDict['lobbyTitleTextPos']   = (.98, .1)
+defaultDict['lobbyTitleTextAlign'] = RIGHT
+defaultDict['lobbyTitleTextScale'] = .0005
+defaultDict['lobbyTitleTextFont']  = "font"
+
+defaultDict['lobbySubtitleText']      = _("Choose Your Character!")
+defaultDict['lobbySubtitleTextPos']   = (.5, .1)
+defaultDict['lobbySubtitleTextAlign'] = CENTER
+defaultDict['lobbySubtitleTextScale'] = .0015
+defaultDict['lobbySubtitleTextFont']  = "font"
+
+defaultDict['lobbyOptionScale']       = .001
+defaultDict['lobbyOptionAlign']       = CENTER
+defaultDict['lobbyOptionFont']        = "font"
+defaultDict['lobbyOptionPos']         = (.5, .46)
+defaultDict['lobbyOptionSpace']       = .04
+defaultDict['lobbyOptionColor']       = (1,1,1)
+
+defaultDict['lobbySaveCharScale']     = .001
+defaultDict['lobbySaveCharAlign']     = CENTER
+defaultDict['lobbySaveCharFont']      = "font"
+defaultDict['lobbySaveCharColor']     = (1,1,1)
+
+defaultDict['lobbyPanelNameFont']     = "font"
+defaultDict['lobbyPanelNameScale']    = .001
+defaultDict['lobbyPanelNameAlign']    = LEFT
+defaultDict['lobbyControlPos']        = (.5,.375)
+defaultDict['lobbyControlFont']       = "font"
+defaultDict['lobbyControlScale']      = .0025
+defaultDict['lobbyControlAlign']      = CENTER
+defaultDict['lobbyHeaderColor']       = (1,1,1)
+defaultDict['lobbySelectLength']      = 4
+defaultDict['lobbyPanelAvatarDimension'] = (200.00, 110.00)
+
+defaultDict['lobbyKeyboardModColor']  = (1,1,1)
+defaultDict['lobbySelectedColor'] = (1,1,1)
+defaultDict['lobbyDisabledColor'] = (.6,.6,.6)
+
+defaultDict['lobbyPanelSize']    = (.2, .8)
+defaultDict['lobbyPanelSpacing'] = .24
+
+classNames = {'setlist': lambda x: Setlist(x), 'themeLobby': lambda x: ThemeLobby(x), 'partDiff': lambda x: ThemeParts(x)}
+
 class Theme(Task):
+  def __str__(self):
+    return "Default Theme Renderer"
+  
+  def __getattr__(self, attr):
+    try: #getting to this function is kinda slow. Set it on the first get to keep renders from lagging.
+      object.__getattribute__(self, '__dict__')[attr] = defaultDict[attr]
+      if Config.get("game", "log_undefined_gets") == 1:
+        Log.debug("No theme variable for %s - Loading default..." % attr)
+      return object.__getattribute__(self, attr)
+    except KeyError:
+      if attr in classNames.keys():
+        Log.warn("No theme class for %s - Loading default..." % attr)
+        object.__getattribute__(self, '__dict__')[attr] = classNames[attr](self)
+        return object.__getattribute__(self, attr)
+      elif attr.startswith('__') and attr.endswith('__'): #for object's attributes (eg: __hash__, __eq__)
+        return object.__getattribute__(self, attr)
+      Log.error("Attempted to load theme variable %s - no default found." % attr)
+  
   def __init__(self, path, name, iniFile = True):
     self.name = name
     self.path = path
@@ -880,53 +950,6 @@ class Theme(Task):
       self.menuTipTextScrollMode = 0
       self.menuTipTextDisplay = False
       
-      #Lobby
-      self.controlActivateX = .645
-      self.controlActivateSelectX = .5
-      self.controlActivatePartX = .41
-      self.controlActivateY = .18
-      self.controlActivateScale = .0018
-      self.controlActivateSpace = .045
-      self.controlActivatePartSize = 22.000
-      self.controlActivateFont = "font"
-      self.controlDescriptionX = .5
-      self.controlDescriptionY = .13
-      self.controlDescriptionScale = .002
-      self.controlDescriptionFont = "font"
-      self.controlCheckX = .16
-      self.controlCheckY = .26
-      self.controlCheckTextY = .61
-      self.controlCheckPartMult = 2.8
-      self.controlCheckScale = .0018
-      self.controlCheckSpace = .23
-      self.controlCheckFont  = "font"
-      self.lobbyMode = 0
-      self.lobbyPreviewX = .7
-      self.lobbyPreviewY = 0.0
-      self.lobbyPreviewSpacing = .04
-      self.lobbyTitleX = .5
-      self.lobbyTitleY = .07
-      self.lobbyTitleCharacterX = .26
-      self.lobbyTitleCharacterY = .24
-      self.lobbyTitleScale = .0024
-      self.lobbyTitleFont = "loadingFont"
-      self.lobbyAvatarX = .7
-      self.lobbyAvatarY = .75
-      self.lobbyAvatarScale = 1.0
-      self.lobbySelectX = .4
-      self.lobbySelectY = .32
-      self.lobbySelectImageX = .255
-      self.lobbySelectImageY = .335
-      self.lobbySelectScale = .0018
-      self.lobbySelectSpace = .04
-      self.lobbySelectFont = "font"
-      self.lobbySelectLength = 5
-      self.lobbyTitleColor = (1,1,1)
-      self.lobbyInfoColor = (1,1,1)
-      self.lobbyFontColor = (1,1,1)
-      self.lobbyPlayerColor = (1,1,1)
-      self.lobbySelectColor = (1,.75,0)
-      self.lobbyDisableColor = (.4,.4,.4)
       self.characterCreateX = .25
       self.characterCreateY = .15
       self.characterCreateOptionX = .75
@@ -1029,10 +1052,6 @@ class Theme(Task):
       self.submenuX = {}
       self.submenuY = {}
       self.submenuVSpace = {}
-    
-    self.themeLobby = ThemeLobby(self)
-    self.setlist    = Setlist(self)
-    self.partDiff   = ThemeParts(self)
   
   def setSelectedColor(self, alpha = 1.0):
     glColor4f(*(self.selectedColor + (alpha,)))
@@ -1117,6 +1136,8 @@ class Theme(Task):
         return module.CustomLobby(self)
       elif moduleName in ["CustomSetlist", "Setlist"]:
         return module.CustomSetlist(self)
+      elif moduleName in ["CustomParts", "ThemeParts"]:
+        return module.CustomParts(self)
       else:
         return None
     except ImportError:
@@ -1124,6 +1145,8 @@ class Theme(Task):
         return ThemeLobby(self)
       elif moduleName in ["CustomSetlist", "Setlist"]:
         return Setlist(self)
+      elif moduleName in ["CustomParts", "ThemeParts"]:
+        return ThemeParts(self)
       else:
         return None
   
@@ -1140,25 +1163,29 @@ class ThemeLobby:
     y = .1
     w, h = lobby.geometry
     font = lobby.fontDict['font']
-    wP = w*.2
-    hP = h*.8
+    controlFont   = lobby.fontDict[self.theme.lobbyControlFont]
+    panelNameFont = lobby.fontDict[self.theme.lobbyPanelNameFont]
+    optionFont    = lobby.fontDict[self.theme.lobbyOptionFont]
+    saveCharFont  = lobby.fontDict[self.theme.lobbySaveCharFont]
+    wP = w*self.theme.lobbyPanelSize[0]
+    hP = h*self.theme.lobbyPanelSize[1]
     for i in range(4):
-      r = 1
-      if i == 0:
-        if lobby.img_leader:
-          lobby.drawImage(lobby.img_leader, scale = (.5, -.5), coord = (wP*.1+w*x, hP*.95+h*y))
       if i == lobby.keyControl:
         if lobby.img_keyboard:
           lobby.drawImage(lobby.img_keyboard, scale = (.1, -.1), coord = (wP*.8+w*x, hP*.95+h*y))
       j = lobby.panelOrder[i]
       if j in lobby.blockedPlayers:
-        glColor3f(.5,.5,.5)
+        glColor3f(*self.theme.lobbyDisabledColor)
       else:
-        glColor3f(r,1,1)
+        glColor3f(*self.theme.lobbyHeaderColor)
+      if self.theme.lobbyTitleText:
+        lobby.fontDict[self.theme.lobbyTitleTextFont].render(self.theme.lobbyTitleText, self.theme.lobbyTitleTextPos, scale = self.theme.lobbyTitleTextScale, align = self.theme.lobbyTitleTextAlign)
+      if self.theme.lobbySubtitleText:
+        lobby.fontDict[self.theme.lobbySubtitleTextFont].render(self.theme.lobbySubtitleText, self.theme.lobbySubtitleTextPos, scale = self.theme.lobbySubtitleTextScale, align = self.theme.lobbySubtitleTextAlign)
       if lobby.img_panel:
-        lobby.drawImage(lobby.img_panel, scale = (.2, -.8), coord = (wP*.5+w*x,hP*.5+h*y), stretched = 3)
-      font.render(lobby.controls[j], (.2*.5+x, .3+y), scale = .0025, align = 1, new = True)
-      font.render(lobby.options[lobby.selected[j]].lower(), (x, y), scale = .001, align = 0, new = True)
+        lobby.drawImage(lobby.img_panel, scale = (self.theme.lobbyPanelSize[0], -self.theme.lobbyPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = 3)
+      controlFont.render(lobby.controls[j], (self.theme.lobbyPanelSize[0]*self.theme.lobbyControlPos[0]+x, self.theme.lobbyPanelSize[1]*self.theme.lobbyControlPos[1]+y), scale = self.theme.lobbyControlScale, align = self.theme.lobbyControlAlign, new = True)
+      panelNameFont.render(lobby.options[lobby.selected[j]].lower(), (x, y), scale = self.theme.lobbyPanelNameScale, align = self.theme.lobbyPanelNameAlign, new = True)
       for l, k in enumerate(range(lobby.pos[j][0], lobby.pos[j][1]+1)):
         if k >= len(lobby.options):
           break
@@ -1171,13 +1198,17 @@ class ThemeLobby:
             lobby.drawImage(lobby.img_newchar_av, scale = (lobby.newCharAvScale, -lobby.newCharAvScale), coord = (wP*.5+w*x, hP*.7+h*y))
           elif lobby.img_default_av:
             lobby.drawImage(lobby.img_default_av, scale = (lobby.defaultAvScale, -lobby.defaultAvScale), coord = (wP*.5+w*x, hP*.7+h*y))
-          glColor3f(1,0,r)
-        elif j in lobby.blockedPlayers:
-          glColor3f(.5,.5,.5)
+          glColor3f(*self.theme.lobbySelectedColor)
+        elif k in lobby.blockedItems or j in lobby.blockedPlayers:
+          glColor3f(*self.theme.lobbyDisabledColor)
         else:
-          glColor3f(r,1,1)
-        font.render(lobby.options[k], (.2*.5+x,.8*.46+y+.04*l), scale = .001, align = 1, new = True)
-      x += .24
+          glColor3f(*self.theme.lobbyOptionColor)
+        if k == 1:
+          glColor3f(*self.theme.lobbySaveCharColor)
+          saveCharFont.render(lobby.options[k], (self.theme.lobbyPanelSize[0]*self.theme.lobbyOptionPos[0]+x,self.theme.lobbyPanelSize[1]*self.theme.lobbyOptionPos[1]+y+self.theme.lobbyOptionSpace*l), scale = self.theme.lobbySaveCharScale, align = self.theme.lobbySaveCharAlign, new = True)
+        else:
+          optionFont.render(lobby.options[k], (self.theme.lobbyPanelSize[0]*self.theme.lobbyOptionPos[0]+x,self.theme.lobbyPanelSize[1]*self.theme.lobbyOptionPos[1]+y+self.theme.lobbyOptionSpace*l), scale = self.theme.lobbyOptionScale, align = self.theme.lobbyOptionAlign, new = True)
+      x += self.theme.lobbyPanelSpacing
 
 class ThemeParts:
   def __init__(self, theme):
