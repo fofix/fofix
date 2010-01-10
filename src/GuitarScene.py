@@ -97,7 +97,7 @@ class GuitarScene(Scene):
     #myfingershurt: new loading place for "loading" screen for song preparation:
     #blazingamer new loading phrases
     self.sinfo = Song.loadSongInfo(self.engine, songName, library = libraryName)
-    phrase = self.sinfo.loading
+    phrase = self.sinfo.loadingPhrase
     if phrase == "":
       phrase = random.choice(self.engine.theme.loadingPhrase)
       if phrase == "None":
@@ -1191,9 +1191,9 @@ class GuitarScene(Scene):
         if self.hopoStyle > 0 or self.song.info.hopo == "on":
           if not self.instruments[i].isDrum and not self.instruments[i].isVocal:
             if self.hopoStyle == 2 or self.hopoStyle == 3 or self.hopoStyle == 4:  #GH2 style HOPO system
-              self.song.track[i].markHopoGH2(self.song.info.EighthNoteHopo, self.hopoAfterChord, self.song.info.hopofreq)
+              self.song.track[i].markHopoGH2(self.song.info.eighthNoteHopo, self.hopoAfterChord, self.song.info.hopofreq)
             elif self.hopoStyle == 1:   #RF-Mod style HOPO system
-              self.song.track[i].markHopoRF(self.song.info.EighthNoteHopo, self.song.info.hopofreq)
+              self.song.track[i].markHopoRF(self.song.info.eighthNoteHopo, self.song.info.hopofreq)
             #self.song.track[i].removeTempoEvents()  #MFH - perform a little event cleanup on these tracks
       
         if self.battleGH and not self.instruments[i].isVocal:
@@ -1203,9 +1203,9 @@ class GuitarScene(Scene):
             if self.hopoStyle > 0 or self.song.info.hopo == "on":
               if not self.instruments[i].isDrum:
                 if self.hopoStyle == 2 or self.hopoStyle == 3 or self.hopoStyle == 4:  #GH2 style HOPO system
-                  self.song.track[i].markHopoGH2(self.song.info.EighthNoteHopo, self.hopoAfterChord, self.song.info.hopofreq)
+                  self.song.track[i].markHopoGH2(self.song.info.eighthNoteHopo, self.hopoAfterChord, self.song.info.hopofreq)
                 elif self.hopoStyle == 1:   #RF-Mod style HOPO system
-                  self.song.track[i].markHopoRF(self.song.info.EighthNoteHopo, self.song.info.hopofreq)
+                  self.song.track[i].markHopoRF(self.song.info.eighthNoteHopo, self.song.info.hopofreq)
                 #self.song.track[i].removeTempoEvents()  #MFH - perform a little event cleanup on these tracks
             self.song.difficulty[i] = Song.difficulties[self.instruments[i].difficulty]
     
@@ -2534,9 +2534,9 @@ class GuitarScene(Scene):
     #  #myfingershurt: next line commented to prevent everthickening BPM lines
     #  if self.hopoStyle > 0 or self.song.info.hopo == "on":
     #    if self.hopoStyle == 2 or self.hopoStyle == 3 or self.hopoStyle == 4:  #GH2 style HOPO system
-    #      self.song.track[i].markHopoGH2(self.song.info.EighthNoteHopo, self.hopoAfterChord, self.song.info.hopofreq)
+    #      self.song.track[i].markHopoGH2(self.song.info.eighthNoteHopo, self.hopoAfterChord, self.song.info.hopofreq)
     #    elif self.hopoStyle == 1:   #RF-Mod style HOPO system
-    #      self.song.track[i].markHopoRF(self.song.info.EighthNoteHopo, self.song.info.hopofreq)
+    #      self.song.track[i].markHopoRF(self.song.info.eighthNoteHopo, self.song.info.hopofreq)
 
   def startSolo(self, playerNum):   #MFH - more modular and general handling of solos
     i = playerNum

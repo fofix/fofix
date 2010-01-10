@@ -672,7 +672,7 @@ class SongInfo(object):
     return v
 
   def getPartDifficulties(self):
-    if len(self._partDifficulties) is not 0:
+    if len(self._partDifficulties) != 0:
       return self._partDifficulties
     self.getParts()
     return self._partDifficulties
@@ -729,120 +729,84 @@ class SongInfo(object):
   def setName(self, value):
     self._set("name", value)
 
-  def getArtist(self):
+  @property
+  def artist(self):
     return self._get("artist")
 
-  def getAlbum(self):
+  @property
+  def album(self):
     return self._get("album")
 
-  def getGenre(self):
+  @property
+  def genre(self):
     return self._get("genre")
-    
-  def getIcon(self):
+
+  @property
+  def icon(self):
     return self._get("icon")
-  
-  def getBossBattle(self):
+
+  @property
+  def bossBattle(self):
     return self._get("boss_battle")
 
-  def getDiffSong(self):
+  @property
+  def diffSong(self):
     return self._get("diff_band", int, -1)
 
-  def getDiffGuitar(self):
+  @property
+  def diffGuitar(self):
     return self._get("diff_guitar", int, -1)
 
-  def getDiffDrums(self):
+  @property
+  def diffDrums(self):
     return self._get("diff_drums", int, -1)
 
-  def getDiffBass(self):
+  @property
+  def diffBass(self):
     return self._get("diff_bass", int, -1)     
-  
-  def getDiffVocals(self):
+
+  @property
+  def diffVocals(self):
     return self._get("diff_vocals", int, -1)
 
-  def getYear(self):
+  @property
+  def year(self):
     return self._get("year")
 
-  def getLoading(self):
+  @property
+  def loadingPhrase(self):
     return self._get("loading_phrase")
 
-  def getCassetteColor(self):
+  @property
+  def cassetteColor(self):
     c = self._get("cassettecolor")
     if c:
       return Theme.Theme.hexToColor(c)
-  
-  def setCassetteColor(self, color):
-    self._set("cassettecolor", Theme.Theme.colorToHex(color))
-  
-  def setArtist(self, value):
-    self._set("artist", value)
 
-  def setAlbum(self, value):
-    self._set("album", value)
-
-  def setGenre(self, value):
-    self._set("genre", value)
-    
-  def setIcon(self, value):
-    self._set("icon", value)
-    
-  def setBossBattle(self, value):
-    self._set("boss_battle", value)
-
-  def setDiffSong(self, value):
-    self._set("diff_band", value)
-
-  def setDiffGuitar(self, value):
-    self._set("diff_guitar", value)
-
-  def setDiffDrums(self, value):
-    self._set("diff_drums", value)
-
-  def setDiffBass(self, value):
-    self._set("diff_bass", value)       
-  
-  def setDiffVocals(self, value):
-    self._set("diff_vocals", value)
-
-  def setYear(self, value):
-    self._set("year", value)
-
-  def setLoading(self, value):
-    self._set("loading_phrase", value)
-    
   def getScoreHash(self, difficulty, score, stars, name):
     if isinstance(difficulty, Difficulty):
       difficulty = difficulty.id
     return hashlib.sha1("%d%d%d%s" % (difficulty, score, stars, name)).hexdigest()
-    
-  def getDelay(self):
-    return self._get("delay", int, 0)
-    
-  def setDelay(self, value):
-    return self._set("delay", value)
 
-  def getFrets(self):
+  @property
+  def delay(self):
+    return self._get("delay", int, 0)
+
+  @property
+  def frets(self):
     return self._get("frets")
 
-  def setFrets(self, value):
-    self._set("frets", value)
-    
-  def getVersion(self):
+  @property
+  def version(self):
     return self._get("version")
 
-  def setVersion(self, value):
-    self._set("version", value)
-
-  def getTags(self):
+  @property
+  def tags(self):
     return self._get("tags")
 
-  def setTags(self, value):
-    self._set("tags", value)
-
-  def getHopo(self):
+  @property
+  def hopo(self):
     return self._get("hopo")
-
-  def setHopo(self, value):
-    self._set("hopo", value)
 
   def getCount(self):
     return self._get("count")
@@ -850,36 +814,25 @@ class SongInfo(object):
   def setCount(self, value):
     self._set("count", value)
 
-  def getEighthNoteHopo(self):
+  @property
+  def eighthNoteHopo(self):
     return self._get("eighthnote_hopo")
 
-  def setEighthNoteHopo(self, value):
-    self._set("eighthnote_hopo", value)
-
-  def getLyrics(self):
+  @property
+  def lyrics(self):
     return self._get("lyrics")
 
-  def setLyrics(self, value):
-    self._set("lyrics", value)    
-        
-  def getVideo(self):
+  @property 
+  def video(self):
     return self._get("video")
 
-  def getVideoStartTime(self):
+  @property
+  def video_start_time(self):
     return self._get("video_start_time", int, 0)
 
-  def getVideoEndTime(self):
+  @property
+  def video_end_time(self):
     return self._get("video_end_time", int, -1)
-
-  def setVideo(self, value):
-    self._set("video", value)
-
-  def setVideoStartTime(self, value):
-    self._set("video_start_time", value)
-
-  def setVideoEndTime(self, value):
-    self._set("video_end_time", value)
-
 
   def getHighscoresWithPartString(self, difficulty, part = str(parts[GUITAR_PART]) ):
     if part == str(parts[GUITAR_PART]):
@@ -974,7 +927,8 @@ class SongInfo(object):
         return i
     return -1
 
-  def isTutorial(self):
+  @property
+  def tutorial(self):
     return self._get("tutorial", int, 0) == 1
 
   def findTag(self, find, value = None):
@@ -1060,61 +1014,21 @@ class SongInfo(object):
 
 
   #MFH - adding song.ini setting to allow fretter to specify early hit window size (none, half, or full)
-  def getEarlyHitWindowSize(self):  #MFH
+  @property
+  def early_hit_window_size(self):  #MFH
     return self._get("early_hit_window_size", str)
 
-  def setEarlyHitWindowSize(self, value):   #MFH
-    self._set("early_hit_window_size", value)
-
-
-
-  def getHopoFreq(self):  #MFH
+  @property
+  def hopofreq(self):  #MFH
     return self._get("hopofreq")
-
-  def setHopoFreq(self, value):   #MFH
-    self._set("hopofreq", value)
-
-    
+ 
   name          = property(getName, setName)
-  artist        = property(getArtist, setArtist)
-  year          = property(getYear, setYear)
-  loading       = property(getLoading, setLoading)
-  delay         = property(getDelay, setDelay)
-  tutorial      = property(isTutorial)
-#  difficulties  = property(getDifficulties)
-  cassetteColor = property(getCassetteColor, setCassetteColor)
   #New RF-mod Items
   parts         = property(getParts)
-  frets         = property(getFrets, setFrets)
-  version       = property(getVersion, setVersion)
-  tags          = property(getTags, setTags)
-  hopo          = property(getHopo, setHopo)
   count         = property(getCount, setCount)
-  lyrics        = property(getLyrics, setLyrics)
-  EighthNoteHopo = property(getEighthNoteHopo, setEighthNoteHopo)
-  hopofreq = property(getHopoFreq, setHopoFreq)   #MFH
-  #New rb2 setlist
-  album         = property(getAlbum, setAlbum)
-  genre         = property(getGenre, setGenre)
-  icon         = property(getIcon, setIcon)
-  diffSong     = property(getDiffSong, setDiffSong)
-  diffGuitar   = property(getDiffGuitar, setDiffGuitar)
-  diffBass     = property(getDiffBass, setDiffBass)
-  diffDrums    = property(getDiffDrums, setDiffDrums)
-  diffVocals   = property(getDiffVocals, setDiffVocals)
-  #boss battles
-  bossBattle   = property(getBossBattle, setBossBattle)
-  #May no longer be necessary
-  folder        = False
-  
+
   completed     = property(getCompleted, setCompleted)
   sections      = property(getSections)   #MFH
-
-  early_hit_window_size = property(getEarlyHitWindowSize, setEarlyHitWindowSize)   #MFH
-
-  video            = property(getVideo, setVideo)
-  video_start_time = property(getVideoStartTime, setVideoStartTime)
-  video_end_time   = property(getVideoEndTime, getVideoEndTime)
 
 class LibraryInfo(object):
   def __init__(self, libraryName, infoFileName):
@@ -1803,7 +1717,7 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
       if isinstance(event, Note):
         event.number = (5-event.number)%5
 
-  def markHopoRF(self, EighthNH, songHopoFreq):
+  def markHopoRF(self, eighthNH, songHopoFreq):
     lastTick = 0
     lastTime  = 0
     lastEvent = Note
@@ -1822,7 +1736,7 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
 
     #dtb file says 170 ticks
     hopoDelta = 170
-    if str(EighthNH) == "1":
+    if str(eighthNH) == "1":
         hopoDelta = 250
     else:
         hopoDelta = 170
@@ -2040,7 +1954,7 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
 
 
 #---------------------
-  def markHopoGH2(self, EighthNH, HoposAfterChords, songHopoFreq):
+  def markHopoGH2(self, eighthNH, HoposAfterChords, songHopoFreq):
     lastTick = 0
     lastTime  = 0
     lastEvent = Note
@@ -2060,7 +1974,7 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
 
     #dtb file says 170 ticks
     hopoDelta = 170
-    if str(EighthNH) == "1":
+    if str(eighthNH) == "1":
         hopoDelta = 250
     else:
         hopoDelta = 170
