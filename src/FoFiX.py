@@ -68,13 +68,12 @@ Options:
 
 Advanced options:
   --verbose, -v                       Verbose messages
-  --debug,   -d                       Write debug file
   --opengl-error-checking             Enable OpenGL error checking
 
 One-shot mode options (ignored unless in one-shot mode):
   --part=,   -p [part number]         0: Guitar, 1: Rhythm, 2: Bass, 3: Lead
                                       4: Drum,   5: Vocals
-  --diff=,   -l [level of difficulty] 0: Expert, 1: Hard, 2: Medium, 3: Easy
+  --diff=,   -d [difficulty]          0: Expert, 1: Hard, 2: Medium, 3: Easy
                                       (Only applies if "part" is set)
   --mode=,   -m [game mode]           0: Quickplay, 1: Practice, 2: Career
 """ % {"prog": sys.argv[0]}
@@ -89,7 +88,7 @@ One-shot mode options (ignored unless in one-shot mode):
   sys.exit(1)
 
 try:
-  opts, args = getopt.getopt(sys.argv[1:], "hvdc:f:r:t:s:l:p:m:n:", ["help", "verbose", "debug", "config=", "fullscreen=", "resolution=", "theme=", "song=", "diff=", "part=", "mode=", "nbrplayers=", "opengl-error-checking"])
+  opts, args = getopt.getopt(sys.argv[1:], "hvc:f:r:t:s:p:l:d:m:n:", ["help", "verbose", "config=", "fullscreen=", "resolution=", "theme=", "song=", "part=", "diff=", "mode=", "nbrplayers=", "opengl-error-checking"])
 except getopt.GetoptError, e:
   _usage(str(e))  # str(e): error message from getopt, e.g. "option --some-invalid-option not recognized"
 if ('-h', '') in opts or ('--help', '') in opts:
@@ -133,8 +132,6 @@ def main():
   for opt, arg in opts:
     if opt in ["--verbose", "-v"]:
       Log.quiet = False
-    if opt in ["--debug", "-d"]:
-      debug = True
     if opt in ["--config", "-c"]:
       configFile = arg
     if opt in ["--fullscreen", "-f"]:
@@ -145,10 +142,10 @@ def main():
       theme = arg
     if opt in ["--song", "-s"]:
       playing = arg
-    if opt in ["--diff", "-l"]:
-      difficulty = arg      
     if opt in ["--part", "-p"]:
       part = arg
+    if opt in ["--diff", "-d", "-l"]:
+      difficulty = arg      
     #evilynux - Multiplayer and mode selection support
     if opt in ["--mode", "-m"]:
       mode = int(arg)
@@ -208,12 +205,6 @@ def main():
     else:
       Config.set("game", "game_mode", 0)
       Config.set("game", "multiplayer_mode", mode)
-
-  if debug:
-    engine.setDebugModeEnabled(not engine.isDebugModeEnabled())
-    engine.debugLayer.debugOut(engine)
-    engine.quit()
-    return
 
   encoding = Config.get("game", "encoding")
   if encoding is not None:
