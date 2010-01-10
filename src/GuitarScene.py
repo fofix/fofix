@@ -1,4 +1,4 @@
- #####################################################################
+#####################################################################
 # -*- coding: iso-8859-1 -*-                                        #
 #                                                                   #
 # Frets on Fire                                                     #
@@ -57,8 +57,6 @@ try:
 except:
   from sets import Set as set
 
-#myfingershurt: decimal class allows for better handling of fixed-point numbers
-import decimal
 import Log
 import locale
 
@@ -689,9 +687,7 @@ class GuitarScene(Scene):
         if not instrument.isDrum and not instrument.isVocal:
           instrument.debugMode = True
     self.numDecimalPlaces = self.engine.config.get("game","decimal_places")
-    self.decimal = decimal.Decimal
-    self.decPlaceOffset = self.decimal(10) ** -(self.numDecimalPlaces)       # same as Decimal('0.01')
-    #self.decOnePlace = self.decimal('0.01')
+    self.roundDecimalForDisplay = lambda n: ('%%.%df' % self.numDecimalPlaces) % float(n)  #stump
     self.starScoring = self.engine.config.get("game", "star_scoring")#MFH
     self.ignoreOpenStrums = self.engine.config.get("game", "ignore_open_strums") #MFH
     self.muteSustainReleases = self.engine.config.get("game", "sustain_muting") #MFH
@@ -2602,7 +2598,7 @@ class GuitarScene(Scene):
     self.scoring[i].score += soloBonusScore
     if self.coOpType:
       self.coOpScoreCard.score += soloBonusScore
-    trimmedSoloNoteAcc = self.decimal(str(self.guitarSoloAccuracy[i])).quantize(self.decPlaceOffset)
+    trimmedSoloNoteAcc = self.roundDecimalForDisplay(self.guitarSoloAccuracy[i])
     #self.soloReviewText[i] = [soloDesc,str(trimmedSoloNoteAcc) + "% = " + str(soloBonusScore) + _(" pts")]
     #ptsText = _("pts")
     self.soloReviewText[i] = [soloDesc, 
@@ -2630,7 +2626,7 @@ class GuitarScene(Scene):
         self.currentGuitarSoloLastHitNotes[i] = self.instruments[i].currentGuitarSoloHitNotes   #update.
         if self.guitarSoloAccuracyDisplayMode > 0:    #if not off:
           tempSoloAccuracy = (float(self.instruments[i].currentGuitarSoloHitNotes)/float(self.currentGuitarSoloTotalNotes[i]) * 100.0)
-          trimmedIntSoloNoteAcc = self.decimal(str(tempSoloAccuracy)).quantize(self.decPlaceOffset)
+          trimmedIntSoloNoteAcc = self.roundDecimalForDisplay(tempSoloAccuracy)
           if self.guitarSoloAccuracyDisplayMode == 1:   #percentage only
             #soloText = str(trimmedIntSoloNoteAcc) + "%"
             self.solo_soloText[i] = "%s%%" % str(trimmedIntSoloNoteAcc)
@@ -5969,7 +5965,7 @@ class GuitarScene(Scene):
                 sHitAcc = self.scoring[i].hitAccuracy
                 sAvMult = self.scoring[i].avMult
                 sEfHand = self.scoring[i].handicapValue
-              trimmedTotalNoteAcc = self.decimal(str(sHitAcc)).quantize(self.decPlaceOffset)
+              trimmedTotalNoteAcc = self.roundDecimalForDisplay(sHitAcc)
               #text = str(self.playerList[i].notesHit) + "/" + str(self.playerList[i].totalStreakNotes) + ": " + str(trimmedTotalNoteAcc) + "%"
               text = "%(notesHit)s/%(totalNotes)s: %(hitAcc)s%%" % \
                 {'notesHit': str(sNotesHit), 'totalNotes': str(sTotalNotes), 'hitAcc': str(trimmedTotalNoteAcc)}
@@ -5993,7 +5989,7 @@ class GuitarScene(Scene):
                 else:
                   accDispX = 0.110
               font.render(text, (accDispX - w/2, accDispYac),(1, 0, 0),0.00140)     #top-centered by streak under score
-              trimmedAvMult = self.decimal(str(sAvMult)).quantize(self.decPlaceOffset)
+              trimmedAvMult = self.roundDecimalForDisplay(sAvMult)
               #text = _("Avg: ") + str(trimmedAvMult) + "x"
 
               #avgLabel = _("Avg")
@@ -6144,7 +6140,7 @@ class GuitarScene(Scene):
                         glColor3f(1, 1, 0)  #yel
                       else:
                         glColor3f(0.5, 0.5, 0.5)  #gry
-                    text = str(self.decimal(str(self.actualWhammyVol[i])).quantize(self.decPlaceOffset))
+                    text = str(self.roundDecimalForDisplay(self.actualWhammyVol[i]))
                     w, h = font.getStringSize(text,killTsize)
                     font.render(text, (killXpos - w / 2, killYpos),(1, 0, 0),killTsize)     #off to the right slightly above fretboard
                   else:
@@ -6192,7 +6188,7 @@ class GuitarScene(Scene):
               #myfingershurt: first display the accuracy readout:
               if self.dispAccuracy[i] and not self.pause and not self.failed:
   
-                trimmedAccuracy = self.decimal(str(self.accuracy[i])).quantize(self.decPlaceOffset)
+                trimmedAccuracy = self.roundDecimalForDisplay(self.accuracy[i])
      
             
                 if self.showAccuracy == 1:    #numeric mode
