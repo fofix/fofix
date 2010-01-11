@@ -408,12 +408,255 @@ Config.define("theme", "fail_songname_x",  float, 0.5)
 Config.define("theme", "fail_songname_y",  float, 0.35)
 
 defaultDict = {}
-defaultDict['panelAvatarDimension'] = (200.00, 110.00)
-defaultDict['lobbyTitleText']      = _("Lobby")
-defaultDict['lobbyTitleTextPos']   = (.98, .1)
-defaultDict['lobbyTitleTextAlign'] = RIGHT
-defaultDict['lobbyTitleTextScale'] = .0005
-defaultDict['lobbyTitleTextFont']  = "font"
+#Old stuff
+#Colors
+defaultDict['backgroundColor'] = (0,0,0)
+defaultDict['baseColor'] = (1,1,1)
+defaultDict['selectedColor'] = (1,.75,0)
+defaultDict['meshColor'] = (0,0,0)
+defaultDict['hopoColor'] = (0,.667,.667)
+defaultDict['spotColor'] = (1,1,1)
+defaultDict['keyColor'] = (.2,.2,.2)
+defaultDict['key2Color'] = (0,0,0)
+defaultDict['tracksColor'] = (1,1,.5)
+defaultDict['barsColor'] = (1,1,.5)
+defaultDict['glowColor'] = (-2,-2,-2)
+
+#Note Colors (this applies to frets and notes)
+defaultDict['noteColors'] = [(.133,1,.133),(1,.133,.133),(1,1,.133),(.2,.2,1),(1,.6,.3),(.8,.133,.8)]
+defaultDict['spNoteColor'] = (.3,.7,.9)
+defaultDict['killNoteColor'] = (0,0,0)
+defaultDict['use_fret_colors'] = False
+
+#Point of View
+defaultDict['povTargetX'] = None
+defaultDict['povTargetY'] = None
+defaultDict['povTargetZ'] = None
+defaultDict['povOriginX'] = None
+defaultDict['povOriginY'] = None
+defaultDict['povOriginZ'] = None
+
+#Loading phrases
+defaultDict['loadingPhrase'] = ["None"]
+defaultDict['resultsPhrase'] = ["None"]
+
+#Miscellany (aka Garbage no one cares about)
+defaultDict['crowdLoopDelay'] = None
+defaultDict['songInfoDisplayScale'] = .0020
+defaultDict['songInfoDisplayX'] = .05
+defaultDict['songInfoDisplayY'] = .05
+defaultDict['displayAllGreyStars'] = True
+defaultDict['smallMult'] = True
+defaultDict['jurgTextPos'] = [1,1,.00035]
+defaultDict['oBarHScale'] = .7
+defaultDict['oBar3dFill'] = False
+defaultDict['power_up_name'] = None
+
+#Continuous star fillup!
+defaultDict['starFillupCenterX'] = None
+defaultDict['starFillupCenterY'] = None
+defaultDict['starFillupInRadius'] = None
+defaultDict['starFillupOutRadius'] = None
+defaultDict['starFillupColor'] = None
+
+#Neck size, neck choose (yeah? you got a problem with that goruping?)
+defaultDict['neckWidth'] = 3.0
+defaultDict['neckLength'] = 9.0
+defaultDict['neck_prompt_x'] = .1
+defaultDict['neck_prompt_y'] = .05
+
+#Setlist
+defaultDict['songListDisplay'] = 1
+defaultDict['setlistguidebuttonsposX'] = .408
+defaultDict['setlistguidebuttonsposY'] = .0322
+defaultDict['setlistguidebuttonsscaleX'] = .29
+defaultDict['setlistguidebuttonsscaleY'] = .308
+defaultDict['setlistpreviewbuttonposX'] = .5
+defaultDict['setlistpreviewbuttonposY'] = .5
+defaultDict['setlistpreviewbuttonscaleX'] = .5
+defaultDict['setlistpreviewbuttonscaleY'] = .5
+defaultDict['versiontagposX'] = .5
+defaultDict['versiontagposY'] = .5
+defaultDict['songSelectSubmenuOffsetLines'] = 2
+defaultDict['songSelectSubmenuOffsetSpaces'] = 2
+defaultDict['songSelectSubmenuX'] = None
+defaultDict['songSelectSubmenuY'] = None
+defaultDict['song_cd_Xpos'] = 0.0
+defaultDict['song_listcd_cd_Xpos'] = .75
+defaultDict['song_listcd_cd_Ypos'] = .6
+defaultDict['song_listcd_score_Xpos'] = .6
+defaultDict['song_listcd_score_Ypos'] = .5
+defaultDict['songlist_score_colorVar'] = (.58,.76,.32)
+defaultDict['songlistcd_score_colorVar'] = (1,1,1)
+defaultDict['song_listcd_list_Xpos'] = .1
+defaultDict['song_cdscore_Xpos'] = .6
+defaultDict['song_list_Xpos'] = .15
+defaultDict['song_listscore_Xpos'] = .8
+defaultDict['career_title_colorVar'] = (0,0,0)
+defaultDict['song_name_text_colorVar'] = (1,1,1)
+defaultDict['song_name_selected_colorVar'] = (1,.75,0)
+defaultDict['artist_text_colorVar'] = (.25,.5,1)
+defaultDict['artist_selected_colorVar'] = (.25,.5,1)
+defaultDict['library_text_colorVar'] = (1,1,1)
+defaultDict['library_selected_colorVar'] = (1,.75,0)
+defaultDict['pause_text_colorVar'] = (1,1,1)
+defaultDict['pause_selected_colorVar'] = (1,.75,0)
+defaultDict['fail_completed_colorVar'] = (1,1,1)
+defaultDict['fail_text_colorVar'] = (1,1,1)
+defaultDict['fail_selected_colorVar'] = (1,.75,0)
+defaultDict['song_rb2_diff_colorVar'] = (1,.75,0)
+
+#pause menu and fail menu
+defaultDict['pause_bkg_pos'] = [.5,.5,1.0,1.0]
+defaultDict['pause_text_xPos'] = None
+defaultDict['pause_text_yPos'] = None
+defaultDict['opt_text_colorVar'] = (1,1,1)
+defaultDict['opt_selected_colorVar'] = (1,.75,0)
+defaultDict['opt_bkg_size'] = [.5,.5,1.0,1.0]
+defaultDict['opt_text_xPos'] = None
+defaultDict['opt_text_yPos'] = None
+defaultDict['fail_bkg_pos'] = [.5,.5,1.0,1.0]
+defaultDict['fail_text_xPos'] = None
+defaultDict['fail_text_yPos'] = None
+defaultDict['fail_songname_xPos'] = .5
+defaultDict['fail_songname_yPos'] = .35
+
+#main menu system
+defaultDict['menuX'] = None
+defaultDict['menuY'] = None
+defaultDict['menuRB'] = False
+defaultDict['loadingX'] = .5
+defaultDict['loadingY'] = .6
+defaultDict['loadingColor'] = (1,1,1)
+defaultDict['loadingFScale'] = .0015
+defaultDict['loadingRMargin'] = 1.0
+defaultDict['loadingLSpacing'] = 1.0
+defaultDict['main_menu_scaleVar'] = None
+defaultDict['main_menu_vspacingVar'] = None
+defaultDict['use_solo_submenu'] = None
+defaultDict['sub_menu_xVar'] = None
+defaultDict['sub_menu_yVar'] = None
+defaultDict['versiontag'] = False
+defaultDict['shadowoffsetx'] = .0022
+defaultDict['shadowoffsety'] = .0005
+defaultDict['menuTipTextY'] = .7
+defaultDict['menuTipTextFont'] = "font"
+defaultDict['menuTipTextScale'] = .002
+defaultDict['menuTipTextColor'] = None
+defaultDict['menuTipTextScrollSpace'] = .25
+defaultDict['menuTipTextScrollMode'] = 0
+defaultDict['menuTipTextDisplay'] = False
+
+defaultDict['characterCreateX'] = .25
+defaultDict['characterCreateY'] = .15
+defaultDict['characterCreateOptionX'] = .75
+defaultDict['characterCreateFontColor'] = (1,1,1)
+defaultDict['characterCreateSelectColor'] = (1,.75,0)
+defaultDict['characterCreateHelpColor'] = (1,1,1)
+defaultDict['characterCreateHelpX'] = .5
+defaultDict['characterCreateHelpY'] = .73
+defaultDict['characterCreateHelpScale'] = .0018
+defaultDict['characterCreateOptionFont'] = "font"
+defaultDict['characterCreateHelpFont'] = "loadingFont"
+defaultDict['characterCreateScale'] = .0018
+defaultDict['characterCreateSpace'] = .045
+defaultDict['avatarSelectTextX'] = .44
+defaultDict['avatarSelectTextY'] = .16
+defaultDict['avatarSelectTextScale'] = .0027
+defaultDict['avatarSelectFont'] = "font"
+defaultDict['avatarSelectAvX'] = .667
+defaultDict['avatarSelectAvY'] = .5
+defaultDict['avatarSelectWheelY'] = 0.0
+
+#Vocal mode
+defaultDict['vocalMeterSize'] = 45.000
+defaultDict['vocalMeterX'] = .25
+defaultDict['vocalMeterY'] = .8
+defaultDict['vocalMultX']  = .28
+defaultDict['vocalMultY']  = .8
+defaultDict['vocalPowerX'] = .5
+defaultDict['vocalPowerY'] = .8
+defaultDict['vocalFillupCenterX'] = 139
+defaultDict['vocalFillupCenterY'] = 151
+defaultDict['vocalFillupInRadius'] = 25
+defaultDict['vocalFillupOutRadius'] = 139
+defaultDict['vocalFillupFactor'] = 300.000
+defaultDict['vocalFillupColor'] = (.87,.87,.87)
+defaultDict['vocalCircularFillup'] = True
+defaultDict['vocalLaneSize'] = .002
+defaultDict['vocalGlowSize'] = .012
+defaultDict['vocalGlowFade'] = .6
+defaultDict['vocalLaneColor'] = (.6,1,.5)
+defaultDict['vocalShadowColor'] = (.8,1,.75)
+defaultDict['vocalGlowColor'] = (.2,1,0)
+defaultDict['vocalLaneColorStar'] = (1,1,.5)
+defaultDict['vocalShadowColorStar'] = (1,1,.75)
+defaultDict['vocalGlowColorStar'] = (1,1,0)
+
+#3D Note/Fret rendering system
+defaultDict['twoDnote'] = True
+defaultDict['twoDkeys'] = True
+defaultDict['threeDspin'] = True
+defaultDict['fret_press'] = True
+defaultDict['noterot'] = [0 for i in range(5)]
+defaultDict['keyrot']  = [0 for i in range(5)]
+defaultDict['drumnoterot'] = [0 for i in range(5)]
+defaultDict['drumkeyrot'] = [0 for i in range(5)]
+defaultDict['notepos'] = [0 for i in range(5)]
+defaultDict['keypos']  = [0 for i in range(5)]
+defaultDict['drumnotepos'] = [0 for i in range(5)]
+defaultDict['drumkeypos'] = [0 for i in range(5)]
+
+#In-game rendering
+defaultDict['rockmeter_score_colorVar'] = (1,1,1)
+defaultDict['ingame_stats_colorVar'] = (1,1,1)
+defaultDict['hopoIndicatorX'] = None
+defaultDict['hopoIndicatorY'] = None
+defaultDict['hopoIndicatorActiveColor'] = (1,1,1)
+defaultDict['hopoIndicatorInactiveColor'] = (.6,.6,.6)
+defaultDict['markSolos'] = 2
+
+#Game results scene
+defaultDict['result_score'] = [.5,.11,.0025,None,None]
+defaultDict['result_star'] = [.5,.4,.15,1.1]
+defaultDict['result_song'] = [.05,.045,.002,None,None]
+defaultDict['result_song_form'] = 0
+defaultDict['result_song_text'] = _("%s Finished!")
+defaultDict['result_stats_part'] = [.5,.64,0.002,None,None]
+defaultDict['result_stats_part_text'] = _("Part: %s")
+defaultDict['result_stats_name'] = [.5,.73,0.002,None,None]
+defaultDict['result_stats_diff'] = [.5,.55,.002,None,None]
+defaultDict['result_stats_diff_text'] = _("Difficulty: %s")
+defaultDict['result_stats_accuracy'] = [.5,.61,.002,None,None]
+defaultDict['result_stats_accuracy_text'] = _("Accuracy: %.1f%%")
+defaultDict['result_stats_streak'] = [.5,.58,.002,None,None]
+defaultDict['result_stats_streak_text'] = _("Longest Streak: %d")
+defaultDict['result_stats_notes'] = [.5,.52,.002,None,None]
+defaultDict['result_stats_notes_text'] = _("%s Notes Hit")
+defaultDict['result_cheats_info'] = [.5,.3,.002]
+defaultDict['result_cheats_numbers'] = [.5,.35,.0015]
+defaultDict['result_cheats_percent'] = [.45,.4,.0015]
+defaultDict['result_cheats_score']   = [.75,.4,.0015]
+defaultDict['result_cheats_color']   = (1,1,1)
+defaultDict['result_cheats_font']    = "font"
+defaultDict['result_high_score_font'] = "font"
+defaultDict['result_menu_x']         = .5
+defaultDict['result_menu_y']         = .2
+defaultDict['result_star_type']      = 0
+
+#Submenus
+defaultDict['submenuScale'] = {}
+defaultDict['submenuX'] = {}
+defaultDict['submenuY'] = {}
+defaultDict['submenuVSpace'] = {}
+
+#New stuff
+defaultDict['lobbyPanelAvatarDimension'] = (200.00, 110.00)
+defaultDict['lobbyTitleText']            = _("Lobby")
+defaultDict['lobbyTitleTextPos']         = (.98, .1)
+defaultDict['lobbyTitleTextAlign']       = RIGHT
+defaultDict['lobbyTitleTextScale']       = .0005
+defaultDict['lobbyTitleTextFont']        = "font"
 
 defaultDict['lobbySubtitleText']      = _("Choose Your Character!")
 defaultDict['lobbySubtitleTextPos']   = (.5, .1)
@@ -482,21 +725,21 @@ class Theme(Task):
         return object.__getattribute__(self, attr)
       Log.error("Attempted to load theme variable %s - no default found." % attr)
   
-  def __init__(self, path, name, iniFile = True):
+  def __init__(self, path, name):
     self.name = name
     self.path = path
     
     self.themePath = os.path.join(Version.dataPath(),"themes", name)
     if not os.path.exists(self.themePath):
-      Log.error("Theme: %s does not exist!\n" % self.themePath)
+      Log.warn("Theme: %s does not exist!\n" % self.themePath)
       name = Config.get("coffee", "themename")
       Log.notice("Theme: Attempting fallback to default theme \"%s\"." % name)
       self.themePath = os.path.join(Version.dataPath(),"themes", name)
       if not os.path.exists(self.themePath):
         Log.error("Theme: %s does not exist!\nExiting.\n" % self.themePath)
         sys.exit(1)
-
-    if iniFile:
+    
+    if os.path.exists(os.path.join(self.themePath, "theme.ini")):
       self.config = Config.load(os.path.join(self.themePath, "theme.ini"))
       config = self.config
       
@@ -821,247 +1064,6 @@ class Theme(Task):
         except IndexError:
           self.submenuVSpace[i] = None
     
-    else:
-      #Colors
-      self.backgroundColor = (0,0,0)
-      self.baseColor = (1,1,1)
-      self.selectedColor = (1,.75,0)
-      self.meshColor = (0,0,0)
-      self.hopoColor = (0,.667,.667)
-      self.spotColor = (1,1,1)
-      self.keyColor = (.2,.2,.2)
-      self.key2Color = (0,0,0)
-      self.tracksColor = (1,1,.5)
-      self.barsColor = (1,1,.5)
-      self.glowColor = (-2,-2,-2)
-      
-      #Note Colors (this applies to frets and notes)
-      self.noteColors = [(.133,1,.133),(1,.133,.133),(1,1,.133),(.2,.2,1),(1,.6,.3),(.8,.133,.8)]
-      self.spNoteColor = (.3,.7,.9)
-      self.killNoteColor = (0,0,0)
-      self.use_fret_colors = False
-      
-      #Point of View
-      self.povTargetX = None
-      self.povTargetY = None
-      self.povTargetZ = None
-      self.povOriginX = None
-      self.povOriginY = None
-      self.povOriginZ = None
-      
-      #Loading phrases
-      self.loadingPhrase = ["None"]
-      self.resultsPhrase = ["None"]
-      
-      #Miscellany (aka Garbage no one cares about)
-      self.crowdLoopDelay = None
-      self.songInfoDisplayScale = .0020
-      self.songInfoDisplayX = .05
-      self.songInfoDisplayY = .05
-      self.displayAllGreyStars = True
-      self.smallMult = True
-      self.jurgTextPos = [1,1,.00035]
-      self.oBarHScale = .7
-      self.oBar3dFill = False
-      self.power_up_name = None
-      
-      #Continuous star fillup!
-      self.starFillupCenterX = None
-      self.starFillupCenterY = None
-      self.starFillupInRadius = None
-      self.starFillupOutRadius = None
-      self.starFillupColor = None
-      
-      #Neck size, neck choose (yeah? you got a problem with that goruping?)
-      self.neckWidth = 3.0
-      self.neckLength = 9.0
-      self.neck_prompt_x = .1
-      self.neck_prompt_y = .05
-      
-      #Setlist
-      self.songListDisplay = 1
-      self.setlistguidebuttonsposX = .408
-      self.setlistguidebuttonsposY = .0322
-      self.setlistguidebuttonsscaleX = .29
-      self.setlistguidebuttonsscaleY = .308
-      self.setlistpreviewbuttonposX = .5
-      self.setlistpreviewbuttonposY = .5
-      self.setlistpreviewbuttonscaleX = .5
-      self.setlistpreviewbuttonscaleY = .5
-      self.versiontagposX = .5
-      self.versiontagposY = .5
-      self.songSelectSubmenuOffsetLines = 2
-      self.songSelectSubmenuOffsetSpaces = 2
-      self.songSelectSubmenuX = None
-      self.songSelectSubmenuY = None
-      self.song_cd_Xpos = 0.0
-      self.song_listcd_cd_Xpos = .75
-      self.song_listcd_cd_Ypos = .6
-      self.song_listcd_score_Xpos = .6
-      self.song_listcd_score_Ypos = .5
-      self.songlist_score_colorVar = (.58,.76,.32)
-      self.songlistcd_score_colorVar = (1,1,1)
-      self.song_listcd_list_Xpos = .1
-      self.song_cdscore_Xpos = .6
-      self.song_list_Xpos = .15
-      self.song_listscore_Xpos = .8
-      self.career_title_colorVar = (0,0,0)
-      self.song_name_text_colorVar = (1,1,1)
-      self.song_name_selected_colorVar = (1,.75,0)
-      self.artist_text_colorVar = (.25,.5,1)
-      self.artist_selected_colorVar = (.25,.5,1)
-      self.library_text_colorVar = (1,1,1)
-      self.library_selected_colorVar = (1,.75,0)
-      self.pause_text_colorVar = (1,1,1)
-      self.pause_selected_colorVar = (1,.75,0)
-      self.fail_completed_colorVar = (1,1,1)
-      self.fail_text_colorVar = (1,1,1)
-      self.fail_selected_colorVar = (1,.75,0)
-      self.song_rb2_diff_colorVar = (1,.75,0)
-      
-      #pause menu and fail menu
-      self.pause_bkg_pos = [.5,.5,1.0,1.0]
-      self.pause_text_xPos = None
-      self.pause_text_yPos = None
-      self.opt_text_colorVar = (1,1,1)
-      self.opt_selected_colorVar = (1,.75,0)
-      self.opt_bkg_size = [.5,.5,1.0,1.0]
-      self.opt_text_xPos = None
-      self.opt_text_yPos = None
-      self.fail_bkg_pos = [.5,.5,1.0,1.0]
-      self.fail_text_xPos = None
-      self.fail_text_yPos = None
-      self.fail_songname_xPos = .5
-      self.fail_songname_yPos = .35
-      
-      #main menu system
-      self.menuX = None
-      self.menuY = None
-      self.menuRB = False
-      self.loadingX = .5
-      self.loadingY = .6
-      self.loadingColor = (1,1,1)
-      self.loadingFScale = .0015
-      self.loadingRMargin = 1.0
-      self.loadingLSpacing = 1.0
-      self.main_menu_scaleVar = None
-      self.main_menu_vspacingVar = None
-      self.use_solo_submenu = None
-      self.sub_menu_xVar = None
-      self.sub_menu_yVar = None
-      self.versiontag = False
-      self.shadowoffsetx = .0022
-      self.shadowoffsety = .0005
-      self.menuTipTextY = .7
-      self.menuTipTextFont = "font"
-      self.menuTipTextScale = .002
-      self.menuTipTextColor = None
-      self.menuTipTextScrollSpace = .25
-      self.menuTipTextScrollMode = 0
-      self.menuTipTextDisplay = False
-      
-      self.characterCreateX = .25
-      self.characterCreateY = .15
-      self.characterCreateOptionX = .75
-      self.characterCreateFontColor = (1,1,1)
-      self.characterCreateSelectColor = (1,.75,0)
-      self.characterCreateHelpColor = (1,1,1)
-      self.characterCreateHelpX = .5
-      self.characterCreateHelpY = .73
-      self.characterCreateHelpScale = .0018
-      self.characterCreateOptionFont = "font"
-      self.characterCreateHelpFont = "loadingFont"
-      self.characterCreateScale = .0018
-      self.characterCreateSpace = .045
-      self.avatarSelectTextX = .44
-      self.avatarSelectTextY = .16
-      self.avatarSelectTextScale = .0027
-      self.avatarSelectFont = "font"
-      self.avatarSelectAvX = .667
-      self.avatarSelectAvY = .5
-      self.avatarSelectWheelY = 0.0
-      
-      #Vocal mode
-      self.vocalMeterSize = 45.000
-      self.vocalMeterX = .25
-      self.vocalMeterY = .8
-      self.vocalMultX  = .28
-      self.vocalMultY  = .8
-      self.vocalPowerX = .5
-      self.vocalPowerY = .8
-      self.vocalFillupCenterX = 139
-      self.vocalFillupCenterY = 151
-      self.vocalFillupInRadius = 25
-      self.vocalFillupOutRadius = 139
-      self.vocalFillupFactor = 300.000
-      self.vocalFillupColor = (.87,.87,.87)
-      self.vocalCircularFillup = True
-      self.vocalLaneSize = .002
-      self.vocalGlowSize = .012
-      self.vocalGlowFade = .6
-      self.vocalLaneColor = (.6,1,.5)
-      self.vocalShadowColor = (.8,1,.75)
-      self.vocalGlowColor = (.2,1,0)
-      self.vocalLaneColorStar = (1,1,.5)
-      self.vocalShadowColorStar = (1,1,.75)
-      self.vocalGlowColorStar = (1,1,0)
-      
-      #3D Note/Fret rendering system
-      self.twoDnote = True
-      self.twoDkeys = True
-      self.threeDspin = True
-      self.fret_press = True
-      self.noterot = [0 for i in range(5)]
-      self.keyrot  = [0 for i in range(5)]
-      self.drumnoterot = [0 for i in range(5)]
-      self.drumkeyrot = [0 for i in range(5)]
-      self.notepos = [0 for i in range(5)]
-      self.keypos  = [0 for i in range(5)]
-      self.drumnotepos = [0 for i in range(5)]
-      self.drumkeypos = [0 for i in range(5)]
-      
-      #In-game rendering
-      self.rockmeter_score_colorVar = (1,1,1)
-      self.ingame_stats_colorVar = (1,1,1)
-      self.hopoIndicatorX = None
-      self.hopoIndicatorY = None
-      self.hopoIndicatorActiveColor = (1,1,1)
-      self.hopoIndicatorInactiveColor = (.6,.6,.6)
-      self.markSolos = 2
-      
-      #Game results scene
-      self.result_score = [.5,.11,.0025,None,None]
-      self.result_star = [.5,.4,.15,1.1]
-      self.result_song = [.05,.045,.002,None,None]
-      self.result_song_form = 0
-      self.result_song_text = _("%s Finished!")
-      self.result_stats_part = [.5,.64,0.002,None,None]
-      self.result_stats_part_text = _("Part: %s")
-      self.result_stats_name = [.5,.73,0.002,None,None]
-      self.result_stats_diff = [.5,.55,.002,None,None]
-      self.result_stats_diff_text = _("Difficulty: %s")
-      self.result_stats_accuracy = [.5,.61,.002,None,None]
-      self.result_stats_accuracy_text = _("Accuracy: %.1f%%")
-      self.result_stats_streak = [.5,.58,.002,None,None]
-      self.result_stats_streak_text = _("Longest Streak: %d")
-      self.result_stats_notes = [.5,.52,.002,None,None]
-      self.result_stats_notes_text = _("%s Notes Hit")
-      self.result_cheats_info = [.5,.3,.002]
-      self.result_cheats_numbers = [.5,.35,.0015]
-      self.result_cheats_percent = [.45,.4,.0015]
-      self.result_cheats_score   = [.75,.4,.0015]
-      self.result_cheats_color   = (1,1,1)
-      self.result_cheats_font    = "font"
-      self.result_high_score_font = "font"
-      self.result_menu_x         = .5
-      self.result_menu_y         = .2
-      self.result_star_type      = 0
-      
-      #Submenus
-      self.submenuScale = {}
-      self.submenuX = {}
-      self.submenuY = {}
-      self.submenuVSpace = {}
   
   def setSelectedColor(self, alpha = 1.0):
     glColor4f(*(self.selectedColor + (alpha,)))
