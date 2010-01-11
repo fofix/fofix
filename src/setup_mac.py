@@ -29,7 +29,7 @@ OPTIONS = {
  'iconfile': '../icon_mac_composed.icns',
  'plist': dict(CFBundleIdentifier='org.pythonmac.FoFiX.FretsonFire',
       CFBundleSignature='FoFX',
-      NSHumanReadableCopyright=u"\xa9 2008-2009 FoFiX Team.  GNU GPL v2 or later."),
+      NSHumanReadableCopyright=u"\xa9 2008-2010 FoFiX Team.  GNU GPL v2 or later."),
  'includes': SceneFactory.scenes,
  'excludes': ["glew.gl.apple",
       "glew.gl.ati",

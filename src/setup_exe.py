@@ -165,7 +165,7 @@ def setupWindows():
               #stump: the parameter below must consist only of up to four numerical fields separated by dots
               Version.versionNum(),
               file_description="Frets on Fire X",
-              legal_copyright=r"© 2008-2009 FoFiX Team.  GNU GPL v2 or later.",
+              legal_copyright=r"© 2008-2010 FoFiX Team.  GNU GPL v2 or later.",
               company_name="FoFiX Team",
               internal_name="FoFiX.exe",
               original_filename="FoFiX.exe",
