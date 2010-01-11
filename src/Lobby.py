@@ -83,6 +83,8 @@ class Lobby(Layer, KeyListener):
     self.drawImage        = self.engine.drawImage
     self.drawStarScore    = self.engine.drawStarScore
     
+    self.gameModeText = self.engine.world.gameName
+    
     self.yes        = []
     self.no         = []
     self.conf       = []

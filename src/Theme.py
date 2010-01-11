@@ -433,6 +433,13 @@ defaultDict['lobbySaveCharAlign']     = CENTER
 defaultDict['lobbySaveCharFont']      = "font"
 defaultDict['lobbySaveCharColor']     = (1,1,1)
 
+defaultDict['lobbyGameModePos']       = (.985, .03)
+defaultDict['lobbyGameModeScale']     = .001
+defaultDict['lobbyGameModeAlign']     = RIGHT
+defaultDict['lobbyGameModeFont']      = "font"
+defaultDict['lobbyGameModeColor']     = (1,1,1)
+
+defaultDict['lobbyPanelNamePos']      = (0, 0)
 defaultDict['lobbyPanelNameFont']     = "font"
 defaultDict['lobbyPanelNameScale']    = .001
 defaultDict['lobbyPanelNameAlign']    = LEFT
@@ -444,11 +451,14 @@ defaultDict['lobbyHeaderColor']       = (1,1,1)
 defaultDict['lobbySelectLength']      = 4
 defaultDict['lobbyPanelAvatarDimension'] = (200.00, 110.00)
 
-defaultDict['lobbyKeyboardModColor']  = (1,1,1)
+defaultDict['lobbyKeyboardImgScale']  = .1
+defaultDict['lobbyKeyboardImgPos']    = (.8, .95)
+
 defaultDict['lobbySelectedColor'] = (1,1,1)
 defaultDict['lobbyDisabledColor'] = (.6,.6,.6)
 
 defaultDict['lobbyPanelSize']    = (.2, .8)
+defaultDict['lobbyPanelPos']     = (.04, .1)
 defaultDict['lobbyPanelSpacing'] = .24
 
 classNames = {'setlist': lambda x: Setlist(x), 'themeLobby': lambda x: ThemeLobby(x), 'partDiff': lambda x: ThemeParts(x)}
@@ -1159,20 +1169,16 @@ class ThemeLobby:
   def run(self, ticks):
     pass
   def renderPanels(self, lobby):
-    x = 0.04
-    y = .1
+    x = self.theme.lobbyPanelPos[0]
+    y = self.theme.lobbyPanelPos[1]
     w, h = lobby.geometry
     font = lobby.fontDict['font']
     controlFont   = lobby.fontDict[self.theme.lobbyControlFont]
     panelNameFont = lobby.fontDict[self.theme.lobbyPanelNameFont]
     optionFont    = lobby.fontDict[self.theme.lobbyOptionFont]
-    saveCharFont  = lobby.fontDict[self.theme.lobbySaveCharFont]
     wP = w*self.theme.lobbyPanelSize[0]
     hP = h*self.theme.lobbyPanelSize[1]
     for i in range(4):
-      if i == lobby.keyControl:
-        if lobby.img_keyboard:
-          lobby.drawImage(lobby.img_keyboard, scale = (.1, -.1), coord = (wP*.8+w*x, hP*.95+h*y))
       j = lobby.panelOrder[i]
       if j in lobby.blockedPlayers:
         glColor3f(*self.theme.lobbyDisabledColor)
@@ -1182,10 +1188,15 @@ class ThemeLobby:
         lobby.fontDict[self.theme.lobbyTitleTextFont].render(self.theme.lobbyTitleText, self.theme.lobbyTitleTextPos, scale = self.theme.lobbyTitleTextScale, align = self.theme.lobbyTitleTextAlign)
       if self.theme.lobbySubtitleText:
         lobby.fontDict[self.theme.lobbySubtitleTextFont].render(self.theme.lobbySubtitleText, self.theme.lobbySubtitleTextPos, scale = self.theme.lobbySubtitleTextScale, align = self.theme.lobbySubtitleTextAlign)
-      if lobby.img_panel:
+      lobby.fontDict[self.theme.lobbyGameModeFont].render(lobby.gameModeText, self.theme.lobbyGameModePos, scale = self.theme.lobbyGameModeScale, align = self.theme.lobbyGameModeAlign)
+      if i == lobby.keyControl and lobby.img_keyboard_panel:
+        lobby.drawImage(lobby.img_keyboard_panel, scale = (self.theme.lobbyPanelSize[0], -self.theme.lobbyPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = 3)
+      elif lobby.img_panel:
         lobby.drawImage(lobby.img_panel, scale = (self.theme.lobbyPanelSize[0], -self.theme.lobbyPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = 3)
+      if i == lobby.keyControl and lobby.img_keyboard:
+        lobby.drawImage(lobby.img_keyboard, scale = (self.theme.lobbyKeyboardImgScale, -self.theme.lobbyKeyboardImgScale), coord = (wP*self.theme.lobbyKeyboardImgPos[0]+w*x, hP*self.theme.lobbyKeyboardImgPos[1]+h*y))
       controlFont.render(lobby.controls[j], (self.theme.lobbyPanelSize[0]*self.theme.lobbyControlPos[0]+x, self.theme.lobbyPanelSize[1]*self.theme.lobbyControlPos[1]+y), scale = self.theme.lobbyControlScale, align = self.theme.lobbyControlAlign, new = True)
-      panelNameFont.render(lobby.options[lobby.selected[j]].lower(), (x, y), scale = self.theme.lobbyPanelNameScale, align = self.theme.lobbyPanelNameAlign, new = True)
+      panelNameFont.render(lobby.options[lobby.selected[j]].lower(), (x+w*self.theme.lobbyPanelNamePos[0], y+h*self.theme.lobbyPanelNamePos[1]), scale = self.theme.lobbyPanelNameScale, align = self.theme.lobbyPanelNameAlign, new = True)
       for l, k in enumerate(range(lobby.pos[j][0], lobby.pos[j][1]+1)):
         if k >= len(lobby.options):
           break
@@ -1204,8 +1215,11 @@ class ThemeLobby:
         else:
           glColor3f(*self.theme.lobbyOptionColor)
         if k == 1:
-          glColor3f(*self.theme.lobbySaveCharColor)
-          saveCharFont.render(lobby.options[k], (self.theme.lobbyPanelSize[0]*self.theme.lobbyOptionPos[0]+x,self.theme.lobbyPanelSize[1]*self.theme.lobbyOptionPos[1]+y+self.theme.lobbyOptionSpace*l), scale = self.theme.lobbySaveCharScale, align = self.theme.lobbySaveCharAlign, new = True)
+          if lobby.img_save_char:
+            lobby.drawImage(lobby.img_save_char, scale = (.5, -.5), coord = (wP*.5+w*x, hP*(.46*.75)+h*y-(h*.04*l)/.75))
+          else:
+            glColor3f(*self.theme.lobbySaveCharColor)
+            lobby.fontDict[self.theme.lobbySaveCharFont].render(lobby.options[k], (self.theme.lobbyPanelSize[0]*self.theme.lobbyOptionPos[0]+x,self.theme.lobbyPanelSize[1]*self.theme.lobbyOptionPos[1]+y+self.theme.lobbyOptionSpace*l), scale = self.theme.lobbySaveCharScale, align = self.theme.lobbySaveCharAlign, new = True)
         else:
           optionFont.render(lobby.options[k], (self.theme.lobbyPanelSize[0]*self.theme.lobbyOptionPos[0]+x,self.theme.lobbyPanelSize[1]*self.theme.lobbyOptionPos[1]+y+self.theme.lobbyOptionSpace*l), scale = self.theme.lobbyOptionScale, align = self.theme.lobbyOptionAlign, new = True)
       x += self.theme.lobbyPanelSpacing

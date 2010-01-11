@@ -27,6 +27,7 @@ import Config
 import Log
 import Dialogs
 from Song import SongQueue
+from Language import _
 
 STARTUP_SCENE = "SongChoosingScene"
 
@@ -47,6 +48,31 @@ class World:
     self.songQueue    = SongQueue()
     self.playingQueue = False
     self.done         = False
+    self.setGameName()
+  
+  def setGameName(self):
+    if self.minPlayers > 1:
+      if self.gameMode == 0:
+        self.gameName = _("Face-Off")
+      elif self.gameMode == 1:
+        self.gameName = _("Pro Face-Off")
+      elif self.gameMode == 2:
+        self.gameName = _("Party Mode")
+      elif self.gameMode == 3:
+        self.gameName = _("FoFiX Co-Op Mode")
+      elif self.gameMode == 4:
+        self.gameName = _("RB Co-Op Mode")
+      elif self.gameMode == 5:
+        self.gameName = _("GH Co-Op Mode")
+      elif self.gameMode == 6:
+        self.gameName = _("Battle Mode")
+    else:
+      if self.gameMode == 0:
+        self.gameName = _("Quickplay")
+      elif self.gameMode == 1:
+        self.gameName = _("Practice")
+      elif self.gameMode == 2:
+        self.gameName = _("Career Mode")
   
   def finishGame(self):
     if self.done:
