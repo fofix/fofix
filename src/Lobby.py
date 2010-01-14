@@ -91,8 +91,10 @@ class Lobby(Layer, KeyListener):
     self.up         = []
     self.down       = []
     self.controls   = [j for j in self.engine.input.controls.controls]
+    self.types      = []
     self.allowed    = [True for i in range(4)]
     for i, type in enumerate(self.engine.input.controls.type):
+      self.types.append(type)
       if type in GUITARTYPES:
         if not self.engine.world.allowGuitar:
           self.allowed[i] = False
@@ -146,6 +148,7 @@ class Lobby(Layer, KeyListener):
     self.theme = self.engine.theme
 
     self.engine.data.loadAllImages(self, os.path.join("themes",themename,"lobby"))
+    self.partImages     = self.engine.data.partImages
     
     if not self.img_default_av:
       self.engine.data.loadImgDrawing(self, "img_default_av", os.path.join("users", "players", "default.png"))
@@ -155,14 +158,14 @@ class Lobby(Layer, KeyListener):
     if self.img_default_av:
       imgheight = self.img_default_av.height1()
       imgwidth  = self.img_default_av.width1()
-      hFactor = self.theme.panelAvatarDimension[1]/imgheight
-      wFactor = self.theme.panelAvatarDimension[0]/imgwidth
+      hFactor = self.theme.lobbyPanelAvatarDimension[1]/imgheight
+      wFactor = self.theme.lobbyPanelAvatarDimension[0]/imgwidth
       self.defaultAvScale = min(hFactor, wFactor)
     if self.img_newchar_av:
       imgheight = self.img_newchar_av.height1()
       imgwidth  = self.img_newchar_av.width1()
-      hFactor = self.theme.panelAvatarDimension[1]/imgheight
-      wFactor = self.theme.panelAvatarDimension[0]/imgwidth
+      hFactor = self.theme.lobbyPanelAvatarDimension[1]/imgheight
+      wFactor = self.theme.lobbyPanelAvatarDimension[0]/imgwidth
       self.newCharAvScale = min(hFactor, wFactor)
     
     self.tsChooseChar = _("Choose Your Character")
@@ -439,7 +442,7 @@ class Lobby(Layer, KeyListener):
           self.scroller[self.scrolling[i]](i)
     if self.music:
       self.engine.mainMenu.runMusic()
-    self.engine.theme.themeLobby.run(ticks)
+    self.engine.theme.themeLobby.run(ticks, self)
   
   def render(self, visibility, topMost):
     if not visibility:

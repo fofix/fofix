@@ -44,6 +44,9 @@ from Task import Task
 LEFT   = 0
 CENTER = 1
 RIGHT  = 2
+GUITARTYPES = [0, 1, 4]
+DRUMTYPES   = [2, 3]
+MICTYPES    = [5]
 
 # read the color scheme from the config file
 Config.define("theme", "background_color",  str, "#000000")
@@ -651,15 +654,16 @@ defaultDict['submenuY'] = {}
 defaultDict['submenuVSpace'] = {}
 
 #New stuff
+#Lobby
 defaultDict['lobbyPanelAvatarDimension'] = (200.00, 110.00)
 defaultDict['lobbyTitleText']            = _("Lobby")
-defaultDict['lobbyTitleTextPos']         = (.98, .1)
-defaultDict['lobbyTitleTextAlign']       = RIGHT
-defaultDict['lobbyTitleTextScale']       = .0005
+defaultDict['lobbyTitleTextPos']         = (.5, .1)
+defaultDict['lobbyTitleTextAlign']       = CENTER
+defaultDict['lobbyTitleTextScale']       = .0025
 defaultDict['lobbyTitleTextFont']        = "font"
 
 defaultDict['lobbySubtitleText']      = _("Choose Your Character!")
-defaultDict['lobbySubtitleTextPos']   = (.5, .1)
+defaultDict['lobbySubtitleTextPos']   = (.5, .15)
 defaultDict['lobbySubtitleTextAlign'] = CENTER
 defaultDict['lobbySubtitleTextScale'] = .0015
 defaultDict['lobbySubtitleTextFont']  = "font"
@@ -692,17 +696,68 @@ defaultDict['lobbyControlScale']      = .0025
 defaultDict['lobbyControlAlign']      = CENTER
 defaultDict['lobbyHeaderColor']       = (1,1,1)
 defaultDict['lobbySelectLength']      = 4
-defaultDict['lobbyPanelAvatarDimension'] = (200.00, 110.00)
+
+defaultDict['lobbyPartScale']         = .25
+defaultDict['lobbyPartPos']           = (.5,.52)
+defaultDict['lobbyControlImgScale']   = .25
+defaultDict['lobbyControlImgPos']     = (.5,.55)
 
 defaultDict['lobbyKeyboardImgScale']  = .1
 defaultDict['lobbyKeyboardImgPos']    = (.8, .95)
 
-defaultDict['lobbySelectedColor'] = (1,1,1)
+defaultDict['lobbySelectedColor'] = (1,1,.3)
 defaultDict['lobbyDisabledColor'] = (.6,.6,.6)
 
 defaultDict['lobbyPanelSize']    = (.2, .8)
 defaultDict['lobbyPanelPos']     = (.04, .1)
 defaultDict['lobbyPanelSpacing'] = .24
+
+#PartDiff
+defaultDict['partDiffTitleText']            = _("Select a Part and Difficulty")
+defaultDict['partDiffTitleTextPos']         = (.5, .1)
+defaultDict['partDiffTitleTextAlign']       = CENTER
+defaultDict['partDiffTitleTextScale']       = .0025
+defaultDict['partDiffTitleTextFont']        = "font"
+
+defaultDict['partDiffSubtitleText']      = _("Ready to Play!")
+defaultDict['partDiffSubtitleTextPos']   = (.5, .15)
+defaultDict['partDiffSubtitleTextAlign'] = CENTER
+defaultDict['partDiffSubtitleTextScale'] = .0015
+defaultDict['partDiffSubtitleTextFont']  = "font"
+
+defaultDict['partDiffOptionScale']       = .001
+defaultDict['partDiffOptionAlign']       = CENTER
+defaultDict['partDiffOptionFont']        = "font"
+defaultDict['partDiffOptionPos']         = (.5, .46)
+defaultDict['partDiffOptionSpace']       = .04
+defaultDict['partDiffOptionColor']       = (1,1,1)
+defaultDict['partDiffSelectedColor']     = (1,1,.3)
+
+defaultDict['partDiffGameModePos']       = (.985, .03)
+defaultDict['partDiffGameModeScale']     = .001
+defaultDict['partDiffGameModeAlign']     = RIGHT
+defaultDict['partDiffGameModeFont']      = "font"
+defaultDict['partDiffGameModeColor']     = (1,1,1)
+
+defaultDict['partDiffPanelNamePos']      = (0, 0)
+defaultDict['partDiffPanelNameFont']     = "font"
+defaultDict['partDiffPanelNameScale']    = .001
+defaultDict['partDiffPanelNameAlign']    = LEFT
+defaultDict['partDiffControlPos']        = (.5,.375)
+defaultDict['partDiffControlFont']       = "font"
+defaultDict['partDiffControlScale']      = .0025
+defaultDict['partDiffControlAlign']      = CENTER
+defaultDict['partDiffHeaderColor']       = (1,1,1)
+
+defaultDict['partDiffPartScale']         = .5
+defaultDict['partDiffPartPos']           = (.5,.65)
+
+defaultDict['partDiffKeyboardImgScale']  = .1
+defaultDict['partDiffKeyboardImgPos']    = (.8, .95)
+
+defaultDict['partDiffPanelSize']    = (.2, .8)
+defaultDict['partDiffPanelPos']     = (.04, .1)
+defaultDict['partDiffPanelSpacing'] = .24
 
 classNames = {'setlist': lambda x: Setlist(x), 'themeLobby': lambda x: ThemeLobby(x), 'partDiff': lambda x: ThemeParts(x)}
 
@@ -1168,8 +1223,45 @@ class Theme(Task):
 class ThemeLobby:
   def __init__(self, theme):
     self.theme = theme
-  def run(self, ticks):
-    pass
+    self.currentImage = -1
+    self.nextImage = 0
+    self.fadeTime = 2500
+  
+  def run(self, ticks, lobby):
+    self.fadeTime += ticks
+    if self.fadeTime >= 2500:
+      self.fadeTime -= 2500
+      self.currentImage = (self.currentImage + 1)%4
+      i = self.currentImage
+      while not lobby.partImages[self.currentImage]:
+        self.currentImage = (self.currentImage + 1)%4
+        if i == self.currentImage:
+          break
+      if lobby.partImages[self.currentImage]:
+        self.nextImage = (self.currentImage + 1)%4
+        i = self.nextImage
+        while not lobby.partImages[self.nextImage]:
+          self.nextImage = (self.nextImage + 1)%4
+          if i == self.nextImage:
+            break
+  
+  def drawPartImage(self, lobby, type, scale, coord):
+    if not lobby.partImages[self.currentImage]:
+      return
+    if type in GUITARTYPES:
+      if self.fadeTime < 1000 or self.nextImage == self.currentImage:
+        lobby.drawImage(lobby.partImages[self.currentImage], scale = scale, coord = coord)
+      else:
+        lobby.drawImage(lobby.partImages[self.currentImage], scale = scale, coord = coord, color = (1,1,1,((2500.0-self.fadeTime)/1500.0)))
+        lobby.drawImage(lobby.partImages[self.nextImage], scale = scale, coord = coord, color = (1,1,1,((self.fadeTime-1000.0)/1500.0)))
+        glColor4f(1,1,1,1)
+    elif type in DRUMTYPES:
+      if lobby.partImages[4]:
+        lobby.drawImage(lobby.partImages[4], scale = scale, coord = coord)
+    else:
+      if lobby.partImages[5]:
+        lobby.drawImage(lobby.partImages[5], scale = scale, coord = coord)
+  
   def renderPanels(self, lobby):
     x = self.theme.lobbyPanelPos[0]
     y = self.theme.lobbyPanelPos[1]
@@ -1180,17 +1272,18 @@ class ThemeLobby:
     optionFont    = lobby.fontDict[self.theme.lobbyOptionFont]
     wP = w*self.theme.lobbyPanelSize[0]
     hP = h*self.theme.lobbyPanelSize[1]
+    glColor3f(*self.theme.lobbyHeaderColor)
+    if self.theme.lobbyTitleText:
+      lobby.fontDict[self.theme.lobbyTitleTextFont].render(self.theme.lobbyTitleText, self.theme.lobbyTitleTextPos, scale = self.theme.lobbyTitleTextScale, align = self.theme.lobbyTitleTextAlign)
+    if self.theme.lobbySubtitleText:
+      lobby.fontDict[self.theme.lobbySubtitleTextFont].render(self.theme.lobbySubtitleText, self.theme.lobbySubtitleTextPos, scale = self.theme.lobbySubtitleTextScale, align = self.theme.lobbySubtitleTextAlign)
+    lobby.fontDict[self.theme.lobbyGameModeFont].render(lobby.gameModeText, self.theme.lobbyGameModePos, scale = self.theme.lobbyGameModeScale, align = self.theme.lobbyGameModeAlign)
     for i in range(4):
       j = lobby.panelOrder[i]
-      if j in lobby.blockedPlayers:
+      if j in lobby.blockedPlayers or len(lobby.selectedPlayers) == lobby.maxPlayers:
         glColor3f(*self.theme.lobbyDisabledColor)
       else:
         glColor3f(*self.theme.lobbyHeaderColor)
-      if self.theme.lobbyTitleText:
-        lobby.fontDict[self.theme.lobbyTitleTextFont].render(self.theme.lobbyTitleText, self.theme.lobbyTitleTextPos, scale = self.theme.lobbyTitleTextScale, align = self.theme.lobbyTitleTextAlign)
-      if self.theme.lobbySubtitleText:
-        lobby.fontDict[self.theme.lobbySubtitleTextFont].render(self.theme.lobbySubtitleText, self.theme.lobbySubtitleTextPos, scale = self.theme.lobbySubtitleTextScale, align = self.theme.lobbySubtitleTextAlign)
-      lobby.fontDict[self.theme.lobbyGameModeFont].render(lobby.gameModeText, self.theme.lobbyGameModePos, scale = self.theme.lobbyGameModeScale, align = self.theme.lobbyGameModeAlign)
       if i == lobby.keyControl and lobby.img_keyboard_panel:
         lobby.drawImage(lobby.img_keyboard_panel, scale = (self.theme.lobbyPanelSize[0], -self.theme.lobbyPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = 3)
       elif lobby.img_panel:
@@ -1198,6 +1291,8 @@ class ThemeLobby:
       if i == lobby.keyControl and lobby.img_keyboard:
         lobby.drawImage(lobby.img_keyboard, scale = (self.theme.lobbyKeyboardImgScale, -self.theme.lobbyKeyboardImgScale), coord = (wP*self.theme.lobbyKeyboardImgPos[0]+w*x, hP*self.theme.lobbyKeyboardImgPos[1]+h*y))
       controlFont.render(lobby.controls[j], (self.theme.lobbyPanelSize[0]*self.theme.lobbyControlPos[0]+x, self.theme.lobbyPanelSize[1]*self.theme.lobbyControlPos[1]+y), scale = self.theme.lobbyControlScale, align = self.theme.lobbyControlAlign, new = True)
+      self.drawPartImage(lobby, lobby.types[j], scale = (self.theme.lobbyPartScale, -self.theme.lobbyPartScale), coord = (wP*self.theme.lobbyPartPos[0]+w*x, hP*self.theme.lobbyPartPos[1]+h*y))
+      #self.drawControlImage(lobby, lobby.types[j], scale = (self.theme.lobbyControlImgScale, -self.theme.lobbyControlImgScale), coord = (wP*self.theme.lobbyControlImgPos[0]+w*x, hP*self.theme.lobbyControlImgPos[1]+h*y))
       panelNameFont.render(lobby.options[lobby.selected[j]].lower(), (x+w*self.theme.lobbyPanelNamePos[0], y+h*self.theme.lobbyPanelNamePos[1]), scale = self.theme.lobbyPanelNameScale, align = self.theme.lobbyPanelNameAlign, new = True)
       for l, k in enumerate(range(lobby.pos[j][0], lobby.pos[j][1]+1)):
         if k >= len(lobby.options):
@@ -1231,42 +1326,59 @@ class ThemeParts:
     self.theme = theme
   def run(self, ticks):
     pass
+  def drawPartImage(self, dialog, part, scale, coord):
+    if part in [0, 2, 4, 5]:
+      dialog.drawImage(dialog.partImages[part], scale = scale, coord = coord)
+    else:
+      if dialog.partImages[part]:
+        dialog.drawImage(dialog.partImages[part], scale = scale, coord = coord)
+      else:
+        dialog.drawImage(dialog.partImages[0], scale = scale, coord = coord)
   def renderPanels(self, dialog):
-    x = 0.04
-    y = .1
+    x = self.theme.partDiffPanelPos[0]
+    y = self.theme.partDiffPanelPos[1]
     w, h = dialog.geometry
     font = dialog.fontDict['font']
-    wP = w*.2
-    hP = h*.8
+    controlFont   = dialog.fontDict[self.theme.partDiffControlFont]
+    panelNameFont = dialog.fontDict[self.theme.partDiffPanelNameFont]
+    optionFont    = dialog.fontDict[self.theme.partDiffOptionFont]
+    wP = w*self.theme.partDiffPanelSize[0]
+    hP = h*self.theme.partDiffPanelSize[1]
+    glColor3f(*self.theme.partDiffHeaderColor)
+    if self.theme.partDiffTitleText:
+      dialog.fontDict[self.theme.partDiffTitleTextFont].render(self.theme.partDiffTitleText, self.theme.partDiffTitleTextPos, scale = self.theme.partDiffTitleTextScale, align = self.theme.partDiffTitleTextAlign)
+    if self.theme.partDiffSubtitleText:
+      dialog.fontDict[self.theme.partDiffSubtitleTextFont].render(self.theme.partDiffSubtitleText, self.theme.partDiffSubtitleTextPos, scale = self.theme.partDiffSubtitleTextScale, align = self.theme.partDiffSubtitleTextAlign)
     for i in range(len(dialog.players)):
-      r = 1
-      if i == dialog.keyControl:
-        if dialog.img_keyboard:
-          r = 0
-          dialog.drawImage(dialog.img_keyboard, scale = (.1, -.1), coord = (wP*.8+w*x, hP*.95+h*y))
-      if dialog.img_panel:
-        dialog.drawImage(dialog.img_panel, scale = (.2, -.8), coord = (wP*.5+w*x,hP*.5+h*y), stretched = 3)
-      a = (i in dialog.readyPlayers) and .5 or 1
-      glColor4f(1,1,1,a)
-      font.render(dialog.players[i].name, (.2*.5+x, .3+y), scale = .0025, align = 1, new = True)
-      font.render(dialog.players[i].name.lower(), (x, y), scale = .001, align = 0, new = True)
+      glColor3f(*self.theme.partDiffHeaderColor)
+      dialog.fontDict[self.theme.partDiffGameModeFont].render(dialog.gameModeText, self.theme.partDiffGameModePos, scale = self.theme.partDiffGameModeScale, align = self.theme.partDiffGameModeAlign)
+      if i == dialog.keyControl and dialog.img_keyboard_panel:
+        dialog.drawImage(dialog.img_keyboard_panel, scale = (self.theme.partDiffPanelSize[0], -self.theme.partDiffPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = 3)
+      elif dialog.img_panel:
+        dialog.drawImage(dialog.img_panel, scale = (self.theme.partDiffPanelSize[0], -self.theme.partDiffPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = 3)
+      if i == dialog.keyControl and dialog.img_keyboard:
+        dialog.drawImage(dialog.img_keyboard, scale = (self.theme.partDiffKeyboardImgScale, -self.theme.partDiffKeyboardImgScale), coord = (wP*self.theme.partDiffKeyboardImgPos[0]+w*x, hP*self.theme.partDiffKeyboardImgPos[1]+h*y))
+      controlFont.render(dialog.players[i].name, (self.theme.partDiffPanelSize[0]*self.theme.partDiffControlPos[0]+x, self.theme.partDiffPanelSize[1]*self.theme.partDiffControlPos[1]+y), scale = self.theme.partDiffControlScale, align = self.theme.partDiffControlAlign, new = True)
+      panelNameFont.render(dialog.players[i].name.lower(), (x+w*self.theme.partDiffPanelNamePos[0], y+h*self.theme.partDiffPanelNamePos[1]), scale = self.theme.partDiffPanelNameScale, align = self.theme.partDiffPanelNameAlign, new = True)
       if dialog.mode[i] == 0:
+        self.drawPartImage(dialog, dialog.parts[i][dialog.selected[i]].id, scale = (self.theme.partDiffPartScale, -self.theme.partDiffPartScale), coord = (wP*self.theme.partDiffPartPos[0]+w*x, hP*self.theme.partDiffPartPos[1]+h*y))
         for p in range(len(dialog.parts[i])):
           if dialog.selected[i] == p:
             if dialog.img_selected:
               dialog.drawImage(dialog.img_selected, scale = (.5, -.5), coord = (wP*.5+w*x, hP*(.46*.75)+h*y-(h*.04*p)/.75))
-            glColor3f(1,0,r)
+            glColor3f(*self.theme.partDiffSelectedColor)
           else:
-            glColor3f(r,1,1)
+            glColor3f(*self.theme.partDiffOptionColor)
           font.render(str(dialog.parts[i][p]), (.2*.5+x,.8*.46+y+.04*p), scale = .001, align = 1, new = True)
       elif dialog.mode[i] == 1:
+        self.drawPartImage(dialog, dialog.players[i].part.id, scale = (self.theme.partDiffPartScale, -self.theme.partDiffPartScale), coord = (wP*self.theme.partDiffPartPos[0]+w*x, hP*self.theme.partDiffPartPos[1]+h*y))
         for d in range(len(dialog.info.partDifficulties[dialog.players[i].part.id])):
           if dialog.selected[i] == d:
             if dialog.img_selected:
               dialog.drawImage(dialog.img_selected, scale = (.5, -.5), coord = (wP*.5+w*x, hP*(.46*.75)+h*y-(h*.04*d)/.75))
-            glColor3f(1,0,r)
+            glColor3f(*self.theme.partDiffSelectedColor)
           else:
-            glColor3f(r,1,1)
+            glColor3f(*self.theme.partDiffOptionColor)
           font.render(str(dialog.info.partDifficulties[dialog.players[i].part.id][d]), (.2*.5+x,.8*.46+y+.04*d), scale = .001, align = 1, new = True)
         if i in dialog.readyPlayers:
           if dialog.img_ready:
@@ -2829,4 +2941,5 @@ class Setlist:
   
   def renderMiniLobby(self, scene):
     return
-  
+
+__all__ = ["LEFT", "CENTER", "RIGHT", "_", "Theme", "shaders"]

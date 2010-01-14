@@ -123,7 +123,7 @@ class Data(object):
 
     self.fontScreenBottom = 0.75      #from our current viewport's constant 3:4 aspect ratio (which is always stretched to fill the video resolution)
 
-
+    self.loadPartImages()
     #myfingershurt: multi-OS compatibility file access fixes using os.path.join()
     # load font customization images
 
@@ -459,6 +459,14 @@ class Data(object):
     #  #self.loadSoundEffect(self, "acceptSound",  os.path.join("themes",themename,"sounds","action.ogg"))
     #  self.loadSoundEffect(self, "cancelSounds",  os.path.join("themes",themename,"sounds","out.ogg"))
 
+  def loadPartImages(self):
+    self.partImages = []
+    self.partImages.append(self.loadImgDrawing(None, "guitar", os.path.join("themes",self.themeLabel,"common","guitar.png")))
+    self.partImages.append(self.loadImgDrawing(None, "rhythm", os.path.join("themes",self.themeLabel,"common","rhythm.png")))
+    self.partImages.append(self.loadImgDrawing(None, "bass", os.path.join("themes",self.themeLabel,"common","bass.png")))
+    self.partImages.append(self.loadImgDrawing(None, "lead", os.path.join("themes",self.themeLabel,"common","lead.png")))
+    self.partImages.append(self.loadImgDrawing(None, "drum", os.path.join("themes",self.themeLabel,"common","drum.png")))
+    self.partImages.append(self.loadImgDrawing(None, "vocal", os.path.join("themes",self.themeLabel,"common","vocal.png")))
   
   def SetAllScrewUpSoundFxObjectVolumes(self, volume):   #MFH - single function to go through all screwup sound objects and set object volume to the given volume
     for s in self.screwUpsounds:

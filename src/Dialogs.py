@@ -1277,6 +1277,8 @@ class PartDiffChooser(MainDialog):
     
     self.retVal  = None
     
+    self.gameModeText = self.engine.world.gameName
+    
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("PartDiffChooser class init (Dialogs.py)...")
@@ -1295,6 +1297,7 @@ class PartDiffChooser(MainDialog):
       self.up.extend(player.up)
       self.down.extend(player.down)
     
+    self.partImages     = self.engine.data.partImages
     self.keyControl     = 0
     self.scrolling      = [0 for i in self.players]
     self.rate           = [0 for i in self.players]
