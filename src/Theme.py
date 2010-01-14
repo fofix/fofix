@@ -1328,12 +1328,14 @@ class ThemeParts:
     pass
   def drawPartImage(self, dialog, part, scale, coord):
     if part in [0, 2, 4, 5]:
-      dialog.drawImage(dialog.partImages[part], scale = scale, coord = coord)
+      if dialog.partImages[part]:
+        dialog.drawImage(dialog.partImages[part], scale = scale, coord = coord)
     else:
       if dialog.partImages[part]:
         dialog.drawImage(dialog.partImages[part], scale = scale, coord = coord)
       else:
-        dialog.drawImage(dialog.partImages[0], scale = scale, coord = coord)
+        if dialog.partImages[0]:
+          dialog.drawImage(dialog.partImages[0], scale = scale, coord = coord)
   def renderPanels(self, dialog):
     x = self.theme.partDiffPanelPos[0]
     y = self.theme.partDiffPanelPos[1]
