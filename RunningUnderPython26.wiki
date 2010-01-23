@@ -42,6 +42,11 @@ The following packages are optional:
 
 Install them in the order listed above by double-clicking the .exe or .msi files that you downloaded.
 
+
+Here's an updated *package containing all dependancies* including all optional modules, gstreamer, and a basic batch installer that does just about everything for you except add C:\Python26 to your Path, _provided you extract it into your 'FoFiX' folder under 'FoFiX\tools\ForPython26\' (or something similar, two folders deep like that)_
+  --MFH, 01-23-2010
+
+
 Here's a *package containing all dependencies* (as of 2009-09-21): [http://www.mediafire.com/download.php?o2uzjoznij4]
 
 <wiki:comment>
