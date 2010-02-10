@@ -635,7 +635,7 @@ class Controls:
     kills = []
     
     for i, config in enumerate(self.config):
-      if self.type[i] > 1 and self.type[i] < 4: #drum set
+      if self.type[i] in DRUMTYPES: #drum set
         drum1s.extend([CONTROLS[i][DRUM1], CONTROLS[i][DRUM1A]])
         drum2s.extend([CONTROLS[i][DRUM2], CONTROLS[i][DRUM2A]])
         drum3s.extend([CONTROLS[i][DRUM3], CONTROLS[i][DRUM3A]])
@@ -657,7 +657,7 @@ class Controls:
           menuDown.append(CONTROLS[i][DOWN])
           menuNext.append(CONTROLS[i][RIGHT])
           menuPrev.append(CONTROLS[i][LEFT])
-      elif self.type[i] == 5:  #stump: it's a mic
+      elif self.type[i] in MICTYPES:  #stump: it's a mic
         if self.p2Nav == 1 or (self.p2Nav == 0 and i == 0):
           menuUp.append(CONTROLS[i][UP])
           menuDown.append(CONTROLS[i][DOWN])
@@ -665,7 +665,7 @@ class Controls:
           menuPrev.append(CONTROLS[i][LEFT])
           menuYes.append(CONTROLS[i][START])
           menuNo.append(CONTROLS[i][CANCEL])
-      elif self.type[i] > -1:
+      elif self.type[i] in GUITARTYPES:
         if self.type[i] == 0:
           key1s.extend([CONTROLS[i][KEY1], CONTROLS[i][KEY1A]])
         else:
@@ -899,13 +899,12 @@ def setNewKeyMapping(engine, config, section, option, key):
   #----------------------------------------------------------
 
 class Player(object):
-  def __init__(self, owner, name, number):
+  def __init__(self, name, number):
 
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("Player class init (Player.py)...")
 
-    self.owner    = owner
     self.name     = name
     
     self.reset()
@@ -918,6 +917,13 @@ class Player(object):
     self.soloShift    = None
     self.soloSlide    = False
     self.actions      = []
+    self.yes          = []
+    self.no           = []
+    self.conf         = []
+    self.up           = []
+    self.down         = []
+    self.left         = []
+    self.right        = []
     self.controller   = -1
     self.controlType  = -1
     
@@ -975,6 +981,25 @@ class Player(object):
         self.soloSlide = True
       else:
         self.soloSlide = False
+      if self.controlType in GUITARTYPES:
+        self.yes  = [self.keyList[KEY1]]
+        if self.controlType == 1:
+          self.yes.append(self.keyList[KEY1A])
+        self.no   = [self.keyList[KEY2], self.keyList[KEY2A]]
+        self.up   = [self.keyList[ACTION1]]
+        self.down = [self.keyList[ACTION2]]
+      elif self.controlType == 2:
+        self.yes  = [self.keyList[DRUM5], self.keyList[DRUM5A]]
+        self.no   = [self.keyList[DRUM1], self.keyList[DRUM1A]]
+        self.up   = [self.keyList[DRUM2], self.keyList[DRUM2A]]
+        self.down = [self.keyList[DRUM3], self.keyList[DRUM3A]]
+        self.conf = [self.keyList[DRUMBASS], self.keyList[DRUMBASSA]]
+      self.yes.append(self.keyList[START])
+      self.no.append(self.keyList[CANCEL])
+      self.up.append(self.keyList[UP])
+      self.down.append(self.keyList[DOWN])
+      self.left.append(self.keyList[LEFT])
+      self.right.append(self.keyList[RIGHT])
       #akedrou - add drum4 to the drums when ready
       return True
     else:

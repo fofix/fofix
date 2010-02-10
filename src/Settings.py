@@ -45,8 +45,6 @@ import os
 
 import Log
 
-import Theme
-
 class ConfigChoice(Menu.Choice):
   def __init__(self, engine, config, section, option, autoApply = False, isQuickset = 0):
     self.engine    = engine
@@ -658,8 +656,8 @@ class SettingsMenu(Menu.Menu):
     
     self.keyCheckerMode = Config.get("game", "key_checker_mode")
     
-    self.opt_text_x = Theme.opt_text_xPos
-    self.opt_text_y = Theme.opt_text_yPos
+    self.opt_text_x = self.engine.theme.opt_text_xPos
+    self.opt_text_y = self.engine.theme.opt_text_yPos
 
     if engine.data.theme == 0:
       if self.opt_text_x == None:
@@ -678,18 +676,13 @@ class SettingsMenu(Menu.Menu):
         self.opt_text_y = .14
 
 
-    self.opt_text_color = Theme.hexToColor(Theme.opt_text_colorVar)
-    self.opt_selected_color = Theme.hexToColor(Theme.opt_selected_colorVar)
-
-    Log.debug("Option text / selected hex colors: " + Theme.opt_text_colorVar + " / " + Theme.opt_selected_colorVar)
-
+    self.opt_text_color = self.engine.theme.hexToColor(self.engine.theme.opt_text_colorVar)
+    self.opt_selected_color = self.engine.theme.hexToColor(self.engine.theme.opt_selected_colorVar)
 
     if self.opt_text_color == None:
       self.opt_text_color = (1,1,1)
     if self.opt_selected_color == None:
       self.opt_selected_color = (1,0.75,0)
-
-    Log.debug("Option text / selected colors: " + str(self.opt_text_color) + " / " + str(self.opt_selected_color))
 
     self.modSettings = [
       ConfigChoice(engine, engine.config, "mods",  "mod_" + m) for m in Mod.getAvailableMods(engine)
@@ -775,7 +768,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(self.engine, self.engine.config, "game", "resume_countdown", autoApply = True), #akedrou
       ConfigChoice(self.engine, self.engine.config, "game", "sp_notes_while_active", autoApply = True, isQuickset = 2),   #myfingershurt - setting for gaining more SP while active
       ConfigChoice(self.engine, self.engine.config, "game", "drum_sp_mode", autoApply = True),#myfingershurt
-      ConfigChoice(self.engine, self.engine.config, "game",  "uploadscores", autoApply = True),
+      ConfigChoice(self.engine, self.engine.config, "network",  "uploadscores", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "audio",  "delay", autoApply = True),     #myfingershurt: so a/v delay can be set without restarting FoF
       (_("Advanced Gameplay Settings"), self.advancedGameSettingsMenu, _("Set advanced gameplay settings that affect the game rules.")),
       (_("Vocal Mode Settings"), self.lyricsSettingsMenu, _("Change settings that affect lyrics and in-game vocals.")),
@@ -881,6 +874,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "coffee", "themename"), #was autoapply... why?
       ConfigChoice(engine, engine.config, "video",  "resolution"),
       ConfigChoice(engine, engine.config, "video",  "fullscreen"),
+      ConfigChoice(engine, engine.config, "video", "disable_screensaver"),  #stump
       ConfigChoice(engine, engine.config, "game", "use_graphical_submenu", autoApply = True, isQuickset = 1),
       (_("Stages Options"), self.stagesOptionsMenu, _("Change settings related to the in-game background.")),
       (_("Choose Default Neck >"), lambda: Dialogs.chooseNeck(self.engine), _("Choose your default neck. You still have to choose which neck you use for your character in the character select screen.")),
@@ -939,6 +933,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "log",   "log_unedited_midis", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "log",   "log_lyric_events", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "log",   "log_tempo_events", autoApply = True),#myfingershurt
+      ConfigChoice(engine, engine.config, "log",   "log_image_not_found", autoApply = True),
     ]
     self.logfileSettingsMenu = Menu.Menu(engine, self.logfileSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
 
@@ -953,6 +948,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "debug",   "show_freestyle_active", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "debug",   "show_bpm", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "debug",   "use_new_vbpm_beta", autoApply = True),#myfingershurt
+      ConfigChoice(engine, engine.config, "debug",   "use_new_song_database", autoApply = True),  #stump
       ConfigChoice(engine, engine.config, "game", "use_new_pitch_analyzer", autoApply = True),  #stump
     ]
     self.debugSettingsMenu = Menu.Menu(engine, self.debugSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
@@ -965,23 +961,25 @@ class SettingsMenu(Menu.Menu):
 
     self.listSettings = [
       (_("Change Setlist Path >"), self.baseLibrarySelect, _("Set the path to a folder named 'songs' that contains your songs.")),
-      ConfigChoice(engine, engine.config, "coffee", "song_display_mode", autoApply = True),
+      #ConfigChoice(engine, engine.config, "coffee", "song_display_mode", autoApply = True),
       ConfigChoice(engine, engine.config, "game",  "sort_order", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "sort_direction", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "song_listing_mode", autoApply = True, isQuickset = 2),
+      #ConfigChoice(engine, engine.config, "game", "song_listing_mode", autoApply = True, isQuickset = 2),
       ConfigChoice(engine, engine.config, "game", "quickplay_tiers", autoApply = True),  #myfingershurt
       ConfigChoice(engine, engine.config, "coffee", "songfilepath", autoApply = True),
       #(_("Select List All Folder >"), self.listAllFolderSelect), #- Not Working Yet - Qstick
       ConfigChoice(engine, engine.config, "game", "songcovertype", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "songlistrotation", autoApply = True, isQuickset = 1),
-      ConfigChoice(engine, engine.config, "performance", "disable_librotation", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "song_icons", autoApply = True),
+      #ConfigChoice(engine, engine.config, "game", "songlistrotation", autoApply = True, isQuickset = 1),
+      #ConfigChoice(engine, engine.config, "performance", "disable_librotation", autoApply = True),
+      #ConfigChoice(engine, engine.config, "game", "song_icons", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "queue_parts", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "queue_diff", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "preload_labels", autoApply = True),
       ConfigChoice(engine, engine.config, "audio", "disable_preview", autoApply = True),  #myfingershurt
       ConfigChoice(engine, engine.config, "game", "songlist_instrument", autoApply = True), #MFH
       ConfigChoice(engine, engine.config, "game", "songlist_difficulty", autoApply = True), #evilynux
       ConfigChoice(engine, engine.config, "game",  "whammy_changes_sort_order", autoApply = True), #stump
-      ConfigChoice(engine, engine.config, "game", "songlist_extra_stats", autoApply = True), #evilynux
+      #ConfigChoice(engine, engine.config, "game", "songlist_extra_stats", autoApply = True), #evilynux
       ConfigChoice(engine, engine.config, "game", "HSMovement", autoApply = True), #racer
       ConfigChoice(engine, engine.config, "performance", "disable_libcount", autoApply = True, isQuickset = 1), 
       ConfigChoice(engine, engine.config, "performance", "cache_song_metadata", autoApply = True, isQuickset = 1), #stump
@@ -992,6 +990,7 @@ class SettingsMenu(Menu.Menu):
     
     advancedSettings = [
       ConfigChoice(engine, engine.config, "performance", "game_priority", autoApply = True, isQuickset = 1),
+      ConfigChoice(engine, engine.config, "performance", "restrict_to_first_processor"),  #stump
       ConfigChoice(engine, engine.config, "performance", "use_psyco"),
       (_("Debug Settings"), self.debugSettingsMenu, _("Settings for coders to debug. Probably not worth changing.")),
       (_("Log Settings"),    self.logfileSettingsMenu, _("Adds junk information to the logfile. Probably not useful in bug reports.")),
@@ -1156,9 +1155,9 @@ class SettingsMenu(Menu.Menu):
     Log.debug("settings.baseLibrarySelect function call...")
     newPath = Dialogs.chooseFile(self.engine, masks = ["*/*"], prompt = _("Choose a new songs directory."), dirSelect = True)
     if newPath != None:
-      Config.set("game", "base_library", os.path.dirname(newPath))
-      Config.set("game", "selected_library", os.path.basename(newPath))
-      Config.set("game", "selected_song", "")
+      Config.set("setlist", "base_library", os.path.dirname(newPath))
+      Config.set("setlist", "selected_library", os.path.basename(newPath))
+      Config.set("setlist", "selected_song", "")
       self.engine.resource.refreshBaseLib()   #myfingershurt - to let user continue with new songpath without restart
     
 
@@ -1173,8 +1172,8 @@ class BasicSettingsMenu(Menu.Menu):
     if self.logClassInits == 1:
       Log.debug("BasicSettingsMenu class init (Settings.py)...")
       
-    self.opt_text_x = Theme.opt_text_xPos
-    self.opt_text_y = Theme.opt_text_yPos
+    self.opt_text_x = self.engine.theme.opt_text_xPos
+    self.opt_text_y = self.engine.theme.opt_text_yPos
 
     if engine.data.theme == 0:
       if self.opt_text_x == None:
@@ -1193,18 +1192,13 @@ class BasicSettingsMenu(Menu.Menu):
         self.opt_text_y = .14
 
 
-    self.opt_text_color = Theme.hexToColor(Theme.opt_text_colorVar)
-    self.opt_selected_color = Theme.hexToColor(Theme.opt_selected_colorVar)
-
-    Log.debug("Option text / selected hex colors: " + Theme.opt_text_colorVar + " / " + Theme.opt_selected_colorVar)
-
+    self.opt_text_color = self.engine.theme.hexToColor(self.engine.theme.opt_text_colorVar)
+    self.opt_selected_color = self.engine.theme.hexToColor(self.engine.theme.opt_selected_colorVar)
 
     if self.opt_text_color == None:
       self.opt_text_color = (1,1,1)
     if self.opt_selected_color == None:
       self.opt_selected_color = (1,0.75,0)
-
-    Log.debug("Option text / selected colors: " + str(self.opt_text_color) + " / " + str(self.opt_selected_color))
 
     self.modSettings = [
       ConfigChoice(engine, engine.config, "mods",  "mod_" + m) for m in Mod.getAvailableMods(engine)
@@ -1222,7 +1216,7 @@ class BasicSettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "game", "resume_countdown", autoApply = True), #akedrou
       ConfigChoice(engine, engine.config, "game", "sp_notes_while_active", autoApply = True, isQuickset = 2),   #myfingershurt - setting for gaining more SP while active
       ConfigChoice(engine, engine.config, "game", "drum_sp_mode", autoApply = True),#myfingershurt
-      ConfigChoice(engine, engine.config, "game",  "uploadscores", autoApply = True),
+      ConfigChoice(engine, engine.config, "network",  "uploadscores", autoApply = True),
       ConfigChoice(engine, engine.config, "audio",  "delay", autoApply = True),     #myfingershurt: so a/v delay can be set without restarting FoF
     ]
     FoFiXBasicSettingsMenu = Menu.Menu(engine, FoFiXBasicSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
@@ -1292,13 +1286,13 @@ class BasicSettingsMenu(Menu.Menu):
 
     listSettings = [
       (_("Change Setlist Path >"), self.baseLibrarySelect, _("Set the path to a folder named 'songs' that contains your songs.")),
-      ConfigChoice(engine, engine.config, "coffee", "song_display_mode", autoApply = True),
+      #ConfigChoice(engine, engine.config, "coffee", "song_display_mode", autoApply = True),
       ConfigChoice(engine, engine.config, "game",  "sort_order", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "sort_direction", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "song_listing_mode", autoApply = True, isQuickset = 2),
+      #ConfigChoice(engine, engine.config, "game", "song_listing_mode", autoApply = True, isQuickset = 2),
       ConfigChoice(engine, engine.config, "game", "quickplay_tiers", autoApply = True),  #myfingershurt
       ConfigChoice(engine, engine.config, "game", "songcovertype", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "song_icons", autoApply = True),
+      #ConfigChoice(engine, engine.config, "game", "song_icons", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "songlist_instrument", autoApply = True), #MFH
       ConfigChoice(engine, engine.config, "game", "songlist_difficulty", autoApply = True), #evilynux
     ]
@@ -1423,9 +1417,9 @@ class BasicSettingsMenu(Menu.Menu):
     Log.debug("settings.baseLibrarySelect function call...")
     newPath = Dialogs.chooseFile(self.engine, masks = ["*/*"], prompt = _("Choose a new songs directory."), dirSelect = True)
     if newPath != None:
-      Config.set("game", "base_library", os.path.dirname(newPath))
-      Config.set("game", "selected_library", os.path.basename(newPath))
-      Config.set("game", "selected_song", "")
+      Config.set("setlist", "base_library", os.path.dirname(newPath))
+      Config.set("setlist", "selected_library", os.path.basename(newPath))
+      Config.set("setlist", "selected_song", "")
       self.engine.resource.refreshBaseLib()   #myfingershurt - to let user continue with new songpath without restart
 
 def quickset(config):
@@ -1623,8 +1617,6 @@ class GameSettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "audio",  "delay", autoApply = True),   #myfingershurt: so the a/v delay can be adjusted in-game
       ConfigChoice(engine, engine.config, "game", "stage_rotate_delay", autoApply = True),   #myfingershurt - user defined stage rotate delay
       ConfigChoice(engine, engine.config, "game", "stage_animate_delay", autoApply = True),   #myfingershurt - user defined stage rotate delay
-      #ConfigChoice(engine, engine.config, "player0",  "leftymode", autoApply = True),
-      #ConfigChoice(engine, engine.config, "player1",  "leftymode", autoApply = True), #QQstarS
     ]
     Menu.Menu.__init__(self, engine, settings, pos = (.360, .250), viewSize = 5, textColor = gTextColor, selectedColor = gSelectedColor, showTips = False) #Worldrave- Changed Pause-Submenu Position more centered until i add a theme.ini setting.
 

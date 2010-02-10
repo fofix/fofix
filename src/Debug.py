@@ -1,8 +1,10 @@
 #####################################################################
 # -*- coding: iso-8859-1 -*-                                        #
 #                                                                   #
-# Frets on Fire                                                     #
+# Frets on Fire X (FoFiX)                                           #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
+# Copyright (C) 2009 FoFiX Team                                     #
+# Copyright (C) 2009 akedrou                                        #                                     
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -60,16 +62,33 @@ class DebugLayer(Layer):
         
       x, y = (.5, .05)
       font.render("Layers:", (x, y), scale = scale)
-      for layer in self.engine.view.layers + self.engine.view.incoming + self.engine.view.outgoing + self.engine.view.visibility.keys():
-        font.render(self.className(layer), (x + .1, y), scale = scale)
+      for layer in self.engine.view.layers:
+        try:
+          v = self.engine.view.visibility[layer]
+        except KeyError:
+          v = -1
+        font.render("%s - v = %.2f" % (self.className(layer), v), (x + .1, y), scale = scale)
         y += h
-        
+      glColor3f(.25, 1, .75)
+      for layer in self.engine.view.incoming:
+        font.render("Adding %s..."%self.className(layer), (x + .1, y), scale = scale)
+        y += h
+      glColor3f(1, .25, .25)
+      for layer in self.engine.view.outgoing:
+        font.render("Removing %s..."%self.className(layer), (x + .1, y), scale = scale)
+        y += h
+      
+      glColor3f(.25, 1, .25)
       x, y = (.05, .4)
-      font.render("Scenes:", (x, y), scale = scale)
-      if "world" in dir(self.engine.server):
-        for scene in self.engine.server.world.scenes:
-          font.render(self.className(scene), (x + .1, y), scale = scale)
-          y += h
+      font.render("Current Scene:", (x, y), scale = scale)
+      if self.engine.world:
+        text = self.engine.world.sceneName
+        if text == "":
+          text = "None (In Lobby)"
+      else:
+        text = "None (In Menu)"
+      font.render(text, (x + .1, y), scale = scale)
+      y += h
         
       x, y = (.5, .4)
       font.render("Loaders:", (x, y), scale = scale)
@@ -81,9 +100,11 @@ class DebugLayer(Layer):
       font.render("Input:", (x, y), scale = scale)
       for listener in self.engine.input.mouseListeners + \
                       self.engine.input.keyListeners + \
-                      self.engine.input.systemListeners + \
-                      self.engine.input.priorityKeyListeners:
+                      self.engine.input.systemListeners:
         font.render(self.className(listener), (x + .1, y), scale = scale)
+        y += h
+      for listener in self.engine.input.priorityKeyListeners:
+        font.render(self.className(listener)+" (Priority)", (x + .1, y), scale = scale)
         y += h
         
       x, y = (.05, .55)
@@ -91,8 +112,8 @@ class DebugLayer(Layer):
       font.render("%d threads" % threading.activeCount(), (x + .1, y), scale = scale)
       y += h
       font.render("%.2f fps" % self.engine.fpsEstimate, (x + .1, y), scale = scale)
-      y += h
-      font.render("%d sessions, server %s" % (len(self.engine.sessions), self.engine.server and "on" or "off"), (x + .1, y), scale = scale)
+      #y += h
+      #font.render("%d sessions, server %s" % (len(self.engine.sessions), self.engine.server and "on" or "off"), (x + .1, y), scale = scale)
       #y += h
       #font.render("%d gc objects" % len(gc.get_objects()), (x + .1, y), scale = scale)
       #y += h
@@ -119,81 +140,3 @@ class DebugLayer(Layer):
         pass
     f.close()
     Log.debug("Wrote a dump of %d GC garbage objects to %s." % (n, fn))
-
-  def debugOut(self, engine):
-    try:
-      f = open("debug.log", "w+")
-    except IOError:
-      # fallback for unix (games dir read-only)
-      import Resource
-      # evilynux - Under MacOS X, put the logs in ~/Library/Logs
-      if( os.uname()[0] == "Darwin" ):
-        logFile = open(os.path.join(Resource.getWritableResourcePath(), 
-                                    "..", "..", "Logs", Version.appName(),
-                                    "debug.log"), "w+")
-      else: # GNU/Linux et al.
-        f = open(os.path.join(Resource.getWritableResourcePath(), 'debug.log'), "w+")
-    version = Version.version()
-    currentDir = os.getcwd()
-    dataDir = Version.dataPath()
-    translationDir = dataDir + "/translations"
-    modsDir = dataDir + "/mods"
-
-    f.write("Date = %s\n" % datetime.datetime.now())   
-    f.write("\nVersion = %s\n" %  version)
-    f.write("\nOS = %s\n" % os.name)
-
-    f.write("\nCurrent Directory = %s\n" % currentDir)
-    self.directoryList(f, currentDir)
-
-    f.write("\nData Directory = %s\n" % dataDir)
-    self.directoryList(f, dataDir)
-
-    zip_path = os.path.join(dataDir, 'library.zip')
-    # no library.zip on regular unix installation
-    if os.path.exists(zip_path):
-      f.write("\nLibrary.zip\n")
-      zip = zipfile.ZipFile(zip_path, 'r')
-      for info in zip.infolist():
-        fileName = info.filename
-        fileCSize = info.compress_size
-        fileSize = info.file_size
-        fileDate = datetime.datetime(*(info.date_time))
-        f.write("%s, %s, %s, %s\n" % (fileName, fileCSize, fileSize, fileDate))
-    
-    f.write("\nTranslation Directory = %s\n" % translationDir)
-    self.directoryList(f, translationDir)
-    
-    f.write("\nMods Directory = %s\n" % modsDir)
-    self.directoryList(f, modsDir)
-
-    mods = os.listdir(modsDir)
-
-    for mod in mods:
-      modDir = os.path.join(modsDir, mod)
-      if os.path.isdir(modDir):
-        f.write("\nMod Directory = %s\n" % modDir)
-        self.directoryList(f, modDir)
-
-    f.write("\nFretsonfire.ini\n")   
-    engine.config.config.write(f)
-
-    # No write() in Theme
-    #f.write("\nTheme.ini\n")
-    #Theme.write(f, engine.config)
-
-    f.write("\nStage.ini\n")
-    stage = Stage.Stage(self, self.engine.resource.fileName("stage.ini"))
-    stage.config.write(f)
-    f.close()
-
-  def directoryList(self, f, root):
-    files = os.listdir(root)
-    
-    for fileName in files:
-      fileSize = os.path.getsize(os.path.join(root, fileName))
-      mTime = datetime.datetime.utcfromtimestamp(os.path.getmtime(os.path.join(root, fileName)))
-      cTime = datetime.datetime.utcfromtimestamp(os.path.getctime(os.path.join(root, fileName)))
-      aTime = datetime.datetime.utcfromtimestamp(os.path.getatime(os.path.join(root, fileName)))
-
-      f.write("%s, %s, %s, %s, %s\n" % (fileName, fileSize, mTime, cTime, aTime))

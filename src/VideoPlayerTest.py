@@ -62,7 +62,7 @@ class VideoPlayerTest(unittest.TestCase):
     self.e = GameEngine(config)
     winWidth, winHeight = (self.e.view.geometry[2], self.e.view.geometry[3])
     vidPlayer = VideoPlayer(framerate, self.src, (winWidth, winHeight),
-                            loop = False)
+                            loop = False, startTime = 10000, endTime = 14000)
     self.e.view.pushLayer(vidPlayer)
     while not vidPlayer.finished:
       self.e.run()
@@ -115,7 +115,7 @@ class VideoPlayerTest(unittest.TestCase):
 
       glClear(GL_COLOR_BUFFER_BIT)
       glColor3f(1., 1., 1.)
-      glBindTexture(GL_TEXTURE_2D, vidPlayer.videoTex)
+      vidPlayer.videoTex.bind()
       glTranslatef(x, y, 0)
       glRotatef(theta, 0, 0, 1.)
       glScalef(.5, .5, 1.)
@@ -144,7 +144,7 @@ class VideoPlayerTest(unittest.TestCase):
   def setUp(self):
     self.src = os.path.join(Version.dataPath(), vidSource)
     self.assert_(os.path.exists(self.src), "File %s does not exist!" % self.src)
-   
+
   def tearDown(self):
     pass
 

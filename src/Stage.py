@@ -34,217 +34,23 @@ import random   #MFH - needed for new stage background handling
 from Language import _
 
 import Version # Provides dataPath
-# try:
-#   from VideoPlayer import VideoPlayer
-#   videoAvailable = True
-# except:
-#   videoAvailable = False
+try:
+  from VideoPlayer import VideoPlayer
+  videoAvailable = True
+except:
+  videoAvailable = False
   
-class Layer(object):
-  """
-  A graphical stage layer that can have a number of animation effects associated with it.
-  """
-  def __init__(self, stage, drawing):
-    """
-    Constructor.
-
-    @param stage:     Containing Stage
-    @param drawing:   SvgDrawing for this layer. Make sure this drawing is rendered to
-                      a texture for performance reasons.
-    """
-    self.stage       = stage
-    self.drawing     = drawing
-    self.position    = (0.0, 0.0)
-    self.angle       = 0.0
-    self.scale       = (1.0, 1.0)
-    self.color       = (1.0, 1.0, 1.0, 1.0)
-    self.srcBlending = GL_SRC_ALPHA
-    self.dstBlending = GL_ONE_MINUS_SRC_ALPHA
-    self.effects     = []
-  
-  def render(self, visibility):
-    """
-    Render the layer.
-
-    @param visibility:  Floating point visibility factor (1 = opaque, 0 = invisibile)
-    """
-    w, h, = self.stage.engine.view.geometry[2:4]
-    v = 1.0
-    self.drawing.transform.reset()
-    self.drawing.transform.translate(w / 2, h / 2)
-    if v > .01:
-      self.color = (self.color[0], self.color[1], self.color[2], visibility)
-      if self.position[0] < -.25:
-        self.drawing.transform.translate(-v * w, 0)
-      elif self.position[0] > .25:
-        self.drawing.transform.translate(v * w, 0)
-    self.drawing.transform.scale(self.scale[0], -self.scale[1])
-    self.drawing.transform.translate(self.position[0] * w / 2, -self.position[1] * h / 2)
-    self.drawing.transform.rotate(self.angle)
-
-    # Blend in all the effects
-    for effect in self.effects:
-      effect.apply()
-    
-    glBlendFunc(self.srcBlending, self.dstBlending)
-    self.drawing.draw(color = self.color)
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-
-class Effect(object):
-  """
-  An animationn effect that can be attached to a Layer.
-  """
-  def __init__(self, layer, options):
-    """
-    Constructor.
-
-    @param layer:     Layer to attach this effect to.
-    @param options:   Effect options (default in parens):
-                        intensity - Floating point effect intensity (1.0)
-                        trigger   - Effect trigger, one of "none", "beat",
-                                    "quarterbeat", "pick", "miss" ("none")
-                        period    - Trigger period in ms (200.0)
-                        delay     - Trigger delay in periods (0.0)
-                        profile   - Trigger profile, one of "step", "linstep",
-                                    "smoothstep"
-    """
-    self.layer       = layer
-    self.stage       = layer.stage
-    self.intensity   = float(options.get("intensity", 1.0))
-    self.trigger     = getattr(self, "trigger" + options.get("trigger", "none").capitalize())
-    self.period      = float(options.get("period", 500.0))
-    self.delay       = float(options.get("delay", 0.0))
-    self.triggerProf = getattr(self, options.get("profile", "linstep"))
-
-  def apply(self):
-    pass
-
-  def triggerNone(self):
-    return 0.0
-
-  def triggerBeat(self):
-    if not self.stage.lastBeatPos:
-      return 0.0
-    t = self.stage.pos - self.delay * self.stage.beatPeriod - self.stage.lastBeatPos
-    return self.intensity * (1.0 - self.triggerProf(0, self.stage.beatPeriod, t))
-
-  def triggerQuarterbeat(self):
-    if not self.stage.lastQuarterBeatPos:
-      return 0.0
-    t = self.stage.pos - self.delay * (self.stage.beatPeriod / 4) - self.stage.lastQuarterBeatPos
-    return self.intensity * (1.0 - self.triggerProf(0, self.stage.beatPeriod / 4, t))
-
-  def triggerPick(self):
-    if not self.stage.lastPickPos:
-      return 0.0
-    t = self.stage.pos - self.delay * self.period - self.stage.lastPickPos
-    return self.intensity * (1.0 - self.triggerProf(0, self.period, t))
-
-  def triggerMiss(self):
-    if not self.stage.lastMissPos:
-      return 0.0
-    t = self.stage.pos - self.delay * self.period - self.stage.lastMissPos
-    return self.intensity * (1.0 - self.triggerProf(0, self.period, t))
-
-  def step(self, threshold, x):
-    return (x > threshold) and 1 or 0
-
-  def linstep(self, min, max, x):
-    if x < min:
-      return 0
-    if x > max:
-      return 1
-    return (x - min) / (max - min)
-
-  def smoothstep(self, min, max, x):
-    if x < min:
-      return 0
-    if x > max:
-      return 1
-    def f(x):
-      return -2 * x**3 + 3*x**2
-    return f((x - min) / (max - min))
-
-  def sinstep(self, min, max, x):
-    return math.cos(math.pi * (1.0 - self.linstep(min, max, x)))
-
-  def getNoteColor(self, note):
-    if note >= len(Theme.fretColors) - 1:
-      return Theme.fretColors[-1]
-    elif note <= 0:
-      return Theme.fretColors[0]
-    f2  = note % 1.0
-    f1  = 1.0 - f2
-    c1 = Theme.fretColors[int(note)]
-    c2 = Theme.fretColors[int(note) + 1]
-    return (c1[0] * f1 + c2[0] * f2, \
-            c1[1] * f1 + c2[1] * f2, \
-            c1[2] * f1 + c2[2] * f2)
-
-class LightEffect(Effect):
-  def __init__(self, layer, options):
-    Effect.__init__(self, layer, options)
-    self.lightNumber = int(options.get("light_number", 0))
-    self.ambient     = float(options.get("ambient", 0.5))
-    self.contrast    = float(options.get("contrast", 0.5))
-
-  def apply(self):
-    if len(self.stage.averageNotes) < self.lightNumber + 2:
-      self.layer.color = (0.0, 0.0, 0.0, 0.0)
-      return
-
-    t = self.trigger()
-    t = self.ambient + self.contrast * t
-    c = self.getNoteColor(self.stage.averageNotes[self.lightNumber])
-    self.layer.color = (c[0] * t, c[1] * t, c[2] * t, self.intensity)
-
-class RotateEffect(Effect):
-  def __init__(self, layer, options):
-    Effect.__init__(self, layer, options)
-    self.angle     = math.pi / 180.0 * float(options.get("angle",  45))
-
-  def apply(self):
-    if not self.stage.lastMissPos:
-      return
-    
-    t = self.trigger()
-    self.layer.drawing.transform.rotate(t * self.angle)
-
-class WiggleEffect(Effect):
-  def __init__(self, layer, options):
-    Effect.__init__(self, layer, options)
-    self.freq     = float(options.get("frequency",  6))
-    self.xmag     = float(options.get("xmagnitude", 0.1))
-    self.ymag     = float(options.get("ymagnitude", 0.1))
-
-  def apply(self):
-    t = self.trigger()
-    
-    w, h = self.stage.engine.view.geometry[2:4]
-    p = t * 2 * math.pi * self.freq
-    s, c = t * math.sin(p), t * math.cos(p)
-    self.layer.drawing.transform.translate(self.xmag * w * s, self.ymag * h * c)
-
-class ScaleEffect(Effect):
-  def __init__(self, layer, options):
-    Effect.__init__(self, layer, options)
-    self.xmag     = float(options.get("xmagnitude", .1))
-    self.ymag     = float(options.get("ymagnitude", .1))
-
-  def apply(self):
-    t = self.trigger()
-    self.layer.drawing.transform.scale(1.0 + self.xmag * t, 1.0 + self.ymag * t)
+import Rockmeter #blazingamer - new 4.0 code for rendering rockmeters through stage.ini
 
 class Stage(object):
   def __init__(self, guitarScene, configFileName):
     self.scene            = guitarScene
     self.engine           = guitarScene.engine
     self.config           = Config.MyConfigParser()
-    self.backgroundLayers = []
-    self.foregroundLayers = []
-    self.textures         = {}
+    self.layers = []
     self.reset()
     
+
     self.wFull = None   #MFH - needed for new stage background handling
     self.hFull = None
     
@@ -286,77 +92,69 @@ class Stage(object):
       Log.warn("Stage folder does not exist: %s" % self.pathfull)
       self.mode = 1 # Fallback to song-specific stage
     suffix = ".jpg"
+
+  def loadVideo(self, libraryName, songName, songVideo = None,
+                songVideoStartTime = None, songVideoEndTime = None):
+    if not videoAvailable:
+      raise NameError('Video (gstreamer) is not available!')
+    self.vidSource = None
+    if self.songStage == 1:
+      songAbsPath = os.path.join(libraryName, songName)
+      if songVideo is not None and \
+             os.path.isfile(os.path.join(songAbsPath, songVideo)):
+        self.vidSource = os.path.join(songAbsPath, songVideo)
+      elif os.path.exists(os.path.join(songAbsPath, "default.avi")):
+        Log.warn("Video not found: %s" % \
+                 os.path.join(songAbsPath, songVideo))
+        self.vidSource = os.path.join(songAbsPath, "default.avi")
+    if self.vidSource is None:
+      if self.songStage == 1:
+        Log.warn("Video not found: %s" % \
+                 os.path.join(songAbsPath, "default.avi"))
+      songVideoStartTime = None
+      songVideoEndTime = None
+      self.vidSource = os.path.join(self.pathfull, "default.avi")
+
+    if not os.path.exists(self.vidSource):
+      Log.warn("Video not found: %s" % \
+               os.path.join(self.pathfull, "default.avi"))
+      Log.warn("No video found, fallbacking to default static image mode for now")
+      self.mode = 1 # Fallback
+      self.vidSource = None
+      return
+      
+    winWidth, winHeight = (self.engine.view.geometry[2],
+                           self.engine.view.geometry[3])
+    Log.debug("Attempting to load video: %s" % self.vidSource)
+    try: # Catches invalid video files or unsupported formats
+      Log.debug("Attempting to load video: %s" % self.vidSource)
+      self.vidPlayer = VideoPlayer(-1, self.vidSource, (winWidth, winHeight),
+                                   mute = True, loop = True,
+                                   startTime = songVideoStartTime,
+                                   endTime = songVideoEndTime)
+      self.engine.view.pushLayer(self.vidPlayer)
+      self.vidPlayer.paused = True
+    except:
+      self.mode = 1
+      Log.warn("Failed to load video, fallback to default stage mode.")
+
+  def restartVideo(self):
+    if not videoAvailable or not self.mode == 3:
+      return
+    self.vidPlayer.loadVideo(self.vidSource)
     
-    # Build the layers
-    for i in range(32):
-      section = "layer%d" % i
-      if self.config.has_section(section):
-        def get(value, type = str, default = None):
-          if self.config.has_option(section, value):
-            return type(self.config.get(section, value))
-          return default
-        
-        xres    = get("xres", int, 256)
-        yres    = get("yres", int, 256)
-        texture = get("texture")
-
-        try:
-          drawing = self.textures[texture]
-        except KeyError:
-          drawing = self.engine.loadImgDrawing(self, None, os.path.join("themes", self.themename, texture), textureSize = (xres, yres))
-          self.textures[texture] = drawing
-          
-        layer = Layer(self, drawing)
-
-        layer.position    = (get("xpos",   float, 0.0), get("ypos",   float, 0.0))
-        layer.scale       = (get("xscale", float, 1.0), get("yscale", float, 1.0))
-        layer.angle       = math.pi * get("angle", float, 0.0) / 180.0
-        layer.srcBlending = globals()["GL_%s" % get("src_blending", str, "src_alpha").upper()]
-        layer.dstBlending = globals()["GL_%s" % get("dst_blending", str, "one_minus_src_alpha").upper()]
-        layer.color       = (get("color_r", float, 1.0), get("color_g", float, 1.0), get("color_b", float, 1.0), get("color_a", float, 1.0))
-
-        # Load any effects
-        fxClasses = {
-          "light":          LightEffect,
-          "rotate":         RotateEffect,
-          "wiggle":         WiggleEffect,
-          "scale":          ScaleEffect,
-        }
-        
-        for j in range(32):
-          fxSection = "layer%d:fx%d" % (i, j)
-          if self.config.has_section(fxSection):
-            type = self.config.get(fxSection, "type")
-
-            if not type in fxClasses:
-              continue
-
-            options = self.config.options(fxSection)
-            options = dict([(opt, self.config.get(fxSection, opt)) for opt in options])
-
-            fx = fxClasses[type](layer, options)
-            layer.effects.append(fx)
-
-        if get("foreground", int):
-          self.foregroundLayers.append(layer)
-        else:
-          self.backgroundLayers.append(layer)
-
-#   def loadVideo(self, libraryName, songName):
-#     if not videoAvailable:
-#       return -1
-#     if self.songStage == 1 and os.path.exists(os.path.join(libraryName, songName, "video.mp4")):
-#       vidSource = os.path.join(libraryName, songName, "video.mp4")
-#     else:
-#       vidSource = os.path.join(Version.dataPath(), "video.mp4")
-
-#     winWidth, winHeight = (self.engine.view.geometry[2], self.engine.view.geometry[3])
-#     self.vidPlayer = VideoPlayer(-1, vidSource, (winWidth, winHeight),
-#                                  mute = True, loop = True)
-#     self.engine.view.pushLayer(self.vidPlayer)
-#     self.vidPlayer.paused = True
-
   def load(self, libraryName, songName, practiceMode = False):
+    rm = os.path.join("themes", self.themename, "rockmeter.ini")
+    if self.scene.coOpType == True:
+      rm = os.path.join("themes", self.themename, "rockmeter_coop.ini")
+    elif self.scene.battle == True:
+      rm = os.path.join("themes", self.themename, "rockmeter_faceoff.ini")
+    elif self.scene.battleGH == True:
+      rm = os.path.join("themes", self.themename, "rockmeter_profaceoff.ini")
+    
+    rockmeter = self.engine.resource.fileName(rm)
+    self.rockmeter = Rockmeter.Rockmeter(self.scene, rockmeter, self.scene.coOpType)
+
     # evilynux - Fixes a self.background not defined crash
     self.background = None
     #MFH - new background stage logic:
@@ -367,36 +165,22 @@ class Stage(object):
       self.songStage = 0
       self.rotationMode = 0
       self.mode = 1
-      try: #separated practice stages for the instruments by k.i.d
-        if self.scene.guitars[0].isDrum:
-          background = "practicedrum"
-        elif self.scene.guitars[0].isBassGuitar:
-          background = "practicebass"
-        else:
-          background = "practice"
-        try:
-          self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages",background + ".jpg"))
-        except IOError:
-          self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages",background + ".png"))            
-      except IOError:
+      #separated practice stages for the instruments by k.i.d
+      if self.scene.guitars[0].isDrum:
+        background = "practicedrum"
+      elif self.scene.guitars[0].isBassGuitar:
+        background = "practicebass"
+      else:
+        background = "practice"
+      if not self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages",background)):
         #MFH - must first fall back on the old practice.png before forcing blank stage mode!
-        try:
-          try:
-            self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages","practice.jpg"))
-          except IOError:
-            self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages","practice.png"))            
-        except IOError:
+        if not self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages","practice")):
           Log.warn("No practice stage, fallbacking on a forced Blank stage mode") # evilynux
           self.mode = 2    #if no practice stage, just fall back on a forced Blank stage mode
             
     elif self.songStage == 1:    #check for song-specific background
       test = True
-      try:
-        try:
-          self.engine.loadImgDrawing(self, "background", os.path.join(libraryName, songName, "background.jpg"))
-        except IOError:
-          self.engine.loadImgDrawing(self, "background", os.path.join(libraryName, songName, "background.png"))
-      except IOError:
+      if not self.engine.loadImgDrawing(self, "background", os.path.join(libraryName, songName, "background")):
         Log.notice("No song-specific stage found") # evilynux
         test = False
       if test:  #does a song-specific background exist?
@@ -408,15 +192,10 @@ class Stage(object):
     #MFH - now, after the above logic, we can run the normal stage mode logic
     #      only worrying about checking for Blank, song-specific and
     #      practice stage modes
-    if self.mode != 2 and self.songStage == 0 and not practiceMode: #still need to load stage(s)
+    if self.mode != 2 and self.mode != 3 and self.songStage == 0 and not practiceMode: #still need to load stage(s)
       #myfingershurt: assign this first
       if self.mode == 1:   #just use Default.png
-        try:
-          try:
-            self.engine.loadImgDrawing(self, "background", os.path.join(self.path, "default.jpg"))
-          except IOError:
-            self.engine.loadImgDrawing(self, "background", os.path.join(self.path, "default.png"))            
-        except IOError:
+        if not self.engine.loadImgDrawing(self, "background", os.path.join(self.path, "default")):
           Log.warn("No default stage; falling back on a forced Blank stage mode") # evilynux
           self.mode = 2    #if no practice stage, just fall back on a forced Blank stage mode
 
@@ -426,14 +205,12 @@ class Stage(object):
         fileIndex = 0
         allfiles = os.listdir(self.pathfull)
         for name in allfiles:
-
-          if os.path.splitext(name)[1].lower() == ".png" or os.path.splitext(name)[1].lower() == ".jpg" or os.path.splitext(name)[1].lower() == ".jpeg":
-            if os.path.splitext(name)[0].lower() != "practice" and os.path.splitext(name)[0].lower() != "practicedrum" and os.path.splitext(name)[0].lower() != "practicebass":
-              Log.debug("Valid background found, index (" + str(fileIndex) + "): " + name)
-              files.append(name)
-              fileIndex += 1
-            else:
-              Log.debug("Practice background filtered: " + name)
+          if os.path.splitext(name)[0].lower() != "practice" and os.path.splitext(name)[0].lower() != "practicedrum" and os.path.splitext(name)[0].lower() != "practicebass" and name != ".svn":
+            Log.debug("Valid background found, index (" + str(fileIndex) + "): " + name)
+            files.append(name)
+            fileIndex += 1
+          else:
+            Log.debug("Practice background filtered: " + name)
   
         # evilynux - improved error handling, fallback to blank background if no background are found
         if fileIndex == 0:
@@ -443,7 +220,8 @@ class Stage(object):
           i = random.randint(0,len(files)-1)
           filename = files[i]
       ##End check number of Stage-backgrounds
-          self.engine.loadImgDrawing(self, "background", os.path.join(self.path, filename))
+          if not self.engine.loadImgDrawing(self, "background", os.path.join(self.path, filename)):
+            self.mode = 2;
 
       elif self.rotationMode > 0 and self.mode != 2:
         files = []
@@ -567,7 +345,7 @@ class Stage(object):
     self.beat         = beat
     self.averageNotes = self.averageNotes[-4:] + self.averageNotes[-1:]
 
-  def _renderLayers(self, layers, visibility):
+  def renderLayers(self, layers, visibility):
     self.engine.view.setOrthogonalProjection(normalize = True)
     try:
       for layer in layers:
@@ -591,7 +369,7 @@ class Stage(object):
   def render(self, visibility):
     if self.mode != 3:
       self.renderBackground()
-    self._renderLayers(self.backgroundLayers, visibility)
+    self.renderLayers(self.layers, visibility)
     if shaders.enable("stage"):
       height = 0.0
       for i in shaders.var["color"].keys():
@@ -611,6 +389,6 @@ class Stage(object):
       shaders.disable()
       
     self.scene.renderGuitar()
-    self._renderLayers(self.foregroundLayers, visibility)
+    self.rockmeter.render(visibility)
     
     

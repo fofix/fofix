@@ -31,7 +31,6 @@ import Player
 from Song import Note, Tempo
 from Mesh import Mesh
 from Neck import Neck
-import Theme
 import random
 from copy import deepcopy
 from Shader import shaders
@@ -45,342 +44,70 @@ import os
 import Log
 import Song   #need the base song defines as well
 
+from Instrument import *
 
-class Guitar:
+class Guitar(Instrument):
   def __init__(self, engine, playerObj, editorMode = False, player = 0, bass = False):
-    self.engine         = engine
-
+    Instrument.__init__(self, engine, playerObj, player)
 
     self.isDrum = False
     self.isBassGuitar = bass
     self.isVocal = False
 
-    self.starPowerDecreaseDivisor = 200.0/self.engine.audioSpeedFactor
     
     self.debugMode = False
-    self.gameMode2p = self.engine.config.get("game","multiplayer_mode")
+    self.gameMode2p = self.engine.world.multiMode
     self.matchingNotes = []
     
-    self.sameNoteHopoString = False
-    self.hopoProblemNoteNum = -1
-    
-    self.useMidiSoloMarkers = False
-    self.currentGuitarSoloHitNotes = 0
-
-    self.cappedScoreMult = 0
     self.starSpinFrameIndex = 0
 
     self.starSpinFrames = 16
-    self.isStarPhrase = False
-    self.finalStarSeen = False
-
-    self.freestyleActive = False
     
-    self.drumFillsActive = False
-    
-    self.bigRockEndingMarkerSeen = False
-
-    #MFH - I do not understand fully how the handicap scorecard works at the moment, nor do I have the time to figure it out.
-    #... so for now, I'm just writing some extra code here for the early hitwindow size handicap.
-    self.earlyHitWindowSizeFactor = 0.5
-
-    
-    # Volshebnyi - BRE scoring variables
-    self.freestyleEnabled = False
-    self.freestyleStart = 0
-    self.freestyleFirstHit = 0
-    self.freestyleLength = 0
-    self.freestyleLastHit = 0
-    self.freestyleBonusFret = -2
-    self.freestyleLastFretHitTime = range(5)
-    self.freestyleBaseScore = 750
-    self.freestylePeriod = 1000
-    self.freestylePercent = 50
-    self.freestyleOffset = 5
-    self.freestyleSP = False
-    
-    #empty variables for class compatibility
-    self.totalPhrases = 0
-
-
-    self.accThresholdWorstLate = 0
-    self.accThresholdVeryLate = 0
-    self.accThresholdLate = 0
-    self.accThresholdSlightlyLate = 0
-    self.accThresholdExcellentLate = 0
-    self.accThresholdPerfect = 0
-    self.accThresholdExcellentEarly = 0
-    self.accThresholdSlightlyEarly = 0
-    self.accThresholdEarly = 0
-    self.accThresholdVeryEarly = 0
-
-    self.tempoBpm = 120   #MFH - default is NEEDED here...
-    
+            
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("Guitar class init...")
-
-    self.incomingNeckMode = self.engine.config.get("game", "incoming_neck_mode")
     
-
-    
-    self.bigRockEndings = self.engine.config.get("game", "big_rock_endings")
-    
-    self.boardWidth     = Theme.neckWidth
-    self.boardLength    = Theme.neckLength
     #death_au: fixed neck size
-    #if Theme.twoDnote == False or Theme.twoDkeys == False:
+    #if self.engine.theme.twoDnote == False or self.engine.theme.twoDkeys == False:
       #self.boardWidth     = 3.6
       #self.boardLength    = 9.0  
-    
-    self.boardScaleX    = self.boardWidth/3.0
-    self.boardScaleY    = self.boardLength/9.0
-    
-    self.fretPress      = Theme.fret_press
-
-    self.beatsPerBoard  = 5.0
-    self.beatsPerUnit   = self.beatsPerBoard / self.boardLength
-    self.strings        = 5
-    self.fretWeight     = [0.0] * self.strings
-    self.fretActivity   = [0.0] * self.strings
-    self.fretColors     = Theme.fretColors
-    self.spColor        = self.fretColors[5]
-    self.useFretColors  = Theme.use_fret_colors
-    self.playedNotes    = []
-
-    self.freestyleHitFlameCounts = [0 for n in range(self.strings+1)]    #MFH
-
     
     self.lastPlayedNotes = []   #MFH - for reverting when game discovers it implied incorrectly
     
     self.missedNotes    = []
     self.missedNoteNums = []
     self.editorMode     = editorMode
-    self.selectedString = 0
-    self.time           = 0.0
-    self.pickStartPos   = 0
-    self.leftyMode      = False
-    self.drumFlip       = False
-    
-    self.battleSuddenDeath  = False
-    self.battleObjectsEnabled = []
-    self.battleSDObjectsEnabled = []
-    if self.engine.config.get("game", "battle_Whammy") == 1:
-      self.battleObjectsEnabled.append(4)
-    if self.engine.config.get("game", "battle_Diff_Up") == 1:
-      if playerObj.getDifficultyInt() > 0:
-        self.battleObjectsEnabled.append(2)
-    if self.engine.config.get("game", "battle_String_Break") == 1:
-      self.battleObjectsEnabled.append(3)
-    if self.engine.config.get("game", "battle_Double") == 1:
-      self.battleObjectsEnabled.append(7)
-    if self.engine.config.get("game", "battle_Death_Drain") == 1:
-      self.battleObjectsEnabled.append(1)
-    if self.engine.config.get("game", "battle_Amp_Overload") == 1:
-      self.battleObjectsEnabled.append(8)
-    if self.engine.config.get("game", "battle_Switch_Controls") == 1:
-      self.battleObjectsEnabled.append(6)
-    if self.engine.config.get("game", "battle_Steal") == 1:
-      self.battleObjectsEnabled.append(5)
-    #if self.engine.config.get("game", "battle_Tune") == 1:
-    #  self.battleObjectsEnabled.append(9)
-    
-    Log.debug(self.battleObjectsEnabled)
-    self.battleNextObject   = 0
-    self.battleObjects      = [0] * 3
-    self.battleBeingUsed    = [0] * 2
-    self.battleStatus       = [False] * 9
-    self.battleStartTimes    = [0] * 9
-    self.battleGetTime      = 0
 
-    
-    self.battleLeftyLength  = 8000 #
-    self.battleDiffUpLength = 15000
-    self.battleDiffUpValue  = playerObj.getDifficultyInt()
-    self.battleDoubleLength = 8000
-    self.battleAmpLength    = 8000
-    self.battleWhammyLimit  = 6 #
-    self.battleWhammyNow    = 0
-    self.battleWhammyDown   = False
-    self.battleBreakLimit   = 8.0
-    self.battleBreakNow     = 0.0
-    self.battleBreakString  = 0
-    self.battleObjectGained = 0
-    self.battleSuddenDeath  = False
-    self.battleDrainStart   = 0
-    self.battleDrainLength  = 8000
-    
-    
-
-
-    #self.actualBpm = 0.0
-    self.currentBpm     = 120.0
-    self.currentPeriod  = 60000.0 / self.currentBpm
-    self.targetBpm      = self.currentBpm
-    self.targetPeriod   = 60000.0 / self.targetBpm
-    self.lastBpmChange  = -1.0
-    self.baseBeat       = 0.0
-
-
-    self.indexFps       = self.engine.config.get("video", "fps") #QQstarS
     #########For Animations
     self.Animspeed      = 30#Lower value = Faster animations
     #For Animated Starnotes
     self.indexCount     = 0
     #Alarian, For animated hitglow
-    self.HCount         = 0
-    self.HCount2        = 0
     self.HCountAni      = False
-    self.Hitanim        = True
-    self.Hitanim2       = True
     
-    #myfingershurt: to keep track of pause status here as well
-    self.paused = False
-
-    self.spEnabled = True
-    self.starPower = 0
-    self.starPowerGained = False
-
-    self.killPoints = False
-
-    self.starpowerMode = self.engine.config.get("game", "starpower_mode") #MFH
-    
-    #get difficulty
-    self.difficulty = playerObj.getDifficultyInt()
-    self.controlType = playerObj.controlType
-
     #myfingershurt:
     self.hopoStyle        = self.engine.config.get("game", "hopo_system")
     self.gh2sloppy        = self.engine.config.get("game", "gh2_sloppy")
     if self.gh2sloppy == 1:
       self.hopoStyle = 4
-    self.LastStrumWasChord = False
-    self.spRefillMode = self.engine.config.get("game","sp_notes_while_active")
-    self.hitglow_color = self.engine.config.get("video", "hitglow_color") #this should be global, not retrieved every fret render.
     self.sfxVolume    = self.engine.config.get("audio", "SFX_volume")
-
-    self.vbpmLogicType = self.engine.config.get("debug",   "use_new_vbpm_beta")
-
     
-    #myfingershurt: this should be retrieved once at init, not repeatedly in-game whenever tails are rendered.
-    self.notedisappear = self.engine.config.get("game", "notedisappear")
-    self.fretsUnderNotes  = self.engine.config.get("game", "frets_under_notes")
+    #blazingamer
+    self.killfx = self.engine.config.get("performance", "killfx")
+    self.killCount         = 0
     
-
-
-    self.muteSustainReleases = self.engine.config.get("game", "sustain_muting") #MFH
-
-    self.hitw = self.engine.config.get("game", "note_hit_window")  #this should be global, not retrieved every BPM change.
-    if self.hitw == 0: 
-      self.hitw = 2.3
-    elif self.hitw == 1: 
-      self.hitw = 1.9
-    elif self.hitw == 2: 
-      self.hitw = 1.2
-    elif self.hitw == 3:  
-      self.hitw = 1.0
-    elif self.hitw == 4:  
-      self.hitw = 0.70
-    else:
-      self.hitw = 1.2
+    self.bigMax = 1
     
-    self.twoChord       = 0
-    self.twoChordApply  = False
-    self.hopoActive     = 0
-    
-    #myfingershurt: need a separate variable to track whether or not hopos are actually active
-    self.wasLastNoteHopod = False
-    
-    
-    self.hopoLast       = -1
-    self.hopoColor      = (0, .5, .5)
-    self.player         = player
-
-    self.hit = [False, False, False, False, False]
-    
-    self.freestyleHit = [False, False, False, False, False]
-
     #Get theme
     themename = self.engine.data.themeLabel
     #now theme determination logic is only in data.py:
     self.theme = self.engine.data.theme
-    
-    #check if BRE enabled
-    if self.bigRockEndings == 2 or (self.theme == 2 and self.bigRockEndings == 1):
-      self.freestyleEnabled = True
 
-    #blazingamer
-    self.nstype = self.engine.config.get("game", "nstype")
-    self.twoDnote = Theme.twoDnote
-    self.twoDkeys = Theme.twoDkeys 
-    self.threeDspin = Theme.threeDspin 
-    self.killfx = self.engine.config.get("performance", "killfx")
-    self.killCount         = 0
-    self.noterotate = self.engine.config.get("coffee", "noterotate")
-    
-    #akedrou
-    self.coOpRescueTime = 0.0
-    
-    #MFH- fixing neck speed
-    if self.nstype < 3:   #not constant mode: 
-      self.speed = self.engine.config.get("coffee", "neckSpeed")*0.01
-    else:   #constant mode
-      self.speed = 410 - self.engine.config.get("coffee", "neckSpeed")    #invert this value
-
-    self.bigMax = 1
-    
-    self.keys = []
-    self.actions = []
-    self.soloKey = []
-
-    
-    self.setBPM(self.currentBpm)
-
-    if self.starpowerMode == 1:
-      self.starNotesSet = False
-    else:
-      self.starNotesSet = True
-
-    self.maxStars = []
-    self.starNotes = []
-    self.totalNotes = 0
-
-
-    engine.loadImgDrawing(self, "glowDrawing", "glow.png")
-    
     self.oFlash = None
-
-    #MFH - making hitflames optional
-    self.hitFlamesPresent = False
-    try:
-      engine.loadImgDrawing(self, "hitflames1Drawing", os.path.join("themes",themename,"hitflames1.png"),  textureSize = (128, 128))
-      engine.loadImgDrawing(self, "hitflames2Drawing", os.path.join("themes",themename,"hitflames2.png"),  textureSize = (128, 128))
-      self.hitFlamesPresent = True
-    except IOError:
-      self.hitFlamesPresent = False
-      self.hitflames1Drawing = None
-      self.hitflames2Drawing = None
-
-    try:
-      engine.loadImgDrawing(self, "hitflamesAnim", os.path.join("themes",themename,"hitflamesanimation.png"),  textureSize = (128, 128))
-    except IOError:
-      self.Hitanim2 = False
-      
-    try:
-      engine.loadImgDrawing(self, "hitglowAnim", os.path.join("themes",themename,"hitglowanimation.png"),  textureSize = (128, 128))
-    except IOError:
-      try:
-        engine.loadImgDrawing(self, "hitglowDrawing", os.path.join("themes",themename,"hitglow.png"),  textureSize = (128, 128))
-        engine.loadImgDrawing(self, "hitglow2Drawing", os.path.join("themes",themename,"hitglow2.png"),  textureSize = (128, 128))
-      except IOError:
-        self.hitglowDrawing = None
-        self.hitglow2Drawing = None
-        self.hitFlamesPresent = False   #MFH - shut down all flames if these are missing.
-      self.Hitanim = False
     
     #myfingershurt:
     self.bassGrooveNeckMode = self.engine.config.get("game", "bass_groove_neck")
-    self.guitarSoloNeckMode = self.engine.config.get("game", "guitar_solo_neck")
 
     self.starspin = self.engine.config.get("performance", "starspin")
     if self.twoDnote == True:
@@ -389,27 +116,19 @@ class Guitar:
       if self.starspin == True and self.theme < 2:
         #myfingershurt: check for SpinNotes, if not there then no animation
         if self.gameMode2p == 6:
-          try:  
-            engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"spinnotesbattle.png"))
+          if engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"spinnotesbattle.png")):
             self.starSpinFrames = 8
-          except IOError:
-            try:
-              self.starspin = False
-              engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notesbattle.png"))
-            except IOError:
-              self.starspin = False
+          else:
+            self.starspin = False
+            if not engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notesbattle.png")):
               engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notes.png"))
-        else:    
-          try:  
-            engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"spinnotes.png"))
-          except IOError:
+        else: 
+          if not engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"spinnotes.png")):
             self.starspin = False
             engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notes.png"))
       else:
         if self.gameMode2p == 6:
-          try:
-            engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notesbattle.png"))
-          except IOError:
+          if not engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notesbattle.png")):
             engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notes.png"))
         else:
           engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notes.png"))
@@ -420,40 +139,35 @@ class Guitar:
         engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "note.dae")))
       else:
         engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName("note.dae")))
-        
-      try:
-        for i in range(5):
-          engine.loadImgDrawing(self,  "notetex"+chr(97+i),  os.path.join("themes", themename, "notetex_"+chr(97+i)+".png"))
-        self.notetex = True
 
-      except IOError:
-        self.notetex = False
+      for i in range(5):
+        if engine.loadImgDrawing(self,  "notetex"+chr(97+i),  os.path.join("themes", themename, "notetex_"+chr(97+i)+".png")):
+          self.notetex = True
+        else:
+          self.notetex = False
+          break
         
       if self.engine.fileExists(os.path.join("themes", themename, "star.dae")):  
         engine.resource.load(self,  "starMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "star.dae")))
       else:  
         self.starMesh = None
 
-      try:
-        for i in range(5):
-          engine.loadImgDrawing(self,  "startex"+chr(97+i),  os.path.join("themes", themename, "startex_"+chr(97+i)+".png"))
-        self.startex = True
+      for i in range(5):
+        if engine.loadImgDrawing(self,  "startex"+chr(97+i),  os.path.join("themes", themename, "startex_"+chr(97+i)+".png")):
+          self.startex = True
+        else:
+          self.startex = False
+          break
 
-      except IOError:
-        self.startex = False
-        
-      try:
-        for i in range(5):
-          engine.loadImgDrawing(self,  "staratex"+chr(97+i),  os.path.join("themes", themename, "staratex_"+chr(97+i)+".png"))
-        self.staratex = True
-
-      except IOError:
-        self.staratex = False
+      for i in range(5):
+        if engine.loadImgDrawing(self,  "staratex"+chr(97+i),  os.path.join("themes", themename, "staratex_"+chr(97+i)+".png")):
+          self.staratex = True
+        else:
+          self.staratex = False
+          break
 
     if self.gameMode2p == 6:
-      try:
-        engine.loadImgDrawing(self, "battleFrets", os.path.join("themes", themename,"battle_frets.png"))
-      except IOError:
+      if not engine.loadImgDrawing(self, "battleFrets", os.path.join("themes", themename,"battle_frets.png")):
         self.battleFrets = None
 
     if self.twoDkeys == True:
@@ -470,89 +184,60 @@ class Guitar:
       if defaultKey:
         self.keytex = False
       else:
-        try:
-          for i in range(5):
-            engine.loadImgDrawing(self,  "keytex"+chr(97+i),  os.path.join("themes", themename, "keytex_"+chr(97+i)+".png"))
-          self.keytex = True
-
-        except IOError:
-          self.keytex = False
+        for i in range(5):
+          if engine.loadImgDrawing(self,  "keytex"+chr(97+i),  os.path.join("themes", themename, "keytex_"+chr(97+i)+".png")):
+            self.keytex = True
+          else:
+            self.keytex = False
+            break
     
-
-
-    if self.theme == 0 or self.theme == 1:
-      engine.loadImgDrawing(self, "hitlightning", os.path.join("themes",themename,"lightning.png"),  textureSize = (128, 128))
-
                                                            
     #inkk: loading theme-dependant tail images
     #myfingershurt: must ensure the new tails don't affect the Rock Band mod...
     self.simpleTails = False
 
-    try:
-      for i in range(0,7):
-        engine.loadImgDrawing(self, "tail"+str(i), os.path.join("themes",themename,"tails","tail"+str(i)+".png"),  textureSize = (128, 128))
-        engine.loadImgDrawing(self, "taile"+str(i), os.path.join("themes",themename,"tails","taile"+str(i)+".png"),  textureSize = (128, 128))
-        engine.loadImgDrawing(self, "btail"+str(i), os.path.join("themes",themename,"tails","btail"+str(i)+".png"),  textureSize = (128, 128))
-        engine.loadImgDrawing(self, "btaile"+str(i), os.path.join("themes",themename,"tails","btaile"+str(i)+".png"),  textureSize = (128, 128))
-        
-    except IOError:
-      self.simpleTails = True
+    for i in range(0,7):
+      if not engine.loadImgDrawing(self, "tail"+str(i), os.path.join("themes",themename,"tails","tail"+str(i)+".png"),  textureSize = (128, 128)):
+        self.simpleTails = True
+        break
+      if not engine.loadImgDrawing(self, "taile"+str(i), os.path.join("themes",themename,"tails","taile"+str(i)+".png"),  textureSize = (128, 128)):
+        self.simpleTails = True
+        break
+      if not engine.loadImgDrawing(self, "btail"+str(i), os.path.join("themes",themename,"tails","btail"+str(i)+".png"),  textureSize = (128, 128)):
+        self.simpleTails = True
+        break
+      if not engine.loadImgDrawing(self, "btaile"+str(i), os.path.join("themes",themename,"tails","btaile"+str(i)+".png"),  textureSize = (128, 128)):
+        self.simpleTails = True
+        break
+    
+    if self.simpleTails:
       Log.debug("Simple tails used; complex tail loading error...")
-      try:
-        engine.loadImgDrawing(self, "tail1", os.path.join("themes",themename,"tail1.png"),  textureSize = (128, 128))
-        engine.loadImgDrawing(self, "tail2", os.path.join("themes",themename,"tail2.png"),  textureSize = (128, 128))
-        engine.loadImgDrawing(self, "bigTail1", os.path.join("themes",themename,"bigtail1.png"),  textureSize = (128, 128))
-        engine.loadImgDrawing(self, "bigTail2", os.path.join("themes",themename,"bigtail2.png"),  textureSize = (128, 128))
-      except IOError:
+      if not engine.loadImgDrawing(self, "tail1", os.path.join("themes",themename,"tail1.png"),  textureSize = (128, 128)):
         engine.loadImgDrawing(self, "tail1", "tail1.png",  textureSize = (128, 128))
+      if not engine.loadImgDrawing(self, "tail2", os.path.join("themes",themename,"tail2.png"),  textureSize = (128, 128)):
         engine.loadImgDrawing(self, "tail2", "tail2.png",  textureSize = (128, 128))
+      if not engine.loadImgDrawing(self, "bigTail1", os.path.join("themes",themename,"bigtail1.png"),  textureSize = (128, 128)):
         engine.loadImgDrawing(self, "bigTail1", "bigtail1.png",  textureSize = (128, 128))
+      if not engine.loadImgDrawing(self, "bigTail2", os.path.join("themes",themename,"bigtail2.png"),  textureSize = (128, 128)):
         engine.loadImgDrawing(self, "bigTail2", "bigtail2.png",  textureSize = (128, 128))
 
-    try:
-      engine.loadImgDrawing(self, "kill1", os.path.join("themes", themename, "kill1.png"),  textureSize = (128, 128))
-      engine.loadImgDrawing(self, "kill2", os.path.join("themes", themename, "kill2.png"),  textureSize = (128, 128))
-    except IOError:
+
+    if not engine.loadImgDrawing(self, "kill1", os.path.join("themes", themename, "kill1.png"),  textureSize = (128, 128)):
       engine.loadImgDrawing(self, "kill1", "kill1.png",  textureSize = (128, 128))
+    if not engine.loadImgDrawing(self, "kill2", os.path.join("themes", themename, "kill2.png"),  textureSize = (128, 128)):
       engine.loadImgDrawing(self, "kill2", "kill2.png",  textureSize = (128, 128))
 
     #MFH - freestyle tails (for drum fills & BREs)
-    try:
-      engine.loadImgDrawing(self, "freestyle1", os.path.join("themes", themename, "freestyletail1.png"),  textureSize = (128, 128))
-      engine.loadImgDrawing(self, "freestyle2", os.path.join("themes", themename, "freestyletail2.png"),  textureSize = (128, 128))
-    except IOError:
+    if not engine.loadImgDrawing(self, "freestyle1", os.path.join("themes", themename, "freestyletail1.png"),  textureSize = (128, 128)):
       engine.loadImgDrawing(self, "freestyle1", "freestyletail1.png",  textureSize = (128, 128))
+    if not engine.loadImgDrawing(self, "freestyle2", os.path.join("themes", themename, "freestyletail2.png"),  textureSize = (128, 128)):
       engine.loadImgDrawing(self, "freestyle2", "freestyletail2.png",  textureSize = (128, 128))
-
-
-
-    self.meshColor  = Theme.meshColor
-    self.hopoColor  = Theme.hopoColor
-    self.spotColor = Theme.spotColor   
-    self.keyColor = Theme.keyColor
-    self.key2Color = Theme.key2Color
-    self.tracksColor = Theme.tracksColor
-    self.flameColors = Theme.flameColors
-    self.gh3flameColor = Theme.gh3flameColor
-    self.flameSizes = Theme.flameSizes
-    self.glowColor  = Theme.glowColor
     
     
     self.twoChordMax = False
-    self.disableVBPM  = self.engine.config.get("game", "disable_vbpm")
-    self.disableNoteSFX  = self.engine.config.get("video", "disable_notesfx")
-    self.disableFretSFX  = self.engine.config.get("video", "disable_fretsfx")
-    self.disableFlameSFX  = self.engine.config.get("video", "disable_flamesfx")
 
     self.rockLevel = 0.0
 
-    self.canGuitarSolo = False
-    self.guitarSolo = False
-    self.fretboardHop = 0.00  #stump
-    self.scoreMultiplier = 1
-    self.coOpFailed = False #akedrou
-    self.coOpRestart = False #akedrou
-    self.starPowerActive = False
     self.neck = Neck(self.engine, self, playerObj)
   
   def selectPreviousString(self):
@@ -577,75 +262,6 @@ class Guitar:
       if self.hit[i] == True:
         possible = True
     return possible
-
-  def setBPM(self, bpm):
-    if bpm > 200:
-      bpm = 200
-
-    #MFH - Filter out unnecessary BPM settings (when currentBPM is already set!)
-    #if self.actualBpm != bpm:
-    #  self.actualBpm = bpm
-    self.currentBpm = bpm   #update current BPM as well
-
-    #MFH - Neck speed determination:
-    if self.nstype == 0:    #BPM mode
-      self.neckSpeed = (340 - bpm)/self.speed
-    elif self.nstype == 1:   #Difficulty mode
-      if self.difficulty == 0:    #expert
-        self.neckSpeed = 220/self.speed
-      elif self.difficulty == 1:
-        self.neckSpeed = 250/self.speed
-      elif self.difficulty == 2:
-        self.neckSpeed = 280/self.speed
-      else:   #easy
-        self.neckSpeed = 300/self.speed
-    elif self.nstype == 2:   #BPM & Diff mode
-      if self.difficulty == 0:    #expert
-        self.neckSpeed = (226-(bpm/10))/self.speed
-      elif self.difficulty == 1:
-        self.neckSpeed = (256-(bpm/10))/self.speed
-      elif self.difficulty == 2:
-        self.neckSpeed = (286-(bpm/10))/self.speed
-      else:   #easy
-        self.neckSpeed = (306-(bpm/10))/self.speed
-    else: #Percentage mode - pre-calculated
-      self.neckSpeed = self.speed
-
-    self.earlyMargin       = 250 - bpm/5 - 70*self.hitw
-    self.lateMargin        = 250 - bpm/5 - 70*self.hitw
-    #self.earlyMargin = self.lateMargin * self.earlyHitWindowSizeFactor    #MFH - scale early hit window here
-
-    #self.noteReleaseMargin = 200 - bpm/5 - 70*self.hitw
-    #if (self.noteReleaseMargin < (200 - bpm/5 - 70*1.2)):   #MFH - enforce "tight" hitwindow minimum note release margin
-    #  self.noteReleaseMargin = (200 - bpm/5 - 70*1.2)
-    if self.muteSustainReleases == 4:   #tight
-      self.noteReleaseMargin = (200 - bpm/5 - 70*1.2)
-    elif self.muteSustainReleases == 3: #standard
-      self.noteReleaseMargin = (200 - bpm/5 - 70*1.0)
-    elif self.muteSustainReleases == 2: #wide
-      self.noteReleaseMargin = (200 - bpm/5 - 70*0.7)
-    else:  #ultra-wide 
-      self.noteReleaseMargin = (200 - bpm/5 - 70*0.5)
-
-
-    #MFH - TODO - only calculate the below values if the realtime hit accuracy feedback display is enabled - otherwise this is a waste!
-    self.accThresholdWorstLate = (0-self.lateMargin)
-    self.accThresholdVeryLate = (0-(3*self.lateMargin/4))
-    self.accThresholdLate = (0-(2*self.lateMargin/4))
-    self.accThresholdSlightlyLate = (0-(1*self.lateMargin/4))
-    self.accThresholdExcellentLate = -1.0
-    self.accThresholdPerfect = 1.0
-    self.accThresholdExcellentEarly = (1*self.lateMargin/4)
-    self.accThresholdSlightlyEarly = (2*self.lateMargin/4)
-    self.accThresholdEarly = (3*self.lateMargin/4)
-    self.accThresholdVeryEarly = (4*self.lateMargin/4)
-
-
-    
-  def setMultiplier(self, multiplier):
-    self.scoreMultiplier = multiplier
-    self.neck.scoreMultiplier = multiplier
-
 
   def renderTail(self, length, sustain, kill, color, flat = False, tailOnly = False, isTappable = False, big = False, fret = 0, spNote = False, freestyleTail = 0, pos = 0):
 
@@ -693,7 +309,7 @@ class Guitar:
                 #volshebnyi - killswitch tail width and color change
                 kEffect = ( math.sin( pos / 50 ) + 1 ) /2
                 size = (0.02+kEffect*0.15, s - zsize)
-                c = [self.fretColors[6][0],self.fretColors[6][1],self.fretColors[6][2]]
+                c = [self.killColor[0],self.killColor[1],self.killColor[2]]
                 if c != [0,0,0]:
                   for i in range(0,3):
                     c[i]=c[i]*kEffect+color[i]*(1-kEffect)
@@ -756,7 +372,7 @@ class Guitar:
                 #volshebnyi - killswitch tail width and color change
                 kEffect = ( math.sin( pos / 50 ) + 1 ) /2
                 size = (0.02+kEffect*0.15, s - zsize)
-                c = [self.fretColors[6][0],self.fretColors[6][1],self.fretColors[6][2]]
+                c = [self.killColor[0],self.killColor[1],self.killColor[2]]
                 if c != [0,0,0]:
                   for i in range(0,3):
                     c[i]=c[i]*kEffect+color[i]*(1-kEffect)
@@ -935,15 +551,15 @@ class Guitar:
         glColor4f(.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1) 
 
       if fret == 0: # green note
-        glRotate(Theme.noterot[0], 0, 0, 1), glTranslatef(0, Theme.notepos[0], 0)
+        glRotate(self.engine.theme.noterot[0], 0, 0, 1), glTranslatef(0, self.engine.theme.notepos[0], 0)
       elif fret == 1: # red note
-        glRotate(Theme.noterot[1], 0, 0, 1), glTranslatef(0, Theme.notepos[1], 0)
+        glRotate(self.engine.theme.noterot[1], 0, 0, 1), glTranslatef(0, self.engine.theme.notepos[1], 0)
       elif fret == 2: # yellow
-        glRotate(Theme.noterot[2], 0, 0, 1), glTranslatef(0, Theme.notepos[2], 0)
+        glRotate(self.engine.theme.noterot[2], 0, 0, 1), glTranslatef(0, self.engine.theme.notepos[2], 0)
       elif fret == 3:# blue note
-        glRotate(Theme.noterot[3], 0, 0, 1), glTranslatef(0, Theme.notepos[3], 0)
+        glRotate(self.engine.theme.noterot[3], 0, 0, 1), glTranslatef(0, self.engine.theme.notepos[3], 0)
       elif fret == 4:# blue note
-        glRotate(Theme.noterot[4], 0, 0, 1), glTranslatef(0, Theme.notepos[4], 0)
+        glRotate(self.engine.theme.noterot[4], 0, 0, 1), glTranslatef(0, self.engine.theme.notepos[4], 0)
 
 
       if self.staratex == True and self.starPowerActive and spNote == False:
@@ -1593,15 +1209,15 @@ class Guitar:
           glRotatef(-90, 0, 0, 1)
 
           if n == 0: #green fret button
-            glRotate(Theme.keyrot[0], 0, 1, 0), glTranslatef(0, 0, Theme.keypos[0])
+            glRotate(self.engine.theme.keyrot[0], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.keypos[0])
           elif n == 1: #red fret button
-            glRotate(Theme.keyrot[1], 0, 1, 0), glTranslatef(0, 0, Theme.keypos[1])
+            glRotate(self.engine.theme.keyrot[1], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.keypos[1])
           elif n == 2: #yellow fret button
-            glRotate(Theme.keyrot[2], 0, 1, 0), glTranslatef(0, 0, Theme.keypos[2])
+            glRotate(self.engine.theme.keyrot[2], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.keypos[2])
           elif n == 3: #blue fret button
-            glRotate(Theme.keyrot[3], 0, 1, 0), glTranslatef(0, 0, Theme.keypos[3])
+            glRotate(self.engine.theme.keyrot[3], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.keypos[3])
           elif n == 4: #orange fret button
-            glRotate(Theme.keyrot[4], 0, 1, 0), glTranslatef(0, 0, Theme.keypos[4])
+            glRotate(self.engine.theme.keyrot[4], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.keypos[4])
 
 
           #Mesh - Main fret
@@ -2136,108 +1752,7 @@ class Guitar:
       elif self.battleStatus[6]:
         glScalef(-1, 1, 1)
 
-  def getMissedNotes(self, song, pos, catchup = False):
-    if not song:
-      return
-    if not song.readyToGo:
-      return
-
-    m1      = self.lateMargin
-    m2      = self.lateMargin * 2
-
-    #if catchup == True:
-    #  m2 = 0
-      
-    track   = song.track[self.player]
-    notes   = [(time, event) for time, event in track.getEvents(pos - m1, pos - m2) if isinstance(event, Note)]
-    notes   = [(time, event) for time, event in notes if (time >= (pos - m2)) and (time <= (pos - m1))]
-    notes   = [(time, event) for time, event in notes if not event.played and not event.hopod and not event.skipped]
-
-    if catchup == True:
-      for time, event in notes:
-        event.skipped = True
-
-    return sorted(notes, key=lambda x: x[1].number)        
     #return notes
-
-  def getMissedNotesMFH(self, song, pos, catchup = False):
-    if not song:
-      return
-    if not song.readyToGo:
-      return
-
-    m1      = self.lateMargin
-    m2      = self.lateMargin * 2
-      
-    track   = song.track[self.player]
-    notes   = [(time, event) for time, event in track.getEvents(pos - m2, pos - m1) if isinstance(event, Note)]   #was out of order
-    
-    #MFH - this additional filtration step removes sustains whose Note On event time is now outside the hitwindow.
-    notes   = [(time, event) for time, event in notes if (time >= (pos - m2)) and (time <= (pos - m1))] 
-    
-    notes   = [(time, event) for time, event in notes if not event.played and not event.hopod and not event.skipped]
-
-    if catchup:
-      for time, event in notes:
-        event.skipped = True
-      
-    return sorted(notes, key=lambda x: x[0])    #MFH - what the hell, this should be sorted by TIME not note number....
-
-
-
-  def getRequiredNotes(self, song, pos):
-    if self.battleStatus[2] and self.difficulty != 0:
-      if pos < self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard or pos > self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
-        song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue]
-      else:
-        song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue - 1]
-        
-    track   = song.track[self.player]
-    notes = [(time, event) for time, event in track.getEvents(pos - self.lateMargin, pos + self.earlyMargin) if isinstance(event, Note)]
-    notes = [(time, event) for time, event in notes if not event.played]
-    notes = [(time, event) for time, event in notes if (time >= (pos - self.lateMargin)) and (time <= (pos + self.earlyMargin))]
-    if notes:
-      t     = min([time for time, event in notes])
-      notes = [(time, event) for time, event in notes if time - t < 1e-3]
-    #Log.debug(notes)
-    if self.battleStatus[7]:
-      notes = self.getDoubleNotes(notes)
-    return sorted(notes, key=lambda x: x[1].number)
-
-  def getRequiredNotes2(self, song, pos, hopo = False):
-    if self.battleStatus[2] and self.difficulty != 0:
-      if pos < self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard or pos > self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
-        song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue]
-      else:
-        song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue - 1]
-        
-    track   = song.track[self.player]
-    notes = [(time, event) for time, event in track.getEvents(pos - self.lateMargin, pos + self.earlyMargin) if isinstance(event, Note)]
-    notes = [(time, event) for time, event in notes if not (event.hopod or event.played)]
-    notes = [(time, event) for time, event in notes if (time >= (pos - self.lateMargin)) and (time <= (pos + self.earlyMargin))]
-    if notes:
-      t     = min([time for time, event in notes])
-      notes = [(time, event) for time, event in notes if time - t < 1e-3]
-    #Log.debug(notes)
-    if self.battleStatus[7]:
-      notes = self.getDoubleNotes(notes)
-    return sorted(notes, key=lambda x: x[1].number)
-    
-  def getRequiredNotes3(self, song, pos, hopo = False):
-    if self.battleStatus[2] and self.difficulty != 0:
-      if pos < self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard or pos > self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
-        song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue]
-      else:
-        song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue - 1]
-        
-    track   = song.track[self.player]
-    notes = [(time, event) for time, event in track.getEvents(pos - self.lateMargin, pos + self.earlyMargin) if isinstance(event, Note)]
-    notes = [(time, event) for time, event in notes if not (event.hopod or event.played or event.skipped)]
-    notes = [(time, event) for time, event in notes if (time >= (pos - self.lateMargin)) and (time <= (pos + self.earlyMargin))]
-    #Log.debug(notes)
-    if self.battleStatus[7]:
-      notes = self.getDoubleNotes(notes)
-    return sorted(notes, key=lambda x: x[1].number)
 
   #MFH - corrected and optimized:
   #def getRequiredNotesMFH(self, song, pos):
@@ -2250,14 +1765,11 @@ class Guitar:
     
     track   = song.track[self.player]
     if hopoTroubleCheck:
-      #notes = [(time, event) for time, event in track.getEvents(pos, pos + (self.earlyMargin*2)) if isinstance(event, Note)]
-      #notes = [(time, event) for time, event in notes if not (event.hopod or event.played or event.skipped)]
       notes = [(time, event) for time, event in track.getEvents(pos, pos + (self.earlyMargin*2)) if isinstance(event, Note)]
       notes = [(time, event) for time, event in notes if not time==pos] #MFH - filter out the problem note that caused this check!
     else:
       notes = [(time, event) for time, event in track.getEvents(pos - self.lateMargin, pos + self.earlyMargin) if isinstance(event, Note)]
       notes = [(time, event) for time, event in notes if not (event.hopod or event.played or event.skipped)]
-      #MFH - this additional filtration step removes sustains whose Note On event time is now outside the hitwindow.
       notes = [(time, event) for time, event in notes if (time >= (pos - self.lateMargin)) and (time <= (pos + self.earlyMargin))]
 
     sorted(notes, key=lambda x: x[0])

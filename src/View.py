@@ -25,14 +25,23 @@ from __future__ import division
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
+import numpy as np
+
 import Log
 
 from Task import Task
 
 class Layer(Task):
+  def __getattr__(self, name):  #for new out-themed rendering
+    if name.startswith("img_"): #rather than try-except, just expect None on no image.
+      return None
+    else:
+      e = str(self.__class__).split(".")[1] + " has no attribute '%s'" % name
+      raise AttributeError(e)
+  
   def render(self, visibility, topMost):
     pass
-    
+  
   def shown(self):
     pass
   
@@ -57,12 +66,72 @@ class View(Task):
     self.outgoing = []
     self.visibility = {}
     self.transitionTime = 512.0
-    self.geometry = geometry or glGetIntegerv(GL_VIEWPORT)
-    self.savedGeometry = None
     self.engine = engine
+    if geometry:
+      self.geometry = list(geometry)
+    else:
+      self.geometry = list(glGetIntegerv(GL_VIEWPORT))
     w = self.geometry[2] - self.geometry[0]
     h = self.geometry[3] - self.geometry[1]
     self.aspectRatio = float(w) / float(h)
+    self.geometryNormalized = [0,0,0,0]
+    self.setNormalizedGeometry()
+    self.geometryAll = None
+    self.initGeometryAll()
+    self.geometryAllHalf = None
+    self.initGeometryAllHalf()
+
+  def initGeometryAll(self):
+    #precalculate geometry for all screens
+    maxScreens = 4
+    screensArray = np.zeros((maxScreens,maxScreens,4))
+    for screens in range(1,maxScreens+1):
+      screenArray = np.zeros((screens,4))
+      for screen in range(0,screens):
+        if screens == 1:
+          screenArray[screen][0] = self.geometry[0]
+          screenArray[screen][1] = self.geometry[1]
+          screenArray[screen][2] = self.geometry[2]
+          screenArray[screen][3] = self.geometry[3]
+        else:
+          screenArray[screen][0] = int(self.geometry[0]+((screen-0.2)*self.geometry[2]/screens))
+          screenArray[screen][2] = int(self.geometry[2]*1.4/screens)
+          screenArray[screen][1] = int(self.geometry[1]) #QQstarS:
+          screenArray[screen][3] = int(self.geometry[3]*1.6/screens)  #QQstarS
+        screensArray[screens-1][screen][:] = screenArray[screen]
+
+    self.geometryAll = screensArray
+
+  def initGeometryAllHalf(self):
+    #precalculate geometryHalf for all screens
+    maxScreens = 4
+    screensArray = np.zeros((maxScreens,maxScreens,4))
+    for screens in range(1,maxScreens+1):
+      screenArray = np.zeros((screens,4))
+      for screen in range(0,screens):
+        if screens == 1:
+          screenArray[screen][0] = self.geometry[0]
+          screenArray[screen][1] = self.geometry[1]
+          screenArray[screen][2] = self.geometry[2]
+          screenArray[screen][3] = self.geometry[3]
+        else: 
+          screenArray[screen][0] = int(self.geometry[0]+(screen*self.geometry[2]/screens))
+          screenArray[screen][2] = int(self.geometry[2]/screens) 
+          screenArray[screen][1] = int(self.geometry[1])#+(geometry[3]/screens*2/3)) #QQstarS
+          screenArray[screen][3] = int((self.geometry[3]/screens)*1.5) #QQstarS: make the Y postion smaller
+        screensArray[screens-1][screen][:] = screenArray[screen]
+
+    self.geometryAllHalf = screensArray
+
+  def setNormalizedGeometry(self):
+    w = self.geometry[2] - self.geometry[0]
+    h = self.geometry[3] - self.geometry[1]
+    # aspect ratio correction
+    h *= (float(w) / float(h)) / (4.0 / 3.0)
+    self.geometryNormalized[0] = 0
+    self.geometryNormalized[1] = 0
+    self.geometryNormalized[2] = 1
+    self.geometryNormalized[3] = h / w
 
   def pushLayer(self, layer):
     Log.debug("View: Push: %s" % layer.__class__.__name__)
@@ -125,7 +194,7 @@ class View(Task):
             layer.hidden()
           if layer in self.incoming:
             self.incoming.remove(layer)
-      elif layer in self.incoming or layer is topLayer:
+      elif layer in self.incoming or layer is topLayer or layer.isBackgroundLayer():
         if self.visibility[layer] < 1.0:
           self.visibility[layer] = min(1.0, self.visibility[layer] + t)
         else:
@@ -138,20 +207,21 @@ class View(Task):
     glPushMatrix()
     glLoadIdentity()
 
-    viewport = glGetIntegerv(GL_VIEWPORT)
     if normalize:
-      w = viewport[2] - viewport[0]
-      h = viewport[3] - viewport[1]
-      # aspect ratio correction
-      h *= (float(w) / float(h)) / (4.0 / 3.0)
-      viewport = [0, 0, 1, h / w]
-  
-    if yIsDown:
-      glOrtho(viewport[0], viewport[2] - viewport[0],
-              viewport[3] - viewport[1], viewport[1], -100, 100);
+      if yIsDown:
+        glOrtho(self.geometryNormalized[0], self.geometryNormalized[2] - self.geometryNormalized[0],
+                self.geometryNormalized[3] - self.geometryNormalized[1], self.geometryNormalized[1], -100, 100);
+      else:
+        glOrtho(self.geometryNormalized[0], self.geometryNormalized[2] - self.geometryNormalized[0],
+                self.geometryNormalized[1], self.geometryNormalized[3] - self.geometryNormalized[1], -100, 100);
     else:
-      glOrtho(viewport[0], viewport[2] - viewport[0],
-              viewport[1], viewport[3] - viewport[1], -100, 100);
+      if yIsDown:
+        glOrtho(self.geometry[0], self.geometry[2] - self.geometry[0],
+                self.geometry[3] - self.geometry[1], self.geometry[1], -100, 100);
+      else:
+        glOrtho(self.geometry[0], self.geometry[2] - self.geometry[0],
+                self.geometry[1], self.geometry[3] - self.geometry[1], -100, 100);
+
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
@@ -163,52 +233,22 @@ class View(Task):
     glPopMatrix()
 
   def setGeometry(self, geometry, screens=1):
-    viewport = glGetIntegerv(GL_VIEWPORT)
-    w = viewport[2] - viewport[0]
-    h = viewport[3] - viewport[1]
-    s = (w, h, w, h)
-
-    geometry = [(type(coord) == float) and int(s[i] * coord) or int(coord) for i, coord in enumerate(geometry)]
-    geometry[0] = int(geometry[0] / screens)
-    geometry[2] = int(geometry[2] / screens)
-    geometry = tuple(geometry)
-    self.savedGeometry, self.geometry = viewport, geometry
-    glViewport(int(geometry[0]), int(geometry[1]), int(geometry[2]), int(geometry[3]))
-    glScissor(int(geometry[0]), int(geometry[1]), int(geometry[2]), int(geometry[3]))
+    self.geometry[0] = int(geometry[0])
+    self.geometry[1] = int(geometry[1])
+    self.geometry[2] = int(geometry[2])
+    self.geometry[3] = int(geometry[3])
+    self.initGeometryAll()
+    self.initGeometryAllHalf()
+    self.setNormalizedGeometry()
+    self.setViewport(screens)
 
   def setViewport(self, screens=1, screen=0):
-    geometry = list(self.savedGeometry)
-    if screens != 1:
-      geometry[0] = int(geometry[0]+((screen-0.2)*geometry[2]/screens))
-      geometry[2] = int(geometry[2]*1.4/screens)
-      geometry[1] = int(geometry[1]) #QQstarS:
-      geometry[3] = int(geometry[3]*1.6/screens)  #QQstarS
-    geometry = tuple(geometry)
-    self.geometry = geometry
-
-    glViewport(int(geometry[0]), int(geometry[1]), int(geometry[2]), int(geometry[3]))
-    glScissor(int(geometry[0]), int(geometry[1]), int(geometry[2]), int(geometry[3]))
+    glViewport(int(self.geometryAll[screens-1,screen,0]), int(self.geometryAll[screens-1,screen,1]), int(self.geometryAll[screens-1,screen,2]), int(self.geometryAll[screens-1,screen,3]))
+    glScissor(int(self.geometryAll[screens-1,screen,0]), int(self.geometryAll[screens-1,screen,1]), int(self.geometryAll[screens-1,screen,2]), int(self.geometryAll[screens-1,screen,3]))
 
   def setViewportHalf(self, screens=1, screen=0):
-    geometry = list(self.savedGeometry)
-    if screens != 1:
-      geometry[0] = int(geometry[0]+(screen*geometry[2]/screens))
-      geometry[2] = int(geometry[2]/screens) 
-      geometry[1] = int(geometry[1])#+(geometry[3]/screens*2/3)) #QQstarS
-      geometry[3] = int((geometry[3]/screens)*1.5) #QQstarS: make the Y postion smaller
-    geometry = tuple(geometry)
-    self.geometry = geometry
-
-    glViewport(int(geometry[0]), int(geometry[1]), int(geometry[2]), int(geometry[3]))
-    glScissor(int(geometry[0]), int(geometry[1]), int(geometry[2]), int(geometry[3]))    
-
-  def resetGeometry(self):
-    assert self.savedGeometry
-    
-    self.savedGeometry, geometry = None, self.savedGeometry
-    self.geometry = geometry
-    glViewport(int(geometry[0]), int(geometry[1]), int(geometry[2]), int(geometry[3]))
-    glScissor(int(geometry[0]), int(geometry[1]), int(geometry[2]), int(geometry[3]))
+    glViewport(int(self.geometryAllHalf[screens-1,screen,0]), int(self.geometryAllHalf[screens-1,screen,1]), int(self.geometryAllHalf[screens-1,screen,2]), int(self.geometryAllHalf[screens-1,screen,3]))
+    glScissor(int(self.geometryAllHalf[screens-1,screen,0]), int(self.geometryAllHalf[screens-1,screen,1]), int(self.geometryAllHalf[screens-1,screen,2]), int(self.geometryAllHalf[screens-1,screen,3]))    
 
   def render(self):
     #print [(str(m.__class__), v) for m, v in self.visibility.items()]

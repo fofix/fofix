@@ -30,11 +30,9 @@ from Song import VocalNote, VocalPhrase
 from OpenGL.GL import *
 from numpy import array, float32
 from random import random
-import Theme
 
 #stump: needed for continuous star fillup (akedrou - stealing for vocals)
-import Image
-import ImageDraw
+from PIL import Image, ImageDraw
 from Svg import ImgDrawing
 
 diffMod    = {0: 1.4, 1: 1.6, 2: 1.75, 3: 1.9}
@@ -153,63 +151,56 @@ class Vocalist:
     self.engine.loadImgDrawing(self, "vocalLyricSheet", os.path.join(self.engine.data.vocalPath,"lyricsheet.png"))
     imgwidth = self.vocalLyricSheet.width1()
     self.vocalLyricSheetWFactor = 640.000/imgwidth
-    try:
-      self.engine.loadImgDrawing(self, "vocalLyricSheetGlow", os.path.join(self.engine.data.vocalPath,"lyricsheetglow.png"))
+
+    if self.engine.loadImgDrawing(self, "vocalLyricSheetGlow", os.path.join(self.engine.data.vocalPath,"lyricsheetglow.png")):
       imgwidth = self.vocalLyricSheetGlow.width1()
       self.vocalLyricSheetGlowWFactor = 640.000/imgwidth
-    except:
+    else:
       self.vocalLyricSheetGlow = None
-    try:
-      self.engine.loadImgDrawing(self, "vocalLyricSheetSP", os.path.join(self.engine.data.vocalPath,"lyricsheetactivate.png"))
+
+    if self.engine.loadImgDrawing(self, "vocalLyricSheetSP", os.path.join(self.engine.data.vocalPath,"lyricsheetactivate.png")):
       self.vocalSheetSPWidth = float(self.vocalLyricSheetSP.width1()*self.vocalLyricSheetWFactor)*(self.engine.view.geometry[2]/640.0)
-    except:
+    else:
       self.vocalLyricSheetSP = None
+
     self.engine.loadImgDrawing(self, "vocalArrow", os.path.join(self.engine.data.vocalPath,"arrow.png"))
-    try:
-      self.engine.loadImgDrawing(self, "vocalSplitArrow", os.path.join(self.engine.data.vocalPath,"split_arrow.png"))
-    except IOError:
+    if not self.engine.loadImgDrawing(self, "vocalSplitArrow", os.path.join(self.engine.data.vocalPath,"split_arrow.png")):
       self.vocalSplitArrow = self.vocalArrow
+
     self.engine.loadImgDrawing(self, "vocalBar", os.path.join(self.engine.data.vocalPath,"beatline.png"))
     self.arrowW = self.vocalArrow.width1()
     self.engine.loadImgDrawing(self, "vocalMult", os.path.join(self.engine.data.vocalPath,"mult.png"))
     self.engine.loadImgDrawing(self, "vocalMeter", os.path.join(self.engine.data.vocalPath,"meter.png"))
-    try:
-      self.engine.loadImgDrawing(self, "vocalFill", os.path.join(self.engine.data.vocalPath,"meter_fill.png"))
-    except IOError:
+    if not self.engine.loadImgDrawing(self, "vocalFill", os.path.join(self.engine.data.vocalPath,"meter_fill.png")):
       self.vocalFill = self.vocalMeter
-    try:
-      self.engine.loadImgDrawing(self, "vocalGlow", os.path.join(self.engine.data.vocalPath,"meter_glow.png"))
-    except IOError:
+    if not self.engine.loadImgDrawing(self, "vocalGlow", os.path.join(self.engine.data.vocalPath,"meter_glow.png")):
       self.vocalGlow = None
     self.engine.loadImgDrawing(self, "vocalTap", os.path.join(self.engine.data.vocalPath,"tap.png"))
     self.engine.loadImgDrawing(self, "vocalTapNote", os.path.join(self.engine.data.vocalPath,"tap_note.png"))
-    try:
-      self.engine.loadImgDrawing(self, "vocalText", os.path.join(self.engine.data.vocalPath,"text.png"))
-    except IOError:
+
+    if not self.engine.loadImgDrawing(self, "vocalText", os.path.join(self.engine.data.vocalPath,"text.png")):
       self.vocalText = None
     self.engine.loadImgDrawing(self, "vocalODBottom", os.path.join(self.engine.data.vocalPath,"bottom.png"))
     self.engine.loadImgDrawing(self, "vocalODFill", os.path.join(self.engine.data.vocalPath,"fill.png"))
     self.vocalODFillWidth = self.vocalODFill.width1()/1280.000
-    try:
-      self.engine.loadImgDrawing(self, "vocalODTop", os.path.join(self.engine.data.vocalPath,"top.png"))
-    except IOError:
+
+    if not self.engine.loadImgDrawing(self, "vocalODTop", os.path.join(self.engine.data.vocalPath,"top.png")):
       self.vocalODTop = None
-    try:
-      self.engine.loadImgDrawing(self, "vocalODGlow", os.path.join(self.engine.data.vocalPath,"glow.png"))
-    except IOError:
+
+    if not self.engine.loadImgDrawing(self, "vocalODGlow", os.path.join(self.engine.data.vocalPath,"glow.png")):
       self.vocalODGlow = None
     
     height = self.vocalMeter.height1()
-    vocalSize = Theme.vocalMeterSize
+    vocalSize = self.engine.theme.vocalMeterSize
     self.vocalMeterScale = (vocalSize/height)*.5
     self.vocalFillWidth = self.vocalFill.width1()*self.vocalMeterScale/640.000
-    olFactor = height/Theme.vocalFillupFactor
-    self.vocalFillupCenterX = int(Theme.vocalFillupCenterX*olFactor)
-    self.vocalFillupCenterY = int(Theme.vocalFillupCenterY*olFactor)
-    self.vocalFillupInRadius = int(Theme.vocalFillupInRadius*olFactor)
-    self.vocalFillupOutRadius = int(Theme.vocalFillupOutRadius*olFactor)
-    self.vocalFillupColor = Theme.vocalFillupColor
-    self.vocalContinuousAvailable = Theme.vocalCircularFillup and \
+    olFactor = height/self.engine.theme.vocalFillupFactor
+    self.vocalFillupCenterX = int(self.engine.theme.vocalFillupCenterX*olFactor)
+    self.vocalFillupCenterY = int(self.engine.theme.vocalFillupCenterY*olFactor)
+    self.vocalFillupInRadius = int(self.engine.theme.vocalFillupInRadius*olFactor)
+    self.vocalFillupOutRadius = int(self.engine.theme.vocalFillupOutRadius*olFactor)
+    self.vocalFillupColor = self.engine.theme.colorToHex(self.engine.theme.vocalFillupColor)
+    self.vocalContinuousAvailable = self.engine.theme.vocalCircularFillup and \
       None not in (self.vocalFillupCenterX, self.vocalFillupCenterY, self.vocalFillupInRadius, self.vocalFillupOutRadius, self.vocalFillupColor)
     if self.vocalContinuousAvailable:
       try:
@@ -230,23 +221,23 @@ class Vocalist:
         Log.error('Could not prebuild vocal overlay textures: ')
         self.vocalContinuousAvailable = False
     
-    self.vocalLaneSize        = Theme.vocalLaneSize
-    self.vocalGlowSize        = Theme.vocalGlowSize
-    self.vocalGlowFade        = Theme.vocalGlowFade
-    self.vocalLaneColor       = list(Theme.vocalLaneColor)
-    self.vocalShadowColor     = list(Theme.vocalShadowColor)
-    self.vocalGlowColor       = list(Theme.vocalGlowColor)
-    self.vocalLaneColorStar   = list(Theme.vocalLaneColorStar)
-    self.vocalShadowColorStar = list(Theme.vocalShadowColorStar)
-    self.vocalGlowColorStar   = list(Theme.vocalGlowColorStar)
+    self.vocalLaneSize        = self.engine.theme.vocalLaneSize
+    self.vocalGlowSize        = self.engine.theme.vocalGlowSize
+    self.vocalGlowFade        = self.engine.theme.vocalGlowFade
+    self.vocalLaneColor       = list(self.engine.theme.vocalLaneColor)
+    self.vocalShadowColor     = list(self.engine.theme.vocalShadowColor)
+    self.vocalGlowColor       = list(self.engine.theme.vocalGlowColor)
+    self.vocalLaneColorStar   = list(self.engine.theme.vocalLaneColorStar)
+    self.vocalShadowColorStar = list(self.engine.theme.vocalShadowColorStar)
+    self.vocalGlowColorStar   = list(self.engine.theme.vocalGlowColorStar)
     
     self.lastVal     = 0
-    self.vocalMeterX = Theme.vocalMeterX
-    self.vocalMeterY = Theme.vocalMeterY
-    self.vocalMultX  = Theme.vocalMultX
-    self.vocalMultY  = Theme.vocalMultY
-    self.vocalPowerX = Theme.vocalPowerX
-    self.vocalPowerY = Theme.vocalPowerY
+    self.vocalMeterX = self.engine.theme.vocalMeterX
+    self.vocalMeterY = self.engine.theme.vocalMeterY
+    self.vocalMultX  = self.engine.theme.vocalMultX
+    self.vocalMultY  = self.engine.theme.vocalMultY
+    self.vocalPowerX = self.engine.theme.vocalPowerX
+    self.vocalPowerY = self.engine.theme.vocalPowerY
     
     self.time = 0.0
     self.tap  = 0

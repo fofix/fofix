@@ -21,16 +21,27 @@
 #####################################################################
 import os
 import sys
-import gobject
 
-from math import fabs as abs # Absolute value
+# Twiddle the appropriate envvars under Windows so we can load gstreamer
+# directly from [FoFiX root]/gstreamer and not have the ugliness of
+# requiring the user to install and configure it separately...
+if os.name == 'nt':
+  if hasattr(sys, 'frozen'):
+    _gstpath = 'gstreamer'
+  else:
+    _gstpath = os.path.join('..', 'gstreamer')
+  if os.path.isdir(_gstpath):
+    os.environ['PATH'] = os.path.abspath(os.path.join(_gstpath, 'bin')) + os.pathsep + os.environ['PATH']
+    os.environ['GST_PLUGIN_PATH'] = os.path.abspath(os.path.join(_gstpath, 'lib', 'gstreamer-0.10'))
 
 # Almighty GStreamer
+import gobject
+import pygst
+pygst.require('0.10')
 import gst
 from gst.extend import discoverer # Video property detection
 
 import pygame
-from pygame.locals import *
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
@@ -39,10 +50,11 @@ from numpy import array, float32
 
 from View import View, BackgroundLayer
 import Log
+from Texture import Texture
 
 # Simple video player
 class VideoPlayer(BackgroundLayer):
-  def __init__(self, framerate, vidSource, (winWidth, winHeight) = (None, None), mute = False, loop = False):
+  def __init__(self, framerate, vidSource, (winWidth, winHeight) = (None, None), mute = False, loop = False, startTime = None, endTime = None):
     self.updated = False
     self.videoList = None
     self.videoTex = None
@@ -50,18 +62,22 @@ class VideoPlayer(BackgroundLayer):
     self.videoSrc = vidSource
     self.mute = mute
     self.loop = loop
+    self.startTime = startTime
+    self.endTime = endTime
     if winWidth is not None and winHeight is not None:
       self.winWidth, self.winHeight = winWidth, winHeight
     else: # default
       self.winWidth, self.winHeight = (640, 480)
-      Log.warning("VideoPlayer: No resolution specified (default %dx%d)",
-                  self.winWidth, self.winHeight)
+      Log.warn("VideoPlayer: No resolution specified (default %dx%d)" %
+               (self.winWidth, self.winHeight))
     self.vidWidth, self.vidHeight = -1, -1
     self.fps = framerate
     self.clock = pygame.time.Clock()
     self.paused = False
     self.finished = False
     self.discovered = False
+    self.timeFormat = gst.Format(gst.FORMAT_TIME)
+
     self.loadVideo(vidSource) # Load the video
 
   # Load a new video:
@@ -69,6 +85,7 @@ class VideoPlayer(BackgroundLayer):
   # 2) Setup OpenGL texture
   # 3) Setup GStreamer pipeline
   def loadVideo(self, vidSource):
+    Log.debug("Attempting to load video: %s" % self.videoSrc)
     if not os.path.exists(vidSource):
       Log.error("Video %s does not exist!" % vidSource)
     self.videoSrc = vidSource
@@ -79,11 +96,16 @@ class VideoPlayer(BackgroundLayer):
     while not self.discovered:
       # Force C threads iteration
       gobject.MainLoop().get_context().iteration(True)
+    if not self.validFile:
+      Log.error("Invalid video file: %s\n" % self.videoSrc)
+      return False
     self.textureSetup()
     self.videoSetup()
+    return True
 
   # Use GStreamer's video discoverer to autodetect video properties
   def videoDiscover(self, d, isMedia):
+    self.validFile = True
     if isMedia and d.is_video:
       self.vidWidth, self.vidHeight = d.videowidth, d.videoheight
       # Force mute if no sound track is available or
@@ -92,25 +114,18 @@ class VideoPlayer(BackgroundLayer):
         Log.warn("Video has no sound ==> forcing mute.")
         self.mute = True
     else:
-      Log.error("Invalid video file: %s" % self.videoSrc)
+      self.validFile = False
+
     self.discovered = True
 
   def textureSetup(self):
-    blankSurface = pygame.Surface((self.vidWidth, self.vidHeight),
-                                  HWSURFACE, 24)
-    blankSurface.fill((0,0,0))
+    if not self.validFile:
+      return
 
-    surfaceData = pygame.image.tostring(blankSurface, "RGB", True)
-    self.videoBuffer = surfaceData
-    self.videoTex = glGenTextures(1)
-    glBindTexture(GL_TEXTURE_2D, self.videoTex)
-    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB,
-                      self.vidWidth, self.vidHeight, GL_RGB,
-                      GL_UNSIGNED_BYTE, surfaceData)
-    glTexParameteri(GL_TEXTURE_2D, 
-                    GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-    glTexParameteri(GL_TEXTURE_2D,
-                    GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+    self.videoTex = Texture(useMipmaps=False)
+    self.videoBuffer = '\x00\x00\x00' * self.vidWidth * self.vidHeight
+    self.updated = True
+    self.textureUpdate()
 
     # Resize video (polygon) to respect resolution ratio
     # (The math is actually simple, take the time to draw it down if required)
@@ -132,18 +147,31 @@ class VideoPlayer(BackgroundLayer):
                       [-vtxX,  vtxY],
                       [-vtxX, -vtxY],
                       [ vtxX, -vtxY]], dtype=float32)
+    backVtx =  array([[-1.0,  1.0],
+                      [ 1.0, -1.0],
+                      [ 1.0,  1.0],
+                      [-1.0,  1.0],
+                      [-1.0, -1.0],
+                      [ 1.0, -1.0]], dtype=float32)
     # Texture coordinates
-    videoTex = array([[0.0, 1.0],
-                      [1.0, 0.0],
-                      [1.0, 1.0],
-                      [0.0, 1.0],
-                      [0.0, 0.0],
-                      [1.0, 0.0]], dtype=float32)
-    
+    videoTex = array([[0.0,                   self.videoTex.size[1]],
+                      [self.videoTex.size[0], 0.0],
+                      [self.videoTex.size[0], self.videoTex.size[1]],
+                      [0.0,                   self.videoTex.size[1]],
+                      [0.0,                   0.0],
+                      [self.videoTex.size[0], 0.0]], dtype=float32)
+
     # Create a compiled OpenGL call list and do array-based drawing
     # Could have used GL_QUADS but IIRC triangles are recommended
     self.videoList = glGenLists(1)
     glNewList(self.videoList, GL_COMPILE)
+    # Draw borders where video aspect is different than specified width/height
+    glEnableClientState(GL_VERTEX_ARRAY)
+    glColor3f(0., 0., 0.)
+    glVertexPointerf(backVtx)
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, backVtx.shape[0])
+    glDisableClientState(GL_VERTEX_ARRAY)
+    # Draw video
     glEnable(GL_TEXTURE_2D)
     glColor3f(1., 1., 1.)
     glEnableClientState(GL_VERTEX_ARRAY)
@@ -160,6 +188,19 @@ class VideoPlayer(BackgroundLayer):
   # Note: playbin2 seems also suitable, we might want to experiment with it
   #       if decodebin is proven problematic
   def videoSetup(self):
+    if self.startTime is not None or self.endTime is not None:
+      self.setTime = True
+    else:
+      self.setTime = False
+    if self.startTime is not None:
+      self.startNs = self.startTime * 1000000 # From ms to ns
+    else:
+      self.startNs = 0
+    if self.endTime is not None:
+      self.endNs = self.endTime * 1000000
+    else:
+      self.endNs = -1
+
     with_audio = ""
     if not self.mute:
       with_audio = "! queue ! audioconvert ! audiorate ! audioresample ! autoaudiosink"
@@ -169,6 +210,7 @@ class VideoPlayer(BackgroundLayer):
     self.fakeSink = self.player.get_by_name('output')
     self.input.set_property("location", self.videoSrc)
     self.fakeSink.connect ("handoff", self.newFrame)
+
     # Catch the end of file as well as errors
     # FIXME:
     #  Messages are sent if i use the following in run():
@@ -186,30 +228,40 @@ class VideoPlayer(BackgroundLayer):
   # Handle bus event e.g. end of video or unsupported formats/codecs
   def onMessage(self, bus, message):
     type = message.type
-#     print "Message %s" % type
+#    print "Message %s" % type
     # End of video
     if type == gst.MESSAGE_EOS:
       if self.loop:
-        self.player.set_state(gst.STATE_NULL)
-        # HACKISH: Need to recreate the pipepile altogether...
-        # For some reason going through STATE_NULL, STATE_READY, STATE_PLAYING
-        # doesn't work as I would expect.
-        self.videoSetup()
+        # Seek back to start time and set end time
+        self.player.seek(1, self.timeFormat, gst.SEEK_FLAG_FLUSH,
+                         gst.SEEK_TYPE_SET, self.startNs,
+                         gst.SEEK_TYPE_SET, self.endNs)
       else:
         self.player.set_state(gst.STATE_NULL)
         self.finished = True
     # Error
     elif type == gst.MESSAGE_ERROR:
-      err, debug = message.parse_error()
-      Log.error("GStreamer error: %s" % err, debug)
+      err = message.parse_error()
+      Log.error("GStreamer error: %s" % err)
       self.player.set_state(gst.STATE_NULL)
       self.finished = True
+#      raise NameError("GStreamer error: %s" % err)
     elif type == gst.MESSAGE_WARNING:
       warning, debug = message.parse_warning()
-      Log.warn("GStreamer warning: %s" % warning, debug)
-    # elif type == gst.MESSAGE_STATE_CHANGED:
-    #   oldstate, newstate, pending = message.parse_state_changed()
-    #   Log.debug("GStreamer state: %s" % newstate)
+      Log.warn("GStreamer warning: %s\n(---) %s" % (warning, debug))
+    elif type == gst.MESSAGE_STATE_CHANGED:
+      oldstate, newstate, pending = message.parse_state_changed()
+#       Log.debug("GStreamer state: %s" % newstate)
+      if newstate == gst.STATE_READY:
+        # Set start and end time
+        if self.setTime:
+          # Note: Weirdly, contrary to loop logic, i need a wait here!
+          #       Moreover, at the beginning, we're ready more than once!?
+          pygame.time.wait(1000) # Why, oh why... isn't ready, READY?!
+          self.player.seek(1, self.timeFormat, gst.SEEK_FLAG_FLUSH,
+                           gst.SEEK_TYPE_SET, self.startNs,
+                           gst.SEEK_TYPE_SET, self.endNs)
+          self.setTime = False # Execute just once
 
   # Handle new video frames coming from the decoder
   def newFrame(self, sink, buffer, pad):
@@ -221,24 +273,19 @@ class VideoPlayer(BackgroundLayer):
       img = pygame.image.frombuffer(self.videoBuffer,
                                     (self.vidWidth, self.vidHeight),
                                     'RGB')
-      glBindTexture(GL_TEXTURE_2D, self.videoTex)
-      surfaceData = pygame.image.tostring(img ,'RGB', True)
-      # Use linear filtering
-      glTexImage2D(GL_TEXTURE_2D, 0, 3, self.vidWidth, self.vidHeight, 0,
-                   GL_RGB, GL_UNSIGNED_BYTE, surfaceData)
-      glTexParameteri(GL_TEXTURE_2D,
-                      GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-      glTexParameteri(GL_TEXTURE_2D,
-                      GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+      self.videoTex.loadSurface(img)
+      self.videoTex.setFilter()
       self.updated = False
 
   def shown(self):
     gobject.threads_init()
-  
+
   def hidden(self):
     self.player.set_state(gst.STATE_NULL)
 
   def run(self, ticks = None):
+    if not self.validFile:
+      return
     if self.paused == True:
       self.player.set_state(gst.STATE_PAUSED)
     else:
@@ -246,7 +293,7 @@ class VideoPlayer(BackgroundLayer):
       self.finished = False
     gobject.MainLoop().get_context().iteration(True)
     self.clock.tick(self.fps)
-    
+
   # Render texture to polygon
   # Note: Both visibility and topMost are currently unused.
   def render(self, visibility = 1.0, topMost = False):
@@ -260,11 +307,11 @@ class VideoPlayer(BackgroundLayer):
       glPushMatrix()
       glLoadIdentity()
       # Draw the polygon and apply texture
-      glBindTexture(GL_TEXTURE_2D, self.videoTex)
+      self.videoTex.bind()
       glCallList(self.videoList)
       # Restore both transformation matrices
       glPopMatrix()
       glMatrixMode(GL_PROJECTION)
       glPopMatrix()
-    except:
+    except Exception:
       Log.error("Error attempting to play video")

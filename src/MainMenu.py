@@ -1,4 +1,4 @@
-####################################################################
+#####################################################################
 # -*- coding: iso-8859-1 -*-                                        #
 #                                                                   #
 # Frets on Fire                                                     #
@@ -24,26 +24,18 @@
 #####################################################################
 
 from OpenGL.GL import *
-import math
-from FakeNetworking import socket
 
 from View import BackgroundLayer
 from Menu import Menu
-from Lobby import Lobby
-from Svg import ImgDrawing
+from Lobby import Lobby, ControlConfigError
 from Language import _
 import Dialogs
 import Config
 import Audio
 import Settings
-import datetime
-import sys
-import Theme
-import Player
 import Version
 from Shader import shaders
-
-#myfingershurt: needed for multi-OS file fetching
+import sys
 import os
 
 #myfingershurt: needed for random menu music:
@@ -64,78 +56,57 @@ class MainMenu(BackgroundLayer):
     self.nextLayer           = None
     self.visibility          = 0.0
     self.active              = False
-    Player.practiceMode      = False    
-
-    #myfingershurt: removing neck menu requirement:
-    #self.neckMenuEnabled = False
     
-    #self.neckMenuEnabled = Config.get("game", "neck_select_enabled")
+    self.showStartupMessages = False
 
     self.gfxVersionTag = Config.get("game", "gfx_version_tag")
-
-    #self.tut = Config.get("game", "tut")
+    
     self.chosenNeck = Config.get("game", "default_neck")
     exists = 0
-    #neck fallback to random if doesn't exist.
-    try:
-      # evilynux - first assume the chosenNeck contains the full filename
-      engine.loadImgDrawing(self, "ok", os.path.join("necks",self.chosenNeck+".png"))
-    except IOError:
-      try:
-        engine.loadImgDrawing(self, "ok", os.path.join("necks","Neck_"+self.chosenNeck+".png"))
-      except IOError:
-        pass
-      else:
-        exists = 1
-    else:
+
+    if engine.loadImgDrawing(self, "ok", os.path.join("necks",self.chosenNeck+".png")):
       exists = 1
+    elif engine.loadImgDrawing(self, "ok", os.path.join("necks","Neck_"+self.chosenNeck+".png")):
+      exists = 1
+
     #MFH - fallback logic now supports a couple valid default neck filenames
     #MFH - check for Neck_1
     if exists == 0:
-      try:
-        engine.loadImgDrawing(self, "ok", os.path.join("necks","Neck_1.png"))
-      except IOError:
-        pass
-      else:
+      if engine.loadImgDrawing(self, "ok", os.path.join("necks","Neck_1.png")):
         Config.set("game", "default_neck", "1")
         Log.warn("Default chosen neck not valid; fallback Neck_1.png forced.")
         exists = 1
+
     #MFH - check for defaultneck
     if exists == 0:
-      try:
-        engine.loadImgDrawing(self, "ok", os.path.join("necks","defaultneck.png"))
-      except IOError: #we don't really need to be accepting this except... ...yea, sorry.
-        raise IOError, "Default chosen neck not valid; fallbacks Neck_1.png and defaultneck.png also not valid!"
-      else:
+      if engine.loadImgDrawing(self, "ok", os.path.join("necks","defaultneck.png")):
         Log.warn("Default chosen neck not valid; fallback defaultneck.png forced.")
         Config.set("game", "default_neck", "defaultneck")
         exists = 1
-    dPlayerConfig = None
+      else:
+        Log.error("Default chosen neck not valid; fallbacks Neck_1.png and defaultneck.png also not valid!")
+
     #Get theme
     self.theme = self.engine.data.theme
     self.themeCoOp = self.engine.data.themeCoOp
     self.themename = self.engine.data.themeLabel
-    self.useSoloMenu = Theme.use_solo_submenu
+    self.useSoloMenu = self.engine.theme.use_solo_submenu
     
     allowMic = True
     
-    if self.theme == 0:
-      allowMic = False
-
     try:
-      #blazingamer
-      self.menux = Theme.menuX
-      self.menuy = Theme.menuY
+      self.menux = self.engine.theme.menuX
+      self.menuy = self.engine.theme.menuY
     except Exception, e:
       Log.warn("Unable to load Theme menuX / Y positions: %s" % e) 
       self.menux = None
       self.menuy = None
 
-    self.rbmenu = Theme.menuRB
+    self.rbmenu = self.engine.theme.menuRB
  
     #MFH
-    self.main_menu_scale = Theme.main_menu_scaleVar
-    self.main_menu_vspacing = Theme.main_menu_vspacingVar
+    self.main_menu_scale = self.engine.theme.main_menu_scaleVar
+    self.main_menu_vspacing = self.engine.theme.main_menu_vspacingVar
 
     if self.main_menu_scale == None:
       self.main_menu_scale = .5
@@ -143,35 +114,21 @@ class MainMenu(BackgroundLayer):
       self.main_menu_vspacing = 0.09
 
 
-    
-    
-  
-
-    try:
-      self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"menu","mainbg.png"))
-    except IOError:
+    if not self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"menu","mainbg.png")):
       self.background = None
     self.engine.loadImgDrawing(self, "BGText", os.path.join("themes",self.themename,"menu","maintext.png"))
-    try:
-      self.engine.loadImgDrawing(self, "optionsBG", os.path.join("themes",self.themename,"menu","optionsbg.png"))
-    except IOError:
+    if not self.engine.loadImgDrawing(self, "optionsBG", os.path.join("themes",self.themename,"menu","optionsbg.png")):
       self.optionsBG = None
     self.engine.loadImgDrawing(self, "optionsPanel", os.path.join("themes",self.themename,"menu","optionspanel.png"))
       
     #racer: added version tag
-    if self.gfxVersionTag or Theme.versiontag == True:
-      try:
-        self.engine.loadImgDrawing(self, "version", os.path.join("themes",self.themename,"menu","versiontag.png"))
-      except IOError:
-        try:
-          self.engine.loadImgDrawing(self, "version", "versiontag.png")   #falls back on default versiontag.png in data\ folder
-        except IOError:
+    if self.gfxVersionTag or self.engine.theme.versiontag == True:
+      if not self.engine.loadImgDrawing(self, "version", os.path.join("themes",self.themename,"menu","versiontag.png")):
+        if not self.engine.loadImgDrawing(self, "version", "versiontag.png"): #falls back on default versiontag.png in data\ folder
           self.version = None
     else:
       self.version = None
 
-
-    
     #myfingershurt: random main menu music function, menu.ogg and menuXX.ogg (any filename with "menu" as the first 4 letters)
     filepath = self.engine.getPath(os.path.join("themes",self.themename,"sounds"))
     self.files = []
@@ -198,8 +155,8 @@ class MainMenu(BackgroundLayer):
    
  #####======= Racer: New Main Menu ======####
 
-    self.opt_text_color = Theme.hexToColor(Theme.opt_text_colorVar)
-    self.opt_selected_color = Theme.hexToColor(Theme.opt_selected_colorVar)
+    self.opt_text_color = self.engine.theme.hexToColor(self.engine.theme.opt_text_colorVar)
+    self.opt_selected_color = self.engine.theme.hexToColor(self.engine.theme.opt_selected_colorVar)
 
     if self.opt_text_color == None:
       self.opt_text_color = (1,1,1)
@@ -207,23 +164,12 @@ class MainMenu(BackgroundLayer):
       self.opt_selected_color = (1,0.75,0)
 
 
-    newMultiplayerMenu = [
-      (_("Host Multiplayer Game"), self.hostMultiplayerGame),
-      (_("Join Multiplayer Game"), self.joinMultiplayerGame),
-    ]
-    
-    editorMenu = Menu(self.engine, [
-      (_("Edit Existing Song"),            self.startEditor),
-      (_("Import New Song"),               self.startImporter),
-      (_("Import GH(tm) Songs"),  self.startGHImporter),
-    ])
-
     trainingMenu = [
       (_("Tutorials"), self.showTutorial),
       (_("Practice"), lambda: self.newLocalGame(mode1p = 1)),
     ]
     
-    self.opt_bkg_size = [float(i) for i in Theme.opt_bkg_size]
+    self.opt_bkg_size = [float(i) for i in self.engine.theme.opt_bkg_size]
 
     strCareer = ""
     strQuickplay = ""
@@ -235,17 +181,17 @@ class MainMenu(BackgroundLayer):
     
     if self.theme == 1 and self.themeCoOp: #Worldrave - Put GH Co-op ahead of FoFix co-op for GH based theme's. Made more sense.
       multPlayerMenu = [
-        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = -1)),
-        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = -1)),
-        (_("GH Battle"), lambda: self.newLocalGame(players = 2, mode2p = 6, maxplayers = -1, allowDrum = False)), #akedrou- so you can block drums
+        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = 4)),
+        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = 4)),
+        (_("GH Battle"), lambda: self.newLocalGame(players = 2, mode2p = 6, allowDrum = False)), #akedrou- so you can block drums
         (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
         (_("Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 5)),
         (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3, allowMic = allowMic)),   #Worldrave - Re-added this option for now.
       ]
     elif self.theme == 1 and not self.themeCoOp:
       multPlayerMenu = [
-        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = -1)),
-        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = -1)),
+        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = 4)),
+        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = 4)),
         (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
       ]
     elif self.theme == 2:
@@ -253,15 +199,15 @@ class MainMenu(BackgroundLayer):
         (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3, maxplayers = 4, allowMic = allowMic)),
         (_("RB Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 4, maxplayers = 4, allowMic = allowMic)),
         (_("GH Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 5, maxplayers = 4)),
-        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = -1)),
-        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = -1)),
+        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = 4)),
+        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = 4)),
         (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
       ]
     else:
       multPlayerMenu = [
         (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3, allowMic = allowMic)),
-        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = -1)),
-        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = -1)),
+        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = 4)),
+        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = 4)),
         (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
       ]
     
@@ -290,7 +236,6 @@ class MainMenu(BackgroundLayer):
       ]
 
       mainMenu = [
-        #( ( _(strSolo), 1, (0,0) ), soloMenu),
         ((strSolo,"solo"), soloMenu),
         ((strMultiplayer,"multiplayer"), multPlayerMenu),
         ((strTraining,"training"),    trainingMenu),
@@ -304,6 +249,9 @@ class MainMenu(BackgroundLayer):
 
     engine.mainMenu = self    #Points engine.mainMenu to the one and only MainMenu object instance
 
+    ## whether the main menu has come into view at least once
+    self.shownOnce = False
+
   def settingsMenu(self):
     if self.engine.advSettings:
       self.settingsMenuObject = Settings.SettingsMenu(self.engine)
@@ -313,9 +261,20 @@ class MainMenu(BackgroundLayer):
 
   def shown(self):
     self.engine.view.pushLayer(self.menu)
-    self.engine.stopServer()
     shaders.checkIfEnabled()
-  
+    if not self.shownOnce:
+      self.shownOnce = True
+      if hasattr(sys, 'frozen'):
+        #stump: Check whether this is a non-svn binary being run from an svn working copy.
+        if os.path.isdir(os.path.join('src', '.svn')) and 'development' not in Version.version():
+          Dialogs.showMessage(self.engine, _('This binary release is being run from a Subversion working copy. This is not the correct way to run FoFiX from Subversion. Please see one of the following web pages to set your Subversion working copy up correctly:') +
+                                           '\n\nhttp://code.google.com/p/fofix/wiki/RunningUnderPython26' +
+                                           '\nhttp://code.google.com/p/fofix/wiki/RequiredSourceModules')
+        #stump: Check whether this is an svn binary not being run from an svn working copy
+        elif not os.path.isdir(os.path.join('src', '.svn')) and 'development' in Version.version():
+          Dialogs.showMessage(self.engine, _('This binary was built from a Subversion working copy but is not running from one. The FoFiX Team will not provide any support whatsoever for this binary. Please see the following site for official binary releases:') +
+                                           '\n\nhttp://code.google.com/p/fofix/')
+
   def runMusic(self):
     if not self.song.isPlaying():   #re-randomize
       if self.files:
@@ -325,11 +284,9 @@ class MainMenu(BackgroundLayer):
         self.menumusic = True
         self.engine.menuMusic = True
     
-        #self.song = Audio.Sound(self.engine.resource.fileName(sound))
         self.song = Audio.Music(self.engine.resource.fileName(sound))
         self.song.setVolume(self.engine.config.get("audio", "menu_volume"))
-        #self.song.play(-1)
-        self.song.play(0)  #no loop
+        self.song.play(0)
       else:
         self.menumusic = False
         self.engine.menuMusic = False
@@ -350,7 +307,8 @@ class MainMenu(BackgroundLayer):
       self.engine.view.pushLayer(self.nextLayer())
       self.nextLayer = None
     else:
-      self.engine.quit()
+      if not self.engine.handlingException:
+        self.engine.quit()
 
   def quit(self):
     self.engine.view.popLayer(self.menu)
@@ -365,12 +323,11 @@ class MainMenu(BackgroundLayer):
           Log.error("Traceback:" + traceback.format_exc() )
           traceback.print_exc()
           raise
-      except socket.error, e:
-        Dialogs.showMessage(self.engine, unicode(e[1]))
       except KeyboardInterrupt:
         pass
+      except ControlConfigError:
+        Dialogs.showMessage(self.engine, _("Your controls are not properly set up for this mode. Please check your settings."))
       except Exception, e:
-        #MFH - enhancing error trapping and locating logic
         if e:
           Dialogs.showMessage(self.engine, unicode(e))
     return harness
@@ -390,25 +347,13 @@ class MainMenu(BackgroundLayer):
       Dialogs.showMessage(self.engine, _("No tutorials found!"))
       return
 
-    if self.engine.isServerRunning():
-      return
-
-    players = Dialogs.activateControllers(self.engine, 1) #akedrou
-    if players == 0:
-      return
+    # players = Dialogs.activateControllers(self.engine, 1) #akedrou
+    # if players == 0:
+      # return
     
-    Config.set("game","game_mode", 0)    #MFH - ensure tutorial can work with new logic that depends on this mode variable
-    Config.set("game","multiplayer_mode", 0)    #MFH - ensure tutorial can work with new logic that depends on this mode variable
-    Config.set("game", "players", 1)
-    Config.set("game", "tut", True)
-    
-    #Config.set("game","game_mode", 1) #MFH - don't force practice mode.... this is problematic.
+    self.engine.startWorld(1, None, 0, 0, tutorial = True)
 
-    self.engine.startServer()
-    self.engine.resource.load(self, "session", lambda: self.engine.connect("127.0.0.1"), synch = True)
-
-    if Dialogs.showLoadingScreen(self.engine, lambda: self.session and self.session.isConnected):
-      self.launchLayer(lambda: Lobby(self.engine, self.session, singlePlayer = True))
+    self.launchLayer(lambda: Lobby(self.engine))
   showTutorial = catchErrors(showTutorial)
 
   #MFH: adding deprecated support for EOF's method of quickstarting a song to test it
@@ -417,77 +362,45 @@ class MainMenu(BackgroundLayer):
   
   def newLocalGame(self, players=1, mode1p=0, mode2p=0, maxplayers = None, allowGuitar = True, allowDrum = True, allowMic = False): #mode1p=0(quickplay),1(practice),2(career) / mode2p=0(faceoff),1(profaceoff)
     self.engine.data.acceptSound.play()
-    players = Dialogs.activateControllers(self.engine, players, maxplayers, allowGuitar, allowDrum, allowMic) #akedrou
-    if players == 0:
-      if self.engine.cmdPlay == 2:
-        self.engine.cmdPlay = 0
-      return
-    Config.set("game", "players", players)
-    Config.set("game","game_mode", mode1p)
-    Config.set("game","multiplayer_mode", mode2p)
-    if Config.get("game", "tut") == True:
-      Config.set("game", "tut", False)
-      #Config.set("game", "selected_library", "")
-      #Config.set("game", "selected_song", "")
+    # players = Dialogs.activateControllers(self.engine, players, maxplayers, allowGuitar, allowDrum, allowMic) #akedrou
+    # if players == 0:
+      # if self.engine.cmdPlay == 2:
+        # self.engine.cmdPlay = 0
+      # return
 
-    #MFH - testing new traceback logging:
-    #raise TypeError
-
-    if self.engine.isServerRunning():
-      return
-    self.engine.startServer()
-    self.engine.resource.load(self, "session", lambda: self.engine.connect("127.0.0.1"), synch = True)
+    self.engine.startWorld(players, maxplayers, mode1p, mode2p, allowGuitar, allowDrum, allowMic)
     
-    if Dialogs.showLoadingScreen(self.engine, lambda: self.session and self.session.isConnected):
-      self.launchLayer(lambda: Lobby(self.engine, self.session, singlePlayer = True))
+    self.launchLayer(lambda: Lobby(self.engine))
   newLocalGame = catchErrors(newLocalGame)
-
-  def hostMultiplayerGame(self):
-    self.engine.startServer()
-    self.engine.resource.load(self, "session", lambda: self.engine.connect("127.0.0.1"))
-
-    if Dialogs.showLoadingScreen(self.engine, lambda: self.session and self.session.isConnected):
-      self.launchLayer(lambda: Lobby(self.engine, self.session))
-  hostMultiplayerGame = catchErrors(hostMultiplayerGame)
-
-  def joinMultiplayerGame(self, address = None):
-    if not address:
-      address = Dialogs.getText(self.engine, _("Enter the server address:"), "127.0.0.1")
-
-    if not address:
-      return
-    
-    self.engine.resource.load(self, "session", lambda: self.engine.connect(address))
-
-    if Dialogs.showLoadingScreen(self.engine, lambda: self.session and self.session.isConnected, text = _("Connecting...")):
-      self.launchLayer(lambda: Lobby(self.engine, self.session))
-  joinMultiplayerGame = catchErrors(joinMultiplayerGame)
-
-  def startEditor(self):
-    self.launchLayer(lambda: Editor(self.engine))
-  startEditor = catchErrors(startEditor)
-
-  def startImporter(self):
-    self.launchLayer(lambda: Importer(self.engine))
-  startImporter = catchErrors(startImporter)
-
-  def startGHImporter(self):
-    self.launchLayer(lambda: GHImporter(self.engine))
-  startGHImporter = catchErrors(startGHImporter)
   
+  def restartGame(self):
+    splash = Dialogs.showLoadingSplashScreen(self.engine, "")
+    self.engine.view.pushLayer(Lobby(self.engine))
+    Dialogs.hideLoadingSplashScreen(self.engine, splash)
+  
+  def showMessages(self):
+    msg = self.engine.startupMessages.pop()
+    self.showStartupMessages = False
+    Dialogs.showMessage(self.engine, msg)
+
   def run(self, ticks):
     self.time += ticks / 50.0
+    if self.showStartupMessages:
+      self.showMessages()
+    if len(self.engine.startupMessages) > 0:
+      self.showStartupMessages = True
+    
     if self.engine.cmdPlay == 1:
       self.engine.cmdPlay = 4
     elif self.engine.cmdPlay == 4: #this frame runs the engine an extra loop to allow the font to load...
       #evilynux - improve cmdline support
       self.engine.cmdPlay = 2
-      self.newLocalGame(players = Config.get("game", "players"), mode1p = Config.get("game","game_mode"), mode2p = Config.get("game","multiplayer_mode"))
+      players, mode1p, mode2p = self.engine.cmdMode
+      self.newLocalGame(players = players, mode1p = mode1p, mode2p = mode2p)
     elif self.engine.cmdPlay == 3:
       self.quit()
     
-    
-    if self.menumusic:  #MFH 
+    if (not self.engine.world) or (not self.engine.world.scene):  #MFH 
       self.runMusic()
     
     
@@ -503,8 +416,7 @@ class MainMenu(BackgroundLayer):
 
     if self.menu.active and not self.active:
       self.active = True
-
-      
+    
     t = self.time / 100
     w, h, = self.engine.view.geometry[2:4]
     r = .5
@@ -600,6 +512,6 @@ class MainMenu(BackgroundLayer):
 #racer: added version tag to main menu:
     if self.version != None:
           wfactor = self.version.widthf(pixelw = 640.000)
-          self.engine.drawImage(self.version, (0.5,-0.5),(w*Theme.versiontagposX, h*Theme.versiontagposY)) #worldrave - Added theme settings to control X+Y positions of versiontag.
+          self.engine.drawImage(self.version, (0.5,-0.5),(w*self.engine.theme.versiontagposX, h*self.engine.theme.versiontagposY)) #worldrave - Added theme settings to control X+Y positions of versiontag.
 
 

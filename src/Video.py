@@ -25,9 +25,10 @@ import os
 import sys
 from OpenGL.GL import *
 from OpenGL.GL.ARB.multisample import *
-import Image
+from PIL import Image
 import Log
 import struct
+from Language import _
 
 class Video:
   def __init__(self, caption = "Game", icon = None):
@@ -37,7 +38,7 @@ class Video:
     self.fullscreen   = False
     self.flags        = True
     self.multisamples = 0
-    
+    self.error        = []
     self.default      = False
 
   def setMode(self, resolution, fullscreen = False, flags = pygame.OPENGL | pygame.DOUBLEBUF,
@@ -147,6 +148,7 @@ class Video:
   
   def resolutionReset(self):
     Log.warn("Video setup failed. Trying default windowed resolution.")
+    self.error.append(_("Video setup failed with your resolution settings, and so were reset to defaults."))
     if self.fullscreen:
       self.flags ^= pygame.FULLSCREEN
       self.fullscreen = False
@@ -183,4 +185,31 @@ class Video:
   def getVideoModes(self):
     return pygame.display.list_modes()
 
+  #stump
+  def disableScreensaver(self):
+    if os.name == 'nt':
+      # See the DisableScreensaver and RestoreScreensaver functions in
+      # modules/video_output/msw/common.c in the source code for VLC.
+      import win32gui
+      import win32con
+      import atexit
 
+      Log.debug('Disabling screensaver.')
+
+      old_lowpowertimeout = win32gui.SystemParametersInfo(win32con.SPI_GETLOWPOWERTIMEOUT)
+      if old_lowpowertimeout != 0:
+        atexit.register(lambda: win32gui.SystemParametersInfo(win32con.SPI_SETLOWPOWERTIMEOUT, old_lowpowertimeout))
+        win32gui.SystemParametersInfo(win32con.SPI_SETLOWPOWERTIMEOUT, 0)
+
+      old_powerofftimeout = win32gui.SystemParametersInfo(win32con.SPI_GETPOWEROFFTIMEOUT)
+      if old_powerofftimeout != 0:
+        atexit.register(lambda: win32gui.SystemParametersInfo(win32con.SPI_SETPOWEROFFTIMEOUT, old_powerofftimeout))
+        win32gui.SystemParametersInfo(win32con.SPI_SETPOWEROFFTIMEOUT, 0)
+
+      old_screensavetimeout = win32gui.SystemParametersInfo(win32con.SPI_GETSCREENSAVETIMEOUT)
+      if old_screensavetimeout != 0:
+        atexit.register(lambda: win32gui.SystemParametersInfo(win32con.SPI_SETSCREENSAVETIMEOUT, old_screensavetimeout))
+        win32gui.SystemParametersInfo(win32con.SPI_SETSCREENSAVETIMEOUT, 0)
+
+    else:
+      Log.debug('Screensaver disabling is not implemented on this platform.')

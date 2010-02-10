@@ -24,11 +24,9 @@ from __future__ import division
 
 import Log
 import Config
-import Image
+from PIL import Image
 import pygame
 import StringIO
-import PngImagePlugin
-import JpegImagePlugin
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
@@ -44,7 +42,7 @@ cleanupQueue = []
 class Texture:
   """Represents an OpenGL texture, optionally loaded from disk in any format supported by PIL"""
 
-  def __init__(self, name = None, target = GL_TEXTURE_2D):
+  def __init__(self, name = None, target = GL_TEXTURE_2D, useMipmaps = True):
     # Delete all pending textures
     try:
       func, args = cleanupQueue[0]
@@ -59,6 +57,7 @@ class Texture:
     self.texEnv = GL_MODULATE
     self.glTarget = target
     self.framebuffer = None
+    self.useMipmaps = useMipmaps
 
     self.setDefaults()
     self.name = name
@@ -154,7 +153,10 @@ class Texture:
     (w, h) = size
     Texture.bind(self)
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
-    gluBuild2DMipmaps(self.glTarget, components, w, h, format, GL_UNSIGNED_BYTE, string)
+    if self.useMipmaps:
+      gluBuild2DMipmaps(self.glTarget, components, w, h, format, GL_UNSIGNED_BYTE, string)
+    else:
+      glTexImage2D(self.glTarget, 0, components, w, h, 0, format, GL_UNSIGNED_BYTE, string)
 
   def loadSubRaw(self, size, position, string, format):
     Texture.bind(self)
@@ -180,8 +182,13 @@ class Texture:
     glTexParameteri(self.glTarget, GL_TEXTURE_WRAP_S, u)
     glTexParameteri(self.glTarget, GL_TEXTURE_WRAP_T, v)
 
-  def setFilter(self, min=GL_LINEAR_MIPMAP_LINEAR, mag=GL_LINEAR):
+  def setFilter(self, min=None, mag=GL_LINEAR):
     Texture.bind(self)
+    if min is None:
+      if self.useMipmaps:
+        min = GL_LINEAR_MIPMAP_LINEAR
+      else:
+        min = GL_LINEAR
     glTexParameteri(self.glTarget, GL_TEXTURE_MIN_FILTER, min)
     glTexParameteri(self.glTarget, GL_TEXTURE_MAG_FILTER, mag)
 

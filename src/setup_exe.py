@@ -32,12 +32,14 @@ try:
 except ImportError:
   pass
 
+#stump: Start building a list of forced includes.
+extraIncludes = [
+  "PIL.PngImagePlugin",
+  "PIL.JpegImagePlugin",
+]
+
 #stump: if we're running pyOpenGL 3, do the necessary black magic.
-# Also bring in modules used by pygame 1.9 if necessary.
-# For some reason py2exe doesn't include them.
 import OpenGL
-import pygame
-extraIncludes = []
 if int(OpenGL.__version__[0]) > 2:
   extraIncludes += [
     "OpenGL.platform.win32",
@@ -47,64 +49,67 @@ if int(OpenGL.__version__[0]) > 2:
     "OpenGL.arrays.numbers",
     "OpenGL.arrays.strings",  #stump: needed by shader code
   ]
-if tuple(int(i) for i in pygame.__version__[:5].split('.')) >= (1, 9, 0):
-  extraIncludes += [
-    "heapq",
-    "bisect",
-  ]
+
+#stump: The pyopengl-accelerator format handlers import this
+# module using the Python/C API, so py2exe doesn't know that
+# it is needed.
+try:
+  from OpenGL_accelerate import formathandler
+  extraIncludes.append("OpenGL_accelerate.formathandler")
+except ImportError:
+  pass
+
+#stump: get the pygst dirs into sys.path if they're there
+try:
+  import pygst
+  pygst.require('0.10')
+  extraDllExcludes = [os.path.basename(d) for d in glob.glob(os.path.join('..', 'gstreamer', 'bin', 'libgst*.dll'))]
+except ImportError:
+  extraDllExcludes = []
 
 options = {
   "py2exe": {
     "dist_dir":  "../dist",
     "includes":  SceneFactory.scenes + extraIncludes,
     "excludes":  [
-      "glew.gl.apple",
-      "glew.gl.ati",
-      "glew.gl.atix",
-      "glew.gl.hp",
-      "glew.gl.ibm",
-      "glew.gl.ingr",
-      "glew.gl.intel",
-      "glew.gl.ktx",
-      "glew.gl.mesa",
-      "glew.gl.oml",
-      "glew.gl.pgi",
-      "glew.gl.rend",
-      "glew.gl.s3",
-      "glew.gl.sgi",
-      "glew.gl.sgis",
-      "glew.gl.sgix",
-      "glew.gl.sun",
-      "glew.gl.sunx",
-      "glew.gl.threedfx",
-      "glew.gl.win",
       "ode",
       "_ssl",
       "bz2",
       "email",
       "calendar",
-      "bisect",
       "difflib",
       "doctest",
       "ftplib",
       "getpass",
       "gopherlib",
-      "heapq",
       "macpath",
       "macurl2path",
-      "GimpGradientFile",
-      "GimpPaletteFile",
-      "PaletteFile",
+      "multiprocessing",
+      "PIL.GimpGradientFile",
+      "PIL.GimpPaletteFile",
+      "PIL.PaletteFile",
+      "GimpGradientFile",  #stump: we still need the non-PIL names for these
+      "GimpPaletteFile",   # because they get included under these names when
+      "PaletteFile",       # excluded above...
       "macosx",
       "Tkinter",
       "Pyrex",
       "distutils",
+      "pydoc",
+      "py_compile",
+      "compiler",
     ],
     "dll_excludes":  [
       "msvcp90.dll",
       "mswsock.dll",
-      "powrprof.dll"
-    ],
+      "powrprof.dll",
+      "w9xpopen.exe",
+      "libgio-2.0-0.dll",
+      "libglib-2.0-0.dll",
+      "libgmodule-2.0-0.dll",
+      "libgobject-2.0-0.dll",
+      "libgthread-2.0-0.dll",
+    ] + extraDllExcludes,
     "optimize":  2,
   }
 }
@@ -158,9 +163,9 @@ def setupWindows():
             "icon_resources":  [(1, "fofix.ico")],
             "other_resources": [(RT_VERSION, 1, VersionResource(
               #stump: the parameter below must consist only of up to four numerical fields separated by dots
-              Version.VERSION,
+              Version.versionNum(),
               file_description="Frets on Fire X",
-              legal_copyright=r"© 2008-2009 FoFiX Team.  GNU GPL v2 or later.",
+              legal_copyright=r"© 2008-2010 FoFiX Team.  GNU GPL v2 or later.",
               company_name="FoFiX Team",
               internal_name="FoFiX.exe",
               original_filename="FoFiX.exe",

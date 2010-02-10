@@ -22,7 +22,9 @@
 
 import sys
 import os
-VERSION = '3.120'
+MAJOR_VERSION = 4
+MINOR_VERSION = 0
+REVISION = 0
 URL = 'http://fofix.googlecode.com'
 
 def appName():
@@ -34,10 +36,14 @@ def appNameSexy():
 def revision():
   import svntag
   try:
-    revision = "alpha (r%d)" % int(svntag.get_svn_info(os.path.dirname(__file__))['revnum'])
+    revision = "development (r%d)" % int(svntag.get_svn_info(os.path.dirname(__file__))['revnum'])
   except:
-    revision = "Final"
+    revision = "development"
   return revision
+
+def versionNum():
+  version = "%d.%d.%d" %(MAJOR_VERSION, MINOR_VERSION, REVISION)
+  return version
 
 # evilynux: Returns version number w.r.t. frozen state
 def version():
@@ -50,9 +56,10 @@ def version():
     else:
       version = VERSION
   else:
-    version = "%s %s" % ( VERSION, revision() )
+    version = "%d.%d.%d %s" % ( MAJOR_VERSION, MINOR_VERSION, REVISION, revision() )
   return version
 
+#stump: VFS will take care of this
 def dataPath():
   # Determine whether were running from an exe or not
   if hasattr(sys, "frozen"):
@@ -64,5 +71,6 @@ def dataPath():
       dataPath = "data"
   else:
     dataPath = os.path.join("..", "data")
+  dataPath = os.path.abspath(dataPath)
   return dataPath
   

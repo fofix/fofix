@@ -29,10 +29,15 @@
 #####################################################################
 
 from OpenGL.GL import *
+from OpenGL import __version__ as OpenGLVersion
+import numpy
+from PIL import Image
 from numpy import array, float32
 import pygame
 import os
 import sys
+import imp
+import traceback
 
 from Engine import Engine, Task
 from Video import Video
@@ -41,18 +46,16 @@ from View import View
 from Input import Input, KeyListener, SystemEventListener
 from Resource import Resource
 from Data import Data
-from Server import Server
-from Session import ClientSession
+from World import World
 from Svg import SvgContext, ImgDrawing
 #alarian
 #from Song import EAS_DIF, MED_DIF, HAR_DIF, EXP_DIF
 from Debug import DebugLayer
 from Language import _
-import Network
 import Log
 import Config
 import Dialogs
-import Theme
+from Theme import Theme
 import Version
 import Mod
 import Player
@@ -88,7 +91,6 @@ version = "%s v%s" % ( Version.appNameSexy(), Version.version() )
 # define configuration keys
 Config.define("engine", "highpriority", bool,  False, text = _("FPS Limiter"),           options = {False: _("On (Set Below)"), True: _("Off (Auto Max FPS)")}, tipText = _("Use this to enable or disable the FPS Limiter. If off, the game will render as many frames as possible. (This is affected by the 'Performance' quickset)"))
 Config.define("game",   "adv_settings", bool,  False)
-Config.define("game",   "uploadscores", bool,  False, text = _("Upload Highscores"),    options = {False: _("No"), True: _("Yes")}, tipText = _("If enabled, your high scores will be sent to the server to rank you against other players."))
 Config.define("video",  "fullscreen",   bool,  False,  text = _("Fullscreen Mode"),      options = {False: _("No"), True: _("Yes")}, tipText = _("Play either in fullscreen ('Yes') or windowed ('No') mode."))
 Config.define("video",  "multisamples", int,   4,     text = _("Antialiasing Quality"), options = {0: _("None"), 2: "2x", 4: "4x", 6: "6x", 8: "8x"}, tipText = _("Sets the antialiasing quality of openGL rendering. Higher values reduce jaggediness, but could affect performance. (This is affected by the 'Performance' quickset)"))
 Config.define("video",  "disable_fretsfx", bool, False, text = _("Show Fret Glow Effect"), options = {False: _("Yes"), True: _("No")}, tipText = _("Turn on or off the glow that appears around a fret when you press it."))
@@ -105,14 +107,24 @@ Config.define("video",  "shader_tail",     str,   "tail2",  text = _("Tails"), o
 Config.define("video",  "shader_notes",     str,   "theme",  text = _("Notes"), options = {"Disabled":_("Disabled"), "notes": _("Metal"), "theme": _("By Theme")}, tipText = _("Gives your notes a metallic sheen. 'By Theme' leaves it to the theme creator."))
 Config.define("video",  "shader_cd",     str,   "cd",  text = _("CDs"), options = {"None":_("Disabled"), "cd": _("White"), "theme": _("By Theme")}, tipText = _("Adds a soft lighting effect to CD labels in CD setlist mode."))
 
+#stump
+Config.define('video',  'disable_screensaver', bool, True, text=_('Disable Screensaver'), options={True: _('Yes'), False: _('No')}, tipText=_('Set whether the game disables the screensaver while it is running.  Does not necessarily work on all platforms.'))
+
 Config.define("performance",  "starspin", bool,     True,  text = _("Animated Star Notes"), options = {True: _("Yes"), False: _("No")}, tipText = _("This will animate star notes as they come towards you, if that is included in your theme. This can have a hit on performance. (This is affected by the 'Performance' quickset)"))
 Config.define("audio",  "frequency",    int,   44100, text = _("Sample Frequency"), options = [8000, 11025, 22050, 32000, 44100, 48000], tipText = _("Set the sample frequency for the audio in the game. You almost certainly want to leave this at 44100 Hz unless you really know what you're doing."))
 Config.define("audio",  "bits",         int,   16,    text = _("Sample Bits"), options = [16, 8], tipText = _("Set the sample bits for the audio in the game. You almost certainly want to leave this at 16-bit unless you really know what you're doing."))
 Config.define("audio",  "stereo",       bool,  True)
 
-#MFH - Frame Buffer Object support: nevermind, needs GLEWpy and Pyrex and some other such addon...
-#Config.define("opengl",  "supportfbo",       bool,  True)
+Config.define("network",   "uploadscores", bool,  False, text = _("Upload Highscores"),    options = {False: _("No"), True: _("Yes")}, tipText = _("If enabled, your high scores will be sent to the server to rank you against other players."))
+Config.define("network",   "uploadurl_w67_starpower",    str,   "http://www.wembley1967.com/chart/uploadsp.php") # evilynux - new one starting 20080902
 
+Config.define("setlist", "selected_library",  str, "")
+Config.define("setlist", "selected_song",     str, "")
+
+Config.define("game", "queue_format", int, 0, text = _("Song Queue System"),     options = {0: _("Disabled"), 1: _("Automatic")}, tipText = _("Enables or disables creating multi-song sets in the setlist."))
+Config.define("game", "queue_order",  int, 0, text = _("Song Queue Order"),      options = {0: _("In Order"), 1: _("Random")}, tipText = _("Sets the order in which songs added to the queue will be played."))
+Config.define("game", "queue_parts",  int, 0, text = _("Song Queue Parts"),      options = {0: _("Closest Available"), 1: _("Always Ask")}, tipText = _("Choose the behavior when the chosen part is not available in all queued songs. 'Closest Available' will match lead parts to guitar and bass to rhythm, or guitar if no rhythm parts are available. 'Always Ask' brings up the part select screen."))
+Config.define("game", "queue_diff",   int, 0, text = _("Song Queue Difficulty"), options = {0: _("Closest Down"), 1: _("Closest Up"), 2: _("Always Ask")}, tipText = _("Choose the behavior when the chosen difficulty is not available in all queued songs. 'Closest Up' will prefer a harder difficulty, while 'Closest Down' will prefer an easier one. 'Always Ask' brings up the difficulty select screen."))
 
 #used internally:
 Config.define("game",   "players",             int,  1)
@@ -120,8 +132,6 @@ Config.define("game",   "player0",             str,  None)
 Config.define("game",   "player1",             str,  None)
 Config.define("game",   "player2",             str,  None)
 Config.define("game",   "player3",             str,  None)
-Config.define("game",   "game_mode",           int,  0)
-Config.define("game",   "multiplayer_mode",    int,  0)
 Config.define("game",   "default_neck",        str, "defaultneck")
 
 Config.define("game","last_theme",           str,  "")
@@ -140,6 +150,7 @@ Config.define("audio",  "songvol",    float,    0.8,  text = _("Background Volum
 #Config.define("audio",  "rhythmvol",  float,    1.0,  text = ("Rhythm Volume"),   options = dict([(n / 100.0, "%02d/10" % (n / 10)) for n in range(0, 110, 10)]), tipText = ("Bass, rhythm guitar, and drum volume."))
 
 Config.define("performance", "game_priority",       int,   2,      text = _("Process Priority"), options = sortOptionsByKey({0: _("Idle"), 1: _("Low"), 2: _("Normal"), 3:_("Above Normal"), 4:_("High"), 5:_("Realtime")}), tipText = _("Change this to increase the priority of the FoFiX process. Don't change this unless you know what you're doing. DO NOT set this to Realtime. Ever."))
+Config.define("performance", "restrict_to_first_processor", bool, False, text=_("Restrict to First Core (Win32 Only)"), options={False: _("No"), True: _("Yes")}, tipText=_("Choose whether to restrict the game to running on only the first processor core on the system. Only has an effect under Windows."))  #stump
 Config.define("performance", "use_psyco", bool, False, text=_("Use Psyco"), options={False: _("No"), True: _("Yes")}, tipText = _("Enable or disable the Psyco specializing compiler. Tests have indicated the game runs faster with it off."))  #stump
 Config.define("game",   "notedisappear",      bool,   False,  text = _("Missed Notes"), options = {False: _("Disappear"), True: _("Keep on going")}, tipText = _("When you miss a note, this sets whether they disappear from the fretboard or scroll off the bottom of the screen."))
 
@@ -163,7 +174,7 @@ Config.define("game",  "stage_rotate_delay",        int,   800,   text = _("Slid
 Config.define("game",  "stage_animate_delay",        int,   3,   text = _("Animation Delay"), options = dict([(n, n) for n in range(0, 10, 1)] + [(n, n) for n in range(10, 50, 10)] + [(n, n) for n in range(50, 2001, 50)]), tipText = _("Sets how long, in milliseconds, to wait between each frame in a stage animation."))
 Config.define("game",   "rotate_stages",           int,  0,  text = _("Stage Slideshow"),  options = {0: _("Off"), 1: _("Random"), 2: _("In Order"), 3: _("BackNForth")}, tipText = _("Sets the method used to rotate frames in a stage slideshow.")) 
 Config.define("game",   "stage_animate",           int,  0,  text = _("Stage Animation"),  options = {0: _("Off"), 1: _("Random"), 2: _("In Order"), 3: _("BackNForth")}, tipText = _("Sets the method used to rotate frames in a stage animation.")) 
-Config.define("game",   "stage_mode",           int,  0,  text = _("Stage Selection"),  options = {0: _("Random"), 1: _("Default"), 2: _("Blank")}, tipText = _("Set the background for your stage. Default will use the default background, and Blank puts you in a dark room. Probably a lot like the one you're in now."))
+Config.define("game",   "stage_mode",           int,  0,  text = _("Stage Selection"),  options = {0: _("Random"), 1: _("Default"), 2: _("Blank"), 3: _("Video")}, tipText = _("Set the background for your stage. Default will use the default background, and Blank puts you in a dark room. Probably a lot like the one you're in now."))
 Config.define("game",   "song_stage",           int,  1,  text = _("Song Stage"),  options = {0: _("Off"), 1: _("On") }, tipText = _("Fretters can include a stage to be used with their songs. If this is enabled, you can see it.")) #MFH
 Config.define("game",   "lyric_mode",           int,   2,   text = _("Script Lyric Display"), options = sortOptionsByKey({0: _("Off"), 1: _("By Song"), 2: _("Always"), 3: _("Dual Lyric Prevention")}), tipText = _("Sets whether lyrics from a script.txt file are displayed. 'By Song' lets the fretter decide. 'Always' always displays script lyrics, if available, and 'Dual Lyric Prevention' will disable script lyrics if there are MIDI lyrics. (This is affected by the 'Performance' quickset)"))#racer
 Config.define("game",   "frets_under_notes",          bool, True,  text = _("Frets Under Notes"), options = {False: _("No"), True: _("Yes")}, tipText = _("Sets whether the notes slide under the frets or over them."))
@@ -183,7 +194,6 @@ Config.define("game", "script_lyric_pos",      int,   0,   text = _("Script Lyri
 
 Config.define("game",   "star_claps",          bool, False,  text = _("Starpower Claps"), options = {False: _("Off"), True: _("On")}, tipText = _("Enables a clapping sound effect to be used on the beats in Starpower."))
 Config.define("audio", "disable_preview",      bool, True,  text = _("Song Previews"), options = {False: _("Automatic"), True: _("Yellow Fret (#3)")}, tipText = _("If set to 'Automatic', songs will automatically start previewing when you select them. Otherwise you must press the third fret."))
-Config.define("game", "uploadurl_w67_starpower",    str,   "http://www.wembley1967.com/chart/uploadsp.php") # evilynux - new one starting 20080902
 Config.define("game", "rb_sp_neck_glow",      bool, False,  text = _("RB SP Neck Glow"), options = {False: _("Off"), True: _("On")}, tipText = _("Sets a neck glow effect during SP in RB-type themes."))
 Config.define("game",   "sp_notes_while_active",  int,  2,  text = _("SP Refill Mode"),  options = sortOptionsByKey({0: _("None"), 1: _("By Theme"), 2: _("By MIDI Type"), 3: _("Always")}), tipText = _("Sets whether you can earn more starpower while using it. In 'By MIDI Type', only MIDIs that mark RB-style sections will use this. (This is set by the 'Gameplay' quickset)")) 
 
@@ -244,6 +254,7 @@ Config.define("debug",   "use_unedited_midis",          int, 1,    text = _("Use
 Config.define("debug",   "show_freestyle_active",          int, 0,    text = _("Show Fill Status"), options = {0: _("No"), 1: _("Yes")}, tipText = _("When enabled, whether or not you are in a drum fill/freestyle ending will be displayed in text on the screen."))
 Config.define("debug",   "show_bpm",          int, 0,    text = _("Show BPM"), options = {0: _("No"), 1: _("Yes")}, tipText = _("When enabled, the current song BPM will be shown on screen."))
 Config.define("debug",   "use_new_vbpm_beta",          int, 0,    text = _("New BPM Logic"), options = {0: _("Off"), 1: _("On")}, tipText = _("If enabled, the game will attempt to use the new BPM logic. This is not a finished feature. Use at your own risk."))
+Config.define("debug", "use_new_song_database", bool, False, text=_("New Song Database Code"), options={False: _("Off"), True: _("On")}, tipText=_("Activates the new, incomplete song database code."))  #stump
 
 Config.define("debug",   "show_raw_vocal_data", int, 0,  text = _("Show Raw Vocal Data"), options = {0: _("Off"), 1: _("On")}, tipText = _("If enabled, various information about the microphone input will be show in text on screen. Probably only needed for vocal debugging."))
 
@@ -263,7 +274,7 @@ Config.define("game",   "log_starpower_misses",          int, 0,    text = _("Lo
 Config.define("log",   "log_unedited_midis",          int, 0,    text = _("Log Unedited MIDIs"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs when notes-unedited.mid is used. This is unnecessary information."))
 Config.define("log",   "log_lyric_events",          int, 0,    text = _("Log Lyric Events"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs MIDI lyric events. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."))
 Config.define("log",   "log_tempo_events",          int, 0,    text = _("Log Tempo Events"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs MIDI tempo events. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."))
-
+Config.define("log",   "log_image_not_found",       int, 0,    text = _("Log Missing Images"), options = {0: _("No"), 1:_("Only on single images"), 2:_("Always")}, tipText = _("Logs when files loaded are not found. 'Only on single images' skips logging when directories are loaded."))
 
 
 #racer
@@ -302,7 +313,6 @@ Config.define("game", "keep_play_count", int, 1, text = _("Remember Play Count")
 Config.define("game", "tut",       bool, False) #-tutorial
 Config.define("video", "counting",       bool, False,     text = _("Show at Song Start"),             options = {True: _("Part"), False: _("Countdown")}, tipText = _("Sets whether to show a countdown or your name and part at the song's start."))
 Config.define("fretboard", "ovrneckoverlay",       bool, True,     text = _("Overdrive Neck"),             options = {True: _("Overlay"), False: _("Replace")}, tipText = _("Sets the style of the Overdrive neck. 'Replace' replaces your neck with the special neck, while 'Overlay' lays the neck over top."))
-
 
 Config.define("game",   "note_hit_window",          int, 2,    text = _("Note Hit Window"), options = sortOptionsByKey({0: _("Tightest"), 1: _("Tight"), 2: _("Standard"), 3: _("Wide"), 4: _("Widest")}), tipText = _("Sets how accurate you need to be while playing."))#racer blazingamer
 
@@ -386,7 +396,15 @@ for name in allthemes:
       defaultTheme = name     #myfingershurt
 
 i = len(themes)
-
+if i == 0:
+  if os.name == 'posix':
+    Log.error("No valid theme found!\n"+\
+              "Make sure theme files are properly cased "+\
+              "e.g. notes.png works, Notes.png doesn't\n")
+  else:
+    Log.error("No valid theme found!")
+  sys.exit(1);
+  
 if defaultTheme != "MegaLight" and defaultTheme != "Rock Band 1":     #myfingershurt
   defaultTheme = themes[0]    #myfingershurt
 
@@ -462,12 +480,26 @@ class GameEngine(Engine):
     self.mainMenu = None    #placeholder for main menu object - to prevent reinstantiation
     
     self.createdGuitarScene = False   #MFH - so we only create ONE guitarscene...!
+    self.currentScene = None
     
     self.versionString = version  #stump: other version stuff moved to allow full version string to be retrieved without instantiating GameEngine
-    self.uploadVersion = "%s-3.100" % Version.appNameSexy() #akedrou - the version passed to the upload site.
+    self.uploadVersion = "%s-4.0" % Version.appNameSexy() #akedrou - the version passed to the upload site.
 
+    self.dataPath = Version.dataPath()
     Log.debug(self.versionString + " starting up...")
-    Log.debug("pygame version: " + str(pygame.version.ver) )
+    Log.debug("Python version: " + sys.version.split(' ')[0])
+    Log.debug("Pygame version: " + str(pygame.version.ver) )
+    Log.debug("PyOpenGL version: " + OpenGLVersion)
+    Log.debug("Numpy version: " + numpy.__version__)
+    Log.debug("PIL version: " + Image.VERSION)
+    Log.debug("os.name: " + os.name)
+    Log.debug("sys.platform: " + sys.platform)
+    if os.name == 'nt':
+      import win32api
+      Log.debug("win32api.GetVersionEx(1): " + repr(win32api.GetVersionEx(1)))
+    elif os.name == 'posix':
+      Log.debug("os.uname(): " + repr(os.uname()))
+
     """
     Constructor.
     @param config:  L{Config} instance for settings
@@ -498,6 +530,8 @@ class GameEngine(Engine):
       icon = fofixicon
 
     self.video             = Video(self.title, icon)
+    if self.config.get("video", "disable_screensaver"):
+      self.video.disableScreensaver()
 
     #self.config.set("game",   "font_rendering_mode", 0) #force oGL mode
 
@@ -527,8 +561,12 @@ class GameEngine(Engine):
     self.bufferSize = bufferSize
     
     self.cmdPlay           = 0
+    self.cmdMode           = None
     self.cmdDiff           = None
     self.cmdPart           = None
+    
+    self.gameStarted       = False
+    self.world             = None
 
     #self.audio.pre_open(frequency = frequency, bits = bits, stereo = stereo, bufferSize = bufferSize)
     #self.audio.open(frequency = frequency, bits = bits, stereo = stereo, bufferSize = bufferSize)
@@ -574,6 +612,7 @@ class GameEngine(Engine):
     self.svg = SvgContext(geometry)
     glViewport(int(viewport[0]), int(viewport[1]), int(viewport[2]), int(viewport[3]))
 
+    self.startupMessages   = self.video.error
     self.input     = Input()
     self.view      = View(self, geometry)
     self.resizeScreen(w, h)
@@ -583,6 +622,8 @@ class GameEngine(Engine):
     self.sessions  = []
     self.mainloop  = self.loading
     self.menuMusic = False
+    
+    self.setlistMsg = None
 
     
     # Load game modifications
@@ -609,6 +650,7 @@ class GameEngine(Engine):
     currentTheme = themename
     
     stagespath = os.path.join(Version.dataPath(), "themes", currentTheme, "stages")
+    themepath  = os.path.join(Version.dataPath(), "themes", currentTheme)
     if os.path.exists(stagespath):
       self.stageFolders = []
       allFolders = os.listdir(stagespath)   #this also includes all the stage files - so check to see if there is at least one .png file inside each folder to be sure it's an animated stage folder
@@ -657,13 +699,15 @@ class GameEngine(Engine):
       self.config.set("game","animated_stage_folder", "None") #MFH: force "None" when Stages folder can't be found
 
     
-    # Load default theme
+    
     try:
-      theme = Config.load(self.resource.fileName("themes", themename, "theme.ini"))
-    except IOError:
-      theme = Config.load(self.resource.fileName("theme.ini"))
-    Theme.open(theme, self.getPath(os.path.join("themes",self.data.themeLabel,"menu")))
-  
+      fp, pathname, description = imp.find_module("CustomTheme",[themepath])
+      theme = imp.load_module("CustomTheme", fp, pathname, description)
+      self.theme = theme.CustomTheme(themepath, themename)
+    except ImportError:
+      self.theme = Theme(themepath, themename)
+    
+    self.addTask(self.theme)
 
     
     self.input.addKeyListener(FullScreenSwitcher(self), priority = True)
@@ -706,7 +750,7 @@ class GameEngine(Engine):
     self.audio.close()
     Player.savePlayers()
     Engine.quit(self)
-
+  
   def setStartupLayer(self, startupLayer):
     """
     Set the L{Layer} that will be shown when the all
@@ -763,48 +807,19 @@ class GameEngine(Engine):
     """
     self.view.setGeometry((0, 0, width, height))
     self.svg.setGeometry((0, 0, width, height))
-    
-  def isServerRunning(self):
-    return bool(self.server)
-
-  def startServer(self):
-    """Start the game server."""
-    if not self.server:
-      Log.debug("Starting server.")
-      self.server = Server(self)
-      self.addTask(self.server, synchronized = False)
-
-  def connect(self, host):
-    """
-    Connect to a game server.
-
-    @param host:  Name of host to connect to
-    @return:      L{Session} connected to remote server
-    """
-    Log.debug("Connecting to host %s." % host)
-    session = ClientSession(self)
-    session.connect(host)
-    self.addTask(session, synchronized = False)
-    self.sessions.append(session)
-    return session
-
-  def stopServer(self):
-    """Stop the game server."""
-    if self.server:
-      Log.debug("Stopping server.")
-      self.removeTask(self.server)
-      self.server = None
-
-  def disconnect(self, session):
-    """
-    Disconnect a L{Session}
-
-    param session:    L{Session} to disconnect
-    """
-    if session in self.sessions:
-      Log.debug("Disconnecting.")
-      self.removeTask(session)
-      self.sessions.remove(session)
+  
+  def startWorld(self, players, maxplayers = None, gameMode = 0, multiMode = 0, allowGuitar = True, allowDrum = True, allowMic = False, tutorial = False):
+    self.world = World(self, players, maxplayers, gameMode, multiMode, allowGuitar, allowDrum, allowMic, tutorial)
+  
+  def finishGame(self):
+    if not self.world:
+      Log.notice("GameEngine.finishGame called before World created.")
+      return
+    self.world.finishGame()
+    self.world = None
+    self.gameStarted = False
+    if not self.handlingException:
+      self.view.pushLayer(self.mainMenu)
 
   def loadImgDrawing(self, target, name, fileName, textureSize = None):
     """
@@ -863,24 +878,52 @@ class GameEngine(Engine):
 
   #blazingamer - cleans up the work for rendering an image
   #volshebnyi - now images can be resized to fit to screen
-  def drawImage(self, image, scale, coord, rot = 0, color = (1,1,1,1), rect = (0,1,0,1), stretched = 0, lOffset = 0.0, rOffset = 0.0):
+  def drawImage(self, image, scale, coord, rot = 0, color = (1,1,1,1), rect = (0,1,0,1), stretched = 0, fit = 0, repeat = 0, repeatOffset = 0, lOffset = 0.0, rOffset = 0.0):
     
     image.transform.reset()
     image.transform.rotate(rot)
+    scale = list(scale)
+    coord = list(coord)
     if stretched == 0: #don't sctretch
       image.transform.scale(scale[0],scale[1])
     elif stretched == 1: # fit to width
-      image.transform.scale(scale[0] / image.width1() * 640,scale[1])
+      scale[0] = scale[0] / image.width1() * 640
+      image.transform.scale(scale[0],scale[1])
     elif stretched == 2: # fit to height
-      image.transform.scale(scale[0],scale[1] / image.height1() * 480)
+      scale[1] = scale[1] / image.height1() * 480
+      image.transform.scale(scale[0],scale[1])
     elif stretched == 11: # fit to width and keep ratio
-      image.transform.scale(scale[0] / image.width1() * 640,scale[1] / image.width1() * 640)
+      scale[0] = scale[0] / image.width1() * 640
+      scale[1] = scale[1] / image.width1() * 640
+      image.transform.scale(scale[0],scale[1])
     elif stretched == 12: # fit to height and keep ratio
-      image.transform.scale(scale[0] / image.height1() * 480,scale[1] / image.height1() * 480)
+      scale[0] = scale[0] / image.height1() * 480
+      scale[1] = scale[1] / image.height1() * 480
+      image.transform.scale(scale[0],scale[1])
     else: # fit to screen
-      image.transform.scale(scale[0] / image.width1() * 640,scale[1] / image.height1() * 480)
-    image.transform.translate(coord[0],coord[1])
-    image.draw(color = color, rect = rect, lOffset = lOffset, rOffset = rOffset)
+      scale[0] = scale[0] / image.width1() * 640
+      scale[1] = scale[1] / image.height1() * 480
+      image.transform.scale(scale[0],scale[1])
+    if fit == 1: #y is on top (not center)
+      coord[1] = coord[1] - ((image.height1() * abs(scale[1]))*.5*(self.view.geometry[3]/float(480)))
+    elif fit == 2: #y is on bottom
+      coord[1] = coord[1] + ((image.height1() * abs(scale[1]))*.5*(self.view.geometry[3]/float(480)))
+    if len(color) == 3:
+      color = (color[0], color[1], color[2], 1.0)
+    if repeat == 1: #repeat-y
+      coord[1] += repeatOffset
+      height = (image.height1() * abs(scale[1]))*(self.view.geometry[3]/float(480))
+      while coord[1] > self.view.geometry[3]+height:
+        coord[1] -= height
+      image.transform.translate(coord[0],coord[1])
+      while coord[1] > -height/2.0:
+        if coord[1] < self.view.geometry[3] + (height/2.0):
+          image.draw(color = color, rect = rect, lOffset = lOffset, rOffset = rOffset)
+        coord[1] -= height
+        image.transform.translate(0,-height)
+    else:
+      image.transform.translate(coord[0],coord[1])
+      image.draw(color = color, rect = rect, lOffset = lOffset, rOffset = rOffset)
 
   #blazingamer - simplifies tex rendering
   def draw3Dtex(self, image, vertex, texcoord, coord = None, scale = None, rot = None, color = (1,1,1), multiples = False, alpha = False, depth = False, vertscale = 0):
@@ -1012,44 +1055,38 @@ class GameEngine(Engine):
     return done
 
   def clearScreen(self):
-    self.svg.clear(*Theme.backgroundColor)
+    self.svg.clear(*self.theme.backgroundColor)
 
   def main(self):
     """Main state loop."""
-    try:
-      done = Engine.run(self)
-      self.clearScreen()
-      self.view.render()
-      if self.debugLayer:
-        self.debugLayer.render(1.0, True)
-      self.video.flip()
-      # evilynux - Estimate the rendered frames per second.
-      if self.show_fps:
-        self.frames = self.frames+1
-        # Estimate every 120 frames when highpriority is True.
-        # Estimate every 2*config.fps when highpriority is False,
-        # if you are on target, that should be every 2 seconds.
-        if( not self.priority and self.frames == (self.fps << 1) ) or ( self.priority and self.frames == 120 ):
-          currentTime = pygame.time.get_ticks()
-          self.elapsedTime = currentTime-self.lastTime
-          self.lastTime = currentTime
-          self.fpsEstimate = self.frames*(1000.0/self.elapsedTime)
-          if self.print_fps_in_console == True:
-            print("%.2f fps" % self.fpsEstimate)
-          self.frames = 0 
-      return done
-    except:
-      Log.error("Loading error: ")
-      raise
+    done = Engine.run(self)
+    self.clearScreen()
+    self.view.render()
+    if self.debugLayer:
+      self.debugLayer.render(1.0, True)
+    self.video.flip()
+    # evilynux - Estimate the rendered frames per second.
+    if self.show_fps:
+      self.frames = self.frames+1
+      # Estimate every 120 frames when highpriority is True.
+      # Estimate every 2*config.fps when highpriority is False,
+      # if you are on target, that should be every 2 seconds.
+      if( not self.priority and self.frames == (self.fps << 1) ) or ( self.priority and self.frames == 120 ):
+        currentTime = pygame.time.get_ticks()
+        self.elapsedTime = currentTime-self.lastTime
+        self.lastTime = currentTime
+        self.fpsEstimate = self.frames*(1000.0/self.elapsedTime)
+        if self.print_fps_in_console == True:
+          print("%.2f fps" % self.fpsEstimate)
+        self.frames = 0 
+    return done
 
   def run(self):
     try:
       return self.mainloop()
-    except KeyboardInterrupt:
-      sys.exit(0)
-    except SystemExit:
-      sys.exit(0)
-    except Exception, e:
+    except (KeyboardInterrupt, SystemExit):
+      raise
+    except:
       def clearMatrixStack(stack):
         try:
           glMatrixMode(stack)
@@ -1060,23 +1097,23 @@ class GameEngine(Engine):
 
       if self.handlingException:
         # A recursive exception is fatal as we can't reliably reset the GL state
-        Log.error("Recursive exception:")
-        sys.exit(1)
+        Log.error('Recursive main loop exception: ')
+        raise
 
       self.handlingException = True
-      Log.error("%s, %s: %s" % (e.__class__.__name__,e.__class__, e))
-      import traceback
-      traceback.print_exc()
+      Log.error('Exception occurred in main loop: ')
 
       clearMatrixStack(GL_PROJECTION)
       clearMatrixStack(GL_MODELVIEW)
 
       #stump: reset game state as much as possible
       self.view.popAllLayers()
-      for session in self.sessions:
-        self.disconnect(session)
-      self.stopServer()
+      if self.gameStarted:
+        self.finishGame()
 
-      Dialogs.showMessage(self, str(e.__class__.__name__) + ": " + unicode(e))
+      etype, evalue, etraceback = sys.exc_info()
+      Dialogs.showMessage(self, ''.join(traceback.format_exception_only(etype, evalue)))
       self.handlingException = False
+      self.view.pushLayer(self.mainMenu)
+
       return True

@@ -25,7 +25,7 @@
 
 from Font import Font
 from Texture import Texture
-from Svg import ImgDrawing, SvgContext
+from Svg import ImgDrawing
 from Texture import Texture
 from Audio import Sound
 from Language import _
@@ -36,6 +36,7 @@ import Version
 #myfingershurt: needed for multi-OS file fetching
 import os
 import sys
+import glob
 import Player
 import Log
 
@@ -62,6 +63,9 @@ class Data(object):
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("Data class init (Data.py)...")
+    self.logLoadings = Config.get("game", "log_loadings")
+    
+    self.logImageNotFound = Config.get("log", "log_image_not_found")
     
     self.resource = resource
     self.svg      = svg
@@ -82,13 +86,13 @@ class Data(object):
     self.themepath = themepath
     self.path = Version.dataPath()
 
-    if not os.path.exists(os.path.join(themepath,themename,"notes.png")):
+    if not self.checkImgDrawing(os.path.join("themes",themename,"notes.png")):
       #myfingershurt: here need to ensure an existing theme is selected
       themes = []
       defaultTheme = None           #myfingershurt
       allthemes = os.listdir(themepath)
       for name in allthemes:
-        if os.path.exists(os.path.join(themepath,name,"notes.png")):
+        if self.checkImgDrawing(os.path.join("themes",name,"notes.png")):
           themes.append(name)
           if name == "MegaLight":         #myfingershurt
             defaultTheme = name     #myfingershurt
@@ -107,19 +111,19 @@ class Data(object):
     else:
       self.vocalPath = os.path.join("themes",themename,"vocals")
 
-    if self.fileExists(os.path.join("themes",themename,"spfill.png")):
+    if self.checkImgDrawing(os.path.join("themes",themename,"spfill.png")):
       self.theme = 0
-    elif self.fileExists(os.path.join("themes",themename,"overdrive fill.png")):
+    elif self.checkImgDrawing(os.path.join("themes",themename,"overdrive fill.png")):
       self.theme = 2
       self.themeCoOp = True
     else:
       self.theme = 1
-      if self.fileExists(os.path.join("themes",themename,"coop_rockmeter.png")):
+      if self.checkImgDrawing(os.path.join("themes",themename,"coop_rockmeter.png")):
         self.themeCoOp = True
 
     self.fontScreenBottom = 0.75      #from our current viewport's constant 3:4 aspect ratio (which is always stretched to fill the video resolution)
 
-
+    self.loadPartImages()
     #myfingershurt: multi-OS compatibility file access fixes using os.path.join()
     # load font customization images
 
@@ -131,18 +135,13 @@ class Data(object):
     self.loadImgDrawing(self, "star2",   os.path.join("themes",themename,"star2.png"), textureSize = (128, 128))
     
     #MFH - let's not rely on errors here if we don't have to...
-    if self.fileExists(os.path.join("themes",themename,"star3.png")):
-      self.loadImgDrawing(self, "star3",   os.path.join("themes",themename,"star3.png"), textureSize = (128, 128))
-    else:
+    if not self.loadImgDrawing(self, "star3",   os.path.join("themes",themename,"star3.png"), textureSize = (128, 128)):
       self.star3 = self.star1
-    if self.fileExists(os.path.join("themes",themename,"star4.png")):
-      self.loadImgDrawing(self, "star4",   os.path.join("themes",themename,"star4.png"), textureSize = (128, 128))
-    else:
+    if not self.loadImgDrawing(self, "star4",   os.path.join("themes",themename,"star4.png"), textureSize = (128, 128)):
       self.star4 = self.star2
       
 
-    if self.fileExists(os.path.join("themes",themename,"starperfect.png")):
-      self.loadImgDrawing(self, "starPerfect",   os.path.join("themes",themename,"starperfect.png"), textureSize = (128, 128))
+    if self.loadImgDrawing(self, "starPerfect",   os.path.join("themes",themename,"starperfect.png"), textureSize = (128, 128)):
       self.perfectStars = True
       self.maskStars = False
     else:
@@ -154,8 +153,7 @@ class Data(object):
 
     #self.perfectStars = False
     if self.perfectStars:
-      if self.fileExists(os.path.join("themes",themename,"starfc.png")):
-        self.loadImgDrawing(self, "starFC",   os.path.join("themes",themename,"starfc.png"), textureSize = (128, 128))
+      if self.loadImgDrawing(self, "starFC",   os.path.join("themes",themename,"starfc.png"), textureSize = (128, 128)):
         self.fcStars   = True
       else:
         #self.starFC = None
@@ -167,20 +165,22 @@ class Data(object):
 
     # load misc images
     self.loadImgDrawing(self, "loadingImage", os.path.join("themes",themename,"loadingbg.png"), textureSize = (256,256))
-    try:
-      self.loadImgDrawing(self, "submenuSelect", os.path.join("themes",themename,"submenuselect.png"))
+    self.loadImgDrawing(self, "choiceImage", os.path.join("themes",themename,"editor.png"))
+    if self.loadImgDrawing(self, "submenuSelect", os.path.join("themes",themename,"submenuselect.png")):
       subSelectImgW = self.submenuSelect.width1()
       self.submenuSelectFound = True
       self.subSelectWFactor = 640.000/subSelectImgW
       self.subSelectImgH = self.submenuSelect.height1()
-    except IOError:
+    else:
       self.submenuSelectFound = False
       self.loadImgDrawing(self, "submenuSelect", os.path.join("themes",themename,"menu","selected.png"))
       self.subSelectWFactor = 0
-
+    self.loadAllImages(self, os.path.join("themes",themename,"common"))
     # load all the data in parallel
-    asciiOnly = not bool(Language.language) or Language.language == "Custom"
-    reversed  = _("__lefttoright__") == "__righttoleft__" and True or False
+    # asciiOnly = not bool(Language.language) or Language.language == "Custom"
+    # reversed  = _("__lefttoright__") == "__righttoleft__" and True or False
+    asciiOnly = True
+    reversed  = False
     scale     = 1
     scale2    = .5
     # evilynux - Load bigger fonts so they're nicer when scaled, scaling readjusted
@@ -195,94 +195,107 @@ class Data(object):
       bigFont = resource.fileName("international.ttf")
 
     # load fonts
-    font1     = lambda: Font(font,    fontSize[0], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly)
-    font2     = lambda: Font(bigFont, fontSize[1], scale = 1, reversed = reversed, systemFont = not asciiOnly)
-    if self.theme == 1: # evilynux - No outline for GH3
-      font3     = lambda: Font(pauseFont, fontSize[2], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False)
+    w, h = [int(s) for s in Config.get("video", "resolution").split("x")]
+    aspectRatio = float(w)/float(h)
+    if os.path.isdir(os.path.join(self.themepath, "fonts")):
+      self.fontDict = {}
+      for file in os.listdir(os.path.join(self.themepath, "fonts")):
+        splitext = os.path.splitext(file)
+        if splitext[1] == ".ttf":
+          self.fontDict[splitext[0]] = Font(os.path.join(self.themepath, "fonts", file), 64, scale = 1, reversed = False, systemFont = False, aspectRatio = aspectRatio)
     else:
-      font3     = lambda: Font(pauseFont, fontSize[2], scale = scale2, reversed = reversed, systemFont = not asciiOnly)
-    font4     = lambda: Font(scoreFont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False)
-    font5     = lambda: Font(streakFont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False)
-    if self.theme == 1:
-      font6     = lambda: Font(loadingFont, fontSize[3], scale = scale2*1.4, reversed = reversed, systemFont = not asciiOnly, outline = False, shadow = True) #Worldrave - Added shadow to Loading Phrases in GH-Based Theme's
-    else:
-      font6     = lambda: Font(loadingFont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False)
-    if self.theme == 2:
-      font7     = lambda: Font(songFont, fontSize[4], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False)#kk69: loads font specific for song name in Guitar Scene =)
-    else:
-      font7     = lambda: Font(songFont, fontSize[0], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False)#kk69: loads font specific for song name in Guitar Scene =)
-    font8     = lambda: Font(songListFont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False) #MFH
-    font9     = lambda: Font(shadowfont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False, shadow = True) #blazingamer
-    font10    = lambda: Font(streakFont2, fontSize[2], scale = scale2*1.08, reversed = reversed, systemFont = not asciiOnly, outline = False, shadow = True) #blazingamer - Worldrave modified size to accuracy.
+      font1     = lambda: Font(font,    fontSize[0], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, aspectRatio = aspectRatio)
+      font2     = lambda: Font(bigFont, fontSize[1], scale = 1, reversed = reversed, systemFont = not asciiOnly)
+      if self.theme == 1: # evilynux - No outline for GH3
+        font3     = lambda: Font(pauseFont, fontSize[2], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio)
+      else:
+        font3     = lambda: Font(pauseFont, fontSize[2], scale = scale2, reversed = reversed, systemFont = not asciiOnly, aspectRatio = aspectRatio)
+      font4     = lambda: Font(scoreFont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio)
+      font5     = lambda: Font(streakFont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio)
+      if self.theme == 1:
+        font6     = lambda: Font(loadingFont, fontSize[3], scale = scale2*1.4, reversed = reversed, systemFont = not asciiOnly, outline = False, shadow = True, aspectRatio = aspectRatio) #Worldrave - Added shadow to Loading Phrases in GH-Based Theme's
+      else:
+        font6     = lambda: Font(loadingFont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio)
+      if self.theme == 2:
+        font7     = lambda: Font(songFont, fontSize[4], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio)#kk69: loads font specific for song name in Guitar Scene =)
+      else:
+        font7     = lambda: Font(songFont, fontSize[0], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio)#kk69: loads font specific for song name in Guitar Scene =)
+      font8     = lambda: Font(songListFont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio) #MFH
+      font9     = lambda: Font(shadowfont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False, shadow = True, aspectRatio = aspectRatio) #blazingamer
+      font10    = lambda: Font(streakFont2, fontSize[2], scale = scale2*1.08, reversed = reversed, systemFont = not asciiOnly, outline = False, shadow = True, aspectRatio = aspectRatio) #blazingamer - Worldrave modified size to accuracy.
 
 
-    resource.load(self, "font",         font1, onLoad = self.customizeFont, synch = True)
-    resource.load(self, "bigFont",      font2, onLoad = self.customizeFont, synch = True)
+      resource.load(self, "font",         font1, synch = True)
+      resource.load(self, "bigFont",      font2, synch = True)
 
 
-    #MFH - seems like these should be up here...
-    menuFont = resource.fileName(os.path.join("themes",themename,"menu.ttf"))
-    pauseFont = resource.fileName(os.path.join("themes",themename,"pause.ttf"))
-    scoreFont = resource.fileName(os.path.join("themes",themename,"score.ttf"))
+      #MFH - seems like these should be up here...
+      menuFont = resource.fileName(os.path.join("themes",themename,"menu.ttf"))
+      pauseFont = resource.fileName(os.path.join("themes",themename,"pause.ttf"))
+      scoreFont = resource.fileName(os.path.join("themes",themename,"score.ttf"))
 
-    if self.fileExists(os.path.join("themes",themename,"Streak.ttf")):
-      streakFont = resource.fileName(os.path.join("themes",themename,"streak.ttf"))
-    else:
-      streakFont = resource.fileName(os.path.join("themes",themename,"score.ttf"))
-    if self.fileExists(os.path.join("themes",themename,"Song.ttf")):
-      songFont = resource.fileName(os.path.join("themes",themename,"song.ttf"))
-    else:
-      songFont = resource.fileName(os.path.join("themes",themename,"menu.ttf"))#kk69: use menu font when song font is not present
+      if self.fileExists(os.path.join("themes",themename,"Streak.ttf")):
+        streakFont = resource.fileName(os.path.join("themes",themename,"streak.ttf"))
+      else:
+        streakFont = resource.fileName(os.path.join("themes",themename,"score.ttf"))
+      if self.fileExists(os.path.join("themes",themename,"Song.ttf")):
+        songFont = resource.fileName(os.path.join("themes",themename,"song.ttf"))
+      else:
+        songFont = resource.fileName(os.path.join("themes",themename,"menu.ttf"))#kk69: use menu font when song font is not present
 
-    if self.fileExists(os.path.join("themes",themename,"loading.ttf")):
-      loadingFont = resource.fileName(os.path.join("themes",themename,"loading.ttf"))
-    else:
-      loadingFont = resource.fileName("default.ttf")
+      if self.fileExists(os.path.join("themes",themename,"loading.ttf")):
+        loadingFont = resource.fileName(os.path.join("themes",themename,"loading.ttf"))
+      else:
+        loadingFont = resource.fileName("default.ttf")
 
-    if self.fileExists(os.path.join("themes",themename,"songlist.ttf")):
-      songListFont = resource.fileName(os.path.join("themes",themename,"songlist.ttf"))
-    else:
-      songListFont = menuFont
-    if self.fileExists(os.path.join("themes",themename,"songlist.ttf")):
-      shadowfont = resource.fileName(os.path.join("themes",themename,"songlist.ttf"))
-    else:
-      shadowfont = menuFont
+      if self.fileExists(os.path.join("themes",themename,"songlist.ttf")):
+        songListFont = resource.fileName(os.path.join("themes",themename,"songlist.ttf"))
+      else:
+        songListFont = menuFont
+      if self.fileExists(os.path.join("themes",themename,"songlist.ttf")):
+        shadowfont = resource.fileName(os.path.join("themes",themename,"songlist.ttf"))
+      else:
+        shadowfont = menuFont
 
-    #blazingamer
-    if self.fileExists(os.path.join("themes",themename,"streakphrase.ttf")):
-      streakFont2 = resource.fileName(os.path.join("themes",themename,"streakphrase.ttf"))
-    else:
-      streakFont2 = menuFont
+      #blazingamer
+      if self.fileExists(os.path.join("themes",themename,"streakphrase.ttf")):
+        streakFont2 = resource.fileName(os.path.join("themes",themename,"streakphrase.ttf"))
+      else:
+        streakFont2 = menuFont
 
-    #blazingamer:Reorganized
-    if self.theme == 0:
-      font1     = lambda: Font(menuFont,  fontSize[2], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly)
-      font2     = lambda: Font(menuFont,  fontSize[2], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, outline = False)
-      resource.load(self, "lfont",         font2, onLoad = self.customizeFont, synch = True)
-      resource.load(self, "font",          font1, onLoad = self.customizeFont, synch = True)
-    elif self.theme == 1:
-      font1     = lambda: Font(menuFont,  fontSize[3], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, outline = False) #Worldrave - Removed outline from options text on GH-Based theme's. No other drawbacks noticed.
-      font2     = lambda: Font(menuFont,  fontSize[3], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, outline = False)
-      resource.load(self, "lfont",         font2, onLoad = self.customizeFont, synch = True)
-      resource.load(self, "font",          font1, onLoad = self.customizeFont, synch = True)
-    elif self.theme == 2:
-      font1     = lambda: Font(menuFont,  fontSize[4], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, outline = False)
-      resource.load(self, "font",          font1, onLoad = self.customizeFont, synch = True)
+      #blazingamer:Reorganized
+      if self.theme == 0:
+        font1     = lambda: Font(menuFont,  fontSize[2], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, aspectRatio = aspectRatio)
+        font2     = lambda: Font(menuFont,  fontSize[2], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio)
+        resource.load(self, "lfont",         font2, synch = True)
+        resource.load(self, "font",          font1, synch = True)
+      elif self.theme == 1:
+        font1     = lambda: Font(menuFont,  fontSize[3], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio) #Worldrave - Removed outline from options text on GH-Based theme's. No other drawbacks noticed.
+        font2     = lambda: Font(menuFont,  fontSize[3], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio)
+        resource.load(self, "lfont",         font2, synch = True)
+        resource.load(self, "font",          font1, synch = True)
+      elif self.theme == 2:
+        font1     = lambda: Font(menuFont,  fontSize[4], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio)
+        resource.load(self, "font",          font1, synch = True)
 
 
-    resource.load(self, "pauseFont",     font3, onLoad = self.customizeFont, synch = True)
-    resource.load(self, "scoreFont",     font4, onLoad = self.customizeFont, synch = True)
-    resource.load(self, "streakFont",    font5, onLoad = self.customizeFont, synch = True)
-    resource.load(self, "songFont",      font7, onLoad = self.customizeFont, synch = True)
-    resource.load(self, "streakFont2",    font10, onLoad = self.customizeFont, synch = True)#blazingamer
+      resource.load(self, "pauseFont",     font3, synch = True)
+      resource.load(self, "scoreFont",     font4, synch = True)
+      resource.load(self, "streakFont",    font5, synch = True)
+      resource.load(self, "songFont",      font7, synch = True)
+      resource.load(self, "streakFont2",    font10, synch = True)#blazingamer
 
-    resource.load(self, "songListFont",      font8, onLoad = self.customizeFont, synch = True)
-    resource.load(self, "shadowfont",      font9, onLoad = self.customizeFont, synch = True)
-    resource.load(self, "loadingFont",    font6, onLoad = self.customizeFont, synch = True)
-    
-    self.fontDict = {"font": self.font, "bigFont": self.bigFont, "pauseFont": self.pauseFont, "scoreFont": self.scoreFont, \
-                     "streakFont": self.streakFont, "songFont": self.songFont, "streakFont2": self.streakFont2, \
-                     "songListFont": self.songListFont, "shadowfont": self.shadowfont, "loadingFont": self.loadingFont}
+      resource.load(self, "songListFont",      font8, synch = True)
+      resource.load(self, "shadowfont",      font9, synch = True)
+      resource.load(self, "loadingFont",    font6, synch = True)
+      
+      self.fontDict = {"font": self.font, "bigFont": self.bigFont, "pauseFont": self.pauseFont, "scoreFont": self.scoreFont, \
+                       "streakFont": self.streakFont, "songFont": self.songFont, "streakFont2": self.streakFont2, \
+                       "songListFont": self.songListFont, "shadowfont": self.shadowfont, "loadingFont": self.loadingFont}
+      try:
+        self.fontDict['lfont'] = self.lfont
+      except AttributeError:
+        pass
 
 
     if self.fileExists(os.path.join("themes",themename,"sounds","starding.ogg")):
@@ -362,7 +375,7 @@ class Data(object):
       self.loadSoundEffect(self, "failSound", os.path.join("themes",themename,"sounds","failsound.ogg"))
     else: #MFH: Fallback on general failsound.ogg
       self.loadSoundEffect(self, "failSound", os.path.join("sounds","failsound.ogg"))
-      Log.warn(themename + "\sounds\ failsound.ogg not found -- using general failsound.ogg instead.")
+      Log.warn(themename + "/sounds/failsound.ogg not found -- using general failsound.ogg instead.")
       
     #myfingershurt: integrating Capo's starpower clap sounds
     self.loadSoundEffect(self, "clapSound", os.path.join("sounds","clapsound.ogg"))
@@ -371,35 +384,35 @@ class Data(object):
       self.loadSoundEffect(self, "starReadySound", os.path.join("themes",themename,"sounds","starpowerready.ogg"))
     else: #MFH: Fallback on starpower.ogg
       self.loadSoundEffect(self, "starReadySound", os.path.join("themes",themename,"sounds","starpower.ogg"))
-      Log.warn(themename + "\sounds\starpowerready.ogg not found -- using starpower.ogg instead.")
+      Log.warn(themename + "/sounds/starpowerready.ogg not found -- using starpower.ogg instead.")
 
-    #MFH - fallback on sounds\crowdcheers.ogg, and then starpower.ogg.  Note if the fallback crowdcheers was used or not.    
+    #MFH - fallback on sounds/crowdcheers.ogg, and then starpower.ogg.  Note if the fallback crowdcheers was used or not.    
     if self.fileExists(os.path.join("themes",themename,"sounds","crowdcheers.ogg")):
       self.loadSoundEffect(self, "crowdSound", os.path.join("themes",themename,"sounds","crowdcheers.ogg"), crowd = True)
       self.cheerSoundFound = 2
     elif self.fileExists(os.path.join("sounds","crowdcheers.ogg")):
       self.loadSoundEffect(self, "crowdSound", os.path.join("sounds","crowdcheers.ogg"), crowd = True)
       self.cheerSoundFound = 1
-      Log.warn(themename + "\sounds\crowdcheers.ogg not found -- using data\sounds\crowdcheers.ogg instead.")
+      Log.warn(themename + "/sounds/crowdcheers.ogg not found -- using data/sounds/crowdcheers.ogg instead.")
     else: #MFH: Fallback on starpower.ogg
       self.loadSoundEffect(self, "crowdSound", os.path.join("themes",themename,"sounds","starpower.ogg"))
       self.cheerSoundFound = 0
-      Log.warn(themename + "\sounds\crowdcheers.ogg not found -- using starpower.ogg instead.")
+      Log.warn(themename + "/sounds/crowdcheers.ogg not found -- using starpower.ogg instead.")
 
     if self.fileExists(os.path.join("themes",themename,"sounds","staractivate.ogg")):
       self.loadSoundEffect(self, "starActivateSound", os.path.join("themes",themename,"sounds","staractivate.ogg"))
     else: #MFH: Fallback on starpower.ogg
       self.loadSoundEffect(self, "starActivateSound", os.path.join("themes",themename,"sounds","starpower.ogg"))
-      Log.warn(themename + "\sounds\staractivate.ogg not found -- using starpower.ogg instead.")
+      Log.warn(themename + "/sounds/staractivate.ogg not found -- using starpower.ogg instead.")
       
     if self.fileExists(os.path.join("themes",themename,"sounds","battleused.ogg")):
       self.loadSoundEffect(self, "battleUsedSound", os.path.join("themes",themename,"sounds","battleused.ogg"))
     elif self.fileExists(os.path.join("themes",themename,"sounds","staractivate.ogg")):
       self.loadSoundEffect(self, "battleUsedSound", os.path.join("themes",themename,"sounds","staractivate.ogg"))
-      Log.warn(themename + "\sounds\battleused.ogg not found -- using staractive.ogg instead.")
+      Log.warn(themename + "/sounds/battleused.ogg not found -- using staractive.ogg instead.")
     else: #Fallback on starpower.ogg
       self.loadSoundEffect(self, "battleUsedSound", os.path.join("themes",themename,"sounds","starpower.ogg"))
-      Log.warn(themename + "\sounds\battleused.ogg not found -- using starpower.ogg instead.")
+      Log.warn(themename + "/sounds/battleused.ogg not found -- using starpower.ogg instead.")
 
 
     if self.fileExists(os.path.join("themes",themename,"sounds","stardeactivate.ogg")):
@@ -408,28 +421,28 @@ class Data(object):
     else: #MFH: Fallback on starpower.ogg - required to load, but will not be played.
       self.loadSoundEffect(self, "starDeActivateSound", os.path.join("themes",themename,"sounds","starpower.ogg"))
       self.starDeActivateSoundFound = False
-      Log.warn(themename + "\sounds\stardeactivate.ogg not found -- sound disabled.")
+      Log.warn(themename + "/sounds/stardeactivate.ogg not found -- sound disabled.")
     
     if self.fileExists(os.path.join("themes",themename,"sounds","rescue.ogg")):
       self.loadSoundEffect(self, "rescueSound", os.path.join("themes",themename,"sounds","rescue.ogg"))
     elif self.fileExists(os.path.join("themes",themename,"sounds","staractivate.ogg")):
       self.loadSoundEffect(self, "rescueSound", os.path.join("themes",themename,"sounds","staractivate.ogg"))
-      Log.warn(themename + "\sounds\rescue.ogg not found -- using staractivate.ogg instead.")
+      Log.warn(themename + "/sounds/rescue.ogg not found -- using staractivate.ogg instead.")
     else:
       self.loadSoundEffect(self, "rescueSound", os.path.join("themes",themename,"sounds","starpower.ogg"))
-      Log.warn(themename + "\sounds\rescue.ogg not found -- using starpower.ogg instead.")
+      Log.warn(themename + "/sounds/rescue.ogg not found -- using starpower.ogg instead.")
     
     if self.fileExists(os.path.join("themes",themename,"sounds","coopfail.ogg")):
       self.loadSoundEffect(self, "coOpFailSound",os.path.join("themes",themename,"sounds","coopfail.ogg"))
     elif self.fileExists(os.path.join("themes",themename,"sounds","stardeactivate.ogg")):
       self.loadSoundEffect(self, "coOpFailSound",os.path.join("themes",themename,"sounds","stardeactivate.ogg"))
-      Log.warn(themename + "\sounds\coopfail.ogg not found -- using stardeactivate.ogg instead")
+      Log.warn(themename + "/sounds/coopfail.ogg not found -- using stardeactivate.ogg instead")
     elif self.fileExists(os.path.join("themes",themename,"sounds","out.ogg")):  #MFH - not all themes have out.ogg!
       self.loadSoundEffect(self, "coOpFailSound",os.path.join("themes",themename,"sounds","out.ogg"))
-      Log.warn(themename + "\sounds\coopfail.ogg not found -- using out.ogg instead")
+      Log.warn(themename + "/sounds/coopfail.ogg not found -- using out.ogg instead")
     else:
       self.loadSoundEffect(self, "coOpFailSound",os.path.join("themes",themename,"sounds","back1.ogg"))
-      Log.warn(themename + "\sounds\coopfail.ogg not found -- using back1.ogg instead")
+      Log.warn(themename + "/sounds/coopfail.ogg not found -- using back1.ogg instead")
 
 
 
@@ -446,6 +459,14 @@ class Data(object):
     #  #self.loadSoundEffect(self, "acceptSound",  os.path.join("themes",themename,"sounds","action.ogg"))
     #  self.loadSoundEffect(self, "cancelSounds",  os.path.join("themes",themename,"sounds","out.ogg"))
 
+  def loadPartImages(self):
+    self.partImages = []
+    self.partImages.append(self.loadImgDrawing(None, "guitar", os.path.join("themes",self.themeLabel,"common","guitar.png")))
+    self.partImages.append(self.loadImgDrawing(None, "rhythm", os.path.join("themes",self.themeLabel,"common","rhythm.png")))
+    self.partImages.append(self.loadImgDrawing(None, "bass", os.path.join("themes",self.themeLabel,"common","bass.png")))
+    self.partImages.append(self.loadImgDrawing(None, "lead", os.path.join("themes",self.themeLabel,"common","lead.png")))
+    self.partImages.append(self.loadImgDrawing(None, "drum", os.path.join("themes",self.themeLabel,"common","drum.png")))
+    self.partImages.append(self.loadImgDrawing(None, "vocal", os.path.join("themes",self.themeLabel,"common","vocal.png")))
   
   def SetAllScrewUpSoundFxObjectVolumes(self, volume):   #MFH - single function to go through all screwup sound objects and set object volume to the given volume
     for s in self.screwUpsounds:
@@ -568,7 +589,50 @@ class Data(object):
   def loadSyncsounds(self):
     return [Sound(self.resource.fileName("sync%d.ogg" % i)) for i in range(1, 2)]
   
-  def loadImgDrawing(self, target, name, fileName, textureSize = None):
+  def checkImgDrawing(self, fileName):
+    return self.getImgDrawing(fileName, False)
+  
+  def getImgDrawing(self, fileName, openImage=True, dirLoad=False):
+    imgDrawing = None
+    for dataPath in self.resource.dataPaths:
+      fileName1 = os.path.join(dataPath, fileName)
+      if self.logLoadings == 1:
+        if openImage:
+            Log.notice("Trying to load image: %s" % fileName1)
+        else:
+            Log.notice("Checking image: %s" % fileName1)
+      #check if fileName1 exists (has extension)
+      if os.path.exists(fileName1):
+        if openImage == True:
+          try:      
+            imgDrawing = ImgDrawing(self.svg, fileName1)
+            return imgDrawing
+          except IOError:
+            Log.warn("Unable to load image file: %s" % fileName1)
+          except OverflowError:
+            Log.warn("Unable to read image file: %s" % fileName1)
+        else:
+          return True
+      else:
+        #find extension
+        fileName1 = os.path.splitext(fileName1)[0]
+        files = glob.glob('%s.*' % fileName1)
+        if openImage == True:
+          for i in range(len(files)):
+            try:
+              imgDrawing = ImgDrawing(self.svg, files[i])
+              return imgDrawing
+            except IOError:
+              Log.warn("Unable to load image file: %s" % files[i])
+        elif len(files) > 0:
+            return True
+    #image not found
+    log = self.logImageNotFound - (dirLoad and 1 or 0)
+    if log > 0:
+      Log.debug("Image not found: %s" % fileName)
+    return False
+
+  def loadImgDrawing(self, target, name, fileName, textureSize = None, dirLoad = False):
     """
     Load an SVG drawing synchronously.
 
@@ -579,11 +643,44 @@ class Data(object):
                         be rendered to an x by y texture
     @return:            L{ImgDrawing} instance
     """
-    fileName = self.resource.fileName(fileName)
-    drawing  = self.resource.load(target, name, lambda: ImgDrawing(self.svg, fileName), synch = True)
+    imgDrawing = self.getImgDrawing(fileName, dirLoad = dirLoad)
+    if not imgDrawing:
+      return False
+    
+    if target is not None:
+      drawing  = self.resource.load(target, name, lambda: imgDrawing, synch = True)
+    else:
+      drawing = imgDrawing
     if textureSize:
       drawing.convertToTexture(textureSize[0], textureSize[1])
     return drawing
+  
+  def loadAllImages(self, target, directory, prefix = "img_", textureSize = None): #akedrou
+    """
+    Loads all images found in a folder to a given target.
+    
+    @param target:      An object that will own the drawings
+    @param directory:   The directory that will be searched for image files.
+    @param textureSize: Either None or (x, y), in which case the files will
+                        be rendered to an x by y texture
+    """
+    if not os.path.isdir(os.path.join(self.path, directory)):
+      return None
+    imgDict = {}
+    for file in os.listdir(os.path.join(self.path, directory)):
+      if file == "thumbs.db" or file == "Thumbs.db":
+        continue
+      elif file[0] == ".":
+        continue
+      elif os.path.isdir(os.path.join(self.path, directory, file)):
+        continue
+      name = os.path.splitext(file)[0]
+      name = prefix+name
+      img = self.loadImgDrawing(target, name, os.path.join(directory, file), textureSize, dirLoad = True)
+      if img and target is None:
+        imgDict[name] = img
+    if target is None and len(imgDict) > 0:
+      return imgDict
   
   #glorandwarf: changed name to getPath
   def getPath(self, fileName):
@@ -595,20 +692,6 @@ class Data(object):
     return os.path.exists(fileName)
 
       
-  #MFH - no more custom font glyphs
-  def customizeFont(self, font):
-    pass
-#-    # change some predefined characters to custom images
-#-    font.setCustomGlyph(STAR1, self.star1.texture)
-#-    font.setCustomGlyph(STAR2, self.star2.texture)
-#-    font.setCustomGlyph(STAR3, self.star3.texture)
-#-    font.setCustomGlyph(STAR4, self.star4.texture)
-#-    font.setCustomGlyph(LEFT,  self.left.texture)
-#-    font.setCustomGlyph(RIGHT, self.right.texture)
-#-    # evilynux - Load cache to speedup rendering
-#-    if Config.get("performance", "preload_glyph_cache"):
-#-      font.loadCache()
-
 #MFH - acceptSound and selectSound will now be merged into either 10 random sounds or just the acceptSound as a fallback:
   def getAcceptSound(self):
     """@return: A randomly chosen selection sound."""
