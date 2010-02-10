@@ -2,24 +2,19 @@
 #labels Phase-Implementation
 = FoFiX Roadmap =
 
-
-== Milestone: 3.120 ==
-*Beta 2: June 20, *
-*Final: June 27*
-[http://code.google.com/p/fofix/issues/list?can=2&q=milestone:Release-3.120 3.120 Issues to Fix]
-
 == Milestone: 4.0.0 ==
 *Final: ??*
 ==== Planned Features: ====
 =====New Features=====
-  * Theme Necks < append theme necks to list of necks with current folder
-    * Option for random neck to be taken from theme folder/currneckfolder/all necks
+  * Theme Necks < append 'Theme Necks' to list of necks with current folder
+    * Option for "Random Neck" to be taken from 'Theme Folder'/'Current Neck Folder'/'All Necks'
   * Difficulty based Careers
   * Single song database - Issue 346
   * Virtual File-system Layer (get rid of conditionals in loading files)
   * Online play
   * Multithreading
   * Controller calibrator (delay, axis deadzone/offset, etc.) - Issue 836
+  * Video playback (Include's video files, and animation using images) 
   * More to come
 =====Rework=====
   * Menu.py
@@ -33,7 +28,7 @@
     * Remove theme-type forks for songChooser
   * !GuitarScene.py
     * Rewrite render effectively removing theme-type and transferring all settings to theme control
-      * Separate rock meter
+      * Separate all rock meter's components to be custom positionable
       * Establish single version of notes.png(maybe new file name)
   * Theme.py
     * Rewrite theme.ini > new name will be needed

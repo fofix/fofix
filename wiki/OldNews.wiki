@@ -2,6 +2,48 @@
 
 = Old News =
 
+====September 22, 2009====
+*What's that? A release?*
+(FoFiX v3.120 Final: r1881)
+
+Yep, that's right. It's finally time to call 3.120 complete and get on with the next big thing. Check out the download links _right here on the front page under Featured Downloads_! (It's to your right - you can also click the Downloads tab up top for more options)
+
+Grab the version for your OS. If you don't know which version to get for Windows, *try the 2.6 version first*.
+
+*Note:* _GNU/Linux players, download the [http://fofix.googlecode.com/files/fofix-3.120.tar.gz source archive] and follow the instructions on our [RunningUnderGNULinux] wiki page._ -evilynux
+
+What's new in version 3.120? A lot! Over 170 issues were resolved by this latest version, including new Vocal support, 3 and 4-player modes, theme-customizable necks, basic character support, revamped control systems supporting more types of controllers, customizable AI difficulty, and many more enhancements and bugfixes! Check out [http://code.google.com/p/fofix/issues/list?can=1&q=status%3Afixed%2Cverified%2Cdone+milestone%3Arelease-3.120 the list of things we've fixed for this version]!
+
+As a reminder, if you are upgrading from a beta version of FoFiX 3.120 - check your "Note Hit Window" setting in the "Mods, Cheats, and AI" menu. There is a chance it may have been set to Tightest. Most players will want Normal.
+
+P.S. I forgot to update the credits, of all things, before packaging and so I'm making it very clear that Steven Knapman (aka knapman) provided the 3D texture used as key_open.dae in the data folder, as well as giving a lot of very helpful input on the 3D notes coding in the run up to release. Thanks a lot, Steven! (and sorry!)
+
+-akedrou
+
+==== September 1st 2009 ====
+*To all*: If you are upgrading from a previous version of FoFiX (including previous betas), your hit window setting will have changed. In the "Mods, Cheats, and AI" section of the Settings menu, check your "Note Hit Window". Most players will want "Normal". See issue 956 for details.
+
+*Windows players*: Some of you may get the issue 959, if so delete the `POWRPROF.dll` file from your data folder.
+
+==== August 27th 2009 ====
+3.120 RC 1 (SVN r1823) is released for final review.
+
+This is (hopefully) the final test release before 3.120 final, and is (predictably) a bugfix on beta 2. Neck rendering, RB Co-Op saving, high scores, translations, and setlist sorting were fixed; Detailed options menu text, "Vocals" difficulty and Jurgen vocals were added.
+Check the Issues page for a [http://code.google.com/p/fofix/issues/list?can=1&q=status%3Afixed%2Cverified%2Cdone+milestone%3Arelease-3.120 detailed list of changes] since the last stable release 3.100.
+
+*Downloads*
+Downloads are here! Some computers have better performance with the older PyOpenGL 2.0.2.x builds. Choose the download that's right for your computer here!
+
+|| *OS* || *Python/PyOpenGL Version* || *Type* || *Link* ||
+|| Windows || Python 2.6/PyOpenGL 3.x || Installer || [http://www.mediafire.com/download.php?ezoqmtjt0mt Download!]||
+|| Windows || Python 2.6/PyOpenGL 3.x || Archive (7zip) || [http://www.mediafire.com/download.php?nhm3zmtvclj Download!]||
+|| Windows || Python 2.4/PyOpenGL 2.0.2.x || Installer || [http://www.mediafire.com/download.php?dzmzlymmwzz Download!]||
+|| Windows || Python 2.4/PyOpenGL 2.0.2.x || Archive (7zip) || [http://www.mediafire.com/download.php?izoydjnjijj Download!]||
+|| Mac OSX || Python 2.6/PyOpenGL 3.x || Archive (zip) || [http://www.mediafire.com/?wmzn4242mmz Download!] ||
+|| Mac OSX || Python 2.5/PyOpenGL 2.0.2.x || Archive (zip) || [http://www.mediafire.com/?zi1xlz4drqg Download!] ||
+
+*GNU/Linux*: See instructions on the [RunningUnderGNULinux] page.
+
 ====June 29th 2009 ====
 3.120 beta 2 (SVN r1740) released for testing. 
 

@@ -6,6 +6,10 @@
 Do you own a Guitar Hero or Rock Band controller for the PS2, PS3, Wii or Xbox 360?
 Are you wondering how to get it to work? Then you're at the right place!
 
+This page shows whether any extra driver software is needed before you can map the inputs on your device.
+
+If your class of devices is not listed and you know how to make it work, please file a bug or share your knowledge with us in IRC and we will update this list.
+
 -------------------------------
 
 = Microsoft Windows =
@@ -32,6 +36,9 @@ Default mapping of the controls for the script correspond to the default control
 ----------------------------------
 
 = GNU/Linux =
+== PS3 ==
+Works right out of the box - just plug it in. It uses the standard USB HID joystick driver in the Linux kernel.
+
 == PS2 ==
 Get your hands on a PS2 to USB adapter and it'll work out of the box.
 
