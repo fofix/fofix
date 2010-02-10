@@ -286,8 +286,9 @@ def main():
         # When running from source, sys.executable is the Python interpreter
         # being used to run the program.
         exe = sys.executable
-        # Pass the optimization level on.
-        if sys.flags.optimize > 0:
+        # Pass the optimization level on iif python version >= 2.6.0 as
+        # sys.flags has been introduced in 2.6.0.
+        if sys.version_info[:3] >= (2,6,0) and sys.flags.optimize > 0:
           args.append('-%s' % ('O' * sys.flags.optimize))
         args.append(__file__)
       os.execv(exe, [sys.executable] + args + sys.argv[1:])
