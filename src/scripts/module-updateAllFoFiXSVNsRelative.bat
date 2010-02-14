@@ -16,6 +16,10 @@ rem RB1 / RbMFH theme by MFH - SVN @ http://svn.xp-dev.com/svn/myfingershurt-fof
 cd ..\data\themes\Rock Band 1
 START /WAIT %TortoiseSVN%TortoiseProc.exe /command:update /path:"%localpath%" /closeonend:%CloseOnEnd%
 
+rem RB1 Beta theme - SVN @ http://svn.xp-dev.com/svn/rbbeta/trunk/
+cd ..\data\themes\Rock Band 1 beta
+START /WAIT %TortoiseSVN%TortoiseProc.exe /command:update /path:"%localpath%" /closeonend:%CloseOnEnd%
+
 rem RB2 theme by kid - SVN @ http://svn.xp-dev.com/svn/kristijan_mkd_RockBand2Theme/
 cd ..
 cd Rock Band 2

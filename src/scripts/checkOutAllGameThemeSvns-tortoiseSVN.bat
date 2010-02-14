@@ -8,6 +8,11 @@ set currentThemeFolder=Rock Band 1
 set urlOfThemeSvn=http://svn.xp-dev.com/svn/myfingershurt-fofix-rb1-theme/
 call module-checkOutOneGameThemeSvn-TortoiseSVN.bat
 
+echo RB1 Beta theme
+set currentThemeFolder=Rock Band 1 beta
+set urlOfThemeSvn=http://svn.xp-dev.com/svn/rbbeta/trunk/
+call module-checkOutOneGameThemeSvn-TortoiseSVN.bat
+
 echo RB2 theme by kid 
 set currentThemeFolder=Rock Band 2
 set urlOfThemeSvn=http://svn.xp-dev.com/svn/kristijan_mkd_RockBand2Theme/
