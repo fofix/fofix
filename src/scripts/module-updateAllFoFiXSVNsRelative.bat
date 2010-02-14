@@ -26,6 +26,11 @@ cd ..
 cd The Beatles Rock Band
 START /WAIT %TortoiseSVN%TortoiseProc.exe /command:update /path:"%localpath%" /closeonend:%CloseOnEnd%
 
+rem Guitar Hero III theme by worldrave - SVN @ http://svn.xp-dev.com/svn/worldrave-guitarheroIII/
+cd ..
+cd Guitar Hero III
+START /WAIT %TortoiseSVN%TortoiseProc.exe /command:update /path:"%localpath%" /closeonend:%CloseOnEnd%
+
 rem Guitar Hero Aerosmith by worldrave - SVN @ http://svn.xp-dev.com/svn/worldrave-guitarhero-aerosmith/
 cd ..
 cd Guitar Hero Aerosmith
@@ -40,6 +45,41 @@ rem Guitar Hero: Metallica by kid - SVN @ http://svn2.xp-dev.com/svn/kristijan_m
 cd ..
 cd Guitar Hero Metallica
 START /WAIT %TortoiseSVN%TortoiseProc.exe /command:update /path:"%localpath%" /closeonend:%CloseOnEnd%
+
+rem Guitar Hero: Metallica by stashincash06 - SVN @ http://svn2.xp-dev.com/svn/stashincash06-Guitar-Hero-Metallica/Guitar Hero Metallica
+cd ..
+cd Guitar Hero Metallica sc
+START /WAIT %TortoiseSVN%TortoiseProc.exe /command:update /path:"%localpath%" /closeonend:%CloseOnEnd%
+
+rem Guitar Hero: Metallica custom by kid - SVN @ http://svn.xp-dev.com/svn/kristijan_mkd-GH-Metallica/
+cd ..
+cd Guitar Hero Metallica cust
+START /WAIT %TortoiseSVN%TortoiseProc.exe /command:update /path:"%localpath%" /closeonend:%CloseOnEnd%
+
+
+Rem ---------------Other (non-GH/RB game clones) themes-------------------
+
+
+rem Geetar Hero theme by slantyr - SVN @ http://svn.xp-dev.com/svn/slantyr-GeetarHero/
+cd ..
+cd Geetar Hero
+START /WAIT %TortoiseSVN%TortoiseProc.exe /command:update /path:"%localpath%" /closeonend:%CloseOnEnd%
+
+rem Bioshock theme by slantyr - SVN @ http://svn.xp-dev.com/svn/slantyr-BioShock/
+cd ..
+cd Bioshock
+START /WAIT %TortoiseSVN%TortoiseProc.exe /command:update /path:"%localpath%" /closeonend:%CloseOnEnd%
+
+rem AC/DC theme - SVN @ http://svn2.xp-dev.com/svn/PaulTechNox-ACDC-Theme/
+cd ..
+cd AC DC
+START /WAIT %TortoiseSVN%TortoiseProc.exe /command:update /path:"%localpath%" /closeonend:%CloseOnEnd%
+
+rem STARZ theme - SVN @ http://svn2.xp-dev.com/svn/Hazzerz-STaRZ/
+cd ..
+cd Starz
+START /WAIT %TortoiseSVN%TortoiseProc.exe /command:update /path:"%localpath%" /closeonend:%CloseOnEnd%
+
 
 cd ..
 cd ..

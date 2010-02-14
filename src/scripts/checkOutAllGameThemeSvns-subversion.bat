@@ -38,6 +38,43 @@ set currentThemeFolder=Guitar Hero Metallica
 set urlOfThemeSvn=http://svn2.xp-dev.com/svn/kristijan_mkd-GuitarHeroMetallicaOriginal/
 call module-checkOutOneGameThemeSvn-subversion.bat
 
+echo Guitar Hero: Metallica by stashincash06  
+set currentThemeFolder=Guitar Hero Metallica sc
+set urlOfThemeSvn=http://svn2.xp-dev.com/svn/stashincash06-Guitar-Hero-Metallica/Guitar Hero Metallica
+call module-checkOutOneGameThemeSvn-subversion.bat
+
+echo Guitar Hero: Metallica custom by kid  
+set currentThemeFolder=Guitar Hero Metallica cust
+set urlOfThemeSvn=http://svn.xp-dev.com/svn/kristijan_mkd-GH-Metallica/
+call module-checkOutOneGameThemeSvn-subversion.bat
+
+
+Rem ---------------Other (non-GH/RB game clones) themes-------------------
+
+echo Geetar Hero theme by slantyr
+set currentThemeFolder=Geetar Hero
+set urlOfThemeSvn=http://svn.xp-dev.com/svn/slantyr-GeetarHero/
+call module-checkOutOneGameThemeSvn-subversion.bat
+
+echo Bioshock theme by slantyr
+set currentThemeFolder=Bioshock
+set urlOfThemeSvn=http://svn.xp-dev.com/svn/slantyr-BioShock/
+call module-checkOutOneGameThemeSvn-subversion.bat
+
+echo AC/DC theme
+set currentThemeFolder=AC DC
+set urlOfThemeSvn=http://svn2.xp-dev.com/svn/PaulTechNox-ACDC-Theme/
+call module-checkOutOneGameThemeSvn-subversion.bat
+
+echo STARZ theme
+set currentThemeFolder=Starz
+set urlOfThemeSvn=http://svn2.xp-dev.com/svn/Hazzerz-STaRZ/
+call module-checkOutOneGameThemeSvn-subversion.bat
+
+
+
+
+
 cd ..
 cd ..
 pause
