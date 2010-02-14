@@ -23,7 +23,8 @@
 
 # FoFiX fully unified setup script
 from distutils.core import setup
-import sys, SceneFactory, Version, glob, os
+import sys, glob, os
+from FoFiX import SceneFactory, Version
 
 if os.name != 'nt' and sys.platform != 'darwin':
   raise RuntimeError, 'This script is only meaningful for OS X and Windows.'
