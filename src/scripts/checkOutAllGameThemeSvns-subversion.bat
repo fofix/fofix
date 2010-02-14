@@ -1,5 +1,4 @@
 @echo off
-set TortoiseSVN=C:\Progra~1\TortoiseSVN\bin\
 set localpath=.\
 
 
