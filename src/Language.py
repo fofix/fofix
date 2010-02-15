@@ -35,8 +35,8 @@ def getAvailableLanguages():
 def dummyTranslator(string):
   return string
 
-encoding = Config.load(Version.appName() + ".ini").get("game", "encoding")
-language = Config.load(Version.appName() + ".ini").get("game", "language")
+encoding = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini").get("game", "encoding")
+language = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini").get("game", "language")
 _ = dummyTranslator
 
 if language:

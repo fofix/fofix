@@ -82,7 +82,7 @@ One-shot mode options (ignored unless in one-shot mode):
   if hasattr(sys, 'frozen') and os.name == 'nt':
     import win32api
     import win32con
-    win32api.MessageBox(0, usage, '%s %s' % (Version.appNameSexy(), Version.version()), win32con.MB_OK)
+    win32api.MessageBox(0, usage, '%s %s' % (Version.PROGRAM_NAME, Version.version()), win32con.MB_OK)
   else:
     print usage
   sys.exit(1)
@@ -155,13 +155,13 @@ def main():
   # Load the configuration file.
   if configFile is not None:
     if configFile.lower() == "reset":
-      fileName = os.path.join(Resource.getWritableResourcePath(), Version.appName() + ".ini")
+      fileName = os.path.join(Resource.getWritableResourcePath(), Version.PROGRAM_UNIXSTYLE_NAME + ".ini")
       os.remove(fileName)
-      config = Config.load(Version.appName() + ".ini", setAsDefault = True)
+      config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
     else:
       config = Config.load(configFile, setAsDefault = True)
   else:
-    config = Config.load(Version.appName() + ".ini", setAsDefault = True)
+    config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
 
   #Lysdestic - Allow support for manipulating fullscreen via CLI
   if fullscreen is not None:
@@ -318,7 +318,7 @@ if __name__ == '__main__':
     if os.name == 'nt':
       import win32api
       import win32con
-      if win32api.MessageBox(0, "%s\n\n%s" % (_errmsg, _("Open the logfile now?")), "%s %s" % (Version.appNameSexy(), Version.version()), win32con.MB_YESNO|win32con.MB_ICONSTOP) == win32con.IDYES:
+      if win32api.MessageBox(0, "%s\n\n%s" % (_errmsg, _("Open the logfile now?")), "%s %s" % (Version.PROGRAM_NAME, Version.version()), win32con.MB_YESNO|win32con.MB_ICONSTOP) == win32con.IDYES:
         Log.logFile.close()
         os.startfile(_logname)
       if hasattr(sys, 'frozen'):

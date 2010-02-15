@@ -43,7 +43,7 @@ class DialogTestInteractive(unittest.TestCase):
     text = getText(self.e, "Please enter your name:", "Wario")
      
   def setUp(self):
-    config = Config.load(Version.appName() + ".ini", setAsDefault = True)
+    config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
     self.e = GameEngine(config)
     
   def tearDown(self):

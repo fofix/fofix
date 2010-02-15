@@ -45,7 +45,7 @@ class MenuTest(unittest.TestCase):
     self.e.view.pushLayer(m)
 
   def setUp(self):
-    config = Config.load(Version.appName() + ".ini", setAsDefault = True)
+    config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
     self.e = GameEngine(config)
     
   def tearDown(self):
@@ -60,7 +60,7 @@ class MenuTestInteractive(unittest.TestCase):
       self.e.run()
 
   def setUp(self):
-    config = Config.load(Version.appName() + ".ini", setAsDefault = True)
+    config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
     self.e = GameEngine(config)
     
   def tearDown(self):

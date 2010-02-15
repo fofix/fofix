@@ -41,11 +41,11 @@ if os.name == "posix": # evilynux - logfile in ~/.fofix/ for GNU/Linux and MacOS
   if os.uname()[0] == "Darwin":
     logFile = open(os.path.join(Resource.getWritableResourcePath(), 
                                 "..", "..", "Logs",
-                                Version.appName() + ".log"), "w")
+                                Version.PROGRAM_UNIXSTYLE_NAME + ".log"), "w")
   else: # GNU/Linux et al.
-    logFile = open(os.path.join(Resource.getWritableResourcePath(), Version.appName() + ".log"), "w")
+    logFile = open(os.path.join(Resource.getWritableResourcePath(), Version.PROGRAM_UNIXSTYLE_NAME + ".log"), "w")
 else:
-  logFile = open(Version.appName() + ".log", "w")  #MFH - local logfile!
+  logFile = open(Version.PROGRAM_UNIXSTYLE_NAME + ".log", "w")  #MFH - local logfile!
 
 ## Character encoding to use for logging.
 encoding = "iso-8859-1"

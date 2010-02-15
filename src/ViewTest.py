@@ -63,7 +63,7 @@ class ViewTest(unittest.TestCase):
     assert not v.layers
       
   def setUp(self):
-    config = Config.load(Version.appName() + ".ini", setAsDefault = True)
+    config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
     self.e = GameEngine(config)
     
   def tearDown(self):

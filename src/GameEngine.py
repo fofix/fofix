@@ -86,7 +86,7 @@ def sortOptionsByKey(dict):
   return a
 
 # evilynux - Grab name and version from Version class.
-version = "%s v%s" % ( Version.appNameSexy(), Version.version() )
+version = "%s v%s" % ( Version.PROGRAM_NAME, Version.version() )
 
 # define configuration keys
 Config.define("engine", "highpriority", bool,  False, text = _("FPS Limiter"),           options = {False: _("On (Set Below)"), True: _("Off (Auto Max FPS)")}, tipText = _("Use this to enable or disable the FPS Limiter. If off, the game will render as many frames as possible. (This is affected by the 'Performance' quickset)"))
@@ -483,7 +483,7 @@ class GameEngine(Engine):
     self.currentScene = None
     
     self.versionString = version  #stump: other version stuff moved to allow full version string to be retrieved without instantiating GameEngine
-    self.uploadVersion = "%s-4.0" % Version.appNameSexy() #akedrou - the version passed to the upload site.
+    self.uploadVersion = "%s-4.0" % Version.PROGRAM_NAME #akedrou - the version passed to the upload site.
 
     self.dataPath = Version.dataPath()
     Log.debug(self.versionString + " starting up...")

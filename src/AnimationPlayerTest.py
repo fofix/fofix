@@ -56,7 +56,7 @@ class AnimationPlayerTest(unittest.TestCase):
   # Simplest way to use the Animation player, use it as a Layer
   def testAnimationPlayerLayer(self):
     loop = 10
-    config = Config.load(Version.appName() + ".ini", setAsDefault = True)
+    config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
     self.e = GameEngine(config)
     animPlayer = AnimationPlayer(framerate, self.path, self.basename,
                                  (self.e.view.geometry[2],

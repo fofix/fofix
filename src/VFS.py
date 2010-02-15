@@ -314,11 +314,11 @@ if os.name == 'nt':
   _appdata = (ctypes.c_char * ctypes.wintypes.MAX_PATH)()
   # [WinSDK]/include/shlobj.h: #define CSIDL_APPDATA 26
   ctypes.windll.shell32.SHGetFolderPathA(None, 26, None, None, _appdata)
-  _writePath = os.path.join(_appdata.value, Version.appName())
+  _writePath = os.path.join(_appdata.value, Version.PROGRAM_UNIXSTYLE_NAME)
 elif sys.platform == 'darwin':
-  _writePath = os.path.expanduser(os.path.join('~', 'Library', 'Preferences', Version.appName()))
+  _writePath = os.path.expanduser(os.path.join('~', 'Library', 'Preferences', Version.PROGRAM_UNIXSTYLE_NAME))
 else:
-  _writePath = os.path.expanduser(os.path.join('~', '.'+Version.appName()))
+  _writePath = os.path.expanduser(os.path.join('~', '.'+Version.PROGRAM_UNIXSTYLE_NAME))
 mountWritable(_writePath, 'userdata')
 if not isdir('/userdata'):
   mkdir('/userdata')

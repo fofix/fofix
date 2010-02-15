@@ -151,7 +151,7 @@ class Resource(Task):
     self.baseLibrary = Config.get("game", "base_library")
     #evilynux - Support for songs in ~/.fretsonfire/songs (GNU/Linux and MacOS X)
     if self.baseLibrary == "None" and os.name == "posix":
-      path = os.path.expanduser("~/." + Version.appName())
+      path = os.path.expanduser("~/." + Version.PROGRAM_UNIXSTYLE_NAME)
       if os.path.isdir(path):
         self.baseLibrary = path
         Config.set("game", "base_library", path)
@@ -265,7 +265,7 @@ def getWritableResourcePath():
   Returns a path that holds the configuration for the application.
   """
   path = "."
-  appname = Version.appName()
+  appname = Version.PROGRAM_UNIXSTYLE_NAME
   if os.name == "posix":
     path = os.path.expanduser("~/." + appname)
     # evilynux - MacOS X, putting config files in the standard folder

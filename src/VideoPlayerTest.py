@@ -58,7 +58,7 @@ vidSource = "t1.avi"
 class VideoPlayerTest(unittest.TestCase):
   # Simplest way to use the video player, use it as a Layer
   def testVideoPlayerLayer(self):
-    config = Config.load(Version.appName() + ".ini", setAsDefault = True)
+    config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
     self.e = GameEngine(config)
     winWidth, winHeight = (self.e.view.geometry[2], self.e.view.geometry[3])
     vidPlayer = VideoPlayer(framerate, self.src, (winWidth, winHeight),

@@ -68,12 +68,6 @@ def _getTagLine():
     tagline = _getSvnTagLine()
   return tagline
 
-def appName():
-  return PROGRAM_UNIXSTYLE_NAME
-
-def appNameSexy():
-  return PROGRAM_NAME
-
 def revision():
   rev = _getGitTagLine()
   if rev is None:

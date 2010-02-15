@@ -27,7 +27,7 @@ import Version
 
 class EngineTest(unittest.TestCase):
   def testNetworking(self):
-    config = Config.load(Version.appName() + ".ini", setAsDefault = True)
+    config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
     e1 = GameEngine(config)
     
     e1.startServer()

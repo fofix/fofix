@@ -77,7 +77,7 @@ class SvgTest(unittest.TestCase):
     time.sleep(2)
 
   def setUp(self):
-    config = Config.load(Version.appName() + ".ini", setAsDefault = True)
+    config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
     self.e = GameEngine(config)
     self.e.loadImgDrawing(self, "svg", "mfhlogo.png")
 

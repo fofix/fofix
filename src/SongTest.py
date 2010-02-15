@@ -30,7 +30,7 @@ import Version
 
 class SongTest(unittest.TestCase):
   def testLoading(self):
-    config = Config.load(Version.appName() + ".ini", setAsDefault = True)
+    config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
     e = GameEngine(config)
     infoFile   = e.resource.fileName("tutorials", "bangbang", "song.ini")
     guitarFile = e.resource.fileName("tutorials", "bangbang", "guitar.ogg")
@@ -41,7 +41,7 @@ class SongTest(unittest.TestCase):
     assert int(song.bpm) == 120
 
   def testSaving(self):
-    config = Config.load(Version.appName() + ".ini", setAsDefault = True)
+    config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
     e = GameEngine(config)
     
     # Make a temp copy
