@@ -1,3 +1,8 @@
+call checkOutAllGameThemeSvns-subversion.bat
+
+rem cd src\scripts
+rem If autocheckout script does not exist, the following will ensure we're back at the root.  
+rem ... if autocheckout script does exist, the following will not be found and all will be well.
 call backToFoFiXroot.bat
 
 set TortoiseSVN=C:\Progra~1\TortoiseSVN\bin\
