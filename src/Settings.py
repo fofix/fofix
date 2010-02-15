@@ -36,6 +36,7 @@ import Config
 import Mod
 import Audio
 import Player
+import Version
 from View import BackgroundLayer
 from Input import KeyListener
 from Song import VOCAL_PART
@@ -1019,7 +1020,7 @@ class SettingsMenu(Menu.Menu):
       (_("Setlist Settings"),   self.listSettingsMenu, _("Settings that affect the setlist.")),
       (_("Advanced Settings"), self.advancedSettingsMenu, _("Settings that probably don't need to be changed.")),
       (_("Mods, Cheats, AI"), self.cheatMenu, _("Set Jurgen to play for you, or other cheats.")),
-      (_("%s Credits") % (engine.versionString), lambda: Dialogs.showCredits(engine), _("See who made this game.")), # evilynux - Show Credits!
+      (_("%s Credits") % (Version.PROGRAM_NAME), lambda: Dialogs.showCredits(engine), _("See who made this game.")),
       (_("Quickset"), self.quicksetMenu, _("A quick way to set many advanced settings.")),
       (_("Hide Advanced Options"), self.advancedSettings)
     ]
