@@ -34,12 +34,13 @@ import numpy
 from PIL import Image
 from numpy import array, float32
 import pygame
+import gc
 import os
 import sys
 import imp
 import traceback
 
-from Engine import Engine, Task
+from Task import Task
 from Video import Video
 from Audio import Audio
 from View import View
@@ -469,7 +470,7 @@ class SystemEventHandler(SystemEventListener):
   def quit(self):
     self.engine.quit()
 
-class GameEngine(Engine):
+class GameEngine(object):
   """The main game engine."""
   def __init__(self, config = None):
 
@@ -509,12 +510,19 @@ class GameEngine(Engine):
 
     if not config:
       config = Config.load()
-      
+
     self.config  = config
-    
+
     fps          = self.config.get("video", "fps")
-    Engine.__init__(self, fps = fps)
-    
+
+    self.tasks = []
+    self.frameTasks = []
+    self.fps = fps
+    self.currentTask = None
+    self.paused = []
+    self.running = True
+    self.clock = pygame.time.Clock()
+
     self.title             = self.versionString
     self.restartRequested  = False
     self.handlingException = False
@@ -747,10 +755,14 @@ class GameEngine(Engine):
   
   # evilynux - This stops the crowd cheers if they're still playing (issue 317).
   def quit(self):
-    self.audio.close()
+    # evilynux - self.audio.close() crashes when we attempt to restart
+    if not self.restartRequested:
+      self.audio.close()
     Player.savePlayers()
-    Engine.quit(self)
-  
+    for t in list(self.tasks + self.frameTasks):
+      self.removeTask(t)
+    self.running = False
+
   def setStartupLayer(self, startupLayer):
     """
     Set the L{Layer} that will be shown when the all
@@ -794,10 +806,8 @@ class GameEngine(Engine):
       self.restartRequested = True
       self.input.broadcastSystemEvent("restartRequested")
     else:
-      # evilynux - With self.audio.close(), calling self.quit() results in
-      #            a crash. Calling the parent directly as a workaround.
-      Engine.quit(self)
-    
+      self.quit()
+
   def resizeScreen(self, width, height):
     """
     Resize the game screen.
@@ -1040,7 +1050,7 @@ class GameEngine(Engine):
 
   def loading(self):
     """Loading state loop."""
-    done = Engine.run(self)
+    done = self.doRun()
     self.clearScreen()
     
     if self.data.essentialResourcesLoaded():
@@ -1057,9 +1067,87 @@ class GameEngine(Engine):
   def clearScreen(self):
     self.svg.clear(*self.theme.backgroundColor)
 
+  def addTask(self, task, synchronized = True):
+    """
+    Add a task to the engine.
+
+    @param task:          L{Task} to add
+    @type  synchronized:  bool
+    @param synchronized:  If True, the task will be run with small
+                          timesteps tied to the engine clock.
+                          Otherwise the task will be run once per frame.
+    """
+    if synchronized:
+      queue = self.tasks
+    else:
+      queue = self.frameTasks
+
+    if not task in queue:
+      queue.append(task)
+      task.started()
+
+  def removeTask(self, task):
+    """
+    Remove a task from the engine.
+
+    @param task:    L{Task} to remove
+    """
+    found = False
+    queues = self._getTaskQueues(task)
+    for q in queues:
+      q.remove(task)
+    if queues:
+      task.stopped()
+
+  def _getTaskQueues(self, task):
+    queues = []
+    for queue in [self.tasks, self.frameTasks]:
+      if task in queue:
+        queues.append(queue)
+    return queues
+
+  def pauseTask(self, task):
+    """
+    Pause a task.
+
+    @param task:  L{Task} to pause
+    """
+    self.paused.append(task)
+
+  def resumeTask(self, task):
+    """
+    Resume a paused task.
+
+    @param task:  L{Task} to resume
+    """
+    self.paused.remove(task)
+
+  def enableGarbageCollection(self, enabled):
+    """
+    Enable or disable garbage collection whenever a random garbage
+    collection run would be undesirable. Disabling the garbage collector
+    has the unfortunate side-effect that your memory usage will skyrocket.
+    """
+    if enabled:
+      gc.enable()
+    else:
+      gc.disable()
+
+  def collectGarbage(self):
+    """
+    Run a garbage collection run.
+    """
+    gc.collect()
+
+  def _runTask(self, task, ticks = 0):
+    if not task in self.paused:
+      self.currentTask = task
+      task.run(ticks)
+      self.currentTask = None
+
   def main(self):
     """Main state loop."""
-    done = Engine.run(self)
+    done = self.doRun()
     self.clearScreen()
     self.view.render()
     if self.debugLayer:
@@ -1080,6 +1168,19 @@ class GameEngine(Engine):
           print("%.2f fps" % self.fpsEstimate)
         self.frames = 0 
     return done
+
+  def doRun(self):
+    """Run one cycle of the task scheduler engine."""
+    if not self.frameTasks and not self.tasks:
+      return False
+
+    for task in self.frameTasks:
+      self._runTask(task)
+    tick = self.clock.get_time()
+    for task in self.tasks:
+      self._runTask(task, tick)
+    self.clock.tick(self.fps)
+    return True
 
   def run(self):
     try:
