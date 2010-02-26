@@ -2,7 +2,7 @@
 # -*- coding: iso-8859-1 -*-                                        #
 #                                                                   #
 # Frets on Fire X (FoFiX)                                           #
-# Copyright (C) 2009 John Stumpo                                    #
+# Copyright (C) 2009-2010 John Stumpo                               #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -303,8 +303,12 @@ def open(path, mode='r'):
 # places: /data contains at least the contents of the main /data
 # and is read-only, and /userdata points to the user-specific
 # configuration area (%APPDATA%\fofix, ~/Library/Preferences/fofix,
-# ~/.fofix, or what-have-you) and is read-write.
+# ~/.fofix, or what-have-you) and is read-write.  /gameroot also
+# always points (read-only) to the root of the game installation
+# (though please try to avoid using it directly when the data you
+# want is available elsewhere in the VFS!)
 
+# Figure out where to map /userdata to.
 if os.name == 'nt':
   # Find the path to Application Data, and do it the Right Way(tm).
   # The APPDATA envvar isn't guaranteed to be reliable.
@@ -323,8 +327,10 @@ mountWritable(_writePath, 'userdata')
 if not isdir('/userdata'):
   mkdir('/userdata')
 
-if hasattr(sys, 'frozen'):
-  _readPath = os.path.abspath('data')
+# Map /data and /gameroot.
+if Version.isWindowsExe():
+  _gameRoot = os.path.abspath('.')
 else:
-  _readPath = os.path.abspath(os.path.join('..', 'data'))
-mount(_readPath, 'data')
+  _gameRoot = os.path.abspath('..')
+mount(_gameRoot, 'gameroot')
+mount(os.path.join(_gameRoot, 'data'), 'data')
