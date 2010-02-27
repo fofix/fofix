@@ -23,6 +23,7 @@
 import sys
 import os
 import subprocess
+import re
 
 MAJOR_VERSION = 4
 MINOR_VERSION = 0
@@ -32,46 +33,28 @@ PROGRAM_UNIXSTYLE_NAME = 'fofix'
 URL = 'http://fofix.googlecode.com'
 RELEASE_ID = 'development'
 
-## Get svn revision info by examining .svn/entries directly.
-def _getSvnTagLine():
-  entriesFile = os.path.join('.svn', 'entries')
-  if not os.path.isfile(entriesFile):
-    return None
-  rev = int(open(entriesFile).read().splitlines()[3])
-  return 'development (r%d)' % rev
-
-## Get git revision info by calling the git executable.
-def _getGitTagLine():
-  # Get the commit hash for the current HEAD.
-  try:
-    revparse = subprocess.Popen(['git', 'rev-parse', 'HEAD'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-  except OSError:  # if git was not found
-    return None
-  head = revparse.communicate()[0].strip()
-  if revparse.returncode != 0:
-    return None
-
-  # Find the latest git-svn commit that is an ancestor of the current HEAD
-  # and pull the svn revision number (injected by git-svn) out of the
-  # commit message.
-  latestSvnLog = subprocess.Popen(['git', 'log', '--grep=git-svn-id:', '-1'], stdout=subprocess.PIPE).communicate()[0]
-  if latestSvnLog.strip() != '':
-    svnRevision = 'r%d+' % int(latestSvnLog.splitlines()[-1].split('@')[1].split()[0])
-  else:
-    svnRevision = ''
-
-  return 'development (%sgit %s)' % (svnRevision, head[:7])
-
 def _getTagLine():
-  tagline = _getGitTagLine()
-  if tagline is None:
-    tagline = _getSvnTagLine()
-  return tagline
+  import VFS  # can't be done at top level due to circular import issues...
+
+  # Look for a git repository.
+  if VFS.isdir('/gameroot/.git'):
+    # HEAD is in the form "ref: refs/heads/master\n"
+    headref = VFS.open('/gameroot/.git/HEAD').read()[5:].strip()
+    # The ref is in the form "sha1-hash\n"
+    headhash = VFS.open('/gameroot/.git/' + headref).read().strip()
+    shortref = re.sub('^refs/(heads/)?', '', headref)
+    return 'development (git %s %s)' % (shortref, headhash[:7])
+
+  # Look for the svn administrative directory.
+  elif VFS.isdir('/gameroot/src/.svn'):
+    revision = VFS.open('/gameroot/src/.svn/entries').readlines()[3].strip()
+    return 'development (svn r%s)' % revision
+
+  else:
+    return None
 
 def revision():
-  rev = _getGitTagLine()
-  if rev is None:
-    rev = _getSvnTagLine()
+  rev = _getTagLine()
   if rev is None:
     rev = RELEASE_ID
   return rev
