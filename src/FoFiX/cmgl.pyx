@@ -41,6 +41,7 @@ cdef extern from "GL/gl.h":
     GL_COLOR_ARRAY
     GL_TEXTURE_COORD_ARRAY
     GL_NORMAL_ARRAY
+    GL_MATRIX_MODE
 
   void glPushMatrix()
   void glPopMatrix()
@@ -61,6 +62,9 @@ cdef extern from "GL/gl.h":
   void glEnableClientState(GLenum)
   void glDisableClientState(GLenum)
   void glDrawArrays(GLenum, GLint, GLsizei)
+
+  void glMatrixMode(GLenum)
+  void glGetIntegerv(GLenum, GLint*)
 
 ## Context manager for a matrix push.
 # Inside its context, the active matrix is pushed.
@@ -84,6 +88,44 @@ cdef class cmglPushedAttrib(object):
     glPushAttrib(self.gl_mask)
   def __exit__(self, etype, evalue, tb):
     glPopAttrib()
+
+## Context manager for switching the matrix mode.
+# Inside its context, the chosen matrix is active.
+# It is restored to its original value upon leaving the context.
+cdef class cmglMatrixMode(object):
+  cdef GLenum oldmode
+  cdef GLenum newmode
+
+  def __cinit__(self, GLenum newmode):
+    self.newmode = newmode
+
+  def __enter__(self):
+    glGetIntegerv(GL_MATRIX_MODE, <GLint*>&self.oldmode)
+    glMatrixMode(self.newmode)
+  def __exit__(self, etype, evalue, tb):
+    glMatrixMode(self.oldmode)
+
+## Context manager for pushing a specific matrix.
+# Inside its context, that matrix is pushed, but the active matrix is not changed.
+# It is popped upon leaving the context.
+cdef class cmglPushedSpecificMatrix(object):
+  cdef GLenum gl_mode
+
+  def __cinit__(self, GLenum mode):
+    self.gl_mode = mode
+
+  def __enter__(self):
+    cdef GLenum oldmode
+    glGetIntegerv(GL_MATRIX_MODE, <GLint*>&oldmode)
+    glMatrixMode(self.gl_mode)
+    glPushMatrix()
+    glMatrixMode(oldmode)
+  def __exit__(self, etype, evalue, tb):
+    cdef GLenum oldmode
+    glGetIntegerv(GL_MATRIX_MODE, <GLint*>&oldmode)
+    glMatrixMode(self.gl_mode)
+    glPopMatrix()
+    glMatrixMode(oldmode)
 
 ## Abstraction of a display list.
 #
