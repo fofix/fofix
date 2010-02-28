@@ -53,10 +53,9 @@ class SvgContext(object):
 
   def setProjection(self, geometry = None):
     geometry = geometry or self.geometry
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    glOrtho(geometry[0], geometry[0] + geometry[2], geometry[1], geometry[1] + geometry[3], -100, 100)
-    glMatrixMode(GL_MODELVIEW)
+    with cmglMatrixMode(GL_PROJECTION):
+      glLoadIdentity()
+      glOrtho(geometry[0], geometry[0] + geometry[2], geometry[1], geometry[1] + geometry[3], -100, 100)
     self.geometry = geometry
 
   def clear(self, r = 0, g = 0, b = 0, a = 0):
@@ -180,49 +179,41 @@ class ImgDrawing(object):
       return 0    
 
   def draw(self, color = (1, 1, 1, 1), rect = (0,1,0,1), lOffset = 0.0, rOffset = 0.0):
-    glMatrixMode(GL_TEXTURE)
-    glPushMatrix()
-    glMatrixMode(GL_PROJECTION)
-    glPushMatrix()
-    self.context.setProjection()
-    glMatrixMode(GL_MODELVIEW)
-    glPushMatrix()
+    with cmglPushedSpecificMatrix(GL_TEXTURE):
+      with cmglPushedSpecificMatrix(GL_PROJECTION):
 
-    glLoadIdentity()
-    self._getEffectiveTransform().applyGL()
+        with cmglMatrixMode(GL_PROJECTION):
+          self.context.setProjection()
 
-    glScalef(self.texture.pixelSize[0], self.texture.pixelSize[1], 1)
-    glTranslatef(-.5, -.5, 0)
-    glColor4f(*color)
+        with cmglPushedMatrix():
+          glLoadIdentity()
+          self._getEffectiveTransform().applyGL()
 
+          glScalef(self.texture.pixelSize[0], self.texture.pixelSize[1], 1)
+          glTranslatef(-.5, -.5, 0)
+          glColor4f(*color)
 
-    glEnable(GL_TEXTURE_2D)
-    self.texture.bind()
-    
-    self.triangVtx[0,0] = 0.0-lOffset
-    self.triangVtx[0,1] = 1.0
-    self.triangVtx[1,0] = 1.0-rOffset
-    self.triangVtx[1,1] = 1.0
-    self.triangVtx[2,0] = 0.0+lOffset
-    self.triangVtx[2,1] = 0.0
-    self.triangVtx[3,0] = 1.0+rOffset
-    self.triangVtx[3,1] = 0.0
-    
-    self.textriangVtx[0,0] = rect[0]
-    self.textriangVtx[0,1] = rect[3]
-    self.textriangVtx[1,0] = rect[1]
-    self.textriangVtx[1,1] = rect[3]
-    self.textriangVtx[2,0] = rect[0]
-    self.textriangVtx[2,1] = rect[2]
-    self.textriangVtx[3,0] = rect[1]
-    self.textriangVtx[3,1] = rect[2]
-    
-    cmglDrawArrays(GL_TRIANGLE_STRIP, vertices=self.triangVtx, texcoords=self.textriangVtx)
-    
-    glDisable(GL_TEXTURE_2D)
-    glPopMatrix()
-    glMatrixMode(GL_TEXTURE)
-    glPopMatrix()
-    glMatrixMode(GL_PROJECTION)
-    glPopMatrix()
-    glMatrixMode(GL_MODELVIEW)
+          glEnable(GL_TEXTURE_2D)
+          self.texture.bind()
+
+          self.triangVtx[0,0] = 0.0-lOffset
+          self.triangVtx[0,1] = 1.0
+          self.triangVtx[1,0] = 1.0-rOffset
+          self.triangVtx[1,1] = 1.0
+          self.triangVtx[2,0] = 0.0+lOffset
+          self.triangVtx[2,1] = 0.0
+          self.triangVtx[3,0] = 1.0+rOffset
+          self.triangVtx[3,1] = 0.0
+
+          self.textriangVtx[0,0] = rect[0]
+          self.textriangVtx[0,1] = rect[3]
+          self.textriangVtx[1,0] = rect[1]
+          self.textriangVtx[1,1] = rect[3]
+          self.textriangVtx[2,0] = rect[0]
+          self.textriangVtx[2,1] = rect[2]
+          self.textriangVtx[3,0] = rect[1]
+          self.textriangVtx[3,1] = rect[2]
+
+          cmglDrawArrays(GL_TRIANGLE_STRIP, vertices=self.triangVtx, texcoords=self.textriangVtx)
+
+          glDisable(GL_TEXTURE_2D)
