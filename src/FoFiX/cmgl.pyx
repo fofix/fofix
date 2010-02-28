@@ -23,11 +23,48 @@
 # makes sense, and even some places where it doesn't...
 
 cdef extern from "GL/gl.h":
+  ctypedef unsigned int GLuint
+  ctypedef unsigned int GLsizei
+  ctypedef int GLenum
+
+  enum:
+    GL_COMPILE
+
   void glPushMatrix()
   void glPopMatrix()
 
+  GLuint glGenLists(GLsizei)
+  void glDeleteLists(GLuint, GLsizei)
+  void glNewList(GLuint, GLenum)
+  void glEndList()
+  void glCallList(GLuint)
+
+## Context manager for a matrix push.
+# Inside its context, the active matrix is pushed.
+# It is popped upon leaving the context.
 cdef class cmglPushedMatrix(object):
   def __enter__(self):
     glPushMatrix()
   def __exit__(self, etype, evalue, tb):
     glPopMatrix()
+
+## Abstraction of a display list.
+#
+# The list is automatically created and destroyed with the object.
+# To compile operations into the list, enter the list's context.
+# To call the list, call the object.
+cdef class cmglList(object):
+  cdef GLuint gl_list
+
+  def __cinit__(self):
+    self.gl_list = glGenLists(1)
+  def __dealloc__(self):
+    glDeleteLists(self.gl_list, 1)
+
+  def __enter__(self):
+    glNewList(self.gl_list, GL_COMPILE)
+  def __exit__(self, etype, evalue, tb):
+    glEndList()
+
+  def __call__(self):
+    glCallList(self.gl_list)
