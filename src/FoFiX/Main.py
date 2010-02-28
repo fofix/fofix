@@ -290,7 +290,7 @@ def main():
         # sys.flags has been introduced in 2.6.0.
         if sys.version_info[:3] >= (2,6,0) and sys.flags.optimize > 0:
           args.append('-%s' % ('O' * sys.flags.optimize))
-        args.append(__file__)
+        args.append(sys.argv[0])
       os.execv(exe, [sys.executable] + args + sys.argv[1:])
     except:
       Log.error("Restart failed: ")
