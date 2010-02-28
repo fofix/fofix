@@ -32,6 +32,7 @@ cdef extern from "GL/gl.h":
   ctypedef int GLenum
   ctypedef float GLfloat
   ctypedef void GLvoid
+  ctypedef unsigned int GLbitfield
 
   enum:
     GL_COMPILE
@@ -43,6 +44,9 @@ cdef extern from "GL/gl.h":
 
   void glPushMatrix()
   void glPopMatrix()
+
+  void glPushAttrib(GLbitfield)
+  void glPopAttrib()
 
   GLuint glGenLists(GLsizei)
   void glDeleteLists(GLuint, GLsizei)
@@ -66,6 +70,20 @@ cdef class cmglPushedMatrix(object):
     glPushMatrix()
   def __exit__(self, etype, evalue, tb):
     glPopMatrix()
+
+## Context manager for an attribute push.
+# Inside its context, the chosen attributes are pushed.
+# They are popped upon leaving the context.
+cdef class cmglPushedAttrib(object):
+  cdef GLbitfield gl_mask
+
+  def __cinit__(self, GLbitfield mask):
+    self.gl_mask = mask
+
+  def __enter__(self):
+    glPushAttrib(self.gl_mask)
+  def __exit__(self, etype, evalue, tb):
+    glPopAttrib()
 
 ## Abstraction of a display list.
 #
