@@ -21,6 +21,11 @@
 #####################################################################
 from OpenGL.GL import *
 try:
+  from cmgl import *
+  cmgl_support = True
+except ImportError:
+  cmgl_support = False
+try:
   from OpenGL.arrays import vbo
   vbo_support = True
 except:
@@ -76,8 +81,12 @@ def init():
       triangVbo = vbo.VBO( triangArray, usage='GL_STATIC_DRAW' )
       spiralVbo = vbo.VBO( spiralArray, usage='GL_STATIC_DRAW' )
     else:
-      print "VBO not supported, fallbacking to array-based drawing."
+      print "VBO not supported, fallbacking to cmgl."
       mode = 1
+
+    if mode == 1 and not cmgl_support:
+      print "cmgl not supported, fallbacking to array-based drawing."
+      mode = 2
 
 def draw():
     global mode, triangVbo, triangVtx, triangCol
@@ -93,12 +102,15 @@ def draw():
     if mode == 0 and vbo_support:
       drawVBO()
 
+    elif mode == 1 and cmgl_support:
+      drawCmgl()
+
     # Array-based drawing
-    elif mode == 1:
+    elif mode == 2:
       drawArray()
 
     # Direct drawing
-    else: # mode == 2
+    else: # mode == 3
       drawDirect()
 
     glPopMatrix()
@@ -121,6 +133,10 @@ def drawDirect():
       glColor3f(spiralCol[i][0],spiralCol[i][1],spiralCol[i][2])
       glVertex3f(spiralVtx[i][0],spiralVtx[i][1],spiralVtx[i][2])
     glEnd()
+
+def drawCmgl():
+    cmglDrawArrays(GL_TRIANGLES, vertices=triangVtx, colors=triangCol)
+    cmglDrawArrays(GL_TRIANGLE_STRIP, vertices=spiralVtx, colors=spiralCol)
 
 def drawArray():
     # Draw triangle
@@ -162,7 +178,7 @@ def drawVBO():
 def main():
     global rot, scale, mode
     scale_dir = -1
-    modeName = ["VBO", "Array-based", "Direct-mode"]
+    modeName = ["VBO", "cmgl", "Array-based", "Direct-mode"]
     fps = 0
     video_flags = DOUBLEBUF|OPENGL|HWPALETTE|HWSURFACE
     
@@ -178,15 +194,21 @@ def main():
       if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
         break
       elif event.type == KEYDOWN and event.key == K_RIGHT:
-        mode = (mode + 1) % 3
+        mode = (mode + 1) % 4
         if mode == 0 and not vbo_support:
-          mode = (mode + 1) % 3
+          mode = (mode + 1) % 4
           print "VBO not supported, fallbacking to %s drawing." % modeName[mode]
+        if mode == 1 and not cmgl_support:
+          mode = (mode + 1) % 4
+          print "cmgl not supported, fallbacking to %s drawing." % modeName[mode]
       elif event.type == KEYDOWN and event.key == K_LEFT:
-        mode = (mode - 1) % 3
+        mode = (mode - 1) % 4
         if mode == 0 and not vbo_support:
-          mode = (mode - 1) % 3
+          mode = (mode - 1) % 4
           print "VBO not supported, fallbacking to %s drawing." % modeName[mode]
+        if mode == 1 and not cmgl_support:
+          mode = (mode - 1) % 4
+          print "cmgl not supported, fallbacking to %s drawing." % modeName[mode]
         
       ticksDiff = pygame.time.get_ticks()-ticks
 
