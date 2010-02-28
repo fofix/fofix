@@ -35,6 +35,8 @@ from numpy import array, float32
 from View import View, BackgroundLayer
 import Log
 
+from FoFiX.cmgl import *
+
 # Simple animation player
 class AnimationPlayer(BackgroundLayer):
   def __init__(self, framerate, animSource, animBasename, (winWidth, winHeight) = (None, None), mute = False, loop = 0):
@@ -165,19 +167,18 @@ class AnimationPlayer(BackgroundLayer):
     
     # Create a compiled OpenGL call list and do array-based drawing
     # Could have used GL_QUADS but IIRC triangles are recommended
-    self.animList = glGenLists(1)
-    glNewList(self.animList, GL_COMPILE)
-    glEnable(GL_TEXTURE_2D)
-    glColor3f(1., 1., 1.)
-    glEnableClientState(GL_VERTEX_ARRAY)
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glVertexPointerf(animVtx)
-    glTexCoordPointerf(texCoord)
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, animVtx.shape[0])
-    glDisableClientState(GL_VERTEX_ARRAY)
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    glDisable(GL_TEXTURE_2D)
-    glEndList()
+    self.animList = cmglList()
+    with self.animList:
+      glEnable(GL_TEXTURE_2D)
+      glColor3f(1., 1., 1.)
+      glEnableClientState(GL_VERTEX_ARRAY)
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+      glVertexPointerf(animVtx)
+      glTexCoordPointerf(texCoord)
+      glDrawArrays(GL_TRIANGLE_STRIP, 0, animVtx.shape[0])
+      glDisableClientState(GL_VERTEX_ARRAY)
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+      glDisable(GL_TEXTURE_2D)
 
   def shown(self):
     pass
@@ -218,7 +219,7 @@ class AnimationPlayer(BackgroundLayer):
       glLoadIdentity()
       # Draw the polygon and apply texture
       glBindTexture(GL_TEXTURE_2D, self.animTexs[self.curFrame])
-      glCallList(self.animList)
+      self.animList()
       # Restore both transformation matrices
       glPopMatrix()
       glMatrixMode(GL_PROJECTION)

@@ -48,6 +48,8 @@ from OpenGL.GLU import *
 # Array-based drawing
 from numpy import array, float32
 
+from FoFiX.cmgl import *
+
 from View import View, BackgroundLayer
 import Log
 from Texture import Texture
@@ -163,26 +165,25 @@ class VideoPlayer(BackgroundLayer):
 
     # Create a compiled OpenGL call list and do array-based drawing
     # Could have used GL_QUADS but IIRC triangles are recommended
-    self.videoList = glGenLists(1)
-    glNewList(self.videoList, GL_COMPILE)
-    # Draw borders where video aspect is different than specified width/height
-    glEnableClientState(GL_VERTEX_ARRAY)
-    glColor3f(0., 0., 0.)
-    glVertexPointerf(backVtx)
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, backVtx.shape[0])
-    glDisableClientState(GL_VERTEX_ARRAY)
-    # Draw video
-    glEnable(GL_TEXTURE_2D)
-    glColor3f(1., 1., 1.)
-    glEnableClientState(GL_VERTEX_ARRAY)
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glVertexPointerf(videoVtx)
-    glTexCoordPointerf(videoTex)
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, videoVtx.shape[0])
-    glDisableClientState(GL_VERTEX_ARRAY)
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    glDisable(GL_TEXTURE_2D)
-    glEndList()
+    self.videoList = cmglList()
+    with self.videoList:
+      # Draw borders where video aspect is different than specified width/height
+      glEnableClientState(GL_VERTEX_ARRAY)
+      glColor3f(0., 0., 0.)
+      glVertexPointerf(backVtx)
+      glDrawArrays(GL_TRIANGLE_STRIP, 0, backVtx.shape[0])
+      glDisableClientState(GL_VERTEX_ARRAY)
+      # Draw video
+      glEnable(GL_TEXTURE_2D)
+      glColor3f(1., 1., 1.)
+      glEnableClientState(GL_VERTEX_ARRAY)
+      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+      glVertexPointerf(videoVtx)
+      glTexCoordPointerf(videoTex)
+      glDrawArrays(GL_TRIANGLE_STRIP, 0, videoVtx.shape[0])
+      glDisableClientState(GL_VERTEX_ARRAY)
+      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+      glDisable(GL_TEXTURE_2D)
 
   # Setup GStreamer's pipeline
   # Note: playbin2 seems also suitable, we might want to experiment with it
@@ -308,7 +309,7 @@ class VideoPlayer(BackgroundLayer):
       glLoadIdentity()
       # Draw the polygon and apply texture
       self.videoTex.bind()
-      glCallList(self.videoList)
+      self.videoList()
       # Restore both transformation matrices
       glPopMatrix()
       glMatrixMode(GL_PROJECTION)
