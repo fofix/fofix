@@ -23,17 +23,15 @@
 #####################################################################
 
 # FoFiX fully unified setup script
-from distutils.core import setup
+from distutils.core import setup, Extension
 import sys, glob, os
 from FoFiX import SceneFactory, Version
-
-if os.name != 'nt' and sys.platform != 'darwin':
-  raise RuntimeError, 'This script is only meaningful for OS X and Windows.'
 
 
 # Start setting up py2{exe,app} and building the argument set for setup().
 # setup() arguments that are not specific to either are near the bottom of
 # the script, just before the actual call to setup().
+setup_args = {}
 if os.name == 'nt':
   import py2exe
   from py2exe.resources.VersionInfo import RT_VERSION
@@ -46,7 +44,7 @@ if os.name == 'nt':
     return __orig_isSystemDLL(pathname)
   py2exe.build_exe.isSystemDLL = isSystemDLL
 
-  setup_args = {
+  setup_args.update({
     'zipfile': "data/library.zip",
     'windows': [
       {
@@ -66,10 +64,10 @@ if os.name == 'nt':
         ).resource_bytes())]
       }
     ]
-  }
+  })
 elif sys.platform == 'darwin':
   import py2app
-  setup_args = {
+  setup_args.update({
     'app': ['FoFiX.py'],
     'data_files': [
       (".", ["../AUTHORS", "../COPYING", "../CREDITS", "../ChangeLog", "../Makefile", "../NEWS", "../README"]),
@@ -84,7 +82,7 @@ elif sys.platform == 'darwin':
     'description': "Frets on Fire X",
     'name': "FoFiX",
     'url': "http://code.google.com/p/fofix/",
-  }
+  })
 
 
 # Forced includes needed for PIL.
@@ -192,9 +190,22 @@ options['py2app'].update({
   }
 })
 
+# Try to register Cython for building our extensions.
+try:
+  from Cython.Distutils import build_ext
+  setup_args['cmdclass'] = {'build_ext': build_ext}
+except ImportError:
+  pass
+
 # Add the common arguments to setup().
+# This includes arguments to cause FoFiX's extension modules to be built.
 setup_args.update({
   'options': options,
+  'packages': ['FoFiX', 'FoFiX.midi'],
+  'ext_package': 'FoFiX',
+  'ext_modules': [
+    Extension('cmgl', ['FoFiX/cmgl.pyx'], libraries=['opengl32' if os.name == 'nt' else 'GL']),
+  ]
 })
 
 # And finally...
