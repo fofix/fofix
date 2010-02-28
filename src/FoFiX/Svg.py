@@ -28,6 +28,7 @@ from OpenGL.GL import *
 import numpy as np
 from numpy import array, float32
 import math
+from FoFiX.cmgl import *
 
 import Log
 import Config
@@ -216,13 +217,7 @@ class ImgDrawing(object):
     self.textriangVtx[3,0] = rect[1]
     self.textriangVtx[3,1] = rect[2]
     
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY)    
-    glEnableClientState(GL_VERTEX_ARRAY)
-    glVertexPointerf(self.triangVtx)
-    glTexCoordPointerf(self.textriangVtx)
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, self.triangVtx.shape[0])
-    glDisableClientState(GL_VERTEX_ARRAY)
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY)
+    cmglDrawArrays(GL_TRIANGLE_STRIP, vertices=self.triangVtx, texcoords=self.textriangVtx)
     
     glDisable(GL_TEXTURE_2D)
     glPopMatrix()

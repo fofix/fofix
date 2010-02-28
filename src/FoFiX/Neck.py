@@ -30,6 +30,7 @@ from Shader import shaders, mixColors
 
 from OpenGL.GL import *
 from numpy import array, float32
+from FoFiX.cmgl import *
 
 #myfingershurt: needed for multi-OS file fetching
 import os
@@ -496,16 +497,7 @@ class Neck:
     if alpha == True:
       glBlendFunc(GL_ONE, GL_ONE)
     neck.texture.bind()
-    glEnableClientState(GL_VERTEX_ARRAY)
-    glEnableClientState(GL_COLOR_ARRAY)
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glVertexPointerf(self.board_vtx)
-    glColorPointerf(board_col)
-    glTexCoordPointerf(board_tex)
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, self.board_vtx.shape[0])
-    glDisableClientState(GL_VERTEX_ARRAY)
-    glDisableClientState(GL_COLOR_ARRAY)
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    cmglDrawArrays(GL_TRIANGLE_STRIP, vertices=self.board_vtx, colors=board_col, texcoords=board_tex)
 
     if alpha == True:
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
@@ -680,29 +672,11 @@ class Neck:
                          [color[0],color[1],color[2], v],
                          [color[0],color[1],color[2], 0],
                          [color[0],color[1],color[2], 0]], dtype=float32)
-      glEnableClientState(GL_VERTEX_ARRAY)
-      glEnableClientState(GL_COLOR_ARRAY)
-      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-      glVertexPointerf(track_vtx)
-      glColorPointerf(track_col)
-      glTexCoordPointerf(track_tex)
-      glDrawArrays(GL_TRIANGLE_STRIP, 0, track_vtx.shape[0])
-      glDisableClientState(GL_VERTEX_ARRAY)
-      glDisableClientState(GL_COLOR_ARRAY)
-      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+      cmglDrawArrays(GL_TRIANGLE_STRIP, vertices=track_vtx, colors=track_col, texcoords=track_tex)
 
     else:   #MFH: original moving strings
 
-      glEnableClientState(GL_VERTEX_ARRAY)
-      glEnableClientState(GL_COLOR_ARRAY)
-      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-      glVertexPointerf(track_vtx)
-      glColorPointerf(self.board_col)
-      glTexCoordPointerf(track_tex)
-      glDrawArrays(GL_TRIANGLE_STRIP, 0, track_vtx.shape[0])
-      glDisableClientState(GL_VERTEX_ARRAY)
-      glDisableClientState(GL_COLOR_ARRAY)
-      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+      cmglDrawArrays(GL_TRIANGLE_STRIP, vertices=track_vtx, colors=self.board_col, texcoords=track_tex)
 
     glDisable(GL_TEXTURE_2D)
 
@@ -738,16 +712,7 @@ class Neck:
     else:
       self.sideBars.texture.bind()
 
-    glEnableClientState(GL_VERTEX_ARRAY)
-    glEnableClientState(GL_COLOR_ARRAY)
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glVertexPointerf(self.sidebars_vtx)
-    glColorPointerf(self.board_col)
-    glTexCoordPointerf(board_tex)
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, self.sidebars_vtx.shape[0])
-    glDisableClientState(GL_VERTEX_ARRAY)
-    glDisableClientState(GL_COLOR_ARRAY)
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+    cmglDrawArrays(GL_TRIANGLE_STRIP, vertices=self.sidebars_vtx, colors=self.board_col, texcoords=board_tex)
     
     glDisable(GL_TEXTURE_2D)
     
@@ -826,16 +791,7 @@ class Neck:
                          [1, 1, 1, v],
                          [1, 1, 1, v]], dtype=float32)
 
-      glEnableClientState(GL_VERTEX_ARRAY)
-      glEnableClientState(GL_COLOR_ARRAY)
-      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-      glVertexPointerf(bpm_vtx)
-      glColorPointerf(bpm_col)
-      glTexCoordPointerf(bpm_tex)
-      glDrawArrays(GL_TRIANGLE_STRIP, 0, bpm_vtx.shape[0])
-      glDisableClientState(GL_VERTEX_ARRAY)
-      glDisableClientState(GL_COLOR_ARRAY)
-      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+      cmglDrawArrays(GL_TRIANGLE_STRIP, vertices=bpm_vtx, colors=bpm_col, texcoords=bpm_tex)
 
       glPopMatrix()
 

@@ -168,21 +168,12 @@ class VideoPlayer(BackgroundLayer):
     self.videoList = cmglList()
     with self.videoList:
       # Draw borders where video aspect is different than specified width/height
-      glEnableClientState(GL_VERTEX_ARRAY)
       glColor3f(0., 0., 0.)
-      glVertexPointerf(backVtx)
-      glDrawArrays(GL_TRIANGLE_STRIP, 0, backVtx.shape[0])
-      glDisableClientState(GL_VERTEX_ARRAY)
+      cmglDrawArrays(GL_TRIANGLE_STRIP, vertices=backVtx)
       # Draw video
       glEnable(GL_TEXTURE_2D)
       glColor3f(1., 1., 1.)
-      glEnableClientState(GL_VERTEX_ARRAY)
-      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-      glVertexPointerf(videoVtx)
-      glTexCoordPointerf(videoTex)
-      glDrawArrays(GL_TRIANGLE_STRIP, 0, videoVtx.shape[0])
-      glDisableClientState(GL_VERTEX_ARRAY)
-      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+      cmglDrawArrays(GL_TRIANGLE_STRIP, vertices=videoVtx, texcoords=videoTex)
       glDisable(GL_TEXTURE_2D)
 
   # Setup GStreamer's pipeline

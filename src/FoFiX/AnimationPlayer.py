@@ -171,13 +171,7 @@ class AnimationPlayer(BackgroundLayer):
     with self.animList:
       glEnable(GL_TEXTURE_2D)
       glColor3f(1., 1., 1.)
-      glEnableClientState(GL_VERTEX_ARRAY)
-      glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-      glVertexPointerf(animVtx)
-      glTexCoordPointerf(texCoord)
-      glDrawArrays(GL_TRIANGLE_STRIP, 0, animVtx.shape[0])
-      glDisableClientState(GL_VERTEX_ARRAY)
-      glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+      cmglDrawArrays(GL_TRIANGLE_STRIP, vertices=animVtx, texcoords=texCoord)
       glDisable(GL_TEXTURE_2D)
 
   def shown(self):

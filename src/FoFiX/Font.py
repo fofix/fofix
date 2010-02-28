@@ -23,6 +23,7 @@
 
 import pygame
 from OpenGL.GL import *
+from FoFiX.cmgl import *
 import sys
 from Texture import Texture
 from numpy import array, float32
@@ -165,13 +166,7 @@ class Font:
         self.square_prim[2,1] = self.square_prim[3,1] = h
         self.square_tex[0,1] = self.square_tex[1,1] = th
         self.square_tex[1,0] = self.square_tex[3,0] = tw
-        glEnableClientState(GL_VERTEX_ARRAY)
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        glVertexPointerf(self.square_prim)
-        glTexCoordPointerf(self.square_tex)
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, self.square_prim.shape[0])
-        glDisableClientState(GL_VERTEX_ARRAY)
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        cmglDrawArrays(GL_TRIANGLE_STRIP, vertices=self.square_prim, texcoords=self.square_tex)
  
     if not text:
         return
