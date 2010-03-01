@@ -58,7 +58,7 @@ if os.name == 'nt':
           company_name="FoFiX Team",
           internal_name="FoFiX.exe",
           original_filename="FoFiX.exe",
-          product_name=Version.appNameSexy(),
+          product_name=Version.PROGRAM_NAME,
           #stump: when run from the exe, FoFiX will claim to be "FoFiX v" + product_version
           product_version=Version.version()
         ).resource_bytes())]
