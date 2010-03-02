@@ -32,13 +32,7 @@ import shutil
 import math
 import random
 import Config
-#stump: when we completely drop 2.4 support, change this to just "import hashlib"
-try:
-  import hashlib
-except ImportError:
-  import sha
-  class hashlib:
-    sha1 = sha.sha
+import hashlib
 import binascii
 import Cerealizer
 import urllib
