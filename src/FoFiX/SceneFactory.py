@@ -26,7 +26,7 @@
 import sys
 import glob
 
-scenes = [n[6:-3] for n in glob.glob("FoFiX/*Scene.py")]
+scenes = ['FoFiX.'+n[6:-3] for n in glob.glob("FoFiX/*Scene.py")]
 
 def create(engine, name, **args):
 
