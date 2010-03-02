@@ -32,113 +32,19 @@ import pygame.image
 import Config
 import Version
 
-#OGL constants for compatibility with all PyOpenGL versions
-#now multitexturing should work even in PyOpenGL 2.x, if your card supports ARB ext
-#stump: managed to eliminate the need for every one of these.  If I was wrong, please uncomment only the necessary line and notify me.
-#GL_TEXTURE_3D = 32879
-#GL_TEXTURE_WRAP_R = 32882
-#GL_TEXTURE0_ARB, GL_TEXTURE1_ARB, GL_TEXTURE2_ARB, GL_TEXTURE3_ARB = 33984, 33985, 33986, 33987
-#GL_FRAGMENT_SHADER_ARB = 0x8B30
-#GL_VERTEX_SHADER_ARB = 0x8B31
-#GL_OBJECT_COMPILE_STATUS_ARB= 0x8B81
-#GL_OBJECT_LINK_STATUS_ARB = 0x8B82
-#GL_INFO_LOG_LENGTH_ARB = 0x8B84
-#GL_CLAMP_TO_EDGE = 33071
-
-# stump: these don't throw the exception for being unsupported - that happens later.
-# There has to be an active OpenGL context already for the checking to occur.
-# We do the check down in ShaderList.set().
-# evilynux : Wrapped around try/except as pyopengl < 2.0.2.x fails here.
-try:
-  from OpenGL.GL.ARB.shader_objects import *
-  from OpenGL.GL.ARB.vertex_shader import *
-  from OpenGL.GL.ARB.fragment_shader import *
-  from OpenGL.GL.ARB.multitexture import *
-  from OpenGL.GL.EXT.texture3D import *
-except:
-  Log.warn("Importing OpenGL ARB fails therefore shaders are disabled."\
-             " It is most likely that your version of PyOpenGL is too old.")
-  glInitShaderObjectsARB = lambda: False
+from OpenGL.GL.ARB.shader_objects import *
+from OpenGL.GL.ARB.vertex_shader import *
+from OpenGL.GL.ARB.fragment_shader import *
+from OpenGL.GL.ARB.multitexture import *
+from OpenGL.GL.EXT.texture3D import *
 
 class ShaderCompilationError(Exception):
   pass
 
-
-#stump: apply some fixups for pyOpenGL 2.x if necessary.
-def checkFunctionsForPyOpenGL2x():
-  global glShaderSourceARB
-  global glGetObjectParameterivARB
-
-  # Check the version of pyOpenGL.
-  import OpenGL
-  if OpenGL.__version__ < '3':
-    #stump: the binding of glShaderSourceARB() in pyOpenGL 2.x segfaults on use... ugh!
-    # (It and glGetObjectParameterivARB() also have incompatible declarations - let's fix that too.)
-
-    try:
-      from ctypes import c_int, c_char_p, POINTER, cdll, byref
-      if os.name == 'nt':
-        from ctypes import WINFUNCTYPE, windll
-      elif sys.platform == 'darwin':
-        from ctypes.util import find_library
-        
-    except ImportError:
-      raise ShaderCompilationError, 'ctypes is required to use shaders with pyOpenGL 2.x.'
-    else:
-
-      if os.name == 'nt':  # Windows - look for the functions using wglGetProcAddress()
-
-        # Grab the function pointers the standard Windows way.
-        # (opengl32.dll doesn't directly export extension entry points like other platforms' OpenGL libraries do.)
-        ptr_glShaderSourceARB = windll.opengl32.wglGetProcAddress('glShaderSourceARB')
-        ptr_glGetObjectParameterivARB = windll.opengl32.wglGetProcAddress('glGetObjectParameterivARB')
-
-        # If we got good function pointers, make them callable using ctypes.
-        if ptr_glShaderSourceARB:
-          func_glShaderSourceARB = WINFUNCTYPE(None, c_int, c_int, POINTER(c_char_p), POINTER(c_int))(ptr_glShaderSourceARB)
-        else:
-          raise ShaderCompilationError, 'wglGetProcAddress("glShaderSourceARB") returned NULL - are shaders supported?'
-
-        if ptr_glGetObjectParameterivARB:
-          func_glGetObjectParameterivARB = WINFUNCTYPE(None, c_int, c_int, POINTER(c_int))(ptr_glGetObjectParameterivARB)
-        else:
-          raise ShaderCompilationError, 'wglGetProcAddress("glGetObjectParameterivARB") returned NULL - are shaders supported?'
-
-      else:  # something else - assume that the OpenGL library exports the extension entry point
-
-        # Figure out where the OpenGL library is.
-        if sys.platform == 'darwin':  # Mac OS X
-          glLibrary = cdll.LoadLibrary(find_library('OpenGL'))
-        else: # something else; most likely GNU/Linux
-          glLibrary = cdll.LoadLibrary('libGL.so')
-
-        try:
-          func_glShaderSourceARB = glLibrary.glShaderSourceARB
-          func_glGetObjectParameterivARB = glLibrary.glGetObjectParameterivARB
-        except:
-          raise ShaderCompilationError, 'Cannot find glShaderSourceARB() and/or glGetObjectParameterivARB() in the OpenGL library - are shaders supported?'
-
-      # Wrap supporting glShaderSource(shader object, iterable object) returning None, as used below.
-      def glShaderSourceARB(shader, source):
-        srcList = list(source)
-        srcListType = c_char_p * len(srcList)
-        func_glShaderSourceARB(shader, len(srcList), srcListType(*srcList), None)
-
-      # Wrap supporting glGetObjectParameterivARB(shader object, parameter id) returning int, as used below.
-      def glGetObjectParameterivARB(shader, param):
-        retval = c_int(0)
-        func_glGetObjectParameterivARB(shader, param, byref(retval))
-        return retval.value
-   
-  #should be placed somewhere else  
-  if sys.platform == 'darwin':
-    global GL_TEXTURE_3D_EXT
-    global GL_TEXTURE_WRAP_R_EXT
-    global glTexImage3DEXT
-    GL_TEXTURE_3D_EXT = GL_TEXTURE_3D
-    GL_TEXTURE_WRAP_R_EXT = GL_TEXTURE_WRAP_R
-    glTexImage3DEXT = glTexImage3D
-
+if sys.platform == 'darwin':
+  GL_TEXTURE_3D_EXT = GL_TEXTURE_3D
+  GL_TEXTURE_WRAP_R_EXT = GL_TEXTURE_WRAP_R
+  glTexImage3DEXT = glTexImage3D
 
 # main class for shaders library
 class ShaderList:
@@ -643,13 +549,6 @@ class ShaderList:
       if sys.platform != 'darwin':
         Log.warn('OpenGL extension EXT_texture3D not supported - shaders disabled')
         return
-
-    #stump: pyOpenGL 2.x compatibility
-    try:
-      checkFunctionsForPyOpenGL2x()
-    except:
-      Log.error('Shaders disabled due to pyOpenGL 2.x compatibility issue: ')
-      return
 
     self.workdir = dir
 
