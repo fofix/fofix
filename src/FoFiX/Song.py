@@ -44,12 +44,7 @@ import cPickle  #stump: Cerealizer and sqlite3 don't seem to like each other tha
 import Resource
 import time
 from Language import _
-
-#stump: turns out the sqlite3 module didn't appear until Python 2.5...
-try:
-  import sqlite3
-except ImportError:
-  import pysqlite2.dbapi2 as sqlite3  # close enough
+import sqlite3
 
 DEFAULT_BPM = 120.0
 DEFAULT_LIBRARY         = "songs"

@@ -63,12 +63,7 @@ def sortOptionsByKey(dict):
     a[k] = ConfigOption(k, dict[k])
   return a
 
-#stump: turns out the sqlite3 module didn't appear until Python 2.5...
-try:
-  import sqlite3
-except ImportError:
-  import pysqlite2.dbapi2 as sqlite3  # close enough
-
+import sqlite3
 import Log
 
 #akedrou - Redoing this, sir. Redoing this...
