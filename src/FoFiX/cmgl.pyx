@@ -25,7 +25,7 @@
 import numpy
 cimport numpy
 
-cdef extern from "GL/gl.h":
+cdef extern from "glwrap.h":
   ctypedef int GLint
   ctypedef unsigned int GLuint
   ctypedef unsigned int GLsizei

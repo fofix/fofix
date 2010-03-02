@@ -25,6 +25,7 @@
 # FoFiX fully unified setup script
 from distutils.core import setup, Extension
 import sys, glob, os
+import numpy
 from FoFiX import SceneFactory, Version
 
 
@@ -204,7 +205,7 @@ setup_args.update({
   'packages': ['FoFiX', 'FoFiX.midi'],
   'ext_package': 'FoFiX',
   'ext_modules': [
-    Extension('cmgl', ['FoFiX/cmgl.pyx'], libraries=['opengl32' if os.name == 'nt' else 'GL']),
+    Extension('cmgl', ['FoFiX/cmgl.pyx'], include_dirs=[numpy.get_include()], libraries=['opengl32' if os.name == 'nt' else 'GL']),
   ]
 })
 
