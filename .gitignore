@@ -6,3 +6,9 @@ src/*.ini
 src/*.log
 data/library.zip
 data/users/players/FoFiX-players.cache
+data/songs/
+data/themes/*
+!data/themes/MegaLight
+!data/themes/MegaLight GH3
+!data/themes/MegaLight V4
+!data/themes/Uberlight
