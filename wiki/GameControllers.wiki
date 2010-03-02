@@ -48,6 +48,13 @@ If it does not, install the [http://pingus.seul.org/~grumbel/xboxdrv/ xboxdrv dr
 
 *Note*: There are alternatives, like the xpad kernel module, but since the xboxdrv is a userspace kernel driver that works even with the most recent kernels with problematic Xorg !AutoAddDevices feature, we recommend that one.
 
+== Wii ==
+_Note: This section is very incomplete_
+
+You should be able to get Wii GH instruments to work using [http://abstrakraft.org/cwiid/ CWiid]
+
+Apparently CWiid does not support the GHWT instruments properly, as they work differently to the GH3 ones. There are instructions and scripts for fixing this issue written up [http://sidrit.wordpress.com/2010/02/10/frets-on-fire-with-guitar-hero-world-tour-ghwt-on-ubuntu/ here]
+
 -----------------------------------
 
 = Mac OSX =
