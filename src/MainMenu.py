@@ -34,6 +34,7 @@ import Config
 import Audio
 import Settings
 import Version
+import VFS
 from Shader import shaders
 import sys
 import os
@@ -265,15 +266,27 @@ class MainMenu(BackgroundLayer):
     if not self.shownOnce:
       self.shownOnce = True
       if hasattr(sys, 'frozen'):
-        #stump: Check whether this is a non-svn binary being run from an svn working copy.
-        if os.path.isdir(os.path.join('src', '.svn')) and 'development' not in Version.version():
-          Dialogs.showMessage(self.engine, _('This binary release is being run from a Subversion working copy. This is not the correct way to run FoFiX from Subversion. Please see one of the following web pages to set your Subversion working copy up correctly:') +
-                                           '\n\nhttp://code.google.com/p/fofix/wiki/RunningUnderPython26' +
-                                           '\nhttp://code.google.com/p/fofix/wiki/RequiredSourceModules')
-        #stump: Check whether this is an svn binary not being run from an svn working copy
-        elif not os.path.isdir(os.path.join('src', '.svn')) and 'development' in Version.version():
-          Dialogs.showMessage(self.engine, _('This binary was built from a Subversion working copy but is not running from one. The FoFiX Team will not provide any support whatsoever for this binary. Please see the following site for official binary releases:') +
-                                           '\n\nhttp://code.google.com/p/fofix/')
+        # Check whether this is a release binary being run from an svn/git
+        # working copy or whether this is an svn/git binary not being run
+        # from an corresponding working copy.
+        currentVcs, buildVcs = None, None
+        if VFS.isdir('/gameroot/.git'):
+          currentVcs = 'git'
+        elif VFS.isdir('/gameroot/src/.svn'):
+          currentVcs = 'Subversion'
+        if 'git' in Version.version():
+          buildVcs = 'git'
+        elif 'svn' in Version.version():
+          buildVcs = 'Subversion'
+        if currentVcs != buildVcs:
+          if buildVcs is None:
+            msg = _('This binary release is being run from a %(currentVcs)s working copy. This is not the correct way to run FoFiX from %(currentVcs)s. Please see one of the following web pages to set your %(currentVcs)s working copy up correctly:') + \
+                  '\n\nhttp://code.google.com/p/fofix/wiki/RunningUnderPython26' + \
+                  '\nhttp://code.google.com/p/fofix/wiki/RequiredSourceModules'
+          else:
+            msg = _('This binary was built from a %(buildVcs)s working copy but is not running from one. The FoFiX Team will not provide any support whatsoever for this binary. Please see the following site for official binary releases:') + \
+                  '\n\nhttp://code.google.com/p/fofix/'
+          Dialogs.showMessage(self.engine, msg % {'buildVcs': buildVcs, 'currentVcs': currentVcs})
 
   def runMusic(self):
     if not self.song.isPlaying():   #re-randomize
