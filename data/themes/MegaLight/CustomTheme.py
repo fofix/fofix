@@ -23,12 +23,15 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-from Theme import _
 from Theme import *
+from OpenGL.GL import *
+from OpenGL.GLU import *
+import math
+import Song
 
 class CustomTheme(Theme):
-  def __init__(self, path, name, iniFile = False):
-    Theme.__init__(self, path, name, iniFile)
+  def __init__(self, path, name):
+    Theme.__init__(self, path, name)
     
     self.menuRB = True
     self.menuX = .25
