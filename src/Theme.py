@@ -2944,4 +2944,4 @@ class Setlist:
   def renderMiniLobby(self, scene):
     return
 
-__all__ = ["LEFT", "CENTER", "RIGHT", "_", "Theme", "shaders"]
+__all__ = ["LEFT", "CENTER", "RIGHT", "_", "Theme", "shaders", "Setlist"]
