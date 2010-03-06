@@ -50,12 +50,7 @@ import cPickle  #stump: Cerealizer and sqlite3 don't seem to like each other tha
 import Resource
 import time
 from Language import _
-
-#stump: turns out the sqlite3 module didn't appear until Python 2.5...
-try:
-  import sqlite3
-except ImportError:
-  import pysqlite2.dbapi2 as sqlite3  # close enough
+import VFS
 
 DEFAULT_BPM = 120.0
 DEFAULT_LIBRARY         = "songs"
@@ -189,13 +184,7 @@ defaultSections = ["Start","1/4","1/2","3/4"]
 class CacheManager(object):
   SCHEMA_VERSION = 7  #stump: current cache format version number
   def __init__(self):
-    cacheName = os.path.join(Resource.getWritableResourcePath(), 'SongCache.sqlite')
-    oldcwd = os.getcwd()
-    try:
-      os.chdir(os.path.dirname(cacheName))  #stump: work around bug in SQLite unicode path name handling
-      self.cache = sqlite3.Connection(os.path.basename(cacheName))
-    finally:
-      os.chdir(oldcwd)
+    self.cache = VFS.openSqlite3('/userdata/SongCache.sqlite')
     # Check that the cache is completely initialized.
     try:
       dbversion = self.cache.execute("SELECT `value` FROM `config` WHERE `key` = 'version'").fetchone()[0]

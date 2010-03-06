@@ -48,6 +48,10 @@ import sys
 import shutil
 import time
 from stat import S_IFDIR, S_ISDIR, S_ISREG
+try:  # {py24hack}
+  import sqlite3
+except ImportError:
+  import pysqlite2.dbapi2 as sqlite3
 
 _mountTable = {}
 
@@ -283,6 +287,22 @@ def open(path, mode='r'):
     return _realopen(resolveRead(path), mode)
   else:
     return _realopen(resolveWrite(path), mode)
+
+## Open a virtual file as a writable SQLite database.
+# @param path   Path to open
+# @return       sqlite3.Connection object for the file
+def openSqlite3(path):
+  # There is a bug in the sqlite3 module's handling of path names containing
+  # unicode characters, so work around that by temporarily changing directory
+  # so we access the file with just its base name.
+  oldcwd = os.getcwd()
+  try:
+    dbName = resolveWrite(path)
+    os.chdir(os.path.dirname(dbName))
+    return sqlite3.Connection(os.path.basename(dbName))
+  finally:
+    os.chdir(oldcwd)
+
 
 # TODO: Function to perform all overlay mounts called for by the
 # active configuration: /data will become /data overlaid by the

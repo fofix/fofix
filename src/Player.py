@@ -34,6 +34,7 @@ import sys
 from Language import _
 #import Dialogs
 import Microphone  #stump
+import VFS
 
 class ConfigOption:
   def __init__(self, id, text):
@@ -62,12 +63,6 @@ def sortOptionsByKey(dict):
   for k in dict.keys():
     a[k] = ConfigOption(k, dict[k])
   return a
-
-#stump: turns out the sqlite3 module didn't appear until Python 2.5...
-try:
-  import sqlite3
-except ImportError:
-  import pysqlite2.dbapi2 as sqlite3  # close enough
 
 import Log
 
@@ -243,44 +238,28 @@ playerstat = []
 class PlayerCacheManager(object): #akedrou - basically stump's cache for the players. Todo? Group the caching. .fofix/appdata?
   SCHEMA_VERSION = 3
   def __init__(self):
-    self.caches = {}
-  def getCache(self):
-    '''Returns the Player Information Cache'''
-    cachePath = playerpath
-    if self.caches.has_key(cachePath):
-      try:
-        self.caches[cachePath].commit()
-        return self.caches[cachePath]
-      except:
-        pass
-    oldcwd = os.getcwd()
-    try:
-      os.chdir(cachePath)  #stump: work around bug in SQLite unicode path name handling
-      conn = sqlite3.Connection('FoFiX-players.cache')
-    finally:
-      os.chdir(oldcwd)
+    self.cache = VFS.openSqlite3('%s/%s' % (playerpath, 'FoFiX-players.cache'))
     # Check that the cache is completely initialized.
     updateTables = 0
     try:
-      v = conn.execute("SELECT `value` FROM `config` WHERE `key` = 'version'").fetchone()[0]
+      v = self.cache.execute("SELECT `value` FROM `config` WHERE `key` = 'version'").fetchone()[0]
       if int(v) != self.SCHEMA_VERSION:
         updateTables = 2 #an old version. We don't want to just burn old tables.
     except:
       updateTables = 1 #no good table
     if updateTables > 0: #needs to handle old versions eventually.
-      for tbl in conn.execute("SELECT `name` FROM `sqlite_master` WHERE `type` = 'table'").fetchall():
-        conn.execute('DROP TABLE `%s`' % tbl)
-      conn.commit()
-      conn.execute('VACUUM')
-      conn.execute('CREATE TABLE `config` (`key` STRING UNIQUE, `value` STRING)')
-      conn.execute('CREATE TABLE `players` (`name` STRING UNIQUE, `lefty` INT, `drumflip` INT, `autokick` INT, `assist` INT, `twochord` INT, `necktype` INT, `neck` STRING, \
+      for tbl in self.cache.execute("SELECT `name` FROM `sqlite_master` WHERE `type` = 'table'").fetchall():
+        self.cache.execute('DROP TABLE `%s`' % tbl)
+      self.cache.commit()
+      self.cache.execute('VACUUM')
+      self.cache.execute('CREATE TABLE `config` (`key` STRING UNIQUE, `value` STRING)')
+      self.cache.execute('CREATE TABLE `players` (`name` STRING UNIQUE, `lefty` INT, `drumflip` INT, `autokick` INT, `assist` INT, `twochord` INT, `necktype` INT, `neck` STRING, \
                      `part` INT, `difficulty` INT, `upname` STRING, `control` INT, `changed` INT, `loaded` INT)')
-      conn.execute('CREATE TABLE `stats` (`song` STRING, `hash` STRING, `player` STRING)')
-      conn.execute("INSERT INTO `config` (`key`, `value`) VALUES (?, ?)", ('version', self.SCHEMA_VERSION))
-      conn.commit()
-    self.caches[cachePath] = conn
-    return conn
-
+      self.cache.execute('CREATE TABLE `stats` (`song` STRING, `hash` STRING, `player` STRING)')
+      self.cache.execute("INSERT INTO `config` (`key`, `value`) VALUES (?, ?)", ('version', self.SCHEMA_VERSION))
+      self.cache.commit()
+  def getCache(self):
+    return self.cache
 playerCacheManager = PlayerCacheManager()  #here's the singleton
 del PlayerCacheManager
 
