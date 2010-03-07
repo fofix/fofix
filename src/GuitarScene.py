@@ -5089,8 +5089,7 @@ class GuitarScene(Scene):
       noScore = False
       for i, player in enumerate(self.playerList):
         player.twoChord = self.instruments[i].twoChord
-        player.pack()
-        
+
         if self.playerList[0].practiceMode:
           self.scoring[i].score = 0
         if self.scoring[i].score > 0:

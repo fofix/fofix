@@ -243,41 +243,34 @@ playername = []
 playerpref = []
 playerstat = []
 
-class PlayerCacheManager(object): #akedrou - basically stump's cache for the players. Todo? Group the caching. .fofix/appdata?
-  SCHEMA_VERSION = 3
-  def __init__(self):
-    self.cache = VFS.openSqlite3('%s/%s' % (playerpath, 'FoFiX-players.cache'))
-    # Check that the cache is completely initialized.
-    updateTables = 0
-    try:
-      v = self.cache.execute("SELECT `value` FROM `config` WHERE `key` = 'version'").fetchone()[0]
-      if int(v) != self.SCHEMA_VERSION:
-        updateTables = 2 #an old version. We don't want to just burn old tables.
-    except:
-      updateTables = 1 #no good table
-    if updateTables > 0: #needs to handle old versions eventually.
-      for tbl in self.cache.execute("SELECT `name` FROM `sqlite_master` WHERE `type` = 'table'").fetchall():
-        self.cache.execute('DROP TABLE `%s`' % tbl)
-      self.cache.commit()
-      self.cache.execute('VACUUM')
-      self.cache.execute('CREATE TABLE `config` (`key` STRING UNIQUE, `value` STRING)')
-      self.cache.execute('CREATE TABLE `players` (`name` STRING UNIQUE, `lefty` INT, `drumflip` INT, `autokick` INT, `assist` INT, `twochord` INT, `necktype` INT, `neck` STRING, \
-                     `part` INT, `difficulty` INT, `upname` STRING, `control` INT, `changed` INT, `loaded` INT)')
-      self.cache.execute('CREATE TABLE `stats` (`song` STRING, `hash` STRING, `player` STRING)')
-      self.cache.execute("INSERT INTO `config` (`key`, `value`) VALUES (?, ?)", ('version', self.SCHEMA_VERSION))
-      self.cache.commit()
-  def getCache(self):
-    return self.cache
-playerCacheManager = PlayerCacheManager()  #here's the singleton
-del PlayerCacheManager
+# Load the player database and check that it is fully initialized.
+_SCHEMA_VERSION = 3
+_playerDB = VFS.openSqlite3('%s/%s' % (playerpath, 'FoFiX-players.cache'))
+_updateTables = 0
+try:
+  v = _playerDB.execute("SELECT `value` FROM `config` WHERE `key` = 'version'").fetchone()[0]
+  if int(v) != _SCHEMA_VERSION:
+    _updateTables = 2 #an old version. We don't want to just burn old tables.
+except:
+  _updateTables = 1 #no good table
+if _updateTables > 0: #needs to handle old versions eventually.
+  for tbl in _playerDB.execute("SELECT `name` FROM `sqlite_master` WHERE `type` = 'table'").fetchall():
+    _playerDB.execute('DROP TABLE `%s`' % tbl)
+  _playerDB.commit()
+  _playerDB.execute('VACUUM')
+  _playerDB.execute('CREATE TABLE `config` (`key` STRING UNIQUE, `value` STRING)')
+  _playerDB.execute('CREATE TABLE `players` (`name` STRING UNIQUE, `lefty` INT, `drumflip` INT, `autokick` INT, `assist` INT, `twochord` INT, `necktype` INT, `neck` STRING, \
+                 `part` INT, `difficulty` INT, `upname` STRING, `control` INT, `changed` INT, `loaded` INT)')
+  _playerDB.execute('CREATE TABLE `stats` (`song` STRING, `hash` STRING, `player` STRING)')
+  _playerDB.execute("INSERT INTO `config` (`key`, `value`) VALUES (?, ?)", ('version', _SCHEMA_VERSION))
+  _playerDB.commit()
 
 def resetStats(player = None):
-  cache = playerCacheManager.getCache()
   if player == None:
-    cache.execute('UPDATE `stats` SET `hit` = 0, `notes` = 0, `sc1` = 0, `sc2` = 0, `sc3` = 0, `sc4` = 0, `sc5` = 0, `ha1` = 0, `ha2` = 0, `ha3` = 0, `ha4` = 0, `ha5` = 0')
+    _playerDB.execute('UPDATE `stats` SET `hit` = 0, `notes` = 0, `sc1` = 0, `sc2` = 0, `sc3` = 0, `sc4` = 0, `sc5` = 0, `ha1` = 0, `ha2` = 0, `ha3` = 0, `ha4` = 0, `ha5` = 0')
   else:
-    cache.execute('UPDATE `stats` SET `hit` = 0, `notes` = 0, `sc1` = 0, `sc2` = 0, `sc3` = 0, `sc4` = 0, `sc5` = 0, `ha1` = 0, `ha2` = 0, `ha3` = 0, `ha4` = 0, `ha5` = 0 WHERE `name` = ?', [player])
-  cache.commit()
+    _playerDB.execute('UPDATE `stats` SET `hit` = 0, `notes` = 0, `sc1` = 0, `sc2` = 0, `sc3` = 0, `sc4` = 0, `sc5` = 0, `ha1` = 0, `ha2` = 0, `ha3` = 0, `ha4` = 0, `ha5` = 0 WHERE `name` = ?', [player])
+  _playerDB.commit()
 
 def loadPlayers():
   global playername, playerpref, playerstat
@@ -285,121 +278,96 @@ def loadPlayers():
   playerpref = []
   playerstat = []
   allplayers = VFS.listdir(playerpath)
-  cache = playerCacheManager.getCache()
   for name in allplayers:
     if name == "default.ini":
       continue
     if name.lower().endswith(".ini") and len(name) > 4:
       playername.append(name[0:len(name)-4])
-      if cache:
-        pref = cache.execute('SELECT * FROM `players` WHERE `name` = ?', [playername[-1]]).fetchone()
-        try:
-          if len(pref) == 14:
-            playerpref.append((pref[1], pref[2], pref[3], pref[4], pref[5], pref[6], pref[7], pref[8], pref[9], pref[10]))
-        except TypeError:
-          try:
-            c = Config.load(VFS.resolveRead(_makePlayerIniName(name[:-4])), type = 2)
-            lefty  = c.get("player","leftymode")
-            drumf  = c.get("player","drumflip")
-            autok  = c.get("player","auto_kick")
-            assist = c.get("player","assist_mode")
-            twoch  = c.get("player","two_chord_max")
-            neck   = c.get("player","neck")
-            neckt  = c.get("player","necktype")
-            part   = c.get("player","part")
-            diff   = c.get("player","difficulty")
-            upname = c.get("player","name")
-            control= c.get("player","controller")
-            del c
-            cache.execute('INSERT INTO `players` VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1)', [playername[-1], lefty, drumf, autok, assist, twoch, neckt, neck, part, diff, upname, control])
-            playerpref.append((lefty, drumf, autok, assist, twoch, neckt, neck, part, diff, upname))
-          except IOError:
-            cache.execute('INSERT INTO `players` VALUES (?, 0, 0, 0, 0, 0, 0, ``, 0, 2, ``, 0, 0, 1)', [playername[-1]])
-            playerpref.append((0, 0, 0, 0, 0, 0, '', 0, 2, '', 0))
-        cache.execute('UPDATE `players` SET `loaded` = 1 WHERE `name` = ?', [playername[-1]])
-        cache.commit()
-      else:
+      pref = _playerDB.execute('SELECT * FROM `players` WHERE `name` = ?', [playername[-1]]).fetchone()
+      try:
+        if len(pref) == 14:
+          playerpref.append((pref[1], pref[2], pref[3], pref[4], pref[5], pref[6], pref[7], pref[8], pref[9], pref[10]))
+      except TypeError:
         try:
           c = Config.load(VFS.resolveRead(_makePlayerIniName(name[:-4])), type = 2)
           lefty  = c.get("player","leftymode")
           drumf  = c.get("player","drumflip")
-          autok  = c.get("player","autokick")
+          autok  = c.get("player","auto_kick")
           assist = c.get("player","assist_mode")
+          twoch  = c.get("player","two_chord_max")
           neck   = c.get("player","neck")
           neckt  = c.get("player","necktype")
-          twoch  = c.get("player","two_chord_max")
           part   = c.get("player","part")
           diff   = c.get("player","difficulty")
           upname = c.get("player","name")
+          control= c.get("player","controller")
           del c
+          _playerDB.execute('INSERT INTO `players` VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1)', [playername[-1], lefty, drumf, autok, assist, twoch, neckt, neck, part, diff, upname, control])
           playerpref.append((lefty, drumf, autok, assist, twoch, neckt, neck, part, diff, upname))
-        except IOError, e:
-          playerpref.append((0, 0, 0, 0, 0, 0, "", 0, 2, ""))
+        except IOError:
+          _playerDB.execute('INSERT INTO `players` VALUES (?, 0, 0, 0, 0, 0, 0, ``, 0, 2, ``, 0, 0, 1)', [playername[-1]])
+          playerpref.append((0, 0, 0, 0, 0, 0, '', 0, 2, '', 0))
+      _playerDB.execute('UPDATE `players` SET `loaded` = 1 WHERE `name` = ?', [playername[-1]])
+      _playerDB.commit()
   return 1
 
 def savePlayers():
-  cache = playerCacheManager.getCache()
-  if cache:
-    for pref in cache.execute('SELECT * FROM `players` WHERE `changed` = 1').fetchall():
-      try:
-        c = Config.load(VFS.resolveWrite(_makePlayerIniName(str(pref[0]))), type = 2)
-        c.set("player","leftymode",int(pref[1]))
-        c.set("player","drumflip",int(pref[2]))
-        c.set("player","auto_kick",int(pref[3]))
-        c.set("player","assist_mode",int(pref[4]))
-        c.set("player","two_chord_max",int(pref[5]))
-        c.set("player","necktype",int(pref[6]))
-        c.set("player","neck",str(pref[7]))
-        c.set("player","part",int(pref[8]))
-        c.set("player","difficulty",int(pref[9]))
-        c.set("player","name",str(pref[10]))
-        c.set("player","controller",int(pref[11]))
-        del c
-        cache.execute('UPDATE `players` SET `changed` = 0 WHERE `name` = ?', [pref[0]])
-      except:
-        c = VFS.open(_makePlayerIniName(str(pref[0])), "w")
-        c.close()
-        c = Config.load(VFS.resolveWrite(_makePlayerIniName(str(pref[0]))), type = 2)
-        c.set("player","leftymode",int(pref[1]))
-        c.set("player","drumflip",int(pref[2]))
-        c.set("player","auto_kick",int(pref[3]))
-        c.set("player","assist_mode",int(pref[4]))
-        c.set("player","two_chord_max",int(pref[5]))
-        c.set("player","necktype",int(pref[6]))
-        c.set("player","neck",str(pref[7]))
-        c.set("player","part",int(pref[8]))
-        c.set("player","difficulty",int(pref[9]))
-        c.set("player","name",str(pref[10]))
-        c.set("player","controller",int(pref[11]))
-        del c
-        cache.execute('UPDATE `players` SET `changed` = 0 WHERE `name` = ?', [pref[0]])
-    #cache.execute('DELETE FROM `players` WHERE `loaded` = 0')
-    cache.execute('UPDATE `players` SET `loaded` = 0')
-    cache.commit()
+  for pref in _playerDB.execute('SELECT * FROM `players` WHERE `changed` = 1').fetchall():
+    try:
+      c = Config.load(VFS.resolveWrite(_makePlayerIniName(str(pref[0]))), type = 2)
+      c.set("player","leftymode",int(pref[1]))
+      c.set("player","drumflip",int(pref[2]))
+      c.set("player","auto_kick",int(pref[3]))
+      c.set("player","assist_mode",int(pref[4]))
+      c.set("player","two_chord_max",int(pref[5]))
+      c.set("player","necktype",int(pref[6]))
+      c.set("player","neck",str(pref[7]))
+      c.set("player","part",int(pref[8]))
+      c.set("player","difficulty",int(pref[9]))
+      c.set("player","name",str(pref[10]))
+      c.set("player","controller",int(pref[11]))
+      del c
+      _playerDB.execute('UPDATE `players` SET `changed` = 0 WHERE `name` = ?', [pref[0]])
+    except:
+      c = VFS.open(_makePlayerIniName(str(pref[0])), "w")
+      c.close()
+      c = Config.load(VFS.resolveWrite(_makePlayerIniName(str(pref[0]))), type = 2)
+      c.set("player","leftymode",int(pref[1]))
+      c.set("player","drumflip",int(pref[2]))
+      c.set("player","auto_kick",int(pref[3]))
+      c.set("player","assist_mode",int(pref[4]))
+      c.set("player","two_chord_max",int(pref[5]))
+      c.set("player","necktype",int(pref[6]))
+      c.set("player","neck",str(pref[7]))
+      c.set("player","part",int(pref[8]))
+      c.set("player","difficulty",int(pref[9]))
+      c.set("player","name",str(pref[10]))
+      c.set("player","controller",int(pref[11]))
+      del c
+      _playerDB.execute('UPDATE `players` SET `changed` = 0 WHERE `name` = ?', [pref[0]])
+  #_playerDB.execute('DELETE FROM `players` WHERE `loaded` = 0')
+  _playerDB.execute('UPDATE `players` SET `loaded` = 0')
+  _playerDB.commit()
 
 def updatePlayer(player, pref):
-  cache = playerCacheManager.getCache()
-  if cache:
-    a = cache.execute('SELECT * FROM `players` WHERE `name` = ?', [player]).fetchone()
-    try:
-      a = a[0]
-    except:
-      a = None
-    if a is not None:
-      cache.execute('UPDATE `players` SET `name` = ?, `lefty` = ?, `drumflip` = ?, `autokick` = ?, `assist` = ?, `twochord` = ?, `necktype` = ?, `neck` = ?, \
-                     `part` = 0, `difficulty` = 2, `upname` = ?, `control` = 0, `changed` = 1, `loaded` = 1 WHERE `name` = ?', pref + [player])
-      if player != pref[0]:
-        VFS.rename(_makePlayerIniName(player), _makePlayerIniName(pref[0]))
-    else:
-      cache.execute('INSERT INTO `players` VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 2, ?, 0, 1, 1)', pref)
-    cache.commit()
+  a = _playerDB.execute('SELECT * FROM `players` WHERE `name` = ?', [player]).fetchone()
+  try:
+    a = a[0]
+  except:
+    a = None
+  if a is not None:
+    _playerDB.execute('UPDATE `players` SET `name` = ?, `lefty` = ?, `drumflip` = ?, `autokick` = ?, `assist` = ?, `twochord` = ?, `necktype` = ?, `neck` = ?, \
+                   `part` = 0, `difficulty` = 2, `upname` = ?, `control` = 0, `changed` = 1, `loaded` = 1 WHERE `name` = ?', pref + [player])
+    if player != pref[0]:
+      VFS.rename(_makePlayerIniName(player), _makePlayerIniName(pref[0]))
+  else:
+    _playerDB.execute('INSERT INTO `players` VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 2, ?, 0, 1, 1)', pref)
+  _playerDB.commit()
   savePlayers()
   loadPlayers()
 
 def deletePlayer(player):
-  cache = playerCacheManager.getCache()
-  if cache:
-    cache.execute('DELETE FROM `players` WHERE `name` = ?', [player])
+  _playerDB.execute('DELETE FROM `players` WHERE `name` = ?', [player])
   VFS.unlink(_makePlayerIniName(player))
   if VFS.isfile('%s/%s.png' % (playerpath, player)):
     VFS.unlink('%s/%s.png' % (playerpath, player))
@@ -917,21 +885,19 @@ class Player(object):
     self.guitarNum    = None
     self.number       = number
     
-    self._cache     = None
-    
     self.bassGrooveEnabled = False
     self.currentTheme = 1
     
-    self.lefty       = self.cache.execute('SELECT `lefty` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
-    self.twoChordMax = self.cache.execute('SELECT `twochord` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
-    self.drumflip    = self.cache.execute('SELECT `drumflip` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
-    self.assistMode  = self.cache.execute('SELECT `assist` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
-    self.autoKick    = self.cache.execute('SELECT `autokick` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
-    self.neck        = self.cache.execute('SELECT `neck` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
-    self.neckType    = self.cache.execute('SELECT `necktype` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
-    self.whichPart   = self.cache.execute('SELECT `part` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
-    self._upname      = self.cache.execute('SELECT `upname` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
-    self._difficulty  = self.cache.execute('SELECT `difficulty` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
+    self.lefty       = _playerDB.execute('SELECT `lefty` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
+    self.twoChordMax = _playerDB.execute('SELECT `twochord` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
+    self.drumflip    = _playerDB.execute('SELECT `drumflip` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
+    self.assistMode  = _playerDB.execute('SELECT `assist` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
+    self.autoKick    = _playerDB.execute('SELECT `autokick` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
+    self.neck        = _playerDB.execute('SELECT `neck` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
+    self.neckType    = _playerDB.execute('SELECT `necktype` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
+    self.whichPart   = _playerDB.execute('SELECT `part` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
+    self._upname      = _playerDB.execute('SELECT `upname` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
+    self._difficulty  = _playerDB.execute('SELECT `difficulty` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
     #MFH - need to store selected practice mode and start position here
     self.practiceMode = False
     self.practiceSpeed = 1.0
@@ -992,18 +958,6 @@ class Player(object):
     else:
       return False 
   
-  def getCache(self):
-    if not self._cache:
-      self._cache = playerCacheManager.getCache()
-    return self._cache
-  def setCache(self, value):
-    self._cache = value
-  
-  cache = property(getCache, setCache)
-  
-  def pack(self):
-    self.cache = None
-  
   def getName(self):
     if self._upname == "" or self._upname is None:
       return self.name
@@ -1011,16 +965,16 @@ class Player(object):
       return self._upname
   
   def setName(self, name):
-    self.cache.execute('UPDATE `players` SET `upname` = ?, `changed` = 1 WHERE `name` = ?', [name, self.name])
-    self.cache.commit()
+    _playerDB.execute('UPDATE `players` SET `upname` = ?, `changed` = 1 WHERE `name` = ?', [name, self.name])
+    _playerDB.commit()
     self._upname = name
     
   def getDifficulty(self):
     return Song.difficulties.get(self._difficulty)
     
   def setDifficulty(self, difficulty):
-    self.cache.execute('UPDATE `players` SET `difficulty` = ?, `changed` = 1 WHERE `name` = ?', [difficulty.id, self.name])
-    self.cache.commit()
+    _playerDB.execute('UPDATE `players` SET `difficulty` = ?, `changed` = 1 WHERE `name` = ?', [difficulty.id, self.name])
+    _playerDB.commit()
     self._difficulty = difficulty.id
   
   def getDifficultyInt(self):
@@ -1043,8 +997,8 @@ class Player(object):
       self.whichPart = -2    #myfingershurt: also need to set self.part here to avoid unnecessary ini reads
     else:
       self.whichPart = part.id    #myfingershurt: also need to set self.part here to avoid unnecessary ini reads
-    self.cache.execute('UPDATE `players` SET `part` = ?, `changed` = 1 WHERE `name` = ?', [self.whichPart, self.name])
-    self.cache.commit()
+    _playerDB.execute('UPDATE `players` SET `part` = ?, `changed` = 1 WHERE `name` = ?', [self.whichPart, self.name])
+    _playerDB.commit()
     
   difficulty = property(getDifficulty, setDifficulty)
   part = property(getPart, setPart)
