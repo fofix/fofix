@@ -97,9 +97,9 @@ class Mount(object):
         raise
       rpath = None
 
+    if not os.path.isdir(os.path.dirname(wpath)):
+      os.makedirs(os.path.dirname(wpath))
     if rpath is not None:
-      if not os.path.isdir(os.path.dirname(wpath)):
-        os.makedirs(os.path.dirname(wpath))
       shutil.copy2(rpath, wpath)
     return wpath
 
