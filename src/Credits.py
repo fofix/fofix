@@ -238,7 +238,7 @@ class Credits(Layer, KeyListener):
       #Text(nf, ns, c2, "right",  "Amanith Framework"),
       #Text(nf, bs, c2, "right",  "http://www.amanith.org"),
       #space,
-      Text(nf, ns, c2, "right",  "Illusoft Collada module 1.4"),
+      Text(nf, ns, c2, "right",  "Illusoft Collada module 0.3.159"),
       Text(nf, bs, c2, "right",  "http://colladablender.illusoft.com"),
       space,
       Text(nf, ns, c2, "right",  "Psyco specializing compiler"),
