@@ -243,6 +243,12 @@ def mkdir(path):
 def rmdir(path):
   os.rmdir(resolveWrite(path))
 
+## Rename or move a virtual object.
+# @param src     Path to rename from
+# @param dest    Path to rename to
+def rename(src, dest):
+  os.rename(resolveWrite(src), resolveWrite(dest))
+
 ## Check the existence of a virtual object at a given path.
 # @param path    Path to check for existence
 # @return        True if object exists, False otherwise
