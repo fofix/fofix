@@ -40,6 +40,7 @@ import Version
 from View import BackgroundLayer
 from Input import KeyListener
 from Song import VOCAL_PART
+import VFS
 
 import pygame
 import os
@@ -397,10 +398,11 @@ class ControlCreator(BackgroundLayer, KeyListener):
   
   def setupMenu(self):
     self.config = None
-    if not os.path.isfile(os.path.join(Player.controlpath, self.control + ".ini")):
-      cr = open(os.path.join(Player.controlpath, self.control + ".ini"),"w")
+    #stump: Temporary use of private stuff in Player until we complete the VFS transition in Config.
+    if not VFS.isfile(Player._makeControllerIniName(self.control)):
+      cr = VFS.open(Player._makeControllerIniName(self.control), "w")
       cr.close()
-    self.config = Config.load(os.path.join(Player.controlpath, self.control + ".ini"), type = 1)
+    self.config = Config.load(VFS.resolveWrite(Player._makeControllerIniName(self.control)), type = 1)
     name = self.config.get("controller", "name")
     if name != self.control:
       self.config.set("controller", "name", self.control)

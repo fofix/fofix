@@ -219,11 +219,19 @@ Config.define("player", "assist_mode",   int,  0, text = _("Assist Mode"),   opt
 Config.define("player", "auto_kick",     int,  0, text = _("Auto Kick"),     options = {0: _("Off"), 1: _("On")})
 Config.define("player", "controller",    int,  0)
 
-controlpath = os.path.join("data","users","controllers")
-playerpath  = os.path.join("data","users","players")
-if not hasattr(sys,"frozen"):
-  controlpath = os.path.join("..",controlpath)
-  playerpath  = os.path.join("..",playerpath)
+# Overlay the users folder in /data with one in the user data folder.
+VFS.mount(VFS.resolveRead('/data/users'), 'users')
+VFS.mountWritable(VFS.resolveWrite('/userdata/users'), 'users')
+controlpath = '/users/controllers'
+playerpath = '/users/players'
+
+## Turn a controller name into a virtual path to the appropriate ini.
+def _makeControllerIniName(name):
+  return '%s/%s.ini' % (controlpath, name)
+
+## Turn a player name into a virtual path to the appropriate ini.
+def _makePlayerIniName(name):
+  return '%s/%s.ini' % (playerpath, name)
 
 control0 = None
 control1 = None
@@ -276,7 +284,7 @@ def loadPlayers():
   playername = []
   playerpref = []
   playerstat = []
-  allplayers = os.listdir(playerpath)
+  allplayers = VFS.listdir(playerpath)
   cache = playerCacheManager.getCache()
   for name in allplayers:
     if name == "default.ini":
@@ -290,7 +298,7 @@ def loadPlayers():
             playerpref.append((pref[1], pref[2], pref[3], pref[4], pref[5], pref[6], pref[7], pref[8], pref[9], pref[10]))
         except TypeError:
           try:
-            c = Config.load(os.path.join(playerpath, name), type = 2)
+            c = Config.load(VFS.resolveRead(_makePlayerIniName(name[:-4])), type = 2)
             lefty  = c.get("player","leftymode")
             drumf  = c.get("player","drumflip")
             autok  = c.get("player","auto_kick")
@@ -312,7 +320,7 @@ def loadPlayers():
         cache.commit()
       else:
         try:
-          c = Config.load(os.path.join(playerpath, name), type = 2)
+          c = Config.load(VFS.resolveRead(_makePlayerIniName(name[:-4])), type = 2)
           lefty  = c.get("player","leftymode")
           drumf  = c.get("player","drumflip")
           autok  = c.get("player","autokick")
@@ -334,7 +342,7 @@ def savePlayers():
   if cache:
     for pref in cache.execute('SELECT * FROM `players` WHERE `changed` = 1').fetchall():
       try:
-        c = Config.load(os.path.join(playerpath, str(pref[0] + ".ini")), type = 2)
+        c = Config.load(VFS.resolveWrite(_makePlayerIniName(str(pref[0]))), type = 2)
         c.set("player","leftymode",int(pref[1]))
         c.set("player","drumflip",int(pref[2]))
         c.set("player","auto_kick",int(pref[3]))
@@ -349,9 +357,9 @@ def savePlayers():
         del c
         cache.execute('UPDATE `players` SET `changed` = 0 WHERE `name` = ?', [pref[0]])
       except:
-        c = open(os.path.join(playerpath, str(pref[0]) + ".ini"), "w")
+        c = VFS.open(_makePlayerIniName(str(pref[0])), "w")
         c.close()
-        c = Config.load(os.path.join(playerpath, str(pref[0]) + ".ini"), type = 2)
+        c = Config.load(VFS.resolveWrite(_makePlayerIniName(str(pref[0]))), type = 2)
         c.set("player","leftymode",int(pref[1]))
         c.set("player","drumflip",int(pref[2]))
         c.set("player","auto_kick",int(pref[3]))
@@ -381,7 +389,7 @@ def updatePlayer(player, pref):
       cache.execute('UPDATE `players` SET `name` = ?, `lefty` = ?, `drumflip` = ?, `autokick` = ?, `assist` = ?, `twochord` = ?, `necktype` = ?, `neck` = ?, \
                      `part` = 0, `difficulty` = 2, `upname` = ?, `control` = 0, `changed` = 1, `loaded` = 1 WHERE `name` = ?', pref + [player])
       if player != pref[0]:
-        os.rename(os.path.join(playerpath,player+".ini"),os.path.join(playerpath,pref[0]+".ini"))
+        VFS.rename(_makePlayerIniName(player), _makePlayerIniName(pref[0]))
     else:
       cache.execute('INSERT INTO `players` VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 2, ?, 0, 1, 1)', pref)
     cache.commit()
@@ -392,16 +400,16 @@ def deletePlayer(player):
   cache = playerCacheManager.getCache()
   if cache:
     cache.execute('DELETE FROM `players` WHERE `name` = ?', [player])
-  os.remove(os.path.join(playerpath, player + ".ini"))
-  if os.path.exists(os.path.join(playerpath, player + ".png")):
-    os.remove(os.path.join(playerpath, player + ".png"))
+  VFS.unlink(_makePlayerIniName(player))
+  if VFS.isfile('%s/%s.png' % (playerpath, player)):
+    VFS.unlink('%s/%s.png' % (playerpath, player))
   savePlayers()
   loadPlayers()
 
 def loadControls():
   global controllerDict
   controllers = []
-  allcontrollers = os.listdir(controlpath)
+  allcontrollers = VFS.listdir(controlpath)
   default = ["defaultd.ini", "defaultg.ini", "defaultm.ini"]
   for name in allcontrollers:
     if name.lower().endswith(".ini") and len(name) > 4:
@@ -430,7 +438,7 @@ def loadControls():
 
 
 def deleteControl(control):
-  os.remove(os.path.join(controlpath, control + ".ini"))
+  VFS.unlink(_makeControllerIniName(control))
   defaultUsed = -1
   for i in range(4):
     get = Config.get("game", "control%d" % i)
@@ -445,7 +453,7 @@ def deleteControl(control):
   loadControls()
 
 def renameControl(control, newname):
-  os.rename(os.path.join(controlpath, control + ".ini"), os.path.join(controlpath, newname + ".ini"))
+  VFS.rename(_makeControllerIniName(control), _makeControllerIniName(newname))
   for i in range(4):
     if Config.get("game", "control%d" % i) == control:
       Config.set("game", "control%d" % i, newname)
@@ -492,22 +500,22 @@ class Controls:
     
     self.keyCheckerMode = Config.get("game","key_checker_mode")
     
-    if os.path.exists(os.path.join(controlpath,self.controls[0] + ".ini")):
-      self.config.append(Config.load(os.path.join(controlpath,self.controls[0] + ".ini"), type = 1))
-      if os.path.exists(os.path.join(controlpath,self.controls[1] + ".ini")) and self.controls[1] != "None":
-        self.config.append(Config.load(os.path.join(controlpath,self.controls[1] + ".ini"), type = 1))
+    if VFS.isfile(_makeControllerIniName(self.controls[0])):
+      self.config.append(Config.load(VFS.resolveRead(_makeControllerIniName(self.controls[0])), type = 1))
+      if VFS.isfile(_makeControllerIniName(self.controls[1])) and self.controls[1] != "None":
+        self.config.append(Config.load(VFS.resolveRead(_makeControllerIniName(self.controls[1])), type = 1))
       else:
         self.config.append(None)
         Config.set("game", "control1", None)
         self.controls[1] = "None"
-      if os.path.exists(os.path.join(controlpath,self.controls[2] + ".ini")) and self.controls[2] != "None":
-        self.config.append(Config.load(os.path.join(controlpath,self.controls[2] + ".ini"), type = 1))
+      if VFS.isfile(_makeControllerIniName(self.controls[2])) and self.controls[2] != "None":
+        self.config.append(Config.load(VFS.resolveRead(_makeControllerIniName(self.controls[2])), type = 1))
       else:
         self.config.append(None)
         Config.set("game", "control2", None)
         self.controls[2] = "None"
-      if os.path.exists(os.path.join(controlpath,self.controls[3] + ".ini")) and self.controls[3] != "None":
-        self.config.append(Config.load(os.path.join(controlpath,self.controls[3] + ".ini"), type = 1))
+      if VFS.isfile(_makeControllerIniName(self.controls[3])) and self.controls[3] != "None":
+        self.config.append(Config.load(VFS.resolveRead(_makeControllerIniName(self.controls[3])), type = 1))
       else:
         self.config.append(None)
         Config.set("game", "control3", None)
@@ -515,9 +523,9 @@ class Controls:
     else:
       confM = None
       if Microphone.supported:
-        confM = Config.load(os.path.join(controlpath,"defaultm.ini"), type = 1)
-      self.config.append(Config.load(os.path.join(controlpath,"defaultg.ini"), type = 1))
-      self.config.append(Config.load(os.path.join(controlpath,"defaultd.ini"), type = 1))
+        confM = Config.load(VFS.resolveRead(_makeControllerIniName("defaultm")), type = 1)
+      self.config.append(Config.load(VFS.resolveRead(_makeControllerIniName("defaultg")), type = 1))
+      self.config.append(Config.load(VFS.resolveRead(_makeControllerIniName("defaultd")), type = 1))
       self.config.append(confM)
       self.config.append(None)
       Config.set("game", "control0", "defaultg")
