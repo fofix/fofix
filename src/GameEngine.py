@@ -493,6 +493,7 @@ class GameEngine(object):
     Log.debug("PyOpenGL version: " + OpenGLVersion)
     Log.debug("Numpy version: " + numpy.__version__)
     Log.debug("PIL version: " + Image.VERSION)
+    Log.debug("sys.argv: " + repr(sys.argv))
     Log.debug("os.name: " + os.name)
     Log.debug("sys.platform: " + sys.platform)
     if os.name == 'nt':
