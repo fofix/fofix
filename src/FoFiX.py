@@ -199,12 +199,10 @@ def main():
     if part is not None:
       engine.cmdPart = int(part)
     #evilynux - Multiplayer and mode selection support
-    Config.set("game", "players", nbrplayers)
     if nbrplayers == 1:
-      Config.set("game", "game_mode", mode)
+      engine.cmdMode = nbrplayers, mode, 0
     else:
-      Config.set("game", "game_mode", 0)
-      Config.set("game", "multiplayer_mode", mode)
+      engine.cmdMode = nbrplayers, 0, mode
 
   encoding = Config.get("game", "encoding")
   if encoding is not None:
