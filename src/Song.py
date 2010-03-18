@@ -180,51 +180,44 @@ defaultSections = ["Start","1/4","1/2","3/4"]
 
 
 
-# stump: manage cache files
-class CacheManager(object):
-  SCHEMA_VERSION = 7  #stump: current cache format version number
-  def __init__(self):
-    self.cache = VFS.openSqlite3('/userdata/SongCache.sqlite')
-    # Check that the cache is completely initialized.
-    try:
-      dbversion = self.cache.execute("SELECT `value` FROM `config` WHERE `key` = 'version'").fetchone()[0]
-      if dbversion == 6:
-        Log.debug('Upgrading song cache schema version 6 to 7.')
-        self.cache.execute('ALTER TABLE `songinfo` ADD `seen` INT')
-        self.cache.execute('UPDATE `songinfo` SET `seen` = 0')
-        self.cache.execute("UPDATE `config` SET `value` = '7' WHERE `key` = 'version'")
-        self.cache.commit()
-        dbversion = 7
-      # (Insert future schema upgrades here - with ifs, not elifs, so we are
-      #  able to upgrade starting at *any* schema version we support
-      #  upgrading from, like so.)
-      #if dbversion == 7:
-      #  Log.debug('Upgrading song cache schema version 7 to 8.')
-      #  self.cache.execute(sql needed to do the update)
-      #  self.cache.commit()
-      #  dbversion = 8
-      if dbversion == self.SCHEMA_VERSION:
-        mustReinitialize = False
-      else:
-        mustReinitialize = True
-        Log.debug('Song cache has incompatible schema version; forcing reinitialization.')
-    except:
-      mustReinitialize = True
-    if mustReinitialize:
-      Log.debug('Initializing song cache.')
-      # Clean out the database, then make our tables.
-      for tbl in self.cache.execute("SELECT `name` FROM `sqlite_master` WHERE `type` = 'table'").fetchall():
-        self.cache.execute('DROP TABLE `%s`' % tbl)
-      self.cache.execute('VACUUM')
-      #stump: if you need to change the database schema, do it here, then bump the version number, a small bit above here.
-      self.cache.execute('CREATE TABLE `config` (`key` STRING UNIQUE, `value` STRING)')
-      self.cache.execute('CREATE TABLE `songinfo` (`hash` STRING UNIQUE, `info` STRING, `seen` INT)')
-      self.cache.execute('INSERT INTO `config` (`key`, `value`) VALUES (?, ?)', ('version', self.SCHEMA_VERSION))
-      self.cache.commit()
-  def getCache(self):
-    return self.cache
-cacheManager = CacheManager()  # singleton instance
-del CacheManager
+# Load the song database and check that it is completely initialized.
+_SCHEMA_VERSION = 7  #stump: current database format version number
+_songDB = VFS.openSqlite3('/userdata/SongCache.sqlite')
+try:
+  _dbversion = _songDB.execute("SELECT `value` FROM `config` WHERE `key` = 'version'").fetchone()[0]
+  if int(_dbversion) == 6:
+    Log.debug('Upgrading song cache schema version 6 to 7.')
+    _songDB.execute('ALTER TABLE `songinfo` ADD `seen` INT')
+    _songDB.execute('UPDATE `songinfo` SET `seen` = 0')
+    _songDB.execute("UPDATE `config` SET `value` = '7' WHERE `key` = 'version'")
+    _songDB.commit()
+    _dbversion = 7
+  # (Insert future schema upgrades here - with ifs, not elifs, so we are
+  #  able to upgrade starting at *any* schema version we support
+  #  upgrading from, like so.)
+  #if _dbversion == 7:
+  #  Log.debug('Upgrading song cache schema version 7 to 8.')
+  #  _songDB.execute(sql needed to do the update)
+  #  _songDB.commit()
+  #  _dbversion = 8
+  if _dbversion == _SCHEMA_VERSION:
+    _mustReinitialize = False
+  else:
+    _mustReinitialize = True
+    Log.debug('Song cache has incompatible schema version; forcing reinitialization.')
+except:
+  _mustReinitialize = True
+if _mustReinitialize:
+  Log.debug('Initializing song cache.')
+  # Clean out the database, then make our tables.
+  for tbl in _songDB.execute("SELECT `name` FROM `sqlite_master` WHERE `type` = 'table'").fetchall():
+    _songDB.execute('DROP TABLE `%s`' % tbl)
+  _songDB.execute('VACUUM')
+  #stump: if you need to change the database schema, do it here, then bump the version number, a small bit above here.
+  _songDB.execute('CREATE TABLE `config` (`key` STRING UNIQUE, `value` STRING)')
+  _songDB.execute('CREATE TABLE `songinfo` (`hash` STRING UNIQUE, `info` STRING, `seen` INT)')
+  _songDB.execute('INSERT INTO `config` (`key`, `value`) VALUES (?, ?)', ('version', _SCHEMA_VERSION))
+  _songDB.commit()
 
 class SongInfo(object):
   def __init__(self, infoFileName, songLibrary = DEFAULT_LIBRARY):
@@ -235,7 +228,6 @@ class SongInfo(object):
     self._partDifficulties = {}
     self._parts        = None
     self._midiStyle    = None
-    self.cache         = cacheManager.getCache()
 
     self.locked = False
 
@@ -532,7 +524,7 @@ class SongInfo(object):
     if Config.get("performance", "cache_song_metadata"):
       songhash = hashlib.sha1(open(self.noteFileName, 'rb').read()).hexdigest()
       try:    #MFH - it crashes here on previews!
-        result = self.cache.execute('SELECT `info` FROM `songinfo` WHERE `hash` = ?', [songhash]).fetchone()
+        result = _songDB.execute('SELECT `info` FROM `songinfo` WHERE `hash` = ?', [songhash]).fetchone()
         if result is None:
           Log.debug('Song %s was not found in the cache.' % infoFileName)
       except Exception, e:
@@ -542,14 +534,14 @@ class SongInfo(object):
       if result is not None:
         try:
           self.__dict__.update(cPickle.loads(str(result[0])))
-          self.cache.execute('UPDATE `songinfo` SET `seen` = 1 WHERE `hash` = ?', [songhash])
+          _songDB.execute('UPDATE `songinfo` SET `seen` = 1 WHERE `hash` = ?', [songhash])
           Log.debug('Song %s successfully loaded from cache.' % infoFileName)
           return
         except:
           # The entry is there but could not be loaded.
           # Nuke it and let it be rebuilt.
           Log.error('Song %s has invalid cache data (will rebuild): ' % infoFileName)
-          self.cache.execute('DELETE FROM `songinfo` WHERE `hash` = ?', [songhash])
+          _songDB.execute('DELETE FROM `songinfo` WHERE `hash` = ?', [songhash])
 
       #stump: preload this stuff...
       self.getParts()
@@ -560,7 +552,7 @@ class SongInfo(object):
       pdict = {}
       for key in ('_parts', '_partDifficulties', '_midiStyle', '_sections'):
         pdict[key] = getattr(self, key)
-      self.cache.execute('INSERT OR REPLACE INTO `songinfo` (`hash`, `info`, `seen`) VALUES (?, ?, 1)', [songhash, cPickle.dumps(pdict)])
+      _songDB.execute('INSERT OR REPLACE INTO `songinfo` (`hash`, `info`, `seen`) VALUES (?, ?, 1)', [songhash, cPickle.dumps(pdict)])
 
 
   def _set(self, attr, value):
@@ -4028,7 +4020,7 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
     progressCallback(len(songs)/float(len(names)))
     songs.append(SongInfo(engine.resource.fileName(library, name, "song.ini", writable = True), library))
   if Config.get("performance", "cache_song_metadata"):
-    cacheManager.getCache().commit()
+    _songDB.commit()
   if not includeTutorials:
     songs = [song for song in songs if not song.tutorial]
   songs = [song for song in songs if not song.artist == '=FOLDER=']
@@ -4473,8 +4465,7 @@ def removeSongOrderPrefixFromName(name): #copied from Dialogs - can't import it 
 def updateSongDatabase(engine):
   import Dialogs  # putting it at the top causes circular-import-related problems...
   Log.debug('Updating song cache.')
-  cache = cacheManager.getCache()
-  cache.execute('UPDATE `songinfo` SET `seen` = 0')
+  _songDB.execute('UPDATE `songinfo` SET `seen` = 0')
   lastScreenUpdateTime = [time.time()]  # one-element list to avoid having to throw this into the global namespace for updatePhase's sake
   loadingScreen = Dialogs.showLoadingSplashScreen(engine, _('Checking song database...'))
   def updatePhase(text):
@@ -4492,9 +4483,9 @@ def updateSongDatabase(engine):
   for i, folder in enumerate(folders):
     getAvailableSongs(engine, folder.libraryName, progressCallback=lambda p: updatePhase('%s \n %s \n %s' % (_('Caching song data...'), folder.libraryName, (_('(folder %d of %d; %d%% of this folder)') % (i+1, len(folders), (p*100))))))
   updatePhase(_('Pruning leftover entries...'))
-  prunecount = cache.execute('DELETE FROM `songinfo` WHERE `seen` = 0').rowcount
+  prunecount = _songDB.execute('DELETE FROM `songinfo` WHERE `seen` = 0').rowcount
   if prunecount != 0:
-    cache.execute('VACUUM')
+    _songDB.execute('VACUUM')
     Log.debug('Pruned %d cache entries.' % prunecount)
-  cache.commit()
+  _songDB.commit()
   Dialogs.hideLoadingSplashScreen(engine, loadingScreen)
