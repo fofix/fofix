@@ -480,7 +480,6 @@ class CreateCharacter(Layer, KeyListener):
     self.active    = False
     self.oldValue  = None
     self.oldName   = None
-    self._cache    = None
     self.selected  = 0
     self.scrolling = 0
     self.scrollRate  = self.engine.scrollRate
@@ -530,7 +529,8 @@ class CreateCharacter(Layer, KeyListener):
     self.playerNum = playerNum
     if player is not None:
       try:
-        pref = self.cache.execute('SELECT * FROM `players` WHERE `name` = ?', [player]).fetchone()
+        #stump: Temporary use of private stuff in Player until the SQLite-vs.-inis issue for players is decided.
+        pref = Player._playerDB.execute('SELECT * FROM `players` WHERE `name` = ?', [player]).fetchone()
         pref = [pref[0], pref[1], pref[2], pref[3], pref[4], pref[5], pref[6], pref[10]]
         self.neck = pref[7]
         self.newChar = False
@@ -580,11 +580,6 @@ class CreateCharacter(Layer, KeyListener):
         Dialogs.showMessage(self.engine, _("That name already exists!"))
     else:
       Dialogs.showMessage(self.engine, _("Please enter a name!"))
-  def getCache(self):
-    if not self._cache:
-      self._cache = Player.playerCacheManager.getCache()
-    return self._cache
-  cache = property(getCache) #to allow deleting.
   def shown(self):
     self.engine.input.addKeyListener(self)
   def hidden(self):

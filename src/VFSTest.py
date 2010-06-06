@@ -57,6 +57,9 @@ class VFSFuse(fuse.Fuse):
   def rmdir(self, path):
     VFS.rmdir(path)
 
+  def rename(self, src, dest):
+    VFS.rename(src, dest)
+
   def mknod(self, path, mode, devno):
     if not stat.S_ISREG(mode):
       return -errno.EINVAL
