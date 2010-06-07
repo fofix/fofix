@@ -839,7 +839,7 @@ class GameEngine(object):
     @param target:      An object that will own the drawing
     @param name:        The name of the attribute the drawing will be assigned to
     @param fileName:    The name of the file in the data directory
-    @param textureSize  Either None or (x, y), in which case the file will
+    @param textureSize: Either None or (x, y), in which case the file will
                         be rendered to an x by y texture
     @return:            L{ImgDrawing} instance
     """
