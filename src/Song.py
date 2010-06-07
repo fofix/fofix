@@ -3559,8 +3559,9 @@ class MidiSectionReader(midi.MidiOutStream):
         text = ""
 
 
-## Stores a list of songs to be played.
 class SongQueue:
+  '''Stores a list of songs to be played.'''
+
   def __init__(self):
     self.songName = []
     self.library = []

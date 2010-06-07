@@ -21,8 +21,9 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-##@package Log
-# Functions for various types of logging that FoFiX needs to do.
+'''
+Functions for writing to the logfile.
+'''
 
 import sys
 import os
@@ -32,10 +33,10 @@ import traceback
 import time
 import warnings
 
-## Whether to output log entries to stdout in addition to the logfile.
+# Whether to output log entries to stdout in addition to the logfile.
 quiet = True
 
-## File object representing the logfile.
+# File object representing the logfile.
 if os.name == "posix": # evilynux - logfile in ~/.fofix/ for GNU/Linux and MacOS X
   # evilynux - Under MacOS X, put the logs in ~/Library/Logs
   if os.uname()[0] == "Darwin":
@@ -47,13 +48,13 @@ if os.name == "posix": # evilynux - logfile in ~/.fofix/ for GNU/Linux and MacOS
 else:
   logFile = open(Version.PROGRAM_UNIXSTYLE_NAME + ".log", "w")  #MFH - local logfile!
 
-## Character encoding to use for logging.
+# Character encoding to use for logging.
 encoding = "iso-8859-1"
 
 if "-v" in sys.argv or "--verbose" in sys.argv:
   quiet = False
 
-## Labels for different priorities, as output to the logfile.
+# Labels for different priorities, as output to the logfile.
 labels = {
   "warn":   "(W)",
   "debug":  "(D)",
@@ -61,7 +62,7 @@ labels = {
   "error":  "(E)",
 }
 
-## Labels for different priorities, as output to stdout.
+# Labels for different priorities, as output to stdout.
 if os.name == "posix":
   displaylabels = {
     "warn":   "\033[1;33m(W)\033[0m",
@@ -72,10 +73,12 @@ if os.name == "posix":
 else:
   displaylabels = labels
 
-## Generic logging function.
-# @param cls    Priority class for the message
-# @param msg    Log message text
 def _log(cls, msg):
+  '''
+  Generic logging function.
+  @param cls:   Priority class for the message
+  @param msg:   Log message text
+  '''
   if not isinstance(msg, unicode):
     msg = unicode(msg, encoding).encode(encoding, "ignore")
   timeprefix = "[%12.6f] " % (time.time() - _initTime)
@@ -84,34 +87,42 @@ def _log(cls, msg):
   print >>logFile, timeprefix + labels[cls] + " " + msg
   logFile.flush()  #stump: truncated logfiles be gone!
 
-## Log a major error.
-# If this is called while handling an exception, the traceback will
-# be automatically included in the log.
-# @param msg    Error message text
 def error(msg):
+  '''
+  Log a major error.
+  If this is called while handling an exception, the traceback will
+  be automatically included in the log.
+  @param msg:   Error message text
+  '''
   if sys.exc_info() == (None, None, None):
     #warnings.warn("Log.error() called without an active exception", UserWarning, 2)  #stump: should we enforce this?
     _log("error", msg)
   else:
     _log("error", msg + "\n" + traceback.format_exc())
 
-## Log a warning.
-# @param msg    Warning message text
 def warn(msg):
+  '''
+  Log a warning.
+  @param msg:   Warning message text
+  '''
   _log("warn", msg)
 
-## Log a notice.
-# @param msg    Notice message text
 def notice(msg):
+  '''
+  Log a notice.
+  @param msg:   Notice message text
+  '''
   _log("notice", msg)
 
-## Log a debug message.
-# @param msg    Debug message text
 def debug(msg):
+  '''
+  Log a debug message.
+  @param msg:   Debug message text
+  '''
   _log("debug", msg)
 
-## A hook to catch Python warnings.
 def _showwarning(*args, **kw):
+  '''A hook to catch Python warnings.'''
   warn("A Python warning was issued:\n" + warnings.formatwarning(*args, **kw))
   _old_showwarning(*args, **kw)
 _old_showwarning = warnings.showwarning
