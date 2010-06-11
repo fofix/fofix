@@ -123,18 +123,13 @@ class World:
       self.scene.removePlayer(player)
   
   def createScene(self, name, **args):
-    try:
-      if self.scene:
-        self.engine.view.popLayer(self.scene)
-        self.engine.removeTask(self.scene)
-      scene = SceneFactory.create(engine = self.engine, name = name, **args)
-      self.scene = scene
-      self.engine.addTask(self.scene)
-      self.engine.view.pushLayer(self.scene)
-    except Exception, e:
-      self.engine.startupMessages.append(str(e))
-      Log.error("%s creation failed: " % name)
-      self.finishGame()
-  
+    if self.scene:
+      self.engine.view.popLayer(self.scene)
+      self.engine.removeTask(self.scene)
+    scene = SceneFactory.create(engine = self.engine, name = name, **args)
+    self.scene = scene
+    self.engine.addTask(self.scene)
+    self.engine.view.pushLayer(self.scene)
+
   def getPlayers(self):
     return self.players
