@@ -1,7 +1,6 @@
 #!/usr/bin/python
+# -*- coding: iso-8859-1 -*-
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
-#                                                                   #
 # Frets on Fire X (FoFiX)                                           #
 # Copyright (C) 2009 John Stumpo                                    #
 #                                                                   #
