@@ -1,7 +1,7 @@
 *.py[cod]
 *.exe
 *.dll
-doc/doxygen
+doc/epydoc
 src/*.ini
 src/*.log
 data/library.zip
