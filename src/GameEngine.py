@@ -141,7 +141,7 @@ Config.define("game",   "joysticks",    int,   0)
 
 #myfingershurt: default buffersize changed from 4096 to 2048:
 Config.define("audio",  "buffersize",   int,   2048,  text = _("Buffer Size"), options = [256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536], tipText = _("Set your audio buffer size. Higher values will reduce audio popping, but increase game lag. Only change this if you are having audio quality issues, and use the lowest value that sounds right."))
-Config.define("audio",  "delay",        int,   100,   text = _("A/V Delay"), options = dict([(n, n) for n in range(0, 1001)]), tipText = _("Set your A/V delay. Unfortunately for now you have to use trial and error."))
+Config.define("audio",  "delay",        int,   100,   text = _("A/V Delay"), options = dict([(n, n) for n in range(-1000, 1001)]), tipText = _("Set your A/V delay. Unfortunately for now you have to use trial and error."))
 Config.define("audio",  "screwupvol", float,   0.25,  text = _("Screw-Up Sounds"), options = sortOptionsByKey({0.0: _("Off"), .25: _("Quiet"), .5: _("Loud"), 1.0: _("Painful")}), tipText = _("How loud should the sound of your screwing up be? Very."))
 
 #MFH: below are normal 0-10 volume settings.
