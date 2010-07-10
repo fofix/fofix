@@ -69,7 +69,8 @@ minutesSongLength = 0
 secondsSongLength = 0
 position = 0
 countdownPosition = 1
-progress = 0.0
+progress = 0.0         #this gives a percentage (between 0 and 1) 
+                       #of how far the song has played
 
 # A graphical rockmeter layer
 # This is the base template for all rockmeter layer types
@@ -330,6 +331,10 @@ class Rockmeter:
     position          = scene.getSongPosition()
     countdownPosition = songLength - position
     progress          = float(position)/float(songLength)
+    if progress < 0:
+        progress = 0
+    elif progress > 1:
+        progress = 1
 
     minutesCountdown, secondsCountdown   = (countdownPosition / 60000, (countdownPosition % 60000) / 1000)
     minutes, seconds                     = (position / 60000, (position % 60000) / 1000)
