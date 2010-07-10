@@ -60,6 +60,12 @@ stars = 0
 rock = 0
 multiplier = 0
 
+minutes = 0
+seconds = 0
+minutesCountdown = 0
+secondsCountdown = 0
+songLength = 0
+
 # A graphical rockmeter layer
 # This is the base template for all rockmeter layer types
 class Layer:
@@ -76,40 +82,6 @@ class Layer:
     self.color       = "#FFFFFF"		#color of the image (#FFFFFF is white on text, on images it is full color)
     self.rect        = (0,1,0,1)		#how much of the image do you want rendered (left, right, top, bottom)
     self.condition   = True				#when should the image be shown (by default it will always be shown)
-
-  #this updates all the usual global variables that are handled by the rockmeter
-  def updateVars(self, playerNum):
-    global score, stars, rock, streak, streakMax, power, multiplier
-    scene = self.stage.scene
-    player = scene.instruments[playerNum]
-
-    #this is here for when I finally get coOp worked in
-    if self in self.stage.sharedlayers:
-      score = scene.coOpScoreCard.score
-      stars = scene.coOpScoreCard.stars
-      rock  = scene.rock[scene.coOpPlayerMeter] / scene.rockMax
-    else:
-      score = scene.scoring[playerNum].score
-      stars = scene.scoring[playerNum].stars
-      rock  = scene.rock[playerNum] / scene.rockMax
-
-    streak = scene.scoring[playerNum].streak
-    power  = player.starPower/100.0
-
-    #allows for bassgroove
-    if player.isBassGuitar:
-      streakMax = 50    
-    else:
-      streakMax = 30
-
-    if streak >= streakMax:
-      multiplier = int(streakMax*.1) + 1
-    else:
-      multiplier = int(streak*.1) + 1
-
-    #doubles the multiplier number when starpower is activated
-    if player.starPowerActive:
-      multiplier *= 2
 
   # all variables that should be updated during the rendering process
   # should be in here just for sake of readablity and organization
@@ -194,7 +166,6 @@ class ImageLayer(Layer):
     v = 1.0
 
     self.updateLayer(playerNum)
-    self.updateVars(playerNum)
 
     rect    = self.rect
 
@@ -253,7 +224,6 @@ class FontLayer(Layer):
     w, h, = self.stage.engine.view.geometry[2:4]
     v = 1.0
 
-    self.updateVars(playerNum)
     self.updateLayer(playerNum)
     
     wid, hgt = self.font.getStringSize(str(self.text))
@@ -342,11 +312,61 @@ class Rockmeter:
             
     self.addLayer(layer, layer.shared)
 
+  #because time is not player specific it's best to update it only once per cycle
+  def updateTime(self):
+    global songLength, minutesCountdown, secondsCountdown, minutes, seconds    
+    scene = self.scene
+
+    songLength = scene.lastEvent
+    pos = scene.getSongPosition()
+    countdownPos = songLength - pos
+
+    minutesCountdown, secondsCountdown = (countdownPos / 60000, (countdownPos % 60000) / 1000)
+    minutes, seconds = (pos / 60000, (pos % 60000) / 1000)
+
+  #this updates all the usual global variables that are handled by the rockmeter
+  #these are all player specific
+  def updateVars(self, playerNum):
+    global score, stars, rock, streak, streakMax, power, multiplier
+    scene = self.scene
+    player = scene.instruments[playerNum]
+
+    #this is here for when I finally get coOp worked in
+    if self.coOp:
+      score = scene.coOpScoreCard.score
+      stars = scene.coOpScoreCard.stars
+      rock  = scene.rock[scene.coOpPlayerMeter] / scene.rockMax
+    else:
+      score = scene.scoring[playerNum].score
+      stars = scene.scoring[playerNum].stars
+      rock  = scene.rock[playerNum] / scene.rockMax
+
+    streak = scene.scoring[playerNum].streak
+    power  = player.starPower/100.0
+
+    #allows for bassgroove
+    if player.isBassGuitar:
+      streakMax = 50    
+    else:
+      streakMax = 30
+
+    if streak >= streakMax:
+      multiplier = int(streakMax*.1) + 1
+    else:
+      multiplier = int(streak*.1) + 1
+
+    #doubles the multiplier number when starpower is activated
+    if player.starPowerActive:
+      multiplier *= 2
+
   def render(self, visibility):
+    self.updateTime()
+
     self.engine.view.setOrthogonalProjection(normalize = True)
     try:
       for i,player in enumerate(self.scene.playerList):
         p = player.guitarNum
+        self.updateVars(p)
         if p is not None:
           self.engine.view.setViewportHalf(self.scene.numberOfGuitars,p)
         else:
