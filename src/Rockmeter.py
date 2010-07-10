@@ -35,6 +35,8 @@ from OpenGL.GL import *
 from PIL import Image, ImageDraw
 from Svg import ImgDrawing
 
+import locale
+
 #Blazingamer - new drawing code
 #from Draw import *
 
@@ -57,6 +59,7 @@ streak = 0
 streakMax = 0
 power = 0
 stars = 0
+partialStars = 0
 rock = 0
 multiplier = 0
 
@@ -197,6 +200,7 @@ class FontLayer(Layer):
     self.text        = ""
     self.replace     = ""
     self.alignment   = LEFT
+    self.useComma    = False
 
     self.color       = "#FFFFFF"
 
@@ -219,8 +223,17 @@ class FontLayer(Layer):
 
     self.condition   = bool(eval(get("condition", str, "True")))
 
-    self.text = str(eval(get("text")))
+    self.useComma = get("useComma", bool, False)
+
+    self.text = eval(get("text"))
     self.color = get("color", str, "#FFFFFF")
+
+    self.alignment = eval(get("alignment", str, "left").upper())
+
+    if self.useComma:
+      self.text = locale.format("%d", self.text, grouping=True)
+    else:
+      self.text = str(self.text)
 
     if self.position[0] > 1.0:
       self.position[0] /= w
@@ -238,7 +251,7 @@ class FontLayer(Layer):
     glColor3f(*self.engine.theme.hexToColor(self.color))
 
     if self.condition:
-      self.font.render(str(self.text), (self.position[0], self.position[1]), align = self.alignment)
+      self.font.render(self.text, (self.position[0], self.position[1]), align = self.alignment)
                 
 class Rockmeter:
   def __init__(self, guitarScene, configFileName, coOp = False):
@@ -351,10 +364,12 @@ class Rockmeter:
     if self.coOp:
       score = scene.coOpScoreCard.score
       stars = scene.coOpScoreCard.stars
+      partialStars = scene.coOpScoreCard.starRatio
       rock  = scene.rock[scene.coOpPlayerMeter] / scene.rockMax
     else:
       score = scene.scoring[playerNum].score
       stars = scene.scoring[playerNum].stars
+      partialStars = scene.scoring[playerNum].starRatio
       rock  = scene.rock[playerNum] / scene.rockMax
 
     streak = scene.scoring[playerNum].streak
