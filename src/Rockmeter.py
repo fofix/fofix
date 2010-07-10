@@ -62,9 +62,14 @@ multiplier = 0
 
 minutes = 0
 seconds = 0
-minutesCountdown = 0
-secondsCountdown = 0
-songLength = 0
+minutesCountdown = 1
+secondsCountdown = 1
+songLength = 1
+minutesSongLength = 0
+secondsSongLength = 0
+position = 0
+countdownPosition = 1
+progress = 0.0
 
 # A graphical rockmeter layer
 # This is the base template for all rockmeter layer types
@@ -120,7 +125,7 @@ class ImageLayer(Layer):
         return type(self.config.get(self.section, value))
       return default
 
-    self.rect        = eval(get("rect", str, "(0,1,0,1)"))
+    self.rect        = list(eval(get("rect", str, "(0,1,0,1)")))
 
     #all of this has to be repeated instead of using the base method
     #because now things can be calculated in relation to the image's properties
@@ -139,13 +144,14 @@ class ImageLayer(Layer):
 
     #this allows you to scale images in relation to pixels instead
     #of percentage of the size of the image.
+    self.scale[0] *=  (self.rect[1] - self.rect[0])
+    self.scale[1] *=  (self.rect[3] - self.rect[2])
     if self.scale[0] > 1.0:
       self.scale[0] /= texture.pixelSize[0]
     if self.scale[1] > 1.0:
       self.scale[1] /= texture.pixelSize[1]
-    self.scale[0] *=  (self.rect[1] - self.rect[0])
-    self.scale[1] *= -(self.rect[3] - self.rect[2])
-
+    self.scale[1] = -self.scale[1]
+    
     if not self.position[0] > 1.0:
       self.position[0] *= w
     if not self.position[1] > 1.0:
@@ -314,15 +320,20 @@ class Rockmeter:
 
   #because time is not player specific it's best to update it only once per cycle
   def updateTime(self):
-    global songLength, minutesCountdown, secondsCountdown, minutes, seconds    
+    global songLength, minutesSongLength, secondsSongLength
+    global minutesCountdown, secondsCountdown, minutes, seconds
+    global position, countdownPosition, progress
+
     scene = self.scene
 
-    songLength = scene.lastEvent
-    pos = scene.getSongPosition()
-    countdownPos = songLength - pos
+    songLength        = scene.lastEvent
+    position          = scene.getSongPosition()
+    countdownPosition = songLength - position
+    progress          = float(position)/float(songLength)
 
-    minutesCountdown, secondsCountdown = (countdownPos / 60000, (countdownPos % 60000) / 1000)
-    minutes, seconds = (pos / 60000, (pos % 60000) / 1000)
+    minutesCountdown, secondsCountdown   = (countdownPosition / 60000, (countdownPosition % 60000) / 1000)
+    minutes, seconds                     = (position / 60000, (position % 60000) / 1000)
+    minutesSongLength, secondsSongLength = (songLength / 60000, (songLength % 60000) / 1000)
 
   #this updates all the usual global variables that are handled by the rockmeter
   #these are all player specific
