@@ -254,7 +254,58 @@ class FontLayer(Layer):
 
     if self.condition:
       self.font.render(self.text, (self.position[0], self.position[1]), align = self.alignment)
-                
+
+#this is just a template for effects                
+class Effect:
+  def __init__(self, layer):
+    pass
+
+  def update(self):
+    pass
+
+#
+class Slide(Effect):
+  def __init__(self, layer):
+    self.layer = layer
+    def get(value, type = str, default = None):
+      if self.config.has_option(self.section, value):
+        return type(self.config.get(self.section, value))
+      return default
+    
+    self.condition = False
+
+    try:    self.startCoord = [get("startX", float, 0.0), get("startY", float, 0.0)]
+    except: self.startCoord = [eval(get("startX")), eval(get("startY"))]
+
+    try:    self.endCoord = [get("endX", float, 0.0), get("endY", float, 0.0)]
+    except: self.endCoord = [eval(get("endX")), eval(get("endY"))]
+
+    self.reverse = bool(eval(get("reverse", str, "True"))    
+
+    #how long it takes for the transition to take place
+    self.transitionTime = 512.0
+
+  def update(self):
+    self.condition = bool(eval(get("condition", str, "False"))
+
+    slideX = (self.endCoord[0] - self.startCoord[0])/self.transitionTime
+    slideY = (self.endCoord[1] - self.startCoord[1])/self.transitionTime
+
+    if self.condition:
+      if layer.position[0] < self.endCoord[0]:
+        layer.position[0] += slideX
+      if layer.position[1] < self.endCoord[1]:
+        layer.position[1] += slideY
+    else:
+      if self.reverse:
+        if layer.position[0] > self.startCoord[0]:
+          layer.position[0] -= slideX
+        if layer.position[1] > self.startCoord[1]:
+          layer.position[1] -= slideY
+      else:  
+        layer.position = self.startCoord
+    
+
 class Rockmeter:
   def __init__(self, guitarScene, configFileName, coOp = False):
 
