@@ -225,12 +225,13 @@ VFS.mountWritable(VFS.resolveWrite('/userdata/users'), 'users')
 controlpath = '/users/controllers'
 playerpath = '/users/players'
 
-## Turn a controller name into a virtual path to the appropriate ini.
+
 def _makeControllerIniName(name):
+  '''Turn a controller name into a virtual path to the appropriate ini.'''
   return '%s/%s.ini' % (controlpath, name)
 
-## Turn a player name into a virtual path to the appropriate ini.
 def _makePlayerIniName(name):
+  '''Turn a player name into a virtual path to the appropriate ini.'''
   return '%s/%s.ini' % (playerpath, name)
 
 control0 = None

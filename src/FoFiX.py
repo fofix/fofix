@@ -23,8 +23,9 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-##@package FoFiX
-# Main game executable.
+'''
+Main game executable.
+'''
 
 # Register the latin-1 encoding
 import codecs
@@ -44,10 +45,6 @@ import sys
 import os
 import Version
 
-## Display command-line usage and exit.
-# Outputs to stdout unless py2exe'd, in which case the usage is presented
-# using a MessageBox().
-# @param errmsg    Optional error message.
 def _usage(errmsg=None):
   usage = """Usage: %(prog)s [options]
 
@@ -117,7 +114,6 @@ try:
 except:
   videoAvailable = False
 
-## Main function.
 def main():
   playing = None
   configFile = None

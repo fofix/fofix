@@ -443,7 +443,7 @@ class GameResultsScene(Scene):
     self.background = None
     self.song = None
     self.engine.view.popLayer(self.menu)
-    self.engine.world.createScene("GuitarScene", libraryName = self.libraryName, songName = self.songName, Players = len(self.playerList))
+    self.engine.world.createScene("GuitarScene", libraryName = self.libraryName, songName = self.songName)
   
   def replaySetlist(self):
     self.background = None

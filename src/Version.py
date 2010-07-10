@@ -62,10 +62,11 @@ def revision():
 def versionNum():
   return "%d.%d.%d" % (MAJOR_VERSION, MINOR_VERSION, MICRO_VERSION)
 
-## Are we running from a py2exe'd Windows executable? (Because typing the
-# test out explicitly everywhere detracts from code readability.)
-# @return boolean for whether this is the Windows executable
 def isWindowsExe():
+  '''
+  Are we running from a py2exe'd Windows executable?
+  @return: boolean for whether this is the Windows executable
+  '''
   return hasattr(sys, 'frozen') and sys.frozen == 'windows_exe'
 
 # evilynux: Returns version number w.r.t. frozen state
