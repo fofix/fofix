@@ -889,36 +889,38 @@ class GameEngine(object):
 
   #blazingamer - cleans up the work for rendering an image
   #volshebnyi - now images can be resized to fit to screen
-  def drawImage(self, image, scale, coord, rot = 0, color = (1,1,1,1), rect = (0,1,0,1), stretched = 0, fit = 0, repeat = 0, repeatOffset = 0, lOffset = 0.0, rOffset = 0.0):
+  def drawImage(self, image, scale, coord, rot = 0, color = (1,1,1,1), rect = (0,1,0,1), stretched = 0, fit = 0, repeat = 0, repeatOffset = 0, lOffset = 0.0, rOffset = 0.0, alignment = 1):
     
     image.transform.reset()
     image.transform.rotate(rot)
     scale = list(scale)
     coord = list(coord)
     if stretched == 0: #don't sctretch
-      image.transform.scale(scale[0],scale[1])
+      scale = scale
     elif stretched == 1: # fit to width
       scale[0] = scale[0] / image.width1() * 640
-      image.transform.scale(scale[0],scale[1])
     elif stretched == 2: # fit to height
       scale[1] = scale[1] / image.height1() * 480
-      image.transform.scale(scale[0],scale[1])
     elif stretched == 11: # fit to width and keep ratio
       scale[0] = scale[0] / image.width1() * 640
       scale[1] = scale[1] / image.width1() * 640
-      image.transform.scale(scale[0],scale[1])
     elif stretched == 12: # fit to height and keep ratio
       scale[0] = scale[0] / image.height1() * 480
       scale[1] = scale[1] / image.height1() * 480
-      image.transform.scale(scale[0],scale[1])
     else: # fit to screen
       scale[0] = scale[0] / image.width1() * 640
       scale[1] = scale[1] / image.height1() * 480
-      image.transform.scale(scale[0],scale[1])
+    image.transform.scale(scale[0],scale[1])
     if fit == 1: #y is on top (not center)
       coord[1] = coord[1] - ((image.height1() * abs(scale[1]))*.5*(self.view.geometry[3]/float(480)))
     elif fit == 2: #y is on bottom
       coord[1] = coord[1] + ((image.height1() * abs(scale[1]))*.5*(self.view.geometry[3]/float(480)))
+
+    if alignment == 0:  #x is on left
+      coord[0] = coord[0] + ((image.width1() * abs(scale[0]))*.5*(self.view.geometry[2]/float(640)))
+    elif alignment == 2:#x is on right
+      coord[0] = coord[0] - ((image.width1() * abs(scale[0]))*.5*(self.view.geometry[2]/float(640)))
+
     if len(color) == 3:
       color = (color[0], color[1], color[2], 1.0)
     if repeat == 1: #repeat-y

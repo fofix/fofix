@@ -47,8 +47,7 @@ class SvgContext(object):
   
   def setGeometry(self, geometry = None):
     glViewport(geometry[0], geometry[1], geometry[2], geometry[3])
-    self.transform.reset()
-    self.transform.scale(geometry[2] / 640.0, geometry[3] / 480.0)
+    glScalef(geometry[2] / 640.0, geometry[3] / 480.0, 1.0)
 
   def setProjection(self, geometry = None):
     geometry = geometry or self.geometry
@@ -109,28 +108,11 @@ class ImgDrawing(object):
       self.ImgData = ImgData.read()
     elif type(ImgData) == str:
       self.texture = Texture(ImgData)
-#      bitmapFile = ImgData.replace(".svg", ".png")
-#      # Load PNG files directly
-#      if ImgData.endswith(".png"):
-#        self.texture = Texture(ImgData)
-#      elif ImgData.endswith(".jpg"):
-#        self.texture = Texture(ImgData)
-#      elif ImgData.endswith(".jpeg"):
-#        self.texture = Texture(ImgData)
-      # Check whether we have a prerendered bitmap version of the SVG file
-#      elif ImgData.endswith(".svg") and os.path.exists(bitmapFile):
-#        Log.debug("Loading cached bitmap '%s' instead of '%s'." % (bitmapFile, ImgData))
-#        self.texture = Texture(bitmapFile)
-#      else:
-#        if not haveAmanith:
-#          e = "PyAmanith support is deprecated and you are trying to load an SVG file."
-#          Log.error(e)
-#          raise RuntimeError(e)
-#        Log.debug("Loading SVG file '%s'." % (ImgData))
-#        self.ImgData = open(ImgData).read()
     elif isinstance(ImgData, Image.Image): #stump: let a PIL image be passed in
       self.texture = Texture()
       self.texture.loadImage(ImgData)
+
+    self.pixelSize = self.texture.pixelSize
 
     # Make sure we have a valid texture
     if not self.texture:
@@ -155,25 +137,24 @@ class ImgDrawing(object):
     return transform
 
   def width1(self):
-    width = self.texture.pixelSize[0]
-    if not width == None:
+    width = self.pixelSize[0]
+    if width:
       return width
     else:
       return 0
 
   #myfingershurt:
   def height1(self):
-    height = self.texture.pixelSize[1]
-    if not height == None:
+    height = self.pixelSize[1]
+    if height:
       return height
     else:
       return 0
 
-
   def widthf(self, pixelw):
-    width = self.texture.pixelSize[0]
-    wfactor = pixelw/width
-    if not width == None:
+    width = self.pixelSize[0]
+    if width:
+      wfactor = pixelw/width
       return wfactor
     else:
       return 0    
