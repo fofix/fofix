@@ -54,6 +54,7 @@ RIGHT  = 2
 #to refer to theme, instead it has a more friendly and logical setup.
 score = 0
 streak = 0
+streakMax = 0
 power = 0
 stars = 0
 rock = 0
@@ -78,9 +79,11 @@ class Layer:
 
   #this updates all the usual global variables that are handled by the rockmeter
   def updateVars(self, playerNum):
-    global score, stars, rock, streak, power, multiplier
+    global score, stars, rock, streak, streakMax, power, multiplier
     scene = self.stage.scene
+    player = scene.instruments[playerNum]
 
+    #this is here for when I finally get coOp worked in
     if self in self.stage.sharedlayers:
       score = scene.coOpScoreCard.score
       stars = scene.coOpScoreCard.stars
@@ -91,34 +94,27 @@ class Layer:
       rock  = scene.rock[playerNum] / scene.rockMax
 
     streak = scene.scoring[playerNum].streak
-    power  = scene.instruments[playerNum].starPower/100.0
-    if streak >= 30:
-      multiplier = 4
+    power  = player.starPower/100.0
+
+    #allows for bassgroove
+    if player.isBassGuitar:
+      streakMax = 50    
+    else:
+      streakMax = 30
+
+    if streak >= streakMax:
+      multiplier = int(streakMax*.1) + 1
     else:
       multiplier = int(streak*.1) + 1
+
+    #doubles the multiplier number when starpower is activated
+    if player.starPowerActive:
+      multiplier *= 2
 
   # all variables that should be updated during the rendering process
   # should be in here just for sake of readablity and organization
   def updateLayer(self, playerNum):
-    def get(value, type = str, default = None):
-      if self.config.has_option(self.section, value):
-        return type(self.config.get(self.section, value))
-      return default
-
-    try:
-      self.position  = (get("xpos",   float, 0.0), get("ypos",   float, 0.0))
-    except:
-      self.position  = (eval(get("xpos")), eval(get("xpos")))
-
-    try:
-      self.scale     = (get("xscale", float, 1.0), get("yscale", float, 1.0))
-    except:
-      self.scale     = (eval(get("xscale")), eval(get("yscale")))
-
-    self.angle       = get("angle", float, 0.0)
-    self.color       = get("color", str, "#FFFFFF")
-
-    self.condition   = bool(eval(get("condition", str, "True")))
+    pass
             
   # should handle the final step of rendering the image
   # be sure if you have variables being updated in updateVars
@@ -226,24 +222,40 @@ class FontLayer(Layer):
 
     self.color       = "#FFFFFF"
 
-  def updateVars(self, playerNum):
-    Layer.updateLayer(self, playerNum)
+  def updateLayer(self, playerNum):
+    w, h, = self.stage.engine.view.geometry[2:4]
 
     def get(value, type = str, default = None):
       if self.config.has_option(self.section, value):
         return type(self.config.get(self.section, value))
       return default
 
+    try:    self.position  = [get("xpos",   float, 0.0), get("ypos",   float, 0.0)]
+    except: self.position  = [eval(get("xpos")),    eval(get("ypos"))]
+
+    try:    self.scale     = [get("xscale", float, 1.0), get("yscale", float, 1.0)]
+    except: self.scale     = [eval(get("xscale")),  eval(get("yscale"))]
+
+    self.angle       = get("angle", float, 0.0)
+    self.color       = get("color", str, "#FFFFFF")
+
+    self.condition   = bool(eval(get("condition", str, "True")))
+
     self.text = str(eval(get("text")))
     self.color = get("color", str, "#FFFFFF")
+
+    if self.position[0] > 1.0:
+      self.position[0] /= w
+    if self.position[1] > 1.0:
+      self.position[1] /= h
 
   def render(self, visibility, playerNum):
     w, h, = self.stage.engine.view.geometry[2:4]
     v = 1.0
 
-    self.updateLayer(playerNum)
     self.updateVars(playerNum)
-
+    self.updateLayer(playerNum)
+    
     wid, hgt = self.font.getStringSize(str(self.text))
 
     glColor3f(*self.engine.theme.hexToColor(self.color))
