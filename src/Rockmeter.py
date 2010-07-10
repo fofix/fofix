@@ -54,6 +54,8 @@ RIGHT  = 2
 #instance of the layer.  This also makes it easier to work with the
 #variables in the rockmeter.ini for you no longer have to use self
 #to refer to theme, instead it has a more friendly and logical setup.
+player = None
+
 score = 0
 streak = 0
 streakMax = 0
@@ -356,7 +358,7 @@ class Rockmeter:
   #this updates all the usual global variables that are handled by the rockmeter
   #these are all player specific
   def updateVars(self, playerNum):
-    global score, stars, rock, streak, streakMax, power, multiplier
+    global score, stars, rock, streak, streakMax, power, multiplier, player
     scene = self.scene
     player = scene.instruments[playerNum]
 
@@ -377,9 +379,9 @@ class Rockmeter:
 
     #allows for bassgroove
     if player.isBassGuitar:
-      streakMax = 50    
+      streakMax = 60    
     else:
-      streakMax = 30
+      streakMax = 40
 
     if streak >= streakMax:
       multiplier = int(streakMax*.1) + 1
