@@ -289,7 +289,7 @@ class Rockmeter:
           break
 
   def addLayer(self, layer, shared = False):
-    if shared and self.coOp:
+    if shared:
       self.sharedlayers.append(layer)
     else:
       if layer:
