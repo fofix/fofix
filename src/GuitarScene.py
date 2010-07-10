@@ -6764,48 +6764,7 @@ class GuitarScene(Scene):
             if countdownPos < 0:
               countdownPos = 0
             self.engine.theme.setBaseColor()
-    
-    
-            #if countdownPos == 0:   #MFH - reset drumStart so that the drummer can get down with his bad self at the end of the song without penalty.
-            #  self.drumStart = False  #faaa's drum sound mod restart
 
-
-            
-            
-            if (self.gameTimeMode > 0 or self.muteLastSecond == 1 or self.hopoDebugDisp == 1) and (not self.pause and not self.failed and not self.ending and not self.youRock):
-              #MFH: making this a global variable so it may be easily accessed for log entries where appropriate
-              if self.gameTimeMode == 1:    #countdown
-                self.timeLeft = "%d:%02d" % (countdownPos / 60000, (countdownPos % 60000) / 1000)
-              elif self.gameTimeMode == 2:  #elapsed
-                self.timeLeft = "%d:%02d" % (pos / 60000, (pos % 60000) / 1000)
-              if self.gameTimeMode > 0 or self.hopoDebugDisp == 1:
-                w, h = font.getStringSize(self.timeLeft)
-                if self.lyricSheet != None or (self.numOfSingers > 0 and self.numOfPlayers > 1):   #shift this stuff down so it don't look so bad over top the lyricsheet:
-                  font.render(self.timeLeft,  (.5 - w / 2, .055 - h / 2 - (1.0 - v) * .2))
-                else:
-                  font.render(self.timeLeft,  (.5 - w / 2, y))
-    
-    
-    
-    
-            #Not ready for 2player yet
-            #if self.notesCum:
-            #  f = int(100 * (float(self.playerList[0].notesHit) / self.notesCum))
-            #  font.render("%d%%" % f, (.5 - w / 2, y + h))
-    
-    
-          
-    
-    #-        if self.rock[0]<=0 and self.battle and self.numOfPlayers>1: #QQstarS:new2 Bettle failing
-    #-          self.displayText = "You Failed!!!!"
-    #-          self.streakFlag = "0"   #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1. 
-    #-          self.instruments[0].actions = [0,0,0]
-    #-          #self.keysList   = [PLAYER2KEYS]
-    #-        elif self.rock[1]<=0 and self.battle and self.numOfPlayers>1: #QQstarS:new2 Bettle failing
-    #-          self.displayText = "You Failed!!!!"
-    #-          self.streakFlag = "1"   #QQstarS:Set [0] to [i] #if player0 streak50, set the flag to 1. 
-    #-          self.instruments[1].actions = [0,0,0]
-    
             #Party mode
             if self.partyMode == True:
               timeleft = (now - self.partySwitch) / 1000
