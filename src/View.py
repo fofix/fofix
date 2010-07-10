@@ -148,11 +148,8 @@ class View(Task):
     self.engine.addTask(layer)
 
   def topLayer(self):
-    layers = list(self.layers)
-    layers.reverse()
-    for layer in layers:
-      if layer not in self.outgoing:
-        return layer
+    layer = self.layers[-1]
+    return layer
 
   def popLayer(self, layer):
     Log.debug("View: Pop: %s" % layer.__class__.__name__)
@@ -173,7 +170,7 @@ class View(Task):
     if not self.layers:
       return
 
-    topLayer = self.topLayer()
+    topLayer = self.layers[-1]
     
     #t = ticks / self.transitionTime
     t = self.engine.clock.get_time() / self.transitionTime
