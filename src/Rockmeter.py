@@ -93,6 +93,7 @@ class Layer:
     self.color       = "#FFFFFF"		#color of the image (#FFFFFF is white on text, on images it is full color)
     self.rect        = (0,1,0,1)		#how much of the image do you want rendered (left, right, top, bottom)
     self.condition   = True				#when should the image be shown (by default it will always be shown)
+    self.inPixels    = []               #makes sure to properly scale/position the images in pixels instead of percent
 
     self.effects     = []
 
@@ -147,20 +148,29 @@ class ImageLayer(Layer):
 
     self.alignment = eval(get("alignment", str, "center").upper())
 
-    #this allows you to scale images in relation to pixels instead
-    #of percentage of the size of the image.
     self.scale[0] *=  (self.rect[1] - self.rect[0])
     self.scale[1] *=  (self.rect[3] - self.rect[2])
-    if self.scale[0] > 1.0:
+    #this allows you to scale images in relation to pixels instead
+    #of percentage of the size of the image.
+    if "xscale" in self.inPixels:
       self.scale[0] /= texture.pixelSize[0]
-    if self.scale[1] > 1.0:
+    if "yscale" in self.inPixels:
       self.scale[1] /= texture.pixelSize[1]
+
     self.scale[1] = -self.scale[1]
+    self.scale[0] *= w/640.0
+    self.scale[1] *= h/480.0
     
-    if self.position[0] <= 1.0:
+    if "xpos" in self.inPixels:
+      self.position[0] *= w/640.0
+    else:
       self.position[0] *= w
-    if self.position[1] <= 1.0:
+
+    if "ypos" in self.inPixels:
+      self.position[1] *= h/480.0
+    else:        
       self.position[1] *= h
+
 
     #try:
     #    self.frameX      = get("currentFrameX", int, 1)
@@ -236,10 +246,10 @@ class FontLayer(Layer):
 
     self.useComma = get("useComma", bool, False)
 
-    if self.position[0] > 1.0:
-      self.position[0] /= w
-    if self.position[1] > 1.0:
-      self.position[1] /= h
+    if "xpos" in self.inPixels:
+      self.position[0] *= w/640.0
+    if "ypos" in self.inPixels:
+      self.position[1] *= h/480.0
 
   def render(self, visibility, playerNum):
     w, h, = self.stage.engine.view.geometry[2:4]
@@ -279,11 +289,31 @@ class Slide(Effect):
     self.endCoord   = [eval(get("endX",   str, "0.0")), eval(get("endY",   str, "0.0"))]
 
     self.position = [eval(get("startX", str, "0.0")), eval(get("startY", str, "0.0"))]
+
+    self.inPixels  = get("inPixels", str, "").split("|")
+
     w, h, = self.layer.engine.view.geometry[2:4]
-    if abs(self.startCoord[0]) <= 1.0:
+
+    if "startX" in self.inPixels:
+      self.position[0] *= w/640.0
+    else:
       self.position[0] *= w
-    if abs(self.startCoord[1]) <= 1.0:
+
+    if "startY" in self.inPixels:
+      self.position[1] *= h/480.0
+    else:
       self.position[1] *= h
+
+    if "endX" in self.inPixels:
+      self.endCoord[0] *= w/640.0
+    else:
+      self.endCoord[0] *= w
+
+    if "endY" in self.inPixels:
+      self.endCoord[1] *= h/480.0
+    else:
+      self.endCoord[1] *= h
+
 
     self.reverse = bool(eval(get("reverse", str, "True")))   
 
@@ -367,8 +397,9 @@ class Rockmeter:
     layer = FontLayer(self, section, font)
 
     layer.text      = get("text")
-    layer.shared    = get("shared", bool, False)
+    layer.shared    = get("shared",   bool, False)
     layer.condition = get("condition", str, "True")
+    layer.inPixels  = get("inPixels", str, "").split("|")
 
     section = section.split(":")[0]
     types = ["Slide", "Rotate", "Fade"]
@@ -403,6 +434,7 @@ class Rockmeter:
 
     layer.shared    = get("shared", bool, False)
     layer.condition = get("condition", str, "True")
+    layer.inPixels  = get("inPixels", str, "").split("|")
 
     layer.rect      = eval(get("rect", str, "(0,1,0,1)"))
 
