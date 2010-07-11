@@ -94,6 +94,8 @@ class Layer:
     self.rect        = (0,1,0,1)		#how much of the image do you want rendered (left, right, top, bottom)
     self.condition   = True				#when should the image be shown (by default it will always be shown)
 
+    self.effects     = []
+
   # all variables that should be updated during the rendering process
   # should be in here just for sake of readablity and organization
   def updateLayer(self, playerNum):
@@ -123,7 +125,7 @@ class ImageLayer(Layer):
     #loadImage(self, "drawing", drawing, frameX, frameY)	#this is the image that is loaded for the layer
     
   def updateLayer(self, playerNum):
-    w, h, = self.stage.engine.view.geometry[2:4]
+    w, h, = self.engine.view.geometry[2:4]
     texture = self.drawing
 
     def get(value, type = str, default = None):
@@ -135,11 +137,8 @@ class ImageLayer(Layer):
 
     #all of this has to be repeated instead of using the base method
     #because now things can be calculated in relation to the image's properties
-    try:    self.position  = [get("xpos",   float, 0.0), get("ypos",   float, 0.0)]
-    except: self.position  = [eval(get("xpos")),    eval(get("ypos"))]
-
-    try:    self.scale     = [get("xscale", float, 1.0), get("yscale", float, 1.0)]
-    except: self.scale     = [eval(get("xscale")),  eval(get("yscale"))]
+    self.position  = [eval(get("xpos", str, "0.0")),    eval(get("ypos", str, "0.0"))]
+    self.scale     = [eval(get("xscale", str, "0.5")),  eval(get("yscale", str, "0.5"))]
 
     self.angle       = get("angle", float, 0.0)
     self.color       = get("color", str, "#FFFFFF")
@@ -158,9 +157,9 @@ class ImageLayer(Layer):
       self.scale[1] /= texture.pixelSize[1]
     self.scale[1] = -self.scale[1]
     
-    if not self.position[0] > 1.0:
+    if self.position[0] <= 1.0:
       self.position[0] *= w
-    if not self.position[1] > 1.0:
+    if self.position[1] <= 1.0:
       self.position[1] *= h
 
     #try:
@@ -178,6 +177,8 @@ class ImageLayer(Layer):
     v = 1.0
 
     self.updateLayer(playerNum)
+    for effect in self.effects:
+      effect.update()
 
     rect    = self.rect
 
@@ -191,7 +192,6 @@ class ImageLayer(Layer):
 
     if self.condition:
       self.engine.drawImage(self.drawing, scale, coord, rot, color, rect, alignment = alignment)
-      #drawImage(self.drawing, coord, scale, rot, color, rect, frameX, frameY)
 
 #defines layers that are just font instead of images
 class FontLayer(Layer): 
@@ -207,25 +207,12 @@ class FontLayer(Layer):
     self.color       = "#FFFFFF"
 
   def updateLayer(self, playerNum):
-    w, h, = self.stage.engine.view.geometry[2:4]
+    w, h, = self.engine.view.geometry[2:4]
 
     def get(value, type = str, default = None):
       if self.config.has_option(self.section, value):
         return type(self.config.get(self.section, value))
       return default
-
-    try:    self.position  = [get("xpos",   float, 0.0), get("ypos",   float, 0.0)]
-    except: self.position  = [eval(get("xpos")),    eval(get("ypos"))]
-
-    try:    self.scale     = [get("xscale", float, 1.0), get("yscale", float, 1.0)]
-    except: self.scale     = [eval(get("xscale")),  eval(get("yscale"))]
-
-    self.angle       = get("angle", float, 0.0)
-    self.color       = get("color", str, "#FFFFFF")
-
-    self.condition   = bool(eval(get("condition", str, "True")))
-
-    self.useComma = get("useComma", bool, False)
 
     self.text = eval(get("text"))
     self.color = get("color", str, "#FFFFFF")
@@ -237,6 +224,18 @@ class FontLayer(Layer):
     else:
       self.text = str(self.text)
 
+    wid, hgt = self.font.getStringSize(str(self.text))
+
+    self.position  = [eval(get("xpos", str, "0.0")),    eval(get("ypos", str, "0.0"))]
+    self.scale     = [eval(get("xscale", str, "1.0")),  eval(get("yscale", str, "1.0"))]
+
+    self.angle       = get("angle", float, 0.0)
+    self.color       = get("color", str, "#FFFFFF")
+
+    self.condition   = bool(eval(get("condition", str, "True")))
+
+    self.useComma = get("useComma", bool, False)
+
     if self.position[0] > 1.0:
       self.position[0] /= w
     if self.position[1] > 1.0:
@@ -247,9 +246,9 @@ class FontLayer(Layer):
     v = 1.0
 
     self.updateLayer(playerNum)
+    for effect in self.effects:
+      effect.update()
     
-    wid, hgt = self.font.getStringSize(str(self.text))
-
     glColor3f(*self.engine.theme.hexToColor(self.color))
 
     if self.condition:
@@ -257,54 +256,66 @@ class FontLayer(Layer):
 
 #this is just a template for effects                
 class Effect:
-  def __init__(self, layer):
+  def __init__(self, layer, section):
     pass
 
   def update(self):
     pass
 
-#
 class Slide(Effect):
-  def __init__(self, layer):
+  def __init__(self, layer, section):
     self.layer = layer
+    self.config = layer.config
+    self.section = section
+
     def get(value, type = str, default = None):
       if self.config.has_option(self.section, value):
         return type(self.config.get(self.section, value))
       return default
     
-    self.condition = False
+    self.condition = True
 
-    try:    self.startCoord = [get("startX", float, 0.0), get("startY", float, 0.0)]
-    except: self.startCoord = [eval(get("startX")), eval(get("startY"))]
+    self.startCoord = [eval(get("startX", str, "0.0")), eval(get("startY", str, "0.0"))]
+    self.endCoord   = [eval(get("endX",   str, "0.0")), eval(get("endY",   str, "0.0"))]
 
-    try:    self.endCoord = [get("endX", float, 0.0), get("endY", float, 0.0)]
-    except: self.endCoord = [eval(get("endX")), eval(get("endY"))]
+    self.position = [eval(get("startX", str, "0.0")), eval(get("startY", str, "0.0"))]
+    w, h, = self.layer.engine.view.geometry[2:4]
+    if abs(self.startCoord[0]) <= 1.0:
+      self.position[0] *= w
+    if abs(self.startCoord[1]) <= 1.0:
+      self.position[1] *= h
 
-    self.reverse = bool(eval(get("reverse", str, "True"))    
+    self.reverse = bool(eval(get("reverse", str, "True")))   
 
     #how long it takes for the transition to take place
-    self.transitionTime = 512.0
+    self.transitionTime = get("transitionTime", float, 512.0)
 
   def update(self):
-    self.condition = bool(eval(get("condition", str, "False"))
+    def get(value, type = str, default = None):
+      if self.config.has_option(self.section, value):
+        return type(self.config.get(self.section, value))
+      return default
+
+    self.condition = bool(eval(get("condition", str, "True")))
 
     slideX = (self.endCoord[0] - self.startCoord[0])/self.transitionTime
     slideY = (self.endCoord[1] - self.startCoord[1])/self.transitionTime
 
     if self.condition:
-      if layer.position[0] < self.endCoord[0]:
-        layer.position[0] += slideX
-      if layer.position[1] < self.endCoord[1]:
-        layer.position[1] += slideY
+      if self.position[0] < self.endCoord[0]:
+        self.position[0] += slideX
+      if self.position[1] < self.endCoord[1]:
+        self.position[1] += slideY
     else:
       if self.reverse:
-        if layer.position[0] > self.startCoord[0]:
-          layer.position[0] -= slideX
-        if layer.position[1] > self.startCoord[1]:
-          layer.position[1] -= slideY
+        if self.position[0] > self.startCoord[0]:
+          self.position[0] -= slideX
+        if self.position[1] > self.startCoord[1]:
+          self.position[1] -= slideY
       else:  
-        layer.position = self.startCoord
+        self.position = self.startCoord
     
+    self.layer.position = [self.position[0], self.position[1]]
 
 class Rockmeter:
   def __init__(self, guitarScene, configFileName, coOp = False):
@@ -333,7 +344,7 @@ class Rockmeter:
           continue
         else:
           exist = True
-          if t == "Text":
+          if t == types[1]:
             self.createFont(section)
           else:
             self.createImage(section)
@@ -355,11 +366,25 @@ class Rockmeter:
     font  = get("font")
     layer = FontLayer(self, section, font)
 
-    layer.xres      = get("xres", int, 256)
-    layer.yres      = get("yres", int, 256)
     layer.text      = get("text")
     layer.shared    = get("shared", bool, False)
     layer.condition = get("condition", str, "True")
+
+    section = section.split(":")[0]
+    types = ["Slide", "Rotate", "Fade"]
+    for i in range(5):
+      for t in types:
+        fxsection = "%s:fx%d:%s" % (section, i, t)
+        if not self.config.has_section(fxsection):
+          continue
+        else:
+          if t == types[0]:
+            layer.effects.append(Slide(layer, fxsection))
+#          else if t == types[1]:
+#            layer.effects.append(Rotate(layer, fxsection))
+#          else:
+#            layer.effects.append(Fade(layer, fxsection))
+
 
     Wid, Hgt = self.engine.data.fontDict[font].getStringSize(layer.text)
 
@@ -376,12 +401,25 @@ class Rockmeter:
     drawing   = os.path.join("themes", self.themename, "rockmeter", texture)
     layer     = ImageLayer(self, section, drawing)
 
-    layer.xres      = get("xres", int, 256)
-    layer.yres      = get("yres", int, 256)
     layer.shared    = get("shared", bool, False)
     layer.condition = get("condition", str, "True")
 
     layer.rect      = eval(get("rect", str, "(0,1,0,1)"))
+
+    section = section.split(":")[0]
+    types = ["Slide", "Rotate", "Fade"]
+    for i in range(5):
+      for t in types:
+        fxsection = "%s:fx%d:%s" % (section, i, t)
+        if not self.config.has_section(fxsection):
+          continue
+        else:
+          if t == types[0]:
+            layer.effects.append(Slide(layer, fxsection))
+#          else if t == types[1]:
+#            layer.effects.append(Rotate(layer, fxsection))
+#          else:
+#            layer.effects.append(Fade(layer, fxsection))
             
     self.addLayer(layer, layer.shared)
 
