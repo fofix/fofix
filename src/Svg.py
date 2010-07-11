@@ -98,10 +98,7 @@ class ImgDrawing(object):
     self.texture = None
     self.context = context
     self.cache = None
-    self.transform = SvgTransform()
     self.filename = ImgData
-    self.triangVtx = np.zeros((4,2), dtype=float32)
-    self.textriangVtx = np.zeros((4,2), dtype=float32)
 
     # Detect the type of data passed in
     if type(ImgData) == file:
@@ -112,8 +109,6 @@ class ImgDrawing(object):
       self.texture = Texture()
       self.texture.loadImage(ImgData)
 
-    self.pixelSize = self.texture.pixelSize
-
     # Make sure we have a valid texture
     if not self.texture:
       if type(ImgData) == str:
@@ -123,6 +118,46 @@ class ImgDrawing(object):
       Log.error(e)
       raise RuntimeError(e)
 
+    self.pixelSize = self.texture.pixelSize
+    self.position = [0.0,0.0]
+    self.scale    = [1.0,1.0]
+    self.angle    = 0
+    self.color    = (1.0,1.0,1.0)
+    self.rect     = (0,1,0,1)
+    self.shift    = -.5
+    self.lOffset  = 0.0
+    self.rOffset  = 0.0
+
+    self.createArrays()
+
+  def createArrays(self):
+    self.vtxArray = np.zeros((4,2), dtype=float32)
+    self.texArray = np.zeros((4,2), dtype=float32)
+
+    self.createVtx()
+    self.createTex()
+
+  def createVtx(self):
+    vA = self.vtxArray #short hand variable casting
+    lO = self.lOffset
+    rO = self.rOffset
+    
+    #topLeft, topRight, bottomRight, bottomLeft
+    vA[0,0] = 0.0-lO; vA[0,1] = 1.0
+    vA[1,0] = 1.0-rO; vA[1,1] = 1.0
+    vA[2,0] = 1.0+rO; vA[2,1] = 0.0
+    vA[3,0] = 0.0+lO; vA[3,1] = 0.0
+    
+  def createTex(self):
+    tA = self.texArray
+    rect = self.rect
+
+    #topLeft, topRight, bottomRight, bottomLeft
+    tA[0,0] = rect[0]; tA[0,1] = rect[3]
+    tA[1,0] = rect[1]; tA[1,1] = rect[3]
+    tA[2,0] = rect[1]; tA[2,1] = rect[2]
+    tA[3,0] = rect[0]; tA[3,1] = rect[2]
+
   def convertToTexture(self, width, height):
     if self.texture:
       return
@@ -130,11 +165,6 @@ class ImgDrawing(object):
     e = "SVG drawing does not have a valid texture image."
     Log.error(e)
     raise RuntimeError(e)
-
-  def _getEffectiveTransform(self):
-    transform = SvgTransform(self.transform)
-    transform.transform(self.context.transform)
-    return transform
 
   def width1(self):
     width = self.pixelSize[0]
@@ -159,7 +189,40 @@ class ImgDrawing(object):
     else:
       return 0    
 
-  def draw(self, color = (1, 1, 1, 1), rect = (0,1,0,1), lOffset = 0.0, rOffset = 0.0):
+  def setPosition(self, x, y):
+    self.position = [x,y]
+
+  def setScale(self, width, height):
+    self.scale = [width, height]
+
+  def setAngle(self, angle):
+    self.angle = angle
+
+  def setRect(self, rect):
+    if not rect == self.rect: 
+      self.rect = rect
+      self.createTex()
+
+  def setAlignment(self, alignment):
+    if alignment == 0:  #left
+      self.shift = 0
+    elif alignment == 1:#center
+      self.shift = -.5
+    elif alignment == 2:#right
+      self.shift = .5
+
+  def setColor(self, color):
+    if len(color) == 3:
+      color = (color[0], color[1], color[2], 1.0)
+    self.color = color
+
+  def setOffset(self, lOffset, rOffset):
+    if not (lOffset == self.lOffset and rOffset == self.rOffset):
+      self.lOffset = lOffset
+      self.rOffset = rOffset
+      self.createVtx()
+
+  def draw(self):
     glMatrixMode(GL_TEXTURE)
     glPushMatrix()
     glMatrixMode(GL_PROJECTION)
@@ -169,39 +232,23 @@ class ImgDrawing(object):
     glPushMatrix()
 
     glLoadIdentity()
-    self._getEffectiveTransform().applyGL()
 
-    glScalef(self.texture.pixelSize[0], self.texture.pixelSize[1], 1)
-    glTranslatef(-.5, -.5, 0)
-    glColor4f(*color)
-
+    glTranslate(self.position[0], self.position[1], 0.0)
+    glScalef(self.scale[0], self.scale[1], 1.0)
+    glRotatef(self.angle, 0, 0, 1)
+    
+    glScalef(self.pixelSize[0], self.pixelSize[1], 1)
+    glTranslatef(self.shift, -.5, 0)
+    glColor4f(*self.color)
 
     glEnable(GL_TEXTURE_2D)
     self.texture.bind()
     
-    self.triangVtx[0,0] = 0.0-lOffset
-    self.triangVtx[0,1] = 1.0
-    self.triangVtx[1,0] = 1.0-rOffset
-    self.triangVtx[1,1] = 1.0
-    self.triangVtx[2,0] = 0.0+lOffset
-    self.triangVtx[2,1] = 0.0
-    self.triangVtx[3,0] = 1.0+rOffset
-    self.triangVtx[3,1] = 0.0
-    
-    self.textriangVtx[0,0] = rect[0]
-    self.textriangVtx[0,1] = rect[3]
-    self.textriangVtx[1,0] = rect[1]
-    self.textriangVtx[1,1] = rect[3]
-    self.textriangVtx[2,0] = rect[0]
-    self.textriangVtx[2,1] = rect[2]
-    self.textriangVtx[3,0] = rect[1]
-    self.textriangVtx[3,1] = rect[2]
-    
     glEnableClientState(GL_TEXTURE_COORD_ARRAY)    
     glEnableClientState(GL_VERTEX_ARRAY)
-    glVertexPointerf(self.triangVtx)
-    glTexCoordPointerf(self.textriangVtx)
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, self.triangVtx.shape[0])
+    glVertexPointerf(self.vtxArray)
+    glTexCoordPointerf(self.texArray)
+    glDrawArrays(GL_QUADS, 0, self.vtxArray.shape[0])
     glDisableClientState(GL_VERTEX_ARRAY)
     glDisableClientState(GL_TEXTURE_COORD_ARRAY)
     

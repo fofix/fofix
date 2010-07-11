@@ -889,54 +889,36 @@ class GameEngine(object):
 
   #blazingamer - cleans up the work for rendering an image
   #volshebnyi - now images can be resized to fit to screen
-  def drawImage(self, image, scale, coord, rot = 0, color = (1,1,1,1), rect = (0,1,0,1), stretched = 0, fit = 0, repeat = 0, repeatOffset = 0, lOffset = 0.0, rOffset = 0.0, alignment = 1):
+  def drawImage(self, image, scale = (1.0, -1.0), coord = (0, 0), rot = 0, color = (1,1,1,1), rect = (0,1,0,1), stretched = 0, fit = 0, repeat = 0, repeatOffset = 0, lOffset = 0.0, rOffset = 0.0, alignment = 1):
     
-    image.transform.reset()
-    image.transform.rotate(rot)
-    scale = list(scale)
-    coord = list(coord)
-    if stretched == 0: #don't sctretch
-      scale = scale
-    elif stretched == 1: # fit to width
-      scale[0] = scale[0] / image.width1() * 640
+    width, height = scale
+    x, y = coord
+    if stretched == 1: # fit to width
+      width  = width  / image.pixelSize[0] * self.view.geometry[2]
     elif stretched == 2: # fit to height
-      scale[1] = scale[1] / image.height1() * 480
+      height = height / image.pixelSize[1] * self.view.geometry[3]
     elif stretched == 11: # fit to width and keep ratio
-      scale[0] = scale[0] / image.width1() * 640
-      scale[1] = scale[1] / image.width1() * 640
+      width  = width  / image.pixelSize[0] * self.view.geometry[2]
+      height = height / image.pixelSize[0] * self.view.geometry[2]
     elif stretched == 12: # fit to height and keep ratio
-      scale[0] = scale[0] / image.height1() * 480
-      scale[1] = scale[1] / image.height1() * 480
-    else: # fit to screen
-      scale[0] = scale[0] / image.width1() * 640
-      scale[1] = scale[1] / image.height1() * 480
-    image.transform.scale(scale[0],scale[1])
+      width  = width  / image.pixelSize[1] * self.view.geometry[3]
+      height = height / image.pixelSize[1] * self.view.geometry[3]
+    elif not stretched == 0: # fit to screen
+      width  = width  / image.pixelSize[0] * self.view.geometry[2]
+      height = height / image.pixelSize[1] * self.view.geometry[3]
+
     if fit == 1: #y is on top (not center)
-      coord[1] = coord[1] - ((image.height1() * abs(scale[1]))*.5*(self.view.geometry[3]/float(480)))
+      y = Y - ((image.pixelSize[1] * abs(scale[1]))*.5*(self.view.geometry[3]/480.0))
     elif fit == 2: #y is on bottom
-      coord[1] = coord[1] + ((image.height1() * abs(scale[1]))*.5*(self.view.geometry[3]/float(480)))
+      y = y + ((image.pixelSize[1] * abs(scale[1]))*.5*(self.view.geometry[3]/480.0))
 
-    if alignment == 0:  #x is on left
-      coord[0] = coord[0] + ((image.width1() * abs(scale[0]))*.5*(self.view.geometry[2]/float(640)))
-    elif alignment == 2:#x is on right
-      coord[0] = coord[0] - ((image.width1() * abs(scale[0]))*.5*(self.view.geometry[2]/float(640)))
-
-    if len(color) == 3:
-      color = (color[0], color[1], color[2], 1.0)
-    if repeat == 1: #repeat-y
-      coord[1] += repeatOffset
-      height = (image.height1() * abs(scale[1]))*(self.view.geometry[3]/float(480))
-      while coord[1] > self.view.geometry[3]+height:
-        coord[1] -= height
-      image.transform.translate(coord[0],coord[1])
-      while coord[1] > -height/2.0:
-        if coord[1] < self.view.geometry[3] + (height/2.0):
-          image.draw(color = color, rect = rect, lOffset = lOffset, rOffset = rOffset)
-        coord[1] -= height
-        image.transform.translate(0,-height)
-    else:
-      image.transform.translate(coord[0],coord[1])
-      image.draw(color = color, rect = rect, lOffset = lOffset, rOffset = rOffset)
+    image.setRect(rect)  
+    image.setScale(width, height)
+    image.setPosition(x, y)
+    image.setAlignment(alignment)
+    image.setAngle(rot)
+    image.setColor(color)
+    image.draw()
 
   #blazingamer - simplifies tex rendering
   def draw3Dtex(self, image, vertex, texcoord, coord = None, scale = None, rot = None, color = (1,1,1), multiples = False, alpha = False, depth = False, vertscale = 0):
