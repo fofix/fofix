@@ -25,9 +25,6 @@ import Config
 import math
 import Log
 import os
-import random   #MFH - needed for new stage background handling
-
-import Version # Provides dataPath
 
 from OpenGL.GL import *
 
@@ -247,9 +244,9 @@ class FontLayer(Layer):
     self.useComma = get("useComma", bool, False)
 
     if "xpos" in self.inPixels:
-      self.position[0] *= w/640.0
+      self.position[0] /= 640.0
     if "ypos" in self.inPixels:
-      self.position[1] *= h/480.0
+      self.position[1] /= 480.0
 
   def render(self, visibility, playerNum):
     w, h, = self.stage.engine.view.geometry[2:4]
