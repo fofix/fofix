@@ -303,13 +303,13 @@ class Stage(object):
     if self.mode != 2:
       if self.rotationMode == 0:
         self.engine.drawImage(self.background, scale = (self.backgroundScaleFactor,-self.backgroundScaleFactor),
-                              coord = (self.wFull/2,self.hFull/2))
+                              coord = (self.wFull/2,self.hFull/2), stretched = 3)
 
       #myfingershurt:
       else:
         #MFH - use precalculated scale factors instead
         self.engine.drawImage(self.imgArr[self.arrNum], scale = (self.imgArrScaleFactors[self.arrNum],-self.imgArrScaleFactors[self.arrNum]),
-                              coord = (self.wFull/2,self.hFull/2))
+                              coord = (self.wFull/2,self.hFull/2), stretched = 3)
 
   def updateDelays(self):
     self.rotateDelay = self.engine.config.get("game",  "stage_rotate_delay") #myfingershurt - user defined stage rotate delay
