@@ -212,16 +212,12 @@ class View(Task):
         glOrtho(self.geometryNormalized[0], self.geometryNormalized[2] - self.geometryNormalized[0],
                 self.geometryNormalized[1], self.geometryNormalized[3] - self.geometryNormalized[1], -100, 100);
     else:
-      if yIsDown:
-        glOrtho(self.geometry[0], self.geometry[2] - self.geometry[0],
-                self.geometry[3] - self.geometry[1], self.geometry[1], -100, 100);
-      else:
-        glOrtho(self.geometry[0], self.geometry[2] - self.geometry[0],
-                self.geometry[1], self.geometry[3] - self.geometry[1], -100, 100);
+      glOrtho(self.geometry[0], self.geometry[2] - self.geometry[0],
+            self.geometry[1], self.geometry[3] - self.geometry[1], -100, 100);
 
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
+    glMatrixMode(GL_MODELVIEW)
+    glPushMatrix()
+    glLoadIdentity()
   
   def resetProjection(self):
     glMatrixMode(GL_PROJECTION)
@@ -236,17 +232,28 @@ class View(Task):
     self.geometry[3] = int(geometry[3])
     self.initGeometryAll()
     self.initGeometryAllHalf()
-    self.setNormalizedGeometry()
     self.setViewport(screens)
 
+    glMatrixMode(GL_MODELVIEW)
+    glLoadIdentity()
+
   def setViewport(self, screens=1, screen=0):
-    glViewport(int(self.geometryAll[screens-1,screen,0]), int(self.geometryAll[screens-1,screen,1]), int(self.geometryAll[screens-1,screen,2]), int(self.geometryAll[screens-1,screen,3]))
-    glScissor(int(self.geometryAll[screens-1,screen,0]), int(self.geometryAll[screens-1,screen,1]), int(self.geometryAll[screens-1,screen,2]), int(self.geometryAll[screens-1,screen,3]))
+    viewport = [int(self.geometryAll[screens-1,screen,0]), 
+                int(self.geometryAll[screens-1,screen,1]),
+                int(self.geometryAll[screens-1,screen,2]),
+                int(self.geometryAll[screens-1,screen,3])]
+    
+    glViewport(*viewport)
+    glScissor (*viewport)
 
   def setViewportHalf(self, screens=1, screen=0):
-    glViewport(int(self.geometryAllHalf[screens-1,screen,0]), int(self.geometryAllHalf[screens-1,screen,1]), int(self.geometryAllHalf[screens-1,screen,2]), int(self.geometryAllHalf[screens-1,screen,3]))
-    glScissor(int(self.geometryAllHalf[screens-1,screen,0]), int(self.geometryAllHalf[screens-1,screen,1]), int(self.geometryAllHalf[screens-1,screen,2]), int(self.geometryAllHalf[screens-1,screen,3]))    
-
+    viewport = [int(self.geometryAllHalf[screens-1,screen,0]),
+                int(self.geometryAllHalf[screens-1,screen,1]),
+                int(self.geometryAllHalf[screens-1,screen,2]),
+                int(self.geometryAllHalf[screens-1,screen,3])]
+    glViewport(*viewport)
+    glScissor (*viewport)
+    
   def render(self):
     #print [(str(m.__class__), v) for m, v in self.visibility.items()]
     for layer in self.layers:
