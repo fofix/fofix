@@ -497,9 +497,9 @@ class Rockmeter:
 
     #allows for bassgroove
     if player.isBassGuitar:
-      streakMax = 60    
+      streakMax = 50    
     else:
-      streakMax = 40
+      streakMax = 30
 
     if streak >= streakMax:
       multiplier = int(streakMax*.1) + 1
