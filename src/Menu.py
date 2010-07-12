@@ -492,12 +492,9 @@ class Menu(Layer, KeyListener):
             boxYOffset = (1.0 - (y*4.0/3.0) - (Th*1.2/2))*hS
             subSelectHYFactor = 640.000/self.engine.view.aspectRatio
             subSelectHFactor = subSelectHYFactor/self.engine.data.subSelectImgH
-            self.engine.data.submenuSelect.transform.reset()
-            tempWScale = frameWidth*self.engine.data.subSelectWFactor
-            tempHScale = -(frameHeight)*subSelectHFactor
-            self.engine.data.submenuSelect.transform.scale(tempWScale,tempHScale)
-            self.engine.data.submenuSelect.transform.translate(boxXOffset,boxYOffset)
-            self.engine.data.submenuSelect.draw()
+            self.engine.drawImage(self.engine.data.submenuSelect,
+                                  scale = (tempWScale,tempHScale),
+                                  coord = (boxXOffset,boxYOffset))
           
           font.render(text, (x - v / 4, y), scale = scale)
         
