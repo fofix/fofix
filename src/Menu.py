@@ -419,7 +419,7 @@ class Menu(Layer, KeyListener):
           else:
             xpos = (0,.5)
           ypos = float(i+self.viewOffset)
-          self.engine.drawImage(self.menuText, scale = (.5*self.menuScale,(-1.0/n*self.menuScale),
+          self.engine.drawImage(self.menuText, scale = (.5*self.menuScale,(-1.0/n*self.menuScale)),
                                 coord = (wS*self.menux,(hS*self.menuy)-(hS*self.vSpace)*i),
                                 rect = (xpos[0],xpos[1],ypos/n,(ypos+1.0)/n))
         else:

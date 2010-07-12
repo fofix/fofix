@@ -90,18 +90,17 @@ class Picture(Element):
   def __init__(self, engine, fileName, height):
     self.height = height
     self.engine = engine
-    engine.loadImgDrawing(self, "drawing", fileName)
+    self.engine = engine
+    self.engine.loadImgDrawing(self, "drawing", fileName)
 
   def getHeight(self):
     return self.height
 
   def render(self, offset):
     offset = (offset*4.0)/3.0  #stump: get it back into alignment...
-    self.drawing.transform.reset()
     w, h = self.engine.view.geometry[2:4]
-    self.drawing.transform.translate(.5 * w, h - (.5 * self.height + offset) * h * float(w) / float(h))
-    self.drawing.transform.scale(1, -1)
-    self.drawing.draw()
+    self.engine.drawImage(self.drawing, scale = (1, -1), 
+                          coord = (.5 * w, h - (.5 * self.height + offset) * h * float(w) / float(h)))
     
 # evilynux - Updated to latest MFH-Alarian mod. Alot changed compared to upstream FoF.
 #            Removed song, our revamped MainMenu already provides songs.
