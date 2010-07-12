@@ -889,8 +889,7 @@ class GameEngine(object):
 
   def drawImage(self, image, scale = (1.0, -1.0), coord = (0, 0), rot = 0, \
                 color = (1,1,1,1), rect = (0,1,0,1), stretched = 0, fit = 0, \
-                repeat = 0, repeatOffset = 0, lOffset = 0.0, rOffset = 0.0, \
-                alignment = 1):
+                repeat = 0, repeatOffset = 0, alignment = 1):
     """
     Draws the image/surface to screen
 
@@ -913,8 +912,6 @@ class GameEngine(object):
                          on the top side (1), bottom side (2), or center point (any other value) of the image
     @param repeat:       This value is no longer used and can be removed once all code using it has be adjusted to this change
     @param repeatOffset: This value is no longer used and can be removed once all code using it has be adjusted to this change
-    @param lOffset:      This value is no longer used and can be removed once all code using it has be adjusted to this change
-    @param rOffset:      This value is no longer used and can be removed once all code using it has be adjusted to this change
     @param alignment:    Adjusts the texture so the coordinate for x-axis placement can either be
                          on the left side (0), center point (1), or right(2) side of the image 
     """

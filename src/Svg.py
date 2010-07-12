@@ -125,8 +125,6 @@ class ImgDrawing(object):
     self.color    = (1.0,1.0,1.0)
     self.rect     = (0,1,0,1)
     self.shift    = -.5
-    self.lOffset  = 0.0
-    self.rOffset  = 0.0
 
     self.createArrays()
 
@@ -139,14 +137,12 @@ class ImgDrawing(object):
 
   def createVtx(self):
     vA = self.vtxArray #short hand variable casting
-    lO = self.lOffset
-    rO = self.rOffset
     
     #topLeft, topRight, bottomRight, bottomLeft
-    vA[0,0] = 0.0-lO; vA[0,1] = 1.0
-    vA[1,0] = 1.0-rO; vA[1,1] = 1.0
-    vA[2,0] = 1.0+rO; vA[2,1] = 0.0
-    vA[3,0] = 0.0+lO; vA[3,1] = 0.0
+    vA[0,0] = 0.0; vA[0,1] = 1.0
+    vA[1,0] = 1.0; vA[1,1] = 1.0
+    vA[2,0] = 1.0; vA[2,1] = 0.0
+    vA[3,0] = 0.0; vA[3,1] = 0.0
     
   def createTex(self):
     tA = self.texArray
@@ -215,12 +211,6 @@ class ImgDrawing(object):
     if len(color) == 3:
       color = (color[0], color[1], color[2], 1.0)
     self.color = color
-
-  def setOffset(self, lOffset, rOffset):
-    if not (lOffset == self.lOffset and rOffset == self.rOffset):
-      self.lOffset = lOffset
-      self.rOffset = rOffset
-      self.createVtx()
 
   def draw(self):
     glMatrixMode(GL_TEXTURE)
