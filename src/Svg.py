@@ -209,7 +209,7 @@ class ImgDrawing(object):
     elif alignment == 1:#center
       self.shift = -.5
     elif alignment == 2:#right
-      self.shift = .5
+      self.shift = -1.0
 
   def setColor(self, color):
     if len(color) == 3:
