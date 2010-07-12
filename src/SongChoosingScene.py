@@ -968,7 +968,7 @@ class SongChoosingScene(Scene):
     
     #render the background (including the header and footer)
     if self.setlistStyle == 1 and self.img_list_bg:
-      self.engine.drawImage(self.img_list_bg, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 11, repeat = 1, repeatOffset = self.yPos)
+      self.engine.drawImage(self.img_list_bg, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 11)
     elif self.img_list_bg:
       self.engine.drawImage(self.img_list_bg, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 3)
     if self.img_list_head:
