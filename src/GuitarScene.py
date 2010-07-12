@@ -6035,11 +6035,6 @@ class GuitarScene(Scene):
                       tempHScale = -(frameHeight)*self.soloFrameWFactor
 
                       self.engine.drawImage(self.soloFrame, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*boxXOffset,boxYOffset))
-                      #self.soloFrame.transform.reset()
-                      #self.soloFrame.transform.scale(tempWScale,tempHScale)
-                      #self.soloFrame.transform.translate(self.wPlayer[i]*boxXOffset,boxYOffset)
-                      #self.soloFrame.draw()
-  
     
                     self.solo_soloFont.render(text1, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #centered
                     self.solo_soloFont.render(text2, (0.5 - Tw2/2, yOffset+lineSpacing),(1, 0, 0),txtSize)   #centered
@@ -6370,13 +6365,9 @@ class GuitarScene(Scene):
                     else:
                       boxYOffset = self.hPlayer[i]-(self.hPlayer[i]* ((yOffset + tH/2.0 ) / self.fontScreenBottom) )   
                       boxXOffset = self.wPlayer[i]*xOffset
-                    #self.breScoreFrame.transform.reset()                  
                     tempWScale = frameWidth*self.breScoreFrameWFactor
                     tempHScale = -(frameHeight)*self.breScoreFrameWFactor
                     self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
-                    #self.breScoreFrame.transform.scale(tempWScale,tempHScale)
-                    #self.breScoreFrame.transform.translate(self.wPlayer[i]*xOffset,boxYOffset)
-                    #self.breScoreFrame.draw()
 
                   self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize/2.0)
 
