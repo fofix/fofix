@@ -887,9 +887,37 @@ class GameEngine(object):
             star = self.data.star1
         self.drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), stretched=11)
 
-  #blazingamer - cleans up the work for rendering an image
-  #volshebnyi - now images can be resized to fit to screen
-  def drawImage(self, image, scale = (1.0, -1.0), coord = (0, 0), rot = 0, color = (1,1,1,1), rect = (0,1,0,1), stretched = 0, fit = 0, repeat = 0, repeatOffset = 0, lOffset = 0.0, rOffset = 0.0, alignment = 1):
+  def drawImage(self, image, scale = (1.0, -1.0), coord = (0, 0), rot = 0, \
+                color = (1,1,1,1), rect = (0,1,0,1), stretched = 0, fit = 0, \
+                repeat = 0, repeatOffset = 0, lOffset = 0.0, rOffset = 0.0, \
+                alignment = 1):
+    """
+    Draws the image/surface to screen
+
+    @param image:        The openGL surface
+    @param scale:        Scale factor (between 0.0 and 1.0, second value must be negative due to texture flipping)
+    @param coord:        Where the image will be translated to on the screen
+    @param rot:          How many degrees it will be rotated
+    @param color:        The color of the image
+                             (values are between 0.0 and 1.0)
+                             (can have 3 values or 4, if 3 are given the alpha is automatically set to 1.0)
+    @param rect:         The surface rectangle, this is used for cropping the texture
+    @param stretched:    Stretches the image in one of 5 ways according to following passed values
+                             1) fits it to the width of the viewport
+                             2) fits it to the height of the viewport
+                            11) fits it to the width of the viewport and scales the height while keeping the aspect ratio
+                            12) fits it to the heigh of the viewport and scales the width while keeping the aspect ratio
+                             0) stretches it so it fits the whole viewport
+                         Any other values will have the image maintain its size passed by scale
+    @param fit:          Adjusts the texture so the coordinate for the y-axis placement can be
+                         on the top side (1), bottom side (2), or center point (any other value) of the image
+    @param repeat:       This value is no longer used and can be removed once all code using it has be adjusted to this change
+    @param repeatOffset: This value is no longer used and can be removed once all code using it has be adjusted to this change
+    @param lOffset:      This value is no longer used and can be removed once all code using it has be adjusted to this change
+    @param rOffset:      This value is no longer used and can be removed once all code using it has be adjusted to this change
+    @param alignment:    Adjusts the texture so the coordinate for x-axis placement can either be
+                         on the left side (0), center point (1), or right(2) side of the image 
+    """
     
     width, height = scale
     x, y = coord
