@@ -25,7 +25,7 @@ import pygame
 from OpenGL.GL import *
 import sys
 from Texture import Texture
-from numpy import array, float32
+from numpy import zeros, float32
 
 DEFAULT_SCALE = 0.002
 
@@ -88,8 +88,8 @@ class Font:
     self.font.set_italic(italic)
     self.font.set_underline(underline)
     self.stringsCache = Cache(256)
-    self.square_prim = array([[.0,.0],[.0,.0],[.0,.0],[.0,.0]], dtype=float32)
-    self.square_tex  = array([[.0,.0],[.0,.0],[.0,.0],[.0,.0]], dtype=float32)
+    self.square_prim = zeros((4,2), dtype=float32)
+    self.square_tex  = zeros((4,2), dtype=float32)
 
   def getStringSize(self, s, scale = DEFAULT_SCALE):
     """
