@@ -1,15 +1,15 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# FoFiX Spanish (Spain) Translation esES
+# Creative Commons v3 (http://creativecommons.org/licenses/by/3.0/)
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Borisdsp <borisdsp@gmail.com>, 2010.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: FoFiX v. 3.120\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2009-09-02 04:03-0600\n"
-"PO-Revision-Date: 2009-09-02 04:23-0700\n"
-"Last-Translator: \n"
+"PO-Revision-Date: 2010-06-30 12:22+0100\n"
+"Last-Translator: Borisdsp <borisdsp@gmail.com>\n"
 "Language-Team: FoFiX\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
@@ -28,7 +28,7 @@ msgstr "que fue escrito sobre el Ultimate mod de UltimateCoffee."
 
 #: Credits.py:128
 msgid "which was built on RogueF's RF_mod 4.15,"
-msgstr "que fue escrito tambien sobre el RF_Mod 4.15 de RogueF's."
+msgstr "que fue escrito también sobre el RF_Mod 4.15 de RogueF's."
 
 #: Credits.py:129
 msgid "which was, of course, built on Frets on Fire 1.2.451,"
@@ -40,7 +40,7 @@ msgstr "que fue creado por Unreal Voodoo"
 
 #: Credits.py:131
 msgid "No Particular Order"
-msgstr "Sin ningun orden en particular"
+msgstr "Sin ningún orden en particular"
 
 #: Credits.py:132
 msgid "Active Coders:"
@@ -52,7 +52,7 @@ msgstr "Programadores antiguos:"
 
 #: Credits.py:134
 msgid "Main Graphic Contributors:"
-msgstr "Principales colaboradores de graficos:"
+msgstr "Principales colaboradores de gráficos:"
 
 #: Credits.py:135
 msgid "Translators:"
@@ -68,7 +68,7 @@ msgstr "Creadores del modo carrera"
 
 #: Credits.py:138
 msgid "Honorary Credits to:"
-msgstr "Creditos honorarios a:"
+msgstr "Créditos honorarios a:"
 
 #: Credits.py:139
 msgid "Donations to MFH"
@@ -80,7 +80,7 @@ msgstr "Donaciones a akedrou"
 
 #: Credits.py:141
 msgid "Major Donations:"
-msgstr "Donaciones Mayores:"
+msgstr "Donaciones mayores:"
 
 #: Credits.py:142
 msgid "Other Donations:"
@@ -88,7 +88,7 @@ msgstr "Otras donaciones:"
 
 #: Credits.py:143
 msgid "Other Credits:"
-msgstr "Otros creditos:"
+msgstr "Otros créditos:"
 
 #: Credits.py:144
 msgid "Jurgen FoF tutorial inspired by adam02"
@@ -96,15 +96,15 @@ msgstr "Tutorial de FoF con Jurgen inspirado por adam02"
 
 #: Credits.py:145
 msgid "Drum test song tutorial by Heka"
-msgstr "Cancion test de bateria creada por Heka"
+msgstr "Canción test de batería creada por Heka"
 
 #: Credits.py:146
 msgid "Bang Bang Mystery Man song tutorial is from the original FoF"
-msgstr "La cancion tutorial \"Bang Bang Mystery Man\" es del FoF original"
+msgstr "La canción tutorial \"Bang Bang Mystery Man\" es del FoF original"
 
 #: Credits.py:147
 msgid "Drum Rolls practice tutorial by venom426"
-msgstr "Tutorial de practica de bateria creado por venom426"
+msgstr "Tutorial de practica de batería creado por venom426"
 
 #: Credits.py:148
 msgid "If you see your work included in this game and you aren't"
@@ -112,35 +112,35 @@ msgstr "Si ves tu trabajo incluido en este juego y no apareces"
 
 #: Credits.py:149
 msgid "in the credits, please leave a polite post stating what you"
-msgstr "en los creditos, por favor deja un mensaje tranquilo poniendo lo que"
+msgstr "en los créditos, por favor deja un mensaje tranquilo poniendo que"
 
 #: Credits.py:150
 msgid "did and when, as specific as possible."
-msgstr "hicistes, y especifica cuanto puedas."
+msgstr "has hecho, y especifica cuanto puedas."
 
 #: Credits.py:151
 msgid "If you can, please provide a link to your original posting"
-msgstr "Si puedes, por favor pon un link al sitio original"
+msgstr "Si puedes, pon un link al sitio original"
 
 #: Credits.py:152
 msgid "of the work in question."
-msgstr "del trabajo que hicistes en cuestion."
+msgstr "del trabajo que hicistes en cuestión."
 
 #: Credits.py:153
 msgid "Then we can properly credit you."
-msgstr "Entonces podremos ponerte en los creditos correctamente."
+msgstr "Entonces podremos ponerte en los créditos correctamente."
 
 #: Credits.py:154
 msgid "Thank you for your contribution."
-msgstr "Gracias por tu contribucion."
+msgstr "Gracias por tu contribución."
 
 #: Credits.py:155
 msgid "Please keep in mind that it is not easy to trace down and"
-msgstr "Porfavor ten en cuenta que no es facil recordar"
+msgstr "Por favor ten en cuenta que no es fácil recordar"
 
 #: Credits.py:156
 msgid "credit every single person who contributed; if your name is"
-msgstr "y poner en los creditos a cada persona que ha contribuido, si tu nombre no esta"
+msgstr "y poner en los créditos a cada persona que ha contribuido, si tu nombre no está"
 
 #: Credits.py:157
 msgid "not included, it was not meant to slight you."
@@ -153,12 +153,12 @@ msgstr "Me equivoque."
 #: Credits.py:160
 #, python-format
 msgid "%s theme credits:"
-msgstr "%s Creditos del tema"
+msgstr "%s Créditos del tema"
 
 #: Credits.py:161
 #, python-format
 msgid "%s theme specific thanks:"
-msgstr "%s Creditos especificos del tema:"
+msgstr "%s Créditos específicos del tema:"
 
 #: Credits.py:163
 msgid "French"
@@ -178,11 +178,11 @@ msgstr "Italiano"
 
 #: Credits.py:167
 msgid "Pig Latin"
-msgstr "Latin (jerga)"
+msgstr "Latín (jerga)"
 
 #: Credits.py:168
 msgid "Portuguese (Brazilian)"
-msgstr "Portugues (de Brasil)"
+msgstr "Portugués (de Brasil)"
 
 #: Credits.py:169
 msgid "Russian"
@@ -202,7 +202,7 @@ msgstr "Creado con:"
 
 #: Credits.py:229
 msgid "Source Code available under the GNU General Public License"
-msgstr "Codigo fuente disponible bajo la Licencia General Publica de GNU"
+msgstr "Código fuente disponible bajo la Licencia General Publica de GNU"
 
 #: Credits.py:233
 msgid "Copyright 2006, 2007 by Unreal Voodoo"
@@ -210,7 +210,7 @@ msgstr "Copyright 2006, 2007 por Unreal Voodoo"
 
 #: Credits.py:234
 msgid "Copyright 2008, 2009 by Team FoFiX"
-msgstr "Copyright 2008, 2009 por Team FoFix"
+msgstr "Copyright 2008-2010 por Team FoFix"
 
 #: Data.py:183
 msgid "__lefttoright__"
@@ -223,7 +223,7 @@ msgstr "<Vale>"
 #: Dialogs.py:910
 #: Dialogs.py:927
 msgid "Browsing Collection..."
-msgstr "Explorando coleccion..."
+msgstr "Explorando colección..."
 
 #: Dialogs.py:987
 #: Song.py:4372
@@ -361,7 +361,7 @@ msgstr "No encontrado"
 #: Dialogs.py:2956
 #: Dialogs.py:3321
 msgid "Loading Preview..."
-msgstr "Cargando Previsualizacion..."
+msgstr "Cargando previsualización..."
 
 #: Dialogs.py:1876
 #: Dialogs.py:2183
@@ -386,7 +386,7 @@ msgstr "Tocada %d veces"
 #: Dialogs.py:1921
 #: Dialogs.py:2116
 msgid "Play To Advance."
-msgstr "Tocala para azanzar."
+msgstr "Tócala para avanzar."
 
 #: Dialogs.py:2001
 msgid "One Song In This Setlist"
@@ -479,7 +479,7 @@ msgstr "Canción aleatoria"
 #: Dialogs.py:3472
 #: Dialogs.py:3492
 msgid "Nil"
-msgstr "Cero"
+msgstr "Nada"
 
 #: Dialogs.py:2401
 #: Dialogs.py:2748
@@ -517,7 +517,7 @@ msgstr "GUITARRA"
 
 #: Dialogs.py:3280
 msgid "DRUM"
-msgstr "BATERIA"
+msgstr "BATERÍA"
 
 #: Dialogs.py:3283
 msgid "BASS"
@@ -529,15 +529,15 @@ msgstr "VOCALES"
 
 #: Dialogs.py:3293
 msgid "SORTING:"
-msgstr "COLOCACION:"
+msgstr "COLOCACIÓN:"
 
 #: Dialogs.py:3295
 msgid "ALPHABETICALLY BY TITLE"
-msgstr "ALFABETICA POR TITULO"
+msgstr "ALFABÉTICA POR TITULO"
 
 #: Dialogs.py:3297
 msgid "ALPHABETICALLY BY ARTIST"
-msgstr "ALFABETICA POR ARTISTA"
+msgstr "ALFABÉTICA POR ARTISTA"
 
 #: Dialogs.py:3299
 msgid "BY PLAY COUNT"
@@ -545,11 +545,11 @@ msgstr "POR EL CONTADOR DE VECES TOCADA"
 
 #: Dialogs.py:3301
 msgid "ALPHABETICALLY BY ALBUM"
-msgstr "ALFABETICA POR ALBUM"
+msgstr "ALFABÉTICA POR ALBUM"
 
 #: Dialogs.py:3303
 msgid "ALPHABETICALLY BY GENRE"
-msgstr "ALFABETICA POR GENERO"
+msgstr "ALFABÉTICA POR GENERO"
 
 #: Dialogs.py:3305
 msgid "BY YEAR"
@@ -565,7 +565,7 @@ msgstr "POR DIFICULTAD DE INSTRUMENTO"
 
 #: Dialogs.py:3311
 msgid "BY SONG COLLECTION"
-msgstr "POR COLECCION DE CANCIONES"
+msgstr "POR COLECCIÓN DE CANCIONES"
 
 #: Dialogs.py:3631
 msgid "[Parent Folder]"
@@ -586,13 +586,13 @@ msgstr "Amarillo (3º) / Azul (4º) para cambiar, verde (1º) para confirmar:"
 
 #: Dialogs.py:3778
 msgid "Loading necks..."
-msgstr "Cargando mastiles..."
+msgstr "Cargando mástiles..."
 
 #: Dialogs.py:3850
 #: GameEngine.py:101
 #: Lobby.py:607
 msgid "Neck"
-msgstr "Mastil"
+msgstr "Mástil"
 
 #: Dialogs.py:4055
 msgid "Loading avatars..."
@@ -604,11 +604,11 @@ msgstr "Elije tu avatar:"
 
 #: Dialogs.py:4477
 msgid "Press Start to Begin!"
-msgstr "Apreta Empezar para comenzar!"
+msgstr "¡Pulsa Empezar para comenzar!"
 
 #: Dialogs.py:4478
 msgid "Use the keyboard to select or just play some notes!"
-msgstr "Usa el teclado para seleccionar o toca algunas notas!"
+msgstr "¡Usa el teclado para seleccionar o toca algunas notas!"
 
 #: Dialogs.py:4489
 msgid "No Controller"
@@ -625,12 +625,12 @@ msgstr "Guitarra por defecto"
 
 #: Dialogs.py:4499
 msgid "Default Drums"
-msgstr "Bateria por defecto"
+msgstr "Batería por defecto"
 
 #: Dialogs.py:4501
 #: Player.py:438
 msgid "Default Microphone"
-msgstr "Microfono por defecto"
+msgstr "Micrófono por defecto"
 
 #: Dialogs.py:4567
 msgid "controller"
@@ -643,7 +643,7 @@ msgstr "controladores"
 #: Dialogs.py:4570
 #, python-format
 msgid "You only have %d %s defined. You need at least %d for this mode."
-msgstr "Solo tienes %d %s selecionados, Necesitas por lo menos %d para este modo."
+msgstr "Solo tienes %d %s seleccionados, Necesitas por lo menos %d para este modo."
 
 #: Dialogs.py:4867
 #, python-format
@@ -742,7 +742,7 @@ msgstr "5º Traste de solo"
 
 #: Dialogs.py:4900
 msgid "Pick!"
-msgstr "Pua"
+msgstr "Púa"
 
 #: Dialogs.py:4900
 #: Dialogs.py:4908
@@ -756,39 +756,39 @@ msgstr "Poder estrella"
 #: GuitarScene.py:530
 #: Player.py:200
 msgid "Whammy"
-msgstr "Distorsion"
+msgstr "Distorsión"
 
 #: Dialogs.py:4906
 #: Dialogs.py:4919
 #: Player.py:189
 #: Player.py:194
 msgid "Drum #1"
-msgstr "Pad 1 de Bateria"
+msgstr "Pad 1 de Batería"
 
 #: Dialogs.py:4906
 #: Player.py:190
 #: Player.py:195
 msgid "Drum #2"
-msgstr "Pad 2 de Bateria"
+msgstr "Pad 2 de Batería"
 
 #: Dialogs.py:4907
 #: Dialogs.py:4920
 #: Player.py:191
 #: Player.py:196
 msgid "Drum #3"
-msgstr "Pad 3 de Bateria"
+msgstr "Pad 3 de Batería"
 
 #: Dialogs.py:4907
 #: Player.py:188
 #: Player.py:193
 msgid "Drum #4"
-msgstr "Pad 4 de bateria"
+msgstr "Pad 4 de Batería"
 
 #: Dialogs.py:4908
 #: Dialogs.py:4921
 #: Player.py:186
 msgid "Bass Drum"
-msgstr "Pedal de bateria"
+msgstr "Pedal de Batería"
 
 #: Dialogs.py:4908
 #: Dialogs.py:4921
@@ -821,7 +821,7 @@ msgstr "4º Platillo"
 #: Player.py:188
 #: Player.py:193
 msgid "Drum #5"
-msgstr "Pad 5 de bateria"
+msgstr "Pad 5 de Batería"
 
 #: Dialogs.py:4923
 msgid "Fret"
@@ -833,7 +833,7 @@ msgstr "Solo"
 
 #: Dialogs.py:4925
 msgid "Drum"
-msgstr "Bateria"
+msgstr "Batería"
 
 #: Dialogs.py:4926
 msgid "Slide~"
@@ -853,7 +853,7 @@ msgstr "Golpe ligero"
 
 #: Dialogs.py:5340
 msgid "Choose a Song"
-msgstr "Elije una cancion"
+msgstr "Elije una canción"
 
 #: Dialogs.py:5359
 msgid "Choose a File"
@@ -861,7 +861,7 @@ msgstr "Elije un archivo"
 
 #: Dialogs.py:5426
 msgid "Play with the keys and press Escape when you're done."
-msgstr "Juega con las teclas y dale a Esc cuando esteas preparado."
+msgstr "Juega con las teclas y pulsa Esc cuando estés preparado."
 
 #: Dialogs.py:5439
 #: Dialogs.py:5557
@@ -875,15 +875,15 @@ msgstr "Limitador de FPS"
 
 #: GameEngine.py:89
 msgid "On (Set Below)"
-msgstr "Encendido (establecer abajo)"
+msgstr "Activado (establecer abajo)"
 
 #: GameEngine.py:89
 msgid "Off (Auto Max FPS)"
-msgstr "Apago ( FPS Maximos automatico)"
+msgstr "Apago ( FPS máximos automático)"
 
 #: GameEngine.py:89
 msgid "Use this to enable or disable the FPS Limiter. If off, the game will render as many frames as possible. (This is affected by the 'Performance' quickset)"
-msgstr "Usa esta opcion para activar o desactivar el limitador de FPS. Si esta apagado el juego dara tantas imagenes por segundos como pueda. ( Esto puede ser afectado por la seleccion de opciones de \"Rendimiento\")"
+msgstr "Usa esta opción para activar o desactivar el limitador de FPS. Si esta desactivado el juego dará tantas imágenes por segundo como pueda. ( Esto puede ser afectado por la selección de opciones de \"Rendimiento\")"
 
 #: GameEngine.py:91
 msgid "Upload Highscores"
@@ -891,7 +891,7 @@ msgstr "Subir puntuaciones"
 
 #: GameEngine.py:91
 msgid "If enabled, your high scores will be sent to the server to rank you against other players."
-msgstr "Si estas activado, tus puntuaciones seran enviadas a un servidor para rankearte a ti contra otros usuarios."
+msgstr "Si está activado, tus puntuaciones serán enviadas a un servidor para rankearte a ti contra otros usuarios."
 
 #: GameEngine.py:92
 msgid "Fullscreen Mode"
@@ -907,7 +907,7 @@ msgstr "Calidad Antialiasing"
 
 #: GameEngine.py:93
 msgid "Sets the antialiasing quality of openGL rendering. Higher values reduce jaggediness, but could affect performance. (This is affected by the 'Performance' quickset)"
-msgstr "Ajusta la calidad antialiasing de rendering de OpenGL. Valores altos reducen posibles irregularidades, pero pueden afectar al rendimiento. (Le afecta el menu de ajusta rapido \"Rendimiento\""
+msgstr "Ajusta la calidad antialiasing de rendering de OpenGL. Valores altos reducen posibles irregularidades, pero pueden afectar al rendimiento. (Le afecta el menú de ajusta rápido \"Rendimiento\""
 
 #: GameEngine.py:94
 msgid "Show Fret Glow Effect"
@@ -915,23 +915,23 @@ msgstr "Mostrar el efecto de resplandor del traste"
 
 #: GameEngine.py:94
 msgid "Turn on or off the glow that appears around a fret when you press it."
-msgstr "Activa o desactiva el brillo que aparece alrededor de un traste cuando los apretas."
+msgstr "Activa o desactiva el brillo que aparece alrededor de un traste cuando lo apretas."
 
 #: GameEngine.py:96
 msgid "Frames per Second"
-msgstr "Imagenes por segundo"
+msgstr "Imágenes por segundo"
 
 #: GameEngine.py:96
 msgid "Set the number of frames to render per second. Higher values are better, but your computer may not be able to keep up. You probably can leave this alone. (This is affected by the 'Performance' quickset)"
-msgstr "Ajusta el numero de imagenes que se reproducen por segundo. Valores altos son mejores, pero tu ordenador quizas no pueda aplicarlos. Puede que sea mejor dejar esta opcion. (Le afecta el menu de ajusta rapido \"Rendimiento\""
+msgstr "Ajusta el numero de imágenes que se reproducen por segundo. Valores altos son mejores, pero tu ordenador quizás no pueda aplicarlos. Puede que sea mejor dejar esta opción. (Le afecta el menú de ajusta rápido \"Rendimiento\""
 
 #: GameEngine.py:97
 msgid "Print Frames per Second"
-msgstr "Mostrar las imagenes por segundo (FPS)"
+msgstr "Mostrar las imágenes por segundo (FPS)"
 
 #: GameEngine.py:97
 msgid "This will display your FPS on some screens, and if running from sources will print your FPS there every two seconds."
-msgstr "Esto mostrara tus imagenes por segundo, si estas ejecutando del codigo fuente las mostrar cada 2 segundos."
+msgstr "Esto mostrara tus imágenes por segundo, si estas ejecutando del código fuente las mostrara cada 2 segundos."
 
 #: GameEngine.py:98
 msgid "Fret Glow Color"
@@ -955,7 +955,7 @@ msgstr "Usar efectos visuales avanzados"
 
 #: GameEngine.py:100
 msgid "Enable or disable the use of shaders. Shaders are visual effects. This must be set to 'Yes' to use the settings below. 'By Theme' leaves it to the theme creator."
-msgstr "Activa o desactiva el uso de efectos graficos. Debes ponerlo en \"Si\" para usar las opciones de abajo. \"Segun el tema\" le deja elejir al creador del tema."
+msgstr "Activa o desactiva el uso de efectos gráficos. Debes ponerlo en \"Si\" para usar las opciones de abajo. \"Según el tema\" le deja elegir al creador del tema."
 
 #: GameEngine.py:101
 #: GameEngine.py:102
@@ -991,11 +991,11 @@ msgstr "Parpadeo"
 #: GameEngine.py:288
 #: GameEngine.py:295
 msgid "By Theme"
-msgstr "Segun el tema"
+msgstr "Según el tema"
 
 #: GameEngine.py:101
 msgid "A bright flash along your fretboard reflecting the notes you've hit. 'By Theme' leaves it to the theme creator."
-msgstr "Un parpadeo brillante que va por tu mastil reflejando las notas que has pulsado. \"Segun el tema\" le deja elejir al creador del tema."
+msgstr "Un parpadeo brillante que va por tu mástil reflejando las notas que has pulsado. \"Según el tema\" le deja elegir al creador del tema."
 
 #: GameEngine.py:102
 msgid "Stage"
@@ -1007,7 +1007,7 @@ msgstr "Alumbramiento EQ"
 
 #: GameEngine.py:102
 msgid "A visual waveform centered above you fretboard. 'By Theme' leaves it to the theme creator."
-msgstr "Un efecto visual con forma de ola centrado por encima del mastil. 'Segun el tema' le deja elejir al creador del tema."
+msgstr "Un efecto visual con forma de ola centrado por encima del mástil. 'Según el tema' le deja elegir al creador del tema."
 
 #: GameEngine.py:103
 msgid "Solo and SP"
@@ -1020,7 +1020,7 @@ msgstr "Alumbramientos"
 
 #: GameEngine.py:103
 msgid "Enables lightning along the side of your fretboard when you are in solos or use SP. 'By Theme' leaves it to the theme creator."
-msgstr "Activa una luz que va por los lados del mastil cuando estas en un solo o usando PE. \"Segun el tema\" le deja elejir al creador del tema."
+msgstr "Activa una luz que va por los lados del mástil cuando estas en un solo o usando PE. \"Según el tema\" le deja elegir al creador del tema."
 
 #: GameEngine.py:104
 msgid "Tails"
@@ -1028,7 +1028,7 @@ msgstr "Colas"
 
 #: GameEngine.py:104
 msgid "Classic"
-msgstr "Clasicas"
+msgstr "Clásicas"
 
 #: GameEngine.py:104
 #: GameEngine.py:208
@@ -1038,7 +1038,7 @@ msgstr "Rock Band 2"
 
 #: GameEngine.py:104
 msgid "Sets the tail effect. Choose from classic tails, lightning, or RB2 style. 'By Theme' leaves it to the theme creator."
-msgstr "Elije el efecto de las colas de las notas. Elije unas colas clasicas, alumbradas,o  como las de RB2. \"Segun el tema\" le deja elejir al creador del tema."
+msgstr "Elije el efecto de las colas de las notas. Elije unas colas clásicas, alumbradas,o  como las de RB2. \"Según el tema\" le deja elegir al creador del tema."
 
 #: GameEngine.py:105
 msgid "Notes"
@@ -1050,7 +1050,7 @@ msgstr "Metal"
 
 #: GameEngine.py:105
 msgid "Gives your notes a metallic sheen. 'By Theme' leaves it to the theme creator."
-msgstr "Le da a tus notas un brillo metalico. \"Segun el tema\" le permite elejir al creador del tema."
+msgstr "Le da a tus notas un brillo metálico. \"Según el tema\" le permite elegir al creador del tema."
 
 #: GameEngine.py:106
 #: GameEngine.py:295
@@ -1063,7 +1063,7 @@ msgstr "Blanco"
 
 #: GameEngine.py:106
 msgid "Adds a soft lighting effect to CD labels in CD setlist mode."
-msgstr "Añade un brillo suave a las caratulas de los CDs en el modo de lista de canciones con CDs."
+msgstr "Añade un brillo suave a las carátulas de los CDs en el modo de lista de canciones con CDs."
 
 #: GameEngine.py:108
 msgid "Animated Star Notes"
@@ -1071,7 +1071,7 @@ msgstr "Notas de poder animadas"
 
 #: GameEngine.py:108
 msgid "This will animate star notes as they come towards you, if that is included in your theme. This can have a hit on performance. (This is affected by the 'Performance' quickset)"
-msgstr "Esto animara las notas con poder mientras van llegando hacia ti, si viene incluido en tu tema. Esto puede llegar a variar el rendimiento (Le afecta el menu de Ajuste rapido \"Rendimiento\""
+msgstr "Esto animara las notas con poder mientras van llegando hacia ti, si viene incluido en tu tema. Esto puede llegar a variar el rendimiento (Le afecta el menú de Ajuste rápido \"Rendimiento\""
 
 #: GameEngine.py:109
 msgid "Sample Frequency"
@@ -1095,7 +1095,7 @@ msgstr "Tamaño del buffer"
 
 #: GameEngine.py:132
 msgid "Set your audio buffer size. Higher values will reduce audio popping, but increase game lag. Only change this if you are having audio quality issues, and use the lowest value that sounds right."
-msgstr "Ajusta el tamaño de tu buffer de audio. Valores altos reduciran los ruidos y fallos de sonido, pero reduciran el rendimiento del juego. Cambia esto solo si estas sufriendo problemas con la calidad del sonido, y usa el valor mas bajo que suena bien."
+msgstr "Ajusta el tamaño de tu buffer de audio. Valores altos reducirán los ruidos y fallos de sonido, pero reducirán el rendimiento del juego. Cambia esto solo si estas sufriendo problemas con la calidad del sonido, y usa el valor mas bajo que suena bien."
 
 #: GameEngine.py:133
 msgid "A/V Delay"
@@ -1107,7 +1107,7 @@ msgstr "Ajusta tu retraso A/V. Desgraciadamente de momento debes usarlo como pru
 
 #: GameEngine.py:134
 msgid "Screw-Up Sounds"
-msgstr "Sonido de publico animado"
+msgstr "Sonido de fallo"
 
 #: GameEngine.py:134
 #: GameEngine.py:149
@@ -1173,7 +1173,7 @@ msgstr "Sonido de publico animado"
 #: Player.py:223
 #: Player.py:224
 msgid "Off"
-msgstr "Apagado"
+msgstr "Desactivado"
 
 #: GameEngine.py:134
 msgid "Quiet"
@@ -1189,7 +1189,7 @@ msgstr "Doloroso"
 
 #: GameEngine.py:134
 msgid "How loud should the sound of your screwing up be? Very."
-msgstr "Como de fuerte deberia oirse el sonido de tus queridos fans? Mucho..."
+msgstr "¿Como de fuerte debería oírse el sonido de tus habituales fallos? Mucho..."
 
 #: GameEngine.py:138
 msgid "Active Track Volume"
@@ -1197,7 +1197,7 @@ msgstr "Volumen de la parte activa"
 
 #: GameEngine.py:138
 msgid "Volume of the parts you are playing."
-msgstr "Volumen de las partes que tocas"
+msgstr "Volumen de las partes que tocas."
 
 #: GameEngine.py:139
 msgid "Background Volume"
@@ -1205,7 +1205,7 @@ msgstr "Volumen del fondo"
 
 #: GameEngine.py:139
 msgid "Volume of the parts you are not playing."
-msgstr "Volumen de las partes que no tocas"
+msgstr "Volumen de las partes que no tocas."
 
 #: GameEngine.py:142
 msgid "Process Priority"
@@ -1217,7 +1217,7 @@ msgstr "Floja "
 
 #: GameEngine.py:142
 msgid "Low"
-msgstr "Bajo"
+msgstr "Baja"
 
 #: GameEngine.py:142
 #: GameEngine.py:154
@@ -1233,7 +1233,7 @@ msgstr "Mas de lo normal"
 
 #: GameEngine.py:142
 msgid "High"
-msgstr "Alto"
+msgstr "Alta"
 
 #: GameEngine.py:142
 msgid "Realtime"
@@ -1241,7 +1241,7 @@ msgstr "A tiempo real"
 
 #: GameEngine.py:142
 msgid "Change this to increase the priority of the FoFiX process. Don't change this unless you know what you're doing. DO NOT set this to Realtime. Ever."
-msgstr "Cambia esto para modificar la prioridad del proceso de FoFiX. No toques esta opcion a menos que sepas lo que haces. NO pongas A tiempo Real. Nunca"
+msgstr "Cambia esto para modificar la prioridad del proceso de FoFiX. No toques esta opción a menos que sepas lo que haces. NO pongas A tiempo Real. Nunca"
 
 #: GameEngine.py:143
 msgid "Use Psyco"
@@ -1249,7 +1249,7 @@ msgstr "Usar Psyco"
 
 #: GameEngine.py:143
 msgid "Enable or disable the Psyco specializing compiler. Tests have indicated the game runs faster with it off."
-msgstr "Activa o desactiva el compilador de especializacion \"Psyco\". Las pruebas indican que el juego va mas rapido con el apagado."
+msgstr "Activa o desactiva el compilador de especialización \"Psyco\". Las pruebas indican que el juego va mas rápido con el desactivado."
 
 #: GameEngine.py:144
 msgid "Missed Notes"
@@ -1261,11 +1261,11 @@ msgstr "Desaparecen"
 
 #: GameEngine.py:144
 msgid "Keep on going"
-msgstr "Sigue adelante"
+msgstr "Siguen adelante"
 
 #: GameEngine.py:144
 msgid "When you miss a note, this sets whether they disappear from the fretboard or scroll off the bottom of the screen."
-msgstr "Cuando fallas una nota, esto ajusta si la nota desaparece del mastil o pasa por debajo."
+msgstr "Cuando fallas una nota, esto ajusta si la nota desaparece del mástil o pasa por debajo."
 
 #: GameEngine.py:147
 msgid "Performance"
@@ -1282,7 +1282,7 @@ msgstr "Pura velocidad"
 
 #: GameEngine.py:147
 msgid "Fast"
-msgstr "Rapida"
+msgstr "Rápida"
 
 #: GameEngine.py:147
 msgid "Quality (Recommended)"
@@ -1290,11 +1290,11 @@ msgstr "Calidad (recomendada)"
 
 #: GameEngine.py:147
 msgid "Max Quality (Slow)"
-msgstr "Maxima calidad (lento)"
+msgstr "Máxima calidad (lento)"
 
 #: GameEngine.py:147
 msgid "Set the performance of your game. You can fine-tune in the advanced menus."
-msgstr "Ajusta el rendimiento de tu juego. Puedes regularlo detalladamente en los menus avanzados."
+msgstr "Ajusta el rendimiento de tu juego. Puedes regularlo detalladamente en los menús avanzados."
 
 #: GameEngine.py:148
 msgid "Gameplay"
@@ -1322,7 +1322,7 @@ msgstr "Estilo GH Wold Tour"
 
 #: GameEngine.py:148
 msgid "Sets how the game 'feels' to play. Theme-Based lets the theme creator decide. MIDI Based lets the fretter decide."
-msgstr "Ajusta como el tema \"se siente al jugar\". Basado en el tema le deja decidir al creador del tema. Basado en el MIDI le deja elejir al freteador."
+msgstr "Ajusta como el tema \"se siente al jugar\". Basado en el tema le deja decidir al creador del tema. Basado en el MIDI le deja elegir al freteador."
 
 #: GameEngine.py:149
 msgid "Pause on Loss of Focus"
@@ -1378,11 +1378,11 @@ msgstr "Pausar en la perdida del foco"
 #: Player.py:222
 #: Player.py:224
 msgid "On"
-msgstr "Encendido"
+msgstr "Activado"
 
 #: GameEngine.py:149
 msgid "Set whether the game automatically pauses when another application steals input focus."
-msgstr "Hace que el juego se pause automaticamente al perder el foco del SO si se abre otro programa."
+msgstr "Hace que el juego se pause automáticamente al perder el foco del SO si se abre otro programa."
 
 #: GameEngine.py:152
 msgid "HO/PO System"
@@ -1406,7 +1406,7 @@ msgstr "Guitar Hero 2"
 
 #: GameEngine.py:152
 msgid "Set the system used for marking hammer-ons and pull-offs (HO/PO). You can either disable them altogether, use the RF-Mod method, or the GH2 system."
-msgstr "Selecciona el sistema usado para marcar los HO/POs. Puedes desactivarlos todos, usar el metodo del RF-Mod, o el sistema de GH2."
+msgstr "Selecciona el sistema usado para marcar los HO/POs. Puedes desactivarlos todos, usar el método del RF-Mod, o el sistema de GH2."
 
 #: GameEngine.py:153
 msgid "GH2 Sloppy Mode"
@@ -1414,7 +1414,7 @@ msgstr "Modo enlodado GH2"
 
 #: GameEngine.py:153
 msgid "Sloppy mode allows you to hold higher frets while tapping lower frets during HO/PO sections. This will lower your score by 25%."
-msgstr "El modo enlodado te permite agarrar los trastes altos mientras tapeas los trastes mas bajos en zonas de HO/PO. Esto disminuira tu puntuacion un 25%-"
+msgstr "El modo enlodado te permite agarrar los trastes altos mientras tapeas los trastes mas bajos en zonas de HO/PO. Esto disminuirá tu puntuacion un 25%."
 
 #: GameEngine.py:154
 msgid "HO/PO Frequency"
@@ -1423,7 +1423,7 @@ msgstr "Frecuencia de HO/PO"
 #: GameEngine.py:154
 #: GameResultsScene.py:261
 msgid "Least"
-msgstr "Minimo"
+msgstr "Minima"
 
 #: GameEngine.py:154
 #: GameResultsScene.py:263
@@ -1443,19 +1443,19 @@ msgstr "Aun mas"
 #: GameEngine.py:154
 #: GameResultsScene.py:267
 msgid "Most"
-msgstr "Lo maximo"
+msgstr "La máxima"
 
 #: GameEngine.py:154
 msgid "Sets the window used to determine HO/PO notes. Increasing the frequency will reduce your score, and lower settings will give you a tiny bonus."
-msgstr "Ajusta la windows usada para determinar las notas de HO/POs. Aumentando la frecuencua reducira tu puntuacion, y bajandola te dara un pequeño bonus."
+msgstr "Ajusta la windows usada para determinar las notas de HO/POs. Aumentando la frecuencia reducirá tu puntuación, y bajándola te dará un pequeño bonus."
 
 #: GameEngine.py:155
 msgid "HO/PO After Chord"
-msgstr "HO/PO despues de acorde"
+msgstr "HO/PO después de acorde"
 
 #: GameEngine.py:155
 msgid "This will determine whether or not HO/PO notes can follow a chord. This only applies to the GH2 systems."
-msgstr "Esta opcion determina si los HO/POs pueden venir despues de un acorde. Solo funciona en el sistema de GH2."
+msgstr "Esta opción determina si los HO/POs pueden venir después de un acorde. Solo funciona en el sistema de GH2."
 
 #: GameEngine.py:156
 msgid "Show Hit Accuracy"
@@ -1475,11 +1475,11 @@ msgstr "Ambos"
 
 #: GameEngine.py:156
 msgid "Shows how accurate your note hits are. Numeric will give a time in milliseconds, and Friendly will use English to inform you. Both will show, well, both. Useful for determining your A/V delay."
-msgstr "Muestra como de precisos son tus toques. Numerico te dara un tiempo en milisegundos, y Amistoso usara Español para informarte. Ambos te mostraran, bueno ambos. Util para determinar tu retraso A/V."
+msgstr "Muestra como de precisos son tus toques. Numerico te dará un tiempo en milisegundos, y Amistoso usara Español para informarte. Ambos te mostraran, bueno ambos. Útil para determinar tu retraso A/V."
 
 #: GameEngine.py:157
 msgid "Hit Accuracy Pos"
-msgstr "Localizacion precision de nota tocada "
+msgstr "Localización precisión de nota tocada "
 
 #: GameEngine.py:157
 #: GameEngine.py:210
@@ -1500,35 +1500,35 @@ msgstr "Centro-inferior"
 
 #: GameEngine.py:157
 msgid "Sets where the accuracy information will be displayed, if enabled."
-msgstr "Selecciona donde aparecera la informacion de exactitudl si esta activada."
+msgstr "Selecciona donde aparecerá la información de exactitud si está activada."
 
 #: GameEngine.py:159
 msgid "Max Players"
-msgstr "Maximos jugadores"
+msgstr "Máximos jugadores"
 
 #: GameEngine.py:159
 msgid "Set the maximum number of players in Co-Op modes. Be aware that higher numbers are associated with a significant drop in performance."
-msgstr "Por el numero maximo de jugadores en modo Coop. Ten en cuenta que los numeros mas altos se notaran en el rendimiento del juego."
+msgstr "Por el numero máximo de jugadores en modo Coop. Ten en cuenta que los números mas altos se notaran en el rendimiento del juego."
 
 #: GameEngine.py:162
 msgid "Slideshow Delay"
-msgstr "Retraso del paso de imagenes"
+msgstr "Retraso del paso de imágenes"
 
 #: GameEngine.py:162
 msgid "Sets how long, in milliseconds, to wait between each frame in a stage slideshow."
-msgstr "Elije en cuanto tiempo, en milisegundos, tarda entre cambiar de fondo en una animacion."
+msgstr "Elije en cuanto tiempo, en milisegundos, tarda entre cambiar de fondo en una animación."
 
 #: GameEngine.py:163
 msgid "Animation Delay"
-msgstr "Retraso de la animacion"
+msgstr "Retraso de la animación"
 
 #: GameEngine.py:163
 msgid "Sets how long, in milliseconds, to wait between each frame in a stage animation."
-msgstr "Configura, cuanto tiempo en milisegundos tarda en cambiar cada imagen en una animacion de palco."
+msgstr "Configura, cuanto tiempo en milisegundos tarda en cambiar cada imagen en una animación de palco."
 
 #: GameEngine.py:164
 msgid "Stage Slideshow"
-msgstr "Paso de imagenes de fondo"
+msgstr "Paso de imágenes de fondo"
 
 #: GameEngine.py:164
 #: GameEngine.py:165
@@ -1549,15 +1549,15 @@ msgstr "AdelanteYatras"
 
 #: GameEngine.py:164
 msgid "Sets the method used to rotate frames in a stage slideshow."
-msgstr "Ajuste el metodo usado para cambiar las imagenes de fondo en una animacion."
+msgstr "Ajuste el método usado para cambiar las imágenes de fondo en una animación."
 
 #: GameEngine.py:165
 msgid "Stage Animation"
-msgstr "Animacion del escenario"
+msgstr "Animación del escenario"
 
 #: GameEngine.py:165
 msgid "Sets the method used to rotate frames in a stage animation."
-msgstr "Ajusta el metodo en que cambia de imagenes la animacion del escenario."
+msgstr "Ajusta el método en que cambia de imágenes la animación del escenario."
 
 #: GameEngine.py:166
 msgid "Stage Selection"
@@ -1570,27 +1570,27 @@ msgstr "Por defecto"
 
 #: GameEngine.py:166
 msgid "Blank"
-msgstr "Vacio"
+msgstr "Vacío"
 
 #: GameEngine.py:166
 msgid "Set the background for your stage. Default will use the default background, and Blank puts you in a dark room. Probably a lot like the one you're in now."
-msgstr "Elije el fondo para tu escenario. \"Por defecto\" usara la imagen por defecto, y \"En blanco\" te pondra en una habitacion oscura. Seguramente muy semejante a en la que estas ahora. "
+msgstr "Elije el fondo para tu escenario. \"Por defecto\" usara la imagen por defecto, y \"En blanco\" te pondrá en una habitación oscura. Seguramente muy semejante a en la que estas ahora. "
 
 #: GameEngine.py:167
 msgid "Song Stage"
-msgstr "Escenario de la cancion"
+msgstr "Escenario de la canción"
 
 #: GameEngine.py:167
 msgid "Fretters can include a stage to be used with their songs. If this is enabled, you can see it."
-msgstr "Los freteadores pueden incluir un fondo de escenario para usarlo con sus freteos. Si lo activas, lo podras ver."
+msgstr "Los freteadores pueden incluir un fondo de escenario para usarlo con sus freteos. Si lo activas, lo podrás ver."
 
 #: GameEngine.py:168
 msgid "Script Lyric Display"
-msgstr "Modo de visualizacion de letra"
+msgstr "Modo de visualización de letra"
 
 #: GameEngine.py:168
 msgid "By Song"
-msgstr "Segun la cancion"
+msgstr "Según la canción"
 
 #: GameEngine.py:168
 #: GameEngine.py:188
@@ -1604,11 +1604,11 @@ msgstr "Siempre"
 
 #: GameEngine.py:168
 msgid "Dual Lyric Prevention"
-msgstr "Prevencion dual de letras"
+msgstr "Prevención dual de letras"
 
 #: GameEngine.py:168
 msgid "Sets whether lyrics from a script.txt file are displayed. 'By Song' lets the fretter decide. 'Always' always displays script lyrics, if available, and 'Dual Lyric Prevention' will disable script lyrics if there are MIDI lyrics. (This is affected by the 'Performance' quickset)"
-msgstr "Te permite elejir si las letras en un script.txt seran mostradas y donde. \"Segun la cancion\" le permite al freteador decidir. \"Siempre\" siempre las mostrara cuando las haiga, y \"Prevencion dual de letra\" desactivara el script de letras si son MIDI. (Le afecta el menu de configuracion rapida \"Rendimiento\")"
+msgstr "Te permite elegir si las letras en un script.txt serán mostradas y donde. \"Según la canción\" le permite al freteador decidir. \"Siempre\" siempre las mostrara cuando las haiga, y \"Prevención dual de letra\" desactivara el script de letras si son MIDI. (Le afecta el menú de configuración rápida \"Rendimiento\")"
 
 #: GameEngine.py:169
 msgid "Frets Under Notes"
@@ -1620,27 +1620,27 @@ msgstr "Elije si las notas se deslizan por encima del traste, o por debajo."
 
 #: GameEngine.py:170
 msgid "Drum Navigation"
-msgstr "Navegacion de bateria"
+msgstr "Navegación de batería"
 
 #: GameEngine.py:170
 msgid "If enabled, drum keys will be allowed to navigate menus. If not, only guitar keys and keyboard master keys will."
-msgstr "Si esta activado, permite navegar por los menus usando la bateria. Si no, las teclas de guitarra y teclado lo haran."
+msgstr "Si está activado, permite navegar por los menús usando la batería. Si no, las teclas de guitarra y teclado lo harán."
 
 #: GameEngine.py:172
 msgid "Ignore Open Strums"
-msgstr "Ignorar rasgeos abiertos"
+msgstr "Ignorar rasgueos abiertos"
 
 #: GameEngine.py:172
 msgid "If enabled, strumming without holding any frets down won't be counted."
-msgstr "Si lo activas, rasgear sin pulsar ningun traste no sera contado."
+msgstr "Si lo activas, rasguear sin pulsar ningún traste no sera contado."
 
 #: GameEngine.py:173
 msgid "Static Strings"
-msgstr "Cuerdas estaticas"
+msgstr "Cuerdas estáticas"
 
 #: GameEngine.py:173
 msgid "If enabled, the 'strings' on your fretboard will not scroll."
-msgstr "Si lo activas, las cuerdas de tu mastil no se deslizaran."
+msgstr "Si lo activas, las cuerdas de tu mástil no se deslizaran."
 
 #: GameEngine.py:174
 msgid "Effects Save SP"
@@ -1648,7 +1648,7 @@ msgstr "Vibrato guarda PE"
 
 #: GameEngine.py:174
 msgid "If enabled, whammying while in SP will slow down its decrease. And your score will be handicapped by 5%."
-msgstr "Si lo activas, al activar el vibrato relentizara la bajada de PE. Y tu puntuacion sera disminuida un 5% por trampa."
+msgstr "Si lo activas, al activar el vibrato ralentizare la bajada de PE. Y tu puntuación sera disminuida un 5% por trampa."
 
 #: GameEngine.py:175
 msgid "Show HO/PO Indicator"
@@ -1656,23 +1656,23 @@ msgstr "Mostrar indicador de HOPOs"
 
 #: GameEngine.py:175
 msgid "If enabled, 'HOPO' will appear in game. When there are HOPO notes active, it will turn white."
-msgstr "Si esta activado, los HOPOs aparecen en el juego. Cuando hay notas de HO/PO activas, se volveran blancas."
+msgstr "Si está activado, los HOPOs aparecen en el juego. Cuando hay notas de HO/PO activas, se volverán blancas."
 
 #: GameEngine.py:176
 msgid "Use Tiers in Quickplay"
-msgstr "Usar tiers en partida rapida"
+msgstr "Usar tiers en partida rápida"
 
 #: GameEngine.py:176
 msgid "Sorting"
-msgstr "Colocacion"
+msgstr "Colocación"
 
 #: GameEngine.py:176
 msgid "Sets whether to mark tiers in quickplay mode. 'Normal' will use the career tiers and 'Sorting' will insert tiers based on the current sort order."
-msgstr "Ajusta como quieres que se marquen los tiers en modo partida rapida. \"Normal\" usara la estructura de carrera, y \"Ordenar por\" pondra tiers basados en la opcion ordenar por lo que sea."
+msgstr "Ajusta como quieres que se marquen los tiers en modo partida rápida. \"Normal\" usara la estructura de carrera, y \"Ordenar por\" pondrá tiers basados en la opción ordenar por lo que sea."
 
 #: GameEngine.py:177
 msgid "Star Updates"
-msgstr "Actualizacion de estrellas"
+msgstr "Actualización de estrellas"
 
 #: GameEngine.py:177
 msgid "On Hit"
@@ -1680,11 +1680,11 @@ msgstr "En el golpe"
 
 #: GameEngine.py:177
 msgid "Score Change"
-msgstr "Cambio de puntuacion"
+msgstr "Cambio de puntuación"
 
 #: GameEngine.py:177
 msgid "If set to 'On Hit', your star score will only be checked when you hit a note. If set to 'Score Change', your star score will constantly update. (This is affected by the 'Performance' quickset)"
-msgstr "Si lo pones \"En el golpe\" tu puntuacion de estrellas solo sera actualizada cuando pulses una nota. Si lo pones en \"Cambio de puntuacion\" tu puntuacion de estrellas sera constantemente actualizada. (Es afectado por el menu de configuracion rapida \"Rendimiento\")"
+msgstr "Si lo pones \"En el golpe\" tu puntuación de estrellas solo sera actualizada cuando pulses una nota. Si lo pones en \"Cambio de puntuación\" tu puntuación de estrellas sera constantemente actualizada. (Es afectado por el menú de configuración rápida \"Rendimiento\")"
 
 #: GameEngine.py:178
 msgid "Partial Star Continuous Fillup"
@@ -1692,19 +1692,19 @@ msgstr "Rellenado continuo de estrellas parciales"
 
 #: GameEngine.py:178
 msgid "Sets whether your partial stars will fill up gradually ('Yes') or in chunks. (This is affected by the 'Performance' quickset)"
-msgstr "Elije si las estrellas se iran llenando gradualmente (\"Si) o en trozos. (Le afecta el menu de configuracion rapida \"Rendimiento\""
+msgstr "Elije si las estrellas se irán llenando gradualmente (\"Si) o en trozos. (Le afecta el menú de configuración rápida \"Rendimiento\""
 
 #: GameEngine.py:179
 msgid "Countdown on Resume"
-msgstr "Cuentra atras al salir de Pausa"
+msgstr "Cuenta atrás al salir de Pausa"
 
 #: GameEngine.py:179
 msgid "If enabled, there will be a three second countdown when you unpause."
-msgstr "Si lo activas, habra una cuentatras de 3 segundos cuando reanudas una partida en pausa."
+msgstr "Si lo activas, habrá una cuenta-tras de 3 segundos cuando reanudas una partida en pausa."
 
 #: GameEngine.py:181
 msgid "Script Lyric Position"
-msgstr "Posicion del script de letra"
+msgstr "Posición del script de letra"
 
 #: GameEngine.py:181
 msgid "Bottom"
@@ -1720,7 +1720,7 @@ msgstr "Muestra las letras en script en la parte baja o alta de la pantalla."
 
 #: GameEngine.py:184
 msgid "Starpower Claps"
-msgstr "Aplausos cuando se activar el poder estrella"
+msgstr "Aplausos cuando se activa el poder estrella"
 
 #: GameEngine.py:184
 msgid "Enables a clapping sound effect to be used on the beats in Starpower."
@@ -1728,11 +1728,11 @@ msgstr "Pone un efecto de palmadas para sonar en cada nota teniendo el poder est
 
 #: GameEngine.py:185
 msgid "Song Previews"
-msgstr "Previsualizacion de las canciones"
+msgstr "Previsualización de las canciones"
 
 #: GameEngine.py:185
 msgid "Automatic"
-msgstr "Automatico"
+msgstr "Automático"
 
 #: GameEngine.py:185
 msgid "Yellow Fret (#3)"
@@ -1740,11 +1740,11 @@ msgstr "Traste Amarillo 3º"
 
 #: GameEngine.py:185
 msgid "If set to 'Automatic', songs will automatically start previewing when you select them. Otherwise you must press the third fret."
-msgstr "Si lo pones en \"Automatico\", las canciones haran una previsualizacion automatica al seleccionarlas. De la otra forma tendrias que apretar el 3º traste."
+msgstr "Si lo pones en \"Automático\", las canciones harán una previsualización automática al seleccionarlas. De la otra forma tendrías que apretar el 3º traste."
 
 #: GameEngine.py:187
 msgid "RB SP Neck Glow"
-msgstr "Brillo de mastil en PE y RB"
+msgstr "Brillo de mástil en PE y RB"
 
 #: GameEngine.py:187
 msgid "Sets a neck glow effect during SP in RB-type themes."
@@ -1760,19 +1760,19 @@ msgstr "Por tipo de MIDI"
 
 #: GameEngine.py:188
 msgid "Sets whether you can earn more starpower while using it. In 'By MIDI Type', only MIDIs that mark RB-style sections will use this. (This is set by the 'Gameplay' quickset)"
-msgstr "Configura si puedes ganar mas poder estrella usandolo. En \"Segun el tipo MIDI\", solo las MIDIs que marquen secciones como las de RockBand lo usaran. (Es configurado por el menu de configuracion rapida \"Juego\")"
+msgstr "Configura si puedes ganar mas poder estrella usándolo. En \"Según el tipo MIDI\", solo las MIDIs que marquen secciones como las de RockBand lo usaran. (Es configurado por el menú de configuración rápida \"Juego\")"
 
 #: GameEngine.py:191
 msgid "Effects Debug"
-msgstr "Depuracion de efectos"
+msgstr "Depuración de efectos"
 
 #: GameEngine.py:191
 msgid "If enabled, will show on-screen the raw data of your killswitch/whammy."
-msgstr "Si esta activado, mostrar la data bruta de tu vibrato."
+msgstr "Si está activado, mostrara la data bruta de tu vibrato."
 
 #: GameEngine.py:193
 msgid "Drum SP"
-msgstr "Poder estrella de bateria"
+msgstr "Poder estrella de batería"
 
 #: GameEngine.py:193
 msgid "Auto / Fills"
@@ -1784,20 +1784,20 @@ msgstr "Manual / Fills"
 
 #: GameEngine.py:193
 msgid "Determines how drum starpower is activated when there are no drum fills. Auto will automatically activate when available, and Manual will wait for the 'Starpower' button to be pressed."
-msgstr "Determina como la bateria activa el poder estrella si no hay fills de bateria. \"Automatico\" la activara automaticamente cuando haiga suficiente, y \"Manual\" esperara hasta que se active el boton de poder estrella."
+msgstr "Determina como la batería activa el poder estrella si no hay fills de batería. \"Automático\" la activara automáticamente cuando haiga suficiente, y \"Manual\" esperara hasta que se active el botón de poder estrella."
 
 #: GameEngine.py:194
 msgid "Large Drum Neck"
-msgstr "Mastil largo de bateria"
+msgstr "Mástil largo de batería"
 
 #: GameEngine.py:194
 msgid "If enabled, will show a larger neck when playing drums."
-msgstr "Si lo activas, se mostrara un mastil mas grande cuando toques bateria."
+msgstr "Si lo activas, se mostrara un mástil mas grande cuando toques batería."
 
 #: GameEngine.py:195
 #: GameEngine.py:233
 msgid "Bass Groove Neck"
-msgstr "Mastil de groov de bajo"
+msgstr "Mástil de groove de bajo"
 
 #: GameEngine.py:195
 #: GameEngine.py:196
@@ -1813,15 +1813,15 @@ msgstr "Sobreponer"
 
 #: GameEngine.py:195
 msgid "Sets the style of the Bass Groove neck. 'Replace' replaces your neck with the special neck, while 'Overlay' lays the neck over top."
-msgstr "Elije es estilo del mastil del groove de bajo. \"Reemplazar\" reemplaza tu mastil con el mastil especial, mientras que \"Sobreponer\" lo pone por encima."
+msgstr "Elije es estilo del mástil del groove de bajo. \"Reemplazar\" reemplaza tu mástil con el mástil especial, mientras que \"Sobreponer\" lo pone por encima."
 
 #: GameEngine.py:196
 msgid "Guitar Solo Neck"
-msgstr "Neck de solo de guitarra"
+msgstr "Mástil de solo de guitarra"
 
 #: GameEngine.py:196
 msgid "Sets the style of the Guitar Solo neck. 'Replace' replaces your neck with the special neck, while 'Overlay' lays the neck over top."
-msgstr "Ajusta el estilo del mastil de solo de guitarra. \"Reemplazar\" reemplaza el mastil con el mastil especial, mientras que \"Sobreponer\" pone el mastil por encima."
+msgstr "Ajusta el estilo del mástil de solo de guitarra. \"Reemplazar\" reemplaza el mástil con el mástil especial, mientras que \"Sobreponer\" pone el mástil por encima."
 
 #: GameEngine.py:197
 msgid "Show Unused Events"
@@ -1829,7 +1829,7 @@ msgstr "Mostrar eventos inusuales"
 
 #: GameEngine.py:197
 msgid "If enabled, various MIDI events not used by the game will be shown on-screen."
-msgstr "Si lo activas, varios eventos MIDI no usados por el juego seran mostrados en la pantalla."
+msgstr "Si lo activas, varios eventos MIDI no usados por el juego serán mostrados en la pantalla."
 
 #: GameEngine.py:198
 msgid "Kick Bass Sound"
@@ -1837,11 +1837,11 @@ msgstr "Sonido de pedal"
 
 #: GameEngine.py:198
 msgid "If enabled, you'll hear a kick bass sound when you use the kick pedal."
-msgstr "Si lo activas, oiras el sonido de un pedal de bateria cuando lo pulses."
+msgstr "Si lo activas, oirás el sonido de un pedal de batería cuando lo pulses."
 
 #: GameEngine.py:199
 msgid "Show Lyrics in All Modes"
-msgstr "Mostrar letra de cancion en todos los modos"
+msgstr "Mostrar letra de canción en todos los modos"
 
 #: GameEngine.py:199
 #: GameEngine.py:200
@@ -1878,15 +1878,15 @@ msgstr "Forzar"
 
 #: GameEngine.py:201
 msgid "Sets how the game handles key conflicts. 'Don't check' doesn't check, but conflicts will affect play. 'Notify' will inform you, but allow you to continue, and 'Enforce' will not allow you to exit the menu until all key conflicts have been resolved."
-msgstr "Elije como el juego maneja los conflictos de teclas. \"No mirar\" no los busca, pero los conflictos afectan a la hora de jugar. \"Notificar\" te informara, pero te permitira continuar sin cambiarlos, y \"Forzar\" no te dejara salir si no cambias las teclas hasta que cambiers los controles."
+msgstr "Elije como el juego maneja los conflictos de teclas. \"No mirar\" no los busca, pero los conflictos afectan a la hora de jugar. \"Notificar\" te informara, pero te permitirá continuar sin cambiarlos, y \"Forzar\" no te dejara salir si no cambias las teclas hasta que cambies los controles."
 
 #: GameEngine.py:202
 msgid "Show In-Game Stats"
-msgstr "Mostrar estadisticas en juego"
+msgstr "Mostrar estadísticas en juego"
 
 #: GameEngine.py:202
 msgid "Sets whether or not to show detailed stats as you play. 'By Theme' leaves it to the theme creator."
-msgstr "Elije si quieres que se muestren estadisticas cuando juegues. \"Segun el tema\" le deja elejir al creador del tema."
+msgstr "Elije si quieres que se muestren estadísticas cuando juegues. \"Según el tema\" le deja elegir al creador del tema."
 
 #: GameEngine.py:203
 msgid "Show Stars In-Game"
@@ -1894,7 +1894,7 @@ msgstr "Mostrar estrellas jugando"
 
 #: GameEngine.py:203
 msgid "Sets whether or not to show your star score as you play. 'By Theme' leaves it to the theme creator."
-msgstr "Ajusta si mostrar o no las estrellas que consigues mientras estas jugando. \"Segun el tema\" le deja elejir al creador del tema."
+msgstr "Ajusta si mostrar o no las estrellas que consigues mientras estas jugando. \"Según el tema\" le deja elegir al creador del tema."
 
 #: GameEngine.py:204
 msgid "Show Partial Stars"
@@ -1902,15 +1902,15 @@ msgstr "Mostrar estrellas parciales"
 
 #: GameEngine.py:204
 msgid "Sets whether or not to show partial stars, if available"
-msgstr "Ajusta si mostrar o no las estrellas parciales, si esta disponible."
+msgstr "Ajusta si mostrar o no las estrellas parciales, si está disponible."
 
 #: GameEngine.py:205
 msgid "HO/PO Debug"
-msgstr "Depuracion de HO/PO"
+msgstr "Depuración de HO/PO"
 
 #: GameEngine.py:205
 msgid "If enabled, various log messages will be recorded regarding the HO/PO system. Please leave this disabled if submitting logs for bug reports unless you are certain it is necessary."
-msgstr "Si lo activas, varios mensajes del log seran guardados teniendo en cuenta el sistema de HO/PO. Porfavor dejalo desactivado si das logs para arreglar bugs, al menos que lo creas necesario."
+msgstr "Si lo activas, varios mensajes del log serán guardados teniendo en cuenta el sistema de HO/PO. Por favor dejalo desactivado si das logs para arreglar bugs, al menos que lo creas necesario."
 
 #: GameEngine.py:206
 msgid "Show Solo Stats"
@@ -1926,23 +1926,23 @@ msgstr "Detallado"
 
 #: GameEngine.py:206
 msgid "Sets whether to show your solo results when you finish a solo. 'Percent' will only show the percentage, while 'Detail' includes additional information."
-msgstr "Elije lo que sale en la pantalla de resultados al acabar un solo. \"Porcentaje\" solo mostrara el porcentaje, mientras que \"Detallado\" incluye informacion adicional."
+msgstr "Elije lo que sale en la pantalla de resultados al acabar un solo. \"Porcentaje\" solo mostrara el porcentaje, mientras que \"Detallado\" incluye información adicional."
 
 #: GameEngine.py:207
 msgid "Stat Decimal Places"
-msgstr "Numeros decimales en los stats"
+msgstr "Números decimales en los stats"
 
 #: GameEngine.py:207
 msgid "Determines how many decimal places will be noted in displaying stats."
-msgstr "Determina cuando lugares decimales apareceran en los stats que se muestren."
+msgstr "Determina cuando lugares decimales aparecerán en los stats que se muestren."
 
 #: GameEngine.py:208
 msgid "Star Scoring Style"
-msgstr "Estilo de puntuacion de estrellas"
+msgstr "Estilo de puntuación de estrellas"
 
 #: GameEngine.py:208
 msgid "Accuracy"
-msgstr "Precision"
+msgstr "Precisión"
 
 #: GameEngine.py:208
 msgid "GH"
@@ -1958,7 +1958,7 @@ msgstr "Rock Band + Guitar Hero"
 
 #: GameEngine.py:208
 msgid "Sets which system to use to calculate your star score."
-msgstr "Elije el sistema que usa el juego para calcular tu puntuacion de estrellas."
+msgstr "Elije el sistema que usa el juego para calcular tu puntuación de estrellas."
 
 #: GameEngine.py:209
 msgid "Career Mode Advance"
@@ -1966,7 +1966,7 @@ msgstr "Avanzar en modo carrera"
 
 #: GameEngine.py:209
 msgid "0 (Song Finish)"
-msgstr "0 (que no se falle la cancion)"
+msgstr "0 (que no se falle la canción)"
 
 #: GameEngine.py:209
 msgid "1 Star"
@@ -1998,11 +1998,11 @@ msgstr "7 (100% racha entera)"
 
 #: GameEngine.py:209
 msgid "Determine how many stars are needed on a song before it is unlocked in career mode."
-msgstr "Determina cuantas estrellas se deben conseguir en una cancion antes de desbloquearla en el modo carrera."
+msgstr "Determina cuantas estrellas se deben conseguir en una canción antes de desbloquearla en el modo carrera."
 
 #: GameEngine.py:210
 msgid "Solo Stat Positioning"
-msgstr "Posicion del cuadro del solo"
+msgstr "Posición del cuadro del solo"
 
 #: GameEngine.py:210
 #: GameEngine.py:317
@@ -2011,7 +2011,7 @@ msgstr "Rock Band"
 
 #: GameEngine.py:210
 msgid "Sets where your solo result stats will be displayed."
-msgstr "Configura donde apareceran los resultados del solo"
+msgstr "Configura donde aparecerán los resultados del solo"
 
 #: GameEngine.py:211
 msgid "Bass Groove"
@@ -2023,15 +2023,15 @@ msgstr "Por MIDI"
 
 #: GameEngine.py:211
 msgid "Enable or disable bass groove (additional score multiplier for bass)"
-msgstr "Activa o desactiva el groove de bajo (mayor multiplicador de puntuacion para bajo)"
+msgstr "Activa o desactiva el groove de bajo (mayor multiplicador de puntuación para bajo)"
 
 #: GameEngine.py:212
 msgid "Drum Miss Penalty"
-msgstr "Penalizacion por fallo de bateria"
+msgstr "Penalización por fallo de batería"
 
 #: GameEngine.py:212
 msgid "Song Start"
-msgstr "Inicio de la cancion"
+msgstr "Inicio de la canción"
 
 #: GameEngine.py:212
 msgid "First Note"
@@ -2039,16 +2039,16 @@ msgstr "Primera nota"
 
 #: GameEngine.py:212
 msgid "Determines when drum hits count as misses: When the song begins, after the first note, or always."
-msgstr "Determina cuando tocar libremente con bateria cuenta como fallo: Cuando empieza la cancion, despues de la 1º nota, o siempre..."
+msgstr "Determina cuando tocar libremente con batería cuenta como fallo: Cuando empieza la canción, después de la 1º nota, o siempre..."
 
 #: GameEngine.py:213
 msgid "Time Display Format"
-msgstr "Formato de visualizaion del tiempo"
+msgstr "Formato de visualización del tiempo"
 
 #: GameEngine.py:213
 #: GameEngine.py:303
 msgid "Countdown"
-msgstr "Cuenta atras"
+msgstr "Cuenta atrás"
 
 #: GameEngine.py:213
 msgid "Elapsed"
@@ -2056,19 +2056,19 @@ msgstr "Transcurrido"
 
 #: GameEngine.py:213
 msgid "Sets whether the song time is displayed as time elapsed, time remaining, or not at all"
-msgstr "Elije que tiempo de cancion aparece arriba, tiempo pasado, tiempo restante o ninguno."
+msgstr "Elije que tiempo de canción aparece arriba, tiempo pasado, tiempo restante o ninguno."
 
 #: GameEngine.py:214
 msgid "Show Theme Version Tag"
-msgstr "Mostrar Tag de version de tema"
+msgstr "Mostrar Tag de versión de tema"
 
 #: GameEngine.py:214
 msgid "Places the theme's version tag over menus and dialogs."
-msgstr "Pone el version tag del tema por encima del menu y los dialogos."
+msgstr "Pone el version tag del tema por encima del menú y los diálogos."
 
 #: GameEngine.py:215
 msgid "Menu Navigation"
-msgstr "Navegacion por menus"
+msgstr "Navegación por menús"
 
 #: GameEngine.py:215
 msgid "P1 Only"
@@ -2080,27 +2080,27 @@ msgstr "Todos los jugadores"
 
 #: GameEngine.py:215
 msgid "Sets whether all players can navigate the menu, or only the controller set as Player 1 and the master keys."
-msgstr "Elije si todos los jugadores pueden navegar por los menus, o solo el controlador que estea en el sitio 1 y las teclas maestras."
+msgstr "Elije si todos los jugadores pueden navegar por los menús, o solo el controlador que este en el sitio 1 y las teclas maestras."
 
 #: GameEngine.py:216
 msgid "In-Game Font Shadow"
-msgstr "Sombre de la fuente dentro del juego"
+msgstr "Sombra de la fuente dentro del juego"
 
 #: GameEngine.py:216
 msgid "Sets whether or not a shadowed font will be used, if available."
-msgstr "Elije si la fuente es sombreada, si esta disponible."
+msgstr "Elije si la fuente es sombreada, si está disponible."
 
 #: GameEngine.py:217
 msgid "Mute Last Second"
-msgstr "Silencuar ultimo segundo"
+msgstr "Silenciar ultimo segundo"
 
 #: GameEngine.py:217
 msgid "Cuts the volume with one second remaining to prevent any pops when the song ends."
-msgstr "Silencua el volumen cuando queda un segundo de cancion para evitar cualquier pop al acabar la cancion."
+msgstr "Silencia el volumen cuando queda un segundo de canción para evitar cualquier pop al acabar la canción."
 
 #: GameEngine.py:218
 msgid "Results Cheer Loop"
-msgstr "Alegria en el resultados"
+msgstr "Alegría en el resultados"
 
 #: GameEngine.py:218
 #: GameEngine.py:317
@@ -2110,27 +2110,27 @@ msgstr "Tema"
 
 #: GameEngine.py:218
 msgid "Sets whether the cheering sound heard on the result screen will loop. 'Theme' leaves it to the theme creator."
-msgstr "Elije si quieres un sonido de publico animado en la pantalla de resultados. \"Tema\" le deja elejir al creador del tema."
+msgstr "Elije si quieres un sonido de publico animado en la pantalla de resultados. \"Tema\" le deja elegir al creador del tema."
 
 #: GameEngine.py:219
 msgid "Cheer Loop Delay"
-msgstr "Retraso de la alegria de la gente"
+msgstr "Retraso de la alegría de la gente"
 
 #: GameEngine.py:219
 msgid "Sets the time, in milliseconds, to wait before playing the result cheer again (if looping is enabled)."
-msgstr "Ajusta el tiempo, en milisegundos, para esperar antes de que vuelva a sonar la gente contenta de nuevo (si la opcion de gente animada esta activada)"
+msgstr "Ajusta el tiempo, en milisegundos, para esperar antes de que vuelva a sonar la gente contenta de nuevo (si la opción de gente animada está activada)"
 
 #: GameEngine.py:220
 msgid "Miss Pauses Anim"
-msgstr "Fallar pausa la animacion"
+msgstr "Fallar pausa la animación"
 
 #: GameEngine.py:220
 msgid "When enabled, missing a note will pause the stage animation."
-msgstr "Si lo activas, al fallar una nota se pausara la animacion de fondo."
+msgstr "Si lo activas, al fallar una nota se pausara la animación de fondo."
 
 #: GameEngine.py:221
 msgid "Song HO/PO Freq"
-msgstr "Frequencia de HO/PO de cancion"
+msgstr "Frecuencia de HO/PO de canción"
 
 #: GameEngine.py:221
 msgid "Sets whether or not to use the HO/PO Frequency setting determined by the fretter, if available."
@@ -2138,11 +2138,11 @@ msgstr "Elije si usar o no la frecuencia de HO/PO puesta por el freteador, si le
 
 #: GameEngine.py:223
 msgid "Mute Drum Track During Fills"
-msgstr "Silenciar pista de bateria durante los fills."
+msgstr "Silenciar pista de batería durante los fills."
 
 #: GameEngine.py:223
 msgid "Sets whether or not the drum track will be muted during drum fills (so you can hear yourself have at it!)"
-msgstr "Elije si la pista de audio de bateria es silenciada durante los drum fills (asi puede oirte a ti tocandola!)"
+msgstr "Elije si la pista de audio de batería es silenciada durante los drum fills (así puedes oírte a ti tocándola!)"
 
 #: GameEngine.py:224
 msgid "Sustain Muting"
@@ -2174,7 +2174,7 @@ msgstr "Siempre silenciar"
 
 #: GameEngine.py:224
 msgid "Sets the window used to determine whether or not to mute a dropped sustain note. 'Early' means it will only mute when you drop the sustain relatively early."
-msgstr "Elije la window usada para determinar si silenciar una nota que estea agarrada.\"Temprano\" significa que solo se silenciara cuando se toque demasiado temprano."
+msgstr "Elije la window usada para determinar si silenciar una nota que este agarrada.\"Temprano\" significa que solo se silenciara cuando se toque demasiado temprano."
 
 #: GameEngine.py:225
 msgid "Show Solo Frame"
@@ -2182,7 +2182,7 @@ msgstr "Mostrar cuadro de solo"
 
 #: GameEngine.py:225
 msgid "Sets whether to show a frame around the solo stats, if available."
-msgstr "Ajusta si mostrar una ventana con los stats del solo, si esta disponible."
+msgstr "Ajusta si mostrar una ventana con los stats del solo, si está disponible."
 
 #: GameEngine.py:226
 msgid "Enable Guitar Solos"
@@ -2199,7 +2199,7 @@ msgstr "Solo MIDI"
 
 #: GameEngine.py:226
 msgid "Sets the logic used to mark solos. 'Always' will mark solos in sections if available. 'By Theme' leaves it to the theme creator. 'MIDI Only' only enables solos marked with the MIDI marker note."
-msgstr "Selecciona la logica usada para marcar solos, \"Siempre\" cojera los solos marcados en secciones, si esta disponible. \"Segun el tema\" le permite elejir al creador del tema. \"Solo MIDI\" solo permite Solos marcados con los marcadores de notas del MIDI."
+msgstr "Selecciona la lógica usada para marcar solos, \"Siempre\" cojera los solos marcados en secciones, si está disponible. \"Según el tema\" le permite elegir al creador del tema. \"Solo MIDI\" solo permite Solos marcados con los marcadores de notas del MIDI."
 
 #: GameEngine.py:227
 msgid "SP Mode"
@@ -2216,15 +2216,15 @@ msgstr "AutoMIDI"
 
 #: GameEngine.py:227
 msgid "Sets the logic used to determine starpower phrases. 'FoF' will generate paths based on the number of notes. 'Auto MIDI' will use MIDI markers to determine the paths, and fall back on the FoF mode if none are available."
-msgstr "Elije la logica usada para determinar frases de PE. \"FoF\" generara frases basadas en el numero de notas. \"Auto MIDI\" usara los marcadores MIDI para dterminar las frases, y el retroceso no esta disponible en el modo FoF."
+msgstr "Elije la lógica usada para determinar frases de PE. \"FoF\" generara frases basadas en el numero de notas. \"Auto MIDI\" usara los marcadores MIDI para determinar las frases, y el retroceso no está disponible en el modo FoF."
 
 #: GameEngine.py:229
 msgid "Inc. Neck Mode"
-msgstr "Inc. modo de mastil"
+msgstr "Inc. modo de mástil"
 
 #: GameEngine.py:229
 msgid "Start Only"
-msgstr "Solo en principio"
+msgstr "Solo al principio"
 
 #: GameEngine.py:229
 msgid "Start & End"
@@ -2232,7 +2232,7 @@ msgstr "Principio & Fin"
 
 #: GameEngine.py:229
 msgid "Sets how and whether to render incoming solo necks. 'Start Only' will scroll it in but not out, while 'Start & End' does both."
-msgstr "Elije como y si renderizar los mastiles entrantes de Solo. \"Solo empezar\" solo los desplazara dentro, pero no fuera, mientras que \"Principio y fin\" hace ambas cosas."
+msgstr "Elije como y si renderizar los mástiles entrantes de Solo. \"Solo empezar\" solo los desplazara dentro, pero no fuera, mientras que \"Principio y fin\" hace ambas cosas."
 
 #: GameEngine.py:230
 msgid "Big Rock Endings"
@@ -2240,59 +2240,59 @@ msgstr "Big Rock Endings"
 
 #: GameEngine.py:230
 msgid "Enable or disable big rock endings. 'By Theme' leaves it to the theme creator."
-msgstr "Activa o desactiva los big rock endings, \"Segun el tema\" le deja elejir al creador del tema."
+msgstr "Activa o desactiva los big rock endings, \"Según el tema\" le deja elegir al creador del tema."
 
 #: GameEngine.py:231
 msgid "Main Neck"
-msgstr "Mastil principal"
+msgstr "Mástil principal"
 
 #: GameEngine.py:231
 msgid "Set the transparency of the main neck. 100% is fully visible."
-msgstr "Ajusta la transparencia del mastil principal. 100% es totalmente visible."
+msgstr "Ajusta la transparencia del mástil principal. 100% es totalmente visible."
 
 #: GameEngine.py:232
 msgid "Solo Neck"
-msgstr "Mastil de solo"
+msgstr "Mástil de solo"
 
 #: GameEngine.py:232
 msgid "Set the transparency of the solo neck. 100% is fully visible."
-msgstr "Configura la transparencia del mastil de solo. 100% es totalmente visible."
+msgstr "Configura la transparencia del mástil de solo. 100% es totalmente visible."
 
 #: GameEngine.py:233
 msgid "Set the transparency of the bass groove neck. 100% is fully visible."
-msgstr "Ajusta la transparencia del mastil del groove de bajo. 100% es totalmente visible."
+msgstr "Ajusta la transparencia del mástil del groove de bajo. 100% es totalmente visible."
 
 #: GameEngine.py:234
 msgid "Fail Neck"
-msgstr "Mastiles de fallo"
+msgstr "Mástiles de fallo"
 
 #: GameEngine.py:234
 msgid "Set the transparency of the failing neck. 100% is fully visible."
-msgstr "Ajusta la transparencia de la neck que sale al estar cerca de fallar. 100% es totalmente visible."
+msgstr "Ajusta la transparencia del mástil que sale al estar cerca de fallar. 100% es totalmente visible."
 
 #: GameEngine.py:235
 msgid "Overlay Neck"
-msgstr "Sobreponer mastil"
+msgstr "Sobreponer mástil"
 
 #: GameEngine.py:235
 msgid "Set the transparency of neck overlays. 100% is fully visible."
-msgstr "Ajusta las transparencia de los mastiles que se sobreponen. 100% es totalmente visible."
+msgstr "Ajusta las transparencia de los mástiles que se sobreponen. 100% es totalmente visible."
 
 #: GameEngine.py:236
 msgid "All Necks"
-msgstr "Todas los mastiles"
+msgstr "Todas los mástiles"
 
 #: GameEngine.py:236
 msgid "Set the master transparency of all necks. 100% is fully visible."
-msgstr "Ajusta la transparencia general de todos los mastiles. 100% es totalmente visible."
+msgstr "Ajusta la transparencia general de todos los mástiles. 100% es totalmente visible."
 
 #: GameEngine.py:237
 msgid "Show Any Available Score"
-msgstr "Muestra cualquier puntuacion disponible"
+msgstr "Muestra cualquier puntuación disponible"
 
 #: GameEngine.py:237
 msgid "When set to 'On', this will look for any available score on the currently selected instrument for setlist score display, if one is not available at the chosen difficulty."
-msgstr "Si los pones en \"On\", buscara por cualquier puntuacion disponible en el intrumento que estea seleccionado para mostrarlo en la lista de canciones, si uno no esta disponible en esa dificultad."
+msgstr "Si los pones en \"Activado\", buscara por cualquier puntuación disponible en el instrumento que este seleccionado para mostrarlo en la lista de canciones, si una no está disponible en esa dificultad."
 
 #: GameEngine.py:239
 msgid "Scroll Delay"
@@ -2300,15 +2300,15 @@ msgstr "Retraso de desplazamiento"
 
 #: GameEngine.py:239
 msgid "Sets how long, in milliseconds, to wait before beginning to scroll."
-msgstr "Elije cuanto tiempo, en milisegundos esperar antes de que empieze a deslizarse."
+msgstr "Elije cuanto tiempo, en milisegundos esperar antes de que empiece a deslizarse."
 
 #: GameEngine.py:240
 msgid "Scroll Rate"
-msgstr "Razon de deslizamiento"
+msgstr "Razón de deslizamiento"
 
 #: GameEngine.py:240
 msgid "Sets how quickly menus will scroll."
-msgstr "Ajusta como de rapido van a desplazarse los menus."
+msgstr "Ajusta como de rápido van a desplazarse los menús."
 
 #: GameEngine.py:243
 msgid "Use (notes-unedited.mid)"
@@ -2316,7 +2316,7 @@ msgstr "Usar (notes-unedited.mid)"
 
 #: GameEngine.py:243
 msgid "Sets whether to look for (and use) a 'notes-unedited.mid' before 'notes.mid'. There's no reason to change this."
-msgstr "Elije si busca (y usa) un \"notes-unedited.mid\" antes de un \"notes.mid\". No hay razon para cambiar esto."
+msgstr "Elije si busca (y usa) un \"notes-unedited.mid\" antes de un \"notes.mid\". No hay razón para cambiar esto."
 
 #: GameEngine.py:244
 msgid "Show Fill Status"
@@ -2324,7 +2324,7 @@ msgstr "Mostrar estado de las fills"
 
 #: GameEngine.py:244
 msgid "When enabled, whether or not you are in a drum fill/freestyle ending will be displayed in text on the screen."
-msgstr "Cuando esta activado, si estas o no en un fill de bateria/final de estilo libre te lo indicara en texto en la pantalla."
+msgstr "Cuando está activado, si estas o no en un fill de batería/final de estilo libre te lo indicara en texto en la pantalla."
 
 #: GameEngine.py:245
 msgid "Show BPM"
@@ -2332,15 +2332,15 @@ msgstr "Mostrar GPM"
 
 #: GameEngine.py:245
 msgid "When enabled, the current song BPM will be shown on screen."
-msgstr "Si esta activado, mostrar los GPM de la cancion en la pantalla."
+msgstr "Si está activado, mostrara los GPM (BPM) de la canción en la pantalla."
 
 #: GameEngine.py:246
 msgid "New BPM Logic"
-msgstr "Nueva logica de GPM"
+msgstr "Nueva lógica de GPM"
 
 #: GameEngine.py:246
 msgid "If enabled, the game will attempt to use the new BPM logic. This is not a finished feature. Use at your own risk."
-msgstr "Si lo activas, el juego usara la nueva logiga de GPM. No es una funcionalidad acabada, usala siendo consciente de ello y arriesgandonte tu."
+msgstr "Si lo activas, el juego usara la nueva lógica de GPM. No es una funcionalidad acabada, usala siendo consciente de ello y arriesgándote tu."
 
 #: GameEngine.py:248
 msgid "Show Raw Vocal Data"
@@ -2348,7 +2348,7 @@ msgstr "Mostrar datos brutos de vocalista"
 
 #: GameEngine.py:248
 msgid "If enabled, various information about the microphone input will be show in text on screen. Probably only needed for vocal debugging."
-msgstr "Si esta activado, aparece informacion sobre el dispositivo de microfono en texto en la pantalla. Probablemente solo sirve para depuracion de vocalista."
+msgstr "Si está activado, aparece información sobre el dispositivo de micrófono en texto en la pantalla. Probablemente solo sirve para depuración de vocalista."
 
 #: GameEngine.py:250
 msgid "Speed Factor"
@@ -2372,15 +2372,15 @@ msgstr "0.25x"
 
 #: GameEngine.py:250
 msgid "Sets the speed to play the audio at. Your score will be severely penalized if you slow the music down."
-msgstr "Ajusta la velocidad a la que ira el audio. Tu puntuacion sera algo penalizada si bajas la velocidad."
+msgstr "Ajusta la velocidad a la que ira el audio. Tu puntuación sera algo penalizada si bajas la velocidad."
 
 #: GameEngine.py:252
 msgid "Effects Mode"
-msgstr "Modo de vobrato"
+msgstr "Modo de vibrato"
 
 #: GameEngine.py:252
 msgid "Killswitch"
-msgstr "Boton de parado (Killswitch)"
+msgstr "Botón de parado (Killswitch)"
 
 #: GameEngine.py:252
 msgid "Pitchbend"
@@ -2396,7 +2396,7 @@ msgstr "Logear lecturas de INI"
 
 #: GameEngine.py:256
 msgid "Logs any read to an INI file. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."
-msgstr "Logear cualquier lectura a un archivo .ini. Es informacion innecesaria en reportes de bugs; porfavor deja esta esta opcion desactivada a menos que esteas seguro que es util."
+msgstr "Logear cualquier lectura a un archivo .ini. Es información innecesaria en reportes de bugs; por favor deja esta opción desactivada a menos que estés seguro que es útil."
 
 #: GameEngine.py:257
 msgid "Log Class Inits"
@@ -2404,15 +2404,15 @@ msgstr "Logear iniciales de la clase"
 
 #: GameEngine.py:257
 msgid "Logs most class initializations in '__init__'. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."
-msgstr "Logear la mayoria de iniciales de clases en '__init__'. Es informacion innecesaria en reportes de bugs; porfavor deja esta esta opcion desactivada a menos que esteas seguro que es util."
+msgstr "Logear la mayoría de iniciales de clases en '__init__'. Es información innecesaria en reportes de bugs; por favor deja esta opción desactivada a menos que estés seguro que es útil."
 
 #: GameEngine.py:258
 msgid "Log Loadings"
-msgstr "Logear Cargas"
+msgstr "Logear cargas"
 
 #: GameEngine.py:258
 msgid "Logs resource loads. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."
-msgstr "Logear las cargas de recursos. Esto es innecesario para reportar bugs; porfavor deja esta opcion desactivada a menos que creas que es necesaria."
+msgstr "Logear las cargas de recursos. Esto es innecesario para reportar bugs; por favor deja esta opción desactivada a menos que creas que es necesaria."
 
 #: GameEngine.py:259
 msgid "Log MIDI Sections"
@@ -2420,7 +2420,7 @@ msgstr "Logear secciones MIDI"
 
 #: GameEngine.py:259
 msgid "Logs MIDI sections. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."
-msgstr "Logear secciones MIDI. Es informacion innecesaria en reportes de bugs; porfavor deja esta esta opcion desactivada a menos que esteas seguro que es util."
+msgstr "Logear secciones MIDI. Es información innecesaria en reportes de bugs; por favor deja esta opción desactivada a menos que estés seguro que es útil."
 
 #: GameEngine.py:260
 msgid "Log Undefined GETs"
@@ -2428,15 +2428,15 @@ msgstr "Logear GETs indefinidas"
 
 #: GameEngine.py:260
 msgid "Logs attempts to read an undefined config key. This is unnecessary information."
-msgstr "Logear intentos de leer una clave de configuracion indefinida. Es informacion innecesaria."
+msgstr "Logear intentos de leer una clave de configuración indefinida. Es información innecesaria."
 
 #: GameEngine.py:261
 msgid "Log Marker Notes"
-msgstr "Logear notas marcadas. Es informacion innecesaria en reportes de bugs; porfavor deja esta esta opcion desactivada a menos que esteas seguro que es util."
+msgstr "Logear notas marcadas."
 
 #: GameEngine.py:261
 msgid "Logs MIDI marker notes (solo, SP, etc). This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."
-msgstr "Logear marcadores de notas MIDI (Solo, PE...) Es informacion innecesaria en reportes de bugs; porfavor deja esta esta opcion desactivada a menos que esteas seguro que es util."
+msgstr "Logear marcadores de notas MIDI (Solo, PE...) Es información innecesaria en reportes de bugs; por favor deja esta opción desactivada a menos que estés seguro que es útil."
 
 #: GameEngine.py:262
 msgid "Log SP Misses"
@@ -2444,7 +2444,7 @@ msgstr "Logear PE perdidos"
 
 #: GameEngine.py:262
 msgid "Logs SP phrase misses. This is unnecessary information."
-msgstr "Logear frases de PE fallads. Esta informacion es innecesaria."
+msgstr "Logear frases de PE falladas. Esta información es innecesaria."
 
 #: GameEngine.py:263
 msgid "Log Unedited MIDIs"
@@ -2452,15 +2452,15 @@ msgstr "Logear MIDIs no editadas"
 
 #: GameEngine.py:263
 msgid "Logs when notes-unedited.mid is used. This is unnecessary information."
-msgstr "Logear cuando de use un archivo MIDI notes-unedited.mid. Esta informacion es innecesaria."
+msgstr "Logear cuando de use un archivo MIDI notes-unedited.mid. Esta información es innecesaria."
 
 #: GameEngine.py:264
 msgid "Log Lyric Events"
-msgstr "Logear"
+msgstr "Logear eventos de letras"
 
 #: GameEngine.py:264
 msgid "Logs MIDI lyric events. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."
-msgstr "Logear eventos MIDI de letras. Es informacion innecesaria en reportes de bugs; porfavor deja esta esta opcion desactivada a menos que esteas seguro que es util."
+msgstr "Logear eventos MIDI de letras. Es información innecesaria en reportes de bugs; por favor deja esta esta opción desactivada a menos que estés seguro que es útil."
 
 #: GameEngine.py:265
 msgid "Log Tempo Events"
@@ -2468,7 +2468,7 @@ msgstr "Logear eventos de tempo"
 
 #: GameEngine.py:265
 msgid "Logs MIDI tempo events. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."
-msgstr "Meter en el .log los eventos de tempo midi. Es innecesario para dar informacion al reportar bugs; porfavor desactiva esta opcion a menos que creas que es importante."
+msgstr "Meter en el .log los eventos de tempo midi. Es innecesario para dar información al reportar bugs; por favor desactiva esta opción a menos que creas que es importante."
 
 #: GameEngine.py:271
 msgid "Practice Beat Claps"
@@ -2480,7 +2480,7 @@ msgstr "Activa el sonido de unas palmadas por cada nota tocada en el modo practi
 
 #: GameEngine.py:272
 msgid "Change Score Display"
-msgstr "Cambiar visualizacion de la puntuacion"
+msgstr "Cambiar visualización de la puntuación"
 
 #: GameEngine.py:272
 #: GameEngine.py:309
@@ -2493,7 +2493,7 @@ msgstr "Traste azul 4º"
 
 #: GameEngine.py:272
 msgid "Sets whether to change the setlist high score difficulty automatically or with the fourth fret."
-msgstr "Ajusta si se cambia las puntuaciones mas altas en la setlist automaticamente o pulsando el 4º traste. "
+msgstr "Ajusta si se cambia las puntuaciones mas altas en la setlist automáticamente o pulsando el 4º traste. "
 
 #: GameEngine.py:275
 msgid "Makes opponent miss notes until the whammy bar is pushed a few times"
@@ -2502,7 +2502,7 @@ msgstr "Hace que el oponente pierda notas hasta que pulse varias veces el vibrat
 #: GameEngine.py:276
 #: GuitarScene.py:528
 msgid "Difficulty Up"
-msgstr "Mas dificil"
+msgstr "Aumento de dificultad"
 
 #: GameEngine.py:276
 msgid "Ups opponent's difficulty for a while (if not playing on Expert)"
@@ -2532,11 +2532,11 @@ msgstr "Drenaje de muerte"
 
 #: GameEngine.py:279
 msgid "Sudden Death Only"
-msgstr "Solo muerte subita"
+msgstr "Solo muerte súbita"
 
 #: GameEngine.py:279
 msgid "Drains your opponents life until they die. 'Sudden Death Only' keeps this from appearing until you reach sudden death mode."
-msgstr "Drena la vida de tu oponente hasta que muera. \"Solo muerte subita\" hace que no apareza hasta que cojes el modo de muerte subita."
+msgstr "Drena la vida de tu oponente hasta que muera. \"Solo muerte súbita\" hace que no aparezca hasta que coges el modo de muerte súbita."
 
 #: GameEngine.py:280
 #: GuitarScene.py:534
@@ -2545,7 +2545,7 @@ msgstr "Sobrecarga de amperios"
 
 #: GameEngine.py:280
 msgid "Makes opponent's amp flip out, making notes disappear and reappear randomly."
-msgstr "Hace que el amplificador del oponente dea fallos, haciendo que las notas aparezcan y desaparezcan."
+msgstr "Hace que el amplificador del oponente dé fallos, haciendo que las notas aparezcan y desaparezcan."
 
 #: GameEngine.py:281
 #: GuitarScene.py:532
@@ -2578,7 +2578,7 @@ msgstr "Sonidos en las puntuaciones"
 
 #: GameEngine.py:286
 msgid "Sets whether or not to have Jurgen taunt (or, I suppose, congratulate) you at the end of a song."
-msgstr "Ajusta si quieres que Jurgen te haga una mofa (o supongo, te felicite) al final de una cancion."
+msgstr "Ajusta si quieres que Jurgen te haga una mofa (o supongo, te felicite) al final de una canción."
 
 #: GameEngine.py:287
 msgid "GH SP Lights"
@@ -2586,7 +2586,7 @@ msgstr "Luces de PE de GH"
 
 #: GameEngine.py:287
 msgid "Sets whether to fade images over the starpower bulbs in GH themes when fully lit."
-msgstr "Hacer que las imagenes se desvanezcan por encima de las bombillas en temas GH cuando estean llenas."
+msgstr "Hacer que las imágenes se desvanezcan por encima de las bombillas en temas GH cuando estén llenas."
 
 #: GameEngine.py:288
 msgid "RB Small 1x Multiplier"
@@ -2594,7 +2594,7 @@ msgstr "Multiplicador pequeño de 1x de RB"
 
 #: GameEngine.py:288
 msgid "When enabled, RB-type themes will have a smaller mult image when the multiplier is at 1x. 'By Theme' leaves it to the theme creator."
-msgstr "Si esta activado, temas basados en RB tendran multiplicador mas pequeño cuando estea a 1x. \"Segun el tema\" le deja elejir al creador del tema."
+msgstr "Si está activado, temas basados en RB tendrán multiplicador mas pequeño cuando este a 1x. \"Según el tema\" le deja elegir al creador del tema."
 
 #: GameEngine.py:289
 msgid "Board Speed Mode"
@@ -2630,15 +2630,15 @@ msgstr "Frases de carga"
 
 #: GameEngine.py:290
 msgid "Sets whether or not to use loading phrases while loading a song"
-msgstr "Configura si se usan frases de carga mientras se carga una cancion."
+msgstr "Configura si se usan frases de carga mientras se carga una canción."
 
 #: GameEngine.py:291
 msgid "Effects Display Mode"
-msgstr "Modo de visualizacion de efectos"
+msgstr "Modo de visualización de efectos"
 
 #: GameEngine.py:291
 msgid "Static"
-msgstr "Estatico"
+msgstr "Estático"
 
 #: GameEngine.py:291
 msgid "Animated"
@@ -2646,7 +2646,7 @@ msgstr "Animado"
 
 #: GameEngine.py:291
 msgid "Sets whether or not the whammy effect is animated. (This is affected by the 'Performance' quickset)"
-msgstr "Elije si quieres que el vibrato sea animado. (Le afecta el menu de opciones rapidas \"Rendimiento\")"
+msgstr "Elije si quieres que el vibrato sea animado. (Le afecta el menú de opciones rápidas \"Rendimiento\")"
 
 #: GameEngine.py:292
 msgid "Show Filepath"
@@ -2662,11 +2662,11 @@ msgstr "Ocultar"
 
 #: GameEngine.py:292
 msgid "Sets whether or not to show the filepath of the song."
-msgstr "Elije si quieres que se muestre la ruta de los archivos de la cancion."
+msgstr "Elije si quieres que se muestre la ruta de los archivos de la canción."
 
 #: GameEngine.py:293
 msgid "3D Note Rotation"
-msgstr "Rotacion de las notas 3D"
+msgstr "Rotación de las notas 3D"
 
 #: GameEngine.py:293
 msgid "Old"
@@ -2690,11 +2690,11 @@ msgstr "Solo racha de notas"
 
 #: GameEngine.py:294
 msgid "Sets whether or not to show text in-game. This includes note streaks and 'Starpower Ready'. (This is affected by the 'Performance' quickset)"
-msgstr "Elije si quieres que se muestre texto en el juego. Esto incluye racha de notas y \"Poder estrella preparado\". (Le afecta el menu de opciones rapidas \"Rendimiento\")"
+msgstr "Elije si quieres que se muestre texto en el juego. Esto incluye racha de notas y \"Poder estrella preparado\". (Le afecta el menú de opciones rápidas \"Rendimiento\")"
 
 #: GameEngine.py:295
 msgid "Setlist Display Mode"
-msgstr "Modo de vision de la lista de canciones"
+msgstr "Modo de visión de la lista de canciones"
 
 #: GameEngine.py:295
 msgid "List"
@@ -2706,7 +2706,7 @@ msgstr "Lista y CDs"
 
 #: GameEngine.py:295
 msgid "Sets the setlist display mode. 'By Theme' lets the theme creator decide."
-msgstr "Elije las forma de mostrar la lista de canciones. \"Segun el tema\" le permite elejir al creador del tema."
+msgstr "Elije las forma de mostrar la lista de canciones. \"Según el tema\" le permite elegir al creador del tema."
 
 #: GameEngine.py:296
 msgid "Use Subfolders"
@@ -2718,43 +2718,43 @@ msgstr "Listar todo"
 
 #: GameEngine.py:296
 msgid "'Normal' allows you to navigate folders. 'List All' places all songs into a single setlist."
-msgstr "\"Normal\" te permirte navegar por las carpetas. \"Listar todo\" pone todas las canciones que tengas en una sola setlist."
+msgstr "\"Normal\" te permite navegar por las carpetas. \"Listar todo\" pone todas las canciones que tengas en una sola setlist."
 
 #: GameEngine.py:297
 msgid "Show Song Type Icons"
-msgstr "Mostrar iconos por tipo de cancion"
+msgstr "Mostrar iconos por tipo de canción"
 
 #: GameEngine.py:297
 msgid "Sets whether or not to show icons indicating the song 'type'"
-msgstr "Elije si quieres que los iconos muestren el \"tipo\" de cancion"
+msgstr "Elije si quieres que los iconos muestren el \"tipo\" de canción"
 
 #: GameEngine.py:298
 msgid "Preload Song Labels"
-msgstr "Precargar caratulas de canciones"
+msgstr "Precargar carátulas de canciones"
 
 #: GameEngine.py:298
 msgid "Sets whether to preload all song labels on load. With large setlists, this option is extremely slow."
-msgstr "Selecciona si precargar todas las canciones y caratulas en la carga. Con listas largas, esta opcion es extremadamente lenta."
+msgstr "Selecciona si precargar todas las canciones y carátulas en la carga. Con listas largas, esta opción es extremadamente lenta."
 
 #: GameEngine.py:299
 msgid "Label Type"
-msgstr "Tipo de caratula"
+msgstr "Tipo de carátula"
 
 #: GameEngine.py:299
 msgid "CD Labels"
-msgstr "Caratula de CD"
+msgstr "Carátula de CD"
 
 #: GameEngine.py:299
 msgid "Album Covers"
-msgstr "Caratula de caja"
+msgstr "Carátula de caja"
 
 #: GameEngine.py:299
 msgid "Sets whether to show CD labels or album covers as the art."
-msgstr "Selecciona si quieres mostrar las caratulas de los CDs y albumes como la arte."
+msgstr "Selecciona si quieres mostrar las carátulas de los CDs y álbumes como la arte."
 
 #: GameEngine.py:300
 msgid "Rotating CDs"
-msgstr "Rotacion de CDs"
+msgstr "Rotación de CDs"
 
 #: GameEngine.py:300
 msgid "Sets whether or not CDs rotate."
@@ -2766,11 +2766,11 @@ msgstr "Recordar cuenta de veces tocada"
 
 #: GameEngine.py:301
 msgid "Keeps track of how many times you've played each song."
-msgstr "Ordenar canciones segun las veces que has tocado cada una."
+msgstr "Ordenar canciones según las veces que has tocado cada una."
 
 #: GameEngine.py:303
 msgid "Show at Song Start"
-msgstr "Mostrar al comienzo de la cancion"
+msgstr "Mostrar al comienzo de la canción"
 
 #: GameEngine.py:303
 msgid "Part"
@@ -2778,15 +2778,15 @@ msgstr "Instrumento"
 
 #: GameEngine.py:303
 msgid "Sets whether to show a countdown or your name and part at the song's start."
-msgstr "Elije que quieres que salga en la cuenta atras del principio, el contador o el instrumento y tu nombre."
+msgstr "Elije que quieres que salga en la cuenta atrás del principio, el contador o el instrumento y tu nombre."
 
 #: GameEngine.py:304
 msgid "Overdrive Neck"
-msgstr "Mastil de sobrecarga"
+msgstr "Mástil de sobrecarga"
 
 #: GameEngine.py:304
 msgid "Sets the style of the Overdrive neck. 'Replace' replaces your neck with the special neck, while 'Overlay' lays the neck over top."
-msgstr "Elije el estilo del mastil de sobrecarga. \"Reemplazar\" reemplaza tu mastil con el mastil especial, mientras que \"Sobreponer\" la poner por encima sin taparla totalmente."
+msgstr "Elije el estilo del mástil de sobrecarga. \"Reemplazar\" reemplaza tu mástil con el mástil especial, mientras que \"Sobreponer\" la poner por encima sin taparla totalmente."
 
 #: GameEngine.py:307
 msgid "Note Hit Window"
@@ -2814,15 +2814,15 @@ msgstr "El mas amplio"
 
 #: GameEngine.py:307
 msgid "Sets how accurate you need to be while playing."
-msgstr "Elije como de exacto necesitas ser mientras juegasl"
+msgstr "Elije como de exacto necesitas ser mientras juegas."
 
 #: GameEngine.py:309
 msgid "Early Hit Window"
-msgstr "Hit windows pronto"
+msgstr "Hit windows anticipado"
 
 #: GameEngine.py:309
 msgid "None (RB2)"
-msgstr "Ninguno (RB2)"
+msgstr "No (RB2)"
 
 #: GameEngine.py:309
 msgid "Half (GH2)"
@@ -2850,11 +2850,11 @@ msgstr "Desactivar los GMP variables"
 
 #: GameEngine.py:313
 msgid "This will disable the use of the Variable BPM logic."
-msgstr "Esto desactivara el uso de la logica de GPM variable."
+msgstr "Esto desactivara el uso de la lógica de GPM variable."
 
 #: GameEngine.py:314
 msgid "Sort Direction"
-msgstr "Direccion de clasificacion"
+msgstr "Dirección de clasificación"
 
 #: GameEngine.py:314
 msgid "Ascending"
@@ -2874,7 +2874,7 @@ msgstr "Ordenar lista por"
 
 #: GameEngine.py:315
 msgid "Title"
-msgstr "Titulo"
+msgstr "Título"
 
 #: GameEngine.py:315
 msgid "Artist"
@@ -2886,7 +2886,7 @@ msgstr "Veces tocada"
 
 #: GameEngine.py:315
 msgid "Album"
-msgstr "Album"
+msgstr "Álbum"
 
 #: GameEngine.py:315
 msgid "Genre"
@@ -2902,7 +2902,7 @@ msgstr "Dificultad de la banda"
 
 #: GameEngine.py:315
 msgid "Song Collection"
-msgstr "Coleccion de canciones"
+msgstr "Colección de canciones"
 
 #: GameEngine.py:315
 msgid "Choose how to sort the setlist by default."
@@ -2914,7 +2914,7 @@ msgstr "Vibrato cambia el orden de muestra"
 
 #: GameEngine.py:316
 msgid "When enabled, pressing the whammy bar will change the sort order in the setlist."
-msgstr "Cuando esta activado, dandole al vibrato cambiara la clasificacion de la lista de canciones."
+msgstr "Cuando está activado, dándole al vibrato cambiara la clasificación de la lista de canciones."
 
 #: GameEngine.py:317
 msgid "Point Of View"
@@ -2930,7 +2930,7 @@ msgstr "Rock Revolution"
 
 #: GameEngine.py:317
 msgid "Sets the camera's point of view. Set it to any game, or set it to 'Theme' to leave it to the theme creator."
-msgstr "Elije el punto de vista de la camara. Ponlo en cualquier juego, o ponlo en \"Tema\" para dejarle elejir al creador del tema."
+msgstr "Elije el punto de vista de la cámara. Ponlo en cualquier juego, o ponlo en \"Tema\" para dejarle elegir al creador del tema."
 
 #: GameEngine.py:318
 msgid "Party Mode Timer"
@@ -2950,7 +2950,7 @@ msgstr "Muestra el numero de canciones dentro de cada lista de canciones."
 
 #: GameEngine.py:320
 msgid "CD Mode Y-Rotation"
-msgstr "Rotacion Y del modo CD"
+msgstr "Rotación Y del modo CD"
 
 #: GameEngine.py:320
 #: GameEngine.py:349
@@ -2969,7 +2969,7 @@ msgstr "J1 IA"
 
 #: GameEngine.py:324
 msgid "Enable or disable the player 1 AI"
-msgstr "Activa o desactiva la inteligencia artifial para el jugador 1"
+msgstr "Activa o desactiva la inteligencia artificial para el jugador 1"
 
 #: GameEngine.py:325
 msgid "P1 AI Personality"
@@ -3023,7 +3023,7 @@ msgstr "Ajusta la personalidad de la IA del jugador 1. El numero corresponde con
 
 #: GameEngine.py:326
 msgid "P1 AI Logic"
-msgstr "Logica de la IA J1"
+msgstr "Lógica de la IA J1"
 
 #: GameEngine.py:326
 #: GameEngine.py:330
@@ -3055,7 +3055,7 @@ msgstr "MFH-A tiempo 2"
 
 #: GameEngine.py:326
 msgid "Set the logic used for the player 1 AI. 'Original' cannot handle fast sections. 'MFH-Early' attempts to hit notes as they enter the hit window. 'MFH-OnTime' are implementations that attempt to hit the notes as they happen, like a real player."
-msgstr "Ajusta la logica usada por la IA del jugador 1. \"Original\" no puede tocar las partes rapidas. \"MFH-Temprano\"intenta tocar las notas cuando entrar en la zona de golpe. \"MFH-A tiempo\" intenta tocar las notas cuando llegan, como un jugador real."
+msgstr "Ajusta la lógica usada por la IA del jugador 1. \"Original\" no puede tocar las partes rápidas. \"MFH-Temprano\"intenta tocar las notas cuando entrar en la zona de golpe. \"MFH-A tiempo\" intenta tocar las notas cuando llegan, como un jugador real."
 
 #: GameEngine.py:328
 msgid "P2 AI"
@@ -3063,7 +3063,7 @@ msgstr "IA J2"
 
 #: GameEngine.py:328
 msgid "Enable or disable the player 2 AI"
-msgstr "Activa o desactiva la inteligencia artifial para el jugador 2"
+msgstr "Activa o desactiva la inteligencia artificial para el jugador 2"
 
 #: GameEngine.py:329
 msgid "P2 AI Personality"
@@ -3075,11 +3075,11 @@ msgstr "Ajusta la personalidad de la IA del jugador 2. El numero corresponde con
 
 #: GameEngine.py:330
 msgid "P2 AI Logic"
-msgstr "Logica de la IA J2"
+msgstr "Lógica de la IA J2"
 
 #: GameEngine.py:330
 msgid "Set the logic used for the player 2 AI. 'Original' cannot handle fast sections. 'MFH-Early' attempts to hit notes as they enter the hit window. 'MFH-OnTime' are implementations that attempt to hit the notes as they happen, like a real player."
-msgstr "Ajusta la logica usada por la IA del jugador 2. \"Original\" no puede tocar las partes rapidas. \"MFH-Temprano\"intenta tocar las notas cuando entrar en la zona de golpe. \"MFH-A tiempo\" intenta tocar las notas cuando llegan, como un jugador real."
+msgstr "Ajusta la lógica usada por la IA del jugador 2. \"Original\" no puede tocar las partes rápidas. \"MFH-Temprano\"intenta tocar las notas cuando entrar en la zona de golpe. \"MFH-A tiempo\" intenta tocar las notas cuando llegan, como un jugador real."
 
 #: GameEngine.py:332
 msgid "P3 AI"
@@ -3087,7 +3087,7 @@ msgstr "IA J3"
 
 #: GameEngine.py:332
 msgid "Enable or disable the player 3 AI"
-msgstr "Activa o desactiva la inteligencia artifial para el jugador 3"
+msgstr "Activa o desactiva la inteligencia artificial para el jugador 3"
 
 #: GameEngine.py:333
 msgid "P3 AI Personality"
@@ -3099,11 +3099,11 @@ msgstr "Ajusta la personalidad de la IA del jugador 3. El numero corresponde con
 
 #: GameEngine.py:334
 msgid "P3 AI Logic"
-msgstr "Logica de la IA J3"
+msgstr "Lógica de la IA J3"
 
 #: GameEngine.py:334
 msgid "Set the logic used for the player 3 AI. 'Original' cannot handle fast sections. 'MFH-Early' attempts to hit notes as they enter the hit window. 'MFH-OnTime' are implementations that attempt to hit the notes as they happen, like a real player."
-msgstr "Ajusta la logica usada por la IA del jugador 3. \"Original\" no puede tocar las partes rapidas. \"MFH-Temprano\"intenta tocar las notas cuando entrar en la zona de golpe. \"MFH-A tiempo\" intenta tocar las notas cuando llegan, como un jugador real."
+msgstr "Ajusta la lógica usada por la IA del jugador 3. \"Original\" no puede tocar las partes rápidas. \"MFH-Temprano\"intenta tocar las notas cuando entrar en la zona de golpe. \"MFH-A tiempo\" intenta tocar las notas cuando llegan, como un jugador real."
 
 #: GameEngine.py:336
 msgid "P4 AI"
@@ -3111,7 +3111,7 @@ msgstr "IA J4"
 
 #: GameEngine.py:336
 msgid "Enable or disable the player 4 AI"
-msgstr "Activa o desactiva la inteligencia artifial para el jugador 4"
+msgstr "Activa o desactiva la inteligencia artificial para el jugador 4"
 
 #: GameEngine.py:337
 msgid "P4 AI Personality"
@@ -3123,11 +3123,11 @@ msgstr "Ajusta la personalidad de la IA del jugador 4. El numero corresponde con
 
 #: GameEngine.py:338
 msgid "P4 AI Logic"
-msgstr "Logica de la IA J4"
+msgstr "Lógica de la IA J4"
 
 #: GameEngine.py:338
 msgid "Set the logic used for the player 4 AI. 'Original' cannot handle fast sections. 'MFH-Early' attempts to hit notes as they enter the hit window. 'MFH-OnTime' are implementations that attempt to hit the notes as they happen, like a real player."
-msgstr "Ajusta la logica usada por la IA del jugador 4. \"Original\" no puede tocar las partes rapidas. \"MFH-Temprano\"intenta tocar las notas cuando entrar en la zona de golpe. \"MFH-A tiempo\" intenta tocar las notas cuando llegan, como un jugador real."
+msgstr "Ajusta la lógica usada por la IA del jugador 4. \"Original\" no puede tocar las partes rápidas. \"MFH-Temprano\"intenta tocar las notas cuando entrar en la zona de golpe. \"MFH-A tiempo\" intenta tocar las notas cuando llegan, como un jugador real."
 
 #: GameEngine.py:341
 msgid "Lyric Display Mode"
@@ -3135,7 +3135,7 @@ msgstr "Modo de mostrar letra"
 
 #: GameEngine.py:341
 msgid "Scrolling"
-msgstr "Desplazandose"
+msgstr "Desplazándose"
 
 #: GameEngine.py:341
 msgid "Simple Lines"
@@ -3163,15 +3163,15 @@ msgstr "Porcentaje velocidad letra"
 
 #: GameEngine.py:343
 msgid "Sets how quickly lyrics will scroll."
-msgstr "Configura como de rapido las letras se desplazaran."
+msgstr "Configura como de rápido las letras se desplazaran."
 
 #: GameEngine.py:349
 msgid "Graphical Submenus"
-msgstr "Submenus graficos"
+msgstr "Submenús gráficos"
 
 #: GameEngine.py:349
 msgid "Enable or disable the use of graphical submenus."
-msgstr "Activa o desactiva el uso de los submenus graficos."
+msgstr "Activa o desactiva el uso de los submenús gráficos."
 
 #: GameEngine.py:352
 msgid "Crowd Cheers"
@@ -3179,7 +3179,7 @@ msgstr "Publico cantando"
 
 #: GameEngine.py:352
 msgid "Off (Disabled)"
-msgstr "Off (Desactivado)"
+msgstr "No (Desactivado)"
 
 #: GameEngine.py:352
 msgid "During SP Only"
@@ -3195,7 +3195,7 @@ msgstr "Siempre activado"
 
 #: GameEngine.py:352
 msgid "Sets when the crowd will cheer for you (if a crowd.ogg is present). 'During SP' will have them sing along in star power, and 'During SP & Green' will have them cheering both in SP and when your rock meter is above 2/3"
-msgstr "Elije cuando el publico cantara tu cancion (si hay un archivo de sonido crowd.ogg). \"Durante PE\" los tendran a ellos cantando solos durante el poder estrella, y \"Durante PE y Verde\" los tendra tanto en PE como cuando tu medidor de rock supere los 2/3."
+msgstr "Elije cuando el publico cantara tu canción (si hay un archivo de sonido crowd.ogg). \"Durante PE\" los tendrán a ellos cantando solos durante el poder estrella, y \"Durante PE y Verde\" los tendrá tanto en PE como cuando tu medidor de rock supere los 2/3."
 
 #: GameEngine.py:355
 msgid "Miss Volume"
@@ -3211,7 +3211,7 @@ msgstr "Fallar pista sola"
 
 #: GameEngine.py:356
 msgid "When playing a song with only a single track, this sets the volume of the track when you miss a note."
-msgstr "Cuando tocas una cancion con una sola pista de audio, esto ajusta el volumen cuando fallas una nota"
+msgstr "Cuando tocas una canción con una sola pista de audio, esto ajusta el volumen cuando fallas una nota"
 
 #: GameEngine.py:357
 msgid "Menu Volume"
@@ -3251,27 +3251,27 @@ msgstr "Guardar datos de canciones en cache"
 
 #: GameEngine.py:369
 msgid "This will allow information about the songs to be stored for quick access later at the cost of a slow first time loading."
-msgstr "Esto permirtira guardar la informacion de las canciones y que sea almaceenada para una acesso mas rapido, con la pega de un tiempo de carga inicial mas lento."
+msgstr "Esto permitirá guardar la información de las canciones y que sea almacenada para una acceso mas rápido, con la pega de un tiempo de carga inicial mas lento."
 
 #: GameEngine.py:372
 msgid "Pitch Analysis Code"
-msgstr "Codigo de analisis de tono"
+msgstr "Código de análisis de tono"
 
 #: GameEngine.py:372
 msgid "Sets whether to use the 'pypitch' engine or the built-in PitchAnalyzer to analyze microphone information."
-msgstr "Elije si usar el motor de \"pypitch\" o el built-in de \"Pitch-Analyzer para analizar la informacion del microfono."
+msgstr "Elije si usar el motor de \"pypitch\" o el built-in de \"Pitch-Analyzer para analizar la información del micrófono."
 
 #: GameEngine.py:394
 msgid "Sets the overall graphical feel of the game. You can find and download many more at fretsonfire.net"
-msgstr "Elije el atuendo grafico de tu juego. Puedes encontrar mucho mas en meteorito.dyndns.org/phpbb3/"
+msgstr "Elije el atuendo gráfico de tu juego. Puedes encontrar mucho mas en meteorito.dyndns.org/phpbb3/"
 
 #: GameEngine.py:399
 msgid "Board Speed Percent"
-msgstr "Porcentaje de velocidad del mastil"
+msgstr "Porcentaje de velocidad del mástil"
 
 #: GameEngine.py:399
 msgid "Sets how quickly note will scroll"
-msgstr "Ajusta como de rapido van a pasar las notas"
+msgstr "Ajusta como de rápido van a pasar las notas"
 
 #: GameEngine.py:400
 msgid "No Fail"
@@ -3279,35 +3279,35 @@ msgstr "Sin fallo"
 
 #: GameEngine.py:400
 msgid "Sets whether or not you can fail out of a song."
-msgstr "Elije si puedes o no fallar una cancion"
+msgstr "Elije si puedes o no fallar una canción"
 
 #: GameEngine.py:404
 msgid "Difficulty (Setlist Score)"
-msgstr "Dificultad (Puntuacion lista)"
+msgstr "Dificultad (Puntuación lista)"
 
 #: GameEngine.py:404
 msgid "Sets the default difficulty displayed in the setlist score."
-msgstr "Elije la dificultad por defecto que aparecera en la lista de canciones."
+msgstr "Elije la dificultad por defecto que aparecerá en la lista de canciones."
 
 #: GameEngine.py:405
 msgid "Show Additional Stats"
-msgstr "Mostrar estadisticas adicionales"
+msgstr "Mostrar estadísticas adicionales"
 
 #: GameEngine.py:405
 msgid "If enabled, additional score information (longest streak, percentage) is displayed on the setlist."
-msgstr "Si lo activas, informacion adicional (mayor racha de notas/frases,porcentaje) sera mostrada en la lista de canciones."
+msgstr "Si lo activas, información adicional (mayor racha de notas/frases,porcentaje) sera mostrada en la lista de canciones."
 
 #: GameEngine.py:407
 msgid "Instrument (Setlist Score)"
-msgstr "Intrumento (Puntuacion lista)"
+msgstr "Instrumento (Puntuación lista)"
 
 #: GameEngine.py:407
 msgid "Sets the default part displayed in the setlist score."
-msgstr "Elije el intrumento por defecto que se muestra en las puntuaciones de la lista de canciones."
+msgstr "Elije el instrumento por defecto que se muestra en las puntuaciones de la lista de canciones."
 
 #: GameEngine.py:638
 msgid "Slideshow"
-msgstr "Pase de imagenes"
+msgstr "Pase de imágenes"
 
 #: GameEngine.py:641
 #: GameEngine.py:655
@@ -3321,7 +3321,7 @@ msgstr "Modo cooperativo"
 
 #: GameResultsScene.py:140
 msgid "settings"
-msgstr "configuracion"
+msgstr "configuración"
 
 #: GameResultsScene.py:141
 msgid "HOPOs"
@@ -3333,11 +3333,11 @@ msgstr "Hit Windows"
 
 #: GameResultsScene.py:143
 msgid "Adjusted Score Multiplier:"
-msgstr "Multiplicador de puntuacion ajustado:"
+msgstr "Multiplicador de puntuación ajustado:"
 
 #: GameResultsScene.py:144
 msgid "Original Score:"
-msgstr "Puntuacion original:"
+msgstr "Puntuación original:"
 
 #: GameResultsScene.py:147
 msgid "Continue"
@@ -3361,37 +3361,37 @@ msgstr "Nuevo sistema"
 
 #: GameResultsScene.py:380
 msgid "Relax, it was an excellent show."
-msgstr "Relajate, fue una actuacion excelente."
+msgstr "Relajate, fue una actuación excelente."
 
 #: GameResultsScene.py:382
 msgid "Truly Amazing!"
-msgstr "Realmente increible!"
+msgstr "¡Realmente increible!"
 
 #: GameResultsScene.py:384
 msgid "Thanks for playing!"
-msgstr "Gracias por tocar!"
+msgstr "¡Gracias por tocar!"
 
 #: GameResultsScene.py:386
 msgid "One more song can't hurt!"
-msgstr "Una cancion mas no puede hacer daño!"
+msgstr "¡Una canción mas no puede hacer daño!"
 
 #: GameResultsScene.py:388
 msgid "What an amazing performance!"
-msgstr "Menuda interpretacion!"
+msgstr "¡Menuda interpretación!"
 
 #: GameResultsScene.py:390
 msgid "That's how it's done!"
-msgstr "Asi se hace!"
+msgstr "¡Así se hace!"
 
 #: GameResultsScene.py:572
 #, python-format
 msgid "%d points is a new high score! Enter your name:"
-msgstr "%d puntos es una nueva puntuacion alta! Introduce tu nombre:"
+msgstr "¡%d puntos es una nueva puntuación alta! Introduce tu nombre:"
 
 #: GameResultsScene.py:1297
 #, python-format
 msgid "%s High Scores for %s"
-msgstr "%s Puntuaciones mas altas para  %s"
+msgstr " Puntuaciones de %s mas altas para %s"
 
 #: GameResultsScene.py:1299
 #, python-format
@@ -3409,11 +3409,11 @@ msgstr "Subiendo puntuaciones al servidor..."
 
 #: GameResultsScene.py:1372
 msgid "Scores uploaded!"
-msgstr "Puntuacion subida!"
+msgstr "¡Puntuación subida!"
 
 #: GameResultsScene.py:1376
 msgid "Your highscore ranks"
-msgstr "Tu puntuacion queda en el puesto"
+msgstr "¡Tu puntuación queda en el puesto"
 
 #: GameResultsScene.py:1377
 msgid "on the world starpower chart!"
@@ -3425,19 +3425,19 @@ msgstr "pero tu puesto es desconocido."
 
 #: GameResultsScene.py:1383
 msgid "but there was no new highscore."
-msgstr "pero no hay una nueva puntuacion alta."
+msgstr "pero no hay una nueva puntuación alta."
 
 #: GameResultsScene.py:1386
 msgid "Score upload failed!  World charts may be down."
-msgstr "Fallo la subida al servidor! Quizas estea caido el servidor."
+msgstr "Fallo la subida al servidor! Quizás esté caído el servidor."
 
 #: GameTask.py:72
 msgid "Connection lost."
-msgstr "Se perdio la conexion."
+msgstr "Se perdió la conexión."
 
 #: GuitarScene.py:121
 msgid "Let's get this show on the Road"
-msgstr "Vamos a hacer este show wn la carretera"
+msgstr "Vamos a hacer este show en la carretera"
 
 #: GuitarScene.py:123
 msgid "Impress the Crowd"
@@ -3445,19 +3445,19 @@ msgstr "Impresiona al publico"
 
 #: GuitarScene.py:125
 msgid "Don't forget to strum!"
-msgstr "No te olvides de rasquear"
+msgstr "No te olvides de rasguear"
 
 #: GuitarScene.py:127
 msgid "Rock the house!"
-msgstr "Rockea tu vida!"
+msgstr "¡Rockea tu vida!"
 
 #: GuitarScene.py:129
 msgid "Jurgen is watching"
-msgstr "Jurgen te esta observando"
+msgstr "Jurgen te está observando"
 
 #: GuitarScene.py:130
 msgid "Initializing..."
-msgstr "Empezando.."
+msgstr "Empezando..."
 
 #: GuitarScene.py:517
 msgid "KiD"
@@ -3485,11 +3485,11 @@ msgstr "Jurgen"
 
 #: GuitarScene.py:522
 msgid "Overdrive"
-msgstr "Sobrecarga (PE RB)"
+msgstr "Sobrecarga"
 
 #: GuitarScene.py:524
 msgid "Starpower"
-msgstr "Poder estrella"
+msgstr "Energía estrella"
 
 #: GuitarScene.py:529
 msgid "Broken String"
@@ -3497,41 +3497,41 @@ msgstr "Cuerda rota"
 
 #: GuitarScene.py:531
 msgid "Powerup Steal"
-msgstr "Robar energia"
+msgstr "Robar energía"
 
 #: GuitarScene.py:535
 #, python-format
 msgid "%d Note Streak!!!"
-msgstr "Racha de %d notas!!"
+msgstr "¡¡Racha de %d notas!!"
 
 #: GuitarScene.py:536
 #, python-format
 msgid "%d Phrase Streak!!!"
-msgstr "Racha de %d frases!!"
+msgstr "¡¡Racha de %d frases!!"
 
 #: GuitarScene.py:537
 #, python-format
 msgid "%s Ready"
-msgstr "%s listo"
+msgstr "%s lista"
 
 #: GuitarScene.py:538
 #, python-format
 msgid "Activate %s!"
-msgstr "Activa %s!"
+msgstr "¡Activa la %s!"
 
 #: GuitarScene.py:539
 msgid "You Failed!!!!"
-msgstr "Fallastes!!!"
+msgstr "¡¡Fallastes!!!"
 
 #: GuitarScene.py:540
 #, python-format
 msgid "%s is here"
-msgstr "%s esta aqui"
+msgstr "%s está aqui"
 
 #: GuitarScene.py:541
 #, python-format
 msgid "%s was here"
-msgstr "%s estaba aqui"
+msgstr "%s estaba aquí"
 
 #: GuitarScene.py:542
 msgid "% Complete"
@@ -3584,15 +3584,15 @@ msgstr "Un poco tarde"
 
 #: GuitarScene.py:553
 msgid "-Excellent!"
-msgstr "-Excelente!"
+msgstr "-¡Excelente!"
 
 #: GuitarScene.py:554
 msgid "Perfect!!"
-msgstr "Perfecto!!"
+msgstr "¡¡Perfecto!!"
 
 #: GuitarScene.py:555
 msgid "+Excellent!"
-msgstr "+Excelente!"
+msgstr "+¡Excelente!"
 
 #: GuitarScene.py:556
 msgid "Slightly Early"
@@ -3608,23 +3608,23 @@ msgstr "Solo!"
 
 #: GuitarScene.py:561
 msgid "Perfect Solo!"
-msgstr "Un solo perfecto!"
+msgstr "¡Un solo perfecto!"
 
 #: GuitarScene.py:562
 msgid "Awesome Solo!"
-msgstr "Un solo increible!"
+msgstr "¡Un solo increíble!"
 
 #: GuitarScene.py:563
 msgid "Great Solo!"
-msgstr "Gran solo!"
+msgstr "¡Gran solo!"
 
 #: GuitarScene.py:564
 msgid "Good Solo!"
-msgstr "Buen solo!"
+msgstr "¡Buen solo!"
 
 #: GuitarScene.py:565
 msgid "Solid Solo!"
-msgstr "Un solo solido!"
+msgstr "¡Un solo solido!"
 
 #: GuitarScene.py:566
 msgid "Okay Solo"
@@ -3640,7 +3640,7 @@ msgstr "pts"
 
 #: GuitarScene.py:569
 msgid "Get Ready to Rock"
-msgstr "Preparate para rochear"
+msgstr "Preparate para rockear"
 
 #: GuitarScene.py:570
 msgid "as made famous by"
@@ -3648,7 +3648,7 @@ msgstr "dada a conocer por"
 
 #: GuitarScene.py:571
 msgid "by "
-msgstr "por"
+msgstr "por "
 
 #: GuitarScene.py:572
 msgid " fretted by "
@@ -3656,69 +3656,69 @@ msgstr "freteada por"
 
 #: GuitarScene.py:952
 msgid "Preparing Note Phrases..."
-msgstr "Cargando chart de ka cancion..."
+msgstr "Cargando chart de la canción..."
 
 #: GuitarScene.py:1447
 msgid "Loading Graphics..."
-msgstr "Cargando imagenes..."
+msgstr "Cargando imágenes..."
 
 #: GuitarScene.py:2098
 msgid "         RESUME"
-msgstr "SEGUIR"
+msgstr "         SEGUIR"
 
 #: GuitarScene.py:2099
 msgid "        RESTART"
-msgstr "REINICIAR"
+msgstr "        REINICIAR"
 
 #: GuitarScene.py:2101
 msgid "       PRACTICE"
-msgstr "PRACTICAR"
+msgstr "       PRACTICAR"
 
 #: GuitarScene.py:2102
 msgid "        OPTIONS"
-msgstr "OPCIONES"
+msgstr "        OPCIONES"
 
 #: GuitarScene.py:2103
 #: GuitarScene.py:2112
 msgid "           QUIT"
-msgstr "SALIR"
+msgstr "           SALIR"
 
 #: GuitarScene.py:2107
 msgid "        RESUME"
-msgstr "SEGUIR"
+msgstr "         SEGUIR"
 
 #: GuitarScene.py:2108
 msgid "       RESTART"
-msgstr "REINICIAR"
+msgstr "       REINICIAR"
 
 #: GuitarScene.py:2110
 msgid "      END SONG"
-msgstr "ACABAR CANCION"
+msgstr " ACABAR CANCIÓN"
 
 #: GuitarScene.py:2111
 msgid "       OPTIONS"
-msgstr "OPCIONES"
+msgstr "       OPCIONES"
 
 #: GuitarScene.py:2117
 #: GuitarScene.py:2124
 msgid "RETRY SONG"
-msgstr "REINTENTAR CANCION"
+msgstr "REINTENTAR CANCIÓN"
 
 #: GuitarScene.py:2118
 msgid "  PRACTICE"
-msgstr "PRACTICAR"
+msgstr "  PRACTICAR"
 
 #: GuitarScene.py:2119
 #: GuitarScene.py:2125
 #: GuitarScene.py:2189
 #: GuitarScene.py:2196
 msgid " NEW SONG"
-msgstr "NUEVA CANCION"
+msgstr "NUEVA CANCIÓN"
 
 #: GuitarScene.py:2120
 #: GuitarScene.py:2126
 msgid "     QUIT"
-msgstr "SALIR"
+msgstr "      SALIR"
 
 #: GuitarScene.py:2133
 #: GuitarScene.py:2142
@@ -3733,7 +3733,7 @@ msgstr "Volver a empezar"
 #: GuitarScene.py:2135
 #: GuitarScene.py:2144
 msgid "  Change Song"
-msgstr "Cambiar cancion"
+msgstr "Cambiar canción"
 
 #: GuitarScene.py:2136
 msgid "  Practice"
@@ -3747,11 +3747,11 @@ msgstr "Ajustes"
 #: GuitarScene.py:2138
 #: GuitarScene.py:2147
 msgid "  Quit to Main Menu"
-msgstr "Salir al menu principal"
+msgstr "Salir al menú principal"
 
 #: GuitarScene.py:2145
 msgid "  End Song"
-msgstr "Acabar cancion"
+msgstr "Acabar canción"
 
 #: GuitarScene.py:2152
 #: GuitarScene.py:2159
@@ -3770,54 +3770,54 @@ msgstr "¿Practicar?"
 #: GuitarScene.py:2155
 #: GuitarScene.py:2161
 msgid "Quit to Main"
-msgstr "Salir al menu"
+msgstr "Salir al menú"
 
 #: GuitarScene.py:2169
 #: GuitarScene.py:2178
 msgid "   RESUME"
-msgstr "SEGUIR"
+msgstr "   SEGUIR"
 
 #: GuitarScene.py:2170
 #: GuitarScene.py:2179
 msgid "   RESTART"
-msgstr "REINICIAR"
+msgstr "   REINICIAR"
 
 #: GuitarScene.py:2171
 #: GuitarScene.py:2180
 msgid "   CHANGE SONG"
-msgstr "CAMBIAR CANCION"
+msgstr "   CAMBIAR CANCIÓN"
 
 #: GuitarScene.py:2172
 msgid "   PRACTICE"
-msgstr "PRACTICAR"
+msgstr "   PRACTICAR"
 
 #: GuitarScene.py:2173
 #: GuitarScene.py:2182
 msgid "   SETTINGS"
-msgstr "AJUSTES"
+msgstr "   AJUSTES"
 
 #: GuitarScene.py:2174
 #: GuitarScene.py:2183
 msgid "   QUIT"
-msgstr "SALIR"
+msgstr "   SALIR"
 
 #: GuitarScene.py:2181
 msgid "   END SONG"
-msgstr "ACABAR CANCION"
+msgstr "   ACABAR CANCIÓN"
 
 #: GuitarScene.py:2188
 #: GuitarScene.py:2195
 msgid " RETRY"
-msgstr "REINTENTAR"
+msgstr " REINTENTAR"
 
 #: GuitarScene.py:2190
 msgid " PRACTICE"
-msgstr "PRACTICAR"
+msgstr " PRACTICAR"
 
 #: GuitarScene.py:2191
 #: GuitarScene.py:2197
 msgid " QUIT"
-msgstr "SALIR"
+msgstr " SALIR"
 
 #: GuitarScene.py:9318
 #, python-format
@@ -3830,7 +3830,7 @@ msgstr "Idioma"
 
 #: Language.py:61
 msgid "Change the game language!"
-msgstr "Cambia el idioma del juego!"
+msgstr "¡Cambia el idioma del juego!"
 
 #: Lobby.py:131
 msgid "Choose Your Character"
@@ -3843,11 +3843,11 @@ msgstr "Jugador %d"
 
 #: Lobby.py:134
 msgid "Regular Drums"
-msgstr "Bateria regular"
+msgstr "Batería regular"
 
 #: Lobby.py:134
 msgid "Flipped Drums"
-msgstr "Bateria volteada"
+msgstr "Batería invertida"
 
 #: Lobby.py:135
 msgid "Pedal-Using"
@@ -3865,7 +3865,7 @@ msgstr "Modo asistido Off"
 #: Lobby.py:600
 #: Player.py:223
 msgid "Easy Assist"
-msgstr "Asistido facil"
+msgstr "Asistido fácil"
 
 #: Lobby.py:136
 #: Lobby.py:600
@@ -3879,11 +3879,11 @@ msgstr "Maestro de los acordes"
 
 #: Lobby.py:137
 msgid "Two Notes Max"
-msgstr "Macimo dos notas"
+msgstr "Máximo dos notas"
 
 #: Lobby.py:138
 msgid "Information:"
-msgstr "Informacion:"
+msgstr "Información:"
 
 #: Lobby.py:156
 msgid "Create New Player"
@@ -3905,7 +3905,7 @@ msgstr "Jugador #%d"
 #: Lobby.py:527
 #, python-format
 msgid "Lobby (%d players)"
-msgstr "Sala de espera (%d jugadores)"
+msgstr "Camerino (%d jugadores)"
 
 #: Lobby.py:556
 msgid "Press Enter to Start Game"
@@ -3914,16 +3914,16 @@ msgstr "Dale a Enter para empezar el juego"
 #: Lobby.py:599
 #: Player.py:219
 msgid "Default Neck"
-msgstr "Mastil por defecto"
+msgstr "Mástil por defecto"
 
 #: Lobby.py:599
 #: Player.py:219
 msgid "Theme Neck"
-msgstr "Mastil del tema"
+msgstr "Mástil del tema"
 
 #: Lobby.py:599
 msgid "Select a Neck"
-msgstr "Elije un mastil"
+msgstr "Elije un mástil"
 
 #: Lobby.py:601
 msgid "Name"
@@ -3931,7 +3931,7 @@ msgstr "Nombre"
 
 #: Lobby.py:601
 msgid "Name your character!"
-msgstr "Ponle un nombre!"
+msgstr "¡Ponle un nombre!"
 
 #: Lobby.py:602
 #: Player.py:220
@@ -3940,16 +3940,16 @@ msgstr "Modo zurdo"
 
 #: Lobby.py:602
 msgid "Flip the guitar frets for left-handed playing!"
-msgstr "Voltea los trastes de guitarra para el modo zurdo!"
+msgstr "¡Voltea los trastes de guitarra para el modo zurdo!"
 
 #: Lobby.py:603
 #: Player.py:221
 msgid "Drum Flip"
-msgstr "Locura de bateria"
+msgstr "Locura de batería"
 
 #: Lobby.py:603
 msgid "Flip the drum sounds - red hits become green, and so on"
-msgstr "Altera los sonidos de la bateria, golpes rojos se vuelven verdes, y etc.."
+msgstr "Altera los sonidos de la batería, golpes rojos se vuelven verdes, y etc.."
 
 #: Lobby.py:604
 msgid "Auto-Kick Bass"
@@ -3957,7 +3957,7 @@ msgstr "Auto pedal"
 
 #: Lobby.py:604
 msgid "Feet uncooperative? Broke your pedal? Not to worry!"
-msgstr "¿Pies pocos cooperativos? ¿Rompe tu pedal? No pasa nada!"
+msgstr "¿Pies pocos cooperativos? ¿Rompe tu pedal? ¡No pasa nada!"
 
 #: Lobby.py:605
 #: Player.py:223
@@ -3966,21 +3966,21 @@ msgstr "Modo asistido"
 
 #: Lobby.py:605
 msgid "Play hard and expert, even when you're not that good!"
-msgstr "Juega en Dificil y Experto, incluso aunque no seas tan bueno!"
+msgstr "¡Juega en Dificil y Experto, incluso aunque no seas tan bueno!"
 
 #: Lobby.py:606
 #: Player.py:202
 #: Player.py:222
 msgid "Two-Chord Max"
-msgstr "Maximo 2 acordes"
+msgstr "Máximo 2 acordes"
 
 #: Lobby.py:606
 msgid "Cut those jumbo chords down to a more manageable size!"
-msgstr "Corta esos acordes colosales en unos mas manejables!"
+msgstr "¡Corta esos acordes colosales en unos mas manejables!"
 
 #: Lobby.py:607
 msgid "Set a custom neck image just for you!"
-msgstr "Elije una imagen de mastil  especialmente para ti!"
+msgstr "¡Elije una imagen de mástil  especialmente para ti!"
 
 #: Lobby.py:608
 msgid "Upload Name"
@@ -3988,7 +3988,7 @@ msgstr "Subir nombre"
 
 #: Lobby.py:608
 msgid "'Harry Potter' is all well and good, but..."
-msgstr "'Chikito de la calzada' esta bien y tal, pero..."
+msgstr "'Chikito de la calzada' está bien y tal, pero..."
 
 #: Lobby.py:609
 msgid "Choose Avatar"
@@ -3996,7 +3996,7 @@ msgstr "Elije un avatar"
 
 #: Lobby.py:609
 msgid "Sometimes I wonder what you look like."
-msgstr "A veces, desearia saber como eres."
+msgstr "A veces, desearía saber como eres."
 
 #: Lobby.py:610
 msgid "Delete Character"
@@ -4004,7 +4004,7 @@ msgstr "Borrar personaje"
 
 #: Lobby.py:610
 msgid "Come on... I didn't mean it. Really, I promise!"
-msgstr "Venga..! No, no me referia a.. lo prometo!"
+msgstr "Venga..! No, no me refería a.. lo prometo!"
 
 #: Lobby.py:611
 msgid "Done"
@@ -4012,7 +4012,7 @@ msgstr "Hecho"
 
 #: Lobby.py:611
 msgid "All finished? Let's do this thing!"
-msgstr "¿Ya acabastes? Vamos a hacerlo!"
+msgstr "¿Ya acabaste? ¡Vamos a crearlo!"
 
 #: Lobby.py:646
 msgid "Are you sure you want to delete this player?"
@@ -4024,15 +4024,15 @@ msgstr "Es un nombre horrible. Elije algo que no sea por \"defecto\""
 
 #: Lobby.py:672
 msgid "That name already exists!"
-msgstr "Ese nombre ya existe!"
+msgstr "¡Ese nombre ya existe!"
 
 #: Lobby.py:674
 msgid "Please enter a name!"
-msgstr "Por favor, escribe un nombre!"
+msgstr "¡Por favor, escribe un nombre!"
 
 #: MainMenu.py:211
 msgid "Host Multiplayer Game"
-msgstr "Hostear juego multijugado"
+msgstr "Hostear juego multijugador"
 
 #: MainMenu.py:212
 msgid "Join Multiplayer Game"
@@ -4040,11 +4040,11 @@ msgstr "Entrar a un juego multijugador"
 
 #: MainMenu.py:216
 msgid "Edit Existing Song"
-msgstr "Editar cancion existente"
+msgstr "Editar canción existente"
 
 #: MainMenu.py:217
 msgid "Import New Song"
-msgstr "Importat nueva cancion"
+msgstr "Importar nueva canción"
 
 #: MainMenu.py:218
 msgid "Import GH(tm) Songs"
@@ -4103,11 +4103,11 @@ msgstr "Tour en solitario"
 
 #: MainMenu.py:390
 msgid "No tutorials found!"
-msgstr "No se encontraron tutoriales!"
+msgstr "¡No se encontraron tutoriales!"
 
 #: MainMenu.py:455
 msgid "Enter the server address:"
-msgstr "Introduce la direccion del server:"
+msgstr "Introduce la direccion del servidor:"
 
 #: MainMenu.py:462
 msgid "Connecting..."
@@ -4115,11 +4115,11 @@ msgstr "Conectando..."
 
 #: Microphone.py:57
 msgid "[Default Microphone]"
-msgstr "[ Microfono por defecto]"
+msgstr "[Micrófono por defecto]"
 
 #: Microphone.py:193
 msgid "[Microphones not supported]"
-msgstr "[Microfono no soportado]"
+msgstr "[Micrófono no soportado]"
 
 #: Player.py:181
 msgid "Name your controller."
@@ -4151,7 +4151,7 @@ msgstr "Pua secundaria"
 
 #: Player.py:187
 msgid "Bass Drum 2"
-msgstr "Pedal fr bateria 2"
+msgstr "Pedal de batería 2"
 
 #: Player.py:193
 msgid "Solo Fret #1"
@@ -4164,7 +4164,7 @@ msgstr "Tecla de solo"
 #: Player.py:193
 #: Player.py:208
 msgid "Analog Slider"
-msgstr "Deslizante analogico"
+msgstr "Deslizante analógico"
 
 #: Player.py:194
 msgid "Solo Fret #2"
@@ -4192,7 +4192,7 @@ msgstr "Poder estrella"
 
 #: Player.py:202
 msgid "When enabled, the highest notes in large note chords are auto-played."
-msgstr "Cuando lo activas, las notas mas altas en largos acordes son tocadas automaticamente."
+msgstr "Cuando lo activas, las notas mas altas en largos acordes son tocadas automáticamente."
 
 #: Player.py:203
 msgid "Controller Type"
@@ -4200,7 +4200,7 @@ msgstr "Tipo de controlador"
 
 #: Player.py:203
 msgid "Standard Guitar"
-msgstr "Guitarra standar"
+msgstr "Guitarra estándar"
 
 #: Player.py:203
 msgid "Solo Shift Guitar"
@@ -4208,47 +4208,47 @@ msgstr "Guitarra variada de solo"
 
 #: Player.py:203
 msgid "Drum Set (4-Drum)"
-msgstr "Kit de bateria (4 pads)"
+msgstr "Kit de batería (4 pads)"
 
 #: Player.py:203
 msgid "Analog Slide Guitar"
-msgstr "Guitarra deslizante analogica"
+msgstr "Guitarra deslizante analógica"
 
 #: Player.py:203
 msgid "Microphone"
-msgstr "Microfono"
+msgstr "Micrófono"
 
 #: Player.py:203
 msgid "'Standard Guitar' is for keyboards and pre-WT GH-series guitars. 'Solo Shift Guitar' is for RB-series guitars and keyboards who want to use a shift key for solo frets. 'Analog Slide Guitar' is for guitars with an analog slider bar."
-msgstr "\"Guitarra estandar\" es para teclados y guitarras pre-WT y de la serie GH. \"Guitarra variada de solo\" es para guitarras de la serie RB y teclados que quieran usar una tecla Shift para trastes de Solo. \"Guitarra deslizante analogica\" es para guitarras con una barra analogica deslizante."
+msgstr "\"Guitarra estándar\" es para teclados y guitarras pre-WT y de la serie GH. \"Guitarra variada de solo\" es para guitarras de la serie RB y teclados que quieran usar una tecla Shift para trastes de Solo. \"Guitarra deslizante analógica\" es para guitarras con una barra analógica deslizante."
 
 #: Player.py:204
 msgid "Analog SP"
-msgstr "PE analogico"
+msgstr "PE analógico"
 
 #: Player.py:204
 msgid "Enables analog SP (as in the XBOX Xplorer controller.)"
-msgstr "Permitir PE analogico (como el controlador de XBOX Xplorer)"
+msgstr "Permitir PE analógico (como el controlador de XBOX Xplorer)"
 
 #: Player.py:205
 msgid "Analog SP Threshold"
-msgstr "Umbral Analogico de PE"
+msgstr "Umbral Analógico de PE"
 
 #: Player.py:205
 msgid "Sets a threshold level for activating SP in analog mode."
-msgstr "Elije un nivel de umbral para activar el PE en modo analogico."
+msgstr "Elije un nivel de umbral para activar el PE en modo analógico."
 
 #: Player.py:206
 msgid "Analog SP Sensitivity"
-msgstr "Sensibilidad analogica del PE"
+msgstr "Sensibilidad analógica del PE"
 
 #: Player.py:206
 msgid "Sets the sensitivity for activating SP in analog mode."
-msgstr "Elije la sensibilidad para activar el PE en modo analogico."
+msgstr "Elije la sensibilidad para activar el PE en modo analógico."
 
 #: Player.py:207
 msgid "Analog Drums"
-msgstr "Bateria analogica"
+msgstr "Batería analógica"
 
 #: Player.py:207
 #: Player.py:209
@@ -4267,7 +4267,7 @@ msgstr "XBOX Inv."
 
 #: Player.py:207
 msgid "Enables analog drums as in RB2 and GH drumsets."
-msgstr "Permite activar el modo analogico en bateria como en RB2 y los kits de bateria de GH."
+msgstr "Permite activar el modo analógico en batería como en RB2 y los kits de batería de GH."
 
 #: Player.py:208
 msgid "Inverted"
@@ -4275,15 +4275,15 @@ msgstr "Invertido"
 
 #: Player.py:208
 msgid "Experimental testing for the analog slide mode."
-msgstr "Prueba experimental para el modo deslizante analogico."
+msgstr "Prueba experimental para el modo deslizante analógico."
 
 #: Player.py:209
 msgid "Analog Effects"
-msgstr "Efectos analogicos"
+msgstr "Efectos analógicos"
 
 #: Player.py:209
 msgid "Enables analog whammy bar. Set to the system your controller was designed for."
-msgstr "Permite usar la palanca de vibrato analogica. Elije el sistema para el que tu controlador fue diseñado."
+msgstr "Permite usar la palanca de vibrato analógica. Elije el sistema para el que tu controlador fue diseñado."
 
 #: Player.py:210
 msgid "Sound FX Switch"
@@ -4299,7 +4299,7 @@ msgstr "Regreso"
 
 #: Player.py:211
 msgid "Microphone Device"
-msgstr "Aparato de microfono"
+msgstr "Aparato de micrófono"
 
 #: Player.py:212
 msgid "Tap Sensitivity"
@@ -4307,7 +4307,7 @@ msgstr "Sensibilidad de golpe"
 
 #: Player.py:212
 msgid "Sets how sensitive the microphone is to being tapped."
-msgstr "Ajusta como de sensible sera el microfono al dar golpes."
+msgstr "Ajusta como de sensible sera el micrófono al dar golpes."
 
 #: Player.py:213
 msgid "Passthrough Volume"
@@ -4315,23 +4315,23 @@ msgstr "Volumen de eco"
 
 #: Player.py:213
 msgid "Sets how loud you hear yourself singing."
-msgstr "Ajusta como de alto te oiras cantar a ti mismo."
+msgstr "Ajusta como de alto te oirás cantar a ti mismo."
 
 #: Player.py:219
 msgid "Neck Type"
-msgstr "Tipo de mastil"
+msgstr "Tipo de mástil"
 
 #: Player.py:219
 msgid "Specific Neck"
-msgstr "Bateria especifica"
+msgstr "Mástil especifica"
 
 #: Player.py:224
 msgid "Auto Kick"
-msgstr "Patada automatica"
+msgstr "Pisada automática"
 
 #: Player.py:435
 msgid "Default Drum"
-msgstr "Bateria por defecto"
+msgstr "Batería por defecto"
 
 #: Player.py:440
 #, python-format
@@ -4341,7 +4341,7 @@ msgstr "Controlador %d"
 #: Player.py:441
 #, python-format
 msgid "Select the controller for slot %d"
-msgstr "Selecciona el controlador para la posicion  %d"
+msgstr "Selecciona el controlador para la posición  %d"
 
 #: Player.py:787
 #, python-format
@@ -4355,7 +4355,7 @@ msgstr "Esta tecla está en conflicto con las teclas siguientes: %s"
 
 #: Scorekeeper.py:39
 msgid "Auto Kick Bass"
-msgstr "Pedal automatico"
+msgstr "Pedal automático"
 
 #: Scorekeeper.py:39
 msgid "Medium Assist Mode"
@@ -4363,11 +4363,11 @@ msgstr "Modo asistido medio"
 
 #: Scorekeeper.py:39
 msgid "Easy Assist Mode"
-msgstr "Modo asistido facil"
+msgstr "Modo asistido fácil"
 
 #: Scorekeeper.py:39
 msgid "Jurgen Played!"
-msgstr "Jurgen jugaba!"
+msgstr "¡Jurgen jugaba!"
 
 #: Scorekeeper.py:40
 msgid "Effects Saved SP"
@@ -4379,11 +4379,11 @@ msgstr "Todo tapping"
 
 #: Scorekeeper.py:40
 msgid "HOPO Frequency: Most"
-msgstr "Frecuencia de HOPO: Maxima"
+msgstr "Frecuencia de HOPO: Máxima"
 
 #: Scorekeeper.py:40
 msgid "HOPO Frequency: Even More"
-msgstr "Frecuencia de HOPO: Todavia mas"
+msgstr "Frecuencia de HOPO: Todavía mas"
 
 #: Scorekeeper.py:41
 msgid "HOPO Frequency: More"
@@ -4395,31 +4395,31 @@ msgstr "Frecuencia de HOPO: Menos"
 
 #: Scorekeeper.py:41
 msgid "HOPO Frequency: Least"
-msgstr "Frecuencia de HOPO: Minimo"
+msgstr "Frecuencia de HOPO: Mínimo"
 
 #: Scorekeeper.py:41
 msgid "HOPO Disabled!"
-msgstr "HOPO Desactivado!"
+msgstr "¡HOPO Desactivado!"
 
 #: Scorekeeper.py:42
 msgid "Hit Window: Tightest!"
-msgstr "Hiw Window: Muy estricto!"
+msgstr "Hit Window: ¡Muy estricto!"
 
 #: Scorekeeper.py:42
 msgid "Hit Window: Tight!"
-msgstr "Hiw Window: Estricto!"
+msgstr "Hit Window: ¡Estricto!"
 
 #: Scorekeeper.py:42
 msgid "Hit Window: Wider"
-msgstr "Hiw Window: Amplio"
+msgstr "Hit Window: Amplio"
 
 #: Scorekeeper.py:42
 msgid "Hit Window: Widest"
-msgstr "Hiw Window: Mas amplio"
+msgstr "Hit Window: Mas amplio"
 
 #: Scorekeeper.py:43
 msgid "Two Note Chords"
-msgstr "Solo acordes de 2"
+msgstr "Solo acordes dobles"
 
 #: Scorekeeper.py:43
 msgid "No Fail Mode"
@@ -4427,11 +4427,11 @@ msgstr "Modo sin fallo"
 
 #: Scorekeeper.py:43
 msgid "Sloppy Mode!"
-msgstr "Modo chapuza!"
+msgstr "¡Modo chapuza!"
 
 #: Scorekeeper.py:44
 msgid "Song Slowdown"
-msgstr "Relentizacion de cancion"
+msgstr "Ralentización de canción"
 
 #: Scorekeeper.py:44
 msgid "Early Hit Window Adjustment"
@@ -4449,7 +4449,7 @@ msgstr "Pulsa una tecla para '%s' o apreta ESC para cancelar."
 
 #: Settings.py:311
 msgid "No Controllers Found."
-msgstr "No se encontraron controladores,"
+msgstr "No se encontraron controladores."
 
 #: Settings.py:359
 msgid "Are you sure you want to delete this controller?"
@@ -4462,7 +4462,7 @@ msgstr "Ponle un nombre a tu controlador"
 #: Settings.py:385
 #: Settings.py:634
 msgid "That name is already taken."
-msgstr "Este nombre ya esta cogido."
+msgstr "Este nombre ya está cogido."
 
 #: Settings.py:387
 #: Settings.py:636
@@ -4480,11 +4480,11 @@ msgstr "Renombra el controlador"
 
 #: Settings.py:481
 msgid "Press the solo shift key. Be sure to assign the frets first! Hold Escape to cancel."
-msgstr "Presiona la tecla shift de solo. Asegurate de asignar los trastes antes! Pulsa ESC para cancelar."
+msgstr "Presiona la tecla shift de solo. ¡Asegurate de asignar los trastes antes! Pulsa ESC para cancelar."
 
 #: Settings.py:577
 msgid "Press the highest fret on the slider. Hold Escape to cancel."
-msgstr "Presiona el traste mas alto del deslizadero. Persion ESC para cancelar."
+msgstr "Presiona el traste mas alto del deslizadero. Presiona ESC para cancelar."
 
 #: Settings.py:632
 msgid "Please rename your controller"
@@ -4492,15 +4492,15 @@ msgstr "Por favor renombra tu controlador"
 
 #: Settings.py:765
 msgid "Battle Objects"
-msgstr "Objectos de batalla"
+msgstr "Objetos de batalla"
 
 #: Settings.py:765
 msgid "Set which objects can appear in Battle Mode"
-msgstr "Indica que objectos pueden aparecer en modo batalla"
+msgstr "Indica que objetos pueden aparecer en modo batalla"
 
 #: Settings.py:780
 msgid "Advanced Gameplay Settings"
-msgstr "Configuracion avanzada de juego"
+msgstr "Configuración avanzada de juego"
 
 #: Settings.py:780
 msgid "Set advanced gameplay settings that affect the game rules."
@@ -4512,7 +4512,7 @@ msgstr "Ajustes del modo vocalista"
 
 #: Settings.py:781
 msgid "Change settings that affect lyrics and in-game vocals."
-msgstr "Cambia las opciones que afectan a las letras y al microfono dentro del juego."
+msgstr "Cambia las opciones que afectan a las letras y al micrófono dentro del juego."
 
 #: Settings.py:782
 msgid "HO/PO Settings"
@@ -4576,15 +4576,15 @@ msgstr "Mas efectos"
 
 #: Settings.py:831
 msgid "Change the settings of the shader system."
-msgstr "Cambias las opciones del sistema de efectos graficos."
+msgstr "Cambias las opciones del sistema de efectos gráficos."
 
 #: Settings.py:847
 msgid "Change Neck Transparency"
-msgstr "Cambiar transparencia del mastil"
+msgstr "Cambiar transparencia del mástil"
 
 #: Settings.py:847
 msgid "Change the transparency of the various in-game necks."
-msgstr "Cambia las transparencia de los diferentes mastiles que hay en el juego."
+msgstr "Cambia las transparencia de los diferentes mástiles que hay en el juego."
 
 #: Settings.py:860
 msgid "Theme Display Settings"
@@ -4597,12 +4597,12 @@ msgstr "Cambia las opciones que afectan solo a algunos tipos de temas."
 #: Settings.py:879
 #: Settings.py:1252
 msgid "Video Resolution"
-msgstr "Resolucion de video"
+msgstr "Resolución de vídeo"
 
 #: Settings.py:879
 #: Settings.py:1252
 msgid "Set the resolution of the game. In windowed mode, higher values mean a larger screen."
-msgstr "Ajusta la resolucion del juego. En modo venmtanta, valorea altos significan una venta mas grande."
+msgstr "Ajusta la resolución del juego. En modo ventana, valorea altos significan una venta mas grande."
 
 #: Settings.py:885
 msgid "Stages Options"
@@ -4615,20 +4615,20 @@ msgstr "Cambiar opciones pertenecientes al escenario dentro del juego."
 #: Settings.py:886
 #: Settings.py:1259
 msgid "Choose Default Neck >"
-msgstr "Elije el mastil por defecto  >"
+msgstr "Elije el mástil por defecto  >"
 
 #: Settings.py:886
 #: Settings.py:1259
 msgid "Choose your default neck. You still have to choose which neck you use for your character in the character select screen."
-msgstr "Elije tu mastil principal. Tambien debes elejir que mastil usaras en el menu de seleccion de caracter."
+msgstr "Elije tu mástil principal. También debes elegir que mástil usaras en el menú de selección de carácter."
 
 #: Settings.py:887
 msgid "Fretboard Settings"
-msgstr "Opciones de mastil"
+msgstr "Opciones de mástil"
 
 #: Settings.py:887
 msgid "Change settings related to the fretboard."
-msgstr "Cambia las opciones relativas al mastil."
+msgstr "Cambia las opciones relativas al mástil."
 
 #: Settings.py:888
 #: Settings.py:1260
@@ -4642,11 +4642,11 @@ msgstr "Cambia que cosas aparecen dentro del juego."
 
 #: Settings.py:889
 msgid "Advanced Video Settings"
-msgstr "Ajustes avanzados de video"
+msgstr "Ajustes avanzados de vídeo"
 
 #: Settings.py:889
 msgid "Change advanced video settings."
-msgstr "Cambia las opciones avanzadas de video."
+msgstr "Cambia las opciones avanzadas de vídeo."
 
 #: Settings.py:917
 #: Settings.py:1279
@@ -4674,7 +4674,7 @@ msgstr "Cambiar ruta de la lista de canciones >"
 #: Settings.py:967
 #: Settings.py:1294
 msgid "Set the path to a folder named 'songs' that contains your songs."
-msgstr "Elije la localizacion en tu disco duro de una carpeta llamada \"songs\" que contiene tus canciones."
+msgstr "Elije la localización en tu disco duro de una carpeta llamada \"songs\" que contiene tus canciones."
 
 #: Settings.py:996
 msgid "Debug Settings"
@@ -4686,11 +4686,11 @@ msgstr "Opciones para programadores para depurar. Probablemente no valga la pena
 
 #: Settings.py:997
 msgid "Log Settings"
-msgstr "Configuracion de Log"
+msgstr "Configuración de Log"
 
 #: Settings.py:997
 msgid "Adds junk information to the logfile. Probably not useful in bug reports."
-msgstr "Añade informacion innecesaria al archivo log. Probablemente no util para reportar errores."
+msgstr "Añade información innecesaria al archivo log. Probablemente no útil para reportar errores."
 
 #: Settings.py:1002
 msgid "AI Settings"
@@ -4698,7 +4698,7 @@ msgstr "Configuraciones de Inteligencia Artificial"
 
 #: Settings.py:1002
 msgid "Change the settings of the AI"
-msgstr "Cambia la configuracion de la IA."
+msgstr "Cambia la configuración de la IA."
 
 #: Settings.py:1011
 #: Settings.py:1369
@@ -4723,7 +4723,7 @@ msgstr "Ajustes que afectan las reglas del juego."
 #: Settings.py:1017
 #: Settings.py:1312
 msgid "Control Settings"
-msgstr "Configuracion de controles"
+msgstr "Configuración de controles"
 
 #: Settings.py:1017
 #: Settings.py:1312
@@ -4733,27 +4733,27 @@ msgstr "Crea, borra y edita tus controladores."
 #: Settings.py:1018
 #: Settings.py:1313
 msgid "Display Settings"
-msgstr "Configuracion visual"
+msgstr "Configuración visual"
 
 #: Settings.py:1018
 #: Settings.py:1313
 msgid "Theme, neck, resolution, etc."
-msgstr "Temas, necks, resolucion, etc."
+msgstr "Temas, mástiles, resolución, etc."
 
 #: Settings.py:1019
 #: Settings.py:1314
 msgid "Audio Settings"
-msgstr "Configuracion de sonido"
+msgstr "Configuración de sonido"
 
 #: Settings.py:1019
 #: Settings.py:1314
 msgid "Volume controls, etc."
-msgstr "Control de Volumen, etc..."
+msgstr "Control de volumen, etc..."
 
 #: Settings.py:1020
 #: Settings.py:1315
 msgid "Setlist Settings"
-msgstr "Configuracion de lista de canciones"
+msgstr "Configuración de lista de canciones"
 
 #: Settings.py:1020
 #: Settings.py:1315
@@ -4762,7 +4762,7 @@ msgstr "Configuraciones que afectan a las lista de canciones."
 
 #: Settings.py:1021
 msgid "Advanced Settings"
-msgstr "Configuracion avanzada"
+msgstr "Configuración avanzada"
 
 #: Settings.py:1021
 msgid "Settings that probably don't need to be changed."
@@ -4782,7 +4782,7 @@ msgstr "Haz que Jurgen juegue por ti, y otros trucos."
 #: Settings.py:1317
 #, python-format
 msgid "%s Credits"
-msgstr "%s Creditos"
+msgstr "%s Créditos"
 
 #: Settings.py:1023
 #: Settings.py:1317
@@ -4792,12 +4792,12 @@ msgstr "Mira quien hace este juego."
 #: Settings.py:1024
 #: Settings.py:1318
 msgid "Quickset"
-msgstr "Ajuste rapido"
+msgstr "Ajuste rápido"
 
 #: Settings.py:1024
 #: Settings.py:1318
 msgid "A quick way to set many advanced settings."
-msgstr "Una forma rapida de ajustar algunas opciones avanzadas."
+msgstr "Una forma rápida de ajustar algunas opciones avanzadas."
 
 #: Settings.py:1025
 msgid "Hide Advanced Options"
@@ -4816,7 +4816,7 @@ msgstr "Probar controles"
 #: Settings.py:1074
 #: Settings.py:1341
 msgid "Go here to test your controllers."
-msgstr "Entra aqui para probar la configuracion de controles."
+msgstr "Entra aquí para probar la configuración de controles."
 
 #: Settings.py:1079
 #: Settings.py:1346
@@ -4857,7 +4857,7 @@ msgstr "Debes poner un controlador en el espacio 1!"
 #: Settings.py:1385
 #, python-format
 msgid "Controllers in slots %d and %d conflict. Setting %d to None."
-msgstr "Controladores en la posicion %d y %d están en conflicto. Poniendo  %d a ninguno."
+msgstr "Controladores en la posición %d y %d están en conflicto. Poniendo  %d a ninguno."
 
 #: Settings.py:1112
 #: Settings.py:1394
@@ -4885,7 +4885,7 @@ msgstr "Guitarra"
 
 #: Song.py:150
 msgid "Rhythm"
-msgstr "Guitarra ritmica"
+msgstr "Guitarra rítmica"
 
 #: Song.py:151
 msgid "Bass"
@@ -4893,11 +4893,11 @@ msgstr "Bajo"
 
 #: Song.py:152
 msgid "Lead"
-msgstr "Guitarra lider"
+msgstr "Guitarra líder"
 
 #: Song.py:153
 msgid "Drums"
-msgstr "Bateria"
+msgstr "Batería"
 
 #: Song.py:154
 msgid "Vocals"
@@ -4905,7 +4905,7 @@ msgstr "Vocales"
 
 #: Song.py:179
 msgid "Easy"
-msgstr "Facil"
+msgstr "Fácil"
 
 #: Song.py:180
 msgid "Medium"
@@ -4913,7 +4913,7 @@ msgstr "Medio"
 
 #: Song.py:181
 msgid "Hard"
-msgstr "Dificil"
+msgstr "Difícil"
 
 #: Song.py:182
 msgid "Expert"
@@ -4925,7 +4925,7 @@ msgstr "SinNombre"
 
 #: Song.py:1041
 msgid "This song is locked."
-msgstr "Esta cancion esta bloqueada."
+msgstr "Esta canción esta bloqueada."
 
 #: Song.py:1284
 msgid "Reset Career"
@@ -4933,7 +4933,7 @@ msgstr "Resetear Carrera"
 
 #: Song.py:1331
 msgid "   (Random Song)"
-msgstr "   (Cancion Aleatoria)"
+msgstr "   (Canción Aleatoria)"
 
 #: SongChoosingScene.py:219
 #: SongChoosingScene.py:221
@@ -4947,35 +4947,35 @@ msgstr "Parte de comienzo:"
 
 #: SongChoosingScene.py:293
 msgid "There are no drum parts in this song. Change your controllers to play."
-msgstr "No hay parte de bateria en en esta cancion. Cambia tus controles para jugar."
+msgstr "No hay parte de batería en esta canción. Cambia tus controles para jugar."
 
 #: SongChoosingScene.py:299
 msgid "There are no guitar parts in this song. Change your controllers to play."
-msgstr "No hay parte de guitarra en en esta cancion. Cambia tus controles para jugar."
+msgstr "No hay parte de guitarra en esta canción. Cambia tus controles para jugar."
 
 #: SongChoosingScene.py:305
 msgid "There are no vocal parts in this song. Change your controllers to play."
-msgstr "No hay parte de letra en en esta cancion. Cambia tus controles para jugar."
+msgstr "No hay parte de letra en esta canción. Cambia tus controles para jugar."
 
 #: SongChoosingScene.py:326
 #: SongChoosingScene.py:328
 #, python-format
 msgid "%s Choose a part:"
-msgstr "%s Elije un intrumento:"
+msgstr "%s elije un instrumento:"
 
 #: SongChoosingScene.py:343
 #: SongChoosingScene.py:346
 #, python-format
 msgid "%s Choose a difficulty:"
-msgstr "%s Elije una dificultad:"
+msgstr "%s elije una dificultad:"
 
 #: Vocalist.py:120
 msgid "Amazing!"
-msgstr "Increible!"
+msgstr "¡Increíble!"
 
 #: Vocalist.py:120
 msgid "Great!"
-msgstr "Bien!"
+msgstr "¡Bien!"
 
 #: Vocalist.py:120
 msgid "Decent"
@@ -4983,7 +4983,7 @@ msgstr "Decente"
 
 #: Vocalist.py:120
 msgid "Average"
-msgstr "Promedio"
+msgstr "Normalito"
 
 #: Vocalist.py:120
 msgid "Meh"
@@ -4999,7 +4999,7 @@ msgstr "Terrible..."
 
 #: Vocalist.py:465
 msgid "Tap!"
-msgstr "Golpea!"
+msgstr "¡Golpea!"
 
 msgid "Ah yes, I know. I'm amazing."
 msgstr "Si, ya. Soy la ostia."
@@ -5026,10 +5026,10 @@ msgid "Check this sh*t!"
 msgstr "Mira que mier*a hago!"
 
 msgid "And now, pick up your keyboard"
-msgstr "Y ahora, coje tu teclado"
+msgstr "Y ahora, coge tu teclado"
 
 msgid "like this."
-msgstr "asi."
+msgstr "así."
 
 msgid "When I shred,"
 msgstr "Cuando estoy puesto,"
@@ -5047,13 +5047,13 @@ msgid "These five frets,"
 msgstr "Estos 5 trastes"
 
 msgid "Und zie Pick button."
-msgstr "Y el boton de pua"
+msgstr "Y el botón de púa"
 
 msgid "However, zie most important"
 msgstr "Sin embargo, el mas importante"
 
 msgid "is the Escape button."
-msgstr "es el boton de ESC."
+msgstr "es el botón de ESC."
 
 msgid "You will need it,"
 msgstr "Vas a necesitarlo,"
@@ -5071,16 +5071,16 @@ msgid "To me, that is already obvious."
 msgstr "Para mi, ya es obvio."
 
 msgid "Ok, there comes your first note."
-msgstr "Bueno, aqui viene tu primera nota."
+msgstr "Bueno, aquí viene tu primera nota."
 
 msgid "You can already hold down the 1st fret"
 msgstr "Ya puedes apretar el 1º traste"
 
 msgid "BUT DON'T PICK IT YET!"
-msgstr "PERO NO LE DEAS A LA PUA TODAVIA!"
+msgstr "PERO NO LE DES A LA PÚA TODAVÍA!"
 
 msgid "You missed it."
-msgstr "La fallastes."
+msgstr "La fallaste."
 
 msgid "Ok, let's try it again."
 msgstr "Vale, probemos otra vez."
@@ -5092,7 +5092,7 @@ msgid "Wait for it."
 msgstr "Esperala."
 
 msgid "No!"
-msgstr "No!"
+msgstr "¡No!"
 
 msgid "*Sigh*"
 msgstr "*Suspiro*"
@@ -5101,7 +5101,7 @@ msgid "Now, hold down two frets."
 msgstr "Ahora manten pulsados 2 trastes."
 
 msgid "Ah, you missed it!"
-msgstr "Ah, los fallastes!"
+msgstr "Ah, los fallaste!"
 
 msgid "And now, try this super easy lick."
 msgstr "Y ahora, intenta esta cadena tan facilita."
@@ -5113,7 +5113,7 @@ msgid "Don't try this,"
 msgstr "No intentes tocar esto,"
 
 msgid "or you'll just hurt yourself."
-msgstr "o te haras daño a ti mismo."
+msgstr "o te harás daño a ti mismo."
 
 msgid "Ok, that was about"
 msgstr "Vale, estas eran aproximadamente"
@@ -5122,10 +5122,10 @@ msgid "four billion notes per second."
 msgstr "cuatro billones de notas por segundo."
 
 msgid "If I play that any faster,"
-msgstr "Si toco esto aun mas rapido,"
+msgstr "Si toco esto aun mas rápido,"
 
 msgid "your minds would just blow up."
-msgstr "tu mente tan solo explotaria."
+msgstr "tu mente tan solo explotaría."
 
 msgid "Ok, that is it for now."
 msgstr "Bueno, eso es todo por ahora."
