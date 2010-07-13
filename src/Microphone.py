@@ -24,22 +24,16 @@
 import Log
 import Audio
 import math
-from PitchAnalyzer import Analyzer
 import numpy
 import Config
 
 try:
   import pyaudio
+  import pypitch
   supported = True
 except ImportError:
-  Log.warn('Missing pyaudio - microphone support will not be possible')
+  Log.warn('Missing pyaudio or pypitch - microphone support will not be possible')
   supported = False
-
-try:
-  import pypitch
-  have_pypitch = True
-except ImportError:
-  have_pypitch = False
 
 from Task import Task
 from Language import _
@@ -73,10 +67,7 @@ if supported:
       else:
         self.devname = pa.get_device_info_by_index(devnum)['name']
       self.mic = pa.open(samprate, 1, pyaudio.paFloat32, input=True, input_device_index=devnum, start=False)
-      if Config.get('game', 'use_new_pitch_analyzer') or not have_pypitch:
-        self.analyzer = Analyzer(samprate)
-      else:
-        self.analyzer = pypitch.Analyzer(samprate)
+      self.analyzer = pypitch.Analyzer(samprate)
       self.mic_started = False
       self.lastPeak    = 0
       self.detectTaps  = True
@@ -152,7 +143,7 @@ if supported:
       return self.analyzer.getFormants()
     
     # Get the note currently being sung.
-    # Returns None if there isn't one or a PitchAnalyzer.Tone object if there is.
+    # Returns None if there isn't one or a pypitch.Tone object if there is.
     def getTone(self):
       return self.analyzer.findTone()
     
