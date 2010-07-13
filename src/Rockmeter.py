@@ -248,6 +248,13 @@ class FontLayer(Layer):
     if "ypos" in self.inPixels:
       self.position[1] /= 480.0
 
+    #the viewport code for rendering for is a little awkward
+    #instead of the bottom edge being at 1.0 it is at .75
+    #by doing this people can use conventional positioning
+    #while the code self adjusts the values
+    self.position[1] *= .75
+    #not only that but it's upside down
+    self.position[1] = .75 - self.position[1]
   def render(self, visibility, playerNum):
     w, h, = self.stage.engine.view.geometry[2:4]
     v = 1.0
