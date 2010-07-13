@@ -22,16 +22,15 @@
 #####################################################################
 
 # FoFiX fully unified setup script
-from distutils.core import setup
+from distutils.core import setup, Extension
+from Cython.Distutils import build_ext
 import sys, SceneFactory, Version, glob, os
-
-if os.name != 'nt' and sys.platform != 'darwin':
-  raise RuntimeError, 'This script is only meaningful for OS X and Windows.'
 
 
 # Start setting up py2{exe,app} and building the argument set for setup().
 # setup() arguments that are not specific to either are near the bottom of
 # the script, just before the actual call to setup().
+setup_args = {}
 if os.name == 'nt':
   import py2exe
   from py2exe.resources.VersionInfo import RT_VERSION
@@ -44,7 +43,7 @@ if os.name == 'nt':
     return __orig_isSystemDLL(pathname)
   py2exe.build_exe.isSystemDLL = isSystemDLL
 
-  setup_args = {
+  setup_args.update({
     'zipfile': "data/library.zip",
     'windows': [
       {
@@ -64,10 +63,10 @@ if os.name == 'nt':
         ).resource_bytes())]
       }
     ]
-  }
+  })
 elif sys.platform == 'darwin':
   import py2app
-  setup_args = {
+  setup_args.update({
     'app': ['FoFiX.py'],
     'data_files': [
       (".", ["../AUTHORS", "../COPYING", "../CREDITS", "../ChangeLog", "../Makefile", "../NEWS", "../README"]),
@@ -82,7 +81,7 @@ elif sys.platform == 'darwin':
     'description': "Frets on Fire X",
     'name': "FoFiX",
     'url': "http://code.google.com/p/fofix/",
-  }
+  })
 
 
 # Forced includes needed for PIL.
@@ -193,6 +192,13 @@ options['py2app'].update({
 # Add the common arguments to setup().
 setup_args.update({
   'options': options,
+  'ext_modules': [
+    Extension('pypitch._pypitch',
+              language='c++',
+              sources=['pypitch/_pypitch.pyx', 'pypitch/pitch.cpp',
+                       'pypitch/AnalyzerInput.cpp'])
+  ],
+  'cmdclass': {'build_ext': build_ext},
 })
 
 # And finally...

@@ -1,9 +1,12 @@
 *.py[cod]
+*.so
 *.exe
 *.dll
 doc/epydoc
 src/*.ini
 src/*.log
+src/build
+src/pypitch/_pypitch.cpp
 data/library.zip
 data/users/players/FoFiX-players.cache
 data/songs/

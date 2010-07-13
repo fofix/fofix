@@ -38,7 +38,6 @@ import gc
 import os
 import sys
 import imp
-import traceback
 
 from Task import Task
 from Video import Video
@@ -379,9 +378,6 @@ Config.define("audio",  "SFX_volume",         float, 0.7,    text = _("SFX Volum
 #stump: allow metadata caching to be turned off
 Config.define("performance", "cache_song_metadata", bool, True, text=_("Cache Song Metadata"), options={False: _("No"), True: _("Yes")}, tipText = _("This will allow information about the songs to be stored for quick access later at the cost of a slow first time loading."))
 
-#stump: choice of pitch analysis engines
-Config.define('game', 'use_new_pitch_analyzer', bool, True, text=_('Pitch Analysis Code'), options={False: 'pypitch', True: 'PitchAnalyzer.py'}, tipText = _("Sets whether to use the 'pypitch' engine or the built-in PitchAnalyzer to analyze microphone information."))
-
 
 ##Alarian: Get unlimited themes by foldername
 themepath = os.path.join(Version.dataPath(), "themes")
@@ -526,7 +522,6 @@ class GameEngine(object):
 
     self.title             = self.versionString
     self.restartRequested  = False
-    self.handlingException = False
 
     # evilynux - Check if theme icon exists first, then fallback on FoFiX icon.
     themename = self.config.get("coffee", "themename")
@@ -829,8 +824,7 @@ class GameEngine(object):
     self.world.finishGame()
     self.world = None
     self.gameStarted = False
-    if not self.handlingException:
-      self.view.pushLayer(self.mainMenu)
+    self.view.pushLayer(self.mainMenu)
 
   def loadImgDrawing(self, target, name, fileName, textureSize = None):
     """
@@ -1191,38 +1185,4 @@ class GameEngine(object):
     return True
 
   def run(self):
-    try:
-      return self.mainloop()
-    except (KeyboardInterrupt, SystemExit):
-      raise
-    except:
-      def clearMatrixStack(stack):
-        try:
-          glMatrixMode(stack)
-          for i in range(16):
-            glPopMatrix()
-        except:
-          pass
-
-      if self.handlingException:
-        # A recursive exception is fatal as we can't reliably reset the GL state
-        Log.error('Recursive main loop exception: ')
-        raise
-
-      self.handlingException = True
-      Log.error('Exception occurred in main loop: ')
-
-      clearMatrixStack(GL_PROJECTION)
-      clearMatrixStack(GL_MODELVIEW)
-
-      #stump: reset game state as much as possible
-      self.view.popAllLayers()
-      if self.gameStarted:
-        self.finishGame()
-
-      etype, evalue, etraceback = sys.exc_info()
-      Dialogs.showMessage(self, ''.join(traceback.format_exception_only(etype, evalue)))
-      self.handlingException = False
-      self.view.pushLayer(self.mainMenu)
-
-      return True
+    return self.mainloop()
