@@ -22,7 +22,8 @@
 #####################################################################
 
 # FoFiX fully unified setup script
-from distutils.core import setup
+from distutils.core import setup, Extension
+from Cython.Distutils import build_ext
 import sys, SceneFactory, Version, glob, os
 
 
@@ -191,6 +192,13 @@ options['py2app'].update({
 # Add the common arguments to setup().
 setup_args.update({
   'options': options,
+  'ext_modules': [
+    Extension('pypitch._pypitch',
+              language='c++',
+              sources=['pypitch/_pypitch.pyx', 'pypitch/pitch.cpp',
+                       'pypitch/AnalyzerInput.cpp'])
+  ],
+  'cmdclass': {'build_ext': build_ext},
 })
 
 # And finally...
