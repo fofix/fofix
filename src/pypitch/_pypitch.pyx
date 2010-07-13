@@ -63,7 +63,7 @@ cdef class Analyzer:
   def __dealloc__(self):
     delete_Analyzer(self._this)
   def input(self, instr):
-    if not typecheck(instr, str):
+    if not isinstance(instr, str):
       instr = instr.tostring()  # assume it was a numpy array
     return feedAnalyzer(self._this, instr)
   def process(self):
