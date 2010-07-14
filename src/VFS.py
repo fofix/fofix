@@ -49,10 +49,7 @@ import sys
 import shutil
 import time
 from stat import S_IFDIR, S_ISDIR, S_ISREG
-try:  # {py24hack}
-  import sqlite3
-except ImportError:
-  import pysqlite2.dbapi2 as sqlite3
+import sqlite3
 
 _mountTable = {}
 
