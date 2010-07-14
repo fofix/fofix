@@ -32,6 +32,12 @@ import pygame.image
 import Config
 import Version
 
+from OpenGL.GL.ARB.shader_objects import *
+from OpenGL.GL.ARB.vertex_shader import *
+from OpenGL.GL.ARB.fragment_shader import *
+from OpenGL.GL.ARB.multitexture import *
+from OpenGL.GL.EXT.texture3D import *
+
 class ShaderCompilationError(Exception):
   pass
 
