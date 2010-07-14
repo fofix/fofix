@@ -52,11 +52,6 @@ import math
 import random
 import os
 
-try:
-  set()
-except:
-  from sets import Set as set
-
 import Log
 import locale
 

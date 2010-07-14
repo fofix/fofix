@@ -97,14 +97,6 @@ class SystemEventListener:
 
 MusicFinished = pygame.USEREVENT
 
-try:
-  reversed
-except:
-  def reversed(seq):
-    seq = seq[:]
-    seq.reverse()
-    return seq
-
 class Input(Task):
   def __init__(self):
 
