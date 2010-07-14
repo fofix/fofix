@@ -19,13 +19,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,        #
 # MA  02110-1301, USA.                                              #
 #####################################################################
+
 import unittest
-try:
-  import hashlib
-except ImportError:
-  import sha
-  class hashlib:
-    sha1 = sha.sha
+import hashlib
 import Cerealizer
 import binascii
 import urllib
