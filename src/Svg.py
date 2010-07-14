@@ -22,7 +22,6 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-import os
 from OpenGL.GL import *
 
 import numpy as np
@@ -30,8 +29,7 @@ from numpy import array, float32
 import math
 
 import Log
-import Config
-from Texture import Texture, TextureException
+from Texture import Texture
 from PIL import Image
 
 #stump: the last few stubs of DummyAmanith.py are inlined here since this

@@ -23,10 +23,8 @@
 from __future__ import division
 
 import Log
-import Config
 from PIL import Image
 import pygame
-import StringIO
 from OpenGL.GL import *
 from OpenGL.GLU import *
 

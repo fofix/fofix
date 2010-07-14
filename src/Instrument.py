@@ -20,18 +20,11 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-import Player
-from Song import Note, Tempo
-import random
-from copy import deepcopy
-
-import math
-from numpy import array, float32
+from Song import Note
 
 #myfingershurt: needed for multi-OS file fetching
 import os
 import Log
-import Song   #need the base song defines as well
 
 class Instrument:
   def __init__(self, engine, playerObj, player = 0):

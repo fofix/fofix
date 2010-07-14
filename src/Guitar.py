@@ -27,7 +27,6 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-import Player
 from Song import Note, Tempo
 from Mesh import Mesh
 from Neck import Neck
@@ -37,7 +36,6 @@ from Shader import shaders
 
 from OpenGL.GL import *
 import math
-from numpy import array, float32
 
 #myfingershurt: needed for multi-OS file fetching
 import os

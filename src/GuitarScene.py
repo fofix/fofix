@@ -31,24 +31,20 @@
 #####################################################################
 
 from Scene import Scene, SuppressScene
-from Song import Note, Tempo, TextEvent, PictureEvent, loadSong, Bars, VocalNote, VocalPhrase
+from Song import Note, TextEvent, PictureEvent, loadSong, Bars, VocalPhrase
 from Menu import Menu
 
 from Language import _
 import Player
-from Player import CONTROLLER1KEYS, CONTROLLER2KEYS, CONTROLLER3KEYS, CONTROLLER1ACTIONS, CONTROLLER2ACTIONS, CONTROLLER3ACTIONS, CONTROLLER4KEYS, CONTROLLER4ACTIONS
-from Player import CONTROLLER1DRUMS, CONTROLLER2DRUMS, CONTROLLER3DRUMS, CONTROLLER4DRUMS, STAR, KILL, CANCEL, KEY1A
+from Player import STAR, KILL, CANCEL, KEY1A
 import Dialogs
-import Data
-import View
 import Audio
 import Stage
 import Settings
 import Song
-from Scorekeeper import ScoreCard, Rockmeter
+from Scorekeeper import ScoreCard
 from Shader import shaders
 
-import math
 import random
 import os
 
@@ -56,9 +52,6 @@ import Log
 import locale
 
 from OpenGL.GL import *
-
-#blazingamer: Little fix for RB Score font
-from pygame import version
 
 class GuitarScene(Scene):
   def __init__(self, engine, libraryName, songName):

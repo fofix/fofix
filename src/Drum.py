@@ -28,17 +28,13 @@
 
 #altered by myfingershurt to adapt to Alarian mod
 
-import Player
 from Song import Note, Tempo
 from Mesh import Mesh
 from Neck import Neck
-import random
-from copy import deepcopy
 from Shader import shaders
 
 from OpenGL.GL import *
 import math
-from numpy import array, float32
 
 #myfingershurt: needed for multi-OS file fetching
 import os

@@ -25,7 +25,6 @@ import Log
 import Audio
 import math
 import numpy
-import Config
 
 try:
   import pyaudio

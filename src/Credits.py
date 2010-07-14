@@ -26,7 +26,6 @@ import pygame
 import OpenGL
 from OpenGL.GL import *
 from OpenGL.GLU import *
-import math
 #evilynux: needed for multi-OS file fetching
 import os
 
@@ -36,12 +35,10 @@ import sys
 from View import Layer
 from Input import KeyListener
 from Language import _
-import Song
 import Version
 import Player
 import Config
 import Dialogs
-import Theme
 
 try:
   from VideoPlayer import VideoPlayer

@@ -34,9 +34,7 @@ from Language import _
 from Player import GUITARTYPES, DRUMTYPES, MICTYPES
 import Dialogs
 import Player
-import Menu
 import Song
-import Config
 
 class ControlConfigError(Exception):
   def __str__(self):

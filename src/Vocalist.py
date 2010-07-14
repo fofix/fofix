@@ -25,8 +25,8 @@ import Log
 import os
 from Language import _
 
-from Microphone import Microphone, getNoteName
-from Song import VocalNote, VocalPhrase
+from Microphone import Microphone
+from Song import VocalNote
 from OpenGL.GL import *
 from numpy import array, float32
 from random import random

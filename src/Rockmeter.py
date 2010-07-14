@@ -22,15 +22,9 @@
 #####################################################################
 
 import Config
-import math
-import Log
 import os
 
 from OpenGL.GL import *
-
-#stump: needed for continuous star fillup
-from PIL import Image, ImageDraw
-from Svg import ImgDrawing
 
 import locale
 

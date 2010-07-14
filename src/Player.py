@@ -26,11 +26,7 @@
 
 import pygame
 import Config
-import Resource
 import Song
-import Scorekeeper
-import os
-import sys
 from Language import _
 #import Dialogs
 import Microphone  #stump

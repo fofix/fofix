@@ -21,11 +21,8 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-
-import Player
-from Song import Tempo, Bars
+from Song import Bars
 import random
-from copy import deepcopy
 from Shader import shaders, mixColors
 
 from OpenGL.GL import *

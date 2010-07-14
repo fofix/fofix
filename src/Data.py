@@ -24,9 +24,7 @@
 #####################################################################
 
 from Font import Font
-from Texture import Texture
 from Svg import ImgDrawing
-from Texture import Texture
 from Audio import Sound
 from Language import _
 import random
@@ -35,7 +33,6 @@ import Config
 import Version
 #myfingershurt: needed for multi-OS file fetching
 import os
-import sys
 import glob
 import Player
 import Log

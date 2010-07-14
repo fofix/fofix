@@ -28,7 +28,6 @@
 #####################################################################
 
 from Scene import Scene, SuppressScene
-import Player
 import Scorekeeper
 import Dialogs
 import Song
@@ -37,7 +36,6 @@ from Menu import Menu
 from Audio import Sound
 from Language import _
 
-import Config
 #stump: when we completely drop 2.4 support, change this to just "import hashlib"
 try:
   import hashlib
@@ -51,7 +49,6 @@ import urllib
 import Log
 
 import pygame
-import math
 import random
 import os
 from OpenGL.GL import *

@@ -34,27 +34,14 @@ from OpenGL.GLU import *
 import math
 import os
 import fnmatch
-import string
-import time
 
 from View import Layer, BackgroundLayer
 from Input import KeyListener
-from Camera import Camera
-from Mesh import Mesh
 from Menu import Menu
 from Language import _
-from Texture import Texture
 from Player import GUITARTYPES, DRUMTYPES, MICTYPES
 import Log
-import Song
-import Data
 import Player
-import Guitar
-import random
-from Shader import shaders
-
-#myfingershurt: drums :)
-import Drum
 
 #stump: vocals
 import Microphone
@@ -63,10 +50,6 @@ import Microphone
 from Credits import Credits
 
 import Config
-import Settings
-
-#MFH - for cd/song list
-from Svg import ImgDrawing
 
 #MFH - for loading phrases
 def wrapCenteredText(font, pos, text, rightMargin = 1.0, scale = 0.002, visibility = 0.0, linespace = 1.0, allowshadowoffset = False, shadowoffset = (.0022, .0005)):

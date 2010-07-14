@@ -22,7 +22,6 @@
 
 import pygame
 import os
-import sys
 from OpenGL.GL import *
 from OpenGL.GL.ARB.multisample import *
 from PIL import Image

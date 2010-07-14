@@ -25,15 +25,12 @@
 
 import Config
 from OpenGL.GL import *
-import math
 import Log
 from Shader import shaders
-import Theme
 import os
 import random   #MFH - needed for new stage background handling
 from Language import _
 
-import Version # Provides dataPath
 try:
   from VideoPlayer import VideoPlayer
   videoAvailable = True

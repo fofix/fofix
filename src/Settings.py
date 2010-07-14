@@ -34,7 +34,6 @@ from Language import _
 import Dialogs
 import Config
 import Mod
-import Audio
 import Player
 import Version
 from View import BackgroundLayer

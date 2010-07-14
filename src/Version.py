@@ -22,7 +22,6 @@
 
 import sys
 import os
-import subprocess
 import re
 
 MAJOR_VERSION = 4

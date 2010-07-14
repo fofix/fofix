@@ -23,23 +23,18 @@
 #####################################################################
 
 from Scene import Scene, SuppressScene
-from Song import SongQueue
 import os
 import time
-import math
 import Player
 import Dialogs
 import Song
 import Config
 import pygame
-import random
 from OpenGL.GL import *
 import Version
-from Menu import Menu, Choice
+from Menu import Menu
 from Settings import ConfigChoice, ActiveConfigChoice
 from Language import _
-from Input import KeyListener
-from View import Layer
 from Camera import Camera
 from Mesh import Mesh
 from Texture import Texture

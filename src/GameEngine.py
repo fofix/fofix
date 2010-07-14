@@ -39,7 +39,6 @@ import os
 import sys
 import imp
 
-from Task import Task
 from Video import Video
 from Audio import Audio
 from View import View
@@ -47,7 +46,7 @@ from Input import Input, KeyListener, SystemEventListener
 from Resource import Resource
 from Data import Data
 from World import World
-from Svg import SvgContext, ImgDrawing
+from Svg import SvgContext
 #alarian
 #from Song import EAS_DIF, MED_DIF, HAR_DIF, EXP_DIF
 from Debug import DebugLayer

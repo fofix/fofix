@@ -28,7 +28,6 @@ import Audio
 import Config
 import os
 import re
-import shutil
 import math
 import random
 import Config
@@ -45,9 +44,7 @@ import urllib
 import Version
 import Theme
 import copy
-import string
 import cPickle  #stump: Cerealizer and sqlite3 don't seem to like each other that much...
-import Resource
 import time
 from Language import _
 import VFS

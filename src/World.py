@@ -23,8 +23,6 @@
 
 import Player
 import SceneFactory
-import Config
-import Log
 import Dialogs
 from Song import SongQueue
 from Language import _

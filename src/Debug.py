@@ -28,12 +28,6 @@ from View import Layer
 import gc
 import threading
 import Log
-import Version
-import os
-import datetime
-import zipfile
-import Theme
-import Stage
 
 class DebugLayer(Layer):
   """A layer for showing some debug information."""
@@ -123,7 +117,6 @@ class DebugLayer(Layer):
       self.engine.view.resetProjection()
 
   def gcDump(self):
-    import World
     before = len(gc.get_objects())
     coll   = gc.collect()
     after  = len(gc.get_objects())
