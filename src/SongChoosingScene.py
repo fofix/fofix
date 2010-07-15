@@ -372,7 +372,7 @@ class SongChoosingScene(Scene):
     
     for item in self.items:
       if isinstance(item, Song.SongInfo):
-        self.removeSongOrderPrefixFromItem(item) #TODO: I don't like this.
+        item.name = Dialogs.removeSongOrderPrefixFromName(item.name) #TODO: I don't like this.
       elif not self.tiersPresent and (isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo)):
         self.tiersPresent = True
     
@@ -393,36 +393,6 @@ class SongChoosingScene(Scene):
     self.updateSelection()
     Dialogs.hideLoadingSplashScreen(self.engine, self.splash)
     self.splash = None
-  
-  def isInt(self, possibleInt): #copypaste
-    try:
-      #MFH - remove any leading zeros (for songs with 01. or 02. for example)        
-      splitName = possibleInt.split("0",1)
-      while splitName[0] == "":
-        splitName = possibleInt.split("0",1)
-        if len(splitName) > 1:
-          if splitName[0] == "":
-            possibleInt = splitName[1]
-      if str(int(possibleInt)) == str(possibleInt):
-        #Log.debug("Dialogs.isInt: " + str(possibleInt) + " = TRUE")
-        return True
-      else:
-        #Log.debug("Dialogs.isInt: " + str(possibleInt) + " = FALSE")
-        return False
-    except Exception, e:
-      return False
-  
-  def removeSongOrderPrefixFromItem(self, item): #copypaste
-    if not item.name.startswith("."):
-      splitName = item.name.split(".",1)
-      if self.isInt(splitName[0]) and len(splitName) > 1:
-        item.name = splitName[1]
-        splitName[0] = ""
-        while splitName[0] == "":
-          splitName = item.name.split(" ",1)
-          if len(splitName) > 1:
-            if splitName[0] == "":
-              item.name = splitName[1]
   
   def checkCmdPlay(self):
     info = Song.loadSongInfo(self.engine, self.songName, library = self.libraryName)
