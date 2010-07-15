@@ -542,7 +542,7 @@ class GameResultsScene(Scene):
     i      = playerNum
     try:
       d = {
-        "songName": "%s" % (Dialogs.removeSongOrderPrefixFromName(self.song.info.name)),
+        "songName": "%s" % (Song.removeSongOrderPrefixFromName(self.song.info.name)),
         "songHash": self.song.getHash(),
         "scores":   None,
         "scores_ext": None,
@@ -827,9 +827,9 @@ class GameResultsScene(Scene):
     
     if self.song:
       try:
-        text = self.engine.theme.result_song_text % Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
+        text = self.engine.theme.result_song_text % Song.removeSongOrderPrefixFromName(self.song.info.name)
       except TypeError:
-        text = "%s %s" % (Dialogs.removeSongOrderPrefixFromName(self.song.info.name), self.engine.theme.result_song_text)
+        text = "%s %s" % (Song.removeSongOrderPrefixFromName(self.song.info.name), self.engine.theme.result_song_text)
       try:
         r, g, b = self.engine.theme.hexToColorResults(self.engine.theme.result_song[3])
         glColor3f(r, g, b)
@@ -1027,9 +1027,9 @@ class GameResultsScene(Scene):
     
     if self.song:
       try:
-        text = self.engine.theme.result_song_text % Dialogs.removeSongOrderPrefixFromName(self.song.info.name)
+        text = self.engine.theme.result_song_text % Song.removeSongOrderPrefixFromName(self.song.info.name)
       except TypeError:
-        text = "%s %s" % (Dialogs.removeSongOrderPrefixFromName(self.song.info.name), self.engine.theme.result_song_text)
+        text = "%s %s" % (Song.removeSongOrderPrefixFromName(self.song.info.name), self.engine.theme.result_song_text)
       try:
         r, g, b = self.engine.theme.hexToColorResults(self.engine.theme.result_song[3])
         glColor3f(r, g, b)
@@ -1302,7 +1302,7 @@ class GameResultsScene(Scene):
     
     # evilynux - highscore
     if self.song is not None:
-      text = _("%s High Scores for %s") % (self.scorePart, Dialogs.removeSongOrderPrefixFromName(self.song.info.name))
+      text = _("%s High Scores for %s") % (self.scorePart, Song.removeSongOrderPrefixFromName(self.song.info.name))
     else:
       text = _("%s High Scores") % self.scorePart
     w1, h1 = font.getStringSize(text)

@@ -372,7 +372,7 @@ class SongChoosingScene(Scene):
     
     for item in self.items:
       if isinstance(item, Song.SongInfo):
-        item.name = Dialogs.removeSongOrderPrefixFromName(item.name) #TODO: I don't like this.
+        item.name = Song.removeSongOrderPrefixFromName(item.name) #TODO: I don't like this.
       elif not self.tiersPresent and (isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo)):
         self.tiersPresent = True
     
@@ -455,7 +455,7 @@ class SongChoosingScene(Scene):
           Dialogs.hideLoadingSplashScreen(self.engine, self.splash)
           self.splash = None
       self.playerList[0].difficulty = Dialogs.chooseItem(self.engine, info.partDifficulties[p.id],
-                            "%s \n %s" % (Dialogs.removeSongOrderPrefixFromName(info.name), _("%s Choose a difficulty:") % player.name), selected = player.difficulty)
+                            "%s \n %s" % (Song.removeSongOrderPrefixFromName(info.name), _("%s Choose a difficulty:") % player.name), selected = player.difficulty)
     return True
   
   def loadItemLabel(self, i, preload = False):

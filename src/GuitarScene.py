@@ -5851,7 +5851,7 @@ class GuitarScene(Scene):
     
                 # evilynux - Closer to actual GH3
                 font = self.engine.data.pauseFont
-                text = Dialogs.removeSongOrderPrefixFromName(self.song.info.name).upper()
+                text = Song.removeSongOrderPrefixFromName(self.song.info.name).upper()
                 scale = font.scaleText(text, maxwidth = 0.398, scale = 0.0038)
                 size = font.getStringSize(text, scale = scale)
                 font.render(text, (.5-size[0]/2.0,.37-size[1]), scale = scale)
@@ -6733,9 +6733,9 @@ class GuitarScene(Scene):
               extra = "%s \n v%s" % (extra, self.song.info.version)
     
             if self.theme != 1:   #shift this stuff down so it don't look so bad over top the lyricsheet:
-              Dialogs.wrapText(songFont, (self.songInfoDisplayX, self.songInfoDisplayX - h / 2), "%s \n %s%s%s%s%s" % (Dialogs.removeSongOrderPrefixFromName(self.song.info.name), cover, self.song.info.artist, comma, self.song.info.year, extra), rightMargin = .6, scale = self.songInfoDisplayScale)#kk69: incorporates song.ttf
+              Dialogs.wrapText(songFont, (self.songInfoDisplayX, self.songInfoDisplayX - h / 2), "%s \n %s%s%s%s%s" % (Song.removeSongOrderPrefixFromName(self.song.info.name), cover, self.song.info.artist, comma, self.song.info.year, extra), rightMargin = .6, scale = self.songInfoDisplayScale)#kk69: incorporates song.ttf
             else:
-              Dialogs.wrapText(songFont, (self.songInfoDisplayX, self.songInfoDisplayY - h / 2), "%s \n %s%s%s%s%s" % (Dialogs.removeSongOrderPrefixFromName(self.song.info.name), cover, self.song.info.artist, comma, self.song.info.year, extra), rightMargin = .6, scale = self.songInfoDisplayScale)
+              Dialogs.wrapText(songFont, (self.songInfoDisplayX, self.songInfoDisplayY - h / 2), "%s \n %s%s%s%s%s" % (Song.removeSongOrderPrefixFromName(self.song.info.name), cover, self.song.info.artist, comma, self.song.info.year, extra), rightMargin = .6, scale = self.songInfoDisplayScale)
           else:
             #mfh: this is where the song countdown display is generated:
             if pos < 0:
