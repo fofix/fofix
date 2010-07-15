@@ -1917,77 +1917,6 @@ class ControlActivator(Layer, KeyListener):
     finally:
       self.engine.view.resetProjection()
 
-class BpmEstimator(Layer, KeyListener):
-  """Beats per minute value estimation layer."""
-  def __init__(self, engine, song, prompt = ""):
-    self.prompt         = prompt
-    self.engine         = engine
-
-    self.logClassInits = self.engine.config.get("game", "log_class_inits")
-    if self.logClassInits == 1:
-      Log.debug("BpmEstimator class init (Dialogs.py)...")
-
-    self.song           = song
-    self.accepted       = False
-    self.bpm            = None
-    self.time           = 0.0
-    self.beats          = []
-    
-    
-  def shown(self):
-    self.engine.input.addKeyListener(self, priority = True)
-    self.song.play()
-  
-  def hidden(self):
-    self.engine.input.removeKeyListener(self)
-    self.song.fadeout(1000)
-    
-  def keyPressed(self, key, unicode):
-    if self.accepted:
-      return True
-      
-    c = self.engine.input.controls.getMapping(key)
-    if key == pygame.K_SPACE:
-      self.beats.append(self.time)
-      if len(self.beats) > 12:
-        diffs = [self.beats[i + 1] - self.beats[i] for i in range(len(self.beats) - 1)]
-        self.bpm = 60000.0 / (sum(diffs) / float(len(diffs)))
-        self.beats = self.beats[-12:]
-    elif c in Player.cancels + Player.key2s:
-      self.engine.view.popLayer(self)
-      self.accepted = True
-      self.bpm      = None
-    elif c in Player.key1s or key == pygame.K_RETURN:
-      self.engine.view.popLayer(self)
-      self.accepted = True
-      
-    return True
-  
-  def run(self, ticks):
-    self.time += ticks
-    
-  def render(self, visibility, topMost):
-    v = (1 - visibility) ** 2
-    
-    self.engine.view.setViewport(1,0)
-    self.engine.view.setOrthogonalProjection(normalize = True)
-    font = self.engine.data.font
-    
-    fadeScreen(v)
-          
-    try:
-      glEnable(GL_BLEND)
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-      glEnable(GL_COLOR_MATERIAL)
-      self.engine.theme.setBaseColor(1 - v)
-      wrapText(font, (.1, .2 - v), self.prompt)
-      
-      if self.bpm is not None:
-        self.engine.theme.setSelectedColor(1 - v)
-        wrapText(font, (.1, .5 + v),  _("%.2f beats per minute") % (self.bpm))
-    finally:
-      self.engine.view.resetProjection()
-      
 class KeyTester(Layer, KeyListener):
   """Keyboard configuration testing layer."""
   def __init__(self, engine, control, prompt = ""):
@@ -2581,18 +2510,6 @@ def showMessage(engine, text):
   d = MessageScreen(engine, text)
   _runDialog(engine, d)
 
-def estimateBpm(engine, song, prompt):
-  """
-  Ask the user to estimate the beats per minute value of a song.
-  
-  @param engine:  Game engine
-  @param song:    Song instance
-  @param prompt:  Prompt shown to the user
-  """
-  d = BpmEstimator(engine, song, prompt)
-  _runDialog(engine, d)
-  return d.bpm
-  
 #=======================================================================
 # glorandwarf: added derived class LoadingSplashScreen
 
