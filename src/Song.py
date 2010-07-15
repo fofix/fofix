@@ -4424,34 +4424,8 @@ def compareSongsAndTitles(engine, a, b, career):
     else:   #MFH - This is where career songs are sorted within tiers -- we want to force sorting by "name" only:
       return cmp(a.name.lower(), b.name.lower())    #MFH - force sort by name for career songs
 
-def isInt(possibleInt):
-  try:
-    #MFH - remove any leading zeros (for songs with 01. or 02. for example)        
-    splitName = possibleInt.split("0",1)
-    while splitName[0] == "":
-      splitName = possibleInt.split("0",1)
-      if len(splitName) > 1:
-        if splitName[0] == "":
-          possibleInt = splitName[1]
-    if str(int(possibleInt)) == str(possibleInt):
-      return True
-    else:
-      return False
-  except Exception, e:
-    return False
-
-def removeSongOrderPrefixFromName(name): #copied from Dialogs - can't import it here.
-  if not name.startswith("."):
-    splitName = name.split(".",1)
-    if isInt(splitName[0]) and len(splitName) > 1:
-      name = splitName[1]
-      splitName[0] = ""
-      while splitName[0] == "":
-        splitName = name.split(" ",1)
-        if len(splitName) > 1:
-          if splitName[0] == "":
-            name = splitName[1]
-  return name
+def removeSongOrderPrefixFromName(name):
+  return re.sub(r'^[0-9]+\. *', '', name)
 
 #stump
 def updateSongDatabase(engine):
