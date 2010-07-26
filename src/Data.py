@@ -227,28 +227,42 @@ class Data(object):
 
 
       #MFH - seems like these should be up here...
-      menuFont = resource.fileName(os.path.join("themes",themename,"menu.ttf"))
-      pauseFont = resource.fileName(os.path.join("themes",themename,"pause.ttf"))
-      scoreFont = resource.fileName(os.path.join("themes",themename,"score.ttf"))
+      #Weirdpeople - make all fonts fallback on the default.ttf if missing
+      if self.fileExists(os.path.join("themes",themename,"menu.ttf")):
+        menuFont = resource.fileName(os.path.join("themes",themename,"menu.ttf"))
+      else:
+        menuFont = font
+
+      if self.fileExists(os.path.join("themes",themename,"pause.ttf")):
+        pauseFont = resource.fileName(os.path.join("themes",themename,"pause.ttf"))
+      else:
+        pauseFont = font
+
+      if self.fileExists(os.path.join("themes",themename,"score.ttf")):
+        scoreFont = resource.fileName(os.path.join("themes",themename,"score.ttf"))
+      else:
+        scoreFont = font
 
       if self.fileExists(os.path.join("themes",themename,"Streak.ttf")):
         streakFont = resource.fileName(os.path.join("themes",themename,"streak.ttf"))
       else:
-        streakFont = resource.fileName(os.path.join("themes",themename,"score.ttf"))
+        streakFont = font
+
       if self.fileExists(os.path.join("themes",themename,"Song.ttf")):
         songFont = resource.fileName(os.path.join("themes",themename,"song.ttf"))
       else:
-        songFont = resource.fileName(os.path.join("themes",themename,"menu.ttf"))#kk69: use menu font when song font is not present
+        songFont = font
 
       if self.fileExists(os.path.join("themes",themename,"loading.ttf")):
         loadingFont = resource.fileName(os.path.join("themes",themename,"loading.ttf"))
       else:
-        loadingFont = resource.fileName("default.ttf")
+        loadingFont = font
 
       if self.fileExists(os.path.join("themes",themename,"songlist.ttf")):
         songListFont = resource.fileName(os.path.join("themes",themename,"songlist.ttf"))
       else:
         songListFont = menuFont
+
       if self.fileExists(os.path.join("themes",themename,"songlist.ttf")):
         shadowfont = resource.fileName(os.path.join("themes",themename,"songlist.ttf"))
       else:
@@ -363,8 +377,19 @@ class Data(object):
     
     resource.load(self, "symcsounds", self.loadScrewUpsounds)
     self.loadSoundEffect(self, "selectSound1", os.path.join("themes",themename,"sounds","select1.ogg"))
-    self.loadSoundEffect(self, "selectSound2", os.path.join("themes",themename,"sounds","select2.ogg"))
-    self.loadSoundEffect(self, "selectSound3", os.path.join("themes",themename,"sounds","select3.ogg"))
+
+    if self.fileExists(os.path.join("themes",themename,"sounds","select2.ogg")):
+      self.loadSoundEffect(self, "selectSound2", os.path.join("themes",themename,"sounds","select2.ogg"))
+    else: #Fallback on select1.ogg
+      self.loadSoundEffect(self, "selectSound2", os.path.join("themes",themename,"sounds","select1.ogg"))
+      Log.warn(themename + "/sounds/select2.ogg not found -- using select1.ogg instead.")
+
+    if self.fileExists(os.path.join("themes",themename,"sounds","select3.ogg")):
+      self.loadSoundEffect(self, "selectSound3", os.path.join("themes",themename,"sounds","select3.ogg"))
+    else: #Fallback on select1.ogg
+      self.loadSoundEffect(self, "selectSound3", os.path.join("themes",themename,"sounds","select1.ogg"))
+      Log.warn(themename + "/sounds/select3.ogg not found -- using select1.ogg instead.")
+
     self.loadSoundEffect(self, "startSound",   os.path.join("themes",themename,"sounds","start.ogg"))
     self.loadSoundEffect(self, "starSound", os.path.join("themes",themename,"sounds","starpower.ogg"))
 
