@@ -60,6 +60,8 @@ class Neck:
 
     self.boardWidth     = self.engine.theme.neckWidth
     self.boardLength    = self.engine.theme.neckLength
+    self.shaderSolocolor    = self.engine.theme.shaderSolocolor
+	
     #death_au: fixed neck size
     
     if self.isDrum and self.engine.config.get("game", "large_drum_neck"):
@@ -609,7 +611,7 @@ class Neck:
         self.renderNeckMethod(self.failcount, 0, self.failNeck)
         
     if (self.guitarSolo or self.instrument.starPowerActive) and self.theme == 1:
-      shaders.var["solocolor"]=(0.3,0.7,0.9,0.6)
+      shaders.var["solocolor"]=self.shaderSolocolor
     else:
       shaders.var["solocolor"]=(0.0,)*4
 

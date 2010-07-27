@@ -467,6 +467,7 @@ defaultDict['neckWidth'] = 3.0
 defaultDict['neckLength'] = 9.0
 defaultDict['neck_prompt_x'] = .1
 defaultDict['neck_prompt_y'] = .05
+defaultDict['shaderSolocolor'] = (0.3,0.7,0.9,0.6)
 
 #Setlist
 defaultDict['songListDisplay'] = 1
@@ -853,6 +854,8 @@ class Theme(Task):
       self.neckLength = config.get("theme", "neck_length")
       self.neck_prompt_x = config.get("theme", "menu_neck_choose_x")
       self.neck_prompt_y = config.get("theme", "menu_neck_choose_y")
+	  
+      self.shaderSolocolor = config.get("theme", "shader_solocolor")
       
       #Setlist
       self.songListDisplay = config.get("theme", "song_list_display")
