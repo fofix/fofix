@@ -265,8 +265,7 @@ class Stage(object):
       self.rotationMode = 0
 
     if self.mode != 2 and self.background:   #MFH - precalculating scale factor
-      imgwidth = self.background.width1()
-      self.backgroundScaleFactor = 640.000/imgwidth
+      self.backgroundScaleFactor = 1.0
 
   #stage rotation
   def rotate(self):
