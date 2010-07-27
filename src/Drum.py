@@ -565,7 +565,7 @@ class Drum(Instrument):
           size = (self.boardWidth/2.0, (self.boardWidth/self.strings)/40.0)
 
       self.engine.draw3Dtex(self.noteButtons, vertex = (-size[0],size[1],size[0],-size[1]), texcoord = (texSize[0],texY[0],texSize[1],texY[1]),
-                            scale = (1,1,1), multiples = True, color = color, vertscale = .2)
+                            scale = (1,1,0), rot = (30,1,0,0), multiples = True, color = color, vertscale = .27)
 
     else:  
 
