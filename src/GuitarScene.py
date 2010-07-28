@@ -1482,10 +1482,6 @@ class GuitarScene(Scene):
     else:
       self.lyricSheet = None
 
-
-    if self.lyricSheet:
-      imgwidth = self.lyricSheet.width1()
-      self.lyricSheetScaleFactor = 640.000/imgwidth
     
     #brescorebackground.png
     if self.engine.loadImgDrawing(self, "breScoreBackground", os.path.join("themes",themename,"brescorebackground.png")):
@@ -5620,7 +5616,7 @@ class GuitarScene(Scene):
       self.renderVocals()
       #MFH: render the note sheet just on top of the background:
       if self.lyricSheet != None and not self.playingVocals:
-        self.engine.drawImage(self.lyricSheet, scale = (self.lyricSheetScaleFactor,-self.lyricSheetScaleFactor), coord = (w/2, h*0.935))
+        self.engine.drawImage(self.lyricSheet, scale = (1.0,-1.0), coord = (w/2, h*0.935), stretched = 1)
         #the timing line on this lyric sheet image is approx. 1/4 over from the left
       #MFH - also render the scrolling lyrics & sections before changing viewports:
 
