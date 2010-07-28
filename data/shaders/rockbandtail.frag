@@ -35,7 +35,7 @@ void main()
    float whiteglow2 = pow(clamp(1.0 - whitedist2+linewidth, 0.0, 1.0), glowExp); 
    
    //end blur
-   float endglow = (1.0 - vTexCoord.x - fadeposition)*fadeintensity;
+   float endglow = (1.1 - vTexCoord.x - fadeposition)*fadeintensity;
    
    //glow between curves
    float backdist1 = pos.x - max(sinz,-sinz);
