@@ -749,8 +749,7 @@ class CreateCharacter(Layer, KeyListener):
     w, h = self.fullView
     try:
       if self.background:
-        wFactor = 640.000/self.background.width1()
-        self.engine.drawImage(self.background, scale = (wFactor,-wFactor), coord = (w/2,h/2))
+        self.engine.drawImage(self.background, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
       helpFont.render(_("Player %d") % (self.playerNum + 1), pos = (.5, .1), scale = self.engine.theme.characterCreateScale, align = 1)
       for i, option in enumerate(self.options):
         r, g, b = self.engine.theme.characterCreateHelpColor
@@ -780,7 +779,6 @@ class CreateCharacter(Layer, KeyListener):
           wText, hText = font.getStringSize(str, scale = self.engine.theme.characterCreateScale)
           font.render(str, (self.engine.theme.characterCreateOptionX-wText, self.engine.theme.characterCreateY+self.engine.theme.characterCreateSpace*i), scale = self.engine.theme.characterCreateScale)
       if self.backgroundTop:
-        wFactor = 640.000/self.backgroundTop.width1()
-        self.engine.drawImage(self.backgroundTop, scale = (wFactor,-wFactor), coord = (w/2,h/2))
+         self.engine.drawImage(self.backgroundTop, scale = (1.0,-1.0), coord = (w/2,h/2))
     finally:
       self.engine.view.resetProjection()
