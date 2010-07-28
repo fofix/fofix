@@ -685,15 +685,11 @@ class FileChooser(BackgroundLayer, KeyListener):
     #MFH - draw neck black BG in for transparent areas (covers options BG):
     if self.neckBlackBack != None:
       #MFH - auto background scaling 
-      imgwidth = self.neckBlackBack.width1()
-      wfactor = 640.000/imgwidth
-      self.engine.drawImage(self.neckBlackBack, scale = (wfactor,-wfactor), coord = (w/2,h/2))
+      self.engine.drawImage(self.neckBlackBack, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
 
 
     #MFH - auto background scaling 
-    imgwidth = self.engine.data.choiceImage.width1()
-    wfactor = 640.000/imgwidth
-    self.engine.drawImage(self.engine.data.choiceImage, scale = (wfactor,-wfactor), coord = (w/2,h/2))
+    self.engine.drawImage(self.engine.data.choiceImage, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
 
 
       
@@ -883,9 +879,7 @@ class NeckChooser(Layer, KeyListener):
    #MFH - draw neck black BG in for transparent necks (covers options BG):
    if self.neckBlackBack != None:
      #MFH - auto background scaling
-     imgwidth = self.neckBlackBack.width1()
-     wfactor = 640.000/imgwidth
-     self.engine.drawImage(self.neckBlackBack, scale = (wfactor,-wfactor), coord = (w/2,h/2))
+     self.engine.drawImage(self.neckBlackBack, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
 
    currentNeck = self.necks[int(self.selectedNeck)+2]
    lastNeck1 = self.necks[int(self.selectedNeck)]
@@ -920,8 +914,8 @@ class NeckChooser(Layer, KeyListener):
      self.y4 = h*0.420
      self.y5 = h*0.420
      self.y6 = h*0.420
-     self.wfac = 192.000
-     self.wfac2 = 62.000  
+     self.wfac = 384.000
+     self.wfac2 = 124.000  
    else:
      self.x1 = w*0.05
      self.x2 = w*0.175
@@ -935,8 +929,8 @@ class NeckChooser(Layer, KeyListener):
      self.y4 = h*0.554
      self.y5 = h*0.402
      self.y6 = h*0.423
-     self.wfac = 187.000
-     self.wfac2 = 64.000
+     self.wfac = 374.000
+     self.wfac2 = 128.000
 
 
 
@@ -960,13 +954,11 @@ class NeckChooser(Layer, KeyListener):
    self.engine.drawImage(nextNeck1, scale = (-wfactor,wfactor), coord = (self.x5,self.y5))
    
    if self.selectedNeck:
-     self.engine.drawImage(self.neckSelect, scale = (-1,1), coord = (self.x6, self.y6))
+     self.engine.drawImage(self.neckSelect, scale = (-1.0,1.0), coord = (self.x6, self.y6))
 
    #MFH - draw neck BG on top of necks
    #MFH - auto background scaling
-   imgwidth = self.neckBG.width1()
-   wfactor = 640.000/imgwidth
-   self.engine.drawImage(self.neckBG, scale = (wfactor,-wfactor), coord = (w/2,h/2))
+   self.engine.drawImage(self.neckBG, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
 
   
    self.engine.view.setOrthogonalProjection(normalize = True)
@@ -1184,8 +1176,7 @@ class AvatarChooser(Layer, KeyListener):
     
     try:
       if self.background:
-        wFactor = 640.000/self.background.width1()
-        self.engine.drawImage(self.background, scale = (wFactor, -wFactor), coord = (w/2,h/2))
+        self.engine.drawImage(self.background, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 3)
       else:
         fadeScreen(v)
       self.engine.theme.setBaseColor(1 - v)
@@ -1530,9 +1521,7 @@ class ItemChooser(BackgroundLayer, KeyListener):
     r = .5
 
     #MFH - auto background scaling 
-    imgwidth = self.engine.data.choiceImage.width1()
-    wfactor = 640.000/imgwidth
-    self.engine.drawImage(self.engine.data.choiceImage, scale = (wfactor,-wfactor), coord = (w/2,h/2))
+    self.engine.drawImage(self.engine.data.choiceImage, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 3)
 
       
     self.engine.view.setOrthogonalProjection(normalize = True)
@@ -1628,14 +1617,10 @@ class ControlActivator(Layer, KeyListener):
         self.selectedIndex = 0
         break
 
-    if self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "lobby", "controlbg.png")):
-      self.bgScale = 640.000/self.background.width1()
-    else:
+    if not self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "lobby", "controlbg.png")):
       self.background = None
 
-    if self.engine.loadImgDrawing(self, "readyImage", os.path.join("themes", themename, "lobby", "ready.png")):
-      self.readyScale = 640.000/self.readyImage.width1()
-    else:
+    if not self.engine.loadImgDrawing(self, "readyImage", os.path.join("themes", themename, "lobby", "ready.png")):
       self.readyImage = None
 
     if not self.engine.loadImgDrawing(self, "selected", os.path.join("themes", themename, "lobby", "select.png")):
@@ -1869,7 +1854,7 @@ class ControlActivator(Layer, KeyListener):
     v = (1-visibility)**2
     try:
       if self.background:
-        self.engine.drawImage(self.background, scale = (self.bgScale,-self.bgScale), coord = (w/2,h/2))
+        self.engine.drawImage(self.background, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
       self.engine.theme.setBaseColor(1-v)
       wText, hText = descFont.getStringSize(self.tsInfo, scale = self.engine.theme.controlDescriptionScale)
       descFont.render(self.tsInfo, (self.engine.theme.controlDescriptionX-wText/2, self.engine.theme.controlDescriptionY), scale = self.engine.theme.controlDescriptionScale)
@@ -1909,7 +1894,7 @@ class ControlActivator(Layer, KeyListener):
         checkFont.render(self.controls[i], ((self.checkX+self.checkSpace*j)-wText/2, self.checkYText*self.engine.data.fontScreenBottom), scale = self.checkScale)
       if self.ready:
         if self.readyImage:
-          self.engine.drawImage(self.readyImage, scale = (self.readyScale, -self.readyScale), coord = (w*.5, h*.5), color = (1, 1, 1, self.fader))
+          self.engine.drawImage(self.readyImage, scale = (1.0, 1.0), coord = (w*.5, h*.5), color = (1, 1, 1, self.fader))
         else:
           self.engine.theme.setBaseColor(self.fader)
           wText, hText = bigFont.getStringSize(self.tsReady, scale = .001)
