@@ -517,7 +517,7 @@ class Rockmeter:
     self.engine.view.setOrthogonalProjection(normalize = True)
     try:
       for i,player in enumerate(self.scene.playerList):
-        p = player.guitarNum
+        p = player.number
         self.updateVars(p)
         if p is not None:
           self.engine.view.setViewportHalf(self.scene.numberOfGuitars,p)
