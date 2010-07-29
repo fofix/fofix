@@ -378,8 +378,7 @@ class Credits(Layer, KeyListener):
     
     self.engine.view.setOrthogonalProjection(normalize = True)
     if self.background:
-      wFactor = 640.000/self.background.width1()
-      self.engine.drawImage(self.background, scale = (wFactor,-wFactor), coord = (w/2,h/2))
+      self.engine.drawImage(self.background, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
     else:
       Dialogs.fadeScreen(.4)
     font = self.engine.data.font
