@@ -26,7 +26,7 @@
 from distutils.core import setup, Extension
 import sys, glob, os
 import numpy
-from FoFiX import SceneFactory, Version
+import SceneFactory, Version
 
 
 # Start setting up py2{exe,app} and building the argument set for setup().
@@ -202,10 +202,8 @@ except ImportError:
 # This includes arguments to cause FoFiX's extension modules to be built.
 setup_args.update({
   'options': options,
-  'packages': ['FoFiX', 'FoFiX.midi'],
-  'ext_package': 'FoFiX',
   'ext_modules': [
-    Extension('cmgl', ['FoFiX/cmgl.pyx'], include_dirs=[numpy.get_include()], libraries=['opengl32' if os.name == 'nt' else 'GL']),
+    Extension('cmgl', ['cmgl.pyx'], include_dirs=[numpy.get_include()], libraries=['opengl32' if os.name == 'nt' else 'GL']),
   ]
 })
 
