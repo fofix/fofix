@@ -63,7 +63,7 @@ import Player
 from Shader import shaders
 from Song import difficulties, parts
 
-from FoFiX.cmgl import *
+from cmgl import *
 
 class ConfigOption:
   def __init__(self, id, text):

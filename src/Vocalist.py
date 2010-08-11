@@ -30,7 +30,7 @@ from Song import VocalNote, VocalPhrase
 from OpenGL.GL import *
 from numpy import array, float32
 from random import random
-from FoFiX.cmgl import *
+from cmgl import *
 
 #stump: needed for continuous star fillup (akedrou - stealing for vocals)
 from PIL import Image, ImageDraw

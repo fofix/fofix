@@ -48,7 +48,7 @@ from OpenGL.GLU import *
 # Array-based drawing
 from numpy import array, float32
 
-from FoFiX.cmgl import *
+from cmgl import *
 
 from View import View, BackgroundLayer
 import Log

@@ -23,7 +23,7 @@
 
 import pygame
 from OpenGL.GL import *
-from FoFiX.cmgl import *
+from cmgl import *
 import sys
 from Texture import Texture
 from numpy import array, float32

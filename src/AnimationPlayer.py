@@ -35,7 +35,7 @@ from numpy import array, float32
 from View import View, BackgroundLayer
 import Log
 
-from FoFiX.cmgl import *
+from cmgl import *
 
 # Simple animation player
 class AnimationPlayer(BackgroundLayer):

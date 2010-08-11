@@ -30,7 +30,7 @@ from Shader import shaders, mixColors
 
 from OpenGL.GL import *
 from numpy import array, float32
-from FoFiX.cmgl import *
+from cmgl import *
 
 #myfingershurt: needed for multi-OS file fetching
 import os

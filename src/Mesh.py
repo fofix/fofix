@@ -24,7 +24,7 @@ from OpenGL.GL import *
 
 import Collada
 
-from FoFiX.cmgl import *
+from cmgl import *
 
 class Mesh:
   def __init__(self, fileName):

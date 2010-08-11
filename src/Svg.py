@@ -28,7 +28,7 @@ from OpenGL.GL import *
 import numpy as np
 from numpy import array, float32
 import math
-from FoFiX.cmgl import *
+from cmgl import *
 
 import Log
 import Config
