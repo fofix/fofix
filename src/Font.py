@@ -23,6 +23,7 @@
 
 import pygame
 from OpenGL.GL import *
+from cmgl import *
 import sys
 from Texture import Texture
 from numpy import zeros, float32
@@ -165,17 +166,11 @@ class Font:
         self.square_prim[2,1] = self.square_prim[3,1] = h
         self.square_tex[0,1] = self.square_tex[1,1] = th
         self.square_tex[1,0] = self.square_tex[3,0] = tw
-        glEnableClientState(GL_VERTEX_ARRAY)
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        glVertexPointerf(self.square_prim)
-        glTexCoordPointerf(self.square_tex)
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, self.square_prim.shape[0])
-        glDisableClientState(GL_VERTEX_ARRAY)
-        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
- 
+        cmglDrawArrays(GL_TRIANGLE_STRIP, vertices=self.square_prim, texcoords=self.square_tex)
+
     if not text:
         return
-    
+
     try:
         t,w,h = self.stringsCache.get(text)
     except KeyError:
@@ -187,7 +182,7 @@ class Font:
         del s
         w, h = self.font.size(text)
         self.stringsCache.add(text,(t,w,h))
-     
+
     x, y = pos
     scale *= self.scale
     w, h = w*scale*self.aspectRatioFactor, h*scale
@@ -198,37 +193,32 @@ class Font:
     y -= (h/2)
     tw,th = t.size
     glEnable(GL_TEXTURE_2D)
-    glPushMatrix()
-    if rotate:
-      if not isinstance(rotate, tuple):
-        glRotatef(rotate, 0, 0, 1.0)
-      else:
-        glRotatef(0, *rotate)
-    glTranslatef(x,y,0)
-    t.bind()
-    if self.outline:
-        glPushAttrib(GL_CURRENT_BIT)
-        glColor4f(0, 0, 0, .25 * glGetDoublev(GL_CURRENT_COLOR)[3])
+    with cmglPushedMatrix():
+      if rotate:
+        if not isinstance(rotate, tuple):
+          glRotatef(rotate, 0, 0, 1.0)
+        else:
+          glRotatef(0, *rotate)
+      glTranslatef(x,y,0)
+      t.bind()
+      if self.outline:
+        with cmglPushedAttrib(GL_CURRENT_BIT):
+          glColor4f(0, 0, 0, .25 * glGetDoublev(GL_CURRENT_COLOR)[3])
 
-        blur = 2 * DEFAULT_SCALE
-        for offset in [(-.7, -.7), (0, -1), (.7, -.7), (-1, 0), 
-                       (1, 0), (-.7, .7), (0, 1), (.7, .7)]:
-            glTranslatef(blur * offset[0], blur * offset[1], 0)
+          blur = 2 * DEFAULT_SCALE
+          for offset in [(-.7, -.7), (0, -1), (.7, -.7), (-1, 0),
+                         (1, 0), (-.7, .7), (0, 1), (.7, .7)]:
+            with cmglPushedMatrix():
+              glTranslatef(blur * offset[0], blur * offset[1], 0)
+              drawSquare(w,h,tw,th)
+
+      if self.shadow:
+        with cmglPushedAttrib(GL_CURRENT_BIT):
+          glColor4f(0, 0, 0, 1)
+          with cmglPushedMatrix():
+            glTranslatef(shadowoffset[0], shadowoffset[1], 0)
             drawSquare(w,h,tw,th)
-            glTranslatef(-blur * offset[0], -blur * offset[1], 0)
-        glPopAttrib()
 
-    if self.shadow:
-        glPushAttrib(GL_CURRENT_BIT)
-        glColor4f(0, 0, 0, 1)
-        glTranslatef(shadowoffset[0], shadowoffset[1], 0)
-        drawSquare(w,h,tw,th)
-        glTranslatef(-shadowoffset[0], -shadowoffset[1], 0)
-        glPopAttrib()
-
-    drawSquare(w,h,tw,th)
-    glPopMatrix()
+      drawSquare(w,h,tw,th)
 
     glDisable(GL_TEXTURE_2D)
-    return
-

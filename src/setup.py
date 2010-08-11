@@ -1,5 +1,6 @@
-#####################################################################
+#!/usr/bin/env python
 # -*- coding: iso-8859-1 -*-                                        #
+#####################################################################
 #                                                                   #
 # Frets on Fire X                                                   #
 # Copyright (C) 2009-2010 FoFiX Team                                #
@@ -25,6 +26,7 @@
 from distutils.core import setup, Extension
 from Cython.Distutils import build_ext
 import sys, SceneFactory, Version, glob, os
+import numpy
 
 
 # Start setting up py2{exe,app} and building the argument set for setup().
@@ -190,9 +192,11 @@ options['py2app'].update({
 })
 
 # Add the common arguments to setup().
+# This includes arguments to cause FoFiX's extension modules to be built.
 setup_args.update({
   'options': options,
   'ext_modules': [
+    Extension('cmgl', ['cmgl.pyx'], include_dirs=[numpy.get_include()], libraries=['opengl32' if os.name == 'nt' else 'GL']),
     Extension('pypitch._pypitch',
               language='c++',
               sources=['pypitch/_pypitch.pyx', 'pypitch/pitch.cpp',

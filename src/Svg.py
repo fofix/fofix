@@ -27,6 +27,7 @@ from OpenGL.GL import *
 import numpy as np
 from numpy import array, float32
 import math
+from cmgl import *
 
 import Log
 from Texture import Texture
@@ -49,10 +50,9 @@ class SvgContext(object):
 
   def setProjection(self, geometry = None):
     geometry = geometry or self.geometry
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    glOrtho(geometry[0], geometry[0] + geometry[2], geometry[1], geometry[1] + geometry[3], -100, 100)
-    glMatrixMode(GL_MODELVIEW)
+    with cmglMatrixMode(GL_PROJECTION):
+      glLoadIdentity()
+      glOrtho(geometry[0], geometry[0] + geometry[2], geometry[1], geometry[1] + geometry[3], -100, 100)
     self.geometry = geometry
 
   def clear(self, r = 0, g = 0, b = 0, a = 0):
@@ -211,39 +211,24 @@ class ImgDrawing(object):
     self.color = color
 
   def draw(self):
-    glMatrixMode(GL_TEXTURE)
-    glPushMatrix()
-    glMatrixMode(GL_PROJECTION)
-    glPushMatrix()
-    self.context.setProjection()
-    glMatrixMode(GL_MODELVIEW)
-    glPushMatrix()
+    with cmglPushedSpecificMatrix(GL_TEXTURE):
+      with cmglPushedSpecificMatrix(GL_PROJECTION):
 
-    glLoadIdentity()
+        with cmglMatrixMode(GL_PROJECTION):
+          self.context.setProjection()
 
-    glTranslate(self.position[0], self.position[1], 0.0)
-    glScalef(self.scale[0], self.scale[1], 1.0)
-    glRotatef(self.angle, 0, 0, 1)
-    
-    glScalef(self.pixelSize[0], self.pixelSize[1], 1)
-    glTranslatef(self.shift, -.5, 0)
-    glColor4f(*self.color)
+        with cmglPushedMatrix():
+          glLoadIdentity()
 
-    glEnable(GL_TEXTURE_2D)
-    self.texture.bind()
-    
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY)    
-    glEnableClientState(GL_VERTEX_ARRAY)
-    glVertexPointerf(self.vtxArray)
-    glTexCoordPointerf(self.texArray)
-    glDrawArrays(GL_QUADS, 0, self.vtxArray.shape[0])
-    glDisableClientState(GL_VERTEX_ARRAY)
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY)
-    
-    glDisable(GL_TEXTURE_2D)
-    glPopMatrix()
-    glMatrixMode(GL_TEXTURE)
-    glPopMatrix()
-    glMatrixMode(GL_PROJECTION)
-    glPopMatrix()
-    glMatrixMode(GL_MODELVIEW)
+          glTranslate(self.position[0], self.position[1], 0.0)
+          glScalef(self.scale[0], self.scale[1], 1.0)
+          glRotatef(self.angle, 0, 0, 1)
+
+          glScalef(self.pixelSize[0], self.pixelSize[1], 1)
+          glTranslatef(self.shift, -.5, 0)
+          glColor4f(*self.color)
+
+          glEnable(GL_TEXTURE_2D)
+          self.texture.bind()
+          cmglDrawArrays(GL_QUADS, vertices=self.vtxArray, texcoords=self.texArray)
+          glDisable(GL_TEXTURE_2D)

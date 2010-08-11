@@ -61,6 +61,8 @@ import Player
 from Shader import shaders
 from Song import difficulties, parts
 
+from cmgl import *
+
 class ConfigOption:
   def __init__(self, id, text):
     self.id   = id
@@ -1021,16 +1023,7 @@ class GameEngine(object):
          [texcoord[0], texcoord[3]],
          [texcoord[2], texcoord[3]]], dtype=float32)
 
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY)    
-    glEnableClientState(GL_VERTEX_ARRAY)
-    glEnableClientState(GL_COLOR_ARRAY)
-    glTexCoordPointerf(textriangVtx)
-    glVertexPointerf(triangVtx)
-    glColorPointerf(col_array)
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, triangVtx.shape[0])
-    glDisableClientState(GL_VERTEX_ARRAY)
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY)
-    glDisableClientState(GL_COLOR_ARRAY)
+    cmglDrawArrays(GL_TRIANGLE_STRIP, vertices=triangVtx, colors=col_array, texcoords=textriangVtx)
     
     if depth == True:
       glDepthMask(0)
