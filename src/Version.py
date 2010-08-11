@@ -40,8 +40,15 @@ def _getTagLine():
   if VFS.isdir('/gameroot/.git'):
     # HEAD is in the form "ref: refs/heads/master\n"
     headref = VFS.open('/gameroot/.git/HEAD').read()[5:].strip()
-    # The ref is in the form "sha1-hash\n"
-    headhash = VFS.open('/gameroot/.git/' + headref).read().strip()
+    if VFS.isfile('/gameroot/.git/' + headref):
+      # The ref is in the form "sha1-hash\n"
+      headhash = VFS.open('/gameroot/.git/' + headref).read().strip()
+    else:
+      # It's a packed ref.
+      for line in VFS.open('/gameroot/.git/packed-refs'):
+        if line.strip().endswith(headref):
+          headhash = line[:40]
+          break
     shortref = re.sub('^refs/(heads/)?', '', headref)
     return 'development (git %s %s)' % (shortref, headhash[:7])
 
