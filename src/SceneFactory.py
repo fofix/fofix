@@ -23,14 +23,16 @@
 #####################################################################
 
 # Scenes
-import sys
 import glob
 
-scenes = ['FoFiX.'+n[6:-3] for n in glob.glob("FoFiX/*Scene.py")]
+scenes = [n.replace(".py", "") for n in glob.glob("*Scene.py")]
+
+def _import(name):
+  globals()[name] = __import__(name)
 
 def create(engine, name, **args):
 
-  __import__('FoFiX.' + name)
+  _import(name)
 
-  m = sys.modules['FoFiX.' + name]
+  m = globals()[name]
   return getattr(m, name)(engine = engine, **args)
