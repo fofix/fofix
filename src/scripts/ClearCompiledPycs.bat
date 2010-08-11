@@ -1,10 +1,10 @@
 cd ..
-del *.pyc *.pyo *.bak
-cd FoFiX
-del *.pyc *.pyo *.bak
+del *.pyc
+del *.pyo
+del *.bak
 cd midi
-del *.pyc *.pyo *.bak
-cd ..\tests
-del *.pyc *.pyo *.bak
-cd ..\..
+del *.pyc
+del *.pyo
+del *.bak
+cd ..
 rd /s /q build
