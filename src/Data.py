@@ -184,7 +184,7 @@ class Data(object):
     fontSize  = [44, 108, 34, 32, 30]
 
     if asciiOnly:
-      font    = resource.fileName("default.ttf")
+      font    = resource.fileName(os.path.join("themes",themename,"default.ttf"))
       bigFont = resource.fileName("title.ttf")
     else:
       Log.debug("Main font International.ttf used!")
@@ -260,19 +260,26 @@ class Data(object):
 
       if self.fileExists(os.path.join("themes",themename,"songlist.ttf")):
         songListFont = resource.fileName(os.path.join("themes",themename,"songlist.ttf"))
-      else:
+      elif self.fileExists(os.path.join("themes",themename,"menu.ttf")):
         songListFont = menuFont
+      else:
+        songListFont = font
+	  
 
       if self.fileExists(os.path.join("themes",themename,"songlist.ttf")):
         shadowfont = resource.fileName(os.path.join("themes",themename,"songlist.ttf"))
-      else:
+      elif self.fileExists(os.path.join("themes",themename,"menu.ttf")):
         shadowfont = menuFont
-
+      else:
+        shadowfont = font
+		
       #blazingamer
       if self.fileExists(os.path.join("themes",themename,"streakphrase.ttf")):
         streakFont2 = resource.fileName(os.path.join("themes",themename,"streakphrase.ttf"))
-      else:
+      elif self.fileExists(os.path.join("themes",themename,"menu.ttf")):
         streakFont2 = menuFont
+      else:
+        streakFont2 = font
 
       #blazingamer:Reorganized
       if self.theme == 0:
