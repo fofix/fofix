@@ -673,8 +673,6 @@ class Data(object):
       drawing  = self.resource.load(target, name, lambda: imgDrawing, synch = True)
     else:
       drawing = imgDrawing
-    if textureSize:
-      drawing.convertToTexture(textureSize[0], textureSize[1])
     return drawing
   
   def loadAllImages(self, target, directory, prefix = "img_", textureSize = None): #akedrou
