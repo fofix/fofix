@@ -667,7 +667,7 @@ class Data(object):
     """
     imgDrawing = self.getImgDrawing(fileName, dirLoad = dirLoad)
     if not imgDrawing:
-      return False
+      return None
     
     if target is not None:
       drawing  = self.resource.load(target, name, lambda: imgDrawing, synch = True)
