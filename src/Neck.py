@@ -198,126 +198,70 @@ class Neck:
 
 
 
-    if self.theme == 2:
-      if self.isDrum == True:
-        if not engine.loadImgDrawing(self, "oSideBars", os.path.join("themes",themename,"drum_overdrive_side_bars.png"),  textureSize = (256, 256)):
-          self.oSideBars = None
-
-        if not engine.loadImgDrawing(self, "oCenterLines", os.path.join("themes",themename,"drum_overdrive_center_lines.png"), textureSize = (256, 256)):
-          #engine.loadImgDrawing(self, "centerLines", os.path.join("themes",themename,"center_lines.png"))
-          self.oCenterLines = None
+    if self.isDrum:
+      engine.loadImgDrawing(self, "oSideBars", os.path.join("themes",themename,"drum_overdrive_side_bars.png"),  textureSize = (256, 256))
+      engine.loadImgDrawing(self, "oCenterLines", os.path.join("themes",themename,"drum_overdrive_center_lines.png"), textureSize = (256, 256))
+      engine.loadImgDrawing(self, "centerLines", os.path.join("themes",themename,"drumcenterlines.png"),  textureSize = (256, 256))
       
-        #myfingershurt: the overdrive neck file should be in the theme folder... and also not required:
-        if not engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck_drum.png"),  textureSize = (256, 256)):
-          if not engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256)):
-            self.oNeck = None
+      engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck_drum.png"),  textureSize = (256, 256))
+      if not self.oNeck:
+        engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
 
-      else:
-        if not engine.loadImgDrawing(self, "oSideBars", os.path.join("themes",themename,"overdrive side_bars.png"),  textureSize = (256, 256)):
-          self.oSideBars = None
-
-        if not engine.loadImgDrawing(self, "oCenterLines", os.path.join("themes",themename,"overdrive center_lines.png"),  textureSize = (256, 256)):
-          self.oCenterLines = None
-
-        if self.isBassGuitar == True:
-          if not engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck_bass.png"),  textureSize = (256, 256)):
-            if not engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256)):
-              self.oNeckBass = None
-        else:
-          if not engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256)):
-            self.oNeck = None
-
-      if not engine.loadImgDrawing(self, "oNeckovr", os.path.join("themes",themename,"overdriveneckovr.png"),  textureSize = (256, 256)):
-        self.oNeckovr = None
-
-      if self.isDrum == True:
-        if not engine.loadImgDrawing(self, "oFlash", os.path.join("themes",themename,"drum_overdrive_string_flash.png"),  textureSize = (256, 256)):
-          self.oFlash = None
-      else:
-        if not engine.loadImgDrawing(self, "oFlash", os.path.join("themes",themename,"overdrive_string_flash.png"),  textureSize = (256, 256)):
-          self.oFlash = None
-
-    if self.isDrum == True:
-      if not engine.loadImgDrawing(self, "centerLines", os.path.join("themes",themename,"drumcenterlines.png"),  textureSize = (256, 256)):
-        #engine.loadImgDrawing(self, "centerLines", os.path.join("themes",themename,"center_lines.png"))
-        self.centerLines = None
+      engine.loadImgDrawing(self, "oFlash", os.path.join("themes",themename,"drum_overdrive_string_flash.png"),  textureSize = (256, 256))
+            
     else:
+      engine.loadImgDrawing(self, "oSideBars", os.path.join("themes",themename,"overdrive side_bars.png"),  textureSize = (256, 256))
+      engine.loadImgDrawing(self, "oCenterLines", os.path.join("themes",themename,"overdrive center_lines.png"),  textureSize = (256, 256))
       engine.loadImgDrawing(self, "centerLines", os.path.join("themes",themename,"center_lines.png"),  textureSize = (256, 256))
+      
+      engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
+      if self.isBassGuitar:
+        engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck_bass.png"),  textureSize = (256, 256))
 
+      engine.loadImgDrawing(self, "oNeckovr", os.path.join("themes",themename,"overdriveneckovr.png"),  textureSize = (256, 256))
+      
+      engine.loadImgDrawing(self, "oFlash", os.path.join("themes",themename,"overdrive_string_flash.png"),  textureSize = (256, 256))
+      
     engine.loadImgDrawing(self, "sideBars", os.path.join("themes",themename,"side_bars.png"))
     engine.loadImgDrawing(self, "bpm_halfbeat", os.path.join("themes",themename,"bpm_halfbeat.png"))
     engine.loadImgDrawing(self, "bpm_beat", os.path.join("themes",themename,"bpm_beat.png"))
     engine.loadImgDrawing(self, "bpm_measure", os.path.join("themes",themename,"bpm_measure.png"))
 
-    if self.theme == 0 or self.theme == 1:
-
-      self.oNeckovr = None #fixes GH theme crash
-
-      if self.isDrum == True:
-        #myfingershurt: the starpower neck file should be in the theme folder... and also not required:
-        if not engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"starpowerneck_drum.png"),  textureSize = (256, 256)):
-          if not engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"starpowerneck.png"),  textureSize = (256, 256)):
-            self.oNeck = None
-      else:
-        #myfingershurt: the starpower neck file should be in the theme folder... and also not required:
-        if not engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"starpowerneck.png"),  textureSize = (256, 256)):
-          self.oNeck = None
-        if not engine.loadImgDrawing(self, "oNeckBass", os.path.join("themes",themename,"starpowerneck_bass.png"),  textureSize = (256, 256)):
-          if not engine.loadImgDrawing(self, "oNeckBass", os.path.join("themes",themename,"starpowerneck.png"),  textureSize = (256, 256)):
-            self.oNeckBass = None
-
-
     #myfingershurt: Bass Groove neck:
-    if self.isBassGuitar == True:
+    self.bassGrooveNeck = None
+    if self.isBassGuitar:
       if self.bassGrooveNeckMode > 0:
         if self.bassGrooveNeckMode == 1:  #replace neck
-          if not engine.loadImgDrawing(self, "bassGrooveNeck", os.path.join("themes",themename,"bassgrooveneck.png"),  textureSize = (256, 256)):
-            self.bassGrooveNeck = None
+          engine.loadImgDrawing(self, "bassGrooveNeck", os.path.join("themes",themename,"bassgrooveneck.png"),  textureSize = (256, 256))
         elif self.bassGrooveNeckMode == 2:  #overlay neck
-          if not engine.loadImgDrawing(self, "bassGrooveNeck", os.path.join("themes",themename,"bassgrooveneckovr.png"),  textureSize = (256, 256)):
-            self.bassGrooveNeck = None
-      else:
-        self.bassGrooveNeck = None
-    else:
-      self.bassGrooveNeck = None
-
+          engine.loadImgDrawing(self, "bassGrooveNeck", os.path.join("themes",themename,"bassgrooveneckovr.png"),  textureSize = (256, 256))
 
 
     #myfingershurt: Guitar Solo neck:
-    if self.isVocal == False:
+    self.guitarSoloNeck = None
+    if not self.isVocal:
       if self.guitarSoloNeckMode > 0:
         if self.guitarSoloNeckMode == 1:  #replace neck
           if self.isBassGuitar:
-            if not engine.loadImgDrawing(self, "guitarSoloNeck", os.path.join("themes",themename,"basssoloneck.png"),  textureSize = (256, 256)):
-              if not engine.loadImgDrawing(self, "guitarSoloNeck", os.path.join("themes",themename,"guitarsoloneck.png"),  textureSize = (256, 256)):
-                self.guitarSoloNeck = None
+            engine.loadImgDrawing(self, "guitarSoloNeck", os.path.join("themes",themename,"basssoloneck.png"),  textureSize = (256, 256))
           elif self.isDrum:
-            if not engine.loadImgDrawing(self, "guitarSoloNeck", os.path.join("themes",themename,"drumsoloneck.png"),  textureSize = (256, 256)):
-              if not engine.loadImgDrawing(self, "guitarSoloNeck", os.path.join("themes",themename,"guitarsoloneck.png"),  textureSize = (256, 256)):
-                self.guitarSoloNeck = None
+            engine.loadImgDrawing(self, "guitarSoloNeck", os.path.join("themes",themename,"drumsoloneck.png"),  textureSize = (256, 256))
           else:
-            if not engine.loadImgDrawing(self, "guitarSoloNeck", os.path.join("themes",themename,"guitarsoloneck.png"),  textureSize = (256, 256)):
-              self.guitarSoloNeck = None
+            engine.loadImgDrawing(self, "guitarSoloNeck", os.path.join("themes",themename,"guitarsoloneck.png"),  textureSize = (256, 256))
+          if not self.guitarSoloNeck:
+            engine.loadImgDrawing(self, "guitarSoloNeck", os.path.join("themes",themename,"guitarsoloneck.png"),  textureSize = (256, 256))
         elif self.guitarSoloNeckMode == 2:  #overlay neck
           if self.isBassGuitar:
             if not engine.loadImgDrawing(self, "guitarSoloNeck", os.path.join("themes",themename,"basssoloneckovr.png"),  textureSize = (256, 256)):
-              if not engine.loadImgDrawing(self, "guitarSoloNeck", os.path.join("themes",themename,"guitarsoloneckovr.png"),  textureSize = (256, 256)):
-                self.guitarSoloNeck = None
+              engine.loadImgDrawing(self, "guitarSoloNeck", os.path.join("themes",themename,"guitarsoloneckovr.png"),  textureSize = (256, 256))
           elif self.isDrum:
             if not engine.loadImgDrawing(self, "guitarSoloNeck", os.path.join("themes",themename,"drumsoloneckovr.png"),  textureSize = (256, 256)):
-              if not engine.loadImgDrawing(self, "guitarSoloNeck", os.path.join("themes",themename,"guitarsoloneckovr.png"),  textureSize = (256, 256)):
-                self.guitarSoloNeck = None
+              engine.loadImgDrawing(self, "guitarSoloNeck", os.path.join("themes",themename,"guitarsoloneckovr.png"),  textureSize = (256, 256))
           else:
-            if not engine.loadImgDrawing(self, "guitarSoloNeck", os.path.join("themes",themename,"guitarsoloneckovr.png"),  textureSize = (256, 256)):
-              self.guitarSoloNeck = None
-      else:
-        self.guitarSoloNeck = None
-    else:
-      self.guitarSoloNeck = None
+            engine.loadImgDrawing(self, "guitarSoloNeck", os.path.join("themes",themename,"guitarsoloneckovr.png"),  textureSize = (256, 256))
 
     if not engine.loadImgDrawing(self, "failNeck", os.path.join("themes",themename,"failneck.png")):
       engine.loadImgDrawing(self, "failNeck", os.path.join("failneck.png"))
-
 
     self.isFailing = False
     self.canGuitarSolo = self.instrument.canGuitarSolo
