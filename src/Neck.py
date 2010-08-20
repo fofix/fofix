@@ -217,11 +217,12 @@ class Neck:
       engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
       if self.isBassGuitar:
         engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck_bass.png"),  textureSize = (256, 256))
-
-      engine.loadImgDrawing(self, "oNeckovr", os.path.join("themes",themename,"overdriveneckovr.png"),  textureSize = (256, 256))
+        if not self.oNeck:
+          engine.loadImgDrawing(self, "oNeck", os.path.join("themes",themename,"overdriveneck.png"),  textureSize = (256, 256))
       
       engine.loadImgDrawing(self, "oFlash", os.path.join("themes",themename,"overdrive_string_flash.png"),  textureSize = (256, 256))
-      
+
+    engine.loadImgDrawing(self, "oNeckovr", os.path.join("themes",themename,"overdriveneckovr.png"),  textureSize = (256, 256))      
     engine.loadImgDrawing(self, "sideBars", os.path.join("themes",themename,"side_bars.png"))
     engine.loadImgDrawing(self, "bpm_halfbeat", os.path.join("themes",themename,"bpm_halfbeat.png"))
     engine.loadImgDrawing(self, "bpm_beat", os.path.join("themes",themename,"bpm_beat.png"))
@@ -438,7 +439,8 @@ class Neck:
 
     if alpha == True:
       glBlendFunc(GL_ONE, GL_ONE)
-    neck.texture.bind()
+    if neck:
+      neck.texture.bind()
     glEnableClientState(GL_VERTEX_ARRAY)
     glEnableClientState(GL_COLOR_ARRAY)
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -469,11 +471,11 @@ class Neck:
 
     #myfingershurt: every theme can have oNeck:
 
-    if self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 1:
+    if self.guitarSolo and self.guitarSoloNeck and self.guitarSoloNeckMode == 1:
       neck = self.guitarSoloNeck
-    elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
+    elif self.scoreMultiplier > 4 and self.bassGrooveNeck and self.bassGrooveNeckMode == 1:
       neck = self.bassGrooveNeck
-    elif self.instrument.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and self.scoreMultiplier <= 4 and self.ovrneckoverlay == False:
+    elif self.instrument.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and self.scoreMultiplier <= 4 and not self.ovrneckoverlay:
       neck = self.oNeck
     else:
       neck = self.neckDrawing
@@ -481,14 +483,14 @@ class Neck:
     
     self.renderNeckMethod(v*self.neckAlpha[1], offset, neck)
     
-    if self.guitarSolo and self.guitarSoloNeck != None and self.guitarSoloNeckMode == 2:   #static overlay
+    if self.guitarSolo and self.guitarSoloNeck and self.guitarSoloNeckMode == 2:   #static overlay
       self.renderNeckMethod(v*self.neckAlpha[2], 0, self.guitarSoloNeck)
       
-    elif self.bgcount > 0 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 2:   #static bass groove overlay
+    elif self.bgcount > 0 and self.bassGrooveNeck and self.bassGrooveNeckMode == 2:   #static bass groove overlay
       self.renderNeckMethod(v*self.bgcount*self.neckAlpha[3], 0, self.bassGrooveNeck)
       
     if self.spcount2 != 0 and self.spcount < 1.2 and self.oNeck:   #static overlay
-      if self.oNeckovr != None and (self.scoreMultiplier > 4 or self.guitarSolo or self.ovrneckoverlay == True):
+      if self.oNeckovr and (self.scoreMultiplier > 4 or self.guitarSolo or self.ovrneckoverlay):
         neck = self.oNeckovr
         alpha = False
       else:
@@ -497,10 +499,8 @@ class Neck:
 
       self.renderNeckMethod(v*self.spcount*self.neckAlpha[4], offset, neck, alpha)
       
-    
-      
-    if self.instrument.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and (self.scoreMultiplier > 4 or self.guitarSolo or self.ovrneckoverlay == True):   #static overlay
-      if self.oNeckovr != None:
+    if self.instrument.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and (self.scoreMultiplier > 4 or self.guitarSolo or self.ovrneckoverlay):   #static overlay
+      if self.oNeckovr:
         neck = self.oNeckovr
         alpha = False
       else:
