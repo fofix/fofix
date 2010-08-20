@@ -6694,16 +6694,22 @@ class GuitarScene(Scene):
               else:
                 scale = 0.002 + 0.0005 * (self.countdownSeconds % 1) ** 3
                 text = "%d" % (self.countdownSeconds)
+                if self.engine.theme.countdownPosX and self.engine.theme.countdownPosY:
+                  self.countdownPosX = self.engine.theme.countdownPosX
+                  self.countdownPosY = self.engine.theme.countdownPosY
+                else:
+                  self.countdownPosX = 0.5
+                  self.countdownPosY = 0.45
                 w, h = bigFont.getStringSize(text, scale = scale)
                 self.engine.theme.setBaseColor()
-                bigFont.render(text,  (.5 - w / 2, .45 - h / 2), scale = scale)
+                bigFont.render(text,  (self.countdownPosX - w / 2, self.countdownPosY - h / 2), scale = scale)
           
           if self.resumeCountdownSeconds > 1:
             scale = 0.002 + 0.0005 * (self.resumeCountdownSeconds % 1) ** 3
             text = "%d" % (self.resumeCountdownSeconds)
             w, h = bigFont.getStringSize(text, scale = scale)
             self.engine.theme.setBaseColor()
-            bigFont.render(text,  (.5 - w / 2, .45 - h / 2), scale = scale)
+            bigFont.render(text,  (self.countdownPosX - w / 2, self.countdownPosY - h / 2), scale = scale)
     
           w, h = font.getStringSize(" ")
           y = .05 - h / 2 - (1.0 - v) * .2

@@ -469,6 +469,10 @@ defaultDict['neck_prompt_x'] = .1
 defaultDict['neck_prompt_y'] = .05
 defaultDict['shaderSolocolor'] = (0.3,0.7,0.9,0.6)
 
+#Countdown
+defaultDict['countdownPosX'] = .5
+defaultDict['countdownPosY'] = .45
+
 #Setlist
 defaultDict['songListDisplay'] = 1
 defaultDict['setlistguidebuttonsposX'] = .408
@@ -856,6 +860,9 @@ class Theme(Task):
       self.neck_prompt_y = config.get("theme", "menu_neck_choose_y")
 	  
       self.shaderSolocolor = config.get("theme", "shader_solocolor")
+      
+      self.countdownPosX = config.get("theme", "countdown_pos_x")
+      self.countdownPosY = config.get("theme", "countdown_pos_y")
       
       #Setlist
       self.songListDisplay = config.get("theme", "song_list_display")
