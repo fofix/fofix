@@ -2212,6 +2212,7 @@ class GuitarScene(Scene):
     self.engine.world.createScene("SongChoosingScene")
 
   def changeSong(self):
+    prevMode = self.engine.world.gameMode
     if self.song:
       self.song.stop()
       self.song  = None
@@ -2222,6 +2223,7 @@ class GuitarScene(Scene):
     self.engine.view.popLayer(self.menu)
     self.engine.view.popLayer(self.failMenu)
     self.freeResources()
+    self.engine.world.gameMode = prevMode
     # self.session.world.deleteScene(self)
     self.engine.world.createScene("SongChoosingScene")
 
