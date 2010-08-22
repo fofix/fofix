@@ -864,7 +864,7 @@ class Guitar(Instrument):
             continue
         if z < 0 and not (event.played or event.hopod): 
           color = (.6, .6, .6, .5 * visibility * f)
-          flat  = True
+    	  flat  = False 
         ###endCapo###
       else:#Notes disappear when missed
         if z < 0:
@@ -876,7 +876,7 @@ class Guitar(Instrument):
               continue
           else:
             color = (.6, .6, .6, .5 * visibility * f)
-            flat  = True
+    	    flat  = False 
           
       big = False
       self.bigMax = 0
@@ -1032,7 +1032,7 @@ class Guitar(Instrument):
             continue
         if z < 0 and not (event.played or event.hopod): 
           color = (.6, .6, .6, .5 * visibility * f)
-          flat  = True
+    	  flat  = False 
         ###endCapo###
       else:#Notes disappear when missed
         if z < 0:
@@ -1044,7 +1044,7 @@ class Guitar(Instrument):
               continue
           else:
             color = (.6, .6, .6, .5 * visibility * f)
-            flat  = True
+    	    flat  = False 
           
       big = False
       self.bigMax = 0
