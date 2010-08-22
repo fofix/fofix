@@ -108,16 +108,9 @@ class Data(object):
     else:
       self.vocalPath = os.path.join("themes",themename,"vocals")
 
-    if self.checkImgDrawing(os.path.join("themes",themename,"spfill.png")):
-      self.theme = 0
-    elif self.checkImgDrawing(os.path.join("themes",themename,"overdrive fill.png")):
-      self.theme = 2
-      self.themeCoOp = True
-    else:
-      self.theme = 1
-      if self.checkImgDrawing(os.path.join("themes",themename,"coop_rockmeter.png")):
-        self.themeCoOp = True
-
+    self.theme = 2
+    self.themeCoOp = True
+    
     self.fontScreenBottom = 0.75      #from our current viewport's constant 3:4 aspect ratio (which is always stretched to fill the video resolution)
 
     self.loadPartImages()
