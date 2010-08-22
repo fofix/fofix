@@ -886,7 +886,7 @@ class Drum(Instrument):
             continue
         if z < 0 and not (event.played or event.hopod): 
           color = (.6, .6, .6, .5 * visibility * f)
-          flat  = True
+          flat  = False
         ###endCapo###
       else:#Notes disappear when missed
         if z < 0:
@@ -898,7 +898,7 @@ class Drum(Instrument):
               continue
           else:
             color = (.6, .6, .6, .5 * visibility * f)
-            flat  = True
+            flat  = False
 
       sustain = False
 
@@ -1057,7 +1057,7 @@ class Drum(Instrument):
             continue
         if z < 0 and not (event.played or event.hopod): 
           color = (.6, .6, .6, .5 * visibility * f)
-          flat  = True
+          flat  = False
         ###endCapo###
       else:#Notes disappear when missed
         if z < 0:
@@ -1069,7 +1069,7 @@ class Drum(Instrument):
               continue
           else:
             color = (.6, .6, .6, .5 * visibility * f)
-            flat  = True
+            flat  = False
 
       sustain = False
 
