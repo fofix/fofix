@@ -88,18 +88,6 @@ class GuitarScene(Scene):
     phrase = self.sinfo.loadingPhrase
     if phrase == "":
       phrase = random.choice(self.engine.theme.loadingPhrase)
-      if phrase == "None":
-        i = random.randint(0,4)
-        if i == 0:
-          phrase = _("Let's get this show on the Road")
-        elif i == 1:
-          phrase = _("Impress the Crowd")
-        elif i == 2:
-          phrase = _("Don't forget to strum!")
-        elif i == 3:
-          phrase = _("Rock the house!")
-        else:
-          phrase = _("Jurgen is watching")
     splash = Dialogs.showLoadingSplashScreen(self.engine, phrase + " \n " + _("Initializing...")) 
     Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Initializing..."))
       
@@ -695,14 +683,6 @@ class GuitarScene(Scene):
     shaders.var["whammy"] = self.whammyEffect
     self.bigRockEndings = self.engine.config.get("game", "big_rock_endings")
     self.showFreestyleActive = self.engine.config.get("debug",   "show_freestyle_active")
-    #stump: continuous star fillup
-    self.starFillupCenterX = self.engine.theme.starFillupCenterX
-    self.starFillupCenterY = self.engine.theme.starFillupCenterY
-    self.starFillupInRadius = self.engine.theme.starFillupInRadius
-    self.starFillupOutRadius = self.engine.theme.starFillupOutRadius
-    self.starFillupColor = self.engine.theme.colorToHex(self.engine.theme.starFillupColor)
-    self.starContinuousAvailable = self.engine.config.get("performance", "star_continuous_fillup") and \
-      None not in (self.starFillupCenterX, self.starFillupCenterY, self.starFillupInRadius, self.starFillupOutRadius, self.starFillupColor)
     self.showBpm = self.engine.config.get("debug",   "show_bpm")    #MFH
 
     self.logLyricEvents = self.engine.config.get("log",   "log_lyric_events")

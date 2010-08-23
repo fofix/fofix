@@ -88,32 +88,21 @@ class MainMenu(BackgroundLayer):
         Log.error("Default chosen neck not valid; fallbacks Neck_1.png and defaultneck.png also not valid!")
 
     #Get theme
-    self.theme = self.engine.data.theme
-    self.themeCoOp = self.engine.data.themeCoOp
-    self.themename = self.engine.data.themeLabel
+    self.theme       = self.engine.data.theme
+    self.themeCoOp   = self.engine.data.themeCoOp
+    self.themename   = self.engine.data.themeLabel
     self.useSoloMenu = self.engine.theme.use_solo_submenu
     
     allowMic = True
     
-    try:
-      self.menux = self.engine.theme.menuX
-      self.menuy = self.engine.theme.menuY
-    except Exception, e:
-      Log.warn("Unable to load Theme menuX / Y positions: %s" % e) 
-      self.menux = None
-      self.menuy = None
+    self.menux = self.engine.theme.menuPos[0]
+    self.menuy = self.engine.theme.menuPos[1]
 
     self.rbmenu = self.engine.theme.menuRB
  
     #MFH
     self.main_menu_scale = self.engine.theme.main_menu_scaleVar
     self.main_menu_vspacing = self.engine.theme.main_menu_vspacingVar
-
-    if self.main_menu_scale == None:
-      self.main_menu_scale = .5
-    if self.main_menu_vspacing == None:
-      self.main_menu_vspacing = 0.09
-
 
     if not self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"menu","mainbg.png")):
       self.background = None
@@ -156,14 +145,8 @@ class MainMenu(BackgroundLayer):
    
  #####======= Racer: New Main Menu ======####
 
-    self.opt_text_color = self.engine.theme.hexToColor(self.engine.theme.opt_text_colorVar)
-    self.opt_selected_color = self.engine.theme.hexToColor(self.engine.theme.opt_selected_colorVar)
-
-    if self.opt_text_color == None:
-      self.opt_text_color = (1,1,1)
-    if self.opt_selected_color == None:
-      self.opt_selected_color = (1,0.75,0)
-
+    self.opt_text_color     = self.engine.theme.opt_text_colorVar
+    self.opt_selected_color = self.engine.theme.opt_selected_colorVar
 
     trainingMenu = [
       (_("Tutorials"), self.showTutorial),
@@ -180,44 +163,16 @@ class MainMenu(BackgroundLayer):
     strSettings = ""
     strQuit = ""
     
-    if self.theme == 1 and self.themeCoOp: #Worldrave - Put GH Co-op ahead of FoFix co-op for GH based theme's. Made more sense.
-      multPlayerMenu = [
-        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = 4)),
+    multPlayerMenu = [
+        (_("Face-Off"),     lambda: self.newLocalGame(players = 2,             maxplayers = 4)),
         (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = 4)),
-        (_("GH Battle"), lambda: self.newLocalGame(players = 2, mode2p = 6, allowDrum = False)), #akedrou- so you can block drums
-        (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
-        (_("Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 5)),
-        (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3, allowMic = allowMic)),   #Worldrave - Re-added this option for now.
+        (_("Party Mode"),   lambda: self.newLocalGame(             mode2p = 2)),
+        (_("FoFiX Co-Op"),  lambda: self.newLocalGame(players = 2, mode2p = 3, maxplayers = 4, allowMic = allowMic)),
+        (_("RB Co-Op"),     lambda: self.newLocalGame(players = 2, mode2p = 4, maxplayers = 4, allowMic = allowMic)),
+        (_("GH Co-Op"),     lambda: self.newLocalGame(players = 2, mode2p = 5, maxplayers = 4)),
+        (_("GH Battle"),    lambda: self.newLocalGame(players = 2, mode2p = 6, allowDrum = False)), #akedrou- so you can block drums
       ]
-    elif self.theme == 1 and not self.themeCoOp:
-      multPlayerMenu = [
-        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = 4)),
-        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = 4)),
-        (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
-      ]
-    elif self.theme == 2:
-      multPlayerMenu = [
-        (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3, maxplayers = 4, allowMic = allowMic)),
-        (_("RB Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 4, maxplayers = 4, allowMic = allowMic)),
-        (_("GH Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 5, maxplayers = 4)),
-        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = 4)),
-        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = 4)),
-        (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
-      ]
-    else:
-      multPlayerMenu = [
-        (_("FoFiX Co-Op"), lambda: self.newLocalGame(players = 2, mode2p = 3, allowMic = allowMic)),
-        (_("Face-Off"), lambda: self.newLocalGame(players = 2, maxplayers = 4)),
-        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = 4)),
-        (_("Party Mode"), lambda: self.newLocalGame(mode2p = 2)),
-      ]
-    
-    if self.useSoloMenu is None:
-      if self.theme == 0 or self.theme == 1:    #GH themes = 6 main menu selections
-        self.useSoloMenu = False
-      else:    #RB themes = 5 main menu selections
-        self.useSoloMenu = True
-    
+        
     if not self.useSoloMenu:
 
       mainMenu = [
@@ -433,93 +388,39 @@ class MainMenu(BackgroundLayer):
     w, h, = self.engine.view.geometry[2:4]
     r = .5
     
-    if not self.useSoloMenu:
-
-      if self.active:
-        if self.engine.view.topLayer() is not None:
-          if self.optionsBG != None:
-            self.engine.drawImage(self.optionsBG, (self.opt_bkg_size[2],-self.opt_bkg_size[3]), (w*self.opt_bkg_size[0],h*self.opt_bkg_size[1]), stretched = 3)
+    if self.active:
+      if self.engine.view.topLayer() is not None:
+        if self.optionsBG != None:
+          self.engine.drawImage(self.optionsBG, (self.opt_bkg_size[2],-self.opt_bkg_size[3]), (w*self.opt_bkg_size[0],h*self.opt_bkg_size[1]), stretched = 3)
           
-          self.engine.drawImage(self.optionsPanel, (0.5,-0.5), (w/1.7, h/2))
+        self.engine.drawImage(self.optionsPanel, (0.5,-0.5), (w/1.7, h/2))
+      else:
+        self.engine.drawImage(self.engine.data.loadingImage, (1.0,-1.0), (w/2, h/2), stretched = 3)
+
+    if self.menu.active and self.engine.cmdPlay == 0:
+      if self.background != None:
+        #MFH - auto-scaling
+        self.engine.drawImage(self.background, (1.0,-1.0), (w/2, h/2), stretched = 3)
+
+      numOfChoices = len(self.menu.choices)
+      for i in range(numOfChoices):
+        #Item selected
+        if self.menu.currentIndex == i:
+          xpos = (.5,1)
+        #Item unselected
         else:
-          self.engine.drawImage(self.engine.data.loadingImage, (1.0,-1.0), (w/2, h/2), stretched = 3)
+          xpos = (0,.5)
+        #which item?
+        ypos = (1/float(numOfChoices) * i, 1/float(numOfChoices) * (i + 1)) 
 
-      if self.menu.active and self.engine.cmdPlay == 0:
-        if self.background != None:
-          #MFH - auto-scaling
-          self.engine.drawImage(self.background, (1.0,-1.0), (w/2, h/2), stretched = 3)
-
-        for i in range(0,6):
-          #Item selected
-          if self.menu.currentIndex == i:
-            xpos = (.5,1)
-          #Item unselected
-          else:
-            xpos = (0,.5)
-          #which item?
-          ypos = 1/6.0*i
-
-
-#============blazingamer============
-#if menux and/or menuy are not set it will use the default positions for the main text
-          if self.menux == None or self.menuy == None:
-            if self.theme == 0:
-              textcoord = (w*0.5,h*0.45-(h*self.main_menu_vspacing)*i)
-            elif self.theme == 1:
-              textcoord = (w*0.7,h*0.8-(h*self.main_menu_vspacing)*i)
-#if menux and menuy are set it will use those
-          else:
-            try:
-              textcoord = (w*self.menux,h*self.menuy-(h*self.main_menu_vspacing)*i)
-            except Exception, e:
-              Log.warn("Unable to translate BGText: %s" % e) 
-        
-#===================================     
-
-          self.engine.drawImage(self.BGText, (.5*self.main_menu_scale,-1/6.0*self.main_menu_scale), textcoord,
-                                rect = (xpos[0],xpos[1],ypos,ypos+1/6.0))
-
-    else:
-
-      if self.active:
-        if self.engine.view.topLayer() is not None:
-          if self.optionsBG != None:
-            self.engine.drawImage(self.optionsBG, (self.opt_bkg_size[2],-self.opt_bkg_size[3]), (w*self.opt_bkg_size[0],h*self.opt_bkg_size[1]), stretched = 3)
-        
-          self.engine.drawImage(self.optionsPanel, (0.5,-0.5), (w*0.4, h/2))
-        else:
-          self.engine.drawImage(self.engine.data.loadingImage, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
-        
-      if self.menu.active and self.engine.cmdPlay == 0:
-        if self.background != None:
-          self.engine.drawImage(self.background, (1.0,-1.0), (w/2, h/2), stretched = 3)
-
-        for i in range(0,5):
-          #Item selected
-          if self.menu.currentIndex == i:
-            xpos = (.5,1)
-          #Item unselected
-          else:
-            xpos = (0,.5)
-          #which item?
-          ypos = 1/5.0*i
-          
-
-#============blazingamer============
-#if menux and/or menuy are not set it will use the default positions for the main text
-          if self.menux == None or self.menuy == None:
-            textcoord = (w*0.2,(h*0.8-(h*self.main_menu_vspacing)*i)*v)
-#if menux and menuy are set it will use those
-          else:
-            try:
-              textcoord = (w*self.menux,(h*self.menuy-(h*self.main_menu_vspacing)*i)*v)
-            except Exception, e:
-              Log.warn("Unable to translate BGText: %s" % e) 
-        
-#===================================
-
-          self.engine.drawImage(self.BGText, (.5*self.main_menu_scale,(-1/5.0*self.main_menu_scale)),
-                                textcoord, rect = (xpos[0],xpos[1],ypos,ypos+1/5.0))
+        textcoord = (w*self.menux,h*self.menuy-(h*self.main_menu_vspacing)*i)
+        sFactor = self.main_menu_scale
+        wFactor = xpos[1] - xpos[0]
+        hFactor = ypos[1] - ypos[0]
+        self.engine.drawImage(self.BGText, 
+                              scale = (wFactor*sFactor,-hFactor*sFactor), 
+                              coord = textcoord,
+                              rect  = (xpos[0],xpos[1],ypos[0],ypos[1]))
 
 #racer: added version tag to main menu:
     if self.version != None:

@@ -25,6 +25,7 @@ import Config
 import os
 
 from OpenGL.GL import *
+from Svg import ImgDrawing
 
 import locale
 
@@ -261,6 +262,87 @@ class FontLayer(Layer):
 
     if self.condition:
       self.font.render(self.text, (self.position[0], self.position[1]), align = self.alignment)
+
+#defines layers that are just font instead of images
+class CircleLayer(Layer): 
+  def __init__(self, stage, section, drawing = None):
+    Layer.__init__(self, stage, section)
+
+    def get(value, type = str, default = None):
+      if self.config.has_option(self.section, value):
+        return type(self.config.get(self.section, value))
+      return default
+    
+    self.color   = get("color", str, "#FFFFFF")
+    self.ratio   = eval(get("ratio", str, "1"))
+
+    if drawing:
+      self.engine.loadImgDrawing(self, "drawing", drawing)
+      self.centerX   = get("centerX", float, self.drawing.width1()/2)
+      self.centerY   = get("centerY", float, self.drawing.height1()/2)
+      self.inRadius  = get("innerRad", float, 0)
+      self.outRadius = get("outerRad", float, self.drawing.width1()/2)
+    else:
+      self.centerX   = get("centerX", float, self.drawing.width1()/2)
+      self.centerY   = get("centerY", float, self.drawing.height1()/2)
+      self.inRadius  = get("innerRad", float, 0)
+      self.outRadius = get("outerRad", float, self.drawing.width1()/2)
+      width = self.centerX + self.outRadius
+      height = self.centerY + self.outRadius
+      surface = pygame.Surface((width, height))
+      surface.fill(self.theme.hexToColor(self.color))
+      self.drawing = ImgDrawing(self.engine.data.svg, pygame.image.tostring(surface, 'RGBA'))      
+
+    self.drawnOverlays = {}
+    baseFillImageSize = self.drawing.pixelSize
+    for degrees in range(0, 361, 5):
+      overlay = Image.new('RGBA', baseFillImageSize)
+      draw = ImageDraw.Draw(overlay)
+      draw.pieslice((self.centerX-self.outRadius, self.centerY-self.outRadius,
+                     self.centerX+self.outRadius, self.centerY+self.outRadius),
+                     -90, degrees-90, outline=self.color, fill=self.color)
+      draw.ellipse((self.centerX-self.inRadius, self.centerY-self.inRadius,
+                    self.centerX+self.inRadius, self.centerY+self.inRadius),
+                    outline=(0, 0, 0, 0), fill=(0, 0, 0, 0))
+      dispOverlay = ImgDrawing(self.engine.data.svg, overlay)
+      self.drawnOverlays[degrees] = dispOverlay
+
+  def updateLayer(self, playerNum):
+    w, h, = self.engine.view.geometry[2:4]
+    texture = self.drawing
+
+    def get(value, type = str, default = None):
+      if self.config.has_option(self.section, value):
+        return type(self.config.get(self.section, value))
+      return default
+
+    self.ratio        = eval(get("ratio", str, "1"))
+
+    self.condition = bool(eval(get("condition", str, "True")))
+
+    if "xpos" in self.inPixels:
+      self.position[0] *= w/640.0
+    else:
+      self.position[0] *= w
+
+    if "ypos" in self.inPixels:
+      self.position[1] *= h/480.0
+    else:        
+      self.position[1] *= h
+
+  def render(self, visibility, playerNum):
+    w, h, = self.stage.engine.view.geometry[2:4]
+    v = 1.0
+
+    self.updateLayer(playerNum)
+    for effect in self.effects:
+      effect.update()
+          
+    if self.condition:
+      degrees = int(360*self.ratio) - (int(360*self.ratio) % 5)
+      self.engine.drawImage(self.drawnVocalOverlays[degrees], scale = (.5,-.5), 
+                            coord = (w*self.position[0],h*self.position[1]))
+
 
 #this is just a template for effects                
 class Effect:
