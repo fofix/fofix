@@ -396,6 +396,7 @@ class Theme(Task):
                                    get("lobbySubtitleTextY", float, .15)) 
       self.lobbySubtitleTextScale = get("lobbySubtitleTextScale", float, .0015)
       self.lobbySubtitleTextFont = get("lobbySubtitleTextFont", str, "font")
+      self.lobbySubtitleTextAlign = eval(get("lobbySubtitleTextAlign", str, "LEFT"))
 
       self.lobbyOptionScale = get("lobbyOptionScale", float, .001)
       self.lobbyOptionAlign = eval(get("lobbyOptionAlign", str, "CENTER"))
