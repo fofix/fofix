@@ -698,6 +698,9 @@ class GuitarScene(Scene):
 
     self.screenCenterX = self.engine.video.screen.get_rect().centerx
     self.screenCenterY = self.engine.video.screen.get_rect().centery
+
+    self.countdownPosX = self.engine.theme.countdownPosX
+    self.countdownPosY = self.engine.theme.countdownPosY
   
 
     #racer: practice beat claps:
@@ -6674,12 +6677,6 @@ class GuitarScene(Scene):
               else:
                 scale = 0.002 + 0.0005 * (self.countdownSeconds % 1) ** 3
                 text = "%d" % (self.countdownSeconds)
-                if self.engine.theme.countdownPosX and self.engine.theme.countdownPosY:
-                  self.countdownPosX = self.engine.theme.countdownPosX
-                  self.countdownPosY = self.engine.theme.countdownPosY
-                else:
-                  self.countdownPosX = 0.5
-                  self.countdownPosY = 0.45
                 w, h = bigFont.getStringSize(text, scale = scale)
                 self.engine.theme.setBaseColor()
                 bigFont.render(text,  (self.countdownPosX - w / 2, self.countdownPosY - h / 2), scale = scale)

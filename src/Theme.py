@@ -178,8 +178,8 @@ class Theme(Task):
       #name from Hering's mod.
       self.power_up_name = get("power_up_name", str, "Jurgen Power")
       
-      self.countdownPosX = config.get("theme", "countdown_pos_x")
-      self.countdownPosY = config.get("theme", "countdown_pos_y")
+      self.countdownPosX = get("countdown_pos_x", float, 0.5)
+      self.countdownPosY = get("countdown_pos_y", float, 0.45)
       
       #These values determine the width of the neck as well as the length of it
       #width seems pretty obvious but length has an advantage in that by making
