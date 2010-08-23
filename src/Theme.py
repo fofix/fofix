@@ -145,10 +145,13 @@ class Theme(Task):
       default_color = ["#22FF22", "#FF2222", "#FFFF22", "#3333FF", "#FF9933", "#CC22CC"]
       self.noteColors  = [get("fret%d_color" % i, "color", default_color[i]) for i in range(6)]
       self.spNoteColor =  get("fretS_color",      "color", "#4CB2E5")
+      self.killNoteColor =  get("fretK_color",      "color", "#FFFFFF")
 
       #just like glow_color, this allows you to have tails use either the color of the note
       #or the actual color of the tail
       self.use_fret_colors =  get("use_fret_colors", bool, False)
+      
+      self.fretPress = get("fretPress", bool, False)
       
       #Point of View (x, y, z)
       self.povTarget  = (get("pov_target_x", float), get("pov_target_y", float), get("pov_target_z", float))
@@ -545,6 +548,8 @@ class Theme(Task):
       self.keypos      = [get("keypos"+str(i+1),      float, 0) for i in range(5)]
       self.drumnotepos = [get("drumnotepos"+str(i+1), float, 0) for i in range(5)]
       self.drumkeypos  = [get("drumkeypos"+str(i+1),  float, 0) for i in range(5)]
+      
+      self.shaderSolocolor = get("shaderSoloColor", "color", "#0000FF")
       
       #In-game rendering
       self.hopoIndicatorX = get("hopo_indicator_x")

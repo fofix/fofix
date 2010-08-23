@@ -374,12 +374,12 @@ class GuitarScene(Scene):
     self.camera.target    = (0.0, 1.0, 8.0)
     self.camera.origin    = (0.0, 2.0, -3.4)
 
-    self.targetX          = self.engine.theme.povTargetX
-    self.targetY          = self.engine.theme.povTargetY
-    self.targetZ          = self.engine.theme.povTargetZ
-    self.originX          = self.engine.theme.povOriginX
-    self.originY          = self.engine.theme.povOriginY
-    self.originZ          = self.engine.theme.povOriginZ
+    self.targetX          = self.engine.theme.povTarget[0]
+    self.targetY          = self.engine.theme.povTarget[1]
+    self.targetZ          = self.engine.theme.povTarget[2]
+    self.originX          = self.engine.theme.povOrigin[0]
+    self.originY          = self.engine.theme.povOrigin[1]
+    self.originZ          = self.engine.theme.povOrigin[0]
     self.customPOV        = False
     self.ending           = False
     
@@ -670,7 +670,6 @@ class GuitarScene(Scene):
     self.starScoreUpdates = self.engine.config.get("performance", "star_score_updates") #MFH
     self.currentlyAnimating = True
     self.missPausesAnim = self.engine.config.get("game", "miss_pauses_anim") #MFH
-    self.displayAllGreyStars = self.engine.theme.displayAllGreyStars
     self.starpowerMode = self.engine.config.get("game", "starpower_mode") #MFH
     self.useMidiSoloMarkers = False
     self.logMarkerNotes = self.engine.config.get("game", "log_marker_notes")
@@ -888,10 +887,6 @@ class GuitarScene(Scene):
     
     self.phrases = self.engine.config.get("coffee", "game_phrases")#blazingamer
     self.starfx = self.engine.config.get("game", "starfx")#blazingamer
-    smallMult = self.engine.config.get("game","small_rb_mult")
-    self.rbmfx = False
-    if smallMult == 2 or (smallMult == 1 and self.engine.theme.smallMult):
-      self.rbmfx = True
     self.boardY = 2
     self.rbOverdriveBarGlowVisibility = 0
     self.rbOverdriveBarGlowFadeOut = False
@@ -1597,35 +1592,12 @@ class GuitarScene(Scene):
     self.fail_text_color = self.engine.theme.hexToColor(self.engine.theme.fail_text_colorVar)
     self.fail_selected_color = self.engine.theme.hexToColor(self.engine.theme.fail_selected_colorVar)
     self.fail_completed_color = self.engine.theme.hexToColor(self.engine.theme.fail_completed_colorVar)
-    
 
     settingsMenu = Settings.GameSettingsMenu(self.engine, self.pause_text_color, self.pause_selected_color, players = self.playerList)
     careerSettingsMenu = Settings.GameCareerSettingsMenu(self.engine, self.pause_text_color, self.pause_selected_color, players = self.playerList)
     settingsMenu.fadeScreen = False
-    careerSettingsMenu.fadeScreen = False
-
+    careerSettingsMenu.fadeScreen = False    
     
-    # evilynux - More themeable options
-    self.rockmeter_score_color = self.engine.theme.rockmeter_score_colorVar
-    
-    #self.fail_completed_color = self.engine.theme.hexToColor(self.engine.theme.song_name_selected_colorVar) # text same color as selected song
-    #self.fail_completed_color = self.engine.theme.hexToColor(self.engine.theme.fail_text_colorVar)  #No, now same as fail_text color.
-    
-    self.ingame_stats_color = self.engine.theme.ingame_stats_colorVar
-
-    
-    if self.pause_text_color == None:
-      self.pause_text_color = (1,1,1)
-    if self.pause_selected_color == None:
-      self.pause_selected_color = (1,0.75,0)
-
-    if self.fail_text_color == None:
-      self.fail_text_color = (1,1,1)
-    if self.fail_selected_color == None:
-      self.fail_selected_color = (1,0.75,0)
-    if self.fail_completed_color == None:
-      self.fail_completed_color = self.fail_text_color
-
     Log.debug("Pause text / selected colors: " + str(self.pause_text_color) + " / " + str(self.pause_selected_color))
 
 
