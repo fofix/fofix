@@ -83,18 +83,18 @@ class Data(object):
     self.themepath = themepath
     self.path = Version.dataPath()
 
-    if not self.checkImgDrawing(os.path.join("themes",themename,"notes.png")):
+    if not self.checkImgDrawing(os.path.join("themes",themename,"notes","notes.png")):
       #myfingershurt: here need to ensure an existing theme is selected
       themes = []
       defaultTheme = None           #myfingershurt
       allthemes = os.listdir(themepath)
       for name in allthemes:
-        if self.checkImgDrawing(os.path.join("themes",name,"notes.png")):
+        if self.checkImgDrawing(os.path.join("themes",name,"notes","notes.png")):
           themes.append(name)
-          if name == "MegaLight":         #myfingershurt
+          if name == "MegaLight V4":         #myfingershurt
             defaultTheme = name     #myfingershurt
       i = len(themes)
-      if defaultTheme != "MegaLight":     #myfingershurt
+      if defaultTheme != "MegaLight V4":     #myfingershurt
         defaultTheme = themes[0]    #myfingershurt
       #not a valid theme if notes.png isn't there!  Force default theme:
       Config.set("coffee", "themename",defaultTheme)

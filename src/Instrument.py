@@ -348,6 +348,34 @@ class Instrument:
     self.coOpRestart = False #akedrou
     self.starPowerActive = False
 
+  #this checks to see if there is a "drum" or "bass" folder
+  #inside the subdirectory for image replacement
+  def checkPath(self, subdirectory, file):
+    #Get theme
+    themename = self.engine.data.themeLabel
+    
+    defaultpath = os.path.join("themes", themename, subdirectory)
+    themepath = os.path.join("themes", themename, subdirectory)
+    if self.isDrum:
+      themepath = os.path.join(themepath, "drum")
+    elif self.isBassGuitar:
+      themepath = os.path.join(themepath, "bass")
+          
+    if self.engine.fileExists(os.path.join(themepath, file)):
+      print themepath + " exists!"
+      return os.path.join(themepath, file)
+    else:
+      return os.path.join(defaultpath, file)
+
+  def loadNotes(self):
+      pass
+      
+  def loadFrets(self):
+      pass
+      
+  def loadTails(self):
+      pass
+
   def setMultiplier(self, multiplier):
     self.scoreMultiplier = multiplier
     self.neck.scoreMultiplier = multiplier

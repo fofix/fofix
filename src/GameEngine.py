@@ -384,12 +384,10 @@ themes = []
 defaultTheme = None           #myfingershurt
 allthemes = os.listdir(themepath)
 for name in allthemes:
-  if os.path.exists(os.path.join(themepath,name,"notes.png")):
+  if os.path.exists(os.path.join(themepath,name,"notes","notes.png")):
     themes.append(name)
-    if name == "MegaLight" and defaultTheme != "Rock Band 1":         #myfingershurt
-      defaultTheme = name     #myfingershurt
-    if name == "Rock Band 1":         #myfingershurt
-      defaultTheme = name     #myfingershurt
+    if name == "MegaLight V4":
+      defaultTheme = name
 
 i = len(themes)
 if i == 0:
