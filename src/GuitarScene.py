@@ -379,7 +379,7 @@ class GuitarScene(Scene):
     self.targetZ          = self.engine.theme.povTarget[2]
     self.originX          = self.engine.theme.povOrigin[0]
     self.originY          = self.engine.theme.povOrigin[1]
-    self.originZ          = self.engine.theme.povOrigin[0]
+    self.originZ          = self.engine.theme.povOrigin[2]
     self.customPOV        = False
     self.ending           = False
     
