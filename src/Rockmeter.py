@@ -72,6 +72,10 @@ progress = 0.0         #this gives a percentage (between 0 and 1)
 # A graphical rockmeter layer
 # This is the base template for all rockmeter layer types
 class Layer:
+  def get(self, value, type = str, default = None):
+    if self.config.has_option(self.section, value):
+      return type(self.config.get(self.section, value))
+    return default
 
   def __init__(self, stage, section):
     self.stage       = stage			#The rockmeter
@@ -106,39 +110,26 @@ class ImageLayer(Layer):
   def __init__(self, stage, section, drawing):
     Layer.__init__(self, stage, section)
 
-    def get(value, type = str, default = None):
-      if self.config.has_option(self.section, value):
-        return type(self.config.get(self.section, value))
-      return default
     
     self.engine.loadImgDrawing(self, "drawing", drawing)
-    #These are for when I get the ImgObj working
-    #frameX        = get("frameX", int, 1)
-    #frameY        = get("frameY", int, 1)
-    #loadImage(self, "drawing", drawing, frameX, frameY)	#this is the image that is loaded for the layer
     
   def updateLayer(self, playerNum):
     w, h, = self.engine.view.geometry[2:4]
     texture = self.drawing
 
-    def get(value, type = str, default = None):
-      if self.config.has_option(self.section, value):
-        return type(self.config.get(self.section, value))
-      return default
-
-    self.rect        = list(eval(get("rect", str, "(0,1,0,1)")))
+    self.rect        = list(eval(self.get("rect", str, "(0,1,0,1)")))
 
     #all of this has to be repeated instead of using the base method
     #because now things can be calculated in relation to the image's properties
-    self.position  = [eval(get("xpos", str, "0.0")),    eval(get("ypos", str, "0.0"))]
-    self.scale     = [eval(get("xscale", str, "0.5")),  eval(get("yscale", str, "0.5"))]
+    self.position  = [eval(self.get("xpos", str, "0.0")),    eval(self.get("ypos", str, "0.0"))]
+    self.scale     = [eval(self.get("xscale", str, "0.5")),  eval(self.get("yscale", str, "0.5"))]
 
-    self.angle       = get("angle", float, 0.0)
-    self.color       = get("color", str, "#FFFFFF")
+    self.angle       = self.get("angle", float, 0.0)
+    self.color       = self.get("color", str, "#FFFFFF")
 
-    self.condition = bool(eval(get("condition", str, "True")))
+    self.condition = bool(eval(self.get("condition", str, "True")))
 
-    self.alignment = eval(get("alignment", str, "center").upper())
+    self.alignment = eval(self.get("alignment", str, "center").upper())
 
     self.scale[0] *=  (self.rect[1] - self.rect[0])
     self.scale[1] *=  (self.rect[3] - self.rect[2])
@@ -162,18 +153,6 @@ class ImageLayer(Layer):
       self.position[1] *= h/480.0
     else:        
       self.position[1] *= h
-
-
-    #try:
-    #    self.frameX      = get("currentFrameX", int, 1)
-    #except:
-    #    self.frameX      = eval(get("currentFrameX"))
-
-    #try:
-    #    self.frameY      = get("currentFrameY", int, 1)
-    #except:
-    #    self.frameY      = eval(get("currentFrameY"))
-
 
   def render(self, visibility, playerNum):
     v = 1.0
@@ -211,15 +190,10 @@ class FontLayer(Layer):
   def updateLayer(self, playerNum):
     w, h, = self.engine.view.geometry[2:4]
 
-    def get(value, type = str, default = None):
-      if self.config.has_option(self.section, value):
-        return type(self.config.get(self.section, value))
-      return default
+    self.text = eval(self.get("text"))
+    self.color = self.get("color", str, "#FFFFFF")
 
-    self.text = eval(get("text"))
-    self.color = get("color", str, "#FFFFFF")
-
-    self.alignment = eval(get("alignment", str, "left").upper())
+    self.alignment = eval(self.get("alignment", str, "left").upper())
 
     if self.useComma:
       self.text = locale.format("%d", self.text, grouping=True)
@@ -228,15 +202,15 @@ class FontLayer(Layer):
 
     wid, hgt = self.font.getStringSize(str(self.text))
 
-    self.position  = [eval(get("xpos", str, "0.0")),    eval(get("ypos", str, "0.0"))]
-    self.scale     = [eval(get("xscale", str, "1.0")),  eval(get("yscale", str, "1.0"))]
+    self.position  = [eval(self.get("xpos", str, "0.0")),    eval(self.get("ypos", str, "0.0"))]
+    self.scale     = [eval(self.get("xscale", str, "1.0")),  eval(self.get("yscale", str, "1.0"))]
 
-    self.angle       = get("angle", float, 0.0)
-    self.color       = get("color", str, "#FFFFFF")
+    self.angle       = self.get("angle", float, 0.0)
+    self.color       = self.get("color", str, "#FFFFFF")
 
-    self.condition   = bool(eval(get("condition", str, "True")))
+    self.condition   = bool(eval(self.get("condition", str, "True")))
 
-    self.useComma = get("useComma", bool, False)
+    self.useComma = self.get("useComma", bool, False)
 
     if "xpos" in self.inPixels:
       self.position[0] /= 640.0
@@ -268,25 +242,20 @@ class CircleLayer(Layer):
   def __init__(self, stage, section, drawing = None):
     Layer.__init__(self, stage, section)
 
-    def get(value, type = str, default = None):
-      if self.config.has_option(self.section, value):
-        return type(self.config.get(self.section, value))
-      return default
-    
-    self.color   = get("color", str, "#FFFFFF")
-    self.ratio   = eval(get("ratio", str, "1"))
+    self.color   = self.get("color", str, "#FFFFFF")
+    self.ratio   = eval(self.get("ratio", str, "1"))
 
     if drawing:
       self.engine.loadImgDrawing(self, "drawing", drawing)
-      self.centerX   = get("centerX", float, self.drawing.width1()/2)
-      self.centerY   = get("centerY", float, self.drawing.height1()/2)
-      self.inRadius  = get("innerRad", float, 0)
-      self.outRadius = get("outerRad", float, self.drawing.width1()/2)
+      self.centerX   = self.get("centerX", float, self.drawing.width1()/2)
+      self.centerY   = self.get("centerY", float, self.drawing.height1()/2)
+      self.inRadius  = self.get("innerRad", float, 0)
+      self.outRadius = self.get("outerRad", float, self.drawing.width1()/2)
     else:
-      self.centerX   = get("centerX", float, self.drawing.width1()/2)
-      self.centerY   = get("centerY", float, self.drawing.height1()/2)
-      self.inRadius  = get("innerRad", float, 0)
-      self.outRadius = get("outerRad", float, self.drawing.width1()/2)
+      self.centerX   = self.get("centerX", float, self.drawing.width1()/2)
+      self.centerY   = self.get("centerY", float, self.drawing.height1()/2)
+      self.inRadius  = self.get("innerRad", float, 0)
+      self.outRadius = self.get("outerRad", float, self.drawing.width1()/2)
       width = self.centerX + self.outRadius
       height = self.centerY + self.outRadius
       surface = pygame.Surface((width, height))
@@ -311,14 +280,9 @@ class CircleLayer(Layer):
     w, h, = self.engine.view.geometry[2:4]
     texture = self.drawing
 
-    def get(value, type = str, default = None):
-      if self.config.has_option(self.section, value):
-        return type(self.config.get(self.section, value))
-      return default
+    self.ratio        = eval(self.get("ratio", str, "1"))
 
-    self.ratio        = eval(get("ratio", str, "1"))
-
-    self.condition = bool(eval(get("condition", str, "True")))
+    self.condition = bool(eval(self.get("condition", str, "True")))
 
     if "xpos" in self.inPixels:
       self.position[0] *= w/640.0
@@ -346,6 +310,11 @@ class CircleLayer(Layer):
 
 #this is just a template for effects                
 class Effect:
+  def get(self, value, type = str, default = None):
+    if self.config.has_option(self.section, value):
+      return type(self.config.get(self.section, value))
+    return default
+
   def __init__(self, layer, section):
     pass
 
@@ -357,20 +326,15 @@ class Slide(Effect):
     self.layer = layer
     self.config = layer.config
     self.section = section
-
-    def get(value, type = str, default = None):
-      if self.config.has_option(self.section, value):
-        return type(self.config.get(self.section, value))
-      return default
     
     self.condition = True
 
-    self.startCoord = [eval(get("startX", str, "0.0")), eval(get("startY", str, "0.0"))]
-    self.endCoord   = [eval(get("endX",   str, "0.0")), eval(get("endY",   str, "0.0"))]
+    self.startCoord = [eval(self.get("startX", str, "0.0")), eval(self.get("startY", str, "0.0"))]
+    self.endCoord   = [eval(self.get("endX",   str, "0.0")), eval(self.get("endY",   str, "0.0"))]
 
-    self.position = [eval(get("startX", str, "0.0")), eval(get("startY", str, "0.0"))]
+    self.position = [eval(self.get("startX", str, "0.0")), eval(self.get("startY", str, "0.0"))]
 
-    self.inPixels  = get("inPixels", str, "").split("|")
+    self.inPixels  = self.get("inPixels", str, "").split("|")
 
     w, h, = self.layer.engine.view.geometry[2:4]
 
@@ -395,18 +359,13 @@ class Slide(Effect):
       self.endCoord[1] *= h
 
 
-    self.reverse = bool(eval(get("reverse", str, "True")))   
+    self.reverse = bool(eval(self.get("reverse", str, "True")))   
 
     #how long it takes for the transition to take place
-    self.transitionTime = get("transitionTime", float, 512.0)
+    self.transitionTime = self.get("transitionTime", float, 512.0)
 
   def update(self):
-    def get(value, type = str, default = None):
-      if self.config.has_option(self.section, value):
-        return type(self.config.get(self.section, value))
-      return default
-
-    self.condition = bool(eval(get("condition", str, "True")))
+    self.condition = bool(eval(self.get("condition", str, "True")))
 
     slideX = (self.endCoord[0] - self.startCoord[0])/self.transitionTime
     slideY = (self.endCoord[1] - self.startCoord[1])/self.transitionTime
@@ -428,6 +387,11 @@ class Slide(Effect):
     self.layer.position = [self.position[0], self.position[1]]
 
 class Rockmeter:
+  def get(self, value, type = str, default = None):
+    if self.config.has_option(self.section, value):
+      return type(self.config.get(self.section, value))
+    return default
+
   def __init__(self, guitarScene, configFileName, coOp = False):
 
     self.scene            = guitarScene
@@ -449,15 +413,15 @@ class Rockmeter:
               ]
       exist = False
       for t in types:
-        section = "layer%d:%s" % (i, t)
-        if not self.config.has_section(section):
+        self.section = "layer%d:%s" % (i, t)
+        if not self.config.has_section(self.section):
           continue
         else:
           exist = True
           if t == types[1]:
-            self.createFont(section)
+            self.createFont(self.section)
           else:
-            self.createImage(section)
+            self.createImage(self.section)
           break
 
   def addLayer(self, layer, shared = False):
@@ -468,18 +432,14 @@ class Rockmeter:
         self.layers.append(layer)
 
   def createFont(self, section):
-    def get(value, type = str, default = None):
-      if self.config.has_option(section, value):
-        return type(self.config.get(section, value))
-      return default
 
-    font  = get("font")
+    font  = self.get("font")
     layer = FontLayer(self, section, font)
 
-    layer.text      = get("text")
-    layer.shared    = get("shared",   bool, False)
-    layer.condition = get("condition", str, "True")
-    layer.inPixels  = get("inPixels", str, "").split("|")
+    layer.text      = self.get("text")
+    layer.shared    = self.get("shared",   bool, False)
+    layer.condition = self.get("condition", str, "True")
+    layer.inPixels  = self.get("inPixels", str, "").split("|")
 
     section = section.split(":")[0]
     types = ["Slide", "Rotate", "Fade"]
@@ -502,21 +462,16 @@ class Rockmeter:
     self.addLayer(layer, layer.shared)
 
   def createImage(self, section):
-    def get(value, type = str, default = None):
-      if self.config.has_option(section, value):
-        return type(self.config.get(section, value))
-      return default
-
     
-    texture   = get("texture")
+    texture   = self.get("texture")
     drawing   = os.path.join("themes", self.themename, "rockmeter", texture)
     layer     = ImageLayer(self, section, drawing)
 
-    layer.shared    = get("shared", bool, False)
-    layer.condition = get("condition", str, "True")
-    layer.inPixels  = get("inPixels", str, "").split("|")
+    layer.shared    = self.get("shared", bool, False)
+    layer.condition = self.get("condition", str, "True")
+    layer.inPixels  = self.get("inPixels", str, "").split("|")
 
-    layer.rect      = eval(get("rect", str, "(0,1,0,1)"))
+    layer.rect      = eval(self.get("rect", str, "(0,1,0,1)"))
 
     section = section.split(":")[0]
     types = ["Slide", "Rotate", "Fade"]
