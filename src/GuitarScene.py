@@ -88,18 +88,6 @@ class GuitarScene(Scene):
     phrase = self.sinfo.loadingPhrase
     if phrase == "":
       phrase = random.choice(self.engine.theme.loadingPhrase)
-      if phrase == "None":
-        i = random.randint(0,4)
-        if i == 0:
-          phrase = _("Let's get this show on the Road")
-        elif i == 1:
-          phrase = _("Impress the Crowd")
-        elif i == 2:
-          phrase = _("Don't forget to strum!")
-        elif i == 3:
-          phrase = _("Rock the house!")
-        else:
-          phrase = _("Jurgen is watching")
     splash = Dialogs.showLoadingSplashScreen(self.engine, phrase + " \n " + _("Initializing...")) 
     Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Initializing..."))
       
@@ -386,12 +374,12 @@ class GuitarScene(Scene):
     self.camera.target    = (0.0, 1.0, 8.0)
     self.camera.origin    = (0.0, 2.0, -3.4)
 
-    self.targetX          = self.engine.theme.povTargetX
-    self.targetY          = self.engine.theme.povTargetY
-    self.targetZ          = self.engine.theme.povTargetZ
-    self.originX          = self.engine.theme.povOriginX
-    self.originY          = self.engine.theme.povOriginY
-    self.originZ          = self.engine.theme.povOriginZ
+    self.targetX          = self.engine.theme.povTarget[0]
+    self.targetY          = self.engine.theme.povTarget[1]
+    self.targetZ          = self.engine.theme.povTarget[2]
+    self.originX          = self.engine.theme.povOrigin[0]
+    self.originY          = self.engine.theme.povOrigin[1]
+    self.originZ          = self.engine.theme.povOrigin[2]
     self.customPOV        = False
     self.ending           = False
     
@@ -682,7 +670,6 @@ class GuitarScene(Scene):
     self.starScoreUpdates = self.engine.config.get("performance", "star_score_updates") #MFH
     self.currentlyAnimating = True
     self.missPausesAnim = self.engine.config.get("game", "miss_pauses_anim") #MFH
-    self.displayAllGreyStars = self.engine.theme.displayAllGreyStars
     self.starpowerMode = self.engine.config.get("game", "starpower_mode") #MFH
     self.useMidiSoloMarkers = False
     self.logMarkerNotes = self.engine.config.get("game", "log_marker_notes")
@@ -695,14 +682,6 @@ class GuitarScene(Scene):
     shaders.var["whammy"] = self.whammyEffect
     self.bigRockEndings = self.engine.config.get("game", "big_rock_endings")
     self.showFreestyleActive = self.engine.config.get("debug",   "show_freestyle_active")
-    #stump: continuous star fillup
-    self.starFillupCenterX = self.engine.theme.starFillupCenterX
-    self.starFillupCenterY = self.engine.theme.starFillupCenterY
-    self.starFillupInRadius = self.engine.theme.starFillupInRadius
-    self.starFillupOutRadius = self.engine.theme.starFillupOutRadius
-    self.starFillupColor = self.engine.theme.colorToHex(self.engine.theme.starFillupColor)
-    self.starContinuousAvailable = self.engine.config.get("performance", "star_continuous_fillup") and \
-      None not in (self.starFillupCenterX, self.starFillupCenterY, self.starFillupInRadius, self.starFillupOutRadius, self.starFillupColor)
     self.showBpm = self.engine.config.get("debug",   "show_bpm")    #MFH
 
     self.logLyricEvents = self.engine.config.get("log",   "log_lyric_events")
@@ -718,6 +697,9 @@ class GuitarScene(Scene):
 
     self.screenCenterX = self.engine.video.screen.get_rect().centerx
     self.screenCenterY = self.engine.video.screen.get_rect().centery
+
+    self.countdownPosX = self.engine.theme.countdownPosX
+    self.countdownPosY = self.engine.theme.countdownPosY
   
 
     #racer: practice beat claps:
@@ -908,10 +890,6 @@ class GuitarScene(Scene):
     
     self.phrases = self.engine.config.get("coffee", "game_phrases")#blazingamer
     self.starfx = self.engine.config.get("game", "starfx")#blazingamer
-    smallMult = self.engine.config.get("game","small_rb_mult")
-    self.rbmfx = False
-    if smallMult == 2 or (smallMult == 1 and self.engine.theme.smallMult):
-      self.rbmfx = True
     self.boardY = 2
     self.rbOverdriveBarGlowVisibility = 0
     self.rbOverdriveBarGlowFadeOut = False
@@ -1617,35 +1595,12 @@ class GuitarScene(Scene):
     self.fail_text_color = self.engine.theme.hexToColor(self.engine.theme.fail_text_colorVar)
     self.fail_selected_color = self.engine.theme.hexToColor(self.engine.theme.fail_selected_colorVar)
     self.fail_completed_color = self.engine.theme.hexToColor(self.engine.theme.fail_completed_colorVar)
-    
 
     settingsMenu = Settings.GameSettingsMenu(self.engine, self.pause_text_color, self.pause_selected_color, players = self.playerList)
     careerSettingsMenu = Settings.GameCareerSettingsMenu(self.engine, self.pause_text_color, self.pause_selected_color, players = self.playerList)
     settingsMenu.fadeScreen = False
-    careerSettingsMenu.fadeScreen = False
-
+    careerSettingsMenu.fadeScreen = False    
     
-    # evilynux - More themeable options
-    self.rockmeter_score_color = self.engine.theme.rockmeter_score_colorVar
-    
-    #self.fail_completed_color = self.engine.theme.hexToColor(self.engine.theme.song_name_selected_colorVar) # text same color as selected song
-    #self.fail_completed_color = self.engine.theme.hexToColor(self.engine.theme.fail_text_colorVar)  #No, now same as fail_text color.
-    
-    self.ingame_stats_color = self.engine.theme.ingame_stats_colorVar
-
-    
-    if self.pause_text_color == None:
-      self.pause_text_color = (1,1,1)
-    if self.pause_selected_color == None:
-      self.pause_selected_color = (1,0.75,0)
-
-    if self.fail_text_color == None:
-      self.fail_text_color = (1,1,1)
-    if self.fail_selected_color == None:
-      self.fail_selected_color = (1,0.75,0)
-    if self.fail_completed_color == None:
-      self.fail_completed_color = self.fail_text_color
-
     Log.debug("Pause text / selected colors: " + str(self.pause_text_color) + " / " + str(self.pause_selected_color))
 
 
@@ -2212,6 +2167,7 @@ class GuitarScene(Scene):
     self.engine.world.createScene("SongChoosingScene")
 
   def changeSong(self):
+    prevMode = self.engine.world.gameMode
     if self.song:
       self.song.stop()
       self.song  = None
@@ -2222,6 +2178,7 @@ class GuitarScene(Scene):
     self.engine.view.popLayer(self.menu)
     self.engine.view.popLayer(self.failMenu)
     self.freeResources()
+    self.engine.world.gameMode = prevMode
     # self.session.world.deleteScene(self)
     self.engine.world.createScene("SongChoosingScene")
 
@@ -6694,14 +6651,14 @@ class GuitarScene(Scene):
                 text = "%d" % (self.countdownSeconds)
                 w, h = bigFont.getStringSize(text, scale = scale)
                 self.engine.theme.setBaseColor()
-                bigFont.render(text,  (.5 - w / 2, .45 - h / 2), scale = scale)
+                bigFont.render(text,  (self.countdownPosX - w / 2, self.countdownPosY - h / 2), scale = scale)
           
           if self.resumeCountdownSeconds > 1:
             scale = 0.002 + 0.0005 * (self.resumeCountdownSeconds % 1) ** 3
             text = "%d" % (self.resumeCountdownSeconds)
             w, h = bigFont.getStringSize(text, scale = scale)
             self.engine.theme.setBaseColor()
-            bigFont.render(text,  (.5 - w / 2, .45 - h / 2), scale = scale)
+            bigFont.render(text,  (self.countdownPosX - w / 2, self.countdownPosY - h / 2), scale = scale)
     
           w, h = font.getStringSize(" ")
           y = .05 - h / 2 - (1.0 - v) * .2

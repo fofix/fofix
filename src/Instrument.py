@@ -327,7 +327,6 @@ class Instrument:
     self.spotColor = self.engine.theme.spotColor   
     self.keyColor = self.engine.theme.keyColor
     self.key2Color = self.engine.theme.key2Color
-    self.tracksColor = self.engine.theme.tracksColor
     fC = [(.84, 1, .51), (1, .53, .5), (.98, .96, .42), (.64, .97, 1), (1, .87, .55)]
     self.flameColors = [fC,fC,fC,fC]
     self.gh3flameColor = (.75,.36,.02)

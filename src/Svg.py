@@ -151,15 +151,7 @@ class ImgDrawing(object):
     tA[1,0] = rect[1]; tA[1,1] = rect[3]
     tA[2,0] = rect[1]; tA[2,1] = rect[2]
     tA[3,0] = rect[0]; tA[3,1] = rect[2]
-
-  def convertToTexture(self, width, height):
-    if self.texture:
-      return
-
-    e = "SVG drawing does not have a valid texture image."
-    Log.error(e)
-    raise RuntimeError(e)
-
+    
   def width1(self):
     width = self.pixelSize[0]
     if width:

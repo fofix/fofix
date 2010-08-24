@@ -108,16 +108,9 @@ class Data(object):
     else:
       self.vocalPath = os.path.join("themes",themename,"vocals")
 
-    if self.checkImgDrawing(os.path.join("themes",themename,"spfill.png")):
-      self.theme = 0
-    elif self.checkImgDrawing(os.path.join("themes",themename,"overdrive fill.png")):
-      self.theme = 2
-      self.themeCoOp = True
-    else:
-      self.theme = 1
-      if self.checkImgDrawing(os.path.join("themes",themename,"coop_rockmeter.png")):
-        self.themeCoOp = True
-
+    self.theme = 2
+    self.themeCoOp = True
+    
     self.fontScreenBottom = 0.75      #from our current viewport's constant 3:4 aspect ratio (which is always stretched to fill the video resolution)
 
     self.loadPartImages()
@@ -184,7 +177,7 @@ class Data(object):
     fontSize  = [44, 108, 34, 32, 30]
 
     if asciiOnly:
-      font    = resource.fileName("default.ttf")
+      font    = resource.fileName(os.path.join("themes",themename,"default.ttf"))
       bigFont = resource.fileName("title.ttf")
     else:
       Log.debug("Main font International.ttf used!")
@@ -260,19 +253,26 @@ class Data(object):
 
       if self.fileExists(os.path.join("themes",themename,"songlist.ttf")):
         songListFont = resource.fileName(os.path.join("themes",themename,"songlist.ttf"))
-      else:
+      elif self.fileExists(os.path.join("themes",themename,"menu.ttf")):
         songListFont = menuFont
+      else:
+        songListFont = font
+	  
 
       if self.fileExists(os.path.join("themes",themename,"songlist.ttf")):
         shadowfont = resource.fileName(os.path.join("themes",themename,"songlist.ttf"))
-      else:
+      elif self.fileExists(os.path.join("themes",themename,"menu.ttf")):
         shadowfont = menuFont
-
+      else:
+        shadowfont = font
+		
       #blazingamer
       if self.fileExists(os.path.join("themes",themename,"streakphrase.ttf")):
         streakFont2 = resource.fileName(os.path.join("themes",themename,"streakphrase.ttf"))
-      else:
+      elif self.fileExists(os.path.join("themes",themename,"menu.ttf")):
         streakFont2 = menuFont
+      else:
+        streakFont2 = font
 
       #blazingamer:Reorganized
       if self.theme == 0:
@@ -667,14 +667,15 @@ class Data(object):
     """
     imgDrawing = self.getImgDrawing(fileName, dirLoad = dirLoad)
     if not imgDrawing:
-      return False
+      if target and name:
+        setattr(target, name, None)
+      else:
+        return None
     
-    if target is not None:
+    if target:
       drawing  = self.resource.load(target, name, lambda: imgDrawing, synch = True)
     else:
       drawing = imgDrawing
-    if textureSize:
-      drawing.convertToTexture(textureSize[0], textureSize[1])
     return drawing
   
   def loadAllImages(self, target, directory, prefix = "img_", textureSize = None): #akedrou

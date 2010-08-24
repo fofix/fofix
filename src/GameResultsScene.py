@@ -936,7 +936,7 @@ class GameResultsScene(Scene):
         settingsText = "%s %s - %s: %s / %s, %s: %s" % (self.engine.versionString, self.tsSettings, self.tsHopos, self.hopoStyle, self.hopoFreq, self.tsHitWindow, self.hitWindow)
         settingsScale = 0.0012
         wText, hText = defFont.getStringSize(settingsText, settingsScale)
-        defFont.render(settingsText, (.5 - wText/2, 0.0), scale = settingsScale)
+        defFont.render(settingsText, (.5 - wText/2, 0.05), scale = settingsScale)
         
         try:
           font = self.engine.data.fontDict[self.engine.theme.result_stats_accuracy[4]]
