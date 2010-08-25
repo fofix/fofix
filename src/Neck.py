@@ -356,7 +356,7 @@ class Neck:
         for time, event in track.getEvents(boardWindowMin, boardWindowMax):
           if isinstance(event, Song.MarkerNote):
             if event.number == Song.starPowerMarkingNote:
-              if self.guitarSoloNeck:
+              if self.soloNeck:
                 if event.endMarker:   #solo end
                   if self.incomingNeckMode == 2:    #render both start and end incoming necks
                     if self.guitarSolo:   #only until the end of the guitar solo!
@@ -373,7 +373,7 @@ class Neck:
                         
                 else:   #solo start
                   if not self.guitarSolo:   #only until guitar solo starts!
-                    neckImg = self.guitarSoloNeck
+                    neckImg = self.soloNeck
                     alpha   = self.neckAlpha[2]
                     self.renderIncomingNeck(visibility*alpha, song, pos, time, neckImg)
                     if self.spcount2 != 0 and self.spcount < 1.2 and self.oNeck:
@@ -386,10 +386,10 @@ class Neck:
 
       elif self.markSolos == 1:   #fall back on text-based guitar solo marking track
         for time, event in song.eventTracks[Song.TK_GUITAR_SOLOS].getEvents(boardWindowMin, boardWindowMax):
-          if self.canGuitarSolo and self.guitarSoloNeck:
+          if self.canGuitarSolo and self.soloNeck:
             if event.text.find("ON") >= 0:
               if not self.guitarSolo:   #only until guitar solo starts!
-                neckImg = self.guitarSoloNeck
+                neckImg = self.soloNeck
                 self.renderIncomingNeck(visibility, song, pos, time, neckImg)
             #else: #event.text.find("OFF"):
             elif self.incomingNeckMode == 2:    #render both start and end incoming necks
@@ -485,8 +485,8 @@ class Neck:
     
     self.renderNeckMethod(v*self.neckAlpha[1], offset, neck)
     
-    if self.guitarSolo and self.guitarSoloNeck and self.guitarSoloNeckMode == 2:   #static overlay
-      self.renderNeckMethod(v*self.neckAlpha[2], 0, self.guitarSoloNeck)
+    if self.guitarSolo and self.soloNeck and self.guitarSoloNeckMode == 2:   #static overlay
+      self.renderNeckMethod(v*self.neckAlpha[2], 0, self.soloNeck)
       
     elif self.bgcount > 0 and self.bassGrooveNeck and self.bassGrooveNeckMode == 2:   #static bass groove overlay
       self.renderNeckMethod(v*self.bgcount*self.neckAlpha[3], 0, self.bassGrooveNeck)
