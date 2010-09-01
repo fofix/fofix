@@ -12,7 +12,7 @@ void main()
 	col = fretcol;
 	col.a *= alphafog;
 	failcol.rgb=vec3(1.0,0.0,0.0);
-	if (isFailing) failcol.a=0.2*max(sin(time*10),0.0)*alphafog;
+	if (isFailing) failcol.a=0.2*max(sin(time*10.0),0.0)*alphafog;
 	else failcol.a=0.0;
 	gl_Position = ftransform();
 	pos=gl_Position.xyz;
