@@ -388,9 +388,7 @@ allthemes = os.listdir(themepath)
 for name in allthemes:
   if os.path.exists(os.path.join(themepath,name,"notes.png")):
     themes.append(name)
-    if name == "MegaLight" and defaultTheme != "Rock Band 1":         #myfingershurt
-      defaultTheme = name     #myfingershurt
-    if name == "Rock Band 1":         #myfingershurt
+    if name == "MegaLight V4":         #myfingershurt
       defaultTheme = name     #myfingershurt
 
 i = len(themes)
@@ -403,7 +401,7 @@ if i == 0:
     Log.error("No valid theme found!")
   sys.exit(1);
   
-if defaultTheme != "MegaLight" and defaultTheme != "Rock Band 1":     #myfingershurt
+if defaultTheme is None:
   defaultTheme = themes[0]    #myfingershurt
 
 #myfingershurt: default theme must be an existing one!
