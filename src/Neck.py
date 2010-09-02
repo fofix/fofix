@@ -214,7 +214,7 @@ class Neck:
 
     def loadImage(name, file):
       if self.extension:
-        if not engine.loadImgDrawing(self, name, os.path.join(themepath, extension, file)):
+        if not engine.loadImgDrawing(self, name, os.path.join(themepath, self.extension, file)):
           engine.loadImgDrawing(self, name, os.path.join(themepath, file))
       else:
         engine.loadImgDrawing(self, name, os.path.join(themepath, file))
