@@ -1384,23 +1384,13 @@ class PartDiffChooser(MainDialog):
           else:
             self.selected[i] = 0
       return True
-    elif key == pygame.K_LEFT:
-      self.scrolling[self.keyControl] = 0
-      self.keyControl -= 1
-      if self.keyControl < 0:
-        self.keyControl = len(self.players)
-    elif key == pygame.K_RIGHT:
-      self.scrolling[self.keyControl] = 0
-      self.keyControl += 1
-      if self.keyControl >= len(self.players):
-        self.keyControl = 0
     elif i in self.readyPlayers:
       return True
-    elif c in self.up + [self.players[i].keyList[Player.UP]] or key == pygame.K_UP:
+    elif c in self.up + [self.players[i].keyList[Player.UP]] or key == pygame.K_LEFT or key == pygame.K_UP:
       self.scrolling[i] = 1
       self.scrollUp(i)
       self.delay[i] = self.engine.scrollDelay
-    elif c in self.down + [self.players[i].keyList[Player.DOWN]] or key == pygame.K_DOWN:
+    elif c in self.down + [self.players[i].keyList[Player.DOWN]] or key == pygame.K_RIGHT or key == pygame.K_DOWN:
       self.scrolling[i] = 2
       self.scrollDown(i)
       self.delay[i] = self.engine.scrollDelay
