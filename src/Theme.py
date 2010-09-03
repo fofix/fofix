@@ -1235,6 +1235,9 @@ class Setlist:
       font.render(text, (.35, .0413*(n+1)+.15), scale = scale)
 
       if isinstance(item, Song.SongInfo):
+        score = _("Nil")
+        stars = 0
+        name = ""
         if not item.getLocked():
           try:
             difficulties = item.partDifficulties[scene.scorePart.id]
@@ -1255,8 +1258,6 @@ class Setlist:
                 break
               else:
                 score, stars, name = 0, 0, "---"
-          else:
-            score, stars, name = _("Nil"), 0, "---"
           
           if score == _("Nil") and scene.nilShowNextScore:   #MFH
             for d in difficulties:   #MFH - just take the first valid difficulty you can find and display it.
@@ -1629,6 +1630,9 @@ class Setlist:
       font.render(text, (.35, .0413*(n+1)+.15), scale = scale) #add theme option for song_listCD_xpos
 
       if isinstance(item, Song.SongInfo):
+        score = _("Nil")
+        stars = 0
+        name = ""
         if not item.getLocked():
           try:
             difficulties = item.partDifficulties[scene.scorePart.id]
@@ -1649,8 +1653,7 @@ class Setlist:
                 break
               else:
                 score, stars, name = 0, 0, "---"
-          else:
-            score, stars, name = _("Nil"), 0, "---"
+
           if score == _("Nil") and scene.nilShowNextScore:   #MFH
             for d in difficulties:   #MFH - just take the first valid difficulty you can find and display it.
               scores = item.getHighscores(d, part = scene.scorePart)
