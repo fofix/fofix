@@ -740,8 +740,6 @@ class SongChoosingScene(Scene):
   def keyPressed(self, key, unicode):
     self.lastTime = self.time
     c = self.engine.input.controls.getMapping(key)
-    self.searching = False
-    self.selectedItem = None
     if key == pygame.K_SLASH and not self.searching:
       self.searching = True
     elif (key in range(30,123) or key == pygame.K_BACKSPACE) and not self.moreInfo:
