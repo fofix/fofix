@@ -177,7 +177,7 @@ def main():
   # Check for a valid invocation of one-shot mode.
   if playing is not None:
     Log.debug('Validating song directory for one-shot mode.')
-    library = Config.get("game","base_library")
+    library = Config.get("setlist","base_library")
     basefolder = os.path.join(Version.dataPath(),library,"songs",playing)
     if not (os.path.exists(os.path.join(basefolder, "song.ini")) and (os.path.exists(os.path.join(basefolder, "notes.mid")) or os.path.exists(os.path.join(basefolder, "notes-unedited.mid"))) and (os.path.exists(os.path.join(basefolder, "song.ogg")) or os.path.exists(os.path.join(basefolder, "guitar.ogg")))):
       Log.warn("Song directory provided ('%s') is not a valid song directory. Starting up FoFiX in standard mode." % playing)
@@ -187,8 +187,8 @@ def main():
   # Set up one-shot mode if the invocation is valid for it.
   if playing is not None:
     Log.debug('Entering one-shot mode.')
-    Config.set("game", "selected_library", "songs")
-    Config.set("game", "selected_song", playing)
+    Config.set("setlist", "selected_library", "songs")
+    Config.set("setlist", "selected_song", playing)
     engine.cmdPlay = 1
     if difficulty is not None:
       engine.cmdDiff = int(difficulty)
