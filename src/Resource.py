@@ -148,13 +148,13 @@ class Resource(Task):
 
     #myfingershurt: the following should be global, and only done at startup.  Not every damn time a file is loaded.
     self.songPath = []
-    self.baseLibrary = Config.get("game", "base_library")
+    self.baseLibrary = Config.get("setlist", "base_library")
     #evilynux - Support for songs in ~/.fretsonfire/songs (GNU/Linux and MacOS X)
     if self.baseLibrary == "None" and os.name == "posix":
       path = os.path.expanduser("~/." + Version.PROGRAM_UNIXSTYLE_NAME)
       if os.path.isdir(path):
         self.baseLibrary = path
-        Config.set("game", "base_library", path)
+        Config.set("setlist", "base_library", path)
 
     if self.baseLibrary and os.path.isdir(self.baseLibrary):
       self.songPath = [self.baseLibrary]
@@ -163,7 +163,7 @@ class Resource(Task):
 
   #myfingershurt: Need a function to refresh the base library after a new one is selected:
   def refreshBaseLib(self):
-    self.baseLibrary = Config.get("game", "base_library")
+    self.baseLibrary = Config.get("setlist", "base_library")
     if self.baseLibrary and os.path.isdir(self.baseLibrary):
       self.songPath = [self.baseLibrary]
   

@@ -338,7 +338,6 @@ class Lobby(Layer, KeyListener):
           self.engine.mainMenu.cutMusic()
           self.preparePlayers()
           if self.tutorial:
-            self.engine.config.set("game", "selected_library", "songs")
             self.engine.world.startGame(libraryName = Song.DEFAULT_LIBRARY, songName = "tutorial")
             self.handleGameStarted()
           else:

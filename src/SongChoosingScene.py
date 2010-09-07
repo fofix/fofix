@@ -119,9 +119,9 @@ class SongChoosingScene(Scene):
     if self.tut == True:
       self.library = self.engine.tutorialFolder
     else:
-      self.library    = os.path.join(self.engine.config.get("game", "base_library"), self.libraryName)
+      self.library    = os.path.join(self.engine.config.get("setlist", "base_library"), self.libraryName)
       if not os.path.isdir(self.engine.resource.fileName(self.library)):
-        self.library = self.engine.resource.fileName(os.path.join(self.engine.config.get("game", "base_library"), Song.DEFAULT_LIBRARY))
+        self.library = self.engine.resource.fileName(os.path.join(self.engine.config.get("setlist", "base_library"), Song.DEFAULT_LIBRARY))
     
     self.searchText = ""
     
@@ -791,7 +791,7 @@ class SongChoosingScene(Scene):
       if self.library != Song.DEFAULT_LIBRARY and not self.tut and (self.listingMode == 0 or self.careerMode):
         self.initialItem  = self.library
         self.library      = os.path.dirname(self.library)
-        if self.library == os.path.join("..", self.engine.config.get("game", "base_library")):
+        if self.library == os.path.join("..", self.engine.config.get("setlist", "base_library")):
           self.quit()
           return
         self.selectedItem = None
