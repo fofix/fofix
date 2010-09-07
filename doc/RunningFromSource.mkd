@@ -1,6 +1,18 @@
 How to set yourself up to run from source
 =========================================
 
+Table of Contents
+-----------------
+1. [Checking out the latest code](#Checking-out-the-latest-code)
+2. [Notes on Python versions](#Notes-on-Python-versions)
+3. [Notes on PyOpenGL versions](#Notes-on-PyOpenGL-versions)
+4. [Setting up Python and third-party dependencies](#Setting-up-Python-and-third-party-dependencies)
+5. [Compiling the native modules](#Compiling-the-native-modules)
+6. [Dependencies for video playback](#Dependencies-for-video-playback)
+7. [Starting the game](#Starting-the-game)
+8. [Making binaries](#Making-binaries)
+
+<a name="Checking-out-the-latest-code"></a>
 Checking out the latest code
 ----------------------------
 
@@ -25,6 +37,7 @@ state that worked if the latest one breaks on you._
 
 ----
 
+<a name="Notes-on-Python-versions"></a>
 Notes on Python versions
 ------------------------
 
@@ -55,6 +68,7 @@ long time.  3.x breaks compatibility with 2.x in many non-trivial ways.
 
 ----
 
+<a name="Notes-on-PyOpenGL-versions"></a>
 Notes on PyOpenGL versions
 --------------------------
 
@@ -73,6 +87,7 @@ increased speed.
 
 ----
 
+<a name="Setting-up-Python-and-third-party-dependencies"></a>
 Setting up Python and third-party dependencies
 ----------------------------------------------
 
@@ -292,7 +307,7 @@ It can be installed system-wide with (as root):
     python setup.py install
 
 ----
-
+<a name="Compiling-the-native-modules"></a>
 Compiling the native modules
 ----------------------------
 
@@ -341,7 +356,7 @@ Install the appropriate package from your distribution's repository.
 Under Debian and Ubuntu, you want `build-essential`.
 
 ----
-
+<a name="Dependencies-for-video-playback"></a>
 Dependencies for video playback
 -------------------------------
 
@@ -392,7 +407,7 @@ dependencies.  Under Debian and Ubuntu, the package to install is
 `python-gst0.10`.
 
 ----
-
+<a name="Starting-the-game"></a>
 Starting the game
 -----------------
 
@@ -407,7 +422,7 @@ Alternatively, if you're running Windows, you can merely double-click
 `src/scripts/RunFofFromSources.bat` to run the game.
 
 ----
-
+<a name="Making-binaries"></a>
 Making binaries
 ---------------
 
