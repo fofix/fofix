@@ -958,7 +958,7 @@ class GuitarScene(Scene):
     self.automaticEarlyHitWindow = Song.EARLY_HIT_WINDOW_HALF
     self.forceEarlyHitWindowSetting = self.engine.config.get("handicap",   "early_hit_window")
     if self.song.info.early_hit_window_size:
-      Log.debug("song.ini setting found speficying early_hit_window_size - %s" % self.song.info.early_hit_window_size)
+      Log.debug("song.ini setting found specifying early_hit_window_size - %s" % self.song.info.early_hit_window_size)
       if self.song.info.early_hit_window_size.lower() == "none":
         self.automaticEarlyHitWindow = Song.EARLY_HIT_WINDOW_NONE
       elif self.song.info.early_hit_window_size.lower() == "half":
@@ -968,7 +968,7 @@ class GuitarScene(Scene):
         self.automaticEarlyHitWindow = Song.EARLY_HIT_WINDOW_FULL
 
     else:
-      Log.debug("No song.ini setting found speficying early_hit_window_size - using automatic detection...")
+      Log.debug("No song.ini setting found specifying early_hit_window_size - using automatic detection...")
 
       if self.song.midiStyle == Song.MIDI_TYPE_RB:
         Log.debug("Basic RB1/RB2 type MIDI found - early hitwindow of NONE is set as handicap base.")
