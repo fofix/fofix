@@ -32,6 +32,8 @@ import locale
 #Blazingamer - new drawing code
 #from Draw import *
 
+from PIL import Image, ImageDraw
+
 #these are the variables for setting the alignment of text and images
 #when setting them up in the rockmeter.ini you do not have
 #to put it in all caps, the code will take care of that
@@ -83,11 +85,11 @@ class Layer:
     self.config      = stage.config     #the rockmeter.ini
     self.section     = section          #the section of the rockmeter.ini involving this layer
 
-    self.position    = (0.0, 0.0)		#where on the screen to draw the layer
+    self.position    = [0.0, 0.0]		#where on the screen to draw the layer
     self.angle       = 0.0				#angle to rotate the layer (in degrees)
-    self.scale       = (1.0, 1.0)		#how much to scale it by (width, height from 0.0 - 1.0)
+    self.scale       = [1.0, 1.0]		#how much to scale it by (width, height from 0.0 - 1.0)
     self.color       = "#FFFFFF"		#color of the image (#FFFFFF is white on text, on images it is full color)
-    self.rect        = (0,1,0,1)		#how much of the image do you want rendered (left, right, top, bottom)
+    self.rect        = [0,1,0,1]		#how much of the image do you want rendered (left, right, top, bottom)
     self.condition   = True				#when should the image be shown (by default it will always be shown)
     self.inPixels    = []               #makes sure to properly scale/position the images in pixels instead of percent
 
@@ -239,29 +241,19 @@ class FontLayer(Layer):
 
 #defines layers that are just font instead of images
 class CircleLayer(Layer): 
-  def __init__(self, stage, section, drawing = None):
+  def __init__(self, stage, section, drawing):
     Layer.__init__(self, stage, section)
 
     self.color   = self.get("color", str, "#FFFFFF")
     self.ratio   = eval(self.get("ratio", str, "1"))
 
-    if drawing:
-      self.engine.loadImgDrawing(self, "drawing", drawing)
-      self.centerX   = self.get("centerX", float, self.drawing.width1()/2)
-      self.centerY   = self.get("centerY", float, self.drawing.height1()/2)
-      self.inRadius  = self.get("innerRad", float, 0)
-      self.outRadius = self.get("outerRad", float, self.drawing.width1()/2)
-    else:
-      self.centerX   = self.get("centerX", float, self.drawing.width1()/2)
-      self.centerY   = self.get("centerY", float, self.drawing.height1()/2)
-      self.inRadius  = self.get("innerRad", float, 0)
-      self.outRadius = self.get("outerRad", float, self.drawing.width1()/2)
-      width = self.centerX + self.outRadius
-      height = self.centerY + self.outRadius
-      surface = pygame.Surface((width, height))
-      surface.fill(self.theme.hexToColor(self.color))
-      self.drawing = ImgDrawing(self.engine.data.svg, pygame.image.tostring(surface, 'RGBA'))      
-
+    self.engine.loadImgDrawing(self, "drawing", drawing)
+  
+    self.centerX   = self.drawing.width1()/2
+    self.centerY   = self.drawing.height1()/2
+    self.inRadius  = 0
+    self.outRadius = self.drawing.width1()/2
+    
     self.drawnOverlays = {}
     baseFillImageSize = self.drawing.pixelSize
     for degrees in range(0, 361, 5):
@@ -280,10 +272,29 @@ class CircleLayer(Layer):
     w, h, = self.engine.view.geometry[2:4]
     texture = self.drawing
 
-    self.ratio        = eval(self.get("ratio", str, "1"))
+    self.ratio = ratio = eval(self.get("ratio", str, "1"))
 
     self.condition = bool(eval(self.get("condition", str, "True")))
+    self.angle     = self.get("angle", float, 0.0)
+    self.color     = self.get("color", str, "#FFFFFF")
+    self.alignment = eval(self.get("alignment", str, "center").upper())
 
+    self.position  = [eval(self.get("xpos", str, "0.0")),    eval(self.get("ypos", str, "0.0"))]
+    self.scale     = [eval(self.get("xscale", str, "0.5")),  eval(self.get("yscale", str, "0.5"))]
+
+    self.scale[0] *=  (self.rect[1] - self.rect[0])
+    self.scale[1] *=  (self.rect[3] - self.rect[2])
+    #this allows you to scale images in relation to pixels instead
+    #of percentage of the size of the image.
+    if "xscale" in self.inPixels:
+      self.scale[0] /= texture.pixelSize[0]
+    if "yscale" in self.inPixels:
+      self.scale[1] /= texture.pixelSize[1]
+
+    self.scale[1] = -self.scale[1]
+    self.scale[0] *= w/640.0
+    self.scale[1] *= h/480.0
+    
     if "xpos" in self.inPixels:
       self.position[0] *= w/640.0
     else:
@@ -301,11 +312,17 @@ class CircleLayer(Layer):
     self.updateLayer(playerNum)
     for effect in self.effects:
       effect.update()
-          
+
+    coord     = self.position
+    scale     = self.scale
+    rot       = self.angle
+    color     = self.engine.theme.hexToColor(self.color)
+    alignment = self.alignment
+              
     if self.condition:
       degrees = int(360*self.ratio) - (int(360*self.ratio) % 5)
-      self.engine.drawImage(self.drawnVocalOverlays[degrees], scale = (.5,-.5), 
-                            coord = (w*self.position[0],h*self.position[1]))
+      self.engine.drawImage(self.drawnOverlays[degrees], scale, 
+                            coord, rot, color, alignment = alignment)
 
 
 #this is just a template for effects                
@@ -409,7 +426,8 @@ class Rockmeter:
     for i in range(99):
       types = [
                "Image",
-               "Text"
+               "Text",
+               "Circle"
               ]
       exist = False
       for t in types:
@@ -420,6 +438,8 @@ class Rockmeter:
           exist = True
           if t == types[1]:
             self.createFont(self.section)
+          elif t == types[2]:
+            self.createCircle(self.section)
           else:
             self.createImage(self.section)
           break
@@ -431,18 +451,9 @@ class Rockmeter:
       if layer:
         self.layers.append(layer)
 
-  def createFont(self, section):
-
-    font  = self.get("font")
-    layer = FontLayer(self, section, font)
-
-    layer.text      = self.get("text")
-    layer.shared    = self.get("shared",   bool, False)
-    layer.condition = self.get("condition", str, "True")
-    layer.inPixels  = self.get("inPixels", str, "").split("|")
-
+  def loadLayerFX(self, layer, section):
     section = section.split(":")[0]
-    types = ["Slide", "Rotate", "Fade"]
+    types = ["Slide", "Rotate", "Replace", "Fade"]
     for i in range(5):
       for t in types:
         fxsection = "%s:fx%d:%s" % (section, i, t)
@@ -453,9 +464,22 @@ class Rockmeter:
             layer.effects.append(Slide(layer, fxsection))
 #          else if t == types[1]:
 #            layer.effects.append(Rotate(layer, fxsection))
+#          else if t == types[2]:
+#            layer.effects.append(Replace(layer, fxsection))
 #          else:
 #            layer.effects.append(Fade(layer, fxsection))
+      
+  def createFont(self, section):
 
+    font  = self.get("font")
+    layer = FontLayer(self, section, font)
+
+    layer.text      = self.get("text")
+    layer.shared    = self.get("shared",   bool, False)
+    layer.condition = self.get("condition", str, "True")
+    layer.inPixels  = self.get("inPixels", str, "").split("|")
+    
+    self.loadLayerFX(layer, section)
 
     Wid, Hgt = self.engine.data.fontDict[font].getStringSize(layer.text)
 
@@ -473,21 +497,24 @@ class Rockmeter:
 
     layer.rect      = eval(self.get("rect", str, "(0,1,0,1)"))
 
-    section = section.split(":")[0]
-    types = ["Slide", "Rotate", "Fade"]
-    for i in range(5):
-      for t in types:
-        fxsection = "%s:fx%d:%s" % (section, i, t)
-        if not self.config.has_section(fxsection):
-          continue
-        else:
-          if t == types[0]:
-            layer.effects.append(Slide(layer, fxsection))
-#          else if t == types[1]:
-#            layer.effects.append(Rotate(layer, fxsection))
-#          else:
-#            layer.effects.append(Fade(layer, fxsection))
+    self.loadLayerFX(layer, section)
             
+    self.addLayer(layer, layer.shared)
+
+  def createCircle(self, section):
+    
+    texture   = self.get("texture")
+    drawing   = os.path.join("themes", self.themename, "rockmeter", texture)
+    layer     = CircleLayer(self, section, drawing)
+
+    layer.shared    = self.get("shared", bool, False)
+    layer.condition = self.get("condition", str, "True")
+    layer.inPixels  = self.get("inPixels", str, "").split("|")
+
+    layer.rect      = eval(self.get("rect", str, "(0,1,0,1)"))
+
+    self.loadLayerFX(layer, section)
+
     self.addLayer(layer, layer.shared)
 
   #because time is not player specific it's best to update it only once per cycle
@@ -514,7 +541,7 @@ class Rockmeter:
   #this updates all the usual global variables that are handled by the rockmeter
   #these are all player specific
   def updateVars(self, playerNum):
-    global score, stars, rock, streak, streakMax, power, multiplier, player
+    global score, rock, streak, streakMax, power, stars, partialStars, multiplier, player
     scene = self.scene
     player = scene.instruments[playerNum]
 
