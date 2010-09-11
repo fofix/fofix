@@ -179,12 +179,28 @@ class Drum(Instrument):
     #Spinning starnotes or not?
     self.starspin = False
 
+    if not engine.loadImgDrawing(self, "freestyle1", os.path.join("themes", themename, "freestyletail1.png"),  textureSize = (128, 128)):
+      engine.loadImgDrawing(self, "freestyle1", "freestyletail1.png",  textureSize = (128, 128))
+    if not engine.loadImgDrawing(self, "freestyle2", os.path.join("themes", themename, "freestyletail2.png"),  textureSize = (128, 128)):
+      engine.loadImgDrawing(self, "freestyle2", "freestyletail2.png",  textureSize = (128, 128))
+
+
+    #t'aint no tails in drums, yo.
+    self.simpleTails = True
+    self.tail1 = None
+    self.tail2 = None
+    self.bigTail1 = None
+    self.bigTail2 = None  
+
+    self.barsColor = self.engine.theme.barsColor
+
+    self.neck = Neck(self.engine, self, playerObj)
+  
+  def loadNotes(self):      
+    get = lambda file: self.checkPath("notes", file)
+      
     if self.twoDnote == True:  
-      if engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"drumnotes.png")):
-        self.separateDrumNotes = True
-      else:
-        self.separateDrumNotes = False
-        engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notes.png"))
+      engine.loadImgDrawing(self, "noteButtons", get("notes.png")):
     else:
       defaultNote = False
       #MFH - can't use IOError for fallback logic for a Mesh() call... 
@@ -253,23 +269,6 @@ class Drum(Instrument):
         self.opentex_stara = True
       else:
         self.opentex_stara = False
-
-    if not engine.loadImgDrawing(self, "freestyle1", os.path.join("themes", themename, "freestyletail1.png"),  textureSize = (128, 128)):
-      engine.loadImgDrawing(self, "freestyle1", "freestyletail1.png",  textureSize = (128, 128))
-    if not engine.loadImgDrawing(self, "freestyle2", os.path.join("themes", themename, "freestyletail2.png"),  textureSize = (128, 128)):
-      engine.loadImgDrawing(self, "freestyle2", "freestyletail2.png",  textureSize = (128, 128))
-
-
-    #t'aint no tails in drums, yo.
-    self.simpleTails = True
-    self.tail1 = None
-    self.tail2 = None
-    self.bigTail1 = None
-    self.bigTail2 = None  
-
-    self.barsColor = self.engine.theme.barsColor
-
-    self.neck = Neck(self.engine, self, playerObj)
     
   def selectPreviousString(self):
     self.selectedString = (self.selectedString - 1) % self.strings

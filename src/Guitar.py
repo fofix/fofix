@@ -185,7 +185,6 @@ class Guitar(Instrument):
   
   def loadNotes(self):
       
-    sub = "notes"
     get = lambda file: self.checkPath("notes", file)
     
     self.starspin = self.engine.config.get("performance", "starspin")
