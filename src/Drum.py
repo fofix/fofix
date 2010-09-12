@@ -133,6 +133,7 @@ class Drum(Instrument):
     #now theme determination logic is only in data.py:
     self.theme = self.engine.data.theme
 
+    self.loadNotes()
 
     if self.twoDkeys == True: #death_au
       #myfingershurt: adding drumfretshacked.png for image-corrected drum fret angles in RB:
@@ -198,18 +199,18 @@ class Drum(Instrument):
   
   def loadNotes(self):      
     get = lambda file: self.checkPath("notes", file)
-      
+    themename = self.engine.data.themeLabel
     if self.twoDnote == True:  
-      engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
+      self.engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
     else:
       defaultNote = False
       #MFH - can't use IOError for fallback logic for a Mesh() call... 
-      if self.engine.fileExists(os.path.join("themes", themename, "note_drum.dae")):
-        engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "note_drum.dae")))
-      elif self.engine.fileExists(os.path.join("themes", themename, "note.dae")):
-        engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "note.dae")))
+      if self.engine.fileExists(get("note_drum.dae")):
+        self.engine.resource.load(self,  "noteMesh",  lambda: Mesh(self.engine.resource.fileName(get("note_drum.dae"))))
+      elif self.engine.fileExists(get("note.dae")):
+        self.engine.resource.load(self,  "noteMesh",  lambda: Mesh(self.engine.resource.fileName(get("note.dae"))))
       else:
-        engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName("note.dae")))
+        self.engine.resource.load(self,  "noteMesh",  lambda: Mesh(self.engine.resource.fileName("note.dae")))
         defaultNote = True
 
       if defaultNote:
@@ -220,7 +221,7 @@ class Drum(Instrument):
         self.spActTex = None
       else:
         for i in range(5):
-          if engine.loadImgDrawing(self,  "notetex"+chr(97+i),  os.path.join("themes", themename, "notetex_"+chr(97+i)+".png")):
+          if self.engine.loadImgDrawing(self,  "notetex"+chr(97+i),  get("notetex_"+chr(97+i)+".png")):
             self.notetex = True
           else:
             self.notetex = False
@@ -234,38 +235,38 @@ class Drum(Instrument):
           self.starMesh = None
 
         for i in range(5):
-          if engine.loadImgDrawing(self,  "startex"+chr(97+i),  os.path.join("themes", themename, "startex_"+chr(97+i)+".png")):
+          if self.engine.loadImgDrawing(self,  "startex"+chr(97+i),  get("startex_"+chr(97+i)+".png")):
             self.startex = True
           else:
             self.startex = False
             break
 
         for i in range(5):
-          if engine.loadImgDrawing(self,  "staratex"+chr(97+i),  os.path.join("themes", themename, "staratex_"+chr(97+i)+".png")):
+          if self.engine.loadImgDrawing(self,  "staratex"+chr(97+i),  get("staratex_"+chr(97+i)+".png")):
             self.staratex = True
           else:
             self.staratex = False
             break
 
-        if not engine.loadImgDrawing(self, "spActTex", os.path.join("themes",themename,"spacttex.png")):
+        if not self.engine.loadImgDrawing(self, "spActTex", get("spacttex.png")):
           self.spActTex = None
       
-      if self.engine.fileExists(os.path.join("themes", themename, "open.dae")):
-        engine.resource.load(self,  "openMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "open.dae")))
-      else:  
-        self.openMesh = None
+      if self.engine.fileExists(get("open.dae")):
+        self.engine.resource.load(self,  "openMesh",  lambda: Mesh(self.engine.resource.fileName(get("open.dae"))))
+      else: #fallback to the default in the data folder
+        self.engine.resource.load(self,  "openMesh",  lambda: Mesh(self.engine.resource.fileName("open.dae")))
 
-      if engine.loadImgDrawing(self,  "opentexture",  os.path.join("themes", themename, "opentex.png")):
+      if self.engine.loadImgDrawing(self, "opentexture", get("opentex.png")):
         self.opentex = True
       else:
         self.opentex = False
 
-      if engine.loadImgDrawing(self,  "opentexture_star",  os.path.join("themes", themename, "opentex_star.png")):
+      if self.engine.loadImgDrawing(self, "opentexture_star", get("opentex_star.png")):
         self.opentex_star = True
       else:
         self.opentex_star = False
 
-      if engine.loadImgDrawing(self,  "opentexture_stara",  os.path.join("themes", themename, "opentex_stara.png")):
+      if self.engine.loadImgDrawing(self, "opentexture_stara", get("opentex_stara.png")):
         self.opentex_stara = True
       else:
         self.opentex_stara = False
@@ -483,6 +484,8 @@ class Drum(Instrument):
 
       tailOnly == True
 
+      #dirty fix
+      self.separateDrumNotes = True
       #death_au: Adjusted for different image.
       if self.separateDrumNotes:
         if isOpen:
