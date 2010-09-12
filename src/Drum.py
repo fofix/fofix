@@ -200,7 +200,7 @@ class Drum(Instrument):
     get = lambda file: self.checkPath("notes", file)
       
     if self.twoDnote == True:  
-      engine.loadImgDrawing(self, "noteButtons", get("notes.png")):
+      engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
     else:
       defaultNote = False
       #MFH - can't use IOError for fallback logic for a Mesh() call... 
