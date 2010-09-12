@@ -107,63 +107,8 @@ class Guitar(Instrument):
     #myfingershurt:
     self.bassGrooveNeckMode = self.engine.config.get("game", "bass_groove_neck")
 
-    self.starspin = self.engine.config.get("performance", "starspin")
-    if self.twoDnote == True:
-      #Spinning starnotes or not?
-      #myfingershurt: allowing any non-Rock Band theme to have spinning starnotes if the SpinNotes.png is available in that theme's folder
-      if self.starspin == True and self.theme < 2:
-        #myfingershurt: check for SpinNotes, if not there then no animation
-        if self.gameMode2p == 6:
-          if engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"spinnotesbattle.png")):
-            self.starSpinFrames = 8
-          else:
-            self.starspin = False
-            if not engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notesbattle.png")):
-              engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notes.png"))
-        else: 
-          if not engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"spinnotes.png")):
-            self.starspin = False
-            engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notes.png"))
-      else:
-        if self.gameMode2p == 6:
-          if not engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notesbattle.png")):
-            engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notes.png"))
-        else:
-          engine.loadImgDrawing(self, "noteButtons", os.path.join("themes",themename,"notes.png"))
-        #mfh - adding fallback for beta option
-    else:
-      #MFH - can't use IOError for fallback logic for a Mesh() call... 
-      if self.engine.fileExists(os.path.join("themes", themename, "note.dae")):
-        engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "note.dae")))
-      else:
-        engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName("note.dae")))
-
-      for i in range(5):
-        if engine.loadImgDrawing(self,  "notetex"+chr(97+i),  os.path.join("themes", themename, "notetex_"+chr(97+i)+".png")):
-          self.notetex = True
-        else:
-          self.notetex = False
-          break
-        
-      if self.engine.fileExists(os.path.join("themes", themename, "star.dae")):  
-        engine.resource.load(self,  "starMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "star.dae")))
-      else:  
-        self.starMesh = None
-
-      for i in range(5):
-        if engine.loadImgDrawing(self,  "startex"+chr(97+i),  os.path.join("themes", themename, "startex_"+chr(97+i)+".png")):
-          self.startex = True
-        else:
-          self.startex = False
-          break
-
-      for i in range(5):
-        if engine.loadImgDrawing(self,  "staratex"+chr(97+i),  os.path.join("themes", themename, "staratex_"+chr(97+i)+".png")):
-          self.staratex = True
-        else:
-          self.staratex = False
-          break
-
+    self.loadNotes()
+    
     if self.gameMode2p == 6:
       if not engine.loadImgDrawing(self, "battleFrets", os.path.join("themes", themename,"battle_frets.png")):
         self.battleFrets = None
@@ -238,6 +183,62 @@ class Guitar(Instrument):
 
     self.neck = Neck(self.engine, self, playerObj)
   
+  def loadNotes(self):
+      
+    get = lambda file: self.checkPath("notes", file)
+    
+    self.starspin = self.engine.config.get("performance", "starspin")
+    if self.twoDnote:
+      if self.starspin:
+        if self.gameMode2p == 6: #battle multiplayer
+          if self.engine.loadImgDrawing(self, "noteButtons", get("spinnotesbattle.png")):
+            self.starSpinFrames = 8
+          else:
+            self.starspin = False
+            if not self.engine.loadImgDrawing(self, "noteButtons", get("notesbattle.png")):
+              self.engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
+        else: 
+          if not self.engine.loadImgDrawing(self, "noteButtons", get("spinnotes.png")):
+            self.starspin = False
+            self.engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
+      else:
+        if self.gameMode2p == 6: #battle multiplayer
+          if not self.engine.loadImgDrawing(self, "noteButtons", get("notesbattle.png")):
+            self.engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
+        else:
+          self.engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
+    else:
+      if self.engine.fileExists(get("note.dae")):
+        self.engine.resource.load(self,  "noteMesh",  lambda: Mesh(self.engine.resource.fileName(get("note.dae"))))
+      else: #fallback to the default in the data folder
+        self.engine.resource.load(self,  "noteMesh",  lambda: Mesh(self.engine.resource.fileName("note.dae")))
+
+      for i in range(5):
+        if self.engine.loadImgDrawing(self,  "notetex"+chr(97+i),  get("notetex_"+chr(97+i)+".png")):
+          self.notetex = True
+        else:
+          self.notetex = False
+          break
+        
+      if self.engine.fileExists(get("star.dae")):  
+        self.engine.resource.load(self,  "starMesh",  lambda: Mesh(self.engine.resource.fileName(get("star.dae"))))
+      else:  
+        self.starMesh = None
+
+      for i in range(5):
+        if self.engine.loadImgDrawing(self,  "startex"+chr(97+i),  get("startex_"+chr(97+i)+".png")):
+          self.startex = True
+        else:
+          self.startex = False
+          break
+
+      for i in range(5):
+        if self.engine.loadImgDrawing(self,  "staratex"+chr(97+i),  get("staratex_"+chr(97+i)+".png")):
+          self.staratex = True
+        else:
+          self.staratex = False
+          break
+
   def selectPreviousString(self):
     self.selectedString = (self.selectedString - 1) % self.strings
 
