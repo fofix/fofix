@@ -239,21 +239,25 @@ class FontLayer(Layer):
     if self.condition:
       self.font.render(self.text, (self.position[0], self.position[1]), align = self.alignment)
 
-#defines layers that are just font instead of images
+#creates a layer that is shaped like a pie-slice/circle instead of a rectangle
 class CircleLayer(Layer): 
   def __init__(self, stage, section, drawing):
     Layer.__init__(self, stage, section)
 
     self.color   = self.get("color", str, "#FFFFFF")
-    self.ratio   = eval(self.get("ratio", str, "1"))
+    #this number (between 0 and 1) determines how much
+    #of the circle should be filled (0 to 360 degrees)
+    self.ratio   = eval(self.get("ratio", str, "1"))  
 
     self.engine.loadImgDrawing(self, "drawing", drawing)
   
+    #these determine the size of the PIL pie-slice
     self.centerX   = self.drawing.width1()/2
     self.centerY   = self.drawing.height1()/2
     self.inRadius  = 0
     self.outRadius = self.drawing.width1()/2
     
+    #generates all the images needed for the circle
     self.drawnOverlays = {}
     baseFillImageSize = self.drawing.pixelSize
     for degrees in range(0, 361, 5):
