@@ -20,7 +20,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,        #
 # MA  02110-1301, USA.                                              #
 #####################################################################
-
+from __future__ import with_statement
 import pygame
 from OpenGL.GL import *
 from cmgl import *
