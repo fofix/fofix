@@ -1340,7 +1340,7 @@ class GuitarScene(Scene):
     self.lyricHeight = 0
 
     if self.midiLyricsEnabled > 0 and (self.midiLyricMode == 1 or self.midiLyricMode == 2) and not self.playingVocals:   #line-by-line lyrics mode is selected and enabled:
-      lyricFont = self.engine.data.font
+      lyricFont = self.engine.data.songFont
       if self.theme == 2:
         txtSize = 0.00170
       else:
@@ -5541,7 +5541,7 @@ class GuitarScene(Scene):
       font    = self.engine.data.shadowfont
     else:
       font    = self.engine.data.font
-    lyricFont = self.engine.data.font
+    lyricFont = self.engine.data.songFont
     bigFont = self.engine.data.bigFont
     sphraseFont = self.engine.data.streakFont2
 
