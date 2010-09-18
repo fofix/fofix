@@ -30,7 +30,6 @@ import os
 import re
 import math
 import random
-import Config
 import hashlib
 import binascii
 import Cerealizer
