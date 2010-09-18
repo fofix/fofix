@@ -23,7 +23,7 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-from ConfigParser import ConfigParser
+from ConfigParser import RawConfigParser
 import Log
 import Resource
 import os
@@ -35,7 +35,7 @@ prototype = {}
 logIniReads = 0   #MFH - INI reads disabled by default during the startup period
 logUndefinedGets = 0 
 
-class MyConfigParser(ConfigParser):
+class MyConfigParser(RawConfigParser):
   def write(self, fp, type = 0):
       if type == 1:
         return self.writeController(fp)
