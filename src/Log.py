@@ -45,6 +45,8 @@ if os.name == "posix": # evilynux - logfile in ~/.fofix/ for GNU/Linux and MacOS
                                 Version.PROGRAM_UNIXSTYLE_NAME + ".log"), "w")
   else: # GNU/Linux et al.
     logFile = open(os.path.join(Resource.getWritableResourcePath(), Version.PROGRAM_UNIXSTYLE_NAME + ".log"), "w")
+elif os.name == "nt":
+  logFile = open(os.path.join(Resource.getWritableResourcePath(), Version.PROGRAM_UNIXSTYLE_NAME + ".log"), "w")
 else:
   logFile = open(Version.PROGRAM_UNIXSTYLE_NAME + ".log", "w")  #MFH - local logfile!
 
