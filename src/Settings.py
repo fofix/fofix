@@ -863,6 +863,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(self.engine, self.engine.config, "game", "gsolo_accuracy_disp", autoApply = True, isQuickset = 1), #MFH
       ConfigChoice(self.engine, self.engine.config, "game", "solo_frame", autoApply = True),      #myfingershurt
       ConfigChoice(self.engine, self.engine.config, "video", "disable_fretsfx", autoApply = True),
+      ConfigChoice(self.engine, self.engine.config, "video", "disable_flamesfx", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "video", "hitglow_color", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "game", "game_time", autoApply = True),  
       ConfigChoice(self.engine, self.engine.config, "video", "counting", autoApply = True, isQuickset = 2),

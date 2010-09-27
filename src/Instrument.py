@@ -293,31 +293,52 @@ class Instrument:
     self.actions = []
     self.soloKey = []
 
-    engine.loadImgDrawing(self, "glowDrawing", "glow.png")
+    self.disableVBPM  = self.engine.config.get("game", "disable_vbpm")
+    self.disableNoteSFX  = self.engine.config.get("video", "disable_notesfx")
+    self.disableFretSFX  = self.engine.config.get("video", "disable_fretsfx")
+    self.disableFlameSFX  = self.engine.config.get("video", "disable_flamesfx")
+
+    # make glow.png optional, theme dependent
+    if self.disableFretSFX != False:
+      self.glowDrawing = None
+    elif engine.loadImgDrawing(self, "glowDrawing", os.path.join("themes",themename,"glow.png"),  textureSize = (128, 128)):
+      engine.loadImgDrawing(self, "glowDrawing", os.path.join("themes",themename,"glow.png"),  textureSize = (128, 128))
+    else:
+      engine.loadImgDrawing(self, "glowDrawing", "glow.png",  textureSize = (128, 128))
 
     #MFH - making hitflames optional
     self.hitFlamesPresent = False
-    if engine.loadImgDrawing(self, "hitflames1Drawing", os.path.join("themes",themename,"hitflames1.png"),  textureSize = (128, 128)):
-      if engine.loadImgDrawing(self, "hitflames2Drawing", os.path.join("themes",themename,"hitflames2.png"),  textureSize = (128, 128)):
-        self.hitFlamesPresent = True
-      else:
-        self.hitflames2Drawing = None
-    else:
-      self.hitflames1Drawing = None
+    if self.disableFlameSFX == True:
+      self.hitFlamesPresent = True
+      self.hitglow2Drawing = None
+      self.hitglowDrawing = None
+      self.hitglowAnim = None
+      self.hitflamesAnim = None
       self.hitflames2Drawing = None
-
-    if not engine.loadImgDrawing(self, "hitflamesAnim", os.path.join("themes",themename,"hitflamesanimation.png"),  textureSize = (128, 128)):
-      self.Hitanim2 = False
-
-    if not engine.loadImgDrawing(self, "hitglowAnim", os.path.join("themes",themename,"hitglowanimation.png"),  textureSize = (128, 128)):
-      if engine.loadImgDrawing(self, "hitglowDrawing", os.path.join("themes",themename,"hitglow.png"),  textureSize = (128, 128)):
-        if not engine.loadImgDrawing(self, "hitglow2Drawing", os.path.join("themes",themename,"hitglow2.png"),  textureSize = (128, 128)):
-          self.hitglow2Drawing = None
-          self.hitFlamesPresent = False   #MFH - shut down all flames if these are missing.
+      self.hitflames1Drawing = None
+    else:
+      if engine.loadImgDrawing(self, "hitflames1Drawing", os.path.join("themes",themename,"hitflames1.png"),  textureSize = (128, 128)):
+        if engine.loadImgDrawing(self, "hitflames2Drawing", os.path.join("themes",themename,"hitflames2.png"),  textureSize = (128, 128)):
+          self.hitFlamesPresent = True
+        else:
+          self.hitflames2Drawing = None
       else:
-        self.hitglowDrawing = None
-        self.hitFlamesPresent = False   #MFH - shut down all flames if these are missing.
-      self.Hitanim = False
+        self.hitflames1Drawing = None
+        self.hitflames2Drawing = None
+      
+      if not engine.loadImgDrawing(self, "hitflamesAnim", os.path.join("themes",themename,"hitflamesanimation.png"),  textureSize = (128, 128)):
+        self.Hitanim2 = False
+      
+      if not engine.loadImgDrawing(self, "hitglowAnim", os.path.join("themes",themename,"hitglowanimation.png"),  textureSize = (128, 128)):
+        if engine.loadImgDrawing(self, "hitglowDrawing", os.path.join("themes",themename,"hitglow.png"),  textureSize = (128, 128)):
+          if not engine.loadImgDrawing(self, "hitglow2Drawing", os.path.join("themes",themename,"hitglow2.png"),  textureSize = (128, 128)):
+            self.hitglow2Drawing = None
+            self.hitFlamesPresent = False   #MFH - shut down all flames if these are missing.
+        else:
+          self.hitglowDrawing = None
+          self.hitFlamesPresent = False   #MFH - shut down all flames if these are missing.
+        self.Hitanim = False
+ 
 
     if self.theme == 0 or self.theme == 1:
       engine.loadImgDrawing(self, "hitlightning", os.path.join("themes",themename,"lightning.png"),  textureSize = (128, 128))
@@ -327,16 +348,22 @@ class Instrument:
     self.spotColor = self.engine.theme.spotColor   
     self.keyColor = self.engine.theme.keyColor
     self.key2Color = self.engine.theme.key2Color
+
     fC = [(.84, 1, .51), (1, .53, .5), (.98, .96, .42), (.64, .97, 1), (1, .87, .55)]
+
+    if not self.engine.theme.glowColor == "frets":
+      gC = self.engine.theme.glowColor
+      fC = [gC, gC, gC, gC, gC]
+    # elif self.engine.theme.glowColor == "frets":
+      # seems like it should work, but no.. 
+      # fC = self.engine.theme.noteColors[:5]
+
     self.flameColors = [fC,fC,fC,fC]
+
     self.gh3flameColor = (.75,.36,.02)
     fS = [.075]*5
     self.flameSizes = [fS,fS,fS,fS]
     self.glowColor  = self.engine.theme.glowColor
-    self.disableVBPM  = self.engine.config.get("game", "disable_vbpm")
-    self.disableNoteSFX  = self.engine.config.get("video", "disable_notesfx")
-    self.disableFretSFX  = self.engine.config.get("video", "disable_fretsfx")
-    self.disableFlameSFX  = self.engine.config.get("video", "disable_flamesfx")
 
     self.twoChordMax = False
 
