@@ -173,39 +173,6 @@ class SongChoosingScene(Scene):
       Dialogs.hideLoadingSplashScreen(self.engine, self.splash)
       return
     
-    #begin to load images...
-    self.itemIcons = {}
-    if os.path.isdir(os.path.join(Version.dataPath(),"themes",themename,"setlist")):
-      self.engine.data.loadAllImages(self, os.path.join("themes",themename,"setlist"))
-      if os.path.isdir(os.path.join(Version.dataPath(),"themes",themename,"setlist","icon")):
-        self.itemIcons = self.engine.data.loadAllImages(None, os.path.join("themes",themename,"setlist","icon"), prefix="")
-    
-    #mesh...
-    if os.path.exists(os.path.join(Version.dataPath(),"themes",themename,"setlist","item.dae")):
-      self.engine.resource.load(self, "itemMesh", lambda: Mesh(self.engine.resource.fileName("themes",themename,"setlist","item.dae")), synch = True)
-    else:
-      self.itemMesh = None
-    if os.path.exists(os.path.join(Version.dataPath(),"themes",themename,"setlist","library.dae")):
-      self.engine.resource.load(self, "libraryMesh", lambda: Mesh(self.engine.resource.fileName("themes",themename,"setlist","library.dae")), synch = True)
-    else:
-      self.libraryMesh = None
-    if os.path.exists(os.path.join(Version.dataPath(),"themes",themename,"setlist","label.dae")):
-      self.engine.resource.load(self, "label", lambda: Mesh(self.engine.resource.fileName("themes",themename,"setlist","label.dae")), synch = True)
-    else:
-      self.label = None
-    if os.path.exists(os.path.join(Version.dataPath(),"themes",themename,"setlist","library_label.dae")):
-      self.engine.resource.load(self, "libraryLabel", lambda: Mesh(self.engine.resource.fileName("themes",themename,"setlist","library_label.dae")), synch = True)
-    else:
-      self.libraryLabel = None
-    if os.path.exists(os.path.join(Version.dataPath(),"themes",themename,"setlist","tier.dae")):
-      self.engine.resource.load(self, "tierMesh", lambda: Mesh(self.engine.resource.fileName("themes",themename,"setlist","tier.dae")), synch = True)
-    else:
-      self.tierMesh = self.libraryMesh
-    if os.path.exists(os.path.join(Version.dataPath(),"themes",themename,"setlist","list.dae")):
-      self.engine.resource.load(self, "listMesh", lambda: Mesh(self.engine.resource.fileName("themes",themename,"setlist","list.dae")), synch = True)
-    else:
-      self.listMesh = self.libraryMesh
-    
     #variables for setlist management (Not that this is necessary here - just to see what exists.)
     self.songLoader       = None #preview handling
     self.tiersPresent     = False
@@ -240,6 +207,52 @@ class SongChoosingScene(Scene):
     
     #now, load the first library
     self.loadLibrary()
+
+    #load the images
+    self.loadImages()
+
+  #blazingamer - by adding this method it makes it much easier for a person 
+  #     to add custom images to the CustomSetlist.py
+  #     
+  def loadImages(self):
+    
+    self.loadIcons()
+
+    #mesh...
+    if os.path.exists(os.path.join(Version.dataPath(),"themes",themename,"setlist","item.dae")):
+      self.engine.resource.load(self, "itemMesh", lambda: Mesh(self.engine.resource.fileName("themes",themename,"setlist","item.dae")), synch = True)
+    else:
+      self.itemMesh = None
+    if os.path.exists(os.path.join(Version.dataPath(),"themes",themename,"setlist","library.dae")):
+      self.engine.resource.load(self, "libraryMesh", lambda: Mesh(self.engine.resource.fileName("themes",themename,"setlist","library.dae")), synch = True)
+    else:
+      self.libraryMesh = None
+    if os.path.exists(os.path.join(Version.dataPath(),"themes",themename,"setlist","label.dae")):
+      self.engine.resource.load(self, "label", lambda: Mesh(self.engine.resource.fileName("themes",themename,"setlist","label.dae")), synch = True)
+    else:
+      self.label = None
+    if os.path.exists(os.path.join(Version.dataPath(),"themes",themename,"setlist","library_label.dae")):
+      self.engine.resource.load(self, "libraryLabel", lambda: Mesh(self.engine.resource.fileName("themes",themename,"setlist","library_label.dae")), synch = True)
+    else:
+      self.libraryLabel = None
+    if os.path.exists(os.path.join(Version.dataPath(),"themes",themename,"setlist","tier.dae")):
+      self.engine.resource.load(self, "tierMesh", lambda: Mesh(self.engine.resource.fileName("themes",themename,"setlist","tier.dae")), synch = True)
+    else:
+      self.tierMesh = self.libraryMesh
+    if os.path.exists(os.path.join(Version.dataPath(),"themes",themename,"setlist","list.dae")):
+      self.engine.resource.load(self, "listMesh", lambda: Mesh(self.engine.resource.fileName("themes",themename,"setlist","list.dae")), synch = True)
+    else:
+      self.listMesh = self.libraryMesh
+    
+  #blazingamer - if someone wishes to load the song icons to use in their setlist they do not have to
+  #              rewrite it into the CustomSetlist.py if we make it a separate method
+  def loadIcons(self):
+    #begin to load images...
+    self.itemIcons = {}
+    if os.path.isdir(os.path.join(Version.dataPath(),"themes",themename,"setlist")):
+      self.engine.data.loadAllImages(self, os.path.join("themes",themename,"setlist"))
+      if os.path.isdir(os.path.join(Version.dataPath(),"themes",themename,"setlist","icon")):
+        self.itemIcons = self.engine.data.loadAllImages(None, os.path.join("themes",themename,"setlist","icon"), prefix="")
   
   def forceReload(self):
     self.menu_force_reload = True
