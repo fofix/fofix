@@ -136,7 +136,7 @@ class Theme(Task):
       #since the original Frets on Fire.  What glow_color allows you to do is set it so
       #the glow is either the color of the fret it's over or it can be the color the image
       #actually is (if the image is white then no matter what key is hit the glow will be white)
-      self.glowColor   = get("glow_color",       str,    "frets")
+      self.glowColor   = get("glow_color",       str,    "fret")
       if not self.glowColor == "frets":
           self.glowColor = self.hexToColor(self.glowColor)
       
