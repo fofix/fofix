@@ -561,6 +561,7 @@ class Theme(Task):
       self.hopoIndicatorActiveColor = get("hopo_indicator_active_color", "color", "#FFFFFF")
       self.hopoIndicatorInactiveColor = get("hopo_indicator_inactive_color", "color", "#666666")
       self.markSolos = get("mark_solo_sections", int, 2)
+      self.ingame_stats_colorVar = get("ingame_stats_color", "color", "#FFFFFF")
       
       #Game results scene
       self.result_score = get("result_score", str, ".5,.11,0.0025,None,None").split(",")

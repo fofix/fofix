@@ -1590,6 +1590,7 @@ class GuitarScene(Scene):
 
     #MFH - new theme.ini color options:
 
+    self.ingame_stats_color = self.engine.theme.ingame_stats_colorVar
     self.pause_text_color = self.engine.theme.hexToColor(self.engine.theme.pause_text_colorVar)
     self.pause_selected_color = self.engine.theme.hexToColor(self.engine.theme.pause_selected_colorVar)
     self.fail_text_color = self.engine.theme.hexToColor(self.engine.theme.fail_text_colorVar)
