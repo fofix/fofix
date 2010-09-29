@@ -144,7 +144,7 @@ class SongChoosingScene(Scene):
     self.nilShowNextScore = self.engine.config.get("songlist",  "nil_show_next_score")
     
     #theme information
-    themename = self.engine.data.themeLabel
+    self.themename = self.engine.data.themeLabel
     self.theme = self.engine.data.theme
     
     #theme configurables
@@ -219,28 +219,28 @@ class SongChoosingScene(Scene):
     self.loadIcons()
 
     #mesh...
-    if os.path.exists(os.path.join(Version.dataPath(),"themes",themename,"setlist","item.dae")):
-      self.engine.resource.load(self, "itemMesh", lambda: Mesh(self.engine.resource.fileName("themes",themename,"setlist","item.dae")), synch = True)
+    if os.path.exists(os.path.join(Version.dataPath(),"themes",self.themename,"setlist","item.dae")):
+      self.engine.resource.load(self, "itemMesh", lambda: Mesh(self.engine.resource.fileName("themes",self.themename,"setlist","item.dae")), synch = True)
     else:
       self.itemMesh = None
-    if os.path.exists(os.path.join(Version.dataPath(),"themes",themename,"setlist","library.dae")):
-      self.engine.resource.load(self, "libraryMesh", lambda: Mesh(self.engine.resource.fileName("themes",themename,"setlist","library.dae")), synch = True)
+    if os.path.exists(os.path.join(Version.dataPath(),"themes",self.themename,"setlist","library.dae")):
+      self.engine.resource.load(self, "libraryMesh", lambda: Mesh(self.engine.resource.fileName("themes",self.themename,"setlist","library.dae")), synch = True)
     else:
       self.libraryMesh = None
-    if os.path.exists(os.path.join(Version.dataPath(),"themes",themename,"setlist","label.dae")):
-      self.engine.resource.load(self, "label", lambda: Mesh(self.engine.resource.fileName("themes",themename,"setlist","label.dae")), synch = True)
+    if os.path.exists(os.path.join(Version.dataPath(),"themes",self.themename,"setlist","label.dae")):
+      self.engine.resource.load(self, "label", lambda: Mesh(self.engine.resource.fileName("themes",self.themename,"setlist","label.dae")), synch = True)
     else:
       self.label = None
-    if os.path.exists(os.path.join(Version.dataPath(),"themes",themename,"setlist","library_label.dae")):
-      self.engine.resource.load(self, "libraryLabel", lambda: Mesh(self.engine.resource.fileName("themes",themename,"setlist","library_label.dae")), synch = True)
+    if os.path.exists(os.path.join(Version.dataPath(),"themes",self.themename,"setlist","library_label.dae")):
+      self.engine.resource.load(self, "libraryLabel", lambda: Mesh(self.engine.resource.fileName("themes",self.themename,"setlist","library_label.dae")), synch = True)
     else:
       self.libraryLabel = None
-    if os.path.exists(os.path.join(Version.dataPath(),"themes",themename,"setlist","tier.dae")):
-      self.engine.resource.load(self, "tierMesh", lambda: Mesh(self.engine.resource.fileName("themes",themename,"setlist","tier.dae")), synch = True)
+    if os.path.exists(os.path.join(Version.dataPath(),"themes",self.themename,"setlist","tier.dae")):
+      self.engine.resource.load(self, "tierMesh", lambda: Mesh(self.engine.resource.fileName("themes",self.themename,"setlist","tier.dae")), synch = True)
     else:
       self.tierMesh = self.libraryMesh
-    if os.path.exists(os.path.join(Version.dataPath(),"themes",themename,"setlist","list.dae")):
-      self.engine.resource.load(self, "listMesh", lambda: Mesh(self.engine.resource.fileName("themes",themename,"setlist","list.dae")), synch = True)
+    if os.path.exists(os.path.join(Version.dataPath(),"themes",self.themename,"setlist","list.dae")):
+      self.engine.resource.load(self, "listMesh", lambda: Mesh(self.engine.resource.fileName("themes",self.themename,"setlist","list.dae")), synch = True)
     else:
       self.listMesh = self.libraryMesh
     
@@ -249,10 +249,10 @@ class SongChoosingScene(Scene):
   def loadIcons(self):
     #begin to load images...
     self.itemIcons = {}
-    if os.path.isdir(os.path.join(Version.dataPath(),"themes",themename,"setlist")):
-      self.engine.data.loadAllImages(self, os.path.join("themes",themename,"setlist"))
-      if os.path.isdir(os.path.join(Version.dataPath(),"themes",themename,"setlist","icon")):
-        self.itemIcons = self.engine.data.loadAllImages(None, os.path.join("themes",themename,"setlist","icon"), prefix="")
+    if os.path.isdir(os.path.join(Version.dataPath(),"themes",self.themename,"setlist")):
+      self.engine.data.loadAllImages(self, os.path.join("themes",self.themename,"setlist"))
+      if os.path.isdir(os.path.join(Version.dataPath(),"themes",self.themename,"setlist","icon")):
+        self.itemIcons = self.engine.data.loadAllImages(None, os.path.join("themes",self.themename,"setlist","icon"), prefix="")
   
   def forceReload(self):
     self.menu_force_reload = True
