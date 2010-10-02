@@ -515,11 +515,7 @@ class CreateCharacter(Layer, KeyListener):
                       (_("Delete Character"), _("Quitter.")), \
                       (_("Done"),             _("All finished? Let's do this thing!"))]
     themename = self.engine.data.themeLabel
-
-    if not self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "lobby", "creator.png")):
-      self.background = None
-    if not self.engine.loadImgDrawing(self, "backgroundTop", os.path.join("themes", themename, "lobby", "creator_top.png")):
-      self.backgroundTop = None
+    self.engine.data.loadAllImages(self, os.path.join("themes",themename,"lobby","creator"))
 
   def loadPlayer(self, playerNum, player = None):
     self.choices = []
@@ -747,8 +743,8 @@ class CreateCharacter(Layer, KeyListener):
     v = ((1 - visibility) **2)
     w, h = self.fullView
     try:
-      if self.background:
-        self.engine.drawImage(self.background, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
+      if self.img_creator:
+        self.engine.drawImage(self.img_creator, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 3)
       helpFont.render(_("Player %d") % (self.playerNum + 1), pos = (.5, .1), scale = self.engine.theme.characterCreateScale, align = 1)
       for i, option in enumerate(self.options):
         r, g, b = self.engine.theme.characterCreateHelpColor
@@ -777,7 +773,7 @@ class CreateCharacter(Layer, KeyListener):
             str = self.values[i-1][self.choices[i]]
           wText, hText = font.getStringSize(str, scale = self.engine.theme.characterCreateScale)
           font.render(str, (self.engine.theme.characterCreateOptionX-wText, self.engine.theme.characterCreateY+self.engine.theme.characterCreateSpace*i), scale = self.engine.theme.characterCreateScale)
-      if self.backgroundTop:
-         self.engine.drawImage(self.backgroundTop, scale = (1.0,-1.0), coord = (w/2,h/2))
+      if self.img_creator_top:
+         self.engine.drawImage(self.img_creator_top, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 3)
     finally:
       self.engine.view.resetProjection()

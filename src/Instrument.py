@@ -301,10 +301,10 @@ class Instrument:
     # make glow.png optional, theme dependent
     if self.disableFretSFX != False:
       self.glowDrawing = None
-    elif engine.loadImgDrawing(self, "glowDrawing", os.path.join("themes",themename,"glow.png"),  textureSize = (128, 128)):
-      engine.loadImgDrawing(self, "glowDrawing", os.path.join("themes",themename,"glow.png"),  textureSize = (128, 128))
     else:
-      engine.loadImgDrawing(self, "glowDrawing", "glow.png",  textureSize = (128, 128))
+      engine.loadImgDrawing(self, "glowDrawing", os.path.join("themes",themename,"glow.png"),  textureSize = (128, 128))
+      if not self.glowDrawing:
+        engine.loadImgDrawing(self, "glowDrawing", "glow.png")
 
     #MFH - making hitflames optional
     self.hitFlamesPresent = False

@@ -218,41 +218,32 @@ class Neck:
           engine.loadImgDrawing(self, name, os.path.join(themepath, file))
       else:
         engine.loadImgDrawing(self, name, os.path.join(themepath, file))
-          
-      
+ 
+    loadImage("sideBars", "side_bars.png")
+    loadImage("oSideBars", "overdrive_side_bars.png")
+    loadImage("oCenterLines", "overdrive_center_lines.png")
+    loadImage("centerLines", "center_lines.png")
+    loadImage("oNeck", "overdriveneck.png")
+    loadImage("oFlash", "overdrive_string_flash.png")
+    loadImage("bpm_halfbeat", "bpm_halfbeat.png")
+    loadImage("bpm_beat",     "bpm_beat.png")
+    loadImage("bpm_measure",  "bpm_measure.png")
+    loadImage("failNeck", "failneck.png")
+
+    if not self.failNeck:
+      engine.loadImgDrawing(self, "failNeck", os.path.join("failneck.png"))
+
+    if self.ovrneckoverlay:
+      loadImage("oNeckovr", "overdriveneckovr.png")
+
     #myfingershurt: Bass Groove neck:
     self.bassGrooveNeck = None
-          
-    loadImage("oSideBars", "overdrive_side_bars.png")
-    loadImage("oCenterLines", "overdrive_center_lines.png")
-    loadImage("centerLines", "center_lines.png")
-      
-    loadImage("oNeck", "overdriveneck.png")
-    loadImage("oNeckovr", "overdriveneckovr.png")      
-
-    loadImage("oFlash", "overdrive_string_flash.png")
-            
-    loadImage("oSideBars", "overdrive_side_bars.png")
-    loadImage("oCenterLines", "overdrive_center_lines.png")
-    loadImage("centerLines", "center_lines.png")
-      
-    loadImage("oNeck", "overdriveneck.png")
 
     if self.bassGrooveNeckMode > 0:
       if self.bassGrooveNeckMode == 2:  #overlay neck
         engine.loadImgDrawing(self, "bassGrooveNeck", os.path.join(themepath, "bass", "bassgrooveneckovr.png"))
       if self.bassGrooveNeckMode == 1 or not self.bassGrooveNeck:  #replace neck
         engine.loadImgDrawing(self, "bassGrooveNeck", os.path.join(themepath, "bass", "bassgrooveneck.png"))
-      
-    loadImage("oFlash", "overdrive_string_flash.png")
-
-    if self.ovrneckoverlay:
-      loadImage("oNeckovr", "overdriveneckovr.png")      
-
-    loadImage("sideBars", "side_bars.png")
-    loadImage("bpm_halfbeat", "bpm_halfbeat.png")
-    loadImage("bpm_beat",     "bpm_beat.png")
-    loadImage("bpm_measure",  "bpm_measure.png")
 
     #myfingershurt: Guitar Solo neck:
     self.soloNeck = None
@@ -262,10 +253,6 @@ class Neck:
           loadImage("soloNeck", "soloneck.png")
         elif self.guitarSoloNeckMode == 2:  #overlay neck
           loadImage("soloNeck", "soloneckovr.png")
-          
-    loadImage("failNeck", "failneck.png")
-    if not self.failNeck:
-      engine.loadImgDrawing(self, "failNeck", os.path.join("failneck.png"))
 
     self.isFailing = False
     self.canGuitarSolo = self.instrument.canGuitarSolo

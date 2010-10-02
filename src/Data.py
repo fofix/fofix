@@ -165,7 +165,6 @@ class Data(object):
       self.submenuSelectFound = False
       self.loadImgDrawing(self, "submenuSelect", os.path.join("themes",themename,"menu","selected.png"))
       self.subSelectWFactor = 0
-    self.loadAllImages(self, os.path.join("themes",themename,"common"))
     # load all the data in parallel
     # asciiOnly = not bool(Language.language) or Language.language == "Custom"
     # reversed  = _("__lefttoright__") == "__righttoleft__" and True or False
@@ -375,7 +374,6 @@ class Data(object):
     resource.load(self, "acceptSounds", self.loadAcceptSounds)    #myfingershurt
     resource.load(self, "cancelSounds", self.loadBackSounds)    #myfingershurt
     
-    resource.load(self, "symcsounds", self.loadScrewUpsounds)
     self.loadSoundEffect(self, "selectSound1", os.path.join("themes",themename,"sounds","select1.ogg"))
 
     if self.fileExists(os.path.join("themes",themename,"sounds","select2.ogg")):
