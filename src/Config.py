@@ -54,12 +54,6 @@ class MyConfigParser(RawConfigParser):
         if section not in ("theme", "controller", "player"):
           self._writeSection(fp, section, self.items(section))
 
-  def writeTheme(self, fp):
-      if self.defaults():
-        self._writeSection(fp, DEFAULTSECT, self.defaults().items())
-      if self.has_section('theme'):
-        self._writeSection(fp, 'theme', self.items('theme'))
-
   def writeController(self, fp):
       if self.defaults():
         self._writeSection(fp, DEFAULTSECT, self.defaults().items())
