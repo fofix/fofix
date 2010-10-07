@@ -84,17 +84,14 @@ One-shot mode options (ignored unless in one-shot mode):
     print usage
   sys.exit(1)
 
-try:
-  opts, args = getopt.getopt(sys.argv[1:], "hvc:f:r:t:s:p:l:d:m:n:", ["help", "verbose", "config=", "fullscreen=", "resolution=", "theme=", "song=", "part=", "diff=", "mode=", "nbrplayers=", "opengl-error-checking"])
-except getopt.GetoptError, e:
-  _usage(str(e))  # str(e): error message from getopt, e.g. "option --some-invalid-option not recognized"
-if ('-h', '') in opts or ('--help', '') in opts:
+# Check --help early so pygst won't eat it.
+if '--help' in sys.argv or '-h' in sys.argv:
   _usage()
 
 #stump: disable pyOpenGL error checking if we are not asked for it.
 # This must be before *anything* that may import pyOpenGL!
 assert 'OpenGL' not in sys.modules
-if ('--opengl-error-checking', '') not in opts:
+if '--opengl-error-checking' not in sys.argv:
   import OpenGL
   if OpenGL.__version__ >= '3':
     OpenGL.ERROR_CHECKING = False
@@ -115,6 +112,13 @@ except:
   videoAvailable = False
 
 def main():
+  try:
+    opts, args = getopt.getopt(sys.argv[1:], "hvc:f:r:t:s:p:l:d:m:n:", ["help", "verbose", "config=", "fullscreen=", "resolution=", "theme=", "song=", "part=", "diff=", "mode=", "nbrplayers=", "opengl-error-checking"])
+  except getopt.GetoptError, e:
+    _usage(str(e))  # str(e): error message from getopt, e.g. "option --some-invalid-option not recognized"
+  if ('-h', '') in opts or ('--help', '') in opts:
+    _usage()
+
   playing = None
   configFile = None
   fullscreen = None
