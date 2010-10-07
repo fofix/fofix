@@ -22,6 +22,8 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+from __future__ import with_statement
+
 import pygame
 from OpenGL.GL import *
 import math
@@ -388,8 +390,7 @@ class Menu(Layer, KeyListener):
     else:
       self.engine.graphicMenuShown = False
     
-    self.engine.view.setOrthogonalProjection(normalize = True)
-    try:
+    with self.engine.view.orthogonalProjection(normalize = True):
       v = (1 - visibility) ** 2
       # Default to this font if none was specified
 
@@ -505,7 +506,3 @@ class Menu(Layer, KeyListener):
           else:
             y += h
           glPopMatrix()
-    
-    
-    finally:
-      self.engine.view.resetProjection()

@@ -28,6 +28,8 @@
 
 """A bunch of dialog functions for interacting with the user."""
 
+from __future__ import with_statement
+
 import pygame
 from OpenGL.GL import *
 from OpenGL.GLU import *
@@ -307,10 +309,8 @@ class GetText(Layer, KeyListener):
   
   def render(self, visibility, topMost):
     self.engine.view.setViewport(1,0)
-    self.engine.view.setOrthogonalProjection(normalize = True)
     font = self.engine.data.font
-    
-    try:
+    with self.engine.view.orthogonalProjection(normalize = True):
       v = (1 - visibility) ** 2
       
       fadeScreen(v)
@@ -328,9 +328,6 @@ class GetText(Layer, KeyListener):
       if self.text is not None:
         pos = wrapText(font, (.1, (pos[1] + v) + .08 + v / 4), self.text)
         font.render(cursor, pos)
-      
-    finally:
-      self.engine.view.resetProjection()
 
 class GetKey(Layer, KeyListener):
   """Key choosing layer."""
@@ -385,10 +382,9 @@ class GetKey(Layer, KeyListener):
   
   def render(self, visibility, topMost):
     self.engine.view.setViewport(1,0)
-    self.engine.view.setOrthogonalProjection(normalize = True)
     font = self.engine.data.font
-    
-    try:
+
+    with self.engine.view.orthogonalProjection(normalize = True):
       v = (1 - visibility) ** 2
       
       fadeScreen(v)
@@ -401,9 +397,6 @@ class GetKey(Layer, KeyListener):
       if self.key is not None:
         text = pygame.key.name(self.key).capitalize()
         pos = wrapText(font, (.1, (pos[1] + v) + .08 + v / 4), text)
-      
-    finally:
-      self.engine.view.resetProjection()
 
 class LoadingScreen(Layer, KeyListener):
   """Loading screen layer."""
@@ -447,14 +440,13 @@ class LoadingScreen(Layer, KeyListener):
   
   def render(self, visibility, topMost):
     self.engine.view.setViewport(1,0)
-    self.engine.view.setOrthogonalProjection(normalize = True)
     #font = self.engine.data.font
     font = self.engine.data.loadingFont
 
     if not font:
       return
 
-    try:
+    with self.engine.view.orthogonalProjection(normalize = True):
       v = (1 - visibility) ** 2
       fadeScreen(v)
 
@@ -486,8 +478,6 @@ class LoadingScreen(Layer, KeyListener):
           font.render(self.text, (x, y), shadowoffset = (self.engine.theme.shadowoffsetx, self.engine.theme.shadowoffsety))     
         else:
           font.render(self.text, (x, y))
-    finally:
-      self.engine.view.resetProjection()
 
 class MessageScreen(Layer, KeyListener):
   """Message screen layer."""
@@ -519,13 +509,12 @@ class MessageScreen(Layer, KeyListener):
   
   def render(self, visibility, topMost):
     self.engine.view.setViewport(1,0)
-    self.engine.view.setOrthogonalProjection(normalize = True)
     font = self.engine.data.font
 
     if not font:
       return
-    
-    try:
+
+    with self.engine.view.orthogonalProjection(normalize = True):
       v = (1 - visibility) ** 2
       fadeScreen(v)
 
@@ -539,10 +528,7 @@ class MessageScreen(Layer, KeyListener):
       y = pos[1] + 3 * h + v * 2
       self.engine.theme.setSelectedColor(1 - v)
       font.render(self.prompt, (x, y), scale = 0.001)
-      
-    finally:
-      self.engine.view.resetProjection()
-      
+
 class FileChooser(BackgroundLayer, KeyListener):
   """File choosing layer."""
   def __init__(self, engine, masks, path, prompt = "", dirSelect = False):
@@ -692,18 +678,13 @@ class FileChooser(BackgroundLayer, KeyListener):
     self.engine.drawImage(self.engine.data.choiceImage, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
 
 
-      
-    self.engine.view.setOrthogonalProjection(normalize = True)
     font = self.engine.data.font
-    
-    try:
+    with self.engine.view.orthogonalProjection(normalize = True):
       glEnable(GL_BLEND)
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
       glEnable(GL_COLOR_MATERIAL)
       self.engine.theme.setBaseColor(1 - v)
       wrapText(font, (.1, .05 - v), self.prompt)
-    finally:
-      self.engine.view.resetProjection()
 
 #==============================================================
 #MFH - on-demand Neck Select menu
@@ -960,18 +941,14 @@ class NeckChooser(Layer, KeyListener):
    #MFH - auto background scaling
    self.engine.drawImage(self.neckBG, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
 
-  
-   self.engine.view.setOrthogonalProjection(normalize = True)
+
    font = self.engine.data.font
-   
-   try:
+   with self.engine.view.orthogonalProjection(normalize = True):
      glEnable(GL_BLEND)
      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
      glEnable(GL_COLOR_MATERIAL)
      self.engine.theme.setBaseColor(1 - v)
      wrapText(font, (self.prompt_x, self.prompt_y - v), self.prompt)
-   finally:
-     self.engine.view.resetProjection()
    #==============================================================
 
     
@@ -1171,10 +1148,9 @@ class AvatarChooser(Layer, KeyListener):
     v = (1 - visibility) ** 2
     t = self.time / 100
     self.engine.view.setViewport(1,0)
-    self.engine.view.setOrthogonalProjection(normalize = True)
     w, h, = self.engine.view.geometry[2:4]
-    
-    try:
+
+    with self.engine.view.orthogonalProjection(normalize = True):
       if self.background:
         self.engine.drawImage(self.background, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 3)
       else:
@@ -1236,8 +1212,6 @@ class AvatarChooser(Layer, KeyListener):
         self.engine.drawImage(self.avText, scale = (self.engine.theme.avatarSelectTextScale, -self.engine.theme.avatarSelectTextScale), coord = (self.engine.theme.avatarSelectTextX, self.engine.theme.avatarSelectTextY - v))
       else:
         font.render(self.avatarText, (self.engine.theme.avatarSelectTextX, self.engine.theme.avatarSelectTextY - v), scale = self.engine.theme.avatarSelectTextScale)
-    finally:
-      self.engine.view.resetProjection()
     #==============================================================
 
 class PartDiffChooser(MainDialog):
@@ -1421,16 +1395,13 @@ class PartDiffChooser(MainDialog):
     self.engine.theme.partDiff.run(ticks)
   
   def render(self, visibility, topMost):
-    self.engine.view.setOrthogonalProjection(normalize = True)
     self.engine.view.setViewport(1,0)
     w, h = self.geometry
     
-    if self.img_background:
-      self.engine.drawImage(self.img_background, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 3)
-    try:
+    with self.engine.view.orthogonalProjection(normalize = True):
+      if self.img_background:
+        self.engine.drawImage(self.img_background, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 3)
       self.theme.partDiff.renderPanels(self)
-    finally:
-      self.engine.view.resetProjection()
 
 class ItemChooser(BackgroundLayer, KeyListener):
   """Item menu layer."""
@@ -1513,20 +1484,14 @@ class ItemChooser(BackgroundLayer, KeyListener):
     #MFH - auto background scaling 
     self.engine.drawImage(self.engine.data.choiceImage, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 3)
 
-      
-    self.engine.view.setOrthogonalProjection(normalize = True)
-    
-    
-    try:
+    with self.engine.view.orthogonalProjection(normalize = True):
       glEnable(GL_BLEND)
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
       glEnable(GL_COLOR_MATERIAL)
       self.engine.theme.setBaseColor(1 - v)
       #wrapText(self.font, (.1, .05 - v), self.prompt)
       wrapText(self.font, (self.posX, self.posY - v), self.prompt, scale = self.promptScale)
-    finally:
-      self.engine.view.resetProjection()
-      
+
 class ControlActivator(Layer, KeyListener):
   def __init__(self, engine, players, maxplayers = None, allowGuitar = True, allowDrum = True, allowMic = False):
     self.engine     = engine
@@ -1839,10 +1804,9 @@ class ControlActivator(Layer, KeyListener):
       descFont = self.engine.data.font
       checkFont = self.engine.data.font
     bigFont = self.engine.data.bigFont
-    self.engine.view.setOrthogonalProjection(normalize = True)
     w, h = self.engine.view.geometry[2:4]
     v = (1-visibility)**2
-    try:
+    with self.engine.view.orthogonalProjection(normalize = True):
       if self.background:
         self.engine.drawImage(self.background, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
       self.engine.theme.setBaseColor(1-v)
@@ -1889,8 +1853,6 @@ class ControlActivator(Layer, KeyListener):
           self.engine.theme.setBaseColor(self.fader)
           wText, hText = bigFont.getStringSize(self.tsReady, scale = .001)
           bigFont.render(self.tsReady, (.5-wText/2, .3), scale = .001)
-    finally:
-      self.engine.view.resetProjection()
 
 class KeyTester(Layer, KeyListener):
   """Keyboard configuration testing layer."""
@@ -2060,34 +2022,33 @@ class KeyTester(Layer, KeyListener):
     v = (1 - visibility) ** 2
     
     self.engine.view.setViewport(1,0)
-    self.engine.view.setOrthogonalProjection(normalize = True)
     font = self.engine.data.font
     w, h = self.engine.view.geometry[2:4]
-    
-    if self.controls.getState(self.keyList[Player.UP]):
-      if self.controls.getState(self.keyList[Player.LEFT]):
-        rotateArrow = math.pi/4
+
+    with self.engine.view.orthogonalProjection(normalize = True):
+      if self.controls.getState(self.keyList[Player.UP]):
+        if self.controls.getState(self.keyList[Player.LEFT]):
+          rotateArrow = math.pi/4
+        elif self.controls.getState(self.keyList[Player.RIGHT]):
+          rotateArrow = -math.pi/4
+        else:
+          rotateArrow = 0.0
+      elif self.controls.getState(self.keyList[Player.DOWN]):
+        if self.controls.getState(self.keyList[Player.LEFT]):
+          rotateArrow = 3*math.pi/4
+        elif self.controls.getState(self.keyList[Player.RIGHT]):
+          rotateArrow = -3*math.pi/4
+        else:
+          rotateArrow = math.pi
+      elif self.controls.getState(self.keyList[Player.LEFT]):
+        rotateArrow = math.pi/2
       elif self.controls.getState(self.keyList[Player.RIGHT]):
-        rotateArrow = -math.pi/4
+        rotateArrow = -math.pi/2
       else:
-        rotateArrow = 0.0
-    elif self.controls.getState(self.keyList[Player.DOWN]):
-      if self.controls.getState(self.keyList[Player.LEFT]):
-        rotateArrow = 3*math.pi/4
-      elif self.controls.getState(self.keyList[Player.RIGHT]):
-        rotateArrow = -3*math.pi/4
-      else:
-        rotateArrow = math.pi
-    elif self.controls.getState(self.keyList[Player.LEFT]):
-      rotateArrow = math.pi/2
-    elif self.controls.getState(self.keyList[Player.RIGHT]):
-      rotateArrow = -math.pi/2
-    else:
-      rotateArrow = None
-    
-    fadeScreen(v)
-          
-    try:
+        rotateArrow = None
+
+      fadeScreen(v)
+
       glEnable(GL_BLEND)
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
       glEnable(GL_COLOR_MATERIAL)
@@ -2322,10 +2283,7 @@ class KeyTester(Layer, KeyListener):
           glColor3f(.4, .4, .4)
         wText, hText = font.getStringSize(self.names[Player.DRUMBASS])
         font.render(self.names[Player.DRUMBASS], (.5-wText/2, .5 + v))
-        
-    finally:
-      self.engine.view.resetProjection()
-      
+
 def _runDialog(engine, dialog):
   """Run a dialog in a sub event loop until it is finished."""
   if not engine.running:
@@ -2524,13 +2482,12 @@ class LoadingSplashScreen(Layer, KeyListener):
   
   def render(self, visibility, topMost):
     self.engine.view.setViewport(1,0)
-    self.engine.view.setOrthogonalProjection(normalize = True)
     font = self.engine.data.loadingFont   #MFH - new font support
 
     if not font:
       return
 
-    try:
+    with self.engine.view.orthogonalProjection(normalize = True):
       v = (1 - visibility) ** 2
       fadeScreen(v)
       w, h = self.engine.view.geometry[2:4]
@@ -2552,10 +2509,7 @@ class LoadingSplashScreen(Layer, KeyListener):
           wrapCenteredText(font, (x,y), self.text, scale = self.fScale, rightMargin = self.rMargin, linespace = self.lspacing, allowshadowoffset = True, shadowoffset = (self.engine.theme.shadowoffsetx, self.engine.theme.shadowoffsety))
         else:
           wrapCenteredText(font, (x,y), self.text, scale = self.fScale, rightMargin = self.rMargin, linespace = self.lspacing)
-            
-    finally:
-      self.engine.view.resetProjection()
-    
+
 def showLoadingSplashScreen(engine, text = _("Loading...")):
   splash = LoadingSplashScreen(engine, text)
   engine.view.pushLayer(splash)

@@ -22,6 +22,8 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+from __future__ import with_statement
+
 from Scene import Scene, SuppressScene
 import os
 import time
@@ -986,14 +988,13 @@ class SongChoosingScene(Scene):
     if self.items == []:
       return
     Scene.render(self, visibility, topMost)
-    self.engine.view.setOrthogonalProjection(normalize = True)
-    self.engine.view.setViewport(1,0)
-    w, h = self.engine.view.geometry[2:4]
-    
-    if self.img_background:
-      self.engine.drawImage(self.img_background, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 3)
-    
-    try:
+    with self.engine.view.orthogonalProjection(normalize = True):
+      self.engine.view.setViewport(1,0)
+      w, h = self.engine.view.geometry[2:4]
+
+      if self.img_background:
+        self.engine.drawImage(self.img_background, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 3)
+
       if self.mode == 0:
         self.renderSetlist(visibility, topMost)
         if self.moreInfoTime > 0:
@@ -1005,5 +1006,3 @@ class SongChoosingScene(Scene):
         self.renderSpeedSelect(visibility, topMost)
       elif self.mode == 2:
         self.renderTimeSelect(visibility, topMost)
-    finally:
-      self.engine.view.resetProjection()

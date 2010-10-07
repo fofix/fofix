@@ -24,6 +24,7 @@
 from __future__ import division
 from OpenGL.GL import *
 from OpenGL.GLU import *
+from contextlib import contextmanager
 
 import numpy as np
 
@@ -199,7 +200,8 @@ class View(Task):
           if layer in self.incoming:
             self.incoming.remove(layer)
 
-  def setOrthogonalProjection(self, normalize = True, yIsDown = True):
+  @contextmanager
+  def orthogonalProjection(self, normalize = True, yIsDown = True):
     glMatrixMode(GL_PROJECTION)
     glPushMatrix()
     glLoadIdentity()
@@ -218,12 +220,14 @@ class View(Task):
     glMatrixMode(GL_MODELVIEW)
     glPushMatrix()
     glLoadIdentity()
-  
-  def resetProjection(self):
-    glMatrixMode(GL_PROJECTION)
-    glPopMatrix()
-    glMatrixMode(GL_MODELVIEW)
-    glPopMatrix()
+
+    try:
+      yield
+    finally:
+      glMatrixMode(GL_PROJECTION)
+      glPopMatrix()
+      glMatrixMode(GL_MODELVIEW)
+      glPopMatrix()
 
   def setGeometry(self, geometry, screens=1):
     self.geometry[0] = int(geometry[0])
