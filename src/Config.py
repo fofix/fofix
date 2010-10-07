@@ -48,21 +48,16 @@ class MyConfigParser(RawConfigParser):
         return self.writeController(fp)
       elif type == 2:
         return self.writePlayer(fp)
-      if self.defaults():
-        self._writeSection(fp, DEFAULTSECT, self.defaults().items())
+
       for section in sorted(self.sections()):
         if section not in ("theme", "controller", "player"):
           self._writeSection(fp, section, self.items(section))
 
   def writeController(self, fp):
-      if self.defaults():
-        self._writeSection(fp, DEFAULTSECT, self.defaults().items())
       if self.has_section('controller'):
         self._writeSection(fp, 'controller', self.items('controller'))
 
   def writePlayer(self, fp):
-      if self.defaults():
-        self._writeSection(fp, DEFAULTSECT, self.defaults().items())
       if self.has_section('player'):
         self._writeSection(fp, 'player', self.items('player'))
 
