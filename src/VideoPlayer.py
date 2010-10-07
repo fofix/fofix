@@ -55,6 +55,10 @@ from View import View, BackgroundLayer
 import Log
 from Texture import Texture
 
+FUTUREPROOF_VIDEO_CODECS = ['Theora']
+FUTUREPROOF_AUDIO_CODECS = ['Vorbis']
+FUTUREPROOF_CONTAINERS = ['Ogg']
+
 # Simple video player
 class VideoPlayer(BackgroundLayer):
   def __init__(self, framerate, vidSource, (winWidth, winHeight) = (None, None), mute = False, loop = False, startTime = None, endTime = None):
@@ -110,6 +114,24 @@ class VideoPlayer(BackgroundLayer):
   def videoDiscover(self, d, isMedia):
     self.validFile = True
     if isMedia and d.is_video:
+
+      # Warn about codecs that might not be supported in the future.
+      vcodec = d.tags.get('video-codec', '[plugin did not give a name]')
+      Log.debug('Video codec: ' + vcodec)
+      if vcodec not in FUTUREPROOF_VIDEO_CODECS:
+        Log.warn('Support for %s is not guaranteed in the future; try one of: %s' % (vcodec, ', '.join(FUTUREPROOF_VIDEO_CODECS)))
+
+      if d.is_audio:
+        acodec = d.tags.get('audio-codec', '[plugin did not give a name]')
+        Log.debug('Audio codec: ' + acodec)
+        if acodec not in FUTUREPROOF_AUDIO_CODECS:
+          Log.warn('Support for %s is not guaranteed in the future; try one of: %s' % (acodec, ', '.join(FUTUREPROOF_AUDIO_CODECS)))
+
+      container = d.tags.get('container-format', '[plugin did not give a name]')
+      Log.debug('Container format: ' + container)
+      if container not in FUTUREPROOF_CONTAINERS:
+        Log.warn('Support for %s is not guaranteed in the future; try one of: %s' % (container, ', '.join(FUTUREPROOF_CONTAINERS)))
+
       self.vidWidth, self.vidHeight = d.videowidth, d.videoheight
       # Force mute if no sound track is available or
       # else you'll get nothing but a black screen!
