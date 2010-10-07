@@ -36,9 +36,9 @@ logIniReads = 0   #MFH - INI reads disabled by default during the startup period
 logUndefinedGets = 0 
 
 class MyConfigParser(RawConfigParser):
-  def _writeSection(self, fp, sectionName, sectionDict):
+  def _writeSection(self, fp, sectionName, sectionItems):
     fp.write("[%s]\n" % sectionName)
-    for key, value in sorted(sectionDict.iteritems()):
+    for key, value in sorted(sectionItems):
       if key != "__name__":
         fp.write("%s = %s\n" % (key, str(value).replace('\n', '\n\t')))
     fp.write("\n")
@@ -48,45 +48,30 @@ class MyConfigParser(RawConfigParser):
         return self.writeController(fp)
       elif type == 2:
         return self.writePlayer(fp)
-      if self._defaults:
-        self._writeSection(fp, DEFAULTSECT, self._defaults)
-      sections = sorted(self._sections)
-      for section in sections:
-        if section == "theme":
-          continue
-        elif section == "controller":
-          continue
-        elif section == "player":
-          continue
-        self._writeSection(fp, section, self._sections[section])
-        
+      if self.defaults():
+        self._writeSection(fp, DEFAULTSECT, self.defaults().items())
+      for section in sorted(self.sections()):
+        if section not in ("theme", "controller", "player"):
+          self._writeSection(fp, section, self.items(section))
+
   def writeTheme(self, fp):
-      if self._defaults:
-        self._writeSection(fp, DEFAULTSECT, self._defaults)
-      sections = sorted(self._sections)
-      for section in sections:
-        if section != "theme":
-          continue
-        self._writeSection(fp, section, self._sections[section])
-  
+      if self.defaults():
+        self._writeSection(fp, DEFAULTSECT, self.defaults().items())
+      if self.has_section('theme'):
+        self._writeSection(fp, 'theme', self.items('theme'))
+
   def writeController(self, fp):
-      if self._defaults:
-        self._writeSection(fp, DEFAULTSECT, self._defaults)
-      sections = sorted(self._sections)
-      for section in sections:
-        if section != "controller":
-          continue
-        self._writeSection(fp, section, self._sections[section])
-  
+      if self.defaults():
+        self._writeSection(fp, DEFAULTSECT, self.defaults().items())
+      if self.has_section('controller'):
+        self._writeSection(fp, 'controller', self.items('controller'))
+
   def writePlayer(self, fp):
-      if self._defaults:
-        self._writeSection(fp, DEFAULTSECT, self._defaults)
-      sections = sorted(self._sections)
-      for section in sections:
-        if section != "player":
-          continue
-        self._writeSection(fp, section, self._sections[section])
-        
+      if self.defaults():
+        self._writeSection(fp, DEFAULTSECT, self.defaults().items())
+      if self.has_section('player'):
+        self._writeSection(fp, 'player', self.items('player'))
+
 class Option:
   """A prototype configuration key."""
   def __init__(self, **args):
