@@ -428,7 +428,7 @@ class Menu(Layer, KeyListener):
           glPushMatrix()
           glRotate(v * 45, 0, 0, 1)
 
-          scale = 0.002
+          scale = self.engine.theme.settingsmenuScale
           if self.mainMenu and self.theme < 2 and i % 2 == 1:#8bit
               scale = 0.0016
 
