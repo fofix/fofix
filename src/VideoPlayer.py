@@ -49,7 +49,7 @@ from OpenGL.GLU import *
 # Array-based drawing
 from numpy import array, float32
 
-from cmgl import *
+import cmgl
 
 from View import View, BackgroundLayer
 import Log
@@ -188,15 +188,15 @@ class VideoPlayer(BackgroundLayer):
 
     # Create a compiled OpenGL call list and do array-based drawing
     # Could have used GL_QUADS but IIRC triangles are recommended
-    self.videoList = cmglList()
+    self.videoList = cmgl.List()
     with self.videoList:
       # Draw borders where video aspect is different than specified width/height
       glColor3f(0., 0., 0.)
-      cmglDrawArrays(GL_TRIANGLE_STRIP, vertices=backVtx)
+      cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=backVtx)
       # Draw video
       glEnable(GL_TEXTURE_2D)
       glColor3f(1., 1., 1.)
-      cmglDrawArrays(GL_TRIANGLE_STRIP, vertices=videoVtx, texcoords=videoTex)
+      cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=videoVtx, texcoords=videoTex)
       glDisable(GL_TEXTURE_2D)
 
   # Setup GStreamer's pipeline

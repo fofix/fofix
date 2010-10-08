@@ -27,7 +27,7 @@ from Shader import shaders, mixColors
 
 from OpenGL.GL import *
 from numpy import array, float32
-from cmgl import *
+import cmgl
 
 #myfingershurt: needed for multi-OS file fetching
 import os
@@ -431,7 +431,7 @@ class Neck:
       glBlendFunc(GL_ONE, GL_ONE)
     if neck:
       neck.texture.bind()
-    cmglDrawArrays(GL_TRIANGLE_STRIP, vertices=self.board_vtx, colors=board_col, texcoords=board_tex)
+    cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.board_vtx, colors=board_col, texcoords=board_tex)
 
     if alpha == True:
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
@@ -604,11 +604,11 @@ class Neck:
                          [color[0],color[1],color[2], v],
                          [color[0],color[1],color[2], 0],
                          [color[0],color[1],color[2], 0]], dtype=float32)
-      cmglDrawArrays(GL_TRIANGLE_STRIP, vertices=track_vtx, colors=track_col, texcoords=track_tex)
+      cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=track_vtx, colors=track_col, texcoords=track_tex)
 
     else:   #MFH: original moving strings
 
-      cmglDrawArrays(GL_TRIANGLE_STRIP, vertices=track_vtx, colors=self.board_col, texcoords=track_tex)
+      cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=track_vtx, colors=self.board_col, texcoords=track_tex)
 
     glDisable(GL_TEXTURE_2D)
 
@@ -644,7 +644,7 @@ class Neck:
     else:
       self.sideBars.texture.bind()
 
-    cmglDrawArrays(GL_TRIANGLE_STRIP, vertices=self.sidebars_vtx, colors=self.board_col, texcoords=board_tex)
+    cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.sidebars_vtx, colors=self.board_col, texcoords=board_tex)
     
     glDisable(GL_TEXTURE_2D)
     
@@ -723,7 +723,7 @@ class Neck:
                          [1, 1, 1, v],
                          [1, 1, 1, v]], dtype=float32)
 
-      cmglDrawArrays(GL_TRIANGLE_STRIP, vertices=bpm_vtx, colors=bpm_col, texcoords=bpm_tex)
+      cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=bpm_vtx, colors=bpm_col, texcoords=bpm_tex)
 
       glPopMatrix()
 

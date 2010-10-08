@@ -68,7 +68,7 @@ cdef extern from "glwrap.h":
   void glGetIntegerv(GLenum, GLint*)
 
 
-cdef class cmglPushedMatrix(object):
+cdef class PushedMatrix(object):
   '''Context manager for a matrix push.
 
   Inside its context, the active matrix is pushed.
@@ -80,7 +80,7 @@ cdef class cmglPushedMatrix(object):
     glPopMatrix()
 
 
-cdef class cmglPushedAttrib(object):
+cdef class PushedAttrib(object):
   '''Context manager for an attribute push.
 
   Inside its context, the chosen attributes are pushed.
@@ -97,7 +97,7 @@ cdef class cmglPushedAttrib(object):
     glPopAttrib()
 
 
-cdef class cmglMatrixMode(object):
+cdef class MatrixMode(object):
   '''Context manager for switching the matrix mode.
 
   Inside its context, the chosen matrix is active.
@@ -116,7 +116,7 @@ cdef class cmglMatrixMode(object):
     glMatrixMode(self.oldmode)
 
 
-cdef class cmglPushedSpecificMatrix(object):
+cdef class PushedSpecificMatrix(object):
   '''Context manager for pushing a specific matrix.
 
   Inside its context, that matrix is pushed, but the active matrix is not changed.
@@ -141,7 +141,7 @@ cdef class cmglPushedSpecificMatrix(object):
     glMatrixMode(oldmode)
 
 
-cdef class cmglList(object):
+cdef class List(object):
   '''Abstraction of a display list.
 
   The list is automatically created and destroyed with the object.
@@ -164,7 +164,7 @@ cdef class cmglList(object):
     glCallList(self.gl_list)
 
 
-def cmglDrawArrays(GLenum mode,
+def drawArrays(GLenum mode,
                    numpy.ndarray[numpy.float32_t, ndim=2] vertices,
                    numpy.ndarray[numpy.float32_t, ndim=2] colors=None,
                    numpy.ndarray[numpy.float32_t, ndim=2] texcoords=None,

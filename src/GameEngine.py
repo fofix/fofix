@@ -61,7 +61,7 @@ import Player
 from Shader import shaders
 from Song import difficulties, parts
 
-from cmgl import *
+import cmgl
 
 class ConfigOption:
   def __init__(self, id, text):
@@ -1020,7 +1020,7 @@ class GameEngine(object):
          [texcoord[0], texcoord[3]],
          [texcoord[2], texcoord[3]]], dtype=float32)
 
-    cmglDrawArrays(GL_TRIANGLE_STRIP, vertices=triangVtx, colors=col_array, texcoords=textriangVtx)
+    cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=triangVtx, colors=col_array, texcoords=textriangVtx)
     
     if depth == True:
       glDepthMask(0)

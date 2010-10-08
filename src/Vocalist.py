@@ -30,7 +30,7 @@ from Song import VocalNote
 from OpenGL.GL import *
 from numpy import array, float32
 from random import random
-from cmgl import *
+import cmgl
 
 #stump: needed for continuous star fillup (akedrou - stealing for vocals)
 from PIL import Image, ImageDraw
@@ -408,7 +408,7 @@ class Vocalist:
                          [xEndPos,                      yEndPos  +self.vocalLaneSize, 0],
                          [xStartPos,                    yStartPos+self.vocalLaneSize, 0]],
                            dtype=float32)
-    cmglDrawArrays(GL_QUADS, vertices=vertexArray, colors=colorArray)
+    cmgl.drawArrays(GL_QUADS, vertices=vertexArray, colors=colorArray)
   
   def coOpRescue(self, pos):
     self.coOpRestart = True #initializes Restart Timer

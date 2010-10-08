@@ -21,7 +21,7 @@
 #####################################################################
 from OpenGL.GL import *
 try:
-  from cmgl import *
+  import cmgl
   cmgl_support = True
 except ImportError:
   cmgl_support = False
@@ -135,8 +135,8 @@ def drawDirect():
     glEnd()
 
 def drawCmgl():
-    cmglDrawArrays(GL_TRIANGLES, vertices=triangVtx, colors=triangCol)
-    cmglDrawArrays(GL_TRIANGLE_STRIP, vertices=spiralVtx, colors=spiralCol)
+    cmgl.drawArrays(GL_TRIANGLES, vertices=triangVtx, colors=triangCol)
+    cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=spiralVtx, colors=spiralCol)
 
 def drawArray():
     # Draw triangle

@@ -36,7 +36,7 @@ from numpy import array, float32
 from View import View, BackgroundLayer
 import Log
 
-from cmgl import *
+import cmgl
 
 # Simple animation player
 class AnimationPlayer(BackgroundLayer):
@@ -168,11 +168,11 @@ class AnimationPlayer(BackgroundLayer):
     
     # Create a compiled OpenGL call list and do array-based drawing
     # Could have used GL_QUADS but IIRC triangles are recommended
-    self.animList = cmglList()
+    self.animList = cmgl.List()
     with self.animList:
       glEnable(GL_TEXTURE_2D)
       glColor3f(1., 1., 1.)
-      cmglDrawArrays(GL_TRIANGLE_STRIP, vertices=animVtx, texcoords=texCoord)
+      cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=animVtx, texcoords=texCoord)
       glDisable(GL_TEXTURE_2D)
 
   def shown(self):
