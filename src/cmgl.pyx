@@ -14,13 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-##@package cmgl
-# cmgl - context-managed OpenGL for Python
-#
-# Yet another Python binding for OpenGL; this one is in the form of
-# extension modules for maximum efficiency and uses context managers
-# (that is, support for Python 2.5+'s "with" statement) wherever it
-# makes sense, and even some places where it doesn't...
+'''
+cmgl - context-managed OpenGL for Python
+
+Yet another Python binding for OpenGL; this one is in the form of
+extension modules for maximum efficiency and uses context managers
+(that is, support for Python 2.5+'s "with" statement) wherever it
+makes sense, and even some places where it doesn't...
+'''
 
 import numpy
 cimport numpy
@@ -66,19 +67,25 @@ cdef extern from "glwrap.h":
   void glMatrixMode(GLenum)
   void glGetIntegerv(GLenum, GLint*)
 
-## Context manager for a matrix push.
-# Inside its context, the active matrix is pushed.
-# It is popped upon leaving the context.
+
 cdef class cmglPushedMatrix(object):
+  '''Context manager for a matrix push.
+
+  Inside its context, the active matrix is pushed.
+  It is popped upon leaving the context.'''
+
   def __enter__(self):
     glPushMatrix()
   def __exit__(self, etype, evalue, tb):
     glPopMatrix()
 
-## Context manager for an attribute push.
-# Inside its context, the chosen attributes are pushed.
-# They are popped upon leaving the context.
+
 cdef class cmglPushedAttrib(object):
+  '''Context manager for an attribute push.
+
+  Inside its context, the chosen attributes are pushed.
+  They are popped upon leaving the context.'''
+
   cdef GLbitfield gl_mask
 
   def __cinit__(self, GLbitfield mask):
@@ -89,10 +96,13 @@ cdef class cmglPushedAttrib(object):
   def __exit__(self, etype, evalue, tb):
     glPopAttrib()
 
-## Context manager for switching the matrix mode.
-# Inside its context, the chosen matrix is active.
-# It is restored to its original value upon leaving the context.
+
 cdef class cmglMatrixMode(object):
+  '''Context manager for switching the matrix mode.
+
+  Inside its context, the chosen matrix is active.
+  It is restored to its original value upon leaving the context.'''
+
   cdef GLenum oldmode
   cdef GLenum newmode
 
@@ -105,10 +115,13 @@ cdef class cmglMatrixMode(object):
   def __exit__(self, etype, evalue, tb):
     glMatrixMode(self.oldmode)
 
-## Context manager for pushing a specific matrix.
-# Inside its context, that matrix is pushed, but the active matrix is not changed.
-# It is popped upon leaving the context.
+
 cdef class cmglPushedSpecificMatrix(object):
+  '''Context manager for pushing a specific matrix.
+
+  Inside its context, that matrix is pushed, but the active matrix is not changed.
+  It is popped upon leaving the context.'''
+
   cdef GLenum gl_mode
 
   def __cinit__(self, GLenum mode):
@@ -127,12 +140,14 @@ cdef class cmglPushedSpecificMatrix(object):
     glPopMatrix()
     glMatrixMode(oldmode)
 
-## Abstraction of a display list.
-#
-# The list is automatically created and destroyed with the object.
-# To compile operations into the list, enter the list's context.
-# To call the list, call the object.
+
 cdef class cmglList(object):
+  '''Abstraction of a display list.
+
+  The list is automatically created and destroyed with the object.
+  To compile operations into the list, enter the list's context.
+  To call the list, call the object.'''
+
   cdef GLuint gl_list
 
   def __cinit__(self):
@@ -148,12 +163,14 @@ cdef class cmglList(object):
   def __call__(self):
     glCallList(self.gl_list)
 
-## Wrapper for drawing from an arbitrary set of numpy arrays.
+
 def cmglDrawArrays(GLenum mode,
                    numpy.ndarray[numpy.float32_t, ndim=2] vertices,
                    numpy.ndarray[numpy.float32_t, ndim=2] colors=None,
                    numpy.ndarray[numpy.float32_t, ndim=2] texcoords=None,
                    numpy.ndarray[numpy.float32_t, ndim=2] normals=None):
+  '''Perform a glDrawArrays call with the given set of numpy arrays.'''
+
   try:
     glEnableClientState(GL_VERTEX_ARRAY)
     glVertexPointer(vertices.shape[1], GL_FLOAT, 0, vertices.data)
