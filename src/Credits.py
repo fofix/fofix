@@ -22,6 +22,8 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+from __future__ import with_statement
+
 import pygame
 import OpenGL
 from OpenGL.GL import *
@@ -376,18 +378,17 @@ class Credits(Layer, KeyListener):
     t = self.time / 100 + 34
     w, h = self.engine.view.geometry[2:4]
     
-    self.engine.view.setOrthogonalProjection(normalize = True)
-    if self.background:
-      self.engine.drawImage(self.background, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
-    else:
-      Dialogs.fadeScreen(.4)
-    font = self.engine.data.font
-    self.doneList = []
+    with self.engine.view.orthogonalProjection(normalize = True):
+      if self.background:
+        self.engine.drawImage(self.background, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
+      else:
+        Dialogs.fadeScreen(.4)
+      font = self.engine.data.font
+      self.doneList = []
 
-    # render the scroller elements
-    y = self.offset
-    glTranslatef(-(1 - v), 0, 0)
-    try:
+      # render the scroller elements
+      y = self.offset
+      glTranslatef(-(1 - v), 0, 0)
       for element in self.credits:
         hE = element.getHeight()
         if y + hE > 0.0 and y < 1.0:
@@ -403,5 +404,3 @@ class Credits(Layer, KeyListener):
         if hPos < h * .6:
           hPos = h * .6
         self.engine.drawImage(self.topLayer, scale = (wFactor,-wFactor), coord = (w/2,hPos))
-    finally:
-      self.engine.view.resetProjection()

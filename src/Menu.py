@@ -22,6 +22,8 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+from __future__ import with_statement
+
 import pygame
 from OpenGL.GL import *
 import math
@@ -388,8 +390,7 @@ class Menu(Layer, KeyListener):
     else:
       self.engine.graphicMenuShown = False
     
-    self.engine.view.setOrthogonalProjection(normalize = True)
-    try:
+    with self.engine.view.orthogonalProjection(normalize = True):
       v = (1 - visibility) ** 2
       # Default to this font if none was specified
 
@@ -427,7 +428,7 @@ class Menu(Layer, KeyListener):
           glPushMatrix()
           glRotate(v * 45, 0, 0, 1)
 
-          scale = 0.002
+          scale = self.engine.theme.settingsmenuScale
           if self.mainMenu and self.theme < 2 and i % 2 == 1:#8bit
               scale = 0.0016
 
@@ -505,7 +506,3 @@ class Menu(Layer, KeyListener):
           else:
             y += h
           glPopMatrix()
-    
-    
-    finally:
-      self.engine.view.resetProjection()

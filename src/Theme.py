@@ -277,6 +277,9 @@ class Theme(Task):
       self.main_menu_vspacingVar = get("main_menu_vspacing", float, .09)
       self.use_solo_submenu      = get("use_solo_submenu",   bool, True)
 
+      #Settings option scale
+      self.settingsmenuScale = get("settings_menu_scale",    float, 0.002)
+
       #loading Parameters
       self.loadingX = get("loading_x", float, 0.5)
       self.loadingY = get("loading_y", float, 0.6)

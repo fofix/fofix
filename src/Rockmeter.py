@@ -21,6 +21,8 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+from __future__ import with_statement
+
 import Config
 import os
 
@@ -632,8 +634,7 @@ class Rockmeter:
   def render(self, visibility):
     self.updateTime()
 
-    self.engine.view.setOrthogonalProjection(normalize = True)
-    try:
+    with self.engine.view.orthogonalProjection(normalize = True):
       for i,player in enumerate(self.scene.playerList):
         p = player.number
         self.updateVars(p)
@@ -647,7 +648,3 @@ class Rockmeter:
       self.engine.view.setViewportHalf(1,0)
       for layer in self.sharedlayers:
         layer.render(visibility, 0)
-
-    finally:
-      self.engine.view.resetProjection()
-

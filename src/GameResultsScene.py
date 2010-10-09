@@ -27,6 +27,8 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+from __future__ import with_statement
+
 from Scene import Scene, SuppressScene
 import Scorekeeper
 import Dialogs
@@ -794,23 +796,21 @@ class GameResultsScene(Scene):
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     glEnable(GL_COLOR_MATERIAL)
     
-    self.engine.view.setOrthogonalProjection(normalize = True)
-    
-    try:
-      if self.detailedScores:
-        self.renderStats(visibility, topMost)
-      else:
-        if self.coOpType > 0:
-          self.renderInitialCoOpScore(visibility, topMost)
+    with self.engine.view.orthogonalProjection(normalize = True):
+      try:
+        if self.detailedScores:
+          self.renderStats(visibility, topMost)
         else:
-          self.renderInitialScore(visibility, topMost)
-        if self.resultStep > 0:
-          self.renderCheatList(visibility, topMost)
-        if self.resultStep > 2:
-          self.renderHighScores(visibility, topMost)
-    finally:
-      self.engine.view.setViewport(1,0)
-      self.engine.view.resetProjection()
+          if self.coOpType > 0:
+            self.renderInitialCoOpScore(visibility, topMost)
+          else:
+            self.renderInitialScore(visibility, topMost)
+          if self.resultStep > 0:
+            self.renderCheatList(visibility, topMost)
+          if self.resultStep > 2:
+            self.renderHighScores(visibility, topMost)
+      finally:
+        self.engine.view.setViewport(1,0)
   
   def renderInitialScore(self, visibility, topMost):
     bigFont = self.engine.data.bigFont
