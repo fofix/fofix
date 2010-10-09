@@ -33,7 +33,7 @@ from OpenGL.GLU import *
 # Array-based drawing
 from numpy import array, float32
 
-from View import View, BackgroundLayer
+from View import BackgroundLayer
 import Log
 
 import cmgl
@@ -54,8 +54,7 @@ class AnimationPlayer(BackgroundLayer):
       self.winWidth, self.winHeight = winWidth, winHeight
     else: # default
       self.winWidth, self.winHeight = (640, 480)
-      Log.warning("AnimationPlayer: No resolution specified (default %dx%d)",
-                  self.winWidth, self.winHeight)
+      Log.warn("AnimationPlayer: No resolution specified (640, 480)")
     self.fps = framerate
     self.paused = False
     self.finished = False

@@ -2,6 +2,10 @@
 *.so
 *.exe
 *.dll
+.project
+.pydevproject
+.settings
+src/html
 doc/epydoc
 src/*.ini
 src/*.log

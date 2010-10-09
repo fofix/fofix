@@ -27,20 +27,11 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-from Song import Note, Tempo
 from Mesh import Mesh
 from Neck import Neck
 import random
 from copy import deepcopy
 from Shader import shaders
-
-from OpenGL.GL import *
-import math
-
-#myfingershurt: needed for multi-OS file fetching
-import os
-import Log
-import Song   #need the base song defines as well
 
 from Instrument import *
 
@@ -1341,318 +1332,85 @@ class Guitar(Instrument):
     size = (.22, .22)
     v = 1.0 - visibility
 
+    if self.disableFlameSFX != True:
+      flameLimit = 10.0
+      flameLimitHalf = round(flameLimit/2.0)
+      for fretNum in range(self.strings):
+        if controls.getState(self.keys[fretNum]) or controls.getState(self.keys[fretNum+5]):
 
-    flameLimit = 10.0
-    flameLimitHalf = round(flameLimit/2.0)
-    for fretNum in range(self.strings):
-      if controls.getState(self.keys[fretNum]) or controls.getState(self.keys[fretNum+5]):
-
-        if self.freestyleHitFlameCounts[fretNum] < flameLimit:
-          ms = math.sin(self.time) * .25 + 1
+          if self.freestyleHitFlameCounts[fretNum] < flameLimit:
+            ms = math.sin(self.time) * .25 + 1
   
-          x  = (self.strings / 2 - fretNum) * w
+            x  = (self.strings / 2 - fretNum) * w
   
-          ff = 1 + 0.25       
-          y = v + ff / 6
+            ff = 1 + 0.25       
+            y = v + ff / 6
   
-          if self.theme == 2:
-            y -= 0.5
-          
-          #flameSize = self.flameSizes[self.scoreMultiplier - 1][fretNum]
-          flameSize = self.flameSizes[self.cappedScoreMult - 1][fretNum]
-          if self.theme == 0 or self.theme == 1: #THIS SETS UP GH3 COLOR, ELSE ROCKBAND(which is DEFAULT in Theme.py)
-            flameColor = self.gh3flameColor
-          else: #MFH - fixing crash!
-            #try:
-            #  flameColor = self.flameColors[self.scoreMultiplier - 1][fretNum]
-            #except IndexError:
-            flameColor = self.fretColors[fretNum]
-          if flameColor[0] == -2:
-            flameColor = self.fretColors[fretNum]
-          
-          ff += 1.5 #ff first time is 2.75 after this
+            if self.theme == 2:
+              y -= 0.5
+            
+            #flameSize = self.flameSizes[self.scoreMultiplier - 1][fretNum]
+            flameSize = self.flameSizes[self.cappedScoreMult - 1][fretNum]
+            if self.theme == 0 or self.theme == 1: #THIS SETS UP GH3 COLOR, ELSE ROCKBAND(which is DEFAULT in Theme.py)
+              flameColor = self.gh3flameColor
+            else: #MFH - fixing crash!
+              #try:
+              #  flameColor = self.flameColors[self.scoreMultiplier - 1][fretNum]
+              #except IndexError:
+              flameColor = self.fretColors[fretNum]
+            if flameColor[0] == -2:
+              flameColor = self.fretColors[fretNum]
+            
+            ff += 1.5 #ff first time is 2.75 after this
   
-          if self.freestyleHitFlameCounts[fretNum] < flameLimitHalf:
-            flamecol = tuple([flameColor[ifc] for ifc in range(3)])
-            rbStarColor = (.1, .1, .2, .3)
-            xOffset = (.0, - .005, .005, .0)
-            yOffset = (.20, .255, .255, .255)
-            scaleMod = .6 * ms * ff
-            scaleFix = (6.0, 5.5, 5.0, 4.7)
-            for step in range(4):
-              if self.starPowerActive and self.theme < 2:
-                flamecol = self.spColor
-              else: #Default starcolor (Rockband)
-                flamecol = (rbStarColor[step],)*3
-              hfCount = self.freestyleHitFlameCounts[fretNum]
-              if step == 0:
-                hfCount += 1
-              if self.disableFlameSFX != True:
+            if self.freestyleHitFlameCounts[fretNum] < flameLimitHalf:
+              flamecol = tuple([flameColor[ifc] for ifc in range(3)])
+              rbStarColor = (.1, .1, .2, .3)
+              xOffset = (.0, - .005, .005, .0)
+              yOffset = (.20, .255, .255, .255)
+              scaleMod = .6 * ms * ff
+              scaleFix = (6.0, 5.5, 5.0, 4.7)
+              for step in range(4):
+                if self.starPowerActive and self.theme < 2:
+                  flamecol = self.spColor
+                else: #Default starcolor (Rockband)
+                  flamecol = (rbStarColor[step],)*3
+                hfCount = self.freestyleHitFlameCounts[fretNum]
+                if step == 0:
+                  hfCount += 1
                 self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x+xOffset[step], y+yOffset[step], 0), rot = (90, 1, 0, 0),
                                     scale = (.25 + .05 * step + scaleMod, hfCount/scaleFix[step] + scaleMod, hfCount/scaleFix[step] + scaleMod),
                                     vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
                                     texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)
-          
-          else:
-            flameColorMod = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
-            flamecol = tuple([flameColor[ifc]*flameColorMod for ifc in range(3)])
-            xOffset = (.0, - .005, .005, .005)
-            yOffset = (.35, .405, .355, .355)
-            scaleMod = .6 * ms * ff
-            scaleFix = (3.0, 2.5, 2.0, 1.7)
-            for step in range(4):
-              hfCount = self.freestyleHitFlameCounts[fretNum]
-              if step == 0:
-                hfCount += 1
-              else:  
-                if self.starPowerActive and self.theme < 2:
-                  flamecol = self.spColor
-                else: #Default starcolor (Rockband)
-                  flamecol = (.4+.1*step,)*3
-              if self.disableFlameSFX != True:
+            
+            else:
+              flameColorMod = 0.1 * (flameLimit - self.freestyleHitFlameCounts[fretNum])
+              flamecol = tuple([flameColor[ifc]*flameColorMod for ifc in range(3)])
+              xOffset = (.0, - .005, .005, .005)
+              yOffset = (.35, .405, .355, .355)
+              scaleMod = .6 * ms * ff
+              scaleFix = (3.0, 2.5, 2.0, 1.7)
+              for step in range(4):
+                hfCount = self.freestyleHitFlameCounts[fretNum]
+                if step == 0:
+                  hfCount += 1
+                else:  
+                  if self.starPowerActive and self.theme < 2:
+                    flamecol = self.spColor
+                  else: #Default starcolor (Rockband)
+                    flamecol = (.4+.1*step,)*3
+                
                 self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x+xOffset[step], y+yOffset[step], 0), rot = (90, 1, 0, 0),
                                     scale = (.25 + .05 * step + scaleMod, hfCount/scaleFix[step] + scaleMod, hfCount/scaleFix[step] + scaleMod),
                                     vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
                                     texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)            
 
-          self.freestyleHitFlameCounts[fretNum] += 1
-      
-        else:   #MFH - flame count is done - reset it!
-          self.freestyleHitFlameCounts[fretNum] = 0    #MFH
-
-
-  def renderFlames(self, visibility, song, pos, controls):
-    if not song or self.flameColors[0][0][0] == -1:
-      return
-
-    w = self.boardWidth / self.strings
-    track = song.track[self.player]
-
-    size = (.22, .22)
-    v = 1.0 - visibility
-
-    if (self.HCountAni == True and self.HCount2 > 12):
-      for n in range(self.strings):
-        f = self.fretWeight[n]
-        c = self.fretColors[n]
-        if f and (controls.getState(self.actions[0]) or controls.getState(self.actions[1])):
-          f += 0.25      
-        y = v + f / 6
-        x = (self.strings / 2 - n) * w
-        f = self.fretActivity[n]
-
-        if f:
-          ms = math.sin(self.time) * .25 + 1
-          ff = f
-          ff += 1.2
-          
-          
-          #myfingershurt: need to cap flameSizes use of scoreMultiplier to 4x, the 5x and 6x bass groove mults cause crash:
-          self.cappedScoreMult = min(self.scoreMultiplier,4)
-
-          flameSize = self.flameSizes[self.cappedScoreMult - 1][n]
-          if self.theme == 0 or self.theme == 1: #THIS SETS UP GH3 COLOR, ELSE ROCKBAND(which is DEFAULT in Theme.py)
-            flameColor = self.gh3flameColor
-          else:
-            flameColor = self.flameColors[self.cappedScoreMult - 1][n]
-
-          flameColorMod = (1.19, 1.97, 10.59)
-          flamecol = tuple([flameColor[ifc]*flameColorMod[ifc] for ifc in range(3)])
-
-          if self.starPowerActive:
-            if self.theme == 0 or self.theme == 1: #GH3 starcolor
-              flamecol = self.spColor
-            else: #Default starcolor (Rockband)
-              flamecol = (.9,.9,.9)
-              
-          if self.Hitanim != True and self.disableFlameSFX != True:
-            self.engine.draw3Dtex(self.hitglowDrawing, coord = (x, y + .125, 0), rot = (90, 1, 0, 0),
-                                  scale = (0.5 + .6 * ms * ff, 1.5 + .6 * ms * ff, 1 + .6 * ms * ff),
-                                  vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
-                                  texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)
-            #Alarian: Animated hitflames
-          else:
-            self.HCount = self.HCount + 1
-            if self.HCount > self.Animspeed-1:
-              self.HCount = 0
-            HIndex = (self.HCount * 16 - (self.HCount * 16) % self.Animspeed) / self.Animspeed
-            if HIndex > 15:
-              HIndex = 0
-            texX = (HIndex*(1/16.0), HIndex*(1/16.0)+(1/16.0))
-            if self.disableFlameSFX != True:
-              self.engine.draw3Dtex(self.hitglowAnim, coord = (x, y + .225, 0), rot = (90, 1, 0, 0), scale = (2.4, 1, 3.3),
-                                    vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
-                                    texcoord = (texX[0],0.0,texX[1],1.0), multiples = True, alpha = True, color = (1,1,1))
-
-          ff += .3
-          
-          flameColorMod = (1.19, 1.78, 12.22)
-          flamecol = tuple([flameColor[ifc]*flameColorMod[ifc] for ifc in range(3)])
-
-          if self.starPowerActive:
-            if self.theme == 0 or self.theme == 1: #GH3 starcolor
-              flamecol = self.spColor
-            else: #Default starcolor (Rockband)
-              flamecol = (.8,.8,.8)
-
-          if self.Hitanim != True and self.disableFlameSFX != True:
-            self.engine.draw3Dtex(self.hitglow2Drawing, coord = (x, y + .25, .05), rot = (90, 1, 0, 0),
-                                  scale = (.40 + .6 * ms * ff, 1.5 + .6 * ms * ff, 1 + .6 * ms * ff),
-                                  vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
-                                  texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)
-
-    
-    flameLimit = 10.0
-    flameLimitHalf = round(flameLimit/2.0)
-    renderedNotes = self.getRequiredNotesForRender(song,pos)
-    for time, event in renderedNotes:
-      if isinstance(event, Tempo):
-        continue
-      
-      if not isinstance(event, Note):
-        continue
-      
-      if (event.played or event.hopod) and event.flameCount < flameLimit:
-        ms = math.sin(self.time) * .25 + 1
-        x  = (self.strings / 2 - event.number) * w
-        xlightning = (self.strings / 2 - event.number)*2.2*w
-        ff = 1 + 0.25       
-        y = v + ff / 6
-
-        if self.theme == 2:
-          y -= 0.5
+            self.freestyleHitFlameCounts[fretNum] += 1
         
-        flameSize = self.flameSizes[self.cappedScoreMult - 1][event.number]
-        if self.theme == 0 or self.theme == 1: #THIS SETS UP GH3 COLOR, ELSE ROCKBAND(which is DEFAULT in Theme.py)
-          flameColor = self.gh3flameColor
-        else:
-          flameColor = self.flameColors[self.cappedScoreMult - 1][event.number]
-        if flameColor[0] == -2:
-          flameColor = self.fretColors[event.number]
+          else:   #MFH - flame count is done - reset it!
+            self.freestyleHitFlameCounts[fretNum] = 0    #MFH
+
         
-        ff += 1.5 #ff first time is 2.75 after this
-
-        if self.Hitanim2 == True:
-          self.HCount2 = self.HCount2 + 1
-          self.HCountAni = False
-          if self.HCount2 > 12:
-            if not event.length > (1.4 * (60000.0 / event.noteBpm) / 4):
-              self.HCount2 = 0
-            else:
-              self.HCountAni = True
-          if event.flameCount < flameLimitHalf:
-
-                
-              HIndex = (self.HCount2 * 13 - (self.HCount2 * 13) % 13) / 13
-              if HIndex > 12 and self.HCountAni != True:
-                HIndex = 0
-                
-              texX = (HIndex*(1/13.0), HIndex*(1/13.0)+(1/13.0))
-              if self.disableFlameSFX != True:
-                self.engine.draw3Dtex(self.hitflamesAnim, coord = (x, y + .665, 0), rot = (90, 1, 0, 0), scale = (1.6, 1.6, 4.9),
-                                      vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
-                                      texcoord = (texX[0],0.0,texX[1],1.0), multiples = True, alpha = True, color = (1,1,1))
-
-          else:
-            flameColorMod = 0.1 * (flameLimit - event.flameCount)
-            flamecol = tuple([ifc*flameColorMod for ifc in flameColor])
-            scaleChange = (3.0,2.5,2.0,1.7)
-            yOffset = (.35, .405, .355, .355)
-            vtx = flameSize * ff
-            scaleMod = .6 * ms * ff
-
-            for step in range(4):
-              #draw lightning in GH themes on SP gain
-              if step == 0 and self.theme != 2 and event.finalStar and self.spEnabled and self.disableFlameSFX != True:
-                self.engine.draw3Dtex(self.hitlightning, coord = (xlightning, y, 3.3), rot = (90, 1, 0, 0),
-                                      scale = (.15 + .5 * ms * ff, event.flameCount / 3.0 + .6 * ms * ff, 2), vertex = (.4,-2,-.4,2),
-                                      texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = (1,1,1))
-                continue
-            
-              if step == 0:
-                yzscaleMod = event.flameCount/ scaleChange[step]
-              else:
-                yzscaleMod = (event.flameCount + 1)/ scaleChange[step]
-                
-              if self.starPowerActive:
-                if self.theme == 0 or self.theme == 1: 
-                  spcolmod = .7+step*.1
-                  flamecol = tuple([isp*spcolmod for isp in self.spColor])
-                else:
-                  flamecol = (.4+step*.1,)*3#Default starcolor (Rockband)
-              
-              if self.hitFlamesPresent == True and self.disableFlameSFX != True:
-                self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x - .005, y + yOffset[step], 0), rot = (90, 1, 0, 0),
-                              scale = (.25 + step*.05 + scaleMod, yzscaleMod + scaleMod, yzscaleMod + scaleMod),
-                              vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
-                              multiples = True, alpha = True, color = flamecol)
-                                  
-        elif self.hitFlamesPresent == True and self.Hitanim2 == False:
-          self.HCount2 = 13
-          self.HCountAni = True
-          if event.flameCount < flameLimitHalf:
-          
-            flamecol = flameColor
-            if self.starPowerActive:
-              if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                spcolmod = .3
-                flamecol = tuple([isp*spcolmod for isp in self.spColor])
-              else: #Default starcolor (Rockband)
-                flamecol = (.1,.1,.1)
-            if self.disableFlameSFX != True:  
-              self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x, y + .20, 0), rot = (90, 1, 0, 0),
-                                      scale = (.25 + .6 * ms * ff, event.flameCount/6.0 + .6 * ms * ff, event.flameCount / 6.0 + .6 * ms * ff),
-                                      vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff), texcoord = (0.0,0.0,1.0,1.0),
-                                      multiples = True, alpha = True, color = flamecol)
-            
-                 
-            for i in range(3):
-              if self.starPowerActive:
-                if self.theme == 0 or self.theme == 1: #GH3 starcolor
-                  spcolmod = 0.4+i*0.1
-                  flamecol = tuple([isp*spcolmod for isp in self.spColor])
-                else: #Default starcolor (Rockband)
-                  flamecol = (0.1+i*0.1,)*3
-              if self.disableFlameSFX != True:
-                self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x-.005, y + .255, 0), rot = (90, 1, 0, 0),
-                                      scale = (.30 + i*0.05 + .6 * ms * ff, event.flameCount/(5.5 - i*0.4) + .6 * ms * ff, event.flameCount / (5.5 - i*0.4) + .6 * ms * ff),
-                                      vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff), texcoord = (0.0,0.0,1.0,1.0),
-                                      multiples = True, alpha = True, color = flamecol)
-
-          else:
-            flameColorMod = 0.1 * (flameLimit - event.flameCount)
-            flamecol = tuple([ifc*flameColorMod for ifc in flameColor])
-            scaleChange = (3.0,2.5,2.0,1.7)
-            yOffset = (.35, .405, .355, .355)
-            vtx = flameSize * ff
-            scaleMod = .6 * ms * ff
-
-            for step in range(4):
-              #draw lightning in GH themes on SP gain
-              if step == 0 and self.theme != 2 and event.finalStar and self.spEnabled:
-                self.engine.draw3Dtex(self.hitlightning, coord = (xlightning, y, 3.3), rot = (90, 1, 0, 0),
-                                    scale = (.15 + .5 * ms * ff, event.flameCount / 3.0 + .6 * ms * ff, 2), vertex = (.4,-2,-.4,2),
-                                    texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = (1,1,1))
-                continue
-            
-              if step == 0:
-                yzscaleMod = event.flameCount/ scaleChange[step]
-              else:
-                yzscaleMod = (event.flameCount + 1)/ scaleChange[step]
-                
-              if self.starPowerActive:
-                if self.theme == 0 or self.theme == 1: 
-                  spcolmod = .7+step*.1
-                  flamecol = tuple([isp*spcolmod for isp in self.spColor])
-                else:
-                  flamecol = (.4+step*.1,)*3#Default starcolor (Rockband)
-              if self.disableFlameSFX != True:
-                self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x - .005, y + yOffset[step], 0), rot = (90, 1, 0, 0),
-                                scale = (.25 + step*.05 + scaleMod, yzscaleMod + scaleMod, yzscaleMod + scaleMod),
-                                vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
-                                multiples = True, alpha = True, color = flamecol)
-        event.flameCount += 1
-      
   def render(self, visibility, song, pos, controls, killswitch):
   
     if shaders.turnon:
@@ -1719,8 +1477,9 @@ class Guitar(Instrument):
         glScalef(-1, 1, 1)
 
       if self.freestyleActive:
-        self.renderTails(visibility, song, pos, killswitch)
-        self.renderNotes(visibility, song, pos, killswitch)
+        #blazingamer - why render the notes if the freestyle lanes are just going to be drawn on top of them
+        #self.renderTails(visibility, song, pos, killswitch)
+        #self.renderNotes(visibility, song, pos, killswitch)
         self.renderFreestyleLanes(visibility, song, pos) #MFH - render the lanes on top of the notes.
         self.renderFrets(visibility, song, controls)
 
@@ -1744,6 +1503,7 @@ class Guitar(Instrument):
 
         
         if self.hitFlamesPresent:   #MFH - only if present!
+          self.renderHitTrails(visibility, song, pos, controls)
           self.renderFlames(visibility, song, pos, controls)    #MFH - only when freestyle inactive!
         
       if self.leftyMode:
