@@ -26,7 +26,7 @@ from OpenGL.GL import *
 import cmgl
 import sys
 from Texture import Texture
-from numpy import zeros, float32
+from numpy.core import zeros, float32
 
 DEFAULT_SCALE = 0.002
 

@@ -32,7 +32,7 @@ from OpenGL.GL import *
 from OpenGL import __version__ as OpenGLVersion
 import numpy
 from PIL import Image
-from numpy import array, float32
+from numpy.core import array, float32
 import pygame
 import gc
 import os

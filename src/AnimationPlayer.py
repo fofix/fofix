@@ -31,7 +31,7 @@ from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 # Array-based drawing
-from numpy import array, float32
+from numpy.core import array, float32
 
 from View import BackgroundLayer
 import Log

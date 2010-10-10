@@ -28,7 +28,7 @@ from Language import _
 from Microphone import Microphone
 from Song import VocalNote
 from OpenGL.GL import *
-from numpy import array, float32
+from numpy.core import array, float32
 from random import random
 import cmgl
 
