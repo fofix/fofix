@@ -386,7 +386,7 @@ class Instrument:
       themepath = os.path.join(themepath, "bass")
           
     if self.engine.fileExists(os.path.join(themepath, file)):
-      print themepath + " exists!"
+      Log.debug(themepath + " exists!")
       return os.path.join(themepath, file)
     else:
       return os.path.join(defaultpath, file)

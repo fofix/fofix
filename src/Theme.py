@@ -87,10 +87,10 @@ class Theme(Task):
       if os.path.exists(os.path.join(self.themePath, "theme.ini")):
         self.config = Config.MyConfigParser()
         self.config.read(os.path.join(self.themePath, "theme.ini"))
-        print "theme.ini loaded"
+        Log.debug("theme.ini loaded")
       else:
         self.config = None
-        print "no theme.ini"
+        Log.debug("no theme.ini")
       config = self.config
     
       def get(value, type = str, default = None):
