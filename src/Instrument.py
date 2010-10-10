@@ -791,7 +791,7 @@ class Instrument:
 
             for step in range(4):
               #draw lightning in GH themes on SP gain
-              if step == 0 and event.finalStar and self.spEnabled:
+              if step == 0 and event.finalStar and self.spEnabled and self.hitlightning:
                 self.engine.draw3Dtex(self.hitlightning, coord = (xlightning, y, 3.3), rot = (90, 1, 0, 0),
                                     scale = (.15 + .5 * ms * ff, event.flameCount / 3.0 + .6 * ms * ff, 2), vertex = (.4,-2,-.4,2),
                                     texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = (1,1,1))
