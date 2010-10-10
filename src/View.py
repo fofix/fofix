@@ -23,7 +23,6 @@
 
 from __future__ import division
 from OpenGL.GL import *
-from OpenGL.GLU import *
 from contextlib import contextmanager
 
 import numpy as np

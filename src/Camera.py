@@ -19,8 +19,9 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,        #
 # MA  02110-1301, USA.                                              #
 #####################################################################
+from OpenGL.GLU import gluLookAt
 
-from OpenGL.GLU import *
+
 
 class Camera:
   def __init__(self):

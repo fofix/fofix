@@ -32,7 +32,6 @@ import Dialogs
 import Song
 import Config
 import pygame
-from OpenGL.GL import *
 import Version
 from Menu import Menu
 from Settings import ConfigChoice, ActiveConfigChoice

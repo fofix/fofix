@@ -23,7 +23,6 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-from OpenGL.GL import *
 
 from View import BackgroundLayer
 from Menu import Menu

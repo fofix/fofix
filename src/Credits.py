@@ -25,9 +25,7 @@
 from __future__ import with_statement
 
 import pygame
-import OpenGL
-from OpenGL.GL import *
-from OpenGL.GLU import *
+from OpenGL.GL import OpenGL, glColor4f, glTranslatef
 #evilynux: needed for multi-OS file fetching
 import os
 

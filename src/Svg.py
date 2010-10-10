@@ -25,7 +25,7 @@ from __future__ import with_statement
 from OpenGL.GL import *
 
 import numpy as np
-from numpy.core import array, float32
+from numpy.core import float32
 import math
 import cmgl
 

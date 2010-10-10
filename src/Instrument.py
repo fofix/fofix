@@ -21,16 +21,15 @@
 #####################################################################
 
 
-from OpenGL.GL import *
+
 
 #myfingershurt: needed for multi-OS file fetching
-import os
-import Log
-
-import math
-
 from Song import Note, Tempo
-import Song   #need the base song defines as well
+import Log
+import math
+import os
+
+
 
 class Instrument:
   def __init__(self, engine, playerObj, player = 0):

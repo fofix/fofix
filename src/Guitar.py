@@ -34,6 +34,8 @@ from copy import deepcopy
 from Shader import shaders
 
 from Instrument import *
+from OpenGL.GL import *
+import Song
 
 class Guitar(Instrument):
   def __init__(self, engine, playerObj, editorMode = False, player = 0, bass = False):

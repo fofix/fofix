@@ -33,7 +33,6 @@ from Scene import Scene, SuppressScene
 import Scorekeeper
 import Dialogs
 import Song
-import Data
 from Menu import Menu
 from Audio import Sound
 from Language import _

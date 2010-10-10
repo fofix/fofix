@@ -24,12 +24,14 @@
 
 from __future__ import with_statement
 
-from OpenGL.GL import *
 from View import Layer
-
+from OpenGL.GL import glColor3f
 import gc
 import threading
 import Log
+
+
+
 
 class DebugLayer(Layer):
   """A layer for showing some debug information."""

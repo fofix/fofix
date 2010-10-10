@@ -26,7 +26,6 @@ from __future__ import with_statement
 import Config
 import os
 
-from OpenGL.GL import *
 from Svg import ImgDrawing
 
 import locale
@@ -35,6 +34,7 @@ import locale
 #from Draw import *
 
 from PIL import Image, ImageDraw
+from OpenGL.GL import glColor3f
 
 #these are the variables for setting the alignment of text and images
 #when setting them up in the rockmeter.ini you do not have

@@ -26,9 +26,7 @@
 from Font import Font
 from Svg import ImgDrawing
 from Audio import Sound
-from Language import _
 import random
-import Language
 import Config
 import Version
 #myfingershurt: needed for multi-OS file fetching

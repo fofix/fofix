@@ -21,7 +21,6 @@
 #####################################################################
 from __future__ import with_statement
 import os
-import sys
 
 from math import fabs as abs # Absolute value
 
@@ -29,7 +28,6 @@ import pygame
 from pygame.locals import *
 
 from OpenGL.GL import *
-from OpenGL.GLU import *
 # Array-based drawing
 from numpy.core import array, float32
 
