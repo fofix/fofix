@@ -26,7 +26,7 @@
 from distutils.core import setup, Extension
 from Cython.Distutils import build_ext
 import sys, SceneFactory, Version, glob, os
-import numpy
+import numpy as np
 
 
 # Start setting up py2{exe,app} and building the argument set for setup().
@@ -196,7 +196,7 @@ options['py2app'].update({
 setup_args.update({
   'options': options,
   'ext_modules': [
-    Extension('cmgl', ['cmgl.pyx'], include_dirs=[numpy.get_include()], libraries=['opengl32' if os.name == 'nt' else 'GL']),
+    Extension('cmgl', ['cmgl.pyx'], include_dirs=[np.get_include()], libraries=['opengl32' if os.name == 'nt' else 'GL']),
     Extension('pypitch._pypitch',
               language='c++',
               sources=['pypitch/_pypitch.pyx', 'pypitch/pitch.cpp',

@@ -25,7 +25,6 @@ from __future__ import with_statement
 from OpenGL.GL import *
 
 import numpy as np
-from numpy.core import float32
 import math
 import cmgl
 
@@ -127,8 +126,8 @@ class ImgDrawing(object):
     self.createArrays()
 
   def createArrays(self):
-    self.vtxArray = np.zeros((4,2), dtype=float32)
-    self.texArray = np.zeros((4,2), dtype=float32)
+    self.vtxArray = np.zeros((4,2), dtype=np.float32)
+    self.texArray = np.zeros((4,2), dtype=np.float32)
 
     self.createVtx()
     self.createTex()

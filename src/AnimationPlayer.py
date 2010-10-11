@@ -29,7 +29,8 @@ from pygame.locals import *
 
 from OpenGL.GL import *
 # Array-based drawing
-from numpy.core import array, float32
+
+import numpy as np
 
 from View import BackgroundLayer
 import Log
@@ -149,19 +150,19 @@ class AnimationPlayer(BackgroundLayer):
       vtxY = 1.0 - abs(self.winHeight-r*animHeight) / (float(self.winHeight))
 
     # Vertices
-    animVtx = array([[-vtxX,  vtxY],
+    animVtx = np.array([[-vtxX,  vtxY],
                      [ vtxX, -vtxY],
                      [ vtxX,  vtxY],
                      [-vtxX,  vtxY],
                      [-vtxX, -vtxY],
-                     [ vtxX, -vtxY]], dtype=float32)
+                     [ vtxX, -vtxY]], dtype=np.float32)
     # Texture coordinates
-    texCoord = array([[0.0, 1.0],
+    texCoord = np.array([[0.0, 1.0],
                       [1.0, 0.0],
                       [1.0, 1.0],
                       [0.0, 1.0],
                       [0.0, 0.0],
-                      [1.0, 0.0]], dtype=float32)
+                      [1.0, 0.0]], dtype=np.float32)
     
     # Create a compiled OpenGL call list and do array-based drawing
     # Could have used GL_QUADS but IIRC triangles are recommended

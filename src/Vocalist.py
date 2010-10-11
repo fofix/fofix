@@ -28,7 +28,7 @@ from Language import _
 from Microphone import Microphone
 from Song import VocalNote
 from OpenGL.GL import *
-from numpy.core import array, float32
+import numpy as np
 from random import random
 import cmgl
 
@@ -390,8 +390,8 @@ class Vocalist:
 
   #stump: draw a vocal note lane, vaguely RB2-style
   def drawNoteLane(self, colors, xStartPos, xEndPos, yStartPos, yEndPos):
-    colorArray = array([colors[i] for i in (4, 5, 6, 6, 0, 1, 1, 0, 2, 3, 3, 2, 6, 6, 5, 4)], dtype=float32)
-    vertexArray = array([[xStartPos,                    yStartPos-self.vocalLaneSize, 0],
+    colorArray = np.array([colors[i] for i in (4, 5, 6, 6, 0, 1, 1, 0, 2, 3, 3, 2, 6, 6, 5, 4)], dtype=np.float32)
+    vertexArray = np.array([[xStartPos,                    yStartPos-self.vocalLaneSize, 0],
                          [xEndPos,                      yEndPos  -self.vocalLaneSize, 0],
                          [xEndPos,                      yEndPos  -self.vocalGlowSize, 0],
                          [xStartPos,                    yStartPos-self.vocalGlowSize, 0],
@@ -407,7 +407,7 @@ class Vocalist:
                          [xEndPos,                      yEndPos  +self.vocalGlowSize, 0],
                          [xEndPos,                      yEndPos  +self.vocalLaneSize, 0],
                          [xStartPos,                    yStartPos+self.vocalLaneSize, 0]],
-                           dtype=float32)
+                           dtype=np.float32)
     cmgl.drawArrays(GL_QUADS, vertices=vertexArray, colors=colorArray)
   
   def coOpRescue(self, pos):

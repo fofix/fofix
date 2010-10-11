@@ -26,7 +26,7 @@ from OpenGL.GL import *
 import cmgl
 import sys
 from Texture import Texture
-from numpy.core import zeros, float32
+import numpy as np
 
 DEFAULT_SCALE = 0.002
 
@@ -89,8 +89,8 @@ class Font:
     self.font.set_italic(italic)
     self.font.set_underline(underline)
     self.stringsCache = Cache(256)
-    self.square_prim = zeros((4,2), dtype=float32)
-    self.square_tex  = zeros((4,2), dtype=float32)
+    self.square_prim = np.zeros((4,2), dtype=np.float32)
+    self.square_tex  = np.zeros((4,2), dtype=np.float32)
 
   def getStringSize(self, s, scale = DEFAULT_SCALE):
     """

@@ -30,9 +30,8 @@
 
 from OpenGL.GL import *
 from OpenGL import __version__ as OpenGLVersion
-import numpy
+import numpy as np
 from PIL import Image
-from numpy.core import array, float32
 import pygame
 import gc
 import os
@@ -485,7 +484,7 @@ class GameEngine(object):
     Log.debug("Python version: " + sys.version.split(' ')[0])
     Log.debug("Pygame version: " + str(pygame.version.ver) )
     Log.debug("PyOpenGL version: " + OpenGLVersion)
-    Log.debug("Numpy version: " + numpy.__version__)
+    Log.debug("Numpy version: " + np.__version__)
     Log.debug("PIL version: " + Image.VERSION)
     Log.debug("sys.argv: " + repr(sys.argv))
     Log.debug("os.name: " + os.name)
@@ -982,15 +981,15 @@ class GameEngine(object):
       glBlendFunc(GL_SRC_ALPHA, GL_ONE)
 
     if len(color) == 4:
-      col_array  = array([[color[0],color[1],color[2], color[3]],
+      col_array  = np.array([[color[0],color[1],color[2], color[3]],
                          [color[0],color[1],color[2], color[3]],
                          [color[0],color[1],color[2], color[3]],
-                         [color[0],color[1],color[2], color[3]]], dtype=float32)
+                         [color[0],color[1],color[2], color[3]]], dtype=np.float32)
     else:
-      col_array  = array([[color[0],color[1],color[2], 1],
+      col_array  = np.array([[color[0],color[1],color[2], 1],
                          [color[0],color[1],color[2], 1],
                          [color[0],color[1],color[2], 1],
-                         [color[0],color[1],color[2], 1]], dtype=float32)
+                         [color[0],color[1],color[2], 1]], dtype=np.float32)
     
     glEnable(GL_TEXTURE_2D)  
     image.texture.bind()
@@ -1008,17 +1007,17 @@ class GameEngine(object):
     if depth == True:
       glDepthMask(1)
 
-    triangVtx = array(
+    triangVtx = np.array(
         [[ vertex[0],  vertscale, vertex[1]],
          [ vertex[2],  vertscale, vertex[1]],
          [ vertex[0], -vertscale, vertex[3]],
-         [ vertex[2], -vertscale, vertex[3]]], dtype=float32)
+         [ vertex[2], -vertscale, vertex[3]]], dtype=np.float32)
 
-    textriangVtx = array(
+    textriangVtx = np.array(
         [[texcoord[0], texcoord[1]],
          [texcoord[2], texcoord[1]],
          [texcoord[0], texcoord[3]],
-         [texcoord[2], texcoord[3]]], dtype=float32)
+         [texcoord[2], texcoord[3]]], dtype=np.float32)
 
     cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=triangVtx, colors=col_array, texcoords=textriangVtx)
     

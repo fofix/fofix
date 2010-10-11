@@ -26,7 +26,7 @@ import random
 from Shader import shaders, mixColors
 
 from OpenGL.GL import *
-from numpy.core import array, float32
+import numpy as np
 import cmgl
 
 #myfingershurt: needed for multi-OS file fetching
@@ -80,42 +80,42 @@ class Neck:
     self.vis = 1
 
     # evilynux - Neck color
-    self.board_col  = array([[color[0],color[1],color[2], 0],
+    self.board_col  = np.array([[color[0],color[1],color[2], 0],
                              [color[0],color[1],color[2], 0],
                              [color[0],color[1],color[2], self.vis],
                              [color[0],color[1],color[2], self.vis],
                              [color[0],color[1],color[2], self.vis],
                              [color[0],color[1],color[2], self.vis],
                              [color[0],color[1],color[2], 0],
-                             [color[0],color[1],color[2], 0]], dtype=float32)
+                             [color[0],color[1],color[2], 0]], dtype=np.float32)
 
     w            = self.boardWidth
     l            = self.boardLength
 
     # evilynux - Neck vertices
-    self.board_vtx = array([[-w / 2, 0, -2],
+    self.board_vtx = np.array([[-w / 2, 0, -2],
                             [w / 2, 0, -2],
                             [-w/ 2, 0, -1],
                             [w / 2, 0, -1],
                             [-w / 2, 0, l * .7],
                             [w / 2, 0, l * .7],
                             [-w / 2, 0, l],
-                            [w / 2, 0, l]], dtype=float32)
+                            [w / 2, 0, l]], dtype=np.float32)
     # evilynux - Sidebars vertices
     w += 0.15
-    self.sidebars_vtx = array([[-w / 2, 0, -2],
+    self.sidebars_vtx = np.array([[-w / 2, 0, -2],
                                [w / 2, 0, -2],
                                [-w/ 2, 0, -1],
                                [w / 2, 0, -1],
                                [-w / 2, 0, l * .7],
                                [w / 2, 0, l * .7],
                                [-w / 2, 0, l],
-                               [w / 2, 0, l]], dtype=float32)
+                               [w / 2, 0, l]], dtype=np.float32)
 
     # evilynux - Just in case the type has became double, convert to float32
-    self.board_col = self.board_col.astype(float32)
-    self.board_vtx = self.board_vtx.astype(float32)
-    self.sidebars_vtx = self.sidebars_vtx.astype(float32)
+    self.board_col = self.board_col.astype(np.float32)
+    self.board_vtx = self.board_vtx.astype(np.float32)
+    self.sidebars_vtx = self.sidebars_vtx.astype(np.float32)
 
     self.neckType = playerObj.neckType
     if self.neckType == 0:
@@ -408,24 +408,24 @@ class Neck:
 
     glEnable(GL_TEXTURE_2D)
 
-    board_tex  = array([[0.0, project(offset - 2 * self.beatsPerUnit)],
+    board_tex  = np.array([[0.0, project(offset - 2 * self.beatsPerUnit)],
                          [1.0, project(offset - 2 * self.beatsPerUnit)],
                          [0.0, project(offset - 1 * self.beatsPerUnit)],
                          [1.0, project(offset - 1 * self.beatsPerUnit)],
                          [0.0, project(offset + l * self.beatsPerUnit * .7)],
                          [1.0, project(offset + l * self.beatsPerUnit * .7)],
                          [0.0, project(offset + l * self.beatsPerUnit)],
-                         [1.0, project(offset + l * self.beatsPerUnit)]], dtype=float32)
+                         [1.0, project(offset + l * self.beatsPerUnit)]], dtype=np.float32)
     
     #must be seperate for neck flashing.
-    board_col  = array([[color[0],color[1],color[2], 0],
+    board_col  = np.array([[color[0],color[1],color[2], 0],
                              [color[0],color[1],color[2], 0],
                              [color[0],color[1],color[2], v],
                              [color[0],color[1],color[2], v],
                              [color[0],color[1],color[2], v],
                              [color[0],color[1],color[2], v],
                              [color[0],color[1],color[2], 0],
-                             [color[0],color[1],color[2], 0]], dtype=float32)
+                             [color[0],color[1],color[2], 0]], dtype=np.float32)
 
     if alpha == True:
       glBlendFunc(GL_ONE, GL_ONE)
@@ -564,14 +564,14 @@ class Neck:
     else:
       offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
 
-    track_tex  = array([[0.0, project(offset - 2 * self.beatsPerUnit)],
+    track_tex  = np.array([[0.0, project(offset - 2 * self.beatsPerUnit)],
                          [1.0, project(offset - 2 * self.beatsPerUnit)],
                          [0.0, project(offset - 1 * self.beatsPerUnit)],
                          [1.0, project(offset - 1 * self.beatsPerUnit)],
                          [0.0, project(offset + l * self.beatsPerUnit * .7)],
                          [1.0, project(offset + l * self.beatsPerUnit * .7)],
                          [0.0, project(offset + l * self.beatsPerUnit)],
-                         [1.0, project(offset + l * self.beatsPerUnit)]], dtype=float32)
+                         [1.0, project(offset + l * self.beatsPerUnit)]], dtype=np.float32)
 
 
     glEnable(GL_TEXTURE_2D)
@@ -585,25 +585,25 @@ class Neck:
       self.centerLines.texture.bind()
 
       
-    track_vtx       = array([[-w / 2, 0, -2+size],
+    track_vtx       = np.array([[-w / 2, 0, -2+size],
                            [w / 2, 0, -2+size],
                            [-w / 2, 0, -1+size],
                            [w / 2, 0, -1+size],
                            [-w / 2, 0, l * .7],
                            [w / 2, 0, l * .7],
                            [-w / 2, 0, l],
-                           [w / 2, 0, l]], dtype=float32)
+                           [w / 2, 0, l]], dtype=np.float32)
     
     if self.staticStrings:    #MFH
       color = (1,1,1)
-      track_col  = array([[color[0],color[1],color[2], v],
+      track_col  = np.array([[color[0],color[1],color[2], v],
                          [color[0],color[1],color[2], v],
                          [color[0],color[1],color[2], v],
                          [color[0],color[1],color[2], v],
                          [color[0],color[1],color[2], v],
                          [color[0],color[1],color[2], v],
                          [color[0],color[1],color[2], 0],
-                         [color[0],color[1],color[2], 0]], dtype=float32)
+                         [color[0],color[1],color[2], 0]], dtype=np.float32)
       cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=track_vtx, colors=track_col, texcoords=track_tex)
 
     else:   #MFH: original moving strings
@@ -629,14 +629,14 @@ class Neck:
 
     c = (1,1,1)
 
-    board_tex  = array([[0.0, project(offset - 2 * self.beatsPerUnit)],
+    board_tex  = np.array([[0.0, project(offset - 2 * self.beatsPerUnit)],
                          [1.0, project(offset - 2 * self.beatsPerUnit)],
                          [0.0, project(offset - 1 * self.beatsPerUnit)],
                          [1.0, project(offset - 1 * self.beatsPerUnit)],
                          [0.0, project(offset + l * self.beatsPerUnit * .7)],
                          [1.0, project(offset + l * self.beatsPerUnit * .7)],
                          [0.0, project(offset + l * self.beatsPerUnit)],
-                         [1.0, project(offset + l * self.beatsPerUnit)]], dtype=float32)
+                         [1.0, project(offset + l * self.beatsPerUnit)]], dtype=np.float32)
 
     glEnable(GL_TEXTURE_2D)
     if self.theme == 2 and self.instrument.starPowerActive and self.oSideBars:
@@ -708,20 +708,20 @@ class Neck:
         sw  = 0.1 #width
         self.bpm_measure.texture.bind()
 
-      bpm_vtx  = array([[-(w / 2), 0,  z + sw],
+      bpm_vtx  = np.array([[-(w / 2), 0,  z + sw],
                          [-(w / 2), 0,  z - sw],
                          [(w / 2), 0,  z + sw],
-                         [(w / 2), 0,  z - sw]], dtype=float32)
+                         [(w / 2), 0,  z - sw]], dtype=np.float32)
 
-      bpm_tex  = array([[0.0, 1.0],
+      bpm_tex  = np.array([[0.0, 1.0],
                          [0.0, 0.0],
                          [1.0, 1.0],
-                         [1.0, 0.0]], dtype=float32)
+                         [1.0, 0.0]], dtype=np.float32)
 
-      bpm_col  = array([[1, 1, 1, v],
+      bpm_col  = np.array([[1, 1, 1, v],
                          [1, 1, 1, v],
                          [1, 1, 1, v],
-                         [1, 1, 1, v]], dtype=float32)
+                         [1, 1, 1, v]], dtype=np.float32)
 
       cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=bpm_vtx, colors=bpm_col, texcoords=bpm_tex)
 

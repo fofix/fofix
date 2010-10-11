@@ -47,7 +47,7 @@ import pygame
 from OpenGL.GL import *
 from OpenGL.GLU import *
 # Array-based drawing
-from numpy.core import array, float32
+import numpy as np
 
 import cmgl
 
@@ -166,25 +166,25 @@ class VideoPlayer(BackgroundLayer):
       vtxY = 1.0 - abs(self.winHeight-r*self.vidHeight) / (float(self.winHeight))
 
     # Vertices
-    videoVtx = array([[-vtxX,  vtxY],
+    videoVtx = np.array([[-vtxX,  vtxY],
                       [ vtxX, -vtxY],
                       [ vtxX,  vtxY],
                       [-vtxX,  vtxY],
                       [-vtxX, -vtxY],
-                      [ vtxX, -vtxY]], dtype=float32)
-    backVtx =  array([[-1.0,  1.0],
+                      [ vtxX, -vtxY]], dtype=np.float32)
+    backVtx = np.array([[-1.0,  1.0],
                       [ 1.0, -1.0],
                       [ 1.0,  1.0],
                       [-1.0,  1.0],
                       [-1.0, -1.0],
-                      [ 1.0, -1.0]], dtype=float32)
+                      [ 1.0, -1.0]], dtype=np.float32)
     # Texture coordinates
-    videoTex = array([[0.0,                   self.videoTex.size[1]],
+    videoTex = np.array([[0.0,                   self.videoTex.size[1]],
                       [self.videoTex.size[0], 0.0],
                       [self.videoTex.size[0], self.videoTex.size[1]],
                       [0.0,                   self.videoTex.size[1]],
                       [0.0,                   0.0],
-                      [self.videoTex.size[0], 0.0]], dtype=float32)
+                      [self.videoTex.size[0], 0.0]], dtype=np.float32)
 
     # Create a compiled OpenGL call list and do array-based drawing
     # Could have used GL_QUADS but IIRC triangles are recommended

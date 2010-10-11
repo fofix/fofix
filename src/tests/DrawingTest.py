@@ -31,7 +31,6 @@ try:
 except:
   vbo_support = False
 import numpy as np
-from numpy import array, float32
 import pygame
 from pygame.locals import *
 from math import cos, sin, sqrt
@@ -43,20 +42,20 @@ mode = 1
 def init():
     global mode, triangVbo, triangVtx, triangCol
     global spiralVtx, spiralVbo, spiralCol
-    triangVtx = array(
+    triangVtx = np.array(
         [[ 0,  1, 0],
          [-1, -1, 0],
-         [ 1, -1, 0]], dtype=float32)
-    triangCol = array(
+         [ 1, -1, 0]], dtype=np.float32)
+    triangCol = np.array(
         [[ 0,  1, 0],
          [ 1,  0, 0],
-         [ 0,  0, 1]], dtype=float32)
+         [ 0,  0, 1]], dtype=np.float32)
 
     nbSteps = 400.0
     
     #np.append changes dtype=f to dtype=d -> don't use it
-    spiralVtx = np.zeros((nbSteps, 3), dtype=float32)
-    spiralCol = np.zeros((nbSteps, 3), dtype=float32)
+    spiralVtx = np.zeros((nbSteps, 3), dtype=np.float32)
+    spiralCol = np.zeros((nbSteps, 3), dtype=np.float32)
     for i in range(0, int(nbSteps), 2):
       ratio = i/nbSteps;
       angle = 21*ratio

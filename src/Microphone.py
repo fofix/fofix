@@ -24,7 +24,7 @@
 import Log
 import Audio
 import math
-import numpy
+import numpy as np
 
 try:
   import pyaudio
@@ -119,7 +119,7 @@ if supported:
             raise
         if self.passthroughStream is not None:
           self.passthroughQueue.append(chunk)
-        self.analyzer.input(numpy.frombuffer(chunk, dtype=numpy.float32))
+        self.analyzer.input(np.frombuffer(chunk, dtype=np.float32))
         self.analyzer.process()
         pk = self.analyzer.getPeak()
         if self.detectTaps:

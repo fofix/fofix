@@ -229,9 +229,9 @@ if tuple(int(i) for i in pygame.__version__[:5].split('.')) < (1, 9, 0):
   def zeros(size):
     return Numeric.zeros(size, typecode='s')   #myfingershurt: typecode s = short = int16
 else:
-  import numpy
+  import numpy as np
   def zeros(size):
-    return numpy.zeros(size, dtype='h')
+    return np.zeros(size, dtype='h')
 
 #stump: mic passthrough
 class MicrophonePassthroughStream(Sound, Task):
