@@ -257,17 +257,10 @@ class Stage(object):
       #myfingershurt: just populate the image array in order, they are pulled in whatever order requested:
         for j in range(len(files)):
           self.engine.loadImgDrawing(self, "backgroundA", os.path.join(self.path, files[j]))
-          #MFH: also precalculate each image's scale factor and store in the array
-          imgwidth = self.backgroundA.width1()
-          wfactor = 640.000/imgwidth
           self.imgArr.append(getattr(self, "backgroundA", os.path.join(self.path, files[j])))
-          self.imgArrScaleFactors.append(wfactor)
     
     if self.rotationMode > 0 and len(self.imgArr) == 0:
       self.rotationMode = 0
-
-    if self.mode != 2 and self.background:   #MFH - precalculating scale factor
-      self.backgroundScaleFactor = 1.0
 
   #stage rotation
   def rotate(self):
@@ -300,13 +293,13 @@ class Stage(object):
     #myfingershurt: multiple rotation modes
     if self.mode != 2:
       if self.rotationMode == 0:
-        self.engine.drawImage(self.background, scale = (self.backgroundScaleFactor,-self.backgroundScaleFactor),
+        self.engine.drawImage(self.background, scale = (1.0,-1.0),
                               coord = (self.wFull/2,self.hFull/2), stretched = 3)
 
       #myfingershurt:
       else:
         #MFH - use precalculated scale factors instead
-        self.engine.drawImage(self.imgArr[self.arrNum], scale = (self.imgArrScaleFactors[self.arrNum],-self.imgArrScaleFactors[self.arrNum]),
+        self.engine.drawImage(self.imgArr[self.arrNum], scale = (1.0,-1.0),
                               coord = (self.wFull/2,self.hFull/2), stretched = 3)
 
   def updateDelays(self):
