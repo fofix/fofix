@@ -21,7 +21,6 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-import pygame
 import Log
 import time
 import struct
