@@ -312,10 +312,6 @@ class MainMenu(BackgroundLayer):
       Log.debug("No folder found: %s" % tutorialpath)
       Dialogs.showMessage(self.engine, _("No tutorials found!"))
       return
-
-    # players = Dialogs.activateControllers(self.engine, 1) #akedrou
-    # if players == 0:
-      # return
     
     self.engine.startWorld(1, None, 0, 0, tutorial = True)
 
@@ -328,11 +324,6 @@ class MainMenu(BackgroundLayer):
   
   def newLocalGame(self, players=1, mode1p=0, mode2p=0, maxplayers = None, allowGuitar = True, allowDrum = True, allowMic = False): #mode1p=0(quickplay),1(practice),2(career) / mode2p=0(faceoff),1(profaceoff)
     self.engine.data.acceptSound.play()
-    # players = Dialogs.activateControllers(self.engine, players, maxplayers, allowGuitar, allowDrum, allowMic) #akedrou
-    # if players == 0:
-      # if self.engine.cmdPlay == 2:
-        # self.engine.cmdPlay = 0
-      # return
 
     self.engine.startWorld(players, maxplayers, mode1p, mode2p, allowGuitar, allowDrum, allowMic)
     
