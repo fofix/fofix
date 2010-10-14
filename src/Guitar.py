@@ -439,7 +439,7 @@ class Guitar(Instrument):
           notecol = (.1,.1,.1)
         else:
           notecol = (1,1,1)
-      tailOnly == True
+      tailOnly = True
 
       if self.theme < 2:
         if self.starspin:
