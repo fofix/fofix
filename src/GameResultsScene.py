@@ -326,7 +326,7 @@ class GameResultsScene(Scene):
       titleFormat = 0
     self.scaleTitle  = titleFormat&1
     self.centerTitle = titleFormat>>1&1
-    
+    self.partLoad = None
     if self.coOpType > 0:
       for i, score in enumerate(self.coOpScoring):
         if not self.partImage:
@@ -371,8 +371,6 @@ class GameResultsScene(Scene):
               self.partImage = False
         if self.partLoad:
           self.part[i] = self.partLoad
-
-    self.partLoad = None
     
     Dialogs.hideLoadingSplashScreen(self.engine, loadingScreen)
  
