@@ -666,9 +666,9 @@ class Theme(Task):
   def rgbToColor(self, color):
     retVal = []
     for c in color:
-      if isinstance(c, int) and i > 1:
+      if isinstance(c, int) and c > 1:
         retVal.append(float(c)/255.0)
-    return tuple(retval)
+    return tuple(retVal)
   
   @staticmethod
   def colorToHex(color):
