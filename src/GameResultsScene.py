@@ -321,15 +321,6 @@ class GameResultsScene(Scene):
     else:
       self.engine.loadImgDrawing(self, "background", os.path.join("themes", themename, "gameresults.png"))
 
-    #MFH - moved all star images to Data.py, alter all references accordingly:
-    #self.star1 = self.engine.data.star1
-    #self.star2 = self.engine.data.star2
-    #self.star3 = self.engine.data.star3
-    #self.star4 = self.engine.data.star4
-    #self.starPerfect = self.engine.data.starPerfect
-    #self.starFC = self.engine.data.starFC
-    #self.fcStars = self.engine.data.fcStars
-    #self.maskStars = self.engine.data.maskStars
     titleFormat = self.engine.theme.result_song_form
     if not titleFormat:
       titleFormat = 0
@@ -900,38 +891,7 @@ class GameResultsScene(Scene):
         except IndexError:
           hspacing = 1.0
         self.engine.drawStarScore(w, h, self.resultStar[0], self.resultStar[1], scoreCard.stars, scale, space = space, horiz_spacing = hspacing, align = 1)
-        
-#-        if scoreCard.stars > 5:
-#-          for j in range(5):
-#-            if self.fcStars and scoreCard.stars == 7:
-#-              star = self.starFC
-#-            else:
-#-              star = self.starPerfect
-#-            try:
-#-              wide = star.width1()*float(self.engine.theme.result_star[3])
-#-            except IndexError:
-#-              wide = star.width1()*.5
-#-            if self.maskStars:
-#-              if self.theme == 2:
-#-                self.engine.drawImage(star, scale = (scale,-scale), coord = (((w*self.engine.theme.result_star[0])+wide*j)*space**4,h*float(self.engine.theme.result_star[1])), color = (1, 1, 0, 1))
-#-              else:
-#-                self.engine.drawImage(star, scale = (scale,-scale), coord = (((w*float(self.engine.theme.result_star[0]))+wide*j)*space**4,h*float(self.engine.theme.result_star[1])), color = (0, 1, 0, 1))
-#-            else:
-#-              self.engine.drawImage(star, scale = (scale,-scale), coord = (((w*float(self.engine.theme.result_star[0]))+wide*j)*space**4,h*float(self.engine.theme.result_star[1])))
-#-        else:
-#-          for j in range(5):
-#-            if j < scoreCard.stars:
-#-              star = self.star2
-#-            else:
-#-              star = self.star1
-#-            try:
-#-              wide = star.width1()*float(self.engine.theme.result_star[3])
-#-            except IndexError:
-#-              wide = star.width1()*.5
-#-            self.engine.drawImage(star, scale = (scale,-scale), coord = (((w*float(self.engine.theme.result_star[0]))+wide*j)*space**4,h*float(self.engine.theme.result_star[1])))
-
-
-        
+ 
         settingsText = "%s %s - %s: %s / %s, %s: %s" % (self.engine.versionString, self.tsSettings, self.tsHopos, self.hopoStyle, self.hopoFreq, self.tsHitWindow, self.hitWindow)
         settingsScale = 0.0012
         wText, hText = defFont.getStringSize(settingsText, settingsScale)
@@ -1084,35 +1044,6 @@ class GameResultsScene(Scene):
         hspacing = 1.1
       self.engine.drawStarScore(w, h, self.resultStar[0], self.resultStar[1], scoreCard.stars, scale, horiz_spacing = hspacing, space = space, align = 1)
 
-#-      if scoreCard.stars > 5:
-#-        for j in range(5):
-#-          if self.fcStars and scoreCard.stars == 7:
-#-            star = self.starFC
-#-          else:
-#-            star = self.starPerfect
-#-          try:
-#-            wide = star.width1()*float(self.engine.theme.result_star[3])
-#-          except IndexError:
-#-            wide = star.width1()*.5
-#-          if self.maskStars:
-#-            if self.theme == 2:
-#-              self.engine.drawImage(star, scale = (float(self.engine.theme.result_star[2]),-float(self.engine.theme.result_star[2])), coord = (((w*self.engine.theme.result_star[0])+wide*j)*space**4,h*float(self.engine.theme.result_star[1])), color = (1, 1, 0, 1))
-#-            else:
-#-              self.engine.drawImage(star, scale = (float(self.engine.theme.result_star[2]),-float(self.engine.theme.result_star[2])), coord = (((w*float(self.engine.theme.result_star[0]))+wide*j)*space**4,h*float(self.engine.theme.result_star[1])), color = (0, 1, 0, 1))
-#-          else:
-#-            self.engine.drawImage(star, scale = (float(self.engine.theme.result_star[2]),-float(self.engine.theme.result_star[2])), coord = (((w*float(self.engine.theme.result_star[0]))+wide*j)*space**4,h*float(self.engine.theme.result_star[1])))
-#-      else:
-#-        for j in range(5):
-#-          if j < scoreCard.stars:
-#-            star = self.star2
-#-          else:
-#-            star = self.star1
-#-          try:
-#-            wide = star.width1()*float(self.engine.theme.result_star[3])
-#-          except IndexError:
-#-            wide = star.width1()*.5
-#-          self.engine.drawImage(star, scale = (float(self.engine.theme.result_star[2]),-float(self.engine.theme.result_star[2])), coord = (((w*float(self.engine.theme.result_star[0]))+wide*j)*space**4,h*float(self.engine.theme.result_star[1])))
-      
       settingsText = "%s %s - %s: %s / %s, %s: %s" % (self.engine.versionString, self.tsSettings, self.tsHopos, self.hopoStyle, self.hopoFreq, self.tsHitWindow, self.hitWindow)
       settingsScale = 0.0012
       wText, hText = font.getStringSize(settingsText, settingsScale)
@@ -1344,7 +1275,6 @@ class GameResultsScene(Scene):
         font.render(unicode(options), (.6 - w2, y + self.offset),   scale = scale / 2)
         # evilynux - Fixed star size following Font render bugfix
         # akedrou  - Fixed stars to render as stars after custom glyph removal... ...beautiful yPos
-        #font.render(unicode(Data.STAR2 * stars + Data.STAR1 * (5 - stars)), (x + .6, y + self.offset), scale = scale * 1.8)
         self.engine.drawStarScore(w, h, x+.6, 1.0-((y+self.offset+h2)/self.engine.data.fontScreenBottom), stars, scale * 15)
 
         for j,player in enumerate(self.playerList):

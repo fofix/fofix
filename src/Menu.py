@@ -39,7 +39,6 @@ import Log
 
 class Choice:
   def __init__(self, text, callback, name = None, values = None, valueIndex = 0, append_submenu_char = True, tipText = None):
-    #Log.debug("Choice class init (Menu.py)...")
     self.text       = unicode(text)
     self.callback   = callback
     self.name       = name
@@ -128,7 +127,6 @@ class Menu(Layer, KeyListener):
     self.selectedColor = selectedColor
     self.tipColor = self.engine.theme.menuTipTextColor
 
-    #self.sfxVolume    = self.engine.config.get("audio", "SFX_volume")
     self.drumNav = self.engine.config.get("game", "drum_navigation")  #MFH
     
     if self.name and self.useGraphics > 0:
@@ -272,14 +270,12 @@ class Menu(Layer, KeyListener):
     if c in Player.menuYes or key == pygame.K_RETURN:
       self.scrolling = 0
       choice.trigger(self.engine)
-      #self.engine.data.acceptSound.setVolume(self.sfxVolume)  #MFH
       self.engine.data.acceptSound.play()
     elif c in Player.menuNo or key == pygame.K_ESCAPE:
       if self.onCancel:
         self.onCancel()
       self.engine.view.popLayer(self)
       self.engine.input.removeKeyListener(self)
-      #self.engine.data.cancelSound.setVolume(self.sfxVolume)  #MFH
       self.engine.data.cancelSound.play()
     elif c in Player.menuDown or key == pygame.K_DOWN:
       self.scrolling = 2
@@ -487,7 +483,6 @@ class Menu(Layer, KeyListener):
             Tw, Th = font.getStringSize(text,scale)
             lineSpacing = font.getLineSpacing(scale)
             frameWidth = Tw*1.10
-            #frameHeight = (Th+Th2)*1.10
             frameHeight = Th + lineSpacing
             boxXOffset = (x + (Tw/2))*wS
             boxYOffset = (1.0 - (y*4.0/3.0) - (Th*1.2/2))*hS

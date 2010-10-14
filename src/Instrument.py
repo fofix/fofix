@@ -135,8 +135,6 @@ class Instrument:
       self.battleObjectsEnabled.append(6)
     if self.engine.config.get("game", "battle_Steal") == 1:
       self.battleObjectsEnabled.append(5)
-    #if self.engine.config.get("game", "battle_Tune") == 1:
-    #  self.battleObjectsEnabled.append(9)
 
     Log.debug("Battle Objects Enabled: "+str(self.battleObjectsEnabled))
     self.battleNextObject   = 0
@@ -163,7 +161,6 @@ class Instrument:
     self.battleDrainStart   = 0
     self.battleDrainLength  = 8000
 
-    #self.actualBpm = 0.0
     self.currentBpm     = 120.0   #MFH - need a default 120BPM to be set in case a custom song has no tempo events.
     self.currentPeriod  = 60000.0 / self.currentBpm
     self.targetBpm      = self.currentBpm
@@ -174,7 +171,6 @@ class Instrument:
 
     self.indexFps       = self.engine.config.get("video", "fps")
 
-    #########For Animations
     self.Animspeed      = 30#Lower value = Faster animations
     #For Animated Starnotes
     self.indexCount     = 0
@@ -269,7 +265,6 @@ class Instrument:
     if self.nstype < 3:   #not constant mode: 
       self.speed = self.engine.config.get("coffee", "neckSpeed")*0.01
     else:   #constant mode
-      #self.speed = self.engine.config.get("coffee", "neckSpeed")
       self.speed = 410 - self.engine.config.get("coffee", "neckSpeed")    #invert this value
 
     self.boardScaleX    = self.boardWidth/3.0
@@ -408,8 +403,6 @@ class Instrument:
       bpm = 200
 
     #MFH - Filter out unnecessary BPM settings (when currentBPM is already set!)
-    #if self.actualBpm != bpm:
-    #  self.actualBpm = bpm
     self.currentBpm = bpm   #update current BPM as well
 
     #MFH - Neck speed determination:
@@ -438,11 +431,7 @@ class Instrument:
 
     self.earlyMargin       = 250 - bpm/5 - 70*self.hitw
     self.lateMargin        = 250 - bpm/5 - 70*self.hitw
-    #self.earlyMargin = self.lateMargin * self.earlyHitWindowSizeFactor    #MFH - scale early hit window here
 
-    #self.noteReleaseMargin = 200 - bpm/5 - 70*self.hitw
-    #if (self.noteReleaseMargin < (200 - bpm/5 - 70*1.2)):   #MFH - enforce "tight" hitwindow minimum note release margin
-    #  self.noteReleaseMargin = (200 - bpm/5 - 70*1.2)
     if self.muteSustainReleases == 4:   #tight
       self.noteReleaseMargin = (200 - bpm/5 - 70*1.2)
     elif self.muteSustainReleases == 3: #standard

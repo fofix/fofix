@@ -43,7 +43,6 @@ if haveMidi:
   try:
     midiin = rtmidi.RtMidiIn()
     portCount = midiin.getPortCount()
-    #Log.debug("MIDI port count = " + str(portCount) )
     if portCount > 0:
       ports = range(portCount)
       for x in ports:
@@ -391,8 +390,6 @@ class Input(Task):
           state     = self.joystickHats[event.joy][event.hat]
           keyEvent  = None
 
-          #if event.value != (0, 0) and state == (0, 0):
-
           # Stump's PS3 GH3 up-and-down-strumming patch
           if event.value != (0, 0) and state != (0, 0):
             keyEvent = "keyReleased"
@@ -424,7 +421,6 @@ class Input(Task):
           if len(midimsg) > 0:
             id = self.encodeMidiButton(x, midimsg[1])
             #MFH - must check for 0x80 - 0x8F for Note Off events (keyReleased) and 0x90 - 0x9F for Note On events (keyPressed)
-            #if midimsg[0] == 153:
             noteOn = False
             noteOff = False
             
@@ -447,7 +443,6 @@ class Input(Task):
             break
 
 
-  #-------------------------------------------
   # glorandwarf: check that there are no control conflicts
   def checkControls(self):
     if self.controls.isKeyMappingOK() == False:
@@ -458,4 +453,3 @@ class Input(Task):
   # glorandwarf: sets the new key mapping and checks for a conflict
   def setNewKeyMapping(self, section, option, key, control):
     return Player.setNewKeyMapping(section, option, key, control)
-  #-------------------------------------------

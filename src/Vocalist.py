@@ -362,9 +362,6 @@ class Vocalist:
         self.currentNote = 0.0
       else:
         self.currentNote = self.mic.getDeviation(self.requiredNote)
-      #if self.awardEnd:
-      #  mult = .8
-      #else:
       mult = 1
       if self.currentNote is not None:
         if self.currentNoteItem.speak or self.currentNoteItem.extra:
@@ -374,10 +371,6 @@ class Vocalist:
           self.currentNoteItem.accuracy += duration*mult*self.getJurgenPct()
           self.phraseInTune += duration*self.difficultyModifier*mult*self.getJurgenPct()
           self.pitchFudge = 70.0
-        # elif self.currentNoteItem.played and self.stayEnd <= 0 and self.awardEnd:
-          # self.currentNoteItem.accuracy += self.currentNoteItem.length * (1-mult)
-          # self.phraseInTune += self.currentNoteItem.length * (1-mult) *self.difficultyModifier
-          # self.pitchFudge = 0.0
         elif abs(self.oldNote) < self.allowedDeviation and self.pitchFudge > 0:
           duration = pos - self.lastPos
           self.currentNoteItem.accuracy += duration * (self.pitchFudge/100.0)
@@ -523,7 +516,6 @@ class Vocalist:
                   glColor4f(.5,.5,.5,vStart)
               font.render(event.lyric, (xStartPos, .085+addYText), scale = self.lyricScale)
               if not (event.speak or event.extra):
-                #font.render("X", (xStartPos, .057-(.05*val)+addYText), scale = self.lyricScale)
                 #stump: note lanes with RB2-like glow
                 if players == 1:
                   baseY = -.1-(.05*val)+addY
@@ -571,7 +563,6 @@ class Vocalist:
                   glColor4f(.5,.5,.5,vStart)
               font.render(event.lyric, (xStartPos, .085+addYText), scale = self.lyricScale)
               if not (event.speak or event.extra):
-                #font.render("X", (xStartPos, .057-(.05*val)+addYText), scale = self.lyricScale)
                 #stump: note lanes with RB2-like glow
                 if players == 1:
                   baseY = -.1-(.05*val)+addY
@@ -621,7 +612,6 @@ class Vocalist:
               glColor4f(.5,.5,.5,vStart)
               font.render(event.lyric, (xStartPos, .085+addYText), scale = self.lyricScale)
               if not (event.speak or event.extra):
-                #font.render("X", (xStartPos, .057-(.05*val)+addYText), scale = self.lyricScale)
                 #stump: note lanes with RB2-like glow
                 if players == 1:
                   baseY = -.1-(.05*val)+addY
@@ -1082,7 +1072,6 @@ class Vocalist:
           self.starPowerActive = False
           #MFH - call to play star power deactivation sound, if it exists (if not play nothing)
           if self.engine.data.starDeActivateSoundFound:
-            #self.engine.data.starDeActivateSound.setVolume(self.sfxVolume)
             self.engine.data.starDeActivateSound.play()
       
       self.getCurrentNote(pos)

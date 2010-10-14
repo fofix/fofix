@@ -92,7 +92,6 @@ class Audio:
       pygame.mixer.quit()
     except:
       pass
-    #pygame.mixer.quit()
 
   def pause(self):
     pygame.mixer.pause()
@@ -155,7 +154,6 @@ class Music(object):
       busy = pygame.mixer.music.get_busy()
     except Exception, e:
       busy = True      
-    #return pygame.mixer.music.get_busy()
     return busy
 
   def getPosition(self):
@@ -407,9 +405,6 @@ if OggStreamer is None:
       if not self.playing:
         return
 
-      #myfingershurt: this is now done directly when called.
-      #self.channel.setVolume(self.volume)
-
       if len(self.buffersOut) < self.bufferCount:
         self._produceSoundBuffers()
 
@@ -439,12 +434,6 @@ class StreamingSound(Sound, Task):
     if fileName.lower().endswith(".ogg"):
       
       return StreamingOggSound(engine, channel, fileName)   #MFH - forced allow of non-matching sample rates
-
-#-      if frequency == 44100 and format == -16 and stereo:
-#-        return StreamingOggSound(engine, channel, fileName)
-#-      else:
-#-        Log.warn("Audio settings must match stereo 16 bits at 44100 Hz in order to stream OGG files.")
-#-    return super(StreamingSound, cls).__new__(cls, engine, channel, fileName)
 
   def play(self):
     self.channel.play(self)

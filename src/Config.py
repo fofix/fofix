@@ -99,10 +99,6 @@ def load(fileName = None, setAsDefault = False, type = 0):
   logUndefinedGets = c.get("game", "log_undefined_gets")
   return c
 
-#def unLoad():   #MFH - to unload the global config object for later reload
-#  global config
-#  config = None
-
 class Config:
   """A configuration registry."""
   def __init__(self, prototype, fileName = None, type = 0):
@@ -239,8 +235,6 @@ class Config:
       Log.debug("Config.getTipText: %s.%s = %s" % (section, option, text))
     return text
 
-#-------------------------
-# glorandwarf: returns the default value of a configuration key
   def getDefault(self, section, option):
     """
     Read the default value of a configuration key.
@@ -277,7 +271,6 @@ class Config:
     if logIniReads == 1:
       Log.debug("Config.getDefault: %s.%s = %s" % (section, option, value))
     return value
-#-------------------------
 
   def set(self, section, option, value):
     """
@@ -310,7 +303,6 @@ class Config:
     self.config.write(f, self.type)
     f.close()
 
-
 def get(section, option):
   """
   Read the value of a global configuration key.
@@ -320,10 +312,6 @@ def get(section, option):
   @return:          Key value
   """
   global config
-  
-  #MFH - for init config.gets
-  #if config == None:
-  #  load()
 
   return config.get(section, option)
   
@@ -338,8 +326,6 @@ def set(section, option, value):
   global config
   return config.set(section, option, value)
 
-#-------------------------
-# glorandwarf: returns the default value of the configuration key
 def getDefault(section, option):
   """
   Read the default value of a global configuration key.
@@ -362,7 +348,6 @@ def getTipText(section, option):
   global config
   return config.getTipText(section, option)
 
-#-------------------------
 def getOptions(section, option):
   """
   Read the default value of a global configuration key.
@@ -373,5 +358,3 @@ def getOptions(section, option):
   """
   global config
   return config.getOptions(section, option)
-
-#-------------------------

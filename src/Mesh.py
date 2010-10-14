@@ -141,9 +141,6 @@ class Mesh:
               continue
             for geom in node.iGeometries:
               if geom.object:
-                #for mat in geom.bindMaterials:
-                #  self.setupMaterial(mat)
-                
                 glPushMatrix()
                 for t in node.transforms:
                   if t[0] == "translate":

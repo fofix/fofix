@@ -342,7 +342,6 @@ def savePlayers():
       c.set("player","controller",int(pref[11]))
       del c
       _playerDB.execute('UPDATE `players` SET `changed` = 0 WHERE `name` = ?', [pref[0]])
-  #_playerDB.execute('DELETE FROM `players` WHERE `loaded` = 0')
   _playerDB.execute('UPDATE `players` SET `loaded` = 0')
   _playerDB.commit()
 
@@ -800,8 +799,6 @@ class Controls:
   def getState(self, control):
     return self.flags & control
 
-#----------------------------------------------------------
-
 # glorandwarf: returns False if there are any key mapping conflicts
 def isKeyMappingOK(config, start):
   def keycode(name, config):
@@ -829,8 +826,6 @@ def isKeyMappingOK(config, start):
     # everything tests OK
   return 0
 
-#----------------------------------------------------------
-
 # glorandwarf: sets the key mapping and checks for a conflict
 # restores the old mapping if a conflict occurred
 def setNewKeyMapping(engine, config, section, option, key):
@@ -848,8 +843,6 @@ def setNewKeyMapping(engine, config, section, option, key):
     return False
   return True
       
-  #----------------------------------------------------------
-
 class Player(object):
   def __init__(self, name, number):
 
@@ -979,7 +972,6 @@ class Player(object):
 
   def getPart(self):
     #myfingershurt: this should not be reading from the ini file each time it wants to know the part.  Also add "self."
-    #part = Config.get(self.playerstring, "part")
     if self.whichPart == -1:
       return "Party Mode"
     elif self.whichPart == -2:

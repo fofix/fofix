@@ -68,15 +68,11 @@ def wrapCenteredText(font, pos, text, rightMargin = 1.0, scale = 0.002, visibili
   x, y = pos
 
   #MFH: rewriting WrapCenteredText function to properly wrap lines in a centered fashion around a defined centerline (x)
-  #space = font.getStringSize(" ", scale = scale)[0]
-  #startXpos = x - (rightMargin-x) #for a symmetrical text wrapping
-  #x = startXpos
   sentence = ""
   for n, word in enumerate(text.split(" ")):
     w, h = font.getStringSize(sentence + " " + word, scale = scale)
     if x + (w/2) > rightMargin or word == "\n":
       w, h = font.getStringSize(sentence, scale = scale)
-      #x = startXpos
       glPushMatrix()
       glRotate(visibility * (n + 1) * -45, 0, 0, 1)
       if allowshadowoffset == True:
@@ -101,29 +97,8 @@ def wrapCenteredText(font, pos, text, rightMargin = 1.0, scale = 0.002, visibili
       font.render(sentence, (x - (w/2), y + visibility * n), scale = scale)
     glPopMatrix()
     y += h * linespace
-  
-    #if word == "\n":
-    #  continue
-    #x += w + space
+
   return (x, y)
-
-  #space = font.getStringSize(" ", scale = scale)[0]
-  #startXpos = x - (rightMargin-x) #for a symmetrical text wrapping
-  #x = startXpos
-  #for n, word in enumerate(text.split(" ")):
-  #  w, h = font.getStringSize(word, scale = scale)
-  #  if x + w > rightMargin*1.11 or word == "\n":
-  #    x = startXpos
-  #    y += h*.5 # Worldrave - Modified spacing between lines
-  #  if word == "\n":
-  #    continue
-  #  glPushMatrix()
-  #  glRotate(visibility * (n + 1) * -45, 0, 0, 1)
-  #  font.render(word, (x, y + visibility * n), scale = scale)
-  #  glPopMatrix()
-  #  x += w + space
-  #return (x - space, y)
-
 
 def wrapText(font, pos, text, rightMargin = 0.9, scale = 0.002, visibility = 0.0):
   """
@@ -224,9 +199,6 @@ class GetText(Layer, KeyListener):
   def keyPressed(self, key, unicode):
     self.time = 0
     c = self.engine.input.controls.getMapping(key)
-    
-    #if (c in Player.KEY1S or key == pygame.K_RETURN) and not self.accepted:
-    #if (c in Player.KEY1S or key == pygame.K_RETURN or c in Player.DRUM4S) and not self.accepted:   #MFH - adding support for green drum "OK"
     if key == pygame.K_BACKSPACE and not self.accepted:
       self.text = self.text[:-1]
     elif unicode and ord(unicode) > 31 and not self.accepted:
@@ -439,7 +411,6 @@ class LoadingScreen(Layer, KeyListener):
   
   def render(self, visibility, topMost):
     self.engine.view.setViewport(1,0)
-    #font = self.engine.data.font
     font = self.engine.data.loadingFont
 
     if not font:
@@ -685,10 +656,11 @@ class FileChooser(BackgroundLayer, KeyListener):
       self.engine.theme.setBaseColor(1 - v)
       wrapText(font, (.1, .05 - v), self.prompt)
 
-#==============================================================
-#MFH - on-demand Neck Select menu
 class NeckChooser(Layer, KeyListener):
-  """Item menu layer."""
+  """
+  Item menu layer.
+  on-demand Neck Select menu
+  """
   def __init__(self, engine, selected = None, prompt = _("Yellow (#3) / Blue (#4) to change, Green (#1) to confirm:"), player = "default", owner = None):
     self.prompt   = prompt
     self.prompt_x = engine.theme.neck_prompt_x
@@ -745,9 +717,6 @@ class NeckChooser(Layer, KeyListener):
 
     for i in neckfiles:
       # evilynux - Special cases, ignore these...
-      #if( str(i) == "overdriveneck.png" or str(i)[-4:] != ".png" ):
-      #exists = 1
-      #if( str(i) == "overdriveneck.png" or not i.endswith(".png") ):
       if( os.path.splitext(i)[0] == "randomneck" or os.path.splitext(i)[0] == "overdriveneck" ):    #MFH 
         exists = 0
         continue
@@ -790,7 +759,7 @@ class NeckChooser(Layer, KeyListener):
     self.themename = self.engine.data.themeLabel
     self.theme = self.engine.data.theme
 
-   #MFH - added simple black background to place in front of Options background, behind Neck BG, for transparent neck displays
+    #MFH - added simple black background to place in front of Options background, behind Neck BG, for transparent neck displays
     if not self.engine.loadImgDrawing(self, "neckBlackBack", ("neckblackback.png")):
       self.neckBlackBack = None
 
@@ -810,7 +779,6 @@ class NeckChooser(Layer, KeyListener):
     self.engine.input.removeKeyListener(self)
     
   def chooseNeck(self):
-    #self.selectedNeck = neck
     if self.player == "default":
       self.engine.config.set("game","default_neck",self.neck[self.selectedNeck])
     if self.owner: #rather hard-coded...
@@ -1124,7 +1092,6 @@ class AvatarChooser(Layer, KeyListener):
   
   def getAvatar(self):
     if self.accepted:
-      #t = self.selectedAv < self.themeAvs and os.path.join("themes",self.themename,"avatars",self.avatar[self.selectedAv]+".123") or os.path.join("avatars",self.avatar[self.selectedAv]+".123")
       t = self.selectedAv < self.themeAvs and self.avatars[self.selectedAv].filename
       return t
     else:
@@ -1426,9 +1393,6 @@ class ItemChooser(BackgroundLayer, KeyListener):
       self.songSelectSubmenuOffsetSpaces = self.engine.theme.songSelectSubmenuOffsetSpaces
       self.posX, self.posY = pos
       wrapX, wrapY = wrapText(self.font, (self.posX, self.posY), self.prompt, scale = self.promptScale)
-      #self.posY += self.promptHeight*2
-      #self.posX -= self.promptWidth/2
-      #self.menu = Menu(self.engine, choices = [(c, self._callbackForItem(c)) for c in items], onClose = self.close, onCancel = self.cancel, font = self.engine.data.streakFont2, pos = (self.posX + widthOfSpace*2, wrapY + self.promptHeight*2) )
       self.menu = Menu(self.engine, choices = [(c, self._callbackForItem(c)) for c in items], onClose = self.close, onCancel = self.cancel, font = self.engine.data.streakFont2, pos = (self.posX + widthOfSpace*(self.songSelectSubmenuOffsetSpaces+1), wrapY + self.promptHeight*(self.songSelectSubmenuOffsetLines+1)) )
     else:
       self.posX = .1    #MFH - default
@@ -1488,7 +1452,6 @@ class ItemChooser(BackgroundLayer, KeyListener):
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
       glEnable(GL_COLOR_MATERIAL)
       self.engine.theme.setBaseColor(1 - v)
-      #wrapText(self.font, (.1, .05 - v), self.prompt)
       wrapText(self.font, (self.posX, self.posY - v), self.prompt, scale = self.promptScale)
 
 class KeyTester(Layer, KeyListener):
@@ -2068,9 +2031,7 @@ def showMessage(engine, text):
   d = MessageScreen(engine, text)
   _runDialog(engine, d)
 
-#=======================================================================
 # glorandwarf: added derived class LoadingSplashScreen
-
 class LoadingSplashScreen(Layer, KeyListener):
   """Loading splash screen layer"""
   def __init__(self, engine, text):

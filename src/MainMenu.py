@@ -141,9 +141,6 @@ class MainMenu(BackgroundLayer):
     else:
       self.menumusic = False
 
-   
- #####======= Racer: New Main Menu ======####
-
     self.opt_text_color     = self.engine.theme.opt_text_colorVar
     self.opt_selected_color = self.engine.theme.opt_selected_colorVar
 
@@ -302,11 +299,9 @@ class MainMenu(BackgroundLayer):
     if not self.nextLayer:
       self.nextLayer = layerFunc
       self.engine.view.popAllLayers()
-  #launchLayer = catchErrors(launchLayer)    #MFH - trying to catch errors
 
   def showTutorial(self):
     # evilynux - Make sure tutorial exists before launching
-    #tutorialpath = self.engine.getPath(os.path.join("songs","tutorial"))
     tutorialpath = self.engine.tutorialFolder
     if not os.path.isdir(self.engine.resource.fileName(tutorialpath)):
       Log.debug("No folder found: %s" % tutorialpath)

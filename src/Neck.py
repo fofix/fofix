@@ -68,9 +68,6 @@ class Neck:
     if self.isDrum and self.engine.config.get("game", "large_drum_neck"):
       self.boardWidth     = 4.0
       self.boardLength    = 12.0
-    #elif Theme.twoDnote == False or Theme.twoDkeys == False:
-      #self.boardWidth     = 3.6
-      #self.boardLength    = 9.0  
 
     self.beatsPerBoard  = 5.0
     self.beatsPerUnit   = self.beatsPerBoard / self.boardLength
@@ -276,7 +273,6 @@ class Neck:
     w            = self.boardWidth
     l            = self.boardLength
 
-    #offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
     offset = 0
 
     z  = ((time - pos) / self.currentPeriod) / self.beatsPerUnit
@@ -291,34 +287,26 @@ class Neck:
     glBegin(GL_TRIANGLE_STRIP)
     glColor4f(color[0],color[1],color[2], 0)
     glTexCoord2f(0.0, project(offset - 2 * self.beatsPerUnit))
-    #glVertex3f(-w / 2, 0, -2)
     glVertex3f(-w / 2, 0, z)   #point A
     glTexCoord2f(1.0, project(offset - 2 * self.beatsPerUnit))
-    #glVertex3f( w / 2, 0, -2)
     glVertex3f( w / 2, 0, z)   #point B
 
     
     glColor4f(color[0],color[1],color[2], v)
     glTexCoord2f(0.0, project(offset - 1 * self.beatsPerUnit))
-    #glVertex3f(-w / 2, 0, -1)
     glVertex3f(-w / 2, 0, z+1)   #point C
     glTexCoord2f(1.0, project(offset - 1 * self.beatsPerUnit))
-    #glVertex3f( w / 2, 0, -1)
     glVertex3f( w / 2, 0, z+1)   #point D
     
     glTexCoord2f(0.0, project(offset + l * self.beatsPerUnit * .7))
-    #glVertex3f(-w / 2, 0, l * .7)
     glVertex3f(-w / 2, 0, z+2+l * .7) #point E
     glTexCoord2f(1.0, project(offset + l * self.beatsPerUnit * .7))
-    #glVertex3f( w / 2, 0, l * .7)
     glVertex3f( w / 2, 0, z+2+l * .7) #point F
     
     glColor4f(color[0],color[1],color[2], 0)
     glTexCoord2f(0.0, project(offset + l * self.beatsPerUnit))
-    #glVertex3f(-w / 2, 0, l)
     glVertex3f(-w / 2, 0, z+2+l)    #point G
     glTexCoord2f(1.0, project(offset + l * self.beatsPerUnit))
-    #glVertex3f( w / 2, 0, l)
     glVertex3f( w / 2, 0, z+2+l)    #point H
     glEnd()
     
@@ -337,9 +325,6 @@ class Neck:
 
 
     if self.incomingNeckMode > 0:   #if enabled
-
-
-      #if self.song.hasStarpowerPaths and self.song.midiStyle == Song.MIDI_TYPE_RB:  
       if self.useMidiSoloMarkers:
         for time, event in track.getEvents(boardWindowMin, boardWindowMax):
           if isinstance(event, Song.MarkerNote):
@@ -379,7 +364,6 @@ class Neck:
               if not self.guitarSolo:   #only until guitar solo starts!
                 neckImg = self.soloNeck
                 self.renderIncomingNeck(visibility, song, pos, time, neckImg)
-            #else: #event.text.find("OFF"):
             elif self.incomingNeckMode == 2:    #render both start and end incoming necks
               if self.guitarSolo:   #only until the end of the guitar solo!
                 if self.instrument.starPowerActive and self.oNeck:

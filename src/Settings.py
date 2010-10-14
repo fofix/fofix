@@ -260,24 +260,6 @@ class KeyConfigChoice(Menu.Choice):
         key = Dialogs.getKey(self.engine, _("Press a key for '%s' or hold Escape to cancel.") % text)
     
     if key:
-      #------------------------------------------
-      
-      #myfingershurt: key conflict checker operation mode
-      #if self.keyCheckerMode == 2:    #enforce; do not allow conflicting key assignments, force reversion
-        # glorandwarf: sets the new key mapping and checks for a conflict
-        #if self.engine.input.setNewKeyMapping(self.section, self.option, key) == False:
-          # key mapping would conflict, warn the user
-          #Dialogs.showMessage(self.engine, _("That key is already in use. Please choose another."))
-        #self.engine.input.reloadControls()
-
-      #elif self.keyCheckerMode == 1:    #just notify, but allow the change
-        # glorandwarf: sets the new key mapping and checks for a conflict
-        #if self.engine.input.setNewKeyMapping(self.section, self.option, key) == False:
-          # key mapping would conflict, warn the user
-          #Dialogs.showMessage(self.engine, _("A key conflict exists somewhere. You should fix it."))
-        #self.engine.input.reloadControls()
-      
-      #else:   #don't even check.
       temp = Player.setNewKeyMapping(self.engine, self.config, self.section, self.option, key)
       if self.name in self.engine.input.controls.controlList:
         self.engine.input.reloadControls()
@@ -286,9 +268,6 @@ class KeyConfigChoice(Menu.Choice):
         temp = Player.setNewKeyMapping(self.engine, self.config, self.section, self.option, "None")
         if self.name in self.engine.input.controls.controlList:
           self.engine.input.reloadControls()
-      
-      
-      #------------------------------------------
 
   def apply(self):
     pass
@@ -1037,17 +1016,6 @@ class SettingsMenu(Menu.Menu):
                            self.quickSettings + \
                            self.modSettings
 
-#-    self.settingsToApply = settings + \
-#-                           videoSettings + \
-#-                           AdvancedAudioSettings + \
-#-                           volumeSettings + \
-#-                           keySettings + \
-#-                           AdvancedVideoSettings + \
-#-                           FoFiXBasicSettings + \11/26/2008 11:10:30 PM
-#-                           perfSettings + \
-#-                           listSettings + \
-#-                           modSettings
-
     Menu.Menu.__init__(self, engine, settings, name = "advsettings", onCancel = self.applySettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)   #MFH - add position to this so we can move it
 
   def applySettings(self):
@@ -1142,16 +1110,6 @@ class SettingsMenu(Menu.Menu):
     if self.engine.config.get("game", "language") != "":
       self.engine.config.set("game", "language", "")
       self.engine.restart()
-
-
-  #def listAllFolderSelect(self):
-  #  Log.debug("settings.baseLibrarySelect function call...")
-  #  newPath = Dialogs.chooseFile(self.engine, masks = ["*/*"], prompt = _("Choose a New List All directory."), dirSelect = True)
-  #  if newPath != None:
-  #    Config.set("game", "listall_folder", os.path.dirname(newPath))
-  #    Log.debug(newPath)
-  #    Log.debug(os.path.dirname(newPath))
-  #    self.engine.resource.refreshBaseLib()   #myfingershurt - to let user continue with new songpath without restart
       
   def baseLibrarySelect(self):
     Log.debug("settings.baseLibrarySelect function call...")

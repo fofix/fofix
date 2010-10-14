@@ -59,18 +59,12 @@ class Guitar(Instrument):
     if self.logClassInits == 1:
       Log.debug("Guitar class init...")
     
-    #death_au: fixed neck size
-    #if self.engine.theme.twoDnote == False or self.engine.theme.twoDkeys == False:
-      #self.boardWidth     = 3.6
-      #self.boardLength    = 9.0  
-    
     self.lastPlayedNotes = []   #MFH - for reverting when game discovers it implied incorrectly
     
     self.missedNotes    = []
     self.missedNoteNums = []
     self.editorMode     = editorMode
 
-    #########For Animations
     self.Animspeed      = 30#Lower value = Faster animations
     #For Animated Starnotes
     self.indexCount     = 0
@@ -392,7 +386,6 @@ class Guitar(Instrument):
           tex1 = self.freestyle1
           tex2 = self.freestyle2
           if freestyleTail == 1:
-            #glColor4f(*color)
             c1, c2, c3, c4 = color
             tailGlow = 1 - (pos - self.freestyleLastFretHitTime[fret] ) / self.freestylePeriod
             if tailGlow < 0:
@@ -664,14 +657,12 @@ class Guitar(Instrument):
       return
 
 
-    #boardWindowMin = pos - self.currentPeriod * 2
     boardWindowMax = pos + self.currentPeriod * self.beatsPerBoard
     track = song.midiEventTrack[self.player]
 
     #MFH - render 5 freestyle tails when Song.freestyleMarkingNote comes up
     if self.freestyleEnabled:
       freestyleActive = False
-      #for time, event in track.getEvents(boardWindowMin, boardWindowMax):
       for time, event in track.getEvents(pos - self.freestyleOffset , boardWindowMax + self.freestyleOffset):
         if isinstance(event, Song.MarkerNote):
           if event.number == Song.freestyleMarkingNote:
@@ -725,7 +716,6 @@ class Guitar(Instrument):
 
     # Update dynamic period
     self.currentPeriod = self.neckSpeed
-    #self.targetPeriod  = self.neckSpeed
 
     self.killPoints = False
 
@@ -737,7 +727,6 @@ class Guitar(Instrument):
     starEventsInView = False
     renderedNotes = reversed(self.getRequiredNotesForRender(song,pos))
     for time, event in renderedNotes:
-    #for time, event in reversed(track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)):    #MFH - reverse order of note rendering
       if isinstance(event, Tempo):
         self.tempoBpm = event.bpm
         if self.lastBpmChange > 0 and self.disableVBPM == True:
@@ -748,7 +737,6 @@ class Guitar(Instrument):
           self.lastBpmChange      = time
           self.neck.lastBpmChange = time
           self.neck.baseBeat      = self.baseBeat
-        #  self.setBPM(self.targetBpm) # glorandwarf: was setDynamicBPM(self.targetBpm)
         continue
       
       if not isinstance(event, Note):
@@ -811,7 +799,6 @@ class Guitar(Instrument):
 
 
       if event.star:
-        #self.isStarPhrase = True
         starEventsInView = True
       if event.finalStar:
         self.finalStarSeen = True
@@ -849,7 +836,6 @@ class Guitar(Instrument):
       # Clip the played notes to the origin
       #myfingershurt: this should be loaded once at init, not every render...
       if self.notedisappear == True:#Notes keep on going when missed
-        ###Capo###
         if event.played or event.hopod:
           tailOnly = True
           length += z
@@ -859,7 +845,6 @@ class Guitar(Instrument):
         if z < 0 and not (event.played or event.hopod): 
           color = (.6, .6, .6, .5 * visibility * f)
           flat  = False 
-        ###endCapo###
       else:#Notes disappear when missed
         if z < 0:
           if event.played or event.hopod:
@@ -926,7 +911,6 @@ class Guitar(Instrument):
 
     # Update dynamic period
     self.currentPeriod = self.neckSpeed
-    #self.targetPeriod  = self.neckSpeed
 
     self.killPoints = False
 
@@ -938,7 +922,6 @@ class Guitar(Instrument):
     enable = True
     renderedNotes = self.getRequiredNotesForRender(song,pos)
     for time, event in renderedNotes:
-    #for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard):
       if isinstance(event, Tempo):
         self.tempoBpm = event.bpm
         continue
@@ -1017,7 +1000,6 @@ class Guitar(Instrument):
       # Clip the played notes to the origin
       #myfingershurt: this should be loaded once at init, not every render...
       if self.notedisappear == True:#Notes keep on going when missed
-        ###Capo###
         if event.played or event.hopod:
           tailOnly = True
           length += z
@@ -1027,7 +1009,6 @@ class Guitar(Instrument):
         if z < 0 and not (event.played or event.hopod): 
           color = (.6, .6, .6, .5 * visibility * f)
           flat  = False 
-        ###endCapo###
       else:#Notes disappear when missed
         if z < 0:
           if event.played or event.hopod:
@@ -1211,18 +1192,11 @@ class Guitar(Instrument):
           elif n == 4: #orange fret button
             glRotate(self.engine.theme.keyrot[4], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.keypos[4])
 
-
           #Mesh - Main fret
           #Key_001 - Top of fret (key_color)
           #Key_002 - Bottom of fret (key2_color)
           #Glow_001 - Only rendered when a note is hit along with the glow.svg
 
-          #if self.complexkey == True:
-          #  glColor4f(.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], visibility)
-          #  if self.battleStatus[4]:
-          #    glTranslatef(x, y + self.battleWhammyNow * .15, 0)
-          #  else:
-          #    glTranslatef(x, y, 0)
           if self.keytex == True:
             glColor4f(1,1,1,visibility)
             if self.battleStatus[4]:
@@ -1270,7 +1244,6 @@ class Guitar(Instrument):
           glPopMatrix()
 
 
-      ######################
       f = self.fretActivity[n]
 
       if f and self.disableFretSFX != True:
@@ -1321,7 +1294,6 @@ class Guitar(Instrument):
                               texcoord = (0.0, 0.0, 1.0, 1.0), vertex = (-size[0] * f, -size[1] * f, size[0] * f, size[1] * f),
                               multiples = True, alpha = True, color = glowcol)
 
-      #self.hit[n] = False  #MFH -- why?  This prevents frets from being rendered under / before the notes...
     glDisable(GL_DEPTH_TEST)
 
   def renderFreestyleFlames(self, visibility, controls):
@@ -1329,7 +1301,6 @@ class Guitar(Instrument):
       return
 
     w = self.boardWidth / self.strings
-    #track = song.track[self.player]
 
     size = (.22, .22)
     v = 1.0 - visibility
@@ -1351,14 +1322,10 @@ class Guitar(Instrument):
           if self.theme == 2:
             y -= 0.5
           
-          #flameSize = self.flameSizes[self.scoreMultiplier - 1][fretNum]
           flameSize = self.flameSizes[self.cappedScoreMult - 1][fretNum]
           if self.theme == 0 or self.theme == 1: #THIS SETS UP GH3 COLOR, ELSE ROCKBAND(which is DEFAULT in Theme.py)
             flameColor = self.gh3flameColor
           else: #MFH - fixing crash!
-            #try:
-            #  flameColor = self.flameColors[self.scoreMultiplier - 1][fretNum]
-            #except IndexError:
             flameColor = self.fretColors[fretNum]
           if flameColor[0] == -2:
             flameColor = self.fretColors[fretNum]
@@ -1462,8 +1429,6 @@ class Guitar(Instrument):
           if time == q:
             event.star = True
         for q in self.maxStars:
-          #if time == q and not event.finalStar:
-          #  event.star = True
           if time == q:   #MFH - no need to mark only the final SP phrase note as the finalStar as in drums, they will be hit simultaneously here.
             event.finalStar = True
       self.starNotesSet = True
@@ -1511,10 +1476,7 @@ class Guitar(Instrument):
       elif self.battleStatus[6]:
         glScalef(-1, 1, 1)
 
-    #return notes
-
   #MFH - corrected and optimized:
-  #def getRequiredNotesMFH(self, song, pos):
   def getRequiredNotesMFH(self, song, pos, hopoTroubleCheck = False):
     if self.battleStatus[2] and self.difficulty != 0:
       if pos < self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard or pos > self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
@@ -1661,7 +1623,6 @@ class Guitar(Instrument):
       track0 = None
       track1 = None
       notes = sorted(notes, key=lambda x: x[0])
-      #Log.debug(notes)
     else:
       track   = song.track[self.player]
       notes = [(time, event) for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
@@ -1748,7 +1709,6 @@ class Guitar(Instrument):
     chords = {}
     for time, note in notes:
       if note.hopod == True and (controls.getState(self.keys[note.number]) or controls.getState(self.keys[note.number + 5])):
-      #if hopo == True and controls.getState(self.keys[note.number]):
         self.playedNotes = []
         return True
       if not time in chords:
@@ -1810,7 +1770,6 @@ class Guitar(Instrument):
     chords = {}
     for time, note in notes:
       if note.hopod == True and (controls.getState(self.keys[note.number]) or controls.getState(self.keys[note.number + 5])):
-      #if hopo == True and controls.getState(self.keys[note.number]):
         self.playedNotes = []
         return True
       if not time in chords:
@@ -1819,7 +1778,6 @@ class Guitar(Instrument):
 
     #Make sure the notes are in the right time order
     chordlist = chords.values()
-    #chordlist.sort(lambda a, b: cmp(a[0][0], b[0][0]))
     chordlist.sort(key=lambda a: a[0][0])
 
     self.missedNotes = []
@@ -2056,7 +2014,6 @@ class Guitar(Instrument):
         note.hopod        = True
       else:
         note.played       = True
-        #self.wasLastNoteHopod = False
       if note.tappable == 1 or note.tappable == 2:
         self.hopoActive = time
         self.wasLastNoteHopod = True
@@ -2083,7 +2040,6 @@ class Guitar(Instrument):
         if isinstance(lastPlayedNote, Note):
           if note.tappable == 1 and lastPlayedNote.tappable == 1:
             self.LastStrumWasChord = True
-            #self.sameNoteHopoString = False
           else:
             self.LastStrumWasChord = False
         lastPlayedNote = note
@@ -2173,7 +2129,6 @@ class Guitar(Instrument):
         self.starPowerActive = False
         #MFH - call to play star power deactivation sound, if it exists (if not play nothing)
         if self.engine.data.starDeActivateSoundFound:
-          #self.engine.data.starDeActivateSound.setVolume(self.sfxVolume)
           self.engine.data.starDeActivateSound.play()
 
     

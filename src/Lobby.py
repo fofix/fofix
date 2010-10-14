@@ -367,8 +367,6 @@ class Lobby(Layer, KeyListener):
       return True
     elif key == pygame.K_SPACE: #todo (allow space to alter the panel order)
       pass
-      #self.keyGrab ^= True
-      #self.oldOrder = self.panelOrder
     elif key == pygame.K_LEFT:
       if self.keyGrab:
         a = self.panelOrder[self.keyControl]

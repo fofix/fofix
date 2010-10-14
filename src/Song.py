@@ -75,10 +75,6 @@ GUITAR_TRACK             = 0
 RHYTHM_TRACK             = 1
 DRUM_TRACK               = 2
 
-#FOF_TYPE                = 0
-#GH1_TYPE                = 1
-#GH2_TYPE                = 2
-
 #MFH
 MIDI_TYPE_GH            = 0       #GH type MIDIs have starpower phrases marked with a long G8 note on that instrument's track
 MIDI_TYPE_RB            = 1       #RB type MIDIs have overdrive phrases marked with a long G#9 note on that instrument's track
@@ -112,10 +108,6 @@ class Part:
   def __init__(self, id, text):
     self.id   = id
     self.text = text
-
-    #self.logClassInits = Config.get("game", "log_class_inits")
-    #if self.logClassInits == 1:
-    #  Log.debug("Part class init (song.py)...")
   
   def __cmp__(self, other):
     if isinstance(other, Part):
@@ -142,10 +134,6 @@ class Difficulty:
   def __init__(self, id, text):
     self.id   = id
     self.text = text
-
-    #self.logClassInits = Config.get("game", "log_class_inits")
-    #if self.logClassInits == 1:
-    #  Log.debug("Difficulty class init (song.py)...")
   
   def __cmp__(self, other):
     if isinstance(other, Difficulty):
@@ -243,7 +231,6 @@ class SongInfo(object):
 
     self.useUneditedMidis = Config.get("debug",   "use_unedited_midis")
     if self.useUneditedMidis == 1:    #auto
-      #if os.path.exists(os.path.join(os.path.dirname(self.fileName), "notes-unedited.mid"))
       if os.path.isfile(os.path.join(os.path.dirname(self.fileName), "notes-unedited.mid")):
         notefile = "notes-unedited.mid"
         if self.logUneditedMidis == 1:
@@ -310,11 +297,6 @@ class SongInfo(object):
           difficulty = difficulties[difficulty]
         except KeyError:
           continue
-        #for score, stars, name, hash in scores[difficulty.id]:
-        #  if self.getScoreHash(difficulty, score, stars, name) == hash:
-        #    self.addHighscore(difficulty, score, stars, name, part = parts[RHYTHM_PART])
-        #  else:
-        #    Log.warn("Weak hack attempt detected. Better luck next time.")
         for i, base_scores in enumerate(scores[difficulty.id]):
           score, stars, name, hash = base_scores
           if scores_ext != "":
@@ -352,11 +334,6 @@ class SongInfo(object):
           difficulty = difficulties[difficulty]
         except KeyError:
           continue
-        #for score, stars, name, hash in scores[difficulty.id]:
-        #  if self.getScoreHash(difficulty, score, stars, name) == hash:
-        #    self.addHighscore(difficulty, score, stars, name, part = parts[BASS_PART])
-        #  else:
-        #    Log.warn("Weak hack attempt detected. Better luck next time.")
         for i, base_scores in enumerate(scores[difficulty.id]):
           score, stars, name, hash = base_scores
           if scores_ext != "":
@@ -394,11 +371,6 @@ class SongInfo(object):
           difficulty = difficulties[difficulty]
         except KeyError:
           continue
-        #for score, stars, name, hash in scores[difficulty.id]:
-        #  if self.getScoreHash(difficulty, score, stars, name) == hash:
-        #    self.addHighscore(difficulty, score, stars, name, part = parts[LEAD_PART])
-        #  else:
-        #    Log.warn("Weak hack attempt detected. Better luck next time.")            
         for i, base_scores in enumerate(scores[difficulty.id]):
           score, stars, name, hash = base_scores
           if scores_ext != "":
@@ -437,11 +409,6 @@ class SongInfo(object):
           difficulty = difficulties[difficulty]
         except KeyError:
           continue
-        #for score, stars, name, hash in scores[difficulty.id]:
-        #  if self.getScoreHash(difficulty, score, stars, name) == hash:
-        #    self.addHighscore(difficulty, score, stars, name, part = parts[DRUM_PART])
-        #  else:
-        #    Log.warn("Weak hack attempt detected. Better luck next time.")         
         for i, base_scores in enumerate(scores[difficulty.id]):
           score, stars, name, hash = base_scores
           if scores_ext != "":
@@ -480,11 +447,6 @@ class SongInfo(object):
           difficulty = difficulties[difficulty]
         except KeyError:
           continue
-        #for score, stars, name, hash in scores[difficulty.id]:
-        #  if self.getScoreHash(difficulty, score, stars, name) == hash:
-        #    self.addHighscore(difficulty, score, stars, name, part = parts[DRUM_PART])
-        #  else:
-        #    Log.warn("Weak hack attempt detected. Better luck next time.")         
         for i, base_scores in enumerate(scores[difficulty.id]):
           score, stars, name, hash = base_scores
           if scores_ext != "":
@@ -864,7 +826,6 @@ class SongInfo(object):
       }
       data = urllib.urlopen(url + "?" + urllib.urlencode(d)).read()
       Log.debug("Score upload result: %s" % data)
-      #return data == "True"
       return data   #MFH - want to return the actual result data.
     except Exception, e:
       Log.error("Score upload error: %s" % e)
@@ -1029,7 +990,6 @@ class LibraryInfo(object):
     libraryRoot = os.path.dirname(self.fileName)
     for name in os.listdir(libraryRoot):
       if not os.path.isdir(os.path.join(libraryRoot, name)) or name.startswith("."):
-      #if not os.path.isdir(os.path.join(libraryRoot, name)):
         continue
       if os.path.isfile(os.path.join(libraryRoot, name, "notes.mid")):
         self.songCount += 1
@@ -1082,10 +1042,7 @@ class LibraryInfo(object):
 
 
 class BlankSpaceInfo(object): #MFH
-  #def __init__(self, config, section):
   def __init__(self, nameToDisplay = ""):
-    #self.info    = config
-    #self.section = section
     self.nameToDisplay = nameToDisplay
 
     self.logClassInits = Config.get("game", "log_class_inits")
@@ -1111,7 +1068,6 @@ class BlankSpaceInfo(object): #MFH
     return v
 
   def getName(self):
-    #return self._get("name")
     return self.nameToDisplay
 
   def setName(self, value):
@@ -1135,10 +1091,7 @@ class BlankSpaceInfo(object): #MFH
 
 
 class CareerResetterInfo(object): #MFH
-  #def __init__(self, config, section):
   def __init__(self):
-    #self.info    = config
-    #self.section = section
 
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:
@@ -1163,7 +1116,6 @@ class CareerResetterInfo(object): #MFH
     return v
 
   def getName(self):
-    #return self._get("name")
     return _("Reset Career")
 
   def setName(self, value):
@@ -1182,11 +1134,7 @@ class CareerResetterInfo(object): #MFH
 
 
 class RandomSongInfo(object): #MFH
-  #def __init__(self, config, section):
   def __init__(self):
-    #self.info    = config
-    #self.section = section
-
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("RandomSongInfo class init (song.py)...")
@@ -1210,7 +1158,6 @@ class RandomSongInfo(object): #MFH
     return v
 
   def getName(self):
-    #return self._get("name")
     return _("   (Random Song)")
 
   def setName(self, value):
@@ -1420,18 +1367,8 @@ class Track:    #MFH - Changing Track class to a base class.  NoteTrack and Temp
       if self.logClassInits == 1:
         Log.debug("Track class init (song.py)...")
 
-    #self.chordFudge = 1
-
-    #self.hopoTick = engine.config.get("coffee", "hopo_frequency")
-    #self.hopoTickCheat = engine.config.get("coffee", "hopo_freq_cheat")
-    #self.songHopoFreq = engine.config.get("game", "song_hopo_freq")
 
   def __getitem__(self, index):
-    #if isinstance(index, slice):
-    #    return [x**2 for x in index]
-    #else:
-    #    return index**2
-    #return index**2
     return self.allEvents[index]
 
   def __len__(self):
@@ -1550,7 +1487,6 @@ class VocalTrack(Track):
           event.star = True
         if time in phraseTimes:
           Log.warn("Phrase repeated - some lyric phrase errors may occur.")
-          #self.removeEvent(time, event)
           phraseId += 1
           continue
         if markStars and phraseId+1 % 7 == 0:
@@ -1644,7 +1580,6 @@ class TempoTrack(Track):    #MFH - special Track type for tempo events
 
   def getNextTempoChange(self, pos):  #MFH
     if self.currentIndex:
-      #return self.getNextEvent(lookAhead = 1)
       return self.getNextEvent()
     return None 
   
@@ -1746,7 +1681,6 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
       
       while bpmNotes and time >= bpmNotes[0][0]:
         #Adjust to new BPM
-        #bpm = bpmNotes[0][1].bpm
         bpmTime, bpmEvent = bpmNotes.pop(0)
         bpm = bpmEvent.bpm
       
@@ -1923,8 +1857,6 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
         continue
 
 
-
-#---------------------
   def markHopoGH2(self, eighthNH, HoposAfterChords, songHopoFreq):
     lastTick = 0
     lastTime  = 0
@@ -1937,7 +1869,6 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
       songHopoFreq = int(songHopoFreq)
     except Exception, e:
       songHopoFreq = None
-    #  Log.warn("Song.ini HOPO Frequency setting is invalid -- forcing Normal (value 1)")
     if self.songHopoFreq == 1 and (songHopoFreq == 0 or songHopoFreq == 1 or songHopoFreq == 2 or songHopoFreq == 3 or songHopoFreq == 4 or songHopoFreq == 5):
       Log.debug("markHopoGH2: song-specific HOPO frequency %d forced" % songHopoFreq)
       self.hopoTick = songHopoFreq
@@ -1950,7 +1881,6 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
     else:
         hopoDelta = 170
 
-    #chordFudge = 10
     self.chordFudge = 1   #MFH - there should be no chord fudge.
 
     if self.hopoTick == 0:
@@ -2054,11 +1984,7 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
           hopoNotes.append([bpmTime, bpmEvent])
 
         hopoNotes.append([time, event])
-
-
-
-
-        
+       
       #HOPO definitely over - time since last note too great.
       if tickDelta > hopoDelta:
         if hopoNotes != []:
@@ -2068,11 +1994,6 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
               lastEvent.tappable = 3
             else:
               lastEvent.tappable = -1
-
-
-
-
-
 
     #note pattern:
       # R R R R R
@@ -2086,7 +2007,6 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
       #-4 0-2-2-2
       #actual: if first RY not considered "same note" as next R:
       #-4 0-2-2
-    
 
       #This is the same note as before
       elif noteDelta == 0:
@@ -2103,14 +2023,7 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
         else:
           event.tappable = -2
           lastEvent.tappable = -2
-
-
-
-
-
-
-
-            
+          
       #This is a chord
       #myfingershurt: both this note and the last note are listed at the same time
       #to allow after-chord HOPOs, we need a separate identification for "chord" notes
@@ -2132,10 +2045,6 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
           lastEvent.tappable = -1
           event.tappable = -1
 
-        
-
-
-        
       #myfingershurt: to really check marking, need to track 3 notes into the past. 
       eventBeforeEventBeforeLast = eventBeforeLast
       timeBeforeTimeBeforeLast = timeBeforeLast
@@ -2203,21 +2112,14 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
         eventBeforeEventBeforeEventBeforeLast = eventBeforeLast
         continue
 
-
-
-
       #need to recompute (or carry forward) BPM at this time
 
       tickDeltaBeforeTickDeltaBeforeLast = tickDeltaBeforeLast    #4 notes in the past
       tickDeltaBeforeLast = lastTickDelta     #3 notes in the past
       lastTickDelta = tickDelta   #2 notes in the past
-
-
       tick = (time * bpm * ticksPerBeat) / 60000.0
       lastTick = (lastTime * bpm * ticksPerBeat) / 60000.0
       tickDelta = tick - lastTick
-
-
 
       #current Note Invalid for HOPO----------
       if note.tappable < 0:
@@ -2233,7 +2135,6 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
         #myfingershurt:
         #If current note is beginning of a same note sequence, it's valid for END of HOPO only
         #need to alter this to not screw up single-same-note-before chords:
-        #elif lastEvent.tappable == 2 and note.tappable == -2:
         if (lastEvent.tappable == 1 or lastEvent.tappable == 2) and note.tappable == -2:
           note.tappable = 3
         #If current note is invalid for HOPO, and previous note was start of a HOPO section, then previous note not HOPO
@@ -2324,11 +2225,8 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
           #This is the end of a valid HOPO section
           if lastEvent.tappable == 1 or lastEvent.tappable == 2:
             eventBeforeEventBeforeEventBeforeLast = eventBeforeLast
-            #timeBeforeTimeBeforeTimeBeforeLast = timeBeforeLast
             eventBeforeEventBeforeLast = eventBeforeLast
-            #timeBeforeTimeBeforeLast = timeBeforeLast
             eventBeforeLast = lastEvent
-            #timeBeforeLast = lastTime
             lastEvent = note
             lastTime = time
             continue
@@ -2528,10 +2426,8 @@ class Song(object):
     self.start        = 0.0
     self.noteFileName = noteFileName
     
-    #self.bpm          = None
     self.bpm          = DEFAULT_BPM     #MFH - enforcing a default / fallback tempo of 120 BPM
 
-    #self.period       = 0
     self.period = 60000.0 / self.bpm    #MFH - enforcing a default / fallback tempo of 120 BPM
 
     self.readyToGo = False    #MFH - to prevent anything from happening until all prepration & initialization is complete!
@@ -2555,11 +2451,6 @@ class Song(object):
 
     #MFH - add a separate variable to house the special text event tracks:
     #MFH - special text-event tracks for the separated text-event list variable
-    #TK_SCRIPT = 0         #script.txt events
-    #TK_SECTIONS = 1       #Section events
-    #TK_GUITAR_SOLOS = 2   #Guitar Solo start/stop events
-    #TK_LYRICS = 3         #RB MIDI Lyric events
-    #TK_UNUSED_TEXT = 4    #Unused / other text events
     self.eventTracks       = [Track(self.engine) for t in range(0,5)]    #MFH - should result in eventTracks[0] through [4]
     
     self.midiEventTracks   = []
@@ -2584,12 +2475,6 @@ class Song(object):
 
     self.music = None
 
-
-    #self.slowDownFactor = self.engine.config.get("audio", "speed_factor")
-    #self.engine.setSpeedFactor(self.slowDownFactor)    #MFH 
-
-    # load the tracks
-    #if self.engine.audioSpeedFactor == 1:    #MFH - only use the music track   
     if songTrackName:
       self.music       = Audio.Music(songTrackName)
 
@@ -2600,8 +2485,6 @@ class Song(object):
     self.drumTrack = None
     #akedrou
     self.crowdTrack = None
-    #if songTrackName:
-    #  drumTrackName = songTrackName.replace("song.ogg","drums.ogg")
 
     try:
       if guitarTrackName:
@@ -2987,10 +2870,6 @@ class ScriptReader:
 
       self.song.eventTracks[TK_SCRIPT].addEvent(time, event)  #MFH - add an event to the script.txt track
 
-      #for track in self.song.tracks:
-      #  for t in track:
-      #    t.addEvent(time, event)
-
 class MidiReader(midi.MidiOutStream):
   def __init__(self, song):
     midi.MidiOutStream.__init__(self)
@@ -3155,7 +3034,6 @@ class MidiReader(midi.MidiOutStream):
     self.addTempoEvent(Tempo(bpm))  #MFH 
 
   def sequence_name(self, text):
-    #if self.get_current_track() == 0:
     self.partnumber = None
 
     tempText = "Found sequence_name in MIDI: " + text + ", recognized as "
@@ -3190,12 +3068,6 @@ class MidiReader(midi.MidiOutStream):
         self.useVocalTrack = False
     else:
       self.vocalTrack = False
-    #for rock band unaltered rip compatibility
-    #-elif text == "PART DRUMS" and parts[DRUM_PART] in self.song.parts:
-      #-self.partnumber = parts[DRUM_PART]
-    #-elif self.get_current_track() <= 1 and parts [GUITAR_PART] in self.song.parts:
-      #-#Oh dear, the track wasn't recognised, lets just assume it was the guitar part
-      #-self.partnumber = parts[GUITAR_PART]
 
     if self.logSections == 1:
       Log.debug(tempText + tempText2)
@@ -3244,9 +3116,7 @@ class MidiReader(midi.MidiOutStream):
         self.song.hasStarpowerPaths = True
         self.earlyHitWindowSize = EARLY_HIT_WINDOW_NONE
 
-        #for diff in self.song.difficulty:
         for diff in difficulties:
-          #self.addEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
           self.addSpecialMidiEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
           self.addSpecialMidiEvent(diff, MarkerNote(note, 1, endMarker = True), time = endTime+1)   #ending marker note
           if self.logMarkerNotes == 1:
@@ -3254,9 +3124,7 @@ class MidiReader(midi.MidiOutStream):
 
       elif note == starPowerMarkingNote:    #MFH
         self.song.hasStarpowerPaths = True
-        #for diff in self.song.difficulty:
         for diff in difficulties:
-          #self.addEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
           self.addSpecialMidiEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
           self.addSpecialMidiEvent(diff, MarkerNote(note, 1, endMarker = True), time = endTime+1)   #ending marker note
           if self.logMarkerNotes == 1:
@@ -3264,16 +3132,11 @@ class MidiReader(midi.MidiOutStream):
 
       elif note == freestyleMarkingNote:    #MFH - for drum fills and big rock endings
         self.song.hasFreestyleMarkings = True
-        #for diff in self.song.difficulty:
         for diff in difficulties:
-          #self.addEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
           self.addSpecialMidiEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
-          #self.addSpecialMidiEvent(diff, MarkerNote(note, 1, endMarker = True), time = endTime+1)   #ending marker note
           if self.logMarkerNotes == 1:
             Log.debug("RB freestyle section (drum fill or BRE) at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, difficulties[diff] ) )
-
       else:
-        #Log.warn("MIDI note 0x%x at %d does not map to any game note." % (note, self.abs_time()))
         pass
     except KeyError:
       Log.warn("MIDI note 0x%x on channel %d ending at %d was never started." % (note, channel, self.abs_time()))
@@ -3291,7 +3154,6 @@ class MidiReader(midi.MidiOutStream):
   #to find these markers and count the notes and add a new text event containing each solo's note count
   def text(self, text):
     if text.find("GNMIDI") < 0:   #to filter out the midi class illegal usage / trial timeout messages
-      #Log.debug(str(self.abs_time()) + "-MIDI Text: " + text)
       if self.readTextAndLyricEvents > 0:
 
         #MFH - if sequence name is PART VOCALS then look for text event lyrics
@@ -3319,7 +3181,6 @@ class MidiReader(midi.MidiOutStream):
             text = text.replace("]","")
             #also convert "gtr" to "Guitar"
             text = text.replace("gtr","Guitar")
-            #event = TextEvent("SEC: " + text, 250.0)
             event = TextEvent(text, 250.0)
             if text.lower().find("big rock ending") >= 0:
               curTime = self.abs_time()
@@ -3342,7 +3203,6 @@ class MidiReader(midi.MidiOutStream):
               gSoloEvent = True
               gSolo = False
           elif text.lower().find("solo") >= 0 and text.find("[") < 0 and text.lower().find("drum") < 0 and text.lower().find("map") < 0 and text.lower().find("play") < 0 and not self.guitarSoloSectionMarkers:
-            #event = TextEvent("SEC: " + text, 250.0)
             event = TextEvent(text, 250.0)
             gSoloEvent = True
             if text.lower().find("off") >= 0:
@@ -3350,19 +3210,16 @@ class MidiReader(midi.MidiOutStream):
             else:
               gSolo = True
           elif (text.lower().find("verse") >= 0 or text.lower().find("chorus") >= 0) and text.find("[") < 0 and not self.guitarSoloSectionMarkers:   #this is an alternate GH1-style solo end marker
-            #event = TextEvent("SEC: " + text, 250.0)
             event = TextEvent(text, 250.0)
             gSoloEvent = True
             gSolo = False
           elif text.lower().find("gtr") >= 0 and text.lower().find("off") >= 0 and text.find("[") < 0 and not self.guitarSoloSectionMarkers:   #this is an alternate GH1-style solo end marker
             #also convert "gtr" to "Guitar"
             text = text.replace("gtr","Guitar")
-            #event = TextEvent("SEC: " + text, 100.0)
             event = TextEvent(text, 100.0)
             gSoloEvent = True
             gSolo = False
           else:  #unused text event
-            #unusedEvent = TextEvent("TXT: " + text, 100.0)
             unusedEvent = TextEvent(text, 100.0)
           #now, check for guitar solo status change:
           soloSlop = 150.0   
@@ -3393,27 +3250,15 @@ class MidiReader(midi.MidiOutStream):
                 self.song.eventTracks[TK_SECTIONS].addEvent(curTime, event)  #MFH - add an event to the sections track
           elif unusedEvent:
             self.song.eventTracks[TK_UNUSED_TEXT].addEvent(self.abs_time(), unusedEvent)  #MFH - add an event to the unused text track
-          
-          #for track in self.song.tracks:
-          #  for t in track:
-          #    t.addEvent(self.abs_time(), event)
-  
-        
-
 
   #myfingershurt: adding MIDI lyric event access
   def lyric(self, text):
     if text.find("GNMIDI") < 0:   #to filter out the midi class illegal usage / trial timeout messages
-      #Log.debug(str(self.abs_time()) + "-MIDI Lyric: " + text)
       if self.readTextAndLyricEvents > 0:
-        #event = TextEvent("LYR: " + text, 400.0)
         event = TextEvent(text, 400.0)
         self.addVocalLyric(text)
         self.song.hasMidiLyrics = True
         self.song.eventTracks[TK_LYRICS].addEvent(self.abs_time(), event)  #MFH - add an event to the lyrics track
-        #for track in self.song.tracks:
-        #  for t in track:
-        #    t.addEvent(self.abs_time(), event)
 
 class MidiSectionReader(midi.MidiOutStream):
   # We exit via this exception so that we don't need to read the whole file in
@@ -3480,7 +3325,6 @@ class MidiSectionReader(midi.MidiOutStream):
 
   def lyric(self, text):  #filter lyric events
     if text.find("GNMIDI") < 0:   #to filter out the midi class illegal usage / trial timeout messages
-      #Log.debug(str(self.abs_time()) + "-MIDI Lyric: " + text)
       text = ""
 
   #MFH - adding text event / section retrieval here 
@@ -3488,8 +3332,6 @@ class MidiSectionReader(midi.MidiOutStream):
   def text(self, text):
     if text.find("GNMIDI") < 0:   #to filter out the midi class illegal usage / trial timeout messages
       pos = self.abs_time()
-      #Log.debug("Found MidiInfoReader text event: " + text)
-      #if self.readTextAndLyricEvents > 0:
       text = text.replace("_"," ")
       if text.lower().find("section") >= 0:
         if not self.guitarSoloSectionMarkers:
@@ -3800,7 +3642,6 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
   useUneditedMidis = engine.config.get("debug",   "use_unedited_midis")
   if useUneditedMidis == 1:    #auto
     noteFile   = engine.resource.fileName(library, name, "notes-unedited.mid", writable = True)
-    #if os.path.exists(os.path.join(os.path.dirname(self.fileName), "notes-unedited.mid"))
     if os.path.isfile(noteFile):
       if logUneditedMidis == 1:
         Log.debug("notes-unedited.mid found, using instead of notes.mid! - " + name)
@@ -3812,10 +3653,7 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
     noteFile   = engine.resource.fileName(library, name, "notes.mid", writable = True)
     if logUneditedMidis == 1:
       Log.debug("notes-unedited.mid not found, using notes.mid - " + name)
-
-
-  #noteFile   = engine.resource.fileName(library, name, "notes.mid", writable = True)
-  
+ 
   infoFile   = engine.resource.fileName(library, name, "song.ini", writable = True)
   scriptFile = engine.resource.fileName(library, name, "script.txt")
   previewFile = engine.resource.fileName(library, name, "preview.ogg")
@@ -3833,25 +3671,15 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
       songFile   = guitarFile
       guitarFile = None
       rhythmFile = ""
-      
   if not os.path.isfile(songFile):
     songFile   = guitarFile
     guitarFile = None
-  
   if not os.path.isfile(rhythmFile):
     rhythmFile = None
-    #if os.path.isfile(alternteRhythmFile):    #support for bass.ogg
-      #rhythmFile = alternateRhythmFile
-
   if not os.path.isfile(drumFile):
     drumFile = None
-  
   if not os.path.isfile(crowdFile):
     crowdFile = None
-    #if os.path.isfile(songCrowdFile) and useSongCrowdTrack:   #supports song+crowd... may be (re)implemented later.
-      #crowdFile = songCrowdFile
-      #Log.warn("crowd.ogg file not found. Using song+crowd.ogg instead! Volumes may be off.")
-
   if crowdsEnabled == 0:
     crowdFile = None      
 
@@ -3958,7 +3786,6 @@ def getAvailableLibraries(engine, library = DEFAULT_LIBRARY):
       libName = library + os.path.join(libraryRoot.replace(songRoot, ""))
       
       libraries.append(LibraryInfo(libName, os.path.join(libraryRoot, "library.ini")))
-      #Log.debug("Library added: " + str(libraries) )
       continue # why were these here? we must filter out empty libraries - coolguy567
                 #MFH - I'll tell you why -- so that empty ("tiered" / organizational) folders are displayed, granting access to songs in subfolders...
       
@@ -3968,7 +3795,6 @@ def getAvailableLibraries(engine, library = DEFAULT_LIBRARY):
           if not libraryRoot in libraryRoots:
             libName = library + os.path.join(libraryRoot.replace(songRoot, ""))
             libraries.append(LibraryInfo(libName, os.path.join(libraryRoot, "library.ini")))
-            #Log.debug("Library added: " + str(libraries) )
             libraryRoots.append(libraryRoot)
    
   libraries.sort(lambda a, b: cmp(a.name.lower(), b.name.lower()))
@@ -3998,11 +3824,9 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
     if (os.path.exists(songRoot) == False):
       return []
     for name in os.listdir(songRoot):
-      #if not os.path.isfile(os.path.join(songRoot, name, "notes.mid")):
       if ( not os.path.isfile(os.path.join(songRoot, name, "notes.mid")) ) and ( not os.path.isfile(os.path.join(songRoot, name, "notes-unedited.mid")) ):
         continue
       if not os.path.isfile(os.path.join(songRoot, name, "song.ini")) or name.startswith("."):
-       #if not os.path.isfile(os.path.join(songRoot, name, "song.ini")):
         continue
       if not name in names:
         names.append(name)
@@ -4076,10 +3900,6 @@ def getSortingTitles(engine, songList = []):
   instrument = engine.config.get("game", "songlist_instrument")
   theInstrumentDiff = instrumentDiff[instrument]
 
-  #if sortOrder == 0:
-  #  for i in range (65,90):
-  #    sortTitles.append(SortTitleInfo(chr(i)))
-  #elif sortOrder == 1:
   for songItem in songList:
     if sortOrder == 1:
       try:
@@ -4180,7 +4000,6 @@ def getAvailableTitles(engine, library = DEFAULT_LIBRARY):
 def getAvailableSongsAndTitles(engine, library = DEFAULT_LIBRARY, includeTutorials = False, progressCallback = lambda p: None):
 
   #NOTE: list-all mode and career modes are BROKEN as of now
-  #listingMode = engine.config.get("game","song_listing_mode")
   if library == None:
     return []
 
@@ -4189,7 +4008,6 @@ def getAvailableSongsAndTitles(engine, library = DEFAULT_LIBRARY, includeTutoria
   career = False
   quickPlayCareerTiers = engine.config.get("game", "quickplay_tiers")
 
-  #if listingMode == 0 or careerMode:
   titles = []
   items = getAvailableSongs(engine, library, includeTutorials, progressCallback=progressCallback)
   if quickPlayCareerTiers == 1 or careerMode:
@@ -4206,10 +4024,6 @@ def getAvailableSongsAndTitles(engine, library = DEFAULT_LIBRARY, includeTutoria
   if (not careerMode) and len(items) != 0:
     items.insert(0, RandomSongInfo())
 
-  # if careerMode and titles != []:
-    # items.append(BlankSpaceInfo())
-    # items.append(CareerResetterInfo())
-  
   return items
   
 def compareSongsAndTitles(engine, a, b, career):
@@ -4237,46 +4051,7 @@ def compareSongsAndTitles(engine, a, b, career):
   instrument = engine.config.get("game", "songlist_instrument")
   theInstrumentDiff = instrumentDiff[instrument]
   direction = engine.config.get("game", "sort_direction")
-  
-  # if (not careerMode) and quickPlayCareerTiers == 0:
-    # if direction == 0:
-      # if order == 1:
-        # return cmp(a.artist.lower(), b.artist.lower())
-      # elif order == 2:
-        # return cmp(int(b.count+str(0)), int(a.count+str(0)))
-      # elif order == 0:
-        # return cmp(removeSongOrderPrefixFromName(a.name).lower(), removeSongOrderPrefixFromName(b.name).lower())
-      # elif order == 3:
-        # return cmp(a.album.lower(), b.album.lower())
-      # elif order == 4:
-        # return cmp(a.genre.lower(), b.genre.lower())
-      # elif order == 5:
-        # return cmp(a.year.lower(), b.year.lower())
-      # elif order == 6:
-        # return cmp(a.diffSong, b.diffSong)
-      # elif order == 7:
-        # return cmp(theInstrumentDiff(a), theInstrumentDiff(b))
-      # elif order == 8:
-        # return cmp(a.icon.lower(), b.icon.lower())
-    # else:
-      # if order == 1:
-        # return cmp(b.artist.lower(), a.artist.lower())
-      # elif order == 2:
-        # return cmp(int(a.count+str(0)), int(b.count+str(0)))
-      # elif order == 0:
-        # return cmp(removeSongOrderPrefixFromName(b.name).lower(), removeSongOrderPrefixFromName(a.name).lower())
-      # elif order == 3:
-        # return cmp(b.album.lower(), a.album.lower())
-      # elif order == 4:
-        # return cmp(b.genre.lower(), a.genre.lower())
-      # elif order == 5:
-        # return cmp(b.year.lower(), a.year.lower())
-      # elif order == 6:
-        # return cmp(b.diffSong, a.diffSong)
-      # elif order == 7:
-        # return cmp(theInstrumentDiff(a), theInstrumentDiff(b))
-      # elif order == 8:
-        # return cmp(b.icon.lower(), a.icon.lower())
+
   if not career:# and quickPlayCareerTiers == 2:
     Aval = ""
     Bval = ""
@@ -4360,7 +4135,6 @@ def compareSongsAndTitles(engine, a, b, career):
     else:
       return cmp(a.name, b.name)
   else:
-    #Log.debug("Unlock IDs found, a=" + str(a.getUnlockID()) + ", b=" + str(b.getUnlockID()) )
     if a.getUnlockID() == "" and b.getUnlockID() != "":   #MFH - a is a bonus song, b is involved in career mode
       return 1
     elif b.getUnlockID() == "" and a.getUnlockID() != "":   #MFH - b is a bonus song, a is involved in career mode - this is fine.

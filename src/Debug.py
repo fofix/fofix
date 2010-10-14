@@ -37,7 +37,6 @@ class DebugLayer(Layer):
   """A layer for showing some debug information."""
   def __init__(self, engine):
     self.engine = engine
-    #gc.set_debug(gc.DEBUG_LEAK)
 
   def className(self, instance):
     return str(instance.__class__).split(".")[1]
@@ -108,12 +107,6 @@ class DebugLayer(Layer):
       font.render("%d threads" % threading.activeCount(), (x + .1, y), scale = scale)
       y += h
       font.render("%.2f fps" % self.engine.fpsEstimate, (x + .1, y), scale = scale)
-      #y += h
-      #font.render("%d sessions, server %s" % (len(self.engine.sessions), self.engine.server and "on" or "off"), (x + .1, y), scale = scale)
-      #y += h
-      #font.render("%d gc objects" % len(gc.get_objects()), (x + .1, y), scale = scale)
-      #y += h
-      #font.render("%d collected" % gc.collect(), (x + .1, y), scale = scale)
 
   def gcDump(self):
     before = len(gc.get_objects())

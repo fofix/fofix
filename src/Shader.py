@@ -392,9 +392,6 @@ class ShaderList:
       Log.debug("Can't load %s; generating random 3D noise instead." % file)
       return self.makeNoise3D(16)
           
-    #self.smoothNoise3D(size, 2, texels)
-    #self.smoothNoise3D(size, 4, texels)
-    
 
     texture = 0
 
@@ -475,7 +472,6 @@ class ShaderList:
       self.globals["scoreMult"] = 1
       self.globals["soloActive"] = False
       self.globals["songpos"] = 0.0
-      #self.loadFromIni()
     
   # check Settings to enable, disable or assign shaders
   def checkIfEnabled(self):
@@ -661,8 +657,6 @@ class ShaderList:
       self.make("cd","cd")
     except:
       Log.error("Error compiling cd shader: ")
-
-    #self.defineConfig()
 
 def mixColors(c1,c2,blend=0.5):
   c1 = list(c1)

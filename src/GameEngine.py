@@ -467,9 +467,6 @@ class GameEngine(object):
   """The main game engine."""
   def __init__(self, config = None):
 
-    #self.logClassInits = Config.get("game", "log_class_inits")
-    #if self.logClassInits == 1:
-    #  Log.debug("GameEngine class init (GameEngine.py)...")
     Log.debug("GameEngine class init (GameEngine.py)...")
     self.mainMenu = None    #placeholder for main menu object - to prevent reinstantiation
     
@@ -534,8 +531,6 @@ class GameEngine(object):
     if self.config.get("video", "disable_screensaver"):
       self.video.disableScreensaver()
 
-    #self.config.set("game",   "font_rendering_mode", 0) #force oGL mode
-
     self.audio             = Audio()
     self.frames            = 0
     self.fpsEstimate       = 0
@@ -569,13 +564,7 @@ class GameEngine(object):
     self.gameStarted       = False
     self.world             = None
 
-    #self.audio.pre_open(frequency = frequency, bits = bits, stereo = stereo, bufferSize = bufferSize)
-    #self.audio.open(frequency = frequency, bits = bits, stereo = stereo, bufferSize = bufferSize)
-    #pygame.init()
-    
     #MFH - TODO - Audio speed divisor needs to be changed to audio speed factor, so can support 0.75x (3/4 speed)
-    
-    
     self.audioSpeedFactor = 0
     self.setSpeedFactor(1)   #MFH - handles initialization at full speed    
     
@@ -598,7 +587,6 @@ class GameEngine(object):
     # Enable the high priority timer if configured
     if self.priority:
       Log.debug("Enabling high priority timer.")
-      #self.timer.highPriority = True
       self.fps = 0 # High priority
 
     # evilynux - This was generating an error on the first pass (at least under
@@ -631,17 +619,11 @@ class GameEngine(object):
     Mod.init(self)
     self.addTask(self.input, synchronized = False)
     
-    #self.addTask(self.view)
     self.addTask(self.view, synchronized = False)
     
     self.addTask(self.resource, synchronized = False)
 
     self.data = Data(self.resource, self.svg)
-
-
-    #self.setSpeedFactor(2)    #MFH - this is just a hack - try if you'd like, doesn't work right yet...
-
-
 
     ##MFH: Animated stage folder selection option
     #<themename>\Stages still contains the backgrounds for when stage rotation is off, and practice.png
@@ -661,7 +643,6 @@ class GameEngine(object):
         try:
           aniStageFolderListing = os.listdir(os.path.join(stagespath,name))
         except Exception, e:
-          #Log.debug(name + " is not a folder, cannot list contents: " + str(e))
           thisIsAnAnimatedStageFolder = False
         for aniFile in aniStageFolderListing:
           if os.path.splitext(aniFile)[1] == ".png" or os.path.splitext(aniFile)[1] ==  ".jpg" or os.path.splitext(aniFile)[1] == ".jpeg":  #we've found at least one .png file here, chances are this is a valid animated stage folder
@@ -670,7 +651,6 @@ class GameEngine(object):
           self.stageFolders.append(name)
 
 
-      #stageFolders.append("Standard")  #MFH: Standard selects the base Stages folder for stage rotation, instead of one of it's subfolders
       i = len(self.stageFolders)
       if i > 0: #only set default to first animated subfolder if one exists - otherwise use Normal!
         defaultAniStage = str(self.stageFolders[0])
@@ -728,13 +708,11 @@ class GameEngine(object):
     Log.debug("Ready.")
     
 
-  def setSpeedFactor(self, factor):     #MFH - allows for slowing down streaming audio tracks
-    #MFH - test to see if re-initializing the mixer here at 22050 Hz after loading the sounds at 44100 Hz results in half speed playback
-    #try:
-    #  self.audio.close()
-    #except:
-    #  pass
-    
+  def setSpeedFactor(self, factor):
+    '''
+    allows for slowing down streaming audio tracks
+    @param factor:
+    '''
     if self.audioSpeedFactor != factor:   #MFH - don't re-init to the same divisor.
       try:
         self.audio.close()    #MFH - ensure no audio is playing during the switch!
@@ -934,48 +912,36 @@ class GameEngine(object):
     image.setColor(color)
     image.draw()
 
-  #blazingamer - simplifies tex rendering
+  #blazingamer
   def draw3Dtex(self, image, vertex, texcoord, coord = None, scale = None, rot = None, color = (1,1,1), multiples = False, alpha = False, depth = False, vertscale = 0):
+    '''
+    Simplifies tex rendering
+    
+    @param image: self.xxx - tells the system which image/resource should be mapped to the plane
+    @param vertex: (Left, Top, Right, Bottom) - sets the points that define where the plane will be drawn
+    @param texcoord: (Left, Top, Right, Bottom) - sets where the texture should be drawn on the plane
+    @param coord: (x,y,z) - where on the screen the plane will be rendered within the 3d field
+    @param scale: (x,y,z) - scales an glplane how far in each direction
 
-#####how to set items#####
-  
+    @param rot: (degrees, x-axis, y-axis, z-axis)
+    a digit in the axis is how many times you want to rotate degrees around that axis
+    
+    @param color: (r,g,b) - sets the color of the image when rendered 
+    0 = No Color, 1 = Full color
 
-##    tex = self.xxx
-##    tells the system which image/resource should be mapped to the plane
-##  
-##    rot = (degrees, x-axis, y-axis, z-axis)
-##    a digit in the axis is how many times you want to rotate degrees around that axis
-##
-##    scale = (x,y,z)
-##    scales an glplane how far in each direction
-##
-##    coord = (x,y,z)
-##    where on the screen the plane will be rendered within the 3d field
-##
-##    vertex = (Left, Top, Right, Bottom)
-##    sets the points that define where the plane will be drawn
-##
-##    texcoord = (Left, Top, Right, Bottom)
-##    sets where the texture should be drawn on the plane
-##
-##    multiples = True/False
-##    defines whether or not there should be multiples of the plane drawn at the same time
-##    only really used with the rendering of the notes, keys, and flames
-##
-##    alpha = True/False
-##    defines whether or not the image should have black turned into transparent
-##    only really used with hitglows and flames
-##
-##    color = (r,g,b)
-##    sets the color of the image when rendered 0 = No Color, 1 = Full color
-##
-##    depth = True/False
-##    sets the depth by which the object is rendered
-##    only really used by keys and notes
-##      
-##    vertscale = #
-##    changes the yscale when setting vertex points
-##    only really used by notes
+    @param multiples: True/False
+    defines whether or not there should be multiples of the plane drawn at the same time
+    only really used with the rendering of the notes, keys, and flames
+
+    @param alpha: True/False - defines whether or not the image should have black turned into transparent
+    only really used with hitglows and flames
+    
+    @param depth: True/False - sets the depth by which the object is rendered
+    only really used by keys and notes
+    
+    @param vertscale: # - changes the yscale when setting vertex points
+    only really used by notes
+    '''
 
     if alpha == True:
       glBlendFunc(GL_SRC_ALPHA, GL_ONE)
