@@ -59,8 +59,8 @@ class Stage(object):
     self.animatedFolder = self.engine.config.get("game", "animated_stage_folder")
 
     # evilynux - imported myfingershurt stuff from GuitarScene w/ minor modifs
-    #MFH TODO - alter logic to accomodate separated animation and slideshow
-    #           settings based on seleted animated stage folder
+    #MFH TODO - alter logic to accommodate separated animation and slideshow
+    #           settings based on selected animated stage folder
     animationMode = self.engine.config.get("game", "stage_animate")
     slideShowMode = self.engine.config.get("game", "rotate_stages")
 
@@ -117,7 +117,7 @@ class Stage(object):
     if not os.path.exists(self.vidSource):
       Log.warn("Video not found: %s" % \
                os.path.join(self.pathfull, "default.avi"))
-      Log.warn("No video found, fallbacking to default static image mode for now")
+      Log.warn("No video found, falling back to default static image mode for now")
       self.mode = 1 # Fallback
       self.vidSource = None
       return
@@ -174,7 +174,7 @@ class Stage(object):
       if not self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages",background)):
         #MFH - must first fall back on the old practice.png before forcing blank stage mode!
         if not self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages","practice")):
-          Log.warn("No practice stage, fallbacking on a forced Blank stage mode") # evilynux
+          Log.warn("No practice stage, falling back on a forced Blank stage mode") # evilynux
           self.mode = 2    #if no practice stage, just fall back on a forced Blank stage mode
             
     elif self.songStage == 1:    #check for song-specific background

@@ -198,7 +198,7 @@ class Theme(Task):
   
       #Setlist
       #This is really a bit of a mess but luckily most of the names are quite self
-      #explainitory.  These values are only necessary if your theme is using the old
+      #explanatory.  These values are only necessary if your theme is using the old
       #default code that takes advantage of having the 4 different modes
       #list, cd, list/cd hybrid, rb2
       #if you're not using the default setlist display then don't bother with these values

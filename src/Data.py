@@ -36,7 +36,7 @@ import Player
 import Log
 
 # these constants define a few customized letters in the default font
-#MFH - with the new simplified Font.py, no more custom glpyhs... let's do a simple replacement here for now...
+#MFH - with the new simplified Font.py, no more custom glyphs... let's do a simple replacement here for now...
 STAR1 = ' '
 STAR2 = '*'
 LEFT  = '<'
@@ -76,7 +76,7 @@ class Data(object):
     self.players = None
     self.players = Player.loadPlayers()
 
-    #myfingershurt: check for existance of theme path
+    #myfingershurt: check for existence of theme path
     themepath = os.path.join(Version.dataPath(), "themes")
     self.themepath = themepath
     self.path = Version.dataPath()

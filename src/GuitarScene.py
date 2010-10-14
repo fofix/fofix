@@ -563,7 +563,7 @@ class GuitarScene(Scene):
         else:
           self.hPlayer[i] = self.hPlayer[i]*self.numberOfGuitars #QQstarS: Set the hight to right one
           self.hOffset[i] = 0
-        self.hFontOffset[i] = -self.hOffset[i]/self.hPlayer[i]*0.752 #QQstarS: font Hight Offset when there are 2 players
+        self.hFontOffset[i] = -self.hOffset[i]/self.hPlayer[i]*0.752 #QQstarS: font Height Offset when there are 2 players
 
     self.engine.view.setViewport(1,0)
 
@@ -1628,7 +1628,7 @@ class GuitarScene(Scene):
     splash = None
     
     self.engine.createdGuitarScene = False
-    #MFH - end of GuitarScene cleint initialization routine
+    #MFH - end of GuitarScene client initialization routine
 
 
   def pauseGame(self):
@@ -2486,7 +2486,7 @@ class GuitarScene(Scene):
       else:
         self.currentBpm = self.targetBpm
     
-      #recalculate all variables dependant on the tempo, apply to instrument objects - only if currentBpm has changed:
+      #recalculate all variables dependent on the tempo, apply to instrument objects - only if currentBpm has changed:
       self.currentPeriod  = 60000.0 / self.currentBpm
       for instrument in self.instruments:
         instrument.setBPM(self.currentBpm)

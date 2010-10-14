@@ -1978,7 +1978,7 @@ def choosePartDiffs(engine, parts, info, players):
   _runDialog(engine, d)
   return d.retVal
 
-# evilynux - Show creadits
+# evilynux - Show credits
 def showCredits(engine):
   d = Credits(engine)
   _runDialog(engine, d)
@@ -2005,7 +2005,7 @@ def showLoadingScreen(engine, condition, text = _("Loading..."), allowCancel = F
   @param text:        Text shown to the user
   @type  allowCancel: bool
   @param allowCancel: Can the loading be canceled
-  @return:            True if the condition was met, Fales if the loading was canceled.
+  @return:            True if the condition was met, False if the loading was canceled.
   """
   
   # poll the condition first for some time

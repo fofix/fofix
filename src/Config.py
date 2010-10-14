@@ -103,7 +103,7 @@ class Config:
   """A configuration registry."""
   def __init__(self, prototype, fileName = None, type = 0):
     """
-    @param prototype:  The configuration protype mapping
+    @param prototype:  The configuration prototype mapping
     @param fileName:   The file that holds this configuration registry
     """
     self.prototype = prototype

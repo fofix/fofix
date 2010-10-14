@@ -401,7 +401,7 @@ class Neck:
                          [0.0, project(offset + l * self.beatsPerUnit)],
                          [1.0, project(offset + l * self.beatsPerUnit)]], dtype=np.float32)
     
-    #must be seperate for neck flashing.
+    #must be separate for neck flashing.
     board_col  = np.array([[color[0],color[1],color[2], 0],
                              [color[0],color[1],color[2], 0],
                              [color[0],color[1],color[2], v],

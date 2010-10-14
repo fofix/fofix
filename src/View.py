@@ -118,7 +118,7 @@ class View(Task):
           screenArray[screen][0] = int(self.geometry[0]+(screen*self.geometry[2]/screens))
           screenArray[screen][2] = int(self.geometry[2]/screens) 
           screenArray[screen][1] = int(self.geometry[1])#+(geometry[3]/screens*2/3)) #QQstarS
-          screenArray[screen][3] = int((self.geometry[3]/screens)*1.5) #QQstarS: make the Y postion smaller
+          screenArray[screen][3] = int((self.geometry[3]/screens)*1.5) #QQstarS: make the Y position smaller
         screensArray[screens-1][screen][:] = screenArray[screen]
 
     self.geometryAllHalf = screensArray

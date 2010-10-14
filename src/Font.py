@@ -124,7 +124,7 @@ class Font:
     return self.font.get_height() * self.scale
 
   def getLineSpacing(self, scale = DEFAULT_SCALE):
-    """@return: Recommanded line spacing of this font"""
+    """@return: Recommended line spacing of this font"""
     return self.font.get_linesize() * self.scale * scale
 
   #MFH - needed to find the centerline of text

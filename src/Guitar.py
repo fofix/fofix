@@ -122,7 +122,7 @@ class Guitar(Instrument):
             break
     
                                                            
-    #inkk: loading theme-dependant tail images
+    #inkk: loading theme-dependent tail images
     #myfingershurt: must ensure the new tails don't affect the Rock Band mod...
     self.simpleTails = False
 
@@ -864,7 +864,7 @@ class Guitar(Instrument):
           big = True
           self.bigMax += 1
 
-      #MFH - filter out this tail whitening when starpower notes have been disbled from a screwup
+      #MFH - filter out this tail whitening when starpower notes have been disabled from a screwup
       if self.spEnabled and killswitch:
         if event.star or event.finalStar:
           if big == True and tailOnly == True:

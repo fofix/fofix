@@ -50,7 +50,7 @@ import Song   #need the base song defines as well
 #3 = drum Blue fret, normally Blue fret
 #4 = drum Green fret, normally Orange fret
 #
-#So, with regard to note number coloring, swap note.number 0's color wih note.number 4.
+#So, with regard to note number coloring, swap note.number 0's color with note.number 4.
 
 #akedrou - 5-drum support is now available.
 # to enable it, only here and Player.drums should need changing.
@@ -133,7 +133,7 @@ class Drum(Instrument):
       #myfingershurt: adding drumfretshacked.png for image-corrected drum fret angles in RB:
       if not engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"drumfretshacked.png")):
         engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"fretbuttons.png"))
-      #death_au: adding drumfrets.png (with bass drum frets seperate)
+      #death_au: adding drumfrets.png (with bass drum frets separate)
       if not engine.loadImgDrawing(self, "drumFretButtons", os.path.join("themes",themename,"drumfrets.png")):
         self.drumFretButtons = None
     else: #death_au

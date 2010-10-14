@@ -251,7 +251,7 @@ class Credits(Layer, KeyListener):
       space
     ])
 
-  # evilynux - Text parsing method. Provides some style functionnalities.
+  # evilynux - Text parsing method. Provides some style functionalities.
   def parseText(self, filename):
     nf = self.engine.data.font
     bf = self.engine.data.bigFont
