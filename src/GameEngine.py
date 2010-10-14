@@ -874,7 +874,7 @@ class GameEngine(object):
       height = height / image.pixelSize[1] * self.view.geometry[3]
 
     if fit == 1: #y is on top (not center)
-      y = Y - ((image.pixelSize[1] * abs(scale[1]))*.5*(self.view.geometry[3]/480.0))
+      y = y - ((image.pixelSize[1] * abs(scale[1]))*.5*(self.view.geometry[3]/480.0))
     elif fit == 2: #y is on bottom
       y = y + ((image.pixelSize[1] * abs(scale[1]))*.5*(self.view.geometry[3]/480.0))
 
