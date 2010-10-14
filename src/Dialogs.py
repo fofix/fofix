@@ -1475,7 +1475,7 @@ class KeyTester(Layer, KeyListener):
     self.analogSPMode   = self.controls.analogSP[control]
     self.analogSPThresh = self.controls.analogSPThresh[control]
     self.analogSPSense  = self.controls.analogSPSense[control]
-    self.analogDrumMode = self.controls.analogDrum[control]
+    self.analogDrumMode = self.controls.analogDrum[control] #FIXME: Analog Drum
     self.analogSlideMode = self.controls.analogSlide[control]
     
     if self.type < 2 or self.type == 4:

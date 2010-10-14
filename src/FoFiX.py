@@ -191,7 +191,6 @@ def main():
   # Set up one-shot mode if the invocation is valid for it.
   if playing is not None:
     Log.debug('Entering one-shot mode.')
-    #Config.set("game", "selected_library", "songs")
     Config.set("setlist", "selected_song", playing)
     engine.cmdPlay = 1
     if difficulty is not None:

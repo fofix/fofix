@@ -195,10 +195,10 @@ Config.define("controller", "type",          int, 0,            text = _("Contro
 Config.define("controller", "analog_sp",     int, 0,            text = _("Analog SP"),       options = {0: _("Disabled"), 1: _("Enabled")}, tipText = _("Enables analog SP (as in the XBOX Xplorer controller.)"))
 Config.define("controller", "analog_sp_threshold",   int, 60,   text = _("Analog SP Threshold"), options = dict([(n, n) for n in range(10, 101, 10)]), tipText = _("Sets a threshold level for activating SP in analog mode."))
 Config.define("controller", "analog_sp_sensitivity", int, 4,    text = _("Analog SP Sensitivity"), options = dict([(n, n+1) for n in range(10)]), tipText = _("Sets the sensitivity for activating SP in analog mode."))
-Config.define("controller", "analog_drum",   int, 0,            text = _("Analog Drums"),    options = {0: _("Disabled"), 1: _("PS2/PS3/Wii"), 2: _("XBOX"), 3: _("XBOX Inv.")}, tipText = _("Enables analog drums as in RB2 and GH drumsets."))
+Config.define("controller", "analog_drum",   int, 0,            text = _("Analog Drums"),    options = {0: _("Disabled"), 1: _("PS2/PS3/Wii"), 2: _("XBOX"), 3: _("XBOX Inv.")}, tipText = _("Enables analog drums as in RB2 and GH drumsets.")) #FIXME: Analog Drum
 Config.define("controller", "analog_slide",  int, 0,            text = _("Analog Slider"),    options = {0: _("Default"), 1: _("Inverted")}, tipText = _("Experimental testing for the analog slide mode."))
 Config.define("controller", "analog_kill",   int, 0,            text = _("Analog Effects"),  options = {0: _("Disabled"), 1: _("PS2/PS3/Wii"), 2: _("XBOX"), 3: _("XBOX Inv.")}, tipText = _("Enables analog whammy bar. Set to the system your controller was designed for."))
-Config.define("controller", "analog_fx",     int, 0,            text = _("Sound FX Switch"), options = {0: _("Switch"), 1: _("Cycle")}) #akedrou - aren't I bold!
+Config.define("controller", "analog_fx",     int, 0,            text = _("Sound FX Switch"), options = {0: _("Switch"), 1: _("Cycle")}) #akedrou - aren't I bold! #FIXME: Analog FX
 Config.define("controller", "mic_device",    int, -1,           text = _("Microphone Device"), options = Microphone.getAvailableMics()) #stump
 Config.define("controller", "mic_tap_sensitivity", int, 5,      text = _("Tap Sensitivity"), options=dict((n, n) for n in range(1, 21)), tipText = _("Sets how sensitive the microphone is to being tapped.")) #stump
 Config.define("controller", "mic_passthrough_volume", float, 0.0, text = _("Passthrough Volume"), options=dict((n / 100.0, n) for n in range(101)), tipText = _("Sets how loud you hear yourself singing.")) #stump
@@ -509,9 +509,9 @@ class Controls:
     self.analogSP   = []
     self.analogSPThresh = []
     self.analogSPSense  = []
-    self.analogDrum = []
+    self.analogDrum = [] #FIXME: Analog Drum
     self.analogSlide = []
-    self.analogFX   = []
+    self.analogFX   = [] #FIXME: Analog FX
     self.twoChord   = []
     self.micDevice  = []  #stump
     self.micTapSensitivity = []
@@ -533,9 +533,9 @@ class Controls:
         self.analogSP.append(i.get("controller", "analog_sp"))
         self.analogSPThresh.append(i.get("controller", "analog_sp_threshold"))
         self.analogSPSense.append(i.get("controller", "analog_sp_sensitivity"))
-        self.analogDrum.append(i.get("controller", "analog_drum"))
+        self.analogDrum.append(i.get("controller", "analog_drum")) #FIXME: Analog Drum
         self.analogSlide.append(i.get("controller", "analog_slide"))
-        self.analogFX.append(i.get("controller", "analog_fx"))
+        self.analogFX.append(i.get("controller", "analog_fx")) #FIXME: Analog FX
         self.micDevice.append(i.get("controller", "mic_device"))  #stump
         self.micTapSensitivity.append(i.get("controller", "mic_tap_sensitivity"))
         self.micPassthroughVolume.append(i.get("controller", "mic_passthrough_volume"))
@@ -545,7 +545,7 @@ class Controls:
         self.type.append(None)
         self.analogKill.append(None)
         self.analogSP.append(None)
-        self.analogFX.append(None)
+        self.analogFX.append(None) #FIXME: Analog FX
         self.twoChord.append(None)
     
     def keycode(name, config):

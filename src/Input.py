@@ -200,7 +200,7 @@ class Input(Task):
     return self.controls.analogSlide[self.activeGameControls[player]]
   
   def getAnalogFX(self, player):
-    return self.controls.analogFX[self.activeGameControls[player]]
+    return self.controls.analogFX[self.activeGameControls[player]] #FIXME: Analog FX
   
   def getTwoChord(self, player):
     return self.controls.twoChord[self.activeGameControls[player]]
