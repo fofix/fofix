@@ -222,9 +222,9 @@ class Drum(Instrument):
             break
 
         if self.engine.fileExists(os.path.join("themes", themename, "star_drum.dae")):  
-          engine.resource.load(self,  "starMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "star_drum.dae")))
+          self.engine.resource.load(self,  "starMesh",  lambda: Mesh(self.engine.resource.fileName("themes", themename, "star_drum.dae")))
         elif self.engine.fileExists(os.path.join("themes", themename, "star.dae")):  
-          engine.resource.load(self,  "starMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "star.dae")))
+          self.engine.resource.load(self,  "starMesh",  lambda: Mesh(self.engine.resource.fileName("themes", themename, "star.dae")))
         else:  
           self.starMesh = None
 
@@ -459,7 +459,7 @@ class Drum(Instrument):
         else:
           notecol = (1,1,1,1)
 
-      tailOnly == True
+      tailOnly = True
 
       #dirty fix
       self.separateDrumNotes = True
