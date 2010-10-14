@@ -6281,7 +6281,7 @@ class GuitarScene(Scene):
               countdownPos = 0
             self.engine.theme.setBaseColor()
 
-            #Party mode
+            #Party mode #FIXME
             if self.partyMode == True:
               timeleft = (now - self.partySwitch) / 1000
               if timeleft > self.partyTime:

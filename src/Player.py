@@ -826,7 +826,7 @@ def isKeyMappingOK(config, start):
     # everything tests OK
   return 0
 
-# glorandwarf: sets the key mapping and checks for a conflict
+# glorandwarf: sets the key mapping and checks for a conflict #FIXME
 # restores the old mapping if a conflict occurred
 def setNewKeyMapping(engine, config, section, option, key):
   oldKey = config.get(section, option)

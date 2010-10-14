@@ -489,7 +489,7 @@ class Menu(Layer, KeyListener):
             subSelectHYFactor = 640.000/self.engine.view.aspectRatio
             subSelectHFactor = subSelectHYFactor/self.engine.data.subSelectImgH
             self.engine.drawImage(self.engine.data.submenuSelect,
-                                  scale = (tempWScale,tempHScale),
+                                  scale = (tempWScale,tempHScale), #FIXME
                                   coord = (boxXOffset,boxYOffset))
           
           font.render(text, (x - v / 4, y), scale = scale)

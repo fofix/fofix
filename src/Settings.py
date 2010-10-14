@@ -230,7 +230,7 @@ class KeyConfigChoice(Menu.Choice):
 
     if isinstance(o.options, dict):
       for k, v in o.options.items():
-        if v == value:
+        if v == value: #FIXME: value?
           value = k
           break
     if isinstance(o.text, tuple):

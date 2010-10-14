@@ -276,7 +276,7 @@ class MainMenu(BackgroundLayer):
   def quit(self):
     self.engine.view.popLayer(self.menu)
 
-  def catchErrors(function):
+  def catchErrors(function): #FIXME
     def harness(self, *args, **kwargs):
       try:
         try:

@@ -510,7 +510,7 @@ class SongChoosingScene(Scene):
           percent = (i*100)/len(self.items)
           Dialogs.changeLoadingSplashScreenText(self.engine, self.splash, _("Loading Album Artwork...") + " %d%%" % percent)
 
-  def addToQueue(self, selectedSong):
+  def addToQueue(self, selectedSong): #FIXME: Queue system
     self.engine.songQueue.addSong(selectedSong, library)
   
   def removeFromQueue(self, selectedSong):

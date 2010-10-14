@@ -443,7 +443,7 @@ class Input(Task):
             break
 
 
-  # glorandwarf: check that there are no control conflicts
+  # glorandwarf: check that there are no control conflicts #FIXME
   def checkControls(self):
     if self.controls.isKeyMappingOK() == False:
       Log.warn("Conflicting player controls, resetting to defaults")
