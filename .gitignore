@@ -9,6 +9,7 @@ src/html
 doc/epydoc
 src/*.ini
 src/*.log
+src/*.idb
 src/build
 src/pypitch/_pypitch.cpp
 src/cmgl.c
