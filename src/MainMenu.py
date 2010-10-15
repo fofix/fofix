@@ -120,24 +120,25 @@ class MainMenu(BackgroundLayer):
 
     #myfingershurt: random main menu music function, menu.ogg and menuXX.ogg (any filename with "menu" as the first 4 letters)
     filepath = self.engine.getPath(os.path.join("themes",self.themename,"sounds"))
-    self.files = []
-    allfiles = os.listdir(filepath)
-    for name in allfiles:
-      if os.path.splitext(name)[1] == ".ogg":
-        if string.find(name,"menu") > -1:
-          self.files.append(name)
-    
-
-    if self.files:
-      i = random.randint(0,len(self.files)-1)
-      filename = self.files[i]
-      sound = os.path.join("themes",self.themename,"sounds",filename)
-      self.menumusic = True
-      engine.menuMusic = True
-
-      self.song = Audio.Music(self.engine.resource.fileName(sound))
-      self.song.setVolume(self.engine.config.get("audio", "menu_volume"))
-      self.song.play(0)  #no loop
+    if os.path.isdir(filepath):
+      self.files = []
+      allfiles = os.listdir(filepath)
+      for name in allfiles:
+        if os.path.splitext(name)[1] == ".ogg":
+          if string.find(name,"menu") > -1:
+            self.files.append(name)
+      
+  
+      if self.files:
+        i = random.randint(0,len(self.files)-1)
+        filename = self.files[i]
+        sound = os.path.join("themes",self.themename,"sounds",filename)
+        self.menumusic = True
+        engine.menuMusic = True
+  
+        self.song = Audio.Music(self.engine.resource.fileName(sound))
+        self.song.setVolume(self.engine.config.get("audio", "menu_volume"))
+        self.song.play(0)  #no loop
     else:
       self.menumusic = False
 
@@ -240,7 +241,7 @@ class MainMenu(BackgroundLayer):
           Dialogs.showMessage(self.engine, msg % {'buildVcs': buildVcs, 'currentVcs': currentVcs})
 
   def runMusic(self):
-    if not self.song.isPlaying():   #re-randomize
+    if self.menumusic and not self.song.isPlaying():   #re-randomize
       if self.files:
         i = random.randint(0,len(self.files)-1)
         filename = self.files[i]
