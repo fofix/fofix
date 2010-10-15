@@ -300,106 +300,47 @@ class Data(object):
       except AttributeError:
         pass
 
-
-    if self.fileExists(os.path.join("themes",themename,"sounds","starding.ogg")):
-      self.loadSoundEffect(self, "starDingSound", os.path.join("themes",themename,"sounds","starding.ogg"))
-      self.starDingSoundFound = True
-    else:
-      Log.debug("Star ding sound not found, loading another sound.")
-      self.loadSoundEffect(self, "starDingSound", os.path.join("sounds","clapsound.ogg"))
-      self.starDingSoundFound = False
-
-    if self.fileExists(os.path.join("themes",themename,"sounds","starlost.ogg")):
-      self.loadSoundEffect(self, "starLostSound", os.path.join("themes",themename,"sounds","starlost.ogg"))
-      self.starLostSoundFound = True
-    else:
-      if self.fileExists(os.path.join("sounds","starlost.ogg")):
-        self.loadSoundEffect(self, "starLostSound", os.path.join("sounds","starlost.ogg"))
-        self.starLostSoundFound = True
-      else:
-        Log.debug("Star lost sound not found, loading another sound.")
-        self.loadSoundEffect(self, "starLostSound", os.path.join("sounds","clapsound.ogg"))
-        self.starLostSoundFound = False
-
-    if self.fileExists(os.path.join("sounds","bassdrum.ogg")):
-      self.loadSoundEffect(self, "bassDrumSound", os.path.join("sounds","bassdrum.ogg"))
-      self.bassDrumSoundFound = True
-    else:
-      Log.debug("Bass drum sound not found, loading another sound.")
-      self.loadSoundEffect(self, "bassDrumSound", os.path.join("sounds","clapsound.ogg"))
-      self.bassDrumSoundFound = False
-     
-#Faaa Drum sound
-    if self.fileExists(os.path.join("sounds","tom01.ogg")):
-      self.loadSoundEffect(self, "T1DrumSound", os.path.join("sounds","tom01.ogg"))
-      self.T1DrumSoundFound = True
-    else:
-      Log.debug("Drum sound tom01 not found, loading another sound.")
-      self.loadSoundEffect(self, "T1DrumSound", os.path.join("sounds","clapsound.ogg"))
-      self.T1DrumSoundFound = False	 
-    if self.fileExists(os.path.join("sounds","tom02.ogg")):
-      self.loadSoundEffect(self, "T2DrumSound", os.path.join("sounds","tom02.ogg"))
-      self.T2DrumSoundFound = True
-    else:
-      Log.debug("Drum sound tom02 not found, loading another sound.")
-      self.loadSoundEffect(self, "T2DrumSound", os.path.join("sounds","clapsound.ogg"))
-      self.T2DrumSoundFound = False	
-    if self.fileExists(os.path.join("sounds","tom03.ogg")):
-      self.loadSoundEffect(self, "T3DrumSound", os.path.join("sounds","tom03.ogg"))
-      self.T3DrumSoundFound = True
-    else:
-      Log.debug("Drum sound tom03 not found, loading another sound.")
-      self.loadSoundEffect(self, "T3DrumSound", os.path.join("sounds","clapsound.ogg"))
-      self.T3DrumSoundFound = False
-    if self.fileExists(os.path.join("sounds","crash.ogg")):
-      self.loadSoundEffect(self, "CDrumSound", os.path.join("sounds","crash.ogg"))
-      self.CDrumSoundFound = True
-    else:
-      Log.debug("Drum sound crash not found, loading another sound.")
-      self.loadSoundEffect(self, "CDrumSound", os.path.join("sounds","clapsound.ogg"))
-      self.CDrumSoundFound = False
-
-    # load sounds
+    # load sounds asynchronously
     resource.load(self, "screwUpsounds", self.loadScrewUpsounds)
     resource.load(self, "screwUpsoundsBass", self.loadScrewUpsoundsBass)
-    resource.load(self, "screwUpsoundsDrums", self.loadScrewUpsoundsDrums)    #myfingershurt: drum screw up sounds
-    
-    resource.load(self, "acceptSounds", self.loadAcceptSounds)    #myfingershurt
-    resource.load(self, "cancelSounds", self.loadBackSounds)    #myfingershurt
-    
-    self.loadSoundEffect(self, "selectSound1", os.path.join("themes",themename,"sounds","select1.ogg"))
+    resource.load(self, "screwUpsoundsDrums", self.loadScrewUpsoundsDrums)
+    resource.load(self, "acceptSounds", self.loadAcceptSounds)
+    resource.load(self, "cancelSounds", self.loadBackSounds)
 
-    if self.fileExists(os.path.join("themes",themename,"sounds","select2.ogg")):
-      self.loadSoundEffect(self, "selectSound2", os.path.join("themes",themename,"sounds","select2.ogg"))
-    else: #Fallback on select1.ogg
-      self.loadSoundEffect(self, "selectSound2", os.path.join("themes",themename,"sounds","select1.ogg"))
-      Log.warn(themename + "/sounds/select2.ogg not found -- using select1.ogg instead.")
+    # loadSoundEffect asynchronously
+    self.syncSounds = [
+      ["bassDrumSound","bassdrum.ogg"],
+      ["battleUsedSound","battleused.ogg"],
+      ["CDrumSound","crash.ogg"],
+      ["clapSound","clapsound.ogg"],
+      ["coOpFailSound","coopfail.ogg"],
+      #["crowdSound","crowdcheers.ogg"],
+      ["failSound","failsound.ogg"],
+      ["rescueSound","rescue.ogg"],
+      ["rockSound","rocksound.ogg"],
+      ["selectSound1","select1.ogg"],
+      ["selectSound2","select2.ogg"],
+      ["selectSound3","select3.ogg"],
+      ["starActivateSound","staractivate.ogg"],
+      ["starDeActivateSound","stardeactivate.ogg"],
+      ["starDingSound","starding.ogg"],
+      ["starLostSound","starlost.ogg"],
+      ["starReadySound","starpowerready.ogg"],
+      ["starSound","starpower.ogg"],
+      ["startSound","start.ogg"],
+      ["T1DrumSound","tom01.ogg"],
+      ["T2DrumSound","tom02.ogg"],
+      ["T3DrumSound","tom03.ogg"]
+    ]
+    for self.sounds in self.syncSounds:
+      if self.fileExists(os.path.join("themes",themename,"sounds",self.sounds[1])):
+        self.loadSoundEffect(self, self.sounds[0], os.path.join("themes",themename,"sounds",self.sounds[1]))
+      else:
+        Log.debug("Theme sound not found: " + self.sounds[1])
+        self.loadSoundEffect(self, self.sounds[0], os.path.join("sounds",self.sounds[1]))
 
-    if self.fileExists(os.path.join("themes",themename,"sounds","select3.ogg")):
-      self.loadSoundEffect(self, "selectSound3", os.path.join("themes",themename,"sounds","select3.ogg"))
-    else: #Fallback on select1.ogg
-      self.loadSoundEffect(self, "selectSound3", os.path.join("themes",themename,"sounds","select1.ogg"))
-      Log.warn(themename + "/sounds/select3.ogg not found -- using select1.ogg instead.")
-
-    self.loadSoundEffect(self, "startSound",   os.path.join("themes",themename,"sounds","start.ogg"))
-    self.loadSoundEffect(self, "starSound", os.path.join("themes",themename,"sounds","starpower.ogg"))
-
-    if self.fileExists(os.path.join("themes",themename,"sounds","failsound.ogg")):
-      self.loadSoundEffect(self, "failSound", os.path.join("themes",themename,"sounds","failsound.ogg"))
-    else: #MFH: Fallback on general failsound.ogg
-      self.loadSoundEffect(self, "failSound", os.path.join("sounds","failsound.ogg"))
-      Log.warn(themename + "/sounds/failsound.ogg not found -- using general failsound.ogg instead.")
-      
-    #myfingershurt: integrating Capo's starpower clap sounds
-    self.loadSoundEffect(self, "clapSound", os.path.join("sounds","clapsound.ogg"))
-
-    if self.fileExists(os.path.join("themes",themename,"sounds","starpowerready.ogg")):
-      self.loadSoundEffect(self, "starReadySound", os.path.join("themes",themename,"sounds","starpowerready.ogg"))
-    else: #MFH: Fallback on starpower.ogg
-      self.loadSoundEffect(self, "starReadySound", os.path.join("themes",themename,"sounds","starpower.ogg"))
-      Log.warn(themename + "/sounds/starpowerready.ogg not found -- using starpower.ogg instead.")
-
-    #MFH - fallback on sounds/crowdcheers.ogg, and then starpower.ogg.  Note if the fallback crowdcheers was used or not.    
+    #TODO: Simplify crowdSound stuff so it can join the rest of us.
+    #MFH - fallback on sounds/crowdcheers.ogg, and then starpower.ogg. Note if the fallback crowdcheers was used or not.
     if self.fileExists(os.path.join("themes",themename,"sounds","crowdcheers.ogg")):
       self.loadSoundEffect(self, "crowdSound", os.path.join("themes",themename,"sounds","crowdcheers.ogg"), crowd = True)
       self.cheerSoundFound = 2
@@ -411,56 +352,6 @@ class Data(object):
       self.loadSoundEffect(self, "crowdSound", os.path.join("themes",themename,"sounds","starpower.ogg"))
       self.cheerSoundFound = 0
       Log.warn(themename + "/sounds/crowdcheers.ogg not found -- using starpower.ogg instead.")
-
-    if self.fileExists(os.path.join("themes",themename,"sounds","staractivate.ogg")):
-      self.loadSoundEffect(self, "starActivateSound", os.path.join("themes",themename,"sounds","staractivate.ogg"))
-    else: #MFH: Fallback on starpower.ogg
-      self.loadSoundEffect(self, "starActivateSound", os.path.join("themes",themename,"sounds","starpower.ogg"))
-      Log.warn(themename + "/sounds/staractivate.ogg not found -- using starpower.ogg instead.")
-      
-    if self.fileExists(os.path.join("themes",themename,"sounds","battleused.ogg")):
-      self.loadSoundEffect(self, "battleUsedSound", os.path.join("themes",themename,"sounds","battleused.ogg"))
-    elif self.fileExists(os.path.join("themes",themename,"sounds","staractivate.ogg")):
-      self.loadSoundEffect(self, "battleUsedSound", os.path.join("themes",themename,"sounds","staractivate.ogg"))
-      Log.warn(themename + "/sounds/battleused.ogg not found -- using staractive.ogg instead.")
-    else: #Fallback on starpower.ogg
-      self.loadSoundEffect(self, "battleUsedSound", os.path.join("themes",themename,"sounds","starpower.ogg"))
-      Log.warn(themename + "/sounds/battleused.ogg not found -- using starpower.ogg instead.")
-
-    if self.fileExists(os.path.join("themes",themename,"sounds","stardeactivate.ogg")):
-      self.loadSoundEffect(self, "starDeActivateSound", os.path.join("themes",themename,"sounds","stardeactivate.ogg"))
-      self.starDeActivateSoundFound = True
-    else: #MFH: Fallback on starpower.ogg - required to load, but will not be played.
-      self.loadSoundEffect(self, "starDeActivateSound", os.path.join("themes",themename,"sounds","starpower.ogg"))
-      self.starDeActivateSoundFound = False
-      Log.warn(themename + "/sounds/stardeactivate.ogg not found -- sound disabled.")
-    
-    if self.fileExists(os.path.join("themes",themename,"sounds","rescue.ogg")):
-      self.loadSoundEffect(self, "rescueSound", os.path.join("themes",themename,"sounds","rescue.ogg"))
-    elif self.fileExists(os.path.join("themes",themename,"sounds","staractivate.ogg")):
-      self.loadSoundEffect(self, "rescueSound", os.path.join("themes",themename,"sounds","staractivate.ogg"))
-      Log.warn(themename + "/sounds/rescue.ogg not found -- using staractivate.ogg instead.")
-    else:
-      self.loadSoundEffect(self, "rescueSound", os.path.join("themes",themename,"sounds","starpower.ogg"))
-      Log.warn(themename + "/sounds/rescue.ogg not found -- using starpower.ogg instead.")
-    
-    if self.fileExists(os.path.join("themes",themename,"sounds","coopfail.ogg")):
-      self.loadSoundEffect(self, "coOpFailSound",os.path.join("themes",themename,"sounds","coopfail.ogg"))
-    elif self.fileExists(os.path.join("themes",themename,"sounds","stardeactivate.ogg")):
-      self.loadSoundEffect(self, "coOpFailSound",os.path.join("themes",themename,"sounds","stardeactivate.ogg"))
-      Log.warn(themename + "/sounds/coopfail.ogg not found -- using stardeactivate.ogg instead")
-    elif self.fileExists(os.path.join("themes",themename,"sounds","out.ogg")):  #MFH - not all themes have out.ogg!
-      self.loadSoundEffect(self, "coOpFailSound",os.path.join("themes",themename,"sounds","out.ogg"))
-      Log.warn(themename + "/sounds/coopfail.ogg not found -- using out.ogg instead")
-    else:
-      self.loadSoundEffect(self, "coOpFailSound",os.path.join("themes",themename,"sounds","back1.ogg"))
-      Log.warn(themename + "/sounds/coopfail.ogg not found -- using back1.ogg instead")
-
-    #myfingershurt: adding You Rock sound effect
-    if self.fileExists(os.path.join("themes",themename,"sounds","rocksound.ogg")):
-      self.loadSoundEffect(self, "rockSound", os.path.join("themes",themename,"sounds","rocksound.ogg"))
-    else:
-      self.loadSoundEffect(self, "rockSound", os.path.join("sounds","rocksound.ogg"))
 
   def loadPartImages(self):
     self.partImages = []

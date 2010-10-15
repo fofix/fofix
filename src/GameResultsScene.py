@@ -675,9 +675,9 @@ class GameResultsScene(Scene):
                   scoreCard.getStarScores()
                   if scoreCard.score == 0:
                     scoreCard.stars = 0
-                  if star > scoreCard.stars and self.engine.data.starLostSoundFound:
+                  if star > scoreCard.stars:
                     self.engine.data.starLostSound.play()
-                  elif star < scoreCard.stars and self.engine.data.starDingSoundFound:
+                  elif star < scoreCard.stars:
                     self.engine.data.starDingSound.play()
             else:
               self.resultSubStep[i] += 1
@@ -688,9 +688,9 @@ class GameResultsScene(Scene):
                 scoreCard.stars = min(int(self.starMass[i]/100),5)
               if scoreCard.stars > self.oldStars[i]:
                 scoreCard.stars = self.oldStars[i]
-              if star > scoreCard.stars and self.engine.data.starLostSoundFound:
+              if star > scoreCard.stars:
                 self.engine.data.starLostSound.play()
-              elif star < scoreCard.stars and self.engine.data.starDingSoundFound:
+              elif star < scoreCard.stars:
                 self.engine.data.starDingSound.play()
             self.resultSubStep[i] += 1
             self.currentScore[i] = self.finalScore[i]

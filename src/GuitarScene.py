@@ -567,20 +567,7 @@ class GuitarScene(Scene):
 
     self.engine.view.setViewport(1,0)
 
-    
-
     self.drumMisses = self.engine.config.get("game", "T_sound") #Faaa Drum sound
-    if not self.engine.data.bassDrumSoundFound:
-      self.bassKickSoundEnabled = False
-    if not self.engine.data.T1DrumSoundFound:
-      self.drumMisses = 0
-    if not self.engine.data.T2DrumSoundFound:
-      self.drumMisses = 0
-    if not self.engine.data.T3DrumSoundFound:
-      self.drumMisses = 0
-    if not self.engine.data.CDrumSoundFound:
-      self.drumMisses = 0
-
 
     #MFH - constant definitions, ini value retrievals
     self.pitchBendLowestFactor = .90 #stump: perhaps read this from song.ini and fall back on a specific value?
@@ -4048,7 +4035,7 @@ class GuitarScene(Scene):
       scoreCard.updateAvMult()
       star = scoreCard.stars
       a = scoreCard.getStarScores()
-      if a > star and self.engine.data.starDingSoundFound and ((self.inGameStars == 1 and self.theme == 2) or self.inGameStars == 2):
+      if a > star and ((self.inGameStars == 1 and self.theme == 2) or self.inGameStars == 2):
         self.engine.data.starDingSound.play()
       
       self.stage.triggerPick(pos, [n[1].number for n in self.instruments[num].playedNotes])
@@ -4189,7 +4176,7 @@ class GuitarScene(Scene):
       scoreCard.updateAvMult()
       star = scoreCard.stars
       a = scoreCard.getStarScores()
-      if a > star and self.engine.data.starDingSoundFound and ((self.inGameStars == 1 and self.theme == 2) or self.inGameStars == 2):
+      if a > star and ((self.inGameStars == 1 and self.theme == 2) or self.inGameStars == 2):
         self.engine.data.starDingSound.play()
       self.stage.triggerPick(pos, [n[1].number for n in self.instruments[num].playedNotes])    
       if self.coOpGH:
@@ -4340,7 +4327,7 @@ class GuitarScene(Scene):
       star = scoreCard.stars
       a = scoreCard.getStarScores()
       
-      if a > star and self.engine.data.starDingSoundFound and ((self.inGameStars == 1 and self.theme == 2) or self.inGameStars == 2):
+      if a > star and ((self.inGameStars == 1 and self.theme == 2) or self.inGameStars == 2):
         self.engine.data.starDingSound.play()
 
       self.stage.triggerPick(pos, [n[1].number for n in self.instruments[num].playedNotes])    
@@ -4549,7 +4536,7 @@ class GuitarScene(Scene):
       star = scoreCard.stars
       a = scoreCard.getStarScores()
       
-      if a > star and self.engine.data.starDingSoundFound and ((self.inGameStars == 1 and self.theme == 2) or self.inGameStars == 2):
+      if a > star and ((self.inGameStars == 1 and self.theme == 2) or self.inGameStars == 2):
         self.engine.data.starDingSound.play()
       
       self.stage.triggerPick(pos, [n[1].number for n in self.instruments[num].playedNotes])    
@@ -5124,7 +5111,7 @@ class GuitarScene(Scene):
         scoreCard.updateAvMult()
         star = scoreCard.stars
         a = scoreCard.getStarScores(tempExtraScore = tempExtraScore)
-        if a > star and self.engine.data.starDingSoundFound and ((self.inGameStars == 1 and self.theme == 2) or self.inGameStars == 2):
+        if a > star and ((self.inGameStars == 1 and self.theme == 2) or self.inGameStars == 2):
           self.engine.data.starDingSound.play()
       return int(tempExtraScore)   #original FoF sustain scoring
     return 0

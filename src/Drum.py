@@ -1870,29 +1870,28 @@ class Drum(Instrument):
       if controls.getState(self.keys[i]) or controls.getState(self.keys[5+i]):
         if i == 0:
           if self.playedSound[i] == False:  #MFH - gotta check if bass drum pedal is just held down!
-            if self.engine.data.bassDrumSoundFound:
-              self.engine.data.bassDrumSound.play()
+            self.engine.data.bassDrumSound.play()
             self.playedSound[i] = True
             drumsJustHit[0] = True
             if self.fretboardHop < 0.04:
               self.fretboardHop = 0.04  #stump
         if i == 1:
-          if self.engine.data.T1DrumSoundFound and not playBassDrumOnly and self.playedSound[i] == False:
+          if not playBassDrumOnly and self.playedSound[i] == False:
             self.engine.data.T1DrumSound.play()
           self.playedSound[i] = True
           drumsJustHit[i] = True
         if i == 2:
-          if self.engine.data.T2DrumSoundFound and not playBassDrumOnly and self.playedSound[i] == False:
+          if not playBassDrumOnly and self.playedSound[i] == False:
             self.engine.data.T2DrumSound.play()
           self.playedSound[i] = True
           drumsJustHit[i] = True
         if i == 3:
-          if self.engine.data.T3DrumSoundFound and not playBassDrumOnly and self.playedSound[i] == False:
+          if not playBassDrumOnly and self.playedSound[i] == False:
             self.engine.data.T3DrumSound.play()
           self.playedSound[i] = True
           drumsJustHit[i] = True
         if i == 4:   #MFH - must actually activate starpower!
-          if self.engine.data.CDrumSoundFound and not playBassDrumOnly and self.playedSound[i] == False:
+          if not playBassDrumOnly and self.playedSound[i] == False:
             self.engine.data.CDrumSound.play()
           self.playedSound[i] = True
           drumsJustHit[i] = True

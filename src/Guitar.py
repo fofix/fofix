@@ -2127,9 +2127,7 @@ class Guitar(Instrument):
       if self.starPower <= 0:
         self.starPower = 0
         self.starPowerActive = False
-        #MFH - call to play star power deactivation sound, if it exists (if not play nothing)
-        if self.engine.data.starDeActivateSoundFound:
-          self.engine.data.starDeActivateSound.play()
+        self.engine.data.starDeActivateSound.play()
 
     
     # update frets
