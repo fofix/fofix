@@ -21,7 +21,7 @@
 #####################################################################
 from __future__ import with_statement
 from OpenGL.GL import *
-
+import numpy as np
 import Collada
 
 import cmgl
@@ -40,9 +40,9 @@ class Mesh:
     l = light.techniqueCommon
     glEnable(GL_LIGHTING)
     glEnable(GL_LIGHT0 + n)
-    glLightfv(GL_LIGHT0 + n, GL_POSITION, (pos[0], pos[1], pos[2], 0.0))
-    glLightfv(GL_LIGHT0 + n, GL_DIFFUSE, (l.color[0], l.color[1], l.color[2], 0.0))
-    glLightfv(GL_LIGHT0 + n, GL_AMBIENT, (0.0, 0.0, 0.0, 0.0))
+    glLightfv(GL_LIGHT0 + n, GL_POSITION, np.array([pos[0], pos[1], pos[2], 0.0], dtype=np.float32))
+    glLightfv(GL_LIGHT0 + n, GL_DIFFUSE, np.array([l.color[0], l.color[1], l.color[2], 0.0], dtype=np.float32))
+    glLightfv(GL_LIGHT0 + n, GL_AMBIENT, np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float32))
 
   def setupMaterial(self, material):
     for m in material.techniqueCommon.iMaterials:

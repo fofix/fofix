@@ -35,6 +35,7 @@ from Shader import shaders
 
 from Instrument import *
 from OpenGL.GL import *
+import numpy as np
 import Song
 
 class Guitar(Instrument):
@@ -1173,9 +1174,9 @@ class Guitar(Instrument):
           glEnable(GL_LIGHT0)
           glShadeModel(GL_SMOOTH)
           glRotatef(90, 0, 1, 0)
-          glLightfv(GL_LIGHT0, GL_POSITION, (5.0, 10.0, -10.0, 0.0))
-          glLightfv(GL_LIGHT0, GL_AMBIENT,  (.2, .2, .2, 0.0))
-          glLightfv(GL_LIGHT0, GL_DIFFUSE,  (1.0, 1.0, 1.0, 0.0))
+          glLightfv(GL_LIGHT0, GL_POSITION, np.array([5.0, 10.0, -10.0, 0.0], dtype=np.float32))
+          glLightfv(GL_LIGHT0, GL_AMBIENT,  np.array([0.2, 0.2, 0.2, 0.0], dtype=np.float32))
+          glLightfv(GL_LIGHT0, GL_DIFFUSE,  np.array([1.0, 1.0, 1.0, 0.0], dtype=np.float32))
           
           
           glRotatef(-90, 1, 0, 0)
