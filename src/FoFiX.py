@@ -95,6 +95,11 @@ if '--opengl-error-checking' not in sys.argv:
   import OpenGL
   if OpenGL.__version__ >= '3':
     OpenGL.ERROR_CHECKING = False
+    OpenGL.ARRAY_SIZE_CHECKING = False
+    OpenGL.ERROR_ON_COPY = True
+    OpenGL.FORWARD_COMPATIBLE_ONLY = True
+    OpenGL.SIZE_1_ARRAY_UNPACK = False
+    OpenGL.STORE_POINTERS = False
 
 import Log
 import Config
