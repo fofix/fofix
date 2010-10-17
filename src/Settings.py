@@ -260,12 +260,10 @@ class KeyConfigChoice(Menu.Choice):
         key = Dialogs.getKey(self.engine, _("Press a key for '%s' or hold Escape to cancel.") % text)
     
     if key:
-      temp = Player.setNewKeyMapping(self.engine, self.config, self.section, self.option, key)
       if self.name in self.engine.input.controls.controlList:
         self.engine.input.reloadControls()
     else:
       if self.noneOK:
-        temp = Player.setNewKeyMapping(self.engine, self.config, self.section, self.option, "None")
         if self.name in self.engine.input.controls.controlList:
           self.engine.input.reloadControls()
 

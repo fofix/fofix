@@ -28,7 +28,6 @@ import pygame
 import Config
 import Song
 from Language import _
-#import Dialogs
 import Microphone  #stump
 import VFS
 
@@ -825,24 +824,7 @@ def isKeyMappingOK(config, start):
 
     # everything tests OK
   return 0
-
-# glorandwarf: sets the key mapping and checks for a conflict #FIXME
-# restores the old mapping if a conflict occurred
-def setNewKeyMapping(engine, config, section, option, key):
-  oldKey = config.get(section, option)
-  config.set(section, option, key)
-  keyCheckerMode = Config.get("game", "key_checker_mode")
-  if key == "None" or key is None:
-    return True
-  b = isKeyMappingOK(config, option)
-  if b != 0:
-    if keyCheckerMode > 0:
-      Dialogs.showMessage(engine, _("This key conflicts with the following keys: %s") % str(b))
-    if keyCheckerMode == 2:   #enforce no conflicts!
-      config.set(section, option, oldKey)
-    return False
-  return True
-      
+     
 class Player(object):
   def __init__(self, name, number):
 
