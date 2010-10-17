@@ -38,10 +38,6 @@ import Dialogs
 import Player
 import Song
 
-class ControlConfigError(Exception):
-  def __str__(self):
-    return _("Your controls are not properly set up for this mode. Please check your settings.")
-
 class WorldNotStarted(Exception):
   def __str__(self):
     return _("World error. Please try again.")
@@ -137,8 +133,8 @@ class Lobby(Layer, KeyListener):
         self.controls[i] = _("Default Microphone")
     
     if 4 - len(self.blockedPlayers) < self.minPlayers:
-      raise ControlConfigError
-    
+      Dialogs.showMessage(self.engine, _("Your controls are not properly set up for this mode. Please check your settings."))
+      #FIXME: Go back to the main menu (or the control menu) without screwing up the layers.
     self.engine.input.activeGameControls = [i for i in range(4) if i not in self.blockedPlayers]
     self.engine.input.pluginControls()
     self.panelOrder = range(4)
