@@ -110,7 +110,7 @@ you install Python to, as you will need to know for the next step.
 (If you use default settings, Python should end up in: `C:\Python26`)
 
   [the Python download page]: http://www.python.org/download/
-  [py2.6.5-win32]: http://www.python.org/ftp/python/2.6.5/python-2.6.5.msi
+  [py2.6.6-win32]: http://python.org/ftp/python/2.6.6/python-2.6.6.msi
 
 #### Adding Python to the PATH
 You will need to add the Python installation folder to the PATH.
