@@ -391,18 +391,18 @@ class Theme(Task):
       self.lobbyPanelAvatarDimension = (get("lobbyPanelAvatarWidth", float, 200.00),
                                         get("lobbyPanelAvatarHeight", float, 110.00))
       self.lobbyTitleText = get("lobbyTitleText", str, "Lobby")
-      self.lobbyTitleTextPos = (get("lobbyTitleTextX", str, .5), 
-                                get("lobbyTitleTextY", float, .1))
+      self.lobbyTitleTextPos = (get("lobbyTitleTextX", str, 0.3), 
+                                get("lobbyTitleTextY", float, 0.015))
       self.lobbyTitleTextAlign = eval(get("lobbyTitleTextAlign", str, "CENTER"))
-      self.lobbyTitleTextScale = get("lobbyTitleTextScale", float, .0025)
+      self.lobbyTitleTextScale = get("lobbyTitleTextScale", float, .001)
       self.lobbyTitleTextFont = get("lobbyTitleTextFont", str, "font")
 
       self.lobbySubtitleText = get("lobbySubtitleText", str, "Choose Your Character!")
-      self.lobbySubtitleTextPos = (get("lobbySubtitleTextX", float, .5),
-                                   get("lobbySubtitleTextY", float, .15)) 
+      self.lobbySubtitleTextPos = (get("lobbySubtitleTextX", float, 0.5),
+                                   get("lobbySubtitleTextY", float, 0.015)) 
       self.lobbySubtitleTextScale = get("lobbySubtitleTextScale", float, .0015)
       self.lobbySubtitleTextFont = get("lobbySubtitleTextFont", str, "font")
-      self.lobbySubtitleTextAlign = eval(get("lobbySubtitleTextAlign", str, "LEFT"))
+      self.lobbySubtitleTextAlign = eval(get("lobbySubtitleTextAlign", str, "CENTER"))
 
       self.lobbyOptionScale = get("lobbyOptionScale", float, .001)
       self.lobbyOptionAlign = eval(get("lobbyOptionAlign", str, "CENTER"))
@@ -417,10 +417,10 @@ class Theme(Task):
       self.lobbySaveCharFont = get("lobbySaveCharFont", str, "font")
       self.lobbySaveCharColor = get("lobbySaveCharColor", "color", "#FFFFFF")
 
-      self.lobbyGameModePos = (get("lobbyGameModeX", float, .985),
-                               get("lobbyGameModeY", float, .03))
+      self.lobbyGameModePos = (get("lobbyGameModeX", float, 0.7),
+                               get("lobbyGameModeY", float, 0.015))
       self.lobbyGameModeScale = get("lobbyGameModeScale", float, .001)
-      self.lobbyGameModeAlign = eval(get("lobbyGameModeAlign", str, "RIGHT"))
+      self.lobbyGameModeAlign = eval(get("lobbyGameModeAlign", str, "CENTER"))
       self.lobbyGameModeFont = get("lobbyGameModeFont", str, "font")
       self.lobbyGameModeColor = get("lobbyGameModeColor", "color", "#FFFFFF")
 
@@ -456,7 +456,7 @@ class Theme(Task):
       self.lobbyPanelSpacing = get("lobbyPanelSpacing", float, .24)
 
       self.partDiffTitleText = get("partDiffTitleText", str, "Select a Part and Difficulty")
-      self.partDiffTitleTextPos = (get("partDiffTitleTextX", float, .5), 
+      self.partDiffTitleTextPos = (get("partDiffTitleTextX", float, .5),
                                    get("partDiffTitleTextY", float, .1))
       self.partDiffTitleTextAlign = eval(get("partDiffTitleTextAlign", str, "CENTER"))
       self.partDiffTitleTextScale = get("partDiffTitleTextScale", float, .0025)
@@ -479,10 +479,10 @@ class Theme(Task):
       self.partDiffSelectedColor = get("partDiffSelectedColor", "color", "#FFFF66")
 
       self.partDiffGameModeScale = get("partDiffGameModeScale", float, .001)
-      self.partDiffGameModeAlign = eval(get("partDiffGameModeAlign", str, "RIGHT"))
+      self.partDiffGameModeAlign = eval(get("partDiffGameModeAlign", str, "CENTER"))
       self.partDiffGameModeFont  = get("partDiffGameModeFont", str, "font")
-      self.partDiffGameModePos   = (get("partDiffGameModeX", float, .985),
-                                    get("partDiffGameModeY", float,  .03))
+      self.partDiffGameModePos   = (get("partDiffGameModeX", float, .07),
+                                    get("partDiffGameModeY", float,  .015))
       self.partDiffGameModeColor = get("partDiffGameModeColor", "color", "#FFFFFF")
 
       self.partDiffPanelNameScale = get("partDiffPanelNameScale", float, .001)
@@ -498,17 +498,17 @@ class Theme(Task):
                                    get("partDiffControlY", float,  .375))
       self.partDiffHeaderColor = get("partDiffHeaderColor", "color", "#FFFFFF")
 
-      self.partDiffPartScale = get("partDiffPartScale", float, .5)
+      self.partDiffPartScale = get("partDiffPartScale", float, .25)
       self.partDiffPartPos = (get("partDiffPartX", float, .5),
-                              get("partDiffpartY", float, .65))
+                              get("partDiffpartY", float, .52))
 
-      self.partDiffKeyboardImgScale = get("partDiffKeyboardImgScale", float, .5)
+      self.partDiffKeyboardImgScale = get("partDiffKeyboardImgScale", float, .1)
       self.partDiffKeyboardImgPos = (get("partDiffKeyboardImgX", float, .8),
                                      get("partDiffKeyboardImgY", float, .95))
 
       self.partDiffPanelSpacing = get("partDiffPanelSpacing", float, .24)
-      self.partDiffPanelPos = (get("partDiffPanelX", float, .8),
-                               get("partDiffPanelY", float, .95))
+      self.partDiffPanelPos = (get("partDiffPanelX", float, .04),
+                               get("partDiffPanelY", float, .1))
       self.partDiffPanelSize = (get("partDiffPanelWidth", float,  .2),
                                 get("partDiffPanelHeight", float, .8))
      
@@ -852,6 +852,7 @@ class ThemeParts:
     wP = w*self.theme.partDiffPanelSize[0]
     hP = h*self.theme.partDiffPanelSize[1]
     glColor3f(*self.theme.partDiffHeaderColor)
+    self.theme.fadeScreen(-2.00)
     if self.theme.partDiffTitleText:
       dialog.fontDict[self.theme.partDiffTitleTextFont].render(self.theme.partDiffTitleText, self.theme.partDiffTitleTextPos, scale = self.theme.partDiffTitleTextScale, align = self.theme.partDiffTitleTextAlign)
     if self.theme.partDiffSubtitleText:
