@@ -103,7 +103,7 @@ under Windows.)
 
 First, you will need Python itself.  Go to [the Python download page][]
 and select the most recent 2.6.x release.  The most recent 2.6.x at the
-time of this writing is 2.6.5 ([direct link][py2.6.5-win32]).  Again,
+time of this writing is 2.6.6 ([direct link][py2.6.6-win32]).  Again,
 _32-bit is recommended, even if you have a 64-bit system._  Install
 by double-clicking the .msi file, and be sure to remember which folder
 you install Python to, as you will need to know for the next step.
