@@ -359,6 +359,8 @@ class GuitarScene(Scene):
     self.originZ          = self.engine.theme.povOrigin[2]
     self.customPOV        = False
     self.ending           = False
+
+    self.neckIntoAnimationType = self.engine.config.get("fretboard", "neck_intro_animation")#weirdpeople
     
     povList = [str(self.targetX), str(self.targetY), str(self.targetZ), str(self.originX), str(self.originY), str(self.originZ)]
     if "None" not in povList:
@@ -839,7 +841,16 @@ class GuitarScene(Scene):
     
     self.phrases = self.engine.config.get("coffee", "game_phrases")#blazingamer
     self.starfx = self.engine.config.get("game", "starfx")#blazingamer
-    self.boardY = 2
+
+    #weirdpeople - sets the distances the neck has to move in the animation
+    if self.neckIntoAnimationType == 0: #Original
+      self.boardY = 2
+    elif self.neckIntoAnimationType == 1: #Guitar Hero
+      self.boardY = 10
+    elif self.neckIntoAnimationType == 2: #Rock Band
+      self.boardZ = 5
+    elif self.neckIntoAnimationType == 4: #By Theme: will implememnt at later point
+      self.boardY = 1
     self.rbOverdriveBarGlowVisibility = 0
     self.rbOverdriveBarGlowFadeOut = False
     self.counting = self.engine.config.get("video", "counting")
@@ -1688,33 +1699,47 @@ class GuitarScene(Scene):
       self.camera.origin    = (0.0, 2.8, -3.6)
     elif self.customPOV:
       self.camera.target    = (self.targetX, self.targetY, self.targetZ)
-      self.camera.origin    = (self.originX, self.originY*self.boardY, self.originZ)
+      self.camera.origin    = (self.originX, self.originY, self.originZ)
     else:
       if self.pov == 1: #GH3
         self.camera.target    = (0.0, 0.6, 4.4)
-        self.camera.origin    = (0.0, 3.5*self.boardY, -3.8)
+        self.camera.origin    = (0.0, 3.5, -3.8)
       elif self.pov == 2: #RB
         self.camera.target    = (0.0, 0.0, 3.7)
-        self.camera.origin    = (0.0, 2.9*self.boardY, -2.9)
+        self.camera.origin    = (0.0, 2.9, -2.9)
       elif self.pov == 3: #GH2
         self.camera.target    = (0.0, 1.6, 2.0)
-        self.camera.origin    = (0.0, 2.6*self.boardY, -3.6)
+        self.camera.origin    = (0.0, 2.6, -3.6)
       elif self.pov == 4: #Rock Rev
         self.camera.target    = (0.0, -6.0, 2.6666666666)
         self.camera.origin    = (0.0, 6.0, 2.6666666665) 
       elif self.pov == 5: #Theme
         if self.rmtype == 0:
           self.camera.target    = (0.0, 1.6, 2.0)
-          self.camera.origin    = (0.0, 2.6*self.boardY, -3.6)
+          self.camera.origin    = (0.0, 2.6, -3.6)
         elif self.rmtype == 1:
           self.camera.target    = (0.0, 0.6, 4.4) #Worldrave - Perfected the proper GH3 POV
-          self.camera.origin    = (0.0, 3.5*self.boardY, -3.8)
+          self.camera.origin    = (0.0, 3.5, -3.8)
         elif self.rmtype == 2:
           self.camera.target    = (0.0, 0.0, 3.7)
-          self.camera.origin    = (0.0, 2.9*self.boardY, -2.9)
+          self.camera.origin    = (0.0, 2.9, -2.9)
       else: # FoF
         self.camera.target    = (0.0, 0.0, 4.0)
-        self.camera.origin    = (0.0, 3.0*self.boardY, -3.0)
+        self.camera.origin    = (0.0, 3.0, -3.0)
+
+    #weirdpeople - differant types of animations
+    if self.neckIntoAnimationType == 0: #Original FoFiX rotate down into place
+      self.camera.origin = (self.camera.origin[0], self.camera.origin[1]*self.boardY, self.camera.origin[2])
+    elif self.neckIntoAnimationType == 1: #Guitar Hero type (from bottom of screen)
+      self.camera.target    = (self.camera.target[0], self.camera.target[1]+self.boardY-1, self.camera.target[2])
+      self.camera.origin    = (self.camera.origin[0], self.camera.origin[1]+self.boardY-1, self.camera.origin[2])
+    elif self.neckIntoAnimationType == 2: #Rock Band type (goes into screen)
+      self.camera.target    = (self.camera.target[0], self.camera.target[1], self.camera.target[2]+self.boardZ-1)
+      self.camera.origin    = (self.camera.origin[0], self.camera.origin[1], self.camera.origin[2]+self.boardZ-1)
+    elif self.neckIntoAnimationType == 3: #Off game starts with the pov as is
+	  self.camera.origin    = self.camera.origin
+    elif self.neckIntoAnimationType == 4: #By Theme: will implememnt at later point
+	  self.camera.origin    = self.camera.origin
 
   def freeResources(self):
     self.engine.view.setViewport(1,0)
@@ -2283,8 +2308,15 @@ class GuitarScene(Scene):
         self.instruments[i].actions = self.playerList[i].actions
 
     self.engine.collectGarbage()
-
-    self.boardY = 2
+    #weirdpeople - sets the default distances the neck has to move in the animation
+    if self.neckIntoAnimationType == 0:#Original
+      self.boardY = 2
+    elif self.neckIntoAnimationType == 1:#Guitar Hero
+      self.boardY = 10
+    elif self.neckIntoAnimationType == 2:#Rock Band
+      self.boardZ = 5
+    elif self.neckIntoAnimationType == 4:#By Theme: will implememnt at later point
+      self.boardY = 1
     self.setCamera()
 
 
@@ -5235,18 +5267,45 @@ class GuitarScene(Scene):
 
     if self.song and self.song.readyToGo:
       pos = self.getSongPosition()
-  
-      if self.boardY <= 1:
+      #weirdpeople - differant styles for the start animation of the fretboard
+      if self.neckIntoAnimationType == 0: #Original
+        if self.boardY <= 1:
+          self.setCamera()
+          if self.countdown > 0: #if the countdown is already at 0 ex. after pause
+            self.countdownOK = True
+            self.boardY = 1
+        elif self.boardY > 1:
+          self.boardY -= 0.01 #speed of animation higher the number = the faster the animation
+          self.setCamera()
+      elif self.neckIntoAnimationType == 1: #Guitar Hero
+        if self.boardY <= 1:
+          self.setCamera()
+          if self.countdown > 0:
+            self.countdownOK = True
+            self.boardY = 1
+        elif self.boardY > 1:
+          self.boardY -= 0.3
+          self.setCamera()
+      elif self.neckIntoAnimationType == 2: #Rock Band
+        if self.boardZ <= 1:
+          self.setCamera()
+          if self.countdown > 0:
+            self.countdownOK = True
+            self.boardZ = 1
+        elif self.boardZ > 1:
+          self.boardZ -= 0.1
+          self.setCamera()
+      elif self.neckIntoAnimationType == 3: #Off
         self.setCamera()
         if self.countdown > 0:
           self.countdownOK = True
-          self.boardY = 1
-      elif self.boardY > 1:
-        self.boardY -= 0.01
+      elif self.neckIntoAnimationType == 4: #By theme: will implement at a later point
         self.setCamera()
+        if self.countdown > 0:
+          self.countdownOK = True
 
       Scene.render(self, visibility, topMost) #MFH - I believe this eventually calls the renderGuitar function, which also involves two viewports... may not be easy to move this one...
-        
+
       self.visibility = v = 1.0 - ((1 - visibility) ** 2)
   
       with self.engine.view.orthogonalProjection(normalize = True):
