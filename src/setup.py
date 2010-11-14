@@ -34,40 +34,52 @@ import numpy as np
 # the script, just before the actual call to setup().
 setup_args = {}
 if os.name == 'nt':
-  import py2exe
-  from py2exe.resources.VersionInfo import RT_VERSION
-  from py2exe.resources.VersionInfo import Version as VersionResource
-  #stump: sometimes py2.6 py2exe thinks parts of pygame are "system" DLLs...
-  __orig_isSystemDLL = py2exe.build_exe.isSystemDLL
-  def isSystemDLL(pathname):
-    if pathname.lower().find('pygame') != -1:
-      return 0
-    return __orig_isSystemDLL(pathname)
-  py2exe.build_exe.isSystemDLL = isSystemDLL
+  try:
+    import py2exe
+  except ImportError:
+    if 'py2exe' in sys.argv:
+      print >>sys.stderr, 'py2exe must be installed to create .exe files.'
+      sys.exit(1)
+  else:
+    from py2exe.resources.VersionInfo import RT_VERSION
+    from py2exe.resources.VersionInfo import Version as VersionResource
+    #stump: sometimes py2.6 py2exe thinks parts of pygame are "system" DLLs...
+    __orig_isSystemDLL = py2exe.build_exe.isSystemDLL
+    def isSystemDLL(pathname):
+      if pathname.lower().find('pygame') != -1:
+        return 0
+      return __orig_isSystemDLL(pathname)
+    py2exe.build_exe.isSystemDLL = isSystemDLL
 
-  setup_args.update({
-    'zipfile': "data/library.zip",
-    'windows': [
-      {
-        "script":          "FoFiX.py",
-        "icon_resources":  [(1, "fofix.ico")],
-        "other_resources": [(RT_VERSION, 1, VersionResource(
-          #stump: the parameter below must consist only of up to four numerical fields separated by dots
-          Version.versionNum(),
-          file_description="Frets on Fire X",
-          legal_copyright=r"© 2008-2010 FoFiX Team.  GNU GPL v2 or later.",
-          company_name="FoFiX Team",
-          internal_name="FoFiX.exe",
-          original_filename="FoFiX.exe",
-          product_name=Version.PROGRAM_NAME,
-          #stump: when run from the exe, FoFiX will claim to be "FoFiX v" + product_version
-          product_version=Version.version()
-        ).resource_bytes())]
-      }
-    ]
-  })
+    setup_args.update({
+      'zipfile': "data/library.zip",
+      'windows': [
+        {
+          "script":          "FoFiX.py",
+          "icon_resources":  [(1, "fofix.ico")],
+          "other_resources": [(RT_VERSION, 1, VersionResource(
+            #stump: the parameter below must consist only of up to four numerical fields separated by dots
+            Version.versionNum(),
+            file_description="Frets on Fire X",
+            legal_copyright=r"© 2008-2010 FoFiX Team.  GNU GPL v2 or later.",
+            company_name="FoFiX Team",
+            internal_name="FoFiX.exe",
+            original_filename="FoFiX.exe",
+            product_name=Version.PROGRAM_NAME,
+            #stump: when run from the exe, FoFiX will claim to be "FoFiX v" + product_version
+            product_version=Version.version()
+          ).resource_bytes())]
+        }
+      ]
+    })
 elif sys.platform == 'darwin':
-  import py2app
+  try:
+    import py2app
+  except ImportError:
+    if 'py2app' in sys.argv:
+      print >>sys.stderr, 'py2app must be installed to create .app bundles.'
+      sys.exit(1)
+
   setup_args.update({
     'app': ['FoFiX.py'],
     'data_files': [

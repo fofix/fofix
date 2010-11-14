@@ -982,7 +982,7 @@ class Setlist:
     w, h = scene.geometry
     font = scene.fontDict['songListFont']
     lfont = scene.fontDict['songListFont']
-    sfont = scene.fontDict['shadowfont']
+    sfont = scene.fontDict['shadowFont']
     if self.setlist_type == 0:
       return
     elif self.setlist_type == 1:
@@ -1295,7 +1295,7 @@ class Setlist:
     w, h = scene.geometry
     font = scene.fontDict['songListFont']
     lfont = scene.fontDict['songListFont']
-    sfont = scene.fontDict['shadowfont']
+    sfont = scene.fontDict['shadowFont']
     item = scene.selectedItem
     if not item:
       return
@@ -2076,10 +2076,7 @@ class Setlist:
       font = scene.fontDict['font']
       screenw, screenh = scene.geometry
       v = 0
-      try:
-        lfont = scene.fontDict['lfont']
-      except KeyError:
-        lfont = font
+      lfont = font
       
       # here we reset the rendering... without pushing the matrices. (they be thar)
       # (otherwise copying engine.view.setOrthogonalProjection)
@@ -2253,10 +2250,7 @@ class Setlist:
       item = scene.selectedItem
       font = scene.fontDict['font']
       w, h = scene.geometry
-      try:
-        lfont = scene.fontDict['lfont']
-      except KeyError:
-        lfont = font
+      lfont = font
       fh = lfont.getHeight()*0.0016
       if isinstance(item, Song.SongInfo):
         angle = scene.itemRenderAngles[scene.selectedIndex]

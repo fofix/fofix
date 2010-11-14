@@ -164,141 +164,45 @@ class Data(object):
     asciiOnly = True
     reversed  = False
     scale     = 1
-    scale2    = .5
     # evilynux - Load bigger fonts so they're nicer when scaled, scaling readjusted
-    fontSize  = [44, 108, 34, 32, 30]
-
-    if asciiOnly:
-      font    = resource.fileName(os.path.join("themes",themename,"default.ttf"))
-      bigFont = resource.fileName("title.ttf")
-    else:
-      Log.debug("Main font International.ttf used!")
-      font    = \
-      bigFont = resource.fileName("international.ttf")
-
-    # load fonts
+    fontSize  = [44, 132, 34, 32, 30]
     w, h = [int(s) for s in Config.get("video", "resolution").split("x")]
     aspectRatio = float(w)/float(h)
-    if os.path.isdir(os.path.join(self.themepath, "fonts")):
-      self.fontDict = {}
-      for file in os.listdir(os.path.join(self.themepath, "fonts")):
-        splitext = os.path.splitext(file)
-        if splitext[1] == ".ttf":
-          self.fontDict[splitext[0]] = Font(os.path.join(self.themepath, "fonts", file), 64, scale = 1, reversed = False, systemFont = False, aspectRatio = aspectRatio)
-    else:
-      font1     = lambda: Font(font,    fontSize[0], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, aspectRatio = aspectRatio)
-      font2     = lambda: Font(bigFont, fontSize[1], scale = 1, reversed = reversed, systemFont = not asciiOnly)
-      if self.theme == 1: # evilynux - No outline for GH3
-        font3     = lambda: Font(pauseFont, fontSize[2], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio)
+
+    self.fontList = [
+      ["font1","font","default.ttf",fontSize[4]],
+      ["font2","bigFont","title.ttf",fontSize[1]],
+      ["font3","pauseFont","pause.ttf",fontSize[2]],
+      ["font4","scoreFont","score.ttf",fontSize[3]],
+      ["font5","streakFont","streak.ttf",fontSize[3]],
+      ["font6","loadingFont","loading.ttf",fontSize[3]],
+      ["font7","songFont","song.ttf",fontSize[4]],
+      ["font8","songListFont","songlist.ttf",fontSize[3]],
+      ["font9","shadowFont","songlist.ttf",fontSize[3]],
+      ["font10","streakFont2","streakphrase.ttf",fontSize[2]]
+    ]
+    for f in self.fontList:
+      if self.fileExists(os.path.join("themes",themename,"fonts",f[2])):
+        fn = resource.fileName(os.path.join("themes",themename,"fonts",f[2]))
+        f[0] = lambda: Font(fn, f[3], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio)
+        resource.load(self,f[1],f[0], synch = True)
+      elif self.fileExists(os.path.join("themes",themename,"fonts","default.ttf")):
+        Log.debug("Theme font not found: " + f[2])
+        fn = resource.fileName(os.path.join("themes",themename,"fonts","default.ttf"))
+        f[0] = lambda: Font(fn, f[3], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio)
+        resource.load(self,f[1],f[0], synch = True)
       else:
-        font3     = lambda: Font(pauseFont, fontSize[2], scale = scale2, reversed = reversed, systemFont = not asciiOnly, aspectRatio = aspectRatio)
-      font4     = lambda: Font(scoreFont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio)
-      font5     = lambda: Font(streakFont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio)
-      if self.theme == 1:
-        font6     = lambda: Font(loadingFont, fontSize[3], scale = scale2*1.4, reversed = reversed, systemFont = not asciiOnly, outline = False, shadow = True, aspectRatio = aspectRatio) #Worldrave - Added shadow to Loading Phrases in GH-Based Theme's
-      else:
-        font6     = lambda: Font(loadingFont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio)
-      if self.theme == 2:
-        font7     = lambda: Font(songFont, fontSize[4], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio)#kk69: loads font specific for song name in Guitar Scene =)
-      else:
-        font7     = lambda: Font(songFont, fontSize[0], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio)#kk69: loads font specific for song name in Guitar Scene =)
-      font8     = lambda: Font(songListFont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio) #MFH
-      font9     = lambda: Font(shadowfont, fontSize[3], scale = scale2, reversed = reversed, systemFont = not asciiOnly, outline = False, shadow = True, aspectRatio = aspectRatio) #blazingamer
-      font10    = lambda: Font(streakFont2, fontSize[2], scale = scale2*1.08, reversed = reversed, systemFont = not asciiOnly, outline = False, shadow = True, aspectRatio = aspectRatio) #blazingamer - Worldrave modified size to accuracy.
+        Log.debug("Default theme font not found: %s - using built-in default" % str(f[2]))
+        fn = resource.fileName(os.path.join("fonts","default.ttf"))
+        f[0] = lambda: Font(fn, f[3], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio)
+        resource.load(self,f[1],f[0], synch = True)
 
+    
+    self.fontDict = {"font": self.font, "bigFont": self.bigFont, "pauseFont": self.pauseFont, "scoreFont": self.scoreFont, \
+                     "streakFont": self.streakFont, "songFont": self.songFont, "streakFont2": self.streakFont2, \
+                     "songListFont": self.songListFont, "shadowFont": self.shadowFont, "loadingFont": self.loadingFont}
 
-      resource.load(self, "font",         font1, synch = True)
-      resource.load(self, "bigFont",      font2, synch = True)
-
-
-      #MFH - seems like these should be up here...
-      #Weirdpeople - make all fonts fallback on the default.ttf if missing
-      if self.fileExists(os.path.join("themes",themename,"menu.ttf")):
-        menuFont = resource.fileName(os.path.join("themes",themename,"menu.ttf"))
-      else:
-        menuFont = font
-
-      if self.fileExists(os.path.join("themes",themename,"pause.ttf")):
-        pauseFont = resource.fileName(os.path.join("themes",themename,"pause.ttf"))
-      else:
-        pauseFont = font
-
-      if self.fileExists(os.path.join("themes",themename,"score.ttf")):
-        scoreFont = resource.fileName(os.path.join("themes",themename,"score.ttf"))
-      else:
-        scoreFont = font
-
-      if self.fileExists(os.path.join("themes",themename,"Streak.ttf")):
-        streakFont = resource.fileName(os.path.join("themes",themename,"streak.ttf"))
-      else:
-        streakFont = font
-
-      if self.fileExists(os.path.join("themes",themename,"Song.ttf")):
-        songFont = resource.fileName(os.path.join("themes",themename,"song.ttf"))
-      else:
-        songFont = font
-
-      if self.fileExists(os.path.join("themes",themename,"loading.ttf")):
-        loadingFont = resource.fileName(os.path.join("themes",themename,"loading.ttf"))
-      else:
-        loadingFont = font
-
-      if self.fileExists(os.path.join("themes",themename,"songlist.ttf")):
-        songListFont = resource.fileName(os.path.join("themes",themename,"songlist.ttf"))
-      elif self.fileExists(os.path.join("themes",themename,"menu.ttf")):
-        songListFont = menuFont
-      else:
-        songListFont = font
-	  
-
-      if self.fileExists(os.path.join("themes",themename,"songlist.ttf")):
-        shadowfont = resource.fileName(os.path.join("themes",themename,"songlist.ttf"))
-      elif self.fileExists(os.path.join("themes",themename,"menu.ttf")):
-        shadowfont = menuFont
-      else:
-        shadowfont = font
-		
-      #blazingamer
-      if self.fileExists(os.path.join("themes",themename,"streakphrase.ttf")):
-        streakFont2 = resource.fileName(os.path.join("themes",themename,"streakphrase.ttf"))
-      elif self.fileExists(os.path.join("themes",themename,"menu.ttf")):
-        streakFont2 = menuFont
-      else:
-        streakFont2 = font
-
-      #blazingamer:Reorganized
-      if self.theme == 0:
-        font1     = lambda: Font(menuFont,  fontSize[2], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, aspectRatio = aspectRatio)
-        font2     = lambda: Font(menuFont,  fontSize[2], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio)
-        resource.load(self, "lfont",         font2, synch = True)
-        resource.load(self, "font",          font1, synch = True)
-      elif self.theme == 1:
-        font1     = lambda: Font(menuFont,  fontSize[3], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio) #Worldrave - Removed outline from options text on GH-Based theme's. No other drawbacks noticed.
-        font2     = lambda: Font(menuFont,  fontSize[3], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio)
-        resource.load(self, "lfont",         font2, synch = True)
-        resource.load(self, "font",          font1, synch = True)
-      elif self.theme == 2:
-        font1     = lambda: Font(menuFont,  fontSize[4], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio)
-        resource.load(self, "font",          font1, synch = True)
-
-
-      resource.load(self, "pauseFont",     font3, synch = True)
-      resource.load(self, "scoreFont",     font4, synch = True)
-      resource.load(self, "streakFont",    font5, synch = True)
-      resource.load(self, "songFont",      font7, synch = True)
-      resource.load(self, "streakFont2",    font10, synch = True)#blazingamer
-
-      resource.load(self, "songListFont",      font8, synch = True)
-      resource.load(self, "shadowfont",      font9, synch = True)
-      resource.load(self, "loadingFont",    font6, synch = True)
-      
-      self.fontDict = {"font": self.font, "bigFont": self.bigFont, "pauseFont": self.pauseFont, "scoreFont": self.scoreFont, \
-                       "streakFont": self.streakFont, "songFont": self.songFont, "streakFont2": self.streakFont2, \
-                       "songListFont": self.songListFont, "shadowfont": self.shadowfont, "loadingFont": self.loadingFont}
-      try:
-        self.fontDict['lfont'] = self.lfont
-      except AttributeError:
-        pass
+    assert self.fontDict['font'] == self.font
 
     # load sounds asynchronously
     resource.load(self, "screwUpsounds", self.loadScrewUpsounds)

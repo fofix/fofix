@@ -103,14 +103,14 @@ under Windows.)
 
 First, you will need Python itself.  Go to [the Python download page][]
 and select the most recent 2.6.x release.  The most recent 2.6.x at the
-time of this writing is 2.6.5 ([direct link][py2.6.5-win32]).  Again,
+time of this writing is 2.6.6 ([direct link][py2.6.6-win32]).  Again,
 _32-bit is recommended, even if you have a 64-bit system._  Install
 by double-clicking the .msi file, and be sure to remember which folder
 you install Python to, as you will need to know for the next step.
 (If you use default settings, Python should end up in: `C:\Python26`)
 
   [the Python download page]: http://www.python.org/download/
-  [py2.6.5-win32]: http://www.python.org/ftp/python/2.6.5/python-2.6.5.msi
+  [py2.6.6-win32]: http://python.org/ftp/python/2.6.6/python-2.6.6.msi
 
 #### Adding Python to the PATH
 You will need to add the Python installation folder to the PATH.
@@ -140,7 +140,7 @@ The following packages are required:
   * Python Imaging Library ([direct link to 1.1.7+](http://github.com/downloads/fuzion/pil-2009-raclette/PIL-1.1.7-2009-raclette-r358.win32-py2.6.exe))
   * pyogg ([direct link to 1.3](http://www.mediafire.com/file/qlw2hwyy0rz/pyogg-1.3.win32-py2.6.exe))
   * pyvorbis ([direct link to 1.5a](http://www.mediafire.com/file/i21ewawljtw/pyvorbis-1.5.win32-py2.6.exe))
-  * Cython ([direct link to 0.12.1](http://www.lfd.uci.edu/~gohlke/pythonlibs/Cython-0.12.1.win32-py2.6.exe))
+  * Cython ([link to 0.13](http://www.lfd.uci.edu/~gohlke/pythonlibs/#cython))
 
 The following packages are optional:
 

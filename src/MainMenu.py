@@ -26,7 +26,7 @@
 
 from View import BackgroundLayer
 from Menu import Menu
-from Lobby import Lobby, ControlConfigError
+from Lobby import Lobby
 from Language import _
 import Dialogs
 import Config
@@ -277,25 +277,6 @@ class MainMenu(BackgroundLayer):
   def quit(self):
     self.engine.view.popLayer(self.menu)
 
-  def catchErrors(function): #FIXME
-    def harness(self, *args, **kwargs):
-      try:
-        try:
-          function(self, *args, **kwargs)
-        except:
-          import traceback
-          Log.error("Traceback:" + traceback.format_exc() )
-          traceback.print_exc()
-          raise
-      except KeyboardInterrupt:
-        pass
-      except ControlConfigError:
-        Dialogs.showMessage(self.engine, _("Your controls are not properly set up for this mode. Please check your settings."))
-      except Exception, e:
-        if e:
-          Dialogs.showMessage(self.engine, unicode(e))
-    return harness
-
   def launchLayer(self, layerFunc):
     if not self.nextLayer:
       self.nextLayer = layerFunc
@@ -312,19 +293,15 @@ class MainMenu(BackgroundLayer):
     self.engine.startWorld(1, None, 0, 0, tutorial = True)
 
     self.launchLayer(lambda: Lobby(self.engine))
-  showTutorial = catchErrors(showTutorial)
 
   #MFH: adding deprecated support for EOF's method of quickstarting a song to test it
   def newSinglePlayerGame(self):
     self.newLocalGame()   #just call start function with default settings  = 1p quickplay
-  
+
   def newLocalGame(self, players=1, mode1p=0, mode2p=0, maxplayers = None, allowGuitar = True, allowDrum = True, allowMic = False): #mode1p=0(quickplay),1(practice),2(career) / mode2p=0(faceoff),1(profaceoff)
     self.engine.data.acceptSound.play()
-
     self.engine.startWorld(players, maxplayers, mode1p, mode2p, allowGuitar, allowDrum, allowMic)
-    
     self.launchLayer(lambda: Lobby(self.engine))
-  newLocalGame = catchErrors(newLocalGame)
   
   def restartGame(self):
     splash = Dialogs.showLoadingSplashScreen(self.engine, "")

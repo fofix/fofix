@@ -5222,7 +5222,7 @@ class GuitarScene(Scene):
     hBak = h
 
     if self.fontShadowing:
-      font    = self.engine.data.shadowfont
+      font    = self.engine.data.shadowFont
     else:
       font    = self.engine.data.font
     lyricFont = self.engine.data.songFont
