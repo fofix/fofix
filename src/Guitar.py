@@ -69,8 +69,6 @@ class Guitar(Instrument):
     self.Animspeed      = 30#Lower value = Faster animations
     #For Animated Starnotes
     self.indexCount     = 0
-    #Alarian, For animated hitglow
-    self.HCountAni      = False
     
     #myfingershurt:
     self.hopoStyle        = self.engine.config.get("game", "hopo_system")
@@ -1600,37 +1598,6 @@ class Guitar(Instrument):
         else:
           noteCount += 1
     return sorted(notes, key=lambda x: x[0])
-
-  def getRequiredNotesForRender(self, song, pos):
-    if self.battleStatus[2] and self.difficulty != 0:
-      Log.debug(self.battleDiffUpValue)
-      song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue]
-      track0 = song.track[self.player]
-      notes0 = [(time, event) for time, event in track0.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
-    
-      song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue - 1]
-      track1   = song.track[self.player]
-      notes1 = [(time, event) for time, event in track1.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
-      
-      notes = []
-      for time,note in notes0:
-        if time < self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard or time > self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
-          notes.append((time,note))
-      for time,note in notes1:
-        if time > self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard and time < self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
-          notes.append((time,note))
-      notes0 = None
-      notes1 = None
-      track0 = None
-      track1 = None
-      notes = sorted(notes, key=lambda x: x[0])
-    else:
-      track   = song.track[self.player]
-      notes = [(time, event) for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
-    
-    if self.battleStatus[7]:
-      notes = self.getDoubleNotes(notes)
-    return notes
  
   #MFH - corrected and optimized:
   def getRequiredNotesForJurgenOnTime(self, song, pos):
