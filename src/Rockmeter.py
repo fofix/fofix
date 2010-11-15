@@ -441,6 +441,28 @@ class Replace(Effect):
 
     self.conditions = self.get("condition", str, "True").split("|")
     
+  #fixes the scale after the rect is changed
+  def fixScale(self):
+    w, h, = self.layer.engine.view.geometry[2:4]
+    
+    rect = self.layer.rect
+    scale     = [eval(self.layer.get("xscale", str, "0.5")), 
+                 eval(self.layer.get("yscale", str, "0.5"))]
+    scale[0] *=  (rect[1] - rect[0])
+    scale[1] *=  (rect[3] - rect[2])
+    #this allows you to scale images in relation to pixels instead
+    #of percentage of the size of the image.
+    if "xscale" in self.layer.inPixels:
+      scale[0] /= self.layer.texture.pixelSize[0]
+    if "yscale" in self.layer.inPixels:
+      scale[1] /= self.layer.texture.pixelSize[1]
+
+    scale[1] = -scale[1]
+    scale[0] *= w/640.0
+    scale[1] *= h/480.0
+    
+    self.layer.scale = scale
+    
   def update(self):
 
     if self.type == "font":
@@ -456,6 +478,7 @@ class Replace(Effect):
             self.layer.drawing = self.drawings[i]
           if len(self.rects) > 1:
             self.layer.rect = self.rects[i]
+            self.fixScale()
         break
         
 class Rockmeter:
