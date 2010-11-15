@@ -179,7 +179,8 @@ class Instrument:
     self.HCount2        = 0
     self.Hitanim        = True
     self.Hitanim2       = True
-
+    self.HCountAni      = False
+    
     #myfingershurt: to keep track of pause status here as well
     self.paused = False
 
@@ -714,7 +715,7 @@ class Instrument:
 
             for step in range(4):
               #draw lightning in GH themes on SP gain
-              if step == 0 and event.finalStar and self.spEnabled and self.disableFlameSFX != True:
+              if step == 0 and event.finalStar and self.spEnabled and self.disableFlameSFX != True and self.hitlightning:
                 self.engine.draw3Dtex(self.hitlightning, coord = (xlightning, y, 3.3), rot = (90, 1, 0, 0),
                                       scale = (.15 + .5 * ms * ff, event.flameCount / 3.0 + .6 * ms * ff, 2), vertex = (.4,-2,-.4,2),
                                       texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = (1,1,1))
@@ -804,3 +805,33 @@ class Instrument:
                                 multiples = True, alpha = True, color = flamecol)
         event.flameCount += 1
 
+  def getRequiredNotesForRender(self, song, pos):
+    if self.battleStatus[2] and self.difficulty != 0:
+      Log.debug(self.battleDiffUpValue)
+      song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue]
+      track0 = song.track[self.player]
+      notes0 = [(time, event) for time, event in track0.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
+    
+      song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue - 1]
+      track1   = song.track[self.player]
+      notes1 = [(time, event) for time, event in track1.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
+      
+      notes = []
+      for time,note in notes0:
+        if time < self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard or time > self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
+          notes.append((time,note))
+      for time,note in notes1:
+        if time > self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard and time < self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
+          notes.append((time,note))
+      notes0 = None
+      notes1 = None
+      track0 = None
+      track1 = None
+      notes = sorted(notes, key=lambda x: x[0])
+    else:
+      track   = song.track[self.player]
+      notes = [(time, event) for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
+    
+    if self.battleStatus[7]:
+      notes = self.getDoubleNotes(notes)
+    return notes
