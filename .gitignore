@@ -27,3 +27,5 @@ data/themes/*
 !data/themes/MegaLight GH3
 !data/themes/MegaLight V4
 !data/themes/Uberlight
+win32/*
+!win32/*.sh
