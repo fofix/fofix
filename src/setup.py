@@ -27,6 +27,8 @@ from distutils.core import setup, Extension
 from Cython.Distutils import build_ext
 import sys, SceneFactory, Version, glob, os
 import numpy as np
+import shlex
+import subprocess
 
 
 # Start setting up py2{exe,app} and building the argument set for setup().
@@ -203,12 +205,122 @@ options['py2app'].update({
   }
 })
 
+
+def find_command(cmd):
+  '''Find a program on the PATH, or, on win32, in the dependency pack.'''
+
+  print 'checking for program %s...' % cmd,
+
+  if os.name == 'nt':
+    # Only accept something from the dependency pack.
+    path = os.path.join('..', 'win32', 'deps', 'bin', cmd+'.exe')
+  else:
+    # Search the PATH.
+    path = None
+    for dir in os.environ['PATH'].split(os.pathsep):
+      if os.access(os.path.join(dir, cmd), os.X_OK):
+        path = os.path.join(dir, cmd)
+        break
+
+  if path is None or not os.path.isfile(path):
+    print 'not found'
+    print >>sys.stderr, 'Could not find required program "%s".' % cmd
+    if os.name == 'nt':
+      print >>sys.stderr, '(Check that you have the latest version of the dependency pack installed.)'
+    sys.exit(1)
+
+  print path
+  return path
+
+
+# Find pkg-config so we can find the libraries we need.
+pkg_config = find_command('pkg-config')
+
+
+def pc_exists(pkg):
+  '''Check whether pkg-config thinks a library exists.'''
+  if os.spawnl(os.P_WAIT, pkg_config, 'pkg-config', '--exists', pkg) == 0:
+    return True
+  else:
+    return False
+
+
+# {py26hack} - Python 2.7 has subprocess.check_output for this purpose.
+def grab_stdout(*args, **kw):
+  '''Obtain standard output from a subprocess invocation, raising an exception
+  if the subprocess fails.'''
+
+  kw['stdout'] = subprocess.PIPE
+  proc = subprocess.Popen(*args, **kw)
+  stdout = proc.communicate()[0]
+  if proc.returncode != 0:
+    raise RuntimeError, 'subprocess %r returned %d' % (args[0], proc.returncode)
+  return stdout
+
+
+def pc_info(pkg):
+  '''Obtain build options for a library from pkg-config and
+  return a dict that can be expanded into the argument list for
+  L{distutils.core.Extension}.'''
+
+  print 'checking for library %s...' % pkg,
+  if not pc_exists(pkg):
+    print 'not found'
+    print >>sys.stderr, 'Could not find required library "%s".' % pkg
+    if os.name == 'nt':
+      print >>sys.stderr, '(Check that you have the latest version of the dependency pack installed.)'
+    else:
+      print >>sys.stderr, '(Check that you have the appropriate development package installed.)'
+    sys.exit(1)
+
+  cflags = shlex.split(grab_stdout([pkg_config, '--cflags', pkg]))
+  libs = shlex.split(grab_stdout([pkg_config, '--libs', pkg]))
+
+  # Pick out anything interesting in the cflags and libs, and
+  # silently drop the rest.
+  info = {
+    'include_dirs': [x[2:] for x in cflags if x[:2] == '-I'],
+    'libraries': [x[2:] for x in libs if x[:2] == '-l'],
+    'library_dirs': [x[2:] for x in libs if x[:2] == '-L'],
+  }
+
+  print 'ok'
+  return info
+
+
+if os.name == 'nt':
+  # Windows systems: we just know what the OpenGL library is.
+  gl_info = {'libraries': ['opengl32']}
+else:
+  # Other systems: we ask pkg-config.
+  gl_info = pc_info('gl')
+# Build a similar info record for the numpy headers.
+numpy_info = {'include_dirs': [np.get_include()]}
+
+
+def combine_info(*args):
+  '''Combine multiple result dicts from L{pc_info} into one.'''
+
+  info = {
+    'include_dirs': [],
+    'libraries': [],
+    'library_dirs': [],
+  }
+
+  for a in args:
+    info['include_dirs'].extend(a.get('include_dirs', []))
+    info['libraries'].extend(a.get('libraries', []))
+    info['library_dirs'].extend(a.get('library_dirs', []))
+
+  return info
+
+
 # Add the common arguments to setup().
 # This includes arguments to cause FoFiX's extension modules to be built.
 setup_args.update({
   'options': options,
   'ext_modules': [
-    Extension('cmgl', ['cmgl.pyx'], include_dirs=[np.get_include()], libraries=['opengl32' if os.name == 'nt' else 'GL']),
+    Extension('cmgl', ['cmgl.pyx'], **combine_info(numpy_info, gl_info)),
     Extension('pypitch._pypitch',
               language='c++',
               sources=['pypitch/_pypitch.pyx', 'pypitch/pitch.cpp',
