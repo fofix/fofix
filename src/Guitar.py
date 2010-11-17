@@ -69,8 +69,6 @@ class Guitar(Instrument):
     self.Animspeed      = 30#Lower value = Faster animations
     #For Animated Starnotes
     self.indexCount     = 0
-    #Alarian, For animated hitglow
-    self.HCountAni      = False
     
     #myfingershurt:
     self.hopoStyle        = self.engine.config.get("game", "hopo_system")
@@ -431,15 +429,15 @@ class Guitar(Instrument):
       return
 
 
+
     if self.twoDnote == True:
       #myfingershurt: this should be retrieved once at init, not repeatedly in-game whenever tails are rendered.
-      if self.notedisappear == True:#Notes keep on going when missed
+      if self.notedisappear ==0:#Notes keep on going when missed
         notecol = (1,1,1)#capo
-      else:
-        if flat:#Notes disappear when missed
-          notecol = (.1,.1,.1)
-        else:
-          notecol = (1,1,1)
+      elif self.notedisappear == 1:#Notes disappear when missed
+        notecol = (.1,.1,.1)
+      elif self.notedisappear == 2: #Notes Turn Red when missed
+        notecol = (1,0,0,1) 
       tailOnly = True
 
       if self.theme < 2:
@@ -836,27 +834,37 @@ class Guitar(Instrument):
       
       # Clip the played notes to the origin
       #myfingershurt: this should be loaded once at init, not every render...
-      if self.notedisappear == True:#Notes keep on going when missed
-        if event.played or event.hopod:
+      if self.notedisappear == 0:#Notes keep on going when missed
+        if event.played or event.hopod:#if the note isnt missed
           tailOnly = True
           length += z
           z = 0
           if length <= 0:
             continue
-        if z < 0 and not (event.played or event.hopod): 
+        if z < 0 and not (event.played or event.hopod):#if the note is missed 
           color = (.6, .6, .6, .5 * visibility * f)
           flat  = False 
-      else:#Notes disappear when missed
-        if z < 0:
-          if event.played or event.hopod:
+      elif self.notedisappear == 1:#Notes disappear when missed
+        if z < 0:#if note past frets
+          if event.played or event.hopod:#if note was hit
             tailOnly = True
             length += z
             z = 0
             if length <= 0:
               continue
-          else:
+          else:#note missed
             color = (.6, .6, .6, .5 * visibility * f)
-            flat  = False 
+            flat  = False
+      if self.notedisappear == 2:#turn red when missed
+        if event.played or event.hopod:  #if the note isnt missed
+          tailOnly = True
+          length += z
+          z = 0
+          if length <= 0:
+            continue
+        if z < 0 and not (event.played or event.hopod): #if the note is missed 
+          color = (1, 0, 0, 1)#turn note red
+          flat  = False 
           
       big = False
       self.bigMax = 0
@@ -1000,27 +1008,37 @@ class Guitar(Instrument):
       
       # Clip the played notes to the origin
       #myfingershurt: this should be loaded once at init, not every render...
-      if self.notedisappear == True:#Notes keep on going when missed
-        if event.played or event.hopod:
+      if self.notedisappear == 0:#Notes keep on going when missed
+        if event.played or event.hopod:#if the note isnt missed
           tailOnly = True
           length += z
           z = 0
           if length <= 0:
             continue
-        if z < 0 and not (event.played or event.hopod): 
+        if z < 0 and not (event.played or event.hopod):#if the note is missed 
           color = (.6, .6, .6, .5 * visibility * f)
           flat  = False 
-      else:#Notes disappear when missed
-        if z < 0:
-          if event.played or event.hopod:
+      elif self.notedisappear == 1:#Notes disappear when missed
+        if z < 0:#if note past frets
+          if event.played or event.hopod:#if note was hit
             tailOnly = True
             length += z
             z = 0
             if length <= 0:
               continue
-          else:
+          else:#note missed
             color = (.6, .6, .6, .5 * visibility * f)
-    	    flat  = False 
+            flat  = False
+      if self.notedisappear == 2:#turn red when missed
+        if event.played or event.hopod:  #if the note isnt missed
+          tailOnly = True
+          length += z
+          z = 0
+          if length <= 0:
+            continue
+        if z < 0 and not (event.played or event.hopod): #if the note is missed 
+          color = (1, 0, 0, 1)#turn note red
+          flat  = False
           
       big = False
       self.bigMax = 0
@@ -1600,37 +1618,6 @@ class Guitar(Instrument):
         else:
           noteCount += 1
     return sorted(notes, key=lambda x: x[0])
-
-  def getRequiredNotesForRender(self, song, pos):
-    if self.battleStatus[2] and self.difficulty != 0:
-      Log.debug(self.battleDiffUpValue)
-      song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue]
-      track0 = song.track[self.player]
-      notes0 = [(time, event) for time, event in track0.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
-    
-      song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue - 1]
-      track1   = song.track[self.player]
-      notes1 = [(time, event) for time, event in track1.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
-      
-      notes = []
-      for time,note in notes0:
-        if time < self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard or time > self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
-          notes.append((time,note))
-      for time,note in notes1:
-        if time > self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard and time < self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
-          notes.append((time,note))
-      notes0 = None
-      notes1 = None
-      track0 = None
-      track1 = None
-      notes = sorted(notes, key=lambda x: x[0])
-    else:
-      track   = song.track[self.player]
-      notes = [(time, event) for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
-    
-    if self.battleStatus[7]:
-      notes = self.getDoubleNotes(notes)
-    return notes
  
   #MFH - corrected and optimized:
   def getRequiredNotesForJurgenOnTime(self, song, pos):

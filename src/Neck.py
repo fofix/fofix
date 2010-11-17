@@ -380,12 +380,7 @@ class Neck:
     def project(beat):
       return 0.125 * beat / self.beatsPerUnit    # glorandwarf: was 0.12
       
-    if self.instrument.starPowerActive and self.theme == 0:#8bit
-      color = self.engine.theme.spNoteColor #self.spColor #(.3,.7,.9)
-    elif self.instrument.starPowerActive and self.theme == 1:
-      color = self.engine.theme.spNoteColor #self.spColor #(.3,.7,.9)
-    else:
-      color = (1,1,1)
+    color = self.engine.theme.spNoteColor #self.spColor #(.3,.7,.9)
 
     v            = visibility
     l            = self.boardLength
