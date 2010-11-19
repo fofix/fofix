@@ -102,21 +102,21 @@ class Stage(object):
       if songVideo is not None and \
              os.path.isfile(os.path.join(songAbsPath, songVideo)):
         self.vidSource = os.path.join(songAbsPath, songVideo)
-      elif os.path.exists(os.path.join(songAbsPath, "default.avi")):
+      elif os.path.exists(os.path.join(songAbsPath, "default.ogv")):
         Log.warn("Video not found: %s" % \
                  os.path.join(songAbsPath, songVideo))
-        self.vidSource = os.path.join(songAbsPath, "default.avi")
+        self.vidSource = os.path.join(songAbsPath, "default.ogv")
     if self.vidSource is None:
       if self.songStage == 1:
         Log.warn("Video not found: %s" % \
-                 os.path.join(songAbsPath, "default.avi"))
+                 os.path.join(songAbsPath, "default.ogv"))
       songVideoStartTime = None
       songVideoEndTime = None
-      self.vidSource = os.path.join(self.pathfull, "default.avi")
+      self.vidSource = os.path.join(self.pathfull, "default.ogv")
 
     if not os.path.exists(self.vidSource):
       Log.warn("Video not found: %s" % \
-               os.path.join(self.pathfull, "default.avi"))
+               os.path.join(self.pathfull, "default.ogv"))
       Log.warn("No video found, falling back to default static image mode for now")
       self.mode = 1 # Fallback
       self.vidSource = None
