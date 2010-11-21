@@ -63,6 +63,8 @@ class Neck:
     self.boardLength    = self.engine.theme.neckLength
     self.shaderSolocolor    = self.engine.theme.shaderSolocolor
 	
+    self.boardFadeAmmount = self.engine.theme.boardFade
+	
     #death_au: fixed neck size
     
     if self.isDrum and self.engine.config.get("game", "large_drum_neck"):
@@ -81,8 +83,8 @@ class Neck:
                              [color[0],color[1],color[2], 0],
                              [color[0],color[1],color[2], self.vis],
                              [color[0],color[1],color[2], self.vis],
-                             [color[0],color[1],color[2], self.vis],
-                             [color[0],color[1],color[2], self.vis],
+                             [color[0],color[1],color[2], self.vis/self.boardFadeAmmount],
+                             [color[0],color[1],color[2], self.vis/self.boardFadeAmmount],
                              [color[0],color[1],color[2], 0],
                              [color[0],color[1],color[2], 0]], dtype=np.float32)
 
@@ -379,8 +381,10 @@ class Neck:
     
     def project(beat):
       return 0.125 * beat / self.beatsPerUnit    # glorandwarf: was 0.12
-      
-    color = self.engine.theme.spNoteColor #self.spColor #(.3,.7,.9)
+    if self.instrument.starPowerActive and (self.theme == 0 or self.theme == 1):#8bit
+      color = self.engine.theme.spNoteColor #self.spColor #(.3,.7,.9)
+    else:
+      color = (1,1,1)
 
     v            = visibility
     l            = self.boardLength
@@ -401,8 +405,8 @@ class Neck:
                              [color[0],color[1],color[2], 0],
                              [color[0],color[1],color[2], v],
                              [color[0],color[1],color[2], v],
-                             [color[0],color[1],color[2], v],
-                             [color[0],color[1],color[2], v],
+                             [color[0],color[1],color[2], v/self.boardFadeAmmount],
+                             [color[0],color[1],color[2], v/self.boardFadeAmmount],
                              [color[0],color[1],color[2], 0],
                              [color[0],color[1],color[2], 0]], dtype=np.float32)
 
@@ -579,8 +583,8 @@ class Neck:
                          [color[0],color[1],color[2], v],
                          [color[0],color[1],color[2], v],
                          [color[0],color[1],color[2], v],
-                         [color[0],color[1],color[2], v],
-                         [color[0],color[1],color[2], v],
+                         [color[0],color[1],color[2], v/self.boardFadeAmmount],
+                         [color[0],color[1],color[2], v/self.boardFadeAmmount],
                          [color[0],color[1],color[2], 0],
                          [color[0],color[1],color[2], 0]], dtype=np.float32)
       cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=track_vtx, colors=track_col, texcoords=track_tex)
