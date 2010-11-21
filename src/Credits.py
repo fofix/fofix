@@ -179,7 +179,7 @@ class Credits(Layer, KeyListener):
       #  - credits_video_start_time
       #  - credits_video_end_time
       vidSource = os.path.join(Version.dataPath(), 'themes', self.themename, \
-                               'menu', 'credits.avi')
+                               'menu', 'credits.ogv')
       if os.path.exists(vidSource):
         winWidth, winHeight = self.engine.view.geometry[2:4]
         songVideoStartTime = 0
