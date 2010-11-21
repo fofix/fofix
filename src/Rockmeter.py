@@ -453,9 +453,9 @@ class Replace(Effect):
     #this allows you to scale images in relation to pixels instead
     #of percentage of the size of the image.
     if "xscale" in self.layer.inPixels:
-      scale[0] /= self.layer.texture.pixelSize[0]
+      scale[0] /= self.layer.drawing.pixelSize[0]
     if "yscale" in self.layer.inPixels:
-      scale[1] /= self.layer.texture.pixelSize[1]
+      scale[1] /= self.layer.drawing.pixelSize[1]
 
     scale[1] = -scale[1]
     scale[0] *= w/640.0
