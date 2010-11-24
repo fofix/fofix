@@ -38,7 +38,6 @@ from PIL import Image
 class SvgContext(object):
   def __init__(self, geometry):
     self.geometry = geometry
-    self.transform = SvgTransform()
     self.setGeometry(geometry)
     self.setProjection(geometry)
     glMatrixMode(GL_MODELVIEW)
@@ -59,35 +58,6 @@ class SvgContext(object):
     glEnable(GL_COLOR_MATERIAL)
     glClearColor(r, g, b, a)
     glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-
-
-class SvgTransform(object):
-  def __init__(self, baseTransform = None):
-    self.reset()
-    if baseTransform is not None:
-      self.ops = baseTransform.ops[:]
-
-  def transform(self, transform):
-    self.ops.extend(transform.ops)
-
-  def reset(self):
-    self.ops = []
-
-  def translate(self, dx, dy):
-    # The old code did this with a matrix addition, not a multiplication.
-    # We get the same effect by doing the translations before anything else.
-    self.ops.insert(0, lambda: glTranslatef(dx, dy, 0))
-
-  def rotate(self, angle):
-    self.ops.append(lambda: glRotatef(math.degrees(angle), 0.0, 0.0, 1.0))
-
-  def scale(self, sx, sy):
-    self.ops.append(lambda: glScalef(sx, sy, 1.0))
-
-  def applyGL(self):
-    for op in self.ops:
-      op()
-
 
 class ImgDrawing(object):
   def __init__(self, context, ImgData):
@@ -115,13 +85,14 @@ class ImgDrawing(object):
       Log.error(e)
       raise RuntimeError(e)
 
-    self.pixelSize = self.texture.pixelSize
-    self.position = [0.0,0.0]
-    self.scale    = [1.0,1.0]
-    self.angle    = 0
-    self.color    = (1.0,1.0,1.0)
-    self.rect     = (0,1,0,1)
-    self.shift    = -.5
+    self.pixelSize = self.texture.pixelSize #the size of the image in pixels (from texture)
+    self.position = [0.0,0.0]               #position of the image in the viewport
+    self.scale    = [1.0,1.0]               #percentage scaling
+    self.angle    = 0                       #angle of rotation (degrees)
+    self.color    = (1.0,1.0,1.0,1.0)       #glColor rgba
+    self.rect     = (0,1,0,1)               #texture mapping coordinates
+    self.shift    = -.5                     #horizontal alignment
+    self.vshift   = -.5                     #vertical alignment
 
     self.createArrays()
 
@@ -196,6 +167,14 @@ class ImgDrawing(object):
     elif alignment == 2:#right
       self.shift = -1.0
 
+  def setVAlignment(self, alignment):
+    if alignment == 0:  #bottom
+      self.vshift = 0
+    elif alignment == 1:#center
+      self.vshift = -.5
+    elif alignment == 2:#top
+      self.vshift = -1.0
+
   def setColor(self, color):
     if len(color) == 3:
       color = (color[0], color[1], color[2], 1.0)
@@ -214,9 +193,10 @@ class ImgDrawing(object):
           glTranslate(self.position[0], self.position[1], 0.0)
           glScalef(self.scale[0], self.scale[1], 1.0)
           glRotatef(self.angle, 0, 0, 1)
-
+          
           glScalef(self.pixelSize[0], self.pixelSize[1], 1)
-          glTranslatef(self.shift, -.5, 0)
+          glTranslatef(self.shift, self.vshift, 0)
+
           glColor4f(*self.color)
 
           glEnable(GL_TEXTURE_2D)
