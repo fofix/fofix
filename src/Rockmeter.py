@@ -433,7 +433,6 @@ class Replace(Effect):
           self.rects.append(eval(rect))
       self.rects.append(layer.rect)
       self.type = "image"
-      print self.rects
     elif isinstance(layer, FontLayer):
       self.font = self.engine.data.fontDict[self.get("font")]
       self.text = self.get("text").split("|")
