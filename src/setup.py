@@ -288,6 +288,9 @@ def pc_info(pkg):
   return info
 
 
+ogg_info = pc_info('ogg')
+theoradec_info = pc_info('theoradec')
+glib_info = pc_info('glib-2.0')
 if os.name == 'nt':
   # Windows systems: we just know what the OpenGL library is.
   gl_info = {'libraries': ['opengl32']}
