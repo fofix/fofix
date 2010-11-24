@@ -24,13 +24,10 @@
 #include <theora/theoradec.h>
 
 #include <errno.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
+#include <stdio.h>
 
 struct _VideoPlayer {
-  int fd;
+  FILE* file;
   ogg_sync_state osync;
   GHashTable* stream_table;
   ogg_page current_page;
@@ -57,7 +54,7 @@ static gboolean demux_next_page(VideoPlayer* player, GError** err)
   /* Demux the next page into player->current_page. */
   while (ogg_sync_pageout(&player->osync, &player->current_page) != 1) {
     char* buf = ogg_sync_buffer(&player->osync, 65536);
-    int bytes = read(player->fd, buf, 65536);
+    int bytes = fread(buf, 1, 65536, player->file);
     if (bytes == 0) {
       player->eof = TRUE;
       return TRUE;
@@ -165,16 +162,13 @@ VideoPlayer* video_player_new(const char* filename, GError** err)
 {
   VideoPlayer* player = g_new0(VideoPlayer, 1);
 
-  player->fd = open(filename, O_RDONLY);
-  if (player->fd < 0) {
+  player->file = fopen(filename, "rb");
+  if (player->file == NULL) {
     g_set_error(err, G_FILE_ERROR, g_file_error_from_errno(errno),
       "Failed to open video: %s", g_strerror(errno));
     g_free(player);
     return NULL;
   }
-#ifdef _WIN32
-  setmode(player->fd, O_BINARY);
-#endif
 
   player->stream_table = g_hash_table_new_full(g_int_hash, g_int_equal, g_free, destroy_stream);
   ogg_sync_init(&player->osync);
@@ -197,7 +191,7 @@ void video_player_destroy(VideoPlayer* player)
   th_info_clear(&player->tinfo);
   g_hash_table_destroy(player->stream_table);
   ogg_sync_clear(&player->osync);
-  close(player->fd);
+  fclose(player->file);
   g_free(player);
 }
 
