@@ -44,6 +44,7 @@ struct _VideoPlayer {
   GTimeVal playback_start_time;
   GLuint video_texture;
   ogg_int64_t decode_granpos;
+  th_ycbcr_buffer frame_buffer;
 };
 
 static void destroy_stream(gpointer data)
@@ -86,6 +87,20 @@ static gboolean demux_next_page(VideoPlayer* player, GError** err)
     ogg_stream_pagein(ostream, &player->current_page);
   }
   return TRUE;
+}
+
+#include <GL/glu.h>
+#include <string.h>
+static void update_texture(VideoPlayer* player)
+{
+  /* TODO: use swscale to get power-of-two dimensions and do yuv->rgb */
+  /* Placeholder: black-and-white video by just using Y channel, using (ugh) gluBuild2DMipmaps */
+  guchar* data = g_malloc(player->frame_buffer[0].width * player->frame_buffer[0].height);
+  int i;
+  for (i = 0; i < player->frame_buffer[0].height; i++)
+    memcpy(data + i*player->frame_buffer[0].width, player->frame_buffer[0].data + i*player->frame_buffer[0].stride, player->frame_buffer[0].width);
+  gluBuild2DMipmaps(GL_TEXTURE_2D, GL_LUMINANCE, player->frame_buffer[0].width, player->frame_buffer[0].height, GL_LUMINANCE, GL_UNSIGNED_BYTE, data);
+  g_free(data);
 }
 
 static gboolean demux_headers(VideoPlayer* player, GError** err)
@@ -149,10 +164,20 @@ got_all_headers:
           "Bad headers in Theora stream.");
         return FALSE;
       } else if (header_status == 0) {
-        /* We have everything we need to start decoding. */
+        /* We have everything we need to start decoding, and we have the first video packet. */
+        int decode_status;
         player->vdecoder = th_decode_alloc(&player->tinfo, player->tsetup);
         player->playing = FALSE;
         player->playback_position = 0;
+        decode_status = th_decode_packetin(player->vdecoder, &pkt, &player->decode_granpos);
+        if (decode_status != 0) {
+          g_set_error(err, VIDEO_PLAYER_ERROR, VIDEO_PLAYER_BAD_DATA,
+            "An error occurred decoding a Theora packet.");
+          return FALSE;
+        }
+        th_decode_ycbcr_out(player->vdecoder, player->frame_buffer);
+        glBindTexture(GL_TEXTURE_2D, player->video_texture);
+        update_texture(player);
         return TRUE;
       }
       /* Otherwise, there are still more header packets needed. */
@@ -220,7 +245,6 @@ void video_player_pause(VideoPlayer* player)
 gboolean video_player_bind_frame(VideoPlayer* player, GError** err)
 {
   gboolean must_update_texture = FALSE;
-  th_ycbcr_buffer frame_buffer;
 
   glBindTexture(GL_TEXTURE_2D, player->video_texture);
 
@@ -254,22 +278,13 @@ gboolean video_player_bind_frame(VideoPlayer* player, GError** err)
     }
 
     if (decode_status == 0) {
-      th_decode_ycbcr_out(player->vdecoder, frame_buffer);
+      th_decode_ycbcr_out(player->vdecoder, player->frame_buffer);
       must_update_texture = TRUE;
     }
   }
 
-  /* TODO: use swscale to get power-of-two dimensions and do yuv->rgb */
-  /* Placeholder: black-and-white video by just using Y channel, using (ugh) gluBuild2DMipmaps */
-  if (must_update_texture) {
-#include <GL/glu.h>
-    guchar* data = g_malloc(frame_buffer[0].width * frame_buffer[0].height);
-    int i;
-    for (i = 0; i < frame_buffer[0].height; i++)
-      memcpy(data + i*frame_buffer[0].width, frame_buffer[0].data + i*frame_buffer[0].stride, frame_buffer[0].width);
-    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_LUMINANCE, frame_buffer[0].width, frame_buffer[0].height, GL_LUMINANCE, GL_UNSIGNED_BYTE, data);
-    g_free(data);
-  }
+  if (must_update_texture)
+    update_texture(player);
 
   return TRUE;
 }
