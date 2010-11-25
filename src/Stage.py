@@ -170,14 +170,14 @@ class Effect(object):
     return math.cos(math.pi * (1.0 - self.linstep(min, max, x)))
 
   def getNoteColor(self, note):
-    if note >= len(self.stage.engine.theme.fretColors) - 1:
-      return self.stage.engine.theme.fretColors[-1]
+    if note >= len(self.stage.engine.theme.noteColors) - 1:
+      return self.stage.engine.theme.noteColors[-1]
     elif note <= 0:
-      return self.stage.engine.theme.fretColors[0]
+      return self.stage.engine.theme.noteColors[0]
     f2  = note % 1.0
     f1  = 1.0 - f2
-    c1 = self.stage.engine.theme.fretColors[int(note)]
-    c2 = self.stage.engine.theme.fretColors[int(note) + 1]
+    c1 = self.stage.engine.theme.noteColors[int(note)]
+    c2 = self.stage.engine.theme.noteColors[int(note) + 1]
     return (c1[0] * f1 + c2[0] * f2, \
             c1[1] * f1 + c2[1] * f2, \
             c1[2] * f1 + c2[2] * f2)
@@ -197,7 +197,7 @@ class LightEffect(Effect):
     t = self.trigger()
     t = self.ambient + self.contrast * t
     c = self.getNoteColor(self.stage.averageNotes[self.lightNumber])
-    self.layer.setColor((c[0] * t, c[1] * t, c[2] * t, self.intensity))
+    self.layer.color = (c[0] * t, c[1] * t, c[2] * t, self.intensity)
 
 class RotateEffect(Effect):
   def __init__(self, layer, options):
