@@ -248,4 +248,32 @@ if test ! -f "$PREFIX"/build-stamps/libtheora; then
   $RM_RF $LIBTHEORA
 fi
 
+# ffmpeg
+# We only need libswscale.
+if test ! -f "$PREFIX"/build-stamps/ffmpeg; then
+  if test ! -d ffmpeg; then
+    svn co svn://svn.ffmpeg.org/ffmpeg/trunk ffmpeg
+  else
+    svn up ffmpeg
+  fi
+  cd ffmpeg
+  ./configure --prefix="$PREFIX" --cc="$CROSS_GCC" --nm="$CROSS_NM" --target-os=mingw32 --arch=i386 --disable-static --enable-shared --enable-gpl --enable-runtime-cpudetect --enable-memalign-hack --disable-everything --disable-ffmpeg --disable-ffplay --disable-ffserver --disable-ffprobe --disable-avdevice --disable-avcodec --disable-avcore --disable-avformat --disable-avfilter
+  sed -i -e 's/-Werror=[^ ]*//g' config.mak
+  make
+  make install
+  for lib in avutil swscale; do
+    # FFmpeg symlinks its DLLs to a few different names, differing in the level
+    # of detail of their version number, rather like what is done with ELF shared
+    # libraries.  Unfortunately, the real DLL for each one is *not* the one that
+    # the implibs reference (that is, the one that will be required at runtime),
+    # so we must rename it after we nuke the symlinks.
+    find "$PREFIX"/bin -type l -name "${lib}*.dll" -print0 | xargs -0 rm -f
+    libfile="`find "$PREFIX"/bin -name "${lib}*.dll" | sed -e 1q`"
+    mv -v "$libfile" "`echo "$libfile" | sed -e "s/\($lib-[0-9]*\)[.0-9]*\.dll/\1.dll/"`"
+  done
+  cd ..
+  touch "$PREFIX"/build-stamps/ffmpeg
+  $RM_RF ffmpeg
+fi
+
 echo "All dependencies done."
