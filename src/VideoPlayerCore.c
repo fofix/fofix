@@ -21,6 +21,7 @@
 #include "VideoPlayer.h"
 
 #include <GL/gl.h>
+#include <libswscale/swscale.h>
 #include <ogg/ogg.h>
 #include <theora/theoradec.h>
 
@@ -45,6 +46,10 @@ struct _VideoPlayer {
   GLuint video_texture;
   ogg_int64_t decode_granpos;
   th_ycbcr_buffer frame_buffer;
+  struct SwsContext* sws_context;
+  int tex_width;
+  int tex_height;
+  guchar* tex_buffer;
 };
 
 static void destroy_stream(gpointer data)
@@ -89,18 +94,27 @@ static gboolean demux_next_page(VideoPlayer* player, GError** err)
   return TRUE;
 }
 
-#include <GL/glu.h>
-#include <string.h>
+static guint32 next_power_of_two(guint32 n)
+{
+  n--;
+  n |= n >> 1;
+  n |= n >> 2;
+  n |= n >> 4;
+  n |= n >> 8;
+  n |= n >> 16;
+  n++;
+  return n;
+}
+
 static void update_texture(VideoPlayer* player)
 {
-  /* TODO: use swscale to get power-of-two dimensions and do yuv->rgb */
-  /* Placeholder: black-and-white video by just using Y channel, using (ugh) gluBuild2DMipmaps */
-  guchar* data = g_malloc(player->frame_buffer[0].width * player->frame_buffer[0].height);
-  int i;
-  for (i = 0; i < player->frame_buffer[0].height; i++)
-    memcpy(data + i*player->frame_buffer[0].width, player->frame_buffer[0].data + i*player->frame_buffer[0].stride, player->frame_buffer[0].width);
-  gluBuild2DMipmaps(GL_TEXTURE_2D, GL_LUMINANCE, player->frame_buffer[0].width, player->frame_buffer[0].height, GL_LUMINANCE, GL_UNSIGNED_BYTE, data);
-  g_free(data);
+  /* TODO: handle pic_[xy] correctly so the whole Theora testsuite works */
+  const uint8_t* const src[] = {player->frame_buffer[0].data, player->frame_buffer[1].data, player->frame_buffer[2].data};
+  int src_stride[] = {player->frame_buffer[0].stride, player->frame_buffer[1].stride, player->frame_buffer[2].stride};
+  uint8_t* dest[] = {player->tex_buffer};
+  int dest_stride[] = {player->tex_width * 4};
+  sws_scale(player->sws_context, src, src_stride, 0, player->tinfo.pic_height, dest, dest_stride);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, player->tex_width, player->tex_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, player->tex_buffer);
 }
 
 static gboolean demux_headers(VideoPlayer* player, GError** err)
@@ -166,6 +180,7 @@ got_all_headers:
       } else if (header_status == 0) {
         /* We have everything we need to start decoding, and we have the first video packet. */
         int decode_status;
+        int pix_format;
         player->vdecoder = th_decode_alloc(&player->tinfo, player->tsetup);
         player->playing = FALSE;
         player->playback_position = 0;
@@ -176,7 +191,32 @@ got_all_headers:
           return FALSE;
         }
         th_decode_ycbcr_out(player->vdecoder, player->frame_buffer);
+
+        player->tex_width = next_power_of_two(player->tinfo.pic_width);
+        player->tex_height = next_power_of_two(player->tinfo.pic_height);
+        player->tex_buffer = g_malloc(player->tex_width * player->tex_height * 4);
+        switch (player->tinfo.pixel_fmt) {
+          case TH_PF_420:
+            pix_format = PIX_FMT_YUV420P;
+            break;
+          case TH_PF_422:
+            pix_format = PIX_FMT_YUV422P;
+            break;
+          case TH_PF_444:
+            pix_format = PIX_FMT_YUV444P;
+            break;
+          default:
+            g_set_error(err, VIDEO_PLAYER_ERROR, VIDEO_PLAYER_BAD_HEADERS,
+              "Bad pixel format in Theora stream.");
+            return FALSE;
+        }
+        player->sws_context = sws_getContext(player->tinfo.pic_width, player->tinfo.pic_height, pix_format, player->tex_width, player->tex_height, PIX_FMT_RGBA, SWS_FAST_BILINEAR, NULL, NULL, NULL);
+
         glBindTexture(GL_TEXTURE_2D, player->video_texture);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         update_texture(player);
         return TRUE;
       }
@@ -221,6 +261,10 @@ void video_player_destroy(VideoPlayer* player)
     th_decode_free(player->vdecoder);
   if (player->tsetup != NULL)
     th_setup_free(player->tsetup);
+  if (player->sws_context != NULL)
+    sws_freeContext(player->sws_context);
+  if (player->tex_buffer != NULL)
+    g_free(player->tex_buffer);
   glDeleteTextures(1, &player->video_texture);
   th_comment_clear(&player->tcomment);
   th_info_clear(&player->tinfo);
