@@ -44,6 +44,8 @@ from OpenGL.GL import glColor3f
 LEFT   = 0
 CENTER = 1
 RIGHT  = 2
+TOP    = 0
+BOTTOM = 2
 
 #by making these global for the class, all layers that rely on 
 #these numbers will no longer have to have them be independent per
@@ -134,6 +136,7 @@ class ImageLayer(Layer):
     self.condition = bool(eval(self.get("condition", str, "True")))
 
     self.alignment = eval(self.get("alignment", str, "center").upper())
+    self.valignment = eval(self.get("valignment", str, "center").upper())
 
     rect = self.rect
     self.scale[0] *=  (rect[1] - rect[0])
@@ -166,19 +169,21 @@ class ImageLayer(Layer):
     for effect in self.effects:
       effect.update()
 
-    coord     = self.position
-    scale     = self.scale
-    rot       = self.angle
-    color     = self.engine.theme.hexToColor(self.color)
-    alignment = self.alignment
-    drawing   = self.drawing
-    rect      = self.rect
+    coord      = self.position
+    scale      = self.scale
+    rot        = self.angle
+    color      = self.engine.theme.hexToColor(self.color)
+    alignment  = self.alignment
+    valignment = self.valignment
+    drawing    = self.drawing
+    rect       = self.rect
     
     #frameX  = self.frameX
     #frameY  = self.frameY
 
     if self.condition:
-      self.engine.drawImage(drawing, scale, coord, rot, color, rect, alignment = alignment)
+      self.engine.drawImage(drawing, scale, coord, rot, color, rect, 
+                            alignment = alignment, valignment = valignment)
 
 #defines layers that are just font instead of images
 class FontLayer(Layer): 
