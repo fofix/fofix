@@ -63,7 +63,7 @@ class Layer(object):
     self.color       = (1.0, 1.0, 1.0, 1.0)
     self.srcBlending = GL_SRC_ALPHA
     self.dstBlending = GL_ONE_MINUS_SRC_ALPHA
-    self.transforms  = [(1,1), (1,1), 1, (1,1,1,1)]
+    self.transforms  = [[1,1], [1,1], 1, [1,1,1,1]] #scale, coord, angle, color
     self.effects     = []
   
   def render(self, visibility):
@@ -78,10 +78,10 @@ class Layer(object):
     color = self.color
     
     #coordinates are positioned with (0,0) being in the middle of the screen
-    coord = (w/2 + self.position[0] * w/2, h/2 - self.position[1] * h/2)
+    coord = [w/2 + self.position[0] * w/2, h/2 - self.position[1] * h/2]
     if v > .01:
-      color = (self.color[0], self.color[1], self.color[2], visibility)
-    scale = (self.scale[0], -self.scale[1])
+      color = [self.color[0], self.color[1], self.color[2], visibility]
+    scale = [self.scale[0], -self.scale[1]]
     rot = self.angle
         
     self.transforms = [scale, coord, rot, color]
@@ -227,7 +227,8 @@ class WiggleEffect(Effect):
     w, h = self.stage.engine.view.geometry[2:4]
     p = t * 2 * math.pi * self.freq
     s, c = t * math.sin(p), t * math.cos(p)
-    self.layer.transforms[1] = (self.xmag * w * s, self.ymag * h * c)
+    self.layer.transforms[1][0] += self.xmag * w * s
+    self.layer.transforms[1][1] += self.ymag * h * c 
 
 class ScaleEffect(Effect):
   def __init__(self, layer, options):
