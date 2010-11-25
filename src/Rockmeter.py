@@ -430,7 +430,8 @@ class Replace(Effect):
         texture   = self.get("texture").strip().split("|")
         for tex in texture:
           path   = os.path.join("themes", layer.stage.themename, "rockmeter", tex)
-          self.drawings.append(layer.engine.loadImgDrawing(self, "drawing", drawing))
+          drawing = layer.engine.loadImgDrawing(self, None, path)
+          self.drawings.append(drawing)
       self.drawings.append(layer.drawing)
       if not self.get("rect") == None:
         rects = self.get("rect").split("|")
@@ -482,7 +483,7 @@ class Replace(Effect):
             self.layer.drawing = self.drawings[i]
           if len(self.rects) > 1:
             self.layer.rect = self.rects[i]
-            self.fixScale()
+          self.fixScale()
         break
         
 class Rockmeter:
