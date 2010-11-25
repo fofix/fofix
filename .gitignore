@@ -16,12 +16,14 @@ src/pypitch/_pypitch.cpp
 src/cmgl.c
 gstreamer/*
 data/library.zip
-data/users/players/FoFiX-players.cache
-data/users/players/*.png
+data/users/players/*
+!data/users/players/default.png
+!data/users/players/default.ini
+data/users/controllers/*
+!data/users/controllers/default[dgm].ini
 data/songs/
 data/themes/*
 !data/themes/MegaLight
 !data/themes/MegaLight GH3
 !data/themes/MegaLight V4
 !data/themes/Uberlight
-!data/users/players/default.png

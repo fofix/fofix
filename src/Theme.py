@@ -157,6 +157,9 @@ class Theme(Task):
       self.povTarget  = (get("pov_target_x", float), get("pov_target_y", float), get("pov_target_z", float))
       self.povOrigin  = (get("pov_origin_x", float), get("pov_origin_y", float), get("pov_origin_z", float))
       
+      #Fade settings for fretboard
+      self.boardFade = (get("fretboard_fade_amount", float, 1))
+	  
       #Loading phrases
       self.loadingPhrase = get("loading_phrase", str, "Let's get this show on the Road_Impress the Crowd_" + 
                                                       "Don't forget to strum!_Rock the house!_Jurgen is watching").split("_")

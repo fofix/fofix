@@ -44,6 +44,8 @@ from OpenGL.GL import glColor3f
 LEFT   = 0
 CENTER = 1
 RIGHT  = 2
+TOP    = 0
+BOTTOM = 2
 
 #by making these global for the class, all layers that rely on 
 #these numbers will no longer have to have them be independent per
@@ -134,6 +136,7 @@ class ImageLayer(Layer):
     self.condition = bool(eval(self.get("condition", str, "True")))
 
     self.alignment = eval(self.get("alignment", str, "center").upper())
+    self.valignment = eval(self.get("valignment", str, "center").upper())
 
     rect = self.rect
     self.scale[0] *=  (rect[1] - rect[0])
@@ -166,19 +169,21 @@ class ImageLayer(Layer):
     for effect in self.effects:
       effect.update()
 
-    coord     = self.position
-    scale     = self.scale
-    rot       = self.angle
-    color     = self.engine.theme.hexToColor(self.color)
-    alignment = self.alignment
-    drawing   = self.drawing
-    rect      = self.rect
+    coord      = self.position
+    scale      = self.scale
+    rot        = self.angle
+    color      = self.engine.theme.hexToColor(self.color)
+    alignment  = self.alignment
+    valignment = self.valignment
+    drawing    = self.drawing
+    rect       = self.rect
     
     #frameX  = self.frameX
     #frameY  = self.frameY
 
     if self.condition:
-      self.engine.drawImage(drawing, scale, coord, rot, color, rect, alignment = alignment)
+      self.engine.drawImage(drawing, scale, coord, rot, color, rect, 
+                            alignment = alignment, valignment = valignment)
 
 #defines layers that are just font instead of images
 class FontLayer(Layer): 
@@ -425,7 +430,8 @@ class Replace(Effect):
         texture   = self.get("texture").strip().split("|")
         for tex in texture:
           path   = os.path.join("themes", layer.stage.themename, "rockmeter", tex)
-          self.drawings.append(layer.engine.loadImgDrawing(self, "drawing", drawing))
+          drawing = layer.engine.loadImgDrawing(self, None, path)
+          self.drawings.append(drawing)
       self.drawings.append(layer.drawing)
       if not self.get("rect") == None:
         rects = self.get("rect").split("|")
@@ -433,7 +439,6 @@ class Replace(Effect):
           self.rects.append(eval(rect))
       self.rects.append(layer.rect)
       self.type = "image"
-      print self.rects
     elif isinstance(layer, FontLayer):
       self.font = self.engine.data.fontDict[self.get("font")]
       self.text = self.get("text").split("|")
@@ -453,9 +458,9 @@ class Replace(Effect):
     #this allows you to scale images in relation to pixels instead
     #of percentage of the size of the image.
     if "xscale" in self.layer.inPixels:
-      scale[0] /= self.layer.texture.pixelSize[0]
+      scale[0] /= self.layer.drawing.pixelSize[0]
     if "yscale" in self.layer.inPixels:
-      scale[1] /= self.layer.texture.pixelSize[1]
+      scale[1] /= self.layer.drawing.pixelSize[1]
 
     scale[1] = -scale[1]
     scale[0] *= w/640.0
@@ -478,7 +483,7 @@ class Replace(Effect):
             self.layer.drawing = self.drawings[i]
           if len(self.rects) > 1:
             self.layer.rect = self.rects[i]
-            self.fixScale()
+          self.fixScale()
         break
         
 class Rockmeter:

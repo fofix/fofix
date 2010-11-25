@@ -833,7 +833,7 @@ class GameEngine(object):
 
   def drawImage(self, image, scale = (1.0, -1.0), coord = (0, 0), rot = 0, \
                 color = (1,1,1,1), rect = (0,1,0,1), stretched = 0, fit = 0, \
-                alignment = 1):
+                alignment = 1, valignment = 1):
     """
     Draws the image/surface to screen
 
@@ -856,6 +856,8 @@ class GameEngine(object):
                          on the top side (1), bottom side (2), or center point (any other value) of the image
     @param alignment:    Adjusts the texture so the coordinate for x-axis placement can either be
                          on the left side (0), center point (1), or right(2) side of the image 
+    @param valignment:   Adjusts the texture so the coordinate for y-axis placement can either be
+                         on the bottom side (0), center point (1), or top(2) side of the image
     """
     
     width, height = scale
@@ -883,6 +885,7 @@ class GameEngine(object):
     image.setScale(width, height)
     image.setPosition(x, y)
     image.setAlignment(alignment)
+    image.setVAlignment(valignment)
     image.setAngle(rot)
     image.setColor(color)
     image.draw()

@@ -63,6 +63,8 @@ class Neck:
     self.boardLength    = self.engine.theme.neckLength
     self.shaderSolocolor    = self.engine.theme.shaderSolocolor
 	
+    self.boardFadeAmount = self.engine.theme.boardFade
+	
     #death_au: fixed neck size
     
     if self.isDrum and self.engine.config.get("game", "large_drum_neck"):
@@ -81,8 +83,8 @@ class Neck:
                              [color[0],color[1],color[2], 0],
                              [color[0],color[1],color[2], self.vis],
                              [color[0],color[1],color[2], self.vis],
-                             [color[0],color[1],color[2], self.vis],
-                             [color[0],color[1],color[2], self.vis],
+                             [color[0],color[1],color[2], self.vis/self.boardFadeAmount],
+                             [color[0],color[1],color[2], self.vis/self.boardFadeAmount],
                              [color[0],color[1],color[2], 0],
                              [color[0],color[1],color[2], 0]], dtype=np.float32)
 
@@ -403,8 +405,8 @@ class Neck:
                              [color[0],color[1],color[2], 0],
                              [color[0],color[1],color[2], v],
                              [color[0],color[1],color[2], v],
-                             [color[0],color[1],color[2], v],
-                             [color[0],color[1],color[2], v],
+                             [color[0],color[1],color[2], v/self.boardFadeAmount],
+                             [color[0],color[1],color[2], v/self.boardFadeAmount],
                              [color[0],color[1],color[2], 0],
                              [color[0],color[1],color[2], 0]], dtype=np.float32)
 
@@ -581,8 +583,8 @@ class Neck:
                          [color[0],color[1],color[2], v],
                          [color[0],color[1],color[2], v],
                          [color[0],color[1],color[2], v],
-                         [color[0],color[1],color[2], v],
-                         [color[0],color[1],color[2], v],
+                         [color[0],color[1],color[2], v/self.boardFadeAmount],
+                         [color[0],color[1],color[2], v/self.boardFadeAmount],
                          [color[0],color[1],color[2], 0],
                          [color[0],color[1],color[2], 0]], dtype=np.float32)
       cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=track_vtx, colors=track_col, texcoords=track_tex)
