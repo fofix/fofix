@@ -63,6 +63,7 @@ class Layer(object):
     self.color       = (1.0, 1.0, 1.0, 1.0)
     self.srcBlending = GL_SRC_ALPHA
     self.dstBlending = GL_ONE_MINUS_SRC_ALPHA
+    self.transforms  = [(1,1), (1,1), 1, (1,1,1,1)]
     self.effects     = []
   
   def render(self, visibility):
@@ -71,25 +72,27 @@ class Layer(object):
 
     @param visibility:  Floating point visibility factor (1 = opaque, 0 = invisibile)
     """
-    w, h, = self.stage.engine.view.geometry[2:4]
+    w, h = self.stage.engine.view.geometry[2:4]
     v = 1.0 - visibility ** 2
     
     color = self.color
-    coord = [self.position[0] * w / 2, -self.position[1] * h / 2]
+    
+    #coordinates are positioned with (0,0) being in the middle of the screen
+    coord = (w/2 + self.position[0] * w/2, h/2 - self.position[1] * h/2)
     if v > .01:
       color = (self.color[0], self.color[1], self.color[2], visibility)
-      if self.position[0] < -.25:
-        coord[0] *= -v * w
-      elif self.position[0] > .25:
-        coord[0] *= v * w
-    scale = [self.scale[0], -self.scale[1]]
+    scale = (self.scale[0], -self.scale[1])
     rot = self.angle
-    
-    self.stage.engine.drawImage(self.drawing, scale, coord, rot, color)
-    
+        
+    self.transforms = [scale, coord, rot, color]
     # Blend in all the effects
     for effect in self.effects:
       effect.apply()
+
+    glBlendFunc(self.srcBlending, self.dstBlending)
+    self.stage.engine.drawImage(self.drawing, self.transforms[0], self.transforms[1],
+                                              self.transforms[2], self.transforms[3])
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
 class Effect(object):
   """
@@ -197,7 +200,7 @@ class LightEffect(Effect):
     t = self.trigger()
     t = self.ambient + self.contrast * t
     c = self.getNoteColor(self.stage.averageNotes[self.lightNumber])
-    self.layer.color = (c[0] * t, c[1] * t, c[2] * t, self.intensity)
+    self.layer.transforms[3] = (c[0] * t, c[1] * t, c[2] * t, self.intensity)
 
 class RotateEffect(Effect):
   def __init__(self, layer, options):
@@ -209,7 +212,7 @@ class RotateEffect(Effect):
       return
     
     t = self.trigger()
-    self.layer.drawing.setAngle(t * self.angle)
+    self.layer.transforms[2] = t*self.angle
 
 class WiggleEffect(Effect):
   def __init__(self, layer, options):
@@ -224,7 +227,7 @@ class WiggleEffect(Effect):
     w, h = self.stage.engine.view.geometry[2:4]
     p = t * 2 * math.pi * self.freq
     s, c = t * math.sin(p), t * math.cos(p)
-    self.layer.drawing.setPosition(self.xmag * w * s, self.ymag * h * c)
+    self.layer.transforms[1] = (self.xmag * w * s, self.ymag * h * c)
 
 class ScaleEffect(Effect):
   def __init__(self, layer, options):
@@ -234,7 +237,7 @@ class ScaleEffect(Effect):
 
   def apply(self):
     t = self.trigger()
-    self.layer.drawing.setScale(1.0 + self.xmag * t, 1.0 + self.ymag * t)
+    self.layer.transforms[0] = (1.0 + self.xmag * t, -1.0 + self.ymag * t)
 
 class Stage(object):
   def __init__(self, guitarScene, configFileName):
@@ -608,9 +611,10 @@ class Stage(object):
       self.triggerBeat(pos, beat)
 
   def renderLayers(self, layers, visibility):
-    with self.engine.view.orthogonalProjection(normalize = True):
-      for layer in layers:
-        layer.render(visibility)
+    if self.mode != 3:
+      with self.engine.view.orthogonalProjection(normalize = True):
+        for layer in layers:
+          layer.render(visibility)
     
   def render(self, visibility):
     if self.mode != 3:
