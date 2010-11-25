@@ -28,12 +28,18 @@ typedef struct _VideoPlayer VideoPlayer;
 VideoPlayer* video_player_new(const char* filename, GError** err);
 void video_player_destroy(VideoPlayer* player);
 
+void video_player_play(VideoPlayer* player);
+void video_player_pause(VideoPlayer* player);
+
+gboolean video_player_bind_frame(VideoPlayer* player, GError** err);
+
 GQuark video_player_error_quark(void);
 #define VIDEO_PLAYER_ERROR video_player_error_quark()
 
 typedef enum {
   VIDEO_PLAYER_NO_VIDEO,
-  VIDEO_PLAYER_BAD_HEADERS
+  VIDEO_PLAYER_BAD_HEADERS,
+  VIDEO_PLAYER_BAD_DATA
 } VideoPlayerError;
 
 #endif

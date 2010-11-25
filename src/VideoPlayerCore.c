@@ -20,6 +20,7 @@
 
 #include "VideoPlayer.h"
 
+#include <GL/gl.h>
 #include <ogg/ogg.h>
 #include <theora/theoradec.h>
 
@@ -38,6 +39,11 @@ struct _VideoPlayer {
   th_setup_info* tsetup;
   gboolean eof;
   th_dec_ctx* vdecoder;
+  gboolean playing;
+  glong playback_position;  /* microseconds */
+  GTimeVal playback_start_time;
+  GLuint video_texture;
+  ogg_int64_t decode_granpos;
 };
 
 static void destroy_stream(gpointer data)
@@ -145,6 +151,8 @@ got_all_headers:
       } else if (header_status == 0) {
         /* We have everything we need to start decoding. */
         player->vdecoder = th_decode_alloc(&player->tinfo, player->tsetup);
+        player->playing = FALSE;
+        player->playback_position = 0;
         return TRUE;
       }
       /* Otherwise, there are still more header packets needed. */
@@ -174,6 +182,7 @@ VideoPlayer* video_player_new(const char* filename, GError** err)
   ogg_sync_init(&player->osync);
   th_info_init(&player->tinfo);
   th_comment_init(&player->tcomment);
+  glGenTextures(1, &player->video_texture);
   if (!demux_headers(player, err)) {
     video_player_destroy(player);
     return NULL;
@@ -187,12 +196,82 @@ void video_player_destroy(VideoPlayer* player)
     th_decode_free(player->vdecoder);
   if (player->tsetup != NULL)
     th_setup_free(player->tsetup);
+  glDeleteTextures(1, &player->video_texture);
   th_comment_clear(&player->tcomment);
   th_info_clear(&player->tinfo);
   g_hash_table_destroy(player->stream_table);
   ogg_sync_clear(&player->osync);
   fclose(player->file);
   g_free(player);
+}
+
+void video_player_play(VideoPlayer* player)
+{
+  g_get_current_time(&player->playback_start_time);
+  g_time_val_add(&player->playback_start_time, -player->playback_position);
+  player->playing = TRUE;
+}
+
+void video_player_pause(VideoPlayer* player)
+{
+  player->playing = FALSE;
+}
+
+gboolean video_player_bind_frame(VideoPlayer* player, GError** err)
+{
+  gboolean must_update_texture = FALSE;
+  th_ycbcr_buffer frame_buffer;
+
+  glBindTexture(GL_TEXTURE_2D, player->video_texture);
+
+  /* Advance the playback position if we're playing. */
+  if (player->playing) {
+    GTimeVal now;
+    g_get_current_time(&now);
+    player->playback_position = (1000000 * (now.tv_sec - player->playback_start_time.tv_sec)) + (now.tv_usec - player->playback_start_time.tv_usec);
+  }
+
+  while (th_granule_time(player->vdecoder, player->decode_granpos) * 1000000 < player->playback_position) {
+    ogg_packet pkt;
+    int decode_status;
+
+    /* Get the next packet. */
+    if (ogg_stream_packetout(player->vstream, &pkt) != 1) {
+      if (player->eof) {
+        video_player_pause(player);
+        break;
+      }
+      if (!demux_next_page(player, err))
+        return FALSE;
+      continue;
+    }
+
+    decode_status = th_decode_packetin(player->vdecoder, &pkt, &player->decode_granpos);
+    if (decode_status != 0 && decode_status != TH_DUPFRAME) {
+      g_set_error(err, VIDEO_PLAYER_ERROR, VIDEO_PLAYER_BAD_DATA,
+        "An error occurred decoding a Theora packet.");
+      return FALSE;
+    }
+
+    if (decode_status == 0) {
+      th_decode_ycbcr_out(player->vdecoder, frame_buffer);
+      must_update_texture = TRUE;
+    }
+  }
+
+  /* TODO: use swscale to get power-of-two dimensions and do yuv->rgb */
+  /* Placeholder: black-and-white video by just using Y channel, using (ugh) gluBuild2DMipmaps */
+  if (must_update_texture) {
+#include <GL/glu.h>
+    guchar* data = g_malloc(frame_buffer[0].width * frame_buffer[0].height);
+    int i;
+    for (i = 0; i < frame_buffer[0].height; i++)
+      memcpy(data + i*frame_buffer[0].width, frame_buffer[0].data + i*frame_buffer[0].stride, frame_buffer[0].width);
+    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_LUMINANCE, frame_buffer[0].width, frame_buffer[0].height, GL_LUMINANCE, GL_UNSIGNED_BYTE, data);
+    g_free(data);
+  }
+
+  return TRUE;
 }
 
 GQuark video_player_error_quark(void)
