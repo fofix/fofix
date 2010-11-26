@@ -141,6 +141,12 @@ class VideoLayer(BackgroundLayer, KeyListener):
   def pause(self):
     self.player.pause()
 
+  def restart(self):
+    # XXX: do this less hackishly
+    del self.player
+    self.player = VideoPlayer(self.filename)
+    self.player.play()
+
   def render(self, visibility, topMost):
     screen_aspect_ratio = float(self.engine.view.geometry[2]) / self.engine.view.geometry[3]
     video_aspect_ratio = self.player.aspect_ratio()
@@ -193,8 +199,6 @@ class VideoLayer(BackgroundLayer, KeyListener):
 
     if self.player.eof():
       if self.loop:
-        del self.player
-        self.player = VideoPlayer(self.filename)
-        self.player.play()
+        self.restart()
       else:
         self.finished = True
