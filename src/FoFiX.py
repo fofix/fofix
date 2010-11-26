@@ -45,6 +45,11 @@ import sys
 import os
 import Version
 
+# Add the directory of DLL dependencies to the PATH if we're running
+# from source on Windows so we pick them up when those bits are imported.
+if os.name == 'nt' and not hasattr(sys, 'frozen'):
+  os.environ['PATH'] = os.path.abspath(os.path.join('..', 'win32', 'deps', 'bin')) + os.pathsep + os.environ['PATH']
+
 def _usage(errmsg=None):
   usage = """Usage: %(prog)s [options]
 
