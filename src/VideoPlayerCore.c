@@ -333,6 +333,16 @@ gboolean video_player_bind_frame(VideoPlayer* player, GError** err)
   return TRUE;
 }
 
+gboolean video_player_eof(const VideoPlayer* player)
+{
+  return player->eof;
+}
+
+double video_player_aspect_ratio(const VideoPlayer* player)
+{
+  return player->tinfo.pic_width / (double)player->tinfo.pic_height;
+}
+
 GQuark video_player_error_quark(void)
 {
   return g_quark_from_static_string("video-player-error-quark");

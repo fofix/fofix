@@ -33,6 +33,9 @@ void video_player_pause(VideoPlayer* player);
 
 gboolean video_player_bind_frame(VideoPlayer* player, GError** err);
 
+gboolean video_player_eof(const VideoPlayer* player);
+double video_player_aspect_ratio(const VideoPlayer* player);
+
 GQuark video_player_error_quark(void);
 #define VIDEO_PLAYER_ERROR video_player_error_quark()
 
