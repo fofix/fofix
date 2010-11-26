@@ -278,7 +278,13 @@ def pc_info(pkg):
 
   # Pick out anything interesting in the cflags and libs, and
   # silently drop the rest.
+  def def_split(x):
+    pair = list(x.split('=', 1))
+    if len(pair) == 1:
+      pair.append(None)
+    return tuple(pair)
   info = {
+    'define_macros': [def_split(x[2:]) for x in cflags if x[:2] == '-D'],
     'include_dirs': [x[2:] for x in cflags if x[:2] == '-I'],
     'libraries': [x[2:] for x in libs if x[:2] == '-l'],
     'library_dirs': [x[2:] for x in libs if x[:2] == '-L'],
@@ -306,12 +312,14 @@ def combine_info(*args):
   '''Combine multiple result dicts from L{pc_info} into one.'''
 
   info = {
+    'define_macros': [],
     'include_dirs': [],
     'libraries': [],
     'library_dirs': [],
   }
 
   for a in args:
+    info['define_macros'].extend(a.get('define_macros', []))
     info['include_dirs'].extend(a.get('include_dirs', []))
     info['libraries'].extend(a.get('libraries', []))
     info['library_dirs'].extend(a.get('library_dirs', []))
