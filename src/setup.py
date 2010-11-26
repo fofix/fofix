@@ -291,6 +291,7 @@ def pc_info(pkg):
 ogg_info = pc_info('ogg')
 theoradec_info = pc_info('theoradec')
 glib_info = pc_info('glib-2.0')
+swscale_info = pc_info('libswscale')
 if os.name == 'nt':
   # Windows systems: we just know what the OpenGL library is.
   gl_info = {'libraries': ['opengl32']}
@@ -327,7 +328,9 @@ setup_args.update({
     Extension('pypitch._pypitch',
               language='c++',
               sources=['pypitch/_pypitch.pyx', 'pypitch/pitch.cpp',
-                       'pypitch/AnalyzerInput.cpp'])
+                       'pypitch/AnalyzerInput.cpp']),
+    Extension('VideoPlayer', ['VideoPlayer.pyx', 'VideoPlayerCore.c'],
+              **combine_info(gl_info, ogg_info, theoradec_info, glib_info, swscale_info))
   ],
   'cmdclass': {'build_ext': build_ext},
 })
