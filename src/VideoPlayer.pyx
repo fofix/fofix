@@ -192,4 +192,9 @@ class VideoLayer(BackgroundLayer, KeyListener):
     glMatrixMode(GL_MODELVIEW)
 
     if self.player.eof():
-      self.finished = True
+      if self.loop:
+        del self.player
+        self.player = VideoPlayer(self.filename)
+        self.player.play()
+      else:
+        self.finished = True
