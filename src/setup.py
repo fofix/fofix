@@ -301,6 +301,8 @@ swscale_info = pc_info('libswscale')
 if os.name == 'nt':
   # Windows systems: we just know what the OpenGL library is.
   gl_info = {'libraries': ['opengl32']}
+  # And glib needs a slight hack to work correctly.
+  glib_info['define_macros'].append(('inline', '__inline'))
 else:
   # Other systems: we ask pkg-config.
   gl_info = pc_info('gl')
