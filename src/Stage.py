@@ -32,6 +32,7 @@ from Shader import shaders
 import os
 import random   #MFH - needed for new stage background handling
 from Language import _
+import math
 
 try:
   from VideoPlayer import VideoPlayer
@@ -41,12 +42,212 @@ except:
   
 import Rockmeter #blazingamer - new 4.0 code for rendering rockmeters through stage.ini
 
+
+class Layer(object):
+  """
+  A graphical stage layer that can have a number of animation effects associated with it.
+  """
+  def __init__(self, stage, drawing):
+    """
+    Constructor.
+
+    @param stage:     Containing Stage
+    @param drawing:   SvgDrawing for this layer. Make sure this drawing is rendered to
+                      a texture for performance reasons.
+    """
+    self.stage       = stage
+    self.drawing     = drawing
+    self.position    = (0.0, 0.0)
+    self.angle       = 0.0
+    self.scale       = (1.0, 1.0)
+    self.color       = (1.0, 1.0, 1.0, 1.0)
+    self.srcBlending = GL_SRC_ALPHA
+    self.dstBlending = GL_ONE_MINUS_SRC_ALPHA
+    self.transforms  = [[1,1], [1,1], 1, [1,1,1,1]] #scale, coord, angle, color
+    self.effects     = []
+  
+  def render(self, visibility):
+    """
+    Render the layer.
+
+    @param visibility:  Floating point visibility factor (1 = opaque, 0 = invisibile)
+    """
+    w, h = self.stage.engine.view.geometry[2:4]
+    v = 1.0 - visibility ** 2
+    
+    color = self.color
+    
+    #coordinates are positioned with (0,0) being in the middle of the screen
+    coord = [w/2 + self.position[0] * w/2, h/2 - self.position[1] * h/2]
+    if v > .01:
+      color = [self.color[0], self.color[1], self.color[2], visibility]
+    scale = [self.scale[0], -self.scale[1]]
+    rot = self.angle
+        
+    self.transforms = [scale, coord, rot, color]
+    # Blend in all the effects
+    for effect in self.effects:
+      effect.apply()
+
+    glBlendFunc(self.srcBlending, self.dstBlending)
+    self.stage.engine.drawImage(self.drawing, self.transforms[0], self.transforms[1],
+                                              self.transforms[2], self.transforms[3])
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
+class Effect(object):
+  """
+  An animationn effect that can be attached to a Layer.
+  """
+  def __init__(self, layer, options):
+    """
+    Constructor.
+
+    @param layer:     Layer to attach this effect to.
+    @param options:   Effect options (default in parens):
+                        intensity - Floating point effect intensity (1.0)
+                        trigger   - Effect trigger, one of "none", "beat",
+                                    "quarterbeat", "pick", "miss" ("none")
+                        period    - Trigger period in ms (200.0)
+                        delay     - Trigger delay in periods (0.0)
+                        profile   - Trigger profile, one of "step", "linstep",
+                                    "smoothstep"
+    """
+    self.layer       = layer
+    self.stage       = layer.stage
+    self.intensity   = float(options.get("intensity", 1.0))
+    self.trigger     = getattr(self, "trigger" + options.get("trigger", "none").capitalize())
+    self.period      = float(options.get("period", 500.0))
+    self.delay       = float(options.get("delay", 0.0))
+    self.triggerProf = getattr(self, options.get("profile", "linstep"))
+
+  def apply(self):
+    pass
+
+  def triggerNone(self):
+    return 0.0
+
+  def triggerBeat(self):
+    if not self.stage.lastBeatPos:
+      return 0.0
+    t = self.stage.pos - self.delay * self.stage.beatPeriod - self.stage.lastBeatPos
+    return self.intensity * (1.0 - self.triggerProf(0, self.stage.beatPeriod, t))
+
+  def triggerQuarterbeat(self):
+    if not self.stage.lastQuarterBeatPos:
+      return 0.0
+    t = self.stage.pos - self.delay * (self.stage.beatPeriod / 4) - self.stage.lastQuarterBeatPos
+    return self.intensity * (1.0 - self.triggerProf(0, self.stage.beatPeriod / 4, t))
+
+  def triggerPick(self):
+    if not self.stage.lastPickPos:
+      return 0.0
+    t = self.stage.pos - self.delay * self.period - self.stage.lastPickPos
+    return self.intensity * (1.0 - self.triggerProf(0, self.period, t))
+
+  def triggerMiss(self):
+    if not self.stage.lastMissPos:
+      return 0.0
+    t = self.stage.pos - self.delay * self.period - self.stage.lastMissPos
+    return self.intensity * (1.0 - self.triggerProf(0, self.period, t))
+
+  def step(self, threshold, x):
+    return (x > threshold) and 1 or 0
+
+  def linstep(self, min, max, x):
+    if x < min:
+      return 0
+    if x > max:
+      return 1
+    return (x - min) / (max - min)
+
+  def smoothstep(self, min, max, x):
+    if x < min:
+      return 0
+    if x > max:
+      return 1
+    def f(x):
+      return -2 * x**3 + 3*x**2
+    return f((x - min) / (max - min))
+
+  def sinstep(self, min, max, x):
+    return math.cos(math.pi * (1.0 - self.linstep(min, max, x)))
+
+  def getNoteColor(self, note):
+    if note >= len(self.stage.engine.theme.noteColors) - 1:
+      return self.stage.engine.theme.noteColors[-1]
+    elif note <= 0:
+      return self.stage.engine.theme.noteColors[0]
+    f2  = note % 1.0
+    f1  = 1.0 - f2
+    c1 = self.stage.engine.theme.noteColors[int(note)]
+    c2 = self.stage.engine.theme.noteColors[int(note) + 1]
+    return (c1[0] * f1 + c2[0] * f2, \
+            c1[1] * f1 + c2[1] * f2, \
+            c1[2] * f1 + c2[2] * f2)
+
+class LightEffect(Effect):
+  def __init__(self, layer, options):
+    Effect.__init__(self, layer, options)
+    self.lightNumber = int(options.get("light_number", 0))
+    self.ambient     = float(options.get("ambient", 0.5))
+    self.contrast    = float(options.get("contrast", 0.5))
+
+  def apply(self):
+    if len(self.stage.averageNotes) < self.lightNumber + 2:
+      self.layer.color = (0.0, 0.0, 0.0, 0.0)
+      return
+
+    t = self.trigger()
+    t = self.ambient + self.contrast * t
+    c = self.getNoteColor(self.stage.averageNotes[self.lightNumber])
+    self.layer.transforms[3] = (c[0] * t, c[1] * t, c[2] * t, self.intensity)
+
+class RotateEffect(Effect):
+  def __init__(self, layer, options):
+    Effect.__init__(self, layer, options)
+    self.angle     = math.pi / 180.0 * float(options.get("angle",  45))
+
+  def apply(self):
+    if not self.stage.lastMissPos:
+      return
+    
+    t = self.trigger()
+    self.layer.transforms[2] = t*self.angle
+
+class WiggleEffect(Effect):
+  def __init__(self, layer, options):
+    Effect.__init__(self, layer, options)
+    self.freq     = float(options.get("frequency",  6))
+    self.xmag     = float(options.get("xmagnitude", 0.1))
+    self.ymag     = float(options.get("ymagnitude", 0.1))
+
+  def apply(self):
+    t = self.trigger()
+    
+    w, h = self.stage.engine.view.geometry[2:4]
+    p = t * 2 * math.pi * self.freq
+    s, c = t * math.sin(p), t * math.cos(p)
+    self.layer.transforms[1][0] += self.xmag * w * s
+    self.layer.transforms[1][1] += self.ymag * h * c 
+
+class ScaleEffect(Effect):
+  def __init__(self, layer, options):
+    Effect.__init__(self, layer, options)
+    self.xmag     = float(options.get("xmagnitude", .1))
+    self.ymag     = float(options.get("ymagnitude", .1))
+
+  def apply(self):
+    t = self.trigger()
+    self.layer.transforms[0] = (1.0 + self.xmag * t, -1.0 + self.ymag * t)
+
 class Stage(object):
   def __init__(self, guitarScene, configFileName):
     self.scene            = guitarScene
     self.engine           = guitarScene.engine
     self.config           = Config.MyConfigParser()
-    self.layers = []
+    self.backgroundLayers = []
+    self.foregroundLayers = []
+    self.textures         = {}
     self.reset()
     
 
@@ -85,12 +286,73 @@ class Stage(object):
 
     # evilynux - Improved stage error handling
     self.themename = self.engine.data.themeLabel
-    self.path = os.path.join("themes",self.themename,"stages")
+    self.path = os.path.join("themes",self.themename,"backgrounds")
     self.pathfull = self.engine.getPath(self.path)
     if not os.path.exists(self.pathfull): # evilynux
       Log.warn("Stage folder does not exist: %s" % self.pathfull)
       self.mode = 1 # Fallback to song-specific stage
     suffix = ".jpg"
+
+    self.loadLayers(configFileName)
+    
+  def loadLayers(self, configFileName):
+    self.config.read(configFileName)
+    path = os.path.join("themes", self.themename, "stage")
+    
+    # Build the layers
+    for i in range(32):
+      section = "layer%d" % i
+      if self.config.has_section(section):
+        def get(value, type = str, default = None):
+          if self.config.has_option(section, value):
+            return type(self.config.get(section, value))
+          return default
+        
+        xres    = get("xres", int, 256)
+        yres    = get("yres", int, 256)
+        texture = get("texture")
+
+        try:
+          drawing = self.textures[texture]
+        except KeyError:
+          drawing = self.engine.loadImgDrawing(self, None, os.path.join(path, texture), textureSize = (xres, yres))
+          self.textures[texture] = drawing
+          
+        layer = Layer(self, drawing)
+
+        layer.position    = (get("xpos",   float, 0.0), get("ypos",   float, 0.0))
+        layer.scale       = (get("xscale", float, 1.0), get("yscale", float, 1.0))
+        layer.angle       = math.pi * get("angle", float, 0.0) / 180.0
+        layer.srcBlending = globals()["GL_%s" % get("src_blending", str, "src_alpha").upper()]
+        layer.dstBlending = globals()["GL_%s" % get("dst_blending", str, "one_minus_src_alpha").upper()]
+        layer.color       = (get("color_r", float, 1.0), get("color_g", float, 1.0), get("color_b", float, 1.0), get("color_a", float, 1.0))
+
+        # Load any effects
+        fxClasses = {
+          "light":          LightEffect,
+          "rotate":         RotateEffect,
+          "wiggle":         WiggleEffect,
+          "scale":          ScaleEffect,
+        }
+        
+        for j in range(32):
+          fxSection = "layer%d:fx%d" % (i, j)
+          if self.config.has_section(fxSection):
+            type = self.config.get(fxSection, "type")
+
+            if not type in fxClasses:
+              continue
+
+            options = self.config.options(fxSection)
+            options = dict([(opt, self.config.get(fxSection, opt)) for opt in options])
+
+            fx = fxClasses[type](layer, options)
+            layer.effects.append(fx)
+
+        if get("foreground", int):
+          self.foregroundLayers.append(layer)
+        else:
+          self.backgroundLayers.append(layer)
 
   def loadVideo(self, libraryName, songName, songVideo = None,
                 songVideoStartTime = None, songVideoEndTime = None):
@@ -336,11 +598,6 @@ class Stage(object):
     self.beat         = beat
     self.averageNotes = self.averageNotes[-4:] + self.averageNotes[-1:]
 
-  def renderLayers(self, layers, visibility):
-    with self.engine.view.orthogonalProjection(normalize = True):
-      for layer in layers:
-        layer.render(visibility)
-
   def run(self, pos, period):
     self.pos        = pos
     self.beatPeriod = period
@@ -354,10 +611,16 @@ class Stage(object):
     if beat > self.beat:
       self.triggerBeat(pos, beat)
 
+  def renderLayers(self, layers, visibility):
+    if self.mode != 3:
+      with self.engine.view.orthogonalProjection(normalize = True):
+        for layer in layers:
+          layer.render(visibility)
+    
   def render(self, visibility):
     if self.mode != 3:
       self.renderBackground()
-    self.renderLayers(self.layers, visibility)
+    self.renderLayers(self.backgroundLayers, visibility)
     if shaders.enable("stage"):
       height = 0.0
       for i in shaders.var["color"].keys():
@@ -377,6 +640,5 @@ class Stage(object):
       shaders.disable()
       
     self.scene.renderGuitar()
+    self.renderLayers(self.foregroundLayers, visibility)
     self.rockmeter.render(visibility)
-    
-    
