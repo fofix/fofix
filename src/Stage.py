@@ -34,12 +34,8 @@ import random   #MFH - needed for new stage background handling
 from Language import _
 import math
 
-try:
-  from VideoPlayer import VideoPlayer
-  videoAvailable = True
-except:
-  videoAvailable = False
-  
+from VideoPlayer import VideoLayer, VideoPlayerError
+
 import Rockmeter #blazingamer - new 4.0 code for rendering rockmeters through stage.ini
 
 
@@ -356,8 +352,6 @@ class Stage(object):
 
   def loadVideo(self, libraryName, songName, songVideo = None,
                 songVideoStartTime = None, songVideoEndTime = None):
-    if not videoAvailable:
-      raise NameError('Video (gstreamer) is not available!')
     self.vidSource = None
     if self.songStage == 1:
       songAbsPath = os.path.join(libraryName, songName)
@@ -383,26 +377,22 @@ class Stage(object):
       self.mode = 1 # Fallback
       self.vidSource = None
       return
-      
-    winWidth, winHeight = (self.engine.view.geometry[2],
-                           self.engine.view.geometry[3])
-    Log.debug("Attempting to load video: %s" % self.vidSource)
+
     try: # Catches invalid video files or unsupported formats
       Log.debug("Attempting to load video: %s" % self.vidSource)
-      self.vidPlayer = VideoPlayer(-1, self.vidSource, (winWidth, winHeight),
-                                   mute = True, loop = True,
-                                   startTime = songVideoStartTime,
-                                   endTime = songVideoEndTime)
+      self.vidPlayer = VideoLayer(self.engine, self.vidSource,
+                                  mute = True, loop = True,
+                                  startTime = songVideoStartTime,
+                                  endTime = songVideoEndTime)
       self.engine.view.pushLayer(self.vidPlayer)
-      self.vidPlayer.paused = True
-    except:
+    except (IOError, VideoPlayerError):
       self.mode = 1
-      Log.warn("Failed to load video, fallback to default stage mode.")
+      Log.error("Failed to load song video (falling back to default stage mode):")
 
   def restartVideo(self):
-    if not videoAvailable or not self.mode == 3:
+    if not self.mode == 3:
       return
-    self.vidPlayer.loadVideo(self.vidSource)
+    self.vidPlayer.restart()
     
   def load(self, libraryName, songName, practiceMode = False):
     rm = os.path.join("themes", self.themename, "rockmeter.ini")
