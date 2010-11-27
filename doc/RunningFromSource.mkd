@@ -8,9 +8,8 @@ Table of Contents
 3. [Notes on PyOpenGL versions](#Notes-on-PyOpenGL-versions)
 4. [Setting up Python and third-party dependencies](#Setting-up-Python-and-third-party-dependencies)
 5. [Compiling the native modules](#Compiling-the-native-modules)
-6. [Dependencies for video playback](#Dependencies-for-video-playback)
-7. [Starting the game](#Starting-the-game)
-8. [Making binaries](#Making-binaries)
+6. [Starting the game](#Starting-the-game)
+7. [Making binaries](#Making-binaries)
 
 <a name="Checking-out-the-latest-code"></a>
 Checking out the latest code
@@ -179,6 +178,20 @@ The following packages are optional:
 Install all packages by double-clicking the .exe or .msi files that
 you downloaded.
 
+#### Installing the Win32 Dependency Pack
+
+Some code in FoFiX depends on external libraries written in C. The
+`win32/` directory contains build scripts, but it can be difficult to
+get the proper environment set up to use them.
+
+Since building and setting up these libraries can be difficult, we are
+making available a prebuilt archive of everything you need to compile
+FoFiX's native modules. Download the latest FoFiX Win32 Dependency Pack
+from [here](http://www.mediafire.com/?x0000ohmctblb) and unzip it into the
+`win32/` directory. (The `deps/` directory in the archive should become
+a subdirectory of the `win32/` directory.) Now you are ready to compile
+the native modules.
+
 
 ### Mac OS X
 
@@ -217,7 +230,8 @@ The following are required:
   * Python's development headers
   * A C++ compiler
   * Cython
-  * The OpenGL and GLU development headers
+  * pkg-config
+  * The OpenGL, GLU, GLib, libogg, libtheora, and libswscale (part of ffmpeg) development headers
 
 The following are optional (refer to the Windows instructions to see
 what each one is needed for):
@@ -230,9 +244,10 @@ what each one is needed for):
 For those of you on Debian or Ubuntu, this means installing the
 following packages: `python-pygame`, `python-opengl`, `python-numpy`,
 `python-imaging`, `python-ogg`, `python-pyvorbis`, `python-dev`,
-`build-essential`, `cython`, `libgl1-mesa-dev`, `libglu1-mesa-dev`.
-If you're stuck without pygame 1.9, also install `python-numeric`.
-If you want Psyco, install `python-psyco`.
+`build-essential`, `cython`, `pkg-config`, `libgl1-mesa-dev`,
+`libglu1-mesa-dev`, `libglib2.0-dev`, `libogg-dev`, `libtheora-dev`,
+`libswscale-dev`.  If you're stuck without pygame 1.9, also install
+`python-numeric`.  If you want Psyco, install `python-psyco`.
 
 Some packages can be troublesome, so we have notes below about certain
 packages.
@@ -325,6 +340,10 @@ You will have to do this **every time** you receive changes to a `.c`,
 are in danger of weird crashes, and our first question will probably be
 whether or not you rebuilt the native modules.
 
+(If `setup.py` complains about any programs or libraries being missing,
+check that you have installed all of the dependencies, and for Windows
+users, that the Win32 Dependency Pack is unpacked in the proper location.)
+
 As for making sure you have a compiler, read the section for your
 operating system.
 
@@ -355,56 +374,6 @@ Install the appropriate package from your distribution's repository.
 
 Under Debian and Ubuntu, you want `build-essential`.
 
-----
-<a name="Dependencies-for-video-playback"></a>
-Dependencies for video playback
--------------------------------
-
-_This section is **optional**, and it is only necessary if you want to
-try out the current implementation, which will be replaced soon._
-
-To play videos in FoFiX you currently need to install GStreamer.
-We'll be moving away from GStreamer soon (before 4.0), but for now,
-here are the instructions.
-
-_N.B.: While many types of video (i.e. anything the GStreamer installation
-knows how to decode) work with the current code, the replacement video
-code is likely not to support anything other than Theora._
-
-Follow the instructions for your operating system.
-
-### Windows
-
-#### GStreamer binaries
-Download a GStreamer binary repack:
-<http://www.mediafire.com/file/zwzwzgyiggc/gstreamer.7z>
-
-Use 7-Zip or a compatible archiving program to unpack it into the root of
-the FoFiX environment.  (If done correctly, this should create a folder
-named `gstreamer` on the same level as `data`, `doc`, `pkg`, `src`, and
-`svg`, and the `gstreamer` folder should have as its direct children
-folders named `bin`, `etc`, `lib`, `share`, and `src` and a file named
-`COPYING`.  Carefully check how you unpacked it if this is not the case.)
-
-#### PyGObject
-
-Download and run this:
-<http://ftp.gnome.org/pub/GNOME/binaries/win32/pygobject/2.14/pygobject-2.14.2-2.win32-py2.6.exe>
-
-#### PyGst
-
-Download and run this:
-<http://www.mediafire.com/file/l2ntmxyqjdf/pygst-0.10.23.0.win32-py2.6.exe>
-
-### Mac OS X
-
-Someone with a Mac will have to expand this section.
-
-### GNU/Linux
-
-Install the Python GStreamer bindings (pygst) and all of their
-dependencies.  Under Debian and Ubuntu, the package to install is
-`python-gst0.10`.
 
 ----
 <a name="Starting-the-game"></a>
