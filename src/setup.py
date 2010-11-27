@@ -329,6 +329,10 @@ class build_ext(_build_ext):
         libfile = os.path.splitext(deffile)[0] + '.lib'
         if newer(deffile, libfile):
           msvc.spawn([msvc.lib, '/nologo', '/machine:x86', '/out:'+libfile, '/def:'+deffile])
+
+      # Also add the directory containing the msinttypes headers to the include path.
+      self.include_dirs.append(os.path.join('..', 'win32', 'deps', 'include', 'msinttypes'))
+
     return _build_ext.run(self, *args, **kw)
 
 # Add the common arguments to setup().
