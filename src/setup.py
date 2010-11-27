@@ -130,17 +130,7 @@ if int(OpenGL.__version__[0]) > 2:
   except ImportError:
     pass
 
-# A couple things we need for pygst under Windows...
 extraDllExcludes = []
-if os.name == 'nt':
-  try:
-    # Get the pygst dirs into sys.path if they're there.
-    import pygst
-    pygst.require('0.10')
-    # Skip the DLLs used by pygst; the player code handles them itself.
-    extraDllExcludes += [os.path.basename(d) for d in glob.glob(os.path.join('..', 'gstreamer', 'bin', 'libgst*.dll'))]
-  except ImportError:
-    pass
 
 # Command-specific options shared between py2exe and py2app.
 common_options = {
@@ -186,11 +176,6 @@ options['py2exe'].update({
     "mswsock.dll",
     "powrprof.dll",
     "w9xpopen.exe",
-    "libgio-2.0-0.dll",
-    "libglib-2.0-0.dll",
-    "libgmodule-2.0-0.dll",
-    "libgobject-2.0-0.dll",
-    "libgthread-2.0-0.dll",
   ] + extraDllExcludes,
   "optimize": 2
 })
