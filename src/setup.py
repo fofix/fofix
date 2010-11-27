@@ -24,7 +24,9 @@
 
 # FoFiX fully unified setup script
 from distutils.core import setup, Extension
-from Cython.Distutils import build_ext
+import distutils.ccompiler
+from distutils.dep_util import newer
+from Cython.Distutils import build_ext as _build_ext
 import sys, SceneFactory, Version, glob, os
 import numpy as np
 import shlex
@@ -328,6 +330,21 @@ def combine_info(*args):
 
   return info
 
+
+# Extend the build_ext command further to rebuild the import libraries on
+# an MSVC build under Windows so they actually work.
+class build_ext(_build_ext):
+  def run(self, *args, **kw):
+    if self.compiler is None:
+      self.compiler = distutils.ccompiler.get_default_compiler()
+    if self.compiler == 'msvc':
+      msvc = distutils.ccompiler.new_compiler(compiler='msvc', verbose=self.verbose, dry_run=self.dry_run, force=self.force)
+      msvc.initialize()
+      for deffile in glob.glob(os.path.join('..', 'win32', 'deps', 'lib', '*.def')):
+        libfile = os.path.splitext(deffile)[0] + '.lib'
+        if newer(deffile, libfile):
+          msvc.spawn([msvc.lib, '/nologo', '/machine:x86', '/out:'+libfile, '/def:'+deffile])
+    return _build_ext.run(self, *args, **kw)
 
 # Add the common arguments to setup().
 # This includes arguments to cause FoFiX's extension modules to be built.
