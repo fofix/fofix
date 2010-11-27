@@ -60,6 +60,7 @@ assert_binary_on_path autoreconf
 assert_binary_on_path libtoolize
 assert_binary_on_path make
 assert_binary_on_path pkg-config
+assert_binary_on_path python
 assert_binary_on_path svn
 assert_binary_on_path tar
 assert_binary_on_path unzip
@@ -277,3 +278,7 @@ if test ! -f "$PREFIX"/build-stamps/ffmpeg; then
 fi
 
 echo "All dependencies done."
+
+echo -n "Creating .def files... "
+python makedefs.py deps/lib deps/bin "$CROSS_DLLTOOL -I"
+echo "done"
