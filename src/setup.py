@@ -362,5 +362,10 @@ setup_args.update({
   'cmdclass': {'build_ext': build_ext},
 })
 
+# If we're on Windows, add the dependency directory to the PATH so py2exe will
+# pick up necessary DLLs from there.
+if os.name == 'nt':
+  os.environ['PATH'] = os.path.abspath(os.path.join('..', 'win32', 'deps', 'bin')) + os.pathsep + os.environ['PATH']
+
 # And finally...
 setup(**setup_args)
