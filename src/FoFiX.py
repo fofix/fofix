@@ -45,6 +45,11 @@ import sys
 import os
 import Version
 
+# Add the directory of DLL dependencies to the PATH if we're running
+# from source on Windows so we pick them up when those bits are imported.
+if os.name == 'nt' and not hasattr(sys, 'frozen'):
+  os.environ['PATH'] = os.path.abspath(os.path.join('..', 'win32', 'deps', 'bin')) + os.pathsep + os.environ['PATH']
+
 def _usage(errmsg=None):
   usage = """Usage: %(prog)s [options]
 
@@ -109,12 +114,7 @@ from Language import _
 import Resource
 import pygame
 import traceback
-
-try:
-  from VideoPlayer import VideoPlayer
-  videoAvailable = True
-except:
-  videoAvailable = False
+from VideoPlayer import VideoLayer, VideoPlayerError
 
 def main():
   try:
@@ -218,33 +218,24 @@ def main():
   # Play the intro video if it is present, we have the capability, and
   # we are not in one-shot mode.
   videoLayer = False
-  if videoAvailable and not engine.cmdPlay:
-    # TODO: Parameters to add to theme.ini:
-    #  - intro_video_file
-    #  - intro_video_start_time
-    #  - intro_video_end_time
+  if not engine.cmdPlay:
     themename = Config.get("coffee", "themename")
     vidSource = os.path.join(Version.dataPath(), 'themes', themename, \
                              'menu', 'intro.ogv')
     if os.path.isfile(vidSource):
-      winWidth, winHeight = engine.view.geometry[2:4]
-      songVideoStartTime = 0
-      songVideoEndTime = None
-      vidPlayer = VideoPlayer(-1, vidSource, (winWidth, winHeight),
-                              startTime = songVideoStartTime,
-                              endTime = songVideoEndTime)
-      if vidPlayer.validFile:
+      try:
+        vidPlayer = VideoLayer(engine, vidSource, cancellable=True)
+      except (IOError, VideoPlayerError):
+        Log.error("Error loading intro video:")
+      else:
+        vidPlayer.play()
         engine.view.pushLayer(vidPlayer)
         videoLayer = True
-        try:
-          engine.ticksAtStart = pygame.time.get_ticks()
-          while not vidPlayer.finished:
-            engine.run()
-          engine.view.popLayer(vidPlayer)
-          engine.view.pushLayer(MainMenu(engine))
-        except KeyboardInterrupt:
-          engine.view.popLayer(vidPlayer)
-          engine.view.pushLayer(MainMenu(engine))
+        engine.ticksAtStart = pygame.time.get_ticks()
+        while not vidPlayer.finished:
+          engine.run()
+        engine.view.popLayer(vidPlayer)
+        engine.view.pushLayer(MainMenu(engine))
   if not videoLayer:
     engine.setStartupLayer(MainMenu(engine))
 

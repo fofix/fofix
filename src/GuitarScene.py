@@ -1309,22 +1309,17 @@ class GuitarScene(Scene):
     
     # evilynux - Load stage background(s)
     if self.stage.mode == 3:
-      if Stage.videoAvailable:
-        songVideo = None
-        if self.song.info.video is not None:
-          songVideo = self.song.info.video
-          songVideoStartTime = self.song.info.video_start_time
-          songVideoEndTime = self.song.info.video_end_time
-          if songVideoEndTime == -1:
-            songVideoEndTime = None
-        self.stage.loadVideo(self.libraryName, self.songName,
-                             songVideo = songVideo,
-                             songVideoStartTime = songVideoStartTime,
-                             songVideoEndTime = songVideoEndTime)
-      else:
-        Log.warn("Video playback is not supported. GStreamer or its python bindings can't be found")
-        self.engine.config.set("game", "stage_mode", 1)
-        self.stage.mode = 1
+      songVideo = None
+      if self.song.info.video is not None:
+        songVideo = self.song.info.video
+        songVideoStartTime = self.song.info.video_start_time
+        songVideoEndTime = self.song.info.video_end_time
+        if songVideoEndTime == -1:
+          songVideoEndTime = None
+      self.stage.loadVideo(self.libraryName, self.songName,
+                           songVideo = songVideo,
+                           songVideoStartTime = songVideoStartTime,
+                           songVideoEndTime = songVideoEndTime)
 
     self.stage.load(self.libraryName, self.songName, self.playerList[0].practiceMode)
 
@@ -1757,7 +1752,7 @@ class GuitarScene(Scene):
     if self.coOpType:
       self.coOpScoreCard.lastNoteEvent = None
 
-    if self.stage.mode == 3 and Stage.videoAvailable:
+    if self.stage.mode == 3:
       self.engine.view.popLayer(self.stage.vidPlayer)
 
   def getHandicap(self):
@@ -3895,14 +3890,14 @@ class GuitarScene(Scene):
         self.scoring[num].addScore(scoreTemp)
 
   def render3D(self):
-    if self.stage.mode == 3 and Stage.videoAvailable:
+    if self.stage.mode == 3:
       if self.countdown <= 0:
         if self.pause == True or self.failed == True:
-          self.stage.vidPlayer.paused = True
+          self.stage.vidPlayer.pause()
         else:
-          self.stage.vidPlayer.paused = False
+          self.stage.vidPlayer.play()
       else:
-        self.stage.vidPlayer.paused = True
+        self.stage.vidPlayer.pause()
 
     self.stage.render(self.visibility)
   
