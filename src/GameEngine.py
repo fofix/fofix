@@ -606,7 +606,7 @@ class GameEngine(object):
     self.stageFolders = []
     currentTheme = themename
     
-    stagespath = os.path.join(Version.dataPath(), "themes", currentTheme, "stages")
+    stagespath = os.path.join(Version.dataPath(), "themes", currentTheme, "backgrounds")
     themepath  = os.path.join(Version.dataPath(), "themes", currentTheme)
     if os.path.exists(stagespath):
       self.stageFolders = []

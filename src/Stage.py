@@ -423,9 +423,9 @@ class Stage(object):
         background = "practicebass"
       else:
         background = "practice"
-      if not self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages",background)):
+      if not self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"backgrounds",background)):
         #MFH - must first fall back on the old practice.png before forcing blank stage mode!
-        if not self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages","practice")):
+        if not self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"backgrounds","practice")):
           Log.warn("No practice stage, falling back on a forced Blank stage mode") # evilynux
           self.mode = 2    #if no practice stage, just fall back on a forced Blank stage mode
             
@@ -489,7 +489,7 @@ class Stage(object):
           self.mode = 2
         
         if self.animatedFolder != "Normal" and self.mode != 2: #just use the base Stages folder for rotation
-          self.path = os.path.join("themes",self.themename,"stages",self.animatedFolder)
+          self.path = os.path.join("themes",self.themename,"backgrounds",self.animatedFolder)
           self.pathfull = self.engine.getPath(self.path)
           self.animation = True
 
