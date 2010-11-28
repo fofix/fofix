@@ -277,6 +277,16 @@ if test ! -f "$PREFIX"/build-stamps/ffmpeg; then
   $RM_RF ffmpeg
 fi
 
+# msinttypes
+# MSVC needs these to compile stuff that uses ffmpeg. Since they intentionally
+# do not work with gcc, we install them to a subdirectory of deps/include
+# and feed MSVC an appropriate include_dir option in setup.py.
+if test ! -f "$PREFIX"/build-stamps/msinttypes; then
+  download http://msinttypes.googlecode.com/files/msinttypes-r26.zip
+  unzip -od deps/include/msinttypes msinttypes-r26.zip stdint.h inttypes.h
+  touch "$PREFIX"/build-stamps/msinttypes
+fi
+
 echo "All dependencies done."
 
 echo -n "Creating .def files... "
