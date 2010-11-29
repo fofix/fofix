@@ -26,47 +26,7 @@ makes sense, and even some places where it doesn't...
 import numpy
 cimport numpy
 
-cdef extern from "glwrap.h":
-  ctypedef int GLint
-  ctypedef unsigned int GLuint
-  ctypedef unsigned int GLsizei
-  ctypedef int GLenum
-  ctypedef float GLfloat
-  ctypedef void GLvoid
-  ctypedef unsigned int GLbitfield
-
-  enum:
-    GL_COMPILE
-    GL_FLOAT
-    GL_VERTEX_ARRAY
-    GL_COLOR_ARRAY
-    GL_TEXTURE_COORD_ARRAY
-    GL_NORMAL_ARRAY
-    GL_MATRIX_MODE
-
-  void glPushMatrix()
-  void glPopMatrix()
-
-  void glPushAttrib(GLbitfield)
-  void glPopAttrib()
-
-  GLuint glGenLists(GLsizei)
-  void glDeleteLists(GLuint, GLsizei)
-  void glNewList(GLuint, GLenum)
-  void glEndList()
-  void glCallList(GLuint)
-
-  void glVertexPointer(GLint, GLenum, GLsizei, GLvoid*)
-  void glColorPointer(GLint, GLenum, GLsizei, GLvoid*)
-  void glTexCoordPointer(GLint, GLenum, GLsizei, GLvoid*)
-  void glNormalPointer(GLenum, GLsizei, GLvoid*)
-  void glEnableClientState(GLenum)
-  void glDisableClientState(GLenum)
-  void glDrawArrays(GLenum, GLint, GLsizei)
-
-  void glMatrixMode(GLenum)
-  void glGetIntegerv(GLenum, GLint*)
-
+include "gl.pxi"
 
 cdef class PushedMatrix(object):
   '''Context manager for a matrix push.

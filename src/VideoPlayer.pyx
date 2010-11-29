@@ -96,19 +96,7 @@ import numpy as np
 import cmgl
 
 # This is Cython after all, so we may as well directly bind to OpenGL for the video layer implementation.
-cdef extern from "glwrap.h":
-  enum:
-    GL_PROJECTION
-    GL_MODELVIEW
-    GL_QUADS
-    GL_TEXTURE_2D
-  void glMatrixMode(int)
-  void glPushMatrix()
-  void glPopMatrix()
-  void glLoadIdentity()
-  void glEnable(int)
-  void glDisable(int)
-  void glColor4f(double, double, double, double)
+include "gl.pxi"
 
 class VideoLayer(BackgroundLayer, KeyListener):
   def __init__(self, engine, filename, mute = False, loop = False, startTime = None, endTime = None, cancellable = False):
