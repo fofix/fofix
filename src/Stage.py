@@ -351,30 +351,29 @@ class Stage(object):
           self.backgroundLayers.append(layer)
 
   def loadVideo(self, libraryName, songName):
-    self.vidSource = None
+    vidSource = None
 
     if self.songStage == 1:
       songBackgroundVideoPath = os.path.join(libraryName, songName, "background.ogv")
       if os.path.isfile(songBackgroundVideoPath):
-        self.vidSource = songBackgroundVideoPath
+        vidSource = songBackgroundVideoPath
         loop = False
       else:
         Log.warn("Video not found: %s" % songBackgroundVideoPath)
 
-    if self.vidSource is None:
-      self.vidSource = os.path.join(self.pathfull, "default.ogv")
+    if vidSource is None:
+      vidSource = os.path.join(self.pathfull, "default.ogv")
       loop = True
 
-    if not os.path.isfile(self.vidSource):
-      Log.warn("Video not found: %s" % self.vidSource)
+    if not os.path.isfile(vidSource):
+      Log.warn("Video not found: %s" % vidSource)
       Log.warn("Falling back to default stage mode.")
       self.mode = 1 # Fallback
-      self.vidSource = None
       return
 
     try: # Catches invalid video files or unsupported formats
-      Log.debug("Attempting to load video: %s" % self.vidSource)
-      self.vidPlayer = VideoLayer(self.engine, self.vidSource,
+      Log.debug("Attempting to load video: %s" % vidSource)
+      self.vidPlayer = VideoLayer(self.engine, vidSource,
                                   mute = True, loop = loop)
       self.engine.view.pushLayer(self.vidPlayer)
     except (IOError, VideoPlayerError):
