@@ -755,10 +755,6 @@ class SongInfo(object):
   def lyrics(self):
     return self._get("lyrics")
 
-  @property 
-  def video(self):
-    return self._get("video")
-
   def getHighscoresWithPartString(self, difficulty, part = str(parts[GUITAR_PART]) ):
     if part == str(parts[GUITAR_PART]):
       highScores = self.highScores

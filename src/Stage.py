@@ -350,27 +350,22 @@ class Stage(object):
         else:
           self.backgroundLayers.append(layer)
 
-  def loadVideo(self, libraryName, songName, songVideo = None):
+  def loadVideo(self, libraryName, songName):
     self.vidSource = None
+
     if self.songStage == 1:
-      songAbsPath = os.path.join(libraryName, songName)
-      if songVideo is not None and \
-             os.path.isfile(os.path.join(songAbsPath, songVideo)):
-        self.vidSource = os.path.join(songAbsPath, songVideo)
-      elif os.path.exists(os.path.join(songAbsPath, "default.ogv")):
-        Log.warn("Video not found: %s" % \
-                 os.path.join(songAbsPath, songVideo))
-        self.vidSource = os.path.join(songAbsPath, "default.ogv")
+      songBackgroundVideoPath = os.path.join(libraryName, songName, "background.ogv")
+      if os.path.isfile(songBackgroundVideoPath):
+        self.vidSource = songBackgroundVideoPath
+      else:
+        Log.warn("Video not found: %s" % songBackgroundVideoPath)
+
     if self.vidSource is None:
-      if self.songStage == 1:
-        Log.warn("Video not found: %s" % \
-                 os.path.join(songAbsPath, "default.ogv"))
       self.vidSource = os.path.join(self.pathfull, "default.ogv")
 
-    if not os.path.exists(self.vidSource):
-      Log.warn("Video not found: %s" % \
-               os.path.join(self.pathfull, "default.ogv"))
-      Log.warn("No video found, falling back to default static image mode for now")
+    if not os.path.isfile(self.vidSource):
+      Log.warn("Video not found: %s" % self.vidSource)
+      Log.warn("Falling back to default stage mode.")
       self.mode = 1 # Fallback
       self.vidSource = None
       return

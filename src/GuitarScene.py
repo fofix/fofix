@@ -1309,11 +1309,7 @@ class GuitarScene(Scene):
     
     # evilynux - Load stage background(s)
     if self.stage.mode == 3:
-      songVideo = None
-      if self.song.info.video is not None:
-        songVideo = self.song.info.video
-      self.stage.loadVideo(self.libraryName, self.songName,
-                           songVideo = songVideo)
+      self.stage.loadVideo(self.libraryName, self.songName)
 
     self.stage.load(self.libraryName, self.songName, self.playerList[0].practiceMode)
 
