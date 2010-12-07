@@ -1312,14 +1312,8 @@ class GuitarScene(Scene):
       songVideo = None
       if self.song.info.video is not None:
         songVideo = self.song.info.video
-        songVideoStartTime = self.song.info.video_start_time
-        songVideoEndTime = self.song.info.video_end_time
-        if songVideoEndTime == -1:
-          songVideoEndTime = None
       self.stage.loadVideo(self.libraryName, self.songName,
-                           songVideo = songVideo,
-                           songVideoStartTime = songVideoStartTime,
-                           songVideoEndTime = songVideoEndTime)
+                           songVideo = songVideo)
 
     self.stage.load(self.libraryName, self.songName, self.playerList[0].practiceMode)
 

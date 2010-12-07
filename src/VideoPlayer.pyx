@@ -99,13 +99,11 @@ import cmgl
 include "gl.pxi"
 
 class VideoLayer(BackgroundLayer, KeyListener):
-  def __init__(self, engine, filename, mute = False, loop = False, startTime = None, endTime = None, cancellable = False):
+  def __init__(self, engine, filename, mute = False, loop = False, cancellable = False):
     self.engine = engine
     self.filename = filename
     self.mute = mute  # TODO: audio
     self.loop = loop  # TODO: seeking
-    self.startTime = startTime  # TODO: seeking
-    self.endTime = endTime  # TODO: seeking
     self.cancellable = cancellable
 
     self.finished = False

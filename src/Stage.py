@@ -350,8 +350,7 @@ class Stage(object):
         else:
           self.backgroundLayers.append(layer)
 
-  def loadVideo(self, libraryName, songName, songVideo = None,
-                songVideoStartTime = None, songVideoEndTime = None):
+  def loadVideo(self, libraryName, songName, songVideo = None):
     self.vidSource = None
     if self.songStage == 1:
       songAbsPath = os.path.join(libraryName, songName)
@@ -366,8 +365,6 @@ class Stage(object):
       if self.songStage == 1:
         Log.warn("Video not found: %s" % \
                  os.path.join(songAbsPath, "default.ogv"))
-      songVideoStartTime = None
-      songVideoEndTime = None
       self.vidSource = os.path.join(self.pathfull, "default.ogv")
 
     if not os.path.exists(self.vidSource):
@@ -381,9 +378,7 @@ class Stage(object):
     try: # Catches invalid video files or unsupported formats
       Log.debug("Attempting to load video: %s" % self.vidSource)
       self.vidPlayer = VideoLayer(self.engine, self.vidSource,
-                                  mute = True, loop = True,
-                                  startTime = songVideoStartTime,
-                                  endTime = songVideoEndTime)
+                                  mute = True, loop = True)
       self.engine.view.pushLayer(self.vidPlayer)
     except (IOError, VideoPlayerError):
       self.mode = 1
