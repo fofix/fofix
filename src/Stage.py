@@ -357,11 +357,13 @@ class Stage(object):
       songBackgroundVideoPath = os.path.join(libraryName, songName, "background.ogv")
       if os.path.isfile(songBackgroundVideoPath):
         self.vidSource = songBackgroundVideoPath
+        loop = False
       else:
         Log.warn("Video not found: %s" % songBackgroundVideoPath)
 
     if self.vidSource is None:
       self.vidSource = os.path.join(self.pathfull, "default.ogv")
+      loop = True
 
     if not os.path.isfile(self.vidSource):
       Log.warn("Video not found: %s" % self.vidSource)
@@ -373,7 +375,7 @@ class Stage(object):
     try: # Catches invalid video files or unsupported formats
       Log.debug("Attempting to load video: %s" % self.vidSource)
       self.vidPlayer = VideoLayer(self.engine, self.vidSource,
-                                  mute = True, loop = True)
+                                  mute = True, loop = loop)
       self.engine.view.pushLayer(self.vidPlayer)
     except (IOError, VideoPlayerError):
       self.mode = 1
