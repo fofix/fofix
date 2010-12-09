@@ -2319,6 +2319,9 @@ class GuitarScene(Scene):
         instrument.endPick(0)
     self.song.stop()
 
+    if self.stage.mode == 3:
+      self.stage.restartVideo()
+
   def startSolo(self, playerNum):   #MFH - more modular and general handling of solos
     i = playerNum
      #Guitar Solo Start
