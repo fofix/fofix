@@ -360,7 +360,7 @@ class GuitarScene(Scene):
     self.customPOV        = False
     self.ending           = False
 
-    self.neckIntoAnimationType = self.engine.config.get("fretboard", "neck_intro_animation")#weirdpeople
+    self.neckintroAnimationType = self.engine.config.get("fretboard", "neck_intro_animation")#weirdpeople
     self.neckintroThemeType = self.engine.theme.povIntroAnimation
     
     povList = [str(self.targetX), str(self.targetY), str(self.targetZ), str(self.originX), str(self.originY), str(self.originZ)]
@@ -844,13 +844,13 @@ class GuitarScene(Scene):
     self.starfx = self.engine.config.get("game", "starfx")#blazingamer
 
     #weirdpeople - sets the distances the neck has to move in the animation
-    if self.neckIntoAnimationType == 0: #Original
+    if self.neckintroAnimationType == 0: #Original
       self.boardY = 2
-    elif self.neckIntoAnimationType == 1: #Guitar Hero
+    elif self.neckintroAnimationType == 1: #Guitar Hero
       self.boardY = 10
-    elif self.neckIntoAnimationType == 2: #Rock Band
+    elif self.neckintroAnimationType == 2: #Rock Band
       self.boardZ = 5
-    elif self.neckIntoAnimationType == 4: #By Theme: will implememnt at later point
+    elif self.neckintroAnimationType == 4: #By Theme: will implememnt at later point
       self.boardY = 1
     self.rbOverdriveBarGlowVisibility = 0
     self.rbOverdriveBarGlowFadeOut = False
@@ -1714,17 +1714,17 @@ class GuitarScene(Scene):
         self.camera.origin    = (0.0, 3.0, -3.0)
 
     #weirdpeople - differant types of fretbord into animations
-    if self.neckIntoAnimationType == 0: #Original FoFiX rotate down into place
+    if self.neckintroAnimationType == 0: #Original FoFiX rotate down into place
       self.camera.origin = (self.camera.origin[0], self.camera.origin[1]*self.boardY, self.camera.origin[2])
-    elif self.neckIntoAnimationType == 1: #Guitar Hero type (from bottom of screen)
+    elif self.neckintroAnimationType == 1: #Guitar Hero type (from bottom of screen)
       self.camera.target    = (self.camera.target[0], self.camera.target[1]+self.boardY-1, self.camera.target[2])
       self.camera.origin    = (self.camera.origin[0], self.camera.origin[1]+self.boardY-1, self.camera.origin[2])
-    elif self.neckIntoAnimationType == 2: #Rock Band type (goes into screen)
+    elif self.neckintroAnimationType == 2: #Rock Band type (goes into screen)
       self.camera.target    = (self.camera.target[0], self.camera.target[1], self.camera.target[2]+self.boardZ-1)
       self.camera.origin    = (self.camera.origin[0], self.camera.origin[1], self.camera.origin[2]+self.boardZ-1)
-    elif self.neckIntoAnimationType == 3: #Off game starts with the pov as is
+    elif self.neckintroAnimationType == 3: #Off game starts with the pov as is
 	  self.camera.origin    = self.camera.origin
-    elif self.neckIntoAnimationType == 4: #By Theme
+    elif self.neckintroAnimationType == 4: #By Theme
       if self.neckintroThemeType == "fofix":
         self.camera.origin = (self.camera.origin[0], self.camera.origin[1]*self.boardY, self.camera.origin[2])
       elif self.neckintroThemeType == "guitar hero":
@@ -2302,16 +2302,16 @@ class GuitarScene(Scene):
 
     self.engine.collectGarbage()
     #weirdpeople - sets the default distances the neck has to move in the animation
-    if self.neckIntoAnimationType == 0:#Original
+    if self.neckintroAnimationType == 0:#Original
       self.boardY = 2
-    elif self.neckIntoAnimationType == 1:#Guitar Hero
+    elif self.neckintroAnimationType == 1:#Guitar Hero
       self.boardY = 10
-    elif self.neckIntoAnimationType == 2:#Rock Band
+    elif self.neckintroAnimationType == 2:#Rock Band
       self.boardZ = 5
-    elif self.neckIntoAnimationType == 4:#By Theme: will implememnt at later point
-      if self.neckintroThemeType == "fofix"::#Original
+    elif self.neckintroAnimationType == 4:#By Theme: will implememnt at later point
+      if self.neckintroThemeType == "fofix":#Original
         self.boardY = 2
-      elif self.neckintroThemeType == "guitar hero"::#Guitar Hero
+      elif self.neckintroThemeType == "guitar hero":#Guitar Hero
         self.boardY = 10
       elif self.neckintroThemeType == "rockband":#Rock Band
         self.boardZ = 5
@@ -5269,7 +5269,7 @@ class GuitarScene(Scene):
     if self.song and self.song.readyToGo:
       pos = self.getSongPosition()
       #weirdpeople - differant styles for the start animation of the fretboard
-      if self.neckIntoAnimationType == 0 or (self.neckIntroAnimationType == 4 and self.neckintroThemeType == "fofix"): #Original
+      if self.neckintroAnimationType == 0 or (self.neckintroAnimationType == 4 and self.neckintroThemeType == "fofix"): #Original
         if self.boardY <= 1:
           self.setCamera()
           if self.countdown > 0: #if the countdown is already at 0 ex. after pause
@@ -5278,7 +5278,7 @@ class GuitarScene(Scene):
         elif self.boardY > 1:
           self.boardY -= 0.01 #speed of animation higher the number = the faster the animation
           self.setCamera()
-      elif self.neckIntoAnimationType == 1 or (self.neckIntroAnimationType == 4 and self.neckintroThemeType == "guitar hero"): #Guitar Hero
+      elif self.neckintroAnimationType == 1 or (self.neckintroAnimationType == 4 and self.neckintroThemeType == "guitar hero"): #Guitar Hero
         if self.boardY <= 1:
           self.setCamera()
           if self.countdown > 0:
@@ -5287,7 +5287,7 @@ class GuitarScene(Scene):
         elif self.boardY > 1:
           self.boardY -= 0.2
           self.setCamera()
-      elif self.neckIntoAnimationType == 2 or (self.neckIntroAnimationType == 4 and self.neckintroThemeType == "rockband"): #Rock Band
+      elif self.neckintroAnimationType == 2 or (self.neckintroAnimationType == 4 and self.neckintroThemeType == "rockband"): #Rock Band
         if self.boardZ <= 1:
           self.setCamera()
           if self.countdown > 0:
@@ -5296,7 +5296,7 @@ class GuitarScene(Scene):
         elif self.boardZ > 1:
           self.boardZ -= 0.2
           self.setCamera()
-      elif self.neckIntoAnimationType == 3: #Off
+      elif self.neckintroAnimationType == 3: #Off
         self.setCamera()
         if self.countdown > 0:
           self.countdownOK = True
