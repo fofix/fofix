@@ -34,12 +34,8 @@ import random   #MFH - needed for new stage background handling
 from Language import _
 import math
 
-try:
-  from VideoPlayer import VideoPlayer
-  videoAvailable = True
-except:
-  videoAvailable = False
-  
+from VideoPlayer import VideoLayer, VideoPlayerError
+
 import Rockmeter #blazingamer - new 4.0 code for rendering rockmeters through stage.ini
 
 
@@ -63,7 +59,7 @@ class Layer(object):
     self.color       = (1.0, 1.0, 1.0, 1.0)
     self.srcBlending = GL_SRC_ALPHA
     self.dstBlending = GL_ONE_MINUS_SRC_ALPHA
-    self.transforms  = [(1,1), (1,1), 1, (1,1,1,1)]
+    self.transforms  = [[1,1], [1,1], 1, [1,1,1,1]] #scale, coord, angle, color
     self.effects     = []
   
   def render(self, visibility):
@@ -78,10 +74,10 @@ class Layer(object):
     color = self.color
     
     #coordinates are positioned with (0,0) being in the middle of the screen
-    coord = (w/2 + self.position[0] * w/2, h/2 - self.position[1] * h/2)
+    coord = [w/2 + self.position[0] * w/2, h/2 - self.position[1] * h/2]
     if v > .01:
-      color = (self.color[0], self.color[1], self.color[2], visibility)
-    scale = (self.scale[0], -self.scale[1])
+      color = [self.color[0], self.color[1], self.color[2], visibility]
+    scale = [self.scale[0], -self.scale[1]]
     rot = self.angle
         
     self.transforms = [scale, coord, rot, color]
@@ -227,7 +223,8 @@ class WiggleEffect(Effect):
     w, h = self.stage.engine.view.geometry[2:4]
     p = t * 2 * math.pi * self.freq
     s, c = t * math.sin(p), t * math.cos(p)
-    self.layer.transforms[1] = (self.xmag * w * s, self.ymag * h * c)
+    self.layer.transforms[1][0] += self.xmag * w * s
+    self.layer.transforms[1][1] += self.ymag * h * c 
 
 class ScaleEffect(Effect):
   def __init__(self, layer, options):
@@ -353,55 +350,40 @@ class Stage(object):
         else:
           self.backgroundLayers.append(layer)
 
-  def loadVideo(self, libraryName, songName, songVideo = None,
-                songVideoStartTime = None, songVideoEndTime = None):
-    if not videoAvailable:
-      raise NameError('Video (gstreamer) is not available!')
-    self.vidSource = None
-    if self.songStage == 1:
-      songAbsPath = os.path.join(libraryName, songName)
-      if songVideo is not None and \
-             os.path.isfile(os.path.join(songAbsPath, songVideo)):
-        self.vidSource = os.path.join(songAbsPath, songVideo)
-      elif os.path.exists(os.path.join(songAbsPath, "default.ogv")):
-        Log.warn("Video not found: %s" % \
-                 os.path.join(songAbsPath, songVideo))
-        self.vidSource = os.path.join(songAbsPath, "default.ogv")
-    if self.vidSource is None:
-      if self.songStage == 1:
-        Log.warn("Video not found: %s" % \
-                 os.path.join(songAbsPath, "default.ogv"))
-      songVideoStartTime = None
-      songVideoEndTime = None
-      self.vidSource = os.path.join(self.pathfull, "default.ogv")
+  def loadVideo(self, libraryName, songName):
+    vidSource = None
 
-    if not os.path.exists(self.vidSource):
-      Log.warn("Video not found: %s" % \
-               os.path.join(self.pathfull, "default.ogv"))
-      Log.warn("No video found, falling back to default static image mode for now")
+    if self.songStage == 1:
+      songBackgroundVideoPath = os.path.join(libraryName, songName, "background.ogv")
+      if os.path.isfile(songBackgroundVideoPath):
+        vidSource = songBackgroundVideoPath
+        loop = False
+      else:
+        Log.warn("Video not found: %s" % songBackgroundVideoPath)
+
+    if vidSource is None:
+      vidSource = os.path.join(self.pathfull, "default.ogv")
+      loop = True
+
+    if not os.path.isfile(vidSource):
+      Log.warn("Video not found: %s" % vidSource)
+      Log.warn("Falling back to default stage mode.")
       self.mode = 1 # Fallback
-      self.vidSource = None
       return
-      
-    winWidth, winHeight = (self.engine.view.geometry[2],
-                           self.engine.view.geometry[3])
-    Log.debug("Attempting to load video: %s" % self.vidSource)
+
     try: # Catches invalid video files or unsupported formats
-      Log.debug("Attempting to load video: %s" % self.vidSource)
-      self.vidPlayer = VideoPlayer(-1, self.vidSource, (winWidth, winHeight),
-                                   mute = True, loop = True,
-                                   startTime = songVideoStartTime,
-                                   endTime = songVideoEndTime)
+      Log.debug("Attempting to load video: %s" % vidSource)
+      self.vidPlayer = VideoLayer(self.engine, vidSource,
+                                  mute = True, loop = loop)
       self.engine.view.pushLayer(self.vidPlayer)
-      self.vidPlayer.paused = True
-    except:
+    except (IOError, VideoPlayerError):
       self.mode = 1
-      Log.warn("Failed to load video, fallback to default stage mode.")
+      Log.error("Failed to load song video (falling back to default stage mode):")
 
   def restartVideo(self):
-    if not videoAvailable or not self.mode == 3:
+    if not self.mode == 3:
       return
-    self.vidPlayer.loadVideo(self.vidSource)
+    self.vidPlayer.restart()
     
   def load(self, libraryName, songName, practiceMode = False):
     rm = os.path.join("themes", self.themename, "rockmeter.ini")
@@ -432,9 +414,9 @@ class Stage(object):
         background = "practicebass"
       else:
         background = "practice"
-      if not self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages",background)):
+      if not self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"backgrounds",background)):
         #MFH - must first fall back on the old practice.png before forcing blank stage mode!
-        if not self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"stages","practice")):
+        if not self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"backgrounds","practice")):
           Log.warn("No practice stage, falling back on a forced Blank stage mode") # evilynux
           self.mode = 2    #if no practice stage, just fall back on a forced Blank stage mode
             
@@ -498,7 +480,7 @@ class Stage(object):
           self.mode = 2
         
         if self.animatedFolder != "Normal" and self.mode != 2: #just use the base Stages folder for rotation
-          self.path = os.path.join("themes",self.themename,"stages",self.animatedFolder)
+          self.path = os.path.join("themes",self.themename,"backgrounds",self.animatedFolder)
           self.pathfull = self.engine.getPath(self.path)
           self.animation = True
 

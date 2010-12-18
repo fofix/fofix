@@ -30,7 +30,7 @@ MICRO_VERSION = 0
 PROGRAM_NAME = 'FoFiX'
 PROGRAM_UNIXSTYLE_NAME = 'fofix'
 URL = 'http://fofix.googlecode.com'
-RELEASE_ID = 'development'
+RELEASE_ID = 'alpha 1'
 
 def _getTagLine():
   import VFS  # can't be done at top level due to circular import issues...

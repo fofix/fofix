@@ -24,9 +24,13 @@
 
 # FoFiX fully unified setup script
 from distutils.core import setup, Extension
-from Cython.Distutils import build_ext
+import distutils.ccompiler
+from distutils.dep_util import newer
+from Cython.Distutils import build_ext as _build_ext
 import sys, SceneFactory, Version, glob, os
 import numpy as np
+import shlex
+import subprocess
 
 
 # Start setting up py2{exe,app} and building the argument set for setup().
@@ -126,17 +130,7 @@ if int(OpenGL.__version__[0]) > 2:
   except ImportError:
     pass
 
-# A couple things we need for pygst under Windows...
 extraDllExcludes = []
-if os.name == 'nt':
-  try:
-    # Get the pygst dirs into sys.path if they're there.
-    import pygst
-    pygst.require('0.10')
-    # Skip the DLLs used by pygst; the player code handles them itself.
-    extraDllExcludes += [os.path.basename(d) for d in glob.glob(os.path.join('..', 'gstreamer', 'bin', 'libgst*.dll'))]
-  except ImportError:
-    pass
 
 # Command-specific options shared between py2exe and py2app.
 common_options = {
@@ -182,11 +176,6 @@ options['py2exe'].update({
     "mswsock.dll",
     "powrprof.dll",
     "w9xpopen.exe",
-    "libgio-2.0-0.dll",
-    "libglib-2.0-0.dll",
-    "libgmodule-2.0-0.dll",
-    "libgobject-2.0-0.dll",
-    "libgthread-2.0-0.dll",
   ] + extraDllExcludes,
   "optimize": 2
 })
@@ -203,19 +192,169 @@ options['py2app'].update({
   }
 })
 
+
+def find_command(cmd):
+  '''Find a program on the PATH, or, on win32, in the dependency pack.'''
+
+  print 'checking for program %s...' % cmd,
+
+  if os.name == 'nt':
+    # Only accept something from the dependency pack.
+    path = os.path.join('..', 'win32', 'deps', 'bin', cmd+'.exe')
+  else:
+    # Search the PATH.
+    path = None
+    for dir in os.environ['PATH'].split(os.pathsep):
+      if os.access(os.path.join(dir, cmd), os.X_OK):
+        path = os.path.join(dir, cmd)
+        break
+
+  if path is None or not os.path.isfile(path):
+    print 'not found'
+    print >>sys.stderr, 'Could not find required program "%s".' % cmd
+    if os.name == 'nt':
+      print >>sys.stderr, '(Check that you have the latest version of the dependency pack installed.)'
+    sys.exit(1)
+
+  print path
+  return path
+
+
+# Find pkg-config so we can find the libraries we need.
+pkg_config = find_command('pkg-config')
+
+
+def pc_exists(pkg):
+  '''Check whether pkg-config thinks a library exists.'''
+  if os.spawnl(os.P_WAIT, pkg_config, 'pkg-config', '--exists', pkg) == 0:
+    return True
+  else:
+    return False
+
+
+# {py26hack} - Python 2.7 has subprocess.check_output for this purpose.
+def grab_stdout(*args, **kw):
+  '''Obtain standard output from a subprocess invocation, raising an exception
+  if the subprocess fails.'''
+
+  kw['stdout'] = subprocess.PIPE
+  proc = subprocess.Popen(*args, **kw)
+  stdout = proc.communicate()[0]
+  if proc.returncode != 0:
+    raise RuntimeError, 'subprocess %r returned %d' % (args[0], proc.returncode)
+  return stdout
+
+
+def pc_info(pkg):
+  '''Obtain build options for a library from pkg-config and
+  return a dict that can be expanded into the argument list for
+  L{distutils.core.Extension}.'''
+
+  print 'checking for library %s...' % pkg,
+  if not pc_exists(pkg):
+    print 'not found'
+    print >>sys.stderr, 'Could not find required library "%s".' % pkg
+    if os.name == 'nt':
+      print >>sys.stderr, '(Check that you have the latest version of the dependency pack installed.)'
+    else:
+      print >>sys.stderr, '(Check that you have the appropriate development package installed.)'
+    sys.exit(1)
+
+  cflags = shlex.split(grab_stdout([pkg_config, '--cflags', pkg]))
+  libs = shlex.split(grab_stdout([pkg_config, '--libs', pkg]))
+
+  # Pick out anything interesting in the cflags and libs, and
+  # silently drop the rest.
+  def def_split(x):
+    pair = list(x.split('=', 1))
+    if len(pair) == 1:
+      pair.append(None)
+    return tuple(pair)
+  info = {
+    'define_macros': [def_split(x[2:]) for x in cflags if x[:2] == '-D'],
+    'include_dirs': [x[2:] for x in cflags if x[:2] == '-I'],
+    'libraries': [x[2:] for x in libs if x[:2] == '-l'],
+    'library_dirs': [x[2:] for x in libs if x[:2] == '-L'],
+  }
+
+  print 'ok'
+  return info
+
+
+ogg_info = pc_info('ogg')
+theoradec_info = pc_info('theoradec')
+glib_info = pc_info('glib-2.0')
+swscale_info = pc_info('libswscale')
+if os.name == 'nt':
+  # Windows systems: we just know what the OpenGL library is.
+  gl_info = {'libraries': ['opengl32']}
+  # And glib needs a slight hack to work correctly.
+  glib_info['define_macros'].append(('inline', '__inline'))
+else:
+  # Other systems: we ask pkg-config.
+  gl_info = pc_info('gl')
+# Build a similar info record for the numpy headers.
+numpy_info = {'include_dirs': [np.get_include()]}
+
+
+def combine_info(*args):
+  '''Combine multiple result dicts from L{pc_info} into one.'''
+
+  info = {
+    'define_macros': [],
+    'include_dirs': [],
+    'libraries': [],
+    'library_dirs': [],
+  }
+
+  for a in args:
+    info['define_macros'].extend(a.get('define_macros', []))
+    info['include_dirs'].extend(a.get('include_dirs', []))
+    info['libraries'].extend(a.get('libraries', []))
+    info['library_dirs'].extend(a.get('library_dirs', []))
+
+  return info
+
+
+# Extend the build_ext command further to rebuild the import libraries on
+# an MSVC build under Windows so they actually work.
+class build_ext(_build_ext):
+  def run(self, *args, **kw):
+    if self.compiler is None:
+      self.compiler = distutils.ccompiler.get_default_compiler()
+    if self.compiler == 'msvc':
+      msvc = distutils.ccompiler.new_compiler(compiler='msvc', verbose=self.verbose, dry_run=self.dry_run, force=self.force)
+      msvc.initialize()
+      for deffile in glob.glob(os.path.join('..', 'win32', 'deps', 'lib', '*.def')):
+        libfile = os.path.splitext(deffile)[0] + '.lib'
+        if newer(deffile, libfile):
+          msvc.spawn([msvc.lib, '/nologo', '/machine:x86', '/out:'+libfile, '/def:'+deffile])
+
+      # Also add the directory containing the msinttypes headers to the include path.
+      self.include_dirs.append(os.path.join('..', 'win32', 'deps', 'include', 'msinttypes'))
+
+    return _build_ext.run(self, *args, **kw)
+
 # Add the common arguments to setup().
 # This includes arguments to cause FoFiX's extension modules to be built.
 setup_args.update({
   'options': options,
   'ext_modules': [
-    Extension('cmgl', ['cmgl.pyx'], include_dirs=[np.get_include()], libraries=['opengl32' if os.name == 'nt' else 'GL']),
+    Extension('cmgl', ['cmgl.pyx'], **combine_info(numpy_info, gl_info)),
     Extension('pypitch._pypitch',
               language='c++',
               sources=['pypitch/_pypitch.pyx', 'pypitch/pitch.cpp',
-                       'pypitch/AnalyzerInput.cpp'])
+                       'pypitch/AnalyzerInput.cpp']),
+    Extension('VideoPlayer', ['VideoPlayer.pyx', 'VideoPlayerCore.c'],
+              **combine_info(gl_info, ogg_info, theoradec_info, glib_info, swscale_info))
   ],
   'cmdclass': {'build_ext': build_ext},
 })
+
+# If we're on Windows, add the dependency directory to the PATH so py2exe will
+# pick up necessary DLLs from there.
+if os.name == 'nt':
+  os.environ['PATH'] = os.path.abspath(os.path.join('..', 'win32', 'deps', 'bin')) + os.pathsep + os.environ['PATH']
 
 # And finally...
 setup(**setup_args)

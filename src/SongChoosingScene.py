@@ -293,7 +293,7 @@ class SongChoosingScene(Scene):
   
   def prepareSetlist(self, songs):
     if self.songLoader:
-      self.songLoader.cancel()
+      self.songLoader.stop()
     msg = self.engine.setlistMsg
     self.engine.setlistMsg = None
     self.selectedIndex = 0
@@ -680,7 +680,7 @@ class SongChoosingScene(Scene):
       self.song = None
     self.selectedItem = None
     if self.songLoader:
-      self.songLoader.cancel()
+      self.songLoader.stop()
       self.songLoader = None
     
   def updateSelection(self):
@@ -723,11 +723,11 @@ class SongChoosingScene(Scene):
       return
     if self.songLoader:
       try:
-        self.songLoader.cancel()
+        self.songLoader.stop()
       except:
         self.songLoader = None
     
-    self.songLoader = self.engine.resource.load(self, None, lambda: Song.loadSong(self.engine, song, playbackOnly = True, library = self.library), synch = False, onLoad = self.songLoaded, onCancel = self.songCanceled)
+    self.songLoader = self.engine.resource.load(self, None, lambda: Song.loadSong(self.engine, song, playbackOnly = True, library = self.library), synch = True, onLoad = self.songLoaded, onCancel = self.songCanceled)
   
   def songCanceled(self):
     self.songLoader = None
@@ -799,7 +799,9 @@ class SongChoosingScene(Scene):
           self.moreInfoTime = 500
         return
       if self.songLoader:
-        self.songLoader.cancel()
+        self.songLoader.stop()
+        self.songLoader = None
+        return
       if self.song:
           self.song.fadeout(1000)
       if self.library != Song.DEFAULT_LIBRARY and not self.tut and (self.listingMode == 0 or self.careerMode):

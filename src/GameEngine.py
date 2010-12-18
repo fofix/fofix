@@ -201,6 +201,7 @@ Config.define("game", "drum_sp_mode",      int, 0,  text = _("Drum SP"), options
 Config.define("game", "large_drum_neck",      bool, False,  text = _("Large Drum Neck"), options = {False: _("No"), True: _("Yes")}, tipText = _("If enabled, will show a larger neck when playing drums."))
 Config.define("game", "bass_groove_neck",      int, 2,  text = _("Bass Groove Neck"), options = {0: _("Off"), 1: _("Replace"), 2: _("Overlay")}, tipText = _("Sets the style of the Bass Groove neck. 'Replace' replaces your neck with the special neck, while 'Overlay' lays the neck over top."))
 Config.define("game", "guitar_solo_neck",      int, 2,  text = _("Guitar Solo Neck"), options = {0: _("Off"), 1: _("Replace"), 2: _("Overlay")}, tipText = _("Sets the style of the Guitar Solo neck. 'Replace' replaces your neck with the special neck, while 'Overlay' lays the neck over top."))
+Config.define("game", "4x_neck",      int, 2,  text = _("4x Neck"), options = {0: _("Off"), 1: _("Replace"), 2: _("Overlay")}, tipText = _("Sets the style of the 4x multiplier neck. 'Replace' replaces your neck with the special neck, while 'Overlay' lays the neck over top."))
 Config.define("game", "show_unused_text_events",      bool, False,  text = _("Show Unused Events"), options = {False: _("No"), True: _("Yes")}, tipText = _("If enabled, various MIDI events not used by the game will be shown on-screen."))
 Config.define("game", "bass_kick_sound",      bool, False,  text = _("Kick Bass Sound"), options = {False: _("Off"), True: _("On")}, tipText = _("If enabled, you'll hear a kick bass sound when you use the kick pedal."))
 Config.define("game", "rb_midi_lyrics",           int,  1,   text = _("Show Lyrics in All Modes"), options = {0: _("No"), 1: _("Single Player"), 2: _("Always")}, tipText = _("Sets whether or not MIDI lyrics will be displayed in modes without a vocalist. 'Single Player' will only show lyrics when in Solo modes."))
@@ -237,6 +238,7 @@ Config.define("game",  "neck_alpha",  float,    1.0,  text = _("Main Neck"),   o
 Config.define("game",  "solo_neck_alpha",  float,    1.0,  text = _("Solo Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]), tipText = _("Set the transparency of the solo neck. 100% is fully visible."))
 Config.define("game",  "bg_neck_alpha",  float,    1.0,  text = _("Bass Groove Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]), tipText = _("Set the transparency of the bass groove neck. 100% is fully visible."))
 Config.define("game",  "fail_neck_alpha",  float,    1.0,  text = _("Fail Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]), tipText = _("Set the transparency of the failing neck. 100% is fully visible."))
+Config.define("game",  "4x_neck_alpha",  float,    1.0,  text = _("4x Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]), tipText = _("Set the transparency of the 4x multiplier neck. 100% is fully visible."))
 Config.define("game",  "overlay_neck_alpha",  float,    1.0,  text = _("Overlay Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]), tipText = _("Set the transparency of neck overlays. 100% is fully visible."))
 Config.define("game",  "necks_alpha",  float,    1.0,  text = _("All Necks"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]), tipText = _("Set the master transparency of all necks. 100% is fully visible."))
 Config.define("songlist",  "nil_show_next_score", int, 0, text = _("Show Any Available Score"), options = {0: _("Off"), 1: _("On")}, tipText = _("When set to 'On', this will look for any available score on the currently selected instrument for setlist score display, if one is not available at the chosen difficulty."))
@@ -607,7 +609,7 @@ class GameEngine(object):
     self.stageFolders = []
     currentTheme = themename
     
-    stagespath = os.path.join(Version.dataPath(), "themes", currentTheme, "stages")
+    stagespath = os.path.join(Version.dataPath(), "themes", currentTheme, "backgrounds")
     themepath  = os.path.join(Version.dataPath(), "themes", currentTheme)
     if os.path.exists(stagespath):
       self.stageFolders = []

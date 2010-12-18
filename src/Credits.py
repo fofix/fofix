@@ -40,11 +40,7 @@ import Player
 import Config
 import Dialogs
 
-try:
-  from VideoPlayer import VideoPlayer
-  videoAvailable = True
-except:
-  videoAvailable = False
+from VideoPlayer import VideoLayer, VideoPlayerError
 
 class Element:
   """A basic element in the credits scroller."""
@@ -173,24 +169,17 @@ class Credits(Layer, KeyListener):
     self.videoLayer = False
     self.background = None
 
-    if videoAvailable:
-      # TODO: Parameters to add to theme.ini:
-      #  - credits_video_file
-      #  - credits_video_start_time
-      #  - credits_video_end_time
-      vidSource = os.path.join(Version.dataPath(), 'themes', self.themename, \
-                               'menu', 'credits.ogv')
-      if os.path.exists(vidSource):
-        winWidth, winHeight = self.engine.view.geometry[2:4]
-        songVideoStartTime = 0
-        songVideoEndTime = None
-        self.vidPlayer = VideoPlayer(-1, vidSource, (winWidth, winHeight),
-                                     mute = True, loop = True,
-                                     startTime = songVideoStartTime,
-                                     endTime = songVideoEndTime)
-        if self.vidPlayer.validFile:
-          self.engine.view.pushLayer(self.vidPlayer)
-          self.videoLayer = True
+    vidSource = os.path.join(Version.dataPath(), 'themes', self.themename, \
+                             'menu', 'credits.ogv')
+    if os.path.isfile(vidSource):
+      try:
+        self.vidPlayer = VideoLayer(self.engine, vidSource, mute = True, loop = True)
+      except (IOError, VideoPlayerError):
+        Log.error('Error loading credits video:')
+      else:
+        self.vidPlayer.play()
+        self.engine.view.pushLayer(self.vidPlayer)
+        self.videoLayer = True
 
     if not self.videoLayer and \
        not self.engine.loadImgDrawing(self, 'background', os.path.join('themes', self.themename, 'menu', 'credits.png')):

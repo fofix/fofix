@@ -7,7 +7,7 @@
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
-# as published by the Free Software Foundation; either version 2    #
+# as published by the Free Software Foundation; either version 2    #++-
 # of the License, or (at your option) any later version.            #
 #                                                                   #
 # This program is distributed in the hope that it will be useful,   #
@@ -58,7 +58,8 @@ class Neck:
     self.neckAlpha.append( self.neckAlpha[0] * self.engine.config.get("game", "bg_neck_alpha") ) # bass groove neck
     self.neckAlpha.append( self.neckAlpha[0] * self.engine.config.get("game", "overlay_neck_alpha") ) # overlay neck
     self.neckAlpha.append( self.neckAlpha[0] * self.engine.config.get("game", "fail_neck_alpha") ) # fail neck
-
+    self.neckAlpha.append( self.neckAlpha[0] * self.engine.config.get("game", "4x_neck_alpha") ) # 4x multi neck
+	
     self.boardWidth     = self.engine.theme.neckWidth
     self.boardLength    = self.engine.theme.neckLength
     self.shaderSolocolor    = self.engine.theme.shaderSolocolor
@@ -146,6 +147,7 @@ class Neck:
     #myfingershurt:
     self.bassGrooveNeckMode = self.engine.config.get("game", "bass_groove_neck")
     self.guitarSoloNeckMode = self.engine.config.get("game", "guitar_solo_neck")
+    self.fourxNeckMode = self.engine.config.get("game", "4x_neck")
 
 
     self.useMidiSoloMarkers = False
@@ -238,7 +240,7 @@ class Neck:
     #myfingershurt: Bass Groove neck:
     self.bassGrooveNeck = None
 
-    if self.bassGrooveNeckMode > 0:
+    if self.isBassGuitar and self.bassGrooveNeckMode > 0:
       if self.bassGrooveNeckMode == 2:  #overlay neck
         engine.loadImgDrawing(self, "bassGrooveNeck", os.path.join(themepath, "bass", "bassgrooveneckovr.png"))
       if self.bassGrooveNeckMode == 1 or not self.bassGrooveNeck:  #replace neck
@@ -252,6 +254,12 @@ class Neck:
           loadImage("soloNeck", "soloneck.png")
         elif self.guitarSoloNeckMode == 2:  #overlay neck
           loadImage("soloNeck", "soloneckovr.png")
+
+    if not self.isBassGuitar and self.fourxNeckMode > 0:
+      if self.fourxNeckMode == 1:  #replace neck
+        engine.loadImgDrawing(self, "fourMultiNeck", os.path.join(themepath, "fourmultineck.png"))
+      if self.fourxNeckMode == 2:  #overlay neck
+        engine.loadImgDrawing(self, "fourMultiNeck", os.path.join(themepath, "fourmultineckovr.png"))
 
     self.isFailing = False
     self.canGuitarSolo = self.instrument.canGuitarSolo
@@ -341,6 +349,9 @@ class Neck:
                       elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
                         neckImg = self.bassGrooveNeck
                         alpha   = self.neckAlpha[3]
+                      elif self.fourMultiNeck and self.scoreMultiplier == 4 and self.fourxNeckMode == 1:
+                        neckImg = self.fourMultiNeck
+                        alpha   = self.neckAlpha[6]
                       else:
                         neckImg = self.neckDrawing
                         alpha   = self.neckAlpha[1]
@@ -372,6 +383,8 @@ class Neck:
                   neckImg = self.oNeck
                 elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
                   neckImg = self.bassGrooveNeck
+                elif self.fourMultiNeck and self.scoreMultiplier == 4 and self.fourxNeckMode == 1:
+                  neckImg = self.fourMultiNeck
                 else:
                   neckImg = self.neckDrawing
                 self.renderIncomingNeck(visibility, song, pos, time, neckImg)
@@ -439,6 +452,8 @@ class Neck:
       neck = self.soloNeck
     elif self.scoreMultiplier > 4 and self.bassGrooveNeck and self.bassGrooveNeckMode == 1:
       neck = self.bassGrooveNeck
+    elif self.fourxNeckMode == 1 and self.fourMultiNeck and self.scoreMultiplier == 4:
+      neck = self.fourMultiNeck
     elif self.instrument.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and self.scoreMultiplier <= 4 and not self.ovrneckoverlay:
       neck = self.oNeck
     else:
@@ -449,10 +464,13 @@ class Neck:
     
     if self.guitarSolo and self.soloNeck and self.guitarSoloNeckMode == 2:   #static overlay
       self.renderNeckMethod(v*self.neckAlpha[2], 0, self.soloNeck)
-      
-    elif self.bgcount > 0 and self.bassGrooveNeck and self.bassGrooveNeckMode == 2:   #static bass groove overlay
+ 
+    if self.bgcount > 0 and self.bassGrooveNeck and self.bassGrooveNeckMode == 2:   #static bass groove overlay
       self.renderNeckMethod(v*self.bgcount*self.neckAlpha[3], 0, self.bassGrooveNeck)
-      
+
+    if self.fourMultiNeck and self.fourxNeckMode == 2 and self.scoreMultiplier == 4:   #4x multi overlay neck
+      self.renderNeckMethod(v*self.neckAlpha[6], offset, self.fourMultiNeck)
+
     if self.spcount2 != 0 and self.spcount < 1.2 and self.oNeck:   #static overlay
       if self.oNeckovr and (self.scoreMultiplier > 4 or self.guitarSolo or self.ovrneckoverlay):
         neck = self.oNeckovr
