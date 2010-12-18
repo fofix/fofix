@@ -452,7 +452,7 @@ class Neck:
       neck = self.soloNeck
     elif self.scoreMultiplier > 4 and self.bassGrooveNeck and self.bassGrooveNeckMode == 1:
       neck = self.bassGrooveNeck
-    elif self.scoreMultiplier == 4 and self.fourMultiNeck and self.fourxNeckMode == 1:
+    elif self.fourxNeckMode == 1 and self.fourMultiNeck and self.scoreMultiplier == 4:
       neck = self.fourMultiNeck
     elif self.instrument.starPowerActive and not (self.spcount2 != 0 and self.spcount < 1.2) and self.oNeck and self.scoreMultiplier <= 4 and not self.ovrneckoverlay:
       neck = self.oNeck
@@ -469,7 +469,7 @@ class Neck:
       self.renderNeckMethod(v*self.bgcount*self.neckAlpha[3], 0, self.bassGrooveNeck)
 
     if self.fourMultiNeck and self.fourxNeckMode == 2 and self.scoreMultiplier == 4:   #4x multi overlay neck
-      self.renderNeckMethod(v*self.bgcount*self.neckAlpha[6], offset, self.fourMultiNeck)
+      self.renderNeckMethod(v*self.neckAlpha[6], offset, self.fourMultiNeck)
 
     if self.spcount2 != 0 and self.spcount < 1.2 and self.oNeck:   #static overlay
       if self.oNeckovr and (self.scoreMultiplier > 4 or self.guitarSolo or self.ovrneckoverlay):
