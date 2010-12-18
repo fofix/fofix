@@ -2309,7 +2309,12 @@ class GuitarScene(Scene):
     elif self.neckIntoAnimationType == 2:#Rock Band
       self.boardZ = 5
     elif self.neckIntoAnimationType == 4:#By Theme: will implememnt at later point
-      self.boardY = 1
+      if self.neckintroThemeType == "fofix"::#Original
+        self.boardY = 2
+      elif self.neckintroThemeType == "guitar hero"::#Guitar Hero
+        self.boardY = 10
+      elif self.neckintroThemeType == "rockband":#Rock Band
+        self.boardZ = 5
     self.setCamera()
 
 
@@ -5264,7 +5269,7 @@ class GuitarScene(Scene):
     if self.song and self.song.readyToGo:
       pos = self.getSongPosition()
       #weirdpeople - differant styles for the start animation of the fretboard
-      if self.neckIntoAnimationType == 0: #Original
+      if self.neckIntoAnimationType == 0 or (self.neckIntroAnimationType == 4 and self.neckintroThemeType == "fofix"): #Original
         if self.boardY <= 1:
           self.setCamera()
           if self.countdown > 0: #if the countdown is already at 0 ex. after pause
@@ -5273,29 +5278,25 @@ class GuitarScene(Scene):
         elif self.boardY > 1:
           self.boardY -= 0.01 #speed of animation higher the number = the faster the animation
           self.setCamera()
-      elif self.neckIntoAnimationType == 1: #Guitar Hero
+      elif self.neckIntoAnimationType == 1 or (self.neckIntroAnimationType == 4 and self.neckintroThemeType == "guitar hero"): #Guitar Hero
         if self.boardY <= 1:
           self.setCamera()
           if self.countdown > 0:
             self.countdownOK = True
             self.boardY = 1
         elif self.boardY > 1:
-          self.boardY -= 0.3
+          self.boardY -= 0.2
           self.setCamera()
-      elif self.neckIntoAnimationType == 2: #Rock Band
+      elif self.neckIntoAnimationType == 2 or (self.neckIntroAnimationType == 4 and self.neckintroThemeType == "rockband"): #Rock Band
         if self.boardZ <= 1:
           self.setCamera()
           if self.countdown > 0:
             self.countdownOK = True
             self.boardZ = 1
         elif self.boardZ > 1:
-          self.boardZ -= 0.1
+          self.boardZ -= 0.2
           self.setCamera()
       elif self.neckIntoAnimationType == 3: #Off
-        self.setCamera()
-        if self.countdown > 0:
-          self.countdownOK = True
-      elif self.neckIntoAnimationType == 4: #By theme: will implement at a later point
         self.setCamera()
         if self.countdown > 0:
           self.countdownOK = True
