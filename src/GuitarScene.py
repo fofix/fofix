@@ -361,6 +361,7 @@ class GuitarScene(Scene):
     self.ending           = False
 
     self.neckIntoAnimationType = self.engine.config.get("fretboard", "neck_intro_animation")#weirdpeople
+	self.neckintroThemeType = self.engine.theme.povIntroAnimation
     
     povList = [str(self.targetX), str(self.targetY), str(self.targetZ), str(self.originX), str(self.originY), str(self.originZ)]
     if "None" not in povList:
@@ -1712,7 +1713,7 @@ class GuitarScene(Scene):
         self.camera.target    = (0.0, 0.0, 4.0)
         self.camera.origin    = (0.0, 3.0, -3.0)
 
-    #weirdpeople - differant types of animations
+    #weirdpeople - differant types of fretbord into animations
     if self.neckIntoAnimationType == 0: #Original FoFiX rotate down into place
       self.camera.origin = (self.camera.origin[0], self.camera.origin[1]*self.boardY, self.camera.origin[2])
     elif self.neckIntoAnimationType == 1: #Guitar Hero type (from bottom of screen)
@@ -1723,8 +1724,15 @@ class GuitarScene(Scene):
       self.camera.origin    = (self.camera.origin[0], self.camera.origin[1], self.camera.origin[2]+self.boardZ-1)
     elif self.neckIntoAnimationType == 3: #Off game starts with the pov as is
 	  self.camera.origin    = self.camera.origin
-    elif self.neckIntoAnimationType == 4: #By Theme: will implememnt at later point
-	  self.camera.origin    = self.camera.origin
+    elif self.neckIntoAnimationType == 4: #By Theme
+      if self.neckintroThemeType == "fofix":
+        self.camera.origin = (self.camera.origin[0], self.camera.origin[1]*self.boardY, self.camera.origin[2])
+      elif self.neckintroThemeType == "guitar hero"
+         self.camera.target    = (self.camera.target[0], self.camera.target[1]+self.boardY-1, self.camera.target[2])
+         self.camera.origin    = (self.camera.origin[0], self.camera.origin[1]+self.boardY-1, self.camera.origin[2])
+      elif self.neckintroThemeType == "rockband"
+          self.camera.target    = (self.camera.target[0], self.camera.target[1], self.camera.target[2]+self.boardZ-1)
+          self.camera.origin    = (self.camera.origin[0], self.camera.origin[1], self.camera.origin[2]+self.boardZ-1)
 
   def freeResources(self):
     self.engine.view.setViewport(1,0)
