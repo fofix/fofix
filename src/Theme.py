@@ -159,7 +159,7 @@ class Theme(Task):
     self.boardFade = (get("fretboard_fade_amount", float, 1))
 	
 	#fretboard intro animation
-	self.povIntroAnimation = (get("fretboard_intro_animation", str, "fofix"))
+    self.povIntroAnimation = (get("fretboard_intro_animation", str, "fofix"))
  
     #Loading phrases
     self.loadingPhrase = get("loading_phrase", str, "Let's get this show on the Road_Impress the Crowd_" + 

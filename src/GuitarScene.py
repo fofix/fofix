@@ -361,7 +361,7 @@ class GuitarScene(Scene):
     self.ending           = False
 
     self.neckIntoAnimationType = self.engine.config.get("fretboard", "neck_intro_animation")#weirdpeople
-	self.neckintroThemeType = self.engine.theme.povIntroAnimation
+    self.neckintroThemeType = self.engine.theme.povIntroAnimation
     
     povList = [str(self.targetX), str(self.targetY), str(self.targetZ), str(self.originX), str(self.originY), str(self.originZ)]
     if "None" not in povList:
@@ -1727,10 +1727,10 @@ class GuitarScene(Scene):
     elif self.neckIntoAnimationType == 4: #By Theme
       if self.neckintroThemeType == "fofix":
         self.camera.origin = (self.camera.origin[0], self.camera.origin[1]*self.boardY, self.camera.origin[2])
-      elif self.neckintroThemeType == "guitar hero"
+      elif self.neckintroThemeType == "guitar hero":
          self.camera.target    = (self.camera.target[0], self.camera.target[1]+self.boardY-1, self.camera.target[2])
          self.camera.origin    = (self.camera.origin[0], self.camera.origin[1]+self.boardY-1, self.camera.origin[2])
-      elif self.neckintroThemeType == "rockband"
+      elif self.neckintroThemeType == "rockband":
           self.camera.target    = (self.camera.target[0], self.camera.target[1], self.camera.target[2]+self.boardZ-1)
           self.camera.origin    = (self.camera.origin[0], self.camera.origin[1], self.camera.origin[2]+self.boardZ-1)
 
