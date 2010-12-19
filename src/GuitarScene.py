@@ -360,6 +360,8 @@ class GuitarScene(Scene):
     self.customPOV        = False
     self.ending           = False
 
+    self.povTheme         = self.engine.theme.povPreset
+
     self.neckintroAnimationType = self.engine.config.get("fretboard", "neck_intro_animation")#weirdpeople
     self.neckintroThemeType = self.engine.theme.povIntroAnimation
     
@@ -423,8 +425,6 @@ class GuitarScene(Scene):
     #Get theme
     themename = self.engine.data.themeLabel
     self.theme = self.engine.data.theme
-
-    self.rmtype = self.theme
 
     if self.engine.theme.hopoIndicatorX != None:
       self.hopoIndicatorX   = self.engine.theme.hopoIndicatorX
@@ -1680,10 +1680,7 @@ class GuitarScene(Scene):
     #y=2 rotate front
     #z=-3
 
-    if self.rmtype == 3:
-      self.camera.target    = (0.0, 1.4, 1.8)
-      self.camera.origin    = (0.0, 2.8, -3.6)
-    elif self.customPOV:
+    if self.customPOV:
       self.camera.target    = (self.targetX, self.targetY, self.targetZ)
       self.camera.origin    = (self.originX, self.originY, self.originZ)
     else:
@@ -1700,15 +1697,18 @@ class GuitarScene(Scene):
         self.camera.target    = (0.0, -6.0, 2.6666666666)
         self.camera.origin    = (0.0, 6.0, 2.6666666665) 
       elif self.pov == 5: #Theme
-        if self.rmtype == 0:
+        if self.povTheme == "gh2":
           self.camera.target    = (0.0, 1.6, 2.0)
           self.camera.origin    = (0.0, 2.6, -3.6)
-        elif self.rmtype == 1:
+        elif self.povTheme == "gh3":
           self.camera.target    = (0.0, 0.6, 4.4) #Worldrave - Perfected the proper GH3 POV
           self.camera.origin    = (0.0, 3.5, -3.8)
-        elif self.rmtype == 2:
+        elif self.povTheme == "rb":
           self.camera.target    = (0.0, 0.0, 3.7)
           self.camera.origin    = (0.0, 2.9, -2.9)
+        elif self.povTheme == "fof":
+          self.camera.target    = (0.0, 0.0, 4.0)
+          self.camera.origin    = (0.0, 3.0, -3.0)
       else: # FoF
         self.camera.target    = (0.0, 0.0, 4.0)
         self.camera.origin    = (0.0, 3.0, -3.0)
@@ -5472,7 +5472,7 @@ class GuitarScene(Scene):
             self.engine.view.setViewportHalf(1,0)  
 
           streakFlag = 0  #set the flag to 0
-          if self.coOpGH and self.rmtype != 2:
+          if self.coOpGH and self.theme != 2:
             self.engine.view.setViewport(1,0)
           self.engine.theme.setBaseColor()
 

@@ -154,7 +154,10 @@ class Theme(Task):
     #Point of View (x, y, z)
     self.povTarget  = (get("pov_target_x", float), get("pov_target_y", float), get("pov_target_z", float))
     self.povOrigin  = (get("pov_origin_x", float), get("pov_origin_y", float), get("pov_origin_z", float))
-    
+
+    #pov presets
+    self.povPreset = (get("pov_preset", str, "rb"))
+
     #Fade settings for fretboard
     self.boardFade = (get("fretboard_fade_amount", float, 1))
 	
