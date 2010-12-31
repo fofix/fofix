@@ -806,5 +806,5 @@ class Neck:
       else:
         self.drawSideBars(visibility, song, pos)
 
-    if self.overdriveFlashCount < self.overdriveFlashCounts and oFlash:
+    if self.overdriveFlashCount < self.overdriveFlashCounts and self.oFlash:
       self.overdriveFlashCount = self.overdriveFlashCount + 1
