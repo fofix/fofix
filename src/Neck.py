@@ -222,6 +222,7 @@ class Neck:
  
     loadImage("sideBars", "side_bars.png")
     loadImage("oSideBars", "overdrive_side_bars.png")
+    loadImage("failSideBars", "fail_side_bars.png")
     loadImage("oCenterLines", "overdrive_center_lines.png")
     loadImage("centerLines", "center_lines.png")
     loadImage("oNeck", "overdriveneck.png")
@@ -578,9 +579,9 @@ class Neck:
     glEnable(GL_TEXTURE_2D)
     
     #MFH - logic to briefly display oFlash
-    if self.theme == 2 and self.overdriveFlashCount < self.overdriveFlashCounts and self.oFlash:
+    if self.overdriveFlashCount < self.overdriveFlashCounts and self.oFlash:
       self.oFlash.texture.bind()
-    elif self.theme == 2 and self.instrument.starPowerActive and self.oCenterLines:
+    elif self.instrument.starPowerActive and self.oCenterLines:
       self.oCenterLines.texture.bind()
     else:
       self.centerLines.texture.bind()
@@ -622,6 +623,8 @@ class Neck:
     def project(beat):
       return 0.125 * beat / self.beatsPerUnit  # glorandwarf: was 0.12
 
+    color = (1,1,1)
+
     v            = visibility
     w            = self.boardWidth + 0.15
     l            = self.boardLength
@@ -639,13 +642,27 @@ class Neck:
                          [0.0, project(offset + l * self.beatsPerUnit)],
                          [1.0, project(offset + l * self.beatsPerUnit)]], dtype=np.float32)
 
+    #must be separate for sidebar flashing.
+    board_col  = np.array([[color[0],color[1],color[2], 0],
+                             [color[0],color[1],color[2], 0],
+                             [color[0],color[1],color[2], v],
+                             [color[0],color[1],color[2], v],
+                             [color[0],color[1],color[2], v/self.boardFadeAmount],
+                             [color[0],color[1],color[2], v/self.boardFadeAmount],
+                             [color[0],color[1],color[2], 0],
+                             [color[0],color[1],color[2], 0]], dtype=np.float32)
+
     glEnable(GL_TEXTURE_2D)
-    if self.theme == 2 and self.instrument.starPowerActive and self.oSideBars:
+    if self.instrument.starPowerActive and self.oSideBars:
       self.oSideBars.texture.bind()
     else:
       self.sideBars.texture.bind()
+    if self.isFailing and self.failSideBars and v == self.failcount:
+      self.failSideBars.texture.bind()
+    else:
+      self.sideBars.texture.bind()
 
-    cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.sidebars_vtx, colors=self.board_col, texcoords=board_tex)
+    cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.sidebars_vtx, colors=board_col, texcoords=board_tex)
     
     glDisable(GL_TEXTURE_2D)
     
@@ -782,8 +799,11 @@ class Neck:
       self.renderIncomingNecks(visibility, song, pos) #MFH
       self.drawTrack(self.ocount, song, pos)
       self.drawBPM(visibility, song, pos)
-      self.drawSideBars(visibility, song, pos)
+      if self.isFailing and self.failSideBars:
+        self.drawSideBars(visibility, song, pos)
+        self.drawSideBars(self.failcount, song, pos)
+      else:
+        self.drawSideBars(visibility, song, pos)
 
-
-    if self.theme == 2 and self.overdriveFlashCount < self.overdriveFlashCounts:
+    if self.overdriveFlashCount < self.overdriveFlashCounts and oFlash:
       self.overdriveFlashCount = self.overdriveFlashCount + 1
