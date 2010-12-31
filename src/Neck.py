@@ -256,6 +256,7 @@ class Neck:
         elif self.guitarSoloNeckMode == 2:  #overlay neck
           loadImage("soloNeck", "soloneckovr.png")
 
+    self.fourMultiNeck = None
     if not self.isBassGuitar and self.fourxNeckMode > 0:
       if self.fourxNeckMode == 1:  #replace neck
         engine.loadImgDrawing(self, "fourMultiNeck", os.path.join(themepath, "fourmultineck.png"))
