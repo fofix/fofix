@@ -85,9 +85,20 @@ class Loader(Thread):
                        win32process.HIGH_PRIORITY_CLASS,
                        win32process.REALTIME_PRIORITY_CLASS]
 
+    threadPriorities = [win32process.THREAD_PRIORITY_IDLE,
+                        #win32process.THREAD_PRIORITY_ABOVE_IDLE,
+                        #win32process.THREAD_PRIORITY_LOWEST,
+                        win32process.THREAD_PRIORITY_BELOW_NORMAL,
+                        win32process.THREAD_PRIORITY_NORMAL,
+                        win32process.THREAD_PRIORITY_ABOVE_NORMAL,
+                        win32process.THREAD_PRIORITY_HIGHEST,
+                        win32process.THREAD_PRIORITY_TIME_CRITICAL]
+
     pid = win32api.GetCurrentProcessId()
+    tid = win32api.GetCurrentThread()
     handle = win32api.OpenProcess(win32con.PROCESS_ALL_ACCESS, True, pid)
     win32process.SetPriorityClass(handle, priorityClasses[priority])
+    win32process.SetThreadPriority(tid, threadPriorities[priority])
     if Config.get('performance', 'restrict_to_first_processor'):
       win32process.SetProcessAffinityMask(handle, 1)
     
