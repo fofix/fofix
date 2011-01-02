@@ -137,6 +137,7 @@ class Neck:
     self.spcount = 0
     self.spcount2 = 0
     self.bgcount = 0
+    self.fourXcount = 0
     self.ovrneckoverlay = self.engine.config.get("fretboard", "ovrneckoverlay")
     self.ocount = 0
     
@@ -292,38 +293,31 @@ class Neck:
     color = (1,1,1)
 
     glEnable(GL_TEXTURE_2D)
+
+    board_vtx = np.array([[-w / 2, 0, z],
+                            [w / 2, 0, z],
+                            [-w/ 2, 0, z + 1],
+                            [w / 2, 0, z + 1],
+                            [-w / 2, 0, z + 2 + l * .7],
+                            [w / 2, 0, z + 2 + l * .7],
+                            [-w / 2, 0, z + 2 + l],
+                            [w / 2, 0, z + 2 + l]], dtype=np.float32)
+
+    board_tex  = np.array([[0.0, project(offset - 2 * self.beatsPerUnit)],
+                         [1.0, project(offset - 2 * self.beatsPerUnit)],
+                         [0.0, project(offset - 1 * self.beatsPerUnit)],
+                         [1.0, project(offset - 1 * self.beatsPerUnit)],
+                         [0.0, project(offset + l * self.beatsPerUnit * .7)],
+                         [1.0, project(offset + l * self.beatsPerUnit * .7)],
+                         [0.0, project(offset + l * self.beatsPerUnit)],
+                         [1.0, project(offset + l * self.beatsPerUnit)]], dtype=np.float32)
+
     if neckTexture:
       neckTexture.texture.bind()
 
+    cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=board_vtx, colors=self.board_col, texcoords=board_tex)
 
-    glBegin(GL_TRIANGLE_STRIP)
-    glColor4f(color[0],color[1],color[2], 0)
-    glTexCoord2f(0.0, project(offset - 2 * self.beatsPerUnit))
-    glVertex3f(-w / 2, 0, z)   #point A
-    glTexCoord2f(1.0, project(offset - 2 * self.beatsPerUnit))
-    glVertex3f( w / 2, 0, z)   #point B
-
-    
-    glColor4f(color[0],color[1],color[2], v)
-    glTexCoord2f(0.0, project(offset - 1 * self.beatsPerUnit))
-    glVertex3f(-w / 2, 0, z+1)   #point C
-    glTexCoord2f(1.0, project(offset - 1 * self.beatsPerUnit))
-    glVertex3f( w / 2, 0, z+1)   #point D
-    
-    glTexCoord2f(0.0, project(offset + l * self.beatsPerUnit * .7))
-    glVertex3f(-w / 2, 0, z+2+l * .7) #point E
-    glTexCoord2f(1.0, project(offset + l * self.beatsPerUnit * .7))
-    glVertex3f( w / 2, 0, z+2+l * .7) #point F
-    
-    glColor4f(color[0],color[1],color[2], 0)
-    glTexCoord2f(0.0, project(offset + l * self.beatsPerUnit))
-    glVertex3f(-w / 2, 0, z+2+l)    #point G
-    glTexCoord2f(1.0, project(offset + l * self.beatsPerUnit))
-    glVertex3f( w / 2, 0, z+2+l)    #point H
-    glEnd()
-    
     glDisable(GL_TEXTURE_2D)
-
 
   def renderIncomingNecks(self, visibility, song, pos):
     if not song:
@@ -339,38 +333,35 @@ class Neck:
     if self.incomingNeckMode > 0:   #if enabled
       if self.useMidiSoloMarkers:
         for time, event in track.getEvents(boardWindowMin, boardWindowMax):
-          if isinstance(event, Song.MarkerNote):
-            if event.number == Song.starPowerMarkingNote:
-              if self.soloNeck:
-                if event.endMarker:   #solo end
-                  if self.incomingNeckMode == 2:    #render both start and end incoming necks
-                    if self.guitarSolo:   #only until the end of the guitar solo!
-                      if self.instrument.starPowerActive and self.oNeck and self.ovrneckoverlay == False:
-                        neckImg = self.oNeck
-                        alpha   = self.neckAlpha[4]
-                      elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
-                        neckImg = self.bassGrooveNeck
-                        alpha   = self.neckAlpha[3]
-                      elif self.fourMultiNeck and self.scoreMultiplier == 4 and self.fourxNeckMode == 1:
-                        neckImg = self.fourMultiNeck
-                        alpha   = self.neckAlpha[6]
-                      else:
-                        neckImg = self.neckDrawing
-                        alpha   = self.neckAlpha[1]
-                      self.renderIncomingNeck(visibility*alpha, song, pos, time, neckImg)
-                        
-                else:   #solo start
-                  if not self.guitarSolo:   #only until guitar solo starts!
-                    neckImg = self.soloNeck
-                    alpha   = self.neckAlpha[2]
-                    self.renderIncomingNeck(visibility*alpha, song, pos, time, neckImg)
-                    if self.spcount2 != 0 and self.spcount < 1.2 and self.oNeck:
-                      alpha = self.neckAlpha[4]
-                      if self.oNeckovr != None and (self.scoreMultiplier > 4 or self.guitarSolo or self.ovrneckoverlay == True):
-                        neck = self.oNeckovr
-                      else:
-                        neck = self.oNeck
-                      self.renderIncomingNeck(visibility*alpha, song, pos, time, neckImg)
+          if isinstance(event, Song.MarkerNote) and event.number == Song.starPowerMarkingNote and self.soloNeck: 
+            if event.endMarker:   #solo end
+              if self.incomingNeckMode == 2 and self.guitarSolo:    #render both start and end incoming necks and only until the end of the guitar solo
+                if self.instrument.starPowerActive and self.oNeck and self.ovrneckoverlay == False:
+                  neckImg = self.oNeck
+                  alpha   = self.neckAlpha[4]
+                elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
+                  neckImg = self.bassGrooveNeck
+                  alpha   = self.neckAlpha[3]
+                elif self.fourMultiNeck and self.scoreMultiplier == 4 and self.fourxNeckMode == 1:
+                  neckImg = self.fourMultiNeck
+                  alpha   = self.neckAlpha[6]
+                else:
+                  neckImg = self.neckDrawing
+                  alpha   = self.neckAlpha[1]
+                self.renderIncomingNeck(visibility*alpha, song, pos, time, neckImg)
+
+            else:    #solo start
+              if not self.guitarSolo:   #only until guitar solo starts!
+                neckImg = self.soloNeck
+                alpha   = self.neckAlpha[2]
+                self.renderIncomingNeck(visibility*alpha, song, pos, time, neckImg)
+                if self.spcount2 != 0 and self.spcount < 1.2 and self.oNeck:
+                  alpha = self.neckAlpha[4]
+                  if self.oNeckovr != None and (self.scoreMultiplier > 4 or self.guitarSolo or self.ovrneckoverlay == True):
+                    neck = self.oNeckovr
+                  else:
+                    neck = self.oNeck
+                  self.renderIncomingNeck(visibility*alpha, song, pos, time, neckImg)
 
       elif self.markSolos == 1:   #fall back on text-based guitar solo marking track
         for time, event in song.eventTracks[Song.TK_GUITAR_SOLOS].getEvents(boardWindowMin, boardWindowMax):
@@ -470,8 +461,8 @@ class Neck:
     if self.bgcount > 0 and self.bassGrooveNeck and self.bassGrooveNeckMode == 2:   #static bass groove overlay
       self.renderNeckMethod(v*self.bgcount*self.neckAlpha[3], 0, self.bassGrooveNeck)
 
-    if self.fourMultiNeck and self.fourxNeckMode == 2 and self.scoreMultiplier == 4:   #4x multi overlay neck
-      self.renderNeckMethod(v*self.neckAlpha[6], offset, self.fourMultiNeck)
+    if self.fourXcount > 0 and self.fourMultiNeck and self.fourxNeckMode == 2:   #4x multi overlay neck
+      self.renderNeckMethod(v*self.fourXcount*self.neckAlpha[6], offset, self.fourMultiNeck)
 
     if self.spcount2 != 0 and self.spcount < 1.2 and self.oNeck:   #static overlay
       if self.oNeckovr and (self.scoreMultiplier > 4 or self.guitarSolo or self.ovrneckoverlay):
@@ -527,12 +518,12 @@ class Neck:
     if shaders.enable("neck"):
       shaders.setVar("fretcol",neckcol)
       shaders.update()
-      glBegin(GL_TRIANGLE_STRIP)
-      glVertex3f(-w / 2, 0.1, -2)
-      glVertex3f(w / 2, 0.1, -2)
-      glVertex3f(-w / 2, 0.1, l)
-      glVertex3f(w / 2, 0.1, l)
-      glEnd()
+      shader_neck_vtx = np.array([[-w / 2, 0.1, -2],
+                                [w / 2, 0.1, -2],
+                                [-w / 2, 0.1, l],
+                                [w / 2, 0.1, l]], dtype=np.float32)
+
+      cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.shader_neck_vtx)
       shaders.disable()
     else:
       if self.isFailing:
@@ -587,7 +578,6 @@ class Neck:
     else:
       self.centerLines.texture.bind()
 
-      
     track_vtx       = np.array([[-w / 2, 0, -2+size],
                            [w / 2, 0, -2+size],
                            [-w / 2, 0, -1+size],
@@ -598,19 +588,8 @@ class Neck:
                            [w / 2, 0, l]], dtype=np.float32)
     
     if self.staticStrings:    #MFH
-      color = (1,1,1)
-      track_col  = np.array([[color[0],color[1],color[2], v],
-                         [color[0],color[1],color[2], v],
-                         [color[0],color[1],color[2], v],
-                         [color[0],color[1],color[2], v],
-                         [color[0],color[1],color[2], v/self.boardFadeAmount],
-                         [color[0],color[1],color[2], v/self.boardFadeAmount],
-                         [color[0],color[1],color[2], 0],
-                         [color[0],color[1],color[2], 0]], dtype=np.float32)
-      cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=track_vtx, colors=track_col, texcoords=track_tex)
-
+      cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=track_vtx, colors=self.board_col, texcoords=track_tex)
     else:   #MFH: original moving strings
-
       cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=track_vtx, colors=self.board_col, texcoords=track_tex)
 
     glDisable(GL_TEXTURE_2D)
@@ -789,6 +768,16 @@ class Neck:
       self.bgcount -= .1
       if self.bgcount < 0:
         self.bgcount = 0
+
+    if self.scoreMultiplier == 4 and self.fourXcount < 1:
+      self.fourXcount += .1
+      if self.fourXcount > 1:
+        self.fourXcount = 1
+    if not self.scoreMultiplier == 4 and self.fourXcount > 0:
+      self.fourXcount -= .1
+      if self.fourXcount < 0:
+        self.fourXcount = 0
+
     if not (self.instrument.coOpFailed and not self.instrument.coOpRestart):
 
       if self.ocount < 1:
