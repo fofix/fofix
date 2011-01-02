@@ -356,7 +356,7 @@ class MainMenu(BackgroundLayer):
         if self.optionsBG != None:
           self.engine.drawImage(self.optionsBG, (self.opt_bkg_size[2],-self.opt_bkg_size[3]), (w*self.opt_bkg_size[0],h*self.opt_bkg_size[1]), stretched = 3)
           
-        self.engine.drawImage(self.optionsPanel, (0.5,-0.5), (w/1.7, h/2))
+        self.engine.drawImage(self.optionsPanel, (1.0,-1.0), (w/2, h/2), stretched = 3)
       else:
         self.engine.drawImage(self.engine.data.loadingImage, (1.0,-1.0), (w/2, h/2), stretched = 3)
 
