@@ -203,6 +203,11 @@ class Theme(Task):
     self.neck_prompt_x = get("menu_neck_choose_x", float,  0.1)
     self.neck_prompt_y = get("menu_neck_choose_y", float, 0.05)
 
+    #Big Rock Ending and Solo Frame Graphics
+    self.breScoreBackgroundScale = get("breScoreBackgroundScale", float,  1.0)
+    self.breScoreFrameScale      = get("breScoreFrameScale", float,  1.0)
+    self.soloFrameScale          = get("soloFrameScale", float,  1.0)
+
     #Setlist
     #This is really a bit of a mess but luckily most of the names are quite self
     #explanatory.  These values are only necessary if your theme is using the old
