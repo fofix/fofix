@@ -356,7 +356,7 @@ class MainMenu(BackgroundLayer):
         if self.optionsBG != None:
           self.engine.drawImage(self.optionsBG, (self.opt_bkg_size[2],-self.opt_bkg_size[3]), (w*self.opt_bkg_size[0],h*self.opt_bkg_size[1]), stretched = 3)
           
-        self.engine.drawImage(self.optionsPanel, (0.5,-0.5), (w/1.7, h/2))
+        self.engine.drawImage(self.optionsPanel, (1.0,-1.0), (w/2, h/2), stretched = 3)
       else:
         self.engine.drawImage(self.engine.data.loadingImage, (1.0,-1.0), (w/2, h/2), stretched = 3)
 
@@ -383,11 +383,11 @@ class MainMenu(BackgroundLayer):
         self.engine.drawImage(self.BGText, 
                               scale = (wFactor*sFactor,-hFactor*sFactor), 
                               coord = textcoord,
-                              rect  = (xpos[0],xpos[1],ypos[0],ypos[1]))
+                              rect  = (xpos[0],xpos[1],ypos[0],ypos[1]), stretched = 11)
 
 #racer: added version tag to main menu:
     if self.version != None:
-          wfactor = self.version.widthf(pixelw = 640.000)
-          self.engine.drawImage(self.version, (0.5,-0.5),(w*self.engine.theme.versiontagposX, h*self.engine.theme.versiontagposY)) #worldrave - Added theme settings to control X+Y positions of versiontag.
+          wfactor = (w * self.engine.theme.versiontagScale) / self.version.width1()
+          self.engine.drawImage(self.version,( wfactor, -wfactor ),(w*self.engine.theme.versiontagposX, h*self.engine.theme.versiontagposY)) #worldrave - Added theme settings to control X+Y positions of versiontag.
 
 

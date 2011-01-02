@@ -1359,8 +1359,7 @@ class GuitarScene(Scene):
     #brescorebackground.png
     self.breScoreBackground = None
     if self.engine.loadImgDrawing(self, "breScoreBackground", os.path.join("themes",themename,"brescorebackground.png")):
-      breScoreBackgroundImgwidth = self.breScoreBackground.width1()
-      self.breScoreBackgroundWFactor = 640.000/breScoreBackgroundImgwidth
+      self.breScoreBackgroundWFactor = (w * self.engine.theme.breScoreBackgroundScale) / self.breScoreBackground.width1()
     else:
       Log.debug("BRE score background image loading problem!")
       self.breScoreBackground = None
@@ -1369,13 +1368,11 @@ class GuitarScene(Scene):
     #brescoreframe.png
     self.breScoreFrame = None
     if self.engine.loadImgDrawing(self, "breScoreFrame", os.path.join("themes",themename,"brescoreframe.png")):
-      breScoreFrameImgwidth = self.breScoreFrame.width1()
-      self.breScoreFrameWFactor = 640.000/breScoreFrameImgwidth
+      self.breScoreFrameWFactor = (w * self.engine.theme.breScoreFrameScale) / self.breScoreFrame.width1()
     else:
       #MFH - fallback on using soloframe.png if no brescoreframe.png is found
       if self.engine.loadImgDrawing(self, "breScoreFrame", os.path.join("themes",themename,"soloframe.png")):
-        breScoreFrameImgwidth = self.breScoreFrame.width1()
-        self.breScoreFrameWFactor = 640.000/breScoreFrameImgwidth
+        self.breScoreFrameWFactor = (w * self.engine.theme.breScoreFrameScale) / self.breScoreFrame.width1()
       else:
         self.breScoreFrame = None
         self.breScoreFrameWFactor = None
@@ -1383,8 +1380,7 @@ class GuitarScene(Scene):
 
 
     if self.engine.loadImgDrawing(self, "soloFrame", os.path.join("themes",themename,"soloframe.png")):
-      soloImgwidth = self.soloFrame.width1()
-      self.soloFrameWFactor = 80.000/soloImgwidth
+      self.soloFrameWFactor = (w * self.engine.theme.soloFrameScale) / self.soloFrame.width1()
     else:
       self.soloFrame = None
       self.soloFrameWFactor = None
@@ -5673,7 +5669,7 @@ class GuitarScene(Scene):
                       tempWScale = frameWidth*self.soloFrameWFactor
                       tempHScale = -(frameHeight)*self.soloFrameWFactor
 
-                      self.engine.drawImage(self.soloFrame, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*boxXOffset,boxYOffset), stretched = 11)
+                      self.engine.drawImage(self.soloFrame, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*boxXOffset,boxYOffset))
     
                     self.solo_soloFont.render(text1, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #centered
                     self.solo_soloFont.render(text2, (0.5 - Tw2/2, yOffset+lineSpacing),(1, 0, 0),txtSize)   #centered
@@ -5921,7 +5917,7 @@ class GuitarScene(Scene):
                         self.solo_boxYOffset[i] = self.hPlayer[i]-(self.hPlayer[i]* ((self.solo_yOffset[i] + self.solo_Th[i]/2.0 ) / self.fontScreenBottom) )   
                         tempWScale = frameWidth*self.soloFrameWFactor
                         tempHScale = -(frameHeight)*self.soloFrameWFactor
-                        self.engine.drawImage(self.soloFrame, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*self.solo_boxXOffset[i],self.solo_boxYOffset[i]), stretched = 11)
+                        self.engine.drawImage(self.soloFrame, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*self.solo_boxXOffset[i],self.solo_boxYOffset[i]))
                       self.solo_soloFont.render(self.solo_soloText[i], (self.solo_xOffset[i], self.solo_yOffset[i]),(1, 0, 0),self.solo_txtSize)
 
                 if self.coOpType: #1 BRE in co-op
@@ -5954,7 +5950,7 @@ class GuitarScene(Scene):
                       boxXOffset = self.wPlayer[i]*xOffset
                     tempWScale = frameWidth*self.breScoreFrameWFactor
                     tempHScale = -(frameHeight)*self.breScoreFrameWFactor
-                    self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset), stretched = 11)
+                    self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
 
                   self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize/2.0)
 
@@ -5983,7 +5979,7 @@ class GuitarScene(Scene):
                       boxXOffset = self.wPlayer[i]*xOffset
                     tempWScale = frameWidth*self.breScoreBackgroundWFactor
                     tempHScale = -(frameHeight)*self.breScoreBackgroundWFactor
-                    self.engine.drawImage(self.breScoreBackground, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset), stretched = 11)
+                    self.engine.drawImage(self.breScoreBackground, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
 
 
                   if self.breScoreFrame:
@@ -5997,7 +5993,7 @@ class GuitarScene(Scene):
                       boxXOffset = self.wPlayer[i]*xOffset
                     tempWScale = frameWidth*self.breScoreFrameWFactor
                     tempHScale = -(frameHeight)*self.breScoreFrameWFactor
-                    self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset), stretched = 11)
+                    self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
                   self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
               
                 elif scoreCard.freestyleWasJustActive and not scoreCard.endingStreakBroken and scoreCard.endingAwarded and oneTime == True:
@@ -6019,7 +6015,7 @@ class GuitarScene(Scene):
                       boxXOffset = self.wPlayer[i]*xOffset
                     tempWScale = frameWidth*self.breScoreFrameWFactor
                     tempHScale = -(frameHeight)*self.breScoreFrameWFactor
-                    self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset), stretched = 11)
+                    self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
 
                   self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize/2.0)
 
@@ -6048,7 +6044,7 @@ class GuitarScene(Scene):
                       boxXOffset = self.wPlayer[i]*xOffset
                     tempWScale = frameWidth*self.breScoreBackgroundWFactor
                     tempHScale = -(frameHeight)*self.breScoreBackgroundWFactor
-                    self.engine.drawImage(self.breScoreBackground, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset), stretched = 11)
+                    self.engine.drawImage(self.breScoreBackground, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
 
                   if self.breScoreFrame:
                     frameWidth = tW*1.15
@@ -6061,7 +6057,7 @@ class GuitarScene(Scene):
                       boxXOffset = self.wPlayer[i]*xOffset
                     tempWScale = frameWidth*self.breScoreFrameWFactor
                     tempHScale = -(frameHeight)*self.breScoreFrameWFactor
-                    self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset), stretched = 11)
+                    self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
                   self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
               
                 elif scoreCard.freestyleWasJustActive and scoreCard.endingStreakBroken and oneTime == True:
@@ -6083,7 +6079,7 @@ class GuitarScene(Scene):
                       boxXOffset = self.wPlayer[i]*xOffset
                     tempWScale = frameWidth*self.breScoreFrameWFactor
                     tempHScale = -(frameHeight)*self.breScoreFrameWFactor
-                    self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset), stretched = 11)
+                    self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
 
                   self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize/2.0)
 
@@ -6116,7 +6112,7 @@ class GuitarScene(Scene):
                       boxXOffset = self.wPlayer[i]*xOffset
                     tempWScale = frameWidth*self.breScoreBackgroundWFactor
                     tempHScale = -(frameHeight)*self.breScoreBackgroundWFactor
-                    self.engine.drawImage(self.breScoreBackground, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset), stretched = 11)
+                    self.engine.drawImage(self.breScoreBackground, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
 
                   if self.breScoreFrame:
                     frameWidth = tW*1.15
@@ -6129,7 +6125,7 @@ class GuitarScene(Scene):
                       boxXOffset = self.wPlayer[i]*xOffset
                     tempWScale = frameWidth*self.breScoreFrameWFactor
                     tempHScale = -(frameHeight)*self.breScoreFrameWFactor
-                    self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset), stretched = 11)
+                    self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
                   self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
             
             self.engine.view.setViewportHalf(1,0)

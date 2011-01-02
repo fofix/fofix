@@ -203,6 +203,11 @@ class Theme(Task):
     self.neck_prompt_x = get("menu_neck_choose_x", float,  0.1)
     self.neck_prompt_y = get("menu_neck_choose_y", float, 0.05)
 
+    #Big Rock Ending and Solo Frame Graphics
+    self.breScoreBackgroundScale = get("breScoreBackgroundScale", float,  1.0)
+    self.breScoreFrameScale      = get("breScoreFrameScale", float,  1.0)
+    self.soloFrameScale          = get("soloFrameScale", float,  1.0)
+
     #Setlist
     #This is really a bit of a mess but luckily most of the names are quite self
     #explanatory.  These values are only necessary if your theme is using the old
@@ -249,10 +254,9 @@ class Theme(Task):
     self.song_rb2_diff_colorVar        = get("song_rb2_diff_color",        "color", "#FFBF00")
     
     #These determine the position of the version tag on the main menu.
-    #Usually it's easier to just create a 640x480 picture and position it
-    #in that because by default the image is position in the middle of the window
+    self.versiontagScale = get("versiontagScale", float, 0.5)
     self.versiontagposX = get("versiontagposX", float, 0.5)
-    self.versiontagposY = get("versiontagposY", float, 0.5)
+    self.versiontagposY = get("versiontagposY", float, 0.05)
     
     #pause menu and fail menu positions and text colors
     self.pause_bkg_pos           = get("pause_bkg",                str, "0.5,0.5,1.0,1.0").split(",")
