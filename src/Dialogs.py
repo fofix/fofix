@@ -421,10 +421,12 @@ class LoadingScreen(Layer, KeyListener):
       fadeScreen(v)
 
       w, h = self.engine.view.geometry[2:4]
+      self.loadingImage = self.engine.data.loadingImage
       
       #MFH - auto-scaling of loading screen
       #Volshebnyi - fit to screen applied
-      self.engine.drawImage(self.engine.data.loadingImage, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
+      if self.loadingImage:
+        self.engine.drawImage(self.loadingImage, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
 
       self.engine.theme.setBaseColor(1 - v)
       w, h = font.getStringSize(self.text)

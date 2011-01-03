@@ -143,24 +143,20 @@ class Guitar(Instrument):
       Log.debug("Simple tails used; complex tail loading error...")
       if not engine.loadImgDrawing(self, "tail1", os.path.join("themes",themename,"tail1.png"),  textureSize = (128, 128)):
         engine.loadImgDrawing(self, "tail1", "tail1.png",  textureSize = (128, 128))
-      if not engine.loadImgDrawing(self, "tail2", os.path.join("themes",themename,"tail2.png"),  textureSize = (128, 128)):
-        engine.loadImgDrawing(self, "tail2", "tail2.png",  textureSize = (128, 128))
+      engine.loadImgDrawing(self, "tail2", os.path.join("themes",themename,"tail2.png"),  textureSize = (128, 128))
       if not engine.loadImgDrawing(self, "bigTail1", os.path.join("themes",themename,"bigtail1.png"),  textureSize = (128, 128)):
         engine.loadImgDrawing(self, "bigTail1", "bigtail1.png",  textureSize = (128, 128))
-      if not engine.loadImgDrawing(self, "bigTail2", os.path.join("themes",themename,"bigtail2.png"),  textureSize = (128, 128)):
-        engine.loadImgDrawing(self, "bigTail2", "bigtail2.png",  textureSize = (128, 128))
+      engine.loadImgDrawing(self, "bigTail2", os.path.join("themes",themename,"bigtail2.png"),  textureSize = (128, 128))
 
 
     if not engine.loadImgDrawing(self, "kill1", os.path.join("themes", themename, "kill1.png"),  textureSize = (128, 128)):
       engine.loadImgDrawing(self, "kill1", "kill1.png",  textureSize = (128, 128))
-    if not engine.loadImgDrawing(self, "kill2", os.path.join("themes", themename, "kill2.png"),  textureSize = (128, 128)):
-      engine.loadImgDrawing(self, "kill2", "kill2.png",  textureSize = (128, 128))
+    engine.loadImgDrawing(self, "kill2", os.path.join("themes", themename, "kill2.png"),  textureSize = (128, 128))
 
     #MFH - freestyle tails (for drum fills & BREs)
     if not engine.loadImgDrawing(self, "freestyle1", os.path.join("themes", themename, "freestyletail1.png"),  textureSize = (128, 128)):
       engine.loadImgDrawing(self, "freestyle1", "freestyletail1.png",  textureSize = (128, 128))
-    if not engine.loadImgDrawing(self, "freestyle2", os.path.join("themes", themename, "freestyletail2.png"),  textureSize = (128, 128)):
-      engine.loadImgDrawing(self, "freestyle2", "freestyletail2.png",  textureSize = (128, 128))
+    engine.loadImgDrawing(self, "freestyle2", os.path.join("themes", themename, "freestyletail2.png"),  textureSize = (128, 128))
     
     
     self.twoChordMax = False
@@ -353,7 +349,8 @@ class Guitar(Instrument):
               if kill:
                 zsize = .25
                 tex1 = self.kill1
-                tex2 = self.kill2
+                if self.kill2:
+                  tex2 = self.kill2
                 #volshebnyi - killswitch tail width and color change
                 kEffect = ( math.sin( pos / 50 ) + 1 ) /2
                 size = (0.02+kEffect*0.15, s - zsize)
@@ -366,12 +363,14 @@ class Guitar(Instrument):
                 zsize = .25
                 size = (.11, s - zsize)
                 tex1 = self.bigTail1
-                tex2 = self.bigTail2
+                if self.bigTail2:
+                  tex2 = self.bigTail2
             else:
               zsize = .15
               size = (.08, s - zsize)
               tex1 = self.tail1
-              tex2 = self.tail2
+              if self.tail2:
+                tex2 = self.tail2
         
         else:   #freestyleTail > 0
           # render an inactive freestyle tail  (self.freestyle1 & self.freestyle2)
@@ -383,7 +382,8 @@ class Guitar(Instrument):
             size = (.15, s - zsize)   
           
           tex1 = self.freestyle1
-          tex2 = self.freestyle2
+          if self.freestyle2:
+            tex2 = self.freestyle2
           if freestyleTail == 1:
             c1, c2, c3, c4 = color
             tailGlow = 1 - (pos - self.freestyleLastFretHitTime[fret] ) / self.freestylePeriod
@@ -404,16 +404,18 @@ class Guitar(Instrument):
           
         self.engine.draw3Dtex(tex1, vertex = (-size[0], 0, size[0], size[1]), texcoord = (0.0, 0.0, 1.0, 1.0),
                               scale = tailscale, color = tailcol)
-        self.engine.draw3Dtex(tex2, vertex = (-size[0], size[1], size[0], size[1] + (zsize)),
-                              scale = tailscale, texcoord = (0.0, 0.05, 1.0, 0.95), color = tailcol)
+        if tex2:
+            self.engine.draw3Dtex(tex2, vertex = (-size[0], size[1], size[0], size[1] + (zsize)),
+                                  scale = tailscale, texcoord = (0.0, 0.05, 1.0, 0.95), color = tailcol)
 
         shaders.disable()  
 
         #MFH - this block of code renders the tail "beginning" - before the note, for freestyle "lanes" only
         #volshebnyi
-        if freestyleTail > 0 and pos < self.freestyleStart + self.freestyleLength:
-          self.engine.draw3Dtex(tex2, vertex = (-size[0], 0-(zsize), size[0], 0 + (.05)),
-                                scale = tailscale, texcoord = (0.0, 0.95, 1.0, 0.05), color = tailcol)
+        if tex2:
+          if freestyleTail > 0 and pos < self.freestyleStart + self.freestyleLength:
+            self.engine.draw3Dtex(tex2, vertex = (-size[0], 0-(zsize), size[0], 0 + (.05)),
+                                  scale = tailscale, texcoord = (0.0, 0.95, 1.0, 0.05), color = tailcol)
           
 
     if tailOnly:

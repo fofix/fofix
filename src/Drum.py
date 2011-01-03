@@ -177,9 +177,7 @@ class Drum(Instrument):
 
     if not engine.loadImgDrawing(self, "freestyle1", os.path.join("themes", themename, "freestyletail1.png"),  textureSize = (128, 128)):
       engine.loadImgDrawing(self, "freestyle1", "freestyletail1.png",  textureSize = (128, 128))
-    if not engine.loadImgDrawing(self, "freestyle2", os.path.join("themes", themename, "freestyletail2.png"),  textureSize = (128, 128)):
-      engine.loadImgDrawing(self, "freestyle2", "freestyletail2.png",  textureSize = (128, 128))
-
+    engine.loadImgDrawing(self, "freestyle2", os.path.join("themes", themename, "freestyletail2.png"),  textureSize = (128, 128))
 
     #t'aint no tails in drums, yo.
     self.simpleTails = True
@@ -417,7 +415,8 @@ class Drum(Instrument):
 
 
     tex1 = self.freestyle1
-    tex2 = self.freestyle2
+    if self.freestyle2:
+      tex2 = self.freestyle2
     if freestyleTail == 1:
       c1, c2, c3, c4 = color
       tailGlow = 1 - (pos - self.freestyleLastFretHitTime[fret] ) / self.freestylePeriod
@@ -429,10 +428,10 @@ class Drum(Instrument):
 
     self.engine.draw3Dtex(tex1, vertex = (-size[0], 0, size[0], size[1]), texcoord = (0.0, 0.0, 1.0, 1.0),
                           scale = tailscale, color = tailcol)
-
+    if tex2:
     self.engine.draw3Dtex(tex2, vertex = (-size[0], size[1] - (.05), size[0], size[1] + (zsize)),
                           scale = tailscale, texcoord = (0.0, 0.05, 1.0, 0.95), color = tailcol)
-
+    if tex2:
     self.engine.draw3Dtex(tex2, vertex = (-size[0], 0-(zsize), size[0], 0 + (.05)),
                           scale = tailscale, texcoord = (0.0, 0.95, 1.0, 0.05), color = tailcol)
 
