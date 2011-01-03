@@ -75,7 +75,6 @@ class Neck:
     self.beatsPerBoard  = 5.0
     self.beatsPerUnit   = self.beatsPerBoard / self.boardLength
 
-
     color = (1,1,1)
     self.vis = 1
 
@@ -252,9 +251,9 @@ class Neck:
     self.soloNeck = None
     if not self.isVocal:
       if self.guitarSoloNeckMode > 0:
-        if self.guitarSoloNeckMode == 1:  #replace neck
+        if self.guitarSoloNeckMode == 1 or not engine.loadImgDrawing(self, "soloNeck", os.path.join(themepath, "soloneckovr.png")):  #replace neck
           loadImage("soloNeck", "soloneck.png")
-        elif self.guitarSoloNeckMode == 2:  #overlay neck
+        elif self.guitarSoloNeckMode == 2 or not engine.loadImgDrawing(self, "soloNeck", os.path.join(themepath, "soloneck.png")):  #overlay neck
           loadImage("soloNeck", "soloneckovr.png")
 
     self.fourMultiNeck = None
@@ -514,15 +513,16 @@ class Neck:
         neckcol = mixColors(neckcol, notecolors[i], blend)
 
       shaders.var["color"][self.player]=neckcol
-      
+
     if shaders.enable("neck"):
       shaders.setVar("fretcol",neckcol)
-      shaders.update()
+
       shader_neck_vtx = np.array([[-w / 2, 0.1, -2],
                                 [w / 2, 0.1, -2],
                                 [-w / 2, 0.1, l],
                                 [w / 2, 0.1, l]], dtype=np.float32)
 
+      shaders.update()
       cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.shader_neck_vtx)
       shaders.disable()
     else:
@@ -576,7 +576,8 @@ class Neck:
     elif self.instrument.starPowerActive and self.oCenterLines:
       self.oCenterLines.texture.bind()
     else:
-      self.centerLines.texture.bind()
+      if self.centerLines:
+        self.centerLines.texture.bind()
 
     track_vtx       = np.array([[-w / 2, 0, -2+size],
                            [w / 2, 0, -2+size],
@@ -643,7 +644,6 @@ class Neck:
       self.sideBars.texture.bind()
 
     cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.sidebars_vtx, colors=board_col, texcoords=board_tex)
-    
     glDisable(GL_TEXTURE_2D)
     
     if self.theme == 1:   
@@ -685,9 +685,9 @@ class Neck:
         continue   
 
       glPushMatrix()
-
       z  = ((time - pos) / self.currentPeriod) / self.beatsPerUnit
       z2 = ((time + event.length - pos) / self.currentPeriod) / self.beatsPerUnit
+      sw = 0.1 #width
 
       if z > self.boardLength:
         f = (self.boardLength - z) / (self.boardLength * .2)
@@ -695,16 +695,7 @@ class Neck:
         f = min(1, max(0, 1 + z2))
       else:
         f = 1.0
-        
-      if event.barType == 0: #half-beat
-        sw  = 0.1 #width
-        self.bpm_halfbeat.texture.bind()
-      elif event.barType == 1: #beat
-        sw  = 0.1 #width
-        self.bpm_beat.texture.bind()
-      elif event.barType == 2: #measure
-        sw  = 0.1 #width
-        self.bpm_measure.texture.bind()
+
 
       bpm_vtx  = np.array([[-(w / 2), 0,  z + sw],
                          [-(w / 2), 0,  z - sw],
@@ -720,6 +711,14 @@ class Neck:
                          [1, 1, 1, v],
                          [1, 1, 1, v],
                          [1, 1, 1, v]], dtype=np.float32)
+
+
+      if event.barType == 0: #half-beat
+        self.bpm_halfbeat.texture.bind()
+      elif event.barType == 1: #beat
+        self.bpm_beat.texture.bind()
+      elif event.barType == 2: #measure
+        self.bpm_measure.texture.bind()
 
       cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=bpm_vtx, colors=bpm_col, texcoords=bpm_tex)
 
@@ -759,7 +758,7 @@ class Neck:
       elif self.spcount <=0:
         self.spcount = 0
         self.spcount2 = 0
-    
+
     if self.scoreMultiplier > 4 and self.bgcount < 1:
       self.bgcount += .1
       if self.bgcount > 1:
@@ -778,22 +777,32 @@ class Neck:
       if self.fourXcount < 0:
         self.fourXcount = 0
 
+    if not (self.bpm_halfbeat and self.bpm_beat and self.bpm_measure):
+      self.bpmLinesDisabled = True
+    else:
+	  self.bpmLinesDisabled = False
+
     if not (self.instrument.coOpFailed and not self.instrument.coOpRestart):
 
       if self.ocount < 1:
         self.ocount += .1
       else:
         self.ocount = 1
+
       self.vis = visibility
       self.renderNeck(visibility, song, pos)
-      self.renderIncomingNecks(visibility, song, pos) #MFH
-      self.drawTrack(self.ocount, song, pos)
-      self.drawBPM(visibility, song, pos)
-      if self.isFailing and self.failSideBars:
-        self.drawSideBars(visibility, song, pos)
-        self.drawSideBars(self.failcount, song, pos)
-      else:
-        self.drawSideBars(visibility, song, pos)
+      if self.soloNeck:
+        self.renderIncomingNecks(visibility, song, pos) #MFH
+      if self.centerLines or self.oCenterLines or self.oFlash:
+        self.drawTrack(self.ocount, song, pos)
+      if not self.bpmLinesDisabled:
+        self.drawBPM(visibility, song, pos)
+      if self.sideBars:
+        if self.isFailing and self.failSideBars:
+          self.drawSideBars(visibility, song, pos)
+          self.drawSideBars(self.failcount, song, pos)
+        else:
+          self.drawSideBars(visibility, song, pos)
 
     if self.overdriveFlashCount < self.overdriveFlashCounts and self.oFlash:
       self.overdriveFlashCount = self.overdriveFlashCount + 1
