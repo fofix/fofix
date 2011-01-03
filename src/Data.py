@@ -148,7 +148,6 @@ class Data(object):
 
     # load misc images
     self.loadImgDrawing(self, "loadingImage", os.path.join("themes",themename,"loadingbg.png"), textureSize = (256,256))
-    self.loadImgDrawing(self, "choiceImage", os.path.join("themes",themename,"editor.png"))
     if self.loadImgDrawing(self, "submenuSelect", os.path.join("themes",themename,"submenuselect.png")):
       subSelectImgW = self.submenuSelect.width1()
       self.submenuSelectFound = True
