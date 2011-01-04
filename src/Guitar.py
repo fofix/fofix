@@ -351,6 +351,8 @@ class Guitar(Instrument):
                 tex1 = self.kill1
                 if self.kill2:
                   tex2 = self.kill2
+                if not self.kill2:
+                  tex2 = None
                 #volshebnyi - killswitch tail width and color change
                 kEffect = ( math.sin( pos / 50 ) + 1 ) /2
                 size = (0.02+kEffect*0.15, s - zsize)
@@ -365,12 +367,16 @@ class Guitar(Instrument):
                 tex1 = self.bigTail1
                 if self.bigTail2:
                   tex2 = self.bigTail2
+                if not self.bigTail2:
+                  tex2 = None
             else:
               zsize = .15
               size = (.08, s - zsize)
               tex1 = self.tail1
               if self.tail2:
                 tex2 = self.tail2
+              if not self.tail2:
+                tex2 = None
         
         else:   #freestyleTail > 0
           # render an inactive freestyle tail  (self.freestyle1 & self.freestyle2)
@@ -384,6 +390,8 @@ class Guitar(Instrument):
           tex1 = self.freestyle1
           if self.freestyle2:
             tex2 = self.freestyle2
+          if not self.freestyle2:
+            tex2 = None
           if freestyleTail == 1:
             c1, c2, c3, c4 = color
             tailGlow = 1 - (pos - self.freestyleLastFretHitTime[fret] ) / self.freestylePeriod

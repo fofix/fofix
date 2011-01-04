@@ -417,6 +417,8 @@ class Drum(Instrument):
     tex1 = self.freestyle1
     if self.freestyle2:
       tex2 = self.freestyle2
+    elif not self.freestyle2:
+      tex2 = None
     if freestyleTail == 1:
       c1, c2, c3, c4 = color
       tailGlow = 1 - (pos - self.freestyleLastFretHitTime[fret] ) / self.freestylePeriod
@@ -429,11 +431,11 @@ class Drum(Instrument):
     self.engine.draw3Dtex(tex1, vertex = (-size[0], 0, size[0], size[1]), texcoord = (0.0, 0.0, 1.0, 1.0),
                           scale = tailscale, color = tailcol)
     if tex2:
-    self.engine.draw3Dtex(tex2, vertex = (-size[0], size[1] - (.05), size[0], size[1] + (zsize)),
-                          scale = tailscale, texcoord = (0.0, 0.05, 1.0, 0.95), color = tailcol)
+      self.engine.draw3Dtex(tex2, vertex = (-size[0], size[1] - (.05), size[0], size[1] + (zsize)),
+                            scale = tailscale, texcoord = (0.0, 0.05, 1.0, 0.95), color = tailcol)
     if tex2:
-    self.engine.draw3Dtex(tex2, vertex = (-size[0], 0-(zsize), size[0], 0 + (.05)),
-                          scale = tailscale, texcoord = (0.0, 0.95, 1.0, 0.05), color = tailcol)
+      self.engine.draw3Dtex(tex2, vertex = (-size[0], 0-(zsize), size[0], 0 + (.05)),
+                            scale = tailscale, texcoord = (0.0, 0.95, 1.0, 0.05), color = tailcol)
 
 
   #myfingershurt:

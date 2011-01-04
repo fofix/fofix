@@ -421,12 +421,12 @@ class LoadingScreen(Layer, KeyListener):
       fadeScreen(v)
 
       w, h = self.engine.view.geometry[2:4]
-      self.loadingImage = self.engine.data.loadingImage
+      self.loadingImg = self.engine.data.loadingImage
       
       #MFH - auto-scaling of loading screen
       #Volshebnyi - fit to screen applied
-      if self.loadingImage:
-        self.engine.drawImage(self.loadingImage, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
+      if self.loadingImg:
+        self.engine.drawImage(self.loadingImg, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
 
       self.engine.theme.setBaseColor(1 - v)
       w, h = font.getStringSize(self.text)
@@ -2047,6 +2047,7 @@ class LoadingSplashScreen(Layer, KeyListener):
     self.fScale = self.engine.theme.loadingFScale
     self.rMargin = self.engine.theme.loadingRMargin
     self.lspacing = self.engine.theme.loadingLSpacing
+    self.loadingImg = self.engine.data.loadingImage
 
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
     if self.logClassInits == 1:
@@ -2079,7 +2080,8 @@ class LoadingSplashScreen(Layer, KeyListener):
       v = (1 - visibility) ** 2
       fadeScreen(v)
       w, h = self.engine.view.geometry[2:4]
-      self.engine.drawImage(self.engine.data.loadingImage, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
+      if self.loadingImg:
+        self.engine.drawImage(self.loadingImg, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
       
       self.engine.theme.setBaseColor(1 - v)
       w, h = font.getStringSize(self.text, scale=self.fScale)
