@@ -106,8 +106,7 @@ class MainMenu(BackgroundLayer):
     if not self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"menu","mainbg.png")):
       self.background = None
     self.engine.loadImgDrawing(self, "BGText", os.path.join("themes",self.themename,"menu","maintext.png"))
-    if not self.engine.loadImgDrawing(self, "optionsBG", os.path.join("themes",self.themename,"menu","optionsbg.png")):
-      self.optionsBG = None
+    self.engine.loadImgDrawing(self, "optionsBG", os.path.join("themes",self.themename,"menu","optionsbg.png"))
     self.engine.loadImgDrawing(self, "optionsPanel", os.path.join("themes",self.themename,"menu","optionspanel.png"))
       
     #racer: added version tag
@@ -353,7 +352,7 @@ class MainMenu(BackgroundLayer):
     
     if self.active:
       if self.engine.view.topLayer() is not None:
-        if self.optionsBG != None:
+        if self.optionsBG:
           self.engine.drawImage(self.optionsBG, (self.opt_bkg_size[2],-self.opt_bkg_size[3]), (w*self.opt_bkg_size[0],h*self.opt_bkg_size[1]), stretched = 3)
           
         self.engine.drawImage(self.optionsPanel, (1.0,-1.0), (w/2, h/2), stretched = 3)

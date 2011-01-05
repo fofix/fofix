@@ -646,8 +646,9 @@ class FileChooser(BackgroundLayer, KeyListener):
       self.engine.drawImage(self.neckBlackBack, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
 
 
-    #MFH - auto background scaling 
-    self.engine.drawImage(self.engine.data.choiceImage, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
+    #MFH - auto background scaling
+    if self.engine.data.optionsBG:
+      self.engine.drawImage(self.engine.data.optionsBG, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
 
 
     font = self.engine.data.font
@@ -1446,8 +1447,9 @@ class ItemChooser(BackgroundLayer, KeyListener):
     w, h, = self.engine.view.geometry[2:4]
     r = .5
 
-    #MFH - auto background scaling 
-    self.engine.drawImage(self.engine.data.choiceImage, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 3)
+    #MFH - auto background scaling
+    if self.engine.data.optionsBG:
+      self.engine.drawImage(self.engine.data.optionsBG, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 3)
 
     with self.engine.view.orthogonalProjection(normalize = True):
       glEnable(GL_BLEND)
