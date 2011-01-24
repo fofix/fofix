@@ -46,7 +46,8 @@ class Guitar(Instrument):
     self.isBassGuitar = bass
     self.isVocal = False
 
-    
+    self.strings        = 5
+
     self.debugMode = False
     self.gameMode2p = self.engine.world.multiMode
     self.matchingNotes = []
@@ -69,7 +70,13 @@ class Guitar(Instrument):
     self.Animspeed      = 30#Lower value = Faster animations
     #For Animated Starnotes
     self.indexCount     = 0
-    
+
+
+    self.freestyleHitFlameCounts = [0 for n in range(self.strings+1)]    #MFH
+
+    self.fretWeight     = [0.0] * self.strings
+    self.fretActivity   = [0.0] * self.strings
+
     #myfingershurt:
     self.hopoStyle        = self.engine.config.get("game", "hopo_system")
     self.gh2sloppy        = self.engine.config.get("game", "gh2_sloppy")
@@ -89,7 +96,9 @@ class Guitar(Instrument):
     self.theme = self.engine.data.theme
 
     self.oFlash = None
-    
+
+    self.lanenumber     = float(5)
+
     #myfingershurt:
     self.bassGrooveNeckMode = self.engine.config.get("game", "bass_groove_neck")
 
@@ -164,11 +173,13 @@ class Guitar(Instrument):
     self.rockLevel = 0.0
 
     self.neck = Neck(self.engine, self, playerObj)
-  
+
   def loadNotes(self):
       
     get = lambda file: self.checkPath("notes", file)
-    
+	
+    self.spActTex = None
+	
     self.starspin = self.engine.config.get("performance", "starspin")
     if self.twoDnote:
       if self.starspin:
@@ -220,16 +231,7 @@ class Guitar(Instrument):
         else:
           self.staratex = False
           break
-
-  def selectPreviousString(self):
-    self.selectedString = (self.selectedString - 1) % self.strings
-
-  def selectString(self, string):
-    self.selectedString = string % self.strings
-
-  def selectNextString(self):
-    self.selectedString = (self.selectedString + 1) % self.strings
-
+  
   def noteBeingHeld(self):
     noteHeld = False
     for i in range(0,5):
@@ -429,236 +431,6 @@ class Guitar(Instrument):
     if tailOnly:
       return
 
-  def renderNote(self, length, sustain, kill, color, flat = False, tailOnly = False, isTappable = False, big = False, fret = 0, spNote = False):
-
-    if flat:
-      glScalef(1, .1, 1)
-
-
-    if tailOnly:
-      return
-
-
-
-    if self.twoDnote == True:
-      #myfingershurt: this should be retrieved once at init, not repeatedly in-game whenever tails are rendered.
-      if self.notedisappear ==0:#Notes keep on going when missed
-        notecol = (1,1,1)#capo
-      elif self.notedisappear == 1:#Notes disappear when missed
-        notecol = (.1,.1,.1)
-      elif self.notedisappear == 2: #Notes Turn Red when missed
-        notecol = (1,0,0,1) 
-      tailOnly = True
-
-      if self.theme < 2:
-        if self.starspin:
-          size = (self.boardWidth/self.strings/2, self.boardWidth/self.strings/2)
-          texSize = (fret/5.0,fret/5.0+0.2)
-          if spNote == True:
-            if isTappable:
-              texY = (0.150+self.starSpinFrameIndex*0.05, 0.175+self.starSpinFrameIndex*0.05)
-            else:
-              texY = (0.125+self.starSpinFrameIndex*0.05, 0.150+self.starSpinFrameIndex*0.05)
-          else:
-            if isTappable:
-              texY = (0.025,0.05)
-            else:
-              texY = (0,0.025)
-          if self.starPowerActive:
-            texY = (0.10,0.125) #QQstarS
-            if isTappable:
-              texSize = (0.2,0.4)
-            else:
-              texSize = (0,0.2)
-        else:
-          size = (self.boardWidth/self.strings/2, self.boardWidth/self.strings/2)
-          texSize = (fret/5.0,fret/5.0+0.2)
-          if spNote == True:
-            if isTappable:
-              texY = (0.6, 0.8)
-            else:
-              texY = (0.4,0.6)
-          else:
-            if isTappable:
-              texY = (0.2,0.4)
-            else:
-              texY = (0,0.2)
-          if self.starPowerActive:
-            texY = (0.8,1)
-            if isTappable:
-              texSize = (0.2,0.4)
-            else:
-              texSize = (0,0.2)
-          
-      elif self.theme == 2:
-        size = (self.boardWidth/self.strings/2, self.boardWidth/self.strings/2)
-        texSize = (fret/5.0,fret/5.0+0.2)
-        if spNote == True:
-          if isTappable:
-            texY = (3*0.166667, 4*0.166667)
-          else:
-            texY = (2*0.166667, 3*0.166667)
-        else:
-          if isTappable:
-            texY = (1*0.166667, 2*0.166667)
-          else:
-            texY = (0, 1*0.166667)
-        #myfingershurt: adding spNote==False conditional so that star notes can appear in overdrive
-        if self.starPowerActive and spNote == False:
-          if isTappable:
-            texY = (5*0.166667, 1)
-          else:
-            texY = (4*0.166667, 5*0.166667)
-
-      self.engine.draw3Dtex(self.noteButtons, vertex = (-size[0],size[1],size[0],-size[1]), texcoord = (texSize[0],texY[0],texSize[1],texY[1]),
-                            scale = (1,1,0), rot = (30,1,0,0), multiples = True, color = color, vertscale = .27)
-
-    else:
-      shaders.setVar("Material",color,"notes")
-      
-      #mesh = outer ring (black) 
-      #mesh_001 = main note (key color) 
-      #mesh_002 = top (spot or hopo if no mesh_003) 
-      #mesh_003 = hopo bump (hopo color)
-    
-      if spNote == True and self.starMesh is not None:
-        meshObj = self.starMesh
-      else:
-        meshObj = self.noteMesh
-
-      glPushMatrix()
-      glEnable(GL_DEPTH_TEST)
-      glDepthMask(1)
-      glShadeModel(GL_SMOOTH)
-      
-      if self.noterotate:
-        glRotatef(90, 0, 1, 0)
-        glRotatef(-90, 1, 0, 0)
-      
-      if spNote == True and self.threeDspin == True:
-        glRotate(90 + self.time/3, 0, 1, 0)
-      #death_au: fixed 3D note colours
-      #volshebnyi - note color when sp is active
-      glColor4f(*color)
-      if self.starPowerActive and self.theme != 2 and not color == (0,0,0,1):
-        c = self.fretColors[5]
-        glColor4f(.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1) 
-
-      if fret == 0: # green note
-        glRotate(self.engine.theme.noterot[0], 0, 0, 1), glTranslatef(0, self.engine.theme.notepos[0], 0)
-      elif fret == 1: # red note
-        glRotate(self.engine.theme.noterot[1], 0, 0, 1), glTranslatef(0, self.engine.theme.notepos[1], 0)
-      elif fret == 2: # yellow
-        glRotate(self.engine.theme.noterot[2], 0, 0, 1), glTranslatef(0, self.engine.theme.notepos[2], 0)
-      elif fret == 3:# blue note
-        glRotate(self.engine.theme.noterot[3], 0, 0, 1), glTranslatef(0, self.engine.theme.notepos[3], 0)
-      elif fret == 4:# blue note
-        glRotate(self.engine.theme.noterot[4], 0, 0, 1), glTranslatef(0, self.engine.theme.notepos[4], 0)
-
-
-      if self.staratex == True and self.starPowerActive and spNote == False:
-        glColor3f(1,1,1)
-        glEnable(GL_TEXTURE_2D)
-        getattr(self,"staratex"+chr(97+fret)).texture.bind()
-        glMatrixMode(GL_TEXTURE)
-        glScalef(1, -1, 1)
-        glMatrixMode(GL_MODELVIEW)
-        glScalef(self.boardScaleX, self.boardScaleY, 1)
-
-
-        if isTappable:
-          mesh = "Mesh_001"
-        else:
-          mesh = "Mesh"
-
-        meshObj.render(mesh)
-        
-        if shaders.enable("notes"):
-          shaders.setVar("isTextured",True)
-          meshObj.render(mesh)
-          shaders.disable() 
-          
-        glMatrixMode(GL_TEXTURE)
-        glLoadIdentity()
-        glMatrixMode(GL_MODELVIEW)
-        glDisable(GL_TEXTURE_2D)          
-      
-      elif self.notetex == True and spNote == False:
-          
-        glColor3f(1,1,1)
-        glEnable(GL_TEXTURE_2D)
-        getattr(self,"notetex"+chr(97+fret)).texture.bind()
-        glMatrixMode(GL_TEXTURE)
-        glScalef(1, -1, 1)
-        glMatrixMode(GL_MODELVIEW)
-        glScalef(self.boardScaleX, self.boardScaleY, 1)
-        
-        if isTappable:
-          mesh = "Mesh_001"
-        else:
-          mesh = "Mesh"
-        meshObj.render(mesh)
-        
-        if shaders.enable("notes"):
-          shaders.setVar("isTextured",True)
-          meshObj.render(mesh)
-          shaders.disable()
-        
-        glMatrixMode(GL_TEXTURE)
-        glLoadIdentity()
-        glMatrixMode(GL_MODELVIEW)
-        glDisable(GL_TEXTURE_2D)
-
-      elif self.startex == True and spNote == True:
-        glColor3f(1,1,1)
-        glEnable(GL_TEXTURE_2D)
-        getattr(self,"startex"+chr(97+fret)).texture.bind()
-        glMatrixMode(GL_TEXTURE)
-        glScalef(1, -1, 1)
-        glMatrixMode(GL_MODELVIEW)
-        glScalef(self.boardScaleX, self.boardScaleY, 1)
-
-
-        if isTappable:
-          mesh = "Mesh_001"
-        else:
-          mesh = "Mesh"
-
-        meshObj.render(mesh)
-        
-        if shaders.enable("notes"):
-          shaders.setVar("isTextured",True)
-          meshObj.render(mesh)
-          shaders.disable() 
-          
-        glMatrixMode(GL_TEXTURE)
-        glLoadIdentity()
-        glMatrixMode(GL_MODELVIEW)
-        glDisable(GL_TEXTURE_2D)          
-        
-      else:
-        if shaders.enable("notes"):
-          shaders.setVar("isTextured",False)
-        meshObj.render("Mesh_001")
-        shaders.disable()
-        glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
-        if isTappable:
-          if self.hopoColor[0] == -2:
-            glColor4f(*color)
-          else:
-            glColor3f(self.hopoColor[0], self.hopoColor[1], self.hopoColor[2])
-          if(meshObj.find("Mesh_003")) == True:
-            meshObj.render("Mesh_003")
-            glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
-        meshObj.render("Mesh_002")
-        glColor3f(self.meshColor[0], self.meshColor[1], self.meshColor[2])
-        meshObj.render("Mesh")
-        
-
-
-      glDepthMask(0)
-      glPopMatrix()
-
   def renderFreestyleLanes(self, visibility, song, pos):
     if not song:
       return
@@ -711,216 +483,6 @@ class Guitar(Instrument):
               glPopMatrix()
               
       self.freestyleActive = freestyleActive
-
-
-
-              
-
-
-  def renderNotes(self, visibility, song, pos, killswitch):
-    if not song:
-      return
-    if not song.readyToGo:
-      return
-
-    # Update dynamic period
-    self.currentPeriod = self.neckSpeed
-
-    self.killPoints = False
-
-    w = self.boardWidth / self.strings
-    track = song.track[self.player]
-
-    num = 0
-    enable = True
-    starEventsInView = False
-    renderedNotes = reversed(self.getRequiredNotesForRender(song,pos))
-    for time, event in renderedNotes:
-      if isinstance(event, Tempo):
-        self.tempoBpm = event.bpm
-        if self.lastBpmChange > 0 and self.disableVBPM == True:
-            continue
-        if (pos - time > self.currentPeriod or self.lastBpmChange < 0) and time > self.lastBpmChange:
-          self.baseBeat          += (time - self.lastBpmChange) / self.currentPeriod
-          self.targetBpm          = event.bpm
-          self.lastBpmChange      = time
-          self.neck.lastBpmChange = time
-          self.neck.baseBeat      = self.baseBeat
-        continue
-      
-      if not isinstance(event, Note):
-        continue
-
-      if (event.noteBpm == 0.0):
-        event.noteBpm = self.tempoBpm
-
-      if self.coOpFailed:
-        if self.coOpRestart:
-          if time - self.coOpRescueTime < (self.currentPeriod * self.beatsPerBoard * 2):
-            continue
-          elif self.coOpRescueTime + (self.currentPeriod * self.beatsPerBoard * 2) < pos:
-            self.coOpFailed = False
-            self.coOpRestart = False
-            Log.debug("Turning off coOpFailed. Rescue successful.")
-        else:
-          continue #can't break. Tempo.
-        
-      c = self.fretColors[event.number]
-
-      x  = (self.strings / 2 - event.number) * w
-      z  = ((time - pos) / self.currentPeriod) / self.beatsPerUnit
-      z2 = ((time + event.length - pos) / self.currentPeriod) / self.beatsPerUnit
-
-
-      if z > self.boardLength * .8:
-        f = (self.boardLength - z) / (self.boardLength * .2)
-      elif z < 0:
-        f = min(1, max(0, 1 + z2))
-      else:
-        f = 1.0
-      
-      #volshebnyi - hide notes in BRE zone if BRE enabled  
-      if self.freestyleEnabled and self.freestyleStart > 0:
-        if time >= self.freestyleStart-self.freestyleOffset and time < self.freestyleStart + self.freestyleLength+self.freestyleOffset:
-          z = -2.0
-
-      if self.twoDnote == True and not self.useFretColors:
-        color      = (1,1,1, 1 * visibility * f)
-      else:
-        color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
-      if event.length > 120:
-        length     = (event.length - 50) / self.currentPeriod / self.beatsPerUnit
-      else:
-        length     = 0
-      flat       = False
-      tailOnly   = False
-
-      spNote = False
-
-      #myfingershurt: user setting for starpower refill / replenish notes
-      if self.starPowerActive:
-        if self.spRefillMode == 0:    #mode 0 = no starpower / overdrive refill notes
-          self.spEnabled = False
-        elif self.spRefillMode == 1 and self.theme != 2:  #mode 1 = overdrive refill notes in RB themes only
-          self.spEnabled = False
-        elif self.spRefillMode == 2 and song.midiStyle != 1: #mode 2 = refill based on MIDI type
-          self.spEnabled = False
-
-
-      if event.star:
-        starEventsInView = True
-      if event.finalStar:
-        self.finalStarSeen = True
-        starEventsInView = True
-
-
-      if event.star and self.spEnabled:
-        spNote = True
-      if event.finalStar and self.spEnabled:
-        spNote = True
-        if event.played or event.hopod:
-          if event.flameCount < 1 and not self.starPowerGained:
-            Log.debug("star power added")
-            if self.gameMode2p == 6:
-              if self.battleSuddenDeath:
-                self.battleObjects = [1] + self.battleObjects[:2]
-              else:
-                self.battleObjects = [self.battleObjectsEnabled[random.randint(0,len(self.battleObjectsEnabled)-1)]] + self.battleObjects[:2]
-              self.battleGetTime = pos
-              self.battleObjectGained = True
-              Log.debug("Battle Object Gained, Objects %s" % str(self.battleObjects))
-            else:
-              if self.starPower < 100:
-                self.starPower += 25
-              if self.starPower > 100:
-                self.starPower = 100
-            self.neck.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
-            self.starPowerGained = True
-
-      if event.tappable < 2:
-        isTappable = False
-      else:
-        isTappable = True
-      
-      # Clip the played notes to the origin
-      #myfingershurt: this should be loaded once at init, not every render...
-      if self.notedisappear == 0:#Notes keep on going when missed
-        if event.played or event.hopod:#if the note isnt missed
-          tailOnly = True
-          length += z
-          z = 0
-          if length <= 0:
-            continue
-        if z < 0 and not (event.played or event.hopod):#if the note is missed 
-          color = (.6, .6, .6, .5 * visibility * f)
-          flat  = False 
-      elif self.notedisappear == 1:#Notes disappear when missed
-        if z < 0:#if note past frets
-          if event.played or event.hopod:#if note was hit
-            tailOnly = True
-            length += z
-            z = 0
-            if length <= 0:
-              continue
-          else:#note missed
-            color = (.6, .6, .6, .5 * visibility * f)
-            flat  = False
-      if self.notedisappear == 2:#turn red when missed
-        if event.played or event.hopod:  #if the note isnt missed
-          tailOnly = True
-          length += z
-          z = 0
-          if length <= 0:
-            continue
-        if z < 0 and not (event.played or event.hopod): #if the note is missed 
-          color = (1, 0, 0, 1)#turn note red
-          flat  = False 
-          
-      big = False
-      self.bigMax = 0
-      for i in range(0,5):
-        if self.hit[i]:
-          big = True
-          self.bigMax += 1
-
-      #MFH - filter out this tail whitening when starpower notes have been disabled from a screwup
-      if self.spEnabled and killswitch:
-        if event.star or event.finalStar:
-          if big == True and tailOnly == True:
-            self.killPoints = True
-            color = (1,1,1,1)
-
-      if z + length < -1.0:
-        continue
-      if event.length <= 120:
-        length = None
-
-      sustain = False
-      if event.length > (1.4 * (60000.0 / event.noteBpm) / 4):
-        sustain = True
-        
-      glPushMatrix()
-      glTranslatef(x, (1.0 - visibility) ** (event.number + 1), z)
-      
-      if shaders.turnon:
-        shaders.setVar("note_position",(x, (1.0 - visibility) ** (event.number + 1), z),"notes")
-
-      if self.battleStatus[8]:
-        renderNote = random.randint(0,2)
-      else:
-        renderNote = 0
-      if renderNote == 0:  
-        if big == True and num < self.bigMax:
-          num += 1
-          self.renderNote(length, sustain = sustain, kill = killswitch, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, big = True, fret = event.number, spNote = spNote)
-        else:
-          self.renderNote(length, sustain = sustain, kill = killswitch, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote)
-      glPopMatrix()
-
-    if (not starEventsInView and self.finalStarSeen):
-      self.spEnabled = True
-      self.finalStarSeen = False
-      self.isStarPhrase = False
 
   def renderTails(self, visibility, song, pos, killswitch):
     if not song:
@@ -1466,6 +1028,7 @@ class Guitar(Instrument):
       glEnable(GL_BLEND)
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
       glEnable(GL_COLOR_MATERIAL)
+
       if self.leftyMode:
         if not self.battleStatus[6]:
           glScalef(-1, 1, 1)
@@ -1484,12 +1047,12 @@ class Guitar(Instrument):
         if self.fretsUnderNotes:  #MFH
           if self.twoDnote == True:
             self.renderFrets(visibility, song, controls)
-            self.renderNotes(visibility, song, pos, killswitch)
+            self.renderNotes(visibility, song, pos)
           else:
-            self.renderNotes(visibility, song, pos, killswitch)
+            self.renderNotes(visibility, song, pos)
             self.renderFrets(visibility, song, controls)
         else:
-          self.renderNotes(visibility, song, pos, killswitch)
+          self.renderNotes(visibility, song, pos)
           self.renderFrets(visibility, song, controls)
 
         self.renderFreestyleLanes(visibility, song, pos) #MFH - render the lanes on top of the notes.
@@ -1504,28 +1067,6 @@ class Guitar(Instrument):
           glScalef(-1, 1, 1)
       elif self.battleStatus[6]:
         glScalef(-1, 1, 1)
-
-  #MFH - corrected and optimized:
-  def getRequiredNotesMFH(self, song, pos, hopoTroubleCheck = False):
-    if self.battleStatus[2] and self.difficulty != 0:
-      if pos < self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard or pos > self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
-        song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue]
-      else:
-        song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue - 1]
-    
-    track   = song.track[self.player]
-    if hopoTroubleCheck:
-      notes = [(time, event) for time, event in track.getEvents(pos, pos + (self.earlyMargin*2)) if isinstance(event, Note)]
-      notes = [(time, event) for time, event in notes if not time==pos] #MFH - filter out the problem note that caused this check!
-    else:
-      notes = [(time, event) for time, event in track.getEvents(pos - self.lateMargin, pos + self.earlyMargin) if isinstance(event, Note)]
-      notes = [(time, event) for time, event in notes if not (event.hopod or event.played or event.skipped)]
-      notes = [(time, event) for time, event in notes if (time >= (pos - self.lateMargin)) and (time <= (pos + self.earlyMargin))]
-
-    sorted(notes, key=lambda x: x[0])
-    if self.battleStatus[7]:
-      notes = self.getDoubleNotes(notes)
-    return sorted(notes, key=lambda x: x[0])    #MFH - what the hell, this should be sorted by TIME not note number....
 
   def getDoubleNotes(self, notes):
     if self.battleStatus[7] and notes != []:
@@ -1628,17 +1169,6 @@ class Guitar(Instrument):
         else:
           noteCount += 1
     return sorted(notes, key=lambda x: x[0])
- 
-  #MFH - corrected and optimized:
-  def getRequiredNotesForJurgenOnTime(self, song, pos):
-    track   = song.track[self.player]
-    notes = [(time, event) for time, event in track.getEvents(pos - self.lateMargin, pos + 30) if isinstance(event, Note)]
-    notes = [(time, event) for time, event in notes if not (event.hopod or event.played or event.skipped)]
-
-    if self.battleStatus[7]:
-      notes = self.getDoubleNotes(notes)
-    return sorted(notes, key=lambda x: x[0])    #MFH - what the hell, this should be sorted by TIME not note number....
-
 
 
   def controlsMatchNotes(self, controls, notes):
@@ -1910,14 +1440,6 @@ class Guitar(Instrument):
               return False
 
     return True
-
-  def areNotesTappable(self, notes):
-    if not notes:
-      return
-    for time, note in notes:
-      if note.tappable > 1:
-        return True
-    return False
   
   def startPick(self, song, pos, controls, hopo = False):
     if hopo == True:
@@ -1930,7 +1452,7 @@ class Guitar(Instrument):
     
     self.playedNotes = []
     
-    self.matchingNotes = self.getRequiredNotes(song, pos)
+    self.matchingNotes = self.getRequiredNotesMFH(song, pos)
 
     if self.controlsMatchNotes(controls, self.matchingNotes):
       self.pickStartPos = pos
@@ -1953,7 +1475,7 @@ class Guitar(Instrument):
     
     self.playedNotes = []
     
-    self.matchingNotes = self.getRequiredNotes2(song, pos, hopo)
+    self.matchingNotes = self.getRequiredNotesMFH(song, pos, hopo)
 
     if self.controlsMatchNotes2(controls, self.matchingNotes, hopo):
       self.pickStartPos = pos
@@ -2077,15 +1599,6 @@ class Guitar(Instrument):
           shaders.var["fretpos"][self.player][theFret]=pos
         numHits += 1
     return numHits
-
-  def endPick(self, pos):
-    for time, note in self.playedNotes:
-      if time + note.length > pos + self.noteReleaseMargin:
-        self.playedNotes = []
-        return False
-      
-    self.playedNotes = []
-    return True
     
   def getPickLength(self, pos):
     if not self.playedNotes:
@@ -2097,26 +1610,19 @@ class Guitar(Instrument):
       pickLength = min(pickLength, note.length)
     return pickLength
 
-
-  def coOpRescue(self, pos):
-    self.coOpRestart = True #initializes Restart Timer
-    self.coOpRescueTime  = pos
-    self.starPower  = 0
-    Log.debug("Rescued at " + str(pos))
-  
   def run(self, ticks, pos, controls):
   
     if not self.paused:
       self.time += ticks
     
-    #MFH - Determine which frame to display for starpower notes
-    if self.starspin:
-      self.indexCount = self.indexCount + 1
-      if self.indexCount > self.Animspeed-1:
-        self.indexCount = 0
-      self.starSpinFrameIndex = (self.indexCount * self.starSpinFrames - (self.indexCount * self.starSpinFrames) % self.Animspeed) / self.Animspeed
-      if self.starSpinFrameIndex > self.starSpinFrames - 1:
-        self.starSpinFrameIndex = 0
+    # #MFH - Determine which frame to display for starpower notes
+    # if self.starspin:
+      # self.indexCount = self.indexCount + 1
+      # if self.indexCount > self.Animspeed-1:
+        # self.indexCount = 0
+      # self.starSpinFrameIndex = (self.indexCount * self.starSpinFrames - (self.indexCount * self.starSpinFrames) % self.Animspeed) / self.Animspeed
+      # if self.starSpinFrameIndex > self.starSpinFrames - 1:
+        # self.starSpinFrameIndex = 0
         
     
     #myfingershurt: must not decrease SP if paused.

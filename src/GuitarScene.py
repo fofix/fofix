@@ -2929,7 +2929,7 @@ class GuitarScene(Scene):
           
 
         if self.jurgenLogic[i] == 0:   #original FoF / RF-Mod style Jurgen Logic (cannot handle fast notes / can only handle 1 strum per notewindow)
-          notes = guitar.getRequiredNotesMFH(self.song, pos)  #mfh - needed updatin' 
+          notes = self.instruments[i].getRequiredNotesMFH(self.song, pos)  #mfh - needed updatin' 
           notes = [note.number for time, note in notes]
           changed = False
           held = 0
@@ -2953,7 +2953,7 @@ class GuitarScene(Scene):
         
         elif self.jurgenLogic[i] == 1:   #Jurgen logic style MFH-Early -- will separate notes out by time index, with chord slop detection, and strum every note
           #MFH - Jurgen needs some logic that can handle notes that may be coming too fast to retrieve one set at a time
-          notes = guitar.getRequiredNotesMFH(self.song, pos)  #mfh - needed updatin' 
+          notes = self.instruments[i].getRequiredNotesMFH(self.song, pos)  #mfh - needed updatin' 
           
           #now, want to isolate the first note or set of notes to strum - then do it, and then release the controls
           if notes:
@@ -3003,7 +3003,7 @@ class GuitarScene(Scene):
         elif self.jurgenLogic[i] == 2:   #Jurgen logic style MFH-OnTime1 -- Have Jurgen attempt to strum on time instead of as early as possible
           #This method simply shrinks the note retrieval window to only notes that are on time and late.  No early notes are even considered.
           #MFH - Jurgen needs some logic that can handle notes that may be coming too fast to retrieve one set at a time
-          notes = guitar.getRequiredNotesForJurgenOnTime(self.song, pos)  #mfh - needed updatin' 
+          notes = self.instruments[i].getRequiredNotesForJurgenOnTime(self.song, pos)  #mfh - needed updatin' 
           
           #now, want to isolate the first note or set of notes to strum - then do it, and then release the controls
           if notes:
@@ -3049,7 +3049,7 @@ class GuitarScene(Scene):
   
         elif self.jurgenLogic[i] == 3:   #Jurgen logic style MFH-OnTime2 -- Have Jurgen attempt to strum on time instead of as early as possible
           #This method retrieves all notes in the window and only attempts to play them as they pass the current position, like a real player
-          notes = guitar.getRequiredNotesMFH(self.song, pos)  #mfh - needed updatin' 
+          notes = self.instruments[i].getRequiredNotesMFH(self.song, pos)  #mfh - needed updatin' 
           
           
           
@@ -4013,7 +4013,7 @@ class GuitarScene(Scene):
       # If all the played notes are tappable, there are no required notes and
       # the last note was played recently enough, ignore this pick
       if self.instruments[num].areNotesTappable(self.instruments[num].playedNotes) and \
-         not self.instruments[num].getRequiredNotes(self.song, pos) and \
+         not self.instruments[num].getRequiredNotesMFH(self.song, pos) and \
          pos - self.lastPickPos[num] <= self.song.period / 2:
         return
       self.endPick(num)
@@ -4894,7 +4894,7 @@ class GuitarScene(Scene):
     elif control in self.keysList[num] and self.song:
       # Check whether we can tap the currently required notes
       pos   = self.getSongPosition()
-      notes = self.instruments[num].getRequiredNotes(self.song, pos)
+      notes = self.instruments[num].getRequiredNotesMFH(self.song, pos)
 
       if ((self.scoring[num].streak > 0 and self.instruments[num].areNotesTappable(notes)) or \
           (self.instruments[num].guitarSolo and control in self.soloKeysList[num])) and \
@@ -5166,7 +5166,7 @@ class GuitarScene(Scene):
     if control in self.keysList[num] and self.song:
       # Check whether we can tap the currently required notes
       pos   = self.getSongPosition()
-      notes = self.instruments[num].getRequiredNotes(self.song, pos)
+      notes = self.instruments[num].getRequiredNotesMFH(self.song, pos)
 
       if ((self.scoring[num].streak > 0 and self.instruments[num].areNotesTappable(notes)) or \
           (self.instruments[num].guitarSolo and control in self.soloKeysList[num])) and \
