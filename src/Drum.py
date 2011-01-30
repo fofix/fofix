@@ -34,7 +34,6 @@ from Neck import Neck
 from Shader import shaders
 
 from OpenGL.GL import *
-import numpy as np
 import math
 
 #myfingershurt: needed for multi-OS file fetching
@@ -104,6 +103,7 @@ class Drum(Instrument):
     self.editorMode     = editorMode
 
     self.lanenumber     = float(4)
+    self.fretImgColNumber = float(6)
 
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
     if self.logClassInits == 1:
@@ -144,7 +144,7 @@ class Drum(Instrument):
       if not engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"drumfretshacked.png")):
         engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"fretbuttons.png"))
       #death_au: adding drumfrets.png (with bass drum frets separate)
-      if not engine.loadImgDrawing(self, "drumFretButtons", os.path.join("themes",themename,"drumfrets.png")):
+      if not engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"drumfrets.png")):
         self.drumFretButtons = None
     else: #death_au
       defaultKey = False
@@ -169,7 +169,7 @@ class Drum(Instrument):
         self.keytexopen = None
       else:
         for i in range(5):
-          if engine.loadImgDrawing(self,  "keytex"+chr(97+i),  os.path.join("themes", themename, "keytex_"+chr(97+i)+".png")):
+          if engine.loadImgDrawing(self,  "keytex"+chr(97+i),  os.path.join("themes", themename, "keytex_"+chr(97+i)+".png")) and engine.loadImgDrawing(self, "keytexopen", os.path.join("themes",themename,"keytex_open.png")):
             self.keytex = True
           else:
             self.keytex = False
@@ -438,280 +438,7 @@ class Drum(Instrument):
       self.engine.draw3Dtex(tex2, vertex = (-size[0], 0-(zsize), size[0], 0 + (.05)),
                             scale = tailscale, texcoord = (0.0, 0.95, 1.0, 0.05), color = tailcol)
 
-  def renderFrets(self, visibility, song, controls):
-    w = self.boardWidth / self.strings
-    size = (.22, .22)
-    v = 1.0 - visibility
 
-    glEnable(GL_DEPTH_TEST)
-
-
-    for n in range(self.strings):
-      f = self.drumsHeldDown[n+1]/200.0
-      pressed = self.drumsHeldDown[n+1]
-
-      if n == 3:
-        c = self.fretColors[0]
-      else:
-        c = self.fretColors[n + 1]
-
-      glColor4f(.1 + .8 * c[0] + f, .1 + .8 * c[1] + f, .1 + .8 * c[2] + f, visibility)
-      if self.fretPress:
-        y = v + f / 6 #this allows the keys to "press"
-      else:
-        y = v / 6
-      x = (self.strings / 2 - .5 - n) * w
-
-      if self.twoDkeys == True: #death_au
-
-        size = (self.boardWidth/self.strings/2, self.boardWidth/self.strings/2.4)
-        whichFret = n
-
-        #death_au: only with old-style drum fret images
-        if self.drumFretButtons == None:
-          whichFret = n+1
-          if whichFret == 4:
-            whichFret = 0
-            #reversing fret 0 since it's angled in Rock Band
-            texSize = (whichFret/5.0+0.2,whichFret/5.0)
-          else:
-            texSize = (whichFret/5.0,whichFret/5.0+0.2)
-
-          texY = (0.0,1.0/3.0)
-          if pressed:
-            texY = (1.0/3.0,2.0/3.0)
-          if self.hit[n]:
-            texY = (2.0/3.0,1.0)
-        #death_au: only with new drum fret images
-        else:
-          texSize = (whichFret/4.0,whichFret/4.0+0.25)
-
-          texY = (0.0,1.0/6.0)
-          if pressed:
-            texY = (2.0/6.0,3.0/6.0)
-          if self.hit[n]:
-            texY = (4.0/6.0,5.0/6.0)
-        if self.drumFretButtons == None:
-          self.engine.draw3Dtex(self.fretButtons, vertex = (size[0],size[1],-size[0],-size[1]), texcoord = (texSize[0], texY[0], texSize[1], texY[1]),
-                                coord = (x,v,0), multiples = True,color = (1,1,1), depth = True)
-        else:
-          self.engine.draw3Dtex(self.drumFretButtons, vertex = (size[0],size[1],-size[0],-size[1]), texcoord = (texSize[0], texY[0], texSize[1], texY[1]),
-                                coord = (x,v,0), multiples = True,color = (1,1,1), depth = True)
-
-
-      else: #death_au
-        if n == 3:
-          c = self.fretColors[0]
-        else:
-          c = self.fretColors[n + 1]
-
-        if self.keyMesh:
-          glPushMatrix()
-          glDepthMask(1)
-          glEnable(GL_LIGHTING)
-          glEnable(GL_LIGHT0)
-          glShadeModel(GL_SMOOTH)
-          glRotatef(90, 0, 1, 0)
-          glLightfv(GL_LIGHT0, GL_POSITION, np.array([5.0, 10.0, -10.0, 0.0], dtype=np.float32))
-          glLightfv(GL_LIGHT0, GL_AMBIENT,  np.array([.2, .2, .2, 0.0], dtype=np.float32))
-          glLightfv(GL_LIGHT0, GL_DIFFUSE,  np.array([1.0, 1.0, 1.0, 0.0], dtype=np.float32))
-          glRotatef(-90, 1, 0, 0)
-          glRotatef(-90, 0, 0, 1)
-
-          #Mesh - Main fret
-          #Key_001 - Top of fret (key_color)
-          #Key_002 - Bottom of fret (key2_color)
-          #Glow_001 - Only rendered when a note is hit along with the glow.svg
-		  
-          if n == 0: #red fret button
-            glRotate(self.engine.theme.drumkeyrot[0], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.drumkeypos[0])
-          elif n == 1:
-            glRotate(self.engine.theme.drumkeyrot[1], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.drumkeypos[1])
-          elif n == 2:
-            glRotate(self.engine.theme.drumkeyrot[2], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.drumkeypos[2])
-          elif n == 3: #green fret button
-            glRotate(self.engine.theme.drumkeyrot[3], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.drumkeypos[3])
-
-          if self.keytex == True:
-            glColor4f(1,1,1,visibility)
-            glTranslatef(x, y, 0)
-            glEnable(GL_TEXTURE_2D)
-            if n == 0: 
-              self.keytexb.texture.bind()
-            elif n == 1:
-              self.keytexc.texture.bind()
-            elif n == 2:
-              self.keytexd.texture.bind()
-            elif n == 3:
-              self.keytexa.texture.bind()
-            glMatrixMode(GL_TEXTURE)
-            glScalef(1, -1, 1)
-            glMatrixMode(GL_MODELVIEW)
-            glScalef(self.boardScaleX, self.boardScaleY, 1)
-            if pressed and not self.hit[n]:
-              self.keyMesh.render("Mesh_001")
-            elif self.hit[n]:
-              self.keyMesh.render("Mesh_002")
-            else:
-              self.keyMesh.render("Mesh")
-            glMatrixMode(GL_TEXTURE)
-            glLoadIdentity()
-            glMatrixMode(GL_MODELVIEW)
-            glDisable(GL_TEXTURE_2D)
-          else:
-            glColor4f(.1 + .8 * c[0] + f, .1 + .8 * c[1] + f, .1 + .8 * c[2] + f, visibility)
-            glTranslatef(x, y + v * 6, 0)
-            key = self.keyMesh
-
-            if(key.find("Glow_001")) == True:
-              key.render("Mesh")
-              if(key.find("Key_001")) == True:
-                glColor3f(self.keyColor[0], self.keyColor[1], self.keyColor[2])
-                key.render("Key_001")
-              if(key.find("Key_002")) == True:
-                glColor3f(self.key2Color[0], self.key2Color[1], self.key2Color[2])
-                key.render("Key_002")
-            else:
-              key.render()
-
-          glDisable(GL_LIGHTING)
-          glDisable(GL_LIGHT0)
-          glDepthMask(0)
-          glPopMatrix()
-          
-      f = self.fretActivity[n]
-
-      if f and self.disableFretSFX != True:
-        glBlendFunc(GL_ONE, GL_ONE)
-
-        if self.glowColor[0] == -1:
-          s = 1.0
-        else:
-          s = 0.0
-
-        while s < 1:
-          ms = s * (math.sin(self.time) * .25 + 1)
-          if self.glowColor[0] == -2:
-            glColor3f(c[0] * (1 - ms), c[1] * (1 - ms), c[2] * (1 - ms))
-          else:
-            glColor3f(self.glowColor[0] * (1 - ms), self.glowColor[1] * (1 - ms), self.glowColor[2] * (1 - ms))
-
-          glPushMatrix()
-          glTranslate(x, y, 0)
-          glScalef(.1 + .02 * ms * f, .1 + .02 * ms * f, .1 + .02 * ms * f)
-          glRotatef( 90, 0, 1, 0)
-          glRotatef(-90, 1, 0, 0)
-          glRotatef(-90, 0, 0, 1)
-          if self.twoDkeys == False and self.keytex == False:
-            if(self.keyMesh.find("Glow_001")) == True:
-              key.render("Glow_001")
-            else:
-              key.render()
-          glPopMatrix()
-          s += 0.2
-        #Hitglow color
-        if self.hitglow_color == 0:
-          glowcol = (c[0], c[1], c[2])#Same as fret
-        elif self.hitglow_color == 1:
-          glowcol = (1, 1, 1)#Actual color in .svg-file
-
-        f += 2
-
-        self.engine.draw3Dtex(self.glowDrawing, coord = (x, y, 0.01), rot = (f * 90 + self.time, 0, 1, 0),
-                              texcoord = (0.0, 0.0, 1.0, 1.0), vertex = (-size[0] * f, -size[1] * f, size[0] * f, size[1] * f),
-                              multiples = True, alpha = True, color = glowcol)
-      self.hit[n] = False
-
-    #death_au:
-    #if we leave the depth test enabled, it thinks that the bass drum images
-    #are under the other frets and openGL culls them. So I just leave it disabled
-    if self.twoDkeys == False: #death_au
-    
-      f = self.drumsHeldDown[0]/200.0
-
-      c = self.openFretColor
-
-      glColor4f(.1 + .8 * c[0] + f, .1 + .8 * c[1] + f, .1 + .8 * c[2] + f, visibility)
-      y = v + f / 6
-      x = 0
-
-      if self.keyMeshOpen:
-        glPushMatrix()
-        glDepthMask(1)
-        glEnable(GL_LIGHTING)
-        glEnable(GL_LIGHT0)
-        glShadeModel(GL_SMOOTH)
-        glRotatef(90, 0, 1, 0)
-        glLightfv(GL_LIGHT0, GL_POSITION, np.array([5.0, 10.0, -10.0, 0.0], dtype=np.float32))
-        glLightfv(GL_LIGHT0, GL_AMBIENT,  np.array([.2, .2, .2, 0.0], dtype=np.float32))
-        glLightfv(GL_LIGHT0, GL_DIFFUSE,  np.array([1.0, 1.0, 1.0, 0.0], dtype=np.float32))
-        glRotatef(-90, 1, 0, 0)
-        glRotatef(-90, 0, 0, 1)
-
-        glRotate(self.engine.theme.drumkeyrot[4], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.drumkeypos[4])
-
-        if self.keytexopen is not None:
-          glColor4f(1,1,1,visibility)
-          glTranslatef(x, v, 0)
-          glEnable(GL_TEXTURE_2D)
-          self.keytexopen.texture.bind()
-          glMatrixMode(GL_TEXTURE)
-          glScalef(1, -1, 1)
-          glMatrixMode(GL_MODELVIEW)
-          glScalef(self.boardScaleX, self.boardScaleY, 1)
-          if self.hit[0]:
-            self.keyMeshOpen.render("Mesh_002")
-          elif self.drumsHeldDown[0] > 0:
-            self.keyMeshOpen.render("Mesh_001")
-          else:
-            self.keyMeshOpen.render("Mesh")
-          glMatrixMode(GL_TEXTURE)
-          glLoadIdentity()
-          glMatrixMode(GL_MODELVIEW)
-          glDisable(GL_TEXTURE_2D)
-        else:
-          glColor4f(.1 + .8 * c[0] + f, .1 + .8 * c[1] + f, .1 + .8 * c[2] + f, visibility)
-          glTranslatef(x, y + v * 6, 0)
-          key = self.keyMeshOpen
-
-          if(key.find("Glow_001")) == True:
-            key.render("Mesh")
-            if(key.find("Key_001")) == True:
-              glColor3f(self.keyColor[0], self.keyColor[1], self.keyColor[2])
-              key.render("Key_001")
-            if(key.find("Key_002")) == True:
-              glColor3f(self.key2Color[0], self.key2Color[1], self.key2Color[2])
-              key.render("Key_002")
-          else:
-            key.render()
-
-        glDisable(GL_LIGHTING)
-        glDisable(GL_LIGHT0)
-        glDepthMask(0)
-        glPopMatrix()
-        glDisable(GL_DEPTH_TEST)
-    
-
-    elif self.twoDkeys == True and self.drumFretButtons != None: #death_au
-      glDisable(GL_DEPTH_TEST)
-    
-      x = 0.0#(self.boardWidth / 2 )
-
-      size = (self.boardWidth/2, self.boardWidth/self.strings/2.4)
-
-      texSize = (0.0,1.0)
-
-      texY = (1.0/6.0,2.0/6.0)
-      if self.drumsHeldDown[0] > 0:
-        texY = (3.0/6.0,4.0/6.0)
-      if self.hit[0]:
-        texY = (5.0/6.0,1.0)
-
-      self.engine.draw3Dtex(self.drumFretButtons, vertex = (size[0],size[1],-size[0],-size[1]), texcoord = (texSize[0], texY[0], texSize[1], texY[1]),
-                            coord = (x,v,0), multiples = True,color = (1,1,1), depth = True)
-
-    else:
-      glDisable(GL_DEPTH_TEST)
 
 
 

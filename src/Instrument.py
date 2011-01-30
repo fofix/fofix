@@ -29,7 +29,7 @@ import Log
 import math
 import os
 from Shader import shaders
-
+import numpy as np
 from OpenGL.GL import *
 
 
@@ -1252,7 +1252,7 @@ class Instrument:
             continue
         if z < 0 and not (event.played or event.hopod):#if the note is missed 
           color = (.6, .6, .6, .5 * visibility * f)
-          flat  = False 
+          flat  = False
       elif self.notedisappear == 1:#Notes disappear when missed
         if z < 0:#if note past frets
           if event.played or event.hopod:#if note was hit
@@ -1471,3 +1471,205 @@ class Instrument:
     self.coOpRescueTime  = pos
     self.starPower  = 0
     Log.debug("Rescued at " + str(pos))
+
+  def renderFrets(self, visibility, song, controls):
+    w = self.boardWidth / self.strings
+    size = (.22, .22)
+    v = 1.0 - visibility
+
+    if self.isDrum:
+      self.strings2      = self.strings + 1 #+1 is for the bass drum fret
+    else:
+      self.strings2      = self.strings
+
+    #weirdpeople - If depth test is on, the drums bass fret will not be seen as death_au said (his comment below)
+    #If it is off and 3d frets and notes are used it messes several things up, things flash 
+	#on fretboard, and 3d frets / notes go through the fretboard (half of the note/fret is through the fretboard)
+	#was tested with fuzions 4x theme
+
+    #death_au:
+    #if we leave the depth test enabled, it thinks that the bass drum images
+    #are under the other frets and openGL culls them. So I just leave it disabled
+	
+    glEnable(GL_DEPTH_TEST)
+	
+    for n in range(self.strings2):
+      if self.isDrum:
+        if n == 4:
+          keyNumb = 0
+        else:
+          keyNumb = n + 1
+      if self.isDrum:#Drum related fret press things
+        f = self.drumsHeldDown[keyNumb]/200.0
+        pressed = self.drumsHeldDown[keyNumb]
+
+        if not n == 4: #Set colors of frets
+          if n == 3:
+            c = self.fretColors[0]
+          else:
+            c = self.fretColors[n + 1]
+
+      else: #Guitar fret colors and things
+        pressed = None #to make sure guitar doesnt crash
+        keyNumb = n
+        f = self.fretWeight[keyNumb]
+        c = self.fretColors[keyNumb]
+
+      glColor4f(.1 + .8 * c[0] + f, .1 + .8 * c[1] + f, .1 + .8 * c[2] + f, visibility)
+
+
+      if self.isDrum and n == 4:
+        y = v + f / 6
+      else:
+        y = v / 6
+
+      if self.isDrum and n == 4:#bass fret x position
+        x = 0
+
+      elif self.isDrum: #drum fret x position
+        x = (self.strings / 2 - .5 - n) * w
+
+      else: #guitar fret x position
+        x = (self.strings / 2 - n) * w
+
+      if self.twoDkeys == True:
+
+        if self.isDrum and n == 4: #Weirdpeople - so the drum bass fret can be seen with 2d frets
+          glDisable(GL_DEPTH_TEST)
+	  
+        fretColor = (1,1,1,1)
+
+        if self.isDrum and n == 4:
+          size = (self.boardWidth/2, self.boardWidth/self.strings/2.4)
+        else:
+         size = (self.boardWidth / self.strings / 2, self.boardWidth / self.strings / 2.4)
+
+        if self.isDrum and n == 4:
+          texSize = (0.0,1.0)
+        else:
+          texSize = (n / self.lanenumber, n / self.lanenumber + 1 / self.lanenumber)
+
+
+        if self.isDrum and n == 4: #fret normal bass drum
+          texY = (1.0 / self.fretImgColNumber, 2.0 / self.fretImgColNumber)
+        else:#fret normall all other's (guitar, drums normal frets)
+          texY = (0.0, 1.0 / self.fretImgColNumber)#fret normal guitar/bass/drums
+
+        if self.isDrum and n == 4 and pressed:#drums bass fret press
+          texY = (3.0 / self.fretImgColNumber, 4.0 / self.fretImgColNumber)
+
+        elif controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]) or (self.isDrum and pressed):#fret press
+          if self.isDrum: #drum
+            texY = (2.0 / self.fretImgColNumber, 3.0 / self.fretImgColNumber)
+          else: #guitar / bass 
+		    texY = (1.0 / self.fretImgColNumber, 2.0 / self.fretImgColNumber)
+
+        elif self.isDrum and n == 4 and self.hit[0]:#drum bass hit fret
+          texY = (5.0 / self.fretImgColNumber, 1.0)
+
+        elif self.hit[n]:#frets on note hit
+          if self.isDrum: #drum
+            texY = (4.0 / self.fretImgColNumber, 5.0 / self.fretImgColNumber)
+          else: #guitar / bass
+            texY = (2.0 / self.fretImgColNumber,1.0)
+
+        self.engine.draw3Dtex(self.fretButtons, vertex = (size[0],size[1],-size[0],-size[1]), texcoord = (texSize[0], texY[0], texSize[1], texY[1]),
+                                coord = (x,v,0), multiples = True,color = fretColor, depth = True)
+
+  
+      else:
+        if self.keyMesh:
+          glPushMatrix()
+          glDepthMask(1)
+          glEnable(GL_LIGHTING)
+          glEnable(GL_LIGHT0)
+          glShadeModel(GL_SMOOTH)
+          glRotatef(90, 0, 1, 0)
+          glLightfv(GL_LIGHT0, GL_POSITION, np.array([5.0, 10.0, -10.0, 0.0], dtype=np.float32))
+          glLightfv(GL_LIGHT0, GL_AMBIENT, np.array([0.2, 0.2, 0.2, 0.0], dtype=np.float32))
+          glLightfv(GL_LIGHT0, GL_DIFFUSE, np.array([1.0, 1.0, 1.0, 0.0], dtype=np.float32))
+          
+          
+          glRotatef(-90, 1, 0, 0)
+          glRotatef(-90, 0, 0, 1)
+
+          if n == 0: #green fret button
+            glRotate(self.engine.theme.keyrot[0], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.keypos[0])
+          elif n == 1: #red fret button
+            glRotate(self.engine.theme.keyrot[1], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.keypos[1])
+          elif n == 2: #yellow fret button
+            glRotate(self.engine.theme.keyrot[2], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.keypos[2])
+          elif n == 3: #blue fret button
+            glRotate(self.engine.theme.keyrot[3], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.keypos[3])
+          elif n == 4: #orange fret button
+            glRotate(self.engine.theme.keyrot[4], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.keypos[4])
+
+          #Mesh - Main fret
+          #Key_001 - Top of fret (key_color)
+          #Key_002 - Bottom of fret (key2_color)
+          #Glow_001 - Only rendered when a note is hit along with the glow.svg
+
+          if self.keytex == True:
+            glColor4f(1,1,1,visibility)
+            if self.battleStatus[4]:
+              glTranslatef(x, y + self.battleWhammyNow * .15, 0)
+            else:
+              glTranslatef(x, y, 0)
+            glEnable(GL_TEXTURE_2D)
+            if self.isDrum:
+              if n == 0:
+                self.keytexb.texture.bind()
+              elif n == 1:
+                self.keytexc.texture.bind()
+              elif n == 2:
+                self.keytexd.texture.bind()
+              elif n == 3:
+                self.keytexa.texture.bind()
+              elif n == 4:
+                self.keytexopen.texture.bind()
+            else:
+              getattr(self,"keytex"+chr(97+n)).texture.bind()
+            glMatrixMode(GL_TEXTURE)
+            glScalef(1, -1, 1)
+            glMatrixMode(GL_MODELVIEW)
+            glScalef(self.boardScaleX, self.boardScaleY, 1)
+            if self.isDrum:
+              if n == 4:
+                key = self.keyMeshOpen
+            else:
+              key = self.keyMesh
+            if not self.hit[keyNumb] and (f or pressed):
+              key.render("Mesh_001")
+            elif self.hit[keyNumb]:
+              key.render("Mesh_002")
+            else:
+              key.render("Mesh")
+            glMatrixMode(GL_TEXTURE)
+            glLoadIdentity()
+            glMatrixMode(GL_MODELVIEW)
+            glDisable(GL_TEXTURE_2D)
+          else:
+            glColor4f(.1 + .8 * c[0] + f, .1 + .8 * c[1] + f, .1 + .8 * c[2] + f, visibility)
+            if self.battleStatus[4]:
+              glTranslatef(x, y + self.battleWhammyNow * .15 + v * 6, 0)
+            else:
+              glTranslatef(x, y + v * 6, 0)
+            key = self.keyMesh
+        
+            if(key.find("Glow_001")) == True:
+              key.render("Mesh")
+              if(key.find("Key_001")) == True:
+                glColor3f(self.keyColor[0], self.keyColor[1], self.keyColor[2])
+                key.render("Key_001")
+              if(key.find("Key_002")) == True:
+                glColor3f(self.key2Color[0], self.key2Color[1], self.key2Color[2])
+                key.render("Key_002")
+            else:
+              key.render()
+          
+          glDisable(GL_LIGHTING)
+          glDisable(GL_LIGHT0)
+          glDepthMask(0)
+          glPopMatrix()
+
+    glDisable(GL_DEPTH_TEST)

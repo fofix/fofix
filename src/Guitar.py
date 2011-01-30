@@ -35,7 +35,6 @@ from Shader import shaders
 
 from Instrument import *
 from OpenGL.GL import *
-import numpy as np
 import Song
 
 class Guitar(Instrument):
@@ -98,6 +97,7 @@ class Guitar(Instrument):
     self.oFlash = None
 
     self.lanenumber     = float(5)
+    self.fretImgColNumber = float(3)
 
     #myfingershurt:
     self.bassGrooveNeckMode = self.engine.config.get("game", "bass_groove_neck")
@@ -702,190 +702,6 @@ class Guitar(Instrument):
           glEnd()
       
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-
-
-  def renderFrets(self, visibility, song, controls):
-    w = self.boardWidth / self.strings
-    size = (.22, .22)
-    v = 1.0 - visibility
-
-    glEnable(GL_DEPTH_TEST)
-    
-    #Hitglow color option - myfingershurt sez this should be a Guitar class global, not retrieved ever fret render in-game...
-    
-    for n in range(self.strings):
-      f = self.fretWeight[n]
-      c = self.fretColors[n]
-            
-      if f and (controls.getState(self.actions[0]) or controls.getState(self.actions[1])):
-        f += 0.25
-
-      glColor4f(.1 + .8 * c[0] + f, .1 + .8 * c[1] + f, .1 + .8 * c[2] + f, visibility)
-      if self.fretPress:
-        y = v + f / 6
-      else:
-        y = v / 6
-      x = (self.strings / 2 - n) * w
-
-      if self.twoDkeys == True:
-
-        if self.battleStatus[4]:
-          fretWhamOffset = self.battleWhammyNow * .15
-          fretColor = (1,1,1,.5)
-        else:
-          fretWhamOffset = 0
-          fretColor = (1,1,1,1)
-
-        size = (self.boardWidth/self.strings/2, self.boardWidth/self.strings/2.4)
-        if self.battleStatus[3] and self.battleFrets != None and self.battleBreakString == n:
-          texSize = (n/5.0+.042,n/5.0+0.158)
-          size = (.30, .40)
-          fretPos = 8 - round((self.battleBreakNow/self.battleBreakLimit) * 8)
-          texY = (fretPos/8.0,(fretPos + 1.0)/8)
-          self.engine.draw3Dtex(self.battleFrets, vertex = (size[0],size[1],-size[0],-size[1]), texcoord = (texSize[0], texY[0], texSize[1], texY[1]),
-                                coord = (x,v + .08 + fretWhamOffset,0), multiples = True,color = fretColor, depth = True)
-        else:
-          texSize = (n/5.0,n/5.0+0.2)
-          texY = (0.0,1.0/3.0)
-          if controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]):
-            texY = (1.0/3.0,2.0/3.0)
-          if self.hit[n] or (self.battleStatus[3] and self.battleBreakString == n):
-            texY = (2.0/3.0,1.0)
-  
-          self.engine.draw3Dtex(self.fretButtons, vertex = (size[0],size[1],-size[0],-size[1]), texcoord = (texSize[0], texY[0], texSize[1], texY[1]),
-                                coord = (x,v + fretWhamOffset,0), multiples = True,color = fretColor, depth = True)
-
-      else:
-
-        if self.keyMesh:
-          glPushMatrix()
-          glDepthMask(1)
-          glEnable(GL_LIGHTING)
-          glEnable(GL_LIGHT0)
-          glShadeModel(GL_SMOOTH)
-          glRotatef(90, 0, 1, 0)
-          glLightfv(GL_LIGHT0, GL_POSITION, np.array([5.0, 10.0, -10.0, 0.0], dtype=np.float32))
-          glLightfv(GL_LIGHT0, GL_AMBIENT,  np.array([0.2, 0.2, 0.2, 0.0], dtype=np.float32))
-          glLightfv(GL_LIGHT0, GL_DIFFUSE,  np.array([1.0, 1.0, 1.0, 0.0], dtype=np.float32))
-          
-          
-          glRotatef(-90, 1, 0, 0)
-          glRotatef(-90, 0, 0, 1)
-
-          if n == 0: #green fret button
-            glRotate(self.engine.theme.keyrot[0], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.keypos[0])
-          elif n == 1: #red fret button
-            glRotate(self.engine.theme.keyrot[1], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.keypos[1])
-          elif n == 2: #yellow fret button
-            glRotate(self.engine.theme.keyrot[2], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.keypos[2])
-          elif n == 3: #blue fret button
-            glRotate(self.engine.theme.keyrot[3], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.keypos[3])
-          elif n == 4: #orange fret button
-            glRotate(self.engine.theme.keyrot[4], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.keypos[4])
-
-          #Mesh - Main fret
-          #Key_001 - Top of fret (key_color)
-          #Key_002 - Bottom of fret (key2_color)
-          #Glow_001 - Only rendered when a note is hit along with the glow.svg
-
-          if self.keytex == True:
-            glColor4f(1,1,1,visibility)
-            if self.battleStatus[4]:
-              glTranslatef(x, y + self.battleWhammyNow * .15, 0)
-            else:
-              glTranslatef(x, y, 0)
-            glEnable(GL_TEXTURE_2D)
-            getattr(self,"keytex"+chr(97+n)).texture.bind()
-            glMatrixMode(GL_TEXTURE)
-            glScalef(1, -1, 1)
-            glMatrixMode(GL_MODELVIEW)
-            glScalef(self.boardScaleX, self.boardScaleY, 1)
-            if f and not self.hit[n]:
-              self.keyMesh.render("Mesh_001")
-            elif self.hit[n]:
-              self.keyMesh.render("Mesh_002")
-            else:
-              self.keyMesh.render("Mesh")
-            glMatrixMode(GL_TEXTURE)
-            glLoadIdentity()
-            glMatrixMode(GL_MODELVIEW)
-            glDisable(GL_TEXTURE_2D)
-          else: 
-            glColor4f(.1 + .8 * c[0] + f, .1 + .8 * c[1] + f, .1 + .8 * c[2] + f, visibility)
-            if self.battleStatus[4]:
-              glTranslatef(x, y + self.battleWhammyNow * .15 + v * 6, 0)
-            else:
-              glTranslatef(x, y + v * 6, 0)
-            key = self.keyMesh
-        
-            if(key.find("Glow_001")) == True:
-              key.render("Mesh")
-              if(key.find("Key_001")) == True:
-                glColor3f(self.keyColor[0], self.keyColor[1], self.keyColor[2])
-                key.render("Key_001")
-              if(key.find("Key_002")) == True:
-                glColor3f(self.key2Color[0], self.key2Color[1], self.key2Color[2])
-                key.render("Key_002")
-            else:
-              key.render()
-          
-          glDisable(GL_LIGHTING)
-          glDisable(GL_LIGHT0)
-          glDepthMask(0)
-          glPopMatrix()
-
-
-      f = self.fretActivity[n]
-
-      if f and self.disableFretSFX != True:
-
-        if self.glowColor[0] == -1:
-          s = 1.0
-        else:
-          s = 0.0
-        
-        while s < 1:
-          ms = s * (math.sin(self.time) * .25 + 1)
-          if self.glowColor[0] == -2:
-            glColor3f(c[0] * (1 - ms), c[1] * (1 - ms), c[2] * (1 - ms))
-          else:
-            glColor3f(self.glowColor[0] * (1 - ms), self.glowColor[1] * (1 - ms), self.glowColor[2] * (1 - ms))
-          
-          glPushMatrix()
-          if self.battleStatus[4]:
-            glTranslatef(x, y + self.battleWhammyNow * .15, 0)
-          else:
-            glTranslatef(x, y, 0)
-          glScalef(.1 + .02 * ms * f, .1 + .02 * ms * f, .1 + .02 * ms * f)
-          glRotatef( 90, 0, 1, 0)
-          glRotatef(-90, 1, 0, 0)
-          glRotatef(-90, 0, 0, 1)
-          if self.twoDkeys == False and self.keytex == False:
-            if(self.keyMesh.find("Glow_001")) == True:
-              key.render("Glow_001")
-            else:
-              key.render()
-          glPopMatrix()
-          s += 0.2
-          
-        #Hitglow color
-        if self.hitglow_color == 0:
-          glowcol = (c[0], c[1], c[2])#Same as fret
-        elif self.hitglow_color == 1:
-          glowcol = (1, 1, 1)#Actual color in .svg-file
-
-        f += 2
-
-        if self.battleStatus[4]:
-          self.engine.draw3Dtex(self.glowDrawing, coord = (x, y + self.battleWhammyNow * .15, 0.01), rot = (f * 90 + self.time, 0, 1, 0),
-                              texcoord = (0.0, 0.0, 1.0, 1.0), vertex = (-size[0] * f, -size[1] * f, size[0] * f, size[1] * f),
-                              multiples = True, alpha = True, color = glowcol)
-        else:
-          self.engine.draw3Dtex(self.glowDrawing, coord = (x, y, 0.01), rot = (f * 90 + self.time, 0, 1, 0),
-                              texcoord = (0.0, 0.0, 1.0, 1.0), vertex = (-size[0] * f, -size[1] * f, size[0] * f, size[1] * f),
-                              multiples = True, alpha = True, color = glowcol)
-
-    glDisable(GL_DEPTH_TEST)
 
   def renderFreestyleFlames(self, visibility, controls):
     if self.flameColors[0][0][0] == -1:
@@ -1516,7 +1332,7 @@ class Guitar(Instrument):
     self.matchingNotes = self.getRequiredNotesMFH(song, pos)
 
     self.controlsMatchNotes3(controls, self.matchingNotes, hopo)
-    
+
     #myfingershurt
     
     for time, note in self.matchingNotes:
