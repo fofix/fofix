@@ -158,6 +158,9 @@ class Theme(Task):
     #pov presets
     self.povPreset = (get("pov_preset", str, "rb"))
 
+    #Render necks toggle
+    self.doNecksRender = (get("render_necks", bool, True))
+
     #Fade settings for fretboard
     self.boardFade = (get("fretboard_fade_amount", float, 1))
 	

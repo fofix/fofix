@@ -66,6 +66,8 @@ class Neck:
 	
     self.boardFadeAmount = self.engine.theme.boardFade
 
+    self.doNecksRender = self.engine.theme.doNecksRender
+
     #death_au: fixed neck size
     
     if self.isDrum and self.engine.config.get("game", "large_drum_neck"):
@@ -790,7 +792,8 @@ class Neck:
         self.ocount = 1
 
       self.vis = visibility
-      self.renderNeck(visibility, song, pos)
+      if self.doNecksRender == True:
+        self.renderNeck(visibility, song, pos)
       if self.soloNeck:
         self.renderIncomingNecks(visibility, song, pos) #MFH
       if self.centerLines or self.oCenterLines or self.oFlash:
