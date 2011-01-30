@@ -1633,8 +1633,7 @@ class Instrument:
             glScalef(1, -1, 1)
             glMatrixMode(GL_MODELVIEW)
             glScalef(self.boardScaleX, self.boardScaleY, 1)
-            if self.isDrum:
-              if n == 4:
+            if self.isDrum and n == 4:
                 key = self.keyMeshOpen
             else:
               key = self.keyMesh
