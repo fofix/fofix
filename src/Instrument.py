@@ -980,11 +980,11 @@ class Instrument:
       glDepthMask(1)
       glShadeModel(GL_SMOOTH)
 
-      if self.noterotate:
+      if spNote == True and self.threeDspin == True and isOpen == False:
+        glRotate(90 + self.time/3, 0, 1, 0)
+      if isOpen == False and spNote == False and self.noterotate == True:
         glRotatef(90, 0, 1, 0)
         glRotatef(-90, 1, 0, 0)
-
-      glColor4f(*color)
 
       if fret == 0: # green note/ drums open note
         glRotate(self.noterot[0], 0, 0, 1), glTranslatef(0, self.notepos[0], 0)
@@ -999,15 +999,15 @@ class Instrument:
 
       if isOpen:
         if self.opentex_stara == True and spNote==False and self.starPowerActive:
-          self.openTex = self.opentexture_stara
-
+          self.noteTex = self.opentexture_stara
+		  
         elif self.opentex == True and spNote==False:
-          self.openTex = self.opentexture
+          self.noteTex = self.opentexture
 
         elif self.opentex_star == True and spNote==True:
-          self.openTex = self.opentexture_star
+          self.noteTex = self.opentexture_star
 
-      if self.spActTex and isOpen == False and spNote == False and spAct and self.isDrum:
+      elif self.spActTex and isOpen == False and spNote == False and spAct and self.isDrum:
         self.noteTex = self.spActTex
 
       elif self.staratex == True and self.starPowerActive and spNote == False and isOpen == False:
@@ -1019,47 +1019,34 @@ class Instrument:
       elif self.startex == True and spNote == True and isOpen == False:
         self.noteTex = getattr(self,"startex"+chr(97+fret))
 
-      if self.noteTex:
-        glColor3f(1,1,1)
-        glEnable(GL_TEXTURE_2D)
-        self.noteTex.texture.bind()
-        glMatrixMode(GL_TEXTURE)
-        glScalef(1, -1, 1)
-        glMatrixMode(GL_MODELVIEW)
-        glScalef(self.boardScaleX, self.boardScaleY, 1)
 
-        if isTappable:
-          mesh = "Mesh_001"
-        else:
-          mesh = "Mesh"
+      glColor3f(1,1,1)
+      glEnable(GL_TEXTURE_2D)
+      self.noteTex.texture.bind()
+      glMatrixMode(GL_TEXTURE)
+      glScalef(1, -1, 1)
+      glMatrixMode(GL_MODELVIEW)
+      glScalef(self.boardScaleX, self.boardScaleY, 1)
 
+      if isTappable:
+        mesh = "Mesh_001"
+      else:
+        mesh = "Mesh"
+
+      meshObj.render(mesh)
+
+      if shaders.enable("notes"):
+        shaders.setVar("isTextured",True)
         meshObj.render(mesh)
+        shaders.disable() 
 
-        if shaders.enable("notes"):
-          shaders.setVar("isTextured",True)
-          meshObj.render(mesh)
-          shaders.disable() 
+      glMatrixMode(GL_TEXTURE)
+      glLoadIdentity()
+      glMatrixMode(GL_MODELVIEW)
+      glDisable(GL_TEXTURE_2D)
 
-        glMatrixMode(GL_TEXTURE)
-        glLoadIdentity()
-        glMatrixMode(GL_MODELVIEW)
-        glDisable(GL_TEXTURE_2D)
 
-      elif self.openTex:
-        glColor3f(1,1,1)
-        glEnable(GL_TEXTURE_2D)
-        self.openTex.texture.bind()
-        glMatrixMode(GL_TEXTURE)
-        glScalef(1, -1, 1)
-        glMatrixMode(GL_MODELVIEW)
-        glScalef(self.boardScaleX, self.boardScaleY, 1)
-        meshObj.render()
-        glMatrixMode(GL_TEXTURE)
-        glLoadIdentity()
-        glMatrixMode(GL_MODELVIEW)
-        glDisable(GL_TEXTURE_2D)
-
-      else: 
+      if not self.noteTex: 
         #death_au: fixed 3D note colours
         glColor4f(*color)
         if isOpen == True and self.starPowerActive == False:
@@ -1084,6 +1071,8 @@ class Instrument:
 
       glDepthMask(0)
       glPopMatrix()
+      glDisable(GL_DEPTH_TEST)
+
   def renderNotes(self, visibility, song, pos):
     if not song:
       return
