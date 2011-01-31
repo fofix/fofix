@@ -233,20 +233,6 @@ class Guitar(Instrument):
         else:
           self.staratex = False
           break
-  
-  def noteBeingHeld(self):
-    noteHeld = False
-    for i in range(0,5):
-      if self.hit[i] == True:
-        noteHeld = True
-    return noteHeld
-
-  def isKillswitchPossible(self):
-    possible = False
-    for i in range(0,5):
-      if self.hit[i] == True:
-        possible = True
-    return possible
 
   def renderTail(self, length, sustain, kill, color, flat = False, tailOnly = False, isTappable = False, big = False, fret = 0, spNote = False, freestyleTail = 0, pos = 0):
 

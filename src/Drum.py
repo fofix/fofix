@@ -272,15 +272,6 @@ class Drum(Instrument):
       else:
         self.opentex_stara = False
 
-  def noteBeingHeld(self):
-    noteHeld = False
-    return noteHeld
-
-  def isKillswitchPossible(self):
-    possible = False
-    return possible
-
-
   #volshebnyi
   def renderFreestyleLanes(self, visibility, song, pos, controls):
     if not song:

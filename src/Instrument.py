@@ -1685,3 +1685,21 @@ class Instrument:
           glPopMatrix()
 
     glDisable(GL_DEPTH_TEST)
+
+  def noteBeingHeld(self):
+    noteHeld = False
+    if self.isDrum:
+      return noteHeld
+    for i in range(0,5):
+      if self.hit[i] == True:
+        noteHeld = True
+    return noteHeld
+
+  def isKillswitchPossible(self):
+    possible = False
+    if self.isDrum:
+      return possible
+    for i in range(0,5):
+      if self.hit[i] == True:
+        possible = True
+    return possible
