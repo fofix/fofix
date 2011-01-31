@@ -144,6 +144,8 @@ class Drum(Instrument):
       if not engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"drumfrets.png")):
         self.drumFretButtons = None
         engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"fretbuttons.png"))
+	  else:
+        self.drumFretButtons = True
     else: #death_au
       defaultKey = False
       defaultOpenKey = False
