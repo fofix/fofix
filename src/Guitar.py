@@ -76,6 +76,8 @@ class Guitar(Instrument):
     self.fretWeight     = [0.0] * self.strings
     self.fretActivity   = [0.0] * self.strings
 
+    self.drumFretButtons = None
+
     #myfingershurt:
     self.hopoStyle        = self.engine.config.get("game", "hopo_system")
     self.gh2sloppy        = self.engine.config.get("game", "gh2_sloppy")

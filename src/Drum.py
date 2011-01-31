@@ -140,12 +140,10 @@ class Drum(Instrument):
     self.loadNotes()
 
     if self.twoDkeys == True: #death_au
-      #myfingershurt: adding drumfretshacked.png for image-corrected drum fret angles in RB:
-      if not engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"drumfretshacked.png")):
-        engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"fretbuttons.png"))
       #death_au: adding drumfrets.png (with bass drum frets separate)
       if not engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"drumfrets.png")):
         self.drumFretButtons = None
+        engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"fretbuttons.png"))
     else: #death_au
       defaultKey = False
       defaultOpenKey = False

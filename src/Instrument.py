@@ -1538,29 +1538,46 @@ class Instrument:
         else:
           texSize = (n / self.lanenumber, n / self.lanenumber + 1 / self.lanenumber)
 
+        if self.drumFretButtons == None and self.isDrum:
+          if n == 4:
+            continue
+          whichFret = n+1
+          if whichFret == 4:
+            whichFret = 0
+            #reversing fret 0 since it's angled in Rock Band
+            texSize = (whichFret/5.0+0.2,whichFret/5.0)
+          else:
+            texSize = (whichFret/5.0,whichFret/5.0+0.2)
 
-        if self.isDrum and n == 4: #fret normal bass drum
-          texY = (1.0 / self.fretImgColNumber, 2.0 / self.fretImgColNumber)
-        else:#fret normall all other's (guitar, drums normal frets)
-          texY = (0.0, 1.0 / self.fretImgColNumber)#fret normal guitar/bass/drums
+          texY = (0.0,1.0/3.0)
+          if pressed:
+            texY = (1.0/3.0,2.0/3.0)
+          if self.hit[n]:
+            texY = (2.0/3.0,1.0)
 
-        if self.isDrum and n == 4 and pressed:#drums bass fret press
-          texY = (3.0 / self.fretImgColNumber, 4.0 / self.fretImgColNumber)
+        else:
+          if self.isDrum and n == 4: #fret normal bass drum
+            texY = (1.0 / self.fretImgColNumber, 2.0 / self.fretImgColNumber)
+          else:#fret normall all other's (guitar, drums normal frets)
+            texY = (0.0, 1.0 / self.fretImgColNumber)#fret normal guitar/bass/drums
 
-        elif controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]) or (self.isDrum and pressed):#fret press
-          if self.isDrum: #drum
-            texY = (2.0 / self.fretImgColNumber, 3.0 / self.fretImgColNumber)
-          else: #guitar / bass 
-		    texY = (1.0 / self.fretImgColNumber, 2.0 / self.fretImgColNumber)
+          if self.isDrum and n == 4 and pressed:#drums bass fret press
+            texY = (3.0 / self.fretImgColNumber, 4.0 / self.fretImgColNumber)
 
-        elif self.isDrum and n == 4 and self.hit[0]:#drum bass hit fret
-          texY = (5.0 / self.fretImgColNumber, 1.0)
+          elif controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]) or (self.isDrum and pressed):#fret press
+            if self.isDrum: #drum
+              texY = (2.0 / self.fretImgColNumber, 3.0 / self.fretImgColNumber)
+            else: #guitar / bass 
+		      texY = (1.0 / self.fretImgColNumber, 2.0 / self.fretImgColNumber)
 
-        elif self.hit[n]:#frets on note hit
-          if self.isDrum: #drum
-            texY = (4.0 / self.fretImgColNumber, 5.0 / self.fretImgColNumber)
-          else: #guitar / bass
-            texY = (2.0 / self.fretImgColNumber,1.0)
+          elif self.isDrum and n == 4 and self.hit[0]:#drum bass hit fret
+            texY = (5.0 / self.fretImgColNumber, 1.0)
+
+          elif self.hit[n]:#frets on note hit
+            if self.isDrum: #drum
+              texY = (4.0 / self.fretImgColNumber, 5.0 / self.fretImgColNumber)
+            else: #guitar / bass
+              texY = (2.0 / self.fretImgColNumber,1.0)
 
         self.engine.draw3Dtex(self.fretButtons, vertex = (size[0],size[1],-size[0],-size[1]), texcoord = (texSize[0], texY[0], texSize[1], texY[1]),
                                 coord = (x,v,0), multiples = True,color = fretColor, depth = True)
