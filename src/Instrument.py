@@ -1546,6 +1546,7 @@ class Instrument:
             whichFret = 0
             #reversing fret 0 since it's angled in Rock Band
             texSize = (whichFret/5.0+0.2,whichFret/5.0)
+
           else:
             texSize = (whichFret/5.0,whichFret/5.0+0.2)
 
@@ -1554,6 +1555,12 @@ class Instrument:
             texY = (1.0/3.0,2.0/3.0)
           if self.hit[n]:
             texY = (2.0/3.0,1.0)
+
+        elif self.battleStatus[3] and self.battleFrets != None and self.battleBreakString == n:
+          texSize = (n/5.0+.042,n/5.0+0.158)
+          size = (.30, .40)
+          fretPos = 8 - round((self.battleBreakNow/self.battleBreakLimit) * 8)
+          texY = (fretPos/8.0,(fretPos + 1.0)/8)
 
         else:
           if self.isDrum and n == 4: #fret normal bass drum
@@ -1573,7 +1580,7 @@ class Instrument:
           elif self.isDrum and n == 4 and self.hit[0]:#drum bass hit fret
             texY = (5.0 / self.fretImgColNumber, 1.0)
 
-          elif self.hit[n]:#frets on note hit
+          elif self.hit[n] or (self.battleStatus[3] and self.battleBreakString == n):#frets on note hit
             if self.isDrum: #drum
               texY = (4.0 / self.fretImgColNumber, 5.0 / self.fretImgColNumber)
             else: #guitar / bass
