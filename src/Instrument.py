@@ -1591,6 +1591,13 @@ class Instrument:
 
   
       else:
+        if self.isDrum:
+          self.keypos = self.engine.theme.drumkeypos
+          self.keyrot = self.engine.theme.drumkeyrot
+        else:
+          self.keypos = self.engine.theme.keypos
+          self.keyrot = self.engine.theme.keyrot
+
         if self.keyMesh:
           glPushMatrix()
           glDepthMask(1)
@@ -1607,15 +1614,15 @@ class Instrument:
           glRotatef(-90, 0, 0, 1)
 
           if n == 0: #green fret button
-            glRotate(self.engine.theme.keyrot[0], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.keypos[0])
+            glRotate(self.keyrot[0], 0, 1, 0), glTranslatef(0, 0, self.keypos[0])
           elif n == 1: #red fret button
-            glRotate(self.engine.theme.keyrot[1], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.keypos[1])
+            glRotate(self.keyrot[1], 0, 1, 0), glTranslatef(0, 0, self.keypos[1])
           elif n == 2: #yellow fret button
-            glRotate(self.engine.theme.keyrot[2], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.keypos[2])
+            glRotate(self.keyrot[2], 0, 1, 0), glTranslatef(0, 0, self.keypos[2])
           elif n == 3: #blue fret button
-            glRotate(self.engine.theme.keyrot[3], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.keypos[3])
+            glRotate(self.keyrot[3], 0, 1, 0), glTranslatef(0, 0, self.keypos[3])
           elif n == 4: #orange fret button
-            glRotate(self.engine.theme.keyrot[4], 0, 1, 0), glTranslatef(0, 0, self.engine.theme.keypos[4])
+            glRotate(self.keyrot[4], 0, 1, 0), glTranslatef(0, 0, self.keypos[4])
 
           #Mesh - Main fret
           #Key_001 - Top of fret (key_color)
