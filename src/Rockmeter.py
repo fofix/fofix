@@ -88,7 +88,10 @@ class Layer:
   #calculates the board's width at a certain position
   #returns a value not in pixels
   def boardWidth(self, x):
-      return player.boardWidth / math.sqrt((self.stage.scene.camera.origin[1] + x)**2+((self.stage.scene.camera.origin[2] + x)-0.5)**2)
+      self.engine.view.setViewport(1,0)
+      wFull, hFull = self.engine.view.geometry[2:4]
+      scaleCoef = (0.6 + 0.4 * self.stage.scene.numberOfGuitars) * 1.256 * hFull / wFull
+      return player.boardWidth / math.sqrt((self.stage.scene.camera.origin[1] + x)**2+((self.stage.scene.camera.origin[2] + x)-0.5)**2) * scaleCoef
 
   def __init__(self, stage, section):
     self.stage       = stage			#The rockmeter
@@ -159,6 +162,11 @@ class ImageLayer(Layer):
     self.scale[0] *= w/640.0
     self.scale[1] *= h/480.0
     
+    if "xpos" in self.inPixels:
+      self.position[0] *= w/640.0
+    else:        
+      self.position[0] *= w
+
     if "ypos" in self.inPixels:
       self.position[1] *= h/480.0
     else:        
