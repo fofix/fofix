@@ -33,7 +33,7 @@ import locale
 #Blazingamer - new drawing code
 #from Draw import *
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageOps
 from OpenGL.GL import glColor3f
 
 import math
@@ -136,7 +136,7 @@ class ImageLayer(Layer):
     w, h, = self.engine.view.geometry[2:4]
     texture = self.drawing
 
-    Layer.updateLayer(playerNum)
+    Layer.updateLayer(self, playerNum)
     
     self.rect      = list(eval(self.get("rect", str, "(0,1,0,1)")))
 
@@ -216,7 +216,7 @@ class FontLayer(Layer):
     wid, hgt = self.font.getStringSize(str(self.text))
 
 
-    Layer.updateLayer(playerNum)
+    Layer.updateLayer(self, playerNum)
     
     if "xpos" in self.inPixels:
       self.position[0] /= 640.0
@@ -268,14 +268,18 @@ class CircleLayer(Layer):
     self.drawnOverlays = {}
     baseFillImageSize = self.drawing.pixelSize
     for degrees in range(0, 361, 5):
-      overlay = Image.open(os.path.join("..", "data", drawing))
-      draw = ImageDraw.Draw(overlay)
+      image = Image.open(os.path.join("..", "data", drawing))
+      mask = Image.new('RGBA', baseFillImageSize)
+      overlay = Image.new('RGBA', baseFillImageSize)
+      draw = ImageDraw.Draw(mask)
       draw.pieslice((self.centerX-self.outRadius, self.centerY-self.outRadius,
                      self.centerX+self.outRadius, self.centerY+self.outRadius),
                      -90, degrees-90, outline=self.color, fill=self.color)
       draw.ellipse((self.centerX-self.inRadius, self.centerY-self.inRadius,
                     self.centerX+self.inRadius, self.centerY+self.inRadius),
                     outline=(0, 0, 0, 0), fill=(0, 0, 0, 0))
+      r,g,b,a = mask.split()
+      overlay.paste(image, mask=a)
       dispOverlay = ImgDrawing(self.engine.data.svg, overlay)
       self.drawnOverlays[degrees] = dispOverlay
 
@@ -285,7 +289,7 @@ class CircleLayer(Layer):
 
     self.ratio = ratio = eval(self.get("ratio", str, "1"))
 
-    Layer.updateLayer(playerNum)
+    Layer.updateLayer(self, playerNum)
     
     self.scale[0] *=  (self.rect[1] - self.rect[0])
     self.scale[1] *=  (self.rect[3] - self.rect[2])
