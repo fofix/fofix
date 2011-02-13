@@ -36,6 +36,8 @@ import locale
 from PIL import Image, ImageDraw
 from OpenGL.GL import glColor3f
 
+import math
+
 #these are the variables for setting the alignment of text and images
 #when setting them up in the rockmeter.ini you do not have
 #to put it in all caps, the code will take care of that
@@ -54,26 +56,26 @@ BOTTOM = 2
 #to refer to theme, instead it has a more friendly and logical setup.
 player = None
 
-score = 0
-streak = 0
-streakMax = 0
-power = 0
-stars = 0
-partialStars = 0
-rock = 0
-multiplier = 0
+score = 0               #player's score
+streak = 0              #player's streak
+streakMax = 0           #amount of notes it takes to hit make multiplier
+power = 0               #star power fill amount
+stars = 0               #how many stars earned
+partialStars = 0        #percentage of the current star earned
+rock = 0                #rock meter fill amount
+multiplier = 0          #player's multiplier
 
-minutes = 0
-seconds = 0
-minutesCountdown = 1
-secondsCountdown = 1
-songLength = 1
-minutesSongLength = 0
-secondsSongLength = 0
-position = 0
-countdownPosition = 1
-progress = 0.0         #this gives a percentage (between 0 and 1) 
-                       #of how far the song has played
+minutes = 0             #how many minutes into the song it is
+seconds = 0             #how many seconds into the song it is (0-59)
+minutesCountdown = 1    #how many minutes left
+secondsCountdown = 1    #how many seconds left
+songLength = 1          #length of the song (milliseconds)
+minutesSongLength = 0   #length of the song in minutes
+secondsSongLength = 0   #length of the song in seconds (0-59)
+position = 0            #millisecond position in the song
+countdownPosition = 1   #milliseconds left
+progress = 0.0          #this gives a percentage (between 0 and 1) 
+                        # of how far the song has played
 
 # A graphical rockmeter layer
 # This is the base template for all rockmeter layer types
@@ -82,6 +84,11 @@ class Layer:
     if self.config.has_option(self.section, value):
       return type(self.config.get(self.section, value))
     return default
+
+  #calculates the board's width at a certain position
+  #returns a value not in pixels
+  def boardWidth(self, x):
+      return player.boardWidth / math.sqrt((self.stage.scene.camera.origin[1] + x)**2+((self.stage.scene.camera.origin[2] + x)-0.5)**2)
 
   def __init__(self, stage, section):
     self.stage       = stage			#The rockmeter
@@ -101,8 +108,14 @@ class Layer:
   # all variables that should be updated during the rendering process
   # should be in here just for sake of readablity and organization
   def updateLayer(self, playerNum):
-    pass
-            
+    self.position  = [eval(self.get("xpos", str, "0.0")),    eval(self.get("ypos", str, "0.0"))]
+    self.scale     = [eval(self.get("xscale", str, "1.0")),  eval(self.get("yscale", str, "1.0"))]
+
+    self.angle       = self.get("angle", float, 0.0)
+    self.color       = self.get("color", str, "#FFFFFF")
+
+    self.alignment = eval(self.get("alignment", str, "center").upper())
+     
   # should handle the final step of rendering the image
   # be sure if you have variables being updated in updateVars
   # to call updateVars and refresh them.  playerNum is *especially*
@@ -123,19 +136,13 @@ class ImageLayer(Layer):
     w, h, = self.engine.view.geometry[2:4]
     texture = self.drawing
 
+    Layer.updateLayer(playerNum)
+    
     self.rect      = list(eval(self.get("rect", str, "(0,1,0,1)")))
 
     #all of this has to be repeated instead of using the base method
     #because now things can be calculated in relation to the image's properties
-    self.position  = [eval(self.get("xpos", str, "0.0")),    eval(self.get("ypos", str, "0.0"))]
-    self.scale     = [eval(self.get("xscale", str, "0.5")),  eval(self.get("yscale", str, "0.5"))]
 
-    self.angle       = self.get("angle", float, 0.0)
-    self.color       = self.get("color", str, "#FFFFFF")
-
-    self.condition = bool(eval(self.get("condition", str, "True")))
-
-    self.alignment = eval(self.get("alignment", str, "center").upper())
     self.valignment = eval(self.get("valignment", str, "center").upper())
 
     rect = self.rect
@@ -152,15 +159,12 @@ class ImageLayer(Layer):
     self.scale[0] *= w/640.0
     self.scale[1] *= h/480.0
     
-    if "xpos" in self.inPixels:
-      self.position[0] *= w/640.0
-    else:
-      self.position[0] *= w
-
     if "ypos" in self.inPixels:
       self.position[1] *= h/480.0
     else:        
       self.position[1] *= h
+
+    self.condition = bool(eval(self.get("condition", str, "True")))
 
   def render(self, visibility, playerNum):
     v = 1.0
@@ -202,9 +206,7 @@ class FontLayer(Layer):
     w, h, = self.engine.view.geometry[2:4]
 
     self.text = eval(self.get("text"))
-    self.color = self.get("color", str, "#FFFFFF")
-
-    self.alignment = eval(self.get("alignment", str, "left").upper())
+    self.useComma = self.get("useComma", bool, False)
 
     if self.useComma:
       self.text = locale.format("%d", self.text, grouping=True)
@@ -213,16 +215,9 @@ class FontLayer(Layer):
 
     wid, hgt = self.font.getStringSize(str(self.text))
 
-    self.position  = [eval(self.get("xpos", str, "0.0")),    eval(self.get("ypos", str, "0.0"))]
-    self.scale     = [eval(self.get("xscale", str, "1.0")),  eval(self.get("yscale", str, "1.0"))]
 
-    self.angle       = self.get("angle", float, 0.0)
-    self.color       = self.get("color", str, "#FFFFFF")
-
-    self.condition   = bool(eval(self.get("condition", str, "True")))
-
-    self.useComma = self.get("useComma", bool, False)
-
+    Layer.updateLayer(playerNum)
+    
     if "xpos" in self.inPixels:
       self.position[0] /= 640.0
     if "ypos" in self.inPixels:
@@ -235,6 +230,9 @@ class FontLayer(Layer):
     self.position[1] *= .75
     #not only that but it's upside down
     self.position[1] = .75 - self.position[1]
+    
+    self.condition = bool(eval(self.get("condition", str, "True")))
+
   def render(self, visibility, playerNum):
     w, h, = self.stage.engine.view.geometry[2:4]
     v = 1.0
@@ -270,7 +268,7 @@ class CircleLayer(Layer):
     self.drawnOverlays = {}
     baseFillImageSize = self.drawing.pixelSize
     for degrees in range(0, 361, 5):
-      overlay = Image.new('RGBA', baseFillImageSize)
+      overlay = Image.open(os.path.join("..", "data", drawing))
       draw = ImageDraw.Draw(overlay)
       draw.pieslice((self.centerX-self.outRadius, self.centerY-self.outRadius,
                      self.centerX+self.outRadius, self.centerY+self.outRadius),
@@ -287,14 +285,8 @@ class CircleLayer(Layer):
 
     self.ratio = ratio = eval(self.get("ratio", str, "1"))
 
-    self.condition = bool(eval(self.get("condition", str, "True")))
-    self.angle     = self.get("angle", float, 0.0)
-    self.color     = self.get("color", str, "#FFFFFF")
-    self.alignment = eval(self.get("alignment", str, "center").upper())
-
-    self.position  = [eval(self.get("xpos", str, "0.0")),    eval(self.get("ypos", str, "0.0"))]
-    self.scale     = [eval(self.get("xscale", str, "0.5")),  eval(self.get("yscale", str, "0.5"))]
-
+    Layer.updateLayer(playerNum)
+    
     self.scale[0] *=  (self.rect[1] - self.rect[0])
     self.scale[1] *=  (self.rect[3] - self.rect[2])
     #this allows you to scale images in relation to pixels instead
@@ -317,6 +309,8 @@ class CircleLayer(Layer):
       self.position[1] *= h/480.0
     else:        
       self.position[1] *= h
+
+    self.condition = bool(eval(self.get("condition", str, "True")))
 
   def render(self, visibility, playerNum):
     w, h, = self.stage.engine.view.geometry[2:4]
