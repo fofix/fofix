@@ -282,7 +282,7 @@ class CircleLayer(Layer):
       draw = ImageDraw.Draw(mask)
       draw.pieslice((self.centerX-self.outRadius, self.centerY-self.outRadius,
                      self.centerX+self.outRadius, self.centerY+self.outRadius),
-                     -90, degrees-90, outline=self.color, fill=self.color)
+                     -90, degrees-90, outline=(255,255,255,255), fill=(255,255,255,255))
       draw.ellipse((self.centerX-self.inRadius, self.centerY-self.inRadius,
                     self.centerX+self.inRadius, self.centerY+self.inRadius),
                     outline=(0, 0, 0, 0), fill=(0, 0, 0, 0))
