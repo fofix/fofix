@@ -909,6 +909,8 @@ class Instrument:
 
     if self.twoDnote == True:
 
+      noteImage = self.noteButtons
+
       if self.notedisappear ==0:#Notes keep on going when missed
         notecol = (1,1,1)#capo
       elif self.notedisappear == 1:#Notes disappear when missed
@@ -922,11 +924,25 @@ class Instrument:
         size = (self.boardWidth/1.9, (self.boardWidth/self.strings)/3.0)
         texSize = (0,1)
         if spNote == True:
-          texY = (3.0*0.166667,4.0*0.166667)
+          if self.noteOpenAnimatedPower:
+            noteImage = self.noteDrumOpenAnimatedPower
+            texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
+          else:
+            texY = (3.0*0.166667,4.0*0.166667)
+
         elif self.starPowerActive == True: #death_au: drum sp active notes.
-          texY = (5.0*0.166667,1.0)
+          if self.noteOpenAnimatedPowerActive:
+            noteImage = self.noteDrumOpenAnimatedPowerActive
+            texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
+          else:
+            texY = (5.0*0.166667,1.0)
+
         else:
-          texY = (1.0*0.166667,2.0*0.166667)
+          if self.noteOpenAnimated:
+            noteImage = self.noteDrumOpenAnimated
+            texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
+          else:
+            texY = (1.0*0.166667,2.0*0.166667)
 
       else:
         size = (self.boardWidth/self.strings/2, self.boardWidth/self.strings/2)
@@ -935,22 +951,47 @@ class Instrument:
         texSize = (fret/self.lanenumber,fret/self.lanenumber+1/self.lanenumber)
         if spNote == True:
           if isTappable:
-            texY = (3*0.166667, 4*0.166667)
+            if self.noteAnimatedPowerHOPO:
+              noteImage = self.noteAnimatedPowerHOPO
+              texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
+            else:
+              texY = (3*0.166667, 4*0.166667)
           else:
-            texY = (2*0.166667, 3*0.166667)
+            if self.noteAnimatedPower:
+              noteImage = self.noteAnimatedPower
+              texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
+            else:
+              texY = (2*0.166667, 3*0.166667)
+
+        elif self.starPowerActive:
+          if isTappable:
+            if self.noteAnimatedPowerActiveHOPO:
+              noteImage = self.noteAnimatedPowerActiveHOPO
+              texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
+            else:
+              texY = (5*0.166667, 1)
+          else:
+            if self.noteAnimatedPowerActive:
+              noteImage = self.noteAnimatedPowerActive
+              texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
+            else:
+              texY = (4*0.166667, 5*0.166667)
+
         else:
           if isTappable:
-            texY = (1*0.166667, 2*0.166667)
+            if self.noteAnimatedHOPO:
+              noteImage = self.noteAnimatedHOPO
+              texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
+            else:
+              texY = (1*0.166667, 2*0.166667)
           else:
-            texY = (0, 1*0.166667)
-        #myfingershurt: adding spNote==False conditional so that star notes can appear in overdrive
-        if self.starPowerActive and spNote == False:
-          if isTappable:
-            texY = (5*0.166667, 1)
-          else:
-            texY = (4*0.166667, 5*0.166667)
+            if self.noteAnimatedNormal:
+              noteImage = self.noteAnimatedNormal
+              texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
+            else:
+              texY = (0, 1*0.166667)
 
-      self.engine.draw3Dtex(self.noteButtons, vertex = (-size[0],size[1],size[0],-size[1]), texcoord = (texSize[0],texY[0],texSize[1],texY[1]),
+      self.engine.draw3Dtex(noteImage, vertex = (-size[0],size[1],size[0],-size[1]), texcoord = (texSize[0],texY[0],texSize[1],texY[1]),
                             scale = (1,1,0), rot = (30,1,0,0), multiples = False, color = color, vertscale = .27)
 
     else: #3d Notes
@@ -1719,7 +1760,7 @@ class Instrument:
     return possible
 
   def loadNotes(self):
-    self.noteSpin = False #self.engine.config.get("performance", "starspin")
+    self.noteSpin = self.engine.config.get("performance", "animated_notes")
 
     engine = self.engine
     themename = self.engine.data.themeLabel
@@ -1746,21 +1787,21 @@ class Instrument:
         if not engine.loadImgDrawing(self, "noteAnimatedPowerActiveHOPO", get("animated_power_active_hopo.png")):
           self.noteAnimatedPowerActiveHOPO = None
         if self.isDrum:
-          if not engine.loadImgDrawing(self, "noteDrumOpenAnimatedPowerActive", get("animated_open_power_active.png")):
-            self.noteDrumOpenAnimatedPowerActive = None
-          if not engine.loadImgDrawing(self, "noteDrumOpenAnimatedPower", get("animated_open_power.png")):
-            self.noteDrumOpenAnimatedPowerActive = None
-          if not engine.loadImgDrawing(self, "noteDrumOpenAnimated", get("animated_open.png")):
-            self.noteDrumOpenAnimated = None
+          if not engine.loadImgDrawing(self, "noteOpenAnimatedPowerActive", get("animated_open_power_active.png")):
+            self.noteOpenAnimatedPowerActive = None
+          if not engine.loadImgDrawing(self, "noteOpenAnimatedPower", get("animated_open_power.png")):
+            self.noteOpenAnimatedPower = None
+          if not engine.loadImgDrawing(self, "noteOpenAnimated", get("animated_open.png")):
+            self.noteOpenAnimated = None
         if self.gameMode2p == 6: #battle multiplayer
           if engine.loadImgDrawing(self, "noteButtons", get("spinnotesbattle.png")):
             self.starSpinFrames = 8
-      else:
-        if not self.isDrum and self.gameMode2p == 6: #battle multiplayer
-          if not self.engine.loadImgDrawing(self, "noteButtons", get("notesbattle.png")):
-            engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
-        else:
+
+      if not self.isDrum and self.gameMode2p == 6: #battle multiplayer
+        if not self.engine.loadImgDrawing(self, "noteButtons", get("notesbattle.png")):
           engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
+      else:
+        engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
     else:
       defaultNote = False
       defaultOpenNote = False
@@ -1798,6 +1839,16 @@ class Instrument:
           else:
             self.notetex = False
 
+          if self.engine.loadImgDrawing(self,  "startex"+chr(97+i),  get("startex_"+chr(97+i)+".png")):
+            self.startex = True
+          else:
+            self.startex = False
+
+          if self.engine.loadImgDrawing(self,  "staratex"+chr(97+i),  get("staratex_"+chr(97+i)+".png")):
+            self.staratex = True
+          else:
+            self.staratex = False
+
 
       if self.isDrum: 
         if not self.engine.loadImgDrawing(self, "spActTex", get("spacttex.png")):
@@ -1824,16 +1875,3 @@ class Instrument:
           self.opentex_stara = True
         else:
           self.opentex_stara = False
-
-
-      if self.starMesh:
-        for i in range(5):
-          if self.engine.loadImgDrawing(self,  "startex"+chr(97+i),  get("startex_"+chr(97+i)+".png")):
-            self.startex = True
-          else:
-            self.startex = False
-
-          if self.engine.loadImgDrawing(self,  "staratex"+chr(97+i),  get("staratex_"+chr(97+i)+".png")):
-            self.staratex = True
-          else:
-            self.staratex = False

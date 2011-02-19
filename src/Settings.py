@@ -1430,7 +1430,7 @@ def quickset(config):
   if perfSetNum == 1:
     config.set("engine", "highpriority", False)
     config.set("performance", "game_priority", 2)
-    config.set("performance", "starspin", False)
+    config.set("performance", "animated_notes", False)
     config.set("game", "rb_midi_lyrics", 0)
     config.set("game", "rb_midi_sections", 0)
     config.set("game", "gsolo_acc_disp", 0)
@@ -1456,7 +1456,7 @@ def quickset(config):
   elif perfSetNum == 2:
     config.set("engine", "highpriority", False)
     config.set("performance", "game_priority", 2)
-    config.set("performance", "starspin", False)
+    config.set("performance", "animated_notes", False)
     config.set("game", "rb_midi_lyrics", 1)
     config.set("game", "rb_midi_sections", 1)
     config.set("game", "gsolo_acc_disp", 1)
@@ -1481,7 +1481,7 @@ def quickset(config):
   elif perfSetNum == 3:
     config.set("engine", "highpriority", False)
     config.set("performance", "game_priority", 2)
-    config.set("performance", "starspin", True)
+    config.set("performance", "animated_notes", True)
     config.set("game", "rb_midi_lyrics", 2)
     config.set("game", "rb_midi_sections", 2)
     config.set("game", "gsolo_acc_disp", 1)
@@ -1505,7 +1505,7 @@ def quickset(config):
   elif perfSetNum == 4:
     config.set("engine", "highpriority", False)
     config.set("performance", "game_priority", 2)
-    config.set("performance", "starspin", True)
+    config.set("performance", "animated_notes", True)
     config.set("game", "rb_midi_lyrics", 2)
     config.set("game", "rb_midi_sections", 2)
     config.set("game", "gsolo_acc_disp", 2)
