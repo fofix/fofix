@@ -50,11 +50,6 @@ class Guitar(Instrument):
     self.debugMode = False
     self.gameMode2p = self.engine.world.multiMode
     self.matchingNotes = []
-    
-    self.starSpinFrameIndex = 0
-
-    self.starSpinFrames = 16
-    
             
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
     if self.logClassInits == 1:
@@ -65,11 +60,6 @@ class Guitar(Instrument):
     self.missedNotes    = []
     self.missedNoteNums = []
     self.editorMode     = editorMode
-
-    self.Animspeed      = 30#Lower value = Faster animations
-    #For Animated Starnotes
-    self.indexCount     = 0
-
 
     self.freestyleHitFlameCounts = [0 for n in range(self.strings+1)]    #MFH
 
@@ -175,64 +165,6 @@ class Guitar(Instrument):
     self.rockLevel = 0.0
 
     self.neck = Neck(self.engine, self, playerObj)
-
-  def loadNotes(self):
-      
-    get = lambda file: self.checkPath("notes", file)
-	
-    self.spActTex = None
-	
-    self.starspin = self.engine.config.get("performance", "starspin")
-    if self.twoDnote:
-      if self.starspin:
-        if self.gameMode2p == 6: #battle multiplayer
-          if self.engine.loadImgDrawing(self, "noteButtons", get("spinnotesbattle.png")):
-            self.starSpinFrames = 8
-          else:
-            self.starspin = False
-            if not self.engine.loadImgDrawing(self, "noteButtons", get("notesbattle.png")):
-              self.engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
-        else: 
-          if not self.engine.loadImgDrawing(self, "noteButtons", get("spinnotes.png")):
-            self.starspin = False
-            self.engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
-      else:
-        if self.gameMode2p == 6: #battle multiplayer
-          if not self.engine.loadImgDrawing(self, "noteButtons", get("notesbattle.png")):
-            self.engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
-        else:
-          self.engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
-    else:
-      if self.engine.fileExists(get("note.dae")):
-        self.engine.resource.load(self,  "noteMesh",  lambda: Mesh(self.engine.resource.fileName(get("note.dae"))))
-      else: #fallback to the default in the data folder
-        self.engine.resource.load(self,  "noteMesh",  lambda: Mesh(self.engine.resource.fileName("note.dae")))
-
-      for i in range(5):
-        if self.engine.loadImgDrawing(self,  "notetex"+chr(97+i),  get("notetex_"+chr(97+i)+".png")):
-          self.notetex = True
-        else:
-          self.notetex = False
-          break
-        
-      if self.engine.fileExists(get("star.dae")):  
-        self.engine.resource.load(self,  "starMesh",  lambda: Mesh(self.engine.resource.fileName(get("star.dae"))))
-      else:  
-        self.starMesh = None
-
-      for i in range(5):
-        if self.engine.loadImgDrawing(self,  "startex"+chr(97+i),  get("startex_"+chr(97+i)+".png")):
-          self.startex = True
-        else:
-          self.startex = False
-          break
-
-      for i in range(5):
-        if self.engine.loadImgDrawing(self,  "staratex"+chr(97+i),  get("staratex_"+chr(97+i)+".png")):
-          self.staratex = True
-        else:
-          self.staratex = False
-          break
 
   def renderTail(self, length, sustain, kill, color, flat = False, tailOnly = False, isTappable = False, big = False, fret = 0, spNote = False, freestyleTail = 0, pos = 0):
 
@@ -1419,16 +1351,15 @@ class Guitar(Instrument):
     if not self.paused:
       self.time += ticks
     
-    # #MFH - Determine which frame to display for starpower notes
-    # if self.starspin:
-      # self.indexCount = self.indexCount + 1
-      # if self.indexCount > self.Animspeed-1:
-        # self.indexCount = 0
-      # self.starSpinFrameIndex = (self.indexCount * self.starSpinFrames - (self.indexCount * self.starSpinFrames) % self.Animspeed) / self.Animspeed
-      # if self.starSpinFrameIndex > self.starSpinFrames - 1:
-        # self.starSpinFrameIndex = 0
-        
-    
+    #MFH - Determine which frame to display for starpower notes
+    if self.noteSpin:
+      self.indexCount = self.indexCount + 1
+      if self.indexCount > self.Animspeed-1:
+        self.indexCount = 0
+      self.noteSpinFrameIndex = (self.indexCount * self.noteSpinFrames - (self.indexCount * self.noteSpinFrames) % self.Animspeed) / self.Animspeed
+      if self.noteSpinFrameIndex > self.noteSpinFrames - 1:
+        self.noteSpinFrameIndex = 0
+
     #myfingershurt: must not decrease SP if paused.
     if self.starPowerActive == True and self.paused == False:
       self.starPower -= ticks/self.starPowerDecreaseDivisor 

@@ -23,14 +23,15 @@
 
 
 
-#myfingershurt: needed for multi-OS file fetching
+
 from Song import Note, Tempo
+from Mesh import Mesh
+from Shader import shaders
+from OpenGL.GL import *
 import Log
 import math
-import os
-from Shader import shaders
+import os #myfingershurt: needed for multi-OS file fetching
 import numpy as np
-from OpenGL.GL import *
 
 
 class Instrument:
@@ -56,6 +57,12 @@ class Instrument:
     self.incomingNeckMode = self.engine.config.get("game", "incoming_neck_mode")
     self.guitarSoloNeckMode = self.engine.config.get("game", "guitar_solo_neck")
     self.bigRockEndings = self.engine.config.get("game", "big_rock_endings")
+
+    #For Animated notes
+    self.noteSpinFrames = 16
+    self.Animspeed      = 30 #Lower value = Faster animations
+    self.indexCount     = 0
+    self.noteSpinFrameIndex = 0
 
     # Volshebnyi - BRE scoring variables
     self.freestyleEnabled = False
@@ -1710,3 +1717,123 @@ class Instrument:
       if self.hit[i] == True:
         possible = True
     return possible
+
+  def loadNotes(self):
+    self.noteSpin = False #self.engine.config.get("performance", "starspin")
+
+    engine = self.engine
+    themename = self.engine.data.themeLabel
+
+    get = lambda file: self.checkPath("notes", file)
+
+    self.spActTex = None
+    self.noteTex = None
+    self.noteButtons = None
+    
+    if self.twoDnote == True:
+      if self.noteSpin:
+        self.starSpinFrames = 16
+        if not engine.loadImgDrawing(self, "noteAnimatedNormal", get("animated_normal.png")):
+          self.noteAnimatedNormal = None
+        if not engine.loadImgDrawing(self, "noteAnimatedHOPO", get("animated_hopo.png")):
+          self.noteAnimatedHOPO = None
+        if not engine.loadImgDrawing(self, "noteAnimatedPower", get("animated_power.png")):
+          self.noteAnimatedPower = None
+        if not engine.loadImgDrawing(self, "noteAnimatedPowerHOPO", get("animated_power_hopo.png")):
+          self.noteAnimatedPowerHOPO = None
+        if not engine.loadImgDrawing(self, "noteAnimatedPowerActive", get("animated_power_active.png")):
+          self.noteAnimatedPowerActive = None
+        if not engine.loadImgDrawing(self, "noteAnimatedPowerActiveHOPO", get("animated_power_active_hopo.png")):
+          self.noteAnimatedPowerActiveHOPO = None
+        if self.isDrum:
+          if not engine.loadImgDrawing(self, "noteDrumOpenAnimatedPowerActive", get("animated_open_power_active.png")):
+            self.noteDrumOpenAnimatedPowerActive = None
+          if not engine.loadImgDrawing(self, "noteDrumOpenAnimatedPower", get("animated_open_power.png")):
+            self.noteDrumOpenAnimatedPowerActive = None
+          if not engine.loadImgDrawing(self, "noteDrumOpenAnimated", get("animated_open.png")):
+            self.noteDrumOpenAnimated = None
+        if self.gameMode2p == 6: #battle multiplayer
+          if engine.loadImgDrawing(self, "noteButtons", get("spinnotesbattle.png")):
+            self.starSpinFrames = 8
+      else:
+        if not self.isDrum and self.gameMode2p == 6: #battle multiplayer
+          if not self.engine.loadImgDrawing(self, "noteButtons", get("notesbattle.png")):
+            engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
+        else:
+          engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
+    else:
+      defaultNote = False
+      defaultOpenNote = False
+
+      #MFH - can't use IOError for fallback logic for a Mesh() call... 
+      if self.isDrum and self.engine.fileExists(get("note_drum.dae")) and self.isDrum:
+        self.engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName(get("note_drum.dae"))))
+      elif self.engine.fileExists(get("note.dae")):
+        self.engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName(get("note.dae"))))
+      else:
+        self.engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName("note.dae")))
+        defaultNote = True
+
+      if self.isDrum and self.engine.fileExists(os.path.join("themes", themename, "star_drum.dae")):  
+        self.engine.resource.load(self,  "starMesh",  lambda: Mesh(self.engine.resource.fileName("themes", themename, "star_drum.dae")))
+      elif self.engine.fileExists(os.path.join("themes", themename, "star.dae")):  
+        self.engine.resource.load(self,  "starMesh",  lambda: Mesh(self.engine.resource.fileName("themes", themename, "star.dae")))
+      else:  
+        self.starMesh = None
+
+      if self.isDrum:
+        if self.engine.fileExists(get("open.dae")):
+          self.engine.resource.load(self,  "openMesh",  lambda: Mesh(self.engine.resource.fileName(get("open.dae"))))
+        else: #fallback to the default in the data folder
+          self.engine.resource.load(self,  "openMesh",  lambda: Mesh(self.engine.resource.fileName("open.dae")))
+          defualtOpenNote = True
+
+      if defaultNote:
+        self.notetex = False
+
+      else:
+        for i in range(5):
+          if engine.loadImgDrawing(self,  "notetex"+chr(97+i),  get("notetex_"+chr(97+i)+".png")):
+            self.notetex = True
+          else:
+            self.notetex = False
+
+
+      if self.isDrum: 
+        if not self.engine.loadImgDrawing(self, "spActTex", get("spacttex.png")):
+          self.spActTex = None
+
+
+      if defaultOpenNote:
+        self.opentex = False
+        self.opentex_star = False
+        self.opentex_stara = False
+
+      else:
+        if self.engine.loadImgDrawing(self, "opentexture", get("opentex.png")):
+          self.opentex = True
+        else:
+          self.opentex = False
+
+        if self.engine.loadImgDrawing(self, "opentexture_star", get("opentex_star.png")):
+          self.opentex_star = True
+        else:
+          self.opentex_star = False
+
+        if self.engine.loadImgDrawing(self, "opentexture_stara", get("opentex_stara.png")):
+          self.opentex_stara = True
+        else:
+          self.opentex_stara = False
+
+
+      if self.starMesh:
+        for i in range(5):
+          if self.engine.loadImgDrawing(self,  "startex"+chr(97+i),  get("startex_"+chr(97+i)+".png")):
+            self.startex = True
+          else:
+            self.startex = False
+
+          if self.engine.loadImgDrawing(self,  "staratex"+chr(97+i),  get("staratex_"+chr(97+i)+".png")):
+            self.staratex = True
+          else:
+            self.staratex = False

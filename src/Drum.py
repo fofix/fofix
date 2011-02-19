@@ -199,81 +199,6 @@ class Drum(Instrument):
 
     self.neck = Neck(self.engine, self, playerObj)
 
-  def loadNotes(self):      
-    get = lambda file: self.checkPath("notes", file)
-    themename = self.engine.data.themeLabel
-    self.noteTex = None
-    if self.twoDnote == True:  
-      self.engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
-    else:
-      defaultNote = False
-      #MFH - can't use IOError for fallback logic for a Mesh() call... 
-      if self.engine.fileExists(get("note_drum.dae")):
-        self.engine.resource.load(self,  "noteMesh",  lambda: Mesh(self.engine.resource.fileName(get("note_drum.dae"))))
-      elif self.engine.fileExists(get("note.dae")):
-        self.engine.resource.load(self,  "noteMesh",  lambda: Mesh(self.engine.resource.fileName(get("note.dae"))))
-      else:
-        self.engine.resource.load(self,  "noteMesh",  lambda: Mesh(self.engine.resource.fileName("note.dae")))
-        defaultNote = True
-
-      if defaultNote:
-        self.notetex = False
-        self.starMesh = None
-        self.startex = False
-        self.staratex = False
-        self.spActTex = None
-      else:
-        for i in range(5):
-          if self.engine.loadImgDrawing(self,  "notetex"+chr(97+i),  get("notetex_"+chr(97+i)+".png")):
-            self.notetex = True
-          else:
-            self.notetex = False
-            break
-
-        if self.engine.fileExists(os.path.join("themes", themename, "star_drum.dae")):  
-          self.engine.resource.load(self,  "starMesh",  lambda: Mesh(self.engine.resource.fileName("themes", themename, "star_drum.dae")))
-        elif self.engine.fileExists(os.path.join("themes", themename, "star.dae")):  
-          self.engine.resource.load(self,  "starMesh",  lambda: Mesh(self.engine.resource.fileName("themes", themename, "star.dae")))
-        else:  
-          self.starMesh = None
-
-        for i in range(5):
-          if self.engine.loadImgDrawing(self,  "startex"+chr(97+i),  get("startex_"+chr(97+i)+".png")):
-            self.startex = True
-          else:
-            self.startex = False
-            break
-
-        for i in range(5):
-          if self.engine.loadImgDrawing(self,  "staratex"+chr(97+i),  get("staratex_"+chr(97+i)+".png")):
-            self.staratex = True
-          else:
-            self.staratex = False
-            break
-
-        if not self.engine.loadImgDrawing(self, "spActTex", get("spacttex.png")):
-          self.spActTex = None
-      
-      if self.engine.fileExists(get("open.dae")):
-        self.engine.resource.load(self,  "openMesh",  lambda: Mesh(self.engine.resource.fileName(get("open.dae"))))
-      else: #fallback to the default in the data folder
-        self.engine.resource.load(self,  "openMesh",  lambda: Mesh(self.engine.resource.fileName("open.dae")))
-
-      if self.engine.loadImgDrawing(self, "opentexture", get("opentex.png")):
-        self.opentex = True
-      else:
-        self.opentex = False
-
-      if self.engine.loadImgDrawing(self, "opentexture_star", get("opentex_star.png")):
-        self.opentex_star = True
-      else:
-        self.opentex_star = False
-
-      if self.engine.loadImgDrawing(self, "opentexture_stara", get("opentex_stara.png")):
-        self.opentex_stara = True
-      else:
-        self.opentex_stara = False
-
   #volshebnyi
   def renderFreestyleLanes(self, visibility, song, pos, controls):
     if not song:
@@ -1041,6 +966,16 @@ class Drum(Instrument):
   def run(self, ticks, pos, controls):
     if not self.paused:
       self.time += ticks
+
+    #MFH - Determine which frame to display for starpower notes
+    if self.noteSpin:
+      self.indexCount = self.indexCount + 1
+      if self.indexCount > self.Animspeed-1:
+        self.indexCount = 0
+      self.noteSpinFrameIndex = (self.indexCount * self.noteSpinFrames - (self.indexCount * self.noteSpinFrames) % self.Animspeed) / self.Animspeed
+      if self.noteSpinFrameIndex > self.noteSpinFrames - 1:
+        self.noteSpinFrameIndex = 0
+
     #myfingershurt: must not decrease SP if paused.
     if self.starPowerActive == True and self.paused == False:
       self.starPower -= ticks/self.starPowerDecreaseDivisor 
