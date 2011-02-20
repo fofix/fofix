@@ -173,9 +173,9 @@ class ImageLayer(Layer):
     #this allows you to scale images in relation to pixels instead
     #of percentage of the size of the image.
     if "xscale" in self.inPixels:
-      scale[0] /= texture.pixelSize[0]
+      scale[0] /= texture.pixelSize[0] * (rect[1] - rect[0])
     if "yscale" in self.inPixels:
-      scale[1] /= texture.pixelSize[1]
+      scale[1] /= texture.pixelSize[1] * (rect[3] - rect[2])
 
     scale[1] = -scale[1]
     scale[0] *= w/640.0
@@ -527,10 +527,20 @@ class Replace(Effect):
         else:
           if len(self.drawings) > 1:
             self.layer.drawing = self.drawings[i]
-          if len(self.rects) > 1:
+          elif len(self.rects) > 1:
             self.layer.finals[-1] = self.rects[i]
           self.fixScale()
-        break
+        return
+    if self.type == "font":
+        self.layer.finals[-1] = self.text[-1]
+    else:
+        if len(self.drawings) > 0:
+            self.layer.drawing = self.drawings[-1]
+        elif len(self.rects) > 0:
+            self.layer.finals[-1] = self.rects[-1]
+            
+    
+    
         
 class Rockmeter:
   def get(self, value, type = str, default = None):
