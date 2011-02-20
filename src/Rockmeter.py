@@ -408,8 +408,6 @@ class Slide(Effect):
     self.startCoord = [eval(self.get("startX", str, "0.0")), eval(self.get("startY", str, "0.0"))]
     self.endCoord   = [eval(self.get("endX",   str, "0.0")), eval(self.get("endY",   str, "0.0"))]
 
-    self.position = [eval(self.get("startX", str, "0.0")), eval(self.get("startY", str, "0.0"))]
-
     self.inPixels  = self.get("inPixels", str, "").split("|")
 
     self.condition = self.get("condition", str, "True")
@@ -417,14 +415,14 @@ class Slide(Effect):
     w, h, = self.layer.engine.view.geometry[2:4]
 
     if "startX" in self.inPixels:
-      self.position[0] *= w/640.0
+      self.startCoord[0] *= w/640.0
     else:
-      self.position[0] *= w
+      self.startCoord[0] *= w
 
     if "startY" in self.inPixels:
-      self.position[1] *= h/480.0
+      self.startCoord[1] *= h/480.0
     else:
-      self.position[1] *= h
+      self.startCoord[1] *= h
 
     if "endX" in self.inPixels:
       self.endCoord[0] *= w/640.0
@@ -436,7 +434,7 @@ class Slide(Effect):
     else:
       self.endCoord[1] *= h
 
-
+    self.position = [self.startCoord[0], self.startCoord[1]]
     self.reverse = bool(eval(self.get("reverse", str, "True")))   
 
     #how long it takes for the transition to take place
@@ -462,6 +460,11 @@ class Slide(Effect):
       else:  
         self.position = self.startCoord
     
+    #fixes coordinates for fonts
+    if isinstance(self.layer, FontLayer):
+        self.position[1] *= .75
+        self.position[1] = .75 - self.position[1]
+        
     self.layer.finals[0] = [self.position[0], self.position[1]]
 
 #replaces the image of the layer when the condition is met
@@ -516,10 +519,6 @@ class Replace(Effect):
     
   def update(self):
 
-    if self.type == "font":
-      self.layer.finals[6] = self.text[-1]
-    else:
-      self.layer.drawing = self.drawings[-1]
     for i, cond in enumerate(self.conditions):
       if bool(eval(cond)):
         if self.type == "font":
@@ -532,12 +531,13 @@ class Replace(Effect):
           self.fixScale()
         return
     if self.type == "font":
-        self.layer.finals[-1] = self.text[-1]
+      self.layer.finals[-1] = self.text[-1]
     else:
-        if len(self.drawings) > 0:
-            self.layer.drawing = self.drawings[-1]
-        elif len(self.rects) > 0:
-            self.layer.finals[-1] = self.rects[-1]
+      if len(self.drawings) > 0:
+          self.layer.drawing = self.drawings[-1]
+      if len(self.rects) > 0:
+          self.layer.finals[-1] = self.rects[-1]
+      self.fixScale()
             
     
     
