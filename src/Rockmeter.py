@@ -414,25 +414,39 @@ class Slide(Effect):
     
     w, h, = self.layer.engine.view.geometry[2:4]
 
-    if "startX" in self.inPixels:
-      self.startCoord[0] *= w/640.0
+    if isinstance(self.layer, FontLayer):
+      if "startX" in self.inPixels:
+        self.startCoord[0] /= 640.0
+      if "endX" in self.inPixels:
+        self.endCoord[0] /= 640.0
+      if "startY" in self.inPixels:
+        self.startCoord[1] /= 480.0
+      if "endY" in self.inPixels:
+        self.endCoord[1] /= 480.0
+      self.startCoord[1] *= .75
+      self.startCoord[1] = .75 - self.startCoord[1]
+      self.endCoord[1] *= .75
+      self.endCoord[1] = .75 - self.endCoord[1]
     else:
-      self.startCoord[0] *= w
+      if "startX" in self.inPixels:
+        self.startCoord[0] *= w/640.0
+      else:
+        self.startCoord[0] *= w
 
-    if "startY" in self.inPixels:
-      self.startCoord[1] *= h/480.0
-    else:
-      self.startCoord[1] *= h
+      if "startY" in self.inPixels:
+        self.startCoord[1] *= h/480.0
+      else:
+        self.startCoord[1] *= h
 
-    if "endX" in self.inPixels:
-      self.endCoord[0] *= w/640.0
-    else:
-      self.endCoord[0] *= w
+      if "endX" in self.inPixels:
+        self.endCoord[0] *= w/640.0
+      else:
+        self.endCoord[0] *= w
 
-    if "endY" in self.inPixels:
-      self.endCoord[1] *= h/480.0
-    else:
-      self.endCoord[1] *= h
+      if "endY" in self.inPixels:
+        self.endCoord[1] *= h/480.0
+      else:
+        self.endCoord[1] *= h
 
     self.position = [self.startCoord[0], self.startCoord[1]]
     self.reverse = bool(eval(self.get("reverse", str, "True")))   
@@ -447,23 +461,38 @@ class Slide(Effect):
     condition = bool(eval(self.condition))
 
     if condition:
-      if self.position[0] < self.endCoord[0]:
-        self.position[0] += self.slideX
-      if self.position[1] < self.endCoord[1]:
-        self.position[1] += self.slideY
+      if self.endCoord[0] < self.startCoord[0]:
+        if self.position[0] > self.endCoord[0]:
+          self.position[0] += self.slideX
+      else:
+        if self.position[0] < self.endCoord[0]:
+          self.position[0] -= self.slideX
+      if self.endCoord[1] < self.startCoord[1]:
+        if self.position[1] > self.endCoord[1]:
+          self.position[1] += self.slideY
+      else:
+        if self.position[1] < self.endCoord[1]:
+          self.position[1] -= self.slideY
     else:
       if self.reverse:
-        if self.position[0] > self.startCoord[0]:
-          self.position[0] -= self.slideX
-        if self.position[1] > self.startCoord[1]:
-          self.position[1] -= self.slideY
+        if self.endCoord[0] < self.startCoord[0]:
+          if self.position[0] < self.startCoord[0]:
+            self.position[0] -= self.slideX
+        else:
+          if self.position[0] > self.startCoord[0]:
+            self.position[0] += self.slideX
+        if self.endCoord[1] < self.startCoord[1]:
+          if self.position[1] < self.startCoord[1]:
+            self.position[1] -= self.slideY
+        else:
+          if self.position[1] > self.startCoord[1]:
+            self.position[1] += self.slideY
       else:  
         self.position = self.startCoord
     
     #fixes coordinates for fonts
     if isinstance(self.layer, FontLayer):
-        self.position[1] *= .75
-        self.position[1] = .75 - self.position[1]
+      self.position[1] *= -1
         
     self.layer.finals[0] = [self.position[0], self.position[1]]
 
