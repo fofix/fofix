@@ -829,7 +829,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(self.engine, self.engine.config, "game", "rb_sp_neck_glow", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "game",   "small_rb_mult", autoApply = True), #blazingamer
       ConfigChoice(self.engine, self.engine.config, "game", "starfx", autoApply = True),
-      ConfigChoice(self.engine, self.engine.config, "performance", "starspin", autoApply = True, isQuickset = 1),
+      ConfigChoice(self.engine, self.engine.config, "performance", "animated_notes", autoApply = True, isQuickset = 1),
     ]
     self.themeDisplayMenu = Menu.Menu(self.engine, self.themeDisplaySettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
     
