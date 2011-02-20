@@ -456,7 +456,10 @@ class Slide(Effect):
 
     self.slideX = (self.endCoord[0] - self.startCoord[0])/self.transitionTime
     self.slideY = (self.endCoord[1] - self.startCoord[1])/self.transitionTime
-
+    if isinstance(self.layer, FontLayer):
+        self.slideX *= -1
+        self.slideY *= -1
+        
   def update(self):
     condition = bool(eval(self.condition))
 
@@ -489,10 +492,6 @@ class Slide(Effect):
             self.position[1] += self.slideY
       else:  
         self.position = self.startCoord
-    
-    #fixes coordinates for fonts
-    if isinstance(self.layer, FontLayer):
-      self.position[1] *= -1
         
     self.layer.finals[0] = [self.position[0], self.position[1]]
 
