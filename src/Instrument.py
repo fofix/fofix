@@ -1770,7 +1770,7 @@ class Instrument:
     self.spActTex = None
     self.noteTex = None
     self.noteButtons = None
-    
+
     if self.twoDnote == True:
       if self.noteSpin:
         self.starSpinFrames = 16
@@ -1807,23 +1807,19 @@ class Instrument:
       defaultOpenNote = False
 
       #MFH - can't use IOError for fallback logic for a Mesh() call... 
-      if self.isDrum and self.engine.fileExists(get("note_drum.dae")) and self.isDrum:
-        self.engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName(get("note_drum.dae"))))
-      elif self.engine.fileExists(get("note.dae")):
+      if self.engine.fileExists(get("note.dae")): #look in the notes folder for files
         self.engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName(get("note.dae"))))
-      else:
+      else: #default to files in data folder
         self.engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName("note.dae")))
         defaultNote = True
 
-      if self.isDrum and self.engine.fileExists(os.path.join("themes", themename, "star_drum.dae")):  
-        self.engine.resource.load(self,  "starMesh",  lambda: Mesh(self.engine.resource.fileName("themes", themename, "star_drum.dae")))
-      elif self.engine.fileExists(os.path.join("themes", themename, "star.dae")):  
-        self.engine.resource.load(self,  "starMesh",  lambda: Mesh(self.engine.resource.fileName("themes", themename, "star.dae")))
-      else:  
+      if self.engine.fileExists(get("star.dae")): #look in the notes folder for files
+        self.engine.resource.load(self,  "starMesh",  lambda: Mesh(self.engine.resource.fileName(get("star.dae"))))
+      else: #No mesh for star notes
         self.starMesh = None
 
       if self.isDrum:
-        if self.engine.fileExists(get("open.dae")):
+        if self.engine.fileExists(get("open.dae")): #load from notes folder
           self.engine.resource.load(self,  "openMesh",  lambda: Mesh(self.engine.resource.fileName(get("open.dae"))))
         else: #fallback to the default in the data folder
           self.engine.resource.load(self,  "openMesh",  lambda: Mesh(self.engine.resource.fileName("open.dae")))
