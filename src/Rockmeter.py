@@ -77,6 +77,9 @@ countdownPosition = 1   #milliseconds left
 progress = 0.0          #this gives a percentage (between 0 and 1) 
                         # of how far the song has played
 
+vpc = [640.0, 480.0]    #viewport's constant size, these variables determine how 
+                        #things are placed on screen in relation to pixel coordinates
+                        
 # A graphical rockmeter layer
 # This is the base template for all rockmeter layer types
 class Layer:
@@ -173,24 +176,24 @@ class ImageLayer(Layer):
     #this allows you to scale images in relation to pixels instead
     #of percentage of the size of the image.
     if "xscale" in self.inPixels:
-      scale[0] /= texture.pixelSize[0]
+      scale[0] /= texture.pixelSize[0] * (rect[1] - rect[0])
     if "yscale" in self.inPixels:
-      scale[1] /= texture.pixelSize[1]
+      scale[1] /= texture.pixelSize[1] * (rect[3] - rect[2])
 
     scale[1] = -scale[1]
-    scale[0] *= w/640.0
-    scale[1] *= h/480.0
+    scale[0] *= w/vpc[0]
+    scale[1] *= h/vpc[1]
     
     self.finals[1] = scale
     
     position = self.finals[0]
     if "xpos" in self.inPixels:
-      position[0] *= w/640.0
+      position[0] *= w/vpc[0]
     else:        
       position[0] *= w
 
     if "ypos" in self.inPixels:
-      position[1] *= h/480.0
+      position[1] *= h/vpc[1]
     else:        
       position[1] *= h
 
@@ -252,9 +255,9 @@ class FontLayer(Layer):
     
     position = self.finals[0]
     if "xpos" in self.inPixels:
-      position[0] /= 640.0
+      position[0] /= vpc[0]
     if "ypos" in self.inPixels:
-      position[1] /= 480.0
+      position[1] /= vpc[1]
     
     #the viewport code for rendering for is a little awkward
     #instead of the bottom edge being at 1.0 it is at .75
@@ -341,20 +344,20 @@ class CircleLayer(Layer):
       scale[1] /= texture.pixelSize[1]
 
     scale[1] = -scale[1]
-    scale[0] *= w/640.0
-    scale[1] *= h/480.0
+    scale[0] *= w/vpc[0]
+    scale[1] *= h/vpc[1]
     
     self.finals[1] = scale
     
     position = self.finals[0]
     
     if "xpos" in self.inPixels:
-      position[0] *= w/640.0
+      position[0] *= w/vpc[0]
     else:
       position[0] *= w
 
     if "ypos" in self.inPixels:
-      position[1] *= h/480.0
+      position[1] *= h/vpc[1]
     else:        
       position[1] *= h
 
@@ -408,35 +411,47 @@ class Slide(Effect):
     self.startCoord = [eval(self.get("startX", str, "0.0")), eval(self.get("startY", str, "0.0"))]
     self.endCoord   = [eval(self.get("endX",   str, "0.0")), eval(self.get("endY",   str, "0.0"))]
 
-    self.position = [eval(self.get("startX", str, "0.0")), eval(self.get("startY", str, "0.0"))]
-
     self.inPixels  = self.get("inPixels", str, "").split("|")
 
     self.condition = self.get("condition", str, "True")
     
     w, h, = self.layer.engine.view.geometry[2:4]
 
-    if "startX" in self.inPixels:
-      self.position[0] *= w/640.0
+    if isinstance(self.layer, FontLayer):
+      if "startX" in self.inPixels:
+        self.startCoord[0] /= vpc[0]
+      if "endX" in self.inPixels:
+        self.endCoord[0] /= vpc[0]
+      if "startY" in self.inPixels:
+        self.startCoord[1] /= vpc[1]
+      if "endY" in self.inPixels:
+        self.endCoord[1] /= vpc[1]
+      self.startCoord[1] *= .75
+      self.startCoord[1] = .75 - self.startCoord[1]
+      self.endCoord[1] *= .75
+      self.endCoord[1] = .75 - self.endCoord[1]
     else:
-      self.position[0] *= w
+      if "startX" in self.inPixels:
+        self.startCoord[0] *= w/vpc[0]
+      else:
+        self.startCoord[0] *= w
 
-    if "startY" in self.inPixels:
-      self.position[1] *= h/480.0
-    else:
-      self.position[1] *= h
+      if "startY" in self.inPixels:
+        self.startCoord[1] *= h/vpc[1]
+      else:
+        self.startCoord[1] *= h
 
-    if "endX" in self.inPixels:
-      self.endCoord[0] *= w/640.0
-    else:
-      self.endCoord[0] *= w
+      if "endX" in self.inPixels:
+        self.endCoord[0] *= w/vpc[0]
+      else:
+        self.endCoord[0] *= w
 
-    if "endY" in self.inPixels:
-      self.endCoord[1] *= h/480.0
-    else:
-      self.endCoord[1] *= h
+      if "endY" in self.inPixels:
+        self.endCoord[1] *= h/vpc[1]
+      else:
+        self.endCoord[1] *= h
 
-
+    self.position = [self.startCoord[0], self.startCoord[1]]
     self.reverse = bool(eval(self.get("reverse", str, "True")))   
 
     #how long it takes for the transition to take place
@@ -444,24 +459,43 @@ class Slide(Effect):
 
     self.slideX = (self.endCoord[0] - self.startCoord[0])/self.transitionTime
     self.slideY = (self.endCoord[1] - self.startCoord[1])/self.transitionTime
-
+    if isinstance(self.layer, FontLayer):
+        self.slideX *= -1
+        self.slideY *= -1
+        
   def update(self):
     condition = bool(eval(self.condition))
 
     if condition:
-      if self.position[0] < self.endCoord[0]:
-        self.position[0] += self.slideX
-      if self.position[1] < self.endCoord[1]:
-        self.position[1] += self.slideY
+      if self.endCoord[0] < self.startCoord[0]:
+        if self.position[0] > self.endCoord[0]:
+          self.position[0] += self.slideX
+      else:
+        if self.position[0] < self.endCoord[0]:
+          self.position[0] -= self.slideX
+      if self.endCoord[1] < self.startCoord[1]:
+        if self.position[1] > self.endCoord[1]:
+          self.position[1] += self.slideY
+      else:
+        if self.position[1] < self.endCoord[1]:
+          self.position[1] -= self.slideY
     else:
       if self.reverse:
-        if self.position[0] > self.startCoord[0]:
-          self.position[0] -= self.slideX
-        if self.position[1] > self.startCoord[1]:
-          self.position[1] -= self.slideY
+        if self.endCoord[0] < self.startCoord[0]:
+          if self.position[0] < self.startCoord[0]:
+            self.position[0] -= self.slideX
+        else:
+          if self.position[0] > self.startCoord[0]:
+            self.position[0] += self.slideX
+        if self.endCoord[1] < self.startCoord[1]:
+          if self.position[1] < self.startCoord[1]:
+            self.position[1] -= self.slideY
+        else:
+          if self.position[1] > self.startCoord[1]:
+            self.position[1] += self.slideY
       else:  
         self.position = self.startCoord
-    
+        
     self.layer.finals[0] = [self.position[0], self.position[1]]
 
 #replaces the image of the layer when the condition is met
@@ -509,17 +543,13 @@ class Replace(Effect):
       scale[1] /= self.layer.drawing.pixelSize[1]
 
     scale[1] = -scale[1]
-    scale[0] *= w/640.0
-    scale[1] *= h/480.0
+    scale[0] *= w/vpc[0]
+    scale[1] *= h/vpc[1]
     
     self.layer.finals[1] = scale
     
   def update(self):
 
-    if self.type == "font":
-      self.layer.finals[6] = self.text[-1]
-    else:
-      self.layer.drawing = self.drawings[-1]
     for i, cond in enumerate(self.conditions):
       if bool(eval(cond)):
         if self.type == "font":
@@ -527,10 +557,21 @@ class Replace(Effect):
         else:
           if len(self.drawings) > 1:
             self.layer.drawing = self.drawings[i]
-          if len(self.rects) > 1:
+          elif len(self.rects) > 1:
             self.layer.finals[-1] = self.rects[i]
           self.fixScale()
-        break
+        return
+    if self.type == "font":
+      self.layer.finals[-1] = self.text[-1]
+    else:
+      if len(self.drawings) > 0:
+          self.layer.drawing = self.drawings[-1]
+      if len(self.rects) > 0:
+          self.layer.finals[-1] = self.rects[-1]
+      self.fixScale()
+            
+    
+    
         
 class Rockmeter:
   def get(self, value, type = str, default = None):
