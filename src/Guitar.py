@@ -27,7 +27,6 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-from Mesh import Mesh
 from Neck import Neck
 import random
 from copy import deepcopy
@@ -94,71 +93,9 @@ class Guitar(Instrument):
     #myfingershurt:
     self.bassGrooveNeckMode = self.engine.config.get("game", "bass_groove_neck")
 
-    self.loadNotes()
-    
-    if self.gameMode2p == 6:
-      if not engine.loadImgDrawing(self, "battleFrets", os.path.join("themes", themename,"battle_frets.png")):
-        self.battleFrets = None
+    self.tailsEnabled = True
 
-    if self.twoDkeys == True:
-      engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"fretbuttons.png"))
-    else:
-      defaultKey = False
-      #MFH - can't use IOError for fallback logic for a Mesh() call... 
-      if self.engine.fileExists(os.path.join("themes", themename, "key.dae")):
-        engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "key.dae")))
-      else:
-        engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName("key.dae")))
-        defaultKey = True
-      
-      if defaultKey:
-        self.keytex = False
-      else:
-        for i in range(5):
-          if engine.loadImgDrawing(self,  "keytex"+chr(97+i),  os.path.join("themes", themename, "keytex_"+chr(97+i)+".png")):
-            self.keytex = True
-          else:
-            self.keytex = False
-            break
-    
-                                                           
-    #inkk: loading theme-dependent tail images
-    #myfingershurt: must ensure the new tails don't affect the Rock Band mod...
-    self.simpleTails = False
-
-    for i in range(0,7):
-      if not engine.loadImgDrawing(self, "tail"+str(i), os.path.join("themes",themename,"tails","tail"+str(i)+".png"),  textureSize = (128, 128)):
-        self.simpleTails = True
-        break
-      if not engine.loadImgDrawing(self, "taile"+str(i), os.path.join("themes",themename,"tails","taile"+str(i)+".png"),  textureSize = (128, 128)):
-        self.simpleTails = True
-        break
-      if not engine.loadImgDrawing(self, "btail"+str(i), os.path.join("themes",themename,"tails","btail"+str(i)+".png"),  textureSize = (128, 128)):
-        self.simpleTails = True
-        break
-      if not engine.loadImgDrawing(self, "btaile"+str(i), os.path.join("themes",themename,"tails","btaile"+str(i)+".png"),  textureSize = (128, 128)):
-        self.simpleTails = True
-        break
-    
-    if self.simpleTails:
-      Log.debug("Simple tails used; complex tail loading error...")
-      if not engine.loadImgDrawing(self, "tail1", os.path.join("themes",themename,"tail1.png"),  textureSize = (128, 128)):
-        engine.loadImgDrawing(self, "tail1", "tail1.png",  textureSize = (128, 128))
-      engine.loadImgDrawing(self, "tail2", os.path.join("themes",themename,"tail2.png"),  textureSize = (128, 128))
-      if not engine.loadImgDrawing(self, "bigTail1", os.path.join("themes",themename,"bigtail1.png"),  textureSize = (128, 128)):
-        engine.loadImgDrawing(self, "bigTail1", "bigtail1.png",  textureSize = (128, 128))
-      engine.loadImgDrawing(self, "bigTail2", os.path.join("themes",themename,"bigtail2.png"),  textureSize = (128, 128))
-
-
-    if not engine.loadImgDrawing(self, "kill1", os.path.join("themes", themename, "kill1.png"),  textureSize = (128, 128)):
-      engine.loadImgDrawing(self, "kill1", "kill1.png",  textureSize = (128, 128))
-    engine.loadImgDrawing(self, "kill2", os.path.join("themes", themename, "kill2.png"),  textureSize = (128, 128))
-
-    #MFH - freestyle tails (for drum fills & BREs)
-    if not engine.loadImgDrawing(self, "freestyle1", os.path.join("themes", themename, "freestyletail1.png"),  textureSize = (128, 128)):
-      engine.loadImgDrawing(self, "freestyle1", "freestyletail1.png",  textureSize = (128, 128))
-    engine.loadImgDrawing(self, "freestyle2", os.path.join("themes", themename, "freestyletail2.png"),  textureSize = (128, 128))
-    
+    self.loadImages()    
     
     self.twoChordMax = False
 

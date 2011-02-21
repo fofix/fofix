@@ -29,7 +29,6 @@
 #altered by myfingershurt to adapt to Alarian mod
 
 from Song import Note, Tempo
-from Mesh import Mesh
 from Neck import Neck
 from Shader import shaders
 
@@ -137,63 +136,9 @@ class Drum(Instrument):
     #now theme determination logic is only in data.py:
     self.theme = self.engine.data.theme
 
-    self.loadNotes()
+    self.tailsEnabled = False
 
-    if self.twoDkeys == True: #death_au
-      #death_au: adding drumfrets.png (with bass drum frets separate)
-      if not engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"drumfrets.png")):
-        self.drumFretButtons = None
-        engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename,"fretbuttons.png"))
-      else:
-        self.drumFretButtons = True
-    else: #death_au
-      defaultKey = False
-      defaultOpenKey = False
-      #MFH - can't use IOError for fallback logic for a Mesh() call... 
-      if self.engine.fileExists(os.path.join("themes", themename, "key_drum.dae")):
-        engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "key_drum.dae")))
-      elif self.engine.fileExists(os.path.join("themes", themename, "key.dae")):
-        engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName("themes", themename, "key.dae")))
-      else:
-        engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName("key.dae")))
-        defaultKey = True
-
-      if self.engine.fileExists(os.path.join("themes", themename, "key_open.dae")):
-        engine.resource.load(self,  "keyMeshOpen",  lambda: Mesh(engine.resource.fileName("themes", themename, "key_open.dae")))
-      else:
-        engine.resource.load(self,  "keyMeshOpen",  lambda: Mesh(engine.resource.fileName("key_open.dae")))
-        defaultOpenKey = True
-
-      if defaultKey:
-        self.keytex = False
-        self.keytexopen = None
-      else:
-        for i in range(5):
-          if engine.loadImgDrawing(self,  "keytex"+chr(97+i),  os.path.join("themes", themename, "keytex_"+chr(97+i)+".png")) and engine.loadImgDrawing(self, "keytexopen", os.path.join("themes",themename,"keytex_open.png")):
-            self.keytex = True
-          else:
-            self.keytex = False
-            break
-
-      if defaultOpenKey:
-        self.keytexopen = None
-      else:
-        if not engine.loadImgDrawing(self, "keytexopen", os.path.join("themes",themename,"keytex_open.png")):
-          self.keytexopen = None
-
-    #Spinning starnotes or not?
-    self.starspin = False
-
-    if not engine.loadImgDrawing(self, "freestyle1", os.path.join("themes", themename, "freestyletail1.png"),  textureSize = (128, 128)):
-      engine.loadImgDrawing(self, "freestyle1", "freestyletail1.png",  textureSize = (128, 128))
-    engine.loadImgDrawing(self, "freestyle2", os.path.join("themes", themename, "freestyletail2.png"),  textureSize = (128, 128))
-
-    #t'aint no tails in drums, yo.
-    self.simpleTails = True
-    self.tail1 = None
-    self.tail2 = None
-    self.bigTail1 = None
-    self.bigTail2 = None  
+    self.loadImages()
 
     self.barsColor = self.engine.theme.barsColor
 
