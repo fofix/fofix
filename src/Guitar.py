@@ -95,7 +95,9 @@ class Guitar(Instrument):
 
     self.tailsEnabled = True
 
-    self.loadImages()    
+    self.loadFrets()
+    self.loadNotes()
+    self.loadTails()
     
     self.twoChordMax = False
 
