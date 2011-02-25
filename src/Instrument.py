@@ -389,13 +389,220 @@ class Instrument:
       return os.path.join(defaultpath, file)
 
   def loadNotes(self):
-      pass
+    engine = self.engine
+    themename = self.engine.data.themeLabel
+    directory = "notes"
+
+    get = lambda file: self.checkPath("notes", file)
+
+    self.noteSpin = self.engine.config.get("performance", "animated_notes")
+
+    self.spActTex = None
+    self.noteTex = None
+    self.noteButtons = None
+
+    if self.twoDnote == True:
+      if self.noteSpin:
+        self.starSpinFrames = 16
+        if not engine.loadImgDrawing(self, "noteAnimatedNormal", get("animated_normal.png")):
+          self.noteAnimatedNormal = None
+        if not engine.loadImgDrawing(self, "noteAnimatedHOPO", get("animated_hopo.png")):
+          self.noteAnimatedHOPO = None
+        if not engine.loadImgDrawing(self, "noteAnimatedPower", get("animated_power.png")):
+          self.noteAnimatedPower = None
+        if not engine.loadImgDrawing(self, "noteAnimatedPowerHOPO", get("animated_power_hopo.png")):
+          self.noteAnimatedPowerHOPO = None
+        if not engine.loadImgDrawing(self, "noteAnimatedPowerActive", get("animated_power_active.png")):
+          self.noteAnimatedPowerActive = None
+        if not engine.loadImgDrawing(self, "noteAnimatedPowerActiveHOPO", get("animated_power_active_hopo.png")):
+          self.noteAnimatedPowerActiveHOPO = None
+        if self.isDrum:
+          if not engine.loadImgDrawing(self, "noteOpenAnimatedPowerActive", get("animated_open_power_active.png")):
+            self.noteOpenAnimatedPowerActive = None
+          if not engine.loadImgDrawing(self, "noteOpenAnimatedPower", get("animated_open_power.png")):
+            self.noteOpenAnimatedPower = None
+          if not engine.loadImgDrawing(self, "noteOpenAnimated", get("animated_open.png")):
+            self.noteOpenAnimated = None
+        if self.gameMode2p == 6: #battle multiplayer
+          if engine.loadImgDrawing(self, "noteButtons", get("spinnotesbattle.png")):
+            self.starSpinFrames = 8
+
+      if not self.isDrum and self.gameMode2p == 6: #battle multiplayer
+        if not self.engine.loadImgDrawing(self, "noteButtons", get("notesbattle.png")):
+          engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
+      else:
+        engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
+    else:
+      defaultNote = False
+      defaultOpenNote = False
+
+      #MFH - can't use IOError for fallback logic for a Mesh() call... 
+      if self.engine.fileExists(get("note.dae")): #look in the notes folder for files
+        self.engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName(get("note.dae"))))
+      else: #default to files in data folder
+        self.engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName("note.dae")))
+        defaultNote = True
+
+      if self.engine.fileExists(get("star.dae")): #look in the notes folder for files
+        self.engine.resource.load(self,  "starMesh",  lambda: Mesh(self.engine.resource.fileName(get("star.dae"))))
+      else: #No mesh for star notes
+        self.starMesh = None
+
+      if self.isDrum:
+        if self.engine.fileExists(get("open.dae")): #load from notes folder
+          self.engine.resource.load(self,  "openMesh",  lambda: Mesh(self.engine.resource.fileName(get("open.dae"))))
+        else: #fallback to the default in the data folder
+          self.engine.resource.load(self,  "openMesh",  lambda: Mesh(self.engine.resource.fileName("open.dae")))
+          defualtOpenNote = True
+
+      if defaultNote:
+        self.notetex = False
+
+      else:
+        for i in range(5):
+          if engine.loadImgDrawing(self,  "notetex"+chr(97+i),  get("notetex_"+chr(97+i)+".png")):
+            self.notetex = True
+          else:
+            self.notetex = False
+
+          if self.engine.loadImgDrawing(self,  "startex"+chr(97+i),  get("startex_"+chr(97+i)+".png")):
+            self.startex = True
+          else:
+            self.startex = False
+
+          if self.engine.loadImgDrawing(self,  "staratex"+chr(97+i),  get("staratex_"+chr(97+i)+".png")):
+            self.staratex = True
+          else:
+            self.staratex = False
+
+
+      if self.isDrum: 
+        if not self.engine.loadImgDrawing(self, "spActTex", get("spacttex.png")):
+          self.spActTex = None
+
+
+      if defaultOpenNote:
+        self.opentex = False
+        self.opentex_star = False
+        self.opentex_stara = False
+
+      else:
+        if self.engine.loadImgDrawing(self, "opentexture", get("opentex.png")):
+          self.opentex = True
+        else:
+          self.opentex = False
+
+        if self.engine.loadImgDrawing(self, "opentexture_star", get("opentex_star.png")):
+          self.opentex_star = True
+        else:
+          self.opentex_star = False
+
+        if self.engine.loadImgDrawing(self, "opentexture_stara", get("opentex_stara.png")):
+          self.opentex_stara = True
+        else:
+          self.opentex_stara = False
       
   def loadFrets(self):
-      pass
+    engine = self.engine
+    themename = self.engine.data.themeLabel
+    directory = "notes"
+
+    get = lambda file: self.checkPath("frets", file)
+
+    if self.twoDkeys == True: #death_au
+
+      if self.gameMode2p == 6:
+        if not engine.loadImgDrawing(self, "battleFrets", os.path.join("themes", themename,"battle_frets.png")):
+          self.battleFrets = None
+
+      #death_au: adding drumfrets.png (with bass drum frets separate)
+      if self.isDrum and engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename, "frets", "drum", "fretbuttons.png")):
+        self.drumFretButtons = True
+      elif engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename, "frets", "fretbuttons.png")):
+        self.drumFretButtons = None
+
+    else:
+      defaultKey = False
+      defaultOpenKey = False
+
+      #MFH - can't use IOError for fallback logic for a Mesh() call...
+      if self.engine.fileExists(get("key.dae")): #look in the frets folder for files
+        engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName(get("key.dae"))))
+      else: #default to files in data folder
+        engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName("key.dae")))
+        defaultKey = True
+
+      if self.isDrum:
+        if self.engine.fileExists(get("open.dae")): #look in the frets folder for files
+          engine.resource.load(self,  "keyMeshOpen",  lambda: Mesh(engine.resource.fileName(get("open.dae"))))
+        else: #default to files in data folder
+          engine.resource.load(self,  "keyMeshOpen",  lambda: Mesh(engine.resource.fileName("key_open.dae")))
+          defaultOpenKey = True
+
+
+      if defaultKey:
+        self.keytex = False
+      else:
+        for i in range(5):
+          if engine.loadImgDrawing(self,  "keytex"+chr(97+i),  get("keytex_"+chr(97+i)+".png")):
+            self.keytex = True
+          else:
+            self.keytex = False
+            break
+
+      if defaultOpenKey:
+        self.keytexopen = False
+      else:
+        if not engine.loadImgDrawing(self, "keytexopen", get("keytex_open.png")):
+          self.keytexopen = None
       
   def loadTails(self):
-      pass
+    engine = self.engine
+    themename = self.engine.data.themeLabel
+
+    #MFH - freestyle tails (for drum fills & BREs)
+    if not engine.loadImgDrawing(self, "freestyle1", os.path.join("themes", themename, "freestyletail1.png"),  textureSize = (128, 128)):
+      engine.loadImgDrawing(self, "freestyle1", "freestyletail1.png",  textureSize = (128, 128))
+    if not engine.loadImgDrawing(self, "freestyle2", os.path.join("themes", themename, "freestyletail2.png"),  textureSize = (128, 128)):
+      self.freestyle2 = None
+
+    if self.tailsEnabled == True:
+      for i in range(0,7):
+        if not engine.loadImgDrawing(self, "tail"+str(i), os.path.join("themes",themename,"tails","tail"+str(i)+".png"),  textureSize = (128, 128)):
+          self.simpleTails = True
+          break
+        if not engine.loadImgDrawing(self, "taile"+str(i), os.path.join("themes",themename,"tails","taile"+str(i)+".png"),  textureSize = (128, 128)):
+          self.simpleTails = True
+          break
+        if not engine.loadImgDrawing(self, "btail"+str(i), os.path.join("themes",themename,"tails","btail"+str(i)+".png"),  textureSize = (128, 128)):
+          self.simpleTails = True
+          break
+        if not engine.loadImgDrawing(self, "btaile"+str(i), os.path.join("themes",themename,"tails","btaile"+str(i)+".png"),  textureSize = (128, 128)):
+          self.simpleTails = True
+          break
+
+      if self.simpleTails:
+        Log.debug("Simple tails used; complex tail loading error...")
+        if not engine.loadImgDrawing(self, "tail1", os.path.join("themes",themename,"tail1.png"),  textureSize = (128, 128)):
+          engine.loadImgDrawing(self, "tail1", "tail1.png",  textureSize = (128, 128))
+        engine.loadImgDrawing(self, "tail2", os.path.join("themes",themename,"tail2.png"),  textureSize = (128, 128))
+        if not engine.loadImgDrawing(self, "bigTail1", os.path.join("themes",themename,"bigtail1.png"),  textureSize = (128, 128)):
+          engine.loadImgDrawing(self, "bigTail1", "bigtail1.png",  textureSize = (128, 128))
+        engine.loadImgDrawing(self, "bigTail2", os.path.join("themes",themename,"bigtail2.png"),  textureSize = (128, 128))
+    
+
+      if not engine.loadImgDrawing(self, "kill1", os.path.join("themes", themename, "kill1.png"),  textureSize = (128, 128)):
+        engine.loadImgDrawing(self, "kill1", "kill1.png",  textureSize = (128, 128))
+      if not engine.loadImgDrawing(self, "kill2", os.path.join("themes", themename, "kill2.png"),  textureSize = (128, 128)):
+        self.kill2 = None
+
+    else:
+      self.tail1 = None
+      self.tail2 = None
+      self.bigTail1 = None
+      self.bigTail2 = None
+      self.kill1 = None
+      self.kill2 = None
 
   def selectPreviousString(self):
     self.selectedString = (self.selectedString - 1) % self.strings
@@ -1758,210 +1965,3 @@ class Instrument:
       if self.hit[i] == True:
         possible = True
     return possible
-
-  def loadImages(self):
-    self.noteSpin = self.engine.config.get("performance", "animated_notes")
-
-    engine = self.engine
-    themename = self.engine.data.themeLabel
-    directory = "notes"
-
-    get = lambda file: self.checkPath(directory, file)
-
-    self.spActTex = None
-    self.noteTex = None
-    self.noteButtons = None
-
-    if self.twoDnote == True:
-      if self.noteSpin:
-        self.starSpinFrames = 16
-        if not engine.loadImgDrawing(self, "noteAnimatedNormal", get("animated_normal.png")):
-          self.noteAnimatedNormal = None
-        if not engine.loadImgDrawing(self, "noteAnimatedHOPO", get("animated_hopo.png")):
-          self.noteAnimatedHOPO = None
-        if not engine.loadImgDrawing(self, "noteAnimatedPower", get("animated_power.png")):
-          self.noteAnimatedPower = None
-        if not engine.loadImgDrawing(self, "noteAnimatedPowerHOPO", get("animated_power_hopo.png")):
-          self.noteAnimatedPowerHOPO = None
-        if not engine.loadImgDrawing(self, "noteAnimatedPowerActive", get("animated_power_active.png")):
-          self.noteAnimatedPowerActive = None
-        if not engine.loadImgDrawing(self, "noteAnimatedPowerActiveHOPO", get("animated_power_active_hopo.png")):
-          self.noteAnimatedPowerActiveHOPO = None
-        if self.isDrum:
-          if not engine.loadImgDrawing(self, "noteOpenAnimatedPowerActive", get("animated_open_power_active.png")):
-            self.noteOpenAnimatedPowerActive = None
-          if not engine.loadImgDrawing(self, "noteOpenAnimatedPower", get("animated_open_power.png")):
-            self.noteOpenAnimatedPower = None
-          if not engine.loadImgDrawing(self, "noteOpenAnimated", get("animated_open.png")):
-            self.noteOpenAnimated = None
-        if self.gameMode2p == 6: #battle multiplayer
-          if engine.loadImgDrawing(self, "noteButtons", get("spinnotesbattle.png")):
-            self.starSpinFrames = 8
-
-      if not self.isDrum and self.gameMode2p == 6: #battle multiplayer
-        if not self.engine.loadImgDrawing(self, "noteButtons", get("notesbattle.png")):
-          engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
-      else:
-        engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
-    else:
-      defaultNote = False
-      defaultOpenNote = False
-
-      #MFH - can't use IOError for fallback logic for a Mesh() call... 
-      if self.engine.fileExists(get("note.dae")): #look in the notes folder for files
-        self.engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName(get("note.dae"))))
-      else: #default to files in data folder
-        self.engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName("note.dae")))
-        defaultNote = True
-
-      if self.engine.fileExists(get("star.dae")): #look in the notes folder for files
-        self.engine.resource.load(self,  "starMesh",  lambda: Mesh(self.engine.resource.fileName(get("star.dae"))))
-      else: #No mesh for star notes
-        self.starMesh = None
-
-      if self.isDrum:
-        if self.engine.fileExists(get("open.dae")): #load from notes folder
-          self.engine.resource.load(self,  "openMesh",  lambda: Mesh(self.engine.resource.fileName(get("open.dae"))))
-        else: #fallback to the default in the data folder
-          self.engine.resource.load(self,  "openMesh",  lambda: Mesh(self.engine.resource.fileName("open.dae")))
-          defualtOpenNote = True
-
-      if defaultNote:
-        self.notetex = False
-
-      else:
-        for i in range(5):
-          if engine.loadImgDrawing(self,  "notetex"+chr(97+i),  get("notetex_"+chr(97+i)+".png")):
-            self.notetex = True
-          else:
-            self.notetex = False
-
-          if self.engine.loadImgDrawing(self,  "startex"+chr(97+i),  get("startex_"+chr(97+i)+".png")):
-            self.startex = True
-          else:
-            self.startex = False
-
-          if self.engine.loadImgDrawing(self,  "staratex"+chr(97+i),  get("staratex_"+chr(97+i)+".png")):
-            self.staratex = True
-          else:
-            self.staratex = False
-
-
-      if self.isDrum: 
-        if not self.engine.loadImgDrawing(self, "spActTex", get("spacttex.png")):
-          self.spActTex = None
-
-
-      if defaultOpenNote:
-        self.opentex = False
-        self.opentex_star = False
-        self.opentex_stara = False
-
-      else:
-        if self.engine.loadImgDrawing(self, "opentexture", get("opentex.png")):
-          self.opentex = True
-        else:
-          self.opentex = False
-
-        if self.engine.loadImgDrawing(self, "opentexture_star", get("opentex_star.png")):
-          self.opentex_star = True
-        else:
-          self.opentex_star = False
-
-        if self.engine.loadImgDrawing(self, "opentexture_stara", get("opentex_stara.png")):
-          self.opentex_stara = True
-        else:
-          self.opentex_stara = False
-
-    directory = "frets"
-
-    if self.twoDkeys == True: #death_au
-
-      if self.gameMode2p == 6:
-        if not engine.loadImgDrawing(self, "battleFrets", os.path.join("themes", themename,"battle_frets.png")):
-          self.battleFrets = None
-
-      #death_au: adding drumfrets.png (with bass drum frets separate)
-      if self.isDrum and engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename, "frets", "drum", "fretbuttons.png")):
-        self.drumFretButtons = True
-      elif engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename, "frets", "fretbuttons.png")):
-        self.drumFretButtons = None
-
-    else:
-      defaultKey = False
-      defaultOpenKey = False
-
-      #MFH - can't use IOError for fallback logic for a Mesh() call...
-      if self.engine.fileExists(get("key.dae")): #look in the frets folder for files
-        engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName(get("key.dae"))))
-      else: #default to files in data folder
-        engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName("key.dae")))
-        defaultKey = True
-
-      if self.isDrum:
-        if self.engine.fileExists(get("key_open.dae")): #look in the frets folder for files
-          engine.resource.load(self,  "keyMeshOpen",  lambda: Mesh(engine.resource.fileName(get("key_open.dae"))))
-        else: #default to files in data folder
-          engine.resource.load(self,  "keyMeshOpen",  lambda: Mesh(engine.resource.fileName("key_open.dae")))
-          defaultOpenKey = True
-
-
-      if defaultKey:
-        self.keytex = False
-      else:
-        for i in range(5):
-          if engine.loadImgDrawing(self,  "keytex"+chr(97+i),  get("keytex_"+chr(97+i)+".png")):
-            self.keytex = True
-          else:
-            self.keytex = False
-            break
-
-      if defaultOpenKey:
-        self.keytexopen = False
-      else:
-        if not engine.loadImgDrawing(self, "keytexopen", get("keytex_open.png")):
-          self.keytexopen = None
-
-    #MFH - freestyle tails (for drum fills & BREs)
-    if not engine.loadImgDrawing(self, "freestyle1", os.path.join("themes", themename, "freestyletail1.png"),  textureSize = (128, 128)):
-      engine.loadImgDrawing(self, "freestyle1", "freestyletail1.png",  textureSize = (128, 128))
-    if not engine.loadImgDrawing(self, "freestyle2", os.path.join("themes", themename, "freestyletail2.png"),  textureSize = (128, 128)):
-      self.freestyle2 = None
-
-    if self.tailsEnabled == True:
-      for i in range(0,7):
-        if not engine.loadImgDrawing(self, "tail"+str(i), os.path.join("themes",themename,"tails","tail"+str(i)+".png"),  textureSize = (128, 128)):
-          self.simpleTails = True
-          break
-        if not engine.loadImgDrawing(self, "taile"+str(i), os.path.join("themes",themename,"tails","taile"+str(i)+".png"),  textureSize = (128, 128)):
-          self.simpleTails = True
-          break
-        if not engine.loadImgDrawing(self, "btail"+str(i), os.path.join("themes",themename,"tails","btail"+str(i)+".png"),  textureSize = (128, 128)):
-          self.simpleTails = True
-          break
-        if not engine.loadImgDrawing(self, "btaile"+str(i), os.path.join("themes",themename,"tails","btaile"+str(i)+".png"),  textureSize = (128, 128)):
-          self.simpleTails = True
-          break
-
-      if self.simpleTails:
-        Log.debug("Simple tails used; complex tail loading error...")
-        if not engine.loadImgDrawing(self, "tail1", os.path.join("themes",themename,"tail1.png"),  textureSize = (128, 128)):
-          engine.loadImgDrawing(self, "tail1", "tail1.png",  textureSize = (128, 128))
-        engine.loadImgDrawing(self, "tail2", os.path.join("themes",themename,"tail2.png"),  textureSize = (128, 128))
-        if not engine.loadImgDrawing(self, "bigTail1", os.path.join("themes",themename,"bigtail1.png"),  textureSize = (128, 128)):
-          engine.loadImgDrawing(self, "bigTail1", "bigtail1.png",  textureSize = (128, 128))
-        engine.loadImgDrawing(self, "bigTail2", os.path.join("themes",themename,"bigtail2.png"),  textureSize = (128, 128))
-    
-
-      if not engine.loadImgDrawing(self, "kill1", os.path.join("themes", themename, "kill1.png"),  textureSize = (128, 128)):
-        engine.loadImgDrawing(self, "kill1", "kill1.png",  textureSize = (128, 128))
-      if not engine.loadImgDrawing(self, "kill2", os.path.join("themes", themename, "kill2.png"),  textureSize = (128, 128)):
-        self.kill2 = None
-
-    else:
-      self.tail1 = None
-      self.tail2 = None
-      self.bigTail1 = None
-      self.bigTail2 = None
-      self.kill1 = None
-      self.kill2 = None
