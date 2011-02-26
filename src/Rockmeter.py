@@ -204,6 +204,10 @@ class ImageLayer(Layer):
   def render(self, visibility, playerNum):
     v = 1.0
 
+    #don't try to render or update an image layer if the texture doesn't even exist
+    if not self.drawing:
+        return
+        
     self.updateLayer(playerNum)
     for effect in self.effects:
       effect.update()
@@ -299,7 +303,14 @@ class CircleLayer(Layer):
     self.finals.append(self.ratio)  
 
     self.engine.loadImgDrawing(self, "drawing", drawing)
-  
+
+    #don't try to create the circle layer if the texture doesn't even exist
+    if self.drawing:
+      self.createMask(drawing)
+        
+  #creates the overlay mask
+  def createMask(self, drawing):
+      
     #these determine the size of the PIL pie-slice
     self.centerX   = self.drawing.width1()/2
     self.centerY   = self.drawing.height1()/2
@@ -369,6 +380,10 @@ class CircleLayer(Layer):
     w, h, = self.stage.engine.view.geometry[2:4]
     v = 1.0
 
+    #don't try to render or update an image layer if the texture doesn't even exist
+    if not self.drawing:
+        return
+    
     self.updateLayer(playerNum)
     for effect in self.effects:
       effect.update()
