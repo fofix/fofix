@@ -175,10 +175,10 @@ class ImageLayer(Layer):
     
     #this allows you to scale images in relation to pixels instead
     #of percentage of the size of the image.
-    if "xscale" in self.inPixels and scale[0] > 0.0:
-      scale[0] /= texture.pixelSize[0] * (rect[1] - rect[0])
-    if "yscale" in self.inPixels and scale[1] > 0.0:
-      scale[1] /= texture.pixelSize[1] * (rect[3] - rect[2])
+    if "xscale" in self.inPixels:
+      scale[0] /= texture.pixelSize[0]
+    if "yscale" in self.inPixels:
+      scale[1] /= texture.pixelSize[1]
 
     scale[1] = -scale[1]
     scale[0] *= w/vpc[0]
