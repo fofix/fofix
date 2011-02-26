@@ -228,7 +228,7 @@ class Drum(Instrument):
                 glTranslatef(x, (1.0 - visibility) ** (theFret + 1), z)
                 freestyleTailMode = 1
 
-                self.renderTail(length = length, color = color, fret = theFret, freestyleTail = freestyleTailMode, pos = pos)
+                self.renderTail(length = length, sustain = True, kill = False, color = color, flat = False, tailOnly = True, isTappable = False, big = True, fret = theFret, freestyleTail = freestyleTailMode, pos = pos)
                 glPopMatrix()
 
 
@@ -242,68 +242,6 @@ class Drum(Instrument):
 
       self.freestyleActive = freestyleActive
       self.drumFillEvents = drumFillEvents
-
-
-  def renderTail(self, length, color, flat = False, fret = 0, freestyleTail = 0, pos = 0):
-
-    beatsPerUnit = self.beatsPerBoard / self.boardLength
-
-    if flat:
-      tailscale = (1, .1, 1)
-    else:
-      tailscale = None
-
-    size = (.08, length + 0.00001)
-
-    if size[1] > self.boardLength:
-      s = self.boardLength
-    else:
-      s = (length + 0.00001)
-
-    # render an inactive freestyle tail  (self.freestyle1 & self.freestyle2)
-    zsize = .25  
-    size = (.15, s - zsize)
-
-    if self.drumFillsActive:
-      if self.drumFillsHits >= 4:
-        size = (.30, s - zsize)
-      if self.drumFillsHits >= 3:
-        size = (.25, s - zsize)
-      elif self.drumFillsHits >= 2:
-        size = (.21, s - zsize)
-      elif self.drumFillsHits >= 1:
-        size = (.17, s - zsize)
-
-    if self.freestyleActive:
-      size = (.30, s - zsize)
-
-
-    tex1 = self.freestyle1
-    if self.freestyle2:
-      tex2 = self.freestyle2
-    elif not self.freestyle2:
-      tex2 = None
-    if freestyleTail == 1:
-      c1, c2, c3, c4 = color
-      tailGlow = 1 - (pos - self.freestyleLastFretHitTime[fret] ) / self.freestylePeriod
-      if tailGlow < 0:
-        tailGlow = 0
-      color = (c1 + c1*2.0*tailGlow, c2 + c2*2.0*tailGlow, c3 + c3*2.0*tailGlow, c4*0.6 + c4*0.4*tailGlow)    #MFH - this fades inactive tails' color darker                   
-
-    tailcol = (color)
-
-    self.engine.draw3Dtex(tex1, vertex = (-size[0], 0, size[0], size[1]), texcoord = (0.0, 0.0, 1.0, 1.0),
-                          scale = tailscale, color = tailcol)
-    if tex2:
-      self.engine.draw3Dtex(tex2, vertex = (-size[0], size[1] - (.05), size[0], size[1] + (zsize)),
-                            scale = tailscale, texcoord = (0.0, 0.05, 1.0, 0.95), color = tailcol)
-    if tex2:
-      self.engine.draw3Dtex(tex2, vertex = (-size[0], 0-(zsize), size[0], 0 + (.05)),
-                            scale = tailscale, texcoord = (0.0, 0.95, 1.0, 0.05), color = tailcol)
-
-
-
-
 
   def renderFlames(self, visibility, song, pos, controls):
     if not song or self.flameColors[0][0][0] == -1:

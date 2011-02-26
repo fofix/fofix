@@ -105,191 +105,6 @@ class Guitar(Instrument):
 
     self.neck = Neck(self.engine, self, playerObj)
 
-  def renderTail(self, length, sustain, kill, color, flat = False, tailOnly = False, isTappable = False, big = False, fret = 0, spNote = False, freestyleTail = 0, pos = 0):
-
-    #volshebnyi - if freestyleTail == 0, act normally.
-    #  if freestyleTail == 1, render an freestyle tail
-    #  if freestyleTail == 2, render highlighted freestyle tail
-
-    if not self.simpleTails:#Tail Colors
-      tailcol = (1,1,1, color[3])
-    else:
-      if big == False and tailOnly == True:
-        tailcol = (.6, .6, .6, color[3])
-      else:
-        tailcol = (color)
-        #volshebnyi - tail color when sp is active
-        if self.starPowerActive and self.theme != 2 and not color == (0,0,0,1):#8bit
-          c = self.fretColors[5]
-          tailcol = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], color[3]) 
-
-    if flat:
-      tailscale = (1, .1, 1)
-    else:
-      tailscale = None
-
-    if sustain:
-      if not length == None:
-        size = (.08, length)
-
-        if size[1] > self.boardLength:
-          s = self.boardLength
-        else:
-          s = length
-
-    #       if freestyleTail == 1, render freestyle tail
-
-        if freestyleTail == 0:    #normal tail rendering
-          #myfingershurt: so any theme containing appropriate files can use new tails
-          if not self.simpleTails:
-            if big == True and tailOnly == True:
-              if kill and self.killfx == 0:
-                zsize = .25
-                tex1 = self.kill1
-                tex2 = self.kill2
-                
-                #volshebnyi - killswitch tail width and color change
-                kEffect = ( math.sin( pos / 50 ) + 1 ) /2
-                size = (0.02+kEffect*0.15, s - zsize)
-                c = [self.killColor[0],self.killColor[1],self.killColor[2]]
-                if c != [0,0,0]:
-                  for i in range(0,3):
-                    c[i]=c[i]*kEffect+color[i]*(1-kEffect)
-                  tailcol = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1) 
-
-              else:
-                zsize = .25
-                size = (.17, s - zsize)
-                if self.starPowerActive and not color == (0,0,0,1):
-                  tex1 = self.btail6
-                  tex2 = self.btaile6
-                else:
-                  if fret == 0:
-                    tex1 = self.btail1
-                    tex2 = self.btaile1
-                  elif fret == 1:
-                    tex1 = self.btail2
-                    tex2 = self.btaile2
-                  elif fret == 2:
-                    tex1 = self.btail3
-                    tex2 = self.btaile3
-                  elif fret == 3:
-                    tex1 = self.btail4
-                    tex2 = self.btaile4
-                  elif fret == 4:
-                    tex1 = self.btail5
-                    tex2 = self.btaile5
-            else:
-              zsize = .15
-              size = (.1, s - zsize)
-              if tailOnly:#Note let go
-                tex1 = self.tail0
-                tex2 = self.taile0
-              else:
-                if self.starPowerActive and not color == (0,0,0,1):
-                  tex1 = self.tail6
-                  tex2 = self.taile6
-                else:
-                  if fret == 0:
-                    tex1 = self.tail1
-                    tex2 = self.taile1
-                  elif fret == 1:
-                    tex1 = self.tail2
-                    tex2 = self.taile2
-                  elif fret == 2:
-                    tex1 = self.tail3
-                    tex2 = self.taile3
-                  elif fret == 3:
-                    tex1 = self.tail4
-                    tex2 = self.taile4
-                  elif fret == 4:
-                    tex1 = self.tail5
-                    tex2 = self.taile5
-          else:
-            if big == True and tailOnly == True:
-              if kill:
-                zsize = .25
-                tex1 = self.kill1
-                if self.kill2:
-                  tex2 = self.kill2
-                if not self.kill2:
-                  tex2 = None
-                #volshebnyi - killswitch tail width and color change
-                kEffect = ( math.sin( pos / 50 ) + 1 ) /2
-                size = (0.02+kEffect*0.15, s - zsize)
-                c = [self.killColor[0],self.killColor[1],self.killColor[2]]
-                if c != [0,0,0]:
-                  for i in range(0,3):
-                    c[i]=c[i]*kEffect+color[i]*(1-kEffect)
-                  tailcol = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1) 
-              else:
-                zsize = .25
-                size = (.11, s - zsize)
-                tex1 = self.bigTail1
-                if self.bigTail2:
-                  tex2 = self.bigTail2
-                if not self.bigTail2:
-                  tex2 = None
-            else:
-              zsize = .15
-              size = (.08, s - zsize)
-              tex1 = self.tail1
-              if self.tail2:
-                tex2 = self.tail2
-              if not self.tail2:
-                tex2 = None
-        
-        else:   #freestyleTail > 0
-          # render an inactive freestyle tail  (self.freestyle1 & self.freestyle2)
-          zsize = .25  
-          
-          if self.freestyleActive:
-            size = (.30, s - zsize)   #was .15
-          else:
-            size = (.15, s - zsize)   
-          
-          tex1 = self.freestyle1
-          if self.freestyle2:
-            tex2 = self.freestyle2
-          if not self.freestyle2:
-            tex2 = None
-          if freestyleTail == 1:
-            c1, c2, c3, c4 = color
-            tailGlow = 1 - (pos - self.freestyleLastFretHitTime[fret] ) / self.freestylePeriod
-            if tailGlow < 0:
-              tailGlow = 0
-            color = (c1 + c1*2.0*tailGlow, c2 + c2*2.0*tailGlow, c3 + c3*2.0*tailGlow, c4*0.6 + c4*0.4*tailGlow)    #MFH - this fades inactive tails' color darker                    
-            
-          tailcol = (color)
-        if self.theme == 2 and freestyleTail == 0 and big and tailOnly and shaders.enable("tail"):
-          color = (color[0]*1.5,color[1]*1.5,color[2]*1.5,1.0)
-          shaders.setVar("color",color)
-          if kill and self.killfx == 0:
-            h = shaders.getVar("height")
-            shaders.modVar("height",0.5,0.06/h-0.1)
-          shaders.setVar("offset",(5.0-size[1],0.0))
-          size=(size[0]*15,size[1])
-          
-          
-        self.engine.draw3Dtex(tex1, vertex = (-size[0], 0, size[0], size[1]), texcoord = (0.0, 0.0, 1.0, 1.0),
-                              scale = tailscale, color = tailcol)
-        if tex2:
-            self.engine.draw3Dtex(tex2, vertex = (-size[0], size[1], size[0], size[1] + (zsize)),
-                                  scale = tailscale, texcoord = (0.0, 0.05, 1.0, 0.95), color = tailcol)
-
-        shaders.disable()  
-
-        #MFH - this block of code renders the tail "beginning" - before the note, for freestyle "lanes" only
-        #volshebnyi
-        if tex2:
-          if freestyleTail > 0 and pos < self.freestyleStart + self.freestyleLength:
-            self.engine.draw3Dtex(tex2, vertex = (-size[0], 0-(zsize), size[0], 0 + (.05)),
-                                  scale = tailscale, texcoord = (0.0, 0.95, 1.0, 0.05), color = tailcol)
-          
-
-    if tailOnly:
-      return
-
   def renderFreestyleLanes(self, visibility, song, pos):
     if not song:
       return
@@ -338,7 +153,7 @@ class Guitar(Instrument):
 
               freestyleTailMode = 1
               
-              self.renderTail(length, sustain = True, kill = False, color = color, flat = False, tailOnly = True, isTappable = False, big = True, fret = theFret, spNote = False, freestyleTail = freestyleTailMode, pos = pos)
+              self.renderTail(length, sustain = True, kill = False, color = color, flat = False, tailOnly = True, isTappable = False, big = True, fret = theFret, freestyleTail = freestyleTailMode, pos = pos)
               glPopMatrix()
               
       self.freestyleActive = freestyleActive
@@ -503,9 +318,9 @@ class Guitar(Instrument):
       if renderNote == 0:  
         if big == True and num < self.bigMax:
           num += 1
-          self.renderTail(length, sustain = sustain, kill = killswitch, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, big = True, fret = event.number, spNote = spNote, pos = pos)
+          self.renderTail(length, sustain = sustain, kill = killswitch, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, big = True, fret = event.number, pos = pos)
         else:
-          self.renderTail(length, sustain = sustain, kill = killswitch, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote, pos = pos)
+          self.renderTail(length, sustain = sustain, kill = killswitch, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, pos = pos)
 
       glPopMatrix()
   
