@@ -412,25 +412,18 @@ class Instrument:
     if self.twoDnote == True:
       if self.noteSpin:
         self.starSpinFrames = 16
-        if not engine.loadImgDrawing(self, "noteAnimatedNormal", get("animated_normal.png")):
-          self.noteAnimatedNormal = None
-        if not engine.loadImgDrawing(self, "noteAnimatedHOPO", get("animated_hopo.png")):
-          self.noteAnimatedHOPO = None
-        if not engine.loadImgDrawing(self, "noteAnimatedPower", get("animated_power.png")):
-          self.noteAnimatedPower = None
-        if not engine.loadImgDrawing(self, "noteAnimatedPowerHOPO", get("animated_power_hopo.png")):
-          self.noteAnimatedPowerHOPO = None
-        if not engine.loadImgDrawing(self, "noteAnimatedPowerActive", get("animated_power_active.png")):
-          self.noteAnimatedPowerActive = None
-        if not engine.loadImgDrawing(self, "noteAnimatedPowerActiveHOPO", get("animated_power_active_hopo.png")):
-          self.noteAnimatedPowerActiveHOPO = None
+        engine.loadImgDrawing(self, "noteAnimatedNormal", get("animated_normal.png"))
+        engine.loadImgDrawing(self, "noteAnimatedHOPO", get("animated_hopo.png"))
+        engine.loadImgDrawing(self, "noteAnimatedPower", get("animated_power.png"))
+        engine.loadImgDrawing(self, "noteAnimatedPowerHOPO", get("animated_power_hopo.png"))
+        engine.loadImgDrawing(self, "noteAnimatedPowerActive", get("animated_power_active.png"))
+        engine.loadImgDrawing(self, "noteAnimatedPowerActiveHOPO", get("animated_power_active_hopo.png"))
+        
         if self.isDrum:
-          if not engine.loadImgDrawing(self, "noteOpenAnimatedPowerActive", get("animated_open_power_active.png")):
-            self.noteOpenAnimatedPowerActive = None
-          if not engine.loadImgDrawing(self, "noteOpenAnimatedPower", get("animated_open_power.png")):
-            self.noteOpenAnimatedPower = None
-          if not engine.loadImgDrawing(self, "noteOpenAnimated", get("animated_open.png")):
-            self.noteOpenAnimated = None
+          engine.loadImgDrawing(self, "noteOpenAnimatedPowerActive", get("animated_open_power_active.png"))
+          engine.loadImgDrawing(self, "noteOpenAnimatedPower", get("animated_open_power.png"))
+          engine.loadImgDrawing(self, "noteOpenAnimated", get("animated_open.png"))
+        
         if self.gameMode2p == 6: #battle multiplayer
           if engine.loadImgDrawing(self, "noteButtons", get("spinnotesbattle.png")):
             self.starSpinFrames = 8
@@ -440,6 +433,7 @@ class Instrument:
           engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
       else:
         engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
+        
     else:
       defaultNote = False
       defaultOpenNote = False
@@ -467,49 +461,39 @@ class Instrument:
         self.notetex = False
 
       else:
+        self.notetex = True
+        self.startex = True
+        self.staratex = True
+        
         for i in range(5):
-          if engine.loadImgDrawing(self,  "notetex"+chr(97+i),  get("notetex_"+chr(97+i)+".png")):
-            self.notetex = True
-          else:
+          if not engine.loadImgDrawing(self,  "notetex"+chr(97+i),  get("notetex_"+chr(97+i)+".png")):
             self.notetex = False
-
-          if self.engine.loadImgDrawing(self,  "startex"+chr(97+i),  get("startex_"+chr(97+i)+".png")):
-            self.startex = True
-          else:
+            break
+            
+        for i in range(5):
+          if not self.engine.loadImgDrawing(self,  "startex"+chr(97+i),  get("startex_"+chr(97+i)+".png")):
             self.startex = False
-
-          if self.engine.loadImgDrawing(self,  "staratex"+chr(97+i),  get("staratex_"+chr(97+i)+".png")):
-            self.staratex = True
-          else:
+            break
+            
+        for i in range(5):
+          if not self.engine.loadImgDrawing(self,  "staratex"+chr(97+i),  get("staratex_"+chr(97+i)+".png")):
             self.staratex = False
+            break
 
 
       if self.isDrum: 
-        if not self.engine.loadImgDrawing(self, "spActTex", get("spacttex.png")):
-          self.spActTex = None
-
+        engine.loadImgDrawing(self, "spActTex", get("spacttex.png"))
+        
 
       if defaultOpenNote:
-        self.opentex = False
-        self.opentex_star = False
-        self.opentex_stara = False
-
+        self.opentexture = False
+        self.opentexture_star = False
+        self.opentexture_stara = False
       else:
-        if self.engine.loadImgDrawing(self, "opentexture", get("opentex.png")):
-          self.opentex = True
-        else:
-          self.opentex = False
-
-        if self.engine.loadImgDrawing(self, "opentexture_star", get("opentex_star.png")):
-          self.opentex_star = True
-        else:
-          self.opentex_star = False
-
-        if self.engine.loadImgDrawing(self, "opentexture_stara", get("opentex_stara.png")):
-          self.opentex_stara = True
-        else:
-          self.opentex_stara = False
-      
+        self.engine.loadImgDrawing(self, "opentexture", get("opentex.png"))
+        self.engine.loadImgDrawing(self, "opentexture_star", get("opentex_star.png"))
+        self.engine.loadImgDrawing(self, "opentexture_stara", get("opentex_stara.png"))
+        
   def loadFrets(self):
     engine = self.engine
     themename = self.engine.data.themeLabel
@@ -519,13 +503,12 @@ class Instrument:
     if self.twoDkeys == True: #death_au
 
       if self.gameMode2p == 6:
-        if not engine.loadImgDrawing(self, "battleFrets", get("battle_frets.png")):
-          self.battleFrets = None
-
+        engine.loadImgDrawing(self, "battleFrets", get("battle_frets.png"))
+        
       #death_au: adding drumfrets.png (with bass drum frets separate)
       if self.isDrum and engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename, "frets", "drum", "fretbuttons.png")):
         self.drumFretButtons = True
-      elif engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename, "frets", "fretbuttons.png")):
+      elif engine.loadImgDrawing(self, "fretButtons", get("fretbuttons.png")):
         self.drumFretButtons = None
 
     else:
@@ -550,58 +533,52 @@ class Instrument:
       if defaultKey:
         self.keytex = False
       else:
+        self.keytex = True
         for i in range(5):
-          if engine.loadImgDrawing(self,  "keytex"+chr(97+i),  get("keytex_"+chr(97+i)+".png")):
-            self.keytex = True
-          else:
+          if not engine.loadImgDrawing(self,  "keytex"+chr(97+i),  get("keytex_"+chr(97+i)+".png")):
             self.keytex = False
             break
 
       if defaultOpenKey:
         self.keytexopen = False
       else:
-        if not engine.loadImgDrawing(self, "keytexopen", get("keytex_open.png")):
-          self.keytexopen = None
-      
+        engine.loadImgDrawing(self, "keytexopen", get("keytex_open.png"))
+        
   def loadTails(self):
     engine = self.engine
     themename = self.engine.data.themeLabel
 
+    get = lambda file: self.checkPath("tails", file)
+    getD = lambda file: self.checkPath("tails", file, True) #resorts to checking data
+    
     #MFH - freestyle tails (for drum fills & BREs)
-    if not engine.loadImgDrawing(self, "freestyle1", os.path.join("themes", themename, "freestyletail1.png"),  textureSize = (128, 128)):
-      engine.loadImgDrawing(self, "freestyle1", "freestyletail1.png",  textureSize = (128, 128))
-    if not engine.loadImgDrawing(self, "freestyle2", os.path.join("themes", themename, "freestyletail2.png"),  textureSize = (128, 128)):
-      self.freestyle2 = None
+    engine.loadImgDrawing(self, "freestyle1", getD("freestyletail1.png"),  textureSize = (128, 128))
+    engine.loadImgDrawing(self, "freestyle2", getD("freestyletail2.png"),  textureSize = (128, 128))
 
     if self.tailsEnabled == True:
       for i in range(0,7):
-        if not engine.loadImgDrawing(self, "tail"+str(i), os.path.join("themes",themename,"tails","tail"+str(i)+".png"),  textureSize = (128, 128)):
+        if not engine.loadImgDrawing(self, "tail"+str(i), get("tail"+str(i)+".png"),  textureSize = (128, 128)):
           self.simpleTails = True
           break
-        if not engine.loadImgDrawing(self, "taile"+str(i), os.path.join("themes",themename,"tails","taile"+str(i)+".png"),  textureSize = (128, 128)):
+        if not engine.loadImgDrawing(self, "taile"+str(i), get("taile"+str(i)+".png"),  textureSize = (128, 128)):
           self.simpleTails = True
           break
-        if not engine.loadImgDrawing(self, "btail"+str(i), os.path.join("themes",themename,"tails","btail"+str(i)+".png"),  textureSize = (128, 128)):
+        if not engine.loadImgDrawing(self, "btail"+str(i), get("btail"+str(i)+".png"),  textureSize = (128, 128)):
           self.simpleTails = True
           break
-        if not engine.loadImgDrawing(self, "btaile"+str(i), os.path.join("themes",themename,"tails","btaile"+str(i)+".png"),  textureSize = (128, 128)):
+        if not engine.loadImgDrawing(self, "btaile"+str(i), get("btaile"+str(i)+".png"),  textureSize = (128, 128)):
           self.simpleTails = True
           break
 
       if self.simpleTails:
         Log.debug("Simple tails used; complex tail loading error...")
-        if not engine.loadImgDrawing(self, "tail1", os.path.join("themes",themename,"tail1.png"),  textureSize = (128, 128)):
-          engine.loadImgDrawing(self, "tail1", "tail1.png",  textureSize = (128, 128))
-        engine.loadImgDrawing(self, "tail2", os.path.join("themes",themename,"tail2.png"),  textureSize = (128, 128))
-        if not engine.loadImgDrawing(self, "bigTail1", os.path.join("themes",themename,"bigtail1.png"),  textureSize = (128, 128)):
-          engine.loadImgDrawing(self, "bigTail1", "bigtail1.png",  textureSize = (128, 128))
-        engine.loadImgDrawing(self, "bigTail2", os.path.join("themes",themename,"bigtail2.png"),  textureSize = (128, 128))
+        engine.loadImgDrawing(self, "tail1", getD("tail1.png"),  textureSize = (128, 128))
+        engine.loadImgDrawing(self, "tail2", getD("tail2.png"),  textureSize = (128, 128))
+        engine.loadImgDrawing(self, "bigTail1", getD("bigtail1.png"),  textureSize = (128, 128))
+        engine.loadImgDrawing(self, "bigTail2", getD("bigtail2.png"),  textureSize = (128, 128))
     
-
-      if not engine.loadImgDrawing(self, "kill1", os.path.join("themes", themename, "kill1.png"),  textureSize = (128, 128)):
-        engine.loadImgDrawing(self, "kill1", "kill1.png",  textureSize = (128, 128))
-      if not engine.loadImgDrawing(self, "kill2", os.path.join("themes", themename, "kill2.png"),  textureSize = (128, 128)):
-        self.kill2 = None
+      engine.loadImgDrawing(self, "kill1", getD("kill1.png"),  textureSize = (128, 128))
+      engine.loadImgDrawing(self, "kill2", getD("kill2.png"),  textureSize = (128, 128))
 
     else:
       self.tail1 = None
@@ -1260,13 +1237,13 @@ class Instrument:
         glRotate(self.noterot[4], 0, 0, 1), glTranslatef(0, self.notepos[4], 0)
 
       if isOpen:
-        if self.opentex_stara == True and spNote==False and self.starPowerActive:
+        if self.opentexture_stara and spNote==False and self.starPowerActive:
           self.noteTex = self.opentexture_stara
 		  
-        elif self.opentex == True and spNote==False:
+        elif self.opentexture and spNote==False:
           self.noteTex = self.opentexture
 
-        elif self.opentex_star == True and spNote==True:
+        elif self.opentexture_star and spNote==True:
           self.noteTex = self.opentexture_star
 
       elif self.spActTex and isOpen == False and spNote == False and spAct and self.isDrum:
