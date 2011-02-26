@@ -28,6 +28,7 @@ from Song import Note, Tempo
 from Mesh import Mesh
 from Shader import shaders
 from OpenGL.GL import *
+import Song
 import Log
 import math
 import os #myfingershurt: needed for multi-OS file fetching
@@ -2134,7 +2135,112 @@ class Instrument:
           if freestyleTail > 0 and pos < self.freestyleStart + self.freestyleLength:
             self.engine.draw3Dtex(tex2, vertex = (-size[0], 0-(zsize), size[0], 0 + (.05)),
                                   scale = tailscale, texcoord = (0.0, 0.95, 1.0, 0.05), color = tailcol)
-          
 
     if tailOnly:
       return
+
+  def renderFreestyleLanes(self, visibility, song, pos, controls):
+    if not song:
+      return
+    if not song.readyToGo:
+      return
+
+    #MFH - check for [section big_rock_ending] to set a flag to determine how to treat the last drum fill marker note:
+    if song.breMarkerTime and pos > song.breMarkerTime:
+      self.bigRockEndingMarkerSeen = True
+    self.drumFillsReady = False
+
+    boardWindowMax = pos + self.currentPeriod * self.beatsPerBoard
+    track = song.midiEventTrack[self.player]
+    beatsPerUnit = self.beatsPerBoard / self.boardLength
+    breLaneOffset = (self.strings - 5) * .5
+
+    if self.freestyleEnabled:
+      freestyleActive = False
+      if self.isDrum:
+        self.drumFillsActive = False
+        drumFillEvents = []
+      for time, event in track.getEvents(pos - self.freestyleOffset, boardWindowMax + self.freestyleOffset):
+        if isinstance(event, Song.MarkerNote):
+          if event.number == Song.freestyleMarkingNote and (not event.happened or self.bigRockEndingMarkerSeen):		  #MFH - don't kill the BRE!
+            if self.isDrum:
+   	          drumFillEvents.append(event)
+            length     = (event.length - 50) / self.currentPeriod / beatsPerUnit
+            w = self.boardWidth / self.strings
+            self.freestyleLength = event.length #volshebnyi
+            self.freestyleStart = time # volshebnyi
+            z  = ((time - pos) / self.currentPeriod) / beatsPerUnit
+            z2 = ((time + event.length - pos) / self.currentPeriod) / beatsPerUnit
+
+            if z > self.boardLength * .8:
+              f = (self.boardLength - z) / (self.boardLength * .2)
+            elif z < 0:
+              f = min(1, max(0, 1 + z2))
+            else:
+              f = 1.0
+
+            time -= self.freestyleOffset 
+            #volshebnyi - allow tail to move under frets
+            if self.isDrum:
+              if time > pos:
+                self.drumFillsHits = -1
+              if self.starPower>=50 and not self.starPowerActive:
+                self.drumFillsReady = True
+
+              else:
+                self.drumFillsReady = False
+            if self.bigRockEndingMarkerSeen:
+              self.freestyleReady = True
+              if self.isDrum:
+                self.drumFillsReady = False
+            else:
+              self.freestyleReady = False
+            if time < pos:
+              if self.bigRockEndingMarkerSeen:
+                freestyleActive = True
+              elif self.isDrum:
+                if self.drumFillsReady:
+                  self.drumFillsActive = True
+                  self.drumFillWasJustActive = True
+                if self.drumFillsHits<0:
+                  self.drumFillsCount += 1
+                  self.drumFillsHits = 0
+
+              if z < -1.5:
+                length += z +1.5
+                z =  -1.5
+
+            if self.isDrum:
+              breRangeStart = 1
+            else:
+              breRangeStart = 0
+
+            #volshebnyi - render freestyle tails
+            if self.freestyleReady or self.drumFillsReady:
+              for theFret in range(breRangeStart,5):
+                x = (self.strings / 2 - breLaneOffset - theFret) * w
+                if self.isDrum and theFret == 4:
+                  c = self.fretColors[0]
+                else:
+                  c = self.fretColors[theFret]
+                color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1.0 * visibility * f)
+                glPushMatrix()
+                glTranslatef(x, (1.0 - visibility) ** (theFret + 1), z)
+
+                freestyleTailMode = 1
+
+                self.renderTail(length = length, sustain = True, kill = False, color = color, flat = False, tailOnly = True, isTappable = False, big = True, fret = theFret, freestyleTail = freestyleTailMode, pos = pos)
+                glPopMatrix()
+
+
+            if self.isDrum and ( self.drumFillsActive and self.drumFillsHits >= 4 and z + length<self.boardLength ):
+              glPushMatrix()
+              color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1.0 * visibility * f)
+              glTranslatef(x, 0.0, z + length)
+              glScalef(1,1.7,1.3)
+              self.renderNote(length, sustain = False, color = color, flat = False, tailOnly = False, isTappable = False, fret = 4, spNote = False, isOpen = False, spAct = True)
+              glPopMatrix()
+
+      self.freestyleActive = freestyleActive
+      if self.isDrum:
+        self.drumFillEvents = drumFillEvents

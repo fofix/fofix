@@ -105,59 +105,6 @@ class Guitar(Instrument):
 
     self.neck = Neck(self.engine, self, playerObj)
 
-  def renderFreestyleLanes(self, visibility, song, pos):
-    if not song:
-      return
-    if not song.readyToGo:
-      return
-
-
-    boardWindowMax = pos + self.currentPeriod * self.beatsPerBoard
-    track = song.midiEventTrack[self.player]
-
-    #MFH - render 5 freestyle tails when Song.freestyleMarkingNote comes up
-    if self.freestyleEnabled:
-      freestyleActive = False
-      for time, event in track.getEvents(pos - self.freestyleOffset , boardWindowMax + self.freestyleOffset):
-        if isinstance(event, Song.MarkerNote):
-          if event.number == Song.freestyleMarkingNote:
-            length     = (event.length - 50) / self.currentPeriod / self.beatsPerUnit
-            w = self.boardWidth / self.strings
-            self.freestyleLength = event.length #volshebnyi
-            self.freestyleStart = time # volshebnyi
-            z  = ((time - pos) / self.currentPeriod) / self.beatsPerUnit
-            z2 = ((time + event.length - pos) / self.currentPeriod) / self.beatsPerUnit
-      
-            if z > self.boardLength * .8:
-              f = (self.boardLength - z) / (self.boardLength * .2)
-            elif z < 0:
-              f = min(1, max(0, 1 + z2))
-            else:
-              f = 1.0
-  
-            #MFH - must extend the tail past the first fretboard section dynamically so we don't have to render the entire length at once
-            #volshebnyi - allow tail to move under frets 
-            if time - self.freestyleOffset < pos:
-              freestyleActive = True
-              if z < -1.5:
-                length += z +1.5
-                z =  -1.5
-  
-            #MFH - render 5 freestyle tails
-            for theFret in range(0,5):
-              x  = (self.strings / 2 - theFret) * w
-              c = self.fretColors[theFret]
-              color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
-              glPushMatrix()
-              glTranslatef(x, (1.0 - visibility) ** (theFret + 1), z)
-
-              freestyleTailMode = 1
-              
-              self.renderTail(length, sustain = True, kill = False, color = color, flat = False, tailOnly = True, isTappable = False, big = True, fret = theFret, freestyleTail = freestyleTailMode, pos = pos)
-              glPopMatrix()
-              
-      self.freestyleActive = freestyleActive
-
   def renderTails(self, visibility, song, pos, killswitch):
     if not song:
       return
@@ -526,7 +473,7 @@ class Guitar(Instrument):
         glScalef(-1, 1, 1)
 
       if self.freestyleActive:
-        self.renderFreestyleLanes(visibility, song, pos) #MFH - render the lanes on top of the notes.
+        self.renderFreestyleLanes(visibility, song, pos, None) #MFH - render the lanes on top of the notes.
         self.renderFrets(visibility, song, controls)
 
         if self.hitFlamesPresent:   #MFH - only if present!
@@ -545,7 +492,7 @@ class Guitar(Instrument):
           self.renderNotes(visibility, song, pos)
           self.renderFrets(visibility, song, controls)
 
-        self.renderFreestyleLanes(visibility, song, pos) #MFH - render the lanes on top of the notes.
+        self.renderFreestyleLanes(visibility, song, pos, None) #MFH - render the lanes on top of the notes.
 
         
         if self.hitFlamesPresent:   #MFH - only if present!
