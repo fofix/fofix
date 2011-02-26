@@ -371,7 +371,14 @@ class Instrument:
 
   #this checks to see if there is a "drum" or "bass" folder
   #inside the subdirectory for image replacement
-  def checkPath(self, subdirectory, file):
+  def checkPath(self, subdirectory, file, lastResort = False):
+  #  parameters
+  #     @subdirectory       the folder in the theme to search
+  #                           if the instrument is drum or bass it will extend this
+  #     @file               the file to search for
+  #     @lastResort         if the file isn't even found in the default path then
+  #                           resort to using the file in the data folder
+  
     #Get theme
     themename = self.engine.data.themeLabel
     
@@ -386,12 +393,13 @@ class Instrument:
       Log.debug(themepath + " exists!")
       return os.path.join(themepath, file)
     else:
+      if lastResort and not self.engine.fileExists(os.path.join(defaultpath, file)):
+          return file
       return os.path.join(defaultpath, file)
 
   def loadNotes(self):
     engine = self.engine
     themename = self.engine.data.themeLabel
-    directory = "notes"
 
     get = lambda file: self.checkPath("notes", file)
 
@@ -505,14 +513,13 @@ class Instrument:
   def loadFrets(self):
     engine = self.engine
     themename = self.engine.data.themeLabel
-    directory = "notes"
 
     get = lambda file: self.checkPath("frets", file)
 
     if self.twoDkeys == True: #death_au
 
       if self.gameMode2p == 6:
-        if not engine.loadImgDrawing(self, "battleFrets", os.path.join("themes", themename,"battle_frets.png")):
+        if not engine.loadImgDrawing(self, "battleFrets", get("battle_frets.png")):
           self.battleFrets = None
 
       #death_au: adding drumfrets.png (with bass drum frets separate)
