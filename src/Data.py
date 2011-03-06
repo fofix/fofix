@@ -445,6 +445,7 @@ class Data(object):
       if target and name:
         setattr(target, name, None)
       else:
+        Log.error("Image not found: " + fileName)
         return None
     
     if target:
