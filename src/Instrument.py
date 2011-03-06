@@ -395,6 +395,7 @@ class Instrument:
     else:
       if lastResort and not self.engine.fileExists(os.path.join(defaultpath, file)):
         return file
+      Log.debug("Image not found: " + themepath + "/" + file)
       return os.path.join(defaultpath, file)
 
   def loadNotes(self):
