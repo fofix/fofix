@@ -45,7 +45,7 @@ from Input import Input, KeyListener, SystemEventListener
 from Resource import Resource
 from Data import Data
 from World import World
-from Svg import SvgContext
+from Svg import SvgContext, ImgDrawing
 #alarian
 #from Song import EAS_DIF, MED_DIF, HAR_DIF, EXP_DIF
 from Debug import DebugLayer
@@ -862,6 +862,9 @@ class GameEngine(object):
                          on the bottom side (0), center point (1), or top(2) side of the image
     """
     
+    if not isinstance(image, ImgDrawing):
+      return
+    
     width, height = scale
     x, y = coord
     if stretched == 1: # fit to width
@@ -923,6 +926,10 @@ class GameEngine(object):
     only really used by notes
     '''
 
+
+    if not isinstance(image, ImgDrawing):
+      return
+        
     if alpha == True:
       glBlendFunc(GL_SRC_ALPHA, GL_ONE)
 
