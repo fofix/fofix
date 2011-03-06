@@ -391,11 +391,10 @@ class Instrument:
       themepath = os.path.join(themepath, "bass")
           
     if self.engine.fileExists(os.path.join(themepath, file)):
-      Log.debug(themepath + " exists!")
       return os.path.join(themepath, file)
     else:
       if lastResort and not self.engine.fileExists(os.path.join(defaultpath, file)):
-          return file
+        return file
       return os.path.join(defaultpath, file)
 
   def loadNotes(self):
@@ -557,6 +556,7 @@ class Instrument:
     engine.loadImgDrawing(self, "freestyle2", getD("freestyletail2.png"),  textureSize = (128, 128))
 
     if self.tailsEnabled == True:
+      self.simpleTails = False
       for i in range(0,7):
         if not engine.loadImgDrawing(self, "tail"+str(i), get("tail"+str(i)+".png"),  textureSize = (128, 128)):
           self.simpleTails = True
