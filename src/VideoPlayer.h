@@ -28,8 +28,17 @@ typedef struct _VideoPlayer VideoPlayer;
 VideoPlayer* video_player_new(const char* filename, GError** err);
 void video_player_destroy(VideoPlayer* player);
 
+/* Real-time playback - bind_frame automatically advances when appropriate */
 void video_player_play(VideoPlayer* player);
 void video_player_pause(VideoPlayer* player);
+
+/* Playback to external timing source - change which frame bind_frame will bind.
+
+   XXX: Only strictly increasing times will do the right thing (and large
+        increases will still work but be inefficient) since we haven't
+        implemented seeking yet!
+ */
+gboolean video_player_advance(VideoPlayer* player, double newpos, GError** err);
 
 gboolean video_player_bind_frame(VideoPlayer* player, GError** err);
 

@@ -39,6 +39,7 @@ cdef extern from "VideoPlayer.h":
   void video_player_destroy(CVideoPlayer*)
   void video_player_play(CVideoPlayer*)
   void video_player_pause(CVideoPlayer*)
+  bint video_player_advance(CVideoPlayer*, double, GError**)
   bint video_player_bind_frame(CVideoPlayer*, GError**)
   bint video_player_eof(CVideoPlayer*)
   double video_player_aspect_ratio(CVideoPlayer*)
@@ -75,6 +76,11 @@ cdef class VideoPlayer(object):
 
   def pause(self):
     video_player_pause(self.player)
+
+  def advance(self, double newpos):
+    cdef GError* err = NULL
+    if not video_player_advance(self.player, newpos, &err):
+      raise_from_gerror(err)
 
   def bind_frame(self):
     cdef GError* err = NULL
@@ -126,6 +132,9 @@ class VideoLayer(BackgroundLayer, KeyListener):
 
   def pause(self):
     self.player.pause()
+
+  def advance(self, newpos):
+    self.player.advance(newpos)
 
   def restart(self):
     # XXX: do this less hackishly

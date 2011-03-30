@@ -50,6 +50,7 @@ struct _VideoPlayer {
   int tex_width;
   int tex_height;
   guchar* tex_buffer;
+  gboolean buffer_dirty;
 };
 
 static void destroy_stream(gpointer data)
@@ -115,6 +116,7 @@ static void update_texture(VideoPlayer* player)
   int dest_stride[] = {player->tex_width * 4};
   sws_scale(player->sws_context, src, src_stride, 0, player->tinfo.pic_height, dest, dest_stride);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, player->tex_width, player->tex_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, player->tex_buffer);
+  player->buffer_dirty = FALSE;
 }
 
 static gboolean demux_headers(VideoPlayer* player, GError** err)
@@ -288,16 +290,25 @@ void video_player_pause(VideoPlayer* player)
 
 gboolean video_player_bind_frame(VideoPlayer* player, GError** err)
 {
-  gboolean must_update_texture = FALSE;
-
   glBindTexture(GL_TEXTURE_2D, player->video_texture);
 
   /* Advance the playback position if we're playing. */
   if (player->playing) {
     GTimeVal now;
     g_get_current_time(&now);
-    player->playback_position = (1000000 * (now.tv_sec - player->playback_start_time.tv_sec)) + (now.tv_usec - player->playback_start_time.tv_usec);
+    if (!video_player_advance(player, (now.tv_sec - player->playback_start_time.tv_sec) + 1e-6 * (now.tv_usec - player->playback_start_time.tv_usec), err))
+      return FALSE;
   }
+
+  if (player->buffer_dirty)
+    update_texture(player);
+
+  return TRUE;
+}
+
+gboolean video_player_advance(VideoPlayer* player, double newpos, GError** err)
+{
+  player->playback_position = 1000000 * newpos;
 
   while (th_granule_time(player->vdecoder, player->decode_granpos) * 1000000 < player->playback_position) {
     ogg_packet pkt;
@@ -323,12 +334,9 @@ gboolean video_player_bind_frame(VideoPlayer* player, GError** err)
 
     if (decode_status == 0) {
       th_decode_ycbcr_out(player->vdecoder, player->frame_buffer);
-      must_update_texture = TRUE;
+      player->buffer_dirty = TRUE;
     }
   }
-
-  if (must_update_texture)
-    update_texture(player);
 
   return TRUE;
 }
