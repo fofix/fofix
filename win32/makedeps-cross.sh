@@ -201,10 +201,10 @@ if test ! -f "$PREFIX"/build-stamps/libffi; then
 fi
 
 # GLib
-GLIB="glib-2.26.1"
+GLIB="glib-2.32.4"
 if test ! -f "$PREFIX"/build-stamps/glib; then
-  download http://ftp.gnome.org/pub/GNOME/sources/glib/2.26/$GLIB.tar.bz2
-  tar jxvf $GLIB.tar.bz2
+  download http://ftp.gnome.org/pub/GNOME/sources/glib/2.32/$GLIB.tar.xz
+  tar Jxvf $GLIB.tar.xz
   cd $GLIB
   ./configure $COMMON_AUTOCONF_FLAGS
   make -C glib
