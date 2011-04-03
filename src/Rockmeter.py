@@ -79,15 +79,18 @@ progress = 0.0          #this gives a percentage (between 0 and 1)
 
 vpc = [640.0, 480.0]    #viewport's constant size, these variables determine how 
                         #things are placed on screen in relation to pixel coordinates
-                        
-# A graphical rockmeter layer
-# This is the base template for all rockmeter layer types
-class Layer:
+
+# Functions for getting config values, optionally as compiled code objects ready to eval().
+class ConfigGetMixin(object):
   def get(self, value, type = str, default = None):
     if self.config.has_option(self.section, value):
       return type(self.config.get(self.section, value))
     return default
 
+
+# A graphical rockmeter layer
+# This is the base template for all rockmeter layer types
+class Layer(ConfigGetMixin):
   #calculates the board's width at a certain position
   #returns a value not in pixels
   def boardWidth(self, x):
@@ -401,12 +404,7 @@ class CircleLayer(Layer):
 
 
 #this is just a template for effects                
-class Effect:
-  def get(self, value, type = str, default = None):
-    if self.config.has_option(self.section, value):
-      return type(self.config.get(self.section, value))
-    return default
-
+class Effect(ConfigGetMixin):
   def __init__(self, layer, section):
     self.layer = layer
     self.config = layer.config
@@ -588,12 +586,7 @@ class Replace(Effect):
     
     
         
-class Rockmeter:
-  def get(self, value, type = str, default = None):
-    if self.config.has_option(self.section, value):
-      return type(self.config.get(self.section, value))
-    return default
-
+class Rockmeter(ConfigGetMixin):
   def __init__(self, guitarScene, configFileName, coOp = False):
 
     self.scene            = guitarScene
