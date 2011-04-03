@@ -38,14 +38,13 @@ from OpenGL.GL import glColor3f
 
 import math
 
+from constants import *
+
 #these are the variables for setting the alignment of text and images
 #when setting them up in the rockmeter.ini you do not have
 #to put it in all caps, the code will take care of that
 #for you; however you do have to spell them right or it will
 #give you an error.
-LEFT   = 0
-CENTER = 1
-RIGHT  = 2
 TOP    = 0
 BOTTOM = 2
 

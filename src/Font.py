@@ -27,14 +27,11 @@ import cmgl
 import sys
 from Texture import Texture
 import numpy as np
+from constants import *
 
 DEFAULT_SCALE = 0.002
 
 SCREEN_BOTTOM = .75
-
-LEFT   = 0
-CENTER = 1
-RIGHT  = 2
 
 class CacheElement(object):
     def __init__(self,content):

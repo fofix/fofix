@@ -38,12 +38,10 @@ import math
 from Language import _
 from Shader import shaders
 from Task import Task
+from constants import *
 
 #Theme Constants.
 
-LEFT   = 0
-CENTER = 1
-RIGHT  = 2
 GUITARTYPES = [0, 1, 4]
 DRUMTYPES   = [2, 3]
 MICTYPES    = [5]
