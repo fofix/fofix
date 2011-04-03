@@ -308,6 +308,21 @@ if test ! -f "$PREFIX"/build-stamps/libsmf; then
   $RM_RF $LIBSMF
 fi
 
+# soundtouch
+SOUNDTOUCH="soundtouch-1.6.0"
+if test ! -f "$PREFIX"/build-stamps/soundtouch; then
+  download http://www.surina.net/soundtouch/$SOUNDTOUCH.tar.gz
+  tar zxvf $SOUNDTOUCH.tar.gz
+  cd soundtouch
+  ./bootstrap
+  ./configure $COMMON_AUTOCONF_FLAGS
+  make LDFLAGS=-no-undefined
+  make install
+  cd ..
+  touch "$PREFIX"/build-stamps/soundtouch
+  $RM_RF soundtouch
+fi
+
 # ffmpeg
 # We only need libswscale.
 if test ! -f "$PREFIX"/build-stamps/ffmpeg; then
