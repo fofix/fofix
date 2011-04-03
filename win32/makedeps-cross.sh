@@ -323,6 +323,19 @@ if test ! -f "$PREFIX"/build-stamps/soundtouch; then
   $RM_RF soundtouch
 fi
 
+# soundtouch-c
+# The reason we build this here even though it's from code in src/
+# is that we need a bridge into the MinGW-compiled C++ code that is
+# SoundTouch that we can link to with MSVC.
+if test ! -f "$PREFIX"/build-stamps/soundtouch-c; then
+  $CROSS_GXX -g -O2 -W -Wall `pkg-config --cflags glib-2.0 soundtouch` -fno-exceptions -fno-rtti -c -o soundtouch-c.o ../src/soundtouch-c.cpp
+  rm -f "$PREFIX"/lib/soundtouch-c.lib
+  $CROSS_AR cru "$PREFIX"/lib/soundtouch-c.lib soundtouch-c.o
+  $CROSS_RANLIB "$PREFIX"/lib/soundtouch-c.lib
+  touch "$PREFIX"/build-stamps/soundtouch-c
+  $RM_RF soundtouch-c.o
+fi
+
 # ffmpeg
 # We only need libswscale.
 if test ! -f "$PREFIX"/build-stamps/ffmpeg; then
