@@ -139,9 +139,9 @@ if test ! -f "$PREFIX"/build-stamps/win-iconv; then
   tar jxvf $WINICONV.tar.bz2
   cd $WINICONV
   make clean
-  make -n iconv.dll win_iconv.exe | sed -e 's/^/$CROSS_TOOL_PREFIX-/' | sh -ex
+  make -n iconv.dll | sed -e 's/^/$CROSS_TOOL_PREFIX-/' | sh -ex
   $CROSS_GCC -mdll -o iconv.dll -Wl,--out-implib,libiconv.a iconv.def win_iconv.o
-  cp -v iconv.dll win_iconv.exe "$PREFIX"/bin
+  cp -v iconv.dll "$PREFIX"/bin
   cp -v iconv.h "$PREFIX"/include
   echo '' >>"$PREFIX"/include/iconv.h  # squelch warnings about no newline at the end
   sed -i -e 's://.*$::' "$PREFIX"/include/iconv.h  # squelch warnings about C++ comments
