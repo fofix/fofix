@@ -281,10 +281,10 @@ if test ! -f "$PREFIX"/build-stamps/libvorbis; then
 fi
 
 # libtheora
-LIBTHEORA="libtheora-1.1.1"
+LIBTHEORA="libtheora-1.2.0alpha1"
 if test ! -f "$PREFIX"/build-stamps/libtheora; then
-  download http://downloads.xiph.org/releases/theora/$LIBTHEORA.tar.bz2
-  tar jxvf $LIBTHEORA.tar.bz2
+  download http://downloads.xiph.org/releases/theora/$LIBTHEORA.tar.xz
+  tar Jxvf $LIBTHEORA.tar.xz
   cd $LIBTHEORA
   ./configure $COMMON_AUTOCONF_FLAGS
   make
