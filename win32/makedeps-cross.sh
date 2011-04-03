@@ -253,13 +253,11 @@ if test ! -f "$PREFIX"/build-stamps/gettext; then
 fi
 
 # libogg
-LIBOGG="libogg-1.2.1"
+LIBOGG="libogg-1.3.0"
 if test ! -f "$PREFIX"/build-stamps/libogg; then
-  download http://downloads.xiph.org/releases/ogg/$LIBOGG.tar.gz
-  tar zxvf $LIBOGG.tar.gz
+  download http://downloads.xiph.org/releases/ogg/$LIBOGG.tar.xz
+  tar Jxvf $LIBOGG.tar.xz
   cd $LIBOGG
-  libtoolize
-  autoreconf  # fix buggy configure test for 16-bit types
   ./configure $COMMON_AUTOCONF_FLAGS
   make
   make install
