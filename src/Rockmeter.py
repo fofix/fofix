@@ -38,6 +38,7 @@ from OpenGL.GL import glColor3f
 
 import math
 
+from Theme import halign
 from constants import *
 
 #these are the variables for setting the alignment of text and images
@@ -110,9 +111,9 @@ class Layer:
     self.color       = self.get("color", str, "#FFFFFF")
                                         #color of the image (#FFFFFF is white on text, on images it is full color)
     self.condition   = True				#when should the image be shown (by default it will always be shown)
-    self.alignment   = self.get("alignment", str, "center").upper()
+    self.alignment   = halign(self.get("alignment", str, "center"))
                                         #alignment of the image (horizontal)
-    self.valignment  = self.get("valignment", str, "center").upper()
+    self.valignment  = halign(self.get("valignment", str, "center"))
                                         #alignment of the image (vertical)
     self.inPixels    = self.get("inPixels", str, "").split("|")
                                         #makes sure to properly scale/position the images in pixels instead of percent
@@ -135,7 +136,7 @@ class Layer:
                         [eval(self.scale[0]),eval(self.scale[1])],
                         eval(self.angle),
                         self.engine.theme.hexToColor(self.color),
-                        [eval(self.alignment),eval(self.valignment)],
+                        [self.alignment, self.valignment],
                         True]
      
   # should handle the final step of rendering the image
@@ -235,7 +236,7 @@ class FontLayer(Layer):
     self.font        = self.engine.data.fontDict[font]
     self.text        = ""
     self.replace     = ""
-    self.alignment   = self.get("alignment", str, "LEFT").upper()
+    self.alignment   = halign(self.get("alignment", str, "LEFT"), 'left')
     self.useComma    = self.get("useComma", bool, False)
 
     self.finals.append(self.text)
