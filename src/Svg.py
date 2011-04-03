@@ -31,6 +31,7 @@ import cmgl
 import Log
 from Texture import Texture
 from PIL import Image
+from constants import *
 
 #stump: the last few stubs of DummyAmanith.py are inlined here since this
 # is the only place in the whole program that uses it now that we've pruned
@@ -160,11 +161,11 @@ class ImgDrawing(object):
       self.createTex()
 
   def setAlignment(self, alignment):
-    if alignment == 0:  #left
+    if alignment == LEFT:  #left
       self.shift = 0
-    elif alignment == 1:#center
+    elif alignment == CENTER:#center
       self.shift = -.5
-    elif alignment == 2:#right
+    elif alignment == RIGHT:#right
       self.shift = -1.0
 
   def setVAlignment(self, alignment):

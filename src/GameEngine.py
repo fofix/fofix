@@ -59,6 +59,7 @@ import Mod
 import Player
 from Shader import shaders
 from Song import difficulties, parts
+from constants import *
 
 import cmgl
 
@@ -792,7 +793,7 @@ class GameEngine(object):
     return self.data.loadImgDrawing(target, name, fileName, textureSize)
 
   #volshebnyi
-  def drawStarScore(self, screenwidth, screenheight, xpos, ypos, stars, scale = None, horiz_spacing = 1.2, space = 1.0, hqStar = False, align = 0):
+  def drawStarScore(self, screenwidth, screenheight, xpos, ypos, stars, scale = None, horiz_spacing = 1.2, space = 1.0, hqStar = False, align = LEFT):
     minScale = 0.02
     w = screenwidth
     h = screenheight
@@ -805,9 +806,9 @@ class GameEngine(object):
     else:
       star = self.data.starPerfect
     wide = scale * horiz_spacing
-    if align == 1: #center - akedrou (simplifying the alignment...)
+    if align == CENTER: #center - akedrou (simplifying the alignment...)
       xpos  -= (2 * wide)
-    elif align == 2: #right
+    elif align == RIGHT: #right
       xpos  -= (4 * wide)
     if stars > 5:
       for j in range(5):
@@ -835,7 +836,7 @@ class GameEngine(object):
 
   def drawImage(self, image, scale = (1.0, -1.0), coord = (0, 0), rot = 0, \
                 color = (1,1,1,1), rect = (0,1,0,1), stretched = 0, fit = 0, \
-                alignment = 1, valignment = 1):
+                alignment = CENTER, valignment = 1):
     """
     Draws the image/surface to screen
 
