@@ -336,6 +336,24 @@ if test ! -f "$PREFIX"/build-stamps/soundtouch-c; then
   $RM_RF soundtouch-c.o
 fi
 
+# SDL
+SDL="SDL-1.2.15"
+if test ! -f "$PREFIX"/build-stamps/sdl; then
+  download http://www.libsdl.org/release/$SDL.tar.gz
+  tar zxvf $SDL.tar.gz
+  cd $SDL
+  ./configure $COMMON_AUTOCONF_FLAGS
+  make
+  make install
+  mv -v "$PREFIX"/lib/libSDLmain.a "$PREFIX"/lib/SDLmain.lib
+  rm -f "$PREFIX"/lib/libSDLmain.la
+  # Compatible with MSVC, unlike what was already installed as SDL_config.h
+  cp -v include/SDL_config_win32.h "$PREFIX"/include/SDL/SDL_config.h
+  cd ..
+  touch "$PREFIX"/build-stamps/sdl
+  $RM_RF $SDL
+fi
+
 # ffmpeg
 # We only need libswscale.
 if test ! -f "$PREFIX"/build-stamps/ffmpeg; then
