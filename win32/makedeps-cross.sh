@@ -354,6 +354,20 @@ if test ! -f "$PREFIX"/build-stamps/sdl; then
   $RM_RF $SDL
 fi
 
+# SDL_mixer
+SDLMIXER="SDL_mixer-1.2.12"
+if test ! -f "$PREFIX"/build-stamps/sdl_mixer; then
+  download http://www.libsdl.org/projects/SDL_mixer/release/$SDLMIXER.tar.gz
+  tar zxvf $SDLMIXER.tar.gz
+  cd $SDLMIXER
+  ./configure $COMMON_AUTOCONF_FLAGS --disable-music-mod --disable-music-midi --disable-music-mp3
+  make
+  make install
+  cd ..
+  touch "$PREFIX"/build-stamps/sdl_mixer
+  $RM_RF $SDLMIXER
+fi
+
 # ffmpeg
 # We only need libswscale.
 if test ! -f "$PREFIX"/build-stamps/ffmpeg; then
