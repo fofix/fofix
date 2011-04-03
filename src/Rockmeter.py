@@ -659,8 +659,6 @@ class Rockmeter(ConfigGetMixin):
     
     self.loadLayerFX(layer, section)
 
-    Wid, Hgt = self.engine.data.fontDict[font].getStringSize(layer.text)
-
     self.addLayer(layer, layer.shared)
 
   def createImage(self, section):
