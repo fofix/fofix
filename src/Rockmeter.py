@@ -23,7 +23,7 @@
 
 from __future__ import with_statement
 
-import Config
+from LinedConfigParser import LinedConfigParser
 import os
 
 from Svg import ImgDrawing
@@ -601,7 +601,7 @@ class Rockmeter:
     self.sharedlayers = [] #these layers are for coOp use only
 
     self.coOp = coOp
-    self.config = Config.MyConfigParser()
+    self.config = LinedConfigParser()
     self.config.read(configFileName)
 
     self.themename = self.engine.data.themeLabel

@@ -25,7 +25,7 @@
 
 from __future__ import with_statement
 
-import Config
+from LinedConfigParser import LinedConfigParser
 from OpenGL.GL import *
 import Log
 from Shader import shaders
@@ -240,7 +240,7 @@ class Stage(object):
   def __init__(self, guitarScene, configFileName):
     self.scene            = guitarScene
     self.engine           = guitarScene.engine
-    self.config           = Config.MyConfigParser()
+    self.config           = LinedConfigParser()
     self.backgroundLayers = []
     self.foregroundLayers = []
     self.textures         = {}
