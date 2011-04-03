@@ -206,10 +206,9 @@ if test ! -f "$PREFIX"/build-stamps/glib; then
   ./configure $COMMON_AUTOCONF_FLAGS
   make -C glib
   make -C gthread
-  make -C gobject glib-genmarshal.exe
-  wine-shwrap gobject/glib-genmarshal
-  make
-  make install
+  make -C glib install
+  make -C gthread install
+  cp -v glib-2.0.pc gthread-2.0.pc "$PREFIX"/lib/pkgconfig
   cd ..
   touch "$PREFIX"/build-stamps/glib
   $RM_RF $GLIB
