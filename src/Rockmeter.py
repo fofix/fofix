@@ -87,17 +87,17 @@ class ConfigGetMixin(object):
       return type(self.config.get(self.section, value))
     return default
 
-  def getexpr(self, value, type=str, default=None):
+  def getexpr(self, value, default=None):
     if self.config.has_option(self.section, value):
       filename, lineno = self.config.getlineno(self.section, value)
-      expr = type(self.config.get(self.section, value))
+      expr = self.config.get(self.section, value)
       return compile('\n' * (lineno - 1) + expr, filename, 'eval')
     return compile(default, '<string>', 'eval')
 
-  def getexprs(self, value, type=str, default=None, separator='|'):
+  def getexprs(self, value, default=None, separator='|'):
     if self.config.has_option(self.section, value):
       filename, lineno = self.config.getlineno(self.section, value)
-      exprs = type(self.config.get(self.section, value)).split(separator)
+      exprs = self.config.get(self.section, value).split(separator)
       return [compile('\n' * (lineno - 1) + expr, filename, 'eval') for expr in exprs]
     return [compile(expr, '<string>', 'eval') for expr in default.split(separator)]
 
@@ -119,11 +119,11 @@ class Layer(ConfigGetMixin):
     self.config      = stage.config     #the rockmeter.ini
     self.section     = section          #the section of the rockmeter.ini involving this layer
 
-    self.position    = [self.getexpr("xpos", str, "0.0"), self.getexpr("ypos", str, "0.0")]
+    self.position    = [self.getexpr("xpos", "0.0"), self.getexpr("ypos", "0.0")]
                                         #where on the screen to draw the layer
-    self.angle       = self.getexpr("angle", str, "0.0")
+    self.angle       = self.getexpr("angle", "0.0")
                                         #angle to rotate the layer (in degrees)
-    self.scale       = [self.getexpr("xscale", str, "1.0"), self.getexpr("yscale", str, "1.0")]
+    self.scale       = [self.getexpr("xscale", "1.0"), self.getexpr("yscale", "1.0")]
                                         #how much to scale it by (width, height from 0.0 - 1.0)
     self.color       = self.get("color", str, "#FFFFFF")
                                         #color of the image (#FFFFFF is white on text, on images it is full color)
@@ -170,7 +170,7 @@ class ImageLayer(Layer):
 
     #these are the images that are drawn when the layer is visible
     self.drawing = self.engine.loadImgDrawing(self, None, drawing)
-    self.rect    = self.getexpr("rect", str, "(0,1,0,1)")
+    self.rect    = self.getexpr("rect", "(0,1,0,1)")
                                 #how much of the image do you want rendered (left, right, top, bottom)
     self.finals.append(self.rect)
     
@@ -316,7 +316,7 @@ class CircleLayer(Layer):
 
     #this number (between 0 and 1) determines how much
     #of the circle should be filled (0 to 360 degrees)
-    self.ratio   = self.getexpr("ratio", str, "1")
+    self.ratio   = self.getexpr("ratio", "1")
     self.finals.append(self.ratio)  
 
     self.engine.loadImgDrawing(self, "drawing", drawing)
@@ -435,12 +435,12 @@ class Slide(Effect):
   def __init__(self, layer, section):
     Effect.__init__(self, layer, section)
 
-    self.startCoord = [eval(self.getexpr("startX", str, "0.0")), eval(self.getexpr("startY", str, "0.0"))]
-    self.endCoord   = [eval(self.getexpr("endX",   str, "0.0")), eval(self.getexpr("endY",   str, "0.0"))]
+    self.startCoord = [eval(self.getexpr("startX", "0.0")), eval(self.getexpr("startY", "0.0"))]
+    self.endCoord   = [eval(self.getexpr("endX",   "0.0")), eval(self.getexpr("endY",   "0.0"))]
 
     self.inPixels  = self.get("inPixels", str, "").split("|")
 
-    self.condition = self.getexpr("condition", str, "True")
+    self.condition = self.getexpr("condition", "True")
     
     w, h, = self.layer.engine.view.geometry[2:4]
 
@@ -479,7 +479,7 @@ class Slide(Effect):
         self.endCoord[1] *= h
 
     self.position = [self.startCoord[0], self.startCoord[1]]
-    self.reverse = bool(eval(self.getexpr("reverse", str, "True")))
+    self.reverse = bool(eval(self.getexpr("reverse", "True")))
 
     #how long it takes for the transition to take place
     self.transitionTime = self.get("transitionTime", float, 512.0)
@@ -551,15 +551,15 @@ class Replace(Effect):
       self.text = self.getexprs("text", separator="|")
       self.type = "font"
 
-    self.conditions = self.getexprs("condition", str, "True", "|")
+    self.conditions = self.getexprs("condition", "True", "|")
     
   #fixes the scale after the rect is changed
   def fixScale(self):
     w, h, = self.layer.engine.view.geometry[2:4]
     
     rect = self.layer.finals[-1]
-    scale     = [eval(self.layer.getexpr("xscale", str, "0.5")),
-                 eval(self.layer.getexpr("yscale", str, "0.5"))]
+    scale     = [eval(self.layer.getexpr("xscale", "0.5")),
+                 eval(self.layer.getexpr("yscale", "0.5"))]
     scale[0] *=  (rect[1] - rect[0])
     scale[1] *=  (rect[3] - rect[2])
     #this allows you to scale images in relation to pixels instead
@@ -668,7 +668,7 @@ class Rockmeter(ConfigGetMixin):
 
     layer.text      = self.getexpr("text")
     layer.shared    = self.get("shared",   bool, False)
-    layer.condition = self.getexpr("condition", str, "True")
+    layer.condition = self.getexpr("condition", "True")
     layer.inPixels  = self.get("inPixels", str, "").split("|")
     
     self.loadLayerFX(layer, section)
@@ -682,10 +682,10 @@ class Rockmeter(ConfigGetMixin):
     layer     = ImageLayer(self, section, drawing)
 
     layer.shared    = self.get("shared", bool, False)
-    layer.condition = self.getexpr("condition", str, "True")
+    layer.condition = self.getexpr("condition", "True")
     layer.inPixels  = self.get("inPixels", str, "").split("|")
 
-    layer.rect      = self.getexpr("rect", str, "(0,1,0,1)")
+    layer.rect      = self.getexpr("rect", "(0,1,0,1)")
 
     self.loadLayerFX(layer, section)
             
@@ -698,10 +698,10 @@ class Rockmeter(ConfigGetMixin):
     layer     = CircleLayer(self, section, drawing)
 
     layer.shared    = self.get("shared", bool, False)
-    layer.condition = self.getexpr("condition", str, "True")
+    layer.condition = self.getexpr("condition", "True")
     layer.inPixels  = self.get("inPixels", str, "").split("|")
 
-    layer.rect      = self.getexpr("rect", str, "(0,1,0,1)")
+    layer.rect      = self.getexpr("rect", "(0,1,0,1)")
 
     self.loadLayerFX(layer, section)
 
