@@ -46,8 +46,6 @@ from constants import *
 #to put it in all caps, the code will take care of that
 #for you; however you do have to spell them right or it will
 #give you an error.
-TOP    = 0
-BOTTOM = 2
 
 #by making these global for the class, all layers that rely on 
 #these numbers will no longer have to have them be independent per
