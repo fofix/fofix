@@ -152,10 +152,13 @@ class Layer(ConfigGetMixin):
     self.finals      = [[eval(self.position[0]),eval(self.position[1])],
                         [eval(self.scale[0]),eval(self.scale[1])],
                         eval(self.angle),
-                        self.engine.theme.hexToColor(self.color),
+                        list(self.engine.theme.hexToColor(self.color)),
                         [self.alignment, self.valignment],
                         True]
-     
+     #makes sure color has an alpha value to consider
+    if len(self.finals[3]) == 3:
+        self.finals[3].append(255.0)
+         
   # should handle the final step of rendering the image
   # be sure if you have variables being updated in updateVars
   # to call updateVars and refresh them.  playerNum is *especially*
@@ -301,7 +304,7 @@ class FontLayer(Layer):
     alignment = self.finals[4][0]
     color = self.finals[3]
     condition = self.finals[5]
-    glColor3f(*color)
+    glColor3f(*color[0:3])          #fonts can't have an alpha value because it looks ugly :(
 
     if condition:
       self.font.render(self.finals[-1], position, align = alignment)
