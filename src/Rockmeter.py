@@ -38,7 +38,7 @@ from OpenGL.GL import glColor3f
 
 import math
 
-from Theme import halign
+from Theme import halign, valign
 from constants import *
 
 #these are the variables for setting the alignment of text and images
@@ -128,7 +128,7 @@ class Layer(ConfigGetMixin):
     self.condition   = True				#when should the image be shown (by default it will always be shown)
     self.alignment   = halign(self.get("alignment", str, "center"))
                                         #alignment of the image (horizontal)
-    self.valignment  = halign(self.get("valignment", str, "center"))
+    self.valignment  = valign(self.get("valignment", str, "middle"))
                                         #alignment of the image (vertical)
     self.inPixels    = self.get("inPixels", str, "").split("|")
                                         #makes sure to properly scale/position the images in pixels instead of percent
