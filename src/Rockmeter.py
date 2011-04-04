@@ -703,8 +703,8 @@ class Rockmeter(ConfigGetMixin):
 #            layer.effects.append(Rotate(layer, fxsection))
           elif t == types[2]:
             layer.effects.append(Replace(layer, fxsection))
-#          else:
-#            layer.effects.append(Fade(layer, fxsection))
+          else:
+            layer.effects.append(Fade(layer, fxsection))
       
   def createFont(self, section):
 
