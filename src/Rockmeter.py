@@ -417,6 +417,7 @@ class CircleLayer(Layer):
 class Effect(ConfigGetMixin):
   def __init__(self, layer, section):
     self.layer = layer
+    self.engine = layer.engine
     self.config = layer.config
     self.section = section
     
@@ -438,7 +439,7 @@ class Slide(Effect):
 
     self.condition = self.getexpr("condition", "True")
     
-    w, h, = self.layer.engine.view.geometry[2:4]
+    w, h, = self.engine.view.geometry[2:4]
 
     if isinstance(self.layer, FontLayer):
       if "startX" in self.inPixels:
@@ -572,7 +573,7 @@ class Replace(Effect):
         texture   = self.get("texture").strip().split("|")
         for tex in texture:
           path   = os.path.join("themes", layer.stage.themename, "rockmeter", tex)
-          drawing = layer.engine.loadImgDrawing(self, None, path)
+          drawing = self.engine.loadImgDrawing(self, None, path)
           self.drawings.append(drawing)
       self.drawings.append(layer.drawing)
       if not self.get("rect") == None:
@@ -590,7 +591,7 @@ class Replace(Effect):
     
   #fixes the scale after the rect is changed
   def fixScale(self):
-    w, h, = self.layer.engine.view.geometry[2:4]
+    w, h, = self.engine.view.geometry[2:4]
     
     rect = self.layer.finals[-1]
     scale     = [eval(self.layer.getexpr("xscale", "0.5")),
