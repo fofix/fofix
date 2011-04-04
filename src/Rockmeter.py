@@ -474,50 +474,38 @@ class Slide(Effect):
       else:
         self.endCoord[1] *= h
 
-    self.position = [self.startCoord[0], self.startCoord[1]]
+
+    self.position = self.startCoord[:]
+    
     self.reverse = bool(eval(self.getexpr("reverse", "True")))
 
     #how long it takes for the transition to take place
     self.transitionTime = self.get("transitionTime", float, 512.0)
 
-    self.slideX = (self.endCoord[0] - self.startCoord[0])/self.transitionTime
-    self.slideY = (self.endCoord[1] - self.startCoord[1])/self.transitionTime
+    self.rates = [(self.endCoord[0] - self.startCoord[0])/self.transitionTime,
+                  (self.endCoord[1] - self.startCoord[1])/self.transitionTime]
     if isinstance(self.layer, FontLayer):
-        self.slideX *= -1
-        self.slideY *= -1
+        self.rates[0] *= -1
+        self.rates[1] *= -1
         
   def update(self):
     condition = bool(eval(self.condition))
 
     if condition:
-      if self.endCoord[0] < self.startCoord[0]:
-        if self.position[0] > self.endCoord[0]:
-          self.position[0] += self.slideX
-      else:
-        if self.position[0] < self.endCoord[0]:
-          self.position[0] -= self.slideX
-      if self.endCoord[1] < self.startCoord[1]:
-        if self.position[1] > self.endCoord[1]:
-          self.position[1] += self.slideY
-      else:
-        if self.position[1] < self.endCoord[1]:
-          self.position[1] -= self.slideY
+      for i in range(2):
+        if self.position[i] > self.endCoord[i]:
+          self.position[i] -= self.rates[i]
+        elif self.position[i] < self.endCoord[i]:
+          self.position[i] += self.rates[i]
     else:
       if self.reverse:
-        if self.endCoord[0] < self.startCoord[0]:
-          if self.position[0] < self.startCoord[0]:
-            self.position[0] -= self.slideX
-        else:
-          if self.position[0] > self.startCoord[0]:
-            self.position[0] += self.slideX
-        if self.endCoord[1] < self.startCoord[1]:
-          if self.position[1] < self.startCoord[1]:
-            self.position[1] -= self.slideY
-        else:
-          if self.position[1] > self.startCoord[1]:
-            self.position[1] += self.slideY
+        for i in range(2):
+          if self.position[i] > self.startCoord[i]:
+            self.position[i] -= self.rates[i]
+          elif self.position[i] < self.startCoord[i]:
+            self.position[i] += self.rates[i]
       else:  
-        self.position = self.startCoord
+        self.position = self.startCoord[:]
         
     self.layer.finals[0] = [self.position[0], self.position[1]]
 
