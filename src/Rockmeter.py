@@ -521,6 +521,57 @@ class Slide(Effect):
         
     self.layer.finals[0] = [self.position[0], self.position[1]]
 
+#fades the color of the layer between this color and its original
+#in a set period of time when the condition is met
+class Fade(Effect):
+  def __init__(self, layer, section):
+    Effect.__init__(self, layer, section)
+
+    #the color to fade to
+    color = self.engine.theme.hexToColor(self.get("color", str, "#FFFFFF"))
+    #makes sure alpha is added
+    if len(color) == 3:
+      color = list(color).append(255.0)
+    
+    #the current color of the image
+    self.currentColor = layer.finals[3]
+    if len(self.currentColor) == 3:
+      self.currentColor = list(self.currentColor).append(255.0)
+    
+    #the colors to alternate between
+    self.colors = [color, self.currentColor]
+    
+    #how long it takes for the transition to take place
+    self.transitionTime = self.get("transitionTime", float, 512.0)
+
+    self.rates = [(self.colors[0][i] - self.colors[1][i])/self.transitionTime 
+                      for i in range(4)]
+    
+    self.condition = self.getexpr("condition", "True")
+    self.reverse = bool(eval(self.getexpr("reverse", "True")))
+        
+  def update(self):
+    condition = bool(eval(self.condition))
+
+    
+    if condition:
+      for i in range(len(self.currentColor)):
+        if self.currentColor[i] > self.colors[0][i]:
+          self.currentColor[i] -= self.rates[i]
+        elif self.currentColor[i] < self.colors[0][i]:
+          self.currentColor[i] += self.rates[i]
+    else:
+      if self.reverse:
+        for i in range(len(self.currentColor)):
+          if self.currentColor[i] > self.colors[1][i]:
+            self.currentColor[i] -= self.rates[i]
+          elif self.currentColor[i] < self.colors[1][i]:
+            self.currentColor[i] += self.rates[i]
+      else:  
+        self.currentColor[i] = self.colors[1]
+        
+    self.layer.finals[3] = self.currentColor
+
 #replaces the image of the layer when the condition is met
 class Replace(Effect):
   def __init__(self, layer, section):
