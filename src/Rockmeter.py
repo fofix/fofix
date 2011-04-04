@@ -33,7 +33,7 @@ import locale
 #Blazingamer - new drawing code
 #from Draw import *
 
-from PIL import Image, ImageDraw, ImageOps
+from PIL import Image, ImageDraw
 from OpenGL.GL import glColor3f
 
 import math
@@ -219,8 +219,6 @@ class ImageLayer(Layer):
     self.finals[5] = bool(eval(self.condition))
 
   def render(self, visibility, playerNum):
-    v = 1.0
-
     #don't try to render or update an image layer if the texture doesn't even exist
     if not self.drawing:
         return
@@ -294,7 +292,6 @@ class FontLayer(Layer):
 
   def render(self, visibility, playerNum):
     w, h, = self.stage.engine.view.geometry[2:4]
-    v = 1.0
 
     self.updateLayer(playerNum)
     for effect in self.effects:
@@ -395,7 +392,6 @@ class CircleLayer(Layer):
 
   def render(self, visibility, playerNum):
     w, h, = self.stage.engine.view.geometry[2:4]
-    v = 1.0
 
     #don't try to render or update an image layer if the texture doesn't even exist
     if not self.drawing:
@@ -621,13 +617,11 @@ class Rockmeter(ConfigGetMixin):
                "Text",
                "Circle"
               ]
-      exist = False
       for t in types:
         self.section = "layer%d:%s" % (i, t)
         if not self.config.has_section(self.section):
           continue
         else:
-          exist = True
           if t == types[1]:
             self.createFont(self.section)
           elif t == types[2]:
