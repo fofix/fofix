@@ -32,6 +32,7 @@ import Song
 import Log
 import math
 import os #myfingershurt: needed for multi-OS file fetching
+import cmgl
 import numpy as np
 
 
@@ -1670,7 +1671,7 @@ class Instrument:
 
       isTappable = False
       if (event.played or event.hopod):
-	    continue
+        continue
       if self.notedisappear == 0:#Notes keep on going when missed
         if z < 0 and not (event.played or event.hopod):#if the note is missed 
           color = (.6, .6, .6, .5 * visibility * f)
@@ -1714,8 +1715,8 @@ class Instrument:
 
     #weirdpeople - If depth test is on, the drums bass fret will not be seen as death_au said (his comment below)
     #If it is off and 3d frets and notes are used it messes several things up, things flash 
-	#on fretboard, and 3d frets / notes go through the fretboard (half of the note/fret is through the fretboard)
-	#was tested with fuzions 4x theme
+    #on fretboard, and 3d frets / notes go through the fretboard (half of the note/fret is through the fretboard)
+    #was tested with fuzions 4x theme
 
     #death_au:
     #if we leave the depth test enabled, it thinks that the bass drum images
@@ -1816,7 +1817,7 @@ class Instrument:
             if self.isDrum: #drum
               texY = (2.0 / self.fretImgColNumber, 3.0 / self.fretImgColNumber)
             else: #guitar / bass 
-		      texY = (1.0 / self.fretImgColNumber, 2.0 / self.fretImgColNumber)
+              texY = (1.0 / self.fretImgColNumber, 2.0 / self.fretImgColNumber)
 
           elif self.isDrum and n == 4 and self.hit[0]:#drum bass hit fret
             texY = (5.0 / self.fretImgColNumber, 1.0)
@@ -1952,128 +1953,91 @@ class Instrument:
         possible = True
     return possible
 
-  def renderTail(self, length, sustain, kill, color, flat = False, tailOnly = False, isTappable = False, big = False, fret = 0, freestyleTail = 0, pos = 0):
+  def renderTail(self, song, length, sustain, kill, color, tailOnly = False, isTappable = False, big = False, fret = 0, freestyleTail = 0, pos = 0):
 
     #volshebnyi - if freestyleTail == 0, act normally.
     #  if freestyleTail == 1, render an freestyle tail
     #  if freestyleTail == 2, render highlighted freestyle tail
 
-    if not self.isDrum and not self.simpleTails:#Tail Colors
-      tailcol = (1,1,1, color[3])
+    renderedNotes = reversed(self.getRequiredNotesForRender(song, pos))
+    for time, event in renderedNotes:
+      self.lastBpmChange      = time
+
+    def project(beat):
+      return 0.125 * beat / self.beatsPerUnit    # glorandwarf: was 0.12
+
+    offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat
+
+    if not self.isDrum and not self.simpleTails:#Tail image Colors no coloring of the images
+      tailcol = (1,1,1,1)
     else:
       if big == False and tailOnly == True:
         tailcol = (.6, .6, .6, color[3])
       else:
         tailcol = (color)
 
-    if flat:
-      tailscale = (1, .1, 1)
+    if length > self.boardLength:
+      s = self.boardLength
     else:
-      tailscale = None
+      s = length
+
+    size = (.2, s)
+
+    if kill and big == True:
+      kEffect = ( math.sin( pos / 50 ) + 1 ) /2
+      size = ( 0.02 + (kEffect * 0.15), s)
+
+      c = [self.killColor[0],self.killColor[1],self.killColor[2]]
+      if c != [0,0,0]:
+        for i in range(0,3):
+          c[i]=c[i]*kEffect+color[i]*(1-kEffect)
+          tailcol = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1)
 
     if sustain:
       if not length == None:
-        size = (.08, length)
-
-        if size[1] > self.boardLength:
-          s = self.boardLength
-        else:
-          s = length
-
         if freestyleTail == 0:    #normal tail rendering
           #myfingershurt: so any theme containing appropriate files can use new tails
           if not self.simpleTails:
-            if big == True and tailOnly == True:
-              if kill and self.killfx == 0:
-                zsize = .25
-                tex1 = self.kill1
-                tex2 = self.kill2
-                
-                #volshebnyi - killswitch tail width and color change
-                kEffect = ( math.sin( pos / 50 ) + 1 ) /2
-                size = (0.02+kEffect*0.15, s - zsize)
-                c = [self.killColor[0],self.killColor[1],self.killColor[2]]
-                if c != [0,0,0]:
-                  for i in range(0,3):
-                    c[i]=c[i]*kEffect+color[i]*(1-kEffect)
-                  tailcol = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1) 
-
-              else:
-                zsize = .25
-                size = (.17, s - zsize)
-                if self.starPowerActive and not color == (0,0,0,1):
-                  tex1 = self.btail6
-                  tex2 = self.btaile6
+            for n in range(5):
+              if big == True and tailOnly == True:
+                if kill and self.killfx == 0:
+                  tex1 = self.kill1
+                  tex2 = self.kill2
                 else:
-                  if fret == 0:
-                    tex1 = self.btail1
-                    tex2 = self.btaile1
-                  elif fret == 1:
-                    tex1 = self.btail2
-                    tex2 = self.btaile2
-                  elif fret == 2:
-                    tex1 = self.btail3
-                    tex2 = self.btaile3
-                  elif fret == 3:
-                    tex1 = self.btail4
-                    tex2 = self.btaile4
-                  elif fret == 4:
-                    tex1 = self.btail5
-                    tex2 = self.btaile5
-            else:
-              zsize = .15
-              size = (.1, s - zsize)
-              if tailOnly:#Note let go
-                tex1 = self.tail0
-                tex2 = self.taile0
+                  if self.starPowerActive and not color == (0,0,0,1):
+                    tex1 = self.btail6
+                    tex2 = self.btaile6
+                  else:
+                    if fret == n:
+                      tex1 = getattr(self,"btail" + str(n+1))
+                      tex2 = getattr(self,"btaile" + str(n+1))
               else:
-                if self.starPowerActive and not color == (0,0,0,1):
-                  tex1 = self.tail6
-                  tex2 = self.taile6
+                if tailOnly:#Note let go
+                  tex1 = self.tail0
+                  tex2 = self.taile0
                 else:
-                  if fret == 0:
-                    tex1 = self.tail1
-                    tex2 = self.taile1
-                  elif fret == 1:
-                    tex1 = self.tail2
-                    tex2 = self.taile2
-                  elif fret == 2:
-                    tex1 = self.tail3
-                    tex2 = self.taile3
-                  elif fret == 3:
-                    tex1 = self.tail4
-                    tex2 = self.taile4
-                  elif fret == 4:
-                    tex1 = self.tail5
-                    tex2 = self.taile5
+                  if self.starPowerActive and not color == (0,0,0,1):
+                    tex1 = self.tail6
+                    tex2 = self.taile6
+                  else:
+                    if fret == n:
+                      tex1 = getattr(self,"tail" + str(n+1))
+                      tex2 = getattr(self,"taile" + str(n+1))
           else:
             if big == True and tailOnly == True:
               if kill:
-                zsize = .25
                 tex1 = self.kill1
                 if self.kill2:
                   tex2 = self.kill2
                 if not self.kill2:
                   tex2 = None
-                #volshebnyi - killswitch tail width and color change
-                kEffect = ( math.sin( pos / 50 ) + 1 ) /2
-                size = (0.02+kEffect*0.15, s - zsize)
-                c = [self.killColor[0],self.killColor[1],self.killColor[2]]
-                if c != [0,0,0]:
-                  for i in range(0,3):
-                    c[i]=c[i]*kEffect+color[i]*(1-kEffect)
-                  tailcol = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1) 
               else:
-                zsize = .25
-                size = (.11, s - zsize)
                 tex1 = self.bigTail1
                 if self.bigTail2:
                   tex2 = self.bigTail2
                 if not self.bigTail2:
                   tex2 = None
             else:
-              zsize = .15
-              size = (.08, s - zsize)
               tex1 = self.tail1
               if self.tail2:
                 tex2 = self.tail2
@@ -2097,7 +2061,7 @@ class Instrument:
             elif self.drumFillsHits >= 2:
               size = (.21, s - zsize)
             elif self.drumFillsHits >= 1:
-              size = (.17, s - zsize)			
+              size = (.17, s - zsize)
           
           tex1 = self.freestyle1
           if self.freestyle2:
@@ -2122,11 +2086,35 @@ class Instrument:
           size=(size[0]*15,size[1])
           
           
-        self.engine.draw3Dtex(tex1, vertex = (-size[0], 0, size[0], size[1]), texcoord = (0.0, 0.0, 1.0, 1.0),
-                              scale = tailscale, color = tailcol)
+        # self.engine.draw3Dtex(tex1, vertex = (-size[0], 0, size[0], size[1]), texcoord = (0.0, 0.0, 1.0, 1.0), color = tailcol)
+
+        glEnable(GL_TEXTURE_2D)
+
+        tail_tex  = np.array([[0.0, (project(offset * self.beatsPerUnit) * 6)],
+                             [1.0, (project(offset * self.beatsPerUnit) * 6)],
+                             [0.0, (project((offset + s) * self.beatsPerUnit) * 6)],
+                             [1.0, (project((offset + s) * self.beatsPerUnit) * 6)]], dtype=np.float32)
+        
+        #must be separate for neck flashing.
+        tail_col  = np.array([[tailcol[0],tailcol[1],tailcol[2], 1],
+                                [tailcol[0],tailcol[1],tailcol[2], 1],
+                                [tailcol[0],tailcol[1],tailcol[2], 1],
+                                [tailcol[0],tailcol[1],tailcol[2], 1]], dtype=np.float32)
+
+        tail_vtx = np.array([[-size[0]*2, 0, size[1]],
+                            [size[0]*2, 0, size[1]],
+                            [-size[0]*2, 0, 0 ],
+                            [size[0]*2, 0, 0]], dtype=np.float32)
+
+        tex1.texture.bind()
+
+        cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=tail_vtx, colors=tail_col, texcoords=tail_tex)
+          
+        glDisable(GL_TEXTURE_2D)
+
         if tex2:
-            self.engine.draw3Dtex(tex2, vertex = (-size[0], size[1], size[0], size[1] + (zsize)),
-                                  scale = tailscale, texcoord = (0.0, 0.05, 1.0, 0.95), color = tailcol)
+            self.engine.draw3Dtex(tex2, vertex = (-size[0], size[1], size[0], size[1]), 
+                                             texcoord = (0.0, 0.05, 1.0, 0.95), color = tailcol)
 
         shaders.disable()  
 
@@ -2134,8 +2122,8 @@ class Instrument:
         #volshebnyi
         if tex2:
           if freestyleTail > 0 and pos < self.freestyleStart + self.freestyleLength:
-            self.engine.draw3Dtex(tex2, vertex = (-size[0], 0-(zsize), size[0], 0 + (.05)),
-                                  scale = tailscale, texcoord = (0.0, 0.95, 1.0, 0.05), color = tailcol)
+            self.engine.draw3Dtex(tex2, vertex = (-size[0], 0-(zsize), size[0], 0 + (.05)), 
+                                       texcoord = (0.0, 0.95, 1.0, 0.05), color = tailcol)
 
     if tailOnly:
       return
@@ -2163,9 +2151,9 @@ class Instrument:
         drumFillEvents = []
       for time, event in track.getEvents(pos - self.freestyleOffset, boardWindowMax + self.freestyleOffset):
         if isinstance(event, Song.MarkerNote):
-          if event.number == Song.freestyleMarkingNote and (not event.happened or self.bigRockEndingMarkerSeen):		  #MFH - don't kill the BRE!
+          if event.number == Song.freestyleMarkingNote and (not event.happened or self.bigRockEndingMarkerSeen):          #MFH - don't kill the BRE!
             if self.isDrum:
-   	          drumFillEvents.append(event)
+              drumFillEvents.append(event)
             length     = (event.length - 50) / self.currentPeriod / beatsPerUnit
             w = self.boardWidth / self.strings
             self.freestyleLength = event.length #volshebnyi
@@ -2230,7 +2218,7 @@ class Instrument:
 
                 freestyleTailMode = 1
 
-                self.renderTail(length = length, sustain = True, kill = False, color = color, flat = False, tailOnly = True, isTappable = False, big = True, fret = theFret, freestyleTail = freestyleTailMode, pos = pos)
+                self.renderTail(song, length = length, sustain = True, kill = False, color = color, tailOnly = True, isTappable = False, big = True, fret = theFret, freestyleTail = freestyleTailMode, pos = pos)
                 glPopMatrix()
 
 
@@ -2239,7 +2227,7 @@ class Instrument:
               color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1.0 * visibility * f)
               glTranslatef(x, 0.0, z + length)
               glScalef(1,1.7,1.3)
-              self.renderNote(length, sustain = False, color = color, flat = False, tailOnly = False, isTappable = False, fret = 4, spNote = False, isOpen = False, spAct = True)
+              self.renderNote(length, sustain = False, color = color, tailOnly = False, isTappable = False, fret = 4, spNote = False, isOpen = False, spAct = True)
               glPopMatrix()
 
       self.freestyleActive = freestyleActive
@@ -2306,7 +2294,6 @@ class Instrument:
         length     = (event.length - 50) / self.currentPeriod / self.beatsPerUnit
       else:
         length     = 0
-      flat       = False
       tailOnly   = False
 
       spNote = False
@@ -2352,7 +2339,6 @@ class Instrument:
             continue
         if z < 0 and not (event.played or event.hopod):#if the note is missed 
           color = (.6, .6, .6, .5 * visibility * f)
-          flat  = False 
       elif self.notedisappear == 1:#Notes disappear when missed
         if z < 0:#if note past frets
           if event.played or event.hopod:#if note was hit
@@ -2363,7 +2349,6 @@ class Instrument:
               continue
           else:#note missed
             color = (.6, .6, .6, .5 * visibility * f)
-            flat  = False
       if self.notedisappear == 2:#turn red when missed
         if event.played or event.hopod:  #if the note isnt missed
           tailOnly = True
@@ -2373,7 +2358,6 @@ class Instrument:
             continue
         if z < 0 and not (event.played or event.hopod): #if the note is missed 
           color = (1, 0, 0, 1)#turn note red
-          flat  = False
           
       big = False
       self.bigMax = 0
@@ -2407,9 +2391,9 @@ class Instrument:
       if renderNote == 0:  
         if big == True and num < self.bigMax:
           num += 1
-          self.renderTail(length, sustain = sustain, kill = killswitch, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, big = True, fret = event.number, pos = pos)
+          self.renderTail(song, length, sustain = sustain, kill = killswitch, color = color, tailOnly = tailOnly, isTappable = isTappable, big = True, fret = event.number, pos = pos)
         else:
-          self.renderTail(length, sustain = sustain, kill = killswitch, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, pos = pos)
+          self.renderTail(song, length, sustain = sustain, kill = killswitch, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, pos = pos)
 
       glPopMatrix()
   
