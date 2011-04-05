@@ -303,7 +303,7 @@ class FontLayer(Layer):
     
 
     if condition:
-        glColor3f(*color[0:3])
+        glColor4f(*color)
         self.font.render(self.finals[-1], position, align = alignment)
     
         
