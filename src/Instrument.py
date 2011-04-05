@@ -1959,10 +1959,6 @@ class Instrument:
     #  if freestyleTail == 1, render an freestyle tail
     #  if freestyleTail == 2, render highlighted freestyle tail
 
-    renderedNotes = reversed(self.getRequiredNotesForRender(song, pos))
-    for time, event in renderedNotes:
-      self.lastBpmChange      = time
-
     def project(beat):
       return 0.125 * beat / self.beatsPerUnit    # glorandwarf: was 0.12
 
@@ -2043,7 +2039,7 @@ class Instrument:
                 tex2 = self.tail2
               if not self.tail2:
                 tex2 = None
-        
+
         else:   #freestyleTail > 0
           # render an inactive freestyle tail  (self.freestyle1 & self.freestyle2)
           zsize = .25
@@ -2094,8 +2090,7 @@ class Instrument:
                              [1.0, (project(offset * self.beatsPerUnit) * 6)],
                              [0.0, (project((offset + s) * self.beatsPerUnit) * 6)],
                              [1.0, (project((offset + s) * self.beatsPerUnit) * 6)]], dtype=np.float32)
-        
-        #must be separate for neck flashing.
+
         tail_col  = np.array([[tailcol[0],tailcol[1],tailcol[2], 1],
                                 [tailcol[0],tailcol[1],tailcol[2], 1],
                                 [tailcol[0],tailcol[1],tailcol[2], 1],
