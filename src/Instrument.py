@@ -1981,7 +1981,7 @@ class Instrument:
 
     if kill and big == True:
       kEffect = ( math.sin( pos / 50 ) + 1 ) /2
-      size = ( 0.02 + (kEffect * 0.15), s)
+      size = ( 0.02 + (kEffect * 0.182), s)
 
       c = [self.killColor[0],self.killColor[1],self.killColor[2]]
       if c != [0,0,0]:
