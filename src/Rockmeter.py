@@ -519,16 +519,20 @@ class Fade(Effect):
   def __init__(self, layer, section):
     Effect.__init__(self, layer, section)
 
-    #the color to fade to
+    
+    #starting color
     color = self.engine.theme.hexToColor(self.get("color", str, "#FFFFFF"))
+    
+    #the current color of the image
+    self.currentColor = color
+    if len(self.currentColor) == 3:
+      self.currentColor = list(self.currentColor).append(255.0)
+    
+    #the color to fade to
+    color = self.engine.theme.hexToColor(self.get("fadeTo", str, "#FFFFFF"))
     #makes sure alpha is added
     if len(color) == 3:
       color = list(color).append(255.0)
-    
-    #the current color of the image
-    self.currentColor = layer.finals[3]
-    if len(self.currentColor) == 3:
-      self.currentColor = list(self.currentColor).append(255.0)
     
     #the colors to alternate between
     self.colors = [color, self.currentColor]
