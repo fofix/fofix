@@ -30,13 +30,11 @@ from Svg import ImgDrawing
 
 import locale
 
-#Blazingamer - new drawing code
-#from Draw import *
-
 from PIL import Image, ImageDraw
-from OpenGL.GL import glColor3f
+from OpenGL.GL import *
 
 import math
+import cmgl     #needed for font color changing
 
 from Theme import halign
 from constants import *
@@ -304,10 +302,12 @@ class FontLayer(Layer):
     alignment = self.finals[4][0]
     color = self.finals[3]
     condition = self.finals[5]
-    glColor3f(*color[0:3])          #fonts can't have an alpha value because it looks ugly :(
+    
 
     if condition:
-      self.font.render(self.finals[-1], position, align = alignment)
+        glColor3f(*color[0:3])
+        self.font.render(self.finals[-1], position, align = alignment)
+    
         
 #creates a layer that is shaped like a pie-slice/circle instead of a rectangle
 class CircleLayer(Layer): 
