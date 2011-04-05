@@ -420,6 +420,7 @@ class CircleLayer(Layer):
 class Effect(ConfigGetMixin):
   def __init__(self, layer, section):
     self.layer = layer
+    self.stage = layer.stage
     self.engine = layer.engine
     self.config = layer.config
     self.section = section
