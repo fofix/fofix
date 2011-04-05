@@ -36,7 +36,7 @@ from OpenGL.GL import *
 import math
 import cmgl     #needed for font color changing
 
-from Theme import halign
+from Theme import halign, valign
 from constants import *
 
 #these are the variables for setting the alignment of text and images
@@ -44,8 +44,6 @@ from constants import *
 #to put it in all caps, the code will take care of that
 #for you; however you do have to spell them right or it will
 #give you an error.
-TOP    = 0
-BOTTOM = 2
 
 #by making these global for the class, all layers that rely on 
 #these numbers will no longer have to have them be independent per
@@ -128,7 +126,7 @@ class Layer(ConfigGetMixin):
     self.condition   = True				#when should the image be shown (by default it will always be shown)
     self.alignment   = halign(self.get("alignment", str, "center"))
                                         #alignment of the image (horizontal)
-    self.valignment  = halign(self.get("valignment", str, "center"))
+    self.valignment  = valign(self.get("valignment", str, "middle"))
                                         #alignment of the image (vertical)
     self.inPixels    = self.get("inPixels", str, "").split("|")
                                         #makes sure to properly scale/position the images in pixels instead of percent

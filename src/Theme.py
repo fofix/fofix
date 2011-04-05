@@ -58,6 +58,18 @@ def halign(value, default='center'):
         Log.warn('Invalid horizontal alignment value - defaulting to %s' % default)
         return halign(default)
 
+def valign(value, default='middle'):
+    try:
+        if value.lower() == 'center':
+            Log.notice('Use of "center" for vertical alignment is deprecated. Use "middle" instead.')
+        return {'top':    TOP,
+                'middle': MIDDLE,  # for consistency with HTML/CSS terminology
+                'center': MIDDLE,  # for temporary backward compatibility
+                'bottom': BOTTOM}[value.lower()]
+    except KeyError:
+        Log.warn('Invalid vertical alignment value - defaulting to %s' % default)
+        return valign(default)
+
 
 class Theme(Task): 
 

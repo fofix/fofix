@@ -22,3 +22,8 @@
 LEFT   = 0
 CENTER = 1
 RIGHT  = 2
+
+# Vertical alignments
+TOP    = 0
+MIDDLE = 1
+BOTTOM = 2
