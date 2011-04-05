@@ -155,7 +155,7 @@ class Layer(ConfigGetMixin):
                         True]
      #makes sure color has an alpha value to consider
     if len(self.finals[3]) == 3:
-        self.finals[3].append(255.0)
+        self.finals[3].append(1.0)
          
   # should handle the final step of rendering the image
   # be sure if you have variables being updated in updateVars
