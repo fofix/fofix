@@ -524,15 +524,15 @@ class Fade(Effect):
     color = self.engine.theme.hexToColor(self.get("color", str, "#FFFFFF"))
     
     #the current color of the image
-    self.currentColor = color
+    self.currentColor = list(color)
     if len(self.currentColor) == 3:
-      self.currentColor = list(self.currentColor).append(255.0)
+      self.currentColor.append(255.0)
     
     #the color to fade to
-    color = self.engine.theme.hexToColor(self.get("fadeTo", str, "#FFFFFF"))
+    color = list(self.engine.theme.hexToColor(self.get("fadeTo", str, "#FFFFFF")))
     #makes sure alpha is added
     if len(color) == 3:
-      color = list(color).append(255.0)
+      color.append(255.0)
     
     #the colors to alternate between
     self.colors = [color, self.currentColor]
