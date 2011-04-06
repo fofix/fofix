@@ -165,7 +165,7 @@ class Layer(ConfigGetMixin):
  #A graphical stage layer that is used to render the rockmeter.
 class ImageLayer(Layer):
   def __init__(self, stage, section, drawing):
-    Layer.__init__(self, stage, section)
+    super(ImageLayer, self).__init__(stage, section)
 
     #these are the images that are drawn when the layer is visible
     self.drawing = self.engine.loadImgDrawing(self, None, drawing)
@@ -177,7 +177,7 @@ class ImageLayer(Layer):
     w, h, = self.engine.view.geometry[2:4]
     texture = self.drawing
 
-    Layer.updateLayer(self, playerNum)
+    super(ImageLayer, self).updateLayer(playerNum)
     
     rect = list(eval(self.rect))
     self.finals.append(rect)
@@ -245,7 +245,7 @@ class ImageLayer(Layer):
 #defines layers that are just font instead of images
 class FontLayer(Layer): 
   def __init__(self, stage, section, font):
-    Layer.__init__(self, stage, section)
+    super(FontLayer, self).__init__(stage, section)
 
     self.font        = self.engine.data.fontDict[font]
     self.text        = ""
@@ -267,7 +267,7 @@ class FontLayer(Layer):
 
     wid, hgt = self.font.getStringSize(str(text))
 
-    Layer.updateLayer(self, playerNum)
+    super(FontLayer, self).updateLayer(playerNum)
 
     self.finals.append(text)
     
@@ -310,7 +310,7 @@ class FontLayer(Layer):
 #creates a layer that is shaped like a pie-slice/circle instead of a rectangle
 class CircleLayer(Layer): 
   def __init__(self, stage, section, drawing):
-    Layer.__init__(self, stage, section)
+    super(CircleLayer, self).__init__(stage, section)
 
     #this number (between 0 and 1) determines how much
     #of the circle should be filled (0 to 360 degrees)
@@ -357,7 +357,7 @@ class CircleLayer(Layer):
 
     ratio = eval(self.ratio)
 
-    Layer.updateLayer(self, playerNum)
+    super(CircleLayer, self).updateLayer(playerNum)
     
     self.finals.append(ratio)
     scale = self.finals[1]
@@ -432,7 +432,7 @@ class Effect(ConfigGetMixin):
 #in a set period of time when the condition is met
 class Slide(Effect):
   def __init__(self, layer, section):
-    Effect.__init__(self, layer, section)
+    super(Slide, self).__init__(layer, section)
 
     self.startCoord = [eval(self.getexpr("startX", "0.0")), eval(self.getexpr("startY", "0.0"))]
     self.endCoord   = [eval(self.getexpr("endX",   "0.0")), eval(self.getexpr("endY",   "0.0"))]
@@ -516,7 +516,7 @@ class Slide(Effect):
 #in a set period of time when the condition is met
 class Fade(Effect):
   def __init__(self, layer, section):
-    Effect.__init__(self, layer, section)
+    super(Fade, self).__init__(layer, section)
 
     
     #starting color
@@ -570,7 +570,7 @@ class Fade(Effect):
 #replaces the image of the layer when the condition is met
 class Replace(Effect):
   def __init__(self, layer, section):
-    Effect.__init__(self, layer, section)
+    super(Replace, self).__init__(layer, section)
 
     if isinstance(layer, ImageLayer):
       self.drawings  = []
