@@ -1977,11 +1977,12 @@ class Instrument:
     else:
       s = length
 
-    size = (.2, s)
+    size = (.4, s)
 
     if kill and big == True:
       kEffect = ( math.sin( pos / 50 ) + 1 ) /2
-      size = ( 0.02 + (kEffect * 0.182), s)
+      size = ((0.02 + (kEffect * 0.182) * 2), s)
+      print size
 
       c = [self.killColor[0],self.killColor[1],self.killColor[2]]
       if c != [0,0,0]:
@@ -2040,30 +2041,32 @@ class Instrument:
           size=(size[0]*15,size[1])
           
           
-        # self.engine.draw3Dtex(tex1, vertex = (-size[0], 0, size[0], size[1]), texcoord = (0.0, 0.0, 1.0, 1.0), color = tailcol)
+        #Render the long part of the tail
 
         glEnable(GL_TEXTURE_2D)
 
         tail_tex  = np.array([[0.0, (project(offset * self.beatsPerUnit) * 6)],
-                             [1.0, (project(offset * self.beatsPerUnit) * 6)],
-                             [0.0, (project((offset + s) * self.beatsPerUnit) * 6)],
-                             [1.0, (project((offset + s) * self.beatsPerUnit) * 6)]], dtype=np.float32)
+                            [1.0, (project(offset * self.beatsPerUnit) * 6)],
+                            [0.0, (project((offset + s) * self.beatsPerUnit) * 6)],
+                            [1.0, (project((offset + s) * self.beatsPerUnit) * 6)]], dtype=np.float32)
 
         tail_col  = np.array([[tailcol[0],tailcol[1],tailcol[2], 1],
-                                [tailcol[0],tailcol[1],tailcol[2], 1],
-                                [tailcol[0],tailcol[1],tailcol[2], 1],
-                                [tailcol[0],tailcol[1],tailcol[2], 1]], dtype=np.float32)
+                            [tailcol[0],tailcol[1],tailcol[2], 1],
+                            [tailcol[0],tailcol[1],tailcol[2], 1],
+                            [tailcol[0],tailcol[1],tailcol[2], 1]], dtype=np.float32)
 
-        tail_vtx = np.array([[-size[0]*2, 0, size[1]],
-                            [size[0]*2, 0, size[1]],
-                            [-size[0]*2, 0, 0 ],
-                            [size[0]*2, 0, 0]], dtype=np.float32)
+        tail_vtx = np.array([[-size[0], 0, size[1]],
+                            [size[0], 0, size[1]],
+                            [-size[0], 0, 0 ],
+                            [size[0], 0, 0]], dtype=np.float32)
 
         tex1.texture.bind()
 
         cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=tail_vtx, colors=tail_col, texcoords=tail_tex)
           
         glDisable(GL_TEXTURE_2D)
+
+        self.engine.draw3Dtex(tex2, vertex = (-size[0], size[1], size[0], size[1] + .6), texcoord = (0.0, 0.0, 1.0, 1.0), color = tailcol) # render the end of a tail
 
         shaders.disable()
 
