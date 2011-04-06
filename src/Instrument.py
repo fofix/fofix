@@ -1964,6 +1964,8 @@ class Instrument:
 
     offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat
 
+    self.tailSpeed      = self.engine.theme.noteTailSpeedMulti
+
     if not self.simpleTails:#Tail image Colors no coloring of the images
       tailcol = (1,1,1,1)
     else:
@@ -2045,10 +2047,10 @@ class Instrument:
 
         glEnable(GL_TEXTURE_2D)
 
-        tail_tex  = np.array([[0.0, (project(offset * self.beatsPerUnit) * 6)],
-                            [1.0, (project(offset * self.beatsPerUnit) * 6)],
-                            [0.0, (project((offset + s) * self.beatsPerUnit) * 6)],
-                            [1.0, (project((offset + s) * self.beatsPerUnit) * 6)]], dtype=np.float32)
+        tail_tex  = np.array([[0.0, (project((offset * self.tailSpeed) * self.beatsPerUnit)*3)],
+                            [1.0, (project((offset * self.tailSpeed) * self.beatsPerUnit)*3)],
+                            [0.0, (project(((offset * self.tailSpeed) + s) * self.beatsPerUnit)*3)],
+                            [1.0, (project(((offset * self.tailSpeed) + s) * self.beatsPerUnit)*3)]], dtype=np.float32)
 
         tail_col  = np.array([[tailcol[0],tailcol[1],tailcol[2], 1],
                             [tailcol[0],tailcol[1],tailcol[2], 1],
