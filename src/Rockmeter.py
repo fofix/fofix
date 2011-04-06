@@ -115,13 +115,13 @@ class Layer(ConfigGetMixin):
     self.config      = stage.config     #the rockmeter.ini
     self.section     = section          #the section of the rockmeter.ini involving this layer
 
-    self.position    = [self.getexpr("xpos", "0.0"), self.getexpr("ypos", "0.0")]
+    self.position    = [0.0, 0.0]
                                         #where on the screen to draw the layer
-    self.angle       = self.getexpr("angle", "0.0")
+    self.angle       = 0.0
                                         #angle to rotate the layer (in degrees)
-    self.scale       = [self.getexpr("xscale", "1.0"), self.getexpr("yscale", "1.0")]
+    self.scale       = [1.0, 1.0]
                                         #how much to scale it by (width, height from 0.0 - 1.0)
-    self.color       = self.get("color", str, "#FFFFFF")
+    self.color       = [1.0,1.0,1.0,0.0]
                                         #color of the image (#FFFFFF is white on text, on images it is full color)
     self.condition   = True				#when should the image be shown (by default it will always be shown)
     self.alignment   = halign(self.get("alignment", str, "center"))
@@ -132,28 +132,20 @@ class Layer(ConfigGetMixin):
                                         #makes sure to properly scale/position the images in pixels instead of percent
 
     self.effects     = []               #various effects associated with the layer
-
-    #these are the final values for the variables
-    self.finals      = [[0,0],          #position
-                        [0.0,0.0],      #scale
-                        [0.0],          #angle
-                        [1.0,1.0,1.0,1.0],
-                                        #color
-                        [CENTER,CENTER],#alignments
-                        [True]]         #condition
                         
   # all variables that should be updated during the rendering process
   # should be in here just for sake of readablity and organization
   def updateLayer(self, playerNum):
-    self.finals      = [[eval(self.position[0]),eval(self.position[1])],
-                        [eval(self.scale[0]),eval(self.scale[1])],
-                        eval(self.angle),
-                        list(self.engine.theme.hexToColor(self.color)),
-                        [self.alignment, self.valignment],
-                        True]
+    self.position    = [eval(self.getexpr("xpos", "0.0")), eval(self.getexpr("ypos", "0.0"))]
+    self.angle       = eval(self.getexpr("angle", "0.0"))
+    self.scale       = [eval(self.getexpr("xscale", "1.0")), eval(self.getexpr("yscale", "1.0"))]
+    self.color       = list(self.engine.theme.hexToColor(self.get("color", str, "#FFFFFF")))
+    self.alignment   = halign(self.get("alignment", str, "center"))
+    self.valignment  = valign(self.get("valignment", str, "middle"))
+    
      #makes sure color has an alpha value to consider
-    if len(self.finals[3]) == 3:
-        self.finals[3].append(1.0)
+    if len(self.color) == 3:
+        self.color.append(1.0)
          
   # should handle the final step of rendering the image
   # be sure if you have variables being updated in updateVars
@@ -169,9 +161,8 @@ class ImageLayer(Layer):
 
     #these are the images that are drawn when the layer is visible
     self.drawing = self.engine.loadImgDrawing(self, None, drawing)
-    self.rect    = self.getexpr("rect", "(0,1,0,1)")
+    self.rect    = eval(self.getexpr("rect", "(0,1,0,1)"))
                                 #how much of the image do you want rendered (left, right, top, bottom)
-    self.finals.append(self.rect)
     
   def updateLayer(self, playerNum):
     w, h, = self.engine.view.geometry[2:4]
@@ -179,13 +170,12 @@ class ImageLayer(Layer):
 
     super(ImageLayer, self).updateLayer(playerNum)
     
-    rect = list(eval(self.rect))
-    self.finals.append(rect)
+    rect = self.rect = eval(self.getexpr("rect", "(0,1,0,1)"))
     
     #all of this has to be repeated instead of using the base method
     #because now things can be calculated in relation to the image's properties
 
-    scale = self.finals[1]
+    scale = self.scale
     scale[0] *=  (rect[1] - rect[0])
     scale[1] *=  (rect[3] - rect[2])
     
@@ -200,9 +190,9 @@ class ImageLayer(Layer):
     scale[0] *= w/vpc[0]
     scale[1] *= h/vpc[1]
     
-    self.finals[1] = scale
+    self.scale = scale
     
-    position = self.finals[0]
+    position = self.position
     if "xpos" in self.inPixels:
       position[0] *= w/vpc[0]
     else:        
@@ -213,9 +203,7 @@ class ImageLayer(Layer):
     else:        
       position[1] *= h
 
-    self.finals[0] = position
-    
-    self.finals[5] = bool(eval(self.condition))
+    self.position = position
 
   def render(self, visibility, playerNum):
     #don't try to render or update an image layer if the texture doesn't even exist
@@ -226,19 +214,19 @@ class ImageLayer(Layer):
     for effect in self.effects:
       effect.update()
 
-    coord      = self.finals[0]
-    scale      = self.finals[1]
-    rot        = self.finals[2]
-    color      = self.finals[3]
-    alignment  = self.finals[4][0]
-    valignment = self.finals[4][1]
+    coord      = self.position
+    scale      = self.scale
+    rot        = self.angle
+    color      = self.color
+    alignment  = self.alignment
+    valignment = self.valignment
     drawing    = self.drawing
-    rect       = self.finals[-1]
+    rect       = self.rect
     
     #frameX  = self.frameX
     #frameY  = self.frameY
 
-    if self.finals[5]:
+    if bool(eval(self.condition)):
       self.engine.drawImage(drawing, scale, coord, rot, color, rect, 
                             alignment = alignment, valignment = valignment)
 
@@ -253,12 +241,10 @@ class FontLayer(Layer):
     self.alignment   = halign(self.get("alignment", str, "LEFT"), 'left')
     self.useComma    = self.get("useComma", bool, False)
 
-    self.finals.append(self.text)
-    
   def updateLayer(self, playerNum):
     w, h, = self.engine.view.geometry[2:4]
     
-    text = eval(self.text)
+    text = eval(self.get("text", str, ""))
 
     if self.useComma:
       text = locale.format("%d", text, grouping=True)
@@ -269,9 +255,9 @@ class FontLayer(Layer):
 
     super(FontLayer, self).updateLayer(playerNum)
 
-    self.finals.append(text)
+    self.text = text
     
-    position = self.finals[0]
+    position = self.position
     if "xpos" in self.inPixels:
       position[0] /= vpc[0]
     if "ypos" in self.inPixels:
@@ -285,10 +271,8 @@ class FontLayer(Layer):
     #not only that but it's upside down
     position[1] = .75 - position[1]
     
-    self.finals[0] = position
+    self.position = position
     
-    self.finals[5] = bool(eval(self.condition))
-
   def render(self, visibility, playerNum):
     w, h, = self.stage.engine.view.geometry[2:4]
 
@@ -296,15 +280,13 @@ class FontLayer(Layer):
     for effect in self.effects:
       effect.update()
 
-    position = self.finals[0]
-    alignment = self.finals[4][0]
-    color = self.finals[3]
-    condition = self.finals[5]
-    
+    position = self.position
+    alignment = self.alignment
+    color = self.color
 
-    if condition:
+    if bool(eval(self.condition)):
         glColor4f(*color)
-        self.font.render(self.finals[-1], position, align = alignment)
+        self.font.render(self.text, position, align = alignment)
     
         
 #creates a layer that is shaped like a pie-slice/circle instead of a rectangle
@@ -315,7 +297,6 @@ class CircleLayer(Layer):
     #this number (between 0 and 1) determines how much
     #of the circle should be filled (0 to 360 degrees)
     self.ratio   = self.getexpr("ratio", "1")
-    self.finals.append(self.ratio)  
 
     self.engine.loadImgDrawing(self, "drawing", drawing)
 
@@ -355,12 +336,12 @@ class CircleLayer(Layer):
     w, h, = self.engine.view.geometry[2:4]
     texture = self.drawing
 
-    ratio = eval(self.ratio)
+    ratio = eval(self.getexpr("ratio", "1"))
 
     super(CircleLayer, self).updateLayer(playerNum)
     
-    self.finals.append(ratio)
-    scale = self.finals[1]
+    self.ratio = ratio
+    scale = self.scale
     
     #this allows you to scale images in relation to pixels instead
     #of percentage of the size of the image.
@@ -373,9 +354,9 @@ class CircleLayer(Layer):
     scale[0] *= w/vpc[0]
     scale[1] *= h/vpc[1]
     
-    self.finals[1] = scale
+    self.scale = scale
     
-    position = self.finals[0]
+    position = self.position
     
     if "xpos" in self.inPixels:
       position[0] *= w/vpc[0]
@@ -387,28 +368,27 @@ class CircleLayer(Layer):
     else:        
       position[1] *= h
 
-    self.finals[0] = position
+    self.position = position
     
-    self.finals[5] = bool(eval(self.condition))
-
   def render(self, visibility, playerNum):
     w, h, = self.stage.engine.view.geometry[2:4]
 
     #don't try to render or update an image layer if the texture doesn't even exist
     if not self.drawing:
-        return
+      return
     
     self.updateLayer(playerNum)
     for effect in self.effects:
       effect.update()
 
-    coord     = self.finals[0]
-    scale     = self.finals[1]
-    rot       = self.finals[2]
-    color     = self.finals[3]
-    alignment = self.finals[4][0]
-    ratio     = self.finals[-1]
-    if self.condition:
+    coord     = self.position
+    scale     = self.scale
+    rot       = self.angle
+    color     = self.color
+    alignment = self.alignment
+    ratio     = self.ratio
+    
+    if bool(eval(self.condition)):
       degrees = int(360*ratio) - (int(360*ratio) % 5)
       self.engine.drawImage(self.drawnOverlays[degrees], scale, 
                             coord, rot, color, alignment = alignment)
@@ -510,7 +490,7 @@ class Slide(Effect):
       else:  
         self.position = self.startCoord[:]
         
-    self.layer.finals[0] = [self.position[0], self.position[1]]
+    self.layer.position = [self.position[0], self.position[1]]
 
 #fades the color of the layer between this color and its original
 #in a set period of time when the condition is met
@@ -565,7 +545,7 @@ class Fade(Effect):
       else:  
         self.currentColor[i] = self.colors[1]
         
-    self.layer.finals[3] = self.currentColor
+    self.layer.color = self.currentColor
 
 #replaces the image of the layer when the condition is met
 class Replace(Effect):
@@ -599,7 +579,7 @@ class Replace(Effect):
   def fixScale(self):
     w, h, = self.engine.view.geometry[2:4]
     
-    rect = self.layer.finals[-1]
+    rect = self.layer.rect
     scale     = [eval(self.layer.getexpr("xscale", "0.5")),
                  eval(self.layer.getexpr("yscale", "0.5"))]
     scale[0] *=  (rect[1] - rect[0])
@@ -615,7 +595,7 @@ class Replace(Effect):
     scale[0] *= w/vpc[0]
     scale[1] *= h/vpc[1]
     
-    self.layer.finals[1] = scale
+    self.layer.scale = scale
     
   def update(self):
 
@@ -626,17 +606,17 @@ class Replace(Effect):
         else:
           if len(self.drawings) > 1:
             self.layer.drawing = self.drawings[i]
-          elif len(self.rects) > 1:
-            self.layer.finals[-1] = self.rects[i]
+          if len(self.rects) > 1:
+            self.layer.rect = self.rects[i]
           self.fixScale()
         return
     if self.type == "font":
-      self.layer.finals[-1] = self.text[-1]
+      self.layer.text = self.text[-1]
     else:
       if len(self.drawings) > 0:
           self.layer.drawing = self.drawings[-1]
       if len(self.rects) > 0:
-          self.layer.finals[-1] = self.rects[-1]
+          self.layer.rect = self.rects[-1]
       self.fixScale()
             
     
