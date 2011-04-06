@@ -1964,7 +1964,7 @@ class Instrument:
 
     offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat
 
-    if not self.isDrum and not self.simpleTails:#Tail image Colors no coloring of the images
+    if not self.simpleTails:#Tail image Colors no coloring of the images
       tailcol = (1,1,1,1)
     else:
       if big == False and tailOnly == True:
@@ -1991,88 +1991,46 @@ class Instrument:
 
     if sustain:
       if not length == None:
-        if freestyleTail == 0:    #normal tail rendering
-          #myfingershurt: so any theme containing appropriate files can use new tails
-          if not self.simpleTails:
-            for n in range(5):
-              if big == True and tailOnly == True:
-                if kill and self.killfx == 0:
-                  tex1 = self.kill1
-                  tex2 = self.kill2
-                else:
-                  if self.starPowerActive and not color == (0,0,0,1):
-                    tex1 = self.btail6
-                    tex2 = self.btaile6
-                  else:
-                    if fret == n:
-                      tex1 = getattr(self,"btail" + str(n+1))
-                      tex2 = getattr(self,"btaile" + str(n+1))
-              else:
-                if tailOnly:#Note let go
-                  tex1 = self.tail0
-                  tex2 = self.taile0
-                else:
-                  if self.starPowerActive and not color == (0,0,0,1):
-                    tex1 = self.tail6
-                    tex2 = self.taile6
-                  else:
-                    if fret == n:
-                      tex1 = getattr(self,"tail" + str(n+1))
-                      tex2 = getattr(self,"taile" + str(n+1))
-          else:
+        #myfingershurt: so any theme containing appropriate files can use new tails
+        if not self.simpleTails:
+          for n in range(5):
             if big == True and tailOnly == True:
-              if kill:
+              if kill and self.killfx == 0:
                 tex1 = self.kill1
-                if self.kill2:
-                  tex2 = self.kill2
-                if not self.kill2:
-                  tex2 = None
+                tex2 = self.kill2
               else:
-                tex1 = self.bigTail1
-                if self.bigTail2:
-                  tex2 = self.bigTail2
-                if not self.bigTail2:
-                  tex2 = None
+                if self.starPowerActive and not color == (0,0,0,1):
+                  tex1 = self.btail6
+                  tex2 = self.btaile6
+                else:
+                  if fret == n:
+                    tex1 = getattr(self,"btail" + str(n+1))
+                    tex2 = getattr(self,"btaile" + str(n+1))
             else:
-              tex1 = self.tail1
-              if self.tail2:
-                tex2 = self.tail2
-              if not self.tail2:
-                tex2 = None
-
-        else:   #freestyleTail > 0
-          # render an inactive freestyle tail  (self.freestyle1 & self.freestyle2)
-          zsize = .25
-  
-          if self.freestyleActive:
-            size = (.30, s - zsize)   #was .15
+              if tailOnly:#Note let go
+                tex1 = self.tail0
+                tex2 = self.taile0
+              else:
+                if self.starPowerActive and not color == (0,0,0,1):
+                  tex1 = self.tail6
+                  tex2 = self.taile6
+                else:
+                  if fret == n:
+                    tex1 = getattr(self,"tail" + str(n+1))
+                    tex2 = getattr(self,"taile" + str(n+1))
+        else:
+          if big == True and tailOnly == True:
+            if kill:
+              tex1 = self.kill1
+              tex2 = self.kill2
+            else:
+              tex1 = self.bigTail1
+              tex2 = self.bigTail2
           else:
-            size = (.15, s - zsize)
+            tex1 = self.tail1
+            tex2 = self.tail2
 
-          if self.isDrum and self.drumFillsActive:
-            if self.drumFillsHits >= 4:
-              size = (.30, s - zsize)
-            elif self.drumFillsHits >= 3:
-              size = (.25, s - zsize)
-            elif self.drumFillsHits >= 2:
-              size = (.21, s - zsize)
-            elif self.drumFillsHits >= 1:
-              size = (.17, s - zsize)
-          
-          tex1 = self.freestyle1
-          if self.freestyle2:
-            tex2 = self.freestyle2
-          if not self.freestyle2:
-            tex2 = None
-          if freestyleTail == 1:
-            c1, c2, c3, c4 = color
-            tailGlow = 1 - (pos - self.freestyleLastFretHitTime[fret] ) / self.freestylePeriod
-            if tailGlow < 0:
-              tailGlow = 0
-            color = (c1 + c1*2.0*tailGlow, c2 + c2*2.0*tailGlow, c3 + c3*2.0*tailGlow, c4*0.6 + c4*0.4*tailGlow)    #MFH - this fades inactive tails' color darker
-          tailcol = (color)
-
-        if freestyleTail == 0 and big and tailOnly and shaders.enable("tail"):
+        if big and tailOnly and shaders.enable("tail"):
           color = (color[0]*1.5,color[1]*1.5,color[2]*1.5,1.0)
           shaders.setVar("color",color)
           if kill and self.killfx == 0:
@@ -2107,21 +2065,52 @@ class Instrument:
           
         glDisable(GL_TEXTURE_2D)
 
-        if tex2:
-            self.engine.draw3Dtex(tex2, vertex = (-size[0], size[1], size[0], size[1]), 
-                                             texcoord = (0.0, 0.05, 1.0, 0.95), color = tailcol)
-
-        shaders.disable()  
-
-        #MFH - this block of code renders the tail "beginning" - before the note, for freestyle "lanes" only
-        #volshebnyi
-        if tex2:
-          if freestyleTail > 0 and pos < self.freestyleStart + self.freestyleLength:
-            self.engine.draw3Dtex(tex2, vertex = (-size[0], 0-(zsize), size[0], 0 + (.05)), 
-                                       texcoord = (0.0, 0.95, 1.0, 0.05), color = tailcol)
+        shaders.disable()
 
     if tailOnly:
       return
+
+  def renderFreeStyleTail(self, length, color, fret, pos):
+
+    if not length == None:
+      if length > self.boardLength:
+        s = self.boardLength
+      else:
+        s = length
+
+      # render a freestyle tail  (self.freestyle1 & self.freestyle2)
+      zsize = .25
+  
+      if self.freestyleActive:
+        size = (.30, s - zsize)   #was .15
+      else:
+        size = (.15, s - zsize)
+
+      if self.isDrum and self.drumFillsActive:
+        if self.drumFillsHits >= 4:
+          size = (.30, s - zsize)
+        elif self.drumFillsHits >= 3:
+          size = (.25, s - zsize)
+        elif self.drumFillsHits >= 2:
+          size = (.21, s - zsize)
+        elif self.drumFillsHits >= 1:
+          size = (.17, s - zsize)
+
+      c1, c2, c3, c4 = color
+      tailGlow = 1 - (pos - self.freestyleLastFretHitTime[fret] ) / self.freestylePeriod
+      if tailGlow < 0:
+        tailGlow = 0
+      color = (c1 + c1*2.0*tailGlow, c2 + c2*2.0*tailGlow, c3 + c3*2.0*tailGlow, c4*0.6 + c4*0.4*tailGlow)    #MFH - this fades inactive tails' color darker
+      tailcol = (color)
+
+      tex1 = self.freestyle1
+      tex2 = self.freestyle2
+
+      self.engine.draw3Dtex(tex1, vertex = (-size[0], 0, size[0], size[1]), texcoord = (0.0, 0.0, 1.0, 1.0), color = tailcol) #Middle of freestyle tail
+
+      self.engine.draw3Dtex(tex2, vertex = (-size[0], size[1], size[0], size[1] + (zsize)), texcoord = (0.0, 0.05, 1.0, 0.95), color = tailcol)#end of freestyle tail
+
+      self.engine.draw3Dtex(tex2, vertex = (-size[0], 0-(zsize), size[0], 0 + (.05)), texcoord = (0.0, 0.95, 1.0, 0.05), color = tailcol)#beginning of freestyle tail
 
   def renderFreestyleLanes(self, visibility, song, pos, controls):
     if not song:
@@ -2213,7 +2202,7 @@ class Instrument:
 
                 freestyleTailMode = 1
 
-                self.renderTail(song, length = length, sustain = True, kill = False, color = color, tailOnly = True, isTappable = False, big = True, fret = theFret, freestyleTail = freestyleTailMode, pos = pos)
+                self.renderFreeStyleTail(length, color, theFret, pos)
                 glPopMatrix()
 
 
