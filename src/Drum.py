@@ -67,7 +67,7 @@ class Drum(Instrument):
 
     self.drumsHeldDown = [0, 0, 0, 0, 0]
 
-    self.gameMode2p = self.engine.world.multiMode
+    self.gameMode2p = self.engine.world.multiplayer
 
     self.lastFretWasBassDrum = False
     self.lastFretWasT1 = False   #Faaa Drum sound

@@ -41,9 +41,7 @@ from Mesh import Mesh
 from Texture import Texture
 
 import Log    #MFH
-
-PRACTICE = 1
-CAREER = 2
+from constants import *
 
 instrumentDiff = {
   0 : (lambda a: a.diffGuitar),
@@ -76,10 +74,10 @@ class SongChoosingScene(Scene):
         self.libraryName = Song.DEFAULT_LIBRARY
     if not self.songName:
       self.songName = self.engine.config.get("setlist", "selected_song")
-    self.gameMode = self.engine.world.gameMode
-    self.careerMode = (self.gameMode == CAREER)
+    self.gameMode = self.engine.world.mode
+    self.careerMode = (self.gameMode == TOUR)
     self.practiceMode = (self.gameMode == PRACTICE)
-    self.gameMode2p = self.engine.world.multiMode
+    self.gameMode2p = self.engine.world.multiplayer
     self.autoPreview = not self.engine.config.get("audio", "disable_preview")
     self.sortOrder   = self.engine.config.get("game", "sort_order")
     self.tut = self.engine.world.tutorial

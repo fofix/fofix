@@ -26,20 +26,18 @@ import SceneFactory
 import Dialogs
 from Song import SongQueue
 from Language import _
+from constants import *
 
 STARTUP_SCENE = "SongChoosingScene"
 
 class World:
-  def __init__(self, engine, players, maxplayers = None, gameMode = 0, multiMode = 0, allowGuitar = True, allowDrum = True, allowMic = False, tutorial = False):
+  def __init__(self, engine, mode = QUICKPLAY, multiplayer = False, tutorial = False):
     self.engine       = engine
     self.players      = []
-    self.minPlayers   = players
-    self.maxPlayers   = maxplayers or players
-    self.gameMode     = gameMode  #Quickplay, Practice, Career
-    self.multiMode    = multiMode #Face-Off, Pro FO, Party, Co-Op, RB Co-Op, GH Co-Op, Battle
-    self.allowGuitar  = allowGuitar
-    self.allowDrum    = allowDrum
-    self.allowMic     = allowMic
+    self.minPlayers   = multiplayer and 2 or 1
+    self.maxPlayers   = multiplayer and self.engine.config.get("performance", "max_players") or 1
+    self.mode         = mode
+    self.multiplayer  = multiplayer
     self.tutorial     = tutorial
     self.scene        = None
     self.sceneName    = ""
@@ -49,27 +47,22 @@ class World:
     self.setGameName()
   
   def setGameName(self):
-    if self.minPlayers > 1:
-      if self.gameMode == 0:
+    if self.multiplayer:
+      if self.multiplayer == FACEOFF:
         self.gameName = _("Face-Off")
-      elif self.gameMode == 1:
+      elif self.multiplayer == SKILL:
         self.gameName = _("Pro Face-Off")
-      elif self.gameMode == 2:
-        self.gameName = _("Party Mode")
-      elif self.gameMode == 3:
-        self.gameName = _("FoFiX Co-Op Mode")
-      elif self.gameMode == 4:
-        self.gameName = _("RB Co-Op Mode")
-      elif self.gameMode == 5:
-        self.gameName = _("GH Co-Op Mode")
-      elif self.gameMode == 6:
-        self.gameName = _("Battle Mode")
+      elif self.multiplayer == COOP:
+        if self.mode == TOUR:
+          self.gameName = _("Co-Op Tour")
+        else:
+          self.gameName = _("Co-Op Mode")
     else:
-      if self.gameMode == 0:
+      if self.mode == QUICKPLAY:
         self.gameName = _("Quickplay")
-      elif self.gameMode == 1:
+      elif self.mode == PRACTICE:
         self.gameName = _("Practice")
-      elif self.gameMode == 2:
+      elif self.mode == TOUR:
         self.gameName = _("Career Mode")
   
   def finishGame(self):

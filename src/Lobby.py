@@ -50,8 +50,6 @@ class Lobby(Layer, KeyListener):
     self.minPlayers     = self.engine.world.minPlayers
     self.maxPlayers     = self.engine.world.maxPlayers
     self.tutorial       = self.engine.world.tutorial
-    self.gameMode       = self.engine.world.gameMode
-    self.multiMode      = self.engine.world.multiMode
     self.time           = 0.0
     self.keyControl     = 0
     self.keyGrab        = False
@@ -92,31 +90,22 @@ class Lobby(Layer, KeyListener):
     for i, type in enumerate(self.engine.input.controls.type):
       self.types.append(type)
       if type in GUITARTYPES:
-        if not self.engine.world.allowGuitar:
-          self.allowed[i] = False
-        else:
-          self.yes.extend([Player.CONTROLS[i][Player.KEY1], Player.CONTROLS[i][Player.KEY1A], Player.CONTROLS[i][Player.START]])
-          self.no.extend([Player.CONTROLS[i][Player.KEY2], Player.CONTROLS[i][Player.KEY2A], Player.CONTROLS[i][Player.CANCEL]])
-          self.conf.extend([Player.CONTROLS[i][Player.KEY3], Player.CONTROLS[i][Player.KEY3A]])
-          self.up.extend([Player.CONTROLS[i][Player.ACTION1], Player.CONTROLS[i][Player.UP]])
-          self.down.extend([Player.CONTROLS[i][Player.ACTION2], Player.CONTROLS[i][Player.DOWN]])
+        self.yes.extend([Player.CONTROLS[i][Player.KEY1], Player.CONTROLS[i][Player.KEY1A], Player.CONTROLS[i][Player.START]])
+        self.no.extend([Player.CONTROLS[i][Player.KEY2], Player.CONTROLS[i][Player.KEY2A], Player.CONTROLS[i][Player.CANCEL]])
+        self.conf.extend([Player.CONTROLS[i][Player.KEY3], Player.CONTROLS[i][Player.KEY3A]])
+        self.up.extend([Player.CONTROLS[i][Player.ACTION1], Player.CONTROLS[i][Player.UP]])
+        self.down.extend([Player.CONTROLS[i][Player.ACTION2], Player.CONTROLS[i][Player.DOWN]])
       elif type in DRUMTYPES:
-        if not self.engine.world.allowDrum:
-          self.allowed[i] = False
-        else:
-          self.yes.extend([Player.CONTROLS[i][Player.DRUM5], Player.CONTROLS[i][Player.DRUM5A], Player.CONTROLS[i][Player.START]])
-          self.no.extend([Player.CONTROLS[i][Player.DRUM1], Player.CONTROLS[i][Player.DRUM1A], Player.CONTROLS[i][Player.CANCEL]])
-          self.conf.extend([Player.CONTROLS[i][Player.DRUMBASS], Player.CONTROLS[i][Player.DRUMBASSA]])
-          self.up.extend([Player.CONTROLS[i][Player.DRUM2], Player.CONTROLS[i][Player.DRUM2A], Player.CONTROLS[i][Player.UP]])
-          self.down.extend([Player.CONTROLS[i][Player.DRUM3], Player.CONTROLS[i][Player.DRUM3A], Player.CONTROLS[i][Player.DOWN]])
+        self.yes.extend([Player.CONTROLS[i][Player.DRUM5], Player.CONTROLS[i][Player.DRUM5A], Player.CONTROLS[i][Player.START]])
+        self.no.extend([Player.CONTROLS[i][Player.DRUM1], Player.CONTROLS[i][Player.DRUM1A], Player.CONTROLS[i][Player.CANCEL]])
+        self.conf.extend([Player.CONTROLS[i][Player.DRUMBASS], Player.CONTROLS[i][Player.DRUMBASSA]])
+        self.up.extend([Player.CONTROLS[i][Player.DRUM2], Player.CONTROLS[i][Player.DRUM2A], Player.CONTROLS[i][Player.UP]])
+        self.down.extend([Player.CONTROLS[i][Player.DRUM3], Player.CONTROLS[i][Player.DRUM3A], Player.CONTROLS[i][Player.DOWN]])
       elif type in MICTYPES:
-        if not self.engine.world.allowMic:
-          self.allowed[i] = False
-        else:
-          self.yes.extend([Player.CONTROLS[i][Player.START]])
-          self.no.extend([Player.CONTROLS[i][Player.CANCEL]])
-          self.up.extend([Player.CONTROLS[i][Player.UP]])
-          self.down.extend([Player.CONTROLS[i][Player.DOWN]])
+        self.yes.extend([Player.CONTROLS[i][Player.START]])
+        self.no.extend([Player.CONTROLS[i][Player.CANCEL]])
+        self.up.extend([Player.CONTROLS[i][Player.UP]])
+        self.down.extend([Player.CONTROLS[i][Player.DOWN]])
     
     for i, control in enumerate(self.engine.input.controls.controls):
       if control == "None":

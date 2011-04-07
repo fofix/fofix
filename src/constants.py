@@ -27,3 +27,13 @@ RIGHT  = 2
 TOP    = 0
 MIDDLE = 1
 BOTTOM = 2
+
+# Game modes
+QUICKPLAY = 0
+PRACTICE = 1
+TOUR = 2
+
+# Multiplayer modes
+FACEOFF = 1
+SKILL = 2
+COOP = 3

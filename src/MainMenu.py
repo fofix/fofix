@@ -37,6 +37,7 @@ import VFS
 from Shader import shaders
 import sys
 import os
+from constants import *
 
 #myfingershurt: needed for random menu music:
 import random
@@ -62,27 +63,27 @@ class MainMenu(BackgroundLayer):
     self.gfxVersionTag = Config.get("game", "gfx_version_tag")
     
     self.chosenNeck = Config.get("game", "default_neck")
-    exists = 0
+    exists = False
 
     if engine.loadImgDrawing(self, "ok", os.path.join("necks",self.chosenNeck+".png")):
-      exists = 1
+      exists = True
     elif engine.loadImgDrawing(self, "ok", os.path.join("necks","Neck_"+self.chosenNeck+".png")):
-      exists = 1
+      exists = True
 
     #MFH - fallback logic now supports a couple valid default neck filenames
     #MFH - check for Neck_1
-    if exists == 0:
+    if not exists:
       if engine.loadImgDrawing(self, "ok", os.path.join("necks","Neck_1.png")):
         Config.set("game", "default_neck", "1")
         Log.warn("Default chosen neck not valid; fallback Neck_1.png forced.")
-        exists = 1
+        exists = True
 
     #MFH - check for defaultneck
-    if exists == 0:
+    if not exists:
       if engine.loadImgDrawing(self, "ok", os.path.join("necks","defaultneck.png")):
         Log.warn("Default chosen neck not valid; fallback defaultneck.png forced.")
         Config.set("game", "default_neck", "defaultneck")
-        exists = 1
+        exists = True
       else:
         Log.error("Default chosen neck not valid; fallbacks Neck_1.png and defaultneck.png also not valid!")
 
@@ -91,8 +92,6 @@ class MainMenu(BackgroundLayer):
     self.themeCoOp   = self.engine.data.themeCoOp
     self.themename   = self.engine.data.themeLabel
     self.useSoloMenu = self.engine.theme.use_solo_submenu
-    
-    allowMic = True
     
     self.menux = self.engine.theme.menuPos[0]
     self.menuy = self.engine.theme.menuPos[1]
@@ -146,7 +145,7 @@ class MainMenu(BackgroundLayer):
 
     trainingMenu = [
       (_("Tutorials"), self.showTutorial),
-      (_("Practice"), lambda: self.newLocalGame(mode1p = 1)),
+      (_("Practice"), lambda: self.newLocalGame(mode = PRACTICE)),
     ]
     
     self.opt_bkg_size = [float(i) for i in self.engine.theme.opt_bkg_size]
@@ -160,20 +159,17 @@ class MainMenu(BackgroundLayer):
     strQuit = ""
     
     multPlayerMenu = [
-        (_("Face-Off"),     lambda: self.newLocalGame(players = 2,             maxplayers = 4)),
-        (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = 4)),
-        (_("Party Mode"),   lambda: self.newLocalGame(             mode2p = 2)),
-        (_("FoFiX Co-Op"),  lambda: self.newLocalGame(players = 2, mode2p = 3, maxplayers = 4, allowMic = allowMic)),
-        (_("RB Co-Op"),     lambda: self.newLocalGame(players = 2, mode2p = 4, maxplayers = 4, allowMic = allowMic)),
-        (_("GH Co-Op"),     lambda: self.newLocalGame(players = 2, mode2p = 5, maxplayers = 4)),
-        (_("GH Battle"),    lambda: self.newLocalGame(players = 2, mode2p = 6, allowDrum = False)), #akedrou- so you can block drums
+        (_("Face-Off"),     lambda: self.newLocalGame(multiplayer = FACEOFF)),
+        (_("Pro Face-Off"), lambda: self.newLocalGame(multiplayer = SKILL)),
+        (_("Co-Op"),  lambda: self.newLocalGame(multiplayer = COOP)),
+        (_("Co-Op Tour"),  lambda: self.newLocalGame(mode = TOUR, multiplayer = COOP))
       ]
         
     if not self.useSoloMenu:
 
       mainMenu = [
-        (strCareer, lambda:   self.newLocalGame(mode1p = 2, allowMic = allowMic)),
-        (strQuickplay, lambda:        self.newLocalGame(allowMic = allowMic)),
+        (strCareer, lambda:   self.newLocalGame(mode = TOUR)),
+        (strQuickplay, lambda:        self.newLocalGame()),
         ((strMultiplayer,"multiplayer"), multPlayerMenu),
         ((strTraining,"training"),    trainingMenu),
         ((strSettings,"settings"),  self.settingsMenu),
@@ -183,8 +179,8 @@ class MainMenu(BackgroundLayer):
     else:
 
       soloMenu = [
-        (_("Solo Tour"), lambda: self.newLocalGame(mode1p = 2, allowMic = allowMic)),
-        (_("Quickplay"), lambda: self.newLocalGame(allowMic = allowMic)),
+        (_("Solo Tour"), lambda: self.newLocalGame(mode = TOUR)),
+        (_("Quickplay"), lambda: self.newLocalGame()),
       ]
 
       mainMenu = [
@@ -297,9 +293,9 @@ class MainMenu(BackgroundLayer):
   def newSinglePlayerGame(self):
     self.newLocalGame()   #just call start function with default settings  = 1p quickplay
 
-  def newLocalGame(self, players=1, mode1p=0, mode2p=0, maxplayers = None, allowGuitar = True, allowDrum = True, allowMic = False): #mode1p=0(quickplay),1(practice),2(career) / mode2p=0(faceoff),1(profaceoff)
+  def newLocalGame(self, mode = QUICKPLAY, multiplayer = None):
     self.engine.data.acceptSound.play()
-    self.engine.startWorld(players, maxplayers, mode1p, mode2p, allowGuitar, allowDrum, allowMic)
+    self.engine.startWorld(mode, multiplayer)
     self.launchLayer(lambda: Lobby(self.engine))
   
   def restartGame(self):

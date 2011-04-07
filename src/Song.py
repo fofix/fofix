@@ -41,6 +41,7 @@ import cPickle  #stump: Cerealizer and sqlite3 don't seem to like each other tha
 import time
 from Language import _
 import VFS
+from constants import *
 
 DEFAULT_BPM = 120.0
 DEFAULT_LIBRARY         = "songs"
@@ -3797,8 +3798,8 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
     includeTutorials = True
 
   #MFH - Career Mode determination:
-  gameMode1p = engine.world.gameMode
-  if gameMode1p == 2:
+  gameMode1p = engine.world.mode
+  if gameMode1p == TOUR:
     careerMode = True
   else:
     careerMode = False
@@ -3959,7 +3960,7 @@ def getSortingTitles(engine, songList = []):
   
   
 def getAvailableTitles(engine, library = DEFAULT_LIBRARY):
-  gameMode1p = engine.world.gameMode
+  gameMode1p = engine.world.mode
   if library == None:
     return []
   
@@ -3992,7 +3993,7 @@ def getAvailableSongsAndTitles(engine, library = DEFAULT_LIBRARY, includeTutoria
     return []
 
   #MFH - Career Mode determination:
-  careerMode = (engine.world.gameMode == 2)
+  careerMode = (engine.world.mode == TOUR)
   career = False
   quickPlayCareerTiers = engine.config.get("game", "quickplay_tiers")
 

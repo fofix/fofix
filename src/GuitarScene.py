@@ -98,8 +98,8 @@ class GuitarScene(Scene):
     
     #MFH - retrieve game parameters:
     self.gamePlayers = len(self.engine.world.players)
-    self.gameMode1p = self.engine.world.gameMode
-    self.gameMode2p = self.engine.world.multiMode
+    self.gameMode1p = self.engine.world.mode
+    self.gameMode2p = self.engine.world.multiplayer
     self.lostFocusPause = self.engine.config.get("game", "lost_focus_pause")
 
     if self.sinfo.bossBattle == "True" and self.gameMode1p == 2 and self.gamePlayers == 1:
@@ -2059,11 +2059,11 @@ class GuitarScene(Scene):
     self.engine.view.popLayer(self.menu)
     self.engine.view.popLayer(self.failMenu)
     self.freeResources()
-    self.engine.world.gameMode = 1
+    self.engine.world.mode = PRACTICE
     self.engine.world.createScene("SongChoosingScene")
 
   def changeSong(self):
-    prevMode = self.engine.world.gameMode
+    prevMode = self.engine.world.mode
     if self.song:
       self.song.stop()
       self.song  = None
@@ -2074,7 +2074,7 @@ class GuitarScene(Scene):
     self.engine.view.popLayer(self.menu)
     self.engine.view.popLayer(self.failMenu)
     self.freeResources()
-    self.engine.world.gameMode = prevMode
+    self.engine.world.mode = prevMode
     self.engine.world.createScene("SongChoosingScene")
 
   def changeAfterFail(self):

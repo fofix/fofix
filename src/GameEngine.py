@@ -767,8 +767,8 @@ class GameEngine(object):
     self.view.setGeometry((0, 0, width, height))
     self.svg.setGeometry((0, 0, width, height))
   
-  def startWorld(self, players, maxplayers = None, gameMode = 0, multiMode = 0, allowGuitar = True, allowDrum = True, allowMic = False, tutorial = False):
-    self.world = World(self, players, maxplayers, gameMode, multiMode, allowGuitar, allowDrum, allowMic, tutorial)
+  def startWorld(self, mode = QUICKPLAY, multiplayer = None, tutorial = False):
+    self.world = World(self, mode, multiplayer, tutorial)
   
   def finishGame(self):
     if not self.world:
