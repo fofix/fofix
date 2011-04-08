@@ -1085,10 +1085,7 @@ class Instrument:
       notes = self.getDoubleNotes(notes)
     return notes
 
-  def renderNote(self, length, sustain, color, flat = False, tailOnly = False, isTappable = False, fret = 0, spNote = False, isOpen = False, spAct = False):
-
-    if flat:
-      glScalef(1, .1, 1)
+  def renderNote(self, length, sustain, color, tailOnly = False, isTappable = False, fret = 0, spNote = False, isOpen = False, spAct = False):
 
     if tailOnly:
       return
@@ -1423,7 +1420,6 @@ class Instrument:
         else:
           length     = 0
 
-      flat       = False
       tailOnly   = False
       spNote = False
 
@@ -1485,7 +1481,6 @@ class Instrument:
 
         elif self.notedisappear == 2: #Notes turn red
           color = (1, 0, 0, 1)#turn note red
-          flat  = False
 
 
       if self.isDrum:
@@ -1493,7 +1488,7 @@ class Instrument:
 
         glPushMatrix()
         glTranslatef(x, 0, z)
-        self.renderNote(length, sustain = sustain, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote, isOpen = isOpen)
+        self.renderNote(length, sustain = sustain, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote, isOpen = isOpen)
         glPopMatrix()
       else:
         if z + length < -1.0:
@@ -1516,7 +1511,7 @@ class Instrument:
         else:
           renderNote = 0
         if renderNote == 0:
-          self.renderNote(length, sustain = sustain, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote)
+          self.renderNote(length, sustain = sustain, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote)
         glPopMatrix()
 
     #myfingershurt: end FOR loop / note rendering loop       
@@ -1613,7 +1608,6 @@ class Instrument:
 
       length     = 0
 
-      flat       = False
       tailOnly   = False
       spNote = False
 
@@ -1657,20 +1651,18 @@ class Instrument:
       if self.notedisappear == 0:#Notes keep on going when missed
         if z < 0 and not (event.played or event.hopod):#if the note is missed 
           color = (.6, .6, .6, .5 * visibility * f)
-          flat  = False 
       elif self.notedisappear == 1:#Notes disappear when missed
         if z < 0 and not (event.played or event.hopod):
               continue
       if self.notedisappear == 2:#turn red when missed
         if z < 0 and not (event.played or event.hopod): #if the note is missed 
           color = (1, 0, 0, 1)#turn note red
-          flat  = False
 
       sustain = False
 
       glPushMatrix()
       glTranslatef(x, 0, z)
-      self.renderNote(length, sustain = sustain, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote, isOpen = isOpen)
+      self.renderNote(length, sustain = sustain, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote, isOpen = isOpen)
       glPopMatrix()
 
     #myfingershurt: end FOR loop / note rendering loop       
