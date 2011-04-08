@@ -23,6 +23,11 @@
 
 from __future__ import with_statement
 
+# So we don't get future division in effect but can get the flag for
+# compiling the rockmeter expressions with it in effect.
+import __future__
+FUTURE_DIVISION = __future__.division.compiler_flag
+
 from LinedConfigParser import LinedConfigParser
 import os
 
@@ -86,15 +91,15 @@ class ConfigGetMixin(object):
     if self.config.has_option(self.section, value):
       filename, lineno = self.config.getlineno(self.section, value)
       expr = self.config.get(self.section, value)
-      return compile('\n' * (lineno - 1) + expr, filename, 'eval')
-    return compile(default, '<string>', 'eval')
+      return compile('\n' * (lineno - 1) + expr, filename, 'eval', FUTURE_DIVISION)
+    return compile(default, '<string>', 'eval', FUTURE_DIVISION)
 
   def getexprs(self, value, default=None, separator='|'):
     if self.config.has_option(self.section, value):
       filename, lineno = self.config.getlineno(self.section, value)
       exprs = self.config.get(self.section, value).split(separator)
-      return [compile('\n' * (lineno - 1) + expr, filename, 'eval') for expr in exprs]
-    return [compile(expr, '<string>', 'eval') for expr in default.split(separator)]
+      return [compile('\n' * (lineno - 1) + expr, filename, 'eval', FUTURE_DIVISION) for expr in exprs]
+    return [compile(expr, '<string>', 'eval', FUTURE_DIVISION) for expr in default.split(separator)]
 
 
 # A graphical rockmeter layer
