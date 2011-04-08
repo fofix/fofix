@@ -1929,7 +1929,7 @@ class Instrument:
         possible = True
     return possible
 
-  def renderTail(self, song, length, sustain, kill, color, tailOnly = False, isTappable = False, big = False, fret = 0, freestyleTail = 0, pos = 0):
+  def renderTail(self, song, length, sustain, kill, color, tailOnly = False, isTappable = False, big = False, fret = 0, spNote = False, freestyleTail = 0, pos = 0):
 
     #volshebnyi - if freestyleTail == 0, act normally.
     #  if freestyleTail == 1, render an freestyle tail
@@ -1942,13 +1942,21 @@ class Instrument:
 
     self.tailSpeed      = self.engine.theme.noteTailSpeedMulti
 
-    if not self.simpleTails:#Tail image Colors no coloring of the images
+
+
+
+    if not self.simpleTails: #Seperate Tail images dont color the images
       tailcol = (1,1,1,1)
-    else:
-      if big == False and tailOnly == True:
-        tailcol = (.6, .6, .6, color[3])
-      else:
-        tailcol = (color)
+
+    elif spNote == True: #Power colored
+      tailcol = (self.spColor)
+
+    elif big == False and tailOnly == True: #grey because the note was missed
+      tailcol = (.6, .6, .6, color[3])
+
+    else: #normal colors
+      tailcol = (color)
+	  
 
     if length > self.boardLength:
       s = self.boardLength
@@ -1960,7 +1968,6 @@ class Instrument:
     if kill and big == True:
       kEffect = ( math.sin( pos / 50 ) + 1 ) /2
       size = ((0.02 + (kEffect * 0.182) * 2), s)
-      print size
 
       c = [self.killColor[0],self.killColor[1],self.killColor[2]]
       if c != [0,0,0]:
@@ -2356,9 +2363,9 @@ class Instrument:
       if renderNote == 0:  
         if big == True and num < self.bigMax:
           num += 1
-          self.renderTail(song, length, sustain = sustain, kill = killswitch, color = color, tailOnly = tailOnly, isTappable = isTappable, big = True, fret = event.number, pos = pos)
+          self.renderTail(song, length, sustain = sustain, kill = killswitch, color = color, tailOnly = tailOnly, isTappable = isTappable, big = True, fret = event.number, spNote = spNote, pos = pos)
         else:
-          self.renderTail(song, length, sustain = sustain, kill = killswitch, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, pos = pos)
+          self.renderTail(song, length, sustain = sustain, kill = killswitch, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote, pos = pos)
 
       glPopMatrix()
   
