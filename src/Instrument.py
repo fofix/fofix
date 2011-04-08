@@ -1646,17 +1646,19 @@ class Instrument:
 
 
       isTappable = False
-      if (event.played or event.hopod):
-        continue
-      if self.notedisappear == 0:#Notes keep on going when missed
-        if z < 0 and not (event.played or event.hopod):#if the note is missed 
-          color = (.6, .6, .6, .5 * visibility * f)
-      elif self.notedisappear == 1:#Notes disappear when missed
-        if z < 0 and not (event.played or event.hopod):
-              continue
-      if self.notedisappear == 2:#turn red when missed
-        if z < 0 and not (event.played or event.hopod): #if the note is missed 
+
+
+      if (event.played or event.hopod): #if the note is hit
+         continue
+
+      elif z < 0: #Notes past frets
+        #if none of the below they keep on going, it would be self.notedisappear == 1
+        if self.notedisappear == 0: #Notes disappear
+          continue
+
+        elif self.notedisappear == 2: #Notes turn red
           color = (1, 0, 0, 1)#turn note red
+
 
       sustain = False
 
