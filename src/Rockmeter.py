@@ -34,7 +34,6 @@ from PIL import Image, ImageDraw
 from OpenGL.GL import *
 
 import math
-import cmgl     #needed for font color changing
 
 from Theme import halign, valign
 from constants import *
