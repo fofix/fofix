@@ -23,6 +23,11 @@
 
 from __future__ import with_statement
 
+# So we don't get future division in effect but can get the flag for
+# compiling the rockmeter expressions with it in effect.
+import __future__
+FUTURE_DIVISION = __future__.division.compiler_flag
+
 from LinedConfigParser import LinedConfigParser
 import os
 
@@ -34,7 +39,6 @@ from PIL import Image, ImageDraw
 from OpenGL.GL import *
 
 import math
-import cmgl     #needed for font color changing
 
 from Theme import halign, valign
 from constants import *
@@ -87,15 +91,15 @@ class ConfigGetMixin(object):
     if self.config.has_option(self.section, value):
       filename, lineno = self.config.getlineno(self.section, value)
       expr = self.config.get(self.section, value)
-      return compile('\n' * (lineno - 1) + expr, filename, 'eval')
-    return compile(default, '<string>', 'eval')
+      return compile('\n' * (lineno - 1) + expr, filename, 'eval', FUTURE_DIVISION)
+    return compile(default, '<string>', 'eval', FUTURE_DIVISION)
 
   def getexprs(self, value, default=None, separator='|'):
     if self.config.has_option(self.section, value):
       filename, lineno = self.config.getlineno(self.section, value)
       exprs = self.config.get(self.section, value).split(separator)
-      return [compile('\n' * (lineno - 1) + expr, filename, 'eval') for expr in exprs]
-    return [compile(expr, '<string>', 'eval') for expr in default.split(separator)]
+      return [compile('\n' * (lineno - 1) + expr, filename, 'eval', FUTURE_DIVISION) for expr in exprs]
+    return [compile(expr, '<string>', 'eval', FUTURE_DIVISION) for expr in default.split(separator)]
 
 
 # A graphical rockmeter layer
@@ -115,13 +119,18 @@ class Layer(ConfigGetMixin):
     self.config      = stage.config     #the rockmeter.ini
     self.section     = section          #the section of the rockmeter.ini involving this layer
 
+    self.xposexpr    = self.getexpr("xpos", "0.0")
+    self.yposexpr    = self.getexpr("ypos", "0.0")
     self.position    = [0.0, 0.0]
                                         #where on the screen to draw the layer
+    self.angleexpr   = self.getexpr("angle", "0.0")
     self.angle       = 0.0
                                         #angle to rotate the layer (in degrees)
+    self.xscaleexpr  = self.getexpr("xscale", "1.0")
+    self.yscaleexpr  = self.getexpr("yscale", "1.0")
     self.scale       = [1.0, 1.0]
                                         #how much to scale it by (width, height from 0.0 - 1.0)
-    self.color       = [1.0,1.0,1.0,0.0]
+    self.color       = list(self.engine.theme.hexToColor(self.get("color", str, "#FFFFFF")))
                                         #color of the image (#FFFFFF is white on text, on images it is full color)
     self.condition   = True				#when should the image be shown (by default it will always be shown)
     self.alignment   = halign(self.get("alignment", str, "center"))
@@ -136,12 +145,9 @@ class Layer(ConfigGetMixin):
   # all variables that should be updated during the rendering process
   # should be in here just for sake of readablity and organization
   def updateLayer(self, playerNum):
-    self.position    = [eval(self.getexpr("xpos", "0.0")), eval(self.getexpr("ypos", "0.0"))]
-    self.angle       = eval(self.getexpr("angle", "0.0"))
-    self.scale       = [eval(self.getexpr("xscale", "1.0")), eval(self.getexpr("yscale", "1.0"))]
-    self.color       = list(self.engine.theme.hexToColor(self.get("color", str, "#FFFFFF")))
-    self.alignment   = halign(self.get("alignment", str, "center"))
-    self.valignment  = valign(self.get("valignment", str, "middle"))
+    self.position    = [eval(self.xposexpr), eval(self.yposexpr)]
+    self.angle       = eval(self.angleexpr)
+    self.scale       = [eval(self.xscaleexpr), eval(self.yscaleexpr)]
     
      #makes sure color has an alpha value to consider
     if len(self.color) == 3:
@@ -161,7 +167,8 @@ class ImageLayer(Layer):
 
     #these are the images that are drawn when the layer is visible
     self.drawing = self.engine.loadImgDrawing(self, None, drawing)
-    self.rect    = eval(self.getexpr("rect", "(0,1,0,1)"))
+    self.rectexpr = self.getexpr("rect", "(0,1,0,1)")
+    self.rect = eval(self.rectexpr)
                                 #how much of the image do you want rendered (left, right, top, bottom)
     
   def updateLayer(self, playerNum):
@@ -170,7 +177,7 @@ class ImageLayer(Layer):
 
     super(ImageLayer, self).updateLayer(playerNum)
     
-    rect = self.rect = eval(self.getexpr("rect", "(0,1,0,1)"))
+    rect = self.rect = eval(self.rectexpr)
     
     #all of this has to be repeated instead of using the base method
     #because now things can be calculated in relation to the image's properties
@@ -237,6 +244,7 @@ class FontLayer(Layer):
 
     self.font        = self.engine.data.fontDict[font]
     self.text        = ""
+    self.textexpr    = self.getexpr("text", "''")
     self.replace     = ""
     self.alignment   = halign(self.get("alignment", str, "LEFT"), 'left')
     self.useComma    = self.get("useComma", bool, False)
@@ -246,7 +254,7 @@ class FontLayer(Layer):
   def updateLayer(self, playerNum):
     w, h, = self.engine.view.geometry[2:4]
     
-    text = eval(self.get("text", str, ""))
+    text = eval(self.textexpr)
 
     if self.useComma:
       text = locale.format("%d", text, grouping=True)
@@ -299,7 +307,8 @@ class CircleLayer(Layer):
 
     #this number (between 0 and 1) determines how much
     #of the circle should be filled (0 to 360 degrees)
-    self.ratio   = self.getexpr("ratio", "1")
+    self.ratioexpr = self.getexpr("ratio", "1")
+    self.ratio     = eval(self.ratioexpr)
 
     self.engine.loadImgDrawing(self, "drawing", drawing)
 
@@ -339,7 +348,7 @@ class CircleLayer(Layer):
     w, h, = self.engine.view.geometry[2:4]
     texture = self.drawing
 
-    ratio = eval(self.getexpr("ratio", "1"))
+    ratio = eval(self.ratioexpr)
 
     super(CircleLayer, self).updateLayer(playerNum)
     
@@ -577,14 +586,15 @@ class Replace(Effect):
       self.type = "font"
 
     self.conditions = self.getexprs("condition", "True", "|")
+    self.xscaleexpr = self.layer.getexpr("xscale", "0.5")
+    self.yscaleexpr = self.layer.getexpr("yscale", "0.5")
     
   #fixes the scale after the rect is changed
   def fixScale(self):
     w, h, = self.engine.view.geometry[2:4]
     
     rect = self.layer.rect
-    scale     = [eval(self.layer.getexpr("xscale", "0.5")),
-                 eval(self.layer.getexpr("yscale", "0.5"))]
+    scale     = [eval(self.xscaleexpr), eval(self.yscaleexpr)]
     scale[0] *=  (rect[1] - rect[0])
     scale[1] *=  (rect[3] - rect[2])
     #this allows you to scale images in relation to pixels instead
