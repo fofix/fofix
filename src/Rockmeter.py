@@ -240,6 +240,8 @@ class FontLayer(Layer):
     self.replace     = ""
     self.alignment   = halign(self.get("alignment", str, "LEFT"), 'left')
     self.useComma    = self.get("useComma", bool, False)
+    self.shadow      = self.get("shadow",   bool, False)
+    self.outline     = self.get("outline",  bool, False)
 
   def updateLayer(self, playerNum):
     w, h, = self.engine.view.geometry[2:4]
@@ -286,7 +288,8 @@ class FontLayer(Layer):
 
     if bool(eval(self.condition)):
         glColor4f(*color)
-        self.font.render(self.text, position, align = alignment)
+        self.font.render(self.text, position, align = alignment, 
+                         shadow = self.shadow, outline = self.outline)
     
         
 #creates a layer that is shaped like a pie-slice/circle instead of a rectangle
