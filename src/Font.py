@@ -145,7 +145,7 @@ class Font:
     """
     pass
 
-  def render(self, text, pos = (0, 0), rotate = 0, scale = DEFAULT_SCALE, shadowoffset = (.0022, .0005), align = LEFT, new = False):
+  def render(self, text, pos = (0, 0), rotate = 0, scale = DEFAULT_SCALE, shadowoffset = (.0022, .0005), align = LEFT, new = False, shadow = False, outline = False):
     """
     Draw some text.
 
@@ -198,7 +198,7 @@ class Font:
           glRotatef(0, *rotate)
       glTranslatef(x,y,0)
       t.bind()
-      if self.outline:
+      if self.outline or outline:
         with cmgl.PushedAttrib(GL_CURRENT_BIT):
           glColor4f(0, 0, 0, .25 * glGetDoublev(GL_CURRENT_COLOR)[3])
 
@@ -209,7 +209,7 @@ class Font:
               glTranslatef(blur * offset[0], blur * offset[1], 0)
               drawSquare(w,h,tw,th)
 
-      if self.shadow:
+      if self.shadow or shadow:
         with cmgl.PushedAttrib(GL_CURRENT_BIT):
           glColor4f(0, 0, 0, 1)
           with cmgl.PushedMatrix():
