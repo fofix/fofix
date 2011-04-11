@@ -301,16 +301,14 @@ class FontLayer(Layer):
     
         
 #creates a layer that is shaped like a pie-slice/circle instead of a rectangle
-class CircleLayer(Layer): 
+class CircleLayer(ImageLayer): 
   def __init__(self, stage, section, drawing):
-    super(CircleLayer, self).__init__(stage, section)
+    super(CircleLayer, self).__init__(stage, section, drawing)
 
     #this number (between 0 and 1) determines how much
     #of the circle should be filled (0 to 360 degrees)
     self.ratioexpr = self.getexpr("ratio", "1")
     self.ratio     = eval(self.ratioexpr)
-
-    self.engine.loadImgDrawing(self, "drawing", drawing)
 
     #don't try to create the circle layer if the texture doesn't even exist
     if self.drawing:
@@ -345,42 +343,10 @@ class CircleLayer(Layer):
       self.drawnOverlays[degrees] = dispOverlay
 
   def updateLayer(self, playerNum):
-    w, h, = self.engine.view.geometry[2:4]
-    texture = self.drawing
-
     ratio = eval(self.ratioexpr)
-
-    super(CircleLayer, self).updateLayer(playerNum)
-    
     self.ratio = ratio
-    scale = self.scale
     
-    #this allows you to scale images in relation to pixels instead
-    #of percentage of the size of the image.
-    if "xscale" in self.inPixels:
-      scale[0] /= texture.pixelSize[0]
-    if "yscale" in self.inPixels:
-      scale[1] /= texture.pixelSize[1]
-
-    scale[1] = -scale[1]
-    scale[0] *= w/vpc[0]
-    scale[1] *= h/vpc[1]
-    
-    self.scale = scale
-    
-    position = self.position
-    
-    if "xpos" in self.inPixels:
-      position[0] *= w/vpc[0]
-    else:
-      position[0] *= w
-
-    if "ypos" in self.inPixels:
-      position[1] *= h/vpc[1]
-    else:        
-      position[1] *= h
-
-    self.position = position
+    super(CircleLayer, self).updateLayer(playerNum)
     
   def render(self, visibility, playerNum):
     w, h, = self.stage.engine.view.geometry[2:4]
