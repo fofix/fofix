@@ -95,6 +95,8 @@ class ImgDrawing(object):
     self.shift    = -.5                     #horizontal alignment
     self.vshift   = -.5                     #vertical alignment
 
+    self.path = self.texture.name           #path of the image file
+    
     self.createArrays()
 
   def createArrays(self):

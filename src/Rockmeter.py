@@ -329,7 +329,7 @@ class CircleLayer(Layer):
     self.drawnOverlays = {}
     baseFillImageSize = self.drawing.pixelSize
     for degrees in range(0, 361, 5):
-      image = Image.open(os.path.join("..", "data", drawing))
+      image = Image.open(self.drawing.path)
       mask = Image.new('RGBA', baseFillImageSize)
       overlay = Image.new('RGBA', baseFillImageSize)
       draw = ImageDraw.Draw(mask)
