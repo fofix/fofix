@@ -145,9 +145,9 @@ class Layer(ConfigGetMixin):
   # all variables that should be updated during the rendering process
   # should be in here just for sake of readablity and organization
   def updateLayer(self, playerNum):
-    self.position    = [eval(self.xposexpr), eval(self.yposexpr)]
-    self.angle       = eval(self.angleexpr)
-    self.scale       = [eval(self.xscaleexpr), eval(self.yscaleexpr)]
+    self.position    = [float(eval(self.xposexpr)), float(eval(self.yposexpr))]
+    self.angle       = float(eval(self.angleexpr))
+    self.scale       = [float(eval(self.xscaleexpr)), float(eval(self.yscaleexpr))]
     
      #makes sure color has an alpha value to consider
     if len(self.color) == 3:
