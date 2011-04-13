@@ -145,7 +145,7 @@ class MainMenu(BackgroundLayer):
 
     trainingMenu = [
       (_("Tutorials"), self.showTutorial),
-      (_("Practice"), lambda: self.newLocalGame(mode = PRACTICE)),
+      (_("Practice"), lambda: self.newLocalGame(gameMode = PRACTICE)),
     ]
     
     self.opt_bkg_size = [float(i) for i in self.engine.theme.opt_bkg_size]
@@ -162,13 +162,13 @@ class MainMenu(BackgroundLayer):
         (_("Face-Off"),     lambda: self.newLocalGame(multiplayer = FACEOFF)),
         (_("Pro Face-Off"), lambda: self.newLocalGame(multiplayer = SKILL)),
         (_("Co-Op"),  lambda: self.newLocalGame(multiplayer = COOP)),
-        (_("Co-Op Tour"),  lambda: self.newLocalGame(mode = TOUR, multiplayer = COOP))
+        (_("Co-Op Tour"),  lambda: self.newLocalGame(gameMode = TOUR, multiplayer = COOP))
       ]
         
     if not self.useSoloMenu:
 
       mainMenu = [
-        (strCareer, lambda:   self.newLocalGame(mode = TOUR)),
+        (strCareer, lambda:   self.newLocalGame(gameMode = TOUR)),
         (strQuickplay, lambda:        self.newLocalGame()),
         ((strMultiplayer,"multiplayer"), multPlayerMenu),
         ((strTraining,"training"),    trainingMenu),
@@ -179,7 +179,7 @@ class MainMenu(BackgroundLayer):
     else:
 
       soloMenu = [
-        (_("Solo Tour"), lambda: self.newLocalGame(mode = TOUR)),
+        (_("Solo Tour"), lambda: self.newLocalGame(gameMode = TOUR)),
         (_("Quickplay"), lambda: self.newLocalGame()),
       ]
 
@@ -285,7 +285,7 @@ class MainMenu(BackgroundLayer):
       Dialogs.showMessage(self.engine, _("No tutorials found!"))
       return
     
-    self.engine.startWorld(1, None, 0, 0, tutorial = True)
+    self.engine.startWorld(tutorial = True)
 
     self.launchLayer(lambda: Lobby(self.engine))
 
@@ -293,9 +293,9 @@ class MainMenu(BackgroundLayer):
   def newSinglePlayerGame(self):
     self.newLocalGame()   #just call start function with default settings  = 1p quickplay
 
-  def newLocalGame(self, mode = QUICKPLAY, multiplayer = None):
+  def newLocalGame(self, gameMode = QUICKPLAY, multiplayer = None):
     self.engine.data.acceptSound.play()
-    self.engine.startWorld(mode, multiplayer)
+    self.engine.startWorld(gameMode, multiplayer)
     self.launchLayer(lambda: Lobby(self.engine))
   
   def restartGame(self):

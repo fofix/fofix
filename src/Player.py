@@ -888,11 +888,6 @@ class Player(object):
     self.whichPart   = _playerDB.execute('SELECT `part` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
     self._upname      = _playerDB.execute('SELECT `upname` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
     self._difficulty  = _playerDB.execute('SELECT `difficulty` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
-    #MFH - need to store selected practice mode and start position here
-    self.practiceMode = False
-    self.practiceSpeed = 1.0
-    self.practiceSection = None
-    self.startPos = 0.0
     
     self.hopoFreq = None
     

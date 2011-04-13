@@ -74,10 +74,7 @@ class SongChoosingScene(Scene):
         self.libraryName = Song.DEFAULT_LIBRARY
     if not self.songName:
       self.songName = self.engine.config.get("setlist", "selected_song")
-    self.gameMode = self.engine.world.mode
-    self.careerMode = (self.gameMode == TOUR)
-    self.practiceMode = (self.gameMode == PRACTICE)
-    self.gameMode2p = self.engine.world.multiplayer
+    self.gameMode = self.engine.world.gameMode
     self.autoPreview = not self.engine.config.get("audio", "disable_preview")
     self.sortOrder   = self.engine.config.get("game", "sort_order")
     self.tut = self.engine.world.tutorial
@@ -125,9 +122,8 @@ class SongChoosingScene(Scene):
     self.searchText = ""
     
     #user configurables and input management
-    self.listingMode       = 0     #with libraries or List All
     self.preloadSongLabels = False
-    self.showCareerTiers   = 1+(self.careerMode and 1 or 0) #0-Never; 1-Career Only; 2-Always
+    self.showCareerTiers   = (self.gameMode == TOUR) and True or (self.engine.config.get("game","quickplay_tiers") == 1)
     self.scrolling        = 0
     self.scrollDelay      = self.engine.config.get("game", "scroll_delay")
     self.scrollRate       = self.engine.config.get("game", "scroll_rate")
@@ -295,10 +291,7 @@ class SongChoosingScene(Scene):
     msg = self.engine.setlistMsg
     self.engine.setlistMsg = None
     self.selectedIndex = 0
-    if self.listingMode == 0 or self.careerMode:
-      self.items = self.libraries + self.songs
-    else:
-      self.items = self.songs
+    self.items = self.libraries + self.songs
     self.itemRenderAngles = [0.0]  * len(self.items)
     self.itemLabels       = [None] * len(self.items)
     self.searching        = False
@@ -307,7 +300,7 @@ class SongChoosingScene(Scene):
     shownItems = []
     for item in self.items: #remove things we don't want to see. Some redundancy, but that's okay.
       if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
-        if self.showCareerTiers == 2:
+        if self.showCareerTiers:
           if isinstance(item, Song.TitleInfo):
             if len(shownItems) > 0:
               if isinstance(shownItems[-1], Song.TitleInfo):
@@ -326,7 +319,7 @@ class SongChoosingScene(Scene):
                 shownItems.pop()
             shownItems.append(item)
       elif isinstance(item, Song.SongInfo):
-        if self.careerMode and (not self.showLockedSongs) and item.getLocked():
+        if self.gameMode == TOUR and (not self.showLockedSongs) and item.getLocked():
           continue
         else:
           shownItems.append(item)
@@ -338,7 +331,7 @@ class SongChoosingScene(Scene):
     
     if len(self.items) > 0 and len(shownItems) == 0:
       msg = _("No songs in this setlist are available to play!")
-      if self.careerMode:
+      if self.gameMode == TOUR:
         msg = msg + " " + _("Make sure you have a working career pack!")
       Dialogs.showMessage(self.engine, msg)
     elif len(shownItems) > 0:
@@ -348,7 +341,7 @@ class SongChoosingScene(Scene):
           break
       else:
         msg = _("No songs in this setlist are available to play!")
-        if self.careerMode:
+        if self.gameMode == TOUR:
           msg = msg + " " + _("Make sure you have a working career pack!")
         Dialogs.showMessage(self.engine, msg)
         self.items = []
@@ -715,7 +708,7 @@ class SongChoosingScene(Scene):
     else:
       return
     
-    if self.careerMode and self.selectedItem.getLocked(): #TODO: SongDB
+    if self.gameMode == TOUR and self.selectedItem.getLocked(): #TODO: SongDB
       if self.song:
         self.song.fadeout(1000)
       return
@@ -802,7 +795,7 @@ class SongChoosingScene(Scene):
         return
       if self.song:
           self.song.fadeout(1000)
-      if self.library != Song.DEFAULT_LIBRARY and not self.tut and (self.listingMode == 0 or self.careerMode):
+      if self.library != Song.DEFAULT_LIBRARY and not self.tut:
         self.initialItem  = self.library
         self.library      = os.path.dirname(self.library)
         if self.library == os.path.join("..", self.engine.config.get("setlist", "base_library")):
@@ -831,8 +824,6 @@ class SongChoosingScene(Scene):
         Log.debug("New library selected: " + str(self.library) )
         self.loadLibrary()
       elif isinstance(self.selectedItem, Song.SongInfo) and not self.selectedItem.getLocked():
-        if self.listingMode == 1 and not self.careerMode:
-          self.library = self.selectedItem.libraryNam #TODO: SongDB
         self.libraryName = self.selectedItem.libraryNam
         self.songName = self.selectedItem.songName
         self.engine.config.set("setlist", "selected_library", self.libraryName)

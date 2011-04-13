@@ -301,7 +301,6 @@ Config.define("coffee", "game_phrases",       int, 2,     text = _("Show In-Game
 Config.define("game", "preload_labels",          bool, False,     text = _("Preload Song Labels"),     options = {True: _("Yes"), False: _("No")}, tipText = _("Sets whether to preload all song labels on load. With large setlists, this option is extremely slow."))
 Config.define("game", "songcovertype",        bool, False,     text = _("Label Type"),      options = {True: _("CD Labels"), False: _("Album Covers")}, tipText = _("Sets whether to show CD labels or album covers as the art."))
 Config.define("game", "keep_play_count", int, 1, text = _("Remember Play Count"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Keeps track of how many times you've played each song."))
-Config.define("game", "tut",       bool, False) #-tutorial
 Config.define("video", "counting",       bool, False,     text = _("Show at Song Start"),             options = {True: _("Part"), False: _("Countdown")}, tipText = _("Sets whether to show a countdown or your name and part at the song's start."))
 Config.define("fretboard", "ovrneckoverlay",       bool, True,     text = _("Overdrive Neck"),             options = {True: _("Overlay"), False: _("Replace")}, tipText = _("Sets the style of the Overdrive neck. 'Replace' replaces your neck with the special neck, while 'Overlay' lays the neck over top."))
 
@@ -767,8 +766,8 @@ class GameEngine(object):
     self.view.setGeometry((0, 0, width, height))
     self.svg.setGeometry((0, 0, width, height))
   
-  def startWorld(self, mode = QUICKPLAY, multiplayer = None, tutorial = False):
-    self.world = World(self, mode, multiplayer, tutorial)
+  def startWorld(self, gameMode = QUICKPLAY, multiplayer = None, tutorial = False):
+    self.world = World(self, gameMode, multiplayer, tutorial)
   
   def finishGame(self):
     if not self.world:

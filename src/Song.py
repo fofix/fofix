@@ -3792,17 +3792,10 @@ def getAvailableLibraries(engine, library = DEFAULT_LIBRARY):
 
 def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = False, progressCallback = lambda p: None):
   order = engine.config.get("game", "sort_order")
-  tut = engine.config.get("game", "tut")
+  tut = engine.world.tutorial
   direction = engine.config.get("game", "sort_direction")
   if tut:
     includeTutorials = True
-
-  #MFH - Career Mode determination:
-  gameMode1p = engine.world.mode
-  if gameMode1p == TOUR:
-    careerMode = True
-  else:
-    careerMode = False
 
   # Search for songs in both the read-write and read-only directories
   if library == None:
@@ -3829,7 +3822,7 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
     songs = [song for song in songs if not song.tutorial]
   songs = [song for song in songs if not song.artist == '=FOLDER=']
     #coolguy567's unlock system
-  if careerMode:
+  if engine.world.gameMode == TOUR:
     for song in songs:
       if song.getUnlockRequire() != "":
         song.setLocked(False)
@@ -3960,7 +3953,6 @@ def getSortingTitles(engine, songList = []):
   
   
 def getAvailableTitles(engine, library = DEFAULT_LIBRARY):
-  gameMode1p = engine.world.mode
   if library == None:
     return []
   
@@ -3977,7 +3969,7 @@ def getAvailableTitles(engine, library = DEFAULT_LIBRARY):
     for section in sections.split():
       titles.append(TitleInfo(config, section))
     
-    if gameMode1p == 2:
+    if engine.world.gameMode == TOUR:
       titles.append(BlankSpaceInfo(_("End of Career")))
     
   except:
@@ -3992,14 +3984,12 @@ def getAvailableSongsAndTitles(engine, library = DEFAULT_LIBRARY, includeTutoria
   if library == None:
     return []
 
-  #MFH - Career Mode determination:
-  careerMode = (engine.world.mode == TOUR)
   career = False
   quickPlayCareerTiers = engine.config.get("game", "quickplay_tiers")
 
   titles = []
   items = getAvailableSongs(engine, library, includeTutorials, progressCallback=progressCallback)
-  if quickPlayCareerTiers == 1 or careerMode:
+  if quickPlayCareerTiers == 1 or engine.world.gameMode == TOUR:
     titles = getAvailableTitles(engine, library)
   if titles == []:
     titles = getSortingTitles(engine, items)

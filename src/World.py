@@ -31,12 +31,12 @@ from constants import *
 STARTUP_SCENE = "SongChoosingScene"
 
 class World:
-  def __init__(self, engine, mode = QUICKPLAY, multiplayer = False, tutorial = False):
+  def __init__(self, engine, gameMode = QUICKPLAY, multiplayer = False, tutorial = False):
     self.engine       = engine
     self.players      = []
     self.minPlayers   = multiplayer and 2 or 1
     self.maxPlayers   = multiplayer and self.engine.config.get("performance", "max_players") or 1
-    self.mode         = mode
+    self.gameMode     = gameMode
     self.multiplayer  = multiplayer
     self.tutorial     = tutorial
     self.scene        = None
@@ -44,6 +44,7 @@ class World:
     self.songQueue    = SongQueue()
     self.playingQueue = False
     self.done         = False
+    self.startPos     = 0.0
     self.setGameName()
   
   def setGameName(self):
@@ -53,16 +54,16 @@ class World:
       elif self.multiplayer == SKILL:
         self.gameName = _("Pro Face-Off")
       elif self.multiplayer == COOP:
-        if self.mode == TOUR:
+        if self.gameMode == TOUR:
           self.gameName = _("Co-Op Tour")
         else:
           self.gameName = _("Co-Op Mode")
     else:
-      if self.mode == QUICKPLAY:
+      if self.gameMode == QUICKPLAY:
         self.gameName = _("Quickplay")
-      elif self.mode == PRACTICE:
+      elif self.gameMode == PRACTICE:
         self.gameName = _("Practice")
-      elif self.mode == TOUR:
+      elif self.gameMode == TOUR:
         self.gameName = _("Career Mode")
   
   def finishGame(self):

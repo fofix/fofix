@@ -1482,9 +1482,9 @@ class Setlist:
         glColor4f(c1,c2,c3,1)
         if item.getLocked():
           text = item.getUnlockText()
-        elif scene.careerMode and not item.completed:
+        elif scene.gameMode == TOUR and not item.completed:
           text = _("Play To Advance")
-        elif scene.practiceMode:
+        elif scene.gameMode == PRACTICE:
           text = _("Practice")
         elif item.count:
           count = int(item.count)
@@ -1591,9 +1591,9 @@ class Setlist:
         glColor3f(c1,c2,c3)
         if item.getLocked():
           text = item.getUnlockText()
-        elif scene.careerMode and not item.completed:
+        elif scene.gameMode == TOUR and not item.completed:
           text = _("Play To Advance")
-        elif scene.practiceMode:
+        elif scene.gameMode == PRACTICE:
           text = _("Practice")
         elif item.count:
           count = int(item.count)
@@ -2191,14 +2191,14 @@ class Setlist:
 
           if item.getLocked():
             text = item.getUnlockText()
-          elif scene.careerMode and not item.completed:
+          elif scene.gameMode == TOUR and not item.completed:
             text = _("Play To Advance.")
           font.render(text, (x, y+2*fh), scale = 0.001)
         else:
           text = _("Never Played")
           if item.getLocked():
             text = item.getUnlockText()
-          elif scene.careerMode and not item.completed:
+          elif scene.gameMode == TOUR and not item.completed:
             text = _("Play To Advance.")
           lfont.render(text, (x, y+3*fh), scale = 0.001)
 

@@ -46,6 +46,7 @@ import Settings
 import Song
 from Scorekeeper import ScoreCard
 from Shader import shaders
+from constants import *
 
 import random
 import os
@@ -75,7 +76,6 @@ class GuitarScene(Scene):
     self.coOpRB = False #akedrou
     self.coOpGH = False
     self.coOpType = False
-    self.practiceMode = False
     self.bossBattle = False
     self.ready = False
     Log.debug("GuitarScene init...")
@@ -98,66 +98,43 @@ class GuitarScene(Scene):
     
     #MFH - retrieve game parameters:
     self.gamePlayers = len(self.engine.world.players)
-    self.gameMode1p = self.engine.world.mode
-    self.gameMode2p = self.engine.world.multiplayer
+    self.gameMode = self.engine.world.gameMode
+    self.tut = self.engine.world.tutorial
     self.lostFocusPause = self.engine.config.get("game", "lost_focus_pause")
 
-    if self.sinfo.bossBattle == "True" and self.gameMode1p == 2 and self.gamePlayers == 1:
-      self.bossBattle = True
-      self.engine.world.multiMode = 6
-      self.gameMode2p = 6
-      self.gamePlayers = 2
-    if self.gameMode1p == 2:
-      self.careerMode = True
-    else:
-      self.careerMode = False
+    # if self.sinfo.bossBattle == "True" and self.gameMode == TOUR and self.gamePlayers == 1: #akedrou TODO - fix boss mode
+      # self.bossBattle = True
+      # self.engine.world.multiplayer = 6
+      # self.gameMode2p = 6
+      # self.gamePlayers = 2
 
 
     
-    #MFH - check for party mode
-    if self.gameMode2p == 2:
-      self.partyMode  = True
-      self.gamePlayers      = 1
-      self.partySwitch      = 0
-      self.partyTime        = self.engine.config.get("game", "party_time")
-      self.partyPlayer      = 0
-    elif self.gamePlayers > 1:
+    #MFH - check for party mode (akedrou TODO - fix/remove party mode!)
+    # if self.gameMode2p == 2:
+      # self.partyMode  = True
+      # self.gamePlayers      = 1
+      # self.partySwitch      = 0
+      # self.partyTime        = self.engine.config.get("game", "party_time")
+      # self.partyPlayer      = 0
+    # el
+    if self.engine.world.multiplayer:
       #MFH - check for battle mode
-      if self.gameMode2p == 1:
+      #akedrou TODO - fix multiplayer modes!
+      if self.engine.world.multiplayer == SKILL:
         self.battle   = True
         self.battleGH = False
         self.coOp     = False
         self.coOpRB   = False
         self.coOpGH   = False
         self.coOpType = False
-      elif self.gameMode2p == 3:
-        self.battle   = False
-        self.battleGH = False
-        self.coOp     = True
-        self.coOpRB   = False
-        self.coOpGH   = False
-        self.coOpType = True
-      elif self.gameMode2p == 4:
+      elif self.engine.world.multiplayer == COOP:
         self.battle   = False
         self.battleGH = False
         self.coOp     = False
-        self.coOpRB   = True
+        self.coOpRB   = True #yea, I'm being partial...
         self.coOpGH   = False
         self.coOpType = True
-      elif self.gameMode2p == 5:
-        self.battle   = False
-        self.battleGH = False
-        self.coOp     = False
-        self.coOpRB   = False
-        self.coOpGH   = True
-        self.coOpType = True
-      elif self.gameMode2p == 6:
-        self.battle   = False
-        self.battleGH = True
-        self.coOp     = False
-        self.coOpRB   = False
-        self.coOpGH   = False
-        self.coOpType = False
       else:
         self.battle   = False
         self.coOp     = False
@@ -207,8 +184,6 @@ class GuitarScene(Scene):
         if player.part.id == Song.LEAD_PART or player.part.id == Song.GUITAR_PART:    #both these selections should get guitar solos
           self.instruments[j].canGuitarSolo = True
 
-      if player.practiceMode:
-        self.practiceMode = True
       if guitar:
         player.guitarNum = gNum
         gNum += 1
@@ -820,21 +795,8 @@ class GuitarScene(Scene):
     soloSlop = 100.0
     unisonCheck = []
 
-    if self.careerMode:
+    if self.gameMode == TOUR:
       self.failingEnabled = True
-
-
-    self.tut = self.engine.config.get("game", "tut")
-    
-
-    #MFH - no Jurgen in Career mode or tutorial mode or practice mode:
-    if self.careerMode or self.tut or self.playerList[0].practiceMode:
-      self.autoPlay = False
-    #force jurgen player 2 (and only player 2) for boss battles
-    if self.bossBattle:
-      self.autoPlay = True
-      self.jurg = [False for i in self.playerList]
-      self.jurg[1] = True
     
     self.rockFailUp  = True #akedrou - fading mech
     self.rockFailViz = 0.0
@@ -861,13 +823,13 @@ class GuitarScene(Scene):
 
     #MFH - this is where song loading originally took place, and the loading screen was spawned.
     
-    self.engine.resource.load(self, "song", lambda: loadSong(self.engine, songName, library = libraryName, part = [player.part for player in self.playerList], practiceMode = self.playerList[0].practiceMode, practiceSpeed = self.playerList[0].practiceSpeed), synch = True, onLoad = self.songLoaded)
+    self.engine.resource.load(self, "song", lambda: loadSong(self.engine, songName, library = libraryName, part = [player.part for player in self.playerList]), synch = True, onLoad = self.songLoaded)
     
     Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Preparing Note Phrases..."))
 
 
 
-    if self.playerList[0].practiceMode or self.song.info.tutorial or self.tut:
+    if self.song.info.tutorial or self.tut or self.gameMode == PRACTICE:
       self.failingEnabled = False
 
     self.playerList[0].hopoFreq = self.song.info.hopofreq
@@ -1138,11 +1100,11 @@ class GuitarScene(Scene):
       if instrument.isDrum:
         self.lastDrumNoteTime = lastDrumNoteTime
         Log.debug("Last drum note located at time = " + str(self.lastDrumNoteTime) )
-        self.scoring[i].totalStreakNotes = len([1 for time, event in self.song.track[i].getEvents(self.playerList[i].startPos,self.lastEvent) if isinstance(event, Note)])
+        self.scoring[i].totalStreakNotes = len([1 for time, event in self.song.track[i].getEvents(self.engine.world.startPos,self.lastEvent) if isinstance(event, Note)])
       elif instrument.isVocal:
-        self.scoring[i].totalStreakNotes = len([1 for time, event in self.song.track[i].getEvents(self.playerList[i].startPos,self.lastEvent) if isinstance(event, VocalPhrase)])
+        self.scoring[i].totalStreakNotes = len([1 for time, event in self.song.track[i].getEvents(self.engine.world.startPos,self.lastEvent) if isinstance(event, VocalPhrase)])
       else:
-        self.scoring[i].totalStreakNotes = len(set(time for time, event in self.song.track[i].getEvents(self.playerList[i].startPos,self.lastEvent) if isinstance(event, Note)))
+        self.scoring[i].totalStreakNotes = len(set(time for time, event in self.song.track[i].getEvents(self.engine.world.startPos,self.lastEvent) if isinstance(event, Note)))
       self.scoring[i].lastNoteEvent = lastDrumNoteEvent
       self.scoring[i].lastNoteTime  = lastDrumNoteTime
       self.lastNoteTimes[i] = lastDrumNoteTime
@@ -1323,7 +1285,7 @@ class GuitarScene(Scene):
     if self.stage.mode == 3:
       self.stage.loadVideo(self.libraryName, self.songName)
 
-    self.stage.load(self.libraryName, self.songName, self.playerList[0].practiceMode)
+    self.stage.load(self.libraryName, self.songName, self.gameMode == PRACTICE)
 
     #MFH - this determination logic should happen once, globally -- not repeatedly.
     self.showScriptLyrics = False
@@ -1505,7 +1467,7 @@ class GuitarScene(Scene):
       self.fail_text_y = .47
 
     if self.theme == 1: #GH3-like theme
-      if self.careerMode:
+      if self.gameMode == TOUR:
         self.menu = Menu(self.engine, [
           (_("         RESUME"), self.resumeSong), #Worldrave adjusted proper spacing.
           (_("        RESTART"), self.restartSong),
@@ -1522,7 +1484,7 @@ class GuitarScene(Scene):
           (_("           QUIT"), self.quit),  #Worldrave - added graphic menu support "pause" for Pause menu in below line.
         ], name = "pause", fadeScreen = False, onClose = self.resumeGame, font = self.engine.data.pauseFont, pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color, append_submenu_char = False)
       size = self.engine.data.pauseFont.getStringSize("Quit to Main")
-      if self.careerMode:
+      if self.gameMode == TOUR:
         self.failMenu = Menu(self.engine, [
           (_("RETRY SONG"), self.restartAfterFail),
           (_("  PRACTICE"), self.practiceSong), #evilynux
@@ -1536,7 +1498,7 @@ class GuitarScene(Scene):
           (_("     QUIT"), self.quit),  #Worldrave - added graphic menu support "fail" for Fail menu in below line.
         ], name = "fail", fadeScreen = False, onCancel = self.changeAfterFail, font = self.engine.data.pauseFont, pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
     elif self.theme == 0:   #GH2-like theme
-      if self.careerMode:
+      if self.gameMode == TOUR:
         self.menu = Menu(self.engine, [
           (_("  Resume"),       self.resumeSong),
           (_("  Start Over"),      self.restartSong),
@@ -1555,7 +1517,7 @@ class GuitarScene(Scene):
           (_("  Quit to Main Menu"), self.quit),  #Worldrave - added graphic menu support "pause" for Pause menu in below line.
         ], name = "pause", fadeScreen = False, onClose = self.resumeGame, font = self.engine.data.pauseFont, pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color)
       size = self.engine.data.pauseFont.getStringSize("Quit to Main")
-      if self.careerMode:
+      if self.gameMode == TOUR:
         self.failMenu = Menu(self.engine, [
           (_(" Try Again?"), self.restartAfterFail),
           (_("  Give Up?"), self.changeAfterFail),
@@ -1570,7 +1532,7 @@ class GuitarScene(Scene):
         ], name = "fail", fadeScreen = False, onCancel = self.changeAfterFail, font = self.engine.data.pauseFont, pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
     elif self.theme == 2:   #RB-like theme
       size = self.engine.data.pauseFont.getStringSize("Quit to Main Menu")
-      if self.careerMode:
+      if self.gameMode == TOUR:
         self.menu = Menu(self.engine, [
           (_("   RESUME"),       self.resumeSong),
           (_("   RESTART"),      self.restartSong),
@@ -1589,7 +1551,7 @@ class GuitarScene(Scene):
           (_("   QUIT"), self.quit),   #Worldrave - added graphic menu support "pause" for Pause menu in below line.
         ], name = "pause", fadeScreen = False, onClose = self.resumeGame, font = self.engine.data.pauseFont, pos = (self.pause_text_x, self.pause_text_y), textColor = self.pause_text_color, selectedColor = self.pause_selected_color)
       size = self.engine.data.pauseFont.getStringSize("Quit to Main")
-      if self.careerMode:
+      if self.gameMode == TOUR:
         self.failMenu = Menu(self.engine, [
           (_(" RETRY"), self.restartAfterFail),
           (_(" NEW SONG"), self.changeAfterFail),
@@ -1951,7 +1913,7 @@ class GuitarScene(Scene):
       
       
     #MFH - no Jurgen in Career mode.
-    if self.careerMode:
+    if self.gameMode != QUICKPLAY or self.tut:
       self.autoPlay = False
     if self.bossBattle:
       self.autoPlay = True
@@ -2059,11 +2021,11 @@ class GuitarScene(Scene):
     self.engine.view.popLayer(self.menu)
     self.engine.view.popLayer(self.failMenu)
     self.freeResources()
-    self.engine.world.mode = PRACTICE
+    self.engine.world.gameMode = PRACTICE
     self.engine.world.createScene("SongChoosingScene")
 
   def changeSong(self):
-    prevMode = self.engine.world.mode
+    prevMode = self.gameMode
     if self.song:
       self.song.stop()
       self.song  = None
@@ -2074,7 +2036,7 @@ class GuitarScene(Scene):
     self.engine.view.popLayer(self.menu)
     self.engine.view.popLayer(self.failMenu)
     self.freeResources()
-    self.engine.world.mode = prevMode
+    self.engine.world.gameMode = prevMode
     self.engine.world.createScene("SongChoosingScene")
 
   def changeAfterFail(self):
@@ -3123,7 +3085,7 @@ class GuitarScene(Scene):
       self.instruments[i].isStarPhrase = True
       self.instruments[i].spEnabled = False
 
-    if not self.failingEnabled or self.practiceMode:
+    if not self.failingEnabled or (self.gameMode == PRACTICE):
       return
 
     if self.battle and self.numOfPlayers > 1: #battle mode
@@ -3218,7 +3180,7 @@ class GuitarScene(Scene):
       return
     if self.instruments[i].isDrum: 
       self.drumStart = True
-    if not self.failingEnabled or self.practiceMode:
+    if not self.failingEnabled or (self.gameMode == PRACTICE):
       return
     if not self.notesHit[i]: return
     if self.battle and self.numOfPlayers > 1: #battle mode
@@ -3303,7 +3265,7 @@ class GuitarScene(Scene):
         self.handleTempo(self.song, pos)  #MFH - new global tempo / BPM handling logic
       
       if self.bossBattle and self.rock[1] < 0:
-        if self.careerMode and not self.song.info.completed:
+        if self.gameMode == TOUR and not self.song.info.completed:
           if self.song.info.count:
             count = int(self.song.info.count)
           else:
@@ -3603,7 +3565,7 @@ class GuitarScene(Scene):
       if (self.starClaps or self.beatClaps) and len(self.beatTime) > 0:
         #Play a sound on each beat on starpower
         clap = False
-        if self.playerList[0].practiceMode and self.beatClaps:
+        if self.gameMode == PRACTICE and self.beatClaps:
           clap = True
         else:
           for i,player in enumerate(self.playerList):
@@ -3802,11 +3764,11 @@ class GuitarScene(Scene):
           for instrument in self.instruments:
             if instrument.isVocal:
               instrument.mic.start()
-          if self.playerList[0].practiceMode and self.engine.audioSpeedFactor == 1:
-            self.playerList[0].startPos -= self.song.period*4
-            if self.playerList[0].startPos < 0.0:
-              self.playerList[0].startPos = 0.0
-            self.song.play(start = self.playerList[0].startPos)
+          if self.gameMode == PRACTICE and self.engine.audioSpeedFactor == 1:
+            self.engine.world.startPos -= self.song.period*4
+            if self.engine.world.startPos < 0.0:
+              self.engine.world.startPos = 0.0
+            self.song.play(start = self.engine.world.startPos)
           else:
             self.song.play()
       
@@ -4783,7 +4745,7 @@ class GuitarScene(Scene):
       for i, player in enumerate(self.playerList):
         player.twoChord = self.instruments[i].twoChord
 
-        if self.playerList[0].practiceMode:
+        if self.gameMode == PRACTICE:
           self.scoring[i].score = 0
         if self.scoring[i].score > 0:
           noScore = False
@@ -4822,7 +4784,7 @@ class GuitarScene(Scene):
 
         self.engine.view.setViewport(1,0)
         self.freeResources()
-        self.engine.world.createScene("GameResultsScene", libraryName = self.libraryName, songName = self.songName, scores = scoreList, coOpType = coOpType, careerMode = self.careerMode)
+        self.engine.world.createScene("GameResultsScene", libraryName = self.libraryName, songName = self.songName, scores = scoreList, coOpType = coOpType)
       
       else:
         self.changeSong()

@@ -47,9 +47,10 @@ import pygame
 import random
 import os
 from OpenGL.GL import *
+from constants import *
 
 class GameResultsScene(Scene):
-  def __init__(self, engine, libraryName, songName, scores = None, coOpType = False, careerMode = False):
+  def __init__(self, engine, libraryName, songName, scores = None, coOpType = False):
     Scene.__init__(self, engine)
     
     if self.engine.world.sceneName == "GameResultsScene":  #MFH - dual / triple loading cycle fix
@@ -63,6 +64,7 @@ class GameResultsScene(Scene):
       Log.debug("GameResultsScene class init...")
     
     players = self.players
+    self.gameMode = self.engine.world.gameMode
     if coOpType > 0:
       self.scoring        = [scores.pop()]
       self.coOpScoring    = scores
@@ -74,7 +76,6 @@ class GameResultsScene(Scene):
     self.numCheats        = [0 for i in self.scoring]
     self.songName         = songName
     self.coOpType         = coOpType
-    self.careerMode       = careerMode
     self.counter          = 0
     self.animationTimer   = 0
     self.scoreRollTimer   = [0 for i in self.scoring]
@@ -718,7 +719,7 @@ class GameResultsScene(Scene):
         else:
           count = 0
         count += 1
-        if self.careerMode and not self.song.info.completed and self.scoring[0].stars >= self.careerStars:
+        if self.gameMode == TOUR and not self.song.info.completed and self.scoring[0].stars >= self.careerStars:
           Log.debug("Song completed")
           self.song.info.completed = True
         self.song.info.count = "%d" % count
