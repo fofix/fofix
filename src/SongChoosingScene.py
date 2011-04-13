@@ -136,7 +136,7 @@ class SongChoosingScene(Scene):
     self.queueOrder       = self.engine.config.get("game", "queue_order")
     self.queueParts       = self.engine.config.get("game", "queue_parts")
     self.queueDiffs       = self.engine.config.get("game", "queue_diff")
-    self.nilShowNextScore = self.engine.config.get("songlist",  "nil_show_next_score")
+    self.nilShowNextScore = self.engine.config.get("setlist",  "nil_show_next_score")
     
     #theme information
     self.themename = self.engine.data.themeLabel

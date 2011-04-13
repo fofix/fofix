@@ -4000,7 +4000,7 @@ def getAvailableSongsAndTitles(engine, library = DEFAULT_LIBRARY, includeTutoria
   items.sort(lambda a, b: compareSongsAndTitles(engine, a, b, career))
   
   
-  if (not careerMode) and len(items) != 0:
+  if (not engine.world.gameMode == TOUR) and len(items) != 0:
     items.insert(0, RandomSongInfo())
 
   return items

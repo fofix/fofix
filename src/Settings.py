@@ -735,11 +735,37 @@ class SettingsMenu(Menu.Menu):
     
     self.battleObjectSettingsMenu = Menu.Menu(self.engine, self.battleObjectSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
     
-    self.battleSettings = [
-      (_("Battle Objects"), self.battleObjectSettingsMenu, _("Set which objects can appear in Battle Mode")),
+    self.faceOffRules = [
+      ConfigChoice(engine, engine.config, "rules", "face_off_style", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "face_off_score", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "face_off_handicap", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "face_off_bonus", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "face_off_black", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "face_off_fail", autoApply = True),
+      (_("Battle Weapons"), self.battleObjectSettingsMenu, _("Change which weapons are available in battle."))
     ]
     
-    self.battleSettingsMenu = Menu.Menu(self.engine, self.battleSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
+    self.faceOffRulesMenu = Menu.Menu(self.engine, self.faceOffRules, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
+    
+    self.coOpRules = [
+      ConfigChoice(engine, engine.config, "rules", "coop_rockmeter", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "coop_mult", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "coop_bonus_activate", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "coop_bonus_mult", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "coop_unison", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "coop_fail", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "coop_save_chances", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "coop_fail_drag", autoApply = True),
+    ]
+    
+    self.coOpRulesMenu = Menu.Menu(self.engine, self.coOpRules, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
+    
+    self.multiplayerRules = [
+      (_("Face-Off Rules"), self.faceOffRulesMenu, _("Change Face-Off mode rules.")),
+      (_("Co-Op Rules"), self.coOpRulesMenu, _("Change Co-Op mode rules."))
+    ]
+    
+    self.multiplayerRulesMenu = Menu.Menu(self.engine, self.multiplayerRules, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
     
     self.basicSettings = [
       ConfigChoice(self.engine, self.engine.config, "game",  "language"),
@@ -751,10 +777,10 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(self.engine, self.engine.config, "game", "drum_sp_mode", autoApply = True),#myfingershurt
       ConfigChoice(self.engine, self.engine.config, "network",  "uploadscores", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "audio",  "delay", autoApply = True),     #myfingershurt: so a/v delay can be set without restarting FoF
+      (_("Multiplayer Rules"), self.multiplayerRulesMenu, _("Set the rules for multiplayer game modes.")),
       (_("Advanced Gameplay Settings"), self.advancedGameSettingsMenu, _("Set advanced gameplay settings that affect the game rules.")),
       (_("Vocal Mode Settings"), self.lyricsSettingsMenu, _("Change settings that affect lyrics and in-game vocals.")),
       (_("HO/PO Settings"), self.hopoSettingsMenu, _("Change settings that affect hammer-ons and pull-offs (HO/PO).")),
-      (_("Battle Settings"), self.battleSettingsMenu, _("Change settings that affect battle mode.")),
     ]
 
     self.basicSettingsMenu = Menu.Menu(self.engine, self.basicSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
@@ -960,7 +986,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "game", "HSMovement", autoApply = True), #racer
       ConfigChoice(engine, engine.config, "performance", "disable_libcount", autoApply = True, isQuickset = 1), 
       ConfigChoice(engine, engine.config, "performance", "cache_song_metadata", autoApply = True, isQuickset = 1), #stump
-      ConfigChoice(engine, engine.config, "songlist",  "nil_show_next_score", autoApply = True), #MFH
+      ConfigChoice(engine, engine.config, "setlist",  "nil_show_next_score", autoApply = True), #MFH
     ]
     self.listSettingsMenu = Menu.Menu(engine, self.listSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
     
