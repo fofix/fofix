@@ -1911,6 +1911,59 @@ class Instrument:
 
     glDisable(GL_DEPTH_TEST)
 
+  def renderHitGlow(self):
+
+   for n in range(self.strings2):
+      c = self.fretColors[n]
+      f = self.fretActivity[n]
+      w = self.boardWidth / self.strings
+      x = (self.strings / 2 - n) * w
+      size = (.22, .22)
+
+      if f and self.disableFretSFX != True:
+
+        if self.glowColor[0] == -1:
+          s = 1.0
+        else:
+          s = 0.0
+       
+        while s < 1:
+          ms = s * (math.sin(self.time) * .25 + 1)
+          if self.glowColor[0] == -2:
+            glColor3f(c[0] * (1 - ms), c[1] * (1 - ms), c[2] * (1 - ms))
+          else:
+            glColor3f(self.glowColor[0] * (1 - ms), self.glowColor[1] * (1 - ms), self.glowColor[2] * (1 - ms))
+         
+          glPushMatrix()
+          glScalef(.1 + .02 * ms * f, .1 + .02 * ms * f, .1 + .02 * ms * f)
+          glRotatef( 90, 0, 1, 0)
+          glRotatef(-90, 1, 0, 0)
+          glRotatef(-90, 0, 0, 1)
+          if self.twoDkeys == False and self.keytex == False:
+            if(self.keyMesh.find("Glow_001")) == True:
+              self.keyMesh.render("Glow_001")
+            else:
+              self.keyMesh.render()
+          glPopMatrix()
+          s += 0.2
+         
+        #Hitglow color
+        if self.hitglow_color == 0:
+          glowcol = (c[0], c[1], c[2])#Same as fret
+        elif self.hitglow_color == 1:
+          glowcol = (1, 1, 1)#Actual color in .svg-file
+
+        f += 2
+
+        if not self.isDrum and self.battleStatus[4]:
+          self.engine.draw3Dtex(self.glowDrawing, coord = (x, self.battleWhammyNow * .15, 0.01), rot = (f * 90 + self.time, 0, 1, 0),
+                              texcoord = (0.0, 0.0, 1.0, 1.0), vertex = (-size[0] * f, -size[1] * f, size[0] * f, size[1] * f),
+                              multiples = True, alpha = True, color = glowcol)
+        else:
+          self.engine.draw3Dtex(self.glowDrawing, coord = (x, 0, 0.01), rot = (f * 90 + self.time, 0, 1, 0),
+                              texcoord = (0.0, 0.0, 1.0, 1.0), vertex = (-size[0] * f, -size[1] * f, size[0] * f, size[1] * f),
+                              multiples = True, alpha = True, color = glowcol)
+
   def noteBeingHeld(self):
     noteHeld = False
     if self.isDrum:

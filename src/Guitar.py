@@ -277,6 +277,7 @@ class Guitar(Instrument):
 
         
         if self.hitFlamesPresent:   #MFH - only if present!
+          self.renderHitGlow()
           self.renderHitTrails(visibility, song, pos, controls)
           self.renderFlames(visibility, song, pos, controls)    #MFH - only when freestyle inactive!
         
