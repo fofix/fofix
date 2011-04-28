@@ -455,16 +455,29 @@ class Slide(Effect):
     if condition:
       for i in range(2):
         if self.position[i] > self.endCoord[i]:
-          self.position[i] -= self.rates[i]
+          if self.endCoord[i] < self.startCoord[i]:
+            self.position[i] -= self.rates[i]
+          else:
+            self.position[i] = self.endCoord[i]
         elif self.position[i] < self.endCoord[i]:
-          self.position[i] += self.rates[i]
+          if self.endCoord[i] > self.startCoord[i]:
+            self.position[i] += self.rates[i]
+          else:
+            self.position[i] = self.endCoord[i]
     else:
       if self.reverse:
         for i in range(2):
           if self.position[i] > self.startCoord[i]:
-            self.position[i] -= self.rates[i]
+            if self.endCoord[i] > self.startCoord[i]:
+              self.position[i] -= self.rates[i]
+            else:
+              self.position[i] = self.startCoord[i]
           elif self.position[i] < self.startCoord[i]:
-            self.position[i] += self.rates[i]
+            if self.endCoord[i] < self.startCoord[i]:
+              self.position[i] += self.rates[i]
+            else:
+              self.position[i] = self.startCoord[i]
+        
       else:  
         self.position = self.startCoord[:]
         
