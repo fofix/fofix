@@ -91,8 +91,9 @@ BASS_PART               = 2
 LEAD_PART               = 3
 DRUM_PART               = 4
 VOCAL_PART              = 5
+PRO_GUITAR_PART         = 6
 
-PART_SORT               = [0,2,3,1,4,5] # these put Lead before Rhythm in menus.
+PART_SORT               = [0,2,3,1,6,4,5] # these put Lead before Rhythm in menus.  Keep all guitar parts grouped together
 SORT_PART               = [0,3,1,2,4,5]
 
 instrumentDiff = {
@@ -128,6 +129,7 @@ parts = {
   LEAD_PART:   Part(LEAD_PART,   _("Lead")),
   DRUM_PART:   Part(DRUM_PART,   _("Drums")),
   VOCAL_PART:  Part(VOCAL_PART,  _("Vocals")),
+  PRO_GUITAR_PART: Part(PRO_GUITAR_PART, _("Pro Guitar"))
 }
 
 class Difficulty:
