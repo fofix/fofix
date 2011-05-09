@@ -36,7 +36,7 @@ import cmgl
 import numpy as np
 
 
-class Instrument:
+class Instrument(object):
   def __init__(self, engine, playerObj, player = 0):
     self.engine         = engine
 
@@ -1089,12 +1089,6 @@ class Instrument:
 
     if tailOnly:
       return
-
-    if self.isDrum:
-      self.strings        = 4
-    else:
-      self.strings        = 5
-	
 
     #myfingershurt: this should be retrieved once at init, not repeatedly in-game whenever tails are rendered.
 
