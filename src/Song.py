@@ -92,8 +92,10 @@ LEAD_PART               = 3
 DRUM_PART               = 4
 VOCAL_PART              = 5
 PRO_GUITAR_PART         = 6
+PRO_DRUM_PART           = 7
 
-PART_SORT               = [0,2,3,1,6,4,5] # these put Lead before Rhythm in menus.  Keep all guitar parts grouped together
+PART_SORT               = [0,2,3,1,6,4,7,5] # these put Lead before Rhythm in menus.
+                                            # group by instrument type
 SORT_PART               = [0,3,1,2,4,5]
 
 instrumentDiff = {
@@ -129,7 +131,8 @@ parts = {
   LEAD_PART:   Part(LEAD_PART,   _("Lead")),
   DRUM_PART:   Part(DRUM_PART,   _("Drums")),
   VOCAL_PART:  Part(VOCAL_PART,  _("Vocals")),
-  PRO_GUITAR_PART: Part(PRO_GUITAR_PART, _("Pro Guitar"))
+  PRO_GUITAR_PART: Part(PRO_GUITAR_PART, _("Pro Guitar")),
+  PRO_DRUM_PART: Part(PRO_DRUM_PART, _("Pro Drum"))
 }
 
 class Difficulty:
@@ -2189,11 +2192,11 @@ class Song(object):
         self.midiEventTracks.append([None])
       else:
         self.midiEventTracks.append([Track(self.engine) for t in range(len(difficulties))])
-        if i == parts[GUITAR_PART] or i == parts[LEAD_PART]:
+        if i == parts[GUITAR_PART] or i == parts[LEAD_PART] or i == parts[PRO_GUITAR_PART]:
           self.activeAudioTracks.append(GUITAR_TRACK)
         elif i == parts[RHYTHM_PART] or i == parts[BASS_PART]:
           self.activeAudioTracks.append(RHYTHM_TRACK)
-        elif i == parts[DRUM_PART]:
+        elif i == parts[DRUM_PART] or i == parts[PRO_DRUM_PART]:
           self.activeAudioTracks.append(DRUM_TRACK)
     
     self.vocalEventTrack   = VocalTrack(self.engine)
@@ -2563,9 +2566,39 @@ noteMap = {     # difficulty, note
   0x40: (EAS_DIF, 4),           #0x40 = 64 = E 5
 }
 
+realNoteMap = {       # difficulty, note
+  0x60: (EXP_DIF, 0), 
+  0x61: (EXP_DIF, 1), 
+  0x62: (EXP_DIF, 2), 
+  0x63: (EXP_DIF, 3), 
+  0x64: (EXP_DIF, 4), 
+  0x65: (EXP_DIF, 5),
+  0x48: (HAR_DIF, 0),
+  0x49: (HAR_DIF, 1),
+  0x4a: (HAR_DIF, 2),
+  0x4b: (HAR_DIF, 3),
+  0x4c: (HAR_DIF, 4),
+  0x4d: (HAR_DIF, 5),
+  0x30: (MED_DIF, 0),
+  0x31: (MED_DIF, 1),
+  0x32: (MED_DIF, 2),
+  0x33: (MED_DIF, 3),
+  0x34: (MED_DIF, 4),
+  0x35: (MED_DIF, 5),
+  0x18: (EAS_DIF, 0),
+  0x19: (EAS_DIF, 1),
+  0x1a: (EAS_DIF, 2),
+  0x1b: (EAS_DIF, 3),
+  0x1c: (EAS_DIF, 4),
+  0x1d: (EAS_DIF, 5),
+}
+
+
 #MFH - special note numbers
 starPowerMarkingNote = 103     #note 103 = G 8
 overDriveMarkingNote = 116     #note 116 = G#9
+hopoMarkingNotes = []
+proHopoMarkingNotes = [0x1e, 0x36, 0x4e, 0x66]
 
 freestyleMarkingNote = 124      #notes 120 - 124 = drum fills & BREs - always all 5 notes present
 
@@ -2783,11 +2816,14 @@ class MidiReader(midi.MidiOutStream):
       self.partnumber = parts[LEAD_PART]
       if self.logSections == 1:
         tempText2 = "LEAD_PART"
+    elif text == "REAL GUITAR" and parts[PRO_GUITAR_PART] in self.song.parts:
+      self.partnumber = parts[PRO_GUITAR_PART]
+      if self.logSections == 1:
+        tempText2 = "PRO_GUITAR_PART"
     elif (text == "PART DRUM" or text == "PART DRUMS") and parts[DRUM_PART] in self.song.parts:
       self.partnumber = parts[DRUM_PART]
       if self.logSections == 1:
         tempText2 = "DRUM_PART"
-    
     elif text == "PART VOCALS": # MFH 
       self.partnumber = parts[VOCAL_PART]
       self.vocalTrack = True
