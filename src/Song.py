@@ -1019,7 +1019,7 @@ class MarkerNote(Event): #MFH
 class Note(Event):
   def __init__(self, number, length, special = False, tappable = 0, star = False, finalStar = False):
     Event.__init__(self, length)
-    self.number   = number
+    self.number   = number      #keeps track of fret number
     self.played   = False
     self.special  = special
     self.tappable = tappable
@@ -1030,7 +1030,8 @@ class Note(Event):
     self.star = star
     self.finalStar = finalStar
     self.noteBpm = 0.0
-    
+    #pro-mode
+    self.lane = 0               #named lane to be vague so then it can be used in guitar and drums
     
   def __repr__(self):
     return "<#%d>" % self.number
