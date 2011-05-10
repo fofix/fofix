@@ -155,33 +155,33 @@ class ProGuitar(Guitar):
             texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
           else:
             texY = (1.0/3.0, .5)
-        elif self.starPowerActive:
-          if isTappable:
-            if self.noteAnimatedPowerActiveHOPO:
-              noteImage = self.noteAnimatedPowerActiveHOPO
-              texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
-            else:
-              texY = (5.0/6.0, 1)
+      elif self.starPowerActive:
+        if isTappable:
+          if self.noteAnimatedPowerActiveHOPO:
+            noteImage = self.noteAnimatedPowerActiveHOPO
+            texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
           else:
-            if self.noteAnimatedPowerActive:
-              noteImage = self.noteAnimatedPowerActive
-              texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
-            else:
-              texY = (2.0/3.0, 5.0/6.0)
-
+            texY = (5.0/6.0, 1)
         else:
-          if isTappable:
-            if self.noteAnimatedHOPO:
-              noteImage = self.noteAnimatedHOPO
-              texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
-            else:
-              texY = (1.0/6.0, 1.0/3.0)
+          if self.noteAnimatedPowerActive:
+            noteImage = self.noteAnimatedPowerActive
+            texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
           else:
-            if self.noteAnimatedNormal:
-              noteImage = self.noteAnimatedNormal
-              texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
-            else:
-              texY = (0, 1.0/6.0)
+            texY = (2.0/3.0, 5.0/6.0)
+
+      else:
+        if isTappable:
+          if self.noteAnimatedHOPO:
+            noteImage = self.noteAnimatedHOPO
+            texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
+          else:
+            texY = (1.0/6.0, 1.0/3.0)
+        else:
+          if self.noteAnimatedNormal:
+            noteImage = self.noteAnimatedNormal
+            texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
+          else:
+            texY = (0, 1.0/6.0)
 
       self.engine.draw3Dtex(noteImage, vertex = (-size[0],size[1],size[0],-size[1]), texcoord = (texSize[0],texY[0],texSize[1],texY[1]),
                             scale = (1,1,0), rot = (30,1,0,0), multiples = False, color = color, vertscale = .27)
