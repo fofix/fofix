@@ -2280,6 +2280,9 @@ class Instrument(object):
       if not isinstance(event, Note):
         continue
 
+      if event.length <= 120:
+        continue
+        
       if (event.noteBpm == 0.0):
         event.noteBpm = self.tempoBpm
 
@@ -2393,8 +2396,7 @@ class Instrument(object):
 
       if z + length < -1.0:
         continue
-      if event.length <= 120:
-        length = None
+      
       #crop to board edge
       if z+length > self.boardLength:
         length     = self.boardLength-z
