@@ -2395,7 +2395,10 @@ class Instrument(object):
         continue
       if event.length <= 120:
         length = None
-
+      #crop to board edge
+      if z+length > self.boardLength:
+        length     = self.boardLength-z
+      
       sustain = False
       if event.length > (1.4 * (60000.0 / event.noteBpm) / 4):
         sustain = True
