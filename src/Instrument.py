@@ -1328,11 +1328,6 @@ class Instrument(object):
     self.starNotesInView = False
     self.openStarNotesInView = False
 
-    if self.isDrum:
-      self.strings        = 4
-    else:
-      self.strings        = 5
-
     renderedNotes = reversed(self.getRequiredNotesForRender(song,pos))
     for time, event in renderedNotes:
 
@@ -1533,11 +1528,6 @@ class Instrument(object):
     num = 0
     enable = True
     self.openStarNotesInView = False
-
-    if self.isDrum:
-      self.strings        = 4
-    else:
-      self.strings        = 5
 
     renderedNotes = reversed(self.getRequiredNotesForRender(song,pos))
     for time, event in renderedNotes:
