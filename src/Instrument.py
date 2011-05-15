@@ -1438,7 +1438,7 @@ class Instrument(object):
         spNote = True
         if event.played or event.hopod:
           if event.flameCount < 1 and not self.starPowerGained:
-            if self.starPower < 50:   #not enough starpower to activate yet, kill existing drumfills
+            if self.starPower < 50 and self.isDrum:   #not enough starpower to activate yet, kill existing drumfills
               for dfEvent in self.drumFillEvents:
                 dfEvent.happened = True
             Log.debug("star power added")
