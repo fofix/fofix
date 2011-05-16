@@ -141,12 +141,24 @@ class Neck:
                            [1, 1, 1, self.vis],
                            [1, 1, 1, self.vis]], dtype=np.float32)
 
+    self.soloLightVtx1 = np.array([[w / 2-1.0, 0.4, -2],
+                                [w / 2+1.0, 0.4, -2],
+                                [w / 2-1.0, 0.4, l],
+                                [w / 2+1.0, 0.4, l]], dtype=np.float32)
+
+    self.soloLightVtx2 = np.array([[-w / 2+1.0, 0.4, -2],
+                                [-w / 2-1.0, 0.4, -2],
+                                [-w / 2+1.0, 0.4, l],
+                                [-w / 2-1.0, 0.4, l]], dtype=np.float32)
+
     # evilynux - Just in case the type has became double, convert to float32
     self.board_col = self.board_col.astype(np.float32)
     self.board_vtx = self.board_vtx.astype(np.float32)
     self.sidebars_vtx = self.sidebars_vtx.astype(np.float32)
     self.bpm_tex = self.bpm_tex.astype(np.float32)
     self.bpm_col = self.bpm_col.astype(np.float32)
+    self.soloLightVtx1 = self.soloLightVtx1.astype(np.float32)
+    self.soloLightVtx2 = self.soloLightVtx2.astype(np.float32)
     self.shader_neck_vtx = self.shader_neck_vtx.astype(np.float32)
     self.track_vtx = self.track_vtx.astype(np.float32)
 	
@@ -656,26 +668,15 @@ class Neck:
       self.sideBars.texture.bind()
     cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.sidebars_vtx, colors=board_col, texcoords=board_tex)
     glDisable(GL_TEXTURE_2D)
-    
-    if self.theme == 1:   
-      if shaders.enable("sololight"):
-        shaders.modVar("color",shaders.var["solocolor"])
-        shaders.setVar("offset",(-3.5,-w/2))
-        glBegin(GL_TRIANGLE_STRIP)
-        glVertex3f(w / 2-1.0, 0.4, -2)
-        glVertex3f(w / 2+1.0, 0.4, -2)
-        glVertex3f(w / 2-1.0, 0.4, l)
-        glVertex3f(w / 2+1.0, 0.4, l)
-        glEnd()   
-        shaders.setVar("offset",(-3.5,w/2))
-        shaders.setVar("time",shaders.time()+0.5)
-        glBegin(GL_TRIANGLE_STRIP)
-        glVertex3f(-w / 2+1.0, 0.4, -2)
-        glVertex3f(-w / 2-1.0, 0.4, -2)
-        glVertex3f(-w / 2+1.0, 0.4, l)
-        glVertex3f(-w / 2-1.0, 0.4, l)
-        glEnd()  
-        shaders.disable()
+     
+    if shaders.enable("sololight"):
+      shaders.modVar("color",shaders.var["solocolor"])
+      shaders.setVar("offset",(-3.5,-w/2))
+      cmgl.drawArrays(GL_TRIANGLE_STRIP, verticeses=self.soloLightVtx1)
+      shaders.setVar("offset",(-3.5,w/2))
+      shaders.setVar("time",shaders.time()+0.5)
+      cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.soloLightVtx2) 
+      shaders.disable()
 
   def drawBPM(self, visibility, song, pos):
     if not song:
