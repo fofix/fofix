@@ -326,15 +326,9 @@ class Neck:
     def project(beat):
       return 0.125 * beat / self.beatsPerUnit    # glorandwarf: was 0.12
 
-    v            = visibility
     w            = self.boardWidth
     l            = self.boardLength
-
-    offset = 0
-
     z  = ((time - pos) / self.currentPeriod) / self.beatsPerUnit
-
-    color = (1,1,1)
 
     glEnable(GL_TEXTURE_2D)
 
@@ -347,14 +341,14 @@ class Neck:
                             [-w / 2, 0, z + 2 + l],
                             [w / 2, 0, z + 2 + l]], dtype=np.float32)
 
-    board_tex  = np.array([[0.0, project(offset - 2 * self.beatsPerUnit)],
-                         [1.0, project(offset - 2 * self.beatsPerUnit)],
-                         [0.0, project(offset - 1 * self.beatsPerUnit)],
-                         [1.0, project(offset - 1 * self.beatsPerUnit)],
-                         [0.0, project(offset + l * self.beatsPerUnit * .7)],
-                         [1.0, project(offset + l * self.beatsPerUnit * .7)],
-                         [0.0, project(offset + l * self.beatsPerUnit)],
-                         [1.0, project(offset + l * self.beatsPerUnit)]], dtype=np.float32)
+    board_tex  = np.array([[0.0, project(-2 * self.beatsPerUnit)],
+                         [1.0, project(-2 * self.beatsPerUnit)],
+                         [0.0, project(-1 * self.beatsPerUnit)],
+                         [1.0, project(-1 * self.beatsPerUnit)],
+                         [0.0, project(l * self.beatsPerUnit * .7)],
+                         [1.0, project(l * self.beatsPerUnit * .7)],
+                         [0.0, project(l * self.beatsPerUnit)],
+                         [1.0, project(l * self.beatsPerUnit)]], dtype=np.float32)
 
     if neckTexture:
       neckTexture.texture.bind()
@@ -431,10 +425,8 @@ class Neck:
     
     def project(beat):
       return 0.125 * beat / self.beatsPerUnit    # glorandwarf: was 0.12
-    if self.instrument.starPowerActive and (self.theme == 0 or self.theme == 1):#8bit
-      color = self.engine.theme.spNoteColor #self.spColor #(.3,.7,.9)
-    else:
-      color = (1,1,1)
+
+    color = (1,1,1)
 
     v            = visibility
     l            = self.boardLength
@@ -478,8 +470,6 @@ class Neck:
       return
     
     v            = visibility
-    w            = self.boardWidth
-    l            = self.boardLength
 
     offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
 
@@ -583,8 +573,6 @@ class Neck:
     def project(beat):
       return 0.125 * beat / self.beatsPerUnit    # glorandwarf: was 0.12
 
-    v            = visibility
-    w            = self.boardWidth
     l            = self.boardLength
 
     if self.staticStrings:
@@ -635,8 +623,6 @@ class Neck:
     l            = self.boardLength
 
     offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
-
-    c = (1,1,1)
 
     board_tex  = np.array([[0.0, project(offset - 2 * self.beatsPerUnit)],
                          [1.0, project(offset - 2 * self.beatsPerUnit)],
@@ -699,15 +685,8 @@ class Neck:
 
       glPushMatrix()
       z  = ((time - pos) / self.currentPeriod) / self.beatsPerUnit
-      z2 = ((time + event.length - pos) / self.currentPeriod) / self.beatsPerUnit
       sw = 0.1 #width
 
-      if z > self.boardLength:
-        f = (self.boardLength - z) / (self.boardLength * .2)
-      elif z < 0:
-        f = min(1, max(0, 1 + z2))
-      else:
-        f = 1.0
 
 
       bpm_vtx  = np.array([[-(w / 2), 0,  z + sw],
