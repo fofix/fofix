@@ -235,7 +235,7 @@ class Credits(Layer, KeyListener):
       space,
       space,
       Text(nf, bs, c1, "center", _("Copyright 2006, 2007 by Unreal Voodoo")),
-      Text(nf, bs, c1, "center", _("Copyright 2008-2010 by Team FoFiX")),
+      Text(nf, bs, c1, "center", _("Copyright 2008-2011 by Team FoFiX")),
       space,
       space
     ])

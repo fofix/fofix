@@ -3,7 +3,7 @@
 #####################################################################
 #                                                                   #
 # Frets on Fire X                                                   #
-# Copyright (C) 2009-2010 FoFiX Team                                #
+# Copyright (C) 2009-2011 FoFiX Team                                #
 #               2006 Sami Kyöstilä                                  #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
@@ -65,7 +65,7 @@ if os.name == 'nt':
             #stump: the parameter below must consist only of up to four numerical fields separated by dots
             Version.versionNum(),
             file_description="Frets on Fire X",
-            legal_copyright=r"© 2008-2010 FoFiX Team.  GNU GPL v2 or later.",
+            legal_copyright=r"© 2008-2011 FoFiX Team.  GNU GPL v2 or later.",
             company_name="FoFiX Team",
             internal_name="FoFiX.exe",
             original_filename="FoFiX.exe",
@@ -188,7 +188,7 @@ options['py2app'].update({
   'plist': {
     'CFBundleIdentifier': 'org.pythonmac.FoFiX.FretsonFire',
     'CFBundleSignature': 'FoFX',
-    'NSHumanReadableCopyright': u"\xa9 2008-2010 FoFiX Team.  GNU GPL v2 or later.",
+    'NSHumanReadableCopyright': u"\xa9 2008-2011 FoFiX Team.  GNU GPL v2 or later.",
   }
 })
 

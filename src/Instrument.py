@@ -36,7 +36,7 @@ import cmgl
 import numpy as np
 
 
-class Instrument:
+class Instrument(object):
   def __init__(self, engine, playerObj, player = 0):
     self.engine         = engine
 
@@ -1085,19 +1085,10 @@ class Instrument:
       notes = self.getDoubleNotes(notes)
     return notes
 
-  def renderNote(self, length, sustain, color, flat = False, tailOnly = False, isTappable = False, fret = 0, spNote = False, isOpen = False, spAct = False):
-
-    if flat:
-      glScalef(1, .1, 1)
+  def renderNote(self, length, sustain, color, tailOnly = False, isTappable = False, fret = 0, spNote = False, isOpen = False, spAct = False):
 
     if tailOnly:
       return
-
-    if self.isDrum:
-      self.strings        = 4
-    else:
-      self.strings        = 5
-	
 
     #myfingershurt: this should be retrieved once at init, not repeatedly in-game whenever tails are rendered.
 
@@ -1337,11 +1328,6 @@ class Instrument:
     self.starNotesInView = False
     self.openStarNotesInView = False
 
-    if self.isDrum:
-      self.strings        = 4
-    else:
-      self.strings        = 5
-
     renderedNotes = reversed(self.getRequiredNotesForRender(song,pos))
     for time, event in renderedNotes:
 
@@ -1423,7 +1409,6 @@ class Instrument:
         else:
           length     = 0
 
-      flat       = False
       tailOnly   = False
       spNote = False
 
@@ -1448,7 +1433,7 @@ class Instrument:
         spNote = True
         if event.played or event.hopod:
           if event.flameCount < 1 and not self.starPowerGained:
-            if self.starPower < 50:   #not enough starpower to activate yet, kill existing drumfills
+            if self.starPower < 50 and self.isDrum:   #not enough starpower to activate yet, kill existing drumfills
               for dfEvent in self.drumFillEvents:
                 dfEvent.happened = True
             Log.debug("star power added")
@@ -1474,44 +1459,25 @@ class Instrument:
       else:
         isTappable = True
 
-      if self.notedisappear == 0:#Notes keep on going when missed
-        if event.played or event.hopod:#if the note isnt missed
-          tailOnly = True
-          length += z
-          z = 0
-          if length <= 0:
-            continue
-        if z < 0 and not (event.played or event.hopod):#if the note is missed 
-          color = (.6, .6, .6, .5 * visibility * f)
-          flat  = False
-      elif self.notedisappear == 1:#Notes disappear when missed
-        if z < 0:#if note past frets
-          if event.played or event.hopod:#if note was hit
-            tailOnly = True
-            length += z
-            z = 0
-            if length <= 0:
-              continue
-          else:#note missed
-            color = (.6, .6, .6, .5 * visibility * f)
-            flat  = False
-      if self.notedisappear == 2:#turn red when missed
-        if event.played or event.hopod:  #if the note isnt missed
-          tailOnly = True
-          length += z
-          z = 0
-          if length <= 0:
-            continue
-        if z < 0 and not (event.played or event.hopod): #if the note is missed 
+
+      if (event.played or event.hopod): #if the note is hit
+         continue
+
+      elif z < 0: #Notes past frets
+        #if none of the below they keep on going, it would be self.notedisappear == 1
+        if self.notedisappear == 0: #Notes disappear
+          continue
+
+        elif self.notedisappear == 2: #Notes turn red
           color = (1, 0, 0, 1)#turn note red
-          flat  = False
+
 
       if self.isDrum:
         sustain = False
 
         glPushMatrix()
         glTranslatef(x, 0, z)
-        self.renderNote(length, sustain = sustain, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote, isOpen = isOpen)
+        self.renderNote(length, sustain = sustain, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote, isOpen = isOpen)
         glPopMatrix()
       else:
         if z + length < -1.0:
@@ -1534,7 +1500,7 @@ class Instrument:
         else:
           renderNote = 0
         if renderNote == 0:
-          self.renderNote(length, sustain = sustain, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote)
+          self.renderNote(length, sustain = sustain, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote)
         glPopMatrix()
 
     #myfingershurt: end FOR loop / note rendering loop       
@@ -1562,11 +1528,6 @@ class Instrument:
     num = 0
     enable = True
     self.openStarNotesInView = False
-
-    if self.isDrum:
-      self.strings        = 4
-    else:
-      self.strings        = 5
 
     renderedNotes = reversed(self.getRequiredNotesForRender(song,pos))
     for time, event in renderedNotes:
@@ -1631,7 +1592,6 @@ class Instrument:
 
       length     = 0
 
-      flat       = False
       tailOnly   = False
       spNote = False
 
@@ -1670,25 +1630,25 @@ class Instrument:
 
 
       isTappable = False
-      if (event.played or event.hopod):
-        continue
-      if self.notedisappear == 0:#Notes keep on going when missed
-        if z < 0 and not (event.played or event.hopod):#if the note is missed 
-          color = (.6, .6, .6, .5 * visibility * f)
-          flat  = False 
-      elif self.notedisappear == 1:#Notes disappear when missed
-        if z < 0 and not (event.played or event.hopod):
-              continue
-      if self.notedisappear == 2:#turn red when missed
-        if z < 0 and not (event.played or event.hopod): #if the note is missed 
+
+
+      if (event.played or event.hopod): #if the note is hit
+         continue
+
+      elif z < 0: #Notes past frets
+        #if none of the below they keep on going, it would be self.notedisappear == 1
+        if self.notedisappear == 0: #Notes disappear
+          continue
+
+        elif self.notedisappear == 2: #Notes turn red
           color = (1, 0, 0, 1)#turn note red
-          flat  = False
+
 
       sustain = False
 
       glPushMatrix()
       glTranslatef(x, 0, z)
-      self.renderNote(length, sustain = sustain, color = color, flat = flat, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote, isOpen = isOpen)
+      self.renderNote(length, sustain = sustain, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote, isOpen = isOpen)
       glPopMatrix()
 
     #myfingershurt: end FOR loop / note rendering loop       
@@ -1935,6 +1895,59 @@ class Instrument:
 
     glDisable(GL_DEPTH_TEST)
 
+  def renderHitGlow(self):
+
+   for n in range(self.strings2):
+      c = self.fretColors[n]
+      f = self.fretActivity[n]
+      w = self.boardWidth / self.strings
+      x = (self.strings / 2 - n) * w
+      size = (.22, .22)
+
+      if f and self.disableFretSFX != True:
+
+        if self.glowColor[0] == -1:
+          s = 1.0
+        else:
+          s = 0.0
+       
+        while s < 1:
+          ms = s * (math.sin(self.time) * .25 + 1)
+          if self.glowColor[0] == -2:
+            glColor3f(c[0] * (1 - ms), c[1] * (1 - ms), c[2] * (1 - ms))
+          else:
+            glColor3f(self.glowColor[0] * (1 - ms), self.glowColor[1] * (1 - ms), self.glowColor[2] * (1 - ms))
+         
+          glPushMatrix()
+          glScalef(.1 + .02 * ms * f, .1 + .02 * ms * f, .1 + .02 * ms * f)
+          glRotatef( 90, 0, 1, 0)
+          glRotatef(-90, 1, 0, 0)
+          glRotatef(-90, 0, 0, 1)
+          if self.twoDkeys == False and self.keytex == False:
+            if(self.keyMesh.find("Glow_001")) == True:
+              self.keyMesh.render("Glow_001")
+            else:
+              self.keyMesh.render()
+          glPopMatrix()
+          s += 0.2
+         
+        #Hitglow color
+        if self.hitglow_color == 0:
+          glowcol = (c[0], c[1], c[2])#Same as fret
+        elif self.hitglow_color == 1:
+          glowcol = (1, 1, 1)#Actual color in .svg-file
+
+        f += 2
+
+        if not self.isDrum and self.battleStatus[4]:
+          self.engine.draw3Dtex(self.glowDrawing, coord = (x, self.battleWhammyNow * .15, 0.01), rot = (f * 90 + self.time, 0, 1, 0),
+                              texcoord = (0.0, 0.0, 1.0, 1.0), vertex = (-size[0] * f, -size[1] * f, size[0] * f, size[1] * f),
+                              multiples = True, alpha = True, color = glowcol)
+        else:
+          self.engine.draw3Dtex(self.glowDrawing, coord = (x, 0, 0.01), rot = (f * 90 + self.time, 0, 1, 0),
+                              texcoord = (0.0, 0.0, 1.0, 1.0), vertex = (-size[0] * f, -size[1] * f, size[0] * f, size[1] * f),
+                              multiples = True, alpha = True, color = glowcol)
+
   def noteBeingHeld(self):
     noteHeld = False
     if self.isDrum:
@@ -1953,7 +1966,7 @@ class Instrument:
         possible = True
     return possible
 
-  def renderTail(self, song, length, sustain, kill, color, tailOnly = False, isTappable = False, big = False, fret = 0, freestyleTail = 0, pos = 0):
+  def renderTail(self, song, length, sustain, kill, color, tailOnly = False, isTappable = False, big = False, fret = 0, spNote = False, freestyleTail = 0, pos = 0):
 
     #volshebnyi - if freestyleTail == 0, act normally.
     #  if freestyleTail == 1, render an freestyle tail
@@ -1966,13 +1979,21 @@ class Instrument:
 
     self.tailSpeed      = self.engine.theme.noteTailSpeedMulti
 
-    if not self.simpleTails:#Tail image Colors no coloring of the images
+
+
+
+    if not self.simpleTails: #Seperate Tail images dont color the images
       tailcol = (1,1,1,1)
-    else:
-      if big == False and tailOnly == True:
-        tailcol = (.6, .6, .6, color[3])
-      else:
-        tailcol = (color)
+
+    elif spNote == True: #Power colored
+      tailcol = (self.spColor)
+
+    elif big == False and tailOnly == True: #grey because the note was missed
+      tailcol = (.6, .6, .6, color[3])
+
+    else: #normal colors
+      tailcol = (color)
+	  
 
     if length > self.boardLength:
       s = self.boardLength
@@ -1984,7 +2005,6 @@ class Instrument:
     if kill and big == True:
       kEffect = ( math.sin( pos / 50 ) + 1 ) /2
       size = ((0.02 + (kEffect * 0.182) * 2), s)
-      print size
 
       c = [self.killColor[0],self.killColor[1],self.killColor[2]]
       if c != [0,0,0]:
@@ -2250,6 +2270,9 @@ class Instrument:
       if not isinstance(event, Note):
         continue
 
+      if event.length <= 120:
+        continue
+        
       if (event.noteBpm == 0.0):
         event.noteBpm = self.tempoBpm
 
@@ -2363,9 +2386,11 @@ class Instrument:
 
       if z + length < -1.0:
         continue
-      if event.length <= 120:
-        length = None
-
+      
+      #crop to board edge
+      if z+length > self.boardLength:
+        length     = self.boardLength-z
+      
       sustain = False
       if event.length > (1.4 * (60000.0 / event.noteBpm) / 4):
         sustain = True
@@ -2380,9 +2405,9 @@ class Instrument:
       if renderNote == 0:  
         if big == True and num < self.bigMax:
           num += 1
-          self.renderTail(song, length, sustain = sustain, kill = killswitch, color = color, tailOnly = tailOnly, isTappable = isTappable, big = True, fret = event.number, pos = pos)
+          self.renderTail(song, length, sustain = sustain, kill = killswitch, color = color, tailOnly = tailOnly, isTappable = isTappable, big = True, fret = event.number, spNote = spNote, pos = pos)
         else:
-          self.renderTail(song, length, sustain = sustain, kill = killswitch, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, pos = pos)
+          self.renderTail(song, length, sustain = sustain, kill = killswitch, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote, pos = pos)
 
       glPopMatrix()
   

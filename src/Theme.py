@@ -180,9 +180,6 @@ class Theme(Task):
 
     #Render necks toggle
     self.doNecksRender = (get("render_necks", bool, True))
-
-    #Fade settings for fretboard
-    self.boardFade = (get("fretboard_fade_amount", float, 1))
 	
 	#fretboard intro animation
     self.povIntroAnimation = (get("fretboard_intro_animation", str, "fofix"))

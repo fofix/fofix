@@ -117,6 +117,7 @@ class MainMenu(BackgroundLayer):
       self.version = None
 
     #myfingershurt: random main menu music function, menu.ogg and menuXX.ogg (any filename with "menu" as the first 4 letters)
+    self.files = None
     filepath = self.engine.getPath(os.path.join("themes",self.themename,"sounds"))
     if os.path.isdir(filepath):
       self.files = []
@@ -127,16 +128,16 @@ class MainMenu(BackgroundLayer):
             self.files.append(name)
       
   
-      if self.files:
-        i = random.randint(0,len(self.files)-1)
-        filename = self.files[i]
-        sound = os.path.join("themes",self.themename,"sounds",filename)
-        self.menumusic = True
-        engine.menuMusic = True
-  
-        self.song = Audio.Music(self.engine.resource.fileName(sound))
-        self.song.setVolume(self.engine.config.get("audio", "menu_volume"))
-        self.song.play(0)  #no loop
+    if self.files:
+      i = random.randint(0,len(self.files)-1)
+      filename = self.files[i]
+      sound = os.path.join("themes",self.themename,"sounds",filename)
+      self.menumusic = True
+      engine.menuMusic = True
+
+      self.song = Audio.Music(self.engine.resource.fileName(sound))
+      self.song.setVolume(self.engine.config.get("audio", "menu_volume"))
+      self.song.play(0)  #no loop
     else:
       self.menumusic = False
 
