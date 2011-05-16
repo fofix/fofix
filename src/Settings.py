@@ -685,13 +685,6 @@ class SettingsMenu(Menu.Menu):
     ]
     self.stagesOptionsMenu = Menu.Menu(self.engine, self.stagesOptions, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
     
-    self.hopoSettings = [
-       ConfigChoice(self.engine, self.engine.config, "game", "hopo_system", autoApply = True),      #myfingershurt
-       ConfigChoice(self.engine, self.engine.config, "game", "song_hopo_freq", autoApply = True),      #myfingershurt
-       ConfigChoice(self.engine, self.engine.config, "game", "hopo_after_chord", autoApply = True),      #myfingershurt
-    ]
-    self.hopoSettingsMenu = Menu.Menu(self.engine, self.hopoSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
-    
     self.lyricsSettings = [
        ConfigChoice(self.engine, self.engine.config, "game", "midi_lyric_mode", autoApply = True, isQuickset = 1),      #myfingershurt
        ConfigChoice(self.engine, self.engine.config, "game", "vocal_scroll", autoApply = True, isQuickset = 1),      #akedrou
@@ -712,12 +705,14 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(self.engine, self.engine.config, "game", "mark_solo_sections", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "game", "lphrases", autoApply = True),#blazingamer
       ConfigChoice(self.engine, self.engine.config, "game", "decimal_places", autoApply = True), #MFH
-      ConfigChoice(self.engine, self.engine.config, "game", "ignore_open_strums", autoApply = True),      #myfingershurt
       ConfigChoice(self.engine, self.engine.config, "game", "big_rock_endings", autoApply = True, isQuickset = 2),#myfingershurt
       ConfigChoice(self.engine, self.engine.config, "game", "starpower_mode", autoApply = True),#myfingershurt
       ConfigChoice(self.engine, self.engine.config, "game", "party_time", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "game", "keep_play_count", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "game", "lost_focus_pause", autoApply = True),
+      ConfigChoice(self.engine, self.engine.config, "game", "hopo_system", autoApply = True),      #myfingershurt
+      ConfigChoice(self.engine, self.engine.config, "game", "song_hopo_freq", autoApply = True),      #myfingershurt
+      ConfigChoice(self.engine, self.engine.config, "game", "hopo_after_chord", autoApply = True),      #myfingershurt
     ]
     self.advancedGameSettingsMenu = Menu.Menu(self.engine, self.advancedGameSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
     
@@ -736,7 +731,6 @@ class SettingsMenu(Menu.Menu):
     self.battleObjectSettingsMenu = Menu.Menu(self.engine, self.battleObjectSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
     
     self.faceOffRules = [
-      ConfigChoice(engine, engine.config, "rules", "face_off_style", autoApply = True),
       ConfigChoice(engine, engine.config, "rules", "face_off_score", autoApply = True),
       ConfigChoice(engine, engine.config, "rules", "face_off_handicap", autoApply = True),
       ConfigChoice(engine, engine.config, "rules", "face_off_bonus", autoApply = True),
@@ -761,8 +755,8 @@ class SettingsMenu(Menu.Menu):
     self.coOpRulesMenu = Menu.Menu(self.engine, self.coOpRules, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
     
     self.multiplayerRules = [
-      (_("Face-Off Rules"), self.faceOffRulesMenu, _("Change Face-Off mode rules.")),
-      (_("Co-Op Rules"), self.coOpRulesMenu, _("Change Co-Op mode rules."))
+      (_("Face-Off Rules"), self.faceOffRulesMenu, _("Change default Face-Off and Head-to-Head mode rules.")),
+      (_("Co-Op Rules"), self.coOpRulesMenu, _("Change default Co-Op mode rules."))
     ]
     
     self.multiplayerRulesMenu = Menu.Menu(self.engine, self.multiplayerRules, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
@@ -780,7 +774,6 @@ class SettingsMenu(Menu.Menu):
       (_("Multiplayer Rules"), self.multiplayerRulesMenu, _("Set the rules for multiplayer game modes.")),
       (_("Advanced Gameplay Settings"), self.advancedGameSettingsMenu, _("Set advanced gameplay settings that affect the game rules.")),
       (_("Vocal Mode Settings"), self.lyricsSettingsMenu, _("Change settings that affect lyrics and in-game vocals.")),
-      (_("HO/PO Settings"), self.hopoSettingsMenu, _("Change settings that affect hammer-ons and pull-offs (HO/PO).")),
     ]
 
     self.basicSettingsMenu = Menu.Menu(self.engine, self.basicSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
@@ -1189,10 +1182,54 @@ class BasicSettingsMenu(Menu.Menu):
       self.modSettingsMenu = Menu.Menu(self.engine, self.modSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
     else:
       self.modSettingsMenu = self.modSettings
+
+    self.battleObjectSettings = [
+      ConfigChoice(engine, engine.config, "game", "battle_Whammy", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "battle_Diff_Up", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "battle_String_Break", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "battle_Double", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "battle_Death_Drain", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "battle_Amp_Overload", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "battle_Switch_Controls", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "battle_Steal", autoApply = True),
+      ConfigChoice(engine, engine.config, "game", "battle_Tune", autoApply = True),
+    ]
     
+    self.battleObjectSettingsMenu = Menu.Menu(self.engine, self.battleObjectSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
+    
+    self.faceOffRules = [
+      ConfigChoice(engine, engine.config, "rules", "face_off_score", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "face_off_handicap", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "face_off_bonus", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "face_off_black", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "face_off_fail", autoApply = True),
+      (_("Battle Weapons"), self.battleObjectSettingsMenu, _("Change which weapons are available in battle."))
+    ]
+    
+    self.faceOffRulesMenu = Menu.Menu(self.engine, self.faceOffRules, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
+    
+    self.coOpRules = [
+      ConfigChoice(engine, engine.config, "rules", "coop_rockmeter", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "coop_mult", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "coop_bonus_activate", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "coop_bonus_mult", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "coop_unison", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "coop_fail", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "coop_save_chances", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "coop_fail_drag", autoApply = True),
+    ]
+    
+    self.coOpRulesMenu = Menu.Menu(self.engine, self.coOpRules, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
+    
+    self.multiplayerRules = [
+      (_("Face-Off Rules"), self.faceOffRulesMenu, _("Change default Face-Off and Head-to-Head mode rules.")),
+      (_("Co-Op Rules"), self.coOpRulesMenu, _("Change default Co-Op mode rules."))
+    ]
+    
+    self.multiplayerRulesMenu = Menu.Menu(self.engine, self.multiplayerRules, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
+          
     FoFiXBasicSettings = [
       ConfigChoice(engine, engine.config, "game",  "language"),
-      ConfigChoice(engine, engine.config, "game", "T_sound", autoApply = True), #Faaa Drum sound
       ConfigChoice(engine, engine.config, "game", "star_scoring", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "career_star_min", autoApply = True), #akedrou
       ConfigChoice(engine, engine.config, "game", "resume_countdown", autoApply = True), #akedrou
@@ -1200,6 +1237,7 @@ class BasicSettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "game", "drum_sp_mode", autoApply = True),#myfingershurt
       ConfigChoice(engine, engine.config, "network",  "uploadscores", autoApply = True),
       ConfigChoice(engine, engine.config, "audio",  "delay", autoApply = True),     #myfingershurt: so a/v delay can be set without restarting FoF
+      (_("Multiplayer Rules"), self.multiplayerRulesMenu, _("Set the rules for multiplayer game modes.")),
     ]
     FoFiXBasicSettingsMenu = Menu.Menu(engine, FoFiXBasicSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
     

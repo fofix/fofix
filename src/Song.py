@@ -1596,7 +1596,7 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
     Track.__init__(self, engine)
     self.chordFudge = 1
 
-    self.hopoTick = engine.config.get("coffee", "hopo_frequency")
+    self.hopoTick = engine.world.hopoFrequency
     self.songHopoFreq = engine.config.get("game", "song_hopo_freq")
     self.logTempoEvents = engine.config.get("log",   "log_tempo_events")
 

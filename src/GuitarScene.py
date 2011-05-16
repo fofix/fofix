@@ -282,7 +282,7 @@ class GuitarScene(Scene):
       
     self.battleJurgMissTime = [0 for i in self.playerList]
 
-    self.whammySavesSP = self.engine.config.get("game", "whammy_saves_starpower") #MFH
+    self.whammySavesSP = self.engine.world.whammySavesSP
     self.failingEnabled = self.engine.config.get("coffee", "failingEnabled")
 
     self.timeLeft = None
@@ -596,7 +596,6 @@ class GuitarScene(Scene):
     self.numDecimalPlaces = self.engine.config.get("game","decimal_places")
     self.roundDecimalForDisplay = lambda n: ('%%.%df' % self.numDecimalPlaces) % float(n)  #stump
     self.starScoring = self.engine.config.get("game", "star_scoring")#MFH
-    self.ignoreOpenStrums = self.engine.config.get("game", "ignore_open_strums") #MFH
     self.muteSustainReleases = self.engine.config.get("game", "sustain_muting") #MFH
     self.hopoIndicatorEnabled = self.engine.config.get("game", "hopo_indicator") #MFH
     self.fontShadowing = self.engine.config.get("game", "in_game_font_shadowing") #MFH
@@ -616,7 +615,7 @@ class GuitarScene(Scene):
       Dialogs.showMessage(self.engine, "Pitchbend module not found!  Forcing Killswitch effect.")
       self.whammyEffect = 0
     shaders.var["whammy"] = self.whammyEffect
-    self.bigRockEndings = self.engine.config.get("game", "big_rock_endings")
+    self.bigRockEndings = self.engine.world.bigRockEndings
     self.showFreestyleActive = self.engine.config.get("debug",   "show_freestyle_active")
     self.showBpm = self.engine.config.get("debug",   "show_bpm")    #MFH
 
@@ -834,7 +833,7 @@ class GuitarScene(Scene):
 
     self.playerList[0].hopoFreq = self.song.info.hopofreq
     
-    bassGrooveEnableSet = self.engine.config.get("game", "bass_groove_enable")
+    bassGrooveEnableSet = self.engine.world.bassGroove
     if bassGrooveEnableSet == 1 and self.theme == 2:
       self.bassGrooveEnabled = True
     elif bassGrooveEnableSet == 2 and self.song.midiStyle == Song.MIDI_TYPE_RB:
@@ -870,7 +869,7 @@ class GuitarScene(Scene):
     #MFH - handle early hit window automatic type determination, and how it compares to the forced handicap if not auto
     self.effectiveEarlyHitWindow = Song.EARLY_HIT_WINDOW_HALF
     self.automaticEarlyHitWindow = Song.EARLY_HIT_WINDOW_HALF
-    self.forceEarlyHitWindowSetting = self.engine.config.get("handicap",   "early_hit_window")
+    self.forceEarlyHitWindowSetting = self.engine.world.earlyHitWindow
     if self.song.info.early_hit_window_size:
       Log.debug("song.ini setting found specifying early_hit_window_size - %s" % self.song.info.early_hit_window_size)
       if self.song.info.early_hit_window_size.lower() == "none":
@@ -1737,7 +1736,7 @@ class GuitarScene(Scene):
       self.engine.view.popLayer(self.stage.vidPlayer)
 
   def getHandicap(self):
-    hopoFreq = self.engine.config.get("coffee", "hopo_frequency")
+    hopoFreq = self.engine.world.hopoFrequency
     try:
       songHopo = int(self.song.info.hopofreq)
     except Exception, e:
@@ -1921,7 +1920,7 @@ class GuitarScene(Scene):
       self.jurg[1] = True
 
     self.hopoStyle        = self.engine.config.get("game", "hopo_system")
-    self.gh2sloppy        = self.engine.config.get("game", "gh2_sloppy")
+    self.gh2sloppy        = self.engine.world.sloppyMode
     self.allTaps          = 0
     self.autoKickBass     = [0 for i in self.playerList]
     if self.gh2sloppy == 1:
@@ -5011,8 +5010,6 @@ class GuitarScene(Scene):
 
     activeList = [k for k in self.keysList[pressed] if self.controls.getState(k)]
 
-    if self.ignoreOpenStrums and len(activeList) < 1:   #MFH - filter out strums without frets
-      pressed = -1
 
     for i in range(self.numOfPlayers): #akedrou- probably loopable...
       if control in self.instruments[i].keys and numpressed[i] >= 1:

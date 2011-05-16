@@ -46,13 +46,14 @@ class World:
     self.done         = False
     self.startPos     = 0.0
     self.setGameName()
+    self.setDefaultRules()
   
   def setGameName(self):
     if self.multiplayer:
       if self.multiplayer == FACEOFF:
         self.gameName = _("Face-Off")
       elif self.multiplayer == SKILL:
-        self.gameName = _("Pro Face-Off")
+        self.gameName = _("Head-to-Head")
       elif self.multiplayer == COOP:
         if self.gameMode == TOUR:
           self.gameName = _("Co-Op Tour")
@@ -65,6 +66,18 @@ class World:
         self.gameName = _("Practice")
       elif self.gameMode == TOUR:
         self.gameName = _("Career Mode")
+  
+  def setDefaultRules(self):
+    #Default rules are here. Rules can be changed on a one-time basis in the lobby.
+    #Try to keep this list short.
+    self.bigRockEndings = self.engine.config.get("game", "big_rock_endings")
+    self.spRefill = self.engine.config.get("game","sp_notes_while_active")
+    self.whammySavesSP = self.engine.config.get("game","whammy_saves_starpower")
+    self.bassGroove = self.engine.config.get("game","bass_groove_enable")
+    self.noteHitWindow = self.engine.config.get("game","note_hit_window")
+    self.earlyHitWindow = self.engine.config.get("handicap","early_hit_window")
+    self.sloppyMode = self.engine.config.get("game","gh2_sloppy")
+    self.hopoFrequency = self.engine.config.get("game","hopo_frequency")
   
   def finishGame(self):
     if self.done:

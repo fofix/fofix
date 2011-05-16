@@ -205,7 +205,7 @@ class Instrument:
     #... so for now, I'm just writing some extra code here for the early hitwindow size handicap.
     self.earlyHitWindowSizeFactor = 0.5
 
-    self.hitw = self.engine.config.get("game", "note_hit_window")  #this should be global, not retrieved every BPM change.
+    self.hitw = self.engine.world.noteHitWindow  #this should be global, not retrieved every BPM change.
     if self.hitw == 0: 
       self.hitw = 2.3
     elif self.hitw == 1: 
@@ -252,7 +252,7 @@ class Instrument:
     #now theme determination logic is only in data.py:
     self.theme = self.engine.data.theme
 
-    self.spRefillMode = self.engine.config.get("game","sp_notes_while_active")
+    self.spRefillMode = self.engine.world.spRefill
     self.hitglow_color = self.engine.config.get("video", "hitglow_color") #this should be global, not retrieved every fret render.
 
     #check if BRE enabled

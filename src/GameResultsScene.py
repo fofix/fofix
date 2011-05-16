@@ -251,7 +251,7 @@ class GameResultsScene(Scene):
       self.skipCheats = True
     
     self.hopoStyle = self.engine.config.get("game", "hopo_system")
-    gh2sloppy      = self.engine.config.get("game", "gh2_sloppy")
+    gh2sloppy      = self.engine.world.sloppyMode
     if gh2sloppy == 1:
       self.hopoStyle = _("GH2 Sloppy")
     elif self.hopoStyle == 0:
@@ -265,10 +265,10 @@ class GameResultsScene(Scene):
     else:
       self.hopoStyle = _("New System")
     
-    self.hopoFreq   = self.engine.config.get("coffee", "hopo_frequency")
+    self.hopoFreq   = self.engine.world.hopoFrequency
     useSongHopoFreq = self.engine.config.get("game", "song_hopo_freq")
     songHopoFreq    = self.playerList[0].hopoFreq
-    noteHitWindow   = self.engine.config.get("game", "note_hit_window")
+    noteHitWindow   = self.engine.world.noteHitWindow
     try:
       songHopoFreq  = abs(int(songHopoFreq))
     except Exception, e:
