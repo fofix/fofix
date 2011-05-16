@@ -49,7 +49,6 @@ class Lobby(Layer, KeyListener):
     self.engine         = engine
     self.minPlayers     = self.engine.world.minPlayers
     self.maxPlayers     = self.engine.world.maxPlayers
-    self.tutorial       = self.engine.world.tutorial
     self.time           = 0.0
     self.keyControl     = 0
     self.keyGrab        = False
@@ -58,16 +57,18 @@ class Lobby(Layer, KeyListener):
     self.delay          = [0,0,0,0]
     self.scroller       = [0, self.scrollUp, self.scrollDown]
     self.gameStarted    = False
-    self.done           = True
-    self.active         = False
-    self.blockedItems   = [1]
-    self.selectedItems  = []
-    self.blockedPlayers = []
-    self.selectedPlayers = []
+    self.showLobby      = True  #give the Lobby visibility if it does not have it.
+    self.inputInit      = False #has Lobby initialized its inputs?
+    self.blockedItems   = [1] #items that cannot be selected - start with the separator.
+    self.selectedItems  = []  #items that have been selected - so as to prevent repeats.
+    self.blockedPlayers = []  #players that cannot select (ie, are not in the game)
+    self.selectedPlayers = [] #players that have selected
     self.playerList     = [None for i in range(4)]
     self.fullView     = self.engine.view.geometry[2:4]
     self.music        = True
     self.creator      = CreateCharacter(self.engine)
+    
+    self.abort = False #Quit the Lobby for the MainMenu.
     
     #key vars
     self.fontDict         = self.engine.data.fontDict
@@ -79,6 +80,7 @@ class Lobby(Layer, KeyListener):
     
     self.gameModeText = self.engine.world.gameName
     
+    #controllers are initialized; set the keys that will trigger menu actions.
     self.yes        = []
     self.no         = []
     self.conf       = []
@@ -123,7 +125,7 @@ class Lobby(Layer, KeyListener):
     
     if 4 - len(self.blockedPlayers) < self.minPlayers:
       Dialogs.showMessage(self.engine, _("Your controls are not properly set up for this mode. Please check your settings."))
-      #FIXME: Go back to the main menu (or the control menu) without screwing up the layers.
+      self.abort = True
     self.engine.input.activeGameControls = [i for i in range(4) if i not in self.blockedPlayers]
     self.engine.input.pluginControls()
     self.panelOrder = range(4)
@@ -282,7 +284,7 @@ class Lobby(Layer, KeyListener):
         self.pos[num] = (self.selected[num], self.selected[num]+self.screenOptions)
   
   def keyPressed(self, key, unicode):
-    if not self.active:
+    if not self.inputInit:
       return
     if self.gameStarted:
       return True
@@ -324,7 +326,7 @@ class Lobby(Layer, KeyListener):
           self.music = False
           self.engine.mainMenu.cutMusic()
           self.preparePlayers()
-          if self.tutorial:
+          if self.engine.world.tutorial:
             self.engine.world.startGame(libraryName = Song.DEFAULT_LIBRARY, songName = "tutorial")
             self.handleGameStarted()
           else:
@@ -334,7 +336,7 @@ class Lobby(Layer, KeyListener):
       self.engine.data.acceptSound.play()
       self.scrolling[i] = 0
       if self.selected[i] == 0:
-        self.done = False
+        self.showLobby = False
         self.creator.loadPlayer(i)
         self.engine.view.pushLayer(self.creator)
       elif self.selected > 1:
@@ -383,7 +385,7 @@ class Lobby(Layer, KeyListener):
     elif (c in self.conf or key in [pygame.K_LCTRL, pygame.K_RCTRL]):
       self.engine.data.acceptSound.play()
       self.creator.loadPlayer(i, self.options[self.selected[i]])
-      self.done = False
+      self.showLobby = False
       self.engine.view.pushLayer(self.creator)
       return True
     elif c in self.up + [Player.playerkeys[self.playerNum][Player.UP]] or key == pygame.K_UP:
@@ -415,6 +417,8 @@ class Lobby(Layer, KeyListener):
 
   def run(self, ticks):
     self.time += ticks / 50.0
+    if self.abort:
+      self.engine.view.popLayer(self)
     for i in range(4):
       if self.scrolling[i] > 0:
         self.delay[i] -= ticks
@@ -428,12 +432,12 @@ class Lobby(Layer, KeyListener):
   
   def render(self, visibility, topMost):
     if not visibility:
-      self.active = False
+      self.inputInit = False
       return
-    if not self.active:
+    if not self.inputInit:
       self.getPlayers()
-    self.active = True
-    self.done   = True
+    self.inputInit = True
+    self.showLobby = True
     if self.playerNum >= self.maxPlayers:
       return
     with self.engine.view.orthogonalProjection(normalize = True):
