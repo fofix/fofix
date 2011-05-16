@@ -672,7 +672,7 @@ class Neck:
     if shaders.enable("sololight"):
       shaders.modVar("color",shaders.var["solocolor"])
       shaders.setVar("offset",(-3.5,-w/2))
-      cmgl.drawArrays(GL_TRIANGLE_STRIP, verticeses=self.soloLightVtx1)
+      cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.soloLightVtx1)
       shaders.setVar("offset",(-3.5,w/2))
       shaders.setVar("time",shaders.time()+0.5)
       cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.soloLightVtx2) 
