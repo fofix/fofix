@@ -317,24 +317,18 @@ class Neck:
     self.ocount = 0
     self.paused = False
 
+  def project(self, beat):
+    return 0.125 * beat / self.beatsPerUnit    # glorandwarf: was 0.12
+
   def renderIncomingNeck(self, visibility, song, pos, time, neckTexture):   #MFH - attempt to "scroll" an incoming guitar solo neck towards the player
     if not song:
       return
     if not song.readyToGo:
       return
-    
-    def project(beat):
-      return 0.125 * beat / self.beatsPerUnit    # glorandwarf: was 0.12
 
-    v            = visibility
     w            = self.boardWidth
     l            = self.boardLength
-
-    offset = 0
-
     z  = ((time - pos) / self.currentPeriod) / self.beatsPerUnit
-
-    color = (1,1,1)
 
     glEnable(GL_TEXTURE_2D)
 
@@ -347,14 +341,14 @@ class Neck:
                             [-w / 2, 0, z + 2 + l],
                             [w / 2, 0, z + 2 + l]], dtype=np.float32)
 
-    board_tex  = np.array([[0.0, project(offset - 2 * self.beatsPerUnit)],
-                         [1.0, project(offset - 2 * self.beatsPerUnit)],
-                         [0.0, project(offset - 1 * self.beatsPerUnit)],
-                         [1.0, project(offset - 1 * self.beatsPerUnit)],
-                         [0.0, project(offset + l * self.beatsPerUnit * .7)],
-                         [1.0, project(offset + l * self.beatsPerUnit * .7)],
-                         [0.0, project(offset + l * self.beatsPerUnit)],
-                         [1.0, project(offset + l * self.beatsPerUnit)]], dtype=np.float32)
+    board_tex  = np.array([[0.0, self.project(-2 * self.beatsPerUnit)],
+                         [1.0, self.project(-2 * self.beatsPerUnit)],
+                         [0.0, self.project(-1 * self.beatsPerUnit)],
+                         [1.0, self.project(-1 * self.beatsPerUnit)],
+                         [0.0, self.project(l * self.beatsPerUnit * .7)],
+                         [1.0, self.project(l * self.beatsPerUnit * .7)],
+                         [0.0, self.project(l * self.beatsPerUnit)],
+                         [1.0, self.project(l * self.beatsPerUnit)]], dtype=np.float32)
 
     if neckTexture:
       neckTexture.texture.bind()
@@ -428,27 +422,22 @@ class Neck:
 
 
   def renderNeckMethod(self, visibility, offset, neck, alpha = False): #blazingamer: New neck rendering method
-    
-    def project(beat):
-      return 0.125 * beat / self.beatsPerUnit    # glorandwarf: was 0.12
-    if self.instrument.starPowerActive and (self.theme == 0 or self.theme == 1):#8bit
-      color = self.engine.theme.spNoteColor #self.spColor #(.3,.7,.9)
-    else:
-      color = (1,1,1)
+
+    color = (1,1,1)
 
     v            = visibility
     l            = self.boardLength
 
     glEnable(GL_TEXTURE_2D)
 
-    board_tex  = np.array([[0.0, project(offset - 2 * self.beatsPerUnit)],
-                         [1.0, project(offset - 2 * self.beatsPerUnit)],
-                         [0.0, project(offset - 1 * self.beatsPerUnit)],
-                         [1.0, project(offset - 1 * self.beatsPerUnit)],
-                         [0.0, project(offset + l * self.beatsPerUnit * .7)],
-                         [1.0, project(offset + l * self.beatsPerUnit * .7)],
-                         [0.0, project(offset + l * self.beatsPerUnit)],
-                         [1.0, project(offset + l * self.beatsPerUnit)]], dtype=np.float32)
+    board_tex  = np.array([[0.0, self.project(offset - 2 * self.beatsPerUnit)],
+                         [1.0, self.project(offset - 2 * self.beatsPerUnit)],
+                         [0.0, self.project(offset - 1 * self.beatsPerUnit)],
+                         [1.0, self.project(offset - 1 * self.beatsPerUnit)],
+                         [0.0, self.project(offset + l * self.beatsPerUnit * .7)],
+                         [1.0, self.project(offset + l * self.beatsPerUnit * .7)],
+                         [0.0, self.project(offset + l * self.beatsPerUnit)],
+                         [1.0, self.project(offset + l * self.beatsPerUnit)]], dtype=np.float32)
     
     #must be separate for neck flashing.
     board_col  = np.array([[color[0],color[1],color[2], 0],
@@ -478,8 +467,6 @@ class Neck:
       return
     
     v            = visibility
-    w            = self.boardWidth
-    l            = self.boardLength
 
     offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
 
@@ -580,11 +567,6 @@ class Neck:
     if not song.readyToGo:
       return
 
-    def project(beat):
-      return 0.125 * beat / self.beatsPerUnit    # glorandwarf: was 0.12
-
-    v            = visibility
-    w            = self.boardWidth
     l            = self.boardLength
 
     if self.staticStrings:
@@ -592,14 +574,14 @@ class Neck:
     else:
       offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
 
-    track_tex  = np.array([[0.0, project(offset - 2 * self.beatsPerUnit)],
-                         [1.0, project(offset - 2 * self.beatsPerUnit)],
-                         [0.0, project(offset - 1 * self.beatsPerUnit)],
-                         [1.0, project(offset - 1 * self.beatsPerUnit)],
-                         [0.0, project(offset + l * self.beatsPerUnit * .7)],
-                         [1.0, project(offset + l * self.beatsPerUnit * .7)],
-                         [0.0, project(offset + l * self.beatsPerUnit)],
-                         [1.0, project(offset + l * self.beatsPerUnit)]], dtype=np.float32)
+    track_tex  = np.array([[0.0, self.project(offset - 2 * self.beatsPerUnit)],
+                         [1.0, self.project(offset - 2 * self.beatsPerUnit)],
+                         [0.0, self.project(offset - 1 * self.beatsPerUnit)],
+                         [1.0, self.project(offset - 1 * self.beatsPerUnit)],
+                         [0.0, self.project(offset + l * self.beatsPerUnit * .7)],
+                         [1.0, self.project(offset + l * self.beatsPerUnit * .7)],
+                         [0.0, self.project(offset + l * self.beatsPerUnit)],
+                         [1.0, self.project(offset + l * self.beatsPerUnit)]], dtype=np.float32)
 
     glEnable(GL_TEXTURE_2D)
     
@@ -625,9 +607,6 @@ class Neck:
     if not song.readyToGo:
       return
 
-    def project(beat):
-      return 0.125 * beat / self.beatsPerUnit  # glorandwarf: was 0.12
-
     color = (1,1,1)
 
     v            = visibility
@@ -636,16 +615,14 @@ class Neck:
 
     offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
 
-    c = (1,1,1)
-
-    board_tex  = np.array([[0.0, project(offset - 2 * self.beatsPerUnit)],
-                         [1.0, project(offset - 2 * self.beatsPerUnit)],
-                         [0.0, project(offset - 1 * self.beatsPerUnit)],
-                         [1.0, project(offset - 1 * self.beatsPerUnit)],
-                         [0.0, project(offset + l * self.beatsPerUnit * .7)],
-                         [1.0, project(offset + l * self.beatsPerUnit * .7)],
-                         [0.0, project(offset + l * self.beatsPerUnit)],
-                         [1.0, project(offset + l * self.beatsPerUnit)]], dtype=np.float32)
+    board_tex  = np.array([[0.0, self.project(offset - 2 * self.beatsPerUnit)],
+                         [1.0, self.project(offset - 2 * self.beatsPerUnit)],
+                         [0.0, self.project(offset - 1 * self.beatsPerUnit)],
+                         [1.0, self.project(offset - 1 * self.beatsPerUnit)],
+                         [0.0, self.project(offset + l * self.beatsPerUnit * .7)],
+                         [1.0, self.project(offset + l * self.beatsPerUnit * .7)],
+                         [0.0, self.project(offset + l * self.beatsPerUnit)],
+                         [1.0, self.project(offset + l * self.beatsPerUnit)]], dtype=np.float32)
 
     #must be separate for sidebar flashing.
     board_col  = np.array([[color[0],color[1],color[2], 0],
@@ -672,7 +649,7 @@ class Neck:
     if shaders.enable("sololight"):
       shaders.modVar("color",shaders.var["solocolor"])
       shaders.setVar("offset",(-3.5,-w/2))
-      cmgl.drawArrays(GL_TRIANGLE_STRIP, verticeses=self.soloLightVtx1)
+      cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.soloLightVtx1)
       shaders.setVar("offset",(-3.5,w/2))
       shaders.setVar("time",shaders.time()+0.5)
       cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.soloLightVtx2) 
@@ -699,15 +676,8 @@ class Neck:
 
       glPushMatrix()
       z  = ((time - pos) / self.currentPeriod) / self.beatsPerUnit
-      z2 = ((time + event.length - pos) / self.currentPeriod) / self.beatsPerUnit
       sw = 0.1 #width
 
-      if z > self.boardLength:
-        f = (self.boardLength - z) / (self.boardLength * .2)
-      elif z < 0:
-        f = min(1, max(0, 1 + z2))
-      else:
-        f = 1.0
 
 
       bpm_vtx  = np.array([[-(w / 2), 0,  z + sw],

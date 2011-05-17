@@ -109,9 +109,10 @@ instrumentDiff = {
 }
 
 class Part:
-  def __init__(self, id, text):
+  def __init__(self, id, text, trackName):
     self.id   = id
     self.text = text
+    self.trackName = trackName  #name of which the part is called in the midi
   
   def __cmp__(self, other):
     if isinstance(other, Part):
@@ -126,14 +127,14 @@ class Part:
     return self.text
 
 parts = {
-  GUITAR_PART: Part(GUITAR_PART, _("Guitar")),
-  RHYTHM_PART: Part(RHYTHM_PART, _("Rhythm")),
-  BASS_PART:   Part(BASS_PART,   _("Bass")),
-  LEAD_PART:   Part(LEAD_PART,   _("Lead")),
-  DRUM_PART:   Part(DRUM_PART,   _("Drums")),
-  VOCAL_PART:  Part(VOCAL_PART,  _("Vocals")),
-  PRO_GUITAR_PART: Part(PRO_GUITAR_PART, _("Pro Guitar")),
-  PRO_DRUM_PART: Part(PRO_DRUM_PART, _("Pro Drum"))
+  GUITAR_PART: Part(GUITAR_PART, _("Guitar"), ["PART GUITAR", "T1 GEMS" "Click", "Midi Out"]),
+  RHYTHM_PART: Part(RHYTHM_PART, _("Rhythm"), ["PART RHYTHM"]),
+  BASS_PART:   Part(BASS_PART,   _("Bass"),   ["PART BASS"]),
+  LEAD_PART:   Part(LEAD_PART,   _("Lead"),   ["PART LEAD"]),
+  DRUM_PART:   Part(DRUM_PART,   _("Drums"),  ["PART DRUMS", "PART DRUM"]),
+  VOCAL_PART:  Part(VOCAL_PART,  _("Vocals"), ["PART VOCALS"]),
+  PRO_GUITAR_PART: Part(PRO_GUITAR_PART, _("Pro Guitar"), ["PART REAL GUITAR"]),
+  PRO_DRUM_PART: Part(PRO_DRUM_PART, _("Pro Drum"), ["PART REAL DRUM"])
 }
 
 class Difficulty:
@@ -2801,46 +2802,26 @@ class MidiReader(midi.MidiOutStream):
 
     tempText = "Found sequence_name in MIDI: " + text + ", recognized as "
     tempText2 = ""
-    if (text == "PART GUITAR" or text == "T1 GEMS" or text == "Click" or text == "MIDI out") and parts[GUITAR_PART] in self.song.parts:
-      self.partnumber = parts[GUITAR_PART]
-      if self.logSections == 1:
-        tempText2 = "GUITAR_PART"
-    elif text == "PART RHYTHM" and parts[RHYTHM_PART] in self.song.parts:
-      self.partnumber = parts[RHYTHM_PART]
-      if self.logSections == 1:
-        tempText2 = "RHYTHM_PART"
-    elif text == "PART BASS" and parts[BASS_PART] in self.song.parts:
-      self.partnumber = parts[BASS_PART]
-      if self.logSections == 1:
-        tempText2 = "BASS_PART"
-    elif text == "PART GUITAR COOP" and parts[LEAD_PART] in self.song.parts:
-      self.partnumber = parts[LEAD_PART]
-      if self.logSections == 1:
-        tempText2 = "LEAD_PART"
-    elif text == "REAL GUITAR" and parts[PRO_GUITAR_PART] in self.song.parts:
-      self.partnumber = parts[PRO_GUITAR_PART]
-      if self.logSections == 1:
-        tempText2 = "PRO_GUITAR_PART"
-    elif (text == "PART DRUM" or text == "PART DRUMS") and parts[DRUM_PART] in self.song.parts:
-      self.partnumber = parts[DRUM_PART]
-      if self.logSections == 1:
-        tempText2 = "DRUM_PART"
-    elif text == "PART VOCALS": # MFH 
-      self.partnumber = parts[VOCAL_PART]
-      self.vocalTrack = True
-      if self.partnumber in self.song.parts:
-        self.useVocalTrack = True
-      else:
-        self.useVocalTrack = False
-    else:
-      self.vocalTrack = False
-
+    
+    for part in self.song.parts:
+      if text in part.trackName:
+        if (part.id == VOCAL_PART):
+          self.vocalTrack = True
+          self.useVocalTrack = True
+        self.partnumber = part
+        if self.logSections == 1:
+          tempText2 = name.replace(" ", "_")
+        break	#should only have one instance of an instrument
+        break   #end the searching
+    
+    if text in parts[VOCAL_PART].trackName and parts[VOCAL_PART] not in self.song.parts:
+	  self.useVocalTrack = False
+                 
     if self.logSections == 1:
       Log.debug(tempText + tempText2)
 
     self.guitarSoloIndex = 0
     self.guitarSoloActive = False
-
       
   def note_on(self, channel, note, velocity):
     if self.partnumber == None:
@@ -3302,66 +3283,25 @@ class MidiPartsDiffReader(midi.MidiOutStream):
       tempText = "MIDI sequence_name found: " + text + ", recognized and added to list as "
       tempText2 = ""
 
-    if text == "PART GUITAR" or text == "T1 GEMS" or text == "Click":
-      if not parts[GUITAR_PART] in self.parts:
-        self.nextPart = parts[GUITAR_PART]
-        self.currentPart = self.nextPart.id
-        self.notesFound  = [0, 0, 0, 0]
-        if self.logSections == 1:
-          tempText2 = "GUITAR_PART"
-          Log.debug(tempText + tempText2)
-
-    elif text == "PART RHYTHM":
-      if not parts[RHYTHM_PART] in self.parts:
-        self.nextPart = parts[RHYTHM_PART]
-        self.currentPart = self.nextPart.id
-        self.notesFound  = [0, 0, 0, 0]
-        if self.logSections == 1:
-          tempText2 = "RHYTHM_PART"
-          Log.debug(tempText + tempText2)
-     
-    elif text == "PART BASS":
-      if not parts[BASS_PART] in self.parts:
-        self.nextPart = parts[BASS_PART]
-        self.currentPart = self.nextPart.id
-        self.notesFound  = [0, 0, 0, 0]
-        if self.logSections == 1:
-          tempText2 = "BASS_PART"
-          Log.debug(tempText + tempText2)
-
-    elif text == "PART GUITAR COOP":
-      if not parts[LEAD_PART] in self.parts:
-        self.nextPart = parts[LEAD_PART]
-        self.currentPart = self.nextPart.id
-        self.notesFound  = [0, 0, 0, 0]
-        if self.logSections == 1:
-          tempText2 = "LEAD_PART"
-          Log.debug(tempText + tempText2)
-
-    #myfingershurt: drums, rock band rip compatible :)
-    elif text == "PART DRUM" or text == "PART DRUMS":
-      if not parts[DRUM_PART] in self.parts:
-        self.nextPart = parts[DRUM_PART]
-        self.currentPart = self.nextPart.id
-        self.notesFound  = [0, 0, 0, 0]
-        self._drumFound  = True #drum parts appear to be obligatory in WT songs, even if phantom.
-        if self.logSections == 1:
-          tempText2 = "DRUM_PART"
-          Log.debug(tempText + tempText2)
-    
-    elif text == "PART VOCALS":
-      if not parts[VOCAL_PART] in self.parts:
-        part = parts[VOCAL_PART]
-        self.parts.append(part)
-        self.nextPart = None
-        self.currentPart = part.id
-        self.difficulties[part.id] = difficulties.values()
-        if self.logSections == 1:
-          tempText2 = "VOCAL_PART"
-          Log.debug(tempText + tempText2)
-    
-    else:
-      self.currentPart = -1
+    for part in parts.values():
+      if text in part.trackName:
+        if part not in self.song.parts:
+          if part.id == VOCAL_PART:
+            self.parts.append(part)
+            self.nextPart = None
+            self.currentPart = part.id
+            self.difficulties[part.id] = difficulties.values()
+          else:
+            self.nextPart = part
+            self.currentPart = self.nextPart.id
+            self.notesFound  = [0, 0, 0, 0]
+            if part.id == DRUM_PART:
+		      self._drumFound  = True  
+          if self.logSections == 1:
+            tempText2 = part.trackName[0].replace(" ", "_")
+            Log.debug(tempText + tempText2)
+          return
+    self.currentPart = -1
   
   def addPart(self):
     self.parts.append(self.nextPart)
