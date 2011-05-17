@@ -457,7 +457,7 @@ class Instrument(object):
           self.engine.resource.load(self,  "openMesh",  lambda: Mesh(self.engine.resource.fileName(get("open.dae"))))
         else: #fallback to the default in the data folder
           self.engine.resource.load(self,  "openMesh",  lambda: Mesh(self.engine.resource.fileName("open.dae")))
-          defualtOpenNote = True
+          defaultOpenNote = True
 
       if defaultNote:
         self.notetex = False
