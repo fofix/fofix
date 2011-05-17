@@ -76,7 +76,7 @@ class Theme(Task):
   def __getattr__(self, attr):
     try: #getting to this function is kinda slow. Set it on the first get to keep renders from lagging.
       object.__getattribute__(self, '__dict__')[attr] = defaultDict[attr]
-      if Config.get("game", "log_undefined_gets") == 1:
+      if Config.get("log", "log_undefined_gets") == 1:
         Log.debug("No theme variable for %s - Loading default..." % attr)
       return object.__getattribute__(self, attr)
     except KeyError:
@@ -95,7 +95,7 @@ class Theme(Task):
     self.themePath = os.path.join(Version.dataPath(),"themes", name)
     if not os.path.exists(self.themePath):
       Log.warn("Theme: %s does not exist!\n" % self.themePath)
-      name = Config.get("coffee", "themename")
+      name = Config.get("engine", "theme")
       Log.notice("Theme: Attempting fallback to default theme \"%s\"." % name)
       self.themePath = os.path.join(Version.dataPath(),"themes", name)
       if not os.path.exists(self.themePath):

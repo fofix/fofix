@@ -50,7 +50,7 @@ class Loader(Thread):
     self.canceled    = False
 
     #myfingershurt: the following should be global and done ONCE:
-    self.logLoadings = Config.get("game", "log_loadings")
+    self.logLoadings = Config.get("log", "log_loadings")
 
     if target and name:
       setattr(target, name, None)
@@ -156,7 +156,7 @@ class Resource(Task):
     if self.baseLibrary and os.path.isdir(self.baseLibrary):
       self.songPath = [self.baseLibrary]
 
-    self.logLoadings = Config.get("game", "log_loadings")
+    self.logLoadings = Config.get("log", "log_loadings")
 
   #myfingershurt: Need a function to refresh the base library after a new one is selected:
   def refreshBaseLib(self):

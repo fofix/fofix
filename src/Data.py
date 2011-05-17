@@ -55,10 +55,10 @@ class Data(object):
   """A collection of globally used data resources such as fonts and sound effects."""
   def __init__(self, resource, svg):
 
-    self.logClassInits = Config.get("game", "log_class_inits")
+    self.logClassInits = Config.get("log", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("Data class init (Data.py)...")
-    self.logLoadings = Config.get("game", "log_loadings")
+    self.logLoadings = Config.get("log", "log_loadings")
     
     self.logImageNotFound = Config.get("log", "log_image_not_found")
     
@@ -69,7 +69,7 @@ class Data(object):
     self.crowdVolume  = Config.get("audio", "crowd_volume")
 
     #Get theme
-    themename = Config.get("coffee", "themename")
+    themename = Config.get("engine", "theme")
     self.themeLabel = themename
     self.themeCoOp  = False
 
@@ -95,7 +95,7 @@ class Data(object):
       if defaultTheme != "MegaLight V4":     #myfingershurt
         defaultTheme = themes[0]    #myfingershurt
       #not a valid theme if notes.png isn't there!  Force default theme:
-      Config.set("coffee", "themename",defaultTheme)
+      Config.set("engine", "theme",defaultTheme)
       #re-init Data with new default
       themename = defaultTheme
       self.themeLabel = themename

@@ -76,7 +76,7 @@ class SongChoosingScene(Scene):
       self.songName = self.engine.config.get("setlist", "selected_song")
     self.gameMode = self.engine.world.gameMode
     self.autoPreview = not self.engine.config.get("audio", "disable_preview")
-    self.sortOrder   = self.engine.config.get("game", "sort_order")
+    self.sortOrder   = self.engine.config.get("setlist", "sort_order")
     self.tut = self.engine.world.tutorial
     self.playerList  = self.players
 
@@ -123,15 +123,15 @@ class SongChoosingScene(Scene):
     
     #user configurables and input management
     self.preloadSongLabels = False
-    self.showCareerTiers   = (self.gameMode == TOUR) and True or (self.engine.config.get("game","quickplay_tiers") == 1)
+    self.showCareerTiers   = (self.gameMode == TOUR) and True or (self.engine.config.get("setlist","quickplay_tiers") == 1)
     self.scrolling        = 0
-    self.scrollDelay      = self.engine.config.get("game", "scroll_delay")
-    self.scrollRate       = self.engine.config.get("game", "scroll_rate")
+    self.scrollDelay      = self.engine.config.get("menu", "scroll_delay")
+    self.scrollRate       = self.engine.config.get("menu", "scroll_rate")
     self.scrollTime       = 0
     self.scroller         = [lambda: None, self.scrollUp, self.scrollDown]
-    self.scoreDifficulty  = Song.difficulties[self.engine.config.get("game", "songlist_difficulty")]
-    self.scorePart        = Song.parts[self.engine.config.get("game", "songlist_instrument")]
-    self.sortOrder        = self.engine.config.get("game", "sort_order")
+    self.scoreDifficulty  = Song.difficulties[self.engine.config.get("setlist", "songlist_difficulty")]
+    self.scorePart        = Song.parts[self.engine.config.get("setlist", "songlist_instrument")]
+    self.sortOrder        = self.engine.config.get("setlist", "sort_order")
     self.queueFormat      = self.engine.config.get("game", "queue_format")
     self.queueOrder       = self.engine.config.get("game", "queue_order")
     self.queueParts       = self.engine.config.get("game", "queue_parts")
@@ -193,10 +193,10 @@ class SongChoosingScene(Scene):
                                    ConfigChoice(self.engine, self.engine.config, "game", "queue_order", autoApply = True),
                                    ConfigChoice(self.engine, self.engine.config, "game", "queue_parts", autoApply = True),
                                    ConfigChoice(self.engine, self.engine.config, "game", "queue_diff", autoApply = True),
-                                   ActiveConfigChoice(self.engine, self.engine.config, "game", "sort_order", onChange = self.forceReload),
-                                   ActiveConfigChoice(self.engine, self.engine.config, "game", "sort_direction", onChange = self.forceReload),
-                                   ActiveConfigChoice(self.engine, self.engine.config, "game", "songlist_instrument", onChange = self.forceReload),
-                                   ActiveConfigChoice(self.engine, self.engine.config, "game", "songlist_difficulty", onChange = self.forceReload),
+                                   ActiveConfigChoice(self.engine, self.engine.config, "setlist", "sort_order", onChange = self.forceReload),
+                                   ActiveConfigChoice(self.engine, self.engine.config, "setlist", "sort_direction", onChange = self.forceReload),
+                                   ActiveConfigChoice(self.engine, self.engine.config, "setlist", "songlist_instrument", onChange = self.forceReload),
+                                   ActiveConfigChoice(self.engine, self.engine.config, "setlist", "songlist_difficulty", onChange = self.forceReload),
                                    ], name = "setlist", fadeScreen = False, onClose = self.resetQueueVars, font = self.engine.data.pauseFont, \
                      pos = self.menu_text_pos, textColor = self.menu_text_color, selectedColor = self.menu_selected_color)
     
@@ -253,9 +253,9 @@ class SongChoosingScene(Scene):
     self.menu_force_reload = True
   
   def resetQueueVars(self):
-    self.scoreDifficulty  = Song.difficulties[self.engine.config.get("game", "songlist_difficulty")]
-    self.scorePart        = Song.parts[self.engine.config.get("game", "songlist_instrument")]
-    self.sortOrder        = self.engine.config.get("game", "sort_order")
+    self.scoreDifficulty  = Song.difficulties[self.engine.config.get("setlist", "songlist_difficulty")]
+    self.scorePart        = Song.parts[self.engine.config.get("setlist", "songlist_instrument")]
+    self.sortOrder        = self.engine.config.get("setlist", "sort_order")
     self.queueFormat      = self.engine.config.get("game", "queue_format")
     self.queueOrder       = self.engine.config.get("game", "queue_order")
     self.queueParts       = self.engine.config.get("game", "queue_parts")
@@ -502,10 +502,10 @@ class SongChoosingScene(Scene):
           Dialogs.changeLoadingSplashScreenText(self.engine, self.splash, _("Loading Album Artwork...") + " %d%%" % percent)
 
   def addToQueue(self, selectedSong): #FIXME: Queue system
-    self.engine.songQueue.addSong(selectedSong, library)
+    self.engine.world.songQueue.addSong(selectedSong, library)
   
   def removeFromQueue(self, selectedSong):
-    self.engine.songQueue.removeSong(selectedSong)
+    self.engine.world.songQueue.removeSong(selectedSong)
   
   def startGame(self, fromQueue = False): #note this is not refined.
     if len(self.engine.world.songQueue) == 0:

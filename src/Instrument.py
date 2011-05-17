@@ -56,8 +56,8 @@ class Instrument(object):
     self.freestyleActive = False
     self.drumFillsActive = False
     
-    self.incomingNeckMode = self.engine.config.get("game", "incoming_neck_mode")
-    self.guitarSoloNeckMode = self.engine.config.get("game", "guitar_solo_neck")
+    self.incomingNeckMode = self.engine.config.get("fretboard", "incoming_neck_mode")
+    self.guitarSoloNeckMode = self.engine.config.get("fretboard", "guitar_solo_neck")
     self.bigRockEndings = self.engine.config.get("game", "big_rock_endings")
 
     #For Animated notes
@@ -233,10 +233,10 @@ class Instrument(object):
 
     #myfingershurt: this should be retrieved once at init, not repeatedly in-game whenever tails are rendered.
     self.notedisappear = self.engine.config.get("game", "notedisappear")
-    self.fretsUnderNotes  = self.engine.config.get("game", "frets_under_notes")
+    self.fretsUnderNotes  = self.engine.config.get("fretboard", "frets_under_notes")
     self.staticStrings  = self.engine.config.get("performance", "static_strings")
 
-    self.muteSustainReleases = self.engine.config.get("game", "sustain_muting") #MFH
+    self.muteSustainReleases = self.engine.config.get("audio", "sustain_muting") #MFH
 
     
     self.twoChord       = 0
@@ -260,17 +260,17 @@ class Instrument(object):
       self.freestyleEnabled = True
 
     #blazingamer
-    self.nstype = self.engine.config.get("game", "nstype")
+    self.nstype = self.engine.config.get("fretboard", "nstype")
     self.twoDnote = self.engine.theme.twoDnote
     self.twoDkeys = self.engine.theme.twoDkeys 
     self.threeDspin = self.engine.theme.threeDspin 
-    self.noterotate = self.engine.config.get("coffee", "noterotate")
+    self.noterotate = self.engine.config.get("game", "noterotate")
 
     #MFH- fixing neck speed
     if self.nstype < 3:   #not constant mode: 
-      self.speed = self.engine.config.get("coffee", "neckSpeed")*0.01
+      self.speed = self.engine.config.get("fretboard", "neck_speed")*0.01
     else:   #constant mode
-      self.speed = 410 - self.engine.config.get("coffee", "neckSpeed")    #invert this value
+      self.speed = 410 - self.engine.config.get("fretboard", "neck_speed")    #invert this value
 
     self.boardScaleX    = self.boardWidth/3.0
     self.boardScaleY    = self.boardLength/9.0

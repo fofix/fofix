@@ -99,8 +99,8 @@ MusicFinished = pygame.USEREVENT
 class Input(Task):
   def __init__(self):
 
-    self.logClassInits = Config.get("game", "log_class_inits")
-    if self.logClassInits == 1:
+    logClassInits = Config.get("game", "log_class_inits")
+    if logClassInits == 1:
       Log.debug("Input class init (Input.py)...")
   
     Task.__init__(self)
@@ -113,7 +113,7 @@ class Input(Task):
     self.activeGameControls   = []
     self.p2Nav                = self.controls.p2Nav
     self.type1                = self.controls.type[0]
-    self.keyCheckerMode       = Config.get("game","key_checker_mode")
+    self.keyCheckerMode       = Config.get("menu","key_checker_mode")
     self.disableKeyRepeat()
     
     self.gameGuitars = 0

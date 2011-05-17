@@ -59,8 +59,7 @@ class GameResultsScene(Scene):
     else:
       self.engine.world.sceneName = "GameResultsScene"
     
-    self.logClassInits = self.engine.config.get("game", "log_class_inits")
-    if self.logClassInits == 1:
+    if self.engine.data.logClassInits == 1:
       Log.debug("GameResultsScene class init...")
     
     players = self.players
@@ -186,12 +185,10 @@ class GameResultsScene(Scene):
 
     self.fullView = self.engine.view.geometry[2:4]
     
-    self.Congratphrase = self.engine.config.get("game", "congrats")#blazingamer
-    self.keepCount     = self.engine.config.get("game", "keep_play_count")
+    self.jurgenTalk = self.engine.config.get("results", "congrats")#blazingamer
+    self.keepCount     = self.engine.config.get("setlist", "keep_play_count")
     
-    self.showHandicap  = self.engine.config.get("handicap", "detailed_handicap")
-    
-    self.resultCheerLoop = self.engine.config.get("game", "result_cheer_loop")
+    self.resultCheerLoop = self.engine.config.get("results", "result_cheer_loop")
     
     self.starScoring = self.engine.config.get("game", "star_scoring")
     self.starMass    = [0 for i in self.scoring]
@@ -199,7 +196,7 @@ class GameResultsScene(Scene):
     
     self.cheerLoopDelay  = self.engine.theme.crowdLoopDelay
     if self.cheerLoopDelay == None:
-      self.cheerLoopDelay = self.engine.config.get("game", "cheer_loop_delay")
+      self.cheerLoopDelay = self.engine.config.get("results", "cheer_loop_delay")
     Log.debug("Cheer loop delay used: %d" % self.cheerLoopDelay)
     
     self.cheerLoopCounter = self.cheerLoopDelay
@@ -300,19 +297,14 @@ class GameResultsScene(Scene):
     else:
       self.hitWindow = _("Standard")
     
-    jurgen   = self.engine.config.get("game", "jurgmode")
-    jurgplay = self.engine.config.get("game", "jurgtype")
-    
     self.progressKeys   = []
     self.playerProgressKeys = [[] for i in self.playerList]
     for i, player in enumerate(self.playerList):
       self.progressKeys.extend(player.progressKeys)
       self.playerProgressKeys[i] = player.progressKeys
-    if jurgen == 0:
-      if jurgplay == 1 and len(self.playerList) > 1:
-        self.playerProgressKeys[1] = self.progressKeys
-      else:
-        self.playerProgressKeys = [self.progressKeys for i in self.playerList]
+    for i, player in enumerate(self.playerList):
+      if self.engine.config.get("jurgen","jurg_p%d" % i):
+        self.playerProgressKeys[i] = self.progressKeys
     
     self.part = [None for i in self.playerList]
     self.partImage = True
@@ -736,7 +728,7 @@ class GameResultsScene(Scene):
       accuracyToUse = self.scoring[0].hitAccuracy
 
       #MFH TODO - utilize new functions in self.engine.data to automatically enumerate any number of the following soundfiles automatically, for issue 73
-      if self.Congratphrase:
+      if self.jurgenTalk:
         if scoreToUse == 0:
           taunt = os.path.join("sounds","jurgen1.ogg")
         elif accuracyToUse == 100.0:    #MFH - this will only play when you 100% a song

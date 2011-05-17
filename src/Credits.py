@@ -106,7 +106,7 @@ class Credits(Layer, KeyListener):
     self.speedDiv    = 20000.0
     self.speedDir    = 1.0
     self.doneList    = []
-    self.themename = Config.get("coffee", "themename")
+    self.themename = Config.get("engine", "theme")
 
     nf = self.engine.data.font
     bf = self.engine.data.bigFont

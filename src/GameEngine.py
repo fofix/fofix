@@ -95,16 +95,16 @@ Config.define("engine", "highpriority", bool,  False, text = _("FPS Limiter"),  
 Config.define("performance", "game_priority",       int,   2,      text = _("Process Priority"), options = sortOptionsByKey({0: _("Idle"), 1: _("Low"), 2: _("Normal"), 3:_("Above Normal"), 4:_("High"), 5:_("Realtime")}), tipText = _("Change this to increase the priority of the FoFiX process. Don't change this unless you know what you're doing. DO NOT set this to Realtime. Ever."))
 Config.define("performance", "restrict_to_first_processor", bool, False, text=_("Restrict to First Core (Win32 Only)"), options={False: _("No"), True: _("Yes")}, tipText=_("Choose whether to restrict the game to running on only the first processor core on the system. Only has an effect under Windows."))  #stump
 Config.define("performance", "use_psyco", bool, False, text=_("Use Psyco"), options={False: _("No"), True: _("Yes")}, tipText = _("Enable or disable the Psyco specializing compiler. Tests have indicated the game runs faster with it off."))  #stump
-Config.define("game",   "adv_settings", bool,  False)
-Config.define("game",   "drum_navigation",          bool, True,  text = _("Drum Navigation"), options = {False: _("Off"), True: _("On")}, tipText = _("If enabled, drum keys will be allowed to navigate menus. If not, only guitar keys and keyboard master keys will."))
-Config.define("game", "key_checker_mode",      int, 1,  text = _("Key Conflicts"), options = sortOptionsByKey({0: _("Don't check"), 1: _("Notify"), 2: _("Enforce")}), tipText = _("Sets how the game handles key conflicts. 'Don't check' doesn't check, but conflicts will affect play. 'Notify' will inform you, but allow you to continue, and 'Enforce' will not allow you to exit the menu until all key conflicts have been resolved."))
-Config.define("game", "gfx_version_tag",       int, 1,     text = _("Show Theme Version Tag"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Places the theme's version tag over menus and dialogs.")) #MFH
-Config.define("game", "p2_menu_nav",       int, 1,     text = _("Menu Navigation"), options = {0: _("P1 Only"), 1: _("All Players")}, tipText = _("Sets whether all players can navigate the menu, or only the controller set as Player 1 and the master keys.")) #MFH
-Config.define("game", "scroll_delay",             int, 500,  text = _("Scroll Delay"), options = dict([(n, n) for n in range(100, 2001, 100)]), tipText = _("Sets how long, in milliseconds, to wait before beginning to scroll."))
-Config.define("game", "scroll_rate",              int, 50,   text = _("Scroll Rate"),  options = dict([(n, 10-((n/10)-1)) for n in range(10, 101, 10)]), tipText = _("Sets how quickly menus will scroll."))
+Config.define("menu",   "adv_settings", bool,  False)
+Config.define("menu",   "drum_navigation",          bool, True,  text = _("Drum Navigation"), options = {False: _("Off"), True: _("On")}, tipText = _("If enabled, drum keys will be allowed to navigate menus. If not, only guitar keys and keyboard master keys will."))
+Config.define("menu", "gfx_version_tag",       int, 1,     text = _("Show Theme Version Tag"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Places the theme's version tag over menus and dialogs.")) #MFH
+Config.define("menu", "p2_menu_nav",       int, 1,     text = _("Menu Navigation"), options = {0: _("P1 Only"), 1: _("All Players")}, tipText = _("Sets whether all players can navigate the menu, or only the controller set as Player 1 and the master keys.")) #MFH
+Config.define("menu", "scroll_delay",             int, 500,  text = _("Scroll Delay"), options = dict([(n, n) for n in range(100, 2001, 100)]), tipText = _("Sets how long, in milliseconds, to wait before beginning to scroll."))
+Config.define("menu", "scroll_rate",              int, 50,   text = _("Scroll Rate"),  options = dict([(n, 10-((n/10)-1)) for n in range(10, 101, 10)]), tipText = _("Sets how quickly menus will scroll."))
 Config.define("performance", "cache_song_metadata", bool, True, text=_("Cache Song Metadata"), options={False: _("No"), True: _("Yes")}, tipText = _("This will allow information about the songs to be stored for quick access later at the cost of a slow first time loading.")) #stump: allow metadata caching to be turned off
-Config.define("game", "use_graphical_submenu", int,   1,      text = _("Graphical Submenus"), options = {0: _("Disabled"), 1: _("Enabled")}, tipText = _("Enable or disable the use of graphical submenus."))
-Config.define("game", "lphrases",       bool, True,     text = _("Loading Phrases"),             options = {True: _("On"), False: _("Off")}, tipText = _("Sets whether or not to use loading phrases while loading a song"))
+Config.define("menu", "use_graphical_submenu", int,   1,      text = _("Graphical Submenus"), options = {0: _("Disabled"), 1: _("Enabled")}, tipText = _("Enable or disable the use of graphical submenus."))
+Config.define("menu", "lphrases",       bool, True,     text = _("Loading Phrases"),             options = {True: _("On"), False: _("Off")}, tipText = _("Sets whether or not to use loading phrases while loading a song"))
+Config.define("menu", "key_checker_mode",      int, 1,  text = _("Key Conflicts"), options = sortOptionsByKey({0: _("Don't check"), 1: _("Notify"), 2: _("Enforce")}), tipText = _("Sets how the game handles key conflicts. 'Don't check' doesn't check, but conflicts will affect play. 'Notify' will inform you, but allow you to continue, and 'Enforce' will not allow you to exit the menu until all key conflicts have been resolved."))
 
 
 #Video Settings
@@ -116,32 +116,30 @@ Config.define("video",  "multisamples", int,   4,     text = _("Antialiasing Qua
 Config.define('video',  'disable_screensaver', bool, True, text=_('Disable Screensaver'), options={True: _('Yes'), False: _('No')}, tipText=_('Set whether the game disables the screensaver while it is running.  Does not necessarily work on all platforms.')) #stump
 
 #Shaders
-Config.define("video",  "shader_use",     bool,   True,  text = _("Use Shaders"), options = {False: _("No"), True: _("Yes")}, tipText = _("Enable or disable the use of shaders. Shaders are visual effects. This must be set to 'Yes' to use the settings below. 'By Theme' leaves it to the theme creator."))
-Config.define("video",  "shader_neck",     str,   "theme",  text = _("Neck"), options = {"Disabled":_("Disabled"), "neck": _("Flashing"), "theme": _("By Theme")}, tipText = _("A bright flash along your fretboard reflecting the notes you've hit. 'By Theme' leaves it to the theme creator."))
-Config.define("video",  "shader_stage",     str,   "theme",  text = _("Stage"), options = {"Disabled":_("Disabled"), "stage": _("EQ Lightning"), "theme": _("By Theme")}, tipText = _("A visual waveform centered above you fretboard. 'By Theme' leaves it to the theme creator."))
-Config.define("video",  "shader_sololight",     str,   "sololight",  text = _("Solo and SP"), options = {"Disabled":_("Disabled"), "sololight": _("Lightnings"), "theme": _("By Theme")}, tipText = _("Enables lightning along the side of your fretboard when you are in solos or use SP. 'By Theme' leaves it to the theme creator."))
-Config.define("video",  "shader_tail",     str,   "tail2",  text = _("Tails"), options = {"Disabled":_("Classic"), "tail1": _("Lightnings"), "tail2": _("RB2"), "theme": _("By Theme")}, tipText = _("Sets the tail effect. Choose from classic tails, lightning, or RB2 style. 'By Theme' leaves it to the theme creator."))
-Config.define("video",  "shader_notes",     str,   "theme",  text = _("Notes"), options = {"Disabled":_("Disabled"), "notes": _("Metal"), "theme": _("By Theme")}, tipText = _("Gives your notes a metallic sheen. 'By Theme' leaves it to the theme creator."))
-Config.define("video",  "shader_cd",     str,   "cd",  text = _("CDs"), options = {"None":_("Disabled"), "cd": _("White"), "theme": _("By Theme")}, tipText = _("Adds a soft lighting effect to CD labels in CD setlist mode."))
+Config.define("video",  "shader_use",       bool, True,        text = _("Use Shaders"), options = {False: _("No"), True: _("Yes")}, tipText = _("Enable or disable the use of shaders. Shaders are visual effects. This must be set to 'Yes' to use the settings below. 'By Theme' leaves it to the theme creator."))
+Config.define("video",  "shader_neck",      str,  "theme",     text = _("Neck Flashing"), options = {"Disabled":_("Disabled"), "neck": _("Enabled"), "theme": _("By Theme")}, tipText = _("A bright flash along your fretboard reflecting the notes you've hit. 'By Theme' leaves it to the theme creator."))
+Config.define("video",  "shader_stage",     str,  "theme",     text = _("Stage EQ"), options = {"Disabled":_("Disabled"), "stage": _("Enabled"), "theme": _("By Theme")}, tipText = _("A visual waveform centered above you fretboard. 'By Theme' leaves it to the theme creator."))
+Config.define("video",  "shader_sololight", str,  "sololight", text = _("Neck Lightning"), options = {"Disabled":_("Disabled"), "sololight": _("Enabled"), "theme": _("By Theme")}, tipText = _("Enables lightning along the side of your fretboard when you are in solos or use SP. 'By Theme' leaves it to the theme creator."))
+Config.define("video",  "shader_tail",      str,  "tail2",     text = _("Tail Effects"), options = {"Disabled":_("Classic"), "tail1": _("Lightning"), "tail2": _("RB2"), "theme": _("By Theme")}, tipText = _("Sets the tail effect. Choose from classic tails, lightning, or RB2 style. 'By Theme' leaves it to the theme creator."))
+Config.define("video",  "shader_notes",     str,  "theme",     text = _("Metal Notes"), options = {"Disabled":_("Disabled"), "notes": _("Enabled"), "theme": _("By Theme")}, tipText = _("Gives your notes a metallic sheen. 'By Theme' leaves it to the theme creator."))
+Config.define("video",  "shader_cd",        str,  "cd",        text = _("CD Glow"), options = {"None":_("Disabled"), "cd": _("Enabled"), "theme": _("By Theme")}, tipText = _("Adds a soft lighting effect to CD labels in CD setlist mode."))
 
 
 #Audio
-Config.define("audio",  "frequency",    int,   44100, text = _("Sample Frequency"), options = [8000, 11025, 22050, 32000, 44100, 48000], tipText = _("Set the sample frequency for the audio in the game. You almost certainly want to leave this at 44100 Hz unless you really know what you're doing."))
-Config.define("audio",  "bits",         int,   16,    text = _("Sample Bits"), options = [16, 8], tipText = _("Set the sample bits for the audio in the game. You almost certainly want to leave this at 16-bit unless you really know what you're doing."))
-Config.define("audio",  "buffersize",   int,   2048,  text = _("Buffer Size"), options = [256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536], tipText = _("Set your audio buffer size. Higher values will reduce audio popping, but increase game lag. Only change this if you are having audio quality issues, and use the lowest value that sounds right."))
-Config.define("audio",  "delay",        int,   100,   text = _("A/V Delay"), options = dict([(n, n) for n in range(-1000, 1001)]), tipText = _("Set your A/V delay. Unfortunately for now you have to use trial and error."))
-Config.define("game",   "star_claps",          bool, False,  text = _("Starpower Claps"), options = {False: _("Off"), True: _("On")}, tipText = _("Enables a clapping sound effect to be used on the beats in Starpower."))
-Config.define("audio", "disable_preview",      bool, True,  text = _("Song Previews"), options = {False: _("Automatic"), True: _("Yellow Fret (#3)")}, tipText = _("If set to 'Automatic', songs will automatically start previewing when you select them. Otherwise you must press the third fret."))
-Config.define("game", "bass_kick_sound",      bool, False,  text = _("Kick Bass Sound"), options = {False: _("Off"), True: _("On")}, tipText = _("If enabled, you'll hear a kick bass sound when you use the kick pedal."))
-Config.define("audio", "mute_last_second",       int, 0,     text = _("Mute Last Second"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Cuts the volume with one second remaining to prevent any pops when the song ends.")) #MFH
-Config.define("game", "result_cheer_loop",       int, 2,     text = _("Results Cheer Loop"), options = {0: _("Off"), 1: _("Theme"), 2: _("On")}, tipText = _("Sets whether the cheering sound heard on the result screen will loop. 'Theme' leaves it to the theme creator.")) #MFH
-Config.define("game",  "cheer_loop_delay",        int,   550,   text = _("Cheer Loop Delay"), options = dict([(n, n) for n in range(0, 10, 1)] + [(n, n) for n in range(10, 50, 10)] + [(n, n) for n in range(50, 2001, 50)]), tipText = _("Sets the time, in milliseconds, to wait before playing the result cheer again (if looping is enabled)."))
-Config.define("game",   "mute_drum_fill",           int, 1,    text = _("Mute Drum Track During Fills"), options = {0: _("No"), 1:_("Yes")}, tipText = _("Sets whether or not the drum track will be muted during drum fills (so you can hear yourself have at it!)"))
-Config.define("game",   "sustain_muting",          int, 1,    text = _("Sustain Muting"), options = sortOptionsByKey({0: _("Never Mute"), 1: _("Very Early"), 2: _("Early"), 3: _("Standard"), 4: _("Always Mute")}), tipText = _("Sets the window used to determine whether or not to mute a dropped sustain note. 'Early' means it will only mute when you drop the sustain relatively early."))
-Config.define("audio",  "speed_factor",  float,    1.0,  text = _("Speed Factor"),   options = sortOptionsByKey({1.0: _("1.00x"), 0.75: _("0.75x"), 0.50: _("0.50x"), 0.25: _("0.25x")}), tipText = _("Sets the speed to play the audio at. Your score will be severely penalized if you slow the music down."))  #MFH
-Config.define("audio",  "whammy_effect",  int,    0,  text = _("Effects Mode"),   options = {0: _("Killswitch"), 1: _("Pitchbend")}, tipText = _("Sets whether to use a killswitch or pitchbend as the effect on your whammy."))  #MFH
-Config.define("game", "beat_claps",          bool, False,  text = _("Practice Beat Claps"), options = {False: _("Off"), True: _("On")}, tipText = _("Enables clap sound effects on every beat in practice mode.")) #racer
-Config.define("audio",  "enable_crowd_tracks", int,  1,      text = _("Crowd Cheers"), options = sortOptionsByKey({0: _("Off (Disabled)"), 1: _("During SP Only"), 2: _("During SP & Green"), 3: _("Always On")}), tipText = _("Sets when the crowd will cheer for you (if a crowd.ogg is present). 'During SP' will have them sing along in star power, and 'During SP & Green' will have them cheering both in SP and when your rock meter is above 2/3")) #akedrou
+Config.define("audio", "frequency",           int,   44100, text = _("Sample Frequency"), options = [8000, 11025, 22050, 32000, 44100, 48000], tipText = _("Set the sample frequency for the audio in the game. You almost certainly want to leave this at 44100 Hz unless you really know what you're doing."))
+Config.define("audio", "bits",                int,   16,    text = _("Sample Bits"), options = [16, 8], tipText = _("Set the sample bits for the audio in the game. You almost certainly want to leave this at 16-bit unless you really know what you're doing."))
+Config.define("audio", "buffersize",          int,   2048,  text = _("Buffer Size"), options = [256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536], tipText = _("Set your audio buffer size. Higher values will reduce audio popping, but increase game lag. Only change this if you are having audio quality issues, and use the lowest value that sounds right."))
+Config.define("audio", "delay",               int,   100,   text = _("A/V Delay"), options = dict([(n, n) for n in range(-1000, 1001)]), tipText = _("Set your A/V delay. Unfortunately for now you have to use trial and error."))
+Config.define("game",  "star_claps",          bool,  False, text = _("Starpower Claps"), options = {False: _("Off"), True: _("On")}, tipText = _("Enables a clapping sound effect to be used on the beats in Starpower."))
+Config.define("audio", "disable_preview",     bool,  True,  text = _("Song Previews"), options = {False: _("Automatic"), True: _("Yellow Fret (#3)")}, tipText = _("If set to 'Automatic', songs will automatically start previewing when you select them. Otherwise you must press the third fret."))
+Config.define("game",  "bass_kick_sound",     bool,  False, text = _("Kick Bass Sound"), options = {False: _("Off"), True: _("On")}, tipText = _("If enabled, you'll hear a kick bass sound when you use the kick pedal."))
+Config.define("audio", "mute_last_second",    int,   0,     text = _("Mute Last Second"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Cuts the volume with one second remaining to prevent any pops when the song ends.")) #MFH
+Config.define("game",  "mute_drum_fill",      int,   1,     text = _("Mute Drum Track During Fills"), options = {0: _("No"), 1:_("Yes")}, tipText = _("Sets whether or not the drum track will be muted during drum fills (so you can hear yourself have at it!)"))
+Config.define("audio",  "sustain_muting",      int,   1,     text = _("Sustain Muting"), options = sortOptionsByKey({0: _("Never Mute"), 1: _("Very Early"), 2: _("Early"), 3: _("Standard"), 4: _("Always Mute")}), tipText = _("Sets the window used to determine whether or not to mute a dropped sustain note. 'Early' means it will only mute when you drop the sustain relatively early."))
+Config.define("audio", "speed_factor",        float, 1.0,   text = _("Speed Factor"),   options = sortOptionsByKey({1.0: _("1.00x"), 0.75: _("0.75x"), 0.50: _("0.50x"), 0.25: _("0.25x")}), tipText = _("Sets the speed to play the audio at. Your score will be severely penalized if you slow the music down."))  #MFH
+Config.define("audio", "whammy_effect",       int,   0,     text = _("Effects Mode"),   options = {0: _("Killswitch"), 1: _("Pitchbend")}, tipText = _("Sets whether to use a killswitch or pitchbend as the effect on your whammy."))  #MFH
+Config.define("game",  "beat_claps",          bool,  False, text = _("Practice Beat Claps"), options = {False: _("Off"), True: _("On")}, tipText = _("Enables clap sound effects on every beat in practice mode.")) #racer
+Config.define("audio", "enable_crowd_tracks", int,   1,     text = _("Crowd Cheers"), options = sortOptionsByKey({0: _("Off (Disabled)"), 1: _("During SP Only"), 2: _("During SP & Green"), 3: _("Always On")}), tipText = _("Sets when the crowd will cheer for you (if a crowd.ogg is present). 'During SP' will have them sing along in star power, and 'During SP & Green' will have them cheering both in SP and when your rock meter is above 2/3")) #akedrou
 
 
 #Volume
@@ -167,17 +165,15 @@ Config.define("game", "queue_format", int, 0, text = _("Song Queue System"),    
 Config.define("game", "queue_order",  int, 0, text = _("Song Queue Order"),      options = {0: _("In Order"), 1: _("Random")}, tipText = _("Sets the order in which songs added to the queue will be played."))
 Config.define("game", "queue_parts",  int, 0, text = _("Song Queue Parts"),      options = {0: _("Closest Available"), 1: _("Always Ask")}, tipText = _("Choose the behavior when the chosen part is not available in all queued songs. 'Closest Available' will match lead parts to guitar and bass to rhythm, or guitar if no rhythm parts are available. 'Always Ask' brings up the part select screen."))
 Config.define("game", "queue_diff",   int, 0, text = _("Song Queue Difficulty"), options = {0: _("Closest Down"), 1: _("Closest Up"), 2: _("Always Ask")}, tipText = _("Choose the behavior when the chosen difficulty is not available in all queued songs. 'Closest Up' will prefer a harder difficulty, while 'Closest Down' will prefer an easier one. 'Always Ask' brings up the difficulty select screen."))
-Config.define("game",   "quickplay_tiers",          int, 1,  text = _("Use Tiers in Quickplay"), options = {0: _("Off"), 1: _("Normal"), 2: _("Sorting")}, tipText = _("Sets whether to mark tiers in quickplay mode. 'Normal' will use the career tiers and 'Sorting' will insert tiers based on the current sort order."))
+Config.define("setlist", "quickplay_tiers",          int, 1,  text = _("Use Tiers in Quickplay"), options = {0: _("Off"), 1: _("Normal"), 2: _("Sorting")}, tipText = _("Sets whether to mark tiers in quickplay mode. 'Normal' will use the career tiers and 'Sorting' will insert tiers based on the current sort order."))
 Config.define("setlist",  "nil_show_next_score", int, 0, text = _("Show Any Available Score"), options = {0: _("Off"), 1: _("On")}, tipText = _("When set to 'On', this will look for any available score on the currently selected instrument for setlist score display, if one is not available at the chosen difficulty."))
-Config.define("game", "HSMovement",      int,   1,   text = _("Change Score Display"),    options = {0: _("Auto"), 1: _("Blue Fret (#4)")}, tipText = _("Sets whether to change the setlist high score difficulty automatically or with the fourth fret.")) #racer
 Config.define("setlist", "songfilepath",       bool, True,     text = _("Show Filepath"),             options = {True: _("Show"), False: _("Hide")}, tipText = _("Sets whether or not to show the filepath of the song."))
-Config.define("game", "preload_labels",          bool, False,     text = _("Preload Song Labels"),     options = {True: _("Yes"), False: _("No")}, tipText = _("Sets whether to preload all song labels on load. With large setlists, this option is extremely slow."))
-Config.define("game", "songcovertype",        bool, False,     text = _("Label Type"),      options = {True: _("CD Labels"), False: _("Album Covers")}, tipText = _("Sets whether to show CD labels or album covers as the art."))
-Config.define("game", "keep_play_count", int, 1, text = _("Remember Play Count"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Keeps track of how many times you've played each song."))
-Config.define("game",   "sort_direction",      int, 0,    text = _("Sort Direction"), options = {0: _("Ascending"), 1: _("Descending")}, tipText = _("Choose whether to sort in ascending (A-Z) or descending (Z-A) order."))
-Config.define("game",   "sort_order",          int,   0,      text = _("Sort Setlist By"), options = sortOptionsByKey({0: _("Title"), 1: _("Artist"), 2: _("Times played"), 3: _("Album"), 4: _("Genre"), 5: _("Year"), 6: _("Band Difficulty"), 7: _("Difficulty"), 8:_("Song Collection")}), tipText = _("Choose how to sort the setlist by default."))
-Config.define("game",   "whammy_changes_sort_order", bool, True, text = _("Whammy Changes Sort Order"), options = {False: _("No"), True: _("Yes")}, tipText = _("When enabled, pressing the whammy bar will change the sort order in the setlist."))
+Config.define("setlist", "keep_play_count", int, 1, text = _("Remember Play Count"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Keeps track of how many times you've played each song."))
+Config.define("setlist",   "sort_direction",      int, 0,    text = _("Sort Direction"), options = {0: _("Ascending"), 1: _("Descending")}, tipText = _("Choose whether to sort in ascending (A-Z) or descending (Z-A) order."))
+Config.define("setlist",   "sort_order",          int,   0,      text = _("Sort Setlist By"), options = sortOptionsByKey({0: _("Title"), 1: _("Artist"), 2: _("Times played"), 3: _("Album"), 4: _("Genre"), 5: _("Year"), 6: _("Band Difficulty"), 7: _("Difficulty"), 8:_("Song Collection")}), tipText = _("Choose how to sort the setlist by default."))
 Config.define("performance",   "disable_libcount",    bool,  True,  text = _("Show Setlist Size"),    options = {False: _("Yes"), True: _("No")}, tipText = _("Show the number of songs inside of each setlist."))
+Config.define("setlist", "songlist_difficulty", int, 0, text = _("Difficulty (Setlist Score)"), options = difficulties, tipText = _("Sets the default difficulty displayed in the setlist score."))
+Config.define("setlist", "songlist_instrument", int, 0, text = _("Instrument (Setlist Score)"), options = parts, tipText = _("Sets the default part displayed in the setlist score."))  #MFH
 
 
 #Gameplay settings
@@ -189,7 +185,7 @@ Config.define("game", "song_hopo_freq",       int, 1,     text = _("Song HO/PO F
 Config.define("game",   "starpower_mode",          int, 2,    text = _("SP Mode"), options = {0: _("Off"), 1: _("FoF"), 2: _("Auto MIDI")}, tipText = _("Sets the logic used to determine starpower phrases. 'FoF' will generate paths based on the number of notes. 'Auto MIDI' will use MIDI markers to determine the paths, and fall back on the FoF mode if none are available."))
 Config.define("game",   "party_time",          int,   30,     text = _("Party Mode Timer"), options = dict([(n, n) for n in range(1, 99)]), tipText = _("Sets the timer in Party Mode."))
 Config.define("game", "drum_sp_mode",      int, 0,  text = _("Drum SP"), options = {0: _("Auto / Fills"), 1: _("Manual / Fills")}, tipText = _("Determines how drum starpower is activated when there are no drum fills. Auto will automatically activate when available, and Manual will wait for the 'Starpower' button to be pressed."))
-Config.define("game", "T_sound",      int, 2,  text = _("Drum Miss Penalty"), options = {0: _("Always"), 1: _("Song Start"), 2: _("First Note")}, tipText = _("Determines when drum hits count as misses: When the song begins, after the first note, or always."))
+Config.define("game", "drum_miss_penalty",      int, 2,  text = _("Drum Miss Penalty"), options = {0: _("Always"), 1: _("Song Start"), 2: _("First Note")}, tipText = _("Determines when drum hits count as misses: When the song begins, after the first note, or always."))
 Config.define("game",   "mark_solo_sections",  int, 1,    text = _("Enable Guitar Solos"), options = sortOptionsByKey({0: _("Never"), 1: _("Always"), 2: _("By Theme"), 3: _("MIDI Only")}), tipText = _("Sets the logic used to mark solos. 'Always' will mark solos in sections if available. 'By Theme' leaves it to the theme creator. 'MIDI Only' only enables solos marked with the MIDI marker note."))
 
 #Game rules
@@ -201,6 +197,7 @@ Config.define("game",   "note_hit_window",          int, 2,    text = _("Note Hi
 Config.define("handicap",   "early_hit_window",          int, 0,    text = _("Early Hit Window"), options = sortOptionsByKey({0: _("Auto"), 1: _("None (RB2)"), 2: _("Half (GH2)"), 3: _("Full (FoF)")}), tipText = _("Sets how much time before the note is part of the hit window. 'Auto' uses the MIDI to determine."))  #MFH
 Config.define("game",   "gh2_sloppy",          int,   0,      text = _("GH2 Sloppy Mode"), options = {0: _("Off"), 1: _("On")}, tipText = _("Sloppy mode allows you to hold higher frets while tapping lower frets during HO/PO sections. This will lower your score by 25%."))
 Config.define("game", "hopo_frequency",            int,   2,   text = _("HO/PO Frequency"),    options = sortOptionsByKey({0: _("Least"), 1: _("Less"), 2: _("Normal"), 3: _("More"), 4: _("Even More"), 5: _("Most")}), tipText = _("Sets the window used to determine HO/PO notes. Increasing the frequency will reduce your score, and lower settings will give you a tiny bonus."))
+Config.define("game", "fail_mode",       bool, True,     text = _("No Fail"),             options = {True: _("Off"), False: _("On")}, tipText = _("Sets whether or not you can fail out of a song."))
 
 #Face-Off Rules
 Config.define("rules", "face_off_score", int, 0, text = _("Face-Off Judge"), options = {0: _("Score"), 1: _("Rockmeter")}, tipText = _("Sets how victory is determined."))
@@ -231,18 +228,18 @@ Config.define("rules", "coop_save_chances", int, 3, text = _("Fail Strikes"), op
 Config.define("rules", "coop_fail_drag", int, 2, text = _("Fail Drag"), options = sortOptionsByKey({0: _("None"), 1: _("Slight"), 2: _("Normal"), 3: _("Intense")}), tipText = _("Sets how much having a failed band member drags your rockmeter down."))
 
 #AI Settings
-Config.define("game",   "jurg_p0",             bool, False,   text = _("P1 AI"), options = {True: _("On"), False: _("Off")}, tipText = _("Enable or disable the player 1 AI"))
-Config.define("game",   "jurg_skill_p0",        int, 5,   text = _("P1 AI Personality"), options = {0: _("1. KiD"), 1: _("2. Stump"), 2: _("3. akedRobot"), 3: _("4. Q"), 4: _("5. MFH"), 5: _("6. Jurgen")}, tipText = _("Set the personality of the player 1 AI. The numbers correspond with their skill."))
-Config.define("game",   "jurg_logic_p0",            int,   1,      text = _("P1 AI Logic"), options = sortOptionsByKey({0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}), tipText = _("Set the logic used for the player 1 AI. 'Original' cannot handle fast sections. 'MFH-Early' attempts to hit notes as they enter the hit window. 'MFH-OnTime' are implementations that attempt to hit the notes as they happen, like a real player."))
-Config.define("game",   "jurg_p1",             bool, False,   text = _("P2 AI"), options = {True: _("On"), False: _("Off")}, tipText = _("Enable or disable the player 2 AI"))
-Config.define("game",   "jurg_skill_p1",        int, 5,   text = _("P2 AI Personality"), options = {0: _("1. KiD"), 1: _("2. Stump"), 2: _("3. akedRobot"), 3: _("4. Q"), 4: _("5. MFH"), 5: _("6. Jurgen")}, tipText = _("Set the personality of the player 2 AI. The numbers correspond with their skill."))
-Config.define("game",   "jurg_logic_p1",            int,   1,      text = _("P2 AI Logic"), options = sortOptionsByKey({0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}), tipText = _("Set the logic used for the player 2 AI. 'Original' cannot handle fast sections. 'MFH-Early' attempts to hit notes as they enter the hit window. 'MFH-OnTime' are implementations that attempt to hit the notes as they happen, like a real player."))
-Config.define("game",   "jurg_p2",             bool, False,   text = _("P3 AI"), options = {True: _("On"), False: _("Off")}, tipText = _("Enable or disable the player 3 AI"))
-Config.define("game",   "jurg_skill_p2",        int, 5,   text = _("P3 AI Personality"), options = {0: _("1. KiD"), 1: _("2. Stump"), 2: _("3. akedRobot"), 3: _("4. Q"), 4: _("5. MFH"), 5: _("6. Jurgen")}, tipText = _("Set the personality of the player 3 AI. The numbers correspond with their skill."))
-Config.define("game",   "jurg_logic_p2",            int,   1,      text = _("P3 AI Logic"), options = sortOptionsByKey({0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}), tipText = _("Set the logic used for the player 3 AI. 'Original' cannot handle fast sections. 'MFH-Early' attempts to hit notes as they enter the hit window. 'MFH-OnTime' are implementations that attempt to hit the notes as they happen, like a real player."))
-Config.define("game",   "jurg_p3",             bool, False,   text = _("P4 AI"), options = {True: _("On"), False: _("Off")}, tipText = _("Enable or disable the player 4 AI"))
-Config.define("game",   "jurg_skill_p3",        int, 5,   text = _("P4 AI Personality"), options = {0: _("1. KiD"), 1: _("2. Stump"), 2: _("3. akedRobot"), 3: _("4. Q"), 4: _("5. MFH"), 5: _("6. Jurgen")}, tipText = _("Set the personality of the player 4 AI. The numbers correspond with their skill."))
-Config.define("game",   "jurg_logic_p3",            int,   1,      text = _("P4 AI Logic"), options = sortOptionsByKey({0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}), tipText = _("Set the logic used for the player 4 AI. 'Original' cannot handle fast sections. 'MFH-Early' attempts to hit notes as they enter the hit window. 'MFH-OnTime' are implementations that attempt to hit the notes as they happen, like a real player."))
+Config.define("jurgen",   "jurg_p0",             bool, False,   text = _("P1 AI"), options = {True: _("On"), False: _("Off")}, tipText = _("Enable or disable the player 1 AI"))
+Config.define("jurgen",   "jurg_skill_p0",        int, 5,   text = _("P1 AI Personality"), options = {0: _("1. KiD"), 1: _("2. Stump"), 2: _("3. akedRobot"), 3: _("4. Q"), 4: _("5. MFH"), 5: _("6. Jurgen")}, tipText = _("Set the personality of the player 1 AI. The numbers correspond with their skill."))
+Config.define("jurgen",   "jurg_logic_p0",            int,   1,      text = _("P1 AI Logic"), options = sortOptionsByKey({0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}), tipText = _("Set the logic used for the player 1 AI. 'Original' cannot handle fast sections. 'MFH-Early' attempts to hit notes as they enter the hit window. 'MFH-OnTime' are implementations that attempt to hit the notes as they happen, like a real player."))
+Config.define("jurgen",   "jurg_p1",             bool, False,   text = _("P2 AI"), options = {True: _("On"), False: _("Off")}, tipText = _("Enable or disable the player 2 AI"))
+Config.define("jurgen",   "jurg_skill_p1",        int, 5,   text = _("P2 AI Personality"), options = {0: _("1. KiD"), 1: _("2. Stump"), 2: _("3. akedRobot"), 3: _("4. Q"), 4: _("5. MFH"), 5: _("6. Jurgen")}, tipText = _("Set the personality of the player 2 AI. The numbers correspond with their skill."))
+Config.define("jurgen",   "jurg_logic_p1",            int,   1,      text = _("P2 AI Logic"), options = sortOptionsByKey({0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}), tipText = _("Set the logic used for the player 2 AI. 'Original' cannot handle fast sections. 'MFH-Early' attempts to hit notes as they enter the hit window. 'MFH-OnTime' are implementations that attempt to hit the notes as they happen, like a real player."))
+Config.define("jurgen",   "jurg_p2",             bool, False,   text = _("P3 AI"), options = {True: _("On"), False: _("Off")}, tipText = _("Enable or disable the player 3 AI"))
+Config.define("jurgen",   "jurg_skill_p2",        int, 5,   text = _("P3 AI Personality"), options = {0: _("1. KiD"), 1: _("2. Stump"), 2: _("3. akedRobot"), 3: _("4. Q"), 4: _("5. MFH"), 5: _("6. Jurgen")}, tipText = _("Set the personality of the player 3 AI. The numbers correspond with their skill."))
+Config.define("jurgen",   "jurg_logic_p2",            int,   1,      text = _("P3 AI Logic"), options = sortOptionsByKey({0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}), tipText = _("Set the logic used for the player 3 AI. 'Original' cannot handle fast sections. 'MFH-Early' attempts to hit notes as they enter the hit window. 'MFH-OnTime' are implementations that attempt to hit the notes as they happen, like a real player."))
+Config.define("jurgen",   "jurg_p3",             bool, False,   text = _("P4 AI"), options = {True: _("On"), False: _("Off")}, tipText = _("Enable or disable the player 4 AI"))
+Config.define("jurgen",   "jurg_skill_p3",        int, 5,   text = _("P4 AI Personality"), options = {0: _("1. KiD"), 1: _("2. Stump"), 2: _("3. akedRobot"), 3: _("4. Q"), 4: _("5. MFH"), 5: _("6. Jurgen")}, tipText = _("Set the personality of the player 4 AI. The numbers correspond with their skill."))
+Config.define("jurgen",   "jurg_logic_p3",            int,   1,      text = _("P4 AI Logic"), options = sortOptionsByKey({0: _("Original"), 1: _("MFH-Early"), 2: _("MFH-OnTime1"), 3: _("MFH-OnTime2")}), tipText = _("Set the logic used for the player 4 AI. 'Original' cannot handle fast sections. 'MFH-Early' attempts to hit notes as they enter the hit window. 'MFH-OnTime' are implementations that attempt to hit the notes as they happen, like a real player."))
 
 
 #Game area visual settings
@@ -251,30 +248,29 @@ Config.define("video",  "disable_flamesfx", bool, False, text = _("Show Fret Fla
 Config.define("video",  "hitglow_color", int,  0,     text = _("Fret Glow Color"), options = {0: _("Same as Fret"), 1: _("Actual Color")}, tipText = _("Sets whether or not the fret glow image will be color-masked with the theme-determined fret color."))
 Config.define("performance",  "animated_notes", bool,     True,  text = _("Animated Notes"), options = {True: _("Yes"), False: _("No")}, tipText = _("This will animate notes as they come towards you, if that is included in your theme. This can reduce performance. (This is affected by the 'Performance' quickset)"))
 Config.define("game",   "notedisappear",      int,   1,  text = _("Missed Notes"), options = {0: _("Disappear"), 1: _("Keep on going"), 2: _("Turn Red")}, tipText = _("When you miss a note, this sets whether they disappear from the fretboard, scroll off the bottom of the screen or turn red"))
-Config.define("game",   "frets_under_notes",          bool, True,  text = _("Frets Under Notes"), options = {False: _("No"), True: _("Yes")}, tipText = _("Sets whether the notes slide under the frets or over them."))
 Config.define("performance",   "static_strings",          bool, True,  text = _("Static Strings"), options = {False: _("No"), True: _("Yes")}, tipText = _("If enabled, the 'strings' on your fretboard will not scroll."))
 Config.define("performance", "killfx",       int, 0,     text = _("Effects Display Mode"),             options = {0: _("Static"), 1: _("Animated"), 2: _("Off")}, tipText = _("Sets whether or not the whammy effect is animated. (This is affected by the 'Performance' quickset)"))
 Config.define("game", "noterotate",       bool, False,     text = _("3D Note Rotation"),             options = {True: _("Old"), False: _("New")}, tipText = _("Sets the manner of 3D Note Rotation."))
 
-#Neck Settings
-Config.define("game", "rb_sp_neck_glow",      bool, False,  text = _("RB SP Neck Glow"), options = {False: _("Off"), True: _("On")}, tipText = _("Sets a neck glow effect during SP in RB-type themes."))
-Config.define("game", "large_drum_neck",      bool, False,  text = _("Large Drum Neck"), options = {False: _("No"), True: _("Yes")}, tipText = _("If enabled, will show a larger neck when playing drums."))
-Config.define("game", "bass_groove_neck",      int, 2,  text = _("Bass Groove Neck"), options = {0: _("Off"), 1: _("Replace"), 2: _("Overlay")}, tipText = _("Sets the style of the Bass Groove neck. 'Replace' replaces your neck with the special neck, while 'Overlay' lays the neck over top."))
-Config.define("game", "guitar_solo_neck",      int, 2,  text = _("Guitar Solo Neck"), options = {0: _("Off"), 1: _("Replace"), 2: _("Overlay")}, tipText = _("Sets the style of the Guitar Solo neck. 'Replace' replaces your neck with the special neck, while 'Overlay' lays the neck over top."))
-Config.define("game", "4x_neck",      int, 2,  text = _("4x Neck"), options = {0: _("Off"), 1: _("Replace"), 2: _("Overlay")}, tipText = _("Sets the style of the 4x multiplier neck. 'Replace' replaces your neck with the special neck, while 'Overlay' lays the neck over top."))
-Config.define("game",   "incoming_neck_mode",          int, 2,    text = _("Inc. Neck Mode"), options = sortOptionsByKey({0: _("Off"), 1: _("Start Only"), 2: _("Start & End")}), tipText = _("Sets how and whether to render incoming solo necks. 'Start Only' will scroll it in but not out, while 'Start & End' does both."))
-Config.define("game",  "neck_alpha",  float,    1.0,  text = _("Main Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]), tipText = _("Set the transparency of the main neck. 100% is fully visible."))
-Config.define("game",  "solo_neck_alpha",  float,    1.0,  text = _("Solo Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]), tipText = _("Set the transparency of the solo neck. 100% is fully visible."))
-Config.define("game",  "bg_neck_alpha",  float,    1.0,  text = _("Bass Groove Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]), tipText = _("Set the transparency of the bass groove neck. 100% is fully visible."))
-Config.define("game",  "fail_neck_alpha",  float,    1.0,  text = _("Fail Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]), tipText = _("Set the transparency of the failing neck. 100% is fully visible."))
-Config.define("game",  "4x_neck_alpha",  float,    1.0,  text = _("4x Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]), tipText = _("Set the transparency of the 4x multiplier neck. 100% is fully visible."))
-Config.define("game",  "overlay_neck_alpha",  float,    1.0,  text = _("Overlay Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]), tipText = _("Set the transparency of neck overlays. 100% is fully visible."))
-Config.define("game",  "necks_alpha",  float,    1.0,  text = _("All Necks"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]), tipText = _("Set the master transparency of all necks. 100% is fully visible."))
-Config.define("game", "nstype",       int, 2,     text = _("Board Speed Mode"),             options = sortOptionsByKey({0: _("BPM"), 1: _("Difficulty"), 2: _("BPM & Diff"), 3: _("Percentage")}), tipText = _("Sets what determines the speed of the scrolling notes."))
+#Fretboard Settings
+Config.define("fretboard", "frets_under_notes",          bool, True,  text = _("Frets Under Notes"), options = {False: _("No"), True: _("Yes")}, tipText = _("Sets whether the notes slide under the frets or over them."))
+Config.define("fretboard", "large_drum_neck",      bool, False,  text = _("Large Drum Neck"), options = {False: _("No"), True: _("Yes")}, tipText = _("If enabled, will show a larger neck when playing drums."))
+Config.define("fretboard", "bass_groove_neck",      int, 2,  text = _("Bass Groove Neck"), options = {0: _("Off"), 1: _("Replace"), 2: _("Overlay")}, tipText = _("Sets the style of the Bass Groove neck. 'Replace' replaces your neck with the special neck, while 'Overlay' lays the neck over top."))
+Config.define("fretboard", "guitar_solo_neck",      int, 2,  text = _("Guitar Solo Neck"), options = {0: _("Off"), 1: _("Replace"), 2: _("Overlay")}, tipText = _("Sets the style of the Guitar Solo neck. 'Replace' replaces your neck with the special neck, while 'Overlay' lays the neck over top."))
+Config.define("fretboard", "4x_neck",      int, 2,  text = _("4x Neck"), options = {0: _("Off"), 1: _("Replace"), 2: _("Overlay")}, tipText = _("Sets the style of the 4x multiplier neck. 'Replace' replaces your neck with the special neck, while 'Overlay' lays the neck over top."))
+Config.define("fretboard", "incoming_neck_mode",          int, 2,    text = _("Inc. Neck Mode"), options = sortOptionsByKey({0: _("Off"), 1: _("Start Only"), 2: _("Start & End")}), tipText = _("Sets how and whether to render incoming solo necks. 'Start Only' will scroll it in but not out, while 'Start & End' does both."))
+Config.define("fretboard",  "neck_alpha",  float,    1.0,  text = _("Main Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]), tipText = _("Set the transparency of the main neck. 100% is fully visible."))
+Config.define("fretboard",  "solo_neck_alpha",  float,    1.0,  text = _("Solo Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]), tipText = _("Set the transparency of the solo neck. 100% is fully visible."))
+Config.define("fretboard",  "bg_neck_alpha",  float,    1.0,  text = _("Bass Groove Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]), tipText = _("Set the transparency of the bass groove neck. 100% is fully visible."))
+Config.define("fretboard",  "fail_neck_alpha",  float,    1.0,  text = _("Fail Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]), tipText = _("Set the transparency of the failing neck. 100% is fully visible."))
+Config.define("fretboard",  "4x_neck_alpha",  float,    1.0,  text = _("4x Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]), tipText = _("Set the transparency of the 4x multiplier neck. 100% is fully visible."))
+Config.define("fretboard",  "overlay_neck_alpha",  float,    1.0,  text = _("Overlay Neck"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]), tipText = _("Set the transparency of neck overlays. 100% is fully visible."))
+Config.define("fretboard",  "necks_alpha",  float,    1.0,  text = _("All Necks"),   options = dict([(n / 100.0, "%3d%s" % (n,"%")) for n in range(0, 110, 10)]), tipText = _("Set the master transparency of all necks. 100% is fully visible."))
+Config.define("fretboard", "nstype",       int, 2,     text = _("Board Speed Mode"),             options = sortOptionsByKey({0: _("BPM"), 1: _("Difficulty"), 2: _("BPM & Diff"), 3: _("Percentage")}), tipText = _("Sets what determines the speed of the scrolling notes."))
 Config.define("fretboard",   "neck_intro_animation",        int,   4,      text = _("Neck Intro Animation"), options = sortOptionsByKey({0: _("Original"), 1: _("Guitar Hero"), 2: _("Rock Band"), 3: _("Off"), 4: _("Theme")}), tipText = _("Sets what the neck animation looks like. Set it to 'Theme' to leave it to the theme creator.")) #weirdpeople
 Config.define("fretboard",   "point_of_view",                 int,   5,      text = _("Point Of View"), options = sortOptionsByKey({0: _("FoF"), 1: _("GH3"), 2: _("Rock Band"), 3: _("GH2"), 4: _("Rock Rev"), 5: _("Theme")}), tipText = _("Sets the camera's point of view. Set it to any game, or set it to 'Theme' to leave it to the theme creator.")) #Racer, Blazingamer
 Config.define("fretboard", "ovrneckoverlay",       bool, True,     text = _("Overdrive Neck"),             options = {True: _("Overlay"), False: _("Replace")}, tipText = _("Sets the style of the Overdrive neck. 'Replace' replaces your neck with the special neck, while 'Overlay' lays the neck over top."))
-
+Config.define("fretboard", "neck_speed",            int,  100,      text = _("Board Speed Percent"),        options = dict([(n, n) for n in range(10, 410, 10)]), tipText = _("Sets how quickly note will scroll"))
 
 #Game information visual settings
 Config.define("game", "accuracy_mode",      int,   2,   text = _("Show Hit Accuracy"),    options = sortOptionsByKey({0: _("Off"), 1: _("Numeric"), 2: _("Friendly"), 3: _("Both")}), tipText = _("Shows how accurate your note hits are. Numeric will give a time in milliseconds, and Friendly will use English to inform you. Both will show, well, both. Useful for determining your A/V delay."))
@@ -309,13 +305,13 @@ Config.define("video", "counting",       bool, False,     text = _("Show at Song
 
 
 #Game stage settings
-Config.define("game",  "stage_rotate_delay",        int,   800,   text = _("Slideshow Delay"), options = dict([(n, n) for n in range(0, 10, 1)] + [(n, n) for n in range(10, 50, 10)] + [(n, n) for n in range(50, 2001, 50)]), tipText = _("Sets how long, in milliseconds, to wait between each frame in a stage slideshow."))
-Config.define("game",  "stage_animate_delay",        int,   3,   text = _("Animation Delay"), options = dict([(n, n) for n in range(0, 10, 1)] + [(n, n) for n in range(10, 50, 10)] + [(n, n) for n in range(50, 2001, 50)]), tipText = _("Sets how long, in milliseconds, to wait between each frame in a stage animation."))
-Config.define("game",   "rotate_stages",           int,  0,  text = _("Stage Slideshow"),  options = {0: _("Off"), 1: _("Random"), 2: _("In Order"), 3: _("BackNForth")}, tipText = _("Sets the method used to rotate frames in a stage slideshow.")) 
-Config.define("game",   "stage_animate",           int,  0,  text = _("Stage Animation"),  options = {0: _("Off"), 1: _("Random"), 2: _("In Order"), 3: _("BackNForth")}, tipText = _("Sets the method used to rotate frames in a stage animation.")) 
-Config.define("game",   "stage_mode",           int,  0,  text = _("Stage Selection"),  options = {0: _("Random"), 1: _("Default"), 2: _("Blank"), 3: _("Video")}, tipText = _("Set the background for your stage. Default will use the default background, and Blank puts you in a dark room. Probably a lot like the one you're in now."))
-Config.define("game",   "song_stage",           int,  1,  text = _("Song Stage"),  options = {0: _("Off"), 1: _("On") }, tipText = _("Fretters can include a stage to be used with their songs. If this is enabled, you can see it.")) #MFH
-Config.define("game", "miss_pauses_anim",       int, 0,     text = _("Miss Pauses Anim"), options = {0: _("Off"), 1: _("On")}, tipText = _("When enabled, missing a note will pause the stage animation.")) #MFH
+Config.define("stage",  "stage_rotate_delay",        int,   800,   text = _("Slideshow Delay"), options = dict([(n, n) for n in range(0, 10, 1)] + [(n, n) for n in range(10, 50, 10)] + [(n, n) for n in range(50, 2001, 50)]), tipText = _("Sets how long, in milliseconds, to wait between each frame in a stage slideshow."))
+Config.define("stage",  "stage_animate_delay",        int,   3,   text = _("Animation Delay"), options = dict([(n, n) for n in range(0, 10, 1)] + [(n, n) for n in range(10, 50, 10)] + [(n, n) for n in range(50, 2001, 50)]), tipText = _("Sets how long, in milliseconds, to wait between each frame in a stage animation."))
+Config.define("stage",   "rotate_stages",           int,  0,  text = _("Stage Slideshow"),  options = {0: _("Off"), 1: _("Random"), 2: _("In Order"), 3: _("BackNForth")}, tipText = _("Sets the method used to rotate frames in a stage slideshow.")) 
+Config.define("stage",   "stage_animate",           int,  0,  text = _("Stage Animation"),  options = {0: _("Off"), 1: _("Random"), 2: _("In Order"), 3: _("BackNForth")}, tipText = _("Sets the method used to rotate frames in a stage animation.")) 
+Config.define("stage",   "stage_mode",           int,  0,  text = _("Stage Selection"),  options = {0: _("Random"), 1: _("Default"), 2: _("Blank"), 3: _("Video")}, tipText = _("Set the background for your stage. Default will use the default background, and Blank puts you in a dark room. Probably a lot like the one you're in now."))
+Config.define("stage",   "song_stage",           int,  1,  text = _("Song Stage"),  options = {0: _("Off"), 1: _("On") }, tipText = _("Fretters can include a stage to be used with their songs. If this is enabled, you can see it.")) #MFH
+Config.define("stage", "miss_pauses_anim",       int, 0,     text = _("Miss Pauses Anim"), options = {0: _("Off"), 1: _("On")}, tipText = _("When enabled, missing a note will pause the stage animation.")) #MFH
 
 
 #HOPO
@@ -323,8 +319,9 @@ Config.define("game",   "hopo_system",          int,   3,      text = _("HO/PO S
 Config.define("game", "hopo_after_chord",      int,   1,   text = _("HO/PO After Chord"),    options = {0: _("Off"), 1: _("On")}, tipText = _("This will determine whether or not HO/PO notes can follow a chord. This only applies to the GH2 systems."))
 
 #Postgame
-Config.define("game", "congrats",       bool, True,     text = _("Score SFX"),             options = {True: _("On"), False: _("Off")}, tipText = _("Sets whether or not to have Jurgen taunt (or, I suppose, congratulate) you at the end of a song."))#blazingamer
-Config.define("handicap",  "detailed_handicap",       int, 1,     text = _("Show Detailed Handicap"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Shows the handicaps individually on the result screen."))
+Config.define("results", "congrats",          bool, True, text = _("Jurgen's Feedback"),  options = {True: _("On"), False: _("Off")}, tipText = _("Sets whether or not to have Jurgen taunt (or, I suppose, congratulate) you at the end of a song."))#blazingamer
+Config.define("results", "result_cheer_loop", int,  2,    text = _("Results Cheer Loop"), options = {0: _("Off"), 1: _("Theme"), 2: _("On")}, tipText = _("Sets whether the cheering sound heard on the result screen will loop. 'Theme' leaves it to the theme creator.")) #MFH
+Config.define("results", "cheer_loop_delay",  int,  550,  text = _("Cheer Loop Delay"),   options = dict([(n, n) for n in range(0, 10, 1)] + [(n, n) for n in range(10, 50, 10)] + [(n, n) for n in range(50, 2001, 50)]), tipText = _("Sets the time, in milliseconds, to wait before playing the result cheer again (if looping is enabled)."))
 
 
 #used internally:
@@ -355,13 +352,13 @@ Config.define("debug",   "show_raw_vocal_data", int, 0,  text = _("Show Raw Voca
 Config.define("game",   "disable_vbpm",        bool,  False,  text = _("Disable Variable BPM"),  options = {False: _("No"), True: _("Yes")}, tipText = _("This will disable the use of the Variable BPM logic."))
 
 #MFH - log settings
-Config.define("game",   "log_ini_reads",          int, 0,    text = _("Log INI Reads"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs any read to an INI file. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."))
-Config.define("game",   "log_class_inits",          int, 0,    text = _("Log Class Inits"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs most class initializations in '__init__'. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."))
-Config.define("game",   "log_loadings",          int, 0,    text = _("Log Loadings"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs resource loads. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."))
-Config.define("game",   "log_sections",          int, 0,    text = _("Log MIDI Sections"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs MIDI sections. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."))
-Config.define("game",   "log_undefined_gets",          int, 0,    text = _("Log Undefined GETs"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs attempts to read an undefined config key. This is unnecessary information."))
-Config.define("game",   "log_marker_notes",          int, 0,    text = _("Log Marker Notes"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs MIDI marker notes (solo, SP, etc). This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."))
-Config.define("game",   "log_starpower_misses",          int, 0,    text = _("Log SP Misses"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs SP phrase misses. This is unnecessary information."))
+Config.define("log",   "log_ini_reads",          int, 0,    text = _("Log INI Reads"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs any read to an INI file. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."))
+Config.define("log",   "log_class_inits",          int, 0,    text = _("Log Class Inits"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs most class initializations in '__init__'. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."))
+Config.define("log",   "log_loadings",          int, 0,    text = _("Log Loadings"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs resource loads. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."))
+Config.define("log",   "log_sections",          int, 0,    text = _("Log MIDI Sections"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs MIDI sections. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."))
+Config.define("log",   "log_undefined_gets",          int, 0,    text = _("Log Undefined GETs"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs attempts to read an undefined config key. This is unnecessary information."))
+Config.define("log",   "log_marker_notes",          int, 0,    text = _("Log Marker Notes"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs MIDI marker notes (solo, SP, etc). This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."))
+Config.define("log",   "log_starpower_misses",          int, 0,    text = _("Log SP Misses"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs SP phrase misses. This is unnecessary information."))
 Config.define("log",   "log_unedited_midis",          int, 0,    text = _("Log Unedited MIDIs"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs when notes-unedited.mid is used. This is unnecessary information."))
 Config.define("log",   "log_lyric_events",          int, 0,    text = _("Log Lyric Events"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs MIDI lyric events. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."))
 Config.define("log",   "log_tempo_events",          int, 0,    text = _("Log Tempo Events"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs MIDI tempo events. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."))
@@ -393,19 +390,10 @@ if defaultTheme is None:
   defaultTheme = themes[0]    #myfingershurt
 
 #myfingershurt: default theme must be an existing one!
-Config.define("coffee", "themename",           str,   defaultTheme,      text = _("Theme"),                options = dict([(str(themes[n]),themes[n]) for n in range(0, i)]), tipText = _("Sets the overall graphical feel of the game. You can find and download many more at fretsonfire.net"))
+Config.define("engine", "theme",           str,   defaultTheme,      text = _("Theme"),                options = dict([(str(themes[n]),themes[n]) for n in range(0, i)]), tipText = _("Sets the overall graphical feel of the game. You can find and download many more at fretsonfire.net"))
 
 ##Alarian: End Get unlimited themes by foldername
 Player.loadControls()
-
-Config.define("coffee", "neckSpeed",            int,  100,      text = _("Board Speed Percent"),        options = dict([(n, n) for n in range(10, 410, 10)]), tipText = _("Sets how quickly note will scroll"))
-Config.define("coffee", "failingEnabled",       bool, True,     text = _("No Fail"),             options = {True: _("Off"), False: _("On")}, tipText = _("Sets whether or not you can fail out of a song."))
-
-# evilynux - configurable default highscores difficulty display.
-# Index assigned following same standard as command line argument.
-Config.define("game", "songlist_difficulty", int, 0, text = _("Difficulty (Setlist Score)"), options = difficulties, tipText = _("Sets the default difficulty displayed in the setlist score."))
-
-Config.define("game", "songlist_instrument", int, 0, text = _("Instrument (Setlist Score)"), options = parts, tipText = _("Sets the default part displayed in the setlist score."))  #MFH
 
 
 class FullScreenSwitcher(KeyListener):
@@ -507,7 +495,7 @@ class GameEngine(object):
     self.restartRequested  = False
 
     # evilynux - Check if theme icon exists first, then fallback on FoFiX icon.
-    themename = self.config.get("coffee", "themename")
+    themename = self.config.get("engine", "theme")
     themeicon = os.path.join(Version.dataPath(), "themes", themename, "icon.png")
     fofixicon = os.path.join(Version.dataPath(), "fofix_icon.png")
     icon = None
@@ -527,12 +515,12 @@ class GameEngine(object):
     self.elapsedTime       = 0
     self.priority          = self.config.get("engine", "highpriority")
     self.show_fps          = self.config.get("video", "show_fps")
-    self.advSettings       = self.config.get("game", "adv_settings")
+    self.advSettings       = self.config.get("menu", "adv_settings")
     self.restartRequired   = False
     self.quicksetRestart   = False
     self.quicksetPerf      = self.config.get("quickset", "performance")
-    self.scrollRate        = self.config.get("game", "scroll_rate")
-    self.scrollDelay       = self.config.get("game", "scroll_delay")
+    self.scrollRate        = self.config.get("menu", "scroll_rate")
+    self.scrollDelay       = self.config.get("menu", "scroll_delay")
     
     Log.debug("Initializing audio.")
     frequency    = self.config.get("audio", "frequency")
@@ -648,23 +636,23 @@ class GameEngine(object):
       aniStageOptions.update({"Normal":_("Slideshow")})
       if i > 1:   #only add Random setting if more than one animated stage exists
         aniStageOptions.update({"Random":_("Random")})
-      Config.define("game", "animated_stage_folder", str, defaultAniStage, text = _("Animated Stage"), options = aniStageOptions )
+      Config.define("stage", "animated_stage_folder", str, defaultAniStage, text = _("Animated Stage"), options = aniStageOptions )
       
       #MFH: here, need to track and check a new ini entry for last theme - so when theme changes we can re-default animated stage to first found
       lastTheme = self.config.get("game","last_theme")
       if lastTheme == "" or lastTheme != currentTheme:   #MFH - no last theme, and theme just changed:
-        self.config.set("game","animated_stage_folder",defaultAniStage)   #force defaultAniStage
+        self.config.set("stage","animated_stage_folder",defaultAniStage)   #force defaultAniStage
       self.config.set("game","last_theme",currentTheme)
       
-      selectedAnimatedStage = self.config.get("game", "animated_stage_folder")
+      selectedAnimatedStage = self.config.get("stage", "animated_stage_folder")
       if selectedAnimatedStage != "Normal" and selectedAnimatedStage != "Random":
         if not os.path.exists(os.path.join(stagespath,selectedAnimatedStage)):
           Log.warn("Selected animated stage folder " + selectedAnimatedStage + " does not exist, forcing Normal.")
-          self.config.set("game","animated_stage_folder","Normal") #MFH: force "Standard" currently selected animated stage folder is invalid
+          self.config.set("stage","animated_stage_folder","Normal") #MFH: force "Standard" currently selected animated stage folder is invalid
     else:
-      Config.define("game", "animated_stage_folder", str, "None", text = _("Animated Stage"), options = ["None",_("None")])
+      Config.define("stage", "animated_stage_folder", str, "None", text = _("Animated Stage"), options = ["None",_("None")])
       Log.warn("No stages\ folder found, forcing None setting for Animated Stage.")
-      self.config.set("game","animated_stage_folder", "None") #MFH: force "None" when Stages folder can't be found
+      self.config.set("stage","animated_stage_folder", "None") #MFH: force "None" when Stages folder can't be found
 
     
     

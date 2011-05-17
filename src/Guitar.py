@@ -50,8 +50,7 @@ class Guitar(Instrument):
     self.gameMode2p = self.engine.world.multiplayer
     self.matchingNotes = []
             
-    self.logClassInits = self.engine.config.get("game", "log_class_inits")
-    if self.logClassInits == 1:
+    if self.engine.data.logClassInits == 1:
       Log.debug("Guitar class init...")
     
     self.lastPlayedNotes = []   #MFH - for reverting when game discovers it implied incorrectly
@@ -91,7 +90,7 @@ class Guitar(Instrument):
     self.fretImgColNumber = float(3)
 
     #myfingershurt:
-    self.bassGrooveNeckMode = self.engine.config.get("game", "bass_groove_neck")
+    self.bassGrooveNeckMode = self.engine.config.get("fretboard", "bass_groove_neck")
 
     self.tailsEnabled = True
 

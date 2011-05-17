@@ -94,8 +94,7 @@ class Menu(Layer, KeyListener):
   def __init__(self, engine, choices, name = None, onClose = None, onCancel = None, pos = (.2, .66 - .35), viewSize = 6, fadeScreen = False, font = "font", mainMenu = None, textColor = None, selectedColor = None, append_submenu_char = True, selectedIndex = None, showTips = True, selectedBox = False):
     self.engine       = engine
 
-    self.logClassInits = self.engine.config.get("game", "log_class_inits")
-    if self.logClassInits == 1:
+    if self.engine.data.logClassInits == 1:
       Log.debug("Menu class init (Menu.py)...")
 
     #Get theme
@@ -115,7 +114,7 @@ class Menu(Layer, KeyListener):
     self.mainMenu = False
     self.graphicMenu = False
     self.useSelectedBox = selectedBox
-    self.useGraphics = self.engine.config.get("game", "use_graphical_submenu")
+    self.useGraphics = self.engine.config.get("menu", "use_graphical_submenu")
     self.gfxText = None
     
     self.scrolling = 0
@@ -127,7 +126,7 @@ class Menu(Layer, KeyListener):
     self.selectedColor = selectedColor
     self.tipColor = self.engine.theme.menuTipTextColor
 
-    self.drumNav = self.engine.config.get("game", "drum_navigation")  #MFH
+    self.drumNav = self.engine.config.get("menu", "drum_navigation")  #MFH
     
     if self.name and self.useGraphics > 0:
       try:

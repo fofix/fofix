@@ -230,7 +230,7 @@ class GuitarScene(Scene):
     
     self.jurgenLogic             = [0 for i in self.playerList]
     for i in range(len(self.playerList)):
-      self.jurgenLogic[i] = self.engine.config.get("game", "jurg_logic_p%d" % i)
+      self.jurgenLogic[i] = self.engine.config.get("jurgen", "jurg_logic_p%d" % i)
 
     self.aiSkill                 = [0 for i in self.playerList]
     self.aiHitPercentage         = [0 for i in self.playerList]
@@ -244,7 +244,7 @@ class GuitarScene(Scene):
       self.battleTarget[i] = i-1
       if self.battleTarget[i] == -1:  
         self.battleTarget[i] = self.numOfPlayers - 1
-      self.aiSkill[i] = self.engine.config.get("game", "jurg_skill_p%d" % i)
+      self.aiSkill[i] = self.engine.config.get("jurgen", "jurg_skill_p%d" % i)
       if self.aiSkill[i] == 0:
         self.aiHitPercentage[i] = 70 + (5*player.getDifficultyInt())
         self.jurgBattleWhammyTime[i] = 1000
@@ -283,7 +283,7 @@ class GuitarScene(Scene):
     self.battleJurgMissTime = [0 for i in self.playerList]
 
     self.whammySavesSP = self.engine.world.whammySavesSP
-    self.failingEnabled = self.engine.config.get("coffee", "failingEnabled")
+    self.failingEnabled = self.engine.config.get("game", "fail_mode")
 
     self.timeLeft = None
     self.processedFirstNoteYet = False
@@ -313,7 +313,7 @@ class GuitarScene(Scene):
     for i in range(self.numOfPlayers):
       if self.instruments[i].isVocal:
         continue
-      if self.engine.config.get("game", "jurg_p%d" % i) == True:
+      if self.engine.config.get("jurgen", "jurg_p%d" % i) == True:
         self.jurg[i] = True
         self.autoPlay = True
 
@@ -545,7 +545,7 @@ class GuitarScene(Scene):
 
     self.engine.view.setViewport(1,0)
 
-    self.drumMisses = self.engine.config.get("game", "T_sound") #Faaa Drum sound
+    self.drumMisses = self.engine.config.get("game", "drum_miss_penalty")
 
     #MFH - constant definitions, ini value retrievals
     self.pitchBendLowestFactor = .90 #stump: perhaps read this from song.ini and fall back on a specific value?
@@ -570,7 +570,6 @@ class GuitarScene(Scene):
     self.lyricMode = self.engine.config.get("game", "lyric_mode")
     self.scriptLyricPos = self.engine.config.get("game", "script_lyric_pos")
     self.starClaps = self.engine.config.get("game", "star_claps")
-    self.rb_sp_neck_glow = self.engine.config.get("game", "rb_sp_neck_glow")
     self.accuracy = [0 for i in self.playerList]
     self.resumeCountdownEnabled = self.engine.config.get("game", "resume_countdown")
     self.resumeCountdown = 0
@@ -596,7 +595,7 @@ class GuitarScene(Scene):
     self.numDecimalPlaces = self.engine.config.get("game","decimal_places")
     self.roundDecimalForDisplay = lambda n: ('%%.%df' % self.numDecimalPlaces) % float(n)  #stump
     self.starScoring = self.engine.config.get("game", "star_scoring")#MFH
-    self.muteSustainReleases = self.engine.config.get("game", "sustain_muting") #MFH
+    self.muteSustainReleases = self.engine.config.get("audio", "sustain_muting") #MFH
     self.hopoIndicatorEnabled = self.engine.config.get("game", "hopo_indicator") #MFH
     self.fontShadowing = self.engine.config.get("game", "in_game_font_shadowing") #MFH
     self.muteLastSecond = self.engine.config.get("audio", "mute_last_second") #MFH
@@ -604,11 +603,11 @@ class GuitarScene(Scene):
     self.muteDrumFill = self.engine.config.get("game", "mute_drum_fill") #MFH
     self.starScoreUpdates = self.engine.config.get("performance", "star_score_updates") #MFH
     self.currentlyAnimating = True
-    self.missPausesAnim = self.engine.config.get("game", "miss_pauses_anim") #MFH
+    self.missPausesAnim = self.engine.config.get("stage", "miss_pauses_anim") #MFH
     self.starpowerMode = self.engine.config.get("game", "starpower_mode") #MFH
     self.useMidiSoloMarkers = False
-    self.logMarkerNotes = self.engine.config.get("game", "log_marker_notes")
-    self.logStarpowerMisses = self.engine.config.get("game", "log_starpower_misses")
+    self.logMarkerNotes = self.engine.config.get("log", "log_marker_notes")
+    self.logStarpowerMisses = self.engine.config.get("log", "log_starpower_misses")
     self.soloFrameMode = self.engine.config.get("game", "solo_frame")
     self.whammyEffect = self.engine.config.get("audio",  "whammy_effect")
     if self.whammyEffect == 1 and not Audio.pitchBendSupported:    #pitchbend
@@ -801,7 +800,7 @@ class GuitarScene(Scene):
     self.rockFailViz = 0.0
     self.failViz = [0.0 for i in self.playerList]
     
-    self.phrases = self.engine.config.get("coffee", "game_phrases")#blazingamer
+    self.phrases = self.engine.config.get("game", "game_phrases")#blazingamer
     self.starfx = self.engine.config.get("game", "starfx")#blazingamer
 
     #weirdpeople - sets the distances the neck has to move in the animation
@@ -1900,15 +1899,15 @@ class GuitarScene(Scene):
     self.aiSkill             = [0 for i in self.playerList]
     
     for i, player in enumerate(self.playerList):
-      jurgen = self.engine.config.get("game", "jurg_p%d" % i)
+      jurgen = self.engine.config.get("jurgen", "jurg_p%d" % i)
       if jurgen == True:
         self.jurg[i] = True
         self.autoPlay = True
-      self.aiSkill[i] = self.engine.config.get("game", "jurg_skill_p%d" % i)
+      self.aiSkill[i] = self.engine.config.get("jurgen", "jurg_skill_p%d" % i)
       if player.part.id == Song.VOCAL_PART:
         self.instruments[i].jurgenEnabled = jurgen
         self.instruments[i].jurgenSkill   = self.aiSkill[i]
-      self.jurgenLogic[i] = self.engine.config.get("game", "jurg_logic_p%d" % i)    
+      self.jurgenLogic[i] = self.engine.config.get("jurgen", "jurg_logic_p%d" % i)    
       
       
     #MFH - no Jurgen in Career mode.

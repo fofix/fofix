@@ -178,7 +178,7 @@ def main():
 
   #Lysdestic - Alter theme from CLI
   if theme is not None:
-    Config.set("coffee", "themename", theme)
+    Config.set("engine", "theme", theme)
 
   engine = GameEngine(config)
   engine.cmdPlay = 0
@@ -219,7 +219,7 @@ def main():
   # we are not in one-shot mode.
   videoLayer = False
   if not engine.cmdPlay:
-    themename = Config.get("coffee", "themename")
+    themename = Config.get("engine", "theme")
     vidSource = os.path.join(Version.dataPath(), 'themes', themename, \
                              'menu', 'intro.ogv')
     if os.path.isfile(vidSource):

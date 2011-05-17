@@ -443,8 +443,8 @@ def pluginControls(activeControls):
 class Controls:
   def __init__(self):
 
-    self.logClassInits = Config.get("game", "log_class_inits")
-    if self.logClassInits == 1:
+    logClassInits = Config.get("game", "log_class_inits")
+    if logClassInits == 1:
       Log.debug("Controls class init (Player.py)...")
     self.controls = []
     self.controls.append(Config.get("game", "control0"))
@@ -459,10 +459,10 @@ class Controls:
     self.mics       = 0
     self.overlap    = []
     
-    self.p2Nav = Config.get("game", "p2_menu_nav")
-    self.drumNav = Config.get("game", "drum_navigation")
+    self.p2Nav = Config.get("menu", "p2_menu_nav")
+    self.drumNav = Config.get("menu", "drum_navigation")
     
-    self.keyCheckerMode = Config.get("game","key_checker_mode")
+    self.keyCheckerMode = Config.get("menu","key_checker_mode")
     
     if VFS.isfile(_makeControllerIniName(self.controls[0])):
       self.config.append(Config.load(VFS.resolveRead(_makeControllerIniName(self.controls[0])), type = 1))
@@ -831,7 +831,7 @@ def isKeyMappingOK(config, start):
 def setNewKeyMapping(engine, config, section, option, key):
   oldKey = config.get(section, option)
   config.set(section, option, key)
-  keyCheckerMode = Config.get("game", "key_checker_mode")
+  keyCheckerMode = Config.get("menu", "key_checker_mode")
   if key == "None" or key is None:
     return True
   b = isKeyMappingOK(config, option)
@@ -846,8 +846,8 @@ def setNewKeyMapping(engine, config, section, option, key):
 class Player(object):
   def __init__(self, name, number):
 
-    self.logClassInits = Config.get("game", "log_class_inits")
-    if self.logClassInits == 1:
+    logClassInits = Config.get("game", "log_class_inits")
+    if logClassInits == 1:
       Log.debug("Player class init (Player.py)...")
 
     self.name     = name

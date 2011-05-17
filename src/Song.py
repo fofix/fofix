@@ -234,7 +234,7 @@ class SongInfo(object):
     if self.logClassInits == 1:
       Log.debug("SongInfo class init (song.py): " + self.name)
 
-    self.logSections = Config.get("game", "log_sections")
+    self.logSections = Config.get("log", "log_sections")
 
     self.logUneditedMidis = Config.get("log",   "log_unedited_midis")
 
@@ -2648,15 +2648,15 @@ class MidiReader(midi.MidiOutStream):
     self.useVocalTrack = False
     self.vocalOverlapCheck = []
 
-    self.logClassInits = Config.get("game", "log_class_inits")
-    if self.logClassInits == 1:
+    logClassInits = Config.get("log", "log_class_inits")
+    if logClassInits == 1:
       Log.debug("MidiReader class init (song.py)...")
 
-    self.logMarkerNotes = Config.get("game", "log_marker_notes")
+    self.logMarkerNotes = Config.get("log", "log_marker_notes")
 
     self.logTempoEvents = Config.get("log",   "log_tempo_events")
 
-    self.logSections = Config.get("game", "log_sections")
+    self.logSections = Config.get("log", "log_sections")
     
     self.readTextAndLyricEvents = Config.get("game","rock_band_events")
     self.guitarSoloIndex = 0
@@ -3038,7 +3038,7 @@ class MidiSectionReader(midi.MidiOutStream):
     if self.logClassInits == 1:
       Log.debug("MidiSectionReader class init (song.py)...")
 
-    self.logSections = Config.get("game", "log_sections")
+    self.logSections = Config.get("log", "log_sections")
 
     #MFH: practice section support:
     self.ticksPerBeat = 480
@@ -3264,7 +3264,7 @@ class MidiPartsDiffReader(midi.MidiOutStream):
     if self.logClassInits == 1:
       Log.debug("MidiPartsDiffReader class init (song.py)...")
 
-    self.logSections = Config.get("game", "log_sections")
+    self.logSections = Config.get("log", "log_sections")
   
   def getMidiStyle(self):
     if self._ODNoteFound:
@@ -3568,9 +3568,9 @@ def getAvailableLibraries(engine, library = DEFAULT_LIBRARY):
   return libraries
 
 def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = False, progressCallback = lambda p: None):
-  order = engine.config.get("game", "sort_order")
+  order = engine.config.get("setlist", "sort_order")
   tut = engine.world.tutorial
-  direction = engine.config.get("game", "sort_direction")
+  direction = engine.config.get("setlist", "sort_direction")
   if tut:
     includeTutorials = True
 
@@ -3608,7 +3608,7 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
             song.setLocked(True)
       else:
         song.setLocked(False)
-  instrument = engine.config.get("game", "songlist_instrument")
+  instrument = engine.config.get("setlist", "songlist_instrument")
   theInstrumentDiff = instrumentDiff[instrument]
   if direction == 0:
     if order == 1:
@@ -3652,11 +3652,11 @@ def getAvailableSongs(engine, library = DEFAULT_LIBRARY, includeTutorials = Fals
 
   #coolguy567's unlock system
 def getSortingTitles(engine, songList = []):
-  sortOrder = engine.config.get("game","sort_order")
+  sortOrder = engine.config.get("setlist","sort_order")
   titles = []
   sortTitles = []
   
-  instrument = engine.config.get("game", "songlist_instrument")
+  instrument = engine.config.get("setlist", "songlist_instrument")
   theInstrumentDiff = instrumentDiff[instrument]
 
   for songItem in songList:
@@ -3762,7 +3762,7 @@ def getAvailableSongsAndTitles(engine, library = DEFAULT_LIBRARY, includeTutoria
     return []
 
   career = False
-  quickPlayCareerTiers = engine.config.get("game", "quickplay_tiers")
+  quickPlayCareerTiers = engine.config.get("setlist", "quickplay_tiers")
 
   titles = []
   items = getAvailableSongs(engine, library, includeTutorials, progressCallback=progressCallback)
@@ -3796,17 +3796,17 @@ def compareSongsAndTitles(engine, a, b, career):
   #>>>    else: # x<y
   #>>>       return -1
 
-  order = engine.config.get("game", "sort_order")
+  order = engine.config.get("setlist", "sort_order")
   
   #MFH - must check here for an invalid Sort Order setting and correct it!
-  orderings = engine.config.getOptions("game", "sort_order")[1]
+  orderings = engine.config.getOptions("setlist", "sort_order")[1]
   if order >= len(orderings):
     order = 0
-    engine.config.set("game", "sort_order", order)
+    engine.config.set("setlist", "sort_order", order)
 
-  instrument = engine.config.get("game", "songlist_instrument")
+  instrument = engine.config.get("setlist", "songlist_instrument")
   theInstrumentDiff = instrumentDiff[instrument]
-  direction = engine.config.get("game", "sort_direction")
+  direction = engine.config.get("setlist", "sort_direction")
 
   if not career:# and quickPlayCareerTiers == 2:
     Aval = ""

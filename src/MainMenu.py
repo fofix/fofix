@@ -49,8 +49,8 @@ class MainMenu(BackgroundLayer):
   def __init__(self, engine):
     self.engine              = engine
 
-    self.logClassInits = Config.get("game", "log_class_inits")
-    if self.logClassInits == 1:
+    logClassInits = Config.get("log", "log_class_inits")
+    if logClassInits == 1:
       Log.debug("MainMenu class init (MainMenu.py)...")
 
     self.time                = 0.0
@@ -60,7 +60,7 @@ class MainMenu(BackgroundLayer):
     
     self.showStartupMessages = False
 
-    self.gfxVersionTag = Config.get("game", "gfx_version_tag")
+    self.gfxVersionTag = Config.get("menu", "gfx_version_tag")
     
     self.chosenNeck = Config.get("game", "default_neck")
     exists = False

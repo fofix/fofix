@@ -104,8 +104,7 @@ class Drum(Instrument):
     self.lanenumber     = float(4)
     self.fretImgColNumber = float(6)
 
-    self.logClassInits = self.engine.config.get("game", "log_class_inits")
-    if self.logClassInits == 1:
+    if self.engine.data.logClassInits == 1:
       Log.debug("Drum class initialization!")
 
 
@@ -127,7 +126,7 @@ class Drum(Instrument):
 
     self.bigMax = 1
 
-    if self.engine.config.get("game", "large_drum_neck"):
+    if self.engine.config.get("fretboard", "large_drum_neck"):
       self.boardWidth     *= (4.0/3.0)
       self.boardLength    *= (4.0/3.0)
     

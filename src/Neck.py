@@ -52,13 +52,13 @@ class Neck:
     self.indexFps       = self.engine.config.get("video", "fps") #QQstarS
     
     self.neckAlpha=[] # necks transparency
-    self.neckAlpha.append( self.engine.config.get("game", "necks_alpha") ) # all necks
-    self.neckAlpha.append( self.neckAlpha[0] * self.engine.config.get("game", "neck_alpha") ) # normal neck
-    self.neckAlpha.append( self.neckAlpha[0] * self.engine.config.get("game", "solo_neck_alpha") ) # solo neck
-    self.neckAlpha.append( self.neckAlpha[0] * self.engine.config.get("game", "bg_neck_alpha") ) # bass groove neck
-    self.neckAlpha.append( self.neckAlpha[0] * self.engine.config.get("game", "overlay_neck_alpha") ) # overlay neck
-    self.neckAlpha.append( self.neckAlpha[0] * self.engine.config.get("game", "fail_neck_alpha") ) # fail neck
-    self.neckAlpha.append( self.neckAlpha[0] * self.engine.config.get("game", "4x_neck_alpha") ) # 4x multi neck
+    self.neckAlpha.append( self.engine.config.get("fretboard", "necks_alpha") ) # all necks
+    self.neckAlpha.append( self.neckAlpha[0] * self.engine.config.get("fretboard", "neck_alpha") ) # normal neck
+    self.neckAlpha.append( self.neckAlpha[0] * self.engine.config.get("fretboard", "solo_neck_alpha") ) # solo neck
+    self.neckAlpha.append( self.neckAlpha[0] * self.engine.config.get("fretboard", "bg_neck_alpha") ) # bass groove neck
+    self.neckAlpha.append( self.neckAlpha[0] * self.engine.config.get("fretboard", "overlay_neck_alpha") ) # overlay neck
+    self.neckAlpha.append( self.neckAlpha[0] * self.engine.config.get("fretboard", "fail_neck_alpha") ) # fail neck
+    self.neckAlpha.append( self.neckAlpha[0] * self.engine.config.get("fretboard", "4x_neck_alpha") ) # 4x multi neck
 	
     self.boardWidth     = self.engine.theme.neckWidth
     self.boardLength    = self.engine.theme.neckLength
@@ -70,7 +70,7 @@ class Neck:
 
     #death_au: fixed neck size
     
-    if self.isDrum and self.engine.config.get("game", "large_drum_neck"):
+    if self.isDrum and self.engine.config.get("fretboard", "large_drum_neck"):
       self.boardWidth     = 4.0
       self.boardLength    = 12.0
 
@@ -173,7 +173,7 @@ class Neck:
     #now theme determination logic is only in data.py:
     self.theme = self.engine.data.theme
 
-    self.incomingNeckMode = self.engine.config.get("game", "incoming_neck_mode")
+    self.incomingNeckMode = self.engine.config.get("fretboard", "incoming_neck_mode")
 
     #blazingamer
     self.failcount = 0
@@ -190,9 +190,9 @@ class Neck:
     self.baseBeat       = 0.0
 
     #myfingershurt:
-    self.bassGrooveNeckMode = self.engine.config.get("game", "bass_groove_neck")
-    self.guitarSoloNeckMode = self.engine.config.get("game", "guitar_solo_neck")
-    self.fourxNeckMode = self.engine.config.get("game", "4x_neck")
+    self.bassGrooveNeckMode = self.engine.config.get("fretboard", "bass_groove_neck")
+    self.guitarSoloNeckMode = self.engine.config.get("fretboard", "guitar_solo_neck")
+    self.fourxNeckMode = self.engine.config.get("fretboard", "4x_neck")
 
 
     self.useMidiSoloMarkers = False

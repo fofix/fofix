@@ -251,15 +251,15 @@ class Stage(object):
     self.hFull = None
     
     # evilynux - imported myfingershurt stuff from GuitarScene
-    self.mode = self.engine.config.get("game", "stage_mode")
-    self.songStage = self.engine.config.get("game", "song_stage")
-    self.animatedFolder = self.engine.config.get("game", "animated_stage_folder")
+    self.mode = self.engine.config.get("stage", "stage_mode")
+    self.songStage = self.engine.config.get("stage", "song_stage")
+    self.animatedFolder = self.engine.config.get("stage", "animated_stage_folder")
 
     # evilynux - imported myfingershurt stuff from GuitarScene w/ minor modifs
     #MFH TODO - alter logic to accommodate separated animation and slideshow
     #           settings based on selected animated stage folder
-    animationMode = self.engine.config.get("game", "stage_animate")
-    slideShowMode = self.engine.config.get("game", "rotate_stages")
+    animationMode = self.engine.config.get("stage", "stage_animate")
+    slideShowMode = self.engine.config.get("stage", "rotate_stages")
 
     if self.animatedFolder == _("None"):
       self.rotationMode = 0   #MFH: if no animated stage folders are available, disable rotation.
@@ -270,8 +270,8 @@ class Stage(object):
     
     self.imgArr = [] #QQstarS:random
     self.imgArrScaleFactors = []  #MFH - for precalculated scale factors
-    self.rotateDelay = self.engine.config.get("game",  "stage_rotate_delay") #myfingershurt - user defined stage rotate delay
-    self.animateDelay = self.engine.config.get("game",  "stage_animate_delay") #myfingershurt - user defined stage rotate delay
+    self.rotateDelay = self.engine.config.get("stage",  "stage_rotate_delay") #myfingershurt - user defined stage rotate delay
+    self.animateDelay = self.engine.config.get("stage",  "stage_animate_delay") #myfingershurt - user defined stage rotate delay
     self.animation = False
 
     self.indexCount = 0 #QQstarS:random time counter
@@ -550,8 +550,8 @@ class Stage(object):
                               coord = (self.wFull/2,self.hFull/2), stretched = 3)
 
   def updateDelays(self):
-    self.rotateDelay = self.engine.config.get("game",  "stage_rotate_delay") #myfingershurt - user defined stage rotate delay
-    self.animateDelay = self.engine.config.get("game",  "stage_animate_delay") #myfingershurt - user defined stage rotate delay
+    self.rotateDelay = self.engine.config.get("stage",  "stage_rotate_delay") #myfingershurt - user defined stage rotate delay
+    self.animateDelay = self.engine.config.get("stage",  "stage_animate_delay") #myfingershurt - user defined stage rotate delay
 
   def reset(self):
     self.lastBeatPos        = None

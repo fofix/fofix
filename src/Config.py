@@ -95,8 +95,8 @@ def load(fileName = None, setAsDefault = False, type = 0):
   c = Config(prototype, fileName, type)
   if setAsDefault and not config:
     config = c
-  logIniReads = c.get("game", "log_ini_reads")
-  logUndefinedGets = c.get("game", "log_undefined_gets")
+  logIniReads = c.get("log", "log_ini_reads")
+  logUndefinedGets = c.get("log", "log_undefined_gets")
   return c
 
 class Config:
