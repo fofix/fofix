@@ -583,7 +583,7 @@ class GameResultsScene(Scene):
     self.animationTimer += ticks
     
     if self.resultStep == 0 and self.loaded:
-      if self.showHandicap == 0 and not self.skipCheats:
+      if not self.skipCheats:
         for i, scoreCard in enumerate(self.scoring):
           if not self.rolling[i] and self.resultSubStep[i] == 0:
             self.newScore[i] = self.finalScore[i]
