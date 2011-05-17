@@ -112,16 +112,18 @@ class Theme(Task):
     config = self.config
   
     def get(value, type = str, default = None):
-      if type == "color":
-        if self.config:
-          if self.config.has_option("theme", value):
+      if self.config:
+        if self.config.has_option("theme", value):
+          if type == bool:
+            return bool(value.lower() in ["1", "true", "yes", "on"])
+          elif type == "color":
             return self.hexToColor(self.config.get("theme", value))
-        return self.hexToColor(default)
-      else:
-        if self.config:
-          if self.config.has_option("theme", value):
+          else:
             return type(self.config.get("theme", value))
-        return default
+        else:
+          if type == "color":
+            return self.hexToColor(default)
+          return default
 
     #These colors are very important
     #background_color defines what color openGL will clear too
