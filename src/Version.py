@@ -37,19 +37,31 @@ def _getTagLine():
 
   # Look for a git repository.
   if VFS.isdir('/gameroot/.git'):
-    # HEAD is in the form "ref: refs/heads/master\n"
-    headref = VFS.open('/gameroot/.git/HEAD').read()[5:].strip()
-    if VFS.isfile('/gameroot/.git/' + headref):
-      # The ref is in the form "sha1-hash\n"
-      headhash = VFS.open('/gameroot/.git/' + headref).read().strip()
+    shortref = None
+    headhash = None
+
+    # HEAD is in the form "ref: refs/heads/master\n" if a branch is
+    # checked out, or just the hash if HEAD is detached.
+    refline = VFS.open('/gameroot/.git/HEAD').read().strip()
+
+    if refline[0:5] == "ref: ":
+      headref = refline[5:]
+      if VFS.isfile('/gameroot/.git/' + headref):
+        # The ref is in the form "sha1-hash\n"
+        headhash = VFS.open('/gameroot/.git/' + headref).read().strip()
+      else:
+        # It's a packed ref.
+        for line in VFS.open('/gameroot/.git/packed-refs'):
+          if line.strip().endswith(headref):
+            headhash = line[:40]
+            break
+      shortref = re.sub('^refs/(heads/)?', '', headref)
     else:
-      # It's a packed ref.
-      for line in VFS.open('/gameroot/.git/packed-refs'):
-        if line.strip().endswith(headref):
-          headhash = line[:40]
-          break
-    shortref = re.sub('^refs/(heads/)?', '', headref)
-    return 'development (git %s %s)' % (shortref, headhash[:7])
+      shortref = "(detached)"
+      headhash = refline
+
+    return 'development (git %s %s)' % (shortref or "(unknown)",
+                                        headhash and headhash[:7] or "(unknown)")
 
   # Look for the svn administrative directory.
   elif VFS.isdir('/gameroot/src/.svn'):
