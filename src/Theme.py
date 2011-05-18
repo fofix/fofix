@@ -182,6 +182,9 @@ class Theme(Task):
 
     #Render necks toggle
     self.doNecksRender = (get("render_necks", bool, True))
+
+    #Pause menu type
+    self.pauseMenuType = (get("pause_menu_type", str, "RB"))
 	
 	#fretboard intro animation
     self.povIntroAnimation = (get("fretboard_intro_animation", str, "fofix"))

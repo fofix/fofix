@@ -1491,7 +1491,7 @@ class GuitarScene(Scene):
 
 
 
-#racer: theme.ini fail positions
+    #racer: theme.ini fail positions
     size = self.engine.data.pauseFont.getStringSize("Quit to Main")
     self.fail_bkg = [float(i) for i in self.engine.theme.fail_bkg_pos]
     self.fail_text_x = self.engine.theme.fail_text_xPos
@@ -1504,7 +1504,9 @@ class GuitarScene(Scene):
     if self.fail_text_y == None:
       self.fail_text_y = .47
 
-    if self.theme == 1: #GH3-like theme
+    self.pauseTextType = self.engine.theme.pauseMenuType
+
+    if self.pauseTextType == "GH3": #GH3-like theme
       if self.careerMode:
         self.menu = Menu(self.engine, [
           (_("         RESUME"), self.resumeSong), #Worldrave adjusted proper spacing.
@@ -1535,7 +1537,7 @@ class GuitarScene(Scene):
           (_(" NEW SONG"), self.changeAfterFail),
           (_("     QUIT"), self.quit),  #Worldrave - added graphic menu support "fail" for Fail menu in below line.
         ], name = "fail", fadeScreen = False, onCancel = self.changeAfterFail, font = self.engine.data.pauseFont, pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
-    elif self.theme == 0:   #GH2-like theme
+    elif self.pauseTextType == "GH2":   #GH2-like theme
       if self.careerMode:
         self.menu = Menu(self.engine, [
           (_("  Resume"),       self.resumeSong),
@@ -1568,7 +1570,7 @@ class GuitarScene(Scene):
           (_("  Give Up?"), self.changeAfterFail),
           (_("Quit to Main"), self.quit),  #Worldrave - added graphic menu support "fail" for Fail menu in below line.
         ], name = "fail", fadeScreen = False, onCancel = self.changeAfterFail, font = self.engine.data.pauseFont, pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
-    elif self.theme == 2:   #RB-like theme
+    elif self.pauseTextType == "RB":   #RB-like theme
       size = self.engine.data.pauseFont.getStringSize("Quit to Main Menu")
       if self.careerMode:
         self.menu = Menu(self.engine, [
