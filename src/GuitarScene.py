@@ -658,6 +658,8 @@ class GuitarScene(Scene):
 
     self.countdownPosX = self.engine.theme.countdownPosX
     self.countdownPosY = self.engine.theme.countdownPosY
+
+    self.fpsRenderPos = self.engine.theme.fpsRenderPos
   
 
     #racer: practice beat claps:
@@ -6139,7 +6141,7 @@ class GuitarScene(Scene):
               glColor3f(c1, c2, c3)
               text = _("FPS: %.2f" % self.engine.fpsEstimate)
               w, h = font.getStringSize(text, scale = 0.00140)
-              font.render(text, (.85, .055 - h/2), (1,0,0), 0.00140)
+              font.render(text, (self.fpsRenderPos[0], self.fpsRenderPos[1] - h/2), (1,0,0), 0.00140)
  
             pos = self.getSongPosition()
     
