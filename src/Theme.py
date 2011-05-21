@@ -120,10 +120,10 @@ class Theme(Task):
             return self.hexToColor(self.config.get("theme", value))
           else:
             return type(self.config.get("theme", value))
-        else:
-          if type == "color":
-            return self.hexToColor(default)
-          return default
+
+      if type == "color":
+        return self.hexToColor(default)
+      return default
 
     #These colors are very important
     #background_color defines what color openGL will clear too
