@@ -413,6 +413,7 @@ class GameResultsScene(Scene):
       if self.resultStep == 3:
         self.engine.view.pushLayer(self.menu)
         self.resultStep += 1
+    return ret
   
   def quit(self):
     self.background = None
