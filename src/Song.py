@@ -38,7 +38,6 @@ import Version
 import Theme
 import copy
 import cPickle  #stump: Cerealizer and sqlite3 don't seem to like each other that much...
-import time
 from Language import _
 import VFS
 
@@ -3901,6 +3900,7 @@ def removeSongOrderPrefixFromName(name):
 #stump
 def updateSongDatabase(engine):
   import Dialogs  # putting it at the top causes circular-import-related problems...
+  import time
   Log.debug('Updating song cache.')
   _songDB.execute('UPDATE `songinfo` SET `seen` = 0')
   lastScreenUpdateTime = [time.time()]  # one-element list to avoid having to throw this into the global namespace for updatePhase's sake
