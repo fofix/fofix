@@ -557,6 +557,7 @@ class GameEngine(object):
     Log.debug("OpenGL version: " + glGetString(GL_VERSION))
     Log.debug("OpenGL vendor: " + glGetString(GL_VENDOR))
     Log.debug("OpenGL renderer: " + glGetString(GL_RENDERER))
+    Log.debug("OpenGL extensions: " + ' '.join(sorted(glGetString(GL_EXTENSIONS).split())))
     
     if self.video.default:
       self.config.set("video", "fullscreen", False)
