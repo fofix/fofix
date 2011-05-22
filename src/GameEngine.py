@@ -681,12 +681,6 @@ class GameEngine(object):
     self.loadingScreenShown = False
     self.graphicMenuShown   = False
     
-    # evilynux - Printing on the console with a frozen binary may cause a crash.
-    if hasattr(sys, "frozen"):
-      self.print_fps_in_console = False
-    else:
-      self.print_fps_in_console = True
-
     Log.debug("Ready.")
     
 
@@ -1102,19 +1096,19 @@ class GameEngine(object):
       self.debugLayer.render(1.0, True)
     self.video.flip()
     # evilynux - Estimate the rendered frames per second.
-    if self.show_fps:
-      self.frames = self.frames+1
-      # Estimate every 120 frames when highpriority is True.
-      # Estimate every 2*config.fps when highpriority is False,
-      # if you are on target, that should be every 2 seconds.
-      if( not self.priority and self.frames == (self.fps << 1) ) or ( self.priority and self.frames == 120 ):
-        currentTime = pygame.time.get_ticks()
-        self.elapsedTime = currentTime-self.lastTime
-        self.lastTime = currentTime
-        self.fpsEstimate = self.frames*(1000.0/self.elapsedTime)
-        if self.print_fps_in_console == True:
-          print("%.2f fps" % self.fpsEstimate)
-        self.frames = 0 
+    self.frames = self.frames+1
+    # Estimate every 120 frames when highpriority is True.
+    # Estimate every 2*config.fps when highpriority is False,
+    # if you are on target, that should be every 2 seconds.
+    if( not self.priority and self.frames == (self.fps << 1) ) or ( self.priority and self.frames == 120 ):
+      currentTime = pygame.time.get_ticks()
+      self.elapsedTime = currentTime-self.lastTime
+      self.lastTime = currentTime
+      self.fpsEstimate = self.frames*(1000.0/self.elapsedTime)
+      # evilynux - Printing on the console with a frozen binary may cause a crash.
+      if self.show_fps and not Version.isWindowsExe():
+        print("%.2f fps" % self.fpsEstimate)
+      self.frames = 0
     return done
 
   def doRun(self):
