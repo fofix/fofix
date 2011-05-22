@@ -45,7 +45,6 @@ class Vocalist:
     self.mic = Microphone(self.engine, playerObj.controller)
     
     #Get theme
-    themename = self.engine.data.themeLabel
     #now theme determination logic is only in data.py:
     self.theme = self.engine.data.theme
     self.showData = self.engine.config.get("debug", "show_raw_vocal_data")

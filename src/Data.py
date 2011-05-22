@@ -91,7 +91,6 @@ class Data(object):
           themes.append(name)
           if name == "MegaLight V4":         #myfingershurt
             defaultTheme = name     #myfingershurt
-      i = len(themes)
       if defaultTheme != "MegaLight V4":     #myfingershurt
         defaultTheme = themes[0]    #myfingershurt
       #not a valid theme if notes.png isn't there!  Force default theme:
@@ -327,7 +326,6 @@ class Data(object):
 
   def loadBackSounds(self):   #MFH - adding optional support for random choice between two back sounds
     soundPathTheme = os.path.join("themes",self.themeLabel,"sounds")
-    soundPathData = "sounds"
     soundPath = soundPathTheme
     soundPrefix = "back"
     numSounds = self.determineNumSounds(soundPath, soundPrefix)
@@ -338,7 +336,6 @@ class Data(object):
 
   def loadAcceptSounds(self):
     soundPathTheme = os.path.join("themes",self.themeLabel,"sounds")
-    soundPathData = "sounds"
     soundPath = soundPathTheme
     soundPrefix = "accept"
     numSounds = self.determineNumSounds(soundPath, soundPrefix)

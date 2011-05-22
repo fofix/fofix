@@ -448,13 +448,6 @@ class Lobby(Layer, KeyListener):
     if self.playerNum >= self.maxPlayers:
       return
     with self.engine.view.orthogonalProjection(normalize = True):
-      try:
-        font = self.engine.data.fontDict[self.engine.theme.lobbySelectFont]
-        titleFont = self.engine.data.fontDict[self.engine.theme.lobbyTitleFont]
-      except KeyError:
-        font = self.engine.data.font
-        titleFont = self.engine.data.loadingFont
-      v = ((1 - visibility) **2)
       w, h = self.fullView
       if self.img_background:
         self.engine.drawImage(self.img_background, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 3)

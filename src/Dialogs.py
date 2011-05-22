@@ -388,7 +388,6 @@ class LoadingScreen(Layer, KeyListener):
     self.allowtext = self.engine.config.get("game", "lphrases")    
 
     #Get theme
-    themename = self.engine.data.themeLabel
     self.theme = self.engine.data.theme
 
   def shown(self):
@@ -522,7 +521,6 @@ class FileChooser(BackgroundLayer, KeyListener):
     self.spinnyDisabled = self.engine.config.get("game", "disable_spinny")
 
     #Get theme
-    themename = self.engine.data.themeLabel
     #now theme determination logic is only in data.py:
     self.theme = self.engine.data.theme
 
@@ -588,7 +586,6 @@ class FileChooser(BackgroundLayer, KeyListener):
       for mask in self.masks:
         if fnmatch.fnmatch(fileName, mask):
           self.selectedFile = fileName
-          accepted = True
           self.engine.view.popLayer(self.menu)
           self.engine.view.popLayer(self)
           self.menu = None
@@ -607,7 +604,6 @@ class FileChooser(BackgroundLayer, KeyListener):
       self.updateFiles()
       return
     self.selectedFile = path
-    accepted = True
     self.engine.view.popLayer(self.menu)
     self.engine.view.popLayer(self)
     self.menu = None
@@ -635,10 +631,8 @@ class FileChooser(BackgroundLayer, KeyListener):
 
     # render the background
 
-    t = self.time / 100
     self.engine.view.setViewport(1,0)
     w, h, = self.engine.view.geometry[2:4]
-    r = .5
 
     #MFH - draw neck black BG in for transparent areas (covers options BG):
     if self.neckBlackBack != None:
@@ -702,7 +696,6 @@ class NeckChooser(Layer, KeyListener):
 
     for i in neckfiles:   #MFH - first go through and find the random neck
       if ( os.path.splitext(i)[0] == "randomneck" ):    #MFH 
-        randomNeck = i
         exists = 1
 
         neckImage = engine.loadImgDrawing(self, "neck"+str(i), os.path.join("necks",str(i)))
@@ -821,10 +814,8 @@ class NeckChooser(Layer, KeyListener):
   def render(self, visibility, topMost):
    v = (1 - visibility) ** 2
    # render the background
-   t = self.time / 100
    self.engine.view.setViewport(1,0)
    w, h, = self.engine.view.geometry[2:4]
-   r = .5
 
 
    #MFH - draw neck black BG in for transparent necks (covers options BG):
@@ -1115,7 +1106,6 @@ class AvatarChooser(Layer, KeyListener):
     
   def render(self, visibility, topMost):
     v = (1 - visibility) ** 2
-    t = self.time / 100
     self.engine.view.setViewport(1,0)
     w, h, = self.engine.view.geometry[2:4]
 
@@ -1407,7 +1397,6 @@ class ItemChooser(BackgroundLayer, KeyListener):
       self.menu.selectItem(items.index(selected))
 
     #Get theme
-    themename = self.engine.data.themeLabel
     self.theme = self.engine.data.theme
     
   def _callbackForItem(self, item):
@@ -1417,7 +1406,6 @@ class ItemChooser(BackgroundLayer, KeyListener):
     
   def chooseItem(self, item):
     self.selectedItem = item
-    accepted = True
     self.engine.view.popLayer(self.menu)
     self.engine.view.popLayer(self)
     
@@ -1442,10 +1430,8 @@ class ItemChooser(BackgroundLayer, KeyListener):
     v = (1 - visibility) ** 2
 
     # render the background
-    t = self.time / 100
     self.engine.view.setViewport(1,0)
     w, h, = self.engine.view.geometry[2:4]
-    r = .5
 
     #MFH - auto background scaling
     if self.engine.data.optionsBG:
@@ -2056,7 +2042,6 @@ class LoadingSplashScreen(Layer, KeyListener):
       Log.debug("LoadingSplashScreen class init (Dialogs.py)...")
 
     #Get theme
-    themename = self.engine.data.themeLabel
     self.theme = self.engine.data.theme
 
   def shown(self):

@@ -153,7 +153,7 @@ class Music(object):
     #MFH - gotta catch case when mixer not initialized yet...
     try:
       busy = pygame.mixer.music.get_busy()
-    except Exception, e:
+    except Exception:
       busy = True      
     return busy
 

@@ -270,7 +270,7 @@ class GameResultsScene(Scene):
     noteHitWindow   = self.engine.config.get("game", "note_hit_window")
     try:
       songHopoFreq  = abs(int(songHopoFreq))
-    except Exception, e:
+    except Exception:
       songHopoFreq  = 10
     if useSongHopoFreq == 1 and songHopoFreq < 6:
       self.hopoFreq = songHopoFreq
@@ -1159,7 +1159,6 @@ class GameResultsScene(Scene):
           font.render(text, (float(self.engine.theme.result_stats_part[0]) - wText / 2, float(self.engine.theme.result_stats_part[1]) + v), scale = float(self.engine.theme.result_stats_part[2]))
   
   def renderCheatList(self, visibility, topMost):
-    bigFont = self.engine.data.bigFont
     try:
       font  = self.engine.data.fontDict[self.engine.theme.result_cheats_font]
     except KeyError:
@@ -1213,7 +1212,6 @@ class GameResultsScene(Scene):
     if self.coOpType == 0:
       self.engine.view.setViewport(1,0)
 
-    bigFont = self.engine.data.bigFont
     try:
       font  = self.engine.data.fontDict[self.engine.theme.result_high_score_font]
     except KeyError:
@@ -1253,9 +1251,6 @@ class GameResultsScene(Scene):
         except ValueError:
           Log.warn("Old highscores found.")
           notesHit, notesTotal, noteStreak, modVersion, oldScores1, oldScores2 = scoreExt
-          handicap = 0
-          handicapLong = "None"
-          originalScore = score
         for j,player in enumerate(self.playerList):
           if (self.time % 10.0) < 5.0 and i == self.highscoreIndex[j] and self.scoreDifficulty == player.difficulty and self.scorePart == player.part:
             self.engine.theme.setSelectedColor(1 - v)

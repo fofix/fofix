@@ -744,7 +744,6 @@ class Controls:
       return newDict
     okconflict = lefts + rights + ups + downs + starts + cancels
     a = []
-    b = len(self.overlap)
     for key, value in newDict.iteritems():
       if key == "None":
         continue

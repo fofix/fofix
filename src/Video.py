@@ -154,7 +154,7 @@ class Video:
     try:
       self.screen = pygame.display.set_mode((800,600), self.flags)
       self.default = True
-    except Exception, e:
+    except Exception:
       if self.multisamples:
         self.multisampleReset((800, 600))
       else:

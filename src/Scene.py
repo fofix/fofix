@@ -84,8 +84,6 @@ class Scene(BackgroundLayer, KeyListener):
     pass
 
   def render(self, visibility, topMost):
-    font = self.engine.data.font
-
     # render the scene
     try:
       glMatrixMode(GL_PROJECTION)

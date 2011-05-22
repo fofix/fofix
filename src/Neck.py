@@ -395,10 +395,6 @@ class Neck:
                 self.renderIncomingNeck(visibility*alpha, song, pos, time, neckImg)
                 if self.spcount2 != 0 and self.spcount < 1.2 and self.oNeck:
                   alpha = self.neckAlpha[4]
-                  if self.oNeckovr != None and (self.scoreMultiplier > 4 or self.guitarSolo or self.ovrneckoverlay == True):
-                    neck = self.oNeckovr
-                  else:
-                    neck = self.oNeck
                   self.renderIncomingNeck(visibility*alpha, song, pos, time, neckImg)
 
       elif self.markSolos == 1:   #fall back on text-based guitar solo marking track
@@ -531,7 +527,6 @@ class Neck:
       shaders.globals["soloActive"] = self.guitarSolo
       
       posx = shaders.time()
-      fret = []
       neckcol = (0,0,0)
       
       notecolors = list(self.engine.theme.noteColors)
@@ -662,7 +657,6 @@ class Neck:
       return
 
 
-    v            = visibility
     w            = self.boardWidth
 
 

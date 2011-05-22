@@ -474,7 +474,6 @@ class SongChoosingScene(Scene):
   
   def loadItemLabel(self, i, preload = False):
     # Load the item label if it isn't yet loaded
-    themename = self.engine.data.themeLabel
     item = self.items[i]
     if self.itemLabels[i] is None:
       if isinstance(item, Song.SongInfo):
@@ -945,7 +944,6 @@ class SongChoosingScene(Scene):
   
   def renderSetlist(self, visibility, topMost):
     w, h = self.engine.view.geometry[2:4]
-    font = self.engine.data.font
     
     #render the background (including the header and footer)
     if self.setlistStyle == 1 and self.img_list_bg:

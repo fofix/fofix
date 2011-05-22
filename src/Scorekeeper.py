@@ -164,7 +164,6 @@ class ScoreCard(object):
     self.freestyleWasJustActive = False  #MFH
 
   def getStarScores(self, tempExtraScore = 0):
-    oldStar = self.stars
     if self.updateOnScore == 1 and self.instrument[0] != Song.VOCAL_PART:
       avMult = float(self.score+tempExtraScore) / float(self.totalNotes * self.baseScore)
     else:

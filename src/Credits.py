@@ -110,7 +110,6 @@ class Credits(Layer, KeyListener):
     self.themename = Config.get("coffee", "themename")
 
     nf = self.engine.data.font
-    bf = self.engine.data.bigFont
     ns = 0.002
     bs = 0.001
     hs = 0.003
@@ -244,7 +243,6 @@ class Credits(Layer, KeyListener):
   # evilynux - Text parsing method. Provides some style functionalities.
   def parseText(self, filename):
     nf = self.engine.data.font
-    bf = self.engine.data.bigFont
     ns = 0.002
     bs = 0.001
     hs = 0.003
@@ -359,7 +357,6 @@ class Credits(Layer, KeyListener):
     v = 1.0 - ((1 - visibility) ** 2)
     
     # render the background    
-    t = self.time / 100 + 34
     w, h = self.engine.view.geometry[2:4]
     
     with self.engine.view.orthogonalProjection(normalize = True):
@@ -367,7 +364,6 @@ class Credits(Layer, KeyListener):
         self.engine.drawImage(self.background, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
       else:
         Dialogs.fadeScreen(.4)
-      font = self.engine.data.font
       self.doneList = []
 
       # render the scroller elements

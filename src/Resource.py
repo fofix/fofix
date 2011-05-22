@@ -177,7 +177,6 @@ class Resource(Task):
   def fileName(self, *name, **args):
     
     #myfingershurt: the following should be global, and only done at startup.  Not every damn time a file is loaded.
-    baseLibrary = self.baseLibrary
     songPath = self.songPath
       
     if not args.get("writable", False):

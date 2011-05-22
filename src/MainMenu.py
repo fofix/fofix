@@ -347,9 +347,7 @@ class MainMenu(BackgroundLayer):
     if self.menu.active and not self.active:
       self.active = True
     
-    t = self.time / 100
     w, h, = self.engine.view.geometry[2:4]
-    r = .5
     
     if self.active:
       if self.engine.view.topLayer() is not None:

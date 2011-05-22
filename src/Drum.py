@@ -36,9 +36,7 @@ from OpenGL.GL import *
 import math
 
 #myfingershurt: needed for multi-OS file fetching
-import os
 import Log
-import Song   #need the base song defines as well
 
 #Normal guitar key color order: Green, Red, Yellow, Blue, Orange
 #Drum fret color order: Red, Yellow, Blue, Green
@@ -132,7 +130,6 @@ class Drum(Instrument):
       self.boardLength    *= (4.0/3.0)
     
     #Get theme
-    themename = self.engine.data.themeLabel
     #now theme determination logic is only in data.py:
     self.theme = self.engine.data.theme
 
@@ -150,11 +147,9 @@ class Drum(Instrument):
     if not song or self.flameColors[0][0][0] == -1:
       return
 
-    beatsPerUnit = self.beatsPerBoard / self.boardLength
     w = self.boardWidth / self.strings
     track = song.track[self.player]
 
-    size = (.22, .22)
     v = 1.0 - visibility
 
 
@@ -427,10 +422,8 @@ class Drum(Instrument):
     if self.flameColors[0][0][0] == -1:
       return
 
-    beatsPerUnit = self.beatsPerBoard / self.boardLength
     w = self.boardWidth / self.strings
 
-    size = (.22, .22)
     v = 1.0 - visibility
 
 
@@ -448,7 +441,6 @@ class Drum(Instrument):
           else:
             x  = (self.strings / 2 +.5 - fretNum) * w
 
-          xlightning = (self.strings / 2 - fretNum)*2.2*w
           ff = 1 + 0.25       
           y = v + ff / 6
           glBlendFunc(GL_ONE, GL_ONE)

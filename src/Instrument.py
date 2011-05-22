@@ -401,7 +401,6 @@ class Instrument(object):
 
   def loadNotes(self):
     engine = self.engine
-    themename = self.engine.data.themeLabel
 
     get = lambda file: self.checkPath("notes", file)
 
@@ -548,7 +547,6 @@ class Instrument(object):
         
   def loadTails(self):
     engine = self.engine
-    themename = self.engine.data.themeLabel
 
     get = lambda file: self.checkPath("tails", file)
     getD = lambda file: self.checkPath("tails", file, True) #resorts to checking data
@@ -746,15 +744,12 @@ class Instrument(object):
       return
 
     w = self.boardWidth / self.strings
-    track = song.track[self.player]
 
-    size = (.22, .22)
     v = 1.0 - visibility
      
     if (self.HCountAni == True and self.HCount2 > 12):
       for n in range(self.strings):
         f = self.fretWeight[n]
-        c = self.fretColors[n]
         if f and (controls.getState(self.actions[0]) or controls.getState(self.actions[1])):
           f += 0.25      
         y = v + f / 6
@@ -827,15 +822,12 @@ class Instrument(object):
       return
 
     w = self.boardWidth / self.strings
-    track = song.track[self.player]
 
-    size = (.22, .22)
     v = 1.0 - visibility
 
     if (self.HCountAni == True and self.HCount2 > 12):
       for n in range(self.strings):
         f = self.fretWeight[n]
-        c = self.fretColors[n]
         if f and (controls.getState(self.actions[0]) or controls.getState(self.actions[1])):
           f += 0.25      
         y = v + f / 6
@@ -1096,13 +1088,6 @@ class Instrument(object):
 
       noteImage = self.noteButtons
 
-      if self.notedisappear ==0:#Notes keep on going when missed
-        notecol = (1,1,1)#capo
-      elif self.notedisappear == 1:#Notes disappear when missed
-        notecol = (.1,.1,.1)
-      elif self.notedisappear == 2: #Notes Turn Red when missed
-        notecol = (1,0,0,1) 
-
       tailOnly = True
 
       if isOpen:
@@ -1321,10 +1306,7 @@ class Instrument(object):
     self.killPoints = False
 
     w = self.boardWidth / self.strings
-    track = song.track[self.player]
 
-    num = 0
-    enable = True
     self.starNotesInView = False
     self.openStarNotesInView = False
 
@@ -1522,11 +1504,6 @@ class Instrument(object):
 
     self.killPoints = False
 
-    w = self.boardWidth / self.strings
-    track = song.track[self.player]
-
-    num = 0
-    enable = True
     self.openStarNotesInView = False
 
     renderedNotes = reversed(self.getRequiredNotesForRender(song,pos))
@@ -2225,8 +2202,6 @@ class Instrument(object):
                 glPushMatrix()
                 glTranslatef(x, (1.0 - visibility) ** (theFret + 1), z)
 
-                freestyleTailMode = 1
-
                 self.renderFreeStyleTail(length, color, theFret, pos)
                 glPopMatrix()
 
@@ -2256,10 +2231,7 @@ class Instrument(object):
 
     w = self.boardWidth / self.strings
     
-    track = song.track[self.player]
-
     num = 0
-    enable = True
     renderedNotes = self.getRequiredNotesForRender(song,pos)
 
     for time, event in renderedNotes:

@@ -260,12 +260,12 @@ class KeyConfigChoice(Menu.Choice):
         key = Dialogs.getKey(self.engine, _("Press a key for '%s' or hold Escape to cancel.") % text)
     
     if key:
-      temp = Player.setNewKeyMapping(self.engine, self.config, self.section, self.option, key)
+      Player.setNewKeyMapping(self.engine, self.config, self.section, self.option, key)
       if self.name in self.engine.input.controls.controlList:
         self.engine.input.reloadControls()
     else:
       if self.noneOK:
-        temp = Player.setNewKeyMapping(self.engine, self.config, self.section, self.option, "None")
+        Player.setNewKeyMapping(self.engine, self.config, self.section, self.option, "None")
         if self.name in self.engine.input.controls.controlList:
           self.engine.input.reloadControls()
 
@@ -1569,7 +1569,6 @@ class GameCareerSettingsMenu(Menu.Menu):
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("GameSettingsMenu class init (Settings.py)...")
-    players = None
     settings = [
       VolumeConfigChoice(engine, engine.config, "audio",  "guitarvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "songvol", autoApply = True),

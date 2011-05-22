@@ -624,7 +624,7 @@ class GameEngine(object):
         thisIsAnAnimatedStageFolder = False
         try:
           aniStageFolderListing = os.listdir(os.path.join(stagespath,name))
-        except Exception, e:
+        except Exception:
           thisIsAnAnimatedStageFolder = False
         for aniFile in aniStageFolderListing:
           if os.path.splitext(aniFile)[1] == ".png" or os.path.splitext(aniFile)[1] ==  ".jpg" or os.path.splitext(aniFile)[1] == ".jpeg":  #we've found at least one .png file here, chances are this is a valid animated stage folder
@@ -697,7 +697,7 @@ class GameEngine(object):
         self.audioSpeedFactor = factor
         pygame.init()
         Log.debug("Initializing pygame.mixer & audio system at " + str(self.frequency*factor) + " Hz." )
-      except Exception, e:
+      except Exception:
         Log.error("Failed to initialize or re-initialize pygame.mixer & audio system - crash imminent!")
   
   # evilynux - This stops the crowd cheers if they're still playing (issue 317).
@@ -1034,7 +1034,6 @@ class GameEngine(object):
 
     @param task:    L{Task} to remove
     """
-    found = False
     queues = self._getTaskQueues(task)
     for q in queues:
       q.remove(task)
