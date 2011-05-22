@@ -28,8 +28,8 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import OpenGL
 from OpenGL.GL import *
-from OpenGL import __version__ as OpenGLVersion
 import numpy as np
 from PIL import Image
 import pygame
@@ -458,7 +458,7 @@ class GameEngine(object):
     Log.debug(self.versionString + " starting up...")
     Log.debug("Python version: " + sys.version.split(' ')[0])
     Log.debug("Pygame version: " + str(pygame.version.ver) )
-    Log.debug("PyOpenGL version: " + OpenGLVersion)
+    Log.debug("PyOpenGL version: " + OpenGL.__version__)
     Log.debug("Numpy version: " + np.__version__)
     Log.debug("PIL version: " + Image.VERSION)
     Log.debug("sys.argv: " + repr(sys.argv))
