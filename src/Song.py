@@ -363,7 +363,7 @@ class SongInfo(object):
       
     for difficulty in highScores.keys():
       if isinstance(difficulty, Difficulty):
-        diff = diff.id
+        diff = difficulty.id
       else:
         diff = difficulty
       s[diff] = [(score, stars, name, self.getScoreHash(difficulty, score, stars, name)) for score, stars, name, scores_ext in highScores[difficulty]]
@@ -375,7 +375,7 @@ class SongInfo(object):
       
     for difficulty in highScores.keys():
       if isinstance(difficulty, Difficulty):
-        diff = diff.id
+        diff = difficulty.id
       else:
         diff = difficulty
       s[diff] = [(self.getScoreHash(difficulty, score, stars, name), stars) + scores_ext for score, stars, name, scores_ext in highScores[difficulty]]
