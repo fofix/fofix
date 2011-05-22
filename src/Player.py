@@ -28,7 +28,6 @@ import pygame
 import Config
 import Song
 from Language import _
-#import Dialogs
 import Microphone  #stump
 import VFS
 
@@ -837,6 +836,7 @@ def setNewKeyMapping(engine, config, section, option, key):
   b = isKeyMappingOK(config, option)
   if b != 0:
     if keyCheckerMode > 0:
+      import Dialogs
       Dialogs.showMessage(engine, _("This key conflicts with the following keys: %s") % str(b))
     if keyCheckerMode == 2:   #enforce no conflicts!
       config.set(section, option, oldKey)

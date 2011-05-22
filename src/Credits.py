@@ -39,6 +39,7 @@ import Version
 import Player
 import Config
 import Dialogs
+import Log
 
 from VideoPlayer import VideoLayer, VideoPlayerError
 
