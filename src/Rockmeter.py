@@ -678,7 +678,7 @@ class Rockmeter(ConfigGetMixin):
 
     self.scene            = guitarScene
     self.engine           = guitarScene.engine
-    self.layers = []
+    self.layers = {}
     self.sharedlayers = [] #these layers are for coOp use only
 
     self.coOp = coOp
@@ -700,19 +700,20 @@ class Rockmeter(ConfigGetMixin):
           continue
         else:
           if t == types[1]:
-            self.createFont(self.section)
+            self.createFont(self.section, i)
           elif t == types[2]:
-            self.createCircle(self.section)
+            self.createCircle(self.section, i)
           else:
-            self.createImage(self.section)
+            self.createImage(self.section, i)
           break
 
-  def addLayer(self, layer, shared = False):
+  #adds a layer to the rockmeter's list
+  def addLayer(self, layer, number, shared = False):
     if shared:
       self.sharedlayers.append(layer)
     else:
       if layer:
-        self.layers.append(layer)
+        self.layers[number] = layer
 
   def loadLayerFX(self, layer, section):
     section = section.split(":")[0]
@@ -736,7 +737,7 @@ class Rockmeter(ConfigGetMixin):
           break #only allow type per effect number
             
       
-  def createFont(self, section):
+  def createFont(self, section, number):
 
     font  = self.get("font")
     layer = FontLayer(self, section, font)
@@ -748,9 +749,9 @@ class Rockmeter(ConfigGetMixin):
     
     self.loadLayerFX(layer, section)
 
-    self.addLayer(layer, layer.shared)
+    self.addLayer(layer, number, layer.shared)
 
-  def createImage(self, section):
+  def createImage(self, section, number):
     
     texture   = self.get("texture")
     drawing   = os.path.join("themes", self.themename, "rockmeter", texture)
@@ -764,9 +765,9 @@ class Rockmeter(ConfigGetMixin):
 
     self.loadLayerFX(layer, section)
             
-    self.addLayer(layer, layer.shared)
+    self.addLayer(layer, number, layer.shared)
 
-  def createCircle(self, section):
+  def createCircle(self, section, number):
     
     texture   = self.get("texture")
     drawing   = os.path.join("themes", self.themename, "rockmeter", texture)
@@ -780,7 +781,7 @@ class Rockmeter(ConfigGetMixin):
 
     self.loadLayerFX(layer, section)
 
-    self.addLayer(layer, layer.shared)
+    self.addLayer(layer, number, layer.shared)
 
   #because time is not player specific it's best to update it only once per cycle
   def updateTime(self):
@@ -851,7 +852,7 @@ class Rockmeter(ConfigGetMixin):
           self.engine.view.setViewportHalf(self.scene.numberOfGuitars,p)
         else:
           self.engine.view.setViewportHalf(1,0)  
-        for layer in self.layers:
+        for layer in self.layers.values():
           layer.render(visibility, p)
 
       self.engine.view.setViewportHalf(1,0)
