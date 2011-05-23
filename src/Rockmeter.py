@@ -648,9 +648,10 @@ class Animate(Effect):
 
   #fixes the scale after the rect is changed
   def fixScale(self):
-    scale = [s/frames for s in self.layer.scale[:]]
+    scale = [self.layer.scale[0]/self.frames, self.layer.scale[1]]
     self.layer.scale = scale
         
+  #adjusts the rate to the current fps
   def updateRate(self):
     self.rate = self.transitionTime * (max(self.engine.clock.get_fps(), _minFPS)) / 1000.0
       
@@ -732,8 +733,8 @@ class Rockmeter(ConfigGetMixin):
             layer.effects.append(Replace(layer, fxsection))
           elif t == types[3]:
             layer.effects.append(Fade(layer, fxsection))
-#          else:
-#            layer.effects.append(Animate(layer, fxsection))
+          else:
+            layer.effects.append(Animate(layer, fxsection))
           break #only allow type per effect number
             
       
