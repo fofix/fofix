@@ -80,6 +80,9 @@ progress = 0.0          #this gives a percentage (between 0 and 1)
 vpc = [640.0, 480.0]    #viewport's constant size, these variables determine how 
                         #things are placed on screen in relation to pixel coordinates
 
+_minFPS = 10            #minimum frame limit for effects that allow the theme maker to set
+                        #time in milliseconds
+
 # Functions for getting config values, optionally as compiled code objects ready to eval().
 class ConfigGetMixin(object):
   def get(self, value, type = str, default = None):
@@ -443,15 +446,23 @@ class Slide(Effect):
     #how long it takes for the transition to take place
     self.transitionTime = self.get("transitionTime", float, 512.0)
 
-    self.rates = [(self.endCoord[0] - self.startCoord[0])/self.transitionTime,
-                  (self.endCoord[1] - self.startCoord[1])/self.transitionTime]
+    self.updateRates()
+    
     if isinstance(self.layer, FontLayer):
-        self.rates[0] *= -1
-        self.rates[1] *= -1
-        
+      self.rates[0] *= -1
+      self.rates[1] *= -1
+       
+
+  def updateRates(self):
+    t = self.transitionTime * (max(self.engine.clock.get_fps(), _minFPS)) / 1000.0
+    self.rates = [(self.endCoord[0] - self.startCoord[0])/t,
+                  (self.endCoord[1] - self.startCoord[1])/t]
+    
   def update(self):
     condition = bool(eval(self.condition))
 
+    self.updateRates()
+    
     if condition:
       for i in range(2):
         if self.position[i] > self.endCoord[i]:
@@ -510,15 +521,20 @@ class Fade(Effect):
     #how long it takes for the transition to take place
     self.transitionTime = self.get("transitionTime", float, 512.0)
 
-    self.rates = [(self.colors[0][i] - self.colors[1][i])/self.transitionTime 
-                      for i in range(4)]
+    self.updateRates()
     
     self.condition = self.getexpr("condition", "True")
     self.reverse = bool(eval(self.getexpr("reverse", "True")))
-        
+
+  def updateRates(self):
+    t = self.transitionTime * (max(self.engine.clock.get_fps(), _minFPS)) / 1000.0
+    self.rates = [(self.colors[0][i] - self.colors[1][i])*t 
+                      for i in range(4)]
+    
   def update(self):
     condition = bool(eval(self.condition))
 
+    self.updateRates()
     
     if condition:
       for i in range(len(self.currentColor)):
