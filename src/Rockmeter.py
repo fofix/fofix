@@ -632,8 +632,46 @@ class Replace(Effect):
           self.layer.rect = self.rects[-1]
       self.fixScale()
             
+#effect that allows one to set the number of frames and
+# have the layer loop through an animation               
+class Animate(Effect):
+  def __init__(self, layer, section):
+    super(Animate, self).__init__(layer, section)
     
+    self.frames = self.get("frames", int, 1)
+    self.fps = self.get("fps", int, 30)
     
+    self.currentFrame = 1
+    self.transitionTime = self.get("transitionTime", float, 512.0)
+    
+    self.condition = self.getexpr("condition", "True")
+
+  #fixes the scale after the rect is changed
+  def fixScale(self):
+    scale = [s/frames for s in self.layer.scale[:]]
+    self.layer.scale = scale
+        
+  def updateRate(self):
+    self.rate = self.transitionTime * (max(self.engine.clock.get_fps(), _minFPS)) / 1000.0
+      
+  def update(self):
+    
+    self.updateRate()
+    
+    if self.condition and self.currentFrame < self.frames:
+      self.currentFrame += self.rate
+    else:
+      self.currentFrame = 1
+    
+    rect = self.layer.rect
+    
+    rect = [(rect[1] - rect[0])/self.frames * (int(self.currentFrame) - 1),
+            (rect[1] - rect[0])/self.frames * (int(self.currentFrame)),
+            rect[2], rect[3]]
+            
+    self.layer.rect = rect
+    
+    self.fixScale()
         
 class Rockmeter(ConfigGetMixin):
   def __init__(self, guitarScene, configFileName, coOp = False):
