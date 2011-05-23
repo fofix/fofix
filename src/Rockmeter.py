@@ -124,18 +124,20 @@ class Layer(ConfigGetMixin):
 
     self.xposexpr    = self.getexpr("xpos", "0.0")
     self.yposexpr    = self.getexpr("ypos", "0.0")
-    self.position    = [0.0, 0.0]
-                                        #where on the screen to draw the layer
+    self.position    = [0.0, 0.0]       #where on the screen to draw the layer
+    
     self.angleexpr   = self.getexpr("angle", "0.0")
-    self.angle       = 0.0
-                                        #angle to rotate the layer (in degrees)
+    self.angle       = 0.0              #angle to rotate the layer (in degrees)
+    
     self.xscaleexpr  = self.getexpr("xscale", "1.0")
     self.yscaleexpr  = self.getexpr("yscale", "1.0")
-    self.scale       = [1.0, 1.0]
-                                        #how much to scale it by (width, height from 0.0 - 1.0)
+    self.scale       = [1.0, 1.0]       #how much to scale it by (width, height from 0.0 - 1.0)
+    
     self.color       = list(self.engine.theme.hexToColor(self.get("color", str, "#FFFFFF")))
                                         #color of the image (#FFFFFF is white on text, on images it is full color)
+    
     self.condition   = True				#when should the image be shown (by default it will always be shown)
+    
     self.alignment   = halign(self.get("alignment", str, "center"))
                                         #alignment of the image (horizontal)
     self.valignment  = valign(self.get("valignment", str, "middle"))
@@ -152,7 +154,7 @@ class Layer(ConfigGetMixin):
     self.angle       = float(eval(self.angleexpr))
     self.scale       = [float(eval(self.xscaleexpr)), float(eval(self.yscaleexpr))]
     
-     #makes sure color has an alpha value to consider
+    #makes sure color has an alpha value to consider
     if len(self.color) == 3:
         self.color.append(1.0)
          
@@ -163,7 +165,7 @@ class Layer(ConfigGetMixin):
   def render(self, visibility, playerNum):
     pass
 
- #A graphical stage layer that is used to render the rockmeter.
+#A graphical stage layer that is used to render the rockmeter.
 class ImageLayer(Layer):
   def __init__(self, stage, section, drawing):
     super(ImageLayer, self).__init__(stage, section)
@@ -171,8 +173,8 @@ class ImageLayer(Layer):
     #these are the images that are drawn when the layer is visible
     self.drawing = self.engine.loadImgDrawing(self, None, drawing)
     self.rectexpr = self.getexpr("rect", "(0,1,0,1)")
-    self.rect = eval(self.rectexpr)
-                                #how much of the image do you want rendered (left, right, top, bottom)
+    self.rect = eval(self.rectexpr) #how much of the image do you want rendered
+                                    # (left, right, top, bottom)
     
   def updateLayer(self, playerNum):
     w, h, = self.engine.view.geometry[2:4]
@@ -245,14 +247,15 @@ class FontLayer(Layer):
   def __init__(self, stage, section, font):
     super(FontLayer, self).__init__(stage, section)
 
-    self.font        = self.engine.data.fontDict[font]
-    self.text        = ""
-    self.textexpr    = self.getexpr("text", "''")
-    self.replace     = ""
+    self.font        = self.engine.data.fontDict[font]          #the font to use
+    self.text        = ""                                       #the text that will be rendered to screen 
+    self.textexpr    = self.getexpr("text", "''")               #the text from the ini that will be evalutated
+    self.replace     = ""                                       #replace character a character in the string with this
     self.alignment   = halign(self.get("alignment", str, "LEFT"), 'left')
-    self.useComma    = self.get("useComma", bool, False)
-    self.shadow      = self.get("shadow",   bool, False)
-    self.outline     = self.get("outline",  bool, False)
+                                                                #alignment of the text
+    self.useComma    = self.get("useComma", bool, False)        #use commas when drawing numbers
+    self.shadow      = self.get("shadow",   bool, False)        #show a shadow on the text
+    self.outline     = self.get("outline",  bool, False)        #give the text an outline
 
   def updateLayer(self, playerNum):
     w, h, = self.engine.view.geometry[2:4]
@@ -266,6 +269,7 @@ class FontLayer(Layer):
 
     wid, hgt = self.font.getStringSize(str(text))
 
+    #needs to be done later because of values that may be dependant on the text's properties
     super(FontLayer, self).updateLayer(playerNum)
 
     self.text = text
@@ -396,9 +400,10 @@ class Slide(Effect):
     super(Slide, self).__init__(layer, section)
 
     self.startCoord = [eval(self.getexpr("startX", "0.0")), eval(self.getexpr("startY", "0.0"))]
+                                                                #starting position of the image
     self.endCoord   = [eval(self.getexpr("endX",   "0.0")), eval(self.getexpr("endY",   "0.0"))]
-
-    self.inPixels  = self.get("inPixels", str, "").split("|")
+                                                                #ending position of the image
+    self.inPixels  = self.get("inPixels", str, "").split("|")   #variables in terms of pixels
 
     self.condition = self.getexpr("condition", "True")
     
