@@ -42,6 +42,7 @@ import Cerealizer
 import binascii
 import urllib
 import Log
+import VFS
 
 import pygame
 import random
@@ -737,21 +738,28 @@ class GameResultsScene(Scene):
 
       #MFH TODO - utilize new functions in self.engine.data to automatically enumerate any number of the following soundfiles automatically, for issue 73
       if self.Congratphrase:
+        globPattern = None
         if scoreToUse == 0:
-          taunt = os.path.join("sounds","jurgen1.ogg")
+          globPattern = 'jurgen1.ogg'
         elif accuracyToUse == 100.0:    #MFH - this will only play when you 100% a song
-          taunt = random.choice([os.path.join("sounds","100pct1.ogg"), os.path.join("sounds","100pct2.ogg"), os.path.join("sounds","100pct3.ogg")])
+          globPattern = '100pct*.ogg'
         elif accuracyToUse >= 99.0:    #MFH - these 3 sounds will only play when you get > 99.0%
-          taunt = random.choice([os.path.join("sounds","99pct1.ogg"), os.path.join("sounds","99pct2.ogg"), os.path.join("sounds","99pct3.ogg")])
+          globPattern = '99pct*.ogg'
 
         elif starsToUse > 0 and starsToUse < 4:   #MFH - ok, fine - perhaps Jurgen shouldn't insult a 4-star score. :)
-          taunt = random.choice([os.path.join("sounds","jurgen2.ogg"), os.path.join("sounds","jurgen3.ogg"), os.path.join("sounds","jurgen4.ogg"), os.path.join("sounds","jurgen5.ogg")])
+          globPattern = 'jurgen*.ogg'
         elif starsToUse >= 5:
-          taunt = random.choice([os.path.join("sounds","perfect1.ogg"), os.path.join("sounds","perfect2.ogg"), os.path.join("sounds","perfect3.ogg")])
+          globPattern = 'perfect*.ogg'
+
+        if globPattern is not None:
+          soundChoices = VFS.glob('/data/sounds/' + globPattern)
+          if soundChoices:
+            taunt = random.choice(soundChoices)
+
 
       if taunt:
         try:
-          self.engine.resource.load(self, "taunt", lambda: Sound(self.engine.resource.fileName(taunt)))
+          self.engine.resource.load(self, "taunt", lambda: Sound(VFS.resolveRead(taunt)))
         except IOError:
           taunt = None
           self.taunt = None
