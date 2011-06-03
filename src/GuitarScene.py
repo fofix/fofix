@@ -5857,7 +5857,7 @@ class GuitarScene(Scene):
                     if isinstance(event, Song.MarkerNote):
                       if (event.number == Song.starPowerMarkingNote) and (self.song.midiStyle == Song.MIDI_TYPE_RB):    #solo marker note.
                         soloChangeNow = False
-                        xOffset = (time - pos) / eventWindow
+                        xOffset = (time - pos) / eventWindow + .15
                         if xOffset < lyricSlop / 16.0:   #present
                           soloChangeNow = True
                         if soloChangeNow:
@@ -5874,7 +5874,7 @@ class GuitarScene(Scene):
                 elif self.markSolos == 1:   #fall back on old guitar solo marking system
                   for time, event in self.song.eventTracks[Song.TK_GUITAR_SOLOS].getEvents(minPos, maxPos):
                     #is event happening now?
-                    xOffset = (time - pos) / eventWindow
+                    xOffset = (time - pos) / eventWindow + .15
                     EventHappeningNow = False
                     if xOffset < (0.0 - lyricSlop * 2.0):   #past
                       EventHappeningNow = False

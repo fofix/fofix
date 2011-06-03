@@ -379,10 +379,10 @@ class Neck:
 
     glEnable(GL_TEXTURE_2D)
 
-    self.board_scroll_vtx[0][2] = self.board_scroll_vtx[1][2] = z - 2
-    self.board_scroll_vtx[2][2] = self.board_scroll_vtx[3][2] = z - 1
-    self.board_scroll_vtx[4][2] = self.board_scroll_vtx[5][2] = z + l * .7
-    self.board_scroll_vtx[6][2] = self.board_scroll_vtx[7][2] = z + l
+    self.board_scroll_vtx[0][2] = self.board_scroll_vtx[1][2] = z
+    self.board_scroll_vtx[2][2] = self.board_scroll_vtx[3][2] = z + 1
+    self.board_scroll_vtx[4][2] = self.board_scroll_vtx[5][2] = z + 2 + l * .7
+    self.board_scroll_vtx[6][2] = self.board_scroll_vtx[7][2] = z + 2 + l
 
     if neckTexture:
       neckTexture.texture.bind()
