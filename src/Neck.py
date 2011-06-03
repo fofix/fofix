@@ -372,8 +372,7 @@ class Neck:
     if not song.readyToGo:
       return
 
-    w            = self.boardWidth
-    l            = self.boardLength
+    l = self.boardLength
     z  = ((time - pos) / self.currentPeriod) / self.beatsPerUnit
 
     glEnable(GL_TEXTURE_2D)
@@ -451,7 +450,7 @@ class Neck:
 
   def renderNeckMethod(self, visibility, offset, neck, alpha = False): #blazingamer: New neck rendering method
 
-    v            = visibility
+    v = visibility
 
     glEnable(GL_TEXTURE_2D)
 
@@ -482,9 +481,9 @@ class Neck:
     if not song.readyToGo:
       return
     
-    v            = visibility
+    v = visibility
 
-    offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
+    offset = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
 
     #myfingershurt: every theme can have oNeck:
 
@@ -610,8 +609,8 @@ class Neck:
 
     color = (1,1,1)
 
-    v            = visibility
-    w            = self.boardWidth + 0.15 
+    v = visibility
+    w = self.boardWidth + 0.15 
 
     if self.failcount == v:
       board_col = self.board_col_flash
@@ -645,7 +644,7 @@ class Neck:
     if not song.readyToGo:
       return
 
-    w            = self.boardWidth
+    w = self.boardWidth
 
     track = song.track[self.player]
 
@@ -677,7 +676,7 @@ class Neck:
     
   def render(self, visibility, song, pos):
 
-    l            = self.boardLength
+    l = self.boardLength
 
     self.currentPeriod = self.instrument.neckSpeed
 
