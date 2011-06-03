@@ -183,6 +183,15 @@ class Neck:
                                 [0.0, 0],
                                 [1.0, 0]], dtype=np.float32)
 
+    self.board_scroll_vtx = np.array([[-w / 2, 0, 0],
+                                      [w / 2, 0, 0],
+                                      [-w/ 2, 0, 0],
+                                      [w / 2, 0, 0],
+                                      [-w/ 2, 0, 0],
+                                      [w / 2, 0, 0],
+                                      [-w/ 2, 0, 0],
+                                      [w / 2, 0, 0]], dtype=np.float32)
+
     # evilynux - Just in case the type has became double, convert to float32
     self.board_col = self.board_col.astype(np.float32)
     self.board_vtx = self.board_vtx.astype(np.float32)
@@ -197,6 +206,7 @@ class Neck:
     self.bpm_vtx = self.bpm_vtx.astype(np.float32)
     self.board_tex_static = self.board_tex_static.astype(np.float32)
     self.board_tex = self.board_tex.astype(np.float32)
+    self.board_scroll_vtx = self.board_scroll_vtx.astype(np.float32)
 	
     self.neckType = playerObj.neckType
     if self.neckType == 0:
@@ -368,19 +378,15 @@ class Neck:
 
     glEnable(GL_TEXTURE_2D)
 
-    board_vtx = np.array([[-w / 2, 0, z],
-                            [w / 2, 0, z],
-                            [-w/ 2, 0, z + 1],
-                            [w / 2, 0, z + 1],
-                            [-w / 2, 0, z + 2 + l * .7],
-                            [w / 2, 0, z + 2 + l * .7],
-                            [-w / 2, 0, z + 2 + l],
-                            [w / 2, 0, z + 2 + l]], dtype=np.float32)
+    self.board_scroll_vtx[0][2] = self.board_scroll_vtx[1][2] = z
+    self.board_scroll_vtx[2][2] = self.board_scroll_vtx[3][2] = z + 1
+    self.board_scroll_vtx[4][2] = self.board_scroll_vtx[5][2] = z + 2 + l * .7
+    self.board_scroll_vtx[6][2] = self.board_scroll_vtx[7][2] = z + 2 + l
 
     if neckTexture:
       neckTexture.texture.bind()
 
-    cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=board_vtx, colors=self.board_col, texcoords=self.board_tex_static)
+    cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.board_scroll_vtx, colors=self.board_col, texcoords=self.board_tex_static)
 
     glDisable(GL_TEXTURE_2D)
 
