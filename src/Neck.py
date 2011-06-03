@@ -120,6 +120,32 @@ class Neck:
                             [-w / 2, 0, l],
                             [w / 2, 0, l]], dtype=np.float32)
 
+
+    self.soloLightVtx1 = np.array([[w / 2-1.0, 0.4, -2],
+                                [w / 2+1.0, 0.4, -2],
+                                [w / 2-1.0, 0.4, l],
+                                [w / 2+1.0, 0.4, l]], dtype=np.float32)
+
+    self.soloLightVtx2 = np.array([[-w / 2+1.0, 0.4, -2],
+                                [-w / 2-1.0, 0.4, -2],
+                                [-w / 2+1.0, 0.4, l],
+                                [-w / 2-1.0, 0.4, l]], dtype=np.float32)
+
+    self.bpm_vtx  = np.array([[-(w / 2), 0,  0],
+                           [-(w / 2), 0,  0],
+                           [(w / 2), 0,  0],
+                           [(w / 2), 0,  0]], dtype=np.float32)
+
+
+    self.board_scroll_vtx = np.array([[-w / 2, 0, 0],
+                                      [w / 2, 0, 0],
+                                      [-w/ 2, 0, 0],
+                                      [w / 2, 0, 0],
+                                      [-w/ 2, 0, 0],
+                                      [w / 2, 0, 0],
+                                      [-w/ 2, 0, 0],
+                                      [w / 2, 0, 0]], dtype=np.float32)
+
     # evilynux - Sidebars vertices
     w += 0.15
     self.sidebars_vtx = np.array([[-w / 2, 0, -2],
@@ -141,16 +167,6 @@ class Neck:
                            [1, 1, 1, self.vis],
                            [1, 1, 1, self.vis]], dtype=np.float32)
 
-    self.soloLightVtx1 = np.array([[w / 2-1.0, 0.4, -2],
-                                [w / 2+1.0, 0.4, -2],
-                                [w / 2-1.0, 0.4, l],
-                                [w / 2+1.0, 0.4, l]], dtype=np.float32)
-
-    self.soloLightVtx2 = np.array([[-w / 2+1.0, 0.4, -2],
-                                [-w / 2-1.0, 0.4, -2],
-                                [-w / 2+1.0, 0.4, l],
-                                [-w / 2-1.0, 0.4, l]], dtype=np.float32)
-
     self.board_col_flash  = np.array([[color[0],color[1],color[2], 0],
                              [color[0],color[1],color[2], 0],
                              [color[0],color[1],color[2], self.vis],
@@ -159,11 +175,6 @@ class Neck:
                              [color[0],color[1],color[2], self.vis],
                              [color[0],color[1],color[2], 0],
                              [color[0],color[1],color[2], 0]], dtype=np.float32)
-
-    self.bpm_vtx  = np.array([[-(w / 2), 0,  0],
-                           [-(w / 2), 0,  0],
-                           [(w / 2), 0,  0],
-                           [(w / 2), 0,  0]], dtype=np.float32)
 
     self.board_tex_static = np.array([[0.0, self.project(-2 * self.beatsPerUnit)],
                                       [1.0, self.project(-2 * self.beatsPerUnit)],
@@ -182,15 +193,6 @@ class Neck:
                                 [1.0, 0],
                                 [0.0, 0],
                                 [1.0, 0]], dtype=np.float32)
-
-    self.board_scroll_vtx = np.array([[-w / 2, 0, 0],
-                                      [w / 2, 0, 0],
-                                      [-w/ 2, 0, 0],
-                                      [w / 2, 0, 0],
-                                      [-w/ 2, 0, 0],
-                                      [w / 2, 0, 0],
-                                      [-w/ 2, 0, 0],
-                                      [w / 2, 0, 0]], dtype=np.float32)
 
     # evilynux - Just in case the type has became double, convert to float32
     self.board_col = self.board_col.astype(np.float32)
@@ -377,10 +379,10 @@ class Neck:
 
     glEnable(GL_TEXTURE_2D)
 
-    self.board_scroll_vtx[0][2] = self.board_scroll_vtx[1][2] = z
-    self.board_scroll_vtx[2][2] = self.board_scroll_vtx[3][2] = z + 1
-    self.board_scroll_vtx[4][2] = self.board_scroll_vtx[5][2] = z + 2 + l * .7
-    self.board_scroll_vtx[6][2] = self.board_scroll_vtx[7][2] = z + 2 + l
+    self.board_scroll_vtx[0][2] = self.board_scroll_vtx[1][2] = z - 2
+    self.board_scroll_vtx[2][2] = self.board_scroll_vtx[3][2] = z - 1
+    self.board_scroll_vtx[4][2] = self.board_scroll_vtx[5][2] = z + l * .7
+    self.board_scroll_vtx[6][2] = self.board_scroll_vtx[7][2] = z + l
 
     if neckTexture:
       neckTexture.texture.bind()
