@@ -653,11 +653,8 @@ class Neck:
       z  = ((time - pos) / self.currentPeriod) / self.beatsPerUnit
       sw = 0.1 #width
 
-      for i in range(0,4):
-        if i == 0 or i == 2:
-          self.bpm_vtx[i][2] = z + sw
-        else:
-          self.bpm_vtx[i][2] = z - sw
+      self.bpm_vtx[0][2] = self.bpm_vtx[2][2] = z + sw
+      self.bpm_vtx[1][2] = self.bpm_vtx[3][2] = z - sw
 
       if event.barType == 0: #half-beat
         self.bpm_halfbeat.texture.bind()
