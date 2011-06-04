@@ -178,12 +178,6 @@ class Instrument(object):
     self.Animspeed      = 30#Lower value = Faster animations
     #For Animated Starnotes
     self.indexCount     = 0
-    #Alarian, For animated hitglow
-    self.HCount         = 0
-    self.HCount2        = 0
-    self.Hitanim        = True
-    self.Hitanim2       = True
-    self.HCountAni      = False
     
     #myfingershurt: to keep track of pause status here as well
     self.paused = False
@@ -302,49 +296,6 @@ class Instrument(object):
     self.disableNoteSFX  = self.engine.config.get("video", "disable_notesfx")
     self.disableFretSFX  = self.engine.config.get("video", "disable_fretsfx")
     self.disableFlameSFX  = self.engine.config.get("video", "disable_flamesfx")
-
-    # make glow.png optional, theme dependent
-    if self.disableFretSFX != False:
-      self.glowDrawing = None
-    else:
-      engine.loadImgDrawing(self, "glowDrawing", os.path.join("themes",themename,"glow.png"),  textureSize = (128, 128))
-      if not self.glowDrawing:
-        engine.loadImgDrawing(self, "glowDrawing", "glow.png")
-
-    #MFH - making hitflames optional
-    self.hitFlamesPresent = False
-    if self.disableFlameSFX == True:
-      self.hitFlamesPresent = True
-      self.hitglow2Drawing = None
-      self.hitglowDrawing = None
-      self.hitglowAnim = None
-      self.hitflamesAnim = None
-      self.hitflames2Drawing = None
-      self.hitflames1Drawing = None
-    else:
-      if engine.loadImgDrawing(self, "hitflames1Drawing", os.path.join("themes",themename,"hitflames1.png"),  textureSize = (128, 128)):
-        if engine.loadImgDrawing(self, "hitflames2Drawing", os.path.join("themes",themename,"hitflames2.png"),  textureSize = (128, 128)):
-          self.hitFlamesPresent = True
-        else:
-          self.hitflames2Drawing = None
-      else:
-        self.hitflames1Drawing = None
-        self.hitflames2Drawing = None
-      
-      if not engine.loadImgDrawing(self, "hitflamesAnim", os.path.join("themes",themename,"hitflamesanimation.png"),  textureSize = (128, 128)):
-        self.Hitanim2 = False
-      
-      if not engine.loadImgDrawing(self, "hitglowAnim", os.path.join("themes",themename,"hitglowanimation.png"),  textureSize = (128, 128)):
-        if engine.loadImgDrawing(self, "hitglowDrawing", os.path.join("themes",themename,"hitglow.png"),  textureSize = (128, 128)):
-          if not engine.loadImgDrawing(self, "hitglow2Drawing", os.path.join("themes",themename,"hitglow2.png"),  textureSize = (128, 128)):
-            self.hitglow2Drawing = None
-            self.hitFlamesPresent = False   #MFH - shut down all flames if these are missing.
-        else:
-          self.hitglowDrawing = None
-          self.hitFlamesPresent = False   #MFH - shut down all flames if these are missing.
-        self.Hitanim = False
-
-    engine.loadImgDrawing(self, "hitlightning", os.path.join("themes",themename,"lightning.png"),  textureSize = (128, 128))
 
     self.meshColor  = self.engine.theme.meshColor
     self.hopoColor  = self.engine.theme.hopoColor
