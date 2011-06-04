@@ -141,6 +141,29 @@ class Drum(Instrument):
 
     self.neck = Neck(self.engine, self, playerObj)
 
+  def loadFrets(self):
+    super(Drum, self).loadFrets()
+    
+    if self.twoDkeys == True: #death_au
+      if engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename, "frets", "drum", "fretbuttons.png")):
+        self.drumFretButtons = True
+      elif engine.loadImgDrawing(self, "fretButtons", get("fretbuttons.png")):
+        self.drumFretButtons = None
+
+    else:
+      defaultOpenKey = False
+
+      if self.engine.fileExists(get("open.dae")): #look in the frets folder for files
+        engine.resource.load(self,  "keyMeshOpen",  lambda: Mesh(engine.resource.fileName(get("open.dae"))))
+      else: #default to files in data folder
+        engine.resource.load(self,  "keyMeshOpen",  lambda: Mesh(engine.resource.fileName("key_open.dae")))
+        defaultOpenKey = True
+
+      if defaultOpenKey:
+        self.keytexopen = False
+      else:
+        engine.loadImgDrawing(self, "keytexopen", get("keytex_open.png"))
+      
   def renderFlames(self, visibility, song, pos, controls):
     if not song or self.flameColors[0][0][0] == -1:
       return

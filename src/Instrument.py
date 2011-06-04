@@ -503,19 +503,11 @@ class Instrument(object):
     get = lambda file: self.checkPath("frets", file)
 
     if self.twoDkeys == True: #death_au
-
       if self.gameMode2p == 6:
         engine.loadImgDrawing(self, "battleFrets", get("battle_frets.png"))
-        
-      #death_au: adding drumfrets.png (with bass drum frets separate)
-      if self.isDrum and engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename, "frets", "drum", "fretbuttons.png")):
-        self.drumFretButtons = True
-      elif engine.loadImgDrawing(self, "fretButtons", get("fretbuttons.png")):
-        self.drumFretButtons = None
 
     else:
       defaultKey = False
-      defaultOpenKey = False
 
       #MFH - can't use IOError for fallback logic for a Mesh() call...
       if self.engine.fileExists(get("key.dae")): #look in the frets folder for files
@@ -523,14 +515,6 @@ class Instrument(object):
       else: #default to files in data folder
         engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName("key.dae")))
         defaultKey = True
-
-      if self.isDrum:
-        if self.engine.fileExists(get("open.dae")): #look in the frets folder for files
-          engine.resource.load(self,  "keyMeshOpen",  lambda: Mesh(engine.resource.fileName(get("open.dae"))))
-        else: #default to files in data folder
-          engine.resource.load(self,  "keyMeshOpen",  lambda: Mesh(engine.resource.fileName("key_open.dae")))
-          defaultOpenKey = True
-
 
       if defaultKey:
         self.keytex = False
@@ -540,11 +524,6 @@ class Instrument(object):
           if not engine.loadImgDrawing(self,  "keytex"+chr(97+i),  get("keytex_"+chr(97+i)+".png")):
             self.keytex = False
             break
-
-      if defaultOpenKey:
-        self.keytexopen = False
-      else:
-        engine.loadImgDrawing(self, "keytexopen", get("keytex_open.png"))
         
   def loadTails(self):
     engine = self.engine
