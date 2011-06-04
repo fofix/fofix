@@ -423,11 +423,6 @@ class Instrument(object):
         engine.loadImgDrawing(self, "noteAnimatedPowerActive", get("animated_power_active.png"))
         engine.loadImgDrawing(self, "noteAnimatedPowerActiveHOPO", get("animated_power_active_hopo.png"))
         
-        if self.isDrum:
-          engine.loadImgDrawing(self, "noteOpenAnimatedPowerActive", get("animated_open_power_active.png"))
-          engine.loadImgDrawing(self, "noteOpenAnimatedPower", get("animated_open_power.png"))
-          engine.loadImgDrawing(self, "noteOpenAnimated", get("animated_open.png"))
-        
         if self.gameMode2p == 6: #battle multiplayer
           if engine.loadImgDrawing(self, "noteButtons", get("spinnotesbattle.png")):
             self.starSpinFrames = 8
@@ -440,7 +435,6 @@ class Instrument(object):
         
     else:
       defaultNote = False
-      defaultOpenNote = False
 
       #MFH - can't use IOError for fallback logic for a Mesh() call... 
       if self.engine.fileExists(get("note.dae")): #look in the notes folder for files
@@ -454,16 +448,8 @@ class Instrument(object):
       else: #No mesh for star notes
         self.starMesh = None
 
-      if self.isDrum:
-        if self.engine.fileExists(get("open.dae")): #load from notes folder
-          self.engine.resource.load(self,  "openMesh",  lambda: Mesh(self.engine.resource.fileName(get("open.dae"))))
-        else: #fallback to the default in the data folder
-          self.engine.resource.load(self,  "openMesh",  lambda: Mesh(self.engine.resource.fileName("open.dae")))
-          defaultOpenNote = True
-
       if defaultNote:
         self.notetex = False
-
       else:
         self.notetex = True
         self.startex = True
@@ -483,21 +469,7 @@ class Instrument(object):
           if not self.engine.loadImgDrawing(self,  "staratex"+chr(97+i),  get("staratex_"+chr(97+i)+".png")):
             self.staratex = False
             break
-
-
-      if self.isDrum: 
-        engine.loadImgDrawing(self, "spActTex", get("spacttex.png"))
-        
-
-      if defaultOpenNote:
-        self.opentexture = False
-        self.opentexture_star = False
-        self.opentexture_stara = False
-      else:
-        self.engine.loadImgDrawing(self, "opentexture", get("opentex.png"))
-        self.engine.loadImgDrawing(self, "opentexture_star", get("opentex_star.png"))
-        self.engine.loadImgDrawing(self, "opentexture_stara", get("opentex_stara.png"))
-        
+  
   def loadFrets(self):
     engine = self.engine
     themename = self.engine.data.themeLabel

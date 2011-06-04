@@ -141,6 +141,35 @@ class Drum(Instrument):
 
     self.neck = Neck(self.engine, self, playerObj)
 
+  def loadNotes(self):
+    super(Drum, self).loadNotes()
+    
+    if self.twoDnote == True:
+      if self.noteSpin:
+        engine.loadImgDrawing(self, "noteOpenAnimatedPowerActive", get("animated_open_power_active.png"))
+        engine.loadImgDrawing(self, "noteOpenAnimatedPower", get("animated_open_power.png"))
+        engine.loadImgDrawing(self, "noteOpenAnimated", get("animated_open.png"))        
+
+    else:
+      defaultOpenNote = False
+
+      if self.engine.fileExists(get("open.dae")): #load from notes folder
+        self.engine.resource.load(self,  "openMesh",  lambda: Mesh(self.engine.resource.fileName(get("open.dae"))))
+      else: #fallback to the default in the data folder
+        self.engine.resource.load(self,  "openMesh",  lambda: Mesh(self.engine.resource.fileName("open.dae")))
+        defaultOpenNote = True
+        
+      engine.loadImgDrawing(self, "spActTex", get("spacttex.png"))
+
+      if defaultOpenNote:
+        self.opentexture = False
+        self.opentexture_star = False
+        self.opentexture_stara = False
+      else:
+        self.engine.loadImgDrawing(self, "opentexture", get("opentex.png"))
+        self.engine.loadImgDrawing(self, "opentexture_star", get("opentex_star.png"))
+        self.engine.loadImgDrawing(self, "opentexture_stara", get("opentex_stara.png"))
+
   def loadFrets(self):
     super(Drum, self).loadFrets()
     
