@@ -135,9 +135,7 @@ class Drum(Instrument):
 
     self.tailsEnabled = False
 
-    self.loadFrets()
-    self.loadNotes()
-    self.loadTails()
+    self.loadImages()
 
     self.barsColor = self.engine.theme.barsColor
 

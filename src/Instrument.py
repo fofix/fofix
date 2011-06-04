@@ -590,6 +590,12 @@ class Instrument(object):
       self.kill1 = None
       self.kill2 = None
 
+  def loadImages(self):
+    self.loadFrets()
+    self.loadNotes()
+    self.loadTails()
+    self.loadFlames()
+          
   def selectPreviousString(self):
     self.selectedString = (self.selectedString - 1) % self.strings
 
