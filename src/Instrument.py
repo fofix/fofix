@@ -278,7 +278,6 @@ class Instrument(object):
 
     self.setBPM(self.currentBpm)
 
-
     if self.starpowerMode == 1:
       self.starNotesSet = False
     else:
@@ -723,6 +722,61 @@ class Instrument(object):
       
     return sorted(notes, key=lambda x: x[0])    #MFH - what the hell, this should be sorted by TIME not note number....
 
+  def getRequiredNotesForRender(self, song, pos):
+    if self.battleStatus[2] and self.difficulty != 0:
+      Log.debug(self.battleDiffUpValue)
+      song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue]
+      track0 = song.track[self.player]
+      notes0 = [(time, event) for time, event in track0.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
+    
+      song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue - 1]
+      track1   = song.track[self.player]
+      notes1 = [(time, event) for time, event in track1.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
+      
+      notes = []
+      for time,note in notes0:
+        if time < self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard or time > self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
+          notes.append((time,note))
+      for time,note in notes1:
+        if time > self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard and time < self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
+          notes.append((time,note))
+      notes0 = None
+      notes1 = None
+      track0 = None
+      track1 = None
+      notes = sorted(notes, key=lambda x: x[0])
+    else:
+      track   = song.track[self.player]
+      notes = [(time, event) for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
+    
+    if self.battleStatus[7]:
+      notes = self.getDoubleNotes(notes)
+    return notes
+
+
+  def coOpRescue(self, pos):
+    self.coOpRestart = True #initializes Restart Timer
+    self.coOpRescueTime  = pos
+    self.starPower  = 0
+    Log.debug("Rescued at " + str(pos))
+
+  def noteBeingHeld(self):
+    noteHeld = False
+    if self.isDrum:
+      return noteHeld
+    for i in range(0,5):
+      if self.hit[i] == True:
+        noteHeld = True
+    return noteHeld
+
+  def isKillswitchPossible(self):
+    possible = False
+    if self.isDrum:
+      return possible
+    for i in range(0,5):
+      if self.hit[i] == True:
+        possible = True
+    return possible
 
   #Renders the tail glow hitflame
   def renderHitTrails(self, visibility, song, pos, controls):
@@ -1031,37 +1085,6 @@ class Instrument(object):
                                 vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
                                 multiples = True, alpha = True, color = flamecol)
         event.flameCount += 1
-
-  def getRequiredNotesForRender(self, song, pos):
-    if self.battleStatus[2] and self.difficulty != 0:
-      Log.debug(self.battleDiffUpValue)
-      song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue]
-      track0 = song.track[self.player]
-      notes0 = [(time, event) for time, event in track0.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
-    
-      song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue - 1]
-      track1   = song.track[self.player]
-      notes1 = [(time, event) for time, event in track1.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
-      
-      notes = []
-      for time,note in notes0:
-        if time < self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard or time > self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
-          notes.append((time,note))
-      for time,note in notes1:
-        if time > self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard and time < self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
-          notes.append((time,note))
-      notes0 = None
-      notes1 = None
-      track0 = None
-      track1 = None
-      notes = sorted(notes, key=lambda x: x[0])
-    else:
-      track   = song.track[self.player]
-      notes = [(time, event) for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
-    
-    if self.battleStatus[7]:
-      notes = self.getDoubleNotes(notes)
-    return notes
 
   def renderNote(self, length, sustain, color, tailOnly = False, isTappable = False, fret = 0, spNote = False, isOpen = False, spAct = False):
 
@@ -1625,12 +1648,6 @@ class Instrument(object):
       self.finalStarSeen = False
       self.isStarPhrase = Fals
 
-  def coOpRescue(self, pos):
-    self.coOpRestart = True #initializes Restart Timer
-    self.coOpRescueTime  = pos
-    self.starPower  = 0
-    Log.debug("Rescued at " + str(pos))
-
   def renderFrets(self, visibility, song, controls):
     w = self.boardWidth / self.strings
     size = (.22, .22)
@@ -1915,24 +1932,6 @@ class Instrument(object):
           self.engine.draw3Dtex(self.glowDrawing, coord = (x, 0, 0.01), rot = (f * 90 + self.time, 0, 1, 0),
                               texcoord = (0.0, 0.0, 1.0, 1.0), vertex = (-size[0] * f, -size[1] * f, size[0] * f, size[1] * f),
                               multiples = True, alpha = True, color = glowcol)
-
-  def noteBeingHeld(self):
-    noteHeld = False
-    if self.isDrum:
-      return noteHeld
-    for i in range(0,5):
-      if self.hit[i] == True:
-        noteHeld = True
-    return noteHeld
-
-  def isKillswitchPossible(self):
-    possible = False
-    if self.isDrum:
-      return possible
-    for i in range(0,5):
-      if self.hit[i] == True:
-        possible = True
-    return possible
 
   def renderTail(self, song, length, sustain, kill, color, tailOnly = False, isTappable = False, big = False, fret = 0, spNote = False, freestyleTail = 0, pos = 0):
 
