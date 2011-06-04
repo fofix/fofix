@@ -795,7 +795,7 @@ class Instrument(object):
               
         #Alarian: Animated hitflames
         if self.Hitanim:
-          self.HCount = self.HCount + 1
+          self.HCount += 1
           if self.HCount > self.Animspeed-1:
             self.HCount = 0
           HIndex = (self.HCount * self.HFrameLimit - (self.HCount * self.HFrameLimit) % self.Animspeed) / self.Animspeed
@@ -880,7 +880,7 @@ class Instrument(object):
                                   texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)
             #Alarian: Animated hitflames
           else:
-            self.HCount = self.HCount + 1
+            self.HCount += 1
             if self.HCount > self.Animspeed-1:
               self.HCount = 0
             HIndex = (self.HCount * self.HFrameLimit - (self.HCount * self.HFrameLimit) % self.Animspeed) / self.Animspeed
@@ -941,7 +941,7 @@ class Instrument(object):
         ff += 1.5 #ff first time is 2.75 after this
 
         if self.Hitanim2 == True:
-          self.HCount2 = self.HCount2 + 1
+          self.HCount2 += 1
           self.HCountAni = False
           if self.HCount2 >= self.HFrameLimit2:
             if not event.length > (1.4 * (60000.0 / event.noteBpm) / 4):
@@ -996,7 +996,7 @@ class Instrument(object):
                               multiples = True, alpha = True, color = flamecol)
                                   
         elif self.hitFlamesPresent == True and self.Hitanim2 == False:
-          self.HCount2 = self.HFrameLimit2
+          self.HCount2 = self.HFrameLimit2 + 1
           self.HCountAni = True
           if event.flameCount < flameLimitHalf:
           
