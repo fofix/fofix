@@ -355,8 +355,8 @@ class Instrument(object):
 
     self.HCount         = 0
     self.HCount2        = 0
-    self.HFrameLimit	= self.engine.theme.HitFlameFrameLimit
-    self.HFrameLimit2	= self.engine.theme.HoldFlameFrameLimit
+    self.HFrameLimit	= self.engine.theme.HoldFlameFrameLimit
+    self.HFrameLimit2	= self.engine.theme.HitFlameFrameLimit
     self.Hitanim        = True
     self.Hitanim2       = True
     self.HCountAni      = False
@@ -479,7 +479,7 @@ class Instrument(object):
     if self.twoDkeys == True: #death_au
       if self.gameMode2p == 6:
         engine.loadImgDrawing(self, "battleFrets", get("battle_frets.png"))
-
+      engine.loadImgDrawing(self, "fretButtons", get("fretbuttons.png"))
     else:
       defaultKey = False
 
@@ -886,7 +886,7 @@ class Instrument(object):
             HIndex = (self.HCount * self.HFrameLimit - (self.HCount * self.HFrameLimit) % self.Animspeed) / self.Animspeed
             if HIndex >= self.HFrameLimit:
               HIndex = 0
-            texX = (HIndex*(1.0/self.HFrameLimit), HIndex*(1.0/self.HFrameLimit+1.0/self.HFrameLimit))
+            texX = (HIndex*(1.0/self.HFrameLimit), HIndex*(1.0/self.HFrameLimit)+(1.0/self.HFrameLimit))
             if self.disableFlameSFX != True:
               self.engine.draw3Dtex(self.hitglowAnim, coord = (x, y + .225, 0), rot = (90, 1, 0, 0), scale = (2.4, 1, 3.3),
                                     vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
