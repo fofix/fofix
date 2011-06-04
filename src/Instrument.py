@@ -787,7 +787,7 @@ class Instrument(object):
 
     v = 1.0 - visibility
      
-    if (self.HCountAni == True and self.HCount2 > 12):
+    if (self.HCountAni == True and self.HCount2 >= self.HFrameLimit2):
       for n in range(self.strings):
         f = self.fretWeight[n]
         if f and (controls.getState(self.actions[0]) or controls.getState(self.actions[1])):
@@ -823,10 +823,10 @@ class Instrument(object):
           self.HCount = self.HCount + 1
           if self.HCount > self.Animspeed-1:
             self.HCount = 0
-          HIndex = (self.HCount * 16 - (self.HCount * 16) % self.Animspeed) / self.Animspeed
-          if HIndex > 15:
+          HIndex = (self.HCount * self.HFrameLimit - (self.HCount * self.HFrameLimit) % self.Animspeed) / self.Animspeed
+          if HIndex >= self.HFrameLimit:
             HIndex = 0
-          texX = (HIndex*(1/16.0), HIndex*(1/16.0)+(1/16.0))
+          texX = (HIndex*(1.0/self.HFrameLimit), HIndex*(1.0/self.HFrameLimit)+(1.0/self.HFrameLimit))
 
           self.engine.draw3Dtex(self.hitglowAnim, coord = (x, y + .225, 0), rot = (90, 1, 0, 0), scale = (2.4, 1, 3.3),
                                 vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
@@ -865,7 +865,7 @@ class Instrument(object):
 
     v = 1.0 - visibility
 
-    if (self.HCountAni == True and self.HCount2 > 12):
+    if (self.HCountAni == True and self.HCount2 >= self.HFrameLimit2):
       for n in range(self.strings):
         f = self.fretWeight[n]
         if f and (controls.getState(self.actions[0]) or controls.getState(self.actions[1])):
@@ -908,10 +908,10 @@ class Instrument(object):
             self.HCount = self.HCount + 1
             if self.HCount > self.Animspeed-1:
               self.HCount = 0
-            HIndex = (self.HCount * 16 - (self.HCount * 16) % self.Animspeed) / self.Animspeed
-            if HIndex > 15:
+            HIndex = (self.HCount * self.HFrameLimit - (self.HCount * self.HFrameLimit) % self.Animspeed) / self.Animspeed
+            if HIndex >= self.HFrameLimit:
               HIndex = 0
-            texX = (HIndex*(1/16.0), HIndex*(1/16.0)+(1/16.0))
+            texX = (HIndex*(1.0/self.HFrameLimit), HIndex*(1.0/self.HFrameLimit+1.0/self.HFrameLimit))
             if self.disableFlameSFX != True:
               self.engine.draw3Dtex(self.hitglowAnim, coord = (x, y + .225, 0), rot = (90, 1, 0, 0), scale = (2.4, 1, 3.3),
                                     vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
@@ -968,7 +968,7 @@ class Instrument(object):
         if self.Hitanim2 == True:
           self.HCount2 = self.HCount2 + 1
           self.HCountAni = False
-          if self.HCount2 > 12:
+          if self.HCount2 >= self.HFrameLimit2:
             if not event.length > (1.4 * (60000.0 / event.noteBpm) / 4):
               self.HCount2 = 0
             else:
@@ -976,11 +976,11 @@ class Instrument(object):
           if event.flameCount < flameLimitHalf:
 
                 
-              HIndex = (self.HCount2 * 13 - (self.HCount2 * 13) % 13) / 13
-              if HIndex > 12 and self.HCountAni != True:
+              HIndex = (self.HCount2 * self.HFrameLimit2 - (self.HCount2 * self.HFrameLimit2) % self.HFrameLimit2) / self.HFrameLimit2
+              if HIndex >= self.HFrameLimit2 and self.HCountAni != True:
                 HIndex = 0
                 
-              texX = (HIndex*(1/13.0), HIndex*(1/13.0)+(1/13.0))
+              texX = (HIndex*(1.0/self.HFrameLimit2), HIndex*(1.0/self.HFrameLimit2)+(1.0/self.HFrameLimit2))
               if self.disableFlameSFX != True:
                 self.engine.draw3Dtex(self.hitflamesAnim, coord = (x, y + .665, 0), rot = (90, 1, 0, 0), scale = (1.6, 1.6, 4.9),
                                       vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
@@ -1021,7 +1021,7 @@ class Instrument(object):
                               multiples = True, alpha = True, color = flamecol)
                                   
         elif self.hitFlamesPresent == True and self.Hitanim2 == False:
-          self.HCount2 = 13
+          self.HCount2 = self.HFrameLimit2
           self.HCountAni = True
           if event.flameCount < flameLimitHalf:
           

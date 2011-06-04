@@ -170,6 +170,11 @@ class Theme(Task):
     #or the actual color of the tail
     self.use_fret_colors =  get("use_fret_colors", bool, False)
     
+    #themes can define how many frames their hitflames will be.
+    # Separate variables for hit and hold animation frame counts.
+    self.HitFlameFrameLimit    = get("hit_flame_frame_limit",  int, 13)
+    self.HoldFlameFrameLimit   = get("hold_flame_frame_limit", int, 16)
+    
     self.fretPress = get("fretPress", bool, False)
     
     #Point of View (x, y, z)
