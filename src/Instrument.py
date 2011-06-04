@@ -350,6 +350,9 @@ class Instrument(object):
       return os.path.join(defaultpath, file)
 
   def loadFlames(self):
+    engine = self.engine
+    themename = self.engine.data.themeLabel
+
     self.HCount         = 0
     self.HCount2        = 0
     self.HFrameLimit	= self.engine.theme.HitFlameFrameLimit
