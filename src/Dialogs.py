@@ -502,29 +502,31 @@ class FileChooser(BackgroundLayer, KeyListener):
   """File choosing layer."""
   def __init__(self, engine, masks, path, prompt = "", dirSelect = False):
     self.masks          = masks
-    self.path           = path
+    self.path           = os.path.abspath(path)
     self.prompt         = prompt
     self.engine         = engine
     self.accepted       = False
     self.selectedFile   = None
     self.time           = 0.0
     self.menu           = None
+    
+    self.driveLetters   = None
+    if os.name == "nt":
+      import win32api, win32file
+      driveLetters=win32api.GetLogicalDriveStrings().split('\x00')[:-1]
+      self.driveLetters = []
+      #Here we should filter some drives out. Unmounted drives for sure, but also optical drives and RAM disks.
+      #This leaves fixed, removable, and remote drives.
+      okDrives = [win32file.DRIVE_REMOVABLE, win32file.DRIVE_FIXED, win32file.DRIVE_REMOTE]
+      for drive in driveLetters:
+        driveType = win32file.GetDriveType(drive)
+        if driveType in okDrives:
+          self.driveLetters.append(drive)
 
     if self.engine.data.logClassInits == 1:
       Log.debug("FileChooser class init (Dialogs.py)...")
     
-
     self.dirSelect      = dirSelect
-    self.spinnyDisabled = self.engine.config.get("game", "disable_spinny")
-
-    #Get theme
-    themename = self.engine.data.themeLabel
-    #now theme determination logic is only in data.py:
-    self.theme = self.engine.data.theme
-
-   #MFH - added simple black background to place in front of Options background, behind Neck BG, for transparent neck displays
-    if not self.engine.loadImgDrawing(self, "neckBlackBack", ("neckblackback.png")):
-      self.neckBlackBack = None
     
   def _getFileCallback(self, fileName):
     return lambda: self.chooseFile(fileName)
@@ -533,10 +535,13 @@ class FileChooser(BackgroundLayer, KeyListener):
     f = os.path.join(self.path, fileName)
     if fileName == "..":
       return _("[Parent Folder]")
-    if self.dirSelect == True:
-      for mask in self.masks:
-        if fnmatch.fnmatch(fileName, mask):
-          return _("[Accept Folder]")
+    if self.path == "?toplevel":
+      return _("%s [Drive]") % fileName
+    else:
+      if self.dirSelect == True:
+        for mask in self.masks:
+          if fnmatch.fnmatch(fileName, mask):
+            return _("[Accept Folder]")
     if os.path.isdir(f):
       return _("%s [Folder]") % fileName
     return fileName
@@ -554,33 +559,28 @@ class FileChooser(BackgroundLayer, KeyListener):
           continue
       files.append(fn)
     files.sort()
-    if self.dirSelect == True and (fnmatch.fnmatch(self.path, self.masks[0])):
+    if self.dirSelect == True and self.path!="?toplevel":
       files.insert(0, self.path)
     return files
 
   def getDisks(self):
-    import win32file, string
-    driveLetters=[]
-    for drive in string.letters[len(string.letters) / 2:]:
-      if win32file.GetDriveType(drive + ":") == win32file.DRIVE_FIXED:
-        driveLetters.append(drive + ":\\")
-    return driveLetters
+    return self.driveLetters
   
   def updateFiles(self):
     if self.menu:
       self.engine.view.popLayer(self.menu)
 
-    if self.path == "toplevel" and os.name != "nt":
+    if self.path == "?toplevel" and os.name != "nt":
       self.path = "/"
       
-    if self.path == "toplevel":
+    if self.path == "?toplevel":
       self.menu = Menu(self.engine, choices = [(self._getFileText(f), self._getFileCallback(f)) for f in self.getDisks()], onClose = self.close, onCancel = self.cancel)
     else:
       self.menu = Menu(self.engine, choices = [(self._getFileText(f), self._getFileCallback(f)) for f in self.getFiles()], onClose = self.close, onCancel = self.cancel)
     self.engine.view.pushLayer(self.menu)
 
   def chooseFile(self, fileName):
-    if self.dirSelect == True:
+    if self.dirSelect == True and self.path != "?toplevel":
       for mask in self.masks:
         if fnmatch.fnmatch(fileName, mask):
           self.selectedFile = fileName
@@ -590,14 +590,13 @@ class FileChooser(BackgroundLayer, KeyListener):
           self.menu = None
           return
 
-    if self.path == "toplevel":
+    if self.path == "?toplevel":
       self.path = ""
     path = os.path.abspath(os.path.join(self.path, fileName))
 
     if os.path.isdir(path):
-
       if path == self.path and fileName == "..":
-        self.path = "toplevel"
+        self.path = "?toplevel"
       else:
         self.path = path
       self.updateFiles()
@@ -635,12 +634,6 @@ class FileChooser(BackgroundLayer, KeyListener):
     self.engine.view.setViewport(1,0)
     w, h, = self.engine.view.geometry[2:4]
     r = .5
-
-    #MFH - draw neck black BG in for transparent areas (covers options BG):
-    if self.neckBlackBack != None:
-      #MFH - auto background scaling 
-      self.engine.drawImage(self.neckBlackBack, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
-
 
     #MFH - auto background scaling
     if self.engine.data.optionsBG:
@@ -1393,7 +1386,6 @@ class ItemChooser(BackgroundLayer, KeyListener):
       self.posX = .1    #MFH - default
       self.posY = .05   #MFH - default
       self.menu = Menu(self.engine, choices = [(c, self._callbackForItem(c)) for c in items], onClose = self.close, onCancel = self.cancel, font = self.engine.data.streakFont2)
-    self.spinnyDisabled = self.engine.config.get("game", "disable_spinny")
     
     if selected and selected in items:
       self.menu.selectItem(items.index(selected))
@@ -1914,7 +1906,7 @@ def getKey(engine, prompt, key = None, specialKeyList = []):
   _runDialog(engine, d)
   return d.key
 
-def chooseFile(engine, masks = ["*.*"], path = ".", prompt = _("Choose a File"), dirSelect = False):
+def chooseFile(engine, masks = ["*.*"], path = "", prompt = _("Choose a File"), dirSelect = False):
   """
   Ask the user to select a file.
   

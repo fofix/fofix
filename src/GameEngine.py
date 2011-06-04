@@ -325,6 +325,7 @@ Config.define("results", "cheer_loop_delay",  int,  550,  text = _("Cheer Loop D
 
 
 #used internally:
+Config.define("setlist", "base_library",      str, "")
 Config.define("setlist", "selected_library",  str, "")
 Config.define("setlist", "selected_song",     str, "")
 Config.define("game",   "players",             int,  1)
