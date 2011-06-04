@@ -399,6 +399,56 @@ class Instrument(object):
       Log.debug("Image not found: " + themepath + "/" + file)
       return os.path.join(defaultpath, file)
 
+  def loadFlames(self):
+    self.HCount         = 0
+    self.HCount2        = 0
+    self.HFrameLimit	= self.engine.theme.HitFlameFrameLimit
+    self.HFrameLimit2	= self.engine.theme.HoldFlameFrameLimit
+    self.Hitanim        = True
+    self.Hitanim2       = True
+    self.HCountAni      = False
+    
+    if self.disableFretSFX != False:
+      self.glowDrawing = None
+    else:
+      engine.loadImgDrawing(self, "glowDrawing", os.path.join("themes",themename,"glow.png"),  textureSize = (128, 128))
+      if not self.glowDrawing:
+        engine.loadImgDrawing(self, "glowDrawing", "glow.png")
+
+    self.hitFlamesPresent = False
+    if self.disableFlameSFX == True:
+      self.hitFlamesPresent = True
+      self.hitglow2Drawing = None
+      self.hitglowDrawing = None
+      self.hitglowAnim = None
+      self.hitflamesAnim = None
+      self.hitflames2Drawing = None
+      self.hitflames1Drawing = None
+    else:
+      if engine.loadImgDrawing(self, "hitflames1Drawing", os.path.join("themes",themename,"hitflames1.png"),  textureSize = (128, 128)):
+        if engine.loadImgDrawing(self, "hitflames2Drawing", os.path.join("themes",themename,"hitflames2.png"),  textureSize = (128, 128)):
+          self.hitFlamesPresent = True
+        else:
+          self.hitflames2Drawing = None
+      else:
+        self.hitflames1Drawing = None
+        self.hitflames2Drawing = None
+      
+      if not engine.loadImgDrawing(self, "hitflamesAnim", os.path.join("themes",themename,"hitflamesanimation.png"),  textureSize = (128, 128)):
+        self.Hitanim2 = False
+      
+      if not engine.loadImgDrawing(self, "hitglowAnim", os.path.join("themes",themename,"hitglowanimation.png"),  textureSize = (128, 128)):
+        if engine.loadImgDrawing(self, "hitglowDrawing", os.path.join("themes",themename,"hitglow.png"),  textureSize = (128, 128)):
+          if not engine.loadImgDrawing(self, "hitglow2Drawing", os.path.join("themes",themename,"hitglow2.png"),  textureSize = (128, 128)):
+            self.hitglow2Drawing = None
+            self.hitFlamesPresent = False
+        else:
+          self.hitglowDrawing = None
+          self.hitFlamesPresent = False
+        self.Hitanim = False
+
+    engine.loadImgDrawing(self, "hitlightning", os.path.join("themes",themename,"lightning.png"),  textureSize = (128, 128))
+
   def loadNotes(self):
     engine = self.engine
 
