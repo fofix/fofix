@@ -38,7 +38,6 @@ import Version
 import Theme
 import copy
 import cPickle  #stump: Cerealizer and sqlite3 don't seem to like each other that much...
-import time
 from Language import _
 import VFS
 from constants import *
@@ -262,7 +261,7 @@ class SongInfo(object):
         result = _songDB.execute('SELECT `info` FROM `songinfo` WHERE `hash` = ?', [songhash]).fetchone()
         if result is None:
           Log.debug('Song %s was not found in the cache.' % infoFileName)
-      except Exception, e:
+      except Exception:
         Log.error('Cache retrieval failed for %s: ' % infoFileName)
         result = None
 
@@ -365,7 +364,7 @@ class SongInfo(object):
       
     for difficulty in highScores.keys():
       if isinstance(difficulty, Difficulty):
-        diff = diff.id
+        diff = difficulty.id
       else:
         diff = difficulty
       s[diff] = [(score, stars, name, self.getScoreHash(difficulty, score, stars, name)) for score, stars, name, scores_ext in highScores[difficulty]]
@@ -377,7 +376,7 @@ class SongInfo(object):
       
     for difficulty in highScores.keys():
       if isinstance(difficulty, Difficulty):
-        diff = diff.id
+        diff = difficulty.id
       else:
         diff = difficulty
       s[diff] = [(self.getScoreHash(difficulty, score, stars, name), stars) + scores_ext for score, stars, name, scores_ext in highScores[difficulty]]
@@ -1209,7 +1208,6 @@ class VocalTrack(Track):
   
   def markPhrases(self):
     phraseId = 0
-    stars = []
     phraseTimes = []
     markStars = False
     if len(self.starTimes) < 2:
@@ -1227,7 +1225,6 @@ class VocalTrack(Track):
           event.star = True
         phraseTimes.append(time)
         phraseId += 1
-    index = 0
     for time, tuple in self.allNotes.iteritems():
       phraseId = 0
       for i, phraseTime in enumerate(self.getAllEvents()):
@@ -1367,7 +1364,7 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
 
     try:
       songHopoFreq = int(songHopoFreq)
-    except Exception, e:
+    except Exception:
       songHopoFreq = None
     #  Log.warn("Song.ini HOPO Frequency setting is invalid -- forcing Normal (value 1)")
       if self.songHopoFreq == 1 and (songHopoFreq == 0 or songHopoFreq == 1 or songHopoFreq == 2 or songHopoFreq == 3 or songHopoFreq == 4 or songHopoFreq == 5):
@@ -1601,7 +1598,7 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
 
     try:
       songHopoFreq = int(songHopoFreq)
-    except Exception, e:
+    except Exception:
       songHopoFreq = None
     if self.songHopoFreq == 1 and (songHopoFreq == 0 or songHopoFreq == 1 or songHopoFreq == 2 or songHopoFreq == 3 or songHopoFreq == 4 or songHopoFreq == 5):
       Log.debug("markHopoGH2: song-specific HOPO frequency %d forced" % songHopoFreq)
@@ -1681,9 +1678,7 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
         lastEvent = event
         lastTime  = time
         eventBeforeLast = lastEvent
-        timeBeforeLast = lastTime
         eventBeforeEventBeforeLast = eventBeforeLast
-        timeBeforeTimeBeforeLast = timeBeforeLast
         firstTime = 0
         continue
 
@@ -1781,9 +1776,7 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
 
       #myfingershurt: to really check marking, need to track 3 notes into the past. 
       eventBeforeEventBeforeLast = eventBeforeLast
-      timeBeforeTimeBeforeLast = timeBeforeLast
       eventBeforeLast = lastEvent
-      timeBeforeLast = lastTime
       lastEvent = event
       lastTime = time
 
@@ -2969,7 +2962,6 @@ class MidiReader(midi.MidiOutStream):
           else:  #unused text event
             unusedEvent = TextEvent(text, 100.0)
           #now, check for guitar solo status change:
-          soloSlop = 150.0   
           if gSoloEvent:
             if gSolo:
               if not self.guitarSoloActive:
@@ -3899,6 +3891,7 @@ def removeSongOrderPrefixFromName(name):
 #stump
 def updateSongDatabase(engine):
   import Dialogs  # putting it at the top causes circular-import-related problems...
+  import time
   Log.debug('Updating song cache.')
   _songDB.execute('UPDATE `songinfo` SET `seen` = 0')
   lastScreenUpdateTime = [time.time()]  # one-element list to avoid having to throw this into the global namespace for updatePhase's sake

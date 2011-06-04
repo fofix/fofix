@@ -25,7 +25,6 @@ from __future__ import with_statement
 from OpenGL.GL import *
 
 import numpy as np
-import math
 import cmgl
 
 import Log

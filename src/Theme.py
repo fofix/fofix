@@ -109,19 +109,20 @@ class Theme(Task):
     else:
       self.config = None
       Log.debug("no theme.ini")
-    config = self.config
   
     def get(value, type = str, default = None):
-      if type == "color":
-        if self.config:
-          if self.config.has_option("theme", value):
+      if self.config:
+        if self.config.has_option("theme", value):
+          if type == bool:
+            return bool(value.lower() in ["1", "true", "yes", "on"])
+          elif type == "color":
             return self.hexToColor(self.config.get("theme", value))
-        return self.hexToColor(default)
-      else:
-        if self.config:
-          if self.config.has_option("theme", value):
+          else:
             return type(self.config.get("theme", value))
-        return default
+
+      if type == "color":
+        return self.hexToColor(default)
+      return default
 
     #These colors are very important
     #background_color defines what color openGL will clear too
@@ -169,6 +170,11 @@ class Theme(Task):
     #or the actual color of the tail
     self.use_fret_colors =  get("use_fret_colors", bool, False)
     
+    #themes can define how many frames their hitflames will be.
+    # Separate variables for hit and hold animation frame counts.
+    self.HitFlameFrameLimit    = get("hit_flame_frame_limit",  int, 13)
+    self.HoldFlameFrameLimit   = get("hold_flame_frame_limit", int, 16)
+    
     self.fretPress = get("fretPress", bool, False)
     
     #Point of View (x, y, z)
@@ -180,6 +186,9 @@ class Theme(Task):
 
     #Render necks toggle
     self.doNecksRender = (get("render_necks", bool, True))
+
+    #Pause menu type
+    self.pauseMenuType = (get("pause_menu_type", str, "RB"))
 	
 	#fretboard intro animation
     self.povIntroAnimation = (get("fretboard_intro_animation", str, "fofix"))
@@ -599,6 +608,7 @@ class Theme(Task):
     self.hopoIndicatorInactiveColor = get("hopo_indicator_inactive_color", "color", "#666666")
     self.markSolos = get("mark_solo_sections", int, 2)
     self.ingame_stats_colorVar = get("ingame_stats_color", "color", "#FFFFFF")
+    self.fpsRenderPos = (get("fps_display_pos_x", float, .85), get("fps_display_pos_y", float, .055))
     
     #Game results scene
     self.result_score = get("result_score", str, ".5,.11,0.0025,None,None").split(",")
@@ -807,7 +817,6 @@ class ThemeLobby:
     x = self.theme.lobbyPanelPos[0]
     y = self.theme.lobbyPanelPos[1]
     w, h = lobby.geometry
-    font = lobby.fontDict['font']
     controlFont   = lobby.fontDict[self.theme.lobbyControlFont]
     panelNameFont = lobby.fontDict[self.theme.lobbyPanelNameFont]
     optionFont    = lobby.fontDict[self.theme.lobbyOptionFont]
@@ -884,7 +893,6 @@ class ThemeParts:
     font = dialog.fontDict['font']
     controlFont   = dialog.fontDict[self.theme.partDiffControlFont]
     panelNameFont = dialog.fontDict[self.theme.partDiffPanelNameFont]
-    optionFont    = dialog.fontDict[self.theme.partDiffOptionFont]
     wP = w*self.theme.partDiffPanelSize[0]
     hP = h*self.theme.partDiffPanelSize[1]
     glColor3f(*self.theme.partDiffHeaderColor)
@@ -1019,7 +1027,6 @@ class Setlist:
     w, h = scene.geometry
     font = scene.fontDict['songListFont']
     lfont = scene.fontDict['songListFont']
-    sfont = scene.fontDict['shadowFont']
     if self.setlist_type == 0:
       return
     elif self.setlist_type == 1:
@@ -1151,7 +1158,6 @@ class Setlist:
         lfont.render(text, (self.song_listscore_xpos+.1, .0925*(n+1)+.0125), scale=scale*1.28, align = 2)
     
     elif self.setlist_type == 2: #old list/cd
-      y = h*(.87-(.1*n))
       if not scene.items:
         return
       item = scene.items[i]
@@ -1198,7 +1204,6 @@ class Setlist:
       if not scene.items or scene.itemIcons is None:
         return
       item = scene.items[i]
-      y = h*(.7825-(.0459*(n+1)))
       
       if scene.img_tier:
         imgwidth = scene.img_tier.width1()
@@ -1309,9 +1314,6 @@ class Setlist:
                   notesHit, notesTotal, noteStreak, modVersion, handicap, handicapLong, originalScore = scoreExt
                 except ValueError:
                   notesHit, notesTotal, noteStreak, modVersion, oldScores1, oldScores2 = scoreExt
-                  handicap = 0
-                  handicapLong = "None"
-                  originalScore = score
                 break
               else:
                 score, stars, name = 0, 0, "---"
@@ -1704,9 +1706,6 @@ class Setlist:
                   notesHit, notesTotal, noteStreak, modVersion, handicap, handicapLong, originalScore = scoreExt
                 except ValueError:
                   notesHit, notesTotal, noteStreak, modVersion, oldScores1, oldScores2 = scoreExt
-                  handicap = 0
-                  handicapLong = "None"
-                  originalScore = score
                 break
               else:
                 score, stars, name = 0, 0, "---"
@@ -2318,9 +2317,6 @@ class Setlist:
               notesHit, notesTotal, noteStreak, modVersion, handicap, handicapLong, originalScore = scoreExt
             except ValueError:
               notesHit, notesTotal, noteStreak, modVersion, oldScores1, oldScores2 = scoreExt
-              handicap = 0
-              handicapLong = "None"
-              originalScore = score
           else:
             score, stars, name = "---", 0, "---"
           
@@ -2367,7 +2363,6 @@ class Setlist:
         
         if scene.img_diff3 != None:
           imgwidth = scene.img_diff3.width1()
-          imgheight = scene.img_diff3.height1()
           wfactor1 = 13.0/imgwidth
         
         albumtag = item.album

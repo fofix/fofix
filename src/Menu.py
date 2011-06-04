@@ -480,13 +480,8 @@ class Menu(Layer, KeyListener):
             
           if self.engine.data.submenuSelectFound and len(text) > 0 and not self.mainMenu and self.useSelectedBox:
             Tw, Th = font.getStringSize(text,scale)
-            lineSpacing = font.getLineSpacing(scale)
-            frameWidth = Tw*1.10
-            frameHeight = Th + lineSpacing
             boxXOffset = (x + (Tw/2))*wS
             boxYOffset = (1.0 - (y*4.0/3.0) - (Th*1.2/2))*hS
-            subSelectHYFactor = 640.000/self.engine.view.aspectRatio
-            subSelectHFactor = subSelectHYFactor/self.engine.data.subSelectImgH
             self.engine.drawImage(self.engine.data.submenuSelect,
                                   scale = (tempWScale,tempHScale), #FIXME
                                   coord = (boxXOffset,boxYOffset))

@@ -28,8 +28,8 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import OpenGL
 from OpenGL.GL import *
-from OpenGL import __version__ as OpenGLVersion
 import numpy as np
 from PIL import Image
 import pygame
@@ -458,7 +458,7 @@ class GameEngine(object):
     Log.debug(self.versionString + " starting up...")
     Log.debug("Python version: " + sys.version.split(' ')[0])
     Log.debug("Pygame version: " + str(pygame.version.ver) )
-    Log.debug("PyOpenGL version: " + OpenGLVersion)
+    Log.debug("PyOpenGL version: " + OpenGL.__version__)
     Log.debug("Numpy version: " + np.__version__)
     Log.debug("PIL version: " + Image.VERSION)
     Log.debug("sys.argv: " + repr(sys.argv))
@@ -552,6 +552,10 @@ class GameEngine(object):
     fullscreen    = self.config.get("video", "fullscreen")
     multisamples  = self.config.get("video", "multisamples")
     self.video.setMode((width, height), fullscreen = fullscreen, multisamples = multisamples)
+    Log.debug("OpenGL version: " + glGetString(GL_VERSION))
+    Log.debug("OpenGL vendor: " + glGetString(GL_VENDOR))
+    Log.debug("OpenGL renderer: " + glGetString(GL_RENDERER))
+    Log.debug("OpenGL extensions: " + ' '.join(sorted(glGetString(GL_EXTENSIONS).split())))
     
     if self.video.default:
       self.config.set("video", "fullscreen", False)
@@ -618,7 +622,7 @@ class GameEngine(object):
         thisIsAnAnimatedStageFolder = False
         try:
           aniStageFolderListing = os.listdir(os.path.join(stagespath,name))
-        except Exception, e:
+        except Exception:
           thisIsAnAnimatedStageFolder = False
         for aniFile in aniStageFolderListing:
           if os.path.splitext(aniFile)[1] == ".png" or os.path.splitext(aniFile)[1] ==  ".jpg" or os.path.splitext(aniFile)[1] == ".jpeg":  #we've found at least one .png file here, chances are this is a valid animated stage folder
@@ -675,12 +679,6 @@ class GameEngine(object):
     self.loadingScreenShown = False
     self.graphicMenuShown   = False
     
-    # evilynux - Printing on the console with a frozen binary may cause a crash.
-    if hasattr(sys, "frozen"):
-      self.print_fps_in_console = False
-    else:
-      self.print_fps_in_console = True
-
     Log.debug("Ready.")
     
 
@@ -697,7 +695,7 @@ class GameEngine(object):
         self.audioSpeedFactor = factor
         pygame.init()
         Log.debug("Initializing pygame.mixer & audio system at " + str(self.frequency*factor) + " Hz." )
-      except Exception, e:
+      except Exception:
         Log.error("Failed to initialize or re-initialize pygame.mixer & audio system - crash imminent!")
   
   # evilynux - This stops the crowd cheers if they're still playing (issue 317).
@@ -1034,7 +1032,6 @@ class GameEngine(object):
 
     @param task:    L{Task} to remove
     """
-    found = False
     queues = self._getTaskQueues(task)
     for q in queues:
       q.remove(task)
@@ -1096,19 +1093,19 @@ class GameEngine(object):
       self.debugLayer.render(1.0, True)
     self.video.flip()
     # evilynux - Estimate the rendered frames per second.
-    if self.show_fps:
-      self.frames = self.frames+1
-      # Estimate every 120 frames when highpriority is True.
-      # Estimate every 2*config.fps when highpriority is False,
-      # if you are on target, that should be every 2 seconds.
-      if( not self.priority and self.frames == (self.fps << 1) ) or ( self.priority and self.frames == 120 ):
-        currentTime = pygame.time.get_ticks()
-        self.elapsedTime = currentTime-self.lastTime
-        self.lastTime = currentTime
-        self.fpsEstimate = self.frames*(1000.0/self.elapsedTime)
-        if self.print_fps_in_console == True:
-          print("%.2f fps" % self.fpsEstimate)
-        self.frames = 0 
+    self.frames = self.frames+1
+    # Estimate every 120 frames when highpriority is True.
+    # Estimate every 2*config.fps when highpriority is False,
+    # if you are on target, that should be every 2 seconds.
+    if( not self.priority and self.frames == (self.fps << 1) ) or ( self.priority and self.frames == 120 ):
+      currentTime = pygame.time.get_ticks()
+      self.elapsedTime = currentTime-self.lastTime
+      self.lastTime = currentTime
+      self.fpsEstimate = self.frames*(1000.0/self.elapsedTime)
+      # evilynux - Printing on the console with a frozen binary may cause a crash.
+      if self.show_fps and not Version.isWindowsExe():
+        print("%.2f fps" % self.fpsEstimate)
+      self.frames = 0
     return done
 
   def doRun(self):

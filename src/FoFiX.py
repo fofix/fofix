@@ -129,7 +129,6 @@ def main():
   fullscreen = None
   resolution = None
   theme = None
-  debug = False
   difficulty = None
   part = None
   mode = 0

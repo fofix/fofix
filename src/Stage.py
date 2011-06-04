@@ -287,7 +287,6 @@ class Stage(object):
     if not os.path.exists(self.pathfull): # evilynux
       Log.warn("Stage folder does not exist: %s" % self.pathfull)
       self.mode = 1 # Fallback to song-specific stage
-    suffix = ".jpg"
 
     self.loadLayers(configFileName)
     

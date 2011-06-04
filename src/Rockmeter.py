@@ -80,6 +80,9 @@ progress = 0.0          #this gives a percentage (between 0 and 1)
 vpc = [640.0, 480.0]    #viewport's constant size, these variables determine how 
                         #things are placed on screen in relation to pixel coordinates
 
+_minFPS = 10            #minimum frame limit for effects that allow the theme maker to set
+                        #time in milliseconds
+
 # Functions for getting config values, optionally as compiled code objects ready to eval().
 class ConfigGetMixin(object):
   def get(self, value, type = str, default = None):
@@ -121,18 +124,20 @@ class Layer(ConfigGetMixin):
 
     self.xposexpr    = self.getexpr("xpos", "0.0")
     self.yposexpr    = self.getexpr("ypos", "0.0")
-    self.position    = [0.0, 0.0]
-                                        #where on the screen to draw the layer
+    self.position    = [0.0, 0.0]       #where on the screen to draw the layer
+    
     self.angleexpr   = self.getexpr("angle", "0.0")
-    self.angle       = 0.0
-                                        #angle to rotate the layer (in degrees)
+    self.angle       = 0.0              #angle to rotate the layer (in degrees)
+    
     self.xscaleexpr  = self.getexpr("xscale", "1.0")
     self.yscaleexpr  = self.getexpr("yscale", "1.0")
-    self.scale       = [1.0, 1.0]
-                                        #how much to scale it by (width, height from 0.0 - 1.0)
+    self.scale       = [1.0, 1.0]       #how much to scale it by (width, height from 0.0 - 1.0)
+    
     self.color       = list(self.engine.theme.hexToColor(self.get("color", str, "#FFFFFF")))
                                         #color of the image (#FFFFFF is white on text, on images it is full color)
+    
     self.condition   = True				#when should the image be shown (by default it will always be shown)
+    
     self.alignment   = halign(self.get("alignment", str, "center"))
                                         #alignment of the image (horizontal)
     self.valignment  = valign(self.get("valignment", str, "middle"))
@@ -149,7 +154,7 @@ class Layer(ConfigGetMixin):
     self.angle       = float(eval(self.angleexpr))
     self.scale       = [float(eval(self.xscaleexpr)), float(eval(self.yscaleexpr))]
     
-     #makes sure color has an alpha value to consider
+    #makes sure color has an alpha value to consider
     if len(self.color) == 3:
         self.color.append(1.0)
          
@@ -160,7 +165,7 @@ class Layer(ConfigGetMixin):
   def render(self, visibility, playerNum):
     pass
 
- #A graphical stage layer that is used to render the rockmeter.
+#A graphical stage layer that is used to render the rockmeter.
 class ImageLayer(Layer):
   def __init__(self, stage, section, drawing):
     super(ImageLayer, self).__init__(stage, section)
@@ -168,8 +173,8 @@ class ImageLayer(Layer):
     #these are the images that are drawn when the layer is visible
     self.drawing = self.engine.loadImgDrawing(self, None, drawing)
     self.rectexpr = self.getexpr("rect", "(0,1,0,1)")
-    self.rect = eval(self.rectexpr)
-                                #how much of the image do you want rendered (left, right, top, bottom)
+    self.rect = eval(self.rectexpr) #how much of the image do you want rendered
+                                    # (left, right, top, bottom)
     
   def updateLayer(self, playerNum):
     w, h, = self.engine.view.geometry[2:4]
@@ -242,14 +247,15 @@ class FontLayer(Layer):
   def __init__(self, stage, section, font):
     super(FontLayer, self).__init__(stage, section)
 
-    self.font        = self.engine.data.fontDict[font]
-    self.text        = ""
-    self.textexpr    = self.getexpr("text", "''")
-    self.replace     = ""
+    self.font        = self.engine.data.fontDict[font]          #the font to use
+    self.text        = ""                                       #the text that will be rendered to screen 
+    self.textexpr    = self.getexpr("text", "''")               #the text from the ini that will be evalutated
+    self.replace     = ""                                       #replace character a character in the string with this
     self.alignment   = halign(self.get("alignment", str, "LEFT"), 'left')
-    self.useComma    = self.get("useComma", bool, False)
-    self.shadow      = self.get("shadow",   bool, False)
-    self.outline     = self.get("outline",  bool, False)
+                                                                #alignment of the text
+    self.useComma    = self.get("useComma", bool, False)        #use commas when drawing numbers
+    self.shadow      = self.get("shadow",   bool, False)        #show a shadow on the text
+    self.outline     = self.get("outline",  bool, False)        #give the text an outline
 
   def updateLayer(self, playerNum):
     w, h, = self.engine.view.geometry[2:4]
@@ -263,6 +269,7 @@ class FontLayer(Layer):
 
     wid, hgt = self.font.getStringSize(str(text))
 
+    #needs to be done later because of values that may be dependant on the text's properties
     super(FontLayer, self).updateLayer(playerNum)
 
     self.text = text
@@ -393,9 +400,10 @@ class Slide(Effect):
     super(Slide, self).__init__(layer, section)
 
     self.startCoord = [eval(self.getexpr("startX", "0.0")), eval(self.getexpr("startY", "0.0"))]
+                                                                #starting position of the image
     self.endCoord   = [eval(self.getexpr("endX",   "0.0")), eval(self.getexpr("endY",   "0.0"))]
-
-    self.inPixels  = self.get("inPixels", str, "").split("|")
+                                                                #ending position of the image
+    self.inPixels  = self.get("inPixels", str, "").split("|")   #variables in terms of pixels
 
     self.condition = self.getexpr("condition", "True")
     
@@ -443,15 +451,23 @@ class Slide(Effect):
     #how long it takes for the transition to take place
     self.transitionTime = self.get("transitionTime", float, 512.0)
 
-    self.rates = [(self.endCoord[0] - self.startCoord[0])/self.transitionTime,
-                  (self.endCoord[1] - self.startCoord[1])/self.transitionTime]
+    self.updateRates()
+    
     if isinstance(self.layer, FontLayer):
-        self.rates[0] *= -1
-        self.rates[1] *= -1
-        
+      self.rates[0] *= -1
+      self.rates[1] *= -1
+       
+
+  def updateRates(self):
+    t = self.transitionTime * (max(self.engine.clock.get_fps(), _minFPS)) / 1000.0
+    self.rates = [(self.endCoord[0] - self.startCoord[0])/t,
+                  (self.endCoord[1] - self.startCoord[1])/t]
+    
   def update(self):
     condition = bool(eval(self.condition))
 
+    self.updateRates()
+    
     if condition:
       for i in range(2):
         if self.position[i] > self.endCoord[i]:
@@ -510,15 +526,20 @@ class Fade(Effect):
     #how long it takes for the transition to take place
     self.transitionTime = self.get("transitionTime", float, 512.0)
 
-    self.rates = [(self.colors[0][i] - self.colors[1][i])/self.transitionTime 
-                      for i in range(4)]
+    self.updateRates()
     
     self.condition = self.getexpr("condition", "True")
     self.reverse = bool(eval(self.getexpr("reverse", "True")))
-        
+
+  def updateRates(self):
+    t = self.transitionTime * (max(self.engine.clock.get_fps(), _minFPS)) / 1000.0
+    self.rates = [(self.colors[0][i] - self.colors[1][i])*t 
+                      for i in range(4)]
+    
   def update(self):
     condition = bool(eval(self.condition))
 
+    self.updateRates()
     
     if condition:
       for i in range(len(self.currentColor)):
@@ -611,15 +632,54 @@ class Replace(Effect):
           self.layer.rect = self.rects[-1]
       self.fixScale()
             
+#effect that allows one to set the number of frames and
+# have the layer loop through an animation               
+class Animate(Effect):
+  def __init__(self, layer, section):
+    super(Animate, self).__init__(layer, section)
     
+    self.frames = self.get("frames", int, 1)
+    self.fps = self.get("fps", int, 30)
     
+    self.currentFrame = 1
+    self.transitionTime = self.get("transitionTime", float, 512.0)
+    
+    self.condition = self.getexpr("condition", "True")
+
+  #fixes the scale after the rect is changed
+  def fixScale(self):
+    scale = [self.layer.scale[0]/self.frames, self.layer.scale[1]]
+    self.layer.scale = scale
+        
+  #adjusts the rate to the current fps
+  def updateRate(self):
+    self.rate = self.transitionTime * (max(self.engine.clock.get_fps(), _minFPS)) / 1000.0
+      
+  def update(self):
+    
+    self.updateRate()
+    
+    if self.condition and self.currentFrame < self.frames:
+      self.currentFrame += self.rate
+    else:
+      self.currentFrame = 1
+    
+    rect = self.layer.rect
+    
+    rect = [(rect[1] - rect[0])/self.frames * (int(self.currentFrame) - 1),
+            (rect[1] - rect[0])/self.frames * (int(self.currentFrame)),
+            rect[2], rect[3]]
+            
+    self.layer.rect = rect
+    
+    self.fixScale()
         
 class Rockmeter(ConfigGetMixin):
   def __init__(self, guitarScene, configFileName, coOp = False):
 
     self.scene            = guitarScene
     self.engine           = guitarScene.engine
-    self.layers = []
+    self.layers = {}
     self.sharedlayers = [] #these layers are for coOp use only
 
     self.coOp = coOp
@@ -641,24 +701,25 @@ class Rockmeter(ConfigGetMixin):
           continue
         else:
           if t == types[1]:
-            self.createFont(self.section)
+            self.createFont(self.section, i)
           elif t == types[2]:
-            self.createCircle(self.section)
+            self.createCircle(self.section, i)
           else:
-            self.createImage(self.section)
+            self.createImage(self.section, i)
           break
 
-  def addLayer(self, layer, shared = False):
+  #adds a layer to the rockmeter's list
+  def addLayer(self, layer, number, shared = False):
     if shared:
       self.sharedlayers.append(layer)
     else:
       if layer:
-        self.layers.append(layer)
+        self.layers[number] = layer
 
   def loadLayerFX(self, layer, section):
     section = section.split(":")[0]
-    types = ["Slide", "Rotate", "Replace", "Fade"]
-    for i in range(5):
+    types = ["Slide", "Rotate", "Replace", "Fade", "Animate"]
+    for i in range(5):  #maximum of 5 effects per layer
       for t in types:
         fxsection = "%s:fx%d:%s" % (section, i, t)
         if not self.config.has_section(fxsection):
@@ -670,10 +731,14 @@ class Rockmeter(ConfigGetMixin):
 #            layer.effects.append(Rotate(layer, fxsection))
           elif t == types[2]:
             layer.effects.append(Replace(layer, fxsection))
-          else:
+          elif t == types[3]:
             layer.effects.append(Fade(layer, fxsection))
+          else:
+            layer.effects.append(Animate(layer, fxsection))
+          break #only allow type per effect number
+            
       
-  def createFont(self, section):
+  def createFont(self, section, number):
 
     font  = self.get("font")
     layer = FontLayer(self, section, font)
@@ -685,9 +750,9 @@ class Rockmeter(ConfigGetMixin):
     
     self.loadLayerFX(layer, section)
 
-    self.addLayer(layer, layer.shared)
+    self.addLayer(layer, number, layer.shared)
 
-  def createImage(self, section):
+  def createImage(self, section, number):
     
     texture   = self.get("texture")
     drawing   = os.path.join("themes", self.themename, "rockmeter", texture)
@@ -701,9 +766,9 @@ class Rockmeter(ConfigGetMixin):
 
     self.loadLayerFX(layer, section)
             
-    self.addLayer(layer, layer.shared)
+    self.addLayer(layer, number, layer.shared)
 
-  def createCircle(self, section):
+  def createCircle(self, section, number):
     
     texture   = self.get("texture")
     drawing   = os.path.join("themes", self.themename, "rockmeter", texture)
@@ -717,7 +782,7 @@ class Rockmeter(ConfigGetMixin):
 
     self.loadLayerFX(layer, section)
 
-    self.addLayer(layer, layer.shared)
+    self.addLayer(layer, number, layer.shared)
 
   #because time is not player specific it's best to update it only once per cycle
   def updateTime(self):
@@ -788,7 +853,7 @@ class Rockmeter(ConfigGetMixin):
           self.engine.view.setViewportHalf(self.scene.numberOfGuitars,p)
         else:
           self.engine.view.setViewportHalf(1,0)  
-        for layer in self.layers:
+        for layer in self.layers.values():
           layer.render(visibility, p)
 
       self.engine.view.setViewportHalf(1,0)

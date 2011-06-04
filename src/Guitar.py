@@ -28,13 +28,11 @@
 #####################################################################
 
 from Neck import Neck
-import random
 from copy import deepcopy
 from Shader import shaders
 
 from Instrument import *
 from OpenGL.GL import *
-import Song
 
 class Guitar(Instrument):
   def __init__(self, engine, playerObj, editorMode = False, player = 0, bass = False):
@@ -80,7 +78,6 @@ class Guitar(Instrument):
     self.bigMax = 1
     
     #Get theme
-    themename = self.engine.data.themeLabel
     #now theme determination logic is only in data.py:
     self.theme = self.engine.data.theme
 
@@ -94,9 +91,7 @@ class Guitar(Instrument):
 
     self.tailsEnabled = True
 
-    self.loadFrets()
-    self.loadNotes()
-    self.loadTails()
+    self.loadImages()
     
     self.twoChordMax = False
 
@@ -110,7 +105,6 @@ class Guitar(Instrument):
 
     w = self.boardWidth / self.strings
 
-    size = (.22, .22)
     v = 1.0 - visibility
 
 
@@ -292,7 +286,6 @@ class Guitar(Instrument):
       curTime = 0
       tempnotes = []
       tempnumbers = []
-      tempnote = None
       curNumbers = []
       noteCount = 0
       for time, note in notes:
@@ -606,7 +599,6 @@ class Guitar(Instrument):
           if controls.getState(k):
             twochord += 1
         if twochord == 2:
-          skipped = len(self.requiredKeys) - 2
           self.requiredKeys = [min(self.requiredKeys), max(self.requiredKeys)]
         else:
           twochord = 0

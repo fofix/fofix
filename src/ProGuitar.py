@@ -20,14 +20,11 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-from Neck import Neck
 import random
-from copy import deepcopy
 from Shader import shaders
 
 from Instrument import *
 from OpenGL.GL import *
-import Song
 
 class ProGuitar(Guitar):
   def __init__(self, engine, playerObj, editorMode = False, player = 0, bass = False):
@@ -37,7 +34,6 @@ class ProGuitar(Guitar):
 
   def loadNotes(self):
     engine = self.engine
-    themename = self.engine.data.themeLabel
 
     get = lambda file: self.checkPath(os.path.join("notes", "pro"), file)
 
@@ -130,13 +126,6 @@ class ProGuitar(Guitar):
 
       noteImage = self.noteButtons
 
-      if self.notedisappear ==0:#Notes keep on going when missed
-        notecol = (1,1,1)#capo
-      elif self.notedisappear == 1:#Notes disappear when missed
-        notecol = (.1,.1,.1)
-      elif self.notedisappear == 2: #Notes Turn Red when missed
-        notecol = (1,0,0,1) 
-
       tailOnly = True
 
      
@@ -208,10 +197,7 @@ class ProGuitar(Guitar):
     self.killPoints = False
 
     w = self.boardWidth / self.strings
-    track = song.track[self.player]
 
-    num = 0
-    enable = True
     self.starNotesInView = False
     self.openStarNotesInView = False
 
@@ -252,7 +238,6 @@ class ProGuitar(Guitar):
           continue #can't break. Tempo.
 
       x  = (self.strings / 2 - (event.number)) * w
-      isOpen = False
       c = self.fretColors[event.number]
 
       if event.number == 4 and self.isDrum:

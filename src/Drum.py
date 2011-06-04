@@ -36,9 +36,7 @@ from OpenGL.GL import *
 import math
 
 #myfingershurt: needed for multi-OS file fetching
-import os
 import Log
-import Song   #need the base song defines as well
 
 #Normal guitar key color order: Green, Red, Yellow, Blue, Orange
 #Drum fret color order: Red, Yellow, Blue, Green
@@ -131,29 +129,76 @@ class Drum(Instrument):
       self.boardLength    *= (4.0/3.0)
     
     #Get theme
-    themename = self.engine.data.themeLabel
     #now theme determination logic is only in data.py:
     self.theme = self.engine.data.theme
 
     self.tailsEnabled = False
 
-    self.loadFrets()
-    self.loadNotes()
-    self.loadTails()
+    self.loadImages()
 
     self.barsColor = self.engine.theme.barsColor
 
     self.neck = Neck(self.engine, self, playerObj)
 
+  def loadNotes(self):
+    super(Drum, self).loadNotes()
+    
+    if self.twoDnote == True:
+      if self.noteSpin:
+        engine.loadImgDrawing(self, "noteOpenAnimatedPowerActive", get("animated_open_power_active.png"))
+        engine.loadImgDrawing(self, "noteOpenAnimatedPower", get("animated_open_power.png"))
+        engine.loadImgDrawing(self, "noteOpenAnimated", get("animated_open.png"))        
+
+    else:
+      defaultOpenNote = False
+
+      if self.engine.fileExists(get("open.dae")): #load from notes folder
+        self.engine.resource.load(self,  "openMesh",  lambda: Mesh(self.engine.resource.fileName(get("open.dae"))))
+      else: #fallback to the default in the data folder
+        self.engine.resource.load(self,  "openMesh",  lambda: Mesh(self.engine.resource.fileName("open.dae")))
+        defaultOpenNote = True
+        
+      engine.loadImgDrawing(self, "spActTex", get("spacttex.png"))
+
+      if defaultOpenNote:
+        self.opentexture = False
+        self.opentexture_star = False
+        self.opentexture_stara = False
+      else:
+        self.engine.loadImgDrawing(self, "opentexture", get("opentex.png"))
+        self.engine.loadImgDrawing(self, "opentexture_star", get("opentex_star.png"))
+        self.engine.loadImgDrawing(self, "opentexture_stara", get("opentex_stara.png"))
+
+  def loadFrets(self):
+    super(Drum, self).loadFrets()
+    
+    if self.twoDkeys == True: #death_au
+      if engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename, "frets", "drum", "fretbuttons.png")):
+        self.drumFretButtons = True
+      elif engine.loadImgDrawing(self, "fretButtons", get("fretbuttons.png")):
+        self.drumFretButtons = None
+
+    else:
+      defaultOpenKey = False
+
+      if self.engine.fileExists(get("open.dae")): #look in the frets folder for files
+        engine.resource.load(self,  "keyMeshOpen",  lambda: Mesh(engine.resource.fileName(get("open.dae"))))
+      else: #default to files in data folder
+        engine.resource.load(self,  "keyMeshOpen",  lambda: Mesh(engine.resource.fileName("key_open.dae")))
+        defaultOpenKey = True
+
+      if defaultOpenKey:
+        self.keytexopen = False
+      else:
+        engine.loadImgDrawing(self, "keytexopen", get("keytex_open.png"))
+      
   def renderFlames(self, visibility, song, pos, controls):
     if not song or self.flameColors[0][0][0] == -1:
       return
 
-    beatsPerUnit = self.beatsPerBoard / self.boardLength
     w = self.boardWidth / self.strings
     track = song.track[self.player]
 
-    size = (.22, .22)
     v = 1.0 - visibility
 
 
@@ -426,10 +471,8 @@ class Drum(Instrument):
     if self.flameColors[0][0][0] == -1:
       return
 
-    beatsPerUnit = self.beatsPerBoard / self.boardLength
     w = self.boardWidth / self.strings
 
-    size = (.22, .22)
     v = 1.0 - visibility
 
 
@@ -447,7 +490,6 @@ class Drum(Instrument):
           else:
             x  = (self.strings / 2 +.5 - fretNum) * w
 
-          xlightning = (self.strings / 2 - fretNum)*2.2*w
           ff = 1 + 0.25       
           y = v + ff / 6
           glBlendFunc(GL_ONE, GL_ONE)

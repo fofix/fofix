@@ -631,6 +631,8 @@ class GuitarScene(Scene):
 
     self.countdownPosX = self.engine.theme.countdownPosX
     self.countdownPosY = self.engine.theme.countdownPosY
+
+    self.fpsRenderPos = self.engine.theme.fpsRenderPos
   
 
     #racer: practice beat claps:
@@ -691,7 +693,7 @@ class GuitarScene(Scene):
         self.isKillAnalog[i], self.whichJoyKill[i], self.whichAxisKill[i] = self.engine.input.getWhammyAxis(KillKeyCode[i])
         if self.isKillAnalog[i]:
           try:
-            testJoy = self.engine.input.joysticks[self.whichJoyKill[i]].get_axis(self.whichAxisKill[i])
+            self.engine.input.joysticks[self.whichJoyKill[i]].get_axis(self.whichAxisKill[i])
           except IndexError:
             self.isKillAnalog[i] = False
       if self.analogSPMode[i] > 0:
@@ -699,7 +701,7 @@ class GuitarScene(Scene):
         self.isSPAnalog[i], self.whichJoyStar[i], self.whichAxisStar[i] = self.engine.input.getWhammyAxis(StarKeyCode[i])
         if self.isSPAnalog[i]:
           try:
-            testJoy = self.engine.input.joysticks[self.whichJoyStar[i]].get_axis(self.whichAxisStar[i])
+            self.engine.input.joysticks[self.whichJoyStar[i]].get_axis(self.whichAxisStar[i])
           except IndexError:
             self.isSPAnalog[i] = False
       if player.controlType == 4:
@@ -707,7 +709,7 @@ class GuitarScene(Scene):
         self.isSlideAnalog[i], self.whichJoySlide[i], self.whichAxisSlide[i] = self.engine.input.getWhammyAxis(SlideKeyCode[i])
         if self.isSlideAnalog[i]:
           try:
-            testJoy = self.engine.input.joysticks[self.whichJoySlide[i]].get_axis(self.whichAxisSlide[i])
+            self.engine.input.joysticks[self.whichJoySlide[i]].get_axis(self.whichAxisSlide[i])
           except IndexError:
             self.isSlideAnalog[i] = False
     
@@ -788,9 +790,7 @@ class GuitarScene(Scene):
     guitarSoloStartTime = 0
     isGuitarSoloNow = False
     guitarSoloNoteCount = 0
-    lastSoloNoteTime = 0
     self.drumStart = False
-    soloSlop = 100.0
     unisonCheck = []
 
     if self.gameMode == TOUR:
@@ -1261,8 +1261,6 @@ class GuitarScene(Scene):
 
     self.coOpTotalStreakNotes = 0
     self.coOpTotalNotes = 0
-    coOpTotalStreakNotes = 0
-    coOpTotalNotes = 0
     if self.coOpScoreCard:
       self.coOpScoreCard.lastNoteTime  = max(self.lastNoteTimes)
       Log.debug("Last note for co-op mode found at %.2f" % self.coOpScoreCard.lastNoteTime)
@@ -1451,7 +1449,7 @@ class GuitarScene(Scene):
 
 
 
-#racer: theme.ini fail positions
+    #racer: theme.ini fail positions
     size = self.engine.data.pauseFont.getStringSize("Quit to Main")
     self.fail_bkg = [float(i) for i in self.engine.theme.fail_bkg_pos]
     self.fail_text_x = self.engine.theme.fail_text_xPos
@@ -1464,7 +1462,9 @@ class GuitarScene(Scene):
     if self.fail_text_y == None:
       self.fail_text_y = .47
 
-    if self.theme == 1: #GH3-like theme
+    self.pauseTextType = self.engine.theme.pauseMenuType
+
+    if self.pauseTextType == "GH3": #GH3-like theme
       if self.gameMode == TOUR:
         self.menu = Menu(self.engine, [
           (_("         RESUME"), self.resumeSong), #Worldrave adjusted proper spacing.
@@ -1495,7 +1495,7 @@ class GuitarScene(Scene):
           (_(" NEW SONG"), self.changeAfterFail),
           (_("     QUIT"), self.quit),  #Worldrave - added graphic menu support "fail" for Fail menu in below line.
         ], name = "fail", fadeScreen = False, onCancel = self.changeAfterFail, font = self.engine.data.pauseFont, pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
-    elif self.theme == 0:   #GH2-like theme
+    elif self.pauseTextType == "GH2":   #GH2-like theme
       if self.gameMode == TOUR:
         self.menu = Menu(self.engine, [
           (_("  Resume"),       self.resumeSong),
@@ -1528,7 +1528,7 @@ class GuitarScene(Scene):
           (_("  Give Up?"), self.changeAfterFail),
           (_("Quit to Main"), self.quit),  #Worldrave - added graphic menu support "fail" for Fail menu in below line.
         ], name = "fail", fadeScreen = False, onCancel = self.changeAfterFail, font = self.engine.data.pauseFont, pos = (self.fail_text_x, self.fail_text_y), textColor = self.fail_text_color, selectedColor = self.fail_selected_color)
-    elif self.theme == 2:   #RB-like theme
+    elif self.pauseTextType == "RB":   #RB-like theme
       size = self.engine.data.pauseFont.getStringSize("Quit to Main Menu")
       if self.gameMode == TOUR:
         self.menu = Menu(self.engine, [
@@ -1738,7 +1738,7 @@ class GuitarScene(Scene):
     hopoFreq = self.engine.world.hopoFrequency
     try:
       songHopo = int(self.song.info.hopofreq)
-    except Exception, e:
+    except Exception:
       songHopo = 1
     for i, scoreCard in enumerate(self.scoring):
       if self.instruments[i].isVocal:
@@ -2614,7 +2614,7 @@ class GuitarScene(Scene):
           else:
             self.killswitchEngaged[i] = False
           
-    except Exception, e:
+    except Exception:
       self.whammyVol[i] = self.defaultWhammyVol[i] 
       
     
@@ -4372,8 +4372,6 @@ class GuitarScene(Scene):
 
     pos = self.getSongPosition()
 
-    chordFudge = 1  #MFH - was 10  #myfingershurt - needed to detect chords
-    
     if self.coOpType:
       scoreCard = self.coOpScoreCard
     else:
@@ -4413,7 +4411,6 @@ class GuitarScene(Scene):
 
     #hopo fudge
     hopoFudge = abs(abs(self.instruments[num].hopoActive) - pos)
-    activeList = [k for k in self.keysList[num] if self.controls.getState(k)]
 
     #myfingershurt
     #Perhaps, if I were to just treat all tappable = 3's as problem notes, and just accept a potential overstrum, that would cover all the bases...
@@ -4919,7 +4916,6 @@ class GuitarScene(Scene):
 
     numpressed = [len([1 for k in guitar.keys if self.controls.getState(k)]) for guitar in self.instruments]
 
-    activeList = [k for k in self.keysList[pressed] if self.controls.getState(k)]
     for i in range(self.numOfPlayers):
       if control in (self.instruments[i].keys) and self.song and numpressed[i] >= 1:
         if self.instruments[i].wasLastNoteHopod and self.instruments[i].hopoActive >= 0:
@@ -5216,9 +5212,6 @@ class GuitarScene(Scene):
     bigFont = self.engine.data.bigFont
     sphraseFont = self.engine.data.streakFont2
 
-    scoreFont = self.engine.data.scoreFont
-    streakFont = self.engine.data.streakFont
-
 
     if self.song and self.song.readyToGo:
       pos = self.getSongPosition()
@@ -5425,7 +5418,6 @@ class GuitarScene(Scene):
           else:
             self.engine.view.setViewportHalf(1,0)  
 
-          streakFlag = 0  #set the flag to 0
           if self.coOpGH and self.theme != 2:
             self.engine.view.setViewport(1,0)
           self.engine.theme.setBaseColor()
@@ -5521,20 +5513,10 @@ class GuitarScene(Scene):
           if (self.coOp and i == self.coOpPlayerMeter) or ((self.coOpRB or self.coOpGH) and i == 0) or not self.coOpType:  #MFH only render for player 1 if co-op mode
 
             if self.coOpType:
-              stars=self.coOpScoreCard.stars
-              partialStars=self.coOpScoreCard.partialStars
               self.engine.view.setViewport(1,0)
-              ratio=self.coOpScoreCard.starRatio
-            else:
-              stars=self.scoring[i].stars
-              partialStars=self.scoring[i].partialStars
-              ratio=self.scoring[i].starRatio
 
             w = wBak
             h = hBak
-            vocaloffset = 0
-            if self.numOfSingers > 0 and self.numOfPlayers > 1:
-              vocaloffset = .05
 
           if self.song and self.song.readyToGo:
     
@@ -5833,7 +5815,7 @@ class GuitarScene(Scene):
                     if isinstance(event, Song.MarkerNote):
                       if (event.number == Song.starPowerMarkingNote) and (self.song.midiStyle == Song.MIDI_TYPE_RB):    #solo marker note.
                         soloChangeNow = False
-                        xOffset = (time - pos) / eventWindow
+                        xOffset = (time - pos) / eventWindow + .15
                         if xOffset < lyricSlop / 16.0:   #present
                           soloChangeNow = True
                         if soloChangeNow:
@@ -5850,7 +5832,7 @@ class GuitarScene(Scene):
                 elif self.markSolos == 1:   #fall back on old guitar solo marking system
                   for time, event in self.song.eventTracks[Song.TK_GUITAR_SOLOS].getEvents(minPos, maxPos):
                     #is event happening now?
-                    xOffset = (time - pos) / eventWindow
+                    xOffset = (time - pos) / eventWindow + .15
                     EventHappeningNow = False
                     if xOffset < (0.0 - lyricSlop * 2.0):   #past
                       EventHappeningNow = False
@@ -6095,7 +6077,7 @@ class GuitarScene(Scene):
               glColor3f(c1, c2, c3)
               text = _("FPS: %.2f" % self.engine.fpsEstimate)
               w, h = font.getStringSize(text, scale = 0.00140)
-              font.render(text, (.85, .055 - h/2), (1,0,0), 0.00140)
+              font.render(text, (self.fpsRenderPos[0], self.fpsRenderPos[1] - h/2), (1,0,0), 0.00140)
  
             pos = self.getSongPosition()
     

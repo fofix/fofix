@@ -256,12 +256,12 @@ class KeyConfigChoice(Menu.Choice):
         key = Dialogs.getKey(self.engine, _("Press a key for '%s' or hold Escape to cancel.") % text)
     
     if key:
-      temp = Player.setNewKeyMapping(self.engine, self.config, self.section, self.option, key)
+      Player.setNewKeyMapping(self.engine, self.config, self.section, self.option, key)
       if self.name in self.engine.input.controls.controlList:
         self.engine.input.reloadControls()
     else:
       if self.noneOK:
-        temp = Player.setNewKeyMapping(self.engine, self.config, self.section, self.option, "None")
+        Player.setNewKeyMapping(self.engine, self.config, self.section, self.option, "None")
         if self.name in self.engine.input.controls.controlList:
           self.engine.input.reloadControls()
 
@@ -1487,7 +1487,7 @@ def quickset(config):
     config.set("game", "midi_lyric_mode", 2)
     config.set("video", "fps", 60)
     config.set("video", "multisamples", 0)
-    config.set("video", "use_shaders", False)
+    config.set("video", "shader_use", False)
     config.set("game", "game_phrases", 0)
     config.set("game", "partial_stars", 0)
     config.set("stage", "stage_animate", 0)
@@ -1562,7 +1562,7 @@ def quickset(config):
     config.set("game", "midi_lyric_mode", 0)
     config.set("video", "fps", 60)
     config.set("video", "multisamples", 4)
-    config.set("video", "use_shaders", True)
+    config.set("video", "shader_use", True)
     config.set("game", "game_phrases", 2)
     config.set("game", "partial_stars", 1)
     config.set("game", "lyric_mode", 2)
@@ -1616,7 +1616,6 @@ class GameCareerSettingsMenu(Menu.Menu):
 
     if engine.data.logClassInits == 1:
       Log.debug("GameSettingsMenu class init (Settings.py)...")
-    players = None
     settings = [
       VolumeConfigChoice(engine, engine.config, "audio",  "guitarvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "songvol", autoApply = True),

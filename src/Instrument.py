@@ -178,12 +178,6 @@ class Instrument(object):
     self.Animspeed      = 30#Lower value = Faster animations
     #For Animated Starnotes
     self.indexCount     = 0
-    #Alarian, For animated hitglow
-    self.HCount         = 0
-    self.HCount2        = 0
-    self.Hitanim        = True
-    self.Hitanim2       = True
-    self.HCountAni      = False
     
     #myfingershurt: to keep track of pause status here as well
     self.paused = False
@@ -284,7 +278,6 @@ class Instrument(object):
 
     self.setBPM(self.currentBpm)
 
-
     if self.starpowerMode == 1:
       self.starNotesSet = False
     else:
@@ -302,49 +295,6 @@ class Instrument(object):
     self.disableNoteSFX  = self.engine.config.get("video", "disable_notesfx")
     self.disableFretSFX  = self.engine.config.get("video", "disable_fretsfx")
     self.disableFlameSFX  = self.engine.config.get("video", "disable_flamesfx")
-
-    # make glow.png optional, theme dependent
-    if self.disableFretSFX != False:
-      self.glowDrawing = None
-    else:
-      engine.loadImgDrawing(self, "glowDrawing", os.path.join("themes",themename,"glow.png"),  textureSize = (128, 128))
-      if not self.glowDrawing:
-        engine.loadImgDrawing(self, "glowDrawing", "glow.png")
-
-    #MFH - making hitflames optional
-    self.hitFlamesPresent = False
-    if self.disableFlameSFX == True:
-      self.hitFlamesPresent = True
-      self.hitglow2Drawing = None
-      self.hitglowDrawing = None
-      self.hitglowAnim = None
-      self.hitflamesAnim = None
-      self.hitflames2Drawing = None
-      self.hitflames1Drawing = None
-    else:
-      if engine.loadImgDrawing(self, "hitflames1Drawing", os.path.join("themes",themename,"hitflames1.png"),  textureSize = (128, 128)):
-        if engine.loadImgDrawing(self, "hitflames2Drawing", os.path.join("themes",themename,"hitflames2.png"),  textureSize = (128, 128)):
-          self.hitFlamesPresent = True
-        else:
-          self.hitflames2Drawing = None
-      else:
-        self.hitflames1Drawing = None
-        self.hitflames2Drawing = None
-      
-      if not engine.loadImgDrawing(self, "hitflamesAnim", os.path.join("themes",themename,"hitflamesanimation.png"),  textureSize = (128, 128)):
-        self.Hitanim2 = False
-      
-      if not engine.loadImgDrawing(self, "hitglowAnim", os.path.join("themes",themename,"hitglowanimation.png"),  textureSize = (128, 128)):
-        if engine.loadImgDrawing(self, "hitglowDrawing", os.path.join("themes",themename,"hitglow.png"),  textureSize = (128, 128)):
-          if not engine.loadImgDrawing(self, "hitglow2Drawing", os.path.join("themes",themename,"hitglow2.png"),  textureSize = (128, 128)):
-            self.hitglow2Drawing = None
-            self.hitFlamesPresent = False   #MFH - shut down all flames if these are missing.
-        else:
-          self.hitglowDrawing = None
-          self.hitFlamesPresent = False   #MFH - shut down all flames if these are missing.
-        self.Hitanim = False
-
-    engine.loadImgDrawing(self, "hitlightning", os.path.join("themes",themename,"lightning.png"),  textureSize = (128, 128))
 
     self.meshColor  = self.engine.theme.meshColor
     self.hopoColor  = self.engine.theme.hopoColor
@@ -399,9 +349,61 @@ class Instrument(object):
       Log.debug("Image not found: " + themepath + "/" + file)
       return os.path.join(defaultpath, file)
 
-  def loadNotes(self):
+  def loadFlames(self):
     engine = self.engine
     themename = self.engine.data.themeLabel
+
+    self.HCount         = 0
+    self.HCount2        = 0
+    self.HFrameLimit	= self.engine.theme.HoldFlameFrameLimit
+    self.HFrameLimit2	= self.engine.theme.HitFlameFrameLimit
+    self.Hitanim        = True
+    self.Hitanim2       = True
+    self.HCountAni      = False
+    
+    if self.disableFretSFX != False:
+      self.glowDrawing = None
+    else:
+      engine.loadImgDrawing(self, "glowDrawing", os.path.join("themes",themename,"glow.png"),  textureSize = (128, 128))
+      if not self.glowDrawing:
+        engine.loadImgDrawing(self, "glowDrawing", "glow.png")
+
+    self.hitFlamesPresent = False
+    if self.disableFlameSFX == True:
+      self.hitFlamesPresent = True
+      self.hitglow2Drawing = None
+      self.hitglowDrawing = None
+      self.hitglowAnim = None
+      self.hitflamesAnim = None
+      self.hitflames2Drawing = None
+      self.hitflames1Drawing = None
+    else:
+      if engine.loadImgDrawing(self, "hitflames1Drawing", os.path.join("themes",themename,"hitflames1.png"),  textureSize = (128, 128)):
+        if engine.loadImgDrawing(self, "hitflames2Drawing", os.path.join("themes",themename,"hitflames2.png"),  textureSize = (128, 128)):
+          self.hitFlamesPresent = True
+        else:
+          self.hitflames2Drawing = None
+      else:
+        self.hitflames1Drawing = None
+        self.hitflames2Drawing = None
+      
+      if not engine.loadImgDrawing(self, "hitflamesAnim", os.path.join("themes",themename,"hitflamesanimation.png"),  textureSize = (128, 128)):
+        self.Hitanim2 = False
+      
+      if not engine.loadImgDrawing(self, "hitglowAnim", os.path.join("themes",themename,"hitglowanimation.png"),  textureSize = (128, 128)):
+        if engine.loadImgDrawing(self, "hitglowDrawing", os.path.join("themes",themename,"hitglow.png"),  textureSize = (128, 128)):
+          if not engine.loadImgDrawing(self, "hitglow2Drawing", os.path.join("themes",themename,"hitglow2.png"),  textureSize = (128, 128)):
+            self.hitglow2Drawing = None
+            self.hitFlamesPresent = False
+        else:
+          self.hitglowDrawing = None
+          self.hitFlamesPresent = False
+        self.Hitanim = False
+
+    engine.loadImgDrawing(self, "hitlightning", os.path.join("themes",themename,"lightning.png"),  textureSize = (128, 128))
+
+  def loadNotes(self):
+    engine = self.engine
 
     get = lambda file: self.checkPath("notes", file)
 
@@ -421,11 +423,6 @@ class Instrument(object):
         engine.loadImgDrawing(self, "noteAnimatedPowerActive", get("animated_power_active.png"))
         engine.loadImgDrawing(self, "noteAnimatedPowerActiveHOPO", get("animated_power_active_hopo.png"))
         
-        if self.isDrum:
-          engine.loadImgDrawing(self, "noteOpenAnimatedPowerActive", get("animated_open_power_active.png"))
-          engine.loadImgDrawing(self, "noteOpenAnimatedPower", get("animated_open_power.png"))
-          engine.loadImgDrawing(self, "noteOpenAnimated", get("animated_open.png"))
-        
         if self.gameMode2p == 6: #battle multiplayer
           if engine.loadImgDrawing(self, "noteButtons", get("spinnotesbattle.png")):
             self.starSpinFrames = 8
@@ -438,7 +435,6 @@ class Instrument(object):
         
     else:
       defaultNote = False
-      defaultOpenNote = False
 
       #MFH - can't use IOError for fallback logic for a Mesh() call... 
       if self.engine.fileExists(get("note.dae")): #look in the notes folder for files
@@ -452,16 +448,8 @@ class Instrument(object):
       else: #No mesh for star notes
         self.starMesh = None
 
-      if self.isDrum:
-        if self.engine.fileExists(get("open.dae")): #load from notes folder
-          self.engine.resource.load(self,  "openMesh",  lambda: Mesh(self.engine.resource.fileName(get("open.dae"))))
-        else: #fallback to the default in the data folder
-          self.engine.resource.load(self,  "openMesh",  lambda: Mesh(self.engine.resource.fileName("open.dae")))
-          defualtOpenNote = True
-
       if defaultNote:
         self.notetex = False
-
       else:
         self.notetex = True
         self.startex = True
@@ -481,21 +469,7 @@ class Instrument(object):
           if not self.engine.loadImgDrawing(self,  "staratex"+chr(97+i),  get("staratex_"+chr(97+i)+".png")):
             self.staratex = False
             break
-
-
-      if self.isDrum: 
-        engine.loadImgDrawing(self, "spActTex", get("spacttex.png"))
-        
-
-      if defaultOpenNote:
-        self.opentexture = False
-        self.opentexture_star = False
-        self.opentexture_stara = False
-      else:
-        self.engine.loadImgDrawing(self, "opentexture", get("opentex.png"))
-        self.engine.loadImgDrawing(self, "opentexture_star", get("opentex_star.png"))
-        self.engine.loadImgDrawing(self, "opentexture_stara", get("opentex_stara.png"))
-        
+  
   def loadFrets(self):
     engine = self.engine
     themename = self.engine.data.themeLabel
@@ -503,19 +477,11 @@ class Instrument(object):
     get = lambda file: self.checkPath("frets", file)
 
     if self.twoDkeys == True: #death_au
-
       if self.gameMode2p == 6:
         engine.loadImgDrawing(self, "battleFrets", get("battle_frets.png"))
-        
-      #death_au: adding drumfrets.png (with bass drum frets separate)
-      if self.isDrum and engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename, "frets", "drum", "fretbuttons.png")):
-        self.drumFretButtons = True
-      elif engine.loadImgDrawing(self, "fretButtons", get("fretbuttons.png")):
-        self.drumFretButtons = None
-
+      engine.loadImgDrawing(self, "fretButtons", get("fretbuttons.png"))
     else:
       defaultKey = False
-      defaultOpenKey = False
 
       #MFH - can't use IOError for fallback logic for a Mesh() call...
       if self.engine.fileExists(get("key.dae")): #look in the frets folder for files
@@ -523,14 +489,6 @@ class Instrument(object):
       else: #default to files in data folder
         engine.resource.load(self,  "keyMesh",  lambda: Mesh(engine.resource.fileName("key.dae")))
         defaultKey = True
-
-      if self.isDrum:
-        if self.engine.fileExists(get("open.dae")): #look in the frets folder for files
-          engine.resource.load(self,  "keyMeshOpen",  lambda: Mesh(engine.resource.fileName(get("open.dae"))))
-        else: #default to files in data folder
-          engine.resource.load(self,  "keyMeshOpen",  lambda: Mesh(engine.resource.fileName("key_open.dae")))
-          defaultOpenKey = True
-
 
       if defaultKey:
         self.keytex = False
@@ -540,15 +498,9 @@ class Instrument(object):
           if not engine.loadImgDrawing(self,  "keytex"+chr(97+i),  get("keytex_"+chr(97+i)+".png")):
             self.keytex = False
             break
-
-      if defaultOpenKey:
-        self.keytexopen = False
-      else:
-        engine.loadImgDrawing(self, "keytexopen", get("keytex_open.png"))
         
   def loadTails(self):
     engine = self.engine
-    themename = self.engine.data.themeLabel
 
     get = lambda file: self.checkPath("tails", file)
     getD = lambda file: self.checkPath("tails", file, True) #resorts to checking data
@@ -591,6 +543,12 @@ class Instrument(object):
       self.kill1 = None
       self.kill2 = None
 
+  def loadImages(self):
+    self.loadFrets()
+    self.loadNotes()
+    self.loadTails()
+    self.loadFlames()
+          
   def selectPreviousString(self):
     self.selectedString = (self.selectedString - 1) % self.strings
 
@@ -739,6 +697,61 @@ class Instrument(object):
       
     return sorted(notes, key=lambda x: x[0])    #MFH - what the hell, this should be sorted by TIME not note number....
 
+  def getRequiredNotesForRender(self, song, pos):
+    if self.battleStatus[2] and self.difficulty != 0:
+      Log.debug(self.battleDiffUpValue)
+      song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue]
+      track0 = song.track[self.player]
+      notes0 = [(time, event) for time, event in track0.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
+    
+      song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue - 1]
+      track1   = song.track[self.player]
+      notes1 = [(time, event) for time, event in track1.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
+      
+      notes = []
+      for time,note in notes0:
+        if time < self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard or time > self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
+          notes.append((time,note))
+      for time,note in notes1:
+        if time > self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard and time < self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
+          notes.append((time,note))
+      notes0 = None
+      notes1 = None
+      track0 = None
+      track1 = None
+      notes = sorted(notes, key=lambda x: x[0])
+    else:
+      track   = song.track[self.player]
+      notes = [(time, event) for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
+    
+    if self.battleStatus[7]:
+      notes = self.getDoubleNotes(notes)
+    return notes
+
+
+  def coOpRescue(self, pos):
+    self.coOpRestart = True #initializes Restart Timer
+    self.coOpRescueTime  = pos
+    self.starPower  = 0
+    Log.debug("Rescued at " + str(pos))
+
+  def noteBeingHeld(self):
+    noteHeld = False
+    if self.isDrum:
+      return noteHeld
+    for i in range(0,5):
+      if self.hit[i] == True:
+        noteHeld = True
+    return noteHeld
+
+  def isKillswitchPossible(self):
+    possible = False
+    if self.isDrum:
+      return possible
+    for i in range(0,5):
+      if self.hit[i] == True:
+        possible = True
+    return possible
 
   #Renders the tail glow hitflame
   def renderHitTrails(self, visibility, song, pos, controls):
@@ -746,15 +759,12 @@ class Instrument(object):
       return
 
     w = self.boardWidth / self.strings
-    track = song.track[self.player]
 
-    size = (.22, .22)
     v = 1.0 - visibility
      
-    if (self.HCountAni == True and self.HCount2 > 12):
+    if (self.HCountAni == True and self.HCount2 >= self.HFrameLimit2):
       for n in range(self.strings):
         f = self.fretWeight[n]
-        c = self.fretColors[n]
         if f and (controls.getState(self.actions[0]) or controls.getState(self.actions[1])):
           f += 0.25      
         y = v + f / 6
@@ -785,13 +795,13 @@ class Instrument(object):
               
         #Alarian: Animated hitflames
         if self.Hitanim:
-          self.HCount = self.HCount + 1
+          self.HCount += 1
           if self.HCount > self.Animspeed-1:
             self.HCount = 0
-          HIndex = (self.HCount * 16 - (self.HCount * 16) % self.Animspeed) / self.Animspeed
-          if HIndex > 15:
+          HIndex = (self.HCount * self.HFrameLimit - (self.HCount * self.HFrameLimit) % self.Animspeed) / self.Animspeed
+          if HIndex >= self.HFrameLimit:
             HIndex = 0
-          texX = (HIndex*(1/16.0), HIndex*(1/16.0)+(1/16.0))
+          texX = (HIndex*(1.0/self.HFrameLimit), HIndex*(1.0/self.HFrameLimit)+(1.0/self.HFrameLimit))
 
           self.engine.draw3Dtex(self.hitglowAnim, coord = (x, y + .225, 0), rot = (90, 1, 0, 0), scale = (2.4, 1, 3.3),
                                 vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
@@ -827,15 +837,12 @@ class Instrument(object):
       return
 
     w = self.boardWidth / self.strings
-    track = song.track[self.player]
 
-    size = (.22, .22)
     v = 1.0 - visibility
 
-    if (self.HCountAni == True and self.HCount2 > 12):
+    if (self.HCountAni == True and self.HCount2 >= self.HFrameLimit2):
       for n in range(self.strings):
         f = self.fretWeight[n]
-        c = self.fretColors[n]
         if f and (controls.getState(self.actions[0]) or controls.getState(self.actions[1])):
           f += 0.25      
         y = v + f / 6
@@ -873,13 +880,13 @@ class Instrument(object):
                                   texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)
             #Alarian: Animated hitflames
           else:
-            self.HCount = self.HCount + 1
+            self.HCount += 1
             if self.HCount > self.Animspeed-1:
               self.HCount = 0
-            HIndex = (self.HCount * 16 - (self.HCount * 16) % self.Animspeed) / self.Animspeed
-            if HIndex > 15:
+            HIndex = (self.HCount * self.HFrameLimit - (self.HCount * self.HFrameLimit) % self.Animspeed) / self.Animspeed
+            if HIndex >= self.HFrameLimit:
               HIndex = 0
-            texX = (HIndex*(1/16.0), HIndex*(1/16.0)+(1/16.0))
+            texX = (HIndex*(1.0/self.HFrameLimit), HIndex*(1.0/self.HFrameLimit)+(1.0/self.HFrameLimit))
             if self.disableFlameSFX != True:
               self.engine.draw3Dtex(self.hitglowAnim, coord = (x, y + .225, 0), rot = (90, 1, 0, 0), scale = (2.4, 1, 3.3),
                                     vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
@@ -934,9 +941,9 @@ class Instrument(object):
         ff += 1.5 #ff first time is 2.75 after this
 
         if self.Hitanim2 == True:
-          self.HCount2 = self.HCount2 + 1
+          self.HCount2 += 1
           self.HCountAni = False
-          if self.HCount2 > 12:
+          if self.HCount2 >= self.HFrameLimit2:
             if not event.length > (1.4 * (60000.0 / event.noteBpm) / 4):
               self.HCount2 = 0
             else:
@@ -944,11 +951,11 @@ class Instrument(object):
           if event.flameCount < flameLimitHalf:
 
                 
-              HIndex = (self.HCount2 * 13 - (self.HCount2 * 13) % 13) / 13
-              if HIndex > 12 and self.HCountAni != True:
+              HIndex = (self.HCount2 * self.HFrameLimit2 - (self.HCount2 * self.HFrameLimit2) % self.HFrameLimit2) / self.HFrameLimit2
+              if HIndex >= self.HFrameLimit2 and self.HCountAni != True:
                 HIndex = 0
                 
-              texX = (HIndex*(1/13.0), HIndex*(1/13.0)+(1/13.0))
+              texX = (HIndex*(1.0/self.HFrameLimit2), HIndex*(1.0/self.HFrameLimit2)+(1.0/self.HFrameLimit2))
               if self.disableFlameSFX != True:
                 self.engine.draw3Dtex(self.hitflamesAnim, coord = (x, y + .665, 0), rot = (90, 1, 0, 0), scale = (1.6, 1.6, 4.9),
                                       vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
@@ -989,7 +996,7 @@ class Instrument(object):
                               multiples = True, alpha = True, color = flamecol)
                                   
         elif self.hitFlamesPresent == True and self.Hitanim2 == False:
-          self.HCount2 = 13
+          self.HCount2 = self.HFrameLimit2 + 1
           self.HCountAni = True
           if event.flameCount < flameLimitHalf:
           
@@ -1054,37 +1061,6 @@ class Instrument(object):
                                 multiples = True, alpha = True, color = flamecol)
         event.flameCount += 1
 
-  def getRequiredNotesForRender(self, song, pos):
-    if self.battleStatus[2] and self.difficulty != 0:
-      Log.debug(self.battleDiffUpValue)
-      song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue]
-      track0 = song.track[self.player]
-      notes0 = [(time, event) for time, event in track0.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
-    
-      song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue - 1]
-      track1   = song.track[self.player]
-      notes1 = [(time, event) for time, event in track1.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
-      
-      notes = []
-      for time,note in notes0:
-        if time < self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard or time > self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
-          notes.append((time,note))
-      for time,note in notes1:
-        if time > self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard and time < self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
-          notes.append((time,note))
-      notes0 = None
-      notes1 = None
-      track0 = None
-      track1 = None
-      notes = sorted(notes, key=lambda x: x[0])
-    else:
-      track   = song.track[self.player]
-      notes = [(time, event) for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
-    
-    if self.battleStatus[7]:
-      notes = self.getDoubleNotes(notes)
-    return notes
-
   def renderNote(self, length, sustain, color, tailOnly = False, isTappable = False, fret = 0, spNote = False, isOpen = False, spAct = False):
 
     if tailOnly:
@@ -1095,13 +1071,6 @@ class Instrument(object):
     if self.twoDnote == True:
 
       noteImage = self.noteButtons
-
-      if self.notedisappear ==0:#Notes keep on going when missed
-        notecol = (1,1,1)#capo
-      elif self.notedisappear == 1:#Notes disappear when missed
-        notecol = (.1,.1,.1)
-      elif self.notedisappear == 2: #Notes Turn Red when missed
-        notecol = (1,0,0,1) 
 
       tailOnly = True
 
@@ -1321,10 +1290,7 @@ class Instrument(object):
     self.killPoints = False
 
     w = self.boardWidth / self.strings
-    track = song.track[self.player]
 
-    num = 0
-    enable = True
     self.starNotesInView = False
     self.openStarNotesInView = False
 
@@ -1432,7 +1398,7 @@ class Instrument(object):
       if event.finalStar and self.spEnabled:
         spNote = True
         if event.played or event.hopod:
-          if event.flameCount < 1 and not self.starPowerGained:
+          if event.flameCount == 0:
             if self.starPower < 50 and self.isDrum:   #not enough starpower to activate yet, kill existing drumfills
               for dfEvent in self.drumFillEvents:
                 dfEvent.happened = True
@@ -1446,8 +1412,11 @@ class Instrument(object):
               self.battleObjectGained = True
               Log.debug("Battle Object Gained, Objects %s" % str(self.battleObjects))
             else:
+              
               if self.starPower < 100:
                 self.starPower += 25
+                if self.hitFlamesPresent == False:
+                  event.flameCount = 1
               if self.starPower > 100:
                 self.starPower = 100
             self.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
@@ -1522,11 +1491,6 @@ class Instrument(object):
 
     self.killPoints = False
 
-    w = self.boardWidth / self.strings
-    track = song.track[self.player]
-
-    num = 0
-    enable = True
     self.openStarNotesInView = False
 
     renderedNotes = reversed(self.getRequiredNotesForRender(song,pos))
@@ -1615,7 +1579,7 @@ class Instrument(object):
       if event.finalStar and self.spEnabled:
         spNote = True
         if event.played or event.hopod:
-          if event.flameCount < 1 and not self.starPowerGained:
+          if event.flameCount == 0:
 
             if self.starPower < 50:   #not enough starpower to activate yet, kill existing drumfills
               for dfEvent in self.drumFillEvents:
@@ -1623,6 +1587,8 @@ class Instrument(object):
 
             if self.starPower < 100:
               self.starPower += 25
+              if self.hitFlamesPresent == False:
+                event.flameCount = 1
             if self.starPower > 100:
               self.starPower = 100
             self.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
@@ -1656,12 +1622,6 @@ class Instrument(object):
       self.spEnabled = True
       self.finalStarSeen = False
       self.isStarPhrase = Fals
-
-  def coOpRescue(self, pos):
-    self.coOpRestart = True #initializes Restart Timer
-    self.coOpRescueTime  = pos
-    self.starPower  = 0
-    Log.debug("Rescued at " + str(pos))
 
   def renderFrets(self, visibility, song, controls):
     w = self.boardWidth / self.strings
@@ -1948,24 +1908,6 @@ class Instrument(object):
                               texcoord = (0.0, 0.0, 1.0, 1.0), vertex = (-size[0] * f, -size[1] * f, size[0] * f, size[1] * f),
                               multiples = True, alpha = True, color = glowcol)
 
-  def noteBeingHeld(self):
-    noteHeld = False
-    if self.isDrum:
-      return noteHeld
-    for i in range(0,5):
-      if self.hit[i] == True:
-        noteHeld = True
-    return noteHeld
-
-  def isKillswitchPossible(self):
-    possible = False
-    if self.isDrum:
-      return possible
-    for i in range(0,5):
-      if self.hit[i] == True:
-        possible = True
-    return possible
-
   def renderTail(self, song, length, sustain, kill, color, tailOnly = False, isTappable = False, big = False, fret = 0, spNote = False, freestyleTail = 0, pos = 0):
 
     #volshebnyi - if freestyleTail == 0, act normally.
@@ -2225,8 +2167,6 @@ class Instrument(object):
                 glPushMatrix()
                 glTranslatef(x, (1.0 - visibility) ** (theFret + 1), z)
 
-                freestyleTailMode = 1
-
                 self.renderFreeStyleTail(length, color, theFret, pos)
                 glPopMatrix()
 
@@ -2256,10 +2196,7 @@ class Instrument(object):
 
     w = self.boardWidth / self.strings
     
-    track = song.track[self.player]
-
     num = 0
-    enable = True
     renderedNotes = self.getRequiredNotesForRender(song,pos)
 
     for time, event in renderedNotes:
@@ -2316,24 +2253,6 @@ class Instrument(object):
         spNote = True
       if event.finalStar and self.spEnabled:
         spNote = True
-        if event.played or event.hopod:
-          if event.flameCount < 1 and not self.starPowerGained:
-            if self.gameMode2p == 6:
-              if self.battleSuddenDeath:
-                self.battleObjects = [1] + self.battleObjects[:2]
-              else:
-                self.battleObjects = [self.battleObjectsEnabled[random.randint(0,len(self.battleObjectsEnabled)-1)]] + self.battleObjects[:2]
-              self.battleGetTime = pos
-              self.battleObjectGained = True
-              Log.debug("Battle Object Gained, Objects %s" % str(self.battleObjects))
-            else:
-              if self.starPower < 100:
-                self.starPower += 25
-              if self.starPower > 100:
-                self.starPower = 100
-            self.neck.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
-            self.starPowerGained = True
-            self.neck.ocount = 0
 
       if event.tappable < 2:
         isTappable = False

@@ -120,6 +120,32 @@ class Neck:
                             [-w / 2, 0, l],
                             [w / 2, 0, l]], dtype=np.float32)
 
+
+    self.soloLightVtx1 = np.array([[w / 2-1.0, 0.4, -2],
+                                [w / 2+1.0, 0.4, -2],
+                                [w / 2-1.0, 0.4, l],
+                                [w / 2+1.0, 0.4, l]], dtype=np.float32)
+
+    self.soloLightVtx2 = np.array([[-w / 2+1.0, 0.4, -2],
+                                [-w / 2-1.0, 0.4, -2],
+                                [-w / 2+1.0, 0.4, l],
+                                [-w / 2-1.0, 0.4, l]], dtype=np.float32)
+
+    self.bpm_vtx  = np.array([[-(w / 2), 0,  0],
+                           [-(w / 2), 0,  0],
+                           [(w / 2), 0,  0],
+                           [(w / 2), 0,  0]], dtype=np.float32)
+
+
+    self.board_scroll_vtx = np.array([[-w / 2, 0, 0],
+                                      [w / 2, 0, 0],
+                                      [-w/ 2, 0, 0],
+                                      [w / 2, 0, 0],
+                                      [-w/ 2, 0, 0],
+                                      [w / 2, 0, 0],
+                                      [-w/ 2, 0, 0],
+                                      [w / 2, 0, 0]], dtype=np.float32)
+
     # evilynux - Sidebars vertices
     w += 0.15
     self.sidebars_vtx = np.array([[-w / 2, 0, -2],
@@ -141,15 +167,32 @@ class Neck:
                            [1, 1, 1, self.vis],
                            [1, 1, 1, self.vis]], dtype=np.float32)
 
-    self.soloLightVtx1 = np.array([[w / 2-1.0, 0.4, -2],
-                                [w / 2+1.0, 0.4, -2],
-                                [w / 2-1.0, 0.4, l],
-                                [w / 2+1.0, 0.4, l]], dtype=np.float32)
+    self.board_col_flash  = np.array([[color[0],color[1],color[2], 0],
+                             [color[0],color[1],color[2], 0],
+                             [color[0],color[1],color[2], self.vis],
+                             [color[0],color[1],color[2], self.vis],
+                             [color[0],color[1],color[2], self.vis],
+                             [color[0],color[1],color[2], self.vis],
+                             [color[0],color[1],color[2], 0],
+                             [color[0],color[1],color[2], 0]], dtype=np.float32)
 
-    self.soloLightVtx2 = np.array([[-w / 2+1.0, 0.4, -2],
-                                [-w / 2-1.0, 0.4, -2],
-                                [-w / 2+1.0, 0.4, l],
-                                [-w / 2-1.0, 0.4, l]], dtype=np.float32)
+    self.board_tex_static = np.array([[0.0, self.project(-2 * self.beatsPerUnit)],
+                                      [1.0, self.project(-2 * self.beatsPerUnit)],
+                                      [0.0, self.project(-1 * self.beatsPerUnit)],
+                                      [1.0, self.project(-1 * self.beatsPerUnit)],
+                                      [0.0, self.project(l * self.beatsPerUnit * .7)],
+                                      [1.0, self.project(l * self.beatsPerUnit * .7)],
+                                      [0.0, self.project(l * self.beatsPerUnit)],
+                                      [1.0, self.project(l * self.beatsPerUnit)]], dtype=np.float32)
+
+    self.board_tex  = np.array([[0.0, 0],
+                                [1.0, 0],
+                                [0.0, 0],
+                                [1.0, 0],
+                                [0.0, 0],
+                                [1.0, 0],
+                                [0.0, 0],
+                                [1.0, 0]], dtype=np.float32)
 
     # evilynux - Just in case the type has became double, convert to float32
     self.board_col = self.board_col.astype(np.float32)
@@ -161,6 +204,11 @@ class Neck:
     self.soloLightVtx2 = self.soloLightVtx2.astype(np.float32)
     self.shader_neck_vtx = self.shader_neck_vtx.astype(np.float32)
     self.track_vtx = self.track_vtx.astype(np.float32)
+    self.board_col_flash = self.board_col_flash.astype(np.float32)
+    self.bpm_vtx = self.bpm_vtx.astype(np.float32)
+    self.board_tex_static = self.board_tex_static.astype(np.float32)
+    self.board_tex = self.board_tex.astype(np.float32)
+    self.board_scroll_vtx = self.board_scroll_vtx.astype(np.float32)
 	
     self.neckType = playerObj.neckType
     if self.neckType == 0:
@@ -326,34 +374,20 @@ class Neck:
     if not song.readyToGo:
       return
 
-    w            = self.boardWidth
-    l            = self.boardLength
+    l = self.boardLength
     z  = ((time - pos) / self.currentPeriod) / self.beatsPerUnit
 
     glEnable(GL_TEXTURE_2D)
 
-    board_vtx = np.array([[-w / 2, 0, z],
-                            [w / 2, 0, z],
-                            [-w/ 2, 0, z + 1],
-                            [w / 2, 0, z + 1],
-                            [-w / 2, 0, z + 2 + l * .7],
-                            [w / 2, 0, z + 2 + l * .7],
-                            [-w / 2, 0, z + 2 + l],
-                            [w / 2, 0, z + 2 + l]], dtype=np.float32)
-
-    board_tex  = np.array([[0.0, self.project(-2 * self.beatsPerUnit)],
-                         [1.0, self.project(-2 * self.beatsPerUnit)],
-                         [0.0, self.project(-1 * self.beatsPerUnit)],
-                         [1.0, self.project(-1 * self.beatsPerUnit)],
-                         [0.0, self.project(l * self.beatsPerUnit * .7)],
-                         [1.0, self.project(l * self.beatsPerUnit * .7)],
-                         [0.0, self.project(l * self.beatsPerUnit)],
-                         [1.0, self.project(l * self.beatsPerUnit)]], dtype=np.float32)
+    self.board_scroll_vtx[0][2] = self.board_scroll_vtx[1][2] = z
+    self.board_scroll_vtx[2][2] = self.board_scroll_vtx[3][2] = z + 1
+    self.board_scroll_vtx[4][2] = self.board_scroll_vtx[5][2] = z + 2 + l * .7
+    self.board_scroll_vtx[6][2] = self.board_scroll_vtx[7][2] = z + 2 + l
 
     if neckTexture:
       neckTexture.texture.bind()
 
-    cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=board_vtx, colors=self.board_col, texcoords=board_tex)
+    cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.board_scroll_vtx, colors=self.board_col, texcoords=self.board_tex_static)
 
     glDisable(GL_TEXTURE_2D)
 
@@ -366,7 +400,6 @@ class Neck:
     boardWindowMin = pos - self.currentPeriod * 2
     boardWindowMax = pos + self.currentPeriod * self.beatsPerBoard
     track = song.midiEventTrack[self.player]
-
 
     if self.incomingNeckMode > 0:   #if enabled
       if self.useMidiSoloMarkers:
@@ -395,10 +428,6 @@ class Neck:
                 self.renderIncomingNeck(visibility*alpha, song, pos, time, neckImg)
                 if self.spcount2 != 0 and self.spcount < 1.2 and self.oNeck:
                   alpha = self.neckAlpha[4]
-                  if self.oNeckovr != None and (self.scoreMultiplier > 4 or self.guitarSolo or self.ovrneckoverlay == True):
-                    neck = self.oNeckovr
-                  else:
-                    neck = self.oNeck
                   self.renderIncomingNeck(visibility*alpha, song, pos, time, neckImg)
 
       elif self.markSolos == 1:   #fall back on text-based guitar solo marking track
@@ -423,31 +452,19 @@ class Neck:
 
   def renderNeckMethod(self, visibility, offset, neck, alpha = False): #blazingamer: New neck rendering method
 
-    color = (1,1,1)
-
-    v            = visibility
-    l            = self.boardLength
+    v = visibility
 
     glEnable(GL_TEXTURE_2D)
 
-    board_tex  = np.array([[0.0, self.project(offset - 2 * self.beatsPerUnit)],
-                         [1.0, self.project(offset - 2 * self.beatsPerUnit)],
-                         [0.0, self.project(offset - 1 * self.beatsPerUnit)],
-                         [1.0, self.project(offset - 1 * self.beatsPerUnit)],
-                         [0.0, self.project(offset + l * self.beatsPerUnit * .7)],
-                         [1.0, self.project(offset + l * self.beatsPerUnit * .7)],
-                         [0.0, self.project(offset + l * self.beatsPerUnit)],
-                         [1.0, self.project(offset + l * self.beatsPerUnit)]], dtype=np.float32)
-    
-    #must be separate for neck flashing.
-    board_col  = np.array([[color[0],color[1],color[2], 0],
-                             [color[0],color[1],color[2], 0],
-                             [color[0],color[1],color[2], v],
-                             [color[0],color[1],color[2], v],
-                             [color[0],color[1],color[2], v],
-                             [color[0],color[1],color[2], v],
-                             [color[0],color[1],color[2], 0],
-                             [color[0],color[1],color[2], 0]], dtype=np.float32)
+    if offset == 0:
+      board_tex = self.board_tex_static
+    else:
+      board_tex = self.board_tex
+
+    if self.failcount == v:
+      board_col = self.board_col_flash
+    else:
+      board_col = self.board_col
 
     if alpha == True:
       glBlendFunc(GL_ONE, GL_ONE)
@@ -466,9 +483,9 @@ class Neck:
     if not song.readyToGo:
       return
     
-    v            = visibility
+    v = visibility
 
-    offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
+    offset = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
 
     #myfingershurt: every theme can have oNeck:
 
@@ -531,7 +548,6 @@ class Neck:
       shaders.globals["soloActive"] = self.guitarSolo
       
       posx = shaders.time()
-      fret = []
       neckcol = (0,0,0)
       
       notecolors = list(self.engine.theme.noteColors)
@@ -567,21 +583,10 @@ class Neck:
     if not song.readyToGo:
       return
 
-    l            = self.boardLength
-
     if self.staticStrings:
-      offset       = 0
+      track_tex = self.board_tex_static
     else:
-      offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
-
-    track_tex  = np.array([[0.0, self.project(offset - 2 * self.beatsPerUnit)],
-                         [1.0, self.project(offset - 2 * self.beatsPerUnit)],
-                         [0.0, self.project(offset - 1 * self.beatsPerUnit)],
-                         [1.0, self.project(offset - 1 * self.beatsPerUnit)],
-                         [0.0, self.project(offset + l * self.beatsPerUnit * .7)],
-                         [1.0, self.project(offset + l * self.beatsPerUnit * .7)],
-                         [0.0, self.project(offset + l * self.beatsPerUnit)],
-                         [1.0, self.project(offset + l * self.beatsPerUnit)]], dtype=np.float32)
+      track_tex = self.board_tex
 
     glEnable(GL_TEXTURE_2D)
     
@@ -593,11 +598,8 @@ class Neck:
     else:
       if self.centerLines:
         self.centerLines.texture.bind()
-    
-    if self.staticStrings:    #MFH
-      cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.track_vtx, colors=self.board_col, texcoords=track_tex)
-    else:   #MFH: original moving strings
-      cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.track_vtx, colors=self.board_col, texcoords=track_tex)
+
+    cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.track_vtx, colors=self.board_col, texcoords=track_tex)
 
     glDisable(GL_TEXTURE_2D)
 
@@ -609,30 +611,13 @@ class Neck:
 
     color = (1,1,1)
 
-    v            = visibility
-    w            = self.boardWidth + 0.15
-    l            = self.boardLength
+    v = visibility
+    w = self.boardWidth + 0.15 
 
-    offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
-
-    board_tex  = np.array([[0.0, self.project(offset - 2 * self.beatsPerUnit)],
-                         [1.0, self.project(offset - 2 * self.beatsPerUnit)],
-                         [0.0, self.project(offset - 1 * self.beatsPerUnit)],
-                         [1.0, self.project(offset - 1 * self.beatsPerUnit)],
-                         [0.0, self.project(offset + l * self.beatsPerUnit * .7)],
-                         [1.0, self.project(offset + l * self.beatsPerUnit * .7)],
-                         [0.0, self.project(offset + l * self.beatsPerUnit)],
-                         [1.0, self.project(offset + l * self.beatsPerUnit)]], dtype=np.float32)
-
-    #must be separate for sidebar flashing.
-    board_col  = np.array([[color[0],color[1],color[2], 0],
-                             [color[0],color[1],color[2], 0],
-                             [color[0],color[1],color[2], v],
-                             [color[0],color[1],color[2], v],
-                             [color[0],color[1],color[2], v],
-                             [color[0],color[1],color[2], v],
-                             [color[0],color[1],color[2], 0],
-                             [color[0],color[1],color[2], 0]], dtype=np.float32)
+    if self.failcount == v:
+      board_col = self.board_col_flash
+    else:
+      board_col = self.board_col
 
     glEnable(GL_TEXTURE_2D)
     if self.instrument.starPowerActive and self.oSideBars:
@@ -643,7 +628,7 @@ class Neck:
       self.failSideBars.texture.bind()
     else:
       self.sideBars.texture.bind()
-    cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.sidebars_vtx, colors=board_col, texcoords=board_tex)
+    cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.sidebars_vtx, colors=board_col, texcoords=self.board_tex)
     glDisable(GL_TEXTURE_2D)
      
     if shaders.enable("sololight"):
@@ -661,10 +646,7 @@ class Neck:
     if not song.readyToGo:
       return
 
-
-    v            = visibility
-    w            = self.boardWidth
-
+    w = self.boardWidth
 
     track = song.track[self.player]
 
@@ -678,13 +660,8 @@ class Neck:
       z  = ((time - pos) / self.currentPeriod) / self.beatsPerUnit
       sw = 0.1 #width
 
-
-
-      bpm_vtx  = np.array([[-(w / 2), 0,  z + sw],
-                         [-(w / 2), 0,  z - sw],
-                         [(w / 2), 0,  z + sw],
-                         [(w / 2), 0,  z - sw]], dtype=np.float32)
-
+      self.bpm_vtx[0][2] = self.bpm_vtx[2][2] = z + sw
+      self.bpm_vtx[1][2] = self.bpm_vtx[3][2] = z - sw
 
       if event.barType == 0: #half-beat
         self.bpm_halfbeat.texture.bind()
@@ -693,13 +670,16 @@ class Neck:
       elif event.barType == 2: #measure
         self.bpm_measure.texture.bind()
 
-      cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=bpm_vtx, colors=self.bpm_col, texcoords=self.bpm_tex)
+      cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.bpm_vtx, colors=self.bpm_col, texcoords=self.bpm_tex)
 
       glPopMatrix()
 
     glDisable(GL_TEXTURE_2D)
     
   def render(self, visibility, song, pos):
+
+    l = self.boardLength
+
     self.currentPeriod = self.instrument.neckSpeed
 
     if self.isFailing == True:
@@ -757,10 +737,23 @@ class Neck:
 
     if not (self.instrument.coOpFailed and not self.instrument.coOpRestart):
 
+      offset       = (pos - self.lastBpmChange) / self.currentPeriod + self.baseBeat 
+
+      #basically sets the scrolling of the necks
+      self.board_tex[0][1] = self.board_tex[1][1] = self.project(offset - 2 * self.beatsPerUnit)
+      self.board_tex[2][1] = self.board_tex[3][1] = self.project(offset - 1 * self.beatsPerUnit)
+      self.board_tex[4][1] = self.board_tex[5][1] = self.project(offset + l * self.beatsPerUnit * .7)
+      self.board_tex[6][1] = self.board_tex[7][1] = self.project(offset + l * self.beatsPerUnit)
+
       if self.ocount < 1:
         self.ocount += .1
       else:
         self.ocount = 1
+
+      #used for fail flashing.
+      if self.isFailing:
+        for i in range(2,6):
+          self.board_col_flash[i][3] = self.failcount
 
       self.vis = visibility
       if self.doNecksRender == True:

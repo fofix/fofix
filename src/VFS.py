@@ -49,6 +49,7 @@ import sys
 import shutil
 import time
 from stat import S_IFDIR, S_ISDIR, S_ISREG
+from fnmatch import fnmatch
 import sqlite3
 
 _mountTable = {}
@@ -256,6 +257,21 @@ def listdir(path):
   else:
     mount, frag = _convertPath(path)
     return mount.listdir(frag)
+
+
+def glob(pattern):
+  '''
+  List object names that match a glob pattern.
+
+  Only the portion after the final slash will be treated as a glob pattern.
+  @param pattern: The glob pattern
+  @return:        List of matching names
+  '''
+  rmatch = re.match('^(/(?:.*/)?)(.*?)$', pattern)
+  if rmatch is None:
+    raise OSError(errno.EINVAL, os.strerror(errno.EINVAL))
+  dirname, basename = rmatch.group(1), rmatch.group(2)
+  return [dirname + name for name in listdir(dirname) if fnmatch(name, basename)]
 
 
 def unlink(path):
