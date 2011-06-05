@@ -39,6 +39,7 @@ from PIL import Image, ImageDraw
 from OpenGL.GL import *
 
 import math
+from math import *
 
 from Theme import halign, valign
 from constants import *
