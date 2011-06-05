@@ -87,7 +87,7 @@ _minFPS = 10            #minimum frame limit for effects that allow the theme ma
 class ConfigGetMixin(object):
   def get(self, value, type = str, default = None):
     if self.config.has_option(self.section, value):
-      return type(self.config.get(self.section, value))
+      return type(self.config.get(self.section, value).strip())
     return default
 
   def getexpr(self, value, default=None):
@@ -100,7 +100,7 @@ class ConfigGetMixin(object):
   def getexprs(self, value, default=None, separator='|'):
     if self.config.has_option(self.section, value):
       filename, lineno = self.config.getlineno(self.section, value)
-      exprs = self.config.get(self.section, value).split(separator)
+      exprs = [e.strip() for e in self.config.get(self.section, value).split(separator)]
       return [compile('\n' * (lineno - 1) + expr, filename, 'eval', FUTURE_DIVISION) for expr in exprs]
     return [compile(expr, '<string>', 'eval', FUTURE_DIVISION) for expr in default.split(separator)]
 
