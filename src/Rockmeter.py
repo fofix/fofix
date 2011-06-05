@@ -467,16 +467,14 @@ class Slide(Effect):
 
     self.updateRates()
     
-    if isinstance(self.layer, FontLayer):
-      self.rates[0] *= -1
-      self.rates[1] *= -1
-       
-
   def updateRates(self):
     t = self.transitionTime * (max(self.engine.clock.get_fps(), _minFPS)) / 1000.0
     self.rates = [(self.endCoord[0] - self.startCoord[0])/t,
                   (self.endCoord[1] - self.startCoord[1])/t]
-    
+    if isinstance(self.layer, FontLayer):
+      self.rates[0] *= -1
+      self.rates[1] *= -1
+      
   def update(self):
     condition = bool(eval(self.condition))
 
@@ -582,7 +580,7 @@ class Replace(Effect):
       self.drawings  = []
       self.rects = []
       if not self.get("texture") == None:
-        texture   = self.get("texture").strip().split("|")
+        texture   = [t.strip() for t in self.get("texture").split("|")]
         for tex in texture:
           path   = os.path.join("themes", layer.stage.themename, "rockmeter", tex)
           drawing = self.engine.loadImgDrawing(self, None, path)
@@ -641,9 +639,9 @@ class Replace(Effect):
       self.layer.text = self.text[-1]
     else:
       if len(self.drawings) > 0:
-          self.layer.drawing = self.drawings[-1]
+        self.layer.drawing = self.drawings[-1]
       if len(self.rects) > 0:
-          self.layer.rect = self.rects[-1]
+        self.layer.rect = self.rects[-1]
       self.fixScale()
             
 #effect that allows one to set the number of frames and
