@@ -194,9 +194,8 @@ class ImgDrawing(object):
 
           glTranslate(self.position[0], self.position[1], 0.0)
           glScalef(self.scale[0], self.scale[1], 1.0)
-          glRotatef(self.angle, 0, 0, 1)
-          
           glScalef(self.pixelSize[0], self.pixelSize[1], 1)
+          glRotatef(self.angle, 0, 0, 1)
           glTranslatef(self.shift, self.vshift, 0)
 
           glColor4f(*self.color)
