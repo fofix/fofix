@@ -134,9 +134,19 @@ class Layer(ConfigGetMixin):
     self.yscaleexpr  = self.getexpr("yscale", "1.0")
     self.scale       = [1.0, 1.0]       #how much to scale it by (width, height from 0.0 - 1.0)
     
-    self.color       = list(self.engine.theme.hexToColor(self.get("color", str, "#FFFFFF")))
+    if self.config.has_option(section, "color"):
                                         #color of the image (#FFFFFF is white on text, on images it is full color)
-    
+      self.color   = list(self.engine.theme.hexToColor(self.get("color", str, "#FFFFFF")))
+      if len(self.color) == 3:
+        self.color.append(1.0)
+      self.r, self.g, self.b, self.a = [str(c) for c in self.color]
+    else:
+      self.r = self.getexpr("r", "1.0")
+      self.g = self.getexpr("g", "1.0")
+      self.b = self.getexpr("b", "1.0")
+      self.a = self.getexpr("a", "1.0")
+      self.color = [1.0,1.0,1.0,1.0]
+        
     self.condition   = True				#when should the image be shown (by default it will always be shown)
     
     self.alignment   = halign(self.get("alignment", str, "center"))
@@ -154,6 +164,9 @@ class Layer(ConfigGetMixin):
     self.position    = [float(eval(self.xposexpr)), float(eval(self.yposexpr))]
     self.angle       = float(eval(self.angleexpr))
     self.scale       = [float(eval(self.xscaleexpr)), float(eval(self.yscaleexpr))]
+    
+    self.color       = [float(eval(self.r)), float(eval(self.g)),
+                        float(eval(self.b)), float(eval(self.a))]
     
     #makes sure color has an alpha value to consider
     if len(self.color) == 3:
