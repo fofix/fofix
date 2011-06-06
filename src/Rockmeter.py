@@ -466,12 +466,16 @@ class Slide(Effect):
     #how long it takes for the transition to take place
     self.transitionTime = self.get("transitionTime", float, 512.0)
 
+    self.rates = [0,0]
     self.updateRates()
     
   def updateRates(self):
     t = self.transitionTime * (max(self.engine.clock.get_fps(), _minFPS)) / 1000.0
-    self.rates = [(self.endCoord[0] - self.startCoord[0])/t,
-                  (self.endCoord[1] - self.startCoord[1])/t]
+    for i in range(2):
+      if self.endCoord[i] < self.startCoord[i]:
+        self.rates[i] = (self.startCoord[i] - self.endCoord[i])/t
+      else:
+        self.rates[i] = (self.endCoord[i] - self.startCoord[i])/t
     if isinstance(self.layer, FontLayer):
       self.rates[0] *= -1
       self.rates[1] *= -1
@@ -510,7 +514,7 @@ class Slide(Effect):
       else:  
         self.position = self.startCoord[:]
         
-    self.layer.position = [self.position[0], self.position[1]]
+    self.layer.position = self.position[:]
 
 #fades the color of the layer between this color and its original
 #in a set period of time when the condition is met
