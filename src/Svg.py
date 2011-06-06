@@ -154,7 +154,7 @@ class ImgDrawing(object):
     self.scale = [width, height]
 
   def setAngle(self, angle):
-    self.angle = angle
+    self.angle = -angle
 
   def setRect(self, rect):
     if not rect == self.rect: 
