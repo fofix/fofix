@@ -672,7 +672,7 @@ class Animate(Effect):
     
     self.updateRate()
     
-    if self.condition and self.currentFrame < self.frames:
+    if bool(eval(self.condition)) and self.currentFrame < self.frames:
       self.currentFrame += self.rate
     else:
       self.currentFrame = 1
