@@ -186,10 +186,11 @@ class ImageLayer(Layer):
 
     #these are the images that are drawn when the layer is visible
     self.drawing = self.engine.loadImgDrawing(self, None, drawing)
-    self.rectexpr = self.getexpr("rect", "(0,1,0,1)")
-    self.rect = eval(self.rectexpr) #how much of the image do you want rendered
+    self.rectexpr = self.getexpr("rect", "(0.0,1.0,0.0,1.0)")
+    self.rect = [float(i) for i in eval(self.rectexpr)]
+                                    #how much of the image do you want rendered
                                     # (left, right, top, bottom)
-    
+                                    
   def updateLayer(self, playerNum):
     w, h, = self.engine.view.geometry[2:4]
     texture = self.drawing
