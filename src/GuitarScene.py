@@ -2374,7 +2374,8 @@ class GuitarScene(Scene):
     instrumentSoloString = "%s %s" % (self.playerList[i].part.text, self.tsSolo)
     if self.phrases > 1:
       self.newScalingText(self.playerList[i].number, instrumentSoloString )
-    self.engine.data.crowdSound.play()
+    if self.engine.data.cheerSoundFound > 0:
+      self.engine.data.crowdSound.play()
   
   def endSolo(self, playerNum):     #MFH - more modular and general handling of solos
     i = playerNum
@@ -2394,15 +2395,18 @@ class GuitarScene(Scene):
     if self.guitarSoloAccuracy[i] == 100.0: #fablaculp: soloDescs changed
       soloDesc = self.tsPerfectSolo
       soloScoreMult = 100
-      self.engine.data.crowdSound.play()    #liquid
+      if self.engine.data.cheerSoundFound > 0:
+        self.engine.data.crowdSound.play()    #liquid
     elif self.guitarSoloAccuracy[i] >= 95.0:
       soloDesc = self.tsAwesomeSolo
       soloScoreMult = 50
-      self.engine.data.crowdSound.play()    #liquid
+      if self.engine.data.cheerSoundFound > 0:
+        self.engine.data.crowdSound.play()    #liquid
     elif self.guitarSoloAccuracy[i] >= 90.0:
       soloDesc = self.tsGreatSolo
       soloScoreMult = 30
-      self.engine.data.crowdSound.play()    #liquid
+      if self.engine.data.cheerSoundFound > 0:
+        self.engine.data.crowdSound.play()    #liquid
     elif self.guitarSoloAccuracy[i] >= 80.0:
       soloDesc = self.tsGoodSolo
       soloScoreMult = 20

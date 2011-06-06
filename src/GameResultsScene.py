@@ -186,7 +186,7 @@ class GameResultsScene(Scene):
 
     self.fullView = self.engine.view.geometry[2:4]
     
-    self.Congratphrase = self.engine.config.get("game", "congrats")#blazingamer
+    self.congratphrase = self.engine.config.get("game", "congrats")#blazingamer
     self.keepCount     = self.engine.config.get("game", "keep_play_count")
     
     self.showHandicap  = self.engine.config.get("handicap", "detailed_handicap")
@@ -737,7 +737,7 @@ class GameResultsScene(Scene):
       accuracyToUse = self.scoring[0].hitAccuracy
 
       #MFH TODO - utilize new functions in self.engine.data to automatically enumerate any number of the following soundfiles automatically, for issue 73
-      if self.Congratphrase:
+      if self.congratphrase:
         globPattern = None
         if scoreToUse == 0:
           globPattern = 'jurgen1.ogg'

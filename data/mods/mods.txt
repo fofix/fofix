@@ -1,3 +1,0 @@
-Cassette Tapes: Replaces CDs with cassettes, cases with guitar cases
-Cassettes Only: Replace CDs in the songlist by the original FoF cassettes.
-Guitar Cases Only: Replace CD Cases in the songlist by the Guitar Cases created by FoZZ
