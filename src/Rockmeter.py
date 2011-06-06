@@ -666,7 +666,7 @@ class Animate(Effect):
         
   #adjusts the rate to the current fps
   def updateRate(self):
-    self.rate = self.transitionTime * (max(self.engine.clock.get_fps(), _minFPS)) / 1000.0
+    self.rate = float(self.frames) / (self.transitionTime * (max(self.engine.clock.get_fps(), _minFPS)) / 1000.0)
       
   def update(self):
     
