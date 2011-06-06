@@ -39,6 +39,7 @@ from PIL import Image, ImageDraw
 from OpenGL.GL import *
 
 import math
+from math import *
 
 from Theme import halign, valign
 from constants import *
@@ -87,7 +88,7 @@ _minFPS = 10            #minimum frame limit for effects that allow the theme ma
 class ConfigGetMixin(object):
   def get(self, value, type = str, default = None):
     if self.config.has_option(self.section, value):
-      return type(self.config.get(self.section, value))
+      return type(self.config.get(self.section, value).strip())
     return default
 
   def getexpr(self, value, default=None):
@@ -100,7 +101,7 @@ class ConfigGetMixin(object):
   def getexprs(self, value, default=None, separator='|'):
     if self.config.has_option(self.section, value):
       filename, lineno = self.config.getlineno(self.section, value)
-      exprs = self.config.get(self.section, value).split(separator)
+      exprs = [e.strip() for e in self.config.get(self.section, value).split(separator)]
       return [compile('\n' * (lineno - 1) + expr, filename, 'eval', FUTURE_DIVISION) for expr in exprs]
     return [compile(expr, '<string>', 'eval', FUTURE_DIVISION) for expr in default.split(separator)]
 
@@ -133,9 +134,19 @@ class Layer(ConfigGetMixin):
     self.yscaleexpr  = self.getexpr("yscale", "1.0")
     self.scale       = [1.0, 1.0]       #how much to scale it by (width, height from 0.0 - 1.0)
     
-    self.color       = list(self.engine.theme.hexToColor(self.get("color", str, "#FFFFFF")))
+    if self.config.has_option(section, "color"):
                                         #color of the image (#FFFFFF is white on text, on images it is full color)
-    
+      self.color   = list(self.engine.theme.hexToColor(self.get("color", str, "#FFFFFF")))
+      if len(self.color) == 3:
+        self.color.append(1.0)
+      self.r, self.g, self.b, self.a = [str(c) for c in self.color]
+    else:
+      self.r = self.getexpr("r", "1.0")
+      self.g = self.getexpr("g", "1.0")
+      self.b = self.getexpr("b", "1.0")
+      self.a = self.getexpr("a", "1.0")
+      self.color = [1.0,1.0,1.0,1.0]
+        
     self.condition   = True				#when should the image be shown (by default it will always be shown)
     
     self.alignment   = halign(self.get("alignment", str, "center"))
@@ -153,6 +164,9 @@ class Layer(ConfigGetMixin):
     self.position    = [float(eval(self.xposexpr)), float(eval(self.yposexpr))]
     self.angle       = float(eval(self.angleexpr))
     self.scale       = [float(eval(self.xscaleexpr)), float(eval(self.yscaleexpr))]
+    
+    self.color       = [float(eval(self.r)), float(eval(self.g)),
+                        float(eval(self.b)), float(eval(self.a))]
     
     #makes sure color has an alpha value to consider
     if len(self.color) == 3:
@@ -453,16 +467,14 @@ class Slide(Effect):
 
     self.updateRates()
     
-    if isinstance(self.layer, FontLayer):
-      self.rates[0] *= -1
-      self.rates[1] *= -1
-       
-
   def updateRates(self):
     t = self.transitionTime * (max(self.engine.clock.get_fps(), _minFPS)) / 1000.0
     self.rates = [(self.endCoord[0] - self.startCoord[0])/t,
                   (self.endCoord[1] - self.startCoord[1])/t]
-    
+    if isinstance(self.layer, FontLayer):
+      self.rates[0] *= -1
+      self.rates[1] *= -1
+      
   def update(self):
     condition = bool(eval(self.condition))
 
@@ -568,7 +580,7 @@ class Replace(Effect):
       self.drawings  = []
       self.rects = []
       if not self.get("texture") == None:
-        texture   = self.get("texture").strip().split("|")
+        texture   = [t.strip() for t in self.get("texture").split("|")]
         for tex in texture:
           path   = os.path.join("themes", layer.stage.themename, "rockmeter", tex)
           drawing = self.engine.loadImgDrawing(self, None, path)
@@ -627,9 +639,9 @@ class Replace(Effect):
       self.layer.text = self.text[-1]
     else:
       if len(self.drawings) > 0:
-          self.layer.drawing = self.drawings[-1]
+        self.layer.drawing = self.drawings[-1]
       if len(self.rects) > 0:
-          self.layer.rect = self.rects[-1]
+        self.layer.rect = self.rects[-1]
       self.fixScale()
             
 #effect that allows one to set the number of frames and
