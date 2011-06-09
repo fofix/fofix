@@ -187,7 +187,6 @@ class ImageLayer(Layer):
     #these are the images that are drawn when the layer is visible
     self.drawing = self.engine.loadImgDrawing(self, None, drawing)
     self.rectexpr = self.getexpr("rect", "(0.0,1.0,0.0,1.0)")
-    self.rect = [float(i) for i in eval(self.rectexpr)]
                                     #how much of the image do you want rendered
                                     # (left, right, top, bottom)
                                     
@@ -197,7 +196,7 @@ class ImageLayer(Layer):
 
     super(ImageLayer, self).updateLayer(playerNum)
     
-    rect = self.rect = eval(self.rectexpr)
+    rect = self.rect = [float(i) for i in eval(self.rectexpr)]
     
     #all of this has to be repeated instead of using the base method
     #because now things can be calculated in relation to the image's properties
@@ -594,8 +593,8 @@ class Replace(Effect):
       if not self.get("rect") == None:
         rects = self.getexprs("rect", separator="|")
         for rect in rects:
-          self.rects.append(eval(rect))
-      self.rects.append(eval(layer.rect))
+          self.rects.append(rect)
+      self.rects.append(layer.rectexpr)
       self.type = "image"
     elif isinstance(layer, FontLayer):
       self.font = self.engine.data.fontDict[self.get("font")]
@@ -637,7 +636,7 @@ class Replace(Effect):
           if len(self.drawings) > 1:
             self.layer.drawing = self.drawings[i]
           if len(self.rects) > 1:
-            self.layer.rect = self.rects[i]
+            self.layer.rect = [float(i) for i in eval(self.rects[i])]
           self.fixScale()
         return
     if self.type == "font":
@@ -646,7 +645,7 @@ class Replace(Effect):
       if len(self.drawings) > 0:
         self.layer.drawing = self.drawings[-1]
       if len(self.rects) > 0:
-        self.layer.rect = self.rects[-1]
+        self.layer.rect = [float(i) for i in eval(self.rects[-1])]
       self.fixScale()
             
 #effect that allows one to set the number of frames and
