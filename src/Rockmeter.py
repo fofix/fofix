@@ -757,7 +757,7 @@ class Rockmeter(ConfigGetMixin):
       
   def createFont(self, section, number):
 
-    font  = self.get("font")
+    font  = self.get("font", str, "font")
     layer = FontLayer(self, section, font)
 
     layer.text      = self.getexpr("text")
