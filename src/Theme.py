@@ -158,6 +158,11 @@ class Theme(Task):
     self.glowColor   = get("glow_color",       str,    "frets")
     if not self.glowColor == "frets":
       self.glowColor = self.hexToColor(self.glowColor)
+
+    #Acts similar to the glowColor but its does so for flames instead
+    self.flamesColor   = get("flames_color",       str,    "frets")
+    if not self.flamesColor == "frets":
+      self.flamesColor = self.hexToColor(self.flamesColor)
     
     #Note Colors (this applies to frets and notes)
     #default is green, red, yellow, blue, orange, purple (I don't know why there's a 6th color)
