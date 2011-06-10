@@ -157,7 +157,7 @@ class Theme(Task):
     #actually is (if the image is white then no matter what key is hit the glow will be white)
     self.glowColor   = get("glow_color",       str,    "frets")
     if not self.glowColor == "frets":
-      self.glowColor = self.hexToColor(self.glowColor)]
+      self.glowColor = self.hexToColor(self.glowColor)
     
     #Note Colors (this applies to frets and notes)
     #default is green, red, yellow, blue, orange, purple (I don't know why there's a 6th color)
