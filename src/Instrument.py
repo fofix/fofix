@@ -1899,7 +1899,7 @@ class Instrument(object):
 
         f += 2
 
-        if not self.isDrum and self.battleStatus[4]:
+        if self.battleStatus[4]:
           self.engine.draw3Dtex(self.glowDrawing, coord = (x, self.battleWhammyNow * .15, 0.01), rot = (f * 90 + self.time, 0, 1, 0),
                               texcoord = (0.0, 0.0, 1.0, 1.0), vertex = (-size[0] * f, -size[1] * f, size[0] * f, size[1] * f),
                               multiples = True, alpha = True, color = glowcol)
