@@ -180,7 +180,7 @@ class Drum(Instrument):
     engine = self.engine
     themename = self.engine.data.themeLabel
 
-    get = lambda file: self.checkPath("tails", file)
+    get = lambda file: self.checkPath("frets", file)
     
     if self.twoDkeys == True: #death_au
       if engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename, "frets", "drum", "fretbuttons.png")):
