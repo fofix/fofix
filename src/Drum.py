@@ -119,6 +119,8 @@ class Drum(Instrument):
       self.boardWidth     = 3.0
       self.boardLength    = 9.0
 
+    self.drumFretButtons = None
+
     #blazingamer
     self.opencolor = self.fretColors[5]
     self.rockLevel = 0.0
@@ -143,6 +145,9 @@ class Drum(Instrument):
 
   def loadNotes(self):
     super(Drum, self).loadNotes()
+    engine = self.engine
+
+    get = lambda file: self.checkPath("tails", file)
     
     if self.twoDnote == True:
       if self.noteSpin:
@@ -172,6 +177,10 @@ class Drum(Instrument):
 
   def loadFrets(self):
     super(Drum, self).loadFrets()
+    engine = self.engine
+    themename = self.engine.data.themeLabel
+
+    get = lambda file: self.checkPath("tails", file)
     
     if self.twoDkeys == True: #death_au
       if engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename, "frets", "drum", "fretbuttons.png")):
