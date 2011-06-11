@@ -433,8 +433,8 @@ class Drum(Instrument):
           self.renderFrets(visibility, song, controls)
 
         if self.hitFlamesPresent: #MFH - only when present!
-          self.renderFlames(visibility, song, pos, controls)    #MFH - only when freestyle inactive!
-
+          self.renderFlames(song, pos, controls)    #MFH - only when freestyle inactive!
+        
 
   def playDrumSounds(self, controls, playBassDrumOnly = False):   #MFH - handles playing of drum sounds.  
     #Returns list of drums that were just hit (including logic for detecting a held bass pedal)

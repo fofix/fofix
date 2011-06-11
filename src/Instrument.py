@@ -758,13 +758,11 @@ class Instrument(object):
     return possible
 
   #Renders the tail glow hitflame
-  def renderHitTrails(self, visibility, song, pos, controls):
-    if not song or self.flameColors[0][0] == -1 or self.disableFlameSFX == True:
+  def renderHitTrails(self, controls):
+    if self.flameColors[0][0] == -1 or self.disableFlameSFX == True:
       return
 
     w = self.boardWidth / self.strings
-
-    v = 1.0 - visibility
 
     if self.starPowerActive:
       flameColor = self.spColor
@@ -781,14 +779,13 @@ class Instrument(object):
         if f and (controls.getState(self.actions[0]) or controls.getState(self.actions[1])):
           f += 0.25
 
-        y = v + f / 6
+        y = f / 6
         x = (self.strings / 2 - n) * w
         flameSize = .075
 
         if self.fretActivity[n]:
           ms = math.sin(self.time) * .25 + 1
-          ff = self.fretActivity[n]
-          ff += 1.2
+          ff = self.fretActivity[n] + 1.2
               
           #Alarian: Animated hitflames
           if self.Hitanim:
@@ -821,12 +818,11 @@ class Instrument(object):
 
 
   #renders the flames that appear when a note is struck
-  def renderFlames(self, visibility, song, pos, controls):
+  def renderFlames(self, song, pos, controls):
     if not song or self.flameColors[0][0] == -1:
       return
 
     w = self.boardWidth / self.strings
-    v = 1.0 - visibility
     flameSize = .075
 
     if self.starPowerActive:
@@ -859,7 +855,7 @@ class Instrument(object):
 
         xlightning = (self.strings / 2 - event.number)*2.2*w
         ff = 1 + 0.25       
-        y = v + ff / 6
+        y = ff / 6
 
         y -= 0.5
         
@@ -1747,7 +1743,7 @@ class Instrument(object):
       f = self.fretActivity[n]
       w = self.boardWidth / self.strings
       x = (self.strings / 2 - n) * w
-      size = (.22, .22)
+      size = .22
 
       if f and self.disableFretSFX != True:
 
@@ -1783,11 +1779,11 @@ class Instrument(object):
 
         if self.battleStatus[4]:
           self.engine.draw3Dtex(self.glowDrawing, coord = (x, self.battleWhammyNow * .15, 0.01), rot = (f * 90 + self.time, 0, 1, 0),
-                              texcoord = (0.0, 0.0, 1.0, 1.0), vertex = (-size[0] * f, -size[1] * f, size[0] * f, size[1] * f),
+                              texcoord = (0.0, 0.0, 1.0, 1.0), vertex = (-size * f, -size * f, size * f, size * f),
                               multiples = True, alpha = True, color = glowcol)
         else:
           self.engine.draw3Dtex(self.glowDrawing, coord = (x, 0, 0.01), rot = (f * 90 + self.time, 0, 1, 0),
-                              texcoord = (0.0, 0.0, 1.0, 1.0), vertex = (-size[0] * f, -size[1] * f, size[0] * f, size[1] * f),
+                              texcoord = (0.0, 0.0, 1.0, 1.0), vertex = (-size * f, -size * f, size * f, size * f),
                               multiples = True, alpha = True, color = glowcol)
 
   def renderTail(self, song, length, sustain, kill, color, tailOnly = False, isTappable = False, big = False, fret = 0, spNote = False, freestyleTail = 0, pos = 0):
