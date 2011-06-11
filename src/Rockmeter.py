@@ -65,6 +65,8 @@ stars = 0               #how many stars earned
 partialStars = 0        #percentage of the current star earned
 rock = 0                #rock meter fill amount
 multiplier = 0          #player's multiplier
+bassgroove = False      #if a player is a bass guitar and their streak is over 30, they enter bass groove, track this
+boost = False           #keeps track if a player is boosting their multiplier (star power/overdrive activated)
 
 minutes = 0             #how many minutes into the song it is
 seconds = 0             #how many seconds into the song it is (0-59)
@@ -824,7 +826,7 @@ class Rockmeter(ConfigGetMixin):
   #this updates all the usual global variables that are handled by the rockmeter
   #these are all player specific
   def updateVars(self, playerNum):
-    global score, rock, streak, streakMax, power, stars, partialStars, multiplier, player
+    global score, rock, streak, streakMax, power, stars, partialStars, multiplier, bassgroove, boost, player
     scene = self.scene
     player = scene.instruments[playerNum]
 
@@ -854,10 +856,21 @@ class Rockmeter(ConfigGetMixin):
     else:
       multiplier = int(streak*.1) + 1
 
+    boost = player.starPowerActive
+    
     #doubles the multiplier number when starpower is activated
-    if player.starPowerActive:
+    if boost:
       multiplier *= 2
-
+      
+    if player.isBassGuitar and streak >= 40:
+        bassgroove = True
+    else:
+        bassgroove = False
+        
+    #force bassgroove to false if it's not enabled
+    if not scene.bassGrooveEnabled:
+        bassgroove = False
+        
   def render(self, visibility):
     self.updateTime()
 
