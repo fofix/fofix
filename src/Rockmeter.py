@@ -434,10 +434,6 @@ class Slide(Effect):
         self.startCoord[1] /= vpc[1]
       if "endY" in self.inPixels:
         self.endCoord[1] /= vpc[1]
-      self.startCoord[1] *= .75
-      self.startCoord[1] = .75 - self.startCoord[1]
-      self.endCoord[1] *= .75
-      self.endCoord[1] = .75 - self.endCoord[1]
     else:
       if "startX" in self.inPixels:
         self.startCoord[0] *= w/vpc[0]
@@ -478,42 +474,49 @@ class Slide(Effect):
       else:
         self.rates[i] = (self.endCoord[i] - self.startCoord[i])/t
     if isinstance(self.layer, FontLayer):
-      self.rates[0] *= -1
-      self.rates[1] *= -1
+      self.rates[1] *= -.75
+      self.rates[1] = .75 - self.rates[1]
       
   def update(self):
     condition = bool(eval(self.condition))
 
     self.updateRates()
     
+    eC = self.endCoord[:]
+    sC = self.startCoord[:]
+        
+    if isinstance(self.layer, FontLayer):
+      eC[1] = .75 - (eC[1]*.75)
+      sC[1] = .75 - (sC[1]*.75)
+        
     if condition:
       for i in range(2):
-        if self.position[i] > self.endCoord[i]:
+        if self.position[i] > eC[i]:
           if self.endCoord[i] < self.startCoord[i]:
             self.position[i] -= self.rates[i]
           else:
-            self.position[i] = self.endCoord[i]
-        elif self.position[i] < self.endCoord[i]:
+            self.position[i] = eC[i]
+        elif self.position[i] < eC[i]:
           if self.endCoord[i] > self.startCoord[i]:
             self.position[i] += self.rates[i]
           else:
-            self.position[i] = self.endCoord[i]
+            self.position[i] = eC[i]
     else:
       if self.reverse:
         for i in range(2):
-          if self.position[i] > self.startCoord[i]:
+          if self.position[i] > sC[i]:
             if self.endCoord[i] > self.startCoord[i]:
               self.position[i] -= self.rates[i]
             else:
-              self.position[i] = self.startCoord[i]
-          elif self.position[i] < self.startCoord[i]:
+              self.position[i] = sC[i]
+          elif self.position[i] < sC[i]:
             if self.endCoord[i] < self.startCoord[i]:
               self.position[i] += self.rates[i]
             else:
-              self.position[i] = self.startCoord[i]
+              self.position[i] = sC[i]
         
       else:  
-        self.position = self.startCoord[:]
+        self.position = sC
         
     self.layer.position = self.position[:]
 
