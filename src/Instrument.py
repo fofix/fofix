@@ -807,16 +807,17 @@ class Instrument(object):
 
           else:   
             ff += .3
+            vtx = flameSize * ff
 
             self.engine.draw3Dtex(self.hitglowDrawing, coord = (x, y + .125, 0), rot = (90, 1, 0, 0),
                                   scale = (0.5 + .6 * ms * ff, 1.5 + .6 * ms * ff, 1 + .6 * ms * ff),
-                                  vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
-                                  texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flameColor)
+                                  vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0), 
+                                  multiples = True, alpha = True, color = flameColor)
 
             self.engine.draw3Dtex(self.hitglow2Drawing, coord = (x, y + .25, .05), rot = (90, 1, 0, 0),
                                   scale = (.40 + .6 * ms * ff, 1.5 + .6 * ms * ff, 1 + .6 * ms * ff),
-                                  vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
-                                  texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flameColor)
+                                  vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0), 
+                                  multiples = True, alpha = True, color = flameColor)
 
 
   #renders the flames that appear when a note is struck
@@ -863,6 +864,8 @@ class Instrument(object):
         y -= 0.5
         
         ff += 1.5 #ff first time is 2.75 after this
+        
+        vtx = flameSize * ff
 
         if self.Hitanim2 == True:
           self.HCount2 += 1
@@ -877,13 +880,12 @@ class Instrument(object):
             texX = (HIndex*(1.0/self.HFrameLimit2), HIndex*(1.0/self.HFrameLimit2)+(1.0/self.HFrameLimit2))
 
             self.engine.draw3Dtex(self.hitflamesAnim, coord = (x, y + .665, 0), rot = (90, 1, 0, 0), scale = (1.6, 1.6, 4.9),
-                                  vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
-                                  texcoord = (texX[0],0.0,texX[1],1.0), multiples = True, alpha = True, color = (1,1,1))
+                                  vertex = (-vtx,-vtx,vtx,vtx), texcoord = (texX[0],0.0,texX[1],1.0), 
+                                  multiples = True, alpha = True, color = (1,1,1))
 
           else:
             scaleChange = (3.0,2.5,2.0,1.7)
             yOffset = (.35, .405, .355, .355)
-            vtx = flameSize * ff
             scaleMod = .6 * ms * ff
 
             for step in range(4):
@@ -909,20 +911,19 @@ class Instrument(object):
           if event.flameCount < flameLimitHalf:
             self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x, y + .20, 0), rot = (90, 1, 0, 0),
                                     scale = (.25 + .6 * ms * ff, event.flameCount/6.0 + .6 * ms * ff, event.flameCount / 6.0 + .6 * ms * ff),
-                                    vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff), texcoord = (0.0,0.0,1.0,1.0),
+                                    vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
                                     multiples = True, alpha = True, color = flameColor)
             
                  
             for i in range(3):
               self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x-.005, y + .255, 0), rot = (90, 1, 0, 0),
                                     scale = (.30 + i*0.05 + .6 * ms * ff, event.flameCount/(5.5 - i*0.4) + .6 * ms * ff, event.flameCount / (5.5 - i*0.4) + .6 * ms * ff),
-                                    vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff), texcoord = (0.0,0.0,1.0,1.0),
+                                    vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
                                     multiples = True, alpha = True, color = flameColor)
 
           else:
             scaleChange = (3.0,2.5,2.0,1.7)
             yOffset = (.35, .405, .355, .355)
-            vtx = flameSize * ff
             scaleMod = .6 * ms * ff
 
             for step in range(4):
