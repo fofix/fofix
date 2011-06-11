@@ -825,7 +825,6 @@ class Instrument(object):
       return
 
     w = self.boardWidth / self.strings
-
     v = 1.0 - visibility
     flameSize = .075
 
@@ -848,7 +847,15 @@ class Instrument(object):
         if not flameColor == self.spColor:
           flameColor = self.flameColors[event.number]
         ms = math.sin(self.time) * .25 + 1
-        x  = (self.strings / 2 - event.number) * w
+
+        if self.isDrum:
+          if event.number == 0:
+            x  = (self.strings / 2 - 2) * w
+          else:
+            x  = (self.strings / 2 +.5 - event.number) * w
+        else:
+          x  = (self.strings / 2 - event.number) * w
+
         xlightning = (self.strings / 2 - event.number)*2.2*w
         ff = 1 + 0.25       
         y = v + ff / 6
