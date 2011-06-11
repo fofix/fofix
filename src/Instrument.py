@@ -783,12 +783,11 @@ class Instrument(object):
 
         y = v + f / 6
         x = (self.strings / 2 - n) * w
-        self.fretActivity[n]
         flameSize = .075
 
         if self.fretActivity[n]:
           ms = math.sin(self.time) * .25 + 1
-          ff = f
+          ff = self.fretActivity[n]
           ff += 1.2
               
           #Alarian: Animated hitflames
@@ -869,6 +868,7 @@ class Instrument(object):
               HIndex = 0
                 
             texX = (HIndex*(1.0/self.HFrameLimit2), HIndex*(1.0/self.HFrameLimit2)+(1.0/self.HFrameLimit2))
+
             self.engine.draw3Dtex(self.hitflamesAnim, coord = (x, y + .665, 0), rot = (90, 1, 0, 0), scale = (1.6, 1.6, 4.9),
                                   vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
                                   texcoord = (texX[0],0.0,texX[1],1.0), multiples = True, alpha = True, color = (1,1,1))
