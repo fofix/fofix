@@ -193,6 +193,10 @@ class ImageLayer(Layer):
                                     # (left, right, top, bottom)
                                     
   def updateLayer(self, playerNum):
+    #don't try to update an image layer if the texture doesn't even exist
+    if not self.drawing:
+      return
+    
     w, h, = self.engine.view.geometry[2:4]
     texture = self.drawing
 
@@ -234,14 +238,15 @@ class ImageLayer(Layer):
     self.position = position
 
   def render(self, visibility, playerNum):
-    #don't try to render or update an image layer if the texture doesn't even exist
-    if not self.drawing:
-        return
         
     self.updateLayer(playerNum)
     for effect in self.effects:
       effect.update()
 
+    #don't try to render an image layer if the texture doesn't even exist
+    if not self.drawing:
+        return
+    
     coord      = self.position
     scale      = self.scale
     rot        = self.angle
@@ -366,6 +371,10 @@ class CircleLayer(ImageLayer):
       self.drawnOverlays[degrees] = dispOverlay
 
   def updateLayer(self, playerNum):
+    #don't try to update an image layer if the texture doesn't even exist
+    if not self.drawing:
+      return
+    
     ratio = eval(self.ratioexpr)
     self.ratio = ratio
     
@@ -374,14 +383,14 @@ class CircleLayer(ImageLayer):
   def render(self, visibility, playerNum):
     w, h, = self.stage.engine.view.geometry[2:4]
 
-    #don't try to render or update an image layer if the texture doesn't even exist
-    if not self.drawing:
-      return
-    
     self.updateLayer(playerNum)
     for effect in self.effects:
       effect.update()
 
+    #don't try to render image layer if the texture doesn't even exist
+    if not self.drawing:
+      return
+    
     coord     = self.position
     scale     = self.scale
     rot       = self.angle
