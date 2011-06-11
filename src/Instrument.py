@@ -835,51 +835,6 @@ class Instrument(object):
     else:
       flameColor = 0
 
-    if self.HCountAni and self.HCount2 >= self.HFrameLimit2 and self.hitFlamesPresent and not self.disableFlameSFX:
-      for n in range(self.strings):
-        f = self.fretWeight[n]
-        if f and (controls.getState(self.actions[0]) or controls.getState(self.actions[1])):
-          f += 0.25      
-        y = v + f / 6
-        x = (self.strings / 2 - n) * w
-        f = self.fretActivity[n]
-
-        if f:
-          ms = math.sin(self.time) * .25 + 1
-          ff = f
-          ff += 1.2
-          if not flameColor == self.spColor:
-            flameColor = self.flameColors[n]
-              
-          if self.Hitanim != True:
-            self.engine.draw3Dtex(self.hitglowDrawing, coord = (x, y + .125, 0), rot = (90, 1, 0, 0),
-                                  scale = (0.5 + .6 * ms * ff, 1.5 + .6 * ms * ff, 1 + .6 * ms * ff),
-                                  vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
-                                  texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flameColor)
-
-            #Alarian: Animated hitflames
-          else:
-            self.HCount += 1
-            if self.HCount > self.Animspeed-1:
-              self.HCount = 0
-            HIndex = (self.HCount * self.HFrameLimit - (self.HCount * self.HFrameLimit) % self.Animspeed) / self.Animspeed
-            if HIndex >= self.HFrameLimit:
-              HIndex = 0
-
-            texX = (HIndex*(1.0/self.HFrameLimit), HIndex*(1.0/self.HFrameLimit)+(1.0/self.HFrameLimit))
-            self.engine.draw3Dtex(self.hitglowAnim, coord = (x, y + .225, 0), rot = (90, 1, 0, 0), scale = (2.4, 1, 3.3),
-                                  vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
-                                  texcoord = (texX[0],0.0,texX[1],1.0), multiples = True, alpha = True, color = (1,1,1))
-
-          ff += .3
-
-          if self.Hitanim != True:
-            self.engine.draw3Dtex(self.hitglow2Drawing, coord = (x, y + .25, .05), rot = (90, 1, 0, 0),
-                                  scale = (.40 + .6 * ms * ff, 1.5 + .6 * ms * ff, 1 + .6 * ms * ff),
-                                  vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
-                                  texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flameColor)
-
-    
     flameLimit = 10.0
     flameLimitHalf = round(flameLimit/2.0)
     renderedNotes = self.getRequiredNotesForRender(song,pos)
