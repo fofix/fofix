@@ -1519,15 +1519,15 @@ class Instrument(object):
     glRotatef(-90, 1, 0, 0)
     glRotatef(-90, 0, 0, 1)
 
-    if n == 0: #green fret button
+    if fretNum == 0: #green fret button
       glRotate(self.keyrot[0], 0, 1, 0), glTranslatef(0, 0, self.keypos[0])
-    elif n == 1: #red fret button
+    elif fretNum == 1: #red fret button
       glRotate(self.keyrot[1], 0, 1, 0), glTranslatef(0, 0, self.keypos[1])
-    elif n == 2: #yellow fret button
+    elif fretNum == 2: #yellow fret button
       glRotate(self.keyrot[2], 0, 1, 0), glTranslatef(0, 0, self.keypos[2])
-    elif n == 3: #blue fret button
+    elif fretNum == 3: #blue fret button
       glRotate(self.keyrot[3], 0, 1, 0), glTranslatef(0, 0, self.keypos[3])
-    elif n == 4: #orange fret button
+    elif fretNum == 4: #orange fret button
       glRotate(self.keyrot[4], 0, 1, 0), glTranslatef(0, 0, self.keypos[4])
 
     if self.battleStatus[4]:
@@ -1554,7 +1554,7 @@ class Instrument(object):
       glMatrixMode(GL_MODELVIEW)
       glDisable(GL_TEXTURE_2D)
     else:
-      glColor4f(.1 + .8 * color[0] + f, .1 + .8 * color[1] + f, .1 + .8 * color[2] + f, color[3])
+      glColor4f(color[0], color[1], color[2], color[3]+1.0)
        
       #Mesh - Main fret
       #Key_001 - Top of fret (key_color)
@@ -1562,15 +1562,15 @@ class Instrument(object):
       #Glow_001 - Only rendered when a note is hit along with the glow.svg
 
       if(model.find("Glow_001")):
-        model.render("Mesh")
+        model.render("Glow_001")
       if(model.find("Key_001")):
         glColor3f(self.keyColor[0], self.keyColor[1], self.keyColor[2])
         model.render("Key_001")
-      if(key.find("Key_002")):
+      if(model.find("Key_002")):
         glColor3f(self.key2Color[0], self.key2Color[1], self.key2Color[2])
         model.render("Key_002")
       else:
-        model.render()
+        model.render("Mesh")
 
     glDisable(GL_LIGHTING)
     glDisable(GL_LIGHT0)

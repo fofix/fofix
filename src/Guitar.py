@@ -101,7 +101,6 @@ class Guitar(Instrument):
 
     self.neck = Neck(self.engine, self, playerObj)
 
-
   def renderFrets(self, visibility, song, controls):
     w = self.boardWidth / self.strings
     size = (.22, .22)
@@ -115,12 +114,10 @@ class Guitar(Instrument):
       f = self.fretWeight[keyNumb]
       c = list(self.fretColors[keyNumb])
 
-      c.append(v)
-      
       y = v / 6
       x = (self.strings / 2 - n) * w
 
-      if self.twoDkeys == True:
+      if self.twoDkeys == True or not self.keyMesh:
         fretColor = (1,1,1,1)
         size = (self.boardWidth / self.strings / 2, self.boardWidth / self.strings / 2.4)
         texSize = (n / self.lanenumber, n / self.lanenumber + 1 / self.lanenumber)
@@ -152,7 +149,8 @@ class Guitar(Instrument):
         else:
           texture = None
           
-        self.draw3DKey(texture,self.keyMesh, x, y, n)
+        c = [.1 + .8 * c[0] + f, .1 + .8 * c[1] + f, .1 + .8 * c[2] + f, v]
+        self.draw3DKey(texture,self.keyMesh, x, y, c, n)
             
     glDisable(GL_DEPTH_TEST)
 

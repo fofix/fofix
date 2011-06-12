@@ -222,7 +222,6 @@ class Drum(Instrument):
         c = list(self.fretColors[0])
       elif not n == 4:
         c = list(self.fretColors[n + 1])
-      c.append(v)
       
       if n == 4:
         y = v + f / 6
@@ -275,7 +274,7 @@ class Drum(Instrument):
           else: #fret normal
             texY = (0.0, 1.0 / self.fretImgColNumber)
 
-          if controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]) or (self.isDrum and pressed):#fret press
+          if controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]) or pressed:#fret press
             texY = (2.0 / self.fretImgColNumber, 3.0 / self.fretImgColNumber)
             
           elif n == 4 and self.hit[0]:#drum bass hit fret
@@ -291,7 +290,9 @@ class Drum(Instrument):
         self.keypos = self.engine.theme.drumkeypos
         self.keyrot = self.engine.theme.drumkeyrot
 
-        if self.keytex == True:
+        texture = None
+        model = self.keyMesh
+        if self.keytex:
           model = self.keyMesh
           if n == 0:
             texture = self.keytexb.texture
@@ -301,13 +302,13 @@ class Drum(Instrument):
             texture = self.keytexd.texture
           elif n == 3:
             texture = self.keytexa.texture
-          elif n == 4:
+          elif n == 4 and self.keytexopen:
             texture = self.keytexopen.texture
-            model = self.keyMeshOpen
-        else:
-          texture = None
-          model = self.keyMesh
-        
+
+        if n == 4:
+          model = self.keyMeshOpen
+              
+        c = [.1 + .8 * c[0] + f, .1 + .8 * c[1] + f, .1 + .8 * c[2] + f, v]
         self.render3DKey(texture, model, x, y, c, n)
           
     glDisable(GL_DEPTH_TEST)      
