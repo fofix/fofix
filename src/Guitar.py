@@ -43,6 +43,7 @@ class Guitar(Instrument):
     self.isVocal = False
 
     self.strings        = 5
+    self.strings2       = 5
 
     self.debugMode = False
     self.gameMode2p = self.engine.world.multiMode
@@ -99,6 +100,61 @@ class Guitar(Instrument):
     self.rockLevel = 0.0
 
     self.neck = Neck(self.engine, self, playerObj)
+
+
+  def renderFrets(self, visibility, song, controls):
+    w = self.boardWidth / self.strings
+    size = (.22, .22)
+    v = 1.0 - visibility
+    
+    glEnable(GL_DEPTH_TEST)
+
+    for n in range(self.strings2):
+      pressed = None #to make sure guitar doesnt crash
+      keyNumb = n
+      f = self.fretWeight[keyNumb]
+      c = list(self.fretColors[keyNumb])
+
+      c.append(v)
+      
+      y = v / 6
+      x = (self.strings / 2 - n) * w
+
+      if self.twoDkeys == True:
+        fretColor = (1,1,1,1)
+        size = (self.boardWidth / self.strings / 2, self.boardWidth / self.strings / 2.4)
+        texSize = (n / self.lanenumber, n / self.lanenumber + 1 / self.lanenumber)
+
+        if self.battleStatus[3] and self.battleFrets != None and self.battleBreakString == n:
+          texSize = (n/5.0+.042,n/5.0+0.158)
+          size = (.30, .40)
+          fretPos = 8 - round((self.battleBreakNow/self.battleBreakLimit) * 8)
+          texY = (fretPos/8.0,(fretPos + 1.0)/8)
+
+        else:
+          texY = (0.0, 1.0 / self.fretImgColNumber)#fret normal guitar/bass/drums
+
+          if controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]) or (self.isDrum and pressed):#fret press
+            texY = (1.0 / self.fretImgColNumber, 2.0 / self.fretImgColNumber)
+
+          elif self.hit[n] or (self.battleStatus[3] and self.battleBreakString == n):#frets on note hit
+            texY = (2.0 / self.fretImgColNumber,1.0)
+
+        self.engine.draw3Dtex(self.fretButtons, vertex = (size[0],size[1],-size[0],-size[1]), texcoord = (texSize[0], texY[0], texSize[1], texY[1]),
+                                coord = (x,v,0), multiples = True,color = fretColor, depth = True)
+
+      else:
+        self.keypos = self.engine.theme.keypos
+        self.keyrot = self.engine.theme.keyrot
+
+        if self.keyTex:
+          texture = getattr(self,"keytex"+chr(97+n)).texture
+        else:
+          texture = None
+          
+        self.draw3DKey(texture,self.keyMesh, x, y, n)
+            
+    glDisable(GL_DEPTH_TEST)
 
   def renderFreestyleFlames(self, visibility, controls):
     if self.flameColors[0][0][0] == -1:

@@ -92,6 +92,7 @@ class Drum(Instrument):
     self.drumFillWasJustActive = False
 
     self.strings        = 4
+    self.strings2       = 5
     self.playedSound  = [True, True, True, True, True]
 
     self.openFretActivity = 0.0
@@ -201,7 +202,115 @@ class Drum(Instrument):
         self.keytexopen = False
       else:
         engine.loadImgDrawing(self, "keytexopen", get("keytex_open.png"))
+
+  def renderFrets(self, visibility, song, controls):
+    w = self.boardWidth / self.strings
+    size = (.22, .22)
+    v = 1.0 - visibility
+	
+    glEnable(GL_DEPTH_TEST)
+	
+    for n in range(self.strings2):
+      if n == 4:
+        keyNumb = 0
+      else:
+        keyNumb = n + 1
+      f = self.drumsHeldDown[keyNumb]/200.0
+      pressed = self.drumsHeldDown[keyNumb]
+
+      if n == 3: #Set colors of frets
+        c = list(self.fretColors[0])
+      elif not n == 4:
+        c = list(self.fretColors[n + 1])
+      c.append(v)
       
+      if n == 4:
+        y = v + f / 6
+        x = 0
+      else:
+        y = v / 6
+        x = (self.strings / 2 - .5 - n) * w
+
+      if self.twoDkeys == True or not self.keyMesh:
+
+        if n == 4: #Weirdpeople - so the drum bass fret can be seen with 2d frets
+          glDisable(GL_DEPTH_TEST)
+          size = (self.boardWidth/2, self.boardWidth/self.strings/2.4)
+          texSize = (0.0,1.0)
+        else:
+          size = (self.boardWidth / self.strings / 2, self.boardWidth / self.strings / 2.4)
+          texSize = (n / self.lanenumber, n / self.lanenumber + 1 / self.lanenumber)
+          
+        fretColor = (1,1,1,1)
+  
+        if self.drumFretButtons == None:
+          if n == 4:
+            continue
+          whichFret = n+1
+          if whichFret == 4:
+            whichFret = 0
+            #reversing fret 0 since it's angled in Rock Band
+            texSize = (whichFret/5.0+0.2,whichFret/5.0)
+          else:
+            texSize = (whichFret/5.0,whichFret/5.0+0.2)
+
+          texY = (0.0,1.0/3.0)
+          if pressed:
+            texY = (1.0/3.0,2.0/3.0)
+          if self.hit[n]:
+            texY = (2.0/3.0,1.0)
+
+        elif self.battleStatus[3] and self.battleFrets != None and self.battleBreakString == n:
+          texSize = (n/5.0+.042,n/5.0+0.158)
+          size = (.30, .40)
+          fretPos = 8 - round((self.battleBreakNow/self.battleBreakLimit) * 8)
+          texY = (fretPos/8.0,(fretPos + 1.0)/8)
+
+        else:
+          if n == 4: 
+            if pressed:  #drums bass fret press
+              texY = (3.0 / self.fretImgColNumber, 4.0 / self.fretImgColNumber)
+            else:        #fret normal bass drum
+              texY = (1.0 / self.fretImgColNumber, 2.0 / self.fretImgColNumber)
+          else: #fret normal
+            texY = (0.0, 1.0 / self.fretImgColNumber)
+
+          if controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]) or (self.isDrum and pressed):#fret press
+            texY = (2.0 / self.fretImgColNumber, 3.0 / self.fretImgColNumber)
+            
+          elif n == 4 and self.hit[0]:#drum bass hit fret
+            texY = (5.0 / self.fretImgColNumber, 1.0)
+
+          elif self.hit[n] or (self.battleStatus[3] and self.battleBreakString == n):#frets on note hit
+            texY = (4.0 / self.fretImgColNumber, 5.0 / self.fretImgColNumber)
+            
+        self.engine.draw3Dtex(self.fretButtons, vertex = (size[0],size[1],-size[0],-size[1]), texcoord = (texSize[0], texY[0], texSize[1], texY[1]),
+                                coord = (x,v,0), multiples = True,color = fretColor, depth = True)
+  
+      else:
+        self.keypos = self.engine.theme.drumkeypos
+        self.keyrot = self.engine.theme.drumkeyrot
+
+        if self.keytex == True:
+          model = self.keyMesh
+          if n == 0:
+            texture = self.keytexb.texture
+          elif n == 1:
+            texture = self.keytexc.texture
+          elif n == 2:
+            texture = self.keytexd.texture
+          elif n == 3:
+            texture = self.keytexa.texture
+          elif n == 4:
+            texture = self.keytexopen.texture
+            model = self.keyMeshOpen
+        else:
+          texture = None
+          model = self.keyMesh
+        
+        self.render3DKey(texture, model, x, y, c, n)
+          
+    glDisable(GL_DEPTH_TEST)      
 
   def renderFreestyleFlames(self, visibility, controls):
     if self.flameColors[0][0] == -1:
