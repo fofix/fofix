@@ -466,8 +466,10 @@ class Slide(Effect):
 
 
     self.position = self.startCoord[:]
+    #y position needs to be flipped initially
     if isinstance(self.layer, FontLayer):
-        self.position[1] = .75 - self.position[1]*.75
+      self.position[1] *= .75
+      self.position[1] = .75 - self.position[1]
     
     self.reverse = bool(eval(self.getexpr("reverse", "True")))
 
@@ -485,91 +487,50 @@ class Slide(Effect):
         self.rates[i] = (self.startCoord[i] - self.endCoord[i])/t
       else:
         self.rates[i] = (self.endCoord[i] - self.startCoord[i])/t
-    
+              
+  def update(self):
+    condition = bool(eval(self.condition))
+
+    #reverse the processing for font layer handling
     if isinstance(self.layer, FontLayer):
-      self.rates[1] *= .75
-      self.rates[1] = .75 - self.rates[1]
-      
-  #setting position for Font layers is different due to the y coordinates being reversed,
-  # this makes calculating a little more complex
-  def setFontPosition(self, sC, eC):
-    condition = bool(eval(self.condition))
+      self.position[1] = .75 - self.position[1]
+      self.position[1] /= .75
 
-    eC[1] = .75 - (eC[1]*.75)
-    sC[1] = .75 - (sC[1]*.75)
-    
-    if condition:
-      for i in range(2):
-        if (self.position[i] > eC[i])*(i == 0):
-          if (self.endCoord[i] < self.startCoord[i]):
-            self.position[i] -= self.rates[i]
-          else:
-            self.position[i] = eC[i]
-        elif (self.position[i] < eC[i])*(i == 0):
-          if (self.endCoord[i] > self.startCoord[i]):
-            self.position[i] += self.rates[i]
-          else:
-            self.position[i] = eC[i]
-    else:
-      if self.reverse:
-        for i in range(2):
-          if self.position[i] > sC[i]:
-            if self.endCoord[i] > self.startCoord[i]:
-              self.position[i] -= self.rates[i]
-            else:
-              self.position[i] = sC[i]
-          elif self.position[i] < sC[i]:
-            if self.endCoord[i] < self.startCoord[i]:
-              self.position[i] += self.rates[i]
-            else:
-              self.position[i] = sC[i]
+    self.updateRates()
         
-      else:  
-        self.position = sC
-    
-  def setPosition(self, sC, eC):
-    condition = bool(eval(self.condition))
-
     if condition:
       for i in range(2):
-        if self.position[i] > eC[i]:
+        if self.position[i] > self.endCoord[i]:
           if self.endCoord[i] < self.startCoord[i]:
             self.position[i] -= self.rates[i]
           else:
-            self.position[i] = eC[i]
-        elif self.position[i] < eC[i]:
+            self.position[i] = self.endCoord[i]
+        elif self.position[i] < self.endCoord[i]:
           if self.endCoord[i] > self.startCoord[i]:
             self.position[i] += self.rates[i]
           else:
-            self.position[i] = eC[i]
+            self.position[i] = self.endCoord[i]
     else:
       if self.reverse:
         for i in range(2):
-          if self.position[i] > sC[i]:
+          if self.position[i] > self.startCoord[i]:
             if self.endCoord[i] > self.startCoord[i]:
               self.position[i] -= self.rates[i]
             else:
-              self.position[i] = sC[i]
-          elif self.position[i] < sC[i]:
+              self.position[i] = self.startCoord[i]
+          elif self.position[i] < self.startCoord[i]:
             if self.endCoord[i] < self.startCoord[i]:
               self.position[i] += self.rates[i]
             else:
-              self.position[i] = sC[i]
+              self.position[i] = self.startCoord[i]
       else:  
-        self.position = sC
+        self.position = self.startCoord
         
-  def update(self):
-
-    self.updateRates()
-    
-    eC = self.endCoord[:]
-    sC = self.startCoord[:]
-        
+    #because of the y position being flipped on fonts it needs to be caught
     if isinstance(self.layer, FontLayer):
-      self.setFontPosition(sC, eC)
-    else:
-      self.setPosition(sC, eC)
-        
+      self.position[1] *= .75
+      self.position[1] = .75 - self.position[1]
+    
     self.layer.position = self.position[:]
 
 #fades the color of the layer between this color and its original
