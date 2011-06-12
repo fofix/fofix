@@ -896,29 +896,28 @@ class Instrument(object):
                                     vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
                                     multiples = True, alpha = True, color = flameColor)
 
-          else:
-            scaleChange = (3.0,2.5,2.0,1.7)
-            yOffset = (.35, .405, .355, .355)
-            scaleMod = .6 * ms * ff
+          scaleChange = (3.0,2.5,2.0,1.7)
+          yOffset = (.35, .405, .355, .355)
+          scaleMod = .6 * ms * ff
 
-            for step in range(4):
-              #draw lightning in GH themes on SP gain
-              if step == 0 and event.finalStar and self.spEnabled and self.hitlightning:
-                self.engine.draw3Dtex(self.hitlightning, coord = (xlightning, ff / 6, 3.3), rot = (90, 1, 0, 0),
-                                      scale = (.15 + .5 * ms * ff, event.flameCount / 3.0 + .6 * ms * ff, 2), vertex = (.4,-2,-.4,2),
-                                      texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = (1,1,1))
-                continue
+          for step in range(4):
+            #draw lightning in GH themes on SP gain
+            if step == 0 and event.finalStar and self.spEnabled and self.hitlightning:
+              self.engine.draw3Dtex(self.hitlightning, coord = (xlightning, ff / 6, 3.3), rot = (90, 1, 0, 0),
+                                    scale = (.15 + .5 * ms * ff, event.flameCount / 3.0 + .6 * ms * ff, 2), vertex = (.4,-2,-.4,2),
+                                    texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = (1,1,1))
+              continue
             
-              if step == 0:
-                yzscaleMod = event.flameCount/ scaleChange[step]
-              else:
-                yzscaleMod = (event.flameCount + 1)/ scaleChange[step]
+            if step == 0:
+              yzscaleMod = event.flameCount/ scaleChange[step]
+            else:
+              yzscaleMod = (event.flameCount + 1)/ scaleChange[step]
 
-              if self.hitflames1Drawing: 
-                self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x - .005, y + yOffset[step], 0), rot = (90, 1, 0, 0),
-                                      scale = (.25 + step*.05 + scaleMod, yzscaleMod + scaleMod, yzscaleMod + scaleMod),
-                                      vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
-                                      multiples = True, alpha = True, color = flameColor)
+            if self.hitflames1Drawing: 
+              self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x - .005, y + yOffset[step], 0), rot = (90, 1, 0, 0),
+                                    scale = (.25 + step*.05 + scaleMod, yzscaleMod + scaleMod, yzscaleMod + scaleMod),
+                                    vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
+                                    multiples = True, alpha = True, color = flameColor)
 
         event.flameCount += 1
 
