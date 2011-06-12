@@ -838,7 +838,16 @@ class Instrument(object):
       if (event.played or event.hopod) and event.flameCount < flameLimit:
         if not self.disableFlameSFX:
           if not flameColor == self.spColor:
-            flameColor = self.flameColors[event.number]
+            if self.isDrum: 
+              if event.number == 0:
+                flameColor = self.flameColors[4]
+              elif event.number == 4:
+                flameColor = self.flameColors[0]
+              else:
+                flameColor = self.flameColors[event.number]
+            else:
+              flameColor = self.flameColors[event.number]
+
           ms = math.sin(self.time) * .25 + 1
 
           if self.isDrum:
