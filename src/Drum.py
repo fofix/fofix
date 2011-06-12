@@ -181,7 +181,7 @@ class Drum(Instrument):
     engine = self.engine
     themename = self.engine.data.themeLabel
 
-    get = lambda file: self.checkPath("tails", file)
+    get = lambda file: self.checkPath("frets", file)
     
     if self.twoDkeys == True: #death_au
       if engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename, "frets", "drum", "fretbuttons.png")):
@@ -542,8 +542,8 @@ class Drum(Instrument):
           self.renderFrets(visibility, song, controls)
 
         if self.hitFlamesPresent: #MFH - only when present!
-          self.renderFlames(visibility, song, pos, controls)    #MFH - only when freestyle inactive!
-
+          self.renderFlames(song, pos, controls)    #MFH - only when freestyle inactive!
+        
 
   def playDrumSounds(self, controls, playBassDrumOnly = False):   #MFH - handles playing of drum sounds.  
     #Returns list of drums that were just hit (including logic for detecting a held bass pedal)
