@@ -1250,7 +1250,7 @@ class Instrument(object):
       if event.finalStar and self.spEnabled:
         spNote = True
         if event.played or event.hopod:
-          if event.flameCount == 0:
+          if event.flameCount < 1 and not self.starPowerGained:
             if self.starPower < 50 and self.isDrum:   #not enough starpower to activate yet, kill existing drumfills
               for dfEvent in self.drumFillEvents:
                 dfEvent.happened = True
@@ -1267,8 +1267,6 @@ class Instrument(object):
               
               if self.starPower < 100:
                 self.starPower += 25
-                if self.hitFlamesPresent == False:
-                  event.flameCount = 1
               if self.starPower > 100:
                 self.starPower = 100
             self.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
@@ -1431,7 +1429,7 @@ class Instrument(object):
       if event.finalStar and self.spEnabled:
         spNote = True
         if event.played or event.hopod:
-          if event.flameCount == 0:
+          if event.flameCount < 1 and not self.starPowerGained:
 
             if self.starPower < 50:   #not enough starpower to activate yet, kill existing drumfills
               for dfEvent in self.drumFillEvents:
@@ -1439,8 +1437,6 @@ class Instrument(object):
 
             if self.starPower < 100:
               self.starPower += 25
-              if self.hitFlamesPresent == False:
-                event.flameCount = 1
             if self.starPower > 100:
               self.starPower = 100
             self.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
