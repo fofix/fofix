@@ -302,6 +302,11 @@ class Instrument(object):
     self.keyColor = self.engine.theme.keyColor
     self.key2Color = self.engine.theme.key2Color
 
+    self.hitFlameYPos = self.engine.theme.hitFlameYPos
+    self.hitFlameSize = self.engine.theme.hitFlameSize
+    self.holdFlameYPos = self.engine.theme.holdFlameYPos
+    self.holdFlameSize = self.engine.theme.holdFlameSize
+
     #all flames/glows are set to there corresponding color else they are set to the fret colors
     if not self.engine.theme.flamesColor == "frets":
       fC = self.engine.theme.flamesColor
@@ -780,8 +785,9 @@ class Instrument(object):
           f += 0.25
 
         y = f / 6
+        y -= self.holdFlameYPos
         x = (self.strings / 2 - n) * w
-        flameSize = .075
+        flameSize = self.holdFlameSize
 
         if self.fretActivity[n]:
           ms = math.sin(self.time) * .25 + 1
@@ -823,7 +829,7 @@ class Instrument(object):
       return
 
     w = self.boardWidth / self.strings
-    flameSize = .075
+    flameSize = self.hitFlameSize
 
     if self.starPowerActive:
       flameColor = self.spColor
@@ -857,7 +863,7 @@ class Instrument(object):
         ff = 1 + 0.25       
         y = ff / 6
 
-        y -= 0.5
+        y -= self.hitFlameYPos
         
         ff += 1.5 #ff first time is 2.75 after this
         
@@ -887,7 +893,7 @@ class Instrument(object):
             for step in range(4):
               #draw lightning in GH themes on SP gain
               if step == 0 and event.finalStar and self.spEnabled and self.hitlightning:
-                self.engine.draw3Dtex(self.hitlightning, coord = (xlightning, y, 3.3), rot = (90, 1, 0, 0),
+                self.engine.draw3Dtex(self.hitlightning, coord = (xlightning, ff / 6, 3.3), rot = (90, 1, 0, 0),
                                       scale = (.15 + .5 * ms * ff, event.flameCount / 3.0 + .6 * ms * ff, 2), vertex = (.4,-2,-.4,2),
                                       texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = (1,1,1))
                 continue
@@ -925,7 +931,7 @@ class Instrument(object):
             for step in range(4):
               #draw lightning in GH themes on SP gain
               if step == 0 and event.finalStar and self.spEnabled and self.hitlightning:
-                self.engine.draw3Dtex(self.hitlightning, coord = (xlightning, y, 3.3), rot = (90, 1, 0, 0),
+                self.engine.draw3Dtex(self.hitlightning, coord = (xlightning, ff / 6, 3.3), rot = (90, 1, 0, 0),
                                     scale = (.15 + .5 * ms * ff, event.flameCount / 3.0 + .6 * ms * ff, 2), vertex = (.4,-2,-.4,2),
                                     texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = (1,1,1))
                 continue
