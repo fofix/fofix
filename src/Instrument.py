@@ -377,9 +377,8 @@ class Instrument(object):
       if not self.glowDrawing:
         engine.loadImgDrawing(self, "glowDrawing", "glow.png")
 
-    self.hitFlamesPresent = False
+    self.hitFlamesPresent = True
     if self.disableFlameSFX == True:
-      self.hitFlamesPresent = True
       self.hitglow2Drawing = None
       self.hitglowDrawing = None
       self.hitglowAnim = None
@@ -387,27 +386,17 @@ class Instrument(object):
       self.hitflames2Drawing = None
       self.hitflames1Drawing = None
     else:
-      if engine.loadImgDrawing(self, "hitflames1Drawing", os.path.join("themes",themename,"hitflames1.png"),  textureSize = (128, 128)):
-        if engine.loadImgDrawing(self, "hitflames2Drawing", os.path.join("themes",themename,"hitflames2.png"),  textureSize = (128, 128)):
-          self.hitFlamesPresent = True
-        else:
-          self.hitflames2Drawing = None
-      else:
-        self.hitflames1Drawing = None
-        self.hitflames2Drawing = None
+      engine.loadImgDrawing(self, "hitflames1Drawing", os.path.join("themes",themename,"hitflames1.png"),  textureSize = (128, 128))
+      engine.loadImgDrawing(self, "hitflames2Drawing", os.path.join("themes",themename,"hitflames2.png"),  textureSize = (128, 128))
       
       if not engine.loadImgDrawing(self, "hitflamesAnim", os.path.join("themes",themename,"hitflamesanimation.png"),  textureSize = (128, 128)):
         self.Hitanim2 = False
       
       if not engine.loadImgDrawing(self, "hitglowAnim", os.path.join("themes",themename,"hitglowanimation.png"),  textureSize = (128, 128)):
-        if engine.loadImgDrawing(self, "hitglowDrawing", os.path.join("themes",themename,"hitglow.png"),  textureSize = (128, 128)):
-          if not engine.loadImgDrawing(self, "hitglow2Drawing", os.path.join("themes",themename,"hitglow2.png"),  textureSize = (128, 128)):
-            self.hitglow2Drawing = None
-            self.hitFlamesPresent = False
-        else:
-          self.hitglowDrawing = None
-          self.hitFlamesPresent = False
         self.Hitanim = False
+
+      engine.loadImgDrawing(self, "hitglowDrawing", os.path.join("themes",themename,"hitglow.png"),  textureSize = (128, 128))
+      engine.loadImgDrawing(self, "hitglow2Drawing", os.path.join("themes",themename,"hitglow2.png"),  textureSize = (128, 128))
 
     engine.loadImgDrawing(self, "hitlightning", os.path.join("themes",themename,"lightning.png"),  textureSize = (128, 128))
 
@@ -794,7 +783,7 @@ class Instrument(object):
           ff = self.fretActivity[n] + 1.2
               
           #Alarian: Animated hitflames
-          if self.Hitanim:
+          if self.Hitanim and self.hitglowAnim:
             self.HCount += 1
             if self.HCount > self.Animspeed-1:
               self.HCount = 0
@@ -807,16 +796,16 @@ class Instrument(object):
                                   vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
                                   texcoord = (texX[0],0.0,texX[1],1.0), multiples = True, alpha = True, color = (1,1,1))
 
+          ff += .3
+          vtx = flameSize * ff
 
-          else:   
-            ff += .3
-            vtx = flameSize * ff
-
+          if self.hitglow2Drawing:
             self.engine.draw3Dtex(self.hitglowDrawing, coord = (x, y + .125, 0), rot = (90, 1, 0, 0),
                                   scale = (0.5 + .6 * ms * ff, 1.5 + .6 * ms * ff, 1 + .6 * ms * ff),
                                   vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0), 
                                   multiples = True, alpha = True, color = flameColor)
 
+          if self.hitglow2Drawing:
             self.engine.draw3Dtex(self.hitglow2Drawing, coord = (x, y + .25, .05), rot = (90, 1, 0, 0),
                                   scale = (.40 + .6 * ms * ff, 1.5 + .6 * ms * ff, 1 + .6 * ms * ff),
                                   vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0), 
@@ -846,44 +835,57 @@ class Instrument(object):
       if not isinstance(event, Note):
         continue
 
-      if (event.played or event.hopod) and event.flameCount < flameLimit and self.hitFlamesPresent and not self.disableFlameSFX:
-        if not flameColor == self.spColor:
-          flameColor = self.flameColors[event.number]
-        ms = math.sin(self.time) * .25 + 1
+      if (event.played or event.hopod) and event.flameCount < flameLimit:
+        if not self.disableFlameSFX:
+          if not flameColor == self.spColor:
+            flameColor = self.flameColors[event.number]
+          ms = math.sin(self.time) * .25 + 1
 
-        if self.isDrum:
-          if event.number == 0:
-            x  = (self.strings / 2 - 2) * w
+          if self.isDrum:
+            if event.number == 0:
+              x  = (self.strings / 2 - 2) * w
+            else:
+              x  = (self.strings / 2 +.5 - event.number) * w
           else:
-            x  = (self.strings / 2 +.5 - event.number) * w
-        else:
-          x  = (self.strings / 2 - event.number) * w
+            x  = (self.strings / 2 - event.number) * w
 
-        xlightning = (self.strings / 2 - event.number)*2.2*w
-        ff = 1 + 0.25       
-        y = ff / 6
+          xlightning = (self.strings / 2 - event.number)*2.2*w
+          ff = 1 + 0.25       
+          y = ff / 6
 
-        y -= self.hitFlameYPos
+          y -= self.hitFlameYPos
         
-        ff += 1.5 #ff first time is 2.75 after this
+          ff += 1.5 #ff first time is 2.75 after this
         
-        vtx = flameSize * ff
+          vtx = flameSize * ff
 
-        if self.Hitanim2 == True:
-          self.HCount2 += 1
-          self.HCountAni = False
-          if self.HCount2 >= self.HFrameLimit2:
-            self.HCountAni = True
-          if event.flameCount < flameLimitHalf:
-            HIndex = (self.HCount2 * self.HFrameLimit2 - (self.HCount2 * self.HFrameLimit2) % self.HFrameLimit2) / self.HFrameLimit2
-            if HIndex >= self.HFrameLimit2 and self.HCountAni != True:
-              HIndex = 0
+          if self.Hitanim2 == True and self.hitflamesAnim:
+            self.HCount2 += 1
+            self.HCountAni = False
+            if self.HCount2 >= self.HFrameLimit2:
+              self.HCountAni = True
+            if event.flameCount < flameLimitHalf:
+              HIndex = (self.HCount2 * self.HFrameLimit2 - (self.HCount2 * self.HFrameLimit2) % self.HFrameLimit2) / self.HFrameLimit2
+              if HIndex >= self.HFrameLimit2 and self.HCountAni != True:
+                HIndex = 0
                 
-            texX = (HIndex*(1.0/self.HFrameLimit2), HIndex*(1.0/self.HFrameLimit2)+(1.0/self.HFrameLimit2))
+              texX = (HIndex*(1.0/self.HFrameLimit2), HIndex*(1.0/self.HFrameLimit2)+(1.0/self.HFrameLimit2))
 
-            self.engine.draw3Dtex(self.hitflamesAnim, coord = (x, y + .665, 0), rot = (90, 1, 0, 0), scale = (1.6, 1.6, 4.9),
-                                  vertex = (-vtx,-vtx,vtx,vtx), texcoord = (texX[0],0.0,texX[1],1.0), 
-                                  multiples = True, alpha = True, color = (1,1,1))
+              self.engine.draw3Dtex(self.hitflamesAnim, coord = (x, y + .665, 0), rot = (90, 1, 0, 0), scale = (1.6, 1.6, 4.9),
+                                    vertex = (-vtx,-vtx,vtx,vtx), texcoord = (texX[0],0.0,texX[1],1.0), 
+                                    multiples = True, alpha = True, color = (1,1,1))
+          self.HCountAni = True
+          if event.flameCount < flameLimitHalf and self.hitflames2Drawing:
+            self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x, y + .20, 0), rot = (90, 1, 0, 0),
+                                  scale = (.25 + .6 * ms * ff, event.flameCount/6.0 + .6 * ms * ff, event.flameCount / 6.0 + .6 * ms * ff),
+                                  vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
+                                  multiples = True, alpha = True, color = flameColor)
+
+            for i in range(3):
+              self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x-.005, y + .255, 0), rot = (90, 1, 0, 0),
+                                    scale = (.30 + i*0.05 + .6 * ms * ff, event.flameCount/(5.5 - i*0.4) + .6 * ms * ff, event.flameCount / (5.5 - i*0.4) + .6 * ms * ff),
+                                    vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
+                                    multiples = True, alpha = True, color = flameColor)
 
           else:
             scaleChange = (3.0,2.5,2.0,1.7)
@@ -903,48 +905,11 @@ class Instrument(object):
               else:
                 yzscaleMod = (event.flameCount + 1)/ scaleChange[step]
 
-              self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x - .005, y + yOffset[step], 0), rot = (90, 1, 0, 0),
-                            scale = (.25 + step*.05 + scaleMod, yzscaleMod + scaleMod, yzscaleMod + scaleMod),
-                            vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
-                            multiples = True, alpha = True, color = flameColor)
-                                  
-        else:
-          self.HCountAni = True
-          if event.flameCount < flameLimitHalf:
-            self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x, y + .20, 0), rot = (90, 1, 0, 0),
-                                    scale = (.25 + .6 * ms * ff, event.flameCount/6.0 + .6 * ms * ff, event.flameCount / 6.0 + .6 * ms * ff),
-                                    vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
-                                    multiples = True, alpha = True, color = flameColor)
-            
-                 
-            for i in range(3):
-              self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x-.005, y + .255, 0), rot = (90, 1, 0, 0),
-                                    scale = (.30 + i*0.05 + .6 * ms * ff, event.flameCount/(5.5 - i*0.4) + .6 * ms * ff, event.flameCount / (5.5 - i*0.4) + .6 * ms * ff),
-                                    vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
-                                    multiples = True, alpha = True, color = flameColor)
-
-          else:
-            scaleChange = (3.0,2.5,2.0,1.7)
-            yOffset = (.35, .405, .355, .355)
-            scaleMod = .6 * ms * ff
-
-            for step in range(4):
-              #draw lightning in GH themes on SP gain
-              if step == 0 and event.finalStar and self.spEnabled and self.hitlightning:
-                self.engine.draw3Dtex(self.hitlightning, coord = (xlightning, ff / 6, 3.3), rot = (90, 1, 0, 0),
-                                    scale = (.15 + .5 * ms * ff, event.flameCount / 3.0 + .6 * ms * ff, 2), vertex = (.4,-2,-.4,2),
-                                    texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = (1,1,1))
-                continue
-            
-              if step == 0:
-                yzscaleMod = event.flameCount/ scaleChange[step]
-              else:
-                yzscaleMod = (event.flameCount + 1)/ scaleChange[step]
-
-              self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x - .005, y + yOffset[step], 0), rot = (90, 1, 0, 0),
-                              scale = (.25 + step*.05 + scaleMod, yzscaleMod + scaleMod, yzscaleMod + scaleMod),
-                              vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
-                              multiples = True, alpha = True, color = flameColor)
+              if self.hitflames1Drawing: 
+                self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x - .005, y + yOffset[step], 0), rot = (90, 1, 0, 0),
+                                      scale = (.25 + step*.05 + scaleMod, yzscaleMod + scaleMod, yzscaleMod + scaleMod),
+                                      vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
+                                      multiples = True, alpha = True, color = flameColor)
 
         event.flameCount += 1
 

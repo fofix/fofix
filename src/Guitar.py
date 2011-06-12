@@ -308,7 +308,7 @@ class Guitar(Instrument):
         if self.hitFlamesPresent:   #MFH - only if present!
           self.renderFreestyleFlames(visibility, controls)    #MFH - freestyle hit flames
 
-      else:    
+      else:
         self.renderTails(visibility, song, pos, killswitch)
         if self.fretsUnderNotes:  #MFH
           if self.twoDnote == True:
@@ -323,11 +323,10 @@ class Guitar(Instrument):
 
         self.renderFreestyleLanes(visibility, song, pos, None) #MFH - render the lanes on top of the notes.
 
-        
-        if self.hitFlamesPresent:   #MFH - only if present!
-          self.renderHitGlow()
-          self.renderHitTrails(controls)
-          self.renderFlames(song, pos, controls)    #MFH - only when freestyle inactive!
+
+        self.renderHitGlow()
+        self.renderHitTrails(controls)
+        self.renderFlames(song, pos, controls)    #MFH - only when freestyle inactive!
         
       if self.leftyMode:
         if not self.battleStatus[6]:
