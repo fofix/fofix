@@ -54,6 +54,8 @@ class CustomTheme(Theme):
     self.starFillupInRadius = 121
     self.starFillupOutRadius = 138
     self.starFillupColor = (1,.95,.37)
+    self.holdFlameYPos = .1
+    self.hitFlameYPos = .5
     self.loadingPhrase = ["If you see a series of glowing white notes, hit it perfectly to gain Energy.","The louder the better!",\
                       "You can buy a real guitar for pretty cheap - maybe it's time to invest.",\
                       "Play flawlessly to get a score multiplier going.  The longer you hold a streak, the higher your multiplier will get.",\
