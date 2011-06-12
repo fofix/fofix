@@ -466,6 +466,8 @@ class Slide(Effect):
 
 
     self.position = self.startCoord[:]
+    if isinstance(self.layer, FontLayer):
+        self.position[1] = .75 - self.position[1]*.75
     
     self.reverse = bool(eval(self.getexpr("reverse", "True")))
 
@@ -475,6 +477,7 @@ class Slide(Effect):
     self.rates = [0,0]
     self.updateRates()
     
+  #updates the rate at which the layer will slide
   def updateRates(self):
     t = self.transitionTime * (max(self.engine.clock.get_fps(), _minFPS)) / 1000.0
     for i in range(2):
@@ -482,22 +485,51 @@ class Slide(Effect):
         self.rates[i] = (self.startCoord[i] - self.endCoord[i])/t
       else:
         self.rates[i] = (self.endCoord[i] - self.startCoord[i])/t
+    
     if isinstance(self.layer, FontLayer):
-      self.rates[1] *= -.75
+      self.rates[1] *= .75
       self.rates[1] = .75 - self.rates[1]
       
-  def update(self):
+  #setting position for Font layers is different due to the y coordinates being reversed,
+  # this makes calculating a little more complex
+  def setFontPosition(self, sC, eC):
     condition = bool(eval(self.condition))
 
-    self.updateRates()
+    eC[1] = .75 - (eC[1]*.75)
+    sC[1] = .75 - (sC[1]*.75)
     
-    eC = self.endCoord[:]
-    sC = self.startCoord[:]
+    if condition:
+      for i in range(2):
+        if (self.position[i] > eC[i])*(i == 0):
+          if (self.endCoord[i] < self.startCoord[i]):
+            self.position[i] -= self.rates[i]
+          else:
+            self.position[i] = eC[i]
+        elif (self.position[i] < eC[i])*(i == 0):
+          if (self.endCoord[i] > self.startCoord[i]):
+            self.position[i] += self.rates[i]
+          else:
+            self.position[i] = eC[i]
+    else:
+      if self.reverse:
+        for i in range(2):
+          if self.position[i] > sC[i]:
+            if self.endCoord[i] > self.startCoord[i]:
+              self.position[i] -= self.rates[i]
+            else:
+              self.position[i] = sC[i]
+          elif self.position[i] < sC[i]:
+            if self.endCoord[i] < self.startCoord[i]:
+              self.position[i] += self.rates[i]
+            else:
+              self.position[i] = sC[i]
         
-    if isinstance(self.layer, FontLayer):
-      eC[1] = .75 - (eC[1]*.75)
-      sC[1] = .75 - (sC[1]*.75)
-        
+      else:  
+        self.position = sC
+    
+  def setPosition(self, sC, eC):
+    condition = bool(eval(self.condition))
+
     if condition:
       for i in range(2):
         if self.position[i] > eC[i]:
@@ -523,9 +555,20 @@ class Slide(Effect):
               self.position[i] += self.rates[i]
             else:
               self.position[i] = sC[i]
-        
       else:  
         self.position = sC
+        
+  def update(self):
+
+    self.updateRates()
+    
+    eC = self.endCoord[:]
+    sC = self.startCoord[:]
+        
+    if isinstance(self.layer, FontLayer):
+      self.setFontPosition(sC, eC)
+    else:
+      self.setPosition(sC, eC)
         
     self.layer.position = self.position[:]
 
