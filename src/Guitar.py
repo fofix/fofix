@@ -36,7 +36,7 @@ from OpenGL.GL import *
 
 class Guitar(Instrument):
   def __init__(self, engine, playerObj, editorMode = False, player = 0, bass = False):
-    Instrument.__init__(self, engine, playerObj, player)
+    super(Guitar, self).__init__(engine, playerObj, player)
 
     self.isDrum = False
     self.isBassGuitar = bass
@@ -144,7 +144,7 @@ class Guitar(Instrument):
         self.keypos = self.engine.theme.keypos
         self.keyrot = self.engine.theme.keyrot
 
-        if self.keyTex:
+        if self.keytex:
           texture = getattr(self,"keytex"+chr(97+n)).texture
         else:
           texture = None

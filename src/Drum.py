@@ -57,7 +57,7 @@ from Instrument import *
 
 class Drum(Instrument):
   def __init__(self, engine, playerObj, editorMode = False, player = 0):
-    Instrument.__init__(self, engine, playerObj, player)
+    super(Drum, self).__init__(engine, playerObj, player)
 
     self.isDrum = True
     self.isBassGuitar = False
