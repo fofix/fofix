@@ -249,8 +249,8 @@ class SongInfo(object):
       if self.logUneditedMidis == 1:
         Log.debug("notes-unedited.mid not found, using notes.mid - " + self.name)
     self.noteFileName = os.path.join(os.path.dirname(self.fileName), notefile)
-    
-    for part in self.getParts():
+
+    for part in parts.values():
       self.getScores(part)
     
     #stump: metadata caching
@@ -277,6 +277,7 @@ class SongInfo(object):
           _songDB.execute('DELETE FROM `songinfo` WHERE `hash` = ?', [songhash])
 
       #stump: preload this stuff...
+      self.getParts()
       self.getSections()
 
       #stump: Write this song's info into the cache.
