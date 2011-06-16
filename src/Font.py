@@ -211,7 +211,7 @@ class Font:
 
       if self.shadow or shadow:
         with cmgl.PushedAttrib(GL_CURRENT_BIT):
-          glColor4f(0, 0, 0, 1)
+          glColor4f(0, 0, 0, glGetDoublev(GL_CURRENT_COLOR)[3])
           with cmgl.PushedMatrix():
             glTranslatef(shadowoffset[0], shadowoffset[1], 0)
             drawSquare(w,h,tw,th)
