@@ -179,7 +179,7 @@ class Guitar(Instrument):
           if self.theme == 2:
             y -= 0.5
           
-          flameSize = self.flameSizes[self.cappedScoreMult - 1][fretNum]
+          flameSize = self.hitFlameSize
           if self.theme == 0 or self.theme == 1: #THIS SETS UP GH3 COLOR, ELSE ROCKBAND(which is DEFAULT in Theme.py)
             flameColor = self.gh3flameColor
           else: #MFH - fixing crash!
