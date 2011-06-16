@@ -155,7 +155,7 @@ class Guitar(Instrument):
     glDisable(GL_DEPTH_TEST)
 
   def renderFreestyleFlames(self, visibility, controls):
-    if self.flameColors[0][0][0] == -1:
+    if self.flameColors[0][0] == -1:
       return
 
     w = self.boardWidth / self.strings
