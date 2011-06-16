@@ -546,13 +546,13 @@ class Fade(Effect):
     #the current color of the image
     self.currentColor = list(color)
     if len(self.currentColor) == 3:
-      self.currentColor.append(255.0)
+      self.currentColor.append(1.0)
     
     #the color to fade to
     color = list(self.engine.theme.hexToColor(self.get("fadeTo", str, "#FFFFFF")))
     #makes sure alpha is added
     if len(color) == 3:
-      color.append(255.0)
+      color.append(1.0)
     
     #the colors to alternate between
     self.colors = [color, self.currentColor]
@@ -567,7 +567,7 @@ class Fade(Effect):
 
   def updateRates(self):
     t = self.transitionTime * (max(self.engine.clock.get_fps(), _minFPS)) / 1000.0
-    self.rates = [(self.colors[0][i] - self.colors[1][i])*t 
+    self.rates = [(self.colors[0][i] - self.colors[1][i])/t 
                       for i in range(4)]
     
   def update(self):
