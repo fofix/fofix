@@ -185,6 +185,7 @@ class Instrument(object):
     self.spEnabled = True
     self.starPower = 0
     self.starPowerGained = False
+    self.spNote = False
 
     self.starpowerMode = self.engine.config.get("game", "starpower_mode") #MFH
     self.killPoints = False
@@ -1235,7 +1236,6 @@ class Instrument(object):
           length     = 0
 
       tailOnly   = False
-      spNote = False
 
       #myfingershurt: user setting for starpower refill / replenish notes
       if self.starPowerActive:
@@ -1253,9 +1253,9 @@ class Instrument(object):
         self.starNotesInView = True
 
       if event.star and self.spEnabled:
-        spNote = True
+        self.spNote = True
       if event.finalStar and self.spEnabled:
-        spNote = True
+        self.spNote = True
         if event.played or event.hopod:
           if event.flameCount < 1 and not self.starPowerGained:
             if self.starPower < 50 and self.isDrum:   #not enough starpower to activate yet, kill existing drumfills
@@ -1303,7 +1303,7 @@ class Instrument(object):
 
         glPushMatrix()
         glTranslatef(x, 0, z)
-        self.renderNote(length, sustain = sustain, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote, isOpen = isOpen)
+        self.renderNote(length, sustain = sustain, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = self.spNote, isOpen = isOpen)
         glPopMatrix()
       else:
         if z + length < -1.0:
@@ -1326,7 +1326,7 @@ class Instrument(object):
         else:
           renderNote = 0
         if renderNote == 0:
-          self.renderNote(length, sustain = sustain, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote)
+          self.renderNote(length, sustain = sustain, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = self.spNote)
         glPopMatrix()
 
     #myfingershurt: end FOR loop / note rendering loop       
