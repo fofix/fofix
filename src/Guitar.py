@@ -150,7 +150,7 @@ class Guitar(Instrument):
           texture = None
           
         c = [.1 + .8 * c[0] + f, .1 + .8 * c[1] + f, .1 + .8 * c[2] + f, v]
-        self.draw3DKey(texture,self.keyMesh, x, y, c, n)
+        self.render3DKey(texture,self.keyMesh, x, y, c, n)
             
     glDisable(GL_DEPTH_TEST)
 
