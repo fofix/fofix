@@ -530,7 +530,6 @@ class SongChoosingScene(Scene):
     guitars = []
     drums = []
     vocals = []
-    print info.parts
     for part in info.parts:
       if part.id == 4 or part.id == 7:
         drums.append(part)
