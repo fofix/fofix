@@ -206,12 +206,12 @@ class SongInfo(object):
   def __init__(self, infoFileName, songLibrary = DEFAULT_LIBRARY):
     self.songName      = os.path.basename(os.path.dirname(infoFileName))
     self.fileName      = infoFileName
-    self.libraryNam       = songLibrary[:]
+    self.libraryNam    = songLibrary[:]
     self.info          = Config.MyConfigParser()
     self._partDifficulties = {}
     self._parts        = None
     self._midiStyle    = None
-    self.highScores = {}
+    self.highScores    = {}
 
     self.locked = False
 
@@ -226,9 +226,6 @@ class SongInfo(object):
     except:
       pass
 
-    for part in self.getParts():
-      self.getScores(part)
-    
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("SongInfo class init (song.py): " + self.name)
@@ -252,6 +249,9 @@ class SongInfo(object):
       if self.logUneditedMidis == 1:
         Log.debug("notes-unedited.mid not found, using notes.mid - " + self.name)
     self.noteFileName = os.path.join(os.path.dirname(self.fileName), notefile)
+    
+    for part in self.getParts():
+      self.getScores(part)
     
     #stump: metadata caching
     if Config.get("performance", "cache_song_metadata"):
@@ -277,7 +277,6 @@ class SongInfo(object):
           _songDB.execute('DELETE FROM `songinfo` WHERE `hash` = ?', [songhash])
 
       #stump: preload this stuff...
-      self.getParts()
       self.getSections()
 
       #stump: Write this song's info into the cache.
@@ -458,7 +457,7 @@ class SongInfo(object):
       for part in self._parts:
         self._partDifficulties[part.id] = difficulties.values()
     return self._parts
-
+    
   def getName(self):
     return self._get("name")
 
@@ -2798,7 +2797,7 @@ class MidiReader(midi.MidiOutStream):
           self.useVocalTrack = True
         self.partnumber = part
         if self.logSections == 1:
-          tempText2 = name.replace(" ", "_")
+          tempText2 = text.replace(" ", "_")
         break	#should only have one instance of an instrument
         break   #end the searching
     
@@ -3272,7 +3271,7 @@ class MidiPartsDiffReader(midi.MidiOutStream):
 
     for part in parts.values():
       if text in part.trackName:
-        if part not in self.song.parts:
+        if part not in self.parts:
           if part.id == VOCAL_PART:
             self.parts.append(part)
             self.nextPart = None

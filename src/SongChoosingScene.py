@@ -415,7 +415,7 @@ class SongChoosingScene(Scene):
     vocals = []
     autoPart = None
     for part in info.parts:
-      if part.id == 4:
+      if part.id == 4 or part.id == 7:
         drums.append(part)
       elif part.id == 5:
         vocals.append(part)
@@ -530,6 +530,7 @@ class SongChoosingScene(Scene):
     guitars = []
     drums = []
     vocals = []
+    print info.parts
     for part in info.parts:
       if part.id == 4 or part.id == 7:
         drums.append(part)
@@ -638,7 +639,7 @@ class SongChoosingScene(Scene):
     drums = []
     vocals = []
     for part in info.parts:
-      if part.id == 4:
+      if part.id == 4 or part.id == 7:
         drums.append(part)
       elif part.id == 5:
         vocals.append(part)
