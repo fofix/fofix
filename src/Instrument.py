@@ -392,6 +392,8 @@ class Instrument(object):
       
       if not engine.loadImgDrawing(self, "hitflamesAnim", os.path.join("themes",themename,"hitflamesanimation.png"),  textureSize = (128, 128)):
         self.Hitanim2 = False
+
+      engine.loadImgDrawing(self, "powerHitflamesAnim", os.path.join("themes",themename,"powerhitflamesanimation.png"),  textureSize = (128, 128))
       
       if not engine.loadImgDrawing(self, "hitglowAnim", os.path.join("themes",themename,"hitglowanimation.png"),  textureSize = (128, 128)):
         self.Hitanim = False
@@ -880,8 +882,12 @@ class Instrument(object):
                 HIndex = 0
                 
               texX = (HIndex*(1.0/self.HFrameLimit2), HIndex*(1.0/self.HFrameLimit2)+(1.0/self.HFrameLimit2))
+              if self.powerHitflamesAnim and self.starPowerActive.
+                texture = self.powerHitflamesAnim
+              else:
+                texture = self.hitflamesAnim
 
-              self.engine.draw3Dtex(self.hitflamesAnim, coord = (x, y + .665, 0), rot = (90, 1, 0, 0), scale = (1.6, 1.6, 4.9),
+              self.engine.draw3Dtex(texture, coord = (x, y + .665, 0), rot = (90, 1, 0, 0), scale = (1.6, 1.6, 4.9),
                                     vertex = (-vtx,-vtx,vtx,vtx), texcoord = (texX[0],0.0,texX[1],1.0), 
                                     multiples = True, alpha = True, color = (1,1,1))
           self.HCountAni = True
