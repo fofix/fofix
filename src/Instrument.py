@@ -876,7 +876,7 @@ class Instrument(object):
             self.HCountAni = False
             if self.HCount2 >= self.HFrameLimit2:
               self.HCountAni = True
-            if event.flameCount < flameLimitHalf:
+            if self.HCount2 < self.HFrameLimit2:
               HIndex = (self.HCount2 * self.HFrameLimit2 - (self.HCount2 * self.HFrameLimit2) % self.HFrameLimit2) / self.HFrameLimit2
               if HIndex >= self.HFrameLimit2 and self.HCountAni != True:
                 HIndex = 0
@@ -926,6 +926,9 @@ class Instrument(object):
                                     texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = (1,1,1))
 
         event.flameCount += 1
+
+    if self.hitflamesAnim and self.HCount2 > self.HFrameLimit2:
+      self.HCount2 = 0
 
   def renderNote(self, length, sustain, color, tailOnly = False, isTappable = False, fret = 0, spNote = False, isOpen = False, spAct = False):
 
