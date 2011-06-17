@@ -759,7 +759,7 @@ class Instrument(object):
 
     w = self.boardWidth / self.strings
 
-    if self.starPowerActive:
+    if self.starPowerActive or self.spNote:
       flameColor = self.spColor
     else:
       flameColor = 0
