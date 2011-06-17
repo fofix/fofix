@@ -761,7 +761,7 @@ class Instrument(object):
 
     w = self.boardWidth / self.strings
 
-    if self.starPowerActive or self.spNote:
+    if self.starPowerActive or self.spNote == True:
       flameColor = self.spColor
     else:
       flameColor = 0
@@ -1252,6 +1252,8 @@ class Instrument(object):
         elif self.spRefillMode == 2 and song.midiStyle != 1: #mode 2 = refill based on MIDI type
           self.spEnabled = False
 
+      self.spNote = False
+
       if event.star:
         self.starNotesInView = True
       if event.finalStar:
@@ -1420,7 +1422,7 @@ class Instrument(object):
       length     = 0
 
       tailOnly   = False
-      spNote = False
+      self.spNote = False
 
       #myfingershurt: user setting for starpower refill / replenish notes
       if self.starPowerActive:
@@ -1475,7 +1477,7 @@ class Instrument(object):
 
       glPushMatrix()
       glTranslatef(x, 0, z)
-      self.renderNote(length, sustain = sustain, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote, isOpen = isOpen)
+      self.renderNote(length, sustain = sustain, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = self.spNote, isOpen = isOpen)
       glPopMatrix()
 
     #myfingershurt: end FOR loop / note rendering loop       
