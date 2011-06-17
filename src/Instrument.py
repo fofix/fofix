@@ -882,7 +882,7 @@ class Instrument(object):
                 HIndex = 0
                 
               texX = (HIndex*(1.0/self.HFrameLimit2), HIndex*(1.0/self.HFrameLimit2)+(1.0/self.HFrameLimit2))
-              if self.powerHitflamesAnim and self.starPowerActive.
+              if self.powerHitflamesAnim and self.starPowerActive:
                 texture = self.powerHitflamesAnim
               else:
                 texture = self.hitflamesAnim
