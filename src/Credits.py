@@ -119,34 +119,34 @@ class Credits(Layer, KeyListener):
     
     #akedrou - Translatable Strings:
     self.bank = {}
-    self.bank['intro']      = [_("This mod was built on Alarian's mod,"),
+    self.bank['intro']      = [_("Frets on Fire X is a progression of MFH-mod,"),
+                               _("which was built on Alarian's mod,"),
                                _("which was built on UltimateCoffee's Ultimate mod,"),
                                _("which was built on RogueF's RF_mod 4.15,"),
                                _("which was, of course, built on Frets on Fire 1.2.451,"),
                                _("which was created by Unreal Voodoo")]
-    self.bank['noOrder']    = [_("No Particular Order")]
-    self.bank['coders']     = [_("Active Coders:")]
-    self.bank['pastCoders'] = [_("Past Coders:")]
-    self.bank['graphics']   = [_("Main Graphic Contributors:")]
-    self.bank['translators']= [_("Translators:")]
-    self.bank['Team Hero']  = [_("Team Hero:")]
-    self.bank['careerMode'] = [_("Creators of Career Mode")]
-    self.bank['honorary']   = [_("Honorary Credits to:")]
-    self.bank['donations']  = [_("Donations to MFH")]
-    self.bank['adonations'] = [_("Donations to akedrou")]
-    self.bank['majorDonor'] = [_("Major Donations:")]
-    self.bank['otherDonor'] = [_("Other Donations:")]
-    self.bank['other']      = [_("Other Credits:")]
+    self.bank['noOrder']    = [_("No particular order")]
+    self.bank['accessOrder']= [_("In order of project commit access")]
+    self.bank['coders']     = [_("Active Coders")]
+    self.bank['otherCoding']= [_("Programming")]
+    self.bank['graphics']   = [_("Graphic Design")]
+    self.bank['3d']         = [_("3D Textures")]
+    self.bank['logo']       = [_("FoFiX Logo Design")]
+    self.bank['hollowmind'] = [_("Hollowmind Necks")]
+    self.bank['themes']     = [_("Included Themes")]
+    self.bank['shaders']    = [_("Shaders")]
+    self.bank['sounds']     = [_("Sound Design")]
+    self.bank['translators']= [_("Translators")]
+    self.bank['honorary']   = [_("Honorary Credits")]
+    self.bank['codeHonor']  = [_("Without whom this game would not exist")]
+    self.bank['giveThanks'] = [_("Special Thanks to")]
+    self.bank['community']  = [_("nwru and all of the community at fretsonfire.net")]
+    self.bank['other']      = [_("Other Contributors:")]
     self.bank['tutorial']   = [_("Jurgen FoF tutorial inspired by adam02"),
                                _("Drum test song tutorial by Heka"),
-                               _("Bang Bang Mystery Man song tutorial is from the original FoF"),
                                _("Drum Rolls practice tutorial by venom426")]
-    self.bank['disclaimer'] = [_("If you see your work included in this game and you aren't"),
-                               _("in the credits, please leave a polite post stating what you"),
-                               _("did and when, as specific as possible."),
-                               _("If you can, please provide a link to your original posting"),
-                               _("of the work in question."),
-                               _("Then we can properly credit you.")]
+    self.bank['disclaimer'] = [_("If you have contributed to this game and are not credited,"),
+                               _("please let us know what and when you contributed.")]
     self.bank['thanks']     = [_("Thank you for your contribution.")]
     self.bank['oversight']  = [_("Please keep in mind that it is not easy to trace down and"),
                                _("credit every single person who contributed; if your name is"),
@@ -191,25 +191,16 @@ class Credits(Layer, KeyListener):
     space = Text(nf, hs, c1, "center", " ")
     self.credits = [
       Picture(self.engine, "fofix_logo.png", .10), 
-      Text(nf, ns, c1, "center", "%s" % Version.version()) ]
+      Text(nf, ns, c1, "center", "%s" % Version.version()), space]
 
     # evilynux: Main FoFiX credits (taken from CREDITS).
     self.parseText("CREDITS")
+    self.credits.extend([space, space, space])
     # evilynux: Theme credits (taken from data/themes/<theme name>/CREDITS).
     self.parseText(os.path.join('data', 'themes', self.themename, 'CREDITS'))
 
-    self.credits.append(space)
-    for i in self.bank['disclaimer']:
-      self.credits.append( Text(nf, ns, c2, "center", i ) )
-    self.credits.append(space)
-    for i in self.bank['thanks']:
-      self.credits.append( Text(nf, ns, c2, "center", i ) )
-    self.credits.append(space)
-    for i in self.bank['oversight']:
-      self.credits.append( Text(nf, ns, c2, "center", i ) )
-
     self.credits.extend( [
-      space,
+      space, space, 
       Text(nf, ns, c1, "left",   _("Made with:")),
       Text(nf, ns, c2, "right",  "Python " + sys.version.split(' ')[0]),  #stump: the version that's actually in use
       Text(nf, bs, c2, "right",  "http://www.python.org"),
@@ -249,6 +240,7 @@ class Credits(Layer, KeyListener):
     c1 = (1, 1, .5, 1)
     c2 = (1, .75, 0, 1)
     space = Text(nf, hs, c1, "center", " ")
+    scale = 1
 
     path = filename
     if not hasattr(sys,"frozen"): #MFH - add ".." to path only if running from sources - not if running from EXE
@@ -261,6 +253,12 @@ class Credits(Layer, KeyListener):
       line = line.strip("\n")
       if line.startswith("=====") or line.startswith("-----"):
         continue
+      try:
+        if line.startswith("!") and line.endswith("!"):
+          scale = float(line.strip("!"))
+          continue
+      except ValueError:
+        Log.warn("CREDITS file does not parse properly")
       if line == "":
         self.credits.append(space)
       elif line.startswith("`") and line.endswith("`"):
@@ -269,43 +267,43 @@ class Credits(Layer, KeyListener):
           line = line.strip("%")
           try:
             for text in self.bank[line]:
-              self.credits.append( Text(nf, bs, c1, "left", "%s" % text) )
+              self.credits.append( Text(nf, bs*scale, c1, "left", "%s" % text) )
           except KeyError:
-            self.credits.append( Text(nf, bs, c1, "left", "%s" % line) )
+            self.credits.append( Text(nf, bs*scale, c1, "left", "%s" % line) )
         else:
-          self.credits.append( Text(nf, bs, c1, "left", "%s" % line) )
+          self.credits.append( Text(nf, bs*scale, c1, "left", "%s" % line) )
       elif line.startswith("_") and line.endswith("_"):
         line = line.strip("_")
         if line.startswith("%") and line.endswith("%"):
           line = line.strip("%")
           try:
             for text in self.bank[line]:
-              self.credits.append( Text(nf, ns, c2, "center", "%s" % text) )
+              self.credits.append( Text(nf, ns*scale, c2, "center", "%s" % text) )
           except KeyError:
-            self.credits.append( Text(nf, ns, c2, "center", "%s" % line) )
+            self.credits.append( Text(nf, ns*scale, c2, "center", "%s" % line) )
         else:
-          self.credits.append( Text(nf, ns, c2, "center", "%s" % line) )
+          self.credits.append( Text(nf, ns*scale, c2, "center", "%s" % line) )
       elif line.startswith("=") and line.endswith("="):
         line = line.strip("=")
         if line.startswith("%") and line.endswith("%"):
           line = line.strip("%")
           try:
             for text in self.bank[line]:
-              self.credits.append( Text(nf, ns, c1, "left", "%s" % text) )
+              self.credits.append( Text(nf, ns*scale, c1, "left", "%s" % text) )
           except KeyError:
-            self.credits.append( Text(nf, ns, c1, "left", "%s" % line) )
+            self.credits.append( Text(nf, ns*scale, c1, "left", "%s" % line) )
         else:
-          self.credits.append( Text(nf, ns, c1, "left", "%s" % line) )
+          self.credits.append( Text(nf, ns*scale, c1, "left", "%s" % line) )
       else:
         if line.startswith("%") and line.endswith("%"):
           line = line.strip("%")
           try:
             for text in self.bank[line]:
-              self.credits.append( Text(nf, ns, c2, "right", "%s" % text) )
+              self.credits.append( Text(nf, ns*scale, c2, "right", "%s" % text) )
           except KeyError:
-            self.credits.append( Text(nf, ns, c2, "right", "%s" % line) )
+            self.credits.append( Text(nf, ns*scale, c2, "right", "%s" % line) )
         else:
-          self.credits.append( Text(nf, ns, c2, "right", "%s" % line) )
+          self.credits.append( Text(nf, ns*scale, c2, "right", "%s" % line) )
 
   def shown(self):
     self.engine.input.addKeyListener(self)

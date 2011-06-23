@@ -36,13 +36,14 @@ from OpenGL.GL import *
 
 class Guitar(Instrument):
   def __init__(self, engine, playerObj, editorMode = False, player = 0, bass = False):
-    Instrument.__init__(self, engine, playerObj, player)
+    super(Guitar, self).__init__(engine, playerObj, player)
 
     self.isDrum = False
     self.isBassGuitar = bass
     self.isVocal = False
 
     self.strings        = 5
+    self.strings2       = 5
 
     self.debugMode = False
     self.gameMode2p = self.engine.world.multiplayer
@@ -99,8 +100,61 @@ class Guitar(Instrument):
 
     self.neck = Neck(self.engine, self, playerObj)
 
+  def renderFrets(self, visibility, song, controls):
+    w = self.boardWidth / self.strings
+    size = (.22, .22)
+    v = 1.0 - visibility
+    
+    glEnable(GL_DEPTH_TEST)
+
+    for n in range(self.strings2):
+      pressed = None #to make sure guitar doesnt crash
+      keyNumb = n
+      f = self.fretWeight[keyNumb]
+      c = list(self.fretColors[keyNumb])
+
+      y = v / 6
+      x = (self.strings / 2 - n) * w
+
+      if self.twoDkeys == True or not self.keyMesh:
+        fretColor = (1,1,1,1)
+        size = (self.boardWidth / self.strings / 2, self.boardWidth / self.strings / 2.4)
+        texSize = (n / self.lanenumber, n / self.lanenumber + 1 / self.lanenumber)
+
+        if self.battleStatus[3] and self.battleFrets != None and self.battleBreakString == n:
+          texSize = (n/5.0+.042,n/5.0+0.158)
+          size = (.30, .40)
+          fretPos = 8 - round((self.battleBreakNow/self.battleBreakLimit) * 8)
+          texY = (fretPos/8.0,(fretPos + 1.0)/8)
+
+        else:
+          texY = (0.0, 1.0 / self.fretImgColNumber)#fret normal guitar/bass/drums
+
+          if controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]) or (self.isDrum and pressed):#fret press
+            texY = (1.0 / self.fretImgColNumber, 2.0 / self.fretImgColNumber)
+
+          elif self.hit[n] or (self.battleStatus[3] and self.battleBreakString == n):#frets on note hit
+            texY = (2.0 / self.fretImgColNumber,1.0)
+
+        self.engine.draw3Dtex(self.fretButtons, vertex = (size[0],size[1],-size[0],-size[1]), texcoord = (texSize[0], texY[0], texSize[1], texY[1]),
+                                coord = (x,v,0), multiples = True,color = fretColor, depth = True)
+
+      else:
+        self.keypos = self.engine.theme.keypos
+        self.keyrot = self.engine.theme.keyrot
+
+        if self.keytex:
+          texture = getattr(self,"keytex"+chr(97+n)).texture
+        else:
+          texture = None
+          
+        c = [.1 + .8 * c[0] + f, .1 + .8 * c[1] + f, .1 + .8 * c[2] + f, v]
+        self.render3DKey(texture,self.keyMesh, x, y, c, n)
+            
+    glDisable(GL_DEPTH_TEST)
+
   def renderFreestyleFlames(self, visibility, controls):
-    if self.flameColors[0][0][0] == -1:
+    if self.flameColors[0][0] == -1:
       return
 
     w = self.boardWidth / self.strings
@@ -124,7 +178,7 @@ class Guitar(Instrument):
           if self.theme == 2:
             y -= 0.5
           
-          flameSize = self.flameSizes[self.cappedScoreMult - 1][fretNum]
+          flameSize = self.hitFlameSize
           if self.theme == 0 or self.theme == 1: #THIS SETS UP GH3 COLOR, ELSE ROCKBAND(which is DEFAULT in Theme.py)
             flameColor = self.gh3flameColor
           else: #MFH - fixing crash!
@@ -253,7 +307,7 @@ class Guitar(Instrument):
         if self.hitFlamesPresent:   #MFH - only if present!
           self.renderFreestyleFlames(visibility, controls)    #MFH - freestyle hit flames
 
-      else:    
+      else:
         self.renderTails(visibility, song, pos, killswitch)
         if self.fretsUnderNotes:  #MFH
           if self.twoDnote == True:
@@ -268,11 +322,10 @@ class Guitar(Instrument):
 
         self.renderFreestyleLanes(visibility, song, pos, None) #MFH - render the lanes on top of the notes.
 
-        
-        if self.hitFlamesPresent:   #MFH - only if present!
-          self.renderHitGlow()
-          self.renderHitTrails(visibility, song, pos, controls)
-          self.renderFlames(visibility, song, pos, controls)    #MFH - only when freestyle inactive!
+
+        self.renderHitGlow()
+        self.renderHitTrails(controls)
+        self.renderFlames(song, pos, controls)    #MFH - only when freestyle inactive!
         
       if self.leftyMode:
         if not self.battleStatus[6]:

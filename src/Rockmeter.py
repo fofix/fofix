@@ -39,6 +39,7 @@ from PIL import Image, ImageDraw
 from OpenGL.GL import *
 
 import math
+from math import *
 
 from Theme import halign, valign
 from constants import *
@@ -64,6 +65,8 @@ stars = 0               #how many stars earned
 partialStars = 0        #percentage of the current star earned
 rock = 0                #rock meter fill amount
 multiplier = 0          #player's multiplier
+bassgroove = False      #if a player is a bass guitar and their streak is over 30, they enter bass groove, track this
+boost = False           #keeps track if a player is boosting their multiplier (star power/overdrive activated)
 
 minutes = 0             #how many minutes into the song it is
 seconds = 0             #how many seconds into the song it is (0-59)
@@ -87,7 +90,7 @@ _minFPS = 10            #minimum frame limit for effects that allow the theme ma
 class ConfigGetMixin(object):
   def get(self, value, type = str, default = None):
     if self.config.has_option(self.section, value):
-      return type(self.config.get(self.section, value))
+      return type(self.config.get(self.section, value).strip())
     return default
 
   def getexpr(self, value, default=None):
@@ -100,7 +103,7 @@ class ConfigGetMixin(object):
   def getexprs(self, value, default=None, separator='|'):
     if self.config.has_option(self.section, value):
       filename, lineno = self.config.getlineno(self.section, value)
-      exprs = self.config.get(self.section, value).split(separator)
+      exprs = [e.strip() for e in self.config.get(self.section, value).split(separator)]
       return [compile('\n' * (lineno - 1) + expr, filename, 'eval', FUTURE_DIVISION) for expr in exprs]
     return [compile(expr, '<string>', 'eval', FUTURE_DIVISION) for expr in default.split(separator)]
 
@@ -133,9 +136,19 @@ class Layer(ConfigGetMixin):
     self.yscaleexpr  = self.getexpr("yscale", "1.0")
     self.scale       = [1.0, 1.0]       #how much to scale it by (width, height from 0.0 - 1.0)
     
-    self.color       = list(self.engine.theme.hexToColor(self.get("color", str, "#FFFFFF")))
+    if self.config.has_option(section, "color"):
                                         #color of the image (#FFFFFF is white on text, on images it is full color)
-    
+      self.color   = list(self.engine.theme.hexToColor(self.get("color", str, "#FFFFFF")))
+      if len(self.color) == 3:
+        self.color.append(1.0)
+      self.r, self.g, self.b, self.a = [str(c) for c in self.color]
+    else:
+      self.r = self.getexpr("r", "1.0")
+      self.g = self.getexpr("g", "1.0")
+      self.b = self.getexpr("b", "1.0")
+      self.a = self.getexpr("a", "1.0")
+      self.color = [1.0,1.0,1.0,1.0]
+        
     self.condition   = True				#when should the image be shown (by default it will always be shown)
     
     self.alignment   = halign(self.get("alignment", str, "center"))
@@ -153,6 +166,9 @@ class Layer(ConfigGetMixin):
     self.position    = [float(eval(self.xposexpr)), float(eval(self.yposexpr))]
     self.angle       = float(eval(self.angleexpr))
     self.scale       = [float(eval(self.xscaleexpr)), float(eval(self.yscaleexpr))]
+    
+    self.color       = [float(eval(self.r)), float(eval(self.g)),
+                        float(eval(self.b)), float(eval(self.a))]
     
     #makes sure color has an alpha value to consider
     if len(self.color) == 3:
@@ -172,17 +188,21 @@ class ImageLayer(Layer):
 
     #these are the images that are drawn when the layer is visible
     self.drawing = self.engine.loadImgDrawing(self, None, drawing)
-    self.rectexpr = self.getexpr("rect", "(0,1,0,1)")
-    self.rect = eval(self.rectexpr) #how much of the image do you want rendered
+    self.rectexpr = self.getexpr("rect", "(0.0,1.0,0.0,1.0)")
+                                    #how much of the image do you want rendered
                                     # (left, right, top, bottom)
-    
+                                    
   def updateLayer(self, playerNum):
+    #don't try to update an image layer if the texture doesn't even exist
+    if not self.drawing:
+      return
+    
     w, h, = self.engine.view.geometry[2:4]
     texture = self.drawing
 
     super(ImageLayer, self).updateLayer(playerNum)
     
-    rect = self.rect = eval(self.rectexpr)
+    rect = self.rect = [float(i) for i in eval(self.rectexpr)]
     
     #all of this has to be repeated instead of using the base method
     #because now things can be calculated in relation to the image's properties
@@ -218,14 +238,15 @@ class ImageLayer(Layer):
     self.position = position
 
   def render(self, visibility, playerNum):
-    #don't try to render or update an image layer if the texture doesn't even exist
-    if not self.drawing:
-        return
         
     self.updateLayer(playerNum)
     for effect in self.effects:
       effect.update()
 
+    #don't try to render an image layer if the texture doesn't even exist
+    if not self.drawing:
+        return
+    
     coord      = self.position
     scale      = self.scale
     rot        = self.angle
@@ -350,6 +371,10 @@ class CircleLayer(ImageLayer):
       self.drawnOverlays[degrees] = dispOverlay
 
   def updateLayer(self, playerNum):
+    #don't try to update an image layer if the texture doesn't even exist
+    if not self.drawing:
+      return
+    
     ratio = eval(self.ratioexpr)
     self.ratio = ratio
     
@@ -358,14 +383,14 @@ class CircleLayer(ImageLayer):
   def render(self, visibility, playerNum):
     w, h, = self.stage.engine.view.geometry[2:4]
 
-    #don't try to render or update an image layer if the texture doesn't even exist
-    if not self.drawing:
-      return
-    
     self.updateLayer(playerNum)
     for effect in self.effects:
       effect.update()
 
+    #don't try to render image layer if the texture doesn't even exist
+    if not self.drawing:
+      return
+    
     coord     = self.position
     scale     = self.scale
     rot       = self.angle
@@ -418,10 +443,6 @@ class Slide(Effect):
         self.startCoord[1] /= vpc[1]
       if "endY" in self.inPixels:
         self.endCoord[1] /= vpc[1]
-      self.startCoord[1] *= .75
-      self.startCoord[1] = .75 - self.startCoord[1]
-      self.endCoord[1] *= .75
-      self.endCoord[1] = .75 - self.endCoord[1]
     else:
       if "startX" in self.inPixels:
         self.startCoord[0] *= w/vpc[0]
@@ -445,29 +466,38 @@ class Slide(Effect):
 
 
     self.position = self.startCoord[:]
+    #y position needs to be flipped initially
+    if isinstance(self.layer, FontLayer):
+      self.position[1] *= .75
+      self.position[1] = .75 - self.position[1]
     
     self.reverse = bool(eval(self.getexpr("reverse", "True")))
 
     #how long it takes for the transition to take place
     self.transitionTime = self.get("transitionTime", float, 512.0)
 
+    self.rates = [0,0]
     self.updateRates()
     
-    if isinstance(self.layer, FontLayer):
-      self.rates[0] *= -1
-      self.rates[1] *= -1
-       
-
+  #updates the rate at which the layer will slide
   def updateRates(self):
     t = self.transitionTime * (max(self.engine.clock.get_fps(), _minFPS)) / 1000.0
-    self.rates = [(self.endCoord[0] - self.startCoord[0])/t,
-                  (self.endCoord[1] - self.startCoord[1])/t]
-    
+    for i in range(2):
+      if self.endCoord[i] < self.startCoord[i]:
+        self.rates[i] = (self.startCoord[i] - self.endCoord[i])/t
+      else:
+        self.rates[i] = (self.endCoord[i] - self.startCoord[i])/t
+              
   def update(self):
     condition = bool(eval(self.condition))
 
+    #reverse the processing for font layer handling
+    if isinstance(self.layer, FontLayer):
+      self.position[1] = .75 - self.position[1]
+      self.position[1] /= .75
+
     self.updateRates()
-    
+        
     if condition:
       for i in range(2):
         if self.position[i] > self.endCoord[i]:
@@ -493,11 +523,15 @@ class Slide(Effect):
               self.position[i] += self.rates[i]
             else:
               self.position[i] = self.startCoord[i]
-        
       else:  
-        self.position = self.startCoord[:]
+        self.position = self.startCoord
         
-    self.layer.position = [self.position[0], self.position[1]]
+    #because of the y position being flipped on fonts it needs to be caught
+    if isinstance(self.layer, FontLayer):
+      self.position[1] *= .75
+      self.position[1] = .75 - self.position[1]
+    
+    self.layer.position = self.position[:]
 
 #fades the color of the layer between this color and its original
 #in a set period of time when the condition is met
@@ -512,13 +546,13 @@ class Fade(Effect):
     #the current color of the image
     self.currentColor = list(color)
     if len(self.currentColor) == 3:
-      self.currentColor.append(255.0)
+      self.currentColor.append(1.0)
     
     #the color to fade to
     color = list(self.engine.theme.hexToColor(self.get("fadeTo", str, "#FFFFFF")))
     #makes sure alpha is added
     if len(color) == 3:
-      color.append(255.0)
+      color.append(1.0)
     
     #the colors to alternate between
     self.colors = [color, self.currentColor]
@@ -533,7 +567,7 @@ class Fade(Effect):
 
   def updateRates(self):
     t = self.transitionTime * (max(self.engine.clock.get_fps(), _minFPS)) / 1000.0
-    self.rates = [(self.colors[0][i] - self.colors[1][i])*t 
+    self.rates = [(self.colors[0][i] - self.colors[1][i])/t 
                       for i in range(4)]
     
   def update(self):
@@ -568,7 +602,7 @@ class Replace(Effect):
       self.drawings  = []
       self.rects = []
       if not self.get("texture") == None:
-        texture   = self.get("texture").strip().split("|")
+        texture   = [t.strip() for t in self.get("texture").split("|")]
         for tex in texture:
           path   = os.path.join("themes", layer.stage.themename, "rockmeter", tex)
           drawing = self.engine.loadImgDrawing(self, None, path)
@@ -577,8 +611,8 @@ class Replace(Effect):
       if not self.get("rect") == None:
         rects = self.getexprs("rect", separator="|")
         for rect in rects:
-          self.rects.append(eval(rect))
-      self.rects.append(eval(layer.rect))
+          self.rects.append(rect)
+      self.rects.append(layer.rectexpr)
       self.type = "image"
     elif isinstance(layer, FontLayer):
       self.font = self.engine.data.fontDict[self.get("font")]
@@ -620,16 +654,16 @@ class Replace(Effect):
           if len(self.drawings) > 1:
             self.layer.drawing = self.drawings[i]
           if len(self.rects) > 1:
-            self.layer.rect = self.rects[i]
+            self.layer.rect = [float(i) for i in eval(self.rects[i])]
           self.fixScale()
         return
     if self.type == "font":
       self.layer.text = self.text[-1]
     else:
       if len(self.drawings) > 0:
-          self.layer.drawing = self.drawings[-1]
+        self.layer.drawing = self.drawings[-1]
       if len(self.rects) > 0:
-          self.layer.rect = self.rects[-1]
+        self.layer.rect = [float(i) for i in eval(self.rects[-1])]
       self.fixScale()
             
 #effect that allows one to set the number of frames and
@@ -653,13 +687,13 @@ class Animate(Effect):
         
   #adjusts the rate to the current fps
   def updateRate(self):
-    self.rate = self.transitionTime * (max(self.engine.clock.get_fps(), _minFPS)) / 1000.0
+    self.rate = float(self.frames) / (self.transitionTime * (max(self.engine.clock.get_fps(), _minFPS)) / 1000.0)
       
   def update(self):
     
     self.updateRate()
     
-    if self.condition and self.currentFrame < self.frames:
+    if bool(eval(self.condition)) and self.currentFrame < self.frames:
       self.currentFrame += self.rate
     else:
       self.currentFrame = 1
@@ -740,7 +774,7 @@ class Rockmeter(ConfigGetMixin):
       
   def createFont(self, section, number):
 
-    font  = self.get("font")
+    font  = self.get("font", str, "font")
     layer = FontLayer(self, section, font)
 
     layer.text      = self.getexpr("text")
@@ -808,7 +842,7 @@ class Rockmeter(ConfigGetMixin):
   #this updates all the usual global variables that are handled by the rockmeter
   #these are all player specific
   def updateVars(self, playerNum):
-    global score, rock, streak, streakMax, power, stars, partialStars, multiplier, player
+    global score, rock, streak, streakMax, power, stars, partialStars, multiplier, bassgroove, boost, player
     scene = self.scene
     player = scene.instruments[playerNum]
 
@@ -838,10 +872,21 @@ class Rockmeter(ConfigGetMixin):
     else:
       multiplier = int(streak*.1) + 1
 
+    boost = player.starPowerActive
+    
     #doubles the multiplier number when starpower is activated
-    if player.starPowerActive:
+    if boost:
       multiplier *= 2
-
+      
+    if player.isBassGuitar and streak >= 40:
+        bassgroove = True
+    else:
+        bassgroove = False
+        
+    #force bassgroove to false if it's not enabled
+    if not scene.bassGrooveEnabled:
+        bassgroove = False
+        
   def render(self, visibility):
     self.updateTime()
 

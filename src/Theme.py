@@ -155,9 +155,14 @@ class Theme(Task):
     #since the original Frets on Fire.  What glow_color allows you to do is set it so
     #the glow is either the color of the fret it's over or it can be the color the image
     #actually is (if the image is white then no matter what key is hit the glow will be white)
-    self.glowColor   = get("glow_color",       str,    "fret")
+    self.glowColor   = get("glow_color",       str,    "frets")
     if not self.glowColor == "frets":
-        self.glowColor = self.hexToColor(self.glowColor)
+      self.glowColor = self.hexToColor(self.glowColor)
+
+    #Acts similar to the glowColor but its does so for flames instead
+    self.flamesColor   = get("flames_color",       str,    "frets")
+    if not self.flamesColor == "frets":
+      self.flamesColor = self.hexToColor(self.flamesColor)
     
     #Note Colors (this applies to frets and notes)
     #default is green, red, yellow, blue, orange, purple (I don't know why there's a 6th color)
@@ -174,7 +179,19 @@ class Theme(Task):
     # Separate variables for hit and hold animation frame counts.
     self.HitFlameFrameLimit    = get("hit_flame_frame_limit",  int, 13)
     self.HoldFlameFrameLimit   = get("hold_flame_frame_limit", int, 16)
-    
+
+    #controls the size of the hitflames
+    self.hitFlameSize   = get("hit_flame_size", int, .075)
+
+    #controls the y position of the hitflames
+    self.hitFlameYPos   = get("hit_flame_y_position", int, .3)
+
+    #controls the size of the hitflame glows
+    self.holdFlameSize   = get("hold_flame_size", int, .075)
+
+    #controls the y position of the hitflames glows
+    self.holdFlameYPos   = get("hold_flame_y_position", int, 0)
+
     self.fretPress = get("fretPress", bool, False)
     
     #Point of View (x, y, z)

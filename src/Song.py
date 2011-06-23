@@ -207,12 +207,12 @@ class SongInfo(object):
   def __init__(self, infoFileName, songLibrary = DEFAULT_LIBRARY):
     self.songName      = os.path.basename(os.path.dirname(infoFileName))
     self.fileName      = infoFileName
-    self.libraryNam       = songLibrary[:]
+    self.libraryNam    = songLibrary[:]
     self.info          = Config.MyConfigParser()
     self._partDifficulties = {}
     self._parts        = None
     self._midiStyle    = None
-    self.highScores = {}
+    self.highScores    = {}
 
     self.locked = False
 
@@ -227,9 +227,6 @@ class SongInfo(object):
     except:
       pass
 
-    for part in self.getParts():
-      self.getScores(part)
-    
     self.logClassInits = Config.get("game", "log_class_inits")
     if self.logClassInits == 1:
       Log.debug("SongInfo class init (song.py): " + self.name)
@@ -253,6 +250,9 @@ class SongInfo(object):
       if self.logUneditedMidis == 1:
         Log.debug("notes-unedited.mid not found, using notes.mid - " + self.name)
     self.noteFileName = os.path.join(os.path.dirname(self.fileName), notefile)
+
+    for part in parts.values():
+      self.getScores(part)
     
     #stump: metadata caching
     if Config.get("performance", "cache_song_metadata"):
@@ -459,7 +459,7 @@ class SongInfo(object):
       for part in self._parts:
         self._partDifficulties[part.id] = difficulties.values()
     return self._parts
-
+    
   def getName(self):
     return self._get("name")
 
@@ -2335,13 +2335,9 @@ class Song(object):
   def setInstrumentVolume(self, volume, part):
     if self.singleTrackSong:
       self.setGuitarVolume(volume)
-    elif part == parts[GUITAR_PART]:
+    elif part == parts[GUITAR_PART] or part == parts[PRO_GUITAR_PART]:
       self.setGuitarVolume(volume)
-    # elif part == parts[BASS_PART]:
-      # self.setRhythmVolume(volume)
-    # elif part == parts[RHYTHM_PART]:
-      # self.setRhythmVolume(volume)
-    elif part == parts[DRUM_PART]:
+    elif part == parts[DRUM_PART] or part == parts[PRO_DRUM_PART]:
       self.setDrumVolume(volume)
     else:
       self.setRhythmVolume(volume)
@@ -2803,7 +2799,7 @@ class MidiReader(midi.MidiOutStream):
           self.useVocalTrack = True
         self.partnumber = part
         if self.logSections == 1:
-          tempText2 = name.replace(" ", "_")
+          tempText2 = text.replace(" ", "_")
         break	#should only have one instance of an instrument
         break   #end the searching
     
@@ -3277,7 +3273,7 @@ class MidiPartsDiffReader(midi.MidiOutStream):
 
     for part in parts.values():
       if text in part.trackName:
-        if part not in self.song.parts:
+        if part not in self.parts:
           if part.id == VOCAL_PART:
             self.parts.append(part)
             self.nextPart = None
@@ -3287,7 +3283,7 @@ class MidiPartsDiffReader(midi.MidiOutStream):
             self.nextPart = part
             self.currentPart = self.nextPart.id
             self.notesFound  = [0, 0, 0, 0]
-            if part.id == DRUM_PART:
+            if part.id == DRUM_PART or part.id == PRO_DRUM_PART:
 		      self._drumFound  = True  
           if self.logSections == 1:
             tempText2 = part.trackName[0].replace(" ", "_")
@@ -3390,11 +3386,11 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
 
     
   if practiceMode:    #single track practice mode only!
-    if part[0] == parts[GUITAR_PART] and guitarFile != None:
+    if (part[0] == parts[GUITAR_PART] or part[0] == parts[PRO_GUITAR_PART]) and guitarFile != None:
       songFile = guitarFile
     elif part[0] == parts[BASS_PART] and rhythmFile != None:
       songFile = rhythmFile
-    elif part[0] == parts[DRUM_PART] and drumFile != None:
+    elif (part[0] == parts[DRUM_PART] or part[0] == parts[PRO_DRUM_PART]) and drumFile != None:
       songFile = drumFile
     guitarFile = None
     rhythmFile = None
@@ -3419,11 +3415,11 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
     if drumFile:
       audioTrackCount += 1
     if audioTrackCount < 1:
-      if part[0] == parts[GUITAR_PART]:
+      if part[0] == parts[GUITAR_PART] or part[0] == parts[PRO_GUITAR_PART]:
         guitarFile = songFile
       elif part[0] == parts[BASS_PART]:
         rhythmFile = songFile
-      elif part[0] == parts[DRUM_PART]:
+      elif part[0] == parts[DRUM_PART] or part[0] == parts[PRO_DRUM_PART]:
         drumFile = songFile
       else:
         guitarFile = songFile

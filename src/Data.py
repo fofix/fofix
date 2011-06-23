@@ -251,10 +251,9 @@ class Data(object):
       self.loadSoundEffect(self, "crowdSound", os.path.join("sounds","crowdcheers.ogg"), crowd = True)
       self.cheerSoundFound = 1
       Log.warn(themename + "/sounds/crowdcheers.ogg not found -- using data/sounds/crowdcheers.ogg instead.")
-    else: #MFH: Fallback on starpower.ogg
-      self.loadSoundEffect(self, "crowdSound", os.path.join("themes",themename,"sounds","starpower.ogg"))
+    else:
       self.cheerSoundFound = 0
-      Log.warn(themename + "/sounds/crowdcheers.ogg not found -- using starpower.ogg instead.")
+      Log.warn("crowdcheers.ogg not found -- no crowd cheering.")
 
   def loadPartImages(self):
     self.partImages = []
