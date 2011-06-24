@@ -112,7 +112,8 @@ class GuitarScene(Scene):
     else:
       self.careerMode = False
 
-
+    if self.gameMode1p == 1:
+      self.practiceMode = True
     
     #MFH - check for party mode
     if self.gameMode2p == 2:
@@ -3111,12 +3112,7 @@ class GuitarScene(Scene):
 
   def rockmeterDecrease(self, playerNum, vScore = 0):
     i = playerNum
-    if self.instruments[i].isVocal:
-      rockMinusAmount = 500 * (3 - vScore)
-      self.rock[i] -= rockMinusAmount
-      if (not self.coOpRB) and (self.rock[i]/self.rockMax <= 0.667) and ((self.rock[i]+rockMinusAmount)/self.rockMax > 0.667): #akedrou
-        self.playersInGreen -= 1
-      return
+
     rockMinusAmount = 0 #akedrou - simplify the various incarnations of minusRock.
     if self.instruments[i].isDrum: 
       self.drumStart = True
@@ -3130,6 +3126,13 @@ class GuitarScene(Scene):
     if not self.failingEnabled or self.practiceMode:
       return
 
+    if self.instruments[i].isVocal:
+      rockMinusAmount = 500 * (3 - vScore)
+      self.rock[i] -= rockMinusAmount
+      if (not self.coOpRB) and (self.rock[i]/self.rockMax <= 0.667) and ((self.rock[i]+rockMinusAmount)/self.rockMax > 0.667): #akedrou
+        self.playersInGreen -= 1
+      return
+      
     if self.battle and self.numOfPlayers > 1: #battle mode
       if self.notesMissed[i]:
         self.minusRock[i] += self.minGain/self.multi[i]
