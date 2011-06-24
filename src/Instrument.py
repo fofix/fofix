@@ -949,6 +949,59 @@ class Instrument(object):
     if self.hitflamesAnim and self.HCount2 > self.HFrameLimit2:
       self.HCount2 = 0
 
+  #group rendering of 2D notes into method
+  def render3DNote(self, texture, model, color, isTappable):
+    if texture: 
+      glColor3f(1,1,1)
+      glEnable(GL_TEXTURE_2D)
+      texture.texture.bind()
+      glMatrixMode(GL_TEXTURE)
+      glScalef(1, -1, 1)
+      glMatrixMode(GL_MODELVIEW)
+      glScalef(self.boardScaleX, self.boardScaleY, 1)
+
+      if isTappable:
+        mesh = "Mesh_001"
+      else:
+        mesh = "Mesh"
+
+      model.render(mesh)
+
+      if shaders.enable("notes"):
+        shaders.setVar("isTextured",True)
+        model.render(mesh)
+        shaders.disable() 
+          
+      glMatrixMode(GL_TEXTURE)
+      glLoadIdentity()
+      glMatrixMode(GL_MODELVIEW)
+      glDisable(GL_TEXTURE_2D)
+
+    else:
+      #mesh = outer ring (black) 
+      #mesh_001 = main note (key color) 
+      #mesh_002 = top (spot or hopo if no mesh_003) 
+      #mesh_003 = hopo bump (hopo color)
+
+      #death_au: fixed 3D note colours
+      glColor4f(*color)
+      if shaders.enable("notes"):
+        shaders.setVar("isTextured",False)
+      model.render("Mesh_001")
+      shaders.disable()
+      glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
+      if isTappable:
+        if self.hopoColor[0] == -2:
+          glColor4f(*color)
+        else:
+          glColor3f(self.hopoColor[0], self.hopoColor[1], self.hopoColor[2])
+        if(model.find("Mesh_003")) == True:
+          model.render("Mesh_003")
+          glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
+      model.render("Mesh_002")
+      glColor3f(self.meshColor[0], self.meshColor[1], self.meshColor[2])
+      model.render("Mesh")
+
   def renderNote(self, length, sustain, color, tailOnly = False, isTappable = False, fret = 0, spNote = False, isOpen = False, spAct = False):
 
     if tailOnly:
@@ -999,12 +1052,8 @@ class Instrument(object):
     else: #3d Notes
       shaders.setVar("Material",color,"notes")
 
-      if self.isDrum:
-        self.notepos = self.engine.theme.drumnotepos
-        self.noterot = self.engine.theme.drumnoterot
-      else:
-        self.notepos = self.engine.theme.notepos
-        self.noterot = self.engine.theme.noterot
+      self.notepos = self.engine.theme.notepos
+      self.noterot = self.engine.theme.noterot
       
       if spNote == True and self.starMesh is not None:
         meshObj = self.starMesh
@@ -1023,69 +1072,21 @@ class Instrument(object):
         glRotatef(-90, 1, 0, 0)
 
       if fret >= 0 and fret <= 4:
-        glRotate(self.noterot[fret], 0, 0, 1), glTranslatef(0, self.notepos[fret], 0)
-      
-      if self.noteTex: 
-
+        glRotate(self.noterot[fret], 0, 0, 1)
+        glTranslatef(0, self.notepos[fret], 0)
+        
+      if self.notetex:
         if self.startex and spNote:
-          self.noteTex = getattr(self,"startex"+chr(97+fret))
-
+          texture = getattr(self,"startex"+chr(97+fret))
         elif self.staratex and self.starPowerActive:
-          self.noteTex = getattr(self,"staratex"+chr(97+fret))
-
-        elif self.notetex:
-          self.noteTex = getattr(self,"notetex"+chr(97+fret))
-
-        glColor3f(1,1,1)
-        glEnable(GL_TEXTURE_2D)
-        self.noteTex.texture.bind()
-        glMatrixMode(GL_TEXTURE)
-        glScalef(1, -1, 1)
-        glMatrixMode(GL_MODELVIEW)
-        glScalef(self.boardScaleX, self.boardScaleY, 1)
-
-        if isTappable:
-          mesh = "Mesh_001"
+          texture = getattr(self,"staratex"+chr(97+fret))
         else:
-          mesh = "Mesh"
-
-        meshObj.render(mesh)
-
-        if shaders.enable("notes"):
-          shaders.setVar("isTextured",True)
-          meshObj.render(mesh)
-          shaders.disable() 
-          
-        glMatrixMode(GL_TEXTURE)
-        glLoadIdentity()
-        glMatrixMode(GL_MODELVIEW)
-        glDisable(GL_TEXTURE_2D)
-
+          texture = getattr(self,"notetex"+chr(97+fret))
       else:
-        #mesh = outer ring (black) 
-        #mesh_001 = main note (key color) 
-        #mesh_002 = top (spot or hopo if no mesh_003) 
-        #mesh_003 = hopo bump (hopo color)
-
-        #death_au: fixed 3D note colours
-        glColor4f(*color)
-        if shaders.enable("notes"):
-          shaders.setVar("isTextured",False)
-        meshObj.render("Mesh_001")
-        shaders.disable()
-        glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
-        if isTappable:
-          if self.hopoColor[0] == -2:
-            glColor4f(*color)
-          else:
-            glColor3f(self.hopoColor[0], self.hopoColor[1], self.hopoColor[2])
-          if(meshObj.find("Mesh_003")) == True:
-            meshObj.render("Mesh_003")
-            glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
-        meshObj.render("Mesh_002")
-        glColor3f(self.meshColor[0], self.meshColor[1], self.meshColor[2])
-        meshObj.render("Mesh")
-
+        texture = None
+        
+      self.render3DNote(texture, meshObj, color, isTappable)
+        
       glDepthMask(0)
       glPopMatrix()
       glDisable(GL_DEPTH_TEST)
