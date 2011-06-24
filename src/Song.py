@@ -557,6 +557,12 @@ class SongInfo(object):
   @property
   def lyrics(self):
     return self._get("lyrics")
+    
+  @property
+  #because of how RB3 pro drums are formatted, this tag
+  #detects a way to properly read the cymbals notes in the midi
+  def prodrum(self):
+    return self._get("pro_drum")
 
   def getHighscoresWithPartString(self, difficulty, part = str(parts[GUITAR_PART])):
     return self.getHighscores(difficulty, part)
