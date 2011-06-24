@@ -434,6 +434,18 @@ class Instrument(object):
       else:
         engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
         
+      self.noteTexCoord = [[np.array([[i/float(self.strings), s/6.0],
+                                     [(i+1)/float(self.strings), s/6.0],
+                                     [i/float(self.strings), (s+1)/6.0],
+                                     [(i+1)/float(self.strings), (s+1)/6.0]], 
+                                     dtype=np.float32)
+                            for i in range(self.strings)] for s in range(6)]
+      self.animatedNoteTexCoord = [[np.array([[i/float(self.strings), s/float(self.noteSpinFrames)],
+                                     [(i+1)/float(self.strings), s/float(self.noteSpinFrames)],
+                                     [i/float(self.strings), (s+1)/float(self.noteSpinFrames)],
+                                     [(i+1)/float(self.strings), (s+1)/float(self.noteSpinFrames)]], 
+                                     dtype=np.float32)
+                            for i in range(self.strings)] for s in range(self.noteSpinFrames)]  
     else:
       defaultNote = False
 
@@ -971,50 +983,39 @@ class Instrument(object):
         size = (self.boardWidth/self.strings/2, self.boardWidth/self.strings/2)
         if self.isDrum:
           fret -= 1
-        texSize = (fret/self.lanenumber,fret/self.lanenumber+1/self.lanenumber)
-        if spNote == True:
-          if isTappable:
-            if self.noteAnimatedPowerHOPO:
-              noteImage = self.noteAnimatedPowerHOPO
-              texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
-            else:
-              texY = (3*0.166667, 4*0.166667)
-          else:
-            if self.noteAnimatedPower:
-              noteImage = self.noteAnimatedPower
-              texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
-            else:
-              texY = (2*0.166667, 3*0.166667)
-
+          
+        y = 0
+        if spNote:
+          y += 2
         elif self.starPowerActive:
+            y += 4
+        if isTappable:
+            y += 1
+        
+        if self.noteSpin:
+          texCoord = self.animatedNoteTexCoord[self.noteSpinFrameIndex][fret]
           if isTappable:
-            if self.noteAnimatedPowerActiveHOPO:
+            if spNote:
+              noteImage = self.noteAnimatedPowerHOPO
+            elif self.starPowerActive:
               noteImage = self.noteAnimatedPowerActiveHOPO
-              texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
             else:
-              texY = (5*0.166667, 1)
-          else:
-            if self.noteAnimatedPowerActive:
-              noteImage = self.noteAnimatedPowerActive
-              texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
-            else:
-              texY = (4*0.166667, 5*0.166667)
-
-        else:
-          if isTappable:
-            if self.noteAnimatedHOPO:
               noteImage = self.noteAnimatedHOPO
-              texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
-            else:
-              texY = (1*0.166667, 2*0.166667)
           else:
-            if self.noteAnimatedNormal:
-              noteImage = self.noteAnimatedNormal
-              texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
+            if spNote:
+              noteImage = self.noteAnimatedPower
+            elif self.starPowerActive:
+              noteImage = self.noteAnimatedPowerActive
             else:
-              texY = (0, 1*0.166667)
-
-      self.engine.draw3Dtex(noteImage, vertex = (-size[0],size[1],size[0],-size[1]), texcoord = (texSize[0],texY[0],texSize[1],texY[1]),
+              noteImage = self.noteAnimatedNormal             
+          if not noteImage:
+            noteImage = self.noteButtons
+            texCoord = self.noteTexCoord[y][fret]
+        else:
+          noteImage = self.noteButtons
+          texCoord = self.noteTexCoord[y][fret]
+          
+      self.engine.draw3Dtex(noteImage, vertex = (-size[0],size[1],size[0],-size[1]), texcoord = texCoord,
                             scale = (1,1,0), rot = (30,1,0,0), multiples = False, color = color, vertscale = .27)
 
     else: #3d Notes
