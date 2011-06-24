@@ -959,19 +959,21 @@ class GameEngine(object):
     if depth == True:
       glDepthMask(1)
 
-    triangVtx = np.array(
+    if not isinstance(vertex, np.ndarray):
+      vertex = np.array(
         [[ vertex[0],  vertscale, vertex[1]],
          [ vertex[2],  vertscale, vertex[1]],
          [ vertex[0], -vertscale, vertex[3]],
          [ vertex[2], -vertscale, vertex[3]]], dtype=np.float32)
-
-    textriangVtx = np.array(
+    
+    if not isinstance(texcoord, np.ndarray):
+      texcoord = np.array(
         [[texcoord[0], texcoord[1]],
          [texcoord[2], texcoord[1]],
          [texcoord[0], texcoord[3]],
          [texcoord[2], texcoord[3]]], dtype=np.float32)
-
-    cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=triangVtx, colors=col_array, texcoords=textriangVtx)
+    
+    cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=vertex, colors=col_array, texcoords=texcoord)
     
     if depth == True:
       glDepthMask(0)
