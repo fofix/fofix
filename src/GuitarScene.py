@@ -88,7 +88,8 @@ class GuitarScene(Scene):
     phrase = self.sinfo.loadingPhrase
     if phrase == "":
       phrase = random.choice(self.engine.theme.loadingPhrase)
-    splash = Dialogs.showLoadingSplashScreen(self.engine, phrase + " \n " + _("Initializing...")) 
+    #splash = Dialogs.showLoadingSplashScreen(self.engine, phrase + " \n " + _("Initializing...")) 
+    splash = Dialogs.showSongLoadingSplashScreen(self.engine, songName, libraryName, phrase + " \n " + _("Initializing..."))
     Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Initializing..."))
       
 
