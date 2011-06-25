@@ -2092,9 +2092,10 @@ class SongLoadingSplashScreen(LoadingSplashScreen):
   def __init__(self, engine, text, songName, libraryName):
     super(SongLoadingSplashScreen, self).__init__(engine, text)
     
-    self.engine.loadImgDrawing(self, "loadingImg", os.path.join("themes", self.engine.data.themeLabel, "loading_overlay.png"))
     self.engine.loadImgDrawing(self, "songBack", os.path.join(libraryName, songName, "loading.png"))
-    print self.songBack
+    if self.songBack:
+      self.engine.loadImgDrawing(self, "loadingImg", os.path.join("themes", self.engine.data.themeLabel, "loading_overlay.png"))
+          
   def render(self, visibility, topMost):
     self.engine.view.setViewport(1,0)
     font = self.engine.data.loadingFont   #MFH - new font support
