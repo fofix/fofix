@@ -479,9 +479,13 @@ class Slide(Effect):
     self.rates = [0,0]
     self.updateRates()
     
+    self.counter = 0
+    self.countrate = 0
+    
   #updates the rate at which the layer will slide
   def updateRates(self):
     t = self.transitionTime * (max(self.engine.clock.get_fps(), _minFPS)) / 1000.0
+    self.countrate = 1.0/t
     for i in range(2):
       if self.endCoord[i] < self.startCoord[i]:
         self.rates[i] = (self.startCoord[i] - self.endCoord[i])/t
@@ -510,6 +514,11 @@ class Slide(Effect):
             self.position[i] += self.rates[i]
           else:
             self.position[i] = self.endCoord[i]
+      if self.counter >= 1.0:
+        self.position = self.endCoord[:]
+        self.counter = 1.0
+      else:
+        self.counter += self.countrate
     else:
       if self.reverse:
         for i in range(2):
@@ -523,8 +532,14 @@ class Slide(Effect):
               self.position[i] += self.rates[i]
             else:
               self.position[i] = self.startCoord[i]
+        if self.counter <= 0.0:
+          self.position = self.startCoord[:]
+          self.counter = 0.0
+        else:
+          self.counter -= self.countrate
       else:  
-        self.position = self.startCoord
+        self.position = self.startCoord[:]
+        self.counter = 0.0
         
     #because of the y position being flipped on fonts it needs to be caught
     if isinstance(self.layer, FontLayer):
