@@ -467,6 +467,7 @@ class IncrementEffect(Effect):
   def updateValues(self):
     condition = bool(eval(self.condition))
     if condition:
+      #slides to the end position
       for i in range(len(self.start)):
         if self.current[i] > self.end[i]:
           if self.end[i] < self.start[i]:
@@ -478,7 +479,10 @@ class IncrementEffect(Effect):
             self.current[i] += self.rates[i]
           else:
             self.current[i] = self.end[i]
+      if self.counter >= 1.0:
+        self.current = self.end[:]
     else:
+      #slides back to original position smoothly
       if self.reverse:
         for i in range(len(self.start)):
           if self.current[i] > self.start[i]:
@@ -490,8 +494,10 @@ class IncrementEffect(Effect):
             if self.end[i] < self.start[i]:
               self.current[i] += self.rates[i]
             else:
-              self.current[i] = self.startCoord[i]
-      else:  
+              self.current[i] = self.start[i]
+        if self.counter <= 0.0:
+          self.current = self.start[:]
+      else:  #instant jump to starting value
         self.current = self.start[:]
         self.counter = 0.0
         
@@ -512,6 +518,12 @@ class IncrementEffect(Effect):
         self.counter = 0.0
         return False
       return True
+    
+  #basic updating for the effect
+  def update(self):
+    self.updateRates()
+    self.updateValues()
+    self.updateCounter()
     
 #slides the layer from one spot to another
 #in a set period of time when the condition is met
@@ -564,25 +576,26 @@ class Slide(IncrementEffect):
     #y position needs to be flipped initially
     if isinstance(self.layer, FontLayer):
       self.current[1] *= .75
-      self.current[1] = .75 - self.position[1]
+      self.current[1] = .75 - self.current[1]
     
     self.reverse = bool(eval(self.getexpr("reverse", "True")))
 
-  def update(self):
+  def updateValues(self):
     #reverse the processing for font layer handling
     if isinstance(self.layer, FontLayer):
       self.current[1] = .75 - self.current[1]
       self.current[1] /= .75
 
-    self.updateRates()
-    self.updateValues()
-    self.updateCounter()
-            
+    super(Slide, self).updateValues()
+
     #because of the y position being flipped on fonts it needs to be caught
     if isinstance(self.layer, FontLayer):
       self.current[1] *= .75
       self.current[1] = .75 - self.current[1]
     
+  def update(self):
+    super(Slide, self).update()
+                
     self.layer.position = self.current[:]
 
 #fades the color of the layer between this color and its original
@@ -616,11 +629,9 @@ class Fade(IncrementEffect):
     self.reverse = bool(eval(self.getexpr("reverse", "True")))
     
   def update(self):
-    self.updateRates()
-    self.updateValues()
-    self.updateCounter()
+    super(Fade, self).update()
     
-    self.layer.color = self.current
+    self.layer.color = self.current[:]
 
 #replaces the image of the layer when the condition is met
 class Replace(Effect):
