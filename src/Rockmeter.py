@@ -850,24 +850,20 @@ class Rockmeter(ConfigGetMixin):
 
   def loadLayerFX(self, layer, section):
     section = section.split(":")[0]
-    types = ["Slide", "Rotate", "Replace", "Fade", "Animate"]
+    types = {"Slide": "Slide(layer, fxsection)",
+             "Rotate": "Rotate(layer, fxsection)",
+             "Replace": "Replace(layer, fxsection)",
+             "Fade": "Fade(layer, fxsection)",
+             "Animate": "Animate(layer, fxsection)",
+             "Scale": "Scale(layer, fxsection)"}
     for i in range(5):  #maximum of 5 effects per layer
-      for t in types:
+      for t in types.keys():
         fxsection = "%s:fx%d:%s" % (section, i, t)
         if not self.config.has_section(fxsection):
           continue
         else:
-          if t == types[0]:
-            layer.effects.append(Slide(layer, fxsection))
-#          elif t == types[1]:
-#            layer.effects.append(Rotate(layer, fxsection))
-          elif t == types[2]:
-            layer.effects.append(Replace(layer, fxsection))
-          elif t == types[3]:
-            layer.effects.append(Fade(layer, fxsection))
-          else:
-            layer.effects.append(Animate(layer, fxsection))
-          break #only allow type per effect number
+          layer.effects.append(eval(types[t]))
+          break
             
       
   def createFont(self, section, number):
