@@ -599,6 +599,63 @@ class Slide(IncrementEffect):
                 
     self.layer.position = self.current[:]
 
+#smoothly scales the layer from one size to another
+#in a set period of time when the condition is met
+class Scale(IncrementEffect):
+  def __init__(self, layer, section):
+    super(Scale, self).__init__(layer, section)
+
+    w, h, = self.engine.view.geometry[2:4]
+    self.start = [eval(self.getexpr("startX", "0.0")), eval(self.getexpr("startY", "0.0"))]
+                                                                #starting dimensions of the image
+    self.end   = [eval(self.getexpr("endX",   "0.0")), eval(self.getexpr("endY",   "0.0"))]
+                                                                #ending dimensions of the image
+    
+    self.current = self.start[:]
+    
+    self.inPixels  = self.get("inPixels", str, "").split("|")   #variables in terms of pixels
+
+    self.transitionTime = self.get("transitionTime", float, 512.0)
+    self.condition = self.getexpr("condition", "True")
+    self.reverse = bool(eval(self.getexpr("reverse", "True")))
+
+    self.fixedScale = isinstance(self.layer, ImageLayer)
+
+  def fixScale(self):
+    w, h, = self.engine.view.geometry[2:4]
+    
+    self.start[0] *=  (self.layer.rect[1] - self.layer.rect[0])
+    self.start[1] *=  (self.layer.rect[3] - self.layer.rect[2])
+    self.end[0] *=  (self.layer.rect[1] - self.layer.rect[0])
+    self.end[1] *=  (self.layer.rect[3] - self.layer.rect[2])
+    
+    if "startX" in self.inPixels:
+      self.start[0] /= self.layer.drawing.pixelSize[0]
+    if "startY" in self.inPixels:
+      self.start[1] /= self.layer.drawing.pixelSize[1]
+    if "endX" in self.inPixels:
+      self.end[0] /= self.layer.drawing.pixelSize[0]
+    if "endY" in self.inPixels:
+      self.end[1] /= self.layer.drawing.pixelSize[1]
+
+    self.start[1] *= -1
+    self.end[1] *= -1
+    self.start[0] *= w/vpc[0]
+    self.end[0] *= w/vpc[0]
+    self.start[1] *= h/vpc[1]
+    self.end[1] *= h/vpc[1]
+    
+    self.current = self.start[:]
+      
+  def update(self):
+    if not self.fixedScale:
+      self.fixScale()
+      self.fixedScale = True
+      
+    super(Scale, self).update()
+    
+    self.layer.scale = self.current[:]
+
 #fades the color of the layer between this color and its original
 #in a set period of time when the condition is met
 class Fade(IncrementEffect):
