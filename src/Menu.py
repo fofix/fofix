@@ -91,7 +91,7 @@ class Choice:
       return "%s: %s" % (self.text, self.values[self.valueIndex])
           
 class Menu(Layer, KeyListener):
-  def __init__(self, engine, choices, name = None, onClose = None, onCancel = None, pos = (.2, .66 - .35), viewSize = 6, fadeScreen = False, font = "font", mainMenu = None, textColor = None, selectedColor = None, append_submenu_char = True, selectedIndex = None, showTips = True, selectedBox = False):
+  def __init__(self, engine, choices, name = None, onClose = None, onCancel = None, pos = (.2, .31), viewSize = 6, fadeScreen = False, font = "font", mainMenu = None, textColor = None, selectedColor = None, append_submenu_char = True, selectedIndex = None, showTips = True, selectedBox = False):
     self.engine       = engine
 
     self.logClassInits = self.engine.config.get("game", "log_class_inits")
@@ -425,8 +425,6 @@ class Menu(Layer, KeyListener):
           glRotate(v * 45, 0, 0, 1)
 
           scale = self.engine.theme.settingsmenuScale
-          if self.mainMenu and self.theme < 2 and i % 2 == 1:#8bit
-              scale = 0.0016
 
           w, h = font.getStringSize(" ", scale = scale)
 
