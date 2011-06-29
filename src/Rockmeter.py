@@ -192,7 +192,7 @@ class ImageLayer(Layer):
     self.rectexpr = self.getexpr("rect", "(0.0,1.0,0.0,1.0)")
                                     #how much of the image do you want rendered
                                     # (left, right, top, bottom)
-                                    
+    self.rect = [0.0,1.0,0.0,1.0]
   def updateLayer(self, playerNum):
     #don't try to update an image layer if the texture doesn't even exist
     if not self.drawing:
@@ -219,7 +219,7 @@ class ImageLayer(Layer):
     if "yscale" in self.inPixels:
       scale[1] /= texture.pixelSize[1]
 
-    scale[1] = -scale[1]
+    scale[1] *= -1
     scale[0] *= w/vpc[0]
     scale[1] *= h/vpc[1]
     
@@ -480,7 +480,7 @@ class IncrementEffect(Effect):
             self.current[i] += self.rates[i]
           else:
             self.current[i] = self.end[i]
-      if self.counter >= 1.0:
+      if self.counter >= self.transitionTime:
         self.current = self.end[:]
     else:
       #slides back to original position smoothly
@@ -509,8 +509,8 @@ class IncrementEffect(Effect):
     condition = bool(eval(self.condition))
     if condition:
       self.counter += self.countRate
-      if self.counter >= 1.0:
-        self.counter = 1.0
+      if self.counter >= self.transitionTime:
+        self.counter = self.transitionTime
         return False
       return True
     else:
@@ -532,15 +532,12 @@ class Slide(IncrementEffect):
   def __init__(self, layer, section):
     super(Slide, self).__init__(layer, section)
 
+    w, h, = self.engine.view.geometry[2:4]
     self.start = [eval(self.getexpr("startX", "0.0")), eval(self.getexpr("startY", "0.0"))]
                                                                 #starting position of the image
     self.end   = [eval(self.getexpr("endX",   "0.0")), eval(self.getexpr("endY",   "0.0"))]
                                                                 #ending position of the image
     self.inPixels  = self.get("inPixels", str, "").split("|")   #variables in terms of pixels
-
-    self.condition = self.getexpr("condition", "True")
-    
-    w, h, = self.engine.view.geometry[2:4]
 
     if isinstance(self.layer, FontLayer):
       if "startX" in self.inPixels:
@@ -579,7 +576,9 @@ class Slide(IncrementEffect):
       self.current[1] *= .75
       self.current[1] = .75 - self.current[1]
     
-    self.reverse = bool(eval(self.getexpr("reverse", "True")))
+    self.reverse = bool(eval(self.getexpr("reverse", "True")))    
+    self.condition = self.getexpr("condition", "True")    
+    self.transitionTime = self.get("transitionTime", float, 512.0)
 
   def updateValues(self):
     #reverse the processing for font layer handling
@@ -678,11 +677,7 @@ class Fade(IncrementEffect):
     #the current color of the image
     self.current = self.start[:]
     
-    #how long it takes for the transition to take place
     self.transitionTime = self.get("transitionTime", float, 512.0)
-
-    self.updateRates()
-    
     self.condition = self.getexpr("condition", "True")
     self.reverse = bool(eval(self.getexpr("reverse", "True")))
     
