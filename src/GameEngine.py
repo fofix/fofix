@@ -179,6 +179,8 @@ Config.define("game",   "lyric_mode",           int,   2,   text = _("Script Lyr
 Config.define("game",   "frets_under_notes",          bool, True,  text = _("Frets Under Notes"), options = {False: _("No"), True: _("Yes")}, tipText = _("Sets whether the notes slide under the frets or over them."))
 Config.define("game",   "drum_navigation",          bool, True,  text = _("Drum Navigation"), options = {False: _("Off"), True: _("On")}, tipText = _("If enabled, drum keys will be allowed to navigate menus. If not, only guitar keys and keyboard master keys will."))
 
+Config.define("game", "decimal_places",      int, 1,  text = _("Stat Decimal Places"), options = dict([(n, n) for n in range(0, 3)]), tipText = _("Determines how many decimal places will be noted in displaying stats."))
+ 
 Config.define("game",   "ignore_open_strums",          bool, True,  text = _("Ignore Open Strums"), options = {False: _("No"), True: _("Yes")}, tipText = _("If enabled, strumming without holding any frets down won't be counted."))
 Config.define("performance",   "static_strings",          bool, True,  text = _("Static Strings"), options = {False: _("No"), True: _("Yes")}, tipText = _("If enabled, the 'strings' on your fretboard will not scroll."))
 Config.define("game",   "whammy_saves_starpower",          bool, False,  text = _("Effects Save SP"), options = {False: _("No"), True: _("Yes")}, tipText = _("If enabled, whammying while in SP will slow down its decrease. And your score will be handicapped by 5%."))

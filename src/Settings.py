@@ -711,6 +711,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(self.engine, self.engine.config, "game", "bass_groove_enable", autoApply = True, isQuickset = 2),#myfingershurt
       ConfigChoice(self.engine, self.engine.config, "game", "mark_solo_sections", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "game", "lphrases", autoApply = True),#blazingamer
+      ConfigChoice(self.engine, self.engine.config, "game", "decimal_places", autoApply = True), #MFH
       ConfigChoice(self.engine, self.engine.config, "game", "ignore_open_strums", autoApply = True),      #myfingershurt
       ConfigChoice(self.engine, self.engine.config, "game", "big_rock_endings", autoApply = True, isQuickset = 2),#myfingershurt
       ConfigChoice(self.engine, self.engine.config, "game", "starpower_mode", autoApply = True),#myfingershurt
